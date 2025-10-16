@@ -16,6 +16,7 @@
 // std header
 #include <list>
 #include <string>
+#include <optional>
 #include <functional>
 
 class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler {
@@ -47,7 +48,7 @@ public:
 
 	// Private: Callback action handler
 
-private:
+//private:
 
 	void handleSetProjectEntitySelected();
 	void handleProjectSelected(ot::JsonDocument& _doc);
@@ -75,6 +76,13 @@ private:
 	// Private: Helper
 
 	void updateButtonStates();
+
+	//! @brief Returns the parent entity to add a new entity to.
+	//! @return The parent entity information or an empty optional if no valid parent could be determined.
+	std::optional<ot::EntityInformation> getParentEntityToAdd();
+
+	std::list<ot::EntityInformation> getProjectsToOpen();
+
 	ot::ReturnMessage requestToOpenProject(const ot::EntityInformation& _entity);
 
 	// ###########################################################################################################################################################################################################################################################################################################################

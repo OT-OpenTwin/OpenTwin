@@ -287,8 +287,7 @@ bool AppBase::logIn() {
 	OTAssert(loginDia.getLoginData().isValid(), "Invalid login data...");
 
 	m_loginData = loginDia.getLoginData();
-	StartArgumentParser args = loginDia.getStartArgs();
-
+	
 	ot::LogDispatcher::instance().setUserName(m_loginData.getUserName());
 
 	this->startSessionRefreshTimer();
@@ -355,10 +354,14 @@ bool AppBase::logIn() {
 	m_shortcutManager = new ShortcutManager;
 
 	// Now check whether a project was specified in the start arguments
-	if (args.getOpenProjectSet()) {
-		QString projName = QString::fromStdString(args.getProjectInfo().getProjectName());
-		QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, projName);
+	StartArgumentParser args;
+	if (args.parse()) {
+		if (args.getOpenProjectSet()) {
+			QString projName = QString::fromStdString(args.getProjectInfo().getProjectName());
+			QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, projName);
+		}
 	}
+	OT_LOG_T("1");
 	return true;
 }
 
@@ -2260,16 +2263,23 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo) {
 	StartArgumentParser args;
 	args.setLogInData(m_loginData);
 	args.setProjectInfo(_projectInfo);
-	if (!args.exportConfig()) {
-		OT_LOG_EA("Failed to export start arguments");
-		return false;
-	}
-
+	//args.setDebug();
+	
 	QString appPath = QCoreApplication::applicationFilePath();
 
+	QStringList arguments = args.createCommandLineArgs();
+	arguments.push_front(appPath);
+
 	// Start new instance
-	appendInfoMessage("Opening project \"" + QString::fromStdString(_projectInfo.getProjectName()) + "\" in new instance...\n");
-	return QProcess::startDetached(appPath, QStringList(), QDir::currentPath());
+	HANDLE handle = nullptr;
+	auto isOk = ot::SystemProcess::runApplication(appPath.toStdString(), arguments.join(' ').toStdString(), handle, ot::SystemProcess::AboveNormalPriority | ot::SystemProcess::DetachedProcess | ot::SystemProcess::UseUnicode).isOk();
+	//auto isOk = ot::SystemProcess::runApplication(appPath.toStdString(), arguments.join(' ').toStdString(), handle, ot::SystemProcess::DefaultFlags | ot::SystemProcess::DetachedProcess).isOk();
+	if (handle) {
+		CloseHandle(handle);
+	}
+	return isOk;
+	
+	//return QProcess::startDetached(appPath, arguments, QDir::currentPath());
 }
 
 void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _pos) {
@@ -3146,12 +3156,12 @@ void AppBase::slotOpenProject() {
 }
 
 void AppBase::slotOpenSpecificProject(QString _projectName) {
-
+	OT_LOG_T("2");
 	// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 	if (!checkForContinue("Open Project")) {
 		return;
 	}
-
+	OT_LOG_T("3");
 	const std::string& selectedProjectName = _projectName.toStdString();
 	bool canBeDeleted = false;
 	ProjectManagement projectManager(m_loginData);

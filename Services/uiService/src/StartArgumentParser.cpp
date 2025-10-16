@@ -7,93 +7,119 @@
 #include "StartArgumentParser.h"
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTCore/LogDispatcher.h"
 
 // Qt header
-#include <qtcore/qfile.h>
-#include <QtCore/qstandardpaths.h>
+#include <QtCore/qcommandlineparser.h>
 
-bool StartArgumentParser::importConfig() {
+bool StartArgumentParser::parse() {
 	// Reset data
+	m_debug = false;
 	m_logIn = false;
 	m_openProject = false;
 
 	m_loginData = LoginData();
 	m_projectInfo = ot::ProjectInformation();
 
-	// Read data
-	const QString tempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	const QString filePath = tempPath + "/OpenTwinFrontendStartupData.otdat";
+	// Prepare parser
+	QCommandLineParser parser;
+	parser.setApplicationDescription("OpenTwin Frontend");
+	parser.addHelpOption();
 
-	QFile file(filePath);
-	if (!file.exists()) {
-		return true;
+	// Define command line options
+	QCommandLineOption debugOption("debug", "Run test code.");
+	parser.addOption(debugOption);
+
+	QCommandLineOption checkGraphicsOption({ "c", "checkgraphics"}, "Check the graphics settings.");
+	parser.addOption(checkGraphicsOption);
+
+	QCommandLineOption loginOption("login",
+		"Login with JSON data.",
+		"string");
+	parser.addOption(loginOption);
+
+	QCommandLineOption openProjectOption("openproject",
+		"Open project with JSON data.",
+		"string");
+	parser.addOption(openProjectOption);
+
+	// Process the actual command line arguments
+	parser.process(*QCoreApplication::instance());
+
+	// Check for debug option
+	if (parser.isSet(debugOption)) {
+		m_debug = true;
 	}
 
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		OT_LOG_E("Failed to open temporary file for reading: \"" + filePath.toStdString() + "\"");
-		return false;
+	// Check for graphics check option
+	if (parser.isSet(checkGraphicsOption)) {
+		m_checkGraphics = true;
 	}
 
-	QByteArray fileContent = file.readAll();
-	file.close();
+	// Check for login option
+	if (parser.isSet(loginOption)) {
+		const QString loginDataStr = parser.value(loginOption);
+		std::string decoded = ot::String::fromHex(loginDataStr.toStdString());
+		if (decoded.empty()) {
+			OT_LOG_E("Login option set but no data provided");
+			return false;
+		}
 
-	// Check for empty file
-	if (fileContent.isEmpty()) {
-		return true;
+		ot::JsonDocument doc;
+		if (!doc.fromJson(decoded)) {
+			OT_LOG_E("Failed to parse login data from command line argument");
+			return false;
+		}
+
+		m_loginData.setFromRequiredDataJson(doc.getConstObject());
+		m_logIn = true;
 	}
 
-	// Parse data
-	ot::JsonDocument doc;
-	if (!doc.fromJson(fileContent.toStdString())) {
-		OT_LOG_E("Failed to parse temporary file content: \"" + filePath.toStdString() + "\"");
-		return false;
-	}
-
-	m_logIn = ot::json::getBool(doc, "LogIn", false);
-	if (m_logIn) {
-		m_loginData.setFromRequiredDataJson(ot::json::getObject(doc, "LoginData"));
-	}
-	m_openProject = ot::json::getBool(doc, "OpenProject", false);
-	if (m_openProject) {
-		m_projectInfo.setFromJsonObject(ot::json::getObject(doc, "ProjectData"));
-	}
-	
-	// Remove file
-	if (!QFile::remove(filePath)) {
-		OT_LOG_W("Failed to remove temporary file: \"" + filePath.toStdString() + "\"");
+	// Check for open project option
+	if (parser.isSet(openProjectOption)) {
+		const QString projectDataStr = parser.value(openProjectOption);
+		std::string decoded = ot::String::fromHex(projectDataStr.toStdString());
+		if (decoded.empty()) {
+			OT_LOG_E("Open project option set but no data provided");
+			return false;
+		}
+		ot::JsonDocument doc;
+		if (!doc.fromJson(decoded)) {
+			OT_LOG_E("Failed to parse project data from command line argument");
+			return false;
+		}
+		m_projectInfo.setFromJsonObject(doc.getConstObject());
+		m_openProject = true;
 	}
 
     return true;
 }
 
-bool StartArgumentParser::exportConfig() const {
-	// Create config
-	ot::JsonDocument doc;
+QStringList StartArgumentParser::createCommandLineArgs() const {
+	QStringList args;
 
-	doc.AddMember("LogIn", m_logIn, doc.GetAllocator());
-	ot::JsonObject logInObj;
-	m_loginData.addRequiredDataToJson(logInObj, doc.GetAllocator());
-	doc.AddMember("LoginData", logInObj, doc.GetAllocator());
-
-	doc.AddMember("OpenProject", m_openProject, doc.GetAllocator());
-	doc.AddMember("ProjectData", ot::JsonObject(m_projectInfo, doc.GetAllocator()), doc.GetAllocator());
-
-	// Write data
-	const QString tempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	const QString filePath = tempPath + "/OpenTwinFrontendStartupData.otdat";
-
-	QFile file(filePath);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
-		OT_LOG_E("Failed to open temporary file for writing: \"" + filePath.toStdString() + "\"");
-		return false;
+	if (m_checkGraphics) {
+		args << "--debug";
 	}
 
-	file.write(QByteArray::fromStdString(doc.toJson()));
-	file.close();
-	return true;
-}
+	if (m_checkGraphics) {
+		args << "--checkgraphics";
+	}
 
-StartArgumentParser::StartArgumentParser() : 
-	m_logIn(false), m_openProject(false) 
-{}
+	if (m_logIn) {
+		ot::JsonDocument doc;
+		m_loginData.addRequiredDataToJson(doc, doc.GetAllocator());
+		std::string encoded = ot::String::toHex(doc.toJson());
+		args << "--login" << QString::fromStdString(encoded);
+	}
+	
+	if (m_openProject) {
+		ot::JsonDocument doc;
+		m_projectInfo.addToJsonObject(doc, doc.GetAllocator());
+		std::string encoded = ot::String::toHex(doc.toJson());
+		args << "--openproject" << QString::fromStdString(encoded);
+	}
+
+	return args;
+}

@@ -197,12 +197,19 @@ LogInDialog::~LogInDialog() {
 }
 
 void LogInDialog::initialize() {
+	StartArgumentParser parser;
+
 	// Check if we have to restore a login
-	if (!m_startArgs.importConfig()) {
+	if (!parser.parse()) {
 		return;
 	}
 
-	if (m_startArgs.getLogInSet()) {
+	if (parser.getDebug()) {
+		QMessageBox msg(QMessageBox::Information, "Debug", "Debug mode was requeted and is now enabled for this instance!", QMessageBox::Ok);
+		msg.exec();
+	}
+
+	if (parser.getLogInSet()) {
 		{
 			QSignalBlocker textBlock(m_password);
 			m_password->setText(LOG_IN_RESTOREDPASSWORD_PLACEHOLDER);
@@ -210,11 +217,11 @@ void LogInDialog::initialize() {
 		m_state |= LogInStateFlag::RestoredPassword;
 
 		// Apply password and username
-		m_restoredPassword = QString::fromStdString(m_startArgs.getLogInData().getEncryptedUserPassword());
-		m_username->setText(QString::fromStdString(m_startArgs.getLogInData().getUserName()));
+		m_restoredPassword = QString::fromStdString(parser.getLogInData().getEncryptedUserPassword());
+		m_username->setText(QString::fromStdString(parser.getLogInData().getUserName()));
 
 		// Apply GSS
-		QString gss = m_startArgs.getLogInData().getGss().getName();
+		QString gss = parser.getLogInData().getGss().getName();
 
 		int ix = 0;
 		for (const LogInGSSEntry& entry : m_gssData) {
@@ -224,6 +231,9 @@ void LogInDialog::initialize() {
 			}
 			ix++;
 		}
+
+		// Queue login request
+		QMetaObject::invokeMethod(this, &LogInDialog::slotLogIn, Qt::QueuedConnection);
 	}
 }
 
@@ -248,10 +258,6 @@ bool LogInDialog::mayCloseDialogWindow() {
 
 void LogInDialog::showEvent(QShowEvent* _event) {
 	ot::Dialog::showEvent(_event);
-
-	if (m_startArgs.getLogInSet()) {
-		this->slotLogIn();
-	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

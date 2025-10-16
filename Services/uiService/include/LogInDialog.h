@@ -9,7 +9,6 @@
 #include "LoginData.h"
 #include "LogInGSSEntry.h"
 #include "UserManagement.h"
-#include "StartArgumentParser.h"
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
@@ -42,8 +41,7 @@ public:
 	const LoginData& getLoginData() const { return m_loginData; };
 
 	void initialize();
-	const StartArgumentParser& getStartArgs() const { return m_startArgs; };
-
+	
 protected:
 	virtual bool mayCloseDialogWindow() override;
 	virtual void showEvent(QShowEvent* _event) override;
@@ -77,8 +75,7 @@ private:
 	LogInState m_state;
 
 	LoginData m_loginData; //! \brief Holds the login data that is set during the login by the worker thread.
-	StartArgumentParser m_startArgs;
-
+	
 	ot::ComboBox* m_gss;
 	ot::LineEdit* m_username;
 	ot::Label* m_passwordLabel;

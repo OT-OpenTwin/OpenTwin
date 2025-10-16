@@ -18,17 +18,18 @@ class StartArgumentParser {
 	OT_DECL_DEFMOVE(StartArgumentParser)
 	OT_DECL_DEFCOPY(StartArgumentParser)
 public:
-	StartArgumentParser();
+	StartArgumentParser() = default;
 	~StartArgumentParser() = default;
 
-	//! @brief Import the configuration from a temporary file.
-	//! The file is deleted after reading.
-	//! @return True if no file existed or the file was read successfully, false otherwise.
-	bool importConfig();
+	bool parse();
 
-	//! @brief Export the configuration to a temporary file.
-	//! @return True if the file was written successfully, false otherwise.
-	bool exportConfig() const;
+	QStringList createCommandLineArgs() const;
+
+	void setDebug(bool _debug = true) { m_debug = _debug; };
+	bool getDebug() const { return m_debug; };
+
+	void setCheckGraphics(bool _check = true) { m_checkGraphics = _check; };
+	bool getCheckGraphics() const { return m_checkGraphics; };
 
 	bool getLogInSet() const { return m_logIn; };
 	void setLogInData(const LoginData& _data) { m_loginData = _data; m_logIn = true; };
@@ -39,10 +40,12 @@ public:
 	const ot::ProjectInformation& getProjectInfo() const { return m_projectInfo; };
 
 private:
-	
-	bool m_logIn;
+	bool m_debug = false;
+	bool m_checkGraphics = false;
+
+	bool m_logIn = false;
 	LoginData m_loginData;
 
-	bool m_openProject;
+	bool m_openProject = false;
 	ot::ProjectInformation m_projectInfo;
 };

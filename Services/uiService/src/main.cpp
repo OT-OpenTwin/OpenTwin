@@ -7,6 +7,7 @@
 
 // App header
 #include "AppBase.h"
+#include "StartArgumentParser.h"
 #include "ExternalServicesComponent.h"
 
 // OT header
@@ -266,12 +267,10 @@ int main(int _argc, char *_argv[])
 
 		QApplication* app = initializeQt(_argc, _argv);
 
-		QCommandLineParser parser;
-		QCommandLineOption checkGraphicsOption("c");
-		parser.addOption(checkGraphicsOption);
+		StartArgumentParser argsParser;
+		argsParser.parse();
 
-		parser.process(*app);
-		bool checkGraphics = parser.isSet(checkGraphicsOption);
+		bool checkGraphics = argsParser.getCheckGraphics();
 
 		initializeAppBase();
 
