@@ -14,7 +14,7 @@ ot::ActionDispatcherBase::ActionDispatcherBase() : m_defaultMessageType(ot::SECU
 
 ot::ActionDispatcherBase::~ActionDispatcherBase() {
 	for (auto& it : m_data) {
-		for (auto& con : it.second) {
+		for (auto& con : it.second.first) {
 			con->forgetActionDispatcher();
 		}
 	}
@@ -53,9 +53,15 @@ bool ot::ActionDispatcherBase::add(ActionHandleConnector* _item, const InsertFla
 	// First check if we can add the item
 	for (const std::string& action : _item->actionNames()) {
 		auto it = m_data.find(action);
-		if (it != m_data.end() && !(_insertFlags & InsertFlag::ExpectMultiple)) {
-			OT_LOG_EAS("Handler for \"" + action + "\" already exist. Cancelling add...");
-			return false;
+		if (it != m_data.end()) {
+			if (!it->second.second) {
+				OT_LOG_EAS("Handler for \"" + action + "\" already exist, multiple handlers are not expected. Cancelling add...");
+				return false;
+			}
+			else if (!(_insertFlags & InsertFlag::ExpectMultiple)) {
+				OT_LOG_EAS("Handler for \"" + action + "\" already exist, multiple handlers are expected but not allowed by insert flags. Cancelling add...");
+				return false;
+			}
 		}
 	}
 
@@ -64,10 +70,10 @@ bool ot::ActionDispatcherBase::add(ActionHandleConnector* _item, const InsertFla
 		if (it == m_data.end() ) {
 			std::list<ot::ActionHandleConnector*> lst;
 			lst.push_back(_item);
-			m_data.insert_or_assign(action, std::move(lst));
+			m_data.insert_or_assign(action, std::make_pair(std::move(lst), _insertFlags & InsertFlag::ExpectMultiple));
 		}
 		else {
-			it->second.push_back(_item);
+			it->second.first.push_back(_item);
 		}
 	}
 
@@ -83,16 +89,16 @@ void ot::ActionDispatcherBase::remove(ActionHandleConnector* _item) {
 			continue;
 		}
 
-		for (auto conIt = it->second.begin(); conIt != it->second.end(); ) {
+		for (auto conIt = it->second.first.begin(); conIt != it->second.first.end(); ) {
 			if (*conIt == _item) {
-				conIt = it->second.erase(conIt);
+				conIt = it->second.first.erase(conIt);
 			}
 			else {
 				conIt++;
 			}
 		}
 
-		if (it->second.empty()) {
+		if (it->second.first.empty()) {
 			m_data.erase(it);
 		}
 	}
@@ -182,7 +188,7 @@ std::string ot::ActionDispatcherBase::dispatchImpl(const std::string& _action, J
 		auto it = m_data.find(_action);
 		_handlerFound = false;
 		if (it != m_data.end()) {
-			m_currentConnectors = it->second;
+			m_currentConnectors = it->second.first;
 			while (!m_currentConnectors.empty()) {
 				auto con = m_currentConnectors.front();
 				m_currentConnectors.pop_front();

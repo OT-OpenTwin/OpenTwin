@@ -114,7 +114,9 @@ namespace ot {
 	private:
 		std::mutex m_mutex;
 		MessageTypeFlags m_defaultMessageType;
-		std::map<std::string, std::list<ActionHandleConnector*>> m_data;
+
+		//! @brief Data structure containing the action name, the list of handlers and a flag indicating if multiple handlers are expected.
+		std::map<std::string, std::pair<std::list<ActionHandleConnector*>, bool>> m_data;
 		std::list<ActionHandleConnector*> m_currentConnectors;
 	};
 
