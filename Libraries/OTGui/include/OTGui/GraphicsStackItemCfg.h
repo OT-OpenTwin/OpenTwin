@@ -9,13 +9,14 @@
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_FactoryKey_GraphicsStackItem "OT_GIStack"
-
 namespace ot {
 
 	//! @class GraphicsStackItemCfg
 	class OT_GUI_API_EXPORT GraphicsStackItemCfg : public ot::GraphicsItemCfg {
+		OT_DECL_NOMOVE(GraphicsStackItemCfg)
 	public:
+		static std::string className() { return "GraphicsStackItemCfg"; };
+
 		struct GraphicsStackItemCfgEntry {
 			ot::GraphicsItemCfg* item;
 			bool isMaster;
@@ -23,10 +24,13 @@ namespace ot {
 		};
 
 		GraphicsStackItemCfg();
+		GraphicsStackItemCfg(const GraphicsStackItemCfg& _other);
 		virtual ~GraphicsStackItemCfg();
 
+		GraphicsStackItemCfg& operator = (const GraphicsStackItemCfg&) = delete;
+
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy(void) const override { return new GraphicsStackItemCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -39,7 +43,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsStackItem); };
+		virtual std::string getFactoryKey(void) const override { return GraphicsStackItemCfg::className(); };
 
 		//! @brief Will add the provided item on the top of the stack (Zn)
 		//! If multiple master items are provided, the biggest size will be used

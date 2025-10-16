@@ -14,7 +14,7 @@
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsShapeItem> polyItemRegistrar(OT_FactoryKey_GraphicsShapeItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsShapeItem> polyItemRegistrar(ot::GraphicsShapeItemCfg::className());
 
 ot::GraphicsShapeItem::GraphicsShapeItem()
 	: ot::CustomGraphicsItem(new GraphicsShapeItemCfg)

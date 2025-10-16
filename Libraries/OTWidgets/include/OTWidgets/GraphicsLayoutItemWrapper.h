@@ -16,6 +16,9 @@ namespace ot {
 	class GraphicsLayoutItem;
 
 	class OT_WIDGETS_API_EXPORT GraphicsLayoutItemWrapper : public QGraphicsWidget, public ot::GraphicsItem {
+		OT_DECL_NODEFAULT(GraphicsLayoutItemWrapper)
+		OT_DECL_NOCOPY(GraphicsLayoutItemWrapper)
+		OT_DECL_NOMOVE(GraphicsLayoutItemWrapper)
 	public:
 		GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner);
 		virtual ~GraphicsLayoutItemWrapper();
@@ -59,10 +62,6 @@ namespace ot {
 
 	private:
 		GraphicsLayoutItem* m_owner;
-
-		GraphicsLayoutItemWrapper() = delete;
-		GraphicsLayoutItemWrapper(const GraphicsLayoutItemWrapper&) = delete;
-		GraphicsLayoutItemWrapper& operator = (const GraphicsLayoutItemWrapper&) = delete;
 	};
 
 }

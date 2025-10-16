@@ -13,6 +13,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsPolygonItem : public CustomGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsPolygonItem)
+		OT_DECL_NOMOVE(GraphicsPolygonItem)
 	public:
 		GraphicsPolygonItem();
 		virtual ~GraphicsPolygonItem();

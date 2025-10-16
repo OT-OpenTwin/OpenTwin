@@ -30,6 +30,8 @@ namespace ot {
 	//! Adding QGraphicsItems to the scene that do not inherit ot::GraphicsItem might lead to undefined behavior
 	class OT_WIDGETS_API_EXPORT GraphicsScene : public QGraphicsScene {
 		Q_OBJECT
+		OT_DECL_NOCOPY(GraphicsScene)
+		OT_DECL_NOMOVE(GraphicsScene)
 	public:
 		GraphicsScene(GraphicsView* _view);
 		GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view);

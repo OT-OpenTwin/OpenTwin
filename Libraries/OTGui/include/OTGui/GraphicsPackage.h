@@ -56,6 +56,8 @@ namespace ot {
 	//! The name of the editor must be unique. If an editor with the given name already exists, the creation will fail.
 	//! Note that the request to the UI must be send manually by providing this object (serialized) as the package
 	class OT_GUI_API_EXPORT GraphicsNewEditorPackage : public ot::GraphicsPickerCollectionPackage {
+		OT_DECL_NOCOPY(GraphicsNewEditorPackage)
+		OT_DECL_DEFMOVE(GraphicsNewEditorPackage)
 	public:
 		//! @brief Constructor
 		//! @param _editorName The unique name for the editor.
@@ -78,9 +80,6 @@ namespace ot {
 	private:
 		std::string m_name;
 		std::string m_title;
-
-		GraphicsNewEditorPackage(const GraphicsNewEditorPackage&) = delete;
-		GraphicsNewEditorPackage& operator = (const GraphicsNewEditorPackage&) = delete;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -92,6 +91,8 @@ namespace ot {
 	//! @brief Package that will be used to add graphics items to an existing scene.
 	//! Note that the request to the UI must be send manually by providing this object (serialized) as the package
 	class OT_GUI_API_EXPORT GraphicsScenePackage : public ot::Serializable {
+		OT_DECL_NOCOPY(GraphicsScenePackage)
+		OT_DECL_NOMOVE(GraphicsScenePackage)
 	public:
 		GraphicsScenePackage(const std::string& _editorName = std::string());
 		virtual ~GraphicsScenePackage();
@@ -120,9 +121,6 @@ namespace ot {
 
 		std::string m_name;
 		std::list<ot::GraphicsItemCfg*> m_items;
-
-		GraphicsScenePackage(const GraphicsScenePackage&) = delete;
-		GraphicsScenePackage& operator = (const GraphicsScenePackage&) = delete;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -132,6 +130,8 @@ namespace ot {
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	class OT_GUI_API_EXPORT GraphicsConnectionPackage : public ot::Serializable {
+		OT_DECL_NOCOPY(GraphicsConnectionPackage)
+		OT_DECL_DEFMOVE(GraphicsConnectionPackage)
 	public:
 		GraphicsConnectionPackage(const std::string& _editorName = std::string());
 		virtual ~GraphicsConnectionPackage();
@@ -156,9 +156,6 @@ namespace ot {
 	private:
 		std::string m_name;
 		std::list<GraphicsConnectionCfg> m_connections;
-
-		GraphicsConnectionPackage(const GraphicsConnectionPackage&) = delete;
-		GraphicsConnectionPackage& operator = (const GraphicsConnectionPackage&) = delete;
 	};
 
 }

@@ -14,7 +14,7 @@
 // Qt header
 #include <QtGui/qpainter.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsEllipseItem> elliItemRegistrar(OT_FactoryKey_GraphicsEllipseItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsEllipseItem> elliItemRegistrar(ot::GraphicsEllipseItemCfg::className());
 
 ot::GraphicsEllipseItem::GraphicsEllipseItem()
 	: ot::CustomGraphicsItem(new GraphicsEllipseItemCfg)

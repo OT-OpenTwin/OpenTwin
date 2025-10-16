@@ -12,10 +12,15 @@
 #include <QtGui/qpixmap.h>
 
 namespace ot {
-	class OT_WIDGETS_API_EXPORT GraphicsPixmapItem : public CustomGraphicsItem {
+
+	class ImagePainter;
+
+	class OT_WIDGETS_API_EXPORT GraphicsImageItem : public CustomGraphicsItem {
+		OT_DECL_NOCOPY(GraphicsImageItem)
+		OT_DECL_NOMOVE(GraphicsImageItem)
 	public:
-		GraphicsPixmapItem(const std::string& _imagePath = std::string());
-		virtual ~GraphicsPixmapItem();
+		GraphicsImageItem();
+		virtual ~GraphicsImageItem();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -39,6 +44,8 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
+
 	private:
+		ImagePainter* m_painter;
 	};
 }

@@ -16,14 +16,18 @@ class QPainter;
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT ImagePainter {
-		OT_DECL_NOCOPY(ImagePainter)
+	class OT_WIDGETS_API_EXPORTONLY ImagePainter {
+		OT_DECL_NOMOVE(ImagePainter)
 	public:
-		ImagePainter() {};
-		virtual ~ImagePainter() {};
+		ImagePainter() = default;
+		ImagePainter(const ImagePainter&) = default;
+		virtual ~ImagePainter() = default;
+
+		ImagePainter& operator=(const ImagePainter&) = default;
 
 		virtual void paintImage(QPainter* _painter, const QRectF& _bounds) const = 0;
 
+		virtual ImagePainter* createCopy() const = 0;
 		virtual QSizeF getDefaultImageSize(void) const = 0;
 
 	};

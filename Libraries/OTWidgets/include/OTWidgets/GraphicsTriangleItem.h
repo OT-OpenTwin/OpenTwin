@@ -17,6 +17,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsTriangleItem : public CustomGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsTriangleItem)
+		OT_DECL_NOMOVE(GraphicsTriangleItem)
 	public:
 		GraphicsTriangleItem();
 		virtual ~GraphicsTriangleItem();
@@ -70,6 +71,5 @@ namespace ot {
 		ot::GraphicsTriangleItemCfg::TriangleDirection getTrianlgeDirection(void) const;
 
 	};
-
 
 }

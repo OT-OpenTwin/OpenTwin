@@ -12,7 +12,7 @@
 #include "OTGui/GraphicsItemFileCfg.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsItemFileCfg> fileItemCfg(OT_FactoryKey_GraphicsFileItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsItemFileCfg> fileItemCfg(ot::GraphicsItemFileCfg::className());
 
 ot::GraphicsItemFileCfg::GraphicsItemFileCfg()
 {}
@@ -21,17 +21,12 @@ ot::GraphicsItemFileCfg::GraphicsItemFileCfg(const std::string& _subPath)
 	: m_file(_subPath)
 {}
 
+ot::GraphicsItemFileCfg::GraphicsItemFileCfg(const GraphicsItemFileCfg & _other)
+	: ot::GraphicsItemCfg(_other), m_file(_other.m_file)
+{}
+
 ot::GraphicsItemFileCfg::~GraphicsItemFileCfg() {
 	
-}
-
-ot::GraphicsItemCfg* ot::GraphicsItemFileCfg::createCopy(void) const {
-	ot::GraphicsItemFileCfg* copy = new GraphicsItemFileCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->setFile(m_file);
-
-	return copy;
 }
 
 void ot::GraphicsItemFileCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

@@ -15,7 +15,7 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 
-static WrappedItemFactoryRegistrar<WrappedLineItem> circleRegistrar(OT_FactoryKey_GraphicsLineItem);
+static WrappedItemFactoryRegistrar<WrappedLineItem> circleRegistrar(ot::GraphicsLineItemCfg::className());
 
 WrappedLineItem::WrappedLineItem() {
 	this->setLineStyle(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemLineColor)));

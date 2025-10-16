@@ -14,7 +14,7 @@
 #define OT_JSON_MEMBER_RowStretch "RowStretch"
 #define OT_JSON_MEMBER_ColumnStretch "ColumnStretch"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsGridLayoutItemCfg> ellipseItemRegistrar(OT_FactoryKey_GraphicsGridLayoutItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsGridLayoutItemCfg> ellipseItemRegistrar(ot::GraphicsGridLayoutItemCfg::className());
 
 ot::GraphicsGridLayoutItemCfg::GraphicsGridLayoutItemCfg(int _rows, int _columns)
 	: m_rows(_rows), m_columns(_columns)
@@ -22,25 +22,15 @@ ot::GraphicsGridLayoutItemCfg::GraphicsGridLayoutItemCfg(int _rows, int _columns
 	this->clearAndResize();
 }
 
-ot::GraphicsGridLayoutItemCfg::~GraphicsGridLayoutItemCfg() {
-	for (auto r : m_items) {
-		for (auto c : r) {
-			if (c) delete c;
-		}
-	}
-	m_items.clear();
-}
+ot::GraphicsGridLayoutItemCfg::GraphicsGridLayoutItemCfg(const GraphicsGridLayoutItemCfg& _other)
+	: ot::GraphicsLayoutItemCfg(_other)
+{
+	m_rows = _other.m_rows;
+	m_columns = _other.m_columns;
+	m_rowStretch = _other.m_rowStretch;
+	m_columnStretch = _other.m_columnStretch;
 
-ot::GraphicsItemCfg* ot::GraphicsGridLayoutItemCfg::createCopy(void) const {
-	ot::GraphicsGridLayoutItemCfg* copy = new GraphicsGridLayoutItemCfg;
-	this->setupData(copy);
-
-	copy->m_rows = m_rows;
-	copy->m_columns = m_columns;
-	copy->m_rowStretch = m_rowStretch;
-	copy->m_columnStretch = m_columnStretch;
-
-	for (const std::vector<GraphicsItemCfg*>& r : m_items) {
+	for (const std::vector<GraphicsItemCfg*>& r : _other.m_items) {
 		std::vector<GraphicsItemCfg*> row;
 		for (GraphicsItemCfg* itm : r) {
 			if (itm) {
@@ -50,10 +40,17 @@ ot::GraphicsItemCfg* ot::GraphicsGridLayoutItemCfg::createCopy(void) const {
 				row.push_back(nullptr);
 			}
 		}
-		copy->m_items.push_back(row);
+		m_items.push_back(std::move(row));
 	}
+}
 
-	return copy;
+ot::GraphicsGridLayoutItemCfg::~GraphicsGridLayoutItemCfg() {
+	for (auto r : m_items) {
+		for (auto c : r) {
+			if (c) delete c;
+		}
+	}
+	m_items.clear();
 }
 
 void ot::GraphicsGridLayoutItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

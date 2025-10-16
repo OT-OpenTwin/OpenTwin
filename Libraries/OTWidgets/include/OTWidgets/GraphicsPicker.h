@@ -35,6 +35,8 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsPicker : public QObject, public WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(GraphicsPicker)
+		OT_DECL_NOMOVE(GraphicsPicker)
 	public:
 		struct PickerState {
 			QStringList expandedItems;

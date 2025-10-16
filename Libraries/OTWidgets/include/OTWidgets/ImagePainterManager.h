@@ -20,12 +20,12 @@ namespace ot {
 	class ImagePainter;
 
 	class OT_WIDGETS_API_EXPORT ImagePainterManager {
+		OT_DECL_NOCOPY(ImagePainterManager)
+		OT_DECL_NOMOVE(ImagePainterManager)
 	public:
 		static ImagePainterManager& instance(void);
 
-		void paintImage(const std::string& _key, QPainter* _painter, const QRectF& _bounds) const;
-
-		ImagePainter* getPainter(const std::string& _key) const;
+		const ImagePainter* getPainter(const std::string& _key) const;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

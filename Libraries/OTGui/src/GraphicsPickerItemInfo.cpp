@@ -16,21 +16,7 @@ ot::GraphicsPickerItemInfo::GraphicsPickerItemInfo(const std::string& _name, con
 	: m_name(_name), m_title(_title), m_previewIcon(_previewIcon)
 {}
 
-ot::GraphicsPickerItemInfo::GraphicsPickerItemInfo(const GraphicsPickerItemInfo& _other) {
-	*this = _other;
-}
-
 ot::GraphicsPickerItemInfo::~GraphicsPickerItemInfo() {}
-
-ot::GraphicsPickerItemInfo& ot::GraphicsPickerItemInfo::operator = (const GraphicsPickerItemInfo& _other) {
-	if (this == &_other) return *this;
-
-	m_name = _other.m_name;
-	m_title = _other.m_title;
-	m_previewIcon = _other.m_previewIcon;
-
-	return *this;
-}
 
 void ot::GraphicsPickerItemInfo::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);

@@ -15,7 +15,7 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 
-static WrappedItemFactoryRegistrar<WrappedArcItem> arcRegistrar(OT_FactoryKey_GraphicsArcItem);
+static WrappedItemFactoryRegistrar<WrappedArcItem> arcRegistrar(ot::GraphicsArcItemCfg::className());
 
 WrappedArcItem::WrappedArcItem() {
 	this->setLineStyle(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemLineColor)));

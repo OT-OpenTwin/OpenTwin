@@ -10,7 +10,7 @@
 #include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/GraphicsGridLayoutItem.h"
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsGridLayoutItem> glayItemRegistrar(OT_FactoryKey_GraphicsGridLayoutItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsGridLayoutItem> glayItemRegistrar(ot::GraphicsGridLayoutItemCfg::className());
 
 ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) 
 	: QGraphicsGridLayout(_parentItem), GraphicsLayoutItem(new GraphicsGridLayoutItemCfg)
@@ -42,7 +42,7 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 	// Create items
 	int x = 0;
-	for (auto r : cfg->items()) {
+	for (auto r : cfg->getItems()) {
 		int y = 0;
 		for (auto c : r) {
 			if (c) {
@@ -62,11 +62,11 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	}
 
 	// Setup stretches
-	for (size_t r = 0; r < cfg->rowStretch().size(); r++) {
-		if (cfg->rowStretch()[r] > 0) this->setRowStretchFactor(r, cfg->rowStretch()[r]);
+	for (size_t r = 0; r < cfg->getRowStretch().size(); r++) {
+		if (cfg->getRowStretch()[r] > 0) this->setRowStretchFactor(r, cfg->getRowStretch()[r]);
 	}
-	for (size_t c = 0; c < cfg->columnStretch().size(); c++) {
-		if (cfg->columnStretch()[c] > 0) this->setColumnStretchFactor(c, cfg->columnStretch()[c]);
+	for (size_t c = 0; c < cfg->getColumnStretch().size(); c++) {
+		if (cfg->getColumnStretch()[c] > 0) this->setColumnStretchFactor(c, cfg->getColumnStretch()[c]);
 	}
 
 	this->setMinimumSize(QtFactory::toQSize(_cfg->getMinimumSize()));

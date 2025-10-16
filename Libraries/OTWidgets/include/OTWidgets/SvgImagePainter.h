@@ -8,22 +8,37 @@
 // OpenTwin header
 #include "OTWidgets/ImagePainter.h"
 
+// Qt header
+#include <QtCore/qbytearray.h>
+
 class QSvgRenderer;
 
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT SvgImagePainter : public ImagePainter {
 		OT_DECL_NODEFAULT(SvgImagePainter)
-		OT_DECL_NOCOPY(SvgImagePainter)
+		OT_DECL_NOMOVE(SvgImagePainter)
 	public:
-		SvgImagePainter(QSvgRenderer* _renderer);
+		//! @brief Constructor.
+		//! @param _svgData The svg data to be rendered.
+		SvgImagePainter(const QByteArray& _svgData);
+		SvgImagePainter(const SvgImagePainter& _other);
 		virtual ~SvgImagePainter();
+
+		SvgImagePainter& operator=(const SvgImagePainter&) = delete;
+
+		virtual ImagePainter* createCopy() const override { return new SvgImagePainter(*this); };
 
 		virtual void paintImage(QPainter* _painter, const QRectF& _bounds) const override;
 
 		virtual QSizeF getDefaultImageSize(void) const override;
 
+		bool isValid() const;
+
+		const QByteArray& getSvgData() const { return m_svgData; }
+
 	private:
+		QByteArray m_svgData;
 		QSvgRenderer* m_svgRenderer;
 	};
 

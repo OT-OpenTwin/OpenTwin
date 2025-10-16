@@ -15,6 +15,10 @@ ot::PixmapImagePainter::PixmapImagePainter(const QPixmap& _pixmap) :
 
 }
 
+ot::PixmapImagePainter::PixmapImagePainter(const PixmapImagePainter& _other)
+	: ImagePainter(_other), m_pixmap(_other.m_pixmap)
+{}
+
 ot::PixmapImagePainter::~PixmapImagePainter() {
 
 }

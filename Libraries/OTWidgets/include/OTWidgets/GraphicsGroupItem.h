@@ -11,6 +11,8 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsGroupItem : public QGraphicsItemGroup, public QGraphicsLayoutItem, public ot::GraphicsItem {
+		OT_DECL_NOCOPY(GraphicsGroupItem)
+		OT_DECL_NOMOVE(GraphicsGroupItem)
 	public:
 		GraphicsGroupItem();
 		virtual ~GraphicsGroupItem();
@@ -86,10 +88,6 @@ namespace ot {
 		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) override;
 
 		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) override;
-
-	private:
-		GraphicsGroupItem(const GraphicsGroupItem&) = delete;
-		GraphicsGroupItem& operator = (const GraphicsGroupItem&) = delete;
 	};
 
 }

@@ -13,5 +13,5 @@ ot::GraphicsItemCfgFactory& ot::GraphicsItemCfgFactory::instance(void) {
 }
 
 ot::GraphicsItemCfg* ot::GraphicsItemCfgFactory::create(const ConstJsonObject& _object) {
-	return GraphicsItemCfgFactory::instance().createFromJSON(_object, OT_JSON_MEMBER_GraphicsItemCfgType);
+	return GraphicsItemCfgFactory::instance().createFromJSON(_object, GraphicsItemCfg::factoryTypeKey());
 }

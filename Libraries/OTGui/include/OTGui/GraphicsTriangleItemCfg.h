@@ -10,15 +10,15 @@
 #include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_FactoryKey_GraphicsTriangleItem "OT_GITria"
-
 namespace ot {
 
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsTriangleItemCfg : public ot::GraphicsItemCfg {
-		OT_DECL_NOCOPY(GraphicsTriangleItemCfg)
+		OT_DECL_NOMOVE(GraphicsTriangleItemCfg)
 	public:
+		static std::string className() { return "GraphicsTriangleItemCfg"; };
+
 		enum TriangleDirection {
 			Left,
 			Up,
@@ -39,10 +39,13 @@ namespace ot {
 		static TriangleShape stringToTriangleShape(const std::string& _shape);
 
 		GraphicsTriangleItemCfg(TriangleDirection _direction = Right, TriangleShape _shape = Triangle);
+		GraphicsTriangleItemCfg(const GraphicsTriangleItemCfg& _other);
 		virtual ~GraphicsTriangleItemCfg();
 
+		GraphicsTriangleItemCfg& operator = (const GraphicsTriangleItemCfg&) = delete;
+
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy(void) const override { return new GraphicsTriangleItemCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -55,7 +58,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsTriangleItem); };
+		virtual std::string getFactoryKey(void) const override { return GraphicsTriangleItemCfg::className(); };
 
 		void setOutline(const ot::PenFCfg& _outline) { m_outline = _outline; };
 		const PenFCfg& getOutline(void) const { return m_outline; };

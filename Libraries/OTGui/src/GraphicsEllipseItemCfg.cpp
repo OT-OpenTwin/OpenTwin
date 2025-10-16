@@ -17,7 +17,7 @@
 #define OT_JSON_MEMBER_RadiusY "RadiusY"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsEllipseItemCfg> ellipseItemRegistrar(OT_FactoryKey_GraphicsEllipseItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsEllipseItemCfg> ellipseItemRegistrar(ot::GraphicsEllipseItemCfg::className());
 
 ot::GraphicsEllipseItemCfg::GraphicsEllipseItemCfg(double _radiusX, double _radiusY, ot::Painter2D* _backgroundPainter)
 	: m_backgroundPainter(_backgroundPainter), m_radiusX(_radiusX), m_radiusY(_radiusY)
@@ -28,20 +28,19 @@ ot::GraphicsEllipseItemCfg::GraphicsEllipseItemCfg(double _radiusX, double _radi
 	}
 }
 
-ot::GraphicsEllipseItemCfg::~GraphicsEllipseItemCfg() {
-	if (m_backgroundPainter) delete m_backgroundPainter;
+ot::GraphicsEllipseItemCfg::GraphicsEllipseItemCfg(const GraphicsEllipseItemCfg& _other)
+	: GraphicsItemCfg(_other), m_radiusX(_other.m_radiusX), m_radiusY(_other.m_radiusY), m_outline(_other.m_outline)
+{
+	if (_other.m_backgroundPainter) {
+		m_backgroundPainter = _other.m_backgroundPainter->createCopy();
+	}
+	else {
+		m_backgroundPainter = nullptr;
+	}
 }
 
-ot::GraphicsItemCfg* ot::GraphicsEllipseItemCfg::createCopy(void) const {
-	ot::GraphicsEllipseItemCfg* copy = new GraphicsEllipseItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_radiusX = m_radiusX;
-	copy->m_radiusY = m_radiusY;
-	copy->m_outline = m_outline;
-	copy->setBackgroundPainer(m_backgroundPainter->createCopy());
-
-	return copy;
+ot::GraphicsEllipseItemCfg::~GraphicsEllipseItemCfg() {
+	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
 void ot::GraphicsEllipseItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

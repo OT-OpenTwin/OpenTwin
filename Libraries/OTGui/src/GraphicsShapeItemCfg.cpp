@@ -12,26 +12,26 @@
 #include "OTGui/GraphicsShapeItemCfg.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsShapeItemCfg> polyItemCfg(OT_FactoryKey_GraphicsShapeItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsShapeItemCfg> polyItemCfg(ot::GraphicsShapeItemCfg::className());
 
 ot::GraphicsShapeItemCfg::GraphicsShapeItemCfg()
 {
 	m_backgroundPainter = new FillPainter2D(Transparent);
 }
 
-ot::GraphicsShapeItemCfg::~GraphicsShapeItemCfg() {
-	if (m_backgroundPainter) delete m_backgroundPainter;
+ot::GraphicsShapeItemCfg::GraphicsShapeItemCfg(const GraphicsShapeItemCfg& _other) 
+	: ot::GraphicsItemCfg(_other), m_path(_other.m_path), m_outline(_other.m_outline), m_fillShape(_other.m_fillShape)
+{
+	if (_other.m_backgroundPainter) {
+		m_backgroundPainter = _other.m_backgroundPainter->createCopy();
+	}
+	else {
+		m_backgroundPainter = new FillPainter2D(Transparent);
+	}
 }
 
-ot::GraphicsItemCfg* ot::GraphicsShapeItemCfg::createCopy(void) const {
-	ot::GraphicsShapeItemCfg* copy = new GraphicsShapeItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_path = m_path;
-	copy->m_outline = m_outline;
-	copy->setBackgroundPainter(m_backgroundPainter->createCopy());
-
-	return copy;
+ot::GraphicsShapeItemCfg::~GraphicsShapeItemCfg() {
+	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
 void ot::GraphicsShapeItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

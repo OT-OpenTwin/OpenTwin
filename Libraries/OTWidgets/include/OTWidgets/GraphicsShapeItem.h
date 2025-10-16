@@ -14,6 +14,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsShapeItem : public CustomGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsShapeItem)
+		OT_DECL_NOMOVE(GraphicsShapeItem)
 	public:
 		GraphicsShapeItem();
 		virtual ~GraphicsShapeItem();

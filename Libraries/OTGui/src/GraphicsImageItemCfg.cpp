@@ -11,34 +11,33 @@
 #define OT_JSON_MEMBER_ImagePath "ImagePath"
 #define OT_JSON_MEMBER_MaintainAspectRatio "MaintainAspectRatio"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsImageItemCfg> imageItemCfg(OT_FactoryKey_GraphicsImageItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsImageItemCfg> imageItemCfg(ot::GraphicsImageItemCfg::className());
 
-ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const std::string& _imageSubPath)
-	: m_imageSubPath(_imageSubPath), m_maintainAspectRatio(false)
+ot::GraphicsImageItemCfg::GraphicsImageItemCfg()
+	: m_maintainAspectRatio(false), m_imageDataFileType(ImageFileFormat::PNG)
+{}
+
+ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const GraphicsImageItemCfg& _other) 
+	: ot::GraphicsItemCfg(_other), m_imageData(_other.m_imageData), m_imageSubPath(_other.m_imageSubPath),
+	m_maintainAspectRatio(_other.m_maintainAspectRatio), m_imageDataFileType(_other.m_imageDataFileType)
 {}
 
 ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 
-ot::GraphicsItemCfg* ot::GraphicsImageItemCfg::createCopy(void) const {
-	ot::GraphicsImageItemCfg* copy = new GraphicsImageItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_imageSubPath = m_imageSubPath;
-	copy->m_maintainAspectRatio = m_maintainAspectRatio;
-	
-	return copy;
-}
-
 void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
-	_object.AddMember(OT_JSON_MEMBER_ImagePath, JsonString(m_imageSubPath, _allocator), _allocator);
-	_object.AddMember(OT_JSON_MEMBER_MaintainAspectRatio, m_maintainAspectRatio, _allocator);
+	_object.AddMember("Data", JsonString(m_imageData, _allocator), _allocator);
+	_object.AddMember("DataFileFormat", JsonString(ot::toString(m_imageDataFileType), _allocator), _allocator);
+	_object.AddMember("Path", JsonString(m_imageSubPath, _allocator), _allocator);
+	_object.AddMember("MaintainRatio", m_maintainAspectRatio, _allocator);
 }
 
 void ot::GraphicsImageItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 	
-	m_imageSubPath = json::getString(_object, OT_JSON_MEMBER_ImagePath);
-	m_maintainAspectRatio = json::getBool(_object, OT_JSON_MEMBER_MaintainAspectRatio);
+	m_imageData = json::getString(_object, "Data");
+	m_imageDataFileType = ot::stringToImageFileFormat(json::getString(_object, "DataFileFormat"));
+	m_imageSubPath = json::getString(_object, "Path");
+	m_maintainAspectRatio = json::getBool(_object, "MaintainRatio");
 }

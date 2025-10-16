@@ -14,26 +14,26 @@
 #define OT_JSON_MEMBER_IsSlave "IsSlave"
 #define OT_JSON_MEMBER_IsMaster "IsMaster"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsStackItemCfg> stackItemCfg(OT_FactoryKey_GraphicsStackItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsStackItemCfg> stackItemCfg(ot::GraphicsStackItemCfg::className());
 
-ot::GraphicsStackItemCfg::GraphicsStackItemCfg()
+ot::GraphicsStackItemCfg::GraphicsStackItemCfg() {
+
+}
+
+ot::GraphicsStackItemCfg::GraphicsStackItemCfg(const GraphicsStackItemCfg& _other) 
+	: ot::GraphicsItemCfg(_other)
 {
-
+	for (const GraphicsStackItemCfgEntry& itm : _other.m_items) {
+		GraphicsStackItemCfgEntry e;
+		e.isMaster = itm.isMaster;
+		e.isSlave = itm.isSlave;
+		e.item = itm.item->createCopy();
+		m_items.push_back(e);
+	}
 }
 
 ot::GraphicsStackItemCfg::~GraphicsStackItemCfg() {
 	this->memClear();
-}
-
-ot::GraphicsItemCfg* ot::GraphicsStackItemCfg::createCopy(void) const {
-	ot::GraphicsStackItemCfg* copy = new GraphicsStackItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	for (const GraphicsStackItemCfgEntry& itm : m_items) {
-		copy->addItemTop(itm.item->createCopy(), itm.isMaster, itm.isSlave);
-	}
-
-	return copy;
 }
 
 void ot::GraphicsStackItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
@@ -72,7 +72,7 @@ void ot::GraphicsStackItemCfg::setFromJsonObject(const ConstJsonObject& _object)
 	this->memClear();
 
 	std::list<ConstJsonObject> itemArr = json::getObjectList(_object, OT_JSON_MEMBER_Items);
-	for (auto itemObj : itemArr) {
+	for (const auto& itemObj : itemArr) {
 		ConstJsonObject itemContObj = json::getObject(itemObj, OT_JSON_MEMBER_Item);
 
 		ot::GraphicsItemCfg* itm = nullptr;
@@ -112,6 +112,6 @@ void ot::GraphicsStackItemCfg::addItemBottom(ot::GraphicsItemCfg* _item, bool _i
 }
 
 void ot::GraphicsStackItemCfg::memClear(void) {
-	for (auto itm : m_items) delete itm.item;
+	for (auto& itm : m_items) delete itm.item;
 	m_items.clear();
 }

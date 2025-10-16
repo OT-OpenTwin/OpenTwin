@@ -30,10 +30,10 @@ namespace ot {
 		virtual ~GraphicsFlowItem();
 
 		void setName(const std::string& _name) { m_builder.setName(_name); };
-		const std::string& name(void) const { return m_builder.name(); };
+		const std::string& name(void) const { return m_builder.getName(); };
 
 		void setTitle(const std::string& _title) { m_builder.setTitle(_title); };
-		const std::string& title(void) const { return m_builder.title(); };
+		const std::string& title(void) const { return m_builder.getTitle(); };
 
 		void setToolTip(const std::string& _toolTip) { m_builder.setToolTip(_toolTip); };
 
@@ -45,8 +45,8 @@ namespace ot {
 
 		void setRightTitleCornerImagePath(const std::string& _path) { m_builder.setRightTitleCornerImagePath(_path); };
 
-		void addConnector(const std::string& _name, FlowConnectorType _type, const std::string& _tip = std::string());
-		void addConnector(const std::string& _name, const std::string& _title, FlowConnectorType _type, const std::string& _tip = std::string());
+		void addConnector(const std::string& _name, FlowConnectorType _type, const std::string& _toolTip = std::string());
+		void addConnector(const std::string& _name, const std::string& _title, FlowConnectorType _type, const std::string& _toolTip = std::string());
 
 		//! @brief Creates a GraphicsItemCfg in the "OpenTwin flow block" style that takes the current configuration into account.
 		//! The caller takes ownership of the item.

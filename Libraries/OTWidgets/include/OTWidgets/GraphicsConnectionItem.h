@@ -23,6 +23,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem, public GraphicsElement {
 		OT_DECL_NOCOPY(GraphicsConnectionItem)
+		OT_DECL_NOMOVE(GraphicsConnectionItem)
 	public:
 		GraphicsConnectionItem();
 		virtual ~GraphicsConnectionItem();

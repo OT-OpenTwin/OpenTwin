@@ -10,19 +10,23 @@
 #include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_FactoryKey_GraphicsRectangularItem "OT_GIRect"
-
 namespace ot {
 
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsRectangularItemCfg : public ot::GraphicsItemCfg {
+		OT_DECL_NOMOVE(GraphicsRectangularItemCfg)
 	public:
+		static std::string className() { return "GraphicsRectangularItemCfg"; };
+
 		GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr, int _cornerRadius = 0);
+		GraphicsRectangularItemCfg(const GraphicsRectangularItemCfg& _other);
 		virtual ~GraphicsRectangularItemCfg();
 
+		GraphicsRectangularItemCfg& operator = (const GraphicsRectangularItemCfg&) = delete;
+
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy(void) const override { return new GraphicsRectangularItemCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -35,7 +39,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsRectangularItem); };
+		virtual std::string getFactoryKey() const override { return GraphicsRectangularItemCfg::className(); };
 
 		void setCornerRadius(int _px) { m_cornerRadius = _px; };
 		int getCornerRadius(void) const { return m_cornerRadius; };

@@ -15,7 +15,7 @@
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsRectangularItem> rectItemRegistrar(OT_FactoryKey_GraphicsRectangularItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsRectangularItem> rectItemRegistrar(ot::GraphicsRectangularItemCfg::className());
 
 ot::GraphicsRectangularItem::GraphicsRectangularItem() 
 	: ot::CustomGraphicsItem(new GraphicsRectangularItemCfg)

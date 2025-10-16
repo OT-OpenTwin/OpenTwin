@@ -10,20 +10,23 @@
 #include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_FactoryKey_GraphicsInvisibleItem "OT_GIInvis"
-
 namespace ot {
 
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsInvisibleItemCfg : public ot::GraphicsItemCfg {
-		OT_DECL_NOCOPY(GraphicsInvisibleItemCfg)
+		OT_DECL_NOMOVE(GraphicsInvisibleItemCfg)
 	public:
+		static std::string className() { return "GraphicsInvisibleItemCfg"; };
+
 		GraphicsInvisibleItemCfg(const ot::Size2DD& _size = ot::Size2DD());
+		GraphicsInvisibleItemCfg(const GraphicsInvisibleItemCfg& _other);
 		virtual ~GraphicsInvisibleItemCfg();
 
+		GraphicsInvisibleItemCfg& operator = (const GraphicsInvisibleItemCfg&) = delete;
+
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy(void) const override { return new GraphicsInvisibleItemCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -36,7 +39,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsInvisibleItem); };
+		virtual std::string getFactoryKey(void) const override { return GraphicsInvisibleItemCfg::className(); };
 
 		void setSize(const ot::Size2DD& _size) { m_size = _size; };
 		const ot::Size2DD& getSize(void) const { return m_size; };

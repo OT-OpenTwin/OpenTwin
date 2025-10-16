@@ -16,6 +16,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORTONLY GraphicsHierarchicalProjectItemBuilder {
 		OT_DECL_NOCOPY(GraphicsHierarchicalProjectItemBuilder)
+		OT_DECL_NOMOVE(GraphicsHierarchicalProjectItemBuilder)
 	public:
 		enum BackgroundImageInsertMode {
 			OnLayout,
@@ -24,65 +25,68 @@ namespace ot {
 
 		//! @brief Creates a GraphicsItemCfg in the "OpenTwin hierarchical project item block" style that takes the current configuration into account.
 		//! The callee takes ownership of the item.
-		ot::GraphicsItemCfg* createGraphicsItem(void) const;
+		ot::GraphicsItemCfg* createGraphicsItem() const;
 
 		GraphicsHierarchicalProjectItemBuilder();
 		virtual ~GraphicsHierarchicalProjectItemBuilder();
 
-		//! @brief Sets the name for the root item
-		//! The item name will be used as a prefix for the created child items (layouts and stacks)
+		//! @brief Sets the name for the root item.
+		//! The item name will be used as a prefix for the created child items (layouts and stacks).
 		void setName(const std::string& _name) { m_name = _name; };
+		const std::string& getName() const { return m_name; };
 
-		//! @brief Item name
-		const std::string& name(void) const { return m_name; };
-
-		//! @brief Sets the title that will be displayed to the user
+		//! @brief Sets the title that will be displayed to the user.
 		void setTitle(const std::string& _title) { m_title = _title; };
+		const std::string& getTitle() const { return m_title; };
 
-		//! @brief Item title
-		const std::string& title(void) const { return m_title; };
+		//! @brief Sets the project type that will be displayed to the user.
+		//! @param _type The type string.
+		void setProjectType(const std::string& _type) { m_type = _type; };
+		const std::string& getProjectType() const { return m_type; };
 
-		//! @brief Set the item tool tip
+		//! @brief Set the item tool tip.
 		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
 
-		//! @brief Set the item tool tip
-		const std::string& toolTip(void) const { return m_toolTip; };
+		//! @brief Set the item tool tip.
+		const std::string& getToolTip() const { return m_toolTip; };
 
-		//! @brief Replace the current title background painter
-		//! The item takes ownership
+		//! @brief Replace the current title background painter.
+		//! The item takes ownership.
 		void setTitleBackgroundPainter(ot::Painter2D* _painter);
 
-		//! @brief Sets the title background color
-		//! Creates a FillPainter2D and replace the current title background painter
+		//! @brief Sets the title background color.
+		//! Creates a FillPainter2D and replace the current title background painter.
 		void setTitleBackgroundColor(const ot::Color& _color);
 
-		//! @brief Sets the title background painter
-		//! Creates a LinearGradientPainter2D and replace the current title background painter
+		//! @brief Sets the title background painter.
+		//! Creates a LinearGradientPainter2D and replace the current title background painter.
 		void setTitleBackgroundGradientColor(const ot::Color& _color);
 
-		//! @brief Sets the title background color
-		//! Will create a FillPainter2D and replace the current title background painter
+		//! @brief Sets the title background color.
+		//! Will create a FillPainter2D and replace the current title background painter.
 		inline void setTitleBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setTitleBackgroundColor(ot::Color(_r, _g, _b, _a)); };
 
-		//! @brief Replace the current title foreground painter
-		//! The item takes ownership
+		//! @brief Replace the current title foreground painter.
+		//! The item takes ownership.
 		void setTitleForegroundPainter(ot::Painter2D* _painter);
 
-		//! @brief Sets the title foreground painter
-		//! Create a FillPainter2D and replace the current title foreground painter
+		//! @brief Sets the title foreground painter.
+		//! Create a FillPainter2D and replace the current title foreground painter.
 		void setTitleForegroundColor(const ot::Color& _color);
 
-		//! @brief Sets the title foreground painter
-		//! Create a LinearGradientPainter2D and replace the current title foreground painter
-		//! @param _color The primary text color, other colors are calculated by 255-color
-		void setDefaultTitleForegroundGradient(void);
+		//! @brief Sets the title foreground painter.
+		//! Create a LinearGradientPainter2D and replace the current title foreground painter.
+		//! @param _color The primary text color, other colors are calculated by 255-color.
+		void setDefaultTitleForegroundGradient();
 
-		void setBackgroundImagePath(const std::string& _path) { m_backgroundImagePath = _path; };
-		void setBackgroundImageMargins(const ot::MarginsD& _margins) { m_backgroundImageMargins = _margins; };
 		void setLeftTitleCornerImagePath(const std::string& _path) { m_leftTitleImagePath = _path; };
 
+		void setBackgroundImageData(const std::string& _data) { m_backgroundImage = _data; };
+		void setBackgroundImageMargins(const ot::MarginsD& _margins) { m_backgroundImageMargins = _margins; };
+		
 	private:
 		std::string m_name;
+		std::string m_type;
 		std::string m_title;
 		std::string m_toolTip;
 
@@ -91,7 +95,7 @@ namespace ot {
 
 		std::string m_leftTitleImagePath;
 
-		std::string m_backgroundImagePath;
+		std::string m_backgroundImage;
 		ot::MarginsD m_backgroundImageMargins;
 	};
 

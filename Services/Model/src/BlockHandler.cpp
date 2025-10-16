@@ -23,7 +23,7 @@ BlockHandler::BlockHandler() {
 
 void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 	std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().createFromJSON(ot::json::getObject(_doc, OT_ACTION_PARAM_Config), OT_JSON_MEMBER_GraphicsItemCfgType);
+	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().create(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
 	if (!itemConfig) {
 		OT_LOG_E("ItemConfig is null");
 		return;

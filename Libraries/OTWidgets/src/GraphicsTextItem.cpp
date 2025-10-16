@@ -16,7 +16,7 @@
 #include <QtGui/qfontmetrics.h>
 #include <QtGui/qtextdocument.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsTextItem> textItemRegistrar(OT_FactoryKey_GraphicsTextItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsTextItem> textItemRegistrar(ot::GraphicsTextItemCfg::className());
 
 ot::GraphicsTextItem::GraphicsTextItem()
 	: ot::CustomGraphicsItem(new GraphicsTextItemCfg)

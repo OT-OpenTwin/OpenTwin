@@ -9,17 +9,20 @@
 // OpenTwin header
 #include "OTGui/GraphicsLayoutItemCfg.h"
 
-#define OT_FactoryKey_GraphicsGridLayoutItem "OT_GILayG"
-
 namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsGridLayoutItemCfg : public GraphicsLayoutItemCfg {
 	public:
+		static std::string className() { return "GraphicsGridLayoutItemCfg"; };
+
 		GraphicsGridLayoutItemCfg(int _rows = 0, int _columns = 0);
+		GraphicsGridLayoutItemCfg(const GraphicsGridLayoutItemCfg& _other);
 		virtual ~GraphicsGridLayoutItemCfg();
 
+		GraphicsGridLayoutItemCfg& operator = (const GraphicsGridLayoutItemCfg&) = delete;
+
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy() const override { return new GraphicsGridLayoutItemCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _document The JSON document (used to get the allocator).
@@ -32,32 +35,29 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory.
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsGridLayoutItem); };
+		virtual std::string getFactoryKey() const override { return GraphicsGridLayoutItemCfg::className(); };
 
-		int rowCount(void) const { return m_rows; };
-		int columnCount(void) const { return m_columns; };
+		int getRowCount() const { return m_rows; };
+		int getColumnCount() const { return m_columns; };
 
 		virtual void addChildItem(ot::GraphicsItemCfg* _item) override;
 		void addChildItem(int _row, int _column, ot::GraphicsItemCfg* _item);
-		const std::vector<std::vector<GraphicsItemCfg*>>& items(void) const { return m_items; };
+		const std::vector<std::vector<GraphicsItemCfg*>>& getItems() const { return m_items; };
 
 		void setRowStretch(int _row, int _stretch);
-		const std::vector<int>& rowStretch(void) const { return m_rowStretch; };
+		const std::vector<int>& getRowStretch() const { return m_rowStretch; };
 
 		void setColumnStretch(int _column, int _stretch);
-		const std::vector<int>& columnStretch(void) const { return m_columnStretch; };
+		const std::vector<int>& getColumnStretch() const { return m_columnStretch; };
 
 	private:
-		void clearAndResize(void);
+		void clearAndResize();
 
 		int m_rows;
 		int m_columns;
 		std::vector<int> m_rowStretch;
 		std::vector<int> m_columnStretch;
 		std::vector<std::vector<GraphicsItemCfg*>> m_items;
-
-		GraphicsGridLayoutItemCfg(const GraphicsGridLayoutItemCfg&) = delete;
-		GraphicsGridLayoutItemCfg& operator = (const GraphicsGridLayoutItemCfg&) = delete;
 	};
 
 }

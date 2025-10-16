@@ -6,9 +6,9 @@
 // OpenTwin header
 #include "OTGui/GraphicsLayoutItemCfg.h"
 
-ot::GraphicsLayoutItemCfg::~GraphicsLayoutItemCfg() {
-	
-}
+ot::GraphicsLayoutItemCfg::GraphicsLayoutItemCfg(const GraphicsLayoutItemCfg& _other) : GraphicsItemCfg(_other) {}
+
+ot::GraphicsLayoutItemCfg::~GraphicsLayoutItemCfg() {}
 
 void ot::GraphicsLayoutItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
@@ -16,8 +16,4 @@ void ot::GraphicsLayoutItemCfg::addToJsonObject(JsonValue& _object, JsonAllocato
 
 void ot::GraphicsLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
-}
-
-void ot::GraphicsLayoutItemCfg::setupData(GraphicsItemCfg* _config) const {
-	GraphicsItemCfg::copyConfigDataToItem(_config);
 }

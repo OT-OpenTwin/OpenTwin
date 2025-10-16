@@ -14,7 +14,7 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 
-static WrappedItemFactoryRegistrar<WrappedPolygonItem> circleRegistrar(OT_FactoryKey_GraphicsPolygonItem);
+static WrappedItemFactoryRegistrar<WrappedPolygonItem> circleRegistrar(ot::GraphicsPolygonItemCfg::className());
 
 WrappedPolygonItem::WrappedPolygonItem() {
 	this->setOutline(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));

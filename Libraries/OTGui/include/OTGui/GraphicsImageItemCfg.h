@@ -10,17 +10,21 @@
 #include "OTCore/Color.h"
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_FactoryKey_GraphicsImageItem "OT_GIImage"
-
 namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsImageItemCfg : public ot::GraphicsItemCfg {
+		OT_DECL_NOMOVE(GraphicsImageItemCfg)
 	public:
-		GraphicsImageItemCfg(const std::string& _imageSubPath = std::string());
+		static std::string className() { return "GraphicsImageItemCfg"; };
+
+		GraphicsImageItemCfg();
+		GraphicsImageItemCfg(const GraphicsImageItemCfg& _other);
 		virtual ~GraphicsImageItemCfg();
 
+		GraphicsImageItemCfg& operator = (const GraphicsImageItemCfg&) = delete;
+
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy() const override { return new GraphicsImageItemCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -33,20 +37,23 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsImageItem); };
+		virtual std::string getFactoryKey() const override { return GraphicsImageItemCfg::className(); };
+
+		void setImageData(const std::string& _data, ImageFileFormat _fileFormat) { m_imageData = _data; m_imageDataFileType = _fileFormat; };
+		const std::string& getImageData() const { return m_imageData; };
+		ImageFileFormat getImageFileFormat() const { return m_imageDataFileType; };
 
 		void setImagePath(const std::string& _path) { m_imageSubPath = _path; };
-		const std::string& imagePath(void) const { return m_imageSubPath; };
+		const std::string& getImagePath() const { return m_imageSubPath; };
 
 		void setMaintainAspectRatio(bool _active) { m_maintainAspectRatio = _active; };
-		bool isMaintainAspectRatio(void) const { return m_maintainAspectRatio; };
+		bool getMaintainAspectRatio() const { return m_maintainAspectRatio; };
 
 	private:
+		ImageFileFormat m_imageDataFileType;
+		std::string m_imageData;
 		std::string m_imageSubPath;
 		bool m_maintainAspectRatio;
-
-		GraphicsImageItemCfg(GraphicsImageItemCfg&) = delete;
-		GraphicsImageItemCfg& operator = (GraphicsImageItemCfg&) = delete;
 	};
 
 }

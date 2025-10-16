@@ -15,13 +15,17 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PixmapImagePainter : public ImagePainter {
 		OT_DECL_NODEFAULT(PixmapImagePainter)
-		OT_DECL_NOCOPY(PixmapImagePainter)
+		OT_DECL_NOMOVE(PixmapImagePainter)
 	public:
 		PixmapImagePainter(const QPixmap& _pixmap);
+		PixmapImagePainter(const PixmapImagePainter& _other);
 		virtual ~PixmapImagePainter();
+
+		PixmapImagePainter& operator=(const PixmapImagePainter&) = delete;
 
 		virtual void paintImage(QPainter* _painter, const QRectF& _bounds) const override;
 
+		virtual ImagePainter* createCopy() const override { return new PixmapImagePainter(*this); };
 		virtual QSizeF getDefaultImageSize(void) const override { return m_pixmap.size().toSizeF(); };
 
 	private:

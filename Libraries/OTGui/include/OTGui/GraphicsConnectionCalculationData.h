@@ -16,7 +16,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT GraphicsConnectionCalculationData {
 		OT_DECL_NODEFAULT(GraphicsConnectionCalculationData)
 	public:
-		static std::list<GraphicsConnectionCalculationData> getAllYXLines(void);
+		static std::list<GraphicsConnectionCalculationData> getAllYXLines();
 
 		GraphicsConnectionCalculationData(ConnectionDirection _originDirection, ConnectionDirection _destinationDirection, Alignment _connectionLineAlignment);
 		GraphicsConnectionCalculationData(const GraphicsConnectionCalculationData& _other);

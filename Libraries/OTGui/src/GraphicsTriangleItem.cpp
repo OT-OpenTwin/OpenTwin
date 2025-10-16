@@ -18,7 +18,7 @@
 #define OT_JSON_MEMBER_Direction "Direction"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsTriangleItemCfg> triaItemCfg(OT_FactoryKey_GraphicsTriangleItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsTriangleItemCfg> triaItemCfg(ot::GraphicsTriangleItemCfg::className());
 
 std::string ot::GraphicsTriangleItemCfg::triangleDirectionToString(TriangleDirection _direction) {
 	switch (_direction)
@@ -72,21 +72,20 @@ ot::GraphicsTriangleItemCfg::GraphicsTriangleItemCfg(TriangleDirection _directio
 	m_backgroundPainter = new ot::FillPainter2D(ot::Color(0, 0, 0, 0));
 }
 
-ot::GraphicsTriangleItemCfg::~GraphicsTriangleItemCfg() {
-	if (m_backgroundPainter) delete m_backgroundPainter;
+ot::GraphicsTriangleItemCfg::GraphicsTriangleItemCfg(const GraphicsTriangleItemCfg& _other)
+	: ot::GraphicsItemCfg(_other), m_outline(_other.m_outline), m_size(_other.m_size),
+	m_direction(_other.m_direction), m_shape(_other.m_shape)
+{
+	if (_other.m_backgroundPainter) {
+		m_backgroundPainter = _other.m_backgroundPainter->createCopy();
+	}
+	else {
+		m_backgroundPainter = new ot::FillPainter2D(ot::Color(0, 0, 0, 0));
+	}
 }
 
-ot::GraphicsItemCfg* ot::GraphicsTriangleItemCfg::createCopy(void) const {
-	ot::GraphicsTriangleItemCfg* copy = new GraphicsTriangleItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_outline = m_outline;
-	copy->m_size = m_size;
-	copy->setBackgroundPainer(m_backgroundPainter->createCopy());
-	copy->m_direction = m_direction;
-	copy->m_shape = m_shape;
-
-	return copy;
+ot::GraphicsTriangleItemCfg::~GraphicsTriangleItemCfg() {
+	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
 void ot::GraphicsTriangleItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

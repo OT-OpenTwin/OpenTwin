@@ -26,6 +26,7 @@ GraphicsItemDesignerView::GraphicsItemDesignerView(GraphicsItemDesigner* _design
 	this->setSceneMargins(QMarginsF(50, 50, 50, 50));
 	this->setGraphicsSceneRect(-5, -5, 810, 610);
 
+
 	m_infoOverlay = new GraphicsItemDesignerViewStatusOverlay(this);
 
 	this->connect(m_scene, &GraphicsItemDesignerScene::selectionChangeFinished, this, &GraphicsItemDesignerView::slotSceneSelectionChanged);

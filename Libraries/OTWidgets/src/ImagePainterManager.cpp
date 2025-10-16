@@ -20,11 +20,7 @@ ot::ImagePainterManager& ot::ImagePainterManager::instance(void) {
 	return g_instance;
 }
 
-void ot::ImagePainterManager::paintImage(const std::string& _key, QPainter* _painter, const QRectF& _bounds) const {
-	
-}
-
-ot::ImagePainter* ot::ImagePainterManager::getPainter(const std::string& _key) const {
+const ot::ImagePainter* ot::ImagePainterManager::getPainter(const std::string& _key) const {
 	const auto& it = m_painter.find(_key);
 	if (it == m_painter.end()) {
 		OT_LOG_EAS("ImagePainter \"" + _key + "\" not found");
@@ -144,14 +140,14 @@ ot::ImagePainter* ot::ImagePainterManager::importSvg(const std::string& _subPath
 		OT_LOG_EA("Empty svg data");
 		return nullptr;
 	}
-	QSvgRenderer* newRenderer = new QSvgRenderer(data);
-	if (!newRenderer->isValid()) {
-		OT_LOG_EA("Invalid svg renderer");
-		delete newRenderer;
+	SvgImagePainter* newPainter = new SvgImagePainter(data);
+	if (!newPainter->isValid()) {
+		OT_LOG_EA("Invalid svg data");
+		delete newPainter;
 		return nullptr;
 	}
 	else {
-		return new SvgImagePainter(newRenderer);
+		return newPainter;
 	}
 }
 

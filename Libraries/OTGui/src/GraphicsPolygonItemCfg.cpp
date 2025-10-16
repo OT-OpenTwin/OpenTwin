@@ -12,7 +12,7 @@
 #include "OTGui/GraphicsPolygonItemCfg.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsPolygonItemCfg> polyItemCfg(OT_FactoryKey_GraphicsPolygonItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsPolygonItemCfg> polyItemCfg(ot::GraphicsPolygonItemCfg::className());
 
 ot::GraphicsPolygonItemCfg::GraphicsPolygonItemCfg()
 	: m_fillPolygon(false)
@@ -20,20 +20,19 @@ ot::GraphicsPolygonItemCfg::GraphicsPolygonItemCfg()
 	m_backgroundPainter = new FillPainter2D(Transparent);
 }
 
-ot::GraphicsPolygonItemCfg::~GraphicsPolygonItemCfg() {
-	if (m_backgroundPainter) delete m_backgroundPainter;
+ot::GraphicsPolygonItemCfg::GraphicsPolygonItemCfg(const GraphicsPolygonItemCfg& _other) 
+	: ot::GraphicsItemCfg(_other), m_fillPolygon(_other.m_fillPolygon), m_points(_other.m_points), m_outline(_other.m_outline)
+{
+	if (_other.m_backgroundPainter) {
+		m_backgroundPainter = _other.m_backgroundPainter->createCopy();
+	}
+	else {
+		m_backgroundPainter = new FillPainter2D(Transparent);
+	}
 }
 
-ot::GraphicsItemCfg* ot::GraphicsPolygonItemCfg::createCopy(void) const {
-	ot::GraphicsPolygonItemCfg* copy = new GraphicsPolygonItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_fillPolygon = m_fillPolygon;
-	copy->m_points = m_points;
-	copy->m_outline = m_outline;
-	copy->setBackgroundPainter(m_backgroundPainter->createCopy());
-
-	return copy;
+ot::GraphicsPolygonItemCfg::~GraphicsPolygonItemCfg() {
+	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
 void ot::GraphicsPolygonItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

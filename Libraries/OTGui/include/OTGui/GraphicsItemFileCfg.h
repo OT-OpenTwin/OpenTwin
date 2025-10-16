@@ -9,23 +9,26 @@
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_FactoryKey_GraphicsFileItem "OT_GIFile"
-
 namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsItemFileCfg : public GraphicsItemCfg {
-		OT_DECL_NOCOPY(GraphicsItemFileCfg)
+		OT_DECL_NOMOVE(GraphicsItemFileCfg)
 	public:
+		static std::string className() { return "GraphicsItemFileCfg"; };
+
 		GraphicsItemFileCfg();
 		GraphicsItemFileCfg(const std::string& _subPath);
+		GraphicsItemFileCfg(const GraphicsItemFileCfg& _other);
 		virtual ~GraphicsItemFileCfg();
+
+		GraphicsItemFileCfg& operator = (const GraphicsItemFileCfg&) = delete;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Base class functions
 
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy() const override { return new GraphicsItemFileCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -38,14 +41,14 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsFileItem); };
+		virtual std::string getFactoryKey() const override { return GraphicsItemFileCfg::className(); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
 
 		void setFile(const std::string& _subPath) { m_file = _subPath; };
-		const std::string& getFile(void) const { return m_file; };
+		const std::string& getFile() const { return m_file; };
 
 	private:
 		std::string m_file; //! @brief Starting point.

@@ -89,16 +89,6 @@ ot::GraphicsItemCfg* ot::GraphicsItemLoader::createConfiguration(const QString& 
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::GraphicsItemLoader::GraphicsItemLoader()
-	
-{
-
-}
-
-ot::GraphicsItemLoader::~GraphicsItemLoader() {
-
-}
-
 QString ot::GraphicsItemLoader::findFullItemPath(const QString& _subPath) const {
 	for (const QString& searchPath : m_searchPaths) {
 		QFile file(searchPath + _subPath);

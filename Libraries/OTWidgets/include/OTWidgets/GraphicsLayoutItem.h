@@ -16,6 +16,8 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsLayoutItem : public ot::GraphicsItem {
 		OT_DECL_NODEFAULT(GraphicsLayoutItem)
+		OT_DECL_NOCOPY(GraphicsLayoutItem)
+		OT_DECL_NOMOVE(GraphicsLayoutItem)
 	public:
 		GraphicsLayoutItem(GraphicsItemCfg* _configuration);
 		virtual ~GraphicsLayoutItem();

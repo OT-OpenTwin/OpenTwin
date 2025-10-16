@@ -27,15 +27,15 @@ ot::GraphicsFlowItem::~GraphicsFlowItem() {
 
 }
 
-void ot::GraphicsFlowItem::addConnector(const std::string& _name, FlowConnectorType _type, const std::string& _tip) {
-	this->addConnector(_name, _name, _type, _tip);
+void ot::GraphicsFlowItem::addConnector(const std::string& _name, FlowConnectorType _type, const std::string& _toolTip) {
+	this->addConnector(_name, _name, _type, _toolTip);
 }
 
-void ot::GraphicsFlowItem::addConnector(const std::string& _name, const std::string& _title, FlowConnectorType _type, const std::string& _tip) {
-	GraphicsFlowItemConnector newConnector = m_builder.defaultConnectorStyle();
+void ot::GraphicsFlowItem::addConnector(const std::string& _name, const std::string& _title, FlowConnectorType _type, const std::string& _toolTip) {
+	GraphicsFlowItemConnector newConnector = m_builder.getDefaultConnectorStyle();
 	newConnector.setName(_name);
 	newConnector.setText(_title);
-	newConnector.setToolTip(_tip);
+	newConnector.setToolTip(_toolTip);
 
 	switch (_type)
 	{

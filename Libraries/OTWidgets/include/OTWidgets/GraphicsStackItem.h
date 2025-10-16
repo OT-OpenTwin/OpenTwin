@@ -15,6 +15,8 @@ namespace ot {
 	//! The graphics stack item will calculate the child item size whenever a master item chaged its size.
 	//! The GraphicsStackItemCfg is used to configure the GraphicsStackItem.
 	class OT_WIDGETS_API_EXPORT GraphicsStackItem : public QGraphicsItemGroup, public QGraphicsLayoutItem, public ot::GraphicsItem {
+		OT_DECL_NOCOPY(GraphicsStackItem)
+		OT_DECL_NOMOVE(GraphicsStackItem)
 	public:
 		//! @struct GraphicsStackItemEntry
 		//! @brief The GraphicsStackItemEntry holds a GraphicsItem aswell as the information if this item is a master or a slave.
@@ -113,9 +115,6 @@ namespace ot {
 
 		std::list<GraphicsStackItemEntry> m_items;
 		QSizeF m_lastCalculatedSize;
-
-		GraphicsStackItem(const GraphicsStackItem&) = delete;
-		GraphicsStackItem& operator = (const GraphicsStackItem&) = delete;
 	};
 
 

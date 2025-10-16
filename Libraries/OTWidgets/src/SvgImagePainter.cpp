@@ -11,20 +11,37 @@
 #include <QtGui/qpainter.h>
 #include <QtSvg/qsvgrenderer.h>
 
-ot::SvgImagePainter::SvgImagePainter(QSvgRenderer* _renderer) :
-	m_svgRenderer(_renderer)
+ot::SvgImagePainter::SvgImagePainter(const QByteArray& _svgData) :
+	m_svgRenderer(nullptr), m_svgData(_svgData)
 {
+	m_svgRenderer = new QSvgRenderer(_svgData);
+	OTAssertNullptr(m_svgRenderer);
+}
+
+ot::SvgImagePainter::SvgImagePainter(const SvgImagePainter& _other) 
+	: ImagePainter(_other), m_svgRenderer(nullptr), m_svgData(_other.m_svgData)
+{
+	m_svgRenderer = new QSvgRenderer(m_svgData);
 	OTAssertNullptr(m_svgRenderer);
 }
 
 ot::SvgImagePainter::~SvgImagePainter() {
-
+	OTAssertNullptr(m_svgRenderer);
+	delete m_svgRenderer;
+	m_svgRenderer = nullptr;
 }
 
 void ot::SvgImagePainter::paintImage(QPainter* _painter, const QRectF& _bounds) const {
+	OTAssertNullptr(m_svgRenderer);
 	m_svgRenderer->render(_painter, _bounds);
 }
 
 QSizeF ot::SvgImagePainter::getDefaultImageSize(void) const {
+	OTAssertNullptr(m_svgRenderer);
 	return m_svgRenderer->defaultSize().toSizeF();
+}
+
+bool ot::SvgImagePainter::isValid() const {
+	OTAssertNullptr(m_svgRenderer);
+	return m_svgRenderer->isValid();
 }

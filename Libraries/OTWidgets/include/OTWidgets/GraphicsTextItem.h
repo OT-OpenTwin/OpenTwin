@@ -15,6 +15,8 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsTextItem : public ot::CustomGraphicsItem {
+		OT_DECL_NOCOPY(GraphicsTextItem)
+		OT_DECL_NOMOVE(GraphicsTextItem)
 	public:
 		GraphicsTextItem();
 		virtual ~GraphicsTextItem();

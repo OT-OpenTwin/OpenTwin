@@ -15,7 +15,7 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainterpath.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsTriangleItem> triaItemRegistrar(OT_FactoryKey_GraphicsTriangleItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsTriangleItem> triaItemRegistrar(ot::GraphicsTriangleItemCfg::className());
 
 ot::GraphicsTriangleItem::GraphicsTriangleItem()
 	: ot::CustomGraphicsItem(new GraphicsTriangleItemCfg)

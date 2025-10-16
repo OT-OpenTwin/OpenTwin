@@ -11,17 +11,11 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsVBoxLayoutItem : public GraphicsBoxLayoutItem {
+		OT_DECL_NOCOPY(GraphicsVBoxLayoutItem)
+		OT_DECL_NOMOVE(GraphicsVBoxLayoutItem)
 	public:
 		GraphicsVBoxLayoutItem(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
 		virtual ~GraphicsVBoxLayoutItem() {};
-
-		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
-
-	private:
-		QSizeF m_size;
-
-		GraphicsVBoxLayoutItem(const GraphicsVBoxLayoutItem&) = delete;
-		GraphicsVBoxLayoutItem& operator = (const GraphicsVBoxLayoutItem&) = delete;
 	};
 
 }

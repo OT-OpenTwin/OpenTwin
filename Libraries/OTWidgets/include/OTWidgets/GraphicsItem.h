@@ -31,6 +31,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsItem : public GraphicsElement {
 		OT_DECL_NODEFAULT(GraphicsItem)
 		OT_DECL_NOCOPY(GraphicsItem)
+		OT_DECL_NOMOVE(GraphicsItem)
 	public:
 
 		// ###############################################################################################################################################

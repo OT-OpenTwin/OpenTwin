@@ -11,17 +11,21 @@
 #include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_FactoryKey_GraphicsTextItem "OT_GIText"
-
 namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsTextItemCfg : public ot::GraphicsItemCfg {
+		OT_DECL_NOMOVE(GraphicsTextItemCfg)
 	public:
+		static std::string className() { return "GraphicsTextItemCfg"; };
+
 		GraphicsTextItemCfg(const std::string& _text = std::string(), const ot::Color& _textColor = ot::Color());
+		GraphicsTextItemCfg(const GraphicsTextItemCfg& _other);
 		virtual ~GraphicsTextItemCfg();
 
+		GraphicsTextItemCfg& operator = (const GraphicsTextItemCfg&) = delete;
+
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy(void) const override { return new GraphicsTextItemCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -34,7 +38,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsTextItem); };
+		virtual std::string getFactoryKey(void) const override { return GraphicsTextItemCfg::className(); };
 
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string& getText(void) const { return m_text; };

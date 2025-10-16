@@ -18,7 +18,7 @@
 // Qt header
 #include <QtGui/qfontdatabase.h>
 
-static WrappedItemFactoryRegistrar<WrappedTextItem> circleRegistrar(OT_FactoryKey_GraphicsTextItem);
+static WrappedItemFactoryRegistrar<WrappedTextItem> circleRegistrar(ot::GraphicsTextItemCfg::className());
 
 WrappedTextItem::WrappedTextItem() {
 	this->setText("Text");

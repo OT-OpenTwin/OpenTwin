@@ -396,6 +396,31 @@ std::list<std::string> ot::getSupportedDocumentSyntaxStringList(void) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Image Format
+
+std::string ot::toString(ImageFileFormat _format) {
+	switch (_format) {
+	case ot::ImageFileFormat::PNG: return "PNG";
+	case ot::ImageFileFormat::JPEG: return "JPEG";
+	case ot::ImageFileFormat::SVG: return "SVG";
+	default:
+		OT_LOG_E("Unknown image format (" + std::to_string((int)_format) + ")");
+		return "PNG";
+	}
+}
+
+ot::ImageFileFormat ot::stringToImageFileFormat(const std::string& _format) {
+	if (_format == toString(ImageFileFormat::PNG)) return ImageFileFormat::PNG;
+	else if (_format == toString(ImageFileFormat::JPEG)) return ImageFileFormat::JPEG;
+	else if (_format == toString(ImageFileFormat::SVG)) return ImageFileFormat::SVG;
+	else {
+		OT_LOG_E("Unknown image format \"" + _format + "\"");
+		return ImageFileFormat::PNG;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // Lock Type
 
 std::string ot::toString(LockTypeFlag _type) {

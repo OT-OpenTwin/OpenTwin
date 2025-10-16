@@ -17,9 +17,13 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsLayoutItemCfg : public GraphicsItemCfg {
+		OT_DECL_NOMOVE(GraphicsLayoutItemCfg)
 	public:
 		GraphicsLayoutItemCfg() {};
+		GraphicsLayoutItemCfg(const GraphicsLayoutItemCfg& _other);
 		virtual ~GraphicsLayoutItemCfg();
+
+		GraphicsLayoutItemCfg& operator=(const GraphicsLayoutItemCfg&) = delete;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -32,17 +36,6 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		virtual void addChildItem(ot::GraphicsItemCfg* _item) = 0;
-		
-		// ###########################################################################################################################################################################################################################################################################################################################
-
-		// Protected: Helper
-
-	protected:
-		virtual void setupData(GraphicsItemCfg* _config) const;
-
-	private:
-		GraphicsLayoutItemCfg(const GraphicsLayoutItemCfg&) = delete;
-		GraphicsLayoutItemCfg& operator = (const GraphicsLayoutItemCfg&) = delete;
 	};
 
 }

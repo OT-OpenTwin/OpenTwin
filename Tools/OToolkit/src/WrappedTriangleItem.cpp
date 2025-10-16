@@ -14,7 +14,7 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 
-static WrappedItemFactoryRegistrar<WrappedTriangleItem> circleRegistrar(OT_FactoryKey_GraphicsTriangleItem);
+static WrappedItemFactoryRegistrar<WrappedTriangleItem> circleRegistrar(ot::GraphicsTriangleItemCfg::className());
 
 WrappedTriangleItem::WrappedTriangleItem() {
 	this->setOutline(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));

@@ -11,24 +11,27 @@
 #include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_FactoryKey_GraphicsLineItem "OT_GILine"
-
 namespace ot {
 
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsLineItemCfg : public ot::GraphicsItemCfg {
-		OT_DECL_NOCOPY(GraphicsLineItemCfg)
+		OT_DECL_NOMOVE(GraphicsLineItemCfg)
 	public:
+		static std::string className() { return "GraphicsLineItemCfg"; };
+
 		GraphicsLineItemCfg();
+		GraphicsLineItemCfg(const GraphicsLineItemCfg& _other);
 		virtual ~GraphicsLineItemCfg();
+
+		GraphicsLineItemCfg& operator = (const GraphicsLineItemCfg&) = delete;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Base class functions
 
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy(void) const override { return new GraphicsLineItemCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -41,7 +44,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsLineItem); };
+		virtual std::string getFactoryKey(void) const override { return GraphicsLineItemCfg::className(); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

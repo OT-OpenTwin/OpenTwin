@@ -14,7 +14,7 @@
 // Qt header
 #include <QtGui/qpainter.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsStackItem> stackItemRegistrar(OT_FactoryKey_GraphicsStackItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsStackItem> stackItemRegistrar(ot::GraphicsStackItemCfg::className());
 
 ot::GraphicsStackItem::GraphicsStackItem() 
 	: ot::GraphicsItem(new GraphicsStackItemCfg), m_lastCalculatedSize(-1., -1.) 

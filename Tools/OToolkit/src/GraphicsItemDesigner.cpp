@@ -197,7 +197,7 @@ void GraphicsItemDesigner::slotImportRequested(void) {
 		return;
 	}
 
-	if (newConfig->getFactoryKey() != OT_FactoryKey_GraphicsGroupItem) {
+	if (newConfig->getFactoryKey() != ot::GraphicsGroupItemCfg::className()) {
 		OT_LOG_E("Invalid GraphicsItem");
 		return;
 	}
@@ -286,7 +286,7 @@ void GraphicsItemDesigner::slotUpdateConfigRequested(void) {
 		return;
 	}
 
-	if (newConfig->getFactoryKey() != OT_FactoryKey_GraphicsGroupItem) {
+	if (newConfig->getFactoryKey() != ot::GraphicsGroupItemCfg::className()) {
 		OT_LOG_E("Invalid GraphicsItem");
 		return;
 	}

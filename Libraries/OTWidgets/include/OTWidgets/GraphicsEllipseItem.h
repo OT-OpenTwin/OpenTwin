@@ -17,6 +17,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsEllipseItem : public CustomGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsEllipseItem)
+		OT_DECL_NOMOVE(GraphicsEllipseItem)
 	public:
 		GraphicsEllipseItem();
 		virtual ~GraphicsEllipseItem();

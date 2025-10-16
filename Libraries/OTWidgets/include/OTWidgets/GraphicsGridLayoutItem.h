@@ -15,6 +15,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsGridLayoutItem : public QGraphicsGridLayout, public ot::GraphicsLayoutItem {
 		OT_DECL_NOCOPY(GraphicsGridLayoutItem)
+		OT_DECL_NOMOVE(GraphicsGridLayoutItem)
 	public:
 		GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
 		virtual ~GraphicsGridLayoutItem();

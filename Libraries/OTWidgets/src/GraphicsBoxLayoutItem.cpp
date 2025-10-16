@@ -10,7 +10,11 @@
 #include "OTWidgets/GraphicsBoxLayoutItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 
-ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, GraphicsItemCfg* _configuration, QGraphicsLayoutItem* _parentItem) 
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsBoxLayoutItem> hblayItemRegistrar(ot::GraphicsBoxLayoutItemCfg::className());
+
+ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem() : GraphicsBoxLayoutItem(Qt::Horizontal, new GraphicsBoxLayoutItemCfg(ot::Horizontal), nullptr) {}
+
+ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, GraphicsItemCfg* _configuration, QGraphicsLayoutItem* _parentItem)
 	: QGraphicsLinearLayout(_orientation, _parentItem), GraphicsLayoutItem(_configuration)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
@@ -38,7 +42,15 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	this->setBlockConfigurationNotifications(true);
 	this->setContentsMargins(_cfg->getMargins().left(), _cfg->getMargins().top(), _cfg->getMargins().right(), _cfg->getMargins().bottom());
 
-	for (auto& itm : cfg->items()) {
+	// Update orientation
+	if (cfg->getOrientation() == ot::Horizontal) {
+		this->setOrientation(Qt::Horizontal);
+	}
+	else {
+		this->setOrientation(Qt::Vertical);
+	}
+
+	for (auto& itm : cfg->getItems()) {
 		if (itm.first) {
 			ot::GraphicsItem* i = ot::GraphicsItemFactory::itemFromConfig(itm.first);
 			if (i == nullptr) {

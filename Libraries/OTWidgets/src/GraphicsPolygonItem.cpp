@@ -15,7 +15,7 @@
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsPolygonItem> polyItemRegistrar(OT_FactoryKey_GraphicsPolygonItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsPolygonItem> polyItemRegistrar(ot::GraphicsPolygonItemCfg::className());
 
 ot::GraphicsPolygonItem::GraphicsPolygonItem()
 	: ot::CustomGraphicsItem(new GraphicsPolygonItemCfg)

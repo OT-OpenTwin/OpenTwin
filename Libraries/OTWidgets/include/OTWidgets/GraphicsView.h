@@ -36,6 +36,8 @@ namespace ot {
 	//! Note that the View creates its own scene.
 	class OT_WIDGETS_API_EXPORT GraphicsView : public QGraphicsView, public WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(GraphicsView)
+		OT_DECL_NOMOVE(GraphicsView)
 	public:
 		enum GraphicsViewFlag {
 			NoViewFlags            = 0x00, //! @brief No flags.

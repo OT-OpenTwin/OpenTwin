@@ -24,6 +24,7 @@ namespace ot {
 	//! The imported configuration(s) will be cached.
 	class OT_WIDGETS_API_EXPORT GraphicsItemLoader {
 		OT_DECL_NOCOPY(GraphicsItemLoader)
+		OT_DECL_NOMOVE(GraphicsItemLoader)
 	public:
 		//! @brief Returns the global instance.
 		static GraphicsItemLoader& instance(void);
@@ -49,10 +50,10 @@ namespace ot {
 	private:
 
 		//! @brief Private constructor.
-		GraphicsItemLoader();
+		GraphicsItemLoader() = default;
 
 		//! @brief Private destructor.
-		virtual ~GraphicsItemLoader();
+		virtual ~GraphicsItemLoader() = default;
 
 		//! @brief Returns the first existing search path +  sub path combination.
 		//! @param _subPath The sub path that will be appended to a search path.

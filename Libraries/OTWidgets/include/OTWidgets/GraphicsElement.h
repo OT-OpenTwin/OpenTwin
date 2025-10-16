@@ -25,6 +25,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsElement {
 		OT_DECL_NOCOPY(GraphicsElement)
+		OT_DECL_NOMOVE(GraphicsElement)
 	public:
 		//! @enum GraphicsElementState
 		//! @brief The GraphicsElementState is used to describe the current state of a GraphicsElement.

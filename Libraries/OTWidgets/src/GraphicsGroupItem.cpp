@@ -14,7 +14,7 @@
 // Qt header
 #include <QtGui/qpainter.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsGroupItem> groupItemRegistrar(OT_FactoryKey_GraphicsGroupItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsGroupItem> groupItemRegistrar(ot::GraphicsGroupItemCfg::className());
 
 ot::GraphicsGroupItem::GraphicsGroupItem()
 	: ot::GraphicsItem(new GraphicsGroupItemCfg)

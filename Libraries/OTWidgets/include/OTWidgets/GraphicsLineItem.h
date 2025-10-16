@@ -16,6 +16,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsLineItem : public CustomGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsLineItem)
+		OT_DECL_NOMOVE(GraphicsLineItem)
 	public:
 		GraphicsLineItem();
 		virtual ~GraphicsLineItem();

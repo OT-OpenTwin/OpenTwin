@@ -15,6 +15,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsRectangularItem : public CustomGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsRectangularItem)
+		OT_DECL_NOMOVE(GraphicsRectangularItem)
 	public:
 		GraphicsRectangularItem();
 		virtual ~GraphicsRectangularItem();

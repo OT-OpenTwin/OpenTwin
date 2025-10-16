@@ -17,7 +17,7 @@
 #define OT_JSON_MEMBER_CornerRadius "CornerRadius"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsRectangularItemCfg> rectItemCfg(OT_FactoryKey_GraphicsRectangularItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsRectangularItemCfg> rectItemCfg(ot::GraphicsRectangularItemCfg::className());
 
 ot::GraphicsRectangularItemCfg::GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter, int _cornerRadius)
 	: m_backgroundPainter(_backgroundPainter), m_cornerRadius(_cornerRadius)
@@ -28,20 +28,19 @@ ot::GraphicsRectangularItemCfg::GraphicsRectangularItemCfg(ot::Painter2D* _backg
 	}
 }
 
-ot::GraphicsRectangularItemCfg::~GraphicsRectangularItemCfg() {
-	if (m_backgroundPainter) delete m_backgroundPainter;
+ot::GraphicsRectangularItemCfg::GraphicsRectangularItemCfg(const GraphicsRectangularItemCfg& _other)
+	: ot::GraphicsItemCfg(_other), m_cornerRadius(_other.m_cornerRadius), m_outline(_other.m_outline), m_size(_other.m_size)
+{
+	if (_other.m_backgroundPainter) {
+		m_backgroundPainter = _other.m_backgroundPainter->createCopy();
+	}
+	else {
+		m_backgroundPainter = new ot::FillPainter2D(ot::Color(0, 0, 0, 0));
+	}
 }
 
-ot::GraphicsItemCfg* ot::GraphicsRectangularItemCfg::createCopy(void) const {
-	ot::GraphicsRectangularItemCfg* copy = new GraphicsRectangularItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_cornerRadius = m_cornerRadius;
-	copy->m_outline = m_outline;
-	copy->m_size = m_size;
-	copy->setBackgroundPainer(m_backgroundPainter->createCopy());
-
-	return copy;
+ot::GraphicsRectangularItemCfg::~GraphicsRectangularItemCfg() {
+	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
 void ot::GraphicsRectangularItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

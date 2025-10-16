@@ -8,15 +8,9 @@
 #include "OTWidgets/GraphicsVBoxLayoutItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsVBoxLayoutItem> vblayItemRegistrar(OT_FactoryKey_GraphicsVBoxLayoutItem);
-
 ot::GraphicsVBoxLayoutItem::GraphicsVBoxLayoutItem(QGraphicsLayoutItem* _parentItem)
 	: GraphicsBoxLayoutItem(Qt::Vertical, new GraphicsVBoxLayoutItemCfg, _parentItem)
 {
 
-}
-
-bool ot::GraphicsVBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
-	return ot::GraphicsBoxLayoutItem::setupFromConfig(_cfg);
 }
 

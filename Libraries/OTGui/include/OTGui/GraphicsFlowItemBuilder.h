@@ -19,6 +19,7 @@ namespace ot {
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsFlowItemConnector {
+		OT_DECL_NOMOVE(GraphicsFlowItemConnector)
 	public:
 		enum ConnectorFigure {
 			Square,
@@ -43,44 +44,44 @@ namespace ot {
 		GraphicsFlowItemConnector& operator = (const GraphicsFlowItemConnector& _other);
 
 		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& name(void) const { return m_name; };
+		const std::string& getName() const { return m_name; };
 
 		void setText(const std::string& _text) { m_text = _text; };
-		const std::string& text(void) const { return m_text; };
+		const std::string& getText() const { return m_text; };
 
 		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
-		const std::string& toolTip(void) const { return m_toolTip; };
+		const std::string& getToolTip() const { return m_toolTip; };
 
 		void setFont(const ot::Font& _font) { m_font = _font; };
-		const ot::Font& font(void) const { return m_font; };
+		const ot::Font& getFont() const { return m_font; };
 
 		void setTextColor(const ot::Color& _color) { m_textColor = _color; };
-		const ot::Color& textColor(void) const { return m_textColor; };
+		const ot::Color& getTextColor() const { return m_textColor; };
 
 		//! @brief Set custom primary painter.
 		//! Connector takes ownership of the painter.
 		//! Existing painter will be destroyed before replacing.
 		void setCustomPrimaryPainter(ot::Painter2D* _painter);
-		const ot::Painter2D* getCustomPrimaryPainter(void) const { return m_customPrimaryPainter; };
+		const ot::Painter2D* getCustomPrimaryPainter() const { return m_customPrimaryPainter; };
 
 		//! @brief Set custom secondary painter.
 		//! Connector takes ownership of the painter.
 		//! Existing painter will be destroyed before replacing.
 		void setCustomSecondaryPainter(ot::Painter2D* _painter);
-		const ot::Painter2D* getCustomSecondaryPainter(void) const { return m_customSecondaryPainter; };
+		const ot::Painter2D* getCustomSecondaryPainter() const { return m_customSecondaryPainter; };
 
 		void setFigure(GraphicsFlowItemConnector::ConnectorFigure _figure) { m_figure = _figure; };
-		GraphicsFlowItemConnector::ConnectorFigure figure(void) const { return m_figure; };
+		GraphicsFlowItemConnector::ConnectorFigure getFigure() const { return m_figure; };
 
 		void addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft);
 
 	private:
-		Painter2D* createPrimaryPainter(void) const;
-		Painter2D* createSecondaryPainter(void) const;
+		Painter2D* createPrimaryPainter() const;
+		Painter2D* createSecondaryPainter() const;
 
-		ot::GraphicsItemCfg* createConnectorItem(void);
-		ot::GraphicsItemCfg* createSquareItem(void);
-		ot::GraphicsItemCfg* createCircleItem(void);
+		ot::GraphicsItemCfg* createConnectorItem();
+		ot::GraphicsItemCfg* createSquareItem();
+		ot::GraphicsItemCfg* createCircleItem();
 		ot::GraphicsItemCfg* createTriangleItem(GraphicsTriangleItemCfg::TriangleDirection _direction, GraphicsTriangleItemCfg::TriangleShape _shape);
 
 		std::string m_name;
@@ -101,6 +102,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORTONLY GraphicsFlowItemBuilder {
 		OT_DECL_NOCOPY(GraphicsFlowItemBuilder)
+		OT_DECL_NOMOVE(GraphicsFlowItemBuilder)
 	public:
 		enum BackgroundImageInsertMode {
 			OnLayout,
@@ -109,7 +111,7 @@ namespace ot {
 
 		//! @brief Creates a GraphicsItemCfg in the "OpenTwin flow block" style that takes the current configuration into account.
 		//! The callee takes ownership of the item.
-		ot::GraphicsItemCfg* createGraphicsItem(void) const;
+		ot::GraphicsItemCfg* createGraphicsItem() const;
 
 		GraphicsFlowItemBuilder();
 		virtual ~GraphicsFlowItemBuilder();
@@ -119,19 +121,19 @@ namespace ot {
 		void setName(const std::string& _name) { m_name = _name; };
 
 		//! @brief Item name
-		const std::string& name(void) const { return m_name; };
+		const std::string& getName() const { return m_name; };
 
 		//! @brief Sets the title that will be displayed to the user
 		void setTitle(const std::string& _title) { m_title = _title; };
 
 		//! @brief Item title
-		const std::string& title(void) const { return m_title; };
+		const std::string& getTitle() const { return m_title; };
 
 		//! @brief Set the item tool tip
 		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
 
 		//! @brief Set the item tool tip
-		const std::string& toolTip(void) const { return m_toolTip; };
+		const std::string& getToolTip() const { return m_toolTip; };
 
 		//! @brief Add a connector on the left side of the FlowItem
 		//! The default connector style will be applied
@@ -210,13 +212,13 @@ namespace ot {
 		//! @brief Sets the title foreground painter
 		//! Create a LinearGradientPainter2D and replace the current title foreground painter
 		//! @param _color The primary text color, other colors are calculated by 255-color
-		void setDefaultTitleForegroundGradient(void);
+		void setDefaultTitleForegroundGradient();
 
 		//! @brief Sets the default connector style
 		//! The new default style will only affect items added after settings the style.
 		//! The defualt style is applied to connetors added via addInput() or addOutput() (with exceptions, see function comments)
 		void setDefaultConnectorStyle(const GraphicsFlowItemConnector& _config) { m_defaultConnectorStyle = _config; };
-		const GraphicsFlowItemConnector& defaultConnectorStyle(void) const { return m_defaultConnectorStyle; };
+		const GraphicsFlowItemConnector& getDefaultConnectorStyle() const { return m_defaultConnectorStyle; };
 
 		void setBackgroundImagePath(const std::string& _path) { m_backgroundImagePath = _path; };
 		void setBackgroundImageAlignment(ot::Alignment _align) { m_backgroundImageAlignment = _align; };

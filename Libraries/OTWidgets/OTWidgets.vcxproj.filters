@@ -55,7 +55,7 @@
     <ClCompile Include="src\GraphicsHBoxLayoutItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsPixmapItem.cpp">
+    <ClCompile Include="src\GraphicsImageItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\CustomGraphicsItem.cpp">
@@ -737,7 +737,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsGridLayoutItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsPixmapItem.h">
+    <ClInclude Include="include\OTWidgets\GraphicsImageItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\CustomGraphicsItem.h">

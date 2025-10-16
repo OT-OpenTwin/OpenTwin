@@ -15,7 +15,7 @@
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsInvisibleItem> invisItemRegistrar(OT_FactoryKey_GraphicsInvisibleItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsInvisibleItem> invisItemRegistrar(ot::GraphicsInvisibleItemCfg::className());
 
 ot::GraphicsInvisibleItem::GraphicsInvisibleItem()
 	: ot::CustomGraphicsItem(new GraphicsInvisibleItemCfg)

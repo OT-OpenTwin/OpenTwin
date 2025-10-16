@@ -20,6 +20,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionPreviewItem : public QGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsConnectionPreviewItem)
+		OT_DECL_NOMOVE(GraphicsConnectionPreviewItem)
 	public:
 		GraphicsConnectionPreviewItem();
 		virtual ~GraphicsConnectionPreviewItem();

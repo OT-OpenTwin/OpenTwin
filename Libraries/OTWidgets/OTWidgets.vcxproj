@@ -104,7 +104,7 @@
     <ClCompile Include="src\GraphicsLineItem.cpp" />
     <ClCompile Include="src\GraphicsPicker.cpp" />
     <ClCompile Include="src\GraphicsPickerView.cpp" />
-    <ClCompile Include="src\GraphicsPixmapItem.cpp" />
+    <ClCompile Include="src\GraphicsImageItem.cpp" />
     <ClCompile Include="src\GraphicsPolygonItem.cpp" />
     <ClCompile Include="src\GraphicsRectangularItem.cpp" />
     <ClCompile Include="src\GraphicsScene.cpp" />
@@ -410,7 +410,7 @@
     <QtMoc Include="include\OTWidgets\GraphicsPicker.h" />
     <ClInclude Include="include\OTWidgets\GraphicsLayoutItemWrapper.h" />
     <ClInclude Include="include\OTWidgets\GraphicsLineItem.h" />
-    <ClInclude Include="include\OTWidgets\GraphicsPixmapItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsImageItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsRectangularItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsStackItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsTextItem.h" />

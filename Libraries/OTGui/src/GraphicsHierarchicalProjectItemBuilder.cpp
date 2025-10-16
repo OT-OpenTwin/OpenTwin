@@ -8,13 +8,13 @@
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/GraphicsHierarchicalProjectItemBuilder.h"
 
-#include "OTGui/GraphicsFlowItemBuilder.h"
-#include "OTGui/GraphicsEllipseItemCfg.h"
-#include "OTGui/GraphicsImageItemCfg.h"
-#include "OTGui/GraphicsRectangularItemCfg.h"
-#include "OTGui/GraphicsStackItemCfg.h"
 #include "OTGui/GraphicsTextItemCfg.h"
+#include "OTGui/GraphicsStackItemCfg.h"
+#include "OTGui/GraphicsImageItemCfg.h"
+#include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTGui/GraphicsFlowItemBuilder.h"
 #include "OTGui/GraphicsTriangleItemCfg.h"
+#include "OTGui/GraphicsRectangularItemCfg.h"
 
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/GraphicsVBoxLayoutItemCfg.h"
@@ -60,7 +60,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 	root->addItemTop(bor, false, true);
 
-	// Layout
+	// Main layout
 	ot::GraphicsVBoxLayoutItemCfg* mLay = new ot::GraphicsVBoxLayoutItemCfg;
 	mLay->setName(m_name + "_mLay");
 	mLay->setMinimumSize(ot::Size2DD(50., 80.));
@@ -120,31 +120,34 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 	tLay->addStrech(1);
 
 	// Central layout
-	ot::GraphicsHBoxLayoutItemCfg* cLay = new ot::GraphicsHBoxLayoutItemCfg;
+	ot::GraphicsVBoxLayoutItemCfg* cLay = new ot::GraphicsVBoxLayoutItemCfg;
 	cLay->setName(m_name + "_cLay");
 	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
+	if (!m_type.empty()) {
+		ot::GraphicsTextItemCfg* typeItm = new GraphicsTextItemCfg("Project Type: " + m_type);
+		typeItm->setName(m_name + "_ptype");
+		typeItm->setAlignment(ot::AlignLeft);
+		
+		cLay->addChildItem(typeItm);
+	}
+	
+
 	// Create background image
-	ot::GraphicsImageItemCfg* cImg = nullptr;
-	if (!m_backgroundImagePath.empty()) {
-		cImg = new ot::GraphicsImageItemCfg;
-		cImg->setImagePath(m_backgroundImagePath);
+	if (!m_backgroundImage.empty()) {
+		/*ot::GraphicsImageItemCfg* cImg = new ot::GraphicsImageItemCfg;
+		//cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(m_name + "_cImg");
 		cImg->setMargins(m_backgroundImageMargins);
 		cImg->setSizePolicy(ot::Dynamic);
 		cImg->setAlignment(ot::AlignCenter);
 		cImg->setMaintainAspectRatio(true);
 		cImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+
+		cLay->addChildItem(cImg, 1);*/
 	}
 
-	// Setup central layout (central image (if on layout mode is set))
-	if (cImg) {
-		cLay->addChildItem(cImg, 1);
-	}
-	else {
-		// Setup central layout (stretch)
-		cLay->addStrech(1);
-	}
+	cLay->addStrech(1);
 
 	// Add central layout to main layout
 	mLay->addChildItem(cLay, 1);
@@ -197,7 +200,7 @@ void ot::GraphicsHierarchicalProjectItemBuilder::setTitleForegroundColor(const o
 	this->setTitleForegroundPainter(new ot::FillPainter2D(_color));
 }
 
-void ot::GraphicsHierarchicalProjectItemBuilder::setDefaultTitleForegroundGradient(void) {
+void ot::GraphicsHierarchicalProjectItemBuilder::setDefaultTitleForegroundGradient() {
 	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
 	painter->setCenterPoint(ot::Point2DD(0., 2.));
 	painter->setCenterRadius(2.5);

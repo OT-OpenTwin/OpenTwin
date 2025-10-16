@@ -14,7 +14,7 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 
-static WrappedItemFactoryRegistrar<WrappedEllipseItem> circleRegistrar(OT_FactoryKey_GraphicsEllipseItem);
+static WrappedItemFactoryRegistrar<WrappedEllipseItem> circleRegistrar(ot::GraphicsEllipseItemCfg::className());
 
 WrappedEllipseItem::WrappedEllipseItem() {
 	this->setOutline(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));

@@ -23,6 +23,7 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NODEFAULT(GraphicsItemPreviewDrag)
 		OT_DECL_NOCOPY(GraphicsItemPreviewDrag)
+		OT_DECL_NOMOVE(GraphicsItemPreviewDrag)
 	public:
 		GraphicsItemPreviewDrag(const std::string& _itemName, const BasicServiceInformation& _owner);
 		virtual ~GraphicsItemPreviewDrag();

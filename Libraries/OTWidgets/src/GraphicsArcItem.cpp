@@ -16,7 +16,7 @@
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsArcItem> arcItemRegistrar(OT_FactoryKey_GraphicsArcItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsArcItem> arcItemRegistrar(ot::GraphicsArcItemCfg::className());
 
 ot::GraphicsArcItem::GraphicsArcItem()
 	: ot::CustomGraphicsItem(new GraphicsArcItemCfg)

@@ -14,6 +14,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsArcItem : public CustomGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsArcItem)
+		OT_DECL_NOMOVE(GraphicsArcItem)
 	public:
 		GraphicsArcItem();
 		virtual ~GraphicsArcItem();

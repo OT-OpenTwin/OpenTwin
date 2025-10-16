@@ -9,19 +9,23 @@
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_FactoryKey_GraphicsGroupItem "OT_GIGroup"
-
 namespace ot {
 
 	//! @class GraphicsGroupItem.
 	//! @brief The graphics group item is used to group multiple items into one item.
 	class OT_GUI_API_EXPORT GraphicsGroupItemCfg : public ot::GraphicsItemCfg {
+		OT_DECL_NOMOVE(GraphicsGroupItemCfg)
 	public:
+		static std::string className() { return "GraphicsGroupItemCfg"; };
+
 		GraphicsGroupItemCfg();
+		GraphicsGroupItemCfg(const GraphicsGroupItemCfg& _other);
 		virtual ~GraphicsGroupItemCfg();
 
+		GraphicsGroupItemCfg& operator = (const GraphicsGroupItemCfg&) = delete;
+
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy(void) const override { return new GraphicsGroupItemCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -34,7 +38,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsGroupItem); };
+		virtual std::string getFactoryKey(void) const override { return GraphicsGroupItemCfg::className(); };
 
 		//! @brief Will add the provided item to the group.
 		//! The group takes ownership of the item.

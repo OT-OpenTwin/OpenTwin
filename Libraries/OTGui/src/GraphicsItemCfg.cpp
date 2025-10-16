@@ -64,9 +64,6 @@ ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 // Base class methods
 
 void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
-
-	// !!!!!     DON'T FORGET copyConfigDataToItem WHEN ADDING MEMBER ;-)     !!!!!
-
 	JsonObject posObj;
 	m_pos.addToJsonObject(posObj, _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Position, posObj, _allocator);
@@ -118,16 +115,13 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	_object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Title, JsonString(m_title, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_ToolTip, JsonString(m_tooltip, _allocator), _allocator);
-	_object.AddMember(OT_JSON_MEMBER_GraphicsItemCfgType, JsonString(this->getFactoryKey(), _allocator), _allocator);
+	_object.AddMember(JsonString(factoryTypeKey(), _allocator), JsonString(this->getFactoryKey(), _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Alignment, JsonString(ot::toString(m_alignment), _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_SizePolicy, JsonString(ot::toString(m_sizePolicy), _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_ConnectionDirection, JsonString(ot::toString(m_connectionDirection), _allocator), _allocator);
 }
 
 void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
-
-	// !!!!!     DON'T FORGET copyConfigDataToItem WHEN ADDING MEMBER ;-)     !!!!!
-
 	m_uid = static_cast<ot::UID>(json::getInt64(_object, OT_JSON_MEMBER_Uid));
 	m_name = json::getString(_object, OT_JSON_MEMBER_Name);
 	m_title = json::getString(_object, OT_JSON_MEMBER_Title);
@@ -185,29 +179,4 @@ std::string ot::GraphicsItemCfg::getStringForKey(const std::string& _key) const 
 	const auto& it = m_stringMap.find(_key);
 	if (it == m_stringMap.end()) return "#" + _key;
 	else return it->second;
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Protected: Helper
-
-void ot::GraphicsItemCfg::copyConfigDataToItem(GraphicsItemCfg* _target) const {
-	_target->m_name = m_name;
-	_target->m_title = m_title;
-	_target->m_uid = m_uid;
-	_target->m_tooltip = m_tooltip;
-	_target->m_pos = m_pos;
-	_target->m_additionalTriggerDistance = m_additionalTriggerDistance;
-
-	_target->m_minSize = m_minSize;
-	_target->m_maxSize = m_maxSize;
-
-	_target->m_margins = m_margins;
-	_target->m_flags = m_flags;
-	_target->m_alignment = m_alignment;
-	_target->m_sizePolicy = m_sizePolicy;
-	_target->m_connectionDirection = m_connectionDirection;
-
-	_target->m_stringMap = m_stringMap;
-	_target->m_transform = m_transform;
 }

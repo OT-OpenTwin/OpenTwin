@@ -14,20 +14,23 @@
 // std header
 #include <list>
 
-#define OT_FactoryKey_GraphicsPolygonItem "OT_GIPoly"
-
 namespace ot {
 
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsPolygonItemCfg : public ot::GraphicsItemCfg {
-		OT_DECL_NOCOPY(GraphicsPolygonItemCfg)
+		OT_DECL_NOMOVE(GraphicsPolygonItemCfg)
 	public:
+		static std::string className() { return "GraphicsPolygonItemCfg"; };
+
 		GraphicsPolygonItemCfg();
+		GraphicsPolygonItemCfg(const GraphicsPolygonItemCfg& _other);
 		virtual ~GraphicsPolygonItemCfg();
 
+		GraphicsPolygonItemCfg& operator = (const GraphicsPolygonItemCfg&) = delete;
+
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const override;
+		virtual GraphicsItemCfg* createCopy(void) const override { return new GraphicsPolygonItemCfg(*this); };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -40,7 +43,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsPolygonItem); };
+		virtual std::string getFactoryKey() const override { return GraphicsPolygonItemCfg::className(); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

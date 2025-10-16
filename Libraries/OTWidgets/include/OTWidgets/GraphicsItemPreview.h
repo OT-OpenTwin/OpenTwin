@@ -18,6 +18,8 @@ namespace ot {
 	class GraphicsItemPreviewDrag;
 
 	class OT_WIDGETS_API_EXPORT GraphicsItemPreview : public QLabel {
+		OT_DECL_NOCOPY(GraphicsItemPreview)
+		OT_DECL_NOMOVE(GraphicsItemPreview)
 	public:
 		GraphicsItemPreview();
 		virtual ~GraphicsItemPreview();
@@ -27,7 +29,7 @@ namespace ot {
 		virtual void leaveEvent(QEvent* _event) override;
 
 		void setItemName(const std::string& _itemName) { m_itemName = _itemName; };
-		const std::string itemName(void) const { return m_itemName; };
+		const std::string getItemName(void) const { return m_itemName; };
 
 		void setOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
 		const BasicServiceInformation& getOwner(void) const { return m_owner; };

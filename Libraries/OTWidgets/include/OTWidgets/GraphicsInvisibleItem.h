@@ -14,6 +14,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsInvisibleItem : public CustomGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsInvisibleItem)
+		OT_DECL_NOMOVE(GraphicsInvisibleItem)
 	public:
 		GraphicsInvisibleItem();
 		virtual ~GraphicsInvisibleItem();

@@ -16,7 +16,7 @@
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsLineItem> lineItemRegistrar(OT_FactoryKey_GraphicsLineItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsLineItem> lineItemRegistrar(ot::GraphicsLineItemCfg::className());
 
 ot::GraphicsLineItem::GraphicsLineItem()
 	: ot::CustomGraphicsItem(new GraphicsLineItemCfg)

@@ -9,26 +9,23 @@
 #include "OTGui/GraphicsGroupItemCfg.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsGroupItemCfg> stackItemCfg(OT_FactoryKey_GraphicsGroupItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsGroupItemCfg> groupItemCfg(ot::GraphicsGroupItemCfg::className());
 
 ot::GraphicsGroupItemCfg::GraphicsGroupItemCfg()
 {
 
 }
 
-ot::GraphicsGroupItemCfg::~GraphicsGroupItemCfg() {
-	this->memClear();
+ot::GraphicsGroupItemCfg::GraphicsGroupItemCfg(const GraphicsGroupItemCfg& _other) 
+	: ot::GraphicsItemCfg(_other)
+{
+	for (GraphicsItemCfg* itm : _other.m_items) {
+		m_items.push_back(itm->createCopy());
+	}
 }
 
-ot::GraphicsItemCfg* ot::GraphicsGroupItemCfg::createCopy(void) const {
-	ot::GraphicsGroupItemCfg* copy = new GraphicsGroupItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	for (GraphicsItemCfg* itm : m_items) {
-		copy->m_items.push_back(itm->createCopy());
-	}
-
-	return copy;
+ot::GraphicsGroupItemCfg::~GraphicsGroupItemCfg() {
+	this->memClear();
 }
 
 void ot::GraphicsGroupItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

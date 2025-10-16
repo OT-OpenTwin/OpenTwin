@@ -17,13 +17,12 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsPickerItemInfo : public Serializable {
+		OT_DECL_DEFCOPY(GraphicsPickerItemInfo)
+		OT_DECL_DEFMOVE(GraphicsPickerItemInfo)
 	public:
 		GraphicsPickerItemInfo();
 		GraphicsPickerItemInfo(const std::string& _name, const std::string& _title, const std::string& _previewIcon);
-		GraphicsPickerItemInfo(const GraphicsPickerItemInfo& _other);
 		virtual ~GraphicsPickerItemInfo();
-
-		GraphicsPickerItemInfo& operator = (const GraphicsPickerItemInfo& _other);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)

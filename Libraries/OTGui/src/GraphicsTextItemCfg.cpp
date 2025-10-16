@@ -11,7 +11,7 @@
 #include "OTGui/GraphicsTextItemCfg.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
 
-static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsTextItemCfg> textItemCfg(OT_FactoryKey_GraphicsTextItem);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsTextItemCfg> textItemCfg(ot::GraphicsTextItemCfg::className());
 
 ot::GraphicsTextItemCfg::GraphicsTextItemCfg(const std::string& _text, const ot::Color& _textColor)
 	: m_text(_text), m_textIsReference(false)
@@ -19,19 +19,14 @@ ot::GraphicsTextItemCfg::GraphicsTextItemCfg(const std::string& _text, const ot:
 	m_textStyle.setColor(_textColor);
 }
 
-ot::GraphicsTextItemCfg::~GraphicsTextItemCfg() {}
+ot::GraphicsTextItemCfg::GraphicsTextItemCfg(const GraphicsTextItemCfg& _other) 
+	: ot::GraphicsItemCfg(_other), m_text(_other.m_text), m_textFont(_other.m_textFont), m_textStyle(_other.m_textStyle), 
+	m_textIsReference(_other.m_textIsReference)
+{
 
-ot::GraphicsItemCfg* ot::GraphicsTextItemCfg::createCopy(void) const {
-	ot::GraphicsTextItemCfg* copy = new GraphicsTextItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_text = m_text;
-	copy->m_textFont = m_textFont;
-	copy->m_textStyle = m_textStyle;
-	copy->m_textIsReference = m_textIsReference;
-
-	return copy;
 }
+
+ot::GraphicsTextItemCfg::~GraphicsTextItemCfg() {}
 
 void ot::GraphicsTextItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
