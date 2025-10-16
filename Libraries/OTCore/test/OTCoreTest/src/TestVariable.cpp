@@ -297,7 +297,7 @@ TEST(StringToVariable, String)
 
 TEST(StringToVariable, StringLoadTest)
 {
-	ot::StringToVariableConverter converter;
+	//ot::StringToVariableConverter converter;
 	for (int i = 0; i < 10000000; i++)
 	{
 		const ot::Variable actualValue("someContent");

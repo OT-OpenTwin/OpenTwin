@@ -15,7 +15,7 @@
 #include <unordered_set>
 
 template <typename K, typename V>
-std::list<K> ot::ContainerHelper::getKeys(const std::map<K, V>& _map) {
+inline std::list<K> ot::ContainerHelper::getKeys(const std::map<K, V>& _map) {
 	std::list<K> result;
 
 	for (const auto& it : _map) {
@@ -26,7 +26,7 @@ std::list<K> ot::ContainerHelper::getKeys(const std::map<K, V>& _map) {
 }
 
 template <typename K, typename V>
-std::list<V> ot::ContainerHelper::getValues(const std::map<K, V>& _map) {
+inline std::list<V> ot::ContainerHelper::getValues(const std::map<K, V>& _map) {
 	std::list<V> result;
 
 	for (const auto& it : _map) {
@@ -37,7 +37,7 @@ std::list<V> ot::ContainerHelper::getValues(const std::map<K, V>& _map) {
 }
 
 template <class K, class V>
-void ot::ContainerHelper::removeByValue(std::map<K, V>& _map, const V& _value) {
+inline void ot::ContainerHelper::removeByValue(std::map<K, V>& _map, const V& _value) {
 	for (auto it = _map.begin(); it != _map.end(); ) {
 		if (it->second == _value) {
 			it = _map.erase(it);
@@ -49,8 +49,8 @@ void ot::ContainerHelper::removeByValue(std::map<K, V>& _map, const V& _value) {
 }
 
 template<class K, class V>
-bool ot::ContainerHelper::hasValue(const std::map<K, V>& _map, const V& _value) {
-	for (const auto& it = _map.begin(); it != _map.end(); it++) {
+inline bool ot::ContainerHelper::hasValue(const std::map<K, V>& _map, const V& _value) {
+	for (auto it = _map.begin(); it != _map.end(); it++) {
 		if (it->second == _value) {
 			return true;
 		}
@@ -58,8 +58,23 @@ bool ot::ContainerHelper::hasValue(const std::map<K, V>& _map, const V& _value) 
 	return false;
 }
 
+template<class K, class V>
+inline bool ot::ContainerHelper::contains(const std::map<K, V>& _map, const K& _key) {
+	return _map.find(_key) != _map.end();
+}
+
+template<typename T>
+inline bool ot::ContainerHelper::contains(const std::list<T>& _list, const T& _value) {
+	return std::find(_list.begin(), _list.end(), _value) != _list.end();
+}
+
+template<typename T>
+inline bool ot::ContainerHelper::contains(const std::vector<T>& _vector, const T& _value) {
+	return std::find(_vector.begin(), _vector.end(), _value) != _vector.end();
+}
+
 template <typename T>
-std::vector<T> ot::ContainerHelper::toVector(const std::list<T>& _list) {
+inline std::vector<T> ot::ContainerHelper::toVector(const std::list<T>& _list) {
 	std::vector<T> result;
 	result.reserve(_list.size());
 	for (const T& entry : _list) {
@@ -69,7 +84,7 @@ std::vector<T> ot::ContainerHelper::toVector(const std::list<T>& _list) {
 }
 
 template <typename T>
-std::list<T> ot::ContainerHelper::toList(const std::vector<T>& _vector) {
+inline std::list<T> ot::ContainerHelper::toList(const std::vector<T>& _vector) {
 	std::list<T> result;
 	for (const T& entry : _vector) {
 		result.push_back(entry);
@@ -78,7 +93,7 @@ std::list<T> ot::ContainerHelper::toList(const std::vector<T>& _vector) {
 }
 
 template<typename T>
-std::list<T> ot::ContainerHelper::createDiff(const std::list<T>& _left, const std::list<T>& _right, DiffMode _diffMode) {
+inline std::list<T> ot::ContainerHelper::createDiff(const std::list<T>& _left, const std::list<T>& _right, DiffMode _diffMode) {
 	std::set<T> leftSet(_left.begin(), _left.end());
 	std::set<T> rightSet(_right.begin(), _right.end());
 	std::list<T> diff;
@@ -105,7 +120,7 @@ std::list<T> ot::ContainerHelper::createDiff(const std::list<T>& _left, const st
 }
 
 template<typename T>
-std::vector<T> ot::ContainerHelper::createDiff(const std::vector<T>& _left, const std::vector<T>& _right, DiffMode _diffMode) {
+inline std::vector<T> ot::ContainerHelper::createDiff(const std::vector<T>& _left, const std::vector<T>& _right, DiffMode _diffMode) {
 	std::set<T> leftSet(_left.begin(), _left.end());
 	std::set<T> rightSet(_right.begin(), _right.end());
 	std::vector<T> diff;
@@ -132,7 +147,7 @@ std::vector<T> ot::ContainerHelper::createDiff(const std::vector<T>& _left, cons
 }
 
 template<typename T>
-bool ot::ContainerHelper::isSubset(const std::list<T>& _subset, const std::list<T>& _list) {
+inline bool ot::ContainerHelper::isSubset(const std::list<T>& _subset, const std::list<T>& _list) {
 	std::unordered_set<T> data(_list.begin(), _list.end());
 
 	for (const T& val : _subset) {
@@ -145,7 +160,7 @@ bool ot::ContainerHelper::isSubset(const std::list<T>& _subset, const std::list<
 }
 
 template<typename T>
-bool ot::ContainerHelper::isSubset(const std::vector<T>& _subset, const std::vector<T>& _vector) {
+inline bool ot::ContainerHelper::isSubset(const std::vector<T>& _subset, const std::vector<T>& _vector) {
 	std::unordered_set<T> data(_vector.begin(), _vector.end());
 
 	for (const T& val : _subset) {
@@ -155,6 +170,28 @@ bool ot::ContainerHelper::isSubset(const std::vector<T>& _subset, const std::vec
 	}
 
 	return true;
+}
+
+template<typename T>
+inline std::list<T> ot::ContainerHelper::intersect(const std::list<T>& _list1, const std::list<T>& _list2) {
+	std::list<T> result;
+	for (const auto& item : _list1) {
+		if (std::find(_list2.begin(), _list2.end(), item) != _list2.end()) {
+			result.push_back(item);
+		}
+	}
+	return result;
+}
+
+template<typename T>
+inline std::vector<T> ot::ContainerHelper::intersect(const std::vector<T>& _vector1, const std::vector<T>& _vector2) {
+	std::vector<T> result;
+	for (const auto& item : _vector1) {
+		if (std::find(_vector2.begin(), _vector2.end(), item) != _vector2.end()) {
+			result.push_back(item);
+		}
+	}
+	return result;
 }
 
 template<typename T>
@@ -182,7 +219,7 @@ namespace ot {
 	namespace intern {
 		// Helper: compare contents via hashing (O(n))
 		template <typename T>
-		static bool isEqualHashing(const T& _c1, const T& _c2) {
+		static inline bool isEqualHashing(const T& _c1, const T& _c2) {
 			if (_c1.size() != _c2.size()) {
 				return false;
 			}
@@ -205,7 +242,7 @@ namespace ot {
 
 		// Helper: compare contents via sorting (O(n log n))
 		template <typename T>
-		static bool isEqualSorting(const T& _c1, const T& _c2) {
+		static inline bool isEqualSorting(const T& _c1, const T& _c2) {
 			if (_c1.size() != _c2.size()) {
 				return false;
 			}

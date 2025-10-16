@@ -14,6 +14,7 @@ namespace ot {
 
 	class ContainerHelper {
 	public:
+		//! @brief Diff modes for functions creating diffs between two containers.
 		enum DiffMode {
 			MissingLeft, //! @brief Items missing in the left list that exist in the right list.
 			MissingRight, //! @brief Items missing in the right list that exist in the left list.
@@ -37,21 +38,58 @@ namespace ot {
 		//! @brief Removes the value from the provided map.
 		//! @tparam K Map key type.
 		//! @tparam V Map value type.
-		//! @param _map 
-		//! @param _value 
+		//! @param _map Map to modify.
+		//! @param _value Value to remove.
 		template <class K, class V> static void removeByValue(std::map<K, V>& _map, const V& _value);
 
 		//! @brief Returns true if the provided map stores an entry with the given value.
 		//! @tparam K Map key type.
 		//! @tparam V Map value type.
-		//! @param _map 
-		//! @param _value 
+		//! @param _map Map to check.
+		//! @param _value Value to search for.
 		template <class K, class V> static bool hasValue(const std::map<K, V>& _map, const V& _value);
 
+		//! @brief Returns true if the provided map contains the given key.
+		//! @tparam K Map key type.
+		//! @tparam V Map value type.
+		//! @param _map Map to check.
+		//! @param _key Key to search for.
+		template <class K, class V> static bool contains(const std::map<K, V>& _map, const K& _key);
+
+		//! @brief Returns true if the provided list contains the given value.
+		//! @tparam T List value type.
+		//! @param _list List to check.
+		//! @param _value Value to search for.
+		template <typename T> static bool contains(const std::list<T>& _list, const T& _value);
+
+		//! @brief Returns true if the provided vector contains the given value.
+		//! @tparam T Vector value type.
+		//! @param _vector Vector to check.
+		//! @param _value Value to search for.
+		template <typename T> static bool contains(const std::vector<T>& _vector, const T& _value);
+
+		//! @brief Converts the provided list into a vector.
+		//! @tparam T List/Vector value type.
+		//! @param _list List to convert.
 		template <typename T> static std::vector<T> toVector(const std::list<T>& _list);
+
+		//! @brief Converts the provided vector into a list.
+		//! @tparam T List/Vector value type.
+		//! @param _vector Vector to convert.
 		template <typename T> static std::list<T> toList(const std::vector<T>& _vector);
 
+		//! @brief Creates a diff between the two provided lists.
+		//! @tparam T List value type.
+		//! @param _left Left list.
+		//! @param _right Right list.
+		//! @param _diffMode Diff mode to apply.
 		template <typename T> static std::list<T> createDiff(const std::list<T>& _left, const std::list<T>& _right, DiffMode _diffMode);
+
+		//! @brief Creates a diff between the two provided vectors.
+		//! @tparam T Vector value type.
+		//! @param _left Left vector.
+		//! @param _right Right vector.
+		//! @param _diffMode Diff mode to apply.
 		template <typename T> static std::vector<T> createDiff(const std::vector<T>& _left, const std::vector<T>& _right, DiffMode _diffMode);
 
 		//! @brief Returns true if _subset is a subset of _list.
@@ -65,6 +103,20 @@ namespace ot {
 		//! @param _subset Vector expected to be a subset.
 		//! @param _vector Vector expected to contain the subset.
 		template <typename T> static bool isSubset(const std::vector<T>& _subset, const std::vector<T>& _vector);
+
+		//! @brief Returns a list containing all items that exist in both provided lists.
+		//! @tparam T List value type.
+		//! @param _list1 List 1.
+		//! @param _list2 List 2.
+		//! @return List of intersecting items.
+		template <typename T> static std::list<T> intersect(const std::list<T>& _list1, const std::list<T>& _list2);
+
+		//! @brief Returns a vector containing all items that exist in both provided vectors.
+		//! @tparam T Vector value type.
+		//! @param _vector1 Vector 1.
+		//! @param _vector2 Vector 2.
+		//! @return Vector of intersecting items.
+		template <typename T> static std::vector<T> intersect(const std::vector<T>& _vector1, const std::vector<T>& _vector2);
 
 		//! @brief Returns true if _list1 has at least one matching item in _list2.
 		//! @tparam T List value type.

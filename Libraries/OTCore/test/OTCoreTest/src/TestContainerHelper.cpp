@@ -2,7 +2,7 @@
 #include "OTCore/ContainerHelper.h"
 #include <string>
 
-TEST(ContainerTests, MapTest) {
+TEST(ContainerTests, MapGetValuesAndKeys) {
 	std::map<int, char> initialData;
 	initialData.insert_or_assign(1, 'A');
 	initialData.insert_or_assign(2, 'B');
@@ -22,7 +22,53 @@ TEST(ContainerTests, MapTest) {
 	}
 }
 
-TEST(ContainerTests, ListVectorTest) {
+TEST(ContainerTests, MapRemoveByValue) {
+	std::map<int, char> initialData;
+	initialData.insert_or_assign(1, 'A');
+	initialData.insert_or_assign(2, 'B');
+	initialData.insert_or_assign(3, 'C');
+
+	ot::ContainerHelper::removeByValue(initialData, 'B');
+	EXPECT_EQ(initialData.size(), 2);
+	EXPECT_EQ(initialData.find(2), initialData.end());
+
+	ot::ContainerHelper::removeByValue(initialData, 'D');
+	EXPECT_EQ(initialData.size(), 2);
+}
+
+TEST(ContainerTests, MapHasValue) {
+	std::map<int, char> initialData;
+	initialData.insert_or_assign(1, 'A');
+	initialData.insert_or_assign(2, 'B');
+	initialData.insert_or_assign(3, 'C');
+
+	EXPECT_TRUE(ot::ContainerHelper::hasValue(initialData, 'A'));
+	EXPECT_FALSE(ot::ContainerHelper::hasValue(initialData, 'D'));
+}
+
+TEST(ContainerTests, ContainsMap) {
+	std::map<int, char> initialData;
+	initialData.insert_or_assign(1, 'A');
+	initialData.insert_or_assign(2, 'B');
+	initialData.insert_or_assign(3, 'C');
+
+	EXPECT_TRUE(ot::ContainerHelper::contains(initialData, 1));
+	EXPECT_FALSE(ot::ContainerHelper::contains(initialData, 4));
+}
+
+TEST(ContainerTests, ContainsList) {
+	std::list<std::string> initialData = { "One", "Two", "Three" };
+	EXPECT_TRUE(ot::ContainerHelper::contains(initialData, std::string("One")));
+	EXPECT_FALSE(ot::ContainerHelper::contains(initialData, std::string("Four")));
+}
+
+TEST(ContainerTests, ContainsVector) {
+	std::vector<std::string> initialData = { "One", "Two", "Three" };
+	EXPECT_TRUE(ot::ContainerHelper::contains(initialData, std::string("One")));
+	EXPECT_FALSE(ot::ContainerHelper::contains(initialData, std::string("Four")));
+}
+
+TEST(ContainerTests, ListVectorConvertTest) {
 	std::list<int> initialData;
 	initialData.push_back(1);
 	initialData.push_back(2);
@@ -85,7 +131,7 @@ TEST(ContainerTests, DiffMissingBoth) {
 	}
 }
 
-TEST(ContainerTests, SubsetList) {
+TEST(ContainerTests, IsSubsetList) {
 	std::list<int> list = { 1, 2, 3 };
 	std::list<int> sub = { 1, 2 };
 	std::list<int> invalid = { 3, 4 };
@@ -94,7 +140,7 @@ TEST(ContainerTests, SubsetList) {
 	EXPECT_FALSE(ot::ContainerHelper::isSubset(invalid, list));
 }
 
-TEST(ContainerTests, SubsetVector) {
+TEST(ContainerTests, IsSubsetVector) {
 	std::vector<int> list = { 1, 2, 3 };
 	std::vector<int> sub = { 1, 2 };
 	std::vector<int> invalid = { 3, 4 };
@@ -103,7 +149,45 @@ TEST(ContainerTests, SubsetVector) {
 	EXPECT_FALSE(ot::ContainerHelper::isSubset(invalid, list));
 }
 
-TEST(ContainerTests, IntersectsList) {
+TEST(ContainerTests, IntersectList) {
+	std::list<int> l1 = { 1, 2, 3 };
+	std::list<int> l2 = { 2, 3, 4 };
+	std::list<int> l3 = { 3, 4, 5 };
+	std::list<int> l4 = { 4, 5, 6 };
+
+	std::list<int> intersect1 = ot::ContainerHelper::intersect(l1, l2);
+	EXPECT_EQ(intersect1.size(), 2);
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(intersect1, std::list<int>({ 2, 3 })));
+
+	std::list<int> intersect2 = ot::ContainerHelper::intersect(l1, l3);
+	EXPECT_EQ(intersect2.size(), 1);
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(intersect2, std::list<int>({ 3 })));
+
+	std::list<int> intersect3 = ot::ContainerHelper::intersect(l1, l4);
+	EXPECT_EQ(intersect3.size(), 0);
+	EXPECT_TRUE(intersect3.empty());
+}
+
+TEST(ContainerTests, IntersectVector) {
+	std::vector<int> l1 = { 1, 2, 3 };
+	std::vector<int> l2 = { 2, 3, 4 };
+	std::vector<int> l3 = { 3, 4, 5 };
+	std::vector<int> l4 = { 4, 5, 6 };
+
+	std::vector<int> intersect1 = ot::ContainerHelper::intersect(l1, l2);
+	EXPECT_EQ(intersect1.size(), 2);
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(intersect1, std::vector<int>({ 2, 3 })));
+	
+	std::vector<int> intersect2 = ot::ContainerHelper::intersect(l1, l3);
+	EXPECT_EQ(intersect2.size(), 1);
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(intersect2, std::vector<int>({ 3 })));
+	
+	std::vector<int> intersect3 = ot::ContainerHelper::intersect(l1, l4);
+	EXPECT_EQ(intersect3.size(), 0);
+	EXPECT_TRUE(intersect3.empty());
+}
+
+TEST(ContainerTests, IsIntersectList) {
 	std::list<int> l1 = { 1, 2 };
 	std::list<int> l2 = { 2, 3 };
 	std::list<int> l3 = { 3, 4 };
@@ -113,7 +197,7 @@ TEST(ContainerTests, IntersectsList) {
 	EXPECT_FALSE(ot::ContainerHelper::hasIntersection(l1, l3));
 }
 
-TEST(ContainerTests, IntersectsVector) {
+TEST(ContainerTests, IsIntersectVector) {
 	std::vector<int> l1 = { 1, 2 };
 	std::vector<int> l2 = { 2, 3 };
 	std::vector<int> l3 = { 3, 4 };
