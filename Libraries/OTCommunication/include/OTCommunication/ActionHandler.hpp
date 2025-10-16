@@ -15,29 +15,6 @@ namespace ot {
 	namespace intern {
 		template<typename Function> struct ActionHandlerFunctionWrapper;
 
-		// Primary template that will fail for unsupported types
-		template<typename Function>
-		struct ActionHandlerFunctionWrapper {
-			// No wrap method - this will cause compile error for unsupported types
-			static_assert(sizeof(Function) == 0, "Unsupported function type for ActionHandlerFunctionWrapper.\n"
-				"Supported types are:\n"
-				" - void(void)\n"
-				" - void(T::*)(void)\n"
-				" - void(JsonDocument&)\n"
-				" - void(T::*)(JsonDocument&)\n"
-				"\n"
-				" - std::string(void)\n"
-				" - std::string(T::*)(void)\n"
-				" - std::string(JsonDocument&)\n"
-				" - std::string(T::*)(JsonDocument&)\n"
-				"\n"
-				" - ot::ReturnMessage(void)\n"
-				" - ot::ReturnMessage(T::*)(void)\n"
-				" - ot::ReturnMessage(JsonDocument&)\n"
-				" - ot::ReturnMessage(T::*)(JsonDocument&)\n"
-				);
-		};
-
 		// void(void)
 		template<>
 		struct ActionHandlerFunctionWrapper<void(*)()> {
@@ -167,6 +144,43 @@ namespace ot {
 		struct ActionHandlerFunctionWrapper<ActionHandler::ActionHandlerMethodType> {
 			static ActionHandler::ActionHandlerMethodType wrap(const ActionHandler::ActionHandlerMethodType& _func) {
 				return _func;
+			}
+		};
+
+		// Generic callable / lambda support
+		template<typename Callable>
+		struct ActionHandlerFunctionWrapper {
+			static ActionHandler::ActionHandlerMethodType wrap(Callable&& func) {
+				return [f = std::forward<Callable>(func)](JsonDocument& _doc) -> std::string {
+					if constexpr (std::is_invocable_r_v<void, Callable>) {
+						f();
+						return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+					}
+					else if constexpr (std::is_invocable_r_v<void, Callable, JsonDocument&>) {
+						f(_doc);
+						return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+					}
+					else if constexpr (std::is_invocable_r_v<std::string, Callable>) {
+						return f();
+					}
+					else if constexpr (std::is_invocable_r_v<std::string, Callable, JsonDocument&>) {
+						return f(_doc);
+					}
+					else if constexpr (std::is_invocable_r_v<ot::ReturnMessage, Callable>) {
+						return f().toJson();
+					}
+					else if constexpr (std::is_invocable_r_v<ot::ReturnMessage, Callable, JsonDocument&>) {
+						return f(_doc).toJson();
+					}
+					else {
+						static_assert(sizeof(Callable) == 0,
+							"Unsupported lambda/functor signature.\n"
+							"Supported forms:\n"
+							"  void(), void(JsonDocument&)\n"
+							"  std::string(), std::string(JsonDocument&)\n"
+							"  ot::ReturnMessage(), ot::ReturnMessage(JsonDocument&)\n");
+					}
+				};
 			}
 		};
 	}
