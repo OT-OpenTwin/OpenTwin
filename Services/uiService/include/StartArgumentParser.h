@@ -21,7 +21,13 @@ public:
 	StartArgumentParser();
 	~StartArgumentParser() = default;
 
+	//! @brief Import the configuration from a temporary file.
+	//! The file is deleted after reading.
+	//! @return True if no file existed or the file was read successfully, false otherwise.
 	bool importConfig();
+
+	//! @brief Export the configuration to a temporary file.
+	//! @return True if the file was written successfully, false otherwise.
 	bool exportConfig() const;
 
 	bool getLogInSet() const { return m_logIn; };
