@@ -74,7 +74,7 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 	itm->setName(m_name);
 	itm->setMargins(ot::MarginsD(0., 0., 0., 0));
 	itm->setToolTip(m_toolTip);
-	itm->setAdditionalTriggerDistance(15.);
+	itm->setAdditionalTriggerDistance(GraphicsItemCfg::defaultAdditionalTriggerDistance());
 
 	// Title item
 	ot::GraphicsTextItemCfg* itmTxt = new ot::GraphicsTextItemCfg;
@@ -83,7 +83,6 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 	itmTxt->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
 	itmTxt->setTextFont(m_font);
 	itmTxt->setToolTip(m_toolTip);
-	//itmTxt->setMargins(ot::MarginsD(2., 2., 2., 2.));
 
 	// Place into layout
 	if (_isLeft) {

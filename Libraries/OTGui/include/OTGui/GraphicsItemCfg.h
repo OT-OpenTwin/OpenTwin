@@ -33,6 +33,8 @@ namespace ot {
 	public:
 		static std::string factoryTypeKey() { return "GIType"; };
 
+		static constexpr double defaultAdditionalTriggerDistance() { return 15.; };
+
 		//! @brief GraphicsItemFlag
 		enum GraphicsItemFlag {
 			NoFlags                    = 0 << 0, //! @brief No item flags.
@@ -191,18 +193,22 @@ namespace ot {
 		//! @ref getMinimumSize
 		void setFixedSize(const Size2DD& _size);
 
-		//! @brief Set item margins
-		//! @param _top Top margin
-		//! @param _right Right margin
-		//! @param _bottom Bottom margin
-		//! @param _left Left margin
+		//! @brief Set item margins.
+		//! @param _margin Margin in all directions.
+		void setMargins(double _margin) { this->setMargins(ot::MarginsD(_margin, _margin, _margin, _margin)); };
+		
+		//! @brief Set item margins.
+		//! @param _top Top margin.
+		//! @param _right Right margin.
+		//! @param _bottom Bottom margin.
+		//! @param _left Left margin.
 		void setMargins(double _left, double _top, double _right, double _bottom) { this->setMargins(ot::MarginsD(_left, _top, _right, _bottom)); };
 
-		//! @brief Set item margins
-		//! @param _margins Margins to set
+		//! @brief Set item margins.
+		//! @param _margins Margins to set.
 		void setMargins(const MarginsD& _margins) { m_margins = _margins; };
 
-		//! @brief Item margins
+		//! @brief Item margins.
 		const MarginsD& getMargins(void) const { return m_margins; };
 
 		void setGraphicsItemFlag(GraphicsItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
