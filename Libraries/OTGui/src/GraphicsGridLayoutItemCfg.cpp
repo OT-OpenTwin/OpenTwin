@@ -65,12 +65,12 @@ void ot::GraphicsGridLayoutItemCfg::addToJsonObject(JsonValue& _object, JsonAllo
 	_object.AddMember(OT_JSON_MEMBER_ColumnStretch, columnStretchArr, _allocator);
 
 	JsonArray itemArr;
-	for (auto r : m_items) {
+	for (auto& row : m_items) {
 		JsonArray columnArr;
-		for (auto c : r) {
-			if (c) {
+		for (GraphicsItemCfg* itm : row) {
+			if (itm) {
 				JsonObject itemObj;
-				c->addToJsonObject(itemObj, _allocator);
+				itm->addToJsonObject(itemObj, _allocator);
 				columnArr.PushBack(itemObj, _allocator);
 			}
 			else {

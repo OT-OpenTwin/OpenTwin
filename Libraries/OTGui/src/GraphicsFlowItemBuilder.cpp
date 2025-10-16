@@ -67,7 +67,7 @@ void ot::GraphicsFlowItemConnector::setCustomSecondaryPainter(ot::Painter2D* _pa
 	m_customSecondaryPainter = _painter;
 }
 
-void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft) {
+void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft) const {
 	// Connector item
 	ot::GraphicsItemCfg* itm = this->createConnectorItem();
 	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable | ot::GraphicsItemCfg::ItemHandlesState);
@@ -106,17 +106,17 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 	
 }
 
-ot::Painter2D* ot::GraphicsFlowItemConnector::createPrimaryPainter(void) const {
+ot::Painter2D* ot::GraphicsFlowItemConnector::createPrimaryPainter() const {
 	if (m_customPrimaryPainter) return m_customPrimaryPainter->createCopy();
 	else return new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemConnectableBackground);
 }
 
-ot::Painter2D* ot::GraphicsFlowItemConnector::createSecondaryPainter(void) const {
+ot::Painter2D* ot::GraphicsFlowItemConnector::createSecondaryPainter() const {
 	if (m_customSecondaryPainter) return m_customSecondaryPainter->createCopy();
 	else return new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder);
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createConnectorItem(void) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createConnectorItem() const {
 	switch (m_figure)
 	{
 	case ot::GraphicsFlowItemConnector::Square: return this->createSquareItem();
@@ -139,7 +139,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createConnectorItem(void) {
 	}
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createSquareItem(void) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createSquareItem() const {
 	Painter2D* primaryPainter = m_customPrimaryPainter;
 	ot::GraphicsRectangularItemCfg* itm = new ot::GraphicsRectangularItemCfg(this->createPrimaryPainter());
 	itm->setSize(ot::Size2DD(10., 10.));
@@ -150,7 +150,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createSquareItem(void) {
 	return itm;
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createCircleItem(void) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createCircleItem() const {
 	ot::GraphicsEllipseItemCfg* itm = new ot::GraphicsEllipseItemCfg(5, 5, this->createPrimaryPainter());
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
@@ -159,7 +159,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createCircleItem(void) {
 	return itm;
 }
 
-ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createTriangleItem(GraphicsTriangleItemCfg::TriangleDirection _direction, GraphicsTriangleItemCfg::TriangleShape _shape) {
+ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createTriangleItem(GraphicsTriangleItemCfg::TriangleDirection _direction, GraphicsTriangleItemCfg::TriangleShape _shape) const {
 	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(_direction, _shape);
 	itm->setBackgroundPainer(this->createPrimaryPainter());
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
@@ -297,7 +297,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	lcLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	int ix = 0;
-	for (auto c : m_left) {
+	for (const auto& c : m_left) {
 		c.addToGrid(ix, lcLay, true);
 		ix++;
 	}
@@ -310,7 +310,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	rcLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	ix = 0;
-	for (auto c : m_right) {
+	for (const auto& c : m_right) {
 		c.addToGrid(ix, rcLay, false);
 		ix++;
 	}
@@ -479,7 +479,7 @@ void ot::GraphicsFlowItemBuilder::setTitleForegroundColor(const ot::Color& _colo
 	this->setTitleForegroundPainter(new ot::FillPainter2D(_color));
 }
 
-void ot::GraphicsFlowItemBuilder::setDefaultTitleForegroundGradient(void) {
+void ot::GraphicsFlowItemBuilder::setDefaultTitleForegroundGradient() {
 	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
 	painter->setCenterPoint(ot::Point2DD(0., 2.));
 	painter->setCenterRadius(2.5);

@@ -73,16 +73,16 @@ namespace ot {
 		void setFigure(GraphicsFlowItemConnector::ConnectorFigure _figure) { m_figure = _figure; };
 		GraphicsFlowItemConnector::ConnectorFigure getFigure() const { return m_figure; };
 
-		void addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft);
+		void addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft) const;
 
 	private:
 		Painter2D* createPrimaryPainter() const;
 		Painter2D* createSecondaryPainter() const;
 
-		ot::GraphicsItemCfg* createConnectorItem();
-		ot::GraphicsItemCfg* createSquareItem();
-		ot::GraphicsItemCfg* createCircleItem();
-		ot::GraphicsItemCfg* createTriangleItem(GraphicsTriangleItemCfg::TriangleDirection _direction, GraphicsTriangleItemCfg::TriangleShape _shape);
+		ot::GraphicsItemCfg* createConnectorItem() const;
+		ot::GraphicsItemCfg* createSquareItem() const;
+		ot::GraphicsItemCfg* createCircleItem() const;
+		ot::GraphicsItemCfg* createTriangleItem(GraphicsTriangleItemCfg::TriangleDirection _direction, GraphicsTriangleItemCfg::TriangleShape _shape) const;
 
 		std::string m_name;
 		std::string m_text;

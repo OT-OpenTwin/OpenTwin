@@ -32,7 +32,7 @@ void EntityBlock::addVisualizationNodes(void)
 
 void EntityBlock::addConnector(const ot::Connector& connector)
 {
-	if (m_connectorsByName.find(connector.getConnectorName()) != m_connectorsByName.end())
+	if (m_connectorsByName.find(connector.getConnectorName()) == m_connectorsByName.end())
 	{
 		m_connectorsByName[connector.getConnectorName()] = connector;
 		setModified();
@@ -44,7 +44,7 @@ void EntityBlock::addConnector(const ot::Connector& connector)
 }
 
 void EntityBlock::addConnector(ot::Connector&& connector) {
-	if (m_connectorsByName.find(connector.getConnectorName()) != m_connectorsByName.end())
+	if (m_connectorsByName.find(connector.getConnectorName()) == m_connectorsByName.end())
 	{
 		m_connectorsByName[connector.getConnectorName()] = std::move(connector);
 		setModified();
