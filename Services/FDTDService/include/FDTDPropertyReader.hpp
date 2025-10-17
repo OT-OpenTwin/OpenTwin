@@ -32,7 +32,7 @@ T readEntityPropertiesInfo(EntityBase* _solverEntity, const std::string& _groupF
 	}
 	for (auto& item : _properties) {
 		EntityProperties& props = item.second;
-		if constexpr (std::is_same<T, double>::value) {
+		if constexpr (std::is_same_v<T, double>) {
 			EntityPropertiesDouble* doubleProp = dynamic_cast<EntityPropertiesDouble*>(props.getProperty(_propertyName));
 			if (doubleProp != nullptr) {
 				return doubleProp->getValue();
@@ -44,7 +44,7 @@ T readEntityPropertiesInfo(EntityBase* _solverEntity, const std::string& _groupF
 				return static_cast<T>(intProp->getValue());
 			}
 		}
-		else if constexpr (std::is_same<T, std::string>::value) {
+		else if constexpr (std::is_same_v<T, std::string>) {
 			EntityPropertiesSelection* selectionProp = dynamic_cast<EntityPropertiesSelection*>(props.getProperty(_propertyName));
 			if (selectionProp != nullptr) {
 				return selectionProp->getValue();
@@ -52,7 +52,7 @@ T readEntityPropertiesInfo(EntityBase* _solverEntity, const std::string& _groupF
 		}
 	}
 	OT_LOG_EAS("Property '" + _propertyName + "' not found!");
-	if constexpr (std::is_same<T, std::string>::value) {
+	if constexpr (std::is_same_v<T, std::string>) {
 		return {};
 	}
 	else { 
