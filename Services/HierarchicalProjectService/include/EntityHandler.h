@@ -21,8 +21,9 @@ public:
 
 	std::shared_ptr<EntityBlockHierarchicalProjectItem> createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo, const std::string& _parentEntity);
 
-
+	bool addConnection(const ot::GraphicsConnectionCfg& _connection);
 
 private:
+	const std::string c_connectionsFolder = "Connections";
 
 };
