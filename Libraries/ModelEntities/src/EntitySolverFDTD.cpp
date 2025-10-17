@@ -29,12 +29,12 @@ void EntitySolverFDTD::createProperties(std::string& _meshFolderName, ot::UID& _
 	EntityPropertiesSelection::createProperty("Simulation Settings", "Excitation type", excitationTypes, "Gauss Excitation", "FDTDSolver", getProperties());
 	EntityPropertiesDouble::createProperty("Simulation Settings", "End Criteria", 1e-5, "FDTDSolver", getProperties());
 	EntityPropertiesInteger::createProperty("Simulation Settings", "Oversampling", 6, "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "x-min", boundaryValues, "PEC", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "x-max", boundaryValues, "PEC", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "y-min", boundaryValues, "PEC", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "y-max", boundaryValues, "PEC", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-min", boundaryValues, "PEC", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-max", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "Xmin", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "Xmax", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "Ymin", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "Ymax", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "Zmin", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "Zmax", boundaryValues, "PEC", "FDTDSolver", getProperties());
 	EntityPropertiesBoolean::createProperty("Specials", "Debug", false, "FDTDSolver", getProperties());
 
 
