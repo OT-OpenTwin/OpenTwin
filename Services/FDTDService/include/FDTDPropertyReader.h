@@ -1,10 +1,8 @@
-/*
- * FDTDPropertyReader.h
- *
- *  Created on: 15.10.2025
- *	Author: Alexandros McCray (alexm-dev)
- *  Copyright (c) 2025
- */
+//! @file FDTDPropertyReader.h
+//! @brief Header file for the readEntityPropertiesInfo template function
+//! @author Alexandros McCray (alexm-dev)
+//! @date 15.10.2025
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 

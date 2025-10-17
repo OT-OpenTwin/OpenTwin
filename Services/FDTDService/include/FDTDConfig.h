@@ -1,10 +1,7 @@
-/*
- * FDTDConfig.h
- *
- *  Created on: 08.10.2025
- *	Author: Alexandros McCray (alexm-dev)
- *  Copyright (c) 2025
- */
+//! @file FDTDConfig.h
+//! @author Alexandros McCray (alexm-dev)
+//! @date 08.10.2025
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
@@ -14,8 +11,8 @@
 // OpenTwin
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/LogDispatcher.h"
-#include "EntityProperties.h"
 #include "OTCore/OTClassHelper.h"
+#include "EntityProperties.h"
 
 // STD
 #include <type_traits>	// is_integral_v()
