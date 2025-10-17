@@ -75,9 +75,12 @@ bool ModelState::openProject(const std::string& _customVersion) {
 
 	// If a specific version was requested we try to open it instead.
 	if (!_customVersion.empty()) {
-		auto versionEntry = m_graphCfg.findVersion(activeVersion);
+		auto versionEntry = m_graphCfg.findVersion(_customVersion);
 		if (!versionEntry) {
 			OT_LOG_E("The requested version \"" + _customVersion + "\" does not exist");
+		}
+		else if (versionEntry->getName() != _customVersion) {
+			OT_LOG_E("Syntax error in requested version \"" + _customVersion + "\"");
 		}
 		else {
 			activeVersion = _customVersion;
