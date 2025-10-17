@@ -20,6 +20,8 @@
 #include "GraphHandler.h"
 #include "InvalidUID.h"
 #include "OTGuiAPI/ButtonHandler.h"
+#include "OTGuiAPI/GraphicsHandler.h"
+
 // Forward declaration
 namespace ot {
 	namespace components {
@@ -28,7 +30,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler {
+class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler, public ot::GraphicsHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -50,11 +52,6 @@ public:
 
 	// Required functions
 
-	//! @brief Will be called whenever a action should be processed. Core actions will be processed in the base and will not be forwarded to this function (see documentation)
-	//! @param _action The action that should be processed
-	//! @param _doc The document containing all the information
-	virtual std::string processAction(const std::string & _action, ot::JsonDocument& _doc) override;
-
 	//! @brief Will be called when a UI connected to the session and is ready to work
 	virtual void uiConnected(ot::components::UiComponent * _ui) override;
 
@@ -62,6 +59,11 @@ public:
 	virtual void modelConnected(ot::components::ModelComponent * _model) override;
 
 	virtual void propertyChanged(ot::JsonDocument& _doc) override;
+
+protected:
+	virtual ot::ReturnMessage graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) override;
+	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) override;
+
 
 private:
 	Application();

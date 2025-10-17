@@ -46,8 +46,6 @@ Application::Application() :
 	connectAction(c_hierarchicalSelectedAction, this, &Application::handleHierarchicalSelected);
 	connectAction(c_documentSelectedAction, this, &Application::handleDocumentSelected);
 
-	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, this, &Application::handleBlockDoubleClicked);
-
 	// Initialize toolbar buttons
 	m_addProjectButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Project", "Hierarchical/AddProject");
 	m_addProjectButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
@@ -149,6 +147,37 @@ void Application::modelSelectionChanged() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Protected: Callback functions
+
+ot::ReturnMessage Application::graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid) {
+	// Get entity information
+	ot::EntityInformation info;
+	if (!ot::ModelServiceAPI::getEntityInformation(_name, info)) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information for entity: " + _name);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	// Check entity type
+	if (info.getEntityType() == EntityBlockHierarchicalProjectItem::className()) {
+		// Request to open the project
+		return this->requestToOpenProject(info);
+	}
+	else {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Unsupported entity type { \"Name\": " + _name + "\", \"Type\": \"" + info.getEntityType() + "\"");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+	return ot::ReturnMessage::Ok;
+}
+
+ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
+
+	return ot::ReturnMessage::Ok;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // Private: Action handler
 
 void Application::handleSetProjectEntitySelected() {
@@ -243,48 +272,6 @@ void Application::handleOpenSelectedProject() {
 	}
 
 	this->enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Private: Graphics Callbacks
-
-ot::ReturnMessage Application::handleBlockDoubleClicked(ot::JsonDocument& _doc) {
-	// Create configuration from provided JSON object
-	ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
-	std::unique_ptr<ot::GraphicsItemCfg> cfg(ot::GraphicsItemCfgFactory::instance().create(cfgObj));
-	if (!cfg.get()) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not create graphics item configuration from provided JSON object");
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-
-	// Get entity name from configuration
-	std::string entityName = cfg->getName();
-	if (entityName.empty()) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity name from graphics item configuration");
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-
-	// Get entity information
-	ot::EntityInformation info;
-	if (!ot::ModelServiceAPI::getEntityInformation(entityName, info)) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information for entity: " + entityName);
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-
-	// Check entity type
-	if (info.getEntityType() == EntityBlockHierarchicalProjectItem::className()) {
-		// Request to open the project
-		return this->requestToOpenProject(info);
-	}
-	else {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Unsupported entity type { \"Name\": " + entityName + "\", \"Type\": \"" + info.getEntityType() + "\"");
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

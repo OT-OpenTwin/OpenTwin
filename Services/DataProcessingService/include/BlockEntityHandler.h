@@ -13,7 +13,7 @@
 class BlockEntityHandler : public BusinessLogicHandler
 {
 public:
-	void createBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
+	void createBlockEntity(const std::string& editorName, const std::string& blockName, const ot::Point2DD& position);
 	void addBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections, const std::string& _baseFolderName);
 	void orderUIToCreateBlockPicker();
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID(const std::string& _folderName);

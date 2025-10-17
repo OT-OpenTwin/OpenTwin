@@ -1,17 +1,17 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCommunication/ActionHandler.h"
+#include "OTGuiAPI/GraphicsHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 
-class BlockHandler : public BusinessLogicHandler {
+class BlockHandler : public BusinessLogicHandler, public ot::GraphicsHandler {
+	OT_DECL_NOCOPY(BlockHandler)
+	OT_DECL_NOMOVE(BlockHandler)
 public:
-	BlockHandler();
-	~BlockHandler() {};
+	BlockHandler() = default;
+	~BlockHandler() = default;
 
-private:
-	ot::ActionHandler m_actionHandler;
-	void handleItemChanged(ot::JsonDocument& _doc);
-	ot::ReturnMessage handleItemDoubleClicked(ot::JsonDocument& _doc);
-	void handleConnectionChanged(ot::JsonDocument& _doc);
+protected:
+	virtual ot::ReturnMessage graphicsItemChanged(const ot::GraphicsItemCfg* _item) override;
+	virtual ot::ReturnMessage graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData) override;
 };

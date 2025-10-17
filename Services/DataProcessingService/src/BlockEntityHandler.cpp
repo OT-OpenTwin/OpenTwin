@@ -17,7 +17,7 @@
 #include "OTCore/ComparisionSymbols.h"
 
 
-void BlockEntityHandler::createBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
+void BlockEntityHandler::createBlockEntity(const std::string& editorName, const std::string& blockName, const ot::Point2DD& position)
 {
 	EntityBase* baseEntity = EntityFactory::instance().create(blockName);
 	assert(baseEntity != nullptr);		
@@ -126,7 +126,6 @@ void BlockEntityHandler::orderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc, tmp);
 }
 
-
 void BlockEntityHandler::initSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity)
 {
 	EntityBlockPython* pythonBlock = dynamic_cast<EntityBlockPython*>(blockEntity.get());
@@ -161,7 +160,6 @@ void BlockEntityHandler::initSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 		fileWriter->createProperties();
 	}
 }
-
 
 ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker()
 {

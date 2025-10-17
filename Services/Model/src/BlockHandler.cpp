@@ -15,31 +15,18 @@
 #include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTCommunication/ActionTypes.h"
 
-BlockHandler::BlockHandler() {
-	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, this, &BlockHandler::handleItemChanged, ot::SECURE_MESSAGE_TYPES);
-	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, this, &BlockHandler::handleItemDoubleClicked, ot::SECURE_MESSAGE_TYPES);
-	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, this, &BlockHandler::handleConnectionChanged, ot::SECURE_MESSAGE_TYPES);
-}
+ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _item) {
+	const ot::UID blockID = _item->getUid();
+	const ot::Transform transform = _item->getTransform();
 
-void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
-	std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().create(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
-	if (!itemConfig) {
-		OT_LOG_E("ItemConfig is null");
-		return;
-	}
-
-	const ot::UID blockID = itemConfig->getUid();
-	const ot::Transform transform = itemConfig->getTransform();
-	
 	Model* _model = Application::instance()->getModel();
 	auto entBase = _model->getEntityByID(blockID);
-    EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(entBase);
+	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(entBase);
 	if (!blockEnt) {
-		OT_LOG_E("BlockEntity is null");
-		return;
+		OT_LOG_E("BlockEntity not fond");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Entity not found");
 	}
-	
+
 	bool _rotationChanged = false;
 	bool _flipChanged = false;
 	bool _positionChanged = false;
@@ -78,10 +65,10 @@ void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 	auto parent = coordinateEntity->getParent();
 	if (!coordinateEntity) {
 		OT_LOG_E("Coordinate Entity is null");
-		return;
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Coordinate entity not found");
 	}
-	if (coordinateEntity->getCoordinates() != itemConfig->getPosition()) {
-		coordinateEntity->setCoordinates(itemConfig->getPosition());
+	if (coordinateEntity->getCoordinates() != _item->getPosition()) {
+		coordinateEntity->setCoordinates(_item->getPosition());
 		_positionChanged = true;
 	}
 
@@ -116,8 +103,8 @@ void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 		blockEnt->storeToDataBase();
 		const std::string comment = "Rotation and Flip updated";
 		std::list<ot::UID>  topologyEntityIDList{ blockEnt->getEntityID() };
-		std::list<ot::UID>  topologyEntityVersionList { blockEnt->getEntityStorageVersion() };
-	
+		std::list<ot::UID>  topologyEntityVersionList{ blockEnt->getEntityStorageVersion() };
+
 		_model->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, comment);
 	}
 	else {
@@ -133,57 +120,22 @@ void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 		EntityBase* parent = coordinateEntity->getParent();
 		if (!parent) {
 			OT_LOG_E("Coordinate entity has no parent");
-			return;
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Coordinate entity has no parent");
 		}
-		std::list<ot::UID> dataEntityParentList{ parent->getEntityID()};
-		
+		std::list<ot::UID> dataEntityParentList{ parent->getEntityID() };
+
 		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntityParentList, "Update BlockItem position", false, false);
 		topoEntID.push_back(blockEnt->getEntityID());
 		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
 		_model->updateTopologyEntities(topoEntID, topoEntVers, "BlockPositionUpdated");
 	}
-}
-
-ot::ReturnMessage BlockHandler::handleItemDoubleClicked(ot::JsonDocument& _doc) {
-	std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-
-	// Restore item configuration
-	std::unique_ptr<ot::GraphicsItemCfg> itemConfig(ot::GraphicsItemCfgFactory::instance().create(ot::json::getObject(_doc, OT_ACTION_PARAM_Config)));
-	if (!itemConfig) {
-		OT_LOG_E("ItemConfig is null");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create item configuration from JSON");
-	}
-
-	// Get entity
-	Model* model = Application::instance()->getModel();
-	EntityBase* baseEntity = model->getEntityByID(itemConfig->getUid());
-	if (!baseEntity) {
-		OT_LOG_E("Entity not found from block config { \"Name\": \"" + itemConfig->getName() + "\", \"UID\": " + std::to_string(itemConfig->getUid()) + " }");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to find entity from UID");
-	}
-
-	// Cast to block entity
-	EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(baseEntity);
-	if (!blockEntity) {
-		OT_LOG_E("Block entity cast failed { \"Name\": \"" + itemConfig->getName() + "\", \"UID\": " + std::to_string(itemConfig->getUid()) + ", \"EntityType\": \"" + baseEntity->getClassName() + "\" }");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Block entity cast failed");
-	}
-
-	// Notify owner service if required
-	ot::BasicServiceInformation ownerService = blockEntity->getServiceInformation();
-	Application* app = Application::instance();
-	if (!ownerService.serviceName().empty() && ownerService.serviceType() != app->getServiceType()) {
-		app->sendMessageAsync(false, ownerService.serviceName(), _doc);
-	}
 
 	return ot::ReturnMessage::Ok;
 }
 
-void BlockHandler::handleConnectionChanged(ot::JsonDocument& _doc) {
-	ot::GraphicsConnectionCfg connection;
-	connection.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
-	std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+ot::ReturnMessage BlockHandler::graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData) {
 
 
-
+	return ot::ReturnMessage::Ok;
 }
+

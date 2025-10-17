@@ -11,6 +11,7 @@
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
 #include "OTGuiAPI/ButtonHandler.h"
+#include "OTGuiAPI/GraphicsHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
 
 // std header
@@ -19,7 +20,7 @@
 #include <optional>
 #include <functional>
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler {
+class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler, public ot::GraphicsHandler {
 private:
 	Application();
 	virtual ~Application();
@@ -43,12 +44,20 @@ public:
 	virtual void modelConnected(ot::components::ModelComponent* _model) override;
 
 	virtual void modelSelectionChanged() override;
+	
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Protected: Callback functions
+
+protected:
+	virtual ot::ReturnMessage graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid) override;
+	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Callback action handler
 
-//private:
+private:
 
 	void handleSetProjectEntitySelected();
 	void handleProjectSelected(ot::JsonDocument& _doc);
@@ -64,12 +73,6 @@ public:
 	void handleAddContainer();
 	void handleAddDocument();
 	void handleOpenSelectedProject();
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Private: Graphics Callbacks
-
-	ot::ReturnMessage handleBlockDoubleClicked(ot::JsonDocument& _doc);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -67,14 +67,6 @@ Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService, new UiNotifier(), new ModelNotifier()) 
 {
 	m_SimulationRunning = false;
-	
-	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, this, &Application::handleNewGraphicsItem);
-	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, this, &Application::handleRemoveGraphicsItem);
-	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, this, &Application::handleNewGraphicsItemConnection);
-	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, this, &Application::handleRemoveGraphicsItemConnection);
-	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, this, &Application::handleConnectionToConnection);
-	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, this, &Application::handleConnectionChanged);
-	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, [](){});
 }
 
 Application::~Application() {
@@ -451,85 +443,7 @@ SubprocessHandler* Application::getSubProcessHandler() {
 	return m_subprocessHandler;
 }
 
-void Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
-	//Here we get the Item Information
-	std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
-	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-
-	ot::Point2DD pos;
-	pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
-
-	//check and store information
-	OT_LOG_D("Handling new graphics item request ( name = \"" + itemName + "\"; editor = \"" + editorName + "\"; x = " + std::to_string(pos.x()) + "; y = " + std::to_string(pos.y()) + " )");
-
-	
-	m_blockEntityHandler.setPackageName(editorName);
-	auto temp = m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);	
-}
-
-void Application::handleRemoveGraphicsItem(ot::JsonDocument& _document) {
-	ot::UIDList items;
-
-	// Add Item UIDs to the list above (Items to be removed)
-	ot::UID itemUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
-	items.push_back(itemUID);
-}
-
-void Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document) {
-	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-	m_blockEntityHandler.setPackageName(pckg.name());
-	m_blockEntityHandler.addBlockConnection(pckg.connections(),pckg.name());
-}
-
-ot::ReturnMessage Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _document) {
-	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-
-	// Here we would check and remove the connection information
-	OT_LOG_D("Handling remove graphics item connection request ( editor = \"" + pckg.name() + "\" )");
-
-	// Request UI to remove connections
-	ot::JsonDocument reqDoc;
-	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-
-	ot::JsonObject pckgObj;
-	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(editorName, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-	
-	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
-
-	std::string tmp;
-	if (this->getUiComponent()->sendMessage(true, reqDoc, tmp)) {
-		return ot::ReturnMessage::Ok;
-	}
-	else {
-		return ot::ReturnMessage::Failed;
-	}
-}
-
-void Application::handleConnectionToConnection(ot::JsonDocument& _document) {
-
-	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-
-	std::string editorName = pckg.name();
-	
-	ot::Point2DD pos;
-	pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_POSITION));
-	m_blockEntityHandler.setPackageName(editorName);
-	m_blockEntityHandler.addConnectionToConnection(pckg.connections(), editorName, pos);
-}
-
-void Application::handleConnectionChanged(ot::JsonDocument& _document) {
-	ot::GraphicsConnectionCfg connection;
-	connection.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-}
-
-// ############################## ####################################################################################################################################################################################
+// ##################################################################################################################################################################################################################
 
 // Required functions
 
@@ -586,4 +500,29 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 void Application::modelConnected(ot::components::ModelComponent * _model) {
 	m_blockEntityHandler.setModelComponent(_model);
 	SimulationResults::getInstance()->setModelComponent(_model);
+}
+
+// ##################################################################################################################################################################################################################
+
+// Protected: Callback functions
+
+ot::ReturnMessage Application::graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) {
+	m_blockEntityHandler.setPackageName(_viewName);
+	auto temp = m_blockEntityHandler.CreateBlockEntity(_viewName, _itemName, _pos);
+
+	return ot::ReturnMessage::Ok;
+}
+
+ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
+	m_blockEntityHandler.setPackageName(_connectionData.name());
+	m_blockEntityHandler.addBlockConnection(_connectionData.connections(), _connectionData.name());
+
+	return ot::ReturnMessage::Ok;
+}
+
+ot::ReturnMessage Application::graphicsConnectionToConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos) {
+	m_blockEntityHandler.setPackageName(_connectionData.name());
+	m_blockEntityHandler.addConnectionToConnection(_connectionData.connections(), _connectionData.name(), _pos);
+
+	return ot::ReturnMessage::Ok;
 }

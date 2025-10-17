@@ -16,6 +16,7 @@
 
 // Open twin header
 #include "OTGuiAPI/ButtonHandler.h"
+#include "OTGuiAPI/GraphicsHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"	// Base class
 
 // C++ header
@@ -33,7 +34,7 @@ namespace ot {
 
 class QtWrapper;
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler, public ot::GraphicsHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -57,13 +58,6 @@ public:
 	// ##################################################################################################################################################################################################################
 
 	// Add your custom functions/ members here
-
-	void handleNewGraphicsItem(ot::JsonDocument& _document);
-	void handleRemoveGraphicsItem(ot::JsonDocument& _document);
-	void handleNewGraphicsItemConnection(ot::JsonDocument& _document);
-	ot::ReturnMessage handleRemoveGraphicsItemConnection(ot::JsonDocument& _document);
-	void handleConnectionToConnection(ot::JsonDocument& _document);
-	void handleConnectionChanged(ot::JsonDocument& _document);
 
 	void createNewCircuit();
 	void createInitialCircuit();
@@ -98,6 +92,15 @@ public:
 
 	//! @brief Will be called when a model service connected to the session and is ready to work
 	virtual void modelConnected(ot::components::ModelComponent * _model) override;
+
+	// ##################################################################################################################################################################################################################
+
+	// Protected: Callback functions
+
+protected:
+	virtual ot::ReturnMessage graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) override;
+	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) override;
+	virtual ot::ReturnMessage graphicsConnectionToConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos) override;
 
 private:
 	SubprocessHandler* m_subprocessHandler = nullptr;

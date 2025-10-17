@@ -11,7 +11,9 @@
 #include "OTCommunication/ActionHandleConnector.h"
 #include "OTGuiAPI/ButtonHandler.h"
 
-ot::ButtonHandler::ButtonHandler() {
+ot::ButtonHandler::ButtonHandler(ActionDispatcherBase* _dispatcher)
+	: m_actionHandler(_dispatcher)
+{
 	if (!m_actionHandler.connectAction(OT_ACTION_CMD_ButtonPressed, this, &ButtonHandler::handleToolBarButtonClicked, ot::SECURE_MESSAGE_TYPES, ActionDispatcher::ExpectMultiple)) {
 		OT_LOG_EA("Failed to register button click handler");
 	}

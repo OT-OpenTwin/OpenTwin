@@ -1795,8 +1795,6 @@ void AppBase::appendInfoMessage(const QString & _message) {
 		m_output->getPlainTextEdit()->moveCursor(QTextCursor::End);
 		m_output->getPlainTextEdit()->insertPlainText(_message);
 		m_output->getPlainTextEdit()->moveCursor(QTextCursor::End);
-
-//		m_output->getPlainTextEdit()->appendPlainText(_message);
 	}
 }
 
@@ -2269,16 +2267,18 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo) {
 	QStringList arguments = args.createCommandLineArgs();
 	arguments.push_front(appPath);
 
+	ot::StyledTextBuilder message;
+	message << "Opening project \"" << ot::StyledText::Bold << _projectInfo.getProjectName() << ot::StyledText::NotBold << "\" in new OpenTwin instance...\n";
+	this->appendOutputMessageAPI(message);
+
 	// Start new instance
 	HANDLE handle = nullptr;
 	auto isOk = ot::SystemProcess::runApplication(appPath.toStdString(), arguments.join(' ').toStdString(), handle, ot::SystemProcess::AboveNormalPriority | ot::SystemProcess::DetachedProcess | ot::SystemProcess::UseUnicode).isOk();
-	//auto isOk = ot::SystemProcess::runApplication(appPath.toStdString(), arguments.join(' ').toStdString(), handle, ot::SystemProcess::DefaultFlags | ot::SystemProcess::DetachedProcess).isOk();
 	if (handle) {
 		CloseHandle(handle);
 	}
+
 	return isOk;
-	
-	//return QProcess::startDetached(appPath, arguments, QDir::currentPath());
 }
 
 void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _pos) {
@@ -2388,15 +2388,13 @@ void AppBase::slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConf
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, doc.GetAllocator()), doc.GetAllocator());
 
-	ot::JsonObject configObj;
-	_itemConfig->addToJsonObject(configObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_itemConfig->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UID, _itemConfig->getUid(), doc.GetAllocator());
 
 	try {
-		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 		std::string response;
-		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}
