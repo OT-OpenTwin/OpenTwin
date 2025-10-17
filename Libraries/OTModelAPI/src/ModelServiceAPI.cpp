@@ -223,6 +223,32 @@ void ot::ModelServiceAPI::deleteEntitiesFromModel(std::list<std::string>& _entit
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
+bool ot::ModelServiceAPI::getEntityInformation(UID _entity, EntityInformation& _entityInfo) {
+	UIDList entities{ _entity };
+	std::list<EntityInformation> entityInfoList;
+
+	getEntityInformation(entities, entityInfoList);
+
+	if (entityInfoList.empty()) return false;
+
+	_entityInfo = entityInfoList.front();
+
+	return true;
+}
+
+bool ot::ModelServiceAPI::getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo) {
+	std::list<std::string> entities{ _entity };
+	std::list<EntityInformation> entityInfoList;
+
+	getEntityInformation(entities, entityInfoList);
+
+	if (entityInfoList.empty()) return false;
+
+	_entityInfo = entityInfoList.front();
+
+	return true;
+}
+
 void ot::ModelServiceAPI::getEntityInformation(const std::list<UID>& _entities, std::list<EntityInformation>& _entityInfo) {
 	// Prepare the request
 	JsonDocument requestDoc;
@@ -265,19 +291,6 @@ void ot::ModelServiceAPI::getEntityInformation(const std::list<UID>& _entities, 
 
 		_entityInfo.push_back(info);
 	}
-}
-
-bool ot::ModelServiceAPI::getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo) {
-	std::list<std::string> entities{ _entity };
-	std::list<EntityInformation> entityInfoList;
-
-	getEntityInformation(entities, entityInfoList);
-
-	if (entityInfoList.empty()) return false;
-
-	_entityInfo = entityInfoList.front();
-
-	return true;
 }
 
 void ot::ModelServiceAPI::getEntityInformation(const std::list<std::string>& _entities, std::list<EntityInformation>& _entityInfo) {

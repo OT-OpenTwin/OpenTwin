@@ -40,9 +40,10 @@ namespace ot {
 		static void addEntitiesToModel(NewModelStateInformation& _newModelStateInfos, const std::string& _changeComment, bool askForBranchCreation = true, bool saveModel = true);
 		static void addGeometryOperation(UID _newEntityID, UID _newEntityVersion, std::string _newEntityName, std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList, std::list<std::string>& _childrenList, const std::string& _changeComment);
 		static void deleteEntitiesFromModel(std::list<std::string>& _entityNameList, bool _saveModel = true);
+		static bool getEntityInformation(UID _entity, EntityInformation& _entityInfo);
+		static bool getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo);
 		static void getEntityInformation(const std::list<UID>& _entities, std::list<EntityInformation>& _entityInfo);
 		static void getEntityInformation(const std::list<std::string>& _entities, std::list<EntityInformation>& _entityInfo);
-		static bool getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo);
 		static void getEntityChildInformation(const std::string& _entity, std::list<EntityInformation>& _entityInfo, bool recursive);
 		static void getEntityChildInformation(UID _entity, std::list<EntityInformation>& _entityInfo, bool recursive);
 		static void getSelectedEntityInformation(std::list<EntityInformation>& _entityInfo, const std::string& typeFilter = "");
