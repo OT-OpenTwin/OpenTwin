@@ -8,6 +8,7 @@
 #include "EntityHandler.h"
 
 // OpenTwin header
+#include "OTCore/EntityName.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityAPI.h"
@@ -65,14 +66,18 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	ot::UIDList newTopo;
 	ot::UIDList newVersions;
 
-	// Get information about the connected items
-	ot::EntityInformation originInfo;
-	originInfo.setEntityName("From");
-	// .......
+	std::string connectionFromName = "From";
+	std::string connectionToName = "To";
 
-	ot::EntityInformation destinationInfo;
-	destinationInfo.setEntityName("To");
-	// .......
+	std::list<ot::EntityInformation> itemInfos;
+	ot::ModelServiceAPI::getEntityInformation({ _connection.getOriginUid(), _connection.getDestinationUid() }, itemInfos);
+	if (itemInfos.size() != 2) {
+		OT_LOG_E("Could not determine entity information for connection endpoints");
+	}
+	else {
+		connectionFromName = ot::EntityName::getSubName(itemInfos.front().getEntityName()).value();
+		connectionToName = ot::EntityName::getSubName(itemInfos.back().getEntityName()).value();
+	}
 
 	// Create container if it does not exist
 	if (!ot::ModelServiceAPI::getEntityInformation(folderPath, containerInfo) || containerInfo.getEntityName().empty()) {
@@ -85,7 +90,7 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 		newVersions.push_back(container.getEntityStorageVersion());
 	}
 
-	std::string newConnectionName = CreateNewUniqueTopologyName(folderPath, originInfo.getEntityName() + " > " + destinationInfo.getEntityName());
+	std::string newConnectionName = CreateNewUniqueTopologyName(folderPath, connectionFromName + " >> " + connectionToName);
 
 	// Create connection entity
 	EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
