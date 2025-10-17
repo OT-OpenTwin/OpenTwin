@@ -86,10 +86,16 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 	{
 		// Create the FDTD configuration and write the XML file
 		FDTDConfig cfg;
+		cfg.setFromEntity(solverEntity);
+		tinyxml2::XMLDocument doc;
+		cfg.addToXML(doc);
 		std::string tempFilePath = tempDirPath + "\\FDTD.xml";
-		cfg.addToXML(solverEntity, tempFilePath);
-		outputText = "\nFDTD XML file generated successfully!";
-		
+		if (doc.SaveFile(tempFilePath.c_str()) == tinyxml2::XML_SUCCESS) {
+			outputText = "\nFDTD XML file generated successfully!";
+		}
+		else {
+			outputText = "\nERROR: Unable to save FDTD XML file!";
+		}
 		// Build the solver input file in the temp folder
 		std::string controlFileName = tempDirPath + "\\model.pro";
 		std::ofstream controlFile(controlFileName);

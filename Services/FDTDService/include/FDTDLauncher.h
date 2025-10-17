@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <map>
 
+#include "tinyxml2.h"
+
 #include "OTCore/CoreTypes.h"
 #include "EntityInformation.h"
 
