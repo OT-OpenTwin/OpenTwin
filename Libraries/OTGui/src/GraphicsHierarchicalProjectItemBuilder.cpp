@@ -61,10 +61,14 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 	root->addItemBottom(conGrid, false, true);
 
 	// Connectors
-	conGrid->addChildItem(0, 2, createConnectorItem(ot::ConnectUp));
-	conGrid->addChildItem(4, 2, createConnectorItem(ot::ConnectDown));
-	conGrid->addChildItem(2, 0, createConnectorItem(ot::ConnectLeft));
-	conGrid->addChildItem(2, 4, createConnectorItem(ot::ConnectRight));
+	//conGrid->addChildItem(0, 0, createConnectorItem(ot::AlignTopLeft));
+	conGrid->addChildItem(0, 2, createConnectorItem(ot::AlignTop));
+	//conGrid->addChildItem(0, 4, createConnectorItem(ot::AlignTopRight));
+	conGrid->addChildItem(2, 0, createConnectorItem(ot::AlignLeft));
+	conGrid->addChildItem(2, 4, createConnectorItem(ot::AlignRight));
+	//conGrid->addChildItem(4, 0, createConnectorItem(ot::AlignBottomLeft));
+	conGrid->addChildItem(4, 2, createConnectorItem(ot::AlignBottom));
+	//conGrid->addChildItem(4, 4, createConnectorItem(ot::AlignBottomRight));
 
 	// Border
 	GraphicsRectangularItemCfg* bor = new GraphicsRectangularItemCfg(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
@@ -184,47 +188,82 @@ void ot::GraphicsHierarchicalProjectItemBuilder::setDefaultTitleForegroundGradie
 
 // Private: Helper
 
-ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createConnectorItem(ot::ConnectionDirection _direction) const {
-	GraphicsEllipseItemCfg* con = new GraphicsEllipseItemCfg(0., 0., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemConnectableBackground));
-	con->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
-	con->setConnectionDirection(_direction);
+ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createConnectorItem(ot::Alignment _alignment) const {
+	GraphicsEllipseItemCfg* con = new GraphicsEllipseItemCfg(0., 0., new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
+	con->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::Transparent)));
 	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 	con->setSizePolicy(ot::Preferred);
 
 	constexpr double trigDist = GraphicsItemCfg::defaultAdditionalTriggerDistance();
 
 	// Set name
-	switch (_direction) {
-	case ot::ConnectLeft:
-		con->setName("Left");
-		con->setRadiusX(m_connectorHeight);
+	switch (_alignment) {
+	case ot::AlignTopLeft:
+		con->setName("TopLeft");
+		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorWidth);
+		con->setConnectionDirection(ot::ConnectUp);
 		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
 		break;
 
-	case ot::ConnectUp:
+	case ot::AlignTop:
 		con->setName("Top");
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorHeight);
+		con->setConnectionDirection(ot::ConnectUp);
+		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
+		break;
+
+	case ot::AlignTopRight:
+		con->setName("TopRight");
+		con->setRadiusX(m_connectorWidth);
+		con->setRadiusY(m_connectorWidth);
+		con->setConnectionDirection(ot::ConnectUp);
+		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
+		break;
+
+	case ot::AlignLeft:
+		con->setName("Left");
+		con->setRadiusX(m_connectorHeight);
+		con->setRadiusY(m_connectorWidth);
+		con->setConnectionDirection(ot::ConnectLeft);
 		con->setAdditionalTriggerDistance(trigDist, trigDist, trigDist, 0.);
 		break;
 
-	case ot::ConnectRight:
+	case ot::AlignRight:
 		con->setName("Right");
 		con->setRadiusX(m_connectorHeight);
 		con->setRadiusY(m_connectorWidth);
+		con->setConnectionDirection(ot::ConnectRight);
 		con->setAdditionalTriggerDistance(0., trigDist, trigDist, trigDist);
 		break;
 
-	case ot::ConnectDown:
+	case ot::AlignBottomLeft:
+		con->setName("BottomLeft");
+		con->setRadiusX(m_connectorWidth);
+		con->setRadiusY(m_connectorWidth);
+		con->setConnectionDirection(ot::ConnectDown);
+		con->setAdditionalTriggerDistance(trigDist, 0., trigDist, trigDist);
+		break;
+
+	case ot::AlignBottom:
 		con->setName("Bottom");
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorHeight);
+		con->setConnectionDirection(ot::ConnectDown);
+		con->setAdditionalTriggerDistance(trigDist, 0., trigDist, trigDist);
+		break;
+
+	case ot::AlignBottomRight:
+		con->setName("BottomRight");
+		con->setRadiusX(m_connectorWidth);
+		con->setRadiusY(m_connectorWidth);
+		con->setConnectionDirection(ot::ConnectDown);
 		con->setAdditionalTriggerDistance(trigDist, 0., trigDist, trigDist);
 		break;
 
 	default:
-		OT_LOG_E("Invalid connection direction (" + std::to_string((int)_direction) + ")");
+		OT_LOG_E("Invalid connection direction (" + std::to_string((int)_alignment) + ")");
 		break;
 	}
 

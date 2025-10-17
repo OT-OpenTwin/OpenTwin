@@ -94,7 +94,7 @@ namespace ot {
 		double m_connectorWidth;
 		double m_connectorHeight;
 
-		ot::GraphicsItemCfg* createConnectorItem(ot::ConnectionDirection _direction) const;
+		ot::GraphicsItemCfg* createConnectorItem(ot::Alignment _alignment) const;
 		ot::GraphicsItemCfg* createTitle() const;
 
 		std::string m_name;
