@@ -14,7 +14,7 @@
 #include "FDTDPropertyReader.h"
 
 // STD
-#include <type_traits>	// is_integral_v()
+#include <type_traits>	// is_integral_v(), is_same_v()
 #include <string>
 #include <stdexcept>
 #include <cstdint>

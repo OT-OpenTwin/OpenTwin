@@ -15,12 +15,10 @@
 #include "EntityProperties.h"
 
 // STD
-#include <type_traits>	// is_integral_v()
 #include <string>
 #include <stdexcept>
 #include <cstdint>
 #include <array>
-#include <vector>
 #include <map>
 
 // Forwarard declaration
