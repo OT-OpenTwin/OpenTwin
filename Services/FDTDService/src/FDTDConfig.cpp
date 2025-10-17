@@ -7,7 +7,7 @@
  */
 
 #include "FDTDConfig.h"
-#include "FDTDPropertyReader.hpp"
+#include "FDTDPropertyReader.h"
 
 FDTDConfig::FDTDConfig()
 {
@@ -41,102 +41,120 @@ std::array<std::string, 6> FDTDConfig::getBoundaryConditions() const {
 	return m_boundaryConditions;
 }
 
-std::string FDTDConfig::getBoundaryConditions(size_t index) const {
-	if (index >= m_boundaryConditions.size()) {
+std::string FDTDConfig::getBoundaryConditions(size_t _index) const {
+	if (_index >= m_boundaryConditions.size()) {
 		throw std::out_of_range("[Boundary Conditions] Index out of range!");
 	}
-	return m_boundaryConditions[index];
+	return m_boundaryConditions[_index];
 }
 
 uint8_t FDTDConfig::getExcitationType() const {
 	return static_cast<uint8_t>(m_excitation);
 }
 
-void FDTDConfig::setTimeSteps(uint32_t timeSteps) {
-	m_timeSteps = timeSteps;
+void FDTDConfig::setTimeSteps(uint32_t _timeSteps) {
+	m_timeSteps = _timeSteps;
 }
 
-void FDTDConfig::setExcitationType(ExcitationType excitationType) {
-	m_excitation = excitationType;
+void FDTDConfig::setExcitationType(ExcitationType _excitationType) {
+	m_excitation = _excitationType;
 }
 
-void FDTDConfig::setExcitationType(uint8_t value) {
-	if (value > 2 || value < 0) {
+void FDTDConfig::setExcitationType(uint8_t _value) {
+	if (_value > 2 || _value < 0) {
 		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 0 (Gaussian), 1 (Sinusoidal), or 2 (Ramp)");
 	}
-	m_excitation = static_cast<ExcitationType>(value);
+	m_excitation = static_cast<ExcitationType>(_value);
 }
 
-void FDTDConfig::setEndCriteria(double endCriteria) {
-	m_endCriteria = endCriteria;
+void FDTDConfig::setEndCriteria(double _endCriteria) {
+	m_endCriteria = _endCriteria;
 }
 
-void FDTDConfig::setFrequencyStart(double freqStart) {
-	m_freqStart = freqStart;
+void FDTDConfig::setFrequencyStart(double _freqStart) {
+	m_freqStart = _freqStart;
 }
 
-void FDTDConfig::setFrequencyStop(double freqStop) {
-	m_freqStop = freqStop;
+void FDTDConfig::setFrequencyStop(double _freqStop) {
+	m_freqStop = _freqStop;
 }
 
-void FDTDConfig::setOverSampling(uint8_t overSampling) {
-	m_oversampling = overSampling;
+void FDTDConfig::setOverSampling(uint8_t _overSampling) {
+	m_oversampling = _overSampling;
 }
 
-void FDTDConfig::setBoundaryCondition(std::array<std::string, 6> values) {
-	for (const auto& val : values) {
+void FDTDConfig::setBoundaryCondition(std::array<std::string, 6> _values) {
+	for (const auto& val : _values) {
 		if (std::find(m_boundaryConditionTypes.begin(), m_boundaryConditionTypes.end(), val) == m_boundaryConditionTypes.end()) {
 			throw std::invalid_argument(std::string("[Boundary Condition] Invalid boundary condition! " + val));
 		}
 	}
-	m_boundaryConditions = values;
+	m_boundaryConditions = _values;
 }
 
-void FDTDConfig::setBoundaryCondition(size_t index, std::string value) {
-	if (std::find(m_boundaryConditionTypes.begin(), m_boundaryConditionTypes.end(), value) == m_boundaryConditionTypes.end()) {
-		throw std::invalid_argument(std::string("[Boundary Condition] Invalid boundary condition! " + value));
+void FDTDConfig::setBoundaryCondition(size_t _index, std::string _value) {
+	if (std::find(m_boundaryConditionTypes.begin(), m_boundaryConditionTypes.end(), _value) == m_boundaryConditionTypes.end()) {
+		throw std::invalid_argument(std::string("[Boundary Condition] Invalid boundary condition! " + _value));
 	}
-	if (index >= m_boundaryConditions.size() || index < 0) {
+	if (_index >= m_boundaryConditions.size() || _index < 0) {
 		throw std::out_of_range(std::string("[Boundary Condition] Index out of range"));
 	}
-	m_boundaryConditions[index] = value;
+	m_boundaryConditions[_index] = _value;
 }
 
-tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLDocument& doc, EntityBase* solverEntity) {
-	m_freqStart = readFrequencyStartInfo(solverEntity);
-	m_freqStop = readFrequencyStopInfo(solverEntity);
+void FDTDConfig::setFromEntity(EntityBase* _solverEntity) {
+	if(!_solverEntity) {
+		throw std::invalid_argument("[FDTDConfig] Solver entity pointer is null!");
+	}
+	m_solverEntity = _solverEntity;
+}
+
+void FDTDConfig::ensureEntityIsSet() const {
+	if (m_solverEntity == nullptr) {
+		throw std::runtime_error("[FDTDConfig] Solver entity is not set. Please set the solver entity before accessing configuration values.");
+	}
+}
+
+tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLElement& _parentElement) {
+	// Define the boundary names used for the solver XML parser
+	// These must match the expected names in the XML and will be different from the GUI
+	const std::array<std::string, 6> solverBoundaryNames = { "xmax", "xmin", "ymax", "ymin", "zmax", "zmin" };
+	m_freqStart = readFrequencyStartInfo();
+	m_freqStop = readFrequencyStopInfo();
 	const double f0 = (m_freqStart + m_freqStop) / 2.0;
 	const double fc = (m_freqStop - m_freqStart) / 2.0;
 
-	const auto& FDTD = doc.NewElement("FDTD");
-	FDTD->SetAttribute("NumberOfTimesteps", readTimestepInfo(solverEntity));
-	FDTD->SetAttribute("OverSampling", readOversamplingInfo(solverEntity));
-	FDTD->SetAttribute("endCriteria", readEndCriteriaInfo(solverEntity));
+	// Now we create the FDTD root node and set its attributes
+	auto FDTD = _parentElement.GetDocument()->NewElement("FDTD");
+	FDTD->SetAttribute("NumberOfTimesteps", readTimestepInfo());
+	FDTD->SetAttribute("OverSampling", readOversamplingInfo());
+	FDTD->SetAttribute("endCriteria", readEndCriteriaInfo());
 	FDTD->SetAttribute("f_max", m_freqStop);
-	doc.InsertFirstChild(FDTD);
 
-	// Now we add the excitation and boundary conditions nodes to the FDTD root node;
-	const auto& excitation = doc.NewElement("Excitation");
-	excitation->SetAttribute("Type", static_cast<int>(readExcitationTypeInfo(solverEntity)));
+	// Now we add the excitation nodes to the FDTD root node
+	auto excitation = _parentElement.GetDocument()->NewElement("Excitation");
+	excitation->SetAttribute("Type", static_cast<int>(readExcitationTypeInfo()));
 	excitation->SetAttribute("f0", f0);
 	excitation->SetAttribute("fc", fc);
 	FDTD->InsertEndChild(excitation);
 
-	const auto& boundary = doc.NewElement("BoundaryCond");
-	for (size_t i = 0; i < m_boundaryNames.size(); ++i) {
-		boundary->SetAttribute(m_boundaryNames[i].c_str(), readBoundaryConditions(solverEntity)[i].c_str());
+	// Finally we add the boundary conditions to the FDTD root node
+	auto boundary = _parentElement.GetDocument()->NewElement("BoundaryCond");
+	const auto boundaryConditions = readBoundaryConditions();
+	for (size_t i = 0; i < solverBoundaryNames.size(); ++i) {
+		boundary->SetAttribute(solverBoundaryNames[i].c_str(), boundaryConditions[i].c_str());
 	}
 	FDTD->InsertEndChild(boundary);
-
 	return FDTD;
 }
 
-uint32_t FDTDConfig::readTimestepInfo(EntityBase* solverEntity) {
-	return readEntityPropertiesInfo<uint32_t>(solverEntity, "Simulation Settings", simulationSettingsProperties, "Timesteps");
+uint32_t FDTDConfig::readTimestepInfo() {
+	ensureEntityIsSet();
+	return readEntityPropertiesInfo<uint32_t>(m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "Timesteps", true);
 }
 
-uint8_t FDTDConfig::readExcitationTypeInfo(EntityBase* solverEntity) {
-	std::string excitation = readEntityPropertiesInfo<std::string> (solverEntity, "Simulation Settings", simulationSettingsProperties, "Excitation type");
+uint8_t FDTDConfig::readExcitationTypeInfo() {
+	std::string excitation = readEntityPropertiesInfo<std::string> (m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "Excitation type", true);
 	if (excitation == "Gauss Excitation") {
 		m_excitation = ExcitationType::GAUSSIAN;
 	}
@@ -144,50 +162,50 @@ uint8_t FDTDConfig::readExcitationTypeInfo(EntityBase* solverEntity) {
 		m_excitation = ExcitationType::SINUSOIDAL;
 	}
 	else {
-		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 'Gaussian', 'Sinusoidal', or 'Ramp'");
+		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 'Gaussian' 'Sinusoidal'");
 	}
 	return static_cast<uint8_t>(m_excitation);
 }
 
-uint16_t FDTDConfig::readOversamplingInfo(EntityBase* solverEntity) {
-	return readEntityPropertiesInfo<uint16_t>(solverEntity, "Simulation Settings", simulationSettingsProperties, "Oversampling");;
+uint16_t FDTDConfig::readOversamplingInfo() {
+	ensureEntityIsSet();
+	return readEntityPropertiesInfo<uint16_t>(m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "Oversampling", true);
 }
 
-double FDTDConfig::readEndCriteriaInfo(EntityBase* solverEntity) {
-	return readEntityPropertiesInfo<double>(solverEntity, "Simulation Settings", simulationSettingsProperties, "End Criteria");
+double FDTDConfig::readEndCriteriaInfo() {
+	ensureEntityIsSet();
+	return readEntityPropertiesInfo<double>(m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "End Criteria", true);
 }
 
-double FDTDConfig::readFrequencyStartInfo(EntityBase* solverEntity) {
-	return readEntityPropertiesInfo<double>(solverEntity, "Frequency", frequencyProperties, "Start Frequency");
+double FDTDConfig::readFrequencyStartInfo() {
+	ensureEntityIsSet();
+	return readEntityPropertiesInfo<double>(m_solverEntity, "Frequency", m_frequencyProperties, "Start Frequency", true);
 }
 
-double FDTDConfig::readFrequencyStopInfo(EntityBase* solverEntity) {
-	return readEntityPropertiesInfo<double>(solverEntity, "Frequency", frequencyProperties, "End Frequency");
+double FDTDConfig::readFrequencyStopInfo() {
+	ensureEntityIsSet();
+	return readEntityPropertiesInfo<double>(m_solverEntity, "Frequency", m_frequencyProperties, "End Frequency", true);
 }
 
-std::array<std::string, 6> FDTDConfig::readBoundaryConditions(EntityBase* solverEntity) {
-	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Boundary Conditions", boundaryConditionProperties);
-	for (auto& item : boundaryConditionProperties) {
-		EntityProperties& props = item.second;
-		for (size_t i = 0; i < m_boundaryNames.size(); ++i) {
-			EntityPropertiesSelection* boundaryCondition = dynamic_cast<EntityPropertiesSelection*>(props.getProperty(m_boundaryNames[i]));
-			if (boundaryCondition != nullptr) {
-				m_boundaryConditions[i] = boundaryCondition->getValue();
-			}
+std::array<std::string, 6> FDTDConfig::readBoundaryConditions() {
+	ensureEntityIsSet();
+	ot::ModelServiceAPI::getEntityProperties(m_solverEntity->getName(), true, "Boundary Conditions", m_boundaryConditionProperties);
+	for (size_t i = 0; i < m_boundaryNames.size(); ++i) {
+		auto value = readEntityPropertiesInfo<std::string>(m_solverEntity, "Boundary Conditions", m_boundaryConditionProperties, m_boundaryNames[i], false);
+		if (value.empty()) {
+			value = "PEC"; // default to PEC
+			OT_LOG_EAS("[Boundary Conditions] Boundary condition for " + m_boundaryNames[i] + " not found! Defaulting to PEC!");
 		}
+		m_boundaryConditions[i] = value;
 	}
 	return m_boundaryConditions;
 }
 
-void FDTDConfig::addToXML(EntityBase* solverEntity, std::string& tempPath) {
-	tinyxml2::XMLDocument doc;	
-	auto declaration = doc.NewDeclaration("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+void FDTDConfig::addToXML(tinyxml2::XMLDocument& doc) {
+	auto declaration = doc.NewDeclaration("xml version=\"1.0\" encoding=\"utf-8\"");
 	doc.InsertFirstChild(declaration);
 	auto root = doc.NewElement("openEMS");
-	doc.InsertFirstChild(root);
-	auto FDTD = writeFDTD(doc, solverEntity);
+	doc.InsertEndChild(root);
+	auto FDTD = writeFDTD(*root);
 	root->InsertEndChild(FDTD);
-	if (doc.SaveFile(tempPath.c_str()) != tinyxml2::XML_SUCCESS) {
-		OT_LOG_EA("Failed to write FDTD configuration to XML file.");
-	}
 }
