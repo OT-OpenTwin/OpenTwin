@@ -54,25 +54,24 @@ public:
 	void setFrequencyStart(double _freqStart);
 	void setFrequencyStop(double _freqStop);
 	void setOverSampling(uint8_t _overSampling);
-	void setBoundaryCondition(std::array<std::string, 6> _values);
-	void setBoundaryCondition(size_t _index, std::string _value);
+	void setBoundaryCondition(const std::array<std::string, 6>& _values);
+	void setBoundaryCondition(size_t _index, const std::string& _value);
 
 	//! @brief This function sets the solver entity from which the configuration will be read
 	void setFromEntity(EntityBase* _solverEntity);
 
 	//! @brief This function ensures that the solver entity has been set before reading configuration
+	//! @brief Will throw an exception if the entity is not set
 	void ensureEntityIsSet() const;
 
 	//! @brief This function creates an XML element for the FDTD configuration 
-	//! and populates it with the relevant attributes and child elements based on the current configuration settings.
-	//! @param doc Reference to the XML document.
-	//! @param solverEntity Pointer to the solver entity.
+	//! @param _parentElement The parent XML element to which the FDTD configuration will be added
+	//! @return The created FDTD XML element
 	tinyxml2::XMLElement* writeFDTD(tinyxml2::XMLElement& _parentElement);
 
 	//! @brief Reads the configuration from the entity properties and writes the XML file
-	//! @param solverEntity Pointer to the solver entity
-	//! @param tempPath Path to the temporary folder where the XML file will be written
-	void addToXML(tinyxml2::XMLDocument& doc);
+	//! @param _doc The XML document to which the configuration will be added
+	void addToXML(tinyxml2::XMLDocument& _doc);
 
 private:
 	uint32_t m_timeSteps = 0;
@@ -90,6 +89,7 @@ private:
 	std::map<ot::UID, EntityProperties> m_boundaryConditionProperties;
 	std::map<ot::UID, EntityProperties> m_frequencyProperties;
 
+	// Solver entiy from which to read the configuration
 	EntityBase* m_solverEntity = nullptr;
 
 	// Helper functions to read the configuration from the entity properties

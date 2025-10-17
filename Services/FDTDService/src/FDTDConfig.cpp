@@ -80,7 +80,7 @@ void FDTDConfig::setOverSampling(uint8_t _overSampling) {
 	m_oversampling = _overSampling;
 }
 
-void FDTDConfig::setBoundaryCondition(std::array<std::string, 6> _values) {
+void FDTDConfig::setBoundaryCondition(const std::array<std::string, 6>& _values) {
 	for (const auto& val : _values) {
 		if (std::find(m_boundaryConditionTypes.begin(), m_boundaryConditionTypes.end(), val) == m_boundaryConditionTypes.end()) {
 			throw std::invalid_argument(std::string("[Boundary Condition] Invalid boundary condition! " + val));
@@ -89,11 +89,11 @@ void FDTDConfig::setBoundaryCondition(std::array<std::string, 6> _values) {
 	m_boundaryConditions = _values;
 }
 
-void FDTDConfig::setBoundaryCondition(size_t _index, std::string _value) {
+void FDTDConfig::setBoundaryCondition(size_t _index, const std::string& _value) {
 	if (std::find(m_boundaryConditionTypes.begin(), m_boundaryConditionTypes.end(), _value) == m_boundaryConditionTypes.end()) {
 		throw std::invalid_argument(std::string("[Boundary Condition] Invalid boundary condition! " + _value));
 	}
-	if (_index >= m_boundaryConditions.size() || _index < 0) {
+	if (_index >= m_boundaryConditions.size()) {
 		throw std::out_of_range(std::string("[Boundary Condition] Index out of range"));
 	}
 	m_boundaryConditions[_index] = _value;
@@ -164,11 +164,6 @@ uint8_t FDTDConfig::readExcitationTypeInfo() {
 	return static_cast<uint8_t>(m_excitation);
 }
 
-uint16_t FDTDConfig::readOversamplingInfo() {
-	ensureEntityIsSet();
-	return readEntityPropertiesInfo<uint16_t>(m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "Oversampling", true);
-}
-
 double FDTDConfig::readEndCriteriaInfo() {
 	ensureEntityIsSet();
 	return readEntityPropertiesInfo<double>(m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "End Criteria", true);
@@ -184,6 +179,11 @@ double FDTDConfig::readFrequencyStopInfo() {
 	return readEntityPropertiesInfo<double>(m_solverEntity, "Frequency", m_frequencyProperties, "End Frequency", true);
 }
 
+uint16_t FDTDConfig::readOversamplingInfo() {
+	ensureEntityIsSet();
+	return readEntityPropertiesInfo<uint16_t>(m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "Oversampling", true);
+}
+
 std::array<std::string, 6> FDTDConfig::readBoundaryConditions() {
 	ensureEntityIsSet();
 	ot::ModelServiceAPI::getEntityProperties(m_solverEntity->getName(), true, "Boundary Conditions", m_boundaryConditionProperties);
@@ -191,18 +191,17 @@ std::array<std::string, 6> FDTDConfig::readBoundaryConditions() {
 		auto value = readEntityPropertiesInfo<std::string>(m_solverEntity, "Boundary Conditions", m_boundaryConditionProperties, m_boundaryNames[i], false);
 		if (value.empty()) {
 			value = "PEC"; // default to PEC
-			OT_LOG_EAS("[Boundary Conditions] Boundary condition for " + m_boundaryNames[i] + " not found! Defaulting to PEC!");
 		}
 		m_boundaryConditions[i] = value;
 	}
 	return m_boundaryConditions;
 }
 
-void FDTDConfig::addToXML(tinyxml2::XMLDocument& doc) {
-	auto declaration = doc.NewDeclaration("xml version=\"1.0\" encoding=\"utf-8\"");
-	doc.InsertFirstChild(declaration);
-	auto root = doc.NewElement("openEMS");
-	doc.InsertEndChild(root);
+void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {
+	auto declaration = _doc.NewDeclaration("xml version=\"1.0\" encoding=\"utf-8\"");
+	_doc.InsertFirstChild(declaration);
+	auto root = _doc.NewElement("openEMS");
+	_doc.InsertEndChild(root);
 	auto FDTD = writeFDTD(*root);
 	root->InsertEndChild(FDTD);
 }
