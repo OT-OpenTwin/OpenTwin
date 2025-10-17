@@ -54,7 +54,7 @@ public:
 	bool isModified(void) const { return m_stateModified; };
 
 	// Open a project, load the version grap and the currently active version
-	bool openProject(void);
+	bool openProject(const std::string& _customVersion = std::string());
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -261,6 +261,12 @@ private:
 
 	// A flag which indicates whether the model state has been modified compared to the last stored state.
 	bool m_stateModified;
+
+	std::string m_initialBranch; //! @brief The initial branch when the project was opened.
+	std::string m_initialVersion; //! @brief The initial version when the project was opened.
+
+	//! @brief Indicates whether the custom version to open is the end of a branch.
+	bool m_customVersionIsEndOfBranch;
 
 	// The maximum number of array entities per state
 	const size_t m_maxNumberArrayEntitiesPerState;

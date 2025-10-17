@@ -39,12 +39,26 @@ ot::GraphicsItemCfg* EntityBlockHierarchicalProjectItem::createBlockCfg() {
 }
 
 bool EntityBlockHierarchicalProjectItem::updateFromProperties() {
+	bool updateGrid = false;
+
 	if (getProperties().anyPropertyNeedsUpdate()) {
 		createBlockItem();
 	}
 
+	bool useLatestVersionProp = PropertyHelper::getBoolPropertyValue(this, "UseLatestsVersion");
+	EntityPropertiesString* customVersionProp = PropertyHelper::getStringProperty(this, "CustomVersion");
+	OTAssertNullptr(customVersionProp);
+
+	updateGrid = (useLatestVersionProp == customVersionProp->getVisible());
+	customVersionProp->setVisible(!useLatestVersionProp);
+
+	if (customVersionProp->getValue().empty()) {
+		customVersionProp->setValue("1");
+	}
+
 	getProperties().forceResetUpdateForAllProperties();
-	return true;
+
+	return updateGrid;
 }
 
 void EntityBlockHierarchicalProjectItem::createProperties() {
@@ -59,6 +73,12 @@ void EntityBlockHierarchicalProjectItem::createProperties() {
 	prop = EntityPropertiesString::createProperty("Project Data", "CollectionName", "", "", getProperties());
 	prop->setVisible(false);
 	prop->setReadOnly(true);
+
+
+
+	prop = EntityPropertiesBoolean::createProperty("Project", "UseLatestsVersion", true, "", getProperties());
+	prop = EntityPropertiesString::createProperty("Project", "CustomVersion", "1", "", getProperties());
+	prop->setVisible(false);
 }
 
 void EntityBlockHierarchicalProjectItem::setProjectInformation(const ot::ProjectInformation& _info) {
@@ -76,4 +96,20 @@ ot::ProjectInformation EntityBlockHierarchicalProjectItem::getProjectInformation
 	info.setCollectionName(PropertyHelper::getStringPropertyValue(this, "CollectionName"));
 
 	return info;
+}
+
+void EntityBlockHierarchicalProjectItem::setUseLatestVersion(bool _flag) {
+	PropertyHelper::setBoolPropertyValue(_flag, this, "UseLatestsVersion");
+}
+
+bool EntityBlockHierarchicalProjectItem::getUseLatestVersion() const {
+	return PropertyHelper::getBoolPropertyValue(this, "UseLatestsVersion");
+}
+
+void EntityBlockHierarchicalProjectItem::setCustomVersion(const std::string& _version) {
+	PropertyHelper::setStringPropertyValue(_version, this, "CustomVersion");
+}
+
+std::string EntityBlockHierarchicalProjectItem::getCustomVersion() const {
+	return PropertyHelper::getStringPropertyValue(this, "CustomVersion");
 }

@@ -81,9 +81,14 @@ void Application::handleSetVisualizationModel(ot::JsonDocument& _document) {
 	ot::UID viewerModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
 	ot::UID viewerViewID = ot::json::getUInt64(_document, OT_ACTION_PARAM_VIEW_ID);
 
+	std::string customVersion;
+	if (_document.HasMember(OT_ACTION_PARAM_PROJECT_VERSION)) {
+		customVersion = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_VERSION);
+	}
+
 	OT_LOG_D("Visualization model set to (" + std::to_string(viewerModelID) + "). Opening project...");
 	
-	m_model->projectOpen();
+	m_model->projectOpen(customVersion);
 	m_model->setVisualizationModel(viewerModelID);
 }
 

@@ -14,6 +14,7 @@
 #include "ShortcutManager.h"
 #include "WebsocketClient.h"
 #include "ProjectManagement.h"
+#include "StartArgumentParser.h"
 #include "SelectProjectDialog.h"
 #include "SelectEntitiesDialog.h"
 #include "ExternalServicesComponent.h"	// Corresponding header
@@ -451,34 +452,6 @@ ModelUIDtype ExternalServicesComponent::createModel(
 ) {
 	assert(0); //NOTE, Not in use anymore
 	return 0;
-}
-
-void ExternalServicesComponent::setVisualizationModel(ModelUIDtype modelID, ModelUIDtype visualizationModelID)
-{
-	OT_LOG_EAS("NOT IN USE ANYMORE");
-	try {
-		ot::JsonDocument inDoc;
-		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetVisualizationModel, inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_VIEW_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
-
-		std::string response;
-		for (auto reciever : m_modelViewNotifier) {
-			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc.toJson(), response);
-			// Check if response is an error or warning
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				OT_LOG_EAS("Error response: " + response);
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				OT_LOG_EAS("Warning response: " + response);
-				}
-		}
-
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_E(_e.what());
-	}
 }
 
 ModelUIDtype ExternalServicesComponent::getVisualizationModel(ModelUIDtype modelID)
@@ -1145,7 +1118,7 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 	return result;
 }
 
-bool ExternalServicesComponent::openProject(const std::string & _projectName, const std::string& _projectType, const std::string & _collectionName) {
+bool ExternalServicesComponent::openProject(const std::string & _projectName, const std::string& _projectType, const std::string & _collectionName, const std::string& _projectVersion) {
 
 	AppBase * app{ AppBase::instance() };
 	try {
@@ -1205,6 +1178,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		// Add session information
 		sessionDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(_projectType, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_PROJECT_VERSION, ot::JsonString(_projectVersion, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		// Add service information
 		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
@@ -2515,6 +2489,14 @@ void ExternalServicesComponent::handleCreateModel(ot::JsonDocument& _document) {
 	docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetVisualizationModel, docOut.GetAllocator()), docOut.GetAllocator());
 	docOut.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, docOut.GetAllocator());
 	docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, viewID, docOut.GetAllocator());
+
+	// Check if we have a custom project version set
+	StartArgumentParser args;
+	if (args.parse()) {
+		if (!args.getProjectVersion().empty()) {
+			docOut.AddMember(OT_ACTION_PARAM_PROJECT_VERSION, ot::JsonString(args.getProjectVersion(), docOut.GetAllocator()), docOut.GetAllocator());
+		}
+	}
 
 	std::string response;
 	if (!sendRelayedRequest(EXECUTE, service->second->getServiceURL(), docOut, response)) {
@@ -4108,7 +4090,12 @@ void ExternalServicesComponent::handleProjectSelectDialog(ot::JsonDocument& _doc
 void ExternalServicesComponent::handleOpenNewProject(ot::JsonDocument& _document) {
 	ot::ProjectInformation projInfo(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	if (!AppBase::instance()->openNewInstance(projInfo)) {
+	std::string customVersion;
+	if (_document.HasMember(OT_ACTION_PARAM_PROJECT_VERSION)) {
+		customVersion = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_VERSION);
+	}
+
+	if (!AppBase::instance()->openNewInstance(projInfo, customVersion)) {
 		OT_LOG_E("Failed to open new project instance for project \"" + projInfo.getProjectName() + "\"");
 	}
 }

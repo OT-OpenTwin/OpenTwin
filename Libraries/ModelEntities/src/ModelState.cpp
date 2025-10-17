@@ -17,7 +17,8 @@
 
 ModelState::ModelState(unsigned int sessionID, unsigned int serviceID) :
 	m_stateModified(false),
-	m_maxNumberArrayEntitiesPerState(250000)
+	m_maxNumberArrayEntitiesPerState(250000),
+	m_customVersionIsEndOfBranch(false)
 {
 	DataStorageAPI::UniqueUIDGenerator *uidGenerator = EntityBase::getUidGenerator();
 	if (uidGenerator == nullptr)
@@ -50,7 +51,7 @@ void ModelState::reset(void)
 	m_stateModified = false;
 }
 
-bool ModelState::openProject(void) {
+bool ModelState::openProject(const std::string& _customVersion) {
 	// load the version graph
 	loadVersionGraph();
 
@@ -72,8 +73,24 @@ bool ModelState::openProject(void) {
 	std::string activeBranch = result->view()["ActiveBranch"].get_utf8().value.data();
 	std::string activeVersion = result->view()["ActiveVersion"].get_utf8().value.data();
 
+	// If a specific version was requested we try to open it instead.
+	if (!_customVersion.empty()) {
+		auto versionEntry = m_graphCfg.findVersion(activeVersion);
+		if (!versionEntry) {
+			OT_LOG_E("The requested version \"" + _customVersion + "\" does not exist");
+		}
+		else {
+			activeVersion = _customVersion;
+			activeBranch = versionEntry->getBranchName();
+			m_customVersionIsEndOfBranch = m_graphCfg.versionIsEndOfBranch(_customVersion);
+		}
+	}
+
 	m_activeBranchInModelEntity = activeBranch;
 	m_activeVersionInModelEntity = activeVersion;
+
+	m_initialBranch = activeBranch;
+	m_initialVersion = activeVersion;
 
 	// Activate the branch
 	m_graphCfg.setActiveBranchName(activeBranch);

@@ -22,10 +22,17 @@ public:
 
 	virtual void createProperties();
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Property accessors
+
 	void setProjectInformation(const ot::ProjectInformation& _info);
 	ot::ProjectInformation getProjectInformation() const;
 
-private:
+	void setUseLatestVersion(bool _flag);
+	bool getUseLatestVersion() const;
 
+	void setCustomVersion(const std::string& _version);
+	std::string getCustomVersion() const;
 };
 

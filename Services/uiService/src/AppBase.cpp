@@ -358,7 +358,8 @@ bool AppBase::logIn() {
 	if (args.parse()) {
 		if (args.getOpenProjectSet()) {
 			QString projName = QString::fromStdString(args.getProjectInfo().getProjectName());
-			QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, projName);
+			std::string projVersion = args.getProjectVersion();
+			QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, projName, projVersion);
 		}
 	}
 	return true;
@@ -2251,7 +2252,7 @@ AppBase * AppBase::instance() {
 	return g_app;
 }
 
-bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo) {
+bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo, const std::string& _customVersion) {
 	if (!(m_state & AppState::LoggedInState)) {
 		OT_LOG_EA("Can not open a new instance if not logged in");
 		return false;
@@ -2260,6 +2261,7 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo) {
 	StartArgumentParser args;
 	args.setLogInData(m_loginData);
 	args.setProjectInfo(_projectInfo);
+	args.setProjectVersion(_customVersion);
 	//args.setDebug();
 	
 	QString appPath = QCoreApplication::applicationFilePath();
@@ -2268,7 +2270,12 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo) {
 	arguments.push_front(appPath);
 
 	ot::StyledTextBuilder message;
-	message << "Opening project \"" << ot::StyledText::Bold << _projectInfo.getProjectName() << ot::StyledText::NotBold << "\" in new OpenTwin instance...\n";
+	message << "Opening project \"" << ot::StyledText::Bold << _projectInfo.getProjectName() << ot::StyledText::NotBold << "\"";
+	
+	if (!_customVersion.empty()) {
+		message << " (version: \"" << ot::StyledText::Bold << _customVersion << ot::StyledText::NotBold << "\")";
+	}
+	message << " in new OpenTwin instance...\n";
 	this->appendOutputMessageAPI(message);
 
 	// Start new instance
@@ -3137,7 +3144,7 @@ void AppBase::slotCreateProject() {
 		m_state &= (~AppState::ProjectOpenState);
 	}
 
-	if (m_ExternalServicesComponent->openProject(currentName, projectType, projectManager.getProjectCollection(currentName))) {
+	if (m_ExternalServicesComponent->openProject(currentName, projectType, projectManager.getProjectCollection(currentName), std::string())) {
 		m_state |= AppState::ProjectOpenState;
 	}
 }
@@ -3149,10 +3156,10 @@ void AppBase::slotOpenProject() {
 			return;
 		}
 
-		this->slotOpenSpecificProject(selectedProjects.front());
+		this->slotOpenSpecificProject(selectedProjects.front(), std::string());
 }
 
-void AppBase::slotOpenSpecificProject(QString _projectName) {
+void AppBase::slotOpenSpecificProject(QString _projectName, const std::string& _projectVersion) {
 	// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 	if (!checkForContinue("Open Project")) {
 		return;
@@ -3198,7 +3205,7 @@ void AppBase::slotOpenSpecificProject(QString _projectName) {
 		}
 
 		// Open project
-		if (m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection)) {
+		if (m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection, std::string())) {
 			userManager.addRecentProject(selectedProjectName);
 			m_state |= AppState::ProjectOpenState;
 			m_welcomeScreen->refreshProjectList();
@@ -3319,7 +3326,7 @@ void AppBase::slotRenameProject() {
 	userManager.removeRecentProject(selectedProjectName.toStdString());
 
 	// Reopen the project if needed
-	if (reopenProject && m_ExternalServicesComponent->openProject(newProjectName, projectManager.getProjectType(newProjectName), projectManager.getProjectCollection(newProjectName))) {
+	if (reopenProject && m_ExternalServicesComponent->openProject(newProjectName, projectManager.getProjectType(newProjectName), projectManager.getProjectCollection(newProjectName), std::string())) {
 		m_state |= AppState::ProjectOpenState;
 	}
 

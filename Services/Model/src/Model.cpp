@@ -3227,7 +3227,7 @@ EntityBase *Model::readEntityFromEntityID(EntityBase *parent, ot::UID entityID, 
 	return readEntityFromEntityIDandVersion(parent, entityID, version, entityMap);
 }
 
-void Model::projectOpen()
+void Model::projectOpen(const std::string& _customVersion)
 {
 	// First, clear the current content of the model
 	clearAll();
@@ -3245,7 +3245,7 @@ void Model::projectOpen()
 	getStateManager()->checkAndUpgradeDataBaseSchema();
 
 	// Load the model state for the latest version
-	if (!getStateManager()->openProject())
+	if (!getStateManager()->openProject(_customVersion))
 	{
 		// The model state could not be loaded -> the project is new
 		resetToNew();

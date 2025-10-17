@@ -39,6 +39,9 @@ public:
 	void setProjectInfo(const ot::ProjectInformation& _info) { m_projectInfo = _info; m_openProject = true; };
 	const ot::ProjectInformation& getProjectInfo() const { return m_projectInfo; };
 
+	void setProjectVersion(const std::string& _version) { m_projectVersion = _version; };
+	const std::string& getProjectVersion() const { return m_projectVersion; };
+
 private:
 	bool m_debug = false;
 	bool m_checkGraphics = false;
@@ -48,4 +51,5 @@ private:
 
 	bool m_openProject = false;
 	ot::ProjectInformation m_projectInfo;
+	std::string m_projectVersion;
 };

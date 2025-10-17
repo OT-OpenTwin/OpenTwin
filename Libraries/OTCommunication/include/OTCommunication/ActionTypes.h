@@ -515,6 +515,7 @@
 
 #define OT_ACTION_PARAM_COLLECTION_NAME "Collection.Name"
 #define OT_ACTION_PARAM_PROJECT_NAME "Project.Name"
+#define OT_ACTION_PARAM_PROJECT_VERSION "Project.Version"
 #define OT_ACTION_PARAM_USER_NAME "User.Name"
 
 #define OT_ACTION_PARAM_MODEL_ID "Model.ID"

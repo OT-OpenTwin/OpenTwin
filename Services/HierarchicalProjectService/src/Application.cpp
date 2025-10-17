@@ -209,8 +209,6 @@ void Application::handleProjectSelected(ot::JsonDocument& _doc) {
 		return;
 	}
 
-	OT_LOG_T("Project selected received: " + info.toJson());
-
 	auto parentInfo = getParentEntityToAdd();
 
 	if (!parentInfo.has_value()) {
@@ -402,6 +400,10 @@ ot::ReturnMessage Application::requestToOpenProject(const ot::EntityInformation&
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_OpenNewProject, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(projectEntity->getProjectInformation(), doc.GetAllocator()), doc.GetAllocator());
+
+	if (!projectEntity->getUseLatestVersion()) {
+		doc.AddMember(OT_ACTION_PARAM_PROJECT_VERSION, ot::JsonString(projectEntity->getCustomVersion(), doc.GetAllocator()), doc.GetAllocator());
+	}
 
 	sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc);
 

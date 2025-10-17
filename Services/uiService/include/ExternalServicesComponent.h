@@ -110,7 +110,6 @@ public:
 
 	ModelUIDtype createModel(const std::string& _projectName, const std::string& _collectionName);
 	
-	void setVisualizationModel(ModelUIDtype modelID, ModelUIDtype visualizationModelID);
 	ModelUIDtype getVisualizationModel(ModelUIDtype modelID);
 	bool isModelModified(ModelUIDtype modelID);
 	bool isCurrentModelModified();
@@ -161,7 +160,7 @@ public:
 	// Project handling
 
 	std::list<ot::ProjectTemplateInformation> getListOfProjectTemplates();
-	bool openProject(const std::string& projectName, const std::string& projectType, const std::string& collectionName);
+	bool openProject(const std::string& projectName, const std::string& projectType, const std::string& collectionName, const std::string& _projectVersion);
 	void closeProject(bool saveChanges);
 	void saveProject();
 	bool projectIsOpened(const std::string& projectName, std::string& projectUser);

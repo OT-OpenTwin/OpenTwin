@@ -494,7 +494,7 @@ public:
 
 	static AppBase * instance();
 
-	bool openNewInstance(const ot::ProjectInformation& _projectInfo);
+	bool openNewInstance(const ot::ProjectInformation& _projectInfo, const std::string& _customVersion);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -539,7 +539,7 @@ private Q_SLOTS:
 
 	void slotCreateProject();
 	void slotOpenProject();
-	void slotOpenSpecificProject(QString _projectName);
+	void slotOpenSpecificProject(QString _projectName, const std::string& _projectVersion);
 	void slotCopyProject();
 	void slotRenameProject();
 	void slotDeleteProject();

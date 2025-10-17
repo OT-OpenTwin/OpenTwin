@@ -141,7 +141,7 @@ public:
 	void addVisualizationMeshNode(const std::string &name, ot::UID entityID);
 
 	bool isProjectOpen() const { return m_isProjectOpen; };
-	void projectOpen();
+	void projectOpen(const std::string& _customVersion = std::string());
 	void projectSave(const std::string &comment, bool silentlyCreateBranch);
 
 	void detachAllViewer();

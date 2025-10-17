@@ -21,6 +21,7 @@ bool StartArgumentParser::parse() {
 
 	m_loginData = LoginData();
 	m_projectInfo = ot::ProjectInformation();
+	m_projectVersion.clear();
 
 	// Prepare parser
 	QCommandLineParser parser;
@@ -44,6 +45,11 @@ bool StartArgumentParser::parse() {
 		"string");
 	parser.addOption(openProjectOption);
 
+	QCommandLineOption projectVersionOption("projversion",
+		"Specify the project version to open.",
+		"string");
+	parser.addOption(projectVersionOption);
+
 	// Process the actual command line arguments
 	parser.process(*QCoreApplication::instance());
 
@@ -60,7 +66,7 @@ bool StartArgumentParser::parse() {
 	// Check for login option
 	if (parser.isSet(loginOption)) {
 		const QString loginDataStr = parser.value(loginOption);
-		std::string decoded = ot::String::fromHex(loginDataStr.toStdString());
+		std::string decoded = ot::String::fromBase64Url(loginDataStr.toStdString());
 		if (decoded.empty()) {
 			OT_LOG_E("Login option set but no data provided");
 			return false;
@@ -79,7 +85,7 @@ bool StartArgumentParser::parse() {
 	// Check for open project option
 	if (parser.isSet(openProjectOption)) {
 		const QString projectDataStr = parser.value(openProjectOption);
-		std::string decoded = ot::String::fromHex(projectDataStr.toStdString());
+		std::string decoded = ot::String::fromBase64Url(projectDataStr.toStdString());
 		if (decoded.empty()) {
 			OT_LOG_E("Open project option set but no data provided");
 			return false;
@@ -91,6 +97,11 @@ bool StartArgumentParser::parse() {
 		}
 		m_projectInfo.setFromJsonObject(doc.getConstObject());
 		m_openProject = true;
+
+		// Check for project version option
+		if (parser.isSet(projectVersionOption)) {
+			m_projectVersion = parser.value(projectVersionOption).toStdString();
+		}
 	}
 
     return true;
@@ -110,15 +121,19 @@ QStringList StartArgumentParser::createCommandLineArgs() const {
 	if (m_logIn) {
 		ot::JsonDocument doc;
 		m_loginData.addRequiredDataToJson(doc, doc.GetAllocator());
-		std::string encoded = ot::String::toHex(doc.toJson());
+		std::string encoded = ot::String::toBase64Url(doc.toJson());
 		args << "--login" << QString::fromStdString(encoded);
 	}
 	
 	if (m_openProject) {
 		ot::JsonDocument doc;
 		m_projectInfo.addToJsonObject(doc, doc.GetAllocator());
-		std::string encoded = ot::String::toHex(doc.toJson());
+		std::string encoded = ot::String::toBase64Url(doc.toJson());
 		args << "--openproject" << QString::fromStdString(encoded);
+	}
+
+	if (!m_projectVersion.empty()) {
+		args << "--projversion" << QString::fromStdString(m_projectVersion);
 	}
 
 	return args;
