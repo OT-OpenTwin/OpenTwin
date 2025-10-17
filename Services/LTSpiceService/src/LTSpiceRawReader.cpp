@@ -1,16 +1,21 @@
-#include "LTSpiceRawReader.h"
+﻿#include "LTSpiceRawReader.h"
 
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
+#include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <limits>
 #include <sstream>
 #include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace ltspice {
 
-    // ---------- RawVariable ----------
+    // -------------------- RawVariable --------------------
     RawVariable::RawVariable(int index, std::string name, std::string type)
         : index_(index), name_(std::move(name)), type_(std::move(type)) {
     }
@@ -19,8 +24,9 @@ namespace ltspice {
     const std::string& RawVariable::name() const { return name_; }
     const std::string& RawVariable::type() const { return type_; }
 
-    // ---------- helpers (internal) ----------
+    // -------------------- internal helpers --------------------
     namespace {
+
         inline std::string trim(const std::string& s) {
             std::size_t a = 0, b = s.size();
             while (a < b && std::isspace(static_cast<unsigned char>(s[a]))) ++a;
@@ -55,14 +61,13 @@ namespace ltspice {
             return static_cast<std::size_t>(std::stoll(s));
         }
 
-        // Read a native little-endian double from stream.
-        // (LTspice writes IEEE754 doubles in little-endian order.)
+        // Read a native little-endian double. (LTspice writes IEEE754 doubles little-endian.)
         inline void readDouble(std::istream& in, double& x) {
             in.read(reinterpret_cast<char*>(&x), sizeof(double));
             if (!in) throw std::runtime_error("Unexpected end of file while reading binary doubles");
         }
 
-        // Header parser result shared by ASCII/Binary payload readers.
+        // Result of header parsing (text part up to "Binary:"/"Values:").
         struct HeaderParseResult {
             std::map<std::string, std::string> header;
             std::vector<RawVariable> variables;
@@ -73,8 +78,7 @@ namespace ltspice {
             std::string marker; // "Binary:" or "Values:"
         };
 
-        // Parse header & variable list; stop right AFTER the marker line.
-        // Leaves stream positioned at the start of the payload.
+        // Parse header & variable list; stream stops right after marker line.
         HeaderParseResult readHeaderAndVariables(std::istream& in) {
             HeaderParseResult r;
             std::string line;
@@ -88,11 +92,11 @@ namespace ltspice {
                 if (t == "Binary:" || t == "Values:") {
                     r.marker = t;
                     r.isBinary = (t == "Binary:");
-                    break; // position is right after the marker line
+                    break;
                 }
 
                 if (inVars) {
-                    // Expected: "<idx>  <name>  <type>"
+                    // "<idx>  <name>  <type>"
                     auto parts = splitWS(t);
                     if (parts.size() >= 3) {
                         int idx = std::stoi(parts[0]);
@@ -101,7 +105,6 @@ namespace ltspice {
                     continue;
                 }
 
-                // Generic header key:value
                 parseHeaderLine(t, r.header);
             }
 
@@ -113,8 +116,8 @@ namespace ltspice {
             return r;
         }
 
-        // Parse ASCII payload given the header result; stream at payload start.
-        void parseAsciiPayload(std::istream& in, const HeaderParseResult& hdr, RawData& data) {
+        // ASCII payload parser.
+        void parseAsciiPayload(std::istream& in, const HeaderParseResult& /*hdr*/, class RawData& data) {
             const bool isComplex = data.isComplex();
             const std::size_t nVars = data.variablesCount();
             const std::size_t nPts = data.points();
@@ -129,7 +132,6 @@ namespace ltspice {
                     line = trim(line);
                 }
 
-                // split once: first token = index (ignored), rest = value
                 std::string rest;
                 {
                     std::istringstream iss(line);
@@ -188,30 +190,248 @@ namespace ltspice {
             }
         }
 
-        // Parse Binary payload given the header result; stream at payload start.
-        void parseBinaryPayload(std::istream& in, const HeaderParseResult& hdr, RawData& data) {
+        // ---------- UTF-16 support (BOM/No-BOM detection & header decoding) ----------
+        enum class Utf16Bom { None, LE, BE };
+
+        // BOM-based detection.
+        Utf16Bom detect_utf16_bom(const std::string& s) {
+            if (s.size() >= 2) {
+                const unsigned char b0 = static_cast<unsigned char>(s[0]);
+                const unsigned char b1 = static_cast<unsigned char>(s[1]);
+                if (b0 == 0xFF && b1 == 0xFE) return Utf16Bom::LE;
+                if (b0 == 0xFE && b1 == 0xFF) return Utf16Bom::BE;
+            }
+            return Utf16Bom::None;
+        }
+
+        // Heuristic for UTF-16 without BOM: look for alternating NULs and ASCII.
+        Utf16Bom detect_utf16_no_bom_heuristic(const std::string& s) {
+            const std::size_t N = std::min<std::size_t>(s.size(), 512);
+            if (N < 4) return Utf16Bom::None;
+
+            auto is_ascii = [](unsigned char c) {
+                return (c == 0x09 || c == 0x0A || c == 0x0D || (c >= 0x20 && c <= 0x7E));
+                };
+
+            std::size_t le_hits = 0, be_hits = 0, pairs = 0;
+            for (std::size_t i = 0; i + 1 < N; i += 2) {
+                unsigned char a = static_cast<unsigned char>(s[i]);
+                unsigned char b = static_cast<unsigned char>(s[i + 1]);
+                if (is_ascii(a) && b == 0x00) le_hits++;
+                if (a == 0x00 && is_ascii(b)) be_hits++;
+                pairs++;
+            }
+
+            if (pairs >= 8) {
+                if (le_hits >= pairs * 0.75) return Utf16Bom::LE;
+                if (be_hits >= pairs * 0.75) return Utf16Bom::BE;
+            }
+            return Utf16Bom::None;
+        }
+
+        // BMP-only conversion (good enough for LTspice headers).
+        static std::string codeunit_to_utf8(uint16_t w) {
+            if (w < 0x80)        return std::string(1, static_cast<char>(w));
+            else if (w < 0x800)  return std::string{ char(0xC0 | (w >> 6)), char(0x80 | (w & 0x3F)) };
+            else                 return std::string{ char(0xE0 | (w >> 12)),
+                                                     char(0x80 | ((w >> 6) & 0x3F)),
+                                                     char(0x80 | (w & 0x3F)) };
+        }
+
+        // Decode UTF-16 header text to UTF-8, stop after marker, return payload offset.
+        struct Utf16HeaderDecodeResult {
+            std::string utf8_header;
+            std::size_t payload_offset_bytes{ 0 };
+            bool isBinary{ false };
+        };
+
+        Utf16HeaderDecodeResult decode_utf16_header_until_marker(const std::string& s,
+            Utf16Bom bom,
+            std::size_t start) {
+            Utf16HeaderDecodeResult out;
+
+            auto read_u16 = [&](std::size_t at)->uint16_t {
+                if (bom == Utf16Bom::LE) return uint16_t(uint8_t(s[at]) | (uint16_t(uint8_t(s[at + 1])) << 8));
+                else                     return uint16_t((uint16_t(uint8_t(s[at])) << 8) | uint8_t(s[at + 1]));
+                };
+            auto equals_word = [&](std::size_t at, const char* ascii)->bool {
+                std::size_t i = 0;
+                while (ascii[i] != '\0') {
+                    if (at + 1 >= s.size()) return false;
+                    uint16_t w = read_u16(at);
+                    if (w != static_cast<unsigned char>(ascii[i])) return false;
+                    at += 2; i++;
+                }
+                return true;
+                };
+
+            std::size_t pos = start;
+            while (pos + 1 < s.size()) {
+                if (equals_word(pos, "Binary:") || equals_word(pos, "Values:")) {
+                    bool isBin = equals_word(pos, "Binary:");
+                    // advance to end-of-line
+                    std::size_t p = pos;
+                    while (p + 1 < s.size()) {
+                        uint16_t w = read_u16(p); p += 2;
+                        if (w == u'\n') break;
+                        if (w == u'\r') { if (p + 1 < s.size() && read_u16(p) == u'\n') p += 2; break; }
+                    }
+                    out.payload_offset_bytes = p;
+                    out.isBinary = isBin;
+                    break;
+                }
+                // collect line → UTF-8
+                while (pos + 1 < s.size()) {
+                    uint16_t w = read_u16(pos); pos += 2;
+                    if (w == u'\n') { out.utf8_header.push_back('\n'); break; }
+                    if (w == u'\r') { if (pos + 1 < s.size() && read_u16(pos) == u'\n') pos += 2; out.utf8_header.push_back('\n'); break; }
+                    out.utf8_header += codeunit_to_utf8(w);
+                }
+            }
+
+            if (out.payload_offset_bytes == 0)
+                throw std::runtime_error("UTF-16 RAW: missing 'Binary:' or 'Values:' marker in header");
+            return out;
+        }
+
+        // --- Binary layout inference & parsing (supports mixed precision) ---
+
+        inline double readFloat32AsDouble(std::istream& in) {
+            std::uint32_t u = 0;
+            in.read(reinterpret_cast<char*>(&u), sizeof(u));
+            if (!in) throw std::runtime_error("Unexpected EOF while reading float32");
+            float f;
+            std::memcpy(&f, &u, sizeof(f));
+            return static_cast<double>(f);
+        }
+
+        enum class LayoutKind { Uniform, MixedVar0Double };
+
+        struct BinaryLayout {
+            LayoutKind kind{ LayoutKind::Uniform };
+            std::size_t bytesPerScalarOthers{ 8 }; // for Uniform: width for all; for Mixed: width for vars 1..N-1
+            std::size_t nVarsEffective{ 0 };
+        };
+
+        inline std::optional<BinaryLayout> infer_layout_from_payload(std::size_t payloadBytes,
+            std::size_t headerVars,
+            std::size_t nPts,
+            bool isComplex,
+            bool flagsHasFloat)
+        {
+            // Try candidates in priority order:
+            // 1) Mixed (var0=double, others=float32)
+            // 2) Mixed (var0=double, others=double)
+            // 3) Uniform as hinted by flags/header (all double or all float32)
+            // 4) ±1 variable tolerance for all above
+
+            auto matches_mixed = [&](std::size_t nv, std::size_t bpsOthers)->bool {
+                const std::size_t scalarsOthers = isComplex ? 2 : 1;
+                // Per point: 8 bytes for var0 + (nv-1) * scalarsOthers * bpsOthers
+                const std::size_t perPoint = 8 + (nv > 0 ? (nv - 1) * scalarsOthers * bpsOthers : 0);
+                return nPts * perPoint == payloadBytes;
+                };
+            auto matches_uniform = [&](std::size_t nv, std::size_t bps)->bool {
+                const std::size_t scalarsPerVar = isComplex ? 2 : 1;
+                return nPts * nv * scalarsPerVar * bps == payloadBytes;
+                };
+
+            // Candidate nv values: header, header+1, header-1
+            std::vector<std::size_t> nvCandidates;
+            nvCandidates.push_back(headerVars);
+            nvCandidates.push_back(headerVars + 1);
+            if (headerVars > 0) nvCandidates.push_back(headerVars - 1);
+
+            // 1) Mixed var0=double, others=float32
+            for (auto nv : nvCandidates) {
+                if (matches_mixed(nv, 4)) return BinaryLayout{ LayoutKind::MixedVar0Double, 4, nv };
+            }
+            // 2) Mixed var0=double, others=double
+            for (auto nv : nvCandidates) {
+                if (matches_mixed(nv, 8)) return BinaryLayout{ LayoutKind::MixedVar0Double, 8, nv };
+            }
+            // 3) Uniform (flags hint first)
+            if (flagsHasFloat) {
+                for (auto nv : nvCandidates) if (matches_uniform(nv, 4)) return BinaryLayout{ LayoutKind::Uniform, 4, nv };
+            }
+            else {
+                for (auto nv : nvCandidates) if (matches_uniform(nv, 8)) return BinaryLayout{ LayoutKind::Uniform, 8, nv };
+                for (auto nv : nvCandidates) if (matches_uniform(nv, 4)) return BinaryLayout{ LayoutKind::Uniform, 4, nv };
+            }
+
+            return std::nullopt;
+        }
+
+        void parseBinaryPayloadWithLayout(std::istream& in,
+            class RawData& data,
+            const BinaryLayout& layout)
+        {
             const bool isComplex = data.isComplex();
             const std::size_t nVars = data.variablesCount();
             const std::size_t nPts = data.points();
 
+            auto readOtherScalar = [&](double& out) {
+                if (layout.bytesPerScalarOthers == 4) out = readFloat32AsDouble(in);
+                else                                  readDouble(in, out);
+                };
+
             for (std::size_t p = 0; p < nPts; ++p) {
-                for (std::size_t v = 0; v < nVars; ++v) {
-                    double a = 0.0, b = 0.0;
-                    readDouble(in, a);
+                // var0 is always a single real DOUBLE (time/frequency), even for complex datasets
+                double x = 0.0;
+                readDouble(in, x);
+                if (isComplex) {
+                    // For complex datasets, var0 is still real (frequency). Store in "real" buffer if available.
+                    // We'll store it in the first column of the chosen container:
+                    // The RawData storage is either real or complex; for complex datasets we need to keep var0's
+                    // real value. We'll map it to complex with imag=0 for consistency.
+                    data.setComplex(p, 0, { x, 0.0 });
+                }
+                else {
+                    data.setReal(p, 0, x);
+                }
+
+                // remaining variables
+                for (std::size_t v = 1; v < nVars; ++v) {
                     if (isComplex) {
-                        readDouble(in, b);
-                        data.setComplex(p, v, RawData::cpx(a, b));
+                        double re = 0.0, im = 0.0;
+                        readOtherScalar(re);
+                        readOtherScalar(im);
+                        data.setComplex(p, v, { re, im });
                     }
                     else {
-                        data.setReal(p, v, a);
+                        double val = 0.0;
+                        readOtherScalar(val);
+                        data.setReal(p, v, val);
                     }
                 }
             }
         }
 
-    } // namespace (helpers)
+        // Optional safety: detect & repair UTF-16-ized binary tails (each low byte stored with 0x00 high).
+        bool looksUtf16izedBinaryTail(const std::string& blob, std::size_t payloadOffset) {
+            std::size_t N = std::min<std::size_t>(blob.size() - payloadOffset, 1024);
+            if (N < 32) return false;
+            std::size_t hits = 0, pairs = 0;
+            for (std::size_t i = 0; i + 1 < N; i += 2) {
+                unsigned char hi = static_cast<unsigned char>(blob[payloadOffset + i + 1]);
+                if (hi == 0x00) ++hits;
+                ++pairs;
+            }
+            return pairs >= 16 && hits >= pairs * 0.8;
+        }
 
-    // ---------- RawData ----------
+        std::string deUtf16izeBinaryTailLE(const std::string& blob, std::size_t payloadOffset) {
+            std::string out;
+            out.reserve((blob.size() - payloadOffset) / 2);
+            for (std::size_t i = payloadOffset; i + 1 < blob.size(); i += 2) {
+                out.push_back(blob[i]); // keep low byte
+            }
+            return out;
+        }
+
+    } // anonymous namespace
+
+    // -------------------- RawData --------------------
     RawData::RawData() = default;
 
     void RawData::setHeader(const std::map<std::string, std::string>& hdr) { header_ = hdr; }
@@ -250,6 +470,44 @@ namespace ltspice {
 
     double RawData::real(std::size_t p, std::size_t v) const { return dataReal_.at(p).at(v); }
     RawData::cpx RawData::complex(std::size_t p, std::size_t v) const { return dataCplx_.at(p).at(v); }
+
+    std::optional<std::size_t> RawData::variableIndexByName(const std::string& name) const {
+        for (std::size_t i = 0; i < variables_.size(); ++i)
+            if (variables_[i].name() == name) return i;
+        return std::nullopt;
+    }
+    std::vector<std::string> RawData::variableNames() const {
+        std::vector<std::string> names; names.reserve(variables_.size());
+        for (const auto& v : variables_) names.push_back(v.name());
+        return names;
+    }
+    double RawData::real(std::size_t p, const std::string& varName) const {
+        auto idx = variableIndexByName(varName);
+        if (!idx) throw std::out_of_range("Variable not found: " + varName);
+        if (isComplex()) throw std::logic_error("Dataset is complex; use complex()");
+        return real(p, *idx);
+    }
+    RawData::cpx RawData::complex(std::size_t p, const std::string& varName) const {
+        auto idx = variableIndexByName(varName);
+        if (!idx) throw std::out_of_range("Variable not found: " + varName);
+        if (!isComplex()) throw std::logic_error("Dataset is real; use real()");
+        return complex(p, *idx);
+    }
+    std::vector<double> RawData::xValues() const {
+        if (isComplex()) throw std::logic_error("xValues() not available for complex dataset");
+        if (variables_.empty()) return {};
+        std::vector<double> xs(nPts_);
+        for (std::size_t i = 0; i < nPts_; ++i) xs[i] = dataReal_[i][0];
+        return xs;
+    }
+    std::vector<double> RawData::yValues(const std::string& varName) const {
+        if (isComplex()) throw std::logic_error("yValues() only valid for real dataset");
+        auto idx = variableIndexByName(varName);
+        if (!idx) throw std::out_of_range("Variable not found: " + varName);
+        std::vector<double> ys(nPts_);
+        for (std::size_t i = 0; i < nPts_; ++i) ys[i] = dataReal_[i][*idx];
+        return ys;
+    }
 
     void RawData::exportCSV(const std::string& path) const {
         std::ofstream out(path, std::ios::binary);
@@ -292,9 +550,11 @@ namespace ltspice {
         }
     }
 
-    // ---------- AutoRawReader ----------
+    // -------------------- AutoRawReader --------------------
+
+    // 8-bit text path (ASCII/UTF-8 header). Stream must be at file start.
+    // For maximum robustness (UTF-16 + layout inference) prefer readFromBytes().
     RawData AutoRawReader::read(std::istream& in) {
-        // Read header & variables; stream remains positioned at payload start.
         HeaderParseResult hdr = readHeaderAndVariables(in);
 
         RawData data;
@@ -305,13 +565,156 @@ namespace ltspice {
         data.setVariables(hdr.variables);
 
         if (hdr.isBinary) {
-            parseBinaryPayload(in, hdr, data);
+            // Default to uniform doubles here (no payload size known in generic istream).
+            // If your input might be mixed/float32, use readFromBytes() instead.
+            BinaryLayout lay;
+            lay.kind = LayoutKind::Uniform;
+            lay.bytesPerScalarOthers = 8;
+            lay.nVarsEffective = data.variablesCount();
+            parseBinaryPayloadWithLayout(in, data, lay);
         }
         else {
             if (hdr.marker != "Values:")
                 throw std::runtime_error("Expected 'Values:' section for ASCII RAW");
             parseAsciiPayload(in, hdr, data);
         }
+        return data;
+    }
+
+    // In-memory path with UTF-16 handling and robust binary layout inference (incl. mixed precision).
+    RawData AutoRawReader::readFromBytes(const std::string& blob) {
+        // Detect UTF-16 header
+        Utf16Bom bom = detect_utf16_bom(blob);
+        if (bom == Utf16Bom::None) {
+            bom = detect_utf16_no_bom_heuristic(blob);
+        }
+
+        if (bom == Utf16Bom::None) {
+            // Not UTF-16 → parse as usual via 8-bit stream
+            std::istringstream iss(blob);
+            iss.seekg(0, std::ios::beg);
+            return read(iss);
+        }
+
+        // UTF-16 header path
+        std::size_t start = 0;
+        if (blob.size() >= 2) {
+            unsigned char b0 = static_cast<unsigned char>(blob[0]);
+            unsigned char b1 = static_cast<unsigned char>(blob[1]);
+            if ((bom == Utf16Bom::LE && b0 == 0xFF && b1 == 0xFE) ||
+                (bom == Utf16Bom::BE && b0 == 0xFE && b1 == 0xFF)) {
+                start = 2; // skip BOM
+            }
+        }
+
+        // Decode header until marker and capture payload offset.
+        Utf16HeaderDecodeResult dec = decode_utf16_header_until_marker(blob, bom, start);
+
+        // Parse the decoded (UTF-8) header using existing logic.
+        std::string syntheticHeader = dec.utf8_header + (dec.isBinary ? "Binary:\n" : "Values:\n");
+        std::istringstream headerStream(syntheticHeader);
+        HeaderParseResult hdr = readHeaderAndVariables(headerStream);
+
+        // Prepare dataset from header
+        RawData data;
+        data.setHeader(hdr.header);
+        data.setFlags(hdr.flags);
+        if (hdr.nVars == 0) hdr.nVars = hdr.variables.size();
+        data.setCounts(hdr.nVars, hdr.nPts);
+        data.setVariables(hdr.variables);
+
+        if (dec.isBinary) {
+            // Prepare payload bytes; repair if binary tail looks UTF-16-ized
+            std::string payload;
+            if (looksUtf16izedBinaryTail(blob, dec.payload_offset_bytes)) {
+                payload = deUtf16izeBinaryTailLE(blob, dec.payload_offset_bytes);
+            }
+            else {
+                payload = blob.substr(dec.payload_offset_bytes);
+            }
+
+            // Header hint for float (may be absent even for float32 payloads)
+            bool flagsHasFloat = false;
+            {
+                auto it = hdr.header.find("Flags");
+                if (it != hdr.header.end()) {
+                    std::string f = it->second;
+                    std::transform(f.begin(), f.end(), f.begin(), [](unsigned char c) { return std::tolower(c); });
+                    flagsHasFloat = (f.find("float") != std::string::npos);
+                }
+            }
+
+            // Infer layout: supports Mixed (var0=double, others float/double) & Uniform, with ±1 var tolerance
+            auto layoutOpt = infer_layout_from_payload(payload.size(),
+                data.variablesCount(),
+                data.points(),
+                data.isComplex(),
+                flagsHasFloat);
+            if (!layoutOpt) {
+                throw std::runtime_error("Cannot reconcile payload size ("
+                    + std::to_string(payload.size()) + " bytes) with header counts: "
+                    "No. Points=" + std::to_string(data.points()) +
+                    " No. Variables=" + std::to_string(data.variablesCount()) +
+                    " Flags=" + data.flags());
+            }
+            BinaryLayout layout = *layoutOpt;
+
+            // If effective #vars differs from header, adjust storage and add placeholder names
+            if (layout.nVarsEffective != data.variablesCount()) {
+                const std::size_t nPts = data.points();
+                const std::size_t nVarsEff = layout.nVarsEffective;
+
+                data.setCounts(nVarsEff, nPts);
+
+                auto vars = data.variables(); // copy existing names
+                while (vars.size() < nVarsEff) {
+                    int idx = static_cast<int>(vars.size());
+                    vars.emplace_back(idx, "__extra" + std::to_string(idx), "unknown");
+                }
+                data.setVariables(std::move(vars));
+            }
+
+            // Sanity: expected bytes vs. available
+            {
+                const bool isComplex = data.isComplex();
+                const std::size_t nv = data.variablesCount();
+                std::size_t expected = 0;
+                if (layout.kind == LayoutKind::MixedVar0Double) {
+                    const std::size_t scalarsOthers = isComplex ? 2 : 1;
+                    const std::size_t perPoint = 8 + (nv > 1 ? (nv - 1) * scalarsOthers * layout.bytesPerScalarOthers : 0);
+                    expected = data.points() * perPoint;
+                }
+                else {
+                    const std::size_t scalarsPerVar = isComplex ? 2 : 1;
+                    expected = data.points() * nv * scalarsPerVar * layout.bytesPerScalarOthers;
+                }
+                if (payload.size() < expected) {
+                    throw std::runtime_error("Binary payload too short: expected " +
+                        std::to_string(expected) + " bytes, got " + std::to_string(payload.size()));
+                }
+            }
+
+            std::istringstream payloadStream(payload);
+            parseBinaryPayloadWithLayout(payloadStream, data, layout);
+        }
+        else {
+            // ASCII Values are UTF-16 too → decode remainder to UTF-8 then parse
+            std::string utf8_values;
+            auto read_u16 = [&](std::size_t at)->uint16_t {
+                if (bom == Utf16Bom::LE) return uint16_t(uint8_t(blob[at]) | (uint16_t(uint8_t(blob[at + 1])) << 8));
+                else                     return uint16_t((uint16_t(uint8_t(blob[at])) << 8) | uint8_t(blob[at + 1]));
+                };
+            std::size_t pos = dec.payload_offset_bytes;
+            while (pos + 1 < blob.size()) {
+                uint16_t w = read_u16(pos); pos += 2;
+                if (w == u'\r') { if (pos + 1 < blob.size() && read_u16(pos) == u'\n') pos += 2; utf8_values.push_back('\n'); continue; }
+                if (w == u'\n') { utf8_values.push_back('\n'); continue; }
+                if (w != 0) utf8_values += codeunit_to_utf8(w);
+            }
+            std::istringstream asciiStream(utf8_values);
+            parseAsciiPayload(asciiStream, hdr, data);
+        }
+
         return data;
     }
 

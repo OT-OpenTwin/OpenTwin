@@ -596,11 +596,8 @@ void Application::extractResults()
 
 	std::vector<char> rawFileData = data->getData();
 
-	std::stringstream dataStream(std::ios::in | std::ios::out | std::ios::binary);
-	dataStream.write(rawFileData.data(), rawFileData.size());
-
 	ltspice::AutoRawReader reader;
-	ltspice::RawData resultData = reader.read(dataStream);
+	ltspice::RawData resultData = reader.readFromBytes(std::string(rawFileData.data(), rawFileData.size()));
 
 	// Finally, we store the parametric data of the curves
 	storeParametricResults(resultData, parameterRuns);
