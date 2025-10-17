@@ -40,6 +40,11 @@
 #include "ParametricCombination.h"
 #include "LTSpiceRawReader.h"
 
+#include "ResultCollectionExtender.h"
+#include "MetadataSeries.h"
+#include "MetadataParameter.h"
+#include "MetadataEntrySingle.h"
+
 #include "boost/algorithm/string.hpp"
 
 #include <thread>
@@ -598,8 +603,41 @@ void Application::extractResults()
 	ltspice::RawData resultData = reader.read(dataStream);
 
 	// Finally, we store the parametric data of the curves
-	// TODO
+	storeParametricResults(resultData, parameterRuns);
+}
 
+void Application::storeParametricResults(ltspice::RawData &resultData, std::list<ParametricCombination> &parameterRuns)
+{
+	size_t numberOfXValues = (parameterRuns.empty() ? 1 : parameterRuns.size());
+
+	std::list<ot::Variable> parameterValuesXAxis;
+	for (size_t index = 0; index < numberOfXValues; index++)
+	{
+		parameterValuesXAxis.push_back(ot::Variable(resultData.real(index, 0)));
+	}
+
+	std::list<std::shared_ptr<ParameterDescription>> allParameterDescriptions;
+
+	// First add the parameter for the x-axis
+	MetadataParameter parameterXAxis;
+	parameterXAxis.parameterName = resultData.variables()[0].name();
+	parameterXAxis.values = std::move(parameterValuesXAxis);
+	parameterXAxis.unit = "";
+	parameterXAxis.typeName = resultData.variables()[0].type();
+	std::shared_ptr<ParameterDescription> parameterXAxisDescription(std::make_shared<ParameterDescription>(parameterXAxis, false));
+	allParameterDescriptions.push_back(std::move(parameterXAxisDescription));
+
+	// Now add the values of all sweep parameters
+	for (auto parameter : parameterRuns)
+	{
+		//MetadataParameter parameterStructure;
+		//parameterStructure.parameterName = parameter..first;
+		//parameterStructure.values = { ot::Variable(param.second) };
+		//parameterStructure.typeName = ot::TypeNames::getDoubleTypeName();
+		//bool isConstantForDataset = parameterStructure.values.size() == 1;
+		//std::shared_ptr<ParameterDescription> parameterDescriptionStructure(std::make_shared<ParameterDescription>(parameterStructure, isConstantForDataset));
+		//allParameterDescriptions.push_back(std::move(parameterDescriptionStructure));
+	}
 
 }
 

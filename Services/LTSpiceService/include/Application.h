@@ -32,19 +32,25 @@ namespace ot {
 	}
 }
 
+namespace ltspice
+{
+	class RawData;
+}
+
 class EntityUnits;
+class ParametricCombination;
 
-struct LTSpiceVariable {
-	int index;
-	std::string name;
-	std::string unit;
-};
-
-struct LTSpiceData {
-	std::vector<LTSpiceVariable> variables;
-	std::vector<std::vector<std::complex<double>>> data;
-	bool isComplex = false;
-};
+//struct LTSpiceVariable {
+//	int index;
+//	std::string name;
+//	std::string unit;
+//};
+//
+//struct LTSpiceData {
+//	std::vector<LTSpiceVariable> variables;
+//	std::vector<std::vector<std::complex<double>>> data;
+//	bool isComplex = false;
+//};
 
 class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
@@ -88,4 +94,5 @@ private:
 	void uploadNeeded(ot::JsonDocument& _doc);
 	void downloadNeeded(ot::JsonDocument& _doc);
 	void filesUploaded(ot::JsonDocument& _doc);
+	void storeParametricResults(ltspice::RawData& resultData, std::list<ParametricCombination>& parameterRuns);
 };
