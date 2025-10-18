@@ -512,10 +512,10 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 				{
 					std::map<std::string, bool> entityNames = getListOfEntityNames();
 
-					int count = 1;
+					int count = 0;
 					do
 					{
-						entity->setName(getGeometryRootName() + "/import_" + std::to_string(count));
+						entity->setName(getGeometryRootName() + "/import_" + std::to_string(++count));
 					} 
 					while (entityNames[entity->getName()]);
 
