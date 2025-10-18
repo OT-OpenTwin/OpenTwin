@@ -347,6 +347,7 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 
 	// Get the bounding rect of the item
 	QRectF r(qitm->boundingRect());
+	r = r.marginsRemoved(QtFactory::toQMargins(this->getGraphicsItemMargins()));
 
 	// Adjust size
 	QSizeF inner;
@@ -364,16 +365,12 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 	}
 
 	// Calculate the size of the inner rectangle
-	inner = inner.expandedTo(this->getGraphicsItemMinimumSize()).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(this->getGraphicsItemMaximumSize());
+	inner = inner.expandedTo(this->getGraphicsItemMinimumSize());
+	inner = inner.expandedTo(this->removeGraphicsItemMargins(m_requestedSize));
+	inner = inner.boundedTo(this->getGraphicsItemMaximumSize());
 
-	if (inner.toSize() == r.size()) {
-		// No further adjustments needed
-		return r;
-	}
-	else {
-		// Calculate the inner rectangle
-		return ot::Positioning::calculateChildRect(r, inner, this->getGraphicsItemAlignment());
-	}
+	// Calculate the inner rectangle
+	return ot::Positioning::calculateChildRect(r, inner, this->getGraphicsItemAlignment());
 }
 
 // ###############################################################################################################################################
