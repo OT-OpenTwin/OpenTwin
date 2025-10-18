@@ -13,6 +13,7 @@
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "EntityInformation.h"
 #include "EntityGeometry.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 
 #include "ParametricCombination.h"
 
@@ -40,7 +41,7 @@ namespace ltspice
 class EntityUnits;
 class ParametricCombination;
 
-class Application : public ot::ApplicationBase, public ot::ButtonHandler {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler, public BusinessLogicHandler {
 public:
 	Application();
 	virtual ~Application();

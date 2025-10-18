@@ -16,6 +16,8 @@
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
+#include "OTCore/FolderNames.h"
 
 #include "Connection\ConnectionAPI.h"
 #include "Document\DocumentAccessBase.h"
@@ -44,6 +46,11 @@
 #include "MetadataSeries.h"
 #include "MetadataParameter.h"
 #include "MetadataEntrySingle.h"
+#include "ValueFormatSetter.h"
+
+#include "QuantityDescription.h"
+#include "QuantityDescriptionCurve.h"
+#include "QuantityDescriptionCurveComplex.h"
 
 #include "boost/algorithm/string.hpp"
 
@@ -147,21 +154,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 void Application::modelSelectionChanged()
 {
-	//if (isUiConnected()) {
-	//	std::list<std::string> enabled;
-	//	std::list<std::string> disabled;
 
-	//	if (selectedEntities.size() > 0)
-	//	{
-	//		enabled.push_back("ElmerFEM:Solver:Run Solver");
-	//	}
-	//	else
-	//	{
-	//		disabled.push_back("ElmerFEM:Solver:Run Solver");
-	//	}
-
-	//	m_uiComponent->setControlsEnabledState(enabled, disabled);
-	//}
 }
 
 void Application::importProject(void)
@@ -605,15 +598,24 @@ void Application::extractResults()
 
 void Application::storeParametricResults(ltspice::RawData &resultData, std::list<ParametricCombination> &parameterRuns)
 {
-	// Kann keine komplexen Daten behandeln
-	return;
-
-	size_t numberOfXValues = (parameterRuns.empty() ? 1 : parameterRuns.size());
+	size_t numberOfParameterRuns = (parameterRuns.empty() ? 1 : parameterRuns.size());
+	size_t numberOfXValues       = resultData.points() / numberOfParameterRuns;
 
 	std::list<ot::Variable> parameterValuesXAxis;
-	for (size_t index = 0; index < numberOfXValues; index++)
+
+	if (resultData.isComplex())
 	{
-		parameterValuesXAxis.push_back(ot::Variable(resultData.real(index, 0)));
+		for (size_t index = 0; index < numberOfXValues; index++)
+		{
+			parameterValuesXAxis.push_back(ot::Variable(resultData.complex(index, 0).real()));
+		}
+	}
+	else
+	{
+		for (size_t index = 0; index < numberOfXValues; index++)
+		{
+			parameterValuesXAxis.push_back(ot::Variable(resultData.real(index, 0)));
+		}
 	}
 
 	std::list<std::shared_ptr<ParameterDescription>> allParameterDescriptions;
@@ -623,7 +625,7 @@ void Application::storeParametricResults(ltspice::RawData &resultData, std::list
 	parameterXAxis.parameterName = resultData.variables()[0].name();
 	parameterXAxis.values = std::move(parameterValuesXAxis);
 	parameterXAxis.unit = "";
-	parameterXAxis.typeName = resultData.variables()[0].type();
+	parameterXAxis.typeName = ot::TypeNames::getDoubleTypeName();
 	std::shared_ptr<ParameterDescription> parameterXAxisDescription(std::make_shared<ParameterDescription>(parameterXAxis, false));
 	allParameterDescriptions.push_back(std::move(parameterXAxisDescription));
 
@@ -639,6 +641,97 @@ void Application::storeParametricResults(ltspice::RawData &resultData, std::list
 		//allParameterDescriptions.push_back(std::move(parameterDescriptionStructure));
 	}
 
+
+	///////
+	// Curve data
+	///////
+
+	std::list<DatasetDescription> allCurveDescriptions;
+
+	for (size_t iVariable = 1; iVariable < resultData.variablesCount(); iVariable++)
+	{
+		DatasetDescription newCurveDescription;
+
+		newCurveDescription.addParameterDescriptions(allParameterDescriptions);
+
+		std::string quantityUnit, quantityName;
+
+		quantityUnit = "";
+		quantityName = resultData.variables()[iVariable].name();;
+
+		QuantityDescription* quantityDescription = nullptr;
+		ValueFormatSetter valueFormatSetter;
+
+		//Values are either complex or real
+		if (resultData.isComplex())
+		{
+			auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
+			valueFormatSetter.setValueFormatRealImaginary(*quantityDescriptionComplex, quantityUnit);
+
+			quantityDescriptionComplex->reserveSizeRealValues(numberOfXValues);
+			for (size_t index = 0; index < numberOfXValues; index++)
+			{
+				quantityDescriptionComplex->addValueReal(ot::Variable(resultData.complex(index, iVariable).real()));
+			}
+
+			quantityDescriptionComplex->reserveSizeImagValues(numberOfXValues);
+			for (size_t index = 0; index < numberOfXValues; index++)
+			{
+				quantityDescriptionComplex->addValueImag(ot::Variable(resultData.complex(index, iVariable).imag()));
+			}
+
+			quantityDescription = quantityDescriptionComplex.release();
+		}
+		else
+		{
+			auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
+
+			valueFormatSetter.setValueFormatRealOnly(*quantityDescriptionCurve, quantityUnit);
+
+			quantityDescriptionCurve->reserveDatapointSize(numberOfXValues);
+			for (size_t index = 0; index < numberOfXValues; index++)
+			{
+				quantityDescriptionCurve->addDatapoint(ot::Variable(resultData.real(index, iVariable)));
+			}
+
+			quantityDescription = quantityDescriptionCurve.release();
+		}
+
+		quantityDescription->setName(quantityName);
+		assert(quantityDescription != nullptr);
+		newCurveDescription.setQuantityDescription(quantityDescription);
+		allCurveDescriptions.push_back(std::move(newCurveDescription));
+	}
+
+	/////
+	// Store data
+	/////
+
+	//First we access the result collection of the current project
+	std::string collectionName = DataBase::GetDataBase()->getProjectName();
+
+	ResultCollectionExtender resultCollectionExtender(collectionName, *getModelComponent(), OT_INFO_SERVICE_TYPE_LTSPICE);
+	resultCollectionExtender.setSaveModel(false);
+
+	setModelComponent(getModelComponent());
+
+	std::string seriesName = CreateNewUniqueTopologyName(ot::FolderNames::DatasetFolder, "LTSpice Imported Results");
+
+	std::list<std::shared_ptr<MetadataEntry>> seriesMetadata;
+	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(allCurveDescriptions, seriesName, seriesMetadata);
+	resultCollectionExtender.storeCampaignChanges();
+	//Now we store all data points in the result collection
+	for (DatasetDescription& dataDescription : allCurveDescriptions)
+	{
+		try
+		{
+			resultCollectionExtender.processDataPoints(&dataDescription, seriesMetadataIndex);
+		}
+		catch (std::exception e)
+		{
+			OT_LOG_E("Unable to import data: " + dataDescription.getQuantityDescription()->getName() + " (" + e.what() + ")");
+		}
+	}
 }
 
 void Application::getParametricCombinations(const std::string& logFileName, std::list<ParametricCombination>& parameterRuns)
