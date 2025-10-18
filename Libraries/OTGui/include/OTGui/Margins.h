@@ -14,7 +14,7 @@ namespace ot {
 
 	// #########################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT Margins : ot::Serializable {
+	class OT_GUI_API_EXPORT Margins : public Serializable {
 	public:
 		Margins() : m_left(0), m_top(0), m_right(0), m_bottom(0) {};
 		Margins(int _left, int _top, int _right, int _bottom) : m_left(_left), m_top(_top), m_right(_right), m_bottom(_bottom) {};
@@ -54,7 +54,7 @@ namespace ot {
 
 	// #########################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT MarginsF : ot::Serializable {
+	class OT_GUI_API_EXPORT MarginsF : public Serializable {
 	public:
 		MarginsF() : m_left(0.f), m_top(0.f), m_right(0.f), m_bottom(0.f) {};
 		MarginsF(float _left, float _top, float _right, float _bottom) : m_left(_left), m_top(_top), m_right(_right), m_bottom(_bottom) {};
@@ -94,7 +94,7 @@ namespace ot {
 
 	// #########################################################################################################################################################################################################
 
-	class OT_GUI_API_EXPORT MarginsD : ot::Serializable {
+	class OT_GUI_API_EXPORT MarginsD : public Serializable {
 	public:
 		MarginsD() : m_left(0.), m_top(0.), m_right(0.), m_bottom(0.) {};
 		MarginsD(double _left, double _top, double _right, double _bottom) : m_left(_left), m_top(_top), m_right(_right), m_bottom(_bottom) {};
