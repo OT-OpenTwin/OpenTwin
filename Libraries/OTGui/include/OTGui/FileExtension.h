@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/GuiTypes.h"
 
 // std header
 #include <list>
@@ -20,6 +20,7 @@ namespace ot {
 	public:
 		enum DefaultFileExtension {
 			AllFiles,
+			Unknown,
 
 			// Text / Script
 
@@ -124,6 +125,17 @@ namespace ot {
 		//! @param _extension Extension to convert.
 		static std::string toFilterString(DefaultFileExtension _extension);
 		
+		//! @brief Converts a file extension string (without dot) to the corresponding DefaultFileExtension enum value.
+		static std::string toString(DefaultFileExtension _extension);
+
+		//! @brief Converts a file extension string (without dot) to the corresponding DefaultFileExtension enum value.
+		static DefaultFileExtension stringToFileExtension(const std::string& _extension);
+
+		//! @brief Converts a DefaultFileExtension to the corresponding ImageFileFormat.
+		//! @param _extension Extension to convert.
+		//! @param _success Returns true if the conversion was successful, false otherwise.
+		static ImageFileFormat toImageFileFormat(DefaultFileExtension _extension, bool& _success);
+
 	};
 
 }
