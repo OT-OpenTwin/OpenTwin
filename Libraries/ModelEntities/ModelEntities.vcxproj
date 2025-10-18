@@ -30,6 +30,7 @@
     <ClInclude Include="include\EntityBatchImporter.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
     <ClInclude Include="include\EntityFactoryRegistrar.h" />
+    <ClInclude Include="include\EntityFileImage.h" />
     <ClInclude Include="include\EntityGraphicsScene.h" />
     <ClInclude Include="include\EntityHierarchicalScene.h" />
     <ClInclude Include="include\EntityInformation.h" />
@@ -45,6 +46,7 @@
     <ClInclude Include="include\InvalidUID.h" />
     <ClInclude Include="include\IVisualisationCurve.h" />
     <ClInclude Include="include\IVisualisationGraphicsView.h" />
+    <ClInclude Include="include\IVisualisationImage.h" />
     <ClInclude Include="include\IVisualisationPlot1D.h" />
     <ClInclude Include="include\IVisualisationTable.h" />
     <ClInclude Include="include\IVisualisationText.h" />
@@ -167,6 +169,7 @@
     <ClCompile Include="src\EntityCompressedVector.cpp" />
     <ClCompile Include="src\EntityCoordinates2D.cpp" />
     <ClCompile Include="src\EntityFacetData.cpp" />
+    <ClCompile Include="src\EntityFileImage.cpp" />
     <ClCompile Include="src\EntityFileText.cpp" />
     <ClCompile Include="src\EntityGraphicsScene.cpp" />
     <ClCompile Include="src\EntityHierarchicalScene.cpp" />
