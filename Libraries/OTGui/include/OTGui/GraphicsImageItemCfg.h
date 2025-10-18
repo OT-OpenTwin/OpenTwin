@@ -39,8 +39,8 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string getFactoryKey() const override { return GraphicsImageItemCfg::className(); };
 
-		void setImageData(const std::string& _data, ImageFileFormat _fileFormat) { m_imageData = _data; m_imageDataFileType = _fileFormat; };
-		const std::string& getImageData() const { return m_imageData; };
+		void setImageData(const std::vector<char>& _data, ImageFileFormat _fileFormat) { m_imageData = _data; m_imageDataFileType = _fileFormat; };
+		const std::vector<char>& getImageData() const { return m_imageData; };
 		ImageFileFormat getImageFileFormat() const { return m_imageDataFileType; };
 
 		void setImagePath(const std::string& _path) { m_imageSubPath = _path; };
@@ -51,7 +51,7 @@ namespace ot {
 
 	private:
 		ImageFileFormat m_imageDataFileType;
-		std::string m_imageData;
+		std::vector<char> m_imageData;
 		std::string m_imageSubPath;
 		bool m_maintainAspectRatio;
 	};

@@ -27,7 +27,7 @@ ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
-	_object.AddMember("Data", JsonString(m_imageData, _allocator), _allocator);
+	_object.AddMember("Data", JsonArray(m_imageData, _allocator), _allocator);
 	_object.AddMember("DataFileFormat", JsonString(ot::toString(m_imageDataFileType), _allocator), _allocator);
 	_object.AddMember("Path", JsonString(m_imageSubPath, _allocator), _allocator);
 	_object.AddMember("MaintainRatio", m_maintainAspectRatio, _allocator);
@@ -36,7 +36,7 @@ void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator
 void ot::GraphicsImageItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 	
-	m_imageData = json::getString(_object, "Data");
+	m_imageData = json::getCharVector(_object, "Data");
 	m_imageDataFileType = ot::stringToImageFileFormat(json::getString(_object, "DataFileFormat"));
 	m_imageSubPath = json::getString(_object, "Path");
 	m_maintainAspectRatio = json::getBool(_object, "MaintainRatio");
