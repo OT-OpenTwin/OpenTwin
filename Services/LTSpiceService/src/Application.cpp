@@ -601,106 +601,112 @@ void Application::storeParametricResults(ltspice::RawData &resultData, std::list
 	size_t numberOfParameterRuns = (parameterRuns.empty() ? 1 : parameterRuns.size());
 	size_t numberOfXValues       = resultData.points() / numberOfParameterRuns;
 
-	std::list<ot::Variable> parameterValuesXAxis;
-
-	if (resultData.isComplex())
-	{
-		for (size_t index = 0; index < numberOfXValues; index++)
-		{
-			parameterValuesXAxis.push_back(ot::Variable(resultData.complex(index, 0).real()));
-		}
-	}
-	else
-	{
-		for (size_t index = 0; index < numberOfXValues; index++)
-		{
-			parameterValuesXAxis.push_back(ot::Variable(resultData.real(index, 0)));
-		}
-	}
-
-	std::list<std::shared_ptr<ParameterDescription>> allParameterDescriptions;
-
-	// First add the parameter for the x-axis
-	MetadataParameter parameterXAxis;
-	parameterXAxis.parameterName = resultData.variables()[0].name();
-	parameterXAxis.values = std::move(parameterValuesXAxis);
-	parameterXAxis.unit = "";
-	parameterXAxis.typeName = ot::TypeNames::getDoubleTypeName();
-	std::shared_ptr<ParameterDescription> parameterXAxisDescription(std::make_shared<ParameterDescription>(parameterXAxis, false));
-	allParameterDescriptions.push_back(std::move(parameterXAxisDescription));
-
-	// Now add the values of all sweep parameters
-	for (auto parameter : parameterRuns)
-	{
-		//MetadataParameter parameterStructure;
-		//parameterStructure.parameterName = parameter..first;
-		//parameterStructure.values = { ot::Variable(param.second) };
-		//parameterStructure.typeName = ot::TypeNames::getDoubleTypeName();
-		//bool isConstantForDataset = parameterStructure.values.size() == 1;
-		//std::shared_ptr<ParameterDescription> parameterDescriptionStructure(std::make_shared<ParameterDescription>(parameterStructure, isConstantForDataset));
-		//allParameterDescriptions.push_back(std::move(parameterDescriptionStructure));
-	}
-
-
-	///////
-	// Curve data
-	///////
-
 	std::list<DatasetDescription> allCurveDescriptions;
 
-	for (size_t iVariable = 1; iVariable < resultData.variablesCount(); iVariable++)
+	size_t indexOffset = 0;
+
+	for (auto currentRun : parameterRuns)
 	{
-		DatasetDescription newCurveDescription;
+		std::list<ot::Variable> parameterValuesXAxis;
 
-		newCurveDescription.addParameterDescriptions(allParameterDescriptions);
-
-		std::string quantityUnit, quantityName;
-
-		quantityUnit = "";
-		quantityName = resultData.variables()[iVariable].name();;
-
-		QuantityDescription* quantityDescription = nullptr;
-		ValueFormatSetter valueFormatSetter;
-
-		//Values are either complex or real
 		if (resultData.isComplex())
 		{
-			auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
-			valueFormatSetter.setValueFormatRealImaginary(*quantityDescriptionComplex, quantityUnit);
-
-			quantityDescriptionComplex->reserveSizeRealValues(numberOfXValues);
 			for (size_t index = 0; index < numberOfXValues; index++)
 			{
-				quantityDescriptionComplex->addValueReal(ot::Variable(resultData.complex(index, iVariable).real()));
+				parameterValuesXAxis.push_back(ot::Variable(resultData.complex(index + indexOffset, 0).real()));
 			}
-
-			quantityDescriptionComplex->reserveSizeImagValues(numberOfXValues);
-			for (size_t index = 0; index < numberOfXValues; index++)
-			{
-				quantityDescriptionComplex->addValueImag(ot::Variable(resultData.complex(index, iVariable).imag()));
-			}
-
-			quantityDescription = quantityDescriptionComplex.release();
 		}
 		else
 		{
-			auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
-
-			valueFormatSetter.setValueFormatRealOnly(*quantityDescriptionCurve, quantityUnit);
-
-			quantityDescriptionCurve->reserveDatapointSize(numberOfXValues);
 			for (size_t index = 0; index < numberOfXValues; index++)
 			{
-				quantityDescriptionCurve->addDatapoint(ot::Variable(resultData.real(index, iVariable)));
+				parameterValuesXAxis.push_back(ot::Variable(resultData.real(index + indexOffset, 0)));
 			}
-
-			quantityDescription = quantityDescriptionCurve.release();
 		}
 
-		quantityDescription->setName(quantityName);
-		assert(quantityDescription != nullptr);
-		newCurveDescription.setQuantityDescription(quantityDescription);
-		allCurveDescriptions.push_back(std::move(newCurveDescription));
+		std::list<std::shared_ptr<ParameterDescription>> allParameterDescriptions;
+
+		// First add the parameter for the x-axis
+		MetadataParameter parameterXAxis;
+		parameterXAxis.parameterName = resultData.variables()[0].name();
+		parameterXAxis.values = std::move(parameterValuesXAxis);
+		parameterXAxis.unit = "";
+		parameterXAxis.typeName = ot::TypeNames::getDoubleTypeName();
+		std::shared_ptr<ParameterDescription> parameterXAxisDescription(std::make_shared<ParameterDescription>(parameterXAxis, false));
+		allParameterDescriptions.push_back(std::move(parameterXAxisDescription));
+
+		// Now add the values of all sweep parameters
+		for (auto parameter : currentRun.getParameters())
+		{
+			MetadataParameter parameterStructure;
+			parameterStructure.parameterName = parameter.first;
+			parameterStructure.values = { ot::Variable(parameter.second) };
+			parameterStructure.typeName = ot::TypeNames::getDoubleTypeName();
+			bool isConstantForDataset = parameterStructure.values.size() == 1;
+			std::shared_ptr<ParameterDescription> parameterDescriptionStructure(std::make_shared<ParameterDescription>(parameterStructure, isConstantForDataset));
+			allParameterDescriptions.push_back(std::move(parameterDescriptionStructure));
+		}
+
+		///////
+		// Curve data
+		///////
+
+		for (size_t iVariable = 1; iVariable < resultData.variablesCount(); iVariable++)
+		{
+			DatasetDescription newCurveDescription;
+
+			newCurveDescription.addParameterDescriptions(allParameterDescriptions);
+
+			std::string quantityUnit, quantityName;
+
+			quantityUnit = "";
+			quantityName = resultData.variables()[iVariable].name();;
+
+			QuantityDescription* quantityDescription = nullptr;
+			ValueFormatSetter valueFormatSetter;
+
+			//Values are either complex or real
+			if (resultData.isComplex())
+			{
+				auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
+				valueFormatSetter.setValueFormatRealImaginary(*quantityDescriptionComplex, quantityUnit);
+
+				quantityDescriptionComplex->reserveSizeRealValues(numberOfXValues);
+				for (size_t index = 0; index < numberOfXValues; index++)
+				{
+					quantityDescriptionComplex->addValueReal(ot::Variable(resultData.complex(index + indexOffset, iVariable).real()));
+				}
+
+				quantityDescriptionComplex->reserveSizeImagValues(numberOfXValues);
+				for (size_t index = 0; index < numberOfXValues; index++)
+				{
+					quantityDescriptionComplex->addValueImag(ot::Variable(resultData.complex(index + indexOffset, iVariable).imag()));
+				}
+
+				quantityDescription = quantityDescriptionComplex.release();
+			}
+			else
+			{
+				auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
+
+				valueFormatSetter.setValueFormatRealOnly(*quantityDescriptionCurve, quantityUnit);
+
+				quantityDescriptionCurve->reserveDatapointSize(numberOfXValues);
+				for (size_t index = 0; index < numberOfXValues; index++)
+				{
+					quantityDescriptionCurve->addDatapoint(ot::Variable(resultData.real(index + indexOffset, iVariable)));
+				}
+
+				quantityDescription = quantityDescriptionCurve.release();
+			}
+
+			quantityDescription->setName(quantityName);
+			assert(quantityDescription != nullptr);
+			newCurveDescription.setQuantityDescription(quantityDescription);
+			allCurveDescriptions.push_back(std::move(newCurveDescription));
+		}
+
+		indexOffset += numberOfXValues;
 	}
 
 	/////
