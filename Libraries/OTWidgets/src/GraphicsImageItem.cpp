@@ -56,7 +56,7 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			case ImageFileFormat::PNG:
 			{
 				QPixmap pix;
-				if (!pix.loadFromData(QByteArray::fromStdString(cfg->getImageData()), "PNG")) {
+				if (!pix.loadFromData(QtFactory::toQByteArray(cfg->getImageData()), "PNG")) {
 					OT_LOG_EAS("Failed to load image from data");
 				}
 				else {
@@ -68,7 +68,7 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			case ImageFileFormat::JPEG:
 			{
 				QPixmap pix;
-				if (!pix.loadFromData(QByteArray::fromStdString(cfg->getImageData()), "JPEG")) {
+				if (!pix.loadFromData(QtFactory::toQByteArray(cfg->getImageData()), "JPEG")) {
 					OT_LOG_EAS("Failed to load image from data");
 				}
 				else {
@@ -79,7 +79,7 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 			case ImageFileFormat::SVG:
 			{
-				QByteArray svgData = QByteArray::fromStdString(cfg->getImageData());
+				QByteArray svgData = QtFactory::toQByteArray(cfg->getImageData());
 				SvgImagePainter* newPainter = new SvgImagePainter(svgData);
 				if (!newPainter->isValid()) {
 					OT_LOG_EAS("Failed to load svg image from data");
