@@ -35,21 +35,18 @@ namespace DataStorageAPI
 			std::string objectId;
 			bsoncxx::builder::basic::document *doc = new bsoncxx::builder::basic::document{};
 
-			try
-			{
-				objectId = jsonInsertValue.view()["_id"].get_oid().value.to_string();
+			auto view   = jsonInsertValue.view();
+			auto idElem = view["_id"];
 
+			if (idElem && idElem.type() == bsoncxx::type::k_oid) 
+			{
+				objectId = idElem.get_oid().value.to_string();
 				doc->append(bsoncxx::builder::concatenate(jsonInsertValue));
 			}
-			catch (std::exception)
-			{
-				// Generate new _id
+			else {
 				bsoncxx::oid newId;
-
-				// Store the document in the queue
 				doc->append(bsoncxx::builder::basic::kvp("_id", newId));
 				doc->append(bsoncxx::builder::concatenate(jsonInsertValue));
-
 				objectId = newId.to_string();
 			}
 
