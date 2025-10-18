@@ -10,7 +10,7 @@
 #include "EntityBinaryData.h"
 #include <memory>
 
-class __declspec(dllexport) EntityFile: public EntityBase
+class OT_MODELENTITIES_API_EXPORT EntityFile: public EntityBase
 {
 public:
 	EntityFile() : EntityFile(0, nullptr, nullptr, nullptr, "") {};
@@ -41,13 +41,13 @@ protected:
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase *>& _entityMap) override;
 
+	long long m_dataUID;
+	long long m_dataVersion;
 
-	long long m_dataUID = -1;
-	long long m_dataVersion = -1;
 private:
-	std::string m_path ="";
-	std::string m_fileName ="";
-	std::string m_fileType ="";
+	std::string m_path = "";
+	std::string m_fileName = "";
+	std::string m_fileType = "";
 	std::string m_fileFilter;
 
 	std::shared_ptr<EntityBinaryData> m_data = nullptr;

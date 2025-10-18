@@ -13,7 +13,8 @@
 static EntityFactoryRegistrar<EntityFile> registrar(EntityFile::className());
 
 EntityFile::EntityFile(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner) :
-	EntityBase(_ID, _parent, _obs, _ms, _owner), m_fileFilter(ot::FileExtension::toFilterString(ot::FileExtension::AllFiles))
+	EntityBase(_ID, _parent, _obs, _ms, _owner), m_fileFilter(ot::FileExtension::toFilterString(ot::FileExtension::AllFiles)),
+	m_dataUID(ot::invalidUID), m_dataVersion(ot::invalidUID)
 {
 }
 
@@ -77,8 +78,12 @@ void EntityFile::ensureDataIsLoaded()
 		assert(m_dataUID != -1 && m_dataVersion != -1);
 		std::map<ot::UID, EntityBase*> entitymap;
 		EntityBase* entityBase = readEntityFromEntityIDAndVersion(this, m_dataUID, m_dataVersion, entitymap);
+		
+		if (!entityBase) {
+			throw ot::Exception::ObjectNotFound("EntityFile::ensureDataIsLoaded: Unable to load data entity { \"ID\": " + std::to_string(m_dataUID) + ", \"Version\": " + std::to_string(m_dataVersion) + " }");
+		}
+
 		entityBase->setObserver(nullptr);
-		assert(entityBase != nullptr);
 		m_data.reset(dynamic_cast<EntityBinaryData*>(entityBase));
 		entityBase = nullptr;
 	}

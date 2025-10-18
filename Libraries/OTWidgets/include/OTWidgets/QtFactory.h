@@ -42,6 +42,8 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT QtFactory {
 		OT_DECL_NOCOPY(QtFactory)
 	public:
+		static inline QByteArray toQByteArray(const std::vector<char>& _data) noexcept { return QByteArray(_data.data(), static_cast<int>(_data.size())); };
+
 		//! @brief Convert OpenTwin Color to Qt Color
 		static inline QColor toQColor(const ot::Color& _color) noexcept { return QColor(_color.r(), _color.g(), _color.b(), _color.a()); };
 		static inline QColor toQColor(const ot::ColorF& _color) noexcept { return QColor((int)(_color.r() * 255.f), (int)(_color.g() * 255.f), (int)(_color.b() * 255.f), (int)(_color.a() * 255.f)); };

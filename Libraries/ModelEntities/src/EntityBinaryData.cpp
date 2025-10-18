@@ -118,12 +118,21 @@ void EntityBinaryData::setData(const char *dat, size_t length)
 	setModified();
 }
 
-void EntityBinaryData::clearData(void)
-{
+void EntityBinaryData::setData(const std::vector<char>& _data) {
+	data = _data;
+	setModified();
+}
+
+void EntityBinaryData::setData(const std::vector<char>&& _data) {
+	data = std::move(_data);
+	setModified();
+}
+
+void EntityBinaryData::clearData() {
 	data.clear();
 }
 
-const std::vector<char>& EntityBinaryData::getData(void) const
+const std::vector<char>& EntityBinaryData::getData() const
 {
 	return data;
 }

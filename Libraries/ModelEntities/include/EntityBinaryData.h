@@ -23,6 +23,8 @@ public:
 	virtual void removeChild(EntityBase *child) override;
 
 	void setData(const char *dat, size_t length);
+	void setData(const std::vector<char>& _data);
+	void setData(const std::vector<char>&& _data);
 
 	void clearData(void);
 

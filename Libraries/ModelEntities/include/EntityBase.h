@@ -18,7 +18,7 @@
 
 class EntityBase;
 
-class  __declspec(dllexport) EntityObserver
+class OT_MODELENTITIES_API_EXPORT EntityObserver
 {
 public:
 	EntityObserver() {};
@@ -35,7 +35,7 @@ public:
 };
 
 //! \brief The Entity class is the base class for model entities and provides basic access properties to model entities. 
-class  __declspec(dllexport) EntityBase
+class  OT_MODELENTITIES_API_EXPORT EntityBase
 {
 public:
 	EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
