@@ -61,6 +61,42 @@ namespace ltspice {
             return static_cast<std::size_t>(std::stoll(s));
         }
 
+        inline std::complex<double> parseComplexFlexible(std::string s) {
+            // Accept "(re,im)" or "re,im"  (any whitespace tolerated)
+            auto ltrim = [](std::string& x) {
+                size_t i = 0; while (i < x.size() && std::isspace((unsigned char)x[i])) ++i; x.erase(0, i);
+                };
+            auto rtrim = [](std::string& x) {
+                while (!x.empty() && std::isspace((unsigned char)x.back())) x.pop_back();
+                };
+
+            ltrim(s); rtrim(s);
+            // strip optional parentheses
+            if (!s.empty() && s.front() == '(' && s.back() == ')') {
+                s = s.substr(1, s.size() - 2);
+                ltrim(s); rtrim(s);
+            }
+            // tolerate trailing separators
+            while (!s.empty() && (s.back() == ',' || s.back() == ';')) s.pop_back();
+
+            // split on the first comma (delimiter between re and im)
+            auto comma = s.find(',');
+            if (comma == std::string::npos) {
+                throw std::runtime_error("Invalid complex literal (expected re,im): " + s);
+            }
+            std::string re = s.substr(0, comma);
+            std::string im = s.substr(comma + 1);
+            ltrim(re); rtrim(re);
+            ltrim(im); rtrim(im);
+            // also strip trailing separators from parts
+            while (!re.empty() && (re.back() == ',' || re.back() == ';')) re.pop_back();
+            while (!im.empty() && (im.back() == ',' || im.back() == ';')) im.pop_back();
+
+            // NOTE: We assume dot-decimal here (as LTspice writes "1.23e+00").
+            // If your locale uses decimal commas globally, imbue classic "C" locale or pre-normalize.
+            return { std::stod(re), std::stod(im) };
+        }
+
         // Read a native little-endian double. (LTspice writes IEEE754 doubles little-endian.)
         inline void readDouble(std::istream& in, double& x) {
             in.read(reinterpret_cast<char*>(&x), sizeof(double));
@@ -142,25 +178,20 @@ namespace ltspice {
                 }
 
                 auto parseReal = [](std::string s)->double {
+                    // Accept "1.23e+00", tolerate trailing ',' or ';'
                     while (!s.empty() && (s.back() == ',' || s.back() == ';')) s.pop_back();
-                    auto comma = s.find(',');
-                    if (comma != std::string::npos && s.find('(') == std::string::npos) {
+                    // If someone used decimal comma in a REAL value line (rare), normalize:
+                    if (s.find('(') == std::string::npos && s.find(',') != std::string::npos) {
+                        // Only convert comma to dot if there's exactly one comma and no 'e' sign confusion
+                        // but safest is: replace all commas by dots when there are no parentheses.
                         std::replace(s.begin(), s.end(), ',', '.');
                     }
                     return std::stod(s);
-                    };
+                };
+                // accept "(re,im)" OR "re,im"
                 auto parseCplx = [](const std::string& s)->std::complex<double> {
-                    auto a = s.find('(');
-                    auto b = s.find(')', a == std::string::npos ? 0 : a + 1);
-                    if (a == std::string::npos || b == std::string::npos || b <= a + 1)
-                        throw std::runtime_error("Invalid complex literal: " + s);
-                    std::string inside = s.substr(a + 1, b - a - 1);
-                    auto comma = inside.find(',');
-                    if (comma == std::string::npos) throw std::runtime_error("Invalid complex literal (no comma): " + s);
-                    auto re = trim(inside.substr(0, comma));
-                    auto im = trim(inside.substr(comma + 1));
-                    return { std::stod(re), std::stod(im) };
-                    };
+                    return parseComplexFlexible(s);
+                };
 
                 if (isComplex) data.setComplex(p, 0, parseCplx(rest));
                 else           data.setReal(p, 0, parseReal(rest));
@@ -171,18 +202,15 @@ namespace ltspice {
                     line = trim(line);
                     if (line.empty()) { --v; continue; }
 
-                    std::string token;
-                    auto posParen = line.find('(');
-                    if (posParen != std::string::npos) {
-                        auto posEnd = line.find(')', posParen);
-                        if (posEnd == std::string::npos) throw std::runtime_error("Malformed complex value in ASCII data");
-                        token = line.substr(posParen, posEnd - posParen + 1);
-                    }
-                    else {
-                        auto parts = splitWS(line);
+                    std::string token = trim(line);
+                    // If the whole line is just the value, keep it.
+                    // Otherwise, fall back to last whitespace-separated token.
+                    if (token.find(',') == std::string::npos && token.find('(') == std::string::npos) {
+                        auto parts = splitWS(token);
                         if (parts.empty()) { --v; continue; }
                         token = parts.back();
                     }
+                    // now token is either "(re,im)" or "re,im" or a single real
 
                     if (isComplex) data.setComplex(p, v, parseCplx(token));
                     else           data.setReal(p, v, parseReal(token));
@@ -319,16 +347,12 @@ namespace ltspice {
             bool isComplex,
             bool flagsHasFloat)
         {
-            // Try candidates in priority order:
-            // 1) Mixed (var0=double, others=float32)
-            // 2) Mixed (var0=double, others=double)
-            // 3) Uniform as hinted by flags/header (all double or all float32)
-            // 4) ±1 variable tolerance for all above
-
+            // Helpers to check candidates
             auto matches_mixed = [&](std::size_t nv, std::size_t bpsOthers)->bool {
+                // Mixed = var0 (time) as double, others with bpsOthers (float32 or double)
+                // NOTE: Only meaningful for real datasets (time domain). For complex datasets we won't use it.
                 const std::size_t scalarsOthers = isComplex ? 2 : 1;
-                // Per point: 8 bytes for var0 + (nv-1) * scalarsOthers * bpsOthers
-                const std::size_t perPoint = 8 + (nv > 0 ? (nv - 1) * scalarsOthers * bpsOthers : 0);
+                const std::size_t perPoint = 8 + (nv > 1 ? (nv - 1) * scalarsOthers * bpsOthers : 0);
                 return nPts * perPoint == payloadBytes;
                 };
             auto matches_uniform = [&](std::size_t nv, std::size_t bps)->bool {
@@ -336,12 +360,27 @@ namespace ltspice {
                 return nPts * nv * scalarsPerVar * bps == payloadBytes;
                 };
 
-            // Candidate nv values: header, header+1, header-1
+            // Candidate variable counts: header, header+1, header-1
             std::vector<std::size_t> nvCandidates;
             nvCandidates.push_back(headerVars);
             nvCandidates.push_back(headerVars + 1);
             if (headerVars > 0) nvCandidates.push_back(headerVars - 1);
 
+            // ---------- Complex datasets: ONLY uniform (freq is float or double like others) ----------
+            if (isComplex) {
+                // Use flags hint first (float), then double, then the other width with ±1 var
+                if (flagsHasFloat) {
+                    for (auto nv : nvCandidates) if (matches_uniform(nv, 4)) return BinaryLayout{ LayoutKind::Uniform, 4, nv };
+                    for (auto nv : nvCandidates) if (matches_uniform(nv, 8)) return BinaryLayout{ LayoutKind::Uniform, 8, nv };
+                }
+                else {
+                    for (auto nv : nvCandidates) if (matches_uniform(nv, 8)) return BinaryLayout{ LayoutKind::Uniform, 8, nv };
+                    for (auto nv : nvCandidates) if (matches_uniform(nv, 4)) return BinaryLayout{ LayoutKind::Uniform, 4, nv };
+                }
+                return std::nullopt;
+            }
+
+            // ---------- Real datasets: prefer Mixed (var0=double, others float/double), then Uniform ----------
             // 1) Mixed var0=double, others=float32
             for (auto nv : nvCandidates) {
                 if (matches_mixed(nv, 4)) return BinaryLayout{ LayoutKind::MixedVar0Double, 4, nv };
@@ -350,9 +389,10 @@ namespace ltspice {
             for (auto nv : nvCandidates) {
                 if (matches_mixed(nv, 8)) return BinaryLayout{ LayoutKind::MixedVar0Double, 8, nv };
             }
-            // 3) Uniform (flags hint first)
+            // 3) Uniform: prefer header hint from flags, then the other width
             if (flagsHasFloat) {
                 for (auto nv : nvCandidates) if (matches_uniform(nv, 4)) return BinaryLayout{ LayoutKind::Uniform, 4, nv };
+                for (auto nv : nvCandidates) if (matches_uniform(nv, 8)) return BinaryLayout{ LayoutKind::Uniform, 8, nv };
             }
             else {
                 for (auto nv : nvCandidates) if (matches_uniform(nv, 8)) return BinaryLayout{ LayoutKind::Uniform, 8, nv };
@@ -371,37 +411,51 @@ namespace ltspice {
             const std::size_t nPts = data.points();
 
             auto readOtherScalar = [&](double& out) {
-                if (layout.bytesPerScalarOthers == 4) out = readFloat32AsDouble(in);
-                else                                  readDouble(in, out);
+                if (layout.bytesPerScalarOthers == 4) {
+                    // float32 -> double
+                    std::uint32_t u = 0;
+                    in.read(reinterpret_cast<char*>(&u), sizeof(u));
+                    if (!in) throw std::runtime_error("Unexpected EOF while reading float32");
+                    float f;
+                    std::memcpy(&f, &u, sizeof(f));
+                    out = static_cast<double>(f);
+                }
+                else {
+                    // double
+                    in.read(reinterpret_cast<char*>(&out), sizeof(double));
+                    if (!in) throw std::runtime_error("Unexpected EOF while reading double");
+                }
                 };
 
             for (std::size_t p = 0; p < nPts; ++p) {
-                // var0 is always a single real DOUBLE (time/frequency), even for complex datasets
-                double x = 0.0;
-                readDouble(in, x);
-                if (isComplex) {
-                    // For complex datasets, var0 is still real (frequency). Store in "real" buffer if available.
-                    // We'll store it in the first column of the chosen container:
-                    // The RawData storage is either real or complex; for complex datasets we need to keep var0's
-                    // real value. We'll map it to complex with imag=0 for consistency.
-                    data.setComplex(p, 0, { x, 0.0 });
+
+                if (!isComplex) {
+                    // -------- Real dataset (transient): var0 (time) is DOUBLE (8B)
+                    double t = 0.0;
+                    in.read(reinterpret_cast<char*>(&t), sizeof(double));
+                    if (!in) throw std::runtime_error("Unexpected EOF while reading time (double)");
+                    data.setReal(p, 0, t);
+
+                    // remaining variables: single scalars (float32 or double)
+                    for (std::size_t v = 1; v < nVars; ++v) {
+                        double val = 0.0;
+                        readOtherScalar(val);
+                        data.setReal(p, v, val);
+                    }
                 }
                 else {
-                    data.setReal(p, 0, x);
-                }
+                    // -------- Complex dataset (AC/Noise): var0 (frequency) is COMPLEX as well
+                    double f_re = 0.0, f_im = 0.0;
+                    readOtherScalar(f_re);
+                    readOtherScalar(f_im);
+                    data.setComplex(p, 0, { f_re, f_im });
 
-                // remaining variables
-                for (std::size_t v = 1; v < nVars; ++v) {
-                    if (isComplex) {
+                    // remaining variables: complex pairs (float32/double each component)
+                    for (std::size_t v = 1; v < nVars; ++v) {
                         double re = 0.0, im = 0.0;
                         readOtherScalar(re);
                         readOtherScalar(im);
                         data.setComplex(p, v, { re, im });
-                    }
-                    else {
-                        double val = 0.0;
-                        readOtherScalar(val);
-                        data.setReal(p, v, val);
                     }
                 }
             }

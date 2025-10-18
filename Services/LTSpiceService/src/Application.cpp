@@ -605,6 +605,9 @@ void Application::extractResults()
 
 void Application::storeParametricResults(ltspice::RawData &resultData, std::list<ParametricCombination> &parameterRuns)
 {
+	// Kann keine komplexen Daten behandeln
+	return;
+
 	size_t numberOfXValues = (parameterRuns.empty() ? 1 : parameterRuns.size());
 
 	std::list<ot::Variable> parameterValuesXAxis;

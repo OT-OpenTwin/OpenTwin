@@ -40,18 +40,6 @@ namespace ltspice
 class EntityUnits;
 class ParametricCombination;
 
-//struct LTSpiceVariable {
-//	int index;
-//	std::string name;
-//	std::string unit;
-//};
-//
-//struct LTSpiceData {
-//	std::vector<LTSpiceVariable> variables;
-//	std::vector<std::vector<std::complex<double>>> data;
-//	bool isComplex = false;
-//};
-
 class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
 	Application();
