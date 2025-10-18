@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #include "OTCore/LogDispatcher.h"
+#include "OTCore/ContainerHelper.h"
 #include "OTGui/GuiTypes.h"
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -400,9 +401,9 @@ std::list<std::string> ot::getSupportedDocumentSyntaxStringList(void) {
 
 std::string ot::toString(ImageFileFormat _format) {
 	switch (_format) {
-	case ot::ImageFileFormat::PNG: return "PNG";
-	case ot::ImageFileFormat::JPEG: return "JPEG";
-	case ot::ImageFileFormat::SVG: return "SVG";
+	case ot::ImageFileFormat::PNG: return "png";
+	case ot::ImageFileFormat::JPEG: return "jpeg";
+	case ot::ImageFileFormat::SVG: return "svg";
 	default:
 		OT_LOG_E("Unknown image format (" + std::to_string((int)_format) + ")");
 		return "PNG";
@@ -411,7 +412,7 @@ std::string ot::toString(ImageFileFormat _format) {
 
 ot::ImageFileFormat ot::stringToImageFileFormat(const std::string& _format) {
 	if (_format == toString(ImageFileFormat::PNG)) return ImageFileFormat::PNG;
-	else if (_format == toString(ImageFileFormat::JPEG)) return ImageFileFormat::JPEG;
+	else if (ot::ContainerHelper::contains(std::vector<std::string>({"jpg", "jpeg", "jiff", "jpe"}), _format)) return ImageFileFormat::JPEG;
 	else if (_format == toString(ImageFileFormat::SVG)) return ImageFileFormat::SVG;
 	else {
 		OT_LOG_E("Unknown image format \"" + _format + "\"");

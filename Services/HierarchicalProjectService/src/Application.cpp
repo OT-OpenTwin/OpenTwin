@@ -15,6 +15,7 @@
 
 // OpenTwin Gui header
 #include "OTGui/DialogCfg.h"
+#include "OTGui/FileExtension.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
 
 // OpenTwin Communication header
@@ -27,11 +28,15 @@
 #include "OTServiceFoundation/AbstractUiNotifier.h"
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 
+// OpenTwin GuiAPI header
+#include "OTGuiAPI/Frontend.h"
+
 // OpenTwin ModelAPI header
 #include "OTModelAPI/ModelServiceAPI.h"
 
 // Entities
 #include "EntityAPI.h"
+#include "EntityBinaryData.h"
 #include "EntityHierarchicalScene.h"
 
 // std header
@@ -45,6 +50,7 @@ Application::Application() :
 	connectAction(c_projectSelectedAction, this, &Application::handleProjectSelected);
 	connectAction(c_hierarchicalSelectedAction, this, &Application::handleHierarchicalSelected);
 	connectAction(c_documentSelectedAction, this, &Application::handleDocumentSelected);
+	connectAction(c_imageSelectedAction, this, &Application::handleImageSelected);
 
 	// Initialize toolbar buttons
 	m_addProjectButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Project", "Hierarchical/AddProject");
@@ -80,6 +86,16 @@ Application::Application() :
 	m_openSelectedProjectButton.setButtonLockFlag(ot::LockModelRead);
 	m_openSelectedProjectButton.setButtonToolTip("Open the selected project in a new OpenTwin instance.");
 	connectToolBarButton(m_openSelectedProjectButton, this, &Application::handleOpenSelectedProject);
+
+	m_addImageToProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Add Image", "Hierarchical/AddImage");
+	m_addImageToProjectButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
+	m_addImageToProjectButton.setButtonToolTip("Add an image to the selected project.");
+	connectToolBarButton(m_addImageToProjectButton, this, &Application::handleAddImageToProject);
+
+	m_removeImageFromProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Remove Image", "Hierarchical/RemoveImage");
+	m_removeImageFromProjectButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
+	m_removeImageFromProjectButton.setButtonToolTip("Remove the image from the selected project.");
+	connectToolBarButton(m_removeImageFromProjectButton, this, &Application::handleRemoveImageFromProject);
 }
 
 Application::~Application() {
@@ -119,6 +135,8 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	_ui->addMenuGroup(c_pageName, c_selectionGroupName);
 
 	_ui->addMenuButton(m_openSelectedProjectButton);
+	_ui->addMenuButton(m_addImageToProjectButton);
+	_ui->addMenuButton(m_removeImageFromProjectButton);
 
 	_ui->switchMenuTab(c_pageName);
 
@@ -174,7 +192,7 @@ ot::ReturnMessage Application::graphicsItemDoubleClicked(const std::string& _nam
 ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
 	for (const ot::GraphicsConnectionCfg& cfg : _connectionData.connections()) {
 		if (!m_entityHandler.addConnection(cfg)) {
-
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Could not add connection entity for connection request");
 		}
 	}
 	return ot::ReturnMessage::Ok;
@@ -224,7 +242,22 @@ void Application::handleHierarchicalSelected(ot::JsonDocument& _doc) {
 }
 
 void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
+	
+}
 
+void Application::handleImageSelected(ot::JsonDocument& _doc) {
+	if (!isModelConnected()) {
+		OT_LOG_E("No model connected");
+		return;
+	}
+
+	std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+	int64_t uncompressedDataLength = ot::json::getInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+	std::string fileName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+	std::string projectEntityName = ot::json::getString(_doc, OT_ACTION_PARAM_Info);
+
+	m_entityHandler.addImageToProject(projectEntityName, fileName, content, uncompressedDataLength, fileFilter);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -276,6 +309,26 @@ void Application::handleOpenSelectedProject() {
 	this->enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
+void Application::handleAddImageToProject() {
+	auto projects = getProjectsToOpen();
+	if (projects.size() != 1) {
+		OT_LOG_E("Invalid number of selected projects to add an image to");
+		return;
+	}
+
+	if (!this->isUiConnected()) {
+		OT_LOG_E("No UI connected");
+		return;
+	}
+
+	auto filter = ot::FileExtension::toFilterString({ ot::FileExtension::Png, ot::FileExtension::Jpeg, ot::FileExtension::Svg });
+	ot::Frontend::requestFileForReading(c_imageSelectedAction, "Select Project Image", filter, true, false, projects.front().getEntityName());
+}
+
+void Application::handleRemoveImageFromProject() {
+
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Helper
@@ -298,7 +351,8 @@ void Application::updateButtonStates() {
 	std::list<std::string> disabledControls;
 
 	const bool canAddChilds = getParentEntityToAdd().has_value();
-	const bool canOpenProject = !getProjectsToOpen().empty();
+	auto projectsToOpen = getProjectsToOpen();
+	const bool canOpenProject = !projectsToOpen.empty();
 
 	if (canAddChilds) {
 		enabledControls = std::move(controlsThatAdd);
@@ -312,6 +366,15 @@ void Application::updateButtonStates() {
 	}
 	else {
 		disabledControls.push_back(m_openSelectedProjectButton.getFullPath());
+	}
+
+	if (projectsToOpen.size() == 1) {
+		enabledControls.push_back(m_addImageToProjectButton.getFullPath());
+		enabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
+	}
+	else {
+		disabledControls.push_back(m_addImageToProjectButton.getFullPath());
+		disabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
 	}
 
 	// Set control states

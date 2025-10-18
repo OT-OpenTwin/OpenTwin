@@ -140,5 +140,6 @@ void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptio
 
 	_painter->setFont(QtFactory::toQFont(cfg->getTextFont()));
 	_painter->setPen(textPen);
+	
 	_painter->drawText(_rect, QString::fromStdString(cfg->getText()), QTextOption(QtFactory::toQAlignment(this->getGraphicsItemAlignment())));
 }

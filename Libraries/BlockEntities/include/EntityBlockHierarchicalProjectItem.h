@@ -8,6 +8,8 @@
 #include "EntityBlock.h"
 #include "OTCore/ProjectInformation.h"
 
+class EntityFileImage;
+
 class __declspec(dllexport) EntityBlockHierarchicalProjectItem : public EntityBlock {
 public:
 	EntityBlockHierarchicalProjectItem() : EntityBlockHierarchicalProjectItem(0, nullptr, nullptr, nullptr, "") {};
@@ -24,6 +26,16 @@ public:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	// Data accessors
+
+	void setPreviewFile(ot::UID _entityID, ot::UID _entityVersion);
+	void setPreviewFile(std::vector<char>&& _imageData, ot::ImageFileFormat _format);
+	bool hasPreviewFile() const { return m_previewUID != ot::invalidUID; };
+	ot::UID getPreviewFileID() const { return m_previewUID; };
+	ot::UID getPreviewFileVersion() const { return m_previewVersion; };
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// Property accessors
 
 	void setProjectInformation(const ot::ProjectInformation& _info);
@@ -34,5 +46,16 @@ public:
 
 	void setCustomVersion(const std::string& _version);
 	std::string getCustomVersion() const;
+
+protected:
+	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
+	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+
+private:
+	void ensurePreviewLoaded();
+
+	ot::UID m_previewUID;
+	ot::UID m_previewVersion;
+	std::shared_ptr<EntityFileImage> m_preview;
 };
 

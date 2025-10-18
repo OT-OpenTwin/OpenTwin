@@ -94,26 +94,52 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 	cLay->setName(m_name + "_cLay");
 	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
+	// Info style
+	ot::MarginsD infoMargins(5., 0., 5., 0.);
+	ot::Font infoFont;
+	infoFont.setSize(10);
+	ot::PenFCfg infoPen(1., new ot::StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
+
+	// Project type
 	if (!m_type.empty()) {
 		GraphicsTextItemCfg* typeItm = new GraphicsTextItemCfg("Project Type: " + m_type);
 		typeItm->setName(m_name + "_ptype");
 		typeItm->setAlignment(AlignLeft);
+		typeItm->setMargins(infoMargins);
+		typeItm->setTextFont(infoFont);
+		typeItm->setTextStyle(infoPen);
 		
 		cLay->addChildItem(typeItm);
 	}
+
+	// Project version
+	if (!m_projectVersion.empty()) {
+		GraphicsTextItemCfg* verItm = new GraphicsTextItemCfg("Version: " + m_projectVersion);
+		verItm->setName(m_name + "_pver");
+		verItm->setAlignment(AlignLeft);
+		ot::Font font = infoFont;
+		font.setSize(font.size() - 2);
+		font.setItalic(true);
+		verItm->setTextFont(font);
+		verItm->setTextStyle(infoPen);
+		verItm->setMargins(infoMargins);
+
+		cLay->addChildItem(verItm);
+	}
 	
 	// Create background image
-	if (!m_backgroundImage.empty()) {
-		/*GraphicsImageItemCfg* cImg = new GraphicsImageItemCfg;
-		//cImg->setImagePath(m_backgroundImagePath);
-		cImg->setName(m_name + "_cImg");
-		cImg->setMargins(m_backgroundImageMargins);
+	if (!m_previewImage.empty()) {
+		GraphicsImageItemCfg* cImg = new GraphicsImageItemCfg;
+		cImg->setImageData(m_previewImage, m_previewImageFormat);
+		cImg->setName(m_name + "_cPrevImg");
+		cImg->setMargins(m_previewImageMargins);
 		cImg->setSizePolicy(Dynamic);
 		cImg->setAlignment(AlignCenter);
 		cImg->setMaintainAspectRatio(true);
 		cImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+		cImg->setMaximumSize(Size2DD(150., 150.));
 
-		cLay->addChildItem(cImg, 1);*/
+		cLay->addChildItem(cImg, 1);
 	}
 
 	cLay->addStrech(1);
@@ -125,8 +151,8 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 }
 
 ot::GraphicsHierarchicalProjectItemBuilder::GraphicsHierarchicalProjectItemBuilder()
-	: m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr),
-	m_backgroundImageMargins(5., 2., 2., 2.), m_connectorWidth(5.), m_connectorHeight(2.)
+	: m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr), m_previewImageFormat(ot::ImageFileFormat::PNG),
+	m_previewImageMargins(10., 10., 10., 10.), m_connectorWidth(5.), m_connectorHeight(2.)
 {
 	this->setTitleBackgroundColor(ot::Color(70, 70, 70));
 	this->setDefaultTitleForegroundGradient();
@@ -320,12 +346,12 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createTitle() c
 		titLImg->setImagePath(m_leftTitleImagePath);
 		titLImg->setFixedSize(16., 16.);
 		titLImg->setAlignment(AlignCenter);
-		titLImg->setMargins(MarginsD(15., 0., 0., 0.));
+		titLImg->setMargins(MarginsD(5., 0., 0., 0.));
 		titLImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titLImg);
 
 		MarginsD titMargins = tit->getMargins();
-		titMargins.setLeft(15.);
+		titMargins.setLeft(5.);
 		tit->setMargins(titMargins);
 	}
 

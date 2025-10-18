@@ -31,7 +31,9 @@ namespace ot
 			Range              = 1 << 4,
 			GraphicsView       = 1 << 5,
 			GraphicsItem       = 1 << 6,
-			GraphicsConnection = 1 << 7
+			GraphicsConnection = 1 << 7,
+			Image              = 1 << 8,
+			PDF                = 1 << 9
 		};
 		typedef Flags<VisualisationType> VisualisationTypeFlags;
 
@@ -49,7 +51,11 @@ namespace ot
 		void addGraphicsViewVisualisation() { m_visualisations |= GraphicsView; };
 		void addGraphicsItemVisualisation() { m_visualisations |= GraphicsItem; };
 		void addGraphicsConnectionVisualisation() { m_visualisations |= GraphicsConnection; };
+		void addImageVisualisation() { m_visualisations |= Image; };
+		void addPDFVisualisation() { m_visualisations |= PDF; };
 
+		bool hasVisualisations() const { return m_visualisations != VisualisationType::None; };
+		bool hasVisualisation(VisualisationType _type) const { return m_visualisations & _type; };
 		const VisualisationTypeFlags& getVisualisations() const { return m_visualisations; };
 		bool visualiseAsText() const { return m_visualisations & Text; };
 		bool visualiseAsTable() const { return m_visualisations & Table; };
@@ -59,6 +65,8 @@ namespace ot
 		bool visualiseAsGraphicsView() const { return m_visualisations & GraphicsView; };
 		bool visualiseAsGraphicsItem() const { return m_visualisations & GraphicsItem; };
 		bool visualiseAsGraphicsConnection() const { return m_visualisations & GraphicsConnection; };
+		bool visualiseAsImage() const { return m_visualisations & Image; };
+		bool visualiseAsPDF() const { return m_visualisations & PDF; };
 
 		//! @brief Sets custom view flags for a specific visualisation type.
 		//! @param _visType The visualisation type for which the custom flags should be set.

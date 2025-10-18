@@ -64,6 +64,8 @@ private:
 	void handleHierarchicalSelected(ot::JsonDocument& _doc);
 	void handleDocumentSelected(ot::JsonDocument& _doc);
 
+	void handleImageSelected(ot::JsonDocument& _doc);
+	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Button callbacks
@@ -72,7 +74,10 @@ private:
 	void handleAddHierarchical();
 	void handleAddContainer();
 	void handleAddDocument();
+
 	void handleOpenSelectedProject();
+	void handleAddImageToProject();
+	void handleRemoveImageFromProject();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -100,10 +105,11 @@ private:
 	const std::string c_projectSelectedAction = "ProjectSelected";
 	const std::string c_hierarchicalSelectedAction = "HierarchicalSelected";
 	const std::string c_documentSelectedAction = "DocumentSelected";
+	const std::string c_imageSelectedAction = "ImageSelected";
 
 	const std::string c_pageName = "Project";
 	const std::string c_managementGroupName = "Management";
-	const std::string c_selectionGroupName = "Selection";
+	const std::string c_selectionGroupName = "Project Selection";
 
 	ot::ToolBarButtonCfg m_addProjectButton;
 	ot::ToolBarButtonCfg m_addHierarchicalButton;
@@ -111,4 +117,6 @@ private:
 	ot::ToolBarButtonCfg m_addDocumentButton;
 
 	ot::ToolBarButtonCfg m_openSelectedProjectButton;
+	ot::ToolBarButtonCfg m_addImageToProjectButton;
+	ot::ToolBarButtonCfg m_removeImageFromProjectButton;
 };

@@ -23,6 +23,8 @@ public:
 
 	bool addConnection(const ot::GraphicsConnectionCfg& _connection);
 
+	bool addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter);
+
 private:
 	const std::string c_connectionsFolder = "Connections";
 

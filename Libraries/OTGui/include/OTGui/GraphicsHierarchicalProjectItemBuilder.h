@@ -10,6 +10,10 @@
 #include "OTGui/Margins.h"
 #include "OTGui/GraphicsItemCfg.h"
 
+// std header
+#include <vector>
+#include <string>
+
 namespace ot {
 
 	class Painter2D;
@@ -43,6 +47,9 @@ namespace ot {
 		//! @param _type The type string.
 		void setProjectType(const std::string& _type) { m_type = _type; };
 		const std::string& getProjectType() const { return m_type; };
+
+		void setProjectVersion(const std::string& _version) { m_projectVersion = _version; };
+		const std::string& getProjectVersion() const { return m_projectVersion; };
 
 		//! @brief Set the item tool tip.
 		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
@@ -81,8 +88,8 @@ namespace ot {
 
 		void setLeftTitleCornerImagePath(const std::string& _path) { m_leftTitleImagePath = _path; };
 
-		void setBackgroundImageData(const std::string& _data) { m_backgroundImage = _data; };
-		void setBackgroundImageMargins(const ot::MarginsD& _margins) { m_backgroundImageMargins = _margins; };
+		void setPreviewImageData(const std::vector<char>& _data, ImageFileFormat _format) { m_previewImage = _data; m_previewImageFormat = _format; };
+		void setPreviewImageMargins(const ot::MarginsD& _margins) { m_previewImageMargins = _margins; };
 		
 		void setConnectorSize(double _width, double _height) { m_connectorWidth = _width; m_connectorHeight = _height; };
 
@@ -102,13 +109,16 @@ namespace ot {
 		std::string m_title;
 		std::string m_toolTip;
 
+		std::string m_projectVersion;
+
 		ot::Painter2D* m_titleBackgroundPainter;
 		ot::Painter2D* m_titleForegroundPainter;
 
 		std::string m_leftTitleImagePath;
 
-		std::string m_backgroundImage;
-		ot::MarginsD m_backgroundImageMargins;
+		std::vector<char> m_previewImage;
+		ImageFileFormat m_previewImageFormat;
+		ot::MarginsD m_previewImageMargins;
 	};
 
 }

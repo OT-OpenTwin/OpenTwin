@@ -8,10 +8,14 @@
 #include "EntityHandler.h"
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTCore/EntityName.h"
+#include "OTGui/FileExtension.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTServiceFoundation/Encryption.h"
 #include "EntityAPI.h"
+#include "EntityFileImage.h"
 #include "EntityBlockConnection.h"
 #include "EntityHierarchicalScene.h"
 #include "EntityBlockHierarchicalProjectItem.h"
@@ -27,18 +31,17 @@ EntityHandler::~EntityHandler() {
 }
 
 std::shared_ptr<EntityBlockHierarchicalProjectItem> EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo, const std::string& _parentEntity) {
-	EntityBase* baseEntity = EntityFactory::instance().create(EntityBlockHierarchicalProjectItem::className());
-	OTAssertNullptr(baseEntity);
+	std::shared_ptr<EntityBlockHierarchicalProjectItem> blockEntity(new EntityBlockHierarchicalProjectItem);
 
-	std::shared_ptr<EntityBlockHierarchicalProjectItem> blockEntity(dynamic_cast<EntityBlockHierarchicalProjectItem*>(baseEntity));
+	const std::string serviceName = Application::instance().getServiceName();
 
 	// Setup the entity
 	blockEntity->setServiceInformation(Application::instance().getBasicServiceInformation());
-	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+	blockEntity->setOwningService(serviceName);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 
 	// Initialize coordinate
-	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService));
+	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, serviceName));
 	blockCoordinates->storeToDataBase();
 	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
 
@@ -115,6 +118,109 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	newVersions.push_back(connectionEntity.getEntityStorageVersion());
 
 	ot::ModelServiceAPI::updateTopologyEntities(newTopo, newVersions, "Connection added");
+
+	return true;
+}
+
+bool EntityHandler::addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter) {
+	// Unpack data
+	std::string unpackedData = ot::Encryption::decryptAndUnzipString(_fileContent, _uncompressedDataLength);
+
+	// Create container
+	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
+
+	// Determine extension
+	size_t ix = _fileName.rfind('.');
+	std::string fileExtension;
+	if (ix != std::string::npos) {
+		fileExtension = ot::String::toLower(_fileName.substr(ix + 1));
+	}
+	else {
+		OT_LOG_E("Could not determine file extension for image file: \"" + _fileName + "\"");
+		return false;
+	}
+
+	// Check if extension is supported
+	ot::FileExtension::DefaultFileExtension extension = ot::FileExtension::stringToFileExtension(fileExtension);
+	if (extension == ot::FileExtension::Unknown) {
+		OT_LOG_E("Unsupported file extension for image file: \"" + fileExtension + "\"");
+		return false;
+	}
+
+	// Check if image format
+	bool isImage = true;
+	ot::ImageFileFormat format = ot::FileExtension::toImageFileFormat(extension, isImage);
+	if (!isImage) {
+		OT_LOG_E("File extension is not an supported image format: \"" + fileExtension + "\"");
+		return false;
+	}
+
+	// Get selected project
+	ot::EntityInformation projectInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(_projectEntityName, projectInfo)) {
+		OT_LOG_E("Could not determine entity information for project entity: \"" + _projectEntityName + "\"");
+		return false;
+	}
+
+	// Load project entity
+	EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(projectInfo.getEntityID(), projectInfo.getEntityVersion());
+	if (!entity) {
+		OT_LOG_E("Could not read entity from database for project entity: \"" + _projectEntityName + "\"");
+		return false;
+	}
+	std::unique_ptr<EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<EntityBlockHierarchicalProjectItem*>(entity));
+	if (!projectEntity) {
+		OT_LOG_E("Entity is not of expected type for project entity { \"Entity\": \"" + _projectEntityName + "\", \"EntityType\": \"" + entity->getClassName() + "\" }");
+		delete entity;
+		return false;
+	}
+
+	ot::NewModelStateInformation newModelStateInfos;
+
+	if (projectEntity->hasPreviewFile()) {
+		// Update existing image
+		projectEntity->setPreviewFile(std::move(fileData), format);
+		projectEntity->storeToDataBase();
+
+		ot::ModelServiceAPI::updateTopologyEntities({ projectEntity->getEntityID() }, { projectEntity->getEntityStorageVersion() }, "Changed image of project item");
+	}
+	else {
+		const std::string serviceName = Application::instance().getServiceName();
+
+		// No previous image existing, create new one
+
+		// Create file data entity
+		EntityBinaryData* fileDataEntity = new EntityBinaryData;
+		fileDataEntity->setOwningService(serviceName);
+		fileDataEntity->setName(CreateNewUniqueTopologyName(projectEntity->getName(), "ImageData"));
+		fileDataEntity->setEntityID(_modelComponent->createEntityUID());
+		fileDataEntity->setData(unpackedData.c_str(), unpackedData.size());
+		fileDataEntity->storeToDataBase();
+
+		newModelStateInfos.m_dataEntityIDs.push_back(fileDataEntity->getEntityID());
+		newModelStateInfos.m_dataEntityParentIDs.push_back(projectEntity->getEntityID());
+		newModelStateInfos.m_dataEntityVersions.push_back(fileDataEntity->getEntityStorageVersion());
+
+		// Create file entity
+		EntityFileImage* imageEntity = new EntityFileImage;
+		imageEntity->setOwningService(serviceName);
+		imageEntity->setName(CreateNewUniqueTopologyName(projectEntity->getName(), "Image"));
+		imageEntity->setEntityID(_modelComponent->createEntityUID());
+		imageEntity->setImageFormat(format);
+		imageEntity->setData(fileDataEntity->getEntityID(), fileDataEntity->getEntityStorageVersion());		
+		imageEntity->storeToDataBase();
+
+		newModelStateInfos.m_topologyEntityIDs.push_back(imageEntity->getEntityID());
+		newModelStateInfos.m_topologyEntityVersions.push_back(imageEntity->getEntityStorageVersion());
+		newModelStateInfos.m_forceVisible.push_back(false);
+
+		// Set preview file in project entity
+		projectEntity->setPreviewFile(imageEntity->getEntityID(), imageEntity->getEntityStorageVersion());
+		projectEntity->storeToDataBase();
+
+		ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfos, "Added image to project item", true, false);
+		ot::ModelServiceAPI::updateTopologyEntities({ projectEntity->getEntityID() }, { projectEntity->getEntityStorageVersion() }, "Set preview image for project item");
+	}
 
 	return true;
 }
