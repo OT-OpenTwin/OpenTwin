@@ -2061,6 +2061,10 @@ void ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocument& _d
 		loadMultiple = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadMultiple);
 	}
 
+	if (_document.HasMember(OT_ACTION_PARAM_Info)) {
+		data.additionalInfo = ot::json::getString(_document, OT_ACTION_PARAM_Info);
+	}
+
 	if (loadMultiple) {
 		QStringList fileNames = QFileDialog::getOpenFileNames(
 			nullptr,
@@ -4274,6 +4278,7 @@ void ExternalServicesComponent::workerImportSingleFile(QString _fileToImport, Im
 		ot::JsonDocument inDoc;
 		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(_info.subsequentFunctionName, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(_info.fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(_info.additionalInfo, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 		if (_info.loadContent) {
 			std::string fileContent;
@@ -4308,6 +4313,7 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 		ot::JsonDocument inDoc;
 		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(_info.subsequentFunctionName, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(_info.fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(_info.additionalInfo, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 		ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;
 		{

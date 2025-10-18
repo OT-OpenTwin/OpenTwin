@@ -450,6 +450,7 @@ private:
 		std::string receiverUrl;
 		std::string subsequentFunctionName;
 		std::string fileMask;
+		std::string additionalInfo;
 		bool loadContent;
 	};
 

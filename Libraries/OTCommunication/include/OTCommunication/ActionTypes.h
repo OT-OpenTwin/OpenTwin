@@ -335,6 +335,7 @@
 #define OT_ACTION_PARAM_List "List"
 #define OT_ACTION_PARAM_Size "Size"
 #define OT_ACTION_PARAM_Data "Data"
+#define OT_ACTION_PARAM_Info "Info"
 #define OT_ACTION_PARAM_Alive "Alive"
 #define OT_ACTION_PARAM_State "State"
 #define OT_ACTION_PARAM_Flags "Flags"
