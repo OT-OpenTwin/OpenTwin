@@ -139,7 +139,9 @@ void ModelState::addNewEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID 
 	// Add the new entity to the parent / child list
 	addEntityToParent(entityID, parentEntityID);
 
-	assert(m_entities.count(entityID) == 0); // Ensure that the entity does not already exist
+	if (m_entities.find(entityID) != m_entities.end()) {
+		OT_LOG_WAS("Entity already exists in model state while adding new entity { \"EntityID\": " + std::to_string(entityID) + " }");
+	}
 	m_entities[entityID] = newEntity;
 	m_addedOrModifiedEntities[entityID] = newEntity;
 	m_stateModified = true;
@@ -170,8 +172,12 @@ void ModelState::modifyEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID 
 	}
 	else
 	{
-		assert(0); // The entity was not found
+		OT_LOG_WAS("Entity not found in model state while modifying entity { \"EntityID\": " + std::to_string(entityID) + " }");
 	}
+}
+
+void ModelState::modifyEntityVersion(const EntityBase& _entity) {
+	modifyEntityVersion(_entity.getEntityID(), _entity.getEntityStorageVersion());
 }
 
 void ModelState::modifyEntityVersion(ot::UID entityID, ot::UID entityVersion)
@@ -188,7 +194,7 @@ void ModelState::modifyEntityVersion(ot::UID entityID, ot::UID entityVersion)
 	}
 	else
 	{
-		assert(0); // The entity was not found
+		OT_LOG_WAS("Entity not found in model state while modifying entity version { \"EntityID\": " + std::to_string(entityID) + " }");
 	}
 }
 
@@ -297,7 +303,7 @@ void ModelState::buildChildrenInformation(void)
 {
 	m_entityChildrenList.clear();
 
-	for (auto entity : m_entities)
+	for (const auto& entity : m_entities)
 	{
 		addEntityToParent(entity.first, entity.second.getParentEntityID());
 	}
@@ -402,7 +408,7 @@ ot::UID ModelState::getCurrentEntityVersion(ot::UID entityID)
 	}
 
 	// Ensure that the entity exists
-	assert(m_entities.count(entityID) > 0);
+	OTAssert(m_entities.find(entityID) != m_entities.end(), "Entity does not exist");
 
 	// Now return the current version of the entity
 	return m_entities[entityID].getEntityVersion();
@@ -411,7 +417,7 @@ ot::UID ModelState::getCurrentEntityVersion(ot::UID entityID)
 ot::UID ModelState::getCurrentEntityParent(ot::UID entityID)
 {
 	// Ensure that the entity exists
-	assert(m_entities.count(entityID) > 0);
+	OTAssert(m_entities.find(entityID) != m_entities.end(), "Entity does not exist");
 
 	// Now return the current version of the entity
 	return m_entities[entityID].getParentEntityID();
@@ -420,7 +426,7 @@ ot::UID ModelState::getCurrentEntityParent(ot::UID entityID)
 void ModelState::getListOfTopologyEntites(std::list<unsigned long long> &topologyEntities)
 {
 	// Loop through all entities and add the topology entities to the list
-	for (auto entity : m_entities)
+	for (const auto& entity : m_entities)
 	{
 		if (entity.second.getEntityType() == ModelStateEntity::tEntityType::TOPOLOGY)
 		{
@@ -541,7 +547,7 @@ bool ModelState::loadState(bsoncxx::document::view docView, const std::string &e
 		auto resultList = docBase.GetAllDocument(std::move(queryDoc), std::move(filterDoc.extract()), 0);
 
 		// Now we need to process all extension states
-		for (auto result : resultList)
+		for (const auto& result : resultList)
 		{
 			loadStateData(result);
 		}
@@ -696,7 +702,7 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;
 
-		for (auto entity : m_entities)
+		for (const auto& entity : m_entities)
 		{
 			switch (entity.second.getEntityType())
 			{
@@ -713,8 +719,7 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 				hasDataEntities = true;
 				break;
 			default:
-				// Unknown type
-				assert(0);
+				OT_LOG_EAS("Unknown entity type (" + std::to_string(entity.second.getEntityType()) + ")");
 			}
 		}		
 		
@@ -803,7 +808,7 @@ bool ModelState::writeMainDocument(std::map<ot::UID, ModelStateEntity> &entities
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;
 
-		for (auto entity : m_entities)
+		for (const auto& entity : m_entities)
 		{
 			if (numberArrayEntriesWritten > m_maxNumberArrayEntitiesPerState) break;
 
@@ -881,7 +886,7 @@ bool ModelState::writeExtensionDocument(std::map<ot::UID, ModelStateEntity> &ent
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;
 
-		for (auto entity : entitiesLocal)
+		for (const auto& entity : entitiesLocal)
 		{
 			if (numberArrayEntriesWritten > m_maxNumberArrayEntitiesPerState) break;
 
@@ -965,7 +970,7 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;
 
-		for (auto entity : m_addedOrModifiedEntities)
+		for (const auto& entity : m_addedOrModifiedEntities)
 		{
 			switch (entity.second.getEntityType())
 			{
@@ -1012,7 +1017,7 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;
 
-		for (auto entity : m_removedEntities)
+		for (const auto& entity : m_removedEntities)
 		{
 			switch (entity.second.getEntityType())
 			{
@@ -1186,7 +1191,7 @@ bool ModelState::getListOfNonModelStateEntities(mongocxx::cursor &cursor, bsoncx
 {
 	bool entitiesInList = false;
 
-	for (auto item : cursor)
+	for (const auto& item : cursor)
 	{
 		std::string schemaType = item["SchemaType"].get_utf8().value.data();
 
@@ -1224,7 +1229,7 @@ void ModelState::loadVersionGraph(void) {
 
 	auto results = docBase.GetAllDocument(std::move(queryDoc), std::move(filterDoc), 0);
 
-	for (auto result : results) {
+	for (const auto& result : results) {
 		std::string version = result["Version"].get_utf8().value.data();
 		std::string parentVersion = result["ParentVersion"].get_utf8().value.data();
 
@@ -1322,7 +1327,7 @@ void ModelState::updateSchema_1_2(void)
 
 	std::string parentVersion;
 	bool hasInactiveModelState = false;
-	for (auto result : results)
+	for (const auto& result : results)
 	{
 		std::string schemaType = result["SchemaType"].get_utf8().value.data();
 		std::string version = result["Version"].get_utf8().value.data();
@@ -1385,7 +1390,7 @@ void ModelState::updateSchema_1_2(void)
 	// Now write the information about the parent version to each model state
 	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
 
-	for (auto item : versionGraph)
+	for (const auto& item : versionGraph)
 	{
 		std::string version = item.first;
 		std::string parentVersion = item.second;
@@ -1549,7 +1554,7 @@ std::list<std::string> ModelState::removeRedoModelStates(void)
 
 	std::list<std::string> removedVersions;
 
-	for (auto version : futureVersions)
+	for (const auto& version : futureVersions)
 	{
 		// Now we need to delete the given model state together with all its newly created entities
 		deleteModelVersion(version);
