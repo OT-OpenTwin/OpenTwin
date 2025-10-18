@@ -212,10 +212,21 @@ void ot::ModelServiceAPI::addGeometryOperation(UID _newEntityID, UID _newEntityV
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
-void ot::ModelServiceAPI::deleteEntitiesFromModel(std::list<std::string>& _entityNameList, bool _saveModel) {
+void ot::ModelServiceAPI::deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel) {
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_DeleteEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityNameList, JsonArray(_entityNameList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_SaveModel, _saveModel, requestDoc.GetAllocator());
+
+	// Send the command
+	std::string response;
+	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
+}
+
+void ot::ModelServiceAPI::deleteEntitiesFromModel(const UIDList& _entityIDList, bool _saveModel) {
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_DeleteEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(_entityIDList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_SaveModel, _saveModel, requestDoc.GetAllocator());
 
 	// Send the command
@@ -572,7 +583,7 @@ void ot::ModelServiceAPI::getEntityProperties(const std::string& entityName, boo
 	}
 }
 
-void ot::ModelServiceAPI::updateTopologyEntities(ot::UIDList& topologyEntityIDs, ot::UIDList& topologyEntityVersions, const std::string& comment) {
+void ot::ModelServiceAPI::updateTopologyEntities(const ot::UIDList& topologyEntityIDs, const ot::UIDList& topologyEntityVersions, const std::string& comment) {
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_UpdateTopologyEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityIDList, JsonArray(topologyEntityIDs, requestDoc.GetAllocator()), requestDoc.GetAllocator());

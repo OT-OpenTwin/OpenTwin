@@ -4103,10 +4103,22 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 	modelChangeOperationCompleted(description);
 }
 
-void Model::deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool saveModel)
+void Model::deleteEntitiesFromModel(const ot::UIDList& _entityIDList, bool _saveModel) {
+	std::list<EntityBase*> entityList;
+	for (ot::UID id : _entityIDList) {
+		auto it = entityMap.find(id);
+		if (it != entityMap.end()) {
+			entityList.push_back(it->second);
+		}
+	}
+
+	deleteEntitiesFromModel(entityList, _saveModel);
+}
+
+void Model::deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel)
 {
 	std::list<EntityBase *> entityList;
-	for (auto name : entityNameList)
+	for (const std::string& name : _entityNameList)
 	{
 		EntityBase *entity = findEntityFromName(name);
 		
@@ -4116,16 +4128,21 @@ void Model::deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool
 		}
 	}
 
-	if (entityList.empty()) return;
+	deleteEntitiesFromModel(entityList, _saveModel);
+}
+
+void Model::deleteEntitiesFromModel(const std::list<EntityBase*>& _entityList, bool _saveModel) {
+	if (_entityList.empty()) {
+		return;
+	}
 
 	// Remove all children from the list
-	std::list<EntityBase *> topLevelEntities = removeChildrenFromList(entityList);
+	std::list<EntityBase*> topLevelEntities = removeChildrenFromList(_entityList);
 
 	// Now we remove all entities from the visualizaton and delete them afterward 
 	std::list<ot::UID> removeFromDisplay;
 
-	for (auto entity : topLevelEntities)
-	{
+	for (EntityBase* entity : topLevelEntities) {
 		removeFromDisplay.push_back(entity->getEntityID());
 
 		// Remove the entity from the entity map and also from the model state
@@ -4138,8 +4155,7 @@ void Model::deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool
 
 	setModified();
 
-	if (saveModel)
-	{
+	if (_saveModel) {
 		modelChangeOperationCompleted("delete objects");
 	}
 }

@@ -39,7 +39,8 @@ namespace ot {
 		static void addEntitiesToModel(std::list<UID>&& _topologyEntityIDList, std::list<UID>&& _topologyEntityVersionList, std::list<bool>&& _topologyEntityForceVisible, std::list<UID>&& _dataEntityIDList, std::list<UID>&& _dataEntityVersionList, std::list<UID>&& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation = true, bool saveModel = true);
 		static void addEntitiesToModel(NewModelStateInformation& _newModelStateInfos, const std::string& _changeComment, bool askForBranchCreation = true, bool saveModel = true);
 		static void addGeometryOperation(UID _newEntityID, UID _newEntityVersion, std::string _newEntityName, std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList, std::list<std::string>& _childrenList, const std::string& _changeComment);
-		static void deleteEntitiesFromModel(std::list<std::string>& _entityNameList, bool _saveModel = true);
+		static void deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel = true);
+		static void deleteEntitiesFromModel(const UIDList& _entityIDList, bool _saveModel = true);
 		static bool getEntityInformation(UID _entity, EntityInformation& _entityInfo);
 		static bool getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo);
 		static void getEntityInformation(const std::list<UID>& _entities, std::list<EntityInformation>& _entityInfo);
@@ -50,7 +51,7 @@ namespace ot {
 		static void addPropertiesToEntities(std::list<UID>& _entityList, const ot::PropertyGridCfg& _configuration);
 		static void getEntityProperties(UID _entity, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties);
 		static void getEntityProperties(const std::string& entityName, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties);
-		static void updateTopologyEntities(ot::UIDList& topologyEntityIDs, ot::UIDList& topologyEntityVersions, const std::string& comment);
+		static void updateTopologyEntities(const ot::UIDList& topologyEntityIDs, const ot::UIDList& topologyEntityVersions, const std::string& comment);
 
 		static void updatePropertyGrid();
 		
