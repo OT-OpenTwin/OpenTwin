@@ -253,12 +253,12 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		titLImg->setImagePath(m_leftTitleImagePath);
 		titLImg->setFixedSize(16., 16.);
 		titLImg->setAlignment(ot::AlignCenter);
-		titLImg->setMargins(ot::MarginsD(15., 0., 0., 0.));
+		titLImg->setMargins(ot::MarginsD(5., 0., 0., 0.));
 		titLImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titLImg);
 
 		MarginsD titMargins = tit->getMargins();
-		titMargins.setLeft(15.);
+		titMargins.setLeft(5.);
 		tit->setMargins(titMargins);
 	}
 	
@@ -274,12 +274,12 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		titRImg->setImagePath(m_rightTitleImagePath);
 		titRImg->setMaximumSize(ot::Size2DD(22., 22.));
 		titRImg->setAlignment(ot::AlignCenter);
-		titRImg->setMargins(ot::MarginsD(0., 2., 15., 2.));
+		titRImg->setMargins(ot::MarginsD(0., 0., 5., 0.));
 		titRImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titRImg);
 
 		MarginsD titMargins = tit->getMargins();
-		titMargins.setRight(15.);
+		titMargins.setRight(5.);
 		tit->setMargins(titMargins);
 	}
 
