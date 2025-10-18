@@ -37,8 +37,6 @@
 #include "EntityBinaryData.h"
 
 #include "InfoFileManager.h"
-#include "Result1DManager.h"
-#include "ParametricResult1DManager.h"
 #include "ParametricCombination.h"
 #include "LTSpiceRawReader.h"
 
