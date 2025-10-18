@@ -199,6 +199,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\LTSpiceRawReader.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
+    <ClCompile Include="src\ResultManager.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -206,6 +207,7 @@
     <ClInclude Include="include\LTSpiceRawReader.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\ParametricCombination.h" />
+    <ClInclude Include="include\ResultManager.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

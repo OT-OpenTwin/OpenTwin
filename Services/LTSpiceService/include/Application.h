@@ -13,9 +13,6 @@
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "EntityInformation.h"
 #include "EntityGeometry.h"
-#include "OTServiceFoundation/BusinessLogicHandler.h"
-
-#include "ParametricCombination.h"
 
 // C++ header
 #include <string>
@@ -26,22 +23,10 @@
 
 // Forward declaration
 class EntityBase;
-namespace ot {
-	namespace components {
-		class UiComponent;
-		class ModelComponent;
-	}
-}
-
-namespace ltspice
-{
-	class RawData;
-}
-
 class EntityUnits;
 class ParametricCombination;
 
-class Application : public ot::ApplicationBase, public ot::ButtonHandler, public BusinessLogicHandler {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
 	Application();
 	virtual ~Application();
@@ -77,11 +62,9 @@ public:
 	std::string getSimpleFileName();
 	long long getCurrentModelEntityVersion(void);
 	void extractResults();
-	void getParametricCombinations(const std::string& logFileName, std::list<ParametricCombination>& parameterRuns);
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);
 	void downloadNeeded(ot::JsonDocument& _doc);
 	void filesUploaded(ot::JsonDocument& _doc);
-	void storeParametricResults(ltspice::RawData& resultData, std::list<ParametricCombination>& parameterRuns);
 };
