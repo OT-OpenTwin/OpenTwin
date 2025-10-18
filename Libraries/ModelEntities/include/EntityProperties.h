@@ -17,7 +17,7 @@ class EntityBase;
 
 namespace ot { class PropertyGroup; };
 
-class __declspec(dllexport) EntityProperties
+class OT_MODELENTITIES_API_EXPORT EntityProperties
 {
 public:
 	EntityProperties() : m_needsUpdate(false) {};

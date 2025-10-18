@@ -10,6 +10,7 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/Painter2DDialogFilter.h"
 #include "OldTreeIcon.h"
+#include "ModelEntitiesAPIExport.h"
 
 // std header
 #include <string>
@@ -22,7 +23,7 @@ class EntityProperties;
 namespace ot { class Property; };
 namespace ot { class Painter2D; };
 
-class __declspec(dllexport) EntityPropertiesBase
+class OT_MODELENTITIES_API_EXPORT EntityPropertiesBase
 {
 public:
 	EntityPropertiesBase();
@@ -99,7 +100,7 @@ private:
 
 // ################################################################################################################################################################
 
-class __declspec(dllexport) EntityPropertiesDouble : public EntityPropertiesBase
+class OT_MODELENTITIES_API_EXPORT EntityPropertiesDouble : public EntityPropertiesBase
 {
 public:
 	static std::string typeString(void) { return "double"; };
@@ -152,7 +153,7 @@ private:
 
 // ################################################################################################################################################################
 
-class __declspec(dllexport) EntityPropertiesInteger : public EntityPropertiesBase
+class OT_MODELENTITIES_API_EXPORT EntityPropertiesInteger : public EntityPropertiesBase
 {
 public:
 	static std::string typeString(void) { return "integer"; };
@@ -205,7 +206,7 @@ private:
 
 // ################################################################################################################################################################
 
-class __declspec(dllexport) EntityPropertiesBoolean : public EntityPropertiesBase
+class OT_MODELENTITIES_API_EXPORT EntityPropertiesBoolean : public EntityPropertiesBase
 {
 public:
 	static std::string typeString(void) { return "boolean"; };
@@ -245,7 +246,7 @@ private:
 
 // ################################################################################################################################################################
 
-class __declspec(dllexport) EntityPropertiesString : public EntityPropertiesBase
+class OT_MODELENTITIES_API_EXPORT EntityPropertiesString : public EntityPropertiesBase
 {
 public:
 	static std::string typeString(void) { return "string"; };
@@ -285,7 +286,7 @@ private:
 
 // ################################################################################################################################################################
 
-class __declspec(dllexport) EntityPropertiesSelection : public EntityPropertiesBase
+class OT_MODELENTITIES_API_EXPORT EntityPropertiesSelection : public EntityPropertiesBase
 {
 public:
 	static std::string typeString(void) { return "selection"; };
@@ -334,7 +335,7 @@ private:
 
 // ################################################################################################################################################################
 
-class __declspec(dllexport) EntityPropertiesColor : public EntityPropertiesBase
+class OT_MODELENTITIES_API_EXPORT EntityPropertiesColor : public EntityPropertiesBase
 {
 public:
 	static std::string typeString(void) { return "color"; };
@@ -381,7 +382,7 @@ private:
 
 // ################################################################################################################################################################
 
-class __declspec(dllexport) EntityPropertiesEntityList : public EntityPropertiesBase
+class OT_MODELENTITIES_API_EXPORT EntityPropertiesEntityList : public EntityPropertiesBase
 {
 public:
 	static std::string typeString(void) { return "entitylist"; };
@@ -445,7 +446,7 @@ private:
 
 // ################################################################################################################################################################
 
-class __declspec(dllexport) EntityPropertiesProjectList : public EntityPropertiesBase
+class OT_MODELENTITIES_API_EXPORT EntityPropertiesProjectList : public EntityPropertiesBase
 {
 public:
 	static std::string typeString(void) { return "projectlist"; };
@@ -474,7 +475,7 @@ private:
 
 // ################################################################################################################################################################
 
-class __declspec(dllexport) EntityPropertiesGuiPainter : public EntityPropertiesBase
+class OT_MODELENTITIES_API_EXPORT EntityPropertiesGuiPainter : public EntityPropertiesBase
 {
 public:
 	static std::string typeString(void) { return "guipainter"; };

@@ -30,6 +30,12 @@ namespace ot {
 		//! @brief Create bool array
 		explicit JsonArray(const std::vector<bool>& _vec, JsonAllocator& _allocator);
 
+		//! @brief Create char array
+		explicit JsonArray(const std::list<char>& _lst, JsonAllocator& _allocator);
+
+		//! @brief Create char array
+		explicit JsonArray(const std::vector<char>& _vec, JsonAllocator& _allocator);
+
 		//! @brief Create int32 array from int16 list
 		explicit JsonArray(const std::list<int16_t>& _lst, JsonAllocator& _allocator);
 

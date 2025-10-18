@@ -36,15 +36,25 @@ for (rapidjson::SizeType i = 0; i < lclit->value.Size(); i++) { \
 } \
 return ___list
 
+#define OT_JSON_getListFromObjectCast(___object, ___memberName, ___entryType, ___castType, ___list, ___errorAction) \
+OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction); \
+OT_JSON_createMemberIterator(___object, ___memberName, lclit); \
+OT_JSON_checkMemberIteratorType(lclit, ___memberName, Array, ___errorAction); \
+for (rapidjson::SizeType i = 0; i < lclit->value.Size(); i++) { \
+	if (!lclit->value[i].Is##___entryType()) { OT_LOG_E("Array entry at index \"" + std::to_string(i) + "\" is not a " #___entryType); ___errorAction; } \
+	___list.push_back(static_cast<___castType>(lclit->value[i].Get##___entryType())); \
+} \
+return ___list
+
 #define OT_JSON_getArrayFromObject(___object, ___memberName, ___entryType, ___entryTypeJson, ___sizeMember) \
 ___entryType* ret = nullptr; \
-OT_JSON_checkMemberExists(___object, ___memberName, return ret); \
+OT_JSON_checkMemberExists(___object, ___memberName, return nullptr); \
 OT_JSON_createMemberIterator(___object, ___memberName, lclit); \
-OT_JSON_checkMemberIteratorType(lclit, ___memberName, Array, return ret); \
+OT_JSON_checkMemberIteratorType(lclit, ___memberName, Array, return nullptr); \
 ___sizeMember = lclit->value.Size(); \
 ret = new ___entryType[___sizeMember]; \
 for (JsonSizeType i = 0; i < ___sizeMember; i++) { \
-	if (!lclit->value[i].Is##___entryTypeJson()) { OT_LOG_E("Array entry at index \"" + std::to_string(i) + "\" is not a " #___entryTypeJson); delete[]ret; return ret; } \
+	if (!lclit->value[i].Is##___entryTypeJson()) { OT_LOG_E("Array entry at index \"" + std::to_string(i) + "\" is not a " #___entryTypeJson); delete[]ret; return nullptr; } \
 	ret[i] = lclit->value[i].Get##___entryTypeJson(); \
 } \
 return ret;
@@ -509,6 +519,26 @@ std::list<bool> ot::json::getBoolList(const ConstJsonObject& _value, const std::
 	OT_JSON_getListFromObject(_value, _member.c_str(), Bool, ret, return _default);
 }
 
+std::list<char> ot::json::getCharList(const JsonValue& _value, const char* _member, const std::list<char>& _default) {
+	std::list<char> ret;
+	OT_JSON_getListFromObjectCast(_value, _member, Int, char, ret, return _default);
+}
+
+std::list<char> ot::json::getCharList(const JsonValue& _value, const std::string& _member, const std::list<char>& _default) {
+	std::list<char> ret;
+	OT_JSON_getListFromObjectCast(_value, _member.c_str(), Int, char, ret, return _default);
+}
+
+std::list<char> ot::json::getCharList(const ConstJsonObject& _value, const char* _member, const std::list<char>& _default) {
+	std::list<char> ret;
+	OT_JSON_getListFromObjectCast(_value, _member, Int, char, ret, return _default);
+}
+
+std::list<char> ot::json::getCharList(const ConstJsonObject& _value, const std::string& _member, const std::list<char>& _default) {
+	std::list<char> ret;
+	OT_JSON_getListFromObjectCast(_value, _member.c_str(), Int, char, ret, return _default);
+}
+
 std::list<int32_t> ot::json::getIntList(const JsonValue& _value, const char* _member, const std::list<int32_t>& _default) {
 	std::list<int32_t> ret;
 	OT_JSON_getListFromObject(_value, _member, Int, ret, return _default);
@@ -707,6 +737,26 @@ std::vector<bool> ot::json::getBoolVector(const ConstJsonObject& _value, const c
 std::vector<bool> ot::json::getBoolVector(const ConstJsonObject& _value, const std::string& _member, const std::vector<bool>& _default) {
 	std::vector<bool> ret;
 	OT_JSON_getListFromObject(_value, _member.c_str(), Bool, ret, return _default);
+}
+
+std::vector<char> ot::json::getCharVector(const JsonValue& _value, const char* _member, const std::vector<char>& _default) {
+	std::vector<char> ret;
+	OT_JSON_getListFromObjectCast(_value, _member, Int, char, ret, return _default);
+}
+
+std::vector<char> ot::json::getCharVector(const JsonValue& _value, const std::string& _member, const std::vector<char>& _default) {
+	std::vector<char> ret;
+	OT_JSON_getListFromObjectCast(_value, _member.c_str(), Int, char, ret, return _default);
+}
+
+std::vector<char> ot::json::getCharVector(const ConstJsonObject& _value, const char* _member, const std::vector<char>& _default) {
+	std::vector<char> ret;
+	OT_JSON_getListFromObjectCast(_value, _member, Int, char, ret, return _default);
+}
+
+std::vector<char> ot::json::getCharVector(const ConstJsonObject& _value, const std::string& _member, const std::vector<char>& _default) {
+	std::vector<char> ret;
+	OT_JSON_getListFromObjectCast(_value, _member.c_str(), Int, char, ret, return _default);
 }
 
 std::vector<int32_t> ot::json::getIntVector(const JsonValue& _value, const char* _member, const std::vector<int32_t>& _default) {
