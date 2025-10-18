@@ -12,7 +12,6 @@
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/GraphicsZValues.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsItemPreviewDrag.h"
 #include "OTWidgets/GraphicsConnectionConnectorItem.h"
@@ -178,7 +177,6 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 
 	m_items.insert_or_assign(_item->getGraphicsItemUid(), _item);
 	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
-	_item->getRootItem()->getQGraphicsItem()->setZValue(GraphicsZValues::Item);
 	_item->setGraphicsScene(m_scene);
 
 	QPointF pt = m_scene->snapToGrid(_item);

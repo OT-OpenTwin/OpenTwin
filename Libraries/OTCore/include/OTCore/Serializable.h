@@ -25,13 +25,13 @@ namespace ot {
 		//! @param _jsonObject JSON object value reference to write the data to.
 		//! @param _allocator Allocator to use when writing data.
 		//! @ref Serializable::addToJsonObject
-		virtual void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const = 0;
+		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const = 0;
 
 		//! @brief Set the data by deserializing the object.
 		//! Set the object contents from the provided JSON object.
 		//! @param _jsonObject JSON object containing the information.
 		//! @ref Serializable::setFromJsonObject
-		virtual void setFromJsonObject(const ot::ConstJsonObject& _jsonObject) = 0;
+		virtual void setFromJsonObject(const ConstJsonObject& _jsonObject) = 0;
 
 		//! @brief Create a JSON string from the object data.
 		virtual std::string toJson() const;

@@ -461,6 +461,9 @@
     <ClInclude Include="include\OTGui\GraphicsHierarchicalProjectItemBuilder.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsZValues.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">

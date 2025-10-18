@@ -29,6 +29,7 @@
 #define OT_JSON_MEMBER_Title "Title"
 #define OT_JSON_MEMBER_Flags "Flags"
 #define OT_JSON_MEMBER_Margin "Margin"
+#define OT_JSON_MEMBER_ZValue "ZValue"
 #define OT_JSON_MEMBER_MinSize "Size.Min"
 #define OT_JSON_MEMBER_MaxSize "Size.Max"
 #define OT_JSON_MEMBER_ToolTip "ToolTip"
@@ -54,7 +55,9 @@
 
 ot::GraphicsItemCfg::GraphicsItemCfg()
 	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), m_uid(0),
-	m_minSize(0., 0.), m_margins(0., 0., 0., 0.), m_maxSize(std::numeric_limits<double>::max(), std::numeric_limits<double>::max()), m_sizePolicy(ot::Preferred), m_connectionDirection(ot::ConnectAny)
+	m_minSize(0., 0.), m_margins(0., 0., 0., 0.), m_zValue(ot::GraphicsZValues::Item),
+	m_maxSize(std::numeric_limits<double>::max(), std::numeric_limits<double>::max()),
+	m_sizePolicy(ot::Preferred), m_connectionDirection(ot::ConnectAny)
 {}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
@@ -64,25 +67,21 @@ ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 // Base class methods
 
 void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
-	JsonObject posObj;
-	m_pos.addToJsonObject(posObj, _allocator);
-	_object.AddMember(OT_JSON_MEMBER_Position, posObj, _allocator);
-
-	JsonObject minSizeObj;
-	m_minSize.addToJsonObject(minSizeObj, _allocator);
-	_object.AddMember(OT_JSON_MEMBER_MinSize, minSizeObj, _allocator);
-
-	JsonObject maxSizeObj;
-	m_maxSize.addToJsonObject(maxSizeObj, _allocator);
-	_object.AddMember(OT_JSON_MEMBER_MaxSize, maxSizeObj, _allocator);
-
-	JsonObject marginObj;
-	m_margins.addToJsonObject(marginObj, _allocator);
-	_object.AddMember(OT_JSON_MEMBER_Margin, marginObj, _allocator);
-
-	JsonObject addTrigDistObj;
-	m_additionalTriggerDistance.addToJsonObject(addTrigDistObj, _allocator);
-	_object.AddMember(OT_JSON_MEMBER_AdditionalTriggerDistance, addTrigDistObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Uid, static_cast<int64_t>(m_uid), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Title, JsonString(m_title, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_ToolTip, JsonString(m_tooltip, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Transform, JsonObject(m_transform, _allocator), _allocator);
+	_object.AddMember(JsonString(factoryTypeKey(), _allocator), JsonString(this->getFactoryKey(), _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Alignment, JsonString(ot::toString(m_alignment), _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_SizePolicy, JsonString(ot::toString(m_sizePolicy), _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_ConnectionDirection, JsonString(ot::toString(m_connectionDirection), _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Position, JsonObject(m_pos, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_MinSize, JsonObject(m_minSize, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_MaxSize, JsonObject(m_maxSize, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Margin, JsonObject(m_margins, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_AdditionalTriggerDistance, JsonObject(m_additionalTriggerDistance, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_ZValue, m_zValue, _allocator);
 
 	JsonArray flagArr;
 	if (m_flags & GraphicsItemCfg::ItemIsMoveable) flagArr.PushBack(JsonString(OT_JSON_VALUE_Moveable, _allocator), _allocator);
@@ -106,19 +105,6 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 		stringMapArr.PushBack(stringMapObj, _allocator);
 	}
 	_object.AddMember(OT_JSON_MEMBER_StringMap, stringMapArr, _allocator);
-
-	JsonObject transformObj;
-	m_transform.addToJsonObject(transformObj, _allocator);
-	_object.AddMember(OT_JSON_MEMBER_Transform, transformObj, _allocator);
-
-	_object.AddMember(OT_JSON_MEMBER_Uid, static_cast<int64_t>(m_uid), _allocator);
-	_object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
-	_object.AddMember(OT_JSON_MEMBER_Title, JsonString(m_title, _allocator), _allocator);
-	_object.AddMember(OT_JSON_MEMBER_ToolTip, JsonString(m_tooltip, _allocator), _allocator);
-	_object.AddMember(JsonString(factoryTypeKey(), _allocator), JsonString(this->getFactoryKey(), _allocator), _allocator);
-	_object.AddMember(OT_JSON_MEMBER_Alignment, JsonString(ot::toString(m_alignment), _allocator), _allocator);
-	_object.AddMember(OT_JSON_MEMBER_SizePolicy, JsonString(ot::toString(m_sizePolicy), _allocator), _allocator);
-	_object.AddMember(OT_JSON_MEMBER_ConnectionDirection, JsonString(ot::toString(m_connectionDirection), _allocator), _allocator);
 }
 
 void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
@@ -129,6 +115,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	m_alignment = stringToAlignment(json::getString(_object, OT_JSON_MEMBER_Alignment));
 	m_sizePolicy = stringToSizePolicy(json::getString(_object, OT_JSON_MEMBER_SizePolicy));
 	m_connectionDirection = stringToConnectionDirection(json::getString(_object, OT_JSON_MEMBER_ConnectionDirection));
+	m_zValue = json::getInt(_object, OT_JSON_MEMBER_ZValue);
 
 	m_pos.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Position));
 	m_margins.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Margin));
@@ -177,6 +164,10 @@ void ot::GraphicsItemCfg::setFixedSize(const Size2DD& _size) {
 
 std::string ot::GraphicsItemCfg::getStringForKey(const std::string& _key) const {
 	const auto& it = m_stringMap.find(_key);
-	if (it == m_stringMap.end()) return "#" + _key;
-	else return it->second;
+	if (it == m_stringMap.end()) {
+		return "#" + _key;
+	}
+	else {
+		return it->second;
+	}
 }

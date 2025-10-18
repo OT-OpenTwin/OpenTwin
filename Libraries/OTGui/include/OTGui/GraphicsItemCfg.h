@@ -6,17 +6,19 @@
 
 #pragma once
 
-// OpenTwin header
+// OpenTwin Core header
 #include "OTSystem/Flags.h"
 #include "OTCore/Size2D.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/Serializable.h"
+
+// OpenTwin Gui header
 #include "OTGui/Font.h"
 #include "OTGui/Margins.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Transform.h"
 #include "OTGui/OTGuiAPIExport.h"
-#include "OTCore/CoreTypes.h"
+#include "OTGui/GraphicsZValues.h"
 
 // std header
 #include <map>
@@ -30,6 +32,7 @@ namespace ot {
 	//! @brief The GraphicsItemCfg is the base class for all graphics item configurations.
 	class OT_GUI_API_EXPORT GraphicsItemCfg : public ot::Serializable {
 		OT_DECL_NOMOVE(GraphicsItemCfg)
+		OT_DECL_DEFCOPY(GraphicsItemCfg)
 	public:
 		static std::string factoryTypeKey() { return "GIType"; };
 
@@ -73,20 +76,17 @@ namespace ot {
 		typedef Flags<GraphicsItemFlag> GraphicsItemFlags; //! @brief GraphicsItemFlags
 
 		GraphicsItemCfg();
-		explicit GraphicsItemCfg(const GraphicsItemCfg& _other) = default;
 		virtual ~GraphicsItemCfg();
-
-		GraphicsItemCfg& operator=(const GraphicsItemCfg& _other) = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Pure virtual methods
 
 		//! @brief Returns the unique GraphicsItemCfg type name that is used in the GraphicsItemCfgFactory.
-		virtual std::string getFactoryKey(void) const = 0;
+		virtual std::string getFactoryKey() const = 0;
 
 		//! @brief Creates a copy of this item.
-		virtual GraphicsItemCfg* createCopy(void) const = 0;
+		virtual GraphicsItemCfg* createCopy() const = 0;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -109,7 +109,7 @@ namespace ot {
 		void setName(const std::string& _name) { m_name = _name; };
 
 		//! @brief Item name.
-		const std::string& getName(void) const { return m_name; };
+		const std::string& getName() const { return m_name; };
 
 		//! @brief Set item title.
 		//! The item title will be displayed to the user when needed.
@@ -117,7 +117,7 @@ namespace ot {
 
 		//! @brief Item title.
 		//! The item title will be displayed to the user when needed.
-		const std::string& getTitle(void) const { return m_title; };
+		const std::string& getTitle() const { return m_title; };
 
 		//! @brief Set ToolTip.
 		//! @ref getToolTip
@@ -125,7 +125,7 @@ namespace ot {
 
 		//! @brief ToolTip that will be displayed to the user when he hovers over the item.
 		//! If the root item in a graphics item hierarchy has a tool tip set, child items may be enabled to forward the tooltip request (see GraphicsItemFlags).
-		const std::string& getToolTip(void) const { return m_tooltip; };
+		const std::string& getToolTip() const { return m_tooltip; };
 
 		//! @brief Set item position.
 		//! If the item is the root item, the position is the scene position.
@@ -143,7 +143,7 @@ namespace ot {
 		//! @brief Item position.
 		//! If the item is the root item, the position is the scene position.
 		//! If the item is a child item, the position is the local position (default: 0.0; 0.0).
-		const Point2DD& getPosition(void) const { return m_pos; };
+		const Point2DD& getPosition() const { return m_pos; };
 
 		//! @param _d Distance in all directions.
 		//! @ref setAdditionalTriggerDistance(const MarginsD& _d)
@@ -157,7 +157,7 @@ namespace ot {
 		void setAdditionalTriggerDistance(const MarginsD& _d) { m_additionalTriggerDistance = _d; };
 
 		//! @ref setAdditionalTriggerDistance(const MarginsD& _d)
-		const MarginsD& getAdditionalTriggerDistance(void) const { return m_additionalTriggerDistance; };
+		const MarginsD& getAdditionalTriggerDistance() const { return m_additionalTriggerDistance; };
 
 		//! @brief Sets the item minimum size.
 		//! @ref getMinimumSize
@@ -169,7 +169,7 @@ namespace ot {
 
 		//! @brief Item minimum size.
 		//! If the graphics item is resized (e.g. via layout) then it may not shrink below the minimum size.
-		const Size2DD& getMinimumSize(void) const { return m_minSize; };
+		const Size2DD& getMinimumSize() const { return m_minSize; };
 
 		//! @brief Sets the item maximum size.
 		//! @ref getMaximumSize
@@ -181,7 +181,7 @@ namespace ot {
 
 		//! @brief Item maximum size.
 		//! If the graphics item is resized (e.g. via layout) then it may not brow above the maximum size.
-		const Size2DD& getMaximumSize(void) const { return m_maxSize; };
+		const Size2DD& getMaximumSize() const { return m_maxSize; };
 
 		//! @brief Sets the items minimum and maximum size.
 		//! @ref getMaximumSize
@@ -209,11 +209,11 @@ namespace ot {
 		void setMargins(const MarginsD& _margins) { m_margins = _margins; };
 
 		//! @brief Item margins.
-		const MarginsD& getMargins(void) const { return m_margins; };
+		const MarginsD& getMargins() const { return m_margins; };
 
 		void setGraphicsItemFlag(GraphicsItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
 		void setGraphicsItemFlags(const GraphicsItemFlags& _flags) { m_flags = _flags; };
-		const GraphicsItemFlags& getGraphicsItemFlags(void) const { return m_flags; };
+		const GraphicsItemFlags& getGraphicsItemFlags() const { return m_flags; };
 
 		//! @brief Set the item alignment.
 		//! @ref getAlignment.
@@ -221,7 +221,7 @@ namespace ot {
 
 		//! @brief Current item alignment.
 		//! The alignment only has an effect if the item is nested.
-		Alignment getAlignment(void) const { return m_alignment; };
+		Alignment getAlignment() const { return m_alignment; };
 
 		//! @brief Set item UID.
 		//! @ref getUid
@@ -230,7 +230,17 @@ namespace ot {
 		//! @brief Item UID.
 		//! The item UID is used to uniquely identify an item in a GraphicsScene.
 		//! The must never exist two items with the same UID.
-		const ot::UID& getUid(void) const { return m_uid; };
+		const ot::UID& getUid() const { return m_uid; };
+
+		//! @brief Set item Z value.
+		//! @ref getZValue.
+		void setZValue(int32_t _zValue) { m_zValue = _zValue; };
+
+		//! @brief Current item Z value.
+		//! The Z value is used to define the drawing order of items in a scene.
+		//! The higher the Z value, the later the item will be drawn (on top of items with lower Z values).
+		//! If two items have the same Z value, the item insertion order will define the drawing order (the later an item was inserted, the later it will be drawn).
+		int32_t getZValue() const { return m_zValue; };
 
 		//! @brief Set item size policy.
 		//! @ref getSizePolicy.
@@ -239,16 +249,16 @@ namespace ot {
 		//! @brief Current item size policy.
 		//! The item size policy is used for nested items.
 		//! @ref ot::SizePolicy
-		SizePolicy getSizePolicy(void) const { return m_sizePolicy; };
+		SizePolicy getSizePolicy() const { return m_sizePolicy; };
 
 		//! @brief Set the item connection direction.
-		//! @ref getConnectionDirection(void)
+		//! @ref getConnectionDirection()
 		void setConnectionDirection(ConnectionDirection _direction) { m_connectionDirection = _direction; };
 
 		//! @brief Current item connection direction.
 		//! This has only an effect if GraphicsItemFlag::ItemIsConnectable is set.
 		//! @ref ot::ConnectionDirection
-		ConnectionDirection getConnectionDirection(void) const { return m_connectionDirection; };
+		ConnectionDirection getConnectionDirection() const { return m_connectionDirection; };
 
 		//! @brief Adds the provided entry to the string map.
 		//! If an entry for the same key already exists it will be replaced.
@@ -262,7 +272,7 @@ namespace ot {
 		//! @brief The string map may be used to reference a value via a key in a complex graphics item.
 		//! For example a text item with enabled reference mode will use the string map to set its text when created in the frontend.
 		//! @warning The string map must be set for the root item only. Child items will be ignored.
-		const std::map<std::string, std::string>& getStringMap(void) const { return m_stringMap; };
+		const std::map<std::string, std::string>& getStringMap() const { return m_stringMap; };
 
 		//! @brief Returns the string set for the given key in the string map.
 		//! Returns the string "#<_key>" if the value was not found.
@@ -273,7 +283,7 @@ namespace ot {
 		void setTransform(const Transform& _transform) { m_transform = _transform; };
 
 		//! @brief Get the item transform.
-		const Transform& getTransform(void) const { return m_transform; };
+		const Transform& getTransform() const { return m_transform; };
 
 	private:
 		std::string m_name; //! @brief Item name.
@@ -282,6 +292,8 @@ namespace ot {
 		std::string m_tooltip; //! @brief Item tool tip.
 		Point2DD m_pos; //! @brief Item position.
 		MarginsD m_additionalTriggerDistance; //! @ref setAdditionalTriggerDistance
+
+		int32_t m_zValue;
 
 		Size2DD m_minSize; //! @brief Minimum item size.
 		Size2DD m_maxSize; //! @brief Maximum item size.

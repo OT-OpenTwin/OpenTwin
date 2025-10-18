@@ -4,7 +4,6 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin Widgets header
-#include "OTWidgets/GraphicsZValues.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/GraphicsDisconnectItem.h"
 #include "OTWidgets/GraphicsConnectionItem.h"

@@ -86,9 +86,13 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(m_config);
 
 	if (m_config) {
+		this->getQGraphicsItem()->setZValue(m_config->getZValue());
+
 		m_moveStartPt = QPointF(m_config->getPosition().x(), m_config->getPosition().y());
 		this->setGraphicsItemName(this->getGraphicsItemName());
-		if (!m_blockFlagNotifications) this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
+		if (!m_blockFlagNotifications) {
+			this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
+		}
 	}
 
 	return true;
@@ -109,7 +113,9 @@ void ot::GraphicsItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _
 }
 
 ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
-	if (_itemName == this->getGraphicsItemName()) return this;
+	if (_itemName == this->getGraphicsItemName()) {
+		return this;
+	}
 	
 	OTAssertNullptr(this->getQGraphicsItem());
 	ot::GraphicsItem* ret = nullptr;
@@ -118,7 +124,9 @@ ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(c);
 		if (itm) {
 			ret = itm->findItem(_itemName);
-			if (ret) break;
+			if (ret) {
+				break;
+			}
 		}
 	}
 
@@ -126,7 +134,9 @@ ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
 }
 
 void ot::GraphicsItem::removeAllConnections() {
-	if (m_connections.empty()) return;
+	if (m_connections.empty()) {
+		return;
+	}
 
 	GraphicsScene* scene = this->getGraphicsScene();
 	if (scene == nullptr) {
@@ -337,8 +347,12 @@ void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
 
 qreal ot::GraphicsItem::calculateShortestDistanceToPoint(const QPointF& _pt) const {
 	QRectF virtualRect = this->getTriggerBoundingRect();
-	if (virtualRect.contains(_pt)) return Math::euclideanDistance(virtualRect.center().x(), virtualRect.center().y(), _pt.x(), _pt.y());
-	else return -1.;
+	if (virtualRect.contains(_pt)) {
+		return Math::euclideanDistance(virtualRect.center().x(), virtualRect.center().y(), _pt.x(), _pt.y());
+	}
+	else {
+		return -1.;
+	}
 }
 
 QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
@@ -401,8 +415,12 @@ const ot::GraphicsItem* ot::GraphicsItem::getRootItem() const {
 
 void ot::GraphicsItem::setConfiguration(GraphicsItemCfg* _config) {
 	OTAssertNullptr(_config);
-	if (m_config == _config) return;
-	if (m_config) delete m_config;
+	if (m_config == _config) {
+		return;
+	}
+	if (m_config) {
+		delete m_config;
+	}
 	m_config = _config;
 
 	this->getQGraphicsItem()->setPos(QtFactory::toQPoint(m_config->getPosition()));
@@ -735,7 +753,9 @@ void ot::GraphicsItem::notifyMoveIfRequired() {
 }
 
 void ot::GraphicsItem::parentItemTransformChanged(const QTransform& _parentTransform) {
-	if (!(this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIgnoresParentTransform)) return;
+	if (!(this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIgnoresParentTransform)) {
+		return;
+	}
 	return;
 
 	// Calculate inverse transform of parent
@@ -803,11 +823,9 @@ ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection()
 	}
 	
 	if (dx >= dy) {
-		if (isRight) return ConnectionDirection::ConnectRight;
-		else return ConnectionDirection::ConnectLeft;
+		return (isRight ? ConnectionDirection::ConnectRight : ConnectionDirection::ConnectLeft);
 	}
 	else {
-		if (isDown) return ConnectionDirection::ConnectDown;
-		else return ConnectionDirection::ConnectUp;
+		return (isDown ? ConnectionDirection::ConnectDown : ConnectionDirection::ConnectUp);
 	}
 }

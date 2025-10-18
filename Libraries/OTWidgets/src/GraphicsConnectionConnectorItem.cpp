@@ -6,7 +6,6 @@
 // OpenTwin Widgets header
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
-#include "OTWidgets/GraphicsZValues.h"
 #include "OTWidgets/GraphicsConnectionConnectorItem.h"
 
 ot::GraphicsConnectionConnectorItem::GraphicsConnectionConnectorItem() {

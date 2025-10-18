@@ -6,7 +6,6 @@
 // OpenTwin header
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/GraphicsZValues.h"
 #include "OTWidgets/VersionGraphItem.h"
 #include "OTWidgets/GraphicsTextItem.h"
 #include "OTWidgets/GraphicsGridLayoutItem.h"
@@ -105,8 +104,6 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	centralLayout->setRowStretchFactor(0, 1);
 	centralLayout->setRowStretchFactor(2, 1);
 	centralLayout->setColumnStretchFactor(1, 1);
-
-	this->setZValue(GraphicsZValues::Item);
 
 	if (m_config.getLabel().empty()) {
 		m_nameItem->setText("");

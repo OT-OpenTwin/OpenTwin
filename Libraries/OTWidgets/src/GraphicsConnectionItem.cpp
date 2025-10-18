@@ -15,7 +15,6 @@
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/GraphicsZValues.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsDisconnectItem.h"
 #include "OTWidgets/GraphicsConnectionConnectorItem.h"

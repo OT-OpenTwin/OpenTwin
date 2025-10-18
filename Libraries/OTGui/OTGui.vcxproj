@@ -29,6 +29,7 @@
     <ClInclude Include="include\OTGui\DefaultPropertyValues.h" />
     <ClInclude Include="include\OTGui\FileExtension.h" />
     <ClInclude Include="include\OTGui\GraphicsHierarchicalProjectItemBuilder.h" />
+    <ClInclude Include="include\OTGui\GraphicsZValues.h" />
     <ClInclude Include="include\OTGui\LibraryModel.h" />
     <ClInclude Include="include\OTGui\LineEditCfg.h" />
     <ClInclude Include="include\OTGui\ManagedPropertyObject.h" />
