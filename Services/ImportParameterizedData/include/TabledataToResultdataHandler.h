@@ -18,7 +18,6 @@
 #include "MetadataEntry.h"
 #include "DatasetDescription.h"
 #include "IVisualisationTable.h"
-#include "OTModelAPI/NewModelStateInformation.h"
 
 class TabledataToResultdataHandler : public BusinessLogicHandler
 {

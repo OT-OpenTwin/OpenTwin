@@ -47,8 +47,8 @@ PyObject* PythonExtensions::OT_GetScript(PyObject* _self, PyObject* _args) {
 
         PythonLoadedModules::instance().addModuleForEntity(entityInfo);
         moduleName = PythonLoadedModules::instance().getModuleName(entityInfo);
-
-        auto plainData = script->getData()->getData();
+        
+        const std::vector<char>& plainData = script->getDataEntity()->getData();
         std::string execution(plainData.begin(), plainData.end());
         CPythonObjectBorrowed  newModule(PyImport_AddModule(moduleName.value().c_str()));
         moduleImported = PyImport_ImportModule(moduleName.value().c_str());

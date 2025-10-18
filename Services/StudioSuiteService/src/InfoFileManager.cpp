@@ -33,13 +33,14 @@ void InfoFileManager::readInformation()
 
 		if (fileEntity != nullptr)
 		{
-			infoEntityID = fileEntity->getData()->getEntityID();
-			infoEntityVersion = fileEntity->getData()->getEntityStorageVersion();
+			auto fileData = fileEntity->getDataEntity();
+			infoEntityID = fileData->getEntityID();
+			infoEntityVersion = fileData->getEntityStorageVersion();
 
-			size_t size = fileEntity->getData()->getData().size();
+			size_t size = fileData->getData().size();
 
 			std::stringstream dataContent;
-			dataContent.write(fileEntity->getData()->getData().data(), size);
+			dataContent.write(fileData->getData().data(), size);
 
 			try
 			{
@@ -111,7 +112,7 @@ void InfoFileManager::getShapes(std::map<std::string, bool>& shapes)
 {
 	shapes.clear();
 
-	for (auto item : shapeHashMap)
+	for (const auto& item : shapeHashMap)
 	{
 		shapes[item.first] = false;
 	}
@@ -180,7 +181,7 @@ void InfoFileManager::writeInformation()
 	dataContent << shapeHashMap.size() << std::endl;
 
 	// And the write the data itseld
-	for (auto item : shapeHashMap)
+	for (const auto& item : shapeHashMap)
 	{
 		dataContent << item.first << std::endl; // Write the name
 		dataContent << item.second << std::endl; // Write the hash
@@ -194,7 +195,7 @@ void InfoFileManager::writeInformation()
 	// Store the entities
 	dataEntity->storeToDataBase();
 
-	fileEntity->setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+	fileEntity->setDataEntity(*dataEntity);
 	fileEntity->storeToDataBase();
 
 	// And add them to the model
@@ -207,7 +208,7 @@ void InfoFileManager::writeInformation()
 
 void InfoFileManager::addDeletedShapesToList(std::list<std::string>& list)
 {
-	for (auto shape : deletedShapes)
+	for (const auto& shape : deletedShapes)
 	{
 		std::string shapeName = "Geometry/" + shape;
 		std::replace(shapeName.begin(), shapeName.end(), '\\', '/');
@@ -245,7 +246,7 @@ void InfoFileManager::writeResult1DInformation(std::stringstream& dataContent)
 	dataContent << runIdMetaHash.size() << std::endl;
 
 	// Now write the information for each runID
-	for (auto runID : runIdMetaHash)
+	for (const auto& runID : runIdMetaHash)
 	{
 		// Write the runID
 		dataContent << runID.first << std::endl;
@@ -257,7 +258,7 @@ void InfoFileManager::writeResult1DInformation(std::stringstream& dataContent)
 		dataContent << runIdToFileNameToHash[runID.first].size() << std::endl;
 
 		// Write the information for each file
-		for (auto file : runIdToFileNameToHash[runID.first])
+		for (const auto& file : runIdToFileNameToHash[runID.first])
 		{
 			// Write the file name
 			dataContent << file.first << std::endl;

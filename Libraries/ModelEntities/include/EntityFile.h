@@ -25,9 +25,11 @@ public:
 
 	void setFileProperties(const std::string& _path, const std::string& _fileName, const std::string& _fileType);
 	
+	void setDataEntity(const EntityBase& _dataEntity) { setDataEntity(_dataEntity.getEntityID(), _dataEntity.getEntityStorageVersion()); };
+
 	//! @brief Does not reset the data entity. If a new data entity is assinged, this topology entity will still hold a reference to the old one. However, typically one would update the old data entity.
-	void setData(ot::UID _dataID, ot::UID _dataVersion);
-	std::shared_ptr<EntityBinaryData> getData();
+	void setDataEntity(ot::UID _dataID, ot::UID _dataVersion);
+	std::shared_ptr<EntityBinaryData> getDataEntity();
 
 	std::string getPath() const { return m_path; }
 	std::string getFileName() const { return m_fileName; }

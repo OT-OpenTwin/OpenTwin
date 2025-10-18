@@ -93,7 +93,7 @@ std::string NGSpice::getCircuitModelType(std::shared_ptr<EntityFileText> _circui
 
 std::string NGSpice::getCircuitModelText(std::shared_ptr<EntityFileText> _circuitModelEntity) {
 	if (_circuitModelEntity != nullptr) {
-		auto data = _circuitModelEntity->getData()->getData();
+		const std::vector<char>& data = _circuitModelEntity->getDataEntity()->getData();
 		std::string modelText(data.begin(), data.end());
 		return modelText;
 	}

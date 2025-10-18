@@ -108,11 +108,9 @@ void BatchedCategorisationHandler::addCreator()
 	importer.createProperties();
 	importer.storeToDataBase();
 	
-	ot::NewModelStateInformation newEntities;
-	newEntities.m_topologyEntityIDs.push_back(importer.getEntityID());
-	newEntities.m_topologyEntityVersions.push_back(importer.getEntityStorageVersion());
-	newEntities.m_forceVisible.push_back(false);
-
+	ot::NewModelStateInfo newEntities;
+	newEntities.addTopologyEntity(importer);
+	
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added batch importer");
 }
 

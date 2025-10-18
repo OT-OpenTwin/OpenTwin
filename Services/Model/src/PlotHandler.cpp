@@ -8,7 +8,6 @@
 #include "OTCore/LogDispatcher.h"
 #include "MetadataEntityInterface.h"
 #include "CurveFactory.h"
-#include "OTModelAPI/NewModelStateInformation.h"
 #include "OTGui/PainterRainbowIterator.h"
 #include "QueuingHttpRequestsRAII.h"
 
@@ -52,7 +51,7 @@ void PlotHandler::handleCreatePlot()
 		return;
 	}
 
-	ot::NewModelStateInformation newModelStateInformation;
+	ot::NewModelStateInfo newModelStateInformation;
 	createCurves(selectedSeriesMetadata, newModelStateInformation, plotName);
 
 
@@ -67,17 +66,10 @@ void PlotHandler::handleCreatePlot()
 	newPlot.createProperties();
 	newPlot.setPlot(plotCfg);
 	newPlot.storeToDataBase();
-	newModelStateInformation.m_topologyEntityIDs.push_back(newPlot.getEntityID());
-	newModelStateInformation.m_topologyEntityVersions.push_back(newPlot.getEntityStorageVersion());
-	newModelStateInformation.m_forceVisible.push_back(false);
+	newModelStateInformation.addTopologyEntity(newPlot);
 
 	//Store state
-	std::list<ot::UID> noDataEntities{};
-	model->addEntitiesToModel(
-		newModelStateInformation.m_topologyEntityIDs, 
-		newModelStateInformation.m_topologyEntityVersions, 
-		newModelStateInformation.m_forceVisible, 
-		noDataEntities, noDataEntities, noDataEntities, "Created new plot for existing series metadata", true, true);
+	model->addEntitiesToModel(newModelStateInformation, "Created new plot for existing series metadata", true, true);
 }
 
 void PlotHandler::handleAddCurveToPlot()
@@ -91,7 +83,7 @@ void PlotHandler::handleAddCurveToPlot()
 		return;
 	}
 	
-	ot::NewModelStateInformation newModelStateInformation, plotsForUpdate;
+	ot::NewModelStateInfo newModelStateInformation, plotsForUpdate;
 	bool storeSecond = false;
 	for (EntityResult1DPlot* selectedPlot : selectedPlots)
 	{
@@ -102,16 +94,11 @@ void PlotHandler::handleAddCurveToPlot()
 	Model* model = Application::instance()->getModel();
 	const std::string comment = "Added curves to plots";
 	 
-	std::list<ot::UID> noDataEntities{};
-	model->addEntitiesToModel(
-		newModelStateInformation.m_topologyEntityIDs,
-		newModelStateInformation.m_topologyEntityVersions,
-		newModelStateInformation.m_forceVisible,
-		noDataEntities, noDataEntities, noDataEntities, comment, !storeSecond, true);
+	model->addEntitiesToModel(newModelStateInformation, comment, !storeSecond, true);
 	
 	if (storeSecond)
 	{
-		model->updateTopologyEntities(plotsForUpdate.m_topologyEntityIDs, plotsForUpdate.m_topologyEntityVersions, comment);
+		model->updateTopologyEntities(plotsForUpdate, comment);
 	}
 	
 	for (EntityResult1DPlot* selectedPlot : selectedPlots)
@@ -205,7 +192,7 @@ std::string PlotHandler::getFreePlotName()
 	}
 }
 
-void PlotHandler::createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInformation& _modelStateInformation, const std::string& _nameBase)
+void PlotHandler::createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInfo& _modelStateInformation, const std::string& _nameBase)
 {
 	ot::PainterRainbowIterator colourIt;
 	MetadataEntityInterface metadataEntityInteraface;
@@ -228,9 +215,7 @@ void PlotHandler::createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata
 		newCurve.setCurve(curveConfig);
 		newCurve.storeToDataBase();
 
-		_modelStateInformation.m_topologyEntityIDs.push_back(newCurve.getEntityID());
-		_modelStateInformation.m_topologyEntityVersions.push_back(newCurve.getEntityStorageVersion());
-		_modelStateInformation.m_forceVisible.push_back(false);
+		_modelStateInformation.addTopologyEntity(newCurve);
 	}
 }
 

@@ -1746,28 +1746,28 @@ void Model::setShapeVisibility(std::list<ot::UID>& visibleEntityIDs, std::list<o
 	}
 }
 
-void Model::addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::list<bool>& forceVisible)
+void Model::addTopologyEntitiesToModel(std::list<EntityBase*> _entities, const std::list<bool>& _forceVisible)
 {
 	std::map<ot::UID, EntityBase*> entityMap;
 	std::map<EntityBase*, bool>forceEntityVisible;
-	auto fvIterator = forceVisible.begin();
-	for (EntityBase* entity: entities)
+	auto fvIterator = _forceVisible.begin();
+	for (EntityBase* entity: _entities)
 	{
 		forceEntityVisible[entity] = *fvIterator;
 		fvIterator++;
 	}
 
 	// We sort the entitylist by the length of the name. This ensures that potential parents are added before their childs are added
-	entities.sort([](EntityBase* e1, EntityBase* e2)
+	_entities.sort([](EntityBase* e1, EntityBase* e2)
 	{
 		return e1->getName().size() < e2->getName().size();
 	});
 
 	// We need to get a list of all top level entities only
-	std::list<EntityBase*> topLevelEntities = getTopLevelEntitiesByName(entities);
+	std::list<EntityBase*> topLevelEntities = getTopLevelEntitiesByName(_entities);
 	std::set<EntityBase*> topLevelEntitySet(std::begin(topLevelEntities), std::end(topLevelEntities));
 
-	for (EntityBase* entity : entities) {
+	for (EntityBase* entity : _entities) {
 
 		// We only need to add visualization containers above the top level entities if needed, since
 		// all containers below the top level entities are part of the model and therefore are children of the top
@@ -1814,7 +1814,7 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::li
 	// Here we need to ensure that the entities with the force visible flag are visible
 
 	ot::UIDList visibleEntityID;
-	for (EntityBase* entity : entities)
+	for (EntityBase* entity : _entities)
 	{
 		if (forceEntityVisible[entity] && entity->getInitiallyHidden())
 		{
@@ -3810,22 +3810,35 @@ std::list<ot::UID> Model::getIDsOfFolderItemsOfType(const std::string &folder, c
 }
 
 
-void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible,
-							   std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList,
-							   const std::string &description, bool saveModel, bool askForCreationOfBranch)
+void Model::addEntitiesToModel(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _description, bool _saveModel, bool _askForCreationOfBranch) {
+	addEntitiesToModel(
+		_modelStateInfo.getTopologyEntityIDs(),
+		_modelStateInfo.getTopologyEntityVersions(),
+		_modelStateInfo.getTopologyForceVisible(),
+		_modelStateInfo.getDataEntityIDs(),
+		_modelStateInfo.getDataEntityVersions(),
+		_modelStateInfo.getDataEntityParentIDs(),
+		_description, _saveModel, _askForCreationOfBranch
+	);
+}
+
+void Model::addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, const std::list<ot::UID>& _topologyEntityVersionList, const std::list<bool>& _topologyEntityForceVisible,
+	const std::list<ot::UID>& _dataEntityIDList, const std::list<ot::UID>& _dataEntityVersionList, const std::list<ot::UID>& _dataEntityParentList, 
+	const std::string& _description, bool _saveModel, bool _askForCreationOfBranch)
 {
 	enableQueuingHttpRequests(true);
 
-	assert(topologyEntityIDList.size() == topologyEntityVersionList.size());
-	assert(dataEntityIDList.size() == dataEntityVersionList.size());
-	assert(dataEntityIDList.size() == dataEntityParentList.size());
+	OTAssert(_topologyEntityIDList.size() == _topologyEntityVersionList.size(), "Topology ID and Version size mismatch");
+	OTAssert(_topologyEntityIDList.size() == _topologyEntityForceVisible.size(), "Topology ID and Force Visible size mismatch");
+	OTAssert(_dataEntityIDList.size() == _dataEntityVersionList.size(), "Data ID and Version size mismatch");
+	OTAssert(_dataEntityIDList.size() == _dataEntityParentList.size(), "Data ID and Parent size mismatch");
 
 	// First of all, we deal with all the data entities and add them to the model state
 
-	auto entityVersion = dataEntityVersionList.begin();
-	auto parentID = dataEntityParentList.begin();
+	auto entityVersion = _dataEntityVersionList.begin();
+	auto parentID = _dataEntityParentList.begin();
 
-	for (auto entityID : dataEntityIDList)
+	for (ot::UID entityID : _dataEntityIDList)
 	{
 		getStateManager()->storeEntity(entityID, *parentID, *entityVersion, ModelStateEntity::tEntityType::DATA);
 		setModified();
@@ -3838,8 +3851,8 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 
 	// Prefetch all entities for faster loading
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
-	auto version = topologyEntityVersionList.begin();
-	for (auto id : topologyEntityIDList)
+	auto version = _topologyEntityVersionList.begin();
+	for (ot::UID id : _topologyEntityIDList)
 	{
 		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(id, *version));
 		version++;
@@ -3850,9 +3863,9 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 	std::list<EntityBase *> entityList;
 	std::list<ot::UID> removeFromDisplay;
 
-	version = topologyEntityVersionList.begin();
+	version = _topologyEntityVersionList.begin();
 
-	for (auto id : topologyEntityIDList)
+	for (ot::UID id : _topologyEntityIDList)
 	{
 		EntityBase *entity = readEntityFromEntityIDandVersion(nullptr, id, *version, entityMap);
 		assert(entity != nullptr);
@@ -3894,16 +3907,16 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 		removeShapesFromVisualization(removeFromDisplay);
 	}
 
-	addTopologyEntitiesToModel(entityList, topologyEntityForceVisible);
+	addTopologyEntitiesToModel(entityList, _topologyEntityForceVisible);
 
 	// Finally refresh the views and save the new model state
 	
 	refreshAllViews();
 	enableQueuingHttpRequests(false);
 
-	if (saveModel)
+	if (_saveModel)
 	{
-		modelChangeOperationCompleted(description, askForCreationOfBranch);
+		modelChangeOperationCompleted(_description, _askForCreationOfBranch);
 	}
 }
 
@@ -4270,25 +4283,29 @@ void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot:
 	geomEntity->addVisualizationNodes();
 }
 
-void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topoEntityVersions, const std::string& comment)
+void Model::updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment) {
+	updateTopologyEntities(_modelStateInfo.getTopologyEntityIDs(), _modelStateInfo.getTopologyEntityVersions(), _comment);
+}
+
+void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::UIDList& _topoEntityVersion, const std::string& _comment)
 {
 	enableQueuingHttpRequests(true);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
-	auto version = topoEntityVersions.begin();
-	for (auto id : topoEntityIDs)
+	auto version = _topoEntityVersion.begin();
+	for (auto id : _topoEntityID)
 	{
 		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(id, *version));
 		version++;
 	}
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
 
-	auto topoEntityVersion = topoEntityVersions.begin();
+	auto topoEntityVersion = _topoEntityVersion.begin();
 	std::list<ot::UID> removeFromDisplay;
 	std::list<EntityBase*> entityList;
 	std::list<bool> topologyEntityForceVisible;
 	const bool considerDependingDataEntities = false;
-	for (ot::UID topoEntityID : topoEntityIDs)
+	for (ot::UID topoEntityID : _topoEntityID)
 	{
 		std::map<ot::UID, EntityBase*> map;
 		EntityBase* newEntity = readEntityFromEntityIDandVersion(nullptr, topoEntityID, *topoEntityVersion, map);
@@ -4365,7 +4382,7 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 
 	refreshAllViews();
 	enableQueuingHttpRequests(false);
-	modelChangeOperationCompleted(comment);
+	modelChangeOperationCompleted(_comment);
 }
 
 void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)

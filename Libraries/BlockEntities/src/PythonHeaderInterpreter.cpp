@@ -21,7 +21,7 @@ bool PythonHeaderInterpreter::interprete(std::shared_ptr<EntityFile> pythonScrip
 	_allConnectors.clear();
 	_allProperties.clear();
 
-	auto& fileContent = pythonScript->getData()->getData();
+	const auto& fileContent = pythonScript->getDataEntity()->getData();
 	std::string script(fileContent.begin(), fileContent.end());
 	std::istringstream scriptStream(script);
 	std::string scriptLine;

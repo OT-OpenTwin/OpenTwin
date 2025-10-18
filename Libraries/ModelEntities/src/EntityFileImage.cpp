@@ -24,7 +24,7 @@ bool EntityFileImage::updateFromProperties() {
 }
 
 void EntityFileImage::setImage(std::vector<char>&& _image, ot::ImageFileFormat _format) {
-	auto dataEntity = getData();
+	auto dataEntity = getDataEntity();
 
 	if (dataEntity != nullptr) {
 		dataEntity->setData(std::move(_image));
@@ -32,11 +32,11 @@ void EntityFileImage::setImage(std::vector<char>&& _image, ot::ImageFileFormat _
 
 		if (getModelState() != nullptr) {
 			dataEntity->storeToDataBase();
-			setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
-			getModelState()->modifyEntityVersion(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+			setDataEntity(*dataEntity);
+			getModelState()->modifyEntityVersion(*dataEntity);
 			
 			this->storeToDataBase();
-			getModelState()->modifyEntityVersion(this->getEntityID(), this->getEntityStorageVersion());
+			getModelState()->modifyEntityVersion(*this);
 		}
 		else {
 			setModified();
@@ -45,7 +45,7 @@ void EntityFileImage::setImage(std::vector<char>&& _image, ot::ImageFileFormat _
 }
 
 const std::vector<char>& EntityFileImage::getImage() {
-	auto dataEntity = getData();
+	auto dataEntity = getDataEntity();
 	if (!dataEntity) {
 		throw ot::Exception::ObjectNotFound("EntityFileImage::getImage: Data entity not found");
 	}

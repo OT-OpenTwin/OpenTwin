@@ -13,6 +13,7 @@
 #include "OTGui/FileExtension.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelAPI/NewModelStateInfo.h"
 #include "OTServiceFoundation/Encryption.h"
 #include "EntityAPI.h"
 #include "EntityFileImage.h"
@@ -175,51 +176,51 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 		return false;
 	}
 
-	ot::NewModelStateInformation newModelStateInfos;
-
 	if (projectEntity->hasPreviewFile()) {
+		ot::NewModelStateInfo update;
+
 		// Update existing image
 		projectEntity->setPreviewFile(std::move(fileData), format);
 		projectEntity->storeToDataBase();
 
-		ot::ModelServiceAPI::updateTopologyEntities({ projectEntity->getEntityID() }, { projectEntity->getEntityStorageVersion() }, "Changed image of project item");
+		update.addTopologyEntity(*projectEntity);
+
+		ot::ModelServiceAPI::updateTopologyEntities(update, "Changed image of project item");
 	}
 	else {
 		const std::string serviceName = Application::instance().getServiceName();
+		ot::NewModelStateInfo newData;
+		ot::NewModelStateInfo existingTopo;
 
 		// No previous image existing, create new one
 
 		// Create file data entity
-		EntityBinaryData* fileDataEntity = new EntityBinaryData;
-		fileDataEntity->setOwningService(serviceName);
-		fileDataEntity->setName(CreateNewUniqueTopologyName(projectEntity->getName(), "ImageData"));
-		fileDataEntity->setEntityID(_modelComponent->createEntityUID());
-		fileDataEntity->setData(unpackedData.c_str(), unpackedData.size());
-		fileDataEntity->storeToDataBase();
-
-		newModelStateInfos.m_dataEntityIDs.push_back(fileDataEntity->getEntityID());
-		newModelStateInfos.m_dataEntityParentIDs.push_back(projectEntity->getEntityID());
-		newModelStateInfos.m_dataEntityVersions.push_back(fileDataEntity->getEntityStorageVersion());
+		EntityBinaryData imageDataEntity;
+		imageDataEntity.setOwningService(serviceName);
+		//imageDataEntity.setName(CreateNewUniqueTopologyName(imageEntity->getName(), "ImageData"));
+		imageDataEntity.setEntityID(_modelComponent->createEntityUID());
+		imageDataEntity.setData(unpackedData.c_str(), unpackedData.size());
+		imageDataEntity.storeToDataBase();
 
 		// Create file entity
-		EntityFileImage* imageEntity = new EntityFileImage;
-		imageEntity->setOwningService(serviceName);
-		imageEntity->setName(CreateNewUniqueTopologyName(projectEntity->getName(), "Image"));
-		imageEntity->setEntityID(_modelComponent->createEntityUID());
-		imageEntity->setImageFormat(format);
-		imageEntity->setData(fileDataEntity->getEntityID(), fileDataEntity->getEntityStorageVersion());		
-		imageEntity->storeToDataBase();
+		EntityFileImage imageEntity;
+		imageEntity.setOwningService(serviceName);
+		//imageEntity.setName(CreateNewUniqueTopologyName(projectEntity->getName(), "Image"));
+		imageEntity.setEntityID(_modelComponent->createEntityUID());
+		imageEntity.setImageFormat(format);
+		imageEntity.setDataEntity(imageDataEntity);
+		imageEntity.storeToDataBase();
 
-		newModelStateInfos.m_topologyEntityIDs.push_back(imageEntity->getEntityID());
-		newModelStateInfos.m_topologyEntityVersions.push_back(imageEntity->getEntityStorageVersion());
-		newModelStateInfos.m_forceVisible.push_back(false);
+		newData.addDataEntity(*projectEntity, imageEntity);
+		newData.addDataEntity(*projectEntity, imageDataEntity);
 
 		// Set preview file in project entity
-		projectEntity->setPreviewFile(imageEntity->getEntityID(), imageEntity->getEntityStorageVersion());
+		projectEntity->setPreviewFile(imageEntity);
 		projectEntity->storeToDataBase();
+		existingTopo.addTopologyEntity(*projectEntity);
 
-		ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfos, "Added image to project item", true, false);
-		ot::ModelServiceAPI::updateTopologyEntities({ projectEntity->getEntityID() }, { projectEntity->getEntityStorageVersion() }, "Set preview image for project item");
+		ot::ModelServiceAPI::addEntitiesToModel(newData, "Added image to project item", true, false);
+		ot::ModelServiceAPI::updateTopologyEntities(existingTopo, "Set preview image for project item");
 	}
 
 	return true;

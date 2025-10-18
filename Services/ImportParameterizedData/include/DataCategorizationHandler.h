@@ -27,7 +27,7 @@
 #include <string>
 #include <memory>
 #include <set>
-#include "OTModelAPI/NewModelStateInformation.h"
+#include "OTModelAPI/NewModelStateInfo.h"
 
 class DataCategorizationHandler : public BusinessLogicHandler
 {
@@ -74,6 +74,6 @@ private:
 	void requestRangeSelection(const std::string& _tableName);
 
 	std::string determineDataTypeOfSelectionRanges(IVisualisationTable* _table,const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType, ot::TableCfg::TableHeaderMode _headerMode);
-	void logWarnings(std::map<std::string, std::string>& _logMessagesByErrorType, ot::NewModelStateInformation& _entityInfos);
+	void logWarnings(std::map<std::string, std::string>& _logMessagesByErrorType, ot::NewModelStateInfo& _entityInfos);
 	std::map<std::string, ot::UID> getAllScripts();
 };

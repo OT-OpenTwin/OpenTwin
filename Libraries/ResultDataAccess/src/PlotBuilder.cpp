@@ -2,7 +2,6 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityResult1DPlot.h"
 
-#include "OTModelAPI/ModelStateInformationHelper.h"
 #include "MetadataSeries.h"
 #include "AdvancedQueryBuilder.h"
 #include "OTGui/QueryInformation.h"
@@ -143,6 +142,7 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 	plotEntity.setPlot(_plotCfg);
 	plotEntity.setEditable(true);
 	plotEntity.storeToDataBase();
+	m_newModelStateInformation.addTopologyEntity(plotEntity);
 
 	for (EntityResult1DCurve& curve : m_curves)
 	{
@@ -154,10 +154,6 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 		}
 
 		curve.storeToDataBase();
-		ModelStateInformationHelper::addTopologyEntity(m_newModelStateInformation, curve);
+		m_newModelStateInformation.addTopologyEntity(curve);
 	}
-	
-	m_newModelStateInformation.m_topologyEntityIDs.insert(m_newModelStateInformation.m_topologyEntityIDs.begin(), plotEntity.getEntityID());
-	m_newModelStateInformation.m_topologyEntityVersions.insert(m_newModelStateInformation.m_topologyEntityVersions.begin(), plotEntity.getEntityStorageVersion());
-	m_newModelStateInformation.m_forceVisible.push_back(false);
 }

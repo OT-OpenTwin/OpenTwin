@@ -69,7 +69,7 @@ ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding()
 std::string EntityFileText::getText(void) 
 {
 	OT_TEST_ENTITYFILETEXT_Interval("Get text");
-	const std::vector<char> plainData = getData()->getData();
+	const std::vector<char> plainData = getDataEntity()->getData();
 	std::string textFromBinary(plainData.begin(), plainData.end());
 
 	ot::TextEncoding::EncodingStandard encoding = getTextEncoding();
@@ -99,7 +99,7 @@ std::string EntityFileText::getText(void)
 
 void EntityFileText::setText(const std::string& _text)
 {
-	auto dataEntity = getData();
+	auto dataEntity = getDataEntity();
 	if (dataEntity != nullptr)
 	{
 		dataEntity->clearData();
@@ -109,10 +109,10 @@ void EntityFileText::setText(const std::string& _text)
 		if (getModelState() != nullptr)
 		{
 			dataEntity->storeToDataBase();
-			setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
-			getModelState()->modifyEntityVersion(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+			setDataEntity(*dataEntity);
+			getModelState()->modifyEntityVersion(*dataEntity);
 			this->storeToDataBase();
-			getModelState()->modifyEntityVersion(this->getEntityID(), this->getEntityStorageVersion());
+			getModelState()->modifyEntityVersion(*this);
 		}
 		else
 		{

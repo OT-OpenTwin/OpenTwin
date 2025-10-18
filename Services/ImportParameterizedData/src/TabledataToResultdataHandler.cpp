@@ -15,6 +15,7 @@
 #include "OTServiceFoundation/ProgressUpdater.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelAPI/NewModelStateInfo.h"
 
 #include "ResultCollectionExtender.h"
 #include "MetadataEntryArray.h"
@@ -393,15 +394,13 @@ void TabledataToResultdataHandler::extractAllQuantities(std::map<std::string, Me
 
 void TabledataToResultdataHandler::unsetConsiderForImport(MetadataAssemblyData& _metadataAssemblyData)
 {
-	ot::NewModelStateInformation newModelEntities;
+	ot::NewModelStateInfo newModelEntities;
 
 	for (auto range : _metadataAssemblyData.m_allSelectionRanges)
 	{
 		range->setConsiderForImport(false);
 		range->storeToDataBase();
-		newModelEntities.m_topologyEntityIDs.push_back(range->getEntityID());
-		newModelEntities.m_topologyEntityVersions.push_back(range->getEntityStorageVersion());
-		newModelEntities.m_forceVisible.push_back(false);
+		newModelEntities.addTopologyEntity(*range);
 	}
 
 	if (_metadataAssemblyData.m_next != nullptr)
@@ -412,9 +411,7 @@ void TabledataToResultdataHandler::unsetConsiderForImport(MetadataAssemblyData& 
 		{
 			range->setConsiderForImport(false);
 			range->storeToDataBase();
-			newModelEntities.m_topologyEntityIDs.push_back(range->getEntityID());
-			newModelEntities.m_topologyEntityVersions.push_back(range->getEntityStorageVersion());
-			newModelEntities.m_forceVisible.push_back(false);
+			newModelEntities.addTopologyEntity(*range);
 		}
 
 		if (quantity->m_next != nullptr)
@@ -424,9 +421,7 @@ void TabledataToResultdataHandler::unsetConsiderForImport(MetadataAssemblyData& 
 			{
 				range->setConsiderForImport(false);
 				range->storeToDataBase();
-				newModelEntities.m_topologyEntityIDs.push_back(range->getEntityID());
-				newModelEntities.m_topologyEntityVersions.push_back(range->getEntityStorageVersion());
-				newModelEntities.m_forceVisible.push_back(false);
+				newModelEntities.addTopologyEntity(*range);
 			}
 		}
 	}

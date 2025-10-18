@@ -570,7 +570,7 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 					// This file exists in the cache
 					cacheFiles[correspondingCacheFile] = true; // This file is still present
 
-					auto cacheFileTimeStamp = cacheFileWriteTimes[correspondingCacheFile];
+					std::filesystem::file_time_type cacheFileTimeStamp = cacheFileWriteTimes[correspondingCacheFile];
 					auto newFileTimeStamp = std::filesystem::last_write_time(path);
 
 					if (newFileTimeStamp > cacheFileTimeStamp)
@@ -599,7 +599,7 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 
 	// Now we check whether there are any files in the cache which do not exist anymore
 	std::string fileNamePrefix = "Files/" + std::filesystem::path(baseProjectName).filename().string() + "/Result";
-	for (auto file : cacheFiles)
+	for (const auto& file : cacheFiles)
 	{
 		if (!file.second)
 		{
@@ -739,7 +739,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 	int fileCount = 0;
 	int lastPercent = 15;
 
-	for (auto file : uploadFileList)
+	for (const auto& file : uploadFileList)
 	{
 		ot::UID dataEntityID = entityIDList.front(); entityIDList.pop_front();
 		ot::UID fileEntityID = entityIDList.front(); entityIDList.pop_front();
@@ -782,7 +782,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 
 		fileEntity->setName("Files/" + pathName);
 		fileEntity->setFileProperties(pathName, filePath.filename().string(), "Absolute");
-		fileEntity->setData(dataEntityID, dataVersion);
+		fileEntity->setDataEntity(dataEntityID, dataVersion);
 		fileEntity->setEditable(false);
 
 		fileEntity->storeToDataBase(fileVersion);
@@ -824,7 +824,7 @@ void ProjectManager::commitNewVersion(const std::string &changeMessage)
 	std::list<ot::UID> dataEntityIDList;
 	std::list<ot::UID> dataVersionList;
 
-	for (auto item : newOrModifiedFiles)
+	for (const auto& item : newOrModifiedFiles)
 	{
 		fileNameList.push_back(item.first);
 		fileEntityIDList.push_back(item.second.first);
@@ -937,7 +937,7 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 	int shapeCount = 0;
 	int lastPercent = 70;
 
-	for (auto shape : trianglesMap)
+	for (const auto& shape : trianglesMap)
 	{
 		std::string fileContent;
 		readFileContent(projectRoot + "/Temp/Upload/stl" + std::to_string(shape.second) + ".stl", fileContent);
@@ -1020,7 +1020,7 @@ std::string ProjectManager::calculateHash(const std::string& fileContent)
 
 	// Now get the list into a string
 	std::stringstream data;
-	for (auto item : vertexList)
+	for (const auto& item : vertexList)
 	{
 		data << item;
 	}
@@ -1268,7 +1268,7 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 	// Here we have a progress range from 20-90
 	int entityCount = 0;
 	int lastPercent = 20;
-	for (auto entity : prefetchIDs)
+	for (const auto& entity : prefetchIDs)
 	{
 		// Download a single cache file
 		success &= downloadFile(cacheFolderVersion, entity.first, entity.second);
@@ -1321,7 +1321,7 @@ bool ProjectManager::downloadFile(const std::string &cacheFolderVersion, ot::UID
 
 	if (fileEntity != nullptr)
 	{
-		size_t size = fileEntity->getData()->getData().size();
+		size_t size = fileEntity->getDataEntity()->getData().size();
 
 		std::string entityPath = fileEntity->getPath();
 		size_t index = entityPath.find('/');
@@ -1334,7 +1334,7 @@ bool ProjectManager::downloadFile(const std::string &cacheFolderVersion, ot::UID
 		std::filesystem::create_directories(parentFolder);
 
 		std::ofstream dataFile(fileName, std::ios::binary);
-		dataFile.write(fileEntity->getData()->getData().data(), size);
+		dataFile.write(fileEntity->getDataEntity()->getData().data(), size);
 		dataFile.close();
 
 		delete fileEntity;

@@ -33,7 +33,7 @@ void TableExtractorCSV::ExtractFromEntitySource(EntityFile* source)
 	_rowDelimiter =	csvSource->getRowDelimiter()[0];
 	_columnDelimiter = csvSource->getColumnDelimiter()[0];
 
-	const std::vector<char>& fileContent =	source->getData()->getData();
+	const std::vector<char>& fileContent = source->getDataEntity()->getData();
 	
 	ot::TextEncoding::EncodingStandard selectedEncodingStandard = csvSource->getTextEncoding();
 	if (selectedEncodingStandard == ot::TextEncoding::EncodingStandard::ANSI)

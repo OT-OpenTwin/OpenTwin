@@ -144,9 +144,7 @@ void ot::ModelServiceAPI::getAvailableScripts(std::string& _scriptFolderName, UI
 }
 
 
-void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>& _topologyEntityIDList, std::list<UID>& _topologyEntityVersionList, std::list<bool>& _topologyEntityForceVisible,
-	std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList,
-	const std::string& _changeComment, bool askForBranchCreation, bool saveModel) {
+void ot::ModelServiceAPI::addEntitiesToModel(const std::list<UID>& _topologyEntityIDList, const std::list<UID>& _topologyEntityVersionList, const std::list<bool>& _topologyEntityForceVisible, const std::list<UID>& _dataEntityIDList, const std::list<UID>& _dataEntityVersionList, const std::list<UID>& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation, bool saveModel) {
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddEntities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityIDList, JsonArray(_topologyEntityIDList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -182,15 +180,15 @@ void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>&& _topologyEntityIDL
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
-void ot::ModelServiceAPI::addEntitiesToModel(NewModelStateInformation& _newModelStateInfos, const std::string& _changeComment, bool askForBranchCreation, bool saveModel)
+void ot::ModelServiceAPI::addEntitiesToModel(const NewModelStateInfo& _newModelStateInfos, const std::string& _changeComment, bool _askForBranchCreation, bool _saveModel)
 {
-	addEntitiesToModel(_newModelStateInfos.m_topologyEntityIDs,
-		_newModelStateInfos.m_topologyEntityVersions,
-		_newModelStateInfos.m_forceVisible,
-		_newModelStateInfos.m_dataEntityIDs,
-		_newModelStateInfos.m_dataEntityVersions,
-		_newModelStateInfos.m_dataEntityParentIDs,
-		_changeComment, askForBranchCreation, saveModel);
+	addEntitiesToModel(_newModelStateInfos.getTopologyEntityIDs(),
+		_newModelStateInfos.getTopologyEntityVersions(),
+		_newModelStateInfos.getTopologyForceVisible(),
+		_newModelStateInfos.getDataEntityIDs(),
+		_newModelStateInfos.getDataEntityVersions(),
+		_newModelStateInfos.getDataEntityParentIDs(),
+		_changeComment, _askForBranchCreation, _saveModel);
 }
 
 void ot::ModelServiceAPI::addGeometryOperation(UID _newEntityID, UID _newEntityVersion, std::string _newEntityName,
@@ -581,6 +579,10 @@ void ot::ModelServiceAPI::getEntityProperties(const std::string& entityName, boo
 
 		prop++;
 	}
+}
+
+void ot::ModelServiceAPI::updateTopologyEntities(const NewModelStateInfo& _updatedEntities, const std::string& _comment) {
+	updateTopologyEntities(_updatedEntities.getTopologyEntityIDs(), _updatedEntities.getTopologyEntityVersions(), _comment);
 }
 
 void ot::ModelServiceAPI::updateTopologyEntities(const ot::UIDList& topologyEntityIDs, const ot::UIDList& topologyEntityVersions, const std::string& comment) {

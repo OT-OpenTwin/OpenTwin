@@ -17,6 +17,7 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
+#include "OTModelAPI/NewModelStateInfo.h"
 #include "OTServiceFoundation/UiComponent.h"
 
 class EntityMesh;
@@ -160,7 +161,8 @@ public:
 	void versionDeselected();
 	void setVersionLabel(const std::string& version, const std::string& label);
 
-	void addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, const std::string &description, bool saveModel, bool askForCreationOfBranch);
+	void addEntitiesToModel(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _description, bool _saveModel, bool _askForCreationOfBranch);
+	void addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, const std::list<ot::UID>& _topologyEntityVersionList, const std::list<bool>& _topologyEntityForceVisible, const std::list<ot::UID>& _dataEntityIDList, const std::list<ot::UID>& _dataEntityVersionList, const std::list<ot::UID>& _dataEntityParentList, const std::string& _description, bool _saveModel, bool _askForCreationOfBranch);
 	void addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion, const std::string &geomEntityName, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, std::list<std::string> &childrenList, const std::string &description);
 	void deleteEntitiesFromModel(const ot::UIDList& _entityIDList, bool _saveModel);
 	void deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel);
@@ -168,11 +170,13 @@ public:
 	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties);
 	
+	void updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment);
+
 	//! @brief Performs an update on a topology entity. The updated entity replaces its old version in the entity map and redirects all parent/child relationships to the updated entity.,
 	//! @param topoEntityID 
 	//! @param topoEntityVersion 
 	//! @param comment 
-	void updateTopologyEntities(ot::UIDList& topoEntityID, ot::UIDList& topoEntityVersion, const std::string& comment);
+	void updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::UIDList& _topoEntityVersion, const std::string& _comment);
 	void requestUpdateVisualizationEntity(ot::UID visEntityID);
 	std::list<ot::UID> getNewEntityIDs(unsigned long long count);
 	std::list<std::string> getListOfFolderItems(const std::string &folder, bool recursive);
@@ -277,7 +281,7 @@ private:
 	size_t getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geometryEntities);
 	std::list<EntityBase*> getListOfEntitiesToConsiderForPropertyChange(const std::list<EntityBase*>& entities);
 	void getEntityProperties(EntityBase* entity, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, ot::PropertyGridCfg>& _entityProperties);
-	void addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::list<bool>& forceVisible);
+	void addTopologyEntitiesToModel(std::list<EntityBase*> entities, const std::list<bool>& forceVisible);
 	void removeParentsOfProtected(std::list<EntityBase*>& unprotectedEntities, const std::list<EntityBase*>& protectedEntities);
 	std::list<EntityBase*> FindTopLevelBlockEntities(std::list<EntityBase*>& entityID);
 	std::list<EntityBase*> getTopLevelEntitiesByName(std::list<EntityBase*> entities);

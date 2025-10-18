@@ -17,7 +17,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/PainterRainbowIterator.h"
 #include "CurveFactory.h"
-#include "OTModelAPI/NewModelStateInformation.h"
+#include "OTModelAPI/NewModelStateInfo.h"
 #include "EntityResult1DPlot.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
@@ -57,7 +57,7 @@ bool BlockHandlerStorage::executeSpecialized()
 			
 			plotName += blockNameShort;
 		}
-		ot::NewModelStateInformation modelStateInformation;
+		ot::NewModelStateInfo modelStateInformation;
 
 		const auto modelComponent = Application::instance()->getModelComponent();
 		const std::string collectionName = Application::instance()->getCollectionName();
@@ -278,9 +278,7 @@ bool BlockHandlerStorage::executeSpecialized()
 				newCurve.setCurve(curveConfig);
 				newCurve.storeToDataBase();
 
-				modelStateInformation.m_topologyEntityIDs.push_back(newCurve.getEntityID());
-				modelStateInformation.m_topologyEntityVersions.push_back(newCurve.getEntityStorageVersion());
-				modelStateInformation.m_forceVisible.push_back(false);
+				modelStateInformation.addTopologyEntity(newCurve);
 			}
 		}
 		
@@ -295,17 +293,10 @@ bool BlockHandlerStorage::executeSpecialized()
 			newPlot.createProperties();
 			newPlot.setPlot(plotCfg);
 			newPlot.storeToDataBase();
-			modelStateInformation.m_topologyEntityIDs.push_back(newPlot.getEntityID());
-			modelStateInformation.m_topologyEntityVersions.push_back(newPlot.getEntityStorageVersion());
-			modelStateInformation.m_forceVisible.push_back(false);
+			modelStateInformation.addTopologyEntity(newPlot);
 
 			//Store state
-			std::list<ot::UID> noDataEntities{};
-			ot::ModelServiceAPI::addEntitiesToModel(
-				modelStateInformation.m_topologyEntityIDs,
-				modelStateInformation.m_topologyEntityVersions,
-				modelStateInformation.m_forceVisible,
-				noDataEntities, noDataEntities, noDataEntities, "Created new plot for existing series metadata", true, true);
+			ot::ModelServiceAPI::addEntitiesToModel(modelStateInformation, "Created new plot for existing series metadata", true, true);
 		}
 		
 		return true;

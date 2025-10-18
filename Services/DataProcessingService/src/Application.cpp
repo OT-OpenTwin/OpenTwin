@@ -100,10 +100,8 @@ void Application::createPipeline()
 	newDataprocessing.setEditable(true);
 	newDataprocessing.storeToDataBase();
 
-	ot::NewModelStateInformation infos;
-	infos.m_topologyEntityIDs.push_back(newDataprocessing.getEntityID());
-	infos.m_topologyEntityVersions.push_back(newDataprocessing.getEntityStorageVersion());
-	infos.m_forceVisible.push_back(false);
+	ot::NewModelStateInfo infos;
+	infos.addTopologyEntity(newDataprocessing);
 	ot::ModelServiceAPI::addEntitiesToModel(infos, "Added pipeline");
 }
 
@@ -125,10 +123,8 @@ void Application::createSolver()
 	newSolver.setName(entityName);
 
 	newSolver.storeToDataBase();
-	ot::NewModelStateInformation entityInfos;
-	entityInfos.m_topologyEntityIDs.push_back(newSolver.getEntityID());
-	entityInfos.m_topologyEntityVersions.push_back(newSolver.getEntityStorageVersion());
-	entityInfos.m_forceVisible.push_back(false);
+	ot::NewModelStateInfo entityInfos;
+	entityInfos.addTopologyEntity(newSolver);
 	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added solver");
 
 }

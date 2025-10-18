@@ -268,7 +268,7 @@ void DataCategorizationHandler::handleChategorisationLock(const std::list<ot::En
 		}
 	}
 	Application::instance()->prefetchDocumentsFromStorage(selectedCategorisations);
-	ot::NewModelStateInformation updatedEntities;
+	ot::NewModelStateInfo updatedEntities;
 	for (ot::UID selectedChategorisation : selectedCategorisations)
 	{
 		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedChategorisation, Application::instance()->getPrefetchedEntityVersion(selectedChategorisation));
@@ -279,14 +279,12 @@ void DataCategorizationHandler::handleChategorisationLock(const std::list<ot::En
 			
 			categorisation->setLock(_lock);
 			categorisation->storeToDataBase();
-			updatedEntities.m_topologyEntityIDs.push_back(categorisation->getEntityID());
-			updatedEntities.m_topologyEntityVersions.push_back(categorisation->getEntityStorageVersion());
-			updatedEntities.m_forceVisible.push_back(false);
+			updatedEntities.addTopologyEntity(*categorisation);
 		}
 	}
-	if (updatedEntities.m_topologyEntityIDs.size() > 0)
+	if (updatedEntities.hasTopologyEntities())
 	{
-		ot::ModelServiceAPI::updateTopologyEntities(updatedEntities.m_topologyEntityIDs, updatedEntities.m_topologyEntityVersions, stateChange);
+		ot::ModelServiceAPI::updateTopologyEntities(updatedEntities, stateChange);
 	}
 }
 
@@ -400,7 +398,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		return;
 	}
 	std::unique_ptr<IVisualisationTable> tableEntPtr(tableEntity);
-	ot::NewModelStateInformation entityInfos;
+	ot::NewModelStateInfo entityInfos;
 	
 	std::list<std::string> takenNames;
 
@@ -513,9 +511,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 			tableRange->setName(name);
 
 			tableRange->storeToDataBase();
-			entityInfos.m_topologyEntityIDs.push_back(tableRange->getEntityID());
-			entityInfos.m_topologyEntityVersions.push_back(tableRange->getEntityStorageVersion());
-			entityInfos.m_forceVisible.push_back(false);
+			entityInfos.addTopologyEntity(*tableRange);
 		}
 	}
 
@@ -523,9 +519,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	for (auto categoryEntity : m_markedForStorringEntities)
 	{
 		categoryEntity->storeToDataBase();
-		entityInfos.m_topologyEntityIDs.push_back(categoryEntity->getEntityID());
-		entityInfos.m_topologyEntityVersions.push_back(categoryEntity->getEntityStorageVersion());
-		entityInfos.m_forceVisible.push_back(false);
+		entityInfos.addTopologyEntity(*categoryEntity);
 	}
 
 	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "added new table selection range");
@@ -637,7 +631,7 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 	return typeName;
 }
 
-void DataCategorizationHandler::logWarnings(std::map<std::string, std::string>& _logMessagesByErrorType, ot::NewModelStateInformation& _entityInfos)
+void DataCategorizationHandler::logWarnings(std::map<std::string, std::string>& _logMessagesByErrorType, ot::NewModelStateInfo& _entityInfos)
 {	
 	if (!_logMessagesByErrorType.empty())
 	{
@@ -654,12 +648,9 @@ void DataCategorizationHandler::logWarnings(std::map<std::string, std::string>& 
 		const std::string logFileName = ot::FolderNames::DataCategorisationFolder + "/Table cells analysation log";
 		logText.setName(logFileName);
 		logText.storeToDataBase();
-		_entityInfos.m_dataEntityIDs.push_back(logText.getTextDataStorageId());
-		_entityInfos.m_dataEntityVersions.push_back(logText.getTextDataStorageVersion());
-		_entityInfos.m_dataEntityParentIDs.push_back(logText.getEntityID());
-		_entityInfos.m_topologyEntityIDs.push_back(logText.getEntityID());
-		_entityInfos.m_topologyEntityVersions.push_back(logText.getEntityStorageVersion());
-		_entityInfos.m_forceVisible.push_back(false);
+
+		_entityInfos.addDataEntity(logText, logText.getTextDataStorageId(), logText.getTextDataStorageVersion());
+		_entityInfos.addTopologyEntity(logText);
 
 		OT_LOG_W("While analysing the table selection classifications, certain issues were detected. Details are listed in the file: \"Table cells analysation log\"");
 	}

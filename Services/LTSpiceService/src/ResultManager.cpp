@@ -44,7 +44,7 @@ void ResultManager::getParametricCombinations(const std::string& logFileName, st
 	EntityFile* fileEntity = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion()));
 	if (fileEntity == nullptr) return;
 
-	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();
+	std::shared_ptr<EntityBinaryData> data = fileEntity->getDataEntity();
 	if (data == nullptr) return;
 
 	std::vector<char> logFileData = data->getData();
@@ -101,7 +101,7 @@ void ResultManager::extractResults(const std::string &ltSpicefileNameBase)
 	EntityFile* fileEntity = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion()));
 	if (fileEntity == nullptr) return;
 
-	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();
+	std::shared_ptr<EntityBinaryData> data = fileEntity->getDataEntity();
 	if (data == nullptr) return;
 
 	std::vector<char> rawFileData = data->getData();

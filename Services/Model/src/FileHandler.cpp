@@ -304,7 +304,7 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	fileContent.setData(_text.data(), _text.size());
 	fileContent.storeToDataBase();
 
-	textFile->setData(fileContent.getEntityID(),fileContent.getEntityStorageVersion());
+	textFile->setDataEntity(fileContent);
 
 	ot::EncodingGuesser guesser;
 	textFile->setFileProperties(path, name,type);

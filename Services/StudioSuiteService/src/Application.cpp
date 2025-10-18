@@ -356,7 +356,7 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 
 	ot::UIDList entityID, versionID;
 
-	for (auto file : fileInfo)
+	for (const auto& file : fileInfo)
 	{
 		if (file.getEntityType() == "EntityFile" && file.getEntityName() != "Files/Information")
 		{
@@ -395,7 +395,7 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 	infoFileManager.addDeletedShapesToList(deletedNameList);
 
 	// Now we need to send the model change to the model service 
-	for (auto item : modifiedNameList)
+	for (const auto& item : modifiedNameList)
 	{
 		ot::UID fileEntityID = fileEntityIDList.front(); fileEntityIDList.pop_front();
 		ot::UID fileVersion  = fileVersionList.front();  fileVersionList.pop_front();
@@ -497,7 +497,7 @@ void Application::changeMaterials(const std::string &content)
 
 	std::list<std::string> obsoleteMaterials;
 
-	for (auto material : currentMaterialInfo)
+	for (const auto& material : currentMaterialInfo)
 	{
 		if (materialProcessed.count(material.getEntityName()) == 0)
 		{
@@ -635,7 +635,7 @@ void Application::changeParameters(const std::string& content)
 
 	std::list<std::string> obsoleteParameters;
 
-	for (auto parameter : currentParameterInfo)
+	for (const auto& parameter : currentParameterInfo)
 	{
 		if (parameterProcessed.count(parameter.getEntityName()) == 0)
 		{
@@ -662,7 +662,7 @@ void Application::changeHistory(const std::string& content)
 			// A history already exists
 			history = dynamic_cast<EntityFileText*> (ot::EntityAPI::readEntityFromEntityIDandVersion(currentHistoryInfo.getEntityID(), currentHistoryInfo.getEntityVersion()));
 
-			data = history->getData();
+			data = history->getDataEntity();
 		}
 		else
 		{
@@ -679,7 +679,7 @@ void Application::changeHistory(const std::string& content)
 
 		ot::EncodingGuesser guesser;
 
-		history->setData(data->getEntityID(), data->getEntityStorageVersion());
+		history->setDataEntity(*data);
 		history->setTextEncoding(guesser(content.data(), content.size()));
 		history->getProperties().setAllPropertiesReadOnly();
 		history->setEditable(false);
@@ -814,7 +814,7 @@ void Application::shapeInformation(const std::string &content)
 		}
 	}
 
-	for (auto shape : previousShape)
+	for (const auto& shape : previousShape)
 	{
 		if (!shape.second)
 		{
@@ -904,7 +904,7 @@ void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<s
 	auto triangles = shapeTriangles.begin();
 	auto hash = shapeHash.begin();
 
-	for (auto name : shapeNames)
+	for (const auto& name : shapeNames)
 	{
 		storeShape(name, *triangles, materialsFolder, materialsFolderID);
 		infoFileManager.setShapeHash(name, *hash);
@@ -964,7 +964,7 @@ void Application::createFacets(const std::string& data, std::vector<Geometry::No
 	// Process the STL data
 	std::stringstream stlData(data);
 
-	ot::UID vertex[3];
+	ot::UID vertex[] = { 0,0,0 };
 	Geometry::Node node[3];
 	int vertexID = 0;
 	size_t vertexCount = 0;
@@ -1030,7 +1030,7 @@ void Application::createFacets(const std::string& data, std::vector<Geometry::No
 
 	// Finally we need to store the list of nodes in the nodes array
 	nodes.reserve(nodesList.size());
-	for (auto n : nodesList)
+	for (const auto& n : nodesList)
 	{
 		nodes.push_back(n);
 	}
@@ -1042,7 +1042,7 @@ void Application::writeProjectInformation(const std::string &simpleFileName, std
 
 	std::stringstream data;
 	data << simpleFileName << std::endl;
-	for (auto item : hostNamesAndFileNames)
+	for (const auto& item : hostNamesAndFileNames)
 	{
 		data << item.first << std::endl;
 		data << item.second << std::endl;
@@ -1152,7 +1152,7 @@ std::string Application::getLocalFileName(const std::string &hostName)
 	}
 
 	// Try to find the Hostname in the list
-	for (auto item : hostNamesAndFileNames)
+	for (const auto& item : hostNamesAndFileNames)
 	{
 		if (item.first == hostName)
 		{
@@ -1180,7 +1180,7 @@ std::string Application::getSimpleFileName()
 void Application::addHostNameAndFileName(const std::string& hostName, const std::string& fileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
 {
 	// First, we delete an previously existing file for the given host
-	for (auto item : hostNamesAndFileNames)
+	for (const auto& item : hostNamesAndFileNames)
 	{
 		if (item.first == hostName)
 		{

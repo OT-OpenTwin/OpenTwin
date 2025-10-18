@@ -204,7 +204,7 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 	//ot::EncodingGuesser guesser;
 
 	// set the data entity 
-	circuitModel->setData(fileContent.getEntityID(), fileContent.getEntityStorageVersion());
+	circuitModel->setDataEntity(fileContent);
 	circuitModel->setFileProperties("", "", "");
 
 	circuitModel->setTextEncoding(ot::TextEncoding::UTF8);

@@ -13,6 +13,8 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include "OTCore/CoreTypes.h"
 
+class EntityBase;
+
 class __declspec(dllexport) ModelStateEntity
 {
 public:
@@ -74,6 +76,9 @@ public:
 
 	// Mark entity as modified (new version and parent)
 	void modifyEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType);
+
+	// Mark entity as modified (new version)
+	void modifyEntityVersion(const EntityBase& _entity);
 
 	// Mark entity as modified (new version)
 	void modifyEntityVersion(ot::UID entityID, ot::UID entityVersion);

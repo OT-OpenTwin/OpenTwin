@@ -4,7 +4,7 @@
 #include "DatasetDescription.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTGui/Plot1DCfg.h"
-#include "OTModelAPI/NewModelStateInformation.h"
+#include "OTModelAPI/NewModelStateInfo.h"
 #include "ResultCollectionExtender.h"
 #include "EntityResult1DCurve.h"
 
@@ -36,7 +36,7 @@ public:
 	uint64_t getNumberOfCurves() { return m_curves.size(); }
 
 private:
-	ot::NewModelStateInformation m_newModelStateInformation;
+	ot::NewModelStateInfo m_newModelStateInformation;
 	ResultCollectionExtender& m_extender;
 	std::list<std::string> m_parameterLabels;
 	std::list<std::string> m_quantityLabel;

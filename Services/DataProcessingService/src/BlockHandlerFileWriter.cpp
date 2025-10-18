@@ -81,7 +81,7 @@ void BlockHandlerFileWriter::createFile()
 	data.setData(fileContent.c_str(), fileContent.size());
 	data.storeToDataBase();
 
-	textFile.setData(data.getEntityID(),data.getEntityStorageVersion());
+	textFile.setDataEntity(data);
 	textFile.storeToDataBase();
 
 	ot::ModelServiceAPI::addEntitiesToModel({ textFile.getEntityID() }, { textFile.getEntityStorageVersion() }, { false }, { data.getEntityID() }, { data.getEntityStorageVersion() }, { textFile.getEntityID() }, "Created text file.");

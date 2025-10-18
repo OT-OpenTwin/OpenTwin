@@ -10,8 +10,8 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTModelAPI/OTModelAPIExport.h"
 #include "EntityBase.h"
+#include "NewModelStateInfo.h"
 #include "EntityInformation.h"
-#include "NewModelStateInformation.h"
 // std header
 #include <string>
 #include <list>
@@ -25,6 +25,7 @@ namespace ot {
 		OT_DECL_NODEFAULT(ModelServiceAPI)
 	public:
 		// Model management
+		
 		static std::string getCurrentModelVersion(void);
 		static UID getCurrentVisualizationModelID(void);
 		static std::list<std::string> getListOfFolderItems(const std::string& _folder, bool recursive = false);
@@ -35,9 +36,10 @@ namespace ot {
 		static void modelChangeOperationCompleted(const std::string& description);
 
 		// Entity management
-		static void addEntitiesToModel(std::list<UID>& _topologyEntityIDList, std::list<UID>& _topologyEntityVersionList, std::list<bool>& _topologyEntityForceVisible, std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation = true, bool saveModel = true);
+
+		static void addEntitiesToModel(const std::list<UID>& _topologyEntityIDList, const std::list<UID>& _topologyEntityVersionList, const std::list<bool>& _topologyEntityForceVisible, const std::list<UID>& _dataEntityIDList, const std::list<UID>& _dataEntityVersionList, const std::list<UID>& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation = true, bool saveModel = true);
 		static void addEntitiesToModel(std::list<UID>&& _topologyEntityIDList, std::list<UID>&& _topologyEntityVersionList, std::list<bool>&& _topologyEntityForceVisible, std::list<UID>&& _dataEntityIDList, std::list<UID>&& _dataEntityVersionList, std::list<UID>&& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation = true, bool saveModel = true);
-		static void addEntitiesToModel(NewModelStateInformation& _newModelStateInfos, const std::string& _changeComment, bool askForBranchCreation = true, bool saveModel = true);
+		static void addEntitiesToModel(const NewModelStateInfo& _newModelStateInfos, const std::string& _changeComment, bool _askForBranchCreation = true, bool _saveModel = true);
 		static void addGeometryOperation(UID _newEntityID, UID _newEntityVersion, std::string _newEntityName, std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList, std::list<std::string>& _childrenList, const std::string& _changeComment);
 		static void deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel = true);
 		static void deleteEntitiesFromModel(const UIDList& _entityIDList, bool _saveModel = true);
@@ -51,6 +53,7 @@ namespace ot {
 		static void addPropertiesToEntities(std::list<UID>& _entityList, const ot::PropertyGridCfg& _configuration);
 		static void getEntityProperties(UID _entity, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties);
 		static void getEntityProperties(const std::string& entityName, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties);
+		static void updateTopologyEntities(const NewModelStateInfo& _updatedEntities, const std::string& _comment);
 		static void updateTopologyEntities(const ot::UIDList& topologyEntityIDs, const ot::UIDList& topologyEntityVersions, const std::string& comment);
 
 		static void updatePropertyGrid();

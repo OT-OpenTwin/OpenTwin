@@ -6,7 +6,7 @@
 #include "EntityResult1DPlot.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
-#include "OTModelAPI/NewModelStateInformation.h"
+#include "OTModelAPI/NewModelStateInfo.h"
 
 class PlotHandler : public SelectionChangedObserver
 {
@@ -30,5 +30,5 @@ private:
 	std::list<EntityResult1DPlot*> getSelectedPlots();
 	std::string getFreePlotName();
 
-	void createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInformation& _modelStateInformation, const std::string& _nameBase);
+	void createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInfo& _modelStateInformation, const std::string& _nameBase);
 };

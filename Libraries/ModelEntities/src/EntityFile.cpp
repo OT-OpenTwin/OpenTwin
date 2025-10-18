@@ -65,7 +65,7 @@ void EntityFile::setFileProperties(const std::string& _path, const std::string& 
 	setProperties();
 }
 
-std::shared_ptr<EntityBinaryData> EntityFile::getData()
+std::shared_ptr<EntityBinaryData> EntityFile::getDataEntity()
 {
 	ensureDataIsLoaded();
 	return m_data;
@@ -104,7 +104,7 @@ void EntityFile::setProperties()
 	setSpecializedProperties();
 }
 
-void EntityFile::setData(ot::UID _dataID, ot::UID _dataVersion)
+void EntityFile::setDataEntity(ot::UID _dataID, ot::UID _dataVersion)
 {
 	m_dataUID = _dataID;
 	m_dataVersion = _dataVersion;
