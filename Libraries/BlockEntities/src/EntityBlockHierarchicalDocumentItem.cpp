@@ -18,7 +18,7 @@ EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot::UID
 	OldTreeIcon icon;
 	icon.visibleIcon = "Hierarchical/Document";
 	icon.hiddenIcon = "Hierarchical/Document";
-	//setNavigationTreeIcon(icon);
+	setNavigationTreeIcon(icon);
 
 	setBlockTitle("Hierarchical Document Item");
 

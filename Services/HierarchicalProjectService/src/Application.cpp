@@ -319,7 +319,13 @@ void Application::handleAddDocument() {
 		return;
 	}
 
-	auto filter = ot::FileExtension::toFilterString({ ot::FileExtension::AllFiles });
+	auto filter = ot::FileExtension::toFilterString({
+		ot::FileExtension::AllFiles,
+		ot::FileExtension::Text,
+		ot::FileExtension::Markdown,
+		ot::FileExtension::CSV,
+		ot::FileExtension::PDF
+		});
 	ot::Frontend::requestFileForReading(c_documentSelectedAction, "Select Document", filter, true, true);
 }
 
