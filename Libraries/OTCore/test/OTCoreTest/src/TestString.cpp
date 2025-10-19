@@ -72,7 +72,17 @@ TEST(StringTests, SplitByString_KeepEmpty) {
 	EXPECT_EQ("CCC", result[3]);
 }
 
-TEST(StringTests, Replace) {
+TEST(StringTests, ReplaceChar) {
+	const std::string txt = "AaBbCc";
+	EXPECT_EQ("AaXbCc", ot::String::replace(txt, 'B', 'X'));
+	EXPECT_EQ("AaYbCc", ot::String::replace(txt, 'B', 'Y'));
+
+	std::string txt2 = txt;
+	ot::String::replaced(txt2, 'D', 'Y');
+	EXPECT_EQ("AaBbCc", txt2);
+}
+
+TEST(StringTests, ReplaceStr) {
 	const std::string txt = "AaBbCc";
 	EXPECT_EQ("AaBbBbCc", ot::String::replace(txt, "Bb", "BbBb"));
 	EXPECT_EQ("AaDdDdCc", ot::String::replace(txt, "Bb", "DdDd"));

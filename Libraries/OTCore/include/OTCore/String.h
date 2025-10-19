@@ -71,14 +71,32 @@ namespace ot {
 		//! @param _skipEmpty If true, all empty parts will be skipped
 		static std::list<std::wstring> split(const std::wstring& _str, const std::wstring& _splitBy, bool _skipEmpty = false);
 
+		//! @brief Replaces all what occurances in the provided string.
+		//! @param _str String to modify.
+		//! @param _what Character to find.
+		//! @param _with Character to replace with.
+		static void replaced(std::string& _str, char _what, char _with);
+
 		//! @brief Replaces all what occurances in the provided string and returns the result.
 		static void replaced(std::string& _str, const std::string& _what, const std::string& _with);
 
 		//! @ref String::replaced
+		static std::string replace(const std::string& _str, char _what, char _with);
+
+		//! @ref String::replaced
 		static std::string replace(const std::string& _str, const std::string& _what, const std::string& _with);
+
+		//! @brief Replaces all what occurances in the provided string.
+		//! @param _str String to modify.
+		//! @param _what Character to find.
+		//! @param _with Character to replace with.
+		static void replaced(std::wstring& _str, wchar_t _what, wchar_t _with);
 
 		//! @brief Replaces all what occurances in the provided string and returns the result.
 		static void replaced(std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
+
+		//! @ref String::replaced
+		static std::wstring replace(const std::wstring& _str, wchar_t _what, wchar_t _with);
 
 		//! @ref String::replaced
 		static std::wstring replace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with);

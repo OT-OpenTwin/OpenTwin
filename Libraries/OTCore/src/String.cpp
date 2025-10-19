@@ -192,12 +192,32 @@ inline std::string ot::String::replace(const std::string& _str, const std::strin
 	return result;
 }
 
+inline void ot::String::replaced(std::string& _str, char _what, char _with) {
+	std::replace(_str.begin(), _str.end(), _what, _with);
+}
+
+inline std::string ot::String::replace(const std::string& _str, char _what, char _with) {
+	std::string result = _str;
+	String::replaced(result, _what, _with);
+	return result;
+}
+
+inline void ot::String::replaced(std::wstring& _str, wchar_t _what, wchar_t _with) {
+	std::replace(_str.begin(), _str.end(), _what, _with);
+}
+
 inline void ot::String::replaced(std::wstring& _str, const std::wstring& _what, const std::wstring& _with) {
 	size_t startPos = _str.find(_what);
 	while (startPos != std::wstring::npos) {
 		_str.replace(startPos, _what.length(), _with);
 		startPos = _str.find(_what, startPos + _with.length());
 	}
+}
+
+inline std::wstring ot::String::replace(const std::wstring& _str, wchar_t _what, wchar_t _with) {
+	std::wstring result = _str;
+	String::replaced(result, _what, _with);
+	return result;
 }
 
 inline std::wstring ot::String::replace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with) {
