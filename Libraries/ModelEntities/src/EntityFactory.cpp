@@ -22,6 +22,20 @@ EntityBase* EntityFactory::create(const std::string& _className) {
 	}
 }
 
+EntityBase* EntityFactory::create(ot::FileExtension::DefaultFileExtension _fileExtension) {
+	auto it = m_fileExtensionCreators.find(_fileExtension);
+	if (it != m_fileExtensionCreators.end()) {
+		return it->second();
+	}
+	else {
+		return nullptr;
+	}
+}
+
 bool EntityFactory::registerClass(const std::string& _className, CreateEntityFunction _createFunction) {
 	return m_creators.emplace(_className, std::move(_createFunction)).second;
+}
+
+bool EntityFactory::registerClass(ot::FileExtension::DefaultFileExtension _fileExtension, CreateEntityFunction _createFunction) {
+	return m_fileExtensionCreators.emplace(_fileExtension, std::move(_createFunction)).second;
 }

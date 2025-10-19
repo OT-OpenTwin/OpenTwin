@@ -28,6 +28,7 @@
 #endif
 
 static EntityFactoryRegistrar<EntityFileText> registrar(EntityFileText::className());
+static EntityFactoryRegistrar<EntityFileText> extensionRegistrar({ ot::FileExtension::Text, ot::FileExtension::Markdown, ot::FileExtension::JSON });
 
 EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
 	: EntityFile(_ID, _parent, _obs, _ms, _owner)

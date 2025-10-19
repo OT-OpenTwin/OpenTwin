@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/FileExtension.h"
 #include "ModelEntitiesAPIExport.h"
 
 // std header
@@ -32,16 +33,28 @@ public:
 	//! @return A pointer to the created instance, or nullptr if the class name is unknown.
 	EntityBase* create(const std::string& _className);
 
+	//! @brief Creates an instance of the class registered for the given file extension.
+	//! @param _fileExtension File extension to create the class for.
+	//! @return A pointer to the created instance, or nullptr if the file extension is unknown.
+	EntityBase* create(ot::FileExtension::DefaultFileExtension _fileExtension);
+
 	//! @brief Registers a class with the factory.
 	//! @param _className The name of the class to register.
 	//! @param _createFunction A function that creates an instance of the class.
 	//! @return true if the class was registered successfully, false if the class name is already registered.
 	bool registerClass(const std::string& _className, CreateEntityFunction _createFunction);
 
+	//! @brief Registers a class with the factory for a specific file extension.
+	//! @param _fileExtension File extension to register the class for.
+	//! @param _createFunction A function that creates an instance of the class.
+	//! @return true if the class was registered successfully, false if the file extension is already registered.
+	bool registerClass(ot::FileExtension::DefaultFileExtension _fileExtension, CreateEntityFunction _createFunction);
+
 private:
 	EntityFactory() = default;
 	~EntityFactory() = default;
 
 	std::map<std::string, CreateEntityFunction> m_creators;
+	std::map<ot::FileExtension::DefaultFileExtension, CreateEntityFunction> m_fileExtensionCreators;
 };
 
