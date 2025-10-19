@@ -17,7 +17,7 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
-#include "OTModelAPI/NewModelStateInfo.h"
+#include "NewModelStateInfo.h"
 #include "OTServiceFoundation/UiComponent.h"
 
 class EntityMesh;

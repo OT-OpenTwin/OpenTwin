@@ -84,7 +84,7 @@ Application::Application() :
 
 	m_removeImageFromProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Remove Image", "Hierarchical/RemoveImage");
 	m_removeImageFromProjectButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
-	m_removeImageFromProjectButton.setButtonToolTip("Remove the image from the selected project.");
+	m_removeImageFromProjectButton.setButtonToolTip("Remove the image from the selected projects.");
 	connectToolBarButton(m_removeImageFromProjectButton, this, &Application::handleRemoveImageFromProject);
 }
 
@@ -305,7 +305,13 @@ void Application::handleAddImageToProject() {
 }
 
 void Application::handleRemoveImageFromProject() {
+	auto projects = getProjectsToOpen();
+	if (projects.empty()) {
+		OT_LOG_E("No project selected to remove image from");
+		return;
+	}
 
+	m_entityHandler.removeImageFromProjects(projects);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -328,18 +334,18 @@ void Application::updateButtonStates() {
 
 	if (canOpenProject) {
 		enabledControls.push_back(m_openSelectedProjectButton.getFullPath());
+		enabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
 	}
 	else {
 		disabledControls.push_back(m_openSelectedProjectButton.getFullPath());
+		disabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
 	}
 
 	if (projectsToOpen.size() == 1) {
 		enabledControls.push_back(m_addImageToProjectButton.getFullPath());
-		enabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
 	}
 	else {
 		disabledControls.push_back(m_addImageToProjectButton.getFullPath());
-		disabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
 	}
 
 	// Set control states

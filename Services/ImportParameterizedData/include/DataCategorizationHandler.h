@@ -27,7 +27,7 @@
 #include <string>
 #include <memory>
 #include <set>
-#include "OTModelAPI/NewModelStateInfo.h"
+#include "NewModelStateInfo.h"
 
 class DataCategorizationHandler : public BusinessLogicHandler
 {

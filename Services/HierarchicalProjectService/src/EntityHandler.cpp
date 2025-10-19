@@ -13,7 +13,7 @@
 #include "OTGui/FileExtension.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTModelAPI/NewModelStateInfo.h"
+#include "NewModelStateInfo.h"
 #include "OTServiceFoundation/Encryption.h"
 #include "EntityAPI.h"
 #include "EntityFileImage.h"
@@ -222,6 +222,46 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 		ot::ModelServiceAPI::addEntitiesToModel(newData, "Added image to project item", true, false);
 		ot::ModelServiceAPI::updateTopologyEntities(existingTopo, "Set preview image for project item");
 	}
+
+	return true;
+}
+
+bool EntityHandler::removeImageFromProjects(const std::list<ot::EntityInformation>& _projects) {
+	ot::UIDList entitiesToDelete;
+	ot::NewModelStateInfo update;
+
+	for (const ot::EntityInformation& proj : _projects) {
+		auto entity = ot::EntityAPI::readEntityFromEntityIDandVersion(proj.getEntityID(), proj.getEntityVersion());
+		if (!entity) {
+			OT_LOG_W("Could not read project entity from database { \"EntityName: \"" + proj.getEntityName() + "\" }");
+			continue;
+		}
+
+		std::unique_ptr<EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<EntityBlockHierarchicalProjectItem*>(entity));
+		if (!projectEntity) {
+			OT_LOG_W("Project entity is not of expected type { \"EntityName: \"" + proj.getEntityName() + "\", \"EntityType\": \"" + entity->getClassName() + "\" }");
+			continue;
+		}
+
+		if (!projectEntity->hasPreviewFile()) {
+			continue;
+		}
+
+		OTAssert(projectEntity->getPreviewFileID() != ot::invalidUID, "Project entity has preview file, but no preview file ID set");
+
+		entitiesToDelete.push_back(projectEntity->getPreviewFileID());
+		
+		projectEntity->removePreviewFile();
+		projectEntity->storeToDataBase();
+		update.addTopologyEntity(*projectEntity);
+	}	
+
+	if (entitiesToDelete.empty()) {
+		return true;
+	}
+
+	ot::ModelServiceAPI::deleteEntitiesFromModel(entitiesToDelete, false);
+	ot::ModelServiceAPI::updateTopologyEntities(update, "Removed preview images from project items");
 
 	return true;
 }

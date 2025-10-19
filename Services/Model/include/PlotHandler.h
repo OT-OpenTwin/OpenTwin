@@ -6,7 +6,7 @@
 #include "EntityResult1DPlot.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
-#include "OTModelAPI/NewModelStateInfo.h"
+#include "NewModelStateInfo.h"
 
 class PlotHandler : public SelectionChangedObserver
 {

@@ -15,7 +15,7 @@
 #include "OTServiceFoundation/ProgressUpdater.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTModelAPI/NewModelStateInfo.h"
+#include "NewModelStateInfo.h"
 
 #include "ResultCollectionExtender.h"
 #include "MetadataEntryArray.h"

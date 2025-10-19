@@ -17,7 +17,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/PainterRainbowIterator.h"
 #include "CurveFactory.h"
-#include "OTModelAPI/NewModelStateInfo.h"
+#include "NewModelStateInfo.h"
 #include "EntityResult1DPlot.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 

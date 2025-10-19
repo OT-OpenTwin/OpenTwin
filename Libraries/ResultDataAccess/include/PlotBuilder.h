@@ -4,7 +4,7 @@
 #include "DatasetDescription.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTGui/Plot1DCfg.h"
-#include "OTModelAPI/NewModelStateInfo.h"
+#include "NewModelStateInfo.h"
 #include "ResultCollectionExtender.h"
 #include "EntityResult1DCurve.h"
 
