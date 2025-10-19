@@ -257,6 +257,7 @@ bool EntityHandler::removeImageFromProjects(const std::list<ot::EntityInformatio
 	}	
 
 	if (entitiesToDelete.empty()) {
+		OTAssert(update.getTopologyEntityIDs().empty(), "No entities to delete, but update contains topology entities");
 		return true;
 	}
 
