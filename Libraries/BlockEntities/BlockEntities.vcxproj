@@ -183,6 +183,8 @@
     <ClInclude Include="include\EntityBlockDatabaseAccess.h" />
     <ClInclude Include="include\EntityBlockDisplay.h" />
     <ClInclude Include="include\EntityBlockFileWriter.h" />
+    <ClInclude Include="include\EntityBlockHierarchicalContainerItem.h" />
+    <ClInclude Include="include\EntityBlockHierarchicalDocumentItem.h" />
     <ClInclude Include="include\EntityBlockImage.h" />
     <ClInclude Include="include\EntityBlockPython.h" />
     <ClInclude Include="include\EntityBlockStorage.h" />
@@ -209,6 +211,8 @@
     <ClCompile Include="src\EntityBlockDatabaseAccess.cpp" />
     <ClCompile Include="src\EntityBlockDisplay.cpp" />
     <ClCompile Include="src\EntityBlockFileWriter.cpp" />
+    <ClCompile Include="src\EntityBlockHierarchicalContainerItem.cpp" />
+    <ClCompile Include="src\EntityBlockHierarchicalDocumentItem.cpp" />
     <ClCompile Include="src\EntityBlockHierarchicalProjectItem.cpp" />
     <ClCompile Include="src\EntityBlockImage.cpp" />
     <ClCompile Include="src\EntityBlockPython.cpp" />

@@ -24,11 +24,13 @@ public:
 
 	bool addConnection(const ot::GraphicsConnectionCfg& _connection);
 
-	void addBackgroundImage(const ot::EntityInformation& _projectInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities);
-	void addBackgroundImages(const ot::EntityInformation& _projectInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
+	void addBackgroundImage(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities);
+	void addBackgroundImages(const ot::EntityInformation& _containerInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
 
 	bool addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter);
 	bool removeImageFromProjects(const std::list<ot::EntityInformation>& _projects);
+
+	void addContainer(const ot::EntityInformation& _containerInfo);
 
 private:
 	bool getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format);

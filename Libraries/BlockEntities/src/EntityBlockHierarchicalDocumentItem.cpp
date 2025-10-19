@@ -2,7 +2,7 @@
 //! @author Alexander Kuester (alexk95)
 //! @date October 2025
 // ###########################################################################################################################################################################################################################################################################################################################
-
+/*
 // OpenTwin header
 #include "EntityFile.h"
 #include "PropertyHelper.h"
@@ -15,8 +15,7 @@
 static EntityFactoryRegistrar<EntityBlockHierarchicalProjectItem> registrar(EntityBlockHierarchicalProjectItem::className());
 
 EntityBlockHierarchicalProjectItem::EntityBlockHierarchicalProjectItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	: EntityBlock(_ID, _parent, _obs, _ms, _owner), m_previewUID(ot::invalidUID), m_previewVersion(ot::invalidUID), m_preview(nullptr)
-{
+	: EntityBlock(_ID, _parent, _obs, _ms, _owner), m_previewUID(ot::invalidUID), m_previewVersion(ot::invalidUID), m_preview(nullptr) {
 	OldTreeIcon icon;
 	icon.visibleIcon = "ProjectTemplates/DefaultIcon";
 	icon.hiddenIcon = "ProjectTemplates/DefaultIcon";
@@ -32,13 +31,13 @@ ot::GraphicsItemCfg* EntityBlockHierarchicalProjectItem::createBlockCfg() {
 
 	ot::ProjectInformation project = this->getProjectInformation();
 	ot::GraphicsHierarchicalProjectItemBuilder builder;
-	
+
 	// Mandatory settings
 	builder.setName(this->getName());
 	builder.setTitle(this->createBlockHeadline());
 	builder.setProjectType(project.getProjectType());
 	builder.setLeftTitleCornerImagePath("ProjectTemplates/" + project.getProjectType());
-	builder.setTitleBackgroundGradientColor(ot::Blue);
+	builder.setTitleBackgroundGradientColor(ot::Green);
 
 	// Optional settings
 	if (!getUseLatestVersion()) {
@@ -140,7 +139,7 @@ void EntityBlockHierarchicalProjectItem::setProjectInformation(const ot::Project
 
 ot::ProjectInformation EntityBlockHierarchicalProjectItem::getProjectInformation() const {
 	ot::ProjectInformation info;
-	
+
 	info.setProjectName(PropertyHelper::getStringPropertyValue(this, "ProjectName"));
 	info.setProjectType(PropertyHelper::getStringPropertyValue(this, "ProjectType"));
 	info.setCollectionName(PropertyHelper::getStringPropertyValue(this, "CollectionName"));
@@ -191,3 +190,4 @@ void EntityBlockHierarchicalProjectItem::ensurePreviewLoaded() {
 	std::map<ot::UID, EntityBase*> entityMap;
 	m_preview.reset(dynamic_cast<EntityFileImage*>(readEntityFromEntityIDAndVersion(this, m_previewUID, m_previewVersion, entityMap)));
 }
+*/

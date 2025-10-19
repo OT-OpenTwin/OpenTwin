@@ -226,6 +226,7 @@ void Application::handleProjectSelected(ot::JsonDocument& _doc) {
 	ot::EntityInformation rootInfo;
 	if (!ot::ModelServiceAPI::getEntityInformation(EntityHierarchicalScene::defaultName(), rootInfo)) {
 		OT_LOG_E("Could not determine entity information for root hierarchical scene");
+		return;
 	}
 
 	m_entityHandler.createProjectItemBlockEntity(info, rootInfo);
@@ -288,7 +289,13 @@ void Application::handleAddProject() {
 }
 
 void Application::handleAddContainer() {
+	ot::EntityInformation rootInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(EntityHierarchicalScene::defaultName(), rootInfo)) {
+		OT_LOG_E("Failed to determine root entity information");
+		return;
+	}
 
+	m_entityHandler.addContainer(rootInfo);
 }
 
 void Application::handleAddDocument() {

@@ -128,8 +128,9 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 	}
 	
 	// Create background image
-	if (!m_previewImage.empty()) {
+	if (!m_previewImage.empty() || !m_previewImagePath.empty()) {
 		GraphicsImageItemCfg* cImg = new GraphicsImageItemCfg;
+		cImg->setImagePath(m_previewImagePath);
 		cImg->setImageData(m_previewImage, m_previewImageFormat);
 		cImg->setName(m_name + "_cPrevImg");
 		cImg->setMargins(m_previewImageMargins);

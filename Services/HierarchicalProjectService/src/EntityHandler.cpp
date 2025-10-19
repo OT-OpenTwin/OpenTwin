@@ -21,6 +21,7 @@
 #include "EntityBlockConnection.h"
 #include "EntityHierarchicalScene.h"
 #include "EntityBlockHierarchicalProjectItem.h"
+#include "EntityBlockHierarchicalContainerItem.h"
 
 EntityHandler::EntityHandler() : 
 	BusinessLogicHandler()
@@ -189,7 +190,7 @@ void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerIn
 	_newEntities.addTopologyEntity(backgroundImageEntity);
 }
 
-void EntityHandler::addBackgroundImages(const ot::EntityInformation& _projectInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
+void EntityHandler::addBackgroundImages(const ot::EntityInformation& _containerInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
 	ot::NewModelStateInfo newEntities;
 
 	auto nameIt = _fileNames.begin();
@@ -197,7 +198,7 @@ void EntityHandler::addBackgroundImages(const ot::EntityInformation& _projectInf
 	auto lengthIt = _uncompressedDataLength.begin();
 	
 	for (; nameIt != _fileNames.end() && contentIt != _fileContent.end() && lengthIt != _uncompressedDataLength.end(); nameIt++, contentIt++, lengthIt++) {
-		addBackgroundImage(_projectInfo, *nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
+		addBackgroundImage(_containerInfo, *nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
 	}
 
 	if (newEntities.hasEntities()) {
@@ -346,6 +347,33 @@ bool EntityHandler::removeImageFromProjects(const std::list<ot::EntityInformatio
 	ot::ModelServiceAPI::updateTopologyEntities(update, "Removed preview images from project items");
 
 	return true;
+}
+
+void EntityHandler::addContainer(const ot::EntityInformation& _containerInfo) {
+	ot::NewModelStateInfo newEntities;
+
+	const std::string serviceName = Application::instance().getServiceName();
+
+	// Create coordinate entity
+	EntityCoordinates2D coord;
+	coord.setOwningService(serviceName);
+	coord.setEntityID(_modelComponent->createEntityUID());
+	coord.storeToDataBase();
+	newEntities.addDataEntity(_containerInfo.getEntityID(), coord);
+
+	EntityBlockHierarchicalContainerItem newContainer;
+
+	newContainer.setEditable(true);
+	newContainer.setEntityID(_modelComponent->createEntityUID());
+	newContainer.setName(CreateNewUniqueTopologyName(_containerInfo.getEntityName(), "Container"));
+	newContainer.setServiceInformation(Application::instance().getBasicServiceInformation());
+	newContainer.setOwningService(serviceName);
+	newContainer.setSelectChildren(false);
+	newContainer.setCoordinateEntityID(coord.getEntityID());
+	newContainer.storeToDataBase();
+	newEntities.addTopologyEntity(newContainer);
+
+	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added hierarchical container", true, true);
 }
 
 bool EntityHandler::getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) {

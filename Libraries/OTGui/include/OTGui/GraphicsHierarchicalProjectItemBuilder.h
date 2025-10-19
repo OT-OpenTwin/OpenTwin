@@ -88,6 +88,15 @@ namespace ot {
 
 		void setLeftTitleCornerImagePath(const std::string& _path) { m_leftTitleImagePath = _path; };
 
+		//! @brief Sets the preview image path.
+		//! The path is only used if no image data is set.
+		//! @param _path The relative image path.
+		void setPreviewImagePath(const std::string& _path) { m_previewImagePath = _path; };
+
+		//! @brief Set the preview image data.
+		//! The data is used instead of the image path if available.
+		//! @param _data The image data.
+		//! @param _format The image file format.
 		void setPreviewImageData(const std::vector<char>& _data, ImageFileFormat _format) { m_previewImage = _data; m_previewImageFormat = _format; };
 		void setPreviewImageMargins(const ot::MarginsD& _margins) { m_previewImageMargins = _margins; };
 		
@@ -116,6 +125,7 @@ namespace ot {
 
 		std::string m_leftTitleImagePath;
 
+		std::string m_previewImagePath;
 		std::vector<char> m_previewImage;
 		ImageFileFormat m_previewImageFormat;
 		ot::MarginsD m_previewImageMargins;
