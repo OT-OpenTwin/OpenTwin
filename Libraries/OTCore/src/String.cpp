@@ -8,6 +8,10 @@
 #include "OTCore/String.h"
 #include "OTCore/LogDispatcher.h"
 
+// ThirdParty header
+#include <zlib.h>
+#include <base64.h>
+
 // std header
 #include <map>
 #include <locale>
@@ -715,4 +719,51 @@ inline std::string ot::String::fromBase64Url(const std::string& _base64UrlString
 	}
 
 	return output;
+}
+
+std::string ot::String::compressed(const std::string& _string) {
+	// Compress the file data content
+	uLong compressedSize = compressBound((uLong)_string.size());
+
+	char* compressedData = new char[compressedSize];
+	if (_string.size() > UINT32_MAX) {
+		throw ot::Exception::OutOfBounds("String to large for compression.");
+	}
+	compress((Bytef*)compressedData, &compressedSize, (Bytef*)_string.data(), static_cast<uint32_t>(_string.size()));
+
+	// Convert the binary to an encoded string
+	int encoded_data_length = Base64encode_len(compressedSize);
+	char* base64_string = new char[encoded_data_length];
+
+	Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
+
+	delete[] compressedData;
+	compressedData = nullptr;
+
+	std::string compressedString(base64_string, encoded_data_length);
+	delete[] base64_string;
+	base64_string = nullptr;
+	return compressedString;
+}
+
+std::string ot::String::decompressed(const std::string& _compressedString, uint64_t _decompressedLength) {
+	int decoded_compressed_data_length = Base64decode_len(_compressedString.c_str());
+	char* compressedContent = new char[decoded_compressed_data_length];
+
+	Base64decode(compressedContent, _compressedString.c_str());
+
+	// Decompress the data
+	char* uncompressesContent = new char[_decompressedLength];
+	uLongf destLen = (uLongf)_decompressedLength;
+	uLong  sourceLen = decoded_compressed_data_length;
+	uncompress((Bytef*)uncompressesContent, &destLen, (Bytef*)compressedContent, sourceLen);
+
+	delete[] compressedContent;
+	compressedContent = nullptr;
+	std::string decompressedString(uncompressesContent, _decompressedLength);
+
+	delete[] uncompressesContent;
+	uncompressesContent = nullptr;
+
+	return decompressedString;
 }

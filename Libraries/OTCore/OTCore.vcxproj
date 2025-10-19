@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(OPENTWIN_THIRDPARTY_ROOT)\base64\base64.c" />
     <ClCompile Include="src\BasicServiceInformation.cpp" />
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\DebugHelper.cpp" />
@@ -73,6 +74,7 @@
     <ClCompile Include="src\VariableToStringConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(OPENTWIN_THIRDPARTY_ROOT)\base64\base64.h" />
     <ClInclude Include="include\OTCore\AbstractLogNotifier.h" />
     <ClInclude Include="include\OTCore\BasicNumberIncrementWrapper.h" />
     <ClInclude Include="include\OTCore\BasicScopedBoolWrapper.h" />
@@ -255,7 +257,7 @@
       <PreprocessorDefinitions>_DEBUG;OPENTWINCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_CORE_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_CORE_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCD);$(BASE64_ROOT);$(ZLIB_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
@@ -265,8 +267,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OTSystem.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(ZLIB_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -278,7 +280,7 @@
       <PreprocessorDefinitions>_DEBUG;OPENTWINCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_CORE_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCD);$(BASE64_ROOT);$(ZLIB_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
@@ -305,7 +307,7 @@
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING ;NDEBUG;OPENTWINCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_CORE_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_CORE_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCR);$(BASE64_ROOT);$(ZLIB_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
@@ -317,8 +319,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OTSystem.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -332,7 +334,7 @@
       <PreprocessorDefinitions>NDEBUG;OPENTWINCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_CORE_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCR);$(BASE64_ROOT);$(ZLIB_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>

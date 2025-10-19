@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTEncryptionKey.h"
 #include "OTSystem/OTAssert.h"
+#include "OTSystem/Exception.h"
 #include "OTServiceFoundation/Encryption.h"
 
 // Third party header
@@ -75,53 +76,4 @@ std::string ot::Encryption::decryptString(const std::string& _str) {
 	delete[] decoded_decompressed_string; decoded_decompressed_string = nullptr;
 
 	return base64_decoded;
-}
-
-std::string ot::Encryption::decryptAndUnzipString(const std::string& _content, uint64_t _uncompressedLength) {
-	int decoded_compressed_data_length = Base64decode_len(_content.c_str());
-	char* decodedCompressedContent = new char[decoded_compressed_data_length];
-
-	Base64decode(decodedCompressedContent, _content.c_str());
-
-	// Decompress the data
-	char* decodedUncompressesContent = new char[_uncompressedLength];
-	uLongf destLen = (uLongf)_uncompressedLength;
-	uLong  sourceLen = decoded_compressed_data_length;
-	uncompress((Bytef*)decodedUncompressesContent, &destLen, (Bytef*)decodedCompressedContent, sourceLen);
-
-	delete[] decodedCompressedContent;
-	decodedCompressedContent = nullptr;
-	std::string decodedAndUnzipped(decodedUncompressesContent, _uncompressedLength);
-	
-	delete[] decodedUncompressesContent;
-	decodedUncompressesContent = nullptr;
-
-	return decodedAndUnzipped;
-}
-
-std::string ot::Encryption::encryptAndZipString(const std::string& _content) {
-	
-	// Compress the file data content
-	uLong compressedSize = compressBound((uLong)_content.size());
-
-	char* compressedData = new char[compressedSize];
-	if (_content.size() > UINT32_MAX)
-	{
-		throw std::exception("Message to large for compression.");
-	}
-	compress((Bytef*)compressedData, &compressedSize, (Bytef*)_content.data(), static_cast<uint32_t>(_content.size()));
-
-	// Convert the binary to an encoded string
-	int encoded_data_length = Base64encode_len(compressedSize);
-	char* base64_string = new char[encoded_data_length];
-
-	Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
-
-	delete[] compressedData;
-	compressedData = nullptr;
-
-	std::string compressedEncryptedContent(base64_string, encoded_data_length);
-	delete[] base64_string;
-	base64_string = nullptr;
-	return compressedEncryptedContent;
 }

@@ -157,6 +157,9 @@
     <ClCompile Include="src\ProjectInformation.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="$(OPENTWIN_THIRDPARTY_ROOT)\base64\base64.c">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -453,6 +456,9 @@
     <ClInclude Include="include\OTCore\ProjectInformation.h">
       <Filter>include\General</Filter>
     </ClInclude>
+    <ClInclude Include="$(OPENTWIN_THIRDPARTY_ROOT)\base64\base64.h">
+      <Filter>ThirdParty</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -517,6 +523,9 @@
     </Filter>
     <Filter Include="src\Logger">
       <UniqueIdentifier>{ed4fcc5a-7178-445c-924c-f70aa04d34c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{2dcfa9b1-af09-429c-99c0-d6b9e973aee1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
