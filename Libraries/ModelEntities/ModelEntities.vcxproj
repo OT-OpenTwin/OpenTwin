@@ -30,6 +30,7 @@
     <ClInclude Include="include\EntityBatchImporter.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
     <ClInclude Include="include\EntityFactoryRegistrar.h" />
+    <ClInclude Include="include\EntityFileRawData.h" />
     <ClInclude Include="include\EntityFileImage.h" />
     <ClInclude Include="include\EntityGraphicsScene.h" />
     <ClInclude Include="include\EntityHierarchicalScene.h" />
@@ -170,7 +171,9 @@
     <ClCompile Include="src\EntityCompressedVector.cpp" />
     <ClCompile Include="src\EntityCoordinates2D.cpp" />
     <ClCompile Include="src\EntityFacetData.cpp" />
+    <ClCompile Include="src\EntityFileCustom.cpp" />
     <ClCompile Include="src\EntityFileImage.cpp" />
+    <ClCompile Include="src\EntityFileRawData.cpp" />
     <ClCompile Include="src\EntityFileText.cpp" />
     <ClCompile Include="src\EntityGraphicsScene.cpp" />
     <ClCompile Include="src\EntityHierarchicalScene.cpp" />
