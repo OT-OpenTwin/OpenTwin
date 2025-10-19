@@ -128,6 +128,8 @@ void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerIn
 	// Unpack data
 	std::string unpackedData = ot::Encryption::decryptAndUnzipString(_fileContent, _uncompressedDataLength);
 
+	const std::string serviceName = Application::instance().getServiceName();
+
 	// Create container
 	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
 
@@ -150,7 +152,7 @@ void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerIn
 
 	// Create data entity
 	EntityBinaryData imageDataEntity;
-	imageDataEntity.setOwningService(Application::instance().getServiceName());
+	imageDataEntity.setOwningService(serviceName);
 	imageDataEntity.setEntityID(_modelComponent->createEntityUID());
 	imageDataEntity.setData(std::move(fileData));
 	imageDataEntity.storeToDataBase();
@@ -158,7 +160,7 @@ void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerIn
 
 	// Create background image entity
 	EntityFileImage imageEntity;
-	imageEntity.setOwningService(Application::instance().getServiceName());
+	imageEntity.setOwningService(serviceName);
 	imageEntity.setEntityID(_modelComponent->createEntityUID());
 	imageEntity.setFileProperties(_fileName, fileNameOnly, extension);
 	imageEntity.setImageFormat(format);
@@ -168,14 +170,15 @@ void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerIn
 
 	// Create coordinate entity
 	EntityCoordinates2D coord;
-	coord.setOwningService(Application::instance().getServiceName());
+	coord.setOwningService(serviceName);
 	coord.setEntityID(_modelComponent->createEntityUID());
 	coord.storeToDataBase();
 	_newEntities.addDataEntity(_containerInfo.getEntityID(), coord);
 
 	// Create background image block entity
 	EntityBlockImage backgroundImageEntity;
-	backgroundImageEntity.setOwningService(Application::instance().getServiceName());
+	backgroundImageEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
+	backgroundImageEntity.setOwningService(serviceName);
 	backgroundImageEntity.setEntityID(_modelComponent->createEntityUID());
 	backgroundImageEntity.setName(CreateNewUniqueTopologyName(_containerInfo.getEntityName(), newName));
 	backgroundImageEntity.createProperties();
