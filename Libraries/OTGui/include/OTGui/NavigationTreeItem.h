@@ -15,7 +15,7 @@
 #include <list>
 #include <string>
 
-#pragma warning(disable:4251)
+#pragma warning (disable: 4251)
 
 namespace ot {
 

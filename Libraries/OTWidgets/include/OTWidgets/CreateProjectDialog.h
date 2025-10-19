@@ -58,15 +58,6 @@ namespace ot {
 		std::string getTemplateName(bool _emptyIfDefault) const;
 		std::string getProjectName(void) const;
 
-		void setDefaultIcon(const QIcon& _icon) { m_defaultIcon = _icon; };
-		const QIcon& getDefaultIcon(void) const { return m_defaultIcon; };
-
-		void setDefaultIconMap(const std::map<std::string, std::string>& _projectNameToIconMap) { m_defaultIconMap = _projectNameToIconMap; };
-		const std::map<std::string, std::string>& getDefaultIconMap(void) const { return m_defaultIconMap; };
-
-		void setCustomIconMap(const std::map<std::string, std::string>& _projectNameToIconMap) { m_customIconMap = _projectNameToIconMap; };
-		const std::map<std::string, std::string>& getCustomIconMap(void) const { return m_customIconMap; };
-
 	protected:
 		virtual void showEvent(QShowEvent* _event) override;
 
@@ -91,10 +82,6 @@ namespace ot {
 		LineEdit* m_search;
 		LineEdit* m_name;
 		PushButton* m_createButton;
-
-		QIcon m_defaultIcon;
-		std::map<std::string, std::string> m_defaultIconMap;
-		std::map<std::string, std::string> m_customIconMap;
 	};
 
 }

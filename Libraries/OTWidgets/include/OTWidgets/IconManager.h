@@ -62,6 +62,13 @@ namespace ot {
 		//! This icon may be used for windows and dialogs to let them all have the same icon.
 		static const QIcon& getApplicationIcon(void);
 
+		//! @brief Stores the default project icon.
+		//! @param _icon The icon to use as default project icon.
+		static void setDefaultProjectIcon(const QIcon& _icon);
+
+		//! @brief Returns the default project icon.
+		static const QIcon& getDefaultProjectIcon(void);
+
 	private:
 		template <class T>
 		std::shared_ptr<T>& getOrCreate(const QString& _subPath, std::map<QString, std::shared_ptr<T>>& _dataMap, std::shared_ptr<T>& _default);
@@ -88,6 +95,7 @@ namespace ot {
 		std::shared_ptr<QMovie> m_emptyMovie;
 		std::shared_ptr<QByteArray> m_emptySvgData;
 		QIcon m_applicationIcon;
+		QIcon m_defaultProjectIcon;
 	};
 
 }

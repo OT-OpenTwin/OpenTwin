@@ -496,6 +496,12 @@
 #define OT_ACTION_PARAM_SESSION_SERVICES "Session.Services"
 #define OT_ACTION_PARAM_SESSION_EXISTS "Session.Exists"
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// !!!!!!!!!! If changing or adding session types, also update the icons in the "Assets/Icons/ProjectTemplates/" folder !!!!!!!!!!
+
+// For each session type there must exists one icon with the session type name and one with the "Custom" prefix for custom templates.
+
 #define OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT "Development"
 #define OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL "Hierarchical"
 #define OT_ACTION_PARAM_SESSIONTYPE_3DSIM "3D Simulation"
@@ -504,6 +510,10 @@
 #define OT_ACTION_PARAM_SESSIONTYPE_LTSPICE "LT Spice"
 #define OT_ACTION_PARAM_SESSIONTYPE_PYRIT "Pyrit"
 #define OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION "Circuit Simulation"
+
+// !!!!!!!!!! If changing or adding session types, also update the icons in the "Assets/Icons/ProjectTemplates/" folder !!!!!!!!!!
+
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #define OT_ACTION_PARAM_SITE_ID "Site.ID"
 #define OT_ACTION_PARAM_SESSION_SERVICE_URL "SessionService.URL"

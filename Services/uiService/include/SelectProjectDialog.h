@@ -66,6 +66,4 @@ private:
 	ot::PushButton* m_confirmButton;
 	ot::LineEdit* m_filter;
 	ot::Label* m_infoLabel;
-
-	std::map<std::string, QIcon> m_projectTypeToIconMap;
 };

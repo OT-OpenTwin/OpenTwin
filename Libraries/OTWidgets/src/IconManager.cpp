@@ -113,6 +113,14 @@ const QIcon& ot::IconManager::getApplicationIcon(void) {
 	return IconManager::instance().m_applicationIcon;
 }
 
+void ot::IconManager::setDefaultProjectIcon(const QIcon& _icon) {
+	IconManager::instance().m_defaultProjectIcon = _icon;
+}
+
+const QIcon& ot::IconManager::getDefaultProjectIcon(void) {
+	return IconManager::instance().m_defaultProjectIcon;
+}
+
 QString ot::IconManager::findFullPath(const QString& _subPath) {
 	for (auto p : m_searchPaths) {
 		if (QFile::exists(p + _subPath)) return p + _subPath;

@@ -74,10 +74,6 @@ SelectProjectDialog::SelectProjectDialog(const ot::DialogCfg& _config)
 	// Initialize data
 	AppBase* app = AppBase::instance();
 
-	for (const auto& it : app->getProjectTypeDefaultIconNameMap()) {
-		m_projectTypeToIconMap.emplace(it.first, ot::IconManager::instance().getIcon(QString::fromStdString(it.second)));
-	}
-
 	this->slotRefillList();
 }
 
@@ -150,12 +146,13 @@ void SelectProjectDialog::slotRefillList() {
 	// Refill list
 	for (const ot::ProjectInformation& proj : projects) {
 		SelectProjectDialogEntry* entry = new SelectProjectDialogEntry(proj);
-		auto icoIt = m_projectTypeToIconMap.find(proj.getProjectType());
-		if (icoIt != m_projectTypeToIconMap.end()) {
-			entry->setIcon(icoIt->second);
+
+		QString filePath = "ProjectTemplates/" + QString::fromStdString(proj.getProjectType()) + ".png";
+		if (ot::IconManager::fileExists(filePath)) {
+			entry->setIcon(ot::IconManager::getIcon(filePath));
 		}
 		else {
-			entry->setIcon(app->getDefaultProjectTypeIcon());
+			entry->setIcon(ot::IconManager::getDefaultProjectIcon());
 		}
 
 		m_list->addItem(entry);

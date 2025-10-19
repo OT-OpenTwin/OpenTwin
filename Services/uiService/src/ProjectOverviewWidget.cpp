@@ -534,10 +534,13 @@ void ProjectOverviewWidget::addProject(const ot::ProjectInformation& _projectInf
 	bool wasSortingEnabled = m_table->isSortingEnabled();
 	m_table->setSortingEnabled(false);
 
-	QIcon projectTypeIcon = AppBase::instance()->getDefaultProjectTypeIcon();
-	auto iconIt = AppBase::instance()->getProjectTypeDefaultIconNameMap().find(_projectInfo.getProjectType());
-	if (iconIt != AppBase::instance()->getProjectTypeDefaultIconNameMap().end()) {
-		projectTypeIcon = ot::IconManager::getIcon(QString::fromStdString(iconIt->second));
+	QIcon projectTypeIcon;
+	const QString iconPath = "ProjectTemplates/" + QString::fromStdString(_projectInfo.getProjectType()) + ".png";
+	if (ot::IconManager::fileExists(iconPath)) {
+		projectTypeIcon = ot::IconManager::getIcon(iconPath);
+	}
+	else {
+		projectTypeIcon = ot::IconManager::getDefaultProjectIcon();
 	}
 
 	ProjectOverviewEntry* newEntry = new ProjectOverviewEntry(_projectInfo, projectTypeIcon, _ownerIsCreator, m_table);

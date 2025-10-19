@@ -28,23 +28,20 @@ ot::CreateProjectDialogEntry::CreateProjectDialogEntry(const ProjectTemplateInfo
 	this->setText(QString::fromStdString(m_info.getName()));
 	this->setToolTip(QString::fromStdString(m_info.getBriefDescription()));
 
+	QString iconPath;
+
 	if (m_info.getIsDefault()) {
-		const auto it = _dialog->getDefaultIconMap().find(m_info.getProjectType());
-		if (it != _dialog->getDefaultIconMap().end()) {
-			this->setIcon(IconManager::getIcon(QString::fromStdString(it->second)));
-		}
-		else {
-			this->setIcon(_dialog->getDefaultIcon());
-		}
+		iconPath = "ProjectTemplates/" + QString::fromStdString(m_info.getProjectType()) + ".png";
 	}
 	else {
-		const auto it = _dialog->getCustomIconMap().find(m_info.getProjectType());
-		if (it != _dialog->getCustomIconMap().end()) {
-			this->setIcon(IconManager::getIcon(QString::fromStdString(it->second)));
-		}
-		else {
-			this->setIcon(_dialog->getDefaultIcon());
-		}
+		iconPath = "ProjectTemplates/Custom" + QString::fromStdString(m_info.getProjectType()) + ".png";
+	}
+
+	if (IconManager::fileExists(iconPath)) {
+		this->setIcon(IconManager::getIcon(iconPath));
+	}
+	else {
+		this->setIcon(IconManager::getDefaultProjectIcon());
 	}
 
 	QFont font = this->font();
