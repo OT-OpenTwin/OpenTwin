@@ -337,11 +337,17 @@ void Application::handleDeleteEntity(ot::JsonDocument& _document) {
 		OT_LOG_E("No model created yet");
 		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
-
-	std::list<std::string> entityNameList = ot::json::getStringList(_document, OT_ACTION_PARAM_MODEL_EntityNameList);
+	
 	bool saveModel = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_SaveModel);
 
-	m_model->deleteEntitiesFromModel(entityNameList, saveModel);
+	if (_document.HasMember(OT_ACTION_PARAM_MODEL_EntityNameList)) {
+		std::list<std::string> entityNameList = ot::json::getStringList(_document, OT_ACTION_PARAM_MODEL_EntityNameList);
+		m_model->deleteEntitiesFromModel(entityNameList, saveModel);
+	}
+	else {
+		ot::UIDList entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+		m_model->deleteEntitiesFromModel(entityIDList, saveModel);
+	}
 }
 
 void Application::handleMeshingCompleted(ot::JsonDocument& _document) {
