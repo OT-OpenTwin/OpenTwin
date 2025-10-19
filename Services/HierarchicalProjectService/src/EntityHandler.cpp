@@ -18,9 +18,11 @@
 #include "EntityAPI.h"
 #include "EntityFileImage.h"
 #include "EntityBlockImage.h"
+#include "EntityFileRawData.h"
 #include "EntityBlockConnection.h"
 #include "EntityHierarchicalScene.h"
 #include "EntityBlockHierarchicalProjectItem.h"
+#include "EntityBlockHierarchicalDocumentItem.h"
 #include "EntityBlockHierarchicalContainerItem.h"
 
 EntityHandler::EntityHandler() : 
@@ -126,14 +128,90 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 }
 
 void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
+	ot::FileExtension::DefaultFileExtension extension = ot::FileExtension::DefaultFileExtension::Unknown;
+	std::string fileNameOnly;
+	std::string extensionString;
+	if (!getFileFormat(_fileName, fileNameOnly, extensionString, extension)) {
+		return;
+	}
+
 	// Unpack data
-	std::string unpackedData = ot::Encryption::decryptAndUnzipString(_fileContent, _uncompressedDataLength);
+	std::string unpackedData = ot::String::decompressed(_fileContent, _uncompressedDataLength);
 
 	const std::string serviceName = Application::instance().getServiceName();
 
 	// Create container
 	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
 
+	// Create data entity
+	EntityBinaryData dataEntity;
+	dataEntity.setOwningService(serviceName);
+	dataEntity.setEntityID(_modelComponent->createEntityUID());
+	dataEntity.setData(std::move(fileData));
+	dataEntity.storeToDataBase();
+	_newEntities.addDataEntity(_containerInfo.getEntityID(), dataEntity);
+
+	ot::UID documentEntityID = ot::invalidUID;
+
+	// Try to create entity from extension
+	{
+		std::unique_ptr<EntityBase> entity(EntityFactory::instance().create(extension));
+		if (entity) {
+			EntityFile* fileEntity = dynamic_cast<EntityFile*>(entity.get());
+			if (fileEntity) {
+				// We have a valid file entity, set it up
+				fileEntity->setOwningService(serviceName);
+				fileEntity->setEntityID(_modelComponent->createEntityUID());
+				fileEntity->setName(CreateNewUniqueTopologyName(_containerInfo.getEntityName() + "/Documents", fileNameOnly + "." + extensionString));
+				fileEntity->setFileProperties(_fileName, fileNameOnly, extensionString);
+				fileEntity->setDataEntity(dataEntity);
+				fileEntity->setEditable(false);
+				fileEntity->setDeletable(false);
+				fileEntity->storeToDataBase();
+				_newEntities.addTopologyEntity(*fileEntity);
+
+				documentEntityID = fileEntity->getEntityID();
+			}
+		}
+
+		if (documentEntityID == ot::invalidUID) {
+			// No regular file entity, fallback to raw file entity
+
+			EntityFileRawData rawDataEntity;
+			rawDataEntity.setOwningService(serviceName);
+			rawDataEntity.setEntityID(_modelComponent->createEntityUID());
+			rawDataEntity.setFileProperties(_fileName, fileNameOnly, extensionString);
+			rawDataEntity.setDataEntity(dataEntity);
+			rawDataEntity.setEditable(false);
+			rawDataEntity.setDeletable(false);
+			rawDataEntity.storeToDataBase();
+			_newEntities.addDataEntity(_containerInfo.getEntityID(), rawDataEntity);
+
+			documentEntityID = rawDataEntity.getEntityID();
+		}
+	}
+
+	OTAssert(documentEntityID != ot::invalidUID, "Document entity ID is invalid");
+
+	// Create coordinate entity
+	EntityCoordinates2D coord;
+	coord.setOwningService(serviceName);
+	coord.setEntityID(_modelComponent->createEntityUID());
+	coord.storeToDataBase();
+	_newEntities.addDataEntity(_containerInfo.getEntityID(), coord);
+
+	// Create block entity
+	EntityBlockHierarchicalDocumentItem blockEntity;
+	blockEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
+	blockEntity.setOwningService(serviceName);
+	blockEntity.setEntityID(_modelComponent->createEntityUID());
+	blockEntity.setName(CreateNewUniqueTopologyName(_containerInfo.getEntityName(), fileNameOnly + "." + extensionString));
+	blockEntity.createProperties();
+	blockEntity.setEditable(true);
+	blockEntity.setCoordinateEntityID(coord.getEntityID());
+	blockEntity.setDocument(documentEntityID);
+	blockEntity.storeToDataBase();
+	_newEntities.addTopologyEntity(blockEntity);
 }
 
 void EntityHandler::addDocuments(const ot::EntityInformation& _containerInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
@@ -154,7 +232,7 @@ void EntityHandler::addDocuments(const ot::EntityInformation& _containerInfo, co
 
 void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
 	// Unpack data
-	std::string unpackedData = ot::Encryption::decryptAndUnzipString(_fileContent, _uncompressedDataLength);
+	std::string unpackedData = ot::String::decompressed(_fileContent, _uncompressedDataLength);
 
 	const std::string serviceName = Application::instance().getServiceName();
 
@@ -235,7 +313,7 @@ void EntityHandler::addBackgroundImages(const ot::EntityInformation& _containerI
 
 bool EntityHandler::addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter) {
 	// Unpack data
-	std::string unpackedData = ot::Encryption::decryptAndUnzipString(_fileContent, _uncompressedDataLength);
+	std::string unpackedData = ot::String::decompressed(_fileContent, _uncompressedDataLength);
 
 	// Create container
 	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
@@ -403,7 +481,7 @@ void EntityHandler::addContainer(const ot::EntityInformation& _containerInfo) {
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added hierarchical container", true, true);
 }
 
-bool EntityHandler::getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) {
+bool EntityHandler::getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const {
 	std::string tmp;
 	std::list<std::string> path = ot::String::split(ot::String::replace(_filePath, '\\', '/'), '/', true);
 	if (path.empty()) {
@@ -417,16 +495,22 @@ bool EntityHandler::getImageFileFormat(const std::string& _filePath, std::string
 	size_t ix = tmp.rfind('.');
 	if (ix != std::string::npos) {
 		_fileName = tmp.substr(0, ix);
-		_extension = ot::String::toLower(tmp.substr(ix + 1));
+		_extensionString = ot::String::toLower(tmp.substr(ix + 1));
 	}
 	else {
-		OT_LOG_E("Could not determine file extension for image file: \"" + _filePath + "\"");
+		OT_LOG_E("Could not determine file extension for file: \"" + _filePath + "\"");
 		return false;
 	}
 
 	// Check if extension is supported
-	ot::FileExtension::DefaultFileExtension extension = ot::FileExtension::stringToFileExtension(_extension);
-	if (extension == ot::FileExtension::Unknown) {
+	_extension = ot::FileExtension::stringToFileExtension(_extensionString);
+
+	return (_extension != ot::FileExtension::Unknown);
+}
+
+bool EntityHandler::getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) const {
+	ot::FileExtension::DefaultFileExtension extension = ot::FileExtension::Unknown;
+	if (!getFileFormat(_filePath, _fileName, _extension, extension)) {
 		OT_LOG_E("Unsupported file extension for image file: \"" + _extension + "\"");
 		return false;
 	}

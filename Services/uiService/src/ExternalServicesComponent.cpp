@@ -98,6 +98,8 @@
 // Qt header
 #include <QtCore/qdir.h>						// QDir
 #include <QtCore/qeventloop.h>
+#include <QtCore/qstandardpaths.h>
+#include <QtGui/qdesktopservices.h>
 #include <QtWidgets/qfiledialog.h>
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qapplication.h>
@@ -151,6 +153,8 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	m_controlsManager = new ControlsManager;
 	m_lockManager = new LockManager(m_owner);
 
+	m_tempFolderPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/OpenTwin/Temp";
+
 	// Connect action handler
 
 	ot::ActionDispatcher::instance().setDefaultMessageTypes(ot::ALL_MESSAGE_TYPES);
@@ -178,6 +182,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	connectAction(OT_ACTION_CMD_UI_RequestFileForReading, this, &ExternalServicesComponent::handleRequestFileForReading);
 	connectAction(OT_ACTION_CMD_UI_SaveFileContent, this, &ExternalServicesComponent::handleSaveFileContent);
 	connectAction(OT_ACTION_CMD_UI_SelectFileForStoring, this, &ExternalServicesComponent::handleSelectFilesForStoring);
+	connectAction(OT_ACTION_CMD_UI_OpenRawFile, this, &ExternalServicesComponent::handleOpenRawFile);
 
 	// General UI control handling
 	connectAction(OT_ACTION_CMD_UI_AddShortcut, this, &ExternalServicesComponent::handleAddShortcut);
@@ -1481,6 +1486,14 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		m_actionBuffer.clear();
 
+		// Clean up temporary files
+		QDir tmpDir(m_tempFolderPath);
+		if (tmpDir.exists()) {
+			if (!tmpDir.removeRecursively()) {
+				OT_LOG_W("Failed to remove temporary folder at \"" + m_tempFolderPath.toStdString() + "\"");
+			}
+		}
+
 		OT_LOG_D("Close project done");
 
 		ot::LogDispatcher::instance().setProjectName("");
@@ -2157,6 +2170,53 @@ void ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocument& _d
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		assert(0); // WARNING
 		}
+	}
+}
+
+void ExternalServicesComponent::handleOpenRawFile(ot::JsonDocument& _document) {
+	std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
+	std::string fileType = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Type);
+	std::string compressedData = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
+	uint64_t uncompressedDataLength = ot::json::getUInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+
+	// Unpack the data
+	std::string fileContent = ot::String::decompressed(compressedData, uncompressedDataLength);
+	QByteArray byteArray = QByteArray::fromRawData(fileContent.c_str(), uncompressedDataLength);
+
+	// Determine a temporary file name
+	QDir dir;
+	if (!dir.exists(m_tempFolderPath)) {
+		dir.mkpath(m_tempFolderPath);
+	}
+
+	QString qFileName = QString::fromStdString(fileName);
+	QString suffix = "." + QString::fromStdString(fileType);
+
+	QString newFileName = m_tempFolderPath + "/" + qFileName + suffix;
+	int ct = 1;
+	while (QFile::exists(newFileName)) {
+		newFileName = newFileName = m_tempFolderPath + "/" + qFileName + "_" + QString::number(ct++) + suffix;
+	}
+
+	// Store the data in the temporary file
+	QFile file(newFileName);
+	if (!file.open(QIODevice::WriteOnly)) {
+		OT_LOG_EAS("Failed to open temporary file \"" + newFileName.toStdString() + "\" for writing");
+		return;
+	}
+	file.write(byteArray);
+	file.close();
+
+	// Launch the file with the associated application
+	if (!QDesktopServices::openUrl(QUrl::fromLocalFile(newFileName))) {
+		OT_LOG_EAS("Failed to open temporary file \"" + newFileName.toStdString() + "\" with associated application");
+
+		// Cleanup the temporary file
+		QFile::remove(newFileName);
+		return;
+	}
+	else {
+		AppBase::instance()->appendInfoMessage("Opened file \"" + newFileName + "\"\n");
 	}
 }
 

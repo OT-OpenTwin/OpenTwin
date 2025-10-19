@@ -215,6 +215,7 @@ public:
 	void handleRequestFileForReading(ot::JsonDocument& _document);
 	void handleSaveFileContent(ot::JsonDocument& _document);
 	void handleSelectFilesForStoring(ot::JsonDocument& _document);
+	void handleOpenRawFile(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -474,6 +475,8 @@ private:
 	AppBase *										m_owner;
 
 	std::string										m_modelServiceURL;
+
+	QString                                         m_tempFolderPath;
 
 	std::map<std::string, ot::UID>					m_serviceToUidMap;
 	std::map<ot::serviceID_t, ServiceDataUi*>	m_serviceIdMap;

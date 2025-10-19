@@ -36,7 +36,8 @@ public:
 	void addContainer(const ot::EntityInformation& _containerInfo);
 
 private:
-	bool getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format);
+	bool getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const;
+	bool getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) const;
 
 	const std::string c_connectionsFolder = "Connections";
 

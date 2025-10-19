@@ -10,6 +10,7 @@
 #include "OTSystem/DateTime.h"
 
 // OpenTwin Core header
+#include "OTCore/String.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/ProjectInformation.h"
 
@@ -23,6 +24,7 @@
 #include "OTCommunication/ActionTypes.h"
 
 // OpenTwin ServiceFoundation header
+#include "OTServiceFoundation/Encryption.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/AbstractUiNotifier.h"
@@ -37,7 +39,10 @@
 // Entities
 #include "EntityAPI.h"
 #include "EntityBinaryData.h"
+#include "EntityFileRawData.h"
 #include "EntityHierarchicalScene.h"
+#include "EntityBlockHierarchicalProjectItem.h"
+#include "EntityBlockHierarchicalDocumentItem.h"
 
 // std header
 #include <thread>
@@ -177,10 +182,9 @@ ot::ReturnMessage Application::graphicsItemDoubleClicked(const std::string& _nam
 		// Request to open the project
 		return this->requestToOpenProject(info);
 	}
-	else {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Unsupported entity type { \"Name\": " + _name + "\", \"Type\": \"" + info.getEntityType() + "\"");
-		OT_LOG_E(ret.getWhat());
-		return ret;
+	else if (info.getEntityType() == EntityBlockHierarchicalDocumentItem::className()) {
+		// Request to open the document
+		return this->requestToOpenDocument(info);
 	}
 	return ot::ReturnMessage::Ok;
 }
@@ -244,7 +248,7 @@ void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
 		return;
 	}
 
-
+	m_entityHandler.addDocuments(info, fileNames, contents, uncompressedDataLengths, fileFilter);
 }
 
 void Application::handleBackgroundImageSelected(ot::JsonDocument& _doc) {
@@ -452,6 +456,98 @@ ot::ReturnMessage Application::requestToOpenProject(const ot::EntityInformation&
 	}
 
 	sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc);
+
+	return ot::ReturnMessage::Ok;
+}
+
+ot::ReturnMessage Application::requestToOpenDocument(const ot::EntityInformation& _entity) {
+	// Load entity
+	std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(_entity.getEntityID(), _entity.getEntityVersion()));
+	if (!entity) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not read entity from database "
+			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
+			", \"Version\": " + std::to_string(_entity.getEntityVersion()) + " }"
+		);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	// Check if entity is of expected type
+	EntityBlockHierarchicalDocumentItem* documentEntity = dynamic_cast<EntityBlockHierarchicalDocumentItem*>(entity.get());
+	if (!documentEntity) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Invalid entity type "
+			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
+			", \"Version\": " + std::to_string(_entity.getEntityVersion()) +
+			", \"Type\": \"" + _entity.getEntityType() + "\", \"ExpectedType\": \"" + EntityBlockHierarchicalDocumentItem::className() + "\" }"
+		);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	// Load data entity
+	if (documentEntity->getDocumentID() == ot::invalidUID) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Document entity does not have a valid data entity assigned "
+			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
+			", \"Version\": " + std::to_string(_entity.getEntityVersion()) + " }"
+		);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	ot::EntityInformation documentInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(documentEntity->getDocumentID(), documentInfo)) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine document data entity information "
+			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
+			", \"Version\": " + std::to_string(_entity.getEntityVersion()) +
+			", \"DataEntityID\": " + std::to_string(documentEntity->getDocumentID()) + " }"
+		);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	std::unique_ptr<EntityBase> document(ot::EntityAPI::readEntityFromEntityIDandVersion(documentInfo.getEntityID(), documentInfo.getEntityVersion()));
+	if (!document) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not load document data entity "
+			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
+			", \"Version\": " + std::to_string(_entity.getEntityVersion()) +
+			", \"DataEntityID\": " + std::to_string(documentEntity->getDocumentID()) + " }"
+		);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	// Check if document is raw file entity
+	EntityFileRawData* fileEntity = dynamic_cast<EntityFileRawData*>(document.get());
+	if (!fileEntity) {
+		// Only raw file entities need custom visualization
+		return ot::ReturnMessage::Ok;
+	}
+
+	// Pack the data
+	std::shared_ptr<EntityBinaryData> dataEntity(fileEntity->getDataEntity());
+	if (!dataEntity) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not load document data entity data "
+			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
+			", \"Version\": " + std::to_string(_entity.getEntityVersion()) +
+			", \"DataEntityID\": " + std::to_string(documentEntity->getDocumentID()) + " }"
+		);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	uint64_t uncompressedDataLength = dataEntity->getData().size();
+	std::string compressedData = ot::String::compressed(std::string(dataEntity->getData().begin(), dataEntity->getData().end()));
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_OpenRawFile, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(compressedData, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLength, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonString(fileEntity->getFileName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Type, ot::JsonString(fileEntity->getFileType(), doc.GetAllocator()), doc.GetAllocator());
+
+
+	std::string tmp;
+	this->getUiComponent()->sendMessage(true, doc, tmp);
 
 	return ot::ReturnMessage::Ok;
 }
