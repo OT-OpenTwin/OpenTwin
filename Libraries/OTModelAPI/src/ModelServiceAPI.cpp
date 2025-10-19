@@ -210,6 +210,14 @@ void ot::ModelServiceAPI::addGeometryOperation(UID _newEntityID, UID _newEntityV
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
+void ot::ModelServiceAPI::deleteEntityFromModel(UID _entityID, bool _saveModel) {
+	ModelServiceAPI::deleteEntitiesFromModel(UIDList{ _entityID }, _saveModel);
+}
+
+void ot::ModelServiceAPI::deleteEntityFromModel(const std::string& _entityName, bool _saveModel) {
+	ModelServiceAPI::deleteEntitiesFromModel(std::list<std::string>{ _entityName }, _saveModel);
+}
+
 void ot::ModelServiceAPI::deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel) {
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_DeleteEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());

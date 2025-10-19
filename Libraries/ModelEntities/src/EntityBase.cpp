@@ -59,7 +59,6 @@ std::string EntityBase::getNameOnly() const {
 	}
 }
 
-
 void EntityBase::setModified(void) {
 	if (m_observer != nullptr) m_observer->entityModified(this);
 	

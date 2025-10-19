@@ -445,6 +445,9 @@
     <ClInclude Include="include\IVisualisationImage.h">
       <Filter>Header Files\EntityInterfaces</Filter>
     </ClInclude>
+    <ClInclude Include="include\NewModelStateInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -767,6 +770,9 @@
     </ClCompile>
     <ClCompile Include="src\EntityFileImage.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NewModelStateInfo.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

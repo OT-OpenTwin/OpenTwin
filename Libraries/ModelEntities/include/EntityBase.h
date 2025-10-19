@@ -13,6 +13,7 @@
 #include "EntityFactoryRegistrar.h"
 #include "OldTreeIcon.h"
 #include "OTCore/LogDispatcher.h"
+#include "OTCore/BasicEntityInformation.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
 
@@ -58,6 +59,8 @@ public:
 	ot::UID getEntityID() const { return m_entityID; };
 
 	ot::UID getEntityStorageVersion() const { return m_entityStorageVersion; };
+
+	ot::BasicEntityInformation getBasicEntityInformation() const { return ot::BasicEntityInformation(m_name, m_entityID, m_entityStorageVersion); };
 
 	void setInitiallyHidden(bool flag) { m_initiallyHidden = flag; };
 	bool getInitiallyHidden() { return m_initiallyHidden; };

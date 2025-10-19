@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTModelAPI/NewModelStateInfo.h"
+#include "NewModelStateInfo.h"
 
 void ot::NewModelStateInfo::addTopologyEntity(ot::UID _entityID, ot::UID _entityVersion, bool _forceVisible) {
 	OTAssert(_entityID != 0, "Entity ID must not be zero");

@@ -6,9 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
-#include "OTModelAPI/OTModelAPIExport.h"
 #include "EntityBase.h"
+#include "ModelEntitiesAPIExport.h"
 
 // std header
 #include <list>
@@ -18,7 +17,7 @@
 namespace ot {
 
 	//! @brief The NewModelStateInfo class is used to collect information about new entities that should be added to the model.
-	class OT_MODELAPI_API_EXPORT NewModelStateInfo {
+	class OT_MODELENTITIES_API_EXPORT NewModelStateInfo {
 		OT_DECL_DEFCOPY(NewModelStateInfo)
 		OT_DECL_DEFMOVE(NewModelStateInfo)
 	public:

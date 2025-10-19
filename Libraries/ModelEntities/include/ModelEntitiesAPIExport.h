@@ -12,3 +12,5 @@
 //! @brief Dll import
 #define OT_MODELENTITIES_API_EXPORT __declspec(dllimport)
 #endif // OPENTWINMODELENTITIES_EXPORTS
+
+#define OT_MODELENTITIES_API_EXPORTONLY __declspec(dllexport)
