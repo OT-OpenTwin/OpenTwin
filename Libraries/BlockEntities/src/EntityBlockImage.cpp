@@ -34,6 +34,7 @@ ot::GraphicsItemCfg* EntityBlockImage::createBlockCfg() {
 	}
 
 	std::unique_ptr<ot::GraphicsImageItemCfg> cfg(new ot::GraphicsImageItemCfg);
+	cfg->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsSelectable | ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemHandlesState);
 	cfg->setImageData(m_image->getImage(), m_image->getImageFormat());
 	int width = PropertyHelper::getIntegerPropertyValue(this, "Width", "Image");
 	int height = PropertyHelper::getIntegerPropertyValue(this, "Height", "Image");
@@ -41,7 +42,7 @@ ot::GraphicsItemCfg* EntityBlockImage::createBlockCfg() {
 	if (width > 0 && height > 0) {
 		cfg->setFixedSize(width, height);
 	}
-	cfg->setMaintainAspectRatio(PropertyHelper::getBoolPropertyValue(this, "Maintain aspect ratio", "Block"));
+	cfg->setMaintainAspectRatio(PropertyHelper::getBoolPropertyValue(this, "Maintain aspect ratio", "Image"));
 	cfg->setZValue(PropertyHelper::getIntegerPropertyValue(this, "Z Value", "Block"));
 
 	return cfg.release();
