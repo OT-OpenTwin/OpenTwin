@@ -25,7 +25,7 @@
     <ClCompile Include="src\PythonServiceInterface.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
+    <ClCompile Include="$(OPENTWIN_THIRDPARTY_ROOT)\base64\base64.c">
       <Filter>ThirdParty</Filter>
     </ClCompile>
     <ClCompile Include="src\UiComponent.cpp">
@@ -72,7 +72,7 @@
     <ClInclude Include="include\OTServiceFoundation\IDManager.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
+    <ClInclude Include="$(OPENTWIN_THIRDPARTY_ROOT)\base64\base64.h">
       <Filter>ThirdParty</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\ModalCommandBase.h">
