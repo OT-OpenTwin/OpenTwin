@@ -23,27 +23,6 @@ bool EntityFileImage::updateFromProperties() {
 	return EntityFile::updateFromProperties();
 }
 
-void EntityFileImage::setImage(std::vector<char>&& _image, ot::ImageFileFormat _format) {
-	auto dataEntity = getDataEntity();
-
-	if (dataEntity != nullptr) {
-		dataEntity->setData(std::move(_image));
-		m_format = _format;
-
-		if (getModelState() != nullptr) {
-			dataEntity->storeToDataBase();
-			setDataEntity(*dataEntity);
-			getModelState()->modifyEntityVersion(*dataEntity);
-			
-			this->storeToDataBase();
-			getModelState()->modifyEntityVersion(*this);
-		}
-		else {
-			setModified();
-		}
-	}
-}
-
 const std::vector<char>& EntityFileImage::getImage() {
 	auto dataEntity = getDataEntity();
 	if (!dataEntity) {

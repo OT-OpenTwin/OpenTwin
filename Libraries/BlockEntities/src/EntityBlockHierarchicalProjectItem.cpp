@@ -107,18 +107,6 @@ void EntityBlockHierarchicalProjectItem::setPreviewFile(ot::UID _entityID, ot::U
 	setModified();
 }
 
-void EntityBlockHierarchicalProjectItem::setPreviewFile(std::vector<char>&& _imageData, ot::ImageFileFormat _format) {
-	ensurePreviewLoaded();
-
-	if (!m_preview) {
-		throw ot::Exception::ObjectNotFound("Preview entity could not be created");
-	}
-
-	m_preview->setImage(std::move(_imageData), _format);
-
-	setModified();
-}
-
 void EntityBlockHierarchicalProjectItem::removePreviewFile() {
 	m_previewUID = ot::invalidUID;
 	m_previewVersion = ot::invalidUID;
@@ -126,6 +114,11 @@ void EntityBlockHierarchicalProjectItem::removePreviewFile() {
 	m_preview = nullptr;
 
 	setModified();
+}
+
+std::shared_ptr<EntityFileImage> EntityBlockHierarchicalProjectItem::getPreviewFile() {
+	ensurePreviewLoaded();
+	return m_preview;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

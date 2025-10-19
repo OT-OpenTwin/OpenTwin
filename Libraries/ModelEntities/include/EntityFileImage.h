@@ -16,7 +16,6 @@ public:
 
 	bool updateFromProperties() override;
 
-	virtual void setImage(std::vector<char>&& _image, ot::ImageFileFormat _format) override;
 	virtual const std::vector<char>& getImage() override;
 
 	void setImageFormat(ot::ImageFileFormat _format) { m_format = _format; setModified(); };

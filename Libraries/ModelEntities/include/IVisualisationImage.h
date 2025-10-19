@@ -10,7 +10,6 @@ class __declspec(dllexport) IVisualisationImage {
 public:
 	virtual ~IVisualisationImage() {};
 
-	virtual void setImage(std::vector<char>&& _image, ot::ImageFileFormat _format) = 0;
 	virtual const std::vector<char>& getImage() = 0;
 	virtual ot::ImageFileFormat getImageFormat() const = 0;
 	

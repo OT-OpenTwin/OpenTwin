@@ -179,12 +179,30 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 	if (projectEntity->hasPreviewFile()) {
 		ot::NewModelStateInfo update;
 
-		// Update existing image
-		projectEntity->setPreviewFile(std::move(fileData), format);
+		auto previewFileEntity = projectEntity->getPreviewFile();
+		if (!previewFileEntity) {
+			OT_LOG_E("Could not load existing preview file entity { \"ProjectEntity\": \"" + _projectEntityName + "\" }");
+			return false;
+		}
+
+		auto dataEntity = previewFileEntity->getDataEntity();
+		if (!dataEntity) {
+			OT_LOG_E("Could not load existing preview file data entity { \"ProjectEntity\": \"" + _projectEntityName + "\" }");
+			return false;
+		}
+
+		// Update entities
+		dataEntity->setData(std::move(fileData));
+		dataEntity->storeToDataBase();
+
+		previewFileEntity->setImageFormat(format);
+		previewFileEntity->setDataEntity(*dataEntity);
+		previewFileEntity->storeToDataBase();
+
+		projectEntity->setPreviewFile(*previewFileEntity);
 		projectEntity->storeToDataBase();
 
 		update.addTopologyEntity(*projectEntity);
-
 		ot::ModelServiceAPI::updateTopologyEntities(update, "Changed image of project item");
 	}
 	else {
