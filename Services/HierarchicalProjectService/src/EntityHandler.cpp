@@ -182,6 +182,7 @@ void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerIn
 	backgroundImageEntity.setEntityID(_modelComponent->createEntityUID());
 	backgroundImageEntity.setName(CreateNewUniqueTopologyName(_containerInfo.getEntityName(), newName));
 	backgroundImageEntity.createProperties();
+	backgroundImageEntity.setEditable(true);
 	backgroundImageEntity.setCoordinateEntityID(coord.getEntityID());
 	backgroundImageEntity.setImageEntity(imageEntity);
 	backgroundImageEntity.storeToDataBase();

@@ -34,7 +34,17 @@ ot::GraphicsItemCfg* EntityBlockImage::createBlockCfg() {
 	}
 
 	std::unique_ptr<ot::GraphicsImageItemCfg> cfg(new ot::GraphicsImageItemCfg);
-	cfg->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsSelectable | ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemHandlesState);
+
+	ot::GraphicsItemCfg::GraphicsItemFlags itemFlags;
+
+	if (PropertyHelper::getBoolPropertyValue(this, "Lock movement", "Block")) {
+		itemFlags = ot::GraphicsItemCfg::ItemSnapsToGridTopLeft;
+	}
+	else {
+		itemFlags = ot::GraphicsItemCfg::ItemIsSelectable | ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemHandlesState;
+	}
+
+	cfg->setGraphicsItemFlags(itemFlags);
 	cfg->setImageData(m_image->getImage(), m_image->getImageFormat());
 	int width = PropertyHelper::getIntegerPropertyValue(this, "Width", "Image");
 	int height = PropertyHelper::getIntegerPropertyValue(this, "Height", "Image");
@@ -57,9 +67,12 @@ bool EntityBlockImage::updateFromProperties() {
 }
 
 void EntityBlockImage::createProperties() {
-	EntityPropertiesBase* prop = EntityPropertiesInteger::createProperty("Block", "Z Value", 0, ot::GraphicsZValues::MinCustomValue, ot::GraphicsZValues::MaxCustomValue, "", getProperties());
+	EntityPropertiesBase* prop = EntityPropertiesBoolean::createProperty("Block", "Lock movement", false, "", getProperties());
+	prop->setToolTip("If enabled, the block item cannot be moved by mouse in the scene.");
+
+	prop = EntityPropertiesInteger::createProperty("Block", "Z Value", 0, ot::GraphicsZValues::MinCustomValue, ot::GraphicsZValues::MaxCustomValue, "", getProperties());
 	prop->setToolTip("Z Value for the block item in the graphics scene. Items with higher Z Values are drawn on top of items with lower Z Values.");
-	
+
 	prop = EntityPropertiesBoolean::createProperty("Image", "Maintain aspect ratio", true, "", getProperties());
 	prop->setToolTip("If enabled, the aspect ratio of the image is maintained when resizing the block item.");
 
