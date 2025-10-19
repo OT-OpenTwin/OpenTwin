@@ -55,8 +55,8 @@ ot::GraphicsItemCfg* EntityBlockHierarchicalProjectItem::createBlockCfg() {
 bool EntityBlockHierarchicalProjectItem::updateFromProperties() {
 	bool updateGrid = false;
 
-	bool useLatestVersionProp = PropertyHelper::getBoolPropertyValue(this, "UseLatestsVersion");
-	EntityPropertiesString* customVersionProp = PropertyHelper::getStringProperty(this, "CustomVersion");
+	bool useLatestVersionProp = PropertyHelper::getBoolPropertyValue(this, "Use current version");
+	EntityPropertiesString* customVersionProp = PropertyHelper::getStringProperty(this, "Custom version");
 	OTAssertNullptr(customVersionProp);
 
 	updateGrid = (useLatestVersionProp == customVersionProp->getVisible());
@@ -86,8 +86,11 @@ void EntityBlockHierarchicalProjectItem::createProperties() {
 	prop->setVisible(false);
 	prop->setReadOnly(true);
 
-	prop = EntityPropertiesBoolean::createProperty("Project", "UseLatestsVersion", true, "", getProperties());
-	prop = EntityPropertiesString::createProperty("Project", "CustomVersion", "1", "", getProperties());
+	prop = EntityPropertiesBoolean::createProperty("Project", "Use current version", true, "", getProperties());
+	prop->setToolTip("If enabled, the last active version will be used (same as opening the project regulary).");
+
+	prop = EntityPropertiesString::createProperty("Project", "Custom version", "1", "", getProperties());
+	prop->setToolTip("Specify a custom version to be used when opening the project.");
 	prop->setVisible(false);
 }
 
@@ -112,6 +115,15 @@ void EntityBlockHierarchicalProjectItem::setPreviewFile(std::vector<char>&& _ima
 	}
 
 	m_preview->setImage(std::move(_imageData), _format);
+
+	setModified();
+}
+
+void EntityBlockHierarchicalProjectItem::removePreviewFile() {
+	m_previewUID = ot::invalidUID;
+	m_previewVersion = ot::invalidUID;
+	m_preview.reset();
+	m_preview = nullptr;
 
 	setModified();
 }
@@ -144,19 +156,19 @@ ot::ProjectInformation EntityBlockHierarchicalProjectItem::getProjectInformation
 }
 
 void EntityBlockHierarchicalProjectItem::setUseLatestVersion(bool _flag) {
-	PropertyHelper::setBoolPropertyValue(_flag, this, "UseLatestsVersion");
+	PropertyHelper::setBoolPropertyValue(_flag, this, "Use current version");
 }
 
 bool EntityBlockHierarchicalProjectItem::getUseLatestVersion() const {
-	return PropertyHelper::getBoolPropertyValue(this, "UseLatestsVersion");
+	return PropertyHelper::getBoolPropertyValue(this, "Use current version");
 }
 
 void EntityBlockHierarchicalProjectItem::setCustomVersion(const std::string& _version) {
-	PropertyHelper::setStringPropertyValue(_version, this, "CustomVersion");
+	PropertyHelper::setStringPropertyValue(_version, this, "Custom version");
 }
 
 std::string EntityBlockHierarchicalProjectItem::getCustomVersion() const {
-	return PropertyHelper::getStringPropertyValue(this, "CustomVersion");
+	return PropertyHelper::getStringPropertyValue(this, "Custom version");
 }
 
 void EntityBlockHierarchicalProjectItem::addStorageData(bsoncxx::builder::basic::document& _storage) {

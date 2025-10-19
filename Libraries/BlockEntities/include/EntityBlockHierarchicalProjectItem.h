@@ -31,6 +31,7 @@ public:
 	void setPreviewFile(const EntityBase& _entity) { setPreviewFile(_entity.getEntityID(), _entity.getEntityStorageVersion()); };
 	void setPreviewFile(ot::UID _entityID, ot::UID _entityVersion);
 	void setPreviewFile(std::vector<char>&& _imageData, ot::ImageFileFormat _format);
+	void removePreviewFile();
 	bool hasPreviewFile() const { return m_previewUID != ot::invalidUID; };
 	ot::UID getPreviewFileID() const { return m_previewUID; };
 	ot::UID getPreviewFileVersion() const { return m_previewVersion; };
