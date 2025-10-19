@@ -777,9 +777,6 @@
     <ClCompile Include="src\NewModelStateInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityFileCustom.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\EntityFileRawData.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>

@@ -171,7 +171,6 @@
     <ClCompile Include="src\EntityCompressedVector.cpp" />
     <ClCompile Include="src\EntityCoordinates2D.cpp" />
     <ClCompile Include="src\EntityFacetData.cpp" />
-    <ClCompile Include="src\EntityFileCustom.cpp" />
     <ClCompile Include="src\EntityFileImage.cpp" />
     <ClCompile Include="src\EntityFileRawData.cpp" />
     <ClCompile Include="src\EntityFileText.cpp" />
