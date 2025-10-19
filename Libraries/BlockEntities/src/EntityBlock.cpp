@@ -202,6 +202,12 @@ void EntityBlock::createBlockItem()
 	assert(entCoordinate != nullptr);
 
 	ot::GraphicsItemCfg* blockCfg = createBlockCfg();
+
+	if (!blockCfg) {
+		OT_LOG_EAS("Failed to create block configuration for block entity  { \"EntityID\": " + std::to_string(getEntityID()) + " }");
+		return;
+	}
+
 	blockCfg->setUid(getEntityID());
 	blockCfg->setPosition(entCoordinate->getCoordinates());
 

@@ -1,5 +1,7 @@
 #pragma once
+
 #include "EntityBase.h"
+#include "BlockEntitiesAPIExport.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/BasicServiceInformation.h"
@@ -13,7 +15,7 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/CopyInformation.h"
 
-class __declspec(dllexport) EntityBlock : public EntityBase
+class OT_BLOCKENTITIES_API_EXPORT EntityBlock : public EntityBase
 {
 public:
 	EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);

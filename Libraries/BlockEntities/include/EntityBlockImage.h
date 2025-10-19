@@ -1,4 +1,4 @@
-//! @file EntityBlockHierarchicalProjectItem.h
+//! @file EntityBlockImage.h
 //! @author Alexander Kuester (alexk95)
 //! @date October 2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -10,13 +10,13 @@
 
 class EntityFileImage;
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalProjectItem : public EntityBlock {
+class OT_BLOCKENTITIES_API_EXPORT EntityBlockImage : public EntityBlock {
 public:
-	EntityBlockHierarchicalProjectItem() : EntityBlockHierarchicalProjectItem(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockHierarchicalProjectItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityBlockImage() : EntityBlockImage(0, nullptr, nullptr, nullptr, "") {};
+	EntityBlockImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
 
-	static std::string className() { return "EntityBlockHierarchicalProjectItem"; }
-	virtual std::string getClassName(void) override { return EntityBlockHierarchicalProjectItem::className(); };
+	static std::string className() { return "EntityBlockImage"; }
+	virtual std::string getClassName(void) override { return EntityBlockImage::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
@@ -28,35 +28,23 @@ public:
 
 	// Data accessors
 
-	void setPreviewFile(const EntityBase& _entity) { setPreviewFile(_entity.getEntityID(), _entity.getEntityStorageVersion()); };
-	void setPreviewFile(ot::UID _entityID, ot::UID _entityVersion);
-	void setPreviewFile(std::vector<char>&& _imageData, ot::ImageFileFormat _format);
-	bool hasPreviewFile() const { return m_previewUID != ot::invalidUID; };
-	ot::UID getPreviewFileID() const { return m_previewUID; };
-	ot::UID getPreviewFileVersion() const { return m_previewVersion; };
+	void setImageEntity(const EntityBase& _entity) { setImageEntity(_entity.getEntityID(), _entity.getEntityStorageVersion()); };
+	void setImageEntity(ot::UID _entityID, ot::UID _entityVersion);
+	ot::UID getImageEntityID() const { return m_imageUID; };
+	ot::UID getImageEntityVersion() const { return m_imageVersion; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Property accessors
-
-	void setProjectInformation(const ot::ProjectInformation& _info);
-	ot::ProjectInformation getProjectInformation() const;
-
-	void setUseLatestVersion(bool _flag);
-	bool getUseLatestVersion() const;
-
-	void setCustomVersion(const std::string& _version);
-	std::string getCustomVersion() const;
 
 protected:
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 private:
-	void ensurePreviewLoaded();
+	void ensureFileIsLoaded();
 
-	ot::UID m_previewUID;
-	ot::UID m_previewVersion;
-	std::shared_ptr<EntityFileImage> m_preview;
+	ot::UID m_imageUID;
+	ot::UID m_imageVersion;
+	std::shared_ptr<EntityFileImage> m_image;
 };
-

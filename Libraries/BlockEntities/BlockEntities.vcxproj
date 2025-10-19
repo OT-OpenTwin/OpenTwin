@@ -90,7 +90,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;OTBLOCKENTITIES_EXPORTS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_GUIAPI_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCD);$(MONGO_CXX_INC);$(MONGO_BOOST_ROOT);$(ProjectDir)\$(OT_INC)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -108,7 +108,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;OTBLOCKENTITIES_EXPORTS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_GUIAPI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(MONGO_C_INCD);$(MONGO_CXX_INCD);$(MONGO_BOOST_ROOT);$(ProjectDir)\$(OT_INC);$(OT_RESULT_COLLECTION_ACCESS_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -127,7 +127,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;OTBLOCKENTITIES_EXPORTS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_GUIAPI_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_CXX_INC);$(MONGO_BOOST_ROOT);$(ProjectDir)\$(OT_INC)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -149,7 +149,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;OTBLOCKENTITIES_EXPORTS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_GUIAPI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_C_INCR);$(MONGO_CXX_INCR);$(MONGO_BOOST_ROOT);$(ProjectDir)\$(OT_INC);$(OT_RESULT_COLLECTION_ACCESS_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -165,6 +165,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\BlockEntitiesAPIExport.h" />
     <ClInclude Include="include\ConfigurationHelper.h" />
     <ClInclude Include="include\EntityBlockCircuitConnector.h" />
     <ClInclude Include="include\EntityBlockCircuitElement.h" />
@@ -182,6 +183,7 @@
     <ClInclude Include="include\EntityBlockDatabaseAccess.h" />
     <ClInclude Include="include\EntityBlockDisplay.h" />
     <ClInclude Include="include\EntityBlockFileWriter.h" />
+    <ClInclude Include="include\EntityBlockImage.h" />
     <ClInclude Include="include\EntityBlockPython.h" />
     <ClInclude Include="include\EntityBlockStorage.h" />
     <ClInclude Include="include\EntityBlockCircuitVoltageMeter.h" />
@@ -208,6 +210,7 @@
     <ClCompile Include="src\EntityBlockDisplay.cpp" />
     <ClCompile Include="src\EntityBlockFileWriter.cpp" />
     <ClCompile Include="src\EntityBlockHierarchicalProjectItem.cpp" />
+    <ClCompile Include="src\EntityBlockImage.cpp" />
     <ClCompile Include="src\EntityBlockPython.cpp" />
     <ClCompile Include="src\EntityBlockStorage.cpp" />
     <ClCompile Include="src\EntityBlockCircuitVoltageMeter.cpp" />

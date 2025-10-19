@@ -1,6 +1,8 @@
 #pragma once
+
 #include "EntityBlockCircuitElement.h"
-class __declspec(dllexport) EntityBlockCircuitCapacitor : public EntityBlockCircuitElement
+
+class OT_BLOCKENTITIES_API_EXPORT EntityBlockCircuitCapacitor : public EntityBlockCircuitElement
 {
 public:
 	EntityBlockCircuitCapacitor() : EntityBlockCircuitCapacitor(0, nullptr, nullptr, nullptr, "") {};
