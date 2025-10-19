@@ -115,7 +115,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	m_alignment = stringToAlignment(json::getString(_object, OT_JSON_MEMBER_Alignment));
 	m_sizePolicy = stringToSizePolicy(json::getString(_object, OT_JSON_MEMBER_SizePolicy));
 	m_connectionDirection = stringToConnectionDirection(json::getString(_object, OT_JSON_MEMBER_ConnectionDirection));
-	m_zValue = json::getInt(_object, OT_JSON_MEMBER_ZValue);
+	m_zValue = json::getInt(_object, OT_JSON_MEMBER_ZValue, GraphicsZValues::Item);
 
 	m_pos.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Position));
 	m_margins.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Margin));
