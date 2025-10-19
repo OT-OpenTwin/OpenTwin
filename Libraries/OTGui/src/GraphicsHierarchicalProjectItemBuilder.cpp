@@ -153,7 +153,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 
 ot::GraphicsHierarchicalProjectItemBuilder::GraphicsHierarchicalProjectItemBuilder()
 	: m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr), m_previewImageFormat(ot::ImageFileFormat::PNG),
-	m_previewImageMargins(10., 10., 10., 10.), m_connectorWidth(5.), m_connectorHeight(2.)
+	m_previewImageMargins(10., 10., 10., 10.), m_connectorWidth(7.), m_connectorHeight(5.)
 {
 	this->setTitleBackgroundColor(ot::Color(70, 70, 70));
 	this->setDefaultTitleForegroundGradient();
