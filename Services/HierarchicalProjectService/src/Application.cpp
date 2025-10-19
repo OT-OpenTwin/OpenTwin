@@ -542,7 +542,7 @@ ot::ReturnMessage Application::requestToOpenDocument(const ot::EntityInformation
 	}
 
 	uint64_t uncompressedDataLength = dataEntity->getData().size();
-	std::string compressedData = ot::String::compressed(std::string(dataEntity->getData().begin(), dataEntity->getData().end()));
+	std::string compressedData = ot::String::compressedBase64(std::string(dataEntity->getData().begin(), dataEntity->getData().end()));
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_OpenRawFile, doc.GetAllocator()), doc.GetAllocator());

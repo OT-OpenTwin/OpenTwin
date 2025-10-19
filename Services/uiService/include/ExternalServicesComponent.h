@@ -479,9 +479,9 @@ private:
 	QString                                         m_tempFolderPath;
 
 	std::map<std::string, ot::UID>					m_serviceToUidMap;
-	std::map<ot::serviceID_t, ServiceDataUi*>	m_serviceIdMap;
+	std::map<ot::serviceID_t, ServiceDataUi*>	    m_serviceIdMap;
 
-	std::vector<ServiceDataUi*>					m_modelViewNotifier;
+	std::vector<ServiceDataUi*>					    m_modelViewNotifier;
 
 	std::string										m_uiRelayServiceHTTP;
 	std::string										m_uiRelayServiceWS;

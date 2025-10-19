@@ -211,13 +211,13 @@ namespace ot {
 		//! @brief Compresses the provided string using zlib compression.
 		//! @param _string String to compress.
 		//! @return Compressed string.
-		static std::string compressed(const std::string& _string);
+		static std::string compressedBase64(const std::string& _string);
 
 		//! @brief Decompresses the provided compressed string using zlib decompression.
 		//! @param _compressedString Compressed string to decompress.
 		//! @param _decompressedLength Expected length of the decompressed string.
 		//! @return Decompressed string.
-		static std::string decompressed(const std::string& _compressedString, uint64_t _decompressedLength);
+		static std::string decompressedBase64(const std::string& _compressedString, uint64_t _decompressedLength);
 
 	};
 }

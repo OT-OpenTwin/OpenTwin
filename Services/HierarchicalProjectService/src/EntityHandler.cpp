@@ -136,7 +136,7 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 	}
 
 	// Unpack data
-	std::string unpackedData = ot::String::decompressed(_fileContent, _uncompressedDataLength);
+	std::string unpackedData = ot::String::decompressedBase64(_fileContent, _uncompressedDataLength);
 
 	const std::string serviceName = Application::instance().getServiceName();
 
@@ -232,7 +232,7 @@ void EntityHandler::addDocuments(const ot::EntityInformation& _containerInfo, co
 
 void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
 	// Unpack data
-	std::string unpackedData = ot::String::decompressed(_fileContent, _uncompressedDataLength);
+	std::string unpackedData = ot::String::decompressedBase64(_fileContent, _uncompressedDataLength);
 
 	const std::string serviceName = Application::instance().getServiceName();
 
@@ -313,7 +313,7 @@ void EntityHandler::addBackgroundImages(const ot::EntityInformation& _containerI
 
 bool EntityHandler::addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter) {
 	// Unpack data
-	std::string unpackedData = ot::String::decompressed(_fileContent, _uncompressedDataLength);
+	std::string unpackedData = ot::String::decompressedBase64(_fileContent, _uncompressedDataLength);
 
 	// Create container
 	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());

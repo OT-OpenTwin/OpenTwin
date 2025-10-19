@@ -721,7 +721,7 @@ inline std::string ot::String::fromBase64Url(const std::string& _base64UrlString
 	return output;
 }
 
-std::string ot::String::compressed(const std::string& _string) {
+std::string ot::String::compressedBase64(const std::string& _string) {
 	// Compress the file data content
 	uLong compressedSize = compressBound((uLong)_string.size());
 
@@ -746,7 +746,7 @@ std::string ot::String::compressed(const std::string& _string) {
 	return compressedString;
 }
 
-std::string ot::String::decompressed(const std::string& _compressedString, uint64_t _decompressedLength) {
+std::string ot::String::decompressedBase64(const std::string& _compressedString, uint64_t _decompressedLength) {
 	int decoded_compressed_data_length = Base64decode_len(_compressedString.c_str());
 	char* compressedContent = new char[decoded_compressed_data_length];
 

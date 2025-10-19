@@ -57,6 +57,7 @@ namespace ot {
 			ViewGraphicsPicker, //! @brief Graphics picker view.
 			ViewProperties,     //! @brief Properties view.
 			ViewNavigation,     //! @brief Navigation view.
+			ViewPDF,            //! @brief PDF view.
 			CustomView          //! @brief Custom view.
 		};
 

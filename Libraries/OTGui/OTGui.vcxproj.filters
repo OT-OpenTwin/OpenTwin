@@ -464,6 +464,9 @@
     <ClInclude Include="include\OTGui\GraphicsZValues.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\PDFWidgetCfg.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -822,6 +825,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsHierarchicalProjectItemBuilder.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PDFWidgetCfg.cpp">
+      <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -101,6 +101,7 @@ std::string ot::WidgetViewBase::toString(ViewType _type) {
 	case ot::WidgetViewBase::ViewGraphicsPicker: return "GraphicsPicker";
 	case ot::WidgetViewBase::ViewProperties: return "Properties";
 	case ot::WidgetViewBase::ViewNavigation: return "Navigation";
+	case ot::WidgetViewBase::ViewPDF: return "PDF";
 	case ot::WidgetViewBase::CustomView: return "Custom";
 	default:
 		OT_LOG_EAS("Unknown view type (" + std::to_string((int)_type) + ")");
@@ -118,6 +119,7 @@ ot::WidgetViewBase::ViewType ot::WidgetViewBase::stringToViewType(const std::str
 	else if (_type == WidgetViewBase::toString(ViewType::ViewGraphicsPicker)) return ViewType::ViewGraphicsPicker;
 	else if (_type == WidgetViewBase::toString(ViewType::ViewProperties)) return ViewType::ViewProperties;
 	else if (_type == WidgetViewBase::toString(ViewType::ViewNavigation)) return ViewType::ViewNavigation;
+	else if (_type == WidgetViewBase::toString(ViewType::ViewPDF)) return ViewType::ViewPDF;
 	else if (_type == WidgetViewBase::toString(ViewType::CustomView)) return ViewType::CustomView;
 	else {
 		OT_LOG_EAS("Unknown view type \"" + _type + "\"");

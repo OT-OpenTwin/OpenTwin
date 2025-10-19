@@ -2180,7 +2180,7 @@ void ExternalServicesComponent::handleOpenRawFile(ot::JsonDocument& _document) {
 	uint64_t uncompressedDataLength = ot::json::getUInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 
 	// Unpack the data
-	std::string fileContent = ot::String::decompressed(compressedData, uncompressedDataLength);
+	std::string fileContent = ot::String::decompressedBase64(compressedData, uncompressedDataLength);
 	QByteArray byteArray = QByteArray::fromRawData(fileContent.c_str(), uncompressedDataLength);
 
 	// Determine a temporary file name
