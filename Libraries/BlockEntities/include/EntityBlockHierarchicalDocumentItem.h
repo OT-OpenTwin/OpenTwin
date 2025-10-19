@@ -5,7 +5,6 @@
 
 #pragma once
 
-/*
 #include "EntityBlock.h"
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalDocumentItem : public EntityBlock {
@@ -29,7 +28,7 @@ public:
 	void setDocument(ot::UID _entityID, ot::UID _entityVersion);
 	ot::UID getDocumentID() const { return m_documentUID; };
 	ot::UID getDocumentVersion() const { return m_documentVersion; };
-	std::shared_ptr<EntityBase> getPreviewFile();
+	std::shared_ptr<EntityBase> getDocument();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -46,5 +45,3 @@ private:
 	ot::UID m_documentVersion;
 	std::shared_ptr<EntityBase> m_documentEntity;
 };
-
-*/

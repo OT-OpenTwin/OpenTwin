@@ -233,7 +233,18 @@ void Application::handleProjectSelected(ot::JsonDocument& _doc) {
 }
 
 void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
-	
+	std::list<std::string> contents = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Content);
+	std::list<int64_t> uncompressedDataLengths = ot::json::getInt64List(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+	std::list<std::string> fileNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+
+	ot::EntityInformation info;
+	if (!ot::ModelServiceAPI::getEntityInformation(EntityHierarchicalScene::defaultName(), info)) {
+		OT_LOG_E("Could not determine entity information for root hierarchical scene");
+		return;
+	}
+
+
 }
 
 void Application::handleBackgroundImageSelected(ot::JsonDocument& _doc) {
@@ -299,7 +310,13 @@ void Application::handleAddContainer() {
 }
 
 void Application::handleAddDocument() {
+	if (!this->isUiConnected()) {
+		OT_LOG_E("No UI connected");
+		return;
+	}
 
+	auto filter = ot::FileExtension::toFilterString({ ot::FileExtension::AllFiles });
+	ot::Frontend::requestFileForReading(c_documentSelectedAction, "Select Document", filter, true, true);
 }
 
 void Application::handleAddBackgroundImage() {

@@ -125,6 +125,33 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	return true;
 }
 
+void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
+	// Unpack data
+	std::string unpackedData = ot::Encryption::decryptAndUnzipString(_fileContent, _uncompressedDataLength);
+
+	const std::string serviceName = Application::instance().getServiceName();
+
+	// Create container
+	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
+
+}
+
+void EntityHandler::addDocuments(const ot::EntityInformation& _containerInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
+	ot::NewModelStateInfo newEntities;
+
+	auto nameIt = _fileNames.begin();
+	auto contentIt = _fileContent.begin();
+	auto lengthIt = _uncompressedDataLength.begin();
+
+	for (; nameIt != _fileNames.end() && contentIt != _fileContent.end() && lengthIt != _uncompressedDataLength.end(); nameIt++, contentIt++, lengthIt++) {
+		addDocument(_containerInfo, *nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
+	}
+
+	if (newEntities.hasEntities()) {
+		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added document", true, true);
+	}
+}
+
 void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
 	// Unpack data
 	std::string unpackedData = ot::Encryption::decryptAndUnzipString(_fileContent, _uncompressedDataLength);
@@ -136,7 +163,7 @@ void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerIn
 
 	std::string fileNameOnly, extension;
 	ot::ImageFileFormat format;
-	if (!getFileFormat(_fileName, fileNameOnly, extension, format)) {
+	if (!getImageFileFormat(_fileName, fileNameOnly, extension, format)) {
 		return;
 	}
 
@@ -215,7 +242,7 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 
 	std::string fileNameOnly, extension;
 	ot::ImageFileFormat format;
-	if (!getFileFormat(_fileName, fileNameOnly, extension, format)) {
+	if (!getImageFileFormat(_fileName, fileNameOnly, extension, format)) {
 		return false;
 	}
 
@@ -376,7 +403,7 @@ void EntityHandler::addContainer(const ot::EntityInformation& _containerInfo) {
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added hierarchical container", true, true);
 }
 
-bool EntityHandler::getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) {
+bool EntityHandler::getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) {
 	std::string tmp;
 	std::list<std::string> path = ot::String::split(ot::String::replace(_filePath, '\\', '/'), '/', true);
 	if (path.empty()) {
