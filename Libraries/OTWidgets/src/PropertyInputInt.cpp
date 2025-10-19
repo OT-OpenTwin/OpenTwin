@@ -181,7 +181,9 @@ ot::Property* ot::PropertyInputInt::createPropertyConfiguration(void) const {
 	newProperty->setMin(m_min);
 	newProperty->setMax(m_max);
 	newProperty->setValue(this->getValue());
-
+	if (m_spinBox) {
+		newProperty->setSuffix(m_spinBox->suffix().toStdString());
+	}
 	return newProperty;
 }
 
@@ -214,6 +216,7 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 		m_spinBox->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 		m_spinBox->setRange(actualProperty->getMin(), actualProperty->getMax());
 		m_spinBox->setValue(actualProperty->getValue());
+		m_spinBox->setSuffix(QString::fromStdString(actualProperty->getSuffix()));
 		if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 			m_spinBox->setSpecialValueText(OT_PROPERTY_INT_MULTIPLEVALUESTEXT);
 		}

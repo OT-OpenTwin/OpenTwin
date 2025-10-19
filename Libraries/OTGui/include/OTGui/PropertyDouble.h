@@ -16,12 +16,12 @@ namespace ot {
 	public:
 		using PropertyValueType = double;
 
-		PropertyDouble(const PropertyDouble* _other);
-		PropertyDouble(const PropertyBase& _base);
-		PropertyDouble(PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyDouble(double _value, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyDouble(const std::string& _name, double _value, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyDouble(const std::string& _name, double _value, double _min, double _max, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyDouble(const PropertyDouble* _other);
+		explicit PropertyDouble(const PropertyBase& _base);
+		explicit PropertyDouble(PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyDouble(double _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyDouble(const std::string& _name, double _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyDouble(const std::string& _name, double _value, double _min, double _max, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyDouble() {};
 
 		static std::string propertyTypeString(void) { return "Double"; };
@@ -45,6 +45,12 @@ namespace ot {
 		void setPrecision(int _p) { m_precision = _p; };
 		int getPrecision(void) const { return m_precision; };
 
+		//! @brief Sets the suffix that is appended to the value when displayed in the frontend.
+		//! The suffix is only displayed when custom values are not enabled.
+		//! @param _suffix Suffix string.
+		void setSuffix(const std::string& _suffix) { m_suffix = _suffix; };
+		std::string getSuffix() const { return m_suffix; };
+
 	protected:
 		//! @brief Add the property data to the provided JSON object
 		//! The property type is already added
@@ -62,6 +68,7 @@ namespace ot {
 		double m_min;
 		double m_max;
 		int m_precision;
+		std::string m_suffix;
 	};
 
 }

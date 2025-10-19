@@ -43,7 +43,7 @@ EntityPropertiesBase::EntityPropertiesBase(const EntityPropertiesBase &other)
 	m_toolTip = other.m_toolTip;
 }
 
-void EntityPropertiesBase::setNeedsUpdate(void) {
+void EntityPropertiesBase::setNeedsUpdate() {
 	if (m_container != nullptr) m_container->setNeedsUpdate();
 
 	m_needsUpdateFlag = true;
@@ -139,7 +139,7 @@ void EntityPropertiesBase::setupPropertyData(ot::PropertyGridCfg& _configuration
 	group->addProperty(_property);
 }
 
-bool EntityPropertiesBase::needsUpdate(void)
+bool EntityPropertiesBase::needsUpdate()
 {
 	return m_needsUpdateFlag;
 }
@@ -165,6 +165,7 @@ EntityPropertiesDouble::EntityPropertiesDouble(const EntityPropertiesDouble& _ot
 	m_allowCustomValues = _other.m_allowCustomValues;
 	m_min = _other.m_min;
 	m_max = _other.m_max;
+	m_suffix = _other.m_suffix;
 }
 
 EntityPropertiesDouble& EntityPropertiesDouble::operator=(const EntityPropertiesDouble& _other) {
@@ -174,6 +175,7 @@ EntityPropertiesDouble& EntityPropertiesDouble::operator=(const EntityProperties
 		m_allowCustomValues = _other.m_allowCustomValues;
 		m_min = _other.m_min;
 		m_max = _other.m_max;
+		m_suffix = _other.m_suffix;
 	}
 	return *this;
 }
@@ -183,6 +185,7 @@ void EntityPropertiesDouble::addToConfiguration(ot::PropertyGridCfg& _configurat
 	ot::PropertyDouble* newProp = new ot::PropertyDouble(this->getName(), m_value);
 	newProp->setPropertyFlag((m_allowCustomValues ? ot::Property::AllowCustomValues : ot::Property::NoFlags));
 	newProp->setRange(m_min, m_max);
+	newProp->setSuffix(m_suffix);
 	this->setupPropertyData(_configuration, newProp);
 }
 
@@ -197,6 +200,7 @@ void EntityPropertiesDouble::setFromConfiguration(const ot::Property* _property,
 
 	this->setValue(actualProperty->getValue());
 	this->setRange(actualProperty->getMin(), actualProperty->getMax());
+	this->setSuffix(actualProperty->getSuffix());
 	this->setAllowCustomValues(actualProperty->getPropertyFlags() & ot::PropertyBase::AllowCustomValues);
 }
 
@@ -208,6 +212,7 @@ void EntityPropertiesDouble::addToJsonObject(ot::JsonObject& _jsonObject, ot::Js
 	_jsonObject.AddMember("AllowCustom", m_allowCustomValues, _allocator);
 	_jsonObject.AddMember("MinValue", m_min, _allocator);
 	_jsonObject.AddMember("MaxValue", m_max, _allocator);
+	_jsonObject.AddMember("Suffix", ot::JsonString(m_suffix, _allocator), _allocator);
 }
 
 void EntityPropertiesDouble::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
@@ -224,6 +229,9 @@ void EntityPropertiesDouble::readFromJsonObject(const ot::ConstJsonObject& _obje
 	if (_object.HasMember("AllowCustom")) {
 		this->setAllowCustomValues(ot::json::getBool(_object, "AllowCustom", true));
 	}
+	if (_object.HasMember("Suffix")) {
+		this->setSuffix(ot::json::getString(_object, "Suffix"));
+	}
 }
 
 void EntityPropertiesDouble::copySettings(EntityPropertiesBase *other, EntityBase *root)
@@ -238,6 +246,7 @@ void EntityPropertiesDouble::copySettings(EntityPropertiesBase *other, EntityBas
 		this->setValue(entity->getValue());
 		this->setRange(entity->getMin(), entity->getMax());
 		this->setAllowCustomValues(entity->getAllowCustomValues());
+		this->setSuffix(entity->getSuffix());
 	}
 }
 
@@ -326,6 +335,7 @@ EntityPropertiesInteger::EntityPropertiesInteger(const EntityPropertiesInteger& 
 	m_allowCustomValues = _other.m_allowCustomValues;
 	m_min = _other.m_min;
 	m_max = _other.m_max;
+	m_suffix = _other.m_suffix;
 }
 
 EntityPropertiesInteger& EntityPropertiesInteger::operator=(const EntityPropertiesInteger& _other) {
@@ -335,6 +345,7 @@ EntityPropertiesInteger& EntityPropertiesInteger::operator=(const EntityProperti
 		m_allowCustomValues = _other.m_allowCustomValues;
 		m_min = _other.m_min;
 		m_max = _other.m_max;
+		m_suffix = _other.m_suffix;
 	}
 	return *this;
 }
@@ -344,6 +355,7 @@ void EntityPropertiesInteger::addToConfiguration(ot::PropertyGridCfg& _configura
 	ot::PropertyInt* newProp = new ot::PropertyInt(this->getName(), m_value);
 	newProp->setPropertyFlag((m_allowCustomValues ? ot::Property::AllowCustomValues : ot::Property::NoFlags));
 	newProp->setRange(m_min, m_max);
+	newProp->setSuffix(m_suffix);
 	this->setupPropertyData(_configuration, newProp);
 }
 
@@ -358,6 +370,7 @@ void EntityPropertiesInteger::setFromConfiguration(const ot::Property* _property
 
 	this->setValue(actualProperty->getValue());
 	this->setRange(actualProperty->getMin(), actualProperty->getMax());
+	this->setSuffix(actualProperty->getSuffix());
 	this->setAllowCustomValues(actualProperty->getPropertyFlags() & ot::PropertyBase::AllowCustomValues);
 }
 
@@ -368,6 +381,7 @@ void EntityPropertiesInteger::addToJsonObject(ot::JsonObject& _jsonObject, ot::J
 	_jsonObject.AddMember("AllowCustom", m_allowCustomValues, _allocator);
 	_jsonObject.AddMember("MinValue", ot::JsonNumber(m_min), _allocator);
 	_jsonObject.AddMember("MaxValue", ot::JsonNumber(m_max), _allocator);
+	_jsonObject.AddMember("Suffix", ot::JsonString(m_suffix, _allocator), _allocator);
 }
 
 void EntityPropertiesInteger::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
@@ -382,6 +396,9 @@ void EntityPropertiesInteger::readFromJsonObject(const ot::ConstJsonObject& _obj
 	}
 	if (_object.HasMember("AllowCustom")) {
 		this->setAllowCustomValues(ot::json::getBool(_object, "AllowCustom", true));
+	}
+	if (_object.HasMember("Suffix")) {
+		this->setSuffix(ot::json::getString(_object, "Suffix"));
 	}
 }
 
@@ -443,6 +460,7 @@ void EntityPropertiesInteger::copySettings(EntityPropertiesBase* other, EntityBa
 		this->setValue(entity->getValue());
 		this->setRange(entity->getMin(), entity->getMax());
 		this->setAllowCustomValues(entity->getAllowCustomValues());
+		this->setSuffix(entity->getSuffix());
 	}
 }
 

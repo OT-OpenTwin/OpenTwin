@@ -31,26 +31,26 @@ public:
 
 	EntityPropertiesBase(const EntityPropertiesBase &other);
 
-	virtual EntityPropertiesBase *createCopy(void) const = 0;
+	virtual EntityPropertiesBase *createCopy() const = 0;
 
 	void setContainer(EntityProperties *c) { m_container = c; };
 
 	void setName(const std::string& _name) { m_name = _name; };
-	const std::string& getName(void) const { return m_name; };
+	const std::string& getName() const { return m_name; };
 
 	void setGroup(const std::string& _group) { m_group = _group; };
-	const std::string& getGroup(void) const { return m_group; };
+	const std::string& getGroup() const { return m_group; };
 
 	enum eType { DOUBLE, INTEGER, BOOLEAN, STRING, SELECTION, COLOR, ENTITYLIST, PROJECTLIST, GUIPAINTER };
-	virtual eType getType(void) const = 0;
-	virtual std::string getTypeString(void) const = 0;
+	virtual eType getType() const = 0;
+	virtual std::string getTypeString() const = 0;
 
-	void resetNeedsUpdate(void) { m_needsUpdateFlag = false; };
-	bool needsUpdate(void);
-	void setNeedsUpdate(void);
+	void resetNeedsUpdate() { m_needsUpdateFlag = false; };
+	bool needsUpdate();
+	void setNeedsUpdate();
 
 	void setHasMultipleValues(bool b) { m_multipleValues = b; };
-	bool hasMultipleValues(void) const { return m_multipleValues; };
+	bool hasMultipleValues() const { return m_multipleValues; };
 
 	virtual bool isCompatible(EntityPropertiesBase *other) const { return true; };
 	virtual bool hasSameValue(EntityPropertiesBase *other) const = 0;
@@ -62,19 +62,19 @@ public:
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root);
 
 	void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
-	const std::string& getToolTip(void) const { return m_toolTip; };
+	const std::string& getToolTip() const { return m_toolTip; };
 
 	void setReadOnly(bool _flag) { m_readOnly = _flag; };
-	bool getReadOnly(void) const { return m_readOnly; };
+	bool getReadOnly() const { return m_readOnly; };
 
 	void setProtected(bool _flag) { m_protectedProperty = _flag; };
-	bool getProtected(void) const { return m_protectedProperty; };
+	bool getProtected() const { return m_protectedProperty; };
 
 	void setVisible(bool _flag) { m_visible = _flag; };
-	bool getVisible(void) const { return m_visible; };
+	bool getVisible() const { return m_visible; };
 	
 	void setErrorState(bool _flag) { m_errorState = _flag; };
-	bool getErrorState(void) const { return m_errorState; };
+	bool getErrorState() const { return m_errorState; };
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -84,7 +84,7 @@ protected:
 	void setupPropertyData(ot::PropertyGridCfg& _configuration, ot::Property* _property) const;
 
 private:
-	void setMultipleValues(void) { m_multipleValues = true; }
+	void setMultipleValues() { m_multipleValues = true; }
 
 	EntityProperties* m_container;
 	bool m_needsUpdateFlag;
@@ -103,7 +103,7 @@ private:
 class OT_MODELENTITIES_API_EXPORT EntityPropertiesDouble : public EntityPropertiesBase
 {
 public:
-	static std::string typeString(void) { return "double"; };
+	static std::string typeString() { return "double"; };
 
 	EntityPropertiesDouble();
 	virtual ~EntityPropertiesDouble() {};
@@ -112,24 +112,27 @@ public:
 
 	EntityPropertiesDouble(const EntityPropertiesDouble& _other);
 
-	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesDouble(*this); };
+	virtual EntityPropertiesBase *createCopy() const override { return new EntityPropertiesDouble(*this); };
 
 	EntityPropertiesDouble& operator=(const EntityPropertiesDouble& _other);
 
-	virtual eType getType(void) const override { return DOUBLE; };
-	virtual std::string getTypeString(void) const override { return EntityPropertiesDouble::typeString(); };
+	virtual eType getType() const override { return DOUBLE; };
+	virtual std::string getTypeString() const override { return EntityPropertiesDouble::typeString(); };
 
 	void setValue(double _value);
-	double getValue(void) const { return m_value; };
+	double getValue() const { return m_value; };
 
 	void setRange(double _min, double _max);
 	void setMin(double _min);
-	double getMin(void) const { return m_min; };
+	double getMin() const { return m_min; };
 	void setMax(double _max);
-	double getMax(void) const { return m_max; };
+	double getMax() const { return m_max; };
 
 	void setAllowCustomValues(bool _allowCustomValues);
-	bool getAllowCustomValues(void) const { return m_allowCustomValues; };
+	bool getAllowCustomValues() const { return m_allowCustomValues; };
+
+	void setSuffix(const std::string& _suffix) { m_suffix = _suffix; };
+	const std::string& getSuffix() const { return m_suffix; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
@@ -149,6 +152,7 @@ private:
 	bool m_allowCustomValues;
 	double m_min;
 	double m_max;
+	std::string m_suffix;
 };
 
 // ################################################################################################################################################################
@@ -156,7 +160,7 @@ private:
 class OT_MODELENTITIES_API_EXPORT EntityPropertiesInteger : public EntityPropertiesBase
 {
 public:
-	static std::string typeString(void) { return "integer"; };
+	static std::string typeString() { return "integer"; };
 
 	EntityPropertiesInteger();
 	virtual ~EntityPropertiesInteger() {};
@@ -165,24 +169,27 @@ public:
 
 	EntityPropertiesInteger(const EntityPropertiesInteger& _other);
 
-	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesInteger(*this); };
+	virtual EntityPropertiesBase *createCopy() const override { return new EntityPropertiesInteger(*this); };
 
 	EntityPropertiesInteger& operator=(const EntityPropertiesInteger& _other);
 
-	virtual eType getType(void) const override { return INTEGER; };
-	virtual std::string getTypeString(void) const override { return EntityPropertiesInteger::typeString(); };
+	virtual eType getType() const override { return INTEGER; };
+	virtual std::string getTypeString() const override { return EntityPropertiesInteger::typeString(); };
 
 	void setValue(long _value);
-	long getValue(void) const { return m_value; };
+	long getValue() const { return m_value; };
 
 	void setRange(long _min, long _max);
 	void setMin(long _min);
-	long getMin(void) const { return m_min; };
+	long getMin() const { return m_min; };
 	void setMax(long _max);
-	long getMax(void) const { return m_max; };
+	long getMax() const { return m_max; };
 
 	void setAllowCustomValues(bool _allowCustomValues);
-	bool getAllowCustomValues(void) const { return m_allowCustomValues; };
+	bool getAllowCustomValues() const { return m_allowCustomValues; };
+
+	void setSuffix(const std::string& _suffix) { m_suffix = _suffix; };
+	const std::string& getSuffix() const { return m_suffix; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
@@ -202,6 +209,7 @@ private:
 	bool m_allowCustomValues;
 	long m_min;
 	long m_max;
+	std::string m_suffix;
 };
 
 // ################################################################################################################################################################
@@ -209,7 +217,7 @@ private:
 class OT_MODELENTITIES_API_EXPORT EntityPropertiesBoolean : public EntityPropertiesBase
 {
 public:
-	static std::string typeString(void) { return "boolean"; };
+	static std::string typeString() { return "boolean"; };
 
 	EntityPropertiesBoolean() : m_value(false) {};
 	virtual ~EntityPropertiesBoolean() {};
@@ -218,15 +226,15 @@ public:
 
 	EntityPropertiesBoolean(const EntityPropertiesBoolean &other) : EntityPropertiesBase(other) { m_value = other.m_value; };
 
-	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesBoolean(*this); };
+	virtual EntityPropertiesBase *createCopy() const override { return new EntityPropertiesBoolean(*this); };
 
 	EntityPropertiesBoolean& operator=(const EntityPropertiesBoolean &other) { if (&other != this) { EntityPropertiesBase::operator=(other); m_value = other.getValue(); }; return *this; };
 
-	virtual eType getType(void) const override { return BOOLEAN; };
-	virtual std::string getTypeString(void) const override { return EntityPropertiesBoolean::typeString(); };
+	virtual eType getType() const override { return BOOLEAN; };
+	virtual std::string getTypeString() const override { return EntityPropertiesBoolean::typeString(); };
 
 	void setValue(bool b) { if (m_value != b) setNeedsUpdate(); m_value = b; };
-	bool getValue(void) const { return m_value; };
+	bool getValue() const { return m_value; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
@@ -249,7 +257,7 @@ private:
 class OT_MODELENTITIES_API_EXPORT EntityPropertiesString : public EntityPropertiesBase
 {
 public:
-	static std::string typeString(void) { return "string"; };
+	static std::string typeString() { return "string"; };
 
 	EntityPropertiesString() {};
 	virtual ~EntityPropertiesString() {};
@@ -258,15 +266,15 @@ public:
 
 	EntityPropertiesString(const EntityPropertiesString &other) : EntityPropertiesBase(other) { m_value = other.m_value; };
 
-	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesString(*this); };
+	virtual EntityPropertiesBase *createCopy() const override { return new EntityPropertiesString(*this); };
 
 	EntityPropertiesString& operator=(const EntityPropertiesString &other) { if (&other != this) { EntityPropertiesBase::operator=(other); m_value =other.getValue(); }; return *this; };
 
-	virtual eType getType(void) const override { return STRING; };
-	virtual std::string getTypeString(void) const override { return EntityPropertiesString::typeString(); };
+	virtual eType getType() const override { return STRING; };
+	virtual std::string getTypeString() const override { return EntityPropertiesString::typeString(); };
 
 	void setValue(const std::string &s) { if (m_value != s) setNeedsUpdate(); m_value = s; };
-	const std::string& getValue(void) const { return m_value; };
+	const std::string& getValue() const { return m_value; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
@@ -289,29 +297,29 @@ private:
 class OT_MODELENTITIES_API_EXPORT EntityPropertiesSelection : public EntityPropertiesBase
 {
 public:
-	static std::string typeString(void) { return "selection"; };
+	static std::string typeString() { return "selection"; };
 
 	EntityPropertiesSelection() {};
 	virtual ~EntityPropertiesSelection() {};
 
 	EntityPropertiesSelection(const EntityPropertiesSelection &other) : EntityPropertiesBase(other) { m_options = other.m_options; m_value = other.m_value; };
 
-	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesSelection(*this); };
+	virtual EntityPropertiesBase *createCopy() const override { return new EntityPropertiesSelection(*this); };
 
 	EntityPropertiesSelection& operator=(const EntityPropertiesSelection &other) { if (&other != this) { assert(checkCompatibilityOfSettings(other)); EntityPropertiesBase::operator=(other); m_value = other.getValue(); }; return *this; };
 
-	virtual eType getType(void) const override { return SELECTION; };
-	virtual std::string getTypeString(void) const override { return EntityPropertiesSelection::typeString(); };
+	virtual eType getType() const override { return SELECTION; };
+	virtual std::string getTypeString() const override { return EntityPropertiesSelection::typeString(); };
 
 	virtual bool isCompatible(EntityPropertiesBase *other) const override;
 
 	bool setValue(const std::string &s);
-	const std::string& getValue(void)const { return m_value; };
+	const std::string& getValue()const { return m_value; };
 
 	void clearOptions() { m_options.clear(); };
 	void addOption(const std::string &option) { assert(std::find(m_options.begin(), m_options.end(), option) == m_options.end());  m_options.push_back(option); }
 	void resetOptions(const std::list<std::string>& _options);
-	const std::vector<std::string> &getOptions(void) { return m_options; };
+	const std::vector<std::string> &getOptions() { return m_options; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
@@ -338,7 +346,7 @@ private:
 class OT_MODELENTITIES_API_EXPORT EntityPropertiesColor : public EntityPropertiesBase
 {
 public:
-	static std::string typeString(void) { return "color"; };
+	static std::string typeString() { return "color"; };
 
 	EntityPropertiesColor() : m_color{ 0.0, 0.0, 0.0 } {};
 
@@ -347,12 +355,12 @@ public:
 	EntityPropertiesColor(const std::string &n, double r, double g, double b) : m_color{ r, g, b } { setName(n); };
 	virtual ~EntityPropertiesColor() {};
 
-	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesColor(*this); };
+	virtual EntityPropertiesBase *createCopy() const override { return new EntityPropertiesColor(*this); };
 
 	EntityPropertiesColor& operator=(const EntityPropertiesColor &other);
 
-	virtual eType getType(void) const override { return COLOR; };
-	virtual std::string getTypeString(void) const override { return EntityPropertiesColor::typeString(); };
+	virtual eType getType() const override { return COLOR; };
+	virtual std::string getTypeString() const override { return EntityPropertiesColor::typeString(); };
 
 	void setColorR(double c) { if (m_color[0] != c) setNeedsUpdate(); m_color[0] = c; };
 	void setColorG(double c) { if (m_color[1] != c) setNeedsUpdate(); m_color[1] = c; };
@@ -360,9 +368,9 @@ public:
 
 	void setColorRGB(double r, double g, double b) { if (m_color[0] != r || m_color[1] != g || m_color[2] != b) setNeedsUpdate(); m_color[0] = r; m_color[1] = g; m_color[2] = b; };
 
-	double getColorR(void) const { return m_color[0]; };
-	double getColorG(void) const { return m_color[1]; };
-	double getColorB(void) const { return m_color[2]; };
+	double getColorR() const { return m_color[0]; };
+	double getColorG() const { return m_color[1]; };
+	double getColorB() const { return m_color[2]; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
@@ -385,7 +393,7 @@ private:
 class OT_MODELENTITIES_API_EXPORT EntityPropertiesEntityList : public EntityPropertiesBase
 {
 public:
-	static std::string typeString(void) { return "entitylist"; };
+	static std::string typeString() { return "entitylist"; };
 
 	EntityPropertiesEntityList() : m_entityContainerID(0), m_valueID(0) {};
 
@@ -394,12 +402,12 @@ public:
 
 	virtual ~EntityPropertiesEntityList() {};
 
-	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesEntityList(*this); };
+	virtual EntityPropertiesBase *createCopy() const override { return new EntityPropertiesEntityList(*this); };
 
 	EntityPropertiesEntityList& operator=(const EntityPropertiesEntityList &other);
 
-	virtual eType getType(void) const override { return ENTITYLIST; };
-	virtual std::string getTypeString(void) const override { return EntityPropertiesEntityList::typeString(); };
+	virtual eType getType() const override { return ENTITYLIST; };
+	virtual std::string getTypeString() const override { return EntityPropertiesEntityList::typeString(); };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
@@ -417,11 +425,11 @@ public:
 	void setValueName(const std::string &vname) { if (m_valueName != vname) setNeedsUpdate(); m_valueName = vname; };
 	void setValueID(ot::UID vid) { if (m_valueID != vid) setNeedsUpdate(); m_valueID = vid; };
 
-	std::string getEntityContainerName(void) const { return m_entityContainerName; };
-	ot::UID getEntityContainerID(void) const { return m_entityContainerID; };
+	std::string getEntityContainerName() const { return m_entityContainerName; };
+	ot::UID getEntityContainerID() const { return m_entityContainerID; };
 
-	std::string getValueName(void) const { return m_valueName; };
-	ot::UID getValueID(void) const { return m_valueID; };
+	std::string getValueName() const { return m_valueName; };
+	ot::UID getValueID() const { return m_valueID; };
 
 	static EntityPropertiesEntityList* createProperty(const std::string &group, const std::string &name, const std::string &contName, ot::UID contID, const std::string &valName, ot::UID valID, const std::string &defaultCategory, EntityProperties &properties);
 
@@ -449,13 +457,13 @@ private:
 class OT_MODELENTITIES_API_EXPORT EntityPropertiesProjectList : public EntityPropertiesBase
 {
 public:
-	static std::string typeString(void) { return "projectlist"; };
+	static std::string typeString() { return "projectlist"; };
 
 	EntityPropertiesProjectList() {};
 	EntityPropertiesProjectList(const std::string& name) { setName(name); }
-	virtual EntityPropertiesBase* createCopy(void) const override { return new EntityPropertiesProjectList(*this); };
-	virtual eType getType(void) const override { return PROJECTLIST; };
-	virtual std::string getTypeString(void) const override { return EntityPropertiesProjectList::typeString(); };
+	virtual EntityPropertiesBase* createCopy() const override { return new EntityPropertiesProjectList(*this); };
+	virtual eType getType() const override { return PROJECTLIST; };
+	virtual std::string getTypeString() const override { return EntityPropertiesProjectList::typeString(); };
 
 	virtual void copySettings(EntityPropertiesBase* other, EntityBase* root);
 
@@ -478,7 +486,7 @@ private:
 class OT_MODELENTITIES_API_EXPORT EntityPropertiesGuiPainter : public EntityPropertiesBase
 {
 public:
-	static std::string typeString(void) { return "guipainter"; };
+	static std::string typeString() { return "guipainter"; };
 
 	EntityPropertiesGuiPainter();
 	virtual ~EntityPropertiesGuiPainter();
@@ -489,18 +497,18 @@ public:
 
 	EntityPropertiesGuiPainter(const EntityPropertiesGuiPainter& other);
 
-	virtual EntityPropertiesBase* createCopy(void) const override { return new EntityPropertiesGuiPainter(*this); };
+	virtual EntityPropertiesBase* createCopy() const override { return new EntityPropertiesGuiPainter(*this); };
 
 	EntityPropertiesGuiPainter& operator=(const EntityPropertiesGuiPainter& other);
 
-	virtual eType getType(void) const override { return GUIPAINTER; };
-	virtual std::string getTypeString(void) const override { return EntityPropertiesGuiPainter::typeString(); };
+	virtual eType getType() const override { return GUIPAINTER; };
+	virtual std::string getTypeString() const override { return EntityPropertiesGuiPainter::typeString(); };
 
 	void setValue(const ot::Painter2D* _painter);
 
 	//! \brief Returns the current painter.
 	//! The entity keeps ownership of the painter
-	const ot::Painter2D* getValue(void) const { return m_painter; };
+	const ot::Painter2D* getValue() const { return m_painter; };
 
 	void setFilter(const ot::Painter2DDialogFilter& _filter) { m_filter = _filter; };
 	const ot::Painter2DDialogFilter& getFilter() const { return m_filter; };

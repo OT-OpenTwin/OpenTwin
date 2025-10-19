@@ -201,6 +201,11 @@ ot::Property* ot::PropertyInputDouble::createPropertyConfiguration(void) const {
 	newProperty->setMax(m_max);
 	newProperty->setValue(this->getValue());
 
+	if (m_spinBox) {
+		newProperty->setPrecision(m_spinBox->decimals());
+		newProperty->setSuffix(m_spinBox->suffix().toStdString());
+	}
+
 	return newProperty;
 }
 
@@ -250,6 +255,7 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 		m_spinBox->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 		m_spinBox->setRange(actualProperty->getMin(), actualProperty->getMax());
 		m_spinBox->setValue(actualProperty->getValue());
+		m_spinBox->setSuffix(QString::fromStdString(actualProperty->getSuffix()));
 		if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 			m_spinBox->setSpecialValueText(OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT);
 		}

@@ -12,7 +12,7 @@
 static ot::PropertyFactoryRegistrar<ot::PropertyInt> propertyIntRegistrar(ot::PropertyInt::propertyTypeString());
 
 ot::PropertyInt::PropertyInt(const PropertyInt* _other) 
-	: Property(_other), m_min(_other->m_min), m_max(_other->m_max), m_value(_other->m_value)
+	: Property(_other), m_min(_other->m_min), m_max(_other->m_max), m_value(_other->m_value), m_suffix(_other->m_suffix)
 {}
 
 ot::PropertyInt::PropertyInt(const PropertyBase& _base)
@@ -47,6 +47,7 @@ void ot::PropertyInt::mergeWith(const Property* _other, const MergeMode& _mergeM
 	if (_mergeMode & PropertyBase::MergeConfig) {
 		m_min = other->m_min;
 		m_max = other->m_max;
+		m_suffix = other->m_suffix;
 	}
 }
 
@@ -58,10 +59,12 @@ void ot::PropertyInt::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator&
 	_object.AddMember("Value", m_value, _allocator);
 	_object.AddMember("Min", m_min, _allocator);
 	_object.AddMember("Max", m_max, _allocator);
+	_object.AddMember("Suffix", JsonString(m_suffix, _allocator), _allocator);
 }
 
 void ot::PropertyInt::setPropertyData(const ot::ConstJsonObject& _object) {
 	m_value = json::getInt(_object, "Value");
 	m_min = json::getInt(_object, "Min");
 	m_max = json::getInt(_object, "Max");
+	m_suffix = json::getString(_object, "Suffix");
 }

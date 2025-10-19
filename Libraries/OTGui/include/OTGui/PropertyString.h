@@ -19,11 +19,11 @@ namespace ot {
 	public:
 		using PropertyValueType = std::string;
 
-		PropertyString(const PropertyString* _other);
-		PropertyString(const PropertyBase& _base);
-		PropertyString(PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyString(const std::string& _value, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyString(const std::string& _name, const std::string& _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyString(const PropertyString* _other);
+		explicit PropertyString(const PropertyBase& _base);
+		explicit PropertyString(PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyString(const std::string& _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyString(const std::string& _name, const std::string& _value, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyString() {};
 
 		static std::string propertyTypeString(void) { return "String"; };

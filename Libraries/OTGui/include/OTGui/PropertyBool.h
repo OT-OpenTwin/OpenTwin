@@ -16,11 +16,11 @@ namespace ot {
 	public:
 		using PropertyValueType = bool;
 
-		PropertyBool(const PropertyBool* _other);
-		PropertyBool(const PropertyBase& _base);
-		PropertyBool(PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyBool(bool _value, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyBool(const PropertyBool* _other);
+		explicit PropertyBool(const PropertyBase& _base);
+		explicit PropertyBool(PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyBool(bool _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyBool() {};
 
 		static std::string propertyTypeString(void) { return "Bool"; };

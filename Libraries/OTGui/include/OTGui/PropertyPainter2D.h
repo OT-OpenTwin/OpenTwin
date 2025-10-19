@@ -20,28 +20,28 @@ namespace ot {
 	public:
 		using PropertyValueType = Painter2D*;
 
-		PropertyPainter2D(const PropertyPainter2D* _other);
-		PropertyPainter2D(const PropertyBase& _base);
+		explicit PropertyPainter2D(const PropertyPainter2D* _other);
+		explicit PropertyPainter2D(const PropertyBase& _base);
 
 		//! @brief Creates new instance.
 		//! Object creates and takes ownership of the painter.
-		PropertyPainter2D(PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyPainter2D(PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Creates new instance.
 		//! Object takes ownership of the painter.
-		PropertyPainter2D(Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyPainter2D(Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Creates new instance.
 		//! Object creates copy the painter.
-		PropertyPainter2D(const Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyPainter2D(const Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Creates new instance.
 		//! Object takes ownership of the painter.
-		PropertyPainter2D(const std::string& _name, Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyPainter2D(const std::string& _name, Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Creates new instance.
 		//! Object creates copy the painter.
-		PropertyPainter2D(const std::string& _name, const Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyPainter2D(const std::string& _name, const Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyPainter2D();
 
 		static std::string propertyTypeString(void) { return "Painter2D"; };

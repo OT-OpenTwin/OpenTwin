@@ -69,12 +69,12 @@ namespace ot {
 
 		//! @brief Default constructor.
 		//! @param _flags Intially set flags.
-		PropertyBase(PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyBase(PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Assignment constructor.
 		//! @param _name Property name.
 		//! @param _flags Intially set flags.
-		PropertyBase(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyBase(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Destructor.
 		virtual ~PropertyBase() {};

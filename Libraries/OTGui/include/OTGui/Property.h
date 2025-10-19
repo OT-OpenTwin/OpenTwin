@@ -24,10 +24,10 @@ namespace ot {
 	public:
 		using PropertyValueType = void;
 
-		Property(const Property* _other);
-		Property(const PropertyBase& _base);
-		Property(PropertyFlags _flags = PropertyFlags(NoFlags));
-		Property(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit Property(const Property* _other);
+		explicit Property(const PropertyBase& _base);
+		explicit Property(PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit Property(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Destructor.
 		//! Destroys the parent group if set.

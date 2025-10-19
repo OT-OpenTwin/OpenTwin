@@ -12,7 +12,7 @@
 static ot::PropertyFactoryRegistrar<ot::PropertyDouble> propertyDoubleRegistrar(ot::PropertyDouble::propertyTypeString());
 
 ot::PropertyDouble::PropertyDouble(const PropertyDouble* _other) 
-	: Property(_other), m_value(_other->m_value), m_min(_other->m_min), m_max(_other->m_max), m_precision(_other->m_precision)
+	: Property(_other), m_value(_other->m_value), m_min(_other->m_min), m_max(_other->m_max), m_precision(_other->m_precision), m_suffix(_other->m_suffix)
 {}
 
 ot::PropertyDouble::PropertyDouble(const PropertyBase & _base)
@@ -48,6 +48,7 @@ void ot::PropertyDouble::mergeWith(const Property* _other, const MergeMode& _mer
 		m_min = other->m_min;
 		m_max = other->m_max;
 		m_precision = other->m_precision;
+		m_suffix = other->m_suffix;
 	}
 }
 
@@ -60,6 +61,7 @@ void ot::PropertyDouble::getPropertyData(ot::JsonValue& _object, ot::JsonAllocat
 	_object.AddMember("Min", m_min, _allocator);
 	_object.AddMember("Max", m_max, _allocator);
 	_object.AddMember("Precision", m_precision, _allocator);
+	_object.AddMember("Suffix", JsonString(m_suffix, _allocator), _allocator);
 }
 
 void ot::PropertyDouble::setPropertyData(const ot::ConstJsonObject& _object) {
@@ -67,4 +69,5 @@ void ot::PropertyDouble::setPropertyData(const ot::ConstJsonObject& _object) {
 	m_min = json::getDouble(_object, "Min");
 	m_max = json::getDouble(_object, "Max");
 	m_precision = json::getInt(_object, "Precision");
+	m_suffix = json::getString(_object, "Suffix");
 }

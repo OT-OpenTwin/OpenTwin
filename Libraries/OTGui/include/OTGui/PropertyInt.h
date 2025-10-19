@@ -16,12 +16,12 @@ namespace ot {
 	public:
 		using PropertyValueType = int;
 
-		PropertyInt(const PropertyInt* _other);
-		PropertyInt(const PropertyBase& _base);
-		PropertyInt(PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyInt(int _value, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyInt(const std::string& _name, int _value, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyInt(const std::string& _name, int _value, int _min, int _max, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyInt(const PropertyInt* _other);
+		explicit PropertyInt(const PropertyBase& _base);
+		explicit PropertyInt(PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyInt(int _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyInt(const std::string& _name, int _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyInt(const std::string& _name, int _value, int _min, int _max, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyInt() {};
 
 		static std::string propertyTypeString(void) { return "Int"; };
@@ -42,6 +42,12 @@ namespace ot {
 		void setMax(int _value) { m_max = _value; };
 		int getMax(void) const { return m_max; };
 
+		//! @brief Sets the suffix that is appended to the value when displayed in the frontend.
+		//! The suffix is only displayed when custom values are not enabled.
+		//! @param _suffix Suffix string.
+		void setSuffix(const std::string& _suffix) { m_suffix = _suffix; };
+		std::string getSuffix() const { return m_suffix; };
+
 	protected:
 		//! @brief Add the property data to the provided JSON object
 		//! The property type is already added
@@ -58,6 +64,7 @@ namespace ot {
 		int m_value;
 		int m_min;
 		int m_max;
+		std::string m_suffix;
 	};
 
 }

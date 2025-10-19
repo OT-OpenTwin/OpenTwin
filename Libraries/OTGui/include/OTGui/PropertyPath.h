@@ -25,11 +25,11 @@ namespace ot {
 			std::string text;
 		};
 
-		PropertyPath(const PropertyPath* _other);
-		PropertyPath(const PropertyBase& _base);
-		PropertyPath(PathBrowseMode _mode = PathBrowseMode::ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyPath(const std::string& _path, PathBrowseMode _mode = PathBrowseMode::ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyPath(const std::string& _name, const std::string& _path, PathBrowseMode _mode = PathBrowseMode::ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyPath(const PropertyPath* _other);
+		explicit PropertyPath(const PropertyBase& _base);
+		explicit PropertyPath(PathBrowseMode _mode = PathBrowseMode::ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyPath(const std::string& _path, PathBrowseMode _mode = PathBrowseMode::ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyPath(const std::string& _name, const std::string& _path, PathBrowseMode _mode = PathBrowseMode::ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyPath() {};
 
 		static std::string propertyTypeString(void) { return "FilePath"; };

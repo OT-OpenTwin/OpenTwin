@@ -17,11 +17,11 @@ namespace ot {
 	public:
 		using PropertyValueType = Color;
 
-		PropertyColor(const PropertyColor* _other);
-		PropertyColor(const PropertyBase& _base);
-		PropertyColor(PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyColor(ot::Color _value, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyColor(const std::string& _name, ot::Color _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyColor(const PropertyColor* _other);
+		explicit PropertyColor(const PropertyBase& _base);
+		explicit PropertyColor(PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyColor(ot::Color _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyColor(const std::string& _name, ot::Color _value, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyColor() {};
 
 		static std::string propertyTypeString(void) { return "Color"; };
