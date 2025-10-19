@@ -17,6 +17,7 @@
 #include "OTServiceFoundation/Encryption.h"
 #include "EntityAPI.h"
 #include "EntityFileImage.h"
+#include "EntityBlockImage.h"
 #include "EntityBlockConnection.h"
 #include "EntityHierarchicalScene.h"
 #include "EntityBlockHierarchicalProjectItem.h"
@@ -123,6 +124,83 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	return true;
 }
 
+void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
+	// Unpack data
+	std::string unpackedData = ot::Encryption::decryptAndUnzipString(_fileContent, _uncompressedDataLength);
+
+	// Create container
+	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
+
+	std::string fileNameOnly, extension;
+	ot::ImageFileFormat format;
+	if (!getFileFormat(_fileName, fileNameOnly, extension, format)) {
+		return;
+	}
+
+	// Create clean file name
+	std::string newName = "BackgroundImage";
+	std::list<std::string> paths = ot::String::split(ot::String::replace(_fileName, '\\', '/'), "/");
+	if (!paths.empty()) {
+		newName = paths.back();
+		size_t ix = newName.rfind('.');
+		if (ix != std::string::npos) {
+			newName = newName.substr(0, ix);
+		}
+	}
+
+	// Create data entity
+	EntityBinaryData imageDataEntity;
+	imageDataEntity.setOwningService(Application::instance().getServiceName());
+	imageDataEntity.setEntityID(_modelComponent->createEntityUID());
+	imageDataEntity.setData(std::move(fileData));
+	imageDataEntity.storeToDataBase();
+	_newEntities.addDataEntity(_containerInfo.getEntityID(), imageDataEntity);
+
+	// Create background image entity
+	EntityFileImage imageEntity;
+	imageEntity.setOwningService(Application::instance().getServiceName());
+	imageEntity.setEntityID(_modelComponent->createEntityUID());
+	imageEntity.setFileProperties(_fileName, fileNameOnly, extension);
+	imageEntity.setImageFormat(format);
+	imageEntity.setDataEntity(imageDataEntity);
+	imageEntity.storeToDataBase();
+	_newEntities.addDataEntity(_containerInfo.getEntityID(), imageEntity);
+
+	// Create coordinate entity
+	EntityCoordinates2D coord;
+	coord.setOwningService(Application::instance().getServiceName());
+	coord.setEntityID(_modelComponent->createEntityUID());
+	coord.storeToDataBase();
+	_newEntities.addDataEntity(_containerInfo.getEntityID(), coord);
+
+	// Create background image block entity
+	EntityBlockImage backgroundImageEntity;
+	backgroundImageEntity.setOwningService(Application::instance().getServiceName());
+	backgroundImageEntity.setEntityID(_modelComponent->createEntityUID());
+	backgroundImageEntity.setName(CreateNewUniqueTopologyName(_containerInfo.getEntityName(), newName));
+	backgroundImageEntity.createProperties();
+	backgroundImageEntity.setCoordinateEntityID(coord.getEntityID());
+	backgroundImageEntity.setImageEntity(imageEntity);
+	backgroundImageEntity.storeToDataBase();
+	_newEntities.addTopologyEntity(backgroundImageEntity);
+}
+
+void EntityHandler::addBackgroundImages(const ot::EntityInformation& _projectInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
+	ot::NewModelStateInfo newEntities;
+
+	auto nameIt = _fileNames.begin();
+	auto contentIt = _fileContent.begin();
+	auto lengthIt = _uncompressedDataLength.begin();
+	
+	for (; nameIt != _fileNames.end() && contentIt != _fileContent.end() && lengthIt != _uncompressedDataLength.end(); nameIt++, contentIt++, lengthIt++) {
+		addBackgroundImage(_projectInfo, *nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
+	}
+
+	if (newEntities.hasEntities()) {
+		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added background image", true, true);
+	}
+}
+
 bool EntityHandler::addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter) {
 	// Unpack data
 	std::string unpackedData = ot::Encryption::decryptAndUnzipString(_fileContent, _uncompressedDataLength);
@@ -130,29 +208,9 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 	// Create container
 	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
 
-	// Determine extension
-	size_t ix = _fileName.rfind('.');
-	std::string fileExtension;
-	if (ix != std::string::npos) {
-		fileExtension = ot::String::toLower(_fileName.substr(ix + 1));
-	}
-	else {
-		OT_LOG_E("Could not determine file extension for image file: \"" + _fileName + "\"");
-		return false;
-	}
-
-	// Check if extension is supported
-	ot::FileExtension::DefaultFileExtension extension = ot::FileExtension::stringToFileExtension(fileExtension);
-	if (extension == ot::FileExtension::Unknown) {
-		OT_LOG_E("Unsupported file extension for image file: \"" + fileExtension + "\"");
-		return false;
-	}
-
-	// Check if image format
-	bool isImage = true;
-	ot::ImageFileFormat format = ot::FileExtension::toImageFileFormat(extension, isImage);
-	if (!isImage) {
-		OT_LOG_E("File extension is not an supported image format: \"" + fileExtension + "\"");
+	std::string fileNameOnly, extension;
+	ot::ImageFileFormat format;
+	if (!getFileFormat(_fileName, fileNameOnly, extension, format)) {
 		return false;
 	}
 
@@ -225,6 +283,7 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 		imageEntity.setOwningService(serviceName);
 		//imageEntity.setName(CreateNewUniqueTopologyName(projectEntity->getName(), "Image"));
 		imageEntity.setEntityID(_modelComponent->createEntityUID());
+		imageEntity.setFileProperties(_fileName, fileNameOnly, extension);
 		imageEntity.setImageFormat(format);
 		imageEntity.setDataEntity(imageDataEntity);
 		imageEntity.storeToDataBase();
@@ -283,4 +342,44 @@ bool EntityHandler::removeImageFromProjects(const std::list<ot::EntityInformatio
 	ot::ModelServiceAPI::updateTopologyEntities(update, "Removed preview images from project items");
 
 	return true;
+}
+
+bool EntityHandler::getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) {
+	std::string tmp;
+	std::list<std::string> path = ot::String::split(ot::String::replace(_filePath, '\\', '/'), '/', true);
+	if (path.empty()) {
+		tmp = _filePath;
+	}
+	else {
+		tmp = path.back();
+	}
+
+	// Determine extension
+	size_t ix = tmp.rfind('.');
+	if (ix != std::string::npos) {
+		_fileName = tmp.substr(0, ix);
+		_extension = ot::String::toLower(tmp.substr(ix + 1));
+	}
+	else {
+		OT_LOG_E("Could not determine file extension for image file: \"" + _filePath + "\"");
+		return false;
+	}
+
+	// Check if extension is supported
+	ot::FileExtension::DefaultFileExtension extension = ot::FileExtension::stringToFileExtension(_extension);
+	if (extension == ot::FileExtension::Unknown) {
+		OT_LOG_E("Unsupported file extension for image file: \"" + _extension + "\"");
+		return false;
+	}
+
+	// Check if image format
+	bool isImage = true;
+	_format = ot::FileExtension::toImageFileFormat(extension, isImage);
+	if (!isImage) {
+		OT_LOG_E("File extension is not an supported image format: \"" + _extension + "\"");
+		return false;
+	}
+	else {
+		return true;
+	}
 }

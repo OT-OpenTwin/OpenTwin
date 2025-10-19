@@ -62,6 +62,7 @@ private:
 	void handleSetProjectEntitySelected();
 	void handleProjectSelected(ot::JsonDocument& _doc);
 	void handleDocumentSelected(ot::JsonDocument& _doc);
+	void handleBackgroundImageSelected(ot::JsonDocument& _doc);
 
 	void handleImageSelected(ot::JsonDocument& _doc);
 	
@@ -72,6 +73,7 @@ private:
 	void handleAddProject();
 	void handleAddContainer();
 	void handleAddDocument();
+	void handleAddBackgroundImage();
 
 	void handleOpenSelectedProject();
 	void handleAddImageToProject();
@@ -99,6 +101,7 @@ private:
 	const std::string c_projectSelectedAction = "ProjectSelected";
 	const std::string c_documentSelectedAction = "DocumentSelected";
 	const std::string c_imageSelectedAction = "ImageSelected";
+	const std::string c_backgroundImageSelectedAction = "BackgroundImageSelected";
 
 	const std::string c_pageName = "Project";
 	const std::string c_managementGroupName = "Management";
@@ -107,6 +110,7 @@ private:
 	ot::ToolBarButtonCfg m_addProjectButton;
 	ot::ToolBarButtonCfg m_addContainerButton;
 	ot::ToolBarButtonCfg m_addDocumentButton;
+	ot::ToolBarButtonCfg m_addBackgroundImageButton;
 
 	ot::ToolBarButtonCfg m_openSelectedProjectButton;
 	ot::ToolBarButtonCfg m_addImageToProjectButton;

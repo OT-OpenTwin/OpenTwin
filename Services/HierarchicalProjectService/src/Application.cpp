@@ -50,6 +50,7 @@ Application::Application() :
 	connectAction(c_projectSelectedAction, this, &Application::handleProjectSelected);
 	connectAction(c_documentSelectedAction, this, &Application::handleDocumentSelected);
 	connectAction(c_imageSelectedAction, this, &Application::handleImageSelected);
+	connectAction(c_backgroundImageSelectedAction, this, &Application::handleBackgroundImageSelected);
 
 	// Initialize toolbar buttons
 	m_addProjectButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Project", "Hierarchical/AddProject");
@@ -67,6 +68,11 @@ Application::Application() :
 	);
 	connectToolBarButton(m_addContainerButton, this, &Application::handleAddContainer);
 	
+	m_addBackgroundImageButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Background Image", "Hierarchical/AddImage");
+	m_addBackgroundImageButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
+	m_addBackgroundImageButton.setButtonToolTip("Add a background image to the hierarchical scene.");
+	connectToolBarButton(m_addBackgroundImageButton, this, &Application::handleAddBackgroundImage);
+
 	m_addDocumentButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Document", "Hierarchical/AddDocument");
 	m_addDocumentButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
 	m_addDocumentButton.setButtonToolTip("Add a new document.");
@@ -120,6 +126,7 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	_ui->addMenuButton(m_addProjectButton);
 	_ui->addMenuButton(m_addContainerButton);
 	_ui->addMenuButton(m_addDocumentButton);
+	_ui->addMenuButton(m_addBackgroundImageButton);
 
 	_ui->addMenuGroup(c_pageName, c_selectionGroupName);
 
@@ -228,6 +235,21 @@ void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
 	
 }
 
+void Application::handleBackgroundImageSelected(ot::JsonDocument& _doc) {
+	std::list<std::string> contents = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Content);
+	std::list<int64_t> uncompressedDataLengths = ot::json::getInt64List(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+	std::list<std::string> fileNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+
+	ot::EntityInformation info;
+	if (!ot::ModelServiceAPI::getEntityInformation(EntityHierarchicalScene::defaultName(), info)) {
+		OT_LOG_E("Could not determine entity information for root hierarchical scene");
+		return;
+	}
+
+	m_entityHandler.addBackgroundImages(info, fileNames, contents, uncompressedDataLengths, fileFilter);
+}
+
 void Application::handleImageSelected(ot::JsonDocument& _doc) {
 	if (!isModelConnected()) {
 		OT_LOG_E("No model connected");
@@ -271,6 +293,16 @@ void Application::handleAddContainer() {
 
 void Application::handleAddDocument() {
 
+}
+
+void Application::handleAddBackgroundImage() {
+	if (!this->isUiConnected()) {
+		OT_LOG_E("No UI connected");
+		return;
+	}
+
+	auto filter = ot::FileExtension::toFilterString({ ot::FileExtension::Png, ot::FileExtension::Jpeg, ot::FileExtension::Svg });
+	ot::Frontend::requestFileForReading(c_backgroundImageSelectedAction, "Select Background Image", filter, true, true);
 }
 
 void Application::handleOpenSelectedProject() {
