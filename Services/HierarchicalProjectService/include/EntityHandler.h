@@ -19,7 +19,7 @@ public:
 	EntityHandler();
 	virtual ~EntityHandler();
 
-	std::shared_ptr<EntityBlockHierarchicalProjectItem> createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo, const std::string& _parentEntity);
+	std::shared_ptr<EntityBlockHierarchicalProjectItem> createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo, const ot::EntityInformation& _parentEntity);
 
 	bool addConnection(const ot::GraphicsConnectionCfg& _connection);
 

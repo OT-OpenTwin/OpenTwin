@@ -61,7 +61,6 @@ private:
 
 	void handleSetProjectEntitySelected();
 	void handleProjectSelected(ot::JsonDocument& _doc);
-	void handleHierarchicalSelected(ot::JsonDocument& _doc);
 	void handleDocumentSelected(ot::JsonDocument& _doc);
 
 	void handleImageSelected(ot::JsonDocument& _doc);
@@ -71,7 +70,6 @@ private:
 	// Private: Button callbacks
 
 	void handleAddProject();
-	void handleAddHierarchical();
 	void handleAddContainer();
 	void handleAddDocument();
 
@@ -84,10 +82,6 @@ private:
 	// Private: Helper
 
 	void updateButtonStates();
-
-	//! @brief Returns the parent entity to add a new entity to.
-	//! @return The parent entity information or an empty optional if no valid parent could be determined.
-	std::optional<ot::EntityInformation> getParentEntityToAdd();
 
 	std::list<ot::EntityInformation> getProjectsToOpen();
 
@@ -103,7 +97,6 @@ private:
 
 	const std::string c_setProjectEntitySelectedAction = "SetProjectEntitySelected";
 	const std::string c_projectSelectedAction = "ProjectSelected";
-	const std::string c_hierarchicalSelectedAction = "HierarchicalSelected";
 	const std::string c_documentSelectedAction = "DocumentSelected";
 	const std::string c_imageSelectedAction = "ImageSelected";
 
@@ -112,7 +105,6 @@ private:
 	const std::string c_selectionGroupName = "Project Selection";
 
 	ot::ToolBarButtonCfg m_addProjectButton;
-	ot::ToolBarButtonCfg m_addHierarchicalButton;
 	ot::ToolBarButtonCfg m_addContainerButton;
 	ot::ToolBarButtonCfg m_addDocumentButton;
 

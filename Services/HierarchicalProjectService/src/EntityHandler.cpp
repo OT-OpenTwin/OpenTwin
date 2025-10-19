@@ -31,7 +31,7 @@ EntityHandler::~EntityHandler() {
 
 }
 
-std::shared_ptr<EntityBlockHierarchicalProjectItem> EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo, const std::string& _parentEntity) {
+std::shared_ptr<EntityBlockHierarchicalProjectItem> EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo, const ot::EntityInformation& _parentEntity) {
 	std::shared_ptr<EntityBlockHierarchicalProjectItem> blockEntity(new EntityBlockHierarchicalProjectItem);
 
 	const std::string serviceName = Application::instance().getServiceName();
@@ -47,7 +47,7 @@ std::shared_ptr<EntityBlockHierarchicalProjectItem> EntityHandler::createProject
 	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
 
 	// Initialize entity name
-	std::string entName = CreateNewUniqueTopologyName(_parentEntity, _projectInfo.getProjectName());
+	std::string entName = CreateNewUniqueTopologyName(_parentEntity.getEntityName(), _projectInfo.getProjectName());
 	blockEntity->setName(entName);
 
 	// Initialize project information

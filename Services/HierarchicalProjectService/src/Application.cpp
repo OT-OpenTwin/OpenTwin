@@ -48,7 +48,6 @@ Application::Application() :
 	// Connect callback action handlers
 	connectAction(c_setProjectEntitySelectedAction, this, &Application::handleSetProjectEntitySelected);
 	connectAction(c_projectSelectedAction, this, &Application::handleProjectSelected);
-	connectAction(c_hierarchicalSelectedAction, this, &Application::handleHierarchicalSelected);
 	connectAction(c_documentSelectedAction, this, &Application::handleDocumentSelected);
 	connectAction(c_imageSelectedAction, this, &Application::handleImageSelected);
 
@@ -57,15 +56,6 @@ Application::Application() :
 	m_addProjectButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
 	m_addProjectButton.setButtonToolTip("Add an existing project.");
 	connectToolBarButton(m_addProjectButton, this, &Application::handleAddProject);
-
-	m_addHierarchicalButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Hierarchical", "Hierarchical/AddHierarchical");
-	m_addHierarchicalButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
-	m_addHierarchicalButton.setButtonToolTip(
-		"Add a new hierarchical project.\n"
-		"+ Adding a hierarchical project allows to open the subproject separately.\n"
-		"- Childs of a hierarchical project are only visible when the corresponding hierarchical project is opened."
-	);
-	connectToolBarButton(m_addHierarchicalButton, this, &Application::handleAddHierarchical);
 
 	m_addContainerButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Container", "Hierarchical/AddContainer");
 	m_addContainerButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
@@ -128,7 +118,6 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	_ui->addMenuGroup(c_pageName, c_managementGroupName);
 
 	_ui->addMenuButton(m_addProjectButton);
-	_ui->addMenuButton(m_addHierarchicalButton);
 	_ui->addMenuButton(m_addContainerButton);
 	_ui->addMenuButton(m_addDocumentButton);
 
@@ -227,18 +216,12 @@ void Application::handleProjectSelected(ot::JsonDocument& _doc) {
 		return;
 	}
 
-	auto parentInfo = getParentEntityToAdd();
-
-	if (!parentInfo.has_value()) {
-		OT_LOG_E("No valid parent entity selected");
-		return;
+	ot::EntityInformation rootInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(EntityHierarchicalScene::defaultName(), rootInfo)) {
+		OT_LOG_E("Could not determine entity information for root hierarchical scene");
 	}
 
-	m_entityHandler.createProjectItemBlockEntity(info, parentInfo.value().getEntityName());
-}
-
-void Application::handleHierarchicalSelected(ot::JsonDocument& _doc) {
-
+	m_entityHandler.createProjectItemBlockEntity(info, rootInfo);
 }
 
 void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
@@ -280,10 +263,6 @@ void Application::handleAddProject() {
 
 	std::string tmp;
 	this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc, tmp);
-}
-
-void Application::handleAddHierarchical() {
-
 }
 
 void Application::handleAddContainer() {
@@ -341,25 +320,11 @@ void Application::updateButtonStates() {
 	}
 
 	// Prepare lists
-	std::list<std::string> controlsThatAdd;
-	controlsThatAdd.push_back(m_addProjectButton.getFullPath());
-	controlsThatAdd.push_back(m_addHierarchicalButton.getFullPath());
-	controlsThatAdd.push_back(m_addContainerButton.getFullPath());
-	controlsThatAdd.push_back(m_addDocumentButton.getFullPath());
-
 	std::list<std::string> enabledControls;
 	std::list<std::string> disabledControls;
 
-	const bool canAddChilds = getParentEntityToAdd().has_value();
 	auto projectsToOpen = getProjectsToOpen();
 	const bool canOpenProject = !projectsToOpen.empty();
-
-	if (canAddChilds) {
-		enabledControls = std::move(controlsThatAdd);
-	}
-	else {
-		disabledControls = std::move(controlsThatAdd);
-	}
 
 	if (canOpenProject) {
 		enabledControls.push_back(m_openSelectedProjectButton.getFullPath());
@@ -379,50 +344,6 @@ void Application::updateButtonStates() {
 
 	// Set control states
 	ui->setControlsEnabledState(enabledControls, disabledControls);
-}
-
-std::optional<ot::EntityInformation> Application::getParentEntityToAdd() {
-	std::list<std::string> validAddableTypes = {
-		EntityHierarchicalScene::className()
-	};
-
-	const std::list<ot::EntityInformation>& selectedInfos = this->getSelectedEntityInfos();
-
-	if (!selectedInfos.empty()) {
-		bool hasParent = false;
-		ot::EntityInformation parentInfo;
-
-		for (const ot::EntityInformation& info : selectedInfos) {
-			if (ot::ContainerHelper::contains(validAddableTypes, info.getEntityType())) {
-				if (!hasParent) {
-					hasParent = true;
-					parentInfo = info;
-				}
-				else {
-					// More than one valid parent selected
-					if (parentInfo != info) {
-						return std::nullopt;
-					}
-				}
-			}
-		}
-
-		if (hasParent) {
-			return parentInfo;
-		}
-		else {
-			return std::nullopt;
-		}
-	}
-
-	ot::EntityInformation rootInfo;
-	if (ot::ModelServiceAPI::getEntityInformation(EntityHierarchicalScene::defaultName(), rootInfo)) {
-		return rootInfo;
-	}
-	else {
-		OT_LOG_E("Could not determine entity information for root hierarchical scene");
-		return std::nullopt;
-	}
 }
 
 std::list<ot::EntityInformation> Application::getProjectsToOpen() {
