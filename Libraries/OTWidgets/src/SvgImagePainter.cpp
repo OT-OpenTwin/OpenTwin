@@ -31,7 +31,7 @@ ot::SvgImagePainter::~SvgImagePainter() {
 	m_svgRenderer = nullptr;
 }
 
-void ot::SvgImagePainter::paintImage(QPainter* _painter, const QRectF& _bounds) const {
+void ot::SvgImagePainter::paintImage(QPainter* _painter, const QRectF& _bounds, bool _maintainAspectRatio) const {
 	OTAssertNullptr(m_svgRenderer);
 	m_svgRenderer->render(_painter, _bounds);
 }

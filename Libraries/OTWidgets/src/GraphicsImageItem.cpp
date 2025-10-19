@@ -160,12 +160,12 @@ void ot::GraphicsImageItem::paintCustomItem(QPainter* _painter, const QStyleOpti
 
 	QSizeF adjustedSize = m_painter->getDefaultImageSize();
 	if (config->getMaintainAspectRatio()) {
-		adjustedSize.scale(_rect.size(), Qt::KeepAspectRatio);
+		adjustedSize.scale(_rect.size(), (config->getMaintainAspectRatio() ? Qt::KeepAspectRatio : Qt::IgnoreAspectRatio));
 	}
 	else {
 		adjustedSize = _rect.size();
 	}
 
 	QRectF adjustedRect = ot::Positioning::calculateChildRect(_rect, adjustedSize, this->getGraphicsItemAlignment());
-	m_painter->paintImage(_painter, adjustedRect);
+	m_painter->paintImage(_painter, adjustedRect, config->getMaintainAspectRatio());
 }

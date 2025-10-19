@@ -23,7 +23,7 @@ ot::PixmapImagePainter::~PixmapImagePainter() {
 
 }
 
-void ot::PixmapImagePainter::paintImage(QPainter* _painter, const QRectF& _bounds) const {
-	QPixmap scaled = m_pixmap.scaled(_bounds.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+void ot::PixmapImagePainter::paintImage(QPainter* _painter, const QRectF& _bounds, bool _maintainAspectRatio) const {
+	QPixmap scaled = m_pixmap.scaled(_bounds.size().toSize(), (_maintainAspectRatio ? Qt::KeepAspectRatio : Qt::IgnoreAspectRatio), Qt::SmoothTransformation);
 	_painter->drawPixmap(_bounds.topLeft(), scaled);
 }

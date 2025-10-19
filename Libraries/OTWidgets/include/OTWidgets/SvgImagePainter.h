@@ -29,7 +29,7 @@ namespace ot {
 
 		virtual ImagePainter* createCopy() const override { return new SvgImagePainter(*this); };
 
-		virtual void paintImage(QPainter* _painter, const QRectF& _bounds) const override;
+		virtual void paintImage(QPainter* _painter, const QRectF& _bounds, bool _maintainAspectRatio) const override;
 
 		virtual QSizeF getDefaultImageSize(void) const override;
 
