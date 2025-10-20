@@ -5,6 +5,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTGui/GraphicsImageItemCfg.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
 
@@ -27,7 +28,8 @@ ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
-	_object.AddMember("Data", JsonArray(m_imageData, _allocator), _allocator);
+	_object.AddMember("Data", JsonString(String::compressedVectorBase64(m_imageData), _allocator), _allocator);
+	_object.AddMember("DataLen", m_imageData.size(), _allocator);
 	_object.AddMember("DataFileFormat", JsonString(ot::toString(m_imageDataFileType), _allocator), _allocator);
 	_object.AddMember("Path", JsonString(m_imageSubPath, _allocator), _allocator);
 	_object.AddMember("MaintainRatio", m_maintainAspectRatio, _allocator);
@@ -36,7 +38,8 @@ void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator
 void ot::GraphicsImageItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 	
-	m_imageData = json::getCharVector(_object, "Data");
+	uint64_t dataLen = json::getUInt64(_object, "DataLen");
+	m_imageData = String::decompressedVectorBase64(json::getString(_object, "Data"), dataLen);
 	m_imageDataFileType = ot::stringToImageFileFormat(json::getString(_object, "DataFileFormat"));
 	m_imageSubPath = json::getString(_object, "Path");
 	m_maintainAspectRatio = json::getBool(_object, "MaintainRatio");
