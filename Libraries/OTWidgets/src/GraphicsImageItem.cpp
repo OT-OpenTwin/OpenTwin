@@ -109,7 +109,8 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		this->setBlockConfigurationNotifications(false);
 
 		if (!m_painter) {
-			return false;
+			// Failed to create painter, default to empty
+			m_painter = new PixmapImagePainter(QPixmap());
 		}
 		
 	}
