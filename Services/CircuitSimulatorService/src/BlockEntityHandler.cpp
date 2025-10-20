@@ -128,9 +128,10 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 
 	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> entityBlockConnectionsByBlockID;
+	EntityBlockConnection temp;
 	for (auto& entityInfo : entityInfos) {
 		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
-		if (baseEntity != nullptr && baseEntity->getClassName() == "EntityBlockConnection") {
+		if (baseEntity != nullptr && baseEntity->getClassName() == temp.getClassName()) {
 			std::shared_ptr<EntityBlockConnection> blockEntityConnection(dynamic_cast<EntityBlockConnection*>(baseEntity));
 			if (blockEntityConnection != nullptr) {
 				entityBlockConnectionsByBlockID[blockEntityConnection->getEntityID()] = blockEntityConnection;

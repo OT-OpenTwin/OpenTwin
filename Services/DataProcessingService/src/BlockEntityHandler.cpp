@@ -211,7 +211,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 	for (auto& entityInfo : entityInfos)
 	{
 		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
-		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
+		if (baseEntity != nullptr)
 		{
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 			if (blockEntity != nullptr)
@@ -231,12 +231,15 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 
 	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> entityBlockConnectionsByBlockID;
+	EntityBlockConnection temp;
 	for (auto& entityInfo : entityInfos) {
 		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
-		if (baseEntity != nullptr && baseEntity->getClassName() == "EntityBlockConnection") {
+		if (baseEntity != nullptr && baseEntity->getClassName() == temp.getClassName()) {
 			std::shared_ptr<EntityBlockConnection> blockEntityConnection(dynamic_cast<EntityBlockConnection*>(baseEntity));
-			assert(blockEntityConnection != nullptr);
-			entityBlockConnectionsByBlockID[blockEntityConnection->getEntityID()] = blockEntityConnection;
+			if (blockEntityConnection != nullptr)
+			{
+				entityBlockConnectionsByBlockID[blockEntityConnection->getEntityID()] = blockEntityConnection;
+			}
 		}
 	}
 
