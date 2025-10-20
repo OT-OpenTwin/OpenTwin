@@ -35,13 +35,10 @@ ot::GraphicsItemCfg* EntityBlockImage::createBlockCfg() {
 
 	std::unique_ptr<ot::GraphicsImageItemCfg> cfg(new ot::GraphicsImageItemCfg);
 
-	ot::GraphicsItemCfg::GraphicsItemFlags itemFlags;
+	ot::GraphicsItemCfg::GraphicsItemFlags itemFlags = ot::GraphicsItemCfg::ItemIsSelectable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemHandlesState;
 
-	if (PropertyHelper::getBoolPropertyValue(this, "Lock movement", "Block")) {
-		itemFlags = ot::GraphicsItemCfg::ItemSnapsToGridTopLeft;
-	}
-	else {
-		itemFlags = ot::GraphicsItemCfg::ItemIsSelectable | ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemHandlesState;
+	if (!PropertyHelper::getBoolPropertyValue(this, "Lock movement", "Block")) {
+		itemFlags |= ot::GraphicsItemCfg::ItemIsMoveable;
 	}
 
 	cfg->setGraphicsItemFlags(itemFlags);
