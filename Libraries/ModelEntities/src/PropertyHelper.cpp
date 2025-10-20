@@ -77,6 +77,32 @@ int32_t PropertyHelper::getIntegerPropertyValue(const EntityBase* _base, const s
 	return intProperty->getValue();
 }
 
+std::string PropertyHelper::getProjectPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	const EntityPropertiesProjectList* projectProperty = getEntityProjectListProperty(_base, _name, _groupName);
+	const std::string selectedProjectName = projectProperty->getValue();
+	return selectedProjectName;
+}
+
+const EntityPropertiesProjectList* PropertyHelper::getEntityProjectListProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
+	if (propertyBase == nullptr)
+	{
+		throw std::exception(("Failed to access property " + _name).c_str());
+	}
+
+	const EntityPropertiesProjectList* entitySelection = dynamic_cast<const EntityPropertiesProjectList*>(propertyBase);
+	if (entitySelection == nullptr)
+	{
+		throw std::exception(("Tried to cast property " + _name + " to wrong type: entity project selection").c_str());
+	}
+
+	return entitySelection;
+}
+
+
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Value setter

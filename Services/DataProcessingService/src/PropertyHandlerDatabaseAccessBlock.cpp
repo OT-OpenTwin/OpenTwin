@@ -118,7 +118,7 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 	ProjectToCollectionConverter collectionFinder(sessionServiceURL);
 	std::string loggedInUserName = Application::instance()->getLogInUserName();
 	std::string loggedInUserPsw = Application::instance()->getLogInUserPassword();
-	_collectionName = collectionFinder.NameCorrespondingCollection(projectName, loggedInUserName, loggedInUserPsw);
+	_collectionName = collectionFinder.nameCorrespondingCollection(projectName, loggedInUserName, loggedInUserPsw);
 
 	const std::string thisProjectsName = DataBase::GetDataBase()->getProjectName();
 

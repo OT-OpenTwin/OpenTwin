@@ -29,6 +29,7 @@
     <ClInclude Include="include\EntityAPI.h" />
     <ClInclude Include="include\EntityBatchImporter.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
+    <ClInclude Include="include\EntityDatabaseIndexManipulator.h" />
     <ClInclude Include="include\EntityFactoryRegistrar.h" />
     <ClInclude Include="include\EntityFileRawData.h" />
     <ClInclude Include="include\EntityFileImage.h" />
@@ -157,6 +158,7 @@
     <ClCompile Include="include\PropertyBundleDataHandle.h" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\BSONToVariableConverter.cpp" />
+    <ClCompile Include="src\EntityDatabaseIndexManipulator.cpp" />
     <ClCompile Include="src\EntityFactory.cpp" />
     <ClCompile Include="src\CSVToTableTransformer.cpp" />
     <ClCompile Include="src\DataBase.cpp" />

@@ -72,7 +72,8 @@ private:
 	ot::ToolBarButtonCfg m_buttonRunPipeline;
 	ot::ToolBarButtonCfg m_buttonCreateSolver;
 	ot::ToolBarButtonCfg m_buttonGraphicsScene;
-	
+	ot::ToolBarButtonCfg m_buttonDefaultIndexCreation;
+
 	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
 	GraphHandler _graphHandler;
@@ -85,4 +86,5 @@ private:
 	void createPipeline();
 	void createSolver();
 	void runPipeline();
+	void createDefaultIndexes();
 };

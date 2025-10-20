@@ -34,6 +34,7 @@
 #include "EntitySolverDataProcessing.h"
 #include "EntityGraphicsScene.h"
 
+
 Application * g_instance{ nullptr };
 
 Application * Application::instance(void) {
@@ -151,6 +152,52 @@ void Application::runPipeline()
 	}
 }
 
+#include "EntityDatabaseIndexManipulator.h"
+#include "IndexHandler.h"
+#include "ProjectToCollectionConverter.h"
+#include "OTServiceFoundation/ProgressUpdater.h"
+#include "NewModelStateInfo.h"
+
+void Application::createDefaultIndexes()
+{
+	const bool continuousProgressbar = true;
+	ProgressUpdater updater(Application::instance()->getUiComponent(), "Creating database indexes", continuousProgressbar);
+
+	//A single entity of this type shall be added if it does not exist yet.
+	std::string projectName = "";
+	ot::UIDList itemIDs = ot::ModelServiceAPI::getIDsOfFolderItemsOfType(ot::FolderNames::DatasetFolder, EntityDatabaseIndexManipulator::className(), false);
+
+	if (itemIDs.size() == 0)
+	{
+		projectName = Application::instance()->getProjectName();
+
+		EntityDatabaseIndexManipulator indexManipulator;
+		indexManipulator.setEntityID(Application::instance()->getModelComponent()->createEntityUID());
+		indexManipulator.createProperties(projectName);
+		indexManipulator.setEditable(false);
+		indexManipulator.storeToDataBase();
+		std::list<std::string> defaultIndexes = { IndexHandler::getDefaultIndexes().begin(),IndexHandler::getDefaultIndexes().end() };
+		indexManipulator.createIndexes(defaultIndexes);
+
+		ot::NewModelStateInfo infos;
+		infos.addTopologyEntity(indexManipulator);
+		ot::ModelServiceAPI::addEntitiesToModel(infos, "Added database index manipulator");
+	}
+
+	const std::string sessionServiceURL = Application::instance()->getSessionServiceURL();
+	auto modelComponent = Application::instance()->getModelComponent();
+
+	ProjectToCollectionConverter collectionFinder(sessionServiceURL);
+	std::string loggedInUserName = Application::instance()->getLogInUserName();
+	std::string loggedInUserPsw = Application::instance()->getLogInUserPassword();
+	const std::string collectionName = collectionFinder.nameCorrespondingCollection(projectName, loggedInUserName, loggedInUserPsw);
+
+
+	ResultImportLogger logger;
+	IndexHandler indexHandler(collectionName, logger);
+	indexHandler.createDefaultIndexes();
+}
+
 // ##################################################################################################################################################################################################################
 
 // Protected: Callback functions
@@ -246,6 +293,9 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonGraphicsScene = ot::ToolBarButtonCfg(pageName, groupName, "Create Pipeline", "Default/AddSolver");
 	_ui->addMenuButton(m_buttonGraphicsScene.setButtonLockFlags(modelWrite));
 
+	m_buttonDefaultIndexCreation = ot::ToolBarButtonCfg(pageName, "Database Indexes", "Update Indexes", "Default/IndexCreation");
+	_ui->addMenuButton(m_buttonDefaultIndexCreation.setButtonLockFlags(modelWrite));
+
 	_blockEntityHandler.setUIComponent(_ui);
 	_blockEntityHandler.orderUIToCreateBlockPicker();
 	
@@ -258,6 +308,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	connectToolBarButton(m_buttonGraphicsScene, this, &Application::createPipeline);
 	connectToolBarButton(m_buttonCreateSolver, this, &Application::createSolver);
 	connectToolBarButton(m_buttonRunPipeline, this, &Application::runPipeline);
+
 }
 
 void Application::modelConnected(ot::components::ModelComponent * _model)

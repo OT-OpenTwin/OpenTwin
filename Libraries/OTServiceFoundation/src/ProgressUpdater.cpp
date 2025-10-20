@@ -2,11 +2,11 @@
 #include <cmath>
 #include <thread>
 
-ProgressUpdater::ProgressUpdater(ot::components::UiComponent* _uiComponent, const std::string& _progressbarMessage)
+ProgressUpdater::ProgressUpdater(ot::components::UiComponent* _uiComponent, const std::string& _progressbarMessage, bool _continuous)
 	: m_uiComponent(_uiComponent)
 {
 	INVARIANT;
-	m_uiComponent->setProgressInformation(_progressbarMessage, false);
+	m_uiComponent->setProgressInformation(_progressbarMessage, _continuous);
 	m_uiComponent->setProgress(0);	
 }
 

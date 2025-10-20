@@ -128,6 +128,9 @@
     <ClInclude Include="include\CurveFactory.h">
       <Filter>include\Plot</Filter>
     </ClInclude>
+    <ClInclude Include="include\IndexHandler.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QuantityContainer.cpp">
@@ -185,6 +188,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\CurveFactory.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IndexHandler.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

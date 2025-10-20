@@ -475,7 +475,7 @@ public:
 	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
-	void setValue(std::string& value) { m_value = value; }
+	void setValue(const std::string& value) { m_value = value; }
 	std::string getValue() const {return m_value;}
 private:
 	std::string m_value;

@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="include\CrossCollectionAccess.h" />
     <ClInclude Include="include\CurveFactory.h" />
+    <ClInclude Include="include\IndexHandler.h" />
     <ClInclude Include="include\PlotBuilder.h" />
     <ClInclude Include="include\ResultImportLoggerEntry.h" />
     <ClInclude Include="include\ResultImportLoggerVerbosity.h" />
@@ -55,6 +56,7 @@
     <ClCompile Include="src\CurveFactory.cpp" />
     <ClCompile Include="src\DatasetDescription.cpp" />
     <ClCompile Include="src\DatasetOverviewVisualiser.cpp" />
+    <ClCompile Include="src\IndexHandler.cpp" />
     <ClCompile Include="src\PlotBuilder.cpp" />
     <ClCompile Include="src\ProjectToCollectionConverter.cpp" />
     <ClCompile Include="src\QuantityContainerSerialiser.cpp" />

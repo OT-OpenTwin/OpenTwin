@@ -6,8 +6,8 @@
 class __declspec(dllexport) ProjectToCollectionConverter
 {
 public:
-	ProjectToCollectionConverter(const std::string& sessionServiceURL);
-	std::string NameCorrespondingCollection(const std::string& projectName, const std::string& userName, const std::string& userPSW);
+	ProjectToCollectionConverter(const std::string& _sessionServiceURL);
+	std::string nameCorrespondingCollection(const std::string& _projectName, const std::string& _userName, const std::string& _userPSW);
 private:
-	std::string _authorisationService;
+	std::string m_authorisationService;
 };

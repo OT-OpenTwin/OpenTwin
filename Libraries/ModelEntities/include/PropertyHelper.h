@@ -1,8 +1,3 @@
-//! @file PropertyHelper.cpp
-//! @author Peter Thoma, Alexander Kuester (alexk95)
-//! @date February 2020
-// ###########################################################################################################################################################################################################################################################################################################################
-
 #pragma once
 
 #include "EntityBase.h"
@@ -30,7 +25,8 @@ public:
 	static ot::Color getColourPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	static const ot::Painter2D* getPainterPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	static int32_t getIntegerPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	
+	static std::string getProjectPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Value setter
@@ -68,6 +64,7 @@ public:
 	static const EntityPropertiesInteger* getIntegerProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	static const EntityPropertiesGuiPainter* getPainterProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	static const EntityPropertiesEntityList* getEntityListProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static const EntityPropertiesProjectList* getEntityProjectListProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 
 };
 

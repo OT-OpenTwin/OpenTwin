@@ -6,12 +6,12 @@
 #include "OTCore/ProjectInformation.h"
 
 
-ProjectToCollectionConverter::ProjectToCollectionConverter(const std::string& sessionServiceURL)
+ProjectToCollectionConverter::ProjectToCollectionConverter(const std::string& _sessionServiceURL)
 {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetAuthorisationServerUrl, doc.GetAllocator()), doc.GetAllocator());
 	std::string responseStr;
-	if (!ot::msg::send("", sessionServiceURL, ot::EXECUTE, doc.toJson(), responseStr)) {
+	if (!ot::msg::send("", _sessionServiceURL, ot::EXECUTE, doc.toJson(), responseStr)) {
 		throw std::exception("Could not get authorisation service URL from session service.");
 	}
 	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
@@ -19,10 +19,10 @@ ProjectToCollectionConverter::ProjectToCollectionConverter(const std::string& se
 		throw std::exception(("Could not get authorisation service URL from session service due to error: " + response.getWhat()).c_str());
 	}
 
-	_authorisationService = response.getWhat();
+	m_authorisationService = response.getWhat();
 }
 
-std::string ProjectToCollectionConverter::NameCorrespondingCollection(const std::string& projectName, const std::string& userName, const std::string& userPSW)
+std::string ProjectToCollectionConverter::nameCorrespondingCollection(const std::string& projectName, const std::string& userName, const std::string& userPSW)
 {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
@@ -32,7 +32,7 @@ std::string ProjectToCollectionConverter::NameCorrespondingCollection(const std:
 
 	std::string response;
 	
-	ot::msg::send("", _authorisationService, ot::EXECUTE, doc.toJson(), response);
+	ot::msg::send("", m_authorisationService, ot::EXECUTE, doc.toJson(), response);
 	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
 
 	if (!responseMessage.isOk()) {

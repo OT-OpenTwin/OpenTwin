@@ -451,6 +451,9 @@
     <ClInclude Include="include\EntityFileRawData.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntityDatabaseIndexManipulator.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -778,6 +781,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityFileRawData.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+        <ClCompile Include="src\EntityDatabaseIndexManipulator.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>

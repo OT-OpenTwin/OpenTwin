@@ -8,7 +8,7 @@ class __declspec(dllexport) ProgressUpdater
 {
 	friend class FixtureProgressUpdater;
 public:
-	ProgressUpdater(ot::components::UiComponent* _uiComponent, const std::string& _progressbarMessage);
+	ProgressUpdater(ot::components::UiComponent* _uiComponent, const std::string& _progressbarMessage, bool _continuous = false);
 	ProgressUpdater(const ProgressUpdater& _other) = delete;
 	ProgressUpdater(ProgressUpdater&& _other) = delete;
 	ProgressUpdater operator=(ProgressUpdater& _other) = delete;
