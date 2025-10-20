@@ -8,9 +8,12 @@
 // OpenTwin header
 #include "OTWidgets/WidgetBase.h"
 
+// Qt header
+#include <QtCore/qobject.h>
+
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT PDFWidget : public ot::WidgetBase {
+	class OT_WIDGETS_API_EXPORT PDFWidget : public QObject, public ot::WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PDFWidget)
 		OT_DECL_NOMOVE(PDFWidget)
