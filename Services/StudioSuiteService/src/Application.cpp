@@ -667,7 +667,7 @@ void Application::changeHistory(const std::string& content)
 		else
 		{
 			// A new history item needs to be created
-			history = new EntityFileText(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
+			history = new EntityFileText(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 			history->setFileProperties("", "history", "txt");
 			history->setName("History");
 

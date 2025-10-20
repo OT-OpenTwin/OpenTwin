@@ -70,12 +70,12 @@ void BlockHandlerFileWriter::createFile()
 	const std::string resultFolder = solverName + "/" + ot::FolderNames::FilesFolder;
 	const std::string fileName = CreateNewUniqueTopologyName(resultFolder, m_fileName);
 
-	EntityFileText textFile(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
+	EntityFileText textFile(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 	textFile.setName(fileName);
 
 	textFile.setFileProperties("", m_fileName, m_fileType);
 	
-	EntityBinaryData data(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
+	EntityBinaryData data(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 	const std::string fileContent = m_fileStream.str();
 
 	data.setData(fileContent.c_str(), fileContent.size());

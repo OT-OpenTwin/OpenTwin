@@ -2731,7 +2731,7 @@ void AppBase::slotTextEditorSaveRequested() {
 	*/
 	{
 		try {
-			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
+			ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 			ot::JsonDocument doc = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(view->getViewData().getEntityName(), view->getTextEditor()->toPlainText().toStdString());
 
 			std::string response;
@@ -2775,7 +2775,7 @@ void AppBase::slotTableSaveRequested() {
 			return;
 		}
 
-		ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
+		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 
 		ot::TableCfg cfg = table->createConfig();
 		ot::BasicEntityInformation entityInfo(view->getViewData());
