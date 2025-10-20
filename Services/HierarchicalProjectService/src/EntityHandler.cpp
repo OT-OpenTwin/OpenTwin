@@ -153,6 +153,8 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 
 	ot::UID documentEntityID = ot::invalidUID;
 
+	const std::string newDocumentName = CreateNewUniqueTopologyName(_containerInfo.getEntityName(), fileNameOnly + "." + extensionString);
+
 	// Try to create entity from extension
 	{
 		std::unique_ptr<EntityBase> entity(EntityFactory::instance().create(extension));
@@ -161,14 +163,14 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 			if (fileEntity) {
 				// We have a valid file entity, set it up
 				fileEntity->setOwningService(serviceName);
+				fileEntity->setName(newDocumentName);
 				fileEntity->setEntityID(_modelComponent->createEntityUID());
-				fileEntity->setName(CreateNewUniqueTopologyName(_containerInfo.getEntityName() + "/Documents", fileNameOnly + "." + extensionString));
 				fileEntity->setFileProperties(_fileName, fileNameOnly, extensionString);
 				fileEntity->setDataEntity(dataEntity);
 				fileEntity->setEditable(false);
 				fileEntity->setDeletable(false);
 				fileEntity->storeToDataBase();
-				_newEntities.addTopologyEntity(*fileEntity);
+				_newEntities.addDataEntity(_containerInfo.getEntityID(), *fileEntity);
 
 				documentEntityID = fileEntity->getEntityID();
 			}
@@ -179,6 +181,7 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 
 			EntityFileRawData rawDataEntity;
 			rawDataEntity.setOwningService(serviceName);
+			rawDataEntity.setName(newDocumentName);
 			rawDataEntity.setEntityID(_modelComponent->createEntityUID());
 			rawDataEntity.setFileProperties(_fileName, fileNameOnly, extensionString);
 			rawDataEntity.setDataEntity(dataEntity);
@@ -205,7 +208,7 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 	blockEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
 	blockEntity.setOwningService(serviceName);
 	blockEntity.setEntityID(_modelComponent->createEntityUID());
-	blockEntity.setName(CreateNewUniqueTopologyName(_containerInfo.getEntityName(), fileNameOnly + "." + extensionString));
+	blockEntity.setName(newDocumentName);
 	blockEntity.createProperties();
 	blockEntity.setEditable(true);
 	blockEntity.setCoordinateEntityID(coord.getEntityID());

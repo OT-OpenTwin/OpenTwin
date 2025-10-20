@@ -20,6 +20,8 @@
 #include <optional>
 #include <functional>
 
+class EntityFileRawData;
+
 class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler, public ot::GraphicsHandler {
 private:
 	Application();
@@ -93,6 +95,12 @@ private:
 	ot::ReturnMessage requestToOpenProject(const ot::EntityInformation& _entity);
 
 	ot::ReturnMessage requestToOpenDocument(const ot::EntityInformation& _entity);
+
+	ot::ReturnMessage requestToOpenRawDataDocument(EntityBase* _entity);
+
+	ot::ReturnMessage requestToOpenTextDocument(EntityBase* _entity);
+
+	ot::ReturnMessage requestToOpenCSVDocument(EntityBase* _entity);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
