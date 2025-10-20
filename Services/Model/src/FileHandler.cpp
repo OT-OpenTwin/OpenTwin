@@ -34,8 +34,6 @@ FileHandler::FileHandler() {
 
 	m_actionHandler.connectAction(OT_ACTION_CMD_ImportTextFile, this, &FileHandler::handleImportTextFile);
 	m_actionHandler.connectAction(OT_ACTION_CMD_ImportPyhtonScript, this, &FileHandler::handleImportPythonScript);
-	m_actionHandler.connectAction(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, this, &FileHandler::handleTextEditorSaveRequest);
-	m_actionHandler.connectAction(OT_ACTION_CMD_UI_TABLE_SaveRequest, this, &FileHandler::handleTableSaveRequest);
 }
 
 void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
@@ -135,63 +133,7 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 	uiComponent->displayMessage(std::to_string(passedTime) + " ms\n");
 }
 
-void FileHandler::handleTableSaveRequest(ot::JsonDocument& _doc)
-{
-	ot::TableCfg config;
-	config.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
-	const std::string entityName = config.getEntityName();
-	
-	Model* model = Application::instance()->getModel();
-	assert(model != nullptr);
-
-	const auto entityIDsByName = model->getEntityNameToIDMap();
-	auto entityIDByName = entityIDsByName.find(entityName);
-	if (entityIDByName != entityIDsByName.end())
-	{
-		ot::UID entityID = entityIDByName->second;
-		EntityBase* entityBase = model->getEntityByID(entityID);
-		IVisualisationTable* tableVisualisationEntity = dynamic_cast<IVisualisationTable*>(entityBase);
-		if (tableVisualisationEntity != nullptr)
-		{
-			ot::ContentChangedHandling changedHandling = tableVisualisationEntity->getTableContentChangedHandling();
-			if (changedHandling == ot::ContentChangedHandling::ModelServiceSaves)
-			{
-				storeChangedTable(tableVisualisationEntity, config);
-			}
-			else if (changedHandling == ot::ContentChangedHandling::OwnerHandles)
-			{
-				const std::string& owner = entityBase->getOwningService();
-				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
-				{
-					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(_doc), owner); //Potentially dangerous ? Usually the document should not be used afterwards.
-					workerThread.detach();
-				}
-			}
-			else if (changedHandling == ot::ContentChangedHandling::ModelServiceSavesNotifyOwner)
-			{
-				storeChangedTable(tableVisualisationEntity, config);
-				const std::string& owner = entityBase->getOwningService();
-				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
-				{
-					ot::JsonDocument notify;
-					notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
-					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), owner);
-					workerThread.detach();
-				}
-			}
-		}
-		else
-		{
-			OT_LOG_E("Failed to visualise " + entityName + " since it does not support the corresponding visualisation interface.");
-		}
-	}
-	else
-	{
-		OT_LOG_E("Failed to handle changed text request since the entity could not be found by name: " + entityName);
-	}
-}
-
-void FileHandler::storeChangedTable(IVisualisationTable* _entity, ot::TableCfg& _cfg)
+void FileHandler::storeChangedTable(IVisualisationTable* _entity, const ot::TableCfg& _cfg)
 {
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);
@@ -202,16 +144,13 @@ void FileHandler::storeChangedTable(IVisualisationTable* _entity, ot::TableCfg& 
 	model->modelChangeOperationCompleted("Updated Table.");
 }
 
-void FileHandler::handleTextEditorSaveRequest(ot::JsonDocument& _doc)
+void FileHandler::textEditorSaveRequested(const std::string& _entityName, const std::string& _text)
 {
-	const std::string entityName = _doc[OT_ACTION_PARAM_TEXTEDITOR_Name].GetString();
-	const std::string textContent = _doc[OT_ACTION_PARAM_TEXTEDITOR_Text].GetString();
-
 	Model* model =	Application::instance()->getModel();
 	assert(model != nullptr);
 
 	const auto entityIDsByName = model->getEntityNameToIDMap();
-	auto entityIDByName	= entityIDsByName.find(entityName);
+	auto entityIDByName	= entityIDsByName.find(_entityName);
 	if(entityIDByName != entityIDsByName.end())
 	{
 		ot::UID entityID = entityIDByName->second;
@@ -223,20 +162,25 @@ void FileHandler::handleTextEditorSaveRequest(ot::JsonDocument& _doc)
 			if (changedHandling == ot::ContentChangedHandling::ModelServiceSaves)
 			{
 				
-				storeChangedText(textVisualisationEntity, textContent);
+				storeChangedText(textVisualisationEntity, _text);
 			}
 			else if (changedHandling == ot::ContentChangedHandling::OwnerHandles)
 			{
 				const std::string& owner =	entityBase->getOwningService();
 				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
 				{
-					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(_doc), owner); //Potentially dangerous ? Usually the document should not be used afterwards.
+					ot::JsonDocument doc;
+					doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(_entityName, doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(_text, doc.GetAllocator()), doc.GetAllocator());
+
+					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(doc), owner); //Potentially dangerous ? Usually the document should not be used afterwards.
 					workerThread.detach();
 				}
 			}
 			else if (changedHandling == ot::ContentChangedHandling::ModelServiceSavesNotifyOwner)
 			{
-				storeChangedText(textVisualisationEntity, textContent);
+				storeChangedText(textVisualisationEntity, _text);
 				
 				const std::string& owner = entityBase->getOwningService();
 				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
@@ -250,11 +194,58 @@ void FileHandler::handleTextEditorSaveRequest(ot::JsonDocument& _doc)
 		}
 		else
 		{
-			OT_LOG_E("Failed to visualise " + entityName + " since it does not support the corresponding visualisation interface.");
+			OT_LOG_E("Failed to visualise " + _entityName + " since it does not support the corresponding visualisation interface.");
 		}
 	}
 	else
 	{
+		OT_LOG_E("Failed to handle changed text request since the entity could not be found by name: " + _entityName);
+	}
+}
+
+void FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
+	const std::string entityName = _cfg.getEntityName();
+
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+
+	const auto entityIDsByName = model->getEntityNameToIDMap();
+	auto entityIDByName = entityIDsByName.find(entityName);
+	if (entityIDByName != entityIDsByName.end()) {
+		ot::UID entityID = entityIDByName->second;
+		EntityBase* entityBase = model->getEntityByID(entityID);
+		IVisualisationTable* tableVisualisationEntity = dynamic_cast<IVisualisationTable*>(entityBase);
+		if (tableVisualisationEntity != nullptr) {
+			ot::ContentChangedHandling changedHandling = tableVisualisationEntity->getTableContentChangedHandling();
+			if (changedHandling == ot::ContentChangedHandling::ModelServiceSaves) {
+				storeChangedTable(tableVisualisationEntity, _cfg);
+			}
+			else if (changedHandling == ot::ContentChangedHandling::OwnerHandles) {
+				const std::string& owner = entityBase->getOwningService();
+				if (owner != OT_INFO_SERVICE_TYPE_MODEL) {
+					ot::JsonDocument doc;
+					doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_cfg, doc.GetAllocator()), doc.GetAllocator());
+					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(doc), owner); //Potentially dangerous ? Usually the document should not be used afterwards.
+					workerThread.detach();
+				}
+			}
+			else if (changedHandling == ot::ContentChangedHandling::ModelServiceSavesNotifyOwner) {
+				storeChangedTable(tableVisualisationEntity, _cfg);
+				const std::string& owner = entityBase->getOwningService();
+				if (owner != OT_INFO_SERVICE_TYPE_MODEL) {
+					ot::JsonDocument notify;
+					notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
+					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), owner);
+					workerThread.detach();
+				}
+			}
+		}
+		else {
+			OT_LOG_E("Failed to visualise " + entityName + " since it does not support the corresponding visualisation interface.");
+		}
+	}
+	else {
 		OT_LOG_E("Failed to handle changed text request since the entity could not be found by name: " + entityName);
 	}
 }

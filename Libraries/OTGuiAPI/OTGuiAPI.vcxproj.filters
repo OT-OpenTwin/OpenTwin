@@ -51,7 +51,13 @@
     <ClInclude Include="include\OTGuiAPI\CheckBoxHandler.h">
       <Filter>Header Files\CommunicationAPIs</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGuiAPI\GraphicsHandler.h">
+    <ClInclude Include="include\OTGuiAPI\GraphicsActionHandler.h">
+      <Filter>Header Files\CommunicationAPIs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGuiAPI\TextEditorActionHandler.h">
+      <Filter>Header Files\CommunicationAPIs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGuiAPI\TableActionHandler.h">
       <Filter>Header Files\CommunicationAPIs</Filter>
     </ClInclude>
   </ItemGroup>
@@ -81,6 +87,12 @@
       <Filter>Source Files\CommunicationAPIs</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsHandler.cpp">
+      <Filter>Source Files\CommunicationAPIs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEditorActionHandler.cpp">
+      <Filter>Source Files\CommunicationAPIs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableActionHandler.cpp">
       <Filter>Source Files\CommunicationAPIs</Filter>
     </ClCompile>
   </ItemGroup>

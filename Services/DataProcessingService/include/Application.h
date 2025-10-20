@@ -20,7 +20,7 @@
 #include "GraphHandler.h"
 #include "InvalidUID.h"
 #include "OTGuiAPI/ButtonHandler.h"
-#include "OTGuiAPI/GraphicsHandler.h"
+#include "OTGuiAPI/GraphicsActionHandler.h"
 
 // Forward declaration
 namespace ot {
@@ -30,7 +30,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler, public ot::GraphicsHandler {
+class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler, public ot::GraphicsActionHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

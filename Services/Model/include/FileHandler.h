@@ -13,11 +13,13 @@
 #include "OTGui/TableCfg.h"
 #include "OTGui/ToolBarButtonCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
+#include "OTGuiAPI/TableActionHandler.h"
+#include "OTGuiAPI/TextEditorActionHandler.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 
-class FileHandler : public BusinessLogicHandler
+class FileHandler : public BusinessLogicHandler, public ot::TextEditorActionHandler, public ot::TableActionHandler
 {
 	OT_DECL_NOCOPY(FileHandler)
 	OT_DECL_NOMOVE(FileHandler)
@@ -53,8 +55,8 @@ private:
 	ot::ActionHandler m_actionHandler;
 	void handleImportTextFile(ot::JsonDocument& _document);
 	void handleImportPythonScript(ot::JsonDocument& _document);
-	void handleTextEditorSaveRequest(ot::JsonDocument& _document);
-	void handleTableSaveRequest(ot::JsonDocument& _document);
+	virtual void textEditorSaveRequested(const std::string& _entityName, const std::string& _text) override;
+	virtual void tableSaveRequested(const ot::TableCfg& _cfg) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -67,7 +69,7 @@ private:
 	void clearBuffer();
 	
 	void storeChangedText(IVisualisationText* _entity, const std::string _text);
-	void storeChangedTable(IVisualisationTable* _entity ,ot::TableCfg& _cfg);
+	void storeChangedTable(IVisualisationTable* _entity, const ot::TableCfg& _cfg);
 	void NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner);
 	//! @brief Filecontent is stored as binary, thus the encoding does not matter. The filename however is stored in properties and used in the visualisation. 
 	//! Thus UTF8 encoding is required.

@@ -24,10 +24,12 @@
     <ClInclude Include="include\OTGuiAPI\FrontendActionHandler.h" />
     <ClInclude Include="include\OTGuiAPI\Frontend.h" />
     <ClInclude Include="include\OTGuiAPI\GraphicsFlowItem.h" />
-    <ClInclude Include="include\OTGuiAPI\GraphicsHandler.h" />
+    <ClInclude Include="include\OTGuiAPI\GraphicsActionHandler.h" />
     <ClInclude Include="include\OTGuiAPI\GuiAPIManager.h" />
     <ClInclude Include="include\OTGuiAPI\LineEditHandler.h" />
     <ClInclude Include="include\OTGuiAPI\OTGuiAPIAPIExport.h" />
+    <ClInclude Include="include\OTGuiAPI\TableActionHandler.h" />
+    <ClInclude Include="include\OTGuiAPI\TextEditorActionHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ButtonHandler.cpp" />
@@ -39,6 +41,8 @@
     <ClCompile Include="src\GraphicsHandler.cpp" />
     <ClCompile Include="src\GuiAPIManager.cpp" />
     <ClCompile Include="src\LineEditHandler.cpp" />
+    <ClCompile Include="src\TableActionHandler.cpp" />
+    <ClCompile Include="src\TextEditorActionHandler.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

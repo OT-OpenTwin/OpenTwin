@@ -16,7 +16,7 @@
 
 // Open twin header
 #include "OTGuiAPI/ButtonHandler.h"
-#include "OTGuiAPI/GraphicsHandler.h"
+#include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"	// Base class
 
 // C++ header
@@ -34,7 +34,7 @@ namespace ot {
 
 class QtWrapper;
 
-class Application : public ot::ApplicationBase, public ot::ButtonHandler, public ot::GraphicsHandler {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler, public ot::GraphicsActionHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

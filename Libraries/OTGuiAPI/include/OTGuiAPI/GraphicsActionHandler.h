@@ -1,4 +1,4 @@
-//! @file GraphicsHandler.h
+//! @file GraphicsActionHandler.h
 //! @author Alexander Kuester (alexk95)
 //! @date October 2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -13,12 +13,12 @@
 
 namespace ot {
 
-	class OT_GUIAPI_API_EXPORT GraphicsHandler {
-		OT_DECL_NOCOPY(GraphicsHandler)
-		OT_DECL_NOMOVE(GraphicsHandler)
+	class OT_GUIAPI_API_EXPORT GraphicsActionHandler {
+		OT_DECL_NOCOPY(GraphicsActionHandler)
+		OT_DECL_NOMOVE(GraphicsActionHandler)
 	public:
-		GraphicsHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
-		virtual ~GraphicsHandler() = default;
+		GraphicsActionHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
+		virtual ~GraphicsActionHandler() = default;
 
 	protected:
 

@@ -11,7 +11,7 @@
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
 #include "OTGuiAPI/ButtonHandler.h"
-#include "OTGuiAPI/GraphicsHandler.h"
+#include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
 
 // std header
@@ -22,7 +22,7 @@
 
 class EntityFileRawData;
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler, public ot::GraphicsHandler {
+class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler, public ot::GraphicsActionHandler {
 private:
 	Application();
 	virtual ~Application();
