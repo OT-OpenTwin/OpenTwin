@@ -3073,7 +3073,6 @@ void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, co
 {
 	auto sceneNodeIt = m_nameToSceneNodesMap.find(_sceneNodeName);
 	if (sceneNodeIt == m_nameToSceneNodesMap.end()) {
-		OT_LOG_EAS("Scene node \"" + _sceneNodeName + "\" not found");
 		return;
 	}
 	
