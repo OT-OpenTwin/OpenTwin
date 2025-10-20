@@ -12,7 +12,7 @@ public:
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	static std::string className() { return "EntityFileImage"; };
-	virtual std::string getClassName(void) override { return EntityFileImage::className(); };
+	virtual std::string getClassName(void) const override { return EntityFileImage::className(); };
 
 	bool updateFromProperties() override;
 

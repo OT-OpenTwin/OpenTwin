@@ -15,7 +15,7 @@ public:
 
 	static std::string defaultName() { return "Project"; };
 	static std::string className() { return "EntityHierarchicalScene"; };
-	virtual std::string getClassName(void) override { return EntityHierarchicalScene::className(); };
+	virtual std::string getClassName(void) const override { return EntityHierarchicalScene::className(); };
 
 	virtual void addVisualizationNodes() override;
 

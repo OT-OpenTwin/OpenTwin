@@ -39,7 +39,7 @@ public:
 	void setTetNode(size_t nT, int nodeIndex, size_t node) { assert(nT < tets.size()); tets[nT].setNode(nodeIndex, node); setModified(); };
 	size_t getTetNode(size_t nT, int nodeIndex) { assert(nT < tets.size()); return tets[nT].getNode(nodeIndex); };
 
-	virtual std::string getClassName(void) override { return "EntityMeshTetItemDataTets"; };
+	virtual std::string getClassName(void) const override { return "EntityMeshTetItemDataTets"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 

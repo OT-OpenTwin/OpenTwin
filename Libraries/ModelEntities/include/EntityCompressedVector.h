@@ -19,7 +19,7 @@ public:
 	virtual void storeToDataBase(void) override;
 
 	static std::string className() { return "EntityCompressedVector"; };
-	virtual std::string getClassName(void) override { return EntityCompressedVector::className(); };
+	virtual std::string getClassName(void) const override { return EntityCompressedVector::className(); };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;

@@ -7,7 +7,7 @@ public:
 	EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 
 	static std::string className() { return "EntityBlockCircuitCurrentMeter"; }
-	virtual std::string getClassName(void) override { return EntityBlockCircuitCurrentMeter::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockCircuitCurrentMeter::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
 	virtual std::string getTypeAbbreviation() override;

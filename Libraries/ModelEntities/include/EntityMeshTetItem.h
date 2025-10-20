@@ -59,7 +59,7 @@ public:
 
 	void setColor(double r, double g, double b) { colorRGB[0] = r; colorRGB[1] = g; colorRGB[2] = b; };
 
-	virtual std::string getClassName(void) override { return "EntityMeshTetItem"; };
+	virtual std::string getClassName(void) const override { return "EntityMeshTetItem"; };
 
 	long long getMeshDataTetsStorageId(void) { return meshDataTetsStorageId; };
 	long long getMeshDataTetedgesStorageId(void) { return meshDataTetEdgesStorageId; };

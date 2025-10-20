@@ -42,7 +42,7 @@ public:
 	void resetFacets(void);
 
 	static std::string className() { return "EntityGeometry"; };
-	virtual std::string getClassName(void) override  { return EntityGeometry::className(); };
+	virtual std::string getClassName(void) const override  { return EntityGeometry::className(); };
 
 	void addPrefetchingRequirementsForBrep(std::list<ot::UID> &prefetchIds);
 	void addPrefetchingRequirementsForFacets(std::list<ot::UID> &prefetchIds);

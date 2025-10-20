@@ -8,7 +8,7 @@ public:
 	EntitySolverDataProcessing(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 		: EntitySolver(ID,parent,obs,ms,owner){ }
 	virtual ~EntitySolverDataProcessing() = default;
-	virtual std::string getClassName(void) override { return "EntitySolverDataProcessing"; };
+	virtual std::string getClassName(void) const override { return "EntitySolverDataProcessing"; };
 
 	void createProperties(const std::string& _graphicsSceneFolder, const ot::UID _graphicsSceneFolderID);
 

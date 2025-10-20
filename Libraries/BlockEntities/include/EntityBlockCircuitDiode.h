@@ -6,7 +6,7 @@ public:
 	EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 
 	static std::string className() { return "EntityBlockCircuitDiode"; }
-	virtual std::string getClassName(void) override { return EntityBlockCircuitDiode::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockCircuitDiode::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
 	virtual std::string getFolderName() override;

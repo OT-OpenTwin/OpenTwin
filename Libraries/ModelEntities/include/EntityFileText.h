@@ -13,7 +13,7 @@ public:
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	static std::string className() { return "EntityFileText"; };
-	virtual std::string getClassName(void) override { return EntityFileText::className(); };
+	virtual std::string getClassName(void) const override { return EntityFileText::className(); };
 
 	void setTextEncoding(ot::TextEncoding::EncodingStandard _encoding);
 	ot::TextEncoding::EncodingStandard getTextEncoding();

@@ -17,7 +17,7 @@ public:
 	virtual void createProperties(void);
 	virtual bool updateFromProperties(void) override;
 	virtual void addVisualizationNodes(void) override;
-	virtual std::string getClassName(void) override { return "EntityUnits"; };
+	virtual std::string getClassName(void) const override { return "EntityUnits"; };
 
 	void TurnToSIDimension(double & value, std::string& formerUnit);
 	void TurnToSITemperature(double & value, std::string& formerUnit);

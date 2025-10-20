@@ -18,7 +18,7 @@ public:
 
 	virtual void storeToDataBase(void) override;
 
-	virtual std::string getClassName(void) override { return "EntityResultTextData"; };
+	virtual std::string getClassName(void) const override { return "EntityResultTextData"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;

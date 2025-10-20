@@ -47,7 +47,7 @@ public:
 	size_t getNumberAnnotations(void) { return faceAnnotationIDs.size(); };
 	void getAnnotation(int index, bool &orientationForward, ot::UID &annotationEntityID) { orientationForward = faceAnnotationIDs[index].first; annotationEntityID = faceAnnotationIDs[index].second; };
 	
-	virtual std::string getClassName(void) override { return "EntityMeshTetFace"; };
+	virtual std::string getClassName(void) const override { return "EntityMeshTetFace"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 

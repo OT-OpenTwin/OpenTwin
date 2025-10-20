@@ -9,7 +9,7 @@ public:
 	EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 
 	static std::string className() { return "EntityBlockCircuitCapacitor"; }
-	virtual std::string getClassName(void) override { return EntityBlockCircuitCapacitor::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockCircuitCapacitor::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
 	std::string getElementType();

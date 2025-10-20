@@ -38,7 +38,7 @@ public:
 	void setEdgeNodes(size_t nE, size_t n[2]) { assert(nE < edges.size()); edges[nE].setNodes(n); setModified(); };
 	void getEdgeNodes(size_t nE, size_t n[2]) { assert(nE < edges.size()); edges[nE].getNodes(n); };
 
-	virtual std::string getClassName(void) override { return "EntityMeshTetItemDataTetedges"; };
+	virtual std::string getClassName(void) const override { return "EntityMeshTetItemDataTetedges"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 

@@ -13,7 +13,7 @@ public:
 	EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
 
 	static std::string className() { return "EntityBlockHierarchicalDocumentItem"; }
-	virtual std::string getClassName(void) override { return EntityBlockHierarchicalDocumentItem::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockHierarchicalDocumentItem::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;

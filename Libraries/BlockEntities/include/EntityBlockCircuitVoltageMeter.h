@@ -7,7 +7,7 @@ public:
 	EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 
 	static std::string className() { return "EntityBlockCircuitVoltageMeter"; }
-	virtual std::string getClassName(void) override { return "EntityBlockCircuitVoltageMeter"; };
+	virtual std::string getClassName(void) const override { return "EntityBlockCircuitVoltageMeter"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
 	virtual std::string getTypeAbbreviation() override;

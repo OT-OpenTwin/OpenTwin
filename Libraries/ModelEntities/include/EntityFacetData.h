@@ -26,7 +26,7 @@ public:
 	std::map<ot::UID, std::string> &getFaceNameMap(void) { return faceNameMap; };
 
 	static std::string className() { return "EntityFacetData"; };
-	virtual std::string getClassName(void) override { return EntityFacetData::className(); };
+	virtual std::string getClassName(void) const override { return EntityFacetData::className(); };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 

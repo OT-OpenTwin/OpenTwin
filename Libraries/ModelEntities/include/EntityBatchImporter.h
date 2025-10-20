@@ -12,7 +12,7 @@ public:
 	virtual void addVisualizationNodes(void) override;
 
 	static std::string className() { return "EntityBatchImporter"; };
-	virtual std::string getClassName(void) override { return EntityBatchImporter::className(); };
+	virtual std::string getClassName(void) const override { return EntityBatchImporter::className(); };
 
 	uint32_t getNumberOfRuns();
 	std::string getNameBase();

@@ -19,7 +19,7 @@ public:
 	virtual bool getEntityBox(double &_xmin, double &_xmax, double &_ymin, double &_ymax, double &_zmin, double &_zmax) override;
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	static std::string className() { return "EntityFile"; };
-	virtual std::string getClassName(void) override { return EntityFile::className(); };
+	virtual std::string getClassName(void) const override { return EntityFile::className(); };
 	virtual bool updateFromProperties(void) override;
 	virtual void addVisualizationNodes() override;
 

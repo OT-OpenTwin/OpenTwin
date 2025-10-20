@@ -16,7 +16,7 @@ public:
 	void createProperties(const std::string circuitFolderName, ot::UID circuitFolderID, const std::string circuitName, ot::UID circuitID);
 	virtual bool updateFromProperties(void) override;
 
-	virtual std::string getClassName(void) override { return "EntitySolverCircuitSimulator"; };
+	virtual std::string getClassName(void) const override { return "EntitySolverCircuitSimulator"; };
 	
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };

@@ -22,7 +22,7 @@ public:
 	virtual void storeToDataBase(void) override;
 
 	static std::string className() { return "EntityCartesianVector"; };
-	virtual std::string getClassName(void) override { return EntityCartesianVector::className(); };
+	virtual std::string getClassName(void) const override { return EntityCartesianVector::className(); };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;

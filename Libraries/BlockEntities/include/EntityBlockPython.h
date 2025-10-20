@@ -9,7 +9,7 @@ public:
 	EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 
 	static std::string className() { return "EntityBlockPython"; }
-	virtual std::string getClassName(void) override { return EntityBlockPython::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockPython::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 	void createProperties(const std::string& scriptFolder, ot::UID scriptFolderID);
 	std::string getSelectedScript();

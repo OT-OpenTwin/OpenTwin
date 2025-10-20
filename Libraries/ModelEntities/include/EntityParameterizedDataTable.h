@@ -15,7 +15,7 @@ public:
 	EntityParameterizedDataTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, const std::string &owner);
 	void SetTableDimensions(uint32_t numberOfRows, uint32_t numberOfColumns);
 	void SetSourceFile(std::string sourceFileName, std::string sourceFilePath);
-	virtual std::string getClassName(void) override { return "EntityParameterizedDataTable"; };
+	virtual std::string getClassName(void) const override { return "EntityParameterizedDataTable"; };
 	std::string getFileName() const { return _sourceFileName; }
 	std::string getFilePath() const { return _sourceFilePath; }
 

@@ -12,7 +12,7 @@ public:
 	void setCoordinates(const ot::Point2DD& position) { m_location = position; setModified(); };
 	const ot::Point2DD& getCoordinates() { return m_location; };
 	static std::string className() { return "EntityCoordinates2D"; };
-	virtual std::string getClassName(void) override { return EntityCoordinates2D::className(); };
+	virtual std::string getClassName(void) const override { return EntityCoordinates2D::className(); };
 
 	virtual std::string serialiseAsJSON() override;
 	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;

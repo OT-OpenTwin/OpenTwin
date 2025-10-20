@@ -14,7 +14,7 @@ public:
 	EntitySolverPyrit(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntitySolverPyrit();
 
-	virtual std::string getClassName(void) override { return "EntitySolverPyrit"; } ;
+	virtual std::string getClassName(void) const override { return "EntitySolverPyrit"; } ;
 
 	void createProperties(std::string& _meshFolderName, ot::UID& _meshFolderID, std::string& _meshName, ot::UID& _meshID,
 					      std::string& _scriptFolderName, ot::UID& _scriptFolderID, std::string& _scriptName, ot::UID& _scriptID);

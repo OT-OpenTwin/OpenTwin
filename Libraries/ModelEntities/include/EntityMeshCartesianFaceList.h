@@ -16,7 +16,7 @@ public:
 	virtual ~EntityMeshCartesianFaceList();
 
 	static std::string className() { return "EntityMeshCartesianFaceList"; }
-	virtual std::string getClassName(void) override { return EntityMeshCartesianFaceList::className(); }
+	virtual std::string getClassName(void) const override { return EntityMeshCartesianFaceList::className(); }
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 

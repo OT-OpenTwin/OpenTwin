@@ -13,7 +13,7 @@ public:
 	EntitySolverKriging(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntitySolverKriging();
 
-	virtual std::string getClassName(void) override { return "EntitySolverKriging"; } ;
+	virtual std::string getClassName(void) const override { return "EntitySolverKriging"; } ;
 
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;

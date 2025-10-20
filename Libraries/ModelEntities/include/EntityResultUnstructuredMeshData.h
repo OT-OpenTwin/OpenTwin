@@ -17,7 +17,7 @@ public:
 	
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
 	
-	virtual std::string getClassName(void) override { return "EntityResultUnstructuredMeshData"; };
+	virtual std::string getClassName(void) const override { return "EntityResultUnstructuredMeshData"; };
 	
 	virtual entityType getEntityType(void) const override { return DATA;};
 

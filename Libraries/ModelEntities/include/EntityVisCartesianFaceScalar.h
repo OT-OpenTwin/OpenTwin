@@ -13,7 +13,7 @@ public:
 	EntityVisCartesianFaceScalar(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityVisCartesianFaceScalar();
 
-	virtual std::string getClassName(void) override { return "EntityVisCartesianFaceScalar"; } ;
+	virtual std::string getClassName(void) const override { return "EntityVisCartesianFaceScalar"; } ;
 
 	virtual void createProperties(void) override;
 	virtual bool updatePropertyVisibilities(void) override;

@@ -14,7 +14,7 @@ public:
 	EntitySolverGetDP(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntitySolverGetDP();
 
-	virtual std::string getClassName(void) override { return "EntitySolverGetDP"; } ;
+	virtual std::string getClassName(void) const override { return "EntitySolverGetDP"; } ;
 
 	void createProperties(std::string& _meshFolderName, ot::UID& _meshFolderID, std::string& _meshName, ot::UID& _meshID);
 

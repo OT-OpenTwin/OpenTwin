@@ -38,7 +38,7 @@ public:
 	void setSurfaceId(int id) { surfaceId = id; setModified(); };
 	int  getSurfaceId(void) { return surfaceId; };
 	
-	virtual std::string getClassName(void) override { return "EntityMeshCartesianFace"; };
+	virtual std::string getClassName(void) const override { return "EntityMeshCartesianFace"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 

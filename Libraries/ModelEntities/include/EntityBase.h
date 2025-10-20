@@ -114,7 +114,7 @@ public:
 
 	virtual void addVisualizationNodes() {};
 
-	virtual std::string getClassName() { return "EntityBase"; };
+	virtual std::string getClassName() const { return "EntityBase"; };
 
 	virtual void addPrefetchingRequirementsForTopology(std::list<ot::UID> &prefetchIds);
 

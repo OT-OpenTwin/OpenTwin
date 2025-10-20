@@ -11,7 +11,7 @@ public:
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 
 	static std::string className() { return "EntityBlockConnection"; }
-	virtual std::string getClassName(void) override { return EntityBlockConnection::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockConnection::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
 	ot::GraphicsConnectionCfg getConnectionCfg();

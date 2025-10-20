@@ -25,7 +25,7 @@ public:
 	void setNumberOfNodes(size_t n);
 	size_t getNumberOfNodes(void) { return nodeCoordsX.size(); }
 
-	virtual std::string getClassName(void) override { return "EntityMeshCartesianNodes"; };
+	virtual std::string getClassName(void) const override { return "EntityMeshCartesianNodes"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 

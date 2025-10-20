@@ -24,7 +24,7 @@ public:
 
 	virtual void addVisualizationNodes(void) override;
 	
-	virtual std::string getClassName(void) override { return "EntityParameter"; };
+	virtual std::string getClassName(void) const override { return "EntityParameter"; };
 
 	void addVisualizationItem(bool isHidden);
 

@@ -12,7 +12,7 @@ public:
 	EntityTableSelectedRanges(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	~EntityTableSelectedRanges() = default;
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
-	virtual std::string getClassName(void) override { return "EntityTableSelectedRanges"; };
+	virtual std::string getClassName(void) const override { return "EntityTableSelectedRanges"; };
 	virtual entityType getEntityType() const override { return TOPOLOGY; }
 	virtual void addVisualizationNodes() override;
 	virtual bool updateFromProperties(void) override;

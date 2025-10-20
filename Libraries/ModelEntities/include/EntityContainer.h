@@ -40,7 +40,7 @@ public:
 	virtual void addVisualizationNodes(void) override;
 
 	static std::string className() { return "EntityContainer"; };
-	virtual std::string getClassName(void) override { return EntityContainer::className(); } ;
+	virtual std::string getClassName(void) const override { return EntityContainer::className(); } ;
 
 	virtual void addPrefetchingRequirementsForTopology(std::list<ot::UID> &prefetchIds) override;
 

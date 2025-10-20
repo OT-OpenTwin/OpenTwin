@@ -16,7 +16,7 @@ public:
 	EntityBlockHierarchicalProjectItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
 
 	static std::string className() { return "EntityBlockHierarchicalProjectItem"; }
-	virtual std::string getClassName(void) override { return EntityBlockHierarchicalProjectItem::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockHierarchicalProjectItem::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;

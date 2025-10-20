@@ -17,7 +17,7 @@ public:
 	EntityVisUnstructuredVectorSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual ~EntityVisUnstructuredVectorSurface();
 
-	virtual std::string getClassName(void) override { return "EntityVisUnstructuredVectorSurface"; };
+	virtual std::string getClassName(void) const override { return "EntityVisUnstructuredVectorSurface"; };
 
 	virtual bool updateFromProperties(void) override;
 

@@ -11,7 +11,7 @@ public:
 	virtual ~EntitySolverPort();
 
 	static std::string className() { return "EntitySolverPort"; }
-	virtual std::string getClassName(void) override { return EntitySolverPort::className(); }
+	virtual std::string getClassName(void) const override { return EntitySolverPort::className(); }
 
 	virtual void addVisualizationNodes(void) override;
 

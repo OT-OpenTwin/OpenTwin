@@ -21,7 +21,7 @@ public:
 	virtual void storeToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
 	void addVisualizationItem(bool isHidden);
-	virtual std::string getClassName(void) override { return className; };
+	virtual std::string getClassName(void) const override { return className; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(void);
 	virtual bool updateFromProperties(void) override;

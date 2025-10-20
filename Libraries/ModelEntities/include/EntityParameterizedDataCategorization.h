@@ -11,7 +11,7 @@ public:
 	EntityParameterizedDataCategorization() : EntityParameterizedDataCategorization(0, nullptr, nullptr, nullptr, "") {};
 	EntityParameterizedDataCategorization(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 
-	virtual std::string getClassName(void) override { return "EntityParameterizedDataCategorization"; };
+	virtual std::string getClassName(void) const override { return "EntityParameterizedDataCategorization"; };
 	virtual void addVisualizationNodes() override;
 	
 	virtual bool considerForPropertyFilter(void) override { return true; };

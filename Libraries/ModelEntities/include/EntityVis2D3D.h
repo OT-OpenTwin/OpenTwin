@@ -16,7 +16,7 @@ public:
 
 	virtual void addVisualizationNodes(void) override;
 
-	virtual std::string getClassName(void) override { return "EntityVis2D3D"; } ;
+	virtual std::string getClassName(void) const override { return "EntityVis2D3D"; } ;
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 

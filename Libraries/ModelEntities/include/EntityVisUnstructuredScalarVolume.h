@@ -17,7 +17,7 @@ public:
 	EntityVisUnstructuredScalarVolume(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual ~EntityVisUnstructuredScalarVolume();
 
-	virtual std::string getClassName(void) override { return "EntityVisUnstructuredScalarVolume"; };
+	virtual std::string getClassName(void) const override { return "EntityVisUnstructuredScalarVolume"; };
 
 	virtual bool updateFromProperties(void) override;
 

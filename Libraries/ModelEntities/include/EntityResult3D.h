@@ -11,7 +11,7 @@ public:
 	EntityResult3D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 
 	static std::string className() { return "EntityResult3D"; }
-	virtual std::string getClassName(void) override { return EntityResult3D::className(); }
+	virtual std::string getClassName(void) const override { return EntityResult3D::className(); }
 	
 	virtual void createProperties(void) override;
 	virtual bool updatePropertyVisibilities(void) override;

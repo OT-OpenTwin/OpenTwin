@@ -14,7 +14,7 @@ public:
 	EntitySolverFDTD(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual ~EntitySolverFDTD();
 
-	virtual std::string getClassName(void) override { return "EntitySolverFDTD"; };
+	virtual std::string getClassName(void) const override { return "EntitySolverFDTD"; };
 
 	void createProperties(std::string& _meshFolderName, ot::UID& _meshFolderID, std::string& _meshName, ot::UID& _meshID);
 

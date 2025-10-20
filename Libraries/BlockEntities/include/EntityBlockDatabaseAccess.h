@@ -16,7 +16,7 @@ public:
 	EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 
 	static std::string className() { return "EntityBlockDatabaseAccess"; }
-	virtual std::string getClassName(void) override { return EntityBlockDatabaseAccess::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockDatabaseAccess::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 	void createProperties();

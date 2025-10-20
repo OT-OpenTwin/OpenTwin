@@ -8,7 +8,7 @@ public:
 	EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 
 	static std::string className() { return "EntityBlockFileWriter"; }
-	virtual std::string getClassName(void) override { return EntityBlockFileWriter::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockFileWriter::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 	void createProperties();

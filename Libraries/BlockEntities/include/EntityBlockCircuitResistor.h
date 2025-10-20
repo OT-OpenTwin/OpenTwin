@@ -7,7 +7,7 @@ public:
 	EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 
 	static std::string className() { return "EntityBlockCircuitResistor"; }
-	virtual std::string getClassName(void) override { return EntityBlockCircuitResistor::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockCircuitResistor::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
 	std::string getResistance();

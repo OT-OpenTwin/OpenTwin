@@ -29,7 +29,7 @@ public:
 	const double* getEdgeColorRGB() { return edgeColorRGB; };
 
 	static std::string className() { return "EntityAnnotationData"; };
-	virtual std::string getClassName(void) override { return EntityAnnotationData::className(); };
+	virtual std::string getClassName(void) const override { return EntityAnnotationData::className(); };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 

@@ -24,7 +24,7 @@ public:
 
 	void setNumberOfNodes(size_t n);
 
-	virtual std::string getClassName(void) override { return "EntityMeshTetNodes"; };
+	virtual std::string getClassName(void) const override { return "EntityMeshTetNodes"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 

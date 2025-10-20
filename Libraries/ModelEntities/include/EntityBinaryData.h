@@ -17,7 +17,7 @@ public:
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 
 	static std::string className() { return "EntityBinaryData"; };
-	virtual std::string getClassName(void) override { return EntityBinaryData::className(); };
+	virtual std::string getClassName(void) const override { return EntityBinaryData::className(); };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;

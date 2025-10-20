@@ -14,7 +14,7 @@ public:
 	virtual ~EntitySolver();
 
 	static std::string className() { return "EntitySolver"; }
-	virtual std::string getClassName(void) override { return EntitySolver::className(); }
+	virtual std::string getClassName(void) const override { return EntitySolver::className(); }
 
 	virtual void addVisualizationNodes(void) override;
 

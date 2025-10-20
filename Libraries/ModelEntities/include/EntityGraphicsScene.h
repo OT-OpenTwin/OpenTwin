@@ -8,7 +8,7 @@ public:
 	EntityGraphicsScene() : EntityGraphicsScene(0, nullptr, nullptr, nullptr, "") {};
 	EntityGraphicsScene(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	static std::string className() { return "EntityGraphicsScene"; };
-	virtual std::string getClassName(void) override { return EntityGraphicsScene::className(); };
+	virtual std::string getClassName(void) const override { return EntityGraphicsScene::className(); };
 	ot::GraphicsNewEditorPackage* getGraphicsEditorPackage() override;
 	bool visualiseGraphicsView() override;
 	void addVisualizationNodes() override;

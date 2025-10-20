@@ -31,7 +31,7 @@ public:
 	virtual void addVisualizationNodes(void) override;
 	void addVisualizationItem(bool isHidden);
 
-	virtual std::string getClassName(void) override { return "EntityMeshCartesianData"; }
+	virtual std::string getClassName(void) const override { return "EntityMeshCartesianData"; }
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 

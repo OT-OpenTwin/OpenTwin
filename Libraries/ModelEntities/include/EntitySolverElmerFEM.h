@@ -14,7 +14,7 @@ public:
 	EntitySolverElmerFEM(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntitySolverElmerFEM();
 
-	virtual std::string getClassName(void) override { return "EntitySolverElmerFEM"; } ;
+	virtual std::string getClassName(void) const override { return "EntitySolverElmerFEM"; } ;
 
 	void createProperties(std::string& _meshFolderName, ot::UID& _meshFolderID, std::string& _meshName, ot::UID& _meshID);
 

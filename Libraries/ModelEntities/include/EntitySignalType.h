@@ -10,7 +10,7 @@ public:
 	virtual ~EntitySignalType();
 	virtual void addVisualizationNodes(void) override;
 
-	virtual std::string getClassName(void) override { return "EntitySignalType"; };
+	virtual std::string getClassName(void) const override { return "EntitySignalType"; };
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 

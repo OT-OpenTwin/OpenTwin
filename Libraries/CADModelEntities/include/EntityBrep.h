@@ -24,7 +24,7 @@ public:
 	TopoDS_Shape &getBrep(void) { return brep; };
 
 	static std::string className() { return "EntityBrep"; };
-	virtual std::string getClassName(void) override { return EntityBrep::className(); };
+	virtual std::string getClassName(void) const override { return EntityBrep::className(); };
 	virtual entityType getEntityType(void) const override { return DATA; };
 
 	gp_Trsf getTransform(void);

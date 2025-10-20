@@ -20,7 +20,7 @@ public:
 	int getFaceId(size_t nF) { return faces[nF]; };
 	void setFace(size_t nF, int faceId) { faces[nF] = faceId; setModified(); };
 
-	virtual std::string getClassName(void) override { return "EntityMeshTetItemDataFaces"; };
+	virtual std::string getClassName(void) const override { return "EntityMeshTetItemDataFaces"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 

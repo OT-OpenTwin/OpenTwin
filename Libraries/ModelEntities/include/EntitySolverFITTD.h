@@ -13,7 +13,7 @@ public:
 	EntitySolverFITTD(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntitySolverFITTD();
 
-	virtual std::string getClassName(void) override { return "EntitySolverFITTD"; } ;
+	virtual std::string getClassName(void) const override { return "EntitySolverFITTD"; } ;
 
 	void createProperties(const std::string meshFolderName, ot::UID meshFolderID, const std::string meshName, ot::UID meshID);
 	virtual bool updateFromProperties(void) override;

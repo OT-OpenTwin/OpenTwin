@@ -17,7 +17,7 @@ public:
 	EntityVisUnstructuredVectorVolume(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual ~EntityVisUnstructuredVectorVolume();
 
-	virtual std::string getClassName(void) override { return "EntityVisUnstructuredVectorVolume"; };
+	virtual std::string getClassName(void) const override { return "EntityVisUnstructuredVectorVolume"; };
 
 	virtual bool updateFromProperties(void) override;
 

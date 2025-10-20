@@ -16,7 +16,7 @@ public:
 	EntityVisUnstructuredScalarSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual ~EntityVisUnstructuredScalarSurface();
 
-	virtual std::string getClassName(void) override { return "EntityVisUnstructuredScalarSurface"; };
+	virtual std::string getClassName(void) const override { return "EntityVisUnstructuredScalarSurface"; };
 
 	virtual bool updateFromProperties(void) override;
 

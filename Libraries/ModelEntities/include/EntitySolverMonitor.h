@@ -12,7 +12,7 @@ public:
 
 	virtual void addVisualizationNodes(void) override;
 
-	virtual std::string getClassName(void) override { return "EntitySolverMonitor"; };
+	virtual std::string getClassName(void) const override { return "EntitySolverMonitor"; };
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 

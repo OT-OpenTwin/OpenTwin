@@ -23,7 +23,7 @@ public:
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
 	static std::string className() { return "EntityBlockStorage"; }
-	virtual std::string getClassName(void) override { return EntityBlockStorage::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockStorage::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 	void createProperties();
 	virtual bool updateFromProperties() override;

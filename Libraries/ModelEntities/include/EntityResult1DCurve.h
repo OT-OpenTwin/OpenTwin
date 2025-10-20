@@ -47,7 +47,7 @@ public:
 	virtual void addVisualizationNodes() override;
 	virtual bool updateFromProperties() override;
 
-	virtual std::string getClassName() override { return "EntityResult1DCurve_New"; };
+	virtual std::string getClassName() const override { return "EntityResult1DCurve_New"; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -17,7 +17,7 @@ public:
 	virtual void addVisualizationNodes(void) override;
 	
 	static std::string className() { return "EntityMaterial"; };
-	virtual std::string getClassName(void) override { return EntityMaterial::className(); };
+	virtual std::string getClassName(void) const override { return EntityMaterial::className(); };
 
 	void addVisualizationItem(bool isHidden);
 

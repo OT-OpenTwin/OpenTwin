@@ -14,7 +14,7 @@ public:
 	std::string getRowDelimiter() ;
 	std::string getColumnDelimiter();
 	static std::string className() { return "EntityFileCSV"; };
-	virtual std::string getClassName(void) override { return EntityFileCSV::className(); };
+	virtual std::string getClassName(void) const override { return EntityFileCSV::className(); };
 
 	// Inherited via IVisualisationTable
 	const ot::GenericDataStructMatrix getTable() override;

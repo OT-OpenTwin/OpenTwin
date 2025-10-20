@@ -8,7 +8,7 @@ public:
 	EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 
 	static std::string className() { return "EntityBlockCircuitGND"; }
-	virtual std::string getClassName(void) override { return EntityBlockCircuitGND::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockCircuitGND::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
 	virtual std::string getTypeAbbreviation() override;

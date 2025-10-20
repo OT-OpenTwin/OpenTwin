@@ -8,7 +8,7 @@ public:
 	EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 
 	static std::string className() { return "EntityBlockDisplay"; }
-	virtual std::string getClassName(void) override { return EntityBlockDisplay::className(); };
+	virtual std::string getClassName(void) const override { return EntityBlockDisplay::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 		
 	void createProperties();

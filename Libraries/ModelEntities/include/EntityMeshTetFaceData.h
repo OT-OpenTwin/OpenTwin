@@ -23,7 +23,7 @@ public:
 
 	virtual void storeToDataBase(void) override;
 
-	virtual std::string getClassName(void) override { return "EntityMeshTetFaceData"; };
+	virtual std::string getClassName(void) const override { return "EntityMeshTetFaceData"; };
 
 	void addMeshFaceStorageIds(EntityMeshTetInfo *meshInfo);
 

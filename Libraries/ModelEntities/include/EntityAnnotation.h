@@ -33,7 +33,7 @@ public:
 	virtual void addVisualizationNodes(void) override;
 	
 	static std::string className() { return "EntityAnnotation"; };
-	virtual std::string getClassName(void) override { return EntityAnnotation::className(); };
+	virtual std::string getClassName(void) const override { return EntityAnnotation::className(); };
 
 	void addVisualizationItem(bool isHidden);
 

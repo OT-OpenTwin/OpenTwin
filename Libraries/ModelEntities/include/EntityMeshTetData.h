@@ -45,7 +45,7 @@ public:
 	virtual void addVisualizationNodes(void) override;
 	void addVisualizationItem(void);
 
-	virtual std::string getClassName(void) override { return "EntityMeshTetData"; };
+	virtual std::string getClassName(void) const override { return "EntityMeshTetData"; };
 
 	long long getMeshNodesStorageId(void) { return meshNodesStorageId; };
 	long long getMeshFacesStorageId(void) { return meshFacesStorageId; };

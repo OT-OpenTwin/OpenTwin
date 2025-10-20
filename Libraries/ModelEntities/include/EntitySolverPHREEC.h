@@ -13,7 +13,7 @@ public:
 	EntitySolverPHREEC(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntitySolverPHREEC();
 
-	virtual std::string getClassName(void) override { return "EntitySolverPHREEC"; } ;
+	virtual std::string getClassName(void) const override { return "EntitySolverPHREEC"; } ;
 
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;
