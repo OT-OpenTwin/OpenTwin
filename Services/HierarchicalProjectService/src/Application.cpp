@@ -83,10 +83,10 @@ Application::Application() :
 	m_addDocumentButton.setButtonToolTip("Add a new document.");
 	connectToolBarButton(m_addDocumentButton, this, &Application::handleAddDocument);
 
-	m_openSelectedProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Open Project", "Hierarchical/OpenProject");
-	m_openSelectedProjectButton.setButtonLockFlag(ot::LockModelRead);
-	m_openSelectedProjectButton.setButtonToolTip("Open the selected project in a new OpenTwin instance.");
-	connectToolBarButton(m_openSelectedProjectButton, this, &Application::handleOpenSelectedProject);
+	m_openSelectedItems = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Open", "Hierarchical/Open");
+	m_openSelectedItems.setButtonLockFlag(ot::LockModelRead);
+	m_openSelectedItems.setButtonToolTip("Open the selected project in a new OpenTwin instance.");
+	connectToolBarButton(m_openSelectedItems, this, &Application::handleOpenSelectedItems);
 
 	m_addImageToProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Add Image", "Hierarchical/AddImage");
 	m_addImageToProjectButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
@@ -135,7 +135,8 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 
 	_ui->addMenuGroup(c_pageName, c_selectionGroupName);
 
-	_ui->addMenuButton(m_openSelectedProjectButton);
+	_ui->addMenuButton(m_openSelectedItems);
+
 	_ui->addMenuButton(m_addImageToProjectButton);
 	_ui->addMenuButton(m_removeImageFromProjectButton);
 
@@ -339,13 +340,18 @@ void Application::handleAddBackgroundImage() {
 	ot::Frontend::requestFileForReading(c_backgroundImageSelectedAction, "Select Background Image", filter, true, true);
 }
 
-void Application::handleOpenSelectedProject() {
-	auto infos = getProjectsToOpen();
-
+void Application::handleOpenSelectedItems() {
 	this->enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 
-	for (const ot::EntityInformation& info : infos) {
+	for (const ot::EntityInformation& info : getSelectedProjects()) {
 		ot::ReturnMessage ret = this->requestToOpenProject(info);
+		if (!ret.isOk()) {
+			OT_LOG_E(ret.getWhat());
+		}
+	}
+
+	for (const ot::EntityInformation& info : getSelectedDocuments()) {
+		ot::ReturnMessage ret = this->requestToOpenDocument(info);
 		if (!ret.isOk()) {
 			OT_LOG_E(ret.getWhat());
 		}
@@ -355,7 +361,7 @@ void Application::handleOpenSelectedProject() {
 }
 
 void Application::handleAddImageToProject() {
-	auto projects = getProjectsToOpen();
+	auto projects = getSelectedProjects();
 	if (projects.size() != 1) {
 		OT_LOG_E("Invalid number of selected projects to add an image to");
 		return;
@@ -371,7 +377,7 @@ void Application::handleAddImageToProject() {
 }
 
 void Application::handleRemoveImageFromProject() {
-	auto projects = getProjectsToOpen();
+	auto projects = getSelectedProjects();
 	if (projects.empty()) {
 		OT_LOG_E("No project selected to remove image from");
 		return;
@@ -395,15 +401,22 @@ void Application::updateButtonStates() {
 	std::list<std::string> enabledControls;
 	std::list<std::string> disabledControls;
 
-	auto projectsToOpen = getProjectsToOpen();
+	const auto projectsToOpen = getSelectedProjects();
+	const auto documentsToOpen = getSelectedDocuments();
 	const bool canOpenProject = !projectsToOpen.empty();
+	const bool canOpenDocument = !documentsToOpen.empty();
+
+	if (canOpenProject || canOpenDocument) {
+		enabledControls.push_back(m_openSelectedItems.getFullPath());
+	}
+	else {
+		disabledControls.push_back(m_openSelectedItems.getFullPath());
+	}
 
 	if (canOpenProject) {
-		enabledControls.push_back(m_openSelectedProjectButton.getFullPath());
 		enabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
 	}
 	else {
-		disabledControls.push_back(m_openSelectedProjectButton.getFullPath());
 		disabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
 	}
 
@@ -418,7 +431,18 @@ void Application::updateButtonStates() {
 	ui->setControlsEnabledState(enabledControls, disabledControls);
 }
 
-std::list<ot::EntityInformation> Application::getProjectsToOpen() {
+std::list<ot::EntityInformation> Application::getSelectedDocuments() {
+	std::list<ot::EntityInformation> ret;
+	const std::list<ot::EntityInformation>& selectedInfos = this->getSelectedEntityInfos();
+	for (const ot::EntityInformation& info : selectedInfos) {
+		if (info.getEntityType() == EntityBlockHierarchicalDocumentItem::className()) {
+			ret.push_back(info);
+		}
+	}
+	return ret;
+}
+
+std::list<ot::EntityInformation> Application::getSelectedProjects() {
 	std::list<ot::EntityInformation> ret;
 	const std::list<ot::EntityInformation>& selectedInfos = this->getSelectedEntityInfos();
 	for (const ot::EntityInformation& info : selectedInfos) {

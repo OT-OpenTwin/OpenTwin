@@ -75,7 +75,8 @@ private:
 	void handleAddDocument();
 	void handleAddBackgroundImage();
 
-	void handleOpenSelectedProject();
+	void handleOpenSelectedItems();
+
 	void handleAddImageToProject();
 	void handleRemoveImageFromProject();
 
@@ -85,7 +86,9 @@ private:
 
 	void updateButtonStates();
 
-	std::list<ot::EntityInformation> getProjectsToOpen();
+	std::list<ot::EntityInformation> getSelectedDocuments();
+
+	std::list<ot::EntityInformation> getSelectedProjects();
 
 	ot::ReturnMessage requestToOpenProject(const ot::EntityInformation& _entity);
 
@@ -107,14 +110,15 @@ private:
 
 	const std::string c_pageName = "Project";
 	const std::string c_managementGroupName = "Management";
-	const std::string c_selectionGroupName = "Project Selection";
+	const std::string c_selectionGroupName = "Selection";
 
 	ot::ToolBarButtonCfg m_addProjectButton;
 	ot::ToolBarButtonCfg m_addContainerButton;
 	ot::ToolBarButtonCfg m_addDocumentButton;
 	ot::ToolBarButtonCfg m_addBackgroundImageButton;
 
-	ot::ToolBarButtonCfg m_openSelectedProjectButton;
+	ot::ToolBarButtonCfg m_openSelectedItems;
+
 	ot::ToolBarButtonCfg m_addImageToProjectButton;
 	ot::ToolBarButtonCfg m_removeImageFromProjectButton;
 };
