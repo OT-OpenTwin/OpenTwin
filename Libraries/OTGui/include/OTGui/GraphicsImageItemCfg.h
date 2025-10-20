@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
 namespace ot {
@@ -49,11 +50,15 @@ namespace ot {
 		void setMaintainAspectRatio(bool _active) { m_maintainAspectRatio = _active; };
 		bool getMaintainAspectRatio() const { return m_maintainAspectRatio; };
 
+		void setBorderPen(const PenFCfg& _pen) { m_borderPen = _pen; };
+		const PenFCfg& getBorderPen() const { return m_borderPen; };
+
 	private:
 		ImageFileFormat m_imageDataFileType;
 		std::vector<char> m_imageData;
 		std::string m_imageSubPath;
 		bool m_maintainAspectRatio;
+		PenFCfg m_borderPen;
 	};
 
 }

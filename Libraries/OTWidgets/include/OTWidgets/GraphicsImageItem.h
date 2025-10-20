@@ -28,6 +28,8 @@ namespace ot {
 
 		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 
+		virtual QMarginsF getOutlineMargins() const override;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Base class functions: ot::CustomGraphicsItem
@@ -46,6 +48,7 @@ namespace ot {
 		// Setter / Getter
 
 	private:
+		const double m_borderPenWidth = 1.;
 		ImagePainter* m_painter;
 	};
 }

@@ -123,6 +123,17 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	return CustomGraphicsItem::setupFromConfig(_cfg);
 }
 
+QMarginsF ot::GraphicsImageItem::getOutlineMargins() const {
+	const GraphicsImageItemCfg* config = dynamic_cast<const GraphicsImageItemCfg*>(this->getConfiguration());
+	if (config) {
+		const double w = config->getBorderPen().getWidth() / 2.;
+		return QMarginsF(w, w, w, w);
+	}
+	else {
+		return CustomGraphicsItem::getOutlineMargins();
+	}
+}
+
 QSizeF ot::GraphicsImageItem::getPreferredGraphicsItemSize(void) const {
 	const GraphicsImageItemCfg* config = dynamic_cast<const GraphicsImageItemCfg*>(this->getConfiguration());
 	if (!config) {
@@ -168,5 +179,22 @@ void ot::GraphicsImageItem::paintCustomItem(QPainter* _painter, const QStyleOpti
 	}
 
 	QRectF adjustedRect = ot::Positioning::calculateChildRect(_rect, adjustedSize, this->getGraphicsItemAlignment());
+
+	// Paint the image
 	m_painter->paintImage(_painter, adjustedRect, config->getMaintainAspectRatio());
+
+	// Paint the border if needed
+	PenFCfg borderPen = config->getBorderPen();
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
+			borderPen.setPainter(GraphicsItem::createSelectionBorderPainter());
+		}
+		else if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
+			borderPen.setPainter(GraphicsItem::createHoverBorderPainter());
+		}
+	}
+
+	_painter->setPen(QtFactory::toQPen(borderPen));
+	_painter->setBrush(Qt::NoBrush);
+	_painter->drawRect(adjustedRect);
 }

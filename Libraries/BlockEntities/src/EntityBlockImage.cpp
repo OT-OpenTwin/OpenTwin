@@ -9,6 +9,7 @@
 #include "EntityFileImage.h"
 #include "EntityProperties.h"
 #include "EntityBlockImage.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/GraphicsImageItemCfg.h"
 
 static EntityFactoryRegistrar<EntityBlockImage> registrar(EntityBlockImage::className());
@@ -52,34 +53,67 @@ ot::GraphicsItemCfg* EntityBlockImage::createBlockCfg() {
 	cfg->setMaintainAspectRatio(PropertyHelper::getBoolPropertyValue(this, "Maintain aspect ratio", "Image"));
 	cfg->setZValue(PropertyHelper::getIntegerPropertyValue(this, "Z Value", "Block"));
 
+	ot::PenFCfg borderPen(1., ot::DefaultColor::Transparent);
+	if (PropertyHelper::getBoolPropertyValue(this, "Draw border", "Image")) {
+		borderPen.setWidth(PropertyHelper::getDoublePropertyValue(this, "Border width", "Image"));
+		ot::Painter2D* penPainter = PropertyHelper::getPainterProperty(this, "Border color", "Image")->getValue()->createCopy();
+		borderPen.setPainter(penPainter);
+	}
+	cfg->setBorderPen(borderPen);
+
 	return cfg.release();
 }
 
 bool EntityBlockImage::updateFromProperties() {
+	bool updateGrid = false;
+
+	const bool drawBorder = PropertyHelper::getBoolPropertyValue(this, "Draw border", "Image");
+	if (drawBorder != PropertyHelper::getDoubleProperty(this, "Border width", "Image")->getVisible()) {
+		PropertyHelper::getDoubleProperty(this, "Border width", "Image")->setVisible(drawBorder);
+		PropertyHelper::getPainterProperty(this, "Border color", "Image")->setVisible(drawBorder);
+		updateGrid = true;
+	}
+	
 	getProperties().forceResetUpdateForAllProperties();
 
 	createBlockItem();
 
-	return false;
+	return updateGrid;
 }
 
 void EntityBlockImage::createProperties() {
 	EntityPropertiesBase* prop = EntityPropertiesBoolean::createProperty("Block", "Lock movement", false, "", getProperties());
 	prop->setToolTip("If enabled, the block item cannot be moved by mouse in the scene.");
 
-	prop = EntityPropertiesInteger::createProperty("Block", "Z Value", 0, ot::GraphicsZValues::MinCustomValue, ot::GraphicsZValues::MaxCustomValue, "", getProperties());
-	prop->setToolTip("Z Value for the block item in the graphics scene. Items with higher Z Values are drawn on top of items with lower Z Values.");
+	EntityPropertiesInteger* intProp = EntityPropertiesInteger::createProperty("Block", "Z Value", 0, ot::GraphicsZValues::MinCustomValue, ot::GraphicsZValues::MaxCustomValue, "", getProperties());
+	intProp->setAllowCustomValues(false);
+	intProp->setToolTip("Z Value for the block item in the graphics scene. Items with higher Z Values are drawn on top of items with lower Z Values.");
 
 	prop = EntityPropertiesBoolean::createProperty("Image", "Maintain aspect ratio", true, "", getProperties());
 	prop->setToolTip("If enabled, the aspect ratio of the image is maintained when resizing the block item.");
 
-	EntityPropertiesInteger* intProp = EntityPropertiesInteger::createProperty("Image", "Width", 0, 0, 10000, "", getProperties());
+	intProp = EntityPropertiesInteger::createProperty("Image", "Width", 0, 0, 10000, "", getProperties());
 	intProp->setToolTip("Width of the image in pixels. If set to 0, the original image width is used.");
+	intProp->setAllowCustomValues(false);
 	intProp->setSuffix("px");
 
 	intProp = EntityPropertiesInteger::createProperty("Image", "Height", 0, 0, 10000, "", getProperties());
 	intProp->setToolTip("Height of the image in pixels. If set to 0, the original image height is used.");
+	intProp->setAllowCustomValues(false);
 	intProp->setSuffix("px");
+
+	prop = EntityPropertiesBoolean::createProperty("Image", "Draw border", false, "", getProperties());
+	prop->setToolTip("If enabled, a border is drawn around the image.");
+
+	EntityPropertiesDouble* dblProp = EntityPropertiesDouble::createProperty("Image", "Border width", 1., 0.1, 100., "", getProperties());
+	dblProp->setToolTip("Thickness of the border drawn around the image.");
+	dblProp->setSuffix("px");
+	dblProp->setAllowCustomValues(false);
+	dblProp->setVisible(false);
+
+	prop = EntityPropertiesGuiPainter::createProperty("Image", "Border color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder), "", getProperties());
+	prop->setToolTip("Color of the border drawn around the image.");
+	prop->setVisible(false);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

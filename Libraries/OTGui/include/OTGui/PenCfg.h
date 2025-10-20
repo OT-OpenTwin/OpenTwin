@@ -86,7 +86,7 @@ namespace ot {
 
 		//! @brief Copy constructor.
 		//! @param _other The other style.
-		explicit PenCfg(const PenCfg& _other);
+		PenCfg(const PenCfg& _other);
 
 		//! @brief Destructor.
 		~PenCfg();
@@ -210,7 +210,7 @@ namespace ot {
 
 		//! @brief Copy constructor.
 		//! @param _other The other style.
-		explicit PenFCfg(const PenFCfg& _other);
+		PenFCfg(const PenFCfg& _other);
 
 		//! @brief Destructor.
 		~PenFCfg();
