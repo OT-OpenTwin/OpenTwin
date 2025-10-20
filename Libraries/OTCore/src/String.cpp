@@ -729,21 +729,49 @@ std::string ot::String::compressedBase64(const std::string& _string) {
 	if (_string.size() > UINT32_MAX) {
 		throw ot::Exception::OutOfBounds("String to large for compression.");
 	}
-	compress((Bytef*)compressedData, &compressedSize, (Bytef*)_string.data(), static_cast<uint32_t>(_string.size()));
+	const int res = compress((Bytef*)compressedData, &compressedSize, (Bytef*)_string.data(), static_cast<uint32_t>(_string.size()));
+
+	if (res != Z_OK) {
+		throw ot::Exception::General("Compression failed with code " + std::to_string(res));
+	}
 
 	// Convert the binary to an encoded string
 	int encoded_data_length = Base64encode_len(compressedSize);
 	char* base64_string = new char[encoded_data_length];
 
-	Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
+	Base64encode(base64_string, compressedData, compressedSize);
 
 	delete[] compressedData;
 	compressedData = nullptr;
 
-	std::string compressedString(base64_string, encoded_data_length);
+	std::string compressedString(base64_string);
 	delete[] base64_string;
 	base64_string = nullptr;
 	return compressedString;
+}
+
+std::string ot::String::compressedVectorBase64(const std::vector<char>& _data) {
+	if (_data.size() > UINT32_MAX) {
+		throw ot::Exception::OutOfBounds("Vector too large for compression.");
+	}
+
+	uLong compressedSize = compressBound((uLong)_data.size());
+	std::vector<char> compressedData(compressedSize);
+
+	const int res = compress(reinterpret_cast<Bytef*>(compressedData.data()), &compressedSize,
+		reinterpret_cast<const Bytef*>(_data.data()), static_cast<uLong>(_data.size())
+	);
+
+	if (res != Z_OK) {
+		throw ot::Exception::General("Compression failed with code " + std::to_string(res));
+	}
+
+	// Encode to Base64
+	int encodedLength = Base64encode_len(compressedSize);
+	std::string base64(encodedLength, '\0');
+	Base64encode(base64.data(), compressedData.data(), compressedSize);
+
+	return base64;
 }
 
 std::string ot::String::decompressedBase64(const std::string& _compressedString, uint64_t _decompressedLength) {
@@ -756,14 +784,43 @@ std::string ot::String::decompressedBase64(const std::string& _compressedString,
 	char* uncompressesContent = new char[_decompressedLength];
 	uLongf destLen = (uLongf)_decompressedLength;
 	uLong  sourceLen = decoded_compressed_data_length;
-	uncompress((Bytef*)uncompressesContent, &destLen, (Bytef*)compressedContent, sourceLen);
+	const int res = uncompress((Bytef*)uncompressesContent, &destLen, (Bytef*)compressedContent, sourceLen);
+
+	if (res != Z_OK) {
+		throw ot::Exception::General("Decompression failed with code " + std::to_string(res));
+	}
 
 	delete[] compressedContent;
 	compressedContent = nullptr;
-	std::string decompressedString(uncompressesContent, _decompressedLength);
+	std::string decompressedString(uncompressesContent, destLen);
 
 	delete[] uncompressesContent;
 	uncompressesContent = nullptr;
 
 	return decompressedString;
+}
+
+std::vector<char> ot::String::decompressedVectorBase64(const std::string& _compressedString, uint64_t _decompressedLength) {
+	// Decode Base64
+	int decodedLength = Base64decode_len(_compressedString.c_str());
+	std::vector<char> compressedData(decodedLength);
+	Base64decode(compressedData.data(), _compressedString.c_str());
+
+	// Decompress
+	std::vector<char> decompressedData(_decompressedLength);
+	uLongf destLen = static_cast<uLongf>(_decompressedLength);
+	uLong sourceLen = static_cast<uLong>(decodedLength);
+
+	int res = uncompress(
+		reinterpret_cast<Bytef*>(decompressedData.data()), &destLen,
+		reinterpret_cast<Bytef*>(compressedData.data()), sourceLen
+	);
+
+	if (res != Z_OK) {
+		throw ot::Exception::General("Decompression failed with code " + std::to_string(res));
+	}
+
+	// Resize in case actual decompressed size < expected
+	decompressedData.resize(destLen);
+	return decompressedData;
 }

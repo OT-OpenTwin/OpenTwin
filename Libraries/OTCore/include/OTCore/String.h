@@ -11,6 +11,7 @@
 // std header
 #include <list>
 #include <string>
+#include <vector>
 
 namespace ot {
 
@@ -218,6 +219,13 @@ namespace ot {
 		//! @param _decompressedLength Expected length of the decompressed string.
 		//! @return Decompressed string.
 		static std::string decompressedBase64(const std::string& _compressedString, uint64_t _decompressedLength);
+
+		//! @brief Compresses the provided char vector using zlib compression.
+		//! @param _string String to compress.
+		//! @return Compressed string.
+		static std::string compressedVectorBase64(const std::vector<char>& _data);
+
+		static std::vector<char> decompressedVectorBase64(const std::string& _compressedString, uint64_t _decompressedLength);
 
 	};
 }
