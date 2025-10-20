@@ -169,12 +169,7 @@ void FileHandler::textEditorSaveRequested(const std::string& _entityName, const 
 				const std::string& owner =	entityBase->getOwningService();
 				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
 				{
-					ot::JsonDocument doc;
-					doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(_entityName, doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(_text, doc.GetAllocator()), doc.GetAllocator());
-
-					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(doc), owner); //Potentially dangerous ? Usually the document should not be used afterwards.
+					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(_entityName, _text)), owner);
 					workerThread.detach();
 				}
 			}
@@ -223,10 +218,7 @@ void FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
 			else if (changedHandling == ot::ContentChangedHandling::OwnerHandles) {
 				const std::string& owner = entityBase->getOwningService();
 				if (owner != OT_INFO_SERVICE_TYPE_MODEL) {
-					ot::JsonDocument doc;
-					doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_cfg, doc.GetAllocator()), doc.GetAllocator());
-					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(doc), owner); //Potentially dangerous ? Usually the document should not be used afterwards.
+					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TableActionHandler::createTableSaveRequestDocument(_cfg)), owner);
 					workerThread.detach();
 				}
 			}

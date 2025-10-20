@@ -56,6 +56,9 @@
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 
+#include "OTGuiAPI/TableActionHandler.h"
+#include "OTGuiAPI/TextEditorActionHandler.h"
+
 #include "OTWidgets/Label.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/PlotView.h"
@@ -2727,14 +2730,9 @@ void AppBase::slotTextEditorSaveRequested() {
 	if (result == ot::MessageDialogCfg::BasicButton::Save)
 	*/
 	{
-		ot::JsonDocument doc;
-		
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
-		
 		try {
 			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
-			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(view->getViewData().getEntityName(), doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(view->getTextEditor()->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+			ot::JsonDocument doc = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(view->getViewData().getEntityName(), view->getTextEditor()->toPlainText().toStdString());
 
 			std::string response;
 			if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
@@ -2770,9 +2768,6 @@ void AppBase::slotTableSaveRequested() {
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
-
 	try {
 		ot::TableView* view = dynamic_cast<ot::TableView*>(ot::WidgetViewManager::instance().findViewFromWidget(table));
 		if (!view) {
@@ -2782,13 +2777,11 @@ void AppBase::slotTableSaveRequested() {
 
 		ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
 
-		ot::JsonObject cfgObj;
 		ot::TableCfg cfg = table->createConfig();
 		ot::BasicEntityInformation entityInfo(view->getViewData());
 		cfg.setEntityInformation(entityInfo);
 		
-		cfg.addToJsonObject(cfgObj, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
+		ot::JsonDocument doc = ot::TableActionHandler::createTableSaveRequestDocument(cfg);
 
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
