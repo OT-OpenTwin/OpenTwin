@@ -69,8 +69,6 @@ private:
 	Application();
 	virtual ~Application();
 
-	
-
 	ot::ToolBarButtonCfg m_buttonRunPipeline;
 	ot::ToolBarButtonCfg m_buttonCreateSolver;
 	ot::ToolBarButtonCfg m_buttonGraphicsScene;

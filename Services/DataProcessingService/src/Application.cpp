@@ -200,9 +200,20 @@ ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsCon
 void Application::propertyChanged(ot::JsonDocument& _doc)
 {
 	EntityBlockDatabaseAccess dbA;
-	if (this->getSelectedEntities().size() == 1 && this->getSelectedEntityInfos().begin()->getEntityType() == dbA.getClassName())
+	std::list<ot::EntityInformation> dbAccessBlockInformations;
+	const std::list<ot::EntityInformation> selectedEntitiesInfos =	this->getSelectedEntityInfos();
+	for (const ot::EntityInformation& selectedEntityInfo :selectedEntitiesInfos )
 	{
-		auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(this->getSelectedEntityInfos().begin()->getEntityID(), this->getSelectedEntityInfos().begin()->getEntityVersion());
+		if (selectedEntityInfo.getEntityType() == dbA.getClassName())
+		{
+			dbAccessBlockInformations.push_back(selectedEntityInfo);
+		}
+	}
+	
+	Application::instance()->prefetchDocumentsFromStorage(dbAccessBlockInformations);
+	for(ot::EntityInformation& selectedEntityInfos : dbAccessBlockInformations)
+	{
+		auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedEntityInfos.getEntityID(), selectedEntityInfos.getEntityVersion());
 		auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
 		if (dbAccess != nullptr)
 		{
