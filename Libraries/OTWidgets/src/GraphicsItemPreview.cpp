@@ -5,13 +5,17 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTWidgets/PixmapImagePainter.h"
 #include "OTWidgets/GraphicsItemPreview.h"
 #include "OTWidgets/GraphicsItemPreviewDrag.h"
 
 // Qt header
 #include <QtGui/qevent.h>
+#include <QtGui/qpainter.h>
 
-ot::GraphicsItemPreview::GraphicsItemPreview() : m_drag(nullptr) {
+ot::GraphicsItemPreview::GraphicsItemPreview() : m_painter(nullptr), m_drag(nullptr) {
+	m_painter = new PixmapImagePainter(QPixmap());
+
 	this->setStyleSheet("border-width: 1px;"
 		"border-style: outset;"
 		"border-color: gray;");
@@ -19,6 +23,34 @@ ot::GraphicsItemPreview::GraphicsItemPreview() : m_drag(nullptr) {
 
 ot::GraphicsItemPreview::~GraphicsItemPreview() {
 	if (m_drag) delete m_drag;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
+void ot::GraphicsItemPreview::setPainter(ImagePainter* _painter) {
+	OTAssertNullptr(_painter);
+	if (m_painter == _painter) {
+		return;
+	}
+	delete m_painter;
+	m_painter = _painter;
+}
+
+
+QSize ot::GraphicsItemPreview::sizeHint() const {
+	OTAssertNullptr(m_painter);
+	return m_painter->getDefaultImageSize();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Proetected: Events
+
+void ot::GraphicsItemPreview::paintEvent(QPaintEvent* _event) {
+	QPainter painter(this);
+	m_painter->paintImage(&painter, this->rect(), true);
 }
 
 void ot::GraphicsItemPreview::mousePressEvent(QMouseEvent* _event) {

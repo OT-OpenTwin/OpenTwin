@@ -23,10 +23,13 @@ namespace ot {
 
 		PixmapImagePainter& operator=(const PixmapImagePainter&) = delete;
 
+		virtual void paintImage(QPainter* _painter, const QRect& _bounds, bool _maintainAspectRatio) const override;
 		virtual void paintImage(QPainter* _painter, const QRectF& _bounds, bool _maintainAspectRatio) const override;
 
 		virtual ImagePainter* createCopy() const override { return new PixmapImagePainter(*this); };
-		virtual QSizeF getDefaultImageSize(void) const override { return m_pixmap.size().toSizeF(); };
+
+		virtual QSize getDefaultImageSize() const override { return m_pixmap.size(); };
+		virtual QSizeF getDefaultImageSizeF() const override { return m_pixmap.size().toSizeF(); };
 
 	private:
 		QPixmap m_pixmap;

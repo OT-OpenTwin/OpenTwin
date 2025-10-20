@@ -31,12 +31,22 @@ ot::SvgImagePainter::~SvgImagePainter() {
 	m_svgRenderer = nullptr;
 }
 
+void ot::SvgImagePainter::paintImage(QPainter* _painter, const QRect& _bounds, bool _maintainAspectRatio) const {
+	OTAssertNullptr(m_svgRenderer);
+	m_svgRenderer->render(_painter, _bounds.toRectF());
+}
+
 void ot::SvgImagePainter::paintImage(QPainter* _painter, const QRectF& _bounds, bool _maintainAspectRatio) const {
 	OTAssertNullptr(m_svgRenderer);
 	m_svgRenderer->render(_painter, _bounds);
 }
 
-QSizeF ot::SvgImagePainter::getDefaultImageSize(void) const {
+QSize ot::SvgImagePainter::getDefaultImageSize() const {
+	OTAssertNullptr(m_svgRenderer);
+	return m_svgRenderer->defaultSize();
+}
+
+QSizeF ot::SvgImagePainter::getDefaultImageSizeF(void) const {
 	OTAssertNullptr(m_svgRenderer);
 	return m_svgRenderer->defaultSize().toSizeF();
 }

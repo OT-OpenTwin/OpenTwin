@@ -142,7 +142,7 @@ QSizeF ot::GraphicsImageItem::getPreferredGraphicsItemSize(void) const {
 	}
 
 	if (m_painter) {
-		return m_painter->getDefaultImageSize();
+		return m_painter->getDefaultImageSizeF();
 	}
 	else {
 		return QSizeF();
@@ -170,7 +170,7 @@ void ot::GraphicsImageItem::paintCustomItem(QPainter* _painter, const QStyleOpti
 		return;
 	}
 
-	QSizeF adjustedSize = m_painter->getDefaultImageSize();
+	QSizeF adjustedSize = m_painter->getDefaultImageSizeF();
 	if (config->getMaintainAspectRatio()) {
 		adjustedSize.scale(_rect.size(), (config->getMaintainAspectRatio() ? Qt::KeepAspectRatio : Qt::IgnoreAspectRatio));
 	}

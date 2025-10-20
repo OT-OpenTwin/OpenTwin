@@ -16,11 +16,13 @@
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/ImagePainter.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/TreeWidgetItem.h"
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/TreeWidgetFilter.h"
+#include "OTWidgets/ImagePainterManager.h"
 #include "OTWidgets/GraphicsItemPreview.h"
 
 // Qt header
@@ -153,20 +155,24 @@ void ot::GraphicsPicker::slotSelectionChanged() {
 
 	std::list<GraphicsView *> previews;
 
+	ImagePainterManager& pManager = ImagePainterManager::instance();
+
 	for (QTreeWidgetItem* selectedItem : m_navigation->getTreeWidget()->selectedItems()) {
 		TreeWidgetItem* itm = dynamic_cast<TreeWidgetItem*>(selectedItem);
 		OTAssertNullptr(itm);
 		auto it = m_previewData.find(itm);
 		if (it != m_previewData.end()) {
 			for (const GraphicsPickerItemInfo& info : *it->second) {
-				PreviewBox box;
+				// Preload image
+				pManager.importFromFile(info.getPreviewIcon());
 
+				PreviewBox box;
 				box.view = new GraphicsItemPreview;
 				box.view->setMaximumSize(m_previewSize);
 				box.view->setMinimumSize(m_previewSize);
-				box.view->setPixmap(IconManager::getIcon(QString::fromStdString(info.getPreviewIcon())).pixmap(m_previewSize));
+				box.view->setPainter(pManager.getPainter(info.getPreviewIcon())->createCopy());
 				box.view->setItemName(info.getName());
-				box.view->setAlignment(Qt::AlignCenter);
+				//box.view->setAlignment(Qt::AlignCenter);
 				box.view->setOwner(m_owner);
 
 				box.label = new QLabel(QString::fromStdString(info.getTitle()));

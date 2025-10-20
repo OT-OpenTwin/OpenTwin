@@ -25,10 +25,13 @@ namespace ot {
 
 		ImagePainter& operator=(const ImagePainter&) = default;
 
+		virtual void paintImage(QPainter* _painter, const QRect& _bounds, bool _maintainAspectRatio) const = 0;
 		virtual void paintImage(QPainter* _painter, const QRectF& _bounds, bool _maintainAspectRatio) const = 0;
 
 		virtual ImagePainter* createCopy() const = 0;
-		virtual QSizeF getDefaultImageSize(void) const = 0;
+
+		virtual QSize getDefaultImageSize() const = 0;
+		virtual QSizeF getDefaultImageSizeF() const = 0;
 
 	};
 
