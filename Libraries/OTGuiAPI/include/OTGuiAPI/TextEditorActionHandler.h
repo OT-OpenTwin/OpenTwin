@@ -30,7 +30,13 @@ namespace ot {
 		// Protected: Callbacks
 
 	protected:
-		virtual void textEditorSaveRequested(const std::string& _entityName, const std::string& _content) {};
+
+		//! @brief Callback that is triggered when a text editor save is requested.
+		//! @param _entityName Name of the text editor entity.
+		//! @param _content The content to be saved.
+		//! @return ReturnMessage indicating success or failure of the save operation.
+		//! A return status of type OK will result in the text editor modified flag being cleared.
+		virtual ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _content) { return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unhandled save request"); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -39,7 +45,7 @@ namespace ot {
 	private:
 		ActionHandler m_actionHandler;
 
-		void handleTextEditorSaveRequested(JsonDocument& _doc);
+		ReturnMessage handleTextEditorSaveRequested(JsonDocument& _doc);
 	};
 
 }

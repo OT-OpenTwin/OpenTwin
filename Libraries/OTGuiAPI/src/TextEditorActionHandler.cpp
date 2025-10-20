@@ -22,9 +22,9 @@ ot::JsonDocument ot::TextEditorActionHandler::createTextEditorSaveRequestDocumen
 	return doc;
 }
 
-void ot::TextEditorActionHandler::handleTextEditorSaveRequested(JsonDocument& _doc) {
+ot::ReturnMessage ot::TextEditorActionHandler::handleTextEditorSaveRequested(JsonDocument& _doc) {
 	const std::string entityName = json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Name);
 	const std::string textContent = json::getString(_doc, OT_ACTION_PARAM_TEXTEDITOR_Text);
 	
-	this->textEditorSaveRequested(entityName, textContent);
+	return this->textEditorSaveRequested(entityName, textContent);
 }

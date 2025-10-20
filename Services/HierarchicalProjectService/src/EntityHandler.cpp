@@ -16,6 +16,8 @@
 #include "NewModelStateInfo.h"
 #include "OTServiceFoundation/Encryption.h"
 #include "EntityAPI.h"
+#include "EntityFileCSV.h"
+#include "EntityFileText.h"
 #include "EntityFileImage.h"
 #include "EntityBlockImage.h"
 #include "EntityFileRawData.h"
@@ -152,6 +154,7 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 	_newEntities.addDataEntity(_containerInfo.getEntityID(), dataEntity);
 
 	ot::UID documentEntityID = ot::invalidUID;
+	ot::UID documentEntityVersion = ot::invalidUID;
 
 	const std::string newDocumentName = CreateNewUniqueTopologyName(_containerInfo.getEntityName(), fileNameOnly + "." + extensionString);
 
@@ -173,6 +176,7 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 				_newEntities.addDataEntity(_containerInfo.getEntityID(), *fileEntity);
 
 				documentEntityID = fileEntity->getEntityID();
+				documentEntityVersion = fileEntity->getEntityStorageVersion();
 			}
 		}
 
@@ -191,6 +195,7 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 			_newEntities.addDataEntity(_containerInfo.getEntityID(), rawDataEntity);
 
 			documentEntityID = rawDataEntity.getEntityID();
+			documentEntityVersion = rawDataEntity.getEntityStorageVersion();
 		}
 	}
 
@@ -212,7 +217,7 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 	blockEntity.createProperties();
 	blockEntity.setEditable(true);
 	blockEntity.setCoordinateEntityID(coord.getEntityID());
-	blockEntity.setDocument(documentEntityID);
+	blockEntity.setDocument(documentEntityID, documentEntityVersion);
 	blockEntity.storeToDataBase();
 	_newEntities.addTopologyEntity(blockEntity);
 }
@@ -482,6 +487,48 @@ void EntityHandler::addContainer(const ot::EntityInformation& _containerInfo) {
 	newEntities.addTopologyEntity(newContainer);
 
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added hierarchical container", true, true);
+}
+
+ot::ReturnMessage EntityHandler::updateDocumentText(EntityBlockHierarchicalDocumentItem* _documentItem, const std::string& _content) {
+	std::shared_ptr<EntityBase> document(_documentItem->getDocument());
+	if (!document) {
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Could not load document entity for document item { \"DocumentName\": \"" + _documentItem->getName() + "\" }");
+	}
+
+	// Ensure document is text
+	EntityFileText* textDocument = dynamic_cast<EntityFileText*>(document.get());
+	if (!textDocument) {
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unexpected document type { \"DocumentName\": \"" + _documentItem->getName() + "\", \"DocumentType\": \"" + document->getClassName() + "\", \"ExpectedType\": \"" + EntityFileText::className() + "\" }");
+	}
+
+	// Update data entity
+	std::shared_ptr<EntityBinaryData> dataEntity = textDocument->getDataEntity();
+	if (!dataEntity) {
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Could not load data entity for text document { \"DocumentName\": \"" + _documentItem->getName() + "\" }");
+	}
+
+	ot::NewModelStateInfo newEntities;
+	ot::NewModelStateInfo update;
+
+	ot::ModelServiceAPI::deleteEntitiesFromModel({ dataEntity->getEntityID(), textDocument->getEntityID() }, false);
+
+	dataEntity->setData(std::vector<char>(_content.begin(), _content.end()));
+	dataEntity->storeToDataBase();
+	newEntities.addDataEntity(*_documentItem, *dataEntity);
+
+
+	textDocument->setDataEntity(*dataEntity);
+	textDocument->storeToDataBase();
+	newEntities.addDataEntity(*_documentItem, *textDocument);
+
+	_documentItem->setDocument(*textDocument);
+	_documentItem->storeToDataBase();
+	update.addTopologyEntity(*_documentItem);
+
+	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Updated text document content", true, false);
+	ot::ModelServiceAPI::updateTopologyEntities(update, "Text changed");
+
+	return ot::ReturnMessage::Ok;
 }
 
 bool EntityHandler::getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const {

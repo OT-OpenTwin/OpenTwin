@@ -29,9 +29,9 @@ ot::JsonDocument ot::TableActionHandler::createTableSaveRequestDocument(const ot
 
 // Private: Action handling
 
-void ot::TableActionHandler::handleTableSaveRequested(JsonDocument& _doc) {
+ot::ReturnMessage ot::TableActionHandler::handleTableSaveRequested(JsonDocument& _doc) {
 	ot::TableCfg config;
 	config.setFromJsonObject(json::getObject(_doc, OT_ACTION_PARAM_Config));
 
-	this->tableSaveRequested(config);
+	return this->tableSaveRequested(config);
 }

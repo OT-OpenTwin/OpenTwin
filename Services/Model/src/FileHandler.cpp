@@ -144,7 +144,7 @@ void FileHandler::storeChangedTable(IVisualisationTable* _entity, const ot::Tabl
 	model->modelChangeOperationCompleted("Updated Table.");
 }
 
-void FileHandler::textEditorSaveRequested(const std::string& _entityName, const std::string& _text)
+ot::ReturnMessage FileHandler::textEditorSaveRequested(const std::string& _entityName, const std::string& _text)
 {
 	Model* model =	Application::instance()->getModel();
 	assert(model != nullptr);
@@ -186,19 +186,25 @@ void FileHandler::textEditorSaveRequested(const std::string& _entityName, const 
 					workerThread.detach();
 				}
 			}
+
+			return ot::ReturnMessage::Ok;
 		}
 		else
 		{
-			OT_LOG_E("Failed to visualise " + _entityName + " since it does not support the corresponding visualisation interface.");
+			ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to visualise " + _entityName + " since it does not support the corresponding visualisation interface.");
+			OT_LOG_E(ret.getWhat());
+			return ret;
 		}
 	}
 	else
 	{
-		OT_LOG_E("Failed to handle changed text request since the entity could not be found by name: " + _entityName);
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to handle changed text request since the entity could not be found by name: " + _entityName);
+		OT_LOG_E(ret.getWhat());
+		return ret;
 	}
 }
 
-void FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
+ot::ReturnMessage FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
 	const std::string entityName = _cfg.getEntityName();
 
 	Model* model = Application::instance()->getModel();
@@ -232,13 +238,19 @@ void FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
 					workerThread.detach();
 				}
 			}
+
+			return ot::ReturnMessage::Ok;
 		}
 		else {
-			OT_LOG_E("Failed to visualise " + entityName + " since it does not support the corresponding visualisation interface.");
+			ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to visualise " + entityName + " since it does not support the corresponding visualisation interface.");
+			OT_LOG_E(ret.getWhat());
+			return ret;
 		}
 	}
 	else {
-		OT_LOG_E("Failed to handle changed text request since the entity could not be found by name: " + entityName);
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to handle changed text request since the entity could not be found by name: " + entityName);
+		OT_LOG_E(ret.getWhat());
+		return ret;
 	}
 }
 

@@ -201,6 +201,44 @@ ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsCon
 	return ot::ReturnMessage::Ok;
 }
 
+ot::ReturnMessage Application::tableSaveRequested(const ot::TableCfg& _config) {
+	return ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported yet");
+}
+
+ot::ReturnMessage Application::textEditorSaveRequested(const std::string& _entityName, const std::string& _content) {
+	// Get entity information
+	ot::EntityInformation info;
+	if (!ot::ModelServiceAPI::getEntityInformation(_entityName, info)) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information { \"Name\": \"" + _entityName + "\" }");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	// Load entity
+	std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion()));
+	if (!entity) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not read entity from database { \"Name\": \"" + _entityName + "\" }");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	// Check entity type
+	if (entity->getClassName() != EntityBlockHierarchicalDocumentItem::className()) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity is not of expected type { \"Name\": \"" + _entityName + "\", \"Type\": \"" + entity->getClassName() + "\", \"ExpectedType\": \"" + EntityBlockHierarchicalDocumentItem::className() + "\" }");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	EntityBlockHierarchicalDocumentItem* documentEntity(dynamic_cast<EntityBlockHierarchicalDocumentItem*>(entity.get()));
+	if (!documentEntity) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity cast failed { \"Name\": \"" + _entityName + "\" }");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	return m_entityHandler.updateDocumentText(documentEntity, _content);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Action handler
@@ -408,18 +446,18 @@ void Application::updateButtonStates() {
 	const bool canOpenProject = !projectsToOpen.empty();
 	const bool canOpenDocument = !documentsToOpen.empty();
 
-	if (canOpenProject || canOpenDocument) {
-		enabledControls.push_back(m_openSelectedItems.getFullPath());
-	}
-	else {
-		disabledControls.push_back(m_openSelectedItems.getFullPath());
-	}
-
 	if (canOpenProject) {
 		enabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
 	}
 	else {
 		disabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
+	}
+	
+	if ((projectsToOpen.size() + documentsToOpen.size()) == 1) {
+		enabledControls.push_back(m_openSelectedItems.getFullPath());
+	}
+	else {
+		disabledControls.push_back(m_openSelectedItems.getFullPath());
 	}
 
 	if (projectsToOpen.size() == 1) {

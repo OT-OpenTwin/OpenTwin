@@ -11,7 +11,9 @@
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
 #include "OTGuiAPI/ButtonHandler.h"
+#include "OTGuiAPI/TableActionHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
+#include "OTGuiAPI/TextEditorActionHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
 
 // std header
@@ -22,7 +24,10 @@
 
 class EntityFileRawData;
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler, public ot::GraphicsActionHandler {
+class Application : public ot::ApplicationBase, public ot::ActionHandler, 
+	public ot::ButtonHandler, public ot::GraphicsActionHandler,
+	public ot::TableActionHandler, public ot::TextEditorActionHandler
+{
 private:
 	Application();
 	virtual ~Application();
@@ -54,6 +59,10 @@ public:
 protected:
 	virtual ot::ReturnMessage graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid) override;
 	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) override;
+
+	virtual ot::ReturnMessage tableSaveRequested(const ot::TableCfg& _config) override;
+
+	virtual ot::ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _content) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

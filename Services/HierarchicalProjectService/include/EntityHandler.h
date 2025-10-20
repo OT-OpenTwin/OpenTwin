@@ -8,12 +8,14 @@
 // Open twin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/FolderNames.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCore/ProjectInformation.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "NewModelStateInfo.h"
 #include "EntityBlockHierarchicalProjectItem.h"
+#include "EntityBlockHierarchicalDocumentItem.h"
 
 class EntityHandler : public BusinessLogicHandler {
 public:
@@ -34,6 +36,8 @@ public:
 	bool removeImageFromProjects(const std::list<ot::EntityInformation>& _projects);
 
 	void addContainer(const ot::EntityInformation& _containerInfo);
+
+	ot::ReturnMessage updateDocumentText(EntityBlockHierarchicalDocumentItem* _documentItem, const std::string& _content);
 
 private:
 	bool getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const;

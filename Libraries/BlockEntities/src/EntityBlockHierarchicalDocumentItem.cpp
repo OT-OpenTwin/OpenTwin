@@ -14,7 +14,7 @@
 static EntityFactoryRegistrar<EntityBlockHierarchicalDocumentItem> registrar(EntityBlockHierarchicalDocumentItem::className());
 
 EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	: EntityBlock(_ID, _parent, _obs, _ms, _owner), m_documentUID(ot::invalidUID), m_documentEntity(nullptr) {
+	: EntityBlock(_ID, _parent, _obs, _ms, _owner), m_documentUID(ot::invalidUID), m_documentVersion(ot::invalidUID), m_documentEntity(nullptr) {
 	OldTreeIcon icon;
 	icon.visibleIcon = "Hierarchical/Document";
 	icon.hiddenIcon = "Hierarchical/Document";
@@ -51,8 +51,9 @@ void EntityBlockHierarchicalDocumentItem::createProperties() {
 
 // Data accessors
 
-void EntityBlockHierarchicalDocumentItem::setDocument(ot::UID _entityID) {
+void EntityBlockHierarchicalDocumentItem::setDocument(ot::UID _entityID, ot::UID _entityVersion) {
 	m_documentUID = _entityID;
+	m_documentVersion = _entityVersion;
 	m_documentEntity.reset();
 	m_documentEntity = nullptr;
 
@@ -72,7 +73,8 @@ void EntityBlockHierarchicalDocumentItem::addStorageData(bsoncxx::builder::basic
 	EntityBlock::addStorageData(_storage);
 
 	_storage.append(
-		bsoncxx::builder::basic::kvp("DocumentID", static_cast<int64_t>(m_documentUID))
+		bsoncxx::builder::basic::kvp("DocumentID", static_cast<int64_t>(m_documentUID)),
+		bsoncxx::builder::basic::kvp("DocumentVersion", static_cast<int64_t>(m_documentVersion))
 	);
 }
 
@@ -80,6 +82,7 @@ void EntityBlockHierarchicalDocumentItem::readSpecificDataFromDataBase(bsoncxx::
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 
 	m_documentUID = static_cast<ot::UID>(_docView["DocumentID"].get_int64());
+	m_documentVersion = static_cast<ot::UID>(_docView["DocumentVersion"].get_int64());
 }
 
 void EntityBlockHierarchicalDocumentItem::ensureDocumentLoaded() {
@@ -91,5 +94,5 @@ void EntityBlockHierarchicalDocumentItem::ensureDocumentLoaded() {
 	}
 
 	std::map<ot::UID, EntityBase*> entityMap;
-	m_documentEntity.reset(readEntityFromEntityID(this, m_documentUID, entityMap));
+	m_documentEntity.reset(readEntityFromEntityIDAndVersion(this, m_documentUID, m_documentVersion, entityMap));
 }

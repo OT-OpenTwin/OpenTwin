@@ -25,8 +25,10 @@ public:
 
 	// Data accessors
 
-	void setDocument(ot::UID _entityID);
+	void setDocument(const EntityBase& _entity) { setDocument(_entity.getEntityID(), _entity.getEntityStorageVersion()); };
+	void setDocument(ot::UID _entityID, ot::UID _entityVersion);
 	ot::UID getDocumentID() const { return m_documentUID; };
+	ot::UID getDocumentVersion() const { return m_documentVersion; };
 	std::shared_ptr<EntityBase> getDocument();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -41,5 +43,6 @@ private:
 	void ensureDocumentLoaded();
 
 	ot::UID m_documentUID;
+	ot::UID m_documentVersion;
 	std::shared_ptr<EntityBase> m_documentEntity;
 };

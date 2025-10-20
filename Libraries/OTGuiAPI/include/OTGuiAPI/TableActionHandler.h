@@ -31,7 +31,11 @@ namespace ot {
 		// Protected: Callbacks
 
 	protected:
-		virtual void tableSaveRequested(const ot::TableCfg& _config) {};
+		//! @brief Callback that is triggered when a table save is requested.
+		//! @param _config Configuration of the table to be saved.
+		//! @return ReturnMessage indicating success or failure of the save operation.
+		//! A return status of type OK will result in the table modified flag being cleared.
+		virtual ReturnMessage tableSaveRequested(const ot::TableCfg& _config) { return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unhandled save request"); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -40,7 +44,7 @@ namespace ot {
 	private:
 		ActionHandler m_actionHandler;
 
-		void handleTableSaveRequested(JsonDocument& _doc);
+		ReturnMessage handleTableSaveRequested(JsonDocument& _doc);
 	};
 
 }

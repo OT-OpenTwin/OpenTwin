@@ -55,8 +55,8 @@ private:
 	ot::ActionHandler m_actionHandler;
 	void handleImportTextFile(ot::JsonDocument& _document);
 	void handleImportPythonScript(ot::JsonDocument& _document);
-	virtual void textEditorSaveRequested(const std::string& _entityName, const std::string& _text) override;
-	virtual void tableSaveRequested(const ot::TableCfg& _cfg) override;
+	virtual ot::ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _text) override;
+	virtual ot::ReturnMessage tableSaveRequested(const ot::TableCfg& _cfg) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
