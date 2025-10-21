@@ -64,7 +64,7 @@ void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitie
 		}
 	}
 	
-	model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Copy+Paste Entities", true,false);
+	model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Copy+Paste Entities", true,false,true);
 }
 
 std::string CopyPasteHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _document) {

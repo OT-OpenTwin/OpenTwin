@@ -298,7 +298,12 @@ void Application::handleAddEntities(ot::JsonDocument& _document) {
 		saveModel = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_SaveModel);
 	}
 
-	m_model->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, changeComment, saveModel, askForBranchCreation);
+	bool considerVisualization = true;
+	if (ot::json::exists(_document, OT_ACTION_PARAM_MODEL_ConsiderVisualization)) {
+		considerVisualization = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_ConsiderVisualization);
+	}
+
+	m_model->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, changeComment, saveModel, askForBranchCreation, considerVisualization);
 }
 
 void Application::handleUpdateTopologyEntity(ot::JsonDocument& _document) {
@@ -311,7 +316,12 @@ void Application::handleUpdateTopologyEntity(ot::JsonDocument& _document) {
 	std::list<ot::UID> topologyEntityVersionList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
 	std::string comment = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Description);
 	
-	m_model->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, comment);
+	bool considerVisualization = true;
+	if (ot::json::exists(_document, OT_ACTION_PARAM_MODEL_ConsiderVisualization)) {
+		considerVisualization = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_ConsiderVisualization);
+	}
+
+	m_model->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, comment, considerVisualization);
 }
 
 void Application::handleAddGeometryOperation(ot::JsonDocument& _document) {

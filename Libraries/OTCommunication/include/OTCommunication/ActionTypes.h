@@ -558,6 +558,7 @@
 #define OT_ACTION_PARAM_MODEL_MeshID "Model.Entities.MeshID"
 #define OT_ACTION_PARAM_MODEL_MeshVersion "Model.Entities.MeshVersion"
 #define OT_ACTION_PARAM_MODEL_SaveModel "Model.SaveModel"
+#define OT_ACTION_PARAM_MODEL_ConsiderVisualization "Model.ConsiderVisualization"
 #define OT_ACTION_PARAM_MODEL_EntityVersionList "Model.Entities.VersionList"
 #define OT_ACTION_PARAM_MODEL_BrepVersionList "Model.Brep.VersionList"
 #define OT_ACTION_PARAM_MODEL_EntityInfoID "Model.EntityInfo.ID"

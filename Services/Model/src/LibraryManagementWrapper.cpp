@@ -254,10 +254,10 @@ void LibraryManagementWrapper::updatePropertyOfEntity(ot::UID _entityID, bool _d
 	const std::string comment = "Property Updated";
 	ot::UIDList topoList{entBase->getEntityID()};
 	ot::UIDList versionList{entBase->getEntityStorageVersion()};
-	model->updateTopologyEntities(topoList, versionList, comment);
+	model->updateTopologyEntities(topoList, versionList, comment, true);
 }
 
 void LibraryManagementWrapper::addModelToEntites() {
 	Model* modelComp = Application::instance()->getModel();
-	modelComp->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added file", true, false);
+	modelComp->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added file", true, false, true);
 }

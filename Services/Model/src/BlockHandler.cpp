@@ -89,14 +89,14 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 		topoEntVers.clear();
 		forceVis.clear();
 
-		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Update BlockItem position and rotation", false, false);
+		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Update BlockItem position and rotation", false, false, false);
 
 		coordinateEntity->storeToDataBase();
 		topoEntID.push_back(blockEnt->getEntityID());
 		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
 		forceVis.push_back(false);
 
-		_model->updateTopologyEntities(topoEntID, topoEntVers, "Rotation and blockitem position changed");
+		_model->updateTopologyEntities(topoEntID, topoEntVers, "Rotation and blockitem position changed", false);
 
 	}
 	else if (_rotationChanged || _flipChanged) {
@@ -105,7 +105,7 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 		std::list<ot::UID>  topologyEntityIDList{ blockEnt->getEntityID() };
 		std::list<ot::UID>  topologyEntityVersionList{ blockEnt->getEntityStorageVersion() };
 
-		_model->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, comment);
+		_model->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, comment, false);
 	}
 	else {
 		coordinateEntity->storeToDataBase();
@@ -124,10 +124,10 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 		}
 		std::list<ot::UID> dataEntityParentList{ parent->getEntityID() };
 
-		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntityParentList, "Update BlockItem position", false, false);
+		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntityParentList, "Update BlockItem position", false, false, false);
 		topoEntID.push_back(blockEnt->getEntityID());
 		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
-		_model->updateTopologyEntities(topoEntID, topoEntVers, "BlockPositionUpdated");
+		_model->updateTopologyEntities(topoEntID, topoEntVers, "BlockPositionUpdated", false);
 	}
 
 	return ot::ReturnMessage::Ok;

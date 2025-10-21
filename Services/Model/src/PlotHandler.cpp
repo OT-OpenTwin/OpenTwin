@@ -69,7 +69,7 @@ void PlotHandler::handleCreatePlot()
 	newModelStateInformation.addTopologyEntity(newPlot);
 
 	//Store state
-	model->addEntitiesToModel(newModelStateInformation, "Created new plot for existing series metadata", true, true);
+	model->addEntitiesToModel(newModelStateInformation, "Created new plot for existing series metadata", true, true, true);
 }
 
 void PlotHandler::handleAddCurveToPlot()
@@ -94,11 +94,11 @@ void PlotHandler::handleAddCurveToPlot()
 	Model* model = Application::instance()->getModel();
 	const std::string comment = "Added curves to plots";
 	 
-	model->addEntitiesToModel(newModelStateInformation, comment, !storeSecond, true);
+	model->addEntitiesToModel(newModelStateInformation, comment, !storeSecond, true, true);
 	
 	if (storeSecond)
 	{
-		model->updateTopologyEntities(plotsForUpdate, comment);
+		model->updateTopologyEntities(plotsForUpdate, comment, true);
 	}
 	
 	for (EntityResult1DPlot* selectedPlot : selectedPlots)

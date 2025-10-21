@@ -332,5 +332,5 @@ void FileHandler::addTextFilesToModel()
 {
 	QueuingHttpRequestsRAII wrapper;
 	Model* model = Application::instance()->getModel();
-	model->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added File", true, false);
+	model->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added File", true, false, true);
 }

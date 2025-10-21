@@ -1746,7 +1746,7 @@ void Model::setShapeVisibility(std::list<ot::UID>& visibleEntityIDs, std::list<o
 	}
 }
 
-void Model::addTopologyEntitiesToModel(std::list<EntityBase*> _entities, const std::list<bool>& _forceVisible)
+void Model::addTopologyEntitiesToModel(std::list<EntityBase*> _entities, const std::list<bool>& _forceVisible, bool _considerVisualization)
 {
 	std::map<ot::UID, EntityBase*> entityMap;
 	std::map<EntityBase*, bool>forceEntityVisible;
@@ -1805,11 +1805,12 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*> _entities, const s
 	
 	// Might be that the visualisation of a parent entity depends on a child entity. Thus the children have to be part of the state before the visualisation is taken care of.
 	// Here we will need to loop through the top level entities only, since they will automatically add their children.
-
-	for (EntityBase* entity : topLevelEntities)
-	{
-		entity->addVisualizationNodes();
+	if (_considerVisualization) {
+		for (EntityBase* entity : topLevelEntities) {
+			entity->addVisualizationNodes();
+		}
 	}
+
 
 	// Here we need to ensure that the entities with the force visible flag are visible
 
@@ -3810,7 +3811,7 @@ std::list<ot::UID> Model::getIDsOfFolderItemsOfType(const std::string &folder, c
 }
 
 
-void Model::addEntitiesToModel(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _description, bool _saveModel, bool _askForCreationOfBranch) {
+void Model::addEntitiesToModel(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _description, bool _saveModel, bool _askForCreationOfBranch, bool _considerVisualization) {
 	addEntitiesToModel(
 		_modelStateInfo.getTopologyEntityIDs(),
 		_modelStateInfo.getTopologyEntityVersions(),
@@ -3818,13 +3819,13 @@ void Model::addEntitiesToModel(const ot::NewModelStateInfo& _modelStateInfo, con
 		_modelStateInfo.getDataEntityIDs(),
 		_modelStateInfo.getDataEntityVersions(),
 		_modelStateInfo.getDataEntityParentIDs(),
-		_description, _saveModel, _askForCreationOfBranch
+		_description, _saveModel, _askForCreationOfBranch, _considerVisualization
 	);
 }
 
 void Model::addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, const std::list<ot::UID>& _topologyEntityVersionList, const std::list<bool>& _topologyEntityForceVisible,
 	const std::list<ot::UID>& _dataEntityIDList, const std::list<ot::UID>& _dataEntityVersionList, const std::list<ot::UID>& _dataEntityParentList, 
-	const std::string& _description, bool _saveModel, bool _askForCreationOfBranch)
+	const std::string& _description, bool _saveModel, bool _askForCreationOfBranch, bool _considerVisualization)
 {
 	enableQueuingHttpRequests(true);
 
@@ -3902,12 +3903,12 @@ void Model::addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, 
 	}
 
 	// Remove the "old" elements from the display
-	if (!removeFromDisplay.empty())
+	if (!removeFromDisplay.empty() && _considerVisualization)
 	{
 		removeShapesFromVisualization(removeFromDisplay);
 	}
 
-	addTopologyEntitiesToModel(entityList, _topologyEntityForceVisible);
+	addTopologyEntitiesToModel(entityList, _topologyEntityForceVisible, _considerVisualization);
 
 	// Finally refresh the views and save the new model state
 	
@@ -4037,7 +4038,7 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 	std::list<ot::UID> topologyEntityIDList = {geomEntityID};
 	std::list<ot::UID> topologyEntityVersionList = {geomEntityVersion};
 	std::list<bool> topologyEntityForceVisible = {false};
-	addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, description, false, true);
+	addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, description, false, true, true);
 
 	// for all children, change the name and the names of the children
 
@@ -4283,11 +4284,11 @@ void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot:
 	geomEntity->addVisualizationNodes();
 }
 
-void Model::updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment) {
-	updateTopologyEntities(_modelStateInfo.getTopologyEntityIDs(), _modelStateInfo.getTopologyEntityVersions(), _comment);
+void Model::updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment, bool _considerVisualization) {
+	updateTopologyEntities(_modelStateInfo.getTopologyEntityIDs(), _modelStateInfo.getTopologyEntityVersions(), _comment, _considerVisualization);
 }
 
-void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::UIDList& _topoEntityVersion, const std::string& _comment)
+void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::UIDList& _topoEntityVersion, const std::string& _comment, bool _considerVisualization)
 {
 	enableQueuingHttpRequests(true);
 
@@ -4371,13 +4372,13 @@ void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::U
 		}
 	}
 
-	if (!removeFromDisplay.empty())
+	if (!removeFromDisplay.empty() && _considerVisualization)
 	{
 		removeShapesFromVisualization(removeFromDisplay);
 	}
 
 	//Now we can add the new version of the topology entities to the model state
-	addTopologyEntitiesToModel(entityList, topologyEntityForceVisible);
+	addTopologyEntitiesToModel(entityList, topologyEntityForceVisible, _considerVisualization);
 
 
 	refreshAllViews();
