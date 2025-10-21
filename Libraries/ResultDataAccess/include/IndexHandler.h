@@ -2,18 +2,17 @@
 #include <string>
 #include "ResultImportLogger.h"
 #include "ResultDataStorageAPI.h"
+#include "OTServiceFoundation/UiComponent.h"
 class __declspec(dllexport) IndexHandler
 {
 public:
-	IndexHandler(const std::string& _collectionName, ResultImportLogger& _logger);
+	IndexHandler(const std::string& _collectionName);
 	
 	void createDefaultIndexes();
 
-	ResultImportLogger& getLogger() { return m_logger; }
-
 	const static std::vector<std::string>& getDefaultIndexes() 
 	{ 
-		static std::vector<std::string> m_defaultIndexes = { "Series","Quantity" };
+		static std::vector<std::string> m_defaultIndexes = { "Quantity" ,"Series"};
 		return m_defaultIndexes;
 	}
 
@@ -22,9 +21,7 @@ public:
 
 private:
 	DataStorageAPI::ResultDataStorageAPI m_dataStorageAccess;
-
 	std::vector<bool> m_defaultIndexesSet = { false,false };
 
-	ResultImportLogger& m_logger;
 	bool checkIfDefaultIndexesAreSet();
 };

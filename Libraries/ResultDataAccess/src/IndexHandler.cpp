@@ -1,15 +1,15 @@
 #include "IndexHandler.h"
-#include "IndexHandler.h"
+#include "OTServiceFoundation/ProgressUpdater.h"
 
-IndexHandler::IndexHandler(const std::string& _collectionName, ResultImportLogger& _logger)
-	: m_dataStorageAccess(_collectionName), m_logger(_logger)
+IndexHandler::IndexHandler(const std::string& _collectionName)
+	: m_dataStorageAccess(_collectionName)
 {}
 
 void IndexHandler::createDefaultIndexes()
 {
 	if(!checkIfDefaultIndexesAreSet())
 	{
-		getLogger().log("Creating default indexes for result collection.", ResultImportLoggerVerbosity::DEBUG);
+		const bool continuousProgressbar = true;
 	
 		mongocxx::collection& collection =	m_dataStorageAccess.getCollection();
 
@@ -28,7 +28,6 @@ void IndexHandler::createDefaultIndexes()
 
 void IndexHandler::dropAllIndexes()
 {
-	getLogger().log("Dropping all indexes except for _id index in result collection.", ResultImportLoggerVerbosity::DEBUG);
 	mongocxx::collection& collection = m_dataStorageAccess.getCollection();
 	collection.indexes().drop_all();
 	
@@ -44,8 +43,11 @@ bool IndexHandler::checkIfDefaultIndexesAreSet()
 	{
 		for (size_t i = 0; i < getDefaultIndexes().size(); ++i)
 		{
+			
+			auto&& key = index["key"].get_document();
+			
 			const std::string& defaultIndex = getDefaultIndexes()[i];
-			if (index.find(defaultIndex) != index.end()) {
+			if (key.view().find(defaultIndex) != key.view().end()) {
 				m_defaultIndexesSet[i] = true;
 				break;
 			}

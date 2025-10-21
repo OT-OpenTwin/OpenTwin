@@ -16,6 +16,7 @@
 
 #include "OTCore/ExplicitStringValueConverter.h"
 #include "OTCore/ComparisionSymbols.h"
+#include "IndexHandler.h"
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	: BlockHandler(blockEntity, handlerMap)
@@ -31,7 +32,9 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	}
 	
 	m_resultCollectionAccess = new DataStorageAPI::ResultDataStorageAPI(collectionName);
-	
+	IndexHandler indexHandler(collectionName);
+	indexHandler.createDefaultIndexes();
+
 	buildQuery(blockEntity);
 }
 
@@ -58,21 +61,28 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	const std::string debugProjection = bsoncxx::to_json(m_projection.view());
 	_uiComponent->displayMessage("Executing projection: " + debugProjection + "\n");
 
-	DataStorageAPI::DataStorageResponse dbResponse;
+	 
+	mongocxx::options::find options;
+	options.projection(m_projection);
+	options.limit(m_documentLimit);
 
 	if (m_sortByID)
 	{
-		mongocxx::options::find options;
 		options.sort(m_sort);
-		options.limit(m_documentLimit);
-		options.projection(m_projection);
+		bsoncxx::builder::basic::document hintDoc;
+		const std::string firstDefaultIndex = IndexHandler::getDefaultIndexes().front();
+		hintDoc.append(bsoncxx::builder::basic::kvp(firstDefaultIndex, 1));
+	}
 
-		dbResponse = m_resultCollectionAccess->searchInResultCollection(m_query, options);
-	}
-	else
-	{
-		dbResponse = m_resultCollectionAccess->searchInResultCollection(m_query, m_projection, m_documentLimit);
-	}
+	auto startTime = std::chrono::high_resolution_clock::now();
+
+	DataStorageAPI::DataStorageResponse dbResponse = m_resultCollectionAccess->searchInResultCollection(m_query, options);
+
+	auto endTime = std::chrono::high_resolution_clock::now();
+	const std::chrono::duration<double, std::milli> response_ms = (endTime - startTime);
+
+	_uiComponent->displayMessage("Query executed in " + std::to_string(response_ms.count()) + " ms.\n");
+
 	
 	if (dbResponse.getSuccess())
 	{

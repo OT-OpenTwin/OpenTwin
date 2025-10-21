@@ -11,6 +11,8 @@
 #include "QuantityContainerSerialiser.h"
 #include "OTCore/VariableToStringConverter.h"
 
+#include "IndexHandler.h"
+
 ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, const std::string& _ownerServiceName)
 	:ResultCollectionMetadataAccess(_collectionName,&_modelComponent), m_requiresUpdateMetadataCampaign(false), m_ownerServiceName(_ownerServiceName)
 {}
@@ -126,6 +128,9 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescri
 
 	parameterIndices.insert(parameterIndices.end(), parameterIndicesNonConstant.begin(), parameterIndicesNonConstant.end());
 	quantityContainerSerialiser.storeDataPoints(_seriesMetadataIndex, parameterIndices, sharedParameterValues, allParameterValueIt, numberOfParameter, currentQuantityDescription);
+
+	IndexHandler indexHandler(m_collectionName);
+	indexHandler.createDefaultIndexes();
 }
 
 void ResultCollectionExtender::addCampaignMetadata(std::shared_ptr<MetadataEntry> _metadata)
