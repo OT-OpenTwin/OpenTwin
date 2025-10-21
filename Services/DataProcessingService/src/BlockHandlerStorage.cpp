@@ -71,6 +71,10 @@ bool BlockHandlerStorage::executeSpecialized()
 			const std::string portInvalidData = "Port " + portName + " received data in an invalid format. The input needs to be an array of json objects.";
 
 			auto pipelineByName = m_dataPerPort.find(portName);
+			if (pipelineByName == m_dataPerPort.end() || pipelineByName->second == nullptr)
+			{
+				throw std::exception(("No data found in port: " + portName).c_str());
+			}
 			PipelineData* dataPipeline = pipelineByName->second;
 
 			const MetadataCampaign* pipelineCampaign = dataPipeline->getMetadataCampaign();

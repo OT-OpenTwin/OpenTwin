@@ -8,6 +8,8 @@
 #include "OTGui/TableIndexSchemata.h"
 #include "EntityAPI.h"
 
+#include "EntityBlock.h"
+
 EntityBuffer& EntityBuffer::instance() {
 	static EntityBuffer g_instance;
 	return g_instance;
@@ -242,6 +244,10 @@ std::shared_ptr<EntityBase> EntityBuffer::loadEntity(const std::string& _absolut
 			throw std::exception(("Requested entity " + _absoluteEntityName + " does not exist.").c_str());
 		}
 		EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
+		if (entity == nullptr)
+		{
+			throw std::exception(("Failed to load entity: " + _absoluteEntityName).c_str());
+		}
 		m_bufferedEntities[_absoluteEntityName] = std::shared_ptr<EntityBase>(entity);
 	}
 	return m_bufferedEntities[_absoluteEntityName];
