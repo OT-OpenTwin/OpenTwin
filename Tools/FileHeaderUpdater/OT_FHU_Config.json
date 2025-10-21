@@ -1,0 +1,27 @@
+{
+    "Keyword.Start": "// @otlicense",
+    "Keyword.End": "// @otlicense-end",
+    "HeaderLinePrefix": "// ",
+    "LicenseFile": "%OPENTWIN_DEV_ROOT%/LICENSE.md",
+    "WarnMissingHeader": false,
+    "AddFileName": true,
+    "AddLicenseTitle": true,
+    "RootDirectories": [
+        "%OPENTWIN_DEV_ROOT%/Tools",
+        "%OPENTWIN_DEV_ROOT%/Libraries",
+        "%OPENTWIN_DEV_ROOT%/Services"
+    ],
+    "FileExtensions": [
+        ".c",
+        ".h",
+        ".hpp",
+        ".cpp"
+    ],
+    "BlacklistDirectories": [
+        "x64",
+        ".vs",
+        "AdminPanel",
+        "package",
+        "ThirdParty"
+    ]
+}
