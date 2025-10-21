@@ -99,6 +99,75 @@ TEST(VariableTest, JSONToVariable)
 	EXPECT_EQ(var.GetInt(), result.getInt32());
 }
 
+TEST(VariableTest, NumberConversionIntToDouble)
+{
+	int32_t expected = 5;
+	rapidjson::Value var(expected);
+
+	ot::JSONToVariableConverter converter;
+	ot::Variable result = converter(var,ot::TypeNames::getDoubleTypeName());
+
+	EXPECT_TRUE(result.isDouble());
+	EXPECT_EQ(var.GetDouble(), static_cast<double>(expected));
+}
+
+TEST(VariableTest, NumberConversionDoubleToInt)
+{
+	double expected = 5.;
+	rapidjson::Value var(expected);
+
+	ot::JSONToVariableConverter converter;
+	EXPECT_ANY_THROW(converter(var, ot::TypeNames::getInt32TypeName()), ::testing::ExitedWithCode(3), "");
+}
+
+TEST(VariableTest, NumberConversionInt64ToInt)
+{
+	int64_t expected = 5;
+	rapidjson::Value var(expected);
+
+	ot::JSONToVariableConverter converter;
+	ot::Variable result = converter(var, ot::TypeNames::getInt32TypeName());
+
+	EXPECT_TRUE(result.isInt32());
+	EXPECT_EQ(var.GetInt(), static_cast<int32_t>(expected));
+}
+
+TEST(VariableTest, NumberConversionIntToInt64)
+{
+	int32_t expected = 5;
+	rapidjson::Value var(expected);
+
+	ot::JSONToVariableConverter converter;
+	ot::Variable result = converter(var, ot::TypeNames::getInt64TypeName());
+
+	EXPECT_TRUE(result.isInt64());
+	EXPECT_EQ(var.GetInt64(), static_cast<int64_t>(expected));
+}
+
+TEST(VariableTest, NumberConversionFloatToDouble)
+{
+	float expected = 5.f;
+	rapidjson::Value var(expected);
+
+	ot::JSONToVariableConverter converter;
+	ot::Variable result = converter(var, ot::TypeNames::getDoubleTypeName());
+
+	EXPECT_TRUE(result.isDouble());
+	EXPECT_EQ(var.GetDouble(), static_cast<double>(expected));
+}
+
+TEST(VariableTest, NumberConversionDoubleToFloat)
+{
+	double expected = 5.;
+	rapidjson::Value var(expected);
+
+	ot::JSONToVariableConverter converter;
+	ot::Variable result = converter(var, ot::TypeNames::getFloatTypeName());
+
+	EXPECT_TRUE(result.isFloat());
+	EXPECT_EQ(var.GetFloat(), static_cast<float>(expected));
+}
+
 TEST(VariableTest, JSONToVariableNotSupportedType)
 {
 	rapidjson::Value var;

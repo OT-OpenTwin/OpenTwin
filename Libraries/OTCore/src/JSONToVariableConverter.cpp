@@ -44,23 +44,59 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 	
 	if (_type == ot::TypeNames::getStringTypeName())
 	{
-		return ot::Variable(value.GetString());
+		if (value.IsString())
+		{
+			return ot::Variable(value.GetString());
+		}
+		else
+		{ 
+			throw std::exception("Cast to variant not possible due to type mismatch");
+		}
 	}
 	else if (_type == ot::TypeNames::getInt32TypeName())
 	{
-		return ot::Variable(value.GetInt());
+		if (value.IsInt64() || value.IsInt())
+		{
+			return ot::Variable(value.GetInt());
+		}
+		else
+		{
+			throw std::exception("Cast to variant not possible due to type mismatch");
+		}
 	}
 	else if (_type == ot::TypeNames::getInt64TypeName())
 	{
-		return ot::Variable(value.GetInt64());
+		if (value.IsInt64() || value.IsInt())
+		{
+			return ot::Variable(value.GetInt64());
+		}
+		else
+		{
+			throw std::exception("Cast to variant not possible due to type mismatch");
+		}
 	}
 	else if (_type == ot::TypeNames::getFloatTypeName())
 	{
-		return ot::Variable(value.GetFloat());
+		if (value.IsNumber())
+		{
+			return ot::Variable(value.GetFloat());
+		}
+		else
+		{
+			throw std::exception("Cast to variant not possible due to type mismatch");
+		}
 	}
 	else if (_type == ot::TypeNames::getDoubleTypeName())
 	{
-		return ot::Variable(value.GetDouble());
+		if (value.IsNumber())
+		{
+			return ot::Variable(value.GetDouble());
+
+		}
+		else
+		{
+			throw std::exception("Cast to variant not possible due to type mismatch");
+		}
 	}
 	else if (_type == ot::TypeNames::getBoolTypeName())
 	{
@@ -96,19 +132,19 @@ bool ot::JSONToVariableConverter::typeIsCompatible(const JsonValue& value, const
 	}
 	else if (_type == ot::TypeNames::getInt32TypeName())
 	{		
-		compatible = value.IsInt();
+		compatible = value.IsInt() || value.IsNumber();
 	}
 	else if (_type == ot::TypeNames::getInt64TypeName())
 	{
-		compatible =  value.IsInt64();
+		compatible =  value.IsInt64() || value.IsNumber();
 	}
 	else if (_type == ot::TypeNames::getFloatTypeName())
 	{
-		compatible = value.IsFloat();
+		compatible = value.IsFloat() || value.IsNumber();
 	}
 	else if (_type == ot::TypeNames::getDoubleTypeName())
 	{
-		compatible = value.IsDouble();
+		compatible = value.IsDouble() || value.IsNumber();
 	}
 	else if (_type == ot::TypeNames::getBoolTypeName())
 	{
