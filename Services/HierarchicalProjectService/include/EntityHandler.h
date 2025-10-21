@@ -19,30 +19,44 @@
 
 class EntityHandler : public BusinessLogicHandler {
 public:
-	EntityHandler();
+	EntityHandler() = delete;
+	EntityHandler(const std::string& _rootFolderPath);
 	virtual ~EntityHandler();
 
-	std::shared_ptr<EntityBlockHierarchicalProjectItem> createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo, const ot::EntityInformation& _parentEntity);
+	void createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo);
 
 	bool addConnection(const ot::GraphicsConnectionCfg& _connection);
 
-	void addDocument(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities);
-	void addDocuments(const ot::EntityInformation& _containerInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
-
-	void addBackgroundImage(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities);
-	void addBackgroundImages(const ot::EntityInformation& _containerInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
+private:
+	void addDocument(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities);
+public:
+	void addDocuments(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
+private:
+	void addBackgroundImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities);
+public:
+	void addBackgroundImages(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
 
 	bool addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter);
 	bool removeImageFromProjects(const std::list<ot::EntityInformation>& _projects);
 
-	void addContainer(const ot::EntityInformation& _containerInfo);
+	void addContainer();
 
 	ot::ReturnMessage updateDocumentText(EntityBlockHierarchicalDocumentItem* _documentItem, const std::string& _content);
 
 private:
 	bool getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const;
 	bool getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) const;
-
-	const std::string c_connectionsFolder = "Connections";
+	
+	const std::string c_rootFolderPath;
+	const std::string c_projectsFolder;
+	const std::string c_projectsFolderName = "Projects";
+	const std::string c_documentsFolder;
+	const std::string c_documentsFolderName = "Documents";
+	const std::string c_containerFolder;
+	const std::string c_containerFolderName = "Container";
+	const std::string c_backgroundFolder;
+	const std::string c_backgroundFolderName = "Background";
+	const std::string c_connectionsFolder;
+	const std::string c_connectionsFolderName = "Connections";
 
 };

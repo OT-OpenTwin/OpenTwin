@@ -50,7 +50,8 @@
 #include <thread>
 
 Application::Application() :
-	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_HierarchicalProjectService, OT_INFO_SERVICE_TYPE_HierarchicalProjectService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier())
+	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_HierarchicalProjectService, OT_INFO_SERVICE_TYPE_HierarchicalProjectService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier()),
+	m_entityHandler(EntityHierarchicalScene::defaultName())
 {
 	// Connect callback action handlers
 	connectAction(c_setProjectEntitySelectedAction, this, &Application::handleSetProjectEntitySelected);
@@ -92,12 +93,12 @@ Application::Application() :
 
 	m_addImageToProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Add Image", "Hierarchical/AddImage");
 	m_addImageToProjectButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
-	m_addImageToProjectButton.setButtonToolTip("Add an image to the selected project.");
+	m_addImageToProjectButton.setButtonToolTip("Add an image to the selected item.");
 	connectToolBarButton(m_addImageToProjectButton, this, &Application::handleAddImageToProject);
 
 	m_removeImageFromProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Remove Image", "Hierarchical/RemoveImage");
 	m_removeImageFromProjectButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
-	m_removeImageFromProjectButton.setButtonToolTip("Remove the image from the selected projects.");
+	m_removeImageFromProjectButton.setButtonToolTip("Remove the image(s) from the selected item(s).");
 	connectToolBarButton(m_removeImageFromProjectButton, this, &Application::handleRemoveImageFromProject);
 }
 
@@ -268,13 +269,7 @@ void Application::handleProjectSelected(ot::JsonDocument& _doc) {
 		return;
 	}
 
-	ot::EntityInformation rootInfo;
-	if (!ot::ModelServiceAPI::getEntityInformation(EntityHierarchicalScene::defaultName(), rootInfo)) {
-		OT_LOG_E("Could not determine entity information for root hierarchical scene");
-		return;
-	}
-
-	m_entityHandler.createProjectItemBlockEntity(info, rootInfo);
+	m_entityHandler.createProjectItemBlockEntity(info);
 }
 
 void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
@@ -283,13 +278,7 @@ void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
 	std::list<std::string> fileNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
 
-	ot::EntityInformation info;
-	if (!ot::ModelServiceAPI::getEntityInformation(EntityHierarchicalScene::defaultName(), info)) {
-		OT_LOG_E("Could not determine entity information for root hierarchical scene");
-		return;
-	}
-
-	m_entityHandler.addDocuments(info, fileNames, contents, uncompressedDataLengths, fileFilter);
+	m_entityHandler.addDocuments(fileNames, contents, uncompressedDataLengths, fileFilter);
 }
 
 void Application::handleBackgroundImageSelected(ot::JsonDocument& _doc) {
@@ -298,13 +287,7 @@ void Application::handleBackgroundImageSelected(ot::JsonDocument& _doc) {
 	std::list<std::string> fileNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
 
-	ot::EntityInformation info;
-	if (!ot::ModelServiceAPI::getEntityInformation(EntityHierarchicalScene::defaultName(), info)) {
-		OT_LOG_E("Could not determine entity information for root hierarchical scene");
-		return;
-	}
-
-	m_entityHandler.addBackgroundImages(info, fileNames, contents, uncompressedDataLengths, fileFilter);
+	m_entityHandler.addBackgroundImages(fileNames, contents, uncompressedDataLengths, fileFilter);
 }
 
 void Application::handleImageSelected(ot::JsonDocument& _doc) {
@@ -345,13 +328,7 @@ void Application::handleAddProject() {
 }
 
 void Application::handleAddContainer() {
-	ot::EntityInformation rootInfo;
-	if (!ot::ModelServiceAPI::getEntityInformation(EntityHierarchicalScene::defaultName(), rootInfo)) {
-		OT_LOG_E("Failed to determine root entity information");
-		return;
-	}
-
-	m_entityHandler.addContainer(rootInfo);
+	m_entityHandler.addContainer();
 }
 
 void Application::handleAddDocument() {

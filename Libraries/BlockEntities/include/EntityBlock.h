@@ -40,6 +40,7 @@ public:
 	void setServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; };
 	ot::BasicServiceInformation getServiceInformation() const { return m_info; };
 
+	void setCoordinateEntity(const EntityCoordinates2D& _coordinateEntity) { m_coordinate2DEntityID = _coordinateEntity.getEntityID(); };
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { m_coordinate2DEntityID = coordinateEntityID; };
 
 	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return m_connectorsByName; }

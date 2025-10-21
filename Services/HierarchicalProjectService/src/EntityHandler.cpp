@@ -27,8 +27,12 @@
 #include "EntityBlockHierarchicalDocumentItem.h"
 #include "EntityBlockHierarchicalContainerItem.h"
 
-EntityHandler::EntityHandler() : 
-	BusinessLogicHandler()
+EntityHandler::EntityHandler(const std::string& _rootFolderPath) :
+	BusinessLogicHandler(), c_rootFolderPath(_rootFolderPath), c_projectsFolder(_rootFolderPath + "/Projects"),
+	c_backgroundFolder(_rootFolderPath + "/Background"), c_documentsFolder(_rootFolderPath + "/Documents"),
+	c_containerFolder(_rootFolderPath + "/Container"), c_connectionsFolder(_rootFolderPath + "/Connections"),
+	c_projectsFolderName("Projects"), c_documentsFolderName("Documents"), c_containerFolderName("Container"), c_backgroundFolderName("Background"),
+	c_connectionsFolderName("Connections")
 {
 
 }
@@ -37,44 +41,53 @@ EntityHandler::~EntityHandler() {
 
 }
 
-std::shared_ptr<EntityBlockHierarchicalProjectItem> EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo, const ot::EntityInformation& _parentEntity) {
-	std::shared_ptr<EntityBlockHierarchicalProjectItem> blockEntity(new EntityBlockHierarchicalProjectItem);
+void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo) {
+	ot::NewModelStateInfo newEntities;
+
+	// Create container if it does not exist
+	ot::EntityInformation containerInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(c_projectsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
+		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		container.setName(c_projectsFolder);
+
+		container.storeToDataBase();
+
+		newEntities.addTopologyEntity(container);
+	}
 
 	const std::string serviceName = Application::instance().getServiceName();
 
-	// Setup the entity
-	blockEntity->setServiceInformation(Application::instance().getBasicServiceInformation());
-	blockEntity->setOwningService(serviceName);
-	blockEntity->setEntityID(_modelComponent->createEntityUID());
+	// Create coordinates
+	EntityCoordinates2D blockCoordinates;
+	blockCoordinates.setEntityID(_modelComponent->createEntityUID());
+	blockCoordinates.setOwningService(serviceName);
+	blockCoordinates.storeToDataBase();
 
-	// Initialize coordinate
-	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, serviceName));
-	blockCoordinates->storeToDataBase();
-	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
-
-	// Initialize entity name
-	std::string entName = CreateNewUniqueTopologyName(_parentEntity.getEntityName(), _projectInfo.getProjectName());
-	blockEntity->setName(entName);
+	// Create block
+	EntityBlockHierarchicalProjectItem blockEntity;
+	blockEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
+	blockEntity.setOwningService(serviceName);
+	blockEntity.setEntityID(_modelComponent->createEntityUID());
+	blockEntity.setName(CreateNewUniqueTopologyName(c_projectsFolder, _projectInfo.getProjectName()));
+	blockEntity.setCoordinateEntity(blockCoordinates);
+	blockEntity.setGraphicsScenePackageChildName(c_projectsFolderName);
 
 	// Initialize project information
-	blockEntity->createProperties();
-	blockEntity->setProjectInformation(_projectInfo);
+	blockEntity.createProperties();
+	blockEntity.setProjectInformation(_projectInfo);
 
 	// Store to DB
-	blockEntity->storeToDataBase();
-	ot::ModelServiceAPI::addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Child Project: " + _projectInfo.getProjectName());
+	blockEntity.storeToDataBase();
 
-	return blockEntity;
+	newEntities.addDataEntity(blockEntity, blockCoordinates);
+	newEntities.addTopologyEntity(blockEntity);
+
+	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added Child Project: " + _projectInfo.getProjectName());
 }
 
 bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) {
 	// Check if container exists
-	ot::EntityInformation containerInfo;
-	
-	const std::string folderPath = EntityHierarchicalScene::defaultName() + "/" + c_connectionsFolder;
-
-	ot::UIDList newTopo;
-	ot::UIDList newVersions;
+	ot::NewModelStateInfo newEntities;
 
 	std::string connectionFromName = "From";
 	std::string connectionToName = "To";
@@ -90,17 +103,17 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	}
 
 	// Create container if it does not exist
-	if (!ot::ModelServiceAPI::getEntityInformation(folderPath, containerInfo) || containerInfo.getEntityName().empty()) {
+	ot::EntityInformation containerInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(c_connectionsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
 		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
-		container.setName(folderPath);
+		container.setName(c_connectionsFolder);
 		
 		container.storeToDataBase();
 
-		newTopo.push_back(container.getEntityID());
-		newVersions.push_back(container.getEntityStorageVersion());
+		newEntities.addTopologyEntity(container);
 	}
 
-	std::string newConnectionName = CreateNewUniqueTopologyName(folderPath, connectionFromName + " >> " + connectionToName);
+	std::string newConnectionName = CreateNewUniqueTopologyName(c_connectionsFolder, connectionFromName + " >> " + connectionToName);
 
 	// Create connection entity
 	EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
@@ -116,20 +129,19 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	//Now i set the attirbutes of connectionEntity
 	connectionEntity.setConnectionCfg(newConnection);
 	connectionEntity.setName(newConnectionName);
-	connectionEntity.setGraphicsScenePackageChildName(c_connectionsFolder);
+	connectionEntity.setGraphicsScenePackageChildName(c_connectionsFolderName);
 	connectionEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
 	connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	connectionEntity.storeToDataBase();
 
-	newTopo.push_back(connectionEntity.getEntityID());
-	newVersions.push_back(connectionEntity.getEntityStorageVersion());
+	newEntities.addTopologyEntity(connectionEntity);
 
-	ot::ModelServiceAPI::updateTopologyEntities(newTopo, newVersions, "Connection added");
+	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Connection added");
 
 	return true;
 }
 
-void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
+void EntityHandler::addDocument(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
 	ot::FileExtension::DefaultFileExtension extension = ot::FileExtension::DefaultFileExtension::Unknown;
 	std::string fileNameOnly;
 	std::string extensionString;
@@ -145,18 +157,20 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 	// Create container
 	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
 
+	const ot::UID blockUid = _modelComponent->createEntityUID();
+
 	// Create data entity
 	EntityBinaryData dataEntity;
 	dataEntity.setOwningService(serviceName);
 	dataEntity.setEntityID(_modelComponent->createEntityUID());
 	dataEntity.setData(std::move(fileData));
 	dataEntity.storeToDataBase();
-	_newEntities.addDataEntity(_containerInfo.getEntityID(), dataEntity);
+	_newEntities.addDataEntity(blockUid, dataEntity);
 
 	ot::UID documentEntityID = ot::invalidUID;
 	ot::UID documentEntityVersion = ot::invalidUID;
 
-	const std::string newDocumentName = CreateNewUniqueTopologyName(_containerInfo.getEntityName(), fileNameOnly + "." + extensionString);
+	const std::string newDocumentName = CreateNewUniqueTopologyName(c_documentsFolder, fileNameOnly + "." + extensionString);
 
 	// Try to create entity from extension
 	{
@@ -173,7 +187,7 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 				fileEntity->setEditable(false);
 				fileEntity->setDeletable(false);
 				fileEntity->storeToDataBase();
-				_newEntities.addDataEntity(_containerInfo.getEntityID(), *fileEntity);
+				_newEntities.addDataEntity(blockUid, *fileEntity);
 
 				documentEntityID = fileEntity->getEntityID();
 				documentEntityVersion = fileEntity->getEntityStorageVersion();
@@ -192,7 +206,7 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 			rawDataEntity.setEditable(false);
 			rawDataEntity.setDeletable(false);
 			rawDataEntity.storeToDataBase();
-			_newEntities.addDataEntity(_containerInfo.getEntityID(), rawDataEntity);
+			_newEntities.addDataEntity(blockUid, rawDataEntity);
 
 			documentEntityID = rawDataEntity.getEntityID();
 			documentEntityVersion = rawDataEntity.getEntityStorageVersion();
@@ -206,14 +220,15 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 	coord.setOwningService(serviceName);
 	coord.setEntityID(_modelComponent->createEntityUID());
 	coord.storeToDataBase();
-	_newEntities.addDataEntity(_containerInfo.getEntityID(), coord);
+	_newEntities.addDataEntity(blockUid, coord);
 
 	// Create block entity
 	EntityBlockHierarchicalDocumentItem blockEntity;
 	blockEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
 	blockEntity.setOwningService(serviceName);
-	blockEntity.setEntityID(_modelComponent->createEntityUID());
+	blockEntity.setEntityID(blockUid);
 	blockEntity.setName(newDocumentName);
+	blockEntity.setGraphicsScenePackageChildName(c_documentsFolderName);
 	blockEntity.createProperties();
 	blockEntity.setEditable(true);
 	blockEntity.setCoordinateEntityID(coord.getEntityID());
@@ -222,15 +237,26 @@ void EntityHandler::addDocument(const ot::EntityInformation& _containerInfo, con
 	_newEntities.addTopologyEntity(blockEntity);
 }
 
-void EntityHandler::addDocuments(const ot::EntityInformation& _containerInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
+void EntityHandler::addDocuments(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
 	ot::NewModelStateInfo newEntities;
+
+	// Create container if it does not exist
+	ot::EntityInformation containerInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(c_documentsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
+		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		container.setName(c_documentsFolder);
+
+		container.storeToDataBase();
+
+		newEntities.addTopologyEntity(container);
+	}
 
 	auto nameIt = _fileNames.begin();
 	auto contentIt = _fileContent.begin();
 	auto lengthIt = _uncompressedDataLength.begin();
 
 	for (; nameIt != _fileNames.end() && contentIt != _fileContent.end() && lengthIt != _uncompressedDataLength.end(); nameIt++, contentIt++, lengthIt++) {
-		addDocument(_containerInfo, *nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
+		addDocument(*nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
 	}
 
 	if (newEntities.hasEntities()) {
@@ -238,7 +264,7 @@ void EntityHandler::addDocuments(const ot::EntityInformation& _containerInfo, co
 	}
 }
 
-void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerInfo, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
+void EntityHandler::addBackgroundImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
 	// Unpack data
 	std::string unpackedData = ot::String::decompressedBase64(_fileContent, _uncompressedDataLength);
 
@@ -270,7 +296,6 @@ void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerIn
 	imageDataEntity.setEntityID(_modelComponent->createEntityUID());
 	imageDataEntity.setData(std::move(fileData));
 	imageDataEntity.storeToDataBase();
-	_newEntities.addDataEntity(_containerInfo.getEntityID(), imageDataEntity);
 
 	// Create background image entity
 	EntityFileImage imageEntity;
@@ -280,38 +305,53 @@ void EntityHandler::addBackgroundImage(const ot::EntityInformation& _containerIn
 	imageEntity.setImageFormat(format);
 	imageEntity.setDataEntity(imageDataEntity);
 	imageEntity.storeToDataBase();
-	_newEntities.addDataEntity(_containerInfo.getEntityID(), imageEntity);
 
 	// Create coordinate entity
 	EntityCoordinates2D coord;
 	coord.setOwningService(serviceName);
 	coord.setEntityID(_modelComponent->createEntityUID());
 	coord.storeToDataBase();
-	_newEntities.addDataEntity(_containerInfo.getEntityID(), coord);
 
 	// Create background image block entity
 	EntityBlockImage backgroundImageEntity;
 	backgroundImageEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
 	backgroundImageEntity.setOwningService(serviceName);
 	backgroundImageEntity.setEntityID(_modelComponent->createEntityUID());
-	backgroundImageEntity.setName(CreateNewUniqueTopologyName(_containerInfo.getEntityName(), newName));
+	backgroundImageEntity.setName(CreateNewUniqueTopologyName(c_backgroundFolder, newName));
+	backgroundImageEntity.setGraphicsScenePackageChildName(c_backgroundFolderName);
 	backgroundImageEntity.createProperties();
 	backgroundImageEntity.setEditable(true);
 	backgroundImageEntity.setCoordinateEntityID(coord.getEntityID());
 	backgroundImageEntity.setImageEntity(imageEntity);
 	backgroundImageEntity.storeToDataBase();
+
+	// Add to new entities
+	_newEntities.addDataEntity(backgroundImageEntity.getEntityID(), imageDataEntity);
+	_newEntities.addDataEntity(backgroundImageEntity.getEntityID(), imageEntity);
+	_newEntities.addDataEntity(backgroundImageEntity.getEntityID(), coord);
 	_newEntities.addTopologyEntity(backgroundImageEntity);
 }
 
-void EntityHandler::addBackgroundImages(const ot::EntityInformation& _containerInfo, const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
+void EntityHandler::addBackgroundImages(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
 	ot::NewModelStateInfo newEntities;
+
+	// Create container if it does not exist
+	ot::EntityInformation containerInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(c_backgroundFolder, containerInfo) || containerInfo.getEntityName().empty()) {
+		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		container.setName(c_backgroundFolder);
+
+		container.storeToDataBase();
+
+		newEntities.addTopologyEntity(container);
+	}
 
 	auto nameIt = _fileNames.begin();
 	auto contentIt = _fileContent.begin();
 	auto lengthIt = _uncompressedDataLength.begin();
 	
 	for (; nameIt != _fileNames.end() && contentIt != _fileContent.end() && lengthIt != _uncompressedDataLength.end(); nameIt++, contentIt++, lengthIt++) {
-		addBackgroundImage(_containerInfo, *nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
+		addBackgroundImage(*nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
 	}
 
 	if (newEntities.hasEntities()) {
@@ -462,7 +502,7 @@ bool EntityHandler::removeImageFromProjects(const std::list<ot::EntityInformatio
 	return true;
 }
 
-void EntityHandler::addContainer(const ot::EntityInformation& _containerInfo) {
+void EntityHandler::addContainer() {
 	ot::NewModelStateInfo newEntities;
 
 	const std::string serviceName = Application::instance().getServiceName();
@@ -472,18 +512,20 @@ void EntityHandler::addContainer(const ot::EntityInformation& _containerInfo) {
 	coord.setOwningService(serviceName);
 	coord.setEntityID(_modelComponent->createEntityUID());
 	coord.storeToDataBase();
-	newEntities.addDataEntity(_containerInfo.getEntityID(), coord);
 
 	EntityBlockHierarchicalContainerItem newContainer;
 
 	newContainer.setEditable(true);
 	newContainer.setEntityID(_modelComponent->createEntityUID());
-	newContainer.setName(CreateNewUniqueTopologyName(_containerInfo.getEntityName(), "Container"));
+	newContainer.setName(CreateNewUniqueTopologyName(c_containerFolder, "Container"));
 	newContainer.setServiceInformation(Application::instance().getBasicServiceInformation());
+	newContainer.setGraphicsScenePackageChildName(c_containerFolderName);
 	newContainer.setOwningService(serviceName);
 	newContainer.setSelectChildren(false);
 	newContainer.setCoordinateEntityID(coord.getEntityID());
 	newContainer.storeToDataBase();
+
+	newEntities.addDataEntity(newContainer.getEntityID(), coord);
 	newEntities.addTopologyEntity(newContainer);
 
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added hierarchical container", true, true);
