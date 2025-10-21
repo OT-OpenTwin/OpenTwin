@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerEnvironment>PATH=$(OT_SYSTEM_ROOT)\$(OT_DLLD);$(OT_CORE_ROOT)\$(OT_DLLD);%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_SYSTEM_ROOT)\$(OT_DLLD);$(OT_CORE_ROOT)\$(OT_DLLD);$(ZLIB_DLLPATHD);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
