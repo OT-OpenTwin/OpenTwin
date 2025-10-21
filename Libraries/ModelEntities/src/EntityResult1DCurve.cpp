@@ -92,6 +92,12 @@ bool EntityResult1DCurve::updateFromProperties() {
 	curveCfg.addToJsonObject(curveCfgSerialised, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgSerialised,doc.GetAllocator());
 
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
+	visualisationCfg.setOverrideViewerContent(false);
+	visualisationCfg.setAsActiveView(true);
+
+	doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
 	getObserver()->sendMessageToViewer(doc);
 
 	return this->updatePropertyVisibilities();
