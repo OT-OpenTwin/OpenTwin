@@ -14,16 +14,17 @@ namespace ot
 			if (_graphicsSceneChildName != "")
 			{
 
-				size_t numberOfFindings = ot::String::count(_entityName, _graphicsSceneChildName);
-				if (numberOfFindings != 1)
-				{
-					OT_LOG_E("Failed to determine the name of the associated graphics scene.");
-				}
-				else
-				{
+				// Would fail if the item name is the same as the container: root/data/data
+				//size_t numberOfFindings = ot::String::count(_entityName, _graphicsSceneChildName);
+				//if (numberOfFindings != 1)
+					//{
+					//OT_LOG_E("Failed to determine the name of the associated graphics scene.");
+					//}
+				//else
+					//{
 					size_t childOfGraphicsScenePos = _entityName.find(_graphicsSceneChildName);
 					packageName = _entityName.substr(0, childOfGraphicsScenePos - 1);
-				}
+				//}
 			}
 			else
 			{

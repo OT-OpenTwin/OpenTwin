@@ -28,11 +28,14 @@
 #include "EntityBlockHierarchicalContainerItem.h"
 
 EntityHandler::EntityHandler(const std::string& _rootFolderPath) :
-	BusinessLogicHandler(), c_rootFolderPath(_rootFolderPath), c_projectsFolder(_rootFolderPath + "/Projects"),
+	// Initialize constants: Paths
+	c_rootFolderPath(_rootFolderPath), c_projectsFolder(_rootFolderPath + "/Projects"),
 	c_backgroundFolder(_rootFolderPath + "/Background"), c_documentsFolder(_rootFolderPath + "/Documents"),
 	c_containerFolder(_rootFolderPath + "/Container"), c_connectionsFolder(_rootFolderPath + "/Connections"),
-	c_projectsFolderName("Projects"), c_documentsFolderName("Documents"), c_containerFolderName("Container"), c_backgroundFolderName("Background"),
-	c_connectionsFolderName("Connections")
+
+	// Initialize constants: Names
+	c_projectsFolderName("Projects"), c_documentsFolderName("Documents"), c_containerFolderName("Container"), 
+	c_backgroundFolderName("Background"), c_connectionsFolderName("Connections")
 {
 
 }

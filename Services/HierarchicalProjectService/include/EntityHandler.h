@@ -49,14 +49,14 @@ private:
 	
 	const std::string c_rootFolderPath;
 	const std::string c_projectsFolder;
-	const std::string c_projectsFolderName = "Projects";
+	const std::string c_projectsFolderName;
 	const std::string c_documentsFolder;
-	const std::string c_documentsFolderName = "Documents";
+	const std::string c_documentsFolderName;
 	const std::string c_containerFolder;
-	const std::string c_containerFolderName = "Container";
+	const std::string c_containerFolderName;
 	const std::string c_backgroundFolder;
-	const std::string c_backgroundFolderName = "Background";
+	const std::string c_backgroundFolderName;
 	const std::string c_connectionsFolder;
-	const std::string c_connectionsFolderName = "Connections";
+	const std::string c_connectionsFolderName;
 
 };
