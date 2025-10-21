@@ -74,6 +74,10 @@ bool BlockHandlerStorage::executeSpecialized()
 			PipelineData* dataPipeline = pipelineByName->second;
 
 			const MetadataCampaign* pipelineCampaign = dataPipeline->getMetadataCampaign();
+			if (pipelineCampaign == nullptr)
+			{
+				throw std::exception(("Metadata are missing in port: " + portName).c_str());
+			}
 			auto pipelineCampaignQuantitiesByLabel = pipelineCampaign->getMetadataQuantitiesByLabel();
 			auto pipelineCampaignParametersByLabel = pipelineCampaign->getMetadataParameterByLabel();
 
@@ -189,8 +193,7 @@ bool BlockHandlerStorage::executeSpecialized()
 										auto campaignParameterByLabel = pipelineCampaignParametersByLabel.find(key);
 										if (campaignParameterByLabel == pipelineCampaignParametersByLabel.end())
 										{
-											//Error case
-											assert(false);
+											throw std::exception(("Field " + key + " is neither defined as quantity nor as parameter in the campaign metadata.").c_str());
 										}
 										else
 										{
@@ -203,6 +206,7 @@ bool BlockHandlerStorage::executeSpecialized()
 
 									MetadataParameter& param = occurringParameterByLabel->second;
 									const std::string typeName = param.typeName;
+									
 									if (typeName != "")
 									{
 										param.values.push_back(converter(fieldValue, typeName));

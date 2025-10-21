@@ -87,7 +87,12 @@ bool BlockHandlerPython::executeSpecialized()
                 {
                     auto& portValues = valueIt->value;
                     PipelineData pipelineData;
-
+                    
+                    if(portValues.HasMember("Data") == false || portValues.HasMember("Meta") == false)
+                    {
+                        throw std::exception(("Output port " + portName + " is missing 'Data' or 'Meta' fields.").c_str());
+                        
+					}
                     pipelineData.setData(std::move(portValues["Data"]));
                     const std::string tt = ot::json::toJson(portValues["Meta"]);
                     pipelineData.setMetadata(std::move(portValues["Meta"]));
