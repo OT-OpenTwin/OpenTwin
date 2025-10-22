@@ -59,10 +59,13 @@ namespace ot { class TableView; };
 namespace ot { class WidgetView; };
 namespace ot { class ServiceBase; };
 namespace ot { class PlotDataset; };
+namespace ot { class TemporaryDir; };
 
 class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::ActionHandler {
 	Q_OBJECT
-	OT_DECL_ACTION_HANDLER(ExternalServicesComponent)
+	OT_DECL_NOCOPY(ExternalServicesComponent)
+	OT_DECL_NOMOVE(ExternalServicesComponent)
+	OT_DECL_NODEFAULT(ExternalServicesComponent)
 public:
 	enum RequestType {
 		EXECUTE,
@@ -476,7 +479,7 @@ private:
 
 	std::string										m_modelServiceURL;
 
-	QString                                         m_tempFolderPath;
+	std::unique_ptr<ot::TemporaryDir>				m_tempFolder;
 
 	std::map<std::string, ot::UID>					m_serviceToUidMap;
 	std::map<ot::serviceID_t, ServiceDataUi*>	    m_serviceIdMap;
@@ -490,10 +493,6 @@ private:
 	
 	bool											m_prefetchingDataCompleted;
 	bool                                            m_servicesUiSetupCompleted;
-
-	ExternalServicesComponent() = delete;
-	ExternalServicesComponent(ExternalServicesComponent &) = delete;
-	ExternalServicesComponent & operator = (ExternalServicesComponent &) = delete;
 };
 
 namespace ot {

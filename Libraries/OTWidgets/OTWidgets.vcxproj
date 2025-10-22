@@ -124,6 +124,7 @@
     <ClCompile Include="src\PlotView.cpp" />
     <ClCompile Include="src\PolarPlotCurve.cpp" />
     <ClCompile Include="src\SelectionData.cpp" />
+    <ClCompile Include="src\TemporaryDir.cpp" />
     <ClCompile Include="src\TreeItemDelegate.cpp" />
     <ClCompile Include="src\WidgetPropertyManager.cpp" />
     <ClCompile Include="src\PlotDatasetData.cpp" />
@@ -285,6 +286,7 @@
     <ClInclude Include="include\OTWidgets\PlotView.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotCurve.h" />
     <ClInclude Include="include\OTWidgets\SelectionData.h" />
+    <ClInclude Include="include\OTWidgets\TemporaryDir.h" />
     <ClInclude Include="include\OTWidgets\TreeItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\WidgetPropertyManager.h" />
     <ClInclude Include="include\OTWidgets\PlotDatasetData.h" />

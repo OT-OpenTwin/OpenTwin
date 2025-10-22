@@ -105,11 +105,11 @@ private:
 
 	ot::ReturnMessage requestToOpenDocument(const ot::EntityInformation& _entity);
 
-	ot::ReturnMessage requestToOpenRawDataDocument(EntityBase* _entity);
+	ot::ReturnMessage requestToOpenRawDataDocument(EntityBase* _entity, const std::string& _blockEntityName);
 
-	ot::ReturnMessage requestToOpenTextDocument(EntityBase* _entity);
+	ot::ReturnMessage requestToOpenTextDocument(EntityBase* _entity, const std::string& _blockEntityName);
 
-	ot::ReturnMessage requestToOpenCSVDocument(EntityBase* _entity);
+	ot::ReturnMessage requestToOpenCSVDocument(EntityBase* _entity, const std::string& _blockEntityName);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

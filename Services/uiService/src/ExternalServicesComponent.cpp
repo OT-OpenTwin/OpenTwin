@@ -58,6 +58,7 @@
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/PropertyGrid.h"
+#include "OTWidgets/TemporaryDir.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/MessageDialog.h"
@@ -152,8 +153,6 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 {
 	m_controlsManager = new ControlsManager;
 	m_lockManager = new LockManager(m_owner);
-
-	m_tempFolderPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/OpenTwin/Temp";
 
 	// Connect action handler
 
@@ -1345,6 +1344,14 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		OT_LOG_D("Open project completed, waiting for run and startup completed");
 
+		// Create unique temp folder for this session
+		m_tempFolder.reset(new ot::TemporaryDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/OpenTwin"));
+		
+		if (!m_tempFolder->isValid()) {
+			OT_LOG_E("Failed to create temporary folder for session");
+			m_tempFolder.reset();
+		}
+
 		// Process buffered actions
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotProcessActionBuffer, Qt::QueuedConnection);
 
@@ -1477,6 +1484,9 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		m_currentSessionID = "";
 		app->clearSessionInformation();
 
+		// Clean up temporary files
+		m_tempFolder.reset();
+
 		app->replaceInfoMessage(c_buildInfo);
 
 		if (m_websocket != nullptr) {
@@ -1485,15 +1495,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		}
 
 		m_actionBuffer.clear();
-
-		// Clean up temporary files
-		QDir tmpDir(m_tempFolderPath);
-		if (tmpDir.exists()) {
-			if (!tmpDir.removeRecursively()) {
-				OT_LOG_W("Failed to remove temporary folder at \"" + m_tempFolderPath.toStdString() + "\"");
-			}
-		}
-
+		
 		OT_LOG_D("Close project done");
 
 		ot::LogDispatcher::instance().setProjectName("");
@@ -2174,6 +2176,12 @@ void ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocument& _d
 }
 
 void ExternalServicesComponent::handleOpenRawFile(ot::JsonDocument& _document) {
+	if (!m_tempFolder) {
+		OT_LOG_E("Temporary folder is not initialized. Can not create temporary file...");
+		return;
+	}
+	
+	std::string entityName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
 	std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
 	std::string fileType = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Type);
 	std::string compressedData = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
@@ -2184,39 +2192,23 @@ void ExternalServicesComponent::handleOpenRawFile(ot::JsonDocument& _document) {
 	QByteArray byteArray = QByteArray::fromRawData(fileContent.c_str(), uncompressedDataLength);
 
 	// Determine a temporary file name
-	QDir dir;
-	if (!dir.exists(m_tempFolderPath)) {
-		dir.mkpath(m_tempFolderPath);
-	}
-
-	QString qFileName = QString::fromStdString(fileName);
 	QString suffix = "." + QString::fromStdString(fileType);
+	QString qFileName = QString::fromStdString(fileName) + suffix;
 
-	QString newFileName = m_tempFolderPath + "/" + qFileName + suffix;
-	int ct = 1;
-	while (QFile::exists(newFileName)) {
-		newFileName = newFileName = m_tempFolderPath + "/" + qFileName + "_" + QString::number(ct++) + suffix;
-	}
-
-	// Store the data in the temporary file
-	QFile file(newFileName);
-	if (!file.open(QIODevice::WriteOnly)) {
-		OT_LOG_EAS("Failed to open temporary file \"" + newFileName.toStdString() + "\" for writing");
+	if (!m_tempFolder->addFile(entityName, qFileName, byteArray, true)) {
 		return;
 	}
-	file.write(byteArray);
-	file.close();
+	
+	auto info = m_tempFolder->getFileEntry(entityName);
 
 	// Launch the file with the associated application
-	if (!QDesktopServices::openUrl(QUrl::fromLocalFile(newFileName))) {
-		OT_LOG_EAS("Failed to open temporary file \"" + newFileName.toStdString() + "\" with associated application");
+	if (!QDesktopServices::openUrl(QUrl::fromLocalFile(info.fullPath))) {
+		OT_LOG_EAS("Failed to open temporary file \"" + info.fullPath.toStdString() + "\" with associated application");
 
-		// Cleanup the temporary file
-		QFile::remove(newFileName);
-		return;
+		m_tempFolder->removeFile(entityName);
 	}
 	else {
-		AppBase::instance()->appendInfoMessage("Opened file \"" + newFileName + "\"\n");
+		AppBase::instance()->appendInfoMessage("Opened file \"" + info.fullPath + "\"\n");
 	}
 }
 

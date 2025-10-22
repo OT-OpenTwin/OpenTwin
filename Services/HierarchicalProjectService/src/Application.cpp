@@ -565,13 +565,13 @@ ot::ReturnMessage Application::requestToOpenDocument(const ot::EntityInformation
 
 	// Check document type
 	if (document->getClassName() == EntityFileRawData::className()) {
-		return this->requestToOpenRawDataDocument(document.get());
+		return this->requestToOpenRawDataDocument(document.get(), documentEntity->getName());
 	}
 	else if (document->getClassName() == EntityFileText::className()) {
-		return this->requestToOpenTextDocument(document.get());
+		return this->requestToOpenTextDocument(document.get(), documentEntity->getName());
 	}
 	else if (document->getClassName() == EntityFileCSV::className()) {
-		return this->requestToOpenCSVDocument(document.get());
+		return this->requestToOpenCSVDocument(document.get(), documentEntity->getName());
 	}
 	else {
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unsupported document type for opening "
@@ -583,7 +583,7 @@ ot::ReturnMessage Application::requestToOpenDocument(const ot::EntityInformation
 	}
 }
 
-ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBase* _entity) {
+ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBase* _entity, const std::string& _blockEntityName) {
 	OTAssertNullptr(_entity);
 	EntityFileRawData* fileEntity = dynamic_cast<EntityFileRawData*>(_entity);
 
@@ -608,6 +608,7 @@ ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBase* _entity)
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_OpenRawFile, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(_blockEntityName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(compressedData, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLength, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonString(fileEntity->getFileName(), doc.GetAllocator()), doc.GetAllocator());
@@ -619,7 +620,7 @@ ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBase* _entity)
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage Application::requestToOpenTextDocument(EntityBase* _entity) {
+ot::ReturnMessage Application::requestToOpenTextDocument(EntityBase* _entity, const std::string& _blockEntityName) {
 	OTAssertNullptr(_entity);
 	EntityFileText* fileEntity = dynamic_cast<EntityFileText*>(_entity);
 
@@ -652,7 +653,7 @@ ot::ReturnMessage Application::requestToOpenTextDocument(EntityBase* _entity) {
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage Application::requestToOpenCSVDocument(EntityBase* _entity) {
+ot::ReturnMessage Application::requestToOpenCSVDocument(EntityBase* _entity, const std::string& _blockEntityName) {
 	
 
 	return ot::ReturnMessage::Ok;
