@@ -33,7 +33,7 @@
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "EntitySolverDataProcessing.h"
 #include "EntityGraphicsScene.h"
-
+#include "OTServiceFoundation/ProgressUpdater.h"
 
 Application * g_instance{ nullptr };
 
@@ -134,6 +134,9 @@ void Application::createSolver()
 
 void Application::runPipeline()
 {
+	UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
+	ProgressUpdater progressUpdater(Application::instance()->getUiComponent(), "Running Data Processing Pipeline", true);
+
 	EntitySolverDataProcessing solver;
 	ot::UIDList selectedSolverIDs;
 	for (const ot::EntityInformation& selectedEntity : getSelectedEntityInfos())
@@ -261,7 +264,12 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	
 	connectToolBarButton(m_buttonGraphicsScene, this, &Application::createPipeline);
 	connectToolBarButton(m_buttonCreateSolver, this, &Application::createSolver);
-	connectToolBarButton(m_buttonRunPipeline, this, &Application::runPipeline);
+	connectToolBarButton(m_buttonRunPipeline, [this]() 
+		{
+			std::thread worker(&Application::runPipeline, this);
+			worker.detach();
+		}
+	);
 }
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
