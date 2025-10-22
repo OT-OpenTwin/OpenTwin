@@ -48,7 +48,7 @@ std::list<std::string> LibraryManagementWrapper::getCircuitModels() {
 
 	do {
 		lmsResonse.clear();
-		if (!(ok = ot::msg::send(Application::instance()->getServiceURL(), m_lmsLocalUrl, ot::EXECUTE, lmsDocs.toJson(), lmsResonse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+		if (!(ok = ot::msg::send(Application::instance()->getServiceURL(), Application::instance()->getLMSUrl(), ot::EXECUTE, lmsDocs.toJson(), lmsResonse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
 			OT_LOG_E("Getting Models from LMS failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
@@ -112,7 +112,7 @@ std::string LibraryManagementWrapper::getCircuitModel(std::string _modelName) {
 
 	do {
 		lmsResonse.clear();
-		if (!(ok = ot::msg::send(Application::instance()->getServiceURL(), m_lmsLocalUrl, ot::EXECUTE, lmsDocs.toJson(), lmsResonse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+		if (!(ok = ot::msg::send(Application::instance()->getServiceURL(), Application::instance()->getLMSUrl(), ot::EXECUTE, lmsDocs.toJson(), lmsResonse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
 			OT_LOG_E("Getting Models from LMS failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
@@ -152,7 +152,7 @@ std::string LibraryManagementWrapper::requestCreateConfig(const ot::JsonDocument
 
 	do {
 		lmsResonse.clear();
-		if (!(ok = ot::msg::send(Application::instance()->getServiceURL(), m_lmsLocalUrl, ot::EXECUTE, _doc.toJson(), lmsResonse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+		if (!(ok = ot::msg::send(Application::instance()->getServiceURL(), Application::instance()->getLMSUrl(), ot::EXECUTE, _doc.toJson(), lmsResonse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
 			OT_LOG_E("Requesting config failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
