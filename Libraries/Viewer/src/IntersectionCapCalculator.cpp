@@ -6,6 +6,7 @@
 #include <osg/LightModel>
 #include <osg/PolygonMode>
 #include <osg/PolygonOffset>
+#include <osg/LineWidth>
 
 #include "IntersectionCapCalculator.h"
 
@@ -251,7 +252,7 @@ void IntersectionCapCalculator::determineCutSegments(const IntersectionCapCalcul
     }
 }
 
-void IntersectionCapCalculator::buildVisualizationNode(SceneNodeGeometry* geometryItem, const osg::Vec3d& normal, const std::vector<IntersectionCapCalculatorTriangle3D> &triangles)
+void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry* geometryItem, const osg::Vec3d& normal, const std::vector<IntersectionCapCalculatorTriangle3D> &triangles)
 {
     std::string materialType = "Rough";
 
@@ -323,12 +324,83 @@ void IntersectionCapCalculator::buildVisualizationNode(SceneNodeGeometry* geomet
     delete materialSet;
     materialSet = nullptr;
 
-    geometryItem->setCutCapGeometry(newGeometry);
+    geometryItem->setCutCapGeometryTriangles(newGeometry);
 }
+
+void IntersectionCapCalculator::buildEdgeVisualizationNode(SceneNodeGeometry* geometryItem, std::vector<std::vector<IntersectionCapCalculatorVec3>>& loops)
+{
+    double colorR = 0.0;
+    double colorG = 1.0;
+    double colorB = 0.0;
+    double lineWidth = 2.0;
+
+    osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
+    colors->push_back(osg::Vec4(colorR, colorG, colorB, 0.0));
+
+    // Create the geometry object to store the data
+    osg::ref_ptr<osg::Geometry> newGeometry = new osg::Geometry;
+
+    if (!ViewerSettings::instance()->useDisplayLists)
+    {
+        newGeometry->setUseDisplayList(false);
+        newGeometry->setUseVertexBufferObjects(ViewerSettings::instance()->useVertexBufferObjects);
+    }
+
+    // Count edges
+    int nEdges = 0;
+    for (auto loop : loops)
+    {
+        nEdges += (loop.size() - 1);
+    }
+
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array(nEdges * 2);
+
+    // Now store the edge vertices in the array
+
+    unsigned long long nVertex = 0;
+
+    for (auto loop : loops)
+    {
+        unsigned long long loopVertex = 0;
+
+        for (auto point : loop)
+        {
+            vertices->at(nVertex).set(point.x, point.y, point.z);
+            nVertex++;
+
+            if (loopVertex != 0 && loopVertex != loop.size()-1)
+            {
+                vertices->at(nVertex).set(point.x, point.y, point.z);
+                nVertex++;
+            }
+
+            loopVertex++;
+        }
+    }
+
+    newGeometry->setVertexArray(vertices);
+
+    newGeometry->setColorArray(colors.get());
+    newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+
+    newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, nEdges * 2));
+
+    osg::StateSet* ss = newGeometry->getOrCreateStateSet();
+
+    ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+    ss->setMode(GL_BLEND, osg::StateAttribute::OFF);
+    ss->setAttributeAndModes(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE));
+    ss->setMode(GL_LINE_SMOOTH, osg::StateAttribute::ON);
+    ss->setAttribute(new osg::LineWidth(lineWidth), osg::StateAttribute::ON);
+
+    geometryItem->setCutCapGeometryEdges(newGeometry);
+}
+
 
 void IntersectionCapCalculator::generateCapGeometryAndVisualization(SceneNodeGeometry* geometryItem, const osg::Vec3d& normal, const osg::Vec3d& point, double radius)
 {
-    geometryItem->deleteCutCapGeometry();
+    geometryItem->deleteCutCapGeometryTriangles();
+    geometryItem->deleteCutCapGeometryEdges();
 
     osg::Vec3d movedPoint = point + normal * radius * 1e-4;
 
@@ -339,6 +411,9 @@ void IntersectionCapCalculator::generateCapGeometryAndVisualization(SceneNodeGeo
     determineCutSegments(plane, geometryItem, segments);
 
     auto loops3D = extractClosedLoops(segments);
+
+    buildEdgeVisualizationNode(geometryItem, loops3D);
+
     IntersectionCapCalculatorProjection2D proj = makeProjectionBasis(plane);
 
     std::vector<std::vector<IntersectionCapCalculatorVec2>> all_rings_2D;
@@ -376,7 +451,7 @@ void IntersectionCapCalculator::generateCapGeometryAndVisualization(SceneNodeGeo
         }
     }
 
-    buildVisualizationNode(geometryItem, normal, triangles_out);
+    buildTriangleVisualizationNode(geometryItem, normal, triangles_out);
 }
 
 

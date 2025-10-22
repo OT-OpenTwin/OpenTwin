@@ -3401,7 +3401,8 @@ void Model::deleteCapGeometryForSceneNodes(SceneNodeBase* root)
 	if (dynamic_cast<SceneNodeGeometry*>(root) != nullptr)
 	{
 		// We have a SceneNodeGeometry item -> process it
-		dynamic_cast<SceneNodeGeometry*>(root)->deleteCutCapGeometry();
+		dynamic_cast<SceneNodeGeometry*>(root)->deleteCutCapGeometryTriangles();
+		dynamic_cast<SceneNodeGeometry*>(root)->deleteCutCapGeometryEdges();
 	}
 
 	for (auto child : root->getChildren())
@@ -3428,7 +3429,8 @@ void Model::updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg:
 	if (dist > boundingSphereRadius) {
 		OutputDebugString(L"No intersection\n\n");
 
-		item->deleteCutCapGeometry();
+		item->deleteCutCapGeometryTriangles();
+		item->deleteCutCapGeometryEdges();
 	}
 	else {
 		OutputDebugString(L"Intersection\n\n");

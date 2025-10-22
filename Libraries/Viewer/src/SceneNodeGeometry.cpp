@@ -56,7 +56,8 @@ SceneNodeGeometry::SceneNodeGeometry() :
 	textureAttributeGen(nullptr),
 	textureAttributeEnv(nullptr),
 	edgeTranspacency(0.35),
-	cutCapGeometry(nullptr)
+	cutCapGeometryTriangles(nullptr),
+	cutCapGeometryEdges(nullptr)
 {
 }
 
@@ -1005,11 +1006,10 @@ osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, u
 	return edgeNode;
 }
 
-void SceneNodeGeometry::setCutCapGeometry(osg::Geometry* geometry)
+void SceneNodeGeometry::setCutCapGeometryTriangles(osg::Geometry* geometry)
 {
-	deleteCutCapGeometry();
+	deleteCutCapGeometryTriangles();
 
-	// First, update the color of the triangles
 	osg::Transform* triangleTransform = dynamic_cast<osg::Transform*>(getTriangles());
 	assert(triangleTransform != nullptr);
 
@@ -1020,13 +1020,13 @@ void SceneNodeGeometry::setCutCapGeometry(osg::Geometry* geometry)
 	if (triangleNode != nullptr)
 	{
 		triangleNode->addDrawable(geometry);
-		cutCapGeometry = geometry;
+		cutCapGeometryTriangles = geometry;
 	}
 }
 
-void SceneNodeGeometry::deleteCutCapGeometry()
+void SceneNodeGeometry::deleteCutCapGeometryTriangles()
 {
-	if (cutCapGeometry == nullptr) return;
+	if (cutCapGeometryTriangles == nullptr) return;
 
 	// First, update the color of the triangles
 	osg::Transform* triangleTransform = dynamic_cast<osg::Transform*>(getTriangles());
@@ -1038,7 +1038,43 @@ void SceneNodeGeometry::deleteCutCapGeometry()
 
 	if (triangleNode != nullptr)
 	{
-		triangleNode->removeDrawable(cutCapGeometry);
+		triangleNode->removeDrawable(cutCapGeometryTriangles);
+	}
+}
+
+void SceneNodeGeometry::setCutCapGeometryEdges(osg::Geometry* geometry)
+{
+	deleteCutCapGeometryEdges();
+
+	osg::Transform* triangleTransform = dynamic_cast<osg::Transform*>(getTriangles());
+	assert(triangleTransform != nullptr);
+
+	assert(triangleTransform->getNumChildren() == 1);
+	osg::Geode* triangleNode = dynamic_cast<osg::Geode*>(triangleTransform->getChild(0));
+	assert(triangleNode != nullptr);
+
+	if (triangleNode != nullptr)
+	{
+		triangleNode->addDrawable(geometry);
+		cutCapGeometryEdges = geometry;
+	}
+}
+
+void SceneNodeGeometry::deleteCutCapGeometryEdges()
+{
+	if (cutCapGeometryEdges == nullptr) return;
+
+	// First, update the color of the triangles
+	osg::Transform* triangleTransform = dynamic_cast<osg::Transform*>(getTriangles());
+	assert(triangleTransform != nullptr);
+
+	assert(triangleTransform->getNumChildren() == 1);
+	osg::Geode* triangleNode = dynamic_cast<osg::Geode*>(triangleTransform->getChild(0));
+	assert(triangleNode != nullptr);
+
+	if (triangleNode != nullptr)
+	{
+		triangleNode->removeDrawable(cutCapGeometryEdges);
 	}
 }
 
