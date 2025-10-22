@@ -22,7 +22,7 @@
 
 #include "Application.h"
 #include "NewModelStateInfo.h"
-
+#include "OTModelAPI/ModelServiceAPI.h"
 SolverReport::~SolverReport()
 {
 	storeReport();
@@ -41,8 +41,9 @@ bool SolverReport::storeReport()
 		{
 			EntityResultText solverReport;
 			solverReport.setEntityID(Application::instance()->getModelComponent()->createEntityUID());
+			solverReport.setOwningService(Application::instance()->getServiceName());
 			solverReport.setText(m_reportContent);
-			solverReport.setName(m_solverName + " /Report");
+			solverReport.setName(m_solverName + "/Report");
 			solverReport.storeToDataBase();
 
 			ot::NewModelStateInfo modelStateInfo;
@@ -51,6 +52,7 @@ bool SolverReport::storeReport()
 			ot::UID dataVersion = solverReport.getTextDataStorageVersion();
 
 			modelStateInfo.addDataEntity(solverReport.getEntityID(), dataUID, dataVersion);
+			ot::ModelServiceAPI::addEntitiesToModel(modelStateInfo, "Added solver report");
 			reportCreated = true;
 		}	
 	}

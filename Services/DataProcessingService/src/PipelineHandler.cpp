@@ -50,6 +50,7 @@ void PipelineHandler::runAll(const std::list<std::shared_ptr<GraphNode>>& _rootN
 			handler->executeOwnNode(rootNode);
 		}
 		SolverReport::instance().addToContentAndDisplay("Pipeline executed successfull.\n", _uiComponent);
+		SolverReport::instance().storeReport();
 	}
 	catch (const std::exception& ex)
 	{
