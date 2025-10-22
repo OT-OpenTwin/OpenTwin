@@ -17,17 +17,17 @@
 #include "SolverReport.h"
 #include "OTServiceFoundation/TimeFormatter.h"
 
-void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+void PipelineHandler::runAll(const std::list<std::shared_ptr<GraphNode>>& _rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& _graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID)
 {
 	try
 	{
-		initiate(graphNodesByBlockID, allBlockEntitiesByBlockID);
+		initiate(_graphNodesByBlockID, _allBlockEntitiesByBlockID);
 		const std::string timeAndDate = TimeFormatter::createCurrentDateTimeString();
 		SolverReport::instance().addToContent("Starting pipeline at: " + timeAndDate + "\n");
 
-		for (std::shared_ptr<GraphNode> rootNode : rootNodes)
+		for (std::shared_ptr<GraphNode> rootNode : _rootNodes)
 		{
-			std::shared_ptr<BlockHandler> handler = _blockHandlerByGraphNode[rootNode];
+			std::shared_ptr<BlockHandler> handler = m_blockHandlerByGraphNode[rootNode];
 			handler->executeOwnNode(rootNode);
 		}
 		SolverReport::instance().addToContentAndDisplay("Pipeline executed successfull.\n", _uiComponent);
@@ -40,49 +40,49 @@ void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNo
 	}
 }
 
-void PipelineHandler::initiate(const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
+void PipelineHandler::initiate(const std::map<ot::UID, std::shared_ptr<GraphNode>>& _graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID)
 {
 	
-	for (auto& blockEntityByBlockID : allBlockEntitiesByBlockID)
+	for (auto& blockEntityByBlockID : _allBlockEntitiesByBlockID)
 	{
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
-		std::shared_ptr<GraphNode> graphNode = graphNodesByBlockID.find(blockEntity->getEntityID())->second;
-		_blockHandlerByGraphNode[graphNode] = createBlockHandler(blockEntity);
-		_blockHandlerByGraphNode[graphNode]->setModelComponent(_modelComponent);
-		_blockHandlerByGraphNode[graphNode]->setUIComponent(_uiComponent);
+		std::shared_ptr<GraphNode> graphNode = _graphNodesByBlockID.find(blockEntity->getEntityID())->second;
+		m_blockHandlerByGraphNode[graphNode] = createBlockHandler(blockEntity);
+		m_blockHandlerByGraphNode[graphNode]->setModelComponent(_modelComponent);
+		m_blockHandlerByGraphNode[graphNode]->setUIComponent(_uiComponent);
 	}
 }
 
-std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_ptr<EntityBlock> blockEntity)
+std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_ptr<EntityBlock> _blockEntity)
 {
-	EntityBlockDatabaseAccess* dbAccessEntity = dynamic_cast<EntityBlockDatabaseAccess*>(blockEntity.get());
+	EntityBlockDatabaseAccess* dbAccessEntity = dynamic_cast<EntityBlockDatabaseAccess*>(_blockEntity.get());
 	if (dbAccessEntity != nullptr)
 	{
-		return std::make_shared<BlockHandlerDatabaseAccess>(dbAccessEntity, _blockHandlerByGraphNode);
+		return std::make_shared<BlockHandlerDatabaseAccess>(dbAccessEntity, m_blockHandlerByGraphNode);
 	}
 	
-	EntityBlockPython* pythonEntity = dynamic_cast<EntityBlockPython*>(blockEntity.get());
+	EntityBlockPython* pythonEntity = dynamic_cast<EntityBlockPython*>(_blockEntity.get());
 	if (pythonEntity != nullptr)
 	{
-		return std::make_shared <BlockHandlerPython>(pythonEntity, _blockHandlerByGraphNode);
+		return std::make_shared <BlockHandlerPython>(pythonEntity, m_blockHandlerByGraphNode);
 	}
 
-	EntityBlockDisplay* display = dynamic_cast<EntityBlockDisplay*>(blockEntity.get());
+	EntityBlockDisplay* display = dynamic_cast<EntityBlockDisplay*>(_blockEntity.get());
 	if (display != nullptr)
 	{
-		return std::make_shared<BlockHandlerDisplay>(display, _blockHandlerByGraphNode);
+		return std::make_shared<BlockHandlerDisplay>(display, m_blockHandlerByGraphNode);
 	}
 	
-	EntityBlockFileWriter* fileWriter = dynamic_cast<EntityBlockFileWriter*>(blockEntity.get());
+	EntityBlockFileWriter* fileWriter = dynamic_cast<EntityBlockFileWriter*>(_blockEntity.get());
 	if (fileWriter != nullptr)
 	{
-		return std::make_shared<BlockHandlerFileWriter>(fileWriter, _blockHandlerByGraphNode);
+		return std::make_shared<BlockHandlerFileWriter>(fileWriter, m_blockHandlerByGraphNode);
 	}
 
-	EntityBlockStorage* storage = dynamic_cast<EntityBlockStorage*>(blockEntity.get());
+	EntityBlockStorage* storage = dynamic_cast<EntityBlockStorage*>(_blockEntity.get());
 	if (storage != nullptr)
 	{
-		return std::make_shared<BlockHandlerStorage>(storage, _blockHandlerByGraphNode);
+		return std::make_shared<BlockHandlerStorage>(storage, m_blockHandlerByGraphNode);
 	}
 	
 	assert(0);

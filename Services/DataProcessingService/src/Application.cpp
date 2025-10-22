@@ -140,7 +140,7 @@ void Application::runPipeline()
 					const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
 					Application::instance()->getUiComponent()->displayMessage("\nRunning pipeline: " + solver->getName() + "\n");
 					_pipelineHandler.setSolverName(solver->getName());
-					_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+					_pipelineHandler.runAll(rootNodes, graphNodesByBlockID, allBlockEntities);
 				}
 			}
 		}
