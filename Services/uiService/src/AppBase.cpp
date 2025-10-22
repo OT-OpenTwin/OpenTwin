@@ -2506,6 +2506,7 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 }
 
 void AppBase::slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _newConfig) {
+	return;
 	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
 	if (graphicsView == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
