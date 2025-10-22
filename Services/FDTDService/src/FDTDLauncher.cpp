@@ -52,20 +52,6 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 		return "ERROR: Unable to create temporary working directory (TMP environment variable needs to be set)";
 	}
 
-	// Extract the mesh into the temp folder
-	ot::UID meshDataID = 0;
-	std::string meshDataName;
-	std::string meshFileName = extractMesh(solverEntity, tempDirPath, meshDataID, meshDataName);
-	if (meshFileName.empty()) return "ERROR: Unable to read the specified tetrahedral mesh (ensure to specify a valid mesh)";
-
-	// Get all mesh entities of the current mesh
-	std::map<ot::UID, ot::EntityInformation> meshItemInfo;
-	readMeshItemInfo(meshDataID, meshItemInfo);
-
-	// Get the properties for all entities of the current mesh
-	std::map<ot::UID, EntityProperties> entityProperties;
-	ot::ModelServiceAPI::getEntityProperties(meshDataID, true, "Solver", entityProperties);
-
 	// Get all the material property infomation
 	std::map<std::string, EntityProperties> materialProperties;
 	readMaterialProperties(materialProperties);
@@ -76,9 +62,6 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 	SolverBase * solver = nullptr;
 
 	solver = new SolverFDTD();
-
-	std::map<std::string, size_t> groupNameToIdMap;
-	readGroupsFromMesh(meshFileName, groupNameToIdMap);
 
 	application->getUiComponent()->setProgressInformation("Solver running: " + problemType, true);
 
@@ -100,7 +83,7 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 		std::string controlFileName = tempDirPath + "\\model.pro";
 		std::ofstream controlFile(controlFileName);
 		
-		solver->setData(solverEntity, meshDataName, meshItemInfo, entityProperties, groupNameToIdMap, materialProperties);
+		//solver->setData(solverEntity, meshDataName, meshItemInfo, entityProperties, groupNameToIdMap, materialProperties);
 		solver->writeInputFile(controlFile, application);
 		controlFile.close();
 
