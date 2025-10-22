@@ -18,6 +18,8 @@
 #include "OTCore/ComparisionSymbols.h"
 #include "IndexHandler.h"
 
+#include "OTServiceFoundation/DurationFormatter.h"
+
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	: BlockHandler(blockEntity, handlerMap)
 {
@@ -79,9 +81,10 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	DataStorageAPI::DataStorageResponse dbResponse = m_resultCollectionAccess->searchInResultCollection(m_query, options);
 
 	auto endTime = std::chrono::high_resolution_clock::now();
-	const std::chrono::duration<double, std::milli> response_ms = (endTime - startTime);
+	const std::string queryDuration =	DurationFormatter::formatDuration(startTime, endTime);
+	
 
-	_uiComponent->displayMessage("Query executed in " + std::to_string(response_ms.count()) + " ms.\n");
+	_uiComponent->displayMessage("Query executed in " + queryDuration + "\n");
 
 	
 	if (dbResponse.getSuccess())

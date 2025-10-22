@@ -196,6 +196,7 @@
     <ClCompile Include="$(OPENTWIN_THIRDPARTY_ROOT)\base64\base64.c" />
     <ClCompile Include="src\ApplicationBase.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
+    <ClCompile Include="src\DurationFormatter.cpp" />
     <ClCompile Include="src\Encryption.cpp" />
     <ClCompile Include="src\FrontendLogNotifier.cpp" />
     <ClCompile Include="src\Foundation.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="include\OTServiceFoundation\AbstractUiNotifier.h" />
     <ClInclude Include="include\OTServiceFoundation\ApplicationBase.h" />
     <ClInclude Include="include\OTServiceFoundation\BusinessLogicHandler.h" />
+    <ClInclude Include="include\OTServiceFoundation\DurationFormatter.h" />
     <ClInclude Include="include\OTServiceFoundation\Encryption.h" />
     <ClInclude Include="include\OTServiceFoundation\FrontendLogNotifier.h" />
     <ClInclude Include="include\OTServiceFoundation\ExternalServicesComponent.h" />

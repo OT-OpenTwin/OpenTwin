@@ -1,4 +1,5 @@
 #include "BlockHandler.h"
+#include "OTServiceFoundation/DurationFormatter.h"
 
 BlockHandler::BlockHandler(EntityBlock* blockEntity, const HandlerMap& allHandler)
 	:m_allHandler(allHandler)
@@ -30,8 +31,8 @@ void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 		auto startTimePoint = std::chrono::high_resolution_clock::now();
 		proceed = executeSpecialized();
 		auto endTimePoint = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::seconds>(endTimePoint - startTimePoint);
-		_uiComponent->displayMessage("Block execution took: " + std::to_string(duration.count()) + " seconds\n");
+		const std::string duration = DurationFormatter::formatDuration(startTimePoint, endTimePoint);
+		_uiComponent->displayMessage("Block execution took: " + duration + "\n");
 	}
 	catch (const std::exception& e)
 	{

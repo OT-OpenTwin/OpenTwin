@@ -20,7 +20,7 @@
 #include "NewModelStateInfo.h"
 #include "EntityResult1DPlot.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-
+#include "OTServiceFoundation/DurationFormatter.h"
 
 BlockHandlerStorage::BlockHandlerStorage(EntityBlockStorage* blockEntityStorage, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntityStorage,handlerMap),m_blockEntityStorage(blockEntityStorage)
@@ -260,11 +260,17 @@ bool BlockHandlerStorage::executeSpecialized()
 			std::list<std::shared_ptr<MetadataEntry>> metadata;
 			ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName,metadata);
 			
+			_uiComponent->displayMessage("Storing data into series: " + seriesName + "\n");
+			auto startTimePoint = std::chrono::high_resolution_clock::now();
 			for (DatasetDescription& dsd : datasetDescr)
 			{
 				resultCollectionExtender.processDataPoints(&dsd, seriesID);
 			}
 			resultCollectionExtender.storeCampaignChanges();
+			auto endTimePoint = std::chrono::high_resolution_clock::now();
+
+			const std::string duration = DurationFormatter::formatDuration(startTimePoint, endTimePoint);
+			_uiComponent->displayMessage("Data storage took: " + duration + "\n");
 
 			if (m_createPlot)
 			{
