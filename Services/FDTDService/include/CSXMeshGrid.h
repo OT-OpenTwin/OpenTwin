@@ -20,7 +20,6 @@
 #include <string>
 #include <list>
 #include <vector>
-#include <array>
 #include <map>
 
 // Forward declaration
