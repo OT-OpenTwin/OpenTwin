@@ -144,6 +144,29 @@ tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLElement& _parentElement
 	return FDTD;
 }
 
+tinyxml2::XMLElement* FDTDConfig::writeCSXMeshGrid(tinyxml2::XMLElement& _parentElement) {
+	ensureEntityIsSet();
+	// Load the mesh grid data from the solver entity	
+	CSXMeshGrid grid;
+	grid.loadMeshGridDataFromEntity(m_solverEntity);
+
+	auto CSX = _parentElement.GetDocument()->NewElement("ContinuousStructure");
+	CSX->SetAttribute("CoordSystem", grid.getCoordSystem());
+	CSX->SetAttribute("DeltaUnit", grid.getDeltaUnit());
+	auto RectGrid = _parentElement.GetDocument()->NewElement("RectilinearGrid");
+	auto xElem = _parentElement.GetDocument()->NewElement("XLines");
+	auto yElem = _parentElement.GetDocument()->NewElement("YLines");
+	auto zElem = _parentElement.GetDocument()->NewElement("ZLines");
+	xElem->SetText((grid.vectorToString(grid.getXLines())).c_str());
+	yElem->SetText((grid.vectorToString(grid.getYLines())).c_str());
+	zElem->SetText((grid.vectorToString(grid.getZLines())).c_str());
+	RectGrid->InsertEndChild(xElem);
+	RectGrid->InsertEndChild(yElem);
+	RectGrid->InsertEndChild(zElem);
+	CSX->InsertEndChild(RectGrid);
+	return CSX;
+}
+
 void FDTDConfig::readTimestepInfo() {
 	ensureEntityIsSet();
 	m_timeSteps = PropertyHelper::getIntegerPropertyValue(m_solverEntity, "Timesteps", "Simulation Settings");
@@ -257,4 +280,6 @@ void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {
 	_doc.InsertEndChild(root);
 	auto FDTD = writeFDTD(*root);
 	root->InsertEndChild(FDTD);
+	auto CSX = writeCSXMeshGrid(*root);
+	root->InsertEndChild(CSX);
 }

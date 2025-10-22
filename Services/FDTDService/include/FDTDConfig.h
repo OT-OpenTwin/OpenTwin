@@ -15,6 +15,8 @@
 #include "PropertyHelper.h"
 #include "EntityProperties.h"
 
+#include "CSXMeshGrid.h"
+
 // STD
 #include <string>
 #include <stdexcept>
@@ -67,6 +69,11 @@ public:
 	//! @param _parentElement The parent XML element to which the FDTD configuration will be added
 	//! @return The created FDTD XML element
 	tinyxml2::XMLElement* writeFDTD(tinyxml2::XMLElement& _parentElement);
+
+	//! @brief This function creates an XML element for the CSX Mesh Grid configuration
+	//! @param _parentElement The parent XML element to which the CSX Mesh Grid configuration will be added
+	//! @return The created CSX Mesh Grid XML element
+	tinyxml2::XMLElement* writeCSXMeshGrid(tinyxml2::XMLElement& _parentElement);
 
 	//! @brief Reads the configuration from the entity properties and writes the XML file
 	//! @param _doc The XML document to which the configuration will be added
