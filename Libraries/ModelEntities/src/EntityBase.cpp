@@ -128,7 +128,10 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 
 	readSpecificDataFromDataBase(doc_view, entityMap);
 
-	entityMap[getEntityID()] = this;
+	if (getEntityType() != DATA)
+	{
+		entityMap[getEntityID()] = this;
+	}
 }
 
 void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {

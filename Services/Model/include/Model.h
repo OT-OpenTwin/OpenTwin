@@ -153,6 +153,8 @@ public:
 
 	bool GetDocumentFromEntityID(ot::UID entityID, bsoncxx::builder::basic::document &doc);
 
+	//! @brief Restores entity from database. Topology entities are added to the entity map. 
+	//! The map is íntended to be the centralized map in the model service, which is only supposed to hold topology entities.
 	EntityBase *readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap);
 	EntityBase *readEntityFromEntityIDandVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap);
 
