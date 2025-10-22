@@ -26,7 +26,10 @@ ProgressUpdater::ProgressUpdater(ot::components::UiComponent* _uiComponent, cons
 {
 	INVARIANT;
 	m_uiComponent->setProgressInformation(_progressbarMessage, _continuous);
-	m_uiComponent->setProgress(0);	
+	if (!_continuous)
+	{
+		m_uiComponent->setProgress(0);	
+	}
 }
 
 ProgressUpdater::~ProgressUpdater()
