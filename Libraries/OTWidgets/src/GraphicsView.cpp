@@ -639,6 +639,8 @@ void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 }
 
 void ot::GraphicsView::dropEvent(QDropEvent* _event) {
+	OTAssertNullptr(m_scene);
+
 	if (!m_dropEnabled) {
 		_event->ignore();
 		return;
@@ -677,7 +679,11 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 		return;
 	}
 
-	Q_EMIT itemRequested(itemName, this->mapToScene(_event->pos()));
+	// Snap position to grid
+	QPointF gridPos = m_scene->snapToGrid(_event->pos());
+	
+	// Emit event
+	Q_EMIT itemRequested(itemName, gridPos);
 	_event->acceptProposedAction();
 }
 
