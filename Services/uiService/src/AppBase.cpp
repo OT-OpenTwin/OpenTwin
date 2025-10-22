@@ -2526,10 +2526,10 @@ void AppBase::slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _ne
 	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	try {
-		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
 		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
-		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}

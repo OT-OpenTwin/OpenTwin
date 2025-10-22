@@ -39,8 +39,9 @@ private:
 	ot::UID _blockIDDestination;
 	std::string _connectorNameOrigin;
 	std::string _connectorNameDestination;
-	
-	
+	ot::Point2DD m_originPos;
+	ot::Point2DD m_destPos;
+
 	void CreateNavigationTreeEntry();
 	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;

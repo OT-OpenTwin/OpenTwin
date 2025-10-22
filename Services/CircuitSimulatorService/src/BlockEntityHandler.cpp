@@ -203,6 +203,8 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		newConnection.setUid(connectionEntity.getEntityID());
 		newConnection.setLineShape(ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine);
 		newConnection.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
+		newConnection.setOriginPos(connection.getOriginPos());
+		newConnection.setDestPos(connection.getDestPos());
 
 		//Now i set the attirbutes of connectionEntity
 		connectionEntity.setConnectionCfg(newConnection);

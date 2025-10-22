@@ -38,6 +38,9 @@ ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
 
 	auto lineShapeProperty = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
 	cfg.setLineShape(ot::GraphicsConnectionCfg::stringToShape(lineShapeProperty->getValue()));
+
+	cfg.setDestPos(m_destPos);
+	cfg.setOriginPos(m_originPos);
 	
 	cfg.setUid(getEntityID());
 	return cfg;
@@ -56,11 +59,14 @@ void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& co
 	
 	EntityPropertiesSelection* lineShape = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
 	lineShape->setValue(ot::GraphicsConnectionCfg::shapeToString(connectionCfg.getLineShape()));
-	
+
 	_blockIDOrigin = connectionCfg.getOriginUid();
 	_blockIDDestination = connectionCfg.getDestinationUid();
 	_connectorNameDestination = connectionCfg.getDestConnectable();
 	_connectorNameOrigin = connectionCfg.getOriginConnectable();
+	m_originPos = connectionCfg.getOriginPos();
+	m_destPos = connectionCfg.getDestPos();
+	setModified();
 }
 
 void EntityBlockConnection::CreateConnections()
@@ -148,7 +154,11 @@ void EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document& st
 		bsoncxx::builder::basic::kvp("FromConnectable", _connectorNameOrigin),
 		bsoncxx::builder::basic::kvp("ToConnectable", _connectorNameDestination),
 		bsoncxx::builder::basic::kvp("FromUID", static_cast<int64_t>(_blockIDOrigin)),
-		bsoncxx::builder::basic::kvp("ToUID", static_cast<int64_t>(_blockIDDestination))
+		bsoncxx::builder::basic::kvp("ToUID", static_cast<int64_t>(_blockIDDestination)),
+		bsoncxx::builder::basic::kvp("OriginPosX", m_originPos.x()),
+		bsoncxx::builder::basic::kvp("OriginPosY", m_originPos.y()),
+		bsoncxx::builder::basic::kvp("DestinationPosX", m_destPos.x()),
+		bsoncxx::builder::basic::kvp("DestinationPosY", m_destPos.y())
 );
 	
 }
@@ -165,5 +175,35 @@ void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view
 	_connectorNameOrigin = std::string(doc_view["FromConnectable"].get_utf8().value.data());
 	_connectorNameDestination = std::string(doc_view["ToConnectable"].get_utf8().value.data());
 	_blockIDOrigin = static_cast<ot::UID>(doc_view["FromUID"].get_int64());
-	_blockIDDestination = static_cast<ot::UID>(doc_view["ToUID"].get_int64());	
+	_blockIDDestination = static_cast<ot::UID>(doc_view["ToUID"].get_int64());
+
+	double originX = 0.0;
+	double originY = 0.0;
+	double destX = 0.0;
+	double destY = 0.0;
+
+	auto itOriginPosX = doc_view.find("OriginPosX");
+	if (itOriginPosX != doc_view.end()) {
+		originX = itOriginPosX->get_double();
+	}
+
+	auto itOriginPosY = doc_view.find("OriginPosY");
+	if (itOriginPosY != doc_view.end()) {
+		originY = itOriginPosY->get_double();
+	}
+
+	auto itDestPosX = doc_view.find("DestinationPosX");
+	if (itDestPosX != doc_view.end()) {
+		destX = itDestPosX->get_double();
+	}
+
+	auto itDestPosY = doc_view.find("DestinationPosY");
+	if (itDestPosY != doc_view.end()) {
+		destY = itDestPosY->get_double();
+	}
+
+	m_originPos.setX(originX);
+	m_originPos.setY(originY);
+	m_destPos.setX(destX);
+	m_destPos.setY(destY);
 }

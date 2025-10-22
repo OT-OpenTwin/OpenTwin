@@ -4,7 +4,6 @@
 // Service header
 #include "Model.h"
 #include "Application.h"
-#include "EntityBlock.h"
 #include "BlockHandler.h"
 
 // OpenTwin header
@@ -14,6 +13,8 @@
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTCommunication/ActionTypes.h"
+#include "EntityBlock.h"
+#include "EntityBlockConnection.h"
 
 ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _item) {
 	const ot::UID blockID = _item->getUid();
@@ -134,8 +135,25 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 }
 
 ot::ReturnMessage BlockHandler::graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData) {
+	
 
+	const ot::UID connectionID =  _connectionData.getUid();
+	Model* _model = Application::instance()->getModel();
+	auto entBase = _model->getEntityByID(connectionID);
+	EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entBase);
+	if (!connectionEntity) {
+		OT_LOG_E("BlockEntity is null");
+		return ot::ReturnMessage::Failed;
+	}
+
+	connectionEntity->setConnectionCfg( _connectionData);
+	ot::UIDList topoEntID, topoEntVers;
+	connectionEntity->storeToDataBase();
+	topoEntID.push_back(connectionEntity->getEntityID());
+	topoEntVers.push_back(connectionEntity->getEntityStorageVersion());
+	_model->updateTopologyEntities(topoEntID, topoEntVers, "Update connection", false);
 
 	return ot::ReturnMessage::Ok;
+
 }
 
