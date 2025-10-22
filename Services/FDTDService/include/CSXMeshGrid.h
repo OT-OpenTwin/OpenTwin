@@ -7,7 +7,6 @@
 
 // OPENTWIN
 #include "OTCore/CoreTypes.h"
-#include "EntityMeshCartesian.h"
 #include "EntityMeshCartesianData.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/LogDispatcher.h"
