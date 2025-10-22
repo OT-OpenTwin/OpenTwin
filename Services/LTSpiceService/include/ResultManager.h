@@ -29,4 +29,5 @@ private:
 	void addParameterDescriptions(ParametricCombination& currentRun, ltspice::RawData& resultData, std::list<ot::Variable> parameterValuesXAxis, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions);
 	void addCurveData(ltspice::RawData& resultData, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions, size_t numberOfXValues, size_t indexOffset);
 	void storeCurves(std::list<DatasetDescription>& allCurveDescriptions);
+	void clear();
 };

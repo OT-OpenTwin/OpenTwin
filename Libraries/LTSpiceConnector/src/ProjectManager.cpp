@@ -515,30 +515,44 @@ void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const st
 		throw("Unable to create cache version folder: " + versionFolderName);
 	}
 
-	// Now copy all project files to the cache version folder
-	std::string projectDirName = std::filesystem::path(baseProjectName + ".asc").parent_path().string();
-	std::replace(projectDirName.begin(), projectDirName.end(), '\\', '/');
-
-	for (const auto& dirEntry : std::filesystem::directory_iterator(projectDirName))
+	if (!copyResults)
 	{
-		if (!dirEntry.is_directory())
+		try
 		{
-			std::string path = dirEntry.path().string();
-			std::replace(path.begin(), path.end(), '\\', '/');
+			copyFile(baseProjectName + ".asc", versionFolderName);
+		}
+		catch (std::exception& error)
+		{
+			throw("Unable to copy data to cache (" + std::string(error.what()) + ") : " + versionFolderName);
+		}
+	}
+	else
+	{
+		// Now copy all project files to the cache version folder
+		std::string projectDirName = std::filesystem::path(baseProjectName + ".asc").parent_path().string();
+		std::replace(projectDirName.begin(), projectDirName.end(), '\\', '/');
 
-			std::string filter = baseProjectName + ".";
-			std::string firstPart = path.substr(0, filter.length());
-
-			if (firstPart == filter)
+		for (const auto& dirEntry : std::filesystem::directory_iterator(projectDirName))
+		{
+			if (!dirEntry.is_directory())
 			{
-				// This file belongs to the project 
-				try
+				std::string path = dirEntry.path().string();
+				std::replace(path.begin(), path.end(), '\\', '/');
+
+				std::string filter = baseProjectName + ".";
+				std::string firstPart = path.substr(0, filter.length());
+
+				if (firstPart == filter)
 				{
-					copyFile(path, versionFolderName);
-				}
-				catch (std::exception& error)
-				{
-					throw("Unable to copy data to cache (" + std::string(error.what()) + ") : " + versionFolderName);
+					// This file belongs to the project 
+					try
+					{
+						copyFile(path, versionFolderName);
+					}
+					catch (std::exception& error)
+					{
+						throw("Unable to copy data to cache (" + std::string(error.what()) + ") : " + versionFolderName);
+					}
 				}
 			}
 		}

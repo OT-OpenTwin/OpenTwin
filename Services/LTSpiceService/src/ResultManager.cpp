@@ -86,6 +86,8 @@ void ResultManager::getParametricCombinations(const std::string& logFileName, st
 
 void ResultManager::extractResults(const std::string &ltSpicefileNameBase)
 {
+	clear();
+
 	std::string projectFileName = "Files/" + std::filesystem::path(ltSpicefileNameBase).stem().string();
 	if (projectFileName.empty()) return;
 
@@ -118,9 +120,23 @@ void ResultManager::extractResults(const std::string &ltSpicefileNameBase)
 	storeCurves(allCurveDescriptions);
 }
 
+void ResultManager::clear()
+{
+	// We delete all previous result data (series), since we will recreate it if necessary
+	std::list<std::string> resultEntity{ ot::FolderNames::DatasetFolder + "/LTSpice Imported Results" };
+	ot::ModelServiceAPI::deleteEntitiesFromModel(resultEntity, false);
+}
+
 void ResultManager::processParametricResults(ltspice::RawData& resultData, std::list<ParametricCombination>& parameterRuns, std::list<DatasetDescription> &allCurveDescriptions)
 {
-	size_t numberOfParameterRuns = (parameterRuns.empty() ? 1 : parameterRuns.size());
+	if (parameterRuns.empty())
+	{
+		// If we have no parametric runs, we add a dummy run 
+		ParametricCombination parameterCombination;
+		parameterRuns.push_back(parameterCombination);
+	}
+
+	size_t numberOfParameterRuns = parameterRuns.size();
 	size_t numberOfXValues       = resultData.points() / numberOfParameterRuns;
 
 	size_t indexOffset = 0;
