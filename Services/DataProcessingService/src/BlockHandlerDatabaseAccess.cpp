@@ -92,6 +92,8 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		bsoncxx::builder::basic::document hintDoc;
 		const std::string firstDefaultIndex = IndexHandler::getDefaultIndexes().front();
 		hintDoc.append(bsoncxx::builder::basic::kvp(firstDefaultIndex, 1));
+		mongocxx::v_noabi::hint hint(hintDoc.extract());
+		options.hint(hint);
 	}
 
 	auto startTime = std::chrono::high_resolution_clock::now();
