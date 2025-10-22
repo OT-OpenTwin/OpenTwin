@@ -11,13 +11,6 @@ CSXMeshGrid::CSXMeshGrid() {
 CSXMeshGrid::~CSXMeshGrid() {
 }
 
-void CSXMeshGrid::readMeshGridData() {
-	std::list<ot::EntityInformation> info;
-
-	ot::UID meshDataID = 0;
-	std::string meshDataName;
-}
-
 void CSXMeshGrid::loadMeshGridDataFromEntity(EntityBase* _solverEntity) {
 	EntityPropertiesEntityList* mesh = dynamic_cast<EntityPropertiesEntityList*>(_solverEntity->getProperties().getProperty("Mesh"));
 	if (!mesh) {
