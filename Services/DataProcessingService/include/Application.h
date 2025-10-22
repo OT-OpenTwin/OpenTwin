@@ -78,8 +78,6 @@ private:
 	GraphHandler _graphHandler;
 	PropertyHandlerDatabaseAccessBlock m_propertyHandlerDatabaseAccessBlock;
 	
-	void runPipelineWorker(ot::UIDList _selectedSolverIDs);
-
 	ot::UID m_dataProcessingFolderID = ot::getInvalidUID();
 
 	void createPipeline();

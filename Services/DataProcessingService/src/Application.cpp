@@ -58,40 +58,6 @@ Application::~Application()
 
 }
 
-void Application::runPipelineWorker(ot::UIDList _selectedSolverIDs)
-{
- 	//UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
-	try
-	{
-		Application::instance()->prefetchDocumentsFromStorage(_selectedSolverIDs);
-
-		for (ot::UID entityID : _selectedSolverIDs)
-		{
-			ot::UID entityVersion =	Application::instance()->getPrefetchedEntityVersion(entityID);
-			EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion);
-			std::unique_ptr<EntitySolverDataProcessing> solver (dynamic_cast<EntitySolverDataProcessing*>(baseEntity));
-			const std::string folderName = solver->getSelectedPipeline();
-			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
-			auto allConnectionEntities = _blockEntityHandler.findAllEntityBlockConnections(folderName);
-			std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntities, allBlockEntities);
-			const bool isValid = _graphHandler.blockDiagramIsValid(allConnectionEntities,allBlockEntities,connectionBlockMap);
-
-			if (isValid)
-			{
-				const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
-				const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
-				Application::instance()->getUiComponent()->displayMessage("\nRunning pipeline: " + solver->getName() + "\n");
-				_pipelineHandler.setSolverName(solver->getName());
-				_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
-			}
-		}
-	}
-	catch (const std::exception& e)
-	{
-		OT_LOG_E("Pipeline run failed: " + std::string(e.what()));
-	}
-}
-
 void Application::createPipeline()
 {
 	auto modelComponent = Application::instance()->getModelComponent();
@@ -135,8 +101,7 @@ void Application::createSolver()
 void Application::runPipeline()
 {
 	UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
-	ProgressUpdater progressUpdater(Application::instance()->getUiComponent(), "Running Data Processing Pipeline", true);
-
+	
 	EntitySolverDataProcessing solver;
 	ot::UIDList selectedSolverIDs;
 	for (const ot::EntityInformation& selectedEntity : getSelectedEntityInfos())
@@ -152,8 +117,37 @@ void Application::runPipeline()
 	}
 	else
 	{
-		std::thread worker(&Application::runPipelineWorker, this, selectedSolverIDs);
-		worker.detach();
+		ProgressUpdater progressUpdater(Application::instance()->getUiComponent(), "Running Data Processing Pipeline", true);
+
+		try
+		{
+			Application::instance()->prefetchDocumentsFromStorage(selectedSolverIDs);
+
+			for (ot::UID entityID : selectedSolverIDs)
+			{
+				ot::UID entityVersion = Application::instance()->getPrefetchedEntityVersion(entityID);
+				EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion);
+				std::unique_ptr<EntitySolverDataProcessing> solver(dynamic_cast<EntitySolverDataProcessing*>(baseEntity));
+				const std::string folderName = solver->getSelectedPipeline();
+				auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
+				auto allConnectionEntities = _blockEntityHandler.findAllEntityBlockConnections(folderName);
+				std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntities, allBlockEntities);
+				const bool isValid = _graphHandler.blockDiagramIsValid(allConnectionEntities, allBlockEntities, connectionBlockMap);
+
+				if (isValid)
+				{
+					const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
+					const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
+					Application::instance()->getUiComponent()->displayMessage("\nRunning pipeline: " + solver->getName() + "\n");
+					_pipelineHandler.setSolverName(solver->getName());
+					_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+				}
+			}
+		}
+		catch (const std::exception& e)
+		{
+			OT_LOG_E("Pipeline run failed: " + std::string(e.what()));
+		}
 	}
 }
 

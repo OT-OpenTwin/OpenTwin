@@ -154,7 +154,6 @@ void BlockHandlerDatabaseAccess::createLabelFieldNameMap()
 	
 	const std::string selectedQuantity = m_selectedQuantityLabel;
 
-
 	const MetadataCampaign& campaign = m_resultCollectionMetadataAccess->getMetadataCampaign();
 	const MetadataQuantity* quantity = campaign.getMetadataQuantitiesByLabel().find(selectedQuantity)->second;
 	auto& allDependingParameter = campaign.getMetadataParameterByUID();
