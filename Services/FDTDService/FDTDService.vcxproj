@@ -195,6 +195,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\CSXMeshGrid.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FDTDConfig.cpp" />
     <ClCompile Include="src\FDTDLauncher.cpp" />
@@ -206,6 +207,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\CSXMeshGrid.h" />
     <ClInclude Include="include\FDTDConfig.h" />
     <ClInclude Include="include\FDTDLauncher.h" />
     <ClInclude Include="include\ModelNotifier.h" />
