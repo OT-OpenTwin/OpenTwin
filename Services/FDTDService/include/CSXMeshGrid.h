@@ -5,7 +5,7 @@
 
 #pragma once
 
-// OPENTWIN
+// OpenTwin
 #include "OTCore/CoreTypes.h"
 #include "EntityMeshCartesianData.h"
 #include "OTModelAPI/ModelServiceAPI.h"
