@@ -1,26 +1,10 @@
 #include "BlockHandler.h"
-#include "OTServiceFoundation/DurationFormatter.h"
-
+#include "OTServiceFoundation/TimeFormatter.h"
+#include "SolverReport.h"
 BlockHandler::BlockHandler(EntityBlock* blockEntity, const HandlerMap& allHandler)
 	:m_allHandler(allHandler)
 {
 	m_blockName = blockEntity->getName();
-}
-
-BlockHandler::~BlockHandler()
-{
-	/*for (auto dataByName : _dataPerPort)
-	{
-		BlockHandler::GenericDataStructList dataList = dataByName.second;
-		for (ot::GenericDataStruct* data : dataList)
-		{
-			if (data != nullptr)
-			{
-				delete data;
-				data = nullptr;
-			}
-		}
-	}*/
 }
 
 void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
@@ -28,11 +12,13 @@ void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 	bool proceed;
 	try
 	{
+		SolverReport::instance().addToContentAndDisplay("\nExecuting " + getBlockType()  + ": " + m_blockName + "\n", _uiComponent);
 		auto startTimePoint = std::chrono::high_resolution_clock::now();
 		proceed = executeSpecialized();
 		auto endTimePoint = std::chrono::high_resolution_clock::now();
-		const std::string duration = DurationFormatter::formatDuration(startTimePoint, endTimePoint);
-		_uiComponent->displayMessage("Block execution took: " + duration + "\n");
+		
+		const std::string duration = TimeFormatter::formatDuration(startTimePoint, endTimePoint);
+		SolverReport::instance().addToContentAndDisplay("Block execution took: " + duration + "\n", _uiComponent);
 	}
 	catch (const std::exception& e)
 	{

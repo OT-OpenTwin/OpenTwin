@@ -15,7 +15,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include "OTCore/EntityName.h"
-#include "PipelineHandler.h"
+#include "SolverReport.h"
 
 BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity, handlerMap)
@@ -41,8 +41,6 @@ BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntit
 
 bool BlockHandlerFileWriter::executeSpecialized()
 {
-	
-	_uiComponent->displayMessage("Executing Filewriter Block: " + m_blockName + "\n");
 	if (!m_headline.empty())
 	{
 		m_fileStream << m_headline<<"\n";
@@ -55,7 +53,7 @@ bool BlockHandlerFileWriter::executeSpecialized()
 	}
 	else
 	{
-		_uiComponent->displayMessage(getErrorDataPipelineNllptr() + "\n");
+		SolverReport::instance().addToContentAndDisplay(getErrorDataPipelineNllptr() + "\n", _uiComponent);
 	}
 		
 	createFile();
@@ -66,7 +64,7 @@ bool BlockHandlerFileWriter::executeSpecialized()
 void BlockHandlerFileWriter::createFile()
 {
 
-	const std::string solverName =	PipelineHandler::getSolverName();
+	const std::string solverName =	SolverReport::instance().getSolverName();
 	const std::string resultFolder = solverName + "/" + ot::FolderNames::FilesFolder;
 	const std::string fileName = CreateNewUniqueTopologyName(resultFolder, m_fileName);
 
@@ -85,5 +83,10 @@ void BlockHandlerFileWriter::createFile()
 	textFile.storeToDataBase();
 
 	ot::ModelServiceAPI::addEntitiesToModel({ textFile.getEntityID() }, { textFile.getEntityStorageVersion() }, { false }, { data.getEntityID() }, { data.getEntityStorageVersion() }, { textFile.getEntityID() }, "Created text file.");
+}
+
+std::string BlockHandlerFileWriter::getBlockType() const
+{
+	return "Filewriter Block";
 }
 

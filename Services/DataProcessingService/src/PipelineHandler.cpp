@@ -12,22 +12,31 @@
 #include "BlockHandlerStorage.h"
 
 #include "OTCore/LogDispatcher.h"
+#include <string>
+#include <ctime>
+#include "SolverReport.h"
+#include "OTServiceFoundation/TimeFormatter.h"
 
 void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	try
 	{
 		initiate(graphNodesByBlockID, allBlockEntitiesByBlockID);
+		const std::string timeAndDate = TimeFormatter::createCurrentDateTimeString();
+		SolverReport::instance().addToContent("Starting pipeline at: " + timeAndDate + "\n");
+
 		for (std::shared_ptr<GraphNode> rootNode : rootNodes)
 		{
 			std::shared_ptr<BlockHandler> handler = _blockHandlerByGraphNode[rootNode];
 			handler->executeOwnNode(rootNode);
 		}
-		_uiComponent->displayMessage("Pipeline executed successfull.\n");
+		SolverReport::instance().addToContentAndDisplay("Pipeline executed successfull.\n", _uiComponent);
 	}
 	catch (const std::exception& ex)
 	{
-		OT_LOG_E("Pipeline execution failed with error:" +  std::string(ex.what())+"\n");
+		const std::string message = "Pipeline execution failed with error: " + std::string(ex.what()) + "\n";
+		OT_LOG_E(message);
+		SolverReport::instance().addToContent(message);
 	}
 }
 

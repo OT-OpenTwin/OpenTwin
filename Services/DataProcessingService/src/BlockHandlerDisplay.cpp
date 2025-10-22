@@ -1,7 +1,7 @@
 #include "BlockHandlerDisplay.h"
 #include "StringConverter.h"
 #include "OTCore/String.h"
-
+#include "SolverReport.h"
 
 BlockHandlerDisplay::BlockHandlerDisplay(EntityBlockDisplay* _blockEntity, const HandlerMap& _handlerMap)
 	:BlockHandler(_blockEntity ,_handlerMap)
@@ -12,7 +12,6 @@ BlockHandlerDisplay::BlockHandlerDisplay(EntityBlockDisplay* _blockEntity, const
 
 bool BlockHandlerDisplay::executeSpecialized()
 {
-	_uiComponent->displayMessage("Executing Display Block: " + m_blockName);
 	std::string displayMessage = m_description + "\n\n";
 
 	auto incomming = m_dataPerPort.find(m_input.getConnectorName());
@@ -34,4 +33,9 @@ bool BlockHandlerDisplay::executeSpecialized()
 		_uiComponent->displayMessage(getErrorDataPipelineNllptr() + "\n");
 	}
 	return true;
+}
+
+std::string BlockHandlerDisplay::getBlockType() const
+{
+	return "Display Block";
 }

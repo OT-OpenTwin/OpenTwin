@@ -15,7 +15,8 @@ public:
 	~BlockHandlerDatabaseAccess();
 
 	bool executeSpecialized() override;	
-
+	
+	std::string getBlockType() const override;
 private:
 	struct LabelFieldNamePair
 	{

@@ -206,6 +206,7 @@
     <ClCompile Include="src\PipelineData.cpp" />
     <ClCompile Include="src\PipelineHandler.cpp" />
     <ClCompile Include="src\PropertyHandlerDatabaseAccessBlock.cpp" />
+    <ClCompile Include="src\SolverReport.cpp" />
     <ClCompile Include="src\StringConverter.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
     <ClCompile Include="src\GraphHandler.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="include\PipelineData.h" />
     <ClInclude Include="include\PipelineHandler.h" />
     <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h" />
+    <ClInclude Include="include\SolverReport.h" />
     <ClInclude Include="include\StringConverter.h" />
     <ClInclude Include="include\UiNotifier.h" />
     <ClInclude Include="include\GraphHandler.h" />

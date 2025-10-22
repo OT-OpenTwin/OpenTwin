@@ -18,7 +18,8 @@
 #include "OTCore/ComparisionSymbols.h"
 #include "IndexHandler.h"
 
-#include "OTServiceFoundation/DurationFormatter.h"
+#include "OTServiceFoundation/TimeFormatter.h"
+#include "SolverReport.h"
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	: BlockHandler(blockEntity, handlerMap)
@@ -55,15 +56,13 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 }
 
 bool BlockHandlerDatabaseAccess::executeSpecialized()
-{
-	_uiComponent->displayMessage("Executing Database Acccess Block: " + m_blockName + "\n");
+{	
 	const std::string debugQuery = bsoncxx::to_json(m_query.view());
-	_uiComponent->displayMessage("Executing query: " + debugQuery + "\n");
+	SolverReport::instance().addToContentAndDisplay("Executing query: " + debugQuery + "\n", _uiComponent);
 	
 	const std::string debugProjection = bsoncxx::to_json(m_projection.view());
-	_uiComponent->displayMessage("Executing projection: " + debugProjection + "\n");
-
-	 
+	SolverReport::instance().addToContentAndDisplay("Executing projection: " + debugProjection + "\n", _uiComponent);
+		 
 	mongocxx::options::find options;
 	options.projection(m_projection);
 	options.limit(m_documentLimit);
@@ -81,11 +80,9 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	DataStorageAPI::DataStorageResponse dbResponse = m_resultCollectionAccess->searchInResultCollection(m_query, options);
 
 	auto endTime = std::chrono::high_resolution_clock::now();
-	const std::string queryDuration =	DurationFormatter::formatDuration(startTime, endTime);
+	const std::string queryDuration =	TimeFormatter::formatDuration(startTime, endTime);
 	
-
-	_uiComponent->displayMessage("Query executed in " + queryDuration + "\n");
-
+	SolverReport::instance().addToContentAndDisplay("Query executed in " + queryDuration + "\n", _uiComponent);
 	
 	if (dbResponse.getSuccess())
 	{
@@ -101,9 +98,8 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 			throw std::exception("Query returned nothing.\n");
 		}
 		
-		if (Application::instance()->getUiComponent()) {
-			Application::instance()->getUiComponent()->displayMessage("Query returned " + std::to_string(numberOfDocuments) + " results.\n");
-		}
+		SolverReport::instance().addToContentAndDisplay("Query returned " + std::to_string(numberOfDocuments) + " results.\n", _uiComponent);
+			
 		ot::JsonDocument dataDoc;
 		ot::JsonArray entries;
 		for (uint32_t i = 0; i < numberOfDocuments; i++)
@@ -304,4 +300,9 @@ void BlockHandlerDatabaseAccess::addComparision(const ValueComparisionDefinition
 		m_comparisons.push_back(query);
 	}
 
+}
+
+std::string BlockHandlerDatabaseAccess::getBlockType() const
+{
+	return "Database Access Block";
 }

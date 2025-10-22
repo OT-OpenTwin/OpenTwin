@@ -9,6 +9,9 @@ public:
 	BlockHandlerPython(EntityBlockPython* blockEntity, const HandlerMap& handlerMap);
 	virtual bool executeSpecialized() override;
 
+	// Inherited via BlockHandler
+	std::string getBlockType() const override;
+
 private:
 	std::list<std::string> m_requiredInput;
 	std::list<std::string> m_outputs;
@@ -16,4 +19,5 @@ private:
 	std::string m_scriptName;
 	std::string m_entityName;
 	ot::PythonServiceInterface* m_pythonServiceInterface = nullptr;
+
 };

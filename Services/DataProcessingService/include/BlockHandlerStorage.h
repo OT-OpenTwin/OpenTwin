@@ -8,10 +8,12 @@ class BlockHandlerStorage : public BlockHandler
 {
 public:
 	BlockHandlerStorage(EntityBlockStorage* blockEntity, const HandlerMap& handlerMap);
-	~BlockHandlerStorage();
+	~BlockHandlerStorage() = default;
 
 	bool executeSpecialized() override;
 
+	// Inherited via BlockHandler
+	std::string getBlockType() const override;
 private:
 	EntityBlockStorage* m_blockEntityStorage;
 	
@@ -23,4 +25,6 @@ private:
 
 	bool allInputsAvailable();
 	std::list<DatasetDescription> createDatasets();
+
+
 };

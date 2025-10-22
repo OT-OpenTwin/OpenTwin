@@ -46,8 +46,7 @@ bool BlockHandlerPython::executeSpecialized()
     
     if (allInputsComplete)
     {
-        _uiComponent->displayMessage("Executing Python Block: " + m_blockName + "\n");
-        
+                
         //First assemble the job for the python service
         ot::PythonServiceInterface::scriptParameter parameter{ {ot::Variable(m_entityName)} };
         m_pythonServiceInterface->addScriptWithParameter(m_scriptName, parameter);
@@ -63,7 +62,7 @@ bool BlockHandlerPython::executeSpecialized()
             }
             else
             {
-                _uiComponent->displayMessage(getErrorDataPipelineNllptr() + " Port: " + portName);
+				SolverReport::instance().addToContentAndDisplay(getErrorDataPipelineNllptr() + " Port: " + portName + ".\n", _uiComponent);
             }
         }
         
@@ -73,7 +72,7 @@ bool BlockHandlerPython::executeSpecialized()
         //Post processing
         if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
         {
-            _uiComponent->displayMessage("Python execution ended with state: " + returnMessage.getStatusString()+ "\n");
+			SolverReport::instance().addToContentAndDisplay("Python script executed with state: " + returnMessage.getStatusString() + ".\n", _uiComponent);
             ot::ReturnValues& returnValues = returnMessage.getValues();
             ot::JsonDocument& values = returnValues.getValues();
 
@@ -104,11 +103,11 @@ bool BlockHandlerPython::executeSpecialized()
                 {
                     //Here we have the return value of the script
                     auto& portValues = valueIt->value;
-                    _uiComponent->displayMessage("Script return message: " + ot::json::toJson(portValues) + "\n");
+					SolverReport::instance().addToContentAndDisplay("Python script returned message: " + ot::json::toJson(portValues) + "\n", _uiComponent);
                 }
                 else 
                 {
-                    _uiComponent->displayMessage("Port name used in python script does not match the listed ports: " + portName + "\n");
+					SolverReport::instance().addToContentAndDisplay("Port name used in python script does not match the listed ports: " + portName + ".\n", _uiComponent);
                 }
             }
 
@@ -117,7 +116,7 @@ bool BlockHandlerPython::executeSpecialized()
             {
                 for (const std::string& output : m_outputs)
                 {
-                    _uiComponent->displayMessage("Port was not set in python script: " + output + "\n");
+					SolverReport::instance().addToContentAndDisplay("Output port was not set in python script: " + output + "\n", _uiComponent);
                 }
             }
         }
@@ -127,5 +126,10 @@ bool BlockHandlerPython::executeSpecialized()
         }
     }
     return allInputsComplete;
+}
+
+std::string BlockHandlerPython::getBlockType() const
+{
+    return "Python Block";
 }
 

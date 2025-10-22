@@ -1,6 +1,6 @@
-#include "OTServiceFoundation/DurationFormatter.h"
+#include "OTServiceFoundation/TimeFormatter.h"
 
-std::string DurationFormatter::formatDuration(const std::chrono::steady_clock::time_point _begin, const std::chrono::steady_clock::time_point& _end)
+std::string TimeFormatter::formatDuration(const std::chrono::steady_clock::time_point _begin, const std::chrono::steady_clock::time_point& _end)
 {
 	const std::chrono::duration<double, std::milli> duration_ms = (_end - _begin);
 	if(duration_ms.count() < 1000.0)
@@ -23,4 +23,12 @@ std::string DurationFormatter::formatDuration(const std::chrono::steady_clock::t
 		return std::to_string(static_cast<uint64_t>(duration_h)) + " h";
 	}
 	
+}
+
+const std::string TimeFormatter::createCurrentDateTimeString()
+{
+	auto now = std::chrono::system_clock::now();
+	std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+	const std::string timeAndDate = std::ctime(&now_time);
+	return timeAndDate;
 }

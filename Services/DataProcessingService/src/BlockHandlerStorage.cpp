@@ -20,7 +20,7 @@
 #include "NewModelStateInfo.h"
 #include "EntityResult1DPlot.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTServiceFoundation/DurationFormatter.h"
+#include "OTServiceFoundation/TimeFormatter.h"
 
 BlockHandlerStorage::BlockHandlerStorage(EntityBlockStorage* blockEntityStorage, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntityStorage,handlerMap),m_blockEntityStorage(blockEntityStorage)
@@ -31,18 +31,11 @@ BlockHandlerStorage::BlockHandlerStorage(EntityBlockStorage* blockEntityStorage,
 	m_plotName = m_blockEntityStorage->getPlotName();
 }
 
-BlockHandlerStorage::~BlockHandlerStorage()
-{
-	
-}
-
 bool BlockHandlerStorage::executeSpecialized()
 {
 
 	if (allInputsAvailable())
 	{
-		_uiComponent->displayMessage("Executing Storage Block: " + m_blockName + "\n");
-
 		ot::PainterRainbowIterator colourIt;
 		std::string plotName = "Plots/";
 		auto blockName = ot::EntityName::getSubName(m_blockName);
@@ -260,7 +253,8 @@ bool BlockHandlerStorage::executeSpecialized()
 			std::list<std::shared_ptr<MetadataEntry>> metadata;
 			ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName,metadata);
 			
-			_uiComponent->displayMessage("Storing data into series: " + seriesName + "\n");
+			SolverReport::instance().addToContentAndDisplay("Storing data into series: " + seriesName + ".\n", _uiComponent);
+
 			auto startTimePoint = std::chrono::high_resolution_clock::now();
 			for (DatasetDescription& dsd : datasetDescr)
 			{
@@ -269,8 +263,8 @@ bool BlockHandlerStorage::executeSpecialized()
 			resultCollectionExtender.storeCampaignChanges();
 			auto endTimePoint = std::chrono::high_resolution_clock::now();
 
-			const std::string duration = DurationFormatter::formatDuration(startTimePoint, endTimePoint);
-			_uiComponent->displayMessage("Data storage took: " + duration + "\n");
+			const std::string duration = TimeFormatter::formatDuration(startTimePoint, endTimePoint);
+			SolverReport::instance().addToContentAndDisplay("Data storage completed in " +duration + ".\n", _uiComponent);
 
 			if (m_createPlot)
 			{
@@ -339,4 +333,9 @@ std::list<DatasetDescription> BlockHandlerStorage::createDatasets()
 	std::list<DatasetDescription> allDataDescriptions;
 
 	return allDataDescriptions;
+}
+
+std::string BlockHandlerStorage::getBlockType() const
+{
+	return "Storage Block";
 }

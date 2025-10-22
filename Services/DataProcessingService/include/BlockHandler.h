@@ -12,9 +12,10 @@ public:
 	using HandlerMap = std::map<std::shared_ptr<GraphNode>, std::shared_ptr<BlockHandler>>;
 
 	BlockHandler(EntityBlock* _blockEntity, const HandlerMap& _allHandler);
-	virtual ~BlockHandler();
+	virtual ~BlockHandler() = default;
 	void executeOwnNode(std::shared_ptr<GraphNode> _ownNode);
 	virtual void setData(PipelineData* _data, const std::string& _targetPort);
+	virtual std::string getBlockType() const = 0;
 
 protected:
 	std::string m_blockName;
