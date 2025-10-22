@@ -77,14 +77,15 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 bool BlockHandlerDatabaseAccess::executeSpecialized()
 {	
 	const std::string debugQuery = bsoncxx::to_json(m_query.view());
-	SolverReport::instance().addToContentAndDisplay("Executing query: " + debugQuery + "\n", _uiComponent);
+	SolverReport::instance().addToContent("Executing query: " + debugQuery + "\n");
 	
 	const std::string debugProjection = bsoncxx::to_json(m_projection.view());
-	SolverReport::instance().addToContentAndDisplay("Executing projection: " + debugProjection + "\n", _uiComponent);
-		 
+	SolverReport::instance().addToContent("Executing projection: " + debugProjection + "\n");
 	mongocxx::options::find options;
 	options.projection(m_projection);
 	options.limit(m_documentLimit);
+	SolverReport::instance().addToContent("Query limit: " + std::to_string( m_documentLimit )+ "\n");
+	SolverReport::instance().addToContent("Sorting by _id: " + std::to_string(m_sortByID) + "\n");
 
 	if (m_sortByID)
 	{
@@ -92,6 +93,8 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		bsoncxx::builder::basic::document hintDoc;
 		const std::string firstDefaultIndex = IndexHandler::getDefaultIndexes().front();
 		hintDoc.append(bsoncxx::builder::basic::kvp(firstDefaultIndex, 1));
+		SolverReport::instance().addToContent("Hint: " + bsoncxx::to_json(hintDoc) + "\n");
+
 		mongocxx::v_noabi::hint hint(hintDoc.extract());
 		options.hint(hint);
 	}
@@ -103,7 +106,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	auto endTime = std::chrono::high_resolution_clock::now();
 	const std::string queryDuration =	TimeFormatter::formatDuration(startTime, endTime);
 	
-	SolverReport::instance().addToContentAndDisplay("Query executed in " + queryDuration + "\n", _uiComponent);
+	SolverReport::instance().addToContent("Query executed in " + queryDuration + "\n");
 	
 	if (dbResponse.getSuccess())
 	{
