@@ -30,4 +30,5 @@ private:
 	void addCurveData(ltspice::RawData& resultData, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions, size_t numberOfXValues, size_t indexOffset);
 	void storeCurves(std::list<DatasetDescription>& allCurveDescriptions);
 	void clear();
+	std::string getUnitFromType(const std::string& type);
 };

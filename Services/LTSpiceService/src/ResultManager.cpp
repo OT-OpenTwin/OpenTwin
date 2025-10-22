@@ -179,7 +179,7 @@ void ResultManager::addParameterDescriptions(ParametricCombination &currentRun, 
 	MetadataParameter parameterXAxis;
 	parameterXAxis.parameterName = resultData.variables()[0].name();
 	parameterXAxis.values = std::move(parameterValuesXAxis);
-	parameterXAxis.unit = "";
+	parameterXAxis.unit = getUnitFromType(resultData.variables()[0].type());
 	parameterXAxis.typeName = ot::TypeNames::getDoubleTypeName();
 	std::shared_ptr<ParameterDescription> parameterXAxisDescription(std::make_shared<ParameterDescription>(parameterXAxis, false));
 	allParameterDescriptions.push_back(std::move(parameterXAxisDescription));
@@ -197,6 +197,31 @@ void ResultManager::addParameterDescriptions(ParametricCombination &currentRun, 
 	}
 }
 
+std::string ResultManager::getUnitFromType(const std::string& type)
+{
+	if (type == "time")
+	{
+		return "s";
+	}
+	else if (type == "frequency")
+	{
+		return "Hz";
+	}
+	else if (type == "voltage")
+	{
+		return "V";
+	}
+	else if (type == "device_current")
+	{
+		return "A";
+	}
+	else
+	{
+		assert(0); // Unknown type
+	}
+	return "";
+}
+
 void ResultManager::addCurveData(ltspice::RawData& resultData, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions, size_t numberOfXValues, size_t indexOffset)
 {
 	for (size_t iVariable = 1; iVariable < resultData.variablesCount(); iVariable++)
@@ -204,7 +229,7 @@ void ResultManager::addCurveData(ltspice::RawData& resultData, std::list<std::sh
 		DatasetDescription newCurveDescription;
 		newCurveDescription.addParameterDescriptions(allParameterDescriptions);
 
-		std::string quantityUnit = "";
+		std::string quantityUnit = getUnitFromType(resultData.variables()[iVariable].type());
 		std::string quantityName = resultData.variables()[iVariable].name();;
 
 		QuantityDescription* quantityDescription = nullptr;
