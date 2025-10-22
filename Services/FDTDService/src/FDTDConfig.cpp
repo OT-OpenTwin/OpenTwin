@@ -4,7 +4,6 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #include "FDTDConfig.h"
-#include "FDTDPropertyReader.h"
 
 FDTDConfig::FDTDConfig()
 {
@@ -30,7 +29,7 @@ double FDTDConfig::getFrequencyStop() const {
 	return m_freqStop;
 }
 
-uint8_t FDTDConfig::getOversampling() const {
+uint32_t FDTDConfig::getOversampling() const {
 	return m_oversampling;
 }
 
@@ -45,8 +44,8 @@ std::string FDTDConfig::getBoundaryConditions(size_t _index) const {
 	return m_boundaryConditions[_index];
 }
 
-uint8_t FDTDConfig::getExcitationType() const {
-	return static_cast<uint8_t>(m_excitation);
+uint32_t FDTDConfig::getExcitationType() const {
+	return static_cast<uint32_t>(m_excitation);
 }
 
 void FDTDConfig::setTimeSteps(uint32_t _timeSteps) {
@@ -57,7 +56,7 @@ void FDTDConfig::setExcitationType(ExcitationType _excitationType) {
 	m_excitation = _excitationType;
 }
 
-void FDTDConfig::setExcitationType(uint8_t _value) {
+void FDTDConfig::setExcitationType(uint32_t _value) {
 	if (_value > 2 || _value < 0) {
 		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 0 (Gaussian), 1 (Sinusoidal), or 2 (Ramp)");
 	}
@@ -76,7 +75,7 @@ void FDTDConfig::setFrequencyStop(double _freqStop) {
 	m_freqStop = _freqStop;
 }
 
-void FDTDConfig::setOverSampling(uint8_t _overSampling) {
+void FDTDConfig::setOverSampling(uint32_t _overSampling) {
 	m_oversampling = _overSampling;
 }
 
@@ -113,45 +112,46 @@ void FDTDConfig::ensureEntityIsSet() const {
 }
 
 tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLElement& _parentElement) {
-	// Define the boundary names used for the solver XML parser
+	// Refresh the property information from the entity properties
+	refreshPropertyInfo();
+
+	// Defining the boundary names used for the solver XML parser
 	// These must match the expected names in the XML and will be different from the GUI
 	const std::array<std::string, 6> solverBoundaryNames = { "xmax", "xmin", "ymax", "ymin", "zmax", "zmin" };
-	m_freqStart = readFrequencyStartInfo();
-	m_freqStop = readFrequencyStopInfo();
 	const double f0 = (m_freqStart + m_freqStop) / 2.0;
 	const double fc = (m_freqStop - m_freqStart) / 2.0;
 
 	// Now we create the FDTD root node and set its attributes
 	auto FDTD = _parentElement.GetDocument()->NewElement("FDTD");
-	FDTD->SetAttribute("NumberOfTimesteps", readTimestepInfo());
-	FDTD->SetAttribute("OverSampling", readOversamplingInfo());
-	FDTD->SetAttribute("endCriteria", readEndCriteriaInfo());
+	FDTD->SetAttribute("NumberOfTimesteps", m_timeSteps);
+	FDTD->SetAttribute("OverSampling", m_oversampling);
+	FDTD->SetAttribute("endCriteria", m_endCriteria);
 	FDTD->SetAttribute("f_max", m_freqStop);
 
 	// Now we add the excitation nodes to the FDTD root node
 	auto excitation = _parentElement.GetDocument()->NewElement("Excitation");
-	excitation->SetAttribute("Type", static_cast<int>(readExcitationTypeInfo()));
+	excitation->SetAttribute("Type", static_cast<int>(m_excitation));
 	excitation->SetAttribute("f0", f0);
 	excitation->SetAttribute("fc", fc);
 	FDTD->InsertEndChild(excitation);
 
 	// Finally we add the boundary conditions to the FDTD root node
 	auto boundary = _parentElement.GetDocument()->NewElement("BoundaryCond");
-	const auto boundaryConditions = readBoundaryConditions();
 	for (size_t i = 0; i < solverBoundaryNames.size(); ++i) {
-		boundary->SetAttribute(solverBoundaryNames[i].c_str(), boundaryConditions[i].c_str());
+		boundary->SetAttribute(solverBoundaryNames[i].c_str(), m_boundaryConditions[i].c_str());
 	}
 	FDTD->InsertEndChild(boundary);
 	return FDTD;
 }
 
-uint32_t FDTDConfig::readTimestepInfo() {
+void FDTDConfig::readTimestepInfo() {
 	ensureEntityIsSet();
-	return readEntityPropertiesInfo<uint32_t>(m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "Timesteps", true);
+	m_timeSteps = PropertyHelper::getIntegerPropertyValue(m_solverEntity, "Timesteps", "Simulation Settings");
 }
 
-uint8_t FDTDConfig::readExcitationTypeInfo() {
-	std::string excitation = readEntityPropertiesInfo<std::string> (m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "Excitation type", true);
+void FDTDConfig::readExcitationTypeInfo() {
+	ensureEntityIsSet();
+	std::string excitation = PropertyHelper::getSelectionPropertyValue(m_solverEntity, "Excitation Type", "Simulation Settings");
 	if (excitation == "Gauss Excitation") {
 		m_excitation = ExcitationType::GAUSSIAN;
 	}
@@ -161,40 +161,93 @@ uint8_t FDTDConfig::readExcitationTypeInfo() {
 	else {
 		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 'Gaussian' 'Sinusoidal'");
 	}
-	return static_cast<uint8_t>(m_excitation);
 }
 
-double FDTDConfig::readEndCriteriaInfo() {
+void FDTDConfig::readEndCriteriaInfo() {
 	ensureEntityIsSet();
-	return readEntityPropertiesInfo<double>(m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "End Criteria", true);
+	m_endCriteria = PropertyHelper::getDoublePropertyValue(m_solverEntity, "End Criteria", "Simulation Settings");
 }
 
-double FDTDConfig::readFrequencyStartInfo() {
+void FDTDConfig::readFrequencyStartInfo() {
 	ensureEntityIsSet();
-	return readEntityPropertiesInfo<double>(m_solverEntity, "Frequency", m_frequencyProperties, "Start Frequency", true);
+	m_freqStart = PropertyHelper::getDoublePropertyValue(m_solverEntity, "Start Frequency", "Frequency");
 }
 
-double FDTDConfig::readFrequencyStopInfo() {
+void FDTDConfig::readFrequencyStopInfo() {
 	ensureEntityIsSet();
-	return readEntityPropertiesInfo<double>(m_solverEntity, "Frequency", m_frequencyProperties, "End Frequency", true);
+	m_freqStop = PropertyHelper::getDoublePropertyValue(m_solverEntity, "End Frequency", "Frequency");
 }
 
-uint16_t FDTDConfig::readOversamplingInfo() {
+void FDTDConfig::readOversamplingInfo() {
 	ensureEntityIsSet();
-	return readEntityPropertiesInfo<uint16_t>(m_solverEntity, "Simulation Settings", m_simulationSettingsProperties, "Oversampling", true);
+	m_oversampling = PropertyHelper::getIntegerPropertyValue(m_solverEntity, "Oversampling", "Simulation Settings");
 }
 
-std::array<std::string, 6> FDTDConfig::readBoundaryConditions() {
+void FDTDConfig::readBoundaryConditions() {
 	ensureEntityIsSet();
-	ot::ModelServiceAPI::getEntityProperties(m_solverEntity->getName(), true, "Boundary Conditions", m_boundaryConditionProperties);
 	for (size_t i = 0; i < m_boundaryNames.size(); ++i) {
-		auto value = readEntityPropertiesInfo<std::string>(m_solverEntity, "Boundary Conditions", m_boundaryConditionProperties, m_boundaryNames[i], false);
+		auto value = PropertyHelper::getSelectionPropertyValue(m_solverEntity, m_boundaryNames[i], "Boundary Conditions");
 		if (value.empty()) {
 			value = "PEC"; // default to PEC
 		}
 		m_boundaryConditions[i] = value;
 	}
-	return m_boundaryConditions;
+}
+
+void FDTDConfig::refreshPropertyInfo() {
+	ensureEntityIsSet();
+
+	// Helper lambda function to safely read a property and log errors
+	//! @brief This lambda function attempts to read a property using the provided read function.
+	//! @brief If an exception occurs during the read, it logs the error and sets the target value to a default.
+	//! @param _readFunc The function that reads the property.
+	//! @param _propertyName The name of the property being read (for logging purposes).
+	//! @param _targetValue The variable where the read value will be stored.
+	//! @param _defaultValue The default value to use if reading fails.
+	auto safeRead = [&](auto _readFunc, const std::string& _propertyName, auto& _targetValue, auto _defaultValue) {
+		try {
+			_readFunc();
+		}
+		catch (const std::exception& e) {
+			_targetValue = _defaultValue;
+			std::string msg = "[FDTDConfig] Error reading property '" + _propertyName + "': " + e.what();
+			std::string msgDefaults = "Defaulting to: ";
+
+			if (_propertyName == "Boundary Conditions") {
+				msgDefaults = "Defaulting to: PEC on all sides" ;
+			}
+			else if constexpr (std::is_same_v<decltype(_defaultValue), std::string>) {
+				msgDefaults += _defaultValue;
+			}
+			else if constexpr (std::is_arithmetic_v<decltype(_defaultValue)>) {
+				msgDefaults += std::to_string(_defaultValue);
+			}
+			else if constexpr (std::is_enum_v<decltype(_defaultValue)>) {
+				switch (_defaultValue) {
+					case ExcitationType::GAUSSIAN: msgDefaults += "Excitation Type: Gaussian"; break;
+					case ExcitationType::SINUSOIDAL: msgDefaults += "Excitation Type: Sinusoidal"; break;
+					default: msgDefaults += "Unknown Excitation Type"; break;
+				}
+			}
+			OT_LOG_E(msg);
+			OT_LOG_E(msgDefaults + "\n");
+		}
+	};
+
+	// Now read each property safely and log errors, and sets default values if reading fails
+	safeRead([&]() { readTimestepInfo(); }, "Timesteps", m_timeSteps, 1000u);
+	safeRead([&]() { readExcitationTypeInfo(); }, "Excitation Type", m_excitation, ExcitationType::GAUSSIAN);
+	safeRead([&]() { readEndCriteriaInfo(); }, "End Criteria", m_endCriteria, 1e-6);
+	safeRead([&]() { readFrequencyStartInfo(); }, "Start Frequency", m_freqStart, 1000.0);
+	safeRead([&]() { readFrequencyStopInfo(); }, "End Frequency", m_freqStop, 2000.0);
+	safeRead([&]() { readOversamplingInfo(); }, "Oversampling", m_oversampling, 1);
+	safeRead([&]() { readBoundaryConditions(); }, "Boundary Conditions", m_boundaryConditions, std::array<std::string, 6>{"PEC", "PEC", "PEC", "PEC", "PEC", "PEC"});
+
+	if (m_freqStart >= m_freqStop) {
+		OT_LOG_W("[FDTDConfig] Start Frequency must be less than End Frequency! Adjusting to default values: Start Frequency = 1000.0, End Frequency = 2000.0\n");
+		m_freqStart = 1000.0;
+		m_freqStop = 2000.0;
+	}
 }
 
 void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {

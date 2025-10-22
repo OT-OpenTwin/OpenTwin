@@ -68,11 +68,5 @@
     <ClInclude Include="include\FDTDConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\FDTDPropertyReader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\FDTDPropertyReader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

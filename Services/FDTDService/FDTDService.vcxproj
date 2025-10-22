@@ -208,8 +208,6 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\FDTDConfig.h" />
     <ClInclude Include="include\FDTDLauncher.h" />
-    <ClInclude Include="include\FDTDPropertyReader.h" />
-    <ClInclude Include="include\FDTDPropertyReader.hpp" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\SolverBase.h" />
     <ClInclude Include="include\SolverFDTD.h" />
