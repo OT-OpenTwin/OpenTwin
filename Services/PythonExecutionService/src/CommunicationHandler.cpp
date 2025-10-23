@@ -305,8 +305,7 @@ bool CommunicationHandler::waitForClient(void) {
 }
 
 void CommunicationHandler::slotProcessMessage(std::string _message) {
-	OT_LOG_D("Message from client: \"" + _message + "\"");
-
+	OT_LOG("Message from client: \"" + _message + "\"", ot::INBOUND_MESSAGE_LOG);
 	while (_message.substr(0, 7) == "OUTPUT:")
 	{
 		std::string text = _message.substr(7, _message.length() - 1 - 7); // There is always an additional \n at the end of the message which needs to be removed here
@@ -361,8 +360,8 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 	}
 
 	// Write request
-	OT_LOG_D("Writing to client: \"" + _data.toStdString() + "\"");
-
+	OT_LOG("Writing to client: \"" + _data.toStdString() + "\"", ot::OUTGOING_MESSAGE_LOG);
+	
 	setClientState(ClientState::WaitForResponse);
 	uint64_t writteByte = m_client->write(_data);
 	bool flushSuccess = m_client->flush(); //Any data was written.
@@ -388,7 +387,7 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 
 	// Check if the client has received a response or disconnected.
 	if (getClientState() == ClientState::ReponseReceived) {
-		OT_LOG_D("Client response received: \"" + _response + "\"");
+		OT_LOG("Client response received: \"" + _response + "\"", ot::INBOUND_MESSAGE_LOG);
 
 		_response = m_response;
 		setClientState(ClientState::Ready);
