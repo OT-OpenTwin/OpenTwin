@@ -59,6 +59,8 @@
 #define OT_ACTION_CMD_GetVisualizationModel "VisualizationModel.Get"
 #define OT_ACTION_CMD_OpenNewProject "Project.OpenNew"
 
+#define OT_ACTION_CMD_AddProjectPreviewImage "Project.AddPreviewImage"
+
 #define OT_ACTION_CMD_Log "Log"
 #define OT_ACTION_CMD_SetGlobalLogFlags "Logger.SetGlobal"
 #define OT_ACTION_CMD_SetSpecificLogFlags "Logger.SetSpecific"

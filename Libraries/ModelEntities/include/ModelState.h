@@ -5,13 +5,15 @@
 #include <string>
 #include <list>
 #include "UniqueUIDGenerator.h"
+#include "OTCore/CoreTypes.h"
+#include "OTGui/GuiTypes.h"
 #include "OTGui/VersionGraphCfg.h"
 
 #include <mongocxx/cursor.hpp>
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/types.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
-#include "OTCore/CoreTypes.h"
+
 
 class EntityBase;
 
@@ -146,6 +148,13 @@ public:
 	// Write the version information to the entity in the data base
 	void updateVersionEntity(const std::string& _version);
 
+	//! @brief Adds an image to the project.
+	//! Any existing image will be replaced.
+	//! @param _imageData The image data to add.
+	bool addPreviewImage(std::vector<char>&& _imageData, ot::ImageFileFormat _format);
+
+
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Helper
@@ -196,14 +205,24 @@ private:
 	// Write an extension document of an absolute state
 	bool writeExtensionDocument(std::map<ot::UID, ModelStateEntity> &entitiesLeft);
 
-	// Helper function to determine non-modelstate entries in a list of results
-	bool getListOfNonModelStateEntities(mongocxx::cursor &cursor, bsoncxx::builder::basic::array &entityArray);
+	//! @brief Retrieve all dangling entities from the given cursor and add them to the given array.
+	//! Dangling entities are entities which are not part of any model state.
+	//! @param _cursor The cursor to retrieve the entities from.
+	//! @param _entityArray The array to add the entities to. 
+	//! @return 
+	bool getDanglingEntities(mongocxx::cursor& _cursor, bsoncxx::builder::basic::array& _entityArray);
 
 	// Determine whether a given version is part of the currently active branch
 	bool isVersionInActiveBranch(const std::string &version);
 
 	// Determine whether a given version is part of the given branch
 	bool isVersionInBranch(const std::string &version, const std::string &branch);
+
+	//! @brief Reads the project preview information from the given document view.
+	//! If no preview information is found, the preview image UID will be set to invalid.
+	//! @param _documentView The document view to read the information from.
+	//! @return True on success, false otherwise.
+	bool readProjectPreviewInformation(bsoncxx::v_noabi::document::view& _documentView);
 
 	// Get the parent branch of the given branch (remove the part after the last .)
 	std::string getParentBranch(const std::string &branch);
@@ -281,6 +300,15 @@ private:
 
 	// The active version which is currently stored in the model entity
 	std::string m_activeVersionInModelEntity;
+
+	//! @brief The preview image UID.
+	ot::UID m_previewImageUID;
+
+	//! @brief The preview image version.
+	ot::UID m_previewImageVersion;
+
+	//! @brief The preview image format.
+	ot::ImageFileFormat m_previewImageFormat;
 
 	// The member for creation of Unique IDs
 	DataStorageAPI::UniqueUIDGenerator* m_uniqueUIDGenerator;

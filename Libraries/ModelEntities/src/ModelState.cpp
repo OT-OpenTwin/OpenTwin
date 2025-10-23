@@ -8,6 +8,7 @@
 
 #include "DataBase.h"
 #include "EntityBase.h"
+#include "EntityFileImage.h"
 #include "Connection\ConnectionAPI.h"
 #include "Document\DocumentAccessBase.h"
 #include "Helper\QueryBuilder.h"
@@ -18,7 +19,10 @@
 ModelState::ModelState(unsigned int sessionID, unsigned int serviceID) :
 	m_stateModified(false),
 	m_maxNumberArrayEntitiesPerState(250000),
-	m_customVersionIsEndOfBranch(false)
+	m_customVersionIsEndOfBranch(false),
+	m_previewImageUID(ot::invalidUID),
+	m_previewImageVersion(ot::invalidUID),
+	m_previewImageFormat(ot::ImageFileFormat::PNG)
 {
 	DataStorageAPI::UniqueUIDGenerator *uidGenerator = EntityBase::getUidGenerator();
 	if (uidGenerator == nullptr)
@@ -73,6 +77,9 @@ bool ModelState::openProject(const std::string& _customVersion) {
 	std::string activeBranch = result->view()["ActiveBranch"].get_utf8().value.data();
 	std::string activeVersion = result->view()["ActiveVersion"].get_utf8().value.data();
 
+	// Load the preview image if set
+	readProjectPreviewInformation(result->view());
+	
 	// If a specific version was requested we try to open it instead.
 	if (!_customVersion.empty()) {
 		auto versionEntry = m_graphCfg.findVersion(_customVersion);
@@ -1162,7 +1169,7 @@ void ModelState::removeDanglingModelEntities(void)
 		<< "_id" << bsoncxx::builder::stream::open_document << "$gte" << searchOid
 		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 
-	filterDoc = filter.GenerateSelectQuery({ "SchemaType" }, true);
+	filterDoc = filter.GenerateSelectQuery({ "SchemaType", "EntityID", "Version" }, true);
 
 	sortDoc = bsoncxx::builder::basic::document{};
 	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
@@ -1173,7 +1180,7 @@ void ModelState::removeDanglingModelEntities(void)
 
 	auto deleteEntities = bsoncxx::builder::basic::array();
 
-	if (getListOfNonModelStateEntities(resultList, deleteEntities))
+	if (getDanglingEntities(resultList, deleteEntities))
 	{
 		// If we have entities to delete, we will send the delete call with the list of entities to be deleted to the database server
 		auto deleteDoc = bsoncxx::builder::stream::document{}
@@ -1184,25 +1191,23 @@ void ModelState::removeDanglingModelEntities(void)
 		docBase.DeleteDocuments(std::move(deleteDoc));
 	}
 
-	// We should not have dangling entities in the project anymore
+	// Now we should not have dangling entities in the project anymore
 }
 
-bool ModelState::getListOfNonModelStateEntities(mongocxx::cursor &cursor, bsoncxx::builder::basic::array &entityArray)
+bool ModelState::getDanglingEntities(mongocxx::cursor& _cursor, bsoncxx::builder::basic::array& _entityArray)
 {
 	bool entitiesInList = false;
 
-	for (const auto& item : cursor)
+	for (const auto& item : _cursor)
 	{
 		std::string schemaType = item["SchemaType"].get_utf8().value.data();
 
-		if (schemaType == "ModelState" || schemaType == "ModelStateExtension" || schemaType == "ModelStateInactive" || schemaType == "ModelStateExtensionInactive")
-		{
+		if (schemaType == "ModelState" || schemaType == "ModelStateExtension" || schemaType == "ModelStateInactive" || schemaType == "ModelStateExtensionInactive") {
 			// We found the fist model state. end the search
 			return entitiesInList;
 		}
-		else
-		{
-			entityArray.append(item["_id"].get_oid());
+		else if (static_cast<ot::UID>(item["EntityID"].get_int64()) != m_previewImageUID || static_cast<ot::UID>(item["Version"].get_int64()) != m_previewImageVersion) {
+			_entityArray.append(item["_id"].get_oid());
 			entitiesInList = true;
 		}
 	}
@@ -1498,6 +1503,37 @@ bool ModelState::isVersionInBranch(const std::string &version, const std::string
 	return false; // The specified version is not in the active branch
 }
 
+bool ModelState::readProjectPreviewInformation(bsoncxx::v_noabi::document::view& _documentView) {
+	// Reset preview image information
+	m_previewImageUID = ot::invalidUID;
+	m_previewImageVersion = ot::invalidUID;
+
+	// Check if a preview image is available
+	auto previewUIDIt = _documentView.find("PreviewImageUID");
+	if (previewUIDIt == _documentView.end()) {
+		// No preview image available
+		return true;
+	}
+
+	// Ensure that all required information is available
+	auto previewVersionIt = _documentView.find("PreviewImageVersion");
+	auto previewFileType = _documentView.find("PreviewImageType");
+
+	if (previewVersionIt == _documentView.end() || previewFileType == _documentView.end()) {
+		OT_LOG_E("Corrupted model entity: Incomplete preview image information");
+		return false;
+	}
+
+	// Convert the file type string into an image file format
+	std::string formatStr = previewFileType->get_utf8().value.data();
+	
+	m_previewImageFormat = ot::stringToImageFileFormat(formatStr);
+	
+	m_previewImageUID = static_cast<ot::UID>(previewUIDIt->get_int64());
+	m_previewImageVersion = static_cast<ot::UID>(previewVersionIt->get_int64());
+	return true;
+}
+
 std::string ModelState::getParentBranch(const std::string &branch)
 {
 	int index = branch.rfind('.');
@@ -1596,6 +1632,71 @@ void ModelState::updateVersionEntity(const std::string& _version) {
 		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 
 	collection.update_one(queryDoc.view(), modifyDoc.view());
+}
+
+bool ModelState::addPreviewImage(std::vector<char>&& _imageData, ot::ImageFileFormat _format) {
+	// Load the model entity
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+
+	long long modelVersion = getCurrentModelEntityVersion();
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< bsoncxx::builder::stream::finalize;
+
+	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
+
+	auto sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
+	if (!result) {
+		OT_LOG_E("No model entity found");
+		return false;  // No model entity found
+	}
+
+	// Now check if we already have an image
+	auto idIt = result->view().find("PreviewImageUID");
+	if (idIt != result->view().end()) {
+		auto verIt = result->view().find("PreviewImageVersion");
+		if (verIt == result->view().end()) {
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
+			return false;
+		}
+
+		// Delete the existing image
+
+		// to be implemented: delete existing image
+	}
+
+	EntityBinaryData newImageData;
+	newImageData.setEntityID(this->createEntityUID());
+	newImageData.setData(std::move(_imageData));
+	newImageData.storeToDataBase();
+
+	std::string imageFormatStr = ot::toString(_format);
+
+	// Now update the model entity with the new image information
+	addNewEntity(newImageData.getEntityID(), 0, newImageData.getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
+	
+	// Finally, update the model entity
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
+	
+	auto queryDoc2 = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< "Version" << modelVersion
+		<< bsoncxx::builder::stream::finalize;
+
+	auto modifyDoc = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "PreviewImageUID" << static_cast<int64_t>(newImageData.getEntityID())
+		<< "PreviewImageVersion" << static_cast<int64_t>(newImageData.getEntityStorageVersion())
+		<< "PreviewImageType" << imageFormatStr
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	collection.update_one(queryDoc2.view(), modifyDoc.view());
+
+	return true;
 }
 
 void ModelState::createAndActivateNewBranch(void)

@@ -346,3 +346,14 @@ ot::ImageFileFormat ot::FileExtension::toImageFileFormat(DefaultFileExtension _e
 		return ot::ImageFileFormat::PNG;
 	}
 }
+
+ot::FileExtension::DefaultFileExtension ot::FileExtension::fromImageFileFormat(ImageFileFormat _format) {
+	switch (_format) {
+	case ot::ImageFileFormat::PNG: return DefaultFileExtension::Png;
+	case ot::ImageFileFormat::JPEG: return DefaultFileExtension::Jpeg;
+	case ot::ImageFileFormat::SVG: return DefaultFileExtension::Svg;
+	default:
+		OT_LOG_E("Unknown image file format (" + std::to_string(static_cast<int>(_format)) + ")");
+		return DefaultFileExtension::Unknown;
+	}
+}

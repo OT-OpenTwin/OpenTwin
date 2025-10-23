@@ -592,7 +592,7 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 
 	std::string actualOpenedProject = DataBase::GetDataBase()->getProjectName();
 	CrossCollectionDatabaseWrapper wrapper(collectionName);
-		
+	
 	ModelState secondary(m_model->getSessionCount(), static_cast<unsigned int>(m_model->getServiceID()));
 	secondary.openProject();
 

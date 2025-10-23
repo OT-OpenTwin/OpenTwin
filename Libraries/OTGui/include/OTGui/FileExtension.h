@@ -136,6 +136,11 @@ namespace ot {
 		//! @param _success Returns true if the conversion was successful, false otherwise.
 		static ImageFileFormat toImageFileFormat(DefaultFileExtension _extension, bool& _success);
 
+		//! @brief Converts an ImageFileFormat to the corresponding DefaultFileExtension.
+		//! @param _format Format to convert.
+		//! @return Corresponding DefaultFileExtension. If no corresponding extension exists, DefaultFileExtension::Unknown is returned.
+		static DefaultFileExtension fromImageFileFormat(ImageFileFormat _format);
+
 	};
 
 }

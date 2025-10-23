@@ -18,6 +18,7 @@
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "NewModelStateInfo.h"
+#include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
 
 class EntityMesh;
@@ -291,6 +292,7 @@ private:
 	ot::ToolBarButtonCfg m_undoButton;
 	ot::ToolBarButtonCfg m_redoButton;
 	ot::ToolBarButtonCfg m_deleteButton;
+	ot::ToolBarButtonCfg m_uploadProjectPreviewImage;
 	ot::ToolBarButtonCfg m_infoButton;
 	ot::ToolBarButtonCfg m_saveButton;
 	ot::ToolBarButtonCfg m_createParameterButton;
@@ -298,8 +300,14 @@ private:
 	void handleUndoLastOperation();
 	void handleRedoNextOperation();
 	void handleDeleteSelectedShapes();
+	void handleRequestUploadProjectPreviewImage();
 	void handleShowSelectedShapeInformation();
 	void handleCreateNewParameter();
+
+	// Action handlers
+	ot::ActionHandler m_actionHandler;
+
+	void handleAddProjectPreviewImage(ot::JsonDocument& _document);
 
 	// Persistent attributes (need to be stored in data base)
 	EntityContainer               *entityRoot;
