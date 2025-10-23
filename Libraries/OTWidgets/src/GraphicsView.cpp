@@ -680,7 +680,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	}
 
 	// Snap position to grid
-	QPointF gridPos = m_scene->snapToGrid(_event->pos());
+	QPointF gridPos = m_scene->snapToGrid(this->mapToScene(_event->pos()));
 	
 	// Emit event
 	Q_EMIT itemRequested(itemName, gridPos);
