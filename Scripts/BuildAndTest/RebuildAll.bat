@@ -81,24 +81,6 @@ DEL Documentation_buildLog.txt 2> nul
 DEL DoxygenDocumentation_buildLog.txt 2> nul
 
 REM ====================================================================
-REM Build the file header updater and run it
-REM ====================================================================
-
-REM ECHO ===============================================================
-REM ECHO Build Tool: FileHeaderUpdater
-REM ECHO ===============================================================
-REM CALL "%OT_FILEHEADERUPDATER_ROOT%\build.bat" RELEASE REBUILD
-
-REM REM Enabled:
-REM CALL "%OT_FILEHEADERUPDATER_ROOT%\x64\Release\FileHeaderUpdater.exe" --config "%OT_FILEHEADERUPDATER_ROOT%\OT_FHU_Config.json"
-
-REM Dry only (Show files that will be changed, no changes will be performed):
-REM CALL "%OT_FILEHEADERUPDATER_ROOT%\x64\Release\FileHeaderUpdater.exe" --dry --config "%OT_FILEHEADERUPDATER_ROOT%\OT_FHU_Config.json"
-
-REM Show expected new files ("Slow", no changes will be performed)
-REM CALL "%OT_FILEHEADERUPDATER_ROOT%\x64\Release\FileHeaderUpdater.exe" --preview --config "%OT_FILEHEADERUPDATER_ROOT%\OT_FHU_Config.json"
-
-REM ====================================================================
 REM Build the libraries 
 REM ====================================================================
 
@@ -443,6 +425,11 @@ ECHO ===============================================================
 ECHO Build Executable: ModelLibraryUpdater
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\ModelLibraryUpdater\build.bat" %1 %2
+
+ECHO ===============================================================
+ECHO Build Executable: FileHeaderUpdater
+ECHO ===============================================================
+CALL "%OT_FILEHEADERUPDATER_ROOT%\build.bat" %1 %2
 
 ECHO ====================================================================
 ECHO Build Admin Panel
