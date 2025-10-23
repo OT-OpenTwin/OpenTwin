@@ -182,11 +182,6 @@ ot::WidgetView* ViewerAPI::getViewerWidget(ot::UID viewerID)
 	return nullptr;
 }
 
-void ViewerAPI::resetAllViews1D(ot::UID osgModelID)
-{
-	getModelFromID(osgModelID)->resetAllViews1D();
-}
-
 void ViewerAPI::resetAllViews3D(ot::UID osgModelID)
 {
 	getModelFromID(osgModelID)->resetAllViews3D();
@@ -709,20 +704,10 @@ void ViewerAPI::prefetchDocumentsFromStorage(const std::string &projectName, std
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
 }
 
-void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName) {
+void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _versionGraphTabName) {
 	ot::ViewerView * v = intern::ViewerManager::uidToViewerMap()[_viewerID];
 	if (v != nullptr) {
-		v->getViewer()->setTabNames(_osgViewTabName, _plotTabName, _versionGraphTabName);
-	}
-}
-
-ot::WidgetView* ViewerAPI::getPlotWidget(ot::UID _viewerID) {
-	ot::ViewerView * v = intern::ViewerManager::uidToViewerMap()[_viewerID];
-	if (v != nullptr) {
-		return v->getViewer()->get1DPlot();
-	}
-	else {
-		return nullptr;
+		v->getViewer()->setTabNames(_osgViewTabName, _versionGraphTabName);
 	}
 }
 

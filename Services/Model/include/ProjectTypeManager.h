@@ -61,7 +61,6 @@ private:
 	bool m_hasHierarchicalRoot          = false;
 
 	bool m_has3DView					= true;
-	bool m_has1DView					= true;
 	bool m_hasBlockPicker				= true;
 
 	std::string m_RMDCategorizationName;

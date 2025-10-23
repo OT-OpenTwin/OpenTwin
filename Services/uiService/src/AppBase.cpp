@@ -187,7 +187,6 @@ AppBase::AppBase() :
 	m_shortcutManager(nullptr),
 	m_graphicsPicker(nullptr),
 	m_visible3D(false),
-	m_visible1D(false),
 	m_visibleBlockPicker(false),
 	m_propertyGrid(nullptr),
 	m_projectNavigation(nullptr),
@@ -1269,18 +1268,6 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 		m_viewerComponent->getViewerWidget(viewID)->getViewWidget()->setVisible(false);
 	}
 	
-	if (getVisible1D())
-	{
-		ot::WidgetView* wv = m_viewerComponent->getPlotWidget(viewID);
-		wv->setViewData(ot::WidgetViewBase(text1D.toStdString(), text1D.toStdString(), ot::WidgetViewBase::View1D, ot::WidgetViewBase::ViewIsCentral));
-
-		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv, ot::WidgetView::KeepCurrentFocus);
-	}
-	else
-	{
-		m_viewerComponent->getPlotWidget(viewID)->getViewWidget()->setVisible(false);
-	}
-
 	{
 		if (m_versionGraph) {
 			OT_LOG_EA("Version graph already exists");

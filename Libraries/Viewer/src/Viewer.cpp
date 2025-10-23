@@ -225,9 +225,6 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	osgAxisViewer->setLight(osgAxisLight);
 	osgAxisViewer->realize();
 
-	// Create new Plot
-	m_plot = new ot::PlotManagerView;
-
 	// Create settings
 	ot::PropertyGridCfg dataset = createSettings();
 
@@ -893,9 +890,8 @@ void Viewer::detachFromModel(void)
 	model = nullptr;
 }
 
-void Viewer::setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName) {
+void Viewer::setTabNames(const std::string & _osgViewTabName, const std::string & _versionGraphTabName) {
 	osgViewerTabName = _osgViewTabName;
-	m_plotTabName = _plotTabName;
 	m_versionGraphTabName = _versionGraphTabName;
 }
 

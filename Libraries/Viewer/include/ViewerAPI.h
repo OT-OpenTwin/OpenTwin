@@ -45,7 +45,6 @@ namespace ViewerAPI {
 	__declspec(dllexport) ot::UID createViewer(ot::UID osgModelID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
 	__declspec(dllexport) ot::WidgetView* getViewerWidget(ot::UID viewer);
 
-	__declspec(dllexport) void resetAllViews1D(ot::UID osgModelID);
 	__declspec(dllexport) void resetAllViews3D(ot::UID osgModelID);
 	__declspec(dllexport) void refreshAllViews(ot::UID osgModelID);
 	__declspec(dllexport) void clearSelection(ot::UID osgModelID);
@@ -125,10 +124,8 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 
-	__declspec(dllexport) void setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
+	__declspec(dllexport) void setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _versionGraphTabName);
 
-	__declspec(dllexport) ot::WidgetView* getPlotWidget(ot::UID _viewerID);
-	
 	/********************************************************************************************/
 
 	__declspec(dllexport) void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);

@@ -62,9 +62,7 @@ public:
 
 	void detachFromModel(void);
 
-	ot::PlotManagerView* get1DPlot(void) const { return m_plot; }
-
-	void setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
+	void setTabNames(const std::string & _osgViewTabName, const std::string & _versionGraphTabName);
 	
 	Rubberband * getRubberband(void) { return rubberband; }
 
@@ -196,9 +194,6 @@ private:
 	bool							   lightSourceDistanceInfinite;
 	osg::ref_ptr<osg::Switch>          handlerNode;
 	HandlerBase						  *currentHandler;
-
-	ot::PlotManagerView*				m_plot;
-	std::string							m_plotTabName;
 
 	std::string							m_versionGraphTabName;
 

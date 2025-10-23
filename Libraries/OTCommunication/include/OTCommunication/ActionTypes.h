@@ -446,7 +446,6 @@
 #define OT_ACTION_PARAM_UI_GRAPH_BRANCH "UI.Graph.Branch"
 
 #define OT_ACTION_PARAM_UI_TREE_Visible3D "UI.View.3D"
-#define OT_ACTION_PARAM_UI_TREE_Visible1D "UI.View.1D"
 #define OT_ACTION_PARAM_UI_TREE_VisibleTable "UI.View.Table"
 #define OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker "UI.View.BlockPicker"
 

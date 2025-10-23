@@ -205,8 +205,6 @@ public:
 	void isModified(ViewerUIDtype viewerUID, bool modifiedState);
 	void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 
-	ot::WidgetView* getPlotWidget(ViewerUIDtype _viewerID);
-	
 	void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);
 
 	ViewerUIDtype createViewer(ModelUIDtype _modelUid, double _scaleWidth, double _scaleHeight,
@@ -226,7 +224,7 @@ public:
 	//! \return Returns true if the selection has requested a new view.
 	ot::SelectionHandlingResult handleSelectionChanged(const ot::SelectionData& _selectionData);
 
-	void setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabName1D, const std::string & _tabNameVersions);
+	void setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabNameVersions);
 
 	void shortcutActivated(const std::string &keySequence);
 

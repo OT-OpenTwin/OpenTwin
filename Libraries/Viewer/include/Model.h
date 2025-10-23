@@ -25,8 +25,6 @@
 
 class Viewer;
 class SceneNodeGeometry;
-class SceneNodePlot1D;
-class SceneNodePlot1DCurve;
 class ManipulatorBase;
 
 class Model
@@ -46,7 +44,6 @@ public:
 
 	void attachViewer(Viewer *viewer);
 	void detachViewer(Viewer *viewer);
-	void resetAllViews1D(void);
 	void resetAllViews3D(void);
 	void refreshAllViews(void);
 	void clearSelection(void);
@@ -237,12 +234,7 @@ private:
 	void       updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg::Vec3d &normal, const osg::Vec3d &point, double radius);
 	bool	   isLineDrawable(osg::Drawable *drawable);
 	void	   clearEdgeSelection(void);
-
-	// Plot 1D
-	void	   clear1DPlot(void);
-	void	   set1DPlotIncompatibleData(void);
-	void       remove1DPlotErrorState(void);
-		
+			
 	void storeInMaps(SceneNodeBase* _node);
 	void removeFromMaps(const SceneNodeBase* _node);
 

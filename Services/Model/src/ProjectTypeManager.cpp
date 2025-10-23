@@ -73,7 +73,6 @@ void ProjectTypeManager::initializeProjectTypeHierarchical() {
 	m_hasHierarchicalRoot = true;
 
 	m_has3DView = false;
-	m_has1DView = false;
 	m_hasBlockPicker = false;
 }
 
@@ -93,7 +92,6 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 	m_hasDataProcessingRoot			= false;
 	
 	m_has3DView						= true;
-	m_has1DView						= true;
 	m_hasBlockPicker				= false;
 }
 
@@ -112,7 +110,6 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 	m_hasRMDCategorizationPreview	= true;
 	
 	m_has3DView						= false;
-	m_has1DView						= true;
 	m_hasBlockPicker				= true;
 }
 
@@ -132,7 +129,6 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 	m_hasRMDCategorizationPreview = false;
 	
 	m_has3DView = true;
-	m_has1DView = true;
 	m_hasBlockPicker = false;
 }
 
@@ -152,7 +148,6 @@ void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 	m_hasDataProcessingRoot = false;
 
 	m_has3DView = false;
-	m_has1DView = true;
 	m_hasBlockPicker = true;
 
 	m_datasetRMD = ot::FolderNames::DatasetFolder + "/Information";
@@ -174,7 +169,6 @@ void ProjectTypeManager::initializeProjectTypePyrit(void)
 	m_hasDataProcessingRoot = false;
 	
 	m_has3DView = true;
-	m_has1DView = true;
 	m_hasBlockPicker = false;
 }
 
@@ -195,7 +189,6 @@ void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
 	
 
 	m_has3DView = false;
-	m_has1DView = true;
 	m_hasBlockPicker = true;
 }
 
@@ -203,7 +196,6 @@ std::string ProjectTypeManager::getViews(void)
 {
 	ot::JsonDocument newDoc;
 	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible3D, m_has3DView, newDoc.GetAllocator());
-	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible1D, m_has1DView, newDoc.GetAllocator());
 	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker, m_hasBlockPicker, newDoc.GetAllocator());
 
 	return newDoc.toJson();

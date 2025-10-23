@@ -341,14 +341,6 @@ void Model::resetAllViews3D(void)
 	}
 }
 
-void Model::resetAllViews1D(void)
-{
-	for (auto viewer : viewerList)
-	{
-		viewer->get1DPlot()->getPlotManager()->resetView();
-	}
-}
-
 void Model::refreshAllViews(void)
 {
 	for (auto viewer : viewerList)
@@ -1156,14 +1148,13 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 		updateWorkingPlaneTransform();
 		
 		ViewerToolBar::instance().updateViewEnabledState(_selectionData.getSelectedTreeItems());
-		clear1DPlot();
 		refreshAllViews();
 
 		// Clear visualizing entities for last central view
 		ot::WidgetView* view = FrontendAPI::instance()->getLastFocusedCentralView();
 		if (view) {
 			ot::WidgetViewBase::ViewType viewType = view->getViewData().getViewType();
-			if (viewType == ot::WidgetViewBase::View3D || viewType == ot::WidgetViewBase::View1D) {
+			if (viewType == ot::WidgetViewBase::View3D) {
 				view->clearVisualizingItems();
 			}
 		}
@@ -1827,10 +1818,6 @@ void Model::viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo) {
 		ViewerToolBar::instance().setupUIControls3D();
 		break;
 
-	case ot::WidgetViewBase::View1D:
-		ViewerToolBar::instance().setupUIControls1D();
-		break;
-
 	case ot::WidgetViewBase::ViewText:
 		m_hasModalMenu = true;
 		m_previousMenu = FrontendAPI::instance()->getCurrentMenuPage();
@@ -1860,7 +1847,6 @@ void Model::executeAction(unsigned long long _buttonID) {
 	ViewerToolBar::ButtonType button = ViewerToolBar::instance().getButtonTypeFromUID(_buttonID);
 	switch (button) {
 	case ViewerToolBar::Reset3DViewButton: resetAllViews3D(); break;
-	case ViewerToolBar::Reset1DViewButton: resetAllViews1D(); break;
 	case ViewerToolBar::ShowAllButton: showAllSceneNodesAction(); break;
 	case ViewerToolBar::ShowSelectedButton: showSelectedSceneNodesAction(); break;
 	case ViewerToolBar::HideSelectedButton: hideSelectedSceneNodesAction(); break;
@@ -3437,32 +3423,6 @@ void Model::updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg:
 
 		IntersectionCapCalculator capping;
 		capping.generateCapGeometryAndVisualization(item, normalizedNormal, point, radius);
-	}
-}
-
-// Plot 1D
-
-void Model::clear1DPlot(void) {
-	for (auto viewer : viewerList) {
-		if (viewer->get1DPlot() != nullptr) {
-			viewer->get1DPlot()->getPlotManager()->clear(false);
-		}
-	}
-}
-
-void Model::set1DPlotIncompatibleData(void) {
-	for (auto viewer : viewerList) {
-		if (viewer->get1DPlot() != nullptr) {
-			viewer->get1DPlot()->getPlotManager()->setIncompatibleData();
-		}
-	}
-}
-
-void Model::remove1DPlotErrorState(void) {
-	for (auto viewer : viewerList) {
-		if (viewer->get1DPlot() != nullptr) {
-			viewer->get1DPlot()->getPlotManager()->setErrorState(false);
-		}
 	}
 }
 

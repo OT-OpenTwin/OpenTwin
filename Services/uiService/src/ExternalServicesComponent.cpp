@@ -4260,13 +4260,11 @@ void ExternalServicesComponent::determineViews(const std::string& _modelServiceU
 		responseDoc.fromJson(response);
 
 		bool visible3D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible3D].GetBool();
-		bool visible1D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible1D].GetBool();
 		bool visibleBlockPicker = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker].GetBool();
 
 		AppBase* app{ AppBase::instance() };
 
 		app->setVisible3D(visible3D);
-		app->setVisible1D(visible1D);
 		app->setVisibleBlockPicker(visibleBlockPicker);
 }
 

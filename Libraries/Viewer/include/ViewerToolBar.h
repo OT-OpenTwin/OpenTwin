@@ -10,7 +10,6 @@ class ViewerToolBar {
 public:
 	enum ButtonType : ot::UID {
 		Reset3DViewButton,
-		Reset1DViewButton,
 		ShowAllButton,
 		ShowSelectedButton,
 		HideSelectedButton,
@@ -42,7 +41,6 @@ public:
 
 	void setupDefaultControls(void);
 	void setupUIControls3D(void);
-	void setupUIControls1D(void);
 	void setupUIControlsText(void);
 	void setupUIControlsTable(void);
 	
@@ -67,7 +65,6 @@ private:
 	ot::UID m_operationsGroupID;
 	ot::UID m_visiblityGroupID;
 	ot::UID m_styleGroupID;
-	ot::UID m_resetView1DButtonID;
 	ot::UID m_resetView3DButtonID;
 	ot::UID m_showAllButtonID;
 	ot::UID m_showSelectedButtonID;
