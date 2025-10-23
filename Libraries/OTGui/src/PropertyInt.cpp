@@ -66,5 +66,7 @@ void ot::PropertyInt::setPropertyData(const ot::ConstJsonObject& _object) {
 	m_value = json::getInt(_object, "Value");
 	m_min = json::getInt(_object, "Min");
 	m_max = json::getInt(_object, "Max");
-	m_suffix = json::getString(_object, "Suffix");
+	if (_object.HasMember("Suffix")) {
+		m_suffix = json::getString(_object, "Suffix");
+	}
 }

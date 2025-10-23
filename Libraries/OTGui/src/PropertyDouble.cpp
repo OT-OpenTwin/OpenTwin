@@ -69,5 +69,7 @@ void ot::PropertyDouble::setPropertyData(const ot::ConstJsonObject& _object) {
 	m_min = json::getDouble(_object, "Min");
 	m_max = json::getDouble(_object, "Max");
 	m_precision = json::getInt(_object, "Precision");
-	m_suffix = json::getString(_object, "Suffix");
+	if (_object.HasMember("Suffix")) {
+		m_suffix = json::getString(_object, "Suffix");
+	}
 }
