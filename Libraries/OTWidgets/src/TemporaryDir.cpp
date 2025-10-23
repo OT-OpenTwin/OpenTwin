@@ -159,9 +159,17 @@ ot::TemporaryDir::FileEntry* ot::TemporaryDir::getFileEntryRef(const std::string
 }
 
 QString ot::TemporaryDir::cleanDir(const QString& _dir) {
-	QString dir = QDir::cleanPath(_dir);
-	if (!dir.endsWith(QDir::separator())) {
-		dir += QDir::separator();
+	QString dirStr = QDir::cleanPath(_dir);
+
+	QDir dir(dirStr);
+	if (!dir.exists()) {
+		if (!dir.mkpath(dirStr)) {
+			OT_LOG_E("Failed to create temporary directory path: \"" + dirStr.toStdString() + "\"");
+		}
 	}
-	return dir;
+
+	if (!dirStr.endsWith(QDir::separator())) {
+		dirStr += QDir::separator();
+	}
+	return dirStr;
 }

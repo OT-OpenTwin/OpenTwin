@@ -1344,14 +1344,6 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		OT_LOG_D("Open project completed, waiting for run and startup completed");
 
-		// Create unique temp folder for this session
-		m_tempFolder.reset(new ot::TemporaryDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/OpenTwin"));
-		
-		if (!m_tempFolder->isValid()) {
-			OT_LOG_E("Failed to create temporary folder for session");
-			m_tempFolder.reset();
-		}
-
 		// Process buffered actions
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotProcessActionBuffer, Qt::QueuedConnection);
 
@@ -1779,6 +1771,19 @@ void ExternalServicesComponent::removeServiceFromList(std::vector<ServiceDataUi 
 	}
 }
 
+bool ExternalServicesComponent::ensureTemporaryFolderCreated() {
+	if (m_tempFolder == nullptr) {
+		m_tempFolder.reset(new ot::TemporaryDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/OpenTwin"));
+		if (!m_tempFolder->isValid()) {
+			OT_LOG_E("Failed to create temporary folder for session");
+			m_tempFolder.reset();
+			return false;
+		}
+	}
+
+	return true;
+}
+
 ot::UID ExternalServicesComponent::getServiceUiUid(ServiceDataUi * _service) {
 	auto itm = m_serviceToUidMap.find(_service->getServiceName());
 	if (itm == m_serviceToUidMap.end()) {
@@ -2176,8 +2181,7 @@ void ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocument& _d
 }
 
 void ExternalServicesComponent::handleOpenRawFile(ot::JsonDocument& _document) {
-	if (!m_tempFolder) {
-		OT_LOG_E("Temporary folder is not initialized. Can not create temporary file...");
+	if (!ensureTemporaryFolderCreated()) {
 		return;
 	}
 	

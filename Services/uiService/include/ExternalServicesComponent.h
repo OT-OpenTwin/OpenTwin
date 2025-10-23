@@ -433,6 +433,8 @@ private:
 	
 	void removeServiceFromList(std::vector<ServiceDataUi *> &list, ServiceDataUi *service);
 
+	bool ensureTemporaryFolderCreated();
+
 	ot::UID getServiceUiUid(ServiceDataUi * _service);
 
 	ServiceDataUi * getService(ot::serviceID_t _serviceID);
