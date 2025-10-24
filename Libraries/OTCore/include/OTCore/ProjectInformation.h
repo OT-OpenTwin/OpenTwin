@@ -46,9 +46,13 @@ namespace ot {
 		void setLastAccessTime(int64_t _msSinceEpoch) { m_lastAccessTime = _msSinceEpoch; };
 		int64_t getLastAccessTime() const { return m_lastAccessTime; };
 
-		void addGroup(const std::string& _group);
+		void addGroup(const std::string& _group) { m_groups.push_back(_group); };
 		void setGroups(const std::list<std::string>& _groups) { m_groups = _groups; };
 		const std::list<std::string>& getGroups() const { return m_groups; };
+
+		void addTag(const std::string& _tag) { m_tags.push_back(_tag); };
+		void setTags(const std::list<std::string>& _tags) { m_tags = _tags; };
+		const std::list<std::string>& getTags() const { return m_tags; };
 
 	private:
 		int m_version;
@@ -59,5 +63,6 @@ namespace ot {
 		int64_t m_creationTime;
 		int64_t m_lastAccessTime;
 		std::list<std::string> m_groups;
+		std::list<std::string> m_tags;
 	};
 }

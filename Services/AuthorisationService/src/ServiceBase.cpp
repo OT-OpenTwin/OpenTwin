@@ -401,6 +401,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_REMOVE_GROUP) { return handleRemoveGroup(_actionDocument.GetObject(), loggedInUser); }
 	//------------ Project FUNCTIONS ------------
 	else if (_action == OT_ACTION_CREATE_PROJECT) { return handleCreateProject(_actionDocument.GetObject(), loggedInUser); }
+	else if (_action == OT_ACTION_SET_PROJECT_TAGS) { return handleUpdateProjectTags(_actionDocument.GetObject(), loggedInUser); }
 	//                                                       v-- CAN BE PERFORMED BY THE UI CLIENT --v
 	else if (_action == OT_ACTION_GET_PROJECT_DATA) { return handleGetProjectData(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_GET_ALL_PROJECT_INFO) { return handleGetProjectsInfo(_actionDocument.GetObject(), loggedInUser); }
@@ -774,6 +775,13 @@ std::string ServiceBase::handleCreateProject(const ot::ConstJsonObject& _actionD
 	Project createdProject = MongoProjectFunctions::createProject(projectName, projectType, _loggedInUser, adminClient);
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, createdProject.toProjectInformation().toJson()).toJson();
+}
+
+std::string ServiceBase::handleUpdateProjectTags(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
+	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
+	std::list<std::string> tags = ot::json::getStringList(_actionDocument, OT_ACTION_PARAM_List);
+
+	return MongoProjectFunctions::updateProjectTags(projectName, tags, adminClient).toJson();
 }
 
 std::string ServiceBase::handleGetProjectData(const ot::ConstJsonObject& _actionDocument) {

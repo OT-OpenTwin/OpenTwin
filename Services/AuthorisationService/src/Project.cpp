@@ -69,4 +69,14 @@ void Project::importData(const bsoncxx::v_noabi::document::view& _view) {
 	catch (...) {
 		m_version = -1;
 	}
+
+	try {
+		auto tagsArr = _view["tags"].get_array().value;
+		for (const auto& tag : tagsArr) {
+			m_tags.push_back(std::string(tag.get_utf8().value.data()));
+		}
+	}
+	catch (...) {
+		m_tags.clear();
+	}
 }

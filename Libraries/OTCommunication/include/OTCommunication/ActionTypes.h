@@ -820,6 +820,7 @@
 
 // Project Functionalities
 #define OT_ACTION_CREATE_PROJECT "CreateProject"
+#define OT_ACTION_SET_PROJECT_TAGS "SetProjectTags"
 #define OT_ACTION_GET_PROJECT_DATA "GetProjectData"
 #define OT_ACTION_GET_ALL_PROJECT_INFO "GetAllProjectsInfo"
 #define OT_ACTION_GET_ALL_PROJECTS "GetAllProjects"

@@ -36,6 +36,7 @@ namespace MongoProjectFunctions
 			<< "collection_name" << collectionName
 			<< "project_role_name" << roleName
 			<< "groups" << open_array << close_array
+			<< "tags" << open_array << close_array
 			<< "version" << 1
 			<< "last_accessed_on" << bsoncxx::types::b_date(std::chrono::system_clock::now())
 			<< finalize;
@@ -53,6 +54,33 @@ namespace MongoProjectFunctions
 		MongoRoleFunctions::addRoleToUser(roleName, creatingUser.username, adminClient);
 
 		return getProject(projectName, adminClient);
+	}
+
+	ot::ReturnMessage updateProjectTags(std::string _projectName, const std::list<std::string>& _tags, mongocxx::client& _adminClient) {
+		mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
+		mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+		// Create tag array
+		bsoncxx::builder::stream::array tagArray;
+		for (const std::string& tag : _tags) {
+			tagArray << tag;
+		}
+
+		// Filter
+		auto filterQuery = bsoncxx::builder::stream::document{}
+			<< "project_name" << _projectName
+			<< bsoncxx::builder::stream::finalize;
+
+		// Modify
+		auto modifyQuery = bsoncxx::builder::stream::document{}
+			<< "$set" << bsoncxx::builder::stream::open_document
+			<< "tags" << tagArray.view()
+			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+		
+		// Perform update
+		projectCollection.update_one(filterQuery.view(), modifyQuery.view());
+
+		return ot::ReturnMessage(ot::ReturnMessage::Ok);
 	}
 
 	std::string generateProjectCollectionName(mongocxx::client& adminClient)

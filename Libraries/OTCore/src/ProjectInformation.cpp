@@ -23,6 +23,7 @@ void ot::ProjectInformation::addToJsonObject(JsonValue& _jsonObject, JsonAllocat
 	_jsonObject.AddMember("CreationTime", m_creationTime, _allocator);
 	_jsonObject.AddMember("LastAccessTime", m_lastAccessTime, _allocator);
 	_jsonObject.AddMember("Groups", JsonArray(m_groups, _allocator), _allocator);
+	_jsonObject.AddMember("Tags", JsonArray(m_tags, _allocator), _allocator);
 }
 
 void ot::ProjectInformation::setFromJsonObject(const ConstJsonObject& _jsonObject) {
@@ -34,8 +35,5 @@ void ot::ProjectInformation::setFromJsonObject(const ConstJsonObject& _jsonObjec
 	m_creationTime = json::getInt64(_jsonObject, "CreationTime");
 	m_lastAccessTime = json::getInt64(_jsonObject, "LastAccessTime");
 	m_groups = json::getStringList(_jsonObject, "Groups");
-}
-
-void ot::ProjectInformation::addGroup(const std::string& _group) {
-	m_groups.push_back(_group);
+	m_tags = json::getStringList(_jsonObject, "Tags");
 }
