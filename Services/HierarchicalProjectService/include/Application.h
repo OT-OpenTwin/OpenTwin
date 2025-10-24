@@ -112,6 +112,7 @@ private:
 
 	void handleAddImageToProject();
 	void handleRemoveImageFromProject();
+	void handleUpdateImageFromProject();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -160,4 +161,5 @@ private:
 
 	ot::ToolBarButtonCfg m_addImageToProjectButton;
 	ot::ToolBarButtonCfg m_removeImageFromProjectButton;
+	ot::ToolBarButtonCfg m_updateImageFromProjectButton;
 };

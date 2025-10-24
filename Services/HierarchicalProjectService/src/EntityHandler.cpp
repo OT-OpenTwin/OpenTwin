@@ -368,6 +368,57 @@ void EntityHandler::addBackgroundImages(const std::list<std::string>& _fileNames
 	}
 }
 
+void EntityHandler::updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities) {
+	// Load project entity
+	std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(_projectInfo.getEntityID(), _projectInfo.getEntityVersion()));
+	EntityBlockHierarchicalProjectItem* projectEntity = dynamic_cast<EntityBlockHierarchicalProjectItem*>(entity.get());
+	if (!projectEntity) {
+		OT_LOG_W("Project entity is not of expected type { \"EntityName: \"" + _projectInfo.getEntityName() + "\", \"EntityType\": \"" + entity->getClassName() + "\" }");
+		return;
+	}
+
+	// Remove existing preview image if existing
+	if (projectEntity->hasPreviewFile()) {
+		ot::UID previewFileID = projectEntity->getPreviewFileID();
+		projectEntity->removePreviewFile();
+		_removalEntities.push_back(previewFileID);
+	}
+
+	// Read preview image if existing
+	std::vector<char> previewImageData;
+	ot::ImageFileFormat previewImageFormat = ot::ImageFileFormat::PNG;
+	if (ModelState::readProjectPreviewImage(projectEntity->getProjectInformation().getCollectionName(), previewImageData, previewImageFormat)) {
+		const std::string serviceName = Application::instance().getServiceName();
+		// Create data entity for preview image
+		EntityBinaryData previewImageDataEntity;
+		previewImageDataEntity.setOwningService(serviceName);
+		previewImageDataEntity.setEntityID(_modelComponent->createEntityUID());
+		previewImageDataEntity.setData(std::move(previewImageData));
+		previewImageDataEntity.storeToDataBase();
+
+		projectEntity->setPreviewFile(previewImageDataEntity, previewImageFormat);
+		projectEntity->storeToDataBase();
+
+		_newEntities.addDataEntity(projectEntity->getEntityID(), previewImageDataEntity);
+	}
+
+	_updateEntities.addTopologyEntity(*projectEntity);
+}
+
+void EntityHandler::updateProjectImages(const std::list<ot::EntityInformation>& _projects) {
+	std::list<ot::UID> removalUIDs;
+	ot::NewModelStateInfo newEntities;
+	ot::NewModelStateInfo updateEntities;
+	for (const ot::EntityInformation& proj : _projects) {
+		updateProjectImage(proj, newEntities, updateEntities, removalUIDs);
+	}
+	if (newEntities.hasEntities()) {
+		ot::ModelServiceAPI::deleteEntitiesFromModel(removalUIDs, false);
+		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Updated project images", false, false);
+		ot::ModelServiceAPI::updateTopologyEntities(updateEntities, "Updated project images");
+	}
+}
+
 bool EntityHandler::addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter) {
 	// Unpack data
 	std::string unpackedData = ot::String::decompressedBase64(_fileContent, _uncompressedDataLength);

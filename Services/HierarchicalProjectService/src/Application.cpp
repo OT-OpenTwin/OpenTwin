@@ -100,6 +100,11 @@ Application::Application() :
 	m_removeImageFromProjectButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
 	m_removeImageFromProjectButton.setButtonToolTip("Remove the image(s) from the selected item(s).");
 	connectToolBarButton(m_removeImageFromProjectButton, this, &Application::handleRemoveImageFromProject);
+
+	m_updateImageFromProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Update Image", "Hierarchical/UpdateImage");
+	m_updateImageFromProjectButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
+	m_updateImageFromProjectButton.setButtonToolTip("Update the image of the selected project(s) from the current projects' preview image.");
+	connectToolBarButton(m_updateImageFromProjectButton, this, &Application::handleUpdateImageFromProject);
 }
 
 Application::~Application() {
@@ -142,6 +147,7 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 
 	_ui->addMenuButton(m_addImageToProjectButton);
 	_ui->addMenuButton(m_removeImageFromProjectButton);
+	_ui->addMenuButton(m_updateImageFromProjectButton);
 
 	_ui->switchMenuTab(c_pageName);
 
@@ -401,6 +407,17 @@ void Application::handleRemoveImageFromProject() {
 	}
 
 	m_entityHandler.removeImageFromProjects(projects);
+}
+
+void Application::handleUpdateImageFromProject() {
+	auto projects = getSelectedProjects();
+	
+	if (projects.empty()) {
+		OT_LOG_E("No project selected to update image from");
+		return;
+	}
+
+	m_entityHandler.updateProjectImages(projects);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
