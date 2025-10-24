@@ -16,6 +16,12 @@
     <Filter Include="Source Files\tinyxml2">
       <UniqueIdentifier>{2bf53b2b-54ba-4f33-8c38-86b1680df57a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Excitations">
+      <UniqueIdentifier>{433ae501-8b9c-49b8-8476-c084908e6632}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Excitations">
+      <UniqueIdentifier>{6bfc408c-5297-482b-9f7d-3a67f5a38e1f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -48,6 +54,15 @@
     <ClCompile Include="src\CSXMeshGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\CSXExcitationProperties.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GaussExcitation.cpp">
+      <Filter>Source Files\Excitations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SinusoidalExcitation.cpp">
+      <Filter>Source Files\Excitations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -73,6 +88,21 @@
     </ClInclude>
     <ClInclude Include="include\CSXMeshGrid.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CSXExcitationProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ExcitationBase.h">
+      <Filter>Header Files\Excitations</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ExcitationTypes.h">
+      <Filter>Header Files\Excitations</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GaussianExcitation.h">
+      <Filter>Header Files\Excitations</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SinusoidalExcitation.h">
+      <Filter>Header Files\Excitations</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
