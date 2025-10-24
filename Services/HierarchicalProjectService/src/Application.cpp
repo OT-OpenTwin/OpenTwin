@@ -587,7 +587,7 @@ ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBinaryData* _d
 }
 
 ot::ReturnMessage Application::requestToOpenTextDocument(EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block) {
-	OTAssertNullptr(_entity);
+	OTAssertNullptr(_data);
 	
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, doc.GetAllocator());
