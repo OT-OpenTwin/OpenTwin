@@ -35,6 +35,7 @@ void CSXMeshGrid::loadMeshGridDataFromEntity(EntityBase* _solverEntity) {
 	ot::ModelServiceAPI::getEntityProperties(meshDataID, true, "Mesh", meshEntityProperties);
 	ot::UID version = entityInfo.front().getEntityVersion();
 
+	// unique ptr
 	EntityMeshCartesianData* meshDataEntity = dynamic_cast<EntityMeshCartesianData*>(ot::EntityAPI::readEntityFromEntityIDandVersion(meshDataID, version));
 	if (!meshDataEntity) {
 		OT_LOG_EA("CSXMeshGrid::loadMeshGridDataFromEntity: Unable to read the mesh data entity.");
@@ -60,4 +61,18 @@ std::string CSXMeshGrid::vectorToString(const std::vector<double>& _vector) cons
 		}
 	}
 	return result;
+}
+
+tinyxml2::XMLElement* CSXMeshGrid::writeCSXMeshGrid(tinyxml2::XMLElement& _parentElement) const {
+	auto rectGrid = _parentElement.GetDocument()->NewElement("RectilinearGrid");
+	auto xElem = _parentElement.GetDocument()->NewElement("XLines");
+	auto yElem = _parentElement.GetDocument()->NewElement("YLines");
+	auto zElem = _parentElement.GetDocument()->NewElement("ZLines");
+	xElem->SetText((vectorToString(m_gridX)).c_str());
+	yElem->SetText((vectorToString(m_gridY)).c_str());
+	zElem->SetText((vectorToString(m_gridZ)).c_str());
+	rectGrid->InsertEndChild(xElem);
+	rectGrid->InsertEndChild(yElem);
+	rectGrid->InsertEndChild(zElem);
+	return rectGrid;
 }

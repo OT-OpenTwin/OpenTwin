@@ -5,17 +5,21 @@
 
 #pragma once
 
+// TINYXML2
+#include "tinyxml2.h"
+
 // OpenTwin
 #include "OTCore/CoreTypes.h"
-#include "EntityMeshCartesianData.h"
-#include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/LogDispatcher.h"
+#include "OTCore/OTClassHelper.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "EntityMeshCartesianData.h"
 #include "EntityProperties.h"
 #include "EntityInformation.h"
-#include "OTCore/OTClassHelper.h"
 #include "EntityAPI.h"
 
 // STD
+#include <memory>
 #include <cstdint>
 #include <string>
 #include <list>
@@ -34,6 +38,7 @@ public:
 	virtual ~CSXMeshGrid();
 
 	//! @brief Loads the mesh grid data from the given solver entity
+	//! @brief Acts as an setter for each member variable
 	//! @param _solverEntity The solver entity to load data from
 	void loadMeshGridDataFromEntity(EntityBase* _solverEntity);
 
@@ -50,10 +55,11 @@ public:
 	//! @brief Getter for the coordinate system
 	uint32_t getCoordSystem() const { return m_coordSystem; }
 
-	//! @brief Converts a vector of doubles to a comma-separated string
-	//! @brief Formating for solver XML
-	//! @param _vector The vector to convert
-	std::string vectorToString(const std::vector<double>& _vector) const;
+	//! @brief Creates an XML element for the mesh grid data
+	//! @brief Is being used by FDTDConfig to then write the complete solver XML
+	//! @param _parentElement The parent XML element to which the mesh grid data will be added
+	//! @return The created mesh grid XML element
+	tinyxml2::XMLElement* writeCSXMeshGrid(tinyxml2::XMLElement& _parentElement) const;
 
 private:
 	// Mesh grid data
@@ -65,4 +71,9 @@ private:
 	uint32_t m_coordSystem = 0; // 0 = Cartesian
 	double m_deltaUnit = 0.001; // in mm
 	double m_stepRatio = 1.0; //1.0
+
+	//! @brief Converts a vector of doubles to a comma-separated string
+	//! @brief Formating for solver XML
+	//! @param _vector The vector to convert
+	std::string vectorToString(const std::vector<double>& _vector) const;
 };
