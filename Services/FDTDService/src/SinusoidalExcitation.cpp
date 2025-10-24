@@ -5,7 +5,7 @@
 
 
 #include "SinusoidalExcitation.h"
-#include "CSXExcitationProperties.h"
+#include "ExcitationProperties.h"
 
 SinusoidalExcitation::SinusoidalExcitation()
 {
@@ -15,14 +15,14 @@ SinusoidalExcitation::~SinusoidalExcitation()
 {
 }
 
-void SinusoidalExcitation::applyToCSX(CSXExcitationProperties& _csxProps) {
-	_csxProps.setName("excite");
-	_csxProps.setType(1); // 1 for Sinusoidal
-	_csxProps.setExciteDirection(true, false, false); // excite in X direction
-	_csxProps.setBoxPriority(0);
-	_csxProps.setPrimitives1(0, 0, 0);
-	_csxProps.setPrimitives2(500, 500, 0);
-	_csxProps.setWeightX("1");
-	_csxProps.setWeightY("0");
-	_csxProps.setWeightZ("0");
+void SinusoidalExcitation::applyProperties() {
+	m_exciteProperties.setName("excite");
+	m_exciteProperties.setType(1); // 1 for Sinusoidal
+	m_exciteProperties.setExciteDirection(true, false, false); // excite in X direction
+	m_exciteProperties.setBoxPriority(0);
+	m_exciteProperties.setPrimitives1(0, 0, 0);
+	m_exciteProperties.setPrimitives2(500, 500, 0);
+	m_exciteProperties.setWeightX("1");
+	m_exciteProperties.setWeightY("0");
+	m_exciteProperties.setWeightZ("0");
 }
