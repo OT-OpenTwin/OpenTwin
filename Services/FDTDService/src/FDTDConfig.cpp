@@ -5,6 +5,10 @@
 
 #include "FDTDConfig.h"
 
+#include "ExcitationBase.h"
+#include "GaussianExcitation.h"
+#include "SinusoidalExcitation.h"
+
 FDTDConfig::FDTDConfig()
 {
 }
@@ -45,22 +49,22 @@ std::string FDTDConfig::getBoundaryConditions(size_t _index) const {
 }
 
 uint32_t FDTDConfig::getExcitationType() const {
-	return static_cast<uint32_t>(m_excitation);
+	return static_cast<uint32_t>(m_excitationType);
 }
 
 void FDTDConfig::setTimeSteps(uint32_t _timeSteps) {
 	m_timeSteps = _timeSteps;
 }
 
-void FDTDConfig::setExcitationType(ExcitationType _excitationType) {
-	m_excitation = _excitationType;
+void FDTDConfig::setExcitationType(ExcitationTypes _excitationType) {
+	m_excitationType = _excitationType;
 }
 
 void FDTDConfig::setExcitationType(uint32_t _value) {
 	if (_value > 2 || _value < 0) {
 		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 0 (Gaussian), 1 (Sinusoidal), or 2 (Ramp)");
 	}
-	m_excitation = static_cast<ExcitationType>(_value);
+	m_excitationType = static_cast<ExcitationTypes>(_value);
 }
 
 void FDTDConfig::setEndCriteria(double _endCriteria) {
@@ -99,22 +103,45 @@ void FDTDConfig::setBoundaryCondition(size_t _index, const std::string& _value) 
 }
 
 void FDTDConfig::setFromEntity(EntityBase* _solverEntity) {
-	if(!_solverEntity) {
+	if (!_solverEntity) {
 		throw std::invalid_argument("[FDTDConfig] Solver entity pointer is null!");
 	}
-	m_solverEntity = _solverEntity;
-}
 
-void FDTDConfig::ensureEntityIsSet() const {
-	if (m_solverEntity == nullptr) {
-		throw std::runtime_error("[FDTDConfig] Solver entity is not set. Please set the solver entity before accessing configuration values.");
+	// Load basic FDTD properties
+	m_timeSteps = PropertyHelper::getIntegerPropertyValue(_solverEntity, "Timesteps", "Simulation Settings");
+	m_endCriteria = PropertyHelper::getDoublePropertyValue(_solverEntity, "End Criteria", "Simulation Settings");
+	m_freqStart = PropertyHelper::getDoublePropertyValue(_solverEntity, "Start Frequency", "Frequency");
+	m_freqStop = PropertyHelper::getDoublePropertyValue(_solverEntity, "End Frequency", "Frequency");
+	m_oversampling = PropertyHelper::getIntegerPropertyValue(_solverEntity, "Oversampling", "Simulation Settings");
+
+	// Load excitation type
+	std::string excitation = PropertyHelper::getSelectionPropertyValue(_solverEntity, "Excitation Type", "Simulation Settings");
+	if (excitation == "Gauss Excitation") {
+		m_excitationType = ExcitationTypes::GAUSSIAN;
 	}
+	else if (excitation == "Sinus Excitation") {
+		m_excitationType = ExcitationTypes::SINUSOIDAL;
+	}
+	else {
+		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 'Gaussian' 'Sinusoidal'");
+	}
+	// Set excitation properties based on the selected type
+	setExcitationProperties();
+
+	// Load boundary conditions
+	for (size_t i = 0; i < m_boundaryNames.size(); ++i) {
+		auto value = PropertyHelper::getSelectionPropertyValue(_solverEntity, m_boundaryNames[i], "Boundary Conditions");
+		if (value.empty()) {
+			value = "PEC"; // default to PEC
+		}
+		m_boundaryConditions[i] = value;
+	}
+
+	// Load the mesh grid data from the solver entity
+	m_meshGrid.loadMeshGridDataFromEntity(_solverEntity);
 }
 
 tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLElement& _parentElement) {
-	// Refresh the property information from the entity properties
-	refreshPropertyInfo();
-
 	// Defining the boundary names used for the solver XML parser
 	// These must match the expected names in the XML and will be different from the GUI
 	const std::array<std::string, 6> solverBoundaryNames = { "xmax", "xmin", "ymax", "ymin", "zmax", "zmin" };
@@ -130,7 +157,7 @@ tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLElement& _parentElement
 
 	// Now we add the excitation nodes to the FDTD root node
 	auto excitation = _parentElement.GetDocument()->NewElement("Excitation");
-	excitation->SetAttribute("Type", static_cast<int>(m_excitation));
+	excitation->SetAttribute("Type", static_cast<int>(m_excitationType));
 	excitation->SetAttribute("f0", f0);
 	excitation->SetAttribute("fc", fc);
 	FDTD->InsertEndChild(excitation);
@@ -144,133 +171,20 @@ tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLElement& _parentElement
 	return FDTD;
 }
 
-tinyxml2::XMLElement* FDTDConfig::writeCSXMeshGrid(tinyxml2::XMLElement& _parentElement) {
-	ensureEntityIsSet();
-	// Load the mesh grid data from the solver entity	
-	CSXMeshGrid grid;
-	grid.loadMeshGridDataFromEntity(m_solverEntity);
-
-	auto CSX = _parentElement.GetDocument()->NewElement("ContinuousStructure");
-	CSX->SetAttribute("CoordSystem", grid.getCoordSystem());
-	CSX->SetAttribute("DeltaUnit", grid.getDeltaUnit());
-	auto RectGrid = _parentElement.GetDocument()->NewElement("RectilinearGrid");
-	auto xElem = _parentElement.GetDocument()->NewElement("XLines");
-	auto yElem = _parentElement.GetDocument()->NewElement("YLines");
-	auto zElem = _parentElement.GetDocument()->NewElement("ZLines");
-	xElem->SetText((grid.vectorToString(grid.getXLines())).c_str());
-	yElem->SetText((grid.vectorToString(grid.getYLines())).c_str());
-	zElem->SetText((grid.vectorToString(grid.getZLines())).c_str());
-	RectGrid->InsertEndChild(xElem);
-	RectGrid->InsertEndChild(yElem);
-	RectGrid->InsertEndChild(zElem);
-	CSX->InsertEndChild(RectGrid);
-	return CSX;
-}
-
-void FDTDConfig::readTimestepInfo() {
-	ensureEntityIsSet();
-	m_timeSteps = PropertyHelper::getIntegerPropertyValue(m_solverEntity, "Timesteps", "Simulation Settings");
-}
-
-void FDTDConfig::readExcitationTypeInfo() {
-	ensureEntityIsSet();
-	std::string excitation = PropertyHelper::getSelectionPropertyValue(m_solverEntity, "Excitation Type", "Simulation Settings");
-	if (excitation == "Gauss Excitation") {
-		m_excitation = ExcitationType::GAUSSIAN;
+void FDTDConfig::setExcitationProperties() {
+	switch (m_excitationType) {
+		case ExcitationTypes::GAUSSIAN:
+			m_excitation = std::make_unique<GaussianExcitation>();
+			break;
+		case ExcitationTypes::SINUSOIDAL:
+			m_excitation = std::make_unique<SinusoidalExcitation>();
+			break;
+		default:
+			OT_LOG_W("[Excitation Type] Unknown excitation type! Defaulting to Gaussian.");
+			m_excitation = std::make_unique<GaussianExcitation>();
+			break;
 	}
-	else if (excitation == "Sinus Excitation") {
-		m_excitation = ExcitationType::SINUSOIDAL;
-	}
-	else {
-		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 'Gaussian' 'Sinusoidal'");
-	}
-}
-
-void FDTDConfig::readEndCriteriaInfo() {
-	ensureEntityIsSet();
-	m_endCriteria = PropertyHelper::getDoublePropertyValue(m_solverEntity, "End Criteria", "Simulation Settings");
-}
-
-void FDTDConfig::readFrequencyStartInfo() {
-	ensureEntityIsSet();
-	m_freqStart = PropertyHelper::getDoublePropertyValue(m_solverEntity, "Start Frequency", "Frequency");
-}
-
-void FDTDConfig::readFrequencyStopInfo() {
-	ensureEntityIsSet();
-	m_freqStop = PropertyHelper::getDoublePropertyValue(m_solverEntity, "End Frequency", "Frequency");
-}
-
-void FDTDConfig::readOversamplingInfo() {
-	ensureEntityIsSet();
-	m_oversampling = PropertyHelper::getIntegerPropertyValue(m_solverEntity, "Oversampling", "Simulation Settings");
-}
-
-void FDTDConfig::readBoundaryConditions() {
-	ensureEntityIsSet();
-	for (size_t i = 0; i < m_boundaryNames.size(); ++i) {
-		auto value = PropertyHelper::getSelectionPropertyValue(m_solverEntity, m_boundaryNames[i], "Boundary Conditions");
-		if (value.empty()) {
-			value = "PEC"; // default to PEC
-		}
-		m_boundaryConditions[i] = value;
-	}
-}
-
-void FDTDConfig::refreshPropertyInfo() {
-	ensureEntityIsSet();
-
-	// Helper lambda function to safely read a property and log errors
-	//! @brief This lambda function attempts to read a property using the provided read function.
-	//! @brief If an exception occurs during the read, it logs the error and sets the target value to a default.
-	//! @param _readFunc The function that reads the property.
-	//! @param _propertyName The name of the property being read (for logging purposes).
-	//! @param _targetValue The variable where the read value will be stored.
-	//! @param _defaultValue The default value to use if reading fails.
-	auto safeRead = [&](auto _readFunc, const std::string& _propertyName, auto& _targetValue, auto _defaultValue) {
-		try {
-			_readFunc();
-		}
-		catch (const std::exception& e) {
-			_targetValue = _defaultValue;
-			std::string msg = "[FDTDConfig] Error reading property '" + _propertyName + "': " + e.what();
-			std::string msgDefaults = "Defaulting to: ";
-
-			if (_propertyName == "Boundary Conditions") {
-				msgDefaults = "Defaulting to: PEC on all sides" ;
-			}
-			else if constexpr (std::is_same_v<decltype(_defaultValue), std::string>) {
-				msgDefaults += _defaultValue;
-			}
-			else if constexpr (std::is_arithmetic_v<decltype(_defaultValue)>) {
-				msgDefaults += std::to_string(_defaultValue);
-			}
-			else if constexpr (std::is_enum_v<decltype(_defaultValue)>) {
-				switch (_defaultValue) {
-					case ExcitationType::GAUSSIAN: msgDefaults += "Excitation Type: Gaussian"; break;
-					case ExcitationType::SINUSOIDAL: msgDefaults += "Excitation Type: Sinusoidal"; break;
-					default: msgDefaults += "Unknown Excitation Type"; break;
-				}
-			}
-			OT_LOG_E(msg);
-			OT_LOG_E(msgDefaults + "\n");
-		}
-	};
-
-	// Now read each property safely and log errors, and sets default values if reading fails
-	safeRead([&]() { readTimestepInfo(); }, "Timesteps", m_timeSteps, 1000u);
-	safeRead([&]() { readExcitationTypeInfo(); }, "Excitation Type", m_excitation, ExcitationType::GAUSSIAN);
-	safeRead([&]() { readEndCriteriaInfo(); }, "End Criteria", m_endCriteria, 1e-6);
-	safeRead([&]() { readFrequencyStartInfo(); }, "Start Frequency", m_freqStart, 1000.0);
-	safeRead([&]() { readFrequencyStopInfo(); }, "End Frequency", m_freqStop, 2000.0);
-	safeRead([&]() { readOversamplingInfo(); }, "Oversampling", m_oversampling, 1);
-	safeRead([&]() { readBoundaryConditions(); }, "Boundary Conditions", m_boundaryConditions, std::array<std::string, 6>{"PEC", "PEC", "PEC", "PEC", "PEC", "PEC"});
-
-	if (m_freqStart >= m_freqStop) {
-		OT_LOG_W("[FDTDConfig] Start Frequency must be less than End Frequency! Adjusting to default values: Start Frequency = 1000.0, End Frequency = 2000.0\n");
-		m_freqStart = 1000.0;
-		m_freqStop = 2000.0;
-	}
+	m_excitation->applyProperties();
 }
 
 void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {
@@ -280,6 +194,14 @@ void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {
 	_doc.InsertEndChild(root);
 	auto FDTD = writeFDTD(*root);
 	root->InsertEndChild(FDTD);
-	auto CSX = writeCSXMeshGrid(*root);
+	auto CSX = _doc.NewElement("ContinuousStructure");
+	auto CSXProperties = _doc.NewElement("Properties");
+
+	// load and write the excitation properties
+	auto& excitations = m_excitation->getExciteProperties();
+	CSXProperties->InsertEndChild(excitations.writeExciteProperties(*root));
+	CSX->InsertEndChild(CSXProperties);
+	auto CSXRectGrid = m_meshGrid.writeCSXMeshGrid(*root);
+	CSX->InsertEndChild(CSXRectGrid);
 	root->InsertEndChild(CSX);
 }
