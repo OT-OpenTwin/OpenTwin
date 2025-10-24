@@ -79,6 +79,6 @@ private:
     double polygonArea(const std::vector<IntersectionCapCalculatorVec2>& poly);
     void classifyPolygons(const std::vector<std::vector<IntersectionCapCalculatorVec2>>& rings, std::vector<std::vector<IntersectionCapCalculatorVec2>>& out_rings, std::vector<std::vector<IntersectionCapCalculatorVec2>>& holes);
     IntersectionCapCalculatorProjection2D makeProjectionBasis(const IntersectionCapCalculatorPlane& plane);
-    void buildTriangleVisualizationNode(SceneNodeGeometry* geometryItem, const osg::Vec3d& normal, const std::vector<IntersectionCapCalculatorTriangle3D>& triangles);
+    void buildTriangleVisualizationNode(SceneNodeGeometry* geometryItem, const osg::Vec3d& normal, const std::vector<IntersectionCapCalculatorTriangle3D>& triangles, std::vector<IntersectionCapCalculatorVec2> &texcoords_out);
     void buildEdgeVisualizationNode(SceneNodeGeometry* geometryItem, std::vector<std::vector<IntersectionCapCalculatorVec3>> &loops);
 };

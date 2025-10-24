@@ -13,6 +13,7 @@
 #include "SceneNodeGeometry.h"
 #include "SceneNodeMaterial.h"
 #include "ViewerSettings.h"
+#include "TextureMapManager.h"
 
 #include <fstream>
 #include <iostream>
@@ -252,7 +253,9 @@ void IntersectionCapCalculator::determineCutSegments(const IntersectionCapCalcul
     }
 }
 
-void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry* geometryItem, const osg::Vec3d& normal, const std::vector<IntersectionCapCalculatorTriangle3D> &triangles)
+void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry* geometryItem, const osg::Vec3d& normal, 
+                                                               const std::vector<IntersectionCapCalculatorTriangle3D> &triangles,
+                                                               std::vector<IntersectionCapCalculatorVec2> &texcoords_out)
 {
     std::string materialType = "Rough";
 
@@ -267,12 +270,14 @@ void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry
     // Allocate and dimensions arrays for nodes and normals (each triangle has three nodes - the nodes are not shared between adjacent triangles)
     unsigned long long nTriangles = triangles.size();
     osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array(nTriangles * 3);
+    osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array(nTriangles * 3);
     osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array(nTriangles * 3);
 
     // Now store the triangle vertices in the nodes and normals array
 
     unsigned long long nVertex = 0;
     unsigned long long nNormal = 0;
+    unsigned long long nTexture = 0;
 
     for (auto triangle : triangles)
     {
@@ -287,6 +292,12 @@ void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry
         normals->at(nNormal + 2).set(normal.x(), normal.y(), normal.z());
 
         nNormal += 3;
+
+        texcoords->at(nTexture).set(texcoords_out[nTexture].x, texcoords_out[nTexture].y);
+        texcoords->at(nTexture + 1).set(texcoords_out[nTexture + 1].x, texcoords_out[nTexture + 1].y);
+        texcoords->at(nTexture + 2).set(texcoords_out[nTexture + 2].x, texcoords_out[nTexture + 2].y);
+
+        nTexture += 3;
     }
 
     // Store the color in a color array (the color will be shared among all nodes, so only one entry is needed)
@@ -314,12 +325,21 @@ void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry
     newGeometry->setNormalArray(normals.get());
     newGeometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
+    newGeometry->setTexCoordArray(0, texcoords);
+
     newGeometry->setColorArray(colors.get());
     newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
     newGeometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, nTriangles * 3));
 
     newGeometry->getOrCreateStateSet()->setAttribute(material.get());
+
+    osg::ref_ptr<osg::Texture2D> texture = TextureMapManager::getTexture("Gold");
+
+    texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+    texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+
+    newGeometry->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
 
     delete materialSet;
     materialSet = nullptr;
@@ -429,6 +449,20 @@ void IntersectionCapCalculator::generateCapGeometryAndVisualization(SceneNodeGeo
 
     using Polygon = std::vector<std::vector<IntersectionCapCalculatorVec2>>;
     std::vector<IntersectionCapCalculatorTriangle3D> triangles_out;
+    std::vector<IntersectionCapCalculatorVec2> texcoords_out;
+
+    IntersectionCapCalculatorVec2 minPt = { std::numeric_limits<double>::max(), std::numeric_limits<double>::max() };
+    IntersectionCapCalculatorVec2 maxPt = { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest() };
+
+    for (const auto& ring : all_rings_2D) {
+        for (const auto& p : ring) {
+            minPt.x = std::min(minPt.x, p.x);
+            minPt.y = std::min(minPt.y, p.y);
+            maxPt.x = std::max(maxPt.x, p.x);
+            maxPt.y = std::max(maxPt.y, p.y);
+        }
+    }
+    IntersectionCapCalculatorVec2 size = { maxPt.x - minPt.x, maxPt.y - minPt.y };
 
     for (auto& outer : outer_rings) {
         Polygon poly = { outer };
@@ -444,14 +478,38 @@ void IntersectionCapCalculator::generateCapGeometryAndVisualization(SceneNodeGeo
                 flat_points.push_back(p);
 
         for (size_t i = 0; i < indices.size(); i += 3) {
-            IntersectionCapCalculatorVec3 v0 = proj.unproject(flat_points[indices[i]]);
-            IntersectionCapCalculatorVec3 v1 = proj.unproject(flat_points[indices[i + 1]]);
-            IntersectionCapCalculatorVec3 v2 = proj.unproject(flat_points[indices[i + 2]]);
+            IntersectionCapCalculatorVec2 p0_2D = flat_points[indices[i]];
+            IntersectionCapCalculatorVec2 p1_2D = flat_points[indices[i + 1]];
+            IntersectionCapCalculatorVec2 p2_2D = flat_points[indices[i + 2]];
+
+            // Rückprojektion in 3D
+            IntersectionCapCalculatorVec3 v0 = proj.unproject(p0_2D);
+            IntersectionCapCalculatorVec3 v1 = proj.unproject(p1_2D);
+            IntersectionCapCalculatorVec3 v2 = proj.unproject(p2_2D);
+
+            // UV-Koordinaten (einfach aus 2D-Polygon, normalisiert auf 0–1)
+            IntersectionCapCalculatorVec2 uv0 = {
+                (p0_2D.x - minPt.x) / size.x,
+                (p0_2D.y - minPt.y) / size.y
+            };
+            IntersectionCapCalculatorVec2 uv1 = {
+                (p1_2D.x - minPt.x) / size.x,
+                (p1_2D.y - minPt.y) / size.y
+            };
+            IntersectionCapCalculatorVec2 uv2 = {
+                (p2_2D.x - minPt.x) / size.x,
+                (p2_2D.y - minPt.y) / size.y
+            };
+
+            // Speichern
             triangles_out.push_back({ v0, v1, v2 });
+            texcoords_out.push_back(uv0);
+            texcoords_out.push_back(uv1);
+            texcoords_out.push_back(uv2);
         }
     }
 
-    buildTriangleVisualizationNode(geometryItem, normal, triangles_out);
+    buildTriangleVisualizationNode(geometryItem, normal, triangles_out, texcoords_out);
 }
 
 
