@@ -16,7 +16,7 @@
 #include <list>
 #include <cassert>
 
-namespace osg { class Switch; };
+#include <osg/Switch>
 
 class SceneNodeBase
 {
@@ -99,7 +99,8 @@ public:
 	void setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 
 protected:
-	osg::Switch* m_shapeNode = nullptr;
+	osg::ref_ptr<osg::Switch> m_shapeNode = nullptr;
+	//osg::Switch* m_shapeNode = nullptr;
 	const float m_transparency = 0.15;
 
 private:

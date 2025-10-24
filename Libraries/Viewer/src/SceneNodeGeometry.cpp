@@ -85,7 +85,7 @@ void SceneNodeGeometry::deleteShapeNode(void)
 		}
 
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
-		m_shapeNode				= nullptr;
+		//m_shapeNode		    = nullptr;  The shape node is a reference pointer belonging to this object and will be deleted when this object is deleted
 		triangles				= nullptr;
 		edges                   = nullptr;
 		edgesHighlighted		= nullptr;

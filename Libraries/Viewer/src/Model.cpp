@@ -3413,14 +3413,10 @@ void Model::updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg:
 	double dist = abs(normalizedNormal.operator*(point.operator-(boundingSphereCenter)));
 
 	if (dist > boundingSphereRadius) {
-		OutputDebugString(L"No intersection\n\n");
-
 		item->deleteCutCapGeometryTriangles();
 		item->deleteCutCapGeometryEdges();
 	}
 	else {
-		OutputDebugString(L"Intersection\n\n");
-
 		IntersectionCapCalculator capping;
 		capping.generateCapGeometryAndVisualization(item, normalizedNormal, point, radius);
 	}

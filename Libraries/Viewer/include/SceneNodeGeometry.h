@@ -81,6 +81,9 @@ public:
 	void setBackFaceCulling(bool b) { backFaceCulling = b; };
 	void setOffsetFactor(double o) { offsetFactor = o; };
 	void setStorage(const std::string &proj, unsigned long long id, unsigned long long version) { projectName = proj; entityID = id, entityVersion = version; };
+
+	void getSurfaceColorRGB(double color[3]) { color[0] = surfaceColorRGB[0]; color[1] = surfaceColorRGB[1]; color[2] = surfaceColorRGB[2]; };
+
 	void setNeedsInitialization(void) { needsInitialization = true; };
 	
 	std::string getProjectName(void) { return projectName; };

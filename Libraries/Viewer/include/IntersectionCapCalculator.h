@@ -81,4 +81,6 @@ private:
     IntersectionCapCalculatorProjection2D makeProjectionBasis(const IntersectionCapCalculatorPlane& plane);
     void buildTriangleVisualizationNode(SceneNodeGeometry* geometryItem, const osg::Vec3d& normal, const std::vector<IntersectionCapCalculatorTriangle3D>& triangles, std::vector<IntersectionCapCalculatorVec2> &texcoords_out);
     void buildEdgeVisualizationNode(SceneNodeGeometry* geometryItem, std::vector<std::vector<IntersectionCapCalculatorVec3>> &loops);
+    void buildProjectionBasis(const osg::Vec3d& normal, const osg::Vec3d& origin, osg::Vec3d& u, osg::Vec3d& v);
+    double dot(const IntersectionCapCalculatorVec3& a, const IntersectionCapCalculatorVec3& b) {return a.x * b.x + a.y * b.y + a.z * b.z;}
 };

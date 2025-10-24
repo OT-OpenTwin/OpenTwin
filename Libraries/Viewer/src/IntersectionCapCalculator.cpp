@@ -262,6 +262,13 @@ void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry
     double colorRGB[] = { 1.0, 0.0, 0.0 };
     double transparency = 0.0;
 
+    bool useShapeColor = true;
+
+    if (useShapeColor)
+    {
+        geometryItem->getSurfaceColorRGB(colorRGB);
+    }
+
     osg::ref_ptr<osg::Material> material = new osg::Material;
 
     SceneNodeMaterial sceneNodeMaterial;
@@ -320,21 +327,22 @@ void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry
     newGeometry->getOrCreateStateSet()->setAttributeAndModes(p);
     newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::FILL));
 
-    newGeometry->setVertexArray(vertices.get());
+    newGeometry->setVertexArray(vertices);
 
-    newGeometry->setNormalArray(normals.get());
+    newGeometry->setNormalArray(normals);
     newGeometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
     newGeometry->setTexCoordArray(0, texcoords);
 
-    newGeometry->setColorArray(colors.get());
+    newGeometry->setColorArray(colors);
     newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
     newGeometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, nTriangles * 3));
 
-    newGeometry->getOrCreateStateSet()->setAttribute(material.get());
+    newGeometry->getOrCreateStateSet()->setAttribute(material);
+    newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f, 2.0f));
 
-    osg::ref_ptr<osg::Texture2D> texture = TextureMapManager::getTexture("Gold");
+    osg::ref_ptr<osg::Texture2D> texture = TextureMapManager::getTexture("Stripes");
 
     texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
     texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
@@ -400,7 +408,7 @@ void IntersectionCapCalculator::buildEdgeVisualizationNode(SceneNodeGeometry* ge
 
     newGeometry->setVertexArray(vertices);
 
-    newGeometry->setColorArray(colors.get());
+    newGeometry->setColorArray(colors);
     newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
     newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, nEdges * 2));
@@ -416,6 +424,14 @@ void IntersectionCapCalculator::buildEdgeVisualizationNode(SceneNodeGeometry* ge
     geometryItem->setCutCapGeometryEdges(newGeometry);
 }
 
+void IntersectionCapCalculator::buildProjectionBasis(const osg::Vec3d& normal, const osg::Vec3d& origin, osg::Vec3d &u, osg::Vec3d &v)
+{
+    osg::Vec3d up = std::abs(normal.z()) < 0.99 ? osg::Vec3d(0.0, 0.0, 1.0) : osg::Vec3d(0.0, 1.0, 0.0);
+    u = normal ^ up;  // Cross product: normal x up -> Basis-U
+    u.normalize();
+    v = normal ^ u;  // Basis-V (normal x u)
+    v.normalize();
+}
 
 void IntersectionCapCalculator::generateCapGeometryAndVisualization(SceneNodeGeometry* geometryItem, const osg::Vec3d& normal, const osg::Vec3d& point, double radius)
 {
@@ -451,18 +467,14 @@ void IntersectionCapCalculator::generateCapGeometryAndVisualization(SceneNodeGeo
     std::vector<IntersectionCapCalculatorTriangle3D> triangles_out;
     std::vector<IntersectionCapCalculatorVec2> texcoords_out;
 
-    IntersectionCapCalculatorVec2 minPt = { std::numeric_limits<double>::max(), std::numeric_limits<double>::max() };
-    IntersectionCapCalculatorVec2 maxPt = { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest() };
+    osg::Vec3d u, v;
+    buildProjectionBasis(normal, point, u, v);
 
-    for (const auto& ring : all_rings_2D) {
-        for (const auto& p : ring) {
-            minPt.x = std::min(minPt.x, p.x);
-            minPt.y = std::min(minPt.y, p.y);
-            maxPt.x = std::max(maxPt.x, p.x);
-            maxPt.y = std::max(maxPt.y, p.y);
-        }
-    }
-    IntersectionCapCalculatorVec2 size = { maxPt.x - minPt.x, maxPt.y - minPt.y };
+    IntersectionCapCalculatorVec3 uDir(u.x(), u.y(), u.z());
+    IntersectionCapCalculatorVec3 vDir(v.x(), v.y(), v.z());
+    IntersectionCapCalculatorVec3 origin(point.x(), point.y(), point.z());
+
+    float repeatPerMeter = (float) (1.5 / (radius > 0.0 ? radius : 1.0));
 
     for (auto& outer : outer_rings) {
         Polygon poly = { outer };
@@ -482,30 +494,20 @@ void IntersectionCapCalculator::generateCapGeometryAndVisualization(SceneNodeGeo
             IntersectionCapCalculatorVec2 p1_2D = flat_points[indices[i + 1]];
             IntersectionCapCalculatorVec2 p2_2D = flat_points[indices[i + 2]];
 
-            // Rückprojektion in 3D
+            // Backprojection in 3D
             IntersectionCapCalculatorVec3 v0 = proj.unproject(p0_2D);
             IntersectionCapCalculatorVec3 v1 = proj.unproject(p1_2D);
             IntersectionCapCalculatorVec3 v2 = proj.unproject(p2_2D);
 
-            // UV-Koordinaten (einfach aus 2D-Polygon, normalisiert auf 0–1)
-            IntersectionCapCalculatorVec2 uv0 = {
-                (p0_2D.x - minPt.x) / size.x,
-                (p0_2D.y - minPt.y) / size.y
-            };
-            IntersectionCapCalculatorVec2 uv1 = {
-                (p1_2D.x - minPt.x) / size.x,
-                (p1_2D.y - minPt.y) / size.y
-            };
-            IntersectionCapCalculatorVec2 uv2 = {
-                (p2_2D.x - minPt.x) / size.x,
-                (p2_2D.y - minPt.y) / size.y
-            };
+            for (auto& p3D : { v0, v1, v2 }) {
+                IntersectionCapCalculatorVec3 rel = p3D - origin;
+                float u = dot(rel, uDir) * repeatPerMeter;
+                float v = dot(rel, vDir) * repeatPerMeter;
+                texcoords_out.push_back({ u, v });
+            }
 
-            // Speichern
+            // Store the triangles
             triangles_out.push_back({ v0, v1, v2 });
-            texcoords_out.push_back(uv0);
-            texcoords_out.push_back(uv1);
-            texcoords_out.push_back(uv2);
         }
     }
 
