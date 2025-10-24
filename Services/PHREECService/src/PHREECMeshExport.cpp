@@ -39,7 +39,7 @@ PHREECMeshExport::~PHREECMeshExport()
 
 std::string PHREECMeshExport::exportMeshData(const std::string &dataBaseURL, const std::string &projectName, unsigned long long meshEntityID, const std::string &outputFileBase, ot::components::ModelComponent *modelComponent)
 {
-//	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
+//	DataBase::instance().prefetchDocumentsFromStorage(prefetchIds);
 	// Load the material information
 	application->getModelComponent()->loadMaterialInformation();
 
@@ -96,7 +96,7 @@ std::string PHREECMeshExport::exportMeshData(const std::string &dataBaseURL, con
 	unsigned long long meshFacesVersion = meshDataView["MeshFacesVersion"].get_int64();
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchList{ std::pair<ot::UID, ot::UID>{meshNodesID, meshNodesVersion},  std::pair<ot::UID, ot::UID>{meshFacesID, meshFacesVersion} };
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchList);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchList);
 
 	error = exportMeshNodes(dataBaseURL, projectName, meshNodesID, meshNodesVersion, meshFile, debug, debugFile);
 	if (!error.empty()) return error;
@@ -167,7 +167,7 @@ std::string PHREECMeshExport::exportMeshData(const std::string &dataBaseURL, con
 		error = prefetchTetList(dataBaseURL, projectName, meshItemID, meshItemVersion, prefetchList, objectMaterialList, meshDataTetsID, meshDataTetsVersion, sectionID);
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchList);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchList);
 
 	std::list<tetrahedron> tetList;
 
@@ -325,7 +325,7 @@ void PHREECMeshExport::processMaterialData(const std::string &meshName, std::lis
 		prefetchIds.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIds);
 
 	for (auto info : materialInfo)
 	{
@@ -358,7 +358,7 @@ std::string PHREECMeshExport::prefetchTetList(const std::string &dataBaseURL, co
 	auto meshItemDocView = meshItemDoc.view()["Found"].get_document().view();
 	std::string entitySchemaType = meshItemDocView["SchemaType"].get_utf8().value.data();
 
-	int schemaVersion = (int)DataBase::GetIntFromView(meshItemDocView, std::string("SchemaVersion_EntityMeshTetItem").c_str());
+	int schemaVersion = (int)DataBase::getIntFromView(meshItemDocView, std::string("SchemaVersion_EntityMeshTetItem").c_str());
 	if (schemaVersion < 1)
 	{
 		return "Too early version of document with entity ID" + std::to_string(meshItemID) + " (expected version at least 1)";
@@ -418,14 +418,14 @@ std::string PHREECMeshExport::readTetList(const std::string &dataBaseURL, const 
 		auto n = nodes.begin();
 
 		// Read the number of triangles
-		size_t numberTets = DataBase::GetIntFromArrayViewIterator(n);
+		size_t numberTets = DataBase::getIntFromArrayViewIterator(n);
 		n++;
 
 		int thisSectionID = sectionID[meshItemID];
 
 		for (unsigned long index = 0; index < numberTets; index++)
 		{
-			int numberNodes = (int)DataBase::GetIntFromArrayViewIterator(n);
+			int numberNodes = (int)DataBase::getIntFromArrayViewIterator(n);
 			n++;
 
 			if (numberNodes != 4) return "The solver currently supports first order meshes only.";
@@ -649,7 +649,7 @@ std::string PHREECMeshExport::exportMeshFaces(const std::string &dataBaseURL, co
 		faceVersion++;
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchList);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchList);
 
 	// Prefetch all annotations
 	faceID = facesID.begin();
@@ -770,12 +770,12 @@ std::string PHREECMeshExport::exportMeshFace(const std::string &dataBaseURL, con
 		auto n = nodes.begin();
 
 		// Read the number of triangles
-		size_t numberTriangles = DataBase::GetIntFromArrayViewIterator(n);
+		size_t numberTriangles = DataBase::getIntFromArrayViewIterator(n);
 		n++;
 
 		for (unsigned long index = 0; index < numberTriangles; index++)
 		{
-			int numberNodes = (int)DataBase::GetIntFromArrayViewIterator(n);
+			int numberNodes = (int)DataBase::getIntFromArrayViewIterator(n);
 			n++;
 
 			if (numberNodes != 3) return "The solver currently supports first order meshes only.";
@@ -957,7 +957,7 @@ std::string PHREECMeshExport::readFaceAnnotation(const std::string &dataBaseURL,
 		return "Wrong schema type of document with entity ID: " + std::to_string(entityID) + " (expected schema type EntityFaceAnnotation)";
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, std::string("SchemaVersion_EntityFaceAnnotation").c_str());
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, std::string("SchemaVersion_EntityFaceAnnotation").c_str());
 	if (schemaVersion < 1)
 	{
 		return "Too early version of document with entity ID: " + std::to_string(entityID) + " (expected version at least 1)";
@@ -993,7 +993,7 @@ std::string PHREECMeshExport::readPartialDocument(const std::string &dataBaseURL
 	//auto filterQuery = queryBuilder.GenerateFilterQuery(filterPairs);
 	//auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);
 
-	bool success = DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(meshEntityID, meshEntityVersion, doc);
+	bool success = DataBase::instance().getDocumentFromEntityIDandVersion(meshEntityID, meshEntityVersion, doc);
 	//DataStorageAPI::DataStorageResponse res = docManager.GetDocument(projectName, filterPairs, columnNames, true);
 
 	if (!success) return "Unable to read document with entity ID " + std::to_string(meshEntityID) + " (schema type " + expectedSchemaType + ")";
@@ -1013,7 +1013,7 @@ std::string PHREECMeshExport::readPartialDocument(const std::string &dataBaseURL
 			return "Wrong schema type of document with entity ID " + std::to_string(meshEntityID) + " (expected schema type " + expectedSchemaType + ")";
 		}
 
-		int schemaVersion = (int)DataBase::GetIntFromView(doc_view, std::string("SchemaVersion_" + expectedSchemaType).c_str());
+		int schemaVersion = (int)DataBase::getIntFromView(doc_view, std::string("SchemaVersion_" + expectedSchemaType).c_str());
 		if (schemaVersion < expectedMinVersion)
 		{
 			return "Too early version of document with entity ID " + std::to_string(meshEntityID) + " (expected version at least " + std::to_string(expectedMinVersion) + ")";
@@ -1029,7 +1029,7 @@ bool PHREECMeshExport::initializeConnection(const std::string &serverURL)
 
 	try
 	{
-		DataStorageAPI::ConnectionAPI::establishConnection(serverURL,DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword());
+		DataStorageAPI::ConnectionAPI::establishConnection(serverURL,DataBase::instance().getUserName(), DataBase::instance().getUserPassword());
 
 		isConnected = true;
 
@@ -1128,5 +1128,5 @@ void PHREECMeshExport::prefetchData(bsoncxx::builder::basic::document &doc)
 	}
 
 	// Now we prefetch all these documents together
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIds);
 }

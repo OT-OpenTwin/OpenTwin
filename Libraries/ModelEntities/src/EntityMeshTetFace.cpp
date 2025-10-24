@@ -49,7 +49,7 @@ void EntityMeshTetFace::readSpecificDataFromDataBase(bsoncxx::document::view &do
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
 	// Now we read the information about the Brep and Facet objects
-	surfaceId = (int) DataBase::GetIntFromView(doc_view, "SurfaceId");
+	surfaceId = (int) DataBase::getIntFromView(doc_view, "SurfaceId");
 	boundingBox.setFromBSON(doc_view["BoundingBox"].get_document().value);
 
 	bsoncxx::document::view trianglesObj   = doc_view["Triangles"].get_document().view();
@@ -121,12 +121,12 @@ void EntityMeshTetFace::readBSON(bsoncxx::document::view &trianglesObj, std::vec
 		auto n = nodes.begin();
 
 		// Read the number of triangles
-		long long numberTriangles = DataBase::GetIntFromArrayViewIterator(n);
+		long long numberTriangles = DataBase::getIntFromArrayViewIterator(n);
 		n++;
 
 		for (unsigned long index = 0; index < numberTriangles; index++)
 		{
-			int numberNodes = (int) DataBase::GetIntFromArrayViewIterator(n);
+			int numberNodes = (int) DataBase::getIntFromArrayViewIterator(n);
 			n++;
 
 			EntityMeshTetTriangle triangle;
@@ -134,7 +134,7 @@ void EntityMeshTetFace::readBSON(bsoncxx::document::view &trianglesObj, std::vec
 
 			for (int iNode = 0; iNode < numberNodes; iNode++)
 			{
-				long long nodeIndex = DataBase::GetIntFromArrayViewIterator(n);
+				long long nodeIndex = DataBase::getIntFromArrayViewIterator(n);
 				n++;
 
 				triangle.setNode(iNode, nodeIndex);
@@ -163,9 +163,9 @@ void EntityMeshTetFace::readBSON(bsoncxx::document::view &trianglesObj, std::vec
 			EntityMeshTetTriangle triangle;
 			triangle.setNumberOfNodes(3);
 
-			triangle.setNode(0, DataBase::GetIntFromArrayViewIterator(n1));
-			triangle.setNode(1, DataBase::GetIntFromArrayViewIterator(n2));
-			triangle.setNode(2, DataBase::GetIntFromArrayViewIterator(n3));
+			triangle.setNode(0, DataBase::getIntFromArrayViewIterator(n1));
+			triangle.setNode(1, DataBase::getIntFromArrayViewIterator(n2));
+			triangle.setNode(2, DataBase::getIntFromArrayViewIterator(n3));
 
 			triangles.push_back(triangle);
 
@@ -189,7 +189,7 @@ void EntityMeshTetFace::readBSON(bsoncxx::document::view &annotationObj, std::ve
 
 	for (unsigned long index = 0; index < numberAnnotations; index++)
 	{
-		faceAnnotationIDs.push_back(std::make_pair(orient->get_bool(), DataBase::GetIntFromArrayViewIterator(id)));
+		faceAnnotationIDs.push_back(std::make_pair(orient->get_bool(), DataBase::getIntFromArrayViewIterator(id)));
 
 		orient++;
 		id++;

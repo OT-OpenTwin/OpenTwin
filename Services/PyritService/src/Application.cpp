@@ -85,10 +85,10 @@ void Application::run(void) {
 
 	DataBaseInfo info;
 	info.setSiteID(this->getSiteID());
-	info.setDataBaseUrl(DataBase::GetDataBase()->getDataBaseServerURL());
+	info.setDataBaseUrl(DataBase::instance().getDataBaseServerURL());
 	info.setCollectionName(this->getCollectionName());
-	info.setUserName(DataBase::GetDataBase()->getUserName());
-	info.setUserPassword(DataBase::GetDataBase()->getUserPassword());
+	info.setUserName(DataBase::instance().getUserName());
+	info.setUserPassword(DataBase::instance().getUserPassword());
 
 	m_subprocessManager->setDataBaseInfo(info);
 
@@ -295,7 +295,7 @@ void Application::handleRunSolver()
 		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdsSolver);
 
 	// Now read the solver objects for each solver
 	std::list<std::string> meshNameList;

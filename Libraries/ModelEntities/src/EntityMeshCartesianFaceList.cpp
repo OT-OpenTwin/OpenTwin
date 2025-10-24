@@ -163,7 +163,7 @@ void EntityMeshCartesianFaceList::readSpecificDataFromDataBase(bsoncxx::document
 
 	for (unsigned long index = 0; index < numberFaces; index++)
 	{
-		meshFaceStorageIds[(int)DataBase::GetIntFromArrayViewIterator(id)] = std::pair<ot::UID, ot::UID>(faceID->get_int64(), faceVersion->get_int64());
+		meshFaceStorageIds[(int)DataBase::getIntFromArrayViewIterator(id)] = std::pair<ot::UID, ot::UID>(faceID->get_int64(), faceVersion->get_int64());
 
 		id++;
 		faceID++;

@@ -4,11 +4,11 @@
 
 QueuingDatabaseWritingRAII::QueuingDatabaseWritingRAII()
 {
-	DataBase::GetDataBase()->queueWriting(true);
+	DataBase::instance().setWritingQueueEnabled(true);
 }
 
 QueuingDatabaseWritingRAII::~QueuingDatabaseWritingRAII()
 {
-	DataBase::GetDataBase()->queueWriting(false);
-	DataBase::GetDataBase()->flushWritingQueue();
+	DataBase::instance().setWritingQueueEnabled(false);
+	DataBase::instance().flushWritingQueue();
 }

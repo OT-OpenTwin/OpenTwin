@@ -279,7 +279,7 @@ void ResultManager::addCurveData(ltspice::RawData& resultData, std::list<std::sh
 void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescriptions)
 {
 	//First we access the result collection of the current project
-	std::string collectionName = DataBase::GetDataBase()->getProjectName();
+	std::string collectionName = DataBase::instance().getCollectionName();
 
 	ResultCollectionExtender resultCollectionExtender(collectionName, *_modelComponent, OT_INFO_SERVICE_TYPE_LTSPICE);
 	resultCollectionExtender.setSaveModel(false);

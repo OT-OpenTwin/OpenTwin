@@ -60,7 +60,7 @@ bool ModelState::openProject(const std::string& _customVersion) {
 	loadVersionGraph();
 
 	// Load the model entity to determine the currently active branch and version
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto queryDoc = bsoncxx::builder::stream::document{}
 		<< "SchemaType" << "Model"
@@ -269,7 +269,7 @@ bool ModelState::loadModelState(const std::string& _version)
 	}
 
 	// Now we search for an entity with SchemaType "ModelState" and the given version
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto queryDoc = bsoncxx::builder::basic::document{};
 	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
@@ -467,7 +467,7 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 		if (!loadModelState(m_currentModelBaseStateVersion)) return false;
 		
 		// Now load the following (incremental) versions until we reach the desired version
-		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 		
 		std::list<const ot::VersionGraphVersionCfg*> versionsToImport = m_graphCfg.findNextVersions(m_currentModelBaseStateVersion, incrementalStateVersion.getBranchName(), incrementalStateVersion.getName());
@@ -550,7 +550,7 @@ bool ModelState::loadState(bsoncxx::document::view docView, const std::string &e
 
 		auto filterDoc = bsoncxx::builder::basic::document{};
 
-		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 		auto resultList = docBase.GetAllDocument(std::move(queryDoc), std::move(filterDoc.extract()), 0);
 
 		// Now we need to process all extension states
@@ -751,7 +751,7 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 	//auto docDataLength = doc.view().length();
 	//assert(docDataLength < MaxDocumentLength);
 
-	DataBase::GetDataBase()->StorePlainDataItem(doc);
+	DataBase::instance().storePlainDataItem(doc);
 
 	// The current version becomes the new base state
 	m_currentModelBaseStateVersion = m_graphCfg.getActiveVersionName();
@@ -859,7 +859,7 @@ bool ModelState::writeMainDocument(std::map<ot::UID, ModelStateEntity> &entities
 	}
 
 	// Store the document in the data base
-	DataBase::GetDataBase()->StorePlainDataItem(doc);
+	DataBase::instance().storePlainDataItem(doc);
 
 	return true;
 }
@@ -937,7 +937,7 @@ bool ModelState::writeExtensionDocument(std::map<ot::UID, ModelStateEntity> &ent
 	}
 
 	// Store the document in the data base
-	DataBase::GetDataBase()->StorePlainDataItem(doc);
+	DataBase::instance().storePlainDataItem(doc);
 
 	return true;
 }
@@ -1054,7 +1054,7 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 	}
 
 	// Store the document in the data base
-	DataBase::GetDataBase()->StorePlainDataItem(doc);
+	DataBase::instance().storePlainDataItem(doc);
 
 	return true;
 }
@@ -1121,7 +1121,7 @@ bool ModelState::redoNextOperation(void)
 
 void ModelState::removeDanglingModelEntities(void)
 {
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	// First of all, we search for the last model state type entry from the back
 
@@ -1218,7 +1218,7 @@ bool ModelState::getDanglingEntities(mongocxx::cursor& _cursor, bsoncxx::builder
 void ModelState::loadVersionGraph(void) {
 	m_graphCfg.clear();
 
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto array_builder = bsoncxx::builder::basic::array{};
 	array_builder.append("ModelState");
@@ -1265,7 +1265,7 @@ const ot::VersionGraphCfg& ModelState::getVersionGraph(void) const {
 long long ModelState::getCurrentModelEntityVersion(void)
 {
 	// We search for the last model entity in the database and determine its version
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto queryDoc = bsoncxx::builder::stream::document{}
 		<< "SchemaType" << "Model"
@@ -1285,7 +1285,7 @@ long long ModelState::getCurrentModelEntityVersion(void)
 void ModelState::checkAndUpgradeDataBaseSchema(void)
 {
 	// Get the schema version of the model entity
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto queryDoc = bsoncxx::builder::basic::document{};
 	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "Model"));
@@ -1314,7 +1314,7 @@ void ModelState::updateSchema_1_2(void)
 	// Read the version graph information
 	std::list<std::pair<std::string, std::string>> versionGraph;
 
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto array_builder = bsoncxx::builder::basic::array{};
 	array_builder.append("ModelState");
@@ -1348,7 +1348,7 @@ void ModelState::updateSchema_1_2(void)
 	if (hasInactiveModelState)
 	{
 		// Find the currently active model state
-		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 		queryDoc = bsoncxx::builder::stream::document{}
 			<< "SchemaType" << "ModelState"
@@ -1367,7 +1367,7 @@ void ModelState::updateSchema_1_2(void)
 		}
 
 		// Turn all inactive model states into active (the current version will be tracked in the model)
-		mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
+		mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
 
 		auto doc_find = bsoncxx::builder::stream::document{}
 			<< "SchemaType" << "ModelStateInactive"
@@ -1393,7 +1393,7 @@ void ModelState::updateSchema_1_2(void)
 	}
 
 	// Now write the information about the parent version to each model state
-	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
 
 	for (const auto& item : versionGraph)
 	{
@@ -1619,7 +1619,7 @@ void ModelState::updateVersionEntity(const std::string& _version) {
 		return;
 	}
 
-	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
 
 	auto queryDoc = bsoncxx::builder::basic::document{};
 	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
@@ -1636,7 +1636,7 @@ void ModelState::updateVersionEntity(const std::string& _version) {
 
 bool ModelState::addPreviewImage(std::vector<char>&& _imageData, ot::ImageFileFormat _format) {
 	// Load the model entity
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	long long modelVersion = getCurrentModelEntityVersion();
 
@@ -1680,7 +1680,7 @@ bool ModelState::addPreviewImage(std::vector<char>&& _imageData, ot::ImageFileFo
 	addNewEntity(newImageData.getEntityID(), 0, newImageData.getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
 	
 	// Finally, update the model entity
-	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
 	
 	auto queryDoc2 = bsoncxx::builder::stream::document{}
 		<< "SchemaType" << "Model"
@@ -1695,6 +1695,69 @@ bool ModelState::addPreviewImage(std::vector<char>&& _imageData, ot::ImageFileFo
 		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 
 	collection.update_one(queryDoc2.view(), modifyDoc.view());
+
+	return true;
+}
+
+bool ModelState::readProjectPreviewImage(const std::string& _collectionName, std::vector<char>& _imageData, ot::ImageFileFormat _format) {
+	// Load the model entity
+	DataStorageAPI::DocumentAccessBase docBase("Projects", _collectionName);
+	auto zeroQueryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< bsoncxx::builder::stream::finalize;
+
+	auto zeroEmptyFilterDoc = bsoncxx::builder::basic::document{};
+
+	auto sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto zeroDoc = docBase.GetDocument(std::move(zeroQueryDoc), std::move(zeroEmptyFilterDoc.extract()), std::move(sortDoc.extract()));
+	if (!zeroDoc) {
+		OT_LOG_E("No model entity found");
+		return false;  // No model entity found
+	}
+
+	// Now check if we already have an image
+	auto idIt = zeroDoc->view().find("PreviewImageUID");
+	if (idIt == zeroDoc->view().end()) {
+		// The project has no preview image
+		return false;
+	}
+
+	auto verIt = zeroDoc->view().find("PreviewImageVersion");
+	if (verIt == zeroDoc->view().end()) {
+		OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
+		return false;
+	}
+	auto typeIt = zeroDoc->view().find("PreviewImageType");
+	if (typeIt == zeroDoc->view().end()) {
+		OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageType");
+		return false;
+	}
+
+	_format = ot::stringToImageFileFormat(typeIt->get_utf8().value.data());
+
+	// Read the image data
+	
+	auto imageQueryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << EntityBinaryData::className()
+		<< "EntityID" << static_cast<int64_t>(idIt->get_int64())
+		<< "Version" << static_cast<int64_t>(verIt->get_int64())
+		<< bsoncxx::builder::stream::finalize;
+
+	auto imageEmptyFilterDoc = bsoncxx::builder::basic::document{};
+
+	auto imageDoc = docBase.GetDocument(std::move(imageQueryDoc), std::move(imageEmptyFilterDoc.extract()));
+	if (!imageDoc) {
+		OT_LOG_E("Preview image entity not found");
+		return false;
+	}
+
+	std::map<ot::UID, EntityBase*> tmp;
+
+	EntityBinaryData imageData;
+	imageData.restoreFromDataBase(nullptr, nullptr, nullptr, imageDoc->view(), tmp);
+	_imageData = imageData.getData();
 
 	return true;
 }
@@ -1721,7 +1784,7 @@ void ModelState::storeCurrentVersionInModelEntity(void) {
 			OT_LOG_E("Attempting to store empty version { \"Version\": \"" + m_graphCfg.getActiveVersionName() + "\", \"Branch\": \"" + m_graphCfg.getActiveBranchName() + "\" }");
 			return;
 		}
-		mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
+		mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
 
 		// We need to update the model entity
 		long long modelVersion = getCurrentModelEntityVersion();
@@ -1799,7 +1862,7 @@ void ModelState::deleteModelVersion(const std::string &version) {
 	// We only delete the model state information here and leave it up to the garbage collection to remove the 
 	// unnecessary entities
 
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	// In a first step, get all model states and model state extensions for the to be deleted version
 	auto array_builder = bsoncxx::builder::basic::array{};

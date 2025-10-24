@@ -139,7 +139,7 @@ void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<ot::Entit
 		}
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdandVersion);
 }
 
 ot::UID ot::ApplicationBase::getPrefetchedEntityVersion(UID _entityID) {
@@ -533,7 +533,7 @@ ot::ReturnMessage ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _
 		return ot::ReturnMessage::Ok;
 	}
 
-	if (!this->storeSettingToDataBase(newSettings, m_databaseURL, m_siteID, DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_dbUserCollection)) {
+	if (!this->storeSettingToDataBase(newSettings, m_databaseURL, m_siteID, DataBase::instance().getUserName(), DataBase::instance().getUserPassword(), m_dbUserCollection)) {
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to store settings");
 	}
 
@@ -563,12 +563,12 @@ void ot::ApplicationBase::setSessionIDPrivate(const std::string& _id) {
 		m_projectName = m_sessionID.substr(0, index);
 		m_collectionName = m_sessionID.substr(index + 1);
 		LogDispatcher::instance().setProjectName(m_projectName);
-		DataBase::GetDataBase()->setProjectName(m_collectionName);
+		DataBase::instance().setCollectionName(m_collectionName);
 	}
 }
 
 bool ot::ApplicationBase::initializeDataBaseConnectionPrivate() {
-	return DataBase::GetDataBase()->InitializeConnection(m_databaseURL);;
+	return DataBase::instance().initializeConnection(m_databaseURL);;
 }
 
 void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _service) {

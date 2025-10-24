@@ -349,14 +349,14 @@ EntityGeometry *ModelBuilder::createGeometryEntity(const std::string &name, Topo
 
 void ModelBuilder::storeEntities(void)
 {
-	DataBase::GetDataBase()->queueWriting(true);
+	DataBase::instance().setWritingQueueEnabled(true);
 
 	for (auto geometryEntity : modelEntities)
 	{
 		application->getModelComponent()->facetAndStoreGeometryEntity(geometryEntity, false);
 	}
 
-	DataBase::GetDataBase()->queueWriting(false);
+	DataBase::instance().setWritingQueueEnabled(false);
 }
 
 void ModelBuilder::analyzeOverlaps(void)

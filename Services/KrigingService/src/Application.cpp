@@ -149,7 +149,7 @@ KrigingParams* Application::getParams(void)
 		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdsSolver);
 
 	// Now read the solver objects for each solver
 	std::map<std::string, EntityBase *> solverMap;

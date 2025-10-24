@@ -11,7 +11,7 @@ InfoFileManager::InfoFileManager(ot::UID infoEntityID, ot::UID infoEntityVersion
 	if (infoEntityID != 0 && infoEntityVersion != 0)
 	{
 		// We need to load the binary item and read the hash information
-		EntityBinaryData* dataEntity = dynamic_cast<EntityBinaryData*>(DataBase::GetDataBase()->GetEntityFromEntityIDandVersion(infoEntityID, infoEntityVersion));
+		EntityBinaryData* dataEntity = dynamic_cast<EntityBinaryData*>(DataBase::instance().getEntityFromEntityIDandVersion(infoEntityID, infoEntityVersion));
 
 		if (dataEntity != nullptr)
 		{

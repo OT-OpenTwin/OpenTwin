@@ -83,14 +83,14 @@ void STEPReader::importSTEPFileWorker(const std::string &fileName, bool removeFi
 	// The step file import reads the entities into a flat list and assigns the entity names. The entities are not yet added to the model. All entities are EntityGeometry
 
 	// Enable write caching to database and message queueing
-	DataBase::GetDataBase()->queueWriting(true);
+	DataBase::instance().setWritingQueueEnabled(true);
 	ot::ModelServiceAPI::enableMessageQueueing(true);
 
 	std::string messages;
 	readStepFile(fileName, rootName, removeFile, messages);
 
 	// Disable write caching to database (this will also flush all pending writes)
-	DataBase::GetDataBase()->queueWriting(false);
+	DataBase::instance().setWritingQueueEnabled(false);
 	application->getUiComponent()->setProgress(95);
 
 	std::list<ot::UID> topologyEntityIDList;

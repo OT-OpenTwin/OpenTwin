@@ -358,7 +358,7 @@ void MicroserviceNotifier::addVisualizationNodeFromFacetData(ot::UID visModelID,
 }
 
 void MicroserviceNotifier::addVisualizationNodeFromFacetDataBase(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-																 double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ot::UID entityID, ot::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation)
+																 double offsetFactor, bool isHidden, bool isEditable, const std::string & collectionName, ot::UID entityID, ot::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation)
 {
 	ot::JsonDocument inDoc;
 	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -374,7 +374,7 @@ void MicroserviceNotifier::addVisualizationNodeFromFacetDataBase(ot::UID visMode
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, offsetFactor, inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, isEditable, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(projectName, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, entityID, inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, entityVersion, inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SelectChildren, selectChildren, inDoc.GetAllocator());

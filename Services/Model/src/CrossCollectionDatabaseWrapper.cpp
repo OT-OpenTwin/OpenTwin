@@ -3,14 +3,14 @@
 #include "DataBase.h"
 
 CrossCollectionDatabaseWrapper::CrossCollectionDatabaseWrapper(const std::string& collectionName)
-	:_oldCollectionName(DataBase::GetDataBase()->getProjectName())
+	:_oldCollectionName(DataBase::instance().getCollectionName())
 {
-	DataBase::GetDataBase()->setProjectName(collectionName);
-	DataBase::GetDataBase()->RemovePrefetchedDocument(0);
+	DataBase::instance().setCollectionName(collectionName);
+	DataBase::instance().removePrefetchedDocument(0);
 }
 
 CrossCollectionDatabaseWrapper::~CrossCollectionDatabaseWrapper()
 {
-	DataBase::GetDataBase()->setProjectName(_oldCollectionName);
-	DataBase::GetDataBase()->RemovePrefetchedDocument(0);
+	DataBase::instance().setCollectionName(_oldCollectionName);
+	DataBase::instance().removePrefetchedDocument(0);
 }

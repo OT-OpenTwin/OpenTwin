@@ -12,8 +12,8 @@ void MeasurementCampaignHandler::ConnectToCollection(const std::string& collecti
 	if(allMeasurementMetadata.size() > 0)
 	{
 
-		std::string oldProjectName = DataBase::GetDataBase()->getProjectName();
-		DataBase::GetDataBase()->setProjectName(collectionName);
+		std::string oldProjectName = DataBase::instance().getCollectionName();
+		DataBase::instance().setCollectionName(collectionName);
 		Application::instance()->prefetchDocumentsFromStorage(allMeasurementMetadata);
 
 		std::vector<std::shared_ptr<EntityMetadataSeries>> measurementMetadata;
@@ -27,7 +27,7 @@ void MeasurementCampaignHandler::ConnectToCollection(const std::string& collecti
 			measurementMetadata.push_back(std::shared_ptr<EntityMetadataSeries>(metadata));
 		}
 
-		DataBase::GetDataBase()->setProjectName(oldProjectName);
+		DataBase::instance().setCollectionName(oldProjectName);
 
 		CollectMetaInformation(measurementMetadata);
 	}

@@ -224,7 +224,7 @@ void Application::runSolver(void) {
 		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdsSolver);
 
 	// Now read the solver objects for each solver
 	std::list<std::string> meshNameList;
@@ -325,8 +325,8 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 	getModelComponent()->clearNewEntityList();
 
 	std::string logFileText;
-	std::string output = elmerFEMSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), this->getUiComponent()->getServiceURL(),
-												    DataBase::GetDataBase()->getProjectName(), solverEntity, static_cast<int>(getServiceID()), getSessionCount(), this->getModelComponent());
+	std::string output = elmerFEMSolver.startSolver(logFileText, DataBase::instance().getDataBaseServerURL(), this->getUiComponent()->getServiceURL(),
+												    DataBase::instance().getCollectionName(), solverEntity, static_cast<int>(getServiceID()), getSessionCount(), this->getModelComponent());
 	this->getUiComponent()->displayMessage(output + "\n");
 
 	// Store the output in a result item

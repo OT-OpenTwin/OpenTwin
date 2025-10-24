@@ -159,7 +159,7 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	}
 
 	// Here we set a dummy project name (needs to be changed later on)
-	DataBase::GetDataBase()->setProjectName(collectionName);
+	DataBase::instance().setCollectionName(collectionName);
 }
 
 void Model::clearAll()
@@ -318,7 +318,7 @@ void Model::resetToNew()
 	}
 
 	// Now we load the default materials from the template definition
-	if (!DataBase::GetDataBase()->getProjectName().empty())
+	if (!DataBase::instance().getCollectionName().empty())
 	{
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 		loadDefaultMaterials();
@@ -810,7 +810,7 @@ void Model::requestImportTableFile(const std::string& _itemName)
 	// Get a file name for the Table file from the UI
 
 	newTableItemName = _itemName;
-	Application::instance()->getNotifier()->requestFileForReading("Import Table File", "Table files (*.csv)", OT_ACTION_CMD_ImportTableFile, DataBase::GetDataBase()->getSiteID());
+	Application::instance()->getNotifier()->requestFileForReading("Import Table File", "Table files (*.csv)", OT_ACTION_CMD_ImportTableFile, DataBase::instance().getSiteID());
 }
 
 void Model::importTableFile(const std::string &fileName, bool removeFile)
@@ -1071,7 +1071,7 @@ void Model::facetEntity(EntityGeometry *entity, double deflection, bool isHidden
 		treeIcons.visibleIcon = "ModelVisible";
 		treeIcons.hiddenIcon = "ModelHidden";
 		addVisualizationNodeFromFacetDataBase(name, colorRGB, colorRGB, materialType, textureType, textureReflective, modelEntityID, treeIcons, true, 1.0, isHidden, entity->getEditable(),
-									  		  DataBase::GetDataBase()->getProjectName(), entity->getFacetsStorageObjectID(), entity->getSelectChildren(), entity->getManageParentVisibility(), entity->getManageChildVisibility(), entity->getShowWhenSelected(), transformation);
+									  		  DataBase::instance().getCollectionName(), entity->getFacetsStorageObjectID(), entity->getSelectChildren(), entity->getManageParentVisibility(), entity->getManageChildVisibility(), entity->getShowWhenSelected(), transformation);
 
 		if (!entity->getFacets()->getErrorString().empty()) displayMessage("Shape: " + name + "\n" + entity->getFacets()->getErrorString());
 	}
@@ -2110,8 +2110,8 @@ void Model::updateEntities(bool itemsVisible)
 
 	std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> otherServicesUpdate;
 
-	bool oldWriteQueueingState = DataBase::GetDataBase()->isWritingQueue();
-	DataBase::GetDataBase()->queueWriting(true);
+	bool oldWriteQueueingState = DataBase::instance().isQueueWritingEnabled();
+	DataBase::instance().setWritingQueueEnabled(true);
 
 	bool needsWritingQueueFlush = false;
 
@@ -2176,10 +2176,10 @@ void Model::updateEntities(bool itemsVisible)
 
 	if (needsWritingQueueFlush)
 	{
-		DataBase::GetDataBase()->flushWritingQueue();
+		DataBase::instance().flushWritingQueue();
 	}
 
-	DataBase::GetDataBase()->queueWriting(oldWriteQueueingState);
+	DataBase::instance().setWritingQueueEnabled(oldWriteQueueingState);
 
 	if (otherServicesUpdate.empty())
 	{
@@ -2965,7 +2965,7 @@ size_t Model::getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geom
 {
 	if (geometryEntities.empty()) return 0;
 
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 	DataStorageAPI::QueryBuilder queryBuilder;
 
 	std::vector<std::string> columnNames;
@@ -3219,7 +3219,7 @@ std::string Model::findMostRecentModelInStorage()
 	columnNames.push_back("Version");
 	
 	auto doc = bsoncxx::builder::basic::document{};
-	if (!DataBase::GetDataBase()->GetAllDocumentsFromFilter(filterPairs, columnNames, doc))
+	if (!DataBase::instance().getAllDocumentsFromFilter(filterPairs, columnNames, doc))
 	{
 		return "";
 	}
@@ -3238,7 +3238,7 @@ std::string Model::findMostRecentModelInStorage()
 		{
 			bsoncxx::document::view subdoc{ msg.get_document() };
 
-			long long version = DataBase::GetIntFromView(subdoc, "Version");
+			long long version = DataBase::getIntFromView(subdoc, "Version");
 
 			if (version > maxVersion)
 			{
@@ -3255,14 +3255,14 @@ bool Model::GetDocumentFromEntityID(ot::UID entityID, bsoncxx::builder::basic::d
 {
 	ot::UID version = getStateManager()->getCurrentEntityVersion(entityID);
 
-	return DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, version, doc);
+	return DataBase::instance().getDocumentFromEntityIDandVersion(entityID, version, doc);
 }
 
 EntityBase *Model::readEntityFromEntityIDandVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, version, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, version, doc))
 	{
 		return nullptr;
 	}
@@ -3293,7 +3293,7 @@ void Model::projectOpen(const std::string& _customVersion)
 	// Ensure that the database collection has a proper index
 	try
 	{
-		DataBase::GetDataBase()->createIndexIfNecessary();
+		DataBase::instance().createIndexIfNecessary();
 	}
 	catch (...)
 	{
@@ -3364,12 +3364,12 @@ void Model::projectOpen(const std::string& _customVersion)
 
 	auto doc_view = doc.view()["Found"].get_document().view();
 
-	ot::UID schemaVersion = (ot::UID) DataBase::GetIntFromView(doc_view, "SchemaVersion_Model");
+	ot::UID schemaVersion = (ot::UID) DataBase::getIntFromView(doc_view, "SchemaVersion_Model");
 	assert(schemaVersion == 2);
 
 	long long entityRootId = doc_view["entityRoot"].get_int64();
 
-	setModelStorageVersion((ot::UID) DataBase::GetIntFromView(doc_view, "Version"));
+	setModelStorageVersion((ot::UID) DataBase::getIntFromView(doc_view, "Version"));
 
 	// Now we read the default template information
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
@@ -3447,8 +3447,8 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	}
 
 	// Enable write caching to database
-	DataBase::GetDataBase()->queueWriting(false);
-	DataBase::GetDataBase()->queueWriting(true);
+	DataBase::instance().setWritingQueueEnabled(false);
+	DataBase::instance().setWritingQueueEnabled(true);
 
 	// Serialize the model content to the data base
 
@@ -3493,8 +3493,8 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 			bsoncxx::builder::basic::kvp("entityRoot", (long long)((entityRoot == nullptr) ? -1 : entityRoot->getEntityID()))
 		);
 
-		DataBase::GetDataBase()->StoreDataItem(doc);
-		DataBase::GetDataBase()->flushWritingQueue();
+		DataBase::instance().storeDataItem(doc);
+		DataBase::instance().flushWritingQueue();
 
 		anyDataChangeSinceLastWrite = false;
 	}
@@ -3505,7 +3505,7 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	// Check whether we have redo information
 	if (getStateManager()->canRedo() && !silentlyCreateBranch) {
 		// Disable write caching to database (this will also flush all pending writes)
-		DataBase::GetDataBase()->queueWriting(false);
+		DataBase::instance().setWritingQueueEnabled(false);
 
 		Application::instance()->getNotifier()->promptChoice("There is redo information available which will be discarded if you change the model at this stage. \n\n"
 			"Do you want to create a new version branch for these changes?", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No, "DiscardRedoInfoAndSave", comment);
@@ -3517,7 +3517,7 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	getStateManager()->saveModelState(false, false, comment);
 
 	// Disable write caching to database (this will also flush all pending writes)
-	DataBase::GetDataBase()->queueWriting(false);
+	DataBase::instance().setWritingQueueEnabled(false);
 
 	// Add the new state and activate it
 	std::string currentModelVersion = getStateManager()->getModelStateVersion();
@@ -3583,7 +3583,7 @@ void Model::prefetchDocumentsFromStorage(std::list<ot::UID> &prefetchIds)
 		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(entityID, entityVersion));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdandVersion);
 }
 
 void Model::setModified() 
@@ -3724,9 +3724,9 @@ void Model::requestConfigForModelDialog(const ot::UID& _entityID,const std::stri
 	doc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(_targetFolder, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_ElementType, ot::JsonString(_elementType, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->getUiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::GetDataBase()->getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::GetDataBase()->getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::GetDataBase()->getDataBaseServerURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::instance().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::instance().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::instance().getDataBaseServerURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);
@@ -3916,7 +3916,7 @@ void Model::addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, 
 		version++;
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdandVersion);
 
 	std::list<EntityBase *> entityList;
 	std::list<ot::UID> removeFromDisplay;
@@ -4263,7 +4263,7 @@ void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVers
 		deleteDocuments.push_back(std::pair<ot::UID, ot::UID>(oldDataItemID, oldDataItemVersion));
 
 		// Now we remove the old display entity to avoid unnecessary growth in data base
-		DataBase::GetDataBase()->DeleteDocuments(deleteDocuments);
+		DataBase::instance().deleteDocuments(deleteDocuments);
 	}
 
 	visEntity->setDataID(binaryDataItemID);
@@ -4283,7 +4283,7 @@ void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVers
 	ot::JsonDocument notify;
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityID, visEntity->getEntityID(), notify.GetAllocator());
-	notify.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::instance().getCollectionName(), notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_DataID, binaryDataItemID, notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_DataVersion, binaryDataItemVersion, notify.GetAllocator());
 
@@ -4314,7 +4314,7 @@ void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot:
 		// Delete the previous (temporary) geometry entity from the data base
 		std::list<std::pair<ot::UID, ot::UID>> deleteDocuments;
 		deleteDocuments.push_back(std::pair<ot::UID, ot::UID>(geomEntity->getEntityID(), geomEntity->getEntityStorageVersion()));
-		DataBase::GetDataBase()->DeleteDocuments(deleteDocuments);
+		DataBase::instance().deleteDocuments(deleteDocuments);
 
 		//geomEntity->setEntityStorageVersion(geomEntity->getEntityStorageVersion() - 1);
 	}
@@ -4356,7 +4356,7 @@ void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::U
 		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(id, *version));
 		version++;
 	}
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdandVersion);
 
 	auto topoEntityVersion = _topoEntityVersion.begin();
 	std::list<ot::UID> removeFromDisplay;
@@ -4618,7 +4618,7 @@ void Model::handleRedoNextOperation()
 
 void Model::removeAllNonTemplateEntities()
 {
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto deleteDoc = bsoncxx::builder::stream::document{}
 		<< "SchemaType" << bsoncxx::builder::stream::open_document << "$ne" << "DefaultTemplate"
@@ -5007,11 +5007,11 @@ void Model::setStateMangager(ModelState* state)
 
 	auto doc_view = doc.view()["Found"].get_document().view();
 
-	ot::UID schemaVersion = (ot::UID)DataBase::GetIntFromView(doc_view, "SchemaVersion_Model");
+	ot::UID schemaVersion = (ot::UID)DataBase::getIntFromView(doc_view, "SchemaVersion_Model");
 	assert(schemaVersion == 2);
 
 	long long entityRootId = doc_view["entityRoot"].get_int64();
-	setModelStorageVersion((ot::UID)DataBase::GetIntFromView(doc_view, "Version"));
+	setModelStorageVersion((ot::UID)DataBase::getIntFromView(doc_view, "Version"));
 	
 	std::list<ot::UID> prefetchIds;
 	getStateManager()->getListOfTopologyEntites(prefetchIds);

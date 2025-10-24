@@ -29,11 +29,10 @@
 
 #include <cassert>
 
-
 DataBase::DataBase() :
-	isConnected(false),
-	serviceSiteID(0),
-	queueWritingFlag(false)
+	m_isConnected(false),
+	m_serviceSiteID(0),
+	m_queueWritingFlag(false)
 {
 	// Please note that we must not use any mongodb operations in the constructor (the object will be initialzed statically and 
 	// therefore the application is not yet running)
@@ -43,108 +42,109 @@ DataBase::~DataBase()
 {
 }
 
-DataBase* DataBase::GetDataBase()
+DataBase& DataBase::instance()
 {
-	static DataBase* globalDataBase = new DataBase();
-	return globalDataBase;
+	static DataBase g_instance;
+	return g_instance;
 }
 
-// Create a compound collection index for entityID and version in case the index has not yet been created
-void DataBase::createIndexIfNecessary(void)
-{
-	auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", projectName);
+// ###########################################################################################################################################################################################################################################################################################################################
 
-	collection.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("EntityID", 1), bsoncxx::builder::basic::kvp("Version", 1)), {});
-}
+// General
 
-std::string DataBase::StorePlainDataItem(bsoncxx::builder::basic::document &storage)
-{
-	assert(isConnected);
-	assert(!projectName.empty());
-
-	DataStorageAPI::DocumentAccess docAccess("Projects", projectName);
-	DataStorageAPI::DataStorageResponse res = docAccess.InsertDocumentToDatabase(storage.extract(), queueWritingFlag);
-
-	if (!res.getSuccess())
-	{
-		assert(0); // This should not happen
-		return "";
+bool DataBase::initializeConnection(const std::string& _serverURL) {
+	if (m_isConnected) {
+		return true;
 	}
 
-	return res.getResult();
-}
-
-std::string DataBase::StoreDataItem(bsoncxx::builder::basic::document &storage)
-{
-	assert(isConnected);
-	assert(!projectName.empty());
-
-	auto storageView = storage.view();
-	unsigned long long entityID = GetIntFromView(storageView, "EntityID");
-	unsigned long long storageVersion = GetIntFromView(storageView, "Version");
-
-	assert(storageVersion != 1); // This is for testing whether still some old version convention is being used somewhere
-
-	DataStorageAPI::DocumentManager docManager;
-	DataStorageAPI::DataStorageResponse res = docManager.InsertDocumentToDatabaseOrFileStorage(entityID, (int)storageVersion, projectName, storage, false, queueWritingFlag);
-
-	if (!res.getSuccess())
-	{
-		assert(0); // This should not happen
-		return "";
-	}
-
-	return res.getResult();
-}
-
-bool DataBase::InitializeConnection(const std::string &serverURL)
-{
-	if (isConnected) return true;
-
-	try
-	{
+	try {
 		// Now test, whetehr the connection is working
-		DataStorageAPI::ConnectionAPI::establishConnection(serverURL, userName, userPassword);
+		DataStorageAPI::ConnectionAPI::establishConnection(_serverURL, m_userName, m_userPassword);
 
-		databaseServerURL = serverURL;
-		isConnected = true;
+		m_databaseServerURL = _serverURL;
+		m_isConnected = true;
 
 		return true; // Everything worked well
 	}
-	catch (std::exception&)
-	{
+	catch (std::exception&) {
 		return false; // Connection failed
 	}
 }
 
-bool DataBase::GetDocumentFromEntityIDandVersion(unsigned long long entityID, unsigned long long version, bsoncxx::builder::basic::document &doc)
-{
-	assert(version != 1); // This is for testing whether still some old version convention is being used somewhere
-
-	{
-		std::lock_guard<std::recursive_mutex> guard(m_accessPrefetchDocuments);
-		auto prefetchedDocument = m_prefetchedDocuments.find(entityID);
-		if (prefetchedDocument != m_prefetchedDocuments.end())
-		{
-			// We have prefetched this document
-			bsoncxx::document::value prefetchedDoc = std::move(prefetchedDocument->second);
-			doc.append(bsoncxx::builder::basic::kvp("Found", std::move(prefetchedDoc)));
-
-			RemovePrefetchedDocument(entityID);
-
-			return true;
-		}
+void DataBase::setWritingQueueEnabled(bool _enableQueuedWriting) {
+	if (m_queueWritingFlag && !_enableQueuedWriting) {
+		flushWritingQueue();
 	}
-	std::cout << "Restoring document directly (no prefetching)" << std::endl;
 
-	assert(isConnected);
-	assert(!projectName.empty());
+	m_queueWritingFlag = _enableQueuedWriting;
+}
+
+void DataBase::flushWritingQueue() {
+	assert(!m_collectionName.empty());
+
+	DataStorageAPI::DocumentAccessBase docBase("Projects", m_collectionName);
+
+	docBase.FlushQueuedDocuments();
+}
+
+void DataBase::createIndexIfNecessary() {
+	auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", m_collectionName);
+
+	collection.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("EntityID", 1), bsoncxx::builder::basic::kvp("Version", 1)), {});
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Data storage
+
+std::string DataBase::storeDataItem(bsoncxx::builder::basic::document& _storage) {
+	assert(m_isConnected);
+	assert(!m_collectionName.empty());
+
+	auto storageView = _storage.view();
+	ot::UID entityID = getIntFromView(storageView, "EntityID");
+	ot::UID storageVersion = getIntFromView(storageView, "Version");
+
+	assert(storageVersion != 1); // This is for testing whether still some old version convention is being used somewhere
+
+	DataStorageAPI::DocumentManager docManager;
+	DataStorageAPI::DataStorageResponse res = docManager.InsertDocumentToDatabaseOrFileStorage(entityID, (int)storageVersion, m_collectionName, _storage, false, m_queueWritingFlag);
+
+	if (!res.getSuccess()) {
+		OT_LOG_EA("Failed to insert document");
+		return "";
+	}
+
+	return res.getResult();
+}
+
+std::string DataBase::storePlainDataItem(bsoncxx::builder::basic::document& _storage) {
+	assert(m_isConnected);
+	assert(!m_collectionName.empty());
+
+	DataStorageAPI::DocumentAccess docAccess("Projects", m_collectionName);
+	DataStorageAPI::DataStorageResponse res = docAccess.InsertDocumentToDatabase(_storage.extract(), m_queueWritingFlag);
+
+	if (!res.getSuccess()) {
+		OT_LOG_EA("Failed to insert plain document");
+		return "";
+	}
+
+	return res.getResult();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Data retreival
+
+bool DataBase::getDocumentFromObjectID(const std::string& _storageID, bsoncxx::builder::basic::document& _doc) {
+	assert(m_isConnected);
+	assert(!m_collectionName.empty());
 
 	DataStorageAPI::DocumentManager docManager;
 
 	std::map<std::string, bsoncxx::types::value> filterPairs;
-	filterPairs.insert(std::pair<std::string, bsoncxx::types::value>("EntityID", DataStorageAPI::BsonValuesHelper::getInt64BsonValue(entityID)));
-	filterPairs.insert(std::pair<std::string, bsoncxx::types::value>("Version", DataStorageAPI::BsonValuesHelper::getInt64BsonValue(version)));
+	filterPairs.insert(std::pair<std::string, bsoncxx::types::value>("_id", DataStorageAPI::BsonValuesHelper::getOIdValue(_storageID)));
 
 	std::vector<std::string> columnNames;
 
@@ -152,23 +152,66 @@ bool DataBase::GetDocumentFromEntityIDandVersion(unsigned long long entityID, un
 	auto filterQuery = queryBuilder.GenerateFilterQuery(filterPairs);
 	auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);
 
-	DataStorageAPI::DataStorageResponse res = docManager.GetDocument(projectName, filterPairs, columnNames, true);
+	DataStorageAPI::DataStorageResponse res = docManager.GetDocument(m_collectionName, filterPairs, columnNames, true);
+
+	if (!res.getSuccess()) {
+		return false;
+	}
+
+	auto results = res.getBsonResult();
+
+	_doc.append(bsoncxx::builder::basic::kvp("Found", results.value()));
+
+	return true;
+}
+
+bool DataBase::getDocumentFromEntityIDandVersion(ot::UID _entityID, ot::UID _version, bsoncxx::builder::basic::document& _doc) {
+	assert(_version != 1); // This is for testing whether still some old version convention is being used somewhere
+
+	{
+		std::lock_guard<std::recursive_mutex> guard(m_accessPrefetchDocuments);
+		auto prefetchedDocument = m_prefetchedDocuments.find(_entityID);
+		if (prefetchedDocument != m_prefetchedDocuments.end()) {
+			// We have prefetched this document
+			bsoncxx::document::value prefetchedDoc = std::move(prefetchedDocument->second);
+			_doc.append(bsoncxx::builder::basic::kvp("Found", std::move(prefetchedDoc)));
+
+			removePrefetchedDocument(_entityID);
+
+			return true;
+		}
+	}
+	
+	assert(m_isConnected);
+	assert(!m_collectionName.empty());
+
+	DataStorageAPI::DocumentManager docManager;
+
+	std::map<std::string, bsoncxx::types::value> filterPairs;
+	filterPairs.insert(std::pair<std::string, bsoncxx::types::value>("EntityID", DataStorageAPI::BsonValuesHelper::getInt64BsonValue(_entityID)));
+	filterPairs.insert(std::pair<std::string, bsoncxx::types::value>("Version", DataStorageAPI::BsonValuesHelper::getInt64BsonValue(_version)));
+
+	std::vector<std::string> columnNames;
+
+	DataStorageAPI::QueryBuilder queryBuilder;
+	auto filterQuery = queryBuilder.GenerateFilterQuery(filterPairs);
+	auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);
+
+	DataStorageAPI::DataStorageResponse res = docManager.GetDocument(m_collectionName, filterPairs, columnNames, true);
 
 	if (!res.getSuccess()) return false;
 
 	auto results = res.getBsonResult();
 
-	doc.append(bsoncxx::builder::basic::kvp("Found", results.value()));
+	_doc.append(bsoncxx::builder::basic::kvp("Found", results.value()));
 
 	return true;
 }
 
-EntityBase * DataBase::GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version)
-{
+EntityBase* DataBase::getEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version) {
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(_entityID, _version, doc))
-	{
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(_entityID, _version, doc)) {
 		return nullptr;
 	}
 
@@ -176,68 +219,60 @@ EntityBase * DataBase::GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UI
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-	EntityBase *entity = EntityFactory::instance().create(entityType);
+	EntityBase* entity = EntityFactory::instance().create(entityType);
 
-	std::map<ot::UID, EntityBase *> entityMap;
+	std::map<ot::UID, EntityBase*> entityMap;
 	entity->restoreFromDataBase(nullptr, nullptr, nullptr, doc_view, entityMap);
 
 	return entity;
 }
 
+bool DataBase::getAllDocumentsFromFilter(std::map<std::string, bsoncxx::types::value>& filterPairs, std::vector<std::string>& _columnNames, bsoncxx::builder::basic::document& _doc) {
+	assert(m_isConnected);
+	assert(!m_collectionName.empty());
 
-bool DataBase::GetDocumentFromObjectID(const std::string &storageID, bsoncxx::builder::basic::document &doc)
-{
-	std::cout << "Restoring document directly (no prefetching)" << std::endl;
-
-	assert(isConnected);
-	assert(!projectName.empty());
-
-	DataStorageAPI::DocumentManager docManager;
-
-	std::map<std::string, bsoncxx::types::value> filterPairs;
-	filterPairs.insert(std::pair<std::string, bsoncxx::types::value>("_id", DataStorageAPI::BsonValuesHelper::getOIdValue(storageID)));
-
-	std::vector<std::string> columnNames;
+	DataStorageAPI::DocumentAccessBase docBase("Projects", m_collectionName);
 
 	DataStorageAPI::QueryBuilder queryBuilder;
 	auto filterQuery = queryBuilder.GenerateFilterQuery(filterPairs);
-	auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);
+	auto projectionQuery = queryBuilder.GenerateSelectQuery(_columnNames, true);
 
-	DataStorageAPI::DataStorageResponse res = docManager.GetDocument(projectName, filterPairs, columnNames, true);
+	try {
+		auto results = docBase.GetAllDocument(std::move(filterQuery), std::move(projectionQuery), 0);
 
-	if (!res.getSuccess()) return false;
+		auto resultArray = bsoncxx::builder::basic::array();
 
-	auto results = res.getBsonResult();
-	
-	doc.append(bsoncxx::builder::basic::kvp("Found", results.value()));
+		for (auto result : results) {
+			resultArray.append(result);
+		}
+
+		_doc.append(bsoncxx::builder::basic::kvp("Found", resultArray));
+	}
+	catch (std::exception) {
+		return false;
+	}
 
 	return true;
 }
 
-void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIdandVersion)
-{
-	if (prefetchIdandVersion.empty()) return;
+void DataBase::prefetchDocumentsFromStorage(const std::list<std::pair<ot::UID, ot::UID>>& _prefetchIdandVersion) {
+	if (_prefetchIdandVersion.empty()) return;
 
-	assert(isConnected);
-	assert(!projectName.empty());
+	assert(m_isConnected);
+	assert(!m_collectionName.empty());
 
-	DataStorageAPI::DocumentAccessBase docBase("Projects", projectName);
+	DataStorageAPI::DocumentAccessBase docBase("Projects", m_collectionName);
 	DataStorageAPI::QueryBuilder queryBuilder;
 	std::vector<std::string> columnNames;
 
-	
 	auto queryArray = bsoncxx::builder::basic::array();
 
-	for (auto storageID : prefetchIdandVersion)
-	{
-		unsigned long long entityID = storageID.first;
-		unsigned long long entityVersion = storageID.second;
-
-		assert(entityVersion != 1); // This is for testing whether still some old version convention is being used somewhere
+	for (const auto& storageID : _prefetchIdandVersion) {
+		assert(storageID.second != 1); // This is for testing whether still some old version convention is being used somewhere
 
 		auto builder = bsoncxx::builder::basic::document{};
-		builder.append(bsoncxx::builder::basic::kvp("EntityID", DataStorageAPI::BsonValuesHelper::getInt64BsonValue(entityID)));
-		builder.append(bsoncxx::builder::basic::kvp("Version", DataStorageAPI::BsonValuesHelper::getInt64BsonValue(entityVersion)));
+		builder.append(bsoncxx::builder::basic::kvp("EntityID", DataStorageAPI::BsonValuesHelper::getInt64BsonValue(storageID.first)));
+		builder.append(bsoncxx::builder::basic::kvp("Version", DataStorageAPI::BsonValuesHelper::getInt64BsonValue(storageID.second)));
 
 		queryArray.append(builder);
 	}
@@ -254,117 +289,62 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 
 	size_t numberPrefetchedDocs = 0;
 	auto resultPointer = results.begin();
-	if (resultPointer == results.end())
-	{
+	if (resultPointer == results.end()) {
 		/*auto tempQueryView = filterQuery.view();
 		std::string filterString =	bsoncxx::to_json(tempQueryView);*/
 	}
 
 	{
 		std::lock_guard<std::recursive_mutex> guard(m_accessPrefetchDocuments);
-		for (; resultPointer != results.end(); resultPointer++)
-		{
+		for (; resultPointer != results.end(); resultPointer++) {
 			auto insertType = (*resultPointer)["InsertType"].get_int32().value;
-			if (InsertType(insertType) == InsertType::Database)
-			{				
-				
-				unsigned long long entityID = (*resultPointer)["EntityID"].get_int64();
+			if (InsertType(insertType) == InsertType::Database) {
 
-				m_prefetchedDocuments.emplace(entityID, bsoncxx::document::value{*resultPointer});
+				ot::UID entityID = (*resultPointer)["EntityID"].get_int64();
+
+				m_prefetchedDocuments.emplace(entityID, bsoncxx::document::value{ *resultPointer });
 				numberPrefetchedDocs++;
 			}
-			else
-			{
-				std::cout << "Document not prefetched, since it is not entirely stored in data base" << std::endl;
+			else {
+				OT_LOG_D("Document not prefetched, since it is not entirely stored in data base");
 			}
 		}
 	}
 
-	std::cout << "Number of prefetched documents: " << numberPrefetchedDocs << std::endl;
+	OT_LOG_D("Number of prefetched documents: " + std::to_string(numberPrefetchedDocs));
 }
 
-void DataBase::RemovePrefetchedDocument(unsigned long long entityID)
-{
-	std::lock_guard<std::recursive_mutex> guard(m_accessPrefetchDocuments);
-	m_prefetchedDocuments.erase(entityID);
-}
-
-bool DataBase::GetAllDocumentsFromFilter(std::map<std::string, bsoncxx::types::value> &filterPairs, std::vector<std::string> &columnNames, bsoncxx::builder::basic::document &doc)
-{
-	assert(isConnected);
-	assert(!projectName.empty());
-	
-	DataStorageAPI::DocumentAccessBase docBase("Projects", projectName);
-
-	DataStorageAPI::QueryBuilder queryBuilder;
-	auto filterQuery = queryBuilder.GenerateFilterQuery(filterPairs);
-	auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, true);
-
-	try
-	{
-		auto results = docBase.GetAllDocument(std::move(filterQuery), std::move(projectionQuery), 0);
-
-		auto resultArray = bsoncxx::builder::basic::array();
-
-		for (auto result : results)
-		{
-			resultArray.append(result);
+int64_t DataBase::getIntFromView(const bsoncxx::document::view& _doc_view, const char* _elementName, int64_t _defaultValue) {
+	auto it = _doc_view.find(_elementName);
+	if (it != _doc_view.end()) {
+		if (it->type() == bsoncxx::type::k_int32) {
+			return it->get_int32();
 		}
-
-		doc.append(bsoncxx::builder::basic::kvp("Found", resultArray));
+		else if (it->type() == bsoncxx::type::k_int64) {
+			return it->get_int64();
+		}
+		else {
+			OT_LOG_EA("Invalid value type");
+		}
 	}
-	catch (std::exception)
-	{
-		return false;
-	}
-
-	return true;
+	return _defaultValue;
 }
 
-long long DataBase::GetIntFromView(bsoncxx::document::view &doc_view, const char *elementName)
-{
-	try
-	{
-		bsoncxx::document::element ele = doc_view[elementName];
-
-		if (ele.type() == bsoncxx::type::k_int32) return ele.get_int32();
-		if (ele.type() == bsoncxx::type::k_int64) return ele.get_int64();
-
-		assert(0); // Unknown type
+int64_t DataBase::getIntFromArrayViewIterator(bsoncxx::array::view::const_iterator& _it) {
+	if (_it->type() == bsoncxx::type::k_int32) {
+		return _it->get_int32();
 	}
-	catch (std::exception)
-	{
-		assert(0);  // The specified element does not exist
+	if (_it->type() == bsoncxx::type::k_int64) {
+		return _it->get_int64();
 	}
-
+	OT_LOG_EA("Invalid value type");
 	return 0;
 }
 
-long long DataBase::GetIntFromView(bsoncxx::document::view &doc_view, const char *elementName, long long defaultValue)
-{
-	try
-	{
-		bsoncxx::document::element ele = doc_view[elementName];
-
-		if (ele.type() == bsoncxx::type::k_int32) return ele.get_int32();
-		if (ele.type() == bsoncxx::type::k_int64) return ele.get_int64();
-
-		assert(0); // Unknown type
-	}
-	catch (std::exception)
-	{
-	}
-
-	return defaultValue;
-}
-
-
-std::string DataBase::getTmpFileName(void)
-{
+std::string DataBase::getTmpFileName() {
 	CHAR path_buf[MAX_PATH];
 	DWORD ret_val = GetTempPathA(MAX_PATH, path_buf);
-	if (ret_val > MAX_PATH || (ret_val == 0))
-	{
+	if (ret_val > MAX_PATH || (ret_val == 0)) {
 		return "";
 	}
 
@@ -376,44 +356,26 @@ std::string DataBase::getTmpFileName(void)
 	return fileName;
 }
 
-void DataBase::queueWriting(bool enableQueuedWriting)
-{
-	if (queueWritingFlag && !enableQueuedWriting)
-	{
-		flushWritingQueue();
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Data removal
+
+void DataBase::deleteDocuments(const std::list<std::pair<ot::UID, ot::UID>>& _deleteDocuments) {
+	if (_deleteDocuments.empty()) {
+		return;
 	}
 
-	queueWritingFlag = enableQueuedWriting;
-}
+	assert(m_isConnected);
+	assert(!m_collectionName.empty());
 
-void DataBase::flushWritingQueue(void)
-{
-	assert(!projectName.empty());
-
-	DataStorageAPI::DocumentAccessBase docBase("Projects", projectName);
-
-	docBase.FlushQueuedDocuments();
-}
-
-void DataBase::DeleteDocuments(std::list<std::pair<unsigned long long, unsigned long long>> &deleteDocuments)
-{
-	// Attention: This function will irrevocably remove a document from the data base
-
-	if (deleteDocuments.empty()) return;  // Nothing to delete
-
-	assert(isConnected);
-	assert(!projectName.empty());
-
-	for (auto item : deleteDocuments)
-	{
-		RemovePrefetchedDocument(item.first); // Just in case we have already prefetched the document
+	for (const auto& item : _deleteDocuments) {
+		removePrefetchedDocument(item.first); // Just in case we have already prefetched the document
 	}
 
-	if (deleteDocuments.size() == 1)
-	{
+	if (_deleteDocuments.size() == 1) {
 		// Here we just need to delete one document
-		unsigned long long entityID = deleteDocuments.front().first;
-		unsigned long long entityVersion = deleteDocuments.front().second;
+		ot::UID entityID = _deleteDocuments.front().first;
+		ot::UID entityVersion = _deleteDocuments.front().second;
 
 		assert(entityVersion != 1); // This is for testing whether still some old version convention is being used somewhere
 
@@ -424,21 +386,19 @@ void DataBase::DeleteDocuments(std::list<std::pair<unsigned long long, unsigned 
 		DataStorageAPI::QueryBuilder queryBuilder;
 		auto filterQuery = queryBuilder.GenerateFilterQuery(filterPairs);
 
-		DataStorageAPI::DocumentAccessBase docBase("Projects", projectName);
+		DataStorageAPI::DocumentAccessBase docBase("Projects", m_collectionName);
 
 		docBase.DeleteDocument(filterQuery);
 	}
-	else
-	{
+	else {
 		// Now we create a query which will select all multiple documents to be deleted
 		DataStorageAPI::QueryBuilder queryBuilder;
 
 		auto queryArray = bsoncxx::builder::basic::array();
 
-		for (auto document : deleteDocuments)
-		{
-			unsigned long long entityID = document.first;
-			unsigned long long entityVersion = document.second;
+		for (const auto& document : _deleteDocuments) {
+			ot::UID entityID = document.first;
+			ot::UID entityVersion = document.second;
 
 			assert(entityVersion != 1); // This is for testing whether still some old version convention is being used somewhere
 
@@ -455,26 +415,34 @@ void DataBase::DeleteDocuments(std::list<std::pair<unsigned long long, unsigned 
 		BsonViewOrValue filterQuery = queryBuilderDoc.extract();
 
 		// And finally delete all documents based on the query
-		DataStorageAPI::DocumentAccessBase docBase("Projects", projectName);
+		DataStorageAPI::DocumentAccessBase docBase("Projects", m_collectionName);
 
 		docBase.DeleteDocuments(std::move(filterQuery));
 	}
 }
 
-
-void DataBase::readBSON(bsoncxx::document::view &nodesObj, std::vector<Geometry::Node> &nodes)
+void DataBase::removePrefetchedDocument(ot::UID _entityID)
 {
-	auto coordX = nodesObj["CoordX"].get_array().value;
-	auto coordY = nodesObj["CoordY"].get_array().value;
-	auto coordZ = nodesObj["CoordZ"].get_array().value;
+	std::lock_guard<std::recursive_mutex> guard(m_accessPrefetchDocuments);
+	m_prefetchedDocuments.erase(_entityID);
+}
 
-	auto normalX = nodesObj["NormalX"].get_array().value;
-	auto normalY = nodesObj["NormalY"].get_array().value;
-	auto normalZ = nodesObj["NormalZ"].get_array().value;
+// ###########################################################################################################################################################################################################################################################################################################################
 
-	auto paramU = nodesObj["ParamU"].get_array().value;
-	auto paramV = nodesObj["ParamV"].get_array().value;
+// Legacy API for Geometry BSON reading (Needs to be removed with next refactoring)
 
+void DataBase::readBSON(const bsoncxx::document::view& _nodesObj, std::vector<Geometry::Node>& _nodes)
+{
+	auto coordX = _nodesObj["CoordX"].get_array().value;
+	auto coordY = _nodesObj["CoordY"].get_array().value;
+	auto coordZ = _nodesObj["CoordZ"].get_array().value;
+
+	auto normalX = _nodesObj["NormalX"].get_array().value;
+	auto normalY = _nodesObj["NormalY"].get_array().value;
+	auto normalZ = _nodesObj["NormalZ"].get_array().value;
+
+	auto paramU = _nodesObj["ParamU"].get_array().value;
+	auto paramV = _nodesObj["ParamV"].get_array().value;
 
 	size_t numberNodes = std::distance(coordX.begin(), coordX.end());
 	assert(numberNodes == std::distance(coordY.begin(), coordZ.end()));
@@ -487,7 +455,7 @@ void DataBase::readBSON(bsoncxx::document::view &nodesObj, std::vector<Geometry:
 	assert(numberNodes == std::distance(paramU.begin(), paramU.end()));
 	assert(numberNodes == std::distance(paramV.begin(), paramV.end()));
 
-	nodes.resize(numberNodes);
+	_nodes.resize(numberNodes);
 
 	auto cX = coordX.begin();
 	auto cY = coordY.begin();
@@ -500,9 +468,9 @@ void DataBase::readBSON(bsoncxx::document::view &nodesObj, std::vector<Geometry:
 
 	for (unsigned long index = 0; index < numberNodes; index++)
 	{
-		nodes[index].setCoords(cX->get_double(), cY->get_double(), cZ->get_double());
-		nodes[index].setNormals(nX->get_double(), nY->get_double(), nZ->get_double());
-		nodes[index].setUVpar(pU->get_double(), pV->get_double());
+		_nodes[index].setCoords(cX->get_double(), cY->get_double(), cZ->get_double());
+		_nodes[index].setNormals(nX->get_double(), nY->get_double(), nZ->get_double());
+		_nodes[index].setUVpar(pU->get_double(), pV->get_double());
 
 		cX++;
 		cY++;
@@ -515,12 +483,12 @@ void DataBase::readBSON(bsoncxx::document::view &nodesObj, std::vector<Geometry:
 	}
 }
 
-void DataBase::readBSON(bsoncxx::document::view &trianglesObj, std::list<Geometry::Triangle> &triangles)
+void DataBase::readBSON(const bsoncxx::document::view& _trianglesObj, std::list<Geometry::Triangle>& _triangles)
 {
-	auto node1 = trianglesObj["Node1"].get_array().value;
-	auto node2 = trianglesObj["Node2"].get_array().value;
-	auto node3 = trianglesObj["Node3"].get_array().value;
-	auto faceID = trianglesObj["faceID"].get_array().value;
+	auto node1 = _trianglesObj["Node1"].get_array().value;
+	auto node2 = _trianglesObj["Node2"].get_array().value;
+	auto node3 = _trianglesObj["Node3"].get_array().value;
+	auto faceID = _trianglesObj["faceID"].get_array().value;
 
 	size_t numberTriangles = std::distance(node1.begin(), node1.end());
 	assert(numberTriangles == std::distance(node2.begin(), node2.end()));
@@ -536,10 +504,10 @@ void DataBase::readBSON(bsoncxx::document::view &trianglesObj, std::list<Geometr
 	{
 		Geometry::Triangle triangle;
 
-		triangle.setNodes(DataBase::GetIntFromArrayViewIterator(n1), DataBase::GetIntFromArrayViewIterator(n2), DataBase::GetIntFromArrayViewIterator(n3));
-		triangle.setFaceId(DataBase::GetIntFromArrayViewIterator(fID));
+		triangle.setNodes(DataBase::getIntFromArrayViewIterator(n1), DataBase::getIntFromArrayViewIterator(n2), DataBase::getIntFromArrayViewIterator(n3));
+		triangle.setFaceId(DataBase::getIntFromArrayViewIterator(fID));
 
-		triangles.push_back(triangle);
+		_triangles.push_back(triangle);
 
 		n1++;
 		n2++;
@@ -548,15 +516,15 @@ void DataBase::readBSON(bsoncxx::document::view &trianglesObj, std::list<Geometr
 	}
 }
 
-void DataBase::readBSON(bsoncxx::document::view &edgesObj, std::list<Geometry::Edge> &edges)
+void DataBase::readBSON(const bsoncxx::document::view& _edgesObj, std::list<Geometry::Edge>& _edges)
 {
-	auto pointX = edgesObj["PointX"].get_array().value;
-	auto pointY = edgesObj["PointY"].get_array().value;
-	auto pointZ = edgesObj["PointZ"].get_array().value;
+	auto pointX = _edgesObj["PointX"].get_array().value;
+	auto pointY = _edgesObj["PointY"].get_array().value;
+	auto pointZ = _edgesObj["PointZ"].get_array().value;
 
-	auto numberPoints = edgesObj["NumberPoints"].get_array().value;
-	auto pointIndex = edgesObj["PointIndex"].get_array().value;
-	auto faceID = edgesObj["faceID"].get_array().value;
+	auto numberPoints = _edgesObj["NumberPoints"].get_array().value;
+	auto pointIndex = _edgesObj["PointIndex"].get_array().value;
+	auto faceID = _edgesObj["faceID"].get_array().value;
 
 	size_t numberEdges = std::distance(numberPoints.begin(), numberPoints.end());
 	assert(numberEdges == std::distance(pointIndex.begin(), pointIndex.end()));
@@ -574,8 +542,8 @@ void DataBase::readBSON(bsoncxx::document::view &edgesObj, std::list<Geometry::E
 	{
 		Geometry::Edge edge;
 
-		edge.setNpoints((int)DataBase::GetIntFromArrayViewIterator(nP));
-		edge.setFaceId(DataBase::GetIntFromArrayViewIterator(fID));
+		edge.setNpoints((int)DataBase::getIntFromArrayViewIterator(nP));
+		edge.setFaceId(DataBase::getIntFromArrayViewIterator(fID));
 
 		for (unsigned long point = 0; point < (unsigned long)edge.getNpoints(); point++)
 		{
@@ -590,6 +558,6 @@ void DataBase::readBSON(bsoncxx::document::view &edgesObj, std::list<Geometry::E
 		pI++;
 		fID++;
 
-		edges.push_back(edge);
+		_edges.push_back(edge);
 	}
 }

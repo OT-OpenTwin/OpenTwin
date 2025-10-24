@@ -11,7 +11,7 @@
 EntityBase* ot::EntityAPI::readEntityFromEntityIDandVersion(UID _entityID, UID _version) {
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(_entityID, _version, doc)) {
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(_entityID, _version, doc)) {
 		return nullptr;
 	}
 

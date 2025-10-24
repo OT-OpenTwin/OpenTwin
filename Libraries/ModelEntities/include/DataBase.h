@@ -14,6 +14,8 @@
 
 #include <mongocxx/pool.hpp>
 
+#include "OTCore/CoreTypes.h"
+#include "ModelEntitiesAPIExport.h"
 #include "Document\DocumentManager.h"
 #include "EntityBase.h"
 
@@ -22,82 +24,106 @@
 
 using connection = mongocxx::pool::entry;
 
-class __declspec(dllexport) DataBase
+class OT_MODELENTITIES_API_EXPORT DataBase
 {
+	OT_DECL_NOCOPY(DataBase)
+	OT_DECL_NOMOVE(DataBase)
 public:
 	DataBase();
 	virtual ~DataBase();
 
-	static DataBase* GetDataBase();
+	static DataBase& instance();
 
-	bool InitializeConnection(const std::string &serverURL);
-	void setProjectName(const std::string &name) { projectName = name; };
-	std::string getProjectName(void) { return projectName; };
-	int getSiteID(void) { return serviceSiteID; };
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Create a compound collection index for entityID and version in case the index has not yet been created
-	void createIndexIfNecessary(void);
+	// Setter / Getter
 
-	std::string StoreDataItem(bsoncxx::builder::basic::document &storage);
-	std::string StorePlainDataItem(bsoncxx::builder::basic::document &storage);
+	void setCollectionName(const std::string& _name) { m_collectionName = _name; };
+	std::string getCollectionName() const { return m_collectionName; };
+	int getSiteID() const { return m_serviceSiteID; };
+
+	void setUserCredentials(const std::string& _userName, const std::string& _password) { m_userName = _userName; m_userPassword = _password; };
+	std::string getUserName() const { return m_userName; };
+	std::string getUserPassword() const { return m_userPassword; };
+
+	std::string getDataBaseServerURL() const { return m_databaseServerURL; };
+
+	void setDataBaseServerURL(const std::string& _url) { m_databaseServerURL = _url; };
+	void setSiteIDString(const std::string& _id) { m_serviceSiteIDString = _id; };
+	std::string getSiteIDString() const { return m_serviceSiteIDString; };
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// General
+
+	bool initializeConnection(const std::string& _serverURL);
+
+	void setWritingQueueEnabled(bool _enableQueuedWriting);
+	void flushWritingQueue();
+	bool isQueueWritingEnabled() const { return m_queueWritingFlag; };
+
+	//! @brief Create a compound collection index for entityID and version in case the index has not yet been created.
+	void createIndexIfNecessary();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Data storage
+
+	std::string storeDataItem(bsoncxx::builder::basic::document& _storage);
+	std::string storePlainDataItem(bsoncxx::builder::basic::document& _storage);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Data retrieval
 
 	//! @return Corresponse to the database success response.
-	bool GetDocumentFromObjectID(const std::string &storageID, bsoncxx::builder::basic::document &doc);
-		
+	bool getDocumentFromObjectID(const std::string& _storageID, bsoncxx::builder::basic::document& _doc);
+
 	//! @return Corresponse to the database success response.
-	bool GetDocumentFromEntityIDandVersion(unsigned long long entityID, unsigned long long version, bsoncxx::builder::basic::document &doc);
-	EntityBase* GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version);
+	bool getDocumentFromEntityIDandVersion(ot::UID _entityID, ot::UID _version, bsoncxx::builder::basic::document& _doc);
+	EntityBase* getEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version);
 
+	bool getAllDocumentsFromFilter(std::map<std::string, bsoncxx::types::value>& _filterPairs, std::vector<std::string>& _columnNames, bsoncxx::builder::basic::document& _doc);
 
-	bool GetAllDocumentsFromFilter(std::map<std::string, bsoncxx::types::value> &filterPairs, std::vector<std::string> &columnNames, bsoncxx::builder::basic::document &doc);
+	void prefetchDocumentsFromStorage(const std::list<std::pair<ot::UID, ot::UID>>& _prefetchIdandVersion);
+	
+	static int64_t getIntFromView(const bsoncxx::document::view& _doc_view, const char* _elementName) { return getIntFromView(_doc_view, _elementName, 0); };
+	static int64_t getIntFromView(const bsoncxx::document::view& _doc_view, const char* _elementName, int64_t _defaultValue);
 
-	void PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIdandVersion);
-	void RemovePrefetchedDocument(unsigned long long entityID);
+	static int64_t getIntFromArrayViewIterator(bsoncxx::array::view::const_iterator& _it);
 
-	static long long GetIntFromView(bsoncxx::document::view &doc_view, const char *elementName);
-	static long long GetIntFromArrayViewIterator(bsoncxx::array::view::const_iterator &it)
-	{
-		if (it->type() == bsoncxx::type::k_int32) return it->get_int32();
-		if (it->type() == bsoncxx::type::k_int64) return it->get_int64();
-		assert(0);
-		return 0;
-	}
-	static long long GetIntFromView(bsoncxx::document::view &doc_view, const char *elementName, long long defaultValue);
+	std::string getTmpFileName();
 
-	std::string getDataBaseServerURL(void) { return databaseServerURL; };
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	void setDataBaseServerURL(const std::string &url) { databaseServerURL = url; };
-	void setSiteIDString(const std::string &id) { serviceSiteIDString = id; };
-	std::string getSiteIDString(void) { return serviceSiteIDString; }
+	// Data removal
 
-	std::string getTmpFileName(void);
+	//! @brief Deletes the documents with the given entity IDs and versions from the database.
+	//! @warning This operation is irreversible!
+	//! @param _deleteDocuments List of pairs of entity ID and version to delete.
+	void deleteDocuments(const std::list<std::pair<ot::UID, ot::UID>>& _deleteDocuments);
 
-	void queueWriting(bool enableQueuedWriting);
-	void flushWritingQueue(void);
-	bool isWritingQueue(void) { return queueWritingFlag; };
+	void removePrefetchedDocument(ot::UID _entityID);
 
-	void DeleteDocuments(std::list<std::pair<unsigned long long, unsigned long long>> &deleteDocuments);
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	void setUserCredentials(const std::string &_userName, const std::string &_password) { userName = _userName; userPassword = _password; }
-	std::string getUserName(void) { return userName; }
-	std::string getUserPassword(void) { return userPassword; }
+	// Legacy API for Geometry BSON reading (Needs to be removed with next refactoring)
 
-	/* ******************************************** Legacy API from Viewer (Needs to be removed with next refactoring) ******************************** */
-	static void readBSON(bsoncxx::document::view &nodesObj, std::vector<Geometry::Node> &nodes);
-	static void readBSON(bsoncxx::document::view &trianglesObj, std::list<Geometry::Triangle> &triangles);
-	static void readBSON(bsoncxx::document::view &edgesObj, std::list<Geometry::Edge> &edges);
-	/** ************************************************************************************************************************************************/
+	OT_DECL_DEPRECATED("Legacy API, use custom implementation instead") static void readBSON(const bsoncxx::document::view& _nodesObj, std::vector<Geometry::Node>& _nodes);
+	OT_DECL_DEPRECATED("Legacy API, use custom implementation instead") static void readBSON(const bsoncxx::document::view& _trianglesObj, std::list<Geometry::Triangle>& _triangles);
+	OT_DECL_DEPRECATED("Legacy API, use custom implementation instead") static void readBSON(const bsoncxx::document::view& _edgesObj, std::list<Geometry::Edge>& _edges);
+
 private:
 	std::recursive_mutex m_accessPrefetchDocuments;
 
-	bool isConnected;
-	std::string projectName;
-	std::string databaseServerURL;
-	int serviceSiteID;
-	std::string serviceSiteIDString;
-	bool queueWritingFlag;
+	bool m_isConnected;
+	std::string m_collectionName;
+	std::string m_databaseServerURL;
+	int m_serviceSiteID;
+	std::string m_serviceSiteIDString;
+	bool m_queueWritingFlag;
 	std::map<unsigned long long, bsoncxx::document::value> m_prefetchedDocuments;
-	std::string userName;
-	std::string userPassword;
+	std::string m_userName;
+	std::string m_userPassword;
 };
 

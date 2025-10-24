@@ -57,7 +57,7 @@ void EntityMeshTetItemDataFaces::readSpecificDataFromDataBase(bsoncxx::document:
 
 	for (unsigned long findex = 0; findex < numberFaces; findex++)
 	{
-		setFace(findex, (int) DataBase::GetIntFromArrayViewIterator(f));
+		setFace(findex, (int) DataBase::getIntFromArrayViewIterator(f));
 		f++;
 	}
 

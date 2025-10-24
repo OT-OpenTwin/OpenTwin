@@ -97,7 +97,7 @@ void EntityResultUnstructuredMesh::GetPointCoordData(size_t & numberPoints, doub
 
 	if (!prefetchIds.empty())
 	{
-		DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
+		DataBase::instance().prefetchDocumentsFromStorage(prefetchIds);
 	}
 
 	if (_xcoord == nullptr)

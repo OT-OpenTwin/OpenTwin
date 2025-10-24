@@ -17,13 +17,11 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT Plot1DAxisCfg : public Serializable {
+		OT_DECL_DEFCOPY(Plot1DAxisCfg)
+		OT_DECL_DEFMOVE(Plot1DAxisCfg)
 	public:
 		Plot1DAxisCfg();
-
-		Plot1DAxisCfg(const Plot1DAxisCfg& _other) = default;
 		virtual ~Plot1DAxisCfg();
-
-		Plot1DAxisCfg& operator = (const Plot1DAxisCfg& _other) = default;
 
 		bool operator==(const Plot1DAxisCfg& _other) const;
 		bool operator!=(const Plot1DAxisCfg& _other) const;
@@ -54,7 +52,6 @@ namespace ot {
 		const std::string& getAxisLabel() const { return m_axisLabel; }
 		void setAutoDetermineAxisLabel(const bool _autoDetermineAxisLabel) { m_autoDetermineAxisLabel = _autoDetermineAxisLabel; }
 		void setAxisLabel(const std::string& _label) { m_axisLabel = _label; }
-
 
 	private:
 		double m_min;

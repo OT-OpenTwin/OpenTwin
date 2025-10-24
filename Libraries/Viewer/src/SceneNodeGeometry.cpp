@@ -1179,7 +1179,7 @@ void SceneNodeGeometry::initializeFromDataStorage(void)
 
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
 	{
 		assert(0);
 		return;
@@ -1195,7 +1195,7 @@ void SceneNodeGeometry::initializeFromDataStorage(void)
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityFacetData");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityFacetData");
 	if (schemaVersion != 1)
 	{
 		assert(0);

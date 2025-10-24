@@ -124,5 +124,5 @@ void EntityCache::prefetchEntities(std::list<ot::EntityInformation> &entityList)
 void EntityCache::prefetchEntities(std::list<std::pair<unsigned long long, unsigned long long>> &prefetchEntities)
 {
 	removeCachedEntitiesFromList(prefetchEntities);
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchEntities);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchEntities);
 }

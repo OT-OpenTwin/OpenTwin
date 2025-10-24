@@ -248,7 +248,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setEntityVersion(getEntityStorageVersion());
 
 	config.setTitle(title);
-	config.setProjectName(DataBase::GetDataBase()->getProjectName());
+	config.setCollectionName(DataBase::instance().getCollectionName());
 	config.setOldTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
 
 	config.setXAxisParameter(xAxisParameter);

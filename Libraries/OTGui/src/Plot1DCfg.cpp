@@ -60,18 +60,12 @@ ot::Plot1DCfg::Plot1DCfg() :
 	m_gridVisible(true), m_gridWidth(1.), m_isHidden(false), m_legendVisible(true), m_curveLimit(0), m_useLimit(false)
 {}
 
-ot::Plot1DCfg::Plot1DCfg(const Plot1DCfg& _other)
-	: WidgetViewBase(WidgetViewBase::View1D, _other.getViewFlags())
-{
-	*this = _other;
-}
-
 ot::Plot1DCfg::~Plot1DCfg() {}
 
 void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	WidgetViewBase::addToJsonObject(_object, _allocator);
 
-	_object.AddMember("ProjectName", JsonString(m_projectName, _allocator), _allocator);
+	_object.AddMember("CollectionName", JsonString(m_collectionName, _allocator), _allocator);
 	_object.AddMember("Type", JsonString(this->plotTypeToString(m_type), _allocator), _allocator);
 	_object.AddMember("AxisQuantity", JsonString(this->axisQuantityToString(m_axisQuantity), _allocator), _allocator);
 
@@ -119,7 +113,7 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	WidgetViewBase::setFromJsonObject(_object);
 
-	m_projectName = json::getString(_object, "ProjectName");
+	m_collectionName = json::getString(_object, "CollectionName");
 	m_type = this->stringToPlotType(json::getString(_object, "Type"));
 	m_axisQuantity = this->stringToAxisQuantity(json::getString(_object, "AxisQuantity"));
 
@@ -156,7 +150,7 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 	return (WidgetViewBase::operator==(_other)) &&
-		(m_projectName == _other.m_projectName) &&
+		(m_collectionName == _other.m_collectionName) &&
 		(m_type == _other.m_type) &&
 		(m_axisQuantity == _other.m_axisQuantity) &&
 
@@ -175,10 +169,4 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 
 bool ot::Plot1DCfg::operator!=(const Plot1DCfg& _other) const {
 	return !Plot1DCfg::operator==(_other);
-}
-
-
-void ot::Plot1DCfg::setQueries(std::list<ValueComparisionDefinition>& _queries)
-{
-	m_queries = _queries;
 }

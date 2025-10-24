@@ -88,7 +88,7 @@ void EntityResultUnstructuredMeshData::getData(size_t& lenPointScalar, float*& p
 
 	if (!prefetchIds.empty())
 	{
-		DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
+		DataBase::instance().prefetchDocumentsFromStorage(prefetchIds);
 	}
 
 	if (_pointScalar == nullptr && _pointScalarID != -1 && _pointScalarVersion != -1)

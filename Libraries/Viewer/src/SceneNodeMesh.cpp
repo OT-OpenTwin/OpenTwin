@@ -86,7 +86,7 @@ void SceneNodeMesh::setDisplayTetEdges(bool displayEdges)
 
 		if (!prefetchIDs.empty())
 		{
-			DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
+			DataBase::instance().prefetchDocumentsFromStorage(prefetchIDs);
 		}
 	}
 
@@ -163,7 +163,7 @@ void SceneNodeMesh::ensureDataLoaded(void)
 
 void SceneNodeMesh::loadMeshData(bsoncxx::builder::basic::document &doc)
 {
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
 	{
 		assert(0);
 		return;
@@ -179,7 +179,7 @@ void SceneNodeMesh::loadMeshData(bsoncxx::builder::basic::document &doc)
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityMeshTetData");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityMeshTetData");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -192,7 +192,7 @@ void SceneNodeMesh::loadFaces(unsigned long long meshFacesID, unsigned long long
 	// First open the mesh nodes document
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(meshFacesID, meshFacesVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(meshFacesID, meshFacesVersion, doc))
 	{
 		assert(0);
 		return;
@@ -208,7 +208,7 @@ void SceneNodeMesh::loadFaces(unsigned long long meshFacesID, unsigned long long
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityMeshTetFaceData");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityMeshTetFaceData");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -242,7 +242,7 @@ void SceneNodeMesh::loadFaces(unsigned long long meshFacesID, unsigned long long
 
 	//std::cout << "Start prefetching data" << std::endl;
 	//auto t1 = std::chrono::high_resolution_clock::now();
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(faceIdList);
+	DataBase::instance().prefetchDocumentsFromStorage(faceIdList);
 	//auto t2 = std::chrono::high_resolution_clock::now();
 	//std::cout << "Finished prefetching data" << std::endl;
 
@@ -257,8 +257,8 @@ void SceneNodeMesh::loadFaces(unsigned long long meshFacesID, unsigned long long
 
 		loadFace(faceStorageID.first, faceStorageID.second, coordX, coordY, coordZ, faceNode, edgeNode);
 
-		faceTriangles[DataBase::GetIntFromArrayViewIterator(findex)] = faceNode;
-		faceEdges[DataBase::GetIntFromArrayViewIterator(findex)] = edgeNode;
+		faceTriangles[DataBase::getIntFromArrayViewIterator(findex)] = faceNode;
+		faceEdges[DataBase::getIntFromArrayViewIterator(findex)] = edgeNode;
 
 		if (faceNode != nullptr)
 		{
@@ -281,7 +281,7 @@ void SceneNodeMesh::loadCoordinates(unsigned long long meshNodesID, unsigned lon
 	// First open the mesh nodes document
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(meshNodesID, meshNodesVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(meshNodesID, meshNodesVersion, doc))
 	{
 		assert(0);
 		return;
@@ -297,7 +297,7 @@ void SceneNodeMesh::loadCoordinates(unsigned long long meshNodesID, unsigned lon
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityMeshTetNodes");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityMeshTetNodes");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -339,7 +339,7 @@ void SceneNodeMesh::loadFace(unsigned long long faceStorageID, unsigned long lon
 	// First open the mesh faces document
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(faceStorageID, faceStorageVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(faceStorageID, faceStorageVersion, doc))
 	{
 		assert(0);
 		return;
@@ -355,7 +355,7 @@ void SceneNodeMesh::loadFace(unsigned long long faceStorageID, unsigned long lon
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityMeshTetFace");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityMeshTetFace");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -369,7 +369,7 @@ void SceneNodeMesh::loadFace(unsigned long long faceStorageID, unsigned long lon
 	edgeNode = createEdgeNode(doc_view, coordX, coordY, coordZ);
 
 	// Remove potentially prefetched data
-	DataBase::GetDataBase()->RemovePrefetchedDocument(faceStorageID);
+	DataBase::instance().removePrefetchedDocument(faceStorageID);
 }
 
 osg::Node *SceneNodeMesh::createFaceNode(bsoncxx::document::view view, double *coordX, double *coordY, double *coordZ)
@@ -382,7 +382,7 @@ osg::Node *SceneNodeMesh::createFaceNode(bsoncxx::document::view view, double *c
 
 		// Read the number of triangles
 		auto item = nodes.begin();
-		size_t numberOfTriangles = DataBase::GetIntFromArrayViewIterator(item);
+		size_t numberOfTriangles = DataBase::getIntFromArrayViewIterator(item);
 		item++;
 
 		// Now we need to read all triangles and determine how many subdivided triangles we need depending on the triangle type and refinement level
@@ -390,7 +390,7 @@ osg::Node *SceneNodeMesh::createFaceNode(bsoncxx::document::view view, double *c
 
 		for (unsigned long index = 0; index < numberOfTriangles; index++)
 		{
-			size_t triangleNodeCount = DataBase::GetIntFromArrayViewIterator(item);
+			size_t triangleNodeCount = DataBase::getIntFromArrayViewIterator(item);
 			item++;
 
 			// Now skip all the nodes
@@ -484,7 +484,7 @@ osg::Node *SceneNodeMesh::createFaceNode(bsoncxx::document::view view, double *c
 
 void SceneNodeMesh::addTriangleVerticesAndNormals(bsoncxx::array::view::const_iterator &item, osg::ref_ptr<osg::Vec3Array> &vertices, osg::ref_ptr<osg::Vec3Array> &normals, size_t &nVertex, size_t &nNormal)
 {
-	size_t triangleNodeCount = DataBase::GetIntFromArrayViewIterator(item);
+	size_t triangleNodeCount = DataBase::getIntFromArrayViewIterator(item);
 	item++;
 
 	switch (triangleNodeCount)
@@ -503,7 +503,7 @@ void SceneNodeMesh::addTriangleVerticesAndNormals(bsoncxx::array::view::const_it
 
 void SceneNodeMesh::addTriangleEdges(bsoncxx::array::view::const_iterator &item, std::map<std::pair<size_t, size_t>, bool> &edgeMap)
 {
-	size_t triangleNodeCount = DataBase::GetIntFromArrayViewIterator(item);
+	size_t triangleNodeCount = DataBase::getIntFromArrayViewIterator(item);
 	item++;
 
 	switch (triangleNodeCount)
@@ -572,9 +572,9 @@ void SceneNodeMesh::averageNormals(size_t n1Index, size_t n2Index, size_t n3Inde
 
 void SceneNodeMesh::addTriangleVerticesAndNormalsOrder1(bsoncxx::array::view::const_iterator &item, osg::ref_ptr<osg::Vec3Array> &vertices, osg::ref_ptr<osg::Vec3Array> &normals, size_t &nVertex, size_t &nNormal)
 {
-	unsigned long long n1Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n2Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n3Index = DataBase::GetIntFromArrayViewIterator(item); item++;
+	unsigned long long n1Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n2Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n3Index = DataBase::getIntFromArrayViewIterator(item); item++;
 
 	addTriangle(n1Index, n2Index, n3Index, vertices, normals, nVertex, nNormal);
 }
@@ -583,12 +583,12 @@ void SceneNodeMesh::addTriangleVerticesAndNormalsOrder2(bsoncxx::array::view::co
 {
 	size_t nNormalBase = nNormal;
 
-	unsigned long long n1Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n2Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n3Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n4Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n5Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n6Index = DataBase::GetIntFromArrayViewIterator(item); item++;
+	unsigned long long n1Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n2Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n3Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n4Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n5Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n6Index = DataBase::getIntFromArrayViewIterator(item); item++;
 
 	addTriangle(n1Index, n4Index, n6Index, vertices, normals, nVertex, nNormal);
 	addTriangle(n4Index, n2Index, n5Index, vertices, normals, nVertex, nNormal);
@@ -604,16 +604,16 @@ void SceneNodeMesh::addTriangleVerticesAndNormalsOrder3(bsoncxx::array::view::co
 {
 	size_t nNormalBase = nNormal;
 
-	unsigned long long n1Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n2Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n3Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n4Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n5Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n6Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n7Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n8Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n9Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n10Index = DataBase::GetIntFromArrayViewIterator(item); item++;
+	unsigned long long n1Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n2Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n3Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n4Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n5Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n6Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n7Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n8Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n9Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n10Index = DataBase::getIntFromArrayViewIterator(item); item++;
 
 	addTriangle(n1Index, n4Index, n9Index, vertices, normals, nVertex, nNormal);
 	addTriangle(n4Index, n5Index, n10Index, vertices, normals, nVertex, nNormal);
@@ -636,9 +636,9 @@ void SceneNodeMesh::addTriangleVerticesAndNormalsOrder3(bsoncxx::array::view::co
 
 void SceneNodeMesh::addTriangleEdgesOrder1(bsoncxx::array::view::const_iterator &item, std::map<std::pair<size_t, size_t>, bool> &edgeMap)
 {
-	unsigned long long n1Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n2Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n3Index = DataBase::GetIntFromArrayViewIterator(item); item++;
+	unsigned long long n1Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n2Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n3Index = DataBase::getIntFromArrayViewIterator(item); item++;
 
 	addEdge(n1Index, n2Index, edgeMap);
 	addEdge(n2Index, n3Index, edgeMap);
@@ -647,12 +647,12 @@ void SceneNodeMesh::addTriangleEdgesOrder1(bsoncxx::array::view::const_iterator 
 
 void SceneNodeMesh::addTriangleEdgesOrder2(bsoncxx::array::view::const_iterator &item, std::map<std::pair<size_t, size_t>, bool> &edgeMap)
 {
-	unsigned long long n1Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n2Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n3Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n4Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n5Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n6Index = DataBase::GetIntFromArrayViewIterator(item); item++;
+	unsigned long long n1Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n2Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n3Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n4Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n5Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n6Index = DataBase::getIntFromArrayViewIterator(item); item++;
 
 	addEdge(n1Index, n4Index, edgeMap);
 	addEdge(n4Index, n2Index, edgeMap);
@@ -666,16 +666,16 @@ void SceneNodeMesh::addTriangleEdgesOrder2(bsoncxx::array::view::const_iterator 
 
 void SceneNodeMesh::addTriangleEdgesOrder3(bsoncxx::array::view::const_iterator &item, std::map<std::pair<size_t, size_t>, bool> &edgeMap)
 {
-	unsigned long long n1Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n2Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n3Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n4Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n5Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n6Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n7Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n8Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n9Index = DataBase::GetIntFromArrayViewIterator(item); item++;
-	unsigned long long n10Index = DataBase::GetIntFromArrayViewIterator(item); item++;
+	unsigned long long n1Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n2Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n3Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n4Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n5Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n6Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n7Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n8Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n9Index = DataBase::getIntFromArrayViewIterator(item); item++;
+	unsigned long long n10Index = DataBase::getIntFromArrayViewIterator(item); item++;
 
 	addEdge(n1Index, n4Index, edgeMap);
 	addEdge(n4Index, n5Index, edgeMap);
@@ -716,9 +716,9 @@ osg::Node *SceneNodeMesh::createFaceNodeBackwardCompatible(bsoncxx::document::vi
 
 	for (unsigned long index = 0; index < numberTriangles; index++)
 	{
-		unsigned long long n1Index = DataBase::GetIntFromArrayViewIterator(n1);
-		unsigned long long n2Index = DataBase::GetIntFromArrayViewIterator(n2);
-		unsigned long long n3Index = DataBase::GetIntFromArrayViewIterator(n3);
+		unsigned long long n1Index = DataBase::getIntFromArrayViewIterator(n1);
+		unsigned long long n2Index = DataBase::getIntFromArrayViewIterator(n2);
+		unsigned long long n3Index = DataBase::getIntFromArrayViewIterator(n3);
 
 		vertices->at(nVertex    ).set(coordX[n1Index], coordY[n1Index], coordZ[n1Index]);
 		vertices->at(nVertex + 1).set(coordX[n2Index], coordY[n2Index], coordZ[n2Index]);
@@ -817,7 +817,7 @@ osg::Node *SceneNodeMesh::createEdgeNode(bsoncxx::document::view view, double *c
 
 		// Read the number of triangles
 		auto item = nodes.begin();
-		size_t numberOfTriangles = DataBase::GetIntFromArrayViewIterator(item);
+		size_t numberOfTriangles = DataBase::getIntFromArrayViewIterator(item);
 		item++;
 
 		// Now we need to read all triangles and determine their subdivided edges
@@ -914,9 +914,9 @@ osg::Node *SceneNodeMesh::createEdgeNodeBackwardCompatible(bsoncxx::document::vi
 
 	for (unsigned long index = 0; index < numberTriangles; index++)
 	{
-		unsigned long long n1Index = DataBase::GetIntFromArrayViewIterator(n1);
-		unsigned long long n2Index = DataBase::GetIntFromArrayViewIterator(n2);
-		unsigned long long n3Index = DataBase::GetIntFromArrayViewIterator(n3);
+		unsigned long long n1Index = DataBase::getIntFromArrayViewIterator(n1);
+		unsigned long long n2Index = DataBase::getIntFromArrayViewIterator(n2);
+		unsigned long long n3Index = DataBase::getIntFromArrayViewIterator(n3);
 
 		addEdge(n1Index, n2Index, edgeMap);
 		addEdge(n2Index, n3Index, edgeMap);

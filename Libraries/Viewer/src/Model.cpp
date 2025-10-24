@@ -567,7 +567,7 @@ void Model::addVisualizationAnnotationNodeDataBase(const std::string &treeName, 
 
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, version, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, version, doc))
 	{
 		assert(0);
 		return;
@@ -583,7 +583,7 @@ void Model::addVisualizationAnnotationNodeDataBase(const std::string &treeName, 
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityAnnotationData");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityAnnotationData");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -1399,7 +1399,7 @@ void Model::showBranch(const std::string &branchName)
 
 		if (!prefetchIDs.empty())
 		{
-			DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
+			DataBase::instance().prefetchDocumentsFromStorage(prefetchIDs);
 		}
 
 		showAllSceneNodes(rootNode);
@@ -1884,7 +1884,7 @@ void Model::showAllSceneNodesAction(void)
 
 	if (!prefetchIDs.empty())
 	{
-		DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
+		DataBase::instance().prefetchDocumentsFromStorage(prefetchIDs);
 	}
 
 	showAllSceneNodes(sceneNodesRoot);
@@ -1900,7 +1900,7 @@ void Model::showSelectedSceneNodesAction(void)
 
 	if (!prefetchIDs.empty())
 	{
-		DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
+		DataBase::instance().prefetchDocumentsFromStorage(prefetchIDs);
 	}
 
 	showSelectedSceneNodes(sceneNodesRoot);

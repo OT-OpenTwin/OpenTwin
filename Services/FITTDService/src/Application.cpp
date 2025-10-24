@@ -434,8 +434,8 @@ void Application::SolverThread(std::list<std::string> solverRunList)
 void Application::SetupSolverService(MicroServiceInterfaceFITTDSolver & newSolver)
 {
 	// Set some general properties
-	newSolver.setDataBaseURL(DataBase::GetDataBase()->getDataBaseServerURL());
-	newSolver.setProjectName(DataBase::GetDataBase()->getProjectName());
+	newSolver.setDataBaseURL(DataBase::instance().getDataBaseServerURL());
+	newSolver.setProjectName(DataBase::instance().getCollectionName());
 	newSolver.setUIComponent(this->getUiComponent());
 	newSolver.setModelComponent(this->getModelComponent());
 }

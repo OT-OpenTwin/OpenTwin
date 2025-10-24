@@ -330,7 +330,7 @@ std::string Application::CreateTmpFileFromCompressedData(const std::string &data
 	decodedCompressedString = nullptr;
 
 	// Store the data in a temporary file
-	std::string tmpFileName = DataBase::GetDataBase()->getTmpFileName();
+	std::string tmpFileName = DataBase::instance().getTmpFileName();
 
 	std::ofstream file(tmpFileName, std::ios::binary);
 	file.write(decodedString, uncompressedDataLength);

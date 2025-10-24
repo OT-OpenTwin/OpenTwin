@@ -39,7 +39,7 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 {	
 	if (m_collectionName == "")
 	{
-		m_collectionName = DataBase::GetDataBase()->getProjectName();
+		m_collectionName = DataBase::instance().getCollectionName();
 	}
 	const std::string seriesName = createSeriesName(m_fileName);
 	const bool seriesExists = seriesAlreadyExists(seriesName);

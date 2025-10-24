@@ -227,7 +227,7 @@ void Application::runCircuitSimulation() {
 		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdsSolver);
 
 	//Now read the solver objects for each solver
 	for (const auto& info : m_solverInfo) {

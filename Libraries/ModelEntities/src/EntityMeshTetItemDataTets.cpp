@@ -63,19 +63,19 @@ void EntityMeshTetItemDataTets::readSpecificDataFromDataBase(bsoncxx::document::
 		auto n = nodes.begin();
 
 		// Read the number of triangles
-		long long numberTets = DataBase::GetIntFromArrayViewIterator(n);
+		long long numberTets = DataBase::getIntFromArrayViewIterator(n);
 		n++;
 
 		setNumberTets(numberTets);
 
 		for (unsigned long index = 0; index < numberTets; index++)
 		{
-			int numberNodes = (int) DataBase::GetIntFromArrayViewIterator(n);
+			int numberNodes = (int) DataBase::getIntFromArrayViewIterator(n);
 			n++;
 
 			for (int iNode = 0; iNode < numberNodes; iNode++)
 			{
-				long long nodeIndex = DataBase::GetIntFromArrayViewIterator(n);
+				long long nodeIndex = DataBase::getIntFromArrayViewIterator(n);
 				n++;
 
 				setTetNode(index, iNode, nodeIndex);
@@ -150,10 +150,10 @@ void EntityMeshTetItemDataTets::readSpecificDataFromDataBase(bsoncxx::document::
 
 			for (unsigned long tindex = 0; tindex < numberTets; tindex++)
 			{
-				setTetNode(tindex, 0, DataBase::GetIntFromArrayViewIterator(n1));
-				setTetNode(tindex, 1, DataBase::GetIntFromArrayViewIterator(n2));
-				setTetNode(tindex, 2, DataBase::GetIntFromArrayViewIterator(n3));
-				setTetNode(tindex, 3, DataBase::GetIntFromArrayViewIterator(n4));
+				setTetNode(tindex, 0, DataBase::getIntFromArrayViewIterator(n1));
+				setTetNode(tindex, 1, DataBase::getIntFromArrayViewIterator(n2));
+				setTetNode(tindex, 2, DataBase::getIntFromArrayViewIterator(n3));
+				setTetNode(tindex, 3, DataBase::getIntFromArrayViewIterator(n4));
 
 				n1++;
 				n2++;

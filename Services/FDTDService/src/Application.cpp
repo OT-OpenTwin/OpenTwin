@@ -218,7 +218,7 @@ void Application::runSolver(void)
 		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdsSolver);
 
 	// Now read the solver objects for each solver
 	std::list<std::string> meshNameList;
@@ -319,8 +319,8 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 	getModelComponent()->clearNewEntityList();
 
 	std::string logFileText;
-	std::string output = FDTDSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), getUiComponent()->getServiceURL(),
-												 DataBase::GetDataBase()->getProjectName(), solverEntity, getServiceID(), getSessionCount(), getModelComponent());
+	std::string output = FDTDSolver.startSolver(logFileText, DataBase::instance().getDataBaseServerURL(), getUiComponent()->getServiceURL(),
+												 DataBase::instance().getCollectionName(), solverEntity, getServiceID(), getSessionCount(), getModelComponent());
 	getUiComponent()->displayMessage(output + "\n");
 
 	// Store the output in a result item

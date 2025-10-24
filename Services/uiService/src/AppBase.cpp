@@ -1304,13 +1304,13 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 
 
 	
-	std::string projectName = AppBase::instance()->getCollectionName();
-	auto dataBase = DataBase::GetDataBase();
+	std::string collectionName = AppBase::instance()->getCollectionName();
+	DataBase& dataBase = DataBase::instance();
 	
-	dataBase->setProjectName(projectName);
+	dataBase.setCollectionName(collectionName);
 	
-	dataBase->setUserCredentials(m_loginData.getSessionUser(), m_loginData.getSessionPassword());
-	bool success = dataBase->InitializeConnection(m_loginData.getDatabaseUrl());
+	dataBase.setUserCredentials(m_loginData.getSessionUser(), m_loginData.getSessionPassword());
+	bool success = dataBase.initializeConnection(m_loginData.getDatabaseUrl());
 
 	assert(success);
 

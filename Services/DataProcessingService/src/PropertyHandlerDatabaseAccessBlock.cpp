@@ -120,7 +120,7 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 	std::string loggedInUserPsw = Application::instance()->getLogInUserPassword();
 	_collectionName = collectionFinder.nameCorrespondingCollection(projectName, loggedInUserName, loggedInUserPsw);
 
-	const std::string thisProjectsName = DataBase::GetDataBase()->getProjectName();
+	const std::string thisProjectsName = DataBase::instance().getCollectionName();
 
 	ResultCollectionMetadataAccess* newResultCollectionAccess;
 	if (thisProjectsName == projectName)

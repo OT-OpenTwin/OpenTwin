@@ -115,7 +115,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 	// Initialize the gmsh component
 	gmsh::initialize();
 
-	DataBase::GetDataBase()->queueWriting(true);
+	DataBase::instance().setWritingQueueEnabled(true);
 	ot::ModelServiceAPI::enableMessageQueueing(true);
 
 	Properties properties;
@@ -397,7 +397,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 	getEntityMesh()->releaseMeshData(); 
 
 	// Turn off the write queue (this will store all entities in the data base)
-	DataBase::GetDataBase()->queueWriting(false);
+	DataBase::instance().setWritingQueueEnabled(false);
 	ot::ModelServiceAPI::enableMessageQueueing(false);
 
 	reportTime("\tTime: Mesh items stored to data base", timer, properties.getVerbose());

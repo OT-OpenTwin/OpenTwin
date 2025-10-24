@@ -37,7 +37,7 @@ void EntityBinaryData::addStorageData(bsoncxx::builder::basic::document &storage
 		// The data is too large and needs to be stored in GridFS
 		DataStorageAPI::DocumentAPI doc;
 
-		bsoncxx::types::value result = doc.InsertBinaryDataUsingGridFs((uint8_t*)(data.data()), data.size(), DataBase::GetDataBase()->getProjectName());
+		bsoncxx::types::value result = doc.InsertBinaryDataUsingGridFs((uint8_t*)(data.data()), data.size(), DataBase::instance().getCollectionName());
 		std::string fileId = result.get_oid().value.to_string();
 
 		storage.append(
@@ -81,7 +81,7 @@ void EntityBinaryData::readSpecificDataFromDataBase(bsoncxx::document::view &doc
 		bsoncxx::oid oid_obj{ file };
 		bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 
-		doc.GetDocumentUsingGridFs(id, buffer, length, DataBase::GetDataBase()->getProjectName());
+		doc.GetDocumentUsingGridFs(id, buffer, length, DataBase::instance().getCollectionName());
 
 		data.insert(data.end(), buffer, buffer + length);
 	}

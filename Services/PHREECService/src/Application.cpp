@@ -234,7 +234,7 @@ void Application::runPHREEC(void) {
 		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdsSolver);
 
 	// Now read the solver objects for each solver
 	std::list<std::string> meshNameList;
@@ -338,8 +338,8 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::string &mo
 
 	PHREECLauncher phreecSolver(this);
 
-	std::string output = phreecSolver.startSolver(DataBase::GetDataBase()->getDataBaseServerURL(), frequencyHz, this->getUiComponent()->getServiceURL(),
-		DataBase::GetDataBase()->getProjectName(), modelVersion, meshEntityID, debugFlag, static_cast<int>(getServiceID()), getSessionCount(), this->getModelComponent());
+	std::string output = phreecSolver.startSolver(DataBase::instance().getDataBaseServerURL(), frequencyHz, this->getUiComponent()->getServiceURL(),
+		DataBase::instance().getCollectionName(), modelVersion, meshEntityID, debugFlag, static_cast<int>(getServiceID()), getSessionCount(), this->getModelComponent());
 	this->getUiComponent()->displayMessage(output + "\n");
 
 	// Store the output in a result item

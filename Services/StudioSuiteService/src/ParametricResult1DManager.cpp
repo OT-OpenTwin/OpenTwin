@@ -87,7 +87,7 @@ void ParametricResult1DManager::storeDataInResultCollection()
 {
 
 	//First we access the result collection of the current project
-	std::string collectionName = DataBase::GetDataBase()->getProjectName();
+	std::string collectionName = DataBase::instance().getCollectionName();
 
 	ResultCollectionExtender resultCollectionExtender(collectionName, *m_application->getModelComponent(), OT_INFO_SERVICE_TYPE_STUDIOSUITE);
 	resultCollectionExtender.setSaveModel(false);

@@ -122,8 +122,8 @@ void EntityMeshCartesianFace::readSpecificDataFromDataBase(bsoncxx::document::vi
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
 	// Now we read the information about the Brep and Facet objects
-	type = (eType) DataBase::GetIntFromView(doc_view, "Type");
-	surfaceId = (int) DataBase::GetIntFromView(doc_view, "SurfaceId");
+	type = (eType) DataBase::getIntFromView(doc_view, "Type");
+	surfaceId = (int) DataBase::getIntFromView(doc_view, "SurfaceId");
 	boundingBox.setFromBSON(doc_view["BoundingBox"].get_document().value);
 
 	if (type == INDEX_BASED)
@@ -154,7 +154,7 @@ void EntityMeshCartesianFace::readCellFaces(bsoncxx::document::view &doc_view, i
 
 		for (size_t findex = 0; findex < numberFaces; findex++)
 		{
-			setCellFace(direction, findex, DataBase::GetIntFromArrayViewIterator(f));
+			setCellFace(direction, findex, DataBase::getIntFromArrayViewIterator(f));
 			f++;
 		}
 	}
@@ -178,7 +178,7 @@ void EntityMeshCartesianFace::readPoints(bsoncxx::document::view &doc_view, int 
 
 		for (size_t pindex = 0; pindex < numberPoints; pindex++)
 		{
-			pointIndices[index][pindex] = DataBase::GetIntFromArrayViewIterator(p);
+			pointIndices[index][pindex] = DataBase::getIntFromArrayViewIterator(p);
 			p++;
 		}
 	}

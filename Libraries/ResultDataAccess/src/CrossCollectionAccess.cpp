@@ -87,12 +87,12 @@ std::pair<ot::UIDList, ot::UIDList> CrossCollectionAccess::InquireMetadataEntity
 }
 
 DataBaseWrapper::DataBaseWrapper(const std::string& collectionName)
-	:_oldCollectionName(DataBase::GetDataBase()->getProjectName())
+	:_oldCollectionName(DataBase::instance().getCollectionName())
 {
-	DataBase::GetDataBase()->setProjectName(collectionName);
+	DataBase::instance().setCollectionName(collectionName);
 }
 
 DataBaseWrapper::~DataBaseWrapper()
 {
-	DataBase::GetDataBase()->setProjectName(_oldCollectionName);
+	DataBase::instance().setCollectionName(_oldCollectionName);
 }

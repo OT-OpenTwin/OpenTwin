@@ -243,7 +243,7 @@ void SceneNodeCartesianMesh::loadNodes(unsigned long long meshNodesID, unsigned 
 	// First open the mesh nodes document
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(meshNodesID, meshNodesVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(meshNodesID, meshNodesVersion, doc))
 	{
 		assert(0);
 		return;
@@ -259,7 +259,7 @@ void SceneNodeCartesianMesh::loadNodes(unsigned long long meshNodesID, unsigned 
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityMeshCartesianNodes");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityMeshCartesianNodes");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -303,7 +303,7 @@ void SceneNodeCartesianMesh::loadFaces(unsigned long long meshFacesID, unsigned 
 	// First open the mesh nodes document
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(meshFacesID, meshFacesVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(meshFacesID, meshFacesVersion, doc))
 	{
 		assert(0);
 		return;
@@ -319,7 +319,7 @@ void SceneNodeCartesianMesh::loadFaces(unsigned long long meshFacesID, unsigned 
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityMeshCartesianFaceList");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityMeshCartesianFaceList");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -353,7 +353,7 @@ void SceneNodeCartesianMesh::loadFaces(unsigned long long meshFacesID, unsigned 
 
 	//std::cout << "Start prefetching data" << std::endl;
 	//auto t1 = std::chrono::high_resolution_clock::now();
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(faceIdList);
+	DataBase::instance().prefetchDocumentsFromStorage(faceIdList);
 	//auto t2 = std::chrono::high_resolution_clock::now();
 	//std::cout << "Finished prefetching data" << std::endl;
 
@@ -368,8 +368,8 @@ void SceneNodeCartesianMesh::loadFaces(unsigned long long meshFacesID, unsigned 
 
 		loadFace(faceStorageID.first, faceStorageID.second, faceNode, edgeNode, numberPoints, coordX, coordY, coordZ);
 
-		faceTriangles[DataBase::GetIntFromArrayViewIterator(findex)] = faceNode;
-		faceEdges[DataBase::GetIntFromArrayViewIterator(findex)] = edgeNode;
+		faceTriangles[DataBase::getIntFromArrayViewIterator(findex)] = faceNode;
+		faceEdges[DataBase::getIntFromArrayViewIterator(findex)] = edgeNode;
 
 		if (faceNode != nullptr)
 		{
@@ -393,7 +393,7 @@ void SceneNodeCartesianMesh::loadFace(unsigned long long faceStorageID, unsigned
 	// First open the mesh faces document
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(faceStorageID, faceStorageVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(faceStorageID, faceStorageVersion, doc))
 	{
 		assert(0);
 		return;
@@ -409,7 +409,7 @@ void SceneNodeCartesianMesh::loadFace(unsigned long long faceStorageID, unsigned
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityMeshCartesianFace");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityMeshCartesianFace");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -446,7 +446,7 @@ void SceneNodeCartesianMesh::loadFace(unsigned long long faceStorageID, unsigned
 	edgeNode = createEdgeNode(vertices, normals);
 
 	// Remove potentially prefetched data
-	DataBase::GetDataBase()->RemovePrefetchedDocument(faceStorageID);
+	DataBase::instance().removePrefetchedDocument(faceStorageID);
 }
 
 void SceneNodeCartesianMesh::createFaceFromIndices(bsoncxx::document::view view, osg::ref_ptr<osg::Vec3Array> &vertices, osg::ref_ptr<osg::Vec3Array> &normals)
@@ -479,7 +479,7 @@ void SceneNodeCartesianMesh::createFaceFromIndices(bsoncxx::document::view view,
 
 	for (unsigned long index = 0; index < numberFacesX; index++)
 	{
-		long long faceIndex = DataBase::GetIntFromArrayViewIterator(fx);
+		long long faceIndex = DataBase::getIntFromArrayViewIterator(fx);
 		double normalFactor = faceIndex < 0 ? -1 : 1;
 		faceIndex = abs(faceIndex);
 
@@ -526,7 +526,7 @@ void SceneNodeCartesianMesh::createFaceFromIndices(bsoncxx::document::view view,
 
 	for (unsigned long index = 0; index < numberFacesY; index++)
 	{
-		long long faceIndex = DataBase::GetIntFromArrayViewIterator(fy);
+		long long faceIndex = DataBase::getIntFromArrayViewIterator(fy);
 		double normalFactor = faceIndex < 0 ? -1 : 1;
 		faceIndex = abs(faceIndex);
 
@@ -573,7 +573,7 @@ void SceneNodeCartesianMesh::createFaceFromIndices(bsoncxx::document::view view,
 
 	for (unsigned long index = 0; index < numberFacesZ; index++)
 	{
-		long long faceIndex = DataBase::GetIntFromArrayViewIterator(fz);
+		long long faceIndex = DataBase::getIntFromArrayViewIterator(fz);
 		double normalFactor = faceIndex < 0 ? -1 : 1;
 		faceIndex = abs(faceIndex);
 
@@ -651,10 +651,10 @@ void SceneNodeCartesianMesh::createFaceFromPoints(bsoncxx::document::view view, 
 
 	for (unsigned long index = 0; index < numberFaces; index++)
 	{
-		long long index0 = DataBase::GetIntFromArrayViewIterator(i0);
-		long long index1 = DataBase::GetIntFromArrayViewIterator(i1);
-		long long index2 = DataBase::GetIntFromArrayViewIterator(i2);
-		long long index3 = DataBase::GetIntFromArrayViewIterator(i3);
+		long long index0 = DataBase::getIntFromArrayViewIterator(i0);
+		long long index1 = DataBase::getIntFromArrayViewIterator(i1);
+		long long index2 = DataBase::getIntFromArrayViewIterator(i2);
+		long long index3 = DataBase::getIntFromArrayViewIterator(i3);
 
 		i0++;
 		i1++;

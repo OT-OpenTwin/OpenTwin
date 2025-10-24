@@ -386,7 +386,7 @@ void Application::writeProjectInformation(const std::string &simpleFileName, std
 
 	std::string stringData = data.str();
 
-	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
 
 	long long modelVersion = getCurrentModelEntityVersion();
 
@@ -406,7 +406,7 @@ void Application::writeProjectInformation(const std::string &simpleFileName, std
 long long Application::getCurrentModelEntityVersion(void)
 {
 	// We search for the last model entity in the database and determine its version
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto queryDoc = bsoncxx::builder::stream::document{}
 		<< "SchemaType" << "Model"
@@ -426,7 +426,7 @@ long long Application::getCurrentModelEntityVersion(void)
 bool Application::readProjectInformation(std::string &simpleFileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
 {
 	// Get the project information string from the model entity
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto queryDoc = bsoncxx::builder::stream::document{}
 		<< "SchemaType" << "Model"

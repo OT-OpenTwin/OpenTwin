@@ -34,9 +34,9 @@ std::list<std::string> LibraryManagementWrapper::getCircuitModels() {
 	lmsDocs.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString("CircuitModels", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
 	lmsDocs.AddMember(OT_ACTION_PARAM_Type, ot::JsonString("ElementType", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
 	lmsDocs.AddMember(OT_ACTION_PARAM_Value, ot::JsonString("Diode", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
-	lmsDocs.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::GetDataBase()->getUserName(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
-	lmsDocs.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::GetDataBase()->getUserPassword(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
-	lmsDocs.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::GetDataBase()->getDataBaseServerURL(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
+	lmsDocs.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::instance().getUserName(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
+	lmsDocs.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::instance().getUserPassword(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
+	lmsDocs.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::instance().getDataBaseServerURL(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
 	
 	
 	// In case of error:
@@ -98,9 +98,9 @@ std::string LibraryManagementWrapper::getCircuitModel(std::string _modelName) {
 	lmsDocs.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString("CircuitModels", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
 	lmsDocs.AddMember(OT_ACTION_PARAM_Type, ot::JsonString("Name", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
 	lmsDocs.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(_modelName, lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
-	lmsDocs.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::GetDataBase()->getUserName(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
-	lmsDocs.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::GetDataBase()->getUserPassword(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
-	lmsDocs.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::GetDataBase()->getDataBaseServerURL(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
+	lmsDocs.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::instance().getUserName(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
+	lmsDocs.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::instance().getUserPassword(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
+	lmsDocs.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::instance().getDataBaseServerURL(), lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
 
 
 	// In case of error:

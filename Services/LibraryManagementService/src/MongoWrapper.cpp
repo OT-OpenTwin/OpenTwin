@@ -9,8 +9,8 @@ MongoWrapper::MongoWrapper(std::string _siteID) {
 
 std::string MongoWrapper::getDocument(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
     
-    DataBase::GetDataBase()->setUserCredentials(_dbUserName, _dbUserPassword);
-    DataBase::GetDataBase()->InitializeConnection(_dbServerUrl);
+    DataBase::instance().setUserCredentials(_dbUserName, _dbUserPassword);
+    DataBase::instance().initializeConnection(_dbServerUrl);
 
     try {
         DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
@@ -57,8 +57,8 @@ std::string MongoWrapper::getDocumentList(const std::string& _collectionName, co
                                           const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
     
    
-    DataBase::GetDataBase()->setUserCredentials(_dbUserName, _dbUserPassword);
-    DataBase::GetDataBase()->InitializeConnection(_dbServerUrl);
+    DataBase::instance().setUserCredentials(_dbUserName, _dbUserPassword);
+    DataBase::instance().initializeConnection(_dbServerUrl);
 
     DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists("Libraries", "CircuitModels");
     DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists("Libraries", "CircuitMetaData");
@@ -117,8 +117,8 @@ std::string MongoWrapper::getDocumentList(const std::string& _collectionName, co
 }
 
 std::string MongoWrapper::getMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
-    DataBase::GetDataBase()->setUserCredentials(_dbUserName, _dbUserPassword);
-    DataBase::GetDataBase()->InitializeConnection(_dbServerUrl);
+    DataBase::instance().setUserCredentials(_dbUserName, _dbUserPassword);
+    DataBase::instance().initializeConnection(_dbServerUrl);
 
     try {
         DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);

@@ -153,7 +153,12 @@ public:
 	//! @param _imageData The image data to add.
 	bool addPreviewImage(std::vector<char>&& _imageData, ot::ImageFileFormat _format);
 
-
+	//! @brief Reads the current project preview image of the project.
+	//! @param _collectionName The name of the project collection to read the preview image from.
+	//! @param _imageData The image data read.
+	//! @param _format The image format read.
+	//! @return True on success, false if the project has no preview image or an error occurred.
+	static bool readProjectPreviewImage(const std::string& _collectionName, std::vector<char>& _imageData, ot::ImageFileFormat _format);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

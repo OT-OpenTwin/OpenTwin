@@ -195,10 +195,10 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 	m_application->m_dataBaseUserPassword = _initData.getDatabasePassword();
 
 	// Initialize database api (project name will be set by the setSessionIDPrivate call above)
-	DataBase* db = DataBase::GetDataBase();
-	db->setDataBaseServerURL(_initData.getDatabaseUrl());
-	db->setSiteIDString("1");
-	db->setUserCredentials(_initData.getDatabaseUsername(), _initData.getDatabasePassword());
+	DataBase& db = DataBase::instance();
+	db.setDataBaseServerURL(_initData.getDatabaseUrl());
+	db.setSiteIDString("1");
+	db.setUserCredentials(_initData.getDatabaseUsername(), _initData.getDatabasePassword());
 
 	ot::DebugHelper::serviceSetupCompleted(*m_application);
 
@@ -250,7 +250,7 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 		"\"Service.ID\": " + std::to_string(m_application->getServiceID()) + ", "
 		"\"Session.ID\": \"" + m_application->getSessionID() + "\", "
 		"\"Database.Url\": \"" + _initData.getDatabaseUrl() + "\", "
-		"\"Site.ID\": \"" + DataBase::GetDataBase()->getSiteIDString() + "\""
+		"\"Site.ID\": \"" + DataBase::instance().getSiteIDString() + "\""
 		" }"
 	);
 
@@ -381,7 +381,8 @@ void ot::intern::ExternalServicesComponent::updateSettingsFromDataBase(PropertyG
 
 	OTAssertNullptr(m_application);
 
-	PropertyGridCfg oldConfig = m_application->getSettingsFromDataBase(DataBase::GetDataBase()->getDataBaseServerURL(), DataBase::GetDataBase()->getSiteIDString(), DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_application->m_dbUserCollection);
+	DataBase& db = DataBase::instance();
+	PropertyGridCfg oldConfig = m_application->getSettingsFromDataBase(db.getDataBaseServerURL(), db.getSiteIDString(), db.getUserName(), db.getUserPassword(), m_application->m_dbUserCollection);
 
 	if (!oldConfig.isEmpty()) {
 		_config.mergeWith(oldConfig, ot::PropertyBase::FullMerge);

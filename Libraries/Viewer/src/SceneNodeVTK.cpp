@@ -254,7 +254,7 @@ std::string SceneNodeVTK::loadDataItem(unsigned long long entityID, unsigned lon
 {
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
 	{
 		// assert(0); This can happen, if the entity is deleted
 		return "";
@@ -270,7 +270,7 @@ std::string SceneNodeVTK::loadDataItem(unsigned long long entityID, unsigned lon
 		return "";
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityBinaryData");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityBinaryData");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -303,7 +303,7 @@ osg::Node *SceneNodeVTK::createOSGNodeFromVTK(void)
 	std::list< std::pair<unsigned long long, unsigned long long>> dataList;
 	dataList.push_back(std::pair<unsigned long long, unsigned long long>(dataID, dataVersion));
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(dataList);
+	DataBase::instance().prefetchDocumentsFromStorage(dataList);
 
 	std::string dataString = loadDataItem(dataID, dataVersion);
 

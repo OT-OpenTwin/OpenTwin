@@ -569,7 +569,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 {
 	size_t dataSize = 0;
 
-	DataBase::GetDataBase()->queueWriting(true);
+	DataBase::instance().setWritingQueueEnabled(true);
 
 	int fileCount = 0;
 	int lastPercent = 15;
@@ -628,7 +628,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 		if (dataSize > 100000000)
 		{
 			// We have more than 100 MB since the last store
-			DataBase::GetDataBase()->flushWritingQueue();
+			DataBase::instance().flushWritingQueue();
 			dataSize = 0;
 		}
 
@@ -641,7 +641,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 		fileCount++;
 	}
 
-	DataBase::GetDataBase()->queueWriting(false);
+	DataBase::instance().setWritingQueueEnabled(false);
 
 	ot::WindowAPI::setProgressBarValue(90);
 }
@@ -871,7 +871,7 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 		versionID++;
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIDs);
 
 	bool success = true;
 
@@ -926,7 +926,7 @@ bool ProjectManager::downloadFile(const std::string &cacheFolderVersion, ot::UID
 {
 	bool success = true;
 
-	EntityFile* fileEntity = dynamic_cast<EntityFile*> (DataBase::GetDataBase()->GetEntityFromEntityIDandVersion(entityID, version));
+	EntityFile* fileEntity = dynamic_cast<EntityFile*> (DataBase::instance().getEntityFromEntityIDandVersion(entityID, version));
 
 	if (fileEntity != nullptr)
 	{

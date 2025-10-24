@@ -8,7 +8,7 @@
 #include "EntityBlock.h"
 #include "OTCore/ProjectInformation.h"
 
-class EntityFileImage;
+class EntityBinaryData;
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalProjectItem : public EntityBlock {
 public:
@@ -28,13 +28,14 @@ public:
 
 	// Data accessors
 
-	void setPreviewFile(const EntityBase& _entity) { setPreviewFile(_entity.getEntityID(), _entity.getEntityStorageVersion()); };
-	void setPreviewFile(ot::UID _entityID, ot::UID _entityVersion);
+	void setPreviewFile(const EntityBase& _entity, ot::ImageFileFormat _format) { setPreviewFile(_entity.getEntityID(), _entity.getEntityStorageVersion(), _format); };
+	void setPreviewFile(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format);
 	void removePreviewFile();
 	bool hasPreviewFile() const { return m_previewUID != ot::invalidUID; };
 	ot::UID getPreviewFileID() const { return m_previewUID; };
 	ot::UID getPreviewFileVersion() const { return m_previewVersion; };
-	std::shared_ptr<EntityFileImage> getPreviewFile();
+	ot::ImageFileFormat getPreviewFileFormat() const { return m_previewFormat; };
+	std::shared_ptr<EntityBinaryData> getPreviewFileData();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -56,8 +57,13 @@ protected:
 private:
 	void ensurePreviewLoaded();
 
+	std::string m_projectName;
+	std::string m_projectType;
+	std::string m_collectionName;
+
 	ot::UID m_previewUID;
 	ot::UID m_previewVersion;
-	std::shared_ptr<EntityFileImage> m_preview;
+	ot::ImageFileFormat m_previewFormat;
+	std::shared_ptr<EntityBinaryData> m_previewData;
 };
 

@@ -264,7 +264,7 @@ std::vector<EntityBase*> ResultCollectionMetadataAccess::findAllExistingMetadata
 	{
 		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(entityInfo.getEntityID(), entityInfo.getEntityVersion()));
 	}
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdandVersion);
 
 	std::vector<EntityBase*> allExistingMetadata;
 	allExistingMetadata.reserve(entityInfos.size());

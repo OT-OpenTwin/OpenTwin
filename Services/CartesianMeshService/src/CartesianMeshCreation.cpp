@@ -265,7 +265,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		// Store all entities in the data base
 		setProgressInformation("Storing mesh", true);
 
-		DataBase::GetDataBase()->queueWriting(true);
+		DataBase::instance().setWritingQueueEnabled(true);
 
 		if (getDsMatrix() != nullptr)
 		{
@@ -311,7 +311,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		{
 			entity->storeToDataBase();
 		}
-		DataBase::GetDataBase()->queueWriting(false);
+		DataBase::instance().setWritingQueueEnabled(false);
 
 		// Now determine the id, version and parent lists of all entities 
 		std::list<ot::UID> topologyEntityIDList;
@@ -508,7 +508,7 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 	{
 		prefetchIds.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIds);
 
 	for (auto info : materialInfo)
 	{

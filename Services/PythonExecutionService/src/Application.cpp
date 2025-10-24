@@ -66,10 +66,10 @@ void Application::run(void) {
 
 	DataBaseInfo info;
 	info.setSiteID(this->getSiteID());
-	info.setDataBaseUrl(DataBase::GetDataBase()->getDataBaseServerURL());
+	info.setDataBaseUrl(DataBase::instance().getDataBaseServerURL());
 	info.setCollectionName(this->getCollectionName());
-	info.setUserName(DataBase::GetDataBase()->getUserName());
-	info.setUserPassword(DataBase::GetDataBase()->getUserPassword());
+	info.setUserName(DataBase::instance().getUserName());
+	info.setUserPassword(DataBase::instance().getUserPassword());
 
 	m_subprocessManager->setDataBaseInfo(info);
 

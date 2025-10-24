@@ -100,7 +100,7 @@ void EntityVis2D3D::addVisualizationNodes(void)
 		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(DataBase::instance().getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_DataID, visualizationDataID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_DataVersion, visualizationDataVersion, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_SourceID, sourceID, doc.GetAllocator());

@@ -112,8 +112,8 @@ void EntityMeshTetItemDataTetedges::readSpecificDataFromDataBase(bsoncxx::docume
 		for (unsigned long eindex = 0; eindex < numberEdges; eindex++)
 		{
 			size_t n[2];
-			n[0] = (size_t)DataBase::GetIntFromArrayViewIterator(n1);
-			n[1] = (size_t)DataBase::GetIntFromArrayViewIterator(n2);
+			n[0] = (size_t)DataBase::getIntFromArrayViewIterator(n1);
+			n[1] = (size_t)DataBase::getIntFromArrayViewIterator(n2);
 
 			setEdgeNodes(eindex, n);
 

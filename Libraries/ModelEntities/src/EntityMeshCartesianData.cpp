@@ -404,7 +404,7 @@ void EntityMeshCartesianData::addVisualizationItem(bool isHidden)
 	doc.AddMember(OT_ACTION_PARAM_MESH_CartesianCoordY, ot::JsonArray(meshCoords[1], doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESH_CartesianCoordZ, ot::JsonArray(meshCoords[2], doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESH_ShowMeshLines, showMesh, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(DataBase::instance().getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, meshFacesStorageId == -1 ? 0 : (unsigned long long) meshFacesStorageId, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, meshFacesStorageVersion == -1 ? 0 : (unsigned long long) meshFacesStorageVersion, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESH_NODE_ID, meshNodesStorageId == -1 ? 0 : (unsigned long long) meshNodesStorageId, doc.GetAllocator());

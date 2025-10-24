@@ -298,12 +298,12 @@ void EntityMeshTetItem::readSpecificDataFromDataBase(bsoncxx::document::view &do
 
 	// Now load the data from the storage
 
-	meshDataTetsStorageId = DataBase::GetIntFromView(doc_view, "MeshDataTetsID", 0);
-	meshDataTetEdgesStorageId = DataBase::GetIntFromView(doc_view, "MeshDataTetEdgesID", 0);
+	meshDataTetsStorageId = DataBase::getIntFromView(doc_view, "MeshDataTetsID", 0);
+	meshDataTetEdgesStorageId = DataBase::getIntFromView(doc_view, "MeshDataTetEdgesID", 0);
 
-	numberOfTriangles = (size_t) DataBase::GetIntFromView(doc_view, "NumberTriangles", 0);
-	numberOfTets      = (size_t) DataBase::GetIntFromView(doc_view, "NumberTets", 0);
-	numberOfTetEdges  = (size_t) DataBase::GetIntFromView(doc_view, "NumberTetEdges", 0);
+	numberOfTriangles = (size_t) DataBase::getIntFromView(doc_view, "NumberTriangles", 0);
+	numberOfTets      = (size_t) DataBase::getIntFromView(doc_view, "NumberTets", 0);
+	numberOfTetEdges  = (size_t) DataBase::getIntFromView(doc_view, "NumberTetEdges", 0);
 
 	auto bbox = doc_view["BoundingBox"].get_document();
 	boundingBox.setFromBSON(bbox);
@@ -324,7 +324,7 @@ void EntityMeshTetItem::readSpecificDataFromDataBase(bsoncxx::document::view &do
 
 		for (unsigned long findex = 0; findex < numberFaces; findex++)
 		{
-			setFace(findex, (int)DataBase::GetIntFromArrayViewIterator(f));
+			setFace(findex, (int)DataBase::getIntFromArrayViewIterator(f));
 			f++;
 		}
 	}
@@ -355,7 +355,7 @@ void EntityMeshTetItem::addVisualizationItem(bool isHidden)
 	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(DataBase::instance().getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, this->getCurrentEntityVersion(this->getEntityID()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_TETEDGES_ID, meshDataTetEdgesStorageId, doc.GetAllocator());

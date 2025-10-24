@@ -590,7 +590,7 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 	std::string className = ot::json::getString(_document, OT_ACTION_PARAM_Type);
 	bool recursive = ot::json::getBool(_document, OT_ACTION_PARAM_Recursive);
 
-	std::string actualOpenedProject = DataBase::GetDataBase()->getProjectName();
+	std::string actualOpenedProject = DataBase::instance().getCollectionName();
 	CrossCollectionDatabaseWrapper wrapper(collectionName);
 	
 	ModelState secondary(m_model->getSessionCount(), static_cast<unsigned int>(m_model->getServiceID()));
@@ -605,12 +605,12 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 		ot::UID entityVersion = secondary.getCurrentEntityVersion(entityID);
 		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(entityID, entityVersion));
 	}
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdandVersion);
 	ot::UIDList entityIDList, entityVersionList;
 	for (auto& identifier : prefetchIdandVersion)
 	{
 		auto doc = bsoncxx::builder::basic::document{};
-		if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(identifier.first, identifier.second, doc))
+		if (!DataBase::instance().getDocumentFromEntityIDandVersion(identifier.first, identifier.second, doc))
 		{
 			return "";
 		}
@@ -1082,7 +1082,7 @@ std::string Application::storeTemporaryFile(const std::string& _content, uint64_
 	decodedCompressedString = nullptr;
 
 	// Store the data in a temporary file
-	std::string tmpFileName = DataBase::GetDataBase()->getTmpFileName();
+	std::string tmpFileName = DataBase::instance().getTmpFileName();
 
 	std::ofstream file(tmpFileName, std::ios::binary);
 	file.write(decodedString, _uncompressedDataLength);

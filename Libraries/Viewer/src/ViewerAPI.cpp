@@ -695,13 +695,13 @@ void ViewerAPI::enterEntitySelectionMode(ot::UID osgModelID, ot::serviceID_t rep
 void ViewerAPI::setDataBaseConnection(const std::string &databaseURL, const std::string &userName, const std::string &password)
 {
 	
-	DataBase::GetDataBase()->setDataBaseServerURL(databaseURL);
-	DataBase::GetDataBase()->setUserCredentials(userName, password);
+	DataBase::instance().setDataBaseServerURL(databaseURL);
+	DataBase::instance().setUserCredentials(userName, password);
 }
 
 void ViewerAPI::prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs)
 {
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIDs);
 }
 
 void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _versionGraphTabName) {

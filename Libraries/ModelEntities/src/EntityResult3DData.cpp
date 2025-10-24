@@ -71,7 +71,7 @@ void EntityResult3DData::LoadAllData(void)
 	{
 		{_meshDataID,_meshDataVersion}, {_xComponentDataID,_xComponentDataVersion}, {_yComponentDataID,_yComponentDataVersion}, {_zComponentDataID,_zComponentDataVersion} 
 	};
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIds);
 	
 	_xComponentData = dynamic_cast<EntityCompressedVector*>(readEntityFromEntityIDAndVersion(this, _xComponentDataID, _xComponentDataVersion, entitymap));
 	assert(_xComponentData != nullptr);

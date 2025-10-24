@@ -97,7 +97,7 @@ void Application::updateEntities(std::list<ot::UID> &entityIDs, std::list<ot::UI
 		entitiesToUpdate.push_back(std::pair<ot::UID, ot::UID>(entityID, entityVersion));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(entitiesToUpdate);
+	DataBase::instance().prefetchDocumentsFromStorage(entitiesToUpdate);
 
 	for (auto entity : entitiesToUpdate)
 	{

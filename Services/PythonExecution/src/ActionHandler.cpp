@@ -80,9 +80,9 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const std::string psw = ot::json::getString(doc, OT_PARAM_AUTH_PASSWORD);
 		const std::string collectionName = ot::json::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
 	
-		DataBase::GetDataBase()->setProjectName(collectionName);
-		DataBase::GetDataBase()->setUserCredentials(userName, psw);
-		DataBase::GetDataBase()->InitializeConnection(url);
+		DataBase::instance().setCollectionName(collectionName);
+		DataBase::instance().setUserCredentials(userName, psw);
+		DataBase::instance().initializeConnection(url);
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE) {
 		OT_LOG_D("Initialise UID Generator");

@@ -15,7 +15,8 @@
 static EntityFactoryRegistrar<EntityBlockHierarchicalProjectItem> registrar(EntityBlockHierarchicalProjectItem::className());
 
 EntityBlockHierarchicalProjectItem::EntityBlockHierarchicalProjectItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	: EntityBlock(_ID, _parent, _obs, _ms, _owner), m_previewUID(ot::invalidUID), m_previewVersion(ot::invalidUID), m_preview(nullptr)
+	: EntityBlock(_ID, _parent, _obs, _ms, _owner), m_previewUID(ot::invalidUID), m_previewVersion(ot::invalidUID), m_previewData(nullptr),
+	m_previewFormat(ot::ImageFileFormat::PNG)
 {
 	OldTreeIcon icon;
 	icon.visibleIcon = "ProjectTemplates/DefaultIcon";
@@ -44,8 +45,8 @@ ot::GraphicsItemCfg* EntityBlockHierarchicalProjectItem::createBlockCfg() {
 	if (!getUseLatestVersion()) {
 		builder.setProjectVersion(getCustomVersion());
 	}
-	if (m_preview != nullptr) {
-		builder.setPreviewImageData(m_preview->getImage(), m_preview->getImageFormat());
+	if (m_previewData != nullptr) {
+		builder.setPreviewImageData(m_previewData->getData(), m_previewFormat);
 	}
 
 	// Create the item
@@ -74,19 +75,7 @@ bool EntityBlockHierarchicalProjectItem::updateFromProperties() {
 }
 
 void EntityBlockHierarchicalProjectItem::createProperties() {
-	EntityPropertiesBase* prop = EntityPropertiesString::createProperty("Project Data", "ProjectName", "", "", getProperties());
-	prop->setVisible(false);
-	prop->setReadOnly(true);
-
-	prop = EntityPropertiesString::createProperty("Project Data", "ProjectType", "", "", getProperties());
-	prop->setVisible(false);
-	prop->setReadOnly(true);
-
-	prop = EntityPropertiesString::createProperty("Project Data", "CollectionName", "", "", getProperties());
-	prop->setVisible(false);
-	prop->setReadOnly(true);
-
-	prop = EntityPropertiesBoolean::createProperty("Project", "Use current version", true, "", getProperties());
+	EntityPropertiesBase* prop = EntityPropertiesBoolean::createProperty("Project", "Use current version", true, "", getProperties());
 	prop->setToolTip("If enabled, the last active version will be used (same as opening the project regulary).");
 
 	prop = EntityPropertiesString::createProperty("Project", "Custom version", "1", "", getProperties());
@@ -98,11 +87,12 @@ void EntityBlockHierarchicalProjectItem::createProperties() {
 
 // Data accessors
 
-void EntityBlockHierarchicalProjectItem::setPreviewFile(ot::UID _entityID, ot::UID _entityVersion) {
+void EntityBlockHierarchicalProjectItem::setPreviewFile(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format) {
 	m_previewUID = _entityID;
 	m_previewVersion = _entityVersion;
-	m_preview.reset();
-	m_preview = nullptr;
+	m_previewFormat = _format;
+	m_previewData.reset();
+	m_previewData = nullptr;
 
 	setModified();
 }
@@ -110,15 +100,15 @@ void EntityBlockHierarchicalProjectItem::setPreviewFile(ot::UID _entityID, ot::U
 void EntityBlockHierarchicalProjectItem::removePreviewFile() {
 	m_previewUID = ot::invalidUID;
 	m_previewVersion = ot::invalidUID;
-	m_preview.reset();
-	m_preview = nullptr;
+	m_previewData.reset();
+	m_previewData = nullptr;
 
 	setModified();
 }
 
-std::shared_ptr<EntityFileImage> EntityBlockHierarchicalProjectItem::getPreviewFile() {
+std::shared_ptr<EntityBinaryData> EntityBlockHierarchicalProjectItem::getPreviewFileData() {
 	ensurePreviewLoaded();
-	return m_preview;
+	return m_previewData;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -126,9 +116,9 @@ std::shared_ptr<EntityFileImage> EntityBlockHierarchicalProjectItem::getPreviewF
 // Property accessors
 
 void EntityBlockHierarchicalProjectItem::setProjectInformation(const ot::ProjectInformation& _info) {
-	PropertyHelper::setStringPropertyValue(_info.getProjectName(), this, "ProjectName");
-	PropertyHelper::setStringPropertyValue(_info.getProjectType(), this, "ProjectType");
-	PropertyHelper::setStringPropertyValue(_info.getCollectionName(), this, "CollectionName");
+	m_projectName = _info.getProjectName();
+	m_projectType = _info.getProjectType();
+	m_collectionName = _info.getCollectionName();
 
 	OldTreeIcon icon;
 	icon.visibleIcon = "ProjectTemplates/" + _info.getProjectType();
@@ -141,9 +131,9 @@ void EntityBlockHierarchicalProjectItem::setProjectInformation(const ot::Project
 ot::ProjectInformation EntityBlockHierarchicalProjectItem::getProjectInformation() const {
 	ot::ProjectInformation info;
 	
-	info.setProjectName(PropertyHelper::getStringPropertyValue(this, "ProjectName"));
-	info.setProjectType(PropertyHelper::getStringPropertyValue(this, "ProjectType"));
-	info.setCollectionName(PropertyHelper::getStringPropertyValue(this, "CollectionName"));
+	info.setProjectName(m_projectName);
+	info.setProjectType(m_projectType);
+	info.setCollectionName(m_collectionName);
 
 	return info;
 }
@@ -168,26 +158,34 @@ void EntityBlockHierarchicalProjectItem::addStorageData(bsoncxx::builder::basic:
 	EntityBlock::addStorageData(_storage);
 
 	_storage.append(
+		bsoncxx::builder::basic::kvp("ProjectName", m_projectName),
+		bsoncxx::builder::basic::kvp("ProjectType", m_projectType),
+		bsoncxx::builder::basic::kvp("CollectionName", m_collectionName),
 		bsoncxx::builder::basic::kvp("PreviewImageID", static_cast<int64_t>(m_previewUID)),
-		bsoncxx::builder::basic::kvp("PreviewImageVersion", static_cast<int64_t>(m_previewVersion))
+		bsoncxx::builder::basic::kvp("PreviewImageVersion", static_cast<int64_t>(m_previewVersion)),
+		bsoncxx::builder::basic::kvp("PreviewImageType", ot::toString(m_previewFormat))
 	);
 }
 
 void EntityBlockHierarchicalProjectItem::readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 
+	m_projectName = _docView["ProjectName"].get_utf8().value.data();
+	m_projectType = _docView["ProjectType"].get_utf8().value.data();
+	m_collectionName = _docView["CollectionName"].get_utf8().value.data();
 	m_previewUID = static_cast<ot::UID>(_docView["PreviewImageID"].get_int64());
 	m_previewVersion = static_cast<ot::UID>(_docView["PreviewImageVersion"].get_int64());
+	m_previewFormat = ot::stringToImageFileFormat(_docView["PreviewImageType"].get_utf8().value.data());
 }
 
 void EntityBlockHierarchicalProjectItem::ensurePreviewLoaded() {
 	if (m_previewUID == ot::invalidUID) {
 		return;
 	}
-	if (m_preview != nullptr) {
+	if (m_previewData != nullptr) {
 		return;
 	}
 
 	std::map<ot::UID, EntityBase*> entityMap;
-	m_preview.reset(dynamic_cast<EntityFileImage*>(readEntityFromEntityIDAndVersion(this, m_previewUID, m_previewVersion, entityMap)));
+	m_previewData.reset(dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, m_previewUID, m_previewVersion, entityMap)));
 }

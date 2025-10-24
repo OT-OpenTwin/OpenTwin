@@ -101,7 +101,7 @@ std::list<ot::UID> UpdateManager::updateParents(std::list<ot::UID> &entityIDs, s
 	std::list<ot::UID> modifiedEntities;
 	
 	// Prefetch all necessary entities (we do not use the cache for these entities, so we need to prefetch all of the top level entities)
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(entitiesToUpdate);
+	DataBase::instance().prefetchDocumentsFromStorage(entitiesToUpdate);
 
 	for (auto entity : entitiesToUpdate)
 	{
@@ -262,7 +262,7 @@ bool UpdateManager::updateBooleanParent(const std::string &type, EntityGeometry 
 	}
 
 	entityCache->removeCachedEntitiesFromList(prefetchData);
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchData);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchData);
 
 	// Load the base and tool breps
 	EntityGeometry *baseShape = dynamic_cast<EntityGeometry*>(entityCache->getEntity(baseShapeID, baseShapeVersion));
@@ -365,7 +365,7 @@ std::list<ot::UID> UpdateManager::updateEntities(std::list<ot::UID> &entityIDs, 
 	}
 
 	// Prefetch all necessary entities (we do not use the cache here, so we need to prefetch all the entities)
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(entitiesToUpdate);
+	DataBase::instance().prefetchDocumentsFromStorage(entitiesToUpdate);
 
 	std::list<ot::UID> modifiedEntities;
 

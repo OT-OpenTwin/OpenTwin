@@ -97,7 +97,7 @@ void EntityBase::storeToDataBase(ot::UID givenEntityVersion) {
 	// This item collects all information about the entity and adds it to the storage data 
 	auto doc = serialiseAsMongoDocument();
 
-	DataBase::GetDataBase()->StoreDataItem(doc);
+	DataBase::instance().storeDataItem(doc);
 
 	resetModified();
 }
@@ -115,11 +115,11 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
 	try {
 		std::string schemaVersionKey = "SchemaVersion_" + getClassName();
-		int schemaVersion = (int) DataBase::GetIntFromView(doc_view, schemaVersionKey.c_str());
+		int schemaVersion = (int) DataBase::getIntFromView(doc_view, schemaVersionKey.c_str());
 		if (schemaVersion != getSchemaVersion()) throw (std::exception());
 
-		m_entityID             = DataBase::GetIntFromView(doc_view, "EntityID");
-		m_entityStorageVersion = DataBase::GetIntFromView(doc_view, "Version");
+		m_entityID             = DataBase::getIntFromView(doc_view, "EntityID");
+		m_entityStorageVersion = DataBase::getIntFromView(doc_view, "Version");
 		m_name                 = doc_view["Name"].get_utf8().value.data();
 		m_initiallyHidden      = doc_view["initiallyHidden"].get_bool();
 		auto bsonObj           = doc_view["Properties"].get_document();
@@ -195,7 +195,7 @@ ot::UID EntityBase::createEntityUID(void) {
 EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap) {
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, version, doc)) {
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, version, doc)) {
 		return nullptr;
 	}
 

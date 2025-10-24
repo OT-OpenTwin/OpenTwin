@@ -215,8 +215,8 @@ void Geometry::readBSON(bsoncxx::document::view &trianglesObj, std::list<Geometr
 	{
 		Geometry::Triangle triangle;
 
-		triangle.setNodes(DataBase::GetIntFromArrayViewIterator(n1), DataBase::GetIntFromArrayViewIterator(n2), DataBase::GetIntFromArrayViewIterator(n3));
-		triangle.setFaceId(DataBase::GetIntFromArrayViewIterator(fID));
+		triangle.setNodes(DataBase::getIntFromArrayViewIterator(n1), DataBase::getIntFromArrayViewIterator(n2), DataBase::getIntFromArrayViewIterator(n3));
+		triangle.setFaceId(DataBase::getIntFromArrayViewIterator(fID));
 
 		triangles.push_back(triangle);
 
@@ -253,8 +253,8 @@ void Geometry::readBSON(bsoncxx::document::view &edgesObj, std::list<Geometry::E
 	{
 		Geometry::Edge edge;
 
-		edge.setNpoints((int)DataBase::GetIntFromArrayViewIterator(nP));
-		edge.setFaceId(DataBase::GetIntFromArrayViewIterator(fID));
+		edge.setNpoints((int)DataBase::getIntFromArrayViewIterator(nP));
+		edge.setFaceId(DataBase::getIntFromArrayViewIterator(fID));
 
 		for (unsigned long point = 0; point < (unsigned long) edge.getNpoints(); point++)
 		{
@@ -286,7 +286,7 @@ void Geometry::readBSON(bsoncxx::document::view& faceNamesObj, std::map<ot::UID,
 
 	for (unsigned long index = 0; index < numberIds; index++)
 	{
-		ot::UID id = DataBase::GetIntFromArrayViewIterator(pId);
+		ot::UID id = DataBase::getIntFromArrayViewIterator(pId);
 		std::string name = std::string(pName->get_utf8().value.data());
 
 		pId++;

@@ -232,7 +232,7 @@ void Application::updateMesh(void) {
 		prefetchIdsMesher.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsMesher);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdsMesher);
 
 	// Now read the solver objects for each solver
 	std::map<std::string, EntityMeshTet *> mesherMap;

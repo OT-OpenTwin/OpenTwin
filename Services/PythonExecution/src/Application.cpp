@@ -42,7 +42,7 @@ void Application::prefetchDocumentsFromStorage(const std::list<ot::EntityInforma
 		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(entity.getEntityID(), entity.getEntityVersion()));
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdandVersion);
 }
 ot::UID Application::getPrefetchedEntityVersion(ot::UID entityID)
 {

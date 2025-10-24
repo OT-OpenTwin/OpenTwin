@@ -2643,7 +2643,7 @@ void ExternalServicesComponent::handleAddNodeFromDataBase(ot::JsonDocument& _doc
 	bool manageParentVisibility = _document[OT_ACTION_PARAM_MODEL_ITM_ManageParentVis].GetBool();
 	bool manageChildVisibility = _document[OT_ACTION_PARAM_MODEL_ITM_ManageChildVis].GetBool();
 	bool showWhenSelected = _document[OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected].GetBool();
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
 	ModelUIDtype entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 	ModelUIDtype entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
@@ -2659,7 +2659,7 @@ void ExternalServicesComponent::handleAddNodeFromDataBase(ot::JsonDocument& _doc
 	}
 
 	AppBase::instance()->getViewerComponent()->addNodeFromFacetDataBase(visModelID, treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective,
-		modelEntityID, treeIcons, backFaceCulling, offsetFactor, isHidden, editable, projectName, entityID,
+		modelEntityID, treeIcons, backFaceCulling, offsetFactor, isHidden, editable, collectionName, entityID,
 		entityVersion, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation);
 }
 
@@ -2680,13 +2680,13 @@ void ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _document
 	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
 	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 
 	ot::UID visualizationDataID = _document[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
 	ot::UID visualizationDataVersion = _document[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
 
-	AppBase::instance()->getViewerComponent()->addVisualizationVis2D3DNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, editable, projectName, visualizationDataID, visualizationDataVersion);
+	AppBase::instance()->getViewerComponent()->addVisualizationVis2D3DNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, editable, collectionName, visualizationDataID, visualizationDataVersion);
 }
 
 void ExternalServicesComponent::handleAddAnnotationNode(ot::JsonDocument& _document) {
@@ -2713,12 +2713,12 @@ void ExternalServicesComponent::handleAddAnnotationNodeFromDataBase(ot::JsonDocu
 	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 	ot::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
 	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
 	ot::UID entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 	ot::UID entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 
-	ViewerAPI::addVisualizationAnnotationNodeDataBase(visModelID, name, uid, treeIcons, isHidden, projectName, entityID, entityVersion);
+	ViewerAPI::addVisualizationAnnotationNodeDataBase(visModelID, name, uid, treeIcons, isHidden, collectionName, entityID, entityVersion);
 }
 
 void ExternalServicesComponent::handleAddMeshNodeFromFacetDataBase(ot::JsonDocument& _document) {
@@ -2729,13 +2729,13 @@ void ExternalServicesComponent::handleAddMeshNodeFromFacetDataBase(ot::JsonDocum
 	edgeColorRGB[0] = _document[OT_ACTION_PARAM_MODEL_EDGE_COLOR_R].GetDouble();
 	edgeColorRGB[1] = _document[OT_ACTION_PARAM_MODEL_EDGE_COLOR_G].GetDouble();
 	edgeColorRGB[2] = _document[OT_ACTION_PARAM_MODEL_EDGE_COLOR_B].GetDouble();
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
 	ot::UID entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 	ot::UID entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 	bool displayTetEdges = _document[OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES].GetBool();
 	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 
-	ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(visModelID, name, uid, treeIcons, edgeColorRGB, displayTetEdges, projectName, entityID, entityVersion);
+	ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(visModelID, name, uid, treeIcons, edgeColorRGB, displayTetEdges, collectionName, entityID, entityVersion);
 }
 
 void ExternalServicesComponent::handleAddCartesianMeshNode(ot::JsonDocument& _document) {
@@ -2755,14 +2755,14 @@ void ExternalServicesComponent::handleAddCartesianMeshNode(ot::JsonDocument& _do
 	std::vector<double> meshCoordsY = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_MESH_CartesianCoordY);
 	std::vector<double> meshCoordsZ = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_MESH_CartesianCoordZ);
 	bool showMeshLines = _document[OT_ACTION_PARAM_MESH_ShowMeshLines].GetBool();
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
 	ot::UID faceListEntityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 	ot::UID faceListEntityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 	ot::UID nodeListEntityID = _document[OT_ACTION_PARAM_MESH_NODE_ID].GetUint64();
 	ot::UID nodeListEntityVersion = _document[OT_ACTION_PARAM_MESH_NODE_VERSION].GetUint64();
 	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 
-	ViewerAPI::addVisualizationCartesianMeshNode(visModelID, name, uid, treeIcons, isHidden, edgeColorRGB, meshLineColorRGB, showMeshLines, meshCoordsX, meshCoordsY, meshCoordsZ, projectName, faceListEntityID, faceListEntityVersion, nodeListEntityID, nodeListEntityVersion);
+	ViewerAPI::addVisualizationCartesianMeshNode(visModelID, name, uid, treeIcons, isHidden, edgeColorRGB, meshLineColorRGB, showMeshLines, meshCoordsX, meshCoordsY, meshCoordsZ, collectionName, faceListEntityID, faceListEntityVersion, nodeListEntityID, nodeListEntityVersion);
 }
 
 void ExternalServicesComponent::handleAddCartesianMeshItem(ot::JsonDocument& _document) {
@@ -2785,14 +2785,14 @@ void ExternalServicesComponent::handleAddMeshItemFromFacetDatabase(ot::JsonDocum
 	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
 	ot::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
 	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
 	ot::UID entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 	ot::UID entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	long long tetEdgesID = _document[OT_ACTION_PARAM_MODEL_TETEDGES_ID].GetUint64();;
 	long long tetEdgesVersion = _document[OT_ACTION_PARAM_MODEL_TETEDGES_Version].GetUint64();
 
-	ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(visModelID, name, uid, treeIcons, isHidden, projectName, entityID, entityVersion, tetEdgesID, tetEdgesVersion);
+	ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(visModelID, name, uid, treeIcons, isHidden, collectionName, entityID, entityVersion, tetEdgesID, tetEdgesVersion);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -60,7 +60,7 @@ void SceneNodeMeshItem::ensureDataLoaded(void)
 
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
 	{
 		assert(0);
 		return;
@@ -76,7 +76,7 @@ void SceneNodeMeshItem::ensureDataLoaded(void)
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityMeshTetItem");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityMeshTetItem");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -90,7 +90,7 @@ void SceneNodeMeshItem::ensureDataLoaded(void)
 	colorRGB[2] = doc_view["ColorB"].get_double();
 
 	// Determine whether we have a volume
-	isVolume = (DataBase::GetIntFromView(doc_view, "NumberTets") > 0);
+	isVolume = (DataBase::getIntFromView(doc_view, "NumberTets") > 0);
 
 	// Read information about the actual face storage
 
@@ -103,15 +103,15 @@ void SceneNodeMeshItem::ensureDataLoaded(void)
 
 	for (unsigned long index = 0; index < numberFaces; index++)
 	{
-		faceID[index] = DataBase::GetIntFromArrayViewIterator(face);
+		faceID[index] = DataBase::getIntFromArrayViewIterator(face);
 		getMesh()->addOwner(this, faceID[index]);
 
 		face++;
 	}
 
 	// Read information about the internal edges storage
-	meshDataTetEdgesID = DataBase::GetIntFromView(doc_view, "MeshDataTetEdgesID", 0);
-	meshDataTetEdgesVersion = DataBase::GetIntFromView(doc_view, "MeshDataTetEdgesVersion", 0);
+	meshDataTetEdgesID = DataBase::getIntFromView(doc_view, "MeshDataTetEdgesID", 0);
+	meshDataTetEdgesVersion = DataBase::getIntFromView(doc_view, "MeshDataTetEdgesVersion", 0);
 
 	if (getMesh()->getDisplayTetEdges() && meshDataTetEdgesID > 0)
 	{
@@ -210,7 +210,7 @@ void SceneNodeMeshItem::loadEdgeData(void)
 {
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(meshDataTetEdgesID, meshDataTetEdgesVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(meshDataTetEdgesID, meshDataTetEdgesVersion, doc))
 	{
 		assert(0);
 		return;
@@ -226,7 +226,7 @@ void SceneNodeMeshItem::loadEdgeData(void)
 		return;
 	}
 
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityMeshTetItemDataTetedges");
+	int schemaVersion = (int)DataBase::getIntFromView(doc_view, "SchemaVersion_EntityMeshTetItemDataTetedges");
 	if (schemaVersion != 1)
 	{
 		assert(0);
@@ -297,8 +297,8 @@ void SceneNodeMeshItem::loadEdgeData(void)
 
 		for (unsigned long eindex = 0; eindex < numberEdges; eindex++)
 		{
-			size_t node1 = (size_t)DataBase::GetIntFromArrayViewIterator(n1);
-			size_t node2 = (size_t)DataBase::GetIntFromArrayViewIterator(n2);
+			size_t node1 = (size_t)DataBase::getIntFromArrayViewIterator(n1);
+			size_t node2 = (size_t)DataBase::getIntFromArrayViewIterator(n2);
 
 			vertices->at(nVertex).set(getMesh()->getNodeX(node1), getMesh()->getNodeY(node1), getMesh()->getNodeZ(node1));
 			vertices->at(nVertex + 1).set(getMesh()->getNodeX(node2), getMesh()->getNodeY(node2), getMesh()->getNodeZ(node2));

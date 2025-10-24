@@ -75,7 +75,7 @@ void TemplateDefaultManager::loadDefaultTemplate(void)
 	defaultTemplateName.clear();
 
 	// We are searching for the entity with schema type DefaultTemplate
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto queryDoc = bsoncxx::builder::basic::document{};
 	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "DefaultTemplate"));

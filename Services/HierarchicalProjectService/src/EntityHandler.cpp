@@ -13,6 +13,8 @@
 #include "OTGui/FileExtension.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "DataBase.h"
+#include "ModelState.h"
 #include "NewModelStateInfo.h"
 #include "OTServiceFoundation/Encryption.h"
 #include "EntityAPI.h"
@@ -78,6 +80,20 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 	// Initialize project information
 	blockEntity.createProperties();
 	blockEntity.setProjectInformation(_projectInfo);
+
+	// Read preview image if existing
+	std::vector<char> previewImageData;
+	ot::ImageFileFormat previewImageFormat = ot::ImageFileFormat::PNG;
+	if (ModelState::readProjectPreviewImage(_projectInfo.getCollectionName(), previewImageData, previewImageFormat)) {
+		// Create data entity for preview image
+		EntityBinaryData previewImageDataEntity;
+		previewImageDataEntity.setOwningService(serviceName);
+		previewImageDataEntity.setEntityID(_modelComponent->createEntityUID());
+		previewImageDataEntity.setData(std::move(previewImageData));
+		previewImageDataEntity.storeToDataBase();
+		blockEntity.setPreviewFile(previewImageDataEntity, previewImageFormat);
+		newEntities.addDataEntity(blockCoordinates.getEntityID(), previewImageDataEntity);
+	}
 
 	// Store to DB
 	blockEntity.storeToDataBase();
@@ -398,13 +414,7 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 	if (projectEntity->hasPreviewFile()) {
 		ot::NewModelStateInfo update;
 
-		auto previewFileEntity = projectEntity->getPreviewFile();
-		if (!previewFileEntity) {
-			OT_LOG_E("Could not load existing preview file entity { \"ProjectEntity\": \"" + _projectEntityName + "\" }");
-			return false;
-		}
-
-		auto dataEntity = previewFileEntity->getDataEntity();
+		auto dataEntity = projectEntity->getPreviewFileData();
 		if (!dataEntity) {
 			OT_LOG_E("Could not load existing preview file data entity { \"ProjectEntity\": \"" + _projectEntityName + "\" }");
 			return false;
@@ -414,11 +424,7 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 		dataEntity->setData(std::move(fileData));
 		dataEntity->storeToDataBase();
 
-		previewFileEntity->setImageFormat(format);
-		previewFileEntity->setDataEntity(*dataEntity);
-		previewFileEntity->storeToDataBase();
-
-		projectEntity->setPreviewFile(*previewFileEntity);
+		projectEntity->setPreviewFile(*dataEntity, format);
 		projectEntity->storeToDataBase();
 
 		update.addTopologyEntity(*projectEntity);
@@ -434,26 +440,14 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 		// Create file data entity
 		EntityBinaryData imageDataEntity;
 		imageDataEntity.setOwningService(serviceName);
-		//imageDataEntity.setName(CreateNewUniqueTopologyName(imageEntity->getName(), "ImageData"));
 		imageDataEntity.setEntityID(_modelComponent->createEntityUID());
 		imageDataEntity.setData(unpackedData.c_str(), unpackedData.size());
 		imageDataEntity.storeToDataBase();
 
-		// Create file entity
-		EntityFileImage imageEntity;
-		imageEntity.setOwningService(serviceName);
-		//imageEntity.setName(CreateNewUniqueTopologyName(projectEntity->getName(), "Image"));
-		imageEntity.setEntityID(_modelComponent->createEntityUID());
-		imageEntity.setFileProperties(_fileName, fileNameOnly, extension);
-		imageEntity.setImageFormat(format);
-		imageEntity.setDataEntity(imageDataEntity);
-		imageEntity.storeToDataBase();
-
-		newData.addDataEntity(*projectEntity, imageEntity);
 		newData.addDataEntity(*projectEntity, imageDataEntity);
 
 		// Set preview file in project entity
-		projectEntity->setPreviewFile(imageEntity);
+		projectEntity->setPreviewFile(imageDataEntity, format);
 		projectEntity->storeToDataBase();
 		existingTopo.addTopologyEntity(*projectEntity);
 
