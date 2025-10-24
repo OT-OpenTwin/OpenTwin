@@ -33,11 +33,11 @@ namespace ot { class LineEdit; }
 namespace ot { class TableItem; }
 namespace ot { class ToolButton; }
 
-class ProjectOverviewEntry : public QObject {
+class ProjectOverviewEntryOld : public QObject {
 	Q_OBJECT
-	OT_DECL_NODEFAULT(ProjectOverviewEntry)
+	OT_DECL_NODEFAULT(ProjectOverviewEntryOld)
 public:
-	ProjectOverviewEntry(const ot::ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table);
+	ProjectOverviewEntryOld(const ot::ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table);
 
 	void setIsChecked(bool _checked);
 	bool getIsChecked() const;
@@ -68,17 +68,17 @@ private:
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-class ProjectOverviewWidget : public QObject, public ot::WidgetBase, public LockableWidget {
+class WelcomeWidget : public QObject, public ot::WidgetBase, public LockableWidget {
 	Q_OBJECT
-	OT_DECL_NODEFAULT(ProjectOverviewWidget)
+	OT_DECL_NODEFAULT(WelcomeWidget)
 public:
 	enum class ViewMode {
 		ViewAll,
 		ViewRecent
 	};
 
-	ProjectOverviewWidget(tt::Page* _ttbPage);
-	virtual ~ProjectOverviewWidget();
+	WelcomeWidget(tt::Page* _ttbPage);
+	virtual ~WelcomeWidget();
 
 	virtual void setWidgetLocked(bool _isLocked) override;
 
@@ -136,7 +136,7 @@ private:
 	void updateToggleViewModeButton();
 	void updateToolButtonsEnabledState(bool _forceDisabled = false);
 	bool hasDifferentSelectedOwner();
-	ProjectOverviewEntry* findEntry(const QString& _projectName);
+	ProjectOverviewEntryOld* findEntry(const QString& _projectName);
 	
 	ViewMode m_mode;
 
@@ -160,5 +160,5 @@ private:
 	ot::ToolButton* m_accessButton;
 	ot::ToolButton* m_ownerButton;
 
-	std::list<ProjectOverviewEntry*> m_entries;
+	std::list<ProjectOverviewEntryOld*> m_entries;
 };

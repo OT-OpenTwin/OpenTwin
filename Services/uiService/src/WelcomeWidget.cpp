@@ -5,9 +5,9 @@
 
 // Frontend header
 #include "AppBase.h"
+#include "WelcomeWidget.h"
 #include "UserManagement.h"
 #include "ProjectManagement.h"
-#include "ProjectOverviewWidget.h"
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
@@ -39,7 +39,7 @@ enum TableColumn {
 	ColumnCount
 };
 
-ProjectOverviewEntry::ProjectOverviewEntry(const ot::ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table)
+ProjectOverviewEntryOld::ProjectOverviewEntryOld(const ot::ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table)
 	: m_ownerIsCreator(_ownerIsCreator), m_table(_table)
 {
 	int row = _table->rowCount();
@@ -98,22 +98,22 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ot::ProjectInformation& _projec
 	_table->setItem(row, TableColumn::ColumnGroups, m_groupsItem);
 	_table->setItem(row, TableColumn::ColumnLastAccess, m_lastAccessTimeItem);
 
-	this->connect(m_checkBox, &ot::CheckBox::stateChanged, this, &ProjectOverviewEntry::slotCheckedChanged);
+	this->connect(m_checkBox, &ot::CheckBox::stateChanged, this, &ProjectOverviewEntryOld::slotCheckedChanged);
 }
 
-void ProjectOverviewEntry::setIsChecked(bool _checked) {
+void ProjectOverviewEntryOld::setIsChecked(bool _checked) {
 	m_checkBox->setChecked(_checked);
 }
 
-bool ProjectOverviewEntry::getIsChecked() const {
+bool ProjectOverviewEntryOld::getIsChecked() const {
 	return m_checkBox->isChecked();
 }
 
-QString ProjectOverviewEntry::getProjectName() const {
+QString ProjectOverviewEntryOld::getProjectName() const {
 	return m_nameItem->text();
 }
 
-void ProjectOverviewEntry::slotCheckedChanged() {
+void ProjectOverviewEntryOld::slotCheckedChanged() {
 	bool isBlock = m_table->signalsBlocked();
 	m_table->blockSignals(true);
 	m_typeItem->setSelected(m_checkBox->isChecked());
@@ -131,7 +131,7 @@ void ProjectOverviewEntry::slotCheckedChanged() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
+WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage)
 	: m_mode(ViewMode::ViewAll)
 {
 	// Create layouts
@@ -196,28 +196,28 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	centralLayout->addWidget(glWidget);
 
 	// Connect signals
-	this->connect(m_filter, &ot::LineEdit::textChanged, this, &ProjectOverviewWidget::slotFilterChanged);
-	this->connect(m_table, &ot::Table::cellDoubleClicked, this, &ProjectOverviewWidget::slotProjectDoubleClicked);
-	this->connect(m_table, &ot::Table::itemSelectionChanged, this, &ProjectOverviewWidget::slotUpdateItemSelection);
-	this->connect(m_table->horizontalHeader(), &QHeaderView::sectionClicked, this, &ProjectOverviewWidget::slotTableHeaderItemClicked);
-	this->connect(m_table->horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &ProjectOverviewWidget::slotTableHeaderSortingChanged);
-	this->connect(m_createButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotCreateProject);
-	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotRefreshProjectList);
-	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotToggleViewMode);
-	this->connect(m_openButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotOpenProject);
-	this->connect(m_copyButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotCopyProject);
-	this->connect(m_renameButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotRenameProject);
-	this->connect(m_deleteButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotDeleteProject);
-	this->connect(m_exportButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotExportProject);
-	this->connect(m_accessButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotAccessProject);
-	this->connect(m_ownerButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotOwnerProject);
+	this->connect(m_filter, &ot::LineEdit::textChanged, this, &WelcomeWidget::slotFilterChanged);
+	this->connect(m_table, &ot::Table::cellDoubleClicked, this, &WelcomeWidget::slotProjectDoubleClicked);
+	this->connect(m_table, &ot::Table::itemSelectionChanged, this, &WelcomeWidget::slotUpdateItemSelection);
+	this->connect(m_table->horizontalHeader(), &QHeaderView::sectionClicked, this, &WelcomeWidget::slotTableHeaderItemClicked);
+	this->connect(m_table->horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &WelcomeWidget::slotTableHeaderSortingChanged);
+	this->connect(m_createButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCreateProject);
+	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRefreshProjectList);
+	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotToggleViewMode);
+	this->connect(m_openButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOpenProject);
+	this->connect(m_copyButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCopyProject);
+	this->connect(m_renameButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRenameProject);
+	this->connect(m_deleteButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotDeleteProject);
+	this->connect(m_exportButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotExportProject);
+	this->connect(m_accessButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotAccessProject);
+	this->connect(m_ownerButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOwnerProject);
 }
 
-ProjectOverviewWidget::~ProjectOverviewWidget() {
+WelcomeWidget::~WelcomeWidget() {
 
 }
 
-void ProjectOverviewWidget::setWidgetLocked(bool _isLocked) {
+void WelcomeWidget::setWidgetLocked(bool _isLocked) {
 	m_widget->setEnabled(!_isLocked);
 	this->updateToolButtonsEnabledState(_isLocked);
 	m_createButton->setEnabled(!_isLocked);
@@ -225,7 +225,7 @@ void ProjectOverviewWidget::setWidgetLocked(bool _isLocked) {
 	m_toggleViewModeButton->setEnabled(!_isLocked);
 }
 
-bool ProjectOverviewWidget::eventFilter(QObject* _watched, QEvent* _event) {
+bool WelcomeWidget::eventFilter(QObject* _watched, QEvent* _event) {
 	if (_watched == m_table && _event->type() == QEvent::KeyPress) {
 		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(_event);
 		if (!keyEvent) {
@@ -252,13 +252,13 @@ bool ProjectOverviewWidget::eventFilter(QObject* _watched, QEvent* _event) {
 	return false;
 }
 
-QString ProjectOverviewWidget::getCurrentProjectFilter() const {
+QString WelcomeWidget::getCurrentProjectFilter() const {
 	return m_filter->text();
 }
 
-std::list<QString> ProjectOverviewWidget::getSelectedProjects() const {
+std::list<QString> WelcomeWidget::getSelectedProjects() const {
 	std::list<QString> result;
-	for (ProjectOverviewEntry* entry : m_entries) {
+	for (ProjectOverviewEntryOld* entry : m_entries) {
 		if (entry->getIsChecked()) {
 			result.push_back(entry->getProjectName());
 		}
@@ -266,15 +266,15 @@ std::list<QString> ProjectOverviewWidget::getSelectedProjects() const {
 	return result;
 }
 
-void ProjectOverviewWidget::refreshProjectList() {
+void WelcomeWidget::refreshProjectList() {
 	this->slotRefreshProjectList();
 }
 
-void ProjectOverviewWidget::refreshRecentProjects() {
+void WelcomeWidget::refreshRecentProjects() {
 	this->slotRefreshRecentProjects();
 }
 
-void ProjectOverviewWidget::slotUpdateItemSelection() {
+void WelcomeWidget::slotUpdateItemSelection() {
 	QList<QTableWidgetItem*> selection = m_table->selectedItems();
 	bool isBlock = m_table->signalsBlocked();
 	m_table->blockSignals(true);
@@ -286,7 +286,7 @@ void ProjectOverviewWidget::slotUpdateItemSelection() {
 			break;
 		}
 
-		ProjectOverviewEntry* entry = this->findEntry(m_table->item(r, TableColumn::ColumnName)->text());
+		ProjectOverviewEntryOld* entry = this->findEntry(m_table->item(r, TableColumn::ColumnName)->text());
 		if (entry) {
 			entry->setIsChecked(m_table->item(r, TableColumn::ColumnType)->isSelected() || m_table->item(r, TableColumn::ColumnName)->isSelected() || m_table->item(r, TableColumn::ColumnOwner)->isSelected() || m_table->item(r, TableColumn::ColumnGroups)->isSelected() || m_table->item(r, TableColumn::ColumnLastAccess)->isSelected());
 		}
@@ -298,20 +298,20 @@ void ProjectOverviewWidget::slotUpdateItemSelection() {
 	m_table->blockSignals(isBlock);
 }
 
-void ProjectOverviewWidget::slotCreateProject() {
+void WelcomeWidget::slotCreateProject() {
 	Q_EMIT createProjectRequest();
 }
 
-void ProjectOverviewWidget::slotProjectDoubleClicked(int _row, int _column) {
+void WelcomeWidget::slotProjectDoubleClicked(int _row, int _column) {
 	if (_row < 0 || _row >= m_entries.size()) {
 		OT_LOG_EA("Index out of range");
 		return;
 	}
-	for (ProjectOverviewEntry* entry : m_entries) {
+	for (ProjectOverviewEntryOld* entry : m_entries) {
 		entry->setIsChecked(false);
 	}
 
-	ProjectOverviewEntry* entry = this->findEntry(m_table->item(_row, TableColumn::ColumnName)->text());
+	ProjectOverviewEntryOld* entry = this->findEntry(m_table->item(_row, TableColumn::ColumnName)->text());
 	if (entry) {
 		entry->setIsChecked(true);
 		this->slotOpenProject();
@@ -321,10 +321,10 @@ void ProjectOverviewWidget::slotProjectDoubleClicked(int _row, int _column) {
 	}
 }
 
-void ProjectOverviewWidget::slotTableHeaderItemClicked(int _column) {
+void WelcomeWidget::slotTableHeaderItemClicked(int _column) {
 	if (_column == TableColumn::ColumnCheck) {
 		bool allChecked = true;
-		for (ProjectOverviewEntry* entry : m_entries) {
+		for (ProjectOverviewEntryOld* entry : m_entries) {
 			if (!entry->getIsChecked()) {
 				allChecked = false;
 				QSignalBlocker sigBlock(m_table);
@@ -334,23 +334,23 @@ void ProjectOverviewWidget::slotTableHeaderItemClicked(int _column) {
 
 		if (allChecked) {
 			QSignalBlocker sigBlock(m_table);
-			for (ProjectOverviewEntry* entry : m_entries) {
+			for (ProjectOverviewEntryOld* entry : m_entries) {
 				entry->setIsChecked(false);
 			}
 		}
 	}
 }
 
-void ProjectOverviewWidget::slotTableHeaderSortingChanged(int _column, Qt::SortOrder _order) {
+void WelcomeWidget::slotTableHeaderSortingChanged(int _column, Qt::SortOrder _order) {
 	m_table->horizontalHeader()->setSortIndicatorShown(_column != TableColumn::ColumnCheck);
 }
 
-void ProjectOverviewWidget::slotRefreshProjectList() {
+void WelcomeWidget::slotRefreshProjectList() {
 	switch (m_mode) {
-	case ProjectOverviewWidget::ViewMode::ViewAll:
+	case WelcomeWidget::ViewMode::ViewAll:
 		this->slotRefreshAllProjects();
 		break;
-	case ProjectOverviewWidget::ViewMode::ViewRecent:
+	case WelcomeWidget::ViewMode::ViewRecent:
 		this->slotRefreshRecentProjects();
 		break;
 	default:
@@ -359,7 +359,7 @@ void ProjectOverviewWidget::slotRefreshProjectList() {
 	}
 }
 
-void ProjectOverviewWidget::slotRefreshRecentProjects() {
+void WelcomeWidget::slotRefreshRecentProjects() {
 	this->clear();
 
 	m_mode = ViewMode::ViewRecent;
@@ -396,7 +396,7 @@ void ProjectOverviewWidget::slotRefreshRecentProjects() {
 	this->updateToolButtonsEnabledState();
 }
 
-void ProjectOverviewWidget::slotRefreshAllProjects() {
+void WelcomeWidget::slotRefreshAllProjects() {
 	this->clear();
 
 	m_mode = ViewMode::ViewAll;
@@ -422,12 +422,12 @@ void ProjectOverviewWidget::slotRefreshAllProjects() {
 	this->updateToolButtonsEnabledState();
 }
 
-void ProjectOverviewWidget::slotToggleViewMode() {
+void WelcomeWidget::slotToggleViewMode() {
 	switch (m_mode) {
-	case ProjectOverviewWidget::ViewMode::ViewAll:
+	case WelcomeWidget::ViewMode::ViewAll:
 		m_mode = ViewMode::ViewRecent;
 		break;
-	case ProjectOverviewWidget::ViewMode::ViewRecent:
+	case WelcomeWidget::ViewMode::ViewRecent:
 		m_mode = ViewMode::ViewAll;
 		break;
 	default:
@@ -438,37 +438,37 @@ void ProjectOverviewWidget::slotToggleViewMode() {
 	this->slotRefreshProjectList();
 }
 
-void ProjectOverviewWidget::slotOpenProject() {
+void WelcomeWidget::slotOpenProject() {
 	Q_EMIT openProjectRequest();
 }
 
-void ProjectOverviewWidget::slotCopyProject() {
+void WelcomeWidget::slotCopyProject() {
 	Q_EMIT copyProjectRequest();
 }
 
-void ProjectOverviewWidget::slotRenameProject() {
+void WelcomeWidget::slotRenameProject() {
 	Q_EMIT renameProjectRequest();
 }
 
-void ProjectOverviewWidget::slotDeleteProject() {
+void WelcomeWidget::slotDeleteProject() {
 	Q_EMIT deleteProjectRequest();
 }
 
-void ProjectOverviewWidget::slotExportProject() {
+void WelcomeWidget::slotExportProject() {
 	Q_EMIT exportProjectRequest();
 }
 
-void ProjectOverviewWidget::slotAccessProject() {
+void WelcomeWidget::slotAccessProject() {
 	Q_EMIT projectAccessRequest();
 	this->refreshProjectList();
 }
 
-void ProjectOverviewWidget::slotOwnerProject() {
+void WelcomeWidget::slotOwnerProject() {
 	Q_EMIT projectOwnerRequest();
 	this->refreshProjectList();
 }
 
-void ProjectOverviewWidget::slotFilterChanged() {
+void WelcomeWidget::slotFilterChanged() {
 	if (m_filter->text().isEmpty()) {
 		for (int r = 0; r < m_table->rowCount(); r++) {
 			m_table->setRowHidden(r, false);
@@ -482,11 +482,11 @@ void ProjectOverviewWidget::slotFilterChanged() {
 	}
 }
 
-void ProjectOverviewWidget::slotProjectCheckedChanged() {
+void WelcomeWidget::slotProjectCheckedChanged() {
 	this->updateToolButtonsEnabledState();
 }
 
-ot::ToolButton* ProjectOverviewWidget::iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip) {
+ot::ToolButton* WelcomeWidget::iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip) {
 	ot::ToolButton* newButton = new ot::ToolButton(ot::IconManager::getIcon(_iconPath), _text);
 	const int iconSize = QApplication::style()->pixelMetric(QStyle::PM_LargeIconSize);
 	newButton->setAutoRaise(true);
@@ -501,7 +501,7 @@ ot::ToolButton* ProjectOverviewWidget::iniToolButton(const QString& _text, const
 	return newButton;
 }
 
-void ProjectOverviewWidget::clear() {
+void WelcomeWidget::clear() {
 	QSignalBlocker sigBlock(m_table);
 	int ix = m_table->horizontalHeader()->sortIndicatorSection();
 	Qt::SortOrder order = m_table->horizontalHeader()->sortIndicatorOrder();
@@ -509,8 +509,8 @@ void ProjectOverviewWidget::clear() {
 	bool wasSortingEnabled = m_table->isSortingEnabled();
 	m_table->setSortingEnabled(false);
 
-	for (ProjectOverviewEntry* entry : m_entries) {
-		this->disconnect(entry, &ProjectOverviewEntry::checkedChanged, this, &ProjectOverviewWidget::slotProjectCheckedChanged);
+	for (ProjectOverviewEntryOld* entry : m_entries) {
+		this->disconnect(entry, &ProjectOverviewEntryOld::checkedChanged, this, &WelcomeWidget::slotProjectCheckedChanged);
 		delete entry;
 	}
 	m_entries.clear();
@@ -525,7 +525,7 @@ void ProjectOverviewWidget::clear() {
 	}
 }
 
-void ProjectOverviewWidget::addProject(const ot::ProjectInformation& _projectInfo, bool _ownerIsCreator) {
+void WelcomeWidget::addProject(const ot::ProjectInformation& _projectInfo, bool _ownerIsCreator) {
 	QSignalBlocker sigBlock(m_table);
 	
 	int ix = m_table->horizontalHeader()->sortIndicatorSection();
@@ -543,9 +543,9 @@ void ProjectOverviewWidget::addProject(const ot::ProjectInformation& _projectInf
 		projectTypeIcon = ot::IconManager::getDefaultProjectIcon();
 	}
 
-	ProjectOverviewEntry* newEntry = new ProjectOverviewEntry(_projectInfo, projectTypeIcon, _ownerIsCreator, m_table);
+	ProjectOverviewEntryOld* newEntry = new ProjectOverviewEntryOld(_projectInfo, projectTypeIcon, _ownerIsCreator, m_table);
 	m_entries.push_back(newEntry);
-	this->connect(newEntry, &ProjectOverviewEntry::checkedChanged, this, &ProjectOverviewWidget::slotProjectCheckedChanged);
+	this->connect(newEntry, &ProjectOverviewEntryOld::checkedChanged, this, &WelcomeWidget::slotProjectCheckedChanged);
 
 	if (wasSortingEnabled) {
 		m_table->setSortingEnabled(true);
@@ -556,7 +556,7 @@ void ProjectOverviewWidget::addProject(const ot::ProjectInformation& _projectInf
 	}
 }
 
-void ProjectOverviewWidget::updateCountLabel(bool _hasMore) {
+void WelcomeWidget::updateCountLabel(bool _hasMore) {
 	if (m_entries.empty()) {
 		m_countLabel->setText("No projects found");
 	}
@@ -578,14 +578,14 @@ void ProjectOverviewWidget::updateCountLabel(bool _hasMore) {
 	}
 }
 
-void ProjectOverviewWidget::updateToggleViewModeButton() {
+void WelcomeWidget::updateToggleViewModeButton() {
 	switch (m_mode) {
-	case ProjectOverviewWidget::ViewMode::ViewAll:
+	case WelcomeWidget::ViewMode::ViewAll:
 		m_toggleViewModeButton->setText("View Recent");
 		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("ToolBar/ViewRecentProjects.png"));
 		m_toggleViewModeButton->setToolTip("View recent projects (Currently showing all projects)");
 		break;
-	case ProjectOverviewWidget::ViewMode::ViewRecent:
+	case WelcomeWidget::ViewMode::ViewRecent:
 		m_toggleViewModeButton->setText("View All");
 		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("ToolBar/ViewAllProjects.png"));
 		m_toggleViewModeButton->setToolTip("View all projects (Currently showing recent projects)");
@@ -596,7 +596,7 @@ void ProjectOverviewWidget::updateToggleViewModeButton() {
 	}
 }
 
-void ProjectOverviewWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
+void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
 	std::list<QString> lst = this->getSelectedProjects();
 	bool hasDifferentOwner = this->hasDifferentSelectedOwner();
 
@@ -629,8 +629,8 @@ void ProjectOverviewWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
 	}
 }
 
-bool ProjectOverviewWidget::hasDifferentSelectedOwner() {
-	for (ProjectOverviewEntry* entry : m_entries) {
+bool WelcomeWidget::hasDifferentSelectedOwner() {
+	for (ProjectOverviewEntryOld* entry : m_entries) {
 		if (entry->getIsChecked()) {
 			if (!entry->getOwnerIsCreator()) return true;
 		}
@@ -638,8 +638,8 @@ bool ProjectOverviewWidget::hasDifferentSelectedOwner() {
 	return false;
 }
 
-ProjectOverviewEntry* ProjectOverviewWidget::findEntry(const QString& _projectName) {
-	for (ProjectOverviewEntry* entry : m_entries) {
+ProjectOverviewEntryOld* WelcomeWidget::findEntry(const QString& _projectName) {
+	for (ProjectOverviewEntryOld* entry : m_entries) {
 		if (entry->getProjectName() == _projectName) {
 			return entry;
 		}

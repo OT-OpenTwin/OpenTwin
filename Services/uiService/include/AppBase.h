@@ -62,19 +62,18 @@
 
 // Forward declaration
 class QWidget;
+class LogInDialog;
+class LockManager;
 class QTreeWidgetItem;
 class ViewerComponent;
 class ControlsManager;
-class LockManager;
-class ExternalServicesComponent;
-class ProjectManagement;
 class ShortcutManager;
-class OldWelcomeScreen;
-class LogInDialog;
+class ProjectManagement;
+class ExternalServicesComponent;
 
 // Forward declaration
 class ToolBar;
-class ProjectOverviewWidget;
+class WelcomeWidget;
 namespace ak { class aNotifier; class aWindow; }
 namespace ak { class aTreeWidget; }
 
@@ -660,7 +659,7 @@ private:
 	ViewerComponent *			m_viewerComponent;
 	ExternalServicesComponent *	m_ExternalServicesComponent;
 
-	ProjectOverviewWidget*      m_welcomeScreen;
+	WelcomeWidget*      m_welcomeScreen;
 
 	ShortcutManager *			m_shortcutManager;
 	

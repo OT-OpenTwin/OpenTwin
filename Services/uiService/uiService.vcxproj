@@ -47,7 +47,7 @@
     <ClCompile Include="src\NavigationSelectionManager.cpp" />
     <ClCompile Include="src\NavigationTreeView.cpp" />
     <ClCompile Include="src\ProgressUpdater.cpp" />
-    <ClCompile Include="src\ProjectOverviewWidget.cpp" />
+    <ClCompile Include="src\WelcomeWidget.cpp" />
     <ClCompile Include="src\RenameProjectDialog.cpp" />
     <ClCompile Include="src\SelectEntitiesDialog.cpp" />
     <ClCompile Include="src\SelectProjectDialog.cpp" />
@@ -100,7 +100,7 @@
     <QtMoc Include="include\LogInGSSEditDialog.h" />
     <ClInclude Include="include\LogInGSSEntry.h" />
     <QtMoc Include="include\NavigationTreeView.h" />
-    <QtMoc Include="include\ProjectOverviewWidget.h" />
+    <QtMoc Include="include\WelcomeWidget.h" />
     <ClInclude Include="include\Notifier.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
     <QtMoc Include="include\SelectEntitiesDialog.h" />

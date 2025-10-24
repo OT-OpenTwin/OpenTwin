@@ -15,6 +15,7 @@
 #include "UserSettings.h"
 #include "DownloadFile.h"
 #include "ViewStateCfg.h"
+#include "WelcomeWidget.h"
 #include "ServiceDataUi.h"
 #include "UserManagement.h"
 #include "ViewerComponent.h"
@@ -25,7 +26,6 @@
 #include "NavigationTreeView.h"
 #include "StartArgumentParser.h"
 #include "RenameProjectDialog.h"
-#include "ProjectOverviewWidget.h"
 #include "ExternalServicesComponent.h"
 
 // uiCore header
@@ -977,16 +977,16 @@ void AppBase::createUi() {
 				m_output->getPlainTextEdit()->appendPlainText(BUILD_INFO);
 			}
 
-			m_welcomeScreen = new ProjectOverviewWidget(m_ttb->getStartPage());
+			m_welcomeScreen = new WelcomeWidget(m_ttb->getStartPage());
 
-			this->connect(m_welcomeScreen, &ProjectOverviewWidget::createProjectRequest, this, &AppBase::slotCreateProject);
-			this->connect(m_welcomeScreen, &ProjectOverviewWidget::openProjectRequest, this, &AppBase::slotOpenProject);
-			this->connect(m_welcomeScreen, &ProjectOverviewWidget::copyProjectRequest, this, &AppBase::slotCopyProject);
-			this->connect(m_welcomeScreen, &ProjectOverviewWidget::renameProjectRequest, this, &AppBase::slotRenameProject);
-			this->connect(m_welcomeScreen, &ProjectOverviewWidget::deleteProjectRequest, this, &AppBase::slotDeleteProject);
-			this->connect(m_welcomeScreen, &ProjectOverviewWidget::exportProjectRequest, this, &AppBase::slotExportProject);
-			this->connect(m_welcomeScreen, &ProjectOverviewWidget::projectAccessRequest, this, &AppBase::slotManageProjectAccess);
-			this->connect(m_welcomeScreen, &ProjectOverviewWidget::projectOwnerRequest, this, &AppBase::slotManageProjectOwner);
+			this->connect(m_welcomeScreen, &WelcomeWidget::createProjectRequest, this, &AppBase::slotCreateProject);
+			this->connect(m_welcomeScreen, &WelcomeWidget::openProjectRequest, this, &AppBase::slotOpenProject);
+			this->connect(m_welcomeScreen, &WelcomeWidget::copyProjectRequest, this, &AppBase::slotCopyProject);
+			this->connect(m_welcomeScreen, &WelcomeWidget::renameProjectRequest, this, &AppBase::slotRenameProject);
+			this->connect(m_welcomeScreen, &WelcomeWidget::deleteProjectRequest, this, &AppBase::slotDeleteProject);
+			this->connect(m_welcomeScreen, &WelcomeWidget::exportProjectRequest, this, &AppBase::slotExportProject);
+			this->connect(m_welcomeScreen, &WelcomeWidget::projectAccessRequest, this, &AppBase::slotManageProjectAccess);
+			this->connect(m_welcomeScreen, &WelcomeWidget::projectOwnerRequest, this, &AppBase::slotManageProjectOwner);
 
 			m_projectNavigation->getTree()->setChildItemsVisibleWhenApplyingFilter(true);
 			m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(true);
