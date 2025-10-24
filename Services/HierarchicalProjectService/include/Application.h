@@ -44,11 +44,11 @@
 #include <optional>
 #include <functional>
 
-class EntityFileRawData;
+class EntityBinaryData;
+class EntityBlockHierarchicalDocumentItem;
 
 class Application : public ot::ApplicationBase, public ot::ActionHandler, 
-	public ot::ButtonHandler, public ot::GraphicsActionHandler,
-	public ot::TableActionHandler, public ot::TextEditorActionHandler
+	public ot::ButtonHandler, public ot::GraphicsActionHandler
 {
 private:
 	Application();
@@ -81,10 +81,6 @@ public:
 protected:
 	virtual ot::ReturnMessage graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid) override;
 	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) override;
-
-	virtual ot::ReturnMessage tableSaveRequested(const ot::TableCfg& _config) override;
-
-	virtual ot::ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _content) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -128,11 +124,11 @@ private:
 
 	ot::ReturnMessage requestToOpenDocument(const ot::EntityInformation& _entity);
 
-	ot::ReturnMessage requestToOpenRawDataDocument(EntityBase* _entity, const std::string& _blockEntityName);
+	ot::ReturnMessage requestToOpenRawDataDocument(EntityBinaryData* _data, const EntityBlockHierarchicalDocumentItem* _block);
 
-	ot::ReturnMessage requestToOpenTextDocument(EntityBase* _entity, const std::string& _blockEntityName);
+	ot::ReturnMessage requestToOpenTextDocument(EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block);
 
-	ot::ReturnMessage requestToOpenCSVDocument(EntityBase* _entity, const std::string& _blockEntityName);
+	ot::ReturnMessage requestToOpenCSVDocument(EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

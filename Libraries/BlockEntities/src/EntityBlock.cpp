@@ -236,7 +236,7 @@ void EntityBlock::createBlockItem()
 
 void EntityBlock::addConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 {
-	for (auto connectorByName : m_connectorsByName)
+	for (const auto& connectorByName : m_connectorsByName)
 	{
 		const ot::Connector& connector = connectorByName.second;
 		ot::ConnectorType connectorType = connector.getConnectorType();

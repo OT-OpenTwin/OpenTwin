@@ -47,8 +47,6 @@ public:
 
 	void addContainer();
 
-	ot::ReturnMessage updateDocumentText(EntityBlockHierarchicalDocumentItem* _documentItem, const std::string& _content);
-
 private:
 	bool getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const;
 	bool getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) const;

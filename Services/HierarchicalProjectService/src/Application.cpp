@@ -11,6 +11,7 @@
 
 // OpenTwin Core header
 #include "OTCore/String.h"
+#include "OTCore/EntityName.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/ProjectInformation.h"
 
@@ -206,44 +207,6 @@ ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsCon
 		}
 	}
 	return ot::ReturnMessage::Ok;
-}
-
-ot::ReturnMessage Application::tableSaveRequested(const ot::TableCfg& _config) {
-	return ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported yet");
-}
-
-ot::ReturnMessage Application::textEditorSaveRequested(const std::string& _entityName, const std::string& _content) {
-	// Get entity information
-	ot::EntityInformation info;
-	if (!ot::ModelServiceAPI::getEntityInformation(_entityName, info)) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information { \"Name\": \"" + _entityName + "\" }");
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-
-	// Load entity
-	std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion()));
-	if (!entity) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not read entity from database { \"Name\": \"" + _entityName + "\" }");
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-
-	// Check entity type
-	if (entity->getClassName() != EntityBlockHierarchicalDocumentItem::className()) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity is not of expected type { \"Name\": \"" + _entityName + "\", \"Type\": \"" + entity->getClassName() + "\", \"ExpectedType\": \"" + EntityBlockHierarchicalDocumentItem::className() + "\" }");
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-
-	EntityBlockHierarchicalDocumentItem* documentEntity(dynamic_cast<EntityBlockHierarchicalDocumentItem*>(entity.get()));
-	if (!documentEntity) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity cast failed { \"Name\": \"" + _entityName + "\" }");
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-
-	return m_entityHandler.updateDocumentText(documentEntity, _content);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -558,8 +521,8 @@ ot::ReturnMessage Application::requestToOpenDocument(const ot::EntityInformation
 		return ret;
 	}
 
-	ot::EntityInformation documentInfo;
-	if (!ot::ModelServiceAPI::getEntityInformation(documentEntity->getDocumentID(), documentInfo)) {
+	ot::EntityInformation dataInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(documentEntity->getDocumentID(), dataInfo)) {
 		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine document data entity information "
 			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
 			", \"Version\": " + std::to_string(_entity.getEntityVersion()) +
@@ -569,8 +532,8 @@ ot::ReturnMessage Application::requestToOpenDocument(const ot::EntityInformation
 		return ret;
 	}
 
-	std::unique_ptr<EntityBase> document(ot::EntityAPI::readEntityFromEntityIDandVersion(documentInfo.getEntityID(), documentInfo.getEntityVersion()));
-	if (!document) {
+	std::unique_ptr<EntityBase> dataEntity(ot::EntityAPI::readEntityFromEntityIDandVersion(dataInfo.getEntityID(), dataInfo.getEntityVersion()));
+	if (!dataEntity) {
 		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not load document data entity "
 			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
 			", \"Version\": " + std::to_string(_entity.getEntityVersion()) +
@@ -580,56 +543,42 @@ ot::ReturnMessage Application::requestToOpenDocument(const ot::EntityInformation
 		return ret;
 	}
 
-	// Check document type
-	if (document->getClassName() == EntityFileRawData::className()) {
-		return this->requestToOpenRawDataDocument(document.get(), documentEntity->getName());
-	}
-	else if (document->getClassName() == EntityFileText::className()) {
-		return this->requestToOpenTextDocument(document.get(), documentEntity->getName());
-	}
-	else if (document->getClassName() == EntityFileCSV::className()) {
-		return this->requestToOpenCSVDocument(document.get(), documentEntity->getName());
-	}
-	else {
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unsupported document type for opening "
+	EntityBinaryData* data = dynamic_cast<EntityBinaryData*>(dataEntity.get());
+	if (!dataEntity) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Invalid document data entity type "
 			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
 			", \"Version\": " + std::to_string(_entity.getEntityVersion()) +
 			", \"DataEntityID\": " + std::to_string(documentEntity->getDocumentID()) +
-			", \"DataEntityType\": \"" + document->getClassName() + "\" }"
-		);
-	}
-}
-
-ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBase* _entity, const std::string& _blockEntityName) {
-	OTAssertNullptr(_entity);
-	EntityFileRawData* fileEntity = dynamic_cast<EntityFileRawData*>(_entity);
-
-	if (!fileEntity) {
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Invalid document entity type for raw data document "
-			"{ \"EntityType\": \"" + _entity->getClassName() + "\", \"ExpectedType\": \"" + EntityFileRawData::className() + "\" }"
-		);
-	}
-
-	// Pack the data
-	std::shared_ptr<EntityBinaryData> dataEntity(fileEntity->getDataEntity());
-	if (!dataEntity) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not load data entity for raw data document "
-			"{ \"DocumentEntityName\": \"" + fileEntity->getName() + "\", \"DocumentEntityID\": " + std::to_string(fileEntity->getEntityID()) + " }"
+			", \"DataEntityType\": \"" + data->getClassName() + "\", \"ExpectedType\": \"" + EntityBinaryData::className() + "\" }"
 		);
 		OT_LOG_E(ret.getWhat());
 		return ret;
 	}
 
-	uint64_t uncompressedDataLength = dataEntity->getData().size();
-	std::string compressedData = ot::String::compressedBase64(std::string(dataEntity->getData().begin(), dataEntity->getData().end()));
+	// Dispatch based on document type
+	if (documentEntity->getDocumentType() == EntityFileText::className()) {
+		return this->requestToOpenTextDocument(data, documentEntity);
+	}
+	else {
+		return this->requestToOpenRawDataDocument(data, documentEntity);
+	}
+}
+
+ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBinaryData* _data, const EntityBlockHierarchicalDocumentItem* _block) {
+	OTAssertNullptr(_data);
+	
+	uint64_t uncompressedDataLength = _data->getData().size();
+	std::string compressedData = ot::String::compressedBase64(std::string(_data->getData().begin(), _data->getData().end()));
+
+	std::string fileNameOnly = ot::EntityName::getSubName(_block->getName()).value();
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_OpenRawFile, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(_blockEntityName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(_block->getName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(compressedData, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLength, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonString(fileEntity->getFileName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Type, ot::JsonString(fileEntity->getFileType(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonString(fileNameOnly, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Type, ot::JsonString(_block->getDocumentExtension(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
 	this->getUiComponent()->sendMessage(true, doc, tmp);
@@ -637,16 +586,9 @@ ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBase* _entity,
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage Application::requestToOpenTextDocument(EntityBase* _entity, const std::string& _blockEntityName) {
+ot::ReturnMessage Application::requestToOpenTextDocument(EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block) {
 	OTAssertNullptr(_entity);
-	EntityFileText* fileEntity = dynamic_cast<EntityFileText*>(_entity);
-
-	if (!fileEntity) {
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Invalid document entity type for text document "
-			"{ \"EntityType\": \"" + _entity->getClassName() + "\", \"ExpectedType\": \"" + EntityFileText::className() + "\" }"
-		);
-	}
-
+	
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, doc.GetAllocator());
 	ot::VisualisationCfg visCfg;
@@ -654,10 +596,11 @@ ot::ReturnMessage Application::requestToOpenTextDocument(EntityBase* _entity, co
 	visCfg.setOverrideViewerContent(true);
 	doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, ot::JsonObject(visCfg, doc.GetAllocator()), doc.GetAllocator());
 
-	getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
+	ot::BasicServiceInformation modelInfo(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
+	modelInfo.addToJsonObject(doc, doc.GetAllocator());
 
-	ot::TextEditorCfg configuration = fileEntity->createConfig(true);
-	configuration.setTitle(fileEntity->getFileName());
+	ot::TextEditorCfg configuration = _block->createConfig(false);
+	configuration.setPlainText(std::string(_data->getData().begin(), _data->getData().end()));
 
 	ot::JsonObject cfgObj;
 	configuration.addToJsonObject(cfgObj, doc.GetAllocator());
@@ -670,7 +613,7 @@ ot::ReturnMessage Application::requestToOpenTextDocument(EntityBase* _entity, co
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage Application::requestToOpenCSVDocument(EntityBase* _entity, const std::string& _blockEntityName) {
+ot::ReturnMessage Application::requestToOpenCSVDocument(EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block) {
 	
 
 	return ot::ReturnMessage::Ok;

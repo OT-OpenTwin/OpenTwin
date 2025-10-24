@@ -191,45 +191,13 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 
 	const std::string newDocumentName = CreateNewUniqueTopologyName(c_documentsFolder, fileNameOnly + "." + extensionString);
 
-	// Try to create entity from extension
-	{
-		std::unique_ptr<EntityBase> entity(EntityFactory::instance().create(extension));
-		if (entity) {
-			EntityFile* fileEntity = dynamic_cast<EntityFile*>(entity.get());
-			if (fileEntity) {
-				// We have a valid file entity, set it up
-				fileEntity->setOwningService(serviceName);
-				fileEntity->setName(newDocumentName);
-				fileEntity->setEntityID(_modelComponent->createEntityUID());
-				fileEntity->setFileProperties(_fileName, fileNameOnly, extensionString);
-				fileEntity->setDataEntity(dataEntity);
-				fileEntity->setEditable(false);
-				fileEntity->setDeletable(false);
-				fileEntity->storeToDataBase();
-				_newEntities.addDataEntity(blockUid, *fileEntity);
-
-				documentEntityID = fileEntity->getEntityID();
-				documentEntityVersion = fileEntity->getEntityStorageVersion();
-			}
-		}
-
-		if (documentEntityID == ot::invalidUID) {
-			// No regular file entity, fallback to raw file entity
-
-			EntityFileRawData rawDataEntity;
-			rawDataEntity.setOwningService(serviceName);
-			rawDataEntity.setName(newDocumentName);
-			rawDataEntity.setEntityID(_modelComponent->createEntityUID());
-			rawDataEntity.setFileProperties(_fileName, fileNameOnly, extensionString);
-			rawDataEntity.setDataEntity(dataEntity);
-			rawDataEntity.setEditable(false);
-			rawDataEntity.setDeletable(false);
-			rawDataEntity.storeToDataBase();
-			_newEntities.addDataEntity(blockUid, rawDataEntity);
-
-			documentEntityID = rawDataEntity.getEntityID();
-			documentEntityVersion = rawDataEntity.getEntityStorageVersion();
-		}
+	std::string dataTypeString;
+	std::unique_ptr<EntityBase> dataTypeEntity(EntityFactory::instance().create(extension));
+	if (dataTypeEntity) {
+		dataTypeString = dataTypeEntity->getClassName();
+	}
+	else {
+		dataTypeString = EntityFileRawData::className();
 	}
 
 	OTAssert(documentEntityID != ot::invalidUID, "Document entity ID is invalid");
@@ -251,7 +219,7 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 	blockEntity.createProperties();
 	blockEntity.setEditable(true);
 	blockEntity.setCoordinateEntityID(coord.getEntityID());
-	blockEntity.setDocument(documentEntityID, documentEntityVersion);
+	blockEntity.setDocument(dataEntity, dataTypeString, extensionString);
 	blockEntity.storeToDataBase();
 	_newEntities.addTopologyEntity(blockEntity);
 }
@@ -567,48 +535,6 @@ void EntityHandler::addContainer() {
 	newEntities.addTopologyEntity(newContainer);
 
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added hierarchical container", true, true);
-}
-
-ot::ReturnMessage EntityHandler::updateDocumentText(EntityBlockHierarchicalDocumentItem* _documentItem, const std::string& _content) {
-	std::shared_ptr<EntityBase> document(_documentItem->getDocument());
-	if (!document) {
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Could not load document entity for document item { \"DocumentName\": \"" + _documentItem->getName() + "\" }");
-	}
-
-	// Ensure document is text
-	EntityFileText* textDocument = dynamic_cast<EntityFileText*>(document.get());
-	if (!textDocument) {
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unexpected document type { \"DocumentName\": \"" + _documentItem->getName() + "\", \"DocumentType\": \"" + document->getClassName() + "\", \"ExpectedType\": \"" + EntityFileText::className() + "\" }");
-	}
-
-	// Update data entity
-	std::shared_ptr<EntityBinaryData> dataEntity = textDocument->getDataEntity();
-	if (!dataEntity) {
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Could not load data entity for text document { \"DocumentName\": \"" + _documentItem->getName() + "\" }");
-	}
-
-	ot::NewModelStateInfo newEntities;
-	ot::NewModelStateInfo update;
-
-	ot::ModelServiceAPI::deleteEntitiesFromModel({ dataEntity->getEntityID(), textDocument->getEntityID() }, false);
-
-	dataEntity->setData(std::vector<char>(_content.begin(), _content.end()));
-	dataEntity->storeToDataBase();
-	newEntities.addDataEntity(*_documentItem, *dataEntity);
-
-
-	textDocument->setDataEntity(*dataEntity);
-	textDocument->storeToDataBase();
-	newEntities.addDataEntity(*_documentItem, *textDocument);
-
-	_documentItem->setDocument(*textDocument);
-	_documentItem->storeToDataBase();
-	update.addTopologyEntity(*_documentItem);
-
-	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Updated text document content", true, false);
-	ot::ModelServiceAPI::updateTopologyEntities(update, "Text changed");
-
-	return ot::ReturnMessage::Ok;
 }
 
 bool EntityHandler::getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const {

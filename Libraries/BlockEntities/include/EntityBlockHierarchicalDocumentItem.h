@@ -6,8 +6,11 @@
 #pragma once
 
 #include "EntityBlock.h"
+#include "IVisualisationText.h"
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalDocumentItem : public EntityBlock {
+class EntityBinaryData;
+
+class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalDocumentItem : public EntityBlock, public IVisualisationText {
 public:
 	EntityBlockHierarchicalDocumentItem() : EntityBlockHierarchicalDocumentItem(0, nullptr, nullptr, nullptr, "") {};
 	EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
@@ -25,11 +28,22 @@ public:
 
 	// Data accessors
 
-	void setDocument(const EntityBase& _entity) { setDocument(_entity.getEntityID(), _entity.getEntityStorageVersion()); };
-	void setDocument(ot::UID _entityID, ot::UID _entityVersion);
+	void setDocument(const EntityBase& _entity, const std::string& _documentType, const std::string& _documentExtension) { setDocument(_entity.getEntityID(), _entity.getEntityStorageVersion(), _documentType, _documentExtension); };
+	void setDocument(ot::UID _entityID, ot::UID _entityVersion, const std::string& _documentType, const std::string& _documentExtension);
 	ot::UID getDocumentID() const { return m_documentUID; };
 	ot::UID getDocumentVersion() const { return m_documentVersion; };
-	std::shared_ptr<EntityBase> getDocument();
+	std::string getDocumentType() const { return m_documentType; };
+	std::string getDocumentExtension() const { return m_documentExtension; };
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Text interface
+
+	virtual std::string getText() override;
+	virtual void setText(const std::string& _text) override;
+	virtual bool visualiseText() override { return false; };
+	virtual ot::TextEditorCfg createConfig(bool _includeData) override;
+	virtual ot::ContentChangedHandling getTextContentChangedHandling() override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -40,9 +54,11 @@ protected:
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 private:
-	void ensureDocumentLoaded();
+	void ensureDocumentDataLoaded();
 
 	ot::UID m_documentUID;
 	ot::UID m_documentVersion;
-	std::shared_ptr<EntityBase> m_documentEntity;
+	std::string m_documentType;
+	std::string m_documentExtension;
+	std::shared_ptr<EntityBinaryData> m_documentData;
 };
