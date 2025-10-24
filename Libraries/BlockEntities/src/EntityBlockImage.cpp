@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "EntityFile.h"
 #include "PropertyHelper.h"
-#include "EntityFileImage.h"
+#include "EntityBinaryData.h"
 #include "EntityProperties.h"
 #include "EntityBlockImage.h"
 #include "OTGui/StyleRefPainter2D.h"
@@ -15,7 +15,9 @@
 static EntityFactoryRegistrar<EntityBlockImage> registrar(EntityBlockImage::className());
 
 EntityBlockImage::EntityBlockImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	: EntityBlock(_ID, _parent, _obs, _ms, _owner), m_imageUID(ot::invalidUID), m_imageVersion(ot::invalidUID), m_image(nullptr) {
+	: EntityBlock(_ID, _parent, _obs, _ms, _owner), m_imageUID(ot::invalidUID), m_imageVersion(ot::invalidUID),
+	m_image(nullptr), m_imageFormat(ot::ImageFileFormat::PNG)
+{
 	OldTreeIcon icon;
 	icon.visibleIcon = "Tree/Image";
 	icon.hiddenIcon = "Tree/Image";
@@ -43,7 +45,7 @@ ot::GraphicsItemCfg* EntityBlockImage::createBlockCfg() {
 	}
 
 	cfg->setGraphicsItemFlags(itemFlags);
-	cfg->setImageData(m_image->getImage(), m_image->getImageFormat());
+	cfg->setImageData(m_image->getData(), m_imageFormat);
 	int width = PropertyHelper::getIntegerPropertyValue(this, "Width", "Image");
 	int height = PropertyHelper::getIntegerPropertyValue(this, "Height", "Image");
 
@@ -120,9 +122,10 @@ void EntityBlockImage::createProperties() {
 
 // Data accessors
 
-void EntityBlockImage::setImageEntity(ot::UID _entityID, ot::UID _entityVersion) {
+void EntityBlockImage::setImageEntity(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format) {
 	m_imageUID = _entityID;
 	m_imageVersion = _entityVersion;
+	m_imageFormat = _format;
 	m_image.reset();
 	m_image = nullptr;
 
@@ -138,7 +141,8 @@ void EntityBlockImage::addStorageData(bsoncxx::builder::basic::document& _storag
 
 	_storage.append(
 		bsoncxx::builder::basic::kvp("ImageDataID", static_cast<int64_t>(m_imageUID)),
-		bsoncxx::builder::basic::kvp("ImageDataVersion", static_cast<int64_t>(m_imageVersion))
+		bsoncxx::builder::basic::kvp("ImageDataVersion", static_cast<int64_t>(m_imageVersion)),
+		bsoncxx::builder::basic::kvp("ImageFormat", ot::toString(m_imageFormat))
 	);
 }
 
@@ -147,6 +151,7 @@ void EntityBlockImage::readSpecificDataFromDataBase(bsoncxx::document::view& _do
 
 	m_imageUID = static_cast<ot::UID>(_docView["ImageDataID"].get_int64());
 	m_imageVersion = static_cast<ot::UID>(_docView["ImageDataVersion"].get_int64());
+	m_imageFormat = ot::stringToImageFileFormat(_docView["ImageFormat"].get_utf8().value.data());
 }
 
 void EntityBlockImage::ensureFileIsLoaded() {
@@ -160,5 +165,5 @@ void EntityBlockImage::ensureFileIsLoaded() {
 	}
 
 	std::map<ot::UID, EntityBase*> entityMap;
-	m_image.reset(dynamic_cast<EntityFileImage*>(readEntityFromEntityIDAndVersion(this, m_imageUID, m_imageVersion, entityMap)));
+	m_image.reset(dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, m_imageUID, m_imageVersion, entityMap)));
 }

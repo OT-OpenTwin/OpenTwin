@@ -8,7 +8,7 @@
 #include "EntityBlock.h"
 #include "OTCore/ProjectInformation.h"
 
-class EntityFileImage;
+class EntityBinaryData;
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockImage : public EntityBlock {
 public:
@@ -28,10 +28,11 @@ public:
 
 	// Data accessors
 
-	void setImageEntity(const EntityBase& _entity) { setImageEntity(_entity.getEntityID(), _entity.getEntityStorageVersion()); };
-	void setImageEntity(ot::UID _entityID, ot::UID _entityVersion);
+	void setImageEntity(const EntityBase& _entity, ot::ImageFileFormat _format) { setImageEntity(_entity.getEntityID(), _entity.getEntityStorageVersion(), _format); };
+	void setImageEntity(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format);
 	ot::UID getImageEntityID() const { return m_imageUID; };
 	ot::UID getImageEntityVersion() const { return m_imageVersion; };
+	ot::ImageFileFormat getImageFormat() const { return m_imageFormat; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -46,5 +47,6 @@ private:
 
 	ot::UID m_imageUID;
 	ot::UID m_imageVersion;
-	std::shared_ptr<EntityFileImage> m_image;
+	ot::ImageFileFormat m_imageFormat;
+	std::shared_ptr<EntityBinaryData> m_image;
 };

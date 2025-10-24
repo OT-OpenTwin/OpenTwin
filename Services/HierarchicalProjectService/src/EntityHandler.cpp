@@ -316,15 +316,6 @@ void EntityHandler::addBackgroundImage(const std::string& _fileName, const std::
 	imageDataEntity.setData(std::move(fileData));
 	imageDataEntity.storeToDataBase();
 
-	// Create background image entity
-	EntityFileImage imageEntity;
-	imageEntity.setOwningService(serviceName);
-	imageEntity.setEntityID(_modelComponent->createEntityUID());
-	imageEntity.setFileProperties(_fileName, fileNameOnly, extension);
-	imageEntity.setImageFormat(format);
-	imageEntity.setDataEntity(imageDataEntity);
-	imageEntity.storeToDataBase();
-
 	// Create coordinate entity
 	EntityCoordinates2D coord;
 	coord.setOwningService(serviceName);
@@ -341,12 +332,11 @@ void EntityHandler::addBackgroundImage(const std::string& _fileName, const std::
 	backgroundImageEntity.createProperties();
 	backgroundImageEntity.setEditable(true);
 	backgroundImageEntity.setCoordinateEntityID(coord.getEntityID());
-	backgroundImageEntity.setImageEntity(imageEntity);
+	backgroundImageEntity.setImageEntity(imageDataEntity, format);
 	backgroundImageEntity.storeToDataBase();
 
 	// Add to new entities
 	_newEntities.addDataEntity(backgroundImageEntity.getEntityID(), imageDataEntity);
-	_newEntities.addDataEntity(backgroundImageEntity.getEntityID(), imageEntity);
 	_newEntities.addDataEntity(backgroundImageEntity.getEntityID(), coord);
 	_newEntities.addTopologyEntity(backgroundImageEntity);
 }
