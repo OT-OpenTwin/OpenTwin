@@ -1,4 +1,5 @@
-//! @file CSXExcitationProperties.h
+//! @file ExcitationPropertiess.h
+//! @brief Definition of the ExcitationProperties class for managing excitation properties in openEMS
 //! @author Alexandros McCray (alexm-dev)
 //! @date 24.10.2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -13,10 +14,10 @@
 #include <cstdint>
 
 //! @brief Class to hold the excitation properties for the openEMS solver
-class CSXExcitationProperties {
+class ExcitationProperties {
 public:
-	CSXExcitationProperties();
-	virtual ~CSXExcitationProperties();
+	ExcitationProperties();
+	virtual ~ExcitationProperties();
 
 	// Setters for the excitation data
 	void setName(const std::string& _name) { m_name = _name; }
@@ -40,7 +41,7 @@ public:
 	//! @brief Writes the excitation properties to an XML element
 	//! @param _parentElement The parent XML element to which the excitation properties will be added
 	//! @return The created Excitation XML element
-	tinyxml2::XMLElement* writeCSXExciteProperties(tinyxml2::XMLElement& _parentElement) const;
+	tinyxml2::XMLElement* writeExciteProperties(tinyxml2::XMLElement& _parentElement) const;
 
 private:
 	std::string m_name = "excite"; //default name

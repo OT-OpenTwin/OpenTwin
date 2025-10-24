@@ -1,31 +1,31 @@
-//! @file CSXExcitationProperties.cpp
+//! @file ExcitationProperties.cpp
 //! @author Alexandros McCray (alexm-dev)
 //! @date 24.10.2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#include "CSXExcitationProperties.h"
+#include "ExcitationProperties.h"
 
-CSXExcitationProperties::CSXExcitationProperties() 
+ExcitationProperties::ExcitationProperties()
 {
 }
 
-CSXExcitationProperties::~CSXExcitationProperties()
+ExcitationProperties::~ExcitationProperties()
 {
 }
 
-void CSXExcitationProperties::setPrimitives1(double _x, double _y, double _z) {
+void ExcitationProperties::setPrimitives1(double _x, double _y, double _z) {
 	m_primitives1_X = _x;
 	m_primitives1_Y = _y;
 	m_primitives1_Z = _z;
 }
 
-void CSXExcitationProperties::setPrimitives2(double _x, double _y, double _z) {
+void ExcitationProperties::setPrimitives2(double _x, double _y, double _z) {
 	m_primitives2_X = _x;
 	m_primitives2_Y = _y;
 	m_primitives2_Z = _z;
 }
 
-void CSXExcitationProperties::setExciteDirection(bool _exciteX, bool _exciteY, bool _exciteZ) {
+void ExcitationProperties::setExciteDirection(bool _exciteX, bool _exciteY, bool _exciteZ) {
 	bool flags[3] = { _exciteX, _exciteY, _exciteZ };
 	m_excite = "";
 	for (int i = 0; i < 3; ++i) {
@@ -41,7 +41,7 @@ void CSXExcitationProperties::setExciteDirection(bool _exciteX, bool _exciteY, b
 	}
 }
 
-tinyxml2::XMLElement* CSXExcitationProperties::writeCSXExciteProperties(tinyxml2::XMLElement& _parentElement) const {
+tinyxml2::XMLElement* ExcitationProperties::writeExciteProperties(tinyxml2::XMLElement& _parentElement) const {
 	auto excitationProperty = _parentElement.GetDocument()->NewElement("Excitation");
 	excitationProperty->SetAttribute("Excite", m_excite.c_str());
 	excitationProperty->SetAttribute("Name", m_name.c_str());
