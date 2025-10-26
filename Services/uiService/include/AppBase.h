@@ -532,7 +532,7 @@ private Q_SLOTS:
 
 	void slotCreateProject();
 	void slotOpenProject();
-	void slotOpenSpecificProject(QString _projectName, const std::string& _projectVersion);
+	void slotOpenSpecificProject(std::string _projectName, const std::string& _projectVersion);
 	void slotCopyProject();
 	void slotRenameProject();
 	void slotDeleteProject();

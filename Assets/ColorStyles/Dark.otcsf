@@ -2542,6 +2542,16 @@ ads--CDockWidgetTab #tabCloseButton::disabled {
 
 /* ##################################################################################### */
 
+#ProjectOverviewWidgetTree {
+    font-size: 12px;
+}
+
+#ProjectOverviewWidgetTree::item {
+    min-height: 28px;
+}
+
+/* ##################################################################################### */
+
 /* View Buttons */
 
 #OT_ViewTabCloseButton {

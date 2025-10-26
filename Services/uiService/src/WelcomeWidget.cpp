@@ -8,6 +8,7 @@
 #include "WelcomeWidget.h"
 #include "UserManagement.h"
 #include "ProjectManagement.h"
+#include "ProjectOverviewWidget.h"
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
@@ -29,111 +30,7 @@
 #include <QtWidgets/qheaderview.h>
 #include <QtOpenGLWidgets/qopenglwidget.h>
 
-enum TableColumn {
-	ColumnCheck,
-	ColumnType,
-	ColumnName,
-	ColumnOwner,
-	ColumnGroups,
-	ColumnLastAccess,
-	ColumnCount
-};
-
-ProjectOverviewEntryOld::ProjectOverviewEntryOld(const ot::ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table)
-	: m_ownerIsCreator(_ownerIsCreator), m_table(_table)
-{
-	int row = _table->rowCount();
-	_table->insertRow(row);
-
-	m_checkBox = new ot::CheckBox;
-	m_checkBox->setFocusPolicy(Qt::NoFocus);
-	
-	m_typeItem = new ot::TableItem;
-	m_typeItem->setFlags(m_typeItem->flags() & ~Qt::ItemIsEditable);
-	m_typeItem->setIcon(_projectTypeIcon);
-	m_typeItem->setToolTip(QString::fromStdString(_projectInfo.getProjectType()));
-	m_typeItem->setSortHint(QString::fromStdString(_projectInfo.getProjectType()));
-
-	m_nameItem = new ot::TableItem;
-	m_nameItem->setFlags(m_typeItem->flags());
-	m_nameItem->setText(QString::fromStdString(_projectInfo.getProjectName()));
-
-	m_ownerItem = new ot::TableItem;
-	m_ownerItem->setFlags(m_typeItem->flags());
-	m_ownerItem->setText(QString::fromStdString(_projectInfo.getUserName()));
-
-	m_groupsItem = new ot::TableItem;;
-	m_groupsItem->setFlags(m_typeItem->flags());
-	if (!_projectInfo.getGroups().empty()) {
-		m_groupsItem->setIcon(ot::IconManager::getIcon("Default/Groups.png"));
-		QString tip;
-		if (_projectInfo.getGroups().size() == 1) {
-			tip = "Shared with group:";
-		}
-		else {
-			tip = "Shared with groups:";
-		}
-
-		std::string newGroupsSortHint;
-		for (const std::string& group : _projectInfo.getGroups()) {
-			tip.append("\n  - " + QString::fromStdString(group));
-			newGroupsSortHint.push_back('\n');
-			newGroupsSortHint.append(group);
-		}
-		m_groupsItem->setToolTip(tip);			
-		m_groupsItem->setSortHint(QString::fromStdString(newGroupsSortHint));
-	}
-
-	QDateTime lastAccess = QDateTime::fromMSecsSinceEpoch(_projectInfo.getLastAccessTime());
-
-	m_lastAccessTimeItem = new ot::TableItem;
-	m_lastAccessTimeItem->setFlags(m_typeItem->flags());
-	m_lastAccessTimeItem->setText(lastAccess.toString());
-	m_lastAccessTimeItem->setSortHint(lastAccess.toString("yyyy.MM.dd hh:mm:ss"));
-
-	_table->setCellWidget(row, TableColumn::ColumnCheck, m_checkBox);
-	_table->setItem(row, TableColumn::ColumnType, m_typeItem);
-	_table->setItem(row, TableColumn::ColumnName, m_nameItem);
-	_table->setItem(row, TableColumn::ColumnOwner, m_ownerItem);
-	_table->setItem(row, TableColumn::ColumnGroups, m_groupsItem);
-	_table->setItem(row, TableColumn::ColumnLastAccess, m_lastAccessTimeItem);
-
-	this->connect(m_checkBox, &ot::CheckBox::stateChanged, this, &ProjectOverviewEntryOld::slotCheckedChanged);
-}
-
-void ProjectOverviewEntryOld::setIsChecked(bool _checked) {
-	m_checkBox->setChecked(_checked);
-}
-
-bool ProjectOverviewEntryOld::getIsChecked() const {
-	return m_checkBox->isChecked();
-}
-
-QString ProjectOverviewEntryOld::getProjectName() const {
-	return m_nameItem->text();
-}
-
-void ProjectOverviewEntryOld::slotCheckedChanged() {
-	bool isBlock = m_table->signalsBlocked();
-	m_table->blockSignals(true);
-	m_typeItem->setSelected(m_checkBox->isChecked());
-	m_nameItem->setSelected(m_checkBox->isChecked());
-	m_ownerItem->setSelected(m_checkBox->isChecked());
-	m_groupsItem->setSelected(m_checkBox->isChecked());
-	m_lastAccessTimeItem->setSelected(m_checkBox->isChecked());
-	m_table->blockSignals(isBlock);
-	Q_EMIT checkedChanged();
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage)
-	: m_mode(ViewMode::ViewAll)
-{
+WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
 	// Create layouts
 	m_widget = new QWidget;
 	QVBoxLayout* centralLayout = new QVBoxLayout(m_widget);
@@ -141,9 +38,11 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage)
 	// Crete controls
 	m_titleLabel = new ot::Label("Projects");
 	m_filter = new ot::LineEdit;
-	m_table = new ot::Table(0, TableColumn::ColumnCount);
 	m_countLabel = new ot::Label;
 	QOpenGLWidget* glWidget = new QOpenGLWidget;
+
+	m_overview = new ot::ProjectOverviewWidget;
+	m_overview->setMultiSelectionEnabled(true);
 
 	// Create Menu
 	tt::Group* projectGroup = _ttbPage->AddGroup("Project");
@@ -172,35 +71,25 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage)
 	m_filter->setPlaceholderText("Find...");
 	m_filter->installEventFilter(this);
 
-	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-	m_table->horizontalHeader()->setSectionResizeMode(TableColumn::ColumnName, QHeaderView::Stretch);
-	m_table->horizontalHeader()->installEventFilter(this);
-	m_table->setHorizontalHeaderLabels({ "", "Type", "Name", "Owner", "Groups", "Last Modified" });
-	m_table->horizontalHeader()->setSelectionMode(QAbstractItemView::NoSelection);
-	m_table->setSortingEnabled(true);
-	m_table->horizontalHeader()->setSortIndicatorShown(false);
-	m_table->verticalHeader()->setHidden(true);
-	m_table->installEventFilter(this);
-
 	glWidget->setMaximumSize(1, 1);
 
-	this->updateCountLabel(false);
+	this->updateCountLabel();
 	this->updateToggleViewModeButton();
 	this->updateToolButtonsEnabledState();
 
 	// Setup layouts
 	centralLayout->addWidget(m_titleLabel);
 	centralLayout->addWidget(m_filter);
-	centralLayout->addWidget(m_table);
+	centralLayout->addWidget(m_overview->getQWidget());
 	centralLayout->addWidget(m_countLabel);
 	centralLayout->addWidget(glWidget);
+	
+	slotRefreshRecentProjects();
 
 	// Connect signals
 	this->connect(m_filter, &ot::LineEdit::textChanged, this, &WelcomeWidget::slotFilterChanged);
-	this->connect(m_table, &ot::Table::cellDoubleClicked, this, &WelcomeWidget::slotProjectDoubleClicked);
-	this->connect(m_table, &ot::Table::itemSelectionChanged, this, &WelcomeWidget::slotUpdateItemSelection);
-	this->connect(m_table->horizontalHeader(), &QHeaderView::sectionClicked, this, &WelcomeWidget::slotTableHeaderItemClicked);
-	this->connect(m_table->horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &WelcomeWidget::slotTableHeaderSortingChanged);
+	this->connect(m_overview, &ot::ProjectOverviewWidget::selectionChanged, this, &WelcomeWidget::slotSelectionChanged);
+	this->connect(m_overview, &ot::ProjectOverviewWidget::projectOpenRequested, this, &WelcomeWidget::slotOpenProject);
 	this->connect(m_createButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCreateProject);
 	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRefreshProjectList);
 	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotToggleViewMode);
@@ -226,18 +115,7 @@ void WelcomeWidget::setWidgetLocked(bool _isLocked) {
 }
 
 bool WelcomeWidget::eventFilter(QObject* _watched, QEvent* _event) {
-	if (_watched == m_table && _event->type() == QEvent::KeyPress) {
-		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(_event);
-		if (!keyEvent) {
-			OT_LOG_E("Key event is null");
-			return false;
-		}
-		if (keyEvent->key() == Qt::Key_Delete || keyEvent->key() == Qt::Key_Backspace) {
-			this->slotDeleteProject();
-			return true;
-		}
-	}
-	else if (_watched == m_filter && _event->type() == QEvent::KeyPress) {
+	if (_watched == m_filter && _event->type() == QEvent::KeyPress) {
 		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(_event);
 		if (!keyEvent) {
 			OT_LOG_E("Key event is null");
@@ -252,190 +130,58 @@ bool WelcomeWidget::eventFilter(QObject* _watched, QEvent* _event) {
 	return false;
 }
 
-QString WelcomeWidget::getCurrentProjectFilter() const {
+QString WelcomeWidget::getGeneralFilter() const {
 	return m_filter->text();
 }
 
-std::list<QString> WelcomeWidget::getSelectedProjects() const {
-	std::list<QString> result;
-	for (ProjectOverviewEntryOld* entry : m_entries) {
-		if (entry->getIsChecked()) {
-			result.push_back(entry->getProjectName());
-		}
-	}
-	return result;
-}
-
-void WelcomeWidget::refreshProjectList() {
-	this->slotRefreshProjectList();
-}
-
-void WelcomeWidget::refreshRecentProjects() {
-	this->slotRefreshRecentProjects();
-}
-
-void WelcomeWidget::slotUpdateItemSelection() {
-	QList<QTableWidgetItem*> selection = m_table->selectedItems();
-	bool isBlock = m_table->signalsBlocked();
-	m_table->blockSignals(true);
-	
-	// Table to check box
-	for (int r = 0; r < m_table->rowCount(); r++) {
-		if (r >= m_entries.size()) {
-			OT_LOG_EA("Data mismatch");
-			break;
-		}
-
-		ProjectOverviewEntryOld* entry = this->findEntry(m_table->item(r, TableColumn::ColumnName)->text());
-		if (entry) {
-			entry->setIsChecked(m_table->item(r, TableColumn::ColumnType)->isSelected() || m_table->item(r, TableColumn::ColumnName)->isSelected() || m_table->item(r, TableColumn::ColumnOwner)->isSelected() || m_table->item(r, TableColumn::ColumnGroups)->isSelected() || m_table->item(r, TableColumn::ColumnLastAccess)->isSelected());
-		}
-		else {
-			OT_LOG_E("Entry not found for project \"" + m_table->item(r, TableColumn::ColumnName)->text().toStdString() + "\"");
-		}
-	}
-
-	m_table->blockSignals(isBlock);
+std::list<ot::ProjectInformation> WelcomeWidget::getSelectedProjects() const {
+	return m_overview->getSelectedProjects();
 }
 
 void WelcomeWidget::slotCreateProject() {
 	Q_EMIT createProjectRequest();
 }
 
-void WelcomeWidget::slotProjectDoubleClicked(int _row, int _column) {
-	if (_row < 0 || _row >= m_entries.size()) {
-		OT_LOG_EA("Index out of range");
-		return;
-	}
-	for (ProjectOverviewEntryOld* entry : m_entries) {
-		entry->setIsChecked(false);
-	}
-
-	ProjectOverviewEntryOld* entry = this->findEntry(m_table->item(_row, TableColumn::ColumnName)->text());
-	if (entry) {
-		entry->setIsChecked(true);
-		this->slotOpenProject();
-	}
-	else {
-		OT_LOG_E("Entry not found for project \"" + m_table->item(_row, TableColumn::ColumnName)->text().toStdString() + "\"");
-	}
-}
-
-void WelcomeWidget::slotTableHeaderItemClicked(int _column) {
-	if (_column == TableColumn::ColumnCheck) {
-		bool allChecked = true;
-		for (ProjectOverviewEntryOld* entry : m_entries) {
-			if (!entry->getIsChecked()) {
-				allChecked = false;
-				QSignalBlocker sigBlock(m_table);
-				entry->setIsChecked(true);
-			}
-		}
-
-		if (allChecked) {
-			QSignalBlocker sigBlock(m_table);
-			for (ProjectOverviewEntryOld* entry : m_entries) {
-				entry->setIsChecked(false);
-			}
-		}
-	}
-}
-
-void WelcomeWidget::slotTableHeaderSortingChanged(int _column, Qt::SortOrder _order) {
-	m_table->horizontalHeader()->setSortIndicatorShown(_column != TableColumn::ColumnCheck);
-}
-
 void WelcomeWidget::slotRefreshProjectList() {
-	switch (m_mode) {
-	case WelcomeWidget::ViewMode::ViewAll:
-		this->slotRefreshAllProjects();
-		break;
-	case WelcomeWidget::ViewMode::ViewRecent:
-		this->slotRefreshRecentProjects();
-		break;
-	default:
-		OT_LOG_EA("Unknown view mode");
-		break;
-	}
+	m_overview->refreshProjectList();
+
+	this->updateCountLabel();
+	this->updateToggleViewModeButton();
+	this->updateToolButtonsEnabledState();
 }
 
 void WelcomeWidget::slotRefreshRecentProjects() {
-	this->clear();
-
-	m_mode = ViewMode::ViewRecent;
 	m_titleLabel->setText("Recent Projects");
 
-	AppBase* app = AppBase::instance();
-	std::string currentUser = app->getCurrentLoginData().getUserName();
+	m_overview->refreshRecentProjects();
 
-	std::list<std::string> projects;
-	UserManagement userManager(app->getCurrentLoginData());
-	ProjectManagement projectManager(app->getCurrentLoginData());
-
-	std::list<std::string> recent;
-	userManager.getListOfRecentProjects(recent);
-	if (!projectManager.readProjectsInfo(recent)) {
-		OT_LOG_E("Read project author failed");
-		return;
-	}
-	
-	for (const std::string& proj : recent) {
-		std::string editorName("< Unknown >");
-		ot::ProjectInformation newInfo = projectManager.getProjectInformation(proj);
-
-		if (newInfo.getProjectName().empty()) {
-			OT_LOG_E("Project information for project \"" + proj + "\" not found");
-		}
-		else {
-			this->addProject(newInfo, newInfo.getUserName() == currentUser);
-		}
-	}
-
-	this->updateCountLabel(false);
+	this->updateCountLabel();
 	this->updateToggleViewModeButton();
 	this->updateToolButtonsEnabledState();
 }
 
 void WelcomeWidget::slotRefreshAllProjects() {
-	this->clear();
-
-	m_mode = ViewMode::ViewAll;
 	m_titleLabel->setText("Projects");
 
-	AppBase* app = AppBase::instance();
-	std::string currentUser = app->getCurrentLoginData().getUserName();
+	m_overview->refreshAllProjects();
 
-	std::list<ot::ProjectInformation> projects;
-	bool resultExceeded = false;
-	ProjectManagement projectManager(app->getCurrentLoginData());
-	projectManager.findProjects(m_filter->text().toStdString(), 100, projects, resultExceeded);
-
-	for (const ot::ProjectInformation& proj : projects) {
-		std::string editorName("< Unknown >");
-		//projectManager.getProjectAuthor(proj.getProjectName(), editorName);
-
-		this->addProject(proj, proj.getUserName() == currentUser);
-	}
-
-	this->updateCountLabel(resultExceeded);
+	this->updateCountLabel();
 	this->updateToggleViewModeButton();
 	this->updateToolButtonsEnabledState();
 }
 
 void WelcomeWidget::slotToggleViewMode() {
-	switch (m_mode) {
-	case WelcomeWidget::ViewMode::ViewAll:
-		m_mode = ViewMode::ViewRecent;
+	switch (m_overview->getDataMode()) {
+	case ot::ProjectOverviewWidget::RecentMode:
+		slotRefreshAllProjects();
 		break;
-	case WelcomeWidget::ViewMode::ViewRecent:
-		m_mode = ViewMode::ViewAll;
+	case ot::ProjectOverviewWidget::AllMode:
+		slotRefreshRecentProjects();
 		break;
 	default:
-		OT_LOG_EA("Unknown view mode");
+		OT_LOG_EAS("Unknown view mode (" + std::to_string(static_cast<int>(m_overview->getDataMode())) + ")");
 		break;
 	}
-
-	this->slotRefreshProjectList();
 }
 
 void WelcomeWidget::slotOpenProject() {
@@ -460,29 +206,19 @@ void WelcomeWidget::slotExportProject() {
 
 void WelcomeWidget::slotAccessProject() {
 	Q_EMIT projectAccessRequest();
-	this->refreshProjectList();
+	this->slotRefreshProjectList();
 }
 
 void WelcomeWidget::slotOwnerProject() {
 	Q_EMIT projectOwnerRequest();
-	this->refreshProjectList();
+	this->slotRefreshProjectList();
 }
 
 void WelcomeWidget::slotFilterChanged() {
-	if (m_filter->text().isEmpty()) {
-		for (int r = 0; r < m_table->rowCount(); r++) {
-			m_table->setRowHidden(r, false);
-		}
-	}
-	else {
-		for (int r = 0; r < m_table->rowCount(); r++) {
-			OTAssert(r < m_entries.size(), "Index mismatch");
-			m_table->setRowHidden(r, !(m_table->item(r, TableColumn::ColumnName)->text().contains(m_filter->text(), Qt::CaseInsensitive)));
-		}
-	}
+	m_overview->setGeneralFilter(m_filter->text());
 }
 
-void WelcomeWidget::slotProjectCheckedChanged() {
+void WelcomeWidget::slotSelectionChanged() {
 	this->updateToolButtonsEnabledState();
 }
 
@@ -501,67 +237,14 @@ ot::ToolButton* WelcomeWidget::iniToolButton(const QString& _text, const QString
 	return newButton;
 }
 
-void WelcomeWidget::clear() {
-	QSignalBlocker sigBlock(m_table);
-	int ix = m_table->horizontalHeader()->sortIndicatorSection();
-	Qt::SortOrder order = m_table->horizontalHeader()->sortIndicatorOrder();
+void WelcomeWidget::updateCountLabel() {
+	int count = m_overview->getProjectCount();
 
-	bool wasSortingEnabled = m_table->isSortingEnabled();
-	m_table->setSortingEnabled(false);
-
-	for (ProjectOverviewEntryOld* entry : m_entries) {
-		this->disconnect(entry, &ProjectOverviewEntryOld::checkedChanged, this, &WelcomeWidget::slotProjectCheckedChanged);
-		delete entry;
-	}
-	m_entries.clear();
-	m_table->setRowCount(0);
-
-	if (wasSortingEnabled) {
-		m_table->setSortingEnabled(true);
-		if (ix >= 0) {
-			m_table->horizontalHeader()->setSortIndicator(ix, order);
-			this->slotTableHeaderSortingChanged(ix, order);
-		}
-	}
-}
-
-void WelcomeWidget::addProject(const ot::ProjectInformation& _projectInfo, bool _ownerIsCreator) {
-	QSignalBlocker sigBlock(m_table);
-	
-	int ix = m_table->horizontalHeader()->sortIndicatorSection();
-	Qt::SortOrder order = m_table->horizontalHeader()->sortIndicatorOrder();
-
-	bool wasSortingEnabled = m_table->isSortingEnabled();
-	m_table->setSortingEnabled(false);
-
-	QIcon projectTypeIcon;
-	const QString iconPath = "ProjectTemplates/" + QString::fromStdString(_projectInfo.getProjectType()) + ".png";
-	if (ot::IconManager::fileExists(iconPath)) {
-		projectTypeIcon = ot::IconManager::getIcon(iconPath);
-	}
-	else {
-		projectTypeIcon = ot::IconManager::getDefaultProjectIcon();
-	}
-
-	ProjectOverviewEntryOld* newEntry = new ProjectOverviewEntryOld(_projectInfo, projectTypeIcon, _ownerIsCreator, m_table);
-	m_entries.push_back(newEntry);
-	this->connect(newEntry, &ProjectOverviewEntryOld::checkedChanged, this, &WelcomeWidget::slotProjectCheckedChanged);
-
-	if (wasSortingEnabled) {
-		m_table->setSortingEnabled(true);
-		if (ix >= 0) {
-			m_table->horizontalHeader()->setSortIndicator(ix, order);
-			this->slotTableHeaderSortingChanged(ix, order);
-		}
-	}
-}
-
-void WelcomeWidget::updateCountLabel(bool _hasMore) {
-	if (m_entries.empty()) {
+	if (count == 0) {
 		m_countLabel->setText("No projects found");
 	}
-	else if (m_entries.size() == 1) {
-		if (_hasMore) {
+	else if (count == 1) {
+		if (m_overview->getProjectsReultsExceeded()) {
 			m_countLabel->setText("Showing the first project found");
 		}
 		else {
@@ -569,23 +252,23 @@ void WelcomeWidget::updateCountLabel(bool _hasMore) {
 		}
 	}
 	else {
-		if (_hasMore) {
-			m_countLabel->setText("Showing the first " + QString::number(m_entries.size()) + " projects");
+		if (m_overview->getProjectsReultsExceeded()) {
+			m_countLabel->setText("Showing the first " + QString::number(count) + " projects");
 		}
 		else {
-			m_countLabel->setText(QString::number(m_entries.size()) + " projects found");
+			m_countLabel->setText(QString::number(count) + " projects found");
 		}
 	}
 }
 
 void WelcomeWidget::updateToggleViewModeButton() {
-	switch (m_mode) {
-	case WelcomeWidget::ViewMode::ViewAll:
+	switch (m_overview->getDataMode()) {
+	case ot::ProjectOverviewWidget::AllMode:
 		m_toggleViewModeButton->setText("View Recent");
 		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("ToolBar/ViewRecentProjects.png"));
 		m_toggleViewModeButton->setToolTip("View recent projects (Currently showing all projects)");
 		break;
-	case WelcomeWidget::ViewMode::ViewRecent:
+	case ot::ProjectOverviewWidget::RecentMode:
 		m_toggleViewModeButton->setText("View All");
 		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("ToolBar/ViewAllProjects.png"));
 		m_toggleViewModeButton->setToolTip("View all projects (Currently showing recent projects)");
@@ -597,10 +280,10 @@ void WelcomeWidget::updateToggleViewModeButton() {
 }
 
 void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
-	std::list<QString> lst = this->getSelectedProjects();
-	bool hasDifferentOwner = this->hasDifferentSelectedOwner();
+	int count = m_overview->getSelectedProjects().size();
+	bool hasDifferentOwner = m_overview->hasOtherUser(AppBase::instance()->getCurrentLoginData().getUserName());
 
-	if (lst.empty() || _forceDisabled) {
+	if (count == 0 || _forceDisabled) {
 		m_openButton->setEnabled(false);
 		m_copyButton->setEnabled(false);
 		m_renameButton->setEnabled(false);
@@ -609,7 +292,7 @@ void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
 		m_accessButton->setEnabled(false);
 		m_ownerButton->setEnabled(false);
 	}
-	else if (lst.size() == 1) {
+	else if (count == 1) {
 		m_openButton->setEnabled(true);
 		m_copyButton->setEnabled(true);
 		m_renameButton->setEnabled(!hasDifferentOwner);
@@ -627,22 +310,4 @@ void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
 		m_accessButton->setEnabled(false);
 		m_ownerButton->setEnabled(false);
 	}
-}
-
-bool WelcomeWidget::hasDifferentSelectedOwner() {
-	for (ProjectOverviewEntryOld* entry : m_entries) {
-		if (entry->getIsChecked()) {
-			if (!entry->getOwnerIsCreator()) return true;
-		}
-	}
-	return false;
-}
-
-ProjectOverviewEntryOld* WelcomeWidget::findEntry(const QString& _projectName) {
-	for (ProjectOverviewEntryOld* entry : m_entries) {
-		if (entry->getProjectName() == _projectName) {
-			return entry;
-		}
-	}
-	return nullptr;
 }

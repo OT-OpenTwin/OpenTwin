@@ -343,7 +343,7 @@ bool AppBase::logIn() {
 	StartArgumentParser args;
 	if (args.parse()) {
 		if (args.getOpenProjectSet()) {
-			QString projName = QString::fromStdString(args.getProjectInfo().getProjectName());
+			std::string projName = args.getProjectInfo().getProjectName();
 			std::string projVersion = args.getProjectVersion();
 			QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, projName, projVersion);
 		}
@@ -414,7 +414,7 @@ void AppBase::notify(UID _senderId, eventType _eventType, int _info1, int _info2
 				if (_info1 == 0 && !m_widgetIsWelcome) {
 					uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->getQWidget());
 					m_widgetIsWelcome = true;
-					m_welcomeScreen->refreshRecentProjects();
+					m_welcomeScreen->slotRefreshProjectList();
 				}
 				else if (m_widgetIsWelcome) {
 					// Changing from welcome screen to other tabView
@@ -499,7 +499,7 @@ bool AppBase::createNewProjectInDatabase(const QString& _projectName, const QStr
 
 void AppBase::refreshWelcomeScreen()
 {
-	m_welcomeScreen->refreshProjectList();
+	m_welcomeScreen->slotRefreshProjectList();
 }
 
 void AppBase::downloadInstaller(QString gssUrl)
@@ -999,7 +999,7 @@ void AppBase::createUi() {
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Set widgets to docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 25);
-			m_welcomeScreen->refreshRecentProjects();
+			m_welcomeScreen->slotRefreshRecentProjects();
 
 			// #######################################################################
 
@@ -3022,7 +3022,7 @@ void AppBase::slotCreateProject() {
 		return;
 	}
 
-	std::string currentName = m_welcomeScreen->getCurrentProjectFilter().toStdString();
+	std::string currentName = m_welcomeScreen->getGeneralFilter().toStdString();
 	// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 	if (!checkForContinue("Create New Project")) { return; }
 
@@ -3050,7 +3050,7 @@ void AppBase::slotCreateProject() {
 
 	// Initialize data
 	newProjectDialog.setProjectTemplates(m_ExternalServicesComponent->getListOfProjectTemplates());
-	newProjectDialog.setCurrentProjectName(m_welcomeScreen->getCurrentProjectFilter());
+	newProjectDialog.setCurrentProjectName(m_welcomeScreen->getGeneralFilter());
 
 	newProjectDialog.selectProjectType(userManager.restoreSetting("CreateProject.Type"), userManager.restoreSetting("CreateProject.Template"));
 
@@ -3090,7 +3090,7 @@ void AppBase::slotCreateProject() {
 
 		// Delete Project
 		projectManager.deleteProject(currentName);
-		m_welcomeScreen->refreshProjectList();
+		m_welcomeScreen->slotRefreshProjectList();
 	}
 
 	projectManager.createProject(currentName, projectType, m_loginData.getUserName(), templateName);
@@ -3110,42 +3110,40 @@ void AppBase::slotCreateProject() {
 }
 
 void AppBase::slotOpenProject() {
-		std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
-		if (selectedProjects.size() != 1) {
-			OT_LOG_EA("Invalid selection");
-			return;
-		}
-
-		this->slotOpenSpecificProject(selectedProjects.front(), std::string());
+	auto selectedProjects = m_welcomeScreen->getSelectedProjects();
+	if (selectedProjects.size() != 1) {
+		OT_LOG_EA("Can not open multiple projects");
+		return;
+	}
+	this->slotOpenSpecificProject(selectedProjects.front().getProjectName(), std::string());
 }
 
-void AppBase::slotOpenSpecificProject(QString _projectName, const std::string& _projectVersion) {
+void AppBase::slotOpenSpecificProject(std::string _projectName, const std::string& _projectVersion) {
 	// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 	if (!checkForContinue("Open Project")) {
 		return;
 	}
-	const std::string& selectedProjectName = _projectName.toStdString();
 	bool canBeDeleted = false;
 	ProjectManagement projectManager(m_loginData);
 
-	if (projectManager.projectExists(selectedProjectName, canBeDeleted)) {
+	if (projectManager.projectExists(_projectName, canBeDeleted)) {
 		// Check whether the project is currently opened in this or another other instance of the ui
-		if (selectedProjectName == m_currentProjectName) {
-			this->slotShowInfoPrompt("The project with the name \"" + selectedProjectName + "\" is already opened in this instance.", "", "Open Project");
+		if (_projectName == m_currentProjectName) {
+			this->slotShowInfoPrompt("The project with the name \"" + _projectName + "\" is already opened in this instance.", "", "Open Project");
 			return;
 		}
 		else {
 			// We have not currently opened this project, check if it is opened elsewhere
 			std::string projectUser;
-			if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName, projectUser)) {
-				this->slotShowErrorPrompt("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".", "", "Open Project");
+			if (m_ExternalServicesComponent->projectIsOpened(_projectName, projectUser)) {
+				this->slotShowErrorPrompt("The project with the name \"" + _projectName + "\" is already opened by user: \"" + projectUser + "\".", "", "Open Project");
 				return;
 			}
 		}
 
 		// Now we need to check whether we are able to open this project
-		std::string projectCollection = projectManager.getProjectCollection(selectedProjectName);
-		std::string projectType = projectManager.getProjectType(selectedProjectName);
+		std::string projectCollection = projectManager.getProjectCollection(_projectName);
+		std::string projectType = projectManager.getProjectType(_projectName);
 
 		UserManagement userManager(m_loginData);
 		assert(userManager.checkConnection()); // Failed to connect
@@ -3153,8 +3151,8 @@ void AppBase::slotOpenSpecificProject(QString _projectName, const std::string& _
 		if (!projectManager.canAccessProject(projectCollection)) {
 			this->slotShowErrorPrompt("Unable to access this project. The access permission might have been changed.", "", "Open Project");
 
-			userManager.removeRecentProject(selectedProjectName);
-			m_welcomeScreen->refreshProjectList();
+			userManager.removeRecentProject(_projectName);
+			m_welcomeScreen->slotRefreshProjectList();
 			return;
 		}
 
@@ -3165,10 +3163,10 @@ void AppBase::slotOpenSpecificProject(QString _projectName, const std::string& _
 		}
 
 		// Open project
-		if (m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection, std::string())) {
-			userManager.addRecentProject(selectedProjectName);
+		if (m_ExternalServicesComponent->openProject(_projectName, projectType, projectCollection, std::string())) {
+			userManager.addRecentProject(_projectName);
 			m_state |= AppState::ProjectOpenState;
-			m_welcomeScreen->refreshProjectList();
+			m_welcomeScreen->slotRefreshProjectList();
 		}
 	}
 	else {
@@ -3178,23 +3176,23 @@ void AppBase::slotOpenSpecificProject(QString _projectName, const std::string& _
 
 		this->slotShowErrorPrompt("Unable to access this project. The access permission might have been changed or the project has been deleted.", "", "Open Project");
 
-		userManager.removeRecentProject(selectedProjectName);
-		m_welcomeScreen->refreshProjectList();
+		userManager.removeRecentProject(_projectName);
+		m_welcomeScreen->slotRefreshProjectList();
 	}
 }
 
 void AppBase::slotCopyProject() {
-	std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
-	if (selectedProjects.size() != 1) {
+	auto lst = m_welcomeScreen->getSelectedProjects();
+	if (lst.size() != 1) {
 		OT_LOG_EA("Invalid selection");
 		return;
 	}
 
 	ProjectManagement projectManager(m_loginData);
 
-	const QString& selectedProjectName = selectedProjects.front();
+	const std::string& selectedProjectName = lst.front().getProjectName();
 
-	CopyProjectDialog dia(selectedProjectName, projectManager);
+	CopyProjectDialog dia(QString::fromStdString(selectedProjectName), projectManager);
 	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}
@@ -3213,7 +3211,7 @@ void AppBase::slotCopyProject() {
 		projectManager.deleteProject(newProjectName);
 	}
 
-	projectManager.copyProject(selectedProjectName.toStdString(), newProjectName, m_loginData.getUserName());
+	projectManager.copyProject(selectedProjectName, newProjectName, m_loginData.getUserName());
 
 	// Now we add the copied project to the recently used projects list
 	UserManagement userManager(m_loginData);
@@ -3224,21 +3222,21 @@ void AppBase::slotCopyProject() {
 	userManager.addRecentProject(newProjectName);
 
 	// And refresh the view
-	m_welcomeScreen->refreshProjectList();
+	m_welcomeScreen->slotRefreshProjectList();
 }
 
 void AppBase::slotRenameProject() {
-	std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
-	if (selectedProjects.size() != 1) {
+	auto lst = m_welcomeScreen->getSelectedProjects();
+	if (lst.size() != 1) {
 		OT_LOG_EA("Invalid selection");
 		return;
 	}
 
 	ProjectManagement projectManager(m_loginData);
 
-	const QString& selectedProjectName = selectedProjects.front();
+	const std::string& selectedProjectName = lst.front().getProjectName();
 
-	RenameProjectDialog dia(selectedProjectName, projectManager);
+	RenameProjectDialog dia(QString::fromStdString(selectedProjectName), projectManager);
 	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}
@@ -3253,11 +3251,11 @@ void AppBase::slotRenameProject() {
 		return;
 	}
 
-	if (selectedProjectName.toStdString() != m_currentProjectName) {
+	if (selectedProjectName != m_currentProjectName) {
 		std::string projectUser;
-		if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName.toStdString(), projectUser)) {
+		if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName, projectUser)) {
 			std::string msg("The project with the name \"");
-			msg.append(selectedProjectName.toStdString());
+			msg.append(selectedProjectName);
 			msg.append("\" is currently opened by user: \"");
 			msg.append(projectUser);
 			msg.append("\".");
@@ -3269,13 +3267,13 @@ void AppBase::slotRenameProject() {
 
 	// Check if the project is currently open
 	bool reopenProject = false;
-	if (m_currentProjectName == selectedProjectName.toStdString()) {
+	if (m_currentProjectName == selectedProjectName) {
 		m_ExternalServicesComponent->closeProject(false);
 		m_state &= (~AppState::ProjectOpenState);
 		reopenProject = true;
 	}
 
-	projectManager.renameProject(selectedProjectName.toStdString(), newProjectName);
+	projectManager.renameProject(selectedProjectName, newProjectName);
 
 	// Now we add the copied project to the recently used projects list
 	UserManagement userManager(m_loginData);
@@ -3283,7 +3281,7 @@ void AppBase::slotRenameProject() {
 		OT_LOG_EA("Failed to establish connection");
 	}
 	userManager.addRecentProject(newProjectName);
-	userManager.removeRecentProject(selectedProjectName.toStdString());
+	userManager.removeRecentProject(selectedProjectName);
 
 	// Reopen the project if needed
 	if (reopenProject && m_ExternalServicesComponent->openProject(newProjectName, projectManager.getProjectType(newProjectName), projectManager.getProjectCollection(newProjectName), std::string())) {
@@ -3291,18 +3289,18 @@ void AppBase::slotRenameProject() {
 	}
 
 	// Refresh the view
-	m_welcomeScreen->refreshProjectList();
+	m_welcomeScreen->slotRefreshProjectList();
 }
 
 void AppBase::slotDeleteProject() {
-	std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
+	auto lst = m_welcomeScreen->getSelectedProjects();
 
 	QString txt;
-	if (selectedProjects.size() == 1) {
-		txt = "Do you want to delete the project \"" + selectedProjects.front() + "\"?\nThis operation can not be undone.";
+	if (lst.size() == 1) {
+		txt = "Do you want to delete the project \"" + QString::fromStdString(lst.front().getProjectName()) + "\"?\nThis operation can not be undone.";
 	}
 	else {
-		txt = "Do you want to delete the selected projects (" + QString::number(selectedProjects.size()) + " projects selected)? This operation can not be undone.";
+		txt = "Do you want to delete the selected projects (" + QString::number(lst.size()) + " projects selected)? This operation can not be undone.";
 	}
 	QMessageBox msg(QMessageBox::Warning, "Confirm Delete", txt, QMessageBox::Yes | QMessageBox::No, this->mainWindow());
 	if (msg.exec() != QMessageBox::Yes) {
@@ -3316,15 +3314,15 @@ void AppBase::slotDeleteProject() {
 		return;
 	}
 
-	for (const QString& proj : selectedProjects) {
+	for (const ot::ProjectInformation& proj : lst) {
 
 		bool projectIsLocked = false;
 
-		if (proj.toStdString() != m_currentProjectName) {
+		if (proj.getProjectName() != m_currentProjectName) {
 			std::string projectUser;
-			if (m_ExternalServicesComponent->projectIsOpened(proj.toStdString(), projectUser)) {
+			if (m_ExternalServicesComponent->projectIsOpened(proj.getProjectName(), projectUser)) {
 				std::string msg("The project with the name \"");
-				msg.append(proj.toStdString());
+				msg.append(proj.getProjectName());
 				msg.append("\" is currently opened by user: \"");
 				msg.append(projectUser);
 				msg.append("\".");
@@ -3335,89 +3333,86 @@ void AppBase::slotDeleteProject() {
 		}
 
 		// Check if the project it the same project as the currently open one
-		if (proj.toStdString() == m_currentProjectName) {
+		if (proj.getProjectName() == m_currentProjectName) {
 			m_ExternalServicesComponent->closeProject(false);
 			m_state &= (~AppState::ProjectOpenState);
 		}
 
-		projectManager.deleteProject(proj.toStdString());
-		userManager.removeRecentProject(proj.toStdString());
+		projectManager.deleteProject(proj.getProjectName());
+		userManager.removeRecentProject(proj.getProjectName());
 	}
 
-	m_welcomeScreen->refreshProjectList();
+	m_welcomeScreen->slotRefreshProjectList();
 }
 
 void AppBase::slotExportProject() {
-	{
-		std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
-		if (selectedProjects.size() != 1) {
-			OT_LOG_EA("Invalid selection");
-			return;
-		}
-
-		const QString& selectedProjectName = selectedProjects.front();
-
-		this->slotLockUI(true);
-
-		// Show the export file selector 
-		QString exportFileName = QFileDialog::getSaveFileName(
-			nullptr,
-			"Export Project To File",
-			QDir::currentPath() + "/" + selectedProjectName,
-			QString("*.otproj ;; All files (*.*)"));
-
-		// Now export the current project to the file
-
-		if (!exportFileName.isEmpty()) {
-			std::thread workerThread(&AppBase::exportProjectWorker, this, selectedProjectName.toStdString(), exportFileName.toStdString());
-			workerThread.detach();
-		}
-		else {
-			slotLockUI(false);
-		}
-	}
-
-}
-
-void AppBase::slotManageProjectAccess() {
-	std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
-	if (selectedProjects.size() != 1) {
+	auto lst = m_welcomeScreen->getSelectedProjects();
+	if (lst.size() != 1) {
 		OT_LOG_EA("Invalid selection");
 		return;
 	}
 
-	const QString& selectedProjectName = selectedProjects.front();
+	const std::string& selectedProjectName = lst.front().getProjectName();
+
+	this->slotLockUI(true);
+
+	// Show the export file selector 
+	QString exportFileName = QFileDialog::getSaveFileName(
+		nullptr,
+		"Export Project To File",
+		QDir::currentPath() + "/" + QString::fromStdString(selectedProjectName),
+		QString("*.otproj ;; All files (*.*)"));
+
+	// Now export the current project to the file
+
+	if (!exportFileName.isEmpty()) {
+		std::thread workerThread(&AppBase::exportProjectWorker, this, selectedProjectName, exportFileName.toStdString());
+		workerThread.detach();
+	}
+	else {
+		slotLockUI(false);
+	}
+}
+
+void AppBase::slotManageProjectAccess() {
+	auto lst = m_welcomeScreen->getSelectedProjects();
+	if (lst.size() != 1) {
+		OT_LOG_EA("Invalid selection");
+		return;
+	}
+
+	const std::string& selectedProjectName = lst.front().getProjectName();
 
 	this->slotLockUI(true);
 
 	// Show the ManageAccess Dialog box
-	ManageAccess accessManager(m_loginData.getAuthorizationUrl(), selectedProjectName.toStdString());
+	ManageAccess accessManager(m_loginData.getAuthorizationUrl(), selectedProjectName);
 	accessManager.showDialog();
 
 	this->slotLockUI(false);
 }
 
 void AppBase::slotManageProjectOwner() {
-	std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
-	if (selectedProjects.size() != 1) {
+	auto lst = m_welcomeScreen->getSelectedProjects();
+	if (lst.size() != 1) {
 		OT_LOG_EA("Invalid selection");
 		return;
 	}
 
-	const QString& selectedProjectName = selectedProjects.front();
+	const std::string& selectedProjectName = lst.front().getProjectName();
 
-	ManageProjectOwner ownerManager(m_loginData.getAuthorizationUrl(), selectedProjectName.toStdString(), m_loginData.getUserName());
+	ManageProjectOwner ownerManager(m_loginData.getAuthorizationUrl(), selectedProjectName, m_loginData.getUserName());
 
 	ownerManager.showDialog();
 
 	// Now we need to check whether we have no longer access to the project
 	ProjectManagement projectManager(m_loginData);
-	std::string projectCollection = projectManager.getProjectCollection(selectedProjectName.toStdString());
+	std::string projectCollection = projectManager.getProjectCollection(selectedProjectName);
 	bool hasAccess = projectManager.canAccessProject(projectCollection);
 
 	if (!hasAccess) {
 		// We need to close the project if it is currently open
-		if (m_currentProjectName == selectedProjectName.toStdString()) {
+		if (m_currentProjectName == selectedProjectName) {
 			m_ExternalServicesComponent->closeProject(false);
 		}
 
@@ -3427,10 +3422,10 @@ void AppBase::slotManageProjectOwner() {
 			OT_LOG_EA("User manager connection failed");
 			return;
 		}
-		userManager.removeRecentProject(selectedProjectName.toStdString());
+		userManager.removeRecentProject(selectedProjectName);
 	}
 
-	m_welcomeScreen->refreshProjectList();
+	m_welcomeScreen->slotRefreshProjectList();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

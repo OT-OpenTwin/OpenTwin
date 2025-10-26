@@ -161,6 +161,12 @@
     <ClCompile Include="src\StartArgumentParser.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProjectOverviewWidget.cpp">
+      <Filter>Source Files\CustomWidgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProjectOverviewEntry.cpp">
+      <Filter>Source Files\CustomWidgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -286,6 +292,12 @@
       <Filter>Header Files\WidgetView</Filter>
     </QtMoc>
     <QtMoc Include="include\SelectProjectDialog.h">
+      <Filter>Header Files\CustomWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectOverviewEntry.h">
+      <Filter>Header Files\CustomWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectOverviewWidget.h">
       <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
   </ItemGroup>
