@@ -190,7 +190,7 @@ void HandleWheel::createWheel(osg::Geode * _geode, double color[4], double wheel
 		geometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
 		geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUAD_STRIP, 0, vertices->size()) );
-		_geode->addDrawable( geometry.get() );
+		_geode->addDrawable( geometry );
 	}  // end cirle loop
 
 	// Apply the general settings
@@ -213,7 +213,7 @@ void HandleWheel::createWheel(osg::Geode * _geode, double color[4], double wheel
 
 	material->setShininess(osg::Material::FRONT_AND_BACK, 0);
 
-	ssGeode->setAttribute(material.get());
+	ssGeode->setAttribute(material);
 }
 
 void HandleWheel::updateTransform(void)

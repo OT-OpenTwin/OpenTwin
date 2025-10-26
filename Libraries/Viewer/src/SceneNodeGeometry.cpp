@@ -608,18 +608,18 @@ osg::Node * SceneNodeGeometry::createOSGNodeFromTriangles(double colorRGB[3], co
 	setOffset(offsetFactor);
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f * offsetFactor, 2.0f * offsetFactor));
 
-	newGeometry->setVertexArray(vertices.get());
-	newGeometry->setTexCoordArray(0, textures.get());
+	newGeometry->setVertexArray(vertices);
+	newGeometry->setTexCoordArray(0, textures);
 
-	newGeometry->setNormalArray(normals.get());
+	newGeometry->setNormalArray(normals);
 	newGeometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, nTriangles * 3));
 
-	newGeometry->getOrCreateStateSet()->setAttribute(material.get());
+	newGeometry->getOrCreateStateSet()->setAttribute(material);
 
 	// Now create the geometry node and assign the drawable
 	osg::Geode *triangleNode = new osg::Geode;
@@ -683,8 +683,8 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 	}
 
 	// Now build the osg nodes for the edge and the selected edge
-	edgesNode = buildEdgesOSGNode(nEdges, vertices.get(), colorRGB[0], colorRGB[1], colorRGB[2], edgeTranspacency, true, 1.0);
-	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices.get(), 1.0, 0.0, 0.0, 1.0, false, 1.0);
+	edgesNode = buildEdgesOSGNode(nEdges, vertices, colorRGB[0], colorRGB[1], colorRGB[2], edgeTranspacency, true, 1.0);
+	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices, 1.0, 0.0, 0.0, 1.0, false, 1.0);
 
 	if (!backFaceCulling)
 	{
@@ -722,7 +722,7 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 			}
 		}
 
-		osg::Node *faceEdgesNode = buildEdgesOSGNode(nEdges, vertices.get(), 1.0, 0.0, 0.0, 1.0, false, 1.0);
+		osg::Node *faceEdgesNode = buildEdgesOSGNode(nEdges, vertices, 1.0, 0.0, 0.0, 1.0, false, 1.0);
 
 		faceEdgesHighlight[faceEdges.first] = faceEdgesNode;
 		faceEdgesHighlightNode->addChild(faceEdgesNode);
@@ -822,7 +822,7 @@ ot::UID SceneNodeGeometry::getFaceIdFromEdgePrimitiveIndex(unsigned long long hi
 }
 
 
-osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::Vec3Array *vertices, double r, double g, double b, double transp, bool depthTest, double width)
+osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::ref_ptr <osg::Vec3Array> &vertices, double r, double g, double b, double transp, bool depthTest, double width)
 {
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
 	colors->push_back(osg::Vec4(r, g, b, transp));
@@ -838,7 +838,7 @@ osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::
 
 	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, nEdges * 2));
@@ -846,7 +846,7 @@ osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::
 //	if (depthTest) {
 //		osg::ref_ptr<osg::Material> matEdges = new osg::Material;
 //		this->setMaterialProperties(matEdges, r, g, b);
-//		newGeometry->getOrCreateStateSet()->setAttribute(matEdges.get());
+//		newGeometry->getOrCreateStateSet()->setAttribute(matEdges);
 //	}
 
 	// Now create the geometry node and assign the drawable
@@ -898,15 +898,15 @@ osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, u
 	osg::MatrixTransform* transformNode = dynamic_cast<osg::MatrixTransform*>(edges);
 	if (transformNode == nullptr) return nullptr;
 
-	osg::Geode* edgesNode = dynamic_cast<osg::Geode*>(transformNode->getChild(0));
-	if (edgesNode == nullptr) return nullptr;
+	osg::ref_ptr<osg::Geode> edgesNode = dynamic_cast<osg::Geode*>(transformNode->getChild(0));
+	if (!edgesNode.valid()) return nullptr;
 
-	osg::Geometry *geometry = dynamic_cast<osg::Geometry*>(edgesNode->getDrawable(0));
-	if (geometry == nullptr) return nullptr;
+	osg::ref_ptr<osg::Geometry> geometry = dynamic_cast<osg::Geometry*>(edgesNode->getDrawable(0));
+	if (!geometry.valid()) return nullptr;
 
 	// Now we get the vertices from this drawable which belong to the two faces
-	osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geometry->getVertexArray());
-	if (vertices == nullptr) return nullptr;
+	osg::ref_ptr <osg::Vec3Array> vertices = dynamic_cast<osg::Vec3Array*>(geometry->getVertexArray());
+	if (!vertices.valid()) return nullptr;
 
 	unsigned int numberVertices = vertices->getNumElements();
 	unsigned int numberEdges = numberVertices / 2;
@@ -996,7 +996,7 @@ osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, u
 		nVertex += 1;
 	}
 
-	osg::Node* edgeNode = buildEdgesOSGNode(nEdges, points.get(), r, g, b, 1.0, false, lineWidth);
+	osg::Node* edgeNode = buildEdgesOSGNode(nEdges, points, r, g, b, 1.0, false, lineWidth);
 
 	if (edgeNode != nullptr)
 	{
@@ -1101,7 +1101,7 @@ void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], double edge
 				SceneNodeMaterial sceneNodeMaterial;
 				sceneNodeMaterial.setMaterial(material, materialType, surfaceColorRGB[0], surfaceColorRGB[1], surfaceColorRGB[2], m_transparency);
 
-				geometry->getOrCreateStateSet()->setAttribute(material.get());
+				geometry->getOrCreateStateSet()->setAttribute(material);
 
 				if (textureAttribute != nullptr) geometry->getOrCreateStateSet()->removeTextureAttribute(0, textureAttribute);
 				if (textureAttributeGen != nullptr) geometry->getOrCreateStateSet()->removeTextureAttribute(0, textureAttributeGen);
@@ -1263,9 +1263,9 @@ void SceneNodeGeometry::assignTexture(osg::Geometry *geometry, const std::string
 			texenv->setColor(osg::Vec4((float) r, (float) g, (float) b, 0.0f));
 			textureAttributeEnv = texenv;
 
-			geometry->getOrCreateStateSet()->setTextureAttributeAndModes(0, texgen.get(), osg::StateAttribute::ON);
+			geometry->getOrCreateStateSet()->setTextureAttributeAndModes(0, texgen, osg::StateAttribute::ON);
 
-			geometry->getOrCreateStateSet()->setTextureAttribute(0, texenv.get());
+			geometry->getOrCreateStateSet()->setTextureAttribute(0, texenv);
 		}
 		else
 		{

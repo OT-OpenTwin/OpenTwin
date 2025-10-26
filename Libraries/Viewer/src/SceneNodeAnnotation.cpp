@@ -279,12 +279,12 @@ osg::Node * SceneNodeAnnotation::createOSGNodeFromTriangles(const std::vector<st
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(1.0f, 1.0f));
 
 	// Now set the vertices, the normal and the colors
-	newGeometry->setVertexArray(vertices.get());
+	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setNormalArray(normals.get());
+	newGeometry->setNormalArray(normals);
 	newGeometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, nTriangles * 3));
@@ -337,11 +337,11 @@ void SceneNodeAnnotation::createOSGNodeFromEdges(const double colorRGB[3],
 	}
 
 	// Now build the osg nodes for the edge and the selected edge
-	edgesNode = buildEdgesOSGNode(nEdges, vertices.get(), colorRGB[0], colorRGB[1], colorRGB[2], true);
-	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices.get(), 1.0, 0.0, 0.0, false);
+	edgesNode = buildEdgesOSGNode(nEdges, vertices, colorRGB[0], colorRGB[1], colorRGB[2], true);
+	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices, 1.0, 0.0, 0.0, false);
 }
 
-osg::Node *SceneNodeAnnotation::buildEdgesOSGNode(unsigned long long nEdges, osg::Vec3Array *vertices, double r, double g, double b, bool depthTest)
+osg::Node *SceneNodeAnnotation::buildEdgesOSGNode(unsigned long long nEdges, osg::ref_ptr<osg::Vec3Array> &vertices, double r, double g, double b, bool depthTest)
 {
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
 	colors->push_back(osg::Vec4(r, g, b, 1.0f));
@@ -357,7 +357,7 @@ osg::Node *SceneNodeAnnotation::buildEdgesOSGNode(unsigned long long nEdges, osg
 
 	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, nEdges * 2));
@@ -423,7 +423,7 @@ void SceneNodeAnnotation::createOSGNodeFromVertices(const std::vector<std::array
 
 	vertexGeometry->setVertexArray(vertices);
 
-	vertexGeometry->setColorArray(colors.get());
+	vertexGeometry->setColorArray(colors);
 	vertexGeometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 
 	vertexGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, nVertices));
@@ -454,7 +454,7 @@ void SceneNodeAnnotation::createOSGNodeFromVertices(const std::vector<std::array
 
 	highlightVertexGeometry->setVertexArray(vertices);
 
-	highlightVertexGeometry->setColorArray(highlightColor.get());
+	highlightVertexGeometry->setColorArray(highlightColor);
 	highlightVertexGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	highlightVertexGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, nVertices));

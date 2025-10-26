@@ -249,9 +249,6 @@
     <ClInclude Include="include\HandleWheel.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\CappingEffect.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\ClipPlaneManipulator.h">
       <Filter>include</Filter>
     </ClInclude>

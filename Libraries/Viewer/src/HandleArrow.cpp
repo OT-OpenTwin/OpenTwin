@@ -73,7 +73,7 @@ void HandleArrow::createArrow(osg::Geode * _geode, double color[4], double lengt
 	// Set color
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array(1);
 	colors->at(0).set(color[0], color[1], color[2], color[3]);
-	arrow->setColorArray(colors.get());
+	arrow->setColorArray(colors);
 	arrow->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	_geode->addDrawable(arrow);
@@ -97,7 +97,7 @@ void HandleArrow::createArrow(osg::Geode * _geode, double color[4], double lengt
 	arrowTip->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
 	// Set color
-	arrowTip->setColorArray(colors.get());
+	arrowTip->setColorArray(colors);
 	arrowTip->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	_geode->addDrawable(arrowTip);
@@ -120,7 +120,7 @@ void HandleArrow::createArrow(osg::Geode * _geode, double color[4], double lengt
 
 	material->setShininess(osg::Material::FRONT_AND_BACK, 0);
 
-	ssGeode->setAttribute(material.get());
+	ssGeode->setAttribute(material);
 }
 
 void HandleArrow::updateTransform(void)

@@ -46,7 +46,7 @@ private:
 								const std::vector<std::array<double, 3>> &triangle_p2,
 								const std::vector<std::array<double, 3>> &triangle_p3,
 							    osg::Node *&edgesNode, osg::Node *&edgesHighlightedNode);
-	osg::Node *buildEdgesOSGNode(unsigned long long nEdges, osg::Vec3Array *vertices, double r, double g, double b, bool depthTest);
+	osg::Node *buildEdgesOSGNode(unsigned long long nEdges, osg::ref_ptr<osg::Vec3Array> &vertices, double r, double g, double b, bool depthTest);
 	void createOSGNodeFromVertices(const std::vector<std::array<double, 3>> &points,
 								   const std::vector<std::array<double, 3>> &points_rgb,
 								   osg::Node *&verticesNode, osg::Node *&verticesHighlightedNode);

@@ -324,9 +324,9 @@ void SceneNodeMeshItem::loadEdgeData(void)
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
 	colors->push_back(osg::Vec4(colorRGB[0], colorRGB[1], colorRGB[2], 1.0f));
 
-	newGeometry->setVertexArray(vertices.get());
+	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, numberEdges * 2));

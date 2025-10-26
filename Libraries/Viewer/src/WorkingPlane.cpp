@@ -237,12 +237,12 @@ void WorkingPlane::rebuildNode(void) {
 		newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(-1.0f, 1.0f));
 
 		// Now set the vertices, the normal and the colors
-		newGeometry->setVertexArray(vertices.get());
+		newGeometry->setVertexArray(vertices);
 
-		newGeometry->setNormalArray(normals.get());
+		newGeometry->setNormalArray(normals);
 		newGeometry->setNormalBinding(osg::Geometry::BIND_OVERALL);
 
-		newGeometry->setColorArray(colors.get());
+		newGeometry->setColorArray(colors);
 		newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 		newGeometry->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
@@ -379,7 +379,7 @@ void WorkingPlane::rebuildNode(void) {
 
 		gridGeometry->setVertexArray(gridVertices);
 
-		gridGeometry->setColorArray(gridColors.get());
+		gridGeometry->setColorArray(gridColors);
 		gridGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 		gridGeometry->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, ctGrid));
@@ -421,7 +421,7 @@ void WorkingPlane::rebuildNode(void) {
 
 			gridGeometryWide->setVertexArray(gridVerticesWide);
 
-			gridGeometryWide->setColorArray(gridColorsWide.get());
+			gridGeometryWide->setColorArray(gridColorsWide);
 			gridGeometryWide->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 			gridGeometryWide->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, ctGridWide));

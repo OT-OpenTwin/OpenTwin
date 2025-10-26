@@ -143,7 +143,7 @@ osg::Node *SceneNodeCartesianMesh::createOSGNodeFromCoordinates(const std::vecto
 
 	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUADS, 0, quadIndex));
@@ -796,12 +796,12 @@ osg::Node *SceneNodeCartesianMesh::createFaceNode(osg::ref_ptr<osg::Vec3Array> &
 
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f, 2.0f));
 
-	newGeometry->setVertexArray(vertices.get());
+	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setNormalArray(normals.get());
+	newGeometry->setNormalArray(normals);
 	newGeometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, vertices->size()));
@@ -832,9 +832,9 @@ osg::Node *SceneNodeCartesianMesh::createEdgeNode(osg::ref_ptr<osg::Vec3Array> &
 
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(1.0f, 1.0f));
 
-	newGeometry->setVertexArray(vertices.get());
+	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUADS, 0, vertices->size()));
@@ -1044,7 +1044,7 @@ void SceneNodeCartesianMesh::setFaceStatus(int face, bool visible, bool forward,
 		SceneNodeMaterial sceneNodeMaterial;
 		sceneNodeMaterial.setMaterial(material, "Rough", r, g, b, m_transparency);
 
-		faceGeometry->getOrCreateStateSet()->setAttribute(material.get());
+		faceGeometry->getOrCreateStateSet()->setAttribute(material);
 
 		faceRefreshNeeded = true;
 	}

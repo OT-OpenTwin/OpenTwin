@@ -181,7 +181,7 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	osg::StateSet* rootStateSet = new osg::StateSet;
 	rootNode->setStateSet(rootStateSet);
 
-	rootNode->addChild(osgLightSource.get());
+	rootNode->addChild(osgLightSource);
 	osgLightSource->setStateSetModes(*(rootNode->getOrCreateStateSet()), osg::StateAttribute::ON);
 	
 	// Create new viewer
@@ -1615,12 +1615,12 @@ void Viewer::createClipPlane(osg::Vec3d normal, osg::Vec3d point)
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(-1.0f, 1.0f));
 
 	// Now set the vertices, the normal and the colors
-	newGeometry->setVertexArray(vertices.get());
+	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setNormalArray(normals.get());
+	newGeometry->setNormalArray(normals);
 	newGeometry->setNormalBinding(osg::Geometry::BIND_OVERALL);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));

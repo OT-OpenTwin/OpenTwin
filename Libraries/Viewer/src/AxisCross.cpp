@@ -152,7 +152,7 @@ void AxisCross::rebuildNode(void) {
 	// Set color
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array(1);
 	colors->at(0).set(settings->axisCenterColor.r() / 255.0, settings->axisCenterColor.g() / 255.0, settings->axisCenterColor.b() / 255.0, settings->axisCenterColor.a() / 255.0);
-	centerPoint->setColorArray(colors.get());
+	centerPoint->setColorArray(colors);
 	centerPoint->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	m_centerPoint->addDrawable(centerPoint);
@@ -175,7 +175,7 @@ void AxisCross::rebuildNode(void) {
 
 	material->setShininess(osg::Material::FRONT_AND_BACK, 0);
 
-	ssCenterGeode->setAttribute(material.get());
+	ssCenterGeode->setAttribute(material);
 
 	m_axisCrossNode->addChild(m_centerPoint);
 
@@ -243,7 +243,7 @@ void AxisCross::createArrow(osg::Geode * _geode, const ot::Color& _color) {
 	// Set color
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array(1);
 	colors->at(0).set(_color.r() / 255.0, _color.g() / 255.0, _color.b() / 255.0, _color.a() / 255.0);
-	arrow->setColorArray(colors.get());
+	arrow->setColorArray(colors);
 	arrow->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	_geode->addDrawable(arrow);
@@ -271,7 +271,7 @@ void AxisCross::createArrow(osg::Geode * _geode, const ot::Color& _color) {
 	arrowTip->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
 	// Set color
-	arrowTip->setColorArray(colors.get());
+	arrowTip->setColorArray(colors);
 	arrowTip->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	_geode->addDrawable(arrowTip);
@@ -294,7 +294,7 @@ void AxisCross::createArrow(osg::Geode * _geode, const ot::Color& _color) {
 
 	material->setShininess(osg::Material::FRONT_AND_BACK, 0);
 
-	ssGeode->setAttribute(material.get());
+	ssGeode->setAttribute(material);
 }
 
 void AxisCross::createText(osg::Geode * _geode, const std::string &label) 

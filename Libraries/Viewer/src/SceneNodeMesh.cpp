@@ -458,12 +458,12 @@ osg::Node *SceneNodeMesh::createFaceNode(bsoncxx::document::view view, double *c
 
 		newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f, 2.0f));
 
-		newGeometry->setVertexArray(vertices.get());
+		newGeometry->setVertexArray(vertices);
 
-		newGeometry->setNormalArray(normals.get());
+		newGeometry->setNormalArray(normals);
 		newGeometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
-		newGeometry->setColorArray(colors.get());
+		newGeometry->setColorArray(colors);
 		newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 		newGeometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, numberOfSubdividedTriangles * 3));
@@ -776,12 +776,12 @@ osg::Node *SceneNodeMesh::createFaceNodeBackwardCompatible(bsoncxx::document::vi
 
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f, 2.0f));
 
-	newGeometry->setVertexArray(vertices.get());
+	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setNormalArray(normals.get());
+	newGeometry->setNormalArray(normals);
 	newGeometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, numberTriangles * 3));
@@ -863,7 +863,7 @@ osg::Node *SceneNodeMesh::createEdgeNode(bsoncxx::document::view view, double *c
 
 		newGeometry->setVertexArray(vertices);
 
-		newGeometry->setColorArray(colors.get());
+		newGeometry->setColorArray(colors);
 		newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 		newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, numberEdges * 2));
@@ -960,7 +960,7 @@ osg::Node *SceneNodeMesh::createEdgeNodeBackwardCompatible(bsoncxx::document::vi
 
 	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, numberEdges * 2));
@@ -1177,7 +1177,7 @@ void SceneNodeMesh::setFaceStatus(int face, bool visible, bool forward, bool dou
 		SceneNodeMaterial sceneNodeMaterial;
 		sceneNodeMaterial.setMaterial(material, "Rough", r, g, b, m_transparency);
 
-		faceGeometry->getOrCreateStateSet()->setAttribute(material.get());
+		faceGeometry->getOrCreateStateSet()->setAttribute(material);
 
 		faceRefreshNeeded = true;
 	}

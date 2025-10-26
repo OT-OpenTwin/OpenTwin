@@ -39,7 +39,7 @@ void HandlerBase::createSelectLine(osg::Switch *node, std::list<osg::Vec3d> &poi
 
 	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP, 0, pointList.size()));

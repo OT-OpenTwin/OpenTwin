@@ -99,7 +99,6 @@
     <ClInclude Include="include\AbstractPlot.h" />
     <ClInclude Include="include\AxisCenterCross.h" />
     <ClInclude Include="include\AxisCross.h" />
-    <ClInclude Include="include\CappingEffect.h" />
     <ClInclude Include="include\ClipPlaneManipulator.h" />
     <ClInclude Include="include\CurveVisualiser.h" />
     <ClInclude Include="include\EdgeSelection.h" />

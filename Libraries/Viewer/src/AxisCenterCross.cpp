@@ -150,7 +150,7 @@ void AxisCenterCross::createArrow(osg::Geode * _geode, const ot::Color& _color, 
 	newGeometry->setVertexArray(vertices);
 
 	// Set colors
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	// Draw vertices
@@ -209,7 +209,7 @@ void AxisCenterCross::createDashedLine(osg::Geode * _geode, const ot::Color& _co
 
 	newGeometry->setVertexArray(vertices);
 
-	newGeometry->setColorArray(colors.get());
+	newGeometry->setColorArray(colors);
 	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, pointList.size()));
