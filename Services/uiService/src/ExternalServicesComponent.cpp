@@ -2197,7 +2197,10 @@ void ExternalServicesComponent::handleOpenRawFile(ot::JsonDocument& _document) {
 
 	// Determine a temporary file name
 	QString suffix = "." + QString::fromStdString(fileType);
-	QString qFileName = QString::fromStdString(fileName) + suffix;
+	QString qFileName = QString::fromStdString(fileName);
+	if (!qFileName.endsWith(suffix)) {
+		qFileName.append(suffix);
+	}
 
 	if (!m_tempFolder->addFile(entityName, qFileName, byteArray, true)) {
 		return;

@@ -405,9 +405,11 @@ void Application::updateButtonStates() {
 
 	if (canOpenProject) {
 		enabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
+		enabledControls.push_back(m_updateImageFromProjectButton.getFullPath());
 	}
 	else {
 		disabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
+		disabledControls.push_back(m_updateImageFromProjectButton.getFullPath());
 	}
 	
 	if ((projectsToOpen.size() + documentsToOpen.size()) == 1) {
