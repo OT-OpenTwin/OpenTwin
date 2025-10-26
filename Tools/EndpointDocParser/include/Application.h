@@ -61,6 +61,8 @@ public:
 
 	bool writeServiceRstFile(const std::string& _path, const std::string& _rst);
 
+	std::string serviceNameToSnakeCase(const std::string& _serviceName);
+
 private:
 	std::list<Service> m_services;
 	std::map<std::string, std::string> m_actionMacros;

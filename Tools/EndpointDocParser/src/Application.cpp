@@ -799,7 +799,7 @@ bool Application::generateDocumentation(const std::list<Service>& m_services) {
 	for (const Service& service : m_services) {
 	std::string rst = generateServiceRstContent(service);
 //  std::string path = getPathToOTDocumentation();	// C:\OT\OpenTwin\Documentation\Developer\documented_endpoints
-//	std::string serviceName = cleanServiceName();	// AuthorisationService -> authorisation_service
+	std::string serviceName = serviceNameToSnakeCase(service.getName());	// AuthorisationService -> authorisation_service
 //	hasError |= writeServiceRstFile(path + "\\" + serviceName + ".rst", rst);
 	hasError |= writeServiceRstFile("C:\\OT\\OpenTwin\\Documentation\\Developer\\documented_endpoints\\" + service.getName() + ".rst", rst);
 	}
@@ -829,13 +829,50 @@ std::string Application::generateServiceRstContent(const Service& _service) {
 bool Application::writeServiceRstFile(const std::string& _path, const std::string& _rst) {
 	OT_LOG_D("Writing into " + _path);
 
-	std::ofstream file(_path);
-	if (!file.is_open()) {
-		OT_LOG_E("Could not write file: " + _path);
+	if (!_rst.empty()) {
+		std::ofstream file(_path);
+
+		if (!file.is_open()) {
+			OT_LOG_E("Could not write file: " + _path);
+			return true;
+		}
+
+		file << _rst;
+		file.close();
+	}
+	else {
+		OT_LOG_E("Could not write into " + _path + "because rst content is empty.");
 		return true;
 	}
-	file << _rst;
-	file.close();
-
+	
 	return false;
+}
+
+std::string Application::serviceNameToSnakeCase(const std::string& _serviceName) {
+	OT_LOG_D("Converting " + _serviceName + " into snake_case:");
+
+	std::string result;
+	result.reserve(_serviceName.length() * 2);
+
+	for (size_t i = 0; i < _serviceName.length(); i++) {
+		char currentChar = _serviceName[i];
+
+		if (isupper(currentChar)) {
+			if (i > 0) {
+				char prevChar = _serviceName[i - 1];
+				bool needUnderscore = islower(prevChar) || (isupper(prevChar) && i + 1 < _serviceName.length() && islower(_serviceName[i + 1]));
+
+				if (needUnderscore) {
+					result += '_';
+				}
+			}
+			result += tolower(currentChar);
+		}
+		else {
+			result += currentChar;
+		}
+	}
+
+	OT_LOG_D(result);
+	return result;
 }
