@@ -118,6 +118,11 @@ namespace ot {
 		ToolBarSeparatorHorizontalIcon,
 		ToolBarSeparatorVerticalIcon,
 
+		HeaderFilterIcon,
+		HeaderFilterHoverIcon,
+		HeaderFilterPressedIcon,
+		HeaderFilterDisabledIcon,
+
 		WindowCloseIcon,
 		WindowCloseDisabledIcon,
 		WindowCloseFocusIcon,

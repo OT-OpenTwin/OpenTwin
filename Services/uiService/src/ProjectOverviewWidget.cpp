@@ -3,6 +3,7 @@
 #include "UserManagement.h"
 #include "ProjectManagement.h"
 #include "ProjectOverviewEntry.h"
+#include "ProjectOverviewHeader.h"
 #include "ProjectOverviewWidget.h"
 #include "OTSystem/DateTime.h"
 #include "OTCore/LogDispatcher.h"
@@ -16,6 +17,9 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 {
 	// Create widgets
 	m_tree = new ot::TreeWidget(_parent);
+	m_header = new ProjectOverviewHeader(m_tree);
+	m_tree->setHeader(m_header);
+
 	m_tree->setObjectName("ProjectOverviewWidgetTree");
 	m_tree->setIconSize(QSize(28, 28));
 	m_tree->setColumnCount(ProjectOverviewEntry::ColumnIndex::Count);

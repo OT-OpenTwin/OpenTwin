@@ -167,6 +167,9 @@
     <ClCompile Include="src\ProjectOverviewEntry.cpp">
       <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProjectOverviewHeader.cpp">
+      <Filter>Source Files\CustomWidgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -298,6 +301,9 @@
       <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
     <QtMoc Include="include\ProjectOverviewWidget.h">
+      <Filter>Header Files\CustomWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectOverviewHeader.h">
       <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
   </ItemGroup>

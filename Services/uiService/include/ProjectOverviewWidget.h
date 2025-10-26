@@ -14,6 +14,7 @@ class QTreeWidgetItem;
 namespace ot {
 
 	class TreeWidget;
+	class ProjectOverviewHeader;
 
 	class ProjectOverviewWidget : public QObject, public WidgetBase {
 		Q_OBJECT
@@ -83,6 +84,8 @@ namespace ot {
 		int getProjectCount(const QTreeWidgetItem* _parent) const;
 		bool hasOtherUser(const QTreeWidgetItem* _parent, const std::string& _currentUser) const;
 		void filterProjects(QTreeWidgetItem* _parent);
+
+		ProjectOverviewHeader* m_header;
 
 		bool m_resultsExceeded;
 		QString m_generalFilter;
