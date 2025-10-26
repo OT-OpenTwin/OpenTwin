@@ -549,6 +549,11 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorHorizontalIcon), new PropertyString("/icons/toolbar_separator_horizontal.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorVerticalIcon), new PropertyString("/icons/toolbar_separator_vertical.png"));
 
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterIcon), new PropertyString("/icons/Filter.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterDisabledIcon), new PropertyString("/icons/Filter_Disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterHoverIcon), new PropertyString("/icons/Filter_Focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterPressedIcon), new PropertyString("/icons/Filter_Pressed.png"));
+
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseIcon), new PropertyString("/icons/window_close.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseDisabledIcon), new PropertyString("/icons/window_close_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseFocusIcon), new PropertyString("/icons/window_close_focus.png"));
@@ -761,6 +766,11 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarMoveVerticalIcon), new PropertyString("/icons/toolbar_move_vertical.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorHorizontalIcon), new PropertyString("/icons/toolbar_separator_horizontal.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorVerticalIcon), new PropertyString("/icons/toolbar_separator_vertical.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterIcon), new PropertyString("/icons/Filter.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterDisabledIcon), new PropertyString("/icons/Filter_Disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterHoverIcon), new PropertyString("/icons/Filter_Focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterPressedIcon), new PropertyString("/icons/Filter_Pressed.png"));
 
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseIcon), new PropertyString("/icons/window_close.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseDisabledIcon), new PropertyString("/icons/window_close_disabled.png"));
@@ -975,6 +985,11 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarMoveVerticalIcon), new PropertyString("/icons/toolbar_move_vertical.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorHorizontalIcon), new PropertyString("/icons/toolbar_separator_horizontal.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorVerticalIcon), new PropertyString("/icons/toolbar_separator_vertical.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterIcon), new PropertyString("/icons/Filter.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterDisabledIcon), new PropertyString("/icons/Filter_Disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterHoverIcon), new PropertyString("/icons/Filter_Focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterPressedIcon), new PropertyString("/icons/Filter_Pressed.png"));
 
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseIcon), new PropertyString("/icons/window_close.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseDisabledIcon), new PropertyString("/icons/window_close_disabled.png"));
