@@ -90,6 +90,13 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 		topoEntVers.clear();
 		forceVis.clear();
 
+
+		// Note: The data entity must be added to the model first.
+		// Important: A topology entity and a data entity cannot be added in the same call.
+		// The reason is that `addEntitiesToModel` first adds the data entity, and when it later adds
+		// an existing topology entity, it removes the data entity associated with the old topology. 
+		// See (ModelState::removeEntity).
+		// As a result, the newly added data entity no longer exists at that point.
 		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Update BlockItem position and rotation", false, false, false);
 
 		coordinateEntity->storeToDataBase();
@@ -97,6 +104,18 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
 		forceVis.push_back(false);
 
+		// After adding the data entity separately, the topology entity can be updated 
+		// with a second call to `updateTopologyEntities`.
+		//
+		// Important notes:
+		// - Existing data entities cannot be updated directly.
+		// - It is also not possible to call `addEntitiesToModel` once for both an existing 
+		//   topology entity and a data entity.
+		// 
+		// We need to update the topology entity here because it is only restored or 
+		// re-visualized when its storage version changes. 
+		// Adding only the data entity does not update the topology entity’s storage version, 
+		// and therefore does not trigger re-visualization in `updateModelStateForUndoRedo`.
 		_model->updateTopologyEntities(topoEntID, topoEntVers, "Rotation and blockitem position changed", false);
 
 	}
@@ -106,6 +125,8 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 		std::list<ot::UID>  topologyEntityIDList{ blockEnt->getEntityID() };
 		std::list<ot::UID>  topologyEntityVersionList{ blockEnt->getEntityStorageVersion() };
 
+
+		// Only the topology entity needs to be updated here because its item configuration has changed
 		_model->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, comment, false);
 	}
 	else {
@@ -125,6 +146,9 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 		}
 		std::list<ot::UID> dataEntityParentList{ parent->getEntityID() };
 
+
+		// Same as before: we need to combine `addEntitiesToModel` for the data entity 
+        // with `updateTopologyEntity` for the topology entity.
 		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntityParentList, "Update BlockItem position", false, false, false);
 		topoEntID.push_back(blockEnt->getEntityID());
 		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
