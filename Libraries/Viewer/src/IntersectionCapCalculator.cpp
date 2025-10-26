@@ -259,10 +259,12 @@ void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry
 {
     std::string materialType = "Rough";
 
-    double colorRGB[] = { 1.0, 0.0, 0.0 };
+    ViewerSettings* settings = ViewerSettings::instance();
+
+    double colorRGB[] = { settings->cutplaneFillColor.r() / 255.0,  settings->cutplaneFillColor.g() / 255.0,  settings->cutplaneFillColor.b() / 255.0 };
     double transparency = 0.0;
 
-    bool useShapeColor = true;
+    bool useShapeColor = settings->cutplaneColorFromObject;
 
     if (useShapeColor)
     {
@@ -342,12 +344,15 @@ void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry
     newGeometry->getOrCreateStateSet()->setAttribute(material);
     newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f, 2.0f));
 
-    osg::ref_ptr<osg::Texture2D> texture = TextureMapManager::getTexture("Stripes");
+    if (settings->cutplaneTexture)
+    {
+        osg::ref_ptr<osg::Texture2D> texture = TextureMapManager::getTexture("Stripes");
 
-    texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
-    texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+        texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+        texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
 
-    newGeometry->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
+        newGeometry->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
+    }
 
     delete materialSet;
     materialSet = nullptr;
@@ -357,10 +362,12 @@ void IntersectionCapCalculator::buildTriangleVisualizationNode(SceneNodeGeometry
 
 void IntersectionCapCalculator::buildEdgeVisualizationNode(SceneNodeGeometry* geometryItem, std::vector<std::vector<IntersectionCapCalculatorVec3>>& loops)
 {
-    double colorR = 0.0;
-    double colorG = 1.0;
-    double colorB = 0.0;
-    double lineWidth = 2.0;
+    ViewerSettings* settings = ViewerSettings::instance();
+
+    double colorR    = settings->cutplaneOutlineColor.r() / 255.0;
+    double colorG    = settings->cutplaneOutlineColor.g() / 255.0;
+    double colorB    = settings->cutplaneOutlineColor.b() / 255.0;
+    double lineWidth = settings->cutplaneOutlineWidth;
 
     osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
     colors->push_back(osg::Vec4(colorR, colorG, colorB, 0.0));
@@ -450,68 +457,73 @@ void IntersectionCapCalculator::generateCapGeometryAndVisualization(SceneNodeGeo
 
     buildEdgeVisualizationNode(geometryItem, loops3D);
 
-    IntersectionCapCalculatorProjection2D proj = makeProjectionBasis(plane);
+    ViewerSettings* settings = ViewerSettings::instance();
 
-    std::vector<std::vector<IntersectionCapCalculatorVec2>> all_rings_2D;
-    for (auto& loop3D : loops3D) {
-        std::vector<IntersectionCapCalculatorVec2> ring2D;
-        for (auto& p : loop3D)
-            ring2D.push_back(proj.project(p));
-        all_rings_2D.push_back(ring2D);
-    }
+    if (settings->cutplaneDrawSolid)
+    {
+        IntersectionCapCalculatorProjection2D proj = makeProjectionBasis(plane);
 
-    std::vector<std::vector<IntersectionCapCalculatorVec2>> outer_rings, hole_rings;
-    classifyPolygons(all_rings_2D, outer_rings, hole_rings);
-
-    using Polygon = std::vector<std::vector<IntersectionCapCalculatorVec2>>;
-    std::vector<IntersectionCapCalculatorTriangle3D> triangles_out;
-    std::vector<IntersectionCapCalculatorVec2> texcoords_out;
-
-    osg::Vec3d u, v;
-    buildProjectionBasis(normal, point, u, v);
-
-    IntersectionCapCalculatorVec3 uDir(u.x(), u.y(), u.z());
-    IntersectionCapCalculatorVec3 vDir(v.x(), v.y(), v.z());
-    IntersectionCapCalculatorVec3 origin(point.x(), point.y(), point.z());
-
-    float repeatPerMeter = (float) (1.5 / (radius > 0.0 ? radius : 1.0));
-
-    for (auto& outer : outer_rings) {
-        Polygon poly = { outer };
-        for (auto& hole : hole_rings) {
-            if (isPointInPolygon(hole[0], outer)) poly.push_back(hole);
+        std::vector<std::vector<IntersectionCapCalculatorVec2>> all_rings_2D;
+        for (auto& loop3D : loops3D) {
+            std::vector<IntersectionCapCalculatorVec2> ring2D;
+            for (auto& p : loop3D)
+                ring2D.push_back(proj.project(p));
+            all_rings_2D.push_back(ring2D);
         }
 
-        auto indices = mapbox::earcut<uint32_t>(poly);
+        std::vector<std::vector<IntersectionCapCalculatorVec2>> outer_rings, hole_rings;
+        classifyPolygons(all_rings_2D, outer_rings, hole_rings);
 
-        std::vector<IntersectionCapCalculatorVec2> flat_points;
-        for (auto& ring : poly)
-            for (auto& p : ring)
-                flat_points.push_back(p);
+        using Polygon = std::vector<std::vector<IntersectionCapCalculatorVec2>>;
+        std::vector<IntersectionCapCalculatorTriangle3D> triangles_out;
+        std::vector<IntersectionCapCalculatorVec2> texcoords_out;
 
-        for (size_t i = 0; i < indices.size(); i += 3) {
-            IntersectionCapCalculatorVec2 p0_2D = flat_points[indices[i]];
-            IntersectionCapCalculatorVec2 p1_2D = flat_points[indices[i + 1]];
-            IntersectionCapCalculatorVec2 p2_2D = flat_points[indices[i + 2]];
+        osg::Vec3d u, v;
+        buildProjectionBasis(normal, point, u, v);
 
-            // Backprojection in 3D
-            IntersectionCapCalculatorVec3 v0 = proj.unproject(p0_2D);
-            IntersectionCapCalculatorVec3 v1 = proj.unproject(p1_2D);
-            IntersectionCapCalculatorVec3 v2 = proj.unproject(p2_2D);
+        IntersectionCapCalculatorVec3 uDir(u.x(), u.y(), u.z());
+        IntersectionCapCalculatorVec3 vDir(v.x(), v.y(), v.z());
+        IntersectionCapCalculatorVec3 origin(point.x(), point.y(), point.z());
 
-            for (auto& p3D : { v0, v1, v2 }) {
-                IntersectionCapCalculatorVec3 rel = p3D - origin;
-                float u = dot(rel, uDir) * repeatPerMeter;
-                float v = dot(rel, vDir) * repeatPerMeter;
-                texcoords_out.push_back({ u, v });
+        float repeatPerMeter = (float)(1.5 / (radius > 0.0 ? radius : 1.0));
+
+        for (auto& outer : outer_rings) {
+            Polygon poly = { outer };
+            for (auto& hole : hole_rings) {
+                if (isPointInPolygon(hole[0], outer)) poly.push_back(hole);
             }
 
-            // Store the triangles
-            triangles_out.push_back({ v0, v1, v2 });
-        }
-    }
+            auto indices = mapbox::earcut<uint32_t>(poly);
 
-    buildTriangleVisualizationNode(geometryItem, normal, triangles_out, texcoords_out);
+            std::vector<IntersectionCapCalculatorVec2> flat_points;
+            for (auto& ring : poly)
+                for (auto& p : ring)
+                    flat_points.push_back(p);
+
+            for (size_t i = 0; i < indices.size(); i += 3) {
+                IntersectionCapCalculatorVec2 p0_2D = flat_points[indices[i]];
+                IntersectionCapCalculatorVec2 p1_2D = flat_points[indices[i + 1]];
+                IntersectionCapCalculatorVec2 p2_2D = flat_points[indices[i + 2]];
+
+                // Backprojection in 3D
+                IntersectionCapCalculatorVec3 v0 = proj.unproject(p0_2D);
+                IntersectionCapCalculatorVec3 v1 = proj.unproject(p1_2D);
+                IntersectionCapCalculatorVec3 v2 = proj.unproject(p2_2D);
+
+                for (auto& p3D : { v0, v1, v2 }) {
+                    IntersectionCapCalculatorVec3 rel = p3D - origin;
+                    float u = dot(rel, uDir) * repeatPerMeter;
+                    float v = dot(rel, vDir) * repeatPerMeter;
+                    texcoords_out.push_back({ u, v });
+                }
+
+                // Store the triangles
+                triangles_out.push_back({ v0, v1, v2 });
+            }
+        }
+
+        buildTriangleVisualizationNode(geometryItem, normal, triangles_out, texcoords_out);
+    }
 }
 
 

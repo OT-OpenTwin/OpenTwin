@@ -971,6 +971,12 @@ void Viewer::settingsItemChanged(const ot::Property* _item) {
 		refresh(true);
 		updateRequired = true;  // We always need to store these settings right away, since they will not be stored later.
 	}
+	else if (cutplaneSettingsItemChanged(logicalName, _item, updateRequired)) {
+		// cutplane has to get updated
+		refreshCutplane();
+		refresh(true);
+		updateRequired = true;  // We always need to store these settings right away, since they will not be stored later.
+	}
 	else if (displaySettingsItemChanged(logicalName, _item, updateRequired)) {
 		// display has to get updated
 		refresh(true);
@@ -1228,6 +1234,56 @@ bool Viewer::displaySettingsItemChanged(const std::string& _logicalName, const o
 	return false;
 }
 
+bool Viewer::cutplaneSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired) {
+	ViewerSettings* settings = ViewerSettings::instance();
+
+	// Check the item (Group:Subgroup:...:Item)
+	if (_logicalName == "Cutplane/Solid Cutplane") {
+		const ot::PropertyBool* actualItem = dynamic_cast<const ot::PropertyBool*>(_item);
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
+		settings->cutplaneDrawSolid = actualItem->getValue();
+		_settingsUpdateRequired = true;
+		return true;
+	}
+	else if (_logicalName == "Cutplane/Enable Hatching") {
+		const ot::PropertyBool* actualItem = dynamic_cast<const ot::PropertyBool*>(_item);
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
+		settings->cutplaneTexture = actualItem->getValue();
+		_settingsUpdateRequired = true;
+		return true;
+	}
+	else if (_logicalName == "Cutplane/Use Object Color For Cutplane") {
+		const ot::PropertyBool* actualItem = dynamic_cast<const ot::PropertyBool*>(_item);
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
+		settings->cutplaneColorFromObject = actualItem->getValue();
+		_settingsUpdateRequired = true;
+		return true;
+	}
+	else if (_logicalName == "Cutplane/Cutplane Color") {
+		const ot::PropertyColor* actualItem = dynamic_cast<const ot::PropertyColor*>(_item);
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
+		settings->cutplaneFillColor = actualItem->getValue();
+		_settingsUpdateRequired = true;
+		return true;
+	}
+	else if (_logicalName == "Cutplane/Cutplane Outline Color") {
+		const ot::PropertyColor* actualItem = dynamic_cast<const ot::PropertyColor*>(_item);
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
+		settings->cutplaneOutlineColor = actualItem->getValue();
+		_settingsUpdateRequired = true;
+		return true;
+	}
+	else if (_logicalName == "Cutplane/Cutplane Outline Width") {
+		const ot::PropertyDouble* actualItem = dynamic_cast<const ot::PropertyDouble*>(_item);
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
+		settings->cutplaneOutlineWidth = actualItem->getValue();
+		_settingsUpdateRequired = true;
+		return true;
+	}
+
+	return false;
+}
+
 void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	ViewerSettings * settings = ViewerSettings::instance();
 
@@ -1265,6 +1321,13 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	const ot::PropertyColor *geometryViewBackgroundColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Background Color"));
 	const ot::PropertyColor *geometryViewForegroundColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Foreground Color"));
 
+	const ot::PropertyBool* cutplaneDrawSolidProp = dynamic_cast<const ot::PropertyBool*>(_dataset.findPropertyByPath("Cutplane/Solid Cutplane"));
+	const ot::PropertyBool* cutplaneTextureProp = dynamic_cast<const ot::PropertyBool*>(_dataset.findPropertyByPath("Cutplane/Enable Hatching"));
+	const ot::PropertyBool* cutplaneColorFromObjProp = dynamic_cast<const ot::PropertyBool*>(_dataset.findPropertyByPath("Cutplane/Use Object Color For Cutplane"));
+	const ot::PropertyColor* cutplaneFillColorProp = dynamic_cast<const ot::PropertyColor*>(_dataset.findPropertyByPath("Cutplane/Cutplane Color"));
+	const ot::PropertyColor* cutplaneOutlineColorProp = dynamic_cast<const ot::PropertyColor*>(_dataset.findPropertyByPath("Cutplane/Cutplane Outline Color"));
+	const ot::PropertyDouble* cutplaneOutlineWidthProp = dynamic_cast<const ot::PropertyDouble*>(_dataset.findPropertyByPath("Cutplane/Cutplane Outline Width"));
+
 	const ot::PropertyBool *useDisplayLists = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Display/Enable Display Lists"));
 	const ot::PropertyBool *useVertexBuffers = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Display/Enable Vertex Buffer"));
 
@@ -1300,6 +1363,13 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	if (geometryViewBackgroundColor) { settings->viewBackgroundColor = geometryViewBackgroundColor->getValue(); }
 	if (geometryViewForegroundColor) { settings->viewForegroundColor = geometryViewForegroundColor->getValue(); }
 
+	if (cutplaneDrawSolidProp) { settings->cutplaneDrawSolid = cutplaneDrawSolidProp->getValue(); }
+	if(cutplaneTextureProp) { settings->cutplaneTexture = cutplaneTextureProp->getValue(); }
+	if (cutplaneColorFromObjProp) { settings->cutplaneColorFromObject = cutplaneColorFromObjProp->getValue(); }
+	if (cutplaneFillColorProp) { settings->cutplaneFillColor = cutplaneFillColorProp->getValue(); }
+	if (cutplaneOutlineColorProp) { settings->cutplaneOutlineColor = cutplaneOutlineColorProp->getValue(); }
+	if (cutplaneOutlineWidthProp) { settings->cutplaneOutlineWidth = cutplaneOutlineWidthProp->getValue(); }
+
 	if (useDisplayLists) { settings->useDisplayLists = useDisplayLists->getValue(); }
 	if (useVertexBuffers) { settings->useVertexBufferObjects = useVertexBuffers->getValue(); }
 }
@@ -1330,6 +1400,14 @@ void Viewer::toggleAxisCross(void) {
 
 void Viewer::toggleCenterAxisCross(void) {
 	axisCenterCross->setVisible(!axisCenterCross->isVisible());
+}
+
+void Viewer::refreshCutplane(void) 
+{
+	if (clipPlaneActive)
+	{
+		updateClipPlane(clipPlaneNormal, clipPlanePoint);
+	}
 }
 
 void Viewer::toggleCutplane(void) {
@@ -1470,6 +1548,28 @@ ot::PropertyGridCfg Viewer::createSettings(void) {
 		geometry->addProperty(viewForegroundColor);
 
 		config.addRootGroup(geometry);
+	}
+
+	// ## Cutplane ##
+	{
+		// Data#
+		PropertyGroup* cutplane = new ot::PropertyGroup("Cutplane");
+		PropertyBool* cutplaneDrawSolidProp = new PropertyBool("Solid Cutplane", settings->cutplaneDrawSolid);
+		PropertyBool* cutplaneTextureProp = new PropertyBool("Enable Hatching", settings->cutplaneTexture);
+		PropertyBool* cutplaneColorFromObjProp = new PropertyBool("Use Object Color For Cutplane", settings->cutplaneColorFromObject);
+		PropertyColor* cutplaneFillColorProp = new PropertyColor("Cutplane Color", settings->cutplaneFillColor);
+		PropertyColor* cutplaneOutlineColorProp = new PropertyColor("Cutplane Outline Color", settings->cutplaneOutlineColor);
+		PropertyDouble* cutplaneOutlineWidthProp = new PropertyDouble("Cutplane Outline Width", settings->cutplaneOutlineWidth, 0, 99999999);
+
+		// Add items
+		cutplane->addProperty(cutplaneDrawSolidProp);
+		cutplane->addProperty(cutplaneTextureProp);
+		cutplane->addProperty(cutplaneColorFromObjProp);
+		cutplane->addProperty(cutplaneFillColorProp);
+		cutplane->addProperty(cutplaneOutlineColorProp);
+		cutplane->addProperty(cutplaneOutlineWidthProp);
+
+		config.addRootGroup(cutplane);
 	}
 
 	// ## Display settings ##

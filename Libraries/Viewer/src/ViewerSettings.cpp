@@ -22,7 +22,8 @@ ViewerSettings::ViewerSettings()
 	axisCenterCrossDashedLineVisible(true), axisCenterCrossLineAtFront(false),
 	geometryHighlightColor(255, 0, 0, 255), geometryEdgeColorMode("Same as geometry"), geometryEdgeColorMode_geom("Same as geometry"), geometryEdgeColorMode_custom("Custom"),
 	geometryEdgeColorMode_noColor("No Color"), geometryEdgeColor(255, 0, 0, 255), geometryLightSourceDistance("Medium"),
-	viewBackgroundColorAutomatic(true), viewBackgroundColor(255, 255, 255, 255), viewForegroundColor(0, 0, 0, 255), useDisplayLists(false), useVertexBufferObjects(true)
+	viewBackgroundColorAutomatic(true), viewBackgroundColor(255, 255, 255, 255), viewForegroundColor(0, 0, 0, 255), useDisplayLists(false), useVertexBufferObjects(true),
+	cutplaneDrawSolid(true), cutplaneColorFromObject(true), cutplaneFillColor(255, 0, 0), cutplaneOutlineColor(0, 255, 0), cutplaneOutlineWidth(2.0), cutplaneTexture(true)
 {}
 
 ViewerSettings::~ViewerSettings() {}

@@ -77,7 +77,8 @@ public:
 	bool workingPlaneSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
 	bool axisCrossSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
 	bool snappingSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
-	bool geometrySettingsItemChanged(const std::string& _logicalName, const ot::Property*_item, bool& _settingsUpdateRequired);
+	bool geometrySettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
+	bool cutplaneSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
 	bool displaySettingsItemChanged(const std::string& _logicalName, const ot::Property*_item, bool& _settingsUpdateRequired);
 
 	void toggleWorkingPlane(void);
@@ -158,6 +159,7 @@ private:
 	void setClearColorAutomatic(void);
 	void settingsSynchronized(const ot::PropertyGridCfg& _dataset);
 	void updateDisplaySettings(osg::Node *node);
+	void refreshCutplane(void);
 
 	// Attributes
 	ot::UID							   viewerUID;

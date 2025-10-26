@@ -57,6 +57,14 @@ public:
 	bool useDisplayLists;
 	bool useVertexBufferObjects;
 
+	// Cutplane attributes
+	bool      cutplaneDrawSolid;
+	bool      cutplaneColorFromObject;
+	ot::Color cutplaneFillColor;
+	ot::Color cutplaneOutlineColor;
+	double    cutplaneOutlineWidth;
+	bool	  cutplaneTexture;
+
 private:
 	ViewerSettings();
 	~ViewerSettings();
