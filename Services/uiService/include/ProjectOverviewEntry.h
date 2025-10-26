@@ -3,6 +3,7 @@
 #pragma once
 
 // OpenTwin header
+#include "ProjectOverviewFilterData.h"
 #include "OTCore/ProjectInformation.h"
 #include "OTWidgets/TreeWidgetItem.h"
 
@@ -17,21 +18,12 @@ namespace ot {
 		OT_DECL_NOMOVE(ProjectOverviewEntry)
 		OT_DECL_NODEFAULT(ProjectOverviewEntry)
 	public:
-		enum ColumnIndex {
-			Checked,
-			Type,
-			Name,
-			Owner,
-			Groups,
-			Modified,
-			Count
-		};
-
 		ProjectOverviewEntry(const ot::ProjectInformation& _projectInfo);
 
 		const ProjectInformation& getProjectInformation() const { return m_projectInfo; };
 
 		void applyFilter(const QString& _generalFilter);
+		void applyFilter(const ProjectOverviewFilterData& _filter);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

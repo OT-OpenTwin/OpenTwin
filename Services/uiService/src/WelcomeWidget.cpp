@@ -1,7 +1,4 @@
-//! @file ProjectOverviewWidget.cpp
-//! @author Alexander Kuester (alexk95)
-//! @date September 2024
-// ###########################################################################################################################################################################################################################################################################################################################
+// @otlicense
 
 // Frontend header
 #include "AppBase.h"
@@ -280,10 +277,17 @@ void WelcomeWidget::updateToggleViewModeButton() {
 }
 
 void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
-	int count = m_overview->getSelectedProjects().size();
-	bool hasDifferentOwner = m_overview->hasOtherUser(AppBase::instance()->getCurrentLoginData().getUserName());
+	std::list<ot::ProjectInformation> selectedProjects = m_overview->getSelectedProjects();
 
-	if (count == 0 || _forceDisabled) {
+	bool hasDifferentOwner = false;
+	for (const ot::ProjectInformation& proj : selectedProjects) {
+		if (proj.getUserName() != AppBase::instance()->getCurrentLoginData().getUserName()) {
+			hasDifferentOwner = true;
+			break;
+		}
+	}
+
+	if (selectedProjects.empty() || _forceDisabled) {
 		m_openButton->setEnabled(false);
 		m_copyButton->setEnabled(false);
 		m_renameButton->setEnabled(false);
@@ -292,7 +296,7 @@ void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
 		m_accessButton->setEnabled(false);
 		m_ownerButton->setEnabled(false);
 	}
-	else if (count == 1) {
+	else if (selectedProjects.size() == 1) {
 		m_openButton->setEnabled(true);
 		m_copyButton->setEnabled(true);
 		m_renameButton->setEnabled(!hasDifferentOwner);

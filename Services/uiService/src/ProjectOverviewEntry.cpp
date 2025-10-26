@@ -2,6 +2,7 @@
 
 // OpenTwin header
 #include "ProjectOverviewEntry.h"
+#include "ProjectOverviewHeader.h"
 #include "OTSystem/DateTime.h"
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/IconManager.h"
@@ -11,20 +12,20 @@ ot::ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projec
 {
 	QDateTime modifiedTime = QDateTime::fromMSecsSinceEpoch(m_projectInfo.getLastAccessTime());
 
-	setCheckState(ColumnIndex::Checked, Qt::Unchecked);
-	setIcon(ColumnIndex::Type, ot::IconManager::getIcon("ProjectTemplates/" + QString::fromStdString(m_projectInfo.getProjectType()) + ".png"));
-	setText(ColumnIndex::Name, QString::fromStdString(m_projectInfo.getProjectName()));
-	setText(ColumnIndex::Owner, QString::fromStdString(m_projectInfo.getUserName()));
-	setText(ColumnIndex::Modified, modifiedTime.toString(Qt::DateFormat::TextDate));
+	setCheckState(ProjectOverviewHeader::Checked, Qt::Unchecked);
+	setIcon(ProjectOverviewHeader::Type, ot::IconManager::getIcon("ProjectTemplates/" + QString::fromStdString(m_projectInfo.getProjectType()) + ".png"));
+	setText(ProjectOverviewHeader::Name, QString::fromStdString(m_projectInfo.getProjectName()));
+	setText(ProjectOverviewHeader::Owner, QString::fromStdString(m_projectInfo.getUserName()));
+	setText(ProjectOverviewHeader::Modified, modifiedTime.toString(Qt::DateFormat::TextDate));
 	
 	if (!m_projectInfo.getGroups().empty()) {
-		setIcon(ColumnIndex::Groups, ot::IconManager::getIcon("Tree/Groups.png"));
+		setIcon(ProjectOverviewHeader::Groups, ot::IconManager::getIcon("Tree/Groups.png"));
 		std::string groupInfo;
 		for (const std::string& group : m_projectInfo.getGroups()) {
 			if (!groupInfo.empty()) groupInfo.append("\n");
 			groupInfo.append(group);
 		}
-		setToolTip(ColumnIndex::Groups, QString::fromStdString(groupInfo));
+		setToolTip(ProjectOverviewHeader::Groups, QString::fromStdString(groupInfo));
 	}
 
 }
@@ -35,9 +36,58 @@ void ot::ProjectOverviewEntry::applyFilter(const QString& _generalFilter) {
 		return;
 	}
 	QString filter = _generalFilter.toLower();
-	bool matches = text(ColumnIndex::Name).toLower().contains(filter) || text(ColumnIndex::Owner).toLower().contains(filter);
+	bool matches = text(ProjectOverviewHeader::Name).toLower().contains(filter);
 	
 	setHidden(!matches);
+}
+
+void ot::ProjectOverviewEntry::applyFilter(const ProjectOverviewFilterData& _filter) {
+	if (!_filter.isValid()) {
+		setHidden(false);
+		return;
+	}
+
+	switch (_filter.getLogicalIndex()) {
+	case ProjectOverviewHeader::Type:
+		setHidden(!_filter.getSelectedFilters().contains(QString::fromStdString(m_projectInfo.getProjectType())));
+		break;
+
+	case ProjectOverviewHeader::Name:
+		setHidden(!_filter.getSelectedFilters().contains(QString::fromStdString(m_projectInfo.getProjectName())));
+		break;
+
+	case ProjectOverviewHeader::Owner:
+		setHidden(!_filter.getSelectedFilters().contains(QString::fromStdString(m_projectInfo.getUserName())));
+		break;
+
+	case ProjectOverviewHeader::Groups:
+	{
+		bool found = false;
+		if (m_projectInfo.getGroups().empty()) {
+			if (_filter.getSelectedFilters().contains(ProjectOverviewFilterData::getEmptyGroupFilterName())) {
+				found = true;
+			}
+		}
+		else {
+			for (const std::string& group : m_projectInfo.getGroups()) {
+				if (_filter.getSelectedFilters().contains(QString::fromStdString(group))) {
+					found = true;
+					break;
+				}
+			}
+		}
+		setHidden(!found);
+		break;
+	}
+
+	default:
+		OT_LOG_E("Invalid column for filter (" + std::to_string(_filter.getLogicalIndex()) + ")");
+		setHidden(false);
+		break;
+
+
+	}
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -45,7 +95,7 @@ void ot::ProjectOverviewEntry::applyFilter(const QString& _generalFilter) {
 // Public: Slots
 
 void ot::ProjectOverviewEntry::updateSelectionState() {
-	bool shouldSelect = (checkState(ColumnIndex::Checked) == Qt::Checked);
+	bool shouldSelect = (checkState(ProjectOverviewHeader::Checked) == Qt::Checked);
 	if (shouldSelect == isSelected()) {
 		return;
 	}
@@ -55,9 +105,9 @@ void ot::ProjectOverviewEntry::updateSelectionState() {
 
 void ot::ProjectOverviewEntry::updateCheckState() {
 	bool shouldCheck = isSelected();
-	if (shouldCheck == (checkState(ColumnIndex::Checked) == Qt::Checked)) {
+	if (shouldCheck == (checkState(ProjectOverviewHeader::Checked) == Qt::Checked)) {
 		return;
 	}
 
-	setCheckState(ColumnIndex::Checked, shouldCheck ? Qt::Checked : Qt::Unchecked);
+	setCheckState(ProjectOverviewHeader::Checked, shouldCheck ? Qt::Checked : Qt::Unchecked);
 }

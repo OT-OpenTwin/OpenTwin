@@ -48,6 +48,8 @@
     <ClCompile Include="src\NavigationTreeView.cpp" />
     <ClCompile Include="src\ProgressUpdater.cpp" />
     <ClCompile Include="src\ProjectOverviewEntry.cpp" />
+    <ClCompile Include="src\ProjectOverviewFilter.cpp" />
+    <ClCompile Include="src\ProjectOverviewFilterData.cpp" />
     <ClCompile Include="src\ProjectOverviewHeader.cpp" />
     <ClCompile Include="src\ProjectOverviewWidget.cpp" />
     <ClCompile Include="src\WelcomeWidget.cpp" />
@@ -88,6 +90,8 @@
     <QtMoc Include="include\ProjectOverviewEntry.h" />
     <QtMoc Include="include\ProjectOverviewWidget.h" />
     <QtMoc Include="include\ProjectOverviewHeader.h" />
+    <QtMoc Include="include\ProjectOverviewFilter.h" />
+    <ClInclude Include="include\ProjectOverviewFilterData.h" />
     <ClInclude Include="include\ShortParameterDescription.h" />
     <ClInclude Include="include\StartArgumentParser.h" />
     <ClInclude Include="include\UITestLogs.h" />

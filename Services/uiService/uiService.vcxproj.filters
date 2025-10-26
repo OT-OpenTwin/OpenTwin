@@ -57,6 +57,12 @@
     <Filter Include="Source Files\Helper">
       <UniqueIdentifier>{73092f66-df31-4074-ae7f-32928c75b830}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ProjectOverview">
+      <UniqueIdentifier>{f039f7e4-8b8f-48e9-ae87-f55907dbe9b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ProjectOverview">
+      <UniqueIdentifier>{3541d9d1-8958-4a79-937e-b2a12eb935cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ViewerComponent.cpp">
@@ -161,14 +167,20 @@
     <ClCompile Include="src\StartArgumentParser.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
-    <ClCompile Include="src\ProjectOverviewWidget.cpp">
-      <Filter>Source Files\CustomWidgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\ProjectOverviewEntry.cpp">
-      <Filter>Source Files\CustomWidgets</Filter>
+      <Filter>Source Files\ProjectOverview</Filter>
     </ClCompile>
     <ClCompile Include="src\ProjectOverviewHeader.cpp">
-      <Filter>Source Files\CustomWidgets</Filter>
+      <Filter>Source Files\ProjectOverview</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProjectOverviewWidget.cpp">
+      <Filter>Source Files\ProjectOverview</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProjectOverviewFilterData.cpp">
+      <Filter>Source Files\ProjectOverview</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProjectOverviewFilter.cpp">
+      <Filter>Source Files\ProjectOverview</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -241,6 +253,9 @@
     <ClInclude Include="include\StartArgumentParser.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
+    <ClInclude Include="include\ProjectOverviewFilterData.h">
+      <Filter>Header Files\ProjectOverview</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\ExternalServicesComponent.h">
@@ -297,14 +312,17 @@
     <QtMoc Include="include\SelectProjectDialog.h">
       <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\ProjectOverviewEntry.h">
-      <Filter>Header Files\CustomWidgets</Filter>
-    </QtMoc>
     <QtMoc Include="include\ProjectOverviewWidget.h">
-      <Filter>Header Files\CustomWidgets</Filter>
+      <Filter>Header Files\ProjectOverview</Filter>
     </QtMoc>
     <QtMoc Include="include\ProjectOverviewHeader.h">
-      <Filter>Header Files\CustomWidgets</Filter>
+      <Filter>Header Files\ProjectOverview</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectOverviewEntry.h">
+      <Filter>Header Files\ProjectOverview</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectOverviewFilter.h">
+      <Filter>Header Files\ProjectOverview</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
