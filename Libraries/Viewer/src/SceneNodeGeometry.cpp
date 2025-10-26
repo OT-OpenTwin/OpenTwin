@@ -1006,7 +1006,7 @@ osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, u
 	return edgeNode;
 }
 
-void SceneNodeGeometry::setCutCapGeometryTriangles(osg::Geometry* geometry)
+void SceneNodeGeometry::setCutCapGeometryTriangles(osg::ref_ptr<osg::Geometry>& geometry)
 {
 	deleteCutCapGeometryTriangles();
 
@@ -1042,7 +1042,7 @@ void SceneNodeGeometry::deleteCutCapGeometryTriangles()
 	}
 }
 
-void SceneNodeGeometry::setCutCapGeometryEdges(osg::Geometry* geometry)
+void SceneNodeGeometry::setCutCapGeometryEdges(osg::ref_ptr<osg::Geometry>& geometry)
 {
 	deleteCutCapGeometryEdges();
 

@@ -98,10 +98,10 @@ public:
 	osg::Node* addSelectedEdge(unsigned long long faceId1, unsigned long long faceId2);
 	void removeSelectedEdge(osg::Node* selected);
 
-	void setCutCapGeometryTriangles(osg::Geometry* geometry);
+	void setCutCapGeometryTriangles(osg::ref_ptr<osg::Geometry>& geometry);
 	void deleteCutCapGeometryTriangles();
 
-	void setCutCapGeometryEdges(osg::Geometry* geometry);
+	void setCutCapGeometryEdges(osg::ref_ptr<osg::Geometry> &geometry);
 	void deleteCutCapGeometryEdges();
 
 private:
@@ -146,7 +146,7 @@ private:
 	osg::TexEnv *textureAttributeEnv;
 	double edgeTranspacency;
 	osg::Matrix transformationMatrix;
-	osg::Geometry* cutCapGeometryTriangles;
-	osg::Geometry* cutCapGeometryEdges;
+	osg::ref_ptr<osg::Geometry> cutCapGeometryTriangles;
+	osg::ref_ptr<osg::Geometry> cutCapGeometryEdges;
 };
 
