@@ -21,40 +21,13 @@ Overview
    :maxdepth: 2
 
    get_started/get_started
-
-.. toctree::
-   :maxdepth: 2
-
    general_concepts/general_concepts
-
-.. toctree::
-   :maxdepth: 2
-
    how_to/how_to
-   
-.. toctree::
-   :maxdepth: 2
-   
    ui_api/ui_api
-
-.. toctree::
-   :maxdepth: 2
-
    services/services
-
-.. toctree::
-   :maxdepth: 2
-
+   documented_endpoints/documented_endpoints
    dev_tools/dev_tools
-
-.. toctree::
-   :maxdepth: 2
-
    code_docs/code_docs
-
-.. toctree::
-   :maxdepth: 2
-   
    test_cases/test_cases
    
 Indices and tables

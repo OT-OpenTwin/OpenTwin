@@ -55,6 +55,12 @@ public:
 
 	void addDescriptionToLastParameter(std::list<Parameter>& _paramList, const std::string& _description);
 	
+	bool generateDocumentation(const std::list<Service>& m_services);
+
+	std::string generateServiceRstContent(const Service& _service);
+
+	bool writeServiceRstFile(const std::string& _path, const std::string& _rst);
+
 private:
 	std::list<Service> m_services;
 	std::map<std::string, std::string> m_actionMacros;

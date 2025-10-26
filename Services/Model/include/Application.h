@@ -45,7 +45,7 @@ public:
 	//api @return In case of success will return an empty String. In case of error will return a String with prefix "Error: ".
 	void handleProjectSave();
 
-	//api @security mTLS
+//	//api @security mTLS
 	ot::ReturnMessage handleCheckProjectOpen();
 
 	void handleSelectionChanged(ot::JsonDocument& _document);

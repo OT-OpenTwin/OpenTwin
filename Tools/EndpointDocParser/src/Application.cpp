@@ -26,7 +26,9 @@ int Application::run(void) {
 		exitCode = 1;
 	}
 
-	// generate documentation, exitCode = 2 if error occured
+	if (generateDocumentation(m_services)) {
+		exitCode = 2;
+	}
 
 	return exitCode;
 }
@@ -787,4 +789,53 @@ void Application::addDescriptionToLastParameter(std::list<Parameter>& _paramList
 		lastParam.printDescription();
 		OT_LOG_D("---");
 	}
+}
+
+bool Application::generateDocumentation(const std::list<Service>& m_services) {
+	OT_LOG_D("Generating the documentation:");
+
+	bool hasError = false;
+
+	for (const Service& service : m_services) {
+	std::string rst = generateServiceRstContent(service);
+//  std::string path = getPathToOTDocumentation();	// C:\OT\OpenTwin\Documentation\Developer\documented_endpoints
+//	std::string serviceName = cleanServiceName();	// AuthorisationService -> authorisation_service
+//	hasError |= writeServiceRstFile(path + "\\" + serviceName + ".rst", rst);
+	hasError |= writeServiceRstFile("C:\\OT\\OpenTwin\\Documentation\\Developer\\documented_endpoints\\" + service.getName() + ".rst", rst);
+	}
+
+	return hasError;
+}
+
+std::string Application::generateServiceRstContent(const Service& _service) {
+	OT_LOG_D("The service is:" + _service.getName());
+
+	std::ostringstream out;
+
+	// Title
+	out << _service.getName() << "\n"
+		<< std::string(_service.getName().size(), '=') << "\n\n";
+
+	// Actions Overview
+	std::string actions = "Actions";
+	out << actions << "\n"
+		<< std::string(actions.size(), '-') << "\n\n";
+
+	OT_LOG_D("The generated documentation is:\n" + out.str());
+
+	return out.str();
+}
+
+bool Application::writeServiceRstFile(const std::string& _path, const std::string& _rst) {
+	OT_LOG_D("Writing into " + _path);
+
+	std::ofstream file(_path);
+	if (!file.is_open()) {
+		OT_LOG_E("Could not write file: " + _path);
+		return true;
+	}
+	file << _rst;
+	file.close();
+
+	return false;
 }
