@@ -284,8 +284,8 @@ void Application::handleAddProject() {
 	
 	ot::DialogCfg cfg;
 	cfg.setFlags(ot::DialogCfg::RecenterOnF11);
-	cfg.setInitialSize(600, 400);
-	cfg.setMinSize(400, 300);
+	cfg.setInitialSize(800, 600);
+	cfg.setMinSize(600, 400);
 	cfg.setName("Select Project");
 	cfg.setTitle("Select Project");
 	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(cfg, doc.GetAllocator()), doc.GetAllocator());
