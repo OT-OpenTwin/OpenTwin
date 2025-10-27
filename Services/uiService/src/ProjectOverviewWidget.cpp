@@ -7,17 +7,23 @@
 #include "ProjectOverviewEntry.h"
 #include "ProjectOverviewHeader.h"
 #include "ProjectOverviewWidget.h"
+#include "ProjectOverviewPreviewBox.h"
 #include "OTSystem/DateTime.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTWidgets/TreeWidget.h"
+#include "ModelState.h"
 
 // Qt header
+#include <QtWidgets/qlayout.h>
 #include <QtWidgets/qheaderview.h>
 
 ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent) 
-	: m_mode(RecentMode), m_resultsExceeded(false)
+	: m_mode(RecentMode), m_resultsExceeded(false), m_isLoading(false)
 {
 	// Create widgets
+	QHBoxLayout* mainLayout = new QHBoxLayout(_parent);
+	setLayout(mainLayout);
+
 	m_tree = new ot::TreeWidget(_parent);
 	m_header = new ProjectOverviewHeader(this, m_tree);
 	m_tree->setHeader(m_header);
@@ -32,20 +38,20 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	m_tree->header()->setStretchLastSection(false);
 	m_tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_tree->header()->setSectionResizeMode(ProjectOverviewHeader::ColumnIndex::Name, QHeaderView::Stretch);
-	
+	mainLayout->addWidget(m_tree, 1);
+
+	m_previewBox = new ProjectOverviewPreviewBox(_parent);
+	mainLayout->addWidget(m_previewBox);
+
 	// Connect signals
-	connect(m_tree, &ot::TreeWidget::itemChanged, this, &ot::ProjectOverviewWidget::slotRefreshSelection);
-	connect(m_tree, &ot::TreeWidget::itemSelectionChanged, this, &ot::ProjectOverviewWidget::slotRefreshAllSelection);
+	connect(m_tree, &ot::TreeWidget::itemChanged, this, &ot::ProjectOverviewWidget::slotItemChanged);
+	connect(m_tree, &ot::TreeWidget::itemSelectionChanged, this, &ot::ProjectOverviewWidget::slotSelectionChanged);
 	connect(m_tree, &ot::TreeWidget::itemDoubleClicked, this, &ot::ProjectOverviewWidget::slotOpenRequested);
 }
 
 ot::ProjectOverviewWidget::~ProjectOverviewWidget() {
-	delete m_tree;
+	stopLoading();
 }
-
-QWidget* ot::ProjectOverviewWidget::getQWidget() { return m_tree; }
-
-const QWidget* ot::ProjectOverviewWidget::getQWidget() const { return m_tree; }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -170,7 +176,7 @@ void ot::ProjectOverviewWidget::filterProjects(const ProjectOverviewFilterData& 
 
 // Private: Slots
 
-void ot::ProjectOverviewWidget::slotRefreshAllSelection() {
+void ot::ProjectOverviewWidget::slotSelectionChanged() {
 	QSignalBlocker sigBlock(m_tree);
 
 	for (int ix = 0; ix < m_tree->topLevelItemCount(); ix++) {
@@ -180,10 +186,25 @@ void ot::ProjectOverviewWidget::slotRefreshAllSelection() {
 		}
 	}
 
+	if (m_tree->selectedItems().size() == 1) {
+		const ProjectOverviewEntry* entry = dynamic_cast<const ProjectOverviewEntry*>(m_tree->selectedItems().front());
+		if (entry) {
+			startLoading(entry->getProjectInformation());
+		}
+		else {
+			m_previewBox->unsetProject();
+			stopLoading();
+		}
+	}
+	else {
+		m_previewBox->unsetProject();
+		stopLoading();
+	}
+
 	Q_EMIT selectionChanged();
 }
 
-void ot::ProjectOverviewWidget::slotRefreshSelection(QTreeWidgetItem* _item, int _column) {
+void ot::ProjectOverviewWidget::slotItemChanged(QTreeWidgetItem* _item, int _column) {
 	if (_column != ProjectOverviewHeader::ColumnIndex::Checked) {
 		return;
 	}
@@ -217,9 +238,47 @@ void ot::ProjectOverviewWidget::slotBasicFilterProjects() {
 	basicFilterProjects(m_tree->invisibleRootItem());
 }
 
+void ot::ProjectOverviewWidget::slotWorkerFinished() {
+	m_previewBox->setProject(m_importedProjectData);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Helper
+
+void ot::ProjectOverviewWidget::startLoading(const ProjectInformation& _projectInfo) {
+	stopLoading();
+
+	m_isLoading = true;
+	m_currentlyLoadingProject = _projectInfo;
+	m_loadingThread.reset(new std::thread(&ot::ProjectOverviewWidget::worker, this));
+}
+
+void ot::ProjectOverviewWidget::stopLoading() {
+	m_isLoading = false;
+	if (m_loadingThread.get()) {
+		m_loadingThread->join();
+		m_loadingThread.reset();
+	}
+}
+
+void ot::ProjectOverviewWidget::worker() {
+	if (!m_isLoading) {
+		return;
+	}
+	// Reset
+	m_importedProjectData = ProjectOverviewPreviewData(m_currentlyLoadingProject);
+
+	// Load preview icon
+	std::vector<char> imageData;
+	ot::ImageFileFormat imageFormat = ot::ImageFileFormat::PNG;
+	
+	if (ModelState::readProjectPreviewImage(m_currentlyLoadingProject.getCollectionName(), imageData, imageFormat)) {
+		m_importedProjectData.setImageData(std::move(imageData), imageFormat);
+	}
+
+	QMetaObject::invokeMethod(this, &ProjectOverviewWidget::slotWorkerFinished, Qt::QueuedConnection);
+}
 
 int ot::ProjectOverviewWidget::getProjectCount(const QTreeWidgetItem* _parent) const {
 	int count = 0;

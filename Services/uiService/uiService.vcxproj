@@ -51,6 +51,8 @@
     <ClCompile Include="src\ProjectOverviewFilter.cpp" />
     <ClCompile Include="src\ProjectOverviewFilterData.cpp" />
     <ClCompile Include="src\ProjectOverviewHeader.cpp" />
+    <ClCompile Include="src\ProjectOverviewPreviewBox.cpp" />
+    <ClCompile Include="src\ProjectOverviewPreviewData.cpp" />
     <ClCompile Include="src\ProjectOverviewWidget.cpp" />
     <ClCompile Include="src\WelcomeWidget.cpp" />
     <ClCompile Include="src\RenameProjectDialog.cpp" />
@@ -92,6 +94,8 @@
     <QtMoc Include="include\ProjectOverviewHeader.h" />
     <QtMoc Include="include\ProjectOverviewFilter.h" />
     <ClInclude Include="include\ProjectOverviewFilterData.h" />
+    <QtMoc Include="include\ProjectOverviewPreviewBox.h" />
+    <ClInclude Include="include\ProjectOverviewPreviewData.h" />
     <ClInclude Include="include\ShortParameterDescription.h" />
     <ClInclude Include="include\StartArgumentParser.h" />
     <ClInclude Include="include\UITestLogs.h" />

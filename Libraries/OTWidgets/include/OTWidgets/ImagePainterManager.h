@@ -27,6 +27,12 @@ namespace ot {
 
 		const ImagePainter* getPainter(const std::string& _key) const;
 
+		//! @brief Creates a ImagePainter from the raw data provided.
+		//! @param _data Raw data of the image file.
+		//! @param _format Format of the image file.
+		//! @return Returns a pointer to the created ImagePainter or nullptr if the data could not be processed.
+		static ImagePainter* createFromRawData(const std::vector<char>& _data, ImageFileFormat _format);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Data manamgement

@@ -182,6 +182,12 @@
     <ClCompile Include="src\ProjectOverviewFilter.cpp">
       <Filter>Source Files\ProjectOverview</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProjectOverviewPreviewBox.cpp">
+      <Filter>Source Files\ProjectOverview</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProjectOverviewPreviewData.cpp">
+      <Filter>Source Files\ProjectOverview</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -256,6 +262,9 @@
     <ClInclude Include="include\ProjectOverviewFilterData.h">
       <Filter>Header Files\ProjectOverview</Filter>
     </ClInclude>
+    <ClInclude Include="include\ProjectOverviewPreviewData.h">
+      <Filter>Header Files\ProjectOverview</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\ExternalServicesComponent.h">
@@ -322,6 +331,9 @@
       <Filter>Header Files\ProjectOverview</Filter>
     </QtMoc>
     <QtMoc Include="include\ProjectOverviewFilter.h">
+      <Filter>Header Files\ProjectOverview</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectOverviewPreviewBox.h">
       <Filter>Header Files\ProjectOverview</Filter>
     </QtMoc>
   </ItemGroup>

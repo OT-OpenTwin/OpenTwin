@@ -20,7 +20,7 @@ namespace ot {
 	public:
 		ProjectInformation();
 		ProjectInformation(const ConstJsonObject& _jsonObject);
-		~ProjectInformation() = default;
+		virtual ~ProjectInformation() = default;
 
 		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ConstJsonObject& _jsonObject) override;

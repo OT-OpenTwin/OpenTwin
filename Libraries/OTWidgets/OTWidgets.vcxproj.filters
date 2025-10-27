@@ -574,6 +574,9 @@
     <ClCompile Include="src\TemporaryDir.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\ImagePainterWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1081,6 +1084,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\TemporaryDir.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\ImagePainterWidget.h">
+      <Filter>include\Widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -29,6 +29,48 @@ const ot::ImagePainter* ot::ImagePainterManager::getPainter(const std::string& _
 	else return it->second;
 }
 
+ot::ImagePainter* ot::ImagePainterManager::createFromRawData(const std::vector<char>& _data, ImageFileFormat _format) {
+	switch (_format) {
+	case ot::ImageFileFormat::PNG:
+	{
+		QPixmap pixmap;
+		if (!pixmap.loadFromData(QByteArray::fromRawData(_data.data(), static_cast<int>(_data.size())), "png")) {
+			OT_LOG_E("Failed to load png file data");
+			return nullptr;
+		}
+		return new PixmapImagePainter(pixmap);
+	}
+		break;
+	case ot::ImageFileFormat::JPEG:
+	{
+		QPixmap pixmap;
+		if (!pixmap.loadFromData(QByteArray::fromRawData(_data.data(), static_cast<int>(_data.size())), "jpeg")) {
+			OT_LOG_E("Failed to load jpeg file data");
+			return nullptr;
+		}
+		return new PixmapImagePainter(pixmap);
+	}
+		break;
+	case ot::ImageFileFormat::SVG:
+	{
+		QByteArray svgData = QByteArray::fromRawData(_data.data(), static_cast<int>(_data.size()));
+		SvgImagePainter* newPainter = new SvgImagePainter(svgData);
+		if (!newPainter->isValid()) {
+			OT_LOG_EA("Invalid svg data");
+			delete newPainter;
+			return nullptr;
+		}
+		else {
+			return newPainter;
+		}
+	}
+		break;
+	default:
+		OT_LOG_E("Unsupported image file format (" + std::to_string(static_cast<int>(_format)) + ")");
+		return nullptr;
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Data management
