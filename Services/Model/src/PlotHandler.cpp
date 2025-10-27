@@ -15,10 +15,10 @@ PlotHandler::PlotHandler() {
 	const std::string pageName = Application::getToolBarPageName();
 	
 	m_btnCreatePlot = ot::ToolBarButtonCfg(pageName, c_groupName, "Create Plot", "Default/Plot1DVisible");
-	m_btnCreatePlot.setButtonLockFlags(ot::LockModelWrite);
+	m_btnCreatePlot.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	
 	m_btnAddCurveToPlot = ot::ToolBarButtonCfg(pageName, c_groupName, "Add Curve to Plot", "Default/Plot1DVisible");
-	m_btnAddCurveToPlot.setButtonLockFlags(ot::LockModelWrite);
+	m_btnAddCurveToPlot.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 
 	m_buttonHandler.connectToolBarButton(m_btnCreatePlot, this, &PlotHandler::handleCreatePlot);
 	m_buttonHandler.connectToolBarButton(m_btnAddCurveToPlot, this, &PlotHandler::handleAddCurveToPlot);

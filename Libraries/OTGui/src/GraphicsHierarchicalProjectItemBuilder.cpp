@@ -57,25 +57,25 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 	conGrid->setColumnStretch(3, 1);
 	conGrid->setRowStretch(1, 1);
 	conGrid->setRowStretch(3, 1);
-	conGrid->setSizePolicy(Dynamic);
+	conGrid->setSizePolicy(SizePolicy::Dynamic);
 	root->addItemBottom(conGrid, false, true);
 
 	// Connectors
-	//conGrid->addChildItem(0, 0, createConnectorItem(ot::AlignTopLeft));
-	conGrid->addChildItem(0, 2, createConnectorItem(ot::AlignTop));
-	//conGrid->addChildItem(0, 4, createConnectorItem(ot::AlignTopRight));
-	conGrid->addChildItem(2, 0, createConnectorItem(ot::AlignLeft));
-	conGrid->addChildItem(2, 4, createConnectorItem(ot::AlignRight));
-	//conGrid->addChildItem(4, 0, createConnectorItem(ot::AlignBottomLeft));
-	conGrid->addChildItem(4, 2, createConnectorItem(ot::AlignBottom));
-	//conGrid->addChildItem(4, 4, createConnectorItem(ot::AlignBottomRight));
+	//conGrid->addChildItem(0, 0, createConnectorItem(Alignment::TopLeft));
+	conGrid->addChildItem(0, 2, createConnectorItem(Alignment::Top));
+	//conGrid->addChildItem(0, 4, createConnectorItem(Alignment::TopRight));
+	conGrid->addChildItem(2, 0, createConnectorItem(Alignment::Left));
+	conGrid->addChildItem(2, 4, createConnectorItem(Alignment::Right));
+	//conGrid->addChildItem(4, 0, createConnectorItem(Alignment::BottomLeft));
+	conGrid->addChildItem(4, 2, createConnectorItem(Alignment::Bottom));
+	//conGrid->addChildItem(4, 4, createConnectorItem(Alignment::BottomRight));
 
 	// Border
 	GraphicsRectangularItemCfg* bor = new GraphicsRectangularItemCfg(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
 	bor->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 	bor->setCornerRadius(5);
 	bor->setName(m_name + "_bor");
-	bor->setSizePolicy(Dynamic);
+	bor->setSizePolicy(SizePolicy::Dynamic);
 	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 	cStack->addItemTop(bor, false, true);
 
@@ -104,7 +104,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 	if (!m_type.empty()) {
 		GraphicsTextItemCfg* typeItm = new GraphicsTextItemCfg("Project Type: " + m_type);
 		typeItm->setName(m_name + "_ptype");
-		typeItm->setAlignment(AlignLeft);
+		typeItm->setAlignment(Alignment::Left);
 		typeItm->setMargins(infoMargins);
 		typeItm->setTextFont(infoFont);
 		typeItm->setTextStyle(infoPen);
@@ -116,7 +116,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 	if (!m_projectVersion.empty()) {
 		GraphicsTextItemCfg* verItm = new GraphicsTextItemCfg("Version: " + m_projectVersion);
 		verItm->setName(m_name + "_pver");
-		verItm->setAlignment(AlignLeft);
+		verItm->setAlignment(Alignment::Left);
 		ot::Font font = infoFont;
 		font.setSize(font.size() - 2);
 		font.setItalic(true);
@@ -134,8 +134,8 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 		cImg->setImageData(m_previewImage, m_previewImageFormat);
 		cImg->setName(m_name + "_cPrevImg");
 		cImg->setMargins(m_previewImageMargins);
-		cImg->setSizePolicy(Dynamic);
-		cImg->setAlignment(AlignCenter);
+		cImg->setSizePolicy(SizePolicy::Dynamic);
+		cImg->setAlignment(Alignment::Center);
 		cImg->setMaintainAspectRatio(true);
 		cImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		cImg->setMaximumSize(Size2DD(150., 150.));
@@ -171,7 +171,7 @@ void ot::GraphicsHierarchicalProjectItemBuilder::setTitleBackgroundGradientColor
 	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
 	painter->setCenterPoint(ot::Point2DD(0., 2.));
 	painter->setCenterRadius(2.5);
-	painter->setSpread(ot::ReflectSpread);
+	painter->setSpread(GradientSpread::Reflect);
 
 	painter->addStop(0.00, _color);
 	painter->addStop(0.75, ot::Color(50, 50, 50));
@@ -200,7 +200,7 @@ void ot::GraphicsHierarchicalProjectItemBuilder::setDefaultTitleForegroundGradie
 	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
 	painter->setCenterPoint(ot::Point2DD(0., 2.));
 	painter->setCenterRadius(2.5);
-	painter->setSpread(ot::ReflectSpread);
+	painter->setSpread(GradientSpread::Reflect);
 
 	painter->addStop(0.00, ot::Color(255, 255, 255));
 	painter->addStop(0.75, ot::Color(255, 255, 255));
@@ -215,77 +215,77 @@ void ot::GraphicsHierarchicalProjectItemBuilder::setDefaultTitleForegroundGradie
 
 // Private: Helper
 
-ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createConnectorItem(ot::Alignment _alignment) const {
+ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createConnectorItem(Alignment _alignment) const {
 	GraphicsEllipseItemCfg* con = new GraphicsEllipseItemCfg(0., 0., new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
 	con->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::Transparent)));
 	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
-	con->setSizePolicy(ot::Preferred);
+	con->setSizePolicy(SizePolicy::Preferred);
 
 	constexpr double trigDist = GraphicsItemCfg::defaultAdditionalTriggerDistance();
 
 	// Set name
 	switch (_alignment) {
-	case ot::AlignTopLeft:
+	case Alignment::TopLeft:
 		con->setName("TopLeft");
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorWidth);
-		con->setConnectionDirection(ot::ConnectUp);
+		con->setConnectionDirection(ConnectionDirection::Up);
 		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
 		break;
 
-	case ot::AlignTop:
+	case Alignment::Top:
 		con->setName("Top");
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorHeight);
-		con->setConnectionDirection(ot::ConnectUp);
+		con->setConnectionDirection(ConnectionDirection::Up);
 		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
 		break;
 
-	case ot::AlignTopRight:
+	case Alignment::TopRight:
 		con->setName("TopRight");
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorWidth);
-		con->setConnectionDirection(ot::ConnectUp);
+		con->setConnectionDirection(ConnectionDirection::Up);
 		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
 		break;
 
-	case ot::AlignLeft:
+	case Alignment::Left:
 		con->setName("Left");
 		con->setRadiusX(m_connectorHeight);
 		con->setRadiusY(m_connectorWidth);
-		con->setConnectionDirection(ot::ConnectLeft);
+		con->setConnectionDirection(ConnectionDirection::Left);
 		con->setAdditionalTriggerDistance(trigDist, trigDist, trigDist, 0.);
 		break;
 
-	case ot::AlignRight:
+	case Alignment::Right:
 		con->setName("Right");
 		con->setRadiusX(m_connectorHeight);
 		con->setRadiusY(m_connectorWidth);
-		con->setConnectionDirection(ot::ConnectRight);
+		con->setConnectionDirection(ConnectionDirection::Right);
 		con->setAdditionalTriggerDistance(0., trigDist, trigDist, trigDist);
 		break;
 
-	case ot::AlignBottomLeft:
+	case Alignment::BottomLeft:
 		con->setName("BottomLeft");
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorWidth);
-		con->setConnectionDirection(ot::ConnectDown);
+		con->setConnectionDirection(ConnectionDirection::Down);
 		con->setAdditionalTriggerDistance(trigDist, 0., trigDist, trigDist);
 		break;
 
-	case ot::AlignBottom:
+	case Alignment::Bottom:
 		con->setName("Bottom");
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorHeight);
-		con->setConnectionDirection(ot::ConnectDown);
+		con->setConnectionDirection(ConnectionDirection::Down);
 		con->setAdditionalTriggerDistance(trigDist, 0., trigDist, trigDist);
 		break;
 
-	case ot::AlignBottomRight:
+	case Alignment::BottomRight:
 		con->setName("BottomRight");
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorWidth);
-		con->setConnectionDirection(ot::ConnectDown);
+		con->setConnectionDirection(ConnectionDirection::Down);
 		con->setAdditionalTriggerDistance(trigDist, 0., trigDist, trigDist);
 		break;
 
@@ -319,7 +319,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createTitle() c
 	tBor->setName(m_name + "_tBor");
 	tBor->setCornerRadius(5);
 	//tBor->setSize(Size2DD(200., 30.));
-	tBor->setSizePolicy(Dynamic);
+	tBor->setSizePolicy(SizePolicy::Dynamic);
 	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 	tStack->addItemTop(tBor, false, true);
 
@@ -346,7 +346,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createTitle() c
 		titLImg->setName(m_name + "_titLImg");
 		titLImg->setImagePath(m_leftTitleImagePath);
 		titLImg->setFixedSize(16., 16.);
-		titLImg->setAlignment(AlignCenter);
+		titLImg->setAlignment(Alignment::Center);
 		titLImg->setMargins(MarginsD(5., 0., 0., 0.));
 		titLImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titLImg);

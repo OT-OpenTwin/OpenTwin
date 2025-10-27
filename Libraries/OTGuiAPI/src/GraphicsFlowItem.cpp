@@ -79,7 +79,7 @@ void ot::GraphicsFlowItem::ini(void) {
 	m_builder.setTitleForegroundColor(Color(White));
 
 	// Background image
-	m_builder.setBackgroundImageAlignment(AlignCenter);
+	m_builder.setBackgroundImageAlignment(Alignment::Center);
 	m_builder.setBackgroundImageMargins(MarginsD( 5., 2., 2., 2.));
 	m_builder.setBackgroundImageInsertMode(GraphicsFlowItemBuilder::OnLayout);
 	m_builder.setBackgroundImageMaintainAspectRatio(true);

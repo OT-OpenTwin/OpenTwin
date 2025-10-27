@@ -11,11 +11,11 @@
 #define OT_JSON_MEMBER_Spread "Spread"
 
 ot::GradientPainter2D::GradientPainter2D()
-	: m_spread(PadSpread)
+	: m_spread(GradientSpread::Pad)
 {}
 
 ot::GradientPainter2D::GradientPainter2D(const std::vector<GradientPainterStop2D>& _stops)
-	: m_spread(PadSpread), m_stops(_stops)
+	: m_spread(GradientSpread::Pad), m_stops(_stops)
 {}
 
 ot::GradientPainter2D::~GradientPainter2D() {}
@@ -74,9 +74,9 @@ void ot::GradientPainter2D::addStops(const std::vector<GradientPainterStop2D>& _
 void ot::GradientPainter2D::addStopsAndSpreadToQss(std::string& _targetString) const {
 	switch (m_spread)
 	{
-	case ot::PadSpread: _targetString.append(", spread: pad"); break;
-	case ot::RepeatSpread: _targetString.append(", spread: repeat"); break;
-	case ot::ReflectSpread: _targetString.append(", spread: reflect"); break;
+	case GradientSpread::Pad: _targetString.append(", spread: pad"); break;
+	case GradientSpread::Repeat: _targetString.append(", spread: repeat"); break;
+	case GradientSpread::Reflect: _targetString.append(", spread: reflect"); break;
 	default:
 		OT_LOG_E("Unknown spread");
 		break;

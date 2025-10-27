@@ -47,17 +47,17 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 
 	m_inConnector = new GraphicsInvisibleItem;
 	m_inConnector->setGraphicsItemName("In");
-	m_inConnector->setGraphicsItemAlignment(AlignCenter);
+	m_inConnector->setGraphicsItemAlignment(Alignment::Center);
 	m_inConnector->setGraphicsItemMaximumSize(1., 1.);
 	m_inConnector->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
-	m_inConnector->setConnectionDirection(ConnectLeft);
+	m_inConnector->setConnectionDirection(ConnectionDirection::Left);
 
 	m_outConnector = new GraphicsInvisibleItem;
 	m_outConnector->setGraphicsItemName("Out");
-	m_outConnector->setGraphicsItemAlignment(AlignCenter);
+	m_outConnector->setGraphicsItemAlignment(Alignment::Center);
 	m_outConnector->setGraphicsItemMaximumSize(1., 1.);
 	m_outConnector->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
-	m_outConnector->setConnectionDirection(ConnectRight);
+	m_outConnector->setConnectionDirection(ConnectionDirection::Right);
 
 	m_nameItem = new GraphicsTextItem;
 	m_nameItem->setGraphicsItemName("Name");

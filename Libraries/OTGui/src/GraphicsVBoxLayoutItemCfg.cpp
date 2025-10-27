@@ -7,5 +7,5 @@
 #include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTGui/GraphicsVBoxLayoutItemCfg.h"
 
-ot::GraphicsVBoxLayoutItemCfg::GraphicsVBoxLayoutItemCfg() : GraphicsBoxLayoutItemCfg(ot::Vertical) {};
+ot::GraphicsVBoxLayoutItemCfg::GraphicsVBoxLayoutItemCfg() : GraphicsBoxLayoutItemCfg(Orientation::Vertical) {};
 

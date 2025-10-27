@@ -274,7 +274,7 @@ QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) 
 	QSizeF newSize;
 
 	// Minimum size
-	if (this->getGraphicsItemSizePolicy() == ot::Dynamic) {
+	if (this->getGraphicsItemSizePolicy() == SizePolicy::Dynamic) {
 		newSize = this->getGraphicsItemMinimumSize();
 	}
 	else {
@@ -368,10 +368,10 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 
 	switch (this->getGraphicsItemSizePolicy())
 	{
-	case ot::Preferred:
+	case SizePolicy::Preferred:
 		inner = _innerSize;
 		break;
-	case ot::Dynamic:
+	case SizePolicy::Dynamic:
 		inner = this->getGraphicsItemMinimumSize();
 		break;
 	default:
@@ -613,13 +613,13 @@ void ot::GraphicsItem::setConnectionDirection(ot::ConnectionDirection _direction
 ot::ConnectionDirection ot::GraphicsItem::getConnectionDirection() const {
 	OTAssertNullptr(m_config);
 	switch (m_config->getConnectionDirection()) {
-	case ot::ConnectAny: return this->calculateOutwardsConnectionDirection();
-	case ot::ConnectLeft: return ConnectionDirection::ConnectLeft;
-	case ot::ConnectUp: return ConnectionDirection::ConnectUp;
-	case ot::ConnectRight: return ConnectionDirection::ConnectRight;
-	case ot::ConnectDown: return ConnectionDirection::ConnectDown;
-	case ot::ConnectOut: return this->calculateOutwardsConnectionDirection();
-	case ot::ConnectIn: return ot::inversedConnectionDirection(this->calculateOutwardsConnectionDirection());
+	case ConnectionDirection::Any: return this->calculateOutwardsConnectionDirection();
+	case ConnectionDirection::Left: return ConnectionDirection::Left;
+	case ConnectionDirection::Up: return ConnectionDirection::Up;
+	case ConnectionDirection::Right: return ConnectionDirection::Right;
+	case ConnectionDirection::Down: return ConnectionDirection::Down;
+	case ConnectionDirection::Out: return this->calculateOutwardsConnectionDirection();
+	case ConnectionDirection::In: return ot::inversedConnectionDirection(this->calculateOutwardsConnectionDirection());
 	default:
 		OT_LOG_EA("Unknown connection direction");
 		return this->calculateOutwardsConnectionDirection();
@@ -807,7 +807,7 @@ ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection()
 	qreal dy = thisCenter.y() - rootCenter.y();
 	
 	if (dx == 0. && dy == 0.) {
-		return ConnectionDirection::ConnectAny;
+		return ConnectionDirection::Any;
 	}
 
 	bool isRight = true;
@@ -823,9 +823,9 @@ ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection()
 	}
 	
 	if (dx >= dy) {
-		return (isRight ? ConnectionDirection::ConnectRight : ConnectionDirection::ConnectLeft);
+		return (isRight ? ConnectionDirection::Right : ConnectionDirection::Left);
 	}
 	else {
-		return (isDown ? ConnectionDirection::ConnectDown : ConnectionDirection::ConnectUp);
+		return (isDown ? ConnectionDirection::Down : ConnectionDirection::Up);
 	}
 }

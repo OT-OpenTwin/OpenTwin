@@ -20,7 +20,7 @@ namespace ot {
 		//! If no item is set then its a stretch only
 		typedef std::pair<GraphicsItemCfg*, int> itemStrechPair_t;
 
-		GraphicsBoxLayoutItemCfg(ot::Orientation _orientation = ot::Horizontal);
+		GraphicsBoxLayoutItemCfg(Orientation _orientation = Orientation::Horizontal);
 		GraphicsBoxLayoutItemCfg(const GraphicsBoxLayoutItemCfg& _other);
 		virtual ~GraphicsBoxLayoutItemCfg();
 
@@ -39,18 +39,18 @@ namespace ot {
 		virtual GraphicsItemCfg* createCopy() const override { return new GraphicsBoxLayoutItemCfg(*this); };
 		virtual std::string getFactoryKey() const override { return GraphicsBoxLayoutItemCfg::className(); };
 
-		virtual void addChildItem(ot::GraphicsItemCfg* _item) override;
-		void addChildItem(ot::GraphicsItemCfg* _item, int _stretch);
+		virtual void addChildItem(GraphicsItemCfg* _item) override;
+		void addChildItem(GraphicsItemCfg* _item, int _stretch);
 		void addStrech(int _stretch = 1);
 		const std::list<itemStrechPair_t>& getItems() const { return m_items; };
 		
-		void setOrientation(ot::Orientation _orientation) { m_orientation = _orientation; };
-		ot::Orientation getOrientation() const { return m_orientation; };
+		void setOrientation(Orientation _orientation) { m_orientation = _orientation; };
+		Orientation getOrientation() const { return m_orientation; };
 
 	private:
 		void clearItems();
 
-		ot::Orientation m_orientation;
+		Orientation m_orientation;
 		std::list<itemStrechPair_t> m_items; //! @brief Items and their stretch in the box (nullptr = stretch only)
 	};
 

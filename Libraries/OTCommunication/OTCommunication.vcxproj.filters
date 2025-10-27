@@ -9,6 +9,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\DebugInformation">
+      <UniqueIdentifier>{d61862ef-7a4f-45a2-9f6b-10e974cb871f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DebugInformation">
+      <UniqueIdentifier>{b81fd435-dd66-41a5-9fc5-2a4987fb7a0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CommunicationTypes.cpp">
@@ -50,20 +56,20 @@
     <ClCompile Include="src\ServiceInitData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\LDSDebugInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GSSDebugInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GDSDebugInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LSSDebugInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ActionHandleConnectorContainer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LDSDebugInfo.cpp">
+      <Filter>Source Files\DebugInformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LSSDebugInfo.cpp">
+      <Filter>Source Files\DebugInformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GSSDebugInfo.cpp">
+      <Filter>Source Files\DebugInformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GDSDebugInfo.cpp">
+      <Filter>Source Files\DebugInformation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -124,23 +130,23 @@
     <ClInclude Include="include\OTCommunication\ServiceRunData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCommunication\GSSDebugInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCommunication\LSSDebugInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCommunication\GDSDebugInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCommunication\LDSDebugInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCommunication\ActionHandleConnectorContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCommunication\ActionHandler.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\GDSDebugInfo.h">
+      <Filter>Header Files\DebugInformation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\GSSDebugInfo.h">
+      <Filter>Header Files\DebugInformation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\LDSDebugInfo.h">
+      <Filter>Header Files\DebugInformation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\LSSDebugInfo.h">
+      <Filter>Header Files\DebugInformation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

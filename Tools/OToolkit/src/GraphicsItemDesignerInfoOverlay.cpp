@@ -14,7 +14,7 @@
 #include <QtWidgets/qscrollbar.h>
 
 GraphicsItemDesignerInfoOverlay::GraphicsItemDesignerInfoOverlay(const QString& _text, GraphicsItemDesignerView* _view, const QMargins& _overlayMargins)
-	: ot::OverlayWidgetBase(_view, ot::AlignTop, _overlayMargins)
+	: ot::OverlayWidgetBase(_view, ot::Alignment::Top, _overlayMargins)
 {
 	QHBoxLayout* lay = new QHBoxLayout(this);
 	m_label = new QLabel(_text);

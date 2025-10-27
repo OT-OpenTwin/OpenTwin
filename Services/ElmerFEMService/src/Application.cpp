@@ -62,7 +62,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("ElmerFEM", "Solver");
 	_ui->addMenuGroup("ElmerFEM", "Sources");
 
-	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockTypeFlag::ModelWrite);
 
 	_ui->addMenuButton("ElmerFEM", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton("ElmerFEM", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default");
@@ -245,10 +245,10 @@ void Application::runSolver(void) {
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase *> solverMap) {
 	ot::LockTypeFlags lock;
-	lock.setFlag(ot::LockModelWrite);
-	lock.setFlag(ot::LockNavigationWrite);
-	lock.setFlag(ot::LockViewWrite);
-	lock.setFlag(ot::LockProperties);
+	lock.setFlag(ot::LockTypeFlag::ModelWrite);
+	lock.setFlag(ot::LockTypeFlag::NavigationWrite);
+	lock.setFlag(ot::LockTypeFlag::ViewWrite);
+	lock.setFlag(ot::LockTypeFlag::Properties);
 
 	this->getUiComponent()->lockUI(lock);
 

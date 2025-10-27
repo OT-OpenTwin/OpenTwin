@@ -8,41 +8,41 @@
 
 std::list<ot::GraphicsConnectionCalculationData> ot::GraphicsConnectionCalculationData::getAllYXLines(void) {
 	static std::list<ot::GraphicsConnectionCalculationData> xyLines({
-		GraphicsConnectionCalculationData(ConnectLeft, ConnectLeft, AlignTopRight),
-		GraphicsConnectionCalculationData(ConnectLeft, ConnectLeft, AlignBottomRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Left, ConnectionDirection::Left, Alignment::TopRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Left, ConnectionDirection::Left, Alignment::BottomRight),
 
-		GraphicsConnectionCalculationData(ConnectRight, ConnectRight, AlignTopLeft),
-		GraphicsConnectionCalculationData(ConnectRight, ConnectRight, AlignBottomLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Right, ConnectionDirection::Right, Alignment::TopLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Right, ConnectionDirection::Right, Alignment::BottomLeft),
 		
-		GraphicsConnectionCalculationData(ConnectUp, ConnectUp, AlignTopLeft),
-		GraphicsConnectionCalculationData(ConnectUp, ConnectUp, AlignTopRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Up, ConnectionDirection::Up, Alignment::TopLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Up, ConnectionDirection::Up, Alignment::TopRight),
 		
-		GraphicsConnectionCalculationData(ConnectDown, ConnectDown, AlignBottomLeft),
-		GraphicsConnectionCalculationData(ConnectDown, ConnectDown, AlignBottomRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Down, ConnectionDirection::Down, Alignment::BottomLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Down, ConnectionDirection::Down, Alignment::BottomRight),
 
-		GraphicsConnectionCalculationData(ConnectLeft, ConnectUp, AlignTopLeft),
-		GraphicsConnectionCalculationData(ConnectLeft, ConnectUp, AlignTopRight),
-		GraphicsConnectionCalculationData(ConnectLeft, ConnectUp, AlignBottomRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Left, ConnectionDirection::Up, Alignment::TopLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Left, ConnectionDirection::Up, Alignment::TopRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Left, ConnectionDirection::Up, Alignment::BottomRight),
 
-		GraphicsConnectionCalculationData(ConnectLeft, ConnectDown, AlignTopRight),
-		GraphicsConnectionCalculationData(ConnectLeft, ConnectDown, AlignBottomRight),
-		GraphicsConnectionCalculationData(ConnectLeft, ConnectDown, AlignBottomLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Left, ConnectionDirection::Down, Alignment::TopRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Left, ConnectionDirection::Down, Alignment::BottomRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Left, ConnectionDirection::Down, Alignment::BottomLeft),
 
-		GraphicsConnectionCalculationData(ConnectRight, ConnectUp, AlignTopLeft),
-		GraphicsConnectionCalculationData(ConnectRight, ConnectUp, AlignTopRight),
-		GraphicsConnectionCalculationData(ConnectRight, ConnectUp, AlignBottomLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Right, ConnectionDirection::Up, Alignment::TopLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Right, ConnectionDirection::Up, Alignment::TopRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Right, ConnectionDirection::Up, Alignment::BottomLeft),
 
-		GraphicsConnectionCalculationData(ConnectRight, ConnectDown, AlignTopLeft),
-		GraphicsConnectionCalculationData(ConnectRight, ConnectDown, AlignBottomRight),
-		GraphicsConnectionCalculationData(ConnectRight, ConnectDown, AlignBottomLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Right, ConnectionDirection::Down, Alignment::TopLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Right, ConnectionDirection::Down, Alignment::BottomRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Right, ConnectionDirection::Down, Alignment::BottomLeft),
 
-		GraphicsConnectionCalculationData(ConnectUp, ConnectLeft, AlignTopRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Up, ConnectionDirection::Left, Alignment::TopRight),
 
-		GraphicsConnectionCalculationData(ConnectUp, ConnectRight, AlignTopLeft),
+		GraphicsConnectionCalculationData(ConnectionDirection::Up, ConnectionDirection::Right, Alignment::TopLeft),
 		
-		GraphicsConnectionCalculationData(ConnectDown, ConnectLeft, AlignBottomRight),
+		GraphicsConnectionCalculationData(ConnectionDirection::Down, ConnectionDirection::Left, Alignment::BottomRight),
 		
-		GraphicsConnectionCalculationData(ConnectDown, ConnectRight, AlignBottomLeft)
+		GraphicsConnectionCalculationData(ConnectionDirection::Down, ConnectionDirection::Right, Alignment::BottomLeft)
 		});
 	return xyLines;
 }

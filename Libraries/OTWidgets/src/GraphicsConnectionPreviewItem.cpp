@@ -15,7 +15,7 @@
 
 ot::GraphicsConnectionPreviewItem::GraphicsConnectionPreviewItem() :
 	m_shape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), 
-	m_originDir(ot::ConnectAny), m_destDir(ot::ConnectAny), c_lineWidth(2.)
+	m_originDir(ConnectionDirection::Any), m_destDir(ConnectionDirection::Any), c_lineWidth(2.)
 {
 
 }
@@ -137,7 +137,7 @@ void ot::GraphicsConnectionPreviewItem::calculateSmoothLinePoints(QPointF& _cont
 void ot::GraphicsConnectionPreviewItem::calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const {
 	switch (_direction)
 	{
-	case ot::ConnectAny:
+	case ConnectionDirection::Any:
 	{
 		double ptx, pty;
 		if (_origin.x() > _destination.x()) ptx = _origin.x() - _halfdistX;
@@ -147,16 +147,16 @@ void ot::GraphicsConnectionPreviewItem::calculateSmoothLineStep(const QPointF& _
 		_control = QPointF(_origin.x() + ptx, _origin.y() + pty);
 	}
 	break;
-	case ot::ConnectLeft:
+	case ConnectionDirection::Left:
 		_control = QPointF(_origin.x() - _halfdistX, _origin.y());
 		break;
-	case ot::ConnectUp:
+	case ConnectionDirection::Up:
 		_control = QPointF(_origin.x(), _origin.y() - _halfdistY);
 		break;
-	case ot::ConnectRight:
+	case ConnectionDirection::Right:
 		_control = QPointF(_origin.x() + _halfdistX, _origin.y());
 		break;
-	case ot::ConnectDown:
+	case ConnectionDirection::Down:
 		_control = QPointF(_origin.x(), _origin.y() + _halfdistY);
 		break;
 	default:

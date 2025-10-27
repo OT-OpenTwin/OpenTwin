@@ -39,9 +39,9 @@ Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
 	m_runSolverButton = ot::ToolBarButtonCfg("FDTD", "Solver", "Run Solver", "Default/RunSolver");
-	m_runSolverButton.setButtonLockFlags(ot::LockModelWrite);
+	m_runSolverButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	m_createSolverButton = ot::ToolBarButtonCfg("FDTD", "Solver", "Create Solver", "Default/AddSolver");
-	m_createSolverButton.setButtonLockFlags(ot::LockModelWrite);
+	m_createSolverButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	connectToolBarButton(m_createSolverButton, this, &Application::addSolver);
 	connectToolBarButton(m_runSolverButton, this, &Application::runSolver);
 }
@@ -72,7 +72,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	//_ui->addMenuGroup(pageName, groupNameSignal);
 	//_ui->addMenuGroup(pageName, groupNamePort);
 
-	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockTypeFlag::ModelWrite);
 
 
 	_ui->addMenuButton(pageName, groupNameSolver, "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
@@ -239,10 +239,10 @@ void Application::runSolver(void)
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase *> solverMap) {
 	ot::LockTypeFlags lock;
-	lock.setFlag(ot::LockModelWrite);
-	lock.setFlag(ot::LockNavigationWrite);
-	lock.setFlag(ot::LockViewWrite);
-	lock.setFlag(ot::LockProperties);
+	lock.setFlag(ot::LockTypeFlag::ModelWrite);
+	lock.setFlag(ot::LockTypeFlag::NavigationWrite);
+	lock.setFlag(ot::LockTypeFlag::ViewWrite);
+	lock.setFlag(ot::LockTypeFlag::Properties);
 
 	getUiComponent()->lockUI(lock);
 

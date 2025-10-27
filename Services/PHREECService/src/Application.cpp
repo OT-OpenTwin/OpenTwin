@@ -59,8 +59,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("PHREEC", "Sources");
 	_ui->addMenuGroup("PHREEC", "Solver");
 
-	ot::LockTypeFlags modelWrite;
-	modelWrite.setFlag(ot::LockModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockTypeFlag::ModelWrite);
 
 	_ui->addMenuButton("PHREEC", "Sources", "Add Terminal", "Add Terminal", modelWrite, "FaceSelect", "Default", "Ctrl+T");
 	_ui->addMenuButton("PHREEC", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");

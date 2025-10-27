@@ -59,15 +59,15 @@ QPen ot::QtFactory::toQPen(const PenFCfg& _outline) {
 Qt::Alignment ot::QtFactory::toQAlignment(ot::Alignment _alignment) {
 	switch (_alignment)
 	{
-	case ot::AlignCenter: return Qt::AlignCenter;
-	case ot::AlignTop: return Qt::AlignTop | Qt::AlignHCenter;
-	case ot::AlignTopRight: return Qt::AlignTop | Qt::AlignRight;
-	case ot::AlignRight: return Qt::AlignRight | Qt::AlignVCenter;
-	case ot::AlignBottomRight: return Qt::AlignBottom | Qt::AlignRight;
-	case ot::AlignBottom: return Qt::AlignBottom | Qt::AlignHCenter;
-	case ot::AlignBottomLeft: return Qt::AlignBottom | Qt::AlignLeft;
-	case ot::AlignLeft: return Qt::AlignLeft | Qt::AlignVCenter;
-	case ot::AlignTopLeft: return Qt::AlignTop | Qt::AlignLeft;
+	case Alignment::Center: return Qt::AlignCenter;
+	case Alignment::Top: return Qt::AlignTop | Qt::AlignHCenter;
+	case Alignment::TopRight: return Qt::AlignTop | Qt::AlignRight;
+	case Alignment::Right: return Qt::AlignRight | Qt::AlignVCenter;
+	case Alignment::BottomRight: return Qt::AlignBottom | Qt::AlignRight;
+	case Alignment::Bottom: return Qt::AlignBottom | Qt::AlignHCenter;
+	case Alignment::BottomLeft: return Qt::AlignBottom | Qt::AlignLeft;
+	case Alignment::Left: return Qt::AlignLeft | Qt::AlignVCenter;
+	case Alignment::TopLeft: return Qt::AlignTop | Qt::AlignLeft;
 	default:
 		OT_LOG_EA("Unknown alignment");
 		return Qt::AlignCenter;
@@ -77,9 +77,9 @@ Qt::Alignment ot::QtFactory::toQAlignment(ot::Alignment _alignment) {
 QGradient::Spread ot::QtFactory::toQGradientSpread(ot::GradientSpread _spread) {
 	switch (_spread)
 	{
-	case ot::PadSpread: return QGradient::PadSpread;
-	case ot::RepeatSpread: return QGradient::RepeatSpread;
-	case ot::ReflectSpread: return QGradient::ReflectSpread;
+	case GradientSpread::Pad: return QGradient::PadSpread;
+	case GradientSpread::Repeat: return QGradient::RepeatSpread;
+	case GradientSpread::Reflect: return QGradient::ReflectSpread;
 	default:
 		OT_LOG_EA("Unknown gradient spread");
 		return QGradient::PadSpread;

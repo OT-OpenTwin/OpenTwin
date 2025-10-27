@@ -656,7 +656,7 @@ void ot::GraphicsConnectionItem::calculateSmoothLinePath(QPainterPath& _path) co
 
 void ot::GraphicsConnectionItem::calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const {
 	switch (_direction) {
-	case ot::ConnectAny:
+	case ConnectionDirection::Any:
 	{
 		double ptx, pty;
 		if (_origin.x() > _destination.x()) ptx = _origin.x() - _halfdistX;
@@ -666,16 +666,16 @@ void ot::GraphicsConnectionItem::calculateSmoothLineStep(const QPointF& _origin,
 		_control = QPointF(_origin.x() + ptx, _origin.y() + pty);
 	}
 		break;
-	case ot::ConnectLeft:
+	case ConnectionDirection::Left:
 		_control = QPointF(_origin.x() - _halfdistX, _origin.y());
 		break;
-	case ot::ConnectUp:
+	case ConnectionDirection::Up:
 		_control = QPointF(_origin.x(), _origin.y() - _halfdistY);
 		break;
-	case ot::ConnectRight:
+	case ConnectionDirection::Right:
 		_control = QPointF(_origin.x() + _halfdistX, _origin.y());
 		break;
-	case ot::ConnectDown:
+	case ConnectionDirection::Down:
 		_control = QPointF(_origin.x(), _origin.y() + _halfdistY);
 		break;
 	default:
@@ -793,11 +793,11 @@ ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionItem::calculate
 	Alignment connectionAlignment = this->calculateConnectionDirectionAlignment();
 	
 	if (
-		connectionAlignment == AlignLeft ||
-		connectionAlignment == AlignTop ||
-		connectionAlignment == AlignRight ||
-		connectionAlignment == AlignBottom ||
-		connectionAlignment == AlignCenter
+		connectionAlignment == Alignment::Left ||
+		connectionAlignment == Alignment::Top ||
+		connectionAlignment == Alignment::Right ||
+		connectionAlignment == Alignment::Bottom ||
+		connectionAlignment == Alignment::Center
 		) {
 		return GraphicsConnectionCfg::ConnectionShape::XYLine;
 	}
@@ -819,18 +819,18 @@ ot::Alignment ot::GraphicsConnectionItem::calculateConnectionDirectionAlignment(
 	const QPointF delta = destinationPoint - originPoint;
 
 	if (delta.x() > 0.) {
-		if (delta.y() > 0.) return Alignment::AlignBottomRight;
-		else if (delta.y() < 0.) return Alignment::AlignTopRight;
-		else return Alignment::AlignRight;
+		if (delta.y() > 0.) return Alignment::BottomRight;
+		else if (delta.y() < 0.) return Alignment::TopRight;
+		else return Alignment::Right;
 	}
 	else if (delta.x() < 0.) {
-		if (delta.y() > 0.) return Alignment::AlignBottomLeft;
-		else if (delta.y() < 0.) return Alignment::AlignTopLeft;
-		else return Alignment::AlignLeft;
+		if (delta.y() > 0.) return Alignment::BottomLeft;
+		else if (delta.y() < 0.) return Alignment::TopLeft;
+		else return Alignment::Left;
 	}
 	else {
-		if (delta.y() > 0.) return Alignment::AlignBottom;
-		else if (delta.y() < 0.) return Alignment::AlignTop;
-		else return Alignment::AlignCenter;
+		if (delta.y() > 0.) return Alignment::Bottom;
+		else if (delta.y() < 0.) return Alignment::Top;
+		else return Alignment::Center;
 	}
 }

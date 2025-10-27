@@ -31,11 +31,7 @@ void SimplifyRemoveFaces::enterRemoveFacesMode(void)
 
 void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 {
-	ot::LockTypeFlags lockFlags;
-	lockFlags.setFlag(ot::LockModelWrite);
-	lockFlags.setFlag(ot::LockNavigationWrite);
-	lockFlags.setFlag(ot::LockViewWrite);
-	lockFlags.setFlag(ot::LockProperties);
+	ot::LockTypeFlags lockFlags(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::NavigationWrite | ot::LockTypeFlag::ViewWrite | ot::LockTypeFlag::Properties);
 
 	uiComponent->lockUI(lockFlags);
 

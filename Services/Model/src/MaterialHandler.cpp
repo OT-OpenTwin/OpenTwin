@@ -10,13 +10,13 @@
 MaterialHandler::MaterialHandler() {
 	const std::string pageName = Application::getToolBarPageName();
 	m_buttonCreateMaterial = ot::ToolBarButtonCfg(pageName, c_groupMaterial, "Create Material", "Default/AddMaterial");
-	m_buttonCreateMaterial.setButtonLockFlags(ot::LockModelWrite);
+	m_buttonCreateMaterial.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	
 	m_buttonShowByMaterial = ot::ToolBarButtonCfg(pageName, c_groupMaterial, "Show By Material", "Default/ShowByMaterial");
-	m_buttonShowByMaterial.setButtonLockFlags(ot::LockModelRead);
+	m_buttonShowByMaterial.setButtonLockFlags(ot::LockTypeFlag::ModelRead);
 
 	m_buttonMaterialMissing = ot::ToolBarButtonCfg(pageName, c_groupMaterial, "Material Missing", "Default/ShowMaterialMissing");
-	m_buttonMaterialMissing.setButtonLockFlags(ot::LockModelRead);
+	m_buttonMaterialMissing.setButtonLockFlags(ot::LockTypeFlag::ModelRead);
 
 	m_buttonHandler.connectToolBarButton(m_buttonCreateMaterial, this, &MaterialHandler::handleCreateNewMaterial);
 	m_buttonHandler.connectToolBarButton(m_buttonShowByMaterial, this, &MaterialHandler::handleShowByMaterial);

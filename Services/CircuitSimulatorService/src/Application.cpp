@@ -264,7 +264,7 @@ void Application::runNextSolvers() {
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
 	
 
-	this->getUiComponent()->lockUI(ot::LockTypeFlag::LockModelWrite);
+	this->getUiComponent()->lockUI(ot::LockTypeFlag::ModelWrite);
 	m_SimulationRunning = true;
 
 	// Enusre that subprocessHandler is null before starting
@@ -421,7 +421,7 @@ void Application::finishSimulation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	this->getUiComponent()->setProgress(100);
 	this->getUiComponent()->closeProgressInformation();
-	this->getUiComponent()->unlockUI(ot::LockTypeFlag::LockModelWrite);
+	this->getUiComponent()->unlockUI(ot::LockTypeFlag::ModelWrite);
 	m_SimulationRunning = false;
 	SimulationResults::getInstance()->storeLogDataInResultText();
 	SimulationResults::getInstance()->clearUp();
@@ -433,7 +433,7 @@ void Application::finishFailedSimulation() {
 	OT_LOG_E("Simulation Failed! Shutting down!");
 
 	this->getUiComponent()->closeProgressInformation();
-	this->getUiComponent()->unlockUI(ot::LockTypeFlag::LockModelWrite);
+	this->getUiComponent()->unlockUI(ot::LockTypeFlag::ModelWrite);
 	m_SimulationRunning = false;
 	SimulationResults::getInstance()->storeLogDataInResultText();
 	SimulationResults::getInstance()->clearUp();
@@ -472,7 +472,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	_ui->addMenuGroup(page, groupEdit);
 	_ui->addMenuGroup(page, groupSimulate);
 
-	auto flags = ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite;
+	auto flags = ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ViewRead | ot::LockTypeFlag::ViewWrite;
 
 	m_buttonAddSolver = ot::ToolBarButtonCfg(page, groupEdit, "Add Solver", "Default/Add");
 	_ui->addMenuButton(m_buttonAddSolver.setButtonLockFlags(flags));

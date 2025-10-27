@@ -115,7 +115,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitResistor::createBlockCfg() {
 	ellipse1->setName("Left1");
 	ellipse1->setOutline(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
 	ellipse1->setBackgroundPainer(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
-	ellipse1->setAlignment(ot::AlignCenter);
+	ellipse1->setAlignment(ot::Alignment::Center);
 	ellipse1->setMaximumSize(ot::Size2DD(10.0, 10.0));
 	ellipse1->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemIsConnectable);
 
@@ -123,7 +123,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitResistor::createBlockCfg() {
 	ellipse2->setName("Right1");
 	ellipse2->setOutline(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
 	ellipse2->setBackgroundPainer(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
-	ellipse2->setAlignment(ot::AlignCenter);
+	ellipse2->setAlignment(ot::Alignment::Center);
 	ellipse2->setMaximumSize(ot::Size2DD(10.0, 10.0));
 	ellipse2->setPosition(ot::Point2DD(20., 0.0));
 	ellipse2->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemIsConnectable);

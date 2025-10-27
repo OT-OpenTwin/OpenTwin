@@ -114,7 +114,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup(pageName, groupNameImport);
 	_ui->addMenuGroup(pageName, groupNameParameterizedDataCreation);
 
-	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockTypeFlag::ModelWrite);
 
 	m_buttonImportTouchstone = ot::ToolBarButtonCfg(pageName, groupNameImport, "Import Touchstone", "Default/regional-indicator-symbol-letter-s");
 	_ui->addMenuButton(m_buttonImportTouchstone.setButtonLockFlags(modelWrite));
@@ -271,7 +271,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					}
 					else
 					{
-						m_twoPartsAction = new UILockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
+						m_twoPartsAction = new UILockWrapper(Application::instance()->getUiComponent(), ot::LockTypeFlag::ModelWrite);
 					}
 				}
 			}
@@ -282,7 +282,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == m_buttonCreateDataCollection.getFullPath())
 			{
-				UILockWrapper uiLock(Application::instance()->getUiComponent(), ot::LockModelWrite);
+				UILockWrapper uiLock(Application::instance()->getUiComponent(), ot::LockTypeFlag::ModelWrite);
 				this->getUiComponent()->displayMessage("===========================================================================\n");
 				this->getUiComponent()->displayMessage("Start creation of dataset\n");
 				_tabledataToResultdataHandler->createDataCollection(getDataBaseURL(), this->getCollectionName());
@@ -384,7 +384,7 @@ void Application::HandleSelectionChanged()
 
 			std::lock_guard<std::mutex> lock(m_onlyOneActionPerTime);
 			try {
-				UILockWrapper wrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
+				UILockWrapper wrapper(Application::instance()->getUiComponent(), ot::LockTypeFlag::ModelWrite);
 				m_rangleSelectionVisualisationHandler.selectRange(entities);
 			}
 			catch (std::exception& e) {

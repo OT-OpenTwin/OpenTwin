@@ -88,7 +88,7 @@ ToolBar::ToolBar(AppBase * _owner)
 	uiAPI::object::setObjectUniqueName(m_view.gUserInterface_aSettings, "View:UI:Settings");
 	
 	// Create lock flags
-	ot::LockTypeFlags lockFlags(ot::LockAll);
+	ot::LockTypeFlags lockFlags(ot::LockTypeFlag::All);
 	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aImport);
 	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aGroup);
 	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aExportLog);

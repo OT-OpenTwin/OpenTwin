@@ -12,7 +12,7 @@
 
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsBoxLayoutItem> hblayItemRegistrar(ot::GraphicsBoxLayoutItemCfg::className());
 
-ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem() : GraphicsBoxLayoutItem(Qt::Horizontal, new GraphicsBoxLayoutItemCfg(ot::Horizontal), nullptr) {}
+ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem() : GraphicsBoxLayoutItem(Qt::Horizontal, new GraphicsBoxLayoutItemCfg(Orientation::Horizontal), nullptr) {}
 
 ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, GraphicsItemCfg* _configuration, QGraphicsLayoutItem* _parentItem)
 	: QGraphicsLinearLayout(_orientation, _parentItem), GraphicsLayoutItem(_configuration)
@@ -43,7 +43,7 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	this->setContentsMargins(_cfg->getMargins().left(), _cfg->getMargins().top(), _cfg->getMargins().right(), _cfg->getMargins().bottom());
 
 	// Update orientation
-	if (cfg->getOrientation() == ot::Horizontal) {
+	if (cfg->getOrientation() == Orientation::Horizontal) {
 		this->setOrientation(Qt::Horizontal);
 	}
 	else {

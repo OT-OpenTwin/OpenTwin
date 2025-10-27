@@ -25,7 +25,7 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD(
 
 	try
 	{
-		UILockWrapper uiLock(Application::instance()->getUiComponent(), ot::LockModelWrite);
+		UILockWrapper uiLock(Application::instance()->getUiComponent(), ot::LockTypeFlag::ModelWrite);
 
 		int64_t startTime = ot::DateTime::msSinceEpoch();
 

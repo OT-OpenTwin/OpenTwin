@@ -61,23 +61,23 @@ Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
 	m_importProjectButton = ot::ToolBarButtonCfg("Project", "Local Project", "Import", "Default/Import");
-	m_importProjectButton.setButtonLockFlags(ot::LockModelWrite);
+	m_importProjectButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	connectToolBarButton(m_importProjectButton, this, &Application::handleImportProject);
 
 	m_setCSTFileButton = ot::ToolBarButtonCfg("Project", "Local Project", "Set File", "Default/ProjectSaveAs");
-	m_setCSTFileButton.setButtonLockFlags(ot::LockModelWrite);
+	m_setCSTFileButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	connectToolBarButton(m_setCSTFileButton, this, &Application::handleSetCSTFile);
 
 	m_showInformationButton = ot::ToolBarButtonCfg("Project", "Versions", "Information", "Default/Information");
-	m_showInformationButton.setButtonLockFlags(ot::LockModelWrite);
+	m_showInformationButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	connectToolBarButton(m_showInformationButton, this, &Application::handleShowInformation);
 
 	m_commitChangesButton = ot::ToolBarButtonCfg("Project", "Versions", "Commit", "Default/AddSolver");
-	m_commitChangesButton.setButtonLockFlags(ot::LockModelWrite);
+	m_commitChangesButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	connectToolBarButton(m_commitChangesButton, this, &Application::handleCommitChanges);
 
 	m_getChangesButton = ot::ToolBarButtonCfg("Project", "Versions", "Checkout", "Default/ArrowGreenDown");
-	m_getChangesButton.setButtonLockFlags(ot::LockModelWrite);
+	m_getChangesButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	connectToolBarButton(m_getChangesButton, this, &Application::handleGetChanges);
 }
 

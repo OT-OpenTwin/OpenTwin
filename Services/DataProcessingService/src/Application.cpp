@@ -100,7 +100,7 @@ void Application::createSolver()
 
 void Application::runPipeline()
 {
-	UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
+	UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockTypeFlag::ModelWrite);
 	
 	EntitySolverDataProcessing solver;
 	ot::UIDList selectedSolverIDs;
@@ -233,7 +233,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	const std::string pageName = "Data Processing";
 	const std::string groupName = "Pipeline Handling";
-	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
+	ot::LockTypeFlags modelWrite(ot::LockTypeFlag::ModelWrite);
 
 	_ui->addMenuPage(pageName);
 	_ui->addMenuGroup(pageName, groupName);

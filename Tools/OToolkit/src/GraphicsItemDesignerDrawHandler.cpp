@@ -224,7 +224,7 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 
 	if (m_previewItem) {
 		m_previewItem->getGraphicsItem()->setGraphicsItemUid(this->generateUid());
-		m_previewItem->getGraphicsItem()->setConnectionDirection(ot::ConnectionDirection::ConnectOut);
+		m_previewItem->getGraphicsItem()->setConnectionDirection(ot::ConnectionDirection::Out);
 		m_previewItem->setDesignerItemFlag(GraphicsItemDesignerItemBase::DesignerItemFlag::DesignerItemIgnoreEvents, true);
 		m_view->addItem(m_previewItem->getGraphicsItem());
 	}

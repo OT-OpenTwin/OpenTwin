@@ -44,10 +44,10 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 {
 	ot::LockTypeFlags lockFlags;
 
-	lockFlags.setFlag(ot::LockModelWrite);
-	lockFlags.setFlag(ot::LockNavigationWrite);
-	lockFlags.setFlag(ot::LockViewWrite);
-	lockFlags.setFlag(ot::LockProperties);
+	lockFlags.setFlag(ot::LockTypeFlag::ModelWrite);
+	lockFlags.setFlag(ot::LockTypeFlag::NavigationWrite);
+	lockFlags.setFlag(ot::LockTypeFlag::ViewWrite);
+	lockFlags.setFlag(ot::LockTypeFlag::Properties);
 
 	application->getUiComponent()->lockUI(lockFlags);
 	application->getUiComponent()->setProgressInformation("Reading mesh file", true);

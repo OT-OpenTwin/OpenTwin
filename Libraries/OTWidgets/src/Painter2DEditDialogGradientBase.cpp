@@ -28,9 +28,9 @@ ot::Painter2DEditDialogGradientBase::Painter2DEditDialogGradientBase(QVBoxLayout
 	}
 
 	QStringList itms;
-	itms.append(QString::fromStdString(toString(PadSpread)));
-	itms.append(QString::fromStdString(toString(RepeatSpread)));
-	itms.append(QString::fromStdString(toString(ReflectSpread)));
+	itms.append(QString::fromStdString(toString(GradientSpread::Pad)));
+	itms.append(QString::fromStdString(toString(GradientSpread::Repeat)));
+	itms.append(QString::fromStdString(toString(GradientSpread::Reflect)));
 	m_spreadBox = new ComboBox;
 	m_spreadBox->setEditable(false);
 	m_spreadBox->addItems(itms);
@@ -44,7 +44,7 @@ ot::Painter2DEditDialogGradientBase::Painter2DEditDialogGradientBase(QVBoxLayout
 	QLabel* stopsLabel = new QLabel("Stops:");
 
 	if (_painter) m_spreadBox->setCurrentText(QString::fromStdString(toString(_painter->getSpread())));
-	else m_spreadBox->setCurrentText(QString::fromStdString(toString(PadSpread)));
+	else m_spreadBox->setCurrentText(QString::fromStdString(toString(GradientSpread::Pad)));
 	m_stopsBox = new SpinBox;
 	m_stopsBox->setValue(tmp.size());
 	m_stopsBox->setRange(1, 99);
@@ -88,12 +88,12 @@ std::vector<ot::GradientPainterStop2D> ot::Painter2DEditDialogGradientBase::stop
 }
 
 ot::GradientSpread ot::Painter2DEditDialogGradientBase::gradientSpread() {
-	if (m_spreadBox->currentText().toStdString() == ot::toString(PadSpread)) return PadSpread;
-	else if (m_spreadBox->currentText().toStdString() == ot::toString(RepeatSpread)) return RepeatSpread;
-	else if (m_spreadBox->currentText().toStdString() == ot::toString(ReflectSpread)) return ReflectSpread;
+	if (m_spreadBox->currentText().toStdString() == ot::toString(GradientSpread::Pad)) return GradientSpread::Pad;
+	else if (m_spreadBox->currentText().toStdString() == ot::toString(GradientSpread::Repeat)) return GradientSpread::Repeat;
+	else if (m_spreadBox->currentText().toStdString() == ot::toString(GradientSpread::Reflect)) return GradientSpread::Reflect;
 	else {
 		OT_LOG_EA("Unknown pad spread");
-		return PadSpread;
+		return GradientSpread::Pad;
 	}
 }
 

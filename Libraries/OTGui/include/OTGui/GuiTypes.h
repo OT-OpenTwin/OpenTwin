@@ -20,18 +20,17 @@ namespace ot {
 
 	// Alignment
 
-	//! @enum Alignment
 	//! @brief Alignment.
-	enum Alignment {
-		AlignCenter,
-		AlignTop,
-		AlignTopRight,
-		AlignRight,
-		AlignBottomRight,
-		AlignBottom,
-		AlignBottomLeft,
-		AlignLeft,
-		AlignTopLeft
+	enum class Alignment {
+		Center,
+		Top,
+		TopRight,
+		Right,
+		BottomRight,
+		Bottom,
+		BottomLeft,
+		Left,
+		TopLeft
 	};
 
 	OT_GUI_API_EXPORT std::string toString(Alignment _alignment);
@@ -41,9 +40,8 @@ namespace ot {
 
 	// Orientation
 
-	//! @enum Orientation
 	//! @brief Orientation.
-	enum Orientation {
+	enum class Orientation {
 		Horizontal,
 		Vertical
 	};
@@ -55,9 +53,8 @@ namespace ot {
 
 	// Font Family
 	
-	//! @enum FontFamily
 	//! @brief Generally available font families.
-	enum FontFamily {
+	enum class FontFamily {
 		Arial,
 		ComicSansMS,
 		Consolas,
@@ -78,9 +75,8 @@ namespace ot {
 
 	// Size Policy
 
-	//! @enum SizePolicy
 	//! @brief Size policy for UI elements.
-	enum SizePolicy {
+	enum class SizePolicy {
 		Preferred, //! @brief The item size is the ideal size, the item wont shrink but may expand.
 		Dynamic //! @brief The item size will be ignored and the requested size will be used instead (only use for nested items).
 	};
@@ -92,16 +88,15 @@ namespace ot {
 
 	// Connections
 
-	//! @enum ConnectionDirection
 	//! @brief Describes in which direction a connetion from an item is starting.
-	enum ConnectionDirection {
-		ConnectAny, //! @brief Connection may start in any direction.
-		ConnectLeft, //! @brief Connection start towards left.
-		ConnectUp, //! @brief Connection start upwards.
-		ConnectRight, //! @brief Connection start towards right.
-		ConnectDown, //! @brief Connection start downwards.
-		ConnectOut, //! @brief Connection start outwards relative to the item center.
-		ConnectIn //! @brief Connection start inwards relative to the item center.
+	enum class ConnectionDirection {
+		Any,   //! @brief Connection may start in any direction.
+		Left,  //! @brief Connection start towards left.
+		Up,    //! @brief Connection start upwards.
+		Right, //! @brief Connection start towards right.
+		Down,  //! @brief Connection start downwards.
+		Out,   //! @brief Connection start outwards relative to the item center.
+		In     //! @brief Connection start inwards relative to the item center.
 	};
 
 	OT_GUI_API_EXPORT std::string toString(ConnectionDirection _direction);
@@ -110,17 +105,17 @@ namespace ot {
 	//! @brief Returnse the opposite connection of the one provided
 	OT_GUI_API_EXPORT ConnectionDirection inversedConnectionDirection(ConnectionDirection _direction);
 
-	OT_GUI_API_EXPORT std::list<ConnectionDirection> getAllConnectionDirections(void);
+	OT_GUI_API_EXPORT std::list<ConnectionDirection> getAllConnectionDirections();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Gradient
 
 	//! @brief Describes how the painter will behave when painting outsite the gradient area.
-	enum GradientSpread {
-		PadSpread, //! Pad the outside area with the color at the closest stop point.
-		RepeatSpread, //! Repeat the gradient.
-		ReflectSpread //! Reflect the gradient.
+	enum class GradientSpread {
+		Pad,    //! Pad the outside area with the color at the closest stop point.
+		Repeat, //! Repeat the gradient.
+		Reflect //! Reflect the gradient.
 	};
 
 	OT_GUI_API_EXPORT std::string toString(GradientSpread _spread);
@@ -130,34 +125,34 @@ namespace ot {
 
 	// Basic Key
 
-	//! @enum BasicKey
-	enum BasicKey {
-		Key_A,
-		Key_B,
-		Key_C,
-		Key_D,
-		Key_E,
-		Key_F,
-		Key_G,
-		Key_H,
-		Key_I,
-		Key_J,
-		Key_K,
-		Key_L,
-		Key_M,
-		Key_N,
-		Key_O,
-		Key_P,
-		Key_Q,
-		Key_R,
-		Key_S,
-		Key_T,
-		Key_U,
-		Key_V,
-		Key_W,
-		Key_X,
-		Key_Y,
-		Key_Z,
+	//! @brief Basic keys used for shortcuts and key events.
+	enum class BasicKey {
+		A,
+		B,
+		C,
+		D,
+		E,
+		F,
+		G,
+		H,
+		I,
+		J,
+		K,
+		L,
+		M,
+		N,
+		O,
+		P,
+		Q,
+		R,
+		S,
+		T,
+		U,
+		V,
+		W,
+		X,
+		Y,
+		Z,
 		Key_1,
 		Key_2,
 		Key_3,
@@ -168,31 +163,31 @@ namespace ot {
 		Key_8,
 		Key_9,
 		Key_0,
-		Key_Alt,
-		Key_Shift,
-		Key_Control,
-		Key_CapsLock,
-		Key_Tab,
-		Key_Return,
-		Key_Space,
-		Key_Backspace,
-		Key_Delete,
-		Key_Up,
-		Key_Down,
-		Key_Left,
-		Key_Right,
-		Key_F1,
-		Key_F2,
-		Key_F3,
-		Key_F4,
-		Key_F5,
-		Key_F6,
-		Key_F7,
-		Key_F8,
-		Key_F9,
-		Key_F10,
-		Key_F11,
-		Key_F12
+		Alt,
+		Shift,
+		Control,
+		CapsLock,
+		Tab,
+		Return,
+		Space,
+		Backspace,
+		Delete,
+		Up,
+		Down,
+		Left,
+		Right,
+		F1,
+		F2,
+		F3,
+		F4,
+		F5,
+		F6,
+		F7,
+		F8,
+		F9,
+		F10,
+		F11,
+		F12
 	};
 
 	OT_GUI_API_EXPORT std::string toString(BasicKey _key);
@@ -214,7 +209,7 @@ namespace ot {
 
 	OT_GUI_API_EXPORT DocumentSyntax stringToDocumentSyntax(const std::string& _syntax);
 
-	OT_GUI_API_EXPORT std::list<std::string> getSupportedDocumentSyntaxStringList(void);
+	OT_GUI_API_EXPORT std::list<std::string> getSupportedDocumentSyntaxStringList();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -235,20 +230,22 @@ namespace ot {
 
 	//! @brief Describes the object type to lock in the UI.
 	//! @warning When adding new flags, add the corresponding flag to ot::getAllLockTypeFlags().
-	enum LockTypeFlag {
-		NoLockFlags = 0x0000, //! @brief No lock flags are set.
-		LockViewWrite = 0x0001, //! @brief Lock view write operations.
-		LockViewRead = 0x0002, //! @brief Lock view read operations.
+	enum class LockTypeFlag {
+		None            = 0 << 0, //! @brief No lock flags are set.
+		ViewWrite       = 1 << 0, //! @brief Lock view write operations.
+		ViewRead        = 1 << 1, //! @brief Lock view read operations.
+		
 		//! @brief Lock model write operations.
 		//! Any control should be disabled and any event supressed which would lead to modifying the model.
-		LockModelWrite = 0x0004,
+		ModelWrite      = 1 << 2,
+
 		//! @brief Lock model write operations.
 		//! Any control should be disabled and any event supressed which would lead to any model reading access.
-		LockModelRead = 0x0008,
-		LockProperties = 0x0010, //! @brief Lock properties.
-		LockNavigationWrite = 0x0020, //! @brief Lock navigation write.
-		LockNavigationAll = 0x0040, //! @brief Lock navigation.
-		LockAll = 0x1000 //! @brief Lock all.
+		ModelRead       = 1 << 3,
+		Properties      = 1 << 4, //! @brief Lock properties.
+		NavigationWrite = 1 << 5, //! @brief Lock navigation write.
+		NavigationAll   = 1 << 6, //! @brief Lock navigation.
+		All             = 1 << 7  //! @brief Lock all.
 	};
 
 	typedef ot::Flags<LockTypeFlag> LockTypeFlags;
@@ -265,7 +262,7 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllSetFlags(const LockTypeFlags& _lockFlags);
 
-	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllLockTypeFlags(void);
+	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllLockTypeFlags();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

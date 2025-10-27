@@ -25,9 +25,9 @@ FileHandler::FileHandler() {
 	const std::string pageName = Application::getToolBarPageName();
 
 	m_buttonPythonImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import Python Script", "Default/python");
-	m_buttonPythonImport.setButtonLockFlags(ot::LockModelWrite);
+	m_buttonPythonImport.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	m_buttonFileImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import Text File", "Default/TextVisible");
-	m_buttonFileImport.setButtonLockFlags(ot::LockModelWrite);
+	m_buttonFileImport.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 
 	m_buttonHandler.connectToolBarButton(m_buttonFileImport, this, &FileHandler::handleImportTextFileButton);
 	m_buttonHandler.connectToolBarButton(m_buttonPythonImport, this, &FileHandler::handleImportPythonScriptButton);
@@ -89,7 +89,7 @@ void FileHandler::importFile(const std::string& _fileMask, const std::string& _d
 void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string& _folderName)
 {
 	auto uiComponent =	Application::instance()->getUiComponent();
-	UILockWrapper uiLock(uiComponent, ot::LockModelWrite);
+	UILockWrapper uiLock(uiComponent, ot::LockTypeFlag::ModelWrite);
 	std::list<std::string> contents = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_Content);
 	std::list<int64_t> 	uncompressedDataLengths = ot::json::getInt64List(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 	std::list<std::string> fileNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_OriginalName);

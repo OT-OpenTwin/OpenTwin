@@ -18,7 +18,7 @@
 #include <QtWidgets/qscrollbar.h>
 
 ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
-	: OverlayWidgetBase(_editor, AlignTopRight, QMargins(5, 2, 25, 2)), m_editor(_editor), m_search(nullptr), m_ix(0)
+	: OverlayWidgetBase(_editor, Alignment::TopRight, QMargins(5, 2, 25, 2)), m_editor(_editor), m_search(nullptr), m_ix(0)
 {
 	OTAssertNullptr(m_editor);
 	 

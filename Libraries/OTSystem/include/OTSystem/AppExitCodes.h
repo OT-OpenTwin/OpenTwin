@@ -111,21 +111,21 @@ namespace ot {
 		//! @brief General exit codes (7700+).
 		//! Contains all general and uncategorized exit codes.
 		enum GeneralExitCode : int {
-			Success                    = 0,    //! @brief General success exit code.
+			Success                    = 0,    //! @brief Success exit code (exit 0).
 
-			GeneralError               = 7700, //! @brief General error exit code.
-			UnknownError               = 7701, //! @brief Unknown error exit code.
-			EmergencyShutdown          = 7702, //! @brief Emergency shutdown exit code.
-			EnvironmentError           = 7703, //! @brief Environment error exit code.
-			ConfigurationBroken        = 7704, //! @brief Configuration broken exit code.
-			OpenGLError                = 7705, //! @brief OpenGL error exit code.
-			AssetError                 = 7706, //! @brief Asset error exit code.
-			ComponentError             = 7707, //! @brief Component error exit code.
-			GeneralTimeout		       = 7708, //! @brief General timeout exit code.
-			LogInError                 = 7800, //! @brief Log in error exit code.
-			FailedToConvertPort        = 7801, //! @brief Failed to convert port exit code.
-			KeepAliveFailed            = 7802, //! @brief Keep alive failed exit code.
-			InitializationTimeout      = 7803  //! @brief Initialization timeout exit code.
+			GeneralError               = 7700, //! @brief General error.
+			UnknownError               = 7701, //! @brief Unknown error.
+			EmergencyShutdown          = 7702, //! @brief Emergency shutdown.
+			EnvironmentError           = 7703, //! @brief Environment error.
+			ConfigurationBroken        = 7704, //! @brief Configuration broken.
+			OpenGLError                = 7705, //! @brief OpenGL error.
+			AssetError                 = 7706, //! @brief Asset error.
+			ComponentError             = 7707, //! @brief Component error.
+			GeneralTimeout		       = 7708, //! @brief General timeout.
+			LogInError                 = 7800, //! @brief Log in error.
+			FailedToConvertPort        = 7801, //! @brief Failed to convert port.
+			KeepAliveFailed            = 7802, //! @brief Keep alive failed.
+			InitializationTimeout      = 7803  //! @brief Initialization timeout.
 		};
 
 		//! @brief Returns a humanly readable string representation of the given exit code.

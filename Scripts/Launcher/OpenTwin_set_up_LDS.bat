@@ -36,8 +36,11 @@ REM Tidy string
 set OT_BATCH_TMP=%OT_BATCH_TMP:\=\\%
 
 REM Set config
-set OT_LOCALDIRECTORYSERVICE_CONFIGURATION={"DefaultMaxCrashRestarts": 8,^
+set OT_LOCALDIRECTORYSERVICE_CONFIGURATION={^
+	"DefaultMaxCrashRestarts": 8,^
     "DefaultMaxStartupRestarts": 64,^
+    "ServiceStartWorkerCount": 4,^
+    "InitializeWorkerCount": 12,^
     "ServicesLibraryPath": "%OT_BATCH_TMP%",^
     "LauncherPath": "%OT_BATCH_TMP%\\open_twin.exe",^
 	"SupportedServices": [^

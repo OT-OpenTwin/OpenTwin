@@ -66,11 +66,7 @@ void STEPReader::importSTEPFileWorker(const std::string &fileName, bool removeFi
 	entityList.clear();
 
 	// Read the STEP file
-	ot::LockTypeFlags lockFlags;
-	lockFlags.setFlag(ot::LockModelWrite);
-	lockFlags.setFlag(ot::LockNavigationWrite);
-	lockFlags.setFlag(ot::LockViewWrite);
-	lockFlags.setFlag(ot::LockProperties);
+	ot::LockTypeFlags lockFlags(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::NavigationWrite | ot::LockTypeFlag::ViewWrite | ot::LockTypeFlag::Properties);
 
 	application->getUiComponent()->lockUI(lockFlags);
 	application->getUiComponent()->setProgressInformation("Read STEP file", false);

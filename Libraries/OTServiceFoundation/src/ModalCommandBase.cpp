@@ -39,10 +39,10 @@ void ot::ModalCommandBase::setupUI(void)
 	application->enableMessageQueuing(application->getUiComponent()->getServiceName(), true);
 
 	LockTypeFlags modelRead;
-	modelRead.setFlag(LockModelRead);
+	modelRead.setFlag(LockTypeFlag::ModelRead);
 
 	LockTypeFlags modelWrite;
-	modelWrite.setFlag(LockModelWrite);
+	modelWrite.setFlag(LockTypeFlag::ModelWrite);
 
 	std::string mainTab = initializeAndCreateUI(modelRead, modelWrite);
 
@@ -50,7 +50,7 @@ void ot::ModalCommandBase::setupUI(void)
 	application->getUiComponent()->activateMenuPage(mainTab);
 
 	application->modelSelectionChanged();
-
+	
 	application->enableMessageQueuing(application->getUiComponent()->getServiceName(), false);
 }
 

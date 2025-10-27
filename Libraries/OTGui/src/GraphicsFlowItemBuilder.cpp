@@ -86,18 +86,18 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 
 	// Place into layout
 	if (_isLeft) {
-		itm->setAlignment(ot::AlignLeft);
-		itm->setConnectionDirection(ot::ConnectLeft);
-		itmTxt->setAlignment(ot::AlignLeft);
+		itm->setAlignment(Alignment::Left);
+		itm->setConnectionDirection(ConnectionDirection::Left);
+		itmTxt->setAlignment(Alignment::Left);
 
 		_gridLayout->addChildItem(_row, 0, itm);
 		_gridLayout->addChildItem(_row, 1, itmTxt);
 		
 	}
 	else {
-		itm->setAlignment(ot::AlignRight);
-		itm->setConnectionDirection(ot::ConnectRight);
-		itmTxt->setAlignment(ot::AlignRight);
+		itm->setAlignment(Alignment::Right);
+		itm->setConnectionDirection(ConnectionDirection::Right);
+		itmTxt->setAlignment(Alignment::Right);
 
 		_gridLayout->addChildItem(_row, 1, itm);
 		_gridLayout->addChildItem(_row, 0, itmTxt);
@@ -202,7 +202,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	bor->setOutline(ot::PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 	bor->setCornerRadius(5);
 	bor->setName(m_name + "_bor");
-	bor->setSizePolicy(ot::Dynamic);
+	bor->setSizePolicy(SizePolicy::Dynamic);
 	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 	root->addItemTop(bor, false, true);
 
@@ -225,7 +225,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	tBor->setName(m_name + "_tBor");
 	tBor->setCornerRadius(5);
 	//tBor->setSize(ot::Size2DD(200., 30.));
-	tBor->setSizePolicy(ot::Dynamic);
+	tBor->setSizePolicy(SizePolicy::Dynamic);
 	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 	tStack->addItemTop(tBor, false, true);
 
@@ -252,7 +252,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		titLImg->setName(m_name + "_titLImg");
 		titLImg->setImagePath(m_leftTitleImagePath);
 		titLImg->setFixedSize(16., 16.);
-		titLImg->setAlignment(ot::AlignCenter);
+		titLImg->setAlignment(Alignment::Center);
 		titLImg->setMargins(ot::MarginsD(5., 0., 0., 0.));
 		titLImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titLImg);
@@ -273,7 +273,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		titRImg->setName(m_name + "_titRImg");
 		titRImg->setImagePath(m_rightTitleImagePath);
 		titRImg->setMaximumSize(ot::Size2DD(22., 22.));
-		titRImg->setAlignment(ot::AlignCenter);
+		titRImg->setAlignment(Alignment::Center);
 		titRImg->setMargins(ot::MarginsD(0., 0., 5., 0.));
 		titRImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titRImg);
@@ -321,7 +321,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(m_name + "_cImg");
 		cImg->setMargins(m_backgroundImageMargins);
-		cImg->setSizePolicy(ot::Dynamic);
+		cImg->setSizePolicy(SizePolicy::Dynamic);
 		cImg->setAlignment(m_backgroundImageAlignment);
 		cImg->setMaintainAspectRatio(m_backgroundImageMaintainAspectRatio);
 		cImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
@@ -366,7 +366,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 
 ot::GraphicsFlowItemBuilder::GraphicsFlowItemBuilder()
 	: m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr),
-	m_backgroundImageAlignment(ot::AlignCenter), m_backgroundImageMargins(5., 2., 2., 2.), m_backgroundImageInsertMode(OnLayout),
+	m_backgroundImageAlignment(Alignment::Center), m_backgroundImageMargins(5., 2., 2., 2.), m_backgroundImageInsertMode(OnLayout),
 	m_backgroundImageMaintainAspectRatio(true)
 {
 	this->setTitleBackgroundColor(ot::Color(70, 70, 70));
@@ -453,7 +453,7 @@ void ot::GraphicsFlowItemBuilder::setTitleBackgroundGradientColor(const ot::Colo
 	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
 	painter->setCenterPoint(ot::Point2DD(0., 2.));
 	painter->setCenterRadius(2.5);
-	painter->setSpread(ot::ReflectSpread);
+	painter->setSpread(GradientSpread::Reflect);
 
 	painter->addStop(0.00, _color);
 	painter->addStop(0.75, ot::Color(50, 50, 50));
@@ -482,7 +482,7 @@ void ot::GraphicsFlowItemBuilder::setDefaultTitleForegroundGradient() {
 	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
 	painter->setCenterPoint(ot::Point2DD(0., 2.));
 	painter->setCenterRadius(2.5);
-	painter->setSpread(ot::ReflectSpread);
+	painter->setSpread(GradientSpread::Reflect);
 
 	painter->addStop(0.00, ot::Color(255, 255, 255));
 	painter->addStop(0.75, ot::Color(255, 255, 255));

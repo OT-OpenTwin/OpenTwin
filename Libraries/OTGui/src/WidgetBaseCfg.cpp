@@ -6,10 +6,10 @@
 // OpenTwin header
 #include "OTGui/WidgetBaseCfg.h"
 
-ot::WidgetBaseCfg::WidgetBaseCfg() : m_lockFlags(ot::LockAll) {}
+ot::WidgetBaseCfg::WidgetBaseCfg() : m_lockFlags(LockTypeFlag::All) {}
 
 ot::WidgetBaseCfg::WidgetBaseCfg(const std::string& _name)
-	: m_lockFlags(ot::LockAll), m_name(_name) {}
+	: m_lockFlags(LockTypeFlag::All), m_name(_name) {}
 
 ot::WidgetBaseCfg::~WidgetBaseCfg() {}
 

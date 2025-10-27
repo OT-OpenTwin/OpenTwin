@@ -114,33 +114,33 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 {
 	//NOTE, debug only
 	std::cout << "Created model for project \"" << _projectName << "\"" << std::endl;
-
+	
 	m_infoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Geometry", "Info", "Default/Information");
-	m_infoButton.setButtonKeySequence(ot::KeySequence(ot::Key_Control, ot::Key_I));
-	m_infoButton.setButtonLockFlags(ot::LockModelRead);
+	m_infoButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Control, ot::BasicKey::I));
+	m_infoButton.setButtonLockFlags(ot::LockTypeFlag::ModelRead);
 	m_buttonHandler.connectToolBarButton(m_infoButton, this, &Model::handleShowSelectedShapeInformation);
 
 	m_createParameterButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Parameters", "Create Parameter", "Default/CreateParameter");
-	m_createParameterButton.setButtonLockFlags(ot::LockModelRead);
+	m_createParameterButton.setButtonLockFlags(ot::LockTypeFlag::ModelRead);
 	m_buttonHandler.connectToolBarButton(m_createParameterButton, this, &Model::handleCreateNewParameter);
 
 	m_undoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Edit", "Undo", "Default/Undo");
-	m_undoButton.setButtonKeySequence(ot::KeySequence(ot::Key_Control, ot::Key_Z));
-	m_undoButton.setButtonLockFlags(ot::LockModelWrite);
+	m_undoButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Control, ot::BasicKey::Z));
+	m_undoButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	m_buttonHandler.connectToolBarButton(m_undoButton, this, &Model::handleUndoLastOperation);
 
 	m_redoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Edit", "Redo", "Default/Redo");
-	m_redoButton.setButtonKeySequence(ot::KeySequence(ot::Key_Control, ot::Key_Y));
-	m_redoButton.setButtonLockFlags(ot::LockModelWrite);
+	m_redoButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Control, ot::BasicKey::Y));
+	m_redoButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	m_buttonHandler.connectToolBarButton(m_redoButton, this, &Model::handleRedoNextOperation);
 
 	m_deleteButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Edit", "Delete", "Default/Delete");
-	m_deleteButton.setButtonKeySequence(ot::KeySequence(ot::Key_Delete));
-	m_deleteButton.setButtonLockFlags(ot::LockModelWrite);
+	m_deleteButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Delete));
+	m_deleteButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
 	m_buttonHandler.connectToolBarButton(m_deleteButton, this, &Model::handleDeleteSelectedShapes);
 	
 	m_uploadProjectPreviewImage = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Edit", "Upload Preview Image", "ToolBar/AddImage");
-	m_uploadProjectPreviewImage.setButtonLockFlags(ot::LockModelRead | ot::LockModelWrite);
+	m_uploadProjectPreviewImage.setButtonLockFlags(ot::LockTypeFlag::ModelRead | ot::LockTypeFlag::ModelWrite);
 	m_buttonHandler.connectToolBarButton(m_uploadProjectPreviewImage, this, &Model::handleRequestUploadProjectPreviewImage);
 
 	// Connect action handlers
@@ -358,11 +358,8 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 {	
 	assert(!uiCreated);
 
-	ot::LockTypeFlags modelRead;
-	modelRead.setFlag(ot::LockModelRead);
-
-	ot::LockTypeFlags modelWrite;
-	modelWrite.setFlag(ot::LockModelWrite);
+	ot::LockTypeFlags modelRead(ot::LockTypeFlag::ModelRead);
+	ot::LockTypeFlags modelWrite(ot::LockTypeFlag::ModelWrite);
 
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults("UI Configuration");
@@ -2206,11 +2203,7 @@ void Model::updateEntities(bool itemsVisible)
 
 void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> otherServicesUpdate, bool itemsVisible)
 {
-	ot::LockTypeFlags lockFlag;
-	lockFlag.setFlag(ot::LockModelWrite);
-	lockFlag.setFlag(ot::LockNavigationWrite);
-	lockFlag.setFlag(ot::LockViewWrite);
-	lockFlag.setFlag(ot::LockProperties);
+	ot::LockTypeFlags lockFlag(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::NavigationWrite | ot::LockTypeFlag::ViewWrite | ot::LockTypeFlag::Properties);
 	UILockWrapper uiLock(Application::instance()->getUiComponent(), lockFlag);
 
 	for (auto serviceUpdate : otherServicesUpdate)
@@ -4470,11 +4463,7 @@ void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
 
 void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::string owningService)
 {
-	ot::LockTypeFlags lockFlag;
-	lockFlag.setFlag(ot::LockModelWrite);
-	lockFlag.setFlag(ot::LockNavigationWrite);
-	lockFlag.setFlag(ot::LockViewWrite);
-	lockFlag.setFlag(ot::LockProperties);
+	ot::LockTypeFlags lockFlag(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::NavigationWrite | ot::LockTypeFlag::ViewWrite | ot::LockTypeFlag::Properties);
 	UILockWrapper uiLock(Application::instance()->getUiComponent(), lockFlag);
 
 	ot::JsonDocument notify;

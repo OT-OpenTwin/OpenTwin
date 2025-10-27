@@ -7,5 +7,5 @@
 #include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTGui/GraphicsHBoxLayoutItemCfg.h"
 
-ot::GraphicsHBoxLayoutItemCfg::GraphicsHBoxLayoutItemCfg() : GraphicsBoxLayoutItemCfg(ot::Horizontal) {};
+ot::GraphicsHBoxLayoutItemCfg::GraphicsHBoxLayoutItemCfg() : GraphicsBoxLayoutItemCfg(Orientation::Horizontal) {};
 

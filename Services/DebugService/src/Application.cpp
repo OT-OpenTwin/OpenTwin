@@ -721,7 +721,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 			addedGroups.push_back(it.cfg.getGroup());
 		}
 		ot::ToolBarButtonCfg cfg = it.cfg;
-		cfg.setButtonLockFlags(ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite);
+		cfg.setButtonLockFlags(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ViewRead | ot::LockTypeFlag::ViewWrite);
 		_ui->addMenuButton(cfg);
 		this->connectToolBarButton(cfg, it.callback);
 	}

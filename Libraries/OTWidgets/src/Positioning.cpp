@@ -19,35 +19,35 @@ QRect ot::Positioning::calculateChildRect(const QRect& _parentRect, const QSize&
 	// Align inner rectangle
 	switch (_childAlignment)
 	{
-	case ot::AlignCenter:
+	case Alignment::Center:
 		pt.setX(pt.x() + ((_parentRect.width() - _childSize.width()) / 2));
 		pt.setY(pt.y() + ((_parentRect.height() - _childSize.height()) / 2));
 		break;
-	case ot::AlignTop:
+	case Alignment::Top:
 		pt.setX(pt.x() + ((_parentRect.width() - _childSize.width()) / 2));
 		break;
-	case ot::AlignTopRight:
+	case Alignment::TopRight:
 		pt.setX(pt.x() + (_parentRect.width() - _childSize.width()));
 		break;
-	case ot::AlignRight:
+	case Alignment::Right:
 		pt.setX(pt.x() + (_parentRect.width() - _childSize.width()));
 		pt.setY(pt.y() + ((_parentRect.height() - _childSize.height()) / 2));
 		break;
-	case ot::AlignBottomRight:
+	case Alignment::BottomRight:
 		pt.setX(pt.x() + (_parentRect.width() - _childSize.width()));
 		pt.setY(pt.y() + (_parentRect.height() - _childSize.height()));
 		break;
-	case ot::AlignBottom:
+	case Alignment::Bottom:
 		pt.setX(pt.x() + ((_parentRect.width() - _childSize.width()) / 2));
 		pt.setY(pt.y() + (_parentRect.height() - _childSize.height()));
 		break;
-	case ot::AlignBottomLeft:
+	case Alignment::BottomLeft:
 		pt.setY(pt.y() + (_parentRect.height() - _childSize.height()));
 		break;
-	case ot::AlignLeft:
+	case Alignment::Left:
 		pt.setY(pt.y() + ((_parentRect.height() - _childSize.height()) / 2));
 		break;
-	case ot::AlignTopLeft:
+	case Alignment::TopLeft:
 		break;
 	default:
 		OT_LOG_EA("Unknown Alignment");
@@ -64,35 +64,35 @@ QRectF ot::Positioning::calculateChildRect(const QRectF& _parentRect, const QSiz
 	// Align inner rectangle
 	switch (_childAlignment)
 	{
-	case ot::AlignCenter:
+	case Alignment::Center:
 		pt.setX(pt.x() + ((_parentRect.width() - _childSize.width()) / 2.));
 		pt.setY(pt.y() + ((_parentRect.height() - _childSize.height()) / 2.));
 		break;
-	case ot::AlignTop:
+	case Alignment::Top:
 		pt.setX(pt.x() + ((_parentRect.width() - _childSize.width()) / 2.));
 		break;
-	case ot::AlignTopRight:
+	case Alignment::TopRight:
 		pt.setX(pt.x() + (_parentRect.width() - _childSize.width()));
 		break;
-	case ot::AlignRight:
+	case Alignment::Right:
 		pt.setX(pt.x() + (_parentRect.width() - _childSize.width()));
 		pt.setY(pt.y() + ((_parentRect.height() - _childSize.height()) / 2.));
 		break;
-	case ot::AlignBottomRight:
+	case Alignment::BottomRight:
 		pt.setX(pt.x() + (_parentRect.width() - _childSize.width()));
 		pt.setY(pt.y() + (_parentRect.height() - _childSize.height()));
 		break;
-	case ot::AlignBottom:
+	case Alignment::Bottom:
 		pt.setX(pt.x() + ((_parentRect.width() - _childSize.width()) / 2.));
 		pt.setY(pt.y() + (_parentRect.height() - _childSize.height()));
 		break;
-	case ot::AlignBottomLeft:
+	case Alignment::BottomLeft:
 		pt.setY(pt.y() + (_parentRect.height() - _childSize.height()));
 		break;
-	case ot::AlignLeft:
+	case Alignment::Left:
 		pt.setY(pt.y() + ((_parentRect.height() - _childSize.height()) / 2.));
 		break;
-	case ot::AlignTopLeft:
+	case Alignment::TopLeft:
 		break;
 	default:
 		OT_LOG_EA("Unknown Alignment");
@@ -220,16 +220,16 @@ QRect ot::Positioning::getCenterWidgetOnParentRect(const QWidget* _parentWidget,
 		return QRect();
 	}
 	if (_parentWidget) {
-		return Positioning::calculateChildRect(_parentWidget->rect(), _childWidget->size(), ot::AlignCenter);
+		return Positioning::calculateChildRect(_parentWidget->rect(), _childWidget->size(), Alignment::Center);
 	}
 	else {
 		QScreen* screen = QApplication::primaryScreen();
 		if (screen) {
-			return Positioning::calculateChildRect(screen->geometry(), _childWidget->size(), ot::AlignCenter);
+			return Positioning::calculateChildRect(screen->geometry(), _childWidget->size(), Alignment::Center);
 		}
 		else {
 			OT_LOG_EA("Primary screen not found");
 			return QRect();
-		}		
+		}
 	}
 }
