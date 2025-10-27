@@ -155,6 +155,8 @@ void ot::LDSDebugInfo::addConfigToJson(const ConfigInfo& _config, ot::JsonObject
 	_jsonObject.AddMember("ConfigImported", _config.configImported, _allocator);
 	_jsonObject.AddMember("LauncherPath", JsonString(_config.launcherPath, _allocator), _allocator);
 	_jsonObject.AddMember("ServicesLibraryPath", JsonString(_config.servicesLibraryPath, _allocator), _allocator);
+	_jsonObject.AddMember("ServiceStartWorkerCount", _config.serviceStartWorkerCount, _allocator);
+	_jsonObject.AddMember("InitializeWorkerCount", _config.iniWorkerCount, _allocator);
 	_jsonObject.AddMember("DefaultMaxCrashRestarts", _config.defaultMaxCrashRestarts, _allocator);
 	_jsonObject.AddMember("DefaultMaxStartupRestarts", _config.defaultMaxStartupRestarts, _allocator);
 
@@ -175,6 +177,8 @@ ot::LDSDebugInfo::ConfigInfo ot::LDSDebugInfo::setConfigFromJson(const ot::Const
 	info.configImported = json::getBool(_jsonObject, "ConfigImported");
 	info.launcherPath = json::getString(_jsonObject, "LauncherPath");
 	info.servicesLibraryPath = json::getString(_jsonObject, "ServicesLibraryPath");
+	info.iniWorkerCount = json::getUInt(_jsonObject, "InitializeWorkerCount");
+	info.serviceStartWorkerCount = json::getUInt(_jsonObject, "ServiceStartWorkerCount");
 	info.defaultMaxCrashRestarts = json::getUInt(_jsonObject, "DefaultMaxCrashRestarts");
 	info.defaultMaxStartupRestarts = json::getUInt(_jsonObject, "DefaultMaxStartupRestarts");
 

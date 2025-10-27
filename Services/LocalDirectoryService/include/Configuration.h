@@ -54,6 +54,11 @@ public:
 
 	// Setter/Getter
 
+	//! @brief Checks if the configuration is valid.
+	//! Will log errors/warnings if the configuration is not valid.
+	//! @return true if the configuration is valid, false otherwise.
+	bool ensureValid() const;
+
 	void setSupportedServices(const std::list<SupportedService>& _services) { m_supportedServices = _services; };
 	const std::list<SupportedService>& getSupportedServices() const { return m_supportedServices; };
 
@@ -69,6 +74,12 @@ public:
 	void setDefaultMaxStartupRestarts(unsigned int _restarts) { m_defaultMaxStartupRestarts = _restarts; };
 	unsigned int getDefaultMaxStartupRestarts() const { return m_defaultMaxStartupRestarts; };
 
+	void setServiceStartWorkerCount(unsigned int _count) { m_serviceStartWorkerCount = _count; };
+	unsigned int getServiceStartWorkerCount() const { return m_serviceStartWorkerCount; };
+
+	void setIniWorkerCount(unsigned int _count) { m_iniWorkerCount = _count; };
+	unsigned int getIniWorkerCount() const { return m_iniWorkerCount; };
+
 private:
 	bool m_configurationImported;
 	std::list<SupportedService> m_supportedServices; //! @brief Name Type pairs of supported services
@@ -76,6 +87,8 @@ private:
 	std::string m_servicesLibraryPath;
 	unsigned int m_defaultMaxCrashRestarts;
 	unsigned int m_defaultMaxStartupRestarts;
+	unsigned int m_serviceStartWorkerCount;
+	unsigned int m_iniWorkerCount;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -153,8 +153,8 @@ private:
 	
 	std::atomic_bool                                     m_workerRunning;
 
-	std::thread *                                        m_threadServiceStarter;
-	std::thread *                                        m_threadServiceInitializer;
+	std::list<std::thread*>                              m_threadsServiceStarter;
+	std::list<std::thread*>                              m_threadsServiceInitializer;
 	std::thread *                                        m_threadHealthCheck;
 	std::thread *                                        m_threadServiceStopper;
 	std::thread *                                        m_threadHealthCheckFail;

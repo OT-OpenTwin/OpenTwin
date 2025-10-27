@@ -647,6 +647,10 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 	configInfoLayout->addWidget(lineEdit(_info.getConfig().launcherPath), r++, 1);
 	configInfoLayout->addWidget(new ot::Label("Services Path:"), r, 0);
 	configInfoLayout->addWidget(lineEdit(_info.getConfig().servicesLibraryPath), r++, 1);
+	configInfoLayout->addWidget(new ot::Label("Start Workers:"), r, 0);
+	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().serviceStartWorkerCount)), r++, 1);
+	configInfoLayout->addWidget(new ot::Label("Initialize Workers:"), r, 0);
+	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().iniWorkerCount)), r++, 1);
 	configInfoLayout->addWidget(new ot::Label("Default Startup Restarts:"), r, 0);
 	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().defaultMaxStartupRestarts)), r++, 1);
 	configInfoLayout->addWidget(new ot::Label("Default Crash Restarts:"), r, 0);

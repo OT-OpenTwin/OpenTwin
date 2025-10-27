@@ -33,6 +33,8 @@ namespace ot {
 			std::string servicesLibraryPath;
 			unsigned int defaultMaxCrashRestarts = 0;
 			unsigned int defaultMaxStartupRestarts = 0;
+			unsigned int serviceStartWorkerCount = 0;
+			unsigned int iniWorkerCount = 0;
 			std::list<SupportedServiceInfo> supportedServices;
 		};
 

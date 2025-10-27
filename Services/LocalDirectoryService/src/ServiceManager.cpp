@@ -20,7 +20,7 @@
 #include <chrono>
 
 ServiceManager::ServiceManager()
-	: m_workerRunning(false), m_threadServiceStarter(nullptr), m_threadServiceInitializer(nullptr), m_threadHealthCheck(nullptr),
+	: m_workerRunning(false), m_threadHealthCheck(nullptr),
 	m_threadServiceStopper(nullptr), m_threadHealthCheckFail(nullptr), m_serviceCheckAliveFrequency(1)
 {
 	
@@ -414,16 +414,18 @@ void ServiceManager::runThreads() {
 		return;
 	}
 
-	OTAssert(m_threadServiceStarter == nullptr, "Service starter thread is already running");
-	OTAssert(m_threadServiceInitializer == nullptr, "Service initializer thread is already running");
 	OTAssert(m_threadHealthCheck == nullptr, "Service health check thread is already running");
 	OTAssert(m_threadServiceStopper == nullptr, "Service stopper thread is already running");
 	OTAssert(m_threadHealthCheckFail == nullptr, "Service health check fail thread is already running");
 
 	m_workerRunning = true;
 
-	m_threadServiceStarter = new std::thread(&ServiceManager::workerServiceStarter, this);
-	m_threadServiceInitializer = new std::thread(&ServiceManager::workerServiceInitializer, this);
+	for (unsigned int i = 0; i < Configuration::instance().getServiceStartWorkerCount(); i++) {
+		m_threadsServiceStarter.push_back(new std::thread(&ServiceManager::workerServiceStarter, this));
+	}
+	for (unsigned int i = 0; i < Configuration::instance().getIniWorkerCount(); i++) {
+		m_threadsServiceInitializer.push_back(new std::thread(&ServiceManager::workerServiceInitializer, this));
+	}
 	m_threadHealthCheck = new std::thread(&ServiceManager::workerHealthCheck, this);
 	m_threadServiceStopper = new std::thread(&ServiceManager::workerServiceStopper, this);
 	m_threadHealthCheckFail = new std::thread(&ServiceManager::workerHealthCheckFail, this);
@@ -434,8 +436,6 @@ void ServiceManager::stopThreads() {
 		return;
 	}
 
-	OTAssertNullptr(m_threadServiceStarter);
-	OTAssertNullptr(m_threadServiceInitializer);
 	OTAssertNullptr(m_threadHealthCheck);
 	OTAssertNullptr(m_threadServiceStopper);
 	OTAssertNullptr(m_threadHealthCheckFail);
@@ -443,17 +443,21 @@ void ServiceManager::stopThreads() {
 	// Stop threads
 	m_workerRunning = false;
 
-	if (m_threadServiceStarter->joinable()) {
-		m_threadServiceStarter->join();
+	for (std::thread* t : m_threadsServiceStarter) {
+		if (t->joinable()) {
+			t->join();
+		}
+		delete t;
 	}
-	delete m_threadServiceStarter;
-	m_threadServiceStarter = nullptr;
+	m_threadsServiceStarter.clear();
 
-	if (m_threadServiceInitializer->joinable()) {
-		m_threadServiceInitializer->join();
+	for (std::thread* t : m_threadsServiceInitializer) {
+		if (t->joinable()) {
+			t->join();
+		}
+		delete t;
 	}
-	delete m_threadServiceInitializer;
-	m_threadServiceInitializer = nullptr;
+	m_threadsServiceInitializer.clear();
 
 	if (m_threadHealthCheck->joinable()) {
 		m_threadHealthCheck->join();

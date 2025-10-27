@@ -36,6 +36,10 @@ int Application::initialize(const char* _ownURL, const char* _globalDirectorySer
 	// Read supported services from environment
 	Configuration::instance().importFromEnvironment();
 
+	if (!Configuration::instance().ensureValid()) {
+		exit(ot::AppExitCode::ConfigurationBroken);
+	}
+
 	this->setServiceURL(_ownURL);
 
 	// Filter ip and port from own url

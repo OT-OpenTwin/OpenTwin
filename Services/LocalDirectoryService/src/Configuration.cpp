@@ -26,6 +26,8 @@
 #define LDS_CFG_ServiceMaxStartupRestarts "MaxStartupRestarts"
 #define LDS_CFG_LauncherPath "LauncherPath"
 #define LDS_CFG_ServicesLibraryPath "ServicesLibraryPath"
+#define LDS_CFG_ServiceStartWorkerCount "ServiceStartWorkerCount"
+#define LDS_CFG_InitializeWorkerCount "InitializeWorkerCount"
 
 Configuration& Configuration::instance() {
 	static Configuration g_instance;
@@ -41,6 +43,8 @@ void Configuration::getDebugInformation(ot::LDSDebugInfo& _info) {
 	configInfo.configImported = m_configurationImported;
 	configInfo.defaultMaxCrashRestarts = m_defaultMaxCrashRestarts;
 	configInfo.defaultMaxStartupRestarts = m_defaultMaxStartupRestarts;
+	configInfo.serviceStartWorkerCount = m_serviceStartWorkerCount;
+	configInfo.iniWorkerCount = m_iniWorkerCount;
 	configInfo.launcherPath = m_launcherPath;
 	configInfo.servicesLibraryPath = m_servicesLibraryPath;
 
@@ -59,6 +63,8 @@ void Configuration::getDebugInformation(ot::LDSDebugInfo& _info) {
 void Configuration::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember(LDS_CFG_DefaultMaxCrashRestarts, m_defaultMaxCrashRestarts, _allocator);
 	_object.AddMember(LDS_CFG_DefaultMaxStartupRestarts, m_defaultMaxStartupRestarts, _allocator);
+	_object.AddMember(LDS_CFG_ServiceStartWorkerCount, m_serviceStartWorkerCount, _allocator);
+	_object.AddMember(LDS_CFG_InitializeWorkerCount, m_iniWorkerCount, _allocator);
 	_object.AddMember(LDS_CFG_LauncherPath, ot::JsonString(m_launcherPath, _allocator), _allocator);
 	_object.AddMember(LDS_CFG_ServicesLibraryPath, ot::JsonString(m_servicesLibraryPath, _allocator), _allocator);
 
@@ -73,10 +79,10 @@ void Configuration::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 
 void Configuration::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	// Load general configuration
-	m_defaultMaxCrashRestarts = ot::json::getUInt(_object, LDS_CFG_DefaultMaxCrashRestarts);
+	m_defaultMaxCrashRestarts = ot::json::getUInt(_object, LDS_CFG_DefaultMaxCrashRestarts, 3);
 	OT_LOG_D("[Configuration]: Default max restarts after crash set to " + std::to_string(m_defaultMaxCrashRestarts));
 
-	m_defaultMaxStartupRestarts = ot::json::getUInt(_object, LDS_CFG_DefaultMaxStartupRestarts);
+	m_defaultMaxStartupRestarts = ot::json::getUInt(_object, LDS_CFG_DefaultMaxStartupRestarts, 64);
 	OT_LOG_D("[Configuration]: Default max restarts at startup set to " + std::to_string(m_defaultMaxStartupRestarts));
 
 	// Load launcher name
@@ -86,6 +92,12 @@ void Configuration::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	// Load services library path
 	m_servicesLibraryPath = ot::json::getString(_object, LDS_CFG_ServicesLibraryPath);
 	OT_LOG_D("[Configuration]: Services library path set to " + m_servicesLibraryPath);
+	
+	m_serviceStartWorkerCount = ot::json::getUInt(_object, LDS_CFG_ServiceStartWorkerCount, 1);
+	OT_LOG_D("[Configuration]: Service start worker count set to " + std::to_string(m_serviceStartWorkerCount));
+
+	m_iniWorkerCount = ot::json::getUInt(_object, LDS_CFG_InitializeWorkerCount, 4);
+	OT_LOG_D("[Configuration]: Initialize worker count set to " + std::to_string(m_iniWorkerCount));
 
 	// Load supported services
 
@@ -201,10 +213,43 @@ std::optional<SupportedService> Configuration::getSupportedService(const std::st
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Setter / Getter
+
+bool Configuration::ensureValid() const {
+	if (!m_configurationImported) {
+		OT_LOG_E("Configuration not imported");
+		return false;
+	}
+	if (m_supportedServices.empty()) {
+		OT_LOG_E("No supported services provided");
+		return false;
+	}
+	if (m_launcherPath.empty()) {
+		OT_LOG_E("Launcher path is empty");
+		return false;
+	}
+	if (m_servicesLibraryPath.empty()) {
+		OT_LOG_E("Services library path is empty");
+		return false;
+	}
+	if (m_serviceStartWorkerCount == 0) {
+		OT_LOG_E("Service start worker count is zero");
+		return false;
+	}
+	if (m_iniWorkerCount == 0) {
+		OT_LOG_E("Initialize worker count is zero");
+		return false;
+	}
+
+	return true;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // Constructor/Destructor
 
 Configuration::Configuration() 
-	: m_configurationImported(false), m_defaultMaxCrashRestarts(8), m_defaultMaxStartupRestarts(64)
+	: m_configurationImported(false), m_defaultMaxCrashRestarts(8), m_defaultMaxStartupRestarts(64), m_iniWorkerCount(4)
 {}
 
 Configuration::~Configuration() {
