@@ -47,7 +47,7 @@ QSize ot::ImagePainterWidget::sizeHint() const {
 
 void ot::ImagePainterWidget::paintEvent(QPaintEvent* _event) {
 	QPainter painter(this);
-	m_painter->paintImage(&painter, this->rect(), true);
+	m_painter->paintImage(&painter, this->rect().marginsRemoved(QMargins(1, 1, 1, 1)), true);
 }
 
 void ot::ImagePainterWidget::enterEvent(QEnterEvent* _event) {
