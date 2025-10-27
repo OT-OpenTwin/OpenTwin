@@ -25,16 +25,16 @@ namespace ot {
 		virtual void modelSelectionChanged(std::list< UID> &selectedEntityID) = 0;
 
 	protected:
-		virtual std::string initializeAndCreateUI(const LockTypeFlags& modelRead, const LockTypeFlags& modelWrite) = 0;
+		virtual std::string initializeAndCreateUI(const LockTypes& modelRead, const LockTypes& modelWrite) = 0;
 
 		void setupUI(void);
 		void addMenuPage(const std::string &menu);
 		void addMenuGroup(const std::string &menu, const std::string &group);
 		void addMenuSubgroup(const std::string &menu, const std::string &group, const std::string &subgroup);
-		void addMenuAction(const std::string &menu, const std::string &group, const std::string &buttonName, const std::string &text, const LockTypeFlags& flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"));
-		void addMenuAction(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &buttonName, const std::string &text, const LockTypeFlags& flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"));
-		void addMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, const std::string &boxText, bool checked, const LockTypeFlags& flags);
-		void addMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, const std::string &editLabel, const LockTypeFlags& flags);
+		void addMenuAction(const std::string &menu, const std::string &group, const std::string &buttonName, const std::string &text, const LockTypes& flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"));
+		void addMenuAction(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &buttonName, const std::string &text, const LockTypes& flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"));
+		void addMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, const std::string &boxText, bool checked, const LockTypes& flags);
+		void addMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, const std::string &editLabel, const LockTypes& flags);
 		void setMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, bool checked);
 		void setMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, bool error);
 

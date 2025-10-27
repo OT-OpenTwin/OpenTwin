@@ -40,9 +40,9 @@ namespace ot {
 		//! @brief Resets the disabled counter back to 0. (like no disabled was called)
 		void resetGuiObjectDisabledCounter(void);
 
-		void lockGuiObject(const LockTypeFlags& _flags, int _lockCount = 1);
+		void lockGuiObject(const LockTypes& _flags, int _lockCount = 1);
 
-		void unlockGuiObject(const LockTypeFlags& _flags, int _unlockCount = 1);
+		void unlockGuiObject(const LockTypes& _flags, int _unlockCount = 1);
 
 		void resetGuiObjectLockCounter(void);
 
@@ -51,17 +51,17 @@ namespace ot {
 		virtual void updateGuiObjectEnabledState(bool _enabled) = 0;
 
 	private:
-		void lockGuiObjectFlag(LockTypeFlag _flag, int _lockCount);
-		void unlockGuiObjectFlag(LockTypeFlag _flag, int _unlockCount);
+		void lockGuiObjectFlag(LockType _flag, int _lockCount);
+		void unlockGuiObjectFlag(LockType _flag, int _unlockCount);
 
 		void evaluateEnabledState(void);
-		int& getLockCounter(LockTypeFlag _flag);
+		int& getLockCounter(LockType _flag);
 
 		BasicServiceInformation m_owner;
 		std::string m_key;
 		bool m_isEnabled;
 		int m_disabledCounter;
-		std::map<LockTypeFlag, int> m_lockCounter;
+		std::map<LockType, int> m_lockCounter;
 	};
 
 }

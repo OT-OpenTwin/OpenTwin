@@ -41,22 +41,22 @@ void UIControlsHandler::createGroups()
 void UIControlsHandler::setupButtons()
 {
 	m_buttonGeometryInfo = ot::ToolBarButtonCfg(m_pageModel, m_groupGeometry, "Info", "Default/Information");
-	m_buttonGeometryInfo.setButtonLockFlags(ot::LockTypeFlag::ModelRead);
+	m_buttonGeometryInfo.setButtonLockFlags(ot::LockType::ModelRead);
 	m_buttonGeometryInfo.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Control, ot::BasicKey::I));
 	
 	m_buttonCreateParameter = ot::ToolBarButtonCfg(m_pageModel, m_groupParameters, "Create Parameter", "Default/CreateParameter");
-	m_buttonCreateParameter.setButtonLockFlags(ot::LockTypeFlag::ModelRead);
+	m_buttonCreateParameter.setButtonLockFlags(ot::LockType::ModelRead);
 	
 	m_buttonDelete = ot::ToolBarButtonCfg(m_pageModel, m_groupEdit, "Delete", "Default/Delete");
-	m_buttonDelete.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
+	m_buttonDelete.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonDelete.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Delete));
 
 	m_buttonRedo = ot::ToolBarButtonCfg(m_pageModel, m_groupEdit, "Redo", "Default/Redo");
-	m_buttonRedo.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
+	m_buttonRedo.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonRedo.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Control, ot::BasicKey::Y));
 
 	m_buttonUndo = ot::ToolBarButtonCfg(m_pageModel, m_groupEdit, "Undo", "Default/Undo");
-	m_buttonUndo.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
+	m_buttonUndo.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonUndo.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Control, ot::BasicKey::Z));
 }
 

@@ -76,7 +76,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup(pageName, groupNameMonitor);
 	_ui->addMenuGroup(pageName, groupNameSignal);
 
-	ot::LockTypeFlags modelWrite(ot::LockTypeFlag::ModelWrite);
+	ot::LockTypes modelWrite(ot::LockType::ModelWrite);
 
 	// Setup buttons
 	_buttonRunSolver = ot::ToolBarButtonCfg(pageName, groupNameSolver, "Run Solver", "Default/RunSolver");
@@ -400,11 +400,11 @@ void Application::runSolver(void) {
 void Application::SolverThread(std::list<std::string> solverRunList)
 {
 	// Lock the UI
-	ot::LockTypeFlags lockFlags;
-	lockFlags.setFlag(ot::LockTypeFlag::ModelWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::NavigationWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::ViewWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::Properties);
+	ot::LockTypes lockFlags;
+	lockFlags.setFlag(ot::LockType::ModelWrite);
+	lockFlags.setFlag(ot::LockType::NavigationWrite);
+	lockFlags.setFlag(ot::LockType::ViewWrite);
+	lockFlags.setFlag(ot::LockType::Properties);
 
 	this->getUiComponent()->lockUI(lockFlags);
 	

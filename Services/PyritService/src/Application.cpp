@@ -51,11 +51,11 @@ Application::Application()
 	m_subprocessManager(nullptr)
 {
 	m_addSolverButton = ot::ToolBarButtonCfg("Pyrit", "Solver", "Create Solver", "Default/AddSolver");
-	m_addSolverButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
+	m_addSolverButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	connectToolBarButton(m_addSolverButton, this, &Application::handleAddSolver);
 
 	m_runSolverButton = ot::ToolBarButtonCfg("Pyrit", "Solver", "Run Solver", "Default/RunSolver");
-	m_runSolverButton.setButtonLockFlags(ot::LockTypeFlag::ModelWrite);
+	m_runSolverButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	connectToolBarButton(m_runSolverButton, this, &Application::handleRunSolver);
 }
 
@@ -317,7 +317,7 @@ void Application::handleRunSolver()
 }
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase*> solverMap) {
-	ot::LockTypeFlags lock(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::NavigationWrite | ot::LockTypeFlag::ViewWrite | ot::LockTypeFlag::Properties);
+	ot::LockTypes lock(ot::LockType::ModelWrite | ot::LockType::NavigationWrite | ot::LockType::ViewWrite | ot::LockType::Properties);
 
 	this->getUiComponent()->lockUI(lock);
 

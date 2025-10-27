@@ -41,7 +41,7 @@ void EdgesOperationBase::addParametricProperty(EntityGeometry* geometryEntity, c
 
 void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 {
-	ot::LockTypeFlags lockFlags(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::NavigationWrite | ot::LockTypeFlag::ViewWrite | ot::LockTypeFlag::Properties);
+	ot::LockTypes lockFlags(ot::LockType::ModelWrite | ot::LockType::NavigationWrite | ot::LockType::ViewWrite | ot::LockType::Properties);
 	uiComponent->lockUI(lockFlags);
 
 	ot::JsonDocument doc;

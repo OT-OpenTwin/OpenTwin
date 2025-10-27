@@ -424,94 +424,94 @@ ot::ImageFileFormat ot::stringToImageFileFormat(const std::string& _format) {
 
 // Lock Type
 
-std::string ot::toString(LockTypeFlag _type) {
+std::string ot::toString(LockType _type) {
 	switch (_type) {
-	case LockTypeFlag::None: return "None";
-	case LockTypeFlag::ViewWrite: return "ViewWrite";
-	case LockTypeFlag::ViewRead: return "ViewRead";
-	case LockTypeFlag::ModelWrite: return "ModelWrite";
-	case LockTypeFlag::ModelRead: return "ModelRead";
-	case LockTypeFlag::Properties: return "Properties";
-	case LockTypeFlag::NavigationWrite: return "NavigationWrite";
-	case LockTypeFlag::NavigationAll: return "NavigationAll";
-	case LockTypeFlag::All: return "All";
+	case LockType::None: return "None";
+	case LockType::ViewWrite: return "ViewWrite";
+	case LockType::ViewRead: return "ViewRead";
+	case LockType::ModelWrite: return "ModelWrite";
+	case LockType::ModelRead: return "ModelRead";
+	case LockType::Properties: return "Properties";
+	case LockType::NavigationWrite: return "NavigationWrite";
+	case LockType::NavigationAll: return "NavigationAll";
+	case LockType::All: return "All";
 	default:
 		OT_LOG_E("Unknown lock type (" + std::to_string((int)_type) + ")");
 		return "None";
 	}
 }
 
-ot::LockTypeFlag ot::stringToLockTypeFlag(const std::string& _flag) {
-	if (_flag == toString(LockTypeFlag::ViewWrite)) return LockTypeFlag::ViewWrite;
-	else if (_flag == toString(LockTypeFlag::ViewRead)) return LockTypeFlag::ViewRead;
-	else if (_flag == toString(LockTypeFlag::ModelWrite)) return LockTypeFlag::ModelWrite;
-	else if (_flag == toString(LockTypeFlag::ModelRead)) return LockTypeFlag::ModelRead;
-	else if (_flag == toString(LockTypeFlag::All)) return LockTypeFlag::All;
-	else if (_flag == toString(LockTypeFlag::Properties)) return LockTypeFlag::Properties;
-	else if (_flag == toString(LockTypeFlag::NavigationWrite)) return LockTypeFlag::NavigationWrite;
-	else if (_flag == toString(LockTypeFlag::NavigationAll)) return LockTypeFlag::NavigationAll;
-	else if (_flag != toString(LockTypeFlag::None)) {
+ot::LockType ot::stringToLockType(const std::string& _flag) {
+	if (_flag == toString(LockType::ViewWrite)) return LockType::ViewWrite;
+	else if (_flag == toString(LockType::ViewRead)) return LockType::ViewRead;
+	else if (_flag == toString(LockType::ModelWrite)) return LockType::ModelWrite;
+	else if (_flag == toString(LockType::ModelRead)) return LockType::ModelRead;
+	else if (_flag == toString(LockType::All)) return LockType::All;
+	else if (_flag == toString(LockType::Properties)) return LockType::Properties;
+	else if (_flag == toString(LockType::NavigationWrite)) return LockType::NavigationWrite;
+	else if (_flag == toString(LockType::NavigationAll)) return LockType::NavigationAll;
+	else if (_flag != toString(LockType::None)) {
 		OT_LOG_E("Unknown lock type flag \"" + _flag + "\"");
 	}
-	return LockTypeFlag::None;
+	return LockType::None;
 }
 
-std::list<std::string> ot::toStringList(const LockTypeFlags& _flags) {
+std::list<std::string> ot::toStringList(const LockTypes& _flags) {
 	std::list<std::string> ret;
 
-	if (_flags & LockTypeFlag::ViewWrite) ret.push_back(toString(LockTypeFlag::ViewWrite));
-	if (_flags & LockTypeFlag::ViewRead) ret.push_back(toString(LockTypeFlag::ViewRead));
-	if (_flags & LockTypeFlag::ModelWrite) ret.push_back(toString(LockTypeFlag::ModelWrite));
-	if (_flags & LockTypeFlag::ModelRead) ret.push_back(toString(LockTypeFlag::ModelRead));
-	if (_flags & LockTypeFlag::Properties) ret.push_back(toString(LockTypeFlag::Properties));
-	if (_flags & LockTypeFlag::NavigationWrite) ret.push_back(toString(LockTypeFlag::NavigationWrite));
-	if (_flags & LockTypeFlag::NavigationAll) ret.push_back(toString(LockTypeFlag::NavigationAll));
-	if (_flags & LockTypeFlag::All) ret.push_back(toString(LockTypeFlag::All));
+	if (_flags & LockType::ViewWrite) ret.push_back(toString(LockType::ViewWrite));
+	if (_flags & LockType::ViewRead) ret.push_back(toString(LockType::ViewRead));
+	if (_flags & LockType::ModelWrite) ret.push_back(toString(LockType::ModelWrite));
+	if (_flags & LockType::ModelRead) ret.push_back(toString(LockType::ModelRead));
+	if (_flags & LockType::Properties) ret.push_back(toString(LockType::Properties));
+	if (_flags & LockType::NavigationWrite) ret.push_back(toString(LockType::NavigationWrite));
+	if (_flags & LockType::NavigationAll) ret.push_back(toString(LockType::NavigationAll));
+	if (_flags & LockType::All) ret.push_back(toString(LockType::All));
 
 	return ret;
 }
 
-ot::LockTypeFlags ot::stringListToLockTypeFlags(const std::vector<std::string>& _flags) {
-	LockTypeFlags flags(LockTypeFlag::None);
+ot::LockTypes ot::stringListToLockTypes(const std::vector<std::string>& _flags) {
+	LockTypes flags(LockType::None);
 	for (const std::string& flag : _flags) {
-		flags |= stringToLockTypeFlag(flag);
+		flags |= stringToLockType(flag);
 	}
 	return flags;
 }
 
-ot::LockTypeFlags ot::stringListToLockTypeFlags(const std::list<std::string>& _flags) {
-	LockTypeFlags flags(LockTypeFlag::None);
+ot::LockTypes ot::stringListToLockTypes(const std::list<std::string>& _flags) {
+	LockTypes flags(LockType::None);
 	for (const std::string& flag : _flags) {
-		flags |= stringToLockTypeFlag(flag);
+		flags |= stringToLockType(flag);
 	}
 	return flags;
 }
 
-std::list<ot::LockTypeFlag> ot::getAllSetFlags(const LockTypeFlags& _lockFlags) {
-	std::list<LockTypeFlag> result;
+std::list<ot::LockType> ot::getAllSetFlags(const LockTypes& _lockFlags) {
+	std::list<LockType> result;
 
-	if (_lockFlags & LockTypeFlag::ViewWrite) result.push_back(LockTypeFlag::ViewWrite);
-	if (_lockFlags & LockTypeFlag::ViewRead) result.push_back(LockTypeFlag::ViewRead);
-	if (_lockFlags & LockTypeFlag::ModelWrite) result.push_back(LockTypeFlag::ModelWrite);
-	if (_lockFlags & LockTypeFlag::ModelRead) result.push_back(LockTypeFlag::ModelRead);
-	if (_lockFlags & LockTypeFlag::Properties) result.push_back(LockTypeFlag::Properties);
-	if (_lockFlags & LockTypeFlag::NavigationWrite) result.push_back(LockTypeFlag::NavigationWrite);
-	if (_lockFlags & LockTypeFlag::NavigationAll) result.push_back(LockTypeFlag::NavigationAll);
-	if (_lockFlags & LockTypeFlag::All) result.push_back(LockTypeFlag::All);
+	if (_lockFlags & LockType::ViewWrite) result.push_back(LockType::ViewWrite);
+	if (_lockFlags & LockType::ViewRead) result.push_back(LockType::ViewRead);
+	if (_lockFlags & LockType::ModelWrite) result.push_back(LockType::ModelWrite);
+	if (_lockFlags & LockType::ModelRead) result.push_back(LockType::ModelRead);
+	if (_lockFlags & LockType::Properties) result.push_back(LockType::Properties);
+	if (_lockFlags & LockType::NavigationWrite) result.push_back(LockType::NavigationWrite);
+	if (_lockFlags & LockType::NavigationAll) result.push_back(LockType::NavigationAll);
+	if (_lockFlags & LockType::All) result.push_back(LockType::All);
 
 	return result;
 }
 
-std::list<ot::LockTypeFlag> ot::getAllLockTypeFlags() {
-	return std::list<LockTypeFlag>({
-		LockTypeFlag::ViewWrite,
-		LockTypeFlag::ViewRead,
-		LockTypeFlag::ModelWrite,
-		LockTypeFlag::ModelRead,
-		LockTypeFlag::Properties,
-		LockTypeFlag::NavigationWrite,
-		LockTypeFlag::NavigationAll,
-		LockTypeFlag::All,
+std::list<ot::LockType> ot::getAllLockTypes() {
+	return std::list<LockType>({
+		LockType::ViewWrite,
+		LockType::ViewRead,
+		LockType::ModelWrite,
+		LockType::ModelRead,
+		LockType::Properties,
+		LockType::NavigationWrite,
+		LockType::NavigationAll,
+		LockType::All,
 		});
 }
 

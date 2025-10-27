@@ -27,10 +27,10 @@ public:
 	void addMenuPage(const std::string &pageName);
 	void addMenuGroup(const std::string &pageName, const std::string &groupName);
 	void addMenuSubGroup(const std::string &pageName, const std::string &groupName, const std::string &subGroupName);
-	void addMenuPushButton(const std::string &pageName, const std::string &groupName, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"), const std::string &keySequence = std::string(""));
-	void addMenuPushButton(const std::string &pageName, const std::string &groupName, const std::string &subgroupName, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"), const std::string &keySequence = std::string(""));
-	void addMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, const std::string &boxText, bool checked, ot::LockTypeFlags &flags);
-	void addMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::LockTypeFlags &flags);
+	void addMenuPushButton(const std::string &pageName, const std::string &groupName, const std::string &buttonName, const std::string &text, ot::LockTypes &flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"), const std::string &keySequence = std::string(""));
+	void addMenuPushButton(const std::string &pageName, const std::string &groupName, const std::string &subgroupName, const std::string &buttonName, const std::string &text, ot::LockTypes &flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"), const std::string &keySequence = std::string(""));
+	void addMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, const std::string &boxText, bool checked, ot::LockTypes &flags);
+	void addMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::LockTypes &flags);
 	void addShortcut(const std::string &keySequence);
 	//Not existing in uiComponent
 	void setMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, bool checked);

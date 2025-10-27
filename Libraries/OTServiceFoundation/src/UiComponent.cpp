@@ -92,7 +92,7 @@ void ot::components::UiComponent::addMenuButton(
 	const std::string &			_groupName,
 	const std::string &			_buttonName,
 	const std::string &			_text,
-	const LockTypeFlags&		_lockTypes,
+	const LockTypes&		_lockTypes,
 	const std::string &			_iconName,
 	const std::string &			_iconFolder,
 	const std::string &			_keySequence
@@ -128,7 +128,7 @@ void ot::components::UiComponent::addMenuButton(
 	const std::string &			_subgroupName,
 	const std::string &			_buttonName,
 	const std::string &			_text,
-	const LockTypeFlags&		_lockTypes,
+	const LockTypes&		_lockTypes,
 	const std::string &			_iconName,
 	const std::string &			_iconFolder,
 	const std::string &			_keySequence
@@ -202,7 +202,7 @@ void ot::components::UiComponent::addMenuCheckbox(
 	const std::string &			_checkboxName,
 	const std::string &			_checkboxText,
 	bool						_isChecked,
-	const LockTypeFlags&		_lockTypes
+	const LockTypes&		_lockTypes
 ) {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _checkboxName))
 	{
@@ -231,7 +231,7 @@ void ot::components::UiComponent::addMenuCheckbox(
 	const std::string &			_checkboxName,
 	const std::string &			_checkboxText,
 	bool						_isChecked,
-	const LockTypeFlags&		_lockTypes
+	const LockTypes&		_lockTypes
 ) {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _checkboxName))
 	{
@@ -260,7 +260,7 @@ void ot::components::UiComponent::addMenuLineEdit(
 	const std::string &			_lineEditName,
 	const std::string &			_labelText,
 	const std::string &			_initialText,
-	const LockTypeFlags&		_lockTypes
+	const LockTypes&		_lockTypes
 ) {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _lineEditName))
 	{
@@ -289,7 +289,7 @@ void ot::components::UiComponent::addMenuLineEdit(
 	const std::string &			_lineEditName,
 	const std::string &			_labelText,
 	const std::string &			_initialText,
-	const LockTypeFlags&		_lockTypes
+	const LockTypes&		_lockTypes
 ) {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _lineEditName))
 	{
@@ -452,7 +452,7 @@ void ot::components::UiComponent::setCheckboxValues(
 }
 
 void ot::components::UiComponent::lockUI(
-	const LockTypeFlags&		_lockTypes
+	const LockTypes&		_lockTypes
 ) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_Lock, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
@@ -464,7 +464,7 @@ void ot::components::UiComponent::lockUI(
 }
 
 void ot::components::UiComponent::unlockUI(
-	const LockTypeFlags&		_lockTypes
+	const LockTypes&		_lockTypes
 ) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_Unlock, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());

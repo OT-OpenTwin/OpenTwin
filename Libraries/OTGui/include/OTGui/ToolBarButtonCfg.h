@@ -62,9 +62,9 @@ namespace ot {
 		ToolBarButtonCfg& setButtonToolTip(const std::string& _toolTip) { m_button.setToolTip(_toolTip); return *this; };
 		const std::string& getButtonToolTip() const { return m_button.getToolTip(); };
 
-		ToolBarButtonCfg& setButtonLockFlag(LockTypeFlag _flag, bool _set = true) { m_button.setLockFlag(_flag, _set); return *this; };
-		ToolBarButtonCfg& setButtonLockFlags(const LockTypeFlags& _flags) { m_button.setLockFlags(_flags); return *this; };
-		const LockTypeFlags& getButtonLockFlags() const { return m_button.getLockFlags(); };
+		ToolBarButtonCfg& setButtonLockFlag(LockType _flag, bool _set = true) { m_button.setLockFlag(_flag, _set); return *this; };
+		ToolBarButtonCfg& setButtonLockFlags(const LockTypes& _flags) { m_button.setLockFlags(_flags); return *this; };
+		const LockTypes& getButtonLockFlags() const { return m_button.getLockFlags(); };
 
 		ToolBarButtonCfg& setButtonMenu(const MenuCfg& _menu) { m_button.setMenu(_menu); return *this; };
 		ToolBarButtonCfg& setButtonMenu(MenuCfg&& _menu) { m_button.setMenu(std::move(_menu)); return *this; };

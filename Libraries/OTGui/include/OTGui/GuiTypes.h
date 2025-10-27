@@ -229,8 +229,8 @@ namespace ot {
 	// Lock Type
 
 	//! @brief Describes the object type to lock in the UI.
-	//! @warning When adding new flags, add the corresponding flag to ot::getAllLockTypeFlags().
-	enum class LockTypeFlag {
+	//! @warning When adding new flags, add the corresponding flag to ot::getAllLockTypes().
+	enum class LockType {
 		None            = 0 << 0, //! @brief No lock flags are set.
 		ViewWrite       = 1 << 0, //! @brief Lock view write operations.
 		ViewRead        = 1 << 1, //! @brief Lock view read operations.
@@ -248,21 +248,21 @@ namespace ot {
 		All             = 1 << 7  //! @brief Lock all.
 	};
 
-	typedef ot::Flags<LockTypeFlag> LockTypeFlags;
+	typedef ot::Flags<LockType> LockTypes;
 
-	OT_GUI_API_EXPORT std::string toString(LockTypeFlag _type);
+	OT_GUI_API_EXPORT std::string toString(LockType _type);
 
-	OT_GUI_API_EXPORT LockTypeFlag stringToLockTypeFlag(const std::string& _flag);
+	OT_GUI_API_EXPORT LockType stringToLockType(const std::string& _flag);
 
-	OT_GUI_API_EXPORT std::list<std::string> toStringList(const LockTypeFlags& _flags);
+	OT_GUI_API_EXPORT std::list<std::string> toStringList(const LockTypes& _flags);
 
-	OT_GUI_API_EXPORT LockTypeFlags stringListToLockTypeFlags(const std::list<std::string>& _flags);
+	OT_GUI_API_EXPORT LockTypes stringListToLockTypes(const std::list<std::string>& _flags);
 
-	OT_GUI_API_EXPORT LockTypeFlags stringListToLockTypeFlags(const std::vector<std::string>& _flags);
+	OT_GUI_API_EXPORT LockTypes stringListToLockTypes(const std::vector<std::string>& _flags);
 
-	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllSetFlags(const LockTypeFlags& _lockFlags);
+	OT_GUI_API_EXPORT std::list<LockType> getAllSetFlags(const LockTypes& _lockFlags);
 
-	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllLockTypeFlags();
+	OT_GUI_API_EXPORT std::list<LockType> getAllLockTypes();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -345,5 +345,5 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::LockTypeFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::LockType)
 OT_ADD_FLAG_FUNCTIONS(ot::SelectionHandlingEvent)

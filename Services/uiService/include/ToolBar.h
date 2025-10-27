@@ -50,7 +50,7 @@ public:
 
 	ot::UID addNiceLineEdit(ot::UID _creator, ot::UID _container, const QString & _title, const QString & _initialState);
 
-	void addDefaultControlsToLockManager(LockManager * _lockManger, ot::LockTypeFlags& _flags);
+	void addDefaultControlsToLockManager(LockManager * _lockManger, ot::LockTypes& _flags);
 
 private:
 

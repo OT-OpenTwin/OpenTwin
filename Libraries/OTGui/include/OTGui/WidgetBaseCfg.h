@@ -41,14 +41,14 @@ namespace ot {
 		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
 		const std::string& getToolTip(void) const { return m_toolTip; };
 
-		void setLockFlag(LockTypeFlag _flag, bool _set = true) { m_lockFlags.setFlag(_flag, _set); };
-		void setLockFlags(const LockTypeFlags& _flags) { m_lockFlags = _flags; };
-		const LockTypeFlags& getLockFlags() const { return m_lockFlags; };
+		void setLockFlag(LockType _flag, bool _set = true) { m_lockFlags.setFlag(_flag, _set); };
+		void setLockFlags(const LockTypes& _flags) { m_lockFlags = _flags; };
+		const LockTypes& getLockFlags() const { return m_lockFlags; };
 
 	private:
 		std::string m_name;
 		std::string m_toolTip;
-		LockTypeFlags m_lockFlags;
+		LockTypes m_lockFlags;
 	};
 
 }

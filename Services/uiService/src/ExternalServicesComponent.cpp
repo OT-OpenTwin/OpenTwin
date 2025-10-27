@@ -1132,7 +1132,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		OT_LOG_D("Open project requested (Project name = \"" + _projectName + ")");
 
-		ScopedLockManagerLock uiLock(m_lockManager, app->getBasicServiceInformation(), ot::LockTypeFlag::All);
+		ScopedLockManagerLock uiLock(m_lockManager, app->getBasicServiceInformation(), ot::LockType::All);
 
 		StudioSuiteConnectorAPI::openProject();
 
@@ -1647,20 +1647,20 @@ void ExternalServicesComponent::setProgressValue(int percentage)
 
 void ExternalServicesComponent::lockGui()
 {
-	ot::LockTypeFlags lockFlags;
-	lockFlags.setFlag(ot::LockTypeFlag::ModelWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::ViewWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::ModelRead);
+	ot::LockTypes lockFlags;
+	lockFlags.setFlag(ot::LockType::ModelWrite);
+	lockFlags.setFlag(ot::LockType::ViewWrite);
+	lockFlags.setFlag(ot::LockType::ModelRead);
 
 	m_lockManager->lock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 }
 
 void ExternalServicesComponent::unlockGui()
 {
-	ot::LockTypeFlags lockFlags;
-	lockFlags.setFlag(ot::LockTypeFlag::ModelWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::ViewWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::ModelRead);
+	ot::LockTypes lockFlags;
+	lockFlags.setFlag(ot::LockType::ModelWrite);
+	lockFlags.setFlag(ot::LockType::ViewWrite);
+	lockFlags.setFlag(ot::LockType::ModelRead);
 
 	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 }
@@ -1872,7 +1872,7 @@ void ExternalServicesComponent::handleCompound(ot::JsonDocument& _document) {
 	rapidjson::Value prefetchID = _document[OT_ACTION_PARAM_PREFETCH_ID].GetArray();
 	rapidjson::Value prefetchVersion = _document[OT_ACTION_PARAM_PREFETCH_Version].GetArray();
 
-	ot::LockTypeFlags lockFlags(ot::LockTypeFlag::All);
+	ot::LockTypes lockFlags(ot::LockType::All);
 	
 	ScopedLockManagerLock uiLock(m_lockManager, AppBase::instance()->getBasicServiceInformation(), lockFlags);
 
@@ -2017,7 +2017,7 @@ void ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocument& _d
 	m_servicesUiSetupCompleted = true;
 
 	AppBase::instance()->switchToViewMenuTabIfNeeded();
-	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockTypeFlag::All);
+	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockType::All);
 
 	AppBase::instance()->restoreSessionState();
 }
@@ -2397,13 +2397,13 @@ void ExternalServicesComponent::handleCreateRubberband(ot::JsonDocument& _docume
 
 void ExternalServicesComponent::handleLock(ot::JsonDocument& _document) {
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	ot::LockTypeFlags flags = ot::stringListToLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	ot::LockTypes flags = ot::stringListToLockTypes(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
 	m_lockManager->lock(getService(serviceId)->getBasicServiceInformation(), flags);
 }
 
 void ExternalServicesComponent::handleUnlock(ot::JsonDocument& _document) {
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	ot::LockTypeFlags flags = ot::stringListToLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	ot::LockTypes flags = ot::stringListToLockTypes(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
 	m_lockManager->unlock(getService(serviceId)->getBasicServiceInformation(), flags);
 }
 
@@ -3025,11 +3025,11 @@ void ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _document)
 	
 	ServiceDataUi* senderService = getService(serviceId);
 	
-	ot::LockTypeFlags flags = (ot::LockTypeFlag::All);
+	ot::LockTypes flags = (ot::LockType::All);
 
 	if (_document.HasMember(OT_ACTION_PARAM_ElementLockTypes)) {
-		flags = ot::stringListToLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-		flags.setFlag(ot::LockTypeFlag::All);	// Add the all flag to all external push buttons
+		flags = ot::stringListToLockTypes(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+		flags.setFlag(ot::LockType::All);	// Add the all flag to all external push buttons
 	}
 
 	ot::UID parentUID;
@@ -3082,8 +3082,8 @@ void ExternalServicesComponent::handleAddMenuCheckbox(ot::JsonDocument& _documen
 	std::string boxText = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
 	bool checked = _document[OT_ACTION_PARAM_UI_CONTROL_CheckedState].GetBool();
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	ot::LockTypeFlags flags = ot::stringListToLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-	flags.setFlag(ot::LockTypeFlag::All);	// Add the all flag to all external checkboxes
+	ot::LockTypes flags = ot::stringListToLockTypes(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	flags.setFlag(ot::LockType::All);	// Add the all flag to all external checkboxes
 
 	ServiceDataUi* service = getService(serviceId);
 
@@ -3130,8 +3130,8 @@ void ExternalServicesComponent::handleAddMenuLineEdit(ot::JsonDocument& _documen
 	std::string editText = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectText);
 	std::string editLabel = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	ot::LockTypeFlags flags = ot::stringListToLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-	flags.setFlag(ot::LockTypeFlag::All);	// Add the all flag to all external checkboxes
+	ot::LockTypes flags = ot::stringListToLockTypes(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
+	flags.setFlag(ot::LockType::All);	// Add the all flag to all external checkboxes
 
 	ServiceDataUi* service = getService(serviceId);
 	

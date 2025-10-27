@@ -73,10 +73,10 @@ ot::Widget* ot::WidgetManager::findWidget(const std::string& _name) const {
 	}
 }
 
-void ot::WidgetManager::lock(const BasicServiceInformation& _owner, const ot::LockTypeFlags& _lockFlags) {
+void ot::WidgetManager::lock(const BasicServiceInformation& _owner, const ot::LockTypes& _lockFlags) {
 	OwnerData& ownerData = this->findOrCreateOwnerData(_owner);
-	std::list<LockTypeFlag> flags = getAllSetFlags(_lockFlags);
-	for (LockTypeFlag flag : flags) {
+	std::list<LockType> flags = getAllSetFlags(_lockFlags);
+	for (LockType flag : flags) {
 		int& count = this->getLockCount(ownerData, flag);
 		count++;
 
@@ -86,10 +86,10 @@ void ot::WidgetManager::lock(const BasicServiceInformation& _owner, const ot::Lo
 	}
 }
 
-void ot::WidgetManager::unlock(const BasicServiceInformation& _owner, const ot::LockTypeFlags& _lockFlags) {
+void ot::WidgetManager::unlock(const BasicServiceInformation& _owner, const ot::LockTypes& _lockFlags) {
 	OwnerData& ownerData = this->findOrCreateOwnerData(_owner);
-	std::list<LockTypeFlag> flags = getAllSetFlags(_lockFlags);
-	for (LockTypeFlag flag : flags) {
+	std::list<LockType> flags = getAllSetFlags(_lockFlags);
+	for (LockType flag : flags) {
 		int& count = this->getLockCount(ownerData, flag);
 		if (count == 0) {
 			OT_LOG_E("Unlock called without a previous lock");
@@ -140,7 +140,7 @@ ot::WidgetManager::OwnerData& ot::WidgetManager::findOrCreateOwnerData(const Bas
 	}
 }
 
-int& ot::WidgetManager::getLockCount(OwnerData& _ownerData, LockTypeFlag _lockFlag) {
+int& ot::WidgetManager::getLockCount(OwnerData& _ownerData, LockType _lockFlag) {
 	auto it = _ownerData.lockData.find(_lockFlag);
 	if (it == _ownerData.lockData.end()) {
 		return _ownerData.lockData.insert_or_assign(_lockFlag, 0).first->second;

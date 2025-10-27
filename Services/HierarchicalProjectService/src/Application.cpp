@@ -63,12 +63,12 @@ Application::Application() :
 
 	// Initialize toolbar buttons
 	m_addProjectButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Project", "Hierarchical/AddProject");
-	m_addProjectButton.setButtonLockFlag(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ModelRead);
+	m_addProjectButton.setButtonLockFlag(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_addProjectButton.setButtonToolTip("Add an existing project.");
 	connectToolBarButton(m_addProjectButton, this, &Application::handleAddProject);
 
 	m_addContainerButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Container", "Hierarchical/AddContainer");
-	m_addContainerButton.setButtonLockFlag(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ModelRead);
+	m_addContainerButton.setButtonLockFlag(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_addContainerButton.setButtonToolTip(
 		"Add a new container.\n"
 		"+ Adding a container allows to group child projects in the same projects.\n"
@@ -78,32 +78,32 @@ Application::Application() :
 	connectToolBarButton(m_addContainerButton, this, &Application::handleAddContainer);
 	
 	m_addBackgroundImageButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Background Image", "Hierarchical/AddImage");
-	m_addBackgroundImageButton.setButtonLockFlag(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ModelRead);
+	m_addBackgroundImageButton.setButtonLockFlag(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_addBackgroundImageButton.setButtonToolTip("Add a background image to the hierarchical scene.");
 	connectToolBarButton(m_addBackgroundImageButton, this, &Application::handleAddBackgroundImage);
 
 	m_addDocumentButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Document", "Hierarchical/AddDocument");
-	m_addDocumentButton.setButtonLockFlag(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ModelRead);
+	m_addDocumentButton.setButtonLockFlag(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_addDocumentButton.setButtonToolTip("Add a new document.");
 	connectToolBarButton(m_addDocumentButton, this, &Application::handleAddDocument);
 
 	m_openSelectedItems = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Open", "Hierarchical/Open");
-	m_openSelectedItems.setButtonLockFlag(ot::LockTypeFlag::ModelRead);
+	m_openSelectedItems.setButtonLockFlag(ot::LockType::ModelRead);
 	m_openSelectedItems.setButtonToolTip("Open the selected project in a new OpenTwin instance.");
 	connectToolBarButton(m_openSelectedItems, this, &Application::handleOpenSelectedItems);
 
 	m_addImageToProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Add Image", "Hierarchical/AddImage");
-	m_addImageToProjectButton.setButtonLockFlag(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ModelRead);
+	m_addImageToProjectButton.setButtonLockFlag(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_addImageToProjectButton.setButtonToolTip("Add an image to the selected item.");
 	connectToolBarButton(m_addImageToProjectButton, this, &Application::handleAddImageToProject);
 
 	m_removeImageFromProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Remove Image", "Hierarchical/RemoveImage");
-	m_removeImageFromProjectButton.setButtonLockFlag(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ModelRead);
+	m_removeImageFromProjectButton.setButtonLockFlag(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_removeImageFromProjectButton.setButtonToolTip("Remove the image(s) from the selected item(s).");
 	connectToolBarButton(m_removeImageFromProjectButton, this, &Application::handleRemoveImageFromProject);
 
 	m_updateImageFromProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Update Image", "Hierarchical/UpdateImage");
-	m_updateImageFromProjectButton.setButtonLockFlag(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ModelRead);
+	m_updateImageFromProjectButton.setButtonLockFlag(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_updateImageFromProjectButton.setButtonToolTip("Update the image of the selected project(s) from the current projects' preview image.");
 	connectToolBarButton(m_updateImageFromProjectButton, this, &Application::handleUpdateImageFromProject);
 }

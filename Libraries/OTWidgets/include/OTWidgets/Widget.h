@@ -36,9 +36,9 @@ namespace ot {
 		//! @brief Resets the disabled counter back to 0. (like no disabled was called)
 		void resetWidgetDisabledCounter(void);
 
-		void lockWidget(const LockTypeFlags& _flags, int _lockCount = 1);
+		void lockWidget(const LockTypes& _flags, int _lockCount = 1);
 
-		void unlockWidget(const LockTypeFlags& _flags, int _unlockCount = 1);
+		void unlockWidget(const LockTypes& _flags, int _unlockCount = 1);
 
 		void resetWidgetLockCounter(void);
 
@@ -47,17 +47,17 @@ namespace ot {
 		virtual void updateWidgetEnabledState(bool _enabled, bool _locked) = 0;
 
 	private:
-		void lockWidgetFlag(LockTypeFlag _flag, int _lockCount);
-		void unlockWidgetFlag(LockTypeFlag _flag, int _unlockCount);
+		void lockWidgetFlag(LockType _flag, int _lockCount);
+		void unlockWidgetFlag(LockType _flag, int _unlockCount);
 
 		void evaluateEnabledState(void);
-		int& getLockCounter(LockTypeFlag _flag);
+		int& getLockCounter(LockType _flag);
 
 		BasicServiceInformation m_owner;
 		bool m_isEnabled;
 		bool m_isUnlocked;
 		int m_disabledCounter;
-		std::map<LockTypeFlag, int> m_lockCounter;
+		std::map<LockType, int> m_lockCounter;
 	};
 
 }

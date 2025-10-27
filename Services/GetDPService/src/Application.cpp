@@ -61,7 +61,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("GetDP", "Solver");
 	_ui->addMenuGroup("GetDP", "Sources");
 
-	ot::LockTypeFlags modelWrite(ot::LockTypeFlag::ModelWrite);
+	ot::LockTypes modelWrite(ot::LockType::ModelWrite);
 
 	_ui->addMenuButton("GetDP", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton("GetDP", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default");
@@ -243,11 +243,11 @@ void Application::runSolver(void) {
 }
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase *> solverMap) {
-	ot::LockTypeFlags lock;
-	lock.setFlag(ot::LockTypeFlag::ModelWrite);
-	lock.setFlag(ot::LockTypeFlag::NavigationWrite);
-	lock.setFlag(ot::LockTypeFlag::ViewWrite);
-	lock.setFlag(ot::LockTypeFlag::Properties);
+	ot::LockTypes lock;
+	lock.setFlag(ot::LockType::ModelWrite);
+	lock.setFlag(ot::LockType::NavigationWrite);
+	lock.setFlag(ot::LockType::ViewWrite);
+	lock.setFlag(ot::LockType::Properties);
 
 	this->getUiComponent()->lockUI(lock);
 

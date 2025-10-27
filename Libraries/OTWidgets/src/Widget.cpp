@@ -27,15 +27,15 @@ void ot::Widget::resetWidgetDisabledCounter(void) {
 	this->evaluateEnabledState();
 }
 
-void ot::Widget::lockWidget(const LockTypeFlags& _flags, int _lockCount) {
-	for (LockTypeFlag flag : ot::getAllLockTypeFlags()) {
+void ot::Widget::lockWidget(const LockTypes& _flags, int _lockCount) {
+	for (LockType flag : ot::getAllLockTypes()) {
 		if (_flags.flagIsSet(flag)) this->lockWidgetFlag(flag, _lockCount);
 	}
 	this->evaluateEnabledState();
 }
 
-void ot::Widget::unlockWidget(const LockTypeFlags& _flags, int _unlockCount) {
-	for (LockTypeFlag flag : ot::getAllLockTypeFlags()) {
+void ot::Widget::unlockWidget(const LockTypes& _flags, int _unlockCount) {
+	for (LockType flag : ot::getAllLockTypes()) {
 		if (_flags.flagIsSet(flag)) this->unlockWidgetFlag(flag, _unlockCount);
 	}
 	this->evaluateEnabledState();
@@ -52,13 +52,13 @@ void ot::Widget::resetWidgetLockCounter(void) {
 
 // Private
 
-void ot::Widget::lockWidgetFlag(LockTypeFlag _flag, int _lockCount) {
+void ot::Widget::lockWidgetFlag(LockType _flag, int _lockCount) {
 	int& ct = this->getLockCounter(_flag);
 	ct = ct + _lockCount;
 	this->evaluateEnabledState();
 }
 
-void ot::Widget::unlockWidgetFlag(LockTypeFlag _flag, int _unlockCount) {
+void ot::Widget::unlockWidgetFlag(LockType _flag, int _unlockCount) {
 	int& ct = this->getLockCounter(_flag);
 	ct = ct - _unlockCount;
 	this->evaluateEnabledState();
@@ -85,7 +85,7 @@ void ot::Widget::evaluateEnabledState(void) {
 	}
 }
 
-int& ot::Widget::getLockCounter(LockTypeFlag _flag) {
+int& ot::Widget::getLockCounter(LockType _flag) {
 	auto it = m_lockCounter.find(_flag);
 	if (it == m_lockCounter.end()) {
 		m_lockCounter.insert_or_assign(_flag, 0);

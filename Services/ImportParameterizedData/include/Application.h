@@ -78,7 +78,7 @@ private:
 	Application();
 
 	std::mutex m_onlyOneActionPerTime;
-	UILockWrapper* m_twoPartsAction = nullptr;
+	ot::UILockWrapper* m_twoPartsAction = nullptr;
 
 	ot::ToolBarButtonCfg m_buttonImportTouchstone;
 	

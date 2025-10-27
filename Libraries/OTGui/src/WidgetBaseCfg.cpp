@@ -6,10 +6,10 @@
 // OpenTwin header
 #include "OTGui/WidgetBaseCfg.h"
 
-ot::WidgetBaseCfg::WidgetBaseCfg() : m_lockFlags(LockTypeFlag::All) {}
+ot::WidgetBaseCfg::WidgetBaseCfg() : m_lockFlags(LockType::All) {}
 
 ot::WidgetBaseCfg::WidgetBaseCfg(const std::string& _name)
-	: m_lockFlags(LockTypeFlag::All), m_name(_name) {}
+	: m_lockFlags(LockType::All), m_name(_name) {}
 
 ot::WidgetBaseCfg::~WidgetBaseCfg() {}
 
@@ -22,5 +22,5 @@ void ot::WidgetBaseCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 void ot::WidgetBaseCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_name = json::getString(_object, "Name");
 	m_toolTip = json::getString(_object, "ToolTip");
-	m_lockFlags = stringListToLockTypeFlags(json::getStringList(_object, "LockFlags"));
+	m_lockFlags = stringListToLockTypes(json::getStringList(_object, "LockFlags"));
 }

@@ -42,12 +42,12 @@ std::string MeshImport::getFileExtensions(void)
 
 void MeshImport::importMesh(const std::string& meshName, const std::string& originalName, const std::string& content, ot::UID uncompressedDataLength)
 {
-	ot::LockTypeFlags lockFlags;
+	ot::LockTypes lockFlags;
 
-	lockFlags.setFlag(ot::LockTypeFlag::ModelWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::NavigationWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::ViewWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::Properties);
+	lockFlags.setFlag(ot::LockType::ModelWrite);
+	lockFlags.setFlag(ot::LockType::NavigationWrite);
+	lockFlags.setFlag(ot::LockType::ViewWrite);
+	lockFlags.setFlag(ot::LockType::Properties);
 
 	application->getUiComponent()->lockUI(lockFlags);
 	application->getUiComponent()->setProgressInformation("Reading mesh file", true);

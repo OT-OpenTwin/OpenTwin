@@ -559,22 +559,22 @@ void GmshMeshCreation::setUILock(bool flag, lockType type)
 		{
 			if (count == 0)
 			{
-				ot::LockTypeFlags f;
+				ot::LockTypes f;
 
 				switch (type)
 				{
 				case ANY_OPERATION:
-					f.setFlag(ot::LockTypeFlag::All);
+					f.setFlag(ot::LockType::All);
 					break;
 				case MODEL_CHANGE:
-					f.setFlag(ot::LockTypeFlag::ModelWrite);
-					f.setFlag(ot::LockTypeFlag::NavigationWrite);
-					f.setFlag(ot::LockTypeFlag::ViewWrite);
-					f.setFlag(ot::LockTypeFlag::Properties);
+					f.setFlag(ot::LockType::ModelWrite);
+					f.setFlag(ot::LockType::NavigationWrite);
+					f.setFlag(ot::LockType::ViewWrite);
+					f.setFlag(ot::LockType::Properties);
 					break;
 				default:
 					assert(0); // Unknown lock type
-					f.setFlag(ot::LockTypeFlag::All);
+					f.setFlag(ot::LockType::All);
 				}
 
 				application->getUiComponent()->lockUI(f);
@@ -591,22 +591,22 @@ void GmshMeshCreation::setUILock(bool flag, lockType type)
 
 				if (count == 0)
 				{
-					ot::LockTypeFlags f;
+					ot::LockTypes f;
 
 					switch (type)
 					{
 					case ANY_OPERATION:
-						f.setFlag(ot::LockTypeFlag::All);
+						f.setFlag(ot::LockType::All);
 						break;
 					case MODEL_CHANGE:
-						f.setFlag(ot::LockTypeFlag::ModelWrite);
-						f.setFlag(ot::LockTypeFlag::NavigationWrite);
-						f.setFlag(ot::LockTypeFlag::ViewWrite);
-						f.setFlag(ot::LockTypeFlag::Properties);
+						f.setFlag(ot::LockType::ModelWrite);
+						f.setFlag(ot::LockType::NavigationWrite);
+						f.setFlag(ot::LockType::ViewWrite);
+						f.setFlag(ot::LockType::Properties);
 						break;
 					default:
 						assert(0); // Unknown lock type
-						f.setFlag(ot::LockTypeFlag::All);
+						f.setFlag(ot::LockType::All);
 					}
 
 					application->getUiComponent()->unlockUI(f);

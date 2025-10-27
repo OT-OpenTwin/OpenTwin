@@ -33,8 +33,8 @@ namespace ot {
 
 		Widget* findWidget(const std::string& _name) const;
 
-		void lock(const BasicServiceInformation& _owner, const ot::LockTypeFlags& _lockFlags);
-		void unlock(const BasicServiceInformation& _owner, const ot::LockTypeFlags& _lockFlags);
+		void lock(const BasicServiceInformation& _owner, const ot::LockTypes& _lockFlags);
+		void unlock(const BasicServiceInformation& _owner, const ot::LockTypes& _lockFlags);
 
 	protected:
 		virtual void objectWasDestroyed(OTObject* _object) override;
@@ -42,7 +42,7 @@ namespace ot {
 	private:
 		struct OwnerData {
 			std::list<Widget*> widgets;
-			std::map<LockTypeFlag, int> lockData;
+			std::map<LockType, int> lockData;
 		};
 
 		//! @brief Maps ObjectName to Widget.
@@ -52,14 +52,14 @@ namespace ot {
 		std::map<BasicServiceInformation, OwnerData> m_ownerData;
 
 		//! @brief Currently set locks.
-		std::map<LockTypeFlag, int> m_lockData;
+		std::map<LockType, int> m_lockData;
 
 		//! @brief Removes all entries related to the widget.
 		void clearWidgetInfo(Widget* _widget);
 
 		OwnerData& findOrCreateOwnerData(const BasicServiceInformation& _owner);
 
-		int& getLockCount(OwnerData& _ownerData, LockTypeFlag _lockFlag);
+		int& getLockCount(OwnerData& _ownerData, LockType _lockFlag);
 	};
 
 }

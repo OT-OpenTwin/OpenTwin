@@ -1097,20 +1097,20 @@ void AppBase::createUi() {
 			// Add default items to lock manager
 			auto lockManager = m_ExternalServicesComponent->lockManager();
 
-			ot::LockTypeFlags f(ot::LockTypeFlag::All);
-			f.setFlag(ot::LockTypeFlag::ModelWrite);
+			ot::LockTypes f(ot::LockType::All);
+			f.setFlag(ot::LockType::ModelWrite);
 			lockManager->registerLockable(this->getBasicServiceInformation(), m_welcomeScreen, f);
 
-			f.setFlag(ot::LockTypeFlag::Properties);
+			f.setFlag(ot::LockType::Properties);
 			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_propertyGrid->getPropertyGrid(), f);
 
 			if (m_graphicsPicker) {
 				lockManager->uiViewCreated(this->getBasicServiceInformation(), m_graphicsPicker, f);
 			}
 
-			f.removeFlag(ot::LockTypeFlag::Properties);
-			f.setFlag(ot::LockTypeFlag::NavigationAll);
-			f.setFlag(ot::LockTypeFlag::NavigationWrite);
+			f.removeFlag(ot::LockType::Properties);
+			f.setFlag(ot::LockType::NavigationAll);
+			f.setFlag(ot::LockType::NavigationWrite);
 			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_projectNavigation->getTree(), f);
 
 			// Update status
@@ -1286,7 +1286,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 		this->connect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 		this->connect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
 		
-		this->lockManager()->uiElementCreated(this->getViewerComponent()->getBasicServiceInformation(), m_versionGraph->getVersionGraphManager()->getGraph(), ot::LockTypeFlag::All | ot::LockTypeFlag::ModelWrite);
+		this->lockManager()->uiElementCreated(this->getViewerComponent()->getBasicServiceInformation(), m_versionGraph->getVersionGraphManager()->getGraph(), ot::LockType::All | ot::LockType::ModelWrite);
 		
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph, ot::WidgetView::KeepCurrentFocus, m_output);
 	}
@@ -1903,7 +1903,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	graphics->getGraphicsScene()->setGridLineStyle(newOutline);
 
 	//m_ExternalServicesComponent->service
-	this->lockManager()->uiElementCreated(_serviceInfo, graphics, ot::LockTypeFlag::All | ot::LockTypeFlag::ModelWrite);
+	this->lockManager()->uiElementCreated(_serviceInfo, graphics, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_graphicsViews.insert_or_assign(_entityName, newEditor);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
@@ -1972,7 +1972,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	ot::TextEditor* textEdit = newEditor->getTextEditor();
 	textEdit->setupFromConfig(_config, true);
 
-	this->lockManager()->uiElementCreated(_serviceInfo, textEdit, ot::LockTypeFlag::All | ot::LockTypeFlag::ModelWrite);
+	this->lockManager()->uiElementCreated(_serviceInfo, textEdit, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
@@ -2044,7 +2044,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 	newTable->getTable()->setMultilineCells(true);
 	newTable->getTable()->setupFromConfig(_config);
 
-	this->lockManager()->uiViewCreated(_serviceInfo, newTable, ot::LockTypeFlag::All | ot::LockTypeFlag::ModelWrite);
+	this->lockManager()->uiViewCreated(_serviceInfo, newTable, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_tables.insert_or_assign(_config.getEntityName(), newTable);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newTable, _viewInsertFlags);
@@ -2108,7 +2108,7 @@ ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::Bas
 	newPlot->setViewData(_config);
 	this->addVisualizingEntityInfoToView(newPlot, _visualizingEntities);
 
-	this->lockManager()->uiViewCreated(_serviceInfo, newPlot, ot::LockTypeFlag::All | ot::LockTypeFlag::ModelWrite);
+	this->lockManager()->uiViewCreated(_serviceInfo, newPlot, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_plots.insert_or_assign(_config.getEntityName(), newPlot);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newPlot, _viewInsertFlags);
@@ -3710,7 +3710,7 @@ void AppBase::activateModelVersionAPI(const std::string& _versionName) {
 // Public: Connector API slots
 
 void AppBase::slotLockUI(bool flag) {
-	ot::LockTypeFlags lockFlags(ot::LockTypeFlag::All);
+	ot::LockTypes lockFlags(ot::LockType::All);
 
 	if (flag) {
 		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
@@ -3723,11 +3723,11 @@ void AppBase::slotLockUI(bool flag) {
 }
 
 void AppBase::slotLockSelectionAndModification(bool flag) {
-	ot::LockTypeFlags lockFlags;
-	lockFlags.setFlag(ot::LockTypeFlag::ModelWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::ModelRead);
-	lockFlags.setFlag(ot::LockTypeFlag::ViewWrite);
-	lockFlags.setFlag(ot::LockTypeFlag::NavigationWrite);
+	ot::LockTypes lockFlags;
+	lockFlags.setFlag(ot::LockType::ModelWrite);
+	lockFlags.setFlag(ot::LockType::ModelRead);
+	lockFlags.setFlag(ot::LockType::ViewWrite);
+	lockFlags.setFlag(ot::LockType::NavigationWrite);
 
 	if (flag) {
 		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);

@@ -64,7 +64,7 @@ Application& Application::instance() {
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
-	ot::LockTypeFlags lockTypes(ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ViewWrite | ot::LockTypeFlag::ModelRead);
+	ot::LockTypes lockTypes(ot::LockType::ModelWrite | ot::LockType::ViewWrite | ot::LockType::ModelRead);
 
 	_ui->addMenuPage("Modeling");
 	_ui->addMenuGroup("Modeling", "Import");
@@ -491,7 +491,7 @@ Application::Application() :
 	connectAction(OT_ACTION_CMD_MODEL_CreateGeometryFromRubberbandData, this, &Application::handleCreateGeometryFromRubberband);
 
 	// Setup and connect buttons
-	ot::LockTypeFlags lockTypes = ot::LockTypeFlag::ModelWrite | ot::LockTypeFlag::ViewWrite | ot::LockTypeFlag::ModelRead;
+	ot::LockTypes lockTypes = ot::LockType::ModelWrite | ot::LockType::ViewWrite | ot::LockType::ModelRead;
 
 	m_buttonImportStep = ot::ToolBarButtonCfg("Modeling", "Import", "Import STEP", "Default/Import");
 	m_buttonImportStep.setButtonLockFlags(lockTypes).setButtonKeySequence("Ctrl+O");

@@ -203,6 +203,7 @@
     <ClCompile Include="src\MessageQueueHandler.cpp" />
     <ClCompile Include="src\ProgressUpdater.cpp" />
     <ClCompile Include="src\PythonServiceInterface.cpp" />
+    <ClCompile Include="src\UILockWrapper.cpp" />
     <ClCompile Include="src\UserCredentials.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ExternalServicesComponent.cpp" />

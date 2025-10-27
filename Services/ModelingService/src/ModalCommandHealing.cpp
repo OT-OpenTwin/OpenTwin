@@ -25,7 +25,7 @@ ModalCommandHealing::~ModalCommandHealing()
 {
 }
 
-std::string ModalCommandHealing::initializeAndCreateUI(const ot::LockTypeFlags& modelRead, const ot::LockTypeFlags& modelWrite)
+std::string ModalCommandHealing::initializeAndCreateUI(const ot::LockTypes& modelRead, const ot::LockTypes& modelWrite)
 {
 	addMenuPage("Healing");
 	addMenuGroup("Healing", "Settings");
