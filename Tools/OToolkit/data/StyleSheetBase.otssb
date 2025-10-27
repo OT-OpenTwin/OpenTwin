@@ -1008,12 +1008,6 @@ QPushButton {
     border-radius: %double:Border Radius Big%;
 }
 
-QPushButton:disabled {
-    background-color: %color:Input Background%;
-    color: %color:Widget Disabled Foreground%;
-    border-radius: %double:Border Radius Big%;
-}
-
 QPushButton:checked {
     background-color: %color:Widget Background%;
     outline: none;
@@ -1055,6 +1049,12 @@ QPushButton::menu-indicator {
 
 QDialogButtonBox QPushButton {
     min-width: 80px;
+}
+
+QPushButton:disabled {
+    background-color: %color:Input Disabled Background%;
+    color: %color:Input Disabled Foreground%;
+    border-radius: %double:Border Radius Big%;
 }
 
 ot--PushButton {

@@ -149,7 +149,9 @@ namespace ot {
 				{ ot::ColorStyleValueEntry::HeaderSelectionForeground, "Header Selection Foreground" },
 
 				{ ot::ColorStyleValueEntry::InputBackground, "Input Background" },
+				{ ot::ColorStyleValueEntry::InputDisabledBackground, "Input Disabled Background" },
 				{ ot::ColorStyleValueEntry::InputForeground, "Input Foreground" },
+				{ ot::ColorStyleValueEntry::InputDisabledForeground, "Input Disabled Foreground" },
 
 				{ ot::ColorStyleValueEntry::TextEditorLineBorder, "TextEditor Line Border" },
 				{ ot::ColorStyleValueEntry::TextEditorHighlightBackground, "TextEditor Highlight Background" },

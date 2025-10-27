@@ -185,7 +185,9 @@ namespace ot {
 		HeaderSelectionForeground,
 
 		InputBackground,
+		InputDisabledBackground,
 		InputForeground,
+		InputDisabledForeground,
 
 		TextEditorLineBorder,
 		TextEditorHighlightBackground,

@@ -393,7 +393,9 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderSelectionForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputDisabledBackground), new PropertyPainter2D(new FillPainter2D(Color(230, 230, 230))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputDisabledForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetAlternateBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
@@ -611,7 +613,9 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderSelectionForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputBackground), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputDisabledBackground), new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputForeground), new PropertyPainter2D(new FillPainter2D(Color(White))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputDisabledForeground), new PropertyPainter2D(new FillPainter2D(Color(White))));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetAlternateBackground), new PropertyPainter2D(new FillPainter2D(Color(40, 40, 40))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
@@ -830,7 +834,9 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderSelectionForeground), new PropertyPainter2D(new FillPainter2D(Color(White))));
 	
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputDisabledBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 44, 108))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputForeground), new PropertyPainter2D(new FillPainter2D(Color(White))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputDisabledForeground), new PropertyPainter2D(new FillPainter2D(Color(White))));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetAlternateBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 80, 140))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
