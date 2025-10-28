@@ -116,7 +116,7 @@ void ot::ProjectOverviewWidget::refreshProjects() {
 	
 	std::list<ot::ProjectInformation> projects;
 	ProjectManagement projectManager(app->getCurrentLoginData());
-	projectManager.findProjects(m_generalFilter.toStdString(), 100, projects, m_resultsExceeded);
+	projectManager.findProjects(m_generalFilter.toStdString(), 0, projects, m_resultsExceeded);
 
 	for (const ot::ProjectInformation& proj : projects) {
 		std::string editorName("< Unknown >");

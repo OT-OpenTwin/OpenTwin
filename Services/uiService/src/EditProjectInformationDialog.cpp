@@ -307,7 +307,7 @@ void EditProjectInformationDialog::initializeData() {
 	QStringList categories;
 	std::list<ot::ProjectInformation> projects;
 	bool exceeded = false;
-	if (projectManager.findProjects("", 1000, projects, exceeded)) {
+	if (projectManager.findProjects("", 0, projects, exceeded)) {
 		for (const ot::ProjectInformation& proj : projects) {
 			const std::string& category = proj.getCategory();
 			if (!category.empty() && !categories.contains(QString::fromStdString(category))) {

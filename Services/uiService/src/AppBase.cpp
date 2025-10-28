@@ -1718,6 +1718,9 @@ void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 	}
 
 	// Properties with the "ProjectList" special type need to get the project list set by the frontend
+	bool projectsFetched = false;
+	std::list<std::string> userProjectNames;
+
 	std::list<ot::Property*> projListProps = _configuration.findPropertiesBySpecialType("ProjectList");
 	for (ot::Property* p : projListProps) {
 		ot::PropertyStringList* actualProp = dynamic_cast<ot::PropertyStringList*>(p);
@@ -1726,11 +1729,21 @@ void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 			continue;
 		}
 
-		std::list<ot::ProjectInformation> userProjects = m_ExternalServicesComponent->GetAllUserProjects();
-		std::list<std::string> userProjectNames;
-		for (const ot::ProjectInformation& pi : userProjects) {
-			userProjectNames.push_back(pi.getProjectName());
+		if (!projectsFetched) {
+			ProjectManagement pm(m_loginData);
+			std::list<ot::ProjectInformation> userProjects;
+			bool tmp = false;
+			if (pm.findProjects("", 0, userProjects, tmp)) {
+				for (const ot::ProjectInformation& pi : userProjects) {
+					userProjectNames.push_back(pi.getProjectName());
+				}
+				projectsFetched = true;
+			}
+			else {
+				OT_LOG_E("Failed to fetch user projects information");
+			}
 		}
+		
 		actualProp->setList(userProjectNames);
 	}
 
