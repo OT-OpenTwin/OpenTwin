@@ -153,12 +153,28 @@ public:
 	//! @param _imageData The image data to add.
 	bool addPreviewImage(std::vector<char>&& _imageData, ot::ImageFileFormat _format);
 
+	//! @brief Removes the current project preview image if one exists.
+	void removePreviewImage();
+
 	//! @brief Reads the current project preview image of the project.
 	//! @param _collectionName The name of the project collection to read the preview image from.
 	//! @param _imageData The image data read.
 	//! @param _format The image format read.
 	//! @return True on success, false if the project has no preview image or an error occurred.
 	static bool readProjectPreviewImage(const std::string& _collectionName, std::vector<char>& _imageData, ot::ImageFileFormat _format);
+
+	//! @brief Adds or updates the project description.
+	//! @param _description The project description to add.
+	bool addProjectDescription(const std::string& _description, ot::DocumentSyntax _syntax);
+
+	//! @brief Removes the current project description if one exists.
+	void removeProjectDescription();
+
+	//! @brief Reads the current project description.
+	//! @param _collectionName The name of the project collection to read the description from.
+	//! @param _description The project description read.
+	//! @return True on success, false if no description is found or an error occurred.
+	static bool readProjectDescription(const std::string& _collectionName, std::string& _description, ot::DocumentSyntax& _syntax);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -223,11 +239,17 @@ private:
 	// Determine whether a given version is part of the given branch
 	bool isVersionInBranch(const std::string &version, const std::string &branch);
 
-	//! @brief Reads the project preview information from the given document view.
-	//! If no preview information is found, the preview image UID will be set to invalid.
+	//! @brief Reads additional project information from the given document view.
+	//! Additional project information includes:
+	//! 
+	//! - Preview image UID/Version/Format
+	//! 
+	//! - Description UID/Version/Syntax
+	//! 
+	//! Will clear the UID/version information of the additional information entries if no information is found in the document.
 	//! @param _documentView The document view to read the information from.
 	//! @return True on success, false otherwise.
-	bool readProjectPreviewInformation(bsoncxx::v_noabi::document::view& _documentView);
+	bool readAdditionalProjectInformation(bsoncxx::v_noabi::document::view& _documentView);
 
 	// Get the parent branch of the given branch (remove the part after the last .)
 	std::string getParentBranch(const std::string &branch);
@@ -314,6 +336,15 @@ private:
 
 	//! @brief The preview image format.
 	ot::ImageFileFormat m_previewImageFormat;
+
+	//! @brief The description entity UID.
+	ot::UID m_descriptionUID;
+
+	//! @brief The description entity version.
+	ot::UID m_descriptionVersion;
+
+	//! @brief The syntax of the project description.
+	ot::DocumentSyntax m_descriptionSyntax;
 
 	// The member for creation of Unique IDs
 	DataStorageAPI::UniqueUIDGenerator* m_uniqueUIDGenerator;
