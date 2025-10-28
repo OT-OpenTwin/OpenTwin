@@ -139,13 +139,6 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	m_deleteButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonHandler.connectToolBarButton(m_deleteButton, this, &Model::handleDeleteSelectedShapes);
 	
-	m_uploadProjectPreviewImage = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Edit", "Upload Preview Image", "ToolBar/AddImage");
-	m_uploadProjectPreviewImage.setButtonLockFlags(ot::LockType::ModelRead | ot::LockType::ModelWrite);
-	m_buttonHandler.connectToolBarButton(m_uploadProjectPreviewImage, this, &Model::handleRequestUploadProjectPreviewImage);
-
-	// Connect action handlers
-	m_actionHandler.connectAction(OT_ACTION_CMD_AddProjectPreviewImage, this, &Model::handleAddProjectPreviewImage);
-
 	// Create a new project structure
 	resetToNew();
 
@@ -370,7 +363,6 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 	_ui->addMenuButton(m_undoButton);
 	_ui->addMenuButton(m_redoButton);
 	_ui->addMenuButton(m_deleteButton);
-	_ui->addMenuButton(m_uploadProjectPreviewImage);
 
 	if (this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL) {
 		// Add pages, groups and buttons for non-hierarchical projects
@@ -385,9 +377,9 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 
 		_ui->addMenuButton(m_infoButton);
 		_ui->addMenuButton(m_createParameterButton);
-
-		Application::instance()->addButtons();
 	}
+
+	Application::instance()->addButtons();
 
 	uiCreated = true;
 
@@ -861,48 +853,6 @@ void Model::handleCreateNewParameter()
 	enableQueuingHttpRequests(false);
 }
 
-void Model::handleAddProjectPreviewImage(ot::JsonDocument& _document) {
-	if (!stateManager) {
-		OT_LOG_E("Model state manager is not available");
-		return;
-	}
-
-	std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
-
-	// Determine file type
-	size_t ix = fileName.rfind('.');
-	if (ix == std::string::npos) {
-		OT_LOG_EAS("File name does not contain an extension, can not determine file type. { \"FileName\": \"" + fileName + "\" }");
-		return;
-	}
-	std::string extensionStr = fileName.substr(ix + 1);
-	ot::FileExtension::DefaultFileExtension extension = ot::FileExtension::stringToFileExtension(extensionStr);
-	if (extension == ot::FileExtension::Unknown) {
-		OT_LOG_EAS("File extension \"" + extensionStr + "\" is not supported. { \"FileName\": \"" + fileName + "\" }");
-		return;
-	}
-
-	bool isImage = false;
-	ot::ImageFileFormat imageFormat = ot::FileExtension::toImageFileFormat(extension, isImage);
-	if (!isImage) {
-		OT_LOG_EAS("File extension \"" + extensionStr + "\" is not a supported image format. { \"FileName\": \"" + fileName + "\" }");
-		return;
-	}
-
-	std::string content = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
-	int64_t uncompressedDataLength = ot::json::getInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
-	std::string fileFilter = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
-
-	std::string unpacked = ot::String::decompressedBase64(content, uncompressedDataLength);
-	std::vector<char> imageData(unpacked.begin(), unpacked.end());
-
-	if (stateManager->addPreviewImage(std::move(imageData), imageFormat)) {
-		if (Application::instance()->isUiConnected()) {
-			Application::instance()->getUiComponent()->displayMessage("Project image set successfully\n");
-		}
-	}
-}
-
 EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 {
 	EntityContainer *entityParameterRoot = dynamic_cast<EntityContainer*>(findEntityFromName(getParameterRootName()));
@@ -1299,11 +1249,6 @@ void Model::handleDeleteSelectedShapes()
 
 	setModified();
 	modelChangeOperationCompleted("delete objects");
-}
-
-void Model::handleRequestUploadProjectPreviewImage() {
-	std::string fileFilter = ot::FileExtension::toFilterString({ ot::FileExtension::Png, ot::FileExtension::Jpeg, ot::FileExtension::Svg });
-	ot::Frontend::requestFileForReading(OT_ACTION_CMD_AddProjectPreviewImage, "Upload Project Preview Image", fileFilter, true, false);
 }
 
 void Model::removeShapesFromVisualization(std::list<ot::UID> &removeFromDisplay)

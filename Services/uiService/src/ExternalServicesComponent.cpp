@@ -162,6 +162,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	connectAction(OT_ACTION_CMD_SetLogFlags, this, &ExternalServicesComponent::handleSetLogFlags);
 	connectAction(OT_ACTION_CMD_Compound, this, &ExternalServicesComponent::handleCompound);
 	connectAction(OT_ACTION_CMD_Run, this, &ExternalServicesComponent::handleRun);
+	connectAction(OT_ACTION_CMD_EditProjectInformation, this, &ExternalServicesComponent::handleEditProjectInformation);
 
 	// Shutdown handling
 	connectAction(OT_ACTION_CMD_ServiceShutdown, this, &ExternalServicesComponent::handleShutdown);
@@ -1138,8 +1139,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		m_currentSessionID = _projectName;
 		m_currentSessionID.append(":").append(_collectionName);
-		AppBase::instance()->SetCollectionName(_collectionName);
-
+		
 		// Request a session service from the global session service
 		ot::JsonDocument gssDoc;
 		gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CreateNewSession, gssDoc.GetAllocator()), gssDoc.GetAllocator());
@@ -1164,8 +1164,11 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		OT_LOG_D("GSS provided the LSS at \"" + m_sessionServiceURL + "\"");
 
-		app->setCurrentProjectName(_projectName);
-		app->setCurrentProjectType(_projectType);
+		ot::ProjectInformation projectInfo;
+		projectInfo.setProjectName(_projectName);
+		projectInfo.setCollectionName(_collectionName);
+		projectInfo.setProjectType(_projectType);
+		app->setCurrentProjectInfo(projectInfo);
 
 		// ##################################################################
 
@@ -1365,9 +1368,10 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		app->initializeDefaultUserSettings();
 
-		OT_LOG_D("Closing project { \"Name\": \"" + app->getCurrentProjectName() + "\", \"SaveChanges\": " + (_saveChanges ? "true" : "false") + " }");
+		std::string projectName = app->getCurrentProjectInfo().getProjectName();
 
-		std::string projectName = app->getCurrentProjectName();
+		OT_LOG_D("Closing project { \"Name\": \"" + projectName + "\", \"SaveChanges\": " + (_saveChanges ? "true" : "false") + " }");
+
 		if (projectName.length() == 0) {
 			return;
 		}
@@ -1940,6 +1944,14 @@ void ExternalServicesComponent::handleCompound(ot::JsonDocument& _document) {
 
 void ExternalServicesComponent::handleRun(ot::JsonDocument& _document) {
 
+}
+
+void ExternalServicesComponent::handleEditProjectInformation(ot::JsonDocument& _document) {
+	m_actionProfiler.ignoreCurrent();
+
+	std::string callbackAction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
+
+	AppBase::instance()->editCurrentProjectInformation(callbackAction);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -2539,7 +2551,7 @@ void ExternalServicesComponent::handleCreateModel(ot::JsonDocument& _document) {
 
 	// Create a model and a view
 	ModelUIDtype modelID = app->createModel();
-	ViewerUIDtype viewID = app->createView(modelID, app->getCurrentProjectName());
+	ViewerUIDtype viewID = app->createView(modelID, app->getCurrentProjectInfo().getProjectName());
 	app->getViewerComponent()->activateModel(modelID);
 
 	auto service = m_serviceIdMap.find(ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID));
@@ -2583,7 +2595,7 @@ void ExternalServicesComponent::handleCreateView(ot::JsonDocument& _document) {
 	ot::JsonDocument docOut;
 	docOut.SetObject();
 	docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, manager->createView(ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID),
-		AppBase::instance()->getCurrentProjectName()), docOut.GetAllocator());
+		AppBase::instance()->getCurrentProjectInfo().getProjectName()), docOut.GetAllocator());
 }
 
 void ExternalServicesComponent::handleAddSceneNode(ot::JsonDocument& _document) {
@@ -3443,7 +3455,7 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 		plot->clear(true);
 
 		// Create curves
-		const std::string collectionName = AppBase::instance()->getCollectionName();
+		const std::string collectionName = AppBase::instance()->getCurrentProjectInfo().getCollectionName();
 		CurveDatasetFactory curveFactory(collectionName);
 
 		ot::ConstJsonArray curveCfgs = ot::json::getArray(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs);
@@ -4171,14 +4183,14 @@ void ExternalServicesComponent::handleStudioSuiteAction(ot::JsonDocument& _docum
 	m_actionProfiler.ignoreCurrent();
 
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName());
+	StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectInfo().getProjectName());
 }
 
 void ExternalServicesComponent::handleLTSpiceAction(ot::JsonDocument& _document) {
 	m_actionProfiler.ignoreCurrent();
 
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName());
+	LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectInfo().getProjectName());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

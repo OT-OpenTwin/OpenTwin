@@ -8,14 +8,15 @@
 
 // OpenTwin header
 #include "OTServiceFoundation/ApplicationBase.h"
-#include "SelectionHandler.h"
 #include "FileHandler.h"
-#include "ViewVisualisationHandler.h"
-#include "CopyPasteHandler.h"
 #include "PlotHandler.h"
-#include "MaterialHandler.h"
 #include "BlockHandler.h"
+#include "MaterialHandler.h"
+#include "SelectionHandler.h"
+#include "CopyPasteHandler.h"
+#include "ViewVisualisationHandler.h"
 #include "LibraryManagementWrapper.h"
+#include "ProjectInformationHandler.h"
 
 // std header
 #include <list>
@@ -225,6 +226,7 @@ private:
 	SelectionHandler m_selectionHandler;
 	MicroserviceNotifier* m_notifier;
 	
+	ProjectInformationHandler m_projectInformationHandler;
 	FileHandler m_fileHandler;
 	PlotHandler m_plotHandler;
 	MaterialHandler m_materialHandler;

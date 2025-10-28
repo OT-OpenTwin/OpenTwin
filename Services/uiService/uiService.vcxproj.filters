@@ -188,6 +188,9 @@
     <ClCompile Include="src\ProjectOverviewPreviewData.cpp">
       <Filter>Source Files\ProjectOverview</Filter>
     </ClCompile>
+    <ClCompile Include="src\EditProjectInformationDialog.cpp">
+      <Filter>Source Files\CustomWidgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -335,6 +338,9 @@
     </QtMoc>
     <QtMoc Include="include\ProjectOverviewPreviewBox.h">
       <Filter>Header Files\ProjectOverview</Filter>
+    </QtMoc>
+    <QtMoc Include="include\EditProjectInformationDialog.h">
+      <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

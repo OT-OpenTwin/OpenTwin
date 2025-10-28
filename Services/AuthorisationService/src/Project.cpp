@@ -39,6 +39,8 @@ ot::ProjectInformation Project::toProjectInformation() const {
 	info.setUserName(m_creatingUser.username);
 	info.setCreationTime(m_createdOn);
 	info.setLastAccessTime(m_lastAccessedOn);
+	info.setTags(m_tags);
+	info.setCategory(m_category);
 
 	for (const Group& group : m_groups) {
 		info.addGroup(group.name);
@@ -70,13 +72,26 @@ void Project::importData(const bsoncxx::v_noabi::document::view& _view) {
 		m_version = -1;
 	}
 
-	try {
-		auto tagsArr = _view["tags"].get_array().value;
-		for (const auto& tag : tagsArr) {
-			m_tags.push_back(std::string(tag.get_utf8().value.data()));
+	auto tagsIt = _view.find("tags");
+	if (tagsIt != _view.end()) {
+		if (tagsIt->type() == bsoncxx::v_noabi::type::k_array) {
+			auto tagsArr = tagsIt->get_array().value;
+			for (const auto& tag : tagsArr) {
+				m_tags.push_back(std::string(tag.get_utf8().value.data()));
+			}
+		}
+		else {
+			OT_LOG_E("Invalid tags format");
 		}
 	}
-	catch (...) {
-		m_tags.clear();
+
+	auto categoryIt = _view.find("category");
+	if (categoryIt != _view.end()) {
+		if (categoryIt->type() == bsoncxx::v_noabi::type::k_utf8) {
+			m_category = std::string(categoryIt->get_utf8().value.data());
+		}
+		else {
+			OT_LOG_E("Invalid category format");
+		}
 	}
 }

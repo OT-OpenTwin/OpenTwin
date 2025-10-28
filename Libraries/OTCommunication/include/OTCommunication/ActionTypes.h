@@ -59,7 +59,7 @@
 #define OT_ACTION_CMD_GetVisualizationModel "VisualizationModel.Get"
 #define OT_ACTION_CMD_OpenNewProject "Project.OpenNew"
 
-#define OT_ACTION_CMD_AddProjectPreviewImage "Project.AddPreviewImage"
+#define OT_ACTION_CMD_EditProjectInformation "Project.EditInformation"
 
 #define OT_ACTION_CMD_Log "Log"
 #define OT_ACTION_CMD_SetGlobalLogFlags "Logger.SetGlobal"
@@ -820,7 +820,7 @@
 
 // Project Functionalities
 #define OT_ACTION_CREATE_PROJECT "CreateProject"
-#define OT_ACTION_SET_PROJECT_TAGS "SetProjectTags"
+#define OT_ACTION_UPDATE_PROJECT_ADDITIONALINFO "UpdateAdditionalProjectInfo"
 #define OT_ACTION_GET_PROJECT_DATA "GetProjectData"
 #define OT_ACTION_GET_ALL_PROJECT_INFO "GetAllProjectsInfo"
 #define OT_ACTION_GET_ALL_PROJECTS "GetAllProjects"

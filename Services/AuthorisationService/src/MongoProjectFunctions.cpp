@@ -56,25 +56,26 @@ namespace MongoProjectFunctions
 		return getProject(projectName, adminClient);
 	}
 
-	ot::ReturnMessage updateProjectTags(std::string _projectName, const std::list<std::string>& _tags, mongocxx::client& _adminClient) {
+	ot::ReturnMessage updateAdditionalProjectInformation(const ot::ProjectInformation& _projectInfo, mongocxx::client& _adminClient) {
 		mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 
 		// Create tag array
 		bsoncxx::builder::stream::array tagArray;
-		for (const std::string& tag : _tags) {
+		for (const std::string& tag : _projectInfo.getTags()) {
 			tagArray << tag;
 		}
 
 		// Filter
 		auto filterQuery = bsoncxx::builder::stream::document{}
-			<< "project_name" << _projectName
+			<< "project_name" << _projectInfo.getProjectName()
 			<< bsoncxx::builder::stream::finalize;
 
 		// Modify
 		auto modifyQuery = bsoncxx::builder::stream::document{}
 			<< "$set" << bsoncxx::builder::stream::open_document
 			<< "tags" << tagArray.view()
+			<< "category" << _projectInfo.getCategory()
 			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 		
 		// Perform update

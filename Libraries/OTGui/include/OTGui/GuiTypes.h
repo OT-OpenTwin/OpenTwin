@@ -202,7 +202,9 @@ namespace ot {
 	//! Mainly used for syntax highlighting.
 	enum class DocumentSyntax {
 		PlainText,
-		PythonScript
+		PythonScript,
+		Markdown,
+		HTML
 	};
 
 	OT_GUI_API_EXPORT std::string toString(DocumentSyntax _syntax);

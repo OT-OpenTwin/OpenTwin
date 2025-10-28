@@ -190,6 +190,7 @@ public:
 	void handleSetLogFlags(ot::JsonDocument& _document);
 	void handleCompound(ot::JsonDocument& _document);
 	void handleRun(ot::JsonDocument& _document);
+	void handleEditProjectInformation(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -62,6 +62,9 @@ public:
 	void setTags(const std::list<std::string>& _tags) { m_tags = _tags; };
 	const std::list<std::string>& getTags() const { return m_tags; };
 
+	void setCategory(const std::string& _category) { m_category = _category; };
+	const std::string& getCategory() const { return m_category; };
+
 	ot::ProjectInformation toProjectInformation() const;
 
 private:
@@ -76,6 +79,7 @@ private:
 	User m_creatingUser;
 	std::vector<Group> m_groups;
 	std::list<std::string> m_tags;
+	std::string m_category;
 	int m_version;
 	bsoncxx::types::b_date m_lastAccessedOn;
 };

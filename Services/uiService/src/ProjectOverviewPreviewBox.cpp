@@ -19,7 +19,7 @@ ot::ProjectOverviewPreviewBox::ProjectOverviewPreviewBox(QWidget* _parent)
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
 	m_imageWidget = new ot::ImagePainterWidget(this);
-	m_imageWidget->setFixedSize(255, 255);
+	m_imageWidget->setFixedSize(previewImageSize());
 	m_imageWidget->setInteractive(false);
 	mainLayout->addWidget(m_imageWidget, 0, Qt::AlignCenter);
 

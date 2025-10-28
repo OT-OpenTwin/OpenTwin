@@ -243,7 +243,6 @@ public:
 	//! @brief Will set the session service URL
 	void setSessionServiceURL(const std::string & _url);
 
-	void SetCollectionName(const std::string _collectionName);
 	void startSessionRefreshTimer();
 
 	void setViewHandlingFlag(ot::ViewHandlingFlag _flag, bool _active = true) { m_viewHandling.setFlag(_flag, _active); };
@@ -273,17 +272,8 @@ public:
 	//! @brief Will return the session service URL
 	const std::string & getSessionServiceURL() const { return m_sessionServiceURL; }
 
-	//! @brief Will return the current project name
-	const std::string & getCurrentProjectName() const { return m_currentProjectName; }
-
-	const std::string& getCurrentProjectType() const { return m_currentProjectType; };
-
-	//! @brief Will set the name of the currently active project
-	void setCurrentProjectName(const std::string & _name) { m_currentProjectName = _name; }
-
-	void setCurrentProjectType(const std::string& _type) { m_currentProjectType = _type; };
-
-	std::string getCollectionName() const { return m_collectionName; }
+	void setCurrentProjectInfo(const ot::ProjectInformation& _info) { m_currentProjectInfo = _info; }
+	const ot::ProjectInformation& getCurrentProjectInfo() const { return m_currentProjectInfo; }
 
 	void switchToViewMenuTabIfNeeded();
 
@@ -489,6 +479,8 @@ public:
 
 	bool openNewInstance(const ot::ProjectInformation& _projectInfo, const std::string& _customVersion);
 
+	void editCurrentProjectInformation(const std::string& _callbackAction);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Asynchronous callbacks
@@ -642,9 +634,7 @@ private:
 	std::string					m_uiServiceURL;
 	int							m_siteID;
 	std::string					m_relayURLs;
-	std::string					m_currentProjectName;
-	std::string					m_currentProjectType;
-	std::string					m_collectionName;
+	ot::ProjectInformation		m_currentProjectInfo;
 
 	std::string					m_currentUserCollection;
 	std::string					m_sessionServiceURL;

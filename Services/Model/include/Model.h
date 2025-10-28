@@ -292,7 +292,6 @@ private:
 	ot::ToolBarButtonCfg m_undoButton;
 	ot::ToolBarButtonCfg m_redoButton;
 	ot::ToolBarButtonCfg m_deleteButton;
-	ot::ToolBarButtonCfg m_uploadProjectPreviewImage;
 	ot::ToolBarButtonCfg m_infoButton;
 	ot::ToolBarButtonCfg m_saveButton;
 	ot::ToolBarButtonCfg m_createParameterButton;
@@ -300,14 +299,8 @@ private:
 	void handleUndoLastOperation();
 	void handleRedoNextOperation();
 	void handleDeleteSelectedShapes();
-	void handleRequestUploadProjectPreviewImage();
 	void handleShowSelectedShapeInformation();
 	void handleCreateNewParameter();
-
-	// Action handlers
-	ot::ActionHandler m_actionHandler;
-
-	void handleAddProjectPreviewImage(ot::JsonDocument& _document);
 
 	// Persistent attributes (need to be stored in data base)
 	EntityContainer               *entityRoot;
@@ -334,7 +327,6 @@ private:
 	std::string                    m_selectedVersion;
 
 	std::map<std::string, std::pair<double, EntityParameter*>>  parameterMap;
-
 
 	Model() = delete;
 	Model(const Model&) = delete;

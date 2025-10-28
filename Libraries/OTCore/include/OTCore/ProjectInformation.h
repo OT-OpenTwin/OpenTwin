@@ -54,6 +54,9 @@ namespace ot {
 		void setTags(const std::list<std::string>& _tags) { m_tags = _tags; };
 		const std::list<std::string>& getTags() const { return m_tags; };
 
+		void setCategory(const std::string& _category) { m_category = _category; };
+		const std::string& getCategory() const { return m_category; };
+
 	private:
 		int m_version;
 		std::string m_name;
@@ -64,5 +67,6 @@ namespace ot {
 		int64_t m_lastAccessTime;
 		std::list<std::string> m_groups;
 		std::list<std::string> m_tags;
+		std::string m_category;
 	};
 }

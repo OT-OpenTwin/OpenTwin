@@ -27,6 +27,7 @@
 #include "StartArgumentParser.h"
 #include "RenameProjectDialog.h"
 #include "ExternalServicesComponent.h"
+#include "EditProjectInformationDialog.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -362,8 +363,8 @@ std::shared_ptr<QSettings> AppBase::createSettingsInstance() const {
 // Component functions
 
 void AppBase::setCurrentProjectIsModified(bool _isModified) {
-	assert(m_currentProjectName.length());	// No project is open
-	QString title(m_currentProjectName.c_str());
+	assert(m_currentProjectInfo.getProjectName().length());	// No project is open
+	QString title(m_currentProjectInfo.getProjectName().c_str());
 	if (_isModified) {
 		uiAPI::window::setTitle(m_mainWindow, title.append(" [modified] - Open twin"));
 	}
@@ -458,7 +459,7 @@ bool AppBase::closeEvent() {
 
 	if (this->getCurrentProjectIsModified()) {
 		std::string msg("You have unsaved changes at the project \"" +
-			m_currentProjectName + 
+			m_currentProjectInfo.getProjectName() +
 			"\".\nDo you want to save them now?\nUnsaved changes will be lost.");
 
 		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "", "Exit Application", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
@@ -1171,9 +1172,9 @@ std::string AppBase::getDebugInformation() const {
 	doc.AddMember("UIUrl", JsonString(m_uiServiceURL, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember("SiteID", m_siteID, doc.GetAllocator());
 	doc.AddMember("RelayUrl", JsonString(m_relayURLs, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember("ProjectName", JsonString(m_currentProjectName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember("ProjectType", JsonString(m_currentProjectType, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember("CollectionName", JsonString(m_collectionName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("ProjectName", JsonString(m_currentProjectInfo.getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("ProjectType", JsonString(m_currentProjectInfo.getProjectType(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("CollectionName", JsonString(m_currentProjectInfo.getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 
 	doc.AddMember("UserCollection", JsonString(m_currentUserCollection, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember("SessionServiceURL", JsonString(m_sessionServiceURL, doc.GetAllocator()), doc.GetAllocator());
@@ -1304,7 +1305,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 
 
 	
-	std::string collectionName = AppBase::instance()->getCollectionName();
+	const std::string collectionName = AppBase::instance()->getCurrentProjectInfo().getCollectionName();
 	DataBase& dataBase = DataBase::instance();
 	
 	dataBase.setCollectionName(collectionName);
@@ -1394,11 +1395,6 @@ void AppBase::setSessionServiceURL(const std::string & _url) {
 	m_ExternalServicesComponent->setSessionServiceURL(m_sessionServiceURL);
 }
 
-void AppBase::SetCollectionName(const std::string _collectionName)
-{
-	m_collectionName = _collectionName;
-}
-
 void AppBase::setRelayURLs(const std::string & _url) {
 	m_relayURLs = _url;
 	m_ExternalServicesComponent->setMessagingRelay(m_relayURLs);
@@ -1454,13 +1450,12 @@ void AppBase::closeAllViewerTabs() {
 }
 
 void AppBase::clearSessionInformation() {
-	m_currentProjectName = "";
-	m_currentProjectType = "";
+	m_currentProjectInfo = ot::ProjectInformation();
 	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
 }
 
 void AppBase::restoreSessionState() {
-	if (m_currentProjectType.empty()) {
+	if (m_currentProjectInfo.getProjectType().empty()) {
 		OT_LOG_W("No project type set. Ignoring");
 		return;
 	}
@@ -1468,13 +1463,13 @@ void AppBase::restoreSessionState() {
 	UserManagement uM(m_loginData);
 
 	if (m_versionGraph) {
-		std::string mode = uM.restoreSetting(STATE_NAME_VERSIONVIEWMODE + std::string("_") + m_currentProjectType);
+		std::string mode = uM.restoreSetting(STATE_NAME_VERSIONVIEWMODE + std::string("_") + m_currentProjectInfo.getProjectType());
 		if (!mode.empty()) {
 			m_versionGraph->getVersionGraphManager()->setCurrentViewMode(ot::VersionGraphManager::stringToViewMode(mode));
 		}
 	}
 
-	std::string s = uM.restoreSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType);
+	std::string s = uM.restoreSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectInfo.getProjectType());
 	if (s.empty()) {
 		return;
 	}
@@ -1507,7 +1502,7 @@ void AppBase::storeSessionState() {
 		return;
 	}
 
-	if (m_currentProjectType.empty()) {
+	if (m_currentProjectInfo.getProjectType().empty()) {
 		OT_LOG_D("No project type set. Ignoring");
 		return;
 	}
@@ -1517,11 +1512,11 @@ void AppBase::storeSessionState() {
 	ViewStateCfg viewStateCfg;
 	viewStateCfg.setViewConfig(ot::WidgetViewManager::instance().saveState());
 	m_currentStateWindow.view = viewStateCfg.toJson();
-	uM.storeSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType, m_currentStateWindow.view);
+	uM.storeSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectInfo.getProjectType(), m_currentStateWindow.view);
 
 	if (m_versionGraph) {
 		std::string mode = ot::VersionGraphManager::viewModeToString(m_versionGraph->getVersionGraphManager()->getCurrentViewMode());
-		uM.storeSetting(STATE_NAME_VERSIONVIEWMODE + std::string("_") + m_currentProjectType, mode);
+		uM.storeSetting(STATE_NAME_VERSIONVIEWMODE + std::string("_") + m_currentProjectInfo.getProjectType(), mode);
 	}
 }
 
@@ -1586,7 +1581,7 @@ void AppBase::updateLogIntensityInfo() {
 bool AppBase::checkForContinue(const std::string& _title) {
 	if (m_ExternalServicesComponent->isCurrentModelModified()) {
 		std::string msg("Do you want to save the changes made to the project \"" + 
-			m_currentProjectName + 
+			m_currentProjectInfo.getProjectName() +
 			"\"?\nUnsaved changes will be lost.");
 
 		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "", _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
@@ -2262,6 +2257,11 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo, const 
 	return isOk;
 }
 
+void AppBase::editCurrentProjectInformation(const std::string& _callbackAction) {
+	EditProjectInformationDialog dia(m_loginData, m_currentProjectInfo, mainWindow());
+	dia.showDialog();
+}
+
 void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _pos) {
 	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
 	if (graphicsView == nullptr) {
@@ -2622,7 +2622,7 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 
 void AppBase::slotCopyRequested(const ot::CopyInformation& _info) {
 	ot::CopyInformation info(_info);
-	info.setOriginProjectName(m_currentProjectName);
+	info.setOriginProjectName(m_currentProjectInfo.getProjectName());
 	
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SelectedEntitiesSerialise, doc.GetAllocator()), doc.GetAllocator());
@@ -3027,7 +3027,7 @@ void AppBase::slotCreateProject() {
 	if (!checkForContinue("Create New Project")) { return; }
 
 	// Check whether the project is currently opened in other instance of the ui
-	if (currentName != m_currentProjectName) {
+	if (currentName != m_currentProjectInfo.getProjectName()) {
 		// We have not currently opened this project, check if it is opened elsewhere
 		std::string projectUser;
 		if (m_ExternalServicesComponent->projectIsOpened(currentName, projectUser)) {
@@ -3083,7 +3083,7 @@ void AppBase::slotCreateProject() {
 		}
 
 		// Check if the project it the same project as the currently open one
-		if (currentName == m_currentProjectName) {
+		if (currentName == m_currentProjectInfo.getProjectName()) {
 			m_ExternalServicesComponent->closeProject(false);
 			m_state &= (~AppState::ProjectOpenState);
 		}
@@ -3099,7 +3099,7 @@ void AppBase::slotCreateProject() {
 	userManager.storeSetting("CreateProject.Template", templateName);
 
 	// Close project
-	if (m_currentProjectName.length() > 0) {
+	if (m_currentProjectInfo.getProjectName().length() > 0) {
 		m_ExternalServicesComponent->closeProject(false);
 		m_state &= (~AppState::ProjectOpenState);
 	}
@@ -3128,7 +3128,7 @@ void AppBase::slotOpenSpecificProject(std::string _projectName, const std::strin
 
 	if (projectManager.projectExists(_projectName, canBeDeleted)) {
 		// Check whether the project is currently opened in this or another other instance of the ui
-		if (_projectName == m_currentProjectName) {
+		if (_projectName == m_currentProjectInfo.getProjectName()) {
 			this->slotShowInfoPrompt("The project with the name \"" + _projectName + "\" is already opened in this instance.", "", "Open Project");
 			return;
 		}
@@ -3157,7 +3157,7 @@ void AppBase::slotOpenSpecificProject(std::string _projectName, const std::strin
 		}
 
 		// Close already opened project
-		if (m_currentProjectName.length() > 0) {
+		if (m_currentProjectInfo.getProjectName().length() > 0) {
 			m_ExternalServicesComponent->closeProject(false);
 			m_state &= (~AppState::ProjectOpenState);
 		}
@@ -3251,7 +3251,7 @@ void AppBase::slotRenameProject() {
 		return;
 	}
 
-	if (selectedProjectName != m_currentProjectName) {
+	if (selectedProjectName != m_currentProjectInfo.getProjectName()) {
 		std::string projectUser;
 		if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName, projectUser)) {
 			std::string msg("The project with the name \"");
@@ -3267,7 +3267,7 @@ void AppBase::slotRenameProject() {
 
 	// Check if the project is currently open
 	bool reopenProject = false;
-	if (m_currentProjectName == selectedProjectName) {
+	if (m_currentProjectInfo.getProjectName() == selectedProjectName) {
 		m_ExternalServicesComponent->closeProject(false);
 		m_state &= (~AppState::ProjectOpenState);
 		reopenProject = true;
@@ -3318,7 +3318,7 @@ void AppBase::slotDeleteProject() {
 
 		bool projectIsLocked = false;
 
-		if (proj.getProjectName() != m_currentProjectName) {
+		if (proj.getProjectName() != m_currentProjectInfo.getProjectName()) {
 			std::string projectUser;
 			if (m_ExternalServicesComponent->projectIsOpened(proj.getProjectName(), projectUser)) {
 				std::string msg("The project with the name \"");
@@ -3333,7 +3333,7 @@ void AppBase::slotDeleteProject() {
 		}
 
 		// Check if the project it the same project as the currently open one
-		if (proj.getProjectName() == m_currentProjectName) {
+		if (proj.getProjectName() == m_currentProjectInfo.getProjectName()) {
 			m_ExternalServicesComponent->closeProject(false);
 			m_state &= (~AppState::ProjectOpenState);
 		}
@@ -3412,7 +3412,7 @@ void AppBase::slotManageProjectOwner() {
 
 	if (!hasAccess) {
 		// We need to close the project if it is currently open
-		if (m_currentProjectName == selectedProjectName) {
+		if (m_currentProjectInfo.getProjectName() == selectedProjectName) {
 			m_ExternalServicesComponent->closeProject(false);
 		}
 

@@ -467,6 +467,9 @@
     <ClInclude Include="include\OTGui\PDFWidgetCfg.h">
       <Filter>Header Files\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\ExtendedProjectInformation.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -828,6 +831,9 @@
     </ClCompile>
     <ClCompile Include="src\PDFWidgetCfg.cpp">
       <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ExtendedProjectInformation.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

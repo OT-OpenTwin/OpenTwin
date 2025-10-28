@@ -22,6 +22,8 @@ namespace ot {
 		OT_DECL_NOCOPY(ProjectOverviewPreviewBox)
 		OT_DECL_NOMOVE(ProjectOverviewPreviewBox)
 	public:
+		static constexpr QSize previewImageSize() { return QSize(255, 255); };
+
 		ProjectOverviewPreviewBox(QWidget* _parent = nullptr);
 		virtual ~ProjectOverviewPreviewBox();
 

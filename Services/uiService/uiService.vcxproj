@@ -34,6 +34,7 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="src\DownloadFile.cpp" />
+    <ClCompile Include="src\EditProjectInformationDialog.cpp" />
     <ClCompile Include="src\LoginData.cpp" />
     <ClCompile Include="src\LogInDialog.cpp" />
     <ClCompile Include="src\LogInGSSEditDialog.cpp" />
@@ -87,6 +88,7 @@
     <ClInclude Include="include\CurveDatasetFactory.h" />
     <ClInclude Include="include\Datapoints.h" />
     <ClInclude Include="include\DownloadFile.h" />
+    <QtMoc Include="include\EditProjectInformationDialog.h" />
     <ClInclude Include="include\ProgressUpdater.h" />
     <QtMoc Include="include\SelectProjectDialog.h" />
     <QtMoc Include="include\ProjectOverviewEntry.h" />

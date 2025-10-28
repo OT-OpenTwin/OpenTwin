@@ -1054,14 +1054,17 @@ void Application::shuttingDown() {
 
 void Application::addButtons()
 {
-	const std::string pageName = "Model";
-	m_fileHandler.addButtons(getUiComponent());
-	
-	m_plotHandler.addButtons(getUiComponent());
-	m_selectionHandler.subscribe(&m_plotHandler);
+	if (this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL) {
+		m_fileHandler.addButtons(getUiComponent());
 
-	m_materialHandler.addButtons(getUiComponent());
-	m_selectionHandler.subscribe(&m_materialHandler);
+		m_plotHandler.addButtons(getUiComponent());
+		m_selectionHandler.subscribe(&m_plotHandler);
+
+		m_materialHandler.addButtons(getUiComponent());
+		m_selectionHandler.subscribe(&m_materialHandler);
+	}
+
+	m_projectInformationHandler.addButtons(getUiComponent());
 }
 
 std::string Application::storeTemporaryFile(const std::string& _content, uint64_t _uncompressedDataLength) {

@@ -373,6 +373,8 @@ std::string ot::toString(DocumentSyntax _syntax) {
 	switch (_syntax) {
 	case DocumentSyntax::PlainText: return "Plain";
 	case DocumentSyntax::PythonScript: return "Python";
+	case DocumentSyntax::Markdown: return "Markdown";
+	case DocumentSyntax::HTML: return "HTML";
 	default:
 		OT_LOG_EAS("Unknown document syntax (" + std::to_string((int)_syntax) + ")");
 		return "Plain";
@@ -382,6 +384,8 @@ std::string ot::toString(DocumentSyntax _syntax) {
 ot::DocumentSyntax ot::stringToDocumentSyntax(const std::string& _syntax) {
 	if (_syntax == toString(DocumentSyntax::PlainText)) return DocumentSyntax::PlainText;
 	else if (_syntax == toString(DocumentSyntax::PythonScript)) return DocumentSyntax::PythonScript;
+	else if (_syntax == toString(DocumentSyntax::Markdown)) return DocumentSyntax::Markdown;
+	else if (_syntax == toString(DocumentSyntax::HTML)) return DocumentSyntax::HTML;
 	else {
 		OT_LOG_EAS("Unknown document syntax \"" + _syntax + "\"");
 		return DocumentSyntax::PlainText;
@@ -391,7 +395,9 @@ ot::DocumentSyntax ot::stringToDocumentSyntax(const std::string& _syntax) {
 std::list<std::string> ot::getSupportedDocumentSyntaxStringList() {
 	return std::list<std::string>({
 		toString(DocumentSyntax::PlainText),
-		toString(DocumentSyntax::PythonScript)
+		toString(DocumentSyntax::PythonScript),
+		toString(DocumentSyntax::Markdown),
+		toString(DocumentSyntax::HTML)
 	});
 }
 
