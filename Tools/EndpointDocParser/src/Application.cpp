@@ -87,21 +87,6 @@ bool Application::searchForServices(void) {
 	return hasError;
 }
 
-std::string Application::getPathToOTServices(void) {
-	std::string fullPath;
-	char* env_p = nullptr;
-	size_t len = 0;
-
-	if (_dupenv_s(&env_p, &len, "OPENTWIN_DEV_ROOT") == 0 && env_p != nullptr) {
-		OT_LOG_D(std::string("Your path is: ") + env_p); // C:\OT\OpenTwin
-		fullPath = std::string(env_p) + "\\Services";
-		OT_LOG_D(std::string("Full path is: ") + fullPath); // C:\OT\OpenTwin\Services
-		free(env_p);
-	}
-	
-	return fullPath;
-}
-
 bool Application::searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service) {
 	OT_LOG_D("Searching for include und src directories of the given file: " + _file);
 //	OT_LOG_D("The service is " + _service.getName() + ".");
@@ -798,10 +783,9 @@ bool Application::generateDocumentation(const std::list<Service>& m_services) {
 
 	for (const Service& service : m_services) {
 	std::string rst = generateServiceRstContent(service);
-//  std::string path = getPathToOTDocumentation();	// C:\OT\OpenTwin\Documentation\Developer\documented_endpoints
-	std::string serviceName = serviceNameToSnakeCase(service.getName());	// AuthorisationService -> authorisation_service
-//	hasError |= writeServiceRstFile(path + "\\" + serviceName + ".rst", rst);
-	hasError |= writeServiceRstFile("C:\\OT\\OpenTwin\\Documentation\\Developer\\documented_endpoints\\" + service.getName() + ".rst", rst);
+    std::string path = getPathToOTDocumentation();	// C:\OT\OpenTwin\Documentation\Developer\documented_endpoints
+	std::string serviceName = serviceNameToSnakeCase(service.getName());
+	hasError |= writeServiceRstFile(path + "\\" + serviceName + ".rst", rst);
 	}
 
 	return hasError;
@@ -846,6 +830,30 @@ bool Application::writeServiceRstFile(const std::string& _path, const std::strin
 	}
 	
 	return false;
+}
+
+// helper functions
+std::string Application::getPathFromEnvironmentVariable(const std::string& _envVar, const std::string& _subPath) {
+	std::string fullPath;
+	char* env_p = nullptr;
+	size_t len = 0;
+
+	if (_dupenv_s(&env_p, &len, _envVar.c_str()) == 0 && env_p != nullptr) {
+		OT_LOG_D(std::string("Environment variable ") + _envVar + " path is: " + env_p);
+		fullPath = std::string(env_p) + "\\" + _subPath;
+		OT_LOG_D(std::string("Full path is: ") + fullPath);
+		free(env_p);
+	}
+
+	return fullPath;
+}
+
+std::string Application::getPathToOTServices(void) {
+	return getPathFromEnvironmentVariable("OPENTWIN_DEV_ROOT", "Services");
+}
+
+std::string Application::getPathToOTDocumentation(void) {
+	return getPathFromEnvironmentVariable("OPENTWIN_DEV_ROOT", "Documentation\\Developer\\documented_endpoints");
 }
 
 std::string Application::serviceNameToSnakeCase(const std::string& _serviceName) {

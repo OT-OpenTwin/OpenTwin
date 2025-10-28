@@ -32,9 +32,7 @@ public:
 	int run(void);
 
 	bool searchForServices(void);
-
-	std::string getPathToOTServices(void);
-
+	
 	bool searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service);
 
 	bool searchSrcDirectoryFiles(const std::string& _srcDirectory, Service& _service);
@@ -60,6 +58,11 @@ public:
 	std::string generateServiceRstContent(const Service& _service);
 
 	bool writeServiceRstFile(const std::string& _path, const std::string& _rst);
+
+	// helper functions
+	std::string getPathFromEnvironmentVariable(const std::string& _envVar, const std::string& _subPath);
+	std::string getPathToOTServices(void);
+	std::string getPathToOTDocumentation(void);
 
 	std::string serviceNameToSnakeCase(const std::string& _serviceName);
 
