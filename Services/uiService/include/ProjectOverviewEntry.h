@@ -25,6 +25,8 @@ namespace ot {
 		void applyFilter(const QString& _generalFilter);
 		void applyFilter(const ProjectOverviewFilterData& _filter);
 
+		virtual bool operator<(const QTreeWidgetItem& _other) const override;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Public: Slots

@@ -38,6 +38,7 @@ ot::ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projec
 		setToolTip(ProjectOverviewHeader::Groups, QString::fromStdString(groupInfo));
 	}
 
+	setData(ProjectOverviewHeader::Modified, Qt::UserRole + 20, m_projectInfo.getLastAccessTime());
 }
 
 void ot::ProjectOverviewEntry::applyFilter(const QString& _generalFilter) {
@@ -118,6 +119,16 @@ void ot::ProjectOverviewEntry::applyFilter(const ProjectOverviewFilterData& _fil
 
 	}
 
+}
+
+bool ot::ProjectOverviewEntry::operator<(const QTreeWidgetItem& _other) const {
+	int column = treeWidget()->sortColumn();
+	if (column == ProjectOverviewHeader::Modified) {
+		return data(column, Qt::UserRole + 20).toLongLong() < _other.data(column, Qt::UserRole + 20).toLongLong();
+	}
+	else {
+		return TreeWidgetItem::operator<(_other);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

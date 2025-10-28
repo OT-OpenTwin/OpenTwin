@@ -13,13 +13,16 @@
 #include <QtWidgets/qwidget.h>
 
 // std header
+#include <map>
 #include <mutex>
 
 class QTreeWidgetItem;
 
 namespace ot {
 
-	class TreeWidget;
+	class TreeWidgetItem;
+	class ProjectOverviewTree;
+	class ProjectOverviewEntry;
 	class ProjectOverviewHeader;
 	class ProjectOverviewPreviewBox;
 
@@ -38,7 +41,7 @@ namespace ot {
 
 		virtual QWidget* getQWidget() override { return this; };
 		virtual const QWidget* getQWidget() const override { return this; };
-		TreeWidget* getTree() { return m_tree; };
+		ProjectOverviewTree* getTree() { return m_tree; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -94,6 +97,10 @@ namespace ot {
 		void startLoading(const ProjectInformation& _projectInfo);
 		void stopLoading();
 		void worker();
+		void addEntry(ProjectOverviewEntry* _entry);
+		void updateCategories();
+		void updateCategoryItem(TreeWidgetItem* _categoryItem);
+		void updateCheckStates(QTreeWidgetItem* _parent);
 		int getProjectCount(const QTreeWidgetItem* _parent) const;
 		void getAllProjects(const QTreeWidgetItem* _parent, std::list<ProjectInformation>& _lst) const;
 		void basicFilterProjects(QTreeWidgetItem* _parent);
@@ -105,12 +112,14 @@ namespace ot {
 		ProjectInformation m_currentlyLoadingProject;
 		ExtendedProjectInformation m_importedProjectData;
 
+		std::map<std::string, TreeWidgetItem*> m_categoryItems;
+
 		ProjectOverviewHeader* m_header;
 		ProjectOverviewPreviewBox* m_previewBox;
 
 		bool m_resultsExceeded;
 		QString m_generalFilter;
-		TreeWidget* m_tree;
+		ProjectOverviewTree* m_tree;
 		DataMode m_mode;
 	};
 

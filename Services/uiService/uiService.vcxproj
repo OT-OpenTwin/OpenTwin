@@ -48,11 +48,13 @@
     <ClCompile Include="src\NavigationSelectionManager.cpp" />
     <ClCompile Include="src\NavigationTreeView.cpp" />
     <ClCompile Include="src\ProgressUpdater.cpp" />
+    <ClCompile Include="src\ProjectOverviewDelegate.cpp" />
     <ClCompile Include="src\ProjectOverviewEntry.cpp" />
     <ClCompile Include="src\ProjectOverviewFilter.cpp" />
     <ClCompile Include="src\ProjectOverviewFilterData.cpp" />
     <ClCompile Include="src\ProjectOverviewHeader.cpp" />
     <ClCompile Include="src\ProjectOverviewPreviewBox.cpp" />
+    <ClCompile Include="src\ProjectOverviewTree.cpp" />
     <ClCompile Include="src\ProjectOverviewWidget.cpp" />
     <ClCompile Include="src\WelcomeWidget.cpp" />
     <ClCompile Include="src\RenameProjectDialog.cpp" />
@@ -94,8 +96,10 @@
     <QtMoc Include="include\ProjectOverviewWidget.h" />
     <QtMoc Include="include\ProjectOverviewHeader.h" />
     <QtMoc Include="include\ProjectOverviewFilter.h" />
+    <ClInclude Include="include\ProjectOverviewDelegate.h" />
     <ClInclude Include="include\ProjectOverviewFilterData.h" />
     <QtMoc Include="include\ProjectOverviewPreviewBox.h" />
+    <ClInclude Include="include\ProjectOverviewTree.h" />
     <ClInclude Include="include\ShortParameterDescription.h" />
     <ClInclude Include="include\StartArgumentParser.h" />
     <ClInclude Include="include\UITestLogs.h" />
