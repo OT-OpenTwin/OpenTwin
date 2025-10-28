@@ -16,7 +16,6 @@
 
 namespace ot {
 	class Label;
-	class ComboBox;
 	class PushButton;
 	class ProjectOverviewWidget;
 }
@@ -36,11 +35,9 @@ private Q_SLOTS:
 	void slotConfirm();
 	void slotOpenRequested();
 	void slotSelectionChanged();
-	void slotModeChanged();
 
 private:
 	ot::ProjectOverviewWidget* m_overview;
-	ot::ComboBox* m_modeSelector;
 	ot::PushButton* m_confirmButton;
 	ot::Label* m_infoLabel;
 };

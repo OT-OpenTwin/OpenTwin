@@ -31,11 +31,6 @@ namespace ot {
 		OT_DECL_NOCOPY(ProjectOverviewWidget)
 		OT_DECL_NOMOVE(ProjectOverviewWidget)
 	public:
-		enum DataMode {
-			RecentMode,
-			AllMode
-		};
-
 		ProjectOverviewWidget(QWidget* _parent = (QWidget*)nullptr);
 		~ProjectOverviewWidget();
 
@@ -52,7 +47,6 @@ namespace ot {
 
 		void setGeneralFilter(const QString& _filter);
 
-		DataMode getDataMode() const { return m_mode; };
 		int getProjectCount() const;
 		bool getProjectsReultsExceeded() const { return m_resultsExceeded; };
 		
@@ -73,9 +67,7 @@ namespace ot {
 
 	public Q_SLOTS:
 		void clear();
-		void refreshProjectList();
-		void refreshRecentProjects();
-		void refreshAllProjects();
+		void refreshProjects();
 		void filterProjects(const ProjectOverviewFilterData& _filterData);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -120,7 +112,6 @@ namespace ot {
 		bool m_resultsExceeded;
 		QString m_generalFilter;
 		ProjectOverviewTree* m_tree;
-		DataMode m_mode;
 	};
 
 }

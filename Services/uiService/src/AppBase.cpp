@@ -1000,7 +1000,7 @@ void AppBase::createUi() {
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Set widgets to docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 25);
-			m_welcomeScreen->slotRefreshRecentProjects();
+			m_welcomeScreen->slotRefreshProjectList();
 
 			// #######################################################################
 

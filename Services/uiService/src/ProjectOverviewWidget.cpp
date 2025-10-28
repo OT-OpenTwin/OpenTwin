@@ -20,7 +20,7 @@
 #include <QtWidgets/qheaderview.h>
 
 ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent) 
-	: m_mode(RecentMode), m_resultsExceeded(false), m_isLoading(false)
+	: m_resultsExceeded(false), m_isLoading(false)
 {
 	// Create widgets
 	QHBoxLayout* mainLayout = new QHBoxLayout(_parent);
@@ -107,61 +107,9 @@ void ot::ProjectOverviewWidget::clear() {
 	m_tree->clear();
 }
 
-void ot::ProjectOverviewWidget::refreshProjectList() {
-	switch (m_mode) {
-	case ot::ProjectOverviewWidget::RecentMode:
-		refreshRecentProjects();
-		break;
-
-	case ot::ProjectOverviewWidget::AllMode:
-		refreshAllProjects();
-		break;
-
-	default:
-		OT_LOG_E("Unknown data mode (" + std::to_string(static_cast<int64_t>(m_mode)));
-		break;
-	}
-}
-
-void ot::ProjectOverviewWidget::refreshRecentProjects() {
+void ot::ProjectOverviewWidget::refreshProjects() {
 	clear();
 
-	m_mode = RecentMode;
-	m_resultsExceeded = false;
-
-	const AppBase* app = AppBase::instance();
-	
-	std::list<std::string> projects;
-	UserManagement userManager(app->getCurrentLoginData());
-	ProjectManagement projectManager(app->getCurrentLoginData());
-
-	std::list<std::string> recent;
-	userManager.getListOfRecentProjects(recent);
-	if (!projectManager.readProjectsInfo(recent)) {
-		OT_LOG_E("Read project author failed");
-		return;
-	}
-
-	for (const std::string& proj : recent) {
-		std::string editorName("< Unknown >");
-		ot::ProjectInformation newInfo = projectManager.getProjectInformation(proj);
-
-		if (newInfo.getProjectName().empty()) {
-			OT_LOG_E("Project information for project \"" + proj + "\" not found");
-		}
-		else {
-			addEntry(new ProjectOverviewEntry(newInfo));
-		}
-	}
-
-	updateCategories();
-	m_tree->sortByColumn(ProjectOverviewHeader::ColumnIndex::Modified, Qt::DescendingOrder);
-}
-
-void ot::ProjectOverviewWidget::refreshAllProjects() {
-	clear();
-
-	m_mode = AllMode;
 	m_resultsExceeded = false;
 
 	const AppBase* app = AppBase::instance();

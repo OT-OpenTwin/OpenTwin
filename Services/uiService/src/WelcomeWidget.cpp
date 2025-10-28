@@ -49,7 +49,6 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
 
 	m_createButton = this->iniToolButton("Create", "ToolBar/CreateProject.png", projectGroup, "Create new project");
 	m_refreshButton = this->iniToolButton("Refresh", "ToolBar/RefreshProjects.png", projectGroup, "Refresh project list");
-	m_toggleViewModeButton = this->iniToolButton("View Recent", "ToolBar/RefreshProjects.png", projectGroup, "Show recent projects");
 	
 	m_openButton = this->iniToolButton("Open", "ToolBar/OpenProject.png", editGroup, "Open selected project");
 	m_copyButton = this->iniToolButton("Copy", "ToolBar/CopyProject.png", editGroup, "Copy selected project");
@@ -71,7 +70,6 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
 	glWidget->setMaximumSize(1, 1);
 
 	this->updateCountLabel();
-	this->updateToggleViewModeButton();
 	this->updateToolButtonsEnabledState();
 
 	// Setup layouts
@@ -81,15 +79,12 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
 	centralLayout->addWidget(m_countLabel);
 	centralLayout->addWidget(glWidget);
 	
-	slotRefreshRecentProjects();
-
 	// Connect signals
 	this->connect(m_filter, &ot::LineEdit::textChanged, this, &WelcomeWidget::slotFilterChanged);
 	this->connect(m_overview, &ot::ProjectOverviewWidget::selectionChanged, this, &WelcomeWidget::slotSelectionChanged);
 	this->connect(m_overview, &ot::ProjectOverviewWidget::projectOpenRequested, this, &WelcomeWidget::slotOpenProject);
 	this->connect(m_createButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCreateProject);
 	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRefreshProjectList);
-	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotToggleViewMode);
 	this->connect(m_openButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOpenProject);
 	this->connect(m_copyButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCopyProject);
 	this->connect(m_renameButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRenameProject);
@@ -108,7 +103,6 @@ void WelcomeWidget::setWidgetLocked(bool _isLocked) {
 	this->updateToolButtonsEnabledState(_isLocked);
 	m_createButton->setEnabled(!_isLocked);
 	m_refreshButton->setEnabled(!_isLocked);
-	m_toggleViewModeButton->setEnabled(!_isLocked);
 }
 
 bool WelcomeWidget::eventFilter(QObject* _watched, QEvent* _event) {
@@ -140,45 +134,10 @@ void WelcomeWidget::slotCreateProject() {
 }
 
 void WelcomeWidget::slotRefreshProjectList() {
-	m_overview->refreshProjectList();
+	m_overview->refreshProjects();
 
 	this->updateCountLabel();
-	this->updateToggleViewModeButton();
 	this->updateToolButtonsEnabledState();
-}
-
-void WelcomeWidget::slotRefreshRecentProjects() {
-	m_titleLabel->setText("Recent Projects");
-
-	m_overview->refreshRecentProjects();
-
-	this->updateCountLabel();
-	this->updateToggleViewModeButton();
-	this->updateToolButtonsEnabledState();
-}
-
-void WelcomeWidget::slotRefreshAllProjects() {
-	m_titleLabel->setText("Projects");
-
-	m_overview->refreshAllProjects();
-
-	this->updateCountLabel();
-	this->updateToggleViewModeButton();
-	this->updateToolButtonsEnabledState();
-}
-
-void WelcomeWidget::slotToggleViewMode() {
-	switch (m_overview->getDataMode()) {
-	case ot::ProjectOverviewWidget::RecentMode:
-		slotRefreshAllProjects();
-		break;
-	case ot::ProjectOverviewWidget::AllMode:
-		slotRefreshRecentProjects();
-		break;
-	default:
-		OT_LOG_EAS("Unknown view mode (" + std::to_string(static_cast<int>(m_overview->getDataMode())) + ")");
-		break;
-	}
 }
 
 void WelcomeWidget::slotOpenProject() {
@@ -255,24 +214,6 @@ void WelcomeWidget::updateCountLabel() {
 		else {
 			m_countLabel->setText(QString::number(count) + " projects found");
 		}
-	}
-}
-
-void WelcomeWidget::updateToggleViewModeButton() {
-	switch (m_overview->getDataMode()) {
-	case ot::ProjectOverviewWidget::AllMode:
-		m_toggleViewModeButton->setText("View Recent");
-		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("ToolBar/ViewRecentProjects.png"));
-		m_toggleViewModeButton->setToolTip("View recent projects (Currently showing all projects)");
-		break;
-	case ot::ProjectOverviewWidget::RecentMode:
-		m_toggleViewModeButton->setText("View All");
-		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("ToolBar/ViewAllProjects.png"));
-		m_toggleViewModeButton->setToolTip("View all projects (Currently showing recent projects)");
-		break;
-	default:
-		OT_LOG_EA("Unknown view mode");
-		break;
 	}
 }
 

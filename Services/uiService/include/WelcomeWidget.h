@@ -64,13 +64,10 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void slotRefreshProjectList();
-	void slotRefreshRecentProjects();
-	void slotRefreshAllProjects();
 
 private Q_SLOTS:
 	void slotCreateProject();
 
-	void slotToggleViewMode();
 	void slotOpenProject();
 	void slotCopyProject();
 	void slotRenameProject();
@@ -85,7 +82,6 @@ private Q_SLOTS:
 private:
 	ot::ToolButton* iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip);
 	void updateCountLabel();
-	void updateToggleViewModeButton();
 	void updateToolButtonsEnabledState(bool _forceDisabled = false);
 	
 	QWidget* m_widget;
@@ -97,8 +93,7 @@ private:
 
 	ot::ToolButton* m_createButton;
 	ot::ToolButton* m_refreshButton;
-	ot::ToolButton* m_toggleViewModeButton;
-
+	
 	ot::ToolButton* m_openButton;
 	ot::ToolButton* m_copyButton;
 	ot::ToolButton* m_renameButton;
