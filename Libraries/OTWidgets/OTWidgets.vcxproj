@@ -52,6 +52,7 @@
     <ClCompile Include="src\CoordinateFormatConverter.cpp" />
     <ClCompile Include="src\CreateProjectDialog.cpp" />
     <ClCompile Include="src\CustomGraphicsItem.cpp" />
+    <ClCompile Include="src\CustomValidator.cpp" />
     <ClCompile Include="src\DelayedCallHandler.cpp" />
     <ClCompile Include="src\DelayedShowHideHandler.cpp" />
     <ClCompile Include="src\Dialog.cpp" />
@@ -126,6 +127,7 @@
     <ClCompile Include="src\PolarPlotCurve.cpp" />
     <ClCompile Include="src\SelectionData.cpp" />
     <ClCompile Include="src\TemporaryDir.cpp" />
+    <ClCompile Include="src\TextEdit.cpp" />
     <ClCompile Include="src\TreeItemDelegate.cpp" />
     <ClCompile Include="src\WidgetPropertyManager.cpp" />
     <ClCompile Include="src\PlotDatasetData.cpp" />
@@ -263,6 +265,7 @@
     <QtMoc Include="include\OTWidgets\GlobalShortcutWrapper.h" />
     <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h" />
     <QtMoc Include="include\OTWidgets\ExpanderWidget.h" />
+    <ClInclude Include="include\OTWidgets\CustomValidator.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsDisconnectItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerManager.h" />
@@ -289,6 +292,7 @@
     <ClInclude Include="include\OTWidgets\PolarPlotCurve.h" />
     <ClInclude Include="include\OTWidgets\SelectionData.h" />
     <ClInclude Include="include\OTWidgets\TemporaryDir.h" />
+    <QtMoc Include="include\OTWidgets\TextEdit.h" />
     <ClInclude Include="include\OTWidgets\TreeItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\WidgetPropertyManager.h" />
     <ClInclude Include="include\OTWidgets\PlotDatasetData.h" />

@@ -1,15 +1,9 @@
-//! @file BasicValidator.h
-//! @author Alexander Kuester (alexk95)
-//! @date March 2025
-// ###########################################################################################################################################################################################################################################################################################################################
+// @otlicense
 
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/WidgetTypes.h"
-
-// Qt header
-#include <QtGui/qvalidator.h>
+#include "OTWidgets/CustomValidator.h"
 
 namespace ot {
 
@@ -17,7 +11,7 @@ namespace ot {
 	//! @brief Defines a validator for ASCII-based names.
 	//! This class provides a validator that ensures names contain only ASCII letters,
 	//! digits, spaces, or underscores. The first character must be a letter.
-	class OT_WIDGETS_API_EXPORT BasicValidator : public QValidator {
+	class OT_WIDGETS_API_EXPORT BasicValidator : public CustomValidator {
 		OT_DECL_NOCOPY(BasicValidator)
 	public:
 		//! @brief Valid ranges for the input string.
@@ -28,6 +22,8 @@ namespace ot {
 			Numbers    = 1 << 2, //! @brief Numbers (0-9).
 			Underscore = 1 << 3, //! @brief Underscore character ('_').
 			Space      = 1 << 4, //! @brief Space character (' ').
+			Tabulator  = 1 << 5, //! @brief Tabulator character ('\t').
+			NewLine    = 1 << 6, //! @brief New line character ('\n' and '\r').
 
 			//! @brief All ASCII letters.
 			AsciiLetters = UpperAscii | LowerAscii,
@@ -36,7 +32,10 @@ namespace ot {
 			CompactNameRanges = UpperAscii | LowerAscii | Numbers | Underscore,
 
 			//! @brief All valid characters for a name including spaces.
-			NameRanges = CompactNameRanges | Space
+			NameRanges = CompactNameRanges | Space,
+
+			//! @brief All valid characters.
+			AllRanges = NameRanges | Tabulator | NewLine
 		};
 		typedef ot::Flags<ValidRange> ValidRanges;
 
@@ -83,11 +82,10 @@ namespace ot {
 		//! @brief Returns true if the input string is valid.
 		bool isStringValid(const QString& _string) const { return this->validateString(_string) == QValidator::Acceptable; };
 
-		//! @brief Attempts to fix an invalid input string.
+		//! @brief Attempts to fix an invalid input string and adjusts the cursor position accordingly.
 		//! @param _input The input string to be corrected.
-		//! Removes any invalid characters from the input string.
-		//! @ref BasicValidator::validate
-		virtual void fixup(QString& _input) const override;
+		//! @param _cursorPosition The current cursor position in the input string. This will be adjusted if characters before the cursor are removed.
+		virtual void fixup(QString& _input, int& _cursorPosition) const override;
 
 		void setValidStartingRanges(std::list<std::pair<char, char>>&& _ranges) { m_validStartingRanges = std::move(_ranges); };
 		const std::list<std::pair<char, char>>& getValidStartingRanges(void) const { return m_validStartingRanges; };
@@ -100,19 +98,6 @@ namespace ot {
 		std::list<std::pair<char, char>> m_validOtherRanges;
 		std::list<std::pair<char, char>> m_validEndingRanges;
 		
-		inline bool isCharValid(const QChar& _chr, const std::list<std::pair<char, char>>& _ranges) const {
-			bool ok = false;
-
-			for (const std::pair<char, char>& range : _ranges) {
-				if (_chr >= range.first && _chr <= range.second) {
-					ok = true;
-					break;
-				}
-			}
-
-			return ok;
-		}
-
 	};
 
 }

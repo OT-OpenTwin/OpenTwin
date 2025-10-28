@@ -7,6 +7,23 @@
 #include "OTSystem/OTAssert.h"
 #include "OTWidgets/BasicValidator.h"
 
+namespace ot {
+	namespace intern {
+		inline bool isCharValid(const QChar& _chr, const std::list<std::pair<char, char>>& _ranges) {
+			bool ok = false;
+
+			for (const std::pair<char, char>& range : _ranges) {
+				if (_chr >= range.first && _chr <= range.second) {
+					ok = true;
+					break;
+				}
+			}
+
+			return ok;
+		}
+	}
+}
+
 std::list<std::pair<char, char>> ot::BasicValidator::rangesToList(const ValidRanges& _ranges) {
 	std::list<std::pair<char, char>> result;
 	
@@ -15,6 +32,9 @@ std::list<std::pair<char, char>> ot::BasicValidator::rangesToList(const ValidRan
 	if (_ranges & ValidRange::Numbers) { result.push_back(std::pair<char, char>('0', '9')); }
 	if (_ranges & ValidRange::Underscore) { result.push_back(std::pair<char, char>('_', '_')); }
 	if (_ranges & ValidRange::Space) { result.push_back(std::pair<char, char>(' ', ' ')); }
+	if (_ranges & ValidRange::Tabulator) { result.push_back(std::pair<char, char>('\t', '\t')); }
+	if (_ranges & ValidRange::NewLine) { result.push_back(std::pair<char, char>('\n', '\n')); }
+	if (_ranges & ValidRange::NewLine) { result.push_back(std::pair<char, char>('\r', '\r')); }
 
 	return result;
 }
@@ -59,7 +79,7 @@ ot::BasicValidator::State ot::BasicValidator::validateString(const QString& _str
 	int lastIx = _str.length() - 1;
 
 	// Check starting character
-	if (!this->isCharValid(_str.at(ix), m_validStartingRanges)) {
+	if (!intern::isCharValid(_str.at(ix), m_validStartingRanges)) {
 		return QValidator::State::Invalid;
 	}
 
@@ -69,14 +89,14 @@ ot::BasicValidator::State ot::BasicValidator::validateString(const QString& _str
 
 		// Check mid section
 		for (; ix < lastIx; ix++) {
-			if (!this->isCharValid(_str.at(ix), m_validOtherRanges)) {
+			if (!intern::isCharValid(_str.at(ix), m_validOtherRanges)) {
 				return QValidator::State::Invalid;
 			}
 		}
 	}
 
 	// Check last character
-	if (this->isCharValid(_str.at(ix), m_validEndingRanges)) {
+	if (intern::isCharValid(_str.at(ix), m_validEndingRanges)) {
 		return QValidator::State::Acceptable;
 	}
 	else {
@@ -84,38 +104,41 @@ ot::BasicValidator::State ot::BasicValidator::validateString(const QString& _str
 	}
 }
 
-void ot::BasicValidator::fixup(QString& _input) const {
+void ot::BasicValidator::fixup(QString& _input, int& _cursorPosition) const {
 	int ix = 0;
 	int lastIx = _input.length() - 1;
 	auto it = _input.begin();
 
 	// Check starting character
-	if (!this->isCharValid(_input.at(ix), m_validStartingRanges)) {
-		auto tmp = it;
-		it++;
-		_input.erase(tmp);
+	if (!intern::isCharValid(*it, m_validStartingRanges)) {
+		it = _input.erase(it);
 		lastIx--;
 	}
-
-	// Longer than one character (Check middle characters)
-	if (ix < lastIx) {
+	else {
 		ix++;
+		it++;
+	}
 
-		// Check mid section
-		for (; ix < lastIx; ix++) {
-			if (!this->isCharValid(_input.at(ix), m_validOtherRanges)) {
-				auto tmp = it;
-				it++;
-				_input.erase(tmp);
-				lastIx--;
+	while (ix < lastIx) {
+		if (!intern::isCharValid(*it, m_validOtherRanges)) {
+			it = _input.erase(it);
+			lastIx--;
+			if (ix < _cursorPosition) {
+				_cursorPosition--;
 			}
+		}
+		else {
+			ix++;
+			it++;
 		}
 	}
 
 	// Check last character
-	if (!this->isCharValid(_input.at(ix), m_validEndingRanges)) {
-		auto tmp = it;
-		it++;
-		_input.erase(tmp);
+	if (!intern::isCharValid(*it, m_validEndingRanges)) {
+		it = _input.erase(it);
+		lastIx--;
+		if (ix < _cursorPosition && ix > 0) {
+			_cursorPosition--;
+		}
 	}
 }

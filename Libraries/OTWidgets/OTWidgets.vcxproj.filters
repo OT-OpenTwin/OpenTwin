@@ -577,6 +577,12 @@
     <ClCompile Include="src\ImagePainterWidget.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\TextEdit.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CustomValidator.cpp">
+      <Filter>src\Syntax</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1088,6 +1094,9 @@
     <ClInclude Include="include\OTWidgets\ImagePainterWidget.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\CustomValidator.h">
+      <Filter>include\Syntax</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -1307,6 +1316,9 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PDFWidget.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TextEdit.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

@@ -11,15 +11,15 @@
 ot::ImagePainterWidget::ImagePainterWidget(QWidget* _parent) 
 	: QFrame(_parent), m_painter(nullptr), m_interactive(false)
 {
-	m_painter = new PixmapImagePainter(QPixmap());
-
 	this->setStyleSheet("border-width: 1px;"
 		"border-style: outset;"
 		"border-color: gray;");
 }
 
 ot::ImagePainterWidget::~ImagePainterWidget() {
-	if (m_painter) delete m_painter;
+	if (m_painter) {
+		delete m_painter;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -27,18 +27,23 @@ ot::ImagePainterWidget::~ImagePainterWidget() {
 // Setter / Getter
 
 void ot::ImagePainterWidget::setPainter(ImagePainter* _painter) {
-	OTAssertNullptr(_painter);
 	if (m_painter == _painter) {
 		return;
 	}
-	delete m_painter;
+	if (m_painter) {
+		delete m_painter;
+	}
 	m_painter = _painter;
 }
 
 
 QSize ot::ImagePainterWidget::sizeHint() const {
-	OTAssertNullptr(m_painter);
-	return m_painter->getDefaultImageSize().expandedTo(minimumSize()).boundedTo(maximumSize());
+	if (m_painter) {
+		return m_painter->getDefaultImageSize().expandedTo(minimumSize()).boundedTo(maximumSize());
+	}
+	else {
+		return QFrame::sizeHint();
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -46,8 +51,15 @@ QSize ot::ImagePainterWidget::sizeHint() const {
 // Proetected: Events
 
 void ot::ImagePainterWidget::paintEvent(QPaintEvent* _event) {
-	QPainter painter(this);
-	m_painter->paintImage(&painter, this->rect().marginsRemoved(QMargins(1, 1, 1, 1)), true);
+	if (m_painter) {
+		QPainter painter(this);
+		m_painter->paintImage(&painter, this->rect().marginsRemoved(QMargins(1, 1, 1, 1)), true);
+	}
+	else {
+		// No painter set
+		return;
+	}
+	
 }
 
 void ot::ImagePainterWidget::enterEvent(QEnterEvent* _event) {
