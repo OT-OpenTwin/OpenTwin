@@ -803,7 +803,100 @@ std::string Application::generateServiceRstContent(const Service& _service) {
 	// Actions Overview
 	std::string actions = "Actions";
 	out << actions << "\n"
-		<< std::string(actions.size(), '-') << "\n\n";
+		<< std::string(actions.size(), '-') << "\n\n"
+		<< ".. list-table:: Actions Overview\n"
+		<< "    :widths: 25 25 50\n"
+		<< "    :header-rows: 1\n\n"
+		<< "    * - Endpoint\n"
+		<< "      - Brief Description\n"
+		<< "      - Macro\n";
+
+	for (const Endpoint& ep : _service.getEndpoints()) {
+		out << "    * - " << ep.getName() << "\n"
+			<< "      - " << ep.getBriefDescription() << "\n"
+			<< "      - " << ep.getAction() << "\n";
+	}
+
+	out << "\n----\n\n";
+
+	// Actions
+	std::string briefDescription = "Brief description";
+	std::string detailedDescription = "Detailed Description";
+	std::string messageType = "Message Type";
+	std::string parameters = "Parameters";
+	std::string responseDescription = "Response Description";
+	std::string response = "Response";
+
+	for (const Endpoint& ep : _service.getEndpoints()) {
+		out << ep.getName() << "\n"			// name
+			<< std::string(ep.getName().size(), '^') << "\n\n"
+			<< briefDescription << "\n"		// brief description
+			<< std::string(briefDescription.size(), '"') << "\n\n"
+			<< ep.getBriefDescription() << "\n\n";
+
+		if (!ep.getDetailedDescription().empty()) {
+			out << detailedDescription << "\n"	// detailed description
+				<< std::string(detailedDescription.size(), '"') << "\n\n"
+				<< "Detailed description ...\n\n";
+//				<< ep.getDetailedDescriptionFormattedForSphinx() << "\n\n";
+		}
+
+		out	<< messageType << "\n"			// message Type
+			<< std::string(messageType.size(), '"') << "\n\n"
+			<< ep.getMessageTypeString() << "\n\n";
+
+		if (!ep.getParameters().empty()) {
+			out << parameters << "\n"		// parameters
+				<< std::string(parameters.size(), '"') << "\n\n"
+				<< ".. list-table::\n"
+				<< "    :widths: 25 25 50 50\n"
+				<< "    :header-rows: 1\n\n"
+				<< "    * - Name\n"
+				<< "      - Type\n"
+				<< "      - Description\n"
+				<< "      - Macro\n";
+			
+			for (const Parameter& param : ep.getParameters()) {
+				out << "    * - " << param.getName() << "\n"
+					<< "      - " << param.getDataTypeString() << "\n"
+//					<< "      - " << param.getDescriptionFormattedForSphinx() << "\n"
+					<< "      - Description ...\n"
+					<< "      - " << param.getMacro() << "\n";
+			}
+
+			out << "\n";
+		}
+
+		if (!ep.getResponseDescription().empty()) {
+			out << responseDescription << "\n"	// response Description
+				<< std::string(responseDescription.size(), '"') << "\n\n"
+				<< "Response description ...\n\n";
+//				<< ep.getResponseDescriptionFormattedForSphinx() << "\n\n";
+		}
+
+		if (!ep.getResponseParameters().empty()) {
+			out << response << "\n"			// response Parameters
+				<< std::string(response.size(), '"') << "\n\n"
+				<< ".. list-table::\n"
+				<< "    :widths: 25 25 50 50\n"
+				<< "    :header-rows: 1\n\n"
+				<< "    * - Name\n"
+				<< "      - Type\n"
+				<< "      - Description\n"
+				<< "      - Macro\n";
+
+			for (const Parameter& rparam : ep.getResponseParameters()) {
+				out << "    * - " << rparam.getName() << "\n"
+					<< "      - " << rparam.getDataTypeString() << "\n"
+//					<< "      - " << rparam.getDescriptionFormattedForSphinx() << "\n"
+					<< "      - Description ...\n"
+					<< "      - " << rparam.getMacro() << "\n";
+			}
+		}
+
+		out << "\n----\n\n";
+	}
+
 
 	OT_LOG_D("The generated documentation is:\n" + out.str());
 

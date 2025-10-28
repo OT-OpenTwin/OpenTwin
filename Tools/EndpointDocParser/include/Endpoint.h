@@ -41,7 +41,7 @@ public:
 	std::string getMessageTypeString() const;
 
 	void setParameters(const std::list<Parameter>& _parameters) { m_parameters = _parameters; };
-//	const std::list<Parameter>& getParameters() const { return m_parameters; };
+	const std::list<Parameter>& getParameters() const { return m_parameters; };
 	std::list<Parameter>& getParameters() { return m_parameters; };
 
 	void addResponseDescription(const std::string& _responseDescription) { m_responseDescription.push_back(_responseDescription); };
@@ -49,7 +49,7 @@ public:
 	void printResponseDescription() const;
 
 	void setResponseParameters(const std::list<Parameter>& _responseParameters) { m_responseParameters = _responseParameters; };
-//	const std::list<Parameter>& getResponseParameters() const { return m_responseParameters; };
+	const std::list<Parameter>& getResponseParameters() const { return m_responseParameters; };
 	std::list<Parameter>& getResponseParameters() { return m_responseParameters; };
 
 	void addParameter(const Parameter& _parameter) { m_parameters.push_back(_parameter); };
