@@ -24,6 +24,7 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 {
 	// Create widgets
 	QHBoxLayout* mainLayout = new QHBoxLayout(_parent);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	setLayout(mainLayout);
 
 	m_tree = new ot::ProjectOverviewTree(_parent);

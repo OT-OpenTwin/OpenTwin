@@ -21,15 +21,12 @@ SelectProjectDialog::SelectProjectDialog(const ot::DialogCfg& _config)
 {
 	// Setup widgets
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
-	QVBoxLayout* centralLayout = new QVBoxLayout;
 	QHBoxLayout* bottomLayout = new QHBoxLayout;
 
 	m_overview = new ot::ProjectOverviewWidget(this);
 	m_overview->setMultiSelectionEnabled(false);
 	m_overview->refreshProjects();
-	centralLayout->addWidget(m_overview->getQWidget());
-
-	mainLayout->addLayout(centralLayout, 1);
+	mainLayout->addWidget(m_overview->getQWidget(), 1);
 
 	m_infoLabel = new ot::Label(this);
 

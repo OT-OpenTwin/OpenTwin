@@ -67,18 +67,19 @@ EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _c
 	imageLayout->addStretch(1);
 	
 	ToolButton* uploadImageButton = new ToolButton(IconManager::getIcon("Button/Add.png"), "", this);
-	uploadImageButton->setToolTip("Upload Image");
+	uploadImageButton->setToolTip("Upload an image from the file system.");
 	uploadImageButton->setFixedSize(c_toolButtonSize);
 	imageButtonLayout->addWidget(uploadImageButton);
 
 	ToolButton* takeScreenshotButton = new ToolButton(IconManager::getIcon("Button/Camera.png"), "", this);
-	takeScreenshotButton->setToolTip("Take Screenshot");
+	takeScreenshotButton->setToolTip("Take a screenshot of the currently focused view.");
 	takeScreenshotButton->setFixedSize(c_toolButtonSize);
 	takeScreenshotButton->setEnabled(getWidgetForScreenshot() != nullptr);
+	takeScreenshotButton->setVisible(takeScreenshotButton->isEnabled());
 	imageButtonLayout->addWidget(takeScreenshotButton);
 
 	ToolButton* removeImageButton = new ToolButton(IconManager::getIcon("Button/Remove.png"), "", this);
-	removeImageButton->setToolTip("Remove Image");
+	removeImageButton->setToolTip("Remove the current image.");
 	removeImageButton->setFixedSize(c_toolButtonSize);
 	imageButtonLayout->addWidget(removeImageButton);
 	imageButtonLayout->addStretch(1);
@@ -91,13 +92,13 @@ EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _c
 	dataLayout->addWidget(new Label("Category:", this), r, 0);
 	m_category = new ComboBox(this);
 	m_category->setEditable(true);
-	m_category->setToolTip("Project Category");
 	m_category->setValidator(new BasicValidator(BasicValidator::NameRanges, BasicValidator::NameRanges, BasicValidator::NameRanges));
 	dataLayout->addWidget(m_category, r++, 1);
 
 	dataLayout->addWidget(new Label("Tags:", this), r, 0);
 	m_tags = new PlainTextEdit(this);
 	m_tags->setToolTip("Project Tags (separated by blanks, tabulators or line breaks)");
+	m_tags->setPlaceholderText("Tag1 Tag2\nTag3");
 	m_tags->setReadOnly(false);
 	m_tags->setFixedHeight(100);
 	m_tags->setValidator(new BasicValidator(BasicValidator::NameRanges, BasicValidator::AllRanges, BasicValidator::AllRanges));
