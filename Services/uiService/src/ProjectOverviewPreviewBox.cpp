@@ -84,6 +84,7 @@ ot::ProjectOverviewPreviewBox::~ProjectOverviewPreviewBox() {
 
 void ot::ProjectOverviewPreviewBox::unsetProject() {
 	setEnabled(false);
+	m_animation.stop();
 	m_collapseTimer.stop();
 	m_collapseTimer.start();
 }
@@ -145,19 +146,36 @@ void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation&
 	m_tags->setText(QString::fromStdString(tagsString));
 
 	// Expand
+	bool showAnim = false;
 	if (!m_isExpanded) {
-		m_animation.setDirection(QAbstractAnimation::Forward);
-		m_animation.start();
+		showAnim = true;
 	}
 	else if (m_animation.state() == QAbstractAnimation::Running) {
-		// Restart animation
+		showAnim = true;
+	}
+
+	if (showAnim) {
 		m_animation.setDirection(QAbstractAnimation::Forward);
+
+		for (int i = 0; i < m_animation.animationCount(); i++) {
+			QPropertyAnimation* anim = dynamic_cast<QPropertyAnimation*>(m_animation.animationAt(i));
+			if (anim) {
+				anim->setEndValue(c_expandedWidth);
+			}
+		}
+
 		m_animation.start();
 	}
 }
 
 void ot::ProjectOverviewPreviewBox::slotDelayedCollapse() {
 	m_animation.setDirection(QAbstractAnimation::Backward);
+	for (int i = 0; i < m_animation.animationCount(); i++) {
+		QPropertyAnimation* anim = dynamic_cast<QPropertyAnimation*>(m_animation.animationAt(i));
+		if (anim) {
+			anim->setEndValue(std::min(this->width(), c_expandedWidth));
+		}
+	}
 	m_animation.start();
 }
 

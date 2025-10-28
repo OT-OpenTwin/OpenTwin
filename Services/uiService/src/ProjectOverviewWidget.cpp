@@ -109,6 +109,15 @@ void ot::ProjectOverviewWidget::clear() {
 }
 
 void ot::ProjectOverviewWidget::refreshProjects() {
+	// Store expanded categories
+	std::set<std::string> expandedCategories;
+	for (auto& it : m_categoryItems) {
+		TreeWidgetItem* categoryItem = it.second;
+		if (categoryItem->isExpanded()) {
+			expandedCategories.insert(it.first);
+		}
+	}
+
 	clear();
 
 	m_resultsExceeded = false;
@@ -124,6 +133,19 @@ void ot::ProjectOverviewWidget::refreshProjects() {
 		addEntry(new ProjectOverviewEntry(proj));
 	}
 
+	// Restore expanded categories
+	if (!expandedCategories.empty()) {
+		for (auto& it : m_categoryItems) {
+			TreeWidgetItem* categoryItem = it.second;
+			if (expandedCategories.find(it.first) != expandedCategories.end()) {
+				categoryItem->setExpanded(true);
+			}
+			else {
+				categoryItem->setExpanded(false);
+			}
+		}
+	}
+	
 	updateCategories();
 	m_tree->sortByColumn(ProjectOverviewHeader::ColumnIndex::Modified, Qt::DescendingOrder);
 }
@@ -182,10 +204,11 @@ void ot::ProjectOverviewWidget::slotOpenRequested(QTreeWidgetItem* _item, int _c
 		return;
 	}
 
-	const ProjectOverviewEntry* entry = dynamic_cast<const ProjectOverviewEntry*>(_item);
+	ProjectOverviewEntry* entry = dynamic_cast<ProjectOverviewEntry*>(_item);
 	if (!entry) {
 		return;
 	}
+	m_previewBox->unsetProject();
 
 	Q_EMIT projectOpenRequested(entry->getProjectInformation());
 }
