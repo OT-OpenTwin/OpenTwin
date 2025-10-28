@@ -11,19 +11,23 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTGui/FileExtension.h"
 #include "OTWidgets/Label.h"
+#include "OTWidgets/TextEdit.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/PushButton.h"
+#include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/PlainTextEdit.h"
 #include "OTWidgets/BasicValidator.h"
+#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/ImagePainterWidget.h"
 #include "OTWidgets/ImagePainterManager.h"
 #include "OTCommunication/ActionTypes.h"
 
 // Qt header
 #include <QtCore/qfile.h>
+#include <QtCore/qbuffer.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qfiledialog.h>
 
@@ -70,6 +74,7 @@ EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _c
 	ToolButton* takeScreenshotButton = new ToolButton(IconManager::getIcon("Button/Camera.png"), "", this);
 	takeScreenshotButton->setToolTip("Take Screenshot");
 	takeScreenshotButton->setFixedSize(c_toolButtonSize);
+	takeScreenshotButton->setEnabled(getWidgetForScreenshot() != nullptr);
 	imageButtonLayout->addWidget(takeScreenshotButton);
 
 	ToolButton* removeImageButton = new ToolButton(IconManager::getIcon("Button/Remove.png"), "", this);
@@ -112,11 +117,24 @@ EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _c
 	m_descriptionSyntax->setToolTip("Description Syntax");
 	m_descriptionSyntax->setEditable(false);
 	descriptionHeaderLayout->addWidget(m_descriptionSyntax);
+	
 	descriptionHeaderLayout->addStretch(1);
+	
+	m_toggleShowPreviewButton = new ToolButton(IconManager::getIcon("Button/ShowPreview.png"), "", this);
+	descriptionHeaderLayout->addWidget(m_toggleShowPreviewButton);
+	connect(m_toggleShowPreviewButton, &ToolButton::clicked, this, &EditProjectInformationDialog::slotTogglePreview);
 
+	QHBoxLayout* descriptionEditorLayout = new QHBoxLayout;
+	descriptionLayout->addLayout(descriptionEditorLayout, 1);
+	
 	m_description = new TextEditor(this);
 	m_description->setPlaceholderText("Project Description");
-	descriptionLayout->addWidget(m_description, 1);
+	descriptionEditorLayout->addWidget(m_description);
+
+	m_descriptionPreview = new TextEdit(this);
+	m_descriptionPreview->setReadOnly(true);
+	m_descriptionPreview->setVisible(false);
+	descriptionEditorLayout->addWidget(m_descriptionPreview);
 
 	// Create buttons
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
@@ -131,8 +149,8 @@ EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _c
 
 	initializeData();
 	
-	resize(400, 800);
-	setMinimumSize(300, 500);
+	resize(500, 1000);
+	setMinimumSize(400, 500);
 	setWindowTitle("Edit Project Information");
 
 	// Connect signals
@@ -143,6 +161,8 @@ EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _c
 	connect(m_confirmButton, &PushButton::clicked, this, &EditProjectInformationDialog::slotConfirm);
 	connect(cancelButton, &PushButton::clicked, this, &EditProjectInformationDialog::closeCancel);
 
+	connect(m_description, &TextEditor::textChanged, this, &EditProjectInformationDialog::slotDescriptionChanged);
+	connect(m_descriptionSyntax, &ComboBox::currentIndexChanged, this, &EditProjectInformationDialog::slotDescriptionChanged);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -239,12 +259,59 @@ void EditProjectInformationDialog::slotUploadImage() {
 }
 
 void EditProjectInformationDialog::slotTakeScreenshot() {
+	QWidget* sourceWidget = getWidgetForScreenshot();
+	if (!sourceWidget) {
+		return;
+	}
 
+	QPixmap pixmap = sourceWidget->grab();
+
+	setEnabled(false);
+
+	pixmap.scaled(ot::ProjectOverviewPreviewBox::previewImageSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	
+	QByteArray byteArray;
+	QBuffer buffer(&byteArray);
+	if (!buffer.open(QIODevice::WriteOnly)) {
+		OT_LOG_E("Failed to create image data buffer for screenshot");
+		setEnabled(true);
+		return;
+	}
+	pixmap.save(&buffer, "png");
+	std::vector<char> imageData(byteArray.size());
+	std::memcpy(imageData.data(), byteArray.data(), byteArray.size());
+
+	ot::ImagePainter* painter = ot::ImagePainterManager::createFromRawData(imageData, ot::ImageFileFormat::PNG);
+	m_imageWidget->setPainter(painter);
+
+	m_projectInformation.setImageData(std::move(imageData), ot::ImageFileFormat::PNG);
+
+	setEnabled(true);
 }
 
 void EditProjectInformationDialog::slotRemoveImage() {
 	m_imageWidget->setPainter(nullptr);
 	m_projectInformation.setImageData(std::vector<char>(), ot::ImageFileFormat::PNG);
+}
+
+void EditProjectInformationDialog::slotTogglePreview() {
+	if (m_descriptionPreview->isVisible()) {
+		m_descriptionPreview->setVisible(false);
+		m_toggleShowPreviewButton->setIcon(ot::IconManager::getIcon("Button/ShowPreview.png"));
+		m_toggleShowPreviewButton->setToolTip("Show Preview");
+	}
+	else {
+		updateDescriptionPreview();
+		m_descriptionPreview->setVisible(true);
+		m_toggleShowPreviewButton->setIcon(ot::IconManager::getIcon("Button/HidePreview.png"));
+		m_toggleShowPreviewButton->setToolTip("Hide Preview");
+	}
+}
+
+void EditProjectInformationDialog::slotDescriptionChanged() {
+	if (m_descriptionPreview->isVisible()) {
+		updateDescriptionPreview();
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -333,4 +400,41 @@ void EditProjectInformationDialog::updateInformationEntry() {
 
 	m_projectInformation.setDescription(m_description->toPlainText().toStdString());
 	m_projectInformation.setDescriptionSyntax(ot::stringToDocumentSyntax(m_descriptionSyntax->currentText().toStdString()));
+}
+
+void EditProjectInformationDialog::updateDescriptionPreview() {
+	using namespace ot;
+	QString description = m_description->toPlainText();
+	DocumentSyntax syntax = stringToDocumentSyntax(m_descriptionSyntax->currentText().toStdString());
+	switch (syntax) {
+	case DocumentSyntax::PlainText:
+		m_descriptionPreview->setPlainText(description);
+		break;
+
+	case DocumentSyntax::Markdown:
+		m_descriptionPreview->setMarkdown(description);
+		break;
+
+	case DocumentSyntax::HTML:
+		m_descriptionPreview->setHtml(description);
+		break;
+
+	default:
+		OT_LOG_E("Unsupported document syntax \"" + m_descriptionSyntax->currentText().toStdString() + "\"");
+		break;
+	}
+}
+
+QWidget* EditProjectInformationDialog::getWidgetForScreenshot() {
+	ot::WidgetView* view = ot::WidgetViewManager::instance().getLastFocusedCentralView();
+	if (view == nullptr) {
+		return nullptr;
+	}
+
+	QWidget* w = view->getViewWidget();
+	if (w == nullptr || !w->isVisible()) {
+		return nullptr;
+	}
+
+	return w;
 }

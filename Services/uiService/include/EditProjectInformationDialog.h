@@ -9,7 +9,9 @@
 
 namespace ot {
 	class ComboBox;
+	class TextEdit;
 	class TextEditor;
+	class ToolButton;
 	class PushButton;
 	class PlainTextEdit;
 	class ImagePainterWidget;
@@ -41,6 +43,8 @@ private Q_SLOTS:
 	void slotUploadImage();
 	void slotTakeScreenshot();
 	void slotRemoveImage();
+	void slotTogglePreview();
+	void slotDescriptionChanged();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -49,7 +53,9 @@ private Q_SLOTS:
 private:
 	void initializeData();
 	void updateInformationEntry();
-	
+	void updateDescriptionPreview();
+	static QWidget* getWidgetForScreenshot();
+
 	std::string m_callbackUrl;
 	std::string m_callbackAction;
 
@@ -63,8 +69,11 @@ private:
 	ot::ComboBox* m_category;
 	ot::PlainTextEdit* m_tags;
 
+	ot::ToolButton* m_toggleShowPreviewButton;
+
 	ot::ComboBox* m_descriptionSyntax;
 	ot::TextEditor* m_description;
+	ot::TextEdit* m_descriptionPreview;
 
 	ot::PushButton* m_confirmButton;
 };
