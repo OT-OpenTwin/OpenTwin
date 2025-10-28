@@ -53,6 +53,8 @@ public:
 
 	std::string getProjectType(const std::string& projectName);
 
+	bool updateAdditionalInformation(const ot::ProjectInformation& projectInfo);
+
 private:
 	bool createNewCollection(const std::string &collectionName, const std::string &defaultSettingTemplate);
 	bool hasError(const std::string &response);

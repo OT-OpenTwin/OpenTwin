@@ -34,7 +34,7 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	m_tree->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 	m_tree->setSelectionMode(QAbstractItemView::SingleSelection);
 
-	m_tree->setHeaderLabels(QStringList() << " " << "Type" << "Name" << "Owner" << "Groups" << "Last Modified");
+	m_tree->setHeaderLabels(QStringList() << " " << "Type" << "Name" << "Tags" << "Owner" << "Groups" << "Last Modified");
 	m_tree->header()->setStretchLastSection(false);
 	m_tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_tree->header()->setSectionResizeMode(ProjectOverviewHeader::ColumnIndex::Name, QHeaderView::Stretch);
@@ -267,7 +267,7 @@ void ot::ProjectOverviewWidget::worker() {
 		return;
 	}
 	// Reset
-	m_importedProjectData = ProjectOverviewPreviewData(m_currentlyLoadingProject);
+	m_importedProjectData = ExtendedProjectInformation(m_currentlyLoadingProject);
 
 	// Load preview icon
 	std::vector<char> imageData;
@@ -277,7 +277,14 @@ void ot::ProjectOverviewWidget::worker() {
 		m_importedProjectData.setImageData(std::move(imageData), imageFormat);
 	}
 
-	QMetaObject::invokeMethod(this, &ProjectOverviewWidget::slotWorkerFinished, Qt::QueuedConnection);
+	std::string description;
+	ot::DocumentSyntax syntax = ot::DocumentSyntax::PlainText;
+	if (ModelState::readProjectDescription(m_currentlyLoadingProject.getCollectionName(), description, syntax)) {
+		m_importedProjectData.setDescription(description);
+		m_importedProjectData.setDescriptionSyntax(syntax);
+	}
+
+		QMetaObject::invokeMethod(this, &ProjectOverviewWidget::slotWorkerFinished, Qt::QueuedConnection);
 }
 
 int ot::ProjectOverviewWidget::getProjectCount(const QTreeWidgetItem* _parent) const {

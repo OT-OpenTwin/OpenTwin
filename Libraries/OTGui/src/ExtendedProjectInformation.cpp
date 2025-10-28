@@ -10,6 +10,10 @@ ot::ExtendedProjectInformation::ExtendedProjectInformation()
 
 }
 
+ot::ExtendedProjectInformation::ExtendedProjectInformation(const ProjectInformation& _basicInfo) 
+	: ProjectInformation(_basicInfo), m_imageFormat(ImageFileFormat::PNG), m_descriptionSyntax(DocumentSyntax::PlainText)
+{}
+
 void ot::ExtendedProjectInformation::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const {
 	ProjectInformation::addToJsonObject(_jsonObject, _allocator);
 

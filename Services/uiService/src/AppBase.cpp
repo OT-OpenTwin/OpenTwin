@@ -2257,8 +2257,8 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo, const 
 	return isOk;
 }
 
-void AppBase::editCurrentProjectInformation(const std::string& _callbackAction) {
-	EditProjectInformationDialog dia(m_loginData, m_currentProjectInfo, mainWindow());
+void AppBase::editProjectInformation(const std::string& _senderUrl, const std::string& _callbackAction) {
+	EditProjectInformationDialog dia(_senderUrl, _callbackAction, m_loginData, m_currentProjectInfo.getProjectName(), mainWindow());
 	dia.showDialog();
 }
 

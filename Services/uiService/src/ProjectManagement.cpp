@@ -287,6 +287,28 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 	return info.getProjectType();
 }
 
+bool ProjectManagement::updateAdditionalInformation(const ot::ProjectInformation& projectInfo) {
+	assert(!m_authServerURL.empty());
+
+	AppBase* app{ AppBase::instance() };
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_UPDATE_PROJECT_ADDITIONALINFO, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(projectInfo, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string response;
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		exit(ot::AppExitCode::SendFailed);
+		return false;
+	}
+
+	return ot::ReturnMessage::fromJson(response).isOk();
+}
+
 bool ProjectManagement::findProjects(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded)
 {
 	assert(!m_authServerURL.empty());

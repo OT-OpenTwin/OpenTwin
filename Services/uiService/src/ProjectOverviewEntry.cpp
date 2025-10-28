@@ -18,6 +18,16 @@ ot::ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projec
 	setText(ProjectOverviewHeader::Owner, QString::fromStdString(m_projectInfo.getUserName()));
 	setText(ProjectOverviewHeader::Modified, modifiedTime.toString(Qt::DateFormat::TextDate));
 	
+	if (!m_projectInfo.getTags().empty()) {
+		setIcon(ProjectOverviewHeader::Tags, ot::IconManager::getIcon("Tree/Tag.png"));
+		std::string tagInfo;
+		for (const std::string& tag : m_projectInfo.getTags()) {
+			if (!tagInfo.empty()) tagInfo.append("\n");
+			tagInfo.append(tag);
+		}
+		setToolTip(ProjectOverviewHeader::Tags, QString::fromStdString(tagInfo));
+	}
+
 	if (!m_projectInfo.getGroups().empty()) {
 		setIcon(ProjectOverviewHeader::Groups, ot::IconManager::getIcon("Tree/Groups.png"));
 		std::string groupInfo;
@@ -59,6 +69,26 @@ void ot::ProjectOverviewEntry::applyFilter(const ProjectOverviewFilterData& _fil
 	case ProjectOverviewHeader::Owner:
 		setHidden(!_filter.getSelectedFilters().contains(QString::fromStdString(m_projectInfo.getUserName())));
 		break;
+
+	case ProjectOverviewHeader::Tags:
+	{
+		bool found = false;
+		if (m_projectInfo.getTags().empty()) {
+			if (_filter.getSelectedFilters().contains(ProjectOverviewFilterData::getEmptyTagsFilterName())) {
+				found = true;
+			}
+		}
+		else {
+			for (const std::string& tag : m_projectInfo.getTags()) {
+				if (_filter.getSelectedFilters().contains(QString::fromStdString(tag))) {
+					found = true;
+					break;
+				}
+			}
+		}
+		setHidden(!found);
+		break;
+	}
 
 	case ProjectOverviewHeader::Groups:
 	{

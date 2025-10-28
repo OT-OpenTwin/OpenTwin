@@ -203,7 +203,9 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
     ProjectOverviewFilter filter(m_overview, _logicalIndex);
 	QStringList options;
 	const std::list<ProjectInformation> allProjects = m_overview->getAllProjects();
+    
     bool hasEmptyGroups = false;
+    bool hasEmptyTags = false;
 
 	// Fill options based on column
     switch (_logicalIndex) {
@@ -227,6 +229,21 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
         }
 		break;
 
+	case ColumnIndex::Tags:
+        filter.setTitle("Project Tags");
+        for (const ProjectInformation& proj : allProjects) {
+			if (proj.getTags().empty()) {
+				hasEmptyTags = true;
+			}
+            for (const std::string& tag : proj.getTags()) {
+                const QString tagName = QString::fromStdString(tag);
+                if (!options.contains(tagName)) {
+                    options.append(tagName);
+                }
+			}
+        }
+        break;
+
     case ColumnIndex::Owner:
 		filter.setTitle("Project Owner");
         for (const ProjectInformation& proj : allProjects) {
@@ -243,12 +260,10 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
             if (proj.getGroups().empty()) {
 				hasEmptyGroups = true;
             }
-            else {
-                for (const std::string& group : proj.getGroups()) {
-                    const QString groupName = QString::fromStdString(group);
-                    if (!options.contains(groupName)) {
-                        options.append(groupName);
-                    }
+            for (const std::string& group : proj.getGroups()) {
+                const QString groupName = QString::fromStdString(group);
+                if (!options.contains(groupName)) {
+                    options.append(groupName);
                 }
             }
         }
@@ -264,6 +279,9 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
     if (hasEmptyGroups) {
         options.append(ProjectOverviewFilterData::getEmptyGroupFilterName());
     }
+    if (hasEmptyTags) {
+        options.append(ProjectOverviewFilterData::getEmptyTagsFilterName());
+	}
 
 	filter.setOptions(options);
 	filter.updateCheckedStatesFromData(m_lastFilter);

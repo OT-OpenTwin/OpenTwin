@@ -1,11 +1,15 @@
 // @otlicense
 
 // OpenTwin header
+#include "AppBase.h"
 #include "ProjectOverviewPreviewBox.h"
 #include "EditProjectInformationDialog.h"
 #include "ModelState.h"
 #include "UserManagement.h"
 #include "ProjectManagement.h"
+#include "OTCore/String.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTGui/FileExtension.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/TextEditor.h"
@@ -13,15 +17,21 @@
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/PlainTextEdit.h"
+#include "OTWidgets/BasicValidator.h"
 #include "OTWidgets/ImagePainterWidget.h"
 #include "OTWidgets/ImagePainterManager.h"
+#include "OTCommunication/ActionTypes.h"
 
 // Qt header
+#include <QtCore/qfile.h>
 #include <QtWidgets/qlayout.h>
+#include <QtWidgets/qfiledialog.h>
 
-EditProjectInformationDialog::EditProjectInformationDialog(const LoginData& _logInData, const ot::ProjectInformation& _project, QWidget* _parent)
-	: Dialog(_parent), c_toolButtonSize(24, 24), m_logInData(_logInData), m_projectInformation(_project)
+EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _callbackUrl, const std::string& _callbackAction, const LoginData& _logInData, const std::string& _projectName, QWidget* _parent)
+	: Dialog(_parent), m_callbackUrl(_callbackUrl), m_callbackAction(_callbackAction), c_toolButtonSize(24, 24), m_logInData(_logInData)
 {
+	m_projectInformation.setProjectName(_projectName);
+
 	using namespace ot;
 
 	// Create widgets
@@ -30,14 +40,13 @@ EditProjectInformationDialog::EditProjectInformationDialog(const LoginData& _log
 	// Title section
 	QHBoxLayout* titleLayout = new QHBoxLayout;
 	titleLayout->addWidget(new Label(QString::fromStdString("Project: " + m_projectInformation.getProjectName())));
+	mainLayout->addLayout(titleLayout);
 
 	// Image section
 	QHBoxLayout* imageLayout = new QHBoxLayout;
 	mainLayout->addLayout(imageLayout);
 	m_imageWidget = new ImagePainterWidget(this);
 	m_imageWidget->setFixedSize(ProjectOverviewPreviewBox::previewImageSize());
-
-	
 
 	QVBoxLayout* imageButtonLayout = new QVBoxLayout;
 	imageButtonLayout->addStretch(1);
@@ -78,6 +87,7 @@ EditProjectInformationDialog::EditProjectInformationDialog(const LoginData& _log
 	m_category = new ComboBox(this);
 	m_category->setEditable(true);
 	m_category->setToolTip("Project Category");
+	m_category->setValidator(new BasicValidator(BasicValidator::NameRanges, BasicValidator::NameRanges, BasicValidator::NameRanges));
 	dataLayout->addWidget(m_category, r++, 1);
 
 	dataLayout->addWidget(new Label("Tags:", this), r, 0);
@@ -85,6 +95,7 @@ EditProjectInformationDialog::EditProjectInformationDialog(const LoginData& _log
 	m_tags->setToolTip("Project Tags (separated by blanks, tabulators or line breaks)");
 	m_tags->setReadOnly(false);
 	m_tags->setFixedHeight(100);
+	m_tags->setValidator(new BasicValidator(BasicValidator::NameRanges, BasicValidator::AllRanges, BasicValidator::AllRanges));
 	dataLayout->addWidget(m_tags, r++, 1);
 
 	// Description
@@ -152,7 +163,26 @@ void EditProjectInformationDialog::showEvent(QShowEvent* _event) {
 // Private: Slots
 
 void EditProjectInformationDialog::slotConfirm() {
+	updateInformationEntry();
 
+	using namespace ot;
+
+	ProjectManagement projectManager(m_logInData);
+	projectManager.updateAdditionalInformation(m_projectInformation);
+
+	JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(m_callbackAction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, JsonObject(m_projectInformation, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string responseStr;
+	AppBase::instance()->sendExecute(m_callbackUrl, doc.toJson(), responseStr);
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk()) {
+		AppBase::instance()->showErrorPrompt("Edit Project Information", "Could not update project information.", response.getWhat());
+		return;
+	}
+
+	closeOk();
 }
 
 void EditProjectInformationDialog::slotChanged() {
@@ -160,7 +190,52 @@ void EditProjectInformationDialog::slotChanged() {
 }
 
 void EditProjectInformationDialog::slotUploadImage() {
+	using namespace ot;
+	std::string filter = FileExtension::toFilterString({ FileExtension::Png, FileExtension::Jpeg, FileExtension::Svg });
+	QString file = QFileDialog::getOpenFileName(this, "Select Image File", "", QString::fromStdString(filter));
+	if (file.isEmpty()) {
+		return;
+	}
 
+	// Determine file 
+	std::string fileStd = file.toStdString();
+	size_t ix = fileStd.rfind('.');
+	if (ix == std::string::npos) {
+		AppBase::instance()->showErrorPrompt("Upload Image", "Could not upload image.", "The selected file does not have a valid file extension.");
+		return;
+	}
+	std::string fileExtension = fileStd.substr(ix + 1);
+	FileExtension::DefaultFileExtension ext = FileExtension::stringToFileExtension(fileExtension);
+	if (ext == FileExtension::Unknown) {
+		AppBase::instance()->showErrorPrompt("Upload Image", "Could not upload image.", "The selected file has an unsupported file extension (*.\"" + fileExtension + "\").");
+		return;
+	}
+
+	bool isImage = false;
+	ImageFileFormat format = ImageFileFormat::PNG;
+	FileExtension::toImageFileFormat(ext, isImage);
+	if (!isImage) {
+		AppBase::instance()->showErrorPrompt("Upload Image", "Could not upload image.", "The selected file is not a supported image file (*.\"" + fileExtension + "\").");
+		return;
+	}
+
+	// Read file data
+	QFile qfile(file);
+	if (!qfile.open(QIODevice::ReadOnly)) {
+		AppBase::instance()->showErrorPrompt("Upload Image", "Could not upload image.", "The selected file could not be opened for reading.");
+		return;
+	}
+
+	QByteArray fileData = qfile.readAll();
+	qfile.close();
+
+	std::vector<char> imageData(fileData.size());
+	std::memcpy(imageData.data(), fileData.data(), fileData.size());
+
+	ImagePainter* painter = ImagePainterManager::createFromRawData(imageData, format);
+	m_imageWidget->setPainter(painter);
+	
+	m_projectInformation.setImageData(std::move(imageData), format);
 }
 
 void EditProjectInformationDialog::slotTakeScreenshot() {
@@ -168,7 +243,8 @@ void EditProjectInformationDialog::slotTakeScreenshot() {
 }
 
 void EditProjectInformationDialog::slotRemoveImage() {
-
+	m_imageWidget->setPainter(nullptr);
+	m_projectInformation.setImageData(std::vector<char>(), ot::ImageFileFormat::PNG);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -178,15 +254,47 @@ void EditProjectInformationDialog::slotRemoveImage() {
 void EditProjectInformationDialog::initializeData() {
 	using namespace ot;
 
+	// Fetch project information
+	ProjectManagement projectManager(m_logInData);
+	std::list<std::string> projectNamesList = { m_projectInformation.getProjectName() };
+	if (!projectManager.readProjectsInfo(projectNamesList) || projectNamesList.empty()) {
+		OT_LOG_E("Failed to read project information for project \"" + m_projectInformation.getProjectName() + "\"");
+		return;
+	}
+
+	ot::ProjectInformation projInfo = projectManager.getProjectInformation(m_projectInformation.getProjectName());
+	if (projInfo.getCollectionName().empty()) {
+		OT_LOG_E("Failed to read project information for project \"" + m_projectInformation.getProjectName() + "\"");
+		return;
+	}
+	m_projectInformation = ot::ExtendedProjectInformation(projInfo);
+
+	// Fetch Description
+	std::string description;
+	ot::DocumentSyntax syntax = ot::DocumentSyntax::PlainText;
+	if (ModelState::readProjectDescription(m_projectInformation.getCollectionName(), description, syntax)) {
+		m_projectInformation.setDescription(description);
+		m_projectInformation.setDescriptionSyntax(syntax);
+	}
+
+	// Fetch Image
+	std::vector<char> imageData;
+	ot::ImageFileFormat imageFormat = ot::ImageFileFormat::PNG;
+	if (ModelState::readProjectPreviewImage(m_projectInformation.getCollectionName(), imageData, imageFormat)) {
+		m_projectInformation.setImageData(std::move(imageData), imageFormat);
+	}
+
+	// Update widgets
 	m_descriptionSyntax->clear();
 	m_descriptionSyntax->addItem(QString::fromStdString(toString(DocumentSyntax::PlainText)));
 	m_descriptionSyntax->addItem(QString::fromStdString(toString(DocumentSyntax::Markdown)));
 	m_descriptionSyntax->addItem(QString::fromStdString(toString(DocumentSyntax::HTML)));
+	m_descriptionSyntax->setCurrentText(QString::fromStdString(toString(m_projectInformation.getDescriptionSyntax())));
+	
+	m_description->setPlainText(QString::fromStdString(m_projectInformation.getDescription()));
 
-	std::vector<char> imageData;
-	ImageFileFormat imageFormat = ImageFileFormat::PNG;
-	if (ModelState::readProjectPreviewImage(m_projectInformation.getCollectionName(), imageData, imageFormat)) {
-		ImagePainter* painter = ImagePainterManager::createFromRawData(imageData, imageFormat);
+	if (!m_projectInformation.getImageData().empty()) {
+		ImagePainter* painter = ImagePainterManager::createFromRawData(m_projectInformation.getImageData(), m_projectInformation.getImageFormat());
 		m_imageWidget->setPainter(painter);
 	}
 
@@ -198,7 +306,6 @@ void EditProjectInformationDialog::initializeData() {
 	m_category->clear();
 	QStringList categories;
 	std::list<ot::ProjectInformation> projects;
-	ProjectManagement projectManager(m_logInData);
 	bool exceeded = false;
 	if (projectManager.findProjects("", 1000, projects, exceeded)) {
 		for (const ot::ProjectInformation& proj : projects) {
@@ -210,4 +317,20 @@ void EditProjectInformationDialog::initializeData() {
 	}
 	m_category->addItems(categories);
 	m_category->setCurrentText(QString::fromStdString(m_projectInformation.getCategory()));
+}
+
+void EditProjectInformationDialog::updateInformationEntry() {
+	m_projectInformation.setCategory(ot::String::removePrefixSuffix(m_category->currentText().toStdString(), " \t\n\r"));
+	
+	std::list<std::string> tags;
+	QString tagsText = m_tags->toPlainText();
+	tagsText.replace('\n', ' ').replace('\t', ' ');
+	QStringList tagList = tagsText.split(' ', Qt::SkipEmptyParts);
+	for (const QString& tag : tagList) {
+		tags.push_back(tag.toStdString());
+	}
+	m_projectInformation.setTags(tags);
+
+	m_projectInformation.setDescription(m_description->toPlainText().toStdString());
+	m_projectInformation.setDescriptionSyntax(ot::stringToDocumentSyntax(m_descriptionSyntax->currentText().toStdString()));
 }

@@ -28,6 +28,7 @@ namespace ot {
 		const QStringList& getSelectedFilters() const { return m_selectedFilters; };
 
 		static QString getEmptyGroupFilterName() { return "< No Groups >"; };
+		static QString getEmptyTagsFilterName() { return "< No Tags >"; };
 
 	private:
 		QStringList m_selectedFilters;

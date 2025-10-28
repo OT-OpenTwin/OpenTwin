@@ -185,9 +185,6 @@
     <ClCompile Include="src\ProjectOverviewPreviewBox.cpp">
       <Filter>Source Files\ProjectOverview</Filter>
     </ClCompile>
-    <ClCompile Include="src\ProjectOverviewPreviewData.cpp">
-      <Filter>Source Files\ProjectOverview</Filter>
-    </ClCompile>
     <ClCompile Include="src\EditProjectInformationDialog.cpp">
       <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
@@ -263,9 +260,6 @@
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
     <ClInclude Include="include\ProjectOverviewFilterData.h">
-      <Filter>Header Files\ProjectOverview</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ProjectOverviewPreviewData.h">
       <Filter>Header Files\ProjectOverview</Filter>
     </ClInclude>
   </ItemGroup>

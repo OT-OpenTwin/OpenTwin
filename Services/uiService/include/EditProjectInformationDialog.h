@@ -4,7 +4,7 @@
 
 // OpenTwin header
 #include "LoginData.h"
-#include "OTCore/ProjectInformation.h"
+#include "OTGui/ExtendedProjectInformation.h"
 #include "OTWidgets/Dialog.h"
 
 namespace ot {
@@ -21,7 +21,7 @@ class EditProjectInformationDialog : public ot::Dialog {
 	OT_DECL_NOMOVE(EditProjectInformationDialog)
 	OT_DECL_NODEFAULT(EditProjectInformationDialog)
 public:
-	EditProjectInformationDialog(const LoginData& _logInData, const ot::ProjectInformation& _project, QWidget* _parent);
+	EditProjectInformationDialog(const std::string& _callbackUrl, const std::string& _callbackAction, const LoginData& _logInData, const std::string& _projectName, QWidget* _parent);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -48,12 +48,16 @@ private Q_SLOTS:
 
 private:
 	void initializeData();
+	void updateInformationEntry();
 	
+	std::string m_callbackUrl;
+	std::string m_callbackAction;
+
 	const QSize c_toolButtonSize;
 	bool m_firstShow;
 
 	LoginData m_logInData;
-	ot::ProjectInformation m_projectInformation;
+	ot::ExtendedProjectInformation m_projectInformation;
 	
 	ot::ImagePainterWidget* m_imageWidget;
 	ot::ComboBox* m_category;

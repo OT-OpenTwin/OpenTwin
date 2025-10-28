@@ -1950,8 +1950,9 @@ void ExternalServicesComponent::handleEditProjectInformation(ot::JsonDocument& _
 	m_actionProfiler.ignoreCurrent();
 
 	std::string callbackAction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
+	std::string senderUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 
-	AppBase::instance()->editCurrentProjectInformation(callbackAction);
+	AppBase::instance()->editProjectInformation(senderUrl, callbackAction);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

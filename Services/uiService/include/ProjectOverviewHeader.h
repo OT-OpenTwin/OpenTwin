@@ -23,6 +23,7 @@ namespace ot {
 			Checked,
 			Type,
 			Name,
+			Tags,
 			Owner,
 			Groups,
 			Modified,

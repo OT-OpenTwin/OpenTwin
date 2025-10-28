@@ -31,6 +31,7 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/VisualisationCfg.h"
+#include "OTGui/ExtendedProjectInformation.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/WidgetView.h"
@@ -479,7 +480,7 @@ public:
 
 	bool openNewInstance(const ot::ProjectInformation& _projectInfo, const std::string& _customVersion);
 
-	void editCurrentProjectInformation(const std::string& _callbackAction);
+	void editProjectInformation(const std::string& _senderUrl, const std::string& _callbackAction);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

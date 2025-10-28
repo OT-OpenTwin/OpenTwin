@@ -2,8 +2,9 @@
 
 // OpenTwin header
 #include "ProjectOverviewPreviewBox.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/Label.h"
-#include "OTWidgets/PlainTextEdit.h"
+#include "OTWidgets/TextEdit.h"
 #include "OTWidgets/ImagePainterWidget.h"
 #include "OTWidgets/PixmapImagePainter.h"
 #include "OTWidgets/ImagePainterManager.h"
@@ -28,16 +29,26 @@ ot::ProjectOverviewPreviewBox::ProjectOverviewPreviewBox(QWidget* _parent)
 	infoLayout->setColumnStretch(1, 1);
 	mainLayout->addLayout(infoLayout);
 
-	infoLayout->addWidget(new ot::Label("Name:", this), 0, 0);
+	int r = 0;
+	infoLayout->addWidget(new ot::Label("Name:", this), r, 0);
 	m_name = new ot::Label(this);
-	infoLayout->addWidget(m_name, 0, 1);
+	infoLayout->addWidget(m_name, r++, 1);
 
-	infoLayout->addWidget(new ot::Label("Type:", this), 1, 0);
+	infoLayout->addWidget(new ot::Label("Type:", this), r, 0);
 	m_type = new ot::Label(this);
-	infoLayout->addWidget(m_type, 1, 1);
+	infoLayout->addWidget(m_type, r++, 1);
+
+	infoLayout->addWidget(new ot::Label("Category:", this), r, 0);
+	m_category = new ot::Label(this);
+	infoLayout->addWidget(m_category, r++, 1);
+
+	infoLayout->addWidget(new ot::Label("Tags:", this), r, 0);
+	m_tags = new ot::Label(this);
+	m_tags->setWordWrap(true);
+	infoLayout->addWidget(m_tags, r++, 1);
 
 	mainLayout->addWidget(new ot::Label("Description:", this));
-	m_description = new ot::PlainTextEdit(this);
+	m_description = new ot::TextEdit(this);
 	m_description->setReadOnly(true);
 	mainLayout->addWidget(m_description, 1);
 
@@ -77,7 +88,7 @@ void ot::ProjectOverviewPreviewBox::unsetProject() {
 	m_collapseTimer.start();
 }
 
-void ot::ProjectOverviewPreviewBox::setProject(const ProjectOverviewPreviewData& _projectInfo) {
+void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation& _projectInfo) {
 	m_collapseTimer.stop();
 
 	// Set image if available
@@ -96,9 +107,42 @@ void ot::ProjectOverviewPreviewBox::setProject(const ProjectOverviewPreviewData&
 		m_imageWidget->setHidden(true);
 	}
 
+	// Set description if available
+	if (!_projectInfo.getDescription().empty()) {
+		switch (_projectInfo.getDescriptionSyntax()) {
+		case DocumentSyntax::PlainText:
+			m_description->setPlainText(QString::fromStdString(_projectInfo.getDescription()));
+			break;
+
+		case DocumentSyntax::Markdown:
+			m_description->setMarkdown(QString::fromStdString(_projectInfo.getDescription()));
+			break;
+
+		case DocumentSyntax::HTML:
+			m_description->setHtml(QString::fromStdString(_projectInfo.getDescription()));
+			break;
+
+		default:
+			OT_LOG_W("Unsupported document syntax (" + std::to_string(static_cast<int>(_projectInfo.getDescriptionSyntax())) + "). Defaulting to plain text...");
+			m_description->setPlainText(QString::fromStdString(_projectInfo.getDescription()));
+			break;
+		}
+	}
+	else {
+		m_description->setPlainText("");
+	}
+
 	// Set general info
 	m_name->setText(QString::fromStdString(_projectInfo.getProjectName()));
 	m_type->setText(QString::fromStdString(_projectInfo.getProjectType()));
+	m_category->setText(QString::fromStdString(_projectInfo.getCategory()));
+
+	std::string tagsString;
+	for (const std::string& tag : _projectInfo.getTags()) {
+		if (!tagsString.empty()) tagsString += " ";
+		tagsString += tag;
+	}
+	m_tags->setText(QString::fromStdString(tagsString));
 
 	// Expand
 	if (!m_isExpanded) {

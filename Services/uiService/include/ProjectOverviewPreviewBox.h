@@ -3,7 +3,7 @@
 #pragma once
 
 // OpenTwin header
-#include "ProjectOverviewPreviewData.h"
+#include "OTGui/ExtendedProjectInformation.h"
 #include "OTWidgets/WidgetBase.h"
 
 // Qt header
@@ -14,7 +14,7 @@
 namespace ot {
 
 	class Label;
-	class PlainTextEdit;
+	class TextEdit;
 	class ImagePainterWidget;
 
 	class ProjectOverviewPreviewBox : public QWidget {
@@ -28,7 +28,7 @@ namespace ot {
 		virtual ~ProjectOverviewPreviewBox();
 
 		void unsetProject();
-		void setProject(const ProjectOverviewPreviewData& _data);
+		void setProject(const ExtendedProjectInformation& _data);
 
 	private Q_SLOTS:
 		void slotDelayedCollapse();
@@ -44,6 +44,8 @@ namespace ot {
 		ImagePainterWidget* m_imageWidget;
 		Label* m_name;
 		Label* m_type;
-		PlainTextEdit* m_description;
+		Label* m_category;
+		Label* m_tags;
+		TextEdit* m_description;
 	};
 } // namespace ot

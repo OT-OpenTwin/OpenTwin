@@ -4,8 +4,8 @@
 
 // OpenTwin header
 #include "ProjectOverviewFilterData.h"
-#include "ProjectOverviewPreviewData.h"
 #include "OTCore/ProjectInformation.h"
+#include "OTGui/ExtendedProjectInformation.h"
 #include "OTWidgets/WidgetBase.h"
 
 // Qt header
@@ -103,7 +103,7 @@ namespace ot {
 		std::mutex m_mutex;
 		std::unique_ptr<std::thread> m_loadingThread;
 		ProjectInformation m_currentlyLoadingProject;
-		ProjectOverviewPreviewData m_importedProjectData;
+		ExtendedProjectInformation m_importedProjectData;
 
 		ProjectOverviewHeader* m_header;
 		ProjectOverviewPreviewBox* m_previewBox;

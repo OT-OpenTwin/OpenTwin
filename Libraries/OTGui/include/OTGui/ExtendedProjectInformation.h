@@ -17,6 +17,7 @@ namespace ot {
 		OT_DECL_DEFMOVE(ExtendedProjectInformation)
 	public:
 		ExtendedProjectInformation();
+		ExtendedProjectInformation(const ProjectInformation& _basicInfo);
 		virtual ~ExtendedProjectInformation() = default;
 
 		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
