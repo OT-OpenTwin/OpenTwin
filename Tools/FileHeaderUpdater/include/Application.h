@@ -55,6 +55,7 @@ private:
 		bool addFileName = false;
 		bool addLicenseTitle = false;
 		std::string keywordStart;
+		std::string keywordStartLower;
 		std::string keywordEnd;
 		std::string headerLinePrefix;
 		std::list<std::string> licenseLines;

@@ -146,8 +146,10 @@ void Application::scanFile(const std::string& _filePath) {
 		return;
 	}
 
+	std::transform(line.begin(), line.end(), line.begin(), [](unsigned char c) { return std::tolower(c); });
+
 	// Check for file header
-	if (line.find(m_config.keywordStart) != 0) {
+	if (line != m_config.keywordStart) {
 		if (m_config.warnMissingHeader) {
 			log("File missing license header: \"" + _filePath + "\"");
 		}
@@ -471,6 +473,9 @@ Application::Config Application::loadConfigFile(const std::string& _fileName) {
 	// Read keyword start
 	if (doc.HasMember("Keyword.Start") && doc["Keyword.Start"].IsString()) {
 		cfg.keywordStart = doc["Keyword.Start"].GetString();
+		cfg.keywordStartLower = cfg.keywordStart;
+		std::transform(cfg.keywordStartLower.begin(), cfg.keywordStartLower.end(), cfg.keywordStartLower.begin(), 
+			[](unsigned char c) { return std::tolower(c); });
 
 		if (cfg.keywordStart.empty()) {
 			logE("Invalid config content: Empty \"Keyword.Start\" string");
