@@ -1,3 +1,6 @@
+// @otLicense
+// @otLicense-end
+
 #include "SolverFDTD.h"
 #include "Application.h"
 #include "EntityVis2D3D.h"

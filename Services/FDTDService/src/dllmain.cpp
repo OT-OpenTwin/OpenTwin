@@ -1,6 +1,5 @@
-/*
- * dllmain.cpp
- */
+// @otLicense
+// @otLicense-end
 
 // C++ header
 #include <Windows.h>

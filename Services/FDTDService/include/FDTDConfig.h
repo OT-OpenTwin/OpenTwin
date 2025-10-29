@@ -1,10 +1,5 @@
 // @otLicense
 // @otLicense-end
-//! @file FDTDConfig.h
-//! @brief Definition of the FDTDConfig class for managing FDTD simulation configuration in openEMS
-//! @author Alexandros McCray (alexm-dev)
-//! @date 08.10.2025
-// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 

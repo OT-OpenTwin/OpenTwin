@@ -1,3 +1,6 @@
+// @otLicense
+// @otLicense-end
+
 #pragma once
 
 #include "SolverBase.h"

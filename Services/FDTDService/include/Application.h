@@ -1,10 +1,5 @@
-/*
- * Application.h
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
+// @otLicense
+// @otLicense-end
 
 #pragma once
 

@@ -1,10 +1,5 @@
-/*
- * Application.cpp
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
+// @otLicense
+// @otLicense-end
 
 // Service header
 #include "Application.h"

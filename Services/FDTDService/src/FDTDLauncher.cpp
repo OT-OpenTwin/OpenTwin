@@ -1,3 +1,5 @@
+// @otLicense
+// @otLicense-end
 
 #include "FDTDLauncher.h"
 

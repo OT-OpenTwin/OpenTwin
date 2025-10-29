@@ -1,8 +1,5 @@
-//! @file ExcitationPropertiess.h
-//! @brief Definition of the ExcitationProperties class for managing excitation properties in openEMS
-//! @author Alexandros McCray (alexm-dev)
-//! @date 24.10.2025
-// ###########################################################################################################################################################################################################################################################################################################################
+// @otLicense
+// @otLicense-end
 
 #pragma once
 

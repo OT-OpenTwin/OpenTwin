@@ -1,3 +1,6 @@
+// @otLicense
+// @otLicense-end
+
 #include "SolverBase.h"
 
 #include "OTSystem/OperatingSystem.h"
