@@ -1,5 +1,4 @@
 // @otLicense
-// @otLicense-end
 
 #include "SolverFDTD.h"
 #include "Application.h"

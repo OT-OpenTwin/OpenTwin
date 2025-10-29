@@ -1,5 +1,4 @@
 // @otLicense
-// @otLicense-end
 
 #include <iostream>
 #include "gtest/gtest.h"
