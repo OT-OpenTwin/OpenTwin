@@ -51,9 +51,6 @@ protected:
 	bool runExecutableAndWaitForCompletion(std::string commandLine, std::string workingDirectory, ot::components::UiComponent* uiComponent);
 	std::string readEnvironmentVariable(const std::string& variableName);
 	bool isPECMaterial(const std::string& materialName);
-	bool isPMCMaterial(const std::string& materialName);
-	bool isMURMaterial(const std::string& materialName);
-	bool isPMLMaterial(const std::string& materialName);
 	void ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiComponent* uiComponent);
 
 	EntityBase* solverEntity;

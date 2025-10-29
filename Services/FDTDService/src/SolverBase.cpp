@@ -32,42 +32,6 @@ bool SolverBase::isPECMaterial(const std::string& materialName)
 	return false;
 }
 
-bool SolverBase::isPMCMaterial(const std::string& materialName)
-{
-	EntityPropertiesSelection* materialType = dynamic_cast<EntityPropertiesSelection*>(materialProperties[materialName].getProperty("Material type"));
-
-	if (materialType != nullptr)
-	{
-		return (materialType->getValue() == "PMC");
-	}
-
-	return false;
-}
-
-bool SolverBase::isMURMaterial(const std::string& materialName)
-{
-	EntityPropertiesSelection* materialType = dynamic_cast<EntityPropertiesSelection*>(materialProperties[materialName].getProperty("Material type"));
-
-	if (materialType != nullptr)
-	{
-		return (materialType->getValue() == "MUR");
-	}
-
-	return false;
-}
-
-bool SolverBase::isPMLMaterial(const std::string& materialName)
-{
-	EntityPropertiesSelection* materialType = dynamic_cast<EntityPropertiesSelection*>(materialProperties[materialName].getProperty("Material type"));
-
-	if (materialType != nullptr)
-	{
-		return (materialType->getValue() == "PML");
-	}
-
-	return false;
-}
-
 void SolverBase::runSolverExe(const std::string& inputFileName, const std::string& solvTarget, const std::string& postTarget, const std::string& workingDirectory, ot::components::UiComponent* uiComponent)
 {
 	std::string exePath;
