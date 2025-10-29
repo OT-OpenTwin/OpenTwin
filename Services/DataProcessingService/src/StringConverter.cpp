@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "StringConverter.h"
 
 std::string ot::toString(const ot::GenericDataStruct* _dataStruct)

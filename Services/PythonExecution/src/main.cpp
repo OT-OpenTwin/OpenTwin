@@ -1,3 +1,5 @@
+// @otlicense
+
 // Service header
 #include "Application.h"
 

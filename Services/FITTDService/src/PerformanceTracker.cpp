@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PerformanceTracker.h"
 
 std::string PerformanceTracker::Print()

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file LogNotifierFileWriter.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date January 2021

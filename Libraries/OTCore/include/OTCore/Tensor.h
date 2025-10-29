@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "DataObject.h"
 #include <memory>

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   EncodingConverter_UTF16ToUTF8.h
  * \brief  Converter that can transform a set of UTF-16 LE BOM or UTF16 BE BOM characters into a set of UTF-8 character.

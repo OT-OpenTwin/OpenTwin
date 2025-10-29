@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PhysicalGroupsManager.h"
 
 #include "Application.h"

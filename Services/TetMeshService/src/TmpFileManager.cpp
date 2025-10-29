@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "TmpFileManager.h"
 
 #include <windows.h> // winapi

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "CSVToTableTransformer.h"
 #include "OTCore/String.h"
 #include "OTCore/LogDispatcher.h"

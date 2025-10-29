@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsHierarchicalProjectItemBuilder.cpp
 //! 
 //! @author Alexander Kuester (alexk95)

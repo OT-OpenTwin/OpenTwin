@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "LTSpiceConnector/ProjectManager.h"
 #include "LTSpiceConnector/VersionFile.h"
 

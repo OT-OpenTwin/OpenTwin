@@ -1,3 +1,5 @@
+// @otlicense
+
 /*********************************************************************
  * @file   Signal.h
  * @brief  Container for properties of signal types. Frequencies are handled internally with the unit Herz.

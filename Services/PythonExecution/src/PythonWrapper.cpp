@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <signal.h>
 #include "PythonWrapper.h"
 #include "PythonExtension.h"

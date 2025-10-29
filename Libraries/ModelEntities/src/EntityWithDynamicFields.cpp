@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityWithDynamicFields.h"
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/basic/array.hpp>

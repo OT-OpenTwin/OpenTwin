@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsLineItemCfg.h
 //! 
 //! @author Alexander Kuester (alexk95)

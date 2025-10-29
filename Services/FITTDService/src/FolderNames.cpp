@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FolderNames.h"
 
 const std::string FolderNames::folderNameSignalType = "Signal Types";

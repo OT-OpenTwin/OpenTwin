@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PythonLoadedModules.h"
 
 PythonLoadedModules& PythonLoadedModules::instance(void) {

@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTCore/DefensiveProgramming.h"

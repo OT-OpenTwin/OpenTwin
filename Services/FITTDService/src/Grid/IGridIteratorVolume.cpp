@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Grid/IGridIteratorVolume.h"
 
 const index_t & IGridIteratorVolume::GetNextIndex()

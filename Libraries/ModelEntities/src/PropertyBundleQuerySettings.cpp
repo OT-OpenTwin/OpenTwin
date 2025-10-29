@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PropertyBundleQuerySettings.h"
 #include "PropertyHelper.h"
 #include "OTCore/ComparisionSymbols.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file FrontendAPI.h
 //!
 //! @author Alexander Kuester (alexk95)

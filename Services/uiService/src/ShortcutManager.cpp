@@ -1,3 +1,5 @@
+// @otlicense
+
 // Project header
 #include "ShortcutManager.h"
 #include "AppBase.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		RubberbandOsgWrapper.h
  *	Package:	rbeWrapper

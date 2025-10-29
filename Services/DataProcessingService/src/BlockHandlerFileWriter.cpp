@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BlockHandlerFileWriter.h"
 
 #include "OTSystem/OTAssert.h"

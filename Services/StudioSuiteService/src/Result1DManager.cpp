@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Result1DManager.h"
 
 #include <stdexcept>

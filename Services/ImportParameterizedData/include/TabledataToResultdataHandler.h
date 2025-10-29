@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   DataCollectionCreationHandler.h
  * \brief  Handler for storring data in the result collection.

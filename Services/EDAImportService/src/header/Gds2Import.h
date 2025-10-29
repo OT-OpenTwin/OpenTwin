@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef GDS2IMPORT_H_
 #define GDS2IMPORT_H_
 

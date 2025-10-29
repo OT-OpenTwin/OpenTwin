@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef IC3DCREATOR_H
 #define IC3DCREATOR_H
 

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PropertyBundleScaling.h"
 
 void PropertyBundleScaling::setProperties(EntityBase * _thisObject)

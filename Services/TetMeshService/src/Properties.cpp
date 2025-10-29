@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Properties.h"
 
 #include "EntityMeshTet.h"

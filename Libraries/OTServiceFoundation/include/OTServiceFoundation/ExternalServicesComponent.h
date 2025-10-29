@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ExternalServicesComponent.h
 //! 
 //! @author Alexander Kuester (alexk95)

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   BusinessLogicHandler.h
  * \brief  Common methods for all central handler classes.

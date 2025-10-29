@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Msg.h
 //! @authors Alexander Kuester, Peter Thoma
 //! @date January 2021

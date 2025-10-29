@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockCircuitElement.h"
 class __declspec(dllexport) EntityBlockCircuitDiode : public EntityBlockCircuitElement
 {

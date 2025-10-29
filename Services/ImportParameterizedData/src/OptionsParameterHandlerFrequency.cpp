@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OptionsParameterHandlerFrequency.h"
 
 bool OptionsParameterHandlerFrequency::IndividualInterpretation(const std::string& entry, ts::OptionSettings& options)

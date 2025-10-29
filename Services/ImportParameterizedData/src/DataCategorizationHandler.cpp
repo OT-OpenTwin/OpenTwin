@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "DataCategorizationHandler.h"
 #include "MetadataEntityInterface.h"
 #include "OTCore/GenericDataStructMatrix.h"

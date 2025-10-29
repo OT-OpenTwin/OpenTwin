@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Color.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2023

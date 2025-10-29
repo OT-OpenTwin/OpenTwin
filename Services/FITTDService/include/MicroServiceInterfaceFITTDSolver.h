@@ -1,3 +1,5 @@
+// @otlicense
+
 /*********************************************************************
  * @file   MicroServiceInterfaceFITTDSolver.h
  * @brief  Interface between service API and solver functionality. Handles creation of entities created from solver results and settings ectrected from properties of ui entities.

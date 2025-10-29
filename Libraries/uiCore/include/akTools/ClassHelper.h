@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 
 //! @brief Creates a private property with public set and get function

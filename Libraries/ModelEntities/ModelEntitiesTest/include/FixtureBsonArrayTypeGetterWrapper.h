@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 
 #include <bsoncxx/builder/stream/document.hpp>

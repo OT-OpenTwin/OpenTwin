@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureGrid.h"
 #include "SystemDependencies/Allignments.h"
 

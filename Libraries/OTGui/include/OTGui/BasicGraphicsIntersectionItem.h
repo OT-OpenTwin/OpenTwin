@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file BasicGraphicsIntersectionItem.h
 //! 
 //! @author Alexander Kuester (alexk95)

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   EncodingGuesser.h
  * \brief  Detects the encoding style. The detection class can only find the next best match and does not guarantee the correct detection of the intended standard. 

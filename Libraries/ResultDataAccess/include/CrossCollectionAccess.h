@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   CrossCollectionAccess.h
  * \brief  Interface to access a different project and get its metadata regarding the result collection.

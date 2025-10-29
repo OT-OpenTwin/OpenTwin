@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureCurlCoefficients3D.h"
 #include "Grid/Grid.h"
 #include "SystemDependencies/Allignments.h"

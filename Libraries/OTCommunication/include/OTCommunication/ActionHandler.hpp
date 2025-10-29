@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ActionHandler.hpp
 //! @author Alexander Kuester (alexk95)
 //! @date October 2025

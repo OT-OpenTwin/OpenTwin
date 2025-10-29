@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Polygon.h"
 
 MyPolygon::MyPolygon(unsigned int l, std::vector<std::pair<int, int>> c) : layer(l), coordinates(c){}

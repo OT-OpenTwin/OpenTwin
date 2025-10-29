@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "ResultFilter/ResultSourceScalar.h"
 #include "Grid/GridIteratorSubvolume.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Ports/PortFactory.h"
 #include "Ports/SourceTarget.h"
 #include "Ports/Signal.h"

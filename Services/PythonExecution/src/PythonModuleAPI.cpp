@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PythonModuleAPI.h"
 #include "PythonObjectBuilder.h"
 #include "PythonLoadedModules.h"

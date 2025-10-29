@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FileWriter.h"
 
 FileWriter::FileWriter(const std::string& _filePath, bool _append)

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBuffer.h"
 #include "Application.h"
 #include "IVisualisationTable.h"

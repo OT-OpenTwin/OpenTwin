@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aNotifierObjectManager.h
  *	Package:	akCore

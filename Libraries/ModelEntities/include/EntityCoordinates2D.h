@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "EntityBase.h"
 #include "OTCore/Point2D.h"

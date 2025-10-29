@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/ExplicitStringValueConverter.h"
 
 ot::Variable ot::ExplicitStringValueConverter::setValueFromString(const std::string& _valueString, const std::string& _valueType)

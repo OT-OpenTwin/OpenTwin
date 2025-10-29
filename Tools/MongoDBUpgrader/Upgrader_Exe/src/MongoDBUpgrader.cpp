@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MongoDBUpgrader.h"
 #include "SharedResources.h"
 #include "MongoDBServerRunner.h"

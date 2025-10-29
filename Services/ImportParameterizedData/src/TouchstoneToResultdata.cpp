@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "TouchstoneToResultdata.h"
 
 #include "OTCore/FolderNames.h"

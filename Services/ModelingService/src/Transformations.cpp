@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Transformations.h"
 
 #include "EntityGeometry.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <stdafx.h>
 #include "PlotVisualiser.h"
 #include "OTCommunication/ActionTypes.h"

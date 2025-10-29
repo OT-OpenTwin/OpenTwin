@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "OTCore/Serializable.h"
 #pragma warning(disable:4251)

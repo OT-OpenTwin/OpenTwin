@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "../include/EntityResult3D.h"
 
 static EntityFactoryRegistrar<EntityResult3D> registrar(EntityResult3D::className());

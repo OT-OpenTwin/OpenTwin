@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTServiceFoundation/TimeFormatter.h"
 
 std::string TimeFormatter::formatDuration(const std::chrono::steady_clock::time_point _begin, const std::chrono::steady_clock::time_point& _end)

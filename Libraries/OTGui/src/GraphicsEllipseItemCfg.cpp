@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsEllipseItemCfg.cpp
 //! 
 //! @author Alexander Kuester (alexk95)

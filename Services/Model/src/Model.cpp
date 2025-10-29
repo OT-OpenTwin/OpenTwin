@@ -1,3 +1,5 @@
+// @otlicense
+
 // Model.cpp : Defines the Model class which is exported for the DLL application.
 //
 

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BatchedCategorisationHandler.h"
 #include "EntityTableSelectedRanges.h"
 #include "CategorisationFolderNames.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BusinessLogicHandler.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "UpdateManager.h"
 
 #include "OTCommunication/ActionTypes.h"

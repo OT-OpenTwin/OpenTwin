@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsRectangularItemCfg.h
 //! 
 //! @author Alexander Kuester (alexk95)

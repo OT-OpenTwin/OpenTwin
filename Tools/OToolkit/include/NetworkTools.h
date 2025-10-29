@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file NetworkTools.h
 //! @author Alexander Kuester (alexk95)
 //! @date August 2024

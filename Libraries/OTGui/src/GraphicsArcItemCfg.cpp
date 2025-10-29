@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsArcItemCfg.cpp
 //! 
 //! @author Alexander Kuester (alexk95)

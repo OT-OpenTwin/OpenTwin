@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "..\include\PropertyBundleDataHandleScaling.h"
 
 PropertyBundleDataHandleScaling::PropertyBundleDataHandleScaling(EntityBase * thisObject) : thisObject(thisObject)

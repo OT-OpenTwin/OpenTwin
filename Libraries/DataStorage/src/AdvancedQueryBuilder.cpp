@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "AdvancedQueryBuilder.h"
 #include "OTCore/VariableToBSONStringConverter.h"

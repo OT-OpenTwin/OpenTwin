@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file PlotBase.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date October 2024

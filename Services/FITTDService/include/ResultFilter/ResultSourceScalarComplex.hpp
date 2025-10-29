@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "ResultFilter/ResultSourceScalarComplex.h"
 #include "ResultFilter/ResultContainerScalarComplex.h"

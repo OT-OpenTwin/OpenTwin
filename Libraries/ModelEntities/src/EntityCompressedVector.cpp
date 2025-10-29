@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntityCompressedVector.h"
 #include "EntityBinaryData.h"

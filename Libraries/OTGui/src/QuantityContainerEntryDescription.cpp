@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTGui/QuantityContainerEntryDescription.h"
 
 void ot::QuantityContainerEntryDescription::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const

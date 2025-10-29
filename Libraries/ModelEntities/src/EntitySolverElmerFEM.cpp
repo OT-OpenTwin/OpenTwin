@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntitySolverElmerFEM.h"
 #include "OldTreeIcon.h"

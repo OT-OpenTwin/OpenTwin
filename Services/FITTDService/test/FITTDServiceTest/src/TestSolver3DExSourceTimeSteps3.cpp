@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureSimulation3D.h"
 #include <gtest/gtest.h>
 #include <list>

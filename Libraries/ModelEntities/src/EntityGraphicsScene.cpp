@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityGraphicsScene.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/VisualisationTypes.h"

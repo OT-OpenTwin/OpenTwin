@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aSignalLinker.cpp
  *	Package:	akGui

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Painter2DEditDialogFillEntry.h
 //! @author Alexander Kuester (alexk95)
 //! @date March 2024

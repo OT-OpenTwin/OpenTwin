@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef QUADTREE_H
 #define QUADTREE_H
 

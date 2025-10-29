@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntitySignalType.h"
 
 #include "OTCommunication/ActionTypes.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntitySolverPyrit.h"
 #include "OldTreeIcon.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 // OpenTwin header
 #include "OTSystem/SystemProcess.h"
 #include "OTSystem/OperatingSystem.h"

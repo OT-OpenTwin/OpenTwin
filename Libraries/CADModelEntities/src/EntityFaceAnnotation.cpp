@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntityFaceAnnotation.h"
 #include "EntityGeometry.h"

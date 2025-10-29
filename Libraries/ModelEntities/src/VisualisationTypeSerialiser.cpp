@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "VisualisationTypeSerialiser.h"
 #include "IVisualisationTable.h"
 #include "IVisualisationText.h"

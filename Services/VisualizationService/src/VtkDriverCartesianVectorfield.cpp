@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 
 #include "VtkDriverCartesianVectorfield.h"

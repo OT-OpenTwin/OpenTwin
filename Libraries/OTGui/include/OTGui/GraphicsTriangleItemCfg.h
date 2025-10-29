@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsTriangleItemCfg.h
 //! 
 //! @author Alexander Kuester (alexk95)

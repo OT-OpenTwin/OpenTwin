@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Matrix2.hpp
 //! @brief Access optimized dense matrix handle.
 //! @author Wagner

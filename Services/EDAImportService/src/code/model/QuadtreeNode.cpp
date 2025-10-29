@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "QuadtreeNode.h"
 #include <Bnd_Box.hxx>
 #include <BRepBndLib.hxx>

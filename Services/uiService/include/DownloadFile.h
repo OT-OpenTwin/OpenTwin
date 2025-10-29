@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	DownloadFile.h
  *

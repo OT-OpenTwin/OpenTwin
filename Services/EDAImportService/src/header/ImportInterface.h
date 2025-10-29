@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef IMPORTINTERDFACE_H_
 #define IMPORTINTERDFACE_H_
 

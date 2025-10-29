@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		rbeAssert.h
  *	Package:	rbeCore

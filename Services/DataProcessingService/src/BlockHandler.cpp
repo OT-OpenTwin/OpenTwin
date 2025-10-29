@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BlockHandler.h"
 #include "OTServiceFoundation/TimeFormatter.h"
 #include "SolverReport.h"

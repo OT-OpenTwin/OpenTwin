@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include <bsoncxx/builder/basic/document.hpp>
 #include "OTCore/Variable.h"

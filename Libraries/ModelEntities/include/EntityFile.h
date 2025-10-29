@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   EntityFile.h
  * \brief  Entity that holds a binary representation of a file. Any type of file should be supported

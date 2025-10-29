@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureTextEncoding.h"
 #include "OTCore/EncodingGuesser.h"
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"

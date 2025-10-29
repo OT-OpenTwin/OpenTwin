@@ -1,3 +1,5 @@
+// @otlicense
+
 //#include "FixtureTouchstoneHandler.h"
 //#include "OptionSettings.h"
 //#include "Options.h"

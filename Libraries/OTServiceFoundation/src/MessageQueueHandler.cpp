@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/MessageQueueHandler.h"
 

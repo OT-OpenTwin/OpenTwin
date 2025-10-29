@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "DataBaseInfo.h"
 
 DataBaseInfo::DataBaseInfo(const DataBaseInfo& _other) {

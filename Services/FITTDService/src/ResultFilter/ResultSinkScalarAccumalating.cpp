@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultFilter/ResultSinkScalarAccumalating.h"
 
 void ResultSinkScalarAccumalating::ConsumeResultContainer(ResultContainer * container)

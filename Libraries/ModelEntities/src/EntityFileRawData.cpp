@@ -1,3 +1,5 @@
+// @otlicense
+
 // OpenTwin header
 #include "EntityFileRawData.h"
 

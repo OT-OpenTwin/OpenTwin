@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "ResultSource.h"
 #include "Simulation/DegreesOfFreedom3DLoopCPU.h"

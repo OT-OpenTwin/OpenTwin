@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntityVisUnstructuredScalarSurface.h"
 #include "OldTreeIcon.h"

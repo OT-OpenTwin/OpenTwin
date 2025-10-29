@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef STEPWRITER_H
 #define STEPWRITER_H
 

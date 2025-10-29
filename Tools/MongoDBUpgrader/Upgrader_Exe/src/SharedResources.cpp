@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "SharedResources.h"
 #include "WindowsUtilityFuctions.h"
 

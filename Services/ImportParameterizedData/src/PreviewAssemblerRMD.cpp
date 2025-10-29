@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PreviewAssemblerRMD.h"
 #include "DataCategorizationHandler.h"
 #include "OTGui/TableIndexSchemata.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "IC3DCreator.h"
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>

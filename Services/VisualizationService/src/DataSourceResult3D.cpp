@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "../include/DataSourceResult3D.h"
 
 

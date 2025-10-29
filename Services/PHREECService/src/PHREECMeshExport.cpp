@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PHREECMeshExport.h"
 
 #include "Application.h"

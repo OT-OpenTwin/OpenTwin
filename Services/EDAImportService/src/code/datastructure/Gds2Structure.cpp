@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Gds2Structure.h"
 
 Gds2Structure::Gds2Structure(std::string name, std::vector<MyPolygon> polygons) : name(name), polygons(polygons), structureReferences({}) {}

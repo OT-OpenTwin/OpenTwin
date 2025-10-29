@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ParametricResult1DManager.h"
 #include "Result1DManager.h"
 #include "Application.h"

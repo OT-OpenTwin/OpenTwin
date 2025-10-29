@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityResultTableData.h"
 
 static EntityFactoryRegistrar<EntityResultTableData<int32_t>> registrar32(EntityResultTableData<int32_t>::classNameBase() + "_" + ot::TypeNames::getInt32TypeName());

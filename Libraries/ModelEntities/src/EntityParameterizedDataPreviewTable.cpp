@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityParameterizedDataPreviewTable.h"
 
 static EntityFactoryRegistrar<EntityParameterizedDataPreviewTable> registrar("EntityParameterizedDataPreviewTable");

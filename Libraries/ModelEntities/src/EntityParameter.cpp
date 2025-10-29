@@ -1,3 +1,5 @@
+// @otlicense
+
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 

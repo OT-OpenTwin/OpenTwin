@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		HistoryConnection.cpp
  *	Package:	rbeCore

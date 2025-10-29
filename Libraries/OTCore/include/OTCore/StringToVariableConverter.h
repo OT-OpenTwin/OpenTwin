@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "Variable.h"
 #include <string>

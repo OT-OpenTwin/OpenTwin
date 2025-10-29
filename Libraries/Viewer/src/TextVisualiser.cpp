@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <stdafx.h>
 #include "TextVisualiser.h"
 #include "OTCore/JSON.h"

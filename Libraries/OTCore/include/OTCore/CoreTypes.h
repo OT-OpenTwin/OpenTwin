@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file CoreTypes.h
 //! @brief This file contains the core defines of OpenTwin.
 //! @author Alexander Kuester (alexk95)

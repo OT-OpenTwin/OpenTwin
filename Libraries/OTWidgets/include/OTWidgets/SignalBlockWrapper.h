@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file SignalBlockWrapper.h
 //! @author Alexander Kuester (alexk95)
 //! @date December 2024

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file PropertyGridView.h
 //! @author Alexander Kuester (alexk95)
 //! @date April 2024

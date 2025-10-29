@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Encryption.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsTextItemCfg.cpp
 //! 
 //! @author Alexander Kuester (alexk95)

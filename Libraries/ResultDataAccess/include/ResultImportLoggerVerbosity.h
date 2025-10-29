@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 enum class __declspec(dllexport) ResultImportLoggerVerbosity
 {

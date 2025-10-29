@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BlockHandlerDatabaseAccess.h"
 
 #include "Application.h"

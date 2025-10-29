@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aObjectManager.h
  *	Package:	akGui

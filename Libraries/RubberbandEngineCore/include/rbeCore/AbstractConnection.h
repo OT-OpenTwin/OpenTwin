@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		AbstractConnection.h
  *	Package:	rbeCore

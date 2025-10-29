@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "SelectionChangedObserver.h"
 #include "OTGui/ToolBarButtonCfg.h"

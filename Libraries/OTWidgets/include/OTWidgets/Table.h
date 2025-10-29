@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Table.h
 //! @author Alexander Kuester (alexk95)
 //! @date August 2024

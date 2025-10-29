@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "TableStatisticAnalyser.h"
 #include <list>    
 

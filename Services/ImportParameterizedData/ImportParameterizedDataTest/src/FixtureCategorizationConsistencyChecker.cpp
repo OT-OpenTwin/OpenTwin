@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureCategorizationConsistencyChecker.h"
 #include "EntityTableSelectedRanges.h"
 #include "EntityParameterizedDataCategorization.h"

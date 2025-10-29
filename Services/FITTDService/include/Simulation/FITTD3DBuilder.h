@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "Simulation/FITTD3DLoop.h"
 #include "Grid/Grid.h"

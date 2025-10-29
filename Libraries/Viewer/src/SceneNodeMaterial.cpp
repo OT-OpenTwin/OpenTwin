@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "SceneNodeMaterial.h"
 #include "SceneNodeMaterialFactory.h"

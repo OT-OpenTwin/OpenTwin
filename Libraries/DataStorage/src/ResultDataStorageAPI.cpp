@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "../include/ResultDataStorageAPI.h"
 #include "Connection/ConnectionAPI.h"

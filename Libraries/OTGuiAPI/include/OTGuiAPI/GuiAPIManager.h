@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GuiAPIManager.h
 //! 
 //! @author Alexander Kuester (alexk95)

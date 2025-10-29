@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ShapesBase.h"
 
 #include "ApplicationSettings.h"

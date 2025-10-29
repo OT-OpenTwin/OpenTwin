@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "SystemDependencies/SystemDependentDefines.h"
 #include "Simulation/FITTD3DLoop.h"

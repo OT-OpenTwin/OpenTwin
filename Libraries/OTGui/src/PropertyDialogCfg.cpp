@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file PropertyDialogCfg.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024

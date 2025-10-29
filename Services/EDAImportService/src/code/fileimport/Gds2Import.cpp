@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Gds2Import.h"
 #include <filesystem>
 #include <fstream>

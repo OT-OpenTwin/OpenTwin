@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "gtest/gtest.h"
 #include "OTSystem/Exception.h"
 #include "OTCore/EntityName.h"

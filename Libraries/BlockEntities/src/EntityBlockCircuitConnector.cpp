@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockCircuitConnector.h"
 #include "OTGui/GraphicsItemFileCfg.h"
 #include "OTGui/BasicGraphicsIntersectionItem.h"

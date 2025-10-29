@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureTabledataToResultdataHandler.h"
 #include "TabledataToResultdataHandler.h"
 

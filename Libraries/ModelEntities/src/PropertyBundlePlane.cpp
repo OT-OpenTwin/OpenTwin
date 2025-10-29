@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "..\include\PropertyBundlePlane.h"
 
 void PropertyBundlePlane::setProperties(EntityBase * _thisObject)

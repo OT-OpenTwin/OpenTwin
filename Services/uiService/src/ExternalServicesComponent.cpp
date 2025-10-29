@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ExternalServicesComponent.cpp
 //! @authors Alexander Kuester, Peter Thoma
 //! @date September 2020

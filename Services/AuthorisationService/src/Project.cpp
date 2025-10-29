@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Project.h"
 
 Project::Project() : m_createdOn(std::chrono::system_clock::now()), m_lastAccessedOn(std::chrono::system_clock::now()),

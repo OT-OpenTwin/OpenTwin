@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "CircuitElements/CurrentMeter.h"
 
 CurrentMeter::CurrentMeter(std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)

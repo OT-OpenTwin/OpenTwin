@@ -1,3 +1,5 @@
+// @otlicense
+
 // OpenTwin header
 #include "EntityFile.h"
 #include "OTCore/JSON.h"

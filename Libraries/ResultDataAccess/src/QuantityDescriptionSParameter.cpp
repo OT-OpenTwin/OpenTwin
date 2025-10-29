@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "QuantityDescriptionSParameter.h"
 
 QuantityDescriptionSParameter::QuantityDescriptionSParameter(uint64_t _reserveNumberOfEntries)

@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "PropertyHandlerDatabaseAccessBlock.h"
 #include "EntityPropertiesItems.h"

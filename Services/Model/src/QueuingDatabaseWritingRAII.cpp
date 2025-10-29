@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "QueuingDatabaseWritingRAII.h"
 #include "DataBase.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PreviewAssembler.h"
 #include "Application.h"
 

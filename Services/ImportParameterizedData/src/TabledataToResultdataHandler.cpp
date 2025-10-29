@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "TabledataToResultdataHandler.h"
 #include "Application.h"
 

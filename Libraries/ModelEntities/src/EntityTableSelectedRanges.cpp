@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityTableSelectedRanges.h"
 #include <bsoncxx/builder/basic/array.hpp>
 

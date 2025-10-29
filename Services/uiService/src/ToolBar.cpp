@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ToolBar.h"
 #include "AppBase.h"
 #include "ControlsManager.h"

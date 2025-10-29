@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
 #include "LTSpiceConnector/ProjectManager.h"
 #include "LTSpiceConnector/CommitMessageDialog.h"

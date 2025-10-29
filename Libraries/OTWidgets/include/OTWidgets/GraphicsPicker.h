@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsPicker.h
 //! @author Alexander Kuester (alexk95)
 //! @date August 2023

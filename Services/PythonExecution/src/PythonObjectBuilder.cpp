@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PythonObjectBuilder.h"
 #include "PythonException.h"
 #include "OTCore/GenericDataStructSingle.h"

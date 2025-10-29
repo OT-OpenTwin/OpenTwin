@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "SimulationResults.h"
 
 SimulationResults* SimulationResults::instance = nullptr;

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityDatabaseIndexManipulator.h"
 #include "PropertyHelper.h"
 

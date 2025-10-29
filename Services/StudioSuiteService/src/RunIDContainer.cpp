@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "RunIDContainer.h"
 #include "Result1DData.h"
 #include "InfoFileManager.h"

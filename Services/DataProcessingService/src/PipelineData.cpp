@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PipelineData.h"
 
 #define memberCampaign "Selected Campaign"

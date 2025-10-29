@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "Geometry.h"
 #include "DataBase.h"

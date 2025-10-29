@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ModelBuilder.h"
 
 #include "Properties.h"

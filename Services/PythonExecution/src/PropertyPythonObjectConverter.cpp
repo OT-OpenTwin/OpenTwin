@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PropertyPythonObjectConverter.h"
 #include "PythonObjectBuilder.h"
 

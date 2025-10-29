@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Connector.h"
 #include <bsoncxx/builder/basic/kvp.hpp>
 

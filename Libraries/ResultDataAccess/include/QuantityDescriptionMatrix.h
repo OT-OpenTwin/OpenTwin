@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "QuantityDescription.h"
 #include "OTCore/GenericDataStructMatrix.h"

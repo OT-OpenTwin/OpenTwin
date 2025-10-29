@@ -1,3 +1,5 @@
+// @otlicense
+
 // Service Header
 #include "ConnectionManager.h"
 #include "NGSpice.h"

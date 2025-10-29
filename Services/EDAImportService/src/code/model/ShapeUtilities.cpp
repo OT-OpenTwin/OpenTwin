@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ShapeUtilities.h"
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>

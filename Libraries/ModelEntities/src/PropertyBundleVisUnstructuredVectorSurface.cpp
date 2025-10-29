@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PropertyBundleVisUnstructuredVectorSurface.h"
 
 void PropertyBundleVisUnstructuredVectorSurface:: setProperties(EntityBase * _thisObject)

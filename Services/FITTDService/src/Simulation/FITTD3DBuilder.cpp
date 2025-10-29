@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Simulation/FITTD3DBuilder.h"
 #include "Simulation/FITTD3DLoopNoVectorization.h"
 #include "Simulation/FITTD3DLoopAVX512Sp.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MeshExport.h"
 
 #include "Application.h"

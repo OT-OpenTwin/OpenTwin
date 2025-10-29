@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PrimitivePyramid.h"
 
 #include "EntityGeometry.h"

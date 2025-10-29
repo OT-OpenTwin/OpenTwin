@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/ValueComparisionDefinition.h"
 
 void ValueComparisionDefinition::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const

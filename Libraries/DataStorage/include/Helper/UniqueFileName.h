@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #ifndef INCLUDE_UNIQUEFILENAME_H_
 #define INCLUDE_UNIQUEFILENAME_H_

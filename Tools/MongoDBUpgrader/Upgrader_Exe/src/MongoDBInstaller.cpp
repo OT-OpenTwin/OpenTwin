@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MongoDBInstaller.h"
 #include "SharedResources.h"
 #include "WindowsServiceManager.h"

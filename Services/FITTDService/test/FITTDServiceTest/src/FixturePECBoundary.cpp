@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixturePECBoundary.h"
 #include "CurlCoefficients/Coefficient3DFactory.h"
 #include "Simulation/FITTD3DBuilder.h"

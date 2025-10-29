@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "SceneNodeMultiVisualisation.h"
 #include <osg/Node>

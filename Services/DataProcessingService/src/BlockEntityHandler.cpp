@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BlockEntityHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "OTGui/StyleRefPainter2D.h"

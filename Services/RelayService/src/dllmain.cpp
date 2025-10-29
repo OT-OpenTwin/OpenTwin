@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file dllmain.cpp
 //! @author Peter Thoma, Alexander Kuester
 //! @date April 2020

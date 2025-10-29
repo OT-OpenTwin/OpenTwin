@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file StartupDispatcher.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date September 2022

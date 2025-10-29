@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file LogDispatcher.h
 //! @brief OpenTwin Logging system.
 //! 

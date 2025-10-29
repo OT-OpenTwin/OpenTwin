@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		CircleConnection.h
  *	Package:	rbeCore

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ObjectManagerTemplate.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023

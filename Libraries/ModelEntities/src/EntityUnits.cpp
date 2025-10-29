@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "..\include\EntityUnits.h"
 #include <math.h>
 

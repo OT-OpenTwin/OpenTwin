@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityResult1DCurve.h"
 #include "PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"

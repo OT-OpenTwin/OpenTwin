@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		AbstractOperator.h
  *	Package:	rbeCalc

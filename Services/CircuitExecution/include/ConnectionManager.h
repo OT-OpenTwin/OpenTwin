@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "QtNetwork/qlocalsocket.h"
 #include "QtCore/qobject.h"

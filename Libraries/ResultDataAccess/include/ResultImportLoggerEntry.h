@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "ResultImportLoggerVerbosity.h"
 #include <string>

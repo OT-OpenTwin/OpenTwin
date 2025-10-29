@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   ParameterizedDataHandler.h
  * \brief  Holds the mechanisms to create the final entities holding the four entities that describe a parameterized data collection.

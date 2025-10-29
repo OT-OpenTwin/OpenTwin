@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntityMeshTetItemDataTetedges.h"
 #include "DataBase.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "SolverElectrostatics.h"
 #include "Application.h"
 #include "EntityVis2D3D.h"

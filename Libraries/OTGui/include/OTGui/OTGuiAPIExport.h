@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 
 // This is used to initialize the group

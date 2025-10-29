@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockPython.h"
 #include "OTCommunication/ActionTypes.h"
 #include "PythonHeaderInterpreter.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aWindowEventHandler.h
  *	Package:	akGui

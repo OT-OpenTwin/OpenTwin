@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "TableExtractorCSV.h"
 #include "FileToTableExtractorRegistrar.h"
 #include "EntityFileCSV.h"

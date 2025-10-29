@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MetadataEntrySingle.h"
 
 bool MetadataEntrySingle::operator==(const MetadataEntrySingle& other)

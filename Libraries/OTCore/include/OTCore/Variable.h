@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   VariableType.h
  * \brief  Container for the usual data types. !ATTENTION! Currently it is required to sort a list of variables before calling unique. 

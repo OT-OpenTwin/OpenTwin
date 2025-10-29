@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "SolverSettings/MonitorSettings.h"
 
 std::string MonitorSettings::Print(void)

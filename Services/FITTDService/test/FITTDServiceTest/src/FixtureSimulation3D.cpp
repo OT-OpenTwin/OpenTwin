@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureSimulation3D.h"
 #include "Grid/Grid.h"
 #include "CurlCoefficients/Coefficient3DFactory.h"

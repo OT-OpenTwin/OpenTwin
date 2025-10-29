@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 
 #ifdef OPENTWINRANDOM_EXPORTS

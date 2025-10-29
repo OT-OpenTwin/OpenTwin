@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include <assert.h>
 #include <cmath>

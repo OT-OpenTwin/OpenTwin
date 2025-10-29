@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/VariableToJSONConverter.h"
 
 ot::JsonValue ot::VariableToJSONConverter::operator()(const Variable& value, JsonAllocator& jsonAllocator)

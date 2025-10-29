@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PropertyBundleVis2D3D.h"
 
 void PropertyBundleVis2D3D::setProperties(EntityBase * _thisObject)

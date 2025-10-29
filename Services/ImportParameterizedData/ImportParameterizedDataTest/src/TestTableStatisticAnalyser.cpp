@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureTableStatisticAnalyser.h"
 
 TEST_F(FixtureTableStatisticAnalyser, CountOfRows) {

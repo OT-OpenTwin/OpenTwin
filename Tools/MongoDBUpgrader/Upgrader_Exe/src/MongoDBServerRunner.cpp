@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MongoDBServerRunner.h"
 #include "WindowsUtilityFuctions.h"
 #include "Logger.h"

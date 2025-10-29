@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "GenericBsonDocument.h"
 #include "VariableToBSONConverter.h"
 void GenericBsonDocument::addAllFieldsToDocument(bsoncxx::builder::basic::document& _storage) const

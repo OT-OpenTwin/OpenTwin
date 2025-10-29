@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ModalCommandHealing.h"
 
 #include "ShapeHealing.h"

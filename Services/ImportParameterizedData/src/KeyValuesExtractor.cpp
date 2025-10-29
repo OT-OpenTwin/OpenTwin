@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "KeyValuesExtractor.h"
 #include "DataCategorizationHandler.h"
 #include "OTCore/StringToNumericCheck.h"

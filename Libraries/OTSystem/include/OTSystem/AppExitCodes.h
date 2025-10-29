@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file AppExitCodes.h
 //! @author Alexander Kuester (alexk95)
 //! @date April 2025

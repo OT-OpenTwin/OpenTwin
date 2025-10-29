@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #ifndef HANDLERINTERSECTOR_H
 #define HANDLERINTERSECTOR_H

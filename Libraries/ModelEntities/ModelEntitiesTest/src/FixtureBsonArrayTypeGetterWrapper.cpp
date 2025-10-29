@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "FixtureBsonArrayTypeGetterWrapper.h"
 

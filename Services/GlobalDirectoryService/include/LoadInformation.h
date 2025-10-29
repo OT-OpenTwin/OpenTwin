@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file LoadInformation.h
 //! @author Alexander Kuester (alexk95)
 //! @date September 2022

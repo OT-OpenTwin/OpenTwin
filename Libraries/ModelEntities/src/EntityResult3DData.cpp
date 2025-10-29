@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "../include/EntityResult3DData.h"
 #include "DataBase.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Painter2DFactory.cpp
 //! 
 //! @author Alexander Kuester (alexk95)

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlock.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/GraphicsPackage.h"

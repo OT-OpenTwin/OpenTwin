@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Ports/Signal.h"
 
 

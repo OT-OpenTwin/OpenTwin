@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FileHelper.h"
 #include "OTSystem/OperatingSystem.h"
 

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "QuantityContainer.h"
 #include "VariableToBSONConverter.h"
 #include "MetadataQuantity.h"

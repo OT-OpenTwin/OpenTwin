@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		VariableValue.h
  *	Package:	rbeCalc

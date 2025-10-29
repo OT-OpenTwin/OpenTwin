@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "CircuitElements/VoltageMeter.h"
 

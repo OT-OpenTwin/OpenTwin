@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "TableVisualiser.h"
 #include "OTCore/JSON.h"

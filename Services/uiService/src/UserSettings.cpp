@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "UserSettings.h"
 #include "AppBase.h"
 

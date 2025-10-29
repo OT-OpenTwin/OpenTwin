@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "StudioSuiteConnector/VersionFile.h"
 
 #include <cassert>

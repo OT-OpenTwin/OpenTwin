@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "LTSpiceConnector/VersionFile.h"
 
 #include <cassert>

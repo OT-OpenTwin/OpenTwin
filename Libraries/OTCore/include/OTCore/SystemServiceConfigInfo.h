@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file SystemServiceConfigInfo.h
 //! @author Alexander Kuester (alexk95)
 //! @date March 2025

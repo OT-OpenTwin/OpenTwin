@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file DelayedCallHandler.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date January 2025

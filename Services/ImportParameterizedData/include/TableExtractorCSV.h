@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   TableExtractorCSV.h
  * \brief  Concrete Importer which interpretes a csv file.

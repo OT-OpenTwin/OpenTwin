@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsVBoxLayoutItemCfg.h
 //! 
 //! @author Alexander Kuester (alexk95)

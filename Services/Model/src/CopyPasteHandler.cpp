@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <stdafx.h>
 #include "CopyPasteHandler.h"
 #include "OTCommunication/ActionTypes.h"

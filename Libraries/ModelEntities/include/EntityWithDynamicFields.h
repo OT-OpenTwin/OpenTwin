@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   EntityWithDynamicFields.h
  * \brief  Abstract class that allows assembling fields and subdocuments of the entity during runtime.

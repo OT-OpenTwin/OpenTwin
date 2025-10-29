@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   TableStatisticAnalyser.h
  * \brief  Takes care of calculating the caracteristics of a table behind a TableExtractor object. 

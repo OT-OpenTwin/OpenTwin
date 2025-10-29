@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aWindowManager.cpp
  *	Package:	akWidgets

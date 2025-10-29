@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "GenericDocument.h"
 
 void GenericDocument::insertInDocumentField(const std::string& _fieldName, const std::list<ot::Variable>& _values)

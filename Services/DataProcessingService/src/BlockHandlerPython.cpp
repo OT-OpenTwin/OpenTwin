@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BlockHandlerPython.h"
 #include "EntityProperties.h"
 #include "Application.h"

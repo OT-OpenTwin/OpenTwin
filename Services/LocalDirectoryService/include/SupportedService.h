@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file SupportedService.h
 //! @author Alexander Kuester (alexk95)
 //! @date September 2025

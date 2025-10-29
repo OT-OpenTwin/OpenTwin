@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   MetadataAssemblyData.h
  * \brief  Container for groups of TableSelectionEntities that describe the same metadata categorization.

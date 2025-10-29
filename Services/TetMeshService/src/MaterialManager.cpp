@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MaterialManager.h"
 
 #include "Application.h"

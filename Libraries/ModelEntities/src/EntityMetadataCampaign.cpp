@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityMetadataCampaign.h"
 
 #include "OTCommunication/ActionTypes.h"

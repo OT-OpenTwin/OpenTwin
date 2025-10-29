@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "ResultFilter/ResultSink.h"
 #include "ResultFilter/ResultContainerVector3DComplex.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTWidgets/CoordinateFormatConverter.h"
 #include <cmath>
 #include <numbers>

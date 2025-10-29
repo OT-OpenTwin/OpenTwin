@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file EntityPropertiesItems.cpp
 //! @author Peter Thoma, Alexander Kuester (alexk95)
 //! @date February 2020

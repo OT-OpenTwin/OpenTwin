@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file dllmain.cpp
 //! @author Sebastian Urmann
 //! @date May 2025

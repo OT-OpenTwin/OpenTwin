@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "OTWidgets/PlotDatasetData.h"
 #include <vector>

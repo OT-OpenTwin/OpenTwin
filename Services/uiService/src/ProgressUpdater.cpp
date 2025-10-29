@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "AppBase.h"
 #include "ProgressUpdater.h"
 

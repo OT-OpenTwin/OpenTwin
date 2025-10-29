@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		Limit.cpp
  *	Package:	rbeCore

@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "EntityFile.h"
 #include "OTCore/TextEncoding.h"

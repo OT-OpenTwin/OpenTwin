@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "Ports/Port.h"
 template <class T>

@@ -1,3 +1,5 @@
+// @otlicense
+
 // Viewer header
 #include "stdafx.h"
 #include "FrontendAPI.h"

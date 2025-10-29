@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   PythonLoadedModules.h
  * \brief  Meyer's singleton that holds a map of all modules that were loaded in the python interpreter, sorted by the name of the corresponding script name.

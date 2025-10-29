@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file FAR.h
 //! @author Alexander Kuester (alexk95)
 //! @date November 2023

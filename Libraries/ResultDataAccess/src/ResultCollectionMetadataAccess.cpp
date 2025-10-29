@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <vector>
 
 #include "ResultCollectionMetadataAccess.h"

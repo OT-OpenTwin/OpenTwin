@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   EntityBuffer.h
  * \brief  Meyer' singleton that buffers all entities and their properties that were used so far.

@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "PropertyBundle.h"
 #include "OTCore/ValueComparisionDefinition.h"

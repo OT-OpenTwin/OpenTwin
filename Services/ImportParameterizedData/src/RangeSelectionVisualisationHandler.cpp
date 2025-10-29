@@ -1,3 +1,5 @@
+// @otlicense
+
 // Project header
 #include "Application.h"
 #include "CategorisationFolderNames.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "VariableToBSONConverter.h"
 #include<cassert>
 

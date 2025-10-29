@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aTreeWidget.h
  *	Package:	akWidgets

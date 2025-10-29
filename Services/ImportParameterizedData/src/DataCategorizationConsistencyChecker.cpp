@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "DataCategorizationConsistencyChecker.h"
 #include "Documentation.h"
 #include "EntityTableSelectedRanges.h"

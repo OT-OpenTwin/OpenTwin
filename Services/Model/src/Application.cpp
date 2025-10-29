@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Application.cpp
 //! 
 //! @author Alexander Kuester (alexk95)

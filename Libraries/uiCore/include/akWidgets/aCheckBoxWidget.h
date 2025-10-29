@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aCheckBoxWidget.h
  *	Package:	akWidgets

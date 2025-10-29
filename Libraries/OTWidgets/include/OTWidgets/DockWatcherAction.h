@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file DockWatcherAction.h
 //! 
 //! @author Alexander Kuester (alexk95)

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "TableHandler.h"
 #include "FileToTableExtractorFactory.h"
 

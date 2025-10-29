@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file LogModeSetter.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date August 2024

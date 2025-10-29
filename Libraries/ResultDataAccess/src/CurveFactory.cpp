@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "CurveFactory.h"
 #include "QuantityContainer.h"
 #include "OTGui/QuantityContainerEntryDescription.h"

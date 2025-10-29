@@ -1,3 +1,5 @@
+// @otlicense
+
 // Relay Service header
 #include "SocketServer.h"
 

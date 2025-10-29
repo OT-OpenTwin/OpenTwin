@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "SimulationResults.h"
 // Open Twin Header
 #include "OTModelAPI/ModelServiceAPI.h"

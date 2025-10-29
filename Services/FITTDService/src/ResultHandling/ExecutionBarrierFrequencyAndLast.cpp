@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultHandling\ExecutionBarrierFrequencyAndLast.h"
 
 bool ExecutionBarrierFrequencyAndLast::AllowExecution(int currentTimestep)

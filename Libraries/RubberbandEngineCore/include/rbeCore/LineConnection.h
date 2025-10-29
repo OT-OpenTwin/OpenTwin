@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		LineConnection.h
  *	Package:	rbeCore

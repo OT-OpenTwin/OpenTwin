@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultImportLogger.h"
 
 void ResultImportLogger::log(std::string& _message, ResultImportLoggerVerbosity _verbosity)

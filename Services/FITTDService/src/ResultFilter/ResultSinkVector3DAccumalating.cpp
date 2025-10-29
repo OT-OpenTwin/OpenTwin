@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultFilter/ResultSinkVector3DAccumalating.h"
 
 void ResultSinkVector3DAccumalating::SetVolumeIterator(IGridIteratorVolume * volumeIter)

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "IndexHandler.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
 

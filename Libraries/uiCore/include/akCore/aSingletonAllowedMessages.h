@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aSingletonAllowedMessages.h
  *	Package:	akCore

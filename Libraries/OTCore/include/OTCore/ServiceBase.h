@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ServiceBase.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2021

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureNumpyAPI.h"
 
 #define PY_ARRAY_UNIQUE_SYMBOL FixtureNumpyAPI_ARRAY_API

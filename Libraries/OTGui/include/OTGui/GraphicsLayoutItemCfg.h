@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphcisLayoutItemCfg.h
 //! 
 //! @author Alexander Kuester (alexk95)

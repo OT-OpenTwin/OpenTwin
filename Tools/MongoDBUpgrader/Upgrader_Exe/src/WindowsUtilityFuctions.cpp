@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "WindowsUtilityFuctions.h"
 
 #include <stdio.h>

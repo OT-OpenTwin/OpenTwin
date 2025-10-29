@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "StepWidthManager.h"
 
 #include "Application.h"

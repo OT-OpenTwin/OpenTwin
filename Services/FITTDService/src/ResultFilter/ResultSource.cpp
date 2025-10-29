@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultFilter/ResultSource.h"
 #include "Grid/GridIteratorSubvolume.h"
 

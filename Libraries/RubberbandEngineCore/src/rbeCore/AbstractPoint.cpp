@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		AbstractPoint.cpp
  *	Package:	rbeCore

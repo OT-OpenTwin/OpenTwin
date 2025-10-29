@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aObjectManager.cpp
  *	Package:	akGui

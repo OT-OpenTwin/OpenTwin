@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "GraphNode.h"
 
 GraphNode::GraphNode(int nodeID)

@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef OTDEVLOGGER__H
 #define OTDEVLOGGER__H
 

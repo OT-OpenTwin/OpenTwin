@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		OperatorDivide.h
  *	Package:	rbeCalc

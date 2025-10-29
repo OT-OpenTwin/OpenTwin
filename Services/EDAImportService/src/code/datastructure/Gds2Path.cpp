@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Gds2Path.h"
 #include <cmath>
 

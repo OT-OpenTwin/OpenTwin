@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 //std Header
 #include <string>

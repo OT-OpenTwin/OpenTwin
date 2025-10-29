@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ModelLibraryDialogCfg.cpp
 //! @author Sebastian Urmann	
 //! @date June 2025

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file JSONDocument.hpp
 //! @author Alexander Kuester (alexk95)
 //! @date June 2025

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		dllmain.cpp
  *	Package:	-NONE-

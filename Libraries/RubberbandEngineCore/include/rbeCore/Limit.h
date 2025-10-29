@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		Limit.h
  *	Package:	rbeCore

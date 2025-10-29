@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ArchitectureInfo.h
 //! @brief The ArchitectureInfo contains multiple definitions that specify the current OS architecture.
 //! @author Alexander Kuester (alexk95)

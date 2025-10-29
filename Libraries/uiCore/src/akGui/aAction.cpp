@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aAction.cpp
  *	Package:	akGui

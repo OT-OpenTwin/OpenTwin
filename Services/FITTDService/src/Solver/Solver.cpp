@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Solver/Solver.h"
 
 Solver::~Solver()

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "Model.h"
 #include "UiNotifier.h"

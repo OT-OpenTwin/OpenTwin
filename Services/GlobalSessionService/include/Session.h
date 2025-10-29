@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Session.h
 //! @author Alexander Kuester (alexk95)
 //! @date March 2022

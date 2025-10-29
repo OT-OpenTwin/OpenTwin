@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BlockHandlerDisplay.h"
 #include "StringConverter.h"
 #include "OTCore/String.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aWindowManagerTimerSignalLinker.cpp
  *	Package:	akWidgets

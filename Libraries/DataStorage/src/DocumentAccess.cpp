@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "stdafx.h"
 #include "..\include\Document\DocumentAccess.h"

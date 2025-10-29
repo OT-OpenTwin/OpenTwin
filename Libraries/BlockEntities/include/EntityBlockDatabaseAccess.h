@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "EntityBlock.h"
 #include "OTCore/ValueComparisionDefinition.h"

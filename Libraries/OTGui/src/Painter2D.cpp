@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Painter2D.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date March 2023

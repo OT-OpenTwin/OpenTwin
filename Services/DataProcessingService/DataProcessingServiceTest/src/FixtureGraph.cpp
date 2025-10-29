@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureGraph.h"
 
 Graph FixtureGraph::getGraphWithCycle()

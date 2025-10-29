@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "StudioSuiteConnector/Result1DFileData.h"
 
 #include <fstream>

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsInvisibleItem.cpp
 //! 
 //! @author Alexander Kuester (alexk95)

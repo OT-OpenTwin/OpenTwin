@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   PythonServiceInterface.h
  * \brief  Class that serves as interface to the PythonExecutionService. Here a execution order can be assambled and send out to the pythonservice. 

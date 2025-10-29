@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ModelComponent.cpp
 //! @authors Alexander Kuester (alexk95), Peter Thoma
 //! @date March 2021

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PropertyBundleVisUnstructuredScalarVolume.h"
 
 void PropertyBundleVisUnstructuredScalarVolume:: setProperties(EntityBase * _thisObject)

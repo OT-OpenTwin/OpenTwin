@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntitySolverFDTD.h"
 #include "OldTreeIcon.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityMesh.h"
 
 static EntityFactoryRegistrar<EntityMesh> registrar(EntityMesh::className());

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GSSRegistrationInfo.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date May 2025

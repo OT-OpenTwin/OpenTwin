@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "BlockHandler.h"
 #include "EntityBlockPython.h"

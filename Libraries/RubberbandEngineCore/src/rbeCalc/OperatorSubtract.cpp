@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		OperatorSubtract.cpp
  *	Package:	rbeCalc

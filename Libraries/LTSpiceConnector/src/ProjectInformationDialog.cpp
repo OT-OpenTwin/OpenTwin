@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "LTSpiceConnector/ProjectInformationDialog.h"
 #include "OTWidgets/IconManager.h"
 

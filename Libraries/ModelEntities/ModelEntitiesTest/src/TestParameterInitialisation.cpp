@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureCSVToTableTransformer.h"
 
 INSTANTIATE_TEST_SUITE_P(TestSomeColumnDelimiter, FixtureCSVToTableTransformer, ::testing::Values(

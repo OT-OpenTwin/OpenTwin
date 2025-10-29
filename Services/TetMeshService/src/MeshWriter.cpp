@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MeshWriter.h"
 
 #include "Application.h"

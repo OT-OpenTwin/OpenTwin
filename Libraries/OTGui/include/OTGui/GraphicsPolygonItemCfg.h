@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsPolygonItemCfg.h
 //! 
 //! @author Alexander Kuester (alexk95)

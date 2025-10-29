@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureProgressUpdater.h"
 #include "OTServiceFoundation/UiComponent.h"
 

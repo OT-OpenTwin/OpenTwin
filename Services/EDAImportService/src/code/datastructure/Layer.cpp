@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Layer.h"
 
 Layer::Layer(int id_, std::vector<MyPolygon> poly, float height_, float thickness_)

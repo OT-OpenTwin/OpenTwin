@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file PushButton.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date January 2024

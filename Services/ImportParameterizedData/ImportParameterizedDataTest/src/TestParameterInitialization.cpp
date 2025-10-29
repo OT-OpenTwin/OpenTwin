@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureTableExtractorCSV.h"
 
 

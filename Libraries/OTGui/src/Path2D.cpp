@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Path2D.cpp
 //! 
 //! @author Alexander Kuester (alexk95)

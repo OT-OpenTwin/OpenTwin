@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "LTSpiceConnector/InfoFileManager.h"
 
 #include "EntityBinaryData.h"

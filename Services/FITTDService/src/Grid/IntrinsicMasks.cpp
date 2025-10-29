@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Grid/IntrinsicMasks.h"
 #include <exception>
 

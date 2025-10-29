@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		OperatorMultiply.h
  *	Package:	rbeCalc

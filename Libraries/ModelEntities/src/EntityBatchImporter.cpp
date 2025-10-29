@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBatchImporter.h"
 #include "PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"

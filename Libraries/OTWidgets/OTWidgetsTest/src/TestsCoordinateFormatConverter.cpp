@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "gtest/gtest.h"
 #include "FixtureCoordinateFormatConverter.h"
 #include "OTWidgets/CoordinateFormatConverter.h"

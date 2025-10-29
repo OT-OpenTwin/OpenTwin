@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "MeshSlicer.h"
 #include "EntityFacetData.h"

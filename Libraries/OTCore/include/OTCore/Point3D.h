@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Point3D.h
 //! @author Alexander Kuester (alexk95)
 //! @date April 2021

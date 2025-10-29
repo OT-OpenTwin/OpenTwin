@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PipelineHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "EntityBlockPython.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BlockHandler.h"
 #include "BlockHandlerStorage.h"
 #include "Application.h"

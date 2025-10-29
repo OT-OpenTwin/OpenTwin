@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FaceAnnotationsManager.h"
 
 #include "Application.h"

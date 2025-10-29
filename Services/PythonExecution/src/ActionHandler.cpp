@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ActionHandler.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Variable.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureBsonArrayTypeGetterWrapper.h"
 #include "BsonArrayTypeGetterWrapper.h"
 #include <stdint.h>

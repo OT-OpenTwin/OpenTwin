@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   TextEncoding.h
  * \brief  MongoDB uses only UTF-8 and some errors occured if the characters with different encoding standard were stored.

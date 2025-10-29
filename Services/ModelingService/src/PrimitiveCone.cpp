@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PrimitiveCone.h"
 
 #include "EntityGeometry.h"

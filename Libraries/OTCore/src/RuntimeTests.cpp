@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file RuntimeTests.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date December 2024

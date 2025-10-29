@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "WindowsServiceManager.h"
 #include "WindowsUtilityFuctions.h"
 #include "Logger.h"

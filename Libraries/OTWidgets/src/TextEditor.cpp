@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file TextEditor.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date December 2023

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "..\..\include\ResultHandling\ExecutionBarrierFixedTimesteps.h"
 
 bool ExecutionBarrierFixedTimesteps::AllowExecution(int currentTimestep)

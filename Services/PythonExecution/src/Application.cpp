@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Application.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"

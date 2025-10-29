@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultPostProcessors/ResultPostProcessingComplexNormalization.h"
 
 ResultPostProcessingComplexNormalization::ResultPostProcessingComplexNormalization(ResultSinkScalarComplexSum * normalizer) : _normalizer(normalizer)

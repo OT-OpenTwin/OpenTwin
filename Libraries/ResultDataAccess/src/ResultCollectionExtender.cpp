@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultCollectionExtender.h"
 #include "MetadataEntryComperator.h"
 #include <set>

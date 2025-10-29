@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BSONToVariableConverter.h"
 
 ot::Variable BSONToVariableConverter::operator()(const bsoncxx::v_noabi::document::element& element)

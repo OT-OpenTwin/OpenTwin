@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #define NOMINMAX //Supress windows macros min max
 #define WIN32_LEAN_AND_MEAN

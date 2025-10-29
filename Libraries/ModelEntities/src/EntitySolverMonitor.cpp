@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "..\include\EntitySolverMonitor.h"
 
 #include "OTCommunication/ActionTypes.h"

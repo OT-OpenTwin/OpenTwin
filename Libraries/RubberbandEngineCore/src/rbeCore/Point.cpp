@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		Point.cpp
  *	Package:	rbeCore

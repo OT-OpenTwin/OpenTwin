@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <QtWidgets/qapplication.h>
 #include "OTCommunication/ServiceLogNotifier.h"
 #include <QtCore/qeventloop.h>

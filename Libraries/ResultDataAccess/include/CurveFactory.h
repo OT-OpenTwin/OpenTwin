@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "MetadataSeries.h"
 #include "EntityResult1DCurve.h"

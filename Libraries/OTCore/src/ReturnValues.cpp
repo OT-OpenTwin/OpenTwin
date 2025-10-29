@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/ReturnValues.h"
 
 #include "OTCore/VariableToJSONConverter.h"

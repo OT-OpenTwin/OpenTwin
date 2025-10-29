@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsTriangleItem.h
 //! @author Alexander Kuester (alexk95)
 //! @date November 2023

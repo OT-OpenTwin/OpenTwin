@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Quadtree.h"
 
 Quadtree::Quadtree(double x, double y, double width, double height)

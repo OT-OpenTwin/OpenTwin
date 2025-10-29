@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "gtest/gtest.h"
 #include "FixtureIntrinsics.h"
 #include <immintrin.h>

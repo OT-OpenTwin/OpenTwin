@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PrimitiveCuboid.h"
 
 #include "EntityGeometry.h"

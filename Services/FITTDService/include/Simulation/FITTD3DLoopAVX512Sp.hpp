@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "Simulation/FITTD3DLoopAVX512Sp.h"
 #include <immintrin.h>

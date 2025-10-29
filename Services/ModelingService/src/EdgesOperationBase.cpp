@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EdgesOperationBase.h"
 #include "EntityGeometry.h"
 #include "EntityFaceAnnotation.h"

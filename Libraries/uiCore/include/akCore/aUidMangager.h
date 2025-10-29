@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aUidManager.h
  *	Package:	akCore

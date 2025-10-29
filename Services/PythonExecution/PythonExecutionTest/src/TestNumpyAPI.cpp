@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureNumpyAPI.h"
 #include "OTCore/Variable.h"
 

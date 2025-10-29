@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		akCore.cpp
  *	Package:	akCore

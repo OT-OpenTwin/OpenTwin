@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "OTServiceFoundation/PythonServiceInterface.h"
 #include "EntityTableSelectedRanges.h"

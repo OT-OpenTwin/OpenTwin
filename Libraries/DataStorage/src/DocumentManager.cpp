@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "../include/Document/DocumentManager.h"
 #include "../include/Document/DocumentAccess.h"

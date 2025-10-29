@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		RubberbandEngine.cpp
  *	Package:	rbeCore

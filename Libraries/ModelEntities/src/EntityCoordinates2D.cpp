@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityCoordinates2D.h"
 
 static EntityFactoryRegistrar<EntityCoordinates2D> registrar(EntityCoordinates2D::className());

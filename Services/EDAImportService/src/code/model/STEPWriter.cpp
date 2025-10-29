@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "STEPWriter.h"
 #include <BinXCAFDrivers.hxx>
 #include <STEPCAFControl_Writer.hxx>

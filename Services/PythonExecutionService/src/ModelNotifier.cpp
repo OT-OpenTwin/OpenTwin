@@ -1,2 +1,4 @@
+// @otlicense
+
 #include "ModelNotifier.h"
 

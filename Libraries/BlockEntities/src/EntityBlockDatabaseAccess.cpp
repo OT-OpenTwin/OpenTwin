@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockDatabaseAccess.h"
 #include "OTCommunication/ActionTypes.h"
 #include "EntityBlockConnection.h"	

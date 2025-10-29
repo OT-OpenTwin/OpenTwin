@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "CurlCoefficients/Coefficient3DFactory.h"
 #include "Grid/Grid.h"
 #include "Grid/EdgeDiscretization.h"

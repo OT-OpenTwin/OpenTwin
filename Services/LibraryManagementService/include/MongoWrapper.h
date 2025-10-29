@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Database.h
 //! @author Sebastian Urmann
 //! @date May 2025

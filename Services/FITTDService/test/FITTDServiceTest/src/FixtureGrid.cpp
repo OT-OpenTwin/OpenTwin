@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureGrid.h"
 #include "Grid/Grid.h"
 #include "SystemDependencies/SystemProperties.h"

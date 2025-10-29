@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ServiceDataUi.h
 //!
 //! @author Alexander Kuester (alexk95)

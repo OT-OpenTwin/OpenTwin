@@ -1,3 +1,5 @@
+// @otlicense
+
 // Frontend header
 #include "ManageOwner.h"
 #include "AppBase.h"

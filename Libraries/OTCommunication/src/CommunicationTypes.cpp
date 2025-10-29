@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/LogDispatcher.h"
 #include "OTCommunication/CommunicationTypes.h"
 

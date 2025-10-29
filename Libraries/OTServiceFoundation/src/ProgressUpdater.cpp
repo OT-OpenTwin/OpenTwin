@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTServiceFoundation/ProgressUpdater.h"
 #include <cmath>
 #include <thread>

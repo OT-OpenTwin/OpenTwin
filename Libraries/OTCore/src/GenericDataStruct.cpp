@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/GenericDataStruct.h"
 
 void ot::GenericDataStruct::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const

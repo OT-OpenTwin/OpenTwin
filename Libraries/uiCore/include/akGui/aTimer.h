@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aTimer.h
  *	Package:	akGui

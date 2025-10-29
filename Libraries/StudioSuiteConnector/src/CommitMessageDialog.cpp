@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "StudioSuiteConnector/CommitMessageDialog.h"
 
 #include "OTWidgets/IconManager.h"

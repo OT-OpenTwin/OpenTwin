@@ -1,3 +1,5 @@
+// @otlicense
+
 /*********************************************************************
  * @file   Application.cpp
  * @brief  Handles service representation in UI.

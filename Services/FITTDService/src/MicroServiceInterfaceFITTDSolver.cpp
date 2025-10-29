@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MicroServiceInterfaceFITTDSolver.h"
 
 #include "SystemDependencies/SystemProperties.h"

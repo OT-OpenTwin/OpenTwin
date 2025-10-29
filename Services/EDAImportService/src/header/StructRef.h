@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef STRUCTREF_H_
 #define STRUCTREF_H_
 

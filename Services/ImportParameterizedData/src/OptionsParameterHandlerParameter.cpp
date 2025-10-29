@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OptionsParameterHandlerParameter.h"
 
 bool OptionsParameterHandlerParameter::IndividualInterpretation(const std::string& entry, ts::OptionSettings& options)

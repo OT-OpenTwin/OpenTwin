@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockDisplay.h"
 #include "SharedResources.h"
 

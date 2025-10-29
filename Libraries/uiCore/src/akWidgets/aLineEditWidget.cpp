@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aLineEditWidget.cpp
  *	Package:	akWidgets

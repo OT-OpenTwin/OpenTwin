@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "Ports/PortSinusGaussian.h"
 #define _USE_MATH_DEFINES

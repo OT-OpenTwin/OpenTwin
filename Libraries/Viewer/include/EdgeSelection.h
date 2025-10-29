@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "EdgeSelection.h"
 #include "SceneNodeGeometry.h"

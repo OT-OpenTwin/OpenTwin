@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file FileHandler.cpp
 //! @authors Jan Wagner, Alexander Kuester
 //! @date November 2024

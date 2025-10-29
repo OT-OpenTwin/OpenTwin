@@ -1,3 +1,5 @@
+// @otlicense
+
 // Frontend header
 #include "ViewStateCfg.h"
 

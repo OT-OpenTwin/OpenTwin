@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aNotifier.cpp
  *	Package:	akCore

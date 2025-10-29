@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BlendEdges.h"
 #include "EntityGeometry.h"
 #include "EntityFaceAnnotation.h"

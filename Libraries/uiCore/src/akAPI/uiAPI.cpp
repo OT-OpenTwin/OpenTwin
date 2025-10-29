@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		uiAPI.cpp
  *	Package:	akAPI

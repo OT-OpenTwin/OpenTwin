@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "ResultFilter/ResultContainer.h"
 #include "SystemDependencies/SystemDependentDefines.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockStorage.h"
 #include "SharedResources.h"	 
 #include "PropertyHelper.h"

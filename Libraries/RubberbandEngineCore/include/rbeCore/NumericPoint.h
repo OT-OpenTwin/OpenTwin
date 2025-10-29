@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		NumericPoint.h
  *	Package:	rbeCore

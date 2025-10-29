@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "OptionsParameterHandler.h"
 #include "OTCore/StringToVariableConverter.h"

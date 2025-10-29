@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 
 #include "DataDocument.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultFilter/ResultFilterSinkVector.h"
 
 void ResultFilterSinkVector::ExecuteFilter(int currentTimestep, double * input)

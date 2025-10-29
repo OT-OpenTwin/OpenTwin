@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "QuantityDescription.h"
 
 void QuantityDescription::addValueDescription(const std::string _valueName, const std::string _valueDataType, const std::string _valueUnit)

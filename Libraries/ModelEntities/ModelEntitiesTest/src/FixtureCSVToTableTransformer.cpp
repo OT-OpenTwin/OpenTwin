@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureCSVToTableTransformer.h"
 #include "FileHelper.h"
 #include <fstream>

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Foundation.h
 //! 
 //! @author Alexander Kuester (alexk95)

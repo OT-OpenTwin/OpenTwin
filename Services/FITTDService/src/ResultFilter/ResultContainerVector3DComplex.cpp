@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultFilter/ResultContainerVector3DComplex.h"
 #include "ResultFilter/IResultFilterEdge.h"
 

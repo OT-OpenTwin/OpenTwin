@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockCircuitVoltageMeter.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/GraphicsStackItemCfg.h"

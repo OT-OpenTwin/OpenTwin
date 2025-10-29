@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/EncodingGuesser.h"
 
 ot::TextEncoding::EncodingStandard ot::EncodingGuesser::operator()(const char* fileContent, int64_t numberOfBytes)

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MetadataEntryArray.h"
 
 bool MetadataEntryArray::operator==(const MetadataEntryArray& other)

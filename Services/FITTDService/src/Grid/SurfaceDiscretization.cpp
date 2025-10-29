@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Grid/SurfaceDiscretization.h"
 
 void SurfaceDiscretization::ExtractComponentsFromSingleVector(const std::vector<double>& surfaceDiscretizations)

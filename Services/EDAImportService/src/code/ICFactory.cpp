@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ICFactory.h"
 
 #include <map>

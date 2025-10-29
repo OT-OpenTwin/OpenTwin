@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureGrid.h"
 #include "FixtureSimulation3D.h"
 #include "FixturePECBoundary.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file WrappedCircleItem.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2024

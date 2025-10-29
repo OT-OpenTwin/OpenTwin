@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "StudioSuiteConnector/InfoFileManager.h"
 
 #include "EntityBinaryData.h"

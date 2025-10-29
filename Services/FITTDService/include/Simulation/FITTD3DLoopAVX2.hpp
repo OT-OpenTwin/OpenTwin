@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "Simulation/FITTD3DLoopAVX2.h"
 #include <cassert>

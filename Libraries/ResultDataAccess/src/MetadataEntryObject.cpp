@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MetadataEntryObject.h"
 #include "MetadataEntryComperator.h"
 

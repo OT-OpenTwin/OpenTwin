@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file VisualisationTypes.h
 //! @author Jan Wagner, Alexander Kuester (alexk95)
 //! @date September 2025

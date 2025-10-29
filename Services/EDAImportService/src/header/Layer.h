@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef LAYER_H_
 #define LAYER_H_
 

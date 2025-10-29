@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsElement.h
 //! 
 //! @author Alexander Kuester (alexk95)

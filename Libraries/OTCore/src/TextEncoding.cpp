@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/TextEncoding.h"
 #include <codecvt>
 

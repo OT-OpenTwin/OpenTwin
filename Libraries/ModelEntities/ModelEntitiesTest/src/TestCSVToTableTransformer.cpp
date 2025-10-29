@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <iostream>
 #include "FixtureCSVToTableTransformer.h"
 

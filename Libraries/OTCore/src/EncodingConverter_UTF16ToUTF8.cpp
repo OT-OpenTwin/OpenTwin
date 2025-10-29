@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"
 
 

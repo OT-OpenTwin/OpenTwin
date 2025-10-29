@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MongoURL.h"
 #include "Connection/ConnectionAPI.h"
 

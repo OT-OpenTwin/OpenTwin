@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   PythonAPI.cpp
  * \brief  Layer that shall be used from the application.cpp. This class deals with the workflow of loading python script entities, executing them and 

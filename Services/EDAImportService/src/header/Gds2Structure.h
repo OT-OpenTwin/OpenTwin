@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef GDS2STRUCTURE_H_
 #define GDS2STRUCTURE_H_
 

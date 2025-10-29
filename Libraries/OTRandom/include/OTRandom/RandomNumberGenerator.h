@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  * RandomNumberGenerator.h
  *

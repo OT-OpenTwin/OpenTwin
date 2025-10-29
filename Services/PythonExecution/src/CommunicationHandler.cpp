@@ -1,3 +1,5 @@
+// @otlicense
+
 // Service header
 #include "Timeouts.h"
 #include "ActionHandler.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "EntityContainer.h"
 class __declspec(dllexport) EntityBatchImporter : public EntityBase

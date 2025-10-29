@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PythonHeaderInterpreter.h"
 
 #include <sstream>

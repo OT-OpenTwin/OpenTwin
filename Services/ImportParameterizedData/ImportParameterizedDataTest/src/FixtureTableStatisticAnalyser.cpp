@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureTableStatisticAnalyser.h"
 #include "DataSourceHandler.h"
 #include "FileHelper.h"

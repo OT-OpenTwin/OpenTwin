@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Result1DData.h"
 
 #include <algorithm>

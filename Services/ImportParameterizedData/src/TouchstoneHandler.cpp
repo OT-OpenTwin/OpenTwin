@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "TouchstoneHandler.h"
 #include "OptionsParameterHandler.h"
 #include "OptionsParameterHandlerFormat.h"

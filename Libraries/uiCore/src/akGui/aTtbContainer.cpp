@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aTtbContainer.cpp
  *	Package:	akGui

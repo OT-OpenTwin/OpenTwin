@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "StudioSuiteConnector/Result1DRunIDContainer.h"
 #include "StudioSuiteConnector/InfoFileManager.h"
 

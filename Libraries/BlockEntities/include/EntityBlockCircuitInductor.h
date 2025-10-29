@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "EntityBlockCircuitElement.h"
 class __declspec(dllexport) EntityBlockCircuitInductor : public EntityBlockCircuitElement

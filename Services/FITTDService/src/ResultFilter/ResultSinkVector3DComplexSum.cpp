@@ -1,3 +1,5 @@
+// @otlicense
+
 #include  "ResultFilter/ResultSinkVector3DComplexSum.h"
 
 ResultSinkVector3DComplexSum::~ResultSinkVector3DComplexSum()

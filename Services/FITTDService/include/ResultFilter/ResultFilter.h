@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "Grid/IGridIteratorVolume.h"
 #include <vector>

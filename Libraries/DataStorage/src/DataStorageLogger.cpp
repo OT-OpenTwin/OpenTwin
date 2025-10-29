@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "DataStorageLogger.h"
 #include "..\include\DataStorageLogger.h"

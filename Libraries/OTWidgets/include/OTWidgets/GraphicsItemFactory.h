@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsFactory.h
 //! 
 //! @author Alexander Kuester (alexk95)

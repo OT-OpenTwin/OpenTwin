@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef SOCKETSERVER_H
 #define SOCKETSERVER_H
 

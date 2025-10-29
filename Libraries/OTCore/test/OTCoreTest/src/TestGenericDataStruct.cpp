@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <gtest/gtest.h>
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTCore/GenericDataStructVector.h"

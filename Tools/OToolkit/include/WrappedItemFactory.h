@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file WrappedItemFactory.h
 //! @author Alexander Kuester (alexk95)
 //! @date June 2024

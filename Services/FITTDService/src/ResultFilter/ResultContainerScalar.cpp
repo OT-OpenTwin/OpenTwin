@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultFilter\ResultContainerScalar.h"
 
 ResultContainerScalar::ResultContainerScalar(double * values, index_t size, int currentTimeStep) 

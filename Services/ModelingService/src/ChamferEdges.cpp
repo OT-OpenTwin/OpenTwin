@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ChamferEdges.h"
 #include "EntityGeometry.h"
 #include "EntityFaceAnnotation.h"

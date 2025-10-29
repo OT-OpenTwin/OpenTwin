@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTServiceFoundation/PythonServiceInterface.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"

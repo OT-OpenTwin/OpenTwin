@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureCurlCoefficients3D.h"
 #include "MeasuredTargetValues.h"
 #include "gtest/gtest.h"

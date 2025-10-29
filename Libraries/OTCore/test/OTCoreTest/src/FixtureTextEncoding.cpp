@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureTextEncoding.h"
 #include <fstream>
 

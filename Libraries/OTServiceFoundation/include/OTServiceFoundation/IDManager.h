@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file IDManager.h
 //! @authors Alexander Kuester (alexk95)
 //! @date September 2022

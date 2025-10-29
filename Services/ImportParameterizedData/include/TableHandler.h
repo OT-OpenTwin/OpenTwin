@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   TableHandler.h
  * \brief  Central class for dealing with table views.

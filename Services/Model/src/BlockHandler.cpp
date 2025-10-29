@@ -1,3 +1,5 @@
+// @otlicense
+
 // std header
 #include <stdafx.h>
 

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Documentation.h"
 
 Documentation* Documentation::INSTANCE()

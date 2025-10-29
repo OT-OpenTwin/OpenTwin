@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ActionDispatchProfiler.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date August 2025

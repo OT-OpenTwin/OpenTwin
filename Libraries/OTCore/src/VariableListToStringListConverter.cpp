@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/VariableListToStringListConverter.h"
 
 std::list<std::string> ot::VariableListToStringListConverter::operator()(const std::list<Variable>& values)

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   FileToTableExtractorRegistrar.h
  * \brief  Class for registrating a new file type. 

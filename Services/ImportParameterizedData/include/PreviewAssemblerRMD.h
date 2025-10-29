@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "PreviewAssembler.h"
 class PreviewAssemblerRMD : public PreviewAssembler

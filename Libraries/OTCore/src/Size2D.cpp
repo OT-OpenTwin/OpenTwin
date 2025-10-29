@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Size2D.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023

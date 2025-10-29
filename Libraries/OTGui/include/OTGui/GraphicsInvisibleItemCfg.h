@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsInvisibleItemCfg.h
 //! 
 //! @author Alexander Kuester (alexk95)

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Helper.h
 //! @author Sebastian Urmann
 //! @date October 2025

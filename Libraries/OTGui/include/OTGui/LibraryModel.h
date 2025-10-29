@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file LibraryModel.h
 //! @author Sebastian Urmann	
 //! @date June 2025

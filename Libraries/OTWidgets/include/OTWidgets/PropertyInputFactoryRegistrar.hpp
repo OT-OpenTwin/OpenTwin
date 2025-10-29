@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file PropertyInputFactoryRegistrar.hpp
 //! @author Alexander Kuester (alexk95)
 //! @date April 2024

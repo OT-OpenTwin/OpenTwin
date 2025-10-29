@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "ResultFilter/ResultFilter.h"
 #include "ResultFilter/IResultFilterEdge.h"

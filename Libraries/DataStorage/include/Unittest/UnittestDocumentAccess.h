@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "Document/DocumentAccess.h"
 #pragma warning(disable:4275)

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PropertyHelper.h"
 #include "OTCore/LogDispatcher.h"
 

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntitySolverDataProcessing.h"
 #include "PropertyHelper.h"
 

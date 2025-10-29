@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		OperatorAdd.h
  *	Package:	rbeCalc

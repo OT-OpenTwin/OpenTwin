@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockCircuitElement.h"
 #include "OTCommunication/ActionTypes.h"
 

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file String.h
 //! @authors Alexander Kuester (alexk95), Jan Wagner (JWagner)
 //! @date June 2025

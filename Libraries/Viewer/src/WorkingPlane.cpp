@@ -1,3 +1,5 @@
+// @otlicense
+
 // Project header
 #include "stdafx.h"
 #include "WorkingPlane.h"

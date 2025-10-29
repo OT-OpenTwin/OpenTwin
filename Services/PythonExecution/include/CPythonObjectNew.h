@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   CPythonObjectNew.h
  * \brief	Wrapper around a PyObject* that is a new reference.

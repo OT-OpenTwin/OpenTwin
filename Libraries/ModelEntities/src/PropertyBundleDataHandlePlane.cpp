@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "..\include\PropertyBundleDataHandlePlane.h"
 
 PropertyBundleDataHandlePlane::PropertyBundleDataHandlePlane(EntityBase * thisObject)

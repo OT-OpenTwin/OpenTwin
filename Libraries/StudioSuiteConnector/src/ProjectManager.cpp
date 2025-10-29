@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "StudioSuiteConnector/ProjectManager.h"
 #include "StudioSuiteConnector/StudioConnector.h"
 #include "StudioSuiteConnector/VersionFile.h"

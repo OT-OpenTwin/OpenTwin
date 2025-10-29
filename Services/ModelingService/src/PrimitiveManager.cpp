@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PrimitiveManager.h"
 
 #include "PrimitiveCuboid.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   PropertyPythonObjectConverter.h
  * \brief  Class that converts a property value into a PythonObject and viceversa. 

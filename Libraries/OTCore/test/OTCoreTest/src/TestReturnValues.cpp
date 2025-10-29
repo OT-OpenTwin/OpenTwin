@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <gtest/gtest.h>
 #include "OTCore/ReturnValues.h"
 #include "OTCore/ReturnMessage.h"

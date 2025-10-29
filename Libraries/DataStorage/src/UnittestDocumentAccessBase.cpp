@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <stdafx.h>
 #include "Unittest/UnittestDocumentAccessBase.h"
 #include "Connection/ConnectionAPI.h"

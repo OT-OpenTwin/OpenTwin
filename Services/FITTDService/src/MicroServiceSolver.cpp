@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MicroServiceSolver.h"
 
 #include "EntitySolverFITTD.h"

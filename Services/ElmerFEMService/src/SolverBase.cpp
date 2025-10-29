@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "SolverBase.h"
 
 #include "OTServiceFoundation/UiComponent.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "CurveDatasetFactory.h"
 #include "ContainerFlexibleOwnership.h"
 #include "OTCore/TypeNames.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "StructRef.h"
 
 StructRef::StructRef(std::string name, std::pair<int, int> coords) : name(name), coordinates(coords) {}

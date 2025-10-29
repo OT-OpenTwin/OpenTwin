@@ -1,3 +1,5 @@
+// @otlicense
+
 // Project header
 #include "OTCore/Color.h"
 #include "OTCore/LogDispatcher.h"

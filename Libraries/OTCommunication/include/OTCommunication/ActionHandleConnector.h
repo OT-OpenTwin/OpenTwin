@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ActionHandleConnector.h
 //! 
 //! @author Alexander Kuester (alexk95)

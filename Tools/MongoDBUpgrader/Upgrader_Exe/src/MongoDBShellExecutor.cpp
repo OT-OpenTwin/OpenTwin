@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MongoDBShellExecutor.h"
 #include "Logger.h"
 

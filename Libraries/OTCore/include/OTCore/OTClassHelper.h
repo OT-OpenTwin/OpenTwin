@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file OTClassHelper.h
 //! @brief This file contains defines that may be used simplyfy class creation.
 //! @author Alexander Kuester (alexk95)

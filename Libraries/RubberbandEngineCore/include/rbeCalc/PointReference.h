@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		PointReference.h
  *	Package:	rbeCalc

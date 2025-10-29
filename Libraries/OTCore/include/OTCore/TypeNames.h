@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   TypeNames.h
  * \brief  Some type names are not system independent, hence the need to create a standardised way for this project. 

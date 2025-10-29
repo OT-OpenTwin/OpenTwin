@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PythonException.h"
 #include <Python.h>
 

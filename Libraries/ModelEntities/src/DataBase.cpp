@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <SDKDDKVer.h>
 
 #define _USE_MATH_DEFINES

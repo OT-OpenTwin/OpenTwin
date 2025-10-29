@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityParameterizedDataCategorization.h"
 
 #include "OTCommunication/ActionTypes.h"

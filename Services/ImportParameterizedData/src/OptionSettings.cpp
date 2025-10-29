@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OptionSettings.h"
 
 ts::OptionSettings::OptionSettings(option::Frequency frequency, option::Format format, option::Parameter parameter, ot::Variable referenceResistance)

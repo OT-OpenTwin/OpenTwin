@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "SelectionHandler.h"
 #include "EntityMaterial.h"

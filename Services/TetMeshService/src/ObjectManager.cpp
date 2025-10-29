@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ObjectManager.h"
 
 #include "Application.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntityResultTextData.h"
 #include "DataBase.h"

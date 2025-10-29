@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aLabelWidget.cpp
  *	Package:	akWidgets

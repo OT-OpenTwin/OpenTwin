@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Frontend.cpp
 //!
 //! @author Alexander Kuester (alexk95)

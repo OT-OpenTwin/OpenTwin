@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntitySolverCircuitSimulator.h"
 #include "OldTreeIcon.h"
 

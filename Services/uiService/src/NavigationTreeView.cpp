@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file NavigationTreeView.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date March 2024

@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntityFacetData.h"
 #include "DataBase.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "..\include\Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"

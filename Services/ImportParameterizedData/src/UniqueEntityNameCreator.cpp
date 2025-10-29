@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "UniqueEntityNameCreator.h"
 std::string UniqueEntityNameCreator::create(const std::string& _entityPath)
 {

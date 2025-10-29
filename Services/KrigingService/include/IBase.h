@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #ifndef IBase
 #include <string>

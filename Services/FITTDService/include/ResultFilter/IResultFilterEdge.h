@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "Ports/SourceTarget.h"
 

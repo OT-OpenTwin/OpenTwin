@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ApplicationSettings.h"
 
 ApplicationSettings * g_settings{ nullptr };

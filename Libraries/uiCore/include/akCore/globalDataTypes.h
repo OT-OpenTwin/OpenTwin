@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		globalDataTypes.h
  *	Package:	akCore

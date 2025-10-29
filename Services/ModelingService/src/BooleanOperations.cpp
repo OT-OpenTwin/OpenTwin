@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "BooleanOperations.h"
 #include "ShapesBase.h"
 #include "EntityCache.h"

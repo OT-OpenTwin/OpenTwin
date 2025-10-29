@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "SubprocessHandler.h"
 #include "SimulationResults.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file FrontendActionHandler.cpp
 //!
 //! @author Alexander Kuester (alexk95)

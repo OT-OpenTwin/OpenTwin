@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PropertyBundleVisUnstructuredVectorVolume.h"
 
 void PropertyBundleVisUnstructuredVectorVolume:: setProperties(EntityBase * _thisObject)

@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "SystemDependencies/Allignments.h"
 #include "SolverSettings/SolverVersion.h"

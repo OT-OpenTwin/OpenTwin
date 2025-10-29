@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixturePropertyPythonObjectInterface.h"
 
 FixturePropertyPythonObjectInterface::FixturePropertyPythonObjectInterface()

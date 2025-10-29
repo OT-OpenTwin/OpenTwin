@@ -1,3 +1,5 @@
+// @otlicense
+
 // Open Twin header
 #include "OTSystem/FileSystem.h"
 #include "OTSystem/Exception.h"

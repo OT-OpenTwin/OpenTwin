@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   DecRefDecorator.h
  * \brief   General wrapper around a PyObject.

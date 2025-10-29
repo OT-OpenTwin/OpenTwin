@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ShapeHealing.h"
 
 #include "Application.h"

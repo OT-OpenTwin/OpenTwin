@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/GenericDataStructSingle.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/VariableToJSONConverter.h"

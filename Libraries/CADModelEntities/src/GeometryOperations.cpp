@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "BRepMesh_IncrementalMesh.hxx"
 #include "TopExp_Explorer.hxx"

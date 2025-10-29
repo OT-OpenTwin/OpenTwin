@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file PropertyManager.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date March 2025

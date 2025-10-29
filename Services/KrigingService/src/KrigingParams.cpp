@@ -1,1 +1,3 @@
+// @otlicense
+
 #include "KrigingParams.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <fstream>
 #include "OTSystem/OperatingSystem.h"
 #include "FixtureTableExtractorCSV.h"

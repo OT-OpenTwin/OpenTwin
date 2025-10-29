@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   EncodingConverter_ISO88591ToUTF8.h
  * \brief  Converter that can transform a set of ISO 8859-1 characters into a set of UTF-8 character.

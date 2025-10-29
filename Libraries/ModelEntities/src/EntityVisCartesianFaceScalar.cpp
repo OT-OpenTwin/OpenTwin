@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntityVisCartesianFaceScalar.h"
 #include "OldTreeIcon.h"

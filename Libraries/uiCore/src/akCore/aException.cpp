@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aException.h
  *	Package:	akCore

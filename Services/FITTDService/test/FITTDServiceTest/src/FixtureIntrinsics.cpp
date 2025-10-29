@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureIntrinsics.h"
 
 FixtureIntrinsics::FixtureIntrinsics()

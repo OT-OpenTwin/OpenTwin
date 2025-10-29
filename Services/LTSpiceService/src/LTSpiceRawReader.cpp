@@ -1,3 +1,5 @@
+// @otlicense
+
 ﻿#include "LTSpiceRawReader.h"
 
 #include <algorithm>

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "DevLogger.h"
 
 #if OT_UISERVICE_DEV_LOGGER_ACTIVE==1

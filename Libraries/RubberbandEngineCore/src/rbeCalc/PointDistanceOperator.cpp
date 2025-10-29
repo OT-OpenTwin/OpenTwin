@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		PointDistanceOperator.cpp
  *	Package:	rbeCalc

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ProgressLogger.h"
 
 #include "Application.h"

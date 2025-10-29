@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "STEPReader.h"
 #include "EntityGeometry.h"
 #include "GeometryOperations.h"

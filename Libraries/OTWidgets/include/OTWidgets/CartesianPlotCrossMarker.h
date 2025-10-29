@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file CartesianPlotCrossMarker.h
 //! @author Alexander Kuester (alexk95)
 //! @date October 2024

@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntitySolverKriging.h"
 #include "OldTreeIcon.h"

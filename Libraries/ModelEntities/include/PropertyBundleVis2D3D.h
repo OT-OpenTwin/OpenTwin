@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "PropertyBundle.h"
 #include "PropertiesVis2D3D.h"

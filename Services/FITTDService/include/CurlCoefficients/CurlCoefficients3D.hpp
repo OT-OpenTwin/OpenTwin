@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "CurlCoefficients3D.h"
 #include <algorithm>

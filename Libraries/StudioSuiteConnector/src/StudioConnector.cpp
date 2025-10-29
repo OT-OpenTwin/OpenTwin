@@ -1,3 +1,5 @@
+// @otlicense
+
 // Project header
 #include "StudioSuiteConnector/StudioConnector.h"
 

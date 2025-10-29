@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PrimitiveCylinder.h"
 
 #include "EntityGeometry.h"

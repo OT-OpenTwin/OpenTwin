@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Margins.h
 //! 
 //! @author Alexander Kuester (alexk95)

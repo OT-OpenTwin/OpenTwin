@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTGui/PainterRainbowIterator.h"
 
 ot::PainterRainbowIterator::PainterRainbowIterator()

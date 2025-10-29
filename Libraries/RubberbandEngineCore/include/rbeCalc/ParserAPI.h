@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		FormulaParser.h
  *	Package:	rbeCalc

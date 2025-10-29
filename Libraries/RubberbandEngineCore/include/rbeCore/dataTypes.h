@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		dataTypes.h
  *	Package:	rbeCore

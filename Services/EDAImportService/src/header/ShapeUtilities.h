@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef SHAPEUTILITIES_H
 #define SHAPEUTILITIES_H
 

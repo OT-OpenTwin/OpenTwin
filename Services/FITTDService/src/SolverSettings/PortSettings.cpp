@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "SolverSettings/PortSettings.h"
 
 PortSettings::PortSettings(std::string portName, std::string excitationTarget, std::string excitationAxis, std::string excitationSignal)

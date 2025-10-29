@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockConnection.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/FillPainter2D.h"

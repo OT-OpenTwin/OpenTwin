@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MongoDBSettingsParser.h"
 #include "FileWriter.h"
 #include "SharedResources.h"

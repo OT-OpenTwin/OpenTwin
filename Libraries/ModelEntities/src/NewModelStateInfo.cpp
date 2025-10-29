@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file NewModelStateInfo.cpp
 //! @authors Jan Wagner, Alexander Kuester (alexk95)
 //! @date April 2024

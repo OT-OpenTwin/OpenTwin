@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "SolverReport.h"
 #include "EntityResultText.h"
 

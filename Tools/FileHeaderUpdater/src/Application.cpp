@@ -162,15 +162,8 @@ void Application::scanFile(const std::string& _filePath) {
 	fileLines.push_back(line);
 
 	// Read remaining lines
-	bool isCommentBlock = true;
 	while (std::getline(fileStream, line)) {
 		fileLines.push_back(line);
-
-		if (isCommentBlock) {
-			if (line.find(m_config.keywordEnd) == 0) {
-				isCommentBlock = false;
-			}
-		}
 	}
 
 	// If the file ends with a newline, add an empty line

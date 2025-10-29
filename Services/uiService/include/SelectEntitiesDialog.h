@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file SelectEntitiesDialog.h
 //! 
 //! @author Alexander Kuester (alexk95)

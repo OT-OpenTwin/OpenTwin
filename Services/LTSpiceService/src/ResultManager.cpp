@@ -1,3 +1,5 @@
+// @otlicense
+
 ﻿#include "ResultManager.h"
 
 #include "ParametricCombination.h"

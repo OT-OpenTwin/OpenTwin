@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef GDS2PATH_H_
 #define GDS2PATH_H_
 

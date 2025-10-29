@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureEntityWithDynamicFields.h"
 
 

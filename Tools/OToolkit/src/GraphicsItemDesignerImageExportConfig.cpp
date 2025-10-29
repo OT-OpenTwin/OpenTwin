@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsItemDesignerImageExportConfig.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date June 2024

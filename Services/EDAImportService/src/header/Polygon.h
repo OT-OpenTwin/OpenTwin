@@ -1,3 +1,5 @@
+// @otlicense
+
 #ifndef MYPOLYGON_H_
 #define MYPOLYGON_H_
 

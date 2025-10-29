@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		AbstractConnection.cpp
  *	Package:	rbeCore

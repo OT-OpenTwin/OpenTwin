@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "OTCore/GenericDataStructMatrix.h"
 #include "MetadataSeries.h"

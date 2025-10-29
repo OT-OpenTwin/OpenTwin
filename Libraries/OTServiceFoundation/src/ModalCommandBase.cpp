@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTServiceFoundation/ModalCommandBase.h"
 #include "OTServiceFoundation/ApplicationBase.h"
 

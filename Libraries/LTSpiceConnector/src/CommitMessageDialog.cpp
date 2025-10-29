@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "LTSpiceConnector/CommitMessageDialog.h"
 #include "OTWidgets/IconManager.h"
 

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PropertyBundleVisUnstructuredScalarSurface.h"
 
 void PropertyBundleVisUnstructuredScalarSurface:: setProperties(EntityBase * _thisObject)

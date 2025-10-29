@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PlotBuilder.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityResult1DPlot.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   TableExtractor.h
  * \brief  API for creating a Table entity from any source. The task of this class is only the extraction of single rows, depending in the set delimiter. 

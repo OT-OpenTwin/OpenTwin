@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityParameterizedDataTable.h"
 #include <bsoncxx/builder/basic/array.hpp>
 

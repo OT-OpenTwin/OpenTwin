@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PortData.h"
 
 PortData::PortData(const std::string& _portName, const std::string& _serialisedData, const std::string& _serialisedMetaData, bool _modified)

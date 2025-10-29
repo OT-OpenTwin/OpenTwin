@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "BusinessLogicHandler.h"
 #include "ResultCollectionExtender.h"

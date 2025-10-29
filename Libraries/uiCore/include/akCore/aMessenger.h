@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aMessenger.h
  *	Package:	akCore

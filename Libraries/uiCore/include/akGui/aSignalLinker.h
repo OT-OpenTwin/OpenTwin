@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aSignalLinker.h
  *	Package:	akGui

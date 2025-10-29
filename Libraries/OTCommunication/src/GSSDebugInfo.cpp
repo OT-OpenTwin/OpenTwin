@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GSSDebugInfo.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date August 2025

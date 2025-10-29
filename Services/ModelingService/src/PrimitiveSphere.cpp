@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PrimitiveSphere.h"
 
 #include "EntityGeometry.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockFileWriter.h"
 #include "SharedResources.h"
 #include "PropertyHelper.h"

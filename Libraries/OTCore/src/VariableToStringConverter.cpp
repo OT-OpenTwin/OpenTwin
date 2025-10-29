@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/VariableToStringConverter.h"
 #include <cassert>
 

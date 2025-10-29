@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MeasurementCampaignHandler.h"
 #include "Application.h"
 #include "OTCore/FolderNames.h"

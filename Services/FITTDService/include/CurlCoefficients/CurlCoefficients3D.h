@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "CurlCoefficients/CurlCoefficients.h"
 #include "Grid/Grid.h"

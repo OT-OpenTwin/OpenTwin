@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file Session.cpp
 //! @authors Alexander Kuester (alexk95)
 //! @date June 2025

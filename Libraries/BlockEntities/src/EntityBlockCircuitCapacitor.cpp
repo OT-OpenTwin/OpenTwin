@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityBlockCircuitCapacitor.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/GraphicsStackItemCfg.h"

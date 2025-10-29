@@ -1,3 +1,5 @@
+// @otlicense
+
 // Model header
 #include "stdafx.h"
 

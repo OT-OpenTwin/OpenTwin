@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   PythonExtension.h
  * \brief  C Python Extension that hold functions for OpenTwin that can be called from a python script.

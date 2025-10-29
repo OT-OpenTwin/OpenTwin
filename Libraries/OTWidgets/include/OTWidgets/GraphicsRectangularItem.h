@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsRectangularItem.h
 //! @author Alexander Kuester (alexk95)
 //! @date August 2023

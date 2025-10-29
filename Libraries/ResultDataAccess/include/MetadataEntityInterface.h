@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "MetadataCampaign.h"
 #include "EntityMetadataSeries.h"

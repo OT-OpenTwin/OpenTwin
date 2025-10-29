@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file LineEditCfg.h
 //! @author Alexander Kuester (alexk95)
 //! @date January 2025

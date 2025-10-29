@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "CircuitElements/Capacitor.h"
 
 Capacitor::Capacitor(std::string capacity, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)

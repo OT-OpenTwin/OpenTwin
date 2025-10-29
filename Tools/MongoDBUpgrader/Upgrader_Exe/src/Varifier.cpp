@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "Varifier.h"
 #include "Logger.h"
 #include "WindowsUtilityFuctions.h"

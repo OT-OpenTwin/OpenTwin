@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntitySolverPHREEC.h"
 #include "OldTreeIcon.h"

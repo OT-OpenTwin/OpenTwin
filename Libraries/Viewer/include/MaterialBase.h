@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include <osg/Material>
 #include <osgDB/ReadFile>

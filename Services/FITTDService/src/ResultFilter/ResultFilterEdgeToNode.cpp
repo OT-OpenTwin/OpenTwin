@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "ResultFilter/ResultFilterEdgeToNode.h"
 
 ResultFilterEdgeToNode::ResultFilterEdgeToNode(int executionFrequency, int totalTimeSteps)

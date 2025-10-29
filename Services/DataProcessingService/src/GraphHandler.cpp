@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "GraphHandler.h"
 #include "GraphNode.h"
 #include "EntityBlockConnection.h"

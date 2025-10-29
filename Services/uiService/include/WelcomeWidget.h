@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ProjectOverviewWidget.h
 //! @author Alexander Kuester (alexk95)
 //! @date September 2024

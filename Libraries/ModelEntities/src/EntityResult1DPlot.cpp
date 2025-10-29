@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "EntityResult1DPlot.h"
 #include "PropertyHelper.h"
 #include "DataBase.h"

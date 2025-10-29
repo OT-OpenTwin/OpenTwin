@@ -1,3 +1,5 @@
+// @otlicense
+
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/LogDispatcher.h"

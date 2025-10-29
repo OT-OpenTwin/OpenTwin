@@ -1,3 +1,5 @@
+// @otlicense
+
 //#include "MetadataParameterBundle.h"
 //#include <assert.h>
 //

@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsHBoxLayoutItemCfg.h
 //! 
 //! @author Alexander Kuester (alexk95)

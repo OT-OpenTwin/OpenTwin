@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "stdafx.h"
 #include "..\include\Helper\BsonValuesHelper.h"
 #include "bsoncxx/types/bson_value/make_value.hpp"

@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 #include "EntityBase.h"
 #include "IVisualisationCurve.h"

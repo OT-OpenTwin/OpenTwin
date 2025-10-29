@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "InfoFileManager.h"
 #include "Application.h"
 

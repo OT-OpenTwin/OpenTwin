@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "CurveColourSetter.h"
 
 CurveColourSetter::CurveColourSetter(ot::Plot1DCurveCfg& _curveCfg)

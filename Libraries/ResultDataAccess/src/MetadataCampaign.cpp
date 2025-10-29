@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MetadataCampaign.h"
 #include <cassert>
 

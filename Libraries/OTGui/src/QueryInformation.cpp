@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTGui/QueryInformation.h"
 
 void ot::QueryInformation::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const

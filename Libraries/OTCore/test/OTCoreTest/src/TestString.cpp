@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "gtest/gtest.h"
 #include "OTCore/String.h"
 #include "OTCore/ContainerHelper.h"

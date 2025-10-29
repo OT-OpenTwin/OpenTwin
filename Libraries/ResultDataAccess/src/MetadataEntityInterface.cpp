@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "MetadataEntityInterface.h"
 #include "MetadataEntry.h"
 #include "MetadataEntryArray.h"

@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		rbeWrapperDatatypes.h
  *	Package:	rbeWrapper

@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntityVis2D3D.h"
 #include "OldTreeIcon.h"

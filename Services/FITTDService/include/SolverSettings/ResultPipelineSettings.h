@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 //Currently only 1D plot. Needs to be extended for different visualization types.
 class ResultPipelineSettings

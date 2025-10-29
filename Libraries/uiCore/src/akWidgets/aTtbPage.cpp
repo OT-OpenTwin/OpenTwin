@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aTtbPage.cpp
  *	Package:	akWidgets

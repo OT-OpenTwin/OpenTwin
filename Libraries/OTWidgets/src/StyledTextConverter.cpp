@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file StyledTextConverter.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date November 2024

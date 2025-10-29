@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "FixtureResultCollectionExtender.h"
 
 #include "MetadataEntrySingle.h"

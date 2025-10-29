@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "StudioSuiteConnector/ProjectManager.h"
 #include "StudioSuiteConnector/CommitMessageDialog.h"

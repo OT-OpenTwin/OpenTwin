@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   PythonWrapper.h
  * \brief  Wrapper around python code execution.

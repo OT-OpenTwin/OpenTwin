@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aAnimationOverlayWidget.h
  *	Package:	akWidgets

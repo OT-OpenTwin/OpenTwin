@@ -1,3 +1,5 @@
+// @otlicense
+
 /*****************************************************************//**
  * \file   PythonException.h
  * \brief  Embedded python functions don't throw exceptions. If the return value holds an error code that says that the function failed in execution, it is possible to 

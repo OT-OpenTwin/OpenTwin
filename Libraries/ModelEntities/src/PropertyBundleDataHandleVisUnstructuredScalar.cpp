@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "PropertyBundleDataHandle.h"
 #include "..\include\PropertyBundleDataHandleVisUnstructuredScalar.h"
 

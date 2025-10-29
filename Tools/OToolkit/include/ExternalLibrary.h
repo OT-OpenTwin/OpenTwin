@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file ExternalLibrary.h
 //! @author Alexander Kuester (alexk95)
 //! @date October 2024

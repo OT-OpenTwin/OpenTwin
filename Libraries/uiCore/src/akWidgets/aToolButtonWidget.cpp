@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aToolButtonWidget.cpp
  *	Package:	akWidgets

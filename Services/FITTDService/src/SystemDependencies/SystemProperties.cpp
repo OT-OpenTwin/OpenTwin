@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "SystemDependencies\SystemProperties.h"
 #include <thread>
 

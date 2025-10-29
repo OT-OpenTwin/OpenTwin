@@ -1,3 +1,5 @@
+// @otlicense
+
 /*
  *	File:		aNiceLineEditWidget.cpp
  *	Package:	akWidgets

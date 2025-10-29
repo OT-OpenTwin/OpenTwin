@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntityVisUnstructuredVectorVolume.h"
 #include "OldTreeIcon.h"

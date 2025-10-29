@@ -1,3 +1,5 @@
+// @otlicense
+
 
 #include "EntityBinaryData.h"
 #include "DataBase.h"

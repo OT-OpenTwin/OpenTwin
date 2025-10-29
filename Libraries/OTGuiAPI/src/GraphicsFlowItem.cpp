@@ -1,3 +1,5 @@
+// @otlicense
+
 //! @file GraphicsFlowItem.cpp
 //! 
 //! @author Alexander Kuester (alexk95)

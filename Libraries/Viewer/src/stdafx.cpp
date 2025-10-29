@@ -1,1 +1,3 @@
+// @otlicense
+
 #include "stdafx.h"

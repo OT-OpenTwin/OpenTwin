@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "OTCore/VariableToBSONStringConverter.h"
 #include <cassert>
 

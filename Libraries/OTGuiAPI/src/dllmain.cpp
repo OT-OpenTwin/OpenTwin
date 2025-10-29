@@ -1,3 +1,5 @@
+// @otlicense
+
 #include <Windows.h>
 
 BOOL APIENTRY DllMain( HMODULE hModule,
