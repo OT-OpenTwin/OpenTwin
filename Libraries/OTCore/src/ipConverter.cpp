@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * ipConverter.cpp
- *
- *  Created on: November 30, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
-
  // SessionService header
 #include <openTwin/ipConverter.h>		// Corresponding header
 

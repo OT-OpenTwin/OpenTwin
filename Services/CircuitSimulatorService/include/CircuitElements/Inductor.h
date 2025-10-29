@@ -1,15 +1,8 @@
 // @otlicense
 
 #pragma once
-/*
- * Inductor.h
- *
- *  Created on: 05.08.2024
- *	Author: Sebastian Urmann
- *  Copyright (c)
- */
 
- //Sevice Header
+// Sevice Header
 #include "CircuitElement.h"
 
 class Inductor : public CircuitElement {

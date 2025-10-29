@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * Application.cpp
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
-
 // Service header
 #include "UiNotifier.h"
 #include "Application.h"

@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * Application.h
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
-
 //Service Header
 #include "Connection.h"
 

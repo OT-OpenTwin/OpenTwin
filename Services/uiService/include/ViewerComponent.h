@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * ViewerComponent.h
- *
- *  Created on: September 21, 2020
- *	Author: Alexander Kuester, Peter Thoma
- *  Copyright (c) 2020 openTwin
- */
-
 #pragma once
 
 // C++ header

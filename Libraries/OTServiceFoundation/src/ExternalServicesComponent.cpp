@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- *  ExternalServicesComponent.cpp
- *
- *  Created on: 01/02/2021
- *	Author: Alexander Kuester, Peter Thoma
- *  Copyright (c) 2021, OpenTwin
- */
-
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"

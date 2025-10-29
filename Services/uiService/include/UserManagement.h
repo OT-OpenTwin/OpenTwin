@@ -1,12 +1,5 @@
 // @otlicense
 
-/*
- * UserManagement.h
- *
- *	Author: Peter Thoma
- *  Copyright (c) 2020 openTwin
- */
-
 #pragma once
 
 // Frontend header

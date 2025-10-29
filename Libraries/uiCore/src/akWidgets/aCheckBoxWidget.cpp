@@ -1,17 +1,5 @@
 // @otlicense
 
-/*
- *	File:		aCheckBoxWidget.cpp
- *	Package:	akWidgets
- *
- *  Created on: March 19, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2022 Alexander Kuester
- *	This file is part of the uiCore component.
- *	This file is subject to the terms and conditions defined in
- *	file 'LICENSE', which is part of this source code package.
- */
-
 // AK header
 #include <akCore/aException.h>
 #include <akWidgets/aCheckBoxWidget.h>

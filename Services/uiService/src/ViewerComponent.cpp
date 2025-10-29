@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * ViewerComponent.cpp
- *
- *  Created on: September 21, 2020
- *	Author: Alexander Kuester, Peter Thoma
- *  Copyright (c) 2020 openTwin
- */
-
  // Wrapper header
 #include <ViewerComponent.h>				// Corresponding header
 #include <ExternalServicesComponent.h>		// Model Component

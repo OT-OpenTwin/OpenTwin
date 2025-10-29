@@ -1,21 +1,5 @@
 // @otlicense
 
-/*
- *	File:		aTtbSubgroup.cpp
- *	Package:	akWidgets
- *
- *  Created on: August 05, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2022 Alexander Kuester
- *	This file is part of the uiCore component.
- *	This file is subject to the terms and conditions defined in
- *	file 'LICENSE', which is part of this source code package.
- *
- *	This class is using a modified version of the "Qt TabToolbar" library.
- *	The changes to the library are listed in the documentation which was
- *	provided with this source code package.
- */
-
  // AK header
 #include <akCore/aException.h>
 #include <akCore/aMessenger.h>

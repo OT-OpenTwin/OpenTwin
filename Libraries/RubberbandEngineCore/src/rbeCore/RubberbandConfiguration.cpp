@@ -1,17 +1,5 @@
 // @otlicense
 
-/*
- *	File:		RubberbandConfiguration.cpp
- *	Package:	rbeCore
- *
- *  Created on: November 07, 2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2021 Alexander Kuester
- *	This file is part of the RubberbandEngine package.
- *	This file is subject to the terms and conditions defined in
- *	file 'LICENSE', which is part of this source code package.
- */
-
 #include <rbeCore/RubberbandConfiguration.h>
 #include <rbeCore/rbeAssert.h>
 #include <rbeCore/jsonMember.h>

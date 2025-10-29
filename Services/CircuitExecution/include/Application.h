@@ -1,21 +1,11 @@
 // @otlicense
 
-/*
- * Application.h
- *
- *  Created on: 03.12.2024
- *	Author: Sebastian Urmann
- *  Copyright (c)
- */
 #pragma once
+
 //std Header
 #include <string>
 
-
 class ConnectionManager;
-
-
-
 
 class Application
 {

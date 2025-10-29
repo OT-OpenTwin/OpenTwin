@@ -1,11 +1,5 @@
 // @otlicense
 
-/*
- *	DownloadFile.h
- *
- *  Copyright (c) 2024 openTwin
- */
-
 #pragma once
 
 #include "OTCommunication/CommunicationAPIExport.h"

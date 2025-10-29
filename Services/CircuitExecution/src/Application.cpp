@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * Application.cpp
- *
- *  Created on: 03.12.2024
- *	Author: Sebastian Urmann
- *  Copyright (c)
- */
-
 #include "Application.h"
 #include "ConnectionManager.h"
 

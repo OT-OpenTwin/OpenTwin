@@ -1,12 +1,5 @@
 // @otlicense
 
-/*
- * ProjectManagement.h
- *
- *	Author: Peter Thoma
- *  Copyright (c) 2020 openTwin
- */
-
 // Frontend header
 #include "ProjectManagement.h"
 #include "UserManagement.h"

@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * dllmain.cpp
- *
- *  Created on: 
- *	Author: 
- *  Copyright (c) 
- */
-
 // std header
 #include <Windows.h>
 

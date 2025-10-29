@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- *	dllmain.cpp
- *
- *  Created on: January 03, 2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2023, OpenTwin
- */
-
 #include "OTSystem/ArchitectureInfo.h"
 
 #ifdef OT_OS_WINDOWS

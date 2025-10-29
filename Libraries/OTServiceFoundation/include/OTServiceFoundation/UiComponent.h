@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- *  UiComponent.h
- *
- *  Created on: 10/02/2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2021, OpenTwin
- */
-
 #pragma once
 
 // OpenTwin System header

@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * UserManagement.cpp
- *
- *  Created on: September 28, 2020
- *	Author: Peter Thoma
- *  Copyright (c) 2020 openTwin
- */
-
 // uiService Header
 #include "UserManagement.h"		// Corresponding header
 #include "AppBase.h"

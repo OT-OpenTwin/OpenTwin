@@ -1,11 +1,5 @@
 // @otlicense
 
-/*
- *	DownloadFile.cpp
- *
- *  Copyright (c) 2024 openTwin
- */
-
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
 #include "DownloadFile.h"			// Corresponding header

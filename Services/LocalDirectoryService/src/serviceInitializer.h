@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * serviceInitializer.h
- *
- *  Created on: December 29, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
-
 #pragma once
 
 #include <string>

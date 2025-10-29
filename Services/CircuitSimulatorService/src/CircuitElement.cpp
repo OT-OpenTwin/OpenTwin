@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * Application.cpp
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
-
 //Service Header
 #include "CircuitElement.h"
 

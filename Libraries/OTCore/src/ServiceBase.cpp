@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- *  ServiceBase.cpp
- *
- *  Created on: 08/02/2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2023, OpenTwin
- */
-
 // Open Twin header
 #include "OTSystem/OTAssert.h"
 #include "OTCore/ServiceBase.h"

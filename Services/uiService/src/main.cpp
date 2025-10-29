@@ -1,12 +1,5 @@
 // @otlicense
 
-/*
- * dllmain.h
- *
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
-
 // App header
 #include "AppBase.h"
 #include "StartArgumentParser.h"

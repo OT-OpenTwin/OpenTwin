@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * Application.cpp
- *
- *  Created on: 21.05.2025
- *	Author: Sebastian Urmann
- *  Copyright (c)
- */
-
 // Service header
 #include "Application.h"
 

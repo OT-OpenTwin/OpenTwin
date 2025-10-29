@@ -1,13 +1,6 @@
 // @otlicense
 
 #pragma once
-/*
- * VoltageSource.h
- *
- *  Created on: 05.08.2024
- *	Author: Sebastian Urmann
- *  Copyright (c)
- */
 
 //Sevice Header
 #include "CircuitElement.h"
