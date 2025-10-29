@@ -1,6 +1,6 @@
 // @otlicense
 
-﻿#include "ResultManager.h"
+#include "ResultManager.h"
 
 #include "ParametricCombination.h"
 #include "LTSpiceRawReader.h"

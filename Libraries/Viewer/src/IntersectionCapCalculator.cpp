@@ -1,6 +1,6 @@
 // @otlicense
 
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 #include <osg/Node>
 #include <osg/Geode>
@@ -190,7 +190,7 @@ void IntersectionCapCalculator::classifyPolygons(const std::vector<std::vector<I
         centroid.y /= ring.size();
 
         bool inside = false;
-        for (size_t j = 0; j < i; ++j) { // ✅ Nur bereits größere Ringe prüfen
+		for (size_t j = 0; j < i; ++j) { // Check against larger rings
             if (isPointInPolygon(centroid, sorted[j].ring)) {
                 inside = true;
                 break;

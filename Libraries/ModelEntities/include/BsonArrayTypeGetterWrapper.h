@@ -1,6 +1,6 @@
 // @otlicense
 
-﻿#pragma once
+#pragma once
 #include <bsoncxx/builder/basic/array.hpp>
 #include <exception>
 #include <stdint.h>

@@ -1,6 +1,5 @@
 // @otlicense
 
-﻿
 #include "MongoSessionFunctions.h"
 #include "MongoRoleFunctions.h"
 #include "MongoConstants.h"

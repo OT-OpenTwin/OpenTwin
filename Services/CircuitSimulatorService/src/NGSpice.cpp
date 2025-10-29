@@ -856,7 +856,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 			//First set the GND connections of the VoltageSource meaning that i first want to find the connection with 0 and set it to it
 			setNodeNumbersOfVoltageSource(_connectionBlockMap, voltageSource->getClassName(), counter, elementUID, elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 
-			//now i go thorugh all the other connections
+			// now i go thorugh all the other connections
 			connectionAlgorithmWithGNDVoltageSource(_connectionBlockMap, voltageSource->getClassName(), counter, elementUID, elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 
 		}
@@ -1050,7 +1050,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		{
 				CurrentMeter* currentMeter = dynamic_cast<CurrentMeter*>(circuitElement);
 				namesOfCurrentMeter.push_back(currentMeter->getCustomName());
-				std::string name = "Rshunt" + std::to_string(rshuntCounter++); // Erhöhe den Zähler nach jedem Schritt
+				std::string name = "Rshunt" + std::to_string(rshuntCounter++); // Increase counter for next Rshunt
 				nameOfRShunts.push_back(name);
 				addToCustomNameToNetlistMap(currentMeter->getCustomName(), to_lowercase(name));
 				addToNetlistNameToCustomMap(currentMeter->getCustomName(), to_lowercase(name));
@@ -1312,16 +1312,16 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 	//Now i will do a loop through the nodes of the voltageMeter to get the potential diffirence with probe
 	for (auto nodes : nodesOfVoltageMeter)
 	{
-		std::string nodeString = "("; // Beginne den String mit einer öffnenden Klammer
+		std::string nodeString = "("; // Begin the string an opening parenthesis
 		for (size_t i = 0; i < nodes.size(); ++i)
 		{
 			nodeString += nodes[i];
 			if (i < nodes.size() - 1)
 			{
-				nodeString += ","; // Füge ein Komma und ein Leerzeichen zwischen den Nodes hinzu
+				nodeString += ","; // Add comma and space between node numbers
 			}
 		}
-		nodeString += ")"; // Schließe den String mit einer schließenden Klammer ab
+		nodeString += ")"; // Close the parenthesis
 
 		std::ostringstream oss;
 		oss << "circbyline .probe vd" << nodeString;

@@ -1,6 +1,6 @@
 // @otlicense
 
-﻿#include "MongoUserFunctions.h"
+#include "MongoUserFunctions.h"
 #include "MongoRoleFunctions.h"
 #include "MongoGroupFunctions.h"
 #include "MongoProjectFunctions.h"

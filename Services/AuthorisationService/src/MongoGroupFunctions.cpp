@@ -1,6 +1,5 @@
 // @otlicense
 
-﻿
 #include "MongoGroupFunctions.h"
 #include "MongoRoleFunctions.h"
 #include "MongoConstants.h"
@@ -9,16 +8,6 @@
 
 #include <sstream>
 
-/*
-* The following functionalities must be imlemented:
-* 1) Create group ✅
-* 2) Get All User groups (Can be performed in the front end) ✅
-* 3) Get group Data (can be performed in the front end) ✅
-* 4) Add user to group ✅
-* 5) Remove User from Group ✅
-* 6) Remove group completely ✅
-* 7) Change groupName  ✅
-*/
 namespace MongoGroupFunctions
 {
 	void createGroup(std::string groupName, User& creatingUser, mongocxx::client& adminClient)

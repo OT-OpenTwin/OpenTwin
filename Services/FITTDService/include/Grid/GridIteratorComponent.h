@@ -16,7 +16,7 @@ protected:
 
 	void SetResetDistance() { _resetDistance = (-_endPoint + _startPoint) * _stepWidth; };
 public:
-	//Vll friend von grid um zu checken ob endpoint auch nicht die dimensionen überschreitet.
+	// Maybe make grid a friend class to check if endpoint does not exceed the dimensions.
 	GridIteratorComponent(index_t startPoint, index_t endPoint, index_t stepWidth)
 		: _startPoint(startPoint), _endPoint(endPoint), _stepWidth(stepWidth), _currentPoint(startPoint)
 	{
@@ -31,9 +31,9 @@ public:
 	};
 
 	/* 
-		!ACHTUNG! Konzeptbruch !ACHTUNG! 
-		HasNext bezieht sich auf _endPoint welches eine Information vom Subvolumen ist. HasPrior schaut nun auf das gesammte Rechengebiet.
-		Hack für ResultFilterSourceVektorVolumeEdgeToNode.
+		!ATTENTION! BREAK OF CONCEPT !ATTENTION!
+		HasNext refers to _endPoint which is information from the subvolume. HasPrior now looks at the entire computational domain.
+		Hack for ResultFilterSourceVektorVolumeEdgeToNode.
 	*/
 	bool HasPrior()const
 	{
