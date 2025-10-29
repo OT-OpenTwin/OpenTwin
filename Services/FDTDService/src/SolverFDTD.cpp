@@ -67,37 +67,6 @@ std::string SolverFDTD::runSolver(const std::string& tempDirPath, ot::components
     return solverOutput.str();
 }
 
-// @brief Get the boundary conditions from the entity properties
-// Default is PEC for all boundaries
-// Still WIP, testing if this works or not.
-// Might need to change the property type to string instead of double.
-std::array<std::string, 6> SolverFDTD::getBoundaryConditions() {
-    std::array<std::string, 6> boundaryConditions = { "PEC", "PEC", "PEC", "PEC", "PEC", "PEC" };
-	const std::array<std::string, 6> propertyNames = { "x-max", "x-min", "y-max", "y-min", "z-max", "z-min" };
-
-    for (auto& item : entityProperties) {
-        for (size_t i = 0; i < propertyNames.size(); ++i) {
-            EntityPropertiesSelection* boundaryCondition = dynamic_cast<EntityPropertiesSelection*>(item.second.getProperty(propertyNames[i]));
-            if (boundaryCondition != nullptr) {
-                boundaryConditions[i] = boundaryCondition->getValue();
-            }
-        }
-    }
-
-	return boundaryConditions;
-}
-
-void SolverFDTD::getBoundaryConditions(std::map<std::string, double>& boundaryConditionDefinitions) {
-
-    for (auto item : entityProperties) {
-        EntityPropertiesDouble* boundaryCondition = dynamic_cast<EntityPropertiesDouble*>(item.second.getProperty("Boundary Condition"));
-
-        if (boundaryCondition != nullptr) {
-            boundaryConditionDefinitions[meshItemInfo[item.first].getEntityName()] = boundaryCondition->getValue();
-        }
-    }
-}
-
 void SolverFDTD::getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application* app)
 {
     // Here we need to loop through all mesh items and their properties and get their materials

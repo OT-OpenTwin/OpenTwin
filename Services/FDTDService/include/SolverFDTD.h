@@ -14,9 +14,6 @@ public:
 	//virtual void convertResults(const std::string& tempDirPath, Application* app, EntityBase* solverEntity) override;
 
 private:
-	std::map<std::string, std::string> getBoundaryAttributes(const FDTDConfig& config) const;
-	void getBoundaryConditions(std::map<std::string, double>& boundaryConditionsDefinition);
-	std::array<std::string, 6> getBoundaryConditions();
 	void getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application* app);
 	void buildMaterialAliases(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap);
 	void buildBoundaryConditionAliases(std::map<std::string, double>& boundaryConditionDefinitions, std::map<std::string, std::string>& boundaryConditionsNameToAliasMap);
