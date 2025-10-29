@@ -52,6 +52,7 @@ private:
 
 		bool isValid = false;
 		bool warnMissingHeader = false;
+		bool warnInvalidChars = false;
 		bool addFileName = false;
 		bool addLicenseTitle = false;
 		std::string keywordStart;
@@ -72,6 +73,7 @@ private:
 		size_t outdateFiles = 0;
 		size_t filesModified = 0;
 		size_t filesWithMissingLicense = 0;
+		size_t filesWithInvalidChars = 0;
 		size_t filesEmpty = 0;
 		size_t filesUpToDate = 0;
 		size_t errors = 0;

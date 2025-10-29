@@ -178,6 +178,27 @@ void Application::scanFile(const std::string& _filePath) {
 
 	fileStream.close();
 
+	if (m_config.warnInvalidChars) {
+		int lineNum = 1;
+		bool hasInvalidChars = false;
+		for (const std::string& l : fileLines) {
+			int colNum = 1;
+			for (const unsigned char c : l) {
+				if ((c < 32 && c != '\t') || c > 126) {
+					logW("Non ASCII character in file \"" + _filePath + "\" at " + 
+						std::to_string(lineNum) + ":" + std::to_string(colNum) + 
+						". Char(" + std::to_string(static_cast<uint32_t>(c)) + ")");
+					if (!hasInvalidChars) {
+						m_resultData.filesWithInvalidChars++;
+					}
+					hasInvalidChars = true;
+				}
+				colNum++;
+			}
+			lineNum++;
+		}
+	}
+
 	// Create expected license header
 	std::list<std::string> expectedLicenseLines = m_config.licenseLines;
 
@@ -513,6 +534,15 @@ Application::Config Application::loadConfigFile(const std::string& _fileName) {
 		cfg.warnMissingHeader = doc["WarnMissingHeader"].GetBool();
 	}
 
+	// Read warn invalid chars flag
+	if (doc.HasMember("WarnInvalidChars")) {
+		if (!doc["WarnInvalidChars"].IsBool()) {
+			logE("Invalid config file format: Invalid \"WarnInvalidChars\" boolean");
+			return cfg;
+		}
+		cfg.warnInvalidChars = doc["WarnInvalidChars"].GetBool();
+	}
+
 	// Read root directories
 	if (doc.HasMember("RootDirectories") && doc["RootDirectories"].IsArray()) {
 		const rapidjson::Value& roots = doc["RootDirectories"];
@@ -659,15 +689,20 @@ void Application::showConfig() {
 
 void Application::showResults()  {
 	log("Results:");
-	log("  Errors:                  " + std::to_string(m_resultData.errors));
-	log("  Warnings:                " + std::to_string(m_resultData.warnings));
-	log("  Directories Scanned:     " + std::to_string(m_resultData.directoriesScanned));
-	log("  Files Scanned:           " + std::to_string(m_resultData.filesScanned));
-	log("  Empty Files:             " + std::to_string(m_resultData.filesEmpty));
-	log("  Files Up-To-Date:        " + std::to_string(m_resultData.filesUpToDate));
-	log("  Files Missing License:   " + std::to_string(m_resultData.filesWithMissingLicense));
-	log("  Files Require Update:    " + std::to_string(m_resultData.outdateFiles));
-	log("  Files Modified:          " + std::to_string(m_resultData.filesModified));
+	log("  Errors:                   " + std::to_string(m_resultData.errors));
+	log("  Warnings:                 " + std::to_string(m_resultData.warnings));
+	log("  Directories Scanned:      " + std::to_string(m_resultData.directoriesScanned));
+	log("  Files Scanned:            " + std::to_string(m_resultData.filesScanned));
+	log("  Empty Files:              " + std::to_string(m_resultData.filesEmpty));
+	
+	if (m_config.warnInvalidChars) {
+	log("  Files with Invalid Chars: " + std::to_string(m_resultData.filesWithInvalidChars));
+	}
+	
+	log("  Files Up-To-Date:         " + std::to_string(m_resultData.filesUpToDate));
+	log("  Files Missing License:    " + std::to_string(m_resultData.filesWithMissingLicense));
+	log("  Files Require Update:     " + std::to_string(m_resultData.outdateFiles));
+	log("  Files Modified:           " + std::to_string(m_resultData.filesModified));
 }
 
 std::string Application::fileNameOnly(const std::string& _filePath) const {

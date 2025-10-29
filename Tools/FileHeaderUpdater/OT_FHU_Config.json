@@ -4,6 +4,7 @@
     "HeaderLinePrefix": "// ",
     "LicenseFile": "%OPENTWIN_DEV_ROOT%/LICENSE.md",
     "WarnMissingHeader": false,
+    "WarnInvalidChars": false,
     "AddFileName": true,
     "AddLicenseTitle": true,
     "RootDirectories": [
