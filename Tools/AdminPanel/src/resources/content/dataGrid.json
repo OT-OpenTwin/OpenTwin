@@ -3,5 +3,5 @@
   "changePasswordButton": "Password",
   "changeGroupName": "Change Group Name",
   "changeProjectName": "Change Project Name",
-  "projectLisAlert": "Only the first 10 projects in the table were displayed!"
+  "projectLisAlert": "Only the first 1000 projects in the database are displayed. Use the filter to reduce the length of the list."
 }

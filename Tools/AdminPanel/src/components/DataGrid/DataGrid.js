@@ -21,18 +21,14 @@ const DataGrid = ({ list, columnHeader, ...props }) => {
   const [showAlert, setShowAlert] = useState("");
 
   useEffect(() => {
-    GetAllProjectCount()
-      .then((response) => {
-        const number = response;
-        if (number > 6) {
-          setShowAlert(t("dataGrid:projectLisAlert"));
-        }
-      })
-      .catch((response) => {
-        console.log("GetAllProjectCount", response.description);
-        navigate("/error");
-      });
-  }, [navigate, t]);
+    if (list.length == 1000) {
+      setShowAlert(t("dataGrid:projectLisAlert"));
+    }
+    else
+    {
+      setShowAlert(null);
+    }
+  }, [list.length, navigate, t]);
 
   const actionUserColumn = [
     {
@@ -155,7 +151,7 @@ const DataGrid = ({ list, columnHeader, ...props }) => {
       {props.title === "Projects" ? (
         <>
           <QuickFilter input={props.input} handleFilter={props.handleFilter} />
-          {props.numberOfProject >= 10 && (
+          {showAlert && (
             <Alert severity="info">{showAlert}</Alert>
           )}
         </>
@@ -167,8 +163,12 @@ const DataGrid = ({ list, columnHeader, ...props }) => {
         rows={list}
         rowHeight={50}
         columns={actionColum}
-        pageSize={50}
-        rowsPerPageOptions={[50]}
+        pageSizeOptions={[25, 50, 100]} // Auswahlmenü für den User
+        initialState={{
+          pagination: {
+            paginationModel: { pageSize: 25, page: 0 }, // Default: 25 Einträge pro Seite
+          },
+        }}
         checkboxSelection
         onRowSelectionModelChange={(ids) => {
           setArrIds(ids);

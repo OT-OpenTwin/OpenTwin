@@ -10,7 +10,7 @@ export function GetAllProjects(props) {
     LoggedInUsername: enteredUsername,
     LoggedInUserPassword: enteredPassword,
     ProjectFilter: props.enteredFilterValue,
-    ProjectLimit: 10,
+    ProjectLimit: 1000,
   };
 
   return authRequest(data);

@@ -13,7 +13,7 @@ export const GroupsColumnHeader = [
 ];
 
 export const ProjectsColumnHeader = [
-  { field: "name", headerName: "Name", width: 150 },
-  { field: "creatingUser", headerName: "Owner", width: 250 },
-  { field: "groups", headerName: "Groups", width: 250 },
+  { field: "Name", headerName: "Name", width: 150 },
+  { field: "UserName", headerName: "Owner", width: 250 },
+  { field: "Groups", headerName: "Groups", width: 250 },
 ];

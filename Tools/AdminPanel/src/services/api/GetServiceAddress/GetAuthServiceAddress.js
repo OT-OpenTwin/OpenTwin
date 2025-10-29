@@ -11,7 +11,8 @@ export function GetAuthServiceAddress() {
   const request = msRequest(sessionServiceAddress, data);
   
   return request.then((value) => {
-    let address = value["Service.AuthUrl"];
+    const whatData = JSON.parse(value.What);
+    let address = whatData["Service.AuthUrl"];
     return address;
   });
 }

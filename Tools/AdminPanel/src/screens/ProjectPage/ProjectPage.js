@@ -54,8 +54,8 @@ const ProjectPage = () => {
     const enteredFilterValue = valueToChange ? valueToChange : "";
     GetAllProjects({ enteredFilterValue })
       .then((response) => {
-        var listObj = response.projects.map((item, index) => {
-          let tempObj = JSON.parse(item);
+        var listObj = response.List.map((item, index) => {
+          let tempObj = (typeof item === "string") ? JSON.parse(item) : item;
           tempObj.id = index + 1;
           return tempObj;
         });
@@ -64,7 +64,7 @@ const ProjectPage = () => {
         GetAllUsers()
           .then((response) => {
             listObj = response.users.map((item, index) => {
-              let tempObj = JSON.parse(item);
+              let tempObj = (typeof item === "string") ? JSON.parse(item) : item;
               tempObj.id = index + 1;
               return tempObj;
             });

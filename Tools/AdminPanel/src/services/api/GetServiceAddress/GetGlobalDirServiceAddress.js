@@ -11,7 +11,8 @@ export function GetGlobalDirServiceAddress() {
   const request = msRequest(sessionServiceAddress, data);
   
   return request.then((value) => {
-    let address = value["Service.GdsUrl"];
+    const whatData = JSON.parse(value.What);
+    let address = whatData["Service.GdsUrl"];
     return address;
   });
 }
