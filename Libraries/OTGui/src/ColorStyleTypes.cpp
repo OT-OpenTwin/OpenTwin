@@ -372,6 +372,11 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 		}
 	}
 
+	// Legacy support for "Header Foreground"
+	if (_colorStyleValueEntry == "Header Foregorund") {
+		return ColorStyleValueEntry::HeaderForeground;
+	}
+
 	OT_LOG_EAS("Unknown ColorStyleValueEntry \"" + _colorStyleValueEntry + "\"");
 	return ColorStyleValueEntry::Transparent;
 }
