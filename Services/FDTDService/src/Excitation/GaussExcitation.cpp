@@ -4,8 +4,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 
-#include "GaussianExcitation.h"
-#include "ExcitationProperties.h"
+#include "Excitation/GaussianExcitation.h"
+#include "Excitation/ExcitationProperties.h"
 
 GaussianExcitation::GaussianExcitation() 
 {

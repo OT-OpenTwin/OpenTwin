@@ -18,8 +18,8 @@
 #include "PropertyHelper.h"
 #include "EntityProperties.h"
 
-#include "ExcitationProperties.h"
-#include "ExcitationTypes.h"
+#include "Excitation/ExcitationProperties.h"
+#include "Excitation/ExcitationTypes.h"
 #include "CSXMeshGrid.h"
 
 // STD

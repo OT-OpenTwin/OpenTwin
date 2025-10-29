@@ -5,9 +5,9 @@
 
 #include "FDTDConfig.h"
 
-#include "ExcitationBase.h"
-#include "GaussianExcitation.h"
-#include "SinusoidalExcitation.h"
+#include "Excitation/ExcitationBase.h"
+#include "Excitation/GaussianExcitation.h"
+#include "Excitation/SinusoidalExcitation.h"
 
 FDTDConfig::FDTDConfig()
 {

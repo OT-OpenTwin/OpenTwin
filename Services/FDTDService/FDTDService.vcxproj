@@ -195,14 +195,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\ExcitationProperties.cpp" />
     <ClCompile Include="src\CSXMeshGrid.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\Excitation\ExcitationProperties.cpp" />
+    <ClCompile Include="src\Excitation\GaussExcitation.cpp" />
+    <ClCompile Include="src\Excitation\SinusoidalExcitation.cpp" />
     <ClCompile Include="src\FDTDConfig.cpp" />
     <ClCompile Include="src\FDTDLauncher.cpp" />
-    <ClCompile Include="src\GaussExcitation.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
-    <ClCompile Include="src\SinusoidalExcitation.cpp" />
     <ClCompile Include="src\SolverBase.cpp" />
     <ClCompile Include="src\SolverFDTD.cpp" />
     <ClCompile Include="src\tinyxml2.cpp" />
@@ -210,15 +210,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
-    <ClInclude Include="include\ExcitationProperties.h" />
     <ClInclude Include="include\CSXMeshGrid.h" />
-    <ClInclude Include="include\ExcitationBase.h" />
-    <ClInclude Include="include\ExcitationTypes.h" />
+    <ClInclude Include="include\Excitation\ExcitationBase.h" />
+    <ClInclude Include="include\Excitation\ExcitationProperties.h" />
+    <ClInclude Include="include\Excitation\ExcitationTypes.h" />
+    <ClInclude Include="include\Excitation\GaussianExcitation.h" />
+    <ClInclude Include="include\Excitation\SinusoidalExcitation.h" />
     <ClInclude Include="include\FDTDConfig.h" />
     <ClInclude Include="include\FDTDLauncher.h" />
-    <ClInclude Include="include\GaussianExcitation.h" />
     <ClInclude Include="include\ModelNotifier.h" />
-    <ClInclude Include="include\SinusoidalExcitation.h" />
     <ClInclude Include="include\SolverBase.h" />
     <ClInclude Include="include\SolverFDTD.h" />
     <ClInclude Include="include\UiNotifier.h" />

@@ -4,8 +4,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 
-#include "SinusoidalExcitation.h"
-#include "ExcitationProperties.h"
+#include "Excitation/SinusoidalExcitation.h"
+#include "Excitation/ExcitationProperties.h"
 
 SinusoidalExcitation::SinusoidalExcitation()
 {
