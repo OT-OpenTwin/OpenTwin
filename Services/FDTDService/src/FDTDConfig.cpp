@@ -115,16 +115,10 @@ void FDTDConfig::setFromEntity(EntityBase* _solverEntity) {
 	m_oversampling = PropertyHelper::getIntegerPropertyValue(_solverEntity, "Oversampling", "Simulation Settings");
 
 	// Load excitation type
-	std::string excitation = PropertyHelper::getSelectionPropertyValue(_solverEntity, "Excitation Type", "Simulation Settings");
-	if (excitation == "Gauss Excitation") {
-		m_excitationType = ExcitationTypes::GAUSSIAN;
-	}
-	else if (excitation == "Sinus Excitation") {
-		m_excitationType = ExcitationTypes::SINUSOIDAL;
-	}
-	else {
-		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 'Gaussian' 'Sinusoidal'");
-	}
+	m_excitationString = PropertyHelper::getSelectionPropertyValue(_solverEntity, "Excitation Type", "Simulation Settings");
+
+	// Perform property checking and adjustments after reading all basic FDTD properties
+	FDTDpropertyChecking();
 	// Set excitation properties based on the selected type
 	setExcitationProperties();
 
@@ -185,6 +179,29 @@ void FDTDConfig::setExcitationProperties() {
 			break;
 	}
 	m_excitation->applyProperties();
+}
+
+void FDTDConfig::FDTDpropertyChecking() {
+	if (m_freqStart >= m_freqStop) {
+		OT_LOG_WA("[FDTDConfig] [Frequency] Start Frequency is greater than or equal to End Frequency. Adjusting End Frequency.");
+		m_freqStart = m_freqStop * 0.1; // default 10% higher than start frequency
+	}
+
+	if (m_timeSteps == 0) {
+		OT_LOG_WA("[FDTDConfig] [Timesteps] Number of timesteps is set to zero. Adjusting to default value of 1000.");
+		m_timeSteps = 1000; // default to 1000 timesteps
+	}
+
+	if (m_excitationString == "Gauss Excitation") {
+		m_excitationType = ExcitationTypes::GAUSSIAN;
+	}
+	else if (m_excitationString == "Sinus Excitation") {
+		m_excitationType = ExcitationTypes::SINUSOIDAL;
+	}
+	else {
+		OT_LOG_WA("[Excitation Type] Invalid excitation type string. Defaulting to Gaussian.");
+		m_excitationType = ExcitationTypes::GAUSSIAN;
+	}
 }
 
 void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {

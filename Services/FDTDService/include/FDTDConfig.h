@@ -1,3 +1,5 @@
+// @otLicense
+// @otLicense-end
 //! @file FDTDConfig.h
 //! @brief Definition of the FDTDConfig class for managing FDTD simulation configuration in openEMS
 //! @author Alexandros McCray (alexm-dev)
@@ -84,6 +86,8 @@ private:
 	const std::array<std::string, 4> m_boundaryConditionTypes = { "PEC", "PMC", "MUR", "PML_8" };
 	const std::array<std::string, 6> m_boundaryNames = { "Xmax", "Xmin", "Ymax", "Ymin", "Zmax", "Zmin" };
 
+	std::string m_excitationString;
+
 	// CSX Mesh Grid
 	CSXMeshGrid m_meshGrid;
 
@@ -92,4 +96,6 @@ private:
 
 	//! @brief Sets the excitation properties based on the selected excitation type
 	void setExcitationProperties();
+
+	void FDTDpropertyChecking();
 };
