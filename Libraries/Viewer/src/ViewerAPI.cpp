@@ -736,8 +736,7 @@ void ViewerAPI::createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, s
 
 	Rubberband * rubberband = viewer->second->getViewer()->getRubberband();
 	if (rubberband) {
-		OT_LOG_W("A rubberband is already active. Created by service: " + std::to_string(rubberband->creator()));
-		return;
+		viewer->second->getViewer()->cancelRubberband();
 	}
 
 	viewer->second->getViewer()->createRubberband(_senderId, _note, _configurationJson);
