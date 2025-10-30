@@ -43,15 +43,34 @@ if not "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 if "%1"=="--dry" (
     goto DRY_ONLY
 )
+if "%2"=="--dry" (
+	goto DRY_ONLY
+)
 
 rem rem Enabled:
 call "%OT_FILEHEADERUPDATER_ROOT%\x64\Release\FileHeaderUpdater.exe" --config "%OT_FILEHEADERUPDATER_ROOT%\OT_FHU_Config.json"
+
+if "%1"=="--pause" (
+	goto PAUSE_END
+)
+if "%2"=="--pause" (
+	goto PAUSE_END
+)
 goto END
+
+
 
 :DRY_ONLY
 
 rem Show expected new files ("Slow", no changes will be performed)
 call "%OT_FILEHEADERUPDATER_ROOT%\x64\Release\FileHeaderUpdater.exe" --dry --config "%OT_FILEHEADERUPDATER_ROOT%\OT_FHU_Config.json"
+
+if "%1"=="--pause" (
+	goto PAUSE_END
+)
+if "%2"=="--pause" (
+	goto PAUSE_END
+)
 goto END
 
 :PAUSE_END
