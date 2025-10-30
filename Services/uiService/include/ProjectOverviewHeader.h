@@ -51,6 +51,9 @@ namespace ot {
 		ProjectOverviewHeader(ProjectOverviewWidget* _overview, QWidget* _parent);
 		virtual ~ProjectOverviewHeader();
 
+		void resetLastFilter() { m_lastFilter = ProjectOverviewFilterData(); }
+		const ProjectOverviewFilterData& getLastFilter() const { return m_lastFilter; }
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Overrides

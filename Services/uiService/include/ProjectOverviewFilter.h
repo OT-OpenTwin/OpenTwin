@@ -43,7 +43,7 @@ namespace ot {
 		OT_DECL_NOMOVE(ProjectOverviewFilter)
 		OT_DECL_NODEFAULT(ProjectOverviewFilter)
 	public:
-		ProjectOverviewFilter(ProjectOverviewWidget* _overview, int _logicalIndex);
+		ProjectOverviewFilter(ProjectOverviewWidget* _overview, int _logicalIndex, bool _sortOnly);
 		virtual ~ProjectOverviewFilter() = default;
 
 		void setTitle(const QString& _title);
@@ -51,7 +51,7 @@ namespace ot {
 		void setOptions(const QStringList& _options);
 		ProjectOverviewFilterData getFilterData() const;
 
-		void updateCheckedStatesFromData(const ProjectOverviewFilterData& _data);
+		void setFromData(const ProjectOverviewFilterData& _data);
 
 		bool isConfirmed() const { return m_isConfirmed; };
 
@@ -66,12 +66,15 @@ namespace ot {
 		void slotConfirm();
 		void slotCancel();
 		void slotTextChanged();
+		void slotSortAscending();
+		void slotSortDescending();
 		void slotCheckedChanged(QListWidgetItem* _item);
 
 	private:
 		int m_logicalIndex;
 		bool m_isConfirmed;
 
+		ProjectOverviewFilterData::SortMode m_sortMode;
 		Label* m_title;
 		LineEdit* m_filterEdit;
 		QListWidget* m_optionsList;

@@ -240,12 +240,15 @@ void ot::ProjectOverviewWidget::refreshProjects() {
 	}
 	
 	updateProjectGroups();
-	m_tree->sortByColumn(ProjectOverviewHeader::ColumnIndex::Modified, Qt::DescendingOrder);
+
+	sort(m_header->getLastFilter());
+	m_header->resetLastFilter();
 }
 
 void ot::ProjectOverviewWidget::filterProjects(const ProjectOverviewFilterData& _filterData) {
 	filterProjects(m_tree->invisibleRootItem(), _filterData);
 	updateProjectGroups();
+	
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -440,6 +443,15 @@ void ot::ProjectOverviewWidget::filterProjects(const QTreeWidgetItem* _parent, c
 		if (entry) {
 			entry->applyFilter(_filterData);
 		}
+	}
+
+	sort(_filterData);
+}
+
+void ot::ProjectOverviewWidget::sort(const ProjectOverviewFilterData& _filterData) {
+	if (_filterData.getLogicalIndex() >= 0 && _filterData.getSortMode() != ProjectOverviewFilterData::SortMode::None) {
+		Qt::SortOrder sortOrder = (_filterData.getSortMode() == ProjectOverviewFilterData::SortMode::Ascending) ? Qt::AscendingOrder : Qt::DescendingOrder;
+		m_tree->sortByColumn(_filterData.getLogicalIndex(), sortOrder);
 	}
 }
 

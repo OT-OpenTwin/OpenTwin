@@ -194,7 +194,7 @@ void ot::ProjectOverviewHeader::slotFilterChanged(const ProjectOverviewFilterDat
 // Private: Helper
 
 bool ot::ProjectOverviewHeader::canFilter(int _logicalIndex) const {
-	return (_logicalIndex != ColumnIndex::Checked && _logicalIndex != ColumnIndex::Modified);
+	return (_logicalIndex != ColumnIndex::Checked);
 }
 
 QRect ot::ProjectOverviewHeader::filterIconRect(int _logicalIndex) const {
@@ -217,7 +217,7 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
 
     QRect rect = filterIconRect(_logicalIndex);
 
-    ProjectOverviewFilter filter(m_overview, _logicalIndex);
+    ProjectOverviewFilter filter(m_overview, _logicalIndex, _logicalIndex == ColumnIndex::Modified);
 	QStringList options;
 	const std::list<ProjectInformation> allProjects = m_overview->getAllProjects();
     
@@ -302,6 +302,10 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
         }
 		break;
 
+	case ColumnIndex::Modified:
+        filter.setTitle("Last Accessed");
+		break;
+
     default:
         OT_LOG_E("Invalid column for filter (" + std::to_string(_logicalIndex) + ")");
         return;
@@ -320,7 +324,7 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
 	}
 
 	filter.setOptions(options);
-	filter.updateCheckedStatesFromData(m_lastFilter);
+	filter.setFromData(m_lastFilter);
 
     m_overview->filterProjects(filter.getFilterData());
 

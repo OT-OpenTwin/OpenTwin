@@ -31,7 +31,13 @@ namespace ot {
 	class ProjectOverviewFilterData {
 		OT_DECL_DEFCOPY(ProjectOverviewFilterData)	
 		OT_DECL_DEFMOVE(ProjectOverviewFilterData)
-	public:		
+	public:
+		enum SortMode {
+			Ascending,
+			Descending,
+			None
+		};
+
 		ProjectOverviewFilterData(int _logicalIndex = -1);
 		~ProjectOverviewFilterData() = default;
 
@@ -44,6 +50,9 @@ namespace ot {
 		void setSelectedFilters(const QStringList& _filters) { m_selectedFilters = _filters; };
 		const QStringList& getSelectedFilters() const { return m_selectedFilters; };
 
+		void setSortMode(SortMode _mode) { m_sortMode = _mode; };
+		SortMode getSortMode() const { return m_sortMode; };
+
 		static QString getEmptyProjectGroupFilterName() { return "< No Group >"; };
 		static QString getEmptyUserGroupFilterName() { return "< No Groups >"; };
 		static QString getEmptyTagsFilterName() { return "< No Tags >"; };
@@ -51,7 +60,7 @@ namespace ot {
 	private:
 		QStringList m_selectedFilters;
 		int m_logicalIndex;
-
+		SortMode m_sortMode;
 	};
 
 }

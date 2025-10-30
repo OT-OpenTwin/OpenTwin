@@ -125,6 +125,7 @@ namespace ot {
 		void getAllProjects(const QTreeWidgetItem* _parent, std::list<ProjectInformation>& _lst) const;
 		void basicFilterProjects(QTreeWidgetItem* _parent);
 		void filterProjects(const QTreeWidgetItem* _parent, const ProjectOverviewFilterData& _filterData);
+		void sort(const ProjectOverviewFilterData& _filterData);
 
 		TreeWidgetItem* getOrCreateProjectGroupItem(const std::string& _groupName);
 
