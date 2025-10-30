@@ -73,7 +73,7 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	m_tree->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 	m_tree->setSelectionMode(QAbstractItemView::SingleSelection);
 
-	m_tree->setHeaderLabels(QStringList() << " " << "Group" << "Type" << "Name" << "Tags" << "Owner" << "Access" << "Last Modified");
+	m_tree->setHeaderLabels(QStringList() << " " << "Group" << "Type" << "Name" << "Tags" << "Owner" << "Access" << "Last Accessed");
 	m_tree->header()->setStretchLastSection(false);
 	m_tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_tree->header()->setSectionResizeMode(ProjectOverviewHeader::ColumnIndex::Name, QHeaderView::Stretch);
@@ -241,7 +241,15 @@ void ot::ProjectOverviewWidget::refreshProjects() {
 	
 	updateProjectGroups();
 
-	sort(m_header->getLastFilter());
+	const ProjectOverviewFilterData& lastFilter = m_header->getLastFilter();
+	if (lastFilter.getLogicalIndex() >= 0) {
+		sort(lastFilter);
+	}
+	else {
+		ProjectOverviewFilterData defaultFilter(ProjectOverviewHeader::Modified);
+		defaultFilter.setSortMode(ProjectOverviewFilterData::SortMode::Descending);
+		sort(defaultFilter);
+	}
 	m_header->resetLastFilter();
 }
 

@@ -190,6 +190,7 @@ private:
 	// authentication needed: project functions
 
 	std::string handleCreateProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleProjectOpened(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleUpdateAdditionalProjectInformation(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleGetProjectData(const ot::ConstJsonObject& _actionDocument);
 	std::string handleGetProjectsInfo(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);

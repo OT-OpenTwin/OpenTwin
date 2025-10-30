@@ -51,6 +51,7 @@ public:
 
 	bool createProject(const std::string &projectName, const std::string& projectType, const std::string &userName, const std::string &defaultSettingTemplate);
 	bool deleteProject(const std::string &projectName);
+	void notifyProjectOpened(const std::string& _projectName);
 	std::string exportProject(const std::string &projectName, const std::string &exportFileName, AppBase *parent);
 	std::string importProject(const std::string &projectName, const std::string &userName, const std::string &importFileName, AppBase *parent);
 	bool renameProject(const std::string &oldProjectName, const std::string &newProjectName);

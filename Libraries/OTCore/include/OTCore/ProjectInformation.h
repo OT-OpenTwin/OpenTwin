@@ -60,6 +60,9 @@ namespace ot {
 		void setLastAccessTime(int64_t _msSinceEpoch) { m_lastAccessTime = _msSinceEpoch; };
 		int64_t getLastAccessTime() const { return m_lastAccessTime; };
 
+		void setLastModifiedTime(int64_t _msSinceEpoch) { m_lastModifiedTime = _msSinceEpoch; };
+		int64_t getLastModifiedTime() const { return m_lastModifiedTime; };
+
 		void addUserGroup(const std::string& _group) { m_userGroups.push_back(_group); };
 		void setUserGroups(const std::list<std::string>& _groups) { m_userGroups = _groups; };
 		const std::list<std::string>& getUserGroups() const { return m_userGroups; };
@@ -79,6 +82,7 @@ namespace ot {
 		std::string m_collection;
 		int64_t m_creationTime;
 		int64_t m_lastAccessTime;
+		int64_t m_lastModifiedTime;
 		std::list<std::string> m_userGroups;
 		std::list<std::string> m_tags;
 		std::string m_projectGroup;

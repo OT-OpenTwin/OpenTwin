@@ -1358,7 +1358,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		m_keepAliveTimer->start(10000);
 
 		uiLock.setNoUnlock();
-
+		
 		OT_LOG_D("Open project completed, waiting for run and startup completed");
 
 		// Process buffered actions

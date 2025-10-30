@@ -3194,6 +3194,9 @@ void AppBase::slotOpenSpecificProject(std::string _projectName, const std::strin
 			userManager.addRecentProject(_projectName);
 			m_state |= AppState::ProjectOpenState;
 			m_welcomeScreen->slotRefreshProjectList();
+
+			// Notify authorization service about project open to update last access time
+			projectManager.notifyProjectOpened(_projectName);
 		}
 	}
 	else {

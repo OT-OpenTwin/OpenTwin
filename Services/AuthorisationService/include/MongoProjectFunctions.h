@@ -56,6 +56,8 @@ namespace MongoProjectFunctions
 
 	Project createProject(std::string projectName, std::string projectType, User& creatingUser, mongocxx::client& adminClient);
 
+	void projectWasOpened(const std::string& projectName, mongocxx::client& adminClient);
+
 	ot::ReturnMessage updateAdditionalProjectInformation(const ot::ProjectInformation& _projectInfo, mongocxx::client& _adminClient);
 
 	std::string generateProjectCollectionName(mongocxx::client& adminClient);

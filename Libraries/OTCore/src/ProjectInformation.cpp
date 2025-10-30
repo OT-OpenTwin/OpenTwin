@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/ProjectInformation.h"
 
-ot::ProjectInformation::ProjectInformation() : m_version(0), m_creationTime(0), m_lastAccessTime(0) {
+ot::ProjectInformation::ProjectInformation() : m_version(0), m_creationTime(0), m_lastAccessTime(0), m_lastModifiedTime(0) {
 
 }
 
@@ -36,6 +36,7 @@ void ot::ProjectInformation::addToJsonObject(JsonValue& _jsonObject, JsonAllocat
 	_jsonObject.AddMember("Collection", JsonString(m_collection, _allocator), _allocator);
 	_jsonObject.AddMember("CreationTime", m_creationTime, _allocator);
 	_jsonObject.AddMember("LastAccessTime", m_lastAccessTime, _allocator);
+	_jsonObject.AddMember("LastModifiedTime", m_lastModifiedTime, _allocator);
 	_jsonObject.AddMember("Groups", JsonArray(m_userGroups, _allocator), _allocator);
 	_jsonObject.AddMember("Tags", JsonArray(m_tags, _allocator), _allocator);
 	_jsonObject.AddMember("ProjectGroup", JsonString(m_projectGroup, _allocator), _allocator);
@@ -49,6 +50,7 @@ void ot::ProjectInformation::setFromJsonObject(const ConstJsonObject& _jsonObjec
 	m_collection = json::getString(_jsonObject, "Collection");
 	m_creationTime = json::getInt64(_jsonObject, "CreationTime");
 	m_lastAccessTime = json::getInt64(_jsonObject, "LastAccessTime");
+	m_lastModifiedTime = json::getInt64(_jsonObject, "LastModifiedTime");
 	m_userGroups = json::getStringList(_jsonObject, "Groups");
 	m_tags = json::getStringList(_jsonObject, "Tags");
 	m_projectGroup = json::getString(_jsonObject, "ProjectGroup");

@@ -420,6 +420,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_REMOVE_GROUP) { return handleRemoveGroup(_actionDocument.GetObject(), loggedInUser); }
 	//------------ Project FUNCTIONS ------------
 	else if (_action == OT_ACTION_CREATE_PROJECT) { return handleCreateProject(_actionDocument.GetObject(), loggedInUser); }
+	else if (_action == OT_ACTION_CMD_OpenNewProject) { return handleProjectOpened(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_UPDATE_PROJECT_ADDITIONALINFO) { return handleUpdateAdditionalProjectInformation(_actionDocument.GetObject(), loggedInUser); }
 	//                                                       v-- CAN BE PERFORMED BY THE UI CLIENT --v
 	else if (_action == OT_ACTION_GET_PROJECT_DATA) { return handleGetProjectData(_actionDocument.GetObject()); }
@@ -794,6 +795,14 @@ std::string ServiceBase::handleCreateProject(const ot::ConstJsonObject& _actionD
 	Project createdProject = MongoProjectFunctions::createProject(projectName, projectType, _loggedInUser, adminClient);
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, createdProject.toProjectInformation().toJson()).toJson();
+}
+
+std::string ServiceBase::handleProjectOpened(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
+	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
+
+	MongoProjectFunctions::projectWasOpened(projectName, adminClient);
+
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string ServiceBase::handleUpdateAdditionalProjectInformation(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {

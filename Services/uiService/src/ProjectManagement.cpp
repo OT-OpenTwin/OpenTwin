@@ -138,6 +138,25 @@ bool ProjectManagement::deleteProject(const std::string &projectName)
 	return hasSuccessful(response);
 }
 
+void ProjectManagement::notifyProjectOpened(const std::string& _projectName) {
+	assert(!m_authServerURL.empty());
+	AppBase* app{ AppBase::instance() };
+	
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_OpenNewProject, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(_projectName, doc.GetAllocator()), doc.GetAllocator());
+	
+	std::string response;
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		exit(ot::AppExitCode::SendFailed);
+		return;
+	}
+}
+
 bool ProjectManagement::renameProject(const std::string &oldProjectName, const std::string &newProjectName)
 {
 	assert(!m_authServerURL.empty());

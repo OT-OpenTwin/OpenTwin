@@ -77,6 +77,9 @@ public:
 	void setLastAccessedOn(bsoncxx::types::b_date _msSinceEpoch) { m_lastAccessedOn = _msSinceEpoch; };
 	bsoncxx::types::b_date getLastAccessedOn() const { return m_lastAccessedOn; };
 
+	void setLastModifiedOn(bsoncxx::types::b_date _msSinceEpoch) { m_lastModifiedOn = _msSinceEpoch; };
+	bsoncxx::types::b_date getLastModifiedOn() const { return m_lastModifiedOn; };
+
 	void addTag(const std::string& _tag) { m_tags.push_back(_tag); };
 	void setTags(const std::list<std::string>& _tags) { m_tags = _tags; };
 	const std::list<std::string>& getTags() const { return m_tags; };
@@ -101,5 +104,6 @@ private:
 	std::string m_projectGroup;
 	int m_version;
 	bsoncxx::types::b_date m_lastAccessedOn;
+	bsoncxx::types::b_date m_lastModifiedOn;
 };
 

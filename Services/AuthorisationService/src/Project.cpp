@@ -19,17 +19,15 @@
 
 #include "Project.h"
 
-Project::Project() : m_createdOn(std::chrono::system_clock::now()), m_lastAccessedOn(std::chrono::system_clock::now()),
-	m_version(-1)
-{
+Project::Project() : m_createdOn(std::chrono::system_clock::now()), m_lastAccessedOn(std::chrono::system_clock::now()), m_lastModifiedOn(std::chrono::system_clock::now()), m_version(-1) {
 
 }
 
-Project::Project(const bsoncxx::v_noabi::document::view& _view) : m_createdOn(std::chrono::system_clock::now()), m_lastAccessedOn(std::chrono::system_clock::now()) {
+Project::Project(const bsoncxx::v_noabi::document::view& _view) : m_createdOn(std::chrono::system_clock::now()), m_lastAccessedOn(std::chrono::system_clock::now()), m_lastModifiedOn(std::chrono::system_clock::now()) {
 	this->importData(_view);
 }
 
-Project::Project(const bsoncxx::v_noabi::document::view& _view, mongocxx::client& _userClient) : m_createdOn(std::chrono::system_clock::now()), m_lastAccessedOn(std::chrono::system_clock::now()) {
+Project::Project(const bsoncxx::v_noabi::document::view& _view, mongocxx::client& _userClient) : m_createdOn(std::chrono::system_clock::now()), m_lastAccessedOn(std::chrono::system_clock::now()), m_lastModifiedOn(std::chrono::system_clock::now()) {
 	this->importData(_view);
 
 	std::string userId = std::string(_view["created_by"].get_utf8().value.data());
@@ -58,6 +56,7 @@ ot::ProjectInformation Project::toProjectInformation() const {
 	info.setUserName(m_creatingUser.username);
 	info.setCreationTime(m_createdOn);
 	info.setLastAccessTime(m_lastAccessedOn);
+	info.setLastModifiedTime(m_lastModifiedOn);
 	info.setTags(m_tags);
 	info.setProjectGroup(m_projectGroup);
 
@@ -89,6 +88,11 @@ void Project::importData(const bsoncxx::v_noabi::document::view& _view) {
 	}
 	catch (...) {
 		m_version = -1;
+	}
+
+	auto lastModifiedIt = _view.find("last_modified_on");
+	if (lastModifiedIt != _view.end()) {
+		m_lastModifiedOn = lastModifiedIt->get_date();
 	}
 
 	auto tagsIt = _view.find("tags");

@@ -75,6 +75,25 @@ namespace MongoProjectFunctions
 		return getProject(projectName, adminClient);
 	}
 
+	void projectWasOpened(const std::string& projectName, mongocxx::client& adminClient) {
+		mongocxx::database db = adminClient.database(MongoConstants::PROJECTS_DB);
+		mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+		// Filter
+		auto filterQuery = bsoncxx::builder::stream::document{}
+			<< "project_name" << projectName
+			<< bsoncxx::builder::stream::finalize;
+		
+		// Modify
+		auto modifyQuery = bsoncxx::builder::stream::document{}
+			<< "$set" << bsoncxx::builder::stream::open_document
+			<< "last_accessed_on" << bsoncxx::types::b_date(std::chrono::system_clock::now())
+			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+		// Perform update
+		projectCollection.update_one(filterQuery.view(), modifyQuery.view());
+	}
+
 	ot::ReturnMessage updateAdditionalProjectInformation(const ot::ProjectInformation& _projectInfo, mongocxx::client& _adminClient) {
 		mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
