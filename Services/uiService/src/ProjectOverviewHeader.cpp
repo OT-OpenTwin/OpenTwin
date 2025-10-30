@@ -185,6 +185,10 @@ void ot::ProjectOverviewHeader::leaveEvent(QEvent* _event) {
 
 // Private: Slots
 
+void ot::ProjectOverviewHeader::slotSortChanged(int _logicalIndex, ProjectOverviewFilterData::SortMode _sortMode) {
+    m_overview->sort(_logicalIndex, _sortMode);
+}
+
 void ot::ProjectOverviewHeader::slotFilterChanged(const ProjectOverviewFilterData& _filterData) {
 	m_overview->filterProjects(_filterData);
 }
@@ -217,7 +221,7 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
 
     QRect rect = filterIconRect(_logicalIndex);
 
-    ProjectOverviewFilter filter(m_overview, _logicalIndex, _logicalIndex == ColumnIndex::Modified);
+    ProjectOverviewFilter filter(m_overview, _logicalIndex, _logicalIndex == ColumnIndex::LastAccessed);
 	QStringList options;
 	const std::list<ProjectInformation> allProjects = m_overview->getAllProjects();
     
@@ -302,7 +306,7 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
         }
 		break;
 
-	case ColumnIndex::Modified:
+	case ColumnIndex::LastAccessed:
         filter.setTitle("Last Accessed");
 		break;
 
@@ -328,10 +332,12 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
 
     m_overview->filterProjects(filter.getFilterData());
 
+	connect(&filter, &ProjectOverviewFilter::sortOrderChanged, this, &ProjectOverviewHeader::slotSortChanged);
 	connect(&filter, &ProjectOverviewFilter::filterChanged, this, &ProjectOverviewHeader::slotFilterChanged);
 
 	filter.exec(mapToGlobal(rect.bottomLeft()));
     
+    disconnect(&filter, &ProjectOverviewFilter::sortOrderChanged, this, &ProjectOverviewHeader::slotSortChanged);
     disconnect(&filter, &ProjectOverviewFilter::filterChanged, this, &ProjectOverviewHeader::slotFilterChanged);
 
     if (filter.isConfirmed()) {

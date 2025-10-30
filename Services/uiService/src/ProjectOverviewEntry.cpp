@@ -27,13 +27,13 @@
 ot::ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInfo)
 	: ot::TreeWidgetItem(), m_projectInfo(_projectInfo)
 {
-	QDateTime modifiedTime = QDateTime::fromMSecsSinceEpoch(m_projectInfo.getLastAccessTime());
+	QDateTime accessedTime = QDateTime::fromMSecsSinceEpoch(m_projectInfo.getLastAccessTime());
 
 	setCheckState(ProjectOverviewHeader::Checked, Qt::Unchecked);
 	setText(ProjectOverviewHeader::Group, QString::fromStdString(m_projectInfo.getProjectGroup()));
 	setText(ProjectOverviewHeader::Name, QString::fromStdString(m_projectInfo.getProjectName()));
 	setText(ProjectOverviewHeader::Owner, QString::fromStdString(m_projectInfo.getUserName()));
-	setText(ProjectOverviewHeader::Modified, modifiedTime.toString(Qt::DateFormat::TextDate));
+	setText(ProjectOverviewHeader::LastAccessed, accessedTime.toString(Qt::DateFormat::TextDate));
 	
 	setIcon(ProjectOverviewHeader::Type, ot::IconManager::getIcon("ProjectTemplates/" + QString::fromStdString(m_projectInfo.getProjectType()) + ".png"));
 	setToolTip(ProjectOverviewHeader::Type, QString::fromStdString(m_projectInfo.getProjectType()));
@@ -58,7 +58,7 @@ ot::ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projec
 		setToolTip(ProjectOverviewHeader::Access, QString::fromStdString(groupInfo));
 	}
 
-	setData(ProjectOverviewHeader::Modified, Qt::UserRole + 20, m_projectInfo.getLastAccessTime());
+	setData(ProjectOverviewHeader::LastAccessed, Qt::UserRole + 20, m_projectInfo.getLastAccessTime());
 }
 
 void ot::ProjectOverviewEntry::applyFilter(const QString& _generalFilter) {
@@ -152,7 +152,7 @@ void ot::ProjectOverviewEntry::applyFilter(const ProjectOverviewFilterData& _fil
 
 bool ot::ProjectOverviewEntry::operator<(const QTreeWidgetItem& _other) const {
 	int column = treeWidget()->sortColumn();
-	if (column == ProjectOverviewHeader::Modified) {
+	if (column == ProjectOverviewHeader::LastAccessed) {
 		return data(column, Qt::UserRole + 20).toLongLong() < _other.data(column, Qt::UserRole + 20).toLongLong();
 	}
 	else {

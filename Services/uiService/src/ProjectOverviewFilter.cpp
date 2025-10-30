@@ -32,7 +32,6 @@
 
 ot::ProjectOverviewFilter::ProjectOverviewFilter(ProjectOverviewWidget* _overview, int _logicalIndex, bool _sortOnly)
 	: QMenu(_overview->getQWidget()), m_logicalIndex(_logicalIndex), m_isConfirmed(false),
-	m_sortMode(ProjectOverviewFilterData::SortMode::None),
 	m_optionsList(nullptr), m_filterEdit(nullptr)
 {
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
@@ -107,8 +106,6 @@ void ot::ProjectOverviewFilter::setOptions(const QStringList& _options) {
 ot::ProjectOverviewFilterData ot::ProjectOverviewFilter::getFilterData() const {
 	ProjectOverviewFilterData data(m_logicalIndex);
 
-	data.setSortMode(m_sortMode);
-
 	if (m_optionsList) {
 		for (int i = 1; i < m_optionsList->count(); ++i) {
 			QListWidgetItem* item = m_optionsList->item(i);
@@ -125,8 +122,6 @@ void ot::ProjectOverviewFilter::setFromData(const ProjectOverviewFilterData& _da
 	if (!_data.isValid() || _data.getLogicalIndex() != m_logicalIndex) {
 		return;
 	}
-
-	m_sortMode = _data.getSortMode();
 
 	if (m_optionsList) {
 		QSignalBlocker blocker(m_optionsList);
@@ -185,13 +180,11 @@ void ot::ProjectOverviewFilter::slotTextChanged() {
 }
 
 void ot::ProjectOverviewFilter::slotSortAscending() {
-	m_sortMode = ProjectOverviewFilterData::SortMode::Ascending;
-	Q_EMIT filterChanged(this->getFilterData());
+	Q_EMIT sortOrderChanged(m_logicalIndex, ProjectOverviewFilterData::SortMode::Ascending);
 }
 
 void ot::ProjectOverviewFilter::slotSortDescending() {
-	m_sortMode = ProjectOverviewFilterData::SortMode::Descending;
-	Q_EMIT filterChanged(this->getFilterData());
+	Q_EMIT sortOrderChanged(m_logicalIndex, ProjectOverviewFilterData::SortMode::Descending);
 }
 
 void ot::ProjectOverviewFilter::slotCheckedChanged(QListWidgetItem* _item) {

@@ -20,6 +20,7 @@
 #pragma once
 
 // OpenTwin header
+#include "UserManagement.h"
 #include "ControlsManager.h"
 #include "ProjectOverviewWidget.h"
 #include "OTCore/OTClassHelper.h"
@@ -52,7 +53,7 @@ class WelcomeWidget : public QObject, public ot::WidgetBase, public LockableWidg
 	Q_OBJECT
 	OT_DECL_NODEFAULT(WelcomeWidget)
 public:
-	WelcomeWidget(tt::Page* _ttbPage);
+	WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager);
 	virtual ~WelcomeWidget();
 
 	virtual void setWidgetLocked(bool _isLocked) override;
@@ -67,7 +68,9 @@ public:
 	std::list<ot::ProjectInformation> getSelectedProjects() const;
 
 	void setViewMode(ot::ProjectOverviewWidget::ViewMode _mode);
-	ot::ProjectOverviewWidget::ViewMode getViewMode() const { return m_overview->getViewMode(); }
+	ot::ProjectOverviewWidget::ViewMode getViewMode() const { return m_overview->getViewMode(); };
+
+	void storeViewModeSetting(UserManagement& _userManager);
 
 Q_SIGNALS:
 	void createProjectRequest();

@@ -44,15 +44,12 @@ namespace ot {
 			Tags,
 			Owner,
 			Access,
-			Modified,
+			LastAccessed,
 			Count
 		};
 
 		ProjectOverviewHeader(ProjectOverviewWidget* _overview, QWidget* _parent);
 		virtual ~ProjectOverviewHeader();
-
-		void resetLastFilter() { m_lastFilter = ProjectOverviewFilterData(); }
-		const ProjectOverviewFilterData& getLastFilter() const { return m_lastFilter; }
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -72,6 +69,9 @@ namespace ot {
 
 		// Private: Slots
 
+	private Q_SLOTS:
+
+		void slotSortChanged(int _logicalIndex, ProjectOverviewFilterData::SortMode _sortMode);
 		void slotFilterChanged(const ProjectOverviewFilterData& _filterData);
 
 		// ###########################################################################################################################################################################################################################################################################################################################

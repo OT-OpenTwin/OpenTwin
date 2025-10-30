@@ -491,6 +491,8 @@ bool AppBase::closeEvent() {
 		UserManagement uM(m_loginData);
 		uM.storeSetting(STATE_NAME_WINDOW, m_currentStateWindow.window);
 		uM.storeSetting(STATE_NAME_VIEW, m_currentStateWindow.view);
+
+		m_welcomeScreen->storeViewModeSetting(uM);
 	}
 
 	// Close the project
@@ -992,7 +994,8 @@ void AppBase::createUi() {
 				m_output->getPlainTextEdit()->appendPlainText(BUILD_INFO);
 			}
 
-			m_welcomeScreen = new WelcomeWidget(m_ttb->getStartPage());
+			UserManagement uM(m_loginData);
+			m_welcomeScreen = new WelcomeWidget(m_ttb->getStartPage(), uM);
 
 			this->connect(m_welcomeScreen, &WelcomeWidget::createProjectRequest, this, &AppBase::slotCreateProject);
 			this->connect(m_welcomeScreen, &WelcomeWidget::openProjectRequest, this, &AppBase::slotOpenProject);

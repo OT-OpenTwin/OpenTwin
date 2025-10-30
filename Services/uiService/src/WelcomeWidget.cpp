@@ -44,7 +44,7 @@
 #include <QtWidgets/qheaderview.h>
 #include <QtOpenGLWidgets/qopenglwidget.h>
 
-WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
+WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager) {
 	// Create layouts
 	m_widget = new QWidget;
 	QVBoxLayout* centralLayout = new QVBoxLayout(m_widget);
@@ -113,12 +113,14 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
 	this->connect(m_ownerButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOwnerProject);
 
 	// Initialize view mode
-	UserManagement userManager(AppBase::instance()->getCurrentLoginData());
-	std::string viewMode = userManager.restoreSetting("WelcomeWidget_ViewMode");
+	std::string viewMode = _userManager.restoreSetting("WelcomeWidget_ViewMode");
 	if (viewMode.empty()){
-		viewMode = ot::ProjectOverviewWidget::toString(ot::ProjectOverviewWidget::ViewMode::Tree);
+		setViewMode(ot::ProjectOverviewWidget::ViewMode::Tree);
 	}
-	setViewMode(ot::ProjectOverviewWidget::viewModeFromString(viewMode));
+	else {
+		setViewMode(ot::ProjectOverviewWidget::viewModeFromString(viewMode));
+	}
+	
 }
 
 WelcomeWidget::~WelcomeWidget() {
@@ -176,6 +178,10 @@ void WelcomeWidget::setViewMode(ot::ProjectOverviewWidget::ViewMode _mode) {
 	}
 }
 
+void WelcomeWidget::storeViewModeSetting(UserManagement& _userManager) {
+	_userManager.storeSetting("WelcomeWidget_ViewMode", ot::ProjectOverviewWidget::toString(m_overview->getViewMode()));
+}
+
 void WelcomeWidget::slotCreateProject() {
 	Q_EMIT createProjectRequest();
 }
@@ -194,9 +200,6 @@ void WelcomeWidget::slotToggleViewMode() {
 	else {
 		setViewMode(ot::ProjectOverviewWidget::ViewMode::Tree);
 	}
-
-	UserManagement userManager(AppBase::instance()->getCurrentLoginData());
-	userManager.storeSetting("WelcomeWidget_ViewMode", ot::ProjectOverviewWidget::toString(m_overview->getViewMode()));
 }
 
 void WelcomeWidget::slotOpenProject() {

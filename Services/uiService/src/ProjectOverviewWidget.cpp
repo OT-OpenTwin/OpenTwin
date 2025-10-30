@@ -56,7 +56,8 @@ ot::ProjectOverviewWidget::ViewMode ot::ProjectOverviewWidget::viewModeFromStrin
 }
 
 ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
-	: QWidget(_parent), m_resultsExceeded(false), m_isLoading(false), m_viewMode(ViewMode::Tree), m_generalFilter("")
+	: QWidget(_parent), m_resultsExceeded(false), m_isLoading(false), m_viewMode(ViewMode::Tree), m_generalFilter(""),
+	m_lastSortColumn(ProjectOverviewHeader::ColumnIndex::LastAccessed), m_lastSortMode(ProjectOverviewFilterData::SortMode::Descending)
 {
 	// Create widgets
 	QHBoxLayout* mainLayout = new QHBoxLayout(_parent);
@@ -154,6 +155,8 @@ void ot::ProjectOverviewWidget::setViewMode(ViewMode _mode) {
 		m_tree->setRootIsDecorated(true);
 		break;
 	}
+
+	sort(m_lastSortColumn, m_lastSortMode);
 }
 
 void ot::ProjectOverviewWidget::setMultiSelectionEnabled(bool _enabled) {
@@ -241,16 +244,18 @@ void ot::ProjectOverviewWidget::refreshProjects() {
 	
 	updateProjectGroups();
 
-	const ProjectOverviewFilterData& lastFilter = m_header->getLastFilter();
-	if (lastFilter.getLogicalIndex() >= 0) {
-		sort(lastFilter);
+	if (m_lastSortColumn >= 0) {
+		sort(m_lastSortColumn, m_lastSortMode);
 	}
-	else {
-		ProjectOverviewFilterData defaultFilter(ProjectOverviewHeader::Modified);
-		defaultFilter.setSortMode(ProjectOverviewFilterData::SortMode::Descending);
-		sort(defaultFilter);
+}
+
+void ot::ProjectOverviewWidget::sort(int _logicalIndex, ProjectOverviewFilterData::SortMode _sortMode) {
+	if (_logicalIndex != -1 && _sortMode != ProjectOverviewFilterData::SortMode::None) {
+		Qt::SortOrder sortOrder = (_sortMode == ProjectOverviewFilterData::SortMode::Ascending) ? Qt::AscendingOrder : Qt::DescendingOrder;
+		m_tree->sortByColumn(_logicalIndex, sortOrder);
+		m_lastSortColumn = _logicalIndex;
+		m_lastSortMode = _sortMode;
 	}
-	m_header->resetLastFilter();
 }
 
 void ot::ProjectOverviewWidget::filterProjects(const ProjectOverviewFilterData& _filterData) {
@@ -453,14 +458,7 @@ void ot::ProjectOverviewWidget::filterProjects(const QTreeWidgetItem* _parent, c
 		}
 	}
 
-	sort(_filterData);
-}
-
-void ot::ProjectOverviewWidget::sort(const ProjectOverviewFilterData& _filterData) {
-	if (_filterData.getLogicalIndex() >= 0 && _filterData.getSortMode() != ProjectOverviewFilterData::SortMode::None) {
-		Qt::SortOrder sortOrder = (_filterData.getSortMode() == ProjectOverviewFilterData::SortMode::Ascending) ? Qt::AscendingOrder : Qt::DescendingOrder;
-		m_tree->sortByColumn(_filterData.getLogicalIndex(), sortOrder);
-	}
+	sort(m_lastSortColumn, m_lastSortMode);
 }
 
 ot::TreeWidgetItem* ot::ProjectOverviewWidget::getOrCreateProjectGroupItem(const std::string& _groupName) {

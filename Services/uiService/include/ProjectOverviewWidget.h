@@ -96,6 +96,7 @@ namespace ot {
 	public Q_SLOTS:
 		void clear();
 		void refreshProjects();
+		void sort(int _logicalIndex, ProjectOverviewFilterData::SortMode _sortMode);
 		void filterProjects(const ProjectOverviewFilterData& _filterData);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -125,7 +126,6 @@ namespace ot {
 		void getAllProjects(const QTreeWidgetItem* _parent, std::list<ProjectInformation>& _lst) const;
 		void basicFilterProjects(QTreeWidgetItem* _parent);
 		void filterProjects(const QTreeWidgetItem* _parent, const ProjectOverviewFilterData& _filterData);
-		void sort(const ProjectOverviewFilterData& _filterData);
 
 		TreeWidgetItem* getOrCreateProjectGroupItem(const std::string& _groupName);
 
@@ -141,6 +141,9 @@ namespace ot {
 
 		ProjectOverviewHeader* m_header;
 		ProjectOverviewPreviewBox* m_previewBox;
+
+		ProjectOverviewFilterData::SortMode m_lastSortMode;
+		int m_lastSortColumn;
 
 		bool m_resultsExceeded;
 		QString m_generalFilter;

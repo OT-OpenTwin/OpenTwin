@@ -21,7 +21,7 @@
 #include "ProjectOverviewFilterData.h"
 
 ot::ProjectOverviewFilterData::ProjectOverviewFilterData(int _logicalIndex)
-	: m_logicalIndex(_logicalIndex), m_sortMode(SortMode::None)
+	: m_logicalIndex(_logicalIndex)
 {
 
 }

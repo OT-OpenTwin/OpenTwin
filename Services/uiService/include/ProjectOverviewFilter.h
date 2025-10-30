@@ -56,6 +56,7 @@ namespace ot {
 		bool isConfirmed() const { return m_isConfirmed; };
 
 	Q_SIGNALS:
+		void sortOrderChanged(int _logicalIndex, ProjectOverviewFilterData::SortMode _sortMode);
 		void filterChanged(const ProjectOverviewFilterData& _filterData);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -74,7 +75,6 @@ namespace ot {
 		int m_logicalIndex;
 		bool m_isConfirmed;
 
-		ProjectOverviewFilterData::SortMode m_sortMode;
 		Label* m_title;
 		LineEdit* m_filterEdit;
 		QListWidget* m_optionsList;
