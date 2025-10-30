@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "ControlsManager.h"
+#include "ProjectOverviewWidget.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/ProjectInformation.h"
 #include "OTGui/GuiTypes.h"
@@ -46,7 +47,6 @@ namespace ot { class CheckBox; }
 namespace ot { class LineEdit; }
 namespace ot { class TableItem; }
 namespace ot { class ToolButton; }
-namespace ot { class ProjectOverviewWidget; }
 
 class WelcomeWidget : public QObject, public ot::WidgetBase, public LockableWidget {
 	Q_OBJECT
@@ -66,6 +66,9 @@ public:
 
 	std::list<ot::ProjectInformation> getSelectedProjects() const;
 
+	void setViewMode(ot::ProjectOverviewWidget::ViewMode _mode);
+	ot::ProjectOverviewWidget::ViewMode getViewMode() const { return m_overview->getViewMode(); }
+
 Q_SIGNALS:
 	void createProjectRequest();
 	void openProjectRequest();
@@ -81,6 +84,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	void slotCreateProject();
+	void slotToggleViewMode();
 
 	void slotOpenProject();
 	void slotCopyProject();
@@ -97,7 +101,7 @@ private:
 	ot::ToolButton* iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip);
 	void updateCountLabel();
 	void updateToolButtonsEnabledState(bool _forceDisabled = false);
-	
+
 	QWidget* m_widget;
 
 	ot::Label* m_titleLabel;
@@ -107,6 +111,7 @@ private:
 
 	ot::ToolButton* m_createButton;
 	ot::ToolButton* m_refreshButton;
+	ot::ToolButton* m_toggleViewModeButton;
 	
 	ot::ToolButton* m_openButton;
 	ot::ToolButton* m_copyButton;

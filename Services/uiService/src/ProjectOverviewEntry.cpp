@@ -31,11 +31,13 @@ ot::ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projec
 
 	setCheckState(ProjectOverviewHeader::Checked, Qt::Unchecked);
 	setText(ProjectOverviewHeader::Group, QString::fromStdString(m_projectInfo.getProjectGroup()));
-	setIcon(ProjectOverviewHeader::Type, ot::IconManager::getIcon("ProjectTemplates/" + QString::fromStdString(m_projectInfo.getProjectType()) + ".png"));
 	setText(ProjectOverviewHeader::Name, QString::fromStdString(m_projectInfo.getProjectName()));
 	setText(ProjectOverviewHeader::Owner, QString::fromStdString(m_projectInfo.getUserName()));
 	setText(ProjectOverviewHeader::Modified, modifiedTime.toString(Qt::DateFormat::TextDate));
 	
+	setIcon(ProjectOverviewHeader::Type, ot::IconManager::getIcon("ProjectTemplates/" + QString::fromStdString(m_projectInfo.getProjectType()) + ".png"));
+	setToolTip(ProjectOverviewHeader::Type, QString::fromStdString(m_projectInfo.getProjectType()));
+
 	if (!m_projectInfo.getTags().empty()) {
 		setIcon(ProjectOverviewHeader::Tags, ot::IconManager::getIcon("Tree/Tag.png"));
 		std::string tagInfo;

@@ -48,6 +48,14 @@ namespace ot {
 		OT_DECL_NOCOPY(ProjectOverviewWidget)
 		OT_DECL_NOMOVE(ProjectOverviewWidget)
 	public:
+		enum class ViewMode {
+			Tree,
+			List
+		};
+
+		static std::string toString(ViewMode _mode);
+		static ViewMode viewModeFromString(const std::string& _modeStr);
+
 		ProjectOverviewWidget(QWidget* _parent = (QWidget*)nullptr);
 		~ProjectOverviewWidget();
 
@@ -58,6 +66,9 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
+
+		void setViewMode(ViewMode _mode);
+		ViewMode getViewMode() const { return m_viewMode; };
 
 		void setMultiSelectionEnabled(bool _enabled);
 		bool getMultiSelectionEnabled() const;
@@ -115,6 +126,8 @@ namespace ot {
 		void basicFilterProjects(QTreeWidgetItem* _parent);
 		void filterProjects(const QTreeWidgetItem* _parent, const ProjectOverviewFilterData& _filterData);
 
+		TreeWidgetItem* getOrCreateProjectGroupItem(const std::string& _groupName);
+
 		std::atomic_bool m_isLoading;
 		std::mutex m_mutex;
 		std::unique_ptr<std::thread> m_loadingThread;
@@ -122,6 +135,8 @@ namespace ot {
 		ExtendedProjectInformation m_importedProjectData;
 
 		std::map<std::string, TreeWidgetItem*> m_projectGroupItems;
+
+		ViewMode m_viewMode;
 
 		ProjectOverviewHeader* m_header;
 		ProjectOverviewPreviewBox* m_previewBox;

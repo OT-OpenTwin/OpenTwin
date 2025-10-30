@@ -36,8 +36,27 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qheaderview.h>
 
-ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent) 
-	: m_resultsExceeded(false), m_isLoading(false)
+std::string ot::ProjectOverviewWidget::toString(ViewMode _mode) {
+	switch (_mode) {
+	case ot::ProjectOverviewWidget::ViewMode::Tree: return "Tree";
+	case ot::ProjectOverviewWidget::ViewMode::List: return "List";
+	default:
+		OT_LOG_E("Invalid ViewMode (" + std::to_string(static_cast<int>(_mode)) + ")");
+		return "Tree";
+	}
+}
+
+ot::ProjectOverviewWidget::ViewMode ot::ProjectOverviewWidget::viewModeFromString(const std::string& _modeStr) {
+	if (_modeStr == toString(ViewMode::Tree)) { return ViewMode::Tree; }
+	else if (_modeStr == toString(ViewMode::List)) { return ViewMode::List; }
+	else {
+		OT_LOG_E("Invalid ViewMode \"" + _modeStr + "\"");
+		return ViewMode::Tree;
+	}
+}
+
+ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
+	: QWidget(_parent), m_resultsExceeded(false), m_isLoading(false), m_viewMode(ViewMode::Tree), m_generalFilter("")
 {
 	// Create widgets
 	QHBoxLayout* mainLayout = new QHBoxLayout(_parent);
@@ -58,6 +77,7 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	m_tree->header()->setStretchLastSection(false);
 	m_tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_tree->header()->setSectionResizeMode(ProjectOverviewHeader::ColumnIndex::Name, QHeaderView::Stretch);
+	m_tree->setRootIsDecorated(true);
 
 	//m_tree->setItemDelegate(new ProjectOverviewDelegate);
 
@@ -79,6 +99,62 @@ ot::ProjectOverviewWidget::~ProjectOverviewWidget() {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter / Getter
+
+void ot::ProjectOverviewWidget::setViewMode(ViewMode _mode) {
+	m_viewMode = _mode;
+	switch (m_viewMode) {
+	case ViewMode::Tree:
+		{
+			std::list<ProjectOverviewEntry*> entries;
+			// Move all entries to their groups
+			for (int i = m_tree->topLevelItemCount() - 1; i >= 0; i--) {
+				ProjectOverviewEntry* entry = dynamic_cast<ProjectOverviewEntry*>(m_tree->topLevelItem(i));
+				if (!entry) {
+					OT_LOG_E("Invalid item found");
+					continue;
+				}
+
+				entries.push_back(entry);
+				m_tree->takeTopLevelItem(i);
+			}
+
+			for (ProjectOverviewEntry* entry : entries) {
+				TreeWidgetItem* groupItem = getOrCreateProjectGroupItem(entry->getProjectInformation().getProjectGroup());
+				groupItem->addChild(entry);
+			}
+
+			m_tree->setRootIsDecorated(true);
+		}
+		break;
+
+	case ViewMode::List:
+		{
+			// Move all entries to the top level
+			for (auto& it : m_projectGroupItems) {
+				TreeWidgetItem* groupItem = it.second;
+				for (int i = groupItem->childCount() - 1; i >= 0; i--) {
+					ProjectOverviewEntry* entry = dynamic_cast<ProjectOverviewEntry*>(groupItem->child(i));
+					if (!entry) {
+						OT_LOG_E("Invalid item found");
+						continue;
+					}
+					groupItem->takeChild(i);
+					m_tree->addTopLevelItem(entry);
+				}
+				delete groupItem;
+			}
+
+			m_projectGroupItems.clear();
+			m_tree->setRootIsDecorated(false);
+		}
+		break;
+
+	default:
+		OT_LOG_E("Invalid ViewMode (" + std::to_string(static_cast<int>(_mode)) + ")");
+		m_tree->setRootIsDecorated(true);
+		break;
+	}
+}
 
 void ot::ProjectOverviewWidget::setMultiSelectionEnabled(bool _enabled) {
 	m_tree->setSelectionMode(_enabled ? QAbstractItemView::ExtendedSelection : QAbstractItemView::SingleSelection);
@@ -289,34 +365,13 @@ void ot::ProjectOverviewWidget::addEntry(ProjectOverviewEntry* _entry) {
 		_entry->setData(i, Qt::UserRole, false);
 	}
 
-	auto it = m_projectGroupItems.find(_entry->getProjectInformation().getProjectGroup());
-	if (it != m_projectGroupItems.end()) {
-		it->second->addChild(_entry);
-		return;
+	if (m_viewMode == ViewMode::List) {
+		m_tree->addTopLevelItem(_entry);
 	}
-	
-	TreeWidgetItem* projectGroupItem = new TreeWidgetItem;
-
-	QString groupText = QString::fromStdString(_entry->getProjectInformation().getProjectGroup());
-	if (groupText.isEmpty()) {
-		groupText = "< Ungrouped >";
+	else {
+		TreeWidgetItem* groupItem = getOrCreateProjectGroupItem(_entry->getProjectInformation().getProjectGroup());
+		groupItem->addChild(_entry);
 	}
-
-	projectGroupItem->setData(ProjectOverviewHeader::Checked, Qt::UserRole + 10, groupText);
-	QFont font = projectGroupItem->font(ProjectOverviewHeader::Checked);
-	font.setBold(true);
-	font.setPointSize(font.pointSize() + 12);
-	projectGroupItem->setFont(ProjectOverviewHeader::Checked, font);
-	projectGroupItem->setFlags(projectGroupItem->flags() & ~Qt::ItemIsSelectable);
-	m_tree->addTopLevelItem(projectGroupItem);
-	projectGroupItem->addChild(_entry);
-	projectGroupItem->setExpanded(true);
-
-	for (int i = 0; i < ProjectOverviewHeader::Count; i++) {
-		projectGroupItem->setData(i, Qt::UserRole, true);
-	}
-
-	m_projectGroupItems.emplace(_entry->getProjectInformation().getProjectGroup(), projectGroupItem);
 }
 
 void ot::ProjectOverviewWidget::updateProjectGroups() {
@@ -386,4 +441,35 @@ void ot::ProjectOverviewWidget::filterProjects(const QTreeWidgetItem* _parent, c
 			entry->applyFilter(_filterData);
 		}
 	}
+}
+
+ot::TreeWidgetItem* ot::ProjectOverviewWidget::getOrCreateProjectGroupItem(const std::string& _groupName) {
+	auto it = m_projectGroupItems.find(_groupName);
+	if (it != m_projectGroupItems.end()) {
+		return it->second;
+	}
+
+	TreeWidgetItem* projectGroupItem = new TreeWidgetItem;
+
+	QString groupText = QString::fromStdString(_groupName);
+	if (groupText.isEmpty()) {
+		groupText = "< Ungrouped >";
+	}
+
+	projectGroupItem->setData(ProjectOverviewHeader::Checked, Qt::UserRole + 10, groupText);
+	QFont font = projectGroupItem->font(ProjectOverviewHeader::Checked);
+	font.setBold(true);
+	font.setPointSize(font.pointSize() + 12);
+	projectGroupItem->setFont(ProjectOverviewHeader::Checked, font);
+	projectGroupItem->setFlags(projectGroupItem->flags() & ~Qt::ItemIsSelectable);
+	m_tree->addTopLevelItem(projectGroupItem);
+	projectGroupItem->setExpanded(true);
+
+	for (int i = 0; i < ProjectOverviewHeader::Count; i++) {
+		projectGroupItem->setData(i, Qt::UserRole, true);
+	}
+
+	m_projectGroupItems.emplace(_groupName, projectGroupItem);
+
+	return projectGroupItem;
 }

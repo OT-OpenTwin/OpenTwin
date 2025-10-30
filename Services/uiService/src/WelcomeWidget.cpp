@@ -57,7 +57,7 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
 
 	m_overview = new ot::ProjectOverviewWidget;
 	m_overview->setMultiSelectionEnabled(true);
-
+	
 	// Create Menu
 	tt::Group* projectGroup = _ttbPage->AddGroup("Project");
 	projectGroup->setObjectName("OT_TTBGroup");
@@ -66,7 +66,9 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
 
 	m_createButton = this->iniToolButton("Create", "ToolBar/CreateProject.png", projectGroup, "Create new project");
 	m_refreshButton = this->iniToolButton("Refresh", "ToolBar/RefreshProjects.png", projectGroup, "Refresh project list");
-	
+	m_toggleViewModeButton = this->iniToolButton("List View", "ToolBar/ListView.png", projectGroup, "Switch to List View");
+	setViewMode(ot::ProjectOverviewWidget::ViewMode::Tree);
+
 	m_openButton = this->iniToolButton("Open", "ToolBar/OpenProject.png", editGroup, "Open selected project");
 	m_copyButton = this->iniToolButton("Copy", "ToolBar/CopyProject.png", editGroup, "Copy selected project");
 	m_renameButton = this->iniToolButton("Rename", "ToolBar/RenameProject.png", editGroup, "Rename selected project");
@@ -102,6 +104,7 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
 	this->connect(m_overview, &ot::ProjectOverviewWidget::projectOpenRequested, this, &WelcomeWidget::slotOpenProject);
 	this->connect(m_createButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCreateProject);
 	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRefreshProjectList);
+	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotToggleViewMode);
 	this->connect(m_openButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOpenProject);
 	this->connect(m_copyButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCopyProject);
 	this->connect(m_renameButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRenameProject);
@@ -146,6 +149,25 @@ std::list<ot::ProjectInformation> WelcomeWidget::getSelectedProjects() const {
 	return m_overview->getSelectedProjects();
 }
 
+void WelcomeWidget::setViewMode(ot::ProjectOverviewWidget::ViewMode _mode) {
+	m_overview->setViewMode(_mode);
+	switch (_mode) {
+	case ot::ProjectOverviewWidget::ViewMode::Tree:
+		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("ToolBar/ListView.png"));
+		m_toggleViewModeButton->setText("View as List");
+		m_toggleViewModeButton->setToolTip("Switch to List View");
+		break;
+	case ot::ProjectOverviewWidget::ViewMode::List:
+		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("ToolBar/TreeView.png"));
+		m_toggleViewModeButton->setText("View as Tree");
+		m_toggleViewModeButton->setToolTip("Switch to Tree View");
+		break;
+	default:
+		OT_LOG_E("Invalid ViewMode (" + std::to_string(static_cast<int>(_mode)) + ")");
+		break;
+	}
+}
+
 void WelcomeWidget::slotCreateProject() {
 	Q_EMIT createProjectRequest();
 }
@@ -155,6 +177,15 @@ void WelcomeWidget::slotRefreshProjectList() {
 
 	this->updateCountLabel();
 	this->updateToolButtonsEnabledState();
+}
+
+void WelcomeWidget::slotToggleViewMode() {
+	if (m_overview->getViewMode() == ot::ProjectOverviewWidget::ViewMode::Tree) {
+		setViewMode(ot::ProjectOverviewWidget::ViewMode::List);
+	}
+	else {
+		setViewMode(ot::ProjectOverviewWidget::ViewMode::Tree);
+	}
 }
 
 void WelcomeWidget::slotOpenProject() {
