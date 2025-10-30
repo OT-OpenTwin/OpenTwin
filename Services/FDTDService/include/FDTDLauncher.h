@@ -2,17 +2,21 @@
 
 #pragma once
 
+// TINYXML2
+#include <tinyxml2.h>
+
+// STD
 #include <string>
 #include <list>
 #include <cstdint>
 #include <map>
 
-#include "tinyxml2.h"
-
+// OPENTWIN
 #include "OTCore/CoreTypes.h"
 #include "EntityInformation.h"
-
 #include "EntityProperties.h"
+
+#include "FDTDConfig.h"
 
 namespace ot {
 	namespace components {

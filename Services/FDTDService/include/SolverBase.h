@@ -5,12 +5,6 @@
 #include "OTCore/TypeNames.h"
 #include "EntityInformation.h"
 
-// TINYXML2
-#include "tinyxml2.h"
-
-// FDTDConfig
-#include "FDTDConfig.h"
-
 // STD INCLUDES
 #include <algorithm>
 #include <fstream>
