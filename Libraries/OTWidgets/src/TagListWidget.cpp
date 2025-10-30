@@ -30,15 +30,15 @@ namespace ot {
 	TagListEntry::TagListEntry(QWidget* _parent) : QFrame(_parent) {
 		setFrameShape(QFrame::Box);
 		setFrameShadow(QFrame::Raised);
-		FlowLayout* layout = new FlowLayout(this);
+		QHBoxLayout* layout = new QHBoxLayout(this);
 		layout->setContentsMargins(2, 2, 2, 2);
 		layout->setSpacing(2);
 
 		m_text = new Label(this);
-		layout->addWidget(m_text);
+		layout->addWidget(m_text, 1);
 
 		m_removeButton = new ToolButton(this);
-		m_removeButton->setFixedSize(12, 12);
+		m_removeButton->setFixedSize(16, 16);
 		m_removeButton->setIcon(IconManager::getIcon("Button/Remove.png"));
 		layout->addWidget(m_removeButton);
 		connect(m_removeButton, &ToolButton::clicked, this, &TagListEntry::slotRemove);
@@ -71,14 +71,18 @@ namespace ot {
 	{
 		QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
-		m_layout = new FlowLayout;
-		m_layout->setParent(this);
-		mainLayout->addLayout(m_layout);
+		QFrame* tagFrame = new QFrame(this);
+		tagFrame->setFrameShape(QFrame::Box);
+		tagFrame->setObjectName("TagListWidgetTagFrame");
+		m_layout = new FlowLayout(tagFrame);
+		mainLayout->addWidget(tagFrame, 1);
 
 		m_input = new ComboBox(this);
 		m_input->setEditable(true);
 		mainLayout->addWidget(m_input);
 		connect(m_input, &ComboBox::returnPressed, this, &TagListWidget::slotAddTagFromInput);
+
+		setFrameShape(QFrame::NoFrame);
 	}
 
 	TagListWidget::~TagListWidget() {
@@ -96,6 +100,8 @@ namespace ot {
 		entry->setText(_tag);
 		m_layout->addWidget(entry);
 		connect(entry, &TagListEntry::removeRequested, this, &TagListWidget::removeTag);
+		m_tags.push_back(entry);
+		addOption(_tag);
 
 		Q_EMIT tagsChanged();
 	}
@@ -103,7 +109,7 @@ namespace ot {
 	void TagListWidget::setTags(const QStringList& _tags) {
 		{
 			QSignalBlocker blocker(this);
-			clearTags();
+			clear();
 			for (const QString& tag : _tags) {
 				addTag(tag);
 			}
@@ -120,7 +126,7 @@ namespace ot {
 		return lst;
 	}
 
-	void TagListWidget::clearTags() {
+	void TagListWidget::clear() {
 		for (TagListEntry* entry : m_tags) {
 			disconnect(entry, &TagListEntry::removeRequested, this, &TagListWidget::removeTag);
 			entry->setVisible(false);
@@ -128,8 +134,40 @@ namespace ot {
 			entry->deleteLater();
 		}
 		m_tags.clear();
+		m_input->clear();
 
 		Q_EMIT tagsChanged();
+	}
+
+	void TagListWidget::addOption(const QString& _option) {
+		for (int i = 0; i < m_input->count(); i++) {
+			if (m_input->itemText(i) == _option) {
+				return;
+			}
+		}
+		m_input->addItem(_option);
+	}
+
+	void TagListWidget::addOptions(const QStringList& _options) {
+		for (const QString& option : _options) {
+			addOption(option);
+		}
+	}
+
+	void TagListWidget::setEditable(bool _editable) {
+		m_input->setEditable(_editable);
+	}
+
+	bool TagListWidget::isEditable() const {
+		return m_input->isEditable();
+	}
+
+	void TagListWidget::setPlaceholderText(const QString& _text) {
+		m_input->setPlaceholderText(_text);
+	}
+
+	QString TagListWidget::getPlaceholderText() const {
+		return m_input->placeholderText();
 	}
 
 	void TagListWidget::removeTag(const QString& _tag) {

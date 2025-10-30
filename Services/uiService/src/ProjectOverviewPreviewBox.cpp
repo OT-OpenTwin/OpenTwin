@@ -172,6 +172,7 @@ void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation&
 		if (!userGroupsString.empty()) userGroupsString += " ";
 		userGroupsString += group;
 	}
+	m_userGroups->setText(QString::fromStdString(userGroupsString));
 
 	// Expand
 	bool showAnim = false;

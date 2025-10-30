@@ -2552,6 +2552,22 @@ ads--CDockWidgetTab #tabCloseButton::disabled {
 
 /* ##################################################################################### */
 
+ot--TagListWidget #TagListWidgetTagFrame {
+    border: 1px solid rgba(0,0,0,255);
+    border-radius: 4;
+}
+
+ot--TagListEntry {
+    border: 1px solid rgba(0,0,0,255);
+    border-radius: 4;
+}
+
+ot--TagListEntry:hover {
+    border: 1px solid rgba(0,215,255,255);
+}
+
+/* ##################################################################################### */
+
 /* View Buttons */
 
 #OT_ViewTabCloseButton {

@@ -80,8 +80,16 @@ namespace ot {
 		void addTag(const QString& _tag);
 		void setTags(const QStringList& _tags);
 		QStringList getTags() const;
-		void clearTags();
+		void clear();
+		void addOption(const QString& _option);
+		void addOptions(const QStringList& _options);
 		
+		void setEditable(bool _editable);
+		bool isEditable() const;
+
+		void setPlaceholderText(const QString& _text);
+		QString getPlaceholderText() const;
+
 	Q_SIGNALS:
 		void tagsChanged();
 

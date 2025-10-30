@@ -30,7 +30,7 @@ namespace ot {
 	class TextEditor;
 	class ToolButton;
 	class PushButton;
-	class PlainTextEdit;
+	class TagListWidget;
 	class ImagePainterWidget;
 }
 
@@ -84,7 +84,7 @@ private:
 	
 	ot::ImagePainterWidget* m_imageWidget;
 	ot::ComboBox* m_projectGroup;
-	ot::PlainTextEdit* m_tags;
+	ot::TagListWidget* m_tags;
 
 	ot::ToolButton* m_toggleShowPreviewButton;
 

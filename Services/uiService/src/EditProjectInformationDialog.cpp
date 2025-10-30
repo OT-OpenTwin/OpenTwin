@@ -35,6 +35,7 @@
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/TagListWidget.h"
 #include "OTWidgets/PlainTextEdit.h"
 #include "OTWidgets/BasicValidator.h"
 #include "OTWidgets/WidgetViewManager.h"
@@ -113,12 +114,10 @@ EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _c
 	dataLayout->addWidget(m_projectGroup, r++, 1);
 
 	dataLayout->addWidget(new Label("Tags:", this), r, 0);
-	m_tags = new PlainTextEdit(this);
-	m_tags->setToolTip("Project Tags (separated by blanks, tabulators or line breaks)");
-	m_tags->setPlaceholderText("Tag1 Tag2\nTag3");
-	m_tags->setReadOnly(false);
-	m_tags->setFixedHeight(100);
-	m_tags->setValidator(new BasicValidator(BasicValidator::NameRanges, BasicValidator::AllRanges, BasicValidator::AllRanges));
+	m_tags = new TagListWidget(this);
+	m_tags->setEditable(true);
+	m_tags->setPlaceholderText("Tag");
+	m_tags->setMinimumHeight(100);
 	dataLayout->addWidget(m_tags, r++, 1);
 
 	// Description
@@ -160,9 +159,13 @@ EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _c
 	buttonLayout->addStretch();
 	
 	m_confirmButton = new PushButton("Confirm", this);
+	m_confirmButton->setDefault(false);
+	m_confirmButton->setAutoDefault(false);
 	buttonLayout->addWidget(m_confirmButton);
 
 	PushButton* cancelButton = new PushButton("Cancel", this);
+	cancelButton->setDefault(false);
+	cancelButton->setAutoDefault(false);
 	buttonLayout->addWidget(cancelButton);
 
 	initializeData();
@@ -384,9 +387,11 @@ void EditProjectInformationDialog::initializeData() {
 	}
 
 	m_tags->clear();
+	QStringList tagList;
 	for (const std::string& tag : m_projectInformation.getTags()) {
-		m_tags->appendPlainText(QString::fromStdString(tag));
+		tagList.append(QString::fromStdString(tag));
 	}
+	m_tags->setTags(tagList);
 
 	m_projectGroup->clear();
 	QStringList projectGroups;
@@ -408,9 +413,7 @@ void EditProjectInformationDialog::updateInformationEntry() {
 	m_projectInformation.setProjectGroup(ot::String::removePrefixSuffix(m_projectGroup->currentText().toStdString(), " \t\n\r"));
 	
 	std::list<std::string> tags;
-	QString tagsText = m_tags->toPlainText();
-	tagsText.replace('\n', ' ').replace('\t', ' ');
-	QStringList tagList = tagsText.split(' ', Qt::SkipEmptyParts);
+	QStringList tagList = m_tags->getTags();
 	for (const QString& tag : tagList) {
 		tags.push_back(tag.toStdString());
 	}
