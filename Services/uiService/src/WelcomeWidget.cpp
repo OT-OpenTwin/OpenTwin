@@ -67,7 +67,6 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
 	m_createButton = this->iniToolButton("Create", "ToolBar/CreateProject.png", projectGroup, "Create new project");
 	m_refreshButton = this->iniToolButton("Refresh", "ToolBar/RefreshProjects.png", projectGroup, "Refresh project list");
 	m_toggleViewModeButton = this->iniToolButton("List View", "ToolBar/ListView.png", projectGroup, "Switch to List View");
-	setViewMode(ot::ProjectOverviewWidget::ViewMode::Tree);
 
 	m_openButton = this->iniToolButton("Open", "ToolBar/OpenProject.png", editGroup, "Open selected project");
 	m_copyButton = this->iniToolButton("Copy", "ToolBar/CopyProject.png", editGroup, "Copy selected project");
@@ -112,6 +111,14 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage) {
 	this->connect(m_exportButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotExportProject);
 	this->connect(m_accessButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotAccessProject);
 	this->connect(m_ownerButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOwnerProject);
+
+	// Initialize view mode
+	UserManagement userManager(AppBase::instance()->getCurrentLoginData());
+	std::string viewMode = userManager.restoreSetting("WelcomeWidget_ViewMode");
+	if (viewMode.empty()){
+		viewMode = ot::ProjectOverviewWidget::toString(ot::ProjectOverviewWidget::ViewMode::Tree);
+	}
+	setViewMode(ot::ProjectOverviewWidget::viewModeFromString(viewMode));
 }
 
 WelcomeWidget::~WelcomeWidget() {
@@ -151,6 +158,7 @@ std::list<ot::ProjectInformation> WelcomeWidget::getSelectedProjects() const {
 
 void WelcomeWidget::setViewMode(ot::ProjectOverviewWidget::ViewMode _mode) {
 	m_overview->setViewMode(_mode);
+
 	switch (_mode) {
 	case ot::ProjectOverviewWidget::ViewMode::Tree:
 		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("ToolBar/ListView.png"));
@@ -186,6 +194,9 @@ void WelcomeWidget::slotToggleViewMode() {
 	else {
 		setViewMode(ot::ProjectOverviewWidget::ViewMode::Tree);
 	}
+
+	UserManagement userManager(AppBase::instance()->getCurrentLoginData());
+	userManager.storeSetting("WelcomeWidget_ViewMode", ot::ProjectOverviewWidget::toString(m_overview->getViewMode()));
 }
 
 void WelcomeWidget::slotOpenProject() {
