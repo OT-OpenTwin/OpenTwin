@@ -1,5 +1,8 @@
 // @otlicense
 
+// Copyright (C) 2016 The Qt Company Ltd.
+// SPDX-License-Identifier: BSD-3-Clause
+
 #pragma once
 
 // OpenTwin header
@@ -12,6 +15,8 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT FlowLayout : public QLayout {
+		OT_DECL_NOMOVE(FlowLayout)
+		OT_DECL_NOCOPY(FlowLayout)
 	public:
         explicit FlowLayout(QWidget* _parent = (QWidget*)nullptr);
         ~FlowLayout();

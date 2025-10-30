@@ -127,6 +127,16 @@
     <ClCompile Include="src\PlotView.cpp" />
     <ClCompile Include="src\PolarPlotCurve.cpp" />
     <ClCompile Include="src\SelectionData.cpp" />
+    <ClCompile Include="src\TagListWidget.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
     <ClCompile Include="src\TemporaryDir.cpp" />
     <ClCompile Include="src\TextEdit.cpp" />
     <ClCompile Include="src\TreeItemDelegate.cpp" />
@@ -293,6 +303,7 @@
     <ClInclude Include="include\OTWidgets\PlotView.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotCurve.h" />
     <ClInclude Include="include\OTWidgets\SelectionData.h" />
+    <QtMoc Include="include\OTWidgets\TagListWidget.h" />
     <ClInclude Include="include\OTWidgets\TemporaryDir.h" />
     <QtMoc Include="include\OTWidgets\TextEdit.h" />
     <ClInclude Include="include\OTWidgets\TreeItemDelegate.h" />

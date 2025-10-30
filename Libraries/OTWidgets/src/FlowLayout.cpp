@@ -1,5 +1,8 @@
 // @otlicense
 
+// Copyright (C) 2016 The Qt Company Ltd.
+// SPDX-License-Identifier: BSD-3-Clause
+
 #include "OTWidgets/FlowLayout.h"
 
 ot::FlowLayout::FlowLayout(QWidget* _parent)

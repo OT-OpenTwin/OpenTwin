@@ -22,16 +22,22 @@ namespace ot {
 		ComboBox(QWidget* _parent = (QWidget*)nullptr);
 		virtual ~ComboBox() {};
 
-		virtual QWidget* getQWidget(void) override { return this; };
-		virtual const QWidget* getQWidget(void) const override { return this; };
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
 
-		bool isPopupVisible(void) const { return m_popupVisible; };
+		bool isPopupVisible() const { return m_popupVisible; };
 
-		virtual void showPopup(void) override;
-		virtual void hidePopup(void) override;
+		virtual void showPopup() override;
+		virtual void hidePopup() override;
+
+	Q_SIGNALS:
+		void returnPressed();
 
 	public Q_SLOTS:
-		void togglePopup(void);
+		void togglePopup();
+
+	protected:
+		virtual void keyPressEvent(QKeyEvent* _event) override;
 
 	private:
 		bool m_popupVisible;
