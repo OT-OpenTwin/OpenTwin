@@ -28,14 +28,14 @@ ot::ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projec
 		setToolTip(ProjectOverviewHeader::Tags, QString::fromStdString(tagInfo));
 	}
 
-	if (!m_projectInfo.getGroups().empty()) {
-		setIcon(ProjectOverviewHeader::Groups, ot::IconManager::getIcon("Tree/Groups.png"));
+	if (!m_projectInfo.getUserGroups().empty()) {
+		setIcon(ProjectOverviewHeader::Access, ot::IconManager::getIcon("Tree/Groups.png"));
 		std::string groupInfo;
-		for (const std::string& group : m_projectInfo.getGroups()) {
+		for (const std::string& group : m_projectInfo.getUserGroups()) {
 			if (!groupInfo.empty()) groupInfo.append("\n");
 			groupInfo.append(group);
 		}
-		setToolTip(ProjectOverviewHeader::Groups, QString::fromStdString(groupInfo));
+		setToolTip(ProjectOverviewHeader::Access, QString::fromStdString(groupInfo));
 	}
 
 	setData(ProjectOverviewHeader::Modified, Qt::UserRole + 20, m_projectInfo.getLastAccessTime());
@@ -91,16 +91,16 @@ void ot::ProjectOverviewEntry::applyFilter(const ProjectOverviewFilterData& _fil
 		break;
 	}
 
-	case ProjectOverviewHeader::Groups:
+	case ProjectOverviewHeader::Access:
 	{
 		bool found = false;
-		if (m_projectInfo.getGroups().empty()) {
+		if (m_projectInfo.getUserGroups().empty()) {
 			if (_filter.getSelectedFilters().contains(ProjectOverviewFilterData::getEmptyGroupFilterName())) {
 				found = true;
 			}
 		}
 		else {
-			for (const std::string& group : m_projectInfo.getGroups()) {
+			for (const std::string& group : m_projectInfo.getUserGroups()) {
 				if (_filter.getSelectedFilters().contains(QString::fromStdString(group))) {
 					found = true;
 					break;

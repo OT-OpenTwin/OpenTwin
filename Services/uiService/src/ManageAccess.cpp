@@ -344,7 +344,7 @@ void ManageAccess::fillGroupsList(void)
 		m_groupHasAccess[user] = false;
 	}
 
-	for (const std::string& groupName : info.getGroups()) {
+	for (const std::string& groupName : info.getUserGroups()) {
 		m_groupHasAccess[groupName] = true;
 	}
 

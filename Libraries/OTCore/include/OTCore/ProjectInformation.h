@@ -48,16 +48,16 @@ namespace ot {
 		void setLastAccessTime(int64_t _msSinceEpoch) { m_lastAccessTime = _msSinceEpoch; };
 		int64_t getLastAccessTime() const { return m_lastAccessTime; };
 
-		void addGroup(const std::string& _group) { m_groups.push_back(_group); };
-		void setGroups(const std::list<std::string>& _groups) { m_groups = _groups; };
-		const std::list<std::string>& getGroups() const { return m_groups; };
+		void addUserGroup(const std::string& _group) { m_userGroups.push_back(_group); };
+		void setUserGroups(const std::list<std::string>& _groups) { m_userGroups = _groups; };
+		const std::list<std::string>& getUserGroups() const { return m_userGroups; };
 
 		void addTag(const std::string& _tag) { m_tags.push_back(_tag); };
 		void setTags(const std::list<std::string>& _tags) { m_tags = _tags; };
 		const std::list<std::string>& getTags() const { return m_tags; };
 
-		void setCategory(const std::string& _category) { m_category = _category; };
-		const std::string& getCategory() const { return m_category; };
+		void setProjectGroup(const std::string& _group) { m_projectGroup = _group; };
+		const std::string& getProjectGroup() const { return m_projectGroup; };
 
 	private:
 		int m_version;
@@ -67,8 +67,8 @@ namespace ot {
 		std::string m_collection;
 		int64_t m_creationTime;
 		int64_t m_lastAccessTime;
-		std::list<std::string> m_groups;
+		std::list<std::string> m_userGroups;
 		std::list<std::string> m_tags;
-		std::string m_category;
+		std::string m_projectGroup;
 	};
 }

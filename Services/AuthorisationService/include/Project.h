@@ -50,9 +50,9 @@ public:
 	void setUser(const User& _user) { m_creatingUser = _user; };
 	const User& getUser() const { return m_creatingUser; };
 
-	void addGroup(const Group& _group);
-	void setGroups(const std::vector<Group>& _groups) { m_groups = _groups; };
-	const std::vector<Group>& getGroups() const { return m_groups; };
+	void addUserGroup(const Group& _group);
+	void setUserGroups(const std::vector<Group>& _groups) { m_userGroups = _groups; };
+	const std::vector<Group>& getUserGroups() const { return m_userGroups; };
 
 	void setVersion(int _version) { m_version = _version; };
 	int getVersion() const { return m_version; };
@@ -64,8 +64,8 @@ public:
 	void setTags(const std::list<std::string>& _tags) { m_tags = _tags; };
 	const std::list<std::string>& getTags() const { return m_tags; };
 
-	void setCategory(const std::string& _category) { m_category = _category; };
-	const std::string& getCategory() const { return m_category; };
+	void setProjectGroup(const std::string& _group) { m_projectGroup = _group; };
+	const std::string& getProjectGroup() const { return m_projectGroup; };
 
 	ot::ProjectInformation toProjectInformation() const;
 
@@ -79,9 +79,9 @@ private:
 	std::string m_collectionName;
 	bsoncxx::types::b_date m_createdOn;
 	User m_creatingUser;
-	std::vector<Group> m_groups;
+	std::vector<Group> m_userGroups;
 	std::list<std::string> m_tags;
-	std::string m_category;
+	std::string m_projectGroup;
 	int m_version;
 	bsoncxx::types::b_date m_lastAccessedOn;
 };

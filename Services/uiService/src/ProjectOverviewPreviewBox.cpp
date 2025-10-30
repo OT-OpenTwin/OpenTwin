@@ -38,14 +38,19 @@ ot::ProjectOverviewPreviewBox::ProjectOverviewPreviewBox(QWidget* _parent)
 	m_type = new ot::Label(this);
 	infoLayout->addWidget(m_type, r++, 1);
 
-	infoLayout->addWidget(new ot::Label("Category:", this), r, 0);
-	m_category = new ot::Label(this);
-	infoLayout->addWidget(m_category, r++, 1);
+	infoLayout->addWidget(new ot::Label("Group:", this), r, 0);
+	m_projectGroup = new ot::Label(this);
+	infoLayout->addWidget(m_projectGroup, r++, 1);
 
 	infoLayout->addWidget(new ot::Label("Tags:", this), r, 0);
 	m_tags = new ot::Label(this);
 	m_tags->setWordWrap(true);
 	infoLayout->addWidget(m_tags, r++, 1);
+
+	infoLayout->addWidget(new ot::Label("Access:", this), r, 0);
+	m_userGroups = new ot::Label(this);
+	m_userGroups->setWordWrap(true);
+	infoLayout->addWidget(m_userGroups, r++, 1);
 
 	mainLayout->addWidget(new ot::Label("Description:", this));
 	m_description = new ot::TextEdit(this);
@@ -136,7 +141,7 @@ void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation&
 	// Set general info
 	m_name->setText(QString::fromStdString(_projectInfo.getProjectName()));
 	m_type->setText(QString::fromStdString(_projectInfo.getProjectType()));
-	m_category->setText(QString::fromStdString(_projectInfo.getCategory()));
+	m_projectGroup->setText(QString::fromStdString(_projectInfo.getProjectGroup()));
 
 	std::string tagsString;
 	for (const std::string& tag : _projectInfo.getTags()) {
@@ -144,6 +149,12 @@ void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation&
 		tagsString += tag;
 	}
 	m_tags->setText(QString::fromStdString(tagsString));
+
+	std::string userGroupsString;
+	for (const std::string& group : _projectInfo.getUserGroups()) {
+		if (!userGroupsString.empty()) userGroupsString += " ";
+		userGroupsString += group;
+	}
 
 	// Expand
 	bool showAnim = false;
@@ -156,26 +167,12 @@ void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation&
 
 	if (showAnim) {
 		m_animation.setDirection(QAbstractAnimation::Forward);
-
-		for (int i = 0; i < m_animation.animationCount(); i++) {
-			QPropertyAnimation* anim = dynamic_cast<QPropertyAnimation*>(m_animation.animationAt(i));
-			if (anim) {
-				anim->setEndValue(c_expandedWidth);
-			}
-		}
-
 		m_animation.start();
 	}
 }
 
 void ot::ProjectOverviewPreviewBox::slotDelayedCollapse() {
 	m_animation.setDirection(QAbstractAnimation::Backward);
-	for (int i = 0; i < m_animation.animationCount(); i++) {
-		QPropertyAnimation* anim = dynamic_cast<QPropertyAnimation*>(m_animation.animationAt(i));
-		if (anim) {
-			anim->setEndValue(std::min(this->width(), c_expandedWidth));
-		}
-	}
 	m_animation.start();
 }
 

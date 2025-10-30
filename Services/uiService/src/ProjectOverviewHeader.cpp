@@ -254,13 +254,13 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
 		}
 		break;
     
-    case ColumnIndex::Groups:
+    case ColumnIndex::Access:
         filter.setTitle("Shared Groups");
         for (const ProjectInformation& proj : allProjects) {
-            if (proj.getGroups().empty()) {
+            if (proj.getUserGroups().empty()) {
 				hasEmptyGroups = true;
             }
-            for (const std::string& group : proj.getGroups()) {
+            for (const std::string& group : proj.getUserGroups()) {
                 const QString groupName = QString::fromStdString(group);
                 if (!options.contains(groupName)) {
                     options.append(groupName);

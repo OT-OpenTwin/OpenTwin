@@ -90,8 +90,8 @@ namespace ot {
 		void stopLoading();
 		void worker();
 		void addEntry(ProjectOverviewEntry* _entry);
-		void updateCategories();
-		void updateCategoryItem(TreeWidgetItem* _categoryItem);
+		void updateProjectGroups();
+		void updateProjectGroup(TreeWidgetItem* _groupItem);
 		void updateCheckStates(QTreeWidgetItem* _parent);
 		int getProjectCount(const QTreeWidgetItem* _parent) const;
 		void getAllProjects(const QTreeWidgetItem* _parent, std::list<ProjectInformation>& _lst) const;
@@ -104,7 +104,7 @@ namespace ot {
 		ProjectInformation m_currentlyLoadingProject;
 		ExtendedProjectInformation m_importedProjectData;
 
-		std::map<std::string, TreeWidgetItem*> m_categoryItems;
+		std::map<std::string, TreeWidgetItem*> m_projectGroupItems;
 
 		ProjectOverviewHeader* m_header;
 		ProjectOverviewPreviewBox* m_previewBox;

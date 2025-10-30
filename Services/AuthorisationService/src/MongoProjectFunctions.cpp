@@ -77,7 +77,7 @@ namespace MongoProjectFunctions
 		auto modifyQuery = bsoncxx::builder::stream::document{}
 			<< "$set" << bsoncxx::builder::stream::open_document
 			<< "tags" << tagArray.view()
-			<< "category" << _projectInfo.getCategory()
+			<< "project_group" << _projectInfo.getProjectGroup()
 			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 		
 		// Perform update
@@ -265,7 +265,7 @@ namespace MongoProjectFunctions
 
 				Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
 
-				tmpProject.addGroup(currentGroup);
+				tmpProject.addUserGroup(currentGroup);
 			}
 
 			projects.push_back(tmpProject);
@@ -411,7 +411,7 @@ namespace MongoProjectFunctions
 		mongocxx::collection projectCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 
 		// checking whether it is already contained
-		for (auto alreadyContainedGroup : project.getGroups())
+		for (const auto& alreadyContainedGroup : project.getUserGroups())
 		{
 			if (alreadyContainedGroup.id == group.id)
 			{
@@ -462,7 +462,7 @@ namespace MongoProjectFunctions
 
 		bool isContained = false;
 		// checking whether it is already contained
-		for (auto alreadyContainedGroup : project.getGroups())
+		for (const auto& alreadyContainedGroup : project.getUserGroups())
 		{
 			if (alreadyContainedGroup.id == group.id)
 			{

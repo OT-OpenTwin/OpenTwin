@@ -24,9 +24,9 @@ void ot::ProjectInformation::addToJsonObject(JsonValue& _jsonObject, JsonAllocat
 	_jsonObject.AddMember("Collection", JsonString(m_collection, _allocator), _allocator);
 	_jsonObject.AddMember("CreationTime", m_creationTime, _allocator);
 	_jsonObject.AddMember("LastAccessTime", m_lastAccessTime, _allocator);
-	_jsonObject.AddMember("Groups", JsonArray(m_groups, _allocator), _allocator);
+	_jsonObject.AddMember("Groups", JsonArray(m_userGroups, _allocator), _allocator);
 	_jsonObject.AddMember("Tags", JsonArray(m_tags, _allocator), _allocator);
-	_jsonObject.AddMember("Category", JsonString(m_category, _allocator), _allocator);
+	_jsonObject.AddMember("ProjectGroup", JsonString(m_projectGroup, _allocator), _allocator);
 }
 
 void ot::ProjectInformation::setFromJsonObject(const ConstJsonObject& _jsonObject) {
@@ -37,7 +37,7 @@ void ot::ProjectInformation::setFromJsonObject(const ConstJsonObject& _jsonObjec
 	m_collection = json::getString(_jsonObject, "Collection");
 	m_creationTime = json::getInt64(_jsonObject, "CreationTime");
 	m_lastAccessTime = json::getInt64(_jsonObject, "LastAccessTime");
-	m_groups = json::getStringList(_jsonObject, "Groups");
+	m_userGroups = json::getStringList(_jsonObject, "Groups");
 	m_tags = json::getStringList(_jsonObject, "Tags");
-	m_category = json::getString(_jsonObject, "Category");
+	m_projectGroup = json::getString(_jsonObject, "ProjectGroup");
 }

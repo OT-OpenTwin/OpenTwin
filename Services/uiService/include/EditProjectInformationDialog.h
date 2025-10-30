@@ -66,7 +66,7 @@ private:
 	ot::ExtendedProjectInformation m_projectInformation;
 	
 	ot::ImagePainterWidget* m_imageWidget;
-	ot::ComboBox* m_category;
+	ot::ComboBox* m_projectGroup;
 	ot::PlainTextEdit* m_tags;
 
 	ot::ToolButton* m_toggleShowPreviewButton;

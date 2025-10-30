@@ -44,8 +44,9 @@ namespace ot {
 		ImagePainterWidget* m_imageWidget;
 		Label* m_name;
 		Label* m_type;
-		Label* m_category;
+		Label* m_projectGroup;
 		Label* m_tags;
+		Label* m_userGroups;
 		TextEdit* m_description;
 	};
 } // namespace ot

@@ -25,7 +25,7 @@ namespace ot {
 			Name,
 			Tags,
 			Owner,
-			Groups,
+			Access,
 			Modified,
 			Count
 		};

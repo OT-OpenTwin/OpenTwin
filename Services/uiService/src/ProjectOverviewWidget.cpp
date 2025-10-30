@@ -37,7 +37,7 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	m_tree->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 	m_tree->setSelectionMode(QAbstractItemView::SingleSelection);
 
-	m_tree->setHeaderLabels(QStringList() << " " << "Type" << "Name" << "Tags" << "Owner" << "Groups" << "Last Modified");
+	m_tree->setHeaderLabels(QStringList() << " " << "Type" << "Name" << "Tags" << "Owner" << "Access" << "Last Modified");
 	m_tree->header()->setStretchLastSection(false);
 	m_tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_tree->header()->setSectionResizeMode(ProjectOverviewHeader::ColumnIndex::Name, QHeaderView::Stretch);
@@ -104,17 +104,17 @@ std::list<ot::ProjectInformation> ot::ProjectOverviewWidget::getSelectedProjects
 // Public: Slots
 
 void ot::ProjectOverviewWidget::clear() {
-	m_categoryItems.clear();
+	m_projectGroupItems.clear();
 	m_tree->clear();
 }
 
 void ot::ProjectOverviewWidget::refreshProjects() {
-	// Store expanded categories
-	std::set<std::string> expandedCategories;
-	for (auto& it : m_categoryItems) {
-		TreeWidgetItem* categoryItem = it.second;
-		if (categoryItem->isExpanded()) {
-			expandedCategories.insert(it.first);
+	// Store expanded project groups
+	std::set<std::string> expandedProjectGroups;
+	for (auto& it : m_projectGroupItems) {
+		TreeWidgetItem* projectGroup = it.second;
+		if (projectGroup->isExpanded()) {
+			expandedProjectGroups.insert(it.first);
 		}
 	}
 
@@ -133,26 +133,26 @@ void ot::ProjectOverviewWidget::refreshProjects() {
 		addEntry(new ProjectOverviewEntry(proj));
 	}
 
-	// Restore expanded categories
-	if (!expandedCategories.empty()) {
-		for (auto& it : m_categoryItems) {
-			TreeWidgetItem* categoryItem = it.second;
-			if (expandedCategories.find(it.first) != expandedCategories.end()) {
-				categoryItem->setExpanded(true);
+	// Restore expanded project groups
+	if (!expandedProjectGroups.empty()) {
+		for (auto& it : m_projectGroupItems) {
+			TreeWidgetItem* groupItem = it.second;
+			if (expandedProjectGroups.find(it.first) != expandedProjectGroups.end()) {
+				groupItem->setExpanded(true);
 			}
 			else {
-				categoryItem->setExpanded(false);
+				groupItem->setExpanded(false);
 			}
 		}
 	}
 	
-	updateCategories();
+	updateProjectGroups();
 	m_tree->sortByColumn(ProjectOverviewHeader::ColumnIndex::Modified, Qt::DescendingOrder);
 }
 
 void ot::ProjectOverviewWidget::filterProjects(const ProjectOverviewFilterData& _filterData) {
 	filterProjects(m_tree->invisibleRootItem(), _filterData);
-	updateCategories();
+	updateProjectGroups();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -215,7 +215,7 @@ void ot::ProjectOverviewWidget::slotOpenRequested(QTreeWidgetItem* _item, int _c
 
 void ot::ProjectOverviewWidget::slotBasicFilterProjects() {
 	basicFilterProjects(m_tree->invisibleRootItem());
-	updateCategories();
+	updateProjectGroups();
 }
 
 void ot::ProjectOverviewWidget::slotWorkerFinished() {
@@ -272,85 +272,51 @@ void ot::ProjectOverviewWidget::addEntry(ProjectOverviewEntry* _entry) {
 		_entry->setData(i, Qt::UserRole, false);
 	}
 
-	auto it = m_categoryItems.find(_entry->getProjectInformation().getCategory());
-	if (it != m_categoryItems.end()) {
+	auto it = m_projectGroupItems.find(_entry->getProjectInformation().getProjectGroup());
+	if (it != m_projectGroupItems.end()) {
 		it->second->addChild(_entry);
 		return;
 	}
 	
-	TreeWidgetItem* categoryItem = new TreeWidgetItem;
+	TreeWidgetItem* projectGroupItem = new TreeWidgetItem;
 
-	QString categoryText = QString::fromStdString(_entry->getProjectInformation().getCategory());
-	if (categoryText.isEmpty()) {
-		categoryText = "< Uncategorized >";
+	QString groupText = QString::fromStdString(_entry->getProjectInformation().getProjectGroup());
+	if (groupText.isEmpty()) {
+		groupText = "< Ungrouped >";
 	}
 
-	categoryItem->setData(ProjectOverviewHeader::Checked, Qt::UserRole + 10, categoryText);
-	QFont font = categoryItem->font(ProjectOverviewHeader::Checked);
+	projectGroupItem->setData(ProjectOverviewHeader::Checked, Qt::UserRole + 10, groupText);
+	QFont font = projectGroupItem->font(ProjectOverviewHeader::Checked);
 	font.setBold(true);
 	font.setPointSize(font.pointSize() + 12);
-	categoryItem->setFont(ProjectOverviewHeader::Checked, font);
-	categoryItem->setFlags(categoryItem->flags() & ~Qt::ItemIsSelectable);
-	m_tree->addTopLevelItem(categoryItem);
-	categoryItem->addChild(_entry);
-	categoryItem->setExpanded(true);
+	projectGroupItem->setFont(ProjectOverviewHeader::Checked, font);
+	projectGroupItem->setFlags(projectGroupItem->flags() & ~Qt::ItemIsSelectable);
+	m_tree->addTopLevelItem(projectGroupItem);
+	projectGroupItem->addChild(_entry);
+	projectGroupItem->setExpanded(true);
 
 	for (int i = 0; i < ProjectOverviewHeader::Count; i++) {
-		categoryItem->setData(i, Qt::UserRole, true);
+		projectGroupItem->setData(i, Qt::UserRole, true);
 	}
 
-	m_categoryItems.emplace(_entry->getProjectInformation().getCategory(), categoryItem);
+	m_projectGroupItems.emplace(_entry->getProjectInformation().getProjectGroup(), projectGroupItem);
 }
 
-void ot::ProjectOverviewWidget::updateCategories() {
-	// Move items to categories
-	for (int i = m_tree->topLevelItemCount() - 1; i >= 0; i--) {
-		QTreeWidgetItem* topItem = m_tree->topLevelItem(i);
-		ProjectOverviewEntry* entry = dynamic_cast<ProjectOverviewEntry*>(topItem);
-		if (entry) {
-			auto it = m_categoryItems.find(entry->getProjectInformation().getCategory());
-			if (it != m_categoryItems.end()) {
-				m_tree->takeTopLevelItem(i);
-				it->second->addChild(entry);
-			}
-		}
-	}
-
-	// Update category visibility
-	int visibleCategories = 0;
-	for (auto& it : m_categoryItems) {
-		TreeWidgetItem* categoryItem = it.second;
-		updateCategoryItem(categoryItem);
-		if (!categoryItem->isHidden()) {
-			visibleCategories++;
-		}
-	}
-
-	// If only one category is visible, reparent items to root
-	if (visibleCategories == 1) {
-		for (auto& it : m_categoryItems) {
-			TreeWidgetItem* categoryItem = it.second;
-			if (!categoryItem->isHidden()) {
-				for (int i = categoryItem->childCount() - 1; i >= 0; i--) {
-					QTreeWidgetItem* child = categoryItem->child(i);
-					categoryItem->removeChild(child);
-					m_tree->addTopLevelItem(child);
-				}
-				categoryItem->setHidden(true);
-			}
-		}
+void ot::ProjectOverviewWidget::updateProjectGroups() {
+	for (auto& it : m_projectGroupItems) {
+		updateProjectGroup(it.second);
 	}
 }
 
-void ot::ProjectOverviewWidget::updateCategoryItem(TreeWidgetItem* _categoryItem) {
+void ot::ProjectOverviewWidget::updateProjectGroup(TreeWidgetItem* _groupItem) {
 	int visibleItems = 0;
-	for (int i = 0; i < _categoryItem->childCount(); i++) {
-		if (!_categoryItem->child(i)->isHidden()) {
+	for (int i = 0; i < _groupItem->childCount(); i++) {
+		if (!_groupItem->child(i)->isHidden()) {
 			visibleItems++;
 		}
 	}
 
-	_categoryItem->setHidden(visibleItems == 0);
+	_groupItem->setHidden(visibleItems == 0);
 }
 
 void ot::ProjectOverviewWidget::updateCheckStates(QTreeWidgetItem* _parent) {

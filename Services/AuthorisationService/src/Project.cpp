@@ -23,12 +23,12 @@ Project::Project(const bsoncxx::v_noabi::document::view& _view, mongocxx::client
 		std::string currId = std::string(groupId.get_utf8().value.data());
 
 		Group currentGroup = MongoGroupFunctions::getGroupDataById(currId, _userClient);
-		m_groups.push_back(currentGroup);
+		m_userGroups.push_back(currentGroup);
 	}
 }
 
-void Project::addGroup(const Group& _group) {
-	m_groups.push_back(_group);
+void Project::addUserGroup(const Group& _group) {
+	m_userGroups.push_back(_group);
 }
 
 ot::ProjectInformation Project::toProjectInformation() const {
@@ -42,10 +42,10 @@ ot::ProjectInformation Project::toProjectInformation() const {
 	info.setCreationTime(m_createdOn);
 	info.setLastAccessTime(m_lastAccessedOn);
 	info.setTags(m_tags);
-	info.setCategory(m_category);
+	info.setProjectGroup(m_projectGroup);
 
-	for (const Group& group : m_groups) {
-		info.addGroup(group.name);
+	for (const Group& group : m_userGroups) {
+		info.addUserGroup(group.name);
 	}
 
 	return info;
@@ -87,10 +87,10 @@ void Project::importData(const bsoncxx::v_noabi::document::view& _view) {
 		}
 	}
 
-	auto categoryIt = _view.find("category");
+	auto categoryIt = _view.find("project_group");
 	if (categoryIt != _view.end()) {
 		if (categoryIt->type() == bsoncxx::v_noabi::type::k_utf8) {
-			m_category = std::string(categoryIt->get_utf8().value.data());
+			m_projectGroup = std::string(categoryIt->get_utf8().value.data());
 		}
 		else {
 			OT_LOG_E("Invalid category format");

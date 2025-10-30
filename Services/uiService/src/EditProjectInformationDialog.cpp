@@ -89,11 +89,11 @@ EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _c
 	mainLayout->addLayout(dataLayout);
 	dataLayout->setColumnStretch(1, 1);
 	int r = 0;
-	dataLayout->addWidget(new Label("Category:", this), r, 0);
-	m_category = new ComboBox(this);
-	m_category->setEditable(true);
-	m_category->setValidator(new BasicValidator(BasicValidator::NameRanges, BasicValidator::NameRanges, BasicValidator::NameRanges));
-	dataLayout->addWidget(m_category, r++, 1);
+	dataLayout->addWidget(new Label("Group:", this), r, 0);
+	m_projectGroup = new ComboBox(this);
+	m_projectGroup->setEditable(true);
+	m_projectGroup->setValidator(new BasicValidator(BasicValidator::NameRanges, BasicValidator::NameRanges, BasicValidator::NameRanges));
+	dataLayout->addWidget(m_projectGroup, r++, 1);
 
 	dataLayout->addWidget(new Label("Tags:", this), r, 0);
 	m_tags = new PlainTextEdit(this);
@@ -371,24 +371,24 @@ void EditProjectInformationDialog::initializeData() {
 		m_tags->appendPlainText(QString::fromStdString(tag));
 	}
 
-	m_category->clear();
-	QStringList categories;
+	m_projectGroup->clear();
+	QStringList projectGroups;
 	std::list<ot::ProjectInformation> projects;
 	bool exceeded = false;
 	if (projectManager.findProjects("", 0, projects, exceeded)) {
 		for (const ot::ProjectInformation& proj : projects) {
-			const std::string& category = proj.getCategory();
-			if (!category.empty() && !categories.contains(QString::fromStdString(category))) {
-				categories.append(QString::fromStdString(category));
+			const std::string& category = proj.getProjectGroup();
+			if (!category.empty() && !projectGroups.contains(QString::fromStdString(category))) {
+				projectGroups.append(QString::fromStdString(category));
 			}
 		}
 	}
-	m_category->addItems(categories);
-	m_category->setCurrentText(QString::fromStdString(m_projectInformation.getCategory()));
+	m_projectGroup->addItems(projectGroups);
+	m_projectGroup->setCurrentText(QString::fromStdString(m_projectInformation.getProjectGroup()));
 }
 
 void EditProjectInformationDialog::updateInformationEntry() {
-	m_projectInformation.setCategory(ot::String::removePrefixSuffix(m_category->currentText().toStdString(), " \t\n\r"));
+	m_projectInformation.setProjectGroup(ot::String::removePrefixSuffix(m_projectGroup->currentText().toStdString(), " \t\n\r"));
 	
 	std::list<std::string> tags;
 	QString tagsText = m_tags->toPlainText();
