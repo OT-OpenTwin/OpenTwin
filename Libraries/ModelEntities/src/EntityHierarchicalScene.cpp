@@ -1,10 +1,5 @@
 // @otlicense
 
-//! @file EntityHierarchicalScene.cpp
-//! @author Alexander Kuester (alexk95)
-//! @date October 2025
-// ###########################################################################################################################################################################################################################################################################################################################
-
 #include "EntityHierarchicalScene.h"
 #include "OTGui/VisualisationTypes.h"
 #include "OTCommunication/ActionTypes.h"

@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   TableHandler.h
- * \brief  Central class for dealing with table views.
- * 
- * \author Wagner
- * \date   April 2023
- *********************************************************************/
 #pragma once
 #include <memory>
 #include <string>
@@ -15,6 +8,7 @@
 #include "EntityResultTableData.h"
 #include "TableExtractor.h"
 
+//! @brief Central class for dealing with table views.
 class TableHandler : public BusinessLogicHandler
 {
 public:

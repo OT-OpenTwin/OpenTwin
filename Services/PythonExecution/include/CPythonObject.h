@@ -1,17 +1,10 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   DecRefDecorator.h
- * \brief   General wrapper around a PyObject.
- *          This decrements the reference count on destruction.
- * 
- * \author Wagner
- * \date   May 2023
- *********************************************************************/
-
 #pragma once
 #include <Python.h>
 
+//! @brief General wrapper around a PyObject.
+//! This decrements the reference count on destruction.
 class CPythonObject{
 public:
     CPythonObject(PyObject* ref) : _ref{ ref } {}

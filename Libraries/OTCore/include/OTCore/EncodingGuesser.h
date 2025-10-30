@@ -1,13 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   EncodingGuesser.h
- * \brief  Detects the encoding style. The detection class can only find the next best match and does not guarantee the correct detection of the intended standard. 
- *			Thus, the detected standard should be propagated to the user, to allow a change.
- * 
- * \author Wagner
- * \date   August 2023
- *********************************************************************/
 #pragma once
 #include <vector>
 #include <string>
@@ -15,6 +7,8 @@
 
 namespace ot
 {
+	//! @brief Detects the encoding style. The detection class can only find the next best match and does not guarantee the correct detection of the intended standard. 
+	//! Thus, the detected standard should be propagated to the user, to allow a change.
 	class OT_CORE_API_EXPORT EncodingGuesser
 	{
 	public:

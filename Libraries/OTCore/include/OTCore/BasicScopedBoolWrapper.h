@@ -1,10 +1,5 @@
 // @otlicense
 
-//! @file BasicScopedBoolWrapper.h
-//! @author Alexander Kuester (alexk95)
-//! @date January 2025
-// ###########################################################################################################################################################################################################################################################################################################################
-
 #pragma once
 
 // OpenTwin header
@@ -30,7 +25,7 @@ namespace ot {
     //!     // myBool       = true;  -> boolWrap1()
     //! 
     //!     try {
-    //!         ot::BasicScopedBoolWrapper boolWrap2(myBool, false, true);
+    //!         ot::BasicScopedBoolWrapper boolWrap2(myBool, false);
     //! 
     //!         // myBool   = false; -> boolWrap2()
     //! 

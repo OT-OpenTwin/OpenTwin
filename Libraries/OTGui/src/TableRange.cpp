@@ -1,13 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   TableRange.cpp
- * \brief
- *
- * \author Wagner
- * \date   February 2023
- *********************************************************************/
-
 // OpenTwin header
 #include "OTGui/TableRange.h"
 

@@ -1,12 +1,5 @@
 // @otlicense
 
-/*********************************************************************
- * @file   MicroServiceInterfaceFITTDSolver.h
- * @brief  Interface between service API and solver functionality. Handles creation of entities created from solver results and settings ectrected from properties of ui entities.
- * 
- * @author Jan Wagner
- * @date   July 2022
- *********************************************************************/
 #pragma once
 #include "MicroServiceSolver.h"
 #include "EntityBase.h"
@@ -32,6 +25,7 @@
 #include <string>
 #include "PlotBuilder.h"
 
+//! @brief Interface between service API and solver functionality. Handles creation of entities created from solver results and settings ectrected from properties of ui entities.
 class MicroServiceInterfaceFITTDSolver : public MicroServiceSolver
 {
 public:

@@ -1,10 +1,5 @@
 // @otlicense
 
-//! @file GraphicsHBoxLayoutItem.cpp
-//! @author Alexander Kuester (alexk95)
-//! @date August 2023
-// ###########################################################################################################################################################################################################################################################################################################################
-
 // OpenTwin header
 #include "OTGui/GraphicsHBoxLayoutItemCfg.h"
 #include "OTWidgets/GraphicsHBoxLayoutItem.h"

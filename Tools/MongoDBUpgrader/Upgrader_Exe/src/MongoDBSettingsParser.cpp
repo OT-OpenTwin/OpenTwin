@@ -56,13 +56,7 @@ void MongoDBSettingsParser::extractDataFromConfig()
     }
     try
     {
-        /*Now we search for the relevant information.
-        net:
-            port : 27017
-            bindIp : 127.0.0.1
-        tls :
-            mode : requireTLS
-            certificateKeyFile : C : \Users\JWagner\OpenTwin_Cert\certificateKeyFile.pem*/
+        // Now we search for the relevant information.
         std::string line;
         size_t journalNumberOfIntentations(0), sysLogNumberOfIntentations(0);
         std::list<std::string> journalSectionBuffer;

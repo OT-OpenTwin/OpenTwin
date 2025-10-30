@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- *	dllmain.cpp
- *
- *  Created on: January 03, 2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
-
 #include <Windows.h>
 
 BOOL APIENTRY DllMain( HMODULE hModule,

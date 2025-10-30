@@ -1,10 +1,5 @@
 // @otlicense
 
-//! @file GraphicsActionHandler.cpp
-//! @author Alexander Kuester (alexk95)
-//! @date October 2025
-// ###########################################################################################################################################################################################################################################################################################################################
-
 // OpenTwin header
 #include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"

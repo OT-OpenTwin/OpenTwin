@@ -15,6 +15,9 @@
     <Filter Include="Source Files\DebugInformation">
       <UniqueIdentifier>{b81fd435-dd66-41a5-9fc5-2a4987fb7a0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{f42c491b-d59e-447b-a8d9-ba5e2acad9ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CommunicationTypes.cpp">
@@ -33,9 +36,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ActionDispatcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ActionDispatcherBase.cpp">
@@ -71,6 +71,9 @@
     <ClCompile Include="src\GDSDebugInfo.cpp">
       <Filter>Source Files\DebugInformation</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCommunication\ActionTypes.h">
@@ -98,9 +101,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCommunication\ActionHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCommunication\ActionDispatcherBase.h">
@@ -147,6 +147,9 @@
     </ClInclude>
     <ClInclude Include="include\OTCommunication\LSSDebugInfo.h">
       <Filter>Header Files\DebugInformation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
+      <Filter>ThirdParty</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

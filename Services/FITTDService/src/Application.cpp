@@ -1,13 +1,5 @@
 // @otlicense
 
-/*********************************************************************
- * @file   Application.cpp
- * @brief  Handles service representation in UI.
- * 
- * @author Jan Wagner
- * @date   August 2022
- *********************************************************************/
-
 // Service header
 #include "Application.h"
 #include "ModelNotifier.h"

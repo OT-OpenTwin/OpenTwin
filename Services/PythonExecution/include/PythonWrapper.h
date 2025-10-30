@@ -1,13 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   PythonWrapper.h
- * \brief  Wrapper around python code execution.
- * 
- * \author Wagner
- * \date   May 2023
- *********************************************************************/
-
 #pragma once
 #define PY_SSIZE_T_CLEAN // # 
 #include <Python.h>
@@ -21,6 +13,7 @@
 #include "CPythonObjectNew.h"
 #include "PythonException.h"
 
+//! @brief Wrapper around python code execution.
 class PythonWrapper {
 	friend class FixturePythonWrapper;
 public:

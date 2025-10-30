@@ -1,13 +1,5 @@
 // @otlicense
 
-/*
- * ipConverter.h
- *
- *  Created on: November 30, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
-
 #pragma once
 
 // OpenTwin header

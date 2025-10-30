@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   BusinessLogicHandler.h
- * \brief  Common methods for all central service handler classes.
- * 
- * \author Wagner
- * \date   April 2023
- *********************************************************************/
 #pragma once
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -16,7 +9,8 @@
 #include <vector>
 #include <list>
 
-class __declspec(dllexport) BusinessLogicHandler
+//! @brief Common methods for all central service handler classes.
+class OT_SERVICEFOUNDATION_API_EXPORT BusinessLogicHandler
 {
 	friend class FixtureBusinessLogicHandler;
 public:

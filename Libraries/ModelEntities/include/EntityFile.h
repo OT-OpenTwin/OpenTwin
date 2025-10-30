@@ -1,17 +1,11 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   EntityFile.h
- * \brief  Entity that holds a binary representation of a file. Any type of file should be supported
- * 
- * \author Wagner
- * \date   August 2023
- *********************************************************************/
 #pragma once
 #include "EntityBase.h"
 #include "EntityBinaryData.h"
 #include <memory>
 
+//! @brief Entity that holds a binary representation of a file. Any type of file should be supported.
 class OT_MODELENTITIES_API_EXPORT EntityFile: public EntityBase
 {
 public:

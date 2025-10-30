@@ -1,15 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   ParameterizedDataHandler.h
- * \brief  Holds the mechanisms to create the final entities holding the four entities that describe a parameterized data collection.
- *			Research metadata, measurementseries metadata, quantities and parameters.
- *			It is possible to create a new entity of each type, i.e. a new measurement series for instance. If an existed measurement series shall be extended, it needs
- *			to be selected from outside and added to the map in this handler.
- * 
- * \author Wagner
- * \date   February 2023
- *********************************************************************/
 #pragma once
 
 #include "BusinessLogicHandler.h"
@@ -31,6 +21,10 @@
 #include <set>
 #include "NewModelStateInfo.h"
 
+//! @brief Holds the mechanisms to create the final entities holding the four entities that describe a parameterized data collection.
+//! Research metadata, measurementseries metadata, quantities and parameters.
+//! It is possible to create a new entity of each type, i.e.a new measurement series for instance.
+//! If an existed measurement series shall be extended, it needs to be selected from outside and added to the map in this handler.
 class DataCategorizationHandler : public BusinessLogicHandler
 {
 public:

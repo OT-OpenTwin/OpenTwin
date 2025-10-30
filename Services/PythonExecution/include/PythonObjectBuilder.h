@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   PythonObjectBuilder.h
- * \brief  Builder to transfer typically used PyObjects to c++ types and vice versa.
- * 
- * \author Wagner
- * \date   July 2023
- *********************************************************************/
 #pragma once
 #include <Python.h>
 #include "CPythonObjectNew.h"
@@ -23,9 +16,8 @@
 #include <memory>
 #include <optional>
 
-/// <summary>
-/// PyObjects don't distingiush between float and double and int32 and int64. All floating point values are handled as double and all integer values are handled as int64
-/// </summary>
+//! @brief Builder to transfer typically used PyObjects to c++ types and vice versa.
+//! PyObjects don't distingiush between float and double and int32 and int64. All floating point values are handled as double and all integer values are handled as int64
 class PythonObjectBuilder
 {
 public:

@@ -1,10 +1,5 @@
 // @otlicense
 
-//! @file Helper.h
-//! @author Sebastian Urmann
-//! @date October 2025
-// #######################################################################################################################################################################################################################################################################################################
-
 #pragma once
 
 // OpenTwin header
@@ -15,6 +10,7 @@
 
 // std header
 #include <map>
+
 //! @brief Provides helper and utility functions shared between DataProcessingService and CircuitSimulatorService.
 class __declspec(dllexport) Helper {
 public:

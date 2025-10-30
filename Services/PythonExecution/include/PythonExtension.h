@@ -1,18 +1,12 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   PythonExtension.h
- * \brief  C Python Extension that hold functions for OpenTwin that can be called from a python script.
- * 
- * \author Wagner
- * \date   July 2023
- *********************************************************************/
 #pragma once
 
 #include <Python.h>
 
 #include <string>
 
+//! @brief C Python Extension that hold functions for OpenTwin that can be called from a python script.
 namespace PythonExtensions {
 
     static PyObject* OT_GetPropertyValue(PyObject* _self, PyObject* _args);

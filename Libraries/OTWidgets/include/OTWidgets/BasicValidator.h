@@ -7,7 +7,6 @@
 
 namespace ot {
 
-	//! @file BasicValidator.h
 	//! @brief Defines a validator for ASCII-based names.
 	//! This class provides a validator that ensures names contain only ASCII letters,
 	//! digits, spaces, or underscores. The first character must be a letter.

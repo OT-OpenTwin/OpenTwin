@@ -9,6 +9,7 @@
 #include "EntityInformation.h"
 #include "OTCore/ReturnValues.h"
 
+//! @brief This class deals with the workflow of loading python script entities, executing them and sending the results back to the service that requested the execution.
 class PythonAPI
 {
 	friend class FixturePythonAPI;

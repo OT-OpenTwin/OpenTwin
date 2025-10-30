@@ -1,13 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   PythonAPI.cpp
- * \brief  Layer that shall be used from the application.cpp. This class deals with the workflow of loading python script entities, executing them and 
- *			sending the results back to the service that requested the execution.
- * 
- * \author Wagner
- * \date   July 2023
- *********************************************************************/
 #include "PythonAPI.h"
 #include "Application.h"
 #include "EntityAPI.h"

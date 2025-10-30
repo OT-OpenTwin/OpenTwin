@@ -1,10 +1,5 @@
 // @otlicense
 
-//! @file GraphicsItemDesignerImageExportDialog.cpp
-//! @author Alexander Kuester (alexk95)
-//! @date June 2023
-// ###########################################################################################################################################################################################################################################################################################################################
-
 // OToolkit header
 #include "GraphicsItemDesigner.h"
 #include "GraphicsItemDesignerView.h"

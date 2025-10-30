@@ -1,12 +1,5 @@
 // @otlicense
 
-/*********************************************************************
- * @file   Signal.h
- * @brief  Container for properties of signal types. Frequencies are handled internally with the unit Herz.
- * 
- * @author Jan Wagner
- * @date   July 2022
- *********************************************************************/
 #pragma once
 #include <string>
 #include <map>
@@ -16,6 +9,7 @@
 
 enum signalType {sinusoidalGauss};
 
+//! @brief Container for properties of signal types. Frequencies are handled internally with the unit Herz.
 class Signal
 {
 public:

@@ -1,12 +1,5 @@
 // @otlicense
 
-/*
- * RandomNumberGenerator.h
- *
- *  Created on: January 17, 2022
- *      Author: Jan Wagner
- */
-
 #ifndef RANDOMNUMBERGENERATOR_H
 #define RANDOMNUMBERGENERATOR_H
 

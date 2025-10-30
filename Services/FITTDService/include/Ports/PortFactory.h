@@ -1,16 +1,11 @@
 // @otlicense
 
 #pragma once
-/*********************************************************************
- * @file   PortFactory.h
- * @brief  Creates a port depending on a portsettings object
- * 
- * @author Jan Wagner
- * @date   August 2022
- *********************************************************************/
+
 #include "Port.h"
 #include "SolverSettings/PortSettings.h"
 
+//! @brief Creates a port depending on a portsettings object
 class PortFactory
 {
 public:

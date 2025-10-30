@@ -1,14 +1,6 @@
 // @otlicense
 
-/*
- * IpConverter.cpp
- *
- *  Created on: November 30, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
-
- // OpenTwin header
+// OpenTwin header
 #include "OTCommunication/IpConverter.h"		// Corresponding header
 
 std::string ot::IpConverter::filterIpFromSender(

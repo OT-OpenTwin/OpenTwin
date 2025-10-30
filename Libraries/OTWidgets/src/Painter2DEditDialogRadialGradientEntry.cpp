@@ -1,10 +1,5 @@
 // @otlicense
 
-//! @file Painter2DEditDialogRadialGradientEntry.h
-//! @author Alexander Kuester (alexk95)
-//! @date March 2024
-// ###########################################################################################################################################################################################################################################################################################################################
-
 // OpenTwin header
 #include "OTGui/RadialGradientPainter2D.h"
 #include "OTWidgets/CheckBox.h"

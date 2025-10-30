@@ -1,11 +1,5 @@
 // @otlicense
 
-//! @file ActionHandleConnector.h
-//! 
-//! @author Alexander Kuester (alexk95)
-//! @date March 2024
-// ###########################################################################################################################################################################################################################################################################################################################
-
 // OpenTwin header
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ActionDispatcherBase.h"

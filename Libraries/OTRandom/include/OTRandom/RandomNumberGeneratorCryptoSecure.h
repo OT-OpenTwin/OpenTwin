@@ -1,12 +1,5 @@
 // @otlicense
 
-/*
- * RandomNumberGeneratorCryptoSecure.h
- *
- *  Created on: January 17, 2022
- *      Author: Jan Wagner
- */
-
 #ifndef RANDOMNUMBERGENERATORCRYPTOSECURE_H
 #define RANDOMNUMBERGENERATORCRYPTOSECURE_H
 

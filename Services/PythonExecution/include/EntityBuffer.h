@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   EntityBuffer.h
- * \brief  Meyer' singleton that buffers all entities and their properties that were used so far.
- * 
- * \author Wagner
- * \date   July 2023
- *********************************************************************/
 #pragma once
 #include "CPythonObjectNew.h"
 #include "EntityBase.h"
@@ -14,6 +7,7 @@
 #include <memory>
 #include "IVisualisationTable.h"
 
+//! @brief Singleton that buffers all entities and their properties that were used so far.
 class EntityBuffer
 {
 public:

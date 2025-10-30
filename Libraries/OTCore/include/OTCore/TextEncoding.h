@@ -1,13 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   TextEncoding.h
- * \brief  MongoDB uses only UTF-8 and some errors occured if the characters with different encoding standard were stored.
- *			This class holds all types of text encodings that can be detected with the EncodingGuesser class.
- * 
- * \author Wagner
- * \date   August 2023
- *********************************************************************/
 #pragma once
 #pragma warning(disable:4251)
 #include <string>
@@ -17,6 +9,8 @@
 
 namespace ot
 {
+	//! @brief This class holds all types of text encodings that can be detected with the EncodingGuesser class.
+	//! MongoDB uses only UTF-8 and some errors occured if the characters with different encoding standard were stored.
 	class OT_CORE_API_EXPORT TextEncoding
 	{
 	public:

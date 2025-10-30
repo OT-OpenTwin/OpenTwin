@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   PythonLoadedModules.h
- * \brief  Meyer's singleton that holds a map of all modules that were loaded in the python interpreter, sorted by the name of the corresponding script name.
- * 
- * \author Wagner
- * \date   July 2023
- *********************************************************************/
 #pragma once
 #include <string>
 #include <set>
@@ -16,6 +9,7 @@
 #include "EntityInformation.h"
 #include "OTCore/LogDispatcher.h"
 
+//! @brief Singleton that holds a map of all modules that were loaded in the python interpreter, sorted by the name of the corresponding script name.
 class PythonLoadedModules
 {
 public:

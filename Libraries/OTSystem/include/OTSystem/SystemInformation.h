@@ -1,6 +1,5 @@
 // @otlicense
 
-
 #pragma once
 
 #include "OTSystem/SystemAPIExport.h"

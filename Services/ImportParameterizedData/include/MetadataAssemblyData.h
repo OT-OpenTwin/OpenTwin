@@ -1,16 +1,10 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   MetadataAssemblyData.h
- * \brief  Container for groups of TableSelectionEntities that describe the same metadata categorization.
- * 
- * \author Wagner
- * \date   March 2023
- *********************************************************************/
 #pragma once
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityTableSelectedRanges.h"
 
+//! @brief Container for groups of TableSelectionEntities that describe the same metadata categorization.
 struct MetadataAssemblyData
 {
 public:

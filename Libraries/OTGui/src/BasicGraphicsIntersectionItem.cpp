@@ -1,11 +1,5 @@
 // @otlicense
 
-//! @file BasicGraphicsIntersectionItem.cpp
-//! 
-//! @author Alexander Kuester (alexk95)
-//! @date August 2024
-// ###########################################################################################################################################################################################################################################################################################################################
-
 // OpenTwin header
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/BasicGraphicsIntersectionItem.h"

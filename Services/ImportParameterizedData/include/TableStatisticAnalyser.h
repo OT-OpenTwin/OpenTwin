@@ -1,15 +1,9 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   TableStatisticAnalyser.h
- * \brief  Takes care of calculating the caracteristics of a table behind a TableExtractor object. 
- * 
- * \author Jan Wagner
- * \date   January 2023
- *********************************************************************/
 #pragma once
 #include "TableExtractor.h"
 
+//! @brief Takes care of calculating the caracteristics of a table behind a TableExtractor object.
 class TableStatisticAnalyser
 {
 private:

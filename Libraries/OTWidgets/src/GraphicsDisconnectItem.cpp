@@ -1,10 +1,5 @@
 // @otlicense
 
-//! @file GraphicsDisconnectItem.cpp
-//! @author Alexander Kuester (alexk95)
-//! @date October 2025
-// ###########################################################################################################################################################################################################################################################################################################################
-
 // OpenTwin Widgets header
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/GraphicsDisconnectItem.h"

@@ -1,15 +1,5 @@
 // @otlicense
 
-//! @file LogDispatcher.h
-//! @brief OpenTwin Logging system.
-//! 
-//! This file contains the Log functionallity, 
-//! that any OpenTwin related class should use to generate their log messages.
-//! 
-//! @author Alexander Kuester (alexk95)
-//! @date January 2021
-// ###########################################################################################################################################################################################################################################################################################################################
-
 #pragma once
 
 // OpenTwin header

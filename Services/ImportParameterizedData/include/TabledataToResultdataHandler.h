@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   DataCollectionCreationHandler.h
- * \brief  Handler for storring data in the result collection.
- * 
- * \author Wagner
- * \date   June 2023
- *********************************************************************/
 #pragma once
 #include <map>
 #include <string>
@@ -21,6 +14,7 @@
 #include "DatasetDescription.h"
 #include "IVisualisationTable.h"
 
+//! @brief Handler for storring data in the result collection.
 class TabledataToResultdataHandler : public BusinessLogicHandler
 {
 	friend class FixtureTabledataToResultdataHandler;

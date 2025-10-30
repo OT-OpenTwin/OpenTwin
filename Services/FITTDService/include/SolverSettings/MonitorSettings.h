@@ -1,13 +1,7 @@
 // @otlicense
 
 #pragma once
-/*********************************************************************
- * @file   MonitorSettings.h
- * @brief  
- * 
- * @author Jan Wagner
- * @date   July 2022
- *********************************************************************/
+
 #include <string>
 #include <map>
 

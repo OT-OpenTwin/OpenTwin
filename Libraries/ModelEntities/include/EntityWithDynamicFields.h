@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   EntityWithDynamicFields.h
- * \brief  Abstract class that allows assembling fields and subdocuments of the entity during runtime.
- *
- * \author Wagner
- * \date   April 2023
- *********************************************************************/
 #pragma once
 #include "EntityContainer.h"
 #include "GenericBsonDocument.h"
@@ -18,6 +11,7 @@
 #include <exception>
 #include "OTCore/Variable.h"
 
+//! @brief Abstract class that allows assembling fields and subdocuments of the entity during runtime.
 class __declspec(dllexport) EntityWithDynamicFields : public EntityContainer
 {
 	friend class FixtureEntityWithDynamicFields;

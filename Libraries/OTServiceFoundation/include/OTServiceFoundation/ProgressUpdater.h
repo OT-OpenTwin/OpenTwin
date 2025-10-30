@@ -1,12 +1,13 @@
 // @otlicense
 
 #pragma once
-#include "OTServiceFoundation/UiComponent.h"
 #include "OTCore/DefensiveProgramming.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/FoundationAPIExport.h"
 #include <chrono>
 
 //! @brief RAII wrapper for the processbar, including  an API to trigger an update with set frequency.
-class __declspec(dllexport) ProgressUpdater
+class OT_SERVICEFOUNDATION_API_EXPORT ProgressUpdater
 {
 	friend class FixtureProgressUpdater;
 public:

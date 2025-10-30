@@ -2,7 +2,7 @@
 
 #pragma once
 
-// openTwin header
+// OpenTwin header
 #include "OTGui/GuiTypes.h"
 
 // uiCore header

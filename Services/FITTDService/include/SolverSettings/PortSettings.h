@@ -1,13 +1,7 @@
 // @otlicense
 
-/*********************************************************************
- * @file   PortSettings.h
- * @brief  Contains information about a single port. Mirrors the settings that were selected for the corresponding entity in the UI.
- * 
- * @author Jan Wagner
- * @date   July 2022
- *********************************************************************/
 #pragma once
+
 #include <map>
 #include "EntitySolverPort.h"
 
@@ -16,6 +10,7 @@
 #include "Ports/Signal.h"
 #include "SystemDependencies/SystemDependentDefines.h"
 
+//! @brief Contains information about a single port. Mirrors the settings that were selected for the corresponding entity in the UI.
 class PortSettings
 {
 public:

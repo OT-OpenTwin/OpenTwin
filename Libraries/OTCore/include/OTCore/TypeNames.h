@@ -1,14 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   TypeNames.h
- * \brief  Some type names are not system independent, hence the need to create a standardised way for this project. 
- * This class provides the names themselve as a central point of access. * 
- * 
- * \author Wagner
- * \date   February 2023
- *********************************************************************/
-
 #pragma once
 
 // std header

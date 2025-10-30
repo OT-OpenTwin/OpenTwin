@@ -1,13 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   CrossCollectionAccess.h
- * \brief  Interface to access a different project and get its metadata regarding the result collection.
- * 
- * \author Wagner
- * \date   September 2023
- *********************************************************************/
-
 #pragma once
 #include <memory>
 #include <list>
@@ -17,6 +9,7 @@
 #include "EntityMetadataCampaign.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
+//! @brief Interface to access a different project and get its metadata regarding the result collection.
 class __declspec(dllexport) CrossCollectionAccess
 {
 public:

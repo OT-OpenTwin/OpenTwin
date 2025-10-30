@@ -1,18 +1,10 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   CPythonObjectBorrowed.h
- * \brief   Wrapper around a PyObject* that is a borrowed reference.
- *          This increments the reference count on construction and
- *          decrements the reference count on destruction.
- * 
- * \author Wagner
- * \date   May 2023
- *********************************************************************/
-
 #pragma once
 #include "CPythonObject.h"
 
+//! @brief Wrapper around a PyObject* that is a borrowed reference.
+//! This increments the reference count on construction and decrements the reference count on destruction.
 class CPythonObjectBorrowed : public CPythonObject
 {
 public:

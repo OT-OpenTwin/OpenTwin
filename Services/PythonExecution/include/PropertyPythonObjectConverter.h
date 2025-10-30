@@ -1,16 +1,11 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   PropertyPythonObjectConverter.h
- * \brief  Class that converts a property value into a PythonObject and viceversa. 
- * 
- * \author Wagner
- * \date   July 2023
- *********************************************************************/
 #pragma once
+
 #include "EntityPropertiesItems.h"
 #include "CPythonObjectNew.h"
 
+//! @brief Class that converts a property value into a PythonObject and viceversa.
 class PropertyPythonObjectConverter
 {
 public:

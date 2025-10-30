@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   PythonServiceInterface.h
- * \brief  Class that serves as interface to the PythonExecutionService. Here a execution order can be assambled and send out to the pythonservice. 
- * 
- * \author Wagner
- * \date   August 2023
- *********************************************************************/
 #pragma once
 #include <string>
 #include <tuple>
@@ -21,6 +14,7 @@
 
 namespace ot
 {
+	//! @brief Class that serves as interface to the PythonExecutionService. Here a execution order can be assambled and send out to the pythonservice.
 	class OT_SERVICEFOUNDATION_API_EXPORT PythonServiceInterface
 	{
 	public:

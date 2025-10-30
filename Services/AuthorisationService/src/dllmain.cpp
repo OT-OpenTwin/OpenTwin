@@ -1,9 +1,5 @@
 // @otlicense
 
-/*
- * dllmain.cpp
- */
-
 // C++ header
 #include <Windows.h>
 

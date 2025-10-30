@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   FileToTableExtractorFactory.h
- * \brief  A Meyer's singleton which the FileToTableExtractorRegistrar class uses to register a new file eding. Registered classes can be created via the Create function.
- * 
- * \author Wagner
- * \date   April 2023
- *********************************************************************/
 #pragma once
 #include <map>
 #include <functional>
@@ -15,6 +8,7 @@
 #include "TableExtractor.h"
 #include <mutex>
 
+//! @brief Singleton which the FileToTableExtractorRegistrar class uses to register a new file eding. Registered classes can be created via the Create function.
 class FileToTableExtractorFactory
 {
 public:

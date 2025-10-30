@@ -1,16 +1,10 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   TableExtractorCSV.h
- * \brief  Concrete Importer which interpretes a csv file.
- * 
- * \author Wagner
- * \date   February 2023
- *********************************************************************/
 #include <sstream>
 #include "TableExtractor.h"
 #include "EntityFileCSV.h"
 
+//! @brief Concrete Importer which interpretes a csv file.
 class TableExtractorCSV : public TableExtractor
 {
 public:

@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   VariableType.h
- * \brief  Container for the usual data types. !ATTENTION! Currently it is required to sort a list of variables before calling unique. 
- * 
- * \author Wagner
- * \date   July 2023
- *********************************************************************/
 #pragma once
 #include <variant>
 #include <stdint.h>
@@ -120,7 +113,8 @@ namespace ot
 		char* _ptr = nullptr;
 	};
 
-
+	//! @brief Container for the usual data types.
+	//! @note Currently it is required to sort a list of variables before calling unique.
 	class OT_CORE_API_EXPORT Variable
 	{
 	public:

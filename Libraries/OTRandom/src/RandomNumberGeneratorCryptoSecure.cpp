@@ -1,12 +1,5 @@
 // @otlicense
 
-/*
- * RandomNumberGeneratorCryptoSecure.h
- *
- *  Created on: January 17, 2022
- *      Author: Jan Wagner
- */
-
 //OpenTwin header
 #include "OTSystem/ArchitectureInfo.h"
 #include "OTRandom/RandomNumberGeneratorCryptoSecure.h"

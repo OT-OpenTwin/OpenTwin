@@ -1,12 +1,5 @@
 // @otlicense
 
-/*****************************************************************//**
- * \file   BusinessLogicHandler.h
- * \brief  Common methods for all central handler classes.
- * 
- * \author Wagner
- * \date   April 2023
- *********************************************************************/
 #pragma once
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -14,6 +7,7 @@
 #include <string>
 #include <vector>
 
+//! @brief Common methods for all central handler classes.
 class BusinessLogicHandler
 {
 public:

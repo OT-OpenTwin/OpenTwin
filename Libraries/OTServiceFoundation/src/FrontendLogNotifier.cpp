@@ -1,10 +1,5 @@
 // @otlicense
 
-//! @file ErrorWarningLogFrontendNotifier.cpp
-//! @author Alexander Kuester (alexk95)
-//! @date November 2024
-// ###########################################################################################################################################################################################################################################################################################################################
-
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
