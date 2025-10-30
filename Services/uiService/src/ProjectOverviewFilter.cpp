@@ -41,7 +41,7 @@ ot::ProjectOverviewFilter::ProjectOverviewFilter(ProjectOverviewWidget* _overvie
 	connect(confirmButton, &PushButton::clicked, this, &ProjectOverviewFilter::slotConfirm);
 	buttonLayout->addWidget(confirmButton);
 	
-	PushButton* cancelButton = new PushButton("Cancel", this);
+	PushButton* cancelButton = new PushButton("Reset", this);
 	connect(cancelButton, &PushButton::clicked, this, &ProjectOverviewFilter::slotCancel);
 	buttonLayout->addWidget(cancelButton);
 }
