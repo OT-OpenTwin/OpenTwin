@@ -1,5 +1,9 @@
 // @otLicense
-// @otLicense-end
+
+//! @file GaussianExcitation.cpp
+//! @author Alexandros McCray (alexm-dev)
+//! @date October 2025
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #include "Excitation/GaussianExcitation.h"
 #include "Excitation/ExcitationProperties.h"

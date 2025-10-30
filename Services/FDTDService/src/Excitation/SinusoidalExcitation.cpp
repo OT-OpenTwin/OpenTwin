@@ -1,5 +1,9 @@
 // @otLicense
-// @otLicense-end
+
+//! @file SinusoidalExcitation.cpp
+//! @author Alexandros McCray (alexm-dev)
+//! @date October 2025
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #include "Excitation/SinusoidalExcitation.h"
 #include "Excitation/ExcitationProperties.h"
