@@ -54,7 +54,7 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	m_tree->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 	m_tree->setSelectionMode(QAbstractItemView::SingleSelection);
 
-	m_tree->setHeaderLabels(QStringList() << " " << "Type" << "Name" << "Tags" << "Owner" << "Access" << "Last Modified");
+	m_tree->setHeaderLabels(QStringList() << " " << "Group" << "Type" << "Name" << "Tags" << "Owner" << "Access" << "Last Modified");
 	m_tree->header()->setStretchLastSection(false);
 	m_tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_tree->header()->setSectionResizeMode(ProjectOverviewHeader::ColumnIndex::Name, QHeaderView::Stretch);

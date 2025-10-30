@@ -44,7 +44,8 @@ namespace ot {
 		void setSelectedFilters(const QStringList& _filters) { m_selectedFilters = _filters; };
 		const QStringList& getSelectedFilters() const { return m_selectedFilters; };
 
-		static QString getEmptyGroupFilterName() { return "< No Groups >"; };
+		static QString getEmptyProjectGroupFilterName() { return "< No Group >"; };
+		static QString getEmptyUserGroupFilterName() { return "< No Groups >"; };
 		static QString getEmptyTagsFilterName() { return "< No Tags >"; };
 
 	private:

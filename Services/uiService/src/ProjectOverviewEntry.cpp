@@ -30,6 +30,7 @@ ot::ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projec
 	QDateTime modifiedTime = QDateTime::fromMSecsSinceEpoch(m_projectInfo.getLastAccessTime());
 
 	setCheckState(ProjectOverviewHeader::Checked, Qt::Unchecked);
+	setText(ProjectOverviewHeader::Group, QString::fromStdString(m_projectInfo.getProjectGroup()));
 	setIcon(ProjectOverviewHeader::Type, ot::IconManager::getIcon("ProjectTemplates/" + QString::fromStdString(m_projectInfo.getProjectType()) + ".png"));
 	setText(ProjectOverviewHeader::Name, QString::fromStdString(m_projectInfo.getProjectName()));
 	setText(ProjectOverviewHeader::Owner, QString::fromStdString(m_projectInfo.getUserName()));
@@ -76,6 +77,15 @@ void ot::ProjectOverviewEntry::applyFilter(const ProjectOverviewFilterData& _fil
 	}
 
 	switch (_filter.getLogicalIndex()) {
+	case ProjectOverviewHeader::Group:
+		if (m_projectInfo.getProjectGroup().empty()) {
+			setHidden(!_filter.getSelectedFilters().contains(ProjectOverviewFilterData::getEmptyProjectGroupFilterName()));
+		}
+		else {
+			setHidden(!_filter.getSelectedFilters().contains(QString::fromStdString(m_projectInfo.getProjectGroup())));
+		}
+		break;
+
 	case ProjectOverviewHeader::Type:
 		setHidden(!_filter.getSelectedFilters().contains(QString::fromStdString(m_projectInfo.getProjectType())));
 		break;
@@ -112,7 +122,7 @@ void ot::ProjectOverviewEntry::applyFilter(const ProjectOverviewFilterData& _fil
 	{
 		bool found = false;
 		if (m_projectInfo.getUserGroups().empty()) {
-			if (_filter.getSelectedFilters().contains(ProjectOverviewFilterData::getEmptyGroupFilterName())) {
+			if (_filter.getSelectedFilters().contains(ProjectOverviewFilterData::getEmptyUserGroupFilterName())) {
 				found = true;
 			}
 		}

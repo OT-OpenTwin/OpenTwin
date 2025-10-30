@@ -221,11 +221,27 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
 	QStringList options;
 	const std::list<ProjectInformation> allProjects = m_overview->getAllProjects();
     
-    bool hasEmptyGroups = false;
+    bool hasEmptyAccess = false;
     bool hasEmptyTags = false;
+	bool hasEmptyGroup = false;
 
 	// Fill options based on column
     switch (_logicalIndex) {
+	case ColumnIndex::Group:
+        filter.setTitle("Project Group");
+        for (const ProjectInformation& proj : allProjects) {
+            const QString group = QString::fromStdString(proj.getProjectGroup());
+            if (group.isEmpty()) {
+                hasEmptyGroup = true;
+			}
+            else {
+                if (!options.contains(group)) {
+                    options.append(group);
+                }
+            }
+        }
+        break;
+
     case ColumnIndex::Type:
         filter.setTitle("Project Type");
         for (const ProjectInformation& proj : allProjects) {
@@ -275,7 +291,7 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
         filter.setTitle("Shared Groups");
         for (const ProjectInformation& proj : allProjects) {
             if (proj.getUserGroups().empty()) {
-				hasEmptyGroups = true;
+                hasEmptyAccess = true;
             }
             for (const std::string& group : proj.getUserGroups()) {
                 const QString groupName = QString::fromStdString(group);
@@ -293,11 +309,14 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
 
 	options.sort();
 
-    if (hasEmptyGroups) {
-        options.append(ProjectOverviewFilterData::getEmptyGroupFilterName());
+    if (hasEmptyAccess) {
+        options.append(ProjectOverviewFilterData::getEmptyUserGroupFilterName());
     }
     if (hasEmptyTags) {
         options.append(ProjectOverviewFilterData::getEmptyTagsFilterName());
+	}
+    if (hasEmptyGroup) {
+        options.append(ProjectOverviewFilterData::getEmptyProjectGroupFilterName());
 	}
 
 	filter.setOptions(options);

@@ -38,6 +38,7 @@ namespace ot {
 	public:
 		enum ColumnIndex {
 			Checked,
+			Group,
 			Type,
 			Name,
 			Tags,
