@@ -48,5 +48,5 @@ By combining established open-source technologies within a unified architecture,
 
 ## License
 
-OpenTwin is licensed under the **MIT License**.  
+OpenTwin is licensed under the **Apache Version 2.0 License**.  Separate licenses apply individually to the third party components.
 See the [LICENSE.md](./LICENSE.md) file for details.
