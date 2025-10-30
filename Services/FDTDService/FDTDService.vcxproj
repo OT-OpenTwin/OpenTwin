@@ -194,7 +194,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\ThirdParty\tinyxml2\tinyxml2-11.0.0\tinyxml2.cpp" />
+    <ClCompile Include="$(OPENTWIN_THIRDPARTY_ROOT)\tinyxml2\tinyxml2-11.0.0\tinyxml2.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\CSXMeshGrid.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
