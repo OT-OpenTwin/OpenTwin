@@ -2,7 +2,7 @@
     "Keyword.Start": "// @otlicense",
     "Keyword.End": "// @otlicense-end",
     "HeaderLinePrefix": "// ",
-    "LicenseFile": "%OPENTWIN_DEV_ROOT%/LICENSE.md",
+    "LicenseFile": "%OPENTWIN_DEV_ROOT%/Tools/FileHeaderUpdater/OpenTwinHeaderLicenseText.txt",
     "WarnMissingHeader": false,
     "WarnInvalidChars": false,
     "AddFileName": true,
