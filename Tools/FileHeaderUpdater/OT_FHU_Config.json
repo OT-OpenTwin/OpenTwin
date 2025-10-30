@@ -1,9 +1,10 @@
 {
     "Keyword.Start": "// @otlicense",
+    "Keyword.Ignore": "// @otlicense-ignore",
     "Keyword.End": "// @otlicense-end",
     "HeaderLinePrefix": "// ",
     "LicenseFile": "%OPENTWIN_DEV_ROOT%/Tools/FileHeaderUpdater/OpenTwinHeaderLicenseText.txt",
-    "WarnMissingHeader": false,
+    "WarnMissingHeader": true,
     "WarnInvalidChars": false,
     "AddFileName": true,
     "AddLicenseTitle": true,

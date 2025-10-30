@@ -50,6 +50,7 @@ private:
 		bool addLicenseTitle = false;
 		std::string keywordStart;
 		std::string keywordStartLower;
+		std::string keywordIgnoreLower;
 		std::string keywordEnd;
 		std::string headerLinePrefix;
 		std::list<std::string> licenseLines;
@@ -68,6 +69,7 @@ private:
 		size_t filesWithMissingLicense = 0;
 		size_t filesWithInvalidChars = 0;
 		size_t filesEmpty = 0;
+		size_t filesIgnored = 0;
 		size_t filesUpToDate = 0;
 		size_t errors = 0;
 		size_t warnings = 0;

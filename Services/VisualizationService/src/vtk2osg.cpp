@@ -1,3 +1,4 @@
+// @otlicense-ignore
 /*
  * Copyright (C) 2002-2003 Michael Gronager, UNI-C
  *

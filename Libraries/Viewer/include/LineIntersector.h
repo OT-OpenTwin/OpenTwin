@@ -1,3 +1,5 @@
+// @otlicense-ignore
+
 /*!
 * \brief OSG-based line intersector class.
 * \details This file is a part of osgIntersectors example program. See more details:

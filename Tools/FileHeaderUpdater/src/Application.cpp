@@ -139,10 +139,16 @@ void Application::scanFile(const std::string& _filePath) {
 		return;
 	}
 
-	std::transform(line.begin(), line.end(), line.begin(), [](unsigned char c) { return std::tolower(c); });
+	std::string lineLower = line;
+	std::transform(lineLower.begin(), lineLower.end(), lineLower.begin(), [](unsigned char c) { return std::tolower(c); });
 
 	// Check for file header
-	if (line != m_config.keywordStart) {
+	if (lineLower == m_config.keywordIgnoreLower) {
+		log("File ignored: \"" + _filePath + "\"");
+		fileStream.close();
+		return;
+	}
+	else if (lineLower != m_config.keywordStart) {
 		if (m_config.warnMissingHeader) {
 			log("File missing license header: \"" + _filePath + "\"");
 		}
@@ -505,6 +511,17 @@ Application::Config Application::loadConfigFile(const std::string& _fileName) {
 	}
 	else {
 		logE("Invalid config file format: Missing or invalid \"Keyword.End\" string");
+		return cfg;
+	}
+
+	// Read keyword ignore
+	if (doc.HasMember("Keyword.Ignore") && doc["Keyword.Ignore"].IsString()) {
+		cfg.keywordIgnoreLower = doc["Keyword.Ignore"].GetString();
+		std::transform(cfg.keywordIgnoreLower.begin(), cfg.keywordIgnoreLower.end(), cfg.keywordIgnoreLower.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+	}
+	else {
+		logE("Invalid config file format: Missing or invalid \"Keyword.Ignore\" string");
 		return cfg;
 	}
 

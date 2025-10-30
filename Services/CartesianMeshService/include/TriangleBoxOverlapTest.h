@@ -1,10 +1,12 @@
+// @otlicense-ignore
+
 #pragma once
 
 /********************************************************/
 
 /* AABB-triangle overlap test code                      */
 
-/* by Tomas Akenine-Möller                              */
+/* by Tomas Akenine-Mï¿½ller                              */
 
 /* Function: int triBoxOverlap(float boxcenter[3],      */
 
@@ -27,7 +29,7 @@
 /********************************************************/
 
 /*
-Copyright 2020 Tomas Akenine-Möller
+Copyright 2020 Tomas Akenine-Mï¿½ller
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation

@@ -1,7 +1,6 @@
+// @otlicense-ignore
+
 /*
-
-This class is a modified version of the QwtPointMapper and therefore uses the following license:
-
                              Qwt License
                            Version 1.0, January 1, 2003
 
