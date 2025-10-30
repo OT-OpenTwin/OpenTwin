@@ -19,8 +19,8 @@
     <Filter Include="Source Files\Excitations">
       <UniqueIdentifier>{6bfc408c-5297-482b-9f7d-3a67f5a38e1f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\tinyxml2">
-      <UniqueIdentifier>{2bf53b2b-54ba-4f33-8c38-86b1680df57a}</UniqueIdentifier>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{73d1a39b-ef31-4ddc-a6b9-5359dbd704cd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,9 +45,6 @@
     <ClCompile Include="src\FDTDLauncher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\tinyxml2.cpp">
-      <Filter>Source Files\tinyxml2</Filter>
-    </ClCompile>
     <ClCompile Include="src\FDTDConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -62,6 +59,9 @@
     </ClCompile>
     <ClCompile Include="src\Excitation\SinusoidalExcitation.cpp">
       <Filter>Source Files\Excitations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ThirdParty\tinyxml2\tinyxml2-11.0.0\tinyxml2.cpp">
+      <Filter>ThirdParty</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
