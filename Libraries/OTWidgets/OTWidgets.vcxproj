@@ -71,6 +71,7 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="src\ExpanderWidget.cpp" />
+    <ClCompile Include="src\FlowLayout.cpp" />
     <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp" />
     <ClCompile Include="src\GraphicsDisconnectItem.cpp" />
     <ClCompile Include="src\GraphicsPickerManager.cpp" />
@@ -266,6 +267,7 @@
     <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h" />
     <QtMoc Include="include\OTWidgets\ExpanderWidget.h" />
     <ClInclude Include="include\OTWidgets\CustomValidator.h" />
+    <ClInclude Include="include\OTWidgets\FlowLayout.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsDisconnectItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerManager.h" />

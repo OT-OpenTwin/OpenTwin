@@ -583,6 +583,9 @@
     <ClCompile Include="src\CustomValidator.cpp">
       <Filter>src\Syntax</Filter>
     </ClCompile>
+    <ClCompile Include="src\FlowLayout.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1096,6 +1099,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\CustomValidator.h">
       <Filter>include\Syntax</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\FlowLayout.h">
+      <Filter>include\Widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
