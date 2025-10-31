@@ -52,7 +52,7 @@ extern "C"{
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
 	{
-		std::string response = ServiceBase::GetInstance().performAction(_json, _senderIP);
+		std::string response = ServiceBase::instance().performAction(_json, _senderIP);
 
 		// Copy the return value. The memory of this value will be deallocated in the deallocateData function
 		char * retVal = new char[response.length() + 1];
@@ -62,7 +62,7 @@ extern "C"{
 
 	_declspec(dllexport) const char *performActionOneWayTLS(const char * _json, const char * _senderIP)
 	{
-		std::string response = ServiceBase::GetInstance().performActionOneWayTLS(_json, _senderIP);
+		std::string response = ServiceBase::instance().performActionOneWayTLS(_json, _senderIP);
 
 		// Copy the return value. The memory of this value will be deallocated in the deallocateData function
 		char * retVal = new char[response.length() + 1];
@@ -73,7 +73,7 @@ extern "C"{
 	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP)
 	{
 		// We are not queueing any messages here -> immediate processing
-		std::string response = ServiceBase::GetInstance().performAction(_json, _senderIP);
+		std::string response = ServiceBase::instance().performAction(_json, _senderIP);
 
 		// Copy the return value. The memory of this value will be deallocated in the deallocateData function
 		char * retVal = new char[response.length() + 1];
@@ -83,7 +83,7 @@ extern "C"{
 
 	_declspec(dllexport) const char *getServiceURL(void)
 	{
-		return ServiceBase::GetInstance().getServiceURL();
+		return ServiceBase::instance().getServiceURL();
 	}
 
 	_declspec(dllexport) void deallocateData(const char * _data)
@@ -108,6 +108,6 @@ extern "C"{
 #else
 	ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_AuthorisationService, loggerServiceURL, false);
 #endif
-		return ServiceBase::GetInstance().initialize(_ownIP, _databaseIP, _databasePWD);
+		return ServiceBase::instance().initialize(_ownIP, _databaseIP, _databasePWD);
 	}
 }

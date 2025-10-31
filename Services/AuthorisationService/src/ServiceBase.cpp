@@ -39,17 +39,17 @@
 
 int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const char * _databasePWD)
 {
-	serviceURL  = _ownIP;
-	databaseURL = _databaseIP;
-	if (databaseURL.find("tls@") == 0)
+	m_serviceURL  = _ownIP;
+	m_databaseURL = _databaseIP;
+	if (m_databaseURL.find("tls@") == 0)
 	{
-		databaseURL = databaseURL.substr(4);
+		m_databaseURL = m_databaseURL.substr(4);
 	}
-	databasePWD = _databasePWD;
+	m_databasePWD = _databasePWD;
 
 	OT_LOG_I("Starting Authorisation Service");
-	OT_LOG_D("Service address : " + serviceURL);
-	OT_LOG_D("Database address: " + databaseURL);
+	OT_LOG_D("Service address : " + m_serviceURL);
+	OT_LOG_D("Database address: " + m_databaseURL);
 
 	// NEEDED AND MUST BE EXECUTED ONCE
 	mongocxx::instance inst{};
@@ -58,22 +58,22 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 
 	// Maybe fetch the admin Credentials through the environment 
 
-	dbUsername = getAdminUserName();
+	m_dbUsername = getAdminUserName();
 
-	if (!databasePWD.empty())
+	if (!m_databasePWD.empty())
 	{
-		dbPassword = databasePWD;
+		m_dbPassword = m_databasePWD;
 	}
 	else
 	{
-		dbPassword = ot::UserCredentials::encryptString("admin");
+		m_dbPassword = ot::UserCredentials::encryptString("admin");
 	}
 
 	try
 	{
-		std::string uriStr = getMongoURL(databaseURL, dbUsername, ot::UserCredentials::decryptString(dbPassword));
+		std::string uriStr = getMongoURL(m_databaseURL, m_dbUsername, ot::UserCredentials::decryptString(m_dbPassword));
 		mongocxx::uri uri(uriStr);
-		adminClient = mongocxx::client(uri);
+		m_adminClient = mongocxx::client(uri);
 	}
 	catch (std::exception err)
 	{
@@ -89,7 +89,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	/* HANDLING PROJECT CATALOG ROLE AND INDEXES */
 	try
 	{
-		MongoRoleFunctions::createInitialProjectRole(adminClient);
+		MongoRoleFunctions::createInitialProjectRole(m_adminClient);
 	}
 	catch (std::runtime_error err)
 	{
@@ -102,7 +102,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	try
 	{
 		// Role so that each user can list the project DB collections
-		MongoRoleFunctions::createInitialProjectDbListCollectionsRole(adminClient);
+		MongoRoleFunctions::createInitialProjectDbListCollectionsRole(m_adminClient);
 	}
 	catch (std::runtime_error err)
 	{
@@ -115,7 +115,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	try
 	{
 		index_options.name("project_name_unique");
-		adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
 			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_name", 1)), index_options);
 	}
 	catch (std::runtime_error err)
@@ -126,7 +126,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	try
 	{
 		index_options.name("project_role_name_unique");
-		adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
 			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_role_name", 1)), index_options);
 	}
 	catch (std::runtime_error err)
@@ -137,7 +137,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	try
 	{
 		index_options.name("project_collection_name_unique");
-		adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
 			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("collection_name", 1)), index_options);
 	}
 	catch (std::runtime_error err)
@@ -150,7 +150,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 
 	try
 	{
-		MongoRoleFunctions::createInitialGroupRole(adminClient);
+		MongoRoleFunctions::createInitialGroupRole(m_adminClient);
 	}
 	catch (std::runtime_error err)
 	{
@@ -163,7 +163,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	try
 	{
 		index_options.name("group_name_unique");
-		adminClient[MongoConstants::PROJECTS_DB][MongoConstants::GROUPS_COLLECTION]
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::GROUPS_COLLECTION]
 			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("group_name", 1)), index_options);
 	}
 	catch (std::runtime_error err)
@@ -177,7 +177,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 
 	try
 	{
-		MongoRoleFunctions::createInitialProjectTemplatesRole(adminClient);
+		MongoRoleFunctions::createInitialProjectTemplatesRole(m_adminClient);
 	}
 	catch (std::runtime_error err)
 	{
@@ -189,7 +189,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 
 	try
 	{
-		MongoRoleFunctions::createInitialProjectsLargeDataRole(adminClient);
+		MongoRoleFunctions::createInitialProjectsLargeDataRole(m_adminClient);
 	}
 	catch (std::runtime_error err)
 	{
@@ -201,7 +201,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 
 	try
 	{
-		MongoRoleFunctions::createInitialSystemDbRole(adminClient);
+		MongoRoleFunctions::createInitialSystemDbRole(m_adminClient);
 	}
 	catch (std::runtime_error err)
 	{
@@ -213,7 +213,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 
 	try
 	{
-		MongoRoleFunctions::createInitialSettingsDbRole(adminClient);
+		MongoRoleFunctions::createInitialSettingsDbRole(m_adminClient);
 	}
 	catch (std::runtime_error err)
 	{
@@ -225,7 +225,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 
 	try 
 	{
-		MongoRoleFunctions::createInitialLibrariesDbRole(adminClient);
+		MongoRoleFunctions::createInitialLibrariesDbRole(m_adminClient);
 	}
 	catch (std::runtime_error err) {
 		std::string errMsg(err.what());
@@ -238,7 +238,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 
 	try
 	{
-		MongoRoleFunctions::createInitialUserRole(adminClient);
+		MongoRoleFunctions::createInitialUserRole(m_adminClient);
 	}
 	catch (std::runtime_error err)
 	{
@@ -251,7 +251,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	try
 	{
 		// Role so that the admin can list the user DB collections
-		MongoRoleFunctions::createInitialUserDbListCollectionsRole(adminClient);
+		MongoRoleFunctions::createInitialUserDbListCollectionsRole(m_adminClient);
 	}
 	catch (std::runtime_error err)
 	{
@@ -264,7 +264,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	try
 	{
 		index_options.name("user_name_unique");
-		adminClient[MongoConstants::USER_DB][MongoConstants::USER_CATALOG_COLLECTION]
+		m_adminClient[MongoConstants::USER_DB][MongoConstants::USER_CATALOG_COLLECTION]
 			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_name", 1)), index_options);
 	}
 	catch (std::runtime_error err)
@@ -275,7 +275,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	try
 	{
 		index_options.name("user_id_unique");
-		adminClient[MongoConstants::USER_DB][MongoConstants::USER_CATALOG_COLLECTION]
+		m_adminClient[MongoConstants::USER_DB][MongoConstants::USER_CATALOG_COLLECTION]
 			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_id", 1)), index_options);
 	}
 	catch (std::runtime_error err)
@@ -294,7 +294,7 @@ bool ServiceBase::removeOldSessionsWorker()
 {
 	while (1)
 	{
-		MongoSessionFunctions::removeOldSessions(adminClient);
+		MongoSessionFunctions::removeOldSessions(m_adminClient);
 
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(3600s);  // Wait for one hour
@@ -308,7 +308,7 @@ bool ServiceBase::isAdminUser(User& _loggedInUser)
 
 const char *ServiceBase::getServiceURL(void)
 {
-	return serviceURL.c_str();
+	return m_serviceURL.c_str();
 }
 
 std::string ServiceBase::performAction(const char * _json, const char * _senderIP)
@@ -386,7 +386,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	
 	if (!isAdminUser(loggedInUser))
 	{
-		bool logInSuccessful = MongoUserFunctions::authenticateUser(loggedInUsername, loggedInUserPassword, databaseURL, adminClient);
+		bool logInSuccessful = MongoUserFunctions::authenticateUser(loggedInUsername, loggedInUserPassword, m_databaseURL, m_adminClient);
 
 		if (!logInSuccessful)
 		{
@@ -394,7 +394,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 			throw std::runtime_error("The User could not be authenticated! Please logout and attempt to log in again!");
 		}
 
-		loggedInUser = MongoUserFunctions::getUserDataThroughUsername(loggedInUsername, adminClient);
+		loggedInUser = MongoUserFunctions::getUserDataThroughUsername(loggedInUsername, m_adminClient);
 	}
 
 	//------------ FUNCTIONS THAT NEED AUTHENTICATION ------------
@@ -455,7 +455,7 @@ std::string ServiceBase::handleAdminLogIn(const ot::ConstJsonObject& _actionDocu
 		password = ot::UserCredentials::decryptString(password);
 	}
 
-	bool successful = (username == dbUsername && password == ot::UserCredentials::decryptString(dbPassword));
+	bool successful = (username == m_dbUsername && password == ot::UserCredentials::decryptString(m_dbPassword));
 
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
@@ -478,19 +478,19 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		password = ot::UserCredentials::decryptString(password);
 	}
 
-	bool successful = MongoUserFunctions::authenticateUser(username, password, databaseURL, adminClient);
+	bool successful = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient);
 
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
 	
 	if (successful)
 	{
-		std::string sessionName = MongoSessionFunctions::createSession(username, adminClient);
+		std::string sessionName = MongoSessionFunctions::createSession(username, m_adminClient);
 		std::string sessionPWD  = createRandomPassword();
 
-		User user = MongoUserFunctions::getUserDataThroughUsername(username, adminClient);
+		User user = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
 
-		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, adminClient, json);
+		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_adminClient, json);
 
 		json.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, json.GetAllocator()), json.GetAllocator());
 		json.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), json.GetAllocator()), json.GetAllocator());
@@ -508,7 +508,7 @@ std::string ServiceBase::handleRegister(const ot::ConstJsonObject& _actionDocume
 		throw std::runtime_error("This user name is reserved for the database admin and cannot be used for a regular user!");
 	}
 
-	bool successful = MongoUserFunctions::registerUser(username, password, adminClient);
+	bool successful = MongoUserFunctions::registerUser(username, password, m_adminClient);
 
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
@@ -518,7 +518,7 @@ std::string ServiceBase::handleRegister(const ot::ConstJsonObject& _actionDocume
 std::string ServiceBase::handleRefreshSession(const ot::ConstJsonObject& _actionDocument) {
 	std::string session = ot::json::getString(_actionDocument, OT_PARAM_DB_USERNAME);
 
-	return MongoSessionFunctions::refreshSession(session, adminClient);
+	return MongoSessionFunctions::refreshSession(session, m_adminClient);
 }
 
 std::string ServiceBase::handleSetGlobalLoggingMode(const ot::ConstJsonObject& _actionDocument) {
@@ -531,25 +531,25 @@ std::string ServiceBase::handleSetGlobalLoggingMode(const ot::ConstJsonObject& _
 
 std::string ServiceBase::handleGetUserData(const ot::ConstJsonObject& _actionDocument) {
 	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
-	User usr = MongoUserFunctions::getUserDataThroughUsername(username, adminClient);
+	User usr = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
 
 	return MongoUserFunctions::userToJson(usr);
 }
 
 std::string ServiceBase::handleGetAllUsers(const ot::ConstJsonObject& _actionDocument) {
-	std::vector<User> allUsers = MongoUserFunctions::getAllUsers(adminClient);
+	std::vector<User> allUsers = MongoUserFunctions::getAllUsers(m_adminClient);
 
 	return MongoUserFunctions::usersToJson(allUsers);
 }
 
 std::string ServiceBase::handleGetAllUsersCount(const ot::ConstJsonObject& _actionDocument) {
-	size_t count = MongoUserFunctions::getAllUserCount(adminClient);
+	size_t count = MongoUserFunctions::getAllUserCount(m_adminClient);
 	return std::to_string(count);
 }
 
 std::string ServiceBase::handleChangeUserNameByUser(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser, const std::string& _loggedInUserPassword) {
 	std::string newUsername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_NEW_USERNAME);
-	bool successful = MongoUserFunctions::updateUserUsernameByName(_loggedInUser.username, newUsername, adminClient);
+	bool successful = MongoUserFunctions::updateUserUsernameByName(_loggedInUser.username, newUsername, m_adminClient);
 
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
@@ -558,7 +558,7 @@ std::string ServiceBase::handleChangeUserNameByUser(const ot::ConstJsonObject& _
 
 std::string ServiceBase::handleChangeUserPasswordByUser(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser, const std::string& _loggedInUserPassword) {
 	std::string password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
-	bool successful = MongoUserFunctions::changeUserPassword(_loggedInUser.username, password, adminClient);
+	bool successful = MongoUserFunctions::changeUserPassword(_loggedInUser.username, password, m_adminClient);
 
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
@@ -568,13 +568,13 @@ std::string ServiceBase::handleChangeUserPasswordByUser(const ot::ConstJsonObjec
 std::string ServiceBase::handleDeleteUser(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword) {
 	std::string usernameToDelete = ot::json::getString(_actionDocument, OT_PARAM_USERNAME_TO_DELETE);
 
-	User toBeDeletedUser = MongoUserFunctions::getUserDataThroughUsername(usernameToDelete, adminClient);
+	User toBeDeletedUser = MongoUserFunctions::getUserDataThroughUsername(usernameToDelete, m_adminClient);
 
 	bool successful = false;
 	// Check if the user wants do delete himself or if the call comes from the Admin User
 	if (_loggedInUser.userId == toBeDeletedUser.userId || isAdminUser(_loggedInUser))
 	{
-		successful = MongoUserFunctions::removeUser(toBeDeletedUser, adminClient);
+		successful = MongoUserFunctions::removeUser(toBeDeletedUser, m_adminClient);
 	}
 
 	ot::JsonDocument json;
@@ -591,7 +591,7 @@ std::string ServiceBase::handleChangeUserNameByAdmin(const ot::ConstJsonObject& 
 	std::string oldUsername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_OLD_USERNAME);
 	std::string newUsername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_NEW_USERNAME);
 
-	bool successful = MongoUserFunctions::updateUsername(oldUsername, newUsername, adminClient);
+	bool successful = MongoUserFunctions::updateUsername(oldUsername, newUsername, m_adminClient);
 
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
@@ -607,7 +607,7 @@ std::string ServiceBase::handleChangeUserPasswordByAdmin(const ot::ConstJsonObje
 	std::string userName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
 	std::string newPassword = ot::json::getString(_actionDocument, OT_PARAM_AUTH_NEW_PASSWORD);
 
-	bool successful = MongoUserFunctions::changeUserPassword(userName, newPassword, adminClient);
+	bool successful = MongoUserFunctions::changeUserPassword(userName, newPassword, m_adminClient);
 
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
@@ -639,8 +639,8 @@ std::string ServiceBase::handleGetSystemInformation(const ot::ConstJsonObject& _
 std::string ServiceBase::handleCreateGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
 
-	MongoGroupFunctions::createGroup(groupName, _loggedInUser, adminClient);
-	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, adminClient);
+	MongoGroupFunctions::createGroup(groupName, _loggedInUser, m_adminClient);
+	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	return MongoGroupFunctions::groupToJson(gr);
 }
@@ -648,13 +648,13 @@ std::string ServiceBase::handleCreateGroup(const ot::ConstJsonObject& _actionDoc
 std::string ServiceBase::handleGetGroupData(const ot::ConstJsonObject& _actionDocument) {
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
 
-	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, adminClient);
+	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	return MongoGroupFunctions::groupToJson(gr);
 }
 
 std::string ServiceBase::handleGetAllUserGroups(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
-	std::vector<Group> groups = MongoGroupFunctions::getAllUserGroups(_loggedInUser, adminClient);
+	std::vector<Group> groups = MongoGroupFunctions::getAllUserGroups(_loggedInUser, m_adminClient);
 
 	return MongoGroupFunctions::groupsToJson(groups);
 }
@@ -665,13 +665,13 @@ std::string ServiceBase::handleGetAllGroups(const ot::ConstJsonObject& _actionDo
 		throw std::runtime_error("The logged in user is not an admin user. Standard users can not retrieve a list of all groups.");
 	}
 
-	std::vector<Group> groups = MongoGroupFunctions::getAllGroups(_loggedInUser, adminClient);
+	std::vector<Group> groups = MongoGroupFunctions::getAllGroups(_loggedInUser, m_adminClient);
 
 	return MongoGroupFunctions::groupsToJson(groups);
 }
 
 std::string ServiceBase::handleGetAllGroupsCount(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
-	size_t count = MongoGroupFunctions::getAllGroupCount(_loggedInUser, adminClient);
+	size_t count = MongoGroupFunctions::getAllGroupCount(_loggedInUser, m_adminClient);
 	return std::to_string(count);
 }
 
@@ -679,13 +679,13 @@ std::string ServiceBase::handleChangeGroupName(const ot::ConstJsonObject& _actio
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
 	std::string newGroupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_NEW_GROUP_NAME);
 
-	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, adminClient);
+	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	bool successful = false;
 
 	if (gr.ownerUserId == _loggedInUser.userId || isAdminUser(_loggedInUser))
 	{
-		successful = MongoGroupFunctions::changeGroupName(groupName, newGroupName, adminClient);
+		successful = MongoGroupFunctions::changeGroupName(groupName, newGroupName, m_adminClient);
 	}
 	else
 	{
@@ -701,14 +701,14 @@ std::string ServiceBase::handleChangeGroupOwner(const ot::ConstJsonObject& _acti
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
 	std::string newOwnerusername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_OWNER_NEW_USER_USERNAME);
 
-	User newOwner = MongoUserFunctions::getUserDataThroughUsername(newOwnerusername, adminClient);
+	User newOwner = MongoUserFunctions::getUserDataThroughUsername(newOwnerusername, m_adminClient);
 
-	Group group = MongoGroupFunctions::getGroupDataByName(groupName, adminClient);
+	Group group = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	bool successful = false;
 	if (group.ownerUserId == _loggedInUser.userId || isAdminUser(_loggedInUser))
 	{
-		successful = MongoGroupFunctions::changeGroupOwner(group, _loggedInUser, newOwner, adminClient);
+		successful = MongoGroupFunctions::changeGroupOwner(group, _loggedInUser, newOwner, m_adminClient);
 	}
 	else
 	{
@@ -723,14 +723,14 @@ std::string ServiceBase::handleChangeGroupOwner(const ot::ConstJsonObject& _acti
 std::string ServiceBase::handleAddUserToGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
-	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, adminClient);
+	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 
 	bool successful = false;
 	if (gr.ownerUserId == _loggedInUser.userId)
 	{
-		User usr = MongoUserFunctions::getUserDataThroughUsername(username, adminClient);
-		successful = MongoGroupFunctions::addUserToGroup(usr, groupName, adminClient);
+		User usr = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
+		successful = MongoGroupFunctions::addUserToGroup(usr, groupName, m_adminClient);
 	}
 	else
 	{
@@ -745,13 +745,13 @@ std::string ServiceBase::handleAddUserToGroup(const ot::ConstJsonObject& _action
 std::string ServiceBase::handleRemoveUserFromGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
-	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, adminClient);
+	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	bool successful = false;
 	if (gr.ownerUserId == _loggedInUser.userId)
 	{
-		User usr = MongoUserFunctions::getUserDataThroughUsername(username, adminClient);
-		successful = MongoGroupFunctions::removeUserFromGroup(usr, groupName, adminClient);
+		User usr = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
+		successful = MongoGroupFunctions::removeUserFromGroup(usr, groupName, m_adminClient);
 	}
 	else
 	{
@@ -766,7 +766,7 @@ std::string ServiceBase::handleRemoveUserFromGroup(const ot::ConstJsonObject& _a
 std::string ServiceBase::handleRemoveGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
 
-	auto group = MongoGroupFunctions::getGroupDataByName(groupName, adminClient);
+	auto group = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	auto groupOwnerId = group.ownerUserId;
 	auto requestingUserId = _loggedInUser.userId;
@@ -774,7 +774,7 @@ std::string ServiceBase::handleRemoveGroup(const ot::ConstJsonObject& _actionDoc
 	bool successful = false;
 	if (groupOwnerId == requestingUserId || isAdminUser(_loggedInUser))
 	{
-		successful = MongoGroupFunctions::removeGroup(group, adminClient);
+		successful = MongoGroupFunctions::removeGroup(group, m_adminClient);
 	}
 	else
 	{
@@ -792,7 +792,7 @@ std::string ServiceBase::handleCreateProject(const ot::ConstJsonObject& _actionD
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
 	std::string projectType = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_TYPE);
 
-	Project createdProject = MongoProjectFunctions::createProject(projectName, projectType, _loggedInUser, adminClient);
+	Project createdProject = MongoProjectFunctions::createProject(projectName, projectType, _loggedInUser, m_adminClient);
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, createdProject.toProjectInformation().toJson()).toJson();
 }
@@ -800,7 +800,7 @@ std::string ServiceBase::handleCreateProject(const ot::ConstJsonObject& _actionD
 std::string ServiceBase::handleProjectOpened(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
 
-	MongoProjectFunctions::projectWasOpened(projectName, adminClient);
+	MongoProjectFunctions::projectWasOpened(projectName, m_adminClient);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
@@ -808,7 +808,7 @@ std::string ServiceBase::handleProjectOpened(const ot::ConstJsonObject& _actionD
 std::string ServiceBase::handleUpdateAdditionalProjectInformation(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	ot::ProjectInformation info(ot::json::getObject(_actionDocument, OT_ACTION_PARAM_Config));
 
-	return MongoProjectFunctions::updateAdditionalProjectInformation(info, adminClient).toJson();
+	return MongoProjectFunctions::updateAdditionalProjectInformation(info, m_adminClient).toJson();
 }
 
 std::string ServiceBase::handleGetProjectData(const ot::ConstJsonObject& _actionDocument) {
@@ -816,7 +816,7 @@ std::string ServiceBase::handleGetProjectData(const ot::ConstJsonObject& _action
 
 	try
 	{
-		Project proj = MongoProjectFunctions::getProject(projectName, adminClient);
+		Project proj = MongoProjectFunctions::getProject(projectName, m_adminClient);
 		ot::ReturnMessage rMsg(ot::ReturnMessage::Ok, proj.toProjectInformation().toJson());
 		return rMsg.toJson();
 	}
@@ -829,7 +829,7 @@ std::string ServiceBase::handleGetProjectData(const ot::ConstJsonObject& _action
 
 std::string ServiceBase::handleGetProjectsInfo(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	auto projectNames = ot::json::getStringList(_actionDocument, OT_PARAM_AUTH_PROJECT_NAMES);
-	return MongoProjectFunctions::getProjectsInfo(projectNames, adminClient);
+	return MongoProjectFunctions::getProjectsInfo(projectNames, m_adminClient);
 }
 
 std::string ServiceBase::handleGetAllUserProjects(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
@@ -838,11 +838,11 @@ std::string ServiceBase::handleGetAllUserProjects(const ot::ConstJsonObject& _ac
 
 	if (_actionDocument.HasMember(OT_PARAM_AUTH_PROJECT_FILTER)) {
 		std::string filter = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_FILTER);
-		projects = MongoProjectFunctions::getAllUserProjects(_loggedInUser, filter, limit, adminClient);
+		projects = MongoProjectFunctions::getAllUserProjects(_loggedInUser, filter, limit, m_adminClient);
 	}
 	else if (_actionDocument.HasMember(OT_ACTION_PARAM_Config)) {
 		ot::ProjectFilterData filterData(ot::json::getObject(_actionDocument, OT_ACTION_PARAM_Config));
-		projects = MongoProjectFunctions::getAllUserProjects(_loggedInUser, filterData, limit, adminClient);
+		projects = MongoProjectFunctions::getAllUserProjects(_loggedInUser, filterData, limit, m_adminClient);
 	}
 	else {
 		OT_LOG_E("No filter provided for getting all user projects. Returning empty list.");
@@ -860,13 +860,13 @@ std::string ServiceBase::handleGetAllProjects(const ot::ConstJsonObject& _action
 	std::string filter = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_FILTER);
 	int limit = ot::json::getInt(_actionDocument, OT_PARAM_AUTH_PROJECT_LIMIT);
 
-	std::vector<Project> projects = MongoProjectFunctions::getAllProjects(_loggedInUser, filter, limit, adminClient);
+	std::vector<Project> projects = MongoProjectFunctions::getAllProjects(_loggedInUser, filter, limit, m_adminClient);
 
 	return MongoProjectFunctions::projectsToJson(projects);
 }
 
 std::string ServiceBase::handleGetAllProjectsCount(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
-	size_t count = MongoProjectFunctions::getAllProjectCount(_loggedInUser, adminClient);
+	size_t count = MongoProjectFunctions::getAllProjectCount(_loggedInUser, m_adminClient);
 
 	return std::to_string(count);
 }
@@ -874,8 +874,8 @@ std::string ServiceBase::handleGetAllProjectsCount(const ot::ConstJsonObject& _a
 std::string ServiceBase::handleGetAllGroupProjects(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
 
-	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, adminClient);
-	std::vector<Project> projectsGr = MongoProjectFunctions::getAllGroupProjects(gr, adminClient);
+	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
+	std::vector<Project> projectsGr = MongoProjectFunctions::getAllGroupProjects(gr, m_adminClient);
 
 	return MongoProjectFunctions::projectsToJson(projectsGr);
 }
@@ -884,11 +884,11 @@ std::string ServiceBase::handleChangeProjectName(const ot::ConstJsonObject& _act
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
 	std::string newProjectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_NEW_PROJECT_NAME);
 
-	Project proj = MongoProjectFunctions::getProject(projectName, adminClient);
+	Project proj = MongoProjectFunctions::getProject(projectName, m_adminClient);
 
 	if (proj.getUser().userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
 	{
-		proj = MongoProjectFunctions::changeProjectName(proj, newProjectName, adminClient);
+		proj = MongoProjectFunctions::changeProjectName(proj, newProjectName, m_adminClient);
 	}
 	else
 	{
@@ -902,12 +902,12 @@ std::string ServiceBase::handleChangeProjectOwner(const ot::ConstJsonObject& _ac
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
 	std::string newOwnerUsername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_NEW_PROJECT_OWNER);
 
-	Project proj = MongoProjectFunctions::getProject(projectName, adminClient);
-	User newOwner = MongoUserFunctions::getUserDataThroughUsername(newOwnerUsername, adminClient);
+	Project proj = MongoProjectFunctions::getProject(projectName, m_adminClient);
+	User newOwner = MongoUserFunctions::getUserDataThroughUsername(newOwnerUsername, m_adminClient);
 
 	if (proj.getUser().userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
 	{
-		proj = MongoProjectFunctions::changeProjectOwner(proj, newOwner, adminClient);
+		proj = MongoProjectFunctions::changeProjectOwner(proj, newOwner, m_adminClient);
 	}
 	else
 	{
@@ -920,7 +920,7 @@ std::string ServiceBase::handleChangeProjectOwner(const ot::ConstJsonObject& _ac
 std::string ServiceBase::handleAddGroupToProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
-	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, adminClient);
+	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	bool userIsGroupMember = false;
 	for (const auto& groupUser : gr.users)
@@ -935,8 +935,8 @@ std::string ServiceBase::handleAddGroupToProject(const ot::ConstJsonObject& _act
 	bool successful = false;
 	if (userIsGroupMember)
 	{
-		Project pr = MongoProjectFunctions::getProject(projectName, adminClient);
-		successful = MongoProjectFunctions::addGroupToProject(gr, pr, adminClient);
+		Project pr = MongoProjectFunctions::getProject(projectName, m_adminClient);
+		successful = MongoProjectFunctions::addGroupToProject(gr, pr, m_adminClient);
 	}
 	else
 	{
@@ -951,7 +951,7 @@ std::string ServiceBase::handleAddGroupToProject(const ot::ConstJsonObject& _act
 std::string ServiceBase::handleRemoveGroupFromProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
-	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, adminClient);
+	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	bool userIsGroupMember = false;
 	for (const auto& groupUser : gr.users) {
@@ -964,9 +964,9 @@ std::string ServiceBase::handleRemoveGroupFromProject(const ot::ConstJsonObject&
 	bool successful = false;
 	if (userIsGroupMember)
 	{
-		Project pr = MongoProjectFunctions::getProject(projectName, adminClient);
+		Project pr = MongoProjectFunctions::getProject(projectName, m_adminClient);
 		if (pr.getUser().userId == _loggedInUser.userId) {
-			successful = MongoProjectFunctions::removeGroupFromProject(gr, pr, adminClient);
+			successful = MongoProjectFunctions::removeGroupFromProject(gr, pr, m_adminClient);
 		}
 		else {
 			throw std::runtime_error("The logged in user is not the owner of this Project! He cannot make the requested changes!");
@@ -985,12 +985,12 @@ std::string ServiceBase::handleRemoveGroupFromProject(const ot::ConstJsonObject&
 std::string ServiceBase::handleRemoveProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
 
-	Project pr = MongoProjectFunctions::getProject(projectName, adminClient);
+	Project pr = MongoProjectFunctions::getProject(projectName, m_adminClient);
 
 	bool successful = false;
 	if (pr.getUser().userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
 	{
-		successful = MongoProjectFunctions::removeProject(pr, adminClient);
+		successful = MongoProjectFunctions::removeProject(pr, m_adminClient);
 	}
 	else
 	{
@@ -1005,7 +1005,7 @@ std::string ServiceBase::handleRemoveProject(const ot::ConstJsonObject& _actionD
 std::string ServiceBase::handleCheckIfCollectionExists(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser)
 {
 	std::string collectionName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_COLLECTION_NAME);
-	bool exist = MongoProjectFunctions::checkForCollectionExistence(collectionName, adminClient);
+	bool exist = MongoProjectFunctions::checkForCollectionExistence(collectionName, m_adminClient);
 	
 	ot::JsonDocument json;
 	json.AddMember(OT_PARAM_AUTH_COLLECTION_EXISTS, exist, json.GetAllocator());

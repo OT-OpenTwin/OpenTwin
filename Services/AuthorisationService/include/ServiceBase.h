@@ -45,9 +45,11 @@
 
 class ServiceBase
 {
+	OT_DECL_NOCOPY(ServiceBase)
+	OT_DECL_NOMOVE(ServiceBase)
 public:
 
-	static ServiceBase& GetInstance() {
+	static ServiceBase& instance() {
 		// Allocate with `new` in case Singleton is not trivially destructible.
 		static ServiceBase* serviceBase = new ServiceBase();
 		return *serviceBase;
@@ -205,6 +207,8 @@ private:
 	std::string handleRemoveProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleCheckIfCollectionExists(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 
+	// initialize functions
+
 	// helper functions
 
 	bool isAdminUser(User& _loggedInUser);
@@ -212,20 +216,14 @@ private:
 	std::string createRandomPassword();
 	bool removeOldSessionsWorker();
 
-	std::string serviceURL;
-	std::string databaseURL;
-	std::string databasePWD;
-	mongocxx::client adminClient;
-	std::string dbUsername;
-	std::string dbPassword;
+	std::string m_serviceURL;
+	std::string m_databaseURL;
+	std::string m_databasePWD;
+	mongocxx::client m_adminClient;
+	std::string m_dbUsername;
+	std::string m_dbPassword;
 	std::mutex m_mutex;
 
 	ServiceBase() = default;
-
-	// Delete copy/move so extra instances can't be created/moved.
-	ServiceBase(const ServiceBase&) = delete;
-	ServiceBase& operator=(const ServiceBase&) = delete;
-	ServiceBase(ServiceBase&&) = delete;
-	ServiceBase& operator=(ServiceBase&&) = delete;
 };
 
