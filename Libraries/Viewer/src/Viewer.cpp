@@ -946,8 +946,8 @@ void Viewer::finishRubberbandExecution(void)
 		FrontendAPI::instance()->rubberbandFinished(rubberband->creator(), rubberband->note(), rubberband->createPointDataJson(), transform);
 		removeOverlay();
 
-		delete rubberband;
-		rubberband = nullptr;
+		//delete rubberband;		We do not delete the rubberband here to avoid flickerung. The rubberband will be removed, when the shape is added.
+		//rubberband = nullptr;
 	}
 	else {
 		OTAssert(0, "Finishing execution of not existing rubberband");

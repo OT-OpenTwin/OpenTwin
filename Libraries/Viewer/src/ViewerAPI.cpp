@@ -246,6 +246,7 @@ void ViewerAPI::addNodeFromFacetData(ot::UID osgModelID, const std::string &tree
 		
 		model->addNodeFromFacetData(treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, false, isEditable, nodes, triangles, edges, faceNameMap,
 								    errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
+		cancelAllRubberbands(osgModelID);
 	}
 	catch (std::out_of_range)
 	{
@@ -264,6 +265,7 @@ void ViewerAPI::addNodeFromFacetDataBase(ot::UID osgModelID, const std::string &
 
 		model->addNodeFromFacetDataBase(treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective, modelEntityID, treeIcons, backFaceCulling, offsetFactor, 
 										isHidden, isEditable, projectName, entityID, version, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation);
+		cancelAllRubberbands(osgModelID);
 	}
 	catch (std::out_of_range)
 	{
@@ -759,6 +761,20 @@ void ViewerAPI::createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, s
 	}
 
 	viewer->second->getViewer()->createRubberband(_senderId, _note, _configurationJson);
+}
+
+void ViewerAPI::cancelAllRubberbands(ot::UID osgModelID)
+{
+	Model* model = intern::OsgModelManager::uidToModelMap()[osgModelID];
+	if (model == nullptr) return;
+
+	// Get all viewers and delete the rubberbands
+	std::list<Viewer*> viewerList = model->getViewerList();
+
+	for (auto viewer : viewerList)
+	{
+		viewer->cancelRubberband();
+	}
 }
 
 void ViewerAPI::settingsItemChanged(ot::UID _viewerID, const ot::Property* _item) {

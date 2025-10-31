@@ -153,7 +153,8 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void shortcutActivated(const std::string & _keySequence);
 
-	__declspec(dllexport) void createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, std::string & _note, const std::string & _configurationJson);
+	__declspec(dllexport) void createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, std::string& _note, const std::string& _configurationJson);
+	__declspec(dllexport) void cancelAllRubberbands(ot::UID osgModelID);
 
 	__declspec(dllexport) void settingsItemChanged(ot::UID _viewerID, const ot::Property* _property);
 
