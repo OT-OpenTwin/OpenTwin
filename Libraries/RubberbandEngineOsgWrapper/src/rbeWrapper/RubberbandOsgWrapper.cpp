@@ -21,6 +21,8 @@
 
 // RBE header
 #include "rbeWrapper/RubberbandOsgWrapper.h"
+#include "rbeWrapper/RubberbandHiddenLineNode.h"
+#include "rbeWrapper/RubberbandPointNode.h"
 
 #include "rbeCore/AbstractConnection.h"
 #include "rbeCore/LineConnection.h"
@@ -39,6 +41,8 @@
 #include <osg/LineWidth>
 #include <osg/Point>
 #include <osg/ShapeDrawable>
+#include <osg/BlendFunc>
+#include <osg/Material>
 
 using namespace rbeCore;
 
@@ -149,50 +153,20 @@ void rbeWrapper::RubberbandOsgWrapper::buildNode(void) {
 		vertices->at(ct++).set(pt);
 	}
 
-	assert((ct / 2) * 2 == ct);
+	osg::ref_ptr<RubberbandHiddenLineNode> rb = new RubberbandHiddenLineNode();
 
-	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(m_r, m_g, m_b, 1.0f));
+	rb->setVertices(vertices);
 
-	// Create the geometry object to store the data
-	osg::ref_ptr<osg::Geometry> newGeometry = new osg::Geometry;
+	RubberbandHiddenLineNode::Style st;
+	st.solidColor = osg::Vec4(0.12f, 0.72f, 1.0f, 0.95f);
+	st.solidWidth = 2.0f;
+	st.dashedColor = osg::Vec4(0.95f, 0.60f, 0.25f, 0.85f);
+	st.dashedWidth = 2.0f;
+	st.dashPattern = 0xF0F0; st.dashFactor = 1;
+	st.lineSmooth = true;
+	rb->setStyle(st);
 
-	newGeometry->setVertexArray(vertices.get());
-
-	newGeometry->setColorArray(colors.get());
-	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
-
-	newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::Mode::LINES, 0, ct));
-
-	//	if (depthTest) {
-	//		osg::ref_ptr<osg::Material> matEdges = new osg::Material;
-	//		this->setMaterialProperties(matEdges, r, g, b);
-	//		newGeometry->getOrCreateStateSet()->setAttribute(matEdges.get());
-	//	}
-
-		// Now create the geometry node and assign the drawable
-	m_node = new osg::Geode;
-	m_node->addDrawable(newGeometry);
-
-	// Set the display attributes for the edges geometry
-	osg::StateSet *ss = m_node->getOrCreateStateSet();
-
-	//osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc;
-	//blendFunc->setFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//ss->setAttributeAndModes(blendFunc);
-
-	ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-	ss->setMode(GL_BLEND, osg::StateAttribute::OFF);
-	ss->setAttributeAndModes(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE));
-	ss->setMode(GL_LINE_SMOOTH, osg::StateAttribute::ON);
-	ss->setAttribute(new osg::LineWidth(1.0), osg::StateAttribute::ON);
-
-	if (!m_depthTest)
-	{
-		ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-		ss->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-	}
+	m_node = rb;
 
 	m_parentGroup->addChild(m_node);
 }
@@ -202,49 +176,13 @@ void rbeWrapper::RubberbandOsgWrapper::buildOriginNode(void) {
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array(1);
 	vertices->at(0).set(osg::Vec3(current()->u(), current()->v(), current()->w()));
 
-	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(m_r, m_g, m_b, 1.0f));
+	auto node = new RubberbandPointNode();
+	node->setVertices(vertices);              
+	node->enableDebugVisual(false);     
+	node->setHiddenDash(false);
 
-	// Create the geometry object to store the data
-	osg::ref_ptr<osg::Geometry> newGeometry = new osg::Geometry;
-
-	newGeometry->setVertexArray(vertices.get());
-
-	newGeometry->setColorArray(colors.get());
-	newGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
-
-	newGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, 1));
-
-	//	if (depthTest) {
-	//		osg::ref_ptr<osg::Material> matEdges = new osg::Material;
-	//		this->setMaterialProperties(matEdges, r, g, b);
-	//		newGeometry->getOrCreateStateSet()->setAttribute(matEdges.get());
-	//	}
-
-		// Now create the geometry node and assign the drawable
-	m_node = new osg::Geode;
-	m_node->addDrawable(newGeometry);
+	m_node = node;
 	m_node->setCullingActive(false);
-
-	// Set the display attributes for the edges geometry
-	osg::StateSet *ss = m_node->getOrCreateStateSet();
-
-	//osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc;
-	//blendFunc->setFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//ss->setAttributeAndModes(blendFunc);
-
-	ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-	ss->setMode(GL_BLEND, osg::StateAttribute::OFF);
-	ss->setAttributeAndModes(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE));
-	ss->setMode(GL_LINE_SMOOTH, osg::StateAttribute::ON);
-	ss->setAttribute(new osg::Point(10), osg::StateAttribute::ON);
-
-	if (!m_depthTest)
-	{
-		//ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-		ss->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-	}
 
 	m_parentGroup->addChild(m_node);
 }
@@ -261,8 +199,9 @@ void rbeWrapper::RubberbandOsgWrapper::updateNode(void) {
 		return;
 	}
 
-	osg::Geometry * geometry = dynamic_cast<osg::Geometry *>(m_node->getDrawable(0));
-	if (geometry) {
+	RubberbandHiddenLineNode *edges = dynamic_cast<RubberbandHiddenLineNode*>(m_node);
+	if (edges != nullptr)
+	{
 		// Read connections and create edges list
 		std::list<osg::Vec3> edgesList;
 		calculateEdges(edgesList);
@@ -274,26 +213,19 @@ void rbeWrapper::RubberbandOsgWrapper::updateNode(void) {
 			vertices->at(ct++).set(pt);
 		}
 
-		geometry->setVertexArray(vertices.get());
-		geometry->dirtyDisplayList();
-	}
-	else {
-		assert(0);
+		edges->setVertices(vertices);
 	}
 }
 
-void rbeWrapper::RubberbandOsgWrapper::updateOriginNode(void) {
-	osg::Geometry * geometry = dynamic_cast<osg::Geometry *>(m_node->getDrawable(0));
-	if (geometry) {
-		// Read connections and create edges list
+void rbeWrapper::RubberbandOsgWrapper::updateOriginNode(void) 
+{
+	RubberbandPointNode* point = dynamic_cast<RubberbandPointNode*>(m_node);
+	if (point != nullptr)
+	{
 		osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array(1);
 		vertices->at(0).set(osg::Vec3(current()->u(), current()->v(), current()->w()));
 
-		geometry->setVertexArray(vertices.get());
-		geometry->dirtyDisplayList();
-	}
-	else {
-		assert(0);
+		point->setVertices(vertices);
 	}
 }
 

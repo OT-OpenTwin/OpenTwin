@@ -27,7 +27,7 @@
 #include <list>
 
 namespace osg {
-	class Geode;
+	class Group;
 	class Switch;
 }
 
@@ -67,7 +67,7 @@ namespace rbeWrapper {
 
 		// Getter
 
-		osg::Geode * osgNode(void) { return m_node; }
+		osg::Group * osgNode(void) { return m_node; }
 
 		float lineColorR(void) const { return m_r; }
 		float lineColorG(void) const { return m_g; }
@@ -82,6 +82,8 @@ namespace rbeWrapper {
 		void setLineColor(float _r, float _g, float _b) { m_r = _r; m_g = _g; m_b = _b; }
 
 		void setDepthTestActive(bool _isActive) { m_depthTest = _isActive; }
+
+
 
 	protected:
 		void calculateEdges(std::list<osg::Vec3>& _list);
@@ -99,7 +101,7 @@ namespace rbeWrapper {
 		void updateOriginNode(void);
 
 		osg::Switch *m_parentGroup;
-		osg::Geode  *m_node;
+		osg::Group  *m_node;
 
 		bool			m_pickOriginEnabled;
 		float			m_r;
