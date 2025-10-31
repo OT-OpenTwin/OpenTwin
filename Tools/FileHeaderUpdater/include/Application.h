@@ -23,6 +23,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <fstream>
 
 class Application {
 public:
@@ -36,12 +37,20 @@ private:
 		bool dryRun = false;
 		bool showExpected = false;
 		bool showConfig = false;
+		bool notifyChangeOnly = false;
+		bool showHelp = false;
+
 		std::string configFileName;
+
+		std::list<std::string> parseWarnings;
+		std::list<std::string> parseErrors;
+		std::list<std::string> parseInfos;
 	};
 
 	struct Config {
 		bool dryRun = false; // Set from command line
 		bool showExpected = false; // Set from command line
+		bool notifyChangeOnly = false; // Set from command line
 
 		bool isValid = false;
 		bool warnMissingHeader = false;
@@ -76,6 +85,7 @@ private:
 	};
 
 	ResultData m_resultData;
+	std::ofstream* m_outputStream = nullptr;
 
 	void scanDirectory(const std::string& _directoryPath);
 	void scanFile(const std::string& _filePath);

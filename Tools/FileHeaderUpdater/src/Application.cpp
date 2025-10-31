@@ -36,16 +36,36 @@ Application::Application() {
 }
 
 Application::~Application() {
-
+	if (m_outputStream) {
+		m_outputStream->close();
+		delete m_outputStream;
+		m_outputStream = nullptr;
+	}
 }
 
 int Application::run(int _argc, char** _argv) {
 	auto start = std::chrono::system_clock::now();
 
-	log("OpenTwin - Starting File Header Updater v" LHU_VERSION);
-
 	// Parse command line
 	CommandLine cmdLine = parseCommandLine(_argc, _argv);
+	
+	log("OpenTwin - Starting File Header Updater v" LHU_VERSION);
+
+	if (cmdLine.showHelp) {
+		showHelp();
+		return 0;
+	}
+
+	for (const std::string& error : cmdLine.parseErrors) {
+		logE(error);
+	}
+	for (const std::string& warning : cmdLine.parseWarnings) {
+		logW(warning);
+	}
+	for (const std::string& info : cmdLine.parseInfos) {
+		log(info);
+	}
+
 	if (cmdLine.configFileName.empty()) {
 		log("No config file specified. Use --help or -h for help.");
 		return 1;
@@ -59,6 +79,7 @@ int Application::run(int _argc, char** _argv) {
 	}
 	m_config.dryRun |= cmdLine.dryRun;
 	m_config.showExpected |= cmdLine.showExpected;
+	m_config.notifyChangeOnly |= cmdLine.notifyChangeOnly;
 
 	if (cmdLine.showConfig) {
 		showConfig();
@@ -132,7 +153,9 @@ void Application::scanFile(const std::string& _filePath) {
 
 	// Read first line
 	if (!std::getline(fileStream, line)) {
-		log("File is empty: \"" + _filePath + "\"");
+		if (!m_config.notifyChangeOnly) {
+			log("File is empty: \"" + _filePath + "\"");
+		}
 		fileStream.close();
 
 		m_resultData.filesEmpty++;
@@ -144,13 +167,17 @@ void Application::scanFile(const std::string& _filePath) {
 
 	// Check for file header
 	if (lineLower == m_config.keywordIgnoreLower) {
-		log("File ignored: \"" + _filePath + "\"");
+		if (!m_config.notifyChangeOnly) {
+			log("File ignored: \"" + _filePath + "\"");
+		}
 		fileStream.close();
+
+		m_resultData.filesIgnored++;
 		return;
 	}
 	else if (lineLower != m_config.keywordStart) {
 		if (m_config.warnMissingHeader) {
-			log("File missing license header: \"" + _filePath + "\"");
+			logW("File missing license header: \"" + _filePath + "\"");
 		}
 
 		fileStream.close();
@@ -327,8 +354,10 @@ bool Application::useFile(const std::string& _filePath) {
 }
 
 void Application::log(const std::string& _message) {
+	if (m_outputStream) {
+		(*m_outputStream) << "[OT FHU] " + _message + "\n";
+	}
 	std::cout << "[OT FHU] " + _message + "\n";
-	std::cout.flush();
 }
 
 void Application::logW(const std::string& _message) {
@@ -347,31 +376,53 @@ Application::CommandLine Application::parseCommandLine(int _argc, char** _argv) 
 		std::string arg = _argv[i];
 		if (arg == "--config") {
 			if (!cmdLine.configFileName.empty()) {
-				logW("Multiple config files specified. Using first specified...");
+				cmdLine.parseWarnings.push_back("Multiple config files specified. Using first specified...");
 				continue;
 			}
 
-			if ((i + 1) < _argc) {
+			if ((i + 1) < _argc) {	
 				cmdLine.configFileName = expandPath(_argv[i + 1]);
 				i++;
 			}
 		}
+		else if (arg == "--out") {
+			if (m_outputStream) {
+				cmdLine.parseWarnings.push_back("Multiple output files specified. Using first specified...");
+				continue;
+			}
+			if ((i + 1) < _argc) {
+				m_outputStream = new std::ofstream(expandPath(_argv[i + 1]));
+				if (!m_outputStream->is_open()) {
+					delete m_outputStream;
+					m_outputStream = nullptr;
+					cmdLine.parseErrors.push_back("Failed to open output file: \"" + std::string(_argv[i + 1]) + "\". Ignoring...");
+				}
+				i++;
+			}
+			else {
+				cmdLine.parseWarnings.push_back("No output file specified after --out argument. Ignoring...");
+			}
+		}
+		else if (arg == "--notifychangeonly") {
+			cmdLine.parseInfos.push_back("Only notifying about changes (ignored/empty files will be skipped)...");
+			cmdLine.notifyChangeOnly = true;
+		}
 		else if (arg == "--dry") {
-			log("Performing dry run (no files will be modified)...");
+			cmdLine.parseInfos.push_back("Performing dry run (no files will be modified)...");
 			cmdLine.dryRun = true;
 		}
 		else if (arg == "--preview") {
-			log("Show modified files data (no files will be modified)...");
+			cmdLine.parseInfos.push_back("Show modified files data (no files will be modified)...");
 			cmdLine.showExpected = true;
 		}
 		else if (arg == "--help" || arg == "-h") {
-			showHelp();
+			cmdLine.showHelp = true;
 		}
 		else if (arg == "--showconfig") {
 			cmdLine.showConfig = true;
 		}
 		else {
-			logW("Unknown command line argument: \"" + arg + "\"");
+			cmdLine.parseWarnings.push_back("Unknown command line argument: \"" + arg + "\"");
 		}
 	}
 
@@ -641,10 +692,12 @@ void Application::showHelp() {
 	log("------------------------------------------------- Help -----------------------------------------------------------------------------");
 	log("Command line arguments:");
 	log("  --config <file path>   Specifies the config file to use");
-	log("  --dry                  Performs a dry run without modifying any files      [Optional]");
-	log("  --preview              Shows the modified files data, will enable --dry    [Optional]");
-	log("  --help, -h             Shows this help message                             [Optional]");
-	log("  --showconfig           Shows the currently imported config                 [Optional]");
+	log("  --out <file path>      Specifies the output report file path (if not specified, output is shown on console only)");
+	log("  --dry                  Performs a dry run without modifying any files                 [Optional]");
+	log("  --preview              Shows the modified files data, will enable --dry               [Optional]");
+	log("  --help, -h             Shows this help message                                        [Optional]");
+	log("  --showconfig           Shows the currently imported config                            [Optional]");
+	log("  --notifychangeonly     Only notifies about changes (ignored/empty files are skipped   [Optional]");
 	log("");
 	log("Config file format (JSON):");
 	log("{");
@@ -652,6 +705,7 @@ void Application::showHelp() {
 	log("");
 	log("  \"LicenseFile\":          \"<path>\",                     // Path to the license file");
 	log("  \"Keyword.Start\":        \"<string>\",                   // Start keyword indicating the beginning of the license header");
+	log("  \"Keyword.Ignore\":       \"<string>\",                   // Keyword indicating that the file should be ignored");
 	log("  \"Keyword.End\":          \"<string>\",                   // End keyword indicating the end of the license header");
 	log("  \"RootDirectories\":      [\"<path1>\", \"<path2>\", ...],  // List of root directories to scan");
 	log("  \"FileExtensions\":       [\".ext1\", \".ext2\", ...],      // List of file extensions to consider");
@@ -662,6 +716,7 @@ void Application::showHelp() {
 	log("  \"AddLicenseTitle\":      <true|false>,                 // Add license title line to the license header");
 	log("  \"HeaderLinePrefix\":     \"<string>\",                   // Prefix to add to each line of the license (e.g., comment characters)");
 	log("  \"WarnMissingHeader\":    <true|false>,                 // Warn if a file is missing a header");
+	log("  \"WarnInvalidChars\":     <true|false>,                 // Warn if a file contains non-ASCII characters");
 	log("  \"BlacklistDirectories\": [\"<path1>\", \"<path2>\", ...]   // List of directories to exclude from scanning");
 	log("}");
 	log("------------------------------------------------------------------------------------------------------------------------------------");
@@ -675,7 +730,10 @@ void Application::showConfig() {
 	log("Add File Name:        " + std::string(m_config.addFileName ? "True" : "False"));
 	log("Add License Title:    " + std::string(m_config.addLicenseTitle ? "True" : "False"));
 	log("Warn Missing Header:  " + std::string(m_config.warnMissingHeader ? "True" : "False"));
+	log("Warn Invalid Chars:   " + std::string(m_config.warnInvalidChars ? "True" : "False"));
+	log("Notify Change Only:   " + std::string(m_config.notifyChangeOnly ? "True" : "False"));
 	log("Keyword Start:        \"" + m_config.keywordStart + "\"");
+	log("Keyword Ignore:       \"" + m_config.keywordIgnoreLower + "\"");
 	log("Keyword End:          \"" + m_config.keywordEnd + "\"");
 	log("Header Line Prefix:   \"" + m_config.headerLinePrefix + "\"");
 	log("Root Directories:");
@@ -704,13 +762,14 @@ void Application::showResults()  {
 	log("  Directories Scanned:      " + std::to_string(m_resultData.directoriesScanned));
 	log("  Files Scanned:            " + std::to_string(m_resultData.filesScanned));
 	log("  Empty Files:              " + std::to_string(m_resultData.filesEmpty));
-	
+	log("  Ignored Files:            " + std::to_string(m_resultData.filesIgnored));
+
 	if (m_config.warnInvalidChars) {
 	log("  Files with Invalid Chars: " + std::to_string(m_resultData.filesWithInvalidChars));
 	}
 	
-	log("  Files Up-To-Date:         " + std::to_string(m_resultData.filesUpToDate));
 	log("  Files Missing License:    " + std::to_string(m_resultData.filesWithMissingLicense));
+	log("  Files Up-To-Date:         " + std::to_string(m_resultData.filesUpToDate));
 	log("  Files Require Update:     " + std::to_string(m_resultData.outdateFiles));
 	log("  Files Modified:           " + std::to_string(m_resultData.filesModified));
 }
