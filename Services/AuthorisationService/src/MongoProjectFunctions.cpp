@@ -34,799 +34,752 @@
 * 7) Remove group from project
 * 8) Delete project
 */
-namespace MongoProjectFunctions
-{
-	// Helper functions
 
-	namespace intern {
+ot::ProjectFilterData MongoProjectFunctions::getProjectFilterOptions(const User& _loggedInUser, mongocxx::client& _adminClient) {
+	ot::ProjectFilterData filters;
 
-		void appendFilter(std::list<bsoncxx::document::value>& _createdFilters, const std::string& _field, const std::list<std::string>& _values) {
-			if (_values.empty()) {
-				return;
+	mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	auto distinctNamesCursor = projectCollection.distinct("project_name", {});
+	for (auto&& name : distinctNamesCursor) {
+
+	}
+
+	return filters;
+}
+
+Project MongoProjectFunctions::createProject(std::string projectName, std::string projectType, User& creatingUser, mongocxx::client& adminClient) {
+	mongocxx::database db = adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	// Create the Collection for the project data
+	std::string collectionName = generateProjectCollectionName(adminClient);
+	std::string roleName = collectionName + "_role";
+
+	// Step one creating the Project Document and inserting it in the Projects collection
+	value new_project_document = document{}
+		<< "project_name" << projectName
+		<< "project_type" << projectType
+		<< "created_on" << bsoncxx::types::b_date(std::chrono::system_clock::now())
+		<< "created_by" << creatingUser.userId
+		<< "collection_name" << collectionName
+		<< "project_role_name" << roleName
+		<< "groups" << open_array << close_array
+		<< "tags" << open_array << close_array
+		<< "version" << 1
+		<< "last_accessed_on" << bsoncxx::types::b_date(std::chrono::system_clock::now())
+		<< finalize;
+
+	auto result = projectCollection.insert_one(new_project_document.view());
+
+	// Project was inserted
+
+	// Create a role for this project. This role will give the rights to a specific user to have access to this Project Collection (not catalog)
+
+	// Role creation
+	MongoRoleFunctions::createProjectRole(roleName, collectionName, adminClient);
+
+	// adding created Role to this user
+	MongoRoleFunctions::addRoleToUser(roleName, creatingUser.username, adminClient);
+
+	return getProject(projectName, adminClient);
+}
+
+void MongoProjectFunctions::projectWasOpened(const std::string& projectName, mongocxx::client& adminClient) {
+	mongocxx::database db = adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	// Filter
+	auto filterQuery = bsoncxx::builder::stream::document{}
+		<< "project_name" << projectName
+		<< bsoncxx::builder::stream::finalize;
+
+	// Modify
+	auto modifyQuery = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "last_accessed_on" << bsoncxx::types::b_date(std::chrono::system_clock::now())
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	// Perform update
+	projectCollection.update_one(filterQuery.view(), modifyQuery.view());
+}
+
+ot::ReturnMessage MongoProjectFunctions::updateAdditionalProjectInformation(const ot::ProjectInformation& _projectInfo, mongocxx::client& _adminClient) {
+	mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	// Create tag array
+	bsoncxx::builder::stream::array tagArray;
+	for (const std::string& tag : _projectInfo.getTags()) {
+		tagArray << tag;
+	}
+
+	// Filter
+	auto filterQuery = bsoncxx::builder::stream::document{}
+		<< "project_name" << _projectInfo.getProjectName()
+		<< bsoncxx::builder::stream::finalize;
+
+	// Modify
+	auto modifyQuery = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "tags" << tagArray.view()
+		<< "project_group" << _projectInfo.getProjectGroup()
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	// Perform update
+	projectCollection.update_one(filterQuery.view(), modifyQuery.view());
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok);
+}
+
+std::string MongoProjectFunctions::generateProjectCollectionName(mongocxx::client& adminClient) {
+	std::time_t currentTime = std::time(nullptr);
+	struct tm currentDate;
+	localtime_s(&currentDate, &currentTime);
+	std::ostringstream collectionName;
+	int random = rand() % 100;
+
+	collectionName << "Data-" << 1900 + currentDate.tm_year << currentDate.tm_mon + 1 << currentDate.tm_mday << "-"
+		<< currentDate.tm_hour << currentDate.tm_min << currentDate.tm_sec << "-" << random;
+
+	bool done = false;
+
+	while (!done) {
+		try {
+			getProject(collectionName.str(), adminClient);
+
+			// This collection name is already in use
+			random = rand() % 100;
+			collectionName << random;
+
+		}
+		catch (std::runtime_error err) {
+			done = true;
+		}
+	}
+
+	return collectionName.str();
+}
+
+Project MongoProjectFunctions::getProject(bsoncxx::oid& projectId, mongocxx::client& userClient) {
+	mongocxx::database secondaryDb = userClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectDataCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	value filter = document{}
+		<< "_id" << projectId
+		<< finalize;
+
+	auto optional = projectDataCollection.find_one(filter.view());
+
+
+	if (!optional.has_value()) {
+		return Project();
+	}
+
+	value projectValue = optional.value();
+
+	return Project(projectValue.view(), userClient);
+}
+
+Project MongoProjectFunctions::getProject(std::string projectName, mongocxx::client& userClient) {
+	mongocxx::database secondaryDb = userClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectDataCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	value filter = document{}
+		<< "project_name" << projectName
+		<< finalize;
+
+	auto optional = projectDataCollection.find_one(filter.view());
+
+	if (!optional) {
+		throw std::runtime_error("Project was not found");
+	}
+
+	value projectValue = optional.value();
+	return Project(projectValue.view(), userClient);
+}
+
+std::string MongoProjectFunctions::getProjectsInfo(const std::list<std::string>& _projectNames, mongocxx::client& _adminClient) {
+	auto array_builder = bsoncxx::builder::basic::array{};
+
+	for (const auto& projectName : _projectNames) {
+		array_builder.append(projectName);
+	}
+
+	auto inArr = document{} << "$in" << array_builder << finalize;
+
+	auto filter = document{} <<
+		"project_name" << inArr
+		<< finalize;
+
+	mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	mongocxx::cursor cursor = projectsCollection.find(filter.view());
+
+	std::vector<Project> projects{};
+	for (auto doc : cursor) {
+		projects.push_back(Project(doc, _adminClient));
+	}
+
+	return projectsToJson(projects);
+}
+
+std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient) {
+	OT_LOG_D("Searching projects of user: " + loggedInUser.username);
+
+	std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(loggedInUser, userClient);
+
+	auto array_builder = bsoncxx::builder::basic::array{};
+
+	for (const auto& group : userGroups) {
+		array_builder.append(group.id);
+	}
+
+	auto inArr = document{} << "$in" << array_builder << finalize;
+
+
+	std::string regexFilter = ".*" + filter + ".*";
+	auto regex = bsoncxx::types::b_regex(regexFilter, "");
+
+
+	value filterDoc = document{}
+		<< "$and"
+		<< open_array
+
+		<< open_document
+		<< "project_name" << regex
+		<< close_document
+
+		<< open_document
+
+		<< "$or"
+		<< open_array
+		<< open_document
+		<< "created_by" << loggedInUser.userId
+		<< close_document
+
+		<< open_document
+		<< "groups" << inArr
+		<< close_document
+
+		<< close_array
+		<< close_document
+
+		<< close_array
+		<< finalize;
+
+
+	mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	mongocxx::pipeline p{};
+	p.match(filterDoc.view());
+	if (limit > 0) {
+		p.limit(limit);
+	}
+
+
+	mongocxx::cursor cursor = projectsCollection.aggregate(p);
+
+	std::vector<Project> projects{};
+	for (auto doc : cursor) {
+		// Research std::move() 
+
+		Project tmpProject(doc);
+		const std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
+		tmpProject.setUser(MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient));
+
+		auto groupsArr = doc["groups"].get_array().value;
+
+		for (const auto& groupId : groupsArr) {
+			std::string id = std::string(groupId.get_utf8().value.data());
+
+			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
+
+			tmpProject.addUserGroup(currentGroup);
+		}
+
+		projects.push_back(tmpProject);
+	}
+
+	return projects;
+}
+
+std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& _filter, int limit, mongocxx::client& userClient) {
+	OT_LOG_D("Searching projects of user: " + loggedInUser.username);
+
+	std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(loggedInUser, userClient);
+
+	std::list<bsoncxx::document::value> filters;
+
+	// Directly accessible data
+	appendFilter(filters, "project_group", _filter.getProjectGroups());
+	appendFilter(filters, "project_type", _filter.getProjectTypes());
+	appendFilter(filters, "project_name", _filter.getProjectNames());
+	appendFilter(filters, "tags", _filter.getTags());
+
+	// Owner filter, names provided, need to convert to IDs
+	if (!_filter.getOwners().empty()) {
+		std::list<std::string> ownerIds;
+		for (const auto& ownerName : _filter.getOwners()) {
+			try {
+				User ownerUser = MongoUserFunctions::getUserDataThroughUsername(ownerName, userClient);
+				ownerIds.push_back(ownerUser.userId);
+			}
+			catch (std::runtime_error err) {
+				OT_LOG_E("Owner user " + ownerName + " specified in the project filter was not found.");
+			}
+		}
+
+		appendFilter(filters, "created_by", ownerIds);
+	}
+
+	// Group access filter, names provided, need to convert to IDs
+	if (!_filter.getUserGroups().empty()) {
+		std::list<std::string> groupIds;
+		for (const auto& groupName : _filter.getUserGroups()) {
+			if (groupName.empty()) {
+				continue;
 			}
 
-			// First separate empty and non-empty values
-			std::vector<std::string> nonEmpty;
-			bool hasEmpty = false;
-
-			for (const std::string& val : _values) {
-				if (val.empty()) {
-					hasEmpty = true;
-				}
-				else {
-					nonEmpty.push_back(val);
-				}
-			}
-
-			bsoncxx::builder::basic::array orArray;
-
-			// Match non-empty entries
-			if (!nonEmpty.empty()) {
-				auto optArray = bsoncxx::builder::basic::array{};
-				for (const std::string& v : nonEmpty) {
-					optArray.append(v);
-				}
-				orArray.append(document{} << _field << open_document << "$in" << optArray << close_document << finalize);
-			}
-
-			// Match documents where field is missing or empty
-			if (hasEmpty) {
-				// field == ""
-				orArray.append(document{} << _field << "" << finalize);
-
-				// field does not exist (legacy support)
-				orArray.append(document{} << _field << open_document << "$exists" << false << close_document << finalize);
-			}
-			_createdFilters.push_back(document{} << "$or" << orArray << finalize);
-
-			//OT_LOG_W(bsoncxx::to_json(_createdFilters.back().view()));
-		}
-
-	}
-
-	
-
-	ot::ProjectFilterData getProjectFilterOptions(const User& _loggedInUser, mongocxx::client& _adminClient) {
-		return ot::ProjectFilterData();
-	}
-
-	Project createProject(std::string projectName, std::string projectType, User& creatingUser, mongocxx::client& adminClient)
-	{
-		mongocxx::database db = adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		// Create the Collection for the project data
-		std::string collectionName = generateProjectCollectionName(adminClient);
-		std::string roleName = collectionName + "_role";
-
-		// Step one creating the Project Document and inserting it in the Projects collection
-		value new_project_document = document{}
-			<< "project_name" << projectName
-			<< "project_type" << projectType
-			<< "created_on" << bsoncxx::types::b_date(std::chrono::system_clock::now())
-			<< "created_by" << creatingUser.userId
-			<< "collection_name" << collectionName
-			<< "project_role_name" << roleName
-			<< "groups" << open_array << close_array
-			<< "tags" << open_array << close_array
-			<< "version" << 1
-			<< "last_accessed_on" << bsoncxx::types::b_date(std::chrono::system_clock::now())
-			<< finalize;
-
-		auto result = projectCollection.insert_one(new_project_document.view());
-
-		// Project was inserted
-
-		// Create a role for this project. This role will give the rights to a specific user to have access to this Project Collection (not catalog)
-
-		// Role creation
-		MongoRoleFunctions::createProjectRole(roleName, collectionName, adminClient);
-
-		// adding created Role to this user
-		MongoRoleFunctions::addRoleToUser(roleName, creatingUser.username, adminClient);
-
-		return getProject(projectName, adminClient);
-	}
-
-	void projectWasOpened(const std::string& projectName, mongocxx::client& adminClient) {
-		mongocxx::database db = adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		// Filter
-		auto filterQuery = bsoncxx::builder::stream::document{}
-			<< "project_name" << projectName
-			<< bsoncxx::builder::stream::finalize;
-		
-		// Modify
-		auto modifyQuery = bsoncxx::builder::stream::document{}
-			<< "$set" << bsoncxx::builder::stream::open_document
-			<< "last_accessed_on" << bsoncxx::types::b_date(std::chrono::system_clock::now())
-			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-		// Perform update
-		projectCollection.update_one(filterQuery.view(), modifyQuery.view());
-	}
-
-	ot::ReturnMessage updateAdditionalProjectInformation(const ot::ProjectInformation& _projectInfo, mongocxx::client& _adminClient) {
-		mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		// Create tag array
-		bsoncxx::builder::stream::array tagArray;
-		for (const std::string& tag : _projectInfo.getTags()) {
-			tagArray << tag;
-		}
-
-		// Filter
-		auto filterQuery = bsoncxx::builder::stream::document{}
-			<< "project_name" << _projectInfo.getProjectName()
-			<< bsoncxx::builder::stream::finalize;
-
-		// Modify
-		auto modifyQuery = bsoncxx::builder::stream::document{}
-			<< "$set" << bsoncxx::builder::stream::open_document
-			<< "tags" << tagArray.view()
-			<< "project_group" << _projectInfo.getProjectGroup()
-			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-		
-		// Perform update
-		projectCollection.update_one(filterQuery.view(), modifyQuery.view());
-
-		return ot::ReturnMessage(ot::ReturnMessage::Ok);
-	}
-
-	std::string generateProjectCollectionName(mongocxx::client& adminClient)
-	{
-		std::time_t currentTime = std::time(nullptr);
-		struct tm currentDate;
-		localtime_s(&currentDate, &currentTime);
-		std::ostringstream collectionName;
-		int random = rand() % 100;
-
-		collectionName << "Data-" << 1900 + currentDate.tm_year << currentDate.tm_mon + 1 << currentDate.tm_mday << "-"
-			<< currentDate.tm_hour << currentDate.tm_min << currentDate.tm_sec << "-" << random;
-
-		bool done = false;
-
-		while (!done)
-		{
-			try
-			{
-				getProject(collectionName.str(), adminClient);
-
-				// This collection name is already in use
-				random = rand() % 100;
-				collectionName << random;
-
-			}
-			catch (std::runtime_error err)
-			{
-				done = true;
-			}
-		}
-
-		return collectionName.str();
-	}
-
-
-	Project getProject(bsoncxx::oid& projectId, mongocxx::client& userClient)
-	{
-		mongocxx::database secondaryDb = userClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectDataCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		value filter = document{}
-			<< "_id" << projectId
-			<< finalize;
-
-		auto optional = projectDataCollection.find_one(filter.view());
-
-		
-		if (!optional.has_value())
-		{
-			return Project();
-		}
-
-		value projectValue = optional.value();
-		
-		return Project(projectValue.view(), userClient);
-	}
-
-	Project getProject(std::string projectName, mongocxx::client& userClient)
-	{
-		mongocxx::database secondaryDb = userClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectDataCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		value filter = document{}
-			<< "project_name" << projectName
-			<< finalize;
-
-		auto optional = projectDataCollection.find_one(filter.view());
-
-		if (!optional)
-		{
-			throw std::runtime_error("Project was not found");
-		}
-
-		value projectValue = optional.value();
-		return Project(projectValue.view(), userClient);
-	}
-
-	std::string getProjectsInfo(const std::list<std::string>& _projectNames, mongocxx::client& _adminClient)
-	{
-		auto array_builder = bsoncxx::builder::basic::array{};
-
-		for (const auto& projectName : _projectNames) {
-			array_builder.append(projectName);
-		}
-
-		auto inArr = document{} << "$in" << array_builder << finalize;
-
-		auto filter = document{} <<
-			"project_name" << inArr
-			<< finalize;
-
-		mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		mongocxx::cursor cursor = projectsCollection.find(filter.view());
-
-		std::vector<Project> projects{};
-		for (auto doc : cursor) {
-			projects.push_back(Project(doc, _adminClient));
-		}
-
-		return projectsToJson(projects);
-	}
-
-	std::vector<Project> getAllUserProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient)
-	{
-		OT_LOG_D("Searching projects of user: " + loggedInUser.username);
-
-		std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(loggedInUser, userClient);
-
-		auto array_builder = bsoncxx::builder::basic::array{};
-
-		for (const auto& group : userGroups) {
-			array_builder.append(group.id);
-		}
-
-		auto inArr = document{} << "$in" << array_builder << finalize;
-
-
-		std::string regexFilter = ".*" + filter + ".*";
-		auto regex = bsoncxx::types::b_regex(regexFilter, "");
-
-		
-		value filterDoc = document{}
-			<< "$and"
-			<< open_array
-
-			<< open_document 
-			<< "project_name" << regex
-			<< close_document
-			
-			<< open_document
-
-			<< "$or"
-			<< open_array
-			<< open_document
-			<< "created_by" << loggedInUser.userId
-			<< close_document
-
-			<< open_document
-			<< "groups" << inArr
-			<< close_document
-
-			<< close_array
-			<< close_document
-
-			<< close_array
-			<< finalize;
-
-
-		mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		mongocxx::pipeline p{};
-		p.match(filterDoc.view());
-		if (limit > 0)
-		{
-			p.limit(limit);
-		}
-
-
-		mongocxx::cursor cursor = projectsCollection.aggregate(p);
-
-		std::vector<Project> projects{};
-		for (auto doc : cursor)
-		{
-			// Research std::move() 
-
-			Project tmpProject(doc);
-			const std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
-			tmpProject.setUser(MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient));
-
-			auto groupsArr = doc["groups"].get_array().value;
-
-			for (const auto& groupId : groupsArr)
-			{
-				std::string id = std::string(groupId.get_utf8().value.data());
-
-				Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
-
-				tmpProject.addUserGroup(currentGroup);
-			}
-
-			projects.push_back(tmpProject);
-		}
-
-		return projects;
-	}
-
-	std::vector<Project> getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& _filter, int limit, mongocxx::client& userClient) {
-		OT_LOG_D("Searching projects of user: " + loggedInUser.username);
-
-		std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(loggedInUser, userClient);
-
-		std::list<bsoncxx::document::value> filters;
-
-		// Directly accessible data
-		intern::appendFilter(filters, "project_group", _filter.getProjectGroups());
-		intern::appendFilter(filters, "project_type", _filter.getProjectTypes());
-		intern::appendFilter(filters, "project_name", _filter.getProjectNames());
-		intern::appendFilter(filters, "tags", _filter.getTags());
-
-		// Owner filter, names provided, need to convert to IDs
-		if (!_filter.getOwners().empty()) {
-			std::list<std::string> ownerIds;
-			for (const auto& ownerName : _filter.getOwners()) {
-				try {
-					User ownerUser = MongoUserFunctions::getUserDataThroughUsername(ownerName, userClient);
-					ownerIds.push_back(ownerUser.userId);
-				}
-				catch (std::runtime_error err) {
-					OT_LOG_E("Owner user " + ownerName + " specified in the project filter was not found.");
+			bool found = false;
+			for (const Group& group : userGroups) {
+				if (group.name == groupName) {
+					groupIds.push_back(group.id);
+					found = true;
+					break;
 				}
 			}
-
-			intern::appendFilter(filters, "created_by", ownerIds);
-		}
-
-		// Group access filter, names provided, need to convert to IDs
-		if (!_filter.getUserGroups().empty()) {
-			std::list<std::string> groupIds;
-			for (const auto& groupName : _filter.getUserGroups()) {
-				if (groupName.empty()) {
-					continue;
-				}
-
-				bool found = false;
-				for (const Group& group : userGroups) {
-					if (group.name == groupName) {
-						groupIds.push_back(group.id);
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					OT_LOG_E("User " + loggedInUser.username + " is not member of group " + groupName + " specified in the project filter.");
-				}
-			}
-			intern::appendFilter(filters, "groups", groupIds);
-		}
-
-		// Build group access array
-		auto accessBuilder = bsoncxx::builder::basic::array{};
-		for (const auto& group : userGroups) {
-			accessBuilder.append(group.id);
-		}
-		auto acessArr = document{} << "$in" << accessBuilder << finalize;
-
-		// Build user access filter (access via ownership or group membership)
-		auto userAccessDoc = document{}
-			<< "$or"
-			<< open_array
-			<< open_document
-			<< "created_by" << loggedInUser.userId
-			<< close_document
-			<< open_document
-			<< "groups" << acessArr
-			<< close_document
-			<< close_array
-			<< finalize;
-
-		// Combine all filters
-		auto filterBuilder = bsoncxx::builder::basic::array{};
-		for (auto& f : filters) {
-			filterBuilder.append(std::move(f));
-		}
-		filterBuilder.append(std::move(userAccessDoc));
-
-		value filterDoc = document{} << "$and" << filterBuilder << finalize;
-
-		//OT_LOG_T(bsoncxx::to_json(filterDoc.view()));
-
-		mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		mongocxx::pipeline p{};
-		p.match(filterDoc.view());
-		if (limit > 0) {
-			p.limit(limit);
-		}
-
-		mongocxx::cursor cursor = projectsCollection.aggregate(p);
-
-		std::vector<Project> projects{};
-		for (auto doc : cursor) {
-			// Research std::move() 
-
-			Project tmpProject(doc);
-			const std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
-			tmpProject.setUser(MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient));
-
-			auto groupsArr = doc["groups"].get_array().value;
-
-			for (const auto& groupId : groupsArr) {
-				std::string id = std::string(groupId.get_utf8().value.data());
-
-				Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
-
-				tmpProject.addUserGroup(currentGroup);
-			}
-
-			projects.push_back(tmpProject);
-		}
-
-		return projects;
-	}
-
-	std::vector<Project> getAllProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient)
-	{
-		std::string regexFilter = ".*" + filter + ".*";
-		auto regex = bsoncxx::types::b_regex(regexFilter, "");
-
-		value filterDoc = document{}
-			<< "project_name" << regex
-			<< finalize;
-
-		mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		mongocxx::pipeline p{};
-		p.match(filterDoc.view());
-		if (limit > 0) {
-			p.limit(limit);
-		}
-
-		mongocxx::cursor cursor = projectsCollection.aggregate(p);
-
-		std::vector<Project> projects{};
-		for (auto doc : cursor) {
-			projects.push_back(Project(doc, userClient));
-		}
-
-		return projects;
-	}
-
-	size_t getAllProjectCount(User& loggedInUser, mongocxx::client& userClient)
-	{
-		mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		size_t count = projectsCollection.count_documents({});
-
-		return count;
-	}
-
-	std::vector<Project> getAllGroupProjects(Group& group, mongocxx::client& userClient)
-	{
-		value filter = document{}
-			<< "groups" << group.id
-			<< finalize;
-
-		mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		mongocxx::cursor cursor = projectsCollection.find(filter.view());
-
-		std::vector<Project> projects{};
-		for (auto doc : cursor)
-		{
-			Project newProject(doc, userClient);
-			projects.push_back(std::move(newProject));
-		}
-
-		return projects;
-	}
-
-	Project changeProjectName(Project& project, std::string newName, mongocxx::client& adminClient)
-	{
-		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		value filter = document{}
-			<< "_id" << project.getId()
-			<< finalize;
-
-		value update = document{}
-			<< "$set"
-			<< open_document
-			<< "project_name" << newName
-			<< close_document
-			<< finalize;
-
-		auto result = projectsCollection.update_one(filter.view(), update.view());
-
-		if (!result.has_value())
-		{
-			throw std::exception("Change project name failed.");
-		}
-		int32_t matchedCount = result.value().matched_count();
-		int32_t modifiedCount = result.value().modified_count();
-
-		if (matchedCount == 1 && modifiedCount == 1)
-		{
-			project.setName(newName);
-			return project;
-		}
-
-		throw std::runtime_error("Couldn't change the project name!");
-	}
-
-	Project changeProjectOwner(Project& project, User& newOwner, mongocxx::client& adminClient)
-	{
-		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		value filter = document{}
-			<< "_id" << project.getId()
-			<< finalize;
-
-		value update = document{}
-			<< "$set"
-			<< open_document
-			<< "created_by" << newOwner.userId
-			<< close_document
-			<< finalize;
-
-		auto result = projectsCollection.update_one(filter.view(), update.view());
-		if (!result.has_value())
-		{
-			throw std::exception("Change project owner failed.");
-		}
-
-		int32_t matchedCount = result.value().matched_count();
-		int32_t modifiedCount = result.value().modified_count();
-
-		if (matchedCount == 1 && modifiedCount == 1)
-		{
-			MongoRoleFunctions::addRoleToUser(project.getRoleName(), newOwner.username, adminClient);
-			MongoRoleFunctions::removeRoleFromUser(project.getRoleName(), project.getUser().username, adminClient);
-
-			project.setUser(newOwner);
-			return project;
-		}
-
-		throw std::runtime_error("Couldn't change the project owner!");
-	}
-
-	bool addGroupToProject(Group& group, Project& project, mongocxx::client& adminClient)
-	{
-		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
-
-		// checking whether it is already contained
-		for (const auto& alreadyContainedGroup : project.getUserGroups())
-		{
-			if (alreadyContainedGroup.id == group.id)
-			{
-				return false;
+			if (!found) {
+				OT_LOG_E("User " + loggedInUser.username + " is not member of group " + groupName + " specified in the project filter.");
 			}
 		}
-
-		// Adding project role to this group role
-		MongoRoleFunctions::addRoleToGroupRole(project.getRoleName(), group, adminClient);
-
-
-		// Adding this group to the group list of this project
-		value filter = document{}
-			<< "_id" << project.getId()
-			<< finalize;
-
-		value change = document{}
-			<< "$push"
-			<< open_document
-			<< "groups" << group.id
-			<< close_document
-			<< finalize;
-
-		auto result = projectCollection.update_one(filter.view(), change.view());
-
-		if (!result.has_value())
-		{
-			throw std::exception("Add group to project failed.");
-		}
-
-		int32_t matchedCount = result.value().matched_count();
-		int32_t modifiedCount = result.value().modified_count();
-
-		if (matchedCount == 1 && modifiedCount == 1)
-		{
-			return true;
-		}
-
-		return false;
-
+		appendFilter(filters, "groups", groupIds);
 	}
 
-	bool removeGroupFromProject(Group& group, Project& project, mongocxx::client& adminClient)
-	{
-		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+	// Build group access array
+	auto accessBuilder = bsoncxx::builder::basic::array{};
+	for (const auto& group : userGroups) {
+		accessBuilder.append(group.id);
+	}
+	auto acessArr = document{} << "$in" << accessBuilder << finalize;
 
-		bool isContained = false;
-		// checking whether it is already contained
-		for (const auto& alreadyContainedGroup : project.getUserGroups())
-		{
-			if (alreadyContainedGroup.id == group.id)
-			{
-				isContained = true;
-				break;
-			}
+	// Build user access filter (access via ownership or group membership)
+	auto userAccessDoc = document{}
+		<< "$or"
+		<< open_array
+		<< open_document
+		<< "created_by" << loggedInUser.userId
+		<< close_document
+		<< open_document
+		<< "groups" << acessArr
+		<< close_document
+		<< close_array
+		<< finalize;
+
+	// Combine all filters
+	auto filterBuilder = bsoncxx::builder::basic::array{};
+	for (auto& f : filters) {
+		filterBuilder.append(std::move(f));
+	}
+	filterBuilder.append(std::move(userAccessDoc));
+
+	value filterDoc = document{} << "$and" << filterBuilder << finalize;
+
+	//OT_LOG_T(bsoncxx::to_json(filterDoc.view()));
+
+	mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	mongocxx::pipeline p{};
+	p.match(filterDoc.view());
+	if (limit > 0) {
+		p.limit(limit);
+	}
+
+	mongocxx::cursor cursor = projectsCollection.aggregate(p);
+
+	std::vector<Project> projects{};
+	for (auto doc : cursor) {
+		// Research std::move() 
+
+		Project tmpProject(doc);
+		const std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
+		tmpProject.setUser(MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient));
+
+		auto groupsArr = doc["groups"].get_array().value;
+
+		for (const auto& groupId : groupsArr) {
+			std::string id = std::string(groupId.get_utf8().value.data());
+
+			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
+
+			tmpProject.addUserGroup(currentGroup);
 		}
 
-		if (!isContained)
-		{
+		projects.push_back(tmpProject);
+	}
+
+	return projects;
+}
+
+std::vector<Project> MongoProjectFunctions::getAllProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient) {
+	std::string regexFilter = ".*" + filter + ".*";
+	auto regex = bsoncxx::types::b_regex(regexFilter, "");
+
+	value filterDoc = document{}
+		<< "project_name" << regex
+		<< finalize;
+
+	mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	mongocxx::pipeline p{};
+	p.match(filterDoc.view());
+	if (limit > 0) {
+		p.limit(limit);
+	}
+
+	mongocxx::cursor cursor = projectsCollection.aggregate(p);
+
+	std::vector<Project> projects{};
+	for (auto doc : cursor) {
+		projects.push_back(Project(doc, userClient));
+	}
+
+	return projects;
+}
+
+size_t MongoProjectFunctions::getAllProjectCount(User& loggedInUser, mongocxx::client& userClient) {
+	mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	size_t count = projectsCollection.count_documents({});
+
+	return count;
+}
+
+std::vector<Project> MongoProjectFunctions::getAllGroupProjects(Group& group, mongocxx::client& userClient) {
+	value filter = document{}
+		<< "groups" << group.id
+		<< finalize;
+
+	mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	mongocxx::cursor cursor = projectsCollection.find(filter.view());
+
+	std::vector<Project> projects{};
+	for (auto doc : cursor) {
+		Project newProject(doc, userClient);
+		projects.push_back(std::move(newProject));
+	}
+
+	return projects;
+}
+
+Project MongoProjectFunctions::changeProjectName(Project& project, std::string newName, mongocxx::client& adminClient) {
+	mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	value filter = document{}
+		<< "_id" << project.getId()
+		<< finalize;
+
+	value update = document{}
+		<< "$set"
+		<< open_document
+		<< "project_name" << newName
+		<< close_document
+		<< finalize;
+
+	auto result = projectsCollection.update_one(filter.view(), update.view());
+
+	if (!result.has_value()) {
+		throw std::exception("Change project name failed.");
+	}
+	int32_t matchedCount = result.value().matched_count();
+	int32_t modifiedCount = result.value().modified_count();
+
+	if (matchedCount == 1 && modifiedCount == 1) {
+		project.setName(newName);
+		return project;
+	}
+
+	throw std::runtime_error("Couldn't change the project name!");
+}
+
+Project MongoProjectFunctions::changeProjectOwner(Project& project, User& newOwner, mongocxx::client& adminClient) {
+	mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	value filter = document{}
+		<< "_id" << project.getId()
+		<< finalize;
+
+	value update = document{}
+		<< "$set"
+		<< open_document
+		<< "created_by" << newOwner.userId
+		<< close_document
+		<< finalize;
+
+	auto result = projectsCollection.update_one(filter.view(), update.view());
+	if (!result.has_value()) {
+		throw std::exception("Change project owner failed.");
+	}
+
+	int32_t matchedCount = result.value().matched_count();
+	int32_t modifiedCount = result.value().modified_count();
+
+	if (matchedCount == 1 && modifiedCount == 1) {
+		MongoRoleFunctions::addRoleToUser(project.getRoleName(), newOwner.username, adminClient);
+		MongoRoleFunctions::removeRoleFromUser(project.getRoleName(), project.getUser().username, adminClient);
+
+		project.setUser(newOwner);
+		return project;
+	}
+
+	throw std::runtime_error("Couldn't change the project owner!");
+}
+
+bool MongoProjectFunctions::addGroupToProject(Group& group, Project& project, mongocxx::client& adminClient) {
+	mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	// checking whether it is already contained
+	for (const auto& alreadyContainedGroup : project.getUserGroups()) {
+		if (alreadyContainedGroup.id == group.id) {
 			return false;
 		}
+	}
 
-		MongoRoleFunctions::removeRoleFromGroupRole(project.getRoleName(), group, adminClient);
+	// Adding project role to this group role
+	MongoRoleFunctions::addRoleToGroupRole(project.getRoleName(), group, adminClient);
 
 
-		// Adding this group to the group list of this project
-		value filter = document{}
-			<< "_id" << project.getId()
-			<< finalize;
+	// Adding this group to the group list of this project
+	value filter = document{}
+		<< "_id" << project.getId()
+		<< finalize;
 
-		value change = document{}
-			<< "$pull"
-			<< open_document
-			<< "groups" << group.id
-			<< close_document
-			<< finalize;
+	value change = document{}
+		<< "$push"
+		<< open_document
+		<< "groups" << group.id
+		<< close_document
+		<< finalize;
 
-		auto result = projectCollection.update_one(filter.view(), change.view());
+	auto result = projectCollection.update_one(filter.view(), change.view());
 
-		if (!result.has_value())
-		{
-			throw std::exception("Remove role from group role failed.");
+	if (!result.has_value()) {
+		throw std::exception("Add group to project failed.");
+	}
+
+	int32_t matchedCount = result.value().matched_count();
+	int32_t modifiedCount = result.value().modified_count();
+
+	if (matchedCount == 1 && modifiedCount == 1) {
+		return true;
+	}
+
+	return false;
+}
+
+bool MongoProjectFunctions::removeGroupFromProject(Group& group, Project& project, mongocxx::client& adminClient) {
+	mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	bool isContained = false;
+	// checking whether it is already contained
+	for (const auto& alreadyContainedGroup : project.getUserGroups()) {
+		if (alreadyContainedGroup.id == group.id) {
+			isContained = true;
+			break;
 		}
+	}
 
-		int32_t matchedCount = result.value().matched_count();
-		int32_t modifiedCount = result.value().modified_count();
-
-		if (matchedCount == 1 && modifiedCount == 1)
-		{
-			return true;
-		}
-
+	if (!isContained) {
 		return false;
 	}
 
-	bool removeProject(Project& project, mongocxx::client& adminClient)
-	{
-		// First remove the project role
-		// then remove project collection
-		// then remove the project from the catalog
+	MongoRoleFunctions::removeRoleFromGroupRole(project.getRoleName(), group, adminClient);
 
-		MongoRoleFunctions::removeRole(project.getRoleName(), adminClient);
 
-		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectDataCollection = secondaryDb.collection(project.getCollectionName());
-		mongocxx::collection projectFilesCollection = secondaryDb.collection(project.getCollectionName() + ".files");
-		mongocxx::collection projectChunksCollection = secondaryDb.collection(project.getCollectionName() + ".chunks");
-		mongocxx::collection projectResultsCollection = secondaryDb.collection(project.getCollectionName() + ".results");
+	// Adding this group to the group list of this project
+	value filter = document{}
+		<< "_id" << project.getId()
+		<< finalize;
 
-		projectDataCollection.drop();
-		projectFilesCollection.drop();
-		projectChunksCollection.drop();
-		projectResultsCollection.drop();
+	value change = document{}
+		<< "$pull"
+		<< open_document
+		<< "groups" << group.id
+		<< close_document
+		<< finalize;
 
-		mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+	auto result = projectCollection.update_one(filter.view(), change.view());
 
-		value filter = document{}
-			<< "_id" << project.getId()
-			<< finalize;
-
-		auto result = projectsCollection.delete_one(filter.view());
-
-		if (!result.has_value())
-		{
-			throw std::exception("Remove project failed.");
-		}
-		if (result.value().deleted_count() == 1)
-		{
-			return true;
-		}
-
-		return false;
-
+	if (!result.has_value()) {
+		throw std::exception("Remove role from group role failed.");
 	}
 
-	bool changeProjectCreator(bsoncxx::oid& projectId, User& oldOwner, User& newOwner, mongocxx::client& adminClient)
-	{
-		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+	int32_t matchedCount = result.value().matched_count();
+	int32_t modifiedCount = result.value().modified_count();
 
-		Project project = getProject(projectId, adminClient);
-
-		if (project.getUser().userId != oldOwner.userId)
-		{
-			throw std::runtime_error("The logged in user is not the creator of this project! He cannot make the requested changes!");
-		}
-
-		value filter = document{}
-			<< "_id" << projectId
-			<< finalize;
-
-		value update = document{}
-			<< "$set"
-			<< open_document
-			<< "created_by" << newOwner.userId
-			<< close_document
-			<< finalize;
-
-
-		auto result = projectsCollection.update_one(filter.view(), update.view());
-
-		if (!result.has_value())
-		{
-			throw std::exception("Change project creator failed.");
-		}
-
-		int32_t matchedCount = result.value().matched_count();
-		int32_t modifiedCount = result.value().modified_count();
-
-
-		if (matchedCount == 1 && modifiedCount == 1)
-		{
-			MongoRoleFunctions::addRoleToUser(project.getRoleName(), newOwner.username, adminClient);
-			return true;
-		}
-
-		return false;
+	if (matchedCount == 1 && modifiedCount == 1) {
+		return true;
 	}
 
-	bool checkForCollectionExistence(const std::string& collectionName, mongocxx::client& userClient)
-	{
-		mongocxx::database secondaryDb = userClient.database(MongoConstants::PROJECTS_DB);
-		return secondaryDb.has_collection(collectionName);
+	return false;
+}
+
+bool MongoProjectFunctions::removeProject(Project& project, mongocxx::client& adminClient) {
+	// First remove the project role
+	// then remove project collection
+	// then remove the project from the catalog
+
+	MongoRoleFunctions::removeRole(project.getRoleName(), adminClient);
+
+	mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectDataCollection = secondaryDb.collection(project.getCollectionName());
+	mongocxx::collection projectFilesCollection = secondaryDb.collection(project.getCollectionName() + ".files");
+	mongocxx::collection projectChunksCollection = secondaryDb.collection(project.getCollectionName() + ".chunks");
+	mongocxx::collection projectResultsCollection = secondaryDb.collection(project.getCollectionName() + ".results");
+
+	projectDataCollection.drop();
+	projectFilesCollection.drop();
+	projectChunksCollection.drop();
+	projectResultsCollection.drop();
+
+	mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+
+	value filter = document{}
+		<< "_id" << project.getId()
+		<< finalize;
+
+	auto result = projectsCollection.delete_one(filter.view());
+
+	if (!result.has_value()) {
+		throw std::exception("Remove project failed.");
+	}
+	if (result.value().deleted_count() == 1) {
+		return true;
 	}
 
-	std::string projectsToJson(std::vector<Project>& projects)
-	{
-		ot::JsonDocument doc;
-		ot::JsonArray projectsArr;
-		for (const Project& project : projects) {
-			projectsArr.PushBack(ot::JsonObject(project.toProjectInformation(), doc.GetAllocator()), doc.GetAllocator());
-		}
-		doc.AddMember(OT_ACTION_PARAM_List, projectsArr, doc.GetAllocator());
-		return doc.toJson();
-		
-		/*
-		std::list<std::string> jsonProjects{};
+	return false;
+}
 
-		for (const Project& project : projects)
-		{
-			jsonProjects.push_back(MongoProjectFunctions::projectToJson(project));
-		}
+bool MongoProjectFunctions::changeProjectCreator(bsoncxx::oid& projectId, User& oldOwner, User& newOwner, mongocxx::client& adminClient) {
+	mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 
-		
-		ot::JsonDocument json;
-		json.AddMember("projects", ot::JsonArray(jsonProjects, json.GetAllocator()), json.GetAllocator());
-		return json.toJson();
+	Project project = getProject(projectId, adminClient);
 
-		*/
+	if (project.getUser().userId != oldOwner.userId) {
+		throw std::runtime_error("The logged in user is not the creator of this project! He cannot make the requested changes!");
 	}
+
+	value filter = document{}
+		<< "_id" << projectId
+		<< finalize;
+
+	value update = document{}
+		<< "$set"
+		<< open_document
+		<< "created_by" << newOwner.userId
+		<< close_document
+		<< finalize;
+
+
+	auto result = projectsCollection.update_one(filter.view(), update.view());
+
+	if (!result.has_value()) {
+		throw std::exception("Change project creator failed.");
+	}
+
+	int32_t matchedCount = result.value().matched_count();
+	int32_t modifiedCount = result.value().modified_count();
+
+
+	if (matchedCount == 1 && modifiedCount == 1) {
+		MongoRoleFunctions::addRoleToUser(project.getRoleName(), newOwner.username, adminClient);
+		return true;
+	}
+
+	return false;
+}
+
+bool MongoProjectFunctions::checkForCollectionExistence(const std::string& collectionName, mongocxx::client& userClient) {
+	mongocxx::database secondaryDb = userClient.database(MongoConstants::PROJECTS_DB);
+	return secondaryDb.has_collection(collectionName);
+}
+
+std::string MongoProjectFunctions::projectsToJson(std::vector<Project>& projects) {
+	ot::JsonDocument doc;
+	ot::JsonArray projectsArr;
+	for (const Project& project : projects) {
+		projectsArr.PushBack(ot::JsonObject(project.toProjectInformation(), doc.GetAllocator()), doc.GetAllocator());
+	}
+	doc.AddMember(OT_ACTION_PARAM_List, projectsArr, doc.GetAllocator());
+	return doc.toJson();
+
+	/*
+	std::list<std::string> jsonProjects{};
+
+	for (const Project& project : projects)
+	{
+		jsonProjects.push_back(MongoProjectFunctions::projectToJson(project));
+	}
+
+
+	ot::JsonDocument json;
+	json.AddMember("projects", ot::JsonArray(jsonProjects, json.GetAllocator()), json.GetAllocator());
+	return json.toJson();
+
+	*/
+}
+
+void MongoProjectFunctions::appendFilter(std::list<bsoncxx::document::value>& _createdFilters, const std::string& _field, const std::list<std::string>& _values) {
+	if (_values.empty()) {
+		return;
+	}
+
+	// First separate empty and non-empty values
+	std::vector<std::string> nonEmpty;
+	bool hasEmpty = false;
+
+	for (const std::string& val : _values) {
+		if (val.empty()) {
+			hasEmpty = true;
+		}
+		else {
+			nonEmpty.push_back(val);
+		}
+	}
+
+	bsoncxx::builder::basic::array orArray;
+
+	// Match non-empty entries
+	if (!nonEmpty.empty()) {
+		auto optArray = bsoncxx::builder::basic::array{};
+		for (const std::string& v : nonEmpty) {
+			optArray.append(v);
+		}
+		orArray.append(document{} << _field << open_document << "$in" << optArray << close_document << finalize);
+	}
+
+	// Match documents where field is missing or empty
+	if (hasEmpty) {
+		// field == ""
+		orArray.append(document{} << _field << "" << finalize);
+
+		// field does not exist (legacy support)
+		orArray.append(document{} << _field << open_document << "$exists" << false << close_document << finalize);
+	}
+	_createdFilters.push_back(document{} << "$or" << orArray << finalize);
+
+	//OT_LOG_W(bsoncxx::to_json(_createdFilters.back().view()));
 }

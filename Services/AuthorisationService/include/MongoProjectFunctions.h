@@ -52,46 +52,49 @@ using bsoncxx::document::view;
 using bsoncxx::document::element;
 
 
-namespace MongoProjectFunctions
-{
-	ot::ProjectFilterData getProjectFilterOptions(const User& _loggedInUser, mongocxx::client& _adminClient);
+class MongoProjectFunctions {
+	OT_DECL_STATICONLY(MongoProjectFunctions)
+public:
+	static ot::ProjectFilterData getProjectFilterOptions(const User& _loggedInUser, mongocxx::client& _adminClient);
 
-	Project createProject(std::string projectName, std::string projectType, User& creatingUser, mongocxx::client& adminClient);
+	static Project createProject(std::string projectName, std::string projectType, User& creatingUser, mongocxx::client& adminClient);
 
-	void projectWasOpened(const std::string& projectName, mongocxx::client& adminClient);
+	static void projectWasOpened(const std::string& projectName, mongocxx::client& adminClient);
 
-	ot::ReturnMessage updateAdditionalProjectInformation(const ot::ProjectInformation& _projectInfo, mongocxx::client& _adminClient);
+	static ot::ReturnMessage updateAdditionalProjectInformation(const ot::ProjectInformation& _projectInfo, mongocxx::client& _adminClient);
 
-	std::string generateProjectCollectionName(mongocxx::client& adminClient);
+	static std::string generateProjectCollectionName(mongocxx::client& adminClient);
 
-	Project getProject(bsoncxx::oid& projectId, mongocxx::client& userClient);
+	static Project getProject(bsoncxx::oid& projectId, mongocxx::client& userClient);
 
-	Project getProject(std::string projectName, mongocxx::client& userClient);
+	static Project getProject(std::string projectName, mongocxx::client& userClient);
 
-	std::string getProjectsInfo(const std::list<std::string>& _projectNames, mongocxx::client& _adminClient);
+	static std::string getProjectsInfo(const std::list<std::string>& _projectNames, mongocxx::client& _adminClient);
 
-	std::vector<Project> getAllGroupProjects(Group& group, mongocxx::client& userClient);
+	static std::vector<Project> getAllGroupProjects(Group& group, mongocxx::client& userClient);
 
-	std::vector<Project> getAllUserProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient);
-	std::vector<Project> getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& filter, int limit, mongocxx::client& userClient);
+	static std::vector<Project> getAllUserProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient);
+	static std::vector<Project> getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& filter, int limit, mongocxx::client& userClient);
 
-	std::vector<Project> getAllProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient);
-	size_t getAllProjectCount(User& loggedInUser, mongocxx::client& userClient);
+	static std::vector<Project> getAllProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient);
+	static size_t getAllProjectCount(User& loggedInUser, mongocxx::client& userClient);
 
-	Project changeProjectName(Project& project, std::string newName, mongocxx::client& adminClient);
+	static Project changeProjectName(Project& project, std::string newName, mongocxx::client& adminClient);
 
-	Project changeProjectOwner(Project& project, User& newOwner, mongocxx::client& adminClient);
+	static Project changeProjectOwner(Project& project, User& newOwner, mongocxx::client& adminClient);
 
-	bool addGroupToProject(Group& group, Project& project, mongocxx::client& adminClient);
+	static bool addGroupToProject(Group& group, Project& project, mongocxx::client& adminClient);
 
-	bool removeGroupFromProject(Group& group, Project& project, mongocxx::client& adminClient);
+	static bool removeGroupFromProject(Group& group, Project& project, mongocxx::client& adminClient);
 
-	bool removeProject(Project& project, mongocxx::client& adminClient);
+	static bool removeProject(Project& project, mongocxx::client& adminClient);
 
-	bool changeProjectCreator(bsoncxx::oid& projectId, User& oldOwner, User& newOwner, mongocxx::client& adminClient);
+	static bool changeProjectCreator(bsoncxx::oid& projectId, User& oldOwner, User& newOwner, mongocxx::client& adminClient);
 
-	bool checkForCollectionExistence(const std::string& collectionName, mongocxx::client& loggedInUser);
+	static bool checkForCollectionExistence(const std::string& collectionName, mongocxx::client& loggedInUser);
 
-	std::string projectsToJson(std::vector<Project>& projects);
+	static std::string projectsToJson(std::vector<Project>& projects);
 
-}
+private:
+	static void appendFilter(std::list<bsoncxx::document::value>& _createdFilters, const std::string& _field, const std::list<std::string>& _values);
+};
