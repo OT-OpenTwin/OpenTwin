@@ -160,6 +160,9 @@
     <ClCompile Include="$(OPENTWIN_THIRDPARTY_ROOT)\base64\base64.c">
       <Filter>ThirdParty</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProjectFilterData.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -458,6 +461,9 @@
     </ClInclude>
     <ClInclude Include="$(OPENTWIN_THIRDPARTY_ROOT)\base64\base64.h">
       <Filter>ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ProjectFilterData.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

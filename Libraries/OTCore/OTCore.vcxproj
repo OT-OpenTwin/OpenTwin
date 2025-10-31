@@ -41,6 +41,7 @@
     <ClCompile Include="src\LogNotifierFileWriter.cpp" />
     <ClCompile Include="src\LogNotifierStdCout.cpp" />
     <ClCompile Include="src\LogTypes.cpp" />
+    <ClCompile Include="src\ProjectFilterData.cpp" />
     <ClCompile Include="src\ProjectInformation.cpp" />
     <ClCompile Include="src\Serializable.cpp" />
     <ClCompile Include="src\ServiceDebugInformation.cpp" />
@@ -118,6 +119,7 @@
     <ClInclude Include="include\OTCore\OTClassHelper.h" />
     <ClInclude Include="include\OTCore\PointerList.h" />
     <ClInclude Include="include\OTCore\PointerList.hpp" />
+    <ClInclude Include="include\OTCore\ProjectFilterData.h" />
     <ClInclude Include="include\OTCore\ProjectInformation.h" />
     <ClInclude Include="include\OTCore\ServiceDebugInformation.h" />
     <ClInclude Include="include\OTCore\ThisComputerInfo.h" />

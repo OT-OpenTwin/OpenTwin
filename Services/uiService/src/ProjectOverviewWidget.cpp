@@ -261,7 +261,22 @@ void ot::ProjectOverviewWidget::sort(int _logicalIndex, ProjectOverviewFilterDat
 void ot::ProjectOverviewWidget::filterProjects(const ProjectOverviewFilterData& _filterData) {
 	filterProjects(m_tree->invisibleRootItem(), _filterData);
 	updateProjectGroups();
+
+	return;
 	
+	if (_filterData.getLogicalIndex() >= 0) {
+		ot::ProjectFilterData filter = _filterData.toProjectFilterData();
+
+		ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
+		std::list<ot::ProjectInformation> projects;
+		if (projectManager.findProjects(filter, 0, projects, m_resultsExceeded)) {
+			std::string tmp;
+			for (const ot::ProjectInformation& info : projects) {
+				tmp.append(info.getProjectName() + "; ");
+			}
+			OT_LOG_T(tmp);
+		}
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

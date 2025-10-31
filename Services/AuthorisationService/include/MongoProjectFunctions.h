@@ -39,6 +39,7 @@
 #include "Project.h"
 
 #include "OTCore/ReturnMessage.h"
+#include "OTCore/ProjectFilterData.h"
 
 using bsoncxx::builder::stream::close_array;
 using bsoncxx::builder::stream::close_document;
@@ -71,6 +72,7 @@ namespace MongoProjectFunctions
 	std::vector<Project> getAllGroupProjects(Group& group, mongocxx::client& userClient);
 
 	std::vector<Project> getAllUserProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient);
+	std::vector<Project> getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& filter, int limit, mongocxx::client& userClient);
 
 	std::vector<Project> getAllProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient);
 	size_t getAllProjectCount(User& loggedInUser, mongocxx::client& userClient);

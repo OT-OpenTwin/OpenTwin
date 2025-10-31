@@ -20,6 +20,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/ProjectFilterData.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt header
@@ -49,6 +50,8 @@ namespace ot {
 		void addSelectedFilter(const QString& _filter) { m_selectedFilters.append(_filter); };
 		void setSelectedFilters(const QStringList& _filters) { m_selectedFilters = _filters; };
 		const QStringList& getSelectedFilters() const { return m_selectedFilters; };
+
+		ProjectFilterData toProjectFilterData() const;
 
 		static QString getEmptyProjectGroupFilterName() { return "< No Group >"; };
 		static QString getEmptyUserGroupFilterName() { return "< No Groups >"; };

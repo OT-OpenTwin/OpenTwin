@@ -18,10 +18,61 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "ProjectOverviewHeader.h"
 #include "ProjectOverviewFilterData.h"
+#include "OTCore/LogDispatcher.h"
 
 ot::ProjectOverviewFilterData::ProjectOverviewFilterData(int _logicalIndex)
 	: m_logicalIndex(_logicalIndex)
 {
 
+}
+
+ot::ProjectFilterData ot::ProjectOverviewFilterData::toProjectFilterData() const {
+	ProjectFilterData filter;
+
+	std::list<std::string> options;
+	for (const QString& option : m_selectedFilters) {
+		if (option == getEmptyProjectGroupFilterName() ||
+			option == getEmptyTagsFilterName() ||
+			option == getEmptyUserGroupFilterName()) 
+		{
+			options.push_back("");
+		}
+		else {
+			options.push_back(option.toStdString());
+		}
+		
+	}
+	switch (m_logicalIndex) {
+	case ProjectOverviewHeader::Group:
+		filter.setProjectGroups(options);
+		break;
+
+	case ProjectOverviewHeader::Type:
+		filter.setProjectTypes(options);
+		break;
+
+	case ProjectOverviewHeader::Name:
+		filter.setProjectNames(options);
+		break;
+
+	case ProjectOverviewHeader::Tags:
+		filter.setTags(options);
+		break;
+
+	case ProjectOverviewHeader::Owner:
+		filter.setOwners(options);
+		break;
+
+	case ProjectOverviewHeader::Access:
+		filter.setUserGroups(options);
+		break;
+
+	default:
+		OT_LOG_E("Invalid logical index (" + std::to_string(m_logicalIndex) + ")");
+		break;
+	}
+
+	return filter;
 }

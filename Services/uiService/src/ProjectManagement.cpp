@@ -385,7 +385,53 @@ bool ProjectManagement::findProjects(const std::string& _projectNameFilter, int 
 		size--;
 	}
 
-	return (!_projectsFound.empty());
+	return true;
+}
+
+bool ProjectManagement::findProjects(const ot::ProjectFilterData& _projectFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded) {
+	assert(!m_authServerURL.empty());
+
+	_projectsFound.clear();
+	m_projectInfoMap.clear();
+
+	AppBase* app{ AppBase::instance() };
+
+	if (_maxNumberOfResults == 0) {
+		_maxNumberOfResults = std::numeric_limits<int>::max();
+	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_projectFilter, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults, doc.GetAllocator());
+
+	std::string response;
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		exit(ot::AppExitCode::SendFailed);
+		return false;
+	}
+
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+
+	for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List)) {
+		ot::ProjectInformation newInfo(projObj);
+		_projectsFound.push_back(newInfo);
+		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
+	}
+
+	size_t size = _projectsFound.size();
+	while (size > _maxNumberOfResults) {
+		_maxLengthExceeded = true;
+		_projectsFound.pop_back();
+		size--;
+	}
+
+	return true;
 }
 
 bool ProjectManagement::createNewCollection(const std::string &collectionName, const std::string &defaultSettingTemplate)

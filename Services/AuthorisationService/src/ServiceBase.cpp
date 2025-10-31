@@ -833,10 +833,20 @@ std::string ServiceBase::handleGetProjectsInfo(const ot::ConstJsonObject& _actio
 }
 
 std::string ServiceBase::handleGetAllUserProjects(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
-	std::string filter = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_FILTER);
+	std::vector<Project> projects;
 	int limit = ot::json::getInt(_actionDocument, OT_PARAM_AUTH_PROJECT_LIMIT);
 
-	std::vector<Project> projects = MongoProjectFunctions::getAllUserProjects(_loggedInUser, filter, limit, adminClient);
+	if (_actionDocument.HasMember(OT_PARAM_AUTH_PROJECT_FILTER)) {
+		std::string filter = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_FILTER);
+		projects = MongoProjectFunctions::getAllUserProjects(_loggedInUser, filter, limit, adminClient);
+	}
+	else if (_actionDocument.HasMember(OT_ACTION_PARAM_Config)) {
+		ot::ProjectFilterData filterData(ot::json::getObject(_actionDocument, OT_ACTION_PARAM_Config));
+		projects = MongoProjectFunctions::getAllUserProjects(_loggedInUser, filterData, limit, adminClient);
+	}
+	else {
+		OT_LOG_E("No filter provided for getting all user projects. Returning empty list.");
+	}
 
 	return MongoProjectFunctions::projectsToJson(projects);
 }
