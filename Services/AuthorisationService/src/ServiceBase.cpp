@@ -953,28 +953,13 @@ std::string ServiceBase::handleRemoveGroupFromProject(const ot::ConstJsonObject&
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
 	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
-	bool userIsGroupMember = false;
-	for (const auto& groupUser : gr.users) {
-		if (groupUser.userId == _loggedInUser.userId) {
-			userIsGroupMember = true;
-			break;
-		}
-	}
-
 	bool successful = false;
-	if (userIsGroupMember)
-	{
-		Project pr = MongoProjectFunctions::getProject(projectName, m_adminClient);
-		if (pr.getUser().userId == _loggedInUser.userId) {
-			successful = MongoProjectFunctions::removeGroupFromProject(gr, pr, m_adminClient);
-		}
-		else {
-			throw std::runtime_error("The logged in user is not the owner of this Project! He cannot make the requested changes!");
-		}
+	Project pr = MongoProjectFunctions::getProject(projectName, m_adminClient);
+	if (pr.getUser().userId == _loggedInUser.userId) {
+		successful = MongoProjectFunctions::removeGroupFromProject(gr, pr, m_adminClient);
 	}
-	else
-	{
-		throw std::runtime_error("The logged in user is not a member of this group! He cannot make the requested changes!");
+	else {
+		throw std::runtime_error("The logged in user is not the owner of this Project! He cannot make the requested changes!");
 	}
 
 	ot::JsonDocument json;
