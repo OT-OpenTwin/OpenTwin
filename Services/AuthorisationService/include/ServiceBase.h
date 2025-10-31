@@ -199,6 +199,7 @@ private:
 
 	// Action handler: Authentication required: Project functions
 
+	std::string handleGetFilterOptions(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleCreateProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleProjectOpened(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleUpdateAdditionalProjectInformation(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);

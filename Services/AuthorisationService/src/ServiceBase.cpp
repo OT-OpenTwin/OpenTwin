@@ -550,6 +550,16 @@ std::string ServiceBase::handleRemoveGroup(const ot::ConstJsonObject& _actionDoc
 
 // Action handler: Authentication required: Project functions
 
+std::string ServiceBase::handleGetFilterOptions(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
+	ot::ReturnMessage ret(ot::ReturnMessage::Ok);
+	ot::JsonDocument optionsDoc;
+	ot::ProjectFilterData filterOptions = MongoProjectFunctions::getProjectFilterOptions(_loggedInUser, m_adminClient);
+
+	filterOptions.addToJsonObject(optionsDoc, optionsDoc.GetAllocator());
+	ret.setWhat(optionsDoc.toJson());
+	return ret.toJson();
+}
+
 std::string ServiceBase::handleCreateProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
 	std::string projectType = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_TYPE);
@@ -792,8 +802,11 @@ void ServiceBase::initializeDatabase() {
 
 	// Add indexes for all 
 
-	mongocxx::options::index index_options{};
-	index_options.unique(true);
+	mongocxx::options::index uniqueIndexOptions{};
+	uniqueIndexOptions.unique(true);
+
+	mongocxx::options::index nonUniqueIndexOptions{};
+	nonUniqueIndexOptions.unique(false);
 
 	/* HANDLING PROJECT CATALOG ROLE AND INDEXES */
 	try {
@@ -818,30 +831,75 @@ void ServiceBase::initializeDatabase() {
 	}
 
 	try {
-		index_options.name("project_name_unique");
+		uniqueIndexOptions.name("project_name_unique");
 		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_name", 1)), index_options);
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_name", 1)), uniqueIndexOptions);
 	}
 	catch (std::runtime_error err) {
 		OT_LOG_E("Error creating db index project_name_unique: " + std::string(err.what()));
 	}
 
 	try {
-		index_options.name("project_collection_name_unique");
+		nonUniqueIndexOptions.name("project_type_index");
 		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("collection_name", 1)), index_options);
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_type", 1)), nonUniqueIndexOptions);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index project_type_index: " + std::string(err.what()));
+	}
+
+	try {
+		nonUniqueIndexOptions.name("created_by_index");
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("created_by", 1)), nonUniqueIndexOptions);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index created_by_index: " + std::string(err.what()));
+	}
+
+	try {
+		uniqueIndexOptions.name("project_collection_name_unique");
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("collection_name", 1)), uniqueIndexOptions);
 	}
 	catch (std::runtime_error err) {
 		OT_LOG_E("Error creating db index project_collection_name_unique: " + std::string(err.what()));
 	}
 	
 	try {
-		index_options.name("project_role_name_unique");
+		uniqueIndexOptions.name("project_role_name_unique");
 		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_role_name", 1)), index_options);
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_role_name", 1)), uniqueIndexOptions);
 	}
 	catch (std::runtime_error err) {
 		OT_LOG_E("Error creating db index project_role_name_unique: " + std::string(err.what()));
+	}
+
+	try {
+		nonUniqueIndexOptions.name("groups_index");
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("groups", 1)), nonUniqueIndexOptions);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index groups_index: " + std::string(err.what()));
+	}
+
+	try {
+		nonUniqueIndexOptions.name("tags_index");
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("tags", 1)), nonUniqueIndexOptions);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index tags_index: " + std::string(err.what()));
+	}
+
+	try {
+		nonUniqueIndexOptions.name("project_group_index");
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_group", 1)), nonUniqueIndexOptions);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index project_group_index: " + std::string(err.what()));
 	}
 
 	/* HANDLING GROUP COLLECTION ROLE AND INDEXES */
@@ -857,9 +915,9 @@ void ServiceBase::initializeDatabase() {
 	}
 
 	try {
-		index_options.name("group_name_unique");
+		uniqueIndexOptions.name("group_name_unique");
 		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::GROUPS_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("group_name", 1)), index_options);
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("group_name", 1)), uniqueIndexOptions);
 	}
 	catch (std::runtime_error err) {
 		OT_LOG_E("Error creating db index group_name_unique: " + std::string(err.what()));
@@ -943,18 +1001,18 @@ void ServiceBase::initializeDatabase() {
 	}
 
 	try {
-		index_options.name("user_name_unique");
+		uniqueIndexOptions.name("user_name_unique");
 		m_adminClient[MongoConstants::USER_DB][MongoConstants::USER_CATALOG_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_name", 1)), index_options);
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_name", 1)), uniqueIndexOptions);
 	}
 	catch (std::runtime_error err) {
 		OT_LOG_E("Error creating db index user_name_unique: " + std::string(err.what()));
 	}
 
 	try {
-		index_options.name("user_id_unique");
+		uniqueIndexOptions.name("user_id_unique");
 		m_adminClient[MongoConstants::USER_DB][MongoConstants::USER_CATALOG_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_id", 1)), index_options);
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_id", 1)), uniqueIndexOptions);
 	}
 	catch (std::runtime_error err) {
 		OT_LOG_E("Error creating db index user_id_unique: " + std::string(err.what()));

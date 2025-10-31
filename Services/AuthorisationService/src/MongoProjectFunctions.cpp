@@ -84,6 +84,11 @@ namespace MongoProjectFunctions
 
 	}
 
+	
+
+	ot::ProjectFilterData getProjectFilterOptions(const User& _loggedInUser, mongocxx::client& _adminClient) {
+		return ot::ProjectFilterData();
+	}
 
 	Project createProject(std::string projectName, std::string projectType, User& creatingUser, mongocxx::client& adminClient)
 	{
@@ -606,7 +611,6 @@ namespace MongoProjectFunctions
 		throw std::runtime_error("Couldn't change the project owner!");
 	}
 
-
 	bool addGroupToProject(Group& group, Project& project, mongocxx::client& adminClient)
 	{
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
@@ -655,7 +659,6 @@ namespace MongoProjectFunctions
 		return false;
 
 	}
-
 
 	bool removeGroupFromProject(Group& group, Project& project, mongocxx::client& adminClient)
 	{
@@ -750,7 +753,6 @@ namespace MongoProjectFunctions
 		return false;
 
 	}
-
 
 	bool changeProjectCreator(bsoncxx::oid& projectId, User& oldOwner, User& newOwner, mongocxx::client& adminClient)
 	{

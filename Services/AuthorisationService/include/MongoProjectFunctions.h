@@ -54,6 +54,7 @@ using bsoncxx::document::element;
 
 namespace MongoProjectFunctions
 {
+	ot::ProjectFilterData getProjectFilterOptions(const User& _loggedInUser, mongocxx::client& _adminClient);
 
 	Project createProject(std::string projectName, std::string projectType, User& creatingUser, mongocxx::client& adminClient);
 
