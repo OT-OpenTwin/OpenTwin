@@ -51,237 +51,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	OT_LOG_D("Service address : " + m_serviceURL);
 	OT_LOG_D("Database address: " + m_databaseURL);
 
-	// NEEDED AND MUST BE EXECUTED ONCE
-	mongocxx::instance inst{};
-
-	// Initializing the Admin Client at the time of starting the service.
-
-	// Maybe fetch the admin Credentials through the environment 
-
-	m_dbUsername = getAdminUserName();
-
-	if (!m_databasePWD.empty())
-	{
-		m_dbPassword = m_databasePWD;
-	}
-	else
-	{
-		m_dbPassword = ot::UserCredentials::encryptString("admin");
-	}
-
-	try
-	{
-		std::string uriStr = getMongoURL(m_databaseURL, m_dbUsername, ot::UserCredentials::decryptString(m_dbPassword));
-		mongocxx::uri uri(uriStr);
-		m_adminClient = mongocxx::client(uri);
-	}
-	catch (std::exception err)
-	{
-		OT_LOG_E("Cannot establish MongoDB connection: " + std::string(err.what())); // todo: should retry or exit?
-		exit(ot::AppExitCode::DataBaseConnectionFailed);
-	}
-
-	// Add indexes for all 
-
-	mongocxx::options::index index_options{};
-	index_options.unique(true);
-
-	/* HANDLING PROJECT CATALOG ROLE AND INDEXES */
-	try
-	{
-		MongoRoleFunctions::createInitialProjectRole(m_adminClient);
-	}
-	catch (std::runtime_error err)
-	{
-		std::string errMsg(err.what());
-		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
-			OT_LOG_E("Error creating initial project role in database: " + std::string(err.what()));
-		}
-	}
-
-	try
-	{
-		// Role so that each user can list the project DB collections
-		MongoRoleFunctions::createInitialProjectDbListCollectionsRole(m_adminClient);
-	}
-	catch (std::runtime_error err)
-	{
-		std::string errMsg(err.what());
-		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
-			OT_LOG_E("Error creating initial project list role in database: " + std::string(err.what()));
-		}
-	}
-
-	try
-	{
-		index_options.name("project_name_unique");
-		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_name", 1)), index_options);
-	}
-	catch (std::runtime_error err)
-	{
-		OT_LOG_E("Error creating db index project_name_unique: " + std::string(err.what()));
-	}
-
-	try
-	{
-		index_options.name("project_role_name_unique");
-		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_role_name", 1)), index_options);
-	}
-	catch (std::runtime_error err)
-	{
-		OT_LOG_E("Error creating db index project_role_name_unique: " + std::string(err.what()));
-	}
-
-	try
-	{
-		index_options.name("project_collection_name_unique");
-		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("collection_name", 1)), index_options);
-	}
-	catch (std::runtime_error err)
-	{
-		OT_LOG_E("Error creating db index project_collection_name_unique: " + std::string(err.what()));
-	}
-
-
-	/* HANDLING GROUP COLLECTION ROLE AND INDEXES */
-
-	try
-	{
-		MongoRoleFunctions::createInitialGroupRole(m_adminClient);
-	}
-	catch (std::runtime_error err)
-	{
-		std::string errMsg(err.what());
-		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
-			OT_LOG_E("Error creating initial group role in database: " + std::string(err.what()));
-		}
-	}
-
-	try
-	{
-		index_options.name("group_name_unique");
-		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::GROUPS_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("group_name", 1)), index_options);
-	}
-	catch (std::runtime_error err)
-	{
-		OT_LOG_E("Error creating db index group_name_unique: " + std::string(err.what()));
-	}
-
-
-
-	/* HANDLING ALL ACCESSIBLE DATABASE ROLES  */
-
-	try
-	{
-		MongoRoleFunctions::createInitialProjectTemplatesRole(m_adminClient);
-	}
-	catch (std::runtime_error err)
-	{
-		std::string errMsg(err.what());
-		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
-			OT_LOG_E("Error creating initial project templates role in database: " + std::string(err.what()));
-		}
-	}
-
-	try
-	{
-		MongoRoleFunctions::createInitialProjectsLargeDataRole(m_adminClient);
-	}
-	catch (std::runtime_error err)
-	{
-		std::string errMsg(err.what());
-		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
-			OT_LOG_E("Error creating initial projects large data role in database: " + std::string(err.what()));
-		}
-	}
-
-	try
-	{
-		MongoRoleFunctions::createInitialSystemDbRole(m_adminClient);
-	}
-	catch (std::runtime_error err)
-	{
-		std::string errMsg(err.what());
-		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
-			OT_LOG_E("Error creating initial system db role in database: " + std::string(err.what()));
-		}
-	}
-
-	try
-	{
-		MongoRoleFunctions::createInitialSettingsDbRole(m_adminClient);
-	}
-	catch (std::runtime_error err)
-	{
-		std::string errMsg(err.what());
-		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
-			OT_LOG_E("Error creating initial settings db role in database: " + std::string(err.what()));
-		}
-	}
-
-	try 
-	{
-		MongoRoleFunctions::createInitialLibrariesDbRole(m_adminClient);
-	}
-	catch (std::runtime_error err) {
-		std::string errMsg(err.what());
-		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
-			OT_LOG_E("Error creating initial libraries db role in database: " + std::string(err.what()));
-		}
-	}
-
-	/* HANDLING USER ROLE AND INDEXES */
-
-	try
-	{
-		MongoRoleFunctions::createInitialUserRole(m_adminClient);
-	}
-	catch (std::runtime_error err)
-	{
-		std::string errMsg(err.what());
-		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
-			OT_LOG_E("Error creating initial user db role in database: " + std::string(err.what()));
-		}
-	}
-
-	try
-	{
-		// Role so that the admin can list the user DB collections
-		MongoRoleFunctions::createInitialUserDbListCollectionsRole(m_adminClient);
-	}
-	catch (std::runtime_error err)
-	{
-		std::string errMsg(err.what());
-		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
-			OT_LOG_E("Error creating initial user list role in database: " + std::string(err.what()));
-		}
-	}
-
-	try
-	{
-		index_options.name("user_name_unique");
-		m_adminClient[MongoConstants::USER_DB][MongoConstants::USER_CATALOG_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_name", 1)), index_options);
-	}
-	catch (std::runtime_error err)
-	{
-		OT_LOG_E("Error creating db index user_name_unique: " + std::string(err.what()));
-	}
-
-	try
-	{
-		index_options.name("user_id_unique");
-		m_adminClient[MongoConstants::USER_DB][MongoConstants::USER_CATALOG_COLLECTION]
-			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_id", 1)), index_options);
-	}
-	catch (std::runtime_error err)
-	{
-		OT_LOG_E("Error creating db index user_id_unique: " + std::string(err.what()));
-	}
+	initializeDatabase();
 
 	// Remove outdated sessions and start time
 	std::thread workerThread(&ServiceBase::removeOldSessionsWorker, this);
@@ -290,23 +60,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	return ot::AppExitCode::Success;
 }
 
-bool ServiceBase::removeOldSessionsWorker()
-{
-	while (1)
-	{
-		MongoSessionFunctions::removeOldSessions(m_adminClient);
-
-		using namespace std::chrono_literals;
-		std::this_thread::sleep_for(3600s);  // Wait for one hour
-	}
-}
-
-bool ServiceBase::isAdminUser(User& _loggedInUser)
-{
-	return (_loggedInUser.username == getAdminUserName());
-}
-
-const char *ServiceBase::getServiceURL(void)
+const char *ServiceBase::getServiceURL()
 {
 	return m_serviceURL.c_str();
 }
@@ -443,7 +197,9 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	}
 }
 
-// No authentication needed
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Action handler: No authentication required
 
 std::string ServiceBase::handleAdminLogIn(const ot::ConstJsonObject& _actionDocument) {
 	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
@@ -527,7 +283,9 @@ std::string ServiceBase::handleSetGlobalLoggingMode(const ot::ConstJsonObject& _
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-// authentication needed: user functions
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Action handler: Authentication required: User functions
 
 std::string ServiceBase::handleGetUserData(const ot::ConstJsonObject& _actionDocument) {
 	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
@@ -634,7 +392,9 @@ std::string ServiceBase::handleGetSystemInformation(const ot::ConstJsonObject& _
 	return response;
 }
 
-// authentication needed: group functions
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Action handler: Authentication required: Group functions
 
 std::string ServiceBase::handleCreateGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string groupName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_GROUP_NAME);
@@ -786,7 +546,9 @@ std::string ServiceBase::handleRemoveGroup(const ot::ConstJsonObject& _actionDoc
 	return json.toJson();
 }
 
-// authentication needed: project functions
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Action handler: Authentication required: Project functions
 
 std::string ServiceBase::handleCreateProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	std::string projectName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PROJECT_NAME);
@@ -997,6 +759,216 @@ std::string ServiceBase::handleCheckIfCollectionExists(const ot::ConstJsonObject
 	return json.toJson();
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Initialization functions
+
+void ServiceBase::initializeDatabase() {
+	// NEEDED AND MUST BE EXECUTED ONCE
+	mongocxx::instance inst{};
+
+	// Initializing the Admin Client at the time of starting the service.
+
+	// Maybe fetch the admin Credentials through the environment 
+
+	m_dbUsername = getAdminUserName();
+
+	if (!m_databasePWD.empty()) {
+		m_dbPassword = m_databasePWD;
+	}
+	else {
+		m_dbPassword = ot::UserCredentials::encryptString("admin");
+	}
+
+	try {
+		std::string uriStr = getMongoURL(m_databaseURL, m_dbUsername, ot::UserCredentials::decryptString(m_dbPassword));
+		mongocxx::uri uri(uriStr);
+		m_adminClient = mongocxx::client(uri);
+	}
+	catch (std::exception err) {
+		OT_LOG_E("Cannot establish MongoDB connection: " + std::string(err.what())); // todo: should retry or exit?
+		exit(ot::AppExitCode::DataBaseConnectionFailed);
+	}
+
+	// Add indexes for all 
+
+	mongocxx::options::index index_options{};
+	index_options.unique(true);
+
+	/* HANDLING PROJECT CATALOG ROLE AND INDEXES */
+	try {
+		MongoRoleFunctions::createInitialProjectRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial project role in database: " + std::string(err.what()));
+		}
+	}
+
+	try {
+		// Role so that each user can list the project DB collections
+		MongoRoleFunctions::createInitialProjectDbListCollectionsRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial project list role in database: " + std::string(err.what()));
+		}
+	}
+
+	try {
+		index_options.name("project_name_unique");
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_name", 1)), index_options);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index project_name_unique: " + std::string(err.what()));
+	}
+
+	try {
+		index_options.name("project_collection_name_unique");
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("collection_name", 1)), index_options);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index project_collection_name_unique: " + std::string(err.what()));
+	}
+	
+	try {
+		index_options.name("project_role_name_unique");
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::PROJECT_CATALOG_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("project_role_name", 1)), index_options);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index project_role_name_unique: " + std::string(err.what()));
+	}
+
+	/* HANDLING GROUP COLLECTION ROLE AND INDEXES */
+
+	try {
+		MongoRoleFunctions::createInitialGroupRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial group role in database: " + std::string(err.what()));
+		}
+	}
+
+	try {
+		index_options.name("group_name_unique");
+		m_adminClient[MongoConstants::PROJECTS_DB][MongoConstants::GROUPS_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("group_name", 1)), index_options);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index group_name_unique: " + std::string(err.what()));
+	}
+
+
+
+	/* HANDLING ALL ACCESSIBLE DATABASE ROLES  */
+
+	try {
+		MongoRoleFunctions::createInitialProjectTemplatesRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial project templates role in database: " + std::string(err.what()));
+		}
+	}
+
+	try {
+		MongoRoleFunctions::createInitialProjectsLargeDataRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial projects large data role in database: " + std::string(err.what()));
+		}
+	}
+
+	try {
+		MongoRoleFunctions::createInitialSystemDbRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial system db role in database: " + std::string(err.what()));
+		}
+	}
+
+	try {
+		MongoRoleFunctions::createInitialSettingsDbRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial settings db role in database: " + std::string(err.what()));
+		}
+	}
+
+	try {
+		MongoRoleFunctions::createInitialLibrariesDbRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial libraries db role in database: " + std::string(err.what()));
+		}
+	}
+
+	/* HANDLING USER ROLE AND INDEXES */
+
+	try {
+		MongoRoleFunctions::createInitialUserRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial user db role in database: " + std::string(err.what()));
+		}
+	}
+
+	try {
+		// Role so that the admin can list the user DB collections
+		MongoRoleFunctions::createInitialUserDbListCollectionsRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial user list role in database: " + std::string(err.what()));
+		}
+	}
+
+	try {
+		index_options.name("user_name_unique");
+		m_adminClient[MongoConstants::USER_DB][MongoConstants::USER_CATALOG_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_name", 1)), index_options);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index user_name_unique: " + std::string(err.what()));
+	}
+
+	try {
+		index_options.name("user_id_unique");
+		m_adminClient[MongoConstants::USER_DB][MongoConstants::USER_CATALOG_COLLECTION]
+			.create_index(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_id", 1)), index_options);
+	}
+	catch (std::runtime_error err) {
+		OT_LOG_E("Error creating db index user_id_unique: " + std::string(err.what()));
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper
+
+bool ServiceBase::isAdminUser(User& _loggedInUser) {
+	return (_loggedInUser.username == getAdminUserName());
+}
+
 std::string ServiceBase::createRandomPassword()
 {
 	const int length = 30;
@@ -1020,4 +992,13 @@ std::string ServiceBase::createRandomPassword()
 	}
 
 	return random_string;
+}
+
+bool ServiceBase::removeOldSessionsWorker() {
+	while (1) {
+		MongoSessionFunctions::removeOldSessions(m_adminClient);
+
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(3600s);  // Wait for one hour
+	}
 }

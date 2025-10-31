@@ -56,7 +56,7 @@ public:
 	}
 
 	int initialize(const char * _ownIP, const char * _databaseIP, const char * _databasePWD);
-	const char *getServiceURL(void);
+	const char *getServiceURL();
 
 	std::string performAction(const char * _json, const char * _senderIP);
 	std::string performActionOneWayTLS(const char * _json, const char * _senderIP);
@@ -67,7 +67,9 @@ private:
 	
 	std::string dispatchAction(const std::string& _action, const ot::JsonDocument& _actionDocument, ot::MessageType _messageType);
 
-	// No authentication needed
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: No authentication required
 
 	//api @SECURITY TLS
 	//api @Action OT_ACTION_LOGIN_ADMIN 
@@ -164,7 +166,9 @@ private:
 	std::string handleRefreshSession(const ot::ConstJsonObject& _actionDocument);
 	std::string handleSetGlobalLoggingMode(const ot::ConstJsonObject& _actionDocument);
 
-	// authentication needed: user functions
+	// ###########################################################################################################################################################################################################################################################################################################################
+	
+	// Action handler: Authentication required: User functions
 
 	std::string handleGetUserData(const ot::ConstJsonObject& _actionDocument);
 	std::string handleGetAllUsers(const ot::ConstJsonObject& _actionDocument);
@@ -176,7 +180,9 @@ private:
 	std::string handleChangeUserPasswordByAdmin(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
 	std::string handleGetSystemInformation(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
 
-	// authentication needed: group functions
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Authentication required: Group functions
 
 	std::string handleCreateGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleGetGroupData(const ot::ConstJsonObject& _actionDocument);
@@ -189,7 +195,9 @@ private:
 	std::string handleRemoveUserFromGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleRemoveGroup(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 
-	// authentication needed: project functions
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Authentication required: Project functions
 
 	std::string handleCreateProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleProjectOpened(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
@@ -207,9 +215,17 @@ private:
 	std::string handleRemoveProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleCheckIfCollectionExists(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 
-	// initialize functions
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// helper functions
+	// Private: Initialize functions
+
+	//! @brief Will initialize the database.
+	//! @warning Call this function only once during service startup.
+	void initializeDatabase();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Helper
 
 	bool isAdminUser(User& _loggedInUser);
 	std::string getAdminUserName() { return "admin"; }
