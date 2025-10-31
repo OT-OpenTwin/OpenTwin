@@ -96,7 +96,7 @@ public:
 	static std::string projectsToJson(std::vector<Project>& projects);
 
 private:
-	static void appendFilter(std::list<bsoncxx::document::value>& _createdFilters, const std::string& _field, const std::list<std::string>& _values);
+	static void appendFilter(std::list<bsoncxx::document::value>& _createdFilters, const std::string& _field, const std::list<std::string>& _values, bool _isArray);
 
-	static void getDistinctStrings(mongocxx::collection& _collection, const std::string& _fieldName, std::list<std::string>& _result);
+	static void getDistinctStrings(mongocxx::collection& _collection, const bsoncxx::v_noabi::document::value& _filter, const std::string& _fieldName, std::list<std::string>& _result);
 };

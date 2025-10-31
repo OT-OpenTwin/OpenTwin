@@ -61,7 +61,7 @@ namespace MongoGroupFunctions
 	void createGroup(std::string groupName, User& creatingUser, mongocxx::client& adminClient);
 
 
-	std::vector<Group> getAllUserGroups(User& loggedInUser, mongocxx::client& userClient);
+	std::vector<Group> getAllUserGroups(const User& loggedInUser, mongocxx::client& userClient);
 
 	std::vector<Group> getAllGroups(User& loggedInUser, mongocxx::client& userClient);
 	size_t getAllGroupCount(User& loggedInUser, mongocxx::client& userClient);

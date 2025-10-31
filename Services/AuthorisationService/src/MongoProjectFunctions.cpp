@@ -41,24 +41,46 @@ ot::ProjectFilterData MongoProjectFunctions::getProjectFilterOptions(const User&
 	mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
 	mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 	
+	std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(_loggedInUser, _adminClient);
+
+	// Build group access array
+	auto accessBuilder = bsoncxx::builder::basic::array{};
+	for (const auto& group : userGroups) {
+		accessBuilder.append(group.id);
+	}
+	auto acessArr = document{} << "$in" << accessBuilder << finalize;
+
+	// Build user access filter (access via ownership or group membership)
+	auto userAccessDoc = document{}
+		<< "$or"
+		<< open_array
+		<< open_document
+		<< "created_by" << _loggedInUser.userId
+		<< close_document
+		<< open_document
+		<< "groups" << acessArr
+		<< close_document
+		<< close_array
+		<< finalize;
+
 	std::list<std::string> result;
-	getDistinctStrings(projectCollection, "project_name", result);
+	getDistinctStrings(projectCollection, userAccessDoc, "project_name", result);
 	filters.setProjectNames(std::move(result));
 	result.clear();
 
-	getDistinctStrings(projectCollection, "project_type", result);
+	getDistinctStrings(projectCollection, userAccessDoc, "project_type", result);
 	filters.setProjectTypes(std::move(result));
 	result.clear();
 
-	getDistinctStrings(projectCollection, "project_group", result);
+	getDistinctStrings(projectCollection, userAccessDoc, "project_group", result);
 	filters.setProjectGroups(std::move(result));
 	result.clear();
 
-	getDistinctStrings(projectCollection, "tags", result);
+	getDistinctStrings(projectCollection, userAccessDoc, "tags", result);
 	filters.setTags(std::move(result));
 	result.clear();
 
-	getDistinctStrings(projectCollection, "groups", result);
+	getDistinctStrings(projectCollection, userAccessDoc, "groups", result);
 	std::list<std::string> groupNames;
 	for (const auto& groupId : result) {
 		try {
@@ -72,7 +94,7 @@ ot::ProjectFilterData MongoProjectFunctions::getProjectFilterOptions(const User&
 	filters.setUserGroups(std::move(groupNames));
 	result.clear();
 
-	getDistinctStrings(projectCollection, "created_by", result);
+	getDistinctStrings(projectCollection, userAccessDoc, "created_by", result);
 	std::list<std::string> ownerNames;
 	for (const auto& ownerId : result) {
 		try {
@@ -265,10 +287,10 @@ std::string MongoProjectFunctions::getProjectsInfo(const std::list<std::string>&
 	return projectsToJson(projects);
 }
 
-std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient) {
+std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& _adminClient) {
 	OT_LOG_D("Searching projects of user: " + loggedInUser.username);
 
-	std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(loggedInUser, userClient);
+	std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(loggedInUser, _adminClient);
 
 	auto array_builder = bsoncxx::builder::basic::array{};
 
@@ -310,7 +332,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 		<< finalize;
 
 
-	mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
 	mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 
 	mongocxx::pipeline p{};
@@ -328,14 +350,14 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 
 		Project tmpProject(doc);
 		const std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
-		tmpProject.setUser(MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient));
+		tmpProject.setUser(MongoUserFunctions::getUserDataThroughId(creatingUserId, _adminClient));
 
 		auto groupsArr = doc["groups"].get_array().value;
 
 		for (const auto& groupId : groupsArr) {
 			std::string id = std::string(groupId.get_utf8().value.data());
 
-			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
+			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, _adminClient);
 
 			tmpProject.addUserGroup(currentGroup);
 		}
@@ -346,56 +368,69 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 	return projects;
 }
 
-std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& _filter, int limit, mongocxx::client& userClient) {
+std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& _filter, int limit, mongocxx::client& _adminClient) {
 	OT_LOG_D("Searching projects of user: " + loggedInUser.username);
 
-	std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(loggedInUser, userClient);
+	std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(loggedInUser, _adminClient);
 
 	std::list<bsoncxx::document::value> filters;
 
 	// Directly accessible data
-	appendFilter(filters, "project_group", _filter.getProjectGroups());
-	appendFilter(filters, "project_type", _filter.getProjectTypes());
-	appendFilter(filters, "project_name", _filter.getProjectNames());
-	appendFilter(filters, "tags", _filter.getTags());
+	appendFilter(filters, "project_group", _filter.getProjectGroups(), false);
+	appendFilter(filters, "project_type", _filter.getProjectTypes(), false);
+	appendFilter(filters, "project_name", _filter.getProjectNames(), false);
+	appendFilter(filters, "tags", _filter.getTags(), true);
 
 	// Owner filter, names provided, need to convert to IDs
 	if (!_filter.getOwners().empty()) {
 		std::list<std::string> ownerIds;
-		for (const auto& ownerName : _filter.getOwners()) {
-			try {
-				User ownerUser = MongoUserFunctions::getUserDataThroughUsername(ownerName, userClient);
-				ownerIds.push_back(ownerUser.userId);
+		bool hasEmpty = false;
+		for (const std::string& ownerName : _filter.getOwners()) {
+			if (ownerName.empty()) {
+				hasEmpty = true;
 			}
-			catch (std::runtime_error err) {
-				OT_LOG_E("Owner user " + ownerName + " specified in the project filter was not found.");
+			else {
+				try {
+					User ownerUser = MongoUserFunctions::getUserDataThroughUsername(ownerName, _adminClient);
+					ownerIds.push_back(ownerUser.userId);
+				}
+				catch (std::runtime_error err) {
+					OT_LOG_E("Owner user " + ownerName + " specified in the project filter was not found.");
+				}
 			}
 		}
-
-		appendFilter(filters, "created_by", ownerIds);
+		if (hasEmpty) {
+			ownerIds.push_back("");
+		}
+		appendFilter(filters, "created_by", ownerIds, false);
 	}
 
 	// Group access filter, names provided, need to convert to IDs
 	if (!_filter.getUserGroups().empty()) {
 		std::list<std::string> groupIds;
+		bool hasEmpty = false;
 		for (const auto& groupName : _filter.getUserGroups()) {
 			if (groupName.empty()) {
-				continue;
+				hasEmpty = true;
 			}
-
-			bool found = false;
-			for (const Group& group : userGroups) {
-				if (group.name == groupName) {
-					groupIds.push_back(group.id);
-					found = true;
-					break;
+			else {
+				bool found = false;
+				for (const Group& group : userGroups) {
+					if (group.name == groupName) {
+						groupIds.push_back(group.id);
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					OT_LOG_E("User " + loggedInUser.username + " is not member of group " + groupName + " specified in the project filter.");
 				}
 			}
-			if (!found) {
-				OT_LOG_E("User " + loggedInUser.username + " is not member of group " + groupName + " specified in the project filter.");
-			}
 		}
-		appendFilter(filters, "groups", groupIds);
+		if (hasEmpty) {
+			groupIds.push_back("");
+		}
+		appendFilter(filters, "groups", groupIds, true);
 	}
 
 	// Build group access array
@@ -429,7 +464,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 
 	//OT_LOG_T(bsoncxx::to_json(filterDoc.view()));
 
-	mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
+	mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
 	mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 
 	mongocxx::pipeline p{};
@@ -446,14 +481,14 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 
 		Project tmpProject(doc);
 		const std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
-		tmpProject.setUser(MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient));
+		tmpProject.setUser(MongoUserFunctions::getUserDataThroughId(creatingUserId, _adminClient));
 
 		auto groupsArr = doc["groups"].get_array().value;
 
 		for (const auto& groupId : groupsArr) {
 			std::string id = std::string(groupId.get_utf8().value.data());
 
-			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
+			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, _adminClient);
 
 			tmpProject.addUserGroup(currentGroup);
 		}
@@ -781,7 +816,7 @@ std::string MongoProjectFunctions::projectsToJson(std::vector<Project>& projects
 	*/
 }
 
-void MongoProjectFunctions::appendFilter(std::list<bsoncxx::document::value>& _createdFilters, const std::string& _field, const std::list<std::string>& _values) {
+void MongoProjectFunctions::appendFilter(std::list<bsoncxx::document::value>& _createdFilters, const std::string& _field, const std::list<std::string>& _values, bool _isArray) {
 	if (_values.empty()) {
 		return;
 	}
@@ -812,12 +847,15 @@ void MongoProjectFunctions::appendFilter(std::list<bsoncxx::document::value>& _c
 
 	// Match documents where field is missing or empty
 	if (hasEmpty) {
-		// field == "" (empty string)
-		orArray.append(document{} << _field << "" << finalize);
-
-		// field == [] (empty array)
-		orArray.append(document{} << _field << open_document << "$eq" << open_array << close_array << close_document << finalize);
-
+		if (_isArray) {
+			// field == [] (empty array)
+			orArray.append(document{} << _field << open_document << "$eq" << open_array << close_array << close_document << finalize);
+		}
+		else {
+			// field == "" (empty string)
+			orArray.append(document{} << _field << "" << finalize);
+		}
+		
 		// field does not exist (legacy support)
 		orArray.append(document{} << _field << open_document << "$exists" << false << close_document << finalize);
 	}
@@ -826,9 +864,9 @@ void MongoProjectFunctions::appendFilter(std::list<bsoncxx::document::value>& _c
 	//OT_LOG_W(bsoncxx::to_json(_createdFilters.back().view()));
 }
 
-void MongoProjectFunctions::getDistinctStrings(mongocxx::collection& _collection, const std::string& _fieldName, std::list<std::string>& _result) {
+void MongoProjectFunctions::getDistinctStrings(mongocxx::collection& _collection, const bsoncxx::v_noabi::document::value& _filter, const std::string& _fieldName, std::list<std::string>& _result) {
 	try {
-		auto distinctCursor = _collection.distinct(_fieldName, {});
+		auto distinctCursor = _collection.distinct(_fieldName, bsoncxx::v_noabi::document::value(_filter));
 		for (auto&& it : distinctCursor) {
 			if (it["values"] && it["values"].type() == bsoncxx::type::k_array) {
 				auto arrayView = it["values"].get_array().value;

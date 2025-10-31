@@ -112,7 +112,7 @@ namespace MongoGroupFunctions
 		return groupName.str();
 	}
 
-	std::vector<Group> getAllUserGroups(User& loggedInUser, mongocxx::client& adminClient)
+	std::vector<Group> getAllUserGroups(const User& loggedInUser, mongocxx::client& adminClient)
 	{
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection groupsCollection = secondaryDb.collection(MongoConstants::GROUPS_COLLECTION);
