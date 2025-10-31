@@ -398,7 +398,7 @@ void SceneNodeGeometry::setHighlighted(bool h)
 	if (isHighlighted() == h) return;  // No change necessary
 
 	getShapeNode()->setChildValue(getEdgesHighlighted(), h);
-	getShapeNode()->setChildValue(getEdges(), !h);
+	getShapeNode()->setChildValue(getEdges(), !isVisible() ? false : !h);
 	getFaceEdgesHighlight()->setAllChildrenOff();
 
 	SceneNodeBase::setHighlighted(h);
