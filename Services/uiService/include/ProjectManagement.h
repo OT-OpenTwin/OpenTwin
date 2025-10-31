@@ -41,6 +41,8 @@ class AppBase;
 
 class ProjectManagement {
 public:
+	static int defaultMaxProjects() { return 1000; };
+
 	ProjectManagement();
 	ProjectManagement(const LoginData& _data);
 	~ProjectManagement();
@@ -50,6 +52,7 @@ public:
 
 	bool InitializeConnection(void);
 
+	ot::ProjectFilterData getProjectFilterData() const;
 	bool createProject(const std::string &projectName, const std::string& projectType, const std::string &userName, const std::string &defaultSettingTemplate);
 	bool deleteProject(const std::string &projectName);
 	void notifyProjectOpened(const std::string& _projectName);

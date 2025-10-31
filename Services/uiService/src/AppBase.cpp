@@ -1750,7 +1750,7 @@ void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 			ProjectManagement pm(m_loginData);
 			std::list<ot::ProjectInformation> userProjects;
 			bool tmp = false;
-			if (pm.findProjects("", 0, userProjects, tmp)) {
+			if (pm.findProjects("", ProjectManagement::defaultMaxProjects(), userProjects, tmp)) {
 				for (const ot::ProjectInformation& pi : userProjects) {
 					userProjectNames.push_back(pi.getProjectName());
 				}
@@ -3052,7 +3052,7 @@ void AppBase::slotCreateProject() {
 		return;
 	}
 
-	std::string currentName = m_welcomeScreen->getGeneralFilter().toStdString();
+	std::string currentName = m_welcomeScreen->getCurrentQuickFilter().toStdString();
 	// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 	if (!checkForContinue("Create New Project")) { return; }
 
@@ -3080,7 +3080,7 @@ void AppBase::slotCreateProject() {
 
 	// Initialize data
 	newProjectDialog.setProjectTemplates(m_ExternalServicesComponent->getListOfProjectTemplates());
-	newProjectDialog.setCurrentProjectName(m_welcomeScreen->getGeneralFilter());
+	newProjectDialog.setCurrentProjectName(m_welcomeScreen->getCurrentQuickFilter());
 
 	newProjectDialog.selectProjectType(userManager.restoreSetting("CreateProject.Type"), userManager.restoreSetting("CreateProject.Template"));
 

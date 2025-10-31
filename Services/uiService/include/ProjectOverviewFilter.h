@@ -51,14 +51,15 @@ namespace ot {
 		void setOptions(const QStringList& _options);
 		ProjectOverviewFilterData getFilterData() const;
 
-		void setFromData(const ProjectOverviewFilterData& _data);
+		//! @brief Will uncheck all items and check only those that are present in the provided data.
+		//! @param _data The filter data to set the state from.
+		void updateCheckedState(const ProjectOverviewFilterData& _data);
 
 		bool isConfirmed() const { return m_isConfirmed; };
 
 	Q_SIGNALS:
-		void sortOrderChanged(int _logicalIndex, ProjectOverviewFilterData::SortMode _sortMode);
-		void filterChanged(const ProjectOverviewFilterData& _filterData);
-
+		void sortOrderChanged(int _logicalIndex, Qt::SortOrder _sortOrder);
+		
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Slots

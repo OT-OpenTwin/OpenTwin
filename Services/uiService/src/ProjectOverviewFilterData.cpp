@@ -46,27 +46,27 @@ ot::ProjectFilterData ot::ProjectOverviewFilterData::toProjectFilterData() const
 	}
 	switch (m_logicalIndex) {
 	case ProjectOverviewHeader::Group:
-		filter.setProjectGroups(options);
+		filter.setProjectGroups(std::move(options));
 		break;
 
 	case ProjectOverviewHeader::Type:
-		filter.setProjectTypes(options);
+		filter.setProjectTypes(std::move(options));
 		break;
 
 	case ProjectOverviewHeader::Name:
-		filter.setProjectNames(options);
+		filter.setProjectNames(std::move(options));
 		break;
 
 	case ProjectOverviewHeader::Tags:
-		filter.setTags(options);
+		filter.setTags(std::move(options));
 		break;
 
 	case ProjectOverviewHeader::Owner:
-		filter.setOwners(options);
+		filter.setOwners(std::move(options));
 		break;
 
 	case ProjectOverviewHeader::Access:
-		filter.setUserGroups(options);
+		filter.setUserGroups(std::move(options));
 		break;
 
 	default:

@@ -812,8 +812,11 @@ void MongoProjectFunctions::appendFilter(std::list<bsoncxx::document::value>& _c
 
 	// Match documents where field is missing or empty
 	if (hasEmpty) {
-		// field == ""
+		// field == "" (empty string)
 		orArray.append(document{} << _field << "" << finalize);
+
+		// field == [] (empty array)
+		orArray.append(document{} << _field << open_document << "$eq" << open_array << close_array << close_document << finalize);
 
 		// field does not exist (legacy support)
 		orArray.append(document{} << _field << open_document << "$exists" << false << close_document << finalize);
@@ -826,27 +829,18 @@ void MongoProjectFunctions::appendFilter(std::list<bsoncxx::document::value>& _c
 void MongoProjectFunctions::getDistinctStrings(mongocxx::collection& _collection, const std::string& _fieldName, std::list<std::string>& _result) {
 	try {
 		auto distinctCursor = _collection.distinct(_fieldName, {});
-		bool hasEmpty = false;
 		for (auto&& it : distinctCursor) {
 			if (it["values"] && it["values"].type() == bsoncxx::type::k_array) {
-				for (auto& val : it["values"].get_array().value) {
+				auto arrayView = it["values"].get_array().value;
+				for (auto& val : arrayView) {
 					if (val.type() == bsoncxx::type::k_utf8) {
 						std::string value = val.get_utf8().value.data();
-						if (value.empty()) {
-							hasEmpty = true;
-						}
-						else {
+						if (!value.empty()) {
 							_result.push_back(std::move(value));
 						}
 					}
-					else if (val.type() == bsoncxx::type::k_null) {
-						hasEmpty = true;
-					}
 				}
 			}
-		}
-		if (hasEmpty) {
-			_result.push_back("");
 		}
 	}
 	catch (const std::exception& _e) {

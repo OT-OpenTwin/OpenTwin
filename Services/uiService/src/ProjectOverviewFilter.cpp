@@ -68,20 +68,20 @@ ot::ProjectOverviewFilter::ProjectOverviewFilter(ProjectOverviewWidget* _overvie
 		setOptions(QStringList());
 		connect(m_optionsList, &QListWidget::itemChanged, this, &ProjectOverviewFilter::slotCheckedChanged);
 		centralLayout->addWidget(m_optionsList);
+
+		QHBoxLayout* buttonLayout = new QHBoxLayout;
+		buttonLayout->setContentsMargins(0, 0, 0, 0);
+		buttonLayout->addStretch();
+		centralLayout->addLayout(buttonLayout);
+
+		PushButton* confirmButton = new PushButton("Apply", this);
+		connect(confirmButton, &PushButton::clicked, this, &ProjectOverviewFilter::slotConfirm);
+		buttonLayout->addWidget(confirmButton);
+
+		PushButton* cancelButton = new PushButton("Cancel", this);
+		connect(cancelButton, &PushButton::clicked, this, &ProjectOverviewFilter::slotCancel);
+		buttonLayout->addWidget(cancelButton);
 	}
-
-	QHBoxLayout* buttonLayout = new QHBoxLayout;
-	buttonLayout->setContentsMargins(0, 0, 0, 0);
-	buttonLayout->addStretch();
-	centralLayout->addLayout(buttonLayout);
-
-	PushButton* confirmButton = new PushButton("Apply", this);
-	connect(confirmButton, &PushButton::clicked, this, &ProjectOverviewFilter::slotConfirm);
-	buttonLayout->addWidget(confirmButton);
-	
-	PushButton* cancelButton = new PushButton("Reset", this);
-	connect(cancelButton, &PushButton::clicked, this, &ProjectOverviewFilter::slotCancel);
-	buttonLayout->addWidget(cancelButton);
 }
 
 void ot::ProjectOverviewFilter::setTitle(const QString& _title) {
@@ -107,18 +107,27 @@ ot::ProjectOverviewFilterData ot::ProjectOverviewFilter::getFilterData() const {
 	ProjectOverviewFilterData data(m_logicalIndex);
 
 	if (m_optionsList) {
+		bool hasUnchecked = false;
 		for (int i = 1; i < m_optionsList->count(); ++i) {
 			QListWidgetItem* item = m_optionsList->item(i);
 			if (item->checkState() == Qt::Checked) {
 				data.addSelectedFilter(item->text());
 			}
+			else {
+				hasUnchecked = true;
+			}
+		}
+
+		// If all items are checked, clear the selection to indicate no filtering
+		if (!hasUnchecked) {
+			data.clearSelectedFilters();
 		}
 	}
 
 	return data;
 }
 
-void ot::ProjectOverviewFilter::setFromData(const ProjectOverviewFilterData& _data) {
+void ot::ProjectOverviewFilter::updateCheckedState(const ProjectOverviewFilterData& _data) {
 	if (!_data.isValid() || _data.getLogicalIndex() != m_logicalIndex) {
 		return;
 	}
@@ -126,30 +135,35 @@ void ot::ProjectOverviewFilter::setFromData(const ProjectOverviewFilterData& _da
 	if (m_optionsList) {
 		QSignalBlocker blocker(m_optionsList);
 
-		// Uncheck all
-		for (int i = 0; i < m_optionsList->count(); ++i) {
-			QListWidgetItem* item = m_optionsList->item(i);
-			item->setCheckState(Qt::Unchecked);
-		}
-
-		// Check matching items
-		for (int i = 1; i < m_optionsList->count(); ++i) {
-			QListWidgetItem* item = m_optionsList->item(i);
-			if (_data.getSelectedFilters().contains(item->text())) {
+		if (_data.getSelectedFilters().isEmpty()) {
+			// No filters provided, check all
+			for (int i = 0; i < m_optionsList->count(); ++i) {
+				QListWidgetItem* item = m_optionsList->item(i);
 				item->setCheckState(Qt::Checked);
 			}
 		}
-
-		// Update the "Select All" item
-		bool allChecked = true;
-		for (int i = 1; i < m_optionsList->count(); ++i) {
-			QListWidgetItem* item = m_optionsList->item(i);
-			if (item->checkState() != Qt::Checked) {
-				allChecked = false;
-				break;
+		else {
+			// Uncheck all
+			for (int i = 0; i < m_optionsList->count(); ++i) {
+				QListWidgetItem* item = m_optionsList->item(i);
+				item->setCheckState(Qt::Unchecked);
 			}
+
+			// Check matching items
+			bool allChecked = true;
+			for (int i = 1; i < m_optionsList->count(); ++i) {
+				QListWidgetItem* item = m_optionsList->item(i);
+				if (_data.getSelectedFilters().contains(item->text())) {
+					item->setCheckState(Qt::Checked);
+				}
+				else {
+					allChecked = false;
+				}
+			}
+
+			// Update the "Select All" item
+			m_optionsList->item(0)->setCheckState((allChecked ? Qt::Checked : Qt::Unchecked));
 		}
-		m_optionsList->item(0)->setCheckState((allChecked ? Qt::Checked : Qt::Unchecked));
 	}
 }
 
@@ -180,11 +194,11 @@ void ot::ProjectOverviewFilter::slotTextChanged() {
 }
 
 void ot::ProjectOverviewFilter::slotSortAscending() {
-	Q_EMIT sortOrderChanged(m_logicalIndex, ProjectOverviewFilterData::SortMode::Ascending);
+	Q_EMIT sortOrderChanged(m_logicalIndex, Qt::AscendingOrder);
 }
 
 void ot::ProjectOverviewFilter::slotSortDescending() {
-	Q_EMIT sortOrderChanged(m_logicalIndex, ProjectOverviewFilterData::SortMode::Descending);
+	Q_EMIT sortOrderChanged(m_logicalIndex, Qt::DescendingOrder);
 }
 
 void ot::ProjectOverviewFilter::slotCheckedChanged(QListWidgetItem* _item) {
@@ -212,6 +226,4 @@ void ot::ProjectOverviewFilter::slotCheckedChanged(QListWidgetItem* _item) {
 
 		m_optionsList->item(0)->setCheckState((allChecked ? Qt::Checked : Qt::Unchecked));
 	}
-
-	Q_EMIT filterChanged(this->getFilterData());
 }

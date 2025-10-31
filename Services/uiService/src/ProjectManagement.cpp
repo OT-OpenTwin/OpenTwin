@@ -82,6 +82,39 @@ void ProjectManagement::setAuthServerURL(const std::string &url)
 	m_authServerURL = url;
 }
 
+ot::ProjectFilterData ProjectManagement::getProjectFilterData() const {
+	ot::ProjectFilterData result;
+
+	assert(!m_authServerURL.empty());
+
+	AppBase* app{ AppBase::instance() };
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetFilter, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	
+	std::string response;
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		exit(ot::AppExitCode::SendFailed);
+		return result;
+	}
+
+	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+	if (responseMessage.isOk()) {
+		ot::JsonDocument doc;
+		doc.fromJson(responseMessage.getWhat());
+		result.setFromJsonObject(doc.getConstObject());
+	}
+	else {
+		OT_LOG_E("Failed to get project filter data: " + responseMessage.getWhat());
+	}
+
+	return result;
+}
+
 bool ProjectManagement::createProject(const std::string &projectName, const std::string& projectType, const std::string &userName, const std::string &defaultSettingTemplate)
 {
 	assert(!m_authServerURL.empty());
@@ -349,8 +382,11 @@ bool ProjectManagement::findProjects(const std::string& _projectNameFilter, int 
 
 	AppBase * app{ AppBase::instance() };
 
-	if (_maxNumberOfResults == 0) {
-		_maxNumberOfResults = std::numeric_limits<int>::max();
+	if (_maxNumberOfResults <= 0) {
+		_maxNumberOfResults = defaultMaxProjects();
+	}
+	if (_maxNumberOfResults == std::numeric_limits<int>::max()) {
+		_maxNumberOfResults--;
 	}
 
 	ot::JsonDocument doc;
@@ -358,7 +394,7 @@ bool ProjectManagement::findProjects(const std::string& _projectNameFilter, int 
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(_projectNameFilter, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults, doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults + 1, doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {

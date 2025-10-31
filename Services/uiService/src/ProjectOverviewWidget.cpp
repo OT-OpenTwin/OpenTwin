@@ -29,6 +29,8 @@
 #include "ProjectOverviewPreviewBox.h"
 #include "OTSystem/DateTime.h"
 #include "OTCore/LogDispatcher.h"
+#include "OTWidgets/Label.h"
+#include "OTWidgets/LineEdit.h"
 #include "OTWidgets/TreeWidget.h"
 #include "ModelState.h"
 
@@ -56,13 +58,24 @@ ot::ProjectOverviewWidget::ViewMode ot::ProjectOverviewWidget::viewModeFromStrin
 }
 
 ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
-	: QWidget(_parent), m_resultsExceeded(false), m_isLoading(false), m_viewMode(ViewMode::Tree), m_generalFilter(""),
-	m_lastSortColumn(ProjectOverviewHeader::ColumnIndex::LastAccessed), m_lastSortMode(ProjectOverviewFilterData::SortMode::Descending)
+	: QWidget(_parent), m_resultsExceeded(false), m_isLoading(false), m_viewMode(ViewMode::Tree),
+	m_lastSortColumn(ProjectOverviewHeader::ColumnIndex::LastAccessed), m_sortOrder(Qt::DescendingOrder)
 {
 	// Create widgets
-	QHBoxLayout* mainLayout = new QHBoxLayout(_parent);
+	QHBoxLayout* mainLayout = new QHBoxLayout(this);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
-	setLayout(mainLayout);
+
+	QVBoxLayout* leftLayout = new QVBoxLayout;
+	mainLayout->addLayout(leftLayout, 1);
+
+	QHBoxLayout* filterLayout = new QHBoxLayout;
+	leftLayout->addLayout(filterLayout);
+	filterLayout->addWidget(new ot::Label("Name Filter:"));
+	m_basicFilter = new ot::LineEdit;
+	m_basicFilter->setToolTip("Quickly filter projects that were fetched before. Extends the column filter.");
+	filterLayout->addWidget(m_basicFilter, 1);
+	connect(m_basicFilter, &ot::LineEdit::textChanged, this, &ot::ProjectOverviewWidget::slotQuickFilterProjects);
+	connect(m_basicFilter, &ot::LineEdit::returnPressed, this, &ot::ProjectOverviewWidget::slotFilterReturnPressed);
 
 	m_tree = new ot::ProjectOverviewTree(_parent);
 	m_header = new ProjectOverviewHeader(this, m_tree);
@@ -82,7 +95,10 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 
 	//m_tree->setItemDelegate(new ProjectOverviewDelegate);
 
-	mainLayout->addWidget(m_tree, 1);
+	leftLayout->addWidget(m_tree, 1);
+
+	m_countLabel = new ot::Label("No projects found");
+	leftLayout->addWidget(m_countLabel);
 
 	m_previewBox = new ProjectOverviewPreviewBox(_parent);
 	mainLayout->addWidget(m_previewBox);
@@ -156,7 +172,7 @@ void ot::ProjectOverviewWidget::setViewMode(ViewMode _mode) {
 		break;
 	}
 
-	sort(m_lastSortColumn, m_lastSortMode);
+	sort(m_lastSortColumn, m_sortOrder);
 }
 
 void ot::ProjectOverviewWidget::setMultiSelectionEnabled(bool _enabled) {
@@ -165,11 +181,6 @@ void ot::ProjectOverviewWidget::setMultiSelectionEnabled(bool _enabled) {
 
 bool ot::ProjectOverviewWidget::getMultiSelectionEnabled() const {
 	return (m_tree->selectionMode() == QAbstractItemView::ExtendedSelection);
-}
-
-void ot::ProjectOverviewWidget::setGeneralFilter(const QString& _filter) {
-	m_generalFilter = _filter;
-	slotBasicFilterProjects();
 }
 
 int ot::ProjectOverviewWidget::getProjectCount() const {
@@ -205,78 +216,42 @@ void ot::ProjectOverviewWidget::clear() {
 }
 
 void ot::ProjectOverviewWidget::refreshProjects() {
-	// Store expanded project groups
-	std::set<std::string> expandedProjectGroups;
-	for (auto& it : m_projectGroupItems) {
-		TreeWidgetItem* projectGroup = it.second;
-		if (projectGroup->isExpanded()) {
-			expandedProjectGroups.insert(it.first);
-		}
-	}
-
-	clear();
-
+	std::list<ot::ProjectInformation> projects;
 	m_resultsExceeded = false;
 
-	const AppBase* app = AppBase::instance();
-	
-	std::list<ot::ProjectInformation> projects;
-	ProjectManagement projectManager(app->getCurrentLoginData());
-	projectManager.findProjects(m_generalFilter.toStdString(), 0, projects, m_resultsExceeded);
+	ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
+	projectManager.findProjects("", ProjectManagement::defaultMaxProjects(), projects, m_resultsExceeded);
 
-	for (const ot::ProjectInformation& proj : projects) {
-		std::string editorName("< Unknown >");
-		addEntry(new ProjectOverviewEntry(proj));
-	}
-
-	// Restore expanded project groups
-	if (!expandedProjectGroups.empty()) {
-		for (auto& it : m_projectGroupItems) {
-			TreeWidgetItem* groupItem = it.second;
-			if (expandedProjectGroups.find(it.first) != expandedProjectGroups.end()) {
-				groupItem->setExpanded(true);
-			}
-			else {
-				groupItem->setExpanded(false);
-			}
-		}
-	}
-	
-	updateProjectGroups();
-
-	if (m_lastSortColumn >= 0) {
-		sort(m_lastSortColumn, m_lastSortMode);
-	}
+	setProjects(projects);
+	updateFilterOptions();
 }
 
-void ot::ProjectOverviewWidget::sort(int _logicalIndex, ProjectOverviewFilterData::SortMode _sortMode) {
-	if (_logicalIndex != -1 && _sortMode != ProjectOverviewFilterData::SortMode::None) {
-		Qt::SortOrder sortOrder = (_sortMode == ProjectOverviewFilterData::SortMode::Ascending) ? Qt::AscendingOrder : Qt::DescendingOrder;
-		m_tree->sortByColumn(_logicalIndex, sortOrder);
+void ot::ProjectOverviewWidget::sort(int _logicalIndex, Qt::SortOrder _sortOrder) {
+	if (_logicalIndex != -1) {
+		m_tree->sortByColumn(_logicalIndex, _sortOrder);
 		m_lastSortColumn = _logicalIndex;
-		m_lastSortMode = _sortMode;
+		m_sortOrder = _sortOrder;
 	}
 }
 
 void ot::ProjectOverviewWidget::filterProjects(const ProjectOverviewFilterData& _filterData) {
-	filterProjects(m_tree->invisibleRootItem(), _filterData);
-	updateProjectGroups();
-
-	return;
-	
 	if (_filterData.getLogicalIndex() >= 0) {
 		ot::ProjectFilterData filter = _filterData.toProjectFilterData();
 
 		ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
+
 		std::list<ot::ProjectInformation> projects;
-		if (projectManager.findProjects(filter, 0, projects, m_resultsExceeded)) {
-			std::string tmp;
-			for (const ot::ProjectInformation& info : projects) {
-				tmp.append(info.getProjectName() + "; ");
-			}
-			OT_LOG_T(tmp);
-		}
+		m_resultsExceeded = false;
+		projectManager.findProjects(filter, ProjectManagement::defaultMaxProjects(), projects, m_resultsExceeded);
+		setProjects(projects);
 	}
+	else {
+		refreshProjects();
+	}
+}
+
+QString ot::ProjectOverviewWidget::getCurrentQuickFilter() const {
+	return m_basicFilter->text();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -337,9 +312,14 @@ void ot::ProjectOverviewWidget::slotOpenRequested(QTreeWidgetItem* _item, int _c
 	Q_EMIT projectOpenRequested(entry->getProjectInformation());
 }
 
-void ot::ProjectOverviewWidget::slotBasicFilterProjects() {
-	basicFilterProjects(m_tree->invisibleRootItem());
-	updateProjectGroups();
+void ot::ProjectOverviewWidget::slotQuickFilterProjects() {
+	quickFilterProjects(m_tree->invisibleRootItem(), m_basicFilter->text());
+}
+
+void ot::ProjectOverviewWidget::slotFilterReturnPressed() {
+	if (!m_basicFilter->text().isEmpty()) {
+		Q_EMIT filterReturnPressed(m_basicFilter->text());
+	}
 }
 
 void ot::ProjectOverviewWidget::slotWorkerFinished() {
@@ -349,6 +329,61 @@ void ot::ProjectOverviewWidget::slotWorkerFinished() {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Helper
+
+void ot::ProjectOverviewWidget::setProjects(const std::list<ProjectInformation>& _projects) {
+	// Store expanded project groups
+	std::set<std::string> expandedProjectGroups;
+	for (auto& it : m_projectGroupItems) {
+		TreeWidgetItem* projectGroup = it.second;
+		if (projectGroup->isExpanded()) {
+			expandedProjectGroups.insert(it.first);
+		}
+	}
+
+	clear();
+
+	for (const ot::ProjectInformation& proj : _projects) {
+		std::string editorName("< Unknown >");
+		addEntry(new ProjectOverviewEntry(proj));
+	}
+
+	// Restore expanded project groups
+	if (!expandedProjectGroups.empty()) {
+		for (auto& it : m_projectGroupItems) {
+			TreeWidgetItem* groupItem = it.second;
+			if (expandedProjectGroups.find(it.first) != expandedProjectGroups.end()) {
+				groupItem->setExpanded(true);
+			}
+			else {
+				groupItem->setExpanded(false);
+			}
+		}
+	}
+
+	sort(m_lastSortColumn, m_sortOrder);
+
+	size_t count = _projects.size();
+
+	if (count == 0) {
+		m_countLabel->setText("No projects found");
+	}
+	else if (count == 1) {
+		if (m_resultsExceeded) {
+			m_countLabel->setText("Showing the first project found");
+		}
+		else {
+			m_countLabel->setText("1 project found");
+		}
+	}
+	else {
+		if (m_resultsExceeded) {
+			m_countLabel->setText("Showing the first " + QString::number(count) + " projects");
+		}
+		else {
+			m_countLabel->setText(QString::number(count) + " projects found");
+		}
+	}
+}
 
 void ot::ProjectOverviewWidget::startLoading(const ProjectInformation& _projectInfo) {
 	stopLoading();
@@ -405,23 +440,6 @@ void ot::ProjectOverviewWidget::addEntry(ProjectOverviewEntry* _entry) {
 	}
 }
 
-void ot::ProjectOverviewWidget::updateProjectGroups() {
-	for (auto& it : m_projectGroupItems) {
-		updateProjectGroup(it.second);
-	}
-}
-
-void ot::ProjectOverviewWidget::updateProjectGroup(TreeWidgetItem* _groupItem) {
-	int visibleItems = 0;
-	for (int i = 0; i < _groupItem->childCount(); i++) {
-		if (!_groupItem->child(i)->isHidden()) {
-			visibleItems++;
-		}
-	}
-
-	_groupItem->setHidden(visibleItems == 0);
-}
-
 void ot::ProjectOverviewWidget::updateCheckStates(QTreeWidgetItem* _parent) {
 	for (int i = 0; i < _parent->childCount(); i++) {
 		updateCheckStates(_parent->child(i));
@@ -454,26 +472,20 @@ void ot::ProjectOverviewWidget::getAllProjects(const QTreeWidgetItem* _parent, s
 	}
 }
 
-void ot::ProjectOverviewWidget::basicFilterProjects(QTreeWidgetItem* _parent) {
-	for (int i = 0; i < _parent->childCount(); i++) {
-		basicFilterProjects(_parent->child(i));
-		ProjectOverviewEntry* entry = dynamic_cast<ProjectOverviewEntry*>(_parent->child(i));
+void ot::ProjectOverviewWidget::quickFilterProjects(QTreeWidgetItem* _parentItem, const QString& _nameFilter) {
+	for (int i = 0; i < _parentItem->childCount(); i++) {
+		quickFilterProjects(_parentItem->child(i), _nameFilter);
+		ProjectOverviewEntry* entry = dynamic_cast<ProjectOverviewEntry*>(_parentItem->child(i));
 		if (entry) {
-			entry->applyFilter(m_generalFilter);
+			entry->applyFilter(_nameFilter);
 		}
 	}
 }
 
-void ot::ProjectOverviewWidget::filterProjects(const QTreeWidgetItem* _parent, const ProjectOverviewFilterData& _filterData) {
-	for (int i = 0; i < _parent->childCount(); i++) {
-		filterProjects(_parent->child(i), _filterData);
-		ProjectOverviewEntry* entry = dynamic_cast<ProjectOverviewEntry*>(_parent->child(i));
-		if (entry) {
-			entry->applyFilter(_filterData);
-		}
-	}
-
-	sort(m_lastSortColumn, m_lastSortMode);
+void ot::ProjectOverviewWidget::updateFilterOptions() {
+	ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
+	ProjectFilterData data = projectManager.getProjectFilterData();
+	m_header->setFilterData(std::move(data));
 }
 
 ot::TreeWidgetItem* ot::ProjectOverviewWidget::getOrCreateProjectGroupItem(const std::string& _groupName) {

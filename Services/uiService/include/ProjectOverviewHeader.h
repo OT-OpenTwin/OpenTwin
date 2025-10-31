@@ -26,6 +26,9 @@
 // Qt header
 #include <QtWidgets/qheaderview.h>
 
+// std header
+#include <map>
+
 namespace ot {
 
 	class ProjectOverviewWidget;
@@ -57,6 +60,8 @@ namespace ot {
 
 		virtual int sizeHintForColumn(int _column) const override;
 
+		void setFilterData(const ProjectFilterData& _filterData);
+
 	protected:
 		virtual void paintSection(QPainter* _painter, const QRect& _rect, int _logicalIndex) const override;
 		virtual QSize sectionSizeFromContents(int _logicalIndex) const override;
@@ -70,10 +75,8 @@ namespace ot {
 		// Private: Slots
 
 	private Q_SLOTS:
-
-		void slotSortChanged(int _logicalIndex, ProjectOverviewFilterData::SortMode _sortMode);
-		void slotFilterChanged(const ProjectOverviewFilterData& _filterData);
-
+		void slotSortChanged(int _logicalIndex, Qt::SortOrder _sortOrder);
+		
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Helper
@@ -84,6 +87,8 @@ namespace ot {
 		void showFilterMenu(int _logicalIndex);
 
 		ProjectOverviewWidget* m_overview;
+
+		std::map<int, QStringList> m_filterOptions;
 		ProjectOverviewFilterData m_lastFilter;
 
 		const QSize c_buttonSize;

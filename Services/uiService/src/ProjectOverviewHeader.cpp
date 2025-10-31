@@ -56,6 +56,67 @@ int ot::ProjectOverviewHeader::sizeHintForColumn(int _column) const {
     return hint;
 }
 
+void ot::ProjectOverviewHeader::setFilterData(const ProjectFilterData& _filterData) {
+    // Clear last filter to avoid mismatch in data
+    m_lastFilter = ProjectOverviewFilterData();
+
+	m_filterOptions.clear();
+
+    // Project groups
+
+	QStringList groupOptions;
+    for (const std::string& group : _filterData.getProjectGroups()) {
+        QString groupName = QString::fromStdString(group);
+        groupOptions.append(std::move(groupName));
+    }
+    groupOptions.append(ProjectOverviewFilterData::getEmptyProjectGroupFilterName());
+	m_filterOptions.emplace(ColumnIndex::Group, std::move(groupOptions));
+
+    // Project names
+
+	QStringList nameOptions;
+    for (const std::string& name : _filterData.getProjectNames()) {
+        QString nameStr = QString::fromStdString(name);
+		nameOptions.append(std::move(nameStr));
+	}
+	m_filterOptions.emplace(ColumnIndex::Name, std::move(nameOptions));
+
+    // Project types
+
+    QStringList typeOptions;
+    for (const std::string& type : _filterData.getProjectTypes()) {
+        QString typeName = QString::fromStdString(type);
+        typeOptions.append(std::move(typeName));
+	}
+    m_filterOptions.emplace(ColumnIndex::Type, std::move(typeOptions));
+
+    // Project tags
+	QStringList tagOptions;
+    for (const std::string& tag : _filterData.getTags()) {
+        QString tagName = QString::fromStdString(tag);
+        tagOptions.append(std::move(tagName));
+    }
+    tagOptions.append(ProjectOverviewFilterData::getEmptyTagsFilterName());
+    m_filterOptions.emplace(ColumnIndex::Tags, std::move(tagOptions));
+
+	// Project owners
+	QStringList ownerOptions;
+    for (const std::string& owner : _filterData.getOwners()) {
+        QString ownerName = QString::fromStdString(owner);
+        ownerOptions.append(std::move(ownerName));
+	}
+    m_filterOptions.emplace(ColumnIndex::Owner, std::move(ownerOptions));
+
+	// Project access
+	QStringList accessOptions;
+    for (const std::string& access : _filterData.getUserGroups()) {
+        QString accessName = QString::fromStdString(access);
+        accessOptions.append(std::move(accessName));
+    }
+    accessOptions.append(ProjectOverviewFilterData::getEmptyUserGroupFilterName());
+	m_filterOptions.emplace(ColumnIndex::Access, std::move(accessOptions));
+}
+
 void ot::ProjectOverviewHeader::paintSection(QPainter* _painter, const QRect& _rect, int _logicalIndex) const {
     // Draw default section background & text
     QStyleOptionHeader opt;
@@ -185,12 +246,8 @@ void ot::ProjectOverviewHeader::leaveEvent(QEvent* _event) {
 
 // Private: Slots
 
-void ot::ProjectOverviewHeader::slotSortChanged(int _logicalIndex, ProjectOverviewFilterData::SortMode _sortMode) {
-    m_overview->sort(_logicalIndex, _sortMode);
-}
-
-void ot::ProjectOverviewHeader::slotFilterChanged(const ProjectOverviewFilterData& _filterData) {
-	m_overview->filterProjects(_filterData);
+void ot::ProjectOverviewHeader::slotSortChanged(int _logicalIndex, Qt::SortOrder _sortOrder) {
+    m_overview->sort(_logicalIndex, _sortOrder);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -218,92 +275,34 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
     if (!canFilter(_logicalIndex)) {
         return;
     }
-
     QRect rect = filterIconRect(_logicalIndex);
 
     ProjectOverviewFilter filter(m_overview, _logicalIndex, _logicalIndex == ColumnIndex::LastAccessed);
-	QStringList options;
-	const std::list<ProjectInformation> allProjects = m_overview->getAllProjects();
-    
-    bool hasEmptyAccess = false;
-    bool hasEmptyTags = false;
-	bool hasEmptyGroup = false;
-
+	
 	// Fill options based on column
     switch (_logicalIndex) {
 	case ColumnIndex::Group:
         filter.setTitle("Project Group");
-        for (const ProjectInformation& proj : allProjects) {
-            const QString group = QString::fromStdString(proj.getProjectGroup());
-            if (group.isEmpty()) {
-                hasEmptyGroup = true;
-			}
-            else {
-                if (!options.contains(group)) {
-                    options.append(group);
-                }
-            }
-        }
         break;
 
     case ColumnIndex::Type:
         filter.setTitle("Project Type");
-        for (const ProjectInformation& proj : allProjects) {
-            const QString type = QString::fromStdString(proj.getProjectType());
-            if (!options.contains(type)) {
-                options.append(type);
-            }
-		}
 		break;
 
     case ColumnIndex::Name:
 		filter.setTitle("Project Name");
-        for (const ProjectInformation& proj : allProjects) {
-            const QString name = QString::fromStdString(proj.getProjectName());
-            if (!options.contains(name)) {
-                options.append(name);
-            }
-        }
 		break;
 
 	case ColumnIndex::Tags:
         filter.setTitle("Project Tags");
-        for (const ProjectInformation& proj : allProjects) {
-			if (proj.getTags().empty()) {
-				hasEmptyTags = true;
-			}
-            for (const std::string& tag : proj.getTags()) {
-                const QString tagName = QString::fromStdString(tag);
-                if (!options.contains(tagName)) {
-                    options.append(tagName);
-                }
-			}
-        }
         break;
 
     case ColumnIndex::Owner:
 		filter.setTitle("Project Owner");
-        for (const ProjectInformation& proj : allProjects) {
-            const QString owner = QString::fromStdString(proj.getUserName());
-            if (!options.contains(owner)) {
-                options.append(owner);
-            }
-		}
 		break;
     
     case ColumnIndex::Access:
         filter.setTitle("Shared Groups");
-        for (const ProjectInformation& proj : allProjects) {
-            if (proj.getUserGroups().empty()) {
-                hasEmptyAccess = true;
-            }
-            for (const std::string& group : proj.getUserGroups()) {
-                const QString groupName = QString::fromStdString(group);
-                if (!options.contains(groupName)) {
-                    options.append(groupName);
-                }
-            }
-        }
 		break;
 
 	case ColumnIndex::LastAccessed:
@@ -315,37 +314,21 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
         return;
     }
 
-	options.sort();
-
-    if (hasEmptyAccess) {
-        options.append(ProjectOverviewFilterData::getEmptyUserGroupFilterName());
+	auto optionsIt = m_filterOptions.find(_logicalIndex);
+    if (optionsIt != m_filterOptions.end()) {
+        filter.setOptions(optionsIt->second);
     }
-    if (hasEmptyTags) {
-        options.append(ProjectOverviewFilterData::getEmptyTagsFilterName());
-	}
-    if (hasEmptyGroup) {
-        options.append(ProjectOverviewFilterData::getEmptyProjectGroupFilterName());
-	}
 
-	filter.setOptions(options);
-	filter.setFromData(m_lastFilter);
-
-    m_overview->filterProjects(filter.getFilterData());
+	filter.updateCheckedState(m_lastFilter);
 
 	connect(&filter, &ProjectOverviewFilter::sortOrderChanged, this, &ProjectOverviewHeader::slotSortChanged);
-	connect(&filter, &ProjectOverviewFilter::filterChanged, this, &ProjectOverviewHeader::slotFilterChanged);
-
+	
 	filter.exec(mapToGlobal(rect.bottomLeft()));
     
     disconnect(&filter, &ProjectOverviewFilter::sortOrderChanged, this, &ProjectOverviewHeader::slotSortChanged);
-    disconnect(&filter, &ProjectOverviewFilter::filterChanged, this, &ProjectOverviewHeader::slotFilterChanged);
-
+    
     if (filter.isConfirmed()) {
 		m_lastFilter = filter.getFilterData();
+        m_overview->filterProjects(m_lastFilter);
 	}
-    else {
-        m_lastFilter = ProjectOverviewFilterData();
-    }
-
-    m_overview->filterProjects(m_lastFilter);
 }

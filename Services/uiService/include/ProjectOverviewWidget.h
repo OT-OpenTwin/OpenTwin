@@ -37,6 +37,8 @@ class QTreeWidgetItem;
 
 namespace ot {
 
+	class Label;
+	class LineEdit;
 	class TreeWidgetItem;
 	class ProjectOverviewTree;
 	class ProjectOverviewEntry;
@@ -73,13 +75,14 @@ namespace ot {
 		void setMultiSelectionEnabled(bool _enabled);
 		bool getMultiSelectionEnabled() const;
 
-		void setGeneralFilter(const QString& _filter);
-
 		int getProjectCount() const;
-		bool getProjectsReultsExceeded() const { return m_resultsExceeded; };
 		
 		std::list<ProjectInformation> getAllProjects() const;
 		std::list<ProjectInformation> getSelectedProjects() const;
+
+		void filterProjects(const ProjectOverviewFilterData& _filterData);
+
+		QString getCurrentQuickFilter() const;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -87,6 +90,7 @@ namespace ot {
 
 	Q_SIGNALS:
 		void selectionChanged();
+		void filterReturnPressed(const QString& _text);
 		void projectOpenRequested(const ProjectInformation& _projectInfo);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -96,8 +100,7 @@ namespace ot {
 	public Q_SLOTS:
 		void clear();
 		void refreshProjects();
-		void sort(int _logicalIndex, ProjectOverviewFilterData::SortMode _sortMode);
-		void filterProjects(const ProjectOverviewFilterData& _filterData);
+		void sort(int _logicalIndex, Qt::SortOrder _sortOrder);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -107,7 +110,8 @@ namespace ot {
 		void slotSelectionChanged();
 		void slotItemChanged(QTreeWidgetItem* _item, int _column);
 		void slotOpenRequested(QTreeWidgetItem* _item, int _column);
-		void slotBasicFilterProjects();
+		void slotQuickFilterProjects();
+		void slotFilterReturnPressed();
 		void slotWorkerFinished();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -115,17 +119,18 @@ namespace ot {
 		// Private: Helper
 
 	private:
+		void setProjects(const std::list<ProjectInformation>& _projects);
 		void startLoading(const ProjectInformation& _projectInfo);
 		void stopLoading();
 		void worker();
 		void addEntry(ProjectOverviewEntry* _entry);
-		void updateProjectGroups();
-		void updateProjectGroup(TreeWidgetItem* _groupItem);
 		void updateCheckStates(QTreeWidgetItem* _parent);
 		int getProjectCount(const QTreeWidgetItem* _parent) const;
 		void getAllProjects(const QTreeWidgetItem* _parent, std::list<ProjectInformation>& _lst) const;
-		void basicFilterProjects(QTreeWidgetItem* _parent);
-		void filterProjects(const QTreeWidgetItem* _parent, const ProjectOverviewFilterData& _filterData);
+		
+		void quickFilterProjects(QTreeWidgetItem* _parentItem, const QString& _nameFilter);
+
+		void updateFilterOptions();
 
 		TreeWidgetItem* getOrCreateProjectGroupItem(const std::string& _groupName);
 
@@ -142,12 +147,14 @@ namespace ot {
 		ProjectOverviewHeader* m_header;
 		ProjectOverviewPreviewBox* m_previewBox;
 
-		ProjectOverviewFilterData::SortMode m_lastSortMode;
+		Qt::SortOrder m_sortOrder;
 		int m_lastSortColumn;
 
 		bool m_resultsExceeded;
-		QString m_generalFilter;
+
+		LineEdit* m_basicFilter;
 		ProjectOverviewTree* m_tree;
+		Label* m_countLabel;
 	};
 
 }

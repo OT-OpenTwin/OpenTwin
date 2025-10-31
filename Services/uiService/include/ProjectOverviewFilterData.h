@@ -33,22 +33,17 @@ namespace ot {
 		OT_DECL_DEFCOPY(ProjectOverviewFilterData)	
 		OT_DECL_DEFMOVE(ProjectOverviewFilterData)
 	public:
-		enum SortMode {
-			Ascending,
-			Descending,
-			None
-		};
-
 		ProjectOverviewFilterData(int _logicalIndex = -1);
 		~ProjectOverviewFilterData() = default;
 
-		bool isValid() const { return !m_selectedFilters.empty() && m_logicalIndex >= 0; };
+		bool isValid() const { return m_logicalIndex >= 0; };
 
 		void setLogicalIndex(int _logicalIndex) { m_logicalIndex = _logicalIndex; };
 		int getLogicalIndex() const { return m_logicalIndex; };
 
 		void addSelectedFilter(const QString& _filter) { m_selectedFilters.append(_filter); };
 		void setSelectedFilters(const QStringList& _filters) { m_selectedFilters = _filters; };
+		void clearSelectedFilters() { m_selectedFilters.clear(); };
 		const QStringList& getSelectedFilters() const { return m_selectedFilters; };
 
 		ProjectFilterData toProjectFilterData() const;

@@ -39,10 +39,9 @@ namespace ot {
 
 		const ProjectInformation& getProjectInformation() const { return m_projectInfo; };
 
-		void applyFilter(const QString& _generalFilter);
-		void applyFilter(const ProjectOverviewFilterData& _filter);
-
 		virtual bool operator<(const QTreeWidgetItem& _other) const override;
+
+		void applyFilter(const QString& _nameFilter);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

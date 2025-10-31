@@ -61,10 +61,7 @@ public:
 	virtual QWidget* getQWidget() override { return m_widget; };
 	virtual const QWidget* getQWidget() const override { return m_widget; };
 
-	virtual bool eventFilter(QObject* _watched, QEvent* _event) override;
-
-	QString getGeneralFilter() const;
-
+	QString getCurrentQuickFilter() const;
 	std::list<ot::ProjectInformation> getSelectedProjects() const;
 
 	void setViewMode(ot::ProjectOverviewWidget::ViewMode _mode);
@@ -97,20 +94,15 @@ private Q_SLOTS:
 	void slotAccessProject();
 	void slotOwnerProject();
 
-	void slotFilterChanged();
 	void slotSelectionChanged();
 
 private:
 	ot::ToolButton* iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip);
-	void updateCountLabel();
 	void updateToolButtonsEnabledState(bool _forceDisabled = false);
 
 	QWidget* m_widget;
 
 	ot::Label* m_titleLabel;
-
-	ot::LineEdit* m_filter;
-	ot::Label* m_countLabel;
 
 	ot::ToolButton* m_createButton;
 	ot::ToolButton* m_refreshButton;

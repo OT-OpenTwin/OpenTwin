@@ -51,8 +51,6 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager) {
 
 	// Crete controls
 	m_titleLabel = new ot::Label("Projects");
-	m_filter = new ot::LineEdit;
-	m_countLabel = new ot::Label;
 	QOpenGLWidget* glWidget = new QOpenGLWidget;
 
 	m_overview = new ot::ProjectOverviewWidget;
@@ -82,25 +80,19 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager) {
 	welcomeFont.setPixelSize(28);
 	m_titleLabel->setFont(welcomeFont);
 
-	m_filter->setPlaceholderText("Find...");
-	m_filter->installEventFilter(this);
-
 	glWidget->setMaximumSize(1, 1);
 
-	this->updateCountLabel();
 	this->updateToolButtonsEnabledState();
 
 	// Setup layouts
 	centralLayout->addWidget(m_titleLabel);
-	centralLayout->addWidget(m_filter);
 	centralLayout->addWidget(m_overview->getQWidget());
-	centralLayout->addWidget(m_countLabel);
 	centralLayout->addWidget(glWidget);
 	
 	// Connect signals
-	this->connect(m_filter, &ot::LineEdit::textChanged, this, &WelcomeWidget::slotFilterChanged);
 	this->connect(m_overview, &ot::ProjectOverviewWidget::selectionChanged, this, &WelcomeWidget::slotSelectionChanged);
 	this->connect(m_overview, &ot::ProjectOverviewWidget::projectOpenRequested, this, &WelcomeWidget::slotOpenProject);
+	this->connect(m_overview, &ot::ProjectOverviewWidget::filterReturnPressed, this, &WelcomeWidget::slotCreateProject);
 	this->connect(m_createButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCreateProject);
 	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRefreshProjectList);
 	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotToggleViewMode);
@@ -134,24 +126,8 @@ void WelcomeWidget::setWidgetLocked(bool _isLocked) {
 	m_refreshButton->setEnabled(!_isLocked);
 }
 
-bool WelcomeWidget::eventFilter(QObject* _watched, QEvent* _event) {
-	if (_watched == m_filter && _event->type() == QEvent::KeyPress) {
-		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(_event);
-		if (!keyEvent) {
-			OT_LOG_E("Key event is null");
-			return false;
-		}
-		if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
-			this->slotCreateProject();
-			return true;
-		}
-	}
-
-	return false;
-}
-
-QString WelcomeWidget::getGeneralFilter() const {
-	return m_filter->text();
+QString WelcomeWidget::getCurrentQuickFilter() const {
+	return m_overview->getCurrentQuickFilter();
 }
 
 std::list<ot::ProjectInformation> WelcomeWidget::getSelectedProjects() const {
@@ -189,7 +165,6 @@ void WelcomeWidget::slotCreateProject() {
 void WelcomeWidget::slotRefreshProjectList() {
 	m_overview->refreshProjects();
 
-	this->updateCountLabel();
 	this->updateToolButtonsEnabledState();
 }
 
@@ -232,10 +207,6 @@ void WelcomeWidget::slotOwnerProject() {
 	this->slotRefreshProjectList();
 }
 
-void WelcomeWidget::slotFilterChanged() {
-	m_overview->setGeneralFilter(m_filter->text());
-}
-
 void WelcomeWidget::slotSelectionChanged() {
 	this->updateToolButtonsEnabledState();
 }
@@ -253,30 +224,6 @@ ot::ToolButton* WelcomeWidget::iniToolButton(const QString& _text, const QString
 	_group->AddWidget(newButton);
 
 	return newButton;
-}
-
-void WelcomeWidget::updateCountLabel() {
-	int count = m_overview->getProjectCount();
-
-	if (count == 0) {
-		m_countLabel->setText("No projects found");
-	}
-	else if (count == 1) {
-		if (m_overview->getProjectsReultsExceeded()) {
-			m_countLabel->setText("Showing the first project found");
-		}
-		else {
-			m_countLabel->setText("1 project found");
-		}
-	}
-	else {
-		if (m_overview->getProjectsReultsExceeded()) {
-			m_countLabel->setText("Showing the first " + QString::number(count) + " projects");
-		}
-		else {
-			m_countLabel->setText(QString::number(count) + " projects found");
-		}
-	}
 }
 
 void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {

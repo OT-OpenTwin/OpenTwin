@@ -397,7 +397,7 @@ void EditProjectInformationDialog::initializeData() {
 	QStringList projectGroups;
 	std::list<ot::ProjectInformation> projects;
 	bool exceeded = false;
-	if (projectManager.findProjects("", 0, projects, exceeded)) {
+	if (projectManager.findProjects("", ProjectManagement::defaultMaxProjects(), projects, exceeded)) {
 		for (const ot::ProjectInformation& proj : projects) {
 			const std::string& category = proj.getProjectGroup();
 			if (!category.empty() && !projectGroups.contains(QString::fromStdString(category))) {

@@ -61,95 +61,6 @@ ot::ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projec
 	setData(ProjectOverviewHeader::LastAccessed, Qt::UserRole + 20, m_projectInfo.getLastAccessTime());
 }
 
-void ot::ProjectOverviewEntry::applyFilter(const QString& _generalFilter) {
-	if (_generalFilter.isEmpty()) {
-		setHidden(false);
-		return;
-	}
-	QString filter = _generalFilter.toLower();
-	bool matches = text(ProjectOverviewHeader::Name).toLower().contains(filter);
-	
-	setHidden(!matches);
-}
-
-void ot::ProjectOverviewEntry::applyFilter(const ProjectOverviewFilterData& _filter) {
-	if (!_filter.isValid()) {
-		setHidden(false);
-		return;
-	}
-
-	switch (_filter.getLogicalIndex()) {
-	case ProjectOverviewHeader::Group:
-		if (m_projectInfo.getProjectGroup().empty()) {
-			setHidden(!_filter.getSelectedFilters().contains(ProjectOverviewFilterData::getEmptyProjectGroupFilterName()));
-		}
-		else {
-			setHidden(!_filter.getSelectedFilters().contains(QString::fromStdString(m_projectInfo.getProjectGroup())));
-		}
-		break;
-
-	case ProjectOverviewHeader::Type:
-		setHidden(!_filter.getSelectedFilters().contains(QString::fromStdString(m_projectInfo.getProjectType())));
-		break;
-
-	case ProjectOverviewHeader::Name:
-		setHidden(!_filter.getSelectedFilters().contains(QString::fromStdString(m_projectInfo.getProjectName())));
-		break;
-
-	case ProjectOverviewHeader::Owner:
-		setHidden(!_filter.getSelectedFilters().contains(QString::fromStdString(m_projectInfo.getUserName())));
-		break;
-
-	case ProjectOverviewHeader::Tags:
-	{
-		bool found = false;
-		if (m_projectInfo.getTags().empty()) {
-			if (_filter.getSelectedFilters().contains(ProjectOverviewFilterData::getEmptyTagsFilterName())) {
-				found = true;
-			}
-		}
-		else {
-			for (const std::string& tag : m_projectInfo.getTags()) {
-				if (_filter.getSelectedFilters().contains(QString::fromStdString(tag))) {
-					found = true;
-					break;
-				}
-			}
-		}
-		setHidden(!found);
-		break;
-	}
-
-	case ProjectOverviewHeader::Access:
-	{
-		bool found = false;
-		if (m_projectInfo.getUserGroups().empty()) {
-			if (_filter.getSelectedFilters().contains(ProjectOverviewFilterData::getEmptyUserGroupFilterName())) {
-				found = true;
-			}
-		}
-		else {
-			for (const std::string& group : m_projectInfo.getUserGroups()) {
-				if (_filter.getSelectedFilters().contains(QString::fromStdString(group))) {
-					found = true;
-					break;
-				}
-			}
-		}
-		setHidden(!found);
-		break;
-	}
-
-	default:
-		OT_LOG_E("Invalid column for filter (" + std::to_string(_filter.getLogicalIndex()) + ")");
-		setHidden(false);
-		break;
-
-
-	}
-
-}
-
 bool ot::ProjectOverviewEntry::operator<(const QTreeWidgetItem& _other) const {
 	int column = treeWidget()->sortColumn();
 	if (column == ProjectOverviewHeader::LastAccessed) {
@@ -158,6 +69,18 @@ bool ot::ProjectOverviewEntry::operator<(const QTreeWidgetItem& _other) const {
 	else {
 		return TreeWidgetItem::operator<(_other);
 	}
+}
+
+void ot::ProjectOverviewEntry::applyFilter(const QString& _nameFilter) {
+	if (_nameFilter.isEmpty()) {
+		setHidden(false);
+		return;
+	}
+
+	QString filter = _nameFilter.toLower();
+	bool matches = text(ProjectOverviewHeader::Name).toLower().contains(filter);
+
+	setHidden(!matches);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
