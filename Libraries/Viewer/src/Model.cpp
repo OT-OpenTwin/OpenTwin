@@ -2992,7 +2992,7 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 					}
 					else
 					{
-						selectedItem->setEdgeHighlight(faceId, true, 1.0);
+						selectedItem->setEdgeHighlight(faceId, true, 2.5);
 					}
 					currentHoverItem = selectedItem;
 				}

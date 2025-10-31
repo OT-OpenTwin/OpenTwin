@@ -216,7 +216,7 @@ void SceneNodeGeometry::updateTransparentState(bool visible, bool transparent, b
 			if (!wireframe)
 			{
 				getShapeNode()->setChildValue(getTriangles(), true);
-				getShapeNode()->setChildValue(getEdges(), false);
+				getShapeNode()->setChildValue(getEdges(), true);
 			}
 			else
 			{
@@ -317,7 +317,7 @@ void SceneNodeGeometry::updateWireframeState(bool visible, bool wireframe, bool 
 		}
 
 		lineWidth = 1.0;
-		lineWidthHighlight = 1.0;
+		lineWidthHighlight = 2.5;
 	}
 
 	// Find the line width attribute of the edges and set the width
@@ -398,6 +398,7 @@ void SceneNodeGeometry::setHighlighted(bool h)
 	if (isHighlighted() == h) return;  // No change necessary
 
 	getShapeNode()->setChildValue(getEdgesHighlighted(), h);
+	getShapeNode()->setChildValue(getEdges(), !h);
 	getFaceEdgesHighlight()->setAllChildrenOff();
 
 	SceneNodeBase::setHighlighted(h);
@@ -703,7 +704,7 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 
 	// Now build the osg nodes for the edge and the selected edge
 	edgesNode = buildEdgesOSGNode(nEdges, vertices, colorRGB[0], colorRGB[1], colorRGB[2], edgeTranspacency, true, 1.0);
-	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices, 1.0, 0.0, 0.0, 1.0, false, 1.0);
+	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices, 1.0, 0.0, 0.0, 1.0, true, 2.5);
 
 	if (!backFaceCulling)
 	{
@@ -741,7 +742,7 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 			}
 		}
 
-		osg::Node *faceEdgesNode = buildEdgesOSGNode(nEdges, vertices, 1.0, 0.0, 0.0, 1.0, false, 1.0);
+		osg::Node *faceEdgesNode = buildEdgesOSGNode(nEdges, vertices, 1.0, 0.0, 0.0, 1.0, false, 2.5);
 
 		faceEdgesHighlight[faceEdges.first] = faceEdgesNode;
 		faceEdgesHighlightNode->addChild(faceEdgesNode);
@@ -905,7 +906,7 @@ osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::
 
 void SceneNodeGeometry::setEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2)
 {
-	osg::Node* highlightNode = getEdgeHighlightNode(faceId1, faceId2, 1.0);
+	osg::Node* highlightNode = getEdgeHighlightNode(faceId1, faceId2, 2.5);
 	setHighlightNode(highlightNode);
 }
 
