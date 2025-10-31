@@ -74,7 +74,7 @@ SceneNodeGeometry::SceneNodeGeometry() :
 	textureAttribute(nullptr),
 	textureAttributeGen(nullptr),
 	textureAttributeEnv(nullptr),
-	edgeTranspacency(0.35),
+	edgeTranspacency(0.15),
 	cutCapGeometryTriangles(nullptr),
 	cutCapGeometryEdges(nullptr)
 {
