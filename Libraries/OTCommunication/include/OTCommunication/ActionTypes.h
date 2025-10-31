@@ -39,6 +39,7 @@
 
 #define OT_ACTION_CMD_Message "Message"
 #define OT_ACTION_CMD_Compound "Compound"
+#define OT_ACTION_CMD_GetFilter "GetFilter"
 #define OT_ACTION_CMD_ConfirmService "Service.Confirm"
 #define OT_ACTION_CMD_ServiceClosing "Service.Closing"
 #define OT_ACTION_CMD_RegisterNewService "Service.Register"

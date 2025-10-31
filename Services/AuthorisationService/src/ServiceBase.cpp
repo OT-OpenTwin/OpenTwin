@@ -173,6 +173,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_REMOVE_USER_FROM_GROUP) { return handleRemoveUserFromGroup(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_REMOVE_GROUP) { return handleRemoveGroup(_actionDocument.GetObject(), loggedInUser); }
 	//------------ Project FUNCTIONS ------------
+	else if (_action == OT_ACTION_CMD_GetFilter) { return handleGetFilterOptions(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_CREATE_PROJECT) { return handleCreateProject(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_CMD_OpenNewProject) { return handleProjectOpened(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_UPDATE_PROJECT_ADDITIONALINFO) { return handleUpdateAdditionalProjectInformation(_actionDocument.GetObject(), loggedInUser); }

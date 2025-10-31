@@ -97,4 +97,6 @@ public:
 
 private:
 	static void appendFilter(std::list<bsoncxx::document::value>& _createdFilters, const std::string& _field, const std::list<std::string>& _values);
+
+	static void getDistinctStrings(mongocxx::collection& _collection, const std::string& _fieldName, std::list<std::string>& _result);
 };

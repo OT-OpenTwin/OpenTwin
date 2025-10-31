@@ -40,11 +40,50 @@ ot::ProjectFilterData MongoProjectFunctions::getProjectFilterOptions(const User&
 
 	mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
 	mongocxx::collection projectCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+	
+	std::list<std::string> result;
+	getDistinctStrings(projectCollection, "project_name", result);
+	filters.setProjectNames(std::move(result));
+	result.clear();
 
-	auto distinctNamesCursor = projectCollection.distinct("project_name", {});
-	for (auto&& name : distinctNamesCursor) {
+	getDistinctStrings(projectCollection, "project_type", result);
+	filters.setProjectTypes(std::move(result));
+	result.clear();
 
+	getDistinctStrings(projectCollection, "project_group", result);
+	filters.setProjectGroups(std::move(result));
+	result.clear();
+
+	getDistinctStrings(projectCollection, "tags", result);
+	filters.setTags(std::move(result));
+	result.clear();
+
+	getDistinctStrings(projectCollection, "groups", result);
+	std::list<std::string> groupNames;
+	for (const auto& groupId : result) {
+		try {
+			Group group = MongoGroupFunctions::getGroupDataById(groupId, _adminClient);
+			groupNames.push_back(group.name);
+		}
+		catch (std::runtime_error err) {
+			OT_LOG_E("Error retrieving group data for group ID \"" + groupId + "\". Error: " + err.what());
+		}
 	}
+	filters.setUserGroups(std::move(groupNames));
+	result.clear();
+
+	getDistinctStrings(projectCollection, "created_by", result);
+	std::list<std::string> ownerNames;
+	for (const auto& ownerId : result) {
+		try {
+			User ownerUser = MongoUserFunctions::getUserDataThroughId(ownerId, _adminClient);
+			ownerNames.push_back(ownerUser.username);
+		}
+		catch (std::runtime_error err) {
+			OT_LOG_E("Error retrieving owner user data for user ID \"" + ownerId + "\". Error: " + err.what());
+		}
+	}
+	filters.setOwners(std::move(ownerNames));
 
 	return filters;
 }
@@ -782,4 +821,35 @@ void MongoProjectFunctions::appendFilter(std::list<bsoncxx::document::value>& _c
 	_createdFilters.push_back(document{} << "$or" << orArray << finalize);
 
 	//OT_LOG_W(bsoncxx::to_json(_createdFilters.back().view()));
+}
+
+void MongoProjectFunctions::getDistinctStrings(mongocxx::collection& _collection, const std::string& _fieldName, std::list<std::string>& _result) {
+	try {
+		auto distinctCursor = _collection.distinct(_fieldName, {});
+		bool hasEmpty = false;
+		for (auto&& it : distinctCursor) {
+			if (it["values"] && it["values"].type() == bsoncxx::type::k_array) {
+				for (auto& val : it["values"].get_array().value) {
+					if (val.type() == bsoncxx::type::k_utf8) {
+						std::string value = val.get_utf8().value.data();
+						if (value.empty()) {
+							hasEmpty = true;
+						}
+						else {
+							_result.push_back(std::move(value));
+						}
+					}
+					else if (val.type() == bsoncxx::type::k_null) {
+						hasEmpty = true;
+					}
+				}
+			}
+		}
+		if (hasEmpty) {
+			_result.push_back("");
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E("Error getting distinct strings for field \"" + _fieldName + "\": " + _e.what());
+	}
 }
