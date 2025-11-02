@@ -115,6 +115,7 @@ namespace ot {
 		bool isCurrentViewTab() const;
 
 		void addVisualizingItem(UID _itemId) { m_visualizingItems.addSelectedNavigationItem(_itemId); };
+		void setVisualizingItems(const ot::UIDList& _itemIds) { m_visualizingItems.setSelectedNavigationItems(_itemIds); };
 		void removeVisualizingItem(UID _itemId) { m_visualizingItems.removeSelectedNavigationItem(_itemId); };
 		void clearVisualizingItems() { m_visualizingItems.setSelectedNavigationItems(UIDList()); };
 		const SelectionInformation& getVisualizingItems() const { return m_visualizingItems; };

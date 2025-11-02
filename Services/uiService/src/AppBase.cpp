@@ -2575,31 +2575,47 @@ void AppBase::slotGraphicsSelectionChanged() {
 		OT_LOG_E("GraphicsScene cast failed");
 		return;
 	}
-	ot::GraphicsView* graphicsView = scene->getGraphicsView();
+	ot::GraphicsViewView* graphicsView = nullptr;
+	for (auto& v : m_graphicsViews) {
+		if (v.second->getGraphicsView() == scene->getGraphicsView()) {
+			graphicsView = v.second;
+			break;
+		}
+	}
+
+	if (!graphicsView) {
+		OT_LOG_E("Failed to determine graphics view for graphics selection event");
+		return;
+	}
 
 	ot::UIDList selectedGraphicSceneItemIDs; 
 	auto selectedItems = scene->selectedItems();
 	if (selectedItems.size() == 0)
 	{
-		return;
+		//return;
 	}
 
+	ot::UIDList newVisualizingEntities;
 	for (auto selectedItem : selectedItems) {
 		ot::GraphicsItem* selectedGraphicsItem = dynamic_cast<ot::GraphicsItem*>(selectedItem);
 		if (selectedGraphicsItem) {
 			selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->getGraphicsItemUid());
+			newVisualizingEntities.push_back(ViewerAPI::getTreeIDFromModelEntityID(selectedGraphicsItem->getGraphicsItemUid()));
 			continue;
 		}
 		
 		ot::GraphicsConnectionItem* selectedConnection = dynamic_cast<ot::GraphicsConnectionItem*>(selectedItem);
 		if (selectedConnection) {
 			selectedGraphicSceneItemIDs.push_back(selectedConnection->getConfiguration().getUid());
+			newVisualizingEntities.push_back(ViewerAPI::getTreeIDFromModelEntityID(selectedConnection->getConfiguration().getUid()));
 			continue;
 		}
 
 		OTAssert(0, "Unknown graphics element selected");
 	}
 	
+
+	graphicsView->setVisualizingItems(newVisualizingEntities);
 	m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
 
 	{
