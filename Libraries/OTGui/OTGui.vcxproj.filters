@@ -470,6 +470,9 @@
     <ClInclude Include="include\OTGui\ExtendedProjectInformation.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsChangeEvent.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -834,6 +837,9 @@
     </ClCompile>
     <ClCompile Include="src\ExtendedProjectInformation.cpp">
       <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsChangeEvent.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

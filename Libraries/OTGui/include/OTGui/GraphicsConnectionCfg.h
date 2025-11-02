@@ -50,6 +50,7 @@ namespace ot {
 		static ConnectionShape stringToShape(const std::string _shape);
 
 		GraphicsConnectionCfg();
+		GraphicsConnectionCfg(const ConstJsonObject& _jsonObject);
 		GraphicsConnectionCfg(const ot::UID& _originUid, const std::string& _originConnectableName, const ot::UID& _destinationUid, const std::string& _destinationName);
 		virtual ~GraphicsConnectionCfg();
 

@@ -34,15 +34,9 @@ ot::GraphicsActionHandler::GraphicsActionHandler(ActionDispatcherBase* _dispatch
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, this, &GraphicsActionHandler::handleGraphicsConnectionToConnectionRequested, ot::SECURE_MESSAGE_TYPES);
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, this, &GraphicsActionHandler::handleGraphicsConnectionChanged, ot::SECURE_MESSAGE_TYPES);
 
-}
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ChangeEvent, this, &GraphicsActionHandler::handleGraphicsChangeEvent, ot::SECURE_MESSAGE_TYPES);
 
-ot::ReturnMessage ot::GraphicsActionHandler::graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); }
-ot::ReturnMessage ot::GraphicsActionHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _item) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); }
-ot::ReturnMessage ot::GraphicsActionHandler::graphicsItemDoubleClicked(const std::string& _name, UID _uid) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); }
-ot::ReturnMessage ot::GraphicsActionHandler::graphicsRemoveRequested(const UIDList& _itemUids, const UIDList& _connectionUids) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); }
-ot::ReturnMessage ot::GraphicsActionHandler::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); }
-ot::ReturnMessage ot::GraphicsActionHandler::graphicsConnectionToConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); }
-ot::ReturnMessage ot::GraphicsActionHandler::graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); }
+}
 
 ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsItemRequested(JsonDocument& _document) {
 	std::string itemName = json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
@@ -99,4 +93,9 @@ ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsConnectionChanged(Jso
 	cfg.setFromJsonObject(json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	return graphicsConnectionChanged(cfg);
+}
+
+ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsChangeEvent(JsonDocument& _document) {
+	GraphicsChangeEvent event(json::getObject(_document, OT_ACTION_PARAM_Event));
+	return graphicsChangeEvent(event);
 }

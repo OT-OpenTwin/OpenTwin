@@ -64,6 +64,10 @@ ot::GraphicsConnectionCfg::GraphicsConnectionCfg()
 	m_lineStyle.setWidth(2.);
 }
 
+ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const ConstJsonObject& _jsonObject) : GraphicsConnectionCfg() {
+	setFromJsonObject(_jsonObject);
+}
+
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const ot::UID& _originUid, const std::string& _originConnectableName, const ot::UID& _destinationUid, const std::string& _destinationName)
 	: m_lineShape(ConnectionShape::DirectLine), m_uid(0),
 	m_originUID(_originUid), m_originConnectable(_originConnectableName), m_destUID(_destinationUid), m_destConnectable(_destinationName), m_handlesState(true)
