@@ -84,7 +84,7 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 
 	// Create block
 	EntityBlockHierarchicalProjectItem blockEntity;
-	blockEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
+	blockEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	blockEntity.setOwningService(serviceName);
 	blockEntity.setEntityID(_modelComponent->createEntityUID());
 	blockEntity.setName(CreateNewUniqueTopologyName(c_projectsFolder, _projectInfo.getProjectName()));
@@ -163,7 +163,7 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	connectionEntity.setConnectionCfg(newConnection);
 	connectionEntity.setName(newConnectionName);
 	connectionEntity.setGraphicsScenePackageChildName(c_connectionsFolderName);
-	connectionEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
+	connectionEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	connectionEntity.storeToDataBase();
 
@@ -225,7 +225,7 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 
 	// Create block entity
 	EntityBlockHierarchicalDocumentItem blockEntity;
-	blockEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
+	blockEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	blockEntity.setOwningService(serviceName);
 	blockEntity.setEntityID(blockUid);
 	blockEntity.setName(newDocumentName);
@@ -306,7 +306,7 @@ void EntityHandler::addBackgroundImage(const std::string& _fileName, const std::
 
 	// Create background image block entity
 	EntityBlockImage backgroundImageEntity;
-	backgroundImageEntity.setServiceInformation(Application::instance().getBasicServiceInformation());
+	backgroundImageEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	backgroundImageEntity.setOwningService(serviceName);
 	backgroundImageEntity.setEntityID(_modelComponent->createEntityUID());
 	backgroundImageEntity.setName(CreateNewUniqueTopologyName(c_backgroundFolder, newName));
@@ -538,7 +538,7 @@ void EntityHandler::addContainer() {
 	newContainer.setEditable(true);
 	newContainer.setEntityID(_modelComponent->createEntityUID());
 	newContainer.setName(CreateNewUniqueTopologyName(c_containerFolder, "Container"));
-	newContainer.setServiceInformation(Application::instance().getBasicServiceInformation());
+	newContainer.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	newContainer.setGraphicsScenePackageChildName(c_containerFolderName);
 	newContainer.setOwningService(serviceName);
 	newContainer.setSelectChildren(false);

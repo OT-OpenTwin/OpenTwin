@@ -103,6 +103,13 @@ ot::Connector EntityBlock::getConnectorByName(const std::string& _connectorName)
 	}
 }
 
+void EntityBlock::setGraphicsPickerKey(const std::string& _key) {
+	if (_key != m_graphicsPickerKey) {
+		m_graphicsPickerKey = _key;
+		setModified();
+	}
+}
+
 std::string EntityBlock::createBlockHeadline()
 {
 	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
@@ -166,9 +173,8 @@ void EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 	
 	storage.append(
 		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(m_coordinate2DEntityID)),
-		bsoncxx::builder::basic::kvp("ServiceName", m_info.serviceName()),
-		bsoncxx::builder::basic::kvp("ServiceType", m_info.serviceType()),
-		bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName)
+		bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName),
+		bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_graphicsPickerKey)
 	);
 
 	auto connectorsArray = bsoncxx::builder::basic::array();
@@ -185,8 +191,6 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	
 	m_coordinate2DEntityID = static_cast<ot::UID>(doc_view["CoordinatesEntityID"].get_int64());
-	m_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
-	m_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
 	m_graphicsScenePackageChildName = doc_view["GraphicPackageChildName"].get_utf8().value.data();
 
 	auto allConnectors = doc_view["Connectors"].get_array();
@@ -196,6 +200,19 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 		ot::Connector connector;
 		connector.DeserializeBSON(subDocument);
 		m_connectorsByName[connector.getConnectorName()]=(connector);
+	}
+
+	auto pickerIt = doc_view.find("GraphicsPickerKey");
+	if (pickerIt != doc_view.end())
+	{
+		m_graphicsPickerKey = pickerIt->get_utf8().value.data();
+	}
+	else {
+		// Legacy support
+		m_graphicsPickerKey = getOwningService();
+		if (m_graphicsPickerKey.empty()) {
+			OT_LOG_W("Block entity has no GraphicsPickerKey and no owning service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
+		}
 	}
 }
 
@@ -234,11 +251,13 @@ void EntityBlock::createBlockItem()
 
 	ot::GraphicsScenePackage pckg(graphicsSceneName);
 	pckg.addItem(blockCfg);
+	pckg.setPickerKey(m_graphicsPickerKey);
 
 	ot::JsonDocument reqDoc;
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	m_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
+	ot::BasicServiceInformation ownerInfo(this->getOwningService());
+	ownerInfo.addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 	ot::VisualisationCfg visualisationCfg;
 	ot::JsonObject visualisationCfgJson;

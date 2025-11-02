@@ -238,8 +238,9 @@ void Model::resetToNew()
 
 	if (typeManager.hasCircuit())
 	{
-		EntityBase* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		EntityGraphicsScene* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		entityCircuit->setName(typeManager.getCircuitName());
+		entityCircuit->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		addEntityToModel(entityCircuit->getName(), entityCircuit, entityRoot, true, allNewEntities);
 	}
 

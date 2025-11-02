@@ -80,11 +80,8 @@ namespace ot {
 		void setPreviewBoxSize(const QSize& _size) { m_previewSize = _size; };
 		const QSize& previewBoxSize() const { return m_previewSize; };
 
-		void setOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
-
-		//! @brief Returns the current owner of the graphics picker.
-		//! The owner information will be added to the mime data when dragging an item.
-		const BasicServiceInformation& getOwner() const { return m_owner; };
+		void setKey(const std::string& _key) { m_key = _key; };
+		const std::string& getKey() const { return m_key; };
 
 	private Q_SLOTS:
 		void slotSelectionChanged();
@@ -112,7 +109,7 @@ namespace ot {
 
 		bool                  m_repaintPreviewRequired;
 
-		BasicServiceInformation m_owner;
+		std::string          m_key;
 
 		QSize                 m_previewSize;
 		Splitter* m_splitter;

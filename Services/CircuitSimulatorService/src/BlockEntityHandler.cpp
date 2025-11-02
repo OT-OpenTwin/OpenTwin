@@ -60,11 +60,10 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 	assert(baseEntity != nullptr);
 	std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 
-	
 	blockEntity->setEditable(true);
-	blockEntity->setServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
+	blockEntity->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	// Here i want to add the items to the corresponding editor	
 
 	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
@@ -229,7 +228,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionEntity.setConnectionCfg(newConnection);
 		connectionEntity.setName(connectionName);
 		connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
-		connectionEntity.setServiceInformation(Application::instance()->getBasicServiceInformation());
+		connectionEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 
 		
@@ -385,6 +384,7 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker() {
 	a.addChildCollection(std::move(a4));
 
 	graphicsPicker.addCollection(std::move(a));
+	graphicsPicker.setPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	return graphicsPicker;
 }
 

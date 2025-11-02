@@ -36,10 +36,12 @@ public:
 	ot::GraphicsConnectionCfg getConnectionCfg();
 	void setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg);
 	
+	void setGraphicsPickerKey(const std::string& _key);
+	const std::string& getGraphicsPickerKey() const { return m_pickerKey; };
+
 	//! @brief The name of the container below the graphics editor. This name need not be editable. 
 	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
 	void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
-	void setServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; }
 	void CreateConnections();
 
 	void createProperties();
@@ -52,7 +54,7 @@ private:
 	ot::GraphicsConnectionCfg::ConnectionShape _lineShape = ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
 	ot::PenFCfg m_lineStyle;
 
-	ot::BasicServiceInformation m_info;
+	std::string m_pickerKey;
 	std::string	m_graphicsScenePackageChildName = "";
 	ot::UID _blockIDOrigin;
 	ot::UID _blockIDDestination;

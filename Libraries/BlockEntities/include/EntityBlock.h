@@ -56,14 +56,14 @@ public:
 	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
 	void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
 
-	void setServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; };
-	ot::BasicServiceInformation getServiceInformation() const { return m_info; };
-
 	void setCoordinateEntity(const EntityCoordinates2D& _coordinateEntity) { m_coordinate2DEntityID = _coordinateEntity.getEntityID(); };
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { m_coordinate2DEntityID = coordinateEntityID; };
 
 	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return m_connectorsByName; }
 	const bool hasConnector(const std::string& connectorName) const { return m_connectorsByName.find(connectorName) != m_connectorsByName.end(); }
+
+	void setGraphicsPickerKey(const std::string& _key);
+	const std::string& getGraphicsPickerKey() const { return m_graphicsPickerKey; };
 
 	virtual ot::GraphicsItemCfg* createBlockCfg() = 0;
 
@@ -98,9 +98,9 @@ private:
 	std::string m_blockTitle = "";
 	ot::UID m_coordinate2DEntityID = 0;
 	EntityCoordinates2D* m_coordinateEntity = nullptr;
-	ot::BasicServiceInformation m_info;
 	std::string	m_graphicsScenePackageChildName = "";
 
+	std::string m_graphicsPickerKey;
 	OldTreeIcon m_navigationTreeIcon;
 
 	std::map<std::string, ot::Connector> m_connectorsByName;

@@ -27,7 +27,7 @@
 #include <QtCore/qobject.h>
 
 #define OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName "GraphicsItem.Name"
-#define OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner "GraphicsItem.Owner"
+#define OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_PickerKey "GraphicsItem.PickerKey"
 
 class QWidget;
 
@@ -39,19 +39,19 @@ namespace ot {
 		OT_DECL_NOCOPY(GraphicsItemPreviewDrag)
 		OT_DECL_NOMOVE(GraphicsItemPreviewDrag)
 	public:
-		GraphicsItemPreviewDrag(const std::string& _itemName, const BasicServiceInformation& _owner);
+		GraphicsItemPreviewDrag(const std::string& _itemName, const std::string& _pickerKey);
 		virtual ~GraphicsItemPreviewDrag();
 
 		void queue(QWidget* _widget);
 
 	private Q_SLOTS:
-		void slotQueue(void);
+		void slotQueue();
 
 	private:
 		QWidget* m_widget;
 		int m_queueCount;
 		std::string m_itemName;
-		BasicServiceInformation m_owner;
+		std::string m_pickerKey;
 	};
 
 }

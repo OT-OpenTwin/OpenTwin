@@ -3288,13 +3288,10 @@ void ExternalServicesComponent::handleAddAndActivateVersionGraphVersion(ot::Json
 // Action handler: Graphics Editor
 
 void ExternalServicesComponent::handleFillGraphicsPicker(ot::JsonDocument& _document) {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
-
 	ot::GraphicsPickerCollectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
+	AppBase::instance()->addGraphicsPickerPackage(pckg);
 }
 
 void ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _document) {
@@ -3312,10 +3309,10 @@ void ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _do
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
 	}
 
-	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
+	AppBase::instance()->addGraphicsPickerPackage(pckg);
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info, insertFlags, visualisationCfg);
+	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getTitle()), info, pckg.getPickerKey(), insertFlags, visualisationCfg);
 
 	if (suppressViewHandling) {
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
@@ -3333,9 +3330,9 @@ void ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _documen
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
 	
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualisationCfg);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getName()), info, pckg.getPickerKey(), insertFlags, visualisationCfg);
 
-	for (auto graphicsItemCfg : pckg.items()) {
+	for (auto graphicsItemCfg : pckg.getItems()) {
 		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::itemFromConfig(graphicsItemCfg, true);
 		if (graphicsItem != nullptr) {
 			//const double xCoordinate = graphicsItemCfg->getPosition().x();
@@ -3360,7 +3357,7 @@ void ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument& _docu
 		std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
 		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info, insertFlags, {});
+		ot::GraphicsViewView* editor = AppBase::instance()->findGraphicsEditor(editorName, {});
 
 		if (editor) {
 			for (auto itemUID : itemUids) {
@@ -3391,9 +3388,9 @@ void ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _d
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
 	
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualisationCfg);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getName()), info, pckg.getPickerKey(), insertFlags, visualisationCfg);
 
-	for (const auto& connection : pckg.connections()) {
+	for (const auto& connection : pckg.getConnections()) {
 		editor->getGraphicsView()->addConnection(connection);
 	}
 
@@ -3407,13 +3404,15 @@ void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument&
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	if (!pckg.name().empty()) {
+	if (!pckg.getName().empty()) {
 		// Specific editor
 		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, {});
+		ot::GraphicsViewView* editor = AppBase::instance()->findGraphicsEditor(pckg.getName(), {});
 
-		for (auto connection : pckg.connections()) {
-			editor->getGraphicsView()->removeConnection(connection.getUid());
+		if (editor) {
+			for (const auto& connection : pckg.getConnections()) {
+				editor->getGraphicsView()->removeConnection(connection.getUid());
+			}
 		}
 	}
 	else {
@@ -3421,7 +3420,7 @@ void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument&
 
 		std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 		for (auto view : views) {
-			for (auto connection : pckg.connections()) {
+			for (const auto& connection : pckg.getConnections()) {
 				view->getGraphicsView()->removeConnection(connection.getUid());
 			}
 		}

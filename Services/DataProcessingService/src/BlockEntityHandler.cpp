@@ -44,8 +44,8 @@ void BlockEntityHandler::createBlockEntity(const std::string& editorName, const 
 
 	std::string entName = CreateNewUniqueTopologyName(editorName + "/" + m_blockFolder, blockEntity->getBlockTitle());
 	blockEntity->setName(entName);
-	blockEntity->setServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
+	blockEntity->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	blockEntity->setGraphicsScenePackageChildName(m_blockFolder);
 	blockEntity->setEditable(true);
@@ -79,7 +79,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		const std::string connectionName = CreateNewUniqueTopologyName(connectionFolderName, "Connection", 1, false);
 		connectionEntity.setName(connectionName);
 		connectionEntity.setConnectionCfg(newConnection);
-		connectionEntity.setServiceInformation(Application::instance()->getBasicServiceInformation());
+		connectionEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
 		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
 		connectionEntity.setGraphicsScenePackageChildName(m_connectionFolder);
 		connectionEntity.createProperties();
@@ -138,8 +138,6 @@ void BlockEntityHandler::orderUIToCreateBlockPicker()
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, ot::JsonObject(graphicsEditorPackage, doc.GetAllocator()), doc.GetAllocator());
 
-	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
-
 	// Message is queued, no response here
 	std::string tmp;
 	_uiComponent->sendMessage(true, doc, tmp);
@@ -183,6 +181,7 @@ void BlockEntityHandler::initSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker()
 {
 	ot::GraphicsPickerCollectionPackage graphicsPicker;
+	graphicsPicker.setPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
 
 	ot::GraphicsPickerCollectionCfg controlBlockCollection("Control Blocks", "Control Blocks");
 	ot::GraphicsPickerCollectionCfg controlBlockDatabaseCollection("Database", "Database");

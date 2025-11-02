@@ -73,6 +73,7 @@ void Application::createPipeline()
 {
 	auto modelComponent = Application::instance()->getModelComponent();
 	EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+	newDataprocessing.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
 
 	auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
 	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
@@ -182,7 +183,7 @@ ot::ReturnMessage Application::graphicsItemRequested(const std::string& _viewNam
 }
 
 ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
-	_blockEntityHandler.addBlockConnection(_connectionData.connections(), _connectionData.name());
+	_blockEntityHandler.addBlockConnection(_connectionData.getConnections(), _connectionData.getName());
 
 	//EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
 	//std::list<std::string> selectedSolverName;

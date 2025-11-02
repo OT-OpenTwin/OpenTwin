@@ -28,8 +28,8 @@
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qstyleoption.h>
 
-ot::GraphicsItemPreviewDrag::GraphicsItemPreviewDrag(const std::string& _itemName, const BasicServiceInformation& _owner) :
-	m_widget(nullptr), m_itemName(_itemName), m_queueCount(0), m_owner(_owner)
+ot::GraphicsItemPreviewDrag::GraphicsItemPreviewDrag(const std::string& _itemName, const std::string& _pickerKey) :
+	m_widget(nullptr), m_itemName(_itemName), m_queueCount(0), m_pickerKey(_pickerKey)
 {}
 
 ot::GraphicsItemPreviewDrag::~GraphicsItemPreviewDrag() {}
@@ -40,17 +40,14 @@ void ot::GraphicsItemPreviewDrag::queue(QWidget* _widget) {
 	QMetaObject::invokeMethod(this, &GraphicsItemPreviewDrag::slotQueue, Qt::QueuedConnection);
 }
 
-void ot::GraphicsItemPreviewDrag::slotQueue(void) {
+void ot::GraphicsItemPreviewDrag::slotQueue() {
 	if (--m_queueCount == 0) {
 		// Add configuration to mime data
 		QDrag drag(m_widget);
 		QMimeData* mimeData = new QMimeData;
 		mimeData->setText("OT_BLOCK");
 		mimeData->setData(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName, QByteArray::fromStdString(m_itemName));
-		
-		JsonDocument ownerDoc;
-		m_owner.addToJsonObject(ownerDoc, ownerDoc.GetAllocator());
-		mimeData->setData(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner, QByteArray::fromStdString(ownerDoc.toJson()));
+		mimeData->setData(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_PickerKey, QByteArray::fromStdString(m_pickerKey));
 
 		// Create drag
 		drag.setMimeData(mimeData);

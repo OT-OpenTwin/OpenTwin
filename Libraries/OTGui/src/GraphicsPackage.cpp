@@ -24,36 +24,22 @@
 #include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTGui/GraphicsPickerCollectionCfg.h"
 
-#define OT_JSON_Member_Name "Name"
-#define OT_JSON_Member_Title "Title"
-#define OT_JSON_Member_Items "Items"
-#define OT_JSON_Member_Collections "Collections"
-#define OT_JSON_Member_Connections "Connections"
-
-ot::GraphicsPickerCollectionPackage::GraphicsPickerCollectionPackage() {
-
-}
-
-ot::GraphicsPickerCollectionPackage::~GraphicsPickerCollectionPackage() {}
-
-void ot::GraphicsPickerCollectionPackage::addCollection(const GraphicsPickerCollectionCfg& _collection) {
-	m_collections.push_back(_collection);
-}
-
-void ot::GraphicsPickerCollectionPackage::addCollection(GraphicsPickerCollectionCfg&& _collection) {
-	m_collections.push_back(std::move(_collection));
-}
-
 void ot::GraphicsPickerCollectionPackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	JsonArray collectionArr;
-	for (auto c : m_collections) {
+	for (auto& c : m_collections) {
 		collectionArr.PushBack(JsonObject(c, _allocator), _allocator);
 	}
-	_object.AddMember(OT_JSON_Member_Collections, collectionArr, _allocator);
+	_object.AddMember("Collections", collectionArr, _allocator);
+	_object.AddMember("PickerKey", JsonString(m_pickerKey, _allocator), _allocator);
+
+	if (m_pickerKey.empty()) {
+		OT_LOG_WA("Picker key is empty");
+	}
 }
 
 void ot::GraphicsPickerCollectionPackage::setFromJsonObject(const ConstJsonObject& _object) {
-	std::list<ConstJsonObject> collectionArr = json::getObjectList(_object, OT_JSON_Member_Collections);
+	m_pickerKey = json::getString(_object, "PickerKey");
+	std::list<ConstJsonObject> collectionArr = json::getObjectList(_object, "Collections");
 	for (const ConstJsonObject& c : collectionArr) {
 		GraphicsPickerCollectionCfg newCollection;
 		newCollection.setFromJsonObject(c);
@@ -70,21 +56,17 @@ void ot::GraphicsPickerCollectionPackage::setFromJsonObject(const ConstJsonObjec
 ot::GraphicsNewEditorPackage::GraphicsNewEditorPackage(const std::string& _packageName, const std::string& _editorTitle)
 	: m_name(_packageName), m_title(_editorTitle) {}
 
-ot::GraphicsNewEditorPackage::~GraphicsNewEditorPackage() {
-	
-}
-
 void ot::GraphicsNewEditorPackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	ot::GraphicsPickerCollectionPackage::addToJsonObject(_object, _allocator);
 
-	_object.AddMember(OT_JSON_Member_Name, JsonString(m_name, _allocator), _allocator);
-	_object.AddMember(OT_JSON_Member_Title, JsonString(m_title, _allocator), _allocator);
+	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
+	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
 }
 
 void ot::GraphicsNewEditorPackage::setFromJsonObject(const ConstJsonObject& _object) {
 	ot::GraphicsPickerCollectionPackage::setFromJsonObject(_object);
-	m_name = json::getString(_object, OT_JSON_Member_Name);
-	m_title = json::getString(_object, OT_JSON_Member_Title);
+	m_name = json::getString(_object, "Name");
+	m_title = json::getString(_object, "Title");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -102,7 +84,7 @@ ot::GraphicsScenePackage::~GraphicsScenePackage() {
 }
 
 void ot::GraphicsScenePackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
-	_object.AddMember(OT_JSON_Member_Name, JsonString(m_name, _allocator), _allocator);
+	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 
 	JsonArray itemsArr;
 	for (auto itm : m_items) {
@@ -111,25 +93,22 @@ void ot::GraphicsScenePackage::addToJsonObject(JsonValue& _object, JsonAllocator
 		itemsArr.PushBack(itemObj, _allocator);
 	}
 
-	_object.AddMember(OT_JSON_Member_Items, itemsArr, _allocator);
+	_object.AddMember("Items", itemsArr, _allocator);
+	_object.AddMember("PickerKey", JsonString(m_pickerKey, _allocator), _allocator);
 }
 
 void ot::GraphicsScenePackage::setFromJsonObject(const ConstJsonObject& _object) {
-	m_name = json::getString(_object, OT_JSON_Member_Name);
+	m_name = json::getString(_object, "Name");
+	m_pickerKey = json::getString(_object, "PickerKey");
 
 	this->memFree();
 
-	std::list<ConstJsonObject> itemsArr = json::getObjectList(_object, OT_JSON_Member_Items);
+	std::list<ConstJsonObject> itemsArr = json::getObjectList(_object, "Items");
 	for (auto itmObj : itemsArr) {
 		ot::GraphicsItemCfg* itm = GraphicsItemCfgFactory::create(itmObj);
 		OTAssertNullptr(itm);
 		if (itm) m_items.push_back(itm);
 	}
-}
-
-void ot::GraphicsScenePackage::addItem(GraphicsItemCfg* _item) {
-	OTAssertNullptr(_item);
-	m_items.push_back(_item);
 }
 
 void ot::GraphicsScenePackage::memFree(void) {
@@ -147,10 +126,6 @@ ot::GraphicsConnectionPackage::GraphicsConnectionPackage(const std::string& _edi
 
 }
 
-ot::GraphicsConnectionPackage::~GraphicsConnectionPackage() {
-
-}
-
 void ot::GraphicsConnectionPackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	JsonArray cArr;
 	for (auto c : m_connections) {
@@ -158,16 +133,18 @@ void ot::GraphicsConnectionPackage::addToJsonObject(JsonValue& _object, JsonAllo
 		c.addToJsonObject(cObj, _allocator);
 		cArr.PushBack(cObj, _allocator);
 	}
-	_object.AddMember(OT_JSON_Member_Connections, cArr, _allocator);
-	_object.AddMember(OT_JSON_Member_Name, JsonString(m_name, _allocator), _allocator);
+	_object.AddMember("Connections", cArr, _allocator);
+	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
+	_object.AddMember("PickerKey", JsonString(m_pickerKey, _allocator), _allocator);
 }
 
 void ot::GraphicsConnectionPackage::setFromJsonObject(const ConstJsonObject& _object) {
 	m_connections.clear();
 
-	m_name = json::getString(_object, OT_JSON_Member_Name);
+	m_name = json::getString(_object, "Name");
+	m_pickerKey = json::getString(_object, "PickerKey");
 
-	std::list<ConstJsonObject> cArr = json::getObjectList(_object, OT_JSON_Member_Connections);
+	std::list<ConstJsonObject> cArr = json::getObjectList(_object, "Connections");
 	for (auto c : cArr) {
 		GraphicsConnectionCfg newConnection;
 		newConnection.setFromJsonObject(c);

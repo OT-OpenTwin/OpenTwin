@@ -39,8 +39,8 @@ namespace ot {
 		OT_DECL_NOCOPY(GraphicsPickerCollectionPackage)
 		OT_DECL_DEFMOVE(GraphicsPickerCollectionPackage)
 	public:
-		GraphicsPickerCollectionPackage();
-		virtual ~GraphicsPickerCollectionPackage();
+		GraphicsPickerCollectionPackage() = default;
+		virtual ~GraphicsPickerCollectionPackage() = default;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -52,11 +52,15 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
-		void addCollection(const GraphicsPickerCollectionCfg& _collection);
-		void addCollection(GraphicsPickerCollectionCfg&& _collection);
+		void setPickerKey(const std::string& _key) { m_pickerKey = _key; };
+		const std::string& getPickerKey() const { return m_pickerKey; };
+
+		void addCollection(const GraphicsPickerCollectionCfg& _collection) { m_collections.push_back(_collection); };
+		void addCollection(GraphicsPickerCollectionCfg&& _collection) { m_collections.push_back(std::move(_collection)); };
 		const std::list<GraphicsPickerCollectionCfg>& getCollections() const { return m_collections; };
 
 	private:
+		std::string m_pickerKey;
 		std::list<GraphicsPickerCollectionCfg> m_collections;
 	};
 
@@ -76,7 +80,7 @@ namespace ot {
 		//! @brief Constructor
 		//! @param _editorName The unique name for the editor.
 		GraphicsNewEditorPackage(const std::string& _editorName = std::string(), const std::string& _editorTitle = std::string());
-		virtual ~GraphicsNewEditorPackage();
+		virtual ~GraphicsNewEditorPackage() = default;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -88,8 +92,8 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
-		const std::string& name(void) const { return m_name; };
-		const std::string& title(void) const { return m_title; };
+		const std::string& getName() const { return m_name; };
+		const std::string& getTitle() const { return m_title; };
 
 	private:
 		std::string m_name;
@@ -121,18 +125,22 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 		
-		/// /// <summary>
-		/// Takes over ownership.
-		/// </summary>
-		void addItem(GraphicsItemCfg* _item);
-		const std::list<GraphicsItemCfg*>& items(void) const { return m_items; };
+		//! @brief Add item.
+		//! The package takes ownership of the item.
+		//! @param _item Item to add.
+		void addItem(GraphicsItemCfg* _item) { m_items.push_back(_item); };
+		const std::list<GraphicsItemCfg*>& getItems() const { return m_items; };
 
 		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& name(void) const { return m_name; };
+		const std::string& getName() const { return m_name; };
+
+		void setPickerKey(const std::string& _key) { m_pickerKey = _key; };
+		const std::string& getPickerKey() const { return m_pickerKey; };
 
 	private:
-		void memFree(void);
+		void memFree();
 
+		std::string m_pickerKey;
 		std::string m_name;
 		std::list<ot::GraphicsItemCfg*> m_items;
 	};
@@ -148,7 +156,7 @@ namespace ot {
 		OT_DECL_DEFMOVE(GraphicsConnectionPackage)
 	public:
 		GraphicsConnectionPackage(const std::string& _editorName = std::string());
-		virtual ~GraphicsConnectionPackage();
+		virtual ~GraphicsConnectionPackage() = default;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -161,14 +169,18 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& name(void) const { return m_name; };
+		const std::string& getName() const { return m_name; };
 
 		void addConnection(const ot::UID& _fromUid, const std::string& _fromConnectable, const ot::UID& _toUid, const std::string& _toConnectable);
 		void addConnection(const GraphicsConnectionCfg& _info) { m_connections.push_back(_info); };
-		const std::list<GraphicsConnectionCfg>& connections(void) const { return m_connections; };
+		const std::list<GraphicsConnectionCfg>& getConnections() const { return m_connections; };
+
+		void setPickerKey(const std::string& _key) { m_pickerKey = _key; };
+		const std::string& getPickerKey() const { return m_pickerKey; };
 
 	private:
 		std::string m_name;
+		std::string m_pickerKey;
 		std::list<GraphicsConnectionCfg> m_connections;
 	};
 

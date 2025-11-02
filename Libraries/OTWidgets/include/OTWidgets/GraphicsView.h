@@ -81,9 +81,6 @@ namespace ot {
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
 		bool getMouseWheelEnabled() const { return m_wheelEnabled; };
 
-		void setOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
-		const BasicServiceInformation& getOwner() const { return m_owner; };
-
 		void setGraphicsViewFlag(GraphicsViewFlag _flag, bool _active = true) { m_viewFlags.setFlag(_flag, _active); };
 		void setGraphicsViewFlags(const GraphicsViewFlags& _flags) { m_viewFlags = _flags; };
 		const GraphicsViewFlags& getGraphicsViewFlags() const { return m_viewFlags; };
@@ -99,6 +96,9 @@ namespace ot {
 		void setGraphicsScene(GraphicsScene* _scene);
 		GraphicsScene* getGraphicsScene() { return m_scene; };
 		const GraphicsScene* getGraphicsScene() const { return m_scene; };
+
+		void setPickerKey(const std::string& _key) { m_pickerKey = _key; };
+		const std::string& getPickerKey() const { return m_pickerKey; };
 
 		void setSceneMargins(const QMarginsF& _margins) { m_sceneMargins = _margins; };
 		const QMarginsF& getSceneMargins() const { return m_sceneMargins; };
@@ -267,7 +267,8 @@ namespace ot {
 		//! All currently selected items will notify a move change and configuration change if their position has changed.
 		void endItemMove();
 
-		BasicServiceInformation m_owner;
+		//! @brief Key to determine the picker that may drop items into the view.
+		std::string m_pickerKey;
 
 		GraphicsViewFlags m_viewFlags;
 		ViewStateFlags m_viewStateFlags;

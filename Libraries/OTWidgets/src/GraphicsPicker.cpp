@@ -187,7 +187,7 @@ void ot::GraphicsPicker::slotSelectionChanged() {
 				box.view->setPainter(pManager.getPainter(info.getPreviewIcon())->createCopy());
 				box.view->setItemName(info.getName());
 				//box.view->setAlignment(Qt::AlignCenter);
-				box.view->setOwner(m_owner);
+				box.view->setPickerKey(m_key);
 
 				box.label = new QLabel(QString::fromStdString(info.getTitle()));
 				box.label->setAlignment(Qt::AlignCenter);

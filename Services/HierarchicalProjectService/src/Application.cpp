@@ -215,7 +215,7 @@ ot::ReturnMessage Application::graphicsItemDoubleClicked(const std::string& _nam
 }
 
 ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
-	for (const ot::GraphicsConnectionCfg& cfg : _connectionData.connections()) {
+	for (const ot::GraphicsConnectionCfg& cfg : _connectionData.getConnections()) {
 		if (!m_entityHandler.addConnection(cfg)) {
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Could not add connection entity for connection request");
 		}

@@ -36,16 +36,16 @@ namespace ot {
 		GraphicsPickerManager(GraphicsPicker* _picker = (GraphicsPicker*)nullptr);
 		virtual ~GraphicsPickerManager() {};
 
-		void setCurrentOwner(const BasicServiceInformation& _owner);
-		const BasicServiceInformation& getCurrentOwner() const { return m_currentOwner; };
+		void setCurrentKey(const std::string& _key);
+		const std::string& getCurrentKey() const { return m_currentKey; };
 
 		void setPicker(GraphicsPicker* _picker) { m_picker = _picker; };
 		void forgetPicker() { m_picker = nullptr; };
 
-		void addCollections(const std::list<GraphicsPickerCollectionCfg>& _collections, const BasicServiceInformation& _owner);
-		void addCollections(std::list<GraphicsPickerCollectionCfg>&& _collections, const BasicServiceInformation& _owner);
+		void addCollections(const std::list<GraphicsPickerCollectionCfg>& _collections, const std::string& _key);
+		void addCollections(std::list<GraphicsPickerCollectionCfg>&& _collections, const std::string& _key);
 		
-		const std::list<GraphicsPickerCollectionCfg>& getCollections(const BasicServiceInformation& _owner) const;
+		const std::list<GraphicsPickerCollectionCfg>& getCollections(const std::string& _key) const;
 
 		void clear();
 		
@@ -60,15 +60,15 @@ namespace ot {
 			GraphicsPicker::PickerState state;
 		};
 
-		void applyCurrentOwner();
+		void applyCurrentKey();
 
-		PickerInfo& getOwnerInfo(const BasicServiceInformation& _owner);
-		const PickerInfo& getOwnerInfo(const BasicServiceInformation& _owner) const;
+		PickerInfo& getInfo(const std::string& _key);
+		const PickerInfo& getInfo(const std::string& _key) const;
 
 		GraphicsPicker* m_picker;
-		BasicServiceInformation m_currentOwner;
-
-		std::map<BasicServiceInformation, PickerInfo> m_collections;
+		
+		std::string m_currentKey;
+		std::map<std::string, PickerInfo > m_collections;
 		PickerInfo m_emptyInfo;
 	};
 

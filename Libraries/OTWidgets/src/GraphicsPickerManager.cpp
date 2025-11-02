@@ -29,53 +29,53 @@ ot::GraphicsPickerManager::GraphicsPickerManager(GraphicsPicker* _picker)
 
 }
 
-void ot::GraphicsPickerManager::setCurrentOwner(const BasicServiceInformation& _owner) {
-	this->clearPicker();
-
-	if (_owner == m_currentOwner) {
+void ot::GraphicsPickerManager::setCurrentKey(const std::string& _key) {
+	if (_key == m_currentKey) {
 		return;
 	}
 
-	m_currentOwner = _owner;
+	this->clearPicker();
 
-	this->applyCurrentOwner();
+	m_currentKey = _key;
+
+	this->applyCurrentKey();
 }
 
-void ot::GraphicsPickerManager::addCollections(const std::list<GraphicsPickerCollectionCfg>& _collections, const BasicServiceInformation& _owner) {
-	OTAssert(_owner != BasicServiceInformation(), "No owner provided");
+void ot::GraphicsPickerManager::addCollections(const std::list<GraphicsPickerCollectionCfg>& _collections, const std::string& _key) {
+	OTAssert(!_key.empty(), "No key provided");
 
 	GraphicsPickerCollectionCfg tmpRoot;
 	for (const GraphicsPickerCollectionCfg& c : _collections) {
 		tmpRoot.addChildCollection(c);
 	}
-	this->getOwnerInfo(_owner).collection.mergeWith(std::move(tmpRoot));
+	this->getInfo(_key).collection.mergeWith(std::move(tmpRoot));
 
-	if (_owner == m_currentOwner) {
-		this->applyCurrentOwner();
+	if (_key == m_currentKey) {
+		this->applyCurrentKey();
 	}
 }
 
-void ot::GraphicsPickerManager::addCollections(std::list<GraphicsPickerCollectionCfg>&& _collections, const BasicServiceInformation& _owner) {
-	OTAssert(_owner != BasicServiceInformation(), "No owner provided");
+void ot::GraphicsPickerManager::addCollections(std::list<GraphicsPickerCollectionCfg>&& _collections, const std::string& _key) {
+	OTAssert(!_key.empty(), "No key provided");
 
 	GraphicsPickerCollectionCfg tmpRoot;
 	for (GraphicsPickerCollectionCfg& c : _collections) {
 		tmpRoot.addChildCollection(std::move(c));
 	}
-	this->getOwnerInfo(_owner).collection.mergeWith(std::move(tmpRoot));
+	this->getInfo(_key).collection.mergeWith(std::move(tmpRoot));
 
-	if (_owner == m_currentOwner) {
-		this->applyCurrentOwner();
+	if (_key == m_currentKey) {
+		this->applyCurrentKey();
 	}
 }
 
-const std::list<ot::GraphicsPickerCollectionCfg>& ot::GraphicsPickerManager::getCollections(const BasicServiceInformation& _owner) const {
-	return this->getOwnerInfo(_owner).collection.getChildCollections();
+const std::list<ot::GraphicsPickerCollectionCfg>& ot::GraphicsPickerManager::getCollections(const std::string& _key) const {
+	return this->getInfo(_key).collection.getChildCollections();
 }
 
 void ot::GraphicsPickerManager::clear() {
 	m_collections.clear();
-	m_currentOwner = BasicServiceInformation();
+	m_currentKey.clear();
 	
 	this->clearPicker();
 }
@@ -84,43 +84,43 @@ void ot::GraphicsPickerManager::clearPicker() {
 	if (!m_picker) {
 		return;
 	}
-	if (m_currentOwner != BasicServiceInformation()) {
-		this->getOwnerInfo(m_currentOwner).state = m_picker->getCurrentState();
+	if (!m_currentKey.empty()) {
+		this->getInfo(m_currentKey).state = m_picker->getCurrentState();
 	}
 
 	m_picker->clear();
-	m_picker->setOwner(ot::BasicServiceInformation());
-	m_currentOwner = ot::BasicServiceInformation();
+	m_currentKey.clear();
+	m_picker->setKey(m_currentKey);
 }
 
-void ot::GraphicsPickerManager::applyCurrentOwner() {
+void ot::GraphicsPickerManager::applyCurrentKey() {
 	if (!m_picker) {
 		return;
 	}
-	if (m_currentOwner == BasicServiceInformation()) {
+	if (m_currentKey.empty()) {
 		return;
 	}
 
-	m_picker->setOwner(m_currentOwner);
+	m_picker->setKey(m_currentKey);
 	
-	PickerInfo& info = this->getOwnerInfo(m_currentOwner);
+	PickerInfo& info = this->getInfo(m_currentKey);
 	
 	m_picker->add(info.collection.getChildCollections());
 	m_picker->applyState(info.state);
 }
 
-ot::GraphicsPickerManager::PickerInfo& ot::GraphicsPickerManager::getOwnerInfo(const BasicServiceInformation& _owner) {
-	auto it = m_collections.find(_owner);
+ot::GraphicsPickerManager::PickerInfo& ot::GraphicsPickerManager::getInfo(const std::string& _key) {
+	auto it = m_collections.find(_key);
 	if (it == m_collections.end()) {
-		return m_collections.insert_or_assign(_owner, PickerInfo()).first->second;
+		return m_collections.insert_or_assign(_key, PickerInfo()).first->second;
 	}
 	else {
 		return it->second;
 	}
 }
 
-const ot::GraphicsPickerManager::PickerInfo& ot::GraphicsPickerManager::getOwnerInfo(const BasicServiceInformation& _owner) const {
-	auto it = m_collections.find(_owner);
+const ot::GraphicsPickerManager::PickerInfo& ot::GraphicsPickerManager::getInfo(const std::string& _key) const {
+	auto it = m_collections.find(_key);
 	if (it == m_collections.end()) {
 		return m_emptyInfo;
 	}

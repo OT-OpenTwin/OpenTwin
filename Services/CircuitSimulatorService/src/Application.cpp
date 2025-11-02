@@ -94,6 +94,7 @@ void Application::createNewCircuit() {
 	std::string circuitName = ot::EntityName::createUniqueEntityName(ot::FolderNames::CircuitsFolder, "Circuit", existingCircuits);
 
 	std::unique_ptr<EntityGraphicsScene> entityCircuitRoot(new EntityGraphicsScene(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
+	entityCircuitRoot->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	entityCircuitRoot->setEditable(true);
 	entityCircuitRoot->setName(circuitName);
 
@@ -525,15 +526,15 @@ ot::ReturnMessage Application::graphicsItemRequested(const std::string& _viewNam
 }
 
 ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
-	m_blockEntityHandler.setPackageName(_connectionData.name());
-	m_blockEntityHandler.addBlockConnection(_connectionData.connections(), _connectionData.name());
+	m_blockEntityHandler.setPackageName(_connectionData.getName());
+	m_blockEntityHandler.addBlockConnection(_connectionData.getConnections(), _connectionData.getName());
 
 	return ot::ReturnMessage::Ok;
 }
 
 ot::ReturnMessage Application::graphicsConnectionToConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos) {
-	m_blockEntityHandler.setPackageName(_connectionData.name());
-	m_blockEntityHandler.addConnectionToConnection(_connectionData.connections(), _connectionData.name(), _pos);
+	m_blockEntityHandler.setPackageName(_connectionData.getName());
+	m_blockEntityHandler.addConnectionToConnection(_connectionData.getConnections(), _connectionData.getName(), _pos);
 
 	return ot::ReturnMessage::Ok;
 }

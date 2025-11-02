@@ -45,8 +45,8 @@ namespace ot {
 		void setItemName(const std::string& _itemName) { m_itemName = _itemName; };
 		const std::string getItemName() const { return m_itemName; };
 
-		void setOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
-		const BasicServiceInformation& getOwner() const { return m_owner; };
+		void setPickerKey(const std::string& _pickerKey) { m_pickerKey = _pickerKey; };
+		const std::string getPickerKey() const { return m_pickerKey; };
 
 		void setPainter(ImagePainter* _painter);
 		const ImagePainter* getPainter() const { return m_painter; };
@@ -67,7 +67,7 @@ namespace ot {
 		ImagePainter* m_painter;
 
 		std::string m_itemName;
-		BasicServiceInformation m_owner;
+		std::string m_pickerKey;
 
 		GraphicsItemPreviewDrag* m_drag;
 	};

@@ -70,7 +70,7 @@ void ot::GraphicsItemPreview::paintEvent(QPaintEvent* _event) {
 void ot::GraphicsItemPreview::mousePressEvent(QMouseEvent* _event) {
 	if (_event->button() == Qt::LeftButton) {
 		if (m_drag == nullptr) {
-			m_drag = new GraphicsItemPreviewDrag(m_itemName, m_owner);
+			m_drag = new GraphicsItemPreviewDrag(m_itemName, m_pickerKey);
 		}
 		m_drag->queue(this);
 	}

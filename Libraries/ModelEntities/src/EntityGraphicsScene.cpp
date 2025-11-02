@@ -31,6 +31,7 @@ EntityGraphicsScene::EntityGraphicsScene(ot::UID ID, EntityBase* parent, EntityO
 ot::GraphicsNewEditorPackage* EntityGraphicsScene::getGraphicsEditorPackage()
 {
 	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage(getName(), getName());
+	editor->setPickerKey(m_graphicsPickerKey);
 	return editor;
 }
 
@@ -52,6 +53,9 @@ void EntityGraphicsScene::addVisualizationNodes()
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
+	ot::BasicServiceInformation ownerInfo(this->getOwningService());
+	ownerInfo.addToJsonObject(doc, doc.GetAllocator());
+
 	ot::VisualisationTypes visTypes;
 	visTypes.addGraphicsViewVisualisation();
 	visTypes.addToJsonObject(doc, doc.GetAllocator());
@@ -65,4 +69,31 @@ void EntityGraphicsScene::addVisualizationNodes()
 		child->addVisualizationNodes();
 	}
 
+}
+
+void EntityGraphicsScene::setGraphicsPickerKey(const std::string& _key) {
+	if (m_graphicsPickerKey != _key) {
+		m_graphicsPickerKey = _key;
+		setModified();
+	}
+}
+
+void EntityGraphicsScene::addStorageData(bsoncxx::builder::basic::document& _storage) {
+	EntityContainer::addStorageData(_storage);
+	_storage.append(bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_graphicsPickerKey));
+}
+
+void EntityGraphicsScene::readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+	EntityContainer::readSpecificDataFromDataBase(_docView, _entityMap);
+	auto keyIt = _docView.find("GraphicsPickerKey");
+	if (keyIt != _docView.end()) {
+		m_graphicsPickerKey = keyIt->get_utf8().value.data();
+	}
+	else {
+		// Legacy support: Use owning service as picker key
+		m_graphicsPickerKey = getOwningService();
+		if (m_graphicsPickerKey.empty()) {
+			OT_LOG_W("Graphics scene entity has no GraphicsPickerKey and no owning service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
+		}
+	}
 }

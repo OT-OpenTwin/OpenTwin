@@ -88,6 +88,13 @@ void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& co
 	setModified();
 }
 
+void EntityBlockConnection::setGraphicsPickerKey(const std::string& _key) {
+	if (_key != m_pickerKey) {
+		m_pickerKey = _key;
+		setModified();
+	}
+}
+
 void EntityBlockConnection::CreateConnections()
 {
 	const std::string graphicsSceneName = ot::ConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
@@ -95,12 +102,14 @@ void EntityBlockConnection::CreateConnections()
 	ot::GraphicsConnectionPackage connectionPckg(graphicsSceneName);
 	ot::GraphicsConnectionCfg connectionCfg = this->getConnectionCfg();
 
-
+	connectionPckg.setPickerKey(m_pickerKey);
 	connectionPckg.addConnection(connectionCfg);
 
 	ot::JsonDocument reqDoc;
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-	m_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
+	
+	ot::BasicServiceInformation ownerInfo(this->getOwningService());
+	ownerInfo.addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 	ot::VisualisationCfg visualisationCfg;
 	ot::JsonObject visualisationCfgJson;
@@ -167,8 +176,7 @@ void EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document& st
 	storage.append(
 		
 	   bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName),
-	   bsoncxx::builder::basic::kvp("ServiceName", m_info.serviceName()),
-	   bsoncxx::builder::basic::kvp("ServiceType", m_info.serviceType()),
+		bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_pickerKey),
 
 		bsoncxx::builder::basic::kvp("FromConnectable", _connectorNameOrigin),
 		bsoncxx::builder::basic::kvp("ToConnectable", _connectorNameDestination),
@@ -188,8 +196,6 @@ void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view
 
 	//Now we read the information about the ConnectionCfg
 	m_graphicsScenePackageChildName = std::string(doc_view["GraphicPackageChildName"].get_utf8().value.data());
-	m_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
-	m_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
 	
 	_connectorNameOrigin = std::string(doc_view["FromConnectable"].get_utf8().value.data());
 	_connectorNameDestination = std::string(doc_view["ToConnectable"].get_utf8().value.data());
@@ -225,4 +231,17 @@ void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view
 	m_originPos.setY(originY);
 	m_destPos.setX(destX);
 	m_destPos.setY(destY);
+
+	auto pickerIt = doc_view.find("GraphicsPickerKey");
+	if (pickerIt != doc_view.end())
+	{
+		m_pickerKey = pickerIt->get_utf8().value.data();
+	}
+	else {
+		// Legacy support
+		m_pickerKey = getOwningService();
+		if (m_pickerKey.empty()) {
+			OT_LOG_W("Block connection entity has no GraphicsPickerKey and no owning service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
+		}
+	}
 }

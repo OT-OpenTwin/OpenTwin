@@ -31,4 +31,15 @@ public:
 	ot::GraphicsNewEditorPackage* getGraphicsEditorPackage() override;
 	bool visualiseGraphicsView() override;
 	void addVisualizationNodes() override;
+
+	void setGraphicsPickerKey(const std::string& _key);
+	const std::string& getGraphicsPickerKey() const { return m_graphicsPickerKey; }
+
+protected:
+	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
+	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+
+private:
+	std::string m_graphicsPickerKey;
+
 };

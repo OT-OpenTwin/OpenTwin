@@ -623,28 +623,14 @@ void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 	}
 
 	// Check owner provided
-	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).isEmpty()) {
+	std::string pickerKey = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_PickerKey).toStdString();
+	if (pickerKey.empty()) {
 		_event->ignore();
 		return;
 	}
-
-	std::string ownerData = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).toStdString();
-	if (ownerData.empty()) {
-		_event->ignore();
-		return;
-	}
-
-	JsonDocument doc;
-	if (!doc.fromJson(ownerData)) {
-		OT_LOG_E("Failed to parse owner document");
-		_event->ignore();
-		return;
-	}
-	BasicServiceInformation ownerInfo;
-	ownerInfo.setFromJsonObject(doc.getConstObject());
 
 	// Check owner equals
-	if (ownerInfo != m_owner) {
+	if (pickerKey != m_pickerKey) {
 		_event->ignore();
 		return;
 	}
@@ -667,28 +653,14 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	}
 
 	// Check owner provided
-	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).isEmpty()) {
+	std::string pickerKey = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_PickerKey).toStdString();
+	if (pickerKey.empty()) {
 		_event->ignore();
 		return;
 	}
-
-	std::string ownerData = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).toStdString();
-	if (ownerData.empty()) {
-		_event->ignore();
-		return;
-	}
-
-	JsonDocument doc;
-	if (!doc.fromJson(ownerData)) {
-		OT_LOG_E("Failed to parse owner document");
-		_event->ignore();
-		return;
-	}
-	BasicServiceInformation ownerInfo;
-	ownerInfo.setFromJsonObject(doc.getConstObject());
 
 	// Check owner equals
-	if (ownerInfo != m_owner) {
+	if (pickerKey != m_pickerKey) {
 		_event->ignore();
 		return;
 	}
@@ -715,28 +687,14 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 	}
 
 	// Check owner provided
-	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).isEmpty()) {
+	std::string pickerKey = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_PickerKey).toStdString();
+	if (pickerKey.empty()) {
 		_event->ignore();
 		return;
 	}
-
-	std::string ownerData = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).toStdString();
-	if (ownerData.empty()) {
-		_event->ignore();
-		return;
-	}
-
-	JsonDocument doc;
-	if (!doc.fromJson(ownerData)) {
-		OT_LOG_E("Failed to parse owner document");
-		_event->ignore();
-		return;
-	}
-	BasicServiceInformation ownerInfo;
-	ownerInfo.setFromJsonObject(doc.getConstObject());
 
 	// Check owner equals
-	if (ownerInfo != m_owner) {
+	if (pickerKey != m_pickerKey) {
 		_event->ignore();
 		return;
 	}

@@ -1843,11 +1843,11 @@ void AppBase::lockPropertyGrid(bool flag)
 	m_propertyGrid->getPropertyGrid()->getTreeWidget()->setEnabled(!flag);
 }
 
-void AppBase::addGraphicsPickerPackage(const ot::GraphicsPickerCollectionPackage& _pckg, const ot::BasicServiceInformation& _serviceInfo) {
+void AppBase::addGraphicsPickerPackage(const ot::GraphicsPickerCollectionPackage& _pckg) {
 	if (_pckg.getCollections().empty()) {
 		return;
 	}
-	m_graphicsPickerManager.addCollections(_pckg.getCollections(), _serviceInfo);
+	m_graphicsPickerManager.addCollections(_pckg.getCollections(), _pckg.getPickerKey());
 }
 
 ot::PropertyGridItem* AppBase::findProperty(const std::string& _groupName, const std::string& _itemName) {
@@ -1890,7 +1890,7 @@ void AppBase::clearGraphicsPickerData() {
 	m_graphicsPickerManager.clear();
 }
 
-ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig) {
+ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const std::string& _pickerKey, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig) {
 	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_entityName, _visualizationConfig.getVisualisingEntities());
 	if (newEditor != nullptr) {
 		OT_LOG_D("GraphicsEditor already exists { \"Editor.Name\": \"" + _entityName + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
@@ -1914,7 +1914,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 
 	ot::GraphicsView* graphics = newEditor->getGraphicsView();
 
-	graphics->setOwner(_serviceInfo);
+	graphics->setPickerKey(_pickerKey);
 	graphics->setGraphicsViewName(_entityName);
 	graphics->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
 	graphics->setDropsEnabled(true);
@@ -1959,7 +1959,7 @@ ot::GraphicsViewView* AppBase::findGraphicsEditor(const std::string& _entityName
 	}
 }
 
-ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig) {
+ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const std::string& _pickerKey, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig) {
 	ot::GraphicsViewView* v = this->findGraphicsEditor(_entityName, _visualizationConfig.getVisualisingEntities());
 	if (v) {
 		return v;
@@ -1967,7 +1967,7 @@ ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _en
 
 	OT_LOG_D("Graphics Editor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _entityName + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
-	return this->createNewGraphicsEditor(_entityName, _title, _serviceInfo, _viewInsertFlags, _visualizationConfig);
+	return this->createNewGraphicsEditor(_entityName, _title, _serviceInfo, _pickerKey, _viewInsertFlags, _visualizationConfig);
 }
 
 std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors() {
@@ -2883,8 +2883,7 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			// Update graphics picker content
 			ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_focusedView);
 			if (graphicsView) {
-				ot::BasicServiceInformation owner = ot::WidgetViewManager::instance().getOwnerFromView(graphicsView);
-				m_graphicsPickerManager.setCurrentOwner(owner);
+				m_graphicsPickerManager.setCurrentKey(graphicsView->getGraphicsView()->getPickerKey());
 			}
 			else {
 				m_graphicsPickerManager.clearPicker();
