@@ -856,8 +856,7 @@ std::string Application::generateServiceRstContent(const Service& _service) {
 		if (!ep.getDetailedDescription().empty()) {
 			out << detailedDescription << "\n"	// detailed description
 				<< std::string(detailedDescription.size(), '"') << "\n\n"
-				<< "Detailed description ...\n\n";
-//				<< ep.getDetailedDescriptionFormattedForSphinx() << "\n\n";
+				<< ep.getDetailedDescriptionFormattedForSphinx(Endpoint::detailedDescription) << "\n\n";
 		}
 
 		out	<< messageType << "\n"			// message Type
@@ -889,8 +888,7 @@ std::string Application::generateServiceRstContent(const Service& _service) {
 		if (!ep.getResponseDescription().empty()) {
 			out << responseDescription << "\n"	// response Description
 				<< std::string(responseDescription.size(), '"') << "\n\n"
-				<< "Response description ...\n\n";
-//				<< ep.getResponseDescriptionFormattedForSphinx() << "\n\n";
+				<< ep.getDetailedDescriptionFormattedForSphinx(Endpoint::detailedResponseDescription) << "\n\n";
 		}
 
 		if (!ep.getResponseParameters().empty()) {

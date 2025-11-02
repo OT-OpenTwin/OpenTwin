@@ -33,6 +33,13 @@ public:
 		TLS
 	};
 
+	enum DescriptionType {
+		detailedDescription,
+		detailedResponseDescription,
+		detailedParameterDescripition,
+		detailedResponseParameterDescription
+	};
+
 	Endpoint();
 	Endpoint(const Endpoint& _other) = default;
 	Endpoint(Endpoint&& _other) noexcept = default;
@@ -75,6 +82,8 @@ public:
 	void addResponseParameter(const Parameter& _parameter) { m_responseParameters.push_back(_parameter); };
 
 	void printEndpoint() const;
+
+	std::string getDetailedDescriptionFormattedForSphinx(DescriptionType _descriptionType) const;
 
 private:
 	std::string m_name;

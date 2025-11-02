@@ -22,9 +22,11 @@
 
 // project header
 #include "Endpoint.h"
+#include "Application.h"
 
 // std header
 #include <iostream>
+#include <sstream>
 
 Endpoint::Endpoint()
     : m_messageType(MessageType::mTLS) {
@@ -75,4 +77,105 @@ void Endpoint::printEndpoint() const {
     OT_LOG_D("Response description:");
     printResponseDescription();
     OT_LOG_D("\n");
+}
+
+std::string Endpoint::getDetailedDescriptionFormattedForSphinx(DescriptionType _descriptionType) const {
+    std::list<std::string> detailedDescription;
+    std::ostringstream out;
+
+    bool inNoteBlock = false;
+    bool inWarningBlock = false;
+
+    switch (_descriptionType) {
+    case Endpoint::detailedDescription:
+        detailedDescription = getDetailedDescription();
+        OT_LOG_D("Converting detailed description into Sphinx format.");
+        break;
+    case Endpoint::detailedResponseDescription:
+        detailedDescription = getResponseDescription();
+        OT_LOG_D("Converting detailed response description into Sphinx format.");
+        break;
+    }
+    
+    for (const std::string& line : detailedDescription) {
+        if (Application::startsWith(line, "@note")) {
+            // Close any open warning block
+            if (inWarningBlock) {
+                out << "\n";
+                inWarningBlock = false;
+            }
+
+            // Start new note block if not already in one
+            if (!inNoteBlock) {
+                out << ".. note::\n\n";
+                inNoteBlock = true;
+            }
+
+            // Extract content after "@note "
+            std::string content = line.substr(5);
+            if (!content.empty() && content[0] == ' ') {
+                content = content.substr(1);
+            }
+
+            // Add content with proper indentation
+            if (!content.empty()) {
+                out << "   " << content << "\n";
+            }
+            else {
+                out << "\n"; // Empty line creates paragraph break within note block
+            }
+        }
+        // Check if line starts with @warning
+        else if (Application::startsWith(line, "@warning")) {
+            // Close any open note block
+            if (inNoteBlock) {
+                out << "\n";
+                inNoteBlock = false;
+            }
+
+            // Start new warning block if not already in one
+            if (!inWarningBlock) {
+                out << ".. warning::\n\n";
+                inWarningBlock = true;
+            }
+
+            // Extract content after "@warning "
+            std::string content = line.substr(8);
+            if (!content.empty() && content[0] == ' ') {
+                content = content.substr(1);
+            }
+
+            // Add content with proper indentation
+            if (!content.empty()) {
+                out << "   " << content << "\n";
+            }
+            else {
+                out << "\n"; // Empty line creates paragraph break within warning block
+            }
+        }
+        // Regular line (not @note or @warning)
+        else {
+            // Close any open blocks
+            if (inNoteBlock || inWarningBlock) {
+                out << "\n";
+                inNoteBlock = false;
+                inWarningBlock = false;
+            }
+
+            // Add regular content
+            if (line.empty()) {
+                out << "\n"; // Empty line creates paragraph break
+            }
+            else {
+                out << line << "\n";
+            }
+        }
+    }
+
+    // Close any remaining open blocks
+    if (inNoteBlock || inWarningBlock) {
+        out << "\n";
+    }
+
+    return out.str();
 }

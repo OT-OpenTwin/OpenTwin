@@ -60,7 +60,7 @@ public:
 
 	bool parseFile(const std::string& _file, Service& _service);
 
-	bool startsWith(const std::string& _line, const std::string& _prefix);
+	static bool startsWith(const std::string& _line, const std::string& _prefix);
 
 	bool parseParameter(Parameter& _parameter, const std::string& _param, Endpoint& _endpoint, ParameterType _parameterType);
 
