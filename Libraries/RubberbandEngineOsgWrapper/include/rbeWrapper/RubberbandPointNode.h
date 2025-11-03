@@ -48,11 +48,11 @@ public:
 
     struct Style
     {
-        // Visible (front) pass – filled disc with depth test
+        // Visible (front) pass - filled disc with depth test
         osg::Vec4 visibleColor = osg::Vec4(0.12f, 0.72f, 1.0f, 0.95f);
         float     visibleSizePx = 12.0f;     // device pixels
 
-        // Hidden (behind geometry) pass – ring without depth test
+        // Hidden (behind geometry) pass - ring without depth test
         osg::Vec4 hiddenColor = osg::Vec4(0.95f, 0.60f, 0.25f, 0.85f);
         float     hiddenSizePx = 12.0f;     // ring outer diameter in px
         float     ringThickness = 2.0f;      // ring thickness in px
