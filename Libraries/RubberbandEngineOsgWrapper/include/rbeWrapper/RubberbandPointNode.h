@@ -1,5 +1,5 @@
-﻿// @otlicense
-// File: rbeOsgWrapperDatatypes.h
+// @otlicense
+// File: RubberbandPointNode.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
