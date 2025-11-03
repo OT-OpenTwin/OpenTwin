@@ -20,6 +20,7 @@
 #pragma once
 
 // std header
+#include <map>
 #include <list>
 #include <string>
 #include <vector>
@@ -33,6 +34,21 @@ public:
 	int run(int _argc, char** _argv);
 
 private:
+	enum class FileSignature {
+		NoSignature,
+		BOM_UTF8,
+		BOM_UTF16_LE,
+		BOM_UTF16_BE,
+		BOM_UTF32_LE,
+		BOM_UTF32_BE,
+		BOM_UTF7,
+		BOM_UTF1,
+		BOM_UTF_EBCDIC,
+		BOM_SCSU,
+		BOM_BOCU1,
+		BOM_GB18030
+	};
+
 	struct CommandLine {
 		bool dryRun = false;
 		bool showExpected = false;
@@ -55,11 +71,13 @@ private:
 		bool isValid = false;
 		bool warnMissingHeader = false;
 		bool warnInvalidChars = false;
+		bool warnSignature = false;
 		bool addFileName = false;
 		bool addLicenseTitle = false;
 		std::string keywordStart;
-		std::string keywordStartLower;
-		std::string keywordIgnoreLower;
+		std::map<std::string, FileSignature> signatureMap;
+		std::map<std::string, FileSignature> keywordStartSignatures;
+		std::map<std::string, FileSignature> keywordIgnoreSignatures;
 		std::string keywordEnd;
 		std::string headerLinePrefix;
 		std::list<std::string> licenseLines;
@@ -67,7 +85,6 @@ private:
 		std::list<std::string> blacklistDirectories;
 		std::list<std::string> fileExtensions;
 	};
-
 	Config m_config;
 
 	struct ResultData{
@@ -83,8 +100,15 @@ private:
 		size_t errors = 0;
 		size_t warnings = 0;
 	};
-
 	ResultData m_resultData;
+
+	struct StartLineInfo {
+		bool isIgnore = false;
+		bool isStart = false;
+		std::string line;
+		FileSignature signature = FileSignature::NoSignature;
+	};
+
 	std::ofstream* m_outputStream = nullptr;
 
 	void scanDirectory(const std::string& _directoryPath);
@@ -103,6 +127,9 @@ private:
 	void showConfig();
 	void showResults();
 
+	StartLineInfo analyzeStartLine(const std::string& _line) const;
+	void fillFileSignatureMap(const std::string& _text, std::map<std::string, FileSignature>& _map);
+	std::string signatureToString(FileSignature _signature);
 	std::string fileNameOnly(const std::string& _filePath) const;
 	std::string stringToLower(const std::string& _string) const;
 	std::string expandPath(const std::string& _path);

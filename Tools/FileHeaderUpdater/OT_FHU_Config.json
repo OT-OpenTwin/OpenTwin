@@ -6,6 +6,7 @@
     "LicenseFile": "%OPENTWIN_DEV_ROOT%/Tools/FileHeaderUpdater/OpenTwinHeaderLicenseText.txt",
     "WarnMissingHeader": true,
     "WarnInvalidChars": false,
+    "WarnFileSignature": true,
     "AddFileName": true,
     "AddLicenseTitle": true,
     "RootDirectories": [

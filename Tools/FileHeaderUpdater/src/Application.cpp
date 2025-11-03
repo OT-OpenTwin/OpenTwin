@@ -166,7 +166,13 @@ void Application::scanFile(const std::string& _filePath) {
 	std::transform(lineLower.begin(), lineLower.end(), lineLower.begin(), [](unsigned char c) { return std::tolower(c); });
 
 	// Check for file header
-	if (lineLower == m_config.keywordIgnoreLower) {
+	StartLineInfo startLineInfo = analyzeStartLine(line);
+
+	if (startLineInfo.signature != FileSignature::NoSignature && m_config.warnSignature) {
+		logW("File with file signature (" + signatureToString(startLineInfo.signature) + ") detected: \"" + _filePath + "\".");
+	}
+
+	if (startLineInfo.isIgnore) {
 		if (!m_config.notifyChangeOnly) {
 			log("File ignored: \"" + _filePath + "\"");
 		}
@@ -175,7 +181,7 @@ void Application::scanFile(const std::string& _filePath) {
 		m_resultData.filesIgnored++;
 		return;
 	}
-	else if (lineLower != m_config.keywordStart) {
+	else if (!startLineInfo.isStart) {
 		if (m_config.warnMissingHeader) {
 			logW("File missing license header: \"" + _filePath + "\"");
 		}
@@ -185,7 +191,7 @@ void Application::scanFile(const std::string& _filePath) {
 		m_resultData.filesWithMissingLicense++;
 		return;
 	}
-	fileLines.push_back(line);
+	fileLines.push_back(startLineInfo.line);
 
 	// Read remaining lines
 	while (std::getline(fileStream, line)) {
@@ -241,7 +247,7 @@ void Application::scanFile(const std::string& _filePath) {
 		expectedLicenseLines.push_front(m_config.headerLinePrefix + "File: " + fileNameOnly(_filePath));
 	}
 
-	expectedLicenseLines.push_front(m_config.keywordStart);
+	expectedLicenseLines.push_front(startLineInfo.line);
 	expectedLicenseLines.push_back(m_config.keywordEnd);
 
 	// Compare license header
@@ -279,7 +285,7 @@ void Application::scanFile(const std::string& _filePath) {
 
 	// Skip existing license lines in the file
 	fileLineIt = fileLines.begin();
-	if (fileLineIt != fileLines.end() && *fileLineIt == m_config.keywordStart) {
+	if (fileLineIt != fileLines.end() && *fileLineIt == startLineInfo.line) {
 		fileLineIt++;
 	}
 	while (fileLineIt != fileLines.end()) {
@@ -429,7 +435,7 @@ Application::CommandLine Application::parseCommandLine(int _argc, char** _argv) 
 	return cmdLine;
 }
 
-std::string toString(rapidjson::ParseErrorCode _code) {
+static std::string toString(rapidjson::ParseErrorCode _code) {
 	switch (_code) {
 	case rapidjson::kParseErrorNone:
 		return "No error";
@@ -475,6 +481,7 @@ std::string toString(rapidjson::ParseErrorCode _code) {
 Application::Config Application::loadConfigFile(const std::string& _fileName) {
 	Config cfg;
 	cfg.isValid = false;
+	fillFileSignatureMap(std::string(), cfg.signatureMap);
 
 	// Read file content
 	std::ifstream configFileStream(_fileName);
@@ -537,9 +544,12 @@ Application::Config Application::loadConfigFile(const std::string& _fileName) {
 	// Read keyword start
 	if (doc.HasMember("Keyword.Start") && doc["Keyword.Start"].IsString()) {
 		cfg.keywordStart = doc["Keyword.Start"].GetString();
-		cfg.keywordStartLower = cfg.keywordStart;
-		std::transform(cfg.keywordStartLower.begin(), cfg.keywordStartLower.end(), cfg.keywordStartLower.begin(), 
+
+		std::string keywordLower = cfg.keywordStart;
+		std::transform(keywordLower.begin(), keywordLower.end(), keywordLower.begin(),
 			[](unsigned char c) { return std::tolower(c); });
+
+		fillFileSignatureMap(cfg.keywordStart, cfg.keywordStartSignatures);
 
 		if (cfg.keywordStart.empty()) {
 			logE("Invalid config content: Empty \"Keyword.Start\" string");
@@ -567,9 +577,11 @@ Application::Config Application::loadConfigFile(const std::string& _fileName) {
 
 	// Read keyword ignore
 	if (doc.HasMember("Keyword.Ignore") && doc["Keyword.Ignore"].IsString()) {
-		cfg.keywordIgnoreLower = doc["Keyword.Ignore"].GetString();
-		std::transform(cfg.keywordIgnoreLower.begin(), cfg.keywordIgnoreLower.end(), cfg.keywordIgnoreLower.begin(),
+		std::string keywordLower = doc["Keyword.Ignore"].GetString();
+		std::transform(keywordLower.begin(), keywordLower.end(), keywordLower.begin(),
 			[](unsigned char c) { return std::tolower(c); });
+
+		fillFileSignatureMap(keywordLower, cfg.keywordIgnoreSignatures);
 	}
 	else {
 		logE("Invalid config file format: Missing or invalid \"Keyword.Ignore\" string");
@@ -602,6 +614,15 @@ Application::Config Application::loadConfigFile(const std::string& _fileName) {
 			return cfg;
 		}
 		cfg.warnInvalidChars = doc["WarnInvalidChars"].GetBool();
+	}
+
+	// Read warn signature flag
+	if (doc.HasMember("WarnFileSignature")) {
+		if (!doc["WarnFileSignature"].IsBool()) {
+			logE("Invalid config file format: Invalid \"WarnFileSignature\" boolean");
+			return cfg;
+		}
+		cfg.warnSignature = doc["WarnFileSignature"].GetBool();
 	}
 
 	// Read root directories
@@ -733,7 +754,6 @@ void Application::showConfig() {
 	log("Warn Invalid Chars:   " + std::string(m_config.warnInvalidChars ? "True" : "False"));
 	log("Notify Change Only:   " + std::string(m_config.notifyChangeOnly ? "True" : "False"));
 	log("Keyword Start:        \"" + m_config.keywordStart + "\"");
-	log("Keyword Ignore:       \"" + m_config.keywordIgnoreLower + "\"");
 	log("Keyword End:          \"" + m_config.keywordEnd + "\"");
 	log("Header Line Prefix:   \"" + m_config.headerLinePrefix + "\"");
 	log("Root Directories:");
@@ -772,6 +792,120 @@ void Application::showResults()  {
 	log("  Files Up-To-Date:         " + std::to_string(m_resultData.filesUpToDate));
 	log("  Files Require Update:     " + std::to_string(m_resultData.outdateFiles));
 	log("  Files Modified:           " + std::to_string(m_resultData.filesModified));
+}
+
+Application::StartLineInfo Application::analyzeStartLine(const std::string& _line) const {
+	StartLineInfo info;
+	auto ignoreIt = m_config.keywordIgnoreSignatures.find(_line);
+	if (ignoreIt != m_config.keywordIgnoreSignatures.end()) {
+		info.isIgnore = true;
+		info.line = ignoreIt->first;
+		info.signature = ignoreIt->second;
+	}
+	else {
+		auto startIt = m_config.keywordStartSignatures.find(_line);
+		if (startIt != m_config.keywordStartSignatures.end()) {
+			info.isStart = true;
+			info.line = startIt->first;
+			info.signature = startIt->second;
+		}
+		else {
+			for (const auto& it : m_config.signatureMap) {
+				if (_line.rfind(it.first, 0) == 0) {
+					info.signature = it.second;
+					break;
+				}
+			}
+		}
+	}
+	
+	return info;
+}
+
+void Application::fillFileSignatureMap(const std::string& _text, std::map<std::string, FileSignature>& _map) {
+	// No BOM (plain text)
+	_map.emplace(_text, FileSignature::NoSignature);
+
+	// UTF-8 BOM: EF BB BF
+	_map.emplace(std::string{ static_cast<char>(0xEF), static_cast<char>(0xBB), static_cast<char>(0xBF) } + _text,
+		FileSignature::BOM_UTF8);
+
+	// UTF-16 LE BOM: FF FE
+	_map.emplace(std::string{ static_cast<char>(0xFF), static_cast<char>(0xFE) } + _text,
+		FileSignature::BOM_UTF16_LE);
+
+	// UTF-16 BE BOM: FE FF
+	_map.emplace(std::string{ static_cast<char>(0xFE), static_cast<char>(0xFF) } + _text,
+		FileSignature::BOM_UTF16_BE);
+
+	// UTF-32 LE BOM: FF FE 00 00
+	_map.emplace(std::string{ static_cast<char>(0xFF), static_cast<char>(0xFE), 
+							  static_cast<char>(0x00), static_cast<char>(0x00) } + _text,
+		FileSignature::BOM_UTF32_LE);
+
+	// UTF-32 BE BOM: 00 00 FE FF
+	_map.emplace(std::string{ static_cast<char>(0x00), static_cast<char>(0x00),
+							  static_cast<char>(0xFE), static_cast<char>(0xFF) } + _text,
+		FileSignature::BOM_UTF32_BE);
+
+	// UTF-7 BOM: 2B 2F 76 (and one of 38 | 39 | 2B | 2F)
+	_map.emplace(std::string{ static_cast<char>(0x2B), static_cast<char>(0x2F),
+							  static_cast<char>(0x76), static_cast<char>(0x38) } + _text,
+		FileSignature::BOM_UTF7);
+	_map.emplace(std::string{ static_cast<char>(0x2B), static_cast<char>(0x2F),
+							  static_cast<char>(0x76), static_cast<char>(0x39) } + _text,
+		FileSignature::BOM_UTF7);
+	_map.emplace(std::string{ static_cast<char>(0x2B), static_cast<char>(0x2F),
+							  static_cast<char>(0x76), static_cast<char>(0x2B) } + _text,
+		FileSignature::BOM_UTF7);
+	_map.emplace(std::string{ static_cast<char>(0x2B), static_cast<char>(0x2F),
+							  static_cast<char>(0x76), static_cast<char>(0x2F) } + _text,
+		FileSignature::BOM_UTF7);
+
+	// UTF-1 BOM: F7 64 4C
+	_map.emplace(std::string{ static_cast<char>(0xF7), static_cast<char>(0x64),
+							  static_cast<char>(0x4C) } + _text,
+		FileSignature::BOM_UTF1);
+
+	// UTF-EBCDIC BOM: DD 73 66 73
+	_map.emplace(std::string{ static_cast<char>(0xDD), static_cast<char>(0x73),
+							  static_cast<char>(0x66), static_cast<char>(0x73) } + _text,
+		FileSignature::BOM_UTF_EBCDIC);
+
+	// SCSU BOM: 0E FE FF
+	_map.emplace(std::string{ static_cast<char>(0x0E), static_cast<char>(0xFE),
+							  static_cast<char>(0xFF) } + _text,
+		FileSignature::BOM_SCSU);
+
+	// BOCU-1 BOM: FB EE 28
+	_map.emplace(std::string{ static_cast<char>(0xFB), static_cast<char>(0xEE),
+							  static_cast<char>(0x28) } + _text,
+		FileSignature::BOM_BOCU1);
+
+	// GB-18030 BOM: 84 31 95 33
+	_map.emplace(std::string{ static_cast<char>(0x84), static_cast<char>(0x31),
+							  static_cast<char>(0x95), static_cast<char>(0x33) } + _text,
+		FileSignature::BOM_GB18030);
+}
+
+std::string Application::signatureToString(FileSignature _signature) {
+	switch (_signature) {
+	case Application::FileSignature::NoSignature: return "No Signature";
+	case Application::FileSignature::BOM_UTF8: return "UTF-8 BOM";
+	case Application::FileSignature::BOM_UTF16_LE: return "UTF-16 LE BOM";
+	case Application::FileSignature::BOM_UTF16_BE: return "UTF-16 BE BOM";
+	case Application::FileSignature::BOM_UTF32_LE: return "UTF-32 LE BOM";
+	case Application::FileSignature::BOM_UTF32_BE: return "UTF-32 BE BOM";
+	case Application::FileSignature::BOM_UTF7: return "UTF-7 BOM";
+	case Application::FileSignature::BOM_UTF1: return "UTF-1 BOM";
+	case Application::FileSignature::BOM_UTF_EBCDIC: return "UTF-EBCDIC BOM";
+	case Application::FileSignature::BOM_SCSU: return "SCSU BOM";
+	case Application::FileSignature::BOM_BOCU1: return "BOCU-1 BOM";
+	case Application::FileSignature::BOM_GB18030: return "GB-18030 BOM";
+	default:
+		logE("Unknown file signature value (" + std::to_string(static_cast<int>(_signature)) + ")");
+		return "Unknown Signature";
+	}
 }
 
 std::string Application::fileNameOnly(const std::string& _filePath) const {
