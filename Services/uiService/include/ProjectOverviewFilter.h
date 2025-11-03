@@ -57,6 +57,11 @@ namespace ot {
 
 		bool isConfirmed() const { return m_isConfirmed; };
 
+		//! @brief Show the filter menu at the specified position.
+		//! Will ensure the menu is properly positioned on screen.
+		//! @param _pos Global position where the menu should be shown.
+		void showAt(const QPoint& _pos);
+
 	Q_SIGNALS:
 		void sortOrderChanged(int _logicalIndex, Qt::SortOrder _sortOrder);
 		

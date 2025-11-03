@@ -116,45 +116,48 @@ QRectF ot::Positioning::calculateChildRect(const QRectF& _parentRect, const QSiz
 	return QRectF(pt, _childSize);
 }
 
-QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly) {
+QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, FitMode _mode) {
 	// Check if the rect is already in a screen
-	if (_primaryScreenOnly) {
-		if (QGuiApplication::primaryScreen()->availableGeometry().contains(_sourceRect)) {
+	for (QScreen* s : QGuiApplication::screens()) {
+		if (s->availableGeometry().contains(_sourceRect)) {
 			return _sourceRect;
-		}
-	}
-	else {	
-		for (QScreen* s : QGuiApplication::screens()) {
-			if (s->availableGeometry().contains(_sourceRect)) {
-				return _sourceRect;
-			}
 		}
 	}
 
 	// Get the screen closest to the initial position of the rect
 	QScreen* screen = nullptr;
 
-	if (_primaryScreenOnly) {
-		screen = QGuiApplication::primaryScreen();
+	// Determine the reference point based on the fit mode
+	QPoint referencePoint;
+	switch (_mode) {
+	case ot::Positioning::FitByTopLeft:
+		referencePoint = _sourceRect.topLeft();
+		break;
+	case ot::Positioning::FitByCenter:
+		referencePoint = _sourceRect.center();
+		break;
+	default:
+		OT_LOG_EAS("Unknown FitMode (" + std::to_string(static_cast<int>(_mode)) + ")");
+		referencePoint = _sourceRect.topLeft();
+		break;
 	}
-	else {
-		double closestDistance = std::numeric_limits<double>::max();
-		for (QScreen* s : QGuiApplication::screens()) {
-			double distanceLeft = _sourceRect.left() - s->availableGeometry().left();
-			double distanceRight = _sourceRect.right() - s->availableGeometry().right();
-			double distanceTop = _sourceRect.top() - s->availableGeometry().top();
-			double distanceBottom = _sourceRect.bottom() - s->availableGeometry().bottom();
 
-			if (distanceLeft < 0.) distanceLeft *= (-1);
-			if (distanceRight < 0.) distanceRight *= (-1);
-			if (distanceTop < 0.) distanceTop *= (-1);
-			if (distanceBottom < 0.) distanceBottom *= (-1);
+	double closestDistance = std::numeric_limits<double>::max();
+	for (QScreen* s : QGuiApplication::screens()) {
+		double distanceLeft = referencePoint.x() - s->availableGeometry().left();
+		double distanceRight = referencePoint.x() - s->availableGeometry().right();
+		double distanceTop = referencePoint.y() - s->availableGeometry().top();
+		double distanceBottom = referencePoint.y() - s->availableGeometry().bottom();
 
-			double distance = std::min({ distanceLeft, distanceRight, distanceTop, distanceBottom });
-			if (distance < closestDistance) {
-				closestDistance = distance;
-				screen = s;
-			}
+		if (distanceLeft < 0.) distanceLeft *= (-1);
+		if (distanceRight < 0.) distanceRight *= (-1);
+		if (distanceTop < 0.) distanceTop *= (-1);
+		if (distanceBottom < 0.) distanceBottom *= (-1);
+
+		double distance = std::min({ distanceLeft, distanceRight, distanceTop, distanceBottom });
+		if (distance < closestDistance) {
+			closestDistance = distance;
+			screen = s;
 		}
 	}
 

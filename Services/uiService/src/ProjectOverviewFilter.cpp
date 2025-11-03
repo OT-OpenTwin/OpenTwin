@@ -25,8 +25,11 @@
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/Positioning.h"
 
 // Qt header
+#include <QtGui/qscreen.h>
+#include <QtGui/qguiapplication.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qlistwidget.h>
 
@@ -165,6 +168,14 @@ void ot::ProjectOverviewFilter::updateCheckedState(const ProjectOverviewFilterDa
 			m_optionsList->item(0)->setCheckState((allChecked ? Qt::Checked : Qt::Unchecked));
 		}
 	}
+}
+
+void ot::ProjectOverviewFilter::showAt(const QPoint& _pos) {
+	layout()->activate();
+	QRect menuRect(_pos, layout()->totalSizeHint());
+	
+	menuRect = Positioning::fitOnScreen(menuRect, Positioning::FitByTopLeft);
+	exec(menuRect.topLeft());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

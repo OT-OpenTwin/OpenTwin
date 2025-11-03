@@ -35,6 +35,11 @@ namespace ot {
 		OT_DECL_NOCOPY(Positioning)
 		OT_DECL_NODEFAULT(Positioning)
 	public:
+		enum FitMode {
+			FitByTopLeft, //! @brief Uses the top left corner as reference point.
+			FitByCenter   //! @brief Uses the center point as reference point.
+		};
+
 		//! @brief Calculates the child rect.
 		//! @param _parentRect Parent rectangle.
 		//! @param _childSize Child size.
@@ -50,8 +55,8 @@ namespace ot {
 		//! @brief Fits the provided rect on the screen.
 		//! If the source rect is bigger than the screen size the source rect will be returned.
 		//! @param _sourceRect Initial rect.
-		//! @param _primaryScreenOnly If true the source rect will be fitted onto the primary screen only, otherwise on any screen.
-		static QRect fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly = false);
+		//! @param _mode Mode how to fit the rect on the screen.
+		static QRect fitOnScreen(const QRect& _sourceRect, FitMode _mode = FitByCenter);
 
 		//! @brief Gets the widgets from the provided interfaces and calls centerWidgetOnParent(const QWidget*, QWidget*).
 		//! @ref centerWidgetOnParent(const QWidget*, QWidget*)

@@ -323,7 +323,7 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
 
 	connect(&filter, &ProjectOverviewFilter::sortOrderChanged, this, &ProjectOverviewHeader::slotSortChanged);
 	
-	filter.exec(mapToGlobal(rect.bottomLeft()));
+	filter.showAt(mapToGlobal(rect.bottomLeft()));
     
     disconnect(&filter, &ProjectOverviewFilter::sortOrderChanged, this, &ProjectOverviewHeader::slotSortChanged);
     
