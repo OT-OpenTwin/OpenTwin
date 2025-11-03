@@ -43,7 +43,7 @@ public:
 
 	// Setter / Getter
 
-	void setExportConfigFlag(ExportConfigFlag _flag, bool _active = true) { m_exportConfigFlags.setFlag(_flag, _active); };
+	void setExportConfigFlag(ExportConfigFlag _flag, bool _active = true) { m_exportConfigFlags.set(_flag, _active); };
 	void setExportConfigFlags(const ExportConfigFlags& _flags) { m_exportConfigFlags = _flags; };
 	const ExportConfigFlags& getExportConfigFlags(void) const { return m_exportConfigFlags; };
 
@@ -55,4 +55,4 @@ private:
 	ExportConfigFlags m_exportConfigFlags;
 };
 
-OT_ADD_FLAG_FUNCTIONS(GraphicsItemDesignerExportConfig::ExportConfigFlag)
+OT_ADD_FLAG_FUNCTIONS(GraphicsItemDesignerExportConfig::ExportConfigFlag, GraphicsItemDesignerExportConfig::ExportConfigFlags)

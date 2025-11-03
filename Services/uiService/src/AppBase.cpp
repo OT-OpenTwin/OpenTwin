@@ -414,7 +414,7 @@ LockManager * AppBase::lockManager() {
 // Event handling
 
 void AppBase::log(const ot::LogMessage& _message) {
-	static const ot::LogFlag flags = ot::ERROR_LOG | ot::WARNING_LOG | ot::TEST_LOG;
+	static const ot::LogFlags flags = ot::ERROR_LOG | ot::WARNING_LOG | ot::TEST_LOG;
 	if (_message.getFlags() & flags) {
 		this->appendLogMessage(_message);
 	}
@@ -1116,19 +1116,19 @@ void AppBase::createUi() {
 			auto lockManager = m_ExternalServicesComponent->lockManager();
 
 			ot::LockTypes f(ot::LockType::All);
-			f.setFlag(ot::LockType::ModelWrite);
+			f.set(ot::LockType::ModelWrite);
 			lockManager->registerLockable(this->getBasicServiceInformation(), m_welcomeScreen, f);
 
-			f.setFlag(ot::LockType::Properties);
+			f.set(ot::LockType::Properties);
 			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_propertyGrid->getPropertyGrid(), f);
 
 			if (m_graphicsPicker) {
 				lockManager->uiViewCreated(this->getBasicServiceInformation(), m_graphicsPicker, f);
 			}
 
-			f.removeFlag(ot::LockType::Properties);
-			f.setFlag(ot::LockType::NavigationAll);
-			f.setFlag(ot::LockType::NavigationWrite);
+			f.remove(ot::LockType::Properties);
+			f.set(ot::LockType::NavigationAll);
+			f.set(ot::LockType::NavigationWrite);
 			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_projectNavigation->getTree(), f);
 
 			// Update status
@@ -3536,7 +3536,7 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 	selectionData.setKeyboardModifiers(QApplication::keyboardModifiers());
 	selectionData.setSelectionOrigin(_eventOrigin);
 	selectionData.setViewHandlingFlags(m_viewHandling);
-	_result->setFlag(m_viewerComponent->handleSelectionChanged(selectionData));
+	(*_result) = m_viewerComponent->handleSelectionChanged(selectionData);
 
 	// Notifiy views about selection change
 	ot::UIDList selectedUids;
@@ -3772,10 +3772,10 @@ void AppBase::slotLockUI(bool flag) {
 
 void AppBase::slotLockSelectionAndModification(bool flag) {
 	ot::LockTypes lockFlags;
-	lockFlags.setFlag(ot::LockType::ModelWrite);
-	lockFlags.setFlag(ot::LockType::ModelRead);
-	lockFlags.setFlag(ot::LockType::ViewWrite);
-	lockFlags.setFlag(ot::LockType::NavigationWrite);
+	lockFlags.set(ot::LockType::ModelWrite);
+	lockFlags.set(ot::LockType::ModelRead);
+	lockFlags.set(ot::LockType::ViewWrite);
+	lockFlags.set(ot::LockType::NavigationWrite);
 
 	if (flag) {
 		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);

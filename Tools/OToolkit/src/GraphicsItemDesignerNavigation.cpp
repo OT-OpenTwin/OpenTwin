@@ -66,7 +66,7 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 	}
 	_item->getGraphicsItem()->setGraphicsItemName(itemName.toStdString());
 	_item->setNavigation(this);
-	_item->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft);
+	_item->getGraphicsItem()->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft);
 	_item->setDesignerItemFlag(GraphicsItemDesignerItemBase::DesignerItemFlag::DesignerItemIgnoreEvents, false);
 
 	OTAssertNullptr(_item->getGraphicsItem());

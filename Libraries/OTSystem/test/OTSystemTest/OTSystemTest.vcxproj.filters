@@ -18,5 +18,8 @@
     <ClCompile Include="src\TestDateTime.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestFlags.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

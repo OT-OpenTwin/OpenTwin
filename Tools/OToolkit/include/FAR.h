@@ -316,4 +316,4 @@ private:
 	QPushButton* m_replaceTextBtn;
 };
 
-OT_ADD_FLAG_FUNCTIONS(FARFilter::FilterFlag)
+OT_ADD_FLAG_FUNCTIONS(FARFilter::FilterFlag, FARFilter::FilterFlags)

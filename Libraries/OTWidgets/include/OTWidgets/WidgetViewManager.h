@@ -180,7 +180,7 @@ namespace ot {
 		//! An initial state is save the first time a state is saved or restored.
 		void applyInitialState();
 
-		void setConfigFlag(ManagerConfigFlag _flag, bool _active = true) { m_config.setFlag(_flag, _active); };
+		void setConfigFlag(ManagerConfigFlag _flag, bool _active = true) { m_config.set(_flag, _active); };
 		void setConfigFlags(const ManagerConfigFlags& _flags) { m_config = _flags; };
 		const ManagerConfigFlags& getConfigFlags() const { return m_config; };
 
@@ -306,9 +306,9 @@ namespace ot {
 
 		WidgetViewDockComponentsFactory* m_dockComponentsFactory;
 
-		OT_ADD_FRIEND_FLAG_FUNCTIONS(ManagerState)
+		OT_ADD_FRIEND_FLAG_FUNCTIONS(ManagerState, ManagerStateFlags)
 	};
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::WidgetViewManager::ManagerConfigFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::WidgetViewManager::ManagerConfigFlag, ot::WidgetViewManager::ManagerConfigFlags)

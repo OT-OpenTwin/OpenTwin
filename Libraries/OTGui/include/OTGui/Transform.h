@@ -58,7 +58,7 @@ namespace ot {
 		//! The angle must be between 0 and 359 degrees.
 		double getRotation(void) const { return m_rotation; };
 
-		void setFlipState(FlipState _state, bool _active = true) { m_flipState.setFlag(_state, _active); };
+		void setFlipState(FlipState _state, bool _active = true) { m_flipState.set(_state, _active); };
 		void setFlipStateFlags(const FlipStateFlags& _flags) { m_flipState = _flags; };
 		const FlipStateFlags& getFlipStateFlags(void) const { return m_flipState; };
 
@@ -71,4 +71,4 @@ namespace ot {
 	};
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::Transform::FlipState)
+OT_ADD_FLAG_FUNCTIONS(ot::Transform::FlipState, ot::Transform::FlipStateFlags)

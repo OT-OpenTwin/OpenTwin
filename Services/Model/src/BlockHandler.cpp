@@ -70,10 +70,19 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 	auto propertyBaseFlip = blockEnt->getProperties().getProperty("Flip");
 	if (propertyBaseFlip != nullptr) {
 		auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBaseFlip);
-		if (propertyFlip->getValue() != stringFlipMap[transform.getFlipStateFlags()]) {
-			propertyFlip->setValue(stringFlipMap[transform.getFlipStateFlags()]);
-			_flipChanged = true;
+		if (transform.getFlipStateFlags() & ot::Transform::FlipHorizontally) {
+			if (propertyFlip->getValue() != stringFlipMap[static_cast<ot::Transform::FlipState>(transform.getFlipStateFlags() & ot::Transform::FlipHorizontally)]) {
+				propertyFlip->setValue(stringFlipMap[ot::Transform::FlipHorizontally]);
+				_flipChanged = true;
+			}
 		}
+		if (transform.getFlipStateFlags() & ot::Transform::FlipVertically) {
+			if (propertyFlip->getValue() != stringFlipMap[static_cast<ot::Transform::FlipState>(transform.getFlipStateFlags() & ot::Transform::FlipVertically)]) {
+				propertyFlip->setValue(stringFlipMap[ot::Transform::FlipVertically]);
+				_flipChanged = true;
+			}
+		}
+		
 	}
 
 	// Here update block positition

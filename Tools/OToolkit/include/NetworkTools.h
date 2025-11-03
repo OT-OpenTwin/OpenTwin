@@ -77,4 +77,4 @@ private:
 	
 };
 
-OT_ADD_FLAG_FUNCTIONS(NetworkTools::NetworkToolStatus)
+OT_ADD_FLAG_FUNCTIONS(NetworkTools::NetworkToolStatus, NetworkTools::NetworkToolStatusFlags)

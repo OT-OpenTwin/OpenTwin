@@ -136,4 +136,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::ThisComputerInfo::InformationModeFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::ThisComputerInfo::InformationModeFlag, ot::ThisComputerInfo::InformationModeFlags)

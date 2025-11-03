@@ -250,10 +250,10 @@ void Application::runSolver(void)
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase *> solverMap) {
 	ot::LockTypes lock;
-	lock.setFlag(ot::LockType::ModelWrite);
-	lock.setFlag(ot::LockType::NavigationWrite);
-	lock.setFlag(ot::LockType::ViewWrite);
-	lock.setFlag(ot::LockType::Properties);
+	lock.set(ot::LockType::ModelWrite);
+	lock.set(ot::LockType::NavigationWrite);
+	lock.set(ot::LockType::ViewWrite);
+	lock.set(ot::LockType::Properties);
 
 	getUiComponent()->lockUI(lock);
 

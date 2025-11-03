@@ -84,7 +84,7 @@ namespace ot {
 		void setTitle(const std::string& _title) { m_title = _title; };
 		const std::string& getTitle(void) const { return m_title; };
 
-		void setFlag(DialogFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setFlag(DialogFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setFlags(DialogFlags _flags) { m_flags = _flags; };
 		DialogFlags getFlags(void) const { return m_flags; };
 
@@ -140,4 +140,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::DialogCfg::DialogFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::DialogCfg::DialogFlag, ot::DialogCfg::DialogFlags)

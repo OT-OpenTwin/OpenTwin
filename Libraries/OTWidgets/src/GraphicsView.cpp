@@ -744,7 +744,7 @@ void ot::GraphicsView::beginItemMove() {
 		return;
 	}
 
-	m_viewStateFlags.setFlag(ItemMoveInProgress, true);
+	m_viewStateFlags.set(ItemMoveInProgress, true);
 
 	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
@@ -759,7 +759,7 @@ void ot::GraphicsView::endItemMove() {
 		return;
 	}
 
-	m_viewStateFlags.setFlag(ItemMoveInProgress, false);
+	m_viewStateFlags.set(ItemMoveInProgress, false);
 
 	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);

@@ -412,10 +412,10 @@ void Application::SolverThread(std::list<std::string> solverRunList)
 {
 	// Lock the UI
 	ot::LockTypes lockFlags;
-	lockFlags.setFlag(ot::LockType::ModelWrite);
-	lockFlags.setFlag(ot::LockType::NavigationWrite);
-	lockFlags.setFlag(ot::LockType::ViewWrite);
-	lockFlags.setFlag(ot::LockType::Properties);
+	lockFlags.set(ot::LockType::ModelWrite);
+	lockFlags.set(ot::LockType::NavigationWrite);
+	lockFlags.set(ot::LockType::ViewWrite);
+	lockFlags.set(ot::LockType::Properties);
 
 	this->getUiComponent()->lockUI(lockFlags);
 	

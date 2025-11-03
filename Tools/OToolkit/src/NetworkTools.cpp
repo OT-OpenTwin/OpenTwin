@@ -96,7 +96,7 @@ bool NetworkTools::prepareToolShutdown(QSettings& _settings) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void NetworkTools::slotRunPortBlocker(void) {
-	if (m_status.flagIsSet(NetworkToolStatus::PortBlockerRunning)) {
+	if (m_status.has(NetworkToolStatus::PortBlockerRunning)) {
 		std::list<PortBlockerServer*> servers = m_servers;
 		m_servers.clear();
 
@@ -113,7 +113,7 @@ void NetworkTools::slotRunPortBlocker(void) {
 		m_portBlockerType->setEnabled(true);
 		m_runPortBlockerButton->setText("Run");
 
-		m_status.setFlag(NetworkToolStatus::PortBlockerRunning, false);
+		m_status.set(NetworkToolStatus::PortBlockerRunning, false);
 	}
 	else {
 		// Collect ports to block
@@ -187,7 +187,7 @@ void NetworkTools::slotRunPortBlocker(void) {
 		// Ensure at least one port was blocked
 		if (!anyBlocked) return;
 		
-		m_status.setFlag(NetworkToolStatus::PortBlockerRunning, true);
+		m_status.set(NetworkToolStatus::PortBlockerRunning, true);
 		m_portBlockerPorts->setReadOnly(true);
 		m_portBlockerType->setEnabled(false);
 		m_runPortBlockerButton->setText("Stop");

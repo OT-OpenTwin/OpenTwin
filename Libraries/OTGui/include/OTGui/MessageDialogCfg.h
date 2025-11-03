@@ -88,7 +88,7 @@ namespace ot {
 		void setDetailedText(const std::string& _text) { m_detailedText = _text; };
 		const std::string& getDetailedText(void) const { return m_detailedText; };
 
-		void setButton(BasicButton _button, bool _active = true) { m_buttons.setFlag(_button, _active); };
+		void setButton(BasicButton _button, bool _active = true) { m_buttons.set(_button, _active); };
 		void setButtons(BasicButtons _buttons) { m_buttons = _buttons; };
 		const BasicButtons& getButtons(void) const { return m_buttons; };
 
@@ -104,4 +104,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::MessageDialogCfg::BasicButton)
+OT_ADD_FLAG_FUNCTIONS(ot::MessageDialogCfg::BasicButton, ot::MessageDialogCfg::BasicButtons)

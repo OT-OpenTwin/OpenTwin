@@ -54,7 +54,7 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		void setFlag(NavigationTreePackageFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setFlag(NavigationTreePackageFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setFlags(NavigationTreePackageFlags _flags) { m_flags = _flags; };
 		NavigationTreePackageFlags flags(void) const { return m_flags; };
 
@@ -73,4 +73,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::NavigationTreePackage::NavigationTreePackageFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::NavigationTreePackage::NavigationTreePackageFlag, ot::NavigationTreePackage::NavigationTreePackageFlags)

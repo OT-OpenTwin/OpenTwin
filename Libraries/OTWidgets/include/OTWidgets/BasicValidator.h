@@ -118,4 +118,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::BasicValidator::ValidRange)
+OT_ADD_FLAG_FUNCTIONS(ot::BasicValidator::ValidRange, ot::BasicValidator::ValidRanges)

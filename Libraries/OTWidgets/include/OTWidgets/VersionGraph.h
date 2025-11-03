@@ -47,7 +47,7 @@ namespace ot {
 		bool isCurrentVersionEndOfBranch(void) const;
 		bool isVersionEndOfBranch(const std::string& _versionName) const;
 
-		void setVersionGraphConfig(VersionGraphConfig _config, bool _active = true) { m_configFlags.setFlag(_config, _active); };
+		void setVersionGraphConfig(VersionGraphConfig _config, bool _active = true) { m_configFlags.set(_config, _active); };
 		void setVersionGraphConfigFlags(const VersionGraphConfigFlags& _flags) { m_configFlags = _flags; };
 		const VersionGraphConfigFlags& getVersionGraphConfigFlags(void) const { return m_configFlags; };
 
@@ -90,4 +90,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::VersionGraph::VersionGraphConfig)
+OT_ADD_FLAG_FUNCTIONS(ot::VersionGraph::VersionGraphConfig, ot::VersionGraph::VersionGraphConfigFlags)

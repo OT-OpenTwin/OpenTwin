@@ -68,7 +68,7 @@ void ot::StyledTextBuilder::addToJsonObject(ot::JsonValue& _object, ot::JsonAllo
 	_object.AddMember("Entries", entriesArray, _allocator);
 
 	JsonArray flagsArray;
-	if (m_flags.flagIsSet(BuilderFlag::EvaluateSubstitutionTokens)) {
+	if (m_flags.has(BuilderFlag::EvaluateSubstitutionTokens)) {
 		flagsArray.PushBack("EvaluateSubstitutionTokens", _allocator);
 	}
 	_object.AddMember("Flags", flagsArray, _allocator);
@@ -84,7 +84,7 @@ void ot::StyledTextBuilder::setFromJsonObject(const ot::ConstJsonObject& _object
 	m_flags = StyledTextBuilder::NoFlags;
 	for (const std::string& flag : json::getStringList(_object, "Flags")) {
 		if (flag == "EvaluateSubstitutionTokens") {
-			m_flags.setFlag(StyledTextBuilder::EvaluateSubstitutionTokens, true);
+			m_flags.set(StyledTextBuilder::EvaluateSubstitutionTokens, true);
 		}
 		else {
 			OT_LOG_EAS("Unknown StyledTextBuilder flag \"" + flag + "\"");
@@ -116,7 +116,7 @@ ot::StyledTextBuilder& ot::StyledTextBuilder::operator<<(const std::string& _tex
 
 ot::StyledTextBuilder& ot::StyledTextBuilder::operator<<(StyledText::SubstitutionToken _token) {
 	m_entries.back().getText().append("$(" + StyledText::toString(_token) + ")");
-	m_flags.setFlag(BuilderFlag::EvaluateSubstitutionTokens, true);
+	m_flags.set(BuilderFlag::EvaluateSubstitutionTokens, true);
 	return *this;
 }
 

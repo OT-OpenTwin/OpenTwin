@@ -43,14 +43,14 @@ void ot::Widget::resetWidgetDisabledCounter(void) {
 
 void ot::Widget::lockWidget(const LockTypes& _flags, int _lockCount) {
 	for (LockType flag : ot::getAllLockTypes()) {
-		if (_flags.flagIsSet(flag)) this->lockWidgetFlag(flag, _lockCount);
+		if (_flags.has(flag)) this->lockWidgetFlag(flag, _lockCount);
 	}
 	this->evaluateEnabledState();
 }
 
 void ot::Widget::unlockWidget(const LockTypes& _flags, int _unlockCount) {
 	for (LockType flag : ot::getAllLockTypes()) {
-		if (_flags.flagIsSet(flag)) this->unlockWidgetFlag(flag, _unlockCount);
+		if (_flags.has(flag)) this->unlockWidgetFlag(flag, _unlockCount);
 	}
 	this->evaluateEnabledState();
 }

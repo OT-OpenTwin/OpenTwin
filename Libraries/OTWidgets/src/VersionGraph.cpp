@@ -27,7 +27,7 @@ ot::VersionGraph::VersionGraph() :
 {
 	this->getGraphicsScene()->setGridFlags(ot::Grid::NoGridFlags);
 	this->getGraphicsScene()->setMultiselectionEnabled(false);
-	this->setGraphicsViewFlag(GraphicsView::IgnoreConnectionByUser | GraphicsView::ViewManagesSceneRect);
+	this->setGraphicsViewFlags(GraphicsView::IgnoreConnectionByUser | GraphicsView::ViewManagesSceneRect);
 
 	this->connect(this->getGraphicsScene(), &GraphicsScene::selectionChangeFinished, this, &VersionGraph::slotSelectionChanged);
 	this->connect(this->getGraphicsScene(), &GraphicsScene::graphicsItemDoubleClicked, this, &VersionGraph::slotGraphicsItemDoubleClicked);

@@ -79,7 +79,7 @@ namespace ot {
 		void setChildItems(const std::list<NavigationTreeItem>& _items);
 		const std::list<NavigationTreeItem>& getChildItems() const { return m_childs; };
 
-		void setFlag(ItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setFlag(ItemFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setFlags(const ItemFlags& _flags) { m_flags = _flags; };
 		const ItemFlags& getFlags() const { return m_flags; };
 
@@ -107,4 +107,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::NavigationTreeItem::ItemFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::NavigationTreeItem::ItemFlag, ot::NavigationTreeItem::ItemFlags)

@@ -49,4 +49,4 @@ namespace ot {
 	__declspec(dllexport) MessageType stringToMessageTypeFlag(const std::string& _type);
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::MessageType);
+OT_ADD_FLAG_FUNCTIONS(ot::MessageType, ot::MessageTypeFlags);

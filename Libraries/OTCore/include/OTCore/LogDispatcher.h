@@ -324,14 +324,14 @@ namespace ot {
 	public:
 		static LogDispatcher& instance(void);
 		static LogDispatcher& initialize(const std::string& _serviceName, bool _addCoutReceiver = false);
-		static inline bool mayLog(LogFlag _flags) { return ((_flags & LogDispatcher::instance().m_logFlags.data()) == _flags); };
+		static inline bool mayLog(LogFlag _flags) { return LogDispatcher::instance().m_logFlags.has(_flags); };
 		static void addFileWriter(void);
 
 		// #################################################################################
 
 		// Setter/Getter
 
-		void setLogFlag(LogFlag _flag, bool _active = true) { m_logFlags.setFlag(_flag, _active); };
+		void setLogFlag(LogFlag _flag, bool _active = true) { m_logFlags.set(_flag, _active); };
 		void setLogFlags(LogFlags _flags) { m_logFlags = _flags; };
 		LogFlags getLogFlags(void) const { return m_logFlags; };
 

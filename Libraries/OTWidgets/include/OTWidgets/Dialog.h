@@ -102,7 +102,7 @@ namespace ot {
 		//! @brief Sets a dialog flag.
 		//! @param _flag The flag to set.
 		//! @param _active Whether the flag should be active.
-		void setDialogFlag(DialogCfg::DialogFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setDialogFlag(DialogCfg::DialogFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 
 		//! @brief Sets multiple dialog flags.
 		//! @param _flags The flags to set.
@@ -196,5 +196,5 @@ namespace ot {
 	};
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::Dialog::ShowFlag)
-OT_ADD_FLAG_FUNCTIONS(ot::Dialog::DialogState)
+OT_ADD_FLAG_FUNCTIONS(ot::Dialog::ShowFlag, ot::Dialog::ShowFlags)
+OT_ADD_FLAG_FUNCTIONS(ot::Dialog::DialogState, ot::Dialog::DialogStateFlags)

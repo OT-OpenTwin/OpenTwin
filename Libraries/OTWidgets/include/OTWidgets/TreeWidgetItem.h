@@ -32,7 +32,7 @@ namespace ot {
 		TreeWidgetItem(const TreeWidgetItemInfo& _itemInfo, int _type = 0);
 		virtual ~TreeWidgetItem();
 
-		void setNavigationItemFlag(NavigationTreeItem::ItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setNavigationItemFlag(NavigationTreeItem::ItemFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setNavigationItemFlags(const NavigationTreeItem::ItemFlags& _flags) { m_flags = _flags; };
 		const NavigationTreeItem::ItemFlags getNavigationItemFlags() const { return m_flags; };
 

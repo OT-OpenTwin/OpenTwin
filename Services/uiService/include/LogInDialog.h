@@ -71,6 +71,7 @@ private:
 		ChangePasswordMode = 0x20
 	};
 	typedef ot::Flags<LogInStateFlag> LogInState;
+	OT_ADD_FRIEND_FLAG_FUNCTIONS(LogInDialog::LogInStateFlag, LogInDialog::LogInState)
 
 	enum class WorkerError {
 		NoError,
@@ -159,6 +160,4 @@ private:
 	WorkerError workerLogin(const UserManagement& _userManager);
 	WorkerError workerRegister(const UserManagement& _userManager);
 	WorkerError workerChangePassword(const UserManagement& _userManager);
-
-	OT_ADD_FRIEND_FLAG_FUNCTIONS(LogInDialog::LogInStateFlag)
 };

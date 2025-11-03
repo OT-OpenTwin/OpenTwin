@@ -194,7 +194,7 @@ void ot::Dialog::mousePressEvent(QMouseEvent* _event) {
 	QDialog::mousePressEvent(_event);
 	if (_event->button() == Qt::LeftButton && m_flags & DialogCfg::MoveGrabAnywhere) {
 		m_lastMousePos = _event->globalPos();
-		m_state.setFlag(DialogState::MousePressed, true);
+		m_state.set(DialogState::MousePressed, true);
 	}
 }
 
@@ -211,12 +211,12 @@ void ot::Dialog::mouseMoveEvent(QMouseEvent* _event) {
 void ot::Dialog::mouseReleaseEvent(QMouseEvent* _event) {
 	QDialog::mouseReleaseEvent(_event);
 	if (_event->button() == Qt::LeftButton) {
-		m_state.setFlag(DialogState::MousePressed, false);
+		m_state.set(DialogState::MousePressed, false);
 	}
 }
 
 void ot::Dialog::closeEvent(QCloseEvent* _event) {
-	m_state.setFlag(DialogState::Closing, true);
+	m_state.set(DialogState::Closing, true);
 
 	if (this->mayCloseDialogWindow()) {
 		QDialog::closeEvent(_event);

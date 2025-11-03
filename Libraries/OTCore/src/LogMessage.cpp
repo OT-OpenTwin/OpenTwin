@@ -115,7 +115,7 @@ std::ostream& ot::operator << (std::ostream& _stream, const LogMessage& _msg) {
 
 	// Log Type
 	_stream << "[";
-	switch (_msg.m_flags.data()) {
+	switch (_msg.m_flags.toEnum()) {
 	case ot::INFORMATION_LOG: _stream << LogMessage::logTypeInformation(); break;
 	case ot::DETAILED_LOG: _stream << LogMessage::logTypeDetailed(); break;
 	case ot::WARNING_LOG: _stream << LogMessage::logTypeWarning(); break;

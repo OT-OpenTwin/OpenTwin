@@ -50,7 +50,7 @@ namespace ot {
 		TreeItemViewLink(QTreeWidgetItem* _treeItem, WidgetView* _view, const LinkFlags& _flags = LinkFlag::DefaultFlags);
 		virtual ~TreeItemViewLink();
 
-		void setLinkFlag(LinkFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setLinkFlag(LinkFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setLinkFlags(const LinkFlags& _flags) { m_flags = _flags; };
 		const LinkFlags& getLinkFlags(void) const { return m_flags; };
 
@@ -66,4 +66,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::TreeItemViewLink::LinkFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::TreeItemViewLink::LinkFlag, ot::TreeItemViewLink::LinkFlags)

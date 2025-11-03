@@ -105,4 +105,4 @@ namespace ot {
 	};
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::SystemProcess::ProcessFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::SystemProcess::ProcessFlag, ot::SystemProcess::ProcessFlags)

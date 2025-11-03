@@ -134,7 +134,7 @@ namespace ot {
 		//! @param _flag Flag to set/unset.
 		//! @param _active If true the flag will be set, otherwise unset.
 		//! @see GridFlags
-		void setGridFlag(GridFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setGridFlag(GridFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		
 		//! @brief Sets the current GridFlags.
 		//! @see GridFlags
@@ -197,4 +197,4 @@ namespace ot {
 		PenFCfg m_lineStyle;
 	};
 }
-OT_ADD_FLAG_FUNCTIONS(ot::Grid::GridFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::Grid::GridFlag, ot::Grid::GridFlags)

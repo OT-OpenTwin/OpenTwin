@@ -93,19 +93,19 @@ AppBase * AppBase::instance(QApplication* _app) {
 // API base functions
 
 void AppBase::log(const ot::LogMessage& _message) {
-	otoolkit::APIInterface::InterfaceLogType typ = otoolkit::APIInterface::Information;
-	switch (_message.getFlags().data())
+	otoolkit::APIInterface::InterfaceLogType type = otoolkit::APIInterface::Information;
+	switch (_message.getFlags().toEnum())
 	{
 	case ot::WARNING_LOG:
-		typ = otoolkit::APIInterface::Warning;
+		type = otoolkit::APIInterface::Warning;
 		break;
 	case ot::ERROR_LOG:
-		typ = otoolkit::APIInterface::Error;
+		type = otoolkit::APIInterface::Error;
 		break;
 	default:
 		break;
 	}
-	this->log(QString::fromStdString(_message.getFunctionName()), typ, QString::fromStdString(_message.getText()));
+	this->log(QString::fromStdString(_message.getFunctionName()), type, QString::fromStdString(_message.getText()));
 }
 
 void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogType _type, const QString& _message) {

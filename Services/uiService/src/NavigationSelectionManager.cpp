@@ -69,9 +69,9 @@ void ot::NavigationSelectionManager::setSelectionInformation(const SelectionInfo
 }
 
 void ot::NavigationSelectionManager::slotViewSelected(void) {
-	m_stateStack->setFlag(SelectionHandlingEvent::ActiveViewChanged);
+	m_stateStack->set(SelectionHandlingEvent::ActiveViewChanged);
 }
 
 void ot::NavigationSelectionManager::slotViewDeselected(void) {
-	m_stateStack->setFlag(SelectionHandlingEvent::ActiveViewChanged);
+	m_stateStack->set(SelectionHandlingEvent::ActiveViewChanged);
 }

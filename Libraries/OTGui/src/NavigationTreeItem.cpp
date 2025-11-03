@@ -69,7 +69,7 @@ void ot::NavigationTreeItem::addToJsonObject(ot::JsonValue& _object, ot::JsonAll
 		childArr.PushBack(JsonObject(c, _allocator), _allocator);
 	}
 	_object.AddMember("Childs", childArr, _allocator);
-	_object.AddMember("Flags", static_cast<uint64_t>(m_flags.data()), _allocator);
+	_object.AddMember("Flags", static_cast<uint64_t>(m_flags), _allocator);
 }
 
 void ot::NavigationTreeItem::setFromJsonObject(const ot::ConstJsonObject& _object) {

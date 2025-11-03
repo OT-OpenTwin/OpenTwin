@@ -62,4 +62,4 @@ namespace ot {
 	}
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::msg::RequestFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::msg::RequestFlag, ot::msg::RequestFlags)

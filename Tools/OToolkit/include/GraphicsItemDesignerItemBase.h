@@ -70,7 +70,7 @@ public:
 	//! The position is used to adjust the control points.
 	const QPointF& getLastPos(void) const { return m_lastPos; };
 
-	void setDesignerItemFlag(DesignerItemFlag _flag, bool _active = true) { m_designerItemFlags.setFlag(_flag, _active); };
+	void setDesignerItemFlag(DesignerItemFlag _flag, bool _active = true) { m_designerItemFlags.set(_flag, _active); };
 	void setDesignerItemFlags(const DesignerItemFlags& _flags) { m_designerItemFlags = _flags; };
 	const DesignerItemFlags& getDesignerItemFlags(void) const { return m_designerItemFlags; };
 
@@ -141,4 +141,4 @@ private:
 
 };
 
-OT_ADD_FLAG_FUNCTIONS(GraphicsItemDesignerItemBase::DesignerItemFlag)
+OT_ADD_FLAG_FUNCTIONS(GraphicsItemDesignerItemBase::DesignerItemFlag, GraphicsItemDesignerItemBase::DesignerItemFlags)

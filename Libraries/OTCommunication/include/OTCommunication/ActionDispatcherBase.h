@@ -136,4 +136,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::ActionDispatcherBase::InsertFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::ActionDispatcherBase::InsertFlag, ot::ActionDispatcherBase::InsertFlags)

@@ -158,7 +158,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	// Check existing locks
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
-			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+			if (_typeFlags.has(lockLevel.first) && lockLevel.second > 0) {
 				OT_LOG_CONTROLSMANAGER("Lock applied on UID uiElementCreated");
 
 				uiElement->lock(lockLevel.second, lockLevel.first);
@@ -175,7 +175,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	// Check existing locks
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
-			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+			if (_typeFlags.has(lockLevel.first) && lockLevel.second > 0) {
 				OT_LOG_CONTROLSMANAGER("Lock applied on TeeWidget uiElementCreated");
 
 				newTree->lock(lockLevel.second, lockLevel.first);
@@ -192,7 +192,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	// Check existing locks
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
-			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+			if (_typeFlags.has(lockLevel.first) && lockLevel.second > 0) {
 				OT_LOG_CONTROLSMANAGER("Lock applied on propGrid uiElementCreated");
 				newProp->lock(lockLevel.second, lockLevel.first);
 			}
@@ -208,7 +208,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	// Check existing locks
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
-			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+			if (_typeFlags.has(lockLevel.first) && lockLevel.second > 0) {
 				OT_LOG_CONTROLSMANAGER("Lock applied on graphicsView uiElementCreated");
 				newGraphics->lock(lockLevel.second, lockLevel.first);
 			}
@@ -224,7 +224,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	// Check existing locks
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
-			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+			if (_typeFlags.has(lockLevel.first) && lockLevel.second > 0) {
 				OT_LOG_CONTROLSMANAGER("Lock applied on textEditor uiElementCreated");
 				newText->lock(lockLevel.second, lockLevel.first);
 			}
@@ -240,7 +240,7 @@ void LockManager::uiViewCreated(const ot::BasicServiceInformation& _serviceInfo,
 	// Check existing locks
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
-			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+			if (_typeFlags.has(lockLevel.first) && lockLevel.second > 0) {
 				OT_LOG_CONTROLSMANAGER("Lock applied on View created");
 
 				newView->lock(lockLevel.second, lockLevel.first);
@@ -257,7 +257,7 @@ void LockManager::registerLockable(const ot::BasicServiceInformation& _serviceIn
 	// Check existing locks
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
-			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+			if (_typeFlags.has(lockLevel.first) && lockLevel.second > 0) {
 				OT_LOG_CONTROLSMANAGER("Lock applied on register lockable");
 
 				newLockable->lock(lockLevel.second, lockLevel.first);
@@ -367,28 +367,28 @@ void LockManager::lock(const ot::BasicServiceInformation& _serviceInfo, ot::Lock
 void LockManager::lock(const ot::BasicServiceInformation& _serviceInfo, const ot::LockTypes & _typeFlags) {
 
 	
-	if (_typeFlags.flagIsSet(ot::LockType::All)) {
+	if (_typeFlags.has(ot::LockType::All)) {
 		lock(_serviceInfo, ot::LockType::All);
 	} 
-	if (_typeFlags.flagIsSet(ot::LockType::ModelWrite)) {
+	if (_typeFlags.has(ot::LockType::ModelWrite)) {
 		lock(_serviceInfo, ot::LockType::ModelWrite);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::ModelRead)) {
+	if (_typeFlags.has(ot::LockType::ModelRead)) {
 		lock(_serviceInfo, ot::LockType::ModelRead);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::NavigationAll)) {
+	if (_typeFlags.has(ot::LockType::NavigationAll)) {
 		lock(_serviceInfo, ot::LockType::NavigationAll);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::NavigationWrite)) {
+	if (_typeFlags.has(ot::LockType::NavigationWrite)) {
 		lock(_serviceInfo, ot::LockType::NavigationWrite);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::Properties)) {
+	if (_typeFlags.has(ot::LockType::Properties)) {
 		lock(_serviceInfo, ot::LockType::Properties);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::ViewRead)) {
+	if (_typeFlags.has(ot::LockType::ViewRead)) {
 		lock(_serviceInfo, ot::LockType::ViewRead);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::ViewWrite)) {
+	if (_typeFlags.has(ot::LockType::ViewWrite)) {
 		lock(_serviceInfo, ot::LockType::ViewWrite);
 	}
 }
@@ -455,28 +455,28 @@ void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, ot::Lo
 }
 
 void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, const ot::LockTypes & _typeFlags) {
-	if (_typeFlags.flagIsSet(ot::LockType::All)) {
+	if (_typeFlags.has(ot::LockType::All)) {
 		unlock(_serviceInfo, ot::LockType::All);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::ModelWrite)) {
+	if (_typeFlags.has(ot::LockType::ModelWrite)) {
 		unlock(_serviceInfo, ot::LockType::ModelWrite);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::ModelRead)) {
+	if (_typeFlags.has(ot::LockType::ModelRead)) {
 		unlock(_serviceInfo, ot::LockType::ModelRead);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::NavigationAll)) {
+	if (_typeFlags.has(ot::LockType::NavigationAll)) {
 		unlock(_serviceInfo, ot::LockType::NavigationAll);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::NavigationWrite)) {
+	if (_typeFlags.has(ot::LockType::NavigationWrite)) {
 		unlock(_serviceInfo, ot::LockType::NavigationWrite);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::Properties)) {
+	if (_typeFlags.has(ot::LockType::Properties)) {
 		unlock(_serviceInfo, ot::LockType::Properties);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::ViewRead)) {
+	if (_typeFlags.has(ot::LockType::ViewRead)) {
 		unlock(_serviceInfo, ot::LockType::ViewRead);
 	}
-	if (_typeFlags.flagIsSet(ot::LockType::ViewWrite)) {
+	if (_typeFlags.has(ot::LockType::ViewWrite)) {
 		unlock(_serviceInfo, ot::LockType::ViewWrite);
 	}
 }
@@ -816,7 +816,7 @@ void LockManagerElement::disable(int _value) {
 }
 
 void LockManagerElement::lock(int _value, ot::LockType _lockType) {
-	if (m_lockTypes.flagIsSet(_lockType)) {
+	if (m_lockTypes.has(_lockType)) {
 		m_lockCount += _value;
 
 		if (m_lockCount > 0) {
@@ -849,7 +849,7 @@ void LockManagerElement::lock(int _value, ot::LockType _lockType) {
 }
 
 void LockManagerElement::unlock(int _value, ot::LockType _lockType) {
-	if (m_lockTypes.flagIsSet(_lockType)) {
+	if (m_lockTypes.has(_lockType)) {
 		m_lockCount -= _value;
 
 		if (m_lockCount < 0)

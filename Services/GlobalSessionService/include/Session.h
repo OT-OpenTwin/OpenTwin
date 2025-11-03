@@ -67,7 +67,7 @@ public:
 
 	// Setter / Getter
 
-	void setStateFlag(SessionStateFlag _flag, bool _active = true) { m_state.setFlag(_flag, _active); };
+	void setStateFlag(SessionStateFlag _flag, bool _active = true) { m_state.set(_flag, _active); };
 	void setState(const SessionState& _state) { m_state = _state; };
 	const SessionState& getState(void) const { return m_state; };
 
@@ -93,4 +93,4 @@ private:
 	std::string m_userName; //! @brief User name.
 };
 
-OT_ADD_FLAG_FUNCTIONS(Session::SessionStateFlag)
+OT_ADD_FLAG_FUNCTIONS(Session::SessionStateFlag, Session::SessionState)

@@ -31,7 +31,7 @@ std::optional<ot::WidgetViewBase::ViewFlags> ot::VisualisationTypes::getCustomVi
 }
 
 void ot::VisualisationTypes::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember("VisualisationTypes", static_cast<uint64_t>(m_visualisations.data()), _allocator);
+	_object.AddMember("VisualisationTypes", static_cast<uint64_t>(m_visualisations), _allocator);
 
 	JsonArray customFlagsArr;
 	for (const auto& it : m_customViewFlags) {
@@ -45,7 +45,7 @@ void ot::VisualisationTypes::addToJsonObject(ot::JsonValue& _object, ot::JsonAll
 
 void ot::VisualisationTypes::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	if (_object.HasMember("VisualisationTypes")) {
-		m_visualisations = static_cast<VisualisationType>(json::getUInt64(_object, "VisualisationTypes"));
+		m_visualisations = VisTypes(json::getUInt64(_object, "VisualisationTypes"));
 	}
 	else {
 		m_visualisations = None;

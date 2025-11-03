@@ -49,8 +49,8 @@ void ot::GraphicsElement::setGraphicsScene(GraphicsScene* _scene) {
 }
 
 void ot::GraphicsElement::setGraphicsElementState(GraphicsElementState _state, bool _active) {
-	if (m_state.flagIsSet(_state) == _active) return;
-	m_state.setFlag(_state, _active);
+	if (m_state.has(_state) == _active) return;
+	m_state.set(_state, _active);
 	this->graphicsElementStateChanged(m_state);
 }
 

@@ -224,7 +224,7 @@ namespace ot {
 		//! @brief Item margins.
 		const MarginsD& getMargins() const { return m_margins; };
 
-		void setGraphicsItemFlag(GraphicsItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setGraphicsItemFlag(GraphicsItemFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setGraphicsItemFlags(const GraphicsItemFlags& _flags) { m_flags = _flags; };
 		const GraphicsItemFlags& getGraphicsItemFlags() const { return m_flags; };
 
@@ -324,4 +324,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItemCfg::GraphicsItemFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItemCfg::GraphicsItemFlag, ot::GraphicsItemCfg::GraphicsItemFlags)

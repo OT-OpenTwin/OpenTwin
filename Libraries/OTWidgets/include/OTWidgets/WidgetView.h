@@ -153,4 +153,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::WidgetView::InsertFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::WidgetView::InsertFlag, ot::WidgetView::InsertFlags)

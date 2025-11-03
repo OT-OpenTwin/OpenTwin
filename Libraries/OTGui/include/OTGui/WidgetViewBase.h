@@ -142,7 +142,7 @@ namespace ot {
 		//! @brief Set the widget view flag.
 		//! @param _flag Flag to set.
 		//! @param _active If false the flag will be unset instead.
-		void setViewFlag(ViewFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setViewFlag(ViewFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 
 		//! @brief Replace the current flags with the flags provided.
 		void setViewFlags(ViewFlags _flags) { m_flags = _flags; };
@@ -172,4 +172,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::WidgetViewBase::ViewFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::WidgetViewBase::ViewFlag, ot::WidgetViewBase::ViewFlags)

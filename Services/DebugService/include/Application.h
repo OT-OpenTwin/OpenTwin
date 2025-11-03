@@ -84,7 +84,7 @@ public:
 
 	void enableFeature(const DebugServiceConfig::FeatureFlag& _flag, bool _enabled = true) { m_config.setFeatureFlag(_flag, _enabled); };
 	void disableFeature(const DebugServiceConfig::FeatureFlag& _flag) { m_config.setFeatureFlag(_flag, false); };
-	bool getFeatureEnabled(const DebugServiceConfig::FeatureFlag& _flag) const { return m_config.getFeatureFlags().flagIsSet(_flag); };
+	bool getFeatureEnabled(const DebugServiceConfig::FeatureFlag& _flag) const { return m_config.getFeatureFlags().has(_flag); };
 	
 	void setFeatures(const DebugServiceConfig::Features& _features) { m_config.setFeatureFlags(_features); };
 	const DebugServiceConfig::Features& getFeatures(void) const { return m_config.getFeatureFlags(); };

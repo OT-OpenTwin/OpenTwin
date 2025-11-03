@@ -78,7 +78,7 @@ void Session::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _alloca
 void Session::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_state = NoStateFlags;
 	for (const std::string& state : ot::json::getStringList(_object, OT_ACTION_PARAM_State)) {
-		if (state == "LssConfirmed") { m_state.setFlag(SessionStateFlag::LssConfirmed); }
+		if (state == "LssConfirmed") { m_state.set(SessionStateFlag::LssConfirmed); }
 		else {
 			OT_LOG_EAS("Unknown state flag \"" + state + "\"");
 		}

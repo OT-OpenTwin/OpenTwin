@@ -97,7 +97,7 @@ public:
 	//! @brief Returns true if any of the services in this session is shutting down.
 	bool hasShuttingDownServices();
 
-	bool isShuttingDown() const { return m_state.flagIsSet(Session::ShuttingDown); };
+	constexpr bool isShuttingDown() const noexcept { return m_state.has(Session::ShuttingDown); };
 
 	ot::ServiceInitData createServiceInitData(ot::serviceID_t _serviceID);
 
@@ -253,4 +253,4 @@ private:
 	ot::IDManager<ot::serviceID_t> m_serviceIdManager;
 };
 
-OT_ADD_FLAG_FUNCTIONS(Session::SessionStateFlag)
+OT_ADD_FLAG_FUNCTIONS(Session::SessionStateFlag, Session::SessionState)

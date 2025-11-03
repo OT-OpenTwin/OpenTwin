@@ -40,5 +40,5 @@ namespace ot {
 	typedef Flags<ViewHandlingFlag> ViewHandlingFlags;
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::WidgetFlag)
-OT_ADD_FLAG_FUNCTIONS(ot::ViewHandlingFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::WidgetFlag, ot::WidgetFlags)
+OT_ADD_FLAG_FUNCTIONS(ot::ViewHandlingFlag, ot::ViewHandlingFlags)

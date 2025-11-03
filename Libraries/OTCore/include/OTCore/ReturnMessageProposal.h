@@ -40,7 +40,9 @@ namespace ot {
 			//! @brief All failed and error flags.
 			Failed = GeneralError | IOError | DeserializeFailed,
 		};
+
+		typedef Flags<ReturnMessageFlag> ReturnMessageFlags;
 	};
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::ReturnMessage2::ReturnMessageFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::ReturnMessage2::ReturnMessageFlag, ot::ReturnMessage2::ReturnMessageFlags)

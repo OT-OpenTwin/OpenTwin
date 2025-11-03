@@ -131,7 +131,7 @@ namespace ot {
 		std::string& getPropertyTip(void) { return m_tip; };
 		const std::string& getPropertyTip(void) const { return m_tip; };
 
-		void setPropertyFlag(PropertyFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setPropertyFlag(PropertyFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setPropertyFlags(PropertyFlags _flags) { m_flags = _flags; };
 		PropertyFlags& getPropertyFlags(void) { return m_flags; };
 		const PropertyFlags& getPropertyFlags(void) const { return m_flags; };
@@ -155,5 +155,5 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::PropertyBase::MergeFlag)
-OT_ADD_FLAG_FUNCTIONS(ot::PropertyBase::PropertyFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::PropertyBase::MergeFlag, ot::PropertyBase::MergeMode)
+OT_ADD_FLAG_FUNCTIONS(ot::PropertyBase::PropertyFlag, ot::PropertyBase::PropertyFlags)

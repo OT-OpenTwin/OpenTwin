@@ -62,7 +62,7 @@ std::list<std::string> DebugServiceConfig::toStringList(const Features& _feature
 DebugServiceConfig::Features DebugServiceConfig::stringListToFeatures(const std::list<std::string>& _features) {
 	Features result;
 	for (const std::string& flag : _features) {
-		result.setFlag(stringToFeatureFlag(flag), true);
+		result.set(stringToFeatureFlag(flag), true);
 	}
 	return result;
 }

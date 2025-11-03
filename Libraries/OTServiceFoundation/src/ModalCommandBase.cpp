@@ -58,10 +58,10 @@ void ot::ModalCommandBase::setupUI(void)
 	application->enableMessageQueuing(application->getUiComponent()->getServiceName(), true);
 
 	LockTypes modelRead;
-	modelRead.setFlag(LockType::ModelRead);
+	modelRead.set(LockType::ModelRead);
 
 	LockTypes modelWrite;
-	modelWrite.setFlag(LockType::ModelWrite);
+	modelWrite.set(LockType::ModelWrite);
 
 	std::string mainTab = initializeAndCreateUI(modelRead, modelWrite);
 

@@ -51,8 +51,8 @@ namespace ot {
 			IsDirect       = 1 << 4,  //! @brief Version is direct parent/child
 			IsOnActivePath = 1 << 5
 		};
-		OT_ADD_FRIEND_FLAG_FUNCTIONS(VersionInfoFlag)
 		typedef Flags<VersionInfoFlag> VersionInfoFlags;
+		OT_ADD_FRIEND_FLAG_FUNCTIONS(VersionInfoFlag, VersionInfoFlags)
 
 		VersionInfo() : m_flags(VersionInfoFlag::None), m_versionConfig(nullptr) {};
 		VersionInfo(VersionInfo&& _other) noexcept = delete;
@@ -65,7 +65,7 @@ namespace ot {
 			return *this;
 		}
 
-		void setFlag(VersionInfoFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setFlag(VersionInfoFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setFlags(const VersionInfoFlags& _flags) { m_flags = _flags; };
 		const VersionInfoFlags& getFlags(void) const { return m_flags; };
 
@@ -77,9 +77,9 @@ namespace ot {
 				return;
 			}
 
-			m_flags.setFlag(IsActive, m_versionConfig->getName() == _graphConfig.getActiveVersionName());
-			m_flags.setFlag(IsBranchNode, _graphConfig.getBranchesCountFromNode(m_versionConfig->getName()) > 0);
-			m_flags.setFlag(IsOnActivePath, m_versionConfig->isOnActivePath(_graphConfig.getActiveBranchName()));
+			m_flags.set(IsActive, m_versionConfig->getName() == _graphConfig.getActiveVersionName());
+			m_flags.set(IsBranchNode, _graphConfig.getBranchesCountFromNode(m_versionConfig->getName()) > 0);
+			m_flags.set(IsOnActivePath, m_versionConfig->isOnActivePath(_graphConfig.getActiveBranchName()));
 		}
 
 	private:

@@ -66,7 +66,7 @@ public:
 
 	// Setter / Getter
 
-	inline void setFeatureFlag(FeatureFlag _flag, bool _set = true) { m_features.setFlag(_flag, _set); };
+	inline void setFeatureFlag(FeatureFlag _flag, bool _set = true) { m_features.set(_flag, _set); };
 	inline void setFeatureFlags(const Features& _features) { m_features = _features; };
 	inline const Features& getFeatureFlags(void) const { return m_features; };
 
@@ -78,4 +78,4 @@ private:
 	Features m_features;
 };
 
-OT_ADD_FLAG_FUNCTIONS(DebugServiceConfig::FeatureFlag)
+OT_ADD_FLAG_FUNCTIONS(DebugServiceConfig::FeatureFlag, DebugServiceConfig::Features)

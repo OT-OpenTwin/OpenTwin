@@ -212,7 +212,7 @@ void Session::getDebugInfo(ot::LSSDebugInfo::SessionInfo& _info) {
 	_info.dataBaseCredPassword = m_dbCredentials.getEncryptedPassword();
 
 	_info.isHealthCheckRunning = m_healthCheckRunning;
-	_info.isShuttingDown = m_state.flagIsSet(Session::ShuttingDown);
+	_info.isShuttingDown = m_state.has(Session::ShuttingDown);
 
 	_info.services.clear();
 	for (const Service& service : m_services) {
@@ -233,7 +233,7 @@ void Session::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _al
 	}
 
 	ot::JsonArray stateArr;
-	if (m_state.flagIsSet(Session::ShuttingDown)) {
+	if (m_state.has(Session::ShuttingDown)) {
 		stateArr.PushBack(ot::JsonString("ShuttingDown", _allocator), _allocator);
 	}
 	_jsonObject.AddMember("StateFlags", stateArr, _allocator);
@@ -409,7 +409,7 @@ void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService, ot::
 	this->stopHealthCheck();
 
 	std::lock_guard<std::mutex> lock(m_mutex);
-	m_state.setFlag(Session::ShuttingDown, true);
+	m_state.set(Session::ShuttingDown, true);
 
 	for (auto it = m_services.begin(); it != m_services.end(); ) {
 		// Remove requested services

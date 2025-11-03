@@ -81,7 +81,7 @@ namespace ot {
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
 		bool getMouseWheelEnabled() const { return m_wheelEnabled; };
 
-		void setGraphicsViewFlag(GraphicsViewFlag _flag, bool _active = true) { m_viewFlags.setFlag(_flag, _active); };
+		void setGraphicsViewFlag(GraphicsViewFlag _flag, bool _active = true) { m_viewFlags.set(_flag, _active); };
 		void setGraphicsViewFlags(const GraphicsViewFlags& _flags) { m_viewFlags = _flags; };
 		const GraphicsViewFlags& getGraphicsViewFlags() const { return m_viewFlags; };
 
@@ -90,8 +90,8 @@ namespace ot {
 		void setGraphicsViewName(const std::string& _name);
 		const std::string& getGraphicsViewName() const { return m_viewName; };
 
-		void setReadOnly(bool _isReadOnly) { m_viewStateFlags.setFlag(ViewStateFlag::ReadOnlyState, _isReadOnly); };
-		bool isReadOnly() const { return m_viewStateFlags.flagIsSet(ViewStateFlag::ReadOnlyState); };
+		void setReadOnly(bool _isReadOnly) { m_viewStateFlags.set(ViewStateFlag::ReadOnlyState, _isReadOnly); };
+		bool isReadOnly() const { return m_viewStateFlags.has(ViewStateFlag::ReadOnlyState); };
 
 		void setGraphicsScene(GraphicsScene* _scene);
 		GraphicsScene* getGraphicsScene() { return m_scene; };
@@ -288,5 +288,5 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::GraphicsView::ViewStateFlag)
-OT_ADD_FLAG_FUNCTIONS(ot::GraphicsView::GraphicsViewFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsView::ViewStateFlag, ot::GraphicsView::ViewStateFlags)
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsView::GraphicsViewFlag, ot::GraphicsView::GraphicsViewFlags)

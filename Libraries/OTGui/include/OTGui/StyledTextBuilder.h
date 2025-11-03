@@ -58,7 +58,7 @@ namespace ot {
 		//! @brief Returns true if the builder has no entries that should be displayed (no text provided).
 		bool isEmpty(void) const;
 
-		void setFlag(BuilderFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setFlag(BuilderFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setFlags(const BuilderFlags& _flags) { m_flags = _flags; };
 		const BuilderFlags& getFlags(void) const { return m_flags; };
 
@@ -99,4 +99,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::StyledTextBuilder::BuilderFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::StyledTextBuilder::BuilderFlag, ot::StyledTextBuilder::BuilderFlags)

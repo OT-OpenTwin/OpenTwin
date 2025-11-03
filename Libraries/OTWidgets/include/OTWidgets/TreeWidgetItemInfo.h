@@ -44,7 +44,7 @@ namespace ot {
 		void setIcon(const QIcon& _icon) { m_icon = _icon; };
 		const QIcon& getIcon() const { return m_icon; };
 
-		void setFlag(NavigationTreeItem::ItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setFlag(NavigationTreeItem::ItemFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setFlags(const NavigationTreeItem::ItemFlags _flags) { m_flags = _flags; };
 		const NavigationTreeItem::ItemFlags& getFlags(void) const { return m_flags; };
 

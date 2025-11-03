@@ -1666,9 +1666,9 @@ void ExternalServicesComponent::setProgressValue(int percentage)
 void ExternalServicesComponent::lockGui()
 {
 	ot::LockTypes lockFlags;
-	lockFlags.setFlag(ot::LockType::ModelWrite);
-	lockFlags.setFlag(ot::LockType::ViewWrite);
-	lockFlags.setFlag(ot::LockType::ModelRead);
+	lockFlags.set(ot::LockType::ModelWrite);
+	lockFlags.set(ot::LockType::ViewWrite);
+	lockFlags.set(ot::LockType::ModelRead);
 
 	m_lockManager->lock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 }
@@ -1676,9 +1676,9 @@ void ExternalServicesComponent::lockGui()
 void ExternalServicesComponent::unlockGui()
 {
 	ot::LockTypes lockFlags;
-	lockFlags.setFlag(ot::LockType::ModelWrite);
-	lockFlags.setFlag(ot::LockType::ViewWrite);
-	lockFlags.setFlag(ot::LockType::ModelRead);
+	lockFlags.set(ot::LockType::ModelWrite);
+	lockFlags.set(ot::LockType::ViewWrite);
+	lockFlags.set(ot::LockType::ModelRead);
 
 	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 }
@@ -3056,7 +3056,7 @@ void ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _document)
 
 	if (_document.HasMember(OT_ACTION_PARAM_ElementLockTypes)) {
 		flags = ot::stringListToLockTypes(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-		flags.setFlag(ot::LockType::All);	// Add the all flag to all external push buttons
+		flags.set(ot::LockType::All);	// Add the all flag to all external push buttons
 	}
 
 	ot::UID parentUID;
@@ -3110,7 +3110,7 @@ void ExternalServicesComponent::handleAddMenuCheckbox(ot::JsonDocument& _documen
 	bool checked = _document[OT_ACTION_PARAM_UI_CONTROL_CheckedState].GetBool();
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	ot::LockTypes flags = ot::stringListToLockTypes(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-	flags.setFlag(ot::LockType::All);	// Add the all flag to all external checkboxes
+	flags.set(ot::LockType::All);	// Add the all flag to all external checkboxes
 
 	ServiceDataUi* service = getService(serviceId);
 
@@ -3158,7 +3158,7 @@ void ExternalServicesComponent::handleAddMenuLineEdit(ot::JsonDocument& _documen
 	std::string editLabel = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	ot::LockTypes flags = ot::stringListToLockTypes(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-	flags.setFlag(ot::LockType::All);	// Add the all flag to all external checkboxes
+	flags.set(ot::LockType::All);	// Add the all flag to all external checkboxes
 
 	ServiceDataUi* service = getService(serviceId);
 	

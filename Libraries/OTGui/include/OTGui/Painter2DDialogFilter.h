@@ -60,7 +60,7 @@ namespace ot {
 
 		// Setter / Getter
 
-		void setPainterTypeAllowed(PainterType _painterType, bool _allowed = true) { m_allowedPainters.setFlag(_painterType, _allowed); };
+		void setPainterTypeAllowed(PainterType _painterType, bool _allowed = true) { m_allowedPainters.set(_painterType, _allowed); };
 		void setPainterTypes(const PainterTypes& _painterTypes) { m_allowedPainters = _painterTypes; };
 		const PainterTypes& getPainterTypes() const { return m_allowedPainters; };
 
@@ -75,4 +75,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::Painter2DDialogFilter::PainterType)
+OT_ADD_FLAG_FUNCTIONS(ot::Painter2DDialogFilter::PainterType, ot::Painter2DDialogFilter::PainterTypes)

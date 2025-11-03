@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\TestDateTime.cpp" />
+    <ClCompile Include="src\TestFlags.cpp" />
     <ClCompile Include="src\TestOS.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup />

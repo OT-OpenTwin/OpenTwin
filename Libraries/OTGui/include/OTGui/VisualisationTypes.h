@@ -49,12 +49,12 @@ namespace ot
 			Image              = 1 << 8,
 			PDF                = 1 << 9
 		};
-		typedef Flags<VisualisationType> VisualisationTypeFlags;
+		typedef Flags<VisualisationType> VisTypes;
 
 		VisualisationTypes() = default;
 		~VisualisationTypes() = default;
 
-		void setVisualisations(const VisualisationTypeFlags& _types) { m_visualisations = _types; };
+		void setVisualisations(const VisTypes& _types) { m_visualisations = _types; };
 		void addVisualisation(VisualisationType _type) { m_visualisations |= _type; };
 
 		void addTextVisualisation() { m_visualisations |= Text; };
@@ -70,7 +70,7 @@ namespace ot
 
 		bool hasVisualisations() const { return m_visualisations != VisualisationType::None; };
 		bool hasVisualisation(VisualisationType _type) const { return m_visualisations & _type; };
-		const VisualisationTypeFlags& getVisualisations() const { return m_visualisations; };
+		const VisTypes& getVisualisations() const { return m_visualisations; };
 		bool visualiseAsText() const { return m_visualisations & Text; };
 		bool visualiseAsTable() const { return m_visualisations & Table; };
 		bool visualiseAsPlot1D() const { return m_visualisations & Plot1D; };
@@ -96,9 +96,9 @@ namespace ot
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 	private:
-		VisualisationTypeFlags m_visualisations;
+		VisTypes m_visualisations;
 		std::map<VisualisationType, ot::WidgetViewBase::ViewFlags> m_customViewFlags;
 	};
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::VisualisationTypes::VisualisationType)
+OT_ADD_FLAG_FUNCTIONS(ot::VisualisationTypes::VisualisationType, ot::VisualisationTypes::VisTypes)

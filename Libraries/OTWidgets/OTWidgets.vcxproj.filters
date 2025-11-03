@@ -73,9 +73,6 @@
     <ClCompile Include="src\ToolTipHandler.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\WidgetBase.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\EventNotifier.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
@@ -436,9 +433,6 @@
     <ClCompile Include="src\TabToolBarPage.cpp">
       <Filter>src\ToolBar</Filter>
     </ClCompile>
-    <ClCompile Include="src\Widget.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\CartesianPlotTextMarker.cpp">
       <Filter>src\Plot\Cartesian</Filter>
     </ClCompile>
@@ -589,6 +583,12 @@
     <ClCompile Include="src\TagListWidget.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\WidgetBase.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Widget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -707,13 +707,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OTWidgets\WidgetBase.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\OTWidgetsAPIExport.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetTypes.h">
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsLayoutItem.h">
@@ -820,9 +814,6 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyInputFactoryRegistrar.hpp">
       <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetProperties.h">
-      <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsPolygonItem.h">
       <Filter>include\Graphics</Filter>
@@ -1004,9 +995,6 @@
     <ClInclude Include="include\OTWidgets\TabToolBar.h">
       <Filter>include\ToolBar</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\Widget.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\CartesianPlotTextMarker.h">
       <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
@@ -1104,6 +1092,18 @@
       <Filter>include\Syntax</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\FlowLayout.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetTypes.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetProperties.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetBase.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Widget.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
   </ItemGroup>

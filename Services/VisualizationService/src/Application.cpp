@@ -73,7 +73,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	//_ui->addMenuGroup("Post Processing", "Visualization");
 
 	//ot::flags<ot::ui::lockType> modelWrite;
-	//modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	//modelWrite.set(ot::ui::lockType::tlModelWrite);
 
 	//_ui->addMenuButton("Post Processing", "Visualization", "Add 2D Plot", "Add 2D Plot", modelWrite, "Add 2D Plot", "Default");
 	

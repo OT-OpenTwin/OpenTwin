@@ -63,4 +63,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::FileSystem::FileSystemOption)
+OT_ADD_FLAG_FUNCTIONS(ot::FileSystem::FileSystemOption, ot::FileSystem::FileSystemOptions)

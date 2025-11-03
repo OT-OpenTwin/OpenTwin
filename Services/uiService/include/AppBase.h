@@ -260,7 +260,7 @@ public:
 
 	void startSessionRefreshTimer();
 
-	void setViewHandlingFlag(ot::ViewHandlingFlag _flag, bool _active = true) { m_viewHandling.setFlag(_flag, _active); };
+	void setViewHandlingFlag(ot::ViewHandlingFlag _flag, bool _active = true) { m_viewHandling.set(_flag, _active); };
 	void setViewHandlingFlags(const ot::ViewHandlingFlags& _flags) { m_viewHandling = _flags; };
 	const ot::ViewHandlingFlags& getViewHandlingFlags() const { return m_viewHandling; };
 
@@ -711,5 +711,5 @@ private:
 	AppBase(AppBase&) = delete;
 	AppBase& operator = (AppBase&) = delete;
 
-	OT_ADD_FRIEND_FLAG_FUNCTIONS(AppBase::AppState)
+	OT_ADD_FRIEND_FLAG_FUNCTIONS(AppBase::AppState, AppBase::AppStateFlags)
 };

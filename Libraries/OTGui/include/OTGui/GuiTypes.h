@@ -361,5 +361,5 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::LockType)
-OT_ADD_FLAG_FUNCTIONS(ot::SelectionHandlingEvent)
+OT_ADD_FLAG_FUNCTIONS(ot::LockType, ot::LockTypes)
+OT_ADD_FLAG_FUNCTIONS(ot::SelectionHandlingEvent, ot::SelectionHandlingResult)

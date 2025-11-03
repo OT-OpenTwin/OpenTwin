@@ -120,4 +120,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::GraphicsElement::GraphicsElementState)
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsElement::GraphicsElementState, ot::GraphicsElement::GraphicsElementStateFlags)

@@ -58,8 +58,8 @@ void ot::Transform::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_flipState = NoFlip;
 	std::list<std::string> flipStateArray = json::getStringList(_object, "Flip");
 	for (const std::string& flipStateEntry : flipStateArray) {
-		if (flipStateEntry == "Horizontal") m_flipState.setFlag(FlipState::FlipHorizontally);
-		else if (flipStateEntry == "Vertical") m_flipState.setFlag(FlipState::FlipVertically);
+		if (flipStateEntry == "Horizontal") m_flipState.set(FlipState::FlipHorizontally);
+		else if (flipStateEntry == "Vertical") m_flipState.set(FlipState::FlipVertically);
 	}
 }
 

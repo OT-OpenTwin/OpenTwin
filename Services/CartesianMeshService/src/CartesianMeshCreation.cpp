@@ -2206,17 +2206,17 @@ void CartesianMeshCreation::setUILock(bool flag, lockType type)
 				switch (type)
 				{
 				case ANY_OPERATION:
-					f.setFlag(ot::LockType::All);
+					f.set(ot::LockType::All);
 					break;
 				case MODEL_CHANGE:
-					f.setFlag(ot::LockType::ModelWrite);
-					f.setFlag(ot::LockType::NavigationWrite);
-					f.setFlag(ot::LockType::ViewWrite);
-					f.setFlag(ot::LockType::Properties);
+					f.set(ot::LockType::ModelWrite);
+					f.set(ot::LockType::NavigationWrite);
+					f.set(ot::LockType::ViewWrite);
+					f.set(ot::LockType::Properties);
 					break;
 				default:
 					assert(0); // Unknown lock type
-					f.setFlag(ot::LockType::All);
+					f.set(ot::LockType::All);
 				}
 
 				getApplication()->getUiComponent()->lockUI(f);
@@ -2238,17 +2238,17 @@ void CartesianMeshCreation::setUILock(bool flag, lockType type)
 					switch (type)
 					{
 					case ANY_OPERATION:
-						f.setFlag(ot::LockType::All);
+						f.set(ot::LockType::All);
 						break;
 					case MODEL_CHANGE:
-						f.setFlag(ot::LockType::ModelWrite);
-						f.setFlag(ot::LockType::NavigationWrite);
-						f.setFlag(ot::LockType::ViewWrite);
-						f.setFlag(ot::LockType::Properties);
+						f.set(ot::LockType::ModelWrite);
+						f.set(ot::LockType::NavigationWrite);
+						f.set(ot::LockType::ViewWrite);
+						f.set(ot::LockType::Properties);
 						break;
 					default:
 						assert(0); // Unknown lock type
-						f.setFlag(ot::LockType::All);
+						f.set(ot::LockType::All);
 					}
 
 					getApplication()->getUiComponent()->unlockUI(f);

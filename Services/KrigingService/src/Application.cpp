@@ -98,7 +98,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 
 	ot::Flags<ot::LockTypes> modelWrite;
-	modelWrite.setFlag(ot::LockType::LockModelWrite);
+	modelWrite.set(ot::LockType::LockModelWrite);
 
 	_ui->addMenuButton("Post Processing", "Data", "Import", "Import", modelWrite, "Kriging", "Default");
 	_ui->addMenuButton("Post Processing", "Data", "Export", "Export", modelWrite, "Kriging", "Default");

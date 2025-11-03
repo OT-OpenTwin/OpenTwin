@@ -65,4 +65,4 @@ namespace ot {
 	OT_CORE_API_EXPORT LogFlags logFlagsFromJsonArray(const ConstJsonArray& _flagsArray);
 
 }
-OT_ADD_FLAG_FUNCTIONS(ot::LogFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::LogFlag, ot::LogFlags)

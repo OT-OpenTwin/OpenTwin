@@ -60,22 +60,22 @@ public:
 	void setWebsocketUrl(const std::string& _websocketUrl) { m_websocketUrl = _websocketUrl; };
 	const std::string& getWebsocketUrl(void) const { return m_websocketUrl; };
 
-	void setIsDebug(bool _isDebug = true) { m_state.setFlag(Service::IsDebug, _isDebug); };
+	void setIsDebug(bool _isDebug = true) { m_state.set(Service::IsDebug, _isDebug); };
 	bool isDebug() const { return m_state & Service::IsDebug; };
 
-	void setRequested(bool _requested = true) { m_state.setFlag(Service::Requested, _requested); };
+	void setRequested(bool _requested = true) { m_state.set(Service::Requested, _requested); };
 	bool isRequested() const { return m_state & Service::Requested; };
 
-	void setAlive(bool _alive = true) { m_state.setFlag(Service::Alive, _alive); };
+	void setAlive(bool _alive = true) { m_state.set(Service::Alive, _alive); };
 	bool isAlive() const { return m_state & Service::Alive; };
 
-	void setRunning(bool _running = true) { m_state.setFlag(Service::Running, _running); };
+	void setRunning(bool _running = true) { m_state.set(Service::Running, _running); };
 	bool isRunning() const { return m_state & Service::Running; };
 
-	void setShuttingDown(bool _shuttingDown = true) { m_state.setFlag(Service::ShuttingDown, _shuttingDown); };
+	void setShuttingDown(bool _shuttingDown = true) { m_state.set(Service::ShuttingDown, _shuttingDown); };
 	bool isShuttingDown() const { return m_state & Service::ShuttingDown; };
 
-	void setHidden(bool _hidden) { m_state.setFlag(Service::Hidden, _hidden); };
+	void setHidden(bool _hidden) { m_state.set(Service::Hidden, _hidden); };
 	bool isHidden() const { return m_state & Service::Hidden; };
 
 	//! @brief Will return the port numbers used by this service.
@@ -98,4 +98,4 @@ private:
 	ServiceState     m_state;        //! @brief Service state.
 };
 
-OT_ADD_FLAG_FUNCTIONS(Service::ServiceStateFlag)
+OT_ADD_FLAG_FUNCTIONS(Service::ServiceStateFlag, Service::ServiceState)
