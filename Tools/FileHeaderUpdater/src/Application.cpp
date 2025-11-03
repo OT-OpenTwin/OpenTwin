@@ -577,11 +577,11 @@ Application::Config Application::loadConfigFile(const std::string& _fileName) {
 
 	// Read keyword ignore
 	if (doc.HasMember("Keyword.Ignore") && doc["Keyword.Ignore"].IsString()) {
-		std::string keywordLower = doc["Keyword.Ignore"].GetString();
-		std::transform(keywordLower.begin(), keywordLower.end(), keywordLower.begin(),
+		cfg.keywordIgnore = doc["Keyword.Ignore"].GetString();
+		std::transform(cfg.keywordIgnore.begin(), cfg.keywordIgnore.end(), cfg.keywordIgnore.begin(),
 			[](unsigned char c) { return std::tolower(c); });
 
-		fillFileSignatureMap(keywordLower, cfg.keywordIgnoreSignatures);
+		fillFileSignatureMap(cfg.keywordIgnore, cfg.keywordIgnoreSignatures);
 	}
 	else {
 		logE("Invalid config file format: Missing or invalid \"Keyword.Ignore\" string");
@@ -718,7 +718,7 @@ void Application::showHelp() {
 	log("  --preview              Shows the modified files data, will enable --dry               [Optional]");
 	log("  --help, -h             Shows this help message                                        [Optional]");
 	log("  --showconfig           Shows the currently imported config                            [Optional]");
-	log("  --notifychangeonly     Only notifies about changes (ignored/empty files are skipped   [Optional]");
+	log("  --notifychangeonly     Only notifies about changes (ignored/empty files are skipped)  [Optional]");
 	log("");
 	log("Config file format (JSON):");
 	log("{");
@@ -754,6 +754,7 @@ void Application::showConfig() {
 	log("Warn Invalid Chars:   " + std::string(m_config.warnInvalidChars ? "True" : "False"));
 	log("Notify Change Only:   " + std::string(m_config.notifyChangeOnly ? "True" : "False"));
 	log("Keyword Start:        \"" + m_config.keywordStart + "\"");
+	log("Keyword Ignore:       \"" + m_config.keywordIgnore + "\"");
 	log("Keyword End:          \"" + m_config.keywordEnd + "\"");
 	log("Header Line Prefix:   \"" + m_config.headerLinePrefix + "\"");
 	log("Root Directories:");

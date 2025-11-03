@@ -5,3 +5,4 @@ Developer Tools
    :maxdepth: 3
 
    otoolkit
+   file_header_updater

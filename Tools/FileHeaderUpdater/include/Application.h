@@ -75,12 +75,13 @@ private:
 		bool addFileName = false;
 		bool addLicenseTitle = false;
 		std::string keywordStart;
+		std::string keywordIgnore;
+		std::string headerLinePrefix;
+		std::string keywordEnd;
+		std::list<std::string> licenseLines;
 		std::map<std::string, FileSignature> signatureMap;
 		std::map<std::string, FileSignature> keywordStartSignatures;
 		std::map<std::string, FileSignature> keywordIgnoreSignatures;
-		std::string keywordEnd;
-		std::string headerLinePrefix;
-		std::list<std::string> licenseLines;
 		std::list<std::string> rootDirectories;
 		std::list<std::string> blacklistDirectories;
 		std::list<std::string> fileExtensions;
