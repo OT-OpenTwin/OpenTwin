@@ -292,7 +292,7 @@ void VtkDriverCartesianVectorfield::AssembleNode(vtkAlgorithmOutput * input, osg
 	{
 		throw std::invalid_argument("Unsuported 2D3D visualization type");
 	}
-	//Banded filter für Contour! 
+	// Banded filter for Contour! 
 	if (visualization == nullptr)
 	{
 		throw std::logic_error("Failed to create a visualization output.");

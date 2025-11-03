@@ -327,7 +327,7 @@ namespace ltspice {
                     out.isBinary = isBin;
                     break;
                 }
-                // collect line → UTF-8
+                // collect line -> UTF-8
                 while (pos + 1 < s.size()) {
                     uint16_t w = read_u16(pos); pos += 2;
                     if (w == u'\n') { out.utf8_header.push_back('\n'); break; }
@@ -387,7 +387,7 @@ namespace ltspice {
 
             // ---------- Complex datasets: ONLY uniform (freq is float or double like others) ----------
             if (isComplex) {
-                // Use flags hint first (float), then double, then the other width with ±1 var
+                // Use flags hint first (float), then double, then the other width with +-1 var
                 if (flagsHasFloat) {
                     for (auto nv : nvCandidates) if (matches_uniform(nv, 4)) return BinaryLayout{ LayoutKind::Uniform, 4, nv };
                     for (auto nv : nvCandidates) if (matches_uniform(nv, 8)) return BinaryLayout{ LayoutKind::Uniform, 8, nv };
@@ -663,7 +663,7 @@ namespace ltspice {
         }
 
         if (bom == Utf16Bom::None) {
-            // Not UTF-16 → parse as usual via 8-bit stream
+            // Not UTF-16 -> parse as usual via 8-bit stream
             std::istringstream iss(blob);
             iss.seekg(0, std::ios::beg);
             return read(iss);
@@ -717,7 +717,7 @@ namespace ltspice {
                 }
             }
 
-            // Infer layout: supports Mixed (var0=double, others float/double) & Uniform, with ±1 var tolerance
+            // Infer layout: supports Mixed (var0=double, others float/double) & Uniform, with +-1 var tolerance
             auto layoutOpt = infer_layout_from_payload(payload.size(),
                 data.variablesCount(),
                 data.points(),
@@ -771,7 +771,7 @@ namespace ltspice {
             parseBinaryPayloadWithLayout(payloadStream, data, layout);
         }
         else {
-            // ASCII Values are UTF-16 too → decode remainder to UTF-8 then parse
+            // ASCII Values are UTF-16 too -> decode remainder to UTF-8 then parse
             std::string utf8_values;
             auto read_u16 = [&](std::size_t at)->uint16_t {
                 if (bom == Utf16Bom::LE) return uint16_t(uint8_t(blob[at]) | (uint16_t(uint8_t(blob[at + 1])) << 8));

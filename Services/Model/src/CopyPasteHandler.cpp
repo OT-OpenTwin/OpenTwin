@@ -57,7 +57,7 @@ void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitie
 		}
 		if (counter == safetyLimit)
 		{
-			OT_LOG_E("Infinit loop protection. Failed to execute a paste of " + oldName+ " because of entitíes number of entities with the same postfix exceed number of : " + std::to_string(safetyLimit));
+			OT_LOG_E("Infinit loop protection. Failed to execute a paste of " + oldName+ " because of entities number of entities with the same postfix exceed number of : " + std::to_string(safetyLimit));
 		}
 		else
 		{

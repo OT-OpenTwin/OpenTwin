@@ -133,8 +133,8 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 		// 
 		// We need to update the topology entity here because it is only restored or 
 		// re-visualized when its storage version changes. 
-		// Adding only the data entity does not update the topology entity’s storage version, 
-		// and therefore does not trigger re-visualization in `updateModelStateForUndoRedo`.
+		// Adding only the data entity does not update the topology entities storage version, 
+		// and therefore does not trigger re-visualization in 'updateModelStateForUndoRedo'.
 		_model->updateTopologyEntities(topoEntID, topoEntVers, "Rotation and blockitem position changed", false);
 
 	}

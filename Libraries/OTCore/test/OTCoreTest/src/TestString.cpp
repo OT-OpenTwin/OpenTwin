@@ -364,23 +364,24 @@ TEST(StringTests, Hex_Basic) {
 }
 
 TEST(StringTests, Hex_WithUmlauts1) {
-	// "Ä" in UTF-8 = 0xC3 0x84
-	const std::string input = u8"Ä";
+	// "Ae" with umlauts in UTF-8 = 0xC3 0x84
+	const std::string input = "\xC3\x84";
 	std::string result = ot::String::toHex(input);
 
 	EXPECT_EQ(result, "c384");
 }
 
 TEST(StringTests, Hex_WithUmlauts2) {
-	// "Überprüfung" in UTF-8 = 0xC3 0x9C 0x62 0x65 0x72 0x70 0x72 0xFC 0x66 0x75 0x6E 0x67
-	const std::string input = u8"Überprüfung";
+	// "Ueberpruefung" with umlauts in UTF-8 = 0xC3 0x9C 0x62 0x65 0x72 0x70 0x72 0xFC 0x66 0x75 0x6E 0x67
+	const std::string input = "\xC3\x9C\x62\x65\x72\x70\x72\xFC\x66\x75\x6E\x67";
 	std::string result = ot::String::toHex(input);
 
 	EXPECT_EQ(result, "c39c6265727072c3bc66756e67");
 }
 
 TEST(StringTests, Hex_Empty) {
-	const std::string input = u8"Überprüfung";
+	// "Ueberpruefung" with umlauts in UTF-8 = 0xC3 0x9C 0x62 0x65 0x72 0x70 0x72 0xFC 0x66 0x75 0x6E 0x67
+	const std::string input = "\xC3\x9C\x62\x65\x72\x70\x72\xFC\x66\x75\x6E\x67";
 	const std::string result = ot::String::toHex(input);
 	const std::string inverse = ot::String::fromHex(result);
 	EXPECT_EQ(input, inverse);
@@ -424,16 +425,16 @@ TEST(StringTests, Base64Url_Basic) {
 }
 
 TEST(StringTests, Base64Url_WithUmlauts1) {
-	// "Ä" in UTF-8 = 0xC3 0x84
-	const std::string input = u8"Ä";
+	// "Ae" with umlauts in UTF-8 = 0xC3 0x84
+	const std::string input = "\xC3\x84";
 	std::string result = ot::String::toBase64Url(input);
 
 	EXPECT_EQ(result, "w4Q");
 }
 
 TEST(StringTests, Base64Url_WithUmlauts2) {
-	// "Ä" in UTF-8 = 0xC3 0x84
-	const std::string input = u8"Überprüfung";
+	// "Ueberpruefung" with umlauts in UTF-8 = 0xC3 0x9C 0x62 0x65 0x72 0x70 0x72 0xFC 0x66 0x75 0x6E 0x67
+	const std::string input = "\xC3\x9C\x62\x65\x72\x70\x72\xFC\x66\x75\x6E\x67";
 	std::string result = ot::String::toBase64Url(input);
 	const std::string expected = "w5xiZXJwcsO8ZnVuZw";
 	EXPECT_EQ(result, expected);
@@ -459,7 +460,8 @@ TEST(StringTests, Base64Url_AllBytes) {
 }
 
 TEST(StringTests, Base64Url_Inverse1) {
-	std::string input = u8"Überprüfung";
+	// "Ueberpruefung" with umlauts in UTF-8 = 0xC3 0x9C 0x62 0x65 0x72 0x70 0x72 0xFC 0x66 0x75 0x6E 0x67
+	const std::string input = "\xC3\x9C\x62\x65\x72\x70\x72\xFC\x66\x75\x6E\x67";
 	const std::string encoded = ot::String::toBase64Url(input);
 	const std::string decoded = ot::String::fromBase64Url(encoded);
 	EXPECT_EQ(input, decoded);

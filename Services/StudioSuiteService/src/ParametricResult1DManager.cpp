@@ -363,12 +363,11 @@ std::list<std::shared_ptr<ParameterDescription>> ParametricResult1DManager::extr
 //					newMetadataQuantity.quantityName = newMetadataQuantity.quantityName + "_" + std::to_string(i);
 //					quantityMetadataByName = _quantitiesByName.find(newMetadataQuantity.quantityName);
 //				} while (quantityMetadataByName != _quantitiesByName.end());
-//
-//				Name eventuell mit _ erweitern
-//				Originalen Namen behalten, ansonsten 
+//              Extend name with _
+//              Keep original name, otherwise
 //				dataDescription.quantityName = newInternalName
-//				Einmal einen UniqueName und dann ein Label. UniqueName = Label, außer UniqueName existiert bereits. Dann wird nämlich hochgezählt
-//				Das löst aber nicht das Problem bei Verteilung. Es kann sein, dass zwei Datensätze parallel hinzugefügt werden. Die UID unterscheidet sich. Der Unique Name ist aber identisch.
+//				UniqueName and a Label. UniqueName = Label, except UniqueName already exists. Then the counter will be inceremented.
+//              This won't resolte the issue in distributed environments. It can be that two datasets are added in parallel. The UID will be different. But the Unique Name is identical.
 //				_quantitiesByName[newMetadataQuantity.quantityName] = newMetadataQuantity;
 //			}
 //		}

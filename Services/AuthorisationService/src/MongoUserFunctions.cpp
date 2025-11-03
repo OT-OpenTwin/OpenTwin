@@ -35,12 +35,12 @@
 
 /*
 	These functions must cover the following functionalities
-	1) Register ✅
-	2) Fetch User Data ✅
-	3) Fetch All Users ✅
-	4) Remove User ✅
-	5) Update Username ✅ (Not fully working, the _id field CANNOT BE CHANGED)
-	6) Change User Password  ✅
+	1) Register
+	2) Fetch User Data
+	3) Fetch All Users
+	4) Remove User
+	5) Update Username (Not fully working, the _id field CANNOT BE CHANGED)
+	6) Change User Password
 */
 
 std::set<std::string> authenticatedUserTokens;

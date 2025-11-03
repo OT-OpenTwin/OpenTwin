@@ -42,8 +42,8 @@ public:
 	void SimulateMultipleTimesteps();
 	void ExecuteOneTimeStepNoParallelization(int currentTimestep);
 
-private:
-	std::vector<ResultPipeline*> _resultPipelines; //Könnte eine rP hinzufügen, welche den enthaltenen Energiewert berechnet. Diese wird in der Loop standardmäßig ausgeführt aber kann zu einer vorzeitigen abbruchbedingung führen.
+private: 
+	std::vector<ResultPipeline*> _resultPipelines; // Could add rP, which calculates the received energy value. This will be performed in a loop by default but could lead to an abort
 	std::vector<Port<float>*> _ports;
 	//Wenn  DegreesOfFreedom eine abstrakte API (kein DoF3D) erhalten, dann kann das ganze auch FITTD anstelle FITTD3D nutzen.
 	FITTD3DLoop<float> * _simulation;

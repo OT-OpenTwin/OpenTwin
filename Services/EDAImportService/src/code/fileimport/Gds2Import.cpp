@@ -273,7 +273,7 @@ std::vector<MyPolygon> Gds2Import::getStrRefPolygons(Gds2Structure& structure, s
 
 		if (referencedStruct.getStructRef().size() > 0) {
 			getStrRefPolygons(referencedStruct, structMap, polygons);
-			// TODO Hier noch zukünftiges return value verarbeiten
+			//! @todo Process return value
 		}
 		for (auto& polygon : refPoly) {
 			std::vector<std::pair<int, int>> coords = polygon.getCoordinates();
@@ -303,7 +303,7 @@ std::pair<std::vector<MyPolygon>, std::vector<Gds2Path>> Gds2Import::getStrRefDa
 
 		if (referencedStruct.getStructRef().size() > 0) {
 			getStrRefData(referencedStruct, structMap, strRefData);
-			// TODO Hier noch zukünftiges return value verarbeiten
+			//! @todo Process return value
 		}
 		for (auto& polygon : refPoly) {
 			std::vector<std::pair<int, int>> coords = polygon.getCoordinates();

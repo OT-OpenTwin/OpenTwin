@@ -84,7 +84,7 @@ void ResultManager::getParametricCombinations(const std::string& logFileName, st
 
 	// Finally, we need to process each line and extract its parameter combinations
 	std::vector<std::pair<std::string, double>> params;
-	std::regex stepRegex(R"((\w+)=([-+]?\d*\.?\d+))"); // Regex f�r Parameter=Wert
+	std::regex stepRegex(R"((\w+)=([-+]?\d*\.?\d+))"); // Regex for Parameter=Value
 	std::smatch match;
 
 	for (auto line : stepLines)

@@ -38,9 +38,9 @@ public:
 
 	double theta = 0.01;
 	double nugget = 2.220446049250313e-14;
-	// Correlation function type = [‘abs_exp’, ‘squar_exp’, ‘act_exp’, ‘matern52’, ‘matern32’] default = squar_exp
+	// Correlation function type = ['abs_exp', 'squar_exp', 'act_exp', 'matern52', 'matern32'] default = squar_exp
 	string corr = "squar_exp"; //  ['abs_exp', 'squar_exp', 'matern52', 'matern32']
-	// Regression function type = [‘constant’, ‘linear’, ‘quadratic’] default = constant
+	// Regression function type = ['constant', 'linear', 'quadratic'] default = constant
 	string poly = "linear";
 
 	void printIt() {

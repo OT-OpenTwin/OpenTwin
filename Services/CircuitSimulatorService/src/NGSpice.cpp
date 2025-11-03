@@ -903,7 +903,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 	std::vector<std::string> namesOfCurrentMeter;
 	std::vector<std::string> nameOfRShunts;
 	std::unordered_set<std::string> usedModels;
-	int rshuntCounter = 1; // Initialisiere den Zähler
+	int rshuntCounter = 1; // Initialize the counter
 	// I need to get the type of Simulation to set then the voltage source if its ac dc or tran
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
