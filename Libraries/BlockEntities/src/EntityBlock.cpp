@@ -178,7 +178,9 @@ void EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 	storage.append(
 		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(m_coordinate2DEntityID)),
 		bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName),
-		bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_graphicsPickerKey)
+		bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_graphicsPickerKey),
+		bsoncxx::builder::basic::kvp("NavigationIconVisible", m_navigationTreeIcon.visibleIcon),
+		bsoncxx::builder::basic::kvp("NavigationIconHidden", m_navigationTreeIcon.hiddenIcon)
 	);
 
 	auto connectorsArray = bsoncxx::builder::basic::array();
@@ -204,6 +206,17 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 		ot::Connector connector;
 		connector.DeserializeBSON(subDocument);
 		m_connectorsByName[connector.getConnectorName()]=(connector);
+	}
+
+	auto iconVisibleIt = doc_view.find("NavigationIconVisible");
+	if (iconVisibleIt != doc_view.end())
+	{
+		m_navigationTreeIcon.visibleIcon = iconVisibleIt->get_utf8().value.data();
+	}
+	auto iconHiddenIt = doc_view.find("NavigationIconHidden");
+	if (iconHiddenIt != doc_view.end())
+	{
+		m_navigationTreeIcon.hiddenIcon = iconHiddenIt->get_utf8().value.data();
 	}
 
 	auto pickerIt = doc_view.find("GraphicsPickerKey");
