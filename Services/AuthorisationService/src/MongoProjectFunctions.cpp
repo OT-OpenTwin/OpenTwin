@@ -302,7 +302,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 
 
 	std::string regexFilter = ".*" + filter + ".*";
-	auto regex = bsoncxx::types::b_regex(regexFilter, "");
+	auto regex = bsoncxx::types::b_regex(regexFilter, "i");
 
 
 	value filterDoc = document{}
