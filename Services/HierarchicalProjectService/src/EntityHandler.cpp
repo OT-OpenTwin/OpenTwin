@@ -74,47 +74,72 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 		newEntities.addTopologyEntity(container);
 	}
 
-	const std::string serviceName = Application::instance().getServiceName();
+	const std::string newEntityName = c_projectsFolder + "/" + _projectInfo.getProjectName();
 
-	// Create coordinates
-	EntityCoordinates2D blockCoordinates;
-	blockCoordinates.setEntityID(_modelComponent->createEntityUID());
-	blockCoordinates.setOwningService(serviceName);
-	blockCoordinates.storeToDataBase();
-
-	// Create block
-	EntityBlockHierarchicalProjectItem blockEntity;
-	blockEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
-	blockEntity.setOwningService(serviceName);
-	blockEntity.setEntityID(_modelComponent->createEntityUID());
-	blockEntity.setName(CreateNewUniqueTopologyName(c_projectsFolder, _projectInfo.getProjectName()));
-	blockEntity.setCoordinateEntity(blockCoordinates);
-	blockEntity.setGraphicsScenePackageChildName(c_projectsFolderName);
-
-	// Initialize project information
-	blockEntity.createProperties();
-	blockEntity.setProjectInformation(_projectInfo);
-
-	// Read preview image if existing
-	std::vector<char> previewImageData;
-	ot::ImageFileFormat previewImageFormat = ot::ImageFileFormat::PNG;
-	if (ModelState::readProjectPreviewImage(_projectInfo.getCollectionName(), previewImageData, previewImageFormat)) {
-		// Create data entity for preview image
-		EntityBinaryData previewImageDataEntity;
-		previewImageDataEntity.setOwningService(serviceName);
-		previewImageDataEntity.setEntityID(_modelComponent->createEntityUID());
-		previewImageDataEntity.setData(std::move(previewImageData));
-		previewImageDataEntity.storeToDataBase();
-		blockEntity.setPreviewFile(previewImageDataEntity, previewImageFormat);
-		newEntities.addDataEntity(blockCoordinates.getEntityID(), previewImageDataEntity);
+	// Check if project already exists
+	std::list<std::string> existingProjects = ot::ModelServiceAPI::getListOfFolderItems(c_projectsFolder);
+	bool hasProject = false;
+	for (const std::string& childName : existingProjects) {
+		if (childName == newEntityName) {
+			hasProject = true;
+			break;
+		}
 	}
 
-	// Store to DB
-	blockEntity.storeToDataBase();
+	if (!hasProject) {
+		const std::string serviceName = Application::instance().getServiceName();
 
-	newEntities.addDataEntity(blockEntity, blockCoordinates);
-	newEntities.addTopologyEntity(blockEntity);
+		// Create coordinates
+		EntityCoordinates2D blockCoordinates;
+		blockCoordinates.setEntityID(_modelComponent->createEntityUID());
+		blockCoordinates.setOwningService(serviceName);
+		blockCoordinates.storeToDataBase();
 
+		// Create block
+		EntityBlockHierarchicalProjectItem blockEntity;
+		blockEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		blockEntity.setOwningService(serviceName);
+		blockEntity.setEntityID(_modelComponent->createEntityUID());
+		blockEntity.setName(newEntityName);
+		blockEntity.setCoordinateEntity(blockCoordinates);
+		blockEntity.setGraphicsScenePackageChildName(c_projectsFolderName);
+
+		// Initialize project information
+		blockEntity.createProperties();
+		blockEntity.setProjectInformation(_projectInfo);
+
+		// Read preview image if existing
+		std::vector<char> previewImageData;
+		ot::ImageFileFormat previewImageFormat = ot::ImageFileFormat::PNG;
+		if (ModelState::readProjectPreviewImage(_projectInfo.getCollectionName(), previewImageData, previewImageFormat)) {
+			// Create data entity for preview image
+			EntityBinaryData previewImageDataEntity;
+			previewImageDataEntity.setOwningService(serviceName);
+			previewImageDataEntity.setEntityID(_modelComponent->createEntityUID());
+			previewImageDataEntity.setData(std::move(previewImageData));
+			previewImageDataEntity.storeToDataBase();
+			blockEntity.setPreviewFile(previewImageDataEntity, previewImageFormat);
+			newEntities.addDataEntity(blockCoordinates.getEntityID(), previewImageDataEntity);
+		}
+
+		// Store to DB
+		blockEntity.storeToDataBase();
+
+		newEntities.addDataEntity(blockEntity, blockCoordinates);
+		newEntities.addTopologyEntity(blockEntity);
+	}
+	else {
+		if (ot::LogDispatcher::mayLog(ot::WARNING_LOG)) {
+			OT_LOG_W("Child project \"" + _projectInfo.getProjectName() + "\" was already added. Remove existing child project item before adding it again.");
+		}
+		else if (Application::instance().isUiConnected()) {
+			Application::instance().getUiComponent()->displayStyledMessage(ot::StyledTextBuilder() 
+				<< "[" << ot::StyledText::Warning << "WARNING" << ot::StyledText::ClearStyle 
+				<< "] Child project \"" << _projectInfo.getProjectName() << "\" was already added. Remove existing child project item before adding it again."
+			);
+		}
+		
+	}
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added Child Project: " + _projectInfo.getProjectName());
 }
 
