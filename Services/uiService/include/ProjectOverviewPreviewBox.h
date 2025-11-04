@@ -44,19 +44,22 @@ namespace ot {
 		ProjectOverviewPreviewBox(QWidget* _parent = nullptr);
 		virtual ~ProjectOverviewPreviewBox();
 
-		void unsetProject();
+		void unsetProject(bool _instantCollapse = false);
 		void setProject(const ExtendedProjectInformation& _data);
 
 	private Q_SLOTS:
 		void slotDelayedCollapse();
+		void slotDelayedExpand();
 		void slotAnimationFinished();
 
 	private:
+		void runAnimation(QAbstractAnimation::Direction _direction);
+
 		const int c_expandedWidth = 300;
 
 		QParallelAnimationGroup m_animation;
+		QTimer m_expandTimer;
 		QTimer m_collapseTimer;
-		bool m_isExpanded;
 
 		ImagePainterWidget* m_imageWidget;
 		Label* m_name;

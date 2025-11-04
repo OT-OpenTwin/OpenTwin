@@ -31,7 +31,7 @@
 #include <QtWidgets/qlayout.h>
 
 ot::ProjectOverviewPreviewBox::ProjectOverviewPreviewBox(QWidget* _parent)
-	: QWidget(_parent), m_isExpanded(false)
+	: QWidget(_parent)
 {
 	// Create widgets
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -88,7 +88,14 @@ ot::ProjectOverviewPreviewBox::ProjectOverviewPreviewBox(QWidget* _parent)
 	animation->setEndValue(c_expandedWidth);
 	animation->setEasingCurve(QEasingCurve::InOutCubic);
 	m_animation.addAnimation(animation);
+
+	m_animation.setDirection(QAbstractAnimation::Forward);
+	m_animation.setCurrentTime(0);
 	connect(&m_animation, &QParallelAnimationGroup::finished, this, &ProjectOverviewPreviewBox::slotAnimationFinished);
+
+	m_expandTimer.setSingleShot(true);
+	m_expandTimer.setInterval(150);
+	connect(&m_expandTimer, &QTimer::timeout, this, &ProjectOverviewPreviewBox::slotDelayedExpand);
 
 	m_collapseTimer.setSingleShot(true);
 	m_collapseTimer.setInterval(500);
@@ -101,18 +108,27 @@ ot::ProjectOverviewPreviewBox::ProjectOverviewPreviewBox(QWidget* _parent)
 
 ot::ProjectOverviewPreviewBox::~ProjectOverviewPreviewBox() {
 	m_collapseTimer.stop();
+	m_expandTimer.stop();
 	m_animation.stop();
 }
 
-void ot::ProjectOverviewPreviewBox::unsetProject() {
+void ot::ProjectOverviewPreviewBox::unsetProject(bool _instantCollapse) {
 	setEnabled(false);
-	m_animation.stop();
-	m_collapseTimer.stop();
-	m_collapseTimer.start();
+
+	m_expandTimer.stop();
+
+	if (_instantCollapse) {
+		slotDelayedCollapse();
+	}
+	else {
+		m_collapseTimer.stop();
+		m_collapseTimer.start();
+	}
 }
 
 void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation& _projectInfo) {
 	m_collapseTimer.stop();
+	m_expandTimer.stop();
 
 	// Set image if available
 	if (!_projectInfo.getImageData().empty()) {
@@ -175,31 +191,38 @@ void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation&
 	m_userGroups->setText(QString::fromStdString(userGroupsString));
 
 	// Expand
-	bool showAnim = false;
-	if (!m_isExpanded) {
-		showAnim = true;
-	}
-	else if (m_animation.state() == QAbstractAnimation::Running) {
-		showAnim = true;
-	}
-
-	if (showAnim) {
-		m_animation.setDirection(QAbstractAnimation::Forward);
-		m_animation.start();
-	}
+	m_expandTimer.start();
 }
 
 void ot::ProjectOverviewPreviewBox::slotDelayedCollapse() {
-	m_animation.setDirection(QAbstractAnimation::Backward);
-	m_animation.start();
+	runAnimation(QAbstractAnimation::Backward);
+}
+
+void ot::ProjectOverviewPreviewBox::slotDelayedExpand() {
+	runAnimation(QAbstractAnimation::Forward);
 }
 
 void ot::ProjectOverviewPreviewBox::slotAnimationFinished() {
 	if (m_animation.direction() == QAbstractAnimation::Forward) {
-		m_isExpanded = true;
 		setEnabled(true);
 	}
+}
+
+void ot::ProjectOverviewPreviewBox::runAnimation(QAbstractAnimation::Direction _direction) {
+	if (m_animation.state() == QAbstractAnimation::Running) {
+		if (m_animation.direction() != _direction) {
+			// Animation is running but in the wrong direction
+			m_animation.setDirection(_direction);
+			m_animation.setCurrentTime(m_animation.totalDuration() - m_animation.currentTime());
+		}
+	}
 	else {
-		m_isExpanded = false;
+		if ((minimumWidth() != c_expandedWidth ||_direction != QAbstractAnimation::Forward) &&
+			(minimumWidth() != 0 || _direction != QAbstractAnimation::Backward))
+		{
+			// Animation is not running and we are not already in the target state
+			m_animation.setDirection(_direction);
+			m_animation.start();
+		}
 	}
 }

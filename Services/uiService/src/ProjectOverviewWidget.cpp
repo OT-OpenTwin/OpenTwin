@@ -307,7 +307,8 @@ void ot::ProjectOverviewWidget::slotOpenRequested(QTreeWidgetItem* _item, int _c
 	if (!entry) {
 		return;
 	}
-	m_previewBox->unsetProject();
+
+	m_previewBox->unsetProject(true);
 
 	Q_EMIT projectOpenRequested(entry->getProjectInformation());
 }
