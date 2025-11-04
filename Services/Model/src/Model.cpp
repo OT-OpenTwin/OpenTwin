@@ -3886,7 +3886,6 @@ void Model::addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, 
 		EntityBase *entity = readEntityFromEntityIDandVersion(nullptr, id, *version, entityMap);
 		assert(entity != nullptr);
 		assert(entity->getEntityType() == EntityBase::TOPOLOGY);
-		version++;
 
 		entityList.push_back(entity);
 
@@ -3900,6 +3899,8 @@ void Model::addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, 
 			removeEntityFromMap(oldEntity, false, false);
 			delete oldEntity;
 		}
+
+		version++;
 	}
 	std::set<std::string> newEntitiesNames;
 	for (EntityBase* newEntity : entityList)
