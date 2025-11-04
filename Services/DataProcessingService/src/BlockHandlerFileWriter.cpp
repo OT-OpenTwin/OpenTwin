@@ -36,6 +36,8 @@
 #include "OTCore/EntityName.h"
 #include "SolverReport.h"
 
+#include "OTCore/EncodingGuesser.h"
+
 BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity, handlerMap)
 {
@@ -91,9 +93,18 @@ void BlockHandlerFileWriter::createFile()
 	textFile.setName(fileName);
 
 	textFile.setFileProperties("", m_fileName, m_fileType);
-	
 	EntityBinaryData data(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 	const std::string fileContent = m_fileStream.str();
+	
+	ot::EncodingGuesser guesser;
+	auto textEncoding = guesser(fileContent.c_str(),fileContent.size());
+	textFile.setTextEncoding(textEncoding);
+
+	if(textEncoding != ot::TextEncoding::EncodingStandard::UTF8)
+	{
+		OT_LOG_D("FileWriter Block: Detected non-UTF-8 encoding for written text file.");
+	}
+	
 
 	data.setData(fileContent.c_str(), fileContent.size());
 	data.storeToDataBase();
