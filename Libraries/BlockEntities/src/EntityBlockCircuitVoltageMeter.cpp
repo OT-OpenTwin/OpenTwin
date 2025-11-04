@@ -38,7 +38,7 @@ EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, Entit
 	icon.hiddenIcon = "VoltMeter";
 	setNavigationTreeIcon(icon);
 
-	setBlockTitle("Voltage Meter");
+	setBlockTitle("VM");
 
 	const std::string connectorNameLeft = "Left4";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
@@ -51,8 +51,8 @@ EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, Entit
 	resetModified();
 }
 
-void EntityBlockCircuitVoltageMeter::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderName,_circuitModelFolderID);
+void EntityBlockCircuitVoltageMeter::createProperties() {
+	EntityBlockCircuitElement::createProperties();
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
 }

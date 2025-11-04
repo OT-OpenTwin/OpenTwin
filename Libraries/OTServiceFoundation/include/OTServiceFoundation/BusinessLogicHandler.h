@@ -26,6 +26,9 @@
 #include <vector>
 #include <list>
 
+// OpenTwin header
+#include "EntityNamingBehavior.h"
+
 //! @brief Common methods for all central service handler classes.
 class OT_SERVICEFOUNDATION_API_EXPORT BusinessLogicHandler
 {
@@ -50,6 +53,7 @@ protected:
 	inline void CheckEssentials();
 
 	std::string CreateNewUniqueTopologyName(std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, int startNumber = 1, bool alwaysNumbered = false);
+	std::string CreateNewUniqueTopologyName(const EntityNamingBehavior& _entityNamingBehavior, std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, int startNumber = 1);
 	std::string CreateNewUniqueTopologyName(const std::string& folderName, const std::string& fileName, int startNumber = 1, bool alwaysNumbered = false);
 	std::vector<std::string> CreateNewUniqueTopologyNames(std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles, int startNumber = 1, bool alwaysNumbered = false);
 	std::vector<std::string> CreateNewUniqueTopologyNames(const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles, int startNumber = 1, bool alwaysNumbered = false);

@@ -30,10 +30,11 @@ public:
 	static std::string className() { return "EntityBlockPython"; }
 	virtual std::string getClassName(void) const override { return EntityBlockPython::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
-	void createProperties(const std::string& scriptFolder, ot::UID scriptFolderID);
+	virtual void createProperties() override;
 	std::string getSelectedScript();
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	virtual bool updateFromProperties() override;
+	void setScriptFolder(const std::string& _scriptFolder, ot::UID _scriptFolderID);
 
 	static const std::string getIconName() { return "Script.svg"; }
 private:

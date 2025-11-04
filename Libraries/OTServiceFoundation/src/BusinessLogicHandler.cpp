@@ -37,6 +37,19 @@ std::string BusinessLogicHandler::CreateNewUniqueTopologyName(std::list<std::str
 	return fullFileName;
 }
 
+std::string BusinessLogicHandler::CreateNewUniqueTopologyName(const EntityNamingBehavior& _entityNamingBehavior, std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, int startNumber) {
+	std::string fullFileName = folderName + "/" + fileName;
+	int count = startNumber;
+	if (_entityNamingBehavior.alwaysNumbered) {
+		fullFileName += _entityNamingBehavior.delimiter + std::to_string(count);
+	}
+	while (std::find(folderContent.begin(), folderContent.end(), fullFileName) != folderContent.end()) {
+		fullFileName = folderName + "/" + fileName + _entityNamingBehavior.delimiter + std::to_string(count);
+		count++;
+	}
+	return fullFileName;
+}
+
 std::string BusinessLogicHandler::CreateNewUniqueTopologyName(const std::string& folderName, const std::string& fileName, int startNumber, bool alwaysNumbered)
 {
 	assert(_modelComponent != nullptr);

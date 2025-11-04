@@ -38,7 +38,7 @@ public:
 	virtual std::string getClassName(void) const override { return EntityBlockDatabaseAccess::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
-	void createProperties();
+	virtual void createProperties() override;
 	void setSelectionSeries(std::list<std::string>& _options, const std::string& _selectedValue);
 
 	std::string getSelectedProjectName();

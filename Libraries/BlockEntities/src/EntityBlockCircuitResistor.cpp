@@ -40,7 +40,7 @@ EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* p
 	icon.hiddenIcon = "ResistorBG";
 	setNavigationTreeIcon(icon);
 
-	setBlockTitle("Resistor");
+	setBlockTitle("R");
 
 	const std::string connectorNameLeft = "Left1";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
@@ -53,9 +53,9 @@ EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* p
 	resetModified();
 }
 
-void EntityBlockCircuitResistor::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {
+void EntityBlockCircuitResistor::createProperties() {
 	EntityPropertiesString::createProperty("Element Property", "Resistance", "200", "default", getProperties());
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderName ,_circuitModelFolderID);
+	EntityBlockCircuitElement::createProperties();
 }
 
 double EntityBlockCircuitResistor::getRotation() {

@@ -38,7 +38,7 @@ EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent,
 	icon.hiddenIcon = "Diod2";
 	setNavigationTreeIcon(icon);
 
-	setBlockTitle("Diode");
+	setBlockTitle("D");
 
 	const std::string connectorNameLeft = "Left2";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
@@ -51,9 +51,9 @@ EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent,
 	resetModified();
 }
 
-void EntityBlockCircuitDiode::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID)
+void EntityBlockCircuitDiode::createProperties()
 {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderName ,_circuitModelFolderID);
+	EntityBlockCircuitElement::createProperties();
 }
 
 std::string EntityBlockCircuitDiode::getFolderName() {

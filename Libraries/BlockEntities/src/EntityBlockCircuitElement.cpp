@@ -26,7 +26,7 @@ EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* par
 	
 }
 
-void EntityBlockCircuitElement::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID)
+void EntityBlockCircuitElement::createProperties()
 {
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
@@ -56,6 +56,13 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 	}
 
 	return true;
+}
+
+EntityNamingBehavior EntityBlockCircuitElement::getNamingBehavior() const {
+	EntityNamingBehavior namingBehavior;
+	namingBehavior.alwaysNumbered = true;
+	namingBehavior.delimiter = "";
+	return namingBehavior;
 }
 
 std::string EntityBlockCircuitElement::getCircuitModel() {

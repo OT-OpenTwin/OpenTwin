@@ -44,7 +44,7 @@ public:
 	static std::string className() { return "EntityBlockStorage"; }
 	virtual std::string getClassName(void) const override { return EntityBlockStorage::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
-	void createProperties();
+	virtual void createProperties() override;
 	virtual bool updateFromProperties() override;
 
 	uint32_t getNumberOfInputs();

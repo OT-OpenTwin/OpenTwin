@@ -38,7 +38,7 @@ EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase*
 	icon.hiddenIcon = "Capacitor";
 	setNavigationTreeIcon(icon);
 
-	setBlockTitle("Capacitor");
+	setBlockTitle("C");
 
 	const std::string connectorNameLeft = "Left7";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
@@ -51,9 +51,9 @@ EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase*
 	resetModified();
 }
 
-void EntityBlockCircuitCapacitor::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID)
+void EntityBlockCircuitCapacitor::createProperties()
 {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderName + "/Capacitor/", _circuitModelFolderID);
+	EntityBlockCircuitElement::createProperties();
 	EntityPropertiesString::createProperty("Element Property", "Capacity", "10uF", "default", getProperties());
 }
 

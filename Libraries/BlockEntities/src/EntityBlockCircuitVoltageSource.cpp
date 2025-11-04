@@ -38,7 +38,7 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 	icon.hiddenIcon = "VoltageSource";
 	setNavigationTreeIcon(icon);
 
-	setBlockTitle("Voltage Source");
+	setBlockTitle("V");
 
 	const std::string connectorPositive = "positivePole";
 	m_positiveConnector = { ot::ConnectorType::In,connectorPositive,connectorPositive };
@@ -51,8 +51,8 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 	resetModified();
 }
 
-void EntityBlockCircuitVoltageSource::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderName,_circuitModelFolderID);
+void EntityBlockCircuitVoltageSource::createProperties() {
+	EntityBlockCircuitElement::createProperties();
 	createDCProperties();
 	createTRANProperties();
 	createACProperties();

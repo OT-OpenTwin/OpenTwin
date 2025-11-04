@@ -29,8 +29,14 @@ class BlockHandler : public BusinessLogicHandler, public ot::GraphicsActionHandl
 public:
 	BlockHandler() = default;
 	~BlockHandler() = default;
-
+	
+	bool addViewBlockRelation(std::string _viewName, ot::UID _blockId, ot::UID _connectionId);
 protected:
 	virtual ot::ReturnMessage graphicsItemChanged(const ot::GraphicsItemCfg* _item) override;
 	virtual ot::ReturnMessage graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData) override;
+	virtual ot::ReturnMessage graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) override;
+
+private:
+	std::unordered_map<std::string, std::unordered_map<ot::UID, ot::UID>> m_viewBlockConnectionMap;
+	const std::string m_connectionsFolder = "Connections";
 };

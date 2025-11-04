@@ -34,6 +34,18 @@
 #include "OTCommunication/ActionTypes.h"
 #include "EntityBlock.h"
 #include "EntityBlockConnection.h"
+#include "EntityBlockPython.h"
+#include "EntityGraphicsScene.h"
+
+bool BlockHandler::addViewBlockRelation(std::string _viewName, ot::UID _blockId, ot::UID _connectionId) {
+	auto& blocks = m_viewBlockConnectionMap[_viewName];
+	if (blocks.find(_blockId) != blocks.end()) {
+		return false;
+	}
+
+	blocks.emplace(_blockId, _connectionId);
+	return true;
+}
 
 ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _item) {
 	const ot::UID blockID = _item->getUid();
@@ -102,14 +114,12 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 	}
 
 
-
-
 	// Now check the cases and do the update or add 
 	if ((_rotationChanged || _flipChanged) && _positionChanged) {
 		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
 		std::list<bool> forceVis;
-
 		blockEnt->storeToDataBase();
+		coordinateEntity->storeToDataBase();
 
 		dataEntID.push_back(coordinateEntity->getEntityID());
 		dataEntVers.push_back(coordinateEntity->getEntityStorageVersion());
@@ -127,7 +137,6 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 		// As a result, the newly added data entity no longer exists at that point.
 		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Update BlockItem position and rotation", false, false, false);
 
-		coordinateEntity->storeToDataBase();
 		topoEntID.push_back(blockEnt->getEntityID());
 		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
 		forceVis.push_back(false);
@@ -159,14 +168,13 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 	}
 	else {
 		coordinateEntity->storeToDataBase();
-		//blockEnt->storeToDataBase();
+		blockEnt->storeToDataBase();
 
 		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
 		std::list<bool> forceVis;
 
 		dataEntID.push_back(coordinateEntity->getEntityID());
 		dataEntVers.push_back(coordinateEntity->getEntityStorageVersion());
-
 		EntityBase* parent = coordinateEntity->getParent();
 		if (!parent) {
 			OT_LOG_E("Coordinate entity has no parent");
@@ -176,7 +184,7 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 
 
 		// Same as before: we need to combine `addEntitiesToModel` for the data entity 
-        // with `updateTopologyEntity` for the topology entity.
+		// with `updateTopologyEntity` for the topology entity.
 		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntityParentList, "Update BlockItem position", false, false, false);
 		topoEntID.push_back(blockEnt->getEntityID());
 		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
@@ -207,5 +215,64 @@ ot::ReturnMessage BlockHandler::graphicsConnectionChanged(const ot::GraphicsConn
 
 	return ot::ReturnMessage::Ok;
 
+}
+
+ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) {
+	Model* model = Application::instance()->getModel();
+
+	ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
+	std::list<bool> forceVis;
+	
+	EntityBase* entBase = EntityFactory::instance().create(_itemName);
+	if (entBase == nullptr) {
+		OT_LOG_E("Could not create Entity: " + _itemName);
+		return ot::ReturnMessage::Failed;
+	}
+
+	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(entBase);
+	if (blockEnt == nullptr) {
+		OT_LOG_E("Could not cast to EntityBlock: " + entBase->getEntityID());
+		return ot::ReturnMessage::Failed;
+	}
+
+	EntityBase* editorBase = model->findEntityFromName(_viewName);
+	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+
+	std::list<std::string> blocks = model->getListOfFolderItems(_viewName, true);
+	std::string entName = CreateNewUniqueTopologyName(blockEnt->getNamingBehavior(), blocks, _viewName, blockEnt->getBlockTitle());
+	blockEnt->setName(entName);
+	blockEnt->setEditable(true);
+	blockEnt->setGraphicsPickerKey(editor->getGraphicsPickerKey());
+	blockEnt->setOwningService(editor->getOwningService());
+	blockEnt->setEntityID(model->createEntityUID());
+
+	EntityCoordinates2D* blockCoordinates = new EntityCoordinates2D(model->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+	blockCoordinates->setCoordinates(_pos);
+	blockCoordinates->storeToDataBase();
+
+	blockEnt->setCoordinateEntityID(blockCoordinates->getEntityID());
+	blockEnt->createProperties();
+	if (blockEnt->getClassName() == "EntityBlockPython") {
+		EntityBlockPython* pythonBlock = dynamic_cast<EntityBlockPython*>(blockEnt);
+		if (pythonBlock == nullptr) {
+			OT_LOG_E("Could not cast to EntityBlockPython: " + blockEnt->getEntityID());
+			return ot::ReturnMessage::Failed;
+		}
+		ot::EntityInformation entityInfo;
+		EntityBase* entity = model->findEntityFromName(ot::FolderNames::PythonScriptFolder);
+		pythonBlock->setScriptFolder(ot::FolderNames::PythonScriptFolder, entity->getEntityID());
+	}
+
+	blockEnt->storeToDataBase();
+
+	topoEntID.push_back(blockEnt->getEntityID());
+	topoEntVers.push_back(blockEnt->getEntityStorageVersion());
+	forceVis.push_back(false);
+	dataEntID.push_back(blockCoordinates->getEntityID());
+	dataEntVers.push_back(blockCoordinates->getEntityStorageVersion());
+	dataEntParent.push_back(blockEnt->getEntityID());
+	model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Added block", true, true, true);
+
+	return ot::ReturnMessage::Ok;
 }
 

@@ -28,7 +28,7 @@ public:
 	static std::string className() { return "EntityBlockCircuitVoltageMeter"; }
 	virtual std::string getClassName(void) const override { return "EntityBlockCircuitVoltageMeter"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
-	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
+	virtual void createProperties() override;
 	virtual std::string getTypeAbbreviation() override;
 	virtual std::string getFolderName() override;
 

@@ -30,7 +30,7 @@ public:
 	virtual std::string getClassName(void) const override { return EntityBlockFileWriter::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
-	void createProperties();
+	virtual void createProperties() override;
 	const std::string& getHeadline();
 	const std::string& getFileName();
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;

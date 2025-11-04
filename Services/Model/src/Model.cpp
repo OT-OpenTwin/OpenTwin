@@ -231,7 +231,7 @@ void Model::resetToNew()
 
 	if (typeManager.hasCircuitsRoot())
 	{
-		EntityBase* entityCircuitsRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		EntityBase* entityCircuitsRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		entityCircuitsRoot->setName(getCircuitsRootName());
 		addEntityToModel(entityCircuitsRoot->getName(), entityCircuitsRoot, entityRoot, true, allNewEntities);
 	}

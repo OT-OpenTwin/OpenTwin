@@ -328,13 +328,7 @@ std::string BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_
 	EntityBlockCircuitElement* element = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
 
 	if (element != nullptr) {
-		// Get the CircuitModel folder infos
-		const std::string circuitModelFolderName = "Circuit Models/" + element->getFolderName();
-		ot::EntityInformation entityInfo;
-		ot::ModelServiceAPI::getEntityInformation(circuitModelFolderName, entityInfo);
-
-	
-		element->createProperties(circuitModelFolderName, entityInfo.getEntityID());
+		element->createProperties();
 		return element->getTypeAbbreviation();
 		
 	} else if(blockEntity->getClassName() != "EntityBlockCircuitGND" && blockEntity->getClassName() != "EntityBlockCircuitConnector") {
@@ -353,30 +347,20 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker() {
 	ot::GraphicsPickerCollectionCfg a2("Meter Elements", "Meter Elements");
 	ot::GraphicsPickerCollectionCfg a3("Sources", "Sources");
 	ot::GraphicsPickerCollectionCfg a4("ActiveElements", "Active Elements");
-
-	EntityBlockCircuitVoltageSource element;
-	EntityBlockCircuitResistor resistor;
-	EntityBlockCircuitDiode diode;
-	EntityBlockCircuitVoltageMeter voltMeter;
-	EntityBlockCircuitCurrentMeter currentMeter;
-	EntityBlockCircuitCapacitor capacitor;
-	EntityBlockCircuitInductor inductor;
-	EntityBlockCircuitGND gndElement;
-	EntityBlockCircuitTransmissionLine transmissionLine;
 	
-	a1.addItem(resistor.getClassName(), resistor.createBlockHeadline(), "CircuitElementImages/ResistorBG.png");
-	a1.addItem(capacitor.getClassName(), capacitor.createBlockHeadline(), "CircuitElementImages/Capacitor.png");
-	a1.addItem(inductor.getClassName(), inductor.createBlockHeadline(), "CircuitElementImages/Inductor.png");
-	a1.addItem(gndElement.getClassName(), gndElement.createBlockHeadline(), "CircuitElementImages/GND.png");
-	a1.addItem(transmissionLine.getClassName(), transmissionLine.createBlockHeadline(), "CircuitElementImages/TranLine.png");
+	a1.addItem(EntityBlockCircuitResistor::className(), "Resistor", "CircuitElementImages/ResistorBG.png");
+	a1.addItem(EntityBlockCircuitCapacitor::className(),"Capacitor", "CircuitElementImages/Capacitor.png");
+	a1.addItem(EntityBlockCircuitInductor::className(), "Inductor", "CircuitElementImages/Inductor.png");
+	a1.addItem(EntityBlockCircuitGND::className(), "GND", "CircuitElementImages/GND.png");
+	a1.addItem(EntityBlockCircuitTransmissionLine::className(), "Transmission Line", "CircuitElementImages/TranLine.png");
 
-	a2.addItem(voltMeter.getClassName(), voltMeter.createBlockHeadline(), "CircuitElementImages/VoltMeter.png");
-	a2.addItem(currentMeter.getClassName(), currentMeter.createBlockHeadline(), "CircuitElementImages/CurrentMeter.png");
+	a2.addItem(EntityBlockCircuitVoltageMeter::className(), "Voltage Meter", "CircuitElementImages/VoltMeter.png");
+	a2.addItem(EntityBlockCircuitCurrentMeter::className(), "Current Meter", "CircuitElementImages/CurrentMeter.png");
 
-	a3.addItem(element.getClassName(), element.createBlockHeadline(), "CircuitElementImages/VoltageSource.png");
+	a3.addItem(EntityBlockCircuitVoltageSource::className(), "Voltage Source", "CircuitElementImages/VoltageSource.png");
 	
 
-	a4.addItem(diode.getClassName(), diode.createBlockHeadline(), "CircuitElementImages/Diod2.png");
+	a4.addItem(EntityBlockCircuitDiode::className(), "Diode", "CircuitElementImages/Diod2.png");
 
 	a.addChildCollection(std::move(a1));
 	a.addChildCollection(std::move(a2));

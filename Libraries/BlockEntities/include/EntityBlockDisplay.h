@@ -30,7 +30,7 @@ public:
 	virtual std::string getClassName(void) const override { return EntityBlockDisplay::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 		
-	void createProperties();
+	virtual void createProperties() override;
 	const std::string& getDescription();
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	const ot::Connector& getConnectorInput() const { return _inputConnector; }

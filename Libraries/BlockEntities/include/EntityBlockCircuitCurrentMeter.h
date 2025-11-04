@@ -28,7 +28,7 @@ public:
 	static std::string className() { return "EntityBlockCircuitCurrentMeter"; }
 	virtual std::string getClassName(void) const override { return EntityBlockCircuitCurrentMeter::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
-	void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
+	void createProperties() override;
 	virtual std::string getTypeAbbreviation() override;
 	virtual std::string getFolderName() override;
 

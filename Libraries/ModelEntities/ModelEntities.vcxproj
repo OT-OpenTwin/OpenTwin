@@ -36,6 +36,7 @@
     <ClInclude Include="include\EntityGraphicsScene.h" />
     <ClInclude Include="include\EntityHierarchicalScene.h" />
     <ClInclude Include="include\EntityInformation.h" />
+    <ClInclude Include="include\EntityNamingBehavior.h" />
     <ClInclude Include="include\EntityResult1DCurve.h" />
     <ClInclude Include="include\EntityResult1DPlot.h" />
     <ClInclude Include="include\EntityResultText.h" />

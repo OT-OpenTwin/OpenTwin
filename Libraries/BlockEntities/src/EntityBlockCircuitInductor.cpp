@@ -38,7 +38,7 @@ EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* p
 	icon.hiddenIcon = "Inductor";
 	setNavigationTreeIcon(icon);
 
-	setBlockTitle("Inductor");
+	setBlockTitle("L");
 
 	const std::string connectorNameLeft = "Left8";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
@@ -51,9 +51,9 @@ EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* p
 	resetModified();
 }
 
-void EntityBlockCircuitInductor::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID)
+void EntityBlockCircuitInductor::createProperties()
 {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderName ,_circuitModelFolderID);
+	EntityBlockCircuitElement::createProperties();
 	EntityPropertiesString::createProperty("Element Property", "Inductance", "100mH", "default", getProperties());
 }
 

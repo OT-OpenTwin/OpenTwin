@@ -21,6 +21,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "PythonHeaderInterpreter.h"
 #include "SharedResources.h"
+#include "PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntityBlockPython> registrar(EntityBlockPython::className());
 
@@ -37,9 +38,9 @@ EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObser
 	resetModified();
 }
 
-void EntityBlockPython::createProperties(const std::string& scriptFolder, ot::UID scriptFolderID)
+void EntityBlockPython::createProperties()
 {
-	EntityPropertiesEntityList::createProperty("Script properties",_propertyNameScripts , scriptFolder, scriptFolderID, "", -1, "default", getProperties());
+	EntityPropertiesEntityList::createProperty("Script properties",_propertyNameScripts , "", ot::invalidUID, "", -1, "default", getProperties());
 }
 
 std::string EntityBlockPython::getSelectedScript()
@@ -82,6 +83,14 @@ bool EntityBlockPython::updateFromProperties()
 	}
 	getProperties().forceResetUpdateForAllProperties();
 	return true;
+}
+
+void EntityBlockPython::setScriptFolder(const std::string& _scriptFolder, ot::UID _scriptFolderID) {
+	auto basePropertyScript = getProperties().getProperty(_propertyNameScripts);
+	auto scriptProperty = dynamic_cast<EntityPropertiesEntityList*>(basePropertyScript);
+
+	scriptProperty->setEntityContainerName(_scriptFolder);
+	scriptProperty->setEntityContainerID(_scriptFolderID);
 }
 
 void EntityBlockPython::updateBlockAccordingToScriptHeader()

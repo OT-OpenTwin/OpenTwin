@@ -38,7 +38,7 @@ EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID I
 	icon.hiddenIcon = "TranLine";
 	setNavigationTreeIcon(icon);
 
-	setBlockTitle("Transmission Line");
+	setBlockTitle("T");
 
 	const std::string connectorNameLeftPos1 = "PositivePole1";
 	m_LeftConnectorPos1 = { ot::ConnectorType::Out,connectorNameLeftPos1,connectorNameLeftPos1 };
@@ -59,8 +59,8 @@ EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID I
 	resetModified();
 }
 
-void EntityBlockCircuitTransmissionLine::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderName,_circuitModelFolderID);
+void EntityBlockCircuitTransmissionLine::createProperties() {
+	EntityBlockCircuitElement::createProperties();
 	EntityPropertiesString::createProperty("Element Property", "Characteristic Impedance", "50", "default", getProperties());
 	EntityPropertiesString::createProperty("Element Property", "Transmission Delay", "10NS", "default", getProperties());
 }

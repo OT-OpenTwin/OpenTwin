@@ -36,7 +36,7 @@ public:
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	virtual bool updateFromProperties() override;
 
-	virtual void createProperties();
+	virtual void createProperties() override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

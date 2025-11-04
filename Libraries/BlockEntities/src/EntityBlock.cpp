@@ -32,6 +32,10 @@ EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, Mo
 	
 }
 
+void EntityBlock::createProperties() {
+
+}
+
 EntityBlock::~EntityBlock()
 {
 	if (m_coordinateEntity != nullptr)

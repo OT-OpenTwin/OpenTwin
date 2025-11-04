@@ -26,6 +26,7 @@
 #include "OTCore/BasicServiceInformation.h"
 #include "EntityCoordinates2D.h"
 #include "OldTreeIcon.h"
+#include "EntityNamingBehavior.h"
 
 #include "Connector.h"
 
@@ -66,6 +67,9 @@ public:
 	const std::string& getGraphicsPickerKey() const { return m_graphicsPickerKey; };
 
 	virtual ot::GraphicsItemCfg* createBlockCfg() = 0;
+	virtual void createProperties();
+
+	virtual EntityNamingBehavior getNamingBehavior() const { return EntityNamingBehavior(); } ;
 
 	std::string createBlockHeadline();
 

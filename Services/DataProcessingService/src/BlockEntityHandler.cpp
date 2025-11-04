@@ -149,7 +149,8 @@ void BlockEntityHandler::initSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	if (pythonBlock != nullptr)
 	{
 		ExternalDependencies dependency;
-		pythonBlock->createProperties(ot::FolderNames::PythonScriptFolder, dependency.getPythonScriptFolderID());
+		pythonBlock->createProperties();
+		pythonBlock->setScriptFolder(ot::FolderNames::PythonScriptFolder, dependency.getPythonScriptFolderID());
 		return;
 	}
 	

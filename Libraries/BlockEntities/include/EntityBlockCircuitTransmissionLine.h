@@ -27,7 +27,7 @@ public:
 	static std::string className() { return "EntityBlockCircuitTransmissionLine"; }
 	virtual std::string getClassName(void) const override { return EntityBlockCircuitTransmissionLine::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
-	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
+	virtual void createProperties() override;
 	std::string getImpedance();
 	std::string getTransmissionDelay();
 	virtual std::string getTypeAbbreviation() override;
