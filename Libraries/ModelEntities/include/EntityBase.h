@@ -130,7 +130,7 @@ public:
 	bool getModified() { return (m_isModified || m_properties.anyPropertyNeedsUpdate()); };
 
 	//! @brief Calls readSpecificDataFromDataBase to load entity specific data from the bson document. Topology entities are added to the entity map. 
-	//! The map is íntended to be the centralized map in the model service, which is only supposed to hold topology entities.
+	//! The map is intended to be the centralized map in the model service, which is only supposed to hold topology entities.
 	void restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
 
 	virtual void addVisualizationNodes() {};
