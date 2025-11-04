@@ -156,7 +156,7 @@ namespace ot {
 		constexpr operator bool() const { return static_cast<bool>(m_data); };
 
 		//! @brief Conversion to underlying storage type (same as calling underlying).
-		constexpr operator Storage() const { return m_data; };
+		explicit constexpr operator Storage() const { return m_data; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

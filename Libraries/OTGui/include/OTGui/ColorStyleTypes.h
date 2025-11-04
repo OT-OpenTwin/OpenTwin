@@ -244,6 +244,7 @@ namespace ot {
 		GraphicsItemHoverBorder,
 		GraphicsItemConnectableBackground,
 		GraphicsItemLineColor,
+		GraphicsItemRubberband,
 
 		StyledTextHighlight,
 		StyledTextLightHighlight,

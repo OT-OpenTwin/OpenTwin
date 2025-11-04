@@ -143,7 +143,7 @@ void ConnectToLoggerDialog::slotDone(void) {
 }
 
 void ConnectToLoggerDialog::slotRecenter(void) {
-	ot::Positioning::centerWidgetOnParent(otoolkit::api::getGlobalInterface()->rootWidget(), static_cast<QWidget*>(this));
+	ot::Positioning::centerWidgetOnParent(otoolkit::api::getGlobalInterface()->rootWidget(), this);
 }
 
 void ConnectToLoggerDialog::slotEnable(void) {

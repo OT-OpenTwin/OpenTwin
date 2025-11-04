@@ -194,6 +194,9 @@
     <ClCompile Include="$(BASE64_ROOT)\base64.c">
       <Filter>Third Party files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ScreenshotDialog.cpp">
+      <Filter>Source Files\ProjectOverview</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -344,6 +347,9 @@
     </QtMoc>
     <QtMoc Include="include\EditProjectInformationDialog.h">
       <Filter>Header Files\CustomWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ScreenshotDialog.h">
+      <Filter>Header Files\ProjectOverview</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

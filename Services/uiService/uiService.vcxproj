@@ -47,6 +47,7 @@
     <ClCompile Include="src\ManageOwner.cpp" />
     <ClCompile Include="src\NavigationSelectionManager.cpp" />
     <ClCompile Include="src\NavigationTreeView.cpp" />
+    <ClCompile Include="src\ScreenshotDialog.cpp" />
     <ClCompile Include="src\ProgressUpdater.cpp" />
     <ClCompile Include="src\ProjectOverviewDelegate.cpp" />
     <ClCompile Include="src\ProjectOverviewEntry.cpp" />
@@ -90,6 +91,7 @@
     <ClInclude Include="include\Datapoints.h" />
     <ClInclude Include="include\DownloadFile.h" />
     <QtMoc Include="include\EditProjectInformationDialog.h" />
+    <QtMoc Include="include\ScreenshotDialog.h" />
     <ClInclude Include="include\ProgressUpdater.h" />
     <QtMoc Include="include\SelectProjectDialog.h" />
     <QtMoc Include="include\ProjectOverviewEntry.h" />

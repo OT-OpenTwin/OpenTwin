@@ -35,22 +35,17 @@ namespace ot {
 		OT_DECL_DEFCOPY(DialogCfg)
 		OT_DECL_DEFMOVE(DialogCfg)
 	public:
-		enum DialogFlag {
-			NoFlags          = 0x00, //! @brief No dialog flags
-			CancelOnNoChange = 0x01, //! @brief If set the UI will silently close the dialog when pressing confim button and the initial data did not change
-			MoveGrabAnywhere = 0x02, //! @brief If set the dialog may be moved around by holding the left mouse button anywhere in the dialog and move.
-			RecenterOnF11    = 0x04  //! @brief If set the dialog will move to the center of the screen if the user presses the "F11" key.
+		enum DialogFlag : uint64_t {
+			NoFlags          = 0 << 0, //! @brief No dialog flags
+			CancelOnNoChange = 1 << 0, //! @brief If set the UI will silently close the dialog when pressing confim button and the initial data did not change
+			MoveGrabAnywhere = 1 << 1, //! @brief If set the dialog may be moved around by holding the left mouse button anywhere in the dialog and move.
+			RecenterOnF11    = 1 << 2, //! @brief If set the dialog will move to the center of the screen if the user presses the "F11" key.
+			
+			CenterOnParent   = 1 << 3, //! @brief Positions this dialog in the middle of the parent widget when showing.
+			FitOnScreen      = 1 << 4, //! @brief Ensures the dialog is fully visible on a single screen when showing.
+			IdealFit         = CenterOnParent | FitOnScreen  //! @brief Combination of flags to achieve an ideal fit on screen.
 		};
 		typedef Flags<DialogFlag> DialogFlags;
-
-		// ###########################################################################################################################################################################################################################################################################################################################
-
-		// Static helper
-
-		static std::string toString(DialogFlag _flag);
-		static DialogFlag stringToFlag(const std::string& _flag);
-		static std::list<std::string> toStringList(DialogFlags _flags);
-		static DialogFlags stringListToFlags(const std::list<std::string>& _flags);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

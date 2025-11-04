@@ -57,11 +57,11 @@ ot::Dialog::Dialog(const DialogCfg& _config, QWidget* _parent)
 
 ot::Dialog::~Dialog() {}
 
-ot::Dialog::DialogResult ot::Dialog::showDialog(const ShowFlags& _showFlags) {
-	if (_showFlags & CenterOnParent && this->parentWidget()) {
+ot::Dialog::DialogResult ot::Dialog::showDialog() {
+	if (m_flags & DialogCfg::CenterOnParent && this->parentWidget()) {
 		Positioning::centerWidgetOnParent(this->parentWidget(), this);
 	}
-	if (_showFlags & FitOnScreen) {
+	if (m_flags & DialogCfg::FitOnScreen) {
 		QRect newRec = Positioning::fitOnScreen(QRect(this->pos(), this->size()));
 		if (this->pos() != newRec.topLeft()) {
 			this->move(newRec.topLeft());

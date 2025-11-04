@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "AppBase.h"
+#include "ScreenshotDialog.h"
 #include "ProjectOverviewPreviewBox.h"
 #include "EditProjectInformationDialog.h"
 #include "ModelState.h"
@@ -34,6 +35,7 @@
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/WidgetView.h"
+#include "OTWidgets/Positioning.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/TagListWidget.h"
 #include "OTWidgets/PlainTextEdit.h"
@@ -286,6 +288,17 @@ void EditProjectInformationDialog::slotTakeScreenshot() {
 	}
 
 	QPixmap pixmap = sourceWidget->grab();
+
+	ot::ScreenshotDialog dia(this);
+	dia.setDialogFlag(ot::DialogCfg::IdealFit);
+	dia.setResultSize(ot::ProjectOverviewPreviewBox::previewImageSize());
+	dia.setPixmap(pixmap);
+
+	if (dia.showDialog() != ot::Dialog::Confirm) {
+		return;
+	}
+
+	pixmap = dia.getResultPixmap();
 
 	setEnabled(false);
 

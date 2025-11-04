@@ -122,6 +122,7 @@
     <ClCompile Include="src\ManagedPropertyLink.cpp" />
     <ClCompile Include="src\ManagedWidgetPropertyObject.cpp" />
     <ClCompile Include="src\PDFWidget.cpp" />
+    <ClCompile Include="src\PixmapEditWidget.cpp" />
     <ClCompile Include="src\Plot.cpp" />
     <ClCompile Include="src\PlotPointMapper.cpp" />
     <ClCompile Include="src\PlotView.cpp" />
@@ -298,6 +299,7 @@
     <QtMoc Include="include\OTWidgets\Painter2DEditDialogRadialGradientEntry.h" />
     <ClInclude Include="include\OTWidgets\Painter2DEditDialogReferenceEntry.h" />
     <QtMoc Include="include\OTWidgets\PDFWidget.h" />
+    <QtMoc Include="include\OTWidgets\PixmapEditWidget.h" />
     <ClInclude Include="include\OTWidgets\Plot.h" />
     <ClInclude Include="include\OTWidgets\PlotPointMapper.h" />
     <ClInclude Include="include\OTWidgets\PlotView.h" />

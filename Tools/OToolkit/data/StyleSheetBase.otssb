@@ -2664,6 +2664,14 @@ ot--IndicatorWidget:disabled {
 
 /* Special Properties */
 
+ot--PixmapEditWidget {
+    border: 1px solid %color:Border Light Color%;
+}
+
+/* ##################################################################################### */
+
+/* Special Properties */
+
 QWidget[OT_TransparentBackground="true"]:!hover:!pressed {
     background: transparent;
 }

@@ -58,22 +58,14 @@ namespace ot {
 		//! @param _mode Mode how to fit the rect on the screen.
 		static QRect fitOnScreen(const QRect& _sourceRect, FitMode _mode = FitByCenter);
 
-		//! @brief Gets the widgets from the provided interfaces and calls centerWidgetOnParent(const QWidget*, QWidget*).
-		//! @ref centerWidgetOnParent(const QWidget*, QWidget*)
-		static bool centerWidgetOnParent(const WidgetBase* _parentWidget, WidgetBase* _childWidget);
-
 		//! @brief Centers this widget on the parent.
 		//! If no parent is provided the widget will center on the primay screen.
 		//! The size of the child won't be affected.
 		static bool centerWidgetOnParent(const QWidget* _parentWidget, QWidget* _childWidget);
 
-		//! @brief Gets the widgets from the provided interfaces and calls getCenterWidgetOnParentRect(const QWidget*, QWidget*).
-		//! @ref getCenterWidgetOnParentRect(const QWidget*, QWidget*)
-		static QRect getCenterWidgetOnParentRect(const WidgetBase* _parentWidget, WidgetBase* _childWidget);
-
 		//! @brief Calculates the top left corner of this widget centered on the parent widget.
 		//! If no parent is provided the widget will center on the screen.
-		static QRect getCenterWidgetOnParentRect(const QWidget* _parentWidget, QWidget* _childWidget);
+		static QRect getCenterWidgetOnParentRect(const QWidget* _parentWidget, const QRect& _childRect);
 
 	};
 }

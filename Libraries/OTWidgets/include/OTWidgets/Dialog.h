@@ -34,7 +34,6 @@ namespace ot {
 	//! @brief Base class for creating customizable dialog windows.
 	//! The Dialog class is used as a base class for dialogs.
 	//! The key features are:
-	//! - Customizable dialog display using ShowFlags.
 	//! - State tracking using DialogStateFlags.
 	//! - Handling of dialog results with predefined result types.
 	//! - Automatic button generation and signal-slot connections for user interactions.
@@ -53,15 +52,6 @@ namespace ot {
 			Retry,   //! @brief Represents a Retry result.
 			Cancel   //! @brief Represents a Cancel result.
 		};
-
-		//! @brief Flags for controlling how the dialog is displayed.
-		enum ShowFlag {
-			DefaultShow = 0 << 0,    //! @brief Default behavior.
-			CenterOnParent = 1 << 0, //! @brief Positions this dialog in the middle of the parent widget.
-			FitOnScreen = 1 << 1,    //! @brief Ensures the dialog fits on any screen.
-			IdealFit = CenterOnParent | FitOnScreen //! @brief Combines centering and fitting.
-		};
-		typedef Flags<ShowFlag> ShowFlags;
 
 		//! @brief Defines different states the dialog can be in.
 		enum class DialogState {
@@ -87,10 +77,11 @@ namespace ot {
 		virtual QWidget* getQWidget() override { return this; };
 		virtual const QWidget* getQWidget() const override { return this; };
 
-		//! @brief Displays the dialog with the specified show flags.
-		//! @param _showFlags Flags determining how the dialog is displayed.
+		//! @brief Displays the dialog.
+		//! Will adjust the dialog position and size based on the configured flags.
+		//! This method blocks until the dialog is closed.
 		//! @return The result of the dialog after it is closed.
-		DialogResult showDialog(const ShowFlags& _showFlags = ShowFlags(IdealFit));
+		DialogResult showDialog();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -196,5 +187,4 @@ namespace ot {
 	};
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::Dialog::ShowFlag, ot::Dialog::ShowFlags)
 OT_ADD_FLAG_FUNCTIONS(ot::Dialog::DialogState, ot::Dialog::DialogStateFlags)

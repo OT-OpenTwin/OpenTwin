@@ -589,6 +589,9 @@
     <ClCompile Include="src\Widget.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\PixmapEditWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1331,6 +1334,9 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\TagListWidget.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PixmapEditWidget.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

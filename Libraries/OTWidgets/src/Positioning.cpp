@@ -24,6 +24,7 @@
 
 // Qt header
 #include <QtGui/qscreen.h>
+#include <QtWidgets/qlayout.h>
 #include <QtWidgets/qapplication.h>
 
 QRect ot::Positioning::calculateChildRect(const QRect& _parentRect, const QSize& _childSize, ot::Alignment _childAlignment) {
@@ -194,21 +195,17 @@ QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, FitMode _mode) {
 	return fittedRect;
 }
 
-bool ot::Positioning::centerWidgetOnParent(const WidgetBase* _parentWidget, WidgetBase* _childWidget) {
-	OTAssertNullptr(_childWidget);
-	const QWidget* parentWidget = nullptr;
-	if (_parentWidget) {
-		parentWidget = _parentWidget->getQWidget();
-	}
-	QWidget* childWidget = nullptr;
-	if (_childWidget) {
-		childWidget = _childWidget->getQWidget();
-	}
-	return Positioning::centerWidgetOnParent(parentWidget, childWidget);
-}
-
 bool ot::Positioning::centerWidgetOnParent(const QWidget* _parentWidget, QWidget* _childWidget) {
-	QRect newRect = Positioning::getCenterWidgetOnParentRect(_parentWidget, _childWidget);
+	QRect childRect;
+	if (_childWidget->layout()) {
+		_childWidget->layout()->activate();
+		childRect = QRect(QPoint(0, 0), _childWidget->layout()->totalSizeHint());
+	}
+	else {
+		childRect = _childWidget->rect();
+	}
+
+	QRect newRect = Positioning::getCenterWidgetOnParentRect(_parentWidget, childRect);
 	if (newRect.isValid()) {
 		_childWidget->move(newRect.topLeft());
 		return true;
@@ -218,35 +215,18 @@ bool ot::Positioning::centerWidgetOnParent(const QWidget* _parentWidget, QWidget
 	}
 }
 
-QRect ot::Positioning::getCenterWidgetOnParentRect(const WidgetBase* _parentWidget, WidgetBase* _childWidget) {
-	OTAssertNullptr(_childWidget);
-	const QWidget* parentWidget = nullptr;
+QRect ot::Positioning::getCenterWidgetOnParentRect(const QWidget* _parentWidget, const QRect& _childRect) {
 	if (_parentWidget) {
-		parentWidget = _parentWidget->getQWidget();
-	}
-	QWidget* childWidget = nullptr;
-	if (_childWidget) {
-		childWidget = _childWidget->getQWidget();
-	}
-	return Positioning::getCenterWidgetOnParentRect(parentWidget, childWidget);
-}
-
-QRect ot::Positioning::getCenterWidgetOnParentRect(const QWidget* _parentWidget, QWidget* _childWidget) {
-	if (!_childWidget) {
-		OT_LOG_EA("No child rect provided");
-		return QRect();
-	}
-	if (_parentWidget) {
-		return Positioning::calculateChildRect(_parentWidget->rect(), _childWidget->size(), Alignment::Center);
+		return Positioning::calculateChildRect(_parentWidget->rect(), _childRect.size(), Alignment::Center);
 	}
 	else {
 		QScreen* screen = QApplication::primaryScreen();
 		if (screen) {
-			return Positioning::calculateChildRect(screen->geometry(), _childWidget->size(), Alignment::Center);
+			return Positioning::calculateChildRect(screen->geometry(), _childRect.size(), Alignment::Center);
 		}
 		else {
 			OT_LOG_EA("Primary screen not found");
-			return QRect();
+			return _childRect;
 		}
 	}
 }

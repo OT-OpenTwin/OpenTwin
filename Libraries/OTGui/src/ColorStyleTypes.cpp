@@ -27,7 +27,7 @@
 namespace ot {
 	namespace intern {
 
-		inline std::map<ot::ColorStyleFileEntry, std::string>& colorStyleFileEntryMap() {
+		static std::map<ot::ColorStyleFileEntry, std::string>& colorStyleFileEntryMap() {
 			static std::map<ot::ColorStyleFileEntry, std::string> g_instance {
 				{ ot::ColorStyleFileEntry::TransparentIcon, "Transparent Icon" },
 
@@ -136,7 +136,7 @@ namespace ot {
 			return g_instance;
 		}
 
-		inline std::map<ot::ColorStyleValueEntry, std::string>& colorStyleValueEntryMap() {
+		static std::map<ot::ColorStyleValueEntry, std::string>& colorStyleValueEntryMap() {
 			static std::map<ot::ColorStyleValueEntry, std::string> g_instance {
 				{ ot::ColorStyleValueEntry::Transparent, "Transparent" },
 
@@ -205,6 +205,7 @@ namespace ot {
 				{ ot::ColorStyleValueEntry::GraphicsItemHoverBorder, "GraphicsItem Hover Border" },
 				{ ot::ColorStyleValueEntry::GraphicsItemConnectableBackground, "GraphicsItem Connectable Background" },
 				{ ot::ColorStyleValueEntry::GraphicsItemLineColor, "GraphicsItem Line Color" },
+				{ ot::ColorStyleValueEntry::GraphicsItemRubberband, "GraphicsItem Rubberband" },
 
 				{ ot::ColorStyleValueEntry::StyledTextHighlight, "Styled Text Highlight" },
 				{ ot::ColorStyleValueEntry::StyledTextLightHighlight, "Styled Light Highlight" },

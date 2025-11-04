@@ -520,7 +520,7 @@ void Logging::slotColumnWidthModeChanged(const QString& _text) {
 			existingNames.push_back(it.first);
 		}
 		LogVisualizerColumnWidthSaveDialog dia(existingNames);
-		ot::Positioning::centerWidgetOnParent(m_root->getViewWidget(), static_cast<QWidget*>(&dia));
+		ot::Positioning::centerWidgetOnParent(m_root->getViewWidget(), &dia);
 		if (dia.showDialog() != ot::Dialog::Ok) {
 			m_cellWidthMode->setCurrentIndex(0);
 			return;
@@ -808,7 +808,7 @@ void Logging::runQuickExport() {
 	}
 
 	QuickLogExport exportDia(m_messages);
-	ot::Positioning::centerWidgetOnParent(m_root->getViewWidget(), static_cast<QWidget*>(&exportDia));
+	ot::Positioning::centerWidgetOnParent(m_root->getViewWidget(), &exportDia);
 
 	if (exportDia.showDialog() == ot::Dialog::Ok) {
 		if (exportDia.isAutoClose()) AppBase::instance()->close();
