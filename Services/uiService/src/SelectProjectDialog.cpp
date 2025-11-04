@@ -26,6 +26,7 @@
 // OpenTwin header
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
+#include "OTWidgets/ToolButton.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
 
@@ -33,28 +34,36 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qlistwidget.h>
 
-SelectProjectDialog::SelectProjectDialog(const ot::DialogCfg& _config)
-	: Dialog(_config)
+SelectProjectDialog::SelectProjectDialog(const ot::DialogCfg& _config, QWidget* _parent)
+	: Dialog(_config, _parent)
 {
 	// Setup widgets
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
-	QHBoxLayout* bottomLayout = new QHBoxLayout;
-
+	
 	m_overview = new ot::ProjectOverviewWidget(this);
 	m_overview->setMultiSelectionEnabled(false);
+	m_overview->setViewMode(AppBase::instance()->getWelcomeScreenViewMode());
 	m_overview->refreshProjects();
 	mainLayout->addWidget(m_overview->getQWidget(), 1);
 
+	QHBoxLayout* bottomLayout = new QHBoxLayout;
+	mainLayout->addLayout(bottomLayout);
+
+	m_toggleViewModeButton = new ot::ToolButton(this);
+	m_toggleViewModeButton->setFixedSize(24, 24);
+	updateToggleViewModeButton();
+	bottomLayout->addWidget(m_toggleViewModeButton);
+	connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &SelectProjectDialog::slotToggleViewMode);
+
 	m_infoLabel = new ot::Label(this);
+	bottomLayout->addWidget(m_infoLabel, 1);
 
 	m_confirmButton = new ot::PushButton("Confirm", this);
 	m_confirmButton->setEnabled(false);
-	ot::PushButton* cancelButton = new ot::PushButton("Cancel", this);
-
-	bottomLayout->addWidget(m_infoLabel, 1);
 	bottomLayout->addWidget(m_confirmButton);
+
+	ot::PushButton* cancelButton = new ot::PushButton("Cancel", this);
 	bottomLayout->addWidget(cancelButton);
-	mainLayout->addLayout(bottomLayout);
 
 	connect(m_confirmButton, &QPushButton::clicked, this, &SelectProjectDialog::slotConfirm);
 	connect(cancelButton, &QPushButton::clicked, this, &SelectProjectDialog::closeCancel);
@@ -92,4 +101,41 @@ void SelectProjectDialog::slotOpenRequested() {
 
 void SelectProjectDialog::slotSelectionChanged() {
 	m_confirmButton->setEnabled(!m_overview->getSelectedProjects().empty());
+}
+
+void SelectProjectDialog::slotToggleViewMode() {
+	switch (m_overview->getViewMode()) {
+	case ot::ProjectOverviewWidget::ViewMode::Tree:
+		m_overview->setViewMode(ot::ProjectOverviewWidget::ViewMode::List);
+		break;
+
+	case ot::ProjectOverviewWidget::ViewMode::List:
+		m_overview->setViewMode(ot::ProjectOverviewWidget::ViewMode::Tree);
+		break;
+
+	default:
+		OT_LOG_E("Invalid ViewMode (" + std::to_string(static_cast<int>(m_overview->getViewMode())) + ")");
+		break;
+
+	}
+
+	this->updateToggleViewModeButton();
+}
+
+void SelectProjectDialog::updateToggleViewModeButton() {
+	switch (m_overview->getViewMode()) {
+	case ot::ProjectOverviewWidget::ViewMode::Tree:
+		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("Button/ListView.png"));
+		m_toggleViewModeButton->setToolTip("Switch to List View");
+		break;
+
+	case ot::ProjectOverviewWidget::ViewMode::List:
+		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("Button/TreeView.png"));
+		m_toggleViewModeButton->setToolTip("Switch to Tree View");
+		break;
+
+	default:
+		OT_LOG_E("Invalid ViewMode (" + std::to_string(static_cast<int>(m_overview->getViewMode())) + ")");
+		break;
+	}
 }

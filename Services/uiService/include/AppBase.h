@@ -25,6 +25,7 @@
 // Frontend header
 #include "uiServiceTypes.h"				// Model and View types
 #include "LoginData.h"
+#include "ProjectOverviewWidget.h"
 #include "NavigationSelectionManager.h"
 
 // OpenTwin Core header
@@ -309,6 +310,8 @@ public:
 	ot::PropertyGridCfg getSettingsFromDataBase(const std::string& _subKey);
 
 	void updateLogIntensityInfo();
+
+	ot::ProjectOverviewWidget::ViewMode getWelcomeScreenViewMode() const;
 
 public Q_SLOTS:
 	void refreshWelcomeScreen();

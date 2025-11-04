@@ -33,6 +33,7 @@
 
 namespace ot {
 	class Label;
+	class ToolButton;
 	class PushButton;
 	class ProjectOverviewWidget;
 }
@@ -43,7 +44,7 @@ class SelectProjectDialog : public ot::Dialog {
 	OT_DECL_NOMOVE(SelectProjectDialog)
 	OT_DECL_NODEFAULT(SelectProjectDialog)
 public:
-	SelectProjectDialog(const ot::DialogCfg& _config);
+	SelectProjectDialog(const ot::DialogCfg& _config, QWidget* _parent);
 	virtual ~SelectProjectDialog();
 
 	ot::ProjectInformation getSelectedProject() const;
@@ -52,9 +53,13 @@ private Q_SLOTS:
 	void slotConfirm();
 	void slotOpenRequested();
 	void slotSelectionChanged();
+	void slotToggleViewMode();
 
 private:
+	void updateToggleViewModeButton();
+
 	ot::ProjectOverviewWidget* m_overview;
+	ot::ToolButton* m_toggleViewModeButton;
 	ot::PushButton* m_confirmButton;
 	ot::Label* m_infoLabel;
 };

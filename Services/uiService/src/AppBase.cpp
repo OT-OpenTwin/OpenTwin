@@ -1591,6 +1591,15 @@ void AppBase::updateLogIntensityInfo() {
 	}
 }
 
+ot::ProjectOverviewWidget::ViewMode AppBase::getWelcomeScreenViewMode() const {
+	if (m_welcomeScreen) {
+		return m_welcomeScreen->getViewMode();
+	}
+	else {
+		return ot::ProjectOverviewWidget::ViewMode::Tree;
+	}
+}
+
 // #################################################################################################################
 
 // Private functions

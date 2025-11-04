@@ -4153,7 +4153,7 @@ void ExternalServicesComponent::handleProjectSelectDialog(ot::JsonDocument& _doc
 	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
 	std::string senderUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 
-	SelectProjectDialog dia(cfg);
+	SelectProjectDialog dia(cfg, AppBase::instance()->mainWindow());
 	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}
