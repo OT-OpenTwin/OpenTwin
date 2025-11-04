@@ -49,6 +49,9 @@ private:
 	ot::ReturnMessage handlePing(const ot::JsonDocument& _doc);
 	ot::ReturnMessage shutdownProcess(const ot::JsonDocument& _doc);
 	ot::ReturnMessage executeScript(const ot::JsonDocument& _doc);
+	void loadPortDataToBuffer(const ot::JsonDocument& _doc);
+	std::string writeReturnDataToDatabase();
+
 	ot::ReturnMessage executeCommand(const ot::JsonDocument& _doc);
 	ot::ReturnMessage initialise(const ot::JsonDocument& _doc);
 	ot::ReturnMessage setLogFlags(const ot::JsonDocument& _doc);

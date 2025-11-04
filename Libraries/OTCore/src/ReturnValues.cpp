@@ -61,9 +61,21 @@ void ot::ReturnValues::addData(const std::string& _entryName, const ot::JsonValu
 	m_valuesByName[_entryName] = _values;
 }
 
+void ot::ReturnValues::addData(const std::string& _entryName, ot::JsonValue&& _values)
+{
+	m_valuesAsDoc.AddMember(ot::JsonString(_entryName, m_valuesAsDoc.GetAllocator()), _values.Move(), m_valuesAsDoc.GetAllocator());
+}
+
+void ot::ReturnValues::addData(const std::string& _entryName, ot::JsonValue& _values)
+{
+	m_valuesAsDoc.AddMember(ot::JsonString(_entryName,m_valuesAsDoc.GetAllocator()), _values, m_valuesAsDoc.GetAllocator());
+}
+
 void ot::ReturnValues::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 {
 	ot::JsonObject fullEntry;
+	fullEntry.CopyFrom(m_valuesAsDoc, _allocator);
+
 	for (auto& element : m_valuesByName)
 	{
 		const std::string name = element.first;

@@ -113,6 +113,8 @@ namespace ot
 		bool isOk() const { return m_status == ReturnMessageStatus::Ok; };
 
 		void setValues(const ReturnValues& _values) { m_values = _values; };
+		
+		void setValues(ReturnValues&& _values) { m_values = std::move(_values); };
 
 		ReturnValues& getValues() { return m_values; }
 

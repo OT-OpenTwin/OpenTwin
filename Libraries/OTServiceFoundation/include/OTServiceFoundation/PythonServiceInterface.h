@@ -50,6 +50,13 @@ namespace ot
 		std::list<std::tuple<std::string, scriptParameter>> m_scriptNamesWithParameter;
 
 		std::map<std::string, std::pair<const ot::JsonValue*, const ot::JsonValue*>> m_portDataByPortName;
+		
 		ot::JsonDocument assembleMessage();
+
+		//! @brief Writes the port data to the database as a GridFS document.
+		//! @return gridFS document ID 
+		std::string writePortDataToDatabase();
+
+		ot::JsonDocument readPortDataFromDatabase(const std::string& _gridFSDocumentID);
 	};
 }

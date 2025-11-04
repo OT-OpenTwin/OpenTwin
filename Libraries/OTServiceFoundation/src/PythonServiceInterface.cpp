@@ -24,6 +24,9 @@
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/VariableToJSONConverter.h"
 
+#include "DocumentAPI.h"
+#include "DataBase.h"
+
 ot::PythonServiceInterface::PythonServiceInterface(const std::string& _pythonExecutionServiceURL)
 	: m_pythonExecutionServiceURL(_pythonExecutionServiceURL)
 {}
@@ -50,6 +53,29 @@ ot::ReturnMessage ot::PythonServiceInterface::sendExecutionOrder()
 	OT_LOG_D("Sending python execution request");
 	ot::msg::send("", m_pythonExecutionServiceURL, ot::MessageType::EXECUTE, this->assembleMessage().toJson(), response,0);
 	ot::ReturnMessage message = ot::ReturnMessage::fromJson(response);
+
+	if (message.isOk())
+	{
+				// If the message is ok, we need to read back the port data from the database
+		ot::ReturnValues& returnValuesWrapper = message.getValues();
+		ot::JsonDocument& returnedValue = returnValuesWrapper.getValues();
+
+		if (returnedValue.HasMember(OT_ACTION_CMD_PYTHON_Portdata))
+		{
+			const ot::JsonValue& portDataEntry = returnedValue[OT_ACTION_CMD_PYTHON_Portdata];
+			if (portDataEntry.IsString())
+			{
+				std::string gridFSDocumentID = portDataEntry.GetString();
+				ot::JsonDocument portDataDocument = this->readPortDataFromDatabase(gridFSDocumentID);
+				ot::JsonObject portData;
+				portData.CopyFrom(portDataDocument.Move(), returnValuesWrapper.getAllocator());
+
+				returnedValue.RemoveMember(OT_ACTION_CMD_PYTHON_Portdata);
+				returnValuesWrapper.addData(OT_ACTION_CMD_PYTHON_Portdata, portData);
+			}
+		}
+	}
+
 	return message;
 }
 
@@ -93,16 +119,29 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 
 	m_scriptNamesWithParameter.clear();
 
+	std::string gridFSDocumentID = writePortDataToDatabase();
+	doc.AddMember(OT_ACTION_CMD_PYTHON_Portdata, ot::JsonString(gridFSDocumentID, doc.GetAllocator()), doc.GetAllocator());
+
+	doc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, allparameter, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Scripts, doc.GetAllocator()), doc.GetAllocator());
+	
+	return doc;
+}
+
+std::string ot::PythonServiceInterface::writePortDataToDatabase()
+{
+	ot::JsonDocument doc;
 	if (m_portDataByPortName.size() > 0)
 	{
 		ot::JsonArray portDataEntries;
-		
+
 		for (auto& portDataByPortName : m_portDataByPortName)
 		{
 			ot::JsonObject portDataEntry;
 			ot::JsonString portName(portDataByPortName.first.c_str(), doc.GetAllocator());
 			portDataEntry.AddMember("Name", portName, doc.GetAllocator());
-			
+
 			const ot::JsonValue* portData = portDataByPortName.second.first;
 			assert(portData != nullptr);
 			ot::JsonValue portDataCopy;
@@ -119,13 +158,36 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 			portDataEntries.PushBack(portDataEntry, doc.GetAllocator());
 		}
 		doc.AddMember(OT_ACTION_CMD_PYTHON_Portdata, portDataEntries, doc.GetAllocator());
-		
 		m_portDataByPortName.clear();
 	}
 
-	doc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, allparameter, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Scripts, doc.GetAllocator()), doc.GetAllocator());
+	const std::string portData = ot::json::toJson(doc);
+	std::stringstream stream(portData);
 	
-	return doc;
+	DataStorageAPI::DocumentAPI gridFSHandle;
+	auto documentID = gridFSHandle.InsertDocumentUsingCollectionGridFs(&stream, DataBase::instance().getCollectionName());
+	const std::string gridFSDocumentID = documentID.get_oid().value.to_string();
+	return gridFSDocumentID;
+}
+
+ot::JsonDocument ot::PythonServiceInterface::readPortDataFromDatabase(const std::string& _gridFSDocumentID)
+{
+	//Load data from gridFS
+	DataStorageAPI::DocumentAPI gridFSHandle;
+	uint8_t* dataBuffer = nullptr;
+	size_t length = 0;
+
+	bsoncxx::oid oid_obj{ _gridFSDocumentID };
+	bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+
+	gridFSHandle.GetDocumentUsingGridFs(id, dataBuffer, length, DataBase::instance().getCollectionName());
+	gridFSHandle.DeleteGridFSData(id, DataBase::instance().getCollectionName());
+
+	const std::string portDataJsonString(reinterpret_cast<char*>(dataBuffer), length);
+	delete[] dataBuffer;
+	dataBuffer = nullptr;
+
+	ot::JsonDocument portDataDoc;
+	portDataDoc.fromJson(portDataJsonString);
+	return portDataDoc;
 }

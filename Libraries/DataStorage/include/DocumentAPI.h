@@ -36,7 +36,12 @@ namespace DataStorageAPI
 	class DocumentAPI
 	{
 	public:
+		//! @brief Legacy. Uses a single central ProjectsLargeData collection to store large files using GridFS. 
 		__declspec(dllexport) value InsertDocumentUsingGridFs(std::istream* source, const std::string &fileName);
+		
+		//! @brief Uses a project specific collection to store large files using GridFS.
+		__declspec(dllexport) value InsertDocumentUsingCollectionGridFs(std::istream* _source, const std::string &_collectionName);
+		
 		__declspec(dllexport) void GetDocumentUsingGridFs(value id, std::ostream* destination);
 		__declspec(dllexport) value InsertDocumentUsingGridFs(bsoncxx::document::view docView, const std::string &fileName);
 		__declspec(dllexport) void GetDocumentUsingGridFs(value id, uint8_t *&buffer, size_t &length);

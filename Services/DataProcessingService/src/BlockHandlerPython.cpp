@@ -25,6 +25,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/PythonServiceInterface.h"
 #include "OTCore/GenericDataStructSingle.h"
+#include "OTServiceFoundation/TimeFormatter.h"
 
 BlockHandlerPython::BlockHandlerPython(EntityBlockPython* _blockEntity, const HandlerMap& _handlerMap)
     : BlockHandler(_blockEntity, _handlerMap)
@@ -86,50 +87,62 @@ bool BlockHandlerPython::executeSpecialized()
         }
         
         //Send the job
+        OT_LOG_D("Sending message to python service");
+        auto start = std::chrono::high_resolution_clock::now();
         ot::ReturnMessage returnMessage = m_pythonServiceInterface->sendExecutionOrder();
+        auto end = std::chrono::high_resolution_clock::now();
+        OT_LOG_D("Python service messag returned");
+        const std::string duration =  TimeFormatter::formatDuration(start, end);  
+        SolverReport::instance().addToContent("Python script execution took: " + duration + ".\n");
+
 
         //Post processing
         if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
         {
 			SolverReport::instance().addToContentAndDisplay("Python script executed with state: " + returnMessage.getStatusString() + ".\n", _uiComponent);
             ot::ReturnValues& returnValues = returnMessage.getValues();
+
             ot::JsonDocument& values = returnValues.getValues();
-
-            for (auto valueIt = values.MemberBegin(); valueIt != values.MemberEnd();valueIt++)
+            if (values.HasMember(OT_ACTION_CMD_PYTHON_Portdata))
             {
-                //Here we have JsonObjects for the different ports set
-                const std::string portName = valueIt->name.GetString();
+                ot::JsonValue& portData = values[OT_ACTION_CMD_PYTHON_Portdata];
+				const std::string temp = ot::json::toJson(portData);
 
-                auto output = std::find(m_outputs.begin(), m_outputs.end(), portName);
-                if (output != m_outputs.end())
+                for (auto valueIt = portData.MemberBegin(); valueIt != portData.MemberEnd(); valueIt++)
                 {
-                    auto& portValues = valueIt->value;
-                    PipelineData pipelineData;
-                    
-                    if(portValues.HasMember("Data") == false || portValues.HasMember("Meta") == false)
+                    //Here we have JsonObjects for the different ports set
+                    const std::string portName = valueIt->name.GetString();
+
+                    auto output = std::find(m_outputs.begin(), m_outputs.end(), portName);
+                    if (output != m_outputs.end())
                     {
-                        throw std::exception(("Output port " + portName + " is missing 'Data' or 'Meta' fields.").c_str());
-                        
-					}
-                    pipelineData.setData(std::move(portValues["Data"]));
-                    const std::string tt = ot::json::toJson(portValues["Meta"]);
-                    pipelineData.setMetadata(std::move(portValues["Meta"]));
-                    m_outputData.push_back(std::move(pipelineData));
-                    m_dataPerPort[portName] = &(m_outputData.back());
-                    m_outputs.remove(portName);
-                }
-                else if (portName == m_scriptName)
-                {
-                    //Here we have the return value of the script
-                    auto& portValues = valueIt->value;
-					SolverReport::instance().addToContentAndDisplay("Python script returned message: " + ot::json::toJson(portValues) + "\n", _uiComponent);
-                }
-                else 
-                {
-					SolverReport::instance().addToContentAndDisplay("Port name used in python script does not match the listed ports: " + portName + ".\n", _uiComponent);
-                }
-            }
+                        auto& portValues = valueIt->value;
+                        PipelineData pipelineData;
 
+                        if (portValues.HasMember("Data") == false || portValues.HasMember("Meta") == false)
+                        {
+                            throw std::exception(("Output port " + portName + " is missing 'Data' or 'Meta' fields.").c_str());
+
+                        }
+                        pipelineData.setData(std::move(portValues["Data"]));
+                        const std::string tt = ot::json::toJson(portValues["Meta"]);
+                        pipelineData.setMetadata(std::move(portValues["Meta"]));
+                        m_outputData.push_back(std::move(pipelineData));
+                        m_dataPerPort[portName] = &(m_outputData.back());
+                        m_outputs.remove(portName);
+                    }
+                    else if (portName == m_scriptName)
+                    {
+                        //Here we have the return value of the script
+                        auto& portValues = valueIt->value;
+                        SolverReport::instance().addToContentAndDisplay("Python script returned message: " + ot::json::toJson(portValues) + "\n", _uiComponent);
+                    }
+                    else
+                    {
+                        SolverReport::instance().addToContentAndDisplay("Port name used in python script does not match the listed ports: " + portName + ".\n", _uiComponent);
+                    }
+                }
+            }            
             //Check if all outputs were set in the script
             if (m_outputs.size() > 0)
             {

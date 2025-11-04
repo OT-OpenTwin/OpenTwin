@@ -36,7 +36,7 @@ public:
 	void overrideMetaData(const std::string& _serialisedMetaData);
 	const ot::JsonValue& getData() const;
 	const ot::JsonValue& getMetadata() const;
-	const ot::JsonValue& getDataAndMetadata() const { return m_data; }
+	ot::JsonValue& getDataAndMetadata() { return m_data; }
 	const bool getModified() const { return m_modified; }
 	const std::string& getPortName() { return m_portName; }
 

@@ -44,6 +44,27 @@ std::int64_t DefaultChunkSize = 1024 * 255;
 // Test class used during performance testing. This is not the actual implementation class.
 namespace DataStorageAPI
 {
+	value DocumentAPI::InsertDocumentUsingCollectionGridFs(std::istream* _source, const std::string& _collectionName)
+	{
+		try
+		{
+			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase("Projects");
+			mongocxx::options::gridfs::bucket bucketOptions = mongocxx::options::gridfs::bucket();
+			bucketOptions.bucket_name(_collectionName);
+			auto bucket = db.gridfs_bucket(bucketOptions);
+
+			mongocxx::options::gridfs::upload options{};
+
+			auto uploader = bucket.upload_from_stream(_collectionName,_source, options);
+
+			return uploader.id();
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what();
+			throw e;
+		}
+	}
 	void DocumentAPI::GetDocumentUsingGridFs(value id, std::ostream* destination)
 	{
 		try

@@ -46,6 +46,13 @@ namespace ot
 		
 		//! @brief Does not take over ownership. Document needs to stay alive until ReturnValues object gets serialised as part of a ReturnMessage
 		void addData(const std::string& _entryName, const ot::JsonValue* _values);
+		
+		//! @brief Does take ownership of the JsonValue
+		void addData(const std::string& _entryName, ot::JsonValue&& _values);
+		void addData(const std::string& _entryName, ot::JsonValue& _values);
+
+
+
 		uint64_t getNumberOfEntries() { return m_valuesByName.size(); }
 		
 		//! @brief 
@@ -55,8 +62,10 @@ namespace ot
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		ot::JsonAllocator& getAllocator() { return m_valuesAsDoc.GetAllocator(); }
 	private:
 		std::map<std::string, const ot::JsonValue*> m_valuesByName;
+		
 		ot::JsonDocument m_valuesAsDoc;
 	};
 }
