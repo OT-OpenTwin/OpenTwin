@@ -71,18 +71,6 @@ bool ot::ProjectOverviewEntry::operator<(const QTreeWidgetItem& _other) const {
 	}
 }
 
-void ot::ProjectOverviewEntry::applyFilter(const QString& _nameFilter) {
-	if (_nameFilter.isEmpty()) {
-		setHidden(false);
-		return;
-	}
-
-	QString filter = _nameFilter.toLower();
-	bool matches = text(ProjectOverviewHeader::Name).toLower().contains(filter);
-
-	setHidden(!matches);
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Public: Slots

@@ -26,6 +26,7 @@
 #include "OTWidgets/WidgetBase.h"
 
 // Qt header
+#include <QtCore/qtimer.h>
 #include <QtCore/qobject.h>
 #include <QtWidgets/qwidget.h>
 
@@ -110,8 +111,9 @@ namespace ot {
 		void slotSelectionChanged();
 		void slotItemChanged(QTreeWidgetItem* _item, int _column);
 		void slotOpenRequested(QTreeWidgetItem* _item, int _column);
-		void slotQuickFilterProjects();
-		void slotFilterReturnPressed();
+		void slotBasicFilterReturnPressed();
+		void slotBasicFilterTextChanged();
+		void slotApplyTextFilterDelayed();
 		void slotWorkerFinished();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -128,8 +130,6 @@ namespace ot {
 		int getProjectCount(const QTreeWidgetItem* _parent) const;
 		void getAllProjects(const QTreeWidgetItem* _parent, std::list<ProjectInformation>& _lst) const;
 		
-		void quickFilterProjects(QTreeWidgetItem* _parentItem, const QString& _nameFilter);
-
 		void updateFilterOptions();
 
 		TreeWidgetItem* getOrCreateProjectGroupItem(const std::string& _groupName);
@@ -153,6 +153,8 @@ namespace ot {
 		bool m_resultsExceeded;
 
 		LineEdit* m_basicFilter;
+		QTimer m_basicFilterTimer;
+
 		ProjectOverviewTree* m_tree;
 		Label* m_countLabel;
 	};

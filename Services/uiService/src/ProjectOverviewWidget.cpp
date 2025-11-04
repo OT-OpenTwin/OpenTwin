@@ -74,8 +74,8 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	m_basicFilter = new ot::LineEdit;
 	m_basicFilter->setToolTip("Quickly filter projects that were fetched before. Extends the column filter.");
 	filterLayout->addWidget(m_basicFilter, 1);
-	connect(m_basicFilter, &ot::LineEdit::textChanged, this, &ot::ProjectOverviewWidget::slotQuickFilterProjects);
-	connect(m_basicFilter, &ot::LineEdit::returnPressed, this, &ot::ProjectOverviewWidget::slotFilterReturnPressed);
+	connect(m_basicFilter, &ot::LineEdit::textChanged, this, &ot::ProjectOverviewWidget::slotBasicFilterTextChanged);
+	connect(m_basicFilter, &ot::LineEdit::returnPressed, this, &ot::ProjectOverviewWidget::slotBasicFilterReturnPressed);
 
 	m_tree = new ot::ProjectOverviewTree(_parent);
 	m_header = new ProjectOverviewHeader(this, m_tree);
@@ -103,10 +103,14 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	m_previewBox = new ProjectOverviewPreviewBox(_parent);
 	mainLayout->addWidget(m_previewBox);
 
+	m_basicFilterTimer.setSingleShot(true);
+	m_basicFilterTimer.setInterval(500);
+
 	// Connect signals
 	connect(m_tree, &ot::TreeWidget::itemChanged, this, &ot::ProjectOverviewWidget::slotItemChanged);
 	connect(m_tree, &ot::TreeWidget::itemSelectionChanged, this, &ot::ProjectOverviewWidget::slotSelectionChanged);
 	connect(m_tree, &ot::TreeWidget::itemDoubleClicked, this, &ot::ProjectOverviewWidget::slotOpenRequested);
+	connect(&m_basicFilterTimer, &QTimer::timeout, this, &ot::ProjectOverviewWidget::slotApplyTextFilterDelayed);
 }
 
 ot::ProjectOverviewWidget::~ProjectOverviewWidget() {
@@ -313,14 +317,24 @@ void ot::ProjectOverviewWidget::slotOpenRequested(QTreeWidgetItem* _item, int _c
 	Q_EMIT projectOpenRequested(entry->getProjectInformation());
 }
 
-void ot::ProjectOverviewWidget::slotQuickFilterProjects() {
-	quickFilterProjects(m_tree->invisibleRootItem(), m_basicFilter->text());
-}
-
-void ot::ProjectOverviewWidget::slotFilterReturnPressed() {
+void ot::ProjectOverviewWidget::slotBasicFilterReturnPressed() {
 	if (!m_basicFilter->text().isEmpty()) {
 		Q_EMIT filterReturnPressed(m_basicFilter->text());
 	}
+}
+
+void ot::ProjectOverviewWidget::slotBasicFilterTextChanged() {
+	m_basicFilterTimer.stop();
+	m_basicFilterTimer.start();
+}
+
+void ot::ProjectOverviewWidget::slotApplyTextFilterDelayed() {
+	ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
+
+	std::list<ot::ProjectInformation> projects;
+	m_resultsExceeded = false;
+	projectManager.findProjects(m_basicFilter->text().toStdString(), ProjectManagement::defaultMaxProjects(), projects, m_resultsExceeded);
+	setProjects(projects);
 }
 
 void ot::ProjectOverviewWidget::slotWorkerFinished() {
@@ -469,16 +483,6 @@ void ot::ProjectOverviewWidget::getAllProjects(const QTreeWidgetItem* _parent, s
 		const ProjectOverviewEntry* entry = dynamic_cast<const ProjectOverviewEntry*>(_parent->child(i));
 		if (entry) {
 			_lst.push_back(entry->getProjectInformation());
-		}
-	}
-}
-
-void ot::ProjectOverviewWidget::quickFilterProjects(QTreeWidgetItem* _parentItem, const QString& _nameFilter) {
-	for (int i = 0; i < _parentItem->childCount(); i++) {
-		quickFilterProjects(_parentItem->child(i), _nameFilter);
-		ProjectOverviewEntry* entry = dynamic_cast<ProjectOverviewEntry*>(_parentItem->child(i));
-		if (entry) {
-			entry->applyFilter(_nameFilter);
 		}
 	}
 }
