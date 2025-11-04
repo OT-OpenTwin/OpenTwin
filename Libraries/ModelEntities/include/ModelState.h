@@ -49,9 +49,9 @@ public:
 	void setVersion(ot::UID version) { m_entityVersion = version; };
 	void setEntityType(tEntityType type) { m_entityType = type; };
 
-	ot::UID getParentEntityID(void) const { return m_parentEntityID; };
-	ot::UID getEntityVersion(void) const { return m_entityVersion; };
-	tEntityType getEntityType(void) const { return m_entityType; };
+	ot::UID getParentEntityID() const { return m_parentEntityID; };
+	ot::UID getEntityVersion() const { return m_entityVersion; };
+	tEntityType getEntityType() const { return m_entityType; };
 
 private:
 	ot::UID m_entityVersion;
@@ -71,10 +71,10 @@ public:
 	// Gerneral
 
 	// Reset the model state to an empty project
-	void reset(void);
+	void reset();
 
 	// Check whether the model state has been modified since the last save
-	bool isModified(void) const { return m_stateModified; };
+	bool isModified() const { return m_stateModified; };
 
 	// Open a project, load the version grap and the currently active version
 	bool openProject(const std::string& _customVersion = std::string());
@@ -84,7 +84,7 @@ public:
 	// Entity handling
 
 	// Create and return a new entity ID (this will increate the maximum entity ID and mark the model state as modified
-	unsigned long long createEntityUID(void);
+	unsigned long long createEntityUID();
 
 	// Load a model state with a particular version
 	bool loadModelState(const std::string& _version);
@@ -111,10 +111,10 @@ public:
 	void removeEntity(ot::UID entityID, bool considerChildren = true);
 
 	// Determine the current modelStateVersion (the last saved one)
-	const std::string& getModelStateVersion(void) const { return m_graphCfg.getActiveVersionName(); };
+	const std::string& getModelStateVersion() const { return m_graphCfg.getActiveVersionName(); };
 
 	// Determine the currently active branch
-	const std::string& getActiveBranch(void) const { return m_graphCfg.getActiveBranchName(); }
+	const std::string& getActiveBranch() const { return m_graphCfg.getActiveBranchName(); }
 
 	// Save the current modified model state. The version counter is incremented automatically in the last digit (e.g. 1.2.1 -> 1.2.2)
 	bool saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment);
@@ -129,40 +129,40 @@ public:
 	void getListOfTopologyEntites(std::list<unsigned long long> &topologyEntities);
 
 	// Deactivate the latest model state and reload an earlier state. Returns true if the state could be reverted (needs to have at least one more model state)
-	bool undoLastOperation(void);
+	bool undoLastOperation();
 
 	// Re-activate the next inactive state and reload the model state
-	bool redoNextOperation(void);
+	bool redoNextOperation();
 
 	// Get the description which was stored for the current model state
-	std::string getCurrentModelStateDescription(void);
+	std::string getCurrentModelStateDescription();
 
 	// Get the description which was stored for the next redo model state
-	std::string getRedoModelStateDescription(void);
+	std::string getRedoModelStateDescription();
 
 	// Check whether an undo operation is possible
-	bool canUndo(void);
+	bool canUndo();
 
 	// Check whether a redo operation is possible
-	bool canRedo(void);
+	bool canRedo();
 
 	// Delete all model entities which were written after the last model state and therefore are not referred to in the data base
-	void removeDanglingModelEntities(void);
+	void removeDanglingModelEntities();
 
 	// Load the version graph of the model (needs to be called when the project is opened)
-	void loadVersionGraph(void);
+	void loadVersionGraph();
 
 	// Get a list of all model states (version, description);
-	ot::VersionGraphCfg& getVersionGraph(void);
+	ot::VersionGraphCfg& getVersionGraph();
 
 	// Get a list of all model states (version, description);
-	const ot::VersionGraphCfg& getVersionGraph(void) const;
+	const ot::VersionGraphCfg& getVersionGraph() const;
 
 	// Check the database schema version and upgrade, if needed
-	void checkAndUpgradeDataBaseSchema(void);
+	void checkAndUpgradeDataBaseSchema();
 
 	// Remove all redo model states and the items belonging to them 
-	std::list<std::string> removeRedoModelStates(void);
+	std::list<std::string> removeRedoModelStates();
 	
 	// Write the version information to the entity in the data base
 	void updateVersionEntity(const std::string& _version);
@@ -195,11 +195,24 @@ public:
 	//! @return True on success, false if no description is found or an error occurred.
 	static bool readProjectDescription(const std::string& _collectionName, std::string& _description, ot::DocumentSyntax& _syntax);
 
+	//! @brief Restore the orginal version if needed.
+	//! Will only modify the model entity without loading the model state.
+	//! @note This function should be called immediately before closing the project.
+	void restoreOriginalVersionIfNeeded();
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Helper
 
 private:
+	struct VersionInformation
+	{
+		std::string branch; //! @brief The branch the version belongs to.
+		std::string version; //! @brief The version string.
+		bool isEndOfBranch = false; //! @brief Whether this version is the end of its branch.
+		bool isOriginalBranch = false; //! @brief Whether this version is part of the original branch.
+	};
+
 	// This function loads the model state from a given ModelState document
 	bool loadModelFromDocument(bsoncxx::document::view docView);
 	
@@ -207,10 +220,10 @@ private:
 	bool loadAbsoluteState(bsoncxx::document::view docView);
 
 	// Clear the information map containing the list of children for each item
-	void clearChildrenInformation(void);
+	void clearChildrenInformation();
 
 	// Build the information map containing the list of children for each item
-	void buildChildrenInformation(void);
+	void buildChildrenInformation();
 	
 	// Add an entity to the child list of its parent entity
 	void addEntityToParent(ot::UID entityID, ot::UID parentID);
@@ -225,7 +238,7 @@ private:
 	bool loadState(bsoncxx::document::view docView, const std::string &expectedType);
 
 	// This function clears the entire model state information
-	void clearModelState(void);
+	void clearModelState();
 
 	// Load the entity data from a state document
 	void loadStateData(bsoncxx::document::view docView);
@@ -292,13 +305,23 @@ private:
 	void removeVersionGraphItem(const std::string &version);
 
 	// Helper function to determine the version of the last model entity in the data base
-	long long getCurrentModelEntityVersion(void);
+	long long getCurrentModelEntityVersion();
 
 	// Determine the last version in the currently active branch
-	std::string getLastVersionInActiveBranch(void);
+	std::string getLastVersionInActiveBranch();
  
-	// Write the current active branch and model version to the model entity
-	void storeCurrentVersionInModelEntity(void);
+	//! @brief Write the current branch and version to the model entity if data differs from the data in the model entity.
+	void storeCurrentVersionInModelEntity();
+
+	//! @brief Attempt to write the given branch and version to the model entity if the version and branch exist in the graph.
+	//! @param _branch Branch name to store.
+	//! @param _version Version name to store.
+	void storeVersionInModelEntityIfExists(const std::string& _branch, const std::string& _version);
+
+	//! @brief Write the given branch and version to the model entity if data differs from the data in the model entity.
+	//! @param _branch Branch name to store.
+	//! @param _version Version name to store.
+	void storeVersionInModelEntity(const std::string& _branch, const std::string& _version);
 
 	// Delete the given model version (model state) together with all its newly created entities
 	void deleteModelVersion(const std::string &version);
@@ -308,13 +331,13 @@ private:
 	void getAllChildVersions(const ot::VersionGraphVersionCfg* _version, std::list<std::string>& _childVersions);
 
 	// Create a new branch and activate it (also update the model entity)
-	void createAndActivateNewBranch(void);
+	void createAndActivateNewBranch();
 
 	// Count the number of dots in a version string
 	int countNumberOfDots(const std::string &text);
 
 	// Helper to perform schema upgrade from version 1 to version 2
-	void updateSchema_1_2(void);
+	void updateSchema_1_2();
 
 	// When we load a relative state, the attribute will hold the version of the last absolute state (base state)
 	std::string m_currentModelBaseStateVersion;
@@ -331,12 +354,6 @@ private:
 
 	// A flag which indicates whether the model state has been modified compared to the last stored state.
 	bool m_stateModified;
-
-	std::string m_initialBranch; //! @brief The initial branch when the project was opened.
-	std::string m_initialVersion; //! @brief The initial version when the project was opened.
-
-	//! @brief Indicates whether the custom version to open is the end of a branch.
-	bool m_customVersionIsEndOfBranch;
 
 	// The maximum number of array entities per state
 	const size_t m_maxNumberArrayEntitiesPerState;
@@ -371,4 +388,11 @@ private:
 	// The version graph (for each version: version, parentVersion, description).
 	// The version graph needs to be loaded when the project is opened and will then be kept up to date
 	ot::VersionGraphCfg m_graphCfg;
+
+	//! @brief The originally active version when the project was opened (as stored in data base) before applying a custom version if set.
+	VersionInformation m_originalInitialVersion;
+
+	//! @brief The custom version that was loaded when the project was opened.
+	//! This version is only set if a custom version was specified when opening the project.
+	VersionInformation m_customInitialVersion;
 };

@@ -38,7 +38,6 @@
 ModelState::ModelState(unsigned int sessionID, unsigned int serviceID) :
 	m_stateModified(false),
 	m_maxNumberArrayEntitiesPerState(250000),
-	m_customVersionIsEndOfBranch(false),
 	m_previewImageUID(ot::invalidUID),
 	m_previewImageVersion(ot::invalidUID),
 	m_previewImageFormat(ot::ImageFileFormat::PNG),
@@ -64,7 +63,7 @@ ModelState::~ModelState()
 
 // General
 
-void ModelState::reset(void)
+void ModelState::reset()
 {
 	m_graphCfg.clear();
 	m_currentModelBaseStateVersion.clear();
@@ -73,6 +72,8 @@ void ModelState::reset(void)
 	m_addedOrModifiedEntities.clear();
 	m_removedEntities.clear();
 	m_entityChildrenList.clear();
+
+	m_customInitialVersion = VersionInformation();
 
 	m_stateModified = false;
 }
@@ -99,6 +100,16 @@ bool ModelState::openProject(const std::string& _customVersion) {
 	std::string activeBranch = result->view()["ActiveBranch"].get_utf8().value.data();
 	std::string activeVersion = result->view()["ActiveVersion"].get_utf8().value.data();
 
+	// Reset initial version infromations
+	m_originalInitialVersion = VersionInformation();
+	m_customInitialVersion = VersionInformation();
+
+	// Store the original initial version information
+	m_originalInitialVersion.version = activeVersion;
+	m_originalInitialVersion.branch = activeBranch;
+	m_originalInitialVersion.isEndOfBranch = m_graphCfg.versionIsEndOfBranch(activeVersion);
+	m_originalInitialVersion.isOriginalBranch = true;
+
 	// Load the preview image if set
 	readAdditionalProjectInformation(result->view());
 	
@@ -114,15 +125,17 @@ bool ModelState::openProject(const std::string& _customVersion) {
 		else {
 			activeVersion = _customVersion;
 			activeBranch = versionEntry->getBranchName();
-			m_customVersionIsEndOfBranch = m_graphCfg.versionIsEndOfBranch(_customVersion);
+			
+			// Store the actual initial version information
+			m_customInitialVersion.version = activeVersion;
+			m_customInitialVersion.branch = activeBranch;
+			m_customInitialVersion.isEndOfBranch = m_graphCfg.versionIsEndOfBranch(activeVersion);
+			m_customInitialVersion.isOriginalBranch = (activeBranch == m_originalInitialVersion.branch);
 		}
 	}
 
 	m_activeBranchInModelEntity = activeBranch;
 	m_activeVersionInModelEntity = activeVersion;
-
-	m_initialBranch = activeBranch;
-	m_initialVersion = activeVersion;
 
 	// Activate the branch
 	m_graphCfg.setActiveBranchName(activeBranch);
@@ -140,7 +153,7 @@ bool ModelState::openProject(const std::string& _customVersion) {
 
 // Entity handling
 
-unsigned long long ModelState::createEntityUID(void)
+unsigned long long ModelState::createEntityUID()
 {
 	return m_uniqueUIDGenerator->getUID();
 }
@@ -323,12 +336,12 @@ bool ModelState::loadModelState(const std::string& _version)
 	return true;
 }
 
-void ModelState::clearChildrenInformation(void)
+void ModelState::clearChildrenInformation()
 {
 	m_entityChildrenList.clear();
 }
 
-void ModelState::buildChildrenInformation(void)
+void ModelState::buildChildrenInformation()
 {
 	m_entityChildrenList.clear();
 
@@ -519,7 +532,7 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 	}
 }
 
-void ModelState::clearModelState(void)
+void ModelState::clearModelState()
 {
 	m_graphCfg.setActiveVersionName("");
 
@@ -1081,12 +1094,12 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 	return true;
 }
 
-std::string ModelState::getCurrentModelStateDescription(void) 
+std::string ModelState::getCurrentModelStateDescription() 
 { 
 	return getVersionDescription(m_graphCfg.getActiveVersionName());
 }
 
-std::string ModelState::getRedoModelStateDescription(void) 
+std::string ModelState::getRedoModelStateDescription() 
 { 
 	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
 	if (nextVersion.empty()) return "";
@@ -1094,20 +1107,20 @@ std::string ModelState::getRedoModelStateDescription(void)
 	return getVersionDescription(nextVersion); 
 }
 
-bool ModelState::canUndo(void) {
+bool ModelState::canUndo() {
 	std::string previousVersion = getPreviousVersion(m_graphCfg.getActiveVersionName());
 
 	return !previousVersion.empty(); 
 }
 
-bool ModelState::canRedo(void) 
+bool ModelState::canRedo() 
 { 
 	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
 
 	return !nextVersion.empty(); 
 }
 
-bool ModelState::undoLastOperation(void)
+bool ModelState::undoLastOperation()
 {
 	// Determine the parent version
 	std::string parentVersion = getPreviousVersion(m_graphCfg.getActiveVersionName());
@@ -1124,7 +1137,7 @@ bool ModelState::undoLastOperation(void)
 	return true;
 }
 
-bool ModelState::redoNextOperation(void)
+bool ModelState::redoNextOperation()
 {
 	// Determine the next version in the current branch
 	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
@@ -1141,7 +1154,7 @@ bool ModelState::redoNextOperation(void)
 	return true;
 }
 
-void ModelState::removeDanglingModelEntities(void)
+void ModelState::removeDanglingModelEntities()
 {
 	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
@@ -1243,7 +1256,7 @@ bool ModelState::getDanglingEntities(mongocxx::cursor& _cursor, bsoncxx::builder
 	return entitiesInList;
 }
 
-void ModelState::loadVersionGraph(void) {
+void ModelState::loadVersionGraph() {
 	m_graphCfg.clear();
 
 	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
@@ -1282,15 +1295,15 @@ void ModelState::loadVersionGraph(void) {
 	}
 }
 
-ot::VersionGraphCfg& ModelState::getVersionGraph(void) {
+ot::VersionGraphCfg& ModelState::getVersionGraph() {
 	return m_graphCfg;
 }
 
-const ot::VersionGraphCfg& ModelState::getVersionGraph(void) const {
+const ot::VersionGraphCfg& ModelState::getVersionGraph() const {
 	return m_graphCfg;
 }
 
-long long ModelState::getCurrentModelEntityVersion(void)
+long long ModelState::getCurrentModelEntityVersion()
 {
 	// We search for the last model entity in the database and determine its version
 	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
@@ -1310,7 +1323,7 @@ long long ModelState::getCurrentModelEntityVersion(void)
 	return result->view()["Version"].get_int64();
 }
 
-void ModelState::checkAndUpgradeDataBaseSchema(void)
+void ModelState::checkAndUpgradeDataBaseSchema()
 {
 	// Get the schema version of the model entity
 	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
@@ -1332,7 +1345,7 @@ void ModelState::checkAndUpgradeDataBaseSchema(void)
 	}
 }
 
-void ModelState::updateSchema_1_2(void)
+void ModelState::updateSchema_1_2()
 {
 	// Here we need to perform a schema upgrade from version 1 to version 2. This means adding the ParentVersion for all Model states,
 	// and adding empty data fields for active branch and active version to the model entity. In addition, we also add a model type
@@ -1614,7 +1627,7 @@ void ModelState::activateBranch(const std::string& _version)
 	}
 }
 
-std::string ModelState::getLastVersionInActiveBranch(void) {
+std::string ModelState::getLastVersionInActiveBranch() {
 	const ot::VersionGraphVersionCfg* version = m_graphCfg.findLastVersion();
 	if (version) {
 		return version->getName();
@@ -1624,7 +1637,7 @@ std::string ModelState::getLastVersionInActiveBranch(void) {
 	}
 }
 
-std::list<std::string> ModelState::removeRedoModelStates(void)
+std::list<std::string> ModelState::removeRedoModelStates()
 {
 	// Find a list of all model State version which follow the current one
 	std::list<std::string> futureVersions;
@@ -2054,7 +2067,45 @@ bool ModelState::readProjectDescription(const std::string& _collectionName, std:
 	return true;
 }
 
-void ModelState::createAndActivateNewBranch(void)
+void ModelState::restoreOriginalVersionIfNeeded() {
+	if (m_customInitialVersion.version.empty()) {
+		// No custom version set, ignore
+		return;
+	}
+
+	// Check if the custom version was part of the original branch
+	if (!m_customInitialVersion.isOriginalBranch) {
+		// The custom version is not part of the original branch, try to restore the original branch and version
+		storeVersionInModelEntityIfExists(m_originalInitialVersion.branch, m_originalInitialVersion.version);
+		return;
+	}
+
+	// Ensure that the initial version is end of branch version
+	if (!m_originalInitialVersion.isEndOfBranch || !m_customInitialVersion.isEndOfBranch) {
+		// The initial version is not an end of branch version, try to restore original branch and version
+		storeVersionInModelEntityIfExists(m_originalInitialVersion.branch, m_originalInitialVersion.version);
+		return;
+	}
+
+	// Here we know that both versions are end of branch versions and that the custom version is part of the original branch
+
+	// Check if we have switched to a different branch while the project was opened
+	if (m_customInitialVersion.branch != m_activeBranchInModelEntity) {
+		// Check if the actual branch is a child branch of the initial branch
+		if (m_activeBranchInModelEntity.find(m_customInitialVersion.branch) != 0)
+		{
+			// We have switched to a different branch, which is not a child branch of the initial branch, try to restore original branch and version
+			return;
+			storeVersionInModelEntityIfExists(m_originalInitialVersion.branch, m_originalInitialVersion.version);
+		}
+	}
+
+	// Here we know that we are in the same branch (or a child branch) of the initial version and that the project was opened at the end of a branch
+
+	// We can skip restoring
+}
+
+void ModelState::createAndActivateNewBranch()
 {
 	std::string newBranch;
 
@@ -2070,10 +2121,23 @@ void ModelState::createAndActivateNewBranch(void)
 	m_graphCfg.setActiveVersionName(newBranch + ".0"); // This will be incremented during the next save operation
 }
 
-void ModelState::storeCurrentVersionInModelEntity(void) {
-	if (m_activeVersionInModelEntity != m_graphCfg.getActiveVersionName() || m_activeBranchInModelEntity != m_graphCfg.getActiveBranchName()) {
-		if (m_graphCfg.getActiveVersionName().empty()) {
-			OT_LOG_E("Attempting to store empty version { \"Version\": \"" + m_graphCfg.getActiveVersionName() + "\", \"Branch\": \"" + m_graphCfg.getActiveBranchName() + "\" }");
+void ModelState::storeCurrentVersionInModelEntity() {
+	storeVersionInModelEntity(m_graphCfg.getActiveBranchName(), m_graphCfg.getActiveVersionName());
+}
+
+void ModelState::storeVersionInModelEntityIfExists(const std::string& _branch, const std::string& _version) {
+	if (!m_graphCfg.getBranchExists(_branch)) {
+		return;
+	}
+	if (m_graphCfg.findVersion(_version) != nullptr) {
+		storeVersionInModelEntity(_branch, _version);
+	}
+}
+
+void ModelState::storeVersionInModelEntity(const std::string& _branch, const std::string& _version) {
+	if (m_activeVersionInModelEntity != _version || m_activeBranchInModelEntity != _branch) {
+		if (_version.empty()) {
+			OT_LOG_E("Attempting to store empty version { \"Version\": \"" + _version + "\", \"Branch\": \"" + _branch + "\" }");
 			return;
 		}
 		mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
@@ -2088,14 +2152,14 @@ void ModelState::storeCurrentVersionInModelEntity(void) {
 
 		auto modifyDoc = bsoncxx::builder::stream::document{}
 			<< "$set" << bsoncxx::builder::stream::open_document
-			<< "ActiveBranch" << m_graphCfg.getActiveBranchName()
-			<< "ActiveVersion" << m_graphCfg.getActiveVersionName()
+			<< "ActiveBranch" << _branch
+			<< "ActiveVersion" << _version
 			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 
 		collection.update_one(queryDoc.view(), modifyDoc.view());
 
-		m_activeBranchInModelEntity = m_graphCfg.getActiveBranchName();
-		m_activeVersionInModelEntity = m_graphCfg.getActiveVersionName();
+		m_activeBranchInModelEntity = _branch;
+		m_activeVersionInModelEntity = _version;
 	}
 }
 

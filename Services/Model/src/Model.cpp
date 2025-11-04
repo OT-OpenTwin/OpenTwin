@@ -180,9 +180,11 @@ void Model::clearAll()
 	{
 		std::list<ot::UID> modelEntityIDs;
 
-		for (auto entity : entityMap)
+		for (const auto& entity : entityMap)
 		{
-			if (entity.second != nullptr) modelEntityIDs.push_back(entity.first);
+			if (entity.second != nullptr) {
+				modelEntityIDs.push_back(entity.first);
+			}
 		}
 
 		removeShapesFromVisualization(modelEntityIDs);
@@ -352,6 +354,12 @@ void Model::resetToNew()
 Model::~Model()
 {
 	shutdown = true;
+
+	// Restore the original version if needed
+	// This must be called before cleaerAll since clearAll will reset the state manager
+	if (stateManager) {
+		stateManager->restoreOriginalVersionIfNeeded();
+	}
 
 	// delete all entities
 	clearAll();
