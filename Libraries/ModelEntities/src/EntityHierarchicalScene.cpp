@@ -42,6 +42,7 @@ EntityHierarchicalScene::EntityHierarchicalScene(ot::UID _ID, EntityBase* _paren
 
 ot::GraphicsNewEditorPackage* EntityHierarchicalScene::getGraphicsEditorPackage() {
 	ot::GraphicsNewEditorPackage* package = new ot::GraphicsNewEditorPackage(this->getName(), this->getName());
+	package->setPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	return package;
 }
 
