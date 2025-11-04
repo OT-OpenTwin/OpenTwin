@@ -2274,7 +2274,7 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo, const 
 	if (!_customVersion.empty()) {
 		message << " (version: \"" << ot::StyledText::Bold << _customVersion << ot::StyledText::NotBold << "\")";
 	}
-	message << " in new OpenTwin instance...\n";
+	message << " in a new OpenTwin instance...\n";
 	this->appendOutputMessageAPI(message);
 
 	// Start new instance
