@@ -139,12 +139,12 @@ ot::ReturnMessage BlockHandler::graphicsConnectionChanged(const ot::GraphicsConn
 	}
 
 	connectionEntity->setConnectionCfg( _connectionData);
-	ot::UIDList topoEntID, topoEntVers;
 	connectionEntity->storeToDataBase();
-	topoEntID.push_back(connectionEntity->getEntityID());
-	topoEntVers.push_back(connectionEntity->getEntityStorageVersion());
-	_model->updateTopologyEntities(topoEntID, topoEntVers, "Update connection", false);
+	_model->getStateManager()->modifyEntityVersion(*connectionEntity);
 
+
+	_model->setModified();
+	_model->modelChangeOperationCompleted("Connection Changed");
 	return ot::ReturnMessage::Ok;
 
 }
