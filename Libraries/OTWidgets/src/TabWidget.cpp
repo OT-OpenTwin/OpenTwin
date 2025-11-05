@@ -19,13 +19,9 @@
 
 #include "OTWidgets/TabWidget.h"
 
-ot::TabWidget::TabWidget() {
+ot::TabWidget::TabWidget(QWidget* _parent) : QTabWidget(_parent) {}
 
-}
-
-ot::TabWidget::~TabWidget() {
-
-}
+ot::TabWidget::~TabWidget() {}
 
 void ot::TabWidget::focusInEvent(QFocusEvent* _event) {
 	QTabWidget::focusInEvent(_event);

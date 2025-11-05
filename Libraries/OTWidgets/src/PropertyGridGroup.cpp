@@ -20,6 +20,7 @@
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/PropertyGroup.h"
+#include "OTWidgets/Label.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PropertyInput.h"
@@ -29,7 +30,6 @@
 #include "OTWidgets/PropertyGridGroup.h"
 
 // Qt header
-#include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
 
 namespace ot {
@@ -42,17 +42,19 @@ namespace ot {
 	}
 }
 
-ot::PropertyGridGroup::PropertyGridGroup() : m_parentGroup(nullptr) {
-	m_titleLabel = new QLabel;
-	m_titleLabel->setObjectName("PropertyGridGroupTitleLabel");
-	m_titleIconLabel = new QLabel;
-	m_titleIconLabel->setObjectName("PropertyGridGroupTitleIconLabel");
-	m_titleLayoutW = new QWidget;
+ot::PropertyGridGroup::PropertyGridGroup(QWidget* _parent) : m_parentGroup(nullptr) {
+	m_titleLayoutW = new QWidget(_parent);
 	m_titleLayoutW->setObjectName("PropertyGridGroupTitleLayoutW");
 	QHBoxLayout* titleLayout = new QHBoxLayout(m_titleLayoutW);
-	titleLayout->addWidget(m_titleIconLabel);
-	titleLayout->addWidget(m_titleLabel, 1);
 	titleLayout->setContentsMargins(0, 0, 0, 0);
+
+	m_titleIconLabel = new Label(m_titleLayoutW);
+	m_titleIconLabel->setObjectName("PropertyGridGroupTitleIconLabel");
+	titleLayout->addWidget(m_titleIconLabel);
+
+	m_titleLabel = new Label(m_titleLayoutW);
+	m_titleLabel->setObjectName("PropertyGridGroupTitleLabel");
+	titleLayout->addWidget(m_titleLabel, 1);
 
 	this->setFlags(this->flags() & (~Qt::ItemIsSelectable));
 	this->slotColorStyleChanged();
@@ -73,7 +75,7 @@ void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 	m_titleLabel->setText(QString::fromStdString(_group->getTitle()));
 
 	for (Property* p : _group->getProperties()) {
-		PropertyGridItem* newItem = new PropertyGridItem;
+		PropertyGridItem* newItem = new PropertyGridItem(m_titleLayoutW->parentWidget());
 		this->addProperty(newItem);
 
 		// Setup must be called after adding
@@ -85,7 +87,7 @@ void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 			continue;
 		}
 
-		PropertyGridGroup* newGroup = new PropertyGridGroup;
+		PropertyGridGroup* newGroup = new PropertyGridGroup(m_titleLayoutW->parentWidget());
 		this->addChildGroup(newGroup);
 
 		// Setup must be called after adding

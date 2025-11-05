@@ -24,14 +24,14 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 
-ot::ImagePreview::ImagePreview() :
-	m_imageMargins(1, 1, 1, 1), m_enabledResizing(true)
+ot::ImagePreview::ImagePreview(QWidget* _parent) :
+	QFrame(_parent), m_imageMargins(1, 1, 1, 1), m_enabledResizing(true)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
 }
 
-ot::ImagePreview::ImagePreview(const QImage& _image) :
-	m_imageMargins(1, 1, 1, 1), m_enabledResizing(true)
+ot::ImagePreview::ImagePreview(const QImage& _image, QWidget* _parent) :
+	QFrame(_parent), m_imageMargins(1, 1, 1, 1), m_enabledResizing(true)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
 	this->setImage(_image);

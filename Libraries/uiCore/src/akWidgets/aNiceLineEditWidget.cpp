@@ -18,15 +18,17 @@
 // @otlicense-end
 
  // AK header
-#include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
+
+// OpenTwin header
+#include "OTWidgets/Label.h"
 
 #include <qevent.h>
 #include <qlayout.h>
 
-ak::aNiceLineEditWidget::aNiceLineEditWidget(const QString & _initialText, const QString & _infoLabelText)
-	: aWidget{ otNiceLineEdit }, m_label{ nullptr }, m_lineEdit{ nullptr }, m_layout{ nullptr }
+ak::aNiceLineEditWidget::aNiceLineEditWidget(const QString & _initialText, const QString & _infoLabelText, QWidget* _parent)
+	: QWidget(_parent), aWidget{ otNiceLineEdit }, m_label{ nullptr }, m_lineEdit{ nullptr }, m_layout{ nullptr }
 {
 	// Create layout 
 	m_layout = new QHBoxLayout(this);
@@ -34,8 +36,8 @@ ak::aNiceLineEditWidget::aNiceLineEditWidget(const QString & _initialText, const
 	this->setContentsMargins(0, 0, 0, 0);
 
 	// Create controls
-	m_lineEdit = new aLineEditWidget{ _initialText };
-	m_label = new aLabelWidget{ _infoLabelText };
+	m_lineEdit = new aLineEditWidget{ _initialText, this };
+	m_label = new ot::Label{ _infoLabelText, this };
 	m_label->setBuddy(m_lineEdit);
 	m_layout->addWidget(m_label);
 	m_layout->addWidget(m_lineEdit);

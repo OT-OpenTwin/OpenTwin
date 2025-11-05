@@ -20,12 +20,18 @@
 // OpenTwin header
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/WidgetViewDock.h"
 
-ot::TextEditorView::TextEditorView(TextEditor* _textEditor)
-	: WidgetView(WidgetViewBase::ViewText), m_textEditor(_textEditor)
+ot::TextEditorView::TextEditorView(QWidget* _parent) : TextEditorView(nullptr, _parent) {}
+
+ot::TextEditorView::TextEditorView(TextEditor* _textEditor, QWidget* _parent)
+	: WidgetView(WidgetViewBase::ViewText, _parent), m_textEditor(_textEditor)
 {
 	if (!m_textEditor) {
-		m_textEditor = new TextEditor;
+		m_textEditor = new TextEditor(getViewDockWidget());
+	}
+	else {
+		m_textEditor->setParent(getViewDockWidget());
 	}
 
 	this->addWidgetInterfaceToDock(m_textEditor);

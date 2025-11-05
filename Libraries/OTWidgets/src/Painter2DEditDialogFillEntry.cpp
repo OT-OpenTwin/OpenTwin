@@ -22,8 +22,8 @@
 #include "OTWidgets/ColorPickButton.h"
 #include "OTWidgets/Painter2DEditDialogFillEntry.h"
 
-ot::Painter2DEditDialogFillEntry::Painter2DEditDialogFillEntry(const Painter2D* _painter) {
-	m_btn = new ColorPickButton;
+ot::Painter2DEditDialogFillEntry::Painter2DEditDialogFillEntry(const Painter2D* _painter, QWidget* _parent) {
+	m_btn = new ColorPickButton(_parent);
 	if (_painter) {
 		const FillPainter2D* actualPainter = dynamic_cast<const FillPainter2D*>(_painter);
 		OTAssertNullptr(actualPainter);

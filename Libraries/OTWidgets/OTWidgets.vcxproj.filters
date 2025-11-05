@@ -791,9 +791,6 @@
     <ClInclude Include="include\OTWidgets\GraphicsViewView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\BasicWidgetView.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\ColorStyleValue.h">
       <Filter>include\General</Filter>
     </ClInclude>
@@ -1108,6 +1105,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\Widget.h">
       <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\BasicWidgetView.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

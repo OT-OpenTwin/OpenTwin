@@ -31,8 +31,9 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PDFWidget)
 		OT_DECL_NOMOVE(PDFWidget)
+		OT_DECL_NODEFAULT(PDFWidget)
 	public:
-		PDFWidget(QWidget* _parentWidget = (QWidget*)nullptr);
+		explicit PDFWidget(QWidget* _parentWidget);
 		virtual ~PDFWidget();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

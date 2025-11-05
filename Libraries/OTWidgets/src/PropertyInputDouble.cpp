@@ -31,10 +31,10 @@ static ot::PropertyInputFactoryRegistrar<ot::PropertyInputDouble> propertyInputD
 #define OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR "."
 #define OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR
 
-ot::PropertyInputDouble::PropertyInputDouble() :
-	m_lineEdit(nullptr), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max())
+ot::PropertyInputDouble::PropertyInputDouble(QWidget* _parent) :
+	m_lineEdit(nullptr), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max()), m_parentWidget(_parent)
 {
-	m_spinBox = new DoubleSpinBox;
+	m_spinBox = new DoubleSpinBox(m_parentWidget);
 	this->connect(m_spinBox, &DoubleSpinBox::valueChangeCompleted, this, &PropertyInputDouble::lclValueChanged);
 }
 
@@ -244,7 +244,7 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 		}
 		
 		if (!m_lineEdit) {
-			m_lineEdit = new LineEdit;
+			m_lineEdit = new LineEdit(m_parentWidget);
 			m_lineEdit->setFocusPolicy(Qt::ClickFocus);
 		}
 		this->connect(m_lineEdit, &LineEdit::textChanged, this, &PropertyInputDouble::lclTextChanged);
@@ -257,7 +257,7 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 		}
 
 		if (!m_spinBox) {
-			m_spinBox = new DoubleSpinBox;
+			m_spinBox = new DoubleSpinBox(m_parentWidget);
 			this->connect(m_spinBox, &DoubleSpinBox::valueChangeCompleted, this, &PropertyInputDouble::lclValueChanged);
 		}
 	}

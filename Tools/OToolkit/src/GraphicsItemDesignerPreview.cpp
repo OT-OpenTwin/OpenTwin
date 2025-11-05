@@ -26,8 +26,8 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 
-GraphicsItemDesignerPreview::GraphicsItemDesignerPreview() 
-	: m_item(nullptr)
+GraphicsItemDesignerPreview::GraphicsItemDesignerPreview(QWidget* _parent) 
+	: ot::GraphicsView(_parent), m_item(nullptr)
 {
 	this->getGraphicsScene()->setGridFlags(ot::Grid::ShowNormalLines | ot::Grid::ShowWideLines | ot::Grid::AutoScaleGrid);
 }
@@ -54,7 +54,7 @@ void GraphicsItemDesignerPreview::updateCurrentItem(const ot::GraphicsItemCfg* _
 	const ViewportAnchor anchor = this->transformationAnchor();
 	this->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
 	qreal factor = 0.1;
-	
+
 	this->scale(factor, factor);
 	this->update();
 

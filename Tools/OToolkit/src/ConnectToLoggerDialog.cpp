@@ -44,8 +44,8 @@
 #define DIA_LOGW(___message) OTOOLKIT_LOGW("Logger Service Connector", ___message)
 #define DIA_LOGE(___message) OTOOLKIT_LOGE("Logger Service Connector", ___message)
 
-ConnectToLoggerDialog::ConnectToLoggerDialog()
-	: m_workerRunning(false), m_stopWorker(false)
+ConnectToLoggerDialog::ConnectToLoggerDialog(QWidget* _parent)
+	: ot::Dialog(_parent), m_workerRunning(false), m_stopWorker(false)
 {
 	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
 
@@ -55,11 +55,11 @@ ConnectToLoggerDialog::ConnectToLoggerDialog()
 	m_buttonLayout = new QHBoxLayout;
 	
 	// Create controls
-	m_urlL = new QLabel("URL:");
+	m_urlL = new QLabel("URL:", this);
 	m_url = new QLineEdit(settings->value("LoggerServiceURL", "").toString());
 
-	m_btnConnect = new QPushButton("Connect");
-	m_btnCancel = new QPushButton("Cancel");
+	m_btnConnect = new QPushButton("Connect", this);
+	m_btnCancel = new QPushButton("Cancel", this);
 
 	// Setup layouts
 	m_centralLayout->addLayout(m_inputLayout, 1);

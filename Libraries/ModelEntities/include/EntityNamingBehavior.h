@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityInformation.h
+// File: EntityNamingBehavior.h
 // 
 // License:
 // Copyright 2025 by OpenTwin

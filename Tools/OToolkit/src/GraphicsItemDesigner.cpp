@@ -63,22 +63,22 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	using namespace ot;
 
 	// Create views
-	m_view = new GraphicsItemDesignerView(this);
+	m_view = new GraphicsItemDesignerView(this, nullptr);
 	ot::WidgetView* view = this->createCentralWidgetView(m_view, "GID");
 	_content.addView(view);
 
 	m_drawHandler = new GraphicsItemDesignerDrawHandler(m_view);
 	m_view->setDrawHandler(m_drawHandler);
 
-	m_props = new ot::PropertyGrid;
+	m_props = new ot::PropertyGrid(nullptr);
 	view = this->createToolWidgetView(m_props->getQWidget(), "GID Properties");
 	_content.addView(view);
 	
-	m_navigation = new GraphicsItemDesignerNavigation(this);
+	m_navigation = new GraphicsItemDesignerNavigation(this, nullptr);
 	view = this->createToolWidgetView(m_navigation, "GID Explorer");
 	_content.addView(view);
 
-	m_preview = new GraphicsItemDesignerPreview;
+	m_preview = new GraphicsItemDesignerPreview(nullptr);
 	view = this->createCentralWidgetView(m_preview, "GID Preview");
 	_content.addView(view);
 
@@ -244,7 +244,7 @@ void GraphicsItemDesigner::slotExportRequested(void) {
 		return;
 	}
 
-	GraphicsItemDesignerExportDialog dia(this);
+	GraphicsItemDesignerExportDialog dia(this, m_view);
 	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}
@@ -258,7 +258,7 @@ void GraphicsItemDesigner::slotExportAsImageRequested(void) {
 		return;
 	}
 
-	GraphicsItemDesignerImageExportDialog dia(this);
+	GraphicsItemDesignerImageExportDialog dia(this, m_view);
 	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}

@@ -20,13 +20,19 @@
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
 #include "OTWidgets/PlainTextEdit.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/PlainTextEditView.h"
 
-ot::PlainTextEditView::PlainTextEditView(PlainTextEdit* _textEdit)
-	: WidgetView(WidgetViewBase::ViewText), m_textEdit(_textEdit)
+ot::PlainTextEditView::PlainTextEditView(QWidget* _parent) : PlainTextEditView(nullptr, _parent) {}
+
+ot::PlainTextEditView::PlainTextEditView(PlainTextEdit* _textEdit, QWidget* _parent)
+	: WidgetView(WidgetViewBase::ViewText, _parent), m_textEdit(_textEdit)
 {
 	if (!m_textEdit) {
-		m_textEdit = new PlainTextEdit;
+		m_textEdit = new PlainTextEdit(getViewDockWidget());
+	}
+	else {
+		m_textEdit->setParent(getViewDockWidget());
 	}
 
 	this->addWidgetInterfaceToDock(m_textEdit);

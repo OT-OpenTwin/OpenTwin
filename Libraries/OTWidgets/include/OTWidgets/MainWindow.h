@@ -31,7 +31,7 @@ namespace ot {
 		OT_DECL_NOCOPY(MainWindow)
 		OT_DECL_NOMOVE(MainWindow)
 	public:
-		MainWindow();
+		explicit MainWindow(QWidget* _parent = (QWidget*)nullptr);
 		virtual ~MainWindow();
 
 	private:

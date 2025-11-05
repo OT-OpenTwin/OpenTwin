@@ -38,8 +38,11 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT TreeWidgetFilter : public QObject, public ot::WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(TreeWidgetFilter)
+		OT_DECL_NOMOVE(TreeWidgetFilter)
+		OT_DECL_NODEFAULT(TreeWidgetFilter)
 	public:
-		TreeWidgetFilter(ot::TreeWidget * _tree = (ot::TreeWidget *)nullptr, int _filterColumn = 0);
+		explicit TreeWidgetFilter(QWidget* _parent, ot::TreeWidget * _tree = (ot::TreeWidget *)nullptr, int _filterColumn = 0);
 		virtual ~TreeWidgetFilter();
 
 		virtual void applyFilter(const QString& _filterText);

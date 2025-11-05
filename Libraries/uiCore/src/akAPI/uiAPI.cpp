@@ -35,10 +35,9 @@
 #include <akGui/aWindowEventHandler.h>
 
 // AK widgets
-#include <akWidgets/aCheckBoxWidget.h>
-#include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
+#include <akWidgets/aCheckBoxWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
 #include <akWidgets/aTtbGroup.h>
 #include <akWidgets/aTtbPage.h>
@@ -230,48 +229,53 @@ void ak::uiAPI::setSurfaceFormatDefaultSamplesCount(
 // Object creation
 
 ak::UID ak::uiAPI::createAction(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_text,
 	const QString &										_iconName,
 	const QString &										_iconSize
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::getIcon(_iconSize + "/" + _iconName + ".png"));
+	return m_objManager->createToolButton(_parent, _creatorUid, _text, ot::IconManager::getIcon(_iconSize + "/" + _iconName + ".png"));
 }
 
 ak::UID ak::uiAPI::createAction(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_text,
 	const QIcon &										_icon
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text, _icon);
+	return m_objManager->createToolButton(_parent, _creatorUid, _text, _icon);
 }
 
 ak::UID ak::uiAPI::createCheckbox(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_text,
 	bool												_checked
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createCheckBox(_creatorUid, _text, _checked);
+	return m_objManager->createCheckBox(_parent, _creatorUid, _text, _checked);
 }
 
 ak::UID ak::uiAPI::createLineEdit(
+	QWidget* _parent,
 	UID													_creatorUid,
 	const QString &											_initialText
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createLineEdit(_creatorUid, _initialText);
+	return m_objManager->createLineEdit(_parent, _creatorUid, _initialText);
 }
 
 ak::UID ak::uiAPI::createNiceLineEdit(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_initialText,
 	const QString &										_infoLabelText
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createNiceLineEdit(_creatorUid, _initialText, _infoLabelText);
+	return m_objManager->createNiceLineEdit(_parent, _creatorUid, _initialText, _infoLabelText);
 }
 
 ak::UID ak::uiAPI::createTabToolBarSubContainer(
@@ -291,37 +295,41 @@ ak::UID ak::uiAPI::createTimer(
 }
 
 ak::UID ak::uiAPI::createToolButton(
+	QWidget* _parent,
 	UID												_creatorUid
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid);
+	return m_objManager->createToolButton(_parent, _creatorUid);
 }
 
 ak::UID ak::uiAPI::createToolButton(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_text
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text);
+	return m_objManager->createToolButton(_parent, _creatorUid, _text);
 }
 
 ak::UID ak::uiAPI::createToolButton(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_text,
 	const QIcon &										_icon
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text, _icon);
+	return m_objManager->createToolButton(_parent, _creatorUid, _text, _icon);
 }
 
 ak::UID ak::uiAPI::createToolButton(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_text,
 	const QString &										_iconName,
 	const QString &										_iconFolder
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"));
+	return m_objManager->createToolButton(_parent, _creatorUid, _text, ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"));
 }
 
 ak::UID ak::uiAPI::createWindow(
@@ -553,7 +561,6 @@ void ak::uiAPI::object::setEnabled(
 	{
 	case otAction: akCastObject<aAction>(obj)->setEnabled(_enabled); return;
 	case otCheckBox: akCastObject<aCheckBoxWidget>(obj)->setEnabled(_enabled); return;
-	case otLabel: akCastObject<aLabelWidget>(obj)->setEnabled(_enabled); return;
 	case otLineEdit: akCastObject<aLineEditWidget>(obj)->setEnabled(_enabled); return;
 	case otNiceLineEdit: akCastObject<aNiceLineEditWidget>(obj)->setEnabled(_enabled); return;
 	case otTabToolbarGroup: akCastObject<aTtbGroup>(obj)->setEnabled(_enabled); return;
@@ -575,7 +582,6 @@ bool ak::uiAPI::object::getIsEnabled(
 	{
 	case otAction: return akCastObject<aAction>(obj)->isEnabled();
 	case otCheckBox: return akCastObject<aCheckBoxWidget>(obj)->isEnabled();
-	case otLabel: return akCastObject<aLabelWidget>(obj)->isEnabled();
 	case otLineEdit: return akCastObject<aLineEditWidget>(obj)->isEnabled();
 	case otNiceLineEdit: return akCastObject<aNiceLineEditWidget>(obj)->isEnabled();
 	case otTabToolbarGroup: return akCastObject<aTtbGroup>(obj)->enabled();

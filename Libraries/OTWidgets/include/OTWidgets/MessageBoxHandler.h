@@ -23,6 +23,8 @@
 #include "OTGui/MessageDialogCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
+class QWidget;
+
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT MessageBoxHandler {
@@ -30,7 +32,7 @@ namespace ot {
 		MessageBoxHandler();
 		virtual ~MessageBoxHandler();
 
-		virtual MessageDialogCfg::BasicButton showPrompt(const MessageDialogCfg& _config) = 0;
+		virtual MessageDialogCfg::BasicButton showPrompt(const MessageDialogCfg& _config, QWidget* _parent) = 0;
 	};
 
 }

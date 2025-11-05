@@ -22,7 +22,9 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/BasicWidgetView.h"
+#include "OTWidgets/WidgetViewManager.h"
 
 otoolkit::Tool::Tool() 
 	: m_isRunning(false), m_isExternal(false)
@@ -74,7 +76,7 @@ ot::WidgetView* otoolkit::Tool::createWidgetView(QWidget* _widget, const QString
 		OT_LOG_E("No widget provided");
 		return nullptr;
 	}
-	ot::BasicWidgetView* ret = new ot::BasicWidgetView(_widget);
+	ot::BasicWidgetView* ret = new ot::BasicWidgetView(_widget, ot::WidgetViewManager::instance().getDockManager());
 
 	ot::WidgetViewBase basicInformation(ot::WidgetViewBase::CustomView);
 	basicInformation.setEntityName(this->getToolName().toStdString() + "_" + _widgetName.toStdString());

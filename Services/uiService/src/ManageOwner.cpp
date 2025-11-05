@@ -44,8 +44,8 @@
 // ####################################################################################################
 // Table Widget 
 
-ManageOwnerTable::ManageOwnerTable()
-	: my_selectedRow(-1)
+ManageOwnerTable::ManageOwnerTable(QWidget* _parent)
+	: ot::Table(_parent), my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -54,8 +54,8 @@ ManageOwnerTable::ManageOwnerTable()
 	connect(this, &ManageOwnerTable::itemSelectionChanged, this, &ManageOwnerTable::slotSelectionChanged);
 }
 
-ManageOwnerTable::ManageOwnerTable(int _rows, int _columns)
-	: ot::Table(_rows, _columns), my_selectedRow(-1)
+ManageOwnerTable::ManageOwnerTable(int _rows, int _columns, QWidget* _parent)
+	: ot::Table(_rows, _columns, _parent), my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -162,7 +162,8 @@ void ManageOwnerTable::getSelectedItems(QTableWidgetItem *&first, QTableWidgetIt
 // ####################################################################################################
 // Main dialog box
 
-ManageOwner::ManageOwner(const std::string &authServerURL, const std::string &assetType, const std::string &assetName, const std::string &ownerName) 
+ManageOwner::ManageOwner(const std::string &authServerURL, const std::string &assetType, const std::string &assetName, const std::string &ownerName, QWidget* _parent) 
+	: ot::Dialog(_parent)
 {
 	m_authServerURL = authServerURL;
 	m_assetType = assetType;
@@ -176,12 +177,12 @@ ManageOwner::ManageOwner(const std::string &authServerURL, const std::string &as
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls
- 	ot::PushButton* btnClose = new ot::PushButton("Close");
-	ot::Label* labelGroups = new ot::Label(QString(assetType.c_str()) + " Owner");
+ 	ot::PushButton* btnClose = new ot::PushButton("Close", this);
+	ot::Label* labelGroups = new ot::Label(QString(assetType.c_str()) + " Owner", this);
 
-	m_filterGroups = new ot::LineEdit;
+	m_filterGroups = new ot::LineEdit(this);
 
-	m_ownersList = new ManageOwnerTable(0, 2);
+	m_ownersList = new ManageOwnerTable(0, 2, this);
 
 	// Setup controls
 	QFont font = labelGroups->font();
@@ -372,8 +373,8 @@ void ManageOwner::fillOwnerList(void)
 
 		m_ownersList->addRow(dataRowItems);
 
-		QWidget *pWidget = new QWidget();
-		ot::CheckBox* pCheckBox = new ot::CheckBox;
+		QWidget *pWidget = new QWidget(m_ownersList);
+		ot::CheckBox* pCheckBox = new ot::CheckBox(pWidget);
 		QHBoxLayout *pLayout = new QHBoxLayout(pWidget);
 		pLayout->addWidget(pCheckBox);
 		pLayout->setAlignment(Qt::AlignCenter);
@@ -418,7 +419,7 @@ void ManageGroupOwner::slotGroupCheckBoxChanged(bool state, int row)
 	config.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
 
 
-	if (AppBase::instance()->showPrompt(config) != ot::MessageDialogCfg::Yes) {
+	if (AppBase::instance()->showPrompt(config, nullptr) != ot::MessageDialogCfg::Yes) {
 		fillOwnerList();
 		return;
 	}
@@ -470,7 +471,7 @@ void ManageProjectOwner::slotGroupCheckBoxChanged(bool state, int row)
 	config.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
 
 
-	if (AppBase::instance()->showPrompt(config) != ot::MessageDialogCfg::Yes)
+	if (AppBase::instance()->showPrompt(config, nullptr) != ot::MessageDialogCfg::Yes)
 	{
 		fillOwnerList();
 		return;

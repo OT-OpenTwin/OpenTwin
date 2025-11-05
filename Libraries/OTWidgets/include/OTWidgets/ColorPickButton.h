@@ -34,9 +34,12 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT ColorPickButton : public QFrame, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ColorPickButton)
+		OT_DECL_NOMOVE(ColorPickButton)
+		OT_DECL_NODEFAULT(ColorPickButton)
 	public:
-		ColorPickButton(const QColor& _color = QColor(), QWidget* _parent = (QWidget*)nullptr);
-		ColorPickButton(const ot::Color& _color, QWidget* _parent = (QWidget*)nullptr);
+		explicit ColorPickButton(QWidget* _parent);
+		explicit ColorPickButton(const ot::Color& _color, QWidget* _parent);
+		explicit ColorPickButton(const QColor& _color, QWidget* _parent);
 		virtual ~ColorPickButton();
 
 		virtual QWidget* getQWidget(void) override { return this; };
@@ -68,8 +71,6 @@ namespace ot {
 		void updateButtonText(void);
 
 	private:
-		void ini(const QColor& _color);
-
 		bool m_useCustomToolTip;
 		bool m_editAlpha;
 		ColorPreviewBox* m_view;

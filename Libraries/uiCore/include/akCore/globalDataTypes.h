@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "OTWidgets/WidgetTypes.h"
 #include <QtCore/qglobal.h>
 
 #if defined(UICORE_EXPORT) // inside DLL

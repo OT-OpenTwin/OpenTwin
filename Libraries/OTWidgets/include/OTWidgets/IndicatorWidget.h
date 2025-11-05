@@ -31,6 +31,8 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT IndicatorWidget : public QAbstractButton, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(IndicatorWidget)
+		OT_DECL_NOMOVE(IndicatorWidget)
+		OT_DECL_NODEFAULT(IndicatorWidget)
 		Q_PROPERTY(Symbol checkedSymbol READ getCheckedSymbol WRITE setCheckedSymbol)
 		Q_PROPERTY(Symbol uncheckedSymbol READ getUncheckedSymbol WRITE setUncheckedSymbol)
 		Q_PROPERTY(bool drawFrame READ getDrawFrame WRITE setDrawFrame)
@@ -43,8 +45,8 @@ namespace ot {
 		};
 		Q_ENUM(Symbol)
 
-		IndicatorWidget(QWidget* _parent = (QWidget*)nullptr);
-		IndicatorWidget(bool _checked, QWidget* _parent = (QWidget*)nullptr);
+		explicit IndicatorWidget(QWidget* _parent);
+		explicit IndicatorWidget(bool _checked, QWidget* _parent);
 		virtual ~IndicatorWidget() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################

@@ -37,6 +37,9 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT TreeWidget : public QTreeWidget, public ot::WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(TreeWidget)
+		OT_DECL_NOMOVE(TreeWidget)
+		OT_DECL_NODEFAULT(TreeWidget)
 	public:
 		struct ItemInformation {
 			QString text;
@@ -44,7 +47,7 @@ namespace ot {
 			NavigationTreeItem::ItemFlags flags;
 		};
 
-		TreeWidget(QWidget * _parentWidget = (QWidget*)nullptr);
+		explicit TreeWidget(QWidget * _parentWidget);
 		virtual ~TreeWidget();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

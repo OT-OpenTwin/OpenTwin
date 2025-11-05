@@ -35,14 +35,21 @@ namespace ot{
 	class OT_WIDGETS_API_EXPORT Painter2DEditButton : public QFrame, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Painter2DEditButton)
+		OT_DECL_NOMOVE(Painter2DEditButton)
+		OT_DECL_NODEFAULT(Painter2DEditButton)
 	public:
+		
 		//! @brief Creates an instance.
-		//! Object takes ownership of the painter.
-		Painter2DEditButton(Painter2D* _painter = (Painter2D*)nullptr, QWidget* _parent = (QWidget*)nullptr);
+		explicit Painter2DEditButton(QWidget* _parent);
 
 		//! @brief Creates an instance.
 		//! Objects creates a copy of the painter.
-		Painter2DEditButton(const Painter2D* _painter, QWidget* _parent = (QWidget*)nullptr);
+		explicit Painter2DEditButton(const Painter2D* _painter, QWidget* _parent);
+
+		//! @brief Creates an instance.
+		//! Object takes ownership of the painter.
+		explicit Painter2DEditButton(Painter2D* _painter, QWidget* _parent);
+
 		virtual ~Painter2DEditButton();
 
 		virtual bool eventFilter(QObject* _obj, QEvent* _event) override;
@@ -73,7 +80,6 @@ namespace ot{
 		QString m_btnText;
 		Painter2DPreview* m_preview;
 
-		void ini(void);
 		void updateText(void);
 	};
 }

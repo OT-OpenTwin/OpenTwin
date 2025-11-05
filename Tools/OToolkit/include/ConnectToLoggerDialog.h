@@ -38,8 +38,11 @@ class QPushButton;
 
 class ConnectToLoggerDialog : public ot::Dialog {
 	Q_OBJECT
+	OT_DECL_NOCOPY(ConnectToLoggerDialog)
+	OT_DECL_NOMOVE(ConnectToLoggerDialog)
+	OT_DECL_NODEFAULT(ConnectToLoggerDialog)
 public:
-	ConnectToLoggerDialog();
+	ConnectToLoggerDialog(QWidget* _parent);
 	virtual ~ConnectToLoggerDialog();
 
 	//! @brief Moves all messages from the internal message buffer to the provided list.

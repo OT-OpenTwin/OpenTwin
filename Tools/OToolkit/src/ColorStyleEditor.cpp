@@ -101,7 +101,7 @@ ColorStyleEditor::~ColorStyleEditor() {
 
 bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	// Create layouts
-	ot::Splitter* rootSplitter = new ot::Splitter;
+	ot::Splitter* rootSplitter = new ot::Splitter(nullptr);
 	m_root = this->createCentralWidgetView(rootSplitter, "ColorStyle Editor");
 	_content.addView(m_root);
 
@@ -109,7 +109,7 @@ bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content
 	QVBoxLayout* rLay = new QVBoxLayout(rLayW);
 
 	// Create controls
-	m_propertyGrid = new ot::PropertyGrid;
+	m_propertyGrid = new ot::PropertyGrid(rootSplitter);
 
 	using namespace ot;
 
@@ -124,20 +124,21 @@ bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content
 
 	m_propertyGridConfig.setRootGroups({ generalGroup, m_painterGroup, m_intGroup, m_doubleGroup, m_fileGroup });
 
-	m_editor = new ot::TextEditor;
+	m_editorTab = new TabWidget(rLayW);
+
+	m_editor = new ot::TextEditor(m_editorTab);
 	m_editor->setReadOnly(true);
-	m_baseEditor = new ot::TextEditor;
+	m_baseEditor = new ot::TextEditor(m_editorTab);
 	m_baseEditor->setReadOnly(false);
 	m_baseEditor->setNewLineWithSamePrefix(true);
 	m_baseEditor->setDuplicateLineShortcutEnabled(true);
 	m_baseEditor->setEnableSameTextHighlighting(true);
 
-	m_editorTab = new TabWidget;
 	m_editorTab->addTab(m_baseEditor, CSE_TAB_Base);
 	m_editorTab->addTab(m_editor, CSE_TAB_Generated);
 
-	ot::PushButton* btnGenerate = new ot::PushButton("Generate");
-	ot::PushButton* btnApply = new ot::PushButton("Apply");
+	ot::PushButton* btnGenerate = new ot::PushButton("Generate", rLayW);
+	ot::PushButton* btnApply = new ot::PushButton("Apply", rLayW);
 	rLay->addWidget(m_editorTab, 1);
 	rLay->addWidget(btnGenerate);
 	rLay->addWidget(btnApply);

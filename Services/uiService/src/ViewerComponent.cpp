@@ -1110,11 +1110,11 @@ void ViewerComponent::viewerTabChanged(const ot::WidgetViewBase& _viewInfo) {
 }
 
 ViewerUIDtype ViewerComponent::createViewer(ModelUIDtype _modelUid, double _scaleWidth, double _scaleHeight,
-	int _backgroundR, int _backgroundG, int _backgroundB, int _overlayR, int _overlayG, int _overlayB) {
+	int _backgroundR, int _backgroundG, int _backgroundB, int _overlayR, int _overlayG, int _overlayB, QWidget* _parent) {
 	try {
 		try {
 			ViewerUIDtype uid = ViewerAPI::createViewer(_modelUid, _scaleWidth, _scaleHeight, _backgroundR, _backgroundG, _backgroundB,
-				_overlayR, _overlayG, _overlayB);
+				_overlayR, _overlayG, _overlayB, _parent);
 			m_viewers.push_back(uid);
 			return uid;
 		}

@@ -20,24 +20,24 @@
 // OpenTwin header
 #include "OTGui/RadialGradientPainter2D.h"
 #include "OTWidgets/CheckBox.h"
+#include "OTWidgets/Label.h"
 #include "OTWidgets/DoubleSpinBox.h"
 #include "OTWidgets/Painter2DEditDialogGradientBase.h"
 #include "OTWidgets/Painter2DEditDialogRadialGradientEntry.h"
 
 // Qt header
-#include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
 
-ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEntry(const Painter2D* _painter) {
+ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEntry(const Painter2D* _painter, QWidget* _parent) {
 	const RadialGradientPainter2D* actualPainter = dynamic_cast<const RadialGradientPainter2D*>(_painter);
 
-	m_cLayW = new QWidget;
+	m_cLayW = new QWidget(_parent);
 	m_cLay = new QVBoxLayout(m_cLayW);
 
 	QGridLayout* positionLay = new QGridLayout;
 
-	QLabel* centerXLabel = new QLabel("Center X:");
-	m_centerX = new DoubleSpinBox;
+	Label* centerXLabel = new Label("Center X:", m_cLayW);
+	m_centerX = new DoubleSpinBox(m_cLayW);
 	m_centerX->setRange(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
 	m_centerX->setDecimals(2);
 	m_centerX->setSuffix("%");
@@ -46,8 +46,8 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	positionLay->addWidget(centerXLabel, 0, 0);
 	positionLay->addWidget(m_centerX, 0, 1);
 
-	QLabel* centerYLabel = new QLabel("Center Y:");
-	m_centerY = new DoubleSpinBox;
+	Label* centerYLabel = new Label("Center Y:", m_cLayW);
+	m_centerY = new DoubleSpinBox(m_cLayW);
 	m_centerY->setRange(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
 	m_centerY->setDecimals(2);
 	m_centerY->setSuffix("%");
@@ -56,8 +56,8 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	positionLay->addWidget(centerYLabel, 1, 0);
 	positionLay->addWidget(m_centerY, 1, 1);
 
-	QLabel* centerRadiusLabel = new QLabel("Center Radius:");
-	m_centerRadius = new DoubleSpinBox;
+	Label* centerRadiusLabel = new Label("Center Radius:", m_cLayW);
+	m_centerRadius = new DoubleSpinBox(m_cLayW);
 	m_centerRadius->setRange(0., std::numeric_limits<double>::max());
 	m_centerRadius->setDecimals(2);
 	m_centerRadius->setValue(100.);
@@ -67,14 +67,14 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	positionLay->addWidget(centerRadiusLabel, 2, 0);
 	positionLay->addWidget(m_centerRadius, 2, 1);
 
-	QLabel* focalEnabledLabel = new QLabel("Focal enabled:");
-	m_useFocal = new CheckBox;
+	Label* focalEnabledLabel = new Label("Focal enabled:", m_cLayW);
+	m_useFocal = new CheckBox(m_cLayW);
 	if (actualPainter) m_useFocal->setChecked(actualPainter->isFocalPointSet());
 	positionLay->addWidget(focalEnabledLabel, 3, 0);
 	positionLay->addWidget(m_useFocal, 3, 1);
 
-	QLabel* focalXLabel = new QLabel("Focal X:");
-	m_focalX = new DoubleSpinBox;
+	Label* focalXLabel = new Label("Focal X:", m_cLayW);
+	m_focalX = new DoubleSpinBox(m_cLayW);
 	m_focalX->setRange(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
 	m_focalX->setDecimals(2);
 	m_focalX->setSuffix("%");
@@ -83,8 +83,8 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	positionLay->addWidget(focalXLabel, 4, 0);
 	positionLay->addWidget(m_focalX, 4, 1);
 
-	QLabel* focalYLabel = new QLabel("Focal Y:");
-	m_focalY = new DoubleSpinBox;
+	Label* focalYLabel = new Label("Focal Y:", m_cLayW);
+	m_focalY = new DoubleSpinBox(m_cLayW);
 	m_focalY->setRange(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
 	m_focalY->setDecimals(2);
 	m_focalY->setSuffix("%");
@@ -93,8 +93,8 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	positionLay->addWidget(focalYLabel, 5, 0);
 	positionLay->addWidget(m_focalY, 5, 1);
 
-	QLabel* focalRadiusLabel = new QLabel("Focal Radius:");
-	m_focalRadius = new DoubleSpinBox;
+	Label* focalRadiusLabel = new Label("Focal Radius:", m_cLayW);
+	m_focalRadius = new DoubleSpinBox(m_cLayW);
 	m_focalRadius->setRange(0., std::numeric_limits<double>::max());
 	m_focalRadius->setDecimals(2);
 	m_focalRadius->setSuffix("%");
@@ -104,7 +104,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	positionLay->addWidget(m_focalRadius, 6, 1);
 
 	m_cLay->addLayout(positionLay);
-	m_gradientBase = new Painter2DEditDialogGradientBase(m_cLay, actualPainter);
+	m_gradientBase = new Painter2DEditDialogGradientBase(m_cLay, actualPainter, m_cLayW);
 
 	this->slotFocalEnabledChanged();
 

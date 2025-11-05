@@ -44,7 +44,12 @@ namespace ot {
 		//! Creates an expander widget which is initially collapsed.
 		//! @param _title The title of the expander widget.
 		//! @param _parent The parent widget.
-		ExpanderWidget(const QString& _title = QString(), QWidget* _parent = (QWidget*)nullptr);
+		explicit ExpanderWidget(QWidget* _parent);
+
+		//! @brief Constructor.
+		//! Creates an expander widget which is initially collapsed.
+		//! @param _parent The parent widget.
+		explicit ExpanderWidget(const QString& _title, QWidget* _parent);
 		virtual ~ExpanderWidget();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

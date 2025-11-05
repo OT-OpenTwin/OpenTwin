@@ -30,9 +30,12 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT Label : public QLabel, public ot::WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(Label)
+		OT_DECL_NOMOVE(Label)
+		OT_DECL_NODEFAULT(Label)
 	public:
-		Label(QWidget* _parentWidget = (QWidget*)nullptr);
-		Label(const QString& _text, QWidget* _parentWidget = (QWidget*)nullptr);
+		explicit Label(QWidget* _parentWidget);
+		explicit Label(const QString& _text, QWidget* _parentWidget);
 		virtual ~Label() {};
 
 		//! @brief Returns a pointer to the root widget of this object

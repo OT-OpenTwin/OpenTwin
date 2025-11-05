@@ -45,8 +45,11 @@
 namespace ot {
 
 		class PropertyDialog::PropertyDialogNavigation : public TreeWidgetFilter {
+			OT_DECL_NOCOPY(PropertyDialogNavigation)
+			OT_DECL_NOMOVE(PropertyDialogNavigation)
+			OT_DECL_NODEFAULT(PropertyDialogNavigation)
 		public:
-			PropertyDialogNavigation() {
+			PropertyDialogNavigation(QWidget* _parent) : TreeWidgetFilter(_parent) {
 				this->getTreeWidget()->setHeaderHidden(true);
 				this->setOTWidgetFlags(ot::WidgetFlag::ApplyFilterOnTextChange | ot::WidgetFlag::ApplyFilterOnReturn);
 			}
@@ -97,29 +100,30 @@ namespace ot {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parentWidget)
-	: Dialog(_config, _parentWidget), m_changed(false)
+ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parent)
+	: Dialog(_config, _parent), m_changed(false)
 {
 	// Create layouts
 	QVBoxLayout* cLay = new QVBoxLayout(this);
-	QHBoxLayout* btnLay = new QHBoxLayout;
-
+	
 	// Create controls
-	Splitter* cSplitter = new Splitter;
-	m_grid = new PropertyGrid;
-	m_navigation = new PropertyDialogNavigation;
-
-	m_confirmButton = new PushButton("Confirm");
-	PushButton* btnCancel = new PushButton("Cancel");
-
-	// Setup layouts
+	Splitter* cSplitter = new Splitter(this);
 	cLay->addWidget(cSplitter, 1);
+
+	m_navigation = new PropertyDialogNavigation(cSplitter);
+	cSplitter->addWidget(m_navigation->getQWidget());
+
+	m_grid = new PropertyGrid(cSplitter);
+	cSplitter->addWidget(m_grid->getQWidget());
+
+	QHBoxLayout* btnLay = new QHBoxLayout;
+	btnLay->addStretch(1);
 	cLay->addLayout(btnLay);
 
-	cSplitter->addWidget(m_navigation->getQWidget());
-	cSplitter->addWidget(m_grid->getQWidget());
-	btnLay->addStretch(1);
+	m_confirmButton = new PushButton("Confirm", this);
 	btnLay->addWidget(m_confirmButton);
+
+	PushButton* btnCancel = new PushButton("Cancel", this);
 	btnLay->addWidget(btnCancel);
 
 	this->setupFromConfiguration(_config);

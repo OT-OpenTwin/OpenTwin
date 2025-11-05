@@ -232,6 +232,7 @@ namespace ak {
 		//! @param _iconName The name of the icon to display in the action (requires also the icon size to be provided)
 		//! @throw ak::Exception if the API is not initialized
 		UICORE_API_EXPORT UID createAction(
+			QWidget* _parent,
 			UID									_creatorUid,
 			const QString &						_text,
 			const QString &						_iconName,
@@ -244,6 +245,7 @@ namespace ak {
 		//! @param _icon The icon of the action
 		//! @throw ak::Exception if the API is not initialized
 		UICORE_API_EXPORT UID createAction(
+			QWidget* _parent,
 			UID									_craetorUid,
 			const QString &						_text,
 			const QIcon &						_icon
@@ -255,6 +257,7 @@ namespace ak {
 		//! @param _checked The initial checked state of the checkbox
 		//! @throw ak::Exception if the API is not initialized
 		UICORE_API_EXPORT UID createCheckbox(
+			QWidget* _parent,
 			UID									_creatorUid,
 			const QString &						_text,
 			bool								_checked = false
@@ -264,6 +267,7 @@ namespace ak {
 		//! param _creatorUid The UID of the creator
 		//! @param _initialText The initial text to display
 		UICORE_API_EXPORT UID createLineEdit(
+			QWidget* _parent,
 			UID									_creatorUid,
 			const QString &						_initialText = QString("")
 		);
@@ -272,6 +276,7 @@ namespace ak {
 		//! @param _initialText The initial text of the edit field
 		//! @param _infoLabelText The initial text of the information label
 		UICORE_API_EXPORT UID createNiceLineEdit(
+			QWidget* _parent,
 			UID									_creatorUid,
 			const QString &						_initialText,
 			const QString &						_infoLabelText
@@ -297,6 +302,7 @@ namespace ak {
 		//! @brief Will create a toolButton and return its UID
 		//! @param _creatorUid The UID of the creator
 		UICORE_API_EXPORT UID createToolButton(
+			QWidget* _parent,
 			UID									_creatorUid
 		);
 
@@ -304,6 +310,7 @@ namespace ak {
 		//! @param _creatorUid The UID of the creator
 		//! @param _text The initial text of the toolButton
 		UICORE_API_EXPORT UID createToolButton(
+			QWidget* _parent,
 			UID									_creatorUid,
 			const QString &						_text
 		);
@@ -313,6 +320,7 @@ namespace ak {
 		//! @param _text The initial text of the toolButton
 		//! @param _icon The initial icon of the toolButton
 		UICORE_API_EXPORT UID createToolButton(
+			QWidget* _parent,
 			UID									_creatorUid,
 			const QString &						_text,
 			const QIcon &						_icon
@@ -324,6 +332,7 @@ namespace ak {
 		//! @param _iconName The name of the initial icon for the toolButton
 		//! @param _iconFolder The folder of the initial icon for the toolButton
 		UICORE_API_EXPORT UID createToolButton(
+			QWidget* _parent,
 			UID									_creatorUid,
 			const QString &						_text,
 			const QString &						_iconName,

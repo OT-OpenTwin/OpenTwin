@@ -33,9 +33,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT WidgetViewDock : public ads::CDockWidget {
 		Q_OBJECT
 		OT_DECL_NOCOPY(WidgetViewDock)
+		OT_DECL_NOMOVE(WidgetViewDock)
 		OT_DECL_NODEFAULT(WidgetViewDock)
 	public:
-		WidgetViewDock(WidgetView* _view);
+		explicit WidgetViewDock(WidgetView* _view, QWidget* _parent);
 		virtual ~WidgetViewDock();
 
 		void openView();

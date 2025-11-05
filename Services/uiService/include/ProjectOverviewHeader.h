@@ -51,7 +51,7 @@ namespace ot {
 			Count
 		};
 
-		ProjectOverviewHeader(ProjectOverviewWidget* _overview, QWidget* _parent);
+		explicit ProjectOverviewHeader(ProjectOverviewWidget* _overview, QWidget* _parent);
 		virtual ~ProjectOverviewHeader();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

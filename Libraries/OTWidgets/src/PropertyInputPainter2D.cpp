@@ -29,9 +29,9 @@
 
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputPainter2D> propertyInputPainter2DRegistrar(ot::PropertyPainter2D::propertyTypeString());
 
-ot::PropertyInputPainter2D::PropertyInputPainter2D()
+ot::PropertyInputPainter2D::PropertyInputPainter2D(QWidget* _parent)
 {
-	m_button = new Painter2DEditButton;
+	m_button = new Painter2DEditButton(_parent);
 	m_button->getPushButton()->setObjectName("OT_PropertyInputPainter2D_Button");
 
 	this->connect(m_button, &Painter2DEditButton::painter2DChanged, this, qOverload<>(&PropertyInput::slotValueChanged));

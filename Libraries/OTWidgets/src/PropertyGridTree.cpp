@@ -24,7 +24,7 @@
 // Qt header
 #include <QtGui/qevent.h>
 
-ot::PropertyGridTree::PropertyGridTree() : m_wasShown(false), m_delegate(nullptr) {
+ot::PropertyGridTree::PropertyGridTree(QWidget* _parent) : TreeWidget(_parent), m_wasShown(false), m_delegate(nullptr) {
 	this->setColumnCount(2);
 	this->setHeaderLabels({ "Name", "Value" });
 	this->setIndentation(0);

@@ -32,9 +32,11 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT SpinBox : public QSpinBox, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(SpinBox)
+		OT_DECL_NOMOVE(SpinBox)
+		OT_DECL_NODEFAULT(SpinBox)
 	public:
-		SpinBox(QWidget* _parentWidget = (QWidget*)nullptr);
-		SpinBox(int _min, int _max, int _value, QWidget* _parentWidget = (QWidget*)nullptr);
+		explicit SpinBox(QWidget* _parentWidget);
+		explicit SpinBox(int _min, int _max, int _value, QWidget* _parentWidget);
 		virtual ~SpinBox();
 
 		virtual QWidget* getQWidget(void) override { return this; };

@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "NavigationTreeView.h"
+#include "OTWidgets/WidgetViewDock.h"
 
 // uiCore header
 #include "akWidgets/aTreeWidget.h"
@@ -26,10 +27,10 @@
 // Qt header
 #include <QtWidgets/qshortcut.h>
 
-ot::NavigationTreeView::NavigationTreeView()
-	: WidgetView(WidgetViewBase::ViewNavigation)
+ot::NavigationTreeView::NavigationTreeView(QWidget* _parent)
+	: WidgetView(WidgetViewBase::ViewNavigation, _parent)
 {
-	m_tree = new ak::aTreeWidget;
+	m_tree = new ak::aTreeWidget(getViewDockWidget());
 	this->addWidgetInterfaceToDock(m_tree);
 
 	QShortcut* projectNavCopy = new QShortcut(QKeySequence("Ctrl+C"), m_tree->getQWidget());

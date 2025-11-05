@@ -27,9 +27,11 @@ class Viewer;
 namespace ot {
 
 	class __declspec(dllexport) ViewerView : public WidgetView {
+		OT_DECL_NOCOPY(ViewerView)
+		OT_DECL_NOMOVE(ViewerView)
+		OT_DECL_NODEFAULT(ViewerView)
 	public:
-		ViewerView() = delete;
-		ViewerView(ot::UID _modelID, ot::UID _viewerID, double _scaleWidth, double _scaleHeight, int _backgroundR, int _backgroundG, int _backgroundB, int _overlayTextR, int _overlayTextG, int _overlayTextB);
+		ViewerView(ot::UID _modelID, ot::UID _viewerID, double _scaleWidth, double _scaleHeight, int _backgroundR, int _backgroundG, int _backgroundB, int _overlayTextR, int _overlayTextG, int _overlayTextB, QWidget* _parent);
 		virtual ~ViewerView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

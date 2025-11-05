@@ -44,18 +44,29 @@
 #include <QtWidgets/qheaderview.h>
 #include <QtOpenGLWidgets/qopenglwidget.h>
 
-WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager) {
+WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager, QWidget* _parent) {
 	// Create layouts
-	m_widget = new QWidget;
+	m_widget = new QWidget(_parent);
 	QVBoxLayout* centralLayout = new QVBoxLayout(m_widget);
 
 	// Crete controls
-	m_titleLabel = new ot::Label("Projects");
-	QOpenGLWidget* glWidget = new QOpenGLWidget;
+	m_titleLabel = new ot::Label("Projects", m_widget);
+	QFont welcomeFont = m_titleLabel->font();
+	welcomeFont.setPixelSize(28);
+	m_titleLabel->setFont(welcomeFont);
+	centralLayout->addWidget(m_titleLabel);
 
-	m_overview = new ot::ProjectOverviewWidget;
+	m_overview = new ot::ProjectOverviewWidget(m_widget);
 	m_overview->setMultiSelectionEnabled(true);
-	
+	centralLayout->addWidget(m_overview->getQWidget());
+	this->connect(m_overview, &ot::ProjectOverviewWidget::selectionChanged, this, &WelcomeWidget::slotSelectionChanged);
+	this->connect(m_overview, &ot::ProjectOverviewWidget::projectOpenRequested, this, &WelcomeWidget::slotOpenProject);
+	this->connect(m_overview, &ot::ProjectOverviewWidget::filterReturnPressed, this, &WelcomeWidget::slotCreateProject);
+
+	QOpenGLWidget* glWidget = new QOpenGLWidget(m_widget);
+	glWidget->setMaximumSize(1, 1);
+	centralLayout->addWidget(glWidget);
+
 	// Create Menu
 	tt::Group* projectGroup = _ttbPage->AddGroup("Project");
 	projectGroup->setObjectName("OT_TTBGroup");
@@ -63,46 +74,37 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager) {
 	editGroup->setObjectName("OT_TTBGroup");
 
 	m_createButton = this->iniToolButton("Create", "ToolBar/CreateProject.png", projectGroup, "Create new project");
+	this->connect(m_createButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCreateProject);
+
 	m_refreshButton = this->iniToolButton("Refresh", "ToolBar/RefreshProjects.png", projectGroup, "Refresh project list");
+	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRefreshProjectList);
+
 	m_toggleViewModeButton = this->iniToolButton("List View", "ToolBar/ListView.png", projectGroup, "Switch to List View");
+	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotToggleViewMode);
 
 	m_openButton = this->iniToolButton("Open", "ToolBar/OpenProject.png", editGroup, "Open selected project");
+	this->connect(m_openButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOpenProject);
+
 	m_copyButton = this->iniToolButton("Copy", "ToolBar/CopyProject.png", editGroup, "Copy selected project");
+	this->connect(m_copyButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCopyProject);
+
 	m_renameButton = this->iniToolButton("Rename", "ToolBar/RenameProject.png", editGroup, "Rename selected project");
+	this->connect(m_renameButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRenameProject);
+
 	m_deleteButton = this->iniToolButton("Delete", "ToolBar/DeleteProject.png", editGroup, "Delete selected project(s)");
 	m_deleteButton->setToolTip("Delete (Del)");
+	this->connect(m_deleteButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotDeleteProject);
+
 	m_exportButton = this->iniToolButton("Export", "ToolBar/ExportProject.png", editGroup, "Export selected project(s)");
+	this->connect(m_exportButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotExportProject);
+
 	m_accessButton = this->iniToolButton("Access", "ToolBar/ManageProjectAccess.png", editGroup, "Manage Access for selected projects");
+	this->connect(m_accessButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotAccessProject);
+
 	m_ownerButton = this->iniToolButton("Owner", "ToolBar/ChangeProjectOwner.png", editGroup, "Manage Owner of selected projects");
-
-	// Setup controls
-	QFont welcomeFont = m_titleLabel->font();
-	welcomeFont.setPixelSize(28);
-	m_titleLabel->setFont(welcomeFont);
-
-	glWidget->setMaximumSize(1, 1);
+	this->connect(m_ownerButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOwnerProject);
 
 	this->updateToolButtonsEnabledState();
-
-	// Setup layouts
-	centralLayout->addWidget(m_titleLabel);
-	centralLayout->addWidget(m_overview->getQWidget());
-	centralLayout->addWidget(glWidget);
-	
-	// Connect signals
-	this->connect(m_overview, &ot::ProjectOverviewWidget::selectionChanged, this, &WelcomeWidget::slotSelectionChanged);
-	this->connect(m_overview, &ot::ProjectOverviewWidget::projectOpenRequested, this, &WelcomeWidget::slotOpenProject);
-	this->connect(m_overview, &ot::ProjectOverviewWidget::filterReturnPressed, this, &WelcomeWidget::slotCreateProject);
-	this->connect(m_createButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCreateProject);
-	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRefreshProjectList);
-	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotToggleViewMode);
-	this->connect(m_openButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOpenProject);
-	this->connect(m_copyButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCopyProject);
-	this->connect(m_renameButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotRenameProject);
-	this->connect(m_deleteButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotDeleteProject);
-	this->connect(m_exportButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotExportProject);
-	this->connect(m_accessButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotAccessProject);
-	this->connect(m_ownerButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOwnerProject);
 
 	// Initialize view mode
 	std::string viewMode = _userManager.restoreSetting("WelcomeWidget_ViewMode");
@@ -112,7 +114,6 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager) {
 	else {
 		setViewMode(ot::ProjectOverviewWidget::viewModeFromString(viewMode));
 	}
-	
 }
 
 WelcomeWidget::~WelcomeWidget() {
@@ -213,7 +214,7 @@ void WelcomeWidget::slotSelectionChanged() {
 }
 
 ot::ToolButton* WelcomeWidget::iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip) {
-	ot::ToolButton* newButton = new ot::ToolButton(ot::IconManager::getIcon(_iconPath), _text);
+	ot::ToolButton* newButton = new ot::ToolButton(ot::IconManager::getIcon(_iconPath), _text, _group);
 	const int iconSize = QApplication::style()->pixelMetric(QStyle::PM_LargeIconSize);
 	newButton->setAutoRaise(true);
 	newButton->setIconSize(QSize(iconSize, iconSize));

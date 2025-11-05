@@ -30,8 +30,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT PropertyInputInt : public PropertyInput {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputInt)
+		OT_DECL_NOMOVE(PropertyInputInt)
+		OT_DECL_NODEFAULT(PropertyInputInt)
 	public:
-		PropertyInputInt();
+		explicit PropertyInputInt(QWidget* _parent);
 		virtual ~PropertyInputInt();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
@@ -55,6 +57,7 @@ namespace ot {
 	private:
 		int m_min;
 		int m_max;
+		QWidget* m_parentWidget;
 		SpinBox* m_spinBox;
 		LineEdit* m_lineEdit;
 	};

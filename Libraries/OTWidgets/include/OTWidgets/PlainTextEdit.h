@@ -32,8 +32,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT PlainTextEdit : public QPlainTextEdit, public ot::WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PlainTextEdit)
+		OT_DECL_NOMOVE(PlainTextEdit)
+		OT_DECL_NODEFAULT(PlainTextEdit)
 	public:
-		PlainTextEdit(QWidget* _parent = (QWidget*)nullptr);
+		explicit PlainTextEdit(QWidget* _parent);
 		virtual ~PlainTextEdit();
 
 		//! @brief Returns a pointer to the root widget of this object

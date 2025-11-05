@@ -39,22 +39,24 @@ LogInGSSEditDialogEntry::LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, Lo
 {
 	OTAssertNullptr(m_dialog);
 
+	QTableWidget* table = m_dialog->getTable();
+
 	// Create controls
-	m_name = new ot::LineEdit(_entry.getName());
+	m_name = new ot::LineEdit(_entry.getName(), table);
 	m_name->setMinimumWidth(180);
 	m_name->setPlaceholderText("Name (e.g. Local)");
 	m_name->setToolTip("Name (e.g. Local)");
 	m_name->setFocusPolicy(Qt::NoFocus);
 	m_name->connect(m_name, &ot::LineEdit::leftMouseButtonPressed, m_name, &ot::LineEdit::setInputFocus);
 
-	m_url = new ot::LineEdit(_entry.getUrl());
+	m_url = new ot::LineEdit(_entry.getUrl(), table);
 	m_url->setMinimumWidth(150);
 	m_url->setPlaceholderText("Session Service URL (e.g. 127.0.0.1)");
 	m_url->setToolTip("Session Service URL (e.g. 127.0.0.1)");
 	m_url->setFocusPolicy(Qt::NoFocus);
 	m_url->connect(m_url, &ot::LineEdit::leftMouseButtonPressed, m_url, &ot::LineEdit::setInputFocus);
 
-	m_port = new ot::LineEdit(_entry.getPort());
+	m_port = new ot::LineEdit(_entry.getPort(), table);
 	m_port->setMinimumWidth(150);
 	m_port->setPlaceholderText("Session Service Port (e.g. 8091)");
 	m_port->setToolTip("Session Service Port (e.g. 8091)");
@@ -69,18 +71,18 @@ LogInGSSEditDialogEntry::LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, Lo
 	m_delete->setIcon(ot::IconManager::getIcon("Table/Delete.png"));
 
 	// Setup table
-	m_row = m_dialog->getTable()->rowCount();
-	m_dialog->getTable()->insertRow(m_row);
-	m_dialog->getTable()->setCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Name, m_name);
-	m_dialog->getTable()->setCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Url, m_url);
-	m_dialog->getTable()->setCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Port, m_port);
-	m_dialog->getTable()->setItem(m_row, (int)LogInGSSEditDialog::TableColumn::Delete, m_delete);
+	m_row = table->rowCount();
+	table->insertRow(m_row);
+	table->setCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Name, m_name);
+	table->setCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Url, m_url);
+	table->setCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Port, m_port);
+	table->setItem(m_row, (int)LogInGSSEditDialog::TableColumn::Delete, m_delete);
 
 	// Connect signals
 	this->connect(m_name, &ot::LineEdit::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
 	this->connect(m_url, &ot::LineEdit::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
 	this->connect(m_port, &ot::LineEdit::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
-	this->connect(m_dialog->getTable(), &QTableWidget::itemPressed, this, &LogInGSSEditDialogEntry::slotDeleteItem);
+	this->connect(table, &QTableWidget::itemPressed, this, &LogInGSSEditDialogEntry::slotDeleteItem);
 }
 
 LogInGSSEditDialogEntry::~LogInGSSEditDialogEntry() {
@@ -186,8 +188,8 @@ bool LogInGSSEditDialogEntry::isValidPort(void) const {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entries) 
-	: m_dataChanged(false)
+LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entries, QWidget* _parent)
+	: ot::Dialog(_parent), m_dataChanged(false)
 {
 	using namespace ot;
 
@@ -198,10 +200,10 @@ LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entrie
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls
-	PushButton* addButton = new PushButton("Add");
-	m_table = new QTableWidget(0, (int)TableColumn::TableColumnCount);
-	PushButton* saveButton = new PushButton("Save");
-	PushButton* cancelButton = new PushButton("Cancel");
+	PushButton* addButton = new PushButton("Add", this);
+	m_table = new QTableWidget(0, (int)TableColumn::TableColumnCount, this);
+	PushButton* saveButton = new PushButton("Save", this);
+	PushButton* cancelButton = new PushButton("Cancel", this);
 
 	// Setup data
 	{

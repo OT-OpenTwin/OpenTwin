@@ -30,9 +30,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT TextEditorSearchPopup : public OverlayWidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(TextEditorSearchPopup)
+		OT_DECL_NOMOVE(TextEditorSearchPopup)
 		OT_DECL_NODEFAULT(TextEditorSearchPopup)
 	public:
-		TextEditorSearchPopup(TextEditor* _editor);
+		explicit TextEditorSearchPopup(TextEditor* _editor);
 
 		virtual ~TextEditorSearchPopup() {};
 

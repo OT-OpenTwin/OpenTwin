@@ -41,10 +41,11 @@ namespace ot {
 class LogInGSSEditDialogEntry : public QObject {
 	Q_OBJECT
 	OT_DECL_NOCOPY(LogInGSSEditDialogEntry)
+	OT_DECL_NOMOVE(LogInGSSEditDialogEntry)
 	OT_DECL_NODEFAULT(LogInGSSEditDialogEntry)
 public:
-	LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, LogInGSSEditDialog* _dialog);
-	~LogInGSSEditDialogEntry();
+	explicit LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, LogInGSSEditDialog* _dialog);
+	virtual ~LogInGSSEditDialogEntry();
 
 	LogInGSSEntry createEntry(void) const;
 	
@@ -83,10 +84,11 @@ private:
 class LogInGSSEditDialog : public ot::Dialog {
 	Q_OBJECT
 	OT_DECL_NOCOPY(LogInGSSEditDialog)
+	OT_DECL_NOMOVE(LogInGSSEditDialog)
 	OT_DECL_NODEFAULT(LogInGSSEditDialog)
 public:
-	LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entries);
-	~LogInGSSEditDialog() {};
+	explicit LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entries, QWidget* _parent);
+	virtual ~LogInGSSEditDialog() {};
 
 	std::vector<LogInGSSEntry> getEntries(void) const;
 

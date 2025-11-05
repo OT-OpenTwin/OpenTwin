@@ -42,7 +42,7 @@ class GraphicsItemDesignerImageExportDialog : public ot::Dialog {
 	OT_DECL_NODEFAULT(GraphicsItemDesignerImageExportDialog)
 	OT_DECL_NOCOPY(GraphicsItemDesignerImageExportDialog)
 public:
-	GraphicsItemDesignerImageExportDialog(GraphicsItemDesigner* _designer);
+	GraphicsItemDesignerImageExportDialog(GraphicsItemDesigner* _designer, QWidget* _parent);
 	virtual ~GraphicsItemDesignerImageExportDialog();
 
 	GraphicsItemDesignerImageExportConfig createImageExportConfig(void) const;

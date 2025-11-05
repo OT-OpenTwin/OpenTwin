@@ -624,7 +624,7 @@ void AppBase::manageGroups()
 {
 	slotLockUI(true);
 
-	ManageGroups groupManager(m_loginData.getAuthorizationUrl());
+	ManageGroups groupManager(m_loginData.getAuthorizationUrl(), m_welcomeScreen->getQWidget());
 
 	groupManager.showDialog();
 
@@ -915,17 +915,19 @@ void AppBase::createUi() {
 			// ########################################################################
 
 			// Setup UI
+			
 			uiAPI::window::addEventHandler(m_mainWindow, this);
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Setup tab toolbar");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 5);
 
-			ot::Label* logIntensityL = new ot::Label("Log Intensity:");
-			m_logIntensity = new ot::Label;
-			this->updateLogIntensityInfo();
-
 			ak::aWindowManager* windowManager = uiAPI::object::get<ak::aWindowManager>(m_mainWindow);
 			OTAssertNullptr(windowManager);
+
+			ot::Label* logIntensityL = new ot::Label("Log Intensity:", windowManager->window()->statusBar());
+			m_logIntensity = new ot::Label(windowManager->window()->statusBar());
+			this->updateLogIntensityInfo();
+
 			windowManager->window()->statusBar()->addPermanentWidget(logIntensityL);
 			windowManager->window()->statusBar()->addPermanentWidget(m_logIntensity);
 
@@ -939,28 +941,30 @@ void AppBase::createUi() {
 
 			// #######################################################################
 
-			// Create docks
+			// Create dock views
 			OT_LOG_D("Creating views");
 
-			ot::Label* defaultLabel = new ot::Label;
-			m_defaultView = new ot::BasicWidgetView(defaultLabel);
+			QWidget* dockManagerWidget = ot::WidgetViewManager::instance().getDockManager();
+
+			ot::Label* defaultLabel = new ot::Label(nullptr);
+			m_defaultView = new ot::BasicWidgetView(defaultLabel, dockManagerWidget);
 			m_defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::CustomView, ot::WidgetViewBase::ViewIsCentral));
 			m_defaultView->setViewIsPermanent(true);
 			m_defaultView->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
-			m_output = new ot::PlainTextEditView;
+			m_output = new ot::PlainTextEditView(dockManagerWidget);
 			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_output->setViewIsPermanent(true);
 			m_output->getPlainTextEdit()->setContextMenuPolicy(Qt::CustomContextMenu);
 			//m_output->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			this->connect(m_output->getPlainTextEdit(), &ot::PlainTextEdit::customContextMenuRequested, this, &AppBase::slotShowOutputContextMenu);
 
-			m_propertyGrid = new ot::PropertyGridView;
+			m_propertyGrid = new ot::PropertyGridView(dockManagerWidget);
 			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewProperties, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_propertyGrid->setViewIsPermanent(true);
 			//m_propertyGrid->getPropertyGrid()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
-			m_projectNavigation = new ot::NavigationTreeView;
+			m_projectNavigation = new ot::NavigationTreeView(dockManagerWidget);
 			m_projectNavigation->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROJECTNAVIGATION, TITLE_DOCK_PROJECTNAVIGATION, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewNavigation, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_projectNavigation->setViewIsPermanent(true);
 			
@@ -969,7 +973,7 @@ void AppBase::createUi() {
 
 			//m_projectNavigation->getTree()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
-			m_graphicsPicker = new ot::GraphicsPickerView;
+			m_graphicsPicker = new ot::GraphicsPickerView(dockManagerWidget);
 			m_graphicsPicker->setViewData(ot::WidgetViewBase("Block Picker", "Block Picker", ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewGraphicsPicker, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_graphicsPicker->setViewIsPermanent(true);
 			//m_graphicsPicker->getGraphicsPicker()->setInitialiDockLocation(ot::WidgetViewCfg::Left);
@@ -995,7 +999,7 @@ void AppBase::createUi() {
 			}
 
 			UserManagement uM(m_loginData);
-			m_welcomeScreen = new WelcomeWidget(m_ttb->getStartPage(), uM);
+			m_welcomeScreen = new WelcomeWidget(m_ttb->getStartPage(), uM, nullptr);
 
 			this->connect(m_welcomeScreen, &WelcomeWidget::createProjectRequest, this, &AppBase::slotCreateProject);
 			this->connect(m_welcomeScreen, &WelcomeWidget::openProjectRequest, this, &AppBase::slotOpenProject);
@@ -1264,8 +1268,10 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 	ot::Color col(255, 255, 255);
 	ot::Color overlayCol;
 
+	QWidget* viewManagerWidget = ot::WidgetViewManager::instance().getDockManager();
+
 	ViewerUIDtype viewID = m_viewerComponent->createViewer(_modelUID, DPIRatio, DPIRatio,
-		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b());
+		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b(), viewManagerWidget);
 
 	//NOTE, in future need to store tab information
 	QString text3D = availableTabText("3D");
@@ -1297,7 +1303,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 			this->disconnect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
 			delete m_versionGraph;
 		}
-		m_versionGraph = new ot::VersionGraphManagerView;
+		m_versionGraph = new ot::VersionGraphManagerView(viewManagerWidget);
 		m_versionGraph->getVersionGraphManager()->getGraph()->setVersionGraphConfigFlags(ot::VersionGraph::IgnoreActivateRequestOnReadOnly);
 		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewVersion, ot::WidgetViewBase::ViewFlag::ViewIsSide));
 		this->connect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
@@ -1911,7 +1917,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 		return nullptr;
 	}
 
-	newEditor = new ot::GraphicsViewView;
+	newEditor = new ot::GraphicsViewView(ot::WidgetViewManager::instance().getDockManager());
 	ot::WidgetViewBase baseData(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewNameAsTitle | ot::WidgetViewBase::ViewIsPinnable | ot::WidgetViewBase::ViewIsCloseable);
 
 	if (_visualizationConfig.getCustomViewFlags().has_value()) {
@@ -1999,7 +2005,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 		return nullptr;
 	}
 
-	newEditor = new ot::TextEditorView;
+	newEditor = new ot::TextEditorView(ot::WidgetViewManager::instance().getDockManager());
 	newEditor->setViewData(_config);
 	this->addVisualizingEntityInfoToView(newEditor, _visualizingEntities);
 
@@ -2071,7 +2077,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 		return nullptr;
 	}
 
-	newTable = new ot::TableView;
+	newTable = new ot::TableView(ot::WidgetViewManager::instance().getDockManager());
 	newTable->setViewData(_config);
 	this->addVisualizingEntityInfoToView(newTable, _visualizingEntities);
 
@@ -2138,7 +2144,7 @@ ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::Bas
 		return nullptr;
 	}
 
-	newPlot = new ot::PlotView;
+	newPlot = new ot::PlotView(ot::WidgetViewManager::instance().getDockManager());
 	newPlot->setViewData(_config);
 	this->addVisualizingEntityInfoToView(newPlot, _visualizingEntities);
 
@@ -2189,13 +2195,13 @@ void AppBase::closePlot(const std::string& _name) {
 
 // Slots
 
-ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const ot::MessageDialogCfg & _config) {
-	if (m_mainWindow != invalidUID) {
-		return ot::MessageDialog::showDialog(_config, uiAPI::object::get<aWindowManager>(m_mainWindow)->window());
+ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const ot::MessageDialogCfg & _config, QWidget* _parent) {
+	if (!_parent) {
+		if (m_mainWindow != invalidUID) {
+			_parent = this->mainWindow();
+		}
 	}
-	else {
-		return ot::MessageDialog::showDialog(_config);
-	}
+	return ot::MessageDialog::showDialog(_config, _parent);
 }
 
 ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons) {
@@ -2206,7 +2212,7 @@ ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _messag
 	config.setButtons(_buttons);
 	config.setIcon(_icon);
 
-	return this->showPrompt(config);
+	return this->showPrompt(config, nullptr);
 }
 
 void AppBase::slotShowInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
@@ -2955,7 +2961,8 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 		msgCfg.setTitle("Data Changed");
 		msgCfg.setText("You have unsaved changes in \"" + _view->getViewData().getTitle() + "\". If you continue unsaved changes will be lost. Continue?");
 		msgCfg.setIcon(ot::MessageDialogCfg::Warning);
-		if (ot::MessageDialog::showDialog(msgCfg) != ot::MessageDialogCfg::Yes) {
+
+		if (ot::MessageDialog::showDialog(msgCfg, this->mainWindow()) != ot::MessageDialogCfg::Yes) {
 			return;
 		}
 	}
@@ -3249,7 +3256,7 @@ void AppBase::slotCopyProject() {
 
 	const std::string& selectedProjectName = lst.front().getProjectName();
 
-	CopyProjectDialog dia(QString::fromStdString(selectedProjectName), projectManager);
+	CopyProjectDialog dia(QString::fromStdString(selectedProjectName), projectManager, m_welcomeScreen->getQWidget());
 	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}
@@ -3293,7 +3300,7 @@ void AppBase::slotRenameProject() {
 
 	const std::string& selectedProjectName = lst.front().getProjectName();
 
-	RenameProjectDialog dia(QString::fromStdString(selectedProjectName), projectManager);
+	RenameProjectDialog dia(QString::fromStdString(selectedProjectName), projectManager, m_welcomeScreen->getQWidget());
 	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}
@@ -3443,7 +3450,7 @@ void AppBase::slotManageProjectAccess() {
 	this->slotLockUI(true);
 
 	// Show the ManageAccess Dialog box
-	ManageAccess accessManager(m_loginData.getAuthorizationUrl(), selectedProjectName);
+	ManageAccess accessManager(m_loginData.getAuthorizationUrl(), selectedProjectName, m_welcomeScreen->getQWidget());
 	accessManager.showDialog();
 
 	this->slotLockUI(false);
@@ -3458,7 +3465,7 @@ void AppBase::slotManageProjectOwner() {
 
 	const std::string& selectedProjectName = lst.front().getProjectName();
 
-	ManageProjectOwner ownerManager(m_loginData.getAuthorizationUrl(), selectedProjectName, m_loginData.getUserName());
+	ManageProjectOwner ownerManager(m_loginData.getAuthorizationUrl(), selectedProjectName, m_loginData.getUserName(), m_welcomeScreen->getQWidget());
 
 	ownerManager.showDialog();
 

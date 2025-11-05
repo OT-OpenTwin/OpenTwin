@@ -31,8 +31,8 @@
 #include <QtWidgets/qgroupbox.h>
 #include <QtWidgets/qscrollarea.h>
 
-ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config)
-	: Dialog(_config)
+ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWidget* _parent)
+	: Dialog(_config, _parent)
 {
 	m_config = std::move(_config);
 

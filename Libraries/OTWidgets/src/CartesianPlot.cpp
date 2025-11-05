@@ -41,8 +41,8 @@
 #include <QtCore/qmath.h>
 #include <QtGui/qevent.h>
 
-ot::CartesianPlot::CartesianPlot(PlotBase* _owner)
-	: AbstractPlot(_owner), m_legend(nullptr)
+ot::CartesianPlot::CartesianPlot(PlotBase* _owner, QWidget* _parent)
+	: QwtPlot(_parent), AbstractPlot(_owner), m_legend(nullptr)
 {
 	setPlotAxis(new CartesianPlotAxis(AbstractPlotAxis::xBottom, this), nullptr, new CartesianPlotAxis(AbstractPlotAxis::yLeft, this), nullptr);
 

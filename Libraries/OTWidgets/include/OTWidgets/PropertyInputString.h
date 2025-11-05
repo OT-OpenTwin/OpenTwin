@@ -32,8 +32,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT PropertyInputString : public PropertyInput {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputString)
+		OT_DECL_NOMOVE(PropertyInputString)
+		OT_DECL_NODEFAULT(PropertyInputString)
 	public:
-		PropertyInputString(const QString& _text = QString());
+		explicit PropertyInputString(QWidget* _parent);
 		virtual ~PropertyInputString();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;

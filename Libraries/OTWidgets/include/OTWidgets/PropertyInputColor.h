@@ -32,8 +32,10 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PropertyInputColor : public PropertyInput {
 		OT_DECL_NOCOPY(PropertyInputColor)
+		OT_DECL_NOMOVE(PropertyInputColor)
+		OT_DECL_NODEFAULT(PropertyInputColor)
 	public:
-		PropertyInputColor();
+		explicit PropertyInputColor(QWidget* _parent);
 		virtual ~PropertyInputColor();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;

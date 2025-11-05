@@ -27,11 +27,11 @@
 #include <qmovie.h>
 #include <qlabel.h>
 
-ak::aAnimationOverlayWidget::aAnimationOverlayWidget()
-	: m_waitingAnimationVisible(false), m_animationDelay(0), m_animationDelayRequested(false)
+ak::aAnimationOverlayWidget::aAnimationOverlayWidget(QWidget* _parent)
+	: QWidget(_parent), m_waitingAnimationVisible(false), m_animationDelay(0), m_animationDelayRequested(false)
 {
 	m_childWidget = nullptr;
-	m_waitingLabel = new QLabel("");
+	m_waitingLabel = new QLabel("", this);
 	m_waitingLabel->setAttribute(Qt::WA_NoSystemBackground);
 	m_waitingLabel->setParent(this);
 	m_waitingLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
@@ -51,16 +51,27 @@ ak::aAnimationOverlayWidget::~aAnimationOverlayWidget() {
 void ak::aAnimationOverlayWidget::setChild(
 	QWidget *		_widget
 ) {
+	if (_widget == m_childWidget) {
+		return;
+	}
+
 	QSize s = size();
-	auto oldChild = m_childWidget;
+
+	if (m_childWidget) {
+		m_childWidget->setParent(nullptr);
+		m_childWidget->hide();
+	}
+
 	m_childWidget = _widget;
 	if (m_childWidget != nullptr) {
 		_widget->setParent(this);
 		_widget->resize(s);
 		_widget->show();
 	}
-	if (oldChild != nullptr) { oldChild->hide(); }
-	if (m_waitingAnimationVisible) { setWaitingAnimationVisible(true); }
+
+	if (m_waitingAnimationVisible) {
+		setWaitingAnimationVisible(true);
+	}
 }
 
 void ak::aAnimationOverlayWidget::resizeEvent(QResizeEvent * _event) {

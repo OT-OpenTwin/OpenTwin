@@ -46,7 +46,7 @@ class GraphicsItemDesignerNavigation : public ot::TreeWidget {
 	OT_DECL_NOCOPY(GraphicsItemDesignerNavigation)
 	OT_DECL_NODEFAULT(GraphicsItemDesignerNavigation)
 public:
-	GraphicsItemDesignerNavigation(GraphicsItemDesigner* _designer);
+	GraphicsItemDesignerNavigation(GraphicsItemDesigner* _designer, QWidget* _parent);
 	virtual ~GraphicsItemDesignerNavigation();
 
 	void addRootItem(GraphicsItemDesignerItemBase* _item, bool _keepName);

@@ -30,9 +30,12 @@ namespace ot {
 
 class ManageOwnerTable : public ot::Table {
 	Q_OBJECT
+	OT_DECL_NOCOPY(ManageOwnerTable)
+	OT_DECL_NOMOVE(ManageOwnerTable)
+	OT_DECL_NODEFAULT(ManageOwnerTable)
 public:
-	ManageOwnerTable();
-	ManageOwnerTable(int _row, int _column);
+	ManageOwnerTable(QWidget* _parent);
+	ManageOwnerTable(int _row, int _column, QWidget* _parent);
 	virtual ~ManageOwnerTable();
 
 	void addRow(const std::array<QTableWidgetItem *, 2> &_columns);
@@ -59,9 +62,11 @@ private:
 
 class ManageOwner : public ot::Dialog {
 	Q_OBJECT
-
+	OT_DECL_NOCOPY(ManageOwner)
+	OT_DECL_NOMOVE(ManageOwner)
+	OT_DECL_NODEFAULT(ManageOwner)
 public:
-	ManageOwner(const std::string &authServerURL, const std::string &assetType, const std::string &assetName, const std::string &ownerName);
+	ManageOwner(const std::string &authServerURL, const std::string &assetType, const std::string &assetName, const std::string &ownerName, QWidget* _parent);
 	virtual ~ManageOwner();
 
 public Q_SLOTS:
@@ -87,17 +92,15 @@ protected:
 	ot::CheckBox*								m_ownerCheckBox;
 
 	std::list<std::string>						m_userList;
-
-	ManageOwner() = delete;
-	ManageOwner(ManageOwner&) = delete;
-	ManageOwner& operator = (ManageOwner&) = delete;
 };
 
 class ManageGroupOwner : public ManageOwner {
 	Q_OBJECT
-
+	OT_DECL_NOCOPY(ManageGroupOwner)
+	OT_DECL_NOMOVE(ManageGroupOwner)
+	OT_DECL_NODEFAULT(ManageGroupOwner)
 public:
-	ManageGroupOwner(const std::string &authServerURL, const std::string &assetName, const std::string &ownerName) : ManageOwner(authServerURL, "Group", assetName, ownerName) {};
+	ManageGroupOwner(const std::string &authServerURL, const std::string &assetName, const std::string &ownerName, QWidget* _parent) : ManageOwner(authServerURL, "Group", assetName, ownerName, _parent) {};
 	virtual ~ManageGroupOwner() {};
 
 	virtual void slotGroupCheckBoxChanged(bool state, int row);
@@ -105,9 +108,11 @@ public:
 
 class ManageProjectOwner : public ManageOwner {
 	Q_OBJECT
-
+	OT_DECL_NOCOPY(ManageProjectOwner)
+	OT_DECL_NOMOVE(ManageProjectOwner)
+	OT_DECL_NODEFAULT(ManageProjectOwner)
 public:
-	ManageProjectOwner(const std::string &authServerURL, const std::string &assetName, const std::string &ownerName) : ManageOwner(authServerURL, "Project", assetName, ownerName) {};
+	ManageProjectOwner(const std::string &authServerURL, const std::string &assetName, const std::string &ownerName, QWidget* _parent) : ManageOwner(authServerURL, "Project", assetName, ownerName, _parent) {};
 	virtual ~ManageProjectOwner() {};
 
 	virtual void slotGroupCheckBoxChanged(bool state, int row);

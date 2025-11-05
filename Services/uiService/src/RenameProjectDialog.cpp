@@ -31,8 +31,9 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qmessagebox.h>
 
-RenameProjectDialog::RenameProjectDialog(const QString& _projectToRename, ProjectManagement& projectManager)
-	: m_projectToRename(_projectToRename), m_projectManager(&projectManager) {
+RenameProjectDialog::RenameProjectDialog(const QString& _projectToRename, ProjectManagement& projectManager, QWidget* _parent)
+	: ot::Dialog(_parent), m_projectToRename(_projectToRename), m_projectManager(&projectManager) 
+{
 	// Create layouts
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
 
@@ -40,11 +41,11 @@ RenameProjectDialog::RenameProjectDialog(const QString& _projectToRename, Projec
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls
-	ot::Label* nameLabel = new ot::Label("New Name:");
-	m_edit = new ot::LineEdit(m_projectToRename);
+	ot::Label* nameLabel = new ot::Label("New Name:", this);
+	m_edit = new ot::LineEdit(m_projectToRename, this);
 
-	ot::PushButton* confirmButton = new ot::PushButton("Confirm");
-	ot::PushButton* cancelButton = new ot::PushButton("Cancel");
+	ot::PushButton* confirmButton = new ot::PushButton("Confirm", this);
+	ot::PushButton* cancelButton = new ot::PushButton("Cancel", this);
 
 	// Setup layouts
 	centralLayout->addLayout(inputLayout);

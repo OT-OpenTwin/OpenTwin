@@ -33,14 +33,15 @@
 // std header
 #include <list>
 
-class QLabel;
 class QWidget;
 class QGridLayout;
 class QVBoxLayout;
 
 namespace ot {
 
+	class Label;
 	class Splitter;
+	class FlowLayout;
 	class TreeWidgetItem;
 	class GraphicsItemCfg;
 	class TreeWidgetFilter;
@@ -51,19 +52,19 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(GraphicsPicker)
 		OT_DECL_NOMOVE(GraphicsPicker)
+		OT_DECL_NODEFAULT(GraphicsPicker)
 	public:
 		struct PickerState {
 			QStringList expandedItems;
 			QStringList selectedItems;
 		};
 
-		GraphicsPicker(Qt::Orientation _orientation = Qt::Vertical);
+		explicit GraphicsPicker(QWidget* _parent);
+		explicit GraphicsPicker(Qt::Orientation _orientation, QWidget* _parent);
 		virtual ~GraphicsPicker();
 
 		virtual QWidget* getQWidget() override;
 		virtual const QWidget* getQWidget() const override;
-
-		virtual bool eventFilter(QObject* _watched, QEvent* _event) override;
 
 		void setOrientation(Qt::Orientation _orientation);
 		Qt::Orientation orientation() const;
@@ -95,16 +96,14 @@ namespace ot {
 
 		void storePreviewData(TreeWidgetItem* _item, const GraphicsPickerItemInfo& _info);
 
-		void rebuildPreview();
-
 		void getCurrentState(PickerState& _state, TreeWidgetItem* _item) const;
 		void applyState(const PickerState& _state, TreeWidgetItem* _item);
 
 		struct PreviewBox {
-			QWidget* layoutWidget;
-			QVBoxLayout* layout;
-			GraphicsItemPreview* view;
-			QLabel* label;
+			QWidget* layoutWidget = nullptr;
+			QVBoxLayout* layout = nullptr;
+			GraphicsItemPreview* view = nullptr;
+			Label* label = nullptr;
 		};
 
 		bool                  m_repaintPreviewRequired;
@@ -117,7 +116,7 @@ namespace ot {
 
 		std::list<PreviewBox> m_previews;
 		QWidget* m_viewLayoutW;
-		QGridLayout* m_viewLayout;
+		FlowLayout* m_viewLayout;
 
 		std::map<TreeWidgetItem*, std::list<GraphicsPickerItemInfo>*> m_previewData;
 	};
@@ -130,22 +129,25 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsPickerDockWidget : public QDockWidget {
 		Q_OBJECT
+		OT_DECL_NOCOPY(GraphicsPickerDockWidget)
+		OT_DECL_NOMOVE(GraphicsPickerDockWidget)
+		OT_DECL_NODEFAULT(GraphicsPickerDockWidget)
 	public:
 
 		//! @brief Constructor
 		//! @param _parentWidget The parent widget
-		GraphicsPickerDockWidget(QWidget* _parentWidget = (QWidget*)nullptr);
+		explicit GraphicsPickerDockWidget(QWidget* _parentWidget);
 
 		//! @brief Constructor
 		//! @param _title The initial dock title
 		//! @param _parentWidget The parent widget
-		GraphicsPickerDockWidget(const QString& _title, QWidget* _parentWidget = (QWidget*)nullptr);
+		explicit GraphicsPickerDockWidget(const QString& _title, QWidget* _parentWidget);
 
 		//! @brief Constructor
 		//! @param _customPickerWidget Provide own block picker widget instance (this dock widget takes ownership)
 		//! @param _title The initial dock title
 		//! @param _parentWidget The parent widget
-		GraphicsPickerDockWidget(GraphicsPicker* _customPickerWidget, const QString& _title, QWidget* _parentWidget = (QWidget*)nullptr);
+		explicit GraphicsPickerDockWidget(GraphicsPicker* _customPickerWidget, const QString& _title, QWidget* _parentWidget);
 
 		virtual ~GraphicsPickerDockWidget();
 

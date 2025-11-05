@@ -40,8 +40,10 @@
 #include <QtWidgets/qapplication.h>
 #include <QtWidgets/qgraphicsproxywidget.h>
 
-ot::GraphicsView::GraphicsView(GraphicsScene* _scene) :
-	m_scene(_scene), m_wheelEnabled(true), m_dropEnabled(false),
+ot::GraphicsView::GraphicsView(QWidget* _parent) : GraphicsView(nullptr, _parent) {}
+
+ot::GraphicsView::GraphicsView(GraphicsScene* _scene, QWidget* _parent) :
+	QGraphicsView(_parent), m_scene(_scene), m_wheelEnabled(true), m_dropEnabled(false),
 	m_viewFlags(NoViewFlags), m_viewStateFlags(DefaultState), m_sceneMargins(5., 5., 5., 5.)
 {
 	if (!m_scene) {

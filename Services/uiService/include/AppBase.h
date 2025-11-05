@@ -474,7 +474,7 @@ public:
 
 	// Prompt
 
-	virtual ot::MessageDialogCfg::BasicButton showPrompt(const ot::MessageDialogCfg& _config) override;
+	virtual ot::MessageDialogCfg::BasicButton showPrompt(const ot::MessageDialogCfg& _config, QWidget* _parent) override;
 
 	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
 

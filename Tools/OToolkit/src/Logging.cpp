@@ -38,6 +38,7 @@
 #include "OTWidgets/Splitter.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/Positioning.h"
+#include "OTWidgets/WidgetViewDock.h"
 
 // Qt header
 #include <QtCore/qtimer.h>
@@ -124,7 +125,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls	
-	ot::Splitter* splitter = new ot::Splitter;
+	ot::Splitter* splitter = new ot::Splitter(nullptr);
 	m_root = this->createCentralWidgetView(splitter, "Log Visualization");
 	_content.addView(m_root);
 
@@ -139,7 +140,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	splitter->setOrientation(Qt::Orientation::Vertical);
 
-	m_cellWidthMode = new ot::ComboBox;
+	m_cellWidthMode = new ot::ComboBox(splitter);
 	m_cellWidthMode->setEditable(false);
 	m_cellWidthMode->setPlaceholderText("Restore Columns");
 
@@ -519,7 +520,7 @@ void Logging::slotColumnWidthModeChanged(const QString& _text) {
 		for (const auto& it : m_columnWidthData) {
 			existingNames.push_back(it.first);
 		}
-		LogVisualizerColumnWidthSaveDialog dia(existingNames);
+		LogVisualizerColumnWidthSaveDialog dia(existingNames, m_root->getViewDockWidget());
 		ot::Positioning::centerWidgetOnParent(m_root->getViewWidget(), &dia);
 		if (dia.showDialog() != ot::Dialog::Ok) {
 			m_cellWidthMode->setCurrentIndex(0);
@@ -780,7 +781,7 @@ void Logging::slotImportFileLogs() {
 
 void Logging::runQuickExport() {
 	if (m_loggerUrl.empty()) {
-		ConnectToLoggerDialog dia;
+		ConnectToLoggerDialog dia(m_root->getViewDockWidget());
 		dia.queueConnectRequest();
 		dia.queueRecenterRequest();
 		dia.exec();
@@ -807,7 +808,7 @@ void Logging::runQuickExport() {
 		return;
 	}
 
-	QuickLogExport exportDia(m_messages);
+	QuickLogExport exportDia(m_messages, m_root->getViewDockWidget());
 	ot::Positioning::centerWidgetOnParent(m_root->getViewWidget(), &exportDia);
 
 	if (exportDia.showDialog() == ot::Dialog::Ok) {
@@ -902,7 +903,7 @@ void Logging::connectToLogger(bool _isAutoConnect) {
 		return;
 	}
 
-	ConnectToLoggerDialog dia;
+	ConnectToLoggerDialog dia(m_root->getViewDockWidget());
 	if (_isAutoConnect) {
 		dia.queueConnectRequest();
 	}

@@ -63,7 +63,7 @@ EditProjectInformationDialog::EditProjectInformationDialog(const std::string& _c
 	
 	// Title section
 	QHBoxLayout* titleLayout = new QHBoxLayout;
-	titleLayout->addWidget(new Label(QString::fromStdString("Project: " + m_projectInformation.getProjectName())));
+	titleLayout->addWidget(new Label(QString::fromStdString("Project: " + m_projectInformation.getProjectName()), this));
 	mainLayout->addLayout(titleLayout);
 
 	// Image section

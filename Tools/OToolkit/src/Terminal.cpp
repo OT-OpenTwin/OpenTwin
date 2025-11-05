@@ -405,20 +405,20 @@ bool Terminal::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
-	ot::Splitter* spl = new ot::Splitter;
+	ot::Splitter* spl = new ot::Splitter(nullptr);
 	m_root = this->createCentralWidgetView(spl, "Terminal");
 	_content.addView(m_root);
 
-	m_leftLayoutW = new QWidget;
+	m_leftLayoutW = new QWidget(spl);
 	m_leftLayout = new QVBoxLayout(m_leftLayoutW);
 
 	m_buttonLayout = new QGridLayout;
 	m_navigationLayout = new QHBoxLayout;
 
-	m_rightLayoutW = new QWidget;
+	m_rightLayoutW = new QWidget(spl);
 	m_rightLayout = new QVBoxLayout(m_rightLayoutW);
 
-	m_rightSplitter = new ot::Splitter;
+	m_rightSplitter = new ot::Splitter(m_rightLayoutW);
 
 	m_receiverBox = new QGroupBox("Configuration");
 	m_receiverLayout = new QGridLayout;

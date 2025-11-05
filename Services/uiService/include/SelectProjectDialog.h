@@ -44,7 +44,7 @@ class SelectProjectDialog : public ot::Dialog {
 	OT_DECL_NOMOVE(SelectProjectDialog)
 	OT_DECL_NODEFAULT(SelectProjectDialog)
 public:
-	SelectProjectDialog(const ot::DialogCfg& _config, QWidget* _parent);
+	explicit SelectProjectDialog(const ot::DialogCfg& _config, QWidget* _parent);
 	virtual ~SelectProjectDialog();
 
 	ot::ProjectInformation getSelectedProject() const;

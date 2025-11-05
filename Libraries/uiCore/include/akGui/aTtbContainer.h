@@ -28,7 +28,7 @@
 // AK header
 #include <akCore/globalDataTypes.h>
 #include <akCore/akCore.h>
-#include <akCore/aObject.h>
+#include <akWidgets/aWidget.h>
 
 #define TTB_CONT_DEL_PARENTCHECK assert(m_parentObject != nullptr); m_parentObject->removeChildObject(this);
 #define TTB_CONTAINER_DESTROYING TTB_CONT_DEL_PARENTCHECK
@@ -40,7 +40,7 @@ namespace ak {
 	class aUidManager;
 	
 	//! This class provides a interface that represents a tab toolbar container.
-	class UICORE_API_EXPORT aTtbContainer : public aObject {
+	class UICORE_API_EXPORT aTtbContainer : public aWidget {
 	public:
 
 		//! @brief Constructor, initializes the uid of this container

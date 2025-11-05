@@ -28,16 +28,28 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qfiledialog.h>
 
-ot::PathBrowseEdit::PathBrowseEdit(PathBrowseMode _mode, QWidget* _parent) :
-	m_mode(_mode), m_root(nullptr), m_edit(nullptr), m_button(nullptr)
-{
-	this->ini(_parent);
-}
+ot::PathBrowseEdit::PathBrowseEdit(PathBrowseMode _mode, QWidget* _parent) : PathBrowseEdit(QString(), _mode, _parent) {}
 
 ot::PathBrowseEdit::PathBrowseEdit(const QString& _path, PathBrowseMode _mode, QWidget* _parent) :
 	m_mode(_mode), m_path(_path), m_root(nullptr), m_edit(nullptr), m_button(nullptr)
 {
-	this->ini(_parent);
+	m_root = new QWidget(_parent);
+	m_root->setContentsMargins(0, 0, 0, 0);
+
+	QHBoxLayout* rootLayout = new QHBoxLayout(m_root);
+	rootLayout->setContentsMargins(0, 0, 0, 0);
+
+	m_edit = new LineEdit(m_path, m_root);
+
+	rootLayout->addWidget(m_edit, 1);
+
+	m_button = new PushButton("Browse", m_root);
+	rootLayout->addWidget(m_button);
+
+	this->setBrowseMode(m_mode);
+
+	this->connect(m_edit, &QLineEdit::editingFinished, this, &PathBrowseEdit::slotEditChanged);
+	this->connect(m_button, &QPushButton::clicked, this, &PathBrowseEdit::slotBrowse);
 }
 
 ot::PathBrowseEdit::~PathBrowseEdit() {
@@ -102,24 +114,4 @@ void ot::PathBrowseEdit::slotEditChanged(void) {
 	m_path = m_edit->text();
 
 	Q_EMIT pathChanged();
-}
-
-void ot::PathBrowseEdit::ini(QWidget* _parent) {
-	m_root = new QWidget(_parent);
-	m_root->setContentsMargins(0, 0, 0, 0);
-
-	QHBoxLayout* rootLayout = new QHBoxLayout(m_root);
-	rootLayout->setContentsMargins(0, 0, 0, 0);
-
-	m_edit = new LineEdit(m_path);
-
-	rootLayout->addWidget(m_edit, 1);
-
-	m_button = new PushButton("Browse");
-	rootLayout->addWidget(m_button);
-
-	this->setBrowseMode(m_mode);
-
-	this->connect(m_edit, &QLineEdit::editingFinished, this, &PathBrowseEdit::slotEditChanged);
-	this->connect(m_button, &QPushButton::clicked, this, &PathBrowseEdit::slotBrowse);
 }

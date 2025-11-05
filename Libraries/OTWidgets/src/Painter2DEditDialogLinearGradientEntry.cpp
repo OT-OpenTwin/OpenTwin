@@ -19,24 +19,24 @@
 
 // OpenTwin header
 #include "OTGui/LinearGradientPainter2D.h"
+#include "OTWidgets/Label.h"
 #include "OTWidgets/DoubleSpinBox.h"
 #include "OTWidgets/Painter2DEditDialogGradientBase.h"
 #include "OTWidgets/Painter2DEditDialogLinearGradientEntry.h"
 
 // Qt header
-#include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
 
-ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEntry(const Painter2D* _painter) {
+ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEntry(const Painter2D* _painter, QWidget* _parent) {
 	const LinearGradientPainter2D* actualPainter = dynamic_cast<const LinearGradientPainter2D*>(_painter);
 
-	m_cLayW = new QWidget;
+	m_cLayW = new QWidget(_parent);
 	m_cLay = new QVBoxLayout(m_cLayW);
 
 	QGridLayout* positionLay = new QGridLayout;
 
-	QLabel* startXLabel = new QLabel("Start X:");
-	m_startX = new DoubleSpinBox;
+	Label* startXLabel = new Label("Start X:", m_cLayW);
+	m_startX = new DoubleSpinBox(m_cLayW);
 	m_startX->setRange(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
 	m_startX->setDecimals(2);
 	m_startX->setSuffix("%");
@@ -45,8 +45,8 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	positionLay->addWidget(startXLabel, 0, 0);
 	positionLay->addWidget(m_startX, 0, 1);
 
-	QLabel* startYLabel = new QLabel("Start Y:");
-	m_startY = new DoubleSpinBox;
+	Label* startYLabel = new Label("Start Y:", m_cLayW);
+	m_startY = new DoubleSpinBox(m_cLayW);
 	m_startY->setRange(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
 	m_startY->setDecimals(2);
 	m_startY->setSuffix("%");
@@ -55,8 +55,8 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	positionLay->addWidget(startYLabel, 1, 0);
 	positionLay->addWidget(m_startY, 1, 1);
 
-	QLabel* endXLabel = new QLabel("End X:");
-	m_finalX = new DoubleSpinBox;
+	Label* endXLabel = new Label("End X:", m_cLayW);
+	m_finalX = new DoubleSpinBox(m_cLayW);
 	m_finalX->setRange(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
 	m_finalX->setDecimals(2);
 	m_finalX->setValue(100.);
@@ -66,8 +66,8 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	positionLay->addWidget(endXLabel, 2, 0);
 	positionLay->addWidget(m_finalX, 2, 1);
 
-	QLabel* endYLabel = new QLabel("End Y:");
-	m_finalY = new DoubleSpinBox;
+	Label* endYLabel = new Label("End Y:", m_cLayW);
+	m_finalY = new DoubleSpinBox(m_cLayW);
 	m_finalY->setRange(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
 	m_finalY->setDecimals(2);
 	m_finalY->setValue(100.);
@@ -78,7 +78,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	positionLay->addWidget(m_finalY, 3, 1);
 
 	m_cLay->addLayout(positionLay);
-	m_gradientBase = new Painter2DEditDialogGradientBase(m_cLay, actualPainter);
+	m_gradientBase = new Painter2DEditDialogGradientBase(m_cLay, actualPainter, m_cLayW);
 
 	this->connect(m_startX, &DoubleSpinBox::valueChanged, this, &Painter2DEditDialogEntry::slotValueChanged);
 	this->connect(m_startY, &DoubleSpinBox::valueChanged, this, &Painter2DEditDialogEntry::slotValueChanged);

@@ -22,11 +22,12 @@
 // OpenTwin header
 #include "PlotManager.h"
 #include "PlotManagerView.h"
+#include "OTWidgets/WidgetViewDock.h"
 
-ot::PlotManagerView::PlotManagerView()
-	: WidgetView(WidgetViewBase::View1D)
+ot::PlotManagerView::PlotManagerView(QWidget* _parent)
+	: WidgetView(WidgetViewBase::View1D, _parent)
 {
-	m_plotManager = new PlotManager;
+	m_plotManager = new PlotManager(getViewDockWidget());
 
 	this->addWidgetInterfaceToDock(m_plotManager);
 }

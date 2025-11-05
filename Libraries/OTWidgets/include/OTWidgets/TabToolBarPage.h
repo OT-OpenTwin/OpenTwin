@@ -41,7 +41,7 @@ namespace ot {
 		OT_DECL_NOCOPY(TabToolBarPage)
 		OT_DECL_NODEFAULT(TabToolBarPage)
 	public:
-		TabToolBarPage(TabToolBar* _parentTabToolBar, tt::Page* _page, const std::string& _name);
+		explicit TabToolBarPage(TabToolBar* _parentTabToolBar, tt::Page* _page, const std::string& _name);
 		virtual ~TabToolBarPage();
 
 		const std::string& getName(void) const { return m_name; };

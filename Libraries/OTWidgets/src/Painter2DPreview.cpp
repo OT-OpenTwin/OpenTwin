@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/Painter2D.h"
-#include "OTGui/Painter2D.h"
+#include "OTGui/FillPainter2D.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
@@ -30,12 +30,16 @@
 #include <QtGui/qpainter.h>
 #include <QtCore/qrect.h>
 
-ot::Painter2DPreview::Painter2DPreview(const ot::Painter2D* _painter) :
-	m_maintainAspectRatio(false)
+ot::Painter2DPreview::Painter2DPreview(QWidget* _parent) : Painter2DPreview(nullptr, _parent) {}
+
+ot::Painter2DPreview::Painter2DPreview(const ot::Painter2D* _painter, QWidget* _parent) 
+	: QFrame(_parent), m_maintainAspectRatio(false)
 {
 	this->setMinimumSize(10, 10);
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
-	if (_painter) this->setFromPainter(_painter);
+	if (_painter) {
+		this->setFromPainter(_painter);
+	}
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &Painter2DPreview::slotGlobalStyleChanged);
 }
 

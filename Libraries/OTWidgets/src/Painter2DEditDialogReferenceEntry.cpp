@@ -23,8 +23,8 @@
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/Painter2DEditDialogReferenceEntry.h"
 
-ot::Painter2DEditDialogReferenceEntry::Painter2DEditDialogReferenceEntry(const Painter2DDialogFilter& _filter, const Painter2D* _painter) {
-	m_comboBox = new ComboBox;
+ot::Painter2DEditDialogReferenceEntry::Painter2DEditDialogReferenceEntry(const Painter2DDialogFilter& _filter, const Painter2D* _painter, QWidget* _parent) {
+	m_comboBox = new ComboBox(_parent);
 
 	const StyleRefPainter2D* actualPainter = dynamic_cast<const StyleRefPainter2D*>(_painter);
 

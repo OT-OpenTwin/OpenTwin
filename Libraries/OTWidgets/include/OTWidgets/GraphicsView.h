@@ -52,6 +52,7 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(GraphicsView)
 		OT_DECL_NOMOVE(GraphicsView)
+		OT_DECL_NODEFAULT(GraphicsView)
 	public:
 		enum GraphicsViewFlag {
 			NoViewFlags            = 0x00, //! @brief No flags.
@@ -68,7 +69,8 @@ namespace ot {
 		};
 		typedef ot::Flags<ViewStateFlag> ViewStateFlags;
 
-		GraphicsView(GraphicsScene* _scene = (GraphicsScene*)nullptr);
+		explicit GraphicsView(QWidget* _parent);
+		explicit GraphicsView(GraphicsScene* _scene, QWidget* _parent);
 		virtual ~GraphicsView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

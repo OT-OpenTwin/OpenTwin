@@ -25,15 +25,15 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 
-ot::PixmapWidget::PixmapWidget() :
-	m_enabledResizing(true), m_userResized(false)
+ot::PixmapWidget::PixmapWidget(QWidget* _parent) :
+	QFrame(_parent), m_enabledResizing(true), m_userResized(false)
 {
 	this->setMinimumSize(10, 10);
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 }
 
-ot::PixmapWidget::PixmapWidget(const QPixmap& _pixmap) :
-	m_enabledResizing(true), m_userResized(false)
+ot::PixmapWidget::PixmapWidget(const QPixmap& _pixmap, QWidget* _parent) :
+	QFrame(_parent), m_enabledResizing(true), m_userResized(false)
 {
 	this->setMinimumSize(10, 10);
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));

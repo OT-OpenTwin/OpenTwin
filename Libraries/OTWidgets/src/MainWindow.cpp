@@ -20,7 +20,9 @@
 // OpenTwin header
 #include "OTWidgets/MainWindow.h"
 
-ot::MainWindow::MainWindow() {
+ot::MainWindow::MainWindow(QWidget* _parent) 
+	: QMainWindow(_parent)
+{
 
 }
 

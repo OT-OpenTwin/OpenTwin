@@ -27,11 +27,11 @@ ot::MessageBoxManager& ot::MessageBoxManager::instance(void) {
 	return g_instance;
 }
 
-ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showPrompt(const MessageDialogCfg& _config) {
-	return MessageBoxManager::instance().forwardPromt(_config);
+ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showPrompt(const MessageDialogCfg& _config, QWidget* _parent) {
+	return MessageBoxManager::instance().forwardPromt(_config, _parent);
 }
 
-ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, MessageDialogCfg::BasicIcon _icon, const MessageDialogCfg::BasicButtons& _buttons) {
+ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, MessageDialogCfg::BasicIcon _icon, const MessageDialogCfg::BasicButtons& _buttons, QWidget* _parent) {
 	ot::MessageDialogCfg config;
 	config.setText(_message);
 	config.setDetailedText(_detailedMessage);
@@ -39,24 +39,24 @@ ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showPrompt(const std::s
 	config.setButtons(_buttons);
 	config.setIcon(_icon);
 
-	return MessageBoxManager::showPrompt(config);
+	return MessageBoxManager::showPrompt(config, _parent);
 }
 
-ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons) {
-	return MessageBoxManager::showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Information, _buttons);
+ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons, QWidget* _parent) {
+	return MessageBoxManager::showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Information, _buttons, _parent);
 }
 
-ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons) {
-	return MessageBoxManager::showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Warning, _buttons);
+ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons, QWidget* _parent) {
+	return MessageBoxManager::showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Warning, _buttons, _parent);
 }
 
-ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons) {
-	return MessageBoxManager::showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Critical, _buttons);
+ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons, QWidget* _parent) {
+	return MessageBoxManager::showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Critical, _buttons, _parent);
 }
 
-ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::forwardPromt(const MessageDialogCfg& _config) {
+ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::forwardPromt(const MessageDialogCfg& _config, QWidget* _parent) {
 	if (m_handler) {
-		return m_handler->showPrompt(_config);
+		return m_handler->showPrompt(_config, _parent);
 	}
 	else {
 		OT_LOG_EA("No message box handler set");

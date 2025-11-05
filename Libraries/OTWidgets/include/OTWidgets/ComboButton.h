@@ -31,10 +31,12 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT ComboButton : public PushButton {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ComboButton)
+		OT_DECL_NOMOVE(ComboButton)
+		OT_DECL_NODEFAULT(ComboButton)
 	public:
-		ComboButton(QWidget* _parent = (QWidget*)nullptr);
-		ComboButton(const QString& _text, QWidget* _parent = (QWidget*)nullptr);
-		ComboButton(const QString& _text, const QStringList& _items, QWidget* _parent = (QWidget*)nullptr);
+		explicit ComboButton(QWidget* _parent);
+		explicit ComboButton(const QString& _text, QWidget* _parent);
+		explicit ComboButton(const QString& _text, const QStringList& _items, QWidget* _parent);
 		virtual ~ComboButton();
 
 		virtual void mousePressEvent(QMouseEvent* _event) override;

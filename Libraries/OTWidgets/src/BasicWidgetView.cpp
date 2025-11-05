@@ -19,13 +19,18 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/BasicWidgetView.h"
 
-ot::BasicWidgetView::BasicWidgetView(QWidget* _widget) 
-	: WidgetView(WidgetViewBase::CustomView), m_widget(_widget)
+// Qt header
+#include <QtWidgets/qwidget.h>
+
+ot::BasicWidgetView::BasicWidgetView(QWidget* _widget, QWidget* _parent)
+	: WidgetView(WidgetViewBase::CustomView, _parent), m_widget(_widget)
 {
 	OTAssertNullptr(m_widget);
 	this->addWidgetToDock(m_widget);
+	m_widget->setParent(this->getViewDockWidget());
 }
 
 ot::BasicWidgetView::~BasicWidgetView() {}

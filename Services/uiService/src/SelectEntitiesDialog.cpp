@@ -41,16 +41,16 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 	QHBoxLayout* btnLay = new QHBoxLayout;
 
 	// Create controls
-	QLabel* lAvail = new QLabel("Available");
-	m_available = new ot::TreeWidgetFilter;
+	QLabel* lAvail = new QLabel("Available", this);
+	m_available = new ot::TreeWidgetFilter(this);
 	m_available->getTreeWidget()->setHeaderHidden(true);
 
-	QLabel* lSelec = new QLabel("Selected");
-	m_selected = new ot::TreeWidgetFilter;
+	QLabel* lSelec = new QLabel("Selected", this);
+	m_selected = new ot::TreeWidgetFilter(this);
 	m_selected->getTreeWidget()->setHeaderHidden(true);
 
-	ot::PushButton* btnApply = new ot::PushButton("Apply");
-	ot::PushButton* btnCancel = new ot::PushButton("Cancel");
+	ot::PushButton* btnApply = new ot::PushButton("Apply", this);
+	ot::PushButton* btnCancel = new ot::PushButton("Cancel", this);
 
 	// Setup layouts
 	cLay->addLayout(inpLay, 1);

@@ -31,9 +31,12 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT SVGWidget : public QObject, public WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(SVGWidget)
+		OT_DECL_NOMOVE(SVGWidget)
+		OT_DECL_NODEFAULT(SVGWidget)
 	public:
-		SVGWidget(QWidget* _parent = (QWidget*)nullptr) : SVGWidget(QByteArray(), _parent) {};
-		SVGWidget(const QByteArray& _svgData, QWidget* _parent = (QWidget*)nullptr);
+		explicit SVGWidget(QWidget* _parent) : SVGWidget(QByteArray(), _parent) {};
+		explicit SVGWidget(const QByteArray& _svgData, QWidget* _parent);
 
 		virtual QWidget* getQWidget(void) override;
 		virtual const QWidget* getQWidget(void) const override;

@@ -27,9 +27,9 @@
 
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputColor> propertyInputColorRegistrar(ot::PropertyColor::propertyTypeString());
 
-ot::PropertyInputColor::PropertyInputColor()
+ot::PropertyInputColor::PropertyInputColor(QWidget* _parent)
 {
-	m_colorBtn = new ColorPickButton;
+	m_colorBtn = new ColorPickButton(_parent);
 	m_colorBtn->getQWidget()->setContentsMargins(0, 0, 0, 0);
 	m_colorBtn->getPushButton()->setObjectName("OT_PropertyInputColor_Button");
 	this->connect(m_colorBtn, &ColorPickButton::colorChanged, this, qOverload<>(&PropertyInput::slotValueChanged));

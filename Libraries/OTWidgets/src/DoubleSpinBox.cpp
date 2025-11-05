@@ -25,21 +25,22 @@
 #include <QtCore/qtimer.h>
 #include <QtGui/qevent.h>
 
-ot::DoubleSpinBox::DoubleSpinBox(QWidget* _parent) :
-	QDoubleSpinBox(_parent), m_requireSignal(false), m_timer(nullptr)
-{
-	this->ini();
-}
+ot::DoubleSpinBox::DoubleSpinBox(QWidget* _parent) : DoubleSpinBox(0., 100., 0., 2, _parent) {}
 
 ot::DoubleSpinBox::DoubleSpinBox(double _min, double _max, double _value, int _precision, QWidget* _parent) :
 	QDoubleSpinBox(_parent), m_requireSignal(false), m_timer(nullptr)
 {
-	this->ini();
+	m_timer = new QTimer;
+	m_timer->setInterval(700);
+	m_timer->setSingleShot(true);
 	
 	OTAssert(_value >= _min && _value <= _max && _max >= _min, "Invalid setup");
 	this->setRange(_min, _max);
 	this->setDecimals(_precision);
 	this->setValue(_value);
+
+	this->connect(this, &DoubleSpinBox::valueChanged, this, &DoubleSpinBox::slotValueChanged);
+	this->connect(m_timer, &QTimer::timeout, this, &DoubleSpinBox::slotValueChangedTimeout);
 }
 
 ot::DoubleSpinBox::~DoubleSpinBox() {}
@@ -80,13 +81,4 @@ void ot::DoubleSpinBox::slotValueChangedTimeout(void) {
 		m_requireSignal = false;
 		Q_EMIT valueChangeCompleted(this->value());
 	}
-}
-
-void ot::DoubleSpinBox::ini(void) {
-	m_timer = new QTimer;
-	m_timer->setInterval(700);
-	m_timer->setSingleShot(true);
-
-	this->connect(this, &DoubleSpinBox::valueChanged, this, &DoubleSpinBox::slotValueChanged);
-	this->connect(m_timer, &QTimer::timeout, this, &DoubleSpinBox::slotValueChangedTimeout);
 }

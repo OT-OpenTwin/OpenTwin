@@ -25,30 +25,25 @@
 #include <qmenu.h>
 #include <qevent.h>
 
-ak::aToolButtonWidget::aToolButtonWidget()
-	: QToolButton(), aWidget(otToolButton),
+ak::aToolButtonWidget::aToolButtonWidget(QWidget* _parent)
+	: QToolButton(_parent), aWidget(otToolButton),
 	m_action(nullptr)
 {
-	m_action = new aAction();
+	m_action = new aAction(QToolButton::InstantPopup, this);
 	ini();
 }
 
-ak::aToolButtonWidget::aToolButtonWidget(
-	const QString &				_text
-)	: QToolButton(), ak::aWidget(otToolButton),
+ak::aToolButtonWidget::aToolButtonWidget(const QString& _text, QWidget* _parent) : QToolButton(_parent), ak::aWidget(otToolButton),
 	m_action(nullptr)
 {
-	m_action = new aAction(_text);
+	m_action = new aAction(_text, QToolButton::InstantPopup, this);
 	ini();
 }
 
-ak::aToolButtonWidget::aToolButtonWidget(
-	const QIcon &				_icon,
-	const QString &				_text
-)	: QToolButton(), ak::aWidget(otToolButton),
+ak::aToolButtonWidget::aToolButtonWidget(const QIcon& _icon, const QString& _text, QWidget* _parent) : QToolButton(_parent), ak::aWidget(otToolButton),
 	m_action(nullptr)
 {
-	m_action = new aAction(_icon, _text);
+	m_action = new aAction(_icon, _text, QToolButton::InstantPopup, this);
 	ini();
 }
 

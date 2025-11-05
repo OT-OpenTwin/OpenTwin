@@ -27,14 +27,14 @@
 
 namespace ot {
 
-	template <class T>
+	template <typename T>
 	class PropertyInputFactoryRegistrar {
-		OT_DECL_NODEFAULT(PropertyInputFactoryRegistrar)
 		OT_DECL_NOCOPY(PropertyInputFactoryRegistrar)
 		OT_DECL_NOMOVE(PropertyInputFactoryRegistrar)
+		OT_DECL_NODEFAULT(PropertyInputFactoryRegistrar)
 	public:
 		PropertyInputFactoryRegistrar(const std::string& _key);
-		~PropertyInputFactoryRegistrar() {};
+		~PropertyInputFactoryRegistrar() = default;
 	};
 
 }

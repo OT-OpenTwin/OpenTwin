@@ -31,9 +31,10 @@ namespace ot { class PushButton; }
 class ManageGroupsTable : public ot::Table {
 	Q_OBJECT
 	OT_DECL_NOCOPY(ManageGroupsTable)
+	OT_DECL_NOMOVE(ManageGroupsTable)
 	OT_DECL_NODEFAULT(ManageGroupsTable)
 public:
-	ManageGroupsTable(int _row, int _column);
+	ManageGroupsTable(int _row, int _column, QWidget* _parent);
 	virtual ~ManageGroupsTable();
 
 	void addRow(const std::array<QTableWidgetItem *, 2>& _columns);
@@ -62,9 +63,10 @@ private:
 class AddGroupDialog : public ot::Dialog {
 	Q_OBJECT
 	OT_DECL_NOCOPY(AddGroupDialog)
+	OT_DECL_NOMOVE(AddGroupDialog)
 	OT_DECL_NODEFAULT(AddGroupDialog)
 public:
-	AddGroupDialog(const std::string &authServerURL);
+	AddGroupDialog(const std::string &authServerURL, QWidget* _parent);
 	virtual ~AddGroupDialog();
 
 	QString groupName(void) const;
@@ -82,9 +84,10 @@ private:
 class RenameGroupDialog : public ot::Dialog {
 	Q_OBJECT
 	OT_DECL_NOCOPY(RenameGroupDialog)
+	OT_DECL_NOMOVE(RenameGroupDialog)
 	OT_DECL_NODEFAULT(RenameGroupDialog)
 public:
-	RenameGroupDialog(const std::string &groupName, const std::string &authServerURL);
+	RenameGroupDialog(const std::string &groupName, const std::string &authServerURL, QWidget* _parent);
 	virtual ~RenameGroupDialog();
 
 	QString groupName(void) const;
@@ -109,9 +112,11 @@ private:
 
 class ManageGroups : public ot::Dialog {
 	Q_OBJECT
-
+	OT_DECL_NOCOPY(ManageGroups)
+	OT_DECL_NOMOVE(ManageGroups)
+	OT_DECL_NODEFAULT(ManageGroups)
 public:
-	ManageGroups(const std::string &authServerURL);
+	ManageGroups(const std::string &authServerURL, QWidget* _parent);
 	virtual ~ManageGroups();
 
 public Q_SLOTS:
@@ -141,9 +146,5 @@ private:
 
 	std::list<std::string>						m_userList;
 	std::map<std::string, bool>					m_userInGroup;
-
-	ManageGroups() = delete;
-	ManageGroups(ManageGroups&) = delete;
-	ManageGroups& operator = (ManageGroups&) = delete;
 };
 

@@ -27,7 +27,9 @@
 
 namespace ot {
 
-	TagListEntry::TagListEntry(QWidget* _parent) : QFrame(_parent) {
+	TagListEntry::TagListEntry(QWidget* _parent) 
+		: QFrame(_parent) 
+	{
 		setFrameShape(QFrame::Box);
 		setFrameShadow(QFrame::Raised);
 		QHBoxLayout* layout = new QHBoxLayout(this);

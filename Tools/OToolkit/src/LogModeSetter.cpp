@@ -45,60 +45,65 @@
 LogModeSetter::LogModeSetter() {
 	// Create layouts
 	QScrollArea* rootScrollArea = new QScrollArea;
-	m_root = rootScrollArea;
-	QWidget* rootLayoutW = new QWidget;
-	QVBoxLayout* rootLayout = new QVBoxLayout(rootLayoutW);
-	rootScrollArea->setWidget(rootLayoutW);
 	rootScrollArea->setWidgetResizable(true);
-	
-	QGridLayout* inputLayout = new QGridLayout;
-	
-	QGroupBox* typeBox = new QGroupBox("Active Log Type");
-	QVBoxLayout* typeLayout = new QVBoxLayout(typeBox);
+	m_root = rootScrollArea;
 
-	// Create controls
-	QLabel* gssL = new QLabel("GSS Url:");
-	m_gssUrl = new QLineEdit;
+	QWidget* rootLayoutW = new QWidget(rootScrollArea);
+	rootScrollArea->setWidget(rootLayoutW);
+
+	QVBoxLayout* rootLayout = new QVBoxLayout(rootLayoutW);
+
+	QGridLayout* inputLayout = new QGridLayout;
+	rootLayout->addLayout(inputLayout);
+
+	QLabel* gssL = new QLabel("GSS Url:", rootLayoutW);
+	inputLayout->addWidget(gssL, 0, 0);
+
+	m_gssUrl = new QLineEdit(rootLayoutW);
 	m_gssUrl->setPlaceholderText("GSS URL (e.g. 127.0.0.1:8091");
 	m_gssUrl->setToolTip("GSS (Global Session Service) url.");
+	inputLayout->addWidget(m_gssUrl, 0, 1);
 
-	QLabel* modeL = new QLabel("Mode:");
-	m_mode = new QComboBox;
+	QLabel* modeL = new QLabel("Mode:", rootLayoutW);
+	inputLayout->addWidget(modeL, 1, 0);
+
+	m_mode = new QComboBox(rootLayoutW);
 	m_mode->addItems({ LMS_Mode_Global });
 	m_mode->setToolTip("Type of log command:\n"
 		LMS_Mode_Global ": Log Flags will be applied to all services in all sessions.\n"
 	);
-
-	m_msgTypeDetailed = new QCheckBox("Detailed");
-	m_msgTypeInfo = new QCheckBox("Info");
-	m_msgTypeWarning = new QCheckBox("Warning");
-	m_msgTypeError = new QCheckBox("Error");
-	m_msgTypeMsgIn = new QCheckBox("Inbound Message");
-	m_msgTypeMsgOut = new QCheckBox("Outgoing Message");
-	m_msgTypeTest = new QCheckBox("Test");
-
-	QPushButton* applyButton = new QPushButton("Send");
-
-	// Setup layouts
-	rootLayout->addLayout(inputLayout);
-	rootLayout->addWidget(typeBox);
-	rootLayout->addStretch(1);
-	rootLayout->addWidget(applyButton);
-
-	inputLayout->addWidget(gssL, 0, 0);
-	inputLayout->addWidget(m_gssUrl, 0, 1);
-	inputLayout->addWidget(modeL, 1, 0);
 	inputLayout->addWidget(m_mode, 1, 1);
+	
+	QGroupBox* typeBox = new QGroupBox("Active Log Type", rootLayoutW);
+	rootLayout->addWidget(typeBox);
 
+	QVBoxLayout* typeLayout = new QVBoxLayout(typeBox);
+
+	m_msgTypeInfo = new QCheckBox("Info", typeBox);
 	typeLayout->addWidget(m_msgTypeInfo);
+
+	m_msgTypeDetailed = new QCheckBox("Detailed", typeBox);
 	typeLayout->addWidget(m_msgTypeDetailed);
+
+	m_msgTypeWarning = new QCheckBox("Warning", typeBox);
 	typeLayout->addWidget(m_msgTypeWarning);
+
+	m_msgTypeError = new QCheckBox("Error", typeBox);
 	typeLayout->addWidget(m_msgTypeError);
+
+	m_msgTypeMsgIn = new QCheckBox("Inbound Message", typeBox);
 	typeLayout->addWidget(m_msgTypeMsgIn);
+
+	m_msgTypeMsgOut = new QCheckBox("Outgoing Message", typeBox);
 	typeLayout->addWidget(m_msgTypeMsgOut);
+
+	m_msgTypeTest = new QCheckBox("Test", typeBox);
 	typeLayout->addWidget(m_msgTypeTest);
 
-	// Connect signals
+	rootLayout->addStretch(1);
+
+	QPushButton* applyButton = new QPushButton("Send", rootLayoutW);
+	rootLayout->addWidget(applyButton);
 	this->connect(applyButton, &QPushButton::clicked, this, &LogModeSetter::slotApply);
 }
 

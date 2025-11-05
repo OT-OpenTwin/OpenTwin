@@ -30,8 +30,8 @@
 // Qt header
 #include <QtGui/qevent.h>
 
-ot::PolarPlot::PolarPlot(PlotBase* _owner)
-	: AbstractPlot(_owner), m_legend(nullptr)
+ot::PolarPlot::PolarPlot(PlotBase* _owner, QWidget* _parent)
+	: QwtPolarPlot(_parent), AbstractPlot(_owner), m_legend(nullptr)
 {
 	m_grid = new PolarPlotGrid(this);
 	m_magnifier = new PolarPlotMagnifier(this);

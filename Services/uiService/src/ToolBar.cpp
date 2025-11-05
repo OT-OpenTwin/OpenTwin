@@ -32,6 +32,7 @@
 // uiCore header
 #include <akAPI/uiAPI.h>
 #include <akWidgets/aToolButtonWidget.h>
+#include <akGui/aTtbContainer.h>
 #include <akWidgets/aTtbPage.h>
 #include <akWidgets/aTtbGroup.h>
 
@@ -67,14 +68,19 @@ ToolBar::ToolBar(AppBase * _owner)
 	m_view.page = uiAPI::createTabToolBarSubContainer(m_owner->m_uid, m_owner->m_mainWindow, "View");
 	m_view.gUserInterface = uiAPI::createTabToolBarSubContainer(m_owner->m_uid, m_view.page, "User Interface");
 
+	auto cont = uiAPI::object::get<aTtbGroup>(m_file.gDefault);
+	OTAssertNullptr(cont);
+	
 	// Create tool buttons
-	m_file.gDefault_aExit = uiAPI::createToolButton(m_owner->m_uid, "Exit", c_icoExit, c_icoPath);
-	m_file.gDefault_aSettings = uiAPI::createToolButton(m_owner->m_uid, "Settings", c_icoSettings, c_icoPath);
-	m_file.gDefault_aImport = uiAPI::createToolButton(m_owner->m_uid, "Import Project", c_icoImport, c_icoPath);
-	m_file.gDefault_aGroup = uiAPI::createToolButton(m_owner->m_uid, "Manage Groups", c_icoGroup, c_icoPath);
-	m_file.gDefault_aExportLog = uiAPI::createToolButton(m_owner->m_uid, "Export Log", c_icoExportLog, c_icoPath);
+	m_file.gDefault_aExit = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Exit", c_icoExit, c_icoPath);
+	m_file.gDefault_aSettings = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Settings", c_icoSettings, c_icoPath);
+	m_file.gDefault_aImport = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Import Project", c_icoImport, c_icoPath);
+	m_file.gDefault_aGroup = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Manage Groups", c_icoGroup, c_icoPath);
+	m_file.gDefault_aExportLog = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Export Log", c_icoExportLog, c_icoPath);
 
-	m_view.gUserInterface_aSettings = uiAPI::createToolButton(m_owner->m_uid, "Settings", c_icoSettings, c_icoPath);
+	cont = uiAPI::object::get<aTtbGroup>(m_view.gUserInterface);
+	OTAssertNullptr(cont);
+	m_view.gUserInterface_aSettings = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Settings", c_icoSettings, c_icoPath);
 	QAction* toggleAction = ot::WidgetViewManager::instance().getDockToggleAction();
 	toggleAction->setIcon(ot::IconManager::getIcon("Default/Docks.png"));
 	toggleAction->setToolTip(c_tipDocks);
@@ -171,32 +177,72 @@ ot::UID ToolBar::addSubGroup(ot::UID _creator, ot::UID _group, const QString & _
 }
 
 ot::UID ToolBar::addToolButton(ot::UID _creator, ot::UID _container, const QIcon & _icon, const QString & _title) {
-	ot::UID obj = uiAPI::createToolButton(_creator, _title, _icon);
+	QWidget* parentWidget = nullptr;
+	auto w = uiAPI::object::get<aTtbContainer>(_container);
+	if (w) {
+		parentWidget = w->widget();
+	}
+	else {
+		parentWidget = AppBase::instance()->mainWindow();
+	}
+	ot::UID obj = uiAPI::createToolButton(parentWidget, _creator, _title, _icon);
 	uiAPI::container::addObject(_container, obj);
 	return obj;
 }
 
 ot::UID ToolBar::addToolButton(ot::UID _creator, ot::UID _container, const QString & _iconName, const QString & _iconPath, const QString & _title) {
-	ot::UID obj = uiAPI::createToolButton(_creator, _title, _iconName, _iconPath);
+	QWidget* parentWidget = nullptr;
+	auto w = uiAPI::object::get<aTtbContainer>(_container);
+	if (w) {
+		parentWidget = w->widget();
+	}
+	else {
+		parentWidget = AppBase::instance()->mainWindow();
+	}
+	ot::UID obj = uiAPI::createToolButton(parentWidget, _creator, _title, _iconName, _iconPath);
 	uiAPI::container::addObject(_container, obj);
 	return obj;
 }
 
 ot::UID ToolBar::addToolButton(ot::UID _creator, ot::UID _container, const QString & _iconName, const QString & _iconPath, const QString & _title, ak::aNotifier * _notifier) {
-	ot::UID obj = uiAPI::createToolButton(_creator, _title, _iconName, _iconPath);
+	QWidget* parentWidget = nullptr;
+	auto w = uiAPI::object::get<aTtbContainer>(_container);
+	if (w) {
+		parentWidget = w->widget();
+	}
+	else {
+		parentWidget = AppBase::instance()->mainWindow();
+	}
+	ot::UID obj = uiAPI::createToolButton(parentWidget, _creator, _title, _iconName, _iconPath);
 	uiAPI::container::addObject(_container, obj);
 	uiAPI::registerUidNotifier(obj, _notifier);
 	return obj;
 }
 
 ot::UID ToolBar::addCheckBox(ot::UID _creator, ot::UID _container, const QString & _text, bool _initialState) {
-	ot::UID obj = uiAPI::createCheckbox(_creator, _text, _initialState);
+	QWidget* parentWidget = nullptr;
+	auto w = uiAPI::object::get<aTtbContainer>(_container);
+	if (w) {
+		parentWidget = w->widget();
+	}
+	else {
+		parentWidget = AppBase::instance()->mainWindow();
+	}
+	ot::UID obj = uiAPI::createCheckbox(parentWidget, _creator, _text, _initialState);
 	uiAPI::container::addObject(_container, obj);
 	return obj;
 }
 
 ot::UID ToolBar::addNiceLineEdit(ot::UID _creator, ot::UID _container, const QString & _title, const QString & _initialState) {
-	ot::UID obj = uiAPI::createNiceLineEdit(_creator, _initialState, _title);
+	QWidget* parentWidget = nullptr;
+	auto w = uiAPI::object::get<aWidget>(_container);
+	if (w) {
+		parentWidget = w->widget();
+	}
+	else {
+		parentWidget = AppBase::instance()->mainWindow();
+	}
+	ot::UID obj = uiAPI::createNiceLineEdit(parentWidget, _creator, _initialState, _title);
 	uiAPI::container::addObject(_container, obj);
 	return obj;
 }

@@ -36,8 +36,11 @@ namespace ak {
 
 	class UICORE_API_EXPORT aAnimationOverlayWidget : public QWidget {
 		Q_OBJECT
+		OT_DECL_NOCOPY(aAnimationOverlayWidget)
+		OT_DECL_NOMOVE(aAnimationOverlayWidget)
+		OT_DECL_NODEFAULT(aAnimationOverlayWidget)
 	public:
-		aAnimationOverlayWidget();
+		explicit aAnimationOverlayWidget(QWidget* _parent);
 		virtual ~aAnimationOverlayWidget();
 
 		void setChild(

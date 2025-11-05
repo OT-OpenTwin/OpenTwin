@@ -30,7 +30,9 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qscrollarea.h>
 
-ot::ExpanderWidget::ExpanderWidget(const QString& _title, QWidget* _parent) 
+ot::ExpanderWidget::ExpanderWidget(QWidget* _parent) : ExpanderWidget(QString(), _parent) {}
+
+ot::ExpanderWidget::ExpanderWidget(const QString& _title, QWidget* _parent)
     : QWidget(_parent), m_animationDuration(300), m_toggleAnimation(nullptr), m_expanded(false),
 	m_currentWidget(nullptr), m_expandedHeight(0), m_dragStartHeight(0), m_resizing(false),
 	c_titleHeight(25), c_handleHeight(5), m_minimumExpandedHeight(20)
@@ -39,7 +41,7 @@ ot::ExpanderWidget::ExpanderWidget(const QString& _title, QWidget* _parent)
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	// Toggle button
-    m_toggleButton = new ot::ToolButton;
+    m_toggleButton = new ot::ToolButton(this);
     m_toggleButton->setObjectName("OT_ExpanderWidgetToggle");
     m_toggleButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     m_toggleButton->setArrowType(Qt::ArrowType::RightArrow);
@@ -48,11 +50,11 @@ ot::ExpanderWidget::ExpanderWidget(const QString& _title, QWidget* _parent)
     m_toggleButton->setFixedHeight(25);
 
 	// Header line
-    m_headerLine = new QFrame;
+    m_headerLine = new QFrame(this);
 	m_headerLine->setObjectName("OT_ExpanderWidgetHeaderLine");
 
 	// Title
-	QWidget* titleWidget = new QWidget;
+	QWidget* titleWidget = new QWidget(this);
 	titleWidget->setObjectName("OT_ExpanderWidgetTitle");
     titleWidget->setFixedHeight(c_titleHeight);
     titleWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -65,7 +67,7 @@ ot::ExpanderWidget::ExpanderWidget(const QString& _title, QWidget* _parent)
     titleLayout->addWidget(m_headerLine, 1);
 
 	// Child area
-	m_childAreaWidget = new QWidget;
+	m_childAreaWidget = new QWidget(this);
     m_childAreaWidget->setObjectName("OT_ExpanderWidgetChildArea");
 	m_childAreaWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_childAreaWidget->setContentsMargins(0, 0, 0, 0);
@@ -75,7 +77,7 @@ ot::ExpanderWidget::ExpanderWidget(const QString& _title, QWidget* _parent)
 	m_childArea->setContentsMargins(0, 0, 0, 0);
 
 	// Resize handle
-    m_handle = new QFrame;
+    m_handle = new QFrame(this);
     m_handle->setObjectName("OT_ExpanderWidgetResizeHandle");
 	m_handle->setFixedHeight(c_handleHeight);
 	m_handle->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -131,7 +133,7 @@ void ot::ExpanderWidget::setWidget(QWidget* _widget) {
     if (!m_currentWidget) {
         return;
     }
-
+	
     m_childArea->addWidget(m_currentWidget);
     m_currentWidget->setParent(m_childAreaWidget);
 

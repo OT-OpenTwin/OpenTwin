@@ -36,8 +36,11 @@ namespace ot {
 	class CartesianPlotWidgetCanvas;
 
 	class OT_WIDGETS_API_EXPORT CartesianPlot : public QwtPlot, public AbstractPlot {
+		OT_DECL_NOCOPY(CartesianPlot)
+		OT_DECL_NOMOVE(CartesianPlot)
+		OT_DECL_NODEFAULT(CartesianPlot)
 	public:
-		CartesianPlot(PlotBase* _owner);
+		CartesianPlot(PlotBase* _owner, QWidget* _parent);
 		virtual ~CartesianPlot();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

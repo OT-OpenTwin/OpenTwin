@@ -19,13 +19,19 @@
 
 // OpenTwin header
 #include "OTWidgets/GraphicsPicker.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/GraphicsPickerView.h"
 
-ot::GraphicsPickerView::GraphicsPickerView(GraphicsPicker* _graphicsPicker)
-	: WidgetView(WidgetViewBase::ViewGraphicsPicker), m_graphicsPicker(_graphicsPicker)
+ot::GraphicsPickerView::GraphicsPickerView(QWidget* _parent) : GraphicsPickerView(nullptr, _parent) {}
+
+ot::GraphicsPickerView::GraphicsPickerView(GraphicsPicker* _graphicsPicker, QWidget* _parent)
+	: WidgetView(WidgetViewBase::ViewGraphicsPicker, _parent), m_graphicsPicker(_graphicsPicker)
 {
 	if (!m_graphicsPicker) {
-		m_graphicsPicker = new GraphicsPicker;
+		m_graphicsPicker = new GraphicsPicker(this->getViewDockWidget());
+	}
+	else {
+		m_graphicsPicker->setParent(this->getViewDockWidget());
 	}
 
 	this->addWidgetInterfaceToDock(m_graphicsPicker);

@@ -46,8 +46,8 @@
 // ####################################################################################################
 // Table Widget 
 
-ManageGroupsTable::ManageGroupsTable(int _rows, int _columns)
-	: ot::Table(_rows, _columns), m_selectedRow(-1)
+ManageGroupsTable::ManageGroupsTable(int _rows, int _columns, QWidget* _parent)
+	: ot::Table(_rows, _columns, _parent), m_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -152,7 +152,9 @@ void ManageGroupsTable::getSelectedItems(QTableWidgetItem *&first, QTableWidgetI
 
 // Add group dialog
 
-AddGroupDialog::AddGroupDialog(const std::string &authServerURL) {
+AddGroupDialog::AddGroupDialog(const std::string &authServerURL, QWidget* _parent)
+	: ot::Dialog(_parent)
+{
 	m_authServerURL = authServerURL;
 
 	// Create layouts
@@ -161,11 +163,11 @@ AddGroupDialog::AddGroupDialog(const std::string &authServerURL) {
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 
 	// Create controls
-	ot::PushButton* okButton = new ot::PushButton("Ok");
-	ot::PushButton* cancelButton = new ot::PushButton("Cancel");
+	ot::PushButton* okButton = new ot::PushButton("Ok", this);
+	ot::PushButton* cancelButton = new ot::PushButton("Cancel", this);
 
-	m_input = new ot::LineEdit;
-	ot::Label* groupLabel = new ot::Label("Group name:");
+	m_input = new ot::LineEdit(this);
+	ot::Label* groupLabel = new ot::Label("Group name:", this);
 	groupLabel->setBuddy(m_input);
 
 	// Setup layouts
@@ -244,7 +246,9 @@ bool AddGroupDialog::hasError(const std::string &response) {
 
 // Rename group dialog
 
-RenameGroupDialog::RenameGroupDialog(const std::string &groupName, const std::string &authServerURL) {
+RenameGroupDialog::RenameGroupDialog(const std::string &groupName, const std::string &authServerURL, QWidget* _parent)
+	: ot::Dialog(_parent)
+{
 	m_groupToRename = groupName;
 	m_authServerURL = authServerURL;
 
@@ -254,12 +258,12 @@ RenameGroupDialog::RenameGroupDialog(const std::string &groupName, const std::st
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 
 	// Create controls
-	ot::PushButton* cancelButton = new ot::PushButton("Cancel");
-	ot::PushButton* confirmButton = new ot::PushButton("Confirm");
+	ot::PushButton* cancelButton = new ot::PushButton("Cancel", this);
+	ot::PushButton* confirmButton = new ot::PushButton("Confirm", this);
 	
-	m_input = new ot::LineEdit(QString::fromStdString(m_groupToRename));
+	m_input = new ot::LineEdit(QString::fromStdString(m_groupToRename), this);
 
-	ot::Label* inputLabel = new ot::Label("Name");
+	ot::Label* inputLabel = new ot::Label("Name", this);
 	inputLabel->setBuddy(m_input);
 
 	// Setup layouts
@@ -352,7 +356,8 @@ bool RenameGroupDialog::hasSuccessful(const std::string &response)
 
 // Main dialog box
 
-ManageGroups::ManageGroups(const std::string &authServerURL) 
+ManageGroups::ManageGroups(const std::string &authServerURL, QWidget* _parent)
+	: ot::Dialog(_parent)
 {
 	m_authServerURL = authServerURL;
 
@@ -370,38 +375,38 @@ ManageGroups::ManageGroups(const std::string &authServerURL)
 	memberLabelLayout->setContentsMargins(0, 0, 0, 0);
 
 	// Create controls
- 	ot::PushButton* closeButton = new ot::PushButton("Close");
+ 	ot::PushButton* closeButton = new ot::PushButton("Close", this);
 
-	ot::PushButton* btnAdd = new ot::PushButton("");
+	ot::PushButton* btnAdd = new ot::PushButton("", this);
 	btnAdd->setIcon(ot::IconManager::getIcon("Default/NewGroup.png"));
 	btnAdd->setToolTip("Create new group");
 
-	m_btnDelete = new ot::PushButton("");
+	m_btnDelete = new ot::PushButton("", this);
 	m_btnDelete->setIcon(ot::IconManager::getIcon("Default/Delete.png"));
 	m_btnDelete->setToolTip("Delete selected group");
 
-	m_btnRename = new ot::PushButton("");
+	m_btnRename = new ot::PushButton("", this);
 	m_btnRename->setIcon(ot::IconManager::getIcon("Default/RenameItem.png"));
 	m_btnRename->setToolTip("Rename selected group");
 
-	m_btnOwner = new ot::PushButton("");
+	m_btnOwner = new ot::PushButton("", this);
 	m_btnOwner->setIcon(ot::IconManager::getIcon("Default/ChangeOwner.png"));
 	m_btnOwner->setToolTip("Change owner of selected group");
 
-	m_groupsList = new ManageGroupsTable(0, 2);
+	m_groupsList = new ManageGroupsTable(0, 2, this);
 	m_groupsList->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_groupsList->setSelectionMode(QAbstractItemView::SingleSelection);
 
-	m_filterGroups = new ot::LineEdit;
+	m_filterGroups = new ot::LineEdit(this);
 
-	ot::Label* labelGroups = new ot::Label("My Groups");
-	ot::Label* labelMembers = new ot::Label("Group Members");
+	ot::Label* labelGroups = new ot::Label("My Groups", this);
+	ot::Label* labelMembers = new ot::Label("Group Members", this);
 
-	m_showMembersOnly = new ot::CheckBox("Show group members only");
+	m_showMembersOnly = new ot::CheckBox("Show group members only", this);
 
-	m_filterMembers = new ot::LineEdit;
+	m_filterMembers = new ot::LineEdit(this);
 
-	m_membersList = new ManageGroupsTable(0, 2);
+	m_membersList = new ManageGroupsTable(0, 2, this);
 	m_membersList->setSelectionMode(QAbstractItemView::NoSelection);
 
 	// Setup controls
@@ -506,7 +511,7 @@ ManageGroups::~ManageGroups() {
 
 void ManageGroups::slotAddGroup(void)
 {
-	AddGroupDialog dialog(m_authServerURL);
+	AddGroupDialog dialog(m_authServerURL, this);
 
 	if (dialog.showDialog() == ot::Dialog::Ok)
 	{
@@ -524,7 +529,7 @@ void ManageGroups::slotRenameGroup(void)
 
 	std::string groupName = groupNameItem->text().toStdString();
 
-	RenameGroupDialog dialog(groupName, m_authServerURL);
+	RenameGroupDialog dialog(groupName, m_authServerURL, this);
 
 	if (dialog.showDialog() == ot::Dialog::Ok) {
 		slotFillGroupsList();
@@ -542,7 +547,7 @@ void ManageGroups::slotChangeGroupOwner(void)
 	std::string groupName = groupNameItem->text().toStdString();
 	std::string groupOwner = groupOwnerItem->text().toStdString();
 
-	ManageGroupOwner ownerManager(m_authServerURL, groupName, groupOwner);
+	ManageGroupOwner ownerManager(m_authServerURL, groupName, groupOwner, this);
 
 	ownerManager.showDialog();
 
@@ -565,7 +570,7 @@ void ManageGroups::slotDeleteGroup(void)
 	config.setIcon(ot::MessageDialogCfg::Warning);
 	config.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
 
-	if (AppBase::instance()->showPrompt(config) == ot::MessageDialogCfg::Yes) {
+	if (AppBase::instance()->showPrompt(config, nullptr) == ot::MessageDialogCfg::Yes) {
 		// Delete the group
 		assert(!m_authServerURL.empty());
 

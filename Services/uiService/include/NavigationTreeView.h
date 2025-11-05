@@ -29,8 +29,11 @@ namespace ot {
 
 	class NavigationTreeView : public WidgetView {
 		Q_OBJECT
+		OT_DECL_NOCOPY(NavigationTreeView)
+		OT_DECL_NOMOVE(NavigationTreeView)
+		OT_DECL_NODEFAULT(NavigationTreeView)
 	public:
-		NavigationTreeView();
+		explicit NavigationTreeView(QWidget* _parent);
 		virtual ~NavigationTreeView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

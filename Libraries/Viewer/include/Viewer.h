@@ -60,9 +60,11 @@ namespace ot        { class PlotManagerView; }
 class Viewer : public QOpenGLWidget, public ot::WidgetBase
 {
 	Q_OBJECT
+	OT_DECL_NOCOPY(Viewer)
+	OT_DECL_NOMOVE(Viewer)
+	OT_DECL_NODEFAULT(Viewer)
 public:
-	Viewer() = delete;
-	Viewer(ot::UID modelID, ot::UID viewerID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
+	Viewer(ot::UID modelID, ot::UID viewerID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB, QWidget* _parent);
 	virtual ~Viewer();
 
 	virtual QWidget* getQWidget(void) override { return this; };

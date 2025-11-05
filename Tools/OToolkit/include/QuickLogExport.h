@@ -30,9 +30,10 @@ namespace ot { class ComboBox; }
 class QuickLogExport : public ot::Dialog {
 	Q_OBJECT
 	OT_DECL_NOCOPY(QuickLogExport)
+	OT_DECL_NOMOVE(QuickLogExport)
 	OT_DECL_NODEFAULT(QuickLogExport)
 public:
-	QuickLogExport(const std::list<ot::LogMessage>& _messages);
+	explicit QuickLogExport(const std::list<ot::LogMessage>& _messages, QWidget* _parent);
 	virtual ~QuickLogExport();
 
 	bool isAutoClose(void);

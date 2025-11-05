@@ -25,8 +25,11 @@
 namespace ot {
 
 	class __declspec(dllexport) PlotManager : public PlotBase {
+		OT_DECL_NOCOPY(PlotManager)
+		OT_DECL_NOMOVE(PlotManager)
+		OT_DECL_NODEFAULT(PlotManager)
 	public:
-		PlotManager();
+		PlotManager(QWidget* _parent);
 		virtual ~PlotManager();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

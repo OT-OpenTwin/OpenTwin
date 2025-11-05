@@ -70,13 +70,13 @@ bool BackendInfo::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	QVBoxLayout* layout = new QVBoxLayout(root);
 
 	// Controls
-	m_gssUrl = new ot::LineEdit;
-	m_loadButton = new ot::PushButton("Load");
-	m_cancelButton = new ot::PushButton("Cancel");
-	m_clearButton = new ot::PushButton("Clear");
+	m_gssUrl = new ot::LineEdit(root);
+	m_loadButton = new ot::PushButton("Load", root);
+	m_cancelButton = new ot::PushButton("Cancel", root);
+	m_clearButton = new ot::PushButton("Clear", root);
 
 	QHBoxLayout* controlLayout = new QHBoxLayout;
-	controlLayout->addWidget(new ot::Label("GSS URL:"));
+	controlLayout->addWidget(new ot::Label("GSS URL:", root));
 	controlLayout->addWidget(m_gssUrl);
 	controlLayout->addWidget(m_loadButton);
 	controlLayout->addWidget(m_cancelButton);
@@ -165,44 +165,46 @@ void BackendInfo::slotCancel() {
 }
 
 void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
-	QSplitter* mainSplitter = new QSplitter;
+	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("GSS { \"URL\": \"" + QString::fromStdString(_info.getUrl()) + "\" }", m_sectionsLayout->widget());
+
+	QSplitter* mainSplitter = new QSplitter(mainExpander);
 	mainSplitter->setMinimumHeight(400);
 
-	QGroupBox* generalInfoGroup = new QGroupBox("General Info");
+	QGroupBox* generalInfoGroup = new QGroupBox("General Info", mainSplitter);
 	mainSplitter->addWidget(generalInfoGroup);
 
 	QGridLayout* generalInfoLayout = new QGridLayout(generalInfoGroup);
 	int r = 0;
-	generalInfoLayout->addWidget(new ot::Label("Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getUrl()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Url:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getUrl(), generalInfoGroup), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("DB Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getDatabaseUrl()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("DB Url:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getDatabaseUrl(), generalInfoGroup), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("Auth Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getAuthorizationUrl()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Auth Url:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getAuthorizationUrl(), generalInfoGroup), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("GDS Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getGlobalDirectoryUrl()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("GDS Url:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getGlobalDirectoryUrl(), generalInfoGroup), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("LMS Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getLibraryManagementUrl()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("LMS Url:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getLibraryManagementUrl(), generalInfoGroup), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("Worker Running:"), r, 0);
-	generalInfoLayout->addWidget(checkBox(_info.isWorkerRunning()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Worker Running:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(checkBox(_info.isWorkerRunning(), generalInfoGroup), r++, 1);
 
 	generalInfoLayout->setRowStretch(r, 1);
 
 	// Sessions
 	Qt::ItemFlags cellFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
-	QGroupBox* sessionGroup = new QGroupBox("Sessions");
+	QGroupBox* sessionGroup = new QGroupBox("Sessions", mainSplitter);
 	mainSplitter->addWidget(sessionGroup);
 
 	QVBoxLayout* sessionLayout = new QVBoxLayout(sessionGroup);
 	sessionLayout->setContentsMargins(0, 10, 0, 0);
 
-	ot::Table* sessionTable = new ot::Table(_info.getSessionToLssList().size(), 2);
+	ot::Table* sessionTable = new ot::Table(_info.getSessionToLssList().size(), 2, sessionGroup);
 	sessionTable->verticalHeader()->setVisible(false);
 	sessionTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	sessionTable->setHorizontalHeaderLabels({ "Session", "LSS ID" });
@@ -218,13 +220,13 @@ void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 
 	// LSS Info
 
-	QGroupBox* lssInfoGroup = new QGroupBox("LSS Info");
+	QGroupBox* lssInfoGroup = new QGroupBox("LSS Info", mainSplitter);
 	mainSplitter->addWidget(lssInfoGroup);
 
 	QVBoxLayout* lssInfoGroupLayout = new QVBoxLayout(lssInfoGroup);
 	lssInfoGroupLayout->setContentsMargins(0, 10, 0, 0);
 
-	QScrollArea* lssArea = new QScrollArea;
+	QScrollArea* lssArea = new QScrollArea(lssInfoGroup);
 	lssArea->setWidgetResizable(true);
 	lssArea->setContentsMargins(0, 0, 0, 0);
 	lssArea->setMinimumSize(400, 500);
@@ -232,42 +234,43 @@ void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 	lssArea->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 	lssInfoGroupLayout->addWidget(lssArea);
 
-	QWidget* lssMainLayoutWidget = new QWidget;
+	QWidget* lssMainLayoutWidget = new QWidget(lssArea);
 	QVBoxLayout* lssMainLayout = new QVBoxLayout(lssMainLayoutWidget);
 	lssMainLayout->setContentsMargins(0, 0, 0, 0);
 	lssArea->setWidget(lssMainLayoutWidget);
 
 	for (const auto& it : _info.getLSSList()) {
-		QScrollArea* lssWidget = new QScrollArea;
+		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("LSS { \"ID\": " + std::to_string(it.id) + ", \"URL\": \"" + it.url + "\" }"), lssMainLayoutWidget);
+
+		QScrollArea* lssWidget = new QScrollArea(expander);
 		lssWidget->setWidgetResizable(true);
 		lssWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 		lssWidget->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 		lssWidget->setMinimumHeight(200);
 
-		QWidget* lssContent = new QWidget;
+		QWidget* lssContent = new QWidget(lssWidget);
 		lssWidget->setWidget(lssContent);
 
 		QVBoxLayout* lssLayout = new QVBoxLayout(lssContent);
 
 		QGridLayout* lssInfoLayout = new QGridLayout;
 		r = 0;
-		lssInfoLayout->addWidget(new ot::Label("ID:"), r, 0);
-		lssInfoLayout->addWidget(lineEdit(it.id), r++, 1);
+		lssInfoLayout->addWidget(new ot::Label("ID:", lssContent), r, 0);
+		lssInfoLayout->addWidget(lineEdit(it.id, lssContent), r++, 1);
 
-		lssInfoLayout->addWidget(new ot::Label("Url:"), r, 0);
-		lssInfoLayout->addWidget(lineEdit(it.url), r++, 1);
+		lssInfoLayout->addWidget(new ot::Label("Url:", lssContent), r, 0);
+		lssInfoLayout->addWidget(lineEdit(it.url, lssContent), r++, 1);
 
 		lssLayout->addLayout(lssInfoLayout);
 
 		// Active sessions
-		lssLayout->addWidget(new ot::Label("Active Sessions:"));
-		lssLayout->addWidget(this->createGssSessionTable(it.activeSessions));
+		lssLayout->addWidget(new ot::Label("Active Sessions:", lssContent));
+		lssLayout->addWidget(this->createGssSessionTable(it.activeSessions, lssContent));
 
 		// Initializing sessions
-		lssLayout->addWidget(new ot::Label("Initializing Sessions:"));
-		lssLayout->addWidget(this->createGssSessionTable(it.initializingSessions));
+		lssLayout->addWidget(new ot::Label("Initializing Sessions:", lssContent));
+		lssLayout->addWidget(this->createGssSessionTable(it.initializingSessions, lssContent));
 	
-		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("LSS { \"ID\": " + std::to_string(it.id) + ", \"URL\": \"" + it.url + "\" }"));
 		//expander->setMinExpandedHeight(450);
 		expander->setWidget(lssWidget);
 		lssMainLayout->addWidget(expander);
@@ -275,7 +278,6 @@ void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 
 	lssMainLayout->addStretch(1);
 
-	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("GSS { \"URL\": \"" + QString::fromStdString(_info.getUrl()) + "\" }");
 	//mainExpander->setMinExpandedHeight(500);
 	mainExpander->setWidget(mainSplitter);
 
@@ -284,12 +286,14 @@ void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 }
 
 void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
-	QSplitter* mainSplitter = new QSplitter;
+	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("LSS { \"ID\": " + QString::number(_info.getID()) + ", \"URL\": \"" + QString::fromStdString(_info.getURL()) + "\" }", m_sectionsLayout->widget());
+
+	QSplitter* mainSplitter = new QSplitter(mainExpander);
 	mainSplitter->setMinimumHeight(400);
 
 	// General Info
 
-	QGroupBox* generalInfoGroup = new QGroupBox("General Info");
+	QGroupBox* generalInfoGroup = new QGroupBox("General Info", mainSplitter);
 	mainSplitter->addWidget(generalInfoGroup);
 
 	QVBoxLayout* generalInfoGroupLayout = new QVBoxLayout(generalInfoGroup);
@@ -301,58 +305,58 @@ void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 	infoArea->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 	generalInfoGroupLayout->addWidget(infoArea);
 
-	QWidget* infoAreaWidget = new QWidget;
+	QWidget* infoAreaWidget = new QWidget(infoArea);
 	infoArea->setWidget(infoAreaWidget);
 	QVBoxLayout* infoAreaLayout = new QVBoxLayout(infoAreaWidget);
 
-	QWidget* generalInfoLayoutWidget = new QWidget;
+	QWidget* generalInfoLayoutWidget = new QWidget(infoAreaWidget);
 	QGridLayout* generalInfoLayout = new QGridLayout(generalInfoLayoutWidget);
 
 	int r = 0;
-	generalInfoLayout->addWidget(new ot::Label("Worker Running:"), r, 0);
-	generalInfoLayout->addWidget(checkBox(_info.getWorkerRunning()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Worker Running:", generalInfoLayoutWidget), r, 0);
+	generalInfoLayout->addWidget(checkBox(_info.getWorkerRunning(), generalInfoLayoutWidget), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getURL()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Url:", generalInfoLayoutWidget), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getURL(), generalInfoLayoutWidget), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("ID:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getID()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("ID:", generalInfoLayoutWidget), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getID(), generalInfoLayoutWidget), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("GSS Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getGSSUrl()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("GSS Url:", generalInfoLayoutWidget), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getGSSUrl(), generalInfoLayoutWidget), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("GSS Connected:"), r, 0);
-	generalInfoLayout->addWidget(checkBox(_info.getGSSConnected()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("GSS Connected:", generalInfoLayoutWidget), r, 0);
+	generalInfoLayout->addWidget(checkBox(_info.getGSSConnected(), generalInfoLayoutWidget), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("GDS Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getGDSUrl()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("GDS Url:", generalInfoLayoutWidget), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getGDSUrl(), generalInfoLayoutWidget), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("GDS Connected:"), r, 0);
-	generalInfoLayout->addWidget(checkBox(_info.getGDSConnected()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("GDS Connected:", generalInfoLayoutWidget), r, 0);
+	generalInfoLayout->addWidget(checkBox(_info.getGDSConnected(), generalInfoLayoutWidget), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("Auth Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getAuthUrl()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Auth Url:", generalInfoLayoutWidget), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getAuthUrl(), generalInfoLayoutWidget), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("Database Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getDataBaseUrl()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Database Url:", generalInfoLayoutWidget), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getDataBaseUrl(), generalInfoLayoutWidget), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("LMS Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getLMSUrl()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("LMS Url:", generalInfoLayoutWidget), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getLMSUrl(), generalInfoLayoutWidget), r++, 1);
 
 	infoAreaLayout->addWidget(generalInfoLayoutWidget);
 
-	QWidget* mandatoryServicesWidget = new QWidget;
+	QWidget* mandatoryServicesWidget = new QWidget(infoAreaWidget);
 	QVBoxLayout* mandatoryServicesLayout = new QVBoxLayout(mandatoryServicesWidget);
 	
 	for (const auto& it : _info.getMandatoryServices()) {
-		QListWidget* mandatoryWidget = new QListWidget;
+		QListWidget* mandatoryWidget = new QListWidget(mandatoryServicesWidget);
 		for (const auto& service : it.second) {
 			QListWidgetItem* itm = new QListWidgetItem(QString::fromStdString(service));
 			itm->setFlags(Qt::ItemIsEnabled);
 			mandatoryWidget->addItem(itm);
 		}
 
-		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("Madatory Services (" + it.first + ")"));
+		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("Madatory Services (" + it.first + ")"), mandatoryServicesWidget);
 		expander->setWidget(mandatoryWidget);
 		mandatoryServicesLayout->addWidget(expander);
 	}
@@ -363,34 +367,37 @@ void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 
 	// Additional Info
 
-	QGroupBox* additionalInfoGroup = new QGroupBox("Additional Info");
+	QGroupBox* additionalInfoGroup = new QGroupBox("Additional Info", mainSplitter);
 	mainSplitter->addWidget(additionalInfoGroup);
 
 	QVBoxLayout* additionalInfoGroupLayout = new QVBoxLayout(additionalInfoGroup);
 
-	QScrollArea* additionalInfoArea = new QScrollArea;
+	QScrollArea* additionalInfoArea = new QScrollArea(additionalInfoGroup);
 	additionalInfoArea->setWidgetResizable(true);
 	additionalInfoArea->setContentsMargins(0, 0, 0, 0);
 	additionalInfoArea->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	additionalInfoArea->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 	additionalInfoGroupLayout->addWidget(additionalInfoArea);
 
-	QWidget* additionalInfoLayoutWidget = new QWidget;
+	QWidget* additionalInfoLayoutWidget = new QWidget(additionalInfoArea);
 	additionalInfoArea->setWidget(additionalInfoLayoutWidget);
 
 	QVBoxLayout* additionalInfoLayout = new QVBoxLayout(additionalInfoLayoutWidget);
 
-	QListWidget* debugServicesList = new QListWidget;
+	ot::ExpanderWidget* debugServicesExpander = new ot::ExpanderWidget("Debug Services (" + QString::number(_info.getDebugServices().size()) + ")", additionalInfoLayoutWidget);
+
+	QListWidget* debugServicesList = new QListWidget(debugServicesExpander);
 	for (const auto& it : _info.getDebugServices()) {
 		QListWidgetItem* itm = new QListWidgetItem(QString::fromStdString(it));
 		itm->setFlags(Qt::ItemIsEnabled);
 		debugServicesList->addItem(itm);
 	}
-	ot::ExpanderWidget* debugServicesExpander = new ot::ExpanderWidget("Debug Services (" + QString::number(_info.getDebugServices().size()) + ")");
 	debugServicesExpander->setWidget(debugServicesList);
 	additionalInfoLayout->addWidget(debugServicesExpander);
 
-	ot::TreeWidget* shutdownQueueTree = new ot::TreeWidget;
+	ot::ExpanderWidget* shutdownQueueExpander = new ot::ExpanderWidget("Shutdown Queue (" + QString::number(_info.getShutdownQueue().size()) + ")", additionalInfoLayoutWidget);
+
+	ot::TreeWidget* shutdownQueueTree = new ot::TreeWidget(shutdownQueueExpander);
 	shutdownQueueTree->setColumnCount(2);
 	shutdownQueueTree->setHeaderLabels({ "SessionID", "Emergency" });
 	for (const auto& it : _info.getShutdownQueue()) {
@@ -399,27 +406,30 @@ void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 		item->setText(1, it.second ? "true" : "");
 		shutdownQueueTree->addTopLevelItem(item);
 	}
-	ot::ExpanderWidget* shutdownQueueExpander = new ot::ExpanderWidget("Shutdown Queue (" + QString::number(_info.getShutdownQueue().size()) + ")");
 	shutdownQueueExpander->setWidget(shutdownQueueTree);
 	additionalInfoLayout->addWidget(shutdownQueueExpander);
 
-	QListWidget* shutdownCompletedList = new QListWidget;
+	ot::ExpanderWidget* shutdownCompletedExpander = new ot::ExpanderWidget("Shutdown Completed (" + QString::number(_info.getShutdownCompletedQueue().size()) + ")", additionalInfoLayoutWidget);
+
+	QListWidget* shutdownCompletedList = new QListWidget(shutdownCompletedExpander);
 	for (const auto& it : _info.getShutdownCompletedQueue()) {
 		QListWidgetItem* itm = new QListWidgetItem(QString::fromStdString(it));
 		itm->setFlags(Qt::ItemIsEnabled);
 		shutdownCompletedList->addItem(itm);
 	}
-	ot::ExpanderWidget* shutdownCompletedExpander = new ot::ExpanderWidget("Shutdown Completed (" + QString::number(_info.getShutdownCompletedQueue().size()) + ")");
+	
 	shutdownCompletedExpander->setWidget(shutdownCompletedList);
 	additionalInfoLayout->addWidget(shutdownCompletedExpander);
 
-	QListWidget* blockedPortsList = new QListWidget;
+	ot::ExpanderWidget* blockedPortsExpander = new ot::ExpanderWidget("Blocked Ports (" + QString::number(_info.getBlockedPorts().size()) + ")", additionalInfoLayoutWidget);
+
+	QListWidget* blockedPortsList = new QListWidget(blockedPortsExpander);
 	for (const auto& it : _info.getBlockedPorts()) {
 		QListWidgetItem* itm = new QListWidgetItem(QString::number(it));
 		itm->setFlags(Qt::ItemIsEnabled);
 		blockedPortsList->addItem(itm);
 	}
-	ot::ExpanderWidget* blockedPortsExpander = new ot::ExpanderWidget("Blocked Ports (" + QString::number(_info.getBlockedPorts().size()) + ")");
+	
 	blockedPortsExpander->setWidget(blockedPortsList);
 	additionalInfoLayout->addWidget(blockedPortsExpander);
 
@@ -427,85 +437,85 @@ void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 
 	// Sessions
 
-	QGroupBox* sessionsGroup = new QGroupBox("Sessions");
+	QGroupBox* sessionsGroup = new QGroupBox("Sessions", mainSplitter);
 	mainSplitter->addWidget(sessionsGroup);
 
 	QVBoxLayout* sessionsGroupLayout = new QVBoxLayout(sessionsGroup);
 
-	QScrollArea* sessionsArea = new QScrollArea;
+	QScrollArea* sessionsArea = new QScrollArea(sessionsGroup);
 	sessionsArea->setWidgetResizable(true);
 	sessionsArea->setContentsMargins(0, 0, 0, 0);
 	sessionsArea->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	sessionsArea->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 	sessionsGroupLayout->addWidget(sessionsArea);
 
-	QWidget* sessionsAreaWidget = new QWidget;
+	QWidget* sessionsAreaWidget = new QWidget(sessionsArea);
 	sessionsArea->setWidget(sessionsAreaWidget);
 
 	QVBoxLayout* sessionsAreaLayout = new QVBoxLayout(sessionsAreaWidget);
 
 	for (const auto& it : _info.getSessions()) {
-		QScrollArea* sessionArea = new QScrollArea;
+		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("Session { \"ID\": \"" + it.id + "\" }"), sessionsAreaWidget);
+
+		QScrollArea* sessionArea = new QScrollArea(expander);
 		sessionArea->setWidgetResizable(true);
 
-		QWidget* sessionContent = new QWidget;
+		QWidget* sessionContent = new QWidget(sessionArea);
 		sessionArea->setWidget(sessionContent);
 
 		QVBoxLayout* sessionLayout = new QVBoxLayout(sessionContent);
 		
 		QGridLayout* sessionInfoLayout = new QGridLayout;
 		r = 0;
-		sessionInfoLayout->addWidget(new ot::Label("ID:"), r, 0);
-		sessionInfoLayout->addWidget(lineEdit(it.id), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("ID:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(lineEdit(it.id, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("Type:"), r, 0);
-		sessionInfoLayout->addWidget(lineEdit(it.type), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("Type:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(lineEdit(it.type, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("User Name:"), r, 0);
-		sessionInfoLayout->addWidget(lineEdit(it.userName), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("User Name:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(lineEdit(it.userName, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("Project Name:"), r, 0);
-		sessionInfoLayout->addWidget(lineEdit(it.projectName), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("Project Name:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(lineEdit(it.projectName, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("Collection Name:"), r, 0);
-		sessionInfoLayout->addWidget(lineEdit(it.collectionName), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("Collection Name:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(lineEdit(it.collectionName, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("User Collection:"), r, 0);
-		sessionInfoLayout->addWidget(lineEdit(it.userCollection), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("User Collection:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(lineEdit(it.userCollection, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("User Credentials Name:"), r, 0);
-		sessionInfoLayout->addWidget(lineEdit(it.userCredName), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("User Credentials Name:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(lineEdit(it.userCredName, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("User Credentials Password:"), r, 0);
-		sessionInfoLayout->addWidget(lineEdit(it.userCredPassword), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("User Credentials Password:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(lineEdit(it.userCredPassword, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("Database Credentials Name:"), r, 0);
-		sessionInfoLayout->addWidget(lineEdit(it.dataBaseCredName), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("Database Credentials Name:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(lineEdit(it.dataBaseCredName, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("Database Credentials Password:"), r, 0);
-		sessionInfoLayout->addWidget(lineEdit(it.dataBaseCredPassword), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("Database Credentials Password:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(lineEdit(it.dataBaseCredPassword, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("Health Check Running:"), r, 0);
-		sessionInfoLayout->addWidget(checkBox(it.isHealthCheckRunning), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("Health Check Running:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(checkBox(it.isHealthCheckRunning, sessionContent), r++, 1);
 
-		sessionInfoLayout->addWidget(new ot::Label("Shutting Down:"), r, 0);
-		sessionInfoLayout->addWidget(checkBox(it.isShuttingDown), r++, 1);
+		sessionInfoLayout->addWidget(new ot::Label("Shutting Down:", sessionContent), r, 0);
+		sessionInfoLayout->addWidget(checkBox(it.isShuttingDown, sessionContent), r++, 1);
 
 		sessionLayout->addLayout(sessionInfoLayout);
 
 		// Services
 
-		sessionLayout->addWidget(new ot::Label("Services:"));
+		sessionLayout->addWidget(new ot::Label("Services:", sessionContent));
 
-		sessionLayout->addWidget(this->createLssServicesTable(it.services));
+		sessionLayout->addWidget(this->createLssServicesTable(it.services, sessionContent));
 
-		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("Session { \"ID\": \"" + it.id + "\" }"));
 		//expander->setMinExpandedHeight(800);
 		expander->setWidget(sessionArea);
 		sessionsAreaLayout->addWidget(expander);
 	}
 
-	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("LSS { \"ID\": " + QString::number(_info.getID()) + ", \"URL\": \"" + QString::fromStdString(_info.getURL()) + "\" }");
 	//mainExpander->setMinExpandedHeight(500);
 	mainExpander->setWidget(mainSplitter);
 
@@ -514,39 +524,41 @@ void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 }
 
 void BackendInfo::slotAddGDS(const ot::GDSDebugInfo& _info) {
-	QSplitter* mainSplitter = new QSplitter;
+	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("GDS { \"URL\": \"" + QString::fromStdString(_info.getURL()) + "\" }", m_sectionsLayout->widget());
+
+	QSplitter* mainSplitter = new QSplitter(mainExpander);
 	mainSplitter->setMinimumHeight(400);
 
-	QGroupBox* generalInfoGroup = new QGroupBox("General Info");
+	QGroupBox* generalInfoGroup = new QGroupBox("General Info", mainSplitter);
 	mainSplitter->addWidget(generalInfoGroup);
 
 	QGridLayout* generalInfoLayout = new QGridLayout(generalInfoGroup);
 	int r = 0;
-	generalInfoLayout->addWidget(new ot::Label("Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getURL()), r++, 1);
-	generalInfoLayout->addWidget(new ot::Label("GSS Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getGSSUrl()), r++, 1);
-	generalInfoLayout->addWidget(new ot::Label("Startup Worker Running:"), r, 0);
-	generalInfoLayout->addWidget(checkBox(_info.getStartupWorkerRunning()), r++, 1);
-	generalInfoLayout->addWidget(new ot::Label("Startup Worker Stopping:"), r, 0);
-	generalInfoLayout->addWidget(checkBox(_info.getStartupWorkerStopping()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Url:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getURL(), generalInfoGroup), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("GSS Url:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getGSSUrl(), generalInfoGroup), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Startup Worker Running:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(checkBox(_info.getStartupWorkerRunning(), generalInfoGroup), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Startup Worker Stopping:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(checkBox(_info.getStartupWorkerStopping(), generalInfoGroup), r++, 1);
 	generalInfoLayout->setRowStretch(r, 1);
 
 	// Requested Services
-	QGroupBox* requestedServicesGroup = new QGroupBox("Requested Services");
+	QGroupBox* requestedServicesGroup = new QGroupBox("Requested Services", mainSplitter);
 	mainSplitter->addWidget(requestedServicesGroup);
 
 	QVBoxLayout* requestedServicesLayout = new QVBoxLayout(requestedServicesGroup);
-	requestedServicesLayout->addWidget(this->createGdsServicesTable(_info.getRequestedServices()));
+	requestedServicesLayout->addWidget(this->createGdsServicesTable(_info.getRequestedServices(), requestedServicesGroup));
 
 	// Local Directory Services Info
-	QGroupBox* ldsInfoGroup = new QGroupBox("LDS Info");
+	QGroupBox* ldsInfoGroup = new QGroupBox("LDS Info", mainSplitter);
 	mainSplitter->addWidget(ldsInfoGroup);
 
 	QVBoxLayout* ldsInfoGroupLayout = new QVBoxLayout(ldsInfoGroup);
 	ldsInfoGroupLayout->setContentsMargins(0, 10, 0, 0);
 
-	QScrollArea* ldsArea = new QScrollArea;
+	QScrollArea* ldsArea = new QScrollArea(ldsInfoGroup);
 	ldsArea->setWidgetResizable(true);
 	ldsArea->setContentsMargins(0, 0, 0, 0);
 	ldsArea->setMinimumSize(400, 500);
@@ -569,7 +581,7 @@ void BackendInfo::slotAddGDS(const ot::GDSDebugInfo& _info) {
 
 		QVBoxLayout* ldsLayout = new QVBoxLayout(ldsContent);
 		
-		ldsLayout->addWidget(new ot::Label("Supported Services:"));
+		ldsLayout->addWidget(new ot::Label("Supported Services:", ldsContent));
 		QListWidget* supportedServicesList = new QListWidget;
 		for (const auto& service : it.supportedServices) {
 			QListWidgetItem* itm = new QListWidgetItem(QString::fromStdString(service));
@@ -578,17 +590,16 @@ void BackendInfo::slotAddGDS(const ot::GDSDebugInfo& _info) {
 		}
 		ldsLayout->addWidget(supportedServicesList);
 
-		ldsLayout->addWidget(new ot::Label("Services:"));
-		ldsLayout->addWidget(this->createGdsServicesTable(it.services), 1);
+		ldsLayout->addWidget(new ot::Label("Services:", ldsContent));
+		ldsLayout->addWidget(this->createGdsServicesTable(it.services, ldsContent), 1);
 
-		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("LDS { \"ID\": " + std::to_string(it.serviceID) + ", \"URL\": \"" + it.url + "\" }"));
+		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("LDS { \"ID\": " + std::to_string(it.serviceID) + ", \"URL\": \"" + it.url + "\" }"), ldsContent);
 		//expander->setMinExpandedHeight(450);
 		expander->setWidget(ldsWidget);
 		ldsMainLayout->addWidget(expander);
 	}
 	ldsMainLayout->addStretch(1);
 	
-	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("GDS { \"URL\": \"" + QString::fromStdString(_info.getURL()) + "\" }");
 	//mainExpander->setMinExpandedHeight(500);
 	mainExpander->setWidget(mainSplitter);
 
@@ -597,39 +608,41 @@ void BackendInfo::slotAddGDS(const ot::GDSDebugInfo& _info) {
 }
 
 void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
-	QSplitter* mainSplitter = new QSplitter;
+	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("LDS { \"ID\": " + QString::number(_info.getId()) + ", \"URL\": \"" + QString::fromStdString(_info.getURL()) + "\" }", m_sectionsLayout->widget());
+
+	QSplitter* mainSplitter = new QSplitter(mainExpander);
 	mainSplitter->setMinimumHeight(400);
 
 	// General Info
 
-	QGroupBox* generalInfoGroup = new QGroupBox("General Info");
+	QGroupBox* generalInfoGroup = new QGroupBox("General Info", mainSplitter);
 	mainSplitter->addWidget(generalInfoGroup);
 
 	QGridLayout* generalInfoLayout = new QGridLayout(generalInfoGroup);
 	int r = 0;
 
-	generalInfoLayout->addWidget(new ot::Label("Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getURL()), r++, 1);
-	generalInfoLayout->addWidget(new ot::Label("ID:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getId()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Url:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getURL(), generalInfoGroup), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("ID:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getId(), generalInfoGroup), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("GDS Url:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getGDSURL()), r++, 1);
-	generalInfoLayout->addWidget(new ot::Label("GDS Connected:"), r, 0);
-	generalInfoLayout->addWidget(checkBox(_info.getGDSConnected()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("GDS Url:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getGDSURL(), generalInfoGroup), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("GDS Connected:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(checkBox(_info.getGDSConnected(), generalInfoGroup), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("Services IP:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getServicesIPAddress()), r++, 1);
-	generalInfoLayout->addWidget(new ot::Label("Last Error:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(_info.getLastError()), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Services IP:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getServicesIPAddress(), generalInfoGroup), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Last Error:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(_info.getLastError(), generalInfoGroup), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("Worker Running:"), r, 0);
-	generalInfoLayout->addWidget(checkBox(_info.getWorkerRunning()), r++, 1);
-	generalInfoLayout->addWidget(new ot::Label("Check Alive Frequency:"), r, 0);
-	generalInfoLayout->addWidget(lineEdit(QString::number(_info.getServiceCheckAliveFrequency()) + "s"), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Worker Running:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(checkBox(_info.getWorkerRunning(), generalInfoGroup), r++, 1);
+	generalInfoLayout->addWidget(new ot::Label("Check Alive Frequency:", generalInfoGroup), r, 0);
+	generalInfoLayout->addWidget(lineEdit(QString::number(_info.getServiceCheckAliveFrequency()) + "s", generalInfoGroup), r++, 1);
 
-	generalInfoLayout->addWidget(new ot::Label("Used Ports:"), r, 0);
-	QListWidget* usedPortsList = new QListWidget;
+	generalInfoLayout->addWidget(new ot::Label("Used Ports:", generalInfoGroup), r, 0);
+	QListWidget* usedPortsList = new QListWidget(generalInfoGroup);
 	for (const auto& it : _info.getUsedPorts()) {
 		QListWidgetItem* itm = new QListWidgetItem(QString::number(it));
 		itm->setFlags(Qt::ItemIsEnabled);
@@ -639,41 +652,41 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 	generalInfoLayout->setRowStretch(r, 1);
 
 	// Config
-	QGroupBox* configGroup = new QGroupBox("Config");
+	QGroupBox* configGroup = new QGroupBox("Config", mainSplitter);
 	mainSplitter->addWidget(configGroup);
 
 	QVBoxLayout* configGroupLayout = new QVBoxLayout(configGroup);
-	QScrollArea* configArea = new QScrollArea;
+	QScrollArea* configArea = new QScrollArea(configGroup);
 	configArea->setWidgetResizable(true);
 	configArea->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	configArea->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 	configGroupLayout->addWidget(configArea);
 
-	QWidget* configContent = new QWidget;
+	QWidget* configContent = new QWidget(configArea);
 	configArea->setWidget(configContent);
 	QVBoxLayout* configLayout = new QVBoxLayout(configContent);
 
 	QGridLayout* configInfoLayout = new QGridLayout;
 	r = 0;
-	configInfoLayout->addWidget(new ot::Label("Config Imported:"), r, 0);
-	configInfoLayout->addWidget(checkBox(_info.getConfig().configImported), r++, 1);
-	configInfoLayout->addWidget(new ot::Label("Launcher Path:"), r, 0);
-	configInfoLayout->addWidget(lineEdit(_info.getConfig().launcherPath), r++, 1);
-	configInfoLayout->addWidget(new ot::Label("Services Path:"), r, 0);
-	configInfoLayout->addWidget(lineEdit(_info.getConfig().servicesLibraryPath), r++, 1);
-	configInfoLayout->addWidget(new ot::Label("Start Workers:"), r, 0);
-	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().serviceStartWorkerCount)), r++, 1);
-	configInfoLayout->addWidget(new ot::Label("Initialize Workers:"), r, 0);
-	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().iniWorkerCount)), r++, 1);
-	configInfoLayout->addWidget(new ot::Label("Default Startup Restarts:"), r, 0);
-	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().defaultMaxStartupRestarts)), r++, 1);
-	configInfoLayout->addWidget(new ot::Label("Default Crash Restarts:"), r, 0);
-	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().defaultMaxCrashRestarts)), r++, 1);
+	configInfoLayout->addWidget(new ot::Label("Config Imported:", configContent), r, 0);
+	configInfoLayout->addWidget(checkBox(_info.getConfig().configImported, configContent), r++, 1);
+	configInfoLayout->addWidget(new ot::Label("Launcher Path:", configContent), r, 0);
+	configInfoLayout->addWidget(lineEdit(_info.getConfig().launcherPath, configContent), r++, 1);
+	configInfoLayout->addWidget(new ot::Label("Services Path:", configContent), r, 0);
+	configInfoLayout->addWidget(lineEdit(_info.getConfig().servicesLibraryPath, configContent), r++, 1);
+	configInfoLayout->addWidget(new ot::Label("Start Workers:", configContent), r, 0);
+	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().serviceStartWorkerCount), configContent), r++, 1);
+	configInfoLayout->addWidget(new ot::Label("Initialize Workers:", configContent), r, 0);
+	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().iniWorkerCount), configContent), r++, 1);
+	configInfoLayout->addWidget(new ot::Label("Default Startup Restarts:", configContent), r, 0);
+	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().defaultMaxStartupRestarts), configContent), r++, 1);
+	configInfoLayout->addWidget(new ot::Label("Default Crash Restarts:", configContent), r, 0);
+	configInfoLayout->addWidget(lineEdit(QString::number(_info.getConfig().defaultMaxCrashRestarts), configContent), r++, 1);
 	configLayout->addLayout(configInfoLayout);
 
-	configLayout->addWidget(new ot::Label("Supported Services:"));
+	configLayout->addWidget(new ot::Label("Supported Services:", configContent));
 	QStringList supportedServicesHeader = { "Name", "Type", "Crash Restarts", "Startup Restarts" };
-	ot::Table* supportedServicesTable = new ot::Table(_info.getConfig().supportedServices.size(), supportedServicesHeader.size());
+	ot::Table* supportedServicesTable = new ot::Table(_info.getConfig().supportedServices.size(), supportedServicesHeader.size(), configContent);
 	configLayout->addWidget(supportedServicesTable, 1);
 	supportedServicesTable->verticalHeader()->setVisible(false);
 	supportedServicesTable->setHorizontalHeaderLabels(supportedServicesHeader);
@@ -691,43 +704,44 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 	}
 
 	// Services
-	QGroupBox* servicesGroup = new QGroupBox("Service Manager");
+	QGroupBox* servicesGroup = new QGroupBox("Service Manager", mainSplitter);
 	mainSplitter->addWidget(servicesGroup);
 
 	QVBoxLayout* servicesGroupLayout = new QVBoxLayout(servicesGroup);
-	QScrollArea* servicesArea = new QScrollArea;
+	QScrollArea* servicesArea = new QScrollArea(servicesGroup);
 	servicesArea->setWidgetResizable(true);
 	servicesArea->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	servicesArea->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 	servicesGroupLayout->addWidget(servicesArea);
 
-	QWidget* servicesContent = new QWidget;
+	QWidget* servicesContent = new QWidget(servicesArea);
 	servicesArea->setWidget(servicesContent);
 
 	QVBoxLayout* servicesLayout = new QVBoxLayout(servicesContent);
 	
-	ot::LDSDebugInfo::SessionInfo dummySession;
-	createLDSServiceInfo(dummySession, _info.getRequestedServices(), LDSServiceInfoMode::RequestedServices, servicesLayout);
-	createLDSServiceInfo(dummySession, _info.getInitializingServices(), LDSServiceInfoMode::InitializingServices, servicesLayout);
+	ot::ExpanderWidget* aliveSessionsExpander = new ot::ExpanderWidget("Alive Sessions (" + QString::number(_info.getAliveSessions().size()) + ")", servicesContent);
 
-	QWidget* aliveSessionsWidget = new QWidget;
+	ot::LDSDebugInfo::SessionInfo dummySession;
+	createLDSServiceInfo(dummySession, _info.getRequestedServices(), LDSServiceInfoMode::RequestedServices, servicesLayout, servicesContent);
+	createLDSServiceInfo(dummySession, _info.getInitializingServices(), LDSServiceInfoMode::InitializingServices, servicesLayout, servicesContent);
+
+	QWidget* aliveSessionsWidget = new QWidget(aliveSessionsExpander);
 	QVBoxLayout* aliveSessionsLayout = new QVBoxLayout(aliveSessionsWidget);
 	int minHeight = 0;
 	for (const auto& it : _info.getAliveSessions()) {
-		minHeight += createLDSServiceInfo(it.first, it.second, LDSServiceInfoMode::AliveServices, aliveSessionsLayout);
+		minHeight += createLDSServiceInfo(it.first, it.second, LDSServiceInfoMode::AliveServices, aliveSessionsLayout, aliveSessionsWidget);
 	}
-	ot::ExpanderWidget* aliveSessionsExpander = new ot::ExpanderWidget("Alive Sessions (" + QString::number(_info.getAliveSessions().size()) + ")");
+	
 	aliveSessionsExpander->setWidget(aliveSessionsWidget);
 	//aliveSessionsExpander->setMinExpandedHeight(minHeight + 100);
 	servicesLayout->addWidget(aliveSessionsExpander);
 
-	createLDSServiceInfo(dummySession, _info.getFailedServices(), LDSServiceInfoMode::FailedServices, servicesLayout);
-	createLDSServiceInfo(dummySession, _info.getNewStoppingServices(), LDSServiceInfoMode::NewStoppingServices, servicesLayout);
-	createLDSServiceInfo(dummySession, _info.getStoppingServices(), LDSServiceInfoMode::StoppingServices, servicesLayout);
+	createLDSServiceInfo(dummySession, _info.getFailedServices(), LDSServiceInfoMode::FailedServices, servicesLayout, servicesContent);
+	createLDSServiceInfo(dummySession, _info.getNewStoppingServices(), LDSServiceInfoMode::NewStoppingServices, servicesLayout, servicesContent);
+	createLDSServiceInfo(dummySession, _info.getStoppingServices(), LDSServiceInfoMode::StoppingServices, servicesLayout, servicesContent);
 
 	servicesLayout->addStretch(1);
 	
-	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("LDS { \"ID\": " + QString::number(_info.getId()) + ", \"URL\": \"" + QString::fromStdString(_info.getURL()) + "\" }");
 	//mainExpander->setMinExpandedHeight(500);
 	mainExpander->setWidget(mainSplitter);
 	
@@ -912,10 +926,10 @@ bool BackendInfo::ldsLoad(const std::string& _ldsUrl, ot::LDSDebugInfo& _ldsInfo
 
 // Private: Widget helper
 
-ot::Table* BackendInfo::createGssSessionTable(const std::list<ot::GSSDebugInfo::SessionData>& _sessionData) {
+ot::Table* BackendInfo::createGssSessionTable(const std::list<ot::GSSDebugInfo::SessionData>& _sessionData, QWidget* _parent) {
 	Qt::ItemFlags cellFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
-	ot::Table* table = new ot::Table(_sessionData.size(), 3);
+	ot::Table* table = new ot::Table(_sessionData.size(), 3, _parent);
 	table->verticalHeader()->setVisible(false);
 	table->setHorizontalHeaderLabels({ "Session ID", "User Name", "Flags" });
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -938,11 +952,11 @@ ot::Table* BackendInfo::createGssSessionTable(const std::list<ot::GSSDebugInfo::
 	return table;
 }
 
-ot::Table* BackendInfo::createLssServicesTable(const std::list<ot::LSSDebugInfo::ServiceInfo>& _services) {
+ot::Table* BackendInfo::createLssServicesTable(const std::list<ot::LSSDebugInfo::ServiceInfo>& _services, QWidget* _parent) {
 	QStringList headers = { "ID", "Name", "Type", "Url", "Websocket Url", "Debug", 
 		"Requested", "Alive", "Running", "Shutting", "Hidden", "Connected Type" };
 
-	ot::Table* table = new ot::Table(_services.size(), headers.count());
+	ot::Table* table = new ot::Table(_services.size(), headers.count(), _parent);
 	table->verticalHeader()->setVisible(false);
 	table->setHorizontalHeaderLabels(headers);
 	table->setSelectionBehavior(ot::Table::SelectRows);
@@ -960,12 +974,12 @@ ot::Table* BackendInfo::createLssServicesTable(const std::list<ot::LSSDebugInfo:
 		table->addItem(r, c++, QString::fromStdString(service.type))->setFlags(cellFlags);
 		table->addItem(r, c++, QString::fromStdString(service.url))->setFlags(cellFlags);
 		table->addItem(r, c++, QString::fromStdString(service.websocketUrl))->setFlags(cellFlags);
-		table->setCellWidget(r, c++, this->checkBox(service.isDebug));
-		table->setCellWidget(r, c++, this->checkBox(service.isRequested));
-		table->setCellWidget(r, c++, this->checkBox(service.isAlive));
-		table->setCellWidget(r, c++, this->checkBox(service.isRunning));
-		table->setCellWidget(r, c++, this->checkBox(service.isShuttingDown));
-		table->setCellWidget(r, c++, this->checkBox(service.isHidden));
+		table->setCellWidget(r, c++, this->checkBox(service.isDebug, table));
+		table->setCellWidget(r, c++, this->checkBox(service.isRequested, table));
+		table->setCellWidget(r, c++, this->checkBox(service.isAlive, table));
+		table->setCellWidget(r, c++, this->checkBox(service.isRunning, table));
+		table->setCellWidget(r, c++, this->checkBox(service.isShuttingDown, table));
+		table->setCellWidget(r, c++, this->checkBox(service.isHidden, table));
 		table->addItem(r, c++, QString::fromStdString(service.connectedType))->setFlags(cellFlags);
 		r++;
 	}
@@ -977,9 +991,9 @@ ot::Table* BackendInfo::createLssServicesTable(const std::list<ot::LSSDebugInfo:
 	return table;
 }
 
-ot::Table* BackendInfo::createGdsServicesTable(const std::list<ot::GDSDebugInfo::ServiceInfo>& _services) {
+ot::Table* BackendInfo::createGdsServicesTable(const std::list<ot::GDSDebugInfo::ServiceInfo>& _services, QWidget* _parent) {
 	QStringList headers = { "ID", "Name", "Type", "Session ID", "LSS Url" };
-	ot::Table* table = new ot::Table(_services.size(), headers.count());
+	ot::Table* table = new ot::Table(_services.size(), headers.count(), _parent);
 	table->verticalHeader()->setVisible(false);
 	table->setHorizontalHeaderLabels(headers);
 	table->setSelectionBehavior(ot::Table::SelectRows);
@@ -1006,7 +1020,7 @@ ot::Table* BackendInfo::createGdsServicesTable(const std::list<ot::GDSDebugInfo:
 	return table;
 }
 
-int BackendInfo::createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sessionInfo, const std::list<ot::LDSDebugInfo::ServiceInfo>& _info, LDSServiceInfoMode _mode, QLayout* _layout) {
+int BackendInfo::createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sessionInfo, const std::list<ot::LDSDebugInfo::ServiceInfo>& _info, LDSServiceInfoMode _mode, QLayout* _layout, QWidget* _parent) {
 	bool additionalInfo = false;
 	QStringList headers;
 	switch (_mode) {
@@ -1051,7 +1065,9 @@ int BackendInfo::createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sess
 		return 0;
 	}
 
-	ot::Table* table = new ot::Table(_info.size(), headers.count());
+	ot::ExpanderWidget* expander = new ot::ExpanderWidget(expanderTitle, _parent);
+
+	ot::Table* table = new ot::Table(_info.size(), headers.count(), expander);
 	//table->verticalHeader()->setVisible(false);
 	table->setHorizontalHeaderLabels(headers);
 	table->setSelectionBehavior(ot::Table::SelectRows);
@@ -1070,7 +1086,7 @@ int BackendInfo::createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sess
 		if (additionalInfo) {
 			table->addItem(r, c++, QString::fromStdString(service.url))->setFlags(cellFlags);
 			table->addItem(r, c++, QString::fromStdString(service.websocketUrl))->setFlags(cellFlags);
-			table->setCellWidget(r, c++, this->checkBox(service.isShuttingDown));
+			table->setCellWidget(r, c++, this->checkBox(service.isShuttingDown, table));
 		}
 		else {
 			table->addItem(r, c++, QString::fromStdString(service.sessionID))->setFlags(cellFlags);
@@ -1091,7 +1107,7 @@ int BackendInfo::createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sess
 
 	minHeight += 50;
 
-	ot::ExpanderWidget* expander = new ot::ExpanderWidget(expanderTitle);
+	
 	//expander->setMinExpandedHeight(minHeight);
 	expander->setWidget(table);
 	_layout->addWidget(expander);
@@ -1099,22 +1115,22 @@ int BackendInfo::createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sess
 	return minHeight + 50;
 }
 
-ot::LineEdit* BackendInfo::lineEdit(uint16_t _value) {
-	return this->lineEdit(QString::number(_value));
+ot::LineEdit* BackendInfo::lineEdit(uint16_t _value, QWidget* _parent) {
+	return this->lineEdit(QString::number(_value), _parent);
 }
 
-ot::LineEdit* BackendInfo::lineEdit(const std::string& _text) {
-	return this->lineEdit(QString::fromStdString(_text));
+ot::LineEdit* BackendInfo::lineEdit(const std::string& _text, QWidget* _parent) {
+	return this->lineEdit(QString::fromStdString(_text), _parent);
 }
 
-ot::LineEdit* BackendInfo::lineEdit(const QString& _text) {
-	ot::LineEdit* edit = new ot::LineEdit(_text);
+ot::LineEdit* BackendInfo::lineEdit(const QString& _text, QWidget* _parent) {
+	ot::LineEdit* edit = new ot::LineEdit(_text, _parent);
 	edit->setReadOnly(true);
 	return edit;
 }
 
-ot::IndicatorWidget* BackendInfo::checkBox(bool _checked) {
-	ot::IndicatorWidget* check = new ot::IndicatorWidget(_checked);
+ot::IndicatorWidget* BackendInfo::checkBox(bool _checked, QWidget* _parent) {
+	ot::IndicatorWidget* check = new ot::IndicatorWidget(_checked, _parent);
 	check->setEnabled(false);
 	if (_checked) {
 		check->setSuccessForeground();

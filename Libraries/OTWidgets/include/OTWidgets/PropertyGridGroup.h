@@ -29,19 +29,20 @@
 #include <QtCore/qobject.h>
 #include <QtGui/qbrush.h>
 
-class QLabel;
 class QWidget;
 
 namespace ot {
 
+	class Label;
 	class PropertyGridItem;
 
 	class OT_WIDGETS_API_EXPORT PropertyGridGroup : public QObject, public TreeWidgetItem {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGridGroup)
 		OT_DECL_NOMOVE(PropertyGridGroup)
+		OT_DECL_NODEFAULT(PropertyGridGroup)
 	public:
-		PropertyGridGroup();
+		PropertyGridGroup(QWidget* _parent);
 		virtual ~PropertyGridGroup();
 
 		void setupFromConfig(const PropertyGroup* _group);
@@ -88,8 +89,8 @@ namespace ot {
 
 		std::string m_name;
 		QWidget* m_titleLayoutW;
-		QLabel* m_titleIconLabel;
-		QLabel* m_titleLabel;
+		Label* m_titleIconLabel;
+		Label* m_titleLabel;
 	};
 
 }

@@ -27,17 +27,17 @@
 // Qt header
 #include <QtWidgets/qlayout.h>
 
-ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget * _dockWidget)
-	: ads::CDockWidgetTab(_dockWidget), m_isPinned(false), m_isMiddleButtonPressed(false)
+ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget * _dockWidget, QWidget* _parent)
+	: ads::CDockWidgetTab(_dockWidget, _parent), m_isPinned(false), m_isMiddleButtonPressed(false)
 {
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 
-	m_closeButton = new ToolButton;
+	m_closeButton = new ToolButton(this);
 	m_closeButton->setHidden(true);
 	m_closeButton->setObjectName("OT_ViewTabCloseButton");
 	m_closeButton->setFixedSize(14, 14);
 	
-	m_pinButton = new ToolButton;
+	m_pinButton = new ToolButton(this);
 	m_pinButton->setHidden(true);
 	m_pinButton->setObjectName("OT_ViewTabPinButton");
 	m_pinButton->setFixedSize(14, 14);

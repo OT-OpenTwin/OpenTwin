@@ -34,7 +34,7 @@ namespace ot {
 		OT_DECL_NOCOPY(TabToolBarSubGroup)
 		OT_DECL_NODEFAULT(TabToolBarSubGroup)
 	public:
-		TabToolBarSubGroup(TabToolBarGroup* _parentGroup, tt::SubGroup* _subGroup, const std::string& _name);
+		explicit TabToolBarSubGroup(TabToolBarGroup* _parentGroup, tt::SubGroup* _subGroup, const std::string& _name);
 		virtual ~TabToolBarSubGroup();
 
 		const std::string& getName(void) const { return m_name; };

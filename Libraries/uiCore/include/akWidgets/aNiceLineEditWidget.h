@@ -29,14 +29,21 @@
 class QHBoxLayout;
 class QKeyEvent;
 
-namespace ak {
-	class aLineEditWidget;
-	class aLabelWidget;
+namespace ot {
+	class Label;
+}
 
+namespace ak {
+	
+	class aLineEditWidget;
+	
 	class UICORE_API_EXPORT aNiceLineEditWidget : public QWidget, public aWidget {
 		Q_OBJECT
+		OT_DECL_NOCOPY(aNiceLineEditWidget)
+		OT_DECL_NOMOVE(aNiceLineEditWidget)
+		OT_DECL_NODEFAULT(aNiceLineEditWidget)
 	public:
-		aNiceLineEditWidget(const QString & _initialText, const QString & _infoLabelText);
+		aNiceLineEditWidget(const QString & _initialText, const QString & _infoLabelText, QWidget* _parent);
 		virtual ~aNiceLineEditWidget();
 
 		// #######################################################################################################
@@ -80,6 +87,6 @@ namespace ak {
 	private:
 		QHBoxLayout *			m_layout;
 		aLineEditWidget *		m_lineEdit;
-		aLabelWidget *			m_label;
+		ot::Label*				m_label;
 	};
 }

@@ -28,19 +28,19 @@ ot::PropertyInputFactory& ot::PropertyInputFactory::instance(void) {
 	return g_instance;
 }
 
-ot::PropertyInput* ot::PropertyInputFactory::createInput(const std::string& _key) {
+ot::PropertyInput* ot::PropertyInputFactory::createInput(const std::string& _key, QWidget* _parent) {
 	PropertyInputFactory& factory = PropertyInputFactory::instance();
 	auto it = factory.m_constructors.find(_key);
 	if (it == factory.m_constructors.end()) {
 		OT_LOG_E("PropertyInput \"" + _key + "\" not registered");
 		return nullptr;
 	}
-	return it->second();
+	return it->second(_parent);
 }
 
-ot::PropertyInput* ot::PropertyInputFactory::createInput(const Property* _config) {
+ot::PropertyInput* ot::PropertyInputFactory::createInput(const Property* _config, QWidget* _parent) {
 	OTAssertNullptr(_config);
-	PropertyInput* inp = PropertyInputFactory::createInput(_config->getPropertyType());
+	PropertyInput* inp = PropertyInputFactory::createInput(_config->getPropertyType(), _parent);
 	if (inp) {
 		inp->setupFromConfiguration(_config);
 	}

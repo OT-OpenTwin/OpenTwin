@@ -23,6 +23,8 @@
 #include "OTGui/MessageDialogCfg.h"
 #include "OTWidgets/WidgetTypes.h"
 
+class QWidget;
+
 namespace ot {
 
 	class MessageBoxHandler;
@@ -32,20 +34,20 @@ namespace ot {
 	public:
 		static MessageBoxManager& instance(void);
 
-		static MessageDialogCfg::BasicButton showPrompt(const MessageDialogCfg& _config);
+		static MessageDialogCfg::BasicButton showPrompt(const MessageDialogCfg& _config, QWidget* _parent = nullptr);
 
-		static MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, MessageDialogCfg::BasicIcon _icon, const MessageDialogCfg::BasicButtons& _buttons);
+		static MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, MessageDialogCfg::BasicIcon _icon, const MessageDialogCfg::BasicButtons& _buttons, QWidget* _parent = nullptr);
 
-		static MessageDialogCfg::BasicButton showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok);
+		static MessageDialogCfg::BasicButton showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok, QWidget* _parent = nullptr);
 
-		static MessageDialogCfg::BasicButton showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok);
+		static MessageDialogCfg::BasicButton showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok, QWidget* _parent = nullptr);
 
-		static MessageDialogCfg::BasicButton showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok);
+		static MessageDialogCfg::BasicButton showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok, QWidget* _parent = nullptr);
 
 		void setHandler(MessageBoxHandler* _handler) { m_handler = _handler; };
 
 	private:
-		MessageDialogCfg::BasicButton forwardPromt(const MessageDialogCfg& _config);
+		MessageDialogCfg::BasicButton forwardPromt(const MessageDialogCfg& _config, QWidget* _parent);
 
 		MessageBoxHandler* m_handler;
 

@@ -34,11 +34,13 @@
 #include <QtWidgets/qlistwidget.h>
 #include <QtWidgets/qmessagebox.h>
 
-LogVisualizerColumnWidthSaveDialog::LogVisualizerColumnWidthSaveDialog(const QStringList& _existingNames) {
+LogVisualizerColumnWidthSaveDialog::LogVisualizerColumnWidthSaveDialog(const QStringList& _existingNames, QWidget* _parent) 
+	: ot::Dialog(_parent)
+{
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
 	QVBoxLayout* existingLayout = new QVBoxLayout;
-	existingLayout->addWidget(new ot::Label("Existing Configurations:"));
+	existingLayout->addWidget(new ot::Label("Existing Configurations:", this));
 	m_names = new QListWidget;
 	m_names->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_names->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -53,8 +55,8 @@ LogVisualizerColumnWidthSaveDialog::LogVisualizerColumnWidthSaveDialog(const QSt
 	mainLayout->addLayout(existingLayout, 1);
 
 	QHBoxLayout* nameLayout = new QHBoxLayout;
-	nameLayout->addWidget(new ot::Label("New Name:"));
-	m_name = new ot::LineEdit;
+	nameLayout->addWidget(new ot::Label("New Name:", this));
+	m_name = new ot::LineEdit(this);
 	m_name->setValidator(new ot::BasicValidator);
 	nameLayout->addWidget(m_name, 1);
 	mainLayout->addLayout(nameLayout);
@@ -62,11 +64,11 @@ LogVisualizerColumnWidthSaveDialog::LogVisualizerColumnWidthSaveDialog(const QSt
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	buttonLayout->addStretch(1);
 
-	ot::PushButton* btnSave = new ot::PushButton("Save");
+	ot::PushButton* btnSave = new ot::PushButton("Save", this);
 	buttonLayout->addWidget(btnSave);
 	this->connect(btnSave, &QPushButton::clicked, this, &LogVisualizerColumnWidthSaveDialog::slotSave);
 
-	ot::PushButton* btnCancel = new ot::PushButton("Cancel");
+	ot::PushButton* btnCancel = new ot::PushButton("Cancel", this);
 	buttonLayout->addWidget(btnCancel);
 	this->connect(btnCancel, &QPushButton::clicked, this, &LogVisualizerColumnWidthSaveDialog::closeCancel);
 	mainLayout->addLayout(buttonLayout);

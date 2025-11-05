@@ -19,13 +19,19 @@
 
 // OpenTwin header
 #include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/GraphicsViewView.h"
 
-ot::GraphicsViewView::GraphicsViewView(GraphicsView* _graphicsView)
-	: WidgetView(WidgetViewBase::ViewGraphics), m_graphicsView(_graphicsView)
+ot::GraphicsViewView::GraphicsViewView(QWidget* _parent) : GraphicsViewView(nullptr, _parent) {}
+
+ot::GraphicsViewView::GraphicsViewView(GraphicsView* _graphicsView, QWidget* _parent)
+	: WidgetView(WidgetViewBase::ViewGraphics, _parent), m_graphicsView(_graphicsView)
 {
 	if (!m_graphicsView) {
-		m_graphicsView = new GraphicsView;
+		m_graphicsView = new GraphicsView(getViewDockWidget());
+	}
+	else {
+		m_graphicsView->setParent(getViewDockWidget());
 	}
 
 	this->addWidgetInterfaceToDock(m_graphicsView);

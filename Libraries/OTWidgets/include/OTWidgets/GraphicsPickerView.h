@@ -27,8 +27,12 @@ namespace ot {
 	class GraphicsPicker;
 
 	class OT_WIDGETS_API_EXPORT GraphicsPickerView : public WidgetView {
+		OT_DECL_NOCOPY(GraphicsPickerView)
+		OT_DECL_NOMOVE(GraphicsPickerView)
+		OT_DECL_NODEFAULT(GraphicsPickerView)
 	public:
-		GraphicsPickerView(GraphicsPicker* _graphicsPicker = (GraphicsPicker*)nullptr);
+		explicit GraphicsPickerView(QWidget* _parent);
+		explicit GraphicsPickerView(GraphicsPicker* _graphicsPicker, QWidget* _parent);
 		virtual ~GraphicsPickerView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

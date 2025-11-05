@@ -43,13 +43,13 @@ ot::TabToolBarSubGroup::~TabToolBarSubGroup() {
 }
 
 ot::ToolButton* ot::TabToolBarSubGroup::addToolButton(const QString& _iconPath, const QString& _text, QMenu* _menu) {
-	ToolButton* btn = TabToolBar::createButton(_iconPath, _text, _menu);
+	ToolButton* btn = TabToolBar::createButton(m_subGroup, _iconPath, _text, _menu);
 	m_subGroup->AddWidget(btn);
 	return btn;
 }
 
 ot::ToolButton* ot::TabToolBarSubGroup::addToolButton(const QIcon& _icon, const QString& _text, QMenu* _menu) {
-	ToolButton* btn = TabToolBar::createButton(_icon, _text, _menu);
+	ToolButton* btn = TabToolBar::createButton(m_subGroup, _icon, _text, _menu);
 	m_subGroup->AddWidget(btn);
 	return btn;
 }

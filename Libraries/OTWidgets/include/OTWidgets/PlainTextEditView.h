@@ -28,8 +28,11 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PlainTextEditView : public WidgetView {
 		OT_DECL_NOCOPY(PlainTextEditView)
+		OT_DECL_NOMOVE(PlainTextEditView)
+		OT_DECL_NODEFAULT(PlainTextEditView)
 	public:
-		PlainTextEditView(PlainTextEdit* _textEdit = (PlainTextEdit*)nullptr);
+		explicit PlainTextEditView(QWidget* _parent);
+		explicit PlainTextEditView(PlainTextEdit* _textEdit, QWidget* _parent);
 		virtual ~PlainTextEditView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

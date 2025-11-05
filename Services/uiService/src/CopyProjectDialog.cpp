@@ -31,43 +31,39 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qmessagebox.h>
 
-CopyProjectDialog::CopyProjectDialog(const QString& _projectToCopy, ProjectManagement& projectManager)
-	: m_projectToCopy(_projectToCopy),
-	  m_projectManagement(&projectManager)
+CopyProjectDialog::CopyProjectDialog(const QString& _projectToCopy, ProjectManagement& projectManager, QWidget* _parent)
+	: ot::Dialog(_parent), m_projectToCopy(_projectToCopy), m_projectManagement(&projectManager)
 {
 	// Create layouts
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
 
 	QHBoxLayout* inputLayout = new QHBoxLayout;
-	QHBoxLayout* buttonLayout = new QHBoxLayout;
-
-	// Create controls
-	ot::Label* nameLabel = new ot::Label("New Name:");
-	m_edit = new ot::LineEdit(m_projectToCopy + " - copy");
-
-	ot::PushButton* confirmButton = new ot::PushButton("Confirm");
-	ot::PushButton* cancelButton = new ot::PushButton("Cancel");
-
-	// Setup layouts
 	centralLayout->addLayout(inputLayout);
-	centralLayout->addLayout(buttonLayout);
-	centralLayout->addStretch(1);
 	
+	ot::Label* nameLabel = new ot::Label("New Name:", this);
 	inputLayout->addWidget(nameLabel);
+
+	m_edit = new ot::LineEdit(m_projectToCopy + " - copy", this);
 	inputLayout->addWidget(m_edit, 1);
 
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	buttonLayout->addStretch(1);
-	buttonLayout->addWidget(confirmButton);
-	buttonLayout->addWidget(cancelButton);
+	centralLayout->addLayout(buttonLayout);
 
+	ot::PushButton* confirmButton = new ot::PushButton("Confirm", this);
+	buttonLayout->addWidget(confirmButton);
+	this->connect(confirmButton, &ot::PushButton::clicked, this, &CopyProjectDialog::slotConfirm);
+
+	ot::PushButton* cancelButton = new ot::PushButton("Cancel", this);
+	buttonLayout->addWidget(cancelButton);
+	this->connect(cancelButton, &ot::PushButton::clicked, this, &CopyProjectDialog::closeCancel);
+
+	centralLayout->addStretch(1);
+	
 	// Setup dialog
 	this->setWindowTitle("Copy project (" + m_projectToCopy + ")");
 	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 	this->setMinimumWidth(200);
-
-	// Connect signals
-	this->connect(confirmButton, &ot::PushButton::clicked, this, &CopyProjectDialog::slotConfirm);
-	this->connect(cancelButton, &ot::PushButton::clicked, this, &CopyProjectDialog::closeCancel);
 }
 
 CopyProjectDialog::~CopyProjectDialog() {

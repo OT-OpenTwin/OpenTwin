@@ -31,7 +31,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT MessageDialog {
 		OT_DECL_NOCOPY(MessageDialog)
 	public:
-		static MessageDialogCfg::BasicButton showDialog(const MessageDialogCfg& _config, QWidget* _parent = (QWidget*)nullptr);
+		static MessageDialogCfg::BasicButton showDialog(const MessageDialogCfg& _config, QWidget* _parent);
 		
 		static QMessageBox::Icon convertIcon(MessageDialogCfg::BasicIcon _icon);
 

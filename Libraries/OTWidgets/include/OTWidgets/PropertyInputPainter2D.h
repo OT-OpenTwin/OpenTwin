@@ -29,8 +29,10 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PropertyInputPainter2D : public PropertyInput {
 		OT_DECL_NOCOPY(PropertyInputPainter2D)
+		OT_DECL_NOMOVE(PropertyInputPainter2D)
+		OT_DECL_NODEFAULT(PropertyInputPainter2D)
 	public:
-		PropertyInputPainter2D();
+		explicit PropertyInputPainter2D(QWidget* _parent);
 		virtual ~PropertyInputPainter2D();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;

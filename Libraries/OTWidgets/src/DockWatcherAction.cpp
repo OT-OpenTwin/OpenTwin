@@ -21,7 +21,9 @@
 #include "OTSystem/OTAssert.h"
 #include "OTWidgets/DockWatcherAction.h"
 
-ot::DockWatcherAction::DockWatcherAction() : m_dock(nullptr) {
+ot::DockWatcherAction::DockWatcherAction(QObject* _parent) 
+	: QAction(_parent), m_dock(nullptr)
+{
 	this->setCheckable(true);
 	this->connect(this, &QAction::triggered, this, &ot::DockWatcherAction::slotTriggered);
 }

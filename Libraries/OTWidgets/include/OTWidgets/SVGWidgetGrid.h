@@ -34,11 +34,15 @@ class QGridLayout;
 namespace ot {
 
 	class SVGWidget;
+	class FlowLayout;
 
 	class OT_WIDGETS_API_EXPORT SVGWidgetGrid : public QScrollArea, public WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(SVGWidgetGrid)
+		OT_DECL_NOMOVE(SVGWidgetGrid)
+		OT_DECL_NODEFAULT(SVGWidgetGrid)
 	public:
-		SVGWidgetGrid();
+		explicit SVGWidgetGrid(QWidget* _parent);
 
 		void fillFromPath(const QString& _rootPath);
 
@@ -52,16 +56,12 @@ namespace ot {
 		void setItemSize(int _width, int _height) { this->setItemSize(QSize(_width, _height)); };
 		void setItemSize(const QSize& _size);
 
-	protected:
-		virtual void resizeEvent(QResizeEvent* _event) override;
-
 	private Q_SLOTS:
 		void slotLoadNext(void);
 
-	private:
-		void rebuildGrid(const QSize& _newSize);
-		
-		QGridLayout* m_layout;
+	private:		
+		QWidget* m_rootWidget;
+		FlowLayout* m_layout;
 
 		QSize m_itemSize;
 

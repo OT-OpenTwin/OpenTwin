@@ -63,12 +63,15 @@ namespace ak {
 
 	class UICORE_API_EXPORT aTreeWidget : public QObject, public aWidget, public ot::WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(aTreeWidget)
+		OT_DECL_NOMOVE(aTreeWidget)
+		OT_DECL_NODEFAULT(aTreeWidget)
 	public:
 		//! @brief Default constructor
 		//! @param _messenger The globally used messenger
 		//! @param _uidManager The globally used UID manager
 		//! @param _dock The dock widget to display the tree at
-		aTreeWidget();
+		explicit aTreeWidget(QWidget* _parent);
 
 		//! @brief Deconstructor
 		virtual ~aTreeWidget();
@@ -483,7 +486,7 @@ namespace ak {
 		Q_OBJECT
 	public:
 		//! @brief Constructor
-		aTreeWidgetBase(aTreeWidget * _ownerTree);
+		aTreeWidgetBase(aTreeWidget * _ownerTree, QWidget* _parent);
 
 		virtual ~aTreeWidgetBase();
 

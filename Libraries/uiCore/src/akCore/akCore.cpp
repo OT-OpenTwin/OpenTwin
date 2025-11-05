@@ -211,7 +211,6 @@ QString ak::toQString(
 	case otNone: return QString("None");
 	case otAction: return QString("Action");
 	case otCheckBox: return QString("CheckBox");
-	case otLabel: return QString("Label");
 	case otLineEdit: return QString("LineEdit");
 	case otMainWindow: return QString("Window");
 	case otNiceLineEdit: return QString("NiceLineEdit");

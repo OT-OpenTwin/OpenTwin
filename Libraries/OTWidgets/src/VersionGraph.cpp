@@ -22,8 +22,8 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/VersionGraphItem.h"
 
-ot::VersionGraph::VersionGraph() :
-	m_updateItemPositionRequired(false), m_configFlags(NoConfigFlags)
+ot::VersionGraph::VersionGraph(QWidget* _parent) :
+	GraphicsView(_parent), m_updateItemPositionRequired(false), m_configFlags(NoConfigFlags)
 {
 	this->getGraphicsScene()->setGridFlags(ot::Grid::NoGridFlags);
 	this->getGraphicsScene()->setMultiselectionEnabled(false);

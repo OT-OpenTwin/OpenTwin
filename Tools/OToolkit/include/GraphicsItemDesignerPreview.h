@@ -25,8 +25,11 @@
 namespace ot { class GraphicsItem; };
 
 class GraphicsItemDesignerPreview : public ot::GraphicsView {
+	OT_DECL_NOCOPY(GraphicsItemDesignerPreview)
+	OT_DECL_NOMOVE(GraphicsItemDesignerPreview)
+	OT_DECL_NODEFAULT(GraphicsItemDesignerPreview)
 public:
-	GraphicsItemDesignerPreview();
+	GraphicsItemDesignerPreview(QWidget* _parent);
 	virtual ~GraphicsItemDesignerPreview();
 
 	//! \brief Updates the current preview.

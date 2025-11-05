@@ -32,7 +32,7 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(DockWatcherAction)
 	public:
-		DockWatcherAction();
+		DockWatcherAction(QObject* _parent = (QObject*)nullptr);
 		virtual ~DockWatcherAction();
 
 		void watch(QDockWidget* _dock);

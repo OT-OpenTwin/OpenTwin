@@ -27,6 +27,9 @@
 // Qt header
 #include <qstring.h>					// QString
 
+// TTB header
+#include <TabToolbar/Group.h>
+
 // Forward declaration
 class QAction;
 namespace tt { class Group; }
@@ -74,6 +77,10 @@ namespace ak {
 		virtual void setEnabled(
 			bool						_enabled
 		) override;
+
+		virtual QWidget* widget(void) override { return m_group; }
+
+		tt::Group* getGroup() { return m_group; };
 
 		void addAction(QAction* _action);
 

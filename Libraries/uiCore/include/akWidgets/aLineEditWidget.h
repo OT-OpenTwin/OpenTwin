@@ -36,15 +36,18 @@ namespace ak {
 	class UICORE_API_EXPORT aLineEditWidget : public QLineEdit, public aWidget
 	{
 		Q_OBJECT
+		OT_DECL_NOCOPY(aLineEditWidget)
+		OT_DECL_NOMOVE(aLineEditWidget)
+		OT_DECL_NODEFAULT(aLineEditWidget)
 	public:
 		//! @brief Constructor
 		//! @param _parent The parent QWidget for this textEdit
-		aLineEditWidget(QWidget * _parent = (QWidget *) nullptr);
+		explicit aLineEditWidget(QWidget * _parent);
 
 		//! @brief Constructor
 		//! @param _text The initial text for this text edit
 		//! @param _parent The parent QWidget for this textEdit
-		aLineEditWidget(const QString & _text, QWidget * _parent = (QWidget *) nullptr);
+		explicit aLineEditWidget(const QString & _text, QWidget* _parent);
 
 		//! @brief Deconstructor
 		virtual ~aLineEditWidget();
@@ -105,9 +108,5 @@ namespace ak {
 		bool					m_errorIsForeground;
 		bool					m_ignoreTabulator;
 		QString					m_text;
-
-		aLineEditWidget(const aLineEditWidget &) = delete;
-		aLineEditWidget & operator = (const aLineEditWidget &) = delete;
-
 	};
 }

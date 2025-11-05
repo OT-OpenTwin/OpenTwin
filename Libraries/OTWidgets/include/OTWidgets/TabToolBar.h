@@ -43,6 +43,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT TabToolBar : public AbstractToolBar {
 		OT_DECL_NOCOPY(TabToolBar)
+		OT_DECL_NOMOVE(TabToolBar)
 	public:
 		//! @brief Creates a default tool button that can be placed in a group or subgroup.
 		//! @param _iconPath Button icon path that will be used in the icon manager to load the icon.
@@ -50,7 +51,7 @@ namespace ot {
 		//! @param _menu Menu to set.
 		//! @return Created ToolButton.
 		//! @ref ToolButton
-		static ToolButton* createButton(const QString& _iconPath, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
+		static ToolButton* createButton(QWidget* _parent, const QString& _iconPath, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
 
 		//! @brief Creates a default tool button that can be placed in a group or subgroup.
 		//! @param _icon Button icon.
@@ -58,7 +59,7 @@ namespace ot {
 		//! @param _menu Menu to set.
 		//! @return Created ToolButton.
 		//! @ref ToolButton
-		static ToolButton* createButton(const QIcon& _icon, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
+		static ToolButton* createButton(QWidget* _parent, const QIcon& _icon, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
 
 		TabToolBar(MainWindow* _window = (MainWindow*)nullptr);
 		virtual ~TabToolBar();
@@ -107,6 +108,8 @@ namespace ot {
 		TabToolBarSubGroup* findSubGroup(const std::string& _pageName, const std::string& _groupName, const std::string& _subGroupName);
 		const TabToolBarSubGroup* findSubGroup(const std::string& _pageName, const std::string& _groupName, const std::string& _subGroupName) const;
 		bool hasSubGroup(const std::string& _pageName, const std::string& _groupName, const std::string& _subGroupName) const { return this->findSubGroup(_pageName, _groupName, _subGroupName) != nullptr; };
+
+		void setParentWidget(QWidget* _parent);
 
 	private:
 		tt::TabToolbar* m_toolBar;

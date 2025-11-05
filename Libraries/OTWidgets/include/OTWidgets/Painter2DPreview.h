@@ -32,8 +32,18 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT Painter2DPreview : public QFrame, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Painter2DPreview)
+		OT_DECL_NOMOVE(Painter2DPreview)
+		OT_DECL_NODEFAULT(Painter2DPreview)
 	public:
-		Painter2DPreview(const Painter2D* _painter = (Painter2D*) nullptr);
+		//! @brief Constructor.
+		//! @param _parent Pointer to the parent widget.
+		explicit Painter2DPreview(QWidget* _parent);
+
+		//! @brief Constructor.
+		//! @param _painter Painter to preview.
+		//! @param _parent Pointer to the parent widget.
+		explicit Painter2DPreview(const Painter2D* _painter, QWidget* _parent);
+
 		virtual ~Painter2DPreview();
 
 		void setFromPainter(const ot::Painter2D* _painter);

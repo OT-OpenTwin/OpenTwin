@@ -31,9 +31,9 @@ namespace ot {
 		OT_DECL_NOCOPY(Action)
 		OT_DECL_NOMOVE(Action)
 	public:
-		Action(QObject* _parent = (QObject*)nullptr);
-		Action(const QString& _text, QObject* _parent = (QObject*)nullptr);
-		Action(const QIcon& _icon, const QString& _text, QObject* _parent = (QObject*)nullptr);
+		explicit Action(QObject* _parent = (QObject*)nullptr);
+		explicit Action(const QString& _text, QObject* _parent = (QObject*)nullptr);
+		explicit Action(const QIcon& _icon, const QString& _text, QObject* _parent = (QObject*)nullptr);
 		virtual ~Action();
 	};
 

@@ -43,53 +43,51 @@ FileLogImporterDialog::FileLogImporterDialog(QWidget* _parent)
 {
 	// Create layouts
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
+
 	QVBoxLayout* centralLayout = new QVBoxLayout;
-	QHBoxLayout* bottomLayout = new QHBoxLayout;
-	QHBoxLayout* outputLayout = new QHBoxLayout;
-	QHBoxLayout* buttonLayout = new QHBoxLayout;
-
-	// Create controls
-	m_importedFiles = new ot::PlainTextEdit;
-	m_importedFiles->setReadOnly(true);
-
-	m_countLabel = new ot::Label("Message count: 0");
-	m_importButton = new ot::PushButton("Import");
-	m_clearButton = new ot::PushButton("Clear");
-	
-	m_confirmButton = new ot::PushButton("Confirm");
-	ot::PushButton* btnCancel = new ot::PushButton("Cancel");
-
-	m_output = new ot::PlainTextEdit;
-	m_output->setReadOnly(true);
-
-	// Setup layouts
 	mainLayout->addLayout(centralLayout);
-	mainLayout->addLayout(bottomLayout);
-	mainLayout->addLayout(outputLayout, 1);
-	mainLayout->addLayout(buttonLayout);
 
+	m_importedFiles = new ot::PlainTextEdit(this);
+	m_importedFiles->setReadOnly(true);
 	centralLayout->addWidget(m_importedFiles);
 
-	bottomLayout->addWidget(m_countLabel, 1);
-	bottomLayout->addWidget(m_importButton);
-	bottomLayout->addWidget(m_clearButton);
+	QHBoxLayout* bottomLayout = new QHBoxLayout;
+	mainLayout->addLayout(bottomLayout);
 
+	m_countLabel = new ot::Label("Message count: 0", this);
+	bottomLayout->addWidget(m_countLabel, 1);
+
+	m_importButton = new ot::PushButton("Import", this);
+	bottomLayout->addWidget(m_importButton);
+	this->connect(m_importButton, &ot::PushButton::clicked, this, &FileLogImporterDialog::slotImport);
+
+	m_clearButton = new ot::PushButton("Clear", this);
+	bottomLayout->addWidget(m_clearButton);
+	this->connect(m_clearButton, &ot::PushButton::clicked, this, &FileLogImporterDialog::slotClear);
+
+	QHBoxLayout* outputLayout = new QHBoxLayout;
+	mainLayout->addLayout(outputLayout, 1);
+
+	m_output = new ot::PlainTextEdit(this);
+	m_output->setReadOnly(true);
 	outputLayout->addWidget(m_output);
 
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
+	mainLayout->addLayout(buttonLayout);
 	buttonLayout->addStretch(1);
+
+	m_confirmButton = new ot::PushButton("Confirm", this);
 	buttonLayout->addWidget(m_confirmButton);
+	this->connect(m_confirmButton, &ot::PushButton::clicked, this, &FileLogImporterDialog::closeOk);
+
+	ot::PushButton* btnCancel = new ot::PushButton("Cancel", this);
 	buttonLayout->addWidget(btnCancel);
+	this->connect(btnCancel, &ot::PushButton::clicked, this, &FileLogImporterDialog::closeCancel);
 
 	// Setup window
 	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 	this->setWindowTitle("File Log Importer");
 	this->resize(400, 200);
-
-	// Connect signals
-	this->connect(m_importButton, &ot::PushButton::clicked, this, &FileLogImporterDialog::slotImport);
-	this->connect(m_clearButton, &ot::PushButton::clicked, this, &FileLogImporterDialog::slotClear);
-	this->connect(m_confirmButton, &ot::PushButton::clicked, this, &FileLogImporterDialog::closeOk);
-	this->connect(btnCancel, &ot::PushButton::clicked, this, &FileLogImporterDialog::closeCancel);
 }
 
 FileLogImporterDialog::~FileLogImporterDialog() {

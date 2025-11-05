@@ -23,10 +23,10 @@
 // Qt header
 #include <QtWidgets/qstatusbar.h>
 
-ot::StatusBarManager::StatusBarManager() :
+ot::StatusBarManager::StatusBarManager(QWidget* _parent) :
 	m_statusBar(nullptr)
 {
-	m_statusBar = new QStatusBar;
+	m_statusBar = new QStatusBar(_parent);
 }
 
 ot::StatusBarManager::~StatusBarManager() {

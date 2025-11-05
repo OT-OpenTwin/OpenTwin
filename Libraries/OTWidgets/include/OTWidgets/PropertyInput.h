@@ -29,6 +29,8 @@
 #include <QtCore/qobject.h>
 #include <QtCore/qvariant.h>
 
+class QWidget;
+
 namespace ot {
 
 	class Property;

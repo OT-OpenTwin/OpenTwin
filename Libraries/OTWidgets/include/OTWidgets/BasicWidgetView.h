@@ -27,8 +27,11 @@ class QWidget;
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT BasicWidgetView : public WidgetView {
+		OT_DECL_NOCOPY(BasicWidgetView)
+		OT_DECL_NOMOVE(BasicWidgetView)
+		OT_DECL_NODEFAULT(BasicWidgetView)
 	public:
-		BasicWidgetView(QWidget* _widget);
+		explicit BasicWidgetView(QWidget* _widget, QWidget* _parent);
 		virtual ~BasicWidgetView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

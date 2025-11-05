@@ -19,10 +19,12 @@
 
 // OpenTwin header
 #include "OTWidgets/PlotView.h"
+#include "OTWidgets/WidgetViewDock.h"
 
-ot::PlotView::PlotView()
-	: WidgetView(WidgetViewBase::View1D) {
-	m_plot = new Plot();
+ot::PlotView::PlotView(QWidget* _parent)
+	: WidgetView(WidgetViewBase::View1D, _parent)
+{
+	m_plot = new Plot(getViewDockWidget());
 
 	this->addWidgetInterfaceToDock(m_plot);
 }

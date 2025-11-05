@@ -29,8 +29,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT PropertyGridTree : public TreeWidget {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGridTree)
+		OT_DECL_NOMOVE(PropertyGridTree)
+		OT_DECL_NODEFAULT(PropertyGridTree)
 	public:
-		PropertyGridTree();
+		PropertyGridTree(QWidget* _parent);
 		virtual ~PropertyGridTree();
 
 	protected:

@@ -82,7 +82,8 @@
 
 #include "ViewerSettings.h"
 
-Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB) :
+Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB, QWidget* _parent) :
+	QOpenGLWidget(_parent),
 	viewerUID(viewerID),
 	model(nullptr),
 	scaleWidth(sw),

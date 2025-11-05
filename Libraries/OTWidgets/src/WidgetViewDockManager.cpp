@@ -44,13 +44,14 @@ void ot::WidgetViewDockManager::addView(WidgetView* _view, ads::CDockAreaWidget*
 		_areaWidget = this->lastAddedDockAreaWidget(area);
 	}
 	
+	_view->getViewDockWidget()->setParent(this);
+
 	if (_areaWidget) {
 		this->addDockWidget(ads::CenterDockWidgetArea, _view->getViewDockWidget(), _areaWidget);
 	}
 	else {
 		this->addDockWidget(area, _view->getViewDockWidget(), nullptr);
 	}
-
 }
 
 ads::DockWidgetArea ot::WidgetViewDockManager::getDockWidgetArea(const WidgetView* _view) const {

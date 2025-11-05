@@ -31,10 +31,10 @@ static ot::PropertyInputFactoryRegistrar<ot::PropertyInputInt> propertyInputIntR
 #define OT_PROPERTY_INT_MULTIPLEVALUESCHAR "."
 #define OT_PROPERTY_INT_MULTIPLEVALUESTEXT OT_PROPERTY_INT_MULTIPLEVALUESCHAR OT_PROPERTY_INT_MULTIPLEVALUESCHAR OT_PROPERTY_INT_MULTIPLEVALUESCHAR
 
-ot::PropertyInputInt::PropertyInputInt() :
-	m_lineEdit(nullptr), m_min(std::numeric_limits<int>::lowest()), m_max(std::numeric_limits<int>::max())
+ot::PropertyInputInt::PropertyInputInt(QWidget* _parent) :
+	m_lineEdit(nullptr), m_min(std::numeric_limits<int>::lowest()), m_max(std::numeric_limits<int>::max()), m_parentWidget(_parent)
 {
-	m_spinBox = new SpinBox;
+	m_spinBox = new SpinBox(m_parentWidget);
 	this->connect(m_spinBox, &SpinBox::valueChangeCompleted, this, &PropertyInputInt::lclValueChanged);
 }
 
@@ -215,12 +215,12 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 	if (this->data().getPropertyFlags() & Property::AllowCustomValues) {
 		if (m_spinBox) delete m_spinBox;
 		m_spinBox = nullptr;
-		if (!m_lineEdit) m_lineEdit = new LineEdit;
+		if (!m_lineEdit) m_lineEdit = new LineEdit(m_parentWidget);
 		this->connect(m_lineEdit, &LineEdit::textChanged, this, &PropertyInputInt::lclTextChanged);
 		this->connect(m_lineEdit, &LineEdit::editingFinished, this, &PropertyInputInt::lclEditingFinishedChanged);
 	}
 	else if (m_spinBox == nullptr) {
-		m_spinBox = new SpinBox;
+		m_spinBox = new SpinBox(m_parentWidget);
 		this->connect(m_spinBox, &SpinBox::valueChangeCompleted, this, &PropertyInputInt::lclValueChanged);
 	}
 

@@ -29,8 +29,8 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsEllipseItem.h"
 
-GraphicsItemDesignerView::GraphicsItemDesignerView(GraphicsItemDesigner* _designer)
-	: GraphicsView(), m_designer(_designer), m_cursorItem(nullptr), m_drawHandler(nullptr), m_selectionChangeInProgress(false)
+GraphicsItemDesignerView::GraphicsItemDesignerView(GraphicsItemDesigner* _designer, QWidget* _parent)
+	: GraphicsView(_parent), m_designer(_designer), m_cursorItem(nullptr), m_drawHandler(nullptr), m_selectionChangeInProgress(false)
 {
 	OTAssertNullptr(m_designer);
 
@@ -39,7 +39,6 @@ GraphicsItemDesignerView::GraphicsItemDesignerView(GraphicsItemDesigner* _design
 	m_scene = new GraphicsItemDesignerScene(this);
 	this->setSceneMargins(QMarginsF(50, 50, 50, 50));
 	this->setGraphicsSceneRect(-5, -5, 810, 610);
-
 
 	m_infoOverlay = new GraphicsItemDesignerViewStatusOverlay(this);
 

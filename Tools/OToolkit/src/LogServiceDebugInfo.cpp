@@ -50,7 +50,7 @@ LogServiceDebugInfo::LogServiceDebugInfo() {
 	m_root = new QWidget;
 	QVBoxLayout* mainLayout = new QVBoxLayout(m_root);
 
-	m_table = new ot::Table(0, tcCount);
+	m_table = new ot::Table(0, tcCount, m_root);
 	m_table->verticalHeader()->setVisible(false);
 	m_table->setSortingEnabled(true);
 	m_table->horizontalHeader()->setSortIndicatorClearable(true);
@@ -64,7 +64,7 @@ LogServiceDebugInfo::LogServiceDebugInfo() {
 
 	mainLayout->addWidget(m_table);
 
-	ot::PushButton* clearButton = new ot::PushButton("Clear");
+	ot::PushButton* clearButton = new ot::PushButton("Clear", m_root);
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	buttonLayout->setContentsMargins(0, 0, 0, 0);
 	buttonLayout->addStretch(1);

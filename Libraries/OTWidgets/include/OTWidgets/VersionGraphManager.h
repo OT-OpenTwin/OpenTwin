@@ -32,6 +32,9 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT VersionGraphManager : public QObject, public WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(VersionGraphManager)
+		OT_DECL_NOMOVE(VersionGraphManager)
+		OT_DECL_NODEFAULT(VersionGraphManager)
 	public:
 		enum ViewMode {
 			ViewAll,
@@ -43,7 +46,7 @@ namespace ot {
 		static std::string viewModeToString(ViewMode _mode);
 		static ViewMode stringToViewMode(const std::string& _mode);
 
-		VersionGraphManager();
+		explicit VersionGraphManager(QWidget* _parent);
 		virtual ~VersionGraphManager();
 
 		virtual QWidget* getQWidget(void) override { return m_root; };

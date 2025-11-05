@@ -32,9 +32,9 @@
 
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputStringList> propertyInputStringListRegistrar(ot::PropertyStringList::propertyTypeString());
 
-ot::PropertyInputStringList::PropertyInputStringList()
+ot::PropertyInputStringList::PropertyInputStringList(QWidget* _parent)
 {
-	m_comboButton = new ComboButton;
+	m_comboButton = new ComboButton(_parent);
 	this->connect(m_comboButton, &ComboButton::textChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
 }
 

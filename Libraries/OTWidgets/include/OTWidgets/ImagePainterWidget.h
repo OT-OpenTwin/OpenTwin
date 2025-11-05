@@ -32,8 +32,9 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT ImagePainterWidget : public QFrame, public WidgetBase {
 		OT_DECL_NOCOPY(ImagePainterWidget)
 		OT_DECL_NOMOVE(ImagePainterWidget)
+		OT_DECL_NODEFAULT(ImagePainterWidget)
 	public:
-		ImagePainterWidget(QWidget* _parent = (QWidget*)nullptr);
+		explicit ImagePainterWidget(QWidget* _parent);
 		virtual ~ImagePainterWidget();
 
 		virtual QWidget* getQWidget() override { return this; };

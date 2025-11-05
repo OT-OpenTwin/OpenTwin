@@ -27,8 +27,11 @@ namespace ot {
 	class ColorPickButton;
 
 	class OT_WIDGETS_API_EXPORT Painter2DEditDialogFillEntry : public Painter2DEditDialogEntry {
+		OT_DECL_NOCOPY(Painter2DEditDialogFillEntry)
+		OT_DECL_NOMOVE(Painter2DEditDialogFillEntry)
+		OT_DECL_NODEFAULT(Painter2DEditDialogFillEntry)
 	public:
-		Painter2DEditDialogFillEntry(const Painter2D* _painter = (Painter2D*)nullptr);
+		Painter2DEditDialogFillEntry(const Painter2D* _painter, QWidget* _parent);
 		virtual ~Painter2DEditDialogFillEntry();
 
 		virtual DialogEntryType getEntryType() const { return Painter2DEditDialogEntry::FillType; };

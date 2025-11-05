@@ -34,11 +34,12 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PathBrowseEdit : public QObject, public WidgetBase {
 		Q_OBJECT
-		OT_DECL_NODEFAULT(PathBrowseEdit)
 		OT_DECL_NOCOPY(PathBrowseEdit)
+		OT_DECL_NOMOVE(PathBrowseEdit)
+		OT_DECL_NODEFAULT(PathBrowseEdit)
 	public:
-		PathBrowseEdit(PathBrowseMode _mode, QWidget* _parent = (QWidget*)nullptr);
-		PathBrowseEdit(const QString& _path, PathBrowseMode _mode, QWidget* _parent = (QWidget*)nullptr);
+		explicit PathBrowseEdit(PathBrowseMode _mode, QWidget* _parent);
+		explicit PathBrowseEdit(const QString& _path, PathBrowseMode _mode, QWidget* _parent);
 		virtual ~PathBrowseEdit();
 
 		virtual QWidget* getQWidget(void) override { return m_root; };
@@ -69,8 +70,6 @@ namespace ot {
 		void slotEditChanged(void);
 
 	private:
-		void ini(QWidget* _parent);
-
 		QString m_path;
 
 		PathBrowseMode m_mode;

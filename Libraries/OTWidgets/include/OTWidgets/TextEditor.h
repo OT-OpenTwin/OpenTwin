@@ -38,8 +38,11 @@ namespace ot {
 	class TextEditorSearchPopup;
 	
 	class OT_WIDGETS_API_EXPORT TextEditorLineNumberArea : public QWidget {
+		OT_DECL_NOCOPY(TextEditorLineNumberArea)
+		OT_DECL_NOMOVE(TextEditorLineNumberArea)
+		OT_DECL_NODEFAULT(TextEditorLineNumberArea)
 	public:
-		TextEditorLineNumberArea(TextEditor* _editor);
+		explicit TextEditorLineNumberArea(TextEditor* _editor);
 		virtual ~TextEditorLineNumberArea();
 
 		QSize sizeHint() const override;
@@ -60,8 +63,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT TextEditor : public PlainTextEdit {
 		Q_OBJECT
 		OT_DECL_NOCOPY(TextEditor)
+		OT_DECL_NOMOVE(TextEditor)
+		OT_DECL_NODEFAULT(TextEditor)
 	public:
-		TextEditor(QWidget* _parent = (QWidget*)nullptr);
+		explicit TextEditor(QWidget* _parent);
 		virtual ~TextEditor();
 
 		//! @brief Setup the TextEditor.

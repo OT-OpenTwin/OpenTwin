@@ -486,7 +486,7 @@ QString FAR::getToolName(void) const {
 }
 
 bool FAR::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
-	ot::Splitter* centralSplitter = new ot::Splitter;
+	ot::Splitter* centralSplitter = new ot::Splitter(nullptr);
 	m_root = this->createCentralWidgetView(centralSplitter, "FAR");
 	_content.addView(m_root);
 	// Filter

@@ -219,7 +219,6 @@
     <ClCompile Include="src\akTools\ClassHelper.cpp" />
     <ClCompile Include="src\akWidgets\aAnimationOverlayWidget.cpp" />
     <ClCompile Include="src\akWidgets\aCheckBoxWidget.cpp" />
-    <ClCompile Include="src\akWidgets\aLabelWidget.cpp" />
     <ClCompile Include="src\akWidgets\aLineEditWidget.cpp" />
     <ClCompile Include="src\akWidgets\aNiceLineEditWidget.cpp" />
     <ClCompile Include="src\akWidgets\aToolButtonWidget.cpp" />
@@ -251,6 +250,7 @@
     <ClInclude Include="include\akGui\aWindowEventHandler.h" />
     <QtMoc Include="include\akWidgets\aAnimationOverlayWidget.h" />
     <ClInclude Include="include\akTools\ClassHelper.h" />
+    <QtMoc Include="include\akWidgets\aCheckBoxWidget.h" />
     <ClInclude Include="include\akWidgets\aTtbGroup.h" />
     <ClInclude Include="include\akWidgets\aTtbPage.h" />
     <ClInclude Include="include\akWidgets\aTtbSubgroup.h" />
@@ -262,8 +262,6 @@
     <QtMoc Include="include\akWidgets\aToolButtonWidget.h" />
     <QtMoc Include="include\akWidgets\aNiceLineEditWidget.h" />
     <QtMoc Include="include\akWidgets\aLineEditWidget.h" />
-    <QtMoc Include="include\akWidgets\aLabelWidget.h" />
-    <QtMoc Include="include\akWidgets\aCheckBoxWidget.h" />
     <QtMoc Include="include\akGui\aSignalLinker.h" />
     <QtMoc Include="include\akGui\aAction.h" />
   </ItemGroup>

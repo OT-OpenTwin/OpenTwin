@@ -38,10 +38,11 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ProjectOverviewPreviewBox)
 		OT_DECL_NOMOVE(ProjectOverviewPreviewBox)
+		OT_DECL_NODEFAULT(ProjectOverviewPreviewBox)
 	public:
 		static constexpr QSize previewImageSize() { return QSize(255, 255); };
 
-		ProjectOverviewPreviewBox(QWidget* _parent = nullptr);
+		explicit ProjectOverviewPreviewBox(QWidget* _parent);
 		virtual ~ProjectOverviewPreviewBox();
 
 		void unsetProject(bool _instantCollapse = false);

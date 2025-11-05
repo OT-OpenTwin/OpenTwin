@@ -26,7 +26,7 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 
-ot::GraphicsItemPreview::GraphicsItemPreview() : m_painter(nullptr), m_drag(nullptr) {
+ot::GraphicsItemPreview::GraphicsItemPreview(QWidget* _parent) : QFrame(_parent), m_painter(nullptr), m_drag(nullptr) {
 	m_painter = new PixmapImagePainter(QPixmap());
 
 	this->setStyleSheet("border-width: 1px;"

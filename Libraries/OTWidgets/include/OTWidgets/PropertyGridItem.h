@@ -44,8 +44,9 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGridItem)
 		OT_DECL_NOMOVE(PropertyGridItem)
+		OT_DECL_NODEFAULT(PropertyGridItem)
 	public:
-		PropertyGridItem();
+		PropertyGridItem(QWidget* _parent);
 		virtual ~PropertyGridItem();
 
 		//! @brief Setup the item
@@ -82,6 +83,8 @@ namespace ot {
 		
 	private:
 		Property* createSignalProperty();
+
+		QWidget* m_parentWidget;
 
 		ot::Property* m_signalProperty;
 		PropertyGridGroup* m_parentGroup;

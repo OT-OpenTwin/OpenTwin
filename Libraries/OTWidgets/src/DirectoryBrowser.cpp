@@ -29,14 +29,16 @@
 #include <QtWidgets/qtreeview.h>
 #include <QtWidgets/qfilesystemmodel.h>
 
-ot::DirectoryBrowser::DirectoryBrowser() {
+ot::DirectoryBrowser::DirectoryBrowser(QWidget* _parent)
+	: QWidget(_parent)
+{
 	// Create layouts
 	QVBoxLayout* rootLay = new QVBoxLayout(this);
 
 	QHBoxLayout* searchLay = new QHBoxLayout;
 	searchLay->setContentsMargins(0, 0, 0, 0);
-	searchLay->addWidget(new Label("Find"));
-	searchLay->addWidget(m_rootEdit = new LineEdit);
+	searchLay->addWidget(new Label("Find", this));
+	searchLay->addWidget(m_rootEdit = new LineEdit(this));
 
 	rootLay->addLayout(searchLay);
 

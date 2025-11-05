@@ -33,8 +33,8 @@
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/GraphicsScene.h"
 
-GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation(GraphicsItemDesigner* _designer)
-	: m_designer(_designer), m_currentPropertyHandler(nullptr), m_selectionChangeInProgress(false)
+GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation(GraphicsItemDesigner* _designer, QWidget* _parent)
+	: ot::TreeWidget(_parent), m_designer(_designer), m_currentPropertyHandler(nullptr), m_selectionChangeInProgress(false)
 {
 	this->setHeaderHidden(true);
 	m_rootItem = new GraphicsItemDesignerNavigationRoot(_designer);

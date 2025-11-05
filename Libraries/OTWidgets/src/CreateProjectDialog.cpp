@@ -74,62 +74,53 @@ ot::CreateProjectDialog::CreateProjectDialog(QWidget* _parentWidget)
 {
 	// Create layouts
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
-	QHBoxLayout* nameAndButtonLayout = new QHBoxLayout;
-	
-	// Create controls
-	QSplitter* centralSplitter = new QSplitter(Qt::Horizontal);
+	m_search = new LineEdit(this);
+	m_search->setPlaceholderText("Search...");
+	centralLayout->addWidget(m_search);
+	this->connect(m_search, &LineEdit::textChanged, this, &CreateProjectDialog::slotSearch);
 
-	m_search = new LineEdit;
-	m_list = new QListWidget;
+	QSplitter* centralSplitter = new QSplitter(Qt::Horizontal, this);
+	centralLayout->addWidget(centralSplitter);
 
-	QScrollArea* infoScrollArea = new QScrollArea;
-	m_info = new Label;
-	m_info->setWordWrap(true);
-	m_info->setTextFormat(Qt::RichText);
-	infoScrollArea->setWidget(m_info);
+	m_list = new QListWidget(centralSplitter);
+	m_list->setIconSize(QSize(32, 32));
+	centralSplitter->addWidget(m_list);
+	this->connect(m_list, &QListWidget::itemSelectionChanged, this, &CreateProjectDialog::slotShowInfo);
+
+	QScrollArea* infoScrollArea = new QScrollArea(centralSplitter);
 	infoScrollArea->setWidgetResizable(true);
 	infoScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-	Label* nameLabel = new Label("Project Name:");
-	m_name = new LineEdit;
-
-	m_createButton = new PushButton("Create");
-	PushButton* cancelButton = new PushButton("Cancel");
-
-	// Setup controls
-	m_search->setPlaceholderText("Search...");
-	
-	m_list->setIconSize(QSize(32, 32));
-	
-	m_info->setMinimumWidth(100);
-	m_info->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-	
-	m_createButton->setEnabled(false);
-
-	// Setup layouts
-	centralLayout->addWidget(m_search);
-	centralLayout->addWidget(centralSplitter);
-	centralLayout->addLayout(nameAndButtonLayout);
-
-	centralSplitter->addWidget(m_list);
 	centralSplitter->addWidget(infoScrollArea);
 
-	nameAndButtonLayout->addWidget(nameLabel);
-	nameAndButtonLayout->addWidget(m_name, 1);
-	nameAndButtonLayout->addWidget(m_createButton);
-	nameAndButtonLayout->addWidget(cancelButton);
+	m_info = new Label(infoScrollArea);
+	m_info->setWordWrap(true);
+	m_info->setTextFormat(Qt::RichText);
+	m_info->setMinimumWidth(100);
+	m_info->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+	infoScrollArea->setWidget(m_info);
 
+	QHBoxLayout* nameAndButtonLayout = new QHBoxLayout;
+	centralLayout->addLayout(nameAndButtonLayout);
+	
+	nameAndButtonLayout->addWidget(new Label("Project Name:", this));
+
+	m_name = new LineEdit(this);
+	nameAndButtonLayout->addWidget(m_name, 1);
+	this->connect(m_name, &LineEdit::textChanged, this, &CreateProjectDialog::slotCheckCreateEnabledState);
+
+	m_createButton = new PushButton("Create", this);
+	m_createButton->setEnabled(false);
+	nameAndButtonLayout->addWidget(m_createButton);
+	this->connect(m_createButton, &PushButton::clicked, this, &CreateProjectDialog::slotCreate);
+
+	PushButton* cancelButton = new PushButton("Cancel", this);
+	nameAndButtonLayout->addWidget(cancelButton);
+	this->connect(cancelButton, &PushButton::clicked, this, &CreateProjectDialog::closeCancel);
+	
 	// Setup dialog
 	this->setWindowTitle(OT_CREATEPROJECTDIALOG_TitlePrefix);
 	this->setWindowIcon(IconManager::getApplicationIcon());
 	this->setMinimumSize(QSize(800, 600));
-
-	// Connect Signals
-	this->connect(m_list, &QListWidget::itemSelectionChanged, this, &CreateProjectDialog::slotShowInfo);
-	this->connect(m_search, &LineEdit::textChanged, this, &CreateProjectDialog::slotSearch);
-	this->connect(m_name, &LineEdit::textChanged, this, &CreateProjectDialog::slotCheckCreateEnabledState);
-	this->connect(m_createButton, &PushButton::clicked, this, &CreateProjectDialog::slotCreate);
-	this->connect(cancelButton, &PushButton::clicked, this, &CreateProjectDialog::closeCancel);
 }
 
 ot::CreateProjectDialog::~CreateProjectDialog() {

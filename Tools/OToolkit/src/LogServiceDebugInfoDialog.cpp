@@ -37,31 +37,31 @@ LogServiceDebugInfoDialog::LogServiceDebugInfoDialog(const QString& _name, const
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
 	QGridLayout* grid = new QGridLayout;
-	grid->addWidget(new ot::Label("Name:"), 0, 0);
-	ot::LineEdit* nameEdit = new ot::LineEdit(_name);
+	grid->addWidget(new ot::Label("Name:", this), 0, 0);
+	ot::LineEdit* nameEdit = new ot::LineEdit(_name, this);
 	nameEdit->setReadOnly(true);
 	grid->addWidget(nameEdit, 0, 1);
 
-	grid->addWidget(new ot::Label("URL:"), 1, 0);
-	ot::LineEdit* urlEdit = new ot::LineEdit(_url);
+	grid->addWidget(new ot::Label("URL:", this), 1, 0);
+	ot::LineEdit* urlEdit = new ot::LineEdit(_url, this);
 	urlEdit->setReadOnly(true);
 	grid->addWidget(urlEdit, 1, 1);
 
-	grid->addWidget(new ot::Label("ID:"), 2, 0);
-	ot::LineEdit* idEdit = new ot::LineEdit(_id);
+	grid->addWidget(new ot::Label("ID:", this), 2, 0);
+	ot::LineEdit* idEdit = new ot::LineEdit(_id, this);
 	idEdit->setReadOnly(true);
 	grid->addWidget(idEdit, 2, 1);
 
-	grid->addWidget(new ot::Label("PID:"), 3, 0);
-	ot::LineEdit* pidEdit = new ot::LineEdit(_pid);
+	grid->addWidget(new ot::Label("PID:", this), 3, 0);
+	ot::LineEdit* pidEdit = new ot::LineEdit(_pid, this);
 	pidEdit->setReadOnly(true);
 	grid->addWidget(pidEdit, 3, 1);
 
 	mainLayout->addLayout(grid);
 
 	QVBoxLayout* infoLayout = new QVBoxLayout;
-	infoLayout->addWidget(new ot::Label("Additional Information:"));
-	ot::PlainTextEdit* infoEdit = new ot::PlainTextEdit;
+	infoLayout->addWidget(new ot::Label("Additional Information:", this));
+	ot::PlainTextEdit* infoEdit = new ot::PlainTextEdit(this);
 	infoEdit->setReadOnly(true);
 	if (_info.isEmpty()) {
 		infoEdit->setPlaceholderText("No additional information available");
@@ -80,7 +80,7 @@ LogServiceDebugInfoDialog::LogServiceDebugInfoDialog(const QString& _name, const
 	mainLayout->addLayout(infoLayout, 1);
 
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
-	ot::PushButton* closeButton = new ot::PushButton("Close");
+	ot::PushButton* closeButton = new ot::PushButton("Close", this);
 	buttonLayout->addStretch(1);
 	buttonLayout->addWidget(closeButton, 0);
 	mainLayout->addLayout(buttonLayout);

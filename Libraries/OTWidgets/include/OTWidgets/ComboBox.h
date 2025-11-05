@@ -30,8 +30,11 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT ComboBox : public QComboBox, public WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(ComboBox)
+		OT_DECL_NOMOVE(ComboBox)
+		OT_DECL_NODEFAULT(ComboBox)
 	public:
-		ComboBox(QWidget* _parent = (QWidget*)nullptr);
+		explicit ComboBox(QWidget* _parent);
 		virtual ~ComboBox() {};
 
 		virtual QWidget* getQWidget() override { return this; };

@@ -77,7 +77,7 @@ public Q_SLOTS:
 		m_toolBarManager = new TabToolBar;
 
 
-		m_statusBarManager = new StatusBarManager;
+		m_statusBarManager = new StatusBarManager(nullptr);
 	}
 
 private:
@@ -93,11 +93,11 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	using namespace ot;
 	
 	{
-		Splitter* root = new Splitter;
+		Splitter* root = new Splitter(nullptr);
 		ot::WidgetView* r = this->createCentralWidgetView(root, "Test Versions");
 		_content.addView(r);
 
-		m_versionGraph = new ot::VersionGraphManager;
+		m_versionGraph = new ot::VersionGraphManager(root);
 		m_versionGraph->setCurrentViewMode(ot::VersionGraphManager::Iterator);
 
 		this->updateVersionConfig(ot::VersionGraphVersionCfg("2.1.3"));
@@ -108,7 +108,7 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		this->connect(m_versionGraph->getGraph(), &VersionGraph::versionActivateRequest, this, &WidgetTest::slotVersionActivatRequest);
 	}
 	{
-		ot::TextEditor* editor = new TextEditor;
+		ot::TextEditor* editor = new TextEditor(nullptr);
 		TextEditorCfg cfg;
 		cfg.setEntityName("Test Editor");
 		cfg.setTitle("Test Editor");

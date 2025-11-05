@@ -40,43 +40,43 @@
 #include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qmessagebox.h>
 
-GraphicsItemDesignerImageExportDialog::GraphicsItemDesignerImageExportDialog(GraphicsItemDesigner* _designer) 
-	: m_designer(_designer)
+GraphicsItemDesignerImageExportDialog::GraphicsItemDesignerImageExportDialog(GraphicsItemDesigner* _designer, QWidget* _parent) 
+	: ot::Dialog(_parent), m_designer(_designer)
 {
 	OTAssertNullptr(m_designer);
 
 	// Create layouts
 	QVBoxLayout* rootLayout = new QVBoxLayout(this);
-	QSplitter* mainSplitter = new QSplitter;
+	QSplitter* mainSplitter = new QSplitter(this);
 	QWidget* inputWidget = new QWidget;
 	QGridLayout* inputLayout = new QGridLayout(inputWidget);
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls
-	ot::Label* pathLabel = new ot::Label("File:");
-	m_pathInput = new ot::PathBrowseEdit(ot::PathBrowseMode::WriteFile);
+	ot::Label* pathLabel = new ot::Label("File:", inputWidget);
+	m_pathInput = new ot::PathBrowseEdit(ot::PathBrowseMode::WriteFile, inputWidget);
 	m_pathInput->setBrowseTitle("Select Image Export");
 	m_pathInput->setFileFilter("Image Files (*.png)");
 
-	ot::Label* showGridLabel = new ot::Label("Show Grid:");
-	m_showGrid = new ot::CheckBox;
+	ot::Label* showGridLabel = new ot::Label("Show Grid:", inputWidget);
+	m_showGrid = new ot::CheckBox(inputWidget);
 
-	ot::Label* topMarginsLabel = new ot::Label("Margins Top:");
-	m_topMarginsInput = new ot::DoubleSpinBox;
+	ot::Label* topMarginsLabel = new ot::Label("Margins Top:", inputWidget);
+	m_topMarginsInput = new ot::DoubleSpinBox(inputWidget);
 
-	ot::Label* leftMarginsLabel = new ot::Label("Margins Left:");
-	m_leftMarginsInput = new ot::DoubleSpinBox;
+	ot::Label* leftMarginsLabel = new ot::Label("Margins Left:", inputWidget);
+	m_leftMarginsInput = new ot::DoubleSpinBox(inputWidget);
 
-	ot::Label* rightMarginsLabel = new ot::Label("Margins Right:");
-	m_rightMarginsInput = new ot::DoubleSpinBox;
+	ot::Label* rightMarginsLabel = new ot::Label("Margins Right:", inputWidget);
+	m_rightMarginsInput = new ot::DoubleSpinBox(inputWidget);
 
-	ot::Label* bottomMarginsLabel = new ot::Label("Margins Bottom:");
-	m_bottomMarginsInput = new ot::DoubleSpinBox;
+	ot::Label* bottomMarginsLabel = new ot::Label("Margins Bottom:", inputWidget);
+	m_bottomMarginsInput = new ot::DoubleSpinBox(inputWidget);
 
-	m_imagePreview = new ot::ImagePreview;
+	m_imagePreview = new ot::ImagePreview(inputWidget);
 	
-	ot::PushButton* buttonExport = new ot::PushButton("Export");
-	ot::PushButton* buttonCancel = new ot::PushButton("Cancel");
+	ot::PushButton* buttonExport = new ot::PushButton("Export", mainSplitter);
+	ot::PushButton* buttonCancel = new ot::PushButton("Cancel", mainSplitter);
 
 	// Setup layouts
 	rootLayout->addWidget(mainSplitter, 1);

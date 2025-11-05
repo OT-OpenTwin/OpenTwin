@@ -20,37 +20,32 @@
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/Property.h"
+#include "OTWidgets/Label.h"
+#include "OTWidgets/PushButton.h"
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/OnePropertyDialog.h"
 #include "OTWidgets/PropertyInputFactory.h"
 
 // Qt header
-#include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
-#include <QtWidgets/qpushbutton.h>
 
 ot::OnePropertyDialog::OnePropertyDialog(const OnePropertyDialogCfg& _config, QWidget* _parent)
 	: Dialog(_config, _parent), m_changed(false)
 {
-	m_input = PropertyInputFactory::createInput(_config.getProperty());
-
-	// Create layouts
 	QVBoxLayout* cLay = new QVBoxLayout(this);
 	QHBoxLayout* inLay = new QHBoxLayout;
-	QHBoxLayout* btnLay = new QHBoxLayout;
-
-	// Create controls
-	QLabel* l = new QLabel(QString::fromStdString(_config.getProperty()->getPropertyTitle()));
-	QPushButton* btnConfirm = new QPushButton("Confirm");
-	QPushButton* btnCancel = new QPushButton("Cancel");
-
-	// Setup layouts
 	cLay->addLayout(inLay);
+
+	inLay->addWidget(new Label(QString::fromStdString(_config.getProperty()->getPropertyTitle()), this));
+	m_input = PropertyInputFactory::createInput(_config.getProperty(), this);
+	inLay->addWidget(m_input->getQWidget(), 1);
+
+	QHBoxLayout* btnLay = new QHBoxLayout;
 	cLay->addStretch(1);
 	cLay->addLayout(btnLay);
 
-	inLay->addWidget(l);
-	inLay->addWidget(m_input->getQWidget(), 1);
+	PushButton* btnConfirm = new PushButton("Confirm", this);
+	PushButton* btnCancel = new PushButton("Cancel", this);
 
 	btnLay->addStretch(1);
 	btnLay->addWidget(btnConfirm);
@@ -58,12 +53,14 @@ ot::OnePropertyDialog::OnePropertyDialog(const OnePropertyDialogCfg& _config, QW
 
 	// Connect signals
 	this->connect(m_input, &PropertyInput::inputValueChanged, this, &OnePropertyDialog::slotValueChanged);
-	this->connect(btnConfirm, &QPushButton::clicked, this, &OnePropertyDialog::slotConfirm);
-	this->connect(btnCancel, &QPushButton::clicked, this, &OnePropertyDialog::closeCancel);
+	this->connect(btnConfirm, &PushButton::clicked, this, &OnePropertyDialog::slotConfirm);
+	this->connect(btnCancel, &PushButton::clicked, this, &OnePropertyDialog::closeCancel);
 }
 
 ot::OnePropertyDialog::~OnePropertyDialog() {
-	if (m_input) delete m_input;
+	if (m_input) {
+		delete m_input;
+	}
 }
 
 void ot::OnePropertyDialog::addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) {

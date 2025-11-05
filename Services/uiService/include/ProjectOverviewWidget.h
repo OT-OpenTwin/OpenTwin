@@ -51,6 +51,7 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ProjectOverviewWidget)
 		OT_DECL_NOMOVE(ProjectOverviewWidget)
+		OT_DECL_NODEFAULT(ProjectOverviewWidget)
 	public:
 		enum class ViewMode {
 			Tree,
@@ -60,7 +61,7 @@ namespace ot {
 		static std::string toString(ViewMode _mode);
 		static ViewMode viewModeFromString(const std::string& _modeStr);
 
-		ProjectOverviewWidget(QWidget* _parent = (QWidget*)nullptr);
+		explicit ProjectOverviewWidget(QWidget* _parent);
 		~ProjectOverviewWidget();
 
 		virtual QWidget* getQWidget() override { return this; };

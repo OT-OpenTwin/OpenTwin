@@ -33,7 +33,7 @@ class GraphicsItemDesignerView : public ot::GraphicsView {
 	OT_DECL_NODEFAULT(GraphicsItemDesignerView)
 	OT_DECL_NOCOPY(GraphicsItemDesignerView)
 public:
-	GraphicsItemDesignerView(GraphicsItemDesigner* _designer);
+	GraphicsItemDesignerView(GraphicsItemDesigner* _designer, QWidget* _parent);
 	virtual ~GraphicsItemDesignerView();
 
 	// ###########################################################################################################################################################################################################################################################################################################################

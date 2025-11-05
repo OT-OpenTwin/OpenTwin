@@ -39,8 +39,8 @@
 #define QLE_LOGW(___message) OTOOLKIT_LOGW("Quick Log Export", ___message)
 #define QLE_LOGE(___message) OTOOLKIT_LOGE("Quick Log Export", ___message)
 
-QuickLogExport::QuickLogExport(const std::list<ot::LogMessage>& _messages) 
-	: m_messages(_messages)
+QuickLogExport::QuickLogExport(const std::list<ot::LogMessage>& _messages, QWidget* _parent)
+	: ot::Dialog(_parent), m_messages(_messages)
 {
 	// Create layouts
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
@@ -48,17 +48,17 @@ QuickLogExport::QuickLogExport(const std::list<ot::LogMessage>& _messages)
 	QHBoxLayout* btnLayout = new QHBoxLayout;
 
 	// Create controls
-	ot::Label* userL = new ot::Label("User:");
-	m_user = new ot::ComboBox;
+	ot::Label* userL = new ot::Label("User:", this);
+	m_user = new ot::ComboBox(this);
 
-	ot::Label* projectL = new ot::Label("Project:");
-	m_project = new ot::ComboBox;
+	ot::Label* projectL = new ot::Label("Project:", this);
+	m_project = new ot::ComboBox(this);
 
-	m_autoClose = new ot::CheckBox("Auto Close");
+	m_autoClose = new ot::CheckBox("Auto Close", this);
 	m_autoClose->setToolTip("If enabled the OToolkit will be closed after a successful export.");
 
-	ot::PushButton* btnExport = new ot::PushButton("Export");
-	ot::PushButton* btnCancel = new ot::PushButton("Cancel");
+	ot::PushButton* btnExport = new ot::PushButton("Export", this);
+	ot::PushButton* btnCancel = new ot::PushButton("Cancel", this);
 
 	// Initialize data
 	QStringList userList({ QLE_USE_ALL });

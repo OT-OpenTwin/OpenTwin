@@ -28,8 +28,11 @@ namespace ot { class LineEdit; }
 
 class LogVisualizerColumnWidthSaveDialog : public ot::Dialog {
 	Q_OBJECT
+	OT_DECL_NOCOPY(LogVisualizerColumnWidthSaveDialog)
+	OT_DECL_NOMOVE(LogVisualizerColumnWidthSaveDialog)
+	OT_DECL_NODEFAULT(LogVisualizerColumnWidthSaveDialog)
 public:
-	LogVisualizerColumnWidthSaveDialog(const QStringList& _existingNames);
+	LogVisualizerColumnWidthSaveDialog(const QStringList& _existingNames, QWidget* _parent);
 
 	QStringList getExistingNames() const;
 	QString getNewName() const;

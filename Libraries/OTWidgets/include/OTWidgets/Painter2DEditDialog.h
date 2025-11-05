@@ -38,6 +38,8 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT Painter2DEditDialog : public Dialog {
 		Q_OBJECT
+		OT_DECL_NOCOPY(Painter2DEditDialog)
+		OT_DECL_NOMOVE(Painter2DEditDialog)
 		OT_DECL_NODEFAULT(Painter2DEditDialog)
 	public:
 		enum PainterEntryType {
@@ -46,7 +48,7 @@ namespace ot {
 			RadialType
 		};
 
-		Painter2DEditDialog(const Painter2DDialogFilter& _filter, const Painter2D* _painter = (const Painter2D*)nullptr);
+		explicit Painter2DEditDialog(const Painter2DDialogFilter& _filter, const Painter2D* _painter, QWidget* _parent);
 		virtual ~Painter2DEditDialog();
 
 		const Painter2D* currentPainter() const { return m_painter; };
@@ -64,7 +66,6 @@ namespace ot {
 		void slotConfirm();
 
 	private:
-		void ini();
 		void applyPainter(const Painter2D* _painter);
 
 		Painter2D* m_painter;
@@ -72,6 +73,7 @@ namespace ot {
 
 		bool m_changed;
 		ComboBox* m_typeSelectionBox;
+		QWidget* m_vLayoutW;
 		QVBoxLayout* m_vLayout;
 		Painter2DPreview* m_preview;
 		Painter2DEditDialogEntry* m_currentEntry;

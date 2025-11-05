@@ -67,7 +67,8 @@ m_timerLabelShow(nullptr),
 m_timerProgressHide(nullptr),
 m_timerProgressShow(nullptr),
 m_timerSignalLinker(nullptr),
-m_timerShowMainWindow(nullptr)
+m_timerShowMainWindow(nullptr),
+m_progressBarContinuous(false)
 {
 	// Check parameter
 	assert(_messenger != nullptr); // Nullptr provided
@@ -82,7 +83,7 @@ m_timerShowMainWindow(nullptr)
 	m_window->setContextMenuPolicy(Qt::ContextMenuPolicy::NoContextMenu);
 
 	// Create tab Toolbar
-	m_tabToolBar = new tt::TabToolbar();
+	m_tabToolBar = new tt::TabToolbar(m_window);
 	m_tabToolBar->setVisible(false);
 	m_tabToolBar->setContextMenuPolicy(Qt::ContextMenuPolicy::NoContextMenu);
 	m_tabToolBar->setObjectName("OT_TTB");
@@ -93,7 +94,7 @@ m_timerShowMainWindow(nullptr)
 	connect(m_tabToolBar, SIGNAL(currentTabChanged(int)), this, SLOT(slotTabToolbarTabCurrentTabChanged(int)));
 
 	// Create progressbar
-	m_progressBar = new QProgressBar;
+	m_progressBar = new QProgressBar(m_window->statusBar());
 	m_progressBar->setMinimumWidth(180);
 	m_progressBar->setMaximumWidth(180);
 	m_progressBar->setMinimum(0);
@@ -102,7 +103,7 @@ m_timerShowMainWindow(nullptr)
 	m_progressBar->setVisible(false);
 
 	// Create status label
-	m_statusLabel = new QLabel;
+	m_statusLabel = new QLabel(m_window->statusBar());
 	m_statusLabel->setMinimumWidth(250);
 	m_statusLabel->setMaximumWidth(500);
 	m_statusLabel->setText(QString());

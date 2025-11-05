@@ -30,8 +30,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT PropertyInputDouble : public PropertyInput {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputDouble)
+		OT_DECL_NOMOVE(PropertyInputDouble)
+		OT_DECL_NODEFAULT(PropertyInputDouble)
 	public:
-		PropertyInputDouble();
+		explicit PropertyInputDouble(QWidget* _parent);
 		virtual ~PropertyInputDouble();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
@@ -55,6 +57,7 @@ namespace ot {
 	private:
 		double m_min;
 		double m_max;
+		QWidget* m_parentWidget;
 		LineEdit* m_lineEdit;
 		DoubleSpinBox* m_spinBox;
 	};

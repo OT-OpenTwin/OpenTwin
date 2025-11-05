@@ -44,8 +44,9 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGrid)
 		OT_DECL_NOMOVE(PropertyGrid)
+		OT_DECL_NODEFAULT(PropertyGrid)
 	public:
-		PropertyGrid(QObject* _parentObject = (QObject*)nullptr);
+		explicit PropertyGrid(QWidget* _parent);
 		virtual ~PropertyGrid();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

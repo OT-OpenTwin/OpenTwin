@@ -77,6 +77,7 @@ namespace ak {
 		//! @param _creatorUid The UID of the creator
 		//! @param _text The initial text of the check box
 		UID createCheckBox(
+			QWidget* _parent,
 			UID												_creatorUid,
 			const QString &										_text = QString(""),
 			bool												_checked = false
@@ -86,6 +87,7 @@ namespace ak {
 		//! param _creatorUid The UID of the creator
 		//! @param _initialText The initial text to display
 		UID createLineEdit(
+			QWidget* _parent,
 			UID													_creatorUid,
 			const QString &											_initialText = QString("")
 		);
@@ -94,6 +96,7 @@ namespace ak {
 		//! @param _initialText The initial text of the edit field
 		//! @param _infoLabelText The initial text of the information label
 		UID createNiceLineEdit(
+			QWidget* _parent,
 			UID												_creatorUid,
 			const QString &										_initialText,
 			const QString &										_infoLabelText
@@ -108,6 +111,7 @@ namespace ak {
 		//! @brief Will create a toolButton and return its UID
 		//! @param _creatorUid The UID of the creator
 		UID createToolButton(
+			QWidget* _parent,
 			UID												_creatorUid
 		);
 
@@ -115,6 +119,7 @@ namespace ak {
 		//! @param _creatorUid The UID of the creator
 		//! @param _text The initial text of the toolButton
 		UID createToolButton(
+			QWidget* _parent,
 			UID												_creatorUid,
 			const QString &										_text
 		);
@@ -124,6 +129,7 @@ namespace ak {
 		//! @param _text The initial text of the toolButton
 		//! @param _icon The initial icon of the toolButton
 		UID createToolButton(
+			QWidget* _parent,
 			UID												_creatorUid,
 			const QString &										_text,
 			const QIcon &										_icon

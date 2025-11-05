@@ -494,8 +494,10 @@ AppBase::AppBase(QApplication* _app)
 	// Initialize dock manager
 	ot::WidgetViewManager::instance().initialize();
 
+	QWidget* widgetViewWidget = ot::WidgetViewManager::instance().getDockManager();
+
 	// Create output
-	m_output = new ot::PlainTextEditView;
+	m_output = new ot::PlainTextEditView(widgetViewWidget);
 
 	// Initialize Toolkit API
 	otoolkit::api::initialize(this);
@@ -508,7 +510,7 @@ AppBase::AppBase(QApplication* _app)
 	// Create external tool manager
 	m_externalLibraryManager = new ExternalLibraryManager;
 
-	ot::PlainTextEditView* defaultView = new ot::PlainTextEditView;
+	ot::PlainTextEditView* defaultView = new ot::PlainTextEditView(widgetViewWidget);
 	defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
 	defaultView->setViewIsPermanent(true);
 	defaultView->getPlainTextEdit()->setPlainText(BUILD_INFO);

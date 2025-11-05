@@ -26,9 +26,9 @@
 
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputBool> propertyInputBoolRegistrar(ot::PropertyBool::propertyTypeString());
 
-ot::PropertyInputBool::PropertyInputBool()
+ot::PropertyInputBool::PropertyInputBool(QWidget* _parent)
 {
-	m_checkBox = new CheckBox;
+	m_checkBox = new CheckBox(_parent);
 	m_checkBox->setFocusPolicy(Qt::NoFocus);
 	this->connect(m_checkBox, &QCheckBox::stateChanged, this, qOverload<int>(&PropertyInput::slotValueChanged));
 }

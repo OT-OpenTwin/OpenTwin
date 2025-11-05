@@ -30,8 +30,11 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT TabWidget : public QTabWidget, public ot::WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(TabWidget)
+		OT_DECL_NOMOVE(TabWidget)
+		OT_DECL_NODEFAULT(TabWidget)
 	public:
-		TabWidget();
+		explicit TabWidget(QWidget* _parent);
 		virtual ~TabWidget();
 
 		virtual void focusInEvent(QFocusEvent* _event) override;

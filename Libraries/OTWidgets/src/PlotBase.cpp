@@ -19,8 +19,9 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTWidgets/QtFactory.h"
+#include "OTWidgets/Label.h"
 #include "OTWidgets/PlotBase.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/PolarPlot.h"
 #include "OTWidgets/PlotDataset.h"
 #include "OTWidgets/CartesianPlot.h"
@@ -33,25 +34,24 @@
 
 // Qt header
 #include <QtWidgets/qwidget.h>
-#include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qapplication.h>
 
 // std header
 #include <memory>
 
-ot::PlotBase::PlotBase() :
+ot::PlotBase::PlotBase(QWidget* _parent) :
 	m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
 {
-	m_centralWidget = new QWidget;
+	m_centralWidget = new QWidget(_parent);
 	m_centralLayout = new QVBoxLayout(m_centralWidget);
 
-	m_errorLabel = new QLabel("Error");
+	m_errorLabel = new Label("Error", m_centralWidget);
 	m_errorLabel->setVisible(false);
 
 	// Create plots
-	m_cartesianPlot = new CartesianPlot(this);
-	m_polarPlot = new PolarPlot(this);
+	m_cartesianPlot = new CartesianPlot(this, m_centralWidget);
+	m_polarPlot = new PolarPlot(this, m_centralWidget);
 
 	m_polarPlot->setParent(nullptr);
 	m_polarPlot->setVisible(false);

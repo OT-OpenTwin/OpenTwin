@@ -35,9 +35,10 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PolarPlot : public QwtPolarPlot, public AbstractPlot {
 		OT_DECL_NOCOPY(PolarPlot)
+		OT_DECL_NOMOVE(PolarPlot)
 		OT_DECL_NODEFAULT(PolarPlot)
 	public:
-		PolarPlot(PlotBase* _owner);
+		PolarPlot(PlotBase* _owner, QWidget* _parent);
 		virtual ~PolarPlot();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

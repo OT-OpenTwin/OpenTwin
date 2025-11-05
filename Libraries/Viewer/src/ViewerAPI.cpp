@@ -175,11 +175,11 @@ ot::UID ViewerAPI::getActiveViewerModel(void)
 	return GlobalModel::instance()->getID();
 }
 
-ot::UID ViewerAPI::createViewer(ot::UID osgModelID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB)
+ot::UID ViewerAPI::createViewer(ot::UID osgModelID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB, QWidget* _parent)
 {
 	intern::ViewerManager::viewerCount()++;
 
-	ot::ViewerView* viewer = new ot::ViewerView(osgModelID, intern::ViewerManager::viewerCount(), scaleWidth, scaleHeight, backgroundR, backgroundG, backgroundB, overlayTextR, overlayTextG, overlayTextB);
+	ot::ViewerView* viewer = new ot::ViewerView(osgModelID, intern::ViewerManager::viewerCount(), scaleWidth, scaleHeight, backgroundR, backgroundG, backgroundB, overlayTextR, overlayTextG, overlayTextB, _parent);
 	intern::ViewerManager::uidToViewerMap()[intern::ViewerManager::viewerCount()] = viewer;
 
 	return intern::ViewerManager::viewerCount();

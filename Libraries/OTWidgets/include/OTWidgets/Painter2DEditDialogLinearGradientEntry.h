@@ -31,8 +31,11 @@ namespace ot {
 	class Painter2DEditDialogGradientBase;
 
 	class OT_WIDGETS_API_EXPORT Painter2DEditDialogLinearGradientEntry : public Painter2DEditDialogEntry {
+		OT_DECL_NOCOPY(Painter2DEditDialogLinearGradientEntry)
+		OT_DECL_NOMOVE(Painter2DEditDialogLinearGradientEntry)
+		OT_DECL_NODEFAULT(Painter2DEditDialogLinearGradientEntry)
 	public:
-		Painter2DEditDialogLinearGradientEntry(const Painter2D* _painter = (Painter2D*)nullptr);
+		explicit Painter2DEditDialogLinearGradientEntry(const Painter2D* _painter, QWidget* _parent);
 		virtual ~Painter2DEditDialogLinearGradientEntry();
 
 		virtual DialogEntryType getEntryType() const { return Painter2DEditDialogEntry::LinearType; };

@@ -45,9 +45,11 @@ namespace ot {
 class SelectEntitiesDialog : public ot::Dialog {
 	Q_OBJECT
 	OT_DECL_NOCOPY(SelectEntitiesDialog)
+	OT_DECL_NOMOVE(SelectEntitiesDialog)
+	OT_DECL_NODEFAULT(SelectEntitiesDialog)
 public:
-	SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _config, QWidget* _parent = (QWidget*)nullptr);
-	~SelectEntitiesDialog();
+	explicit SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _config, QWidget* _parent);
+	virtual ~SelectEntitiesDialog();
 
 	bool selectionHasChanged(void) const;
 
@@ -68,6 +70,4 @@ private:
 	std::list<std::string> m_initiallySelected;
 	ot::TreeWidgetFilter* m_available;
 	ot::TreeWidgetFilter* m_selected;
-
-	SelectEntitiesDialog() = delete;
 };

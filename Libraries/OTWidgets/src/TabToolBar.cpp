@@ -34,12 +34,12 @@
 #include <QtWidgets/qstyle.h>
 #include <QtWidgets/qapplication.h>
 
-ot::ToolButton* ot::TabToolBar::createButton(const QString& _iconPath, const QString& _text, QMenu* _menu) {
-	return TabToolBar::createButton(IconManager::getIcon(_iconPath), _text, _menu);
+ot::ToolButton* ot::TabToolBar::createButton(QWidget* _parent, const QString& _iconPath, const QString& _text, QMenu* _menu) {
+	return TabToolBar::createButton(_parent, IconManager::getIcon(_iconPath), _text, _menu);
 }
 
-ot::ToolButton* ot::TabToolBar::createButton(const QIcon& _icon, const QString& _text, QMenu* _menu) {
-	ToolButton* btn = new ot::ToolButton(_icon, _text);
+ot::ToolButton* ot::TabToolBar::createButton(QWidget* _parent, const QIcon& _icon, const QString& _text, QMenu* _menu) {
+	ToolButton* btn = new ot::ToolButton(_icon, _text, _parent);
 
 	const int iconSize = QApplication::style()->pixelMetric(QStyle::PM_LargeIconSize);
 
@@ -55,7 +55,7 @@ ot::ToolButton* ot::TabToolBar::createButton(const QIcon& _icon, const QString& 
 ot::TabToolBar::TabToolBar(MainWindow* _window) :
 	m_toolBar(nullptr)
 {
-	m_toolBar = new tt::TabToolbar;
+	m_toolBar = new tt::TabToolbar(_window);
 
 	if (_window) {
 		_window->addToolBar(m_toolBar);
@@ -201,4 +201,8 @@ const ot::TabToolBarSubGroup* ot::TabToolBar::findSubGroup(const std::string& _p
 	else {
 		return page->findSubGroup(_groupName, _subGroupName);
 	}
+}
+
+void ot::TabToolBar::setParentWidget(QWidget* _parent) {
+	m_toolBar->setParent(_parent);
 }

@@ -34,8 +34,9 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsItemPreview : public QFrame {
 		OT_DECL_NOCOPY(GraphicsItemPreview)
 		OT_DECL_NOMOVE(GraphicsItemPreview)
+		OT_DECL_NODEFAULT(GraphicsItemPreview)
 	public:
-		GraphicsItemPreview();
+		explicit GraphicsItemPreview(QWidget* _parent);
 		virtual ~GraphicsItemPreview();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

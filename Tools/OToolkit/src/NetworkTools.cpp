@@ -52,11 +52,11 @@ bool NetworkTools::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	QWidget* portBlockerLayoutW = new QWidget;
 	QGridLayout* portBlockerLayout = new QGridLayout(portBlockerLayoutW);
 
-	m_portBlockerPorts = new ot::PlainTextEdit;
-	ot::Label* portBlockerLabel = new ot::Label("Ports to block:");
-	m_runPortBlockerButton = new ot::PushButton("Run");
+	m_portBlockerPorts = new ot::PlainTextEdit(portBlockerLayoutW);
+	ot::Label* portBlockerLabel = new ot::Label("Ports to block:", portBlockerLayoutW);
+	m_runPortBlockerButton = new ot::PushButton("Run", portBlockerLayoutW);
 	
-	m_portBlockerType = new ot::ComboBox;
+	m_portBlockerType = new ot::ComboBox(portBlockerLayoutW);
 	m_portBlockerType->addItems({ NETWORKTOOLS_PORTTYPE_ANY, NETWORKTOOLS_PORTTYPE_IPv4, NETWORKTOOLS_PORTTYPE_IPv6 });
 	m_portBlockerType->setCurrentIndex(0);
 

@@ -34,9 +34,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT WidgetViewTab : public ads::CDockWidgetTab {
 		Q_OBJECT
 		OT_DECL_NOCOPY(WidgetViewTab)
+		OT_DECL_NOMOVE(WidgetViewTab)
 		OT_DECL_NODEFAULT(WidgetViewTab)
 	public:
-		WidgetViewTab(ads::CDockWidget* _dockWidget);
+		explicit WidgetViewTab(ads::CDockWidget* _dockWidget, QWidget* _parent);
 		virtual ~WidgetViewTab();
 
 		void setIsPinned(bool _pinned);

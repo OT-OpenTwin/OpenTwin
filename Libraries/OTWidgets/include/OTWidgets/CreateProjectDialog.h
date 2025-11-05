@@ -38,10 +38,11 @@ namespace ot {
 	class CreateProjectDialog;
 
 	class OT_WIDGETS_API_EXPORT CreateProjectDialogEntry : public QListWidgetItem {
-		OT_DECL_NODEFAULT(CreateProjectDialogEntry)
 		OT_DECL_NOCOPY(CreateProjectDialogEntry)
+		OT_DECL_NOMOVE(CreateProjectDialogEntry)
+		OT_DECL_NODEFAULT(CreateProjectDialogEntry)
 	public:
-		CreateProjectDialogEntry(const ProjectTemplateInformation& _info, const CreateProjectDialog* _dialog);
+		explicit CreateProjectDialogEntry(const ProjectTemplateInformation& _info, const CreateProjectDialog* _dialog);
 		virtual ~CreateProjectDialogEntry() {};
 
 		const ProjectTemplateInformation& getInfo(void) const { return m_info; };
@@ -59,8 +60,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT CreateProjectDialog : public Dialog {
 		Q_OBJECT
 		OT_DECL_NOCOPY(CreateProjectDialog)
+		OT_DECL_NOMOVE(CreateProjectDialog)
+		OT_DECL_NODEFAULT(CreateProjectDialog)
 	public:
-		CreateProjectDialog(QWidget* _parentWidget = (QWidget*)nullptr);
+		explicit CreateProjectDialog(QWidget* _parentWidget);
 		virtual ~CreateProjectDialog();
 
 		void setProjectTemplates(const std::list<ProjectTemplateInformation>& _templates);

@@ -29,8 +29,11 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT TableView : public WidgetView {
 		Q_OBJECT
 		OT_DECL_NOCOPY(TableView)
+		OT_DECL_NOMOVE(TableView)
+		OT_DECL_NODEFAULT(TableView)
 	public:
-		TableView(Table* _table = (Table*)nullptr);
+		explicit TableView(QWidget* _parent);
+		explicit TableView(Table* _table, QWidget* _parent);
 		virtual ~TableView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

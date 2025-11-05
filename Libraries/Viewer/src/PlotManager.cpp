@@ -26,7 +26,7 @@
 #include "OTWidgets/PolarPlotCurve.h"
 #include "OTWidgets/CartesianPlotCurve.h"
 
-ot::PlotManager::PlotManager() {
+ot::PlotManager::PlotManager(QWidget* _parent) : PlotBase(_parent) {
 
 }
 

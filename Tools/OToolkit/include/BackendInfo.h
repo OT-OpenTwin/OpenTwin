@@ -105,15 +105,15 @@ private:
 
 	// Private: Widget Helper
 
-	ot::Table* createGssSessionTable(const std::list<ot::GSSDebugInfo::SessionData>& _sessionData);
-	ot::Table* createLssServicesTable(const std::list<ot::LSSDebugInfo::ServiceInfo>& _services);
-	ot::Table* createGdsServicesTable(const std::list<ot::GDSDebugInfo::ServiceInfo>& _services);
-	int createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sessionInfo, const std::list<ot::LDSDebugInfo::ServiceInfo>& _info, LDSServiceInfoMode _mode, QLayout* _layout);
+	ot::Table* createGssSessionTable(const std::list<ot::GSSDebugInfo::SessionData>& _sessionData, QWidget* _parent);
+	ot::Table* createLssServicesTable(const std::list<ot::LSSDebugInfo::ServiceInfo>& _services, QWidget* _parent);
+	ot::Table* createGdsServicesTable(const std::list<ot::GDSDebugInfo::ServiceInfo>& _services, QWidget* _parent);
+	int createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sessionInfo, const std::list<ot::LDSDebugInfo::ServiceInfo>& _info, LDSServiceInfoMode _mode, QLayout* _layout, QWidget* _parent);
 
-	ot::LineEdit* lineEdit(uint16_t _value);
-	ot::LineEdit* lineEdit(const std::string& _text);
-	ot::LineEdit* lineEdit(const QString& _text);
-	ot::IndicatorWidget* checkBox(bool _checked);
+	ot::LineEdit* lineEdit(uint16_t _value, QWidget* _parent);
+	ot::LineEdit* lineEdit(const std::string& _text, QWidget* _parent);
+	ot::LineEdit* lineEdit(const QString& _text, QWidget* _parent);
+	ot::IndicatorWidget* checkBox(bool _checked, QWidget* _parent);
 
 	std::list<ot::GSSDebugInfo> m_gssInfos;
 	std::list<ot::LSSDebugInfo> m_lssInfos;

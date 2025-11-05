@@ -114,17 +114,17 @@ ot::VersionGraphManager::ViewMode ot::VersionGraphManager::stringToViewMode(cons
 	}
 }
 
-ot::VersionGraphManager::VersionGraphManager() {
-	m_root = new QWidget;
+ot::VersionGraphManager::VersionGraphManager(QWidget* _parent) {
+	m_root = new QWidget(_parent);
 	QVBoxLayout* rootLay = new QVBoxLayout(m_root);
 	QHBoxLayout* modeLay = new QHBoxLayout;
 	
-	m_textFilter = new LineEdit;
+	m_textFilter = new LineEdit(m_root);
 	m_textFilter->setPlaceholderText("Find...");
 	m_textFilter->setToolTip("Find version containing the text in its label or description (mode independent)");
 
-	Label* modeLabel = new Label("Mode:");
-	m_modeSelector = new ComboBox;
+	Label* modeLabel = new Label("Mode:", m_root);
+	m_modeSelector = new ComboBox(m_root);
 	m_modeSelector->addItems({
 		QString::fromStdString(viewModeToString(ViewMode::ViewAll)),
 		QString::fromStdString(viewModeToString(ViewMode::Compact)),
@@ -134,7 +134,7 @@ ot::VersionGraphManager::VersionGraphManager() {
 	});
 	m_modeSelector->setCurrentText(QString::fromStdString(viewModeToString(ViewMode::Compact)));
 
-	m_graph = new VersionGraph;
+	m_graph = new VersionGraph(m_root);
 
 	rootLay->addLayout(modeLay);
 	rootLay->addWidget(m_graph, 1);

@@ -32,10 +32,12 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT ToolButton : public QToolButton, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ToolButton)
+		OT_DECL_NOMOVE(ToolButton)
+		OT_DECL_NODEFAULT(ToolButton)
 	public:
-		ToolButton(QWidget* _parent = (QWidget*)nullptr);
-		ToolButton(const QString& _text, QWidget* _parent = (QWidget*)nullptr);
-		ToolButton(const QIcon& _icon, const QString& _text, QWidget* _parent = (QWidget*)nullptr);
+		explicit ToolButton(QWidget* _parent);
+		explicit ToolButton(const QString& _text, QWidget* _parent);
+		explicit ToolButton(const QIcon& _icon, const QString& _text, QWidget* _parent);
 
 		virtual ~ToolButton();
 

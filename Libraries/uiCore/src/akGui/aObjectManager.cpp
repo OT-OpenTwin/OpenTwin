@@ -36,7 +36,6 @@
 
 // AK Widgets header
 #include <akWidgets/aCheckBoxWidget.h>
-#include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
@@ -113,12 +112,13 @@ ak::UID ak::aObjectManager::createAction(
 }
 
 ak::UID ak::aObjectManager::createCheckBox(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_text,
 	bool												_checked
 ) {
 	// Create object
-	aCheckBoxWidget * obj = new aCheckBoxWidget(_text);
+	aCheckBoxWidget * obj = new aCheckBoxWidget(_text, _parent);
 	// Set parameter
 	obj->setChecked(_checked);
 	m_signalLinker->addLink(obj);
@@ -129,11 +129,12 @@ ak::UID ak::aObjectManager::createCheckBox(
 }
 
 ak::UID ak::aObjectManager::createLineEdit(
+	QWidget* _parent,
 	UID													_creatorUid,
 	const QString &											_initialText
 ) {
 	// Create object
-	aLineEditWidget * obj = new aLineEditWidget(_initialText);
+	aLineEditWidget * obj = new aLineEditWidget(_initialText, _parent);
 	// Connect to signal linker
 	m_signalLinker->addLink(obj);
 	// Store data
@@ -143,12 +144,13 @@ ak::UID ak::aObjectManager::createLineEdit(
 }
 
 ak::UID ak::aObjectManager::createNiceLineEdit(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_initialText,
 	const QString &										_infoLabelText
 ) {
 	// Create object
-	aNiceLineEditWidget * obj = new aNiceLineEditWidget(_initialText, _infoLabelText);
+	aNiceLineEditWidget * obj = new aNiceLineEditWidget(_initialText, _infoLabelText, _parent);
 	// Set parameter
 	m_signalLinker->addLink(obj);
 	obj->setUid(m_uidManager->getId());
@@ -172,10 +174,11 @@ ak::UID ak::aObjectManager::createTimer(
 }
 
 ak::UID ak::aObjectManager::createToolButton(
+	QWidget* _parent,
 	UID												_creatorUid
 ) {
 	// Create object
-	aToolButtonWidget * obj = new aToolButtonWidget();
+	aToolButtonWidget * obj = new aToolButtonWidget(_parent);
 	// Set parameter
 	m_signalLinker->addLink(obj);
 	// Store data
@@ -185,11 +188,12 @@ ak::UID ak::aObjectManager::createToolButton(
 }
 
 ak::UID ak::aObjectManager::createToolButton(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_text
 ) {
 	// Create object
-	aToolButtonWidget * obj = new aToolButtonWidget(_text);
+	aToolButtonWidget * obj = new aToolButtonWidget(_text, _parent);
 	// Set parameter
 	m_signalLinker->addLink(obj);
 	// Store data
@@ -199,12 +203,13 @@ ak::UID ak::aObjectManager::createToolButton(
 }
 
 ak::UID ak::aObjectManager::createToolButton(
+	QWidget* _parent,
 	UID												_creatorUid,
 	const QString &										_text,
 	const QIcon &										_icon
 ) {
 	// Create object
-	aToolButtonWidget * obj = new aToolButtonWidget(_icon, _text);
+	aToolButtonWidget * obj = new aToolButtonWidget(_icon, _text, _parent);
 	// Set parameter
 	m_signalLinker->addLink(obj);
 	// Store data

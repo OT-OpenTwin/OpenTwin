@@ -32,18 +32,22 @@
 // Qt header
 #include <QtWidgets/qlayout.h>
 
-ot::PropertyGridItem::PropertyGridItem() : m_input(nullptr), m_parentGroup(nullptr), m_signalProperty(nullptr) {
-	m_titleLayoutW = new QWidget;
+ot::PropertyGridItem::PropertyGridItem(QWidget* _parent) 
+	: m_input(nullptr), m_parentGroup(nullptr), m_signalProperty(nullptr),
+	m_parentWidget(_parent)
+{
+	m_titleLayoutW = new QWidget(_parent);
 	m_titleLayoutW->setObjectName("PropertyGridItemTitleLayout");
 	QHBoxLayout* titleLayout = new QHBoxLayout(m_titleLayoutW);
 	titleLayout->setContentsMargins(0, 0, 0, 0);
-	m_titleLabel = new Label;
+
+	m_titleLabel = new Label(m_titleLayoutW);
 	m_titleLabel->setObjectName("PropertyGridItemTitleLabel");
-	m_deleteLabel = new Label;
+	titleLayout->addWidget(m_titleLabel, 1);
+
+	m_deleteLabel = new Label(m_titleLayoutW);
 	m_deleteLabel->setObjectName("PropertyGridItemDeleteLabel");
 	m_deleteLabel->setHidden(true);
-
-	titleLayout->addWidget(m_titleLabel, 1);
 	titleLayout->addWidget(m_deleteLabel);
 
 	this->slotGlobalStyleChanged();
@@ -79,7 +83,7 @@ bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
 
 	m_titleLabel->setText(QString::fromStdString(_config->getPropertyTitle()));
 	
-	m_input = PropertyInputFactory::createInput(_config);
+	m_input = PropertyInputFactory::createInput(_config, m_parentWidget);
 
 	m_deleteLabel->setHidden(!(m_input->data().getPropertyFlags() & Property::IsDeletable));
 

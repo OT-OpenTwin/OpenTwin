@@ -27,8 +27,12 @@ namespace ot {
 	class VersionGraphManager;
 
 	class OT_WIDGETS_API_EXPORT VersionGraphManagerView : public WidgetView {
+		OT_DECL_NOCOPY(VersionGraphManagerView)
+		OT_DECL_NOMOVE(VersionGraphManagerView)
+		OT_DECL_NODEFAULT(VersionGraphManagerView)
 	public:
-		VersionGraphManagerView(VersionGraphManager* _versionGraphManager = (VersionGraphManager*)nullptr);
+		VersionGraphManagerView(QWidget* _parent);
+		VersionGraphManagerView(VersionGraphManager* _versionGraphManager, QWidget* _parent);
 		virtual ~VersionGraphManagerView();
 
 		virtual QWidget* getViewWidget(void) override;

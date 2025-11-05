@@ -30,9 +30,11 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT Splitter : public QSplitter {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Splitter)
+		OT_DECL_NOMOVE(Splitter)
+		OT_DECL_NODEFAULT(Splitter)
 	public:
-		Splitter(QWidget* _parent = (QWidget*)nullptr);
-		Splitter(Qt::Orientation _orientation, QWidget* _parent = (QWidget*)nullptr);
+		explicit Splitter(QWidget* _parent);
+		explicit Splitter(Qt::Orientation _orientation, QWidget* _parent);
 		virtual ~Splitter();
 
 	private Q_SLOTS:

@@ -31,9 +31,12 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT ImagePreview : public QFrame, public WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(ImagePreview)
+		OT_DECL_NOMOVE(ImagePreview)
+		OT_DECL_NODEFAULT(ImagePreview)
 	public:
-		ImagePreview();
-		ImagePreview(const QImage& _image);
+		explicit ImagePreview(QWidget* _parent);
+		explicit ImagePreview(const QImage& _image, QWidget* _parent);
 		virtual ~ImagePreview();
 
 		virtual QWidget* getQWidget(void) override { return this; };

@@ -29,9 +29,10 @@ class ProjectManagement;
 class CopyProjectDialog : public ot::Dialog {
 	Q_OBJECT
 	OT_DECL_NOCOPY(CopyProjectDialog)
+	OT_DECL_NOMOVE(CopyProjectDialog)
 	OT_DECL_NODEFAULT(CopyProjectDialog)
 public:
-	CopyProjectDialog(const QString& _projectToCopy, ProjectManagement &projectManager);
+	explicit CopyProjectDialog(const QString& _projectToCopy, ProjectManagement &projectManager, QWidget* _parent);
 	virtual ~CopyProjectDialog();
 
 	QString getProjectName(void) const;

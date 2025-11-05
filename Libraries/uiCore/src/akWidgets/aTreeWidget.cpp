@@ -35,33 +35,33 @@
 
 #include <qheaderview.h>
 
-ak::aTreeWidget::aTreeWidget() : ak::aWidget(otTree),
+ak::aTreeWidget::aTreeWidget(QWidget* _parent) : QObject(_parent), ak::aWidget(otTree),
 	m_tree(nullptr), m_filter(nullptr), m_layout(nullptr),
 	m_filterCaseSensitive(false), m_filterRefreshOnChange(true), m_currentId(0), m_itemsAreEditable(false),
 	m_selectAndDeselectChildren(false), m_ignoreEvents(false), m_focusedItem(invalidUID), m_isReadOnly(false),
 	m_displayChildsOnFilter(false), m_mouseIsPressed(false), m_selectionHasChanged(false)
 {
-	// Create tree
-	m_tree = new ak::aTreeWidgetBase(this);
-	assert(m_tree != nullptr); // Failed to create
-
-	// Create filter
-	m_filter = new aLineEditWidget();
-	assert(m_filter != nullptr); // Failed to create
-	m_filter->setVisible(false);
-	m_filter->setPlaceholderText("Search...");
-
 	// Create widget
-	m_widget = new QWidget;
+	m_widget = new QWidget(_parent);
 	m_widget->setContentsMargins(0, 0, 0, 0);
 
 	// Create layout
 	m_layout = new QVBoxLayout(m_widget);
 	assert(m_layout != nullptr); // Failed to create
 	m_layout->setContentsMargins(0, 0, 0, 0);
+	
+	// Create filter
+	m_filter = new aLineEditWidget(m_widget);
+	assert(m_filter != nullptr); // Failed to create
+	m_filter->setVisible(false);
+	m_filter->setPlaceholderText("Search...");
 	m_layout->addWidget(m_filter);
-	m_layout->addWidget(m_tree);
 
+	// Create tree
+	m_tree = new ak::aTreeWidgetBase(this, m_widget);
+	assert(m_tree != nullptr); // Failed to create
+	m_layout->addWidget(m_tree);
+	
 	m_tree->setHeaderLabel(QString(""));
 
 	m_tree->setMouseTracking(true);
@@ -857,8 +857,8 @@ void ak::aTreeWidget::clearItem(
 
 // ###########################################################################################################################################
 
-ak::aTreeWidgetBase::aTreeWidgetBase(aTreeWidget * _ownerTree)
-	: QTreeWidget(), ak::aWidget(otTree), m_ownerTree(_ownerTree)
+ak::aTreeWidgetBase::aTreeWidgetBase(aTreeWidget * _ownerTree, QWidget* _parent)
+	: QTreeWidget(_parent), ak::aWidget(otTree), m_ownerTree(_ownerTree)
 {
 	setContextMenuPolicy(Qt::CustomContextMenu);
 	m_itemDelegate = new ot::TreeItemDelegate(this);

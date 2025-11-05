@@ -28,8 +28,11 @@ namespace ot {
 	class ComboBox;
 
 	class OT_WIDGETS_API_EXPORT Painter2DEditDialogReferenceEntry : public Painter2DEditDialogEntry {
+		OT_DECL_NOCOPY(Painter2DEditDialogReferenceEntry)
+		OT_DECL_NOMOVE(Painter2DEditDialogReferenceEntry)
+		OT_DECL_NODEFAULT(Painter2DEditDialogReferenceEntry)
 	public:
-		Painter2DEditDialogReferenceEntry(const Painter2DDialogFilter& _filter, const Painter2D* _painter = (Painter2D*)nullptr);
+		explicit Painter2DEditDialogReferenceEntry(const Painter2DDialogFilter& _filter, const Painter2D* _painter, QWidget* _parent);
 		virtual ~Painter2DEditDialogReferenceEntry();
 
 		virtual DialogEntryType getEntryType() const { return Painter2DEditDialogEntry::ReferenceType; };

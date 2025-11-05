@@ -35,6 +35,7 @@
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/ImagePreview.h"
 #include "OTGui/ColorStyleTypes.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/ColorPickButton.h"
 #include "OTWidgets/BasicWidgetView.h"
 #include "OTWidgets/GlobalColorStyle.h"
@@ -50,28 +51,30 @@
 #include <QtWidgets/qscrollarea.h>
 #include <QtWidgets/qfiledialog.h>
 
-ImageEditorToolBar::ImageEditorToolBar() {
+ImageEditorToolBar::ImageEditorToolBar(QWidget* _parent)
+	: QToolBar(_parent)
+{
 	using namespace ot;
-	Label* fromLabel = new Label("From:");
-	m_fromColor = new ColorPickButton(QColor(0, 0, 0));
+	Label* fromLabel = new Label("From:", this);
+	m_fromColor = new ColorPickButton(QColor(0, 0, 0), this);
 	m_fromColor->setMinimumWidth(100);
 	m_fromColor->setEditAlpha(true);
 
-	Label* toLabel = new Label("To:");
-	m_toColor = new ColorPickButton(QColor(0, 0, 0));
+	Label* toLabel = new Label("To:", this);
+	m_toColor = new ColorPickButton(QColor(0, 0, 0), this);
 	m_toColor->setEditAlpha(true);
 
-	Label* toleranceLabel = new Label("Tolerance:");
-	m_tolerance = new SpinBox;
+	Label* toleranceLabel = new Label("Tolerance:", this);
+	m_tolerance = new SpinBox(this);
 
-	Label* useDiffLabel = new Label("Use Difference:");
-	m_useDiff = new CheckBox;
+	Label* useDiffLabel = new Label("Use Difference:", this);
+	m_useDiff = new CheckBox(this);
 
-	Label* checkAlphaLabel = new Label("Check Alpha:");
-	m_checkAlpha = new CheckBox;
+	Label* checkAlphaLabel = new Label("Check Alpha:", this);
+	m_checkAlpha = new CheckBox(this);
 
-	Label* useOriginAlphaLabel = new Label("Use Original Alpha:");
-	m_useOriginalAlpha = new CheckBox;
+	Label* useOriginAlphaLabel = new Label("Use Original Alpha:", this);
+	m_useOriginalAlpha = new CheckBox(this);
 
 	m_spinDelayTimer = new QTimer;
 	m_spinDelayTimer->setInterval(1000);
@@ -164,33 +167,34 @@ bool ImageEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	using namespace ot;
 	
 	// Create layouts
-	Splitter* rootSplitter = new Splitter;
+	Splitter* rootSplitter = new Splitter(nullptr);
 	m_root = this->createCentralWidgetView(rootSplitter, "Image Editor");
 	_content.addView(m_root);
 
-	QWidget* lLayW = new QWidget;
+	QWidget* lLayW = new QWidget(rootSplitter);
 	QVBoxLayout* lLay = new QVBoxLayout(lLayW);
 
-	QWidget* rLayW = new QWidget;
+	QWidget* rLayW = new QWidget(rootSplitter);
 	QVBoxLayout* rLay = new QVBoxLayout(rLayW);
 
 	// Create controls
-	PushButton* btnImport = new PushButton("Import");
-	PushButton* btnCalculate = new PushButton("Calculate");
-	PushButton* btnExport = new PushButton("Export");
+	PushButton* btnImport = new PushButton("Import", lLayW);
+	PushButton* btnCalculate = new PushButton("Calculate", lLayW);
+	PushButton* btnExport = new PushButton("Export", lLayW);
 
-	m_original = new ImagePreview;
-	m_converted = new ImagePreview;
-
-	m_toolBar = new ImageEditorToolBar;
-
-	QScrollArea* scrollL = new QScrollArea;
+	QScrollArea* scrollL = new QScrollArea(lLayW);
 	scrollL->setWidgetResizable(true);
+	
+	m_original = new ImagePreview(scrollL);
 	scrollL->setWidget(m_original);
 
-	QScrollArea* scrollR = new QScrollArea;
+	QScrollArea* scrollR = new QScrollArea(rLayW);
 	scrollR->setWidgetResizable(true);
+	
+	m_converted = new ImagePreview(scrollR);
 	scrollR->setWidget(m_converted);
+
+	m_toolBar = new ImageEditorToolBar(m_root->getViewDockWidget());
 
 	// Setup controls
 

@@ -70,8 +70,8 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 
 	QHBoxLayout* filterLayout = new QHBoxLayout;
 	leftLayout->addLayout(filterLayout);
-	filterLayout->addWidget(new ot::Label("Name Filter:"));
-	m_basicFilter = new ot::LineEdit;
+	filterLayout->addWidget(new ot::Label("Name Filter:", this));
+	m_basicFilter = new ot::LineEdit(this);
 	m_basicFilter->setToolTip("Quickly filter projects that were fetched before. Extends the column filter.");
 	filterLayout->addWidget(m_basicFilter, 1);
 	connect(m_basicFilter, &ot::LineEdit::textChanged, this, &ot::ProjectOverviewWidget::slotBasicFilterTextChanged);
@@ -97,10 +97,10 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 
 	leftLayout->addWidget(m_tree, 1);
 
-	m_countLabel = new ot::Label("No projects found");
+	m_countLabel = new ot::Label("No projects found", this);
 	leftLayout->addWidget(m_countLabel);
 
-	m_previewBox = new ProjectOverviewPreviewBox(_parent);
+	m_previewBox = new ProjectOverviewPreviewBox(this);
 	mainLayout->addWidget(m_previewBox);
 
 	m_basicFilterTimer.setSingleShot(true);

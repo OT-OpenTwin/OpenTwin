@@ -45,8 +45,8 @@
 // ####################################################################################################
 // Table Widget 
 
-ManageAccessTable::ManageAccessTable()
-	: my_selectedRow(-1)
+ManageAccessTable::ManageAccessTable(QWidget* _parent)
+	: ot::Table(_parent), my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -55,8 +55,8 @@ ManageAccessTable::ManageAccessTable()
 	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
 }
 
-ManageAccessTable::ManageAccessTable(int _rows, int _columns)
-	: ot::Table(_rows, _columns), my_selectedRow(-1)
+ManageAccessTable::ManageAccessTable(int _rows, int _columns, QWidget* _parent)
+	: ot::Table(_rows, _columns, _parent), my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -164,7 +164,8 @@ void ManageAccessTable::getSelectedItems(QTableWidgetItem *&first, QTableWidgetI
 
 // Main dialog box
 
-ManageAccess::ManageAccess(const std::string &authServerURL, const std::string &projectName) 
+ManageAccess::ManageAccess(const std::string &authServerURL, const std::string &projectName, QWidget* _parent)
+	: ot::Dialog(_parent)
 {
 	m_authServerURL = authServerURL;
 	m_projectName = projectName;
@@ -175,19 +176,19 @@ ManageAccess::ManageAccess(const std::string &authServerURL, const std::string &
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls
-	ot::PushButton* closeButton = new ot::PushButton("Close");
+	ot::PushButton* closeButton = new ot::PushButton("Close", this);
 
-	ot::Label* labelGroups = new ot::Label("User Groups");
+	ot::Label* labelGroups = new ot::Label("User Groups", this);
 
-	m_filterGroups = new ot::LineEdit;
+	m_filterGroups = new ot::LineEdit(this);
 	m_filterGroups->setPlaceholderText("Filter...");
 
-	m_showGroupsWithAccessOnly = new ot::CheckBox("Show groups with access only");
+	m_showGroupsWithAccessOnly = new ot::CheckBox("Show groups with access only", this);
 	m_showGroupsWithAccessOnly->setChecked(true);
 	m_showGroupsWithAccessOnly->setMinimumSize(QSize(0, 0));
 	m_showGroupsWithAccessOnly->setContentsMargins(0, 0, 0, 0);
 
-	m_groupsList = new ManageAccessTable(0, 2);
+	m_groupsList = new ManageAccessTable(0, 2, this);
 
 	// Setup controls
 	QFont font = labelGroups->font();

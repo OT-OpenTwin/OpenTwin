@@ -175,7 +175,6 @@ namespace ak {
 		otNone,
 		otAction,
 		otCheckBox,
-		otLabel,
 		otLineEdit,
 		otMainWindow,
 		otMenu,

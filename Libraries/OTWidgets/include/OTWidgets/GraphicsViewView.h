@@ -27,8 +27,12 @@ namespace ot {
 	class GraphicsView;
 
 	class OT_WIDGETS_API_EXPORT GraphicsViewView : public WidgetView {
+		OT_DECL_NOCOPY(GraphicsViewView)
+		OT_DECL_NOMOVE(GraphicsViewView)
+		OT_DECL_NODEFAULT(GraphicsViewView)
 	public:
-		GraphicsViewView(GraphicsView* _graphicsView = (GraphicsView*)nullptr);
+		explicit GraphicsViewView(QWidget* _parent);
+		explicit GraphicsViewView(GraphicsView* _graphicsView, QWidget* _parent);
 		virtual ~GraphicsViewView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

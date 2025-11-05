@@ -27,8 +27,9 @@ namespace ot {
 	class ProjectOverviewTree : public TreeWidget {
 		OT_DECL_NOCOPY(ProjectOverviewTree)
 		OT_DECL_NOMOVE(ProjectOverviewTree)
+		OT_DECL_NODEFAULT(ProjectOverviewTree)
 	public:
-		ProjectOverviewTree(QWidget* _parent = (QWidget*)nullptr);
+		explicit ProjectOverviewTree(QWidget* _parent);
 		virtual ~ProjectOverviewTree() = default;
 		
 		virtual void drawRow(QPainter* _painter, const QStyleOptionViewItem& _option, const QModelIndex& _index) const override;

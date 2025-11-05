@@ -22,6 +22,9 @@
 // Toolkit API header
 #include "OToolkitAPI/otoolkitapi_global.h"
 
+// OpenTwin header
+#include "OTWidgets/WidgetTypes.h"
+
 // Qt header
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qtoolbar.h>
@@ -36,12 +39,11 @@ namespace ot { class WidgetView; };
 namespace otoolkit {
 
 	class OTOOLKITAPI_EXPORT ToolWidgets { 
+		OT_DECL_DEFCOPY(ToolWidgets)
+		OT_DECL_DEFMOVE(ToolWidgets)
 	public:
 		ToolWidgets();
-		ToolWidgets(const ToolWidgets& _other);
-		virtual ~ToolWidgets() {};
-
-		ToolWidgets& operator = (const ToolWidgets& _other);
+		virtual ~ToolWidgets() = default;
 
 		void addView(ot::WidgetView* _view) { m_views.push_back(_view); };
 		void setViews(const std::list<ot::WidgetView*>& _views) { m_views = _views; };

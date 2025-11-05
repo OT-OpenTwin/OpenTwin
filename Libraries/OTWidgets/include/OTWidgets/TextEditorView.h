@@ -28,8 +28,12 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT TextEditorView : public WidgetView {
 		Q_OBJECT
+		OT_DECL_NOCOPY(TextEditorView)
+		OT_DECL_NOMOVE(TextEditorView)
+		OT_DECL_NODEFAULT(TextEditorView)
 	public:
-		TextEditorView(TextEditor* _textEditor = (TextEditor*)nullptr);
+		explicit TextEditorView(QWidget* _parent);
+		explicit TextEditorView(TextEditor* _textEditor, QWidget* _parent);
 		virtual ~TextEditorView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

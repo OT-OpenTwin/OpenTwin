@@ -41,11 +41,11 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT ModelLibraryDialog : public Dialog {
 		Q_OBJECT
-		OT_DECL_NODEFAULT(ModelLibraryDialog)
 		OT_DECL_NOCOPY(ModelLibraryDialog)
 		OT_DECL_NOMOVE(ModelLibraryDialog)
+		OT_DECL_NODEFAULT(ModelLibraryDialog)
 	public:
-		ModelLibraryDialog(ModelLibraryDialogCfg&& _config);
+		explicit ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWidget* _parent);
 		virtual ~ModelLibraryDialog();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

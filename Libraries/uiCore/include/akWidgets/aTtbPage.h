@@ -24,11 +24,13 @@
 #include <akCore/akCore.h>
 #include <akGui/aTtbContainer.h>
 
+// TTB header
+#include <TabToolbar/Page.h>
+
 // Qt header
 #include <qstring.h>					// QString
 
 // Forward declaraion
-namespace tt { class Page; }
 
 namespace ak {
 
@@ -75,6 +77,8 @@ namespace ak {
 		virtual void setEnabled(
 			bool						_enabled
 		) override;
+
+		virtual QWidget* widget(void) override { return m_page; }
 
 		tt::Page* getPage(void) const { return m_page; };
 

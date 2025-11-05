@@ -39,8 +39,9 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(TagListEntry)
 		OT_DECL_NOMOVE(TagListEntry)
+		OT_DECL_NODEFAULT(TagListEntry)
 	public:
-		TagListEntry(QWidget* _parent);
+		explicit TagListEntry(QWidget* _parent);
 		virtual ~TagListEntry();
 
 		virtual QWidget* getQWidget() override { return this; };
@@ -70,8 +71,9 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOMOVE(TagListWidget)
 		OT_DECL_NOCOPY(TagListWidget)
+		OT_DECL_NODEFAULT(TagListWidget)
 	public:
-		TagListWidget(QWidget* _parent = nullptr);
+		explicit TagListWidget(QWidget* _parent);
 		~TagListWidget();
 
 		virtual QWidget* getQWidget() override { return this; };

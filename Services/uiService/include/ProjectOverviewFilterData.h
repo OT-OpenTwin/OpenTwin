@@ -33,7 +33,7 @@ namespace ot {
 		OT_DECL_DEFCOPY(ProjectOverviewFilterData)	
 		OT_DECL_DEFMOVE(ProjectOverviewFilterData)
 	public:
-		ProjectOverviewFilterData(int _logicalIndex = -1);
+		explicit ProjectOverviewFilterData(int _logicalIndex = -1);
 		~ProjectOverviewFilterData() = default;
 
 		bool isValid() const { return m_logicalIndex >= 0; };

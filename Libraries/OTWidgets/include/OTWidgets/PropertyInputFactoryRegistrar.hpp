@@ -23,7 +23,10 @@
 #include "OTWidgets/PropertyInputFactory.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
-template <class T>
+template <typename T>
 ot::PropertyInputFactoryRegistrar<T>::PropertyInputFactoryRegistrar(const std::string& _key) {
-	PropertyInputFactory::registerPropertyInput(_key, []() { return new T; });
+	static_assert(std::is_constructible_v<T, QWidget*>,
+		"Factory-registered type must be constructible with QWidget* as its only parameter.");
+
+	PropertyInputFactory::registerPropertyInput(_key, [](QWidget* _parent) { return new T(_parent); });
 }

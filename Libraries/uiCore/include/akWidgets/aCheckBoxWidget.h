@@ -36,11 +36,14 @@ namespace ak {
 	class UICORE_API_EXPORT aCheckBoxWidget : public QCheckBox, public aWidget
 	{
 		Q_OBJECT
+		OT_DECL_NOCOPY(aCheckBoxWidget)
+		OT_DECL_NOMOVE(aCheckBoxWidget)
+		OT_DECL_NODEFAULT(aCheckBoxWidget)
 	public:
 		//! @brief Constructor
 		//! @param _parent The parent QWidget for this CheckBox
 		aCheckBoxWidget(
-			QWidget *								_parent = (QWidget *) nullptr
+			QWidget *								_parent
 		);
 
 		//! @brief Constructor
@@ -48,7 +51,7 @@ namespace ak {
 		//! @param _parent The parent QWidget for this CheckBox
 		aCheckBoxWidget(
 			const QString &							_text,
-			QWidget *								_parent = (QWidget *) nullptr
+			QWidget *								_parent
 		);
 
 		//! @brief Deconstructor

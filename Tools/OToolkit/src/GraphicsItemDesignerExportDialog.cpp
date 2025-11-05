@@ -37,8 +37,8 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qmessagebox.h>
 
-GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemDesigner* _designer)
-	: m_designer(_designer)
+GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemDesigner* _designer, QWidget* _parent)
+	: ot::Dialog(_parent), m_designer(_designer)
 {
 	OTAssertNullptr(m_designer);
 
@@ -48,18 +48,18 @@ GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemD
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls
-	ot::Label* fileNameLabel = new ot::Label("File Name:");
-	m_fileInput = new ot::PathBrowseEdit(ot::PathBrowseMode::WriteFile);
+	ot::Label* fileNameLabel = new ot::Label("File Name:", this);
+	m_fileInput = new ot::PathBrowseEdit(ot::PathBrowseMode::WriteFile, this);
 	m_fileInput->setBrowseTitle("Select GraphicsItem Export");
 	m_fileInput->setFileFilter("GraphicsItem Files (*.ot.json)");
 	m_fileInput->getLineEdit()->setToolTip("File export location.");
 
-	ot::Label* autoAlignLabel = new ot::Label("Auto Align Item:");
-	m_autoAlignInput = new ot::CheckBox;
+	ot::Label* autoAlignLabel = new ot::Label("Auto Align Item:", this);
+	m_autoAlignInput = new ot::CheckBox(this);
 	m_autoAlignInput->setToolTip("If enabled the item will be moved to (x: 0; y: 0) during export.\nThis should be enabled.");
 
-	ot::PushButton* buttonExport = new ot::PushButton("Export");
-	ot::PushButton* buttonCancel = new ot::PushButton("Cancel");
+	ot::PushButton* buttonExport = new ot::PushButton("Export", this);
+	ot::PushButton* buttonCancel = new ot::PushButton("Cancel", this);
 
 	// Initialize data
 	m_autoAlignInput->setChecked(m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign);

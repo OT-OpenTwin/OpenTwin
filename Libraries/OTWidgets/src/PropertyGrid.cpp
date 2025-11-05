@@ -29,10 +29,10 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 
-ot::PropertyGrid::PropertyGrid(QObject* _parentObject) :
-	QObject(_parentObject), m_isModal(false)
+ot::PropertyGrid::PropertyGrid(QWidget* _parent) :
+	QObject(_parent), m_isModal(false)
 {
-	m_tree = new PropertyGridTree;
+	m_tree = new PropertyGridTree(_parent);
 	
 	this->connect(m_tree, &QTreeWidget::itemCollapsed, this, &PropertyGrid::slotItemCollapsed);
 	this->connect(m_tree, &QTreeWidget::itemExpanded, this, &PropertyGrid::slotItemExpanded);
@@ -64,7 +64,7 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 	m_isModal = _config.getIsModal();
 
 	for (const PropertyGroup* group : _config.getRootGroups()) {
-		PropertyGridGroup* newGroup = new PropertyGridGroup;
+		PropertyGridGroup* newGroup = new PropertyGridGroup(m_tree);
 		newGroup->setupFromConfig(group);
 		this->addGroup(newGroup);
 		newGroup->finishSetup();

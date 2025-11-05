@@ -32,9 +32,12 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT ColorPreviewBox : public QFrame, public WidgetBase {
 		OT_DECL_NOCOPY(ColorPreviewBox)
+		OT_DECL_NOMOVE(ColorPreviewBox)
+		OT_DECL_NODEFAULT(ColorPreviewBox)
 	public:
-		ColorPreviewBox(const QColor& _color = QColor(), QWidget* _parent = (QWidget*)nullptr);
-		ColorPreviewBox(const ot::Color& _color, QWidget* _parent = (QWidget*)nullptr);
+		explicit ColorPreviewBox(QWidget* _parent);
+		explicit ColorPreviewBox(const QColor& _color, QWidget* _parent);
+		explicit ColorPreviewBox(const ot::Color& _color, QWidget* _parent);
 		virtual ~ColorPreviewBox();
 
 		virtual QWidget* getQWidget(void) override { return this; };

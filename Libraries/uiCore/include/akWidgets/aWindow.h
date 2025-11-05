@@ -44,6 +44,8 @@ namespace ak {
 
 	class UICORE_API_EXPORT aWindow : public QMainWindow, public aObject {
 		Q_OBJECT
+		OT_DECL_NOCOPY(aWindow)
+		OT_DECL_NOMOVE(aWindow)
 	public:
 		aWindow();
 		virtual ~aWindow();

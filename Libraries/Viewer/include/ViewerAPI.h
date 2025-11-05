@@ -61,7 +61,7 @@ namespace ViewerAPI {
 	__declspec(dllexport) ot::UID getActiveDataModel(void);
 	__declspec(dllexport) ot::UID getActiveViewerModel(void);
 
-	__declspec(dllexport) ot::UID createViewer(ot::UID osgModelID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
+	__declspec(dllexport) ot::UID createViewer(ot::UID osgModelID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB, QWidget* _parent);
 	__declspec(dllexport) ot::WidgetView* getViewerWidget(ot::UID viewer);
 
 	__declspec(dllexport) void resetAllViews3D(ot::UID osgModelID);

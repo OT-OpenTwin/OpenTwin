@@ -19,14 +19,20 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/VersionGraphManager.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
-ot::VersionGraphManagerView::VersionGraphManagerView(VersionGraphManager* _versionGraphManager)
-	: WidgetView(WidgetViewBase::ViewVersion), m_versionGraphManager(_versionGraphManager)
+ot::VersionGraphManagerView::VersionGraphManagerView(QWidget* _parent) : VersionGraphManagerView(nullptr, _parent) {}
+
+ot::VersionGraphManagerView::VersionGraphManagerView(VersionGraphManager* _versionGraphManager, QWidget* _parent)
+	: WidgetView(WidgetViewBase::ViewVersion, _parent), m_versionGraphManager(_versionGraphManager)
 {
 	if (!m_versionGraphManager) {
-		m_versionGraphManager = new VersionGraphManager;
+		m_versionGraphManager = new VersionGraphManager(getViewDockWidget());
+	}
+	else {
+		m_versionGraphManager->setParent(getViewDockWidget());
 	}
 
 	this->addWidgetInterfaceToDock(m_versionGraphManager);

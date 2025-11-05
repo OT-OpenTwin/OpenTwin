@@ -20,13 +20,19 @@
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
 #include "OTWidgets/PropertyGrid.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/PropertyGridView.h"
 
-ot::PropertyGridView::PropertyGridView(PropertyGrid* _propertyGrid)
-	: WidgetView(WidgetViewBase::ViewProperties), m_propertyGrid(_propertyGrid)
+ot::PropertyGridView::PropertyGridView(QWidget* _parent) : PropertyGridView(nullptr, _parent) {}
+
+ot::PropertyGridView::PropertyGridView(PropertyGrid* _propertyGrid, QWidget* _parent)
+	: WidgetView(WidgetViewBase::ViewProperties, _parent), m_propertyGrid(_propertyGrid)
 {
 	if (!m_propertyGrid) {
-		m_propertyGrid = new PropertyGrid;
+		m_propertyGrid = new PropertyGrid(getViewDockWidget());
+	}
+	else {
+		m_propertyGrid->setParent(getViewDockWidget());
 	}
 
 	this->addWidgetInterfaceToDock(m_propertyGrid);

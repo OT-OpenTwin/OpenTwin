@@ -22,12 +22,16 @@
 // OpenTwin header
 #include "OTWidgets/AbstractStatusBar.h"
 
+class QWidget;
+
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT StatusBarManager : public AbstractStatusBar {
 		OT_DECL_NOCOPY(StatusBarManager)
+		OT_DECL_NOMOVE(StatusBarManager)
+		OT_DECL_NODEFAULT(StatusBarManager)
 	public:
-		StatusBarManager();
+		explicit StatusBarManager(QWidget* _parent);
 		virtual ~StatusBarManager();
 
 		virtual QStatusBar* getStatusBar(void) override;

@@ -30,9 +30,12 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT LineEdit : public QLineEdit, public ot::WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(LineEdit)
+		OT_DECL_NOMOVE(LineEdit)
+		OT_DECL_NODEFAULT(LineEdit)
 	public:
-		LineEdit(QWidget* _parentWidget = (QWidget*)nullptr);
-		LineEdit(const QString& _initialText, QWidget* _parentWidget = (QWidget*)nullptr);
+		explicit LineEdit(QWidget* _parentWidget);
+		explicit LineEdit(const QString& _initialText, QWidget* _parentWidget);
 		virtual ~LineEdit() {};
 
 		//! @brief Returns a pointer to the root widget of this object

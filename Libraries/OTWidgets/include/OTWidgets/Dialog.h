@@ -42,6 +42,7 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Dialog)
 		OT_DECL_NOMOVE(Dialog)
+		OT_DECL_NODEFAULT(Dialog)
 	public:
 		//! @brief Defines possible dialog results.
 		enum DialogResult {
@@ -63,12 +64,12 @@ namespace ot {
 
 		//! @brief Constructs a Dialog instance.
 		//! @param _parent The parent widget.
-		Dialog(QWidget* _parent = (QWidget*)nullptr);
+		explicit Dialog(QWidget* _parent);
 
 		//! @brief Constructs a Dialog instance with a configuration.
 		//! @param _config The dialog configuration.
 		//! @param _parent The parent widget.
-		Dialog(const DialogCfg& _config, QWidget* _parent = (QWidget*)nullptr);
+		explicit Dialog(const DialogCfg& _config, QWidget* _parent);
 
 		//! @brief Destroys the Dialog instance.
 		virtual ~Dialog();

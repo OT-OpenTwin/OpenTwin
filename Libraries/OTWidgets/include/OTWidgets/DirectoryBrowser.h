@@ -36,8 +36,10 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT DirectoryBrowser : public QWidget, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(DirectoryBrowser)
+		OT_DECL_NOMOVE(DirectoryBrowser)
+		OT_DECL_NODEFAULT(DirectoryBrowser)
 	public:
-		DirectoryBrowser();
+		explicit DirectoryBrowser(QWidget* _parent);
 		virtual ~DirectoryBrowser();
 
 		virtual QWidget* getQWidget(void) override { return this; };

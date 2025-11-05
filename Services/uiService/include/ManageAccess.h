@@ -31,9 +31,12 @@ namespace ot { class CheckBox; }
 
 class ManageAccessTable : public ot::Table {
 	Q_OBJECT
+	OT_DECL_NOCOPY(ManageAccessTable)
+	OT_DECL_NOMOVE(ManageAccessTable)
+	OT_DECL_NODEFAULT(ManageAccessTable)
 public:
-	ManageAccessTable();
-	ManageAccessTable(int _row, int _column);
+	ManageAccessTable(QWidget* _parent);
+	ManageAccessTable(int _row, int _column, QWidget* _parent);
 	virtual ~ManageAccessTable();
 
 	void addRow(const std::array<QTableWidgetItem *, 2> &_columns);
@@ -60,9 +63,11 @@ private:
 
 class ManageAccess : public ot::Dialog {
 	Q_OBJECT
-
+	OT_DECL_NOCOPY(ManageAccess)
+	OT_DECL_NOMOVE(ManageAccess)
+	OT_DECL_NODEFAULT(ManageAccess)
 public:
-	ManageAccess(const std::string &authServerURL, const std::string &projectName);
+	ManageAccess(const std::string &authServerURL, const std::string &projectName, QWidget* _parent);
 	virtual ~ManageAccess();
 
 public Q_SLOTS:
@@ -86,8 +91,4 @@ private:
 
 	std::list<std::string>						m_groupList;
 	std::map<std::string, bool>					m_groupHasAccess;
-
-	ManageAccess() = delete;
-	ManageAccess(ManageAccess&) = delete;
-	ManageAccess& operator = (ManageAccess&) = delete;
 };

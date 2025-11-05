@@ -26,8 +26,10 @@
 #include "OTGui/GraphicsPickerCollectionCfg.h"
 
 // OpenTwin Widgets header
+#include "OTWidgets/Label.h"
 #include "OTWidgets/Splitter.h"
 #include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/FlowLayout.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/ImagePainter.h"
@@ -40,7 +42,6 @@
 #include "OTWidgets/GraphicsItemPreview.h"
 
 // Qt header
-#include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qsplitter.h>
 
@@ -54,19 +55,20 @@ namespace intern {
 	};
 }
 
-ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation) :
+ot::GraphicsPicker::GraphicsPicker(QWidget* _parent) : GraphicsPicker(Qt::Vertical, _parent) {}
+
+ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation, QWidget* _parent) :
 	m_navigation(nullptr), m_splitter(nullptr), m_repaintPreviewRequired(false), m_previewSize(48, 48)
 {
 	// Create controls
-	m_splitter = new Splitter(_orientation);
+	m_splitter = new Splitter(_orientation, _parent);
 
-	m_navigation = new ot::TreeWidgetFilter;
+	m_navigation = new ot::TreeWidgetFilter(m_splitter);
 	m_navigation->getTreeWidget()->setHeaderHidden(true);
 	m_navigation->setOTWidgetFlags(ot::ApplyFilterOnTextChange);
 
-	m_viewLayoutW = new QWidget;
-	m_viewLayout = new QGridLayout(m_viewLayoutW);
-	m_viewLayoutW->installEventFilter(this);
+	m_viewLayoutW = new QWidget(m_splitter);
+	m_viewLayout = new FlowLayout(m_viewLayoutW);
 
 	m_splitter->addWidget(m_navigation->getQWidget());
 	m_splitter->addWidget(m_viewLayoutW);
@@ -85,14 +87,6 @@ QWidget* ot::GraphicsPicker::getQWidget() {
 
 const QWidget* ot::GraphicsPicker::getQWidget() const {
 	return m_splitter;
-}
-
-bool ot::GraphicsPicker::eventFilter(QObject* _watched, QEvent* _event) {
-	if (_event->type() == QEvent::Resize) {
-		this->rebuildPreview();
-	}
-
-	return false;
 }
 
 // ##############################################################################################################################
@@ -118,7 +112,7 @@ void ot::GraphicsPicker::add(const std::list<ot::GraphicsPickerCollectionCfg>& _
 }
 
 void ot::GraphicsPicker::clear() {
-	for (auto v : m_previews) {
+	for (auto& v : m_previews) {
 		m_viewLayout->removeWidget(v.layoutWidget);
 		delete v.label;
 		delete v.view;
@@ -126,7 +120,7 @@ void ot::GraphicsPicker::clear() {
 	}
 	m_previews.clear();
 
-	for (auto d : m_previewData) {
+	for (auto& d : m_previewData) {
 		delete d.second;
 	}
 	m_previewData.clear();
@@ -159,7 +153,7 @@ void ot::GraphicsPicker::applyState(const PickerState& _state) {
 // Private: Slots
 
 void ot::GraphicsPicker::slotSelectionChanged() {
-	for (auto v : m_previews) {
+	for (auto& v : m_previews) {
 		m_viewLayout->removeWidget(v.layoutWidget);
 		delete v.label;
 		delete v.view;
@@ -181,29 +175,29 @@ void ot::GraphicsPicker::slotSelectionChanged() {
 				pManager.importFromFile(info.getPreviewIcon());
 
 				PreviewBox box;
-				box.view = new GraphicsItemPreview;
+				box.layoutWidget = new QWidget(m_viewLayoutW);
+
+				box.layout = new QVBoxLayout(box.layoutWidget);
+
+				box.view = new GraphicsItemPreview(box.layoutWidget);
 				box.view->setMaximumSize(m_previewSize);
 				box.view->setMinimumSize(m_previewSize);
 				box.view->setPainter(pManager.getPainter(info.getPreviewIcon())->createCopy());
 				box.view->setItemName(info.getName());
 				//box.view->setAlignment(Qt::AlignCenter);
 				box.view->setPickerKey(m_key);
-
-				box.label = new QLabel(QString::fromStdString(info.getTitle()));
-				box.label->setAlignment(Qt::AlignCenter);
-
-				box.layoutWidget = new QWidget;
-
-				box.layout = new QVBoxLayout(box.layoutWidget);
 				box.layout->addWidget(box.view, 0, Qt::AlignCenter);
+
+				box.label = new Label(QString::fromStdString(info.getTitle()), box.layoutWidget);
+				box.label->setAlignment(Qt::AlignCenter);
 				box.layout->addWidget(box.label, 1, Qt::AlignTop | Qt::AlignHCenter);
 
-				m_previews.push_back(box);
+				m_viewLayout->addWidget(box.layoutWidget);
+
+				m_previews.push_back(std::move(box));
 			}
 		}
 	}
-
-	this->rebuildPreview();
 }
 
 // ##############################################################################################################################
@@ -300,37 +294,6 @@ void ot::GraphicsPicker::storePreviewData(TreeWidgetItem* _item, const GraphicsP
 	}
 }
 
-void ot::GraphicsPicker::rebuildPreview() {
-	// Remove current previews
-	for (PreviewBox& v : m_previews) {
-		v.layoutWidget->setHidden(true);
-		m_viewLayout->removeWidget(v.layoutWidget);
-	}
-
-	// Determine max preview width
-	int maxWidth = m_previewSize.width() + 5;
-	for (const PreviewBox& v : m_previews) {
-		QFontMetrics fm(v.label->font());
-		maxWidth = std::max(maxWidth, fm.horizontalAdvance(v.label->text()) + 5);
-	}
-
-	// Rebuild previews
-	int row = 0;
-	int col = 0;
-	int cols = m_splitter->visibleRegion().boundingRect().width() / maxWidth;
-
-	for (PreviewBox& v : m_previews) {
-		m_viewLayout->addWidget(v.layoutWidget, row, col);
-		v.layoutWidget->setHidden(false);
-
-		col++;
-		if (col >= cols) {
-			col = 0;
-			row++;
-		}
-	}
-}
-
 void ot::GraphicsPicker::getCurrentState(PickerState& _state, TreeWidgetItem* _item) const {
 	if (_item->isSelected()) {
 		_state.selectedItems.push_back(_item->getTreeWidgetItemPath());
@@ -376,14 +339,14 @@ void ot::GraphicsPicker::applyState(const PickerState& _state, TreeWidgetItem* _
 ot::GraphicsPickerDockWidget::GraphicsPickerDockWidget(QWidget* _parentWidget)
 	: QDockWidget(_parentWidget)
 {
-	m_widget = new GraphicsPicker(this->calcWidgetOrientation());
+	m_widget = new GraphicsPicker(this->calcWidgetOrientation(), this);
 	setWidget(m_widget->getQWidget());
 }
 
 ot::GraphicsPickerDockWidget::GraphicsPickerDockWidget(const QString& _title, QWidget* _parentWidget)
 	: QDockWidget(_title, _parentWidget)
 {
-	m_widget = new GraphicsPicker(this->calcWidgetOrientation());
+	m_widget = new GraphicsPicker(this->calcWidgetOrientation(), this);
 	setWidget(m_widget->getQWidget());
 }
 

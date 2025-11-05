@@ -23,8 +23,8 @@
 #include "OTWidgets/WidgetViewTab.h"
 #include "OTWidgets/WidgetViewDock.h"
 
-ot::WidgetViewDock::WidgetViewDock(WidgetView* _view) :
-	ads::CDockWidget(QString()), m_view(_view), m_tab(nullptr)
+ot::WidgetViewDock::WidgetViewDock(WidgetView* _view, QWidget* _parent) :
+	ads::CDockWidget(QString(), _parent), m_view(_view), m_tab(nullptr)
 {
 	m_tab = dynamic_cast<WidgetViewTab*>(this->tabWidget());
 	if (m_tab) {

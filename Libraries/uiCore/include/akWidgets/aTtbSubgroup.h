@@ -24,11 +24,13 @@
 #include <akCore/akCore.h>
 #include <akGui/aTtbContainer.h>
 
+// TTB header
+#include <TabToolbar/SubGroup.h>
+
 // Qt header
 #include <qstring.h>					// QString
 
 // Forward declaration
-namespace tt { class SubGroup; }
 
 namespace ak {
 
@@ -73,6 +75,10 @@ namespace ak {
 		virtual void setEnabled(
 			bool						_enabled
 		) override;
+
+		virtual QWidget* widget(void) override { return m_subGroup; };
+
+		tt::SubGroup* getSubGroup(void) const { return m_subGroup; }
 
 	private:
 		tt::SubGroup *			m_subGroup;

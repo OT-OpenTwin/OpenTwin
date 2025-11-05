@@ -34,8 +34,8 @@
 ak::aWindow::aWindow()
 	: QMainWindow(), aObject(otMainWindow), m_waitingWidget(nullptr), m_centralWidget(nullptr)
 {
-	m_waitingWidget = new QLabel();
-	m_centralWidget = new aAnimationOverlayWidget();
+	m_waitingWidget = new QLabel(this);
+	m_centralWidget = new aAnimationOverlayWidget(this);
 	setCentralWidget(m_centralWidget);
 }
 

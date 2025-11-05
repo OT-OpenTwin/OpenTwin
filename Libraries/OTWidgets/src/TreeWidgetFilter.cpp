@@ -28,10 +28,10 @@
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qlayout.h>
 
-ot::TreeWidgetFilter::TreeWidgetFilter(ot::TreeWidget* _tree, int _filterColumn) :
+ot::TreeWidgetFilter::TreeWidgetFilter(QWidget* _parent, ot::TreeWidget* _tree, int _filterColumn) :
 	m_tree(_tree), m_filterColumn(_filterColumn)
 {
-	m_layoutW = new QWidget;
+	m_layoutW = new QWidget(_parent);
 	m_layoutW->setObjectName("OT_W_TreeWidgetFilterTemplateLayoutW");
 	//m_layoutW->setContentsMargins(0, 0, 0, 0);
 
@@ -39,13 +39,16 @@ ot::TreeWidgetFilter::TreeWidgetFilter(ot::TreeWidget* _tree, int _filterColumn)
 	m_layout->setObjectName("OT_W_TreeWidgetFilterTemplateLayout");
 	m_layout->setContentsMargins(0, 0, 0, 0);
 
-	m_lineEdit = new ot::LineEdit;
+	m_lineEdit = new ot::LineEdit(m_layoutW);
 	m_lineEdit->setObjectName("OT_W_TreeWidgetFilterTemplateLineEdit");
 	m_lineEdit->setPlaceholderText("Search");
 
 	if (m_tree == nullptr) {
-		m_tree = new TreeWidget;
+		m_tree = new TreeWidget(m_layoutW);
 		m_tree->setObjectName("OT_W_TreeWidgetFilterTemplateTree");
+	}
+	else {
+		m_tree->setParent(m_layoutW);
 	}
 
 	m_layout->addWidget(m_lineEdit->getQWidget());

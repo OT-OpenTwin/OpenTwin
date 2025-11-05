@@ -31,8 +31,7 @@
 ot::IndicatorWidget::IndicatorWidget(QWidget* _parent) : IndicatorWidget(false, _parent) {}
 
 ot::IndicatorWidget::IndicatorWidget(bool _checked, QWidget* _parent)
-	: QAbstractButton(_parent), WidgetBase(), 
-	m_checkedSymbol(Checkmark), m_uncheckedSymbol(Cross), m_drawFrame(true)
+	: QAbstractButton(_parent), m_checkedSymbol(Checkmark), m_uncheckedSymbol(Cross), m_drawFrame(true)
 {
 	this->setCheckable(true);
 	this->setChecked(_checked);

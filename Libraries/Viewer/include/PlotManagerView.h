@@ -27,8 +27,11 @@ namespace ot {
 	class PlotManager;
 
 	class __declspec(dllexport) PlotManagerView : public WidgetView {
+		OT_DECL_NOCOPY(PlotManagerView)
+		OT_DECL_NOMOVE(PlotManagerView)
+		OT_DECL_NODEFAULT(PlotManagerView)
 	public:
-		PlotManagerView();
+		PlotManagerView(QWidget* _parent);
 		virtual ~PlotManagerView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

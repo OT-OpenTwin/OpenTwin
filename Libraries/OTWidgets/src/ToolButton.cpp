@@ -22,21 +22,21 @@
 #include "OTWidgets/ToolButton.h"
 
 ot::ToolButton::ToolButton(QWidget* _parent) : QToolButton(_parent), m_action(nullptr) {
-	m_action = new Action;
+	m_action = new Action(this);
 	this->ini();
 }
 
 ot::ToolButton::ToolButton(const QString& _text, QWidget* _parent)
 	: QToolButton(_parent), m_action(nullptr) 
 {
-	m_action = new Action(_text);
+	m_action = new Action(_text, this);
 	this->ini();
 }
 
 ot::ToolButton::ToolButton(const QIcon& _icon, const QString& _text, QWidget* _parent)
 	: QToolButton(_parent), m_action(nullptr) 
 {
-	m_action = new Action(_icon, _text);
+	m_action = new Action(_icon, _text, this);
 	this->ini();
 }
 

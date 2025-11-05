@@ -51,9 +51,11 @@ namespace ot { class ToolButton; }
 
 class WelcomeWidget : public QObject, public ot::WidgetBase, public LockableWidget {
 	Q_OBJECT
+	OT_DECL_NOCOPY(WelcomeWidget)
+	OT_DECL_NOMOVE(WelcomeWidget)
 	OT_DECL_NODEFAULT(WelcomeWidget)
 public:
-	WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager);
+	explicit WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager, QWidget* _parent);
 	virtual ~WelcomeWidget();
 
 	virtual void setWidgetLocked(bool _isLocked) override;

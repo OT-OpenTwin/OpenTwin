@@ -30,10 +30,13 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PushButton : public QPushButton, public WidgetBase {
 		Q_OBJECT
+		OT_DECL_NOCOPY(PushButton)
+		OT_DECL_NOMOVE(PushButton)
+		OT_DECL_NODEFAULT(PushButton)
 	public:
-		PushButton(QWidget* _parent = (QWidget*)nullptr);
-		PushButton(const QString& _text, QWidget* _parent = (QWidget*)nullptr);
-		PushButton(const QIcon& _icon, const QString& _text, QWidget* _parent = (QWidget*)nullptr);
+		explicit PushButton(QWidget* _parent);
+		explicit PushButton(const QString& _text, QWidget* _parent);
+		explicit PushButton(const QIcon& _icon, const QString& _text, QWidget* _parent);
 		virtual ~PushButton() {};
 
 		//! @brief Returns a pointer to the root widget of this object

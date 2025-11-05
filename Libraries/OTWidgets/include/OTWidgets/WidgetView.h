@@ -44,8 +44,9 @@ namespace ot {
 	//! @brief The WidgetView class is used to integrate the Qt-ADS functionallity into open twin.
 	class OT_WIDGETS_API_EXPORT WidgetView : public QObject {
 		Q_OBJECT
-			OT_DECL_NODEFAULT(WidgetView)
-			OT_DECL_NOCOPY(WidgetView)
+		OT_DECL_NOCOPY(WidgetView)
+		OT_DECL_NOMOVE(WidgetView)
+		OT_DECL_NODEFAULT(WidgetView)
 	public:
 		enum InsertFlag {
 			NoInsertFlags = 0 << 0,
@@ -59,7 +60,7 @@ namespace ot {
 		//! The resulted name has the following syntax: <entityName>$<viewTypeString>
 		static std::string createStoredViewName(const std::string& _entityName, WidgetViewBase::ViewType _viewType);
 
-		WidgetView(WidgetViewBase::ViewType _viewType);
+		explicit WidgetView(WidgetViewBase::ViewType _viewType, QWidget* _parent);
 		virtual ~WidgetView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

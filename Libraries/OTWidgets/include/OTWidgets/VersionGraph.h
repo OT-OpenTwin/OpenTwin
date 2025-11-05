@@ -29,6 +29,9 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT VersionGraph : public GraphicsView {
 		Q_OBJECT
+		OT_DECL_NOCOPY(VersionGraph)
+		OT_DECL_NOMOVE(VersionGraph)
+		OT_DECL_NODEFAULT(VersionGraph)
 	public:
 		enum VersionGraphConfig {
 			NoConfigFlags                     = 0 << 0, //! @brief No VersionGraph configuration flags.
@@ -37,7 +40,7 @@ namespace ot {
 		};
 		typedef Flags<VersionGraphConfig> VersionGraphConfigFlags;
 
-		VersionGraph();
+		explicit VersionGraph(QWidget* _parent);
 		virtual ~VersionGraph();
 
 		void setupFromConfig(const VersionGraphCfg& _config);

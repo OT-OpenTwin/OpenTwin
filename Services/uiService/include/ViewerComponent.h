@@ -219,7 +219,7 @@ public:
 	void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);
 
 	ViewerUIDtype createViewer(ModelUIDtype _modelUid, double _scaleWidth, double _scaleHeight,
-		int _backgroundR, int _backgroundG, int _backgroundB, int _overlayR, int _overlayG, int _overlayB);
+		int _backgroundR, int _backgroundG, int _backgroundB, int _overlayR, int _overlayG, int _overlayB, QWidget* _parent);
 
 	ot::WidgetView* getViewerWidget(ViewerUIDtype _viewerUID);
 	void setDataModel(ViewerUIDtype viewerUID, ModelUIDtype modelUID);

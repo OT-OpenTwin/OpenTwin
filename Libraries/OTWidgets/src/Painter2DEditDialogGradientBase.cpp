@@ -20,6 +20,7 @@
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/GradientPainter2D.h"
+#include "OTWidgets/Label.h"
 #include "OTWidgets/SpinBox.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/DoubleSpinBox.h"
@@ -27,12 +28,12 @@
 #include "OTWidgets/Painter2DEditDialogGradientBase.h"
 
 // Qt header
-#include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qgroupbox.h>
 
-ot::Painter2DEditDialogGradientBase::Painter2DEditDialogGradientBase(QVBoxLayout* _layout, const GradientPainter2D* _painter) :
-	m_layout(_layout) {
+ot::Painter2DEditDialogGradientBase::Painter2DEditDialogGradientBase(QVBoxLayout* _layout, const GradientPainter2D* _painter, QWidget* _parent) :
+	m_layout(_layout), m_parentWidget(_parent)
+{
 	std::vector<GradientPainterStop2D> tmp;
 	if (_painter) {
 		tmp = _painter->getStops();
@@ -45,21 +46,21 @@ ot::Painter2DEditDialogGradientBase::Painter2DEditDialogGradientBase(QVBoxLayout
 	itms.append(QString::fromStdString(toString(GradientSpread::Pad)));
 	itms.append(QString::fromStdString(toString(GradientSpread::Repeat)));
 	itms.append(QString::fromStdString(toString(GradientSpread::Reflect)));
-	m_spreadBox = new ComboBox;
+	m_spreadBox = new ComboBox(_parent);
 	m_spreadBox->setEditable(false);
 	m_spreadBox->addItems(itms);
 
-	QLabel* spreadLabel = new QLabel("Spread:");
+	QLabel* spreadLabel = new Label("Spread:", _parent);
 	QHBoxLayout* spreadLay = new QHBoxLayout;
 	spreadLay->addWidget(spreadLabel);
 	spreadLay->addWidget(m_spreadBox, 1);
 
 	QHBoxLayout* stopsLay = new QHBoxLayout;
-	QLabel* stopsLabel = new QLabel("Stops:");
+	QLabel* stopsLabel = new Label("Stops:", _parent);
 
 	if (_painter) m_spreadBox->setCurrentText(QString::fromStdString(toString(_painter->getSpread())));
 	else m_spreadBox->setCurrentText(QString::fromStdString(toString(GradientSpread::Pad)));
-	m_stopsBox = new SpinBox;
+	m_stopsBox = new SpinBox(_parent);
 	m_stopsBox->setValue(tmp.size());
 	m_stopsBox->setRange(1, 99);
 	stopsLay->addWidget(stopsLabel, 0);
@@ -150,13 +151,13 @@ ot::Painter2DEditDialogGradientBase::StopEntry ot::Painter2DEditDialogGradientBa
 	QLabel* positionLabel = new QLabel("Position:");
 	QLabel* colorLabel = new QLabel("Color:");
 
-	newEntry.pos = new DoubleSpinBox;
+	newEntry.pos = new DoubleSpinBox(m_parentWidget);
 	newEntry.pos->setRange(0., 100.);
 	newEntry.pos->setDecimals(2);
 	newEntry.pos->setValue((_stop.getPos() >= 0. && _stop.getPos() <= 1.) ? (_stop.getPos() * 100.) : 0.);
 	newEntry.pos->setSuffix("%");
 
-	newEntry.color = new ColorPickButton(_stop.getColor());
+	newEntry.color = new ColorPickButton(_stop.getColor(), m_parentWidget);
 
 	lay->addWidget(positionLabel, 0, 0);
 	lay->addWidget(newEntry.pos, 0, 1);

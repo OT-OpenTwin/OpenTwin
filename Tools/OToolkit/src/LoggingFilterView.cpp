@@ -47,145 +47,149 @@ LoggingFilterView::LoggingFilterView()
 	QScrollArea* scrollArea = new QScrollArea;
 	m_root = scrollArea;
 	scrollArea->setObjectName("LoggingFilterViewRoot");
-
-	QWidget* centralLayoutW = new QWidget;
-	QVBoxLayout* centralLayout = new QVBoxLayout(centralLayoutW);
-	scrollArea->setWidget(centralLayoutW);
 	scrollArea->setWidgetResizable(true);
 
+	QWidget* centralLayoutW = new QWidget(scrollArea);
+	QVBoxLayout* centralLayout = new QVBoxLayout(centralLayoutW);
+	scrollArea->setWidget(centralLayoutW);
+
 	QHBoxLayout* messageContainsLayout = new QHBoxLayout;
+	centralLayout->addLayout(messageContainsLayout);
 
-	QGroupBox* filterByMessageTypeBox = new QGroupBox("Message Type Filter");
-	QVBoxLayout* filterByMessageTypeLayout = new QVBoxLayout(filterByMessageTypeBox);
+	// Message Content Filter
 
-	QGroupBox* filterByUserBox = new QGroupBox("User Filter");
-	QVBoxLayout* filterByUserLayout = new QVBoxLayout(filterByUserBox);
-
-	QGroupBox* filterByProjectBox = new QGroupBox("Project Filter");
-	QVBoxLayout* filterByProjectLayout = new QVBoxLayout(filterByProjectBox);
-
-	QGroupBox* filterByServiceBox = new QGroupBox("Service Type Filter");
-	QVBoxLayout* filterByServiceLayout = new QVBoxLayout(filterByServiceBox);
-
-	QGroupBox* settingsBox = new QGroupBox("Settings");
-	QVBoxLayout* settingsLayout = new QVBoxLayout(settingsBox);
-
-	// Create controls
-	QLabel* messageFilterL = new QLabel("Message contains:");
-	m_messageFilter = new QLineEdit;
+	QLabel* messageFilterL = new QLabel("Message contains:", centralLayoutW);
+	m_messageFilter = new QLineEdit(centralLayoutW);
 	m_messageFilter->setPlaceholderText("<Confirm by pressing return>");
 	m_messageFilter->setToolTip("Only messages containing the specified text will be displayed. Case insensitive.");
+	messageContainsLayout->addWidget(messageFilterL);
+	messageContainsLayout->addWidget(m_messageFilter, 1);
+	this->connect(m_messageFilter, &QLineEdit::returnPressed, this, &LoggingFilterView::slotFilterChanged);
 
-	m_userFilter = new QComboBox;
+	// Message Type Filter
+
+	QGroupBox* filterByMessageTypeBox = new QGroupBox("Message Type Filter", centralLayoutW);
+	QVBoxLayout* filterByMessageTypeLayout = new QVBoxLayout(filterByMessageTypeBox);
+	centralLayout->addWidget(filterByMessageTypeBox, 0);
+
+	m_msgTypeFilterDetailed = new ot::CheckBox("Detailed", filterByMessageTypeBox);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterDetailed);
+	this->connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
+	this->connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	m_msgTypeFilterDetailed->setChecked(true);
+
+	m_msgTypeFilterInfo = new ot::CheckBox("Info", filterByMessageTypeBox);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterInfo);
+	this->connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
+	this->connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	m_msgTypeFilterInfo->setChecked(true);
+
+	m_msgTypeFilterWarning = new ot::CheckBox("Warning", filterByMessageTypeBox);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterWarning);
+	this->connect(m_msgTypeFilterWarning, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
+	this->connect(m_msgTypeFilterWarning, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	m_msgTypeFilterWarning->setChecked(true);
+
+	m_msgTypeFilterError = new ot::CheckBox("Error", filterByMessageTypeBox);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterError);
+	this->connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
+	this->connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	m_msgTypeFilterError->setChecked(true);
+
+	m_msgTypeFilterMsgIn = new ot::CheckBox("Inbound Message", filterByMessageTypeBox);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgIn);
+	this->connect(m_msgTypeFilterMsgIn, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
+	this->connect(m_msgTypeFilterMsgIn, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+
+	m_msgTypeFilterMsgOut = new ot::CheckBox("Outgoing Message", filterByMessageTypeBox);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgOut);
+	this->connect(m_msgTypeFilterMsgOut, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
+	this->connect(m_msgTypeFilterMsgOut, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+
+	m_msgTypeFilterTest = new ot::CheckBox("Testing", filterByMessageTypeBox);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterTest);
+	this->connect(m_msgTypeFilterTest, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
+	this->connect(m_msgTypeFilterTest, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+
+	// User Filter
+
+	QGroupBox* filterByUserBox = new QGroupBox("User Filter", centralLayoutW);
+	QVBoxLayout* filterByUserLayout = new QVBoxLayout(filterByUserBox);
+	centralLayout->addWidget(filterByUserBox, 0);
+
+	m_userFilter = new QComboBox(filterByUserBox);
 	m_userFilter->setToolTip("Only messages from the selected user will be displayed.");
 	m_userFilter->addItem(LFV_Filter_AllNames);
 	filterByUserLayout->addWidget(m_userFilter);
+	this->connect(m_userFilter, &QComboBox::currentTextChanged, this, &LoggingFilterView::slotFilterChanged);
+	
+	// Project Filter
 
-	m_sessionFilter = new QComboBox;
+	QGroupBox* filterByProjectBox = new QGroupBox("Project Filter", centralLayoutW);
+	QVBoxLayout* filterByProjectLayout = new QVBoxLayout(filterByProjectBox);
+	centralLayout->addWidget(filterByProjectBox, 0);
+
+	m_sessionFilter = new QComboBox(filterByProjectBox);
 	m_sessionFilter->setToolTip("Only messages from the selected project will be displayed.");
 	m_sessionFilter->addItem(LFV_Filter_AllNames);
 	filterByProjectLayout->addWidget(m_sessionFilter);
+	this->connect(m_sessionFilter, &QComboBox::currentTextChanged, this, &LoggingFilterView::slotFilterChanged);
 
-	m_msgTypeFilterDetailed = new ot::CheckBox("Detailed");
-	m_msgTypeFilterInfo = new ot::CheckBox("Info");
-	m_msgTypeFilterWarning = new ot::CheckBox("Warning");
-	m_msgTypeFilterError = new ot::CheckBox("Error");
-	m_msgTypeFilterMsgIn = new ot::CheckBox("Inbound Message");
-	m_msgTypeFilterMsgOut = new ot::CheckBox("Outgoing Message");
-	m_msgTypeFilterTest = new ot::CheckBox("Testing");
+	// Service Type Filter
+	QGroupBox* filterByServiceBox = new QGroupBox("Service Type Filter", centralLayoutW);
+	QVBoxLayout* filterByServiceLayout = new QVBoxLayout(filterByServiceBox);
+	centralLayout->addWidget(filterByServiceBox, 1);
+	
+	m_serviceFilter = new QListWidget(filterByServiceBox);
+	filterByServiceLayout->addWidget(m_serviceFilter);
+	this->connect(m_serviceFilter, &QListWidget::itemChanged, this, &LoggingFilterView::slotFilterChanged);
 
-	m_serviceFilter = new QListWidget;
-	QPushButton* btnSelectAllServices = new QPushButton("Select All");
+	QPushButton* btnSelectAllServices = new QPushButton("Select All", filterByServiceBox);
 	btnSelectAllServices->setToolTip("Select all services in the list");
+	filterByServiceLayout->addWidget(btnSelectAllServices);
+	this->connect(btnSelectAllServices, &QPushButton::clicked, this, &LoggingFilterView::slotSelectAllServices);
 
-	QPushButton* btnDeselectAllServices = new QPushButton("Deselect All");
+	QPushButton* btnDeselectAllServices = new QPushButton("Deselect All", filterByServiceBox);
 	btnDeselectAllServices->setToolTip("Deselect all services in the list");
+	filterByServiceLayout->addWidget(btnDeselectAllServices);
+	this->connect(btnDeselectAllServices, &QPushButton::clicked, this, &LoggingFilterView::slotDeselectAllServices);
 
 	// Settings
-	m_messageLimitEnabled = new ot::CheckBox("Enable Message Limit");
+	QGroupBox* settingsBox = new QGroupBox("Settings", centralLayoutW);
+	QVBoxLayout* settingsLayout = new QVBoxLayout(settingsBox);
+	centralLayout->addWidget(settingsBox, 0);
+
+	m_messageLimitEnabled = new ot::CheckBox("Enable Message Limit", settingsBox);
 	m_messageLimitEnabled->setToolTip("If enabled, only the specified number of messages will be kept in the log. Older messages will be removed.");
+	this->connect(m_messageLimitEnabled, &QCheckBox::stateChanged, this, &LoggingFilterView::slotMessageLimitChanged);
 
 	QHBoxLayout* messageLimitLayout = new QHBoxLayout;
 	messageLimitLayout->setContentsMargins(0, 0, 0, 0);
-	m_messageLimit = new ot::SpinBox(100, std::numeric_limits<int>::max(), 20000);
+	m_messageLimit = new ot::SpinBox(100, std::numeric_limits<int>::max(), 20000, settingsBox);
 	m_messageLimit->setToolTip("Maximum number of messages that will be kept in the log.");
 	messageLimitLayout->addWidget(new QLabel("Limit:"));
 	messageLimitLayout->addWidget(m_messageLimit, 1);
 	settingsLayout->addWidget(m_messageLimitEnabled);
 	settingsLayout->addLayout(messageLimitLayout);
+	this->connect(m_messageLimit, &ot::SpinBox::valueChangeCompleted, this, &LoggingFilterView::slotMessageLimitChanged);
 
-	m_useInterval = new ot::CheckBox("Use Interval");
+	m_useInterval = new ot::CheckBox("Use Interval", settingsBox);
 	m_useInterval->setToolTip("If enabled, the log will be updated only in the specified intervals. This can help to reduce the load on the GUI when a lot of messages are incoming.");
+	this->connect(m_useInterval, &QCheckBox::stateChanged, this, &LoggingFilterView::slotIntervalChanged);
+
 	QHBoxLayout* intervalLayout = new QHBoxLayout;
 	intervalLayout->setContentsMargins(0, 0, 0, 0);
-	m_intervalMilliseconds = new ot::SpinBox(10, 10000, 1000);
+	m_intervalMilliseconds = new ot::SpinBox(10, 10000, 1000, settingsBox);
 	m_intervalMilliseconds->setToolTip("Interval in milliseconds that will be used to update the log view.");
 	m_intervalMilliseconds->setSuffix(" ms");
 	intervalLayout->addWidget(new QLabel("Interval:"));
 	intervalLayout->addWidget(m_intervalMilliseconds, 1);
 	settingsLayout->addWidget(m_useInterval);
 	settingsLayout->addLayout(intervalLayout);
-
-	// Setup controls
-	m_msgTypeFilterDetailed->setChecked(true);
-	m_msgTypeFilterInfo->setChecked(true);
-	m_msgTypeFilterWarning->setChecked(true);
-	m_msgTypeFilterError->setChecked(true);
-
-	// Setup layouts
-	centralLayout->addLayout(messageContainsLayout);
-	centralLayout->addWidget(filterByMessageTypeBox, 0);
-	centralLayout->addWidget(filterByUserBox, 0);
-	centralLayout->addWidget(filterByProjectBox, 0);
-	centralLayout->addWidget(filterByServiceBox, 1);
-	centralLayout->addWidget(settingsBox, 0);
-
-	messageContainsLayout->addWidget(messageFilterL);
-	messageContainsLayout->addWidget(m_messageFilter, 1);
-
-	filterByMessageTypeLayout->addWidget(m_msgTypeFilterDetailed);
-	filterByMessageTypeLayout->addWidget(m_msgTypeFilterInfo);
-	filterByMessageTypeLayout->addWidget(m_msgTypeFilterWarning);
-	filterByMessageTypeLayout->addWidget(m_msgTypeFilterError);
-	filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgIn);
-	filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgOut);
-	filterByMessageTypeLayout->addWidget(m_msgTypeFilterTest);
-
-	filterByServiceLayout->addWidget(m_serviceFilter);
-	filterByServiceLayout->addWidget(btnSelectAllServices);
-	filterByServiceLayout->addWidget(btnDeselectAllServices);
-
-	// Connect signals
-	this->connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
-	this->connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
-	this->connect(m_msgTypeFilterWarning, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
-	this->connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
-	this->connect(m_msgTypeFilterMsgIn, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
-	this->connect(m_msgTypeFilterMsgOut, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
-	this->connect(m_msgTypeFilterTest, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
-
-	this->connect(m_messageFilter, &QLineEdit::returnPressed, this, &LoggingFilterView::slotFilterChanged);
-
-	this->connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	this->connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	this->connect(m_msgTypeFilterWarning, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	this->connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	this->connect(m_msgTypeFilterMsgIn, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	this->connect(m_msgTypeFilterMsgOut, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	this->connect(m_msgTypeFilterTest, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-
-	this->connect(m_userFilter, &QComboBox::currentTextChanged, this, &LoggingFilterView::slotFilterChanged);
-	this->connect(m_sessionFilter, &QComboBox::currentTextChanged, this, &LoggingFilterView::slotFilterChanged);
-
-	this->connect(m_serviceFilter, &QListWidget::itemChanged, this, &LoggingFilterView::slotFilterChanged);
-
-	this->connect(m_messageLimitEnabled, &QCheckBox::stateChanged, this, &LoggingFilterView::slotMessageLimitChanged);
-	this->connect(m_messageLimit, &ot::SpinBox::valueChangeCompleted, this, &LoggingFilterView::slotMessageLimitChanged);
-	this->connect(m_useInterval, &QCheckBox::stateChanged, this, &LoggingFilterView::slotIntervalChanged);
 	this->connect(m_intervalMilliseconds, &ot::SpinBox::valueChangeCompleted, this, &LoggingFilterView::slotIntervalChanged);
 
-	this->connect(btnSelectAllServices, &QPushButton::clicked, this, &LoggingFilterView::slotSelectAllServices);
-	this->connect(btnDeselectAllServices, &QPushButton::clicked, this, &LoggingFilterView::slotDeselectAllServices);
+	// Initialize colors
+	slotUpdateCheckboxColors();
 }
 
 LoggingFilterView::~LoggingFilterView() {

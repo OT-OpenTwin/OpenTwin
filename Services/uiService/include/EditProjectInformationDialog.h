@@ -40,7 +40,7 @@ class EditProjectInformationDialog : public ot::Dialog {
 	OT_DECL_NOMOVE(EditProjectInformationDialog)
 	OT_DECL_NODEFAULT(EditProjectInformationDialog)
 public:
-	EditProjectInformationDialog(const std::string& _callbackUrl, const std::string& _callbackAction, const LoginData& _logInData, const std::string& _projectName, QWidget* _parent);
+	explicit EditProjectInformationDialog(const std::string& _callbackUrl, const std::string& _callbackAction, const LoginData& _logInData, const std::string& _projectName, QWidget* _parent);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

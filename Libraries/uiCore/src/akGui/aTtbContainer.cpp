@@ -26,7 +26,7 @@ ak::aTtbContainer::aTtbContainer(
 	aMessenger *			_messenger,
 	objectType				_type,
 	UID						_uid
-) : aObject(_type, _uid),
+) : aWidget(_type, _uid),
 	m_messenger(nullptr),
 	m_isEnabled(true)
 {

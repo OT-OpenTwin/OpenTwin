@@ -29,9 +29,10 @@ class ProjectManagement;
 class RenameProjectDialog : public ot::Dialog {
 	Q_OBJECT
 	OT_DECL_NOCOPY(RenameProjectDialog)
+	OT_DECL_NOMOVE(RenameProjectDialog)
 	OT_DECL_NODEFAULT(RenameProjectDialog)
 public:
-	RenameProjectDialog(const QString& _projectToRename, ProjectManagement &projectManager);
+	explicit RenameProjectDialog(const QString& _projectToRename, ProjectManagement &projectManager, QWidget* _parent);
 	virtual ~RenameProjectDialog();
 
 	QString getProjectName(void) const;

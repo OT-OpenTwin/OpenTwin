@@ -23,16 +23,3 @@
 otoolkit::ToolWidgets::ToolWidgets()
 	: m_toolBar(nullptr)
 {}
-
-otoolkit::ToolWidgets::ToolWidgets(const ToolWidgets& _other) 
-{
-	*this = _other;
-}
-
-otoolkit::ToolWidgets& otoolkit::ToolWidgets::operator = (const ToolWidgets& _other) {
-	m_views = _other.m_views;
-	m_toolBar = _other.m_toolBar;
-	m_statusWidgets = _other.m_statusWidgets;
-
-	return *this;
-}

@@ -85,7 +85,7 @@ std::list<ot::PushButton*> ot::Dialog::generateDefaultButtons(const std::list<st
 	std::list<PushButton*> result;
 	PushButton* btn = nullptr;
 	for (const auto& info : _buttonTextToResultList) {
-		result.push_back(btn = new PushButton(info.first));
+		result.push_back(btn = new PushButton(info.first, (_layout->widget() ? _layout->widget() : this)));
 		if (_layout) {
 			_layout->addWidget(btn);
 		}
@@ -113,32 +113,32 @@ std::list<ot::PushButton*> ot::Dialog::generateDefaultButtons(const std::initial
 	for (DialogResult result : _buttonResults) {
 		switch (result) {
 		case ot::Dialog::Ok:
-			ret.push_back(btn = new PushButton("Ok"));
+			ret.push_back(btn = new PushButton("Ok", (_layout->widget() ? _layout->widget() : this)));
 			this->connect(btn, &PushButton::clicked, this, &Dialog::closeOk); 
 			break;
 
 		case ot::Dialog::Confirm:
-			ret.push_back(btn = new PushButton("Confirm"));
+			ret.push_back(btn = new PushButton("Confirm", (_layout->widget() ? _layout->widget() : this)));
 			this->connect(btn, &PushButton::clicked, this, &Dialog::closeConfirm);
 			break;
 
 		case ot::Dialog::Yes:
-			ret.push_back(btn = new PushButton("Yes"));
+			ret.push_back(btn = new PushButton("Yes", (_layout->widget() ? _layout->widget() : this)));
 			this->connect(btn, &PushButton::clicked, this, &Dialog::closeYes);
 			break;
 
 		case ot::Dialog::No:
-			ret.push_back(btn = new PushButton("No"));
+			ret.push_back(btn = new PushButton("No", (_layout->widget() ? _layout->widget() : this)));
 			this->connect(btn, &PushButton::clicked, this, &Dialog::closeNo);
 			break;
 
 		case ot::Dialog::Retry:
-			ret.push_back(btn = new PushButton("Retry"));
+			ret.push_back(btn = new PushButton("Retry", (_layout->widget() ? _layout->widget() : this)));
 			this->connect(btn, &PushButton::clicked, this, &Dialog::closeRetry);
 			break;
 
 		case ot::Dialog::Cancel:
-			ret.push_back(btn = new PushButton("Cancel"));
+			ret.push_back(btn = new PushButton("Cancel", (_layout->widget() ? _layout->widget() : this)));
 			this->connect(btn, &PushButton::clicked, this, &Dialog::closeCancel);
 			break;
 

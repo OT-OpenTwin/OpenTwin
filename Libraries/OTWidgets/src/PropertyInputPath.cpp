@@ -29,8 +29,8 @@
 
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputPath> propertyInputFilePathRegistrar(ot::PropertyPath::propertyTypeString());
 
-ot::PropertyInputPath::PropertyInputPath() {
-	m_path = new PathBrowseEdit(PathBrowseMode::ReadFile);
+ot::PropertyInputPath::PropertyInputPath(QWidget* _parent) {
+	m_path = new PathBrowseEdit(PathBrowseMode::ReadFile, _parent);
 	
 	this->connect(m_path, &PathBrowseEdit::pathChanged, this, qOverload<>(&PropertyInputPath::slotValueChanged));
 }

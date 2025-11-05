@@ -40,11 +40,13 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT Table : public QTableWidget, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Table)
+		OT_DECL_NOMOVE(Table)
+		OT_DECL_NODEFAULT(Table)
 	public:
 		static QRect getSelectionBoundingRect(const QList<QTableWidgetSelectionRange>& _selections);
 
-		Table(QWidget* _parentWidget = (QWidget*)nullptr);
-		Table(int _rows, int _columns, QWidget* _parentWidget = (QWidget*)nullptr);
+		explicit Table(QWidget* _parentWidget);
+		explicit Table(int _rows, int _columns, QWidget* _parentWidget);
 		virtual ~Table();
 
 		virtual QWidget* getQWidget() override { return this; };

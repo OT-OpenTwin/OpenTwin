@@ -28,8 +28,9 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT PlotView : public WidgetView {
 		OT_DECL_NOCOPY(PlotView)
 		OT_DECL_NOMOVE(PlotView)
+		OT_DECL_NODEFAULT(PlotView)
 	public:
-		PlotView();
+		explicit PlotView(QWidget* _parent);
 		virtual ~PlotView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

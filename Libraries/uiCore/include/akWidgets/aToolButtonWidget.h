@@ -37,17 +37,15 @@ namespace ak {
 
 	class UICORE_API_EXPORT aToolButtonWidget : public QToolButton, public aWidget {
 		Q_OBJECT
+		OT_DECL_NOCOPY(aToolButtonWidget)
+		OT_DECL_NOMOVE(aToolButtonWidget)
+		OT_DECL_NODEFAULT(aToolButtonWidget)
 	public:
-		aToolButtonWidget();
+		explicit aToolButtonWidget(QWidget* _parent);
 
-		aToolButtonWidget(
-			const QString &				_text
-		);
+		explicit aToolButtonWidget(const QString& _text, QWidget* _parent);
 
-		aToolButtonWidget(
-			const QIcon &				_icon,
-			const QString &				_text
-		);
+		explicit aToolButtonWidget(const QIcon& _icon, const QString& _text, QWidget* _parent);
 
 		virtual ~aToolButtonWidget();
 

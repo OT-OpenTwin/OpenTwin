@@ -27,6 +27,7 @@
 // Qt header
 #include <QtCore/qobject.h>
 
+class QWidget;
 class QGroupBox;
 class QVBoxLayout;
 
@@ -40,8 +41,11 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT Painter2DEditDialogGradientBase : public QObject {
 		Q_OBJECT
+		OT_DECL_NOCOPY(Painter2DEditDialogGradientBase)
+		OT_DECL_NOMOVE(Painter2DEditDialogGradientBase)
+		OT_DECL_NODEFAULT(Painter2DEditDialogGradientBase)
 	public:
-		Painter2DEditDialogGradientBase(QVBoxLayout* _layout, const GradientPainter2D* _painter);
+		Painter2DEditDialogGradientBase(QVBoxLayout* _layout, const GradientPainter2D* _painter, QWidget* _parent);
 		virtual ~Painter2DEditDialogGradientBase();
 
 		inline void addStop(double _pos, const ot::Color& _color) { this->addStop(GradientPainterStop2D(_pos, _color)); };
@@ -67,6 +71,7 @@ namespace ot {
 		StopEntry createStopEntry(size_t stopIx, const GradientPainterStop2D& _stop = GradientPainterStop2D()) const;
 		ot::GradientPainterStop2D createStopFromEntry(const StopEntry& _entry) const;
 
+		QWidget* m_parentWidget;
 		QVBoxLayout* m_layout;
 		ComboBox* m_spreadBox;
 

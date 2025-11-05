@@ -61,7 +61,7 @@
 #define TOGGLE_MODE_LABEL_SwitchToChangePassword "Change Password"
 
 LogInDialog::LogInDialog() 
-	: m_state(LogInStateFlag::NoState)
+	: ot::Dialog(nullptr), m_state(LogInStateFlag::NoState)
 {
 	using namespace ot;
 
@@ -74,47 +74,47 @@ LogInDialog::LogInDialog()
 	QHBoxLayout* registerLayout = new QHBoxLayout;
 	
 	// Create controls
-	ImagePreview* titleImageView = new ImagePreview(IconManager::getPixmap("Images/OpenTwinIcon.png").scaled(QSize(192, 192), Qt::KeepAspectRatio).toImage());
+	ImagePreview* titleImageView = new ImagePreview(IconManager::getPixmap("Images/OpenTwinIcon.png").scaled(QSize(192, 192), Qt::KeepAspectRatio).toImage(), this);
 	titleImageView->setObjectName("LogInDialogImageView");
 	titleImageView->setEnableResizing(false);
 	titleImageView->setFixedSize(titleImageView->getImage().size());
 	titleImageView->setEnabled(false);
 
-	Label* gssLabel = new Label("Global Session Service:");
-	m_gss = new ComboBox;
+	Label* gssLabel = new Label("Global Session Service:", this);
+	m_gss = new ComboBox(this);
 	m_gss->setEditable(false);
 
-	Label* usernameLabel = new Label("Username:");
-	m_username = new LineEdit;
+	Label* usernameLabel = new Label("Username:", this);
+	m_username = new LineEdit(this);
 	
-	m_passwordLabel = new Label("Password:");
-	m_password = new LineEdit;
+	m_passwordLabel = new Label("Password:", this);
+	m_password = new LineEdit(this);
 	m_password->setEchoMode(QLineEdit::Password);
 	
-	m_passwordNewLabel = new Label("New Password:");
+	m_passwordNewLabel = new Label("New Password:", this);
 	m_passwordNewLabel->setHidden(true);
-	m_passwordNew = new LineEdit;
+	m_passwordNew = new LineEdit(this);
 	m_passwordNew->setEchoMode(QLineEdit::Password);
 	m_passwordNew->setHidden(true);
 
-	m_passwordConfirmLabel = new Label("Confirm Password:");
+	m_passwordConfirmLabel = new Label("Confirm Password:", this);
 	m_passwordConfirmLabel->setHidden(true);
-	m_passwordConfirm = new LineEdit;
+	m_passwordConfirm = new LineEdit(this);
 	m_passwordConfirm->setEchoMode(QLineEdit::Password);
 	m_passwordConfirm->setHidden(true);
 
-	m_savePassword = new CheckBox("Save Password");
+	m_savePassword = new CheckBox("Save Password", this);
 	m_savePassword->setObjectName("LogInDialogSavePassword");
 
-	Label* spacerLabel1 = new Label;
-	Label* spacerLabel2 = new Label;
+	Label* spacerLabel1 = new Label(this);
+	Label* spacerLabel2 = new Label(this);
 
-	m_logInButton = new PushButton("Log In");
-	m_registerButton = new PushButton("Register");
+	m_logInButton = new PushButton("Log In", this);
+	m_registerButton = new PushButton("Register", this);
 	m_registerButton->setHidden(true);
-	m_changePasswordButton = new PushButton("Change Password");
+	m_changePasswordButton = new PushButton("Change Password", this);
 	m_changePasswordButton->setHidden(true);
-	m_exitButton = new PushButton("Exit");
+	m_exitButton = new PushButton("Exit", this);
 
 	// Initialize data
 	std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
@@ -163,7 +163,7 @@ LogInDialog::LogInDialog()
 
 
 	// ... Setup optional inputs (this section may be disabled when a registration is not allowed)
-	m_toggleRegisterModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToRegister);
+	m_toggleRegisterModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToRegister, this);
 	m_toggleRegisterModeLabel->setObjectName("LogInDialogRegisterLabel");
 	m_toggleRegisterModeLabel->setMargin(4);
 	registerLayout->addStretch(1);
@@ -171,7 +171,7 @@ LogInDialog::LogInDialog()
 	registerLayout->addStretch(1);
 	this->connect(m_toggleRegisterModeLabel, &Label::mouseClicked, this, &LogInDialog::slotToggleLogInAndRegisterMode);
 
-	m_toggleChangePasswordModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToChangePassword);
+	m_toggleChangePasswordModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToChangePassword, this);
 	m_toggleChangePasswordModeLabel->setObjectName("LogInDialogChangePasswordLabel");
 	m_toggleChangePasswordModeLabel->setMargin(4);
 	m_toggleChangePasswordModeLabel->setVisible(false);
@@ -474,7 +474,7 @@ void LogInDialog::slotGSSChanged() {
 		return;
 	}
 
-	LogInGSSEditDialog dialog(m_gssData);
+	LogInGSSEditDialog dialog(m_gssData, this);
 
 	ot::Dialog::DialogResult result = dialog.showDialog();
 

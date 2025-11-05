@@ -32,9 +32,10 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PixmapWidget)
 		OT_DECL_NOMOVE(PixmapWidget)
+		OT_DECL_NODEFAULT(PixmapWidget)
 	public:
-		PixmapWidget();
-		PixmapWidget(const QPixmap& _pixmap);
+		explicit PixmapWidget(QWidget* _parent);
+		explicit PixmapWidget(const QPixmap& _pixmap, QWidget* _parent);
 		virtual ~PixmapWidget();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

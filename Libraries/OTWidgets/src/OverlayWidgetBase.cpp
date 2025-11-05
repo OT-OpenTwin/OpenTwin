@@ -26,7 +26,7 @@
 #include <QtGui/qevent.h>
 
 ot::OverlayWidgetBase::OverlayWidgetBase(QWidget* _parent, Alignment _overlayAlignment, const QMargins& _overlayMargins)
-    : QFrame(nullptr, Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint), m_parent(_parent), 
+    : QFrame(_parent, Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint), m_parent(_parent), 
     m_alignment(_overlayAlignment), m_margins(_overlayMargins), m_hidden(false)
 {
     OTAssertNullptr(m_parent);

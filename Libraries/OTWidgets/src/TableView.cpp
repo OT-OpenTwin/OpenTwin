@@ -20,12 +20,18 @@
 // OpenTwin header
 #include "OTWidgets/Table.h"
 #include "OTWidgets/TableView.h"
+#include "OTWidgets/WidgetViewDock.h"
 
-ot::TableView::TableView(Table* _table)
-	: WidgetView(WidgetViewBase::ViewTable), m_table(_table)
+ot::TableView::TableView(QWidget* _parent) : TableView(nullptr, _parent) {}
+
+ot::TableView::TableView(Table* _table, QWidget* _parent)
+	: WidgetView(WidgetViewBase::ViewTable, _parent), m_table(_table)
 {
 	if (!m_table) {
-		m_table = new Table;
+		m_table = new Table(getViewDockWidget());
+	}
+	else {
+		m_table->setParent(getViewDockWidget());
 	}
 
 	this->addWidgetInterfaceToDock(m_table);

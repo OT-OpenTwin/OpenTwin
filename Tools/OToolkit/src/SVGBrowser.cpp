@@ -36,10 +36,10 @@ SVGBrowser::~SVGBrowser() {
 }
 
 bool SVGBrowser::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
-	m_grid = new SVGWidgetGrid;
+	m_grid = new SVGWidgetGrid(nullptr);
 	_content.addView(this->createCentralWidgetView(m_grid->getQWidget(), "SVG View"));
 
-	DirectoryBrowser* newBrowser = new DirectoryBrowser;
+	DirectoryBrowser* newBrowser = new DirectoryBrowser(m_grid->getQWidget());
 
 	_content.addView(this->createSideWidgetView(newBrowser->getQWidget(), "SVG Browser"));
 

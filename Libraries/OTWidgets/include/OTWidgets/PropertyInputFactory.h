@@ -36,11 +36,11 @@ namespace ot {
 		OT_DECL_NOCOPY(PropertyInputFactory)
 		OT_DECL_NOMOVE(PropertyInputFactory)
 	public:
-		using PropertyInputConstructor = std::function<PropertyInput* ()>;
+		using PropertyInputConstructor = std::function<PropertyInput* (QWidget*)>;
 
-		static PropertyInputFactory& instance(void);
-		static PropertyInput* createInput(const std::string& _key);
-		static PropertyInput* createInput(const Property* _config);
+		static PropertyInputFactory& instance();
+		static PropertyInput* createInput(const std::string& _key, QWidget* _parent);
+		static PropertyInput* createInput(const Property* _config, QWidget* _parent);
 		static bool registerPropertyInput(const std::string& _key, const PropertyInputConstructor& _constructor);
 	private:
 		PropertyInputFactory() {};

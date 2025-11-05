@@ -46,8 +46,11 @@ namespace ot {
 
 class ImageEditorToolBar : public QToolBar {
 	Q_OBJECT
+	OT_DECL_NOCOPY(ImageEditorToolBar)
+	OT_DECL_NOMOVE(ImageEditorToolBar)
+	OT_DECL_NODEFAULT(ImageEditorToolBar)
 public:
-	ImageEditorToolBar();
+	ImageEditorToolBar(QWidget* _parent);
 	virtual ~ImageEditorToolBar();
 
 	void setFromColor(const QColor& _color);

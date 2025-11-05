@@ -27,16 +27,29 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qcolordialog.h>
 
+ot::ColorPickButton::ColorPickButton(QWidget* _parent) : ColorPickButton(QColor(), _parent) {}
+
+ot::ColorPickButton::ColorPickButton(const ot::Color& _color, QWidget* _parent) : ColorPickButton(QtFactory::toQColor(_color), _parent) {}
+
 ot::ColorPickButton::ColorPickButton(const QColor& _color, QWidget* _parent)
 	: QFrame(_parent), m_editAlpha(false), m_useCustomToolTip(false)
 {
-	this->ini(_color);
-}
+	// Create layout and controls
+	QHBoxLayout* cLay = new QHBoxLayout(this);
+	cLay->setContentsMargins(0, 0, 0, 0);
 
-ot::ColorPickButton::ColorPickButton(const ot::Color& _color, QWidget* _parent) 
-	: QFrame(_parent), m_editAlpha(false), m_useCustomToolTip(false)
-{
-	this->ini(QtFactory::toQColor(_color));
+	m_btn = new PushButton(this);
+	m_view = new ColorPreviewBox(_color, this);
+
+	// Setup layout
+	cLay->addWidget(m_view);
+	cLay->addWidget(m_btn, 1);
+
+	// Initialize text
+	this->updateButtonText();
+
+	// Connect signals
+	this->connect(m_btn, &QPushButton::clicked, this, &ColorPickButton::slotBrowse);
 }
 
 ot::ColorPickButton::~ColorPickButton() {}
@@ -118,23 +131,4 @@ void ot::ColorPickButton::updateButtonText(void) {
 		}
 	}
 	
-}
-
-void ot::ColorPickButton::ini(const QColor& _color) {
-	// Create layout and controls
-	QHBoxLayout* cLay = new QHBoxLayout(this);
-	cLay->setContentsMargins(0, 0, 0, 0);
-
-	m_btn = new PushButton;
-	m_view = new ColorPreviewBox(_color);
-
-	// Setup layout
-	cLay->addWidget(m_view);
-	cLay->addWidget(m_btn, 1);
-
-	// Initialize text
-	this->updateButtonText();
-
-	// Connect signals
-	this->connect(m_btn, &QPushButton::clicked, this, &ColorPickButton::slotBrowse);
 }

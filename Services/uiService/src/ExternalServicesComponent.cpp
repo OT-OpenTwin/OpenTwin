@@ -2537,7 +2537,7 @@ void ExternalServicesComponent::handlePromptInformation(ot::JsonDocument& _docum
 	std::string sender = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
 	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
 
-	ot::MessageDialogCfg::BasicButton result = AppBase::instance()->showPrompt(config);
+	ot::MessageDialogCfg::BasicButton result = AppBase::instance()->showPrompt(config, AppBase::instance()->mainWindow());
 
 	std::string queryResult = ot::MessageDialogCfg::toString(result);
 
@@ -4089,7 +4089,7 @@ void ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _document)
 	ot::MessageDialogCfg cfg;
 	cfg.setFromJsonObject(cfgObj);
 
-	ot::MessageDialogCfg::BasicButton result = ot::MessageDialog::showDialog(cfg);
+	ot::MessageDialogCfg::BasicButton result = ot::MessageDialog::showDialog(cfg, AppBase::instance()->mainWindow());
 
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_MessageDialogValue, responseDoc.GetAllocator()), responseDoc.GetAllocator());
@@ -4129,7 +4129,7 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 	responseDoc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(dbServerUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 	// Show dialog
-	ot::ModelLibraryDialog dia(std::move(cfg));
+	ot::ModelLibraryDialog dia(std::move(cfg), AppBase::instance()->mainWindow());
 	if (dia.showDialog() == ot::Dialog::Ok) {
 		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ModelDialogConfirmed, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 		responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(dia.getSelectedName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());

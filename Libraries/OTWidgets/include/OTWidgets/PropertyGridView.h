@@ -28,8 +28,11 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PropertyGridView : public WidgetView {
 		OT_DECL_NOCOPY(PropertyGridView)
+		OT_DECL_NOMOVE(PropertyGridView)
+		OT_DECL_NODEFAULT(PropertyGridView)
 	public:
-		PropertyGridView(PropertyGrid* _propertyGrid = (PropertyGrid*)nullptr);
+		explicit PropertyGridView(QWidget* _parent);
+		explicit PropertyGridView(PropertyGrid* _propertyGrid, QWidget* _parent);
 		virtual ~PropertyGridView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
