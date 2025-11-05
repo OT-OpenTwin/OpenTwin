@@ -67,6 +67,8 @@ public:
 
 	void printParameter() const;
 
+	std::string getDetailedDescriptionFormattedForSphinx() const;
+
 private:
 	std::string m_name;
 	DataType m_dataType;

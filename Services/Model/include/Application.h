@@ -55,7 +55,8 @@ public:
 	//api @security mTLS
 	//api @action OT_ACTION_CMD_PROJ_Save
 	//api @brief Saves a project in the database.
-	//api @return In case of success will return an empty String. In case of error will return a String with prefix "Error: ".
+	//api @return In case of success will return an empty String.
+	//api In case of error will return a String with prefix "Error: ".
 	void handleProjectSave();
 
 //	//api @security mTLS

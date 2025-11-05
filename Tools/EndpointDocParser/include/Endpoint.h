@@ -36,8 +36,6 @@ public:
 	enum DescriptionType {
 		detailedDescription,
 		detailedResponseDescription,
-		detailedParameterDescripition,
-		detailedResponseParameterDescription
 	};
 
 	Endpoint();

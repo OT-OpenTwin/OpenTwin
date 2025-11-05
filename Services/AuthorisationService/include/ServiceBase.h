@@ -76,7 +76,6 @@ private:
 	//api @Brief Processes the login of an administrator.
 	//api This is the detailed description.
 	//api This is the second line of the detailed description.
-	//api
 	//api @NOTE This is an important note.
 	//api This line belongs to the note block.
 	//api @Endnote
@@ -84,20 +83,23 @@ private:
 	//api
 	//api This line belongs to the warning block.
 	//api @Endwarning	
-	//api This is the fifth line of the detailed description.
+	//api This is the third line of the detailed description.
 	//api @PARAM OT_PARAM_AUTH_USERNAME String User name
 	//api This is the detailed description of OT_PARAM_AUTH_USERNAME.
+	//api
 	//api This is the second line of the detailed description of OT_PARAM_AUTH_USERNAME.
 	//api @NOte This is a note in the detailed description of OT_PARAM_AUTH_USERNAME.
+	//api
 	//api This is the second line in the note block of OT_PARAM_AUTH_USERNAME.
 	//api @WARNING This warning follows the note block.
 	//api This is the second line in the warning block of OT_PARAM_AUTH_USERNAME.
 	//api @endwarning
-	//api This is the fourth line in the detailed description of OT_PARAM_AUTH_USERNAME.
+	//api This is the third line in the detailed description of OT_PARAM_AUTH_USERNAME.
 	//api @note This is a note.
 	//api @endnote
 	//api @param OT_PARAM_AUTH_PASSWORD String User password
 	//api This is the detailed description of OT_PARAM_AUTH_PASSWORD.
+	//api
 	//api This is the second line of the detailed description of OT_PARAM_AUTH_PASSWORD.
 	//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 
 	//api This is the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
@@ -113,7 +115,7 @@ private:
 	//api @Warning This warning follows the note block.
 	//api This is the second line in the warning block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api @endwarning
-	//api This is the fourth line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api This is the third line in the response description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api @return This is the response desciption of OT_ACTION_LOGIN_ADMIN.
 	//api This is the second line of the response description of OT_ACTION_LOGIN_ADMIN.
 	//api
@@ -124,7 +126,7 @@ private:
 	//api
 	//api This line belongs to the warning block.
 	//api @endwarning
-	//api This is the fifth line of the response description of OT_ACTION_LOGIN_ADMIN.
+	//api This is the third line of the response description of OT_ACTION_LOGIN_ADMIN.
 	std::string handleAdminLogIn(const ot::ConstJsonObject& _actionDocument);
 	
 	//api @security TLS
@@ -149,7 +151,7 @@ private:
 	//api @warning This warning follows the note block.
 	//api This is the second line in the warning block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api @endwarning
-	//api This is the fourth line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api This is the third line in the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api @return This is the response desciption of OT_ACTION_LOGIN.
 	//api This is the second line of the response description of OT_ACTION_LOGIN.
 	//api
@@ -160,7 +162,7 @@ private:
 	//api
 	//api This line belongs to the warning block.
 	//api @endwarning
-	//api This is the fifth line of the response description of OT_ACTION_LOGIN.
+	//api This is the third line of the response description of OT_ACTION_LOGIN.
 	std::string handleLogIn(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRegister(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRefreshSession(const ot::ConstJsonObject& _actionDocument);

@@ -85,6 +85,9 @@ std::string Endpoint::getDetailedDescriptionFormattedForSphinx(DescriptionType _
 
     bool inNoteBlock = false;
     bool inWarningBlock = false;
+    bool isFirstLine = true;
+    bool lastLineWasEmpty = false;
+    bool paragraphBreakAdded = false;
 
     switch (_descriptionType) {
     case Endpoint::detailedDescription:
@@ -96,8 +99,9 @@ std::string Endpoint::getDetailedDescriptionFormattedForSphinx(DescriptionType _
         OT_LOG_D("Converting detailed response description into Sphinx format.");
         break;
     }
-    
+
     for (const std::string& line : detailedDescription) {
+        // Check if line starts with @note
         if (Application::startsWith(line, "@note")) {
             // Close any open warning block
             if (inWarningBlock) {
@@ -107,6 +111,9 @@ std::string Endpoint::getDetailedDescriptionFormattedForSphinx(DescriptionType _
 
             // Start new note block if not already in one
             if (!inNoteBlock) {
+                if (!isFirstLine) {
+                    out << "\n";
+                }
                 out << ".. note::\n\n";
                 inNoteBlock = true;
             }
@@ -117,13 +124,18 @@ std::string Endpoint::getDetailedDescriptionFormattedForSphinx(DescriptionType _
                 content = content.substr(1);
             }
 
-            // Add content with proper indentation
+            // Add content with proper indentation and pipe format
             if (!content.empty()) {
-                out << "   " << content << "\n";
+                out << "   | " << content << "\n";
+                paragraphBreakAdded = false;
             }
             else {
-                out << "\n"; // Empty line creates paragraph break within note block
+                // Empty @note line creates paragraph break within note block
+                out << "   |\n";
+                paragraphBreakAdded = true;
             }
+
+            lastLineWasEmpty = content.empty();
         }
         // Check if line starts with @warning
         else if (Application::startsWith(line, "@warning")) {
@@ -135,6 +147,9 @@ std::string Endpoint::getDetailedDescriptionFormattedForSphinx(DescriptionType _
 
             // Start new warning block if not already in one
             if (!inWarningBlock) {
+                if (!isFirstLine) {
+                    out << "\n";
+                }
                 out << ".. warning::\n\n";
                 inWarningBlock = true;
             }
@@ -145,13 +160,18 @@ std::string Endpoint::getDetailedDescriptionFormattedForSphinx(DescriptionType _
                 content = content.substr(1);
             }
 
-            // Add content with proper indentation
+            // Add content with proper indentation and pipe format
             if (!content.empty()) {
-                out << "   " << content << "\n";
+                out << "   | " << content << "\n";
+                paragraphBreakAdded = false;
             }
             else {
-                out << "\n"; // Empty line creates paragraph break within warning block
+                // Empty @warning line creates paragraph break within warning block
+                out << "   |\n";
+                paragraphBreakAdded = true;
             }
+
+            lastLineWasEmpty = content.empty();
         }
         // Regular line (not @note or @warning)
         else {
@@ -160,16 +180,36 @@ std::string Endpoint::getDetailedDescriptionFormattedForSphinx(DescriptionType _
                 out << "\n";
                 inNoteBlock = false;
                 inWarningBlock = false;
+                paragraphBreakAdded = false;
             }
 
-            // Add regular content
+            // Handle empty lines as paragraph breaks
             if (line.empty()) {
-                out << "\n"; // Empty line creates paragraph break
+                if (!isFirstLine && !lastLineWasEmpty && !paragraphBreakAdded) {
+                    out << "|\n";
+                    paragraphBreakAdded = true;
+                }
+                lastLineWasEmpty = true;
             }
             else {
-                out << line << "\n";
+                // Don't add extra paragraph break if one was already added for the empty line
+                if (lastLineWasEmpty && !isFirstLine && !paragraphBreakAdded) {
+                    out << "|\n";
+                }
+
+                if (isFirstLine) {
+                    out << "| " << line << "\n";
+                }
+                else {
+                    out << "| " << line << "\n";
+                }
+
+                lastLineWasEmpty = false;
+                paragraphBreakAdded = false;
             }
         }
+
+        isFirstLine = false;
     }
 
     // Close any remaining open blocks
@@ -177,5 +217,11 @@ std::string Endpoint::getDetailedDescriptionFormattedForSphinx(DescriptionType _
         out << "\n";
     }
 
-    return out.str();
+    // Remove trailing newline to avoid extra spacing
+    std::string result = out.str();
+    if (!result.empty() && result.back() == '\n') {
+        result.pop_back();
+    }
+
+    return result;
 }

@@ -877,9 +877,9 @@ std::string Application::generateServiceRstContent(const Service& _service) {
 			for (const Parameter& param : ep.getParameters()) {
 				out << "    * - " << param.getName() << "\n"
 					<< "      - " << param.getDataTypeString() << "\n"
-//					<< "      - " << param.getDescriptionFormattedForSphinx() << "\n"
-					<< "      - Description ...\n"
+					<< "      - " << param.getDetailedDescriptionFormattedForSphinx() << "\n"
 					<< "      - " << param.getMacro() << "\n";
+				
 			}
 
 			out << "\n";
@@ -905,8 +905,7 @@ std::string Application::generateServiceRstContent(const Service& _service) {
 			for (const Parameter& rparam : ep.getResponseParameters()) {
 				out << "    * - " << rparam.getName() << "\n"
 					<< "      - " << rparam.getDataTypeString() << "\n"
-//					<< "      - " << rparam.getDescriptionFormattedForSphinx() << "\n"
-					<< "      - Description ...\n"
+					<< "      - " << rparam.getDetailedDescriptionFormattedForSphinx() << "\n"
 					<< "      - " << rparam.getMacro() << "\n";
 			}
 		}
