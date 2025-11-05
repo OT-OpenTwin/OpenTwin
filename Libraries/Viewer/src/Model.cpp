@@ -3458,3 +3458,17 @@ void Model::removeFromMaps(const SceneNodeBase* _node) {
 	treeItemToSceneNodesMap.erase(_node->getTreeItemID());
 	modelItemToSceneNodesMap.erase(_node->getModelEntityID());
 }
+
+void Model::setTransparency(double transparencyValue)
+{
+	auto setTransparencyRecursive = [&](SceneNodeBase* node, auto&& setTransparencyRecursiveRef) -> void
+	{
+		node->setTransparency(transparencyValue);
+		for (auto child : node->getChildren())
+		{
+			setTransparencyRecursiveRef(child, setTransparencyRecursiveRef);
+		}
+	};
+
+	setTransparencyRecursive(sceneNodesRoot, setTransparencyRecursive);
+}

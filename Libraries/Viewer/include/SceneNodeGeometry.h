@@ -123,6 +123,8 @@ public:
 	void setCutCapGeometryEdges(osg::ref_ptr<osg::Geometry> &geometry);
 	void deleteCutCapGeometryEdges();
 
+	virtual void setTransparency(double value) override;
+
 private:
 	void deleteShapeNode(void);
 	osg::Node *createOSGNodeFromTriangles(double colorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, bool backFaceCulling, double offsetFactor, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles);
@@ -163,7 +165,7 @@ private:
 	osg::StateAttribute *textureAttribute;
 	osg::TexGen *textureAttributeGen;
 	osg::TexEnv *textureAttributeEnv;
-	double edgeTranspacency;
+	double edgeTransparency;
 	osg::Matrix transformationMatrix;
 	osg::ref_ptr<osg::Geometry> cutCapGeometryTriangles;
 	osg::ref_ptr<osg::Geometry> cutCapGeometryEdges;

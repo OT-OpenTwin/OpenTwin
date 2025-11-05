@@ -68,7 +68,9 @@ public:
 	std::string geometryEdgeColorMode_geom;
 	std::string geometryEdgeColorMode_custom;
 	std::string geometryEdgeColorMode_noColor;
+	double geometrySelectionTransparency;
 	ot::Color geometryHighlightColor;
+	double geometryHighlightLineWidth;
 	ot::Color geometryEdgeColor;
 	std::string geometryLightSourceDistance;
 

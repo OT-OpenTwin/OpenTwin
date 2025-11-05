@@ -36,7 +36,7 @@ namespace osg
 class SceneNodeAnnotation : public SceneNodeBase
 {
 public:
-	SceneNodeAnnotation() : triangles(nullptr), edges(nullptr), edgesHighlighted(nullptr), vertices(nullptr), verticesHighlighted(nullptr) {};
+	SceneNodeAnnotation();
 	virtual ~SceneNodeAnnotation();
 
 	virtual void setTransparent(bool t) override;
@@ -53,6 +53,8 @@ public:
 							const std::vector<std::array<double, 3>> &triangle_rgb);
 
 	virtual bool isItem3D(void) const override { return true; };
+
+	virtual void setTransparency(double value) override;
 
 private:
 	osg::Node * createOSGNodeFromTriangles(const std::vector<std::array<double, 3>> &triangle_p1,

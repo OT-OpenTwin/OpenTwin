@@ -86,6 +86,8 @@ public:
 	void setFaceListStorage(const std::string &proj, unsigned long long id, unsigned long long version) { projectName = proj; faceListEntityID = id, faceListEntityVersion = version; }
 	void setNodeListStorage(unsigned long long id, unsigned long long version) { nodeListEntityID = id, nodeListEntityVersion = version; }
 
+	virtual void setTransparency(double value) override;
+
 private:
 	osg::Node *createOSGNodeFromCoordinates(const std::vector<double> &x, const std::vector<double> &y, const std::vector<double> &z);
 	void get1DBounds(const std::vector<double> &coords, double &min, double &max);

@@ -51,9 +51,10 @@ SceneNodeCartesianMesh::SceneNodeCartesianMesh() :
 	faceListEntityID(0),
 	faceListEntityVersion(0),
 	nodeListEntityID(0),
-	nodeListEntityVersion(0)
+	nodeListEntityVersion(0),
+	needsInitialization(true)
 {
-
+	m_transparency = ViewerSettings::instance()->geometrySelectionTransparency;
 }
 
 SceneNodeCartesianMesh::~SceneNodeCartesianMesh()
@@ -811,7 +812,7 @@ osg::Node *SceneNodeCartesianMesh::createFaceNode(osg::ref_ptr<osg::Vec3Array> &
 
 	// Store the color in a color array (the color will be shared among all nodes, so only one entry is needed)
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(0.5, 0.5, 0.5, m_transparency));
+	colors->push_back(osg::Vec4(0.5, 0.5, 0.5, 1.0-m_transparency));
 
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f, 2.0f));
 
@@ -967,16 +968,16 @@ void SceneNodeCartesianMesh::updateFaceStatus(const std::vector<int> &faceID)
 	}
 }
 
-void SceneNodeCartesianMesh::setFaceStatus(int face, bool visible, bool forward, bool doublesided, bool transparent, bool wireframe, double r, double g, double b, SceneNodeBase *owner)
+void SceneNodeCartesianMesh::setFaceStatus(int face, bool visible, bool forward, bool doublesided, bool transparent, bool wireframe, double r, double g, double b, SceneNodeBase* owner)
 {
 	// Check whether face status has really changed
 
-	bool visibilityChanged  = true;
-	bool forwardChanged     = true;
+	bool visibilityChanged = true;
+	bool forwardChanged = true;
 	bool doublesidedChanged = true;
 	bool transparentChanged = true;
-	bool wireframeChanged   = true;
-	bool colorChanged       = true;
+	bool wireframeChanged = true;
+	bool colorChanged = true;
 
 	if (faceStatusCache.count(face) > 0)
 	{
@@ -1001,23 +1002,23 @@ void SceneNodeCartesianMesh::setFaceStatus(int face, bool visible, bool forward,
 	// The face has changed. Cache the new settings
 
 	CartesianMeshFaceStatus newStatusCache;
-	newStatusCache.visible     = visible;
-	newStatusCache.forward     = forward;
+	newStatusCache.visible = visible;
+	newStatusCache.forward = forward;
 	newStatusCache.doublesided = doublesided;
 	newStatusCache.transparent = transparent;
-	newStatusCache.wireframe   = wireframe;
-	newStatusCache.r           = r;
-	newStatusCache.g           = g;
-	newStatusCache.b           = b;
+	newStatusCache.wireframe = wireframe;
+	newStatusCache.r = r;
+	newStatusCache.g = g;
+	newStatusCache.b = b;
 
 	faceStatusCache[face] = newStatusCache;
 
 	// Now modify the face status according to the new settings
 
-	osg::Node *faceNode = faceTriangles[face];
+	osg::Node* faceNode = faceTriangles[face];
 	assert(faceNode != nullptr);
 
-	osg::Node *edgeNode = faceEdges[face];
+	osg::Node* edgeNode = faceEdges[face];
 	assert(edgeNode != nullptr);
 
 	// Set the owner
@@ -1061,7 +1062,7 @@ void SceneNodeCartesianMesh::setFaceStatus(int face, bool visible, bool forward,
 		osg::ref_ptr<osg::Material> material = new osg::Material;
 
 		SceneNodeMaterial sceneNodeMaterial;
-		sceneNodeMaterial.setMaterial(material, "Rough", r, g, b, m_transparency);
+		sceneNodeMaterial.setMaterial(material, "Rough", r, g, b, 1.0-m_transparency);
 
 		faceGeometry->getOrCreateStateSet()->setAttribute(material);
 
@@ -1164,3 +1165,24 @@ void SceneNodeCartesianMesh::removeOwner(SceneNodeCartesianMeshItem *item, const
 	updateFaceStatus(faceID);
 }
 
+void SceneNodeCartesianMesh::setTransparency(double value)
+{
+	SceneNodeBase::setTransparency(value);
+
+	// Reset the transparency for all triangles
+	for (auto& face : faceTriangles)
+	{
+		osg::Geode* faceGeode = dynamic_cast<osg::Geode*>(face.second);
+		assert(faceGeode != nullptr);
+
+		osg::Geometry* faceGeometry = dynamic_cast<osg::Geometry*>(faceGeode->getDrawable(0));
+		assert(faceGeometry != nullptr);
+
+		osg::Material* material = dynamic_cast<osg::Material*>(faceGeometry->getOrCreateStateSet()->getAttribute(osg::StateAttribute::MATERIAL));
+		assert(material != nullptr);
+
+		material->setAlpha(osg::Material::FRONT_AND_BACK, 1.0 - m_transparency);
+
+		faceGeometry->dirtyGLObjects();
+	}
+}

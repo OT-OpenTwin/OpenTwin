@@ -69,6 +69,7 @@ public:
 	
 	bool isTransparent(void) const { return m_transparent; };
 	virtual void setTransparent(bool t) { m_transparent = t; };
+	virtual void setTransparency(double value) { m_transparency = value; };
 
 	bool isWireframe(void) const { return m_wireframe; };
 	virtual void setWireframe(bool w) { m_wireframe = w; };
@@ -120,7 +121,7 @@ public:
 protected:
 	osg::ref_ptr<osg::Switch> m_shapeNode = nullptr;
 	//osg::Switch* m_shapeNode = nullptr;
-	const float m_transparency = 0.15;
+	float m_transparency = 0.85;
 
 private:
 	std::string        m_name = "";

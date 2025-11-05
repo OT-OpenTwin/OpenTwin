@@ -36,6 +36,11 @@
 #include <osg/Point>
 #include <osg/Depth>
 
+SceneNodeAnnotation::SceneNodeAnnotation() : triangles(nullptr), edges(nullptr), edgesHighlighted(nullptr), vertices(nullptr), verticesHighlighted(nullptr)
+{
+	m_transparency = ViewerSettings::instance()->geometrySelectionTransparency;
+}
+
 SceneNodeAnnotation::~SceneNodeAnnotation()
 {
 
@@ -270,9 +275,9 @@ osg::Node * SceneNodeAnnotation::createOSGNodeFromTriangles(const std::vector<st
 		nNormal += 3;
 
 		// Store the color in a color array (the color will be set per vertex, so we need to store the same color three times)
-		colors->at(nColor    ).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], m_transparency);
-		colors->at(nColor + 1).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], m_transparency);
-		colors->at(nColor + 2).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], m_transparency);
+		colors->at(nColor    ).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], 1.0 - m_transparency);
+		colors->at(nColor + 1).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], 1.0 - m_transparency);
+		colors->at(nColor + 2).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], 1.0 - m_transparency);
 
 		nColor += 3;
 	}
@@ -426,7 +431,7 @@ void SceneNodeAnnotation::createOSGNodeFromVertices(const std::vector<std::array
 	for (unsigned long long nV = 0; nV < nVertices; nV++)
 	{
 		vertices->at(nV).set(points[nV][0], points[nV][1], points[nV][2]);
-		colors->at(nV).set(points_rgb[nV][0], points_rgb[nV][1], points_rgb[nV][2], 1.0f);
+		colors->at(nV).set(points_rgb[nV][0], points_rgb[nV][1], points_rgb[nV][2], 1.0f - m_transparency);
 	}
 
 	// Build vertex geometry and node
@@ -498,3 +503,69 @@ void SceneNodeAnnotation::createOSGNodeFromVertices(const std::vector<std::array
 	ssHighlight->setAttributeAndModes(depth, osg::StateAttribute::ON);
 	ssHighlight->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
 }
+
+void SceneNodeAnnotation::setTransparency(double value)
+{
+	SceneNodeBase::setTransparency(value);
+
+	// Update the triangle transparency
+	osg::Geode* triangleGeode = dynamic_cast<osg::Geode*>(triangles);
+	if (triangleGeode != nullptr)
+	{
+		osg::Geometry* triangleGeometry = dynamic_cast<osg::Geometry*>(triangleGeode->getDrawable(0));
+		assert(triangleGeometry != nullptr);
+
+		osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(triangleGeometry->getColorArray());
+		if (colorArray != nullptr)
+		{
+			for (auto& color : *colorArray)
+			{
+				color[3] = 1.0 - m_transparency;
+			}
+		}
+
+		colorArray->dirty();
+		triangleGeometry->dirtyGLObjects();
+	}
+
+	// Update the edge transparency
+	osg::Geode* edgesGeode = dynamic_cast<osg::Geode*>(edges);
+	if (edgesGeode != nullptr)
+	{
+		osg::Geometry* edgesGeometry = dynamic_cast<osg::Geometry*>(edgesGeode->getDrawable(0));
+		assert(edgesGeometry != nullptr);
+
+		osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(edgesGeometry->getColorArray());
+		if (colorArray != nullptr)
+		{
+			for (auto& color : *colorArray)
+			{
+				color[3] = 1.0 - m_transparency;
+			}
+		}
+
+		colorArray->dirty();
+		edgesGeometry->dirtyGLObjects();
+	}
+
+	// Update the vertex transparency
+	osg::Geode* verticesGeode = dynamic_cast<osg::Geode*>(vertices);
+	if (verticesGeode != nullptr)
+	{
+		osg::Geometry* verticesGeometry = dynamic_cast<osg::Geometry*>(verticesGeode->getDrawable(0));
+		assert(verticesGeometry != nullptr);
+
+		osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(verticesGeometry->getColorArray());
+		if (colorArray != nullptr)
+		{
+			for (auto& color : *colorArray)
+			{
+				color[3] = 1.0 - m_transparency;
+			}
+		}
+
+		colorArray->dirty();
+		verticesGeometry->dirtyGLObjects();
+	}
+}
+

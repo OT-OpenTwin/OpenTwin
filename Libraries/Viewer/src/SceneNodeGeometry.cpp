@@ -74,10 +74,10 @@ SceneNodeGeometry::SceneNodeGeometry() :
 	textureAttribute(nullptr),
 	textureAttributeGen(nullptr),
 	textureAttributeEnv(nullptr),
-	edgeTranspacency(0.15),
 	cutCapGeometryTriangles(nullptr),
 	cutCapGeometryEdges(nullptr)
 {
+	edgeTransparency = m_transparency = ViewerSettings::instance()->geometrySelectionTransparency;
 }
 
 SceneNodeGeometry::~SceneNodeGeometry()
@@ -557,7 +557,7 @@ osg::Node * SceneNodeGeometry::createOSGNodeFromTriangles(double colorRGB[3], co
 	osg::ref_ptr<osg::Material> material = new osg::Material;
 
 	SceneNodeMaterial sceneNodeMaterial;
-	auto materialSet = sceneNodeMaterial.setMaterial(material, materialType, colorRGB[0], colorRGB[1], colorRGB[2], m_transparency);
+	auto materialSet = sceneNodeMaterial.setMaterial(material, materialType, colorRGB[0], colorRGB[1], colorRGB[2], 1.0-m_transparency);
 
 	bool applyTexture = (textureType != "None");
 
@@ -600,7 +600,7 @@ osg::Node * SceneNodeGeometry::createOSGNodeFromTriangles(double colorRGB[3], co
 
 	// Store the color in a color array (the color will be shared among all nodes, so only one entry is needed)
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(colorRGB[0], colorRGB[1], colorRGB[2], m_transparency));
+	colors->push_back(osg::Vec4(colorRGB[0], colorRGB[1], colorRGB[2], 1.0-m_transparency));
 
 	// Create the geometry object to store the data
 	osg::ref_ptr<osg::Geometry> newGeometry = new osg::Geometry;
@@ -703,7 +703,7 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 	}
 
 	// Now build the osg nodes for the edge and the selected edge
-	edgesNode = buildEdgesOSGNode(nEdges, vertices, colorRGB[0], colorRGB[1], colorRGB[2], edgeTranspacency, true, 1.0);
+	edgesNode = buildEdgesOSGNode(nEdges, vertices, colorRGB[0], colorRGB[1], colorRGB[2], 1.0-edgeTransparency, true, 1.0);
 	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices, 1.0, 0.0, 0.0, 1.0, true, 2.5);
 
 	if (!backFaceCulling)
@@ -1119,7 +1119,7 @@ void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], double edge
 				osg::ref_ptr<osg::Material> material = new osg::Material;
 
 				SceneNodeMaterial sceneNodeMaterial;
-				sceneNodeMaterial.setMaterial(material, materialType, surfaceColorRGB[0], surfaceColorRGB[1], surfaceColorRGB[2], m_transparency);
+				sceneNodeMaterial.setMaterial(material, materialType, surfaceColorRGB[0], surfaceColorRGB[1], surfaceColorRGB[2], 1.0-m_transparency);
 
 				geometry->getOrCreateStateSet()->setAttribute(material);
 
@@ -1162,7 +1162,7 @@ void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], double edge
 
 				if (colorArray != nullptr)
 				{
-					(*colorArray)[0] = osg::Vec4(edgeColorRGB[0], edgeColorRGB[1], edgeColorRGB[2], edgeTranspacency);
+					(*colorArray)[0] = osg::Vec4(edgeColorRGB[0], edgeColorRGB[1], edgeColorRGB[2], 1.0-edgeTransparency);
 				}
 
 				geometry->dirtyGLObjects();
@@ -1352,4 +1352,11 @@ osg::Node* SceneNodeGeometry::addSelectedEdge(unsigned long long faceId1, unsign
 	getShapeNode()->addChild(selected);
 
 	return selected;
+}
+
+void SceneNodeGeometry::setTransparency(double value)
+{
+	SceneNodeBase::setTransparency(value);
+
+	updateObjectColor(surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective);
 }

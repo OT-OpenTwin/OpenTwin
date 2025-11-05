@@ -81,6 +81,8 @@ public:
 	bool getDisplayTetEdges(void) { return displayTetEdges; }
 	void setDisplayTetEdges(bool displayEdges);
 
+	virtual void setTransparency(double value) override;
+
 private:
 	void loadMeshData(bsoncxx::builder::basic::document &doc);
 	void loadCoordinates(unsigned long long meshNodesID, unsigned long long meshNodesVersion, double *&coordX, double *&coordY, double *&coordZ);

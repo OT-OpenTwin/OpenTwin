@@ -1169,13 +1169,33 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, const 
 	ViewerSettings *settings = ViewerSettings::instance();
 
 	// Check the item (Group:Subgroup:...:Item)
-	if (_logicalName == "Geometry/Highlight Color") {
-		const ot::PropertyColor *actualItem = dynamic_cast<const ot::PropertyColor *>(_item);
+		if (_logicalName == "Geometry/Selection Transparency") {
+		const ot::PropertyDouble *actualItem = dynamic_cast<const ot::PropertyDouble*>(_item);
+		if (actualItem == nullptr) {
+			OTAssert(0, "Cast item fialed");
+			return true;
+		}
+		settings->geometrySelectionTransparency = actualItem->getValue();
+		getModel()->setTransparency(settings->geometrySelectionTransparency);
+		refresh();
+		return true;
+	}
+	else if (_logicalName == "Geometry/Highlight Color") {
+		const ot::PropertyColor* actualItem = dynamic_cast<const ot::PropertyColor*>(_item);
 		if (actualItem == nullptr) {
 			OTAssert(0, "Cast item fialed");
 			return true;
 		}
 		settings->geometryHighlightColor = actualItem->getValue();
+		return true;
+	}
+	else if (_logicalName == "Geometry/Highlight Line Width") {
+		const ot::PropertyDouble *actualItem = dynamic_cast<const ot::PropertyDouble *>(_item);
+		if (actualItem == nullptr) {
+			OTAssert(0, "Cast item fialed");
+			return true;
+		}
+		settings->geometryHighlightLineWidth = actualItem->getValue();
 		return true;
 	}
 	else if (_logicalName == "Geometry/Edge Color Mode") {
@@ -1187,6 +1207,15 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, const 
 		settings->geometryEdgeColorMode = actualItem->getCurrent();
 		_settingsUpdateRequired = true;
 		return true;
+	}
+	else if (_logicalName == "Geometry/Edge Color") {
+			const ot::PropertyColor* actualItem = dynamic_cast<const ot::PropertyColor*>(_item);
+			if (actualItem == nullptr) {
+				OTAssert(0, "Cast item fialed");
+				return true;
+			}
+			settings->geometryEdgeColor = actualItem->getValue();
+			return true;
 	}
 	else if (_logicalName == "Geometry/Light Source Distance") {
 		const ot::PropertyStringList * actualItem = dynamic_cast<const ot::PropertyStringList *>(_item);
@@ -1333,8 +1362,11 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	const ot::PropertyBool *axisCrossDashedLineVisible = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Axis Cross/Negative Visible"));
 	const ot::PropertyBool *axisCrossCenterCrossAlswaysAtFront = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Axis Cross/Keep At Front"));
 
-	const ot::PropertyColor *geometryHighlightColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/Highlight Color"));
+	const ot::PropertyDouble* geometrySelectionTransparency = dynamic_cast<const ot::PropertyDouble*>(_dataset.findPropertyByPath("Geometry/Selection Transparency"));
+	const ot::PropertyColor* geometryHighlightColor = dynamic_cast<const ot::PropertyColor*>(_dataset.findPropertyByPath("Geometry/Highlight Color"));
+	const ot::PropertyDouble* geometryHighlightLineWidth = dynamic_cast<const ot::PropertyDouble*>(_dataset.findPropertyByPath("Geometry/Highlight Line Width"));
 	const ot::PropertyStringList *geometryEdgeColorMode = dynamic_cast<const ot::PropertyStringList *>(_dataset.findPropertyByPath("Geometry/Edge Color Mode"));
+	const ot::PropertyColor* geometryEdgeColor = dynamic_cast<const ot::PropertyColor*>(_dataset.findPropertyByPath("Geometry/Edge Color"));
 	const ot::PropertyStringList *geometryLightSourceDistance = dynamic_cast<const ot::PropertyStringList *>(_dataset.findPropertyByPath("Geometry/Light Source Distance"));
 	const ot::PropertyBool *geometryViewBackgroundColorAutomatic = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Geometry/Automatic View Background Color"));
 	const ot::PropertyColor *geometryViewBackgroundColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Background Color"));
@@ -1375,8 +1407,11 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	if (axisCrossDashedLineVisible) { settings->axisCenterCrossDashedLineVisible = axisCrossDashedLineVisible->getValue(); }
 	if (axisCrossCenterCrossAlswaysAtFront) { settings->axisCenterCrossLineAtFront = axisCrossCenterCrossAlswaysAtFront->getValue(); }
 
+	if (geometrySelectionTransparency) { settings->geometrySelectionTransparency = geometrySelectionTransparency->getValue(); }
 	if (geometryHighlightColor) { settings->geometryHighlightColor = geometryHighlightColor->getValue(); }
+	if (geometryHighlightLineWidth) { settings->geometryHighlightLineWidth = geometryHighlightLineWidth->getValue(); }
 	if (geometryEdgeColorMode) { settings->geometryEdgeColorMode = geometryEdgeColorMode->getCurrent(); }
+	if (geometryEdgeColor) { settings->geometryEdgeColor = geometryEdgeColor->getValue(); }
 	if (geometryLightSourceDistance) { settings->geometryLightSourceDistance = geometryLightSourceDistance->getCurrent(); }
 	if (geometryViewBackgroundColorAutomatic) { settings->viewBackgroundColorAutomatic = geometryViewBackgroundColorAutomatic->getValue(); }
 	if (geometryViewBackgroundColor) { settings->viewBackgroundColor = geometryViewBackgroundColor->getValue(); }
@@ -1546,7 +1581,9 @@ ot::PropertyGridCfg Viewer::createSettings(void) {
 	{
 		// Data#
 		PropertyGroup* geometry = new ot::PropertyGroup("Geometry");
+		PropertyDouble* geometrySelectionTransparency = new PropertyDouble("Selection Transparency", settings->geometrySelectionTransparency);
 		PropertyColor* geometryHightlightColor = new PropertyColor("Highlight Color", settings->geometryHighlightColor);
+		PropertyDouble* geometryHightlightLineWidth = new PropertyDouble("Highlight Line Width", settings->geometryHighlightLineWidth);
 		PropertyStringList* geometryEdgeColorMode = new PropertyStringList("Edge Color Mode", settings->geometryEdgeColorMode, std::list<std::string>({ settings->geometryEdgeColorMode_custom, settings->geometryEdgeColorMode_geom, settings->geometryEdgeColorMode_noColor }));
 		PropertyColor* geometryEdgeColor = new PropertyColor("Edge Color", settings->geometryEdgeColor);
 		PropertyStringList* geometryLightSourceDistance = new PropertyStringList("Light Source Distance", settings->geometryLightSourceDistance, std::list<std::string>({ "Low", "Medium", "High", "Infinite" }));
@@ -1557,10 +1594,14 @@ ot::PropertyGridCfg Viewer::createSettings(void) {
 		// Visibility
 		viewBackgroundColor->setPropertyFlag(Property::IsHidden, settings->viewBackgroundColorAutomatic);
 		viewForegroundColor->setPropertyFlag(Property::IsHidden, settings->viewBackgroundColorAutomatic);
+		geometryEdgeColor->setPropertyFlag(Property::IsHidden, settings->geometryEdgeColorMode != settings->geometryEdgeColorMode_custom);
 
 		// Add items
+		geometry->addProperty(geometrySelectionTransparency);
 		geometry->addProperty(geometryHightlightColor);
+		geometry->addProperty(geometryHightlightLineWidth);
 		geometry->addProperty(geometryEdgeColorMode);
+		geometry->addProperty(geometryEdgeColor);
 		geometry->addProperty(geometryLightSourceDistance);
 		geometry->addProperty(viewBackgroundColorAutomatic);
 		geometry->addProperty(viewBackgroundColor);

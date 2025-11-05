@@ -184,6 +184,8 @@ public:
 
 	void setCursorText(const std::string& text);
 
+	void setTransparency(double transparencyValue);
+
 private:
 	// Methods
 	void	   fillTree(void);

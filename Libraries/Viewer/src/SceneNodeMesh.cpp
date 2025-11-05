@@ -53,7 +53,7 @@ SceneNodeMesh::SceneNodeMesh() :
 	coordZ(nullptr),
 	displayTetEdges(false)
 {
-
+	m_transparency = ViewerSettings::instance()->geometrySelectionTransparency;
 }
 
 
@@ -473,7 +473,7 @@ osg::Node *SceneNodeMesh::createFaceNode(bsoncxx::document::view view, double *c
 
 		// Store the color in a color array (the color will be shared among all nodes, so only one entry is needed)
 		osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-		colors->push_back(osg::Vec4(0.5, 0.5, 0.5, m_transparency));
+		colors->push_back(osg::Vec4(0.5, 0.5, 0.5, 1.0-m_transparency));
 
 		newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f, 2.0f));
 
@@ -791,7 +791,7 @@ osg::Node *SceneNodeMesh::createFaceNodeBackwardCompatible(bsoncxx::document::vi
 
 	// Store the color in a color array (the color will be shared among all nodes, so only one entry is needed)
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(0.5, 0.5, 0.5, m_transparency));
+	colors->push_back(osg::Vec4(0.5, 0.5, 0.5, 1.0-m_transparency));
 
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f, 2.0f));
 
@@ -1194,7 +1194,7 @@ void SceneNodeMesh::setFaceStatus(int face, bool visible, bool forward, bool dou
 		osg::ref_ptr<osg::Material> material = new osg::Material;
 
 		SceneNodeMaterial sceneNodeMaterial;
-		sceneNodeMaterial.setMaterial(material, "Rough", r, g, b, m_transparency);
+		sceneNodeMaterial.setMaterial(material, "Rough", r, g, b, 1.0-m_transparency);
 
 		faceGeometry->getOrCreateStateSet()->setAttribute(material);
 
@@ -1299,3 +1299,26 @@ void SceneNodeMesh::removeOwner(SceneNodeMeshItem *item, const std::vector<int> 
 
 	updateFaceStatus(faceID);
 }
+
+void SceneNodeMesh::setTransparency(double value)
+{
+	SceneNodeBase::setTransparency(value);
+
+	// Reset the transparency for all triangles
+	for (auto& face : faceTriangles)
+	{
+		osg::Geode* faceGeode = dynamic_cast<osg::Geode*>(face.second);
+		assert(faceGeode != nullptr);
+
+		osg::Geometry* faceGeometry = dynamic_cast<osg::Geometry*>(faceGeode->getDrawable(0));
+		assert(faceGeometry != nullptr);
+
+		osg::Material* material = dynamic_cast<osg::Material*>(faceGeometry->getOrCreateStateSet()->getAttribute(osg::StateAttribute::MATERIAL));
+		assert(material != nullptr);
+
+		material->setAlpha(osg::Material::FRONT_AND_BACK, 1.0 - m_transparency);
+
+		faceGeometry->dirtyGLObjects();
+	}
+}
+
