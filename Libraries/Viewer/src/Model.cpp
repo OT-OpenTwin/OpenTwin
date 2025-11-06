@@ -3523,3 +3523,22 @@ void Model::setHighlightLineWidth(double lineWidthValue)
 
 	setHighlightLineWidthRecursive(sceneNodesRoot, setHighlightLineWidthRecursive);
 }
+
+void Model::updateEdgeColorMode()
+{
+	auto setUpdateEdgeColorModeRecursive = [&](SceneNodeBase* node, auto&& setUpdateEdgeColorModeRecursiveRef) -> void
+		{
+			SceneNodeGeometry* geometryNode = dynamic_cast<SceneNodeGeometry*>(node);
+			if (geometryNode != nullptr)
+			{
+				geometryNode->updateEdgeColorMode();
+			}
+
+			for (auto child : node->getChildren())
+			{
+				setUpdateEdgeColorModeRecursiveRef(child, setUpdateEdgeColorModeRecursiveRef);
+			}
+		};
+
+	setUpdateEdgeColorModeRecursive(sceneNodesRoot, setUpdateEdgeColorModeRecursive);
+}

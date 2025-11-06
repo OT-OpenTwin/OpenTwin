@@ -87,7 +87,7 @@ public:
 
 	void initializeFromFacetData(std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string> &faceNameMap);
 	//void assignMaterial(const std::string & materialType);
-	void updateObjectColor(double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective);
+	void updateObjectColor(double surfaceColorRGB[3], const double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective);
 	void updateObjectFacetsFromDataBase(unsigned long long entityID, unsigned long long entityVersion);
 
 	void setEdgeHighlight(unsigned long long faceId, bool h, double thickness);
@@ -130,6 +130,7 @@ public:
 
 	void setHighlightColor(const ot::Color & colorValue);
 	void setHighlightLineWidth(double lineWidth);
+	void updateEdgeColorMode();
 
 private:
 	void deleteShapeNode(void);
@@ -142,6 +143,7 @@ private:
 	void updateTransparentState(bool visible, bool transparent, bool wireframe);
 	void applyParentTransform(void);
 	osg::Node* getEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2, double lineWidth);
+	double getActualEdgeColor(const double color[], int index);
 
 	osg::Node   *      triangles;
 	osg::Node   *      edges;

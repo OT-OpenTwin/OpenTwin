@@ -510,7 +510,8 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 	osg::Node *edgeNode(nullptr), *edgeHighlightedNode(nullptr);
 	osg::Switch *faceEdgesHighlightNode(nullptr);
 
-	createOSGNodeFromEdges(edgeColorRGB, edges, edgeNode, edgeHighlightedNode, faceEdgesHighlightNode);
+	double color[] = { getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2) };
+	createOSGNodeFromEdges(color, edges, edgeNode, edgeHighlightedNode, faceEdgesHighlightNode);
 
 	// Create a new entry in the shape map for this object
 
@@ -1106,7 +1107,7 @@ void SceneNodeGeometry::deleteCutCapGeometryEdges()
 	}
 }
 
-void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective)
+void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], const double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective)
 {
 	// First, update the color of the triangles
 	osg::Transform *triangleTransform = dynamic_cast<osg::Transform *>(getTriangles());
@@ -1170,12 +1171,27 @@ void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], double edge
 
 				if (colorArray != nullptr)
 				{
-					(*colorArray)[0] = osg::Vec4(edgeColorRGB[0], edgeColorRGB[1], edgeColorRGB[2], 1.0-edgeTransparency);
+					(*colorArray)[0] = osg::Vec4(getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2), 1.0-edgeTransparency);
 				}
 
 				geometry->dirtyGLObjects();
 			}
 		}
+	}
+}
+
+double SceneNodeGeometry::getActualEdgeColor(const double colorRGB[], int index)
+{
+	if (ViewerSettings::instance()->geometryEdgeColorMode == ViewerSettings::instance()->geometryEdgeColorMode_custom)
+	{
+		double color[] = { ViewerSettings::instance()->geometryEdgeColor.r() / 255.0, 
+						   ViewerSettings::instance()->geometryEdgeColor.g() / 255.0, 
+						   ViewerSettings::instance()->geometryEdgeColor.b() / 255.0};
+		return color[index];
+	}
+	else
+	{
+		return colorRGB[index];
 	}
 }
 
@@ -1367,7 +1383,8 @@ void SceneNodeGeometry::setTransparency(double value)
 	SceneNodeBase::setTransparency(value);
 	edgeTransparency = value;
 
-	updateObjectColor(surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective);
+	double color[] = { getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2) };
+	updateObjectColor(surfaceColorRGB, color, materialType, textureType, reflective);
 }
 
 void SceneNodeGeometry::setHighlightColor(const ot::Color& colorValue)
@@ -1449,4 +1466,10 @@ void SceneNodeGeometry::setHighlightLineWidth(double lineWidth)
 		auto* lw = dynamic_cast<osg::LineWidth*>(ss->getAttribute(osg::StateAttribute::LINEWIDTH));
 		lw->setWidth(lineWidth);
 	}
+}
+
+void SceneNodeGeometry::updateEdgeColorMode()
+{
+	double color[] = { getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2) };
+	updateObjectColor(surfaceColorRGB, color, materialType, textureType, reflective);
 }

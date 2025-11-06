@@ -187,6 +187,7 @@ public:
 	void setTransparency(double transparencyValue);
 	void setHighlightColor(const ot::Color &colorValue);
 	void setHighlightLineWidth(double lineWidthValue);
+	void updateEdgeColorMode();
 
 private:
 	// Methods

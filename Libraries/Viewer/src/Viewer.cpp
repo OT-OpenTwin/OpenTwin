@@ -1210,17 +1210,21 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, const 
 			return true;
 		}
 		settings->geometryEdgeColorMode = actualItem->getCurrent();
+		getModel()->updateEdgeColorMode();
+		refresh();
 		_settingsUpdateRequired = true;
 		return true;
 	}
 	else if (_logicalName == "Geometry/Edge Color") {
-			const ot::PropertyColor* actualItem = dynamic_cast<const ot::PropertyColor*>(_item);
-			if (actualItem == nullptr) {
-				OTAssert(0, "Cast item fialed");
-				return true;
-			}
-			settings->geometryEdgeColor = actualItem->getValue();
+		const ot::PropertyColor* actualItem = dynamic_cast<const ot::PropertyColor*>(_item);
+		if (actualItem == nullptr) {
+			OTAssert(0, "Cast item fialed");
 			return true;
+		}
+		settings->geometryEdgeColor = actualItem->getValue();
+		getModel()->updateEdgeColorMode();
+		refresh();
+		return true;
 	}
 	else if (_logicalName == "Geometry/Light Source Distance") {
 		const ot::PropertyStringList * actualItem = dynamic_cast<const ot::PropertyStringList *>(_item);
