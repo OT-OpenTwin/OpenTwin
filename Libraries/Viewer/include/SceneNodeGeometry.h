@@ -144,6 +144,7 @@ private:
 	void applyParentTransform(void);
 	osg::Node* getEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2, double lineWidth);
 	double getActualEdgeColor(const double color[], int index);
+	void setEdgesColor(const double color[]);
 
 	osg::Node   *      triangles;
 	osg::Node   *      edges;
@@ -177,5 +178,6 @@ private:
 	osg::Matrix transformationMatrix;
 	osg::ref_ptr<osg::Geometry> cutCapGeometryTriangles;
 	osg::ref_ptr<osg::Geometry> cutCapGeometryEdges;
+	bool enableEdgesDisplay;
 };
 

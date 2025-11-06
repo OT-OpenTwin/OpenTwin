@@ -78,6 +78,7 @@ SceneNodeGeometry::SceneNodeGeometry() :
 	cutCapGeometryEdges(nullptr)
 {
 	edgeTransparency = m_transparency = ViewerSettings::instance()->geometrySelectionTransparency;
+	enableEdgesDisplay = (ViewerSettings::instance()->geometryEdgeColorMode != ViewerSettings::instance()->geometryEdgeColorMode_noColor);
 }
 
 SceneNodeGeometry::~SceneNodeGeometry()
@@ -216,7 +217,7 @@ void SceneNodeGeometry::updateTransparentState(bool visible, bool transparent, b
 			if (!wireframe)
 			{
 				getShapeNode()->setChildValue(getTriangles(), true);
-				getShapeNode()->setChildValue(getEdges(), true);
+				getShapeNode()->setChildValue(getEdges(), enableEdgesDisplay);
 			}
 			else
 			{
@@ -261,10 +262,7 @@ void SceneNodeGeometry::updateTransparentState(bool visible, bool transparent, b
 		getShapeNode()->setChildValue(getTriangles(), visible && !wireframe);
 
 		// Turn on edge display (if visible)
-		if (visible)
-		{
-			getShapeNode()->setChildValue(getEdges(), true);
-		}
+		getShapeNode()->setChildValue(getEdges(), visible && enableEdgesDisplay);
 
 		getShapeNode()->setNodeMask(getShapeNode()->getNodeMask() | 1);  // Set last bit of node mask
 	}
@@ -296,6 +294,8 @@ void SceneNodeGeometry::updateWireframeState(bool visible, bool wireframe, bool 
 			getShapeNode()->setChildValue(getEdges(), true);
 		}
 
+		setEdgesColor(surfaceColorRGB);
+
 		if (isTransparent())
 		{
 			lineWidth = 1.0;
@@ -313,8 +313,11 @@ void SceneNodeGeometry::updateWireframeState(bool visible, bool wireframe, bool 
 		if (visible)
 		{
 			getShapeNode()->setChildValue(getTriangles(), true);
-			getShapeNode()->setChildValue(getEdges(), !isTransparent());
+			getShapeNode()->setChildValue(getEdges(), !isTransparent() && enableEdgesDisplay);
 		}
+
+		double color[] = { getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2) };
+		setEdgesColor(color);
 
 		lineWidth = 1.0;
 		lineWidthHighlight = ViewerSettings::instance()->geometryHighlightLineWidth;
@@ -368,7 +371,7 @@ void SceneNodeGeometry::setVisibleState(bool visible, bool transparent, bool wir
 
 			if (!transparent)
 			{
-				getShapeNode()->setChildValue(getEdges(), true);
+				getShapeNode()->setChildValue(getEdges(), enableEdgesDisplay || wireframe);
 			}
 
 			if (!wireframe)
@@ -398,7 +401,7 @@ void SceneNodeGeometry::setHighlighted(bool h)
 	if (isHighlighted() == h) return;  // No change necessary
 
 	getShapeNode()->setChildValue(getEdgesHighlighted(), h);
-	getShapeNode()->setChildValue(getEdges(), !isVisible() ? false : !h);
+	getShapeNode()->setChildValue(getEdges(), enableEdgesDisplay && (!isVisible() ? false : !h));
 	getFaceEdgesHighlight()->setAllChildrenOff();
 
 	SceneNodeBase::setHighlighted(h);
@@ -1151,33 +1154,8 @@ void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], const doubl
 	}
 
 	// Now update the edges color
-	osg::Transform *edgeTransform = dynamic_cast<osg::Transform *>(getEdges());
-	assert(edgeTransform != nullptr);
-
-	assert(edgeTransform->getNumChildren() == 1);
-	osg::Geode *edgesNode = dynamic_cast<osg::Geode *>(edgeTransform->getChild(0));
-	assert(edgesNode != nullptr);
-
-	if (edgesNode != nullptr)
-	{
-		for (int i = 0; i < edgesNode->getNumDrawables(); i++)
-		{
-			osg::Geometry *geometry = dynamic_cast<osg::Geometry *>(edgesNode->getDrawable(i));
-
-			if (geometry != nullptr)
-			{
-				osg::Array *dataArray = geometry->getColorArray();
-				osg::Vec4Array *colorArray = dynamic_cast<osg::Vec4Array *>(dataArray);
-
-				if (colorArray != nullptr)
-				{
-					(*colorArray)[0] = osg::Vec4(getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2), 1.0-edgeTransparency);
-				}
-
-				geometry->dirtyGLObjects();
-			}
-		}
-	}
+	double color[] = { getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2) };
+	setEdgesColor(color);
 }
 
 double SceneNodeGeometry::getActualEdgeColor(const double colorRGB[], int index)
@@ -1470,6 +1448,42 @@ void SceneNodeGeometry::setHighlightLineWidth(double lineWidth)
 
 void SceneNodeGeometry::updateEdgeColorMode()
 {
+	enableEdgesDisplay = (ViewerSettings::instance()->geometryEdgeColorMode != ViewerSettings::instance()->geometryEdgeColorMode_noColor);
+
 	double color[] = { getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2) };
 	updateObjectColor(surfaceColorRGB, color, materialType, textureType, reflective);
+
+	updateWireframeState(isVisible(), isWireframe(), isTransparent());
+	updateTransparentState(isVisible(), isTransparent(), isWireframe());
+}
+
+void SceneNodeGeometry::setEdgesColor(const double color[])
+{
+	osg::Transform* edgeTransform = dynamic_cast<osg::Transform*>(getEdges());
+	assert(edgeTransform != nullptr);
+
+	assert(edgeTransform->getNumChildren() == 1);
+	osg::Geode* edgesNode = dynamic_cast<osg::Geode*>(edgeTransform->getChild(0));
+	assert(edgesNode != nullptr);
+
+	if (edgesNode != nullptr)
+	{
+		for (int i = 0; i < edgesNode->getNumDrawables(); i++)
+		{
+			osg::Geometry* geometry = dynamic_cast<osg::Geometry*>(edgesNode->getDrawable(i));
+
+			if (geometry != nullptr)
+			{
+				osg::Array* dataArray = geometry->getColorArray();
+				osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(dataArray);
+
+				if (colorArray != nullptr)
+				{
+					(*colorArray)[0] = osg::Vec4(color[0], color[1], color[2], 1.0 - edgeTransparency);
+				}
+
+				geometry->dirtyGLObjects();
+			}
+		}
+	}
 }
