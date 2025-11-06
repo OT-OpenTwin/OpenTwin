@@ -42,6 +42,11 @@ std::string ot::StyleRefPainter2D::generateQss(void) const {
 	return "/*<referencing style value \"" + toString(m_reference) + "\">*/";
 }
 
+std::string ot::StyleRefPainter2D::generateSvgColorString(const std::string& _id) const {
+	OT_LOG_E("StyleRefPainter2D can not be used to generate SVG color string.");
+	return "<referencing style value \"" + toString(m_reference) + "\">";
+}
+
 ot::Color ot::StyleRefPainter2D::getDefaultColor(void) const {
 	return Color();
 }

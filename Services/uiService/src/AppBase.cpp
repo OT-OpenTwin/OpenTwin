@@ -93,6 +93,7 @@
 #include "OTWidgets/TextEditorView.h"
 #include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/BasicWidgetView.h"
+#include "OTWidgets/StyledSvgWidget.h"
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/PropertyGridView.h"
 #include "OTWidgets/PropertyGridItem.h"
@@ -946,8 +947,18 @@ void AppBase::createUi() {
 
 			QWidget* dockManagerWidget = ot::WidgetViewManager::instance().getDockManager();
 
-			ot::Label* defaultLabel = new ot::Label(nullptr);
-			m_defaultView = new ot::BasicWidgetView(defaultLabel, dockManagerWidget);
+			QWidget* defaultWidget = new QWidget;
+			QGridLayout* defaultWidgetLayout = new QGridLayout(defaultWidget);
+			ot::StyledSvgWidget* logoWidget = new ot::StyledSvgWidget("Application/OpenTwinBackground.svg", defaultWidget);
+			logoWidget->setMaintainAspectRatio(true);
+			logoWidget->setFixedSize(512, 512);
+			defaultWidgetLayout->addWidget(logoWidget, 1, 1);
+			defaultWidgetLayout->setColumnStretch(0, 1);
+			defaultWidgetLayout->setColumnStretch(2, 1);
+			defaultWidgetLayout->setRowStretch(0, 1);
+			defaultWidgetLayout->setRowStretch(2, 1);
+
+			m_defaultView = new ot::BasicWidgetView(defaultWidget, dockManagerWidget);
 			m_defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::CustomView, ot::WidgetViewBase::ViewIsCentral));
 			m_defaultView->setViewIsPermanent(true);
 			m_defaultView->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);

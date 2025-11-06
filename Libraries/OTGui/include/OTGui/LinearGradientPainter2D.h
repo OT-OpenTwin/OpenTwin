@@ -48,21 +48,23 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_LinearGradientPainter2D); };
+		virtual std::string getFactoryKey() const override { return std::string(OT_FactoryKey_LinearGradientPainter2D); };
 		
-		virtual std::string generateQss(void) const override;
+		virtual std::string generateQss() const override;
+
+		virtual std::string generateSvgColorString(const std::string& _id) const override;
 
 		virtual bool isEqualTo(const Painter2D* _other) const override;
 
 		//! @brief Set the starting point for the gradient.
 		//! The painted area is between 0.0 and 1.0.
 		void setStart(const ot::Point2DD& _start) { m_start = _start; };
-		const ot::Point2DD& getStart(void) const { return m_start; }
+		const ot::Point2DD& getStart() const { return m_start; }
 
 		//! @brief Set the final stop point for the gradient.
 		//! The painted area is between 0.0 and 1.0.
 		void setFinalStop(const ot::Point2DD& _finalStop) { m_finalStop = _finalStop; };
-		const ot::Point2DD& getFinalStop(void) const { return m_finalStop; };
+		const ot::Point2DD& getFinalStop() const { return m_finalStop; };
 
 	private:
 		ot::Point2DD m_start;

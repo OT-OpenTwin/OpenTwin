@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="138"
+   height="138"
+   viewBox="0 0 36.5125 36.5125"
+   version="1.1"
+   id="svg1"
+   xml:space="preserve"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+   <defs id="defs1">
+   </defs>
+    <g
+   id="layer1"
+   transform="translate(-0.86198054,-0.45690343)">
+      <path
+   style="fill:none;fill-opacity:1;stroke:$(color:Logo Light);stroke-width:0.971815;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+   id="path1"
+   d="M 21.341859,10.428466 A 10.944,10.693416 0 0 1 20.401848,23.563443 10.944,10.693416 0 0 1 7.1309745,25.849876 10.944,10.693416 0 0 1 1.6499551,13.821179 10.944,10.693416 0 0 1 12.268871,5.7147326" />
+      <path
+   style="fill:none;fill-opacity:1;stroke:$(color:Logo Light);stroke-width:0.977702;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+   d="M 12.478201,5.7082547 H 36.87435 v 4.5507273 h -5.167348 v 15.95915 H 25.819357 V 10.322186 h -4.572322"
+   id="path3" />
+       
+    <text
+   xml:space="preserve"
+   style="font-size:5.64444px;font-family:'Bauhaus 93';-inkscape-font-specification:'Bauhaus 93, Normal';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:$(color:Logo Light);stroke-width:0.264583;stroke-linecap:round"
+   x="5.7101989"
+   y="32.519825"
+   id="text4"><tspan
+     id="tspan3"
+     style="stroke-width:0.264583"
+     x="5.7101989"
+     y="32.519825">OPEN TWIN</tspan></text><ellipse
+   style="fill:none;fill-opacity:1;stroke:$(color:Logo Light);stroke-width:1.07115;stroke-dasharray:none;stroke-opacity:1"
+   id="path2"
+   cx="12.150157"
+   cy="16.263588"
+   rx="4.6855612"
+   ry="6.0757742" /></g>
+    
+</svg>

@@ -49,7 +49,16 @@ ot::CheckerboardPainter2D::CheckerboardPainter2D(Painter2D* _primaryPainter, Pai
 	: m_primary(_primaryPainter), m_secondary(_secondaryPainter), m_cellSize(_cellSize)
 {}
 
-ot::CheckerboardPainter2D::~CheckerboardPainter2D() {}
+ot::CheckerboardPainter2D::~CheckerboardPainter2D() {
+	if (m_primary) {
+		delete m_primary;
+		m_primary = nullptr;
+	}
+	if (m_secondary) {
+		delete m_secondary;
+		m_secondary = nullptr;
+	}
+}
 
 void ot::CheckerboardPainter2D::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	ot::Painter2D::addToJsonObject(_object, _allocator);
@@ -82,6 +91,11 @@ void ot::CheckerboardPainter2D::setFromJsonObject(const ConstJsonObject& _object
 std::string ot::CheckerboardPainter2D::generateQss(void) const {
 	OT_LOG_W("Checkboard can not be exported to qss. Returning primary painter qss.");
 	return m_primary->generateQss();
+}
+
+std::string ot::CheckerboardPainter2D::generateSvgColorString(const std::string& _id) const {
+	OT_LOG_W("Checkboard can not be exported to SVG. Returning primary painter svg color string.");
+	return m_primary->generateSvgColorString(_id);
 }
 
 ot::Color ot::CheckerboardPainter2D::getDefaultColor(void) const {

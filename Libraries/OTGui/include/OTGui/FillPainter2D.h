@@ -46,16 +46,18 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_FillPainter2D); };
+		virtual std::string getFactoryKey() const override { return std::string(OT_FactoryKey_FillPainter2D); };
 
-		virtual std::string generateQss(void) const override;
+		virtual std::string generateQss() const override;
 
-		virtual ot::Color getDefaultColor(void) const override;
+		virtual std::string generateSvgColorString(const std::string& _id) const override;
+
+		virtual ot::Color getDefaultColor() const override;
 
 		virtual bool isEqualTo(const Painter2D* _other) const override;
 
 		void setColor(const ot::Color& _color) { m_color = _color; };
-		const ot::Color& getColor(void) const { return m_color; };
+		const ot::Color& getColor() const { return m_color; };
 
 	private:
 		ot::Color m_color;

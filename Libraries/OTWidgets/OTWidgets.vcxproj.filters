@@ -592,6 +592,12 @@
     <ClCompile Include="src\PixmapEditWidget.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\OTSVGDataParser.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StyledSvgWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1109,6 +1115,9 @@
     <ClInclude Include="include\OTWidgets\BasicWidgetView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\OTSVGDataParser.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -1337,6 +1346,9 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PixmapEditWidget.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\StyledSvgWidget.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

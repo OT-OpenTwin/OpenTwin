@@ -18,8 +18,12 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTGui/Painter2DFactory.h"
 #include "OTGui/LinearGradientPainter2D.h"
+
+// std header
+#include <sstream>
 
 #define OT_JSON_MEMBER_Start "Start"
 #define OT_JSON_MEMBER_FinalStop "FinalStop"
@@ -54,7 +58,7 @@ void ot::LinearGradientPainter2D::setFromJsonObject(const ConstJsonObject& _obje
 	m_finalStop.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_FinalStop));
 }
 
-std::string ot::LinearGradientPainter2D::generateQss(void) const {
+std::string ot::LinearGradientPainter2D::generateQss() const {
 	std::string ret = "qlineargradient(x1: " + std::to_string(m_start.x()) +
 		", y1: " + std::to_string(m_start.y()) +
 		", x2: " + std::to_string(m_finalStop.x()) +
@@ -64,6 +68,43 @@ std::string ot::LinearGradientPainter2D::generateQss(void) const {
 	ret.append(")");
 
 	return ret;
+}
+
+std::string ot::LinearGradientPainter2D::generateSvgColorString(const std::string& _id) const {
+	std::ostringstream ss;
+	ss << "<linearGradient id=\"" << _id
+		<< "\" x1=\"" << m_start.x()
+		<< "\" y1=\"" << m_start.y()
+		<< "\" x2=\"" << m_finalStop.x()
+		<< "\" y2=\"" << m_finalStop.y()
+		<< "\" gradientUnits=\"objectBoundingBox\"";
+
+	// Handle spread method if applicable
+	switch (getSpread()) {
+	case GradientSpread::Pad:   ss << " spreadMethod=\"pad\""; break;
+	case GradientSpread::Reflect: ss << " spreadMethod=\"reflect\""; break;
+	case GradientSpread::Repeat: ss << " spreadMethod=\"repeat\""; break;
+	default: 
+		OT_LOG_E("Unknown gradient spread method (" + std::to_string(static_cast<int>(getSpread())) + ")");
+		break;
+	}
+
+	ss << ">";
+
+	// Add color stops
+	for (const auto& stop : getStops()) {
+		const Color& c = stop.getColor();
+		ss << "<stop offset=\"" << stop.getPos() * 100.
+			<< "%\" stop-color=\"#"
+			<< String::numberToHexString(stop.getColor().r(), '0', 2)
+			<< String::numberToHexString(stop.getColor().g(), '0', 2)
+			<< String::numberToHexString(stop.getColor().b(), '0', 2)
+			<< "\" stop-opacity=\""
+			<< (ColorF::channelValueFromInt(stop.getColor().a())) << "\"/>";
+	}
+
+	ss << "</linearGradient>";
+	return ss.str();
 }
 
 bool ot::LinearGradientPainter2D::isEqualTo(const Painter2D* _other) const {

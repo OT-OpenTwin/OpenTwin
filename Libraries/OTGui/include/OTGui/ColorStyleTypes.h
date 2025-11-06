@@ -268,6 +268,8 @@ namespace ot {
 		WarningForeground,
 		ErrorForeground,
 
+		LogoLight,
+
 		//! @brief Used to determine the last entry.
 		//! @warning This must always be the last entry in this enum.
 		ColorStyleValueEntry_End

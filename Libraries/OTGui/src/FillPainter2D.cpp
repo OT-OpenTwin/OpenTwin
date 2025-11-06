@@ -18,8 +18,12 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/Painter2DFactory.h"
+
+// std header
+#include <sstream>
 
 static ot::Painter2DFactoryRegistrar<ot::FillPainter2D> fillCfgRegistrar(OT_FactoryKey_FillPainter2D);
 
@@ -47,6 +51,27 @@ void ot::FillPainter2D::setFromJsonObject(const ConstJsonObject& _object) {
 
 std::string ot::FillPainter2D::generateQss(void) const {
 	return "rgba(" + std::to_string(m_color.r()) + "," + std::to_string(m_color.g()) + "," + std::to_string(m_color.b()) + "," + std::to_string(m_color.a()) + ")";
+}
+
+std::string ot::FillPainter2D::generateSvgColorString(const std::string& _id) const {
+	std::ostringstream ss;
+	ss << "<linearGradient id=\"" << _id
+		<< "\" x1=\"" << 0
+		<< "\" y1=\"" << 0
+		<< "\" x2=\"" << 1
+		<< "\" y2=\"" << 1
+		<< "\" gradientUnits=\"objectBoundingBox\""
+	    << ">"
+		
+		// We only specify one color since it's a fill
+		<< "<stop offset=\"0%\" stop-color=\"#"
+		<< String::numberToHexString(m_color.r(), '0', 2)
+		<< String::numberToHexString(m_color.g(), '0', 2)
+		<< String::numberToHexString(m_color.b(), '0', 2)
+		<< "\" stop-opacity=\""
+		<< (ColorF::channelValueFromInt(m_color.a())) << "\"/>"
+		<< "</linearGradient>";
+	return ss.str();
 }
 
 ot::Color ot::FillPainter2D::getDefaultColor(void) const {

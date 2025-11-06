@@ -227,7 +227,9 @@ namespace ot {
 
 				{ ot::ColorStyleValueEntry::SuccessForeground, "Success Foreground" },
 				{ ot::ColorStyleValueEntry::WarningForeground, "Warning Foreground" },
-				{ ot::ColorStyleValueEntry::ErrorForeground, "Error Foreground" }
+				{ ot::ColorStyleValueEntry::ErrorForeground, "Error Foreground" },
+
+				{ ot::ColorStyleValueEntry::LogoLight, "Logo Light" }
 			};
 
 			return g_instance;

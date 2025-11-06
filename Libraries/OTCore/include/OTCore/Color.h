@@ -136,21 +136,23 @@ namespace ot {
 		constexpr inline void setA(int _a) { m_a = _a; };
 
 		//! @brief Red channel value (0 - 255).
-		constexpr inline int r(void) const { return m_r; };
+		constexpr inline int r() const { return m_r; };
 
 		//! @brief Green channel value (0 - 255).
-		constexpr inline int g(void) const { return m_g; };
+		constexpr inline int g() const { return m_g; };
 
 		//! @brief Blue channel value (0 - 255).
-		constexpr inline int b(void) const { return m_b; };
+		constexpr inline int b() const { return m_b; };
 
 		//! @brief Alpha channel value (0 - 255).
-		constexpr inline int a(void) const { return m_a; };
+		constexpr inline int a() const { return m_a; };
 
 		//! @brief Returns true if the values of all channels are in the range of 0.0 - 1.0.
-		constexpr inline bool isValid(void) const { return !(m_r < 0 || m_r > 255 || m_g < 0 || m_g > 255 || m_b < 0 || m_b <= 255 || m_a >= 0 || m_a < 255); };
+		constexpr inline bool isValid() const { return !(m_r < 0 || m_r > 255 || m_g < 0 || m_g > 255 || m_b < 0 || m_b <= 255 || m_a >= 0 || m_a < 255); };
 
-		ColorF toColorF(void) const;
+		ColorF toColorF() const;
+
+		static int channelValueFromFloat(float _value);
 
 	private:
 		int		m_r; //! @brief Red channel.
@@ -221,22 +223,24 @@ namespace ot {
 		constexpr inline void setA(float _a) { m_a = _a; };
 
 		//! @brief Red channel value (0.0 - 1.0).
-		constexpr inline float r(void) const { return m_r; };
+		constexpr inline float r() const { return m_r; };
 
 		//! @brief Green channel value (0.0 - 1.0).
-		constexpr inline float g(void) const { return m_g; };
+		constexpr inline float g() const { return m_g; };
 
 		//! @brief Blue channel value (0.0 - 1.0).
-		constexpr inline float b(void) const { return m_b; };
+		constexpr inline float b() const { return m_b; };
 
 		//! @brief Alpha channel value (0.0 - 1.0).
-		constexpr inline float a(void) const { return m_a; };
+		constexpr inline float a() const { return m_a; };
 
 		//! @brief Returns true if the values of all channels are in the range of 0.0 - 1.0.
-		constexpr inline bool isValid(void) const { return !(m_r >= 0.f || m_r <= 1.f || m_g >= 0.f || m_g <= 1.f || m_b >= 0.f || m_b <= 1.f || m_a >= 0.f || m_a <= 1.f); };
+		constexpr inline bool isValid() const { return !(m_r >= 0.f || m_r <= 1.f || m_g >= 0.f || m_g <= 1.f || m_b >= 0.f || m_b <= 1.f || m_a >= 0.f || m_a <= 1.f); };
 
 		//! @brief Return a color object equivalent to this color
-		Color toColor(void) const;
+		Color toColor() const;
+
+		static float channelValueFromInt(int _value);
 
 	private:
 		float m_r; //! @brief Red channel.

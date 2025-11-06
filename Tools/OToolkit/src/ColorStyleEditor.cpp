@@ -478,6 +478,8 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WarningForeground), new PropertyPainter2D(new FillPainter2D(ot::Orange)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::LogoLight), new PropertyPainter2D(new FillPainter2D(228, 228, 228)));
+
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
 
 	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
@@ -699,6 +701,8 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SuccessForeground), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WarningForeground), new PropertyPainter2D(new FillPainter2D(ot::Yellow)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+	
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::LogoLight), new PropertyPainter2D(new FillPainter2D(33, 33, 33)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(70, 100, 70))));
 
@@ -922,6 +926,8 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SuccessForeground), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WarningForeground), new PropertyPainter2D(new FillPainter2D(ot::Yellow)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::LogoLight), new PropertyPainter2D(new FillPainter2D(0, 60, 124)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 100, 180))));
 

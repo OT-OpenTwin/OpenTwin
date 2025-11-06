@@ -52,6 +52,22 @@ namespace ot {
 		//! @param _childAlignment Child alignment.
 		static QRectF calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSize, ot::Alignment _childAlignment);
 
+		//! @brief Calculates the scaled child rect.
+		//! The child size will be scaled to fill the parent rect while maintaining the aspect ratio if requested.
+		//! @param _parentRect Parent rectangle.
+		//! @param _childSize Child size.
+		//! @param _childAlignment Child alignment.
+		//! @param _maintainAspectRatio Whether to maintain the aspect ratio of the child size.
+		static QRect calculateScaledChildRect(const QRect& _parentRect, const QSize& _childSize, ot::Alignment _childAlignment = Alignment::Center, bool _maintainAspectRatio = true);
+
+		//! @brief Calculates the scaled child rect.
+		//! The child size will be scaled to fill the parent rect while maintaining the aspect ratio if requested.
+		//! @param _parentRect Parent rectangle.
+		//! @param _childSize Child size.
+		//! @param _childAlignment Child alignment.
+		//! @param _maintainAspectRatio Whether to maintain the aspect ratio of the child size.
+		static QRectF calculateScaledChildRect(const QRectF& _parentRect, const QSizeF& _childSize, ot::Alignment _childAlignment = Alignment::Center, bool _maintainAspectRatio = true);
+
 		//! @brief Fits the provided rect on the screen.
 		//! If the source rect is bigger than the screen size the source rect will be returned.
 		//! @param _sourceRect Initial rect.

@@ -39,6 +39,7 @@
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/StyledSvgWidget.h"
 #include "OTWidgets/StatusBarManager.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PropertyGridGroup.h"
@@ -47,6 +48,7 @@
 
 // Qt header
 #include <QtCore/qfile.h>
+#include <QtWidgets/qlayout.h>
 #include <QtWidgets/qfiledialog.h>
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qtablewidget.h>
@@ -92,7 +94,7 @@ private:
 bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	using namespace ot;
 	
-	{
+	if (false) {
 		Splitter* root = new Splitter(nullptr);
 		ot::WidgetView* r = this->createCentralWidgetView(root, "Test Versions");
 		_content.addView(r);
@@ -107,7 +109,8 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		this->connect(m_versionGraph->getGraph(), &VersionGraph::versionSelected, this, &WidgetTest::slotVersionSelected);
 		this->connect(m_versionGraph->getGraph(), &VersionGraph::versionActivateRequest, this, &WidgetTest::slotVersionActivatRequest);
 	}
-	{
+	
+	if (false) {
 		ot::TextEditor* editor = new TextEditor(nullptr);
 		TextEditorCfg cfg;
 		cfg.setEntityName("Test Editor");
@@ -129,7 +132,8 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		editor->setupFromConfig(cfg, false);
 		_content.addView(this->createCentralWidgetView(editor, "Test Editor"));
 	}
-	{
+	
+	if (false) {
 		QTableWidget* table = new QTableWidget(2, 2);
 		ot::WidgetView* r = this->createCentralWidgetView(table, "Test Table");
 		_content.addView(r);
@@ -140,6 +144,21 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		table->setItem(1, 1, new QTableWidgetItem("Test11"));
 
 		table->setSortingEnabled(true);
+	}
+
+	if (true) {
+		QWidget* w = new QWidget;
+		QGridLayout* l = new QGridLayout(w);
+		ot::StyledSvgWidget* svg = new ot::StyledSvgWidget("Application/OpenTwinBackground.svg", w);
+		svg->setMaintainAspectRatio(true);
+		svg->setFixedSize(512, 512);
+		l->addWidget(svg, 1, 1);
+		l->setColumnStretch(0, 1);
+		l->setColumnStretch(2, 1);
+		l->setRowStretch(0, 1);
+		l->setRowStretch(2, 1);
+
+		_content.addView(this->createCentralWidgetView(w, "Test Logo"));
 	}
 
 	TestToolBar* test = new TestToolBar(this);

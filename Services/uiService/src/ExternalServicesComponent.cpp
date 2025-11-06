@@ -79,6 +79,7 @@
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/TextEditorView.h"
 #include "OTWidgets/PropertyDialog.h"
+#include "OTWidgets/OTSVGDataParser.h"
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/OnePropertyDialog.h"

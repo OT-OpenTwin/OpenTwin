@@ -50,11 +50,13 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_CheckerboardPainter2D); };
+		virtual std::string getFactoryKey() const override { return std::string(OT_FactoryKey_CheckerboardPainter2D); };
 
-		virtual std::string generateQss(void) const override;
+		virtual std::string generateQss() const override;
 
-		virtual ot::Color getDefaultColor(void) const override;
+		virtual std::string generateSvgColorString(const std::string& _id) const override;
+
+		virtual ot::Color getDefaultColor() const override;
 
 		virtual bool isEqualTo(const Painter2D* _other) const override;
 
@@ -63,19 +65,19 @@ namespace ot {
 		//! The current painter will be destroyed.
 		//! @note Note that the primary and secondary painter must be different objects.
 		void setPrimaryPainter(Painter2D* _painter);
-		const Painter2D* getPrimaryPainter(void) const { return m_primary; };
+		const Painter2D* getPrimaryPainter() const { return m_primary; };
 
 		//! @brief Sets the secondary painter.
 		//! The object takes ownership of the provided painter.
 		//! The current painter will be destroyed.
 		//! @note Note that the primary and secondary painter must be different objects.
 		void setSecondaryPainter(Painter2D* _painter);
-		const Painter2D* getSecondaryPainter(void) const { return m_secondary; };
+		const Painter2D* getSecondaryPainter() const { return m_secondary; };
 
 		void setCellSize(int _size);
 		void setCellSize(int _width, int _height);
 		void setCellSize(const Size2D& _size) { m_cellSize = _size; };
-		const Size2D& getCellSize(void) const { return m_cellSize; };
+		const Size2D& getCellSize() const { return m_cellSize; };
 
 	private:
 		Size2D m_cellSize;

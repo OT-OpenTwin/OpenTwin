@@ -19,9 +19,10 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTWidgets/WidgetViewManager.h"
-#include "OTWidgets/GlobalColorStyle.h"
 #include "OTGui/ColorStyleTypes.h"
+#include "OTWidgets/IconManager.h"
+#include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/WidgetViewManager.h"
 
 // Qt header
 #include <QtCore/qdir.h>
@@ -95,6 +96,10 @@ bool ot::GlobalColorStyle::setCurrentStyle(const std::string& _styleName, bool _
 	if (m_app) {
 		m_app->setStyleSheet(it->second.styleSheet());
 	}
+
+	// Clear icon svg cache to force re-parsing with new style
+	IconManager::clearParsedSvgDataCache();
+
 	OT_LOG_D("Current color style changed \"" + m_currentStyle + "\"");
 	Q_EMIT currentStyleChanged();
 	return true;

@@ -18,8 +18,9 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/IconManager.h"
 #include "OTCore/LogDispatcher.h"
+#include "OTWidgets/IconManager.h"
+#include "OTWidgets/OTSVGDataParser.h"
 
 // Qt header
 #include <QtCore/qdir.h>
@@ -104,19 +105,30 @@ const QByteArray& ot::IconManager::getSvgData(const QString& _subPath) {
 	QString path = manager.findFullPath(_subPath);
 	if (path.isEmpty()) {
 		OT_LOG_E("Icon \"" + _subPath.toStdString() + "\" not found");
-		return *manager.m_emptySvgData;
+		return manager.m_emptyByteArray;
 	}
 
 	// Create and store new
 	QFile file(path);
 	if (!file.open(QIODevice::ReadOnly)) {
 		OT_LOG_E("Failed to open file for reading: \"" + path.toStdString() + "\"");
-		return *manager.m_emptySvgData;
+		return manager.m_emptyByteArray;
 	}
 	
-	std::shared_ptr<QByteArray> newData = std::shared_ptr<QByteArray>(new QByteArray(file.readAll()));
+	std::shared_ptr<QByteArray> newData(new QByteArray(file.readAll()));
 	file.close();
 	return *manager.m_svgData.insert_or_assign(_subPath, newData).first->second;
+}
+
+const QByteArray& ot::IconManager::getParsedSvgData(const QString& _subPath) {
+	IconManager& manager = IconManager::instance();
+	auto it = manager.m_parsedSvgData.find(_subPath);
+	if (it != manager.m_parsedSvgData.end()) {
+		return it->second;
+	}
+	else {
+		return manager.m_parsedSvgData.insert_or_assign(_subPath, OTSVGDataParser::parse(getSvgData(_subPath))).first->second;
+	}
 }
 
 void ot::IconManager::setApplicationIcon(const QIcon& _icon) {
@@ -135,6 +147,10 @@ const QIcon& ot::IconManager::getDefaultProjectIcon(void) {
 	return IconManager::instance().m_defaultProjectIcon;
 }
 
+void ot::IconManager::clearParsedSvgDataCache() {
+	IconManager::instance().m_parsedSvgData.clear();
+}
+
 QString ot::IconManager::findFullPath(const QString& _subPath) {
 	for (auto p : m_searchPaths) {
 		if (QFile::exists(p + _subPath)) return p + _subPath;
@@ -143,7 +159,7 @@ QString ot::IconManager::findFullPath(const QString& _subPath) {
 }
 
 ot::IconManager::IconManager() :
-	m_emptyIcon(new QIcon), m_emptyMovie(new QMovie), m_emptyPixmap(new QPixmap), m_emptySvgData(new QByteArray)
+	m_emptyIcon(new QIcon), m_emptyMovie(new QMovie), m_emptyPixmap(new QPixmap)
 {
 
 }

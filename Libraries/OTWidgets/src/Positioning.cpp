@@ -117,6 +117,136 @@ QRectF ot::Positioning::calculateChildRect(const QRectF& _parentRect, const QSiz
 	return QRectF(pt, _childSize);
 }
 
+QRect ot::Positioning::calculateScaledChildRect(const QRect& _parentRect, const QSize& _childSize, ot::Alignment _childAlignment, bool _maintainAspectRatio) {
+	if (!_maintainAspectRatio) {
+		return _parentRect;
+	}
+
+	// Calculate aspect ratios
+	const qreal childAspect = _childSize.width() / _childSize.height();
+	const qreal parentAspect = _parentRect.width() / _parentRect.height();
+
+	QRect result;
+
+	if (childAspect > parentAspect) {
+		// Child is wider than parent: fit width
+		const qreal newWidth = _parentRect.width();
+		const qreal newHeight = newWidth / childAspect;
+		result.setSize(QSizeF(newWidth, newHeight).toSize().boundedTo(_parentRect.size()));
+	}
+	else {
+		// Child is taller than parent: fit height
+		const qreal newHeight = _parentRect.height();
+		const qreal newWidth = newHeight * childAspect;
+		result.setSize(QSizeF(newWidth, newHeight).toSize().boundedTo(_parentRect.size()));
+	}
+
+	int x = _parentRect.x();
+	int y = _parentRect.y();
+
+	// Horizontal alignment
+	switch (_childAlignment) {
+	case Alignment::Left:
+	case Alignment::TopLeft:
+	case Alignment::BottomLeft:
+		x = _parentRect.x();
+		break;
+	case Alignment::Right:
+	case Alignment::TopRight:
+	case Alignment::BottomRight:
+		x = _parentRect.right() - result.width();
+		break;
+	default: // Center horizontally
+		x = _parentRect.x() + (_parentRect.width() - result.width()) / 2.0;
+		break;
+	}
+
+	// Vertical alignment
+	switch (_childAlignment) {
+	case Alignment::Top:
+	case Alignment::TopLeft:
+	case Alignment::TopRight:
+		y = _parentRect.y();
+		break;
+	case Alignment::Bottom:
+	case Alignment::BottomLeft:
+	case Alignment::BottomRight:
+		y = _parentRect.bottom() - result.height();
+		break;
+	default: // Center vertically
+		y = _parentRect.y() + (_parentRect.height() - result.height()) / 2.0;
+		break;
+	}
+
+	result.moveTo(x, y);
+	return result;
+}
+
+QRectF ot::Positioning::calculateScaledChildRect(const QRectF& _parentRect, const QSizeF& _childSize, ot::Alignment _childAlignment, bool _maintainAspectRatio) {
+	if (!_maintainAspectRatio) {
+		return _parentRect;
+	}
+
+	// Calculate aspect ratios
+	const qreal childAspect = _childSize.width() / _childSize.height();
+	const qreal parentAspect = _parentRect.width() / _parentRect.height();
+
+	QRectF result;
+
+	if (childAspect > parentAspect) {
+		// Child is wider than parent: fit width
+		const qreal newWidth = _parentRect.width();
+		const qreal newHeight = newWidth / childAspect;
+		result.setSize(QSizeF(newWidth, newHeight));
+	}
+	else {
+		// Child is taller than parent: fit height
+		const qreal newHeight = _parentRect.height();
+		const qreal newWidth = newHeight * childAspect;
+		result.setSize(QSizeF(newWidth, newHeight));
+	}
+
+	qreal x = _parentRect.x();
+	qreal y = _parentRect.y();
+
+	// Horizontal alignment
+	switch (_childAlignment) {
+	case Alignment::Left:
+	case Alignment::TopLeft:
+	case Alignment::BottomLeft:
+		x = _parentRect.x();
+		break;
+	case Alignment::Right:
+	case Alignment::TopRight:
+	case Alignment::BottomRight:
+		x = _parentRect.right() - result.width();
+		break;
+	default: // Center horizontally
+		x = _parentRect.x() + (_parentRect.width() - result.width()) / 2.0;
+		break;
+	}
+
+	// Vertical alignment
+	switch (_childAlignment) {
+	case Alignment::Top:
+	case Alignment::TopLeft:
+	case Alignment::TopRight:
+		y = _parentRect.y();
+		break;
+	case Alignment::Bottom:
+	case Alignment::BottomLeft:
+	case Alignment::BottomRight:
+		y = _parentRect.bottom() - result.height();
+		break;
+	default: // Center vertically
+		y = _parentRect.y() + (_parentRect.height() - result.height()) / 2.0;
+		break;
+	}
+
+	result.moveTo(x, y);
+	return result;
+}
+
 QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, FitMode _mode) {
 	// Check if the rect is already in a screen
 	for (QScreen* s : QGuiApplication::screens()) {

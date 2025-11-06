@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
+#include "OTWidgets/Positioning.h"
 #include "OTWidgets/SvgImagePainter.h"
 
 // Qt header
@@ -47,11 +48,13 @@ ot::SvgImagePainter::~SvgImagePainter() {
 
 void ot::SvgImagePainter::paintImage(QPainter* _painter, const QRect& _bounds, bool _maintainAspectRatio) const {
 	OTAssertNullptr(m_svgRenderer);
-	m_svgRenderer->render(_painter, _bounds.toRectF());
+	QRectF rect = Positioning::calculateScaledChildRect(_bounds, getDefaultImageSize(), ot::Alignment::Center, _maintainAspectRatio).toRectF();
+	m_svgRenderer->render(_painter, rect);
 }
 
 void ot::SvgImagePainter::paintImage(QPainter* _painter, const QRectF& _bounds, bool _maintainAspectRatio) const {
 	OTAssertNullptr(m_svgRenderer);
+	QRectF rect = Positioning::calculateScaledChildRect(_bounds, getDefaultImageSize(), ot::Alignment::Center, _maintainAspectRatio);
 	m_svgRenderer->render(_painter, _bounds);
 }
 

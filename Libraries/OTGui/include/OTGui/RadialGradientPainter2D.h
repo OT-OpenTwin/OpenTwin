@@ -46,29 +46,31 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_RadialGradientPainter2D); };
+		virtual std::string getFactoryKey() const override { return std::string(OT_FactoryKey_RadialGradientPainter2D); };
 
-		virtual std::string generateQss(void) const override;
+		virtual std::string generateQss() const override;
+
+		virtual std::string generateSvgColorString(const std::string& _id) const override;
 
 		virtual bool isEqualTo(const Painter2D* _other) const override;
 
 		//! @brief Set the center point for the gradient
 		void setCenterPoint(const ot::Point2DD& _center) { m_center = _center; };
-		const ot::Point2DD& getCenterPoint(void) const { return m_center; }
+		const ot::Point2DD& getCenterPoint() const { return m_center; }
 
 		void setCenterRadius(double _r) { m_centerRadius = _r; };
-		double getCenterRadius(void) const { return m_centerRadius; };
+		double getCenterRadius() const { return m_centerRadius; };
 
 		//! @brief Set the focal point for the gradient
 		void setFocalPoint(const ot::Point2DD& _focal);
-		const ot::Point2DD& getFocalPoint(void) const { return m_focal; };
+		const ot::Point2DD& getFocalPoint() const { return m_focal; };
 
 		//! @brief Set the focal radius
 		//! Note that the focal point needs to be set
 		void setFocalRadius(double _r) { m_focalRadius = _r; };
-		double getFocalRadius(void) const { return m_focalRadius; };
+		double getFocalRadius() const { return m_focalRadius; };
 
-		bool isFocalPointSet(void) const { return m_focalSet; };
+		bool isFocalPointSet() const { return m_focalSet; };
 
 	private:
 		ot::Point2DD m_center;

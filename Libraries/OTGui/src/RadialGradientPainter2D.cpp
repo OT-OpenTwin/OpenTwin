@@ -18,8 +18,12 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTGui/Painter2DFactory.h"
 #include "OTGui/RadialGradientPainter2D.h"
+
+// std header
+#include <sstream>
 
 #define OT_JSON_MEMBER_CenterPoint "Center.Point"
 #define OT_JSON_MEMBER_CenterRadius "Center.Radius"
@@ -63,7 +67,7 @@ void ot::RadialGradientPainter2D::setFocalPoint(const ot::Point2DD& _focal) {
 	m_focalSet = true;
 }
 
-std::string ot::RadialGradientPainter2D::generateQss(void) const {
+std::string ot::RadialGradientPainter2D::generateQss() const {
 	std::string ret = "qradialgradient(cx: " + std::to_string(m_center.x()) +
 						", cy: " + std::to_string(m_center.y()) +
 						", radius: " + std::to_string(m_centerRadius);
@@ -78,6 +82,47 @@ std::string ot::RadialGradientPainter2D::generateQss(void) const {
 	ret.append(")");
 
 	return ret;
+}
+
+std::string ot::RadialGradientPainter2D::generateSvgColorString(const std::string& _id) const {
+	std::ostringstream ss;
+	ss << "<radialGradient id=\"" << _id
+		<< "\" cx=\"" << m_center.x()
+		<< "\" cy=\"" << m_center.y()
+		<< "\" r=\"" << m_centerRadius
+		<< "\" gradientUnits=\"objectBoundingBox\"";
+
+	// Add focal point if defined
+	if (m_focalSet) {
+		ss << " fx=\"" << m_focal.x() << "\" fy=\"" << m_focal.y() << "\"";
+	}
+
+	// Handle spread method
+	switch (getSpread()) {
+	case GradientSpread::Pad:   ss << " spreadMethod=\"pad\""; break;
+	case GradientSpread::Reflect: ss << " spreadMethod=\"reflect\""; break;
+	case GradientSpread::Repeat: ss << " spreadMethod=\"repeat\""; break;
+	default:
+		OT_LOG_E("Unknown gradient spread method (" + std::to_string(static_cast<int>(getSpread())) + ")");
+		break;
+	}
+
+	ss << ">";
+
+	// Add color stops
+	for (const auto& stop : getStops()) {
+		const Color& c = stop.getColor();
+		ss << "<stop offset=\"" << (stop.getPos() * 100.0)
+			<< "%\" stop-color=\"#"
+			<< String::numberToHexString(stop.getColor().r(), '0', 2)
+			<< String::numberToHexString(stop.getColor().g(), '0', 2)
+			<< String::numberToHexString(stop.getColor().b(), '0', 2)
+			<< "\" stop-opacity=\""
+			<< (ColorF::channelValueFromInt(stop.getColor().a())) << "\"/>";
+	}
+
+	ss << "</radialGradient>";
+	return ss.str();
 }
 
 bool ot::RadialGradientPainter2D::isEqualTo(const Painter2D* _other) const {

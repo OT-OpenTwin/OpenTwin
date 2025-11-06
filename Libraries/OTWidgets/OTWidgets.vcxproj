@@ -128,6 +128,8 @@
     <ClCompile Include="src\PlotView.cpp" />
     <ClCompile Include="src\PolarPlotCurve.cpp" />
     <ClCompile Include="src\SelectionData.cpp" />
+    <ClCompile Include="src\OTSVGDataParser.cpp" />
+    <ClCompile Include="src\StyledSvgWidget.cpp" />
     <ClCompile Include="src\TagListWidget.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
@@ -306,6 +308,8 @@
     <ClInclude Include="include\OTWidgets\PolarPlotCurve.h" />
     <ClInclude Include="include\OTWidgets\SelectionData.h" />
     <QtMoc Include="include\OTWidgets\TagListWidget.h" />
+    <ClInclude Include="include\OTWidgets\OTSVGDataParser.h" />
+    <QtMoc Include="include\OTWidgets\StyledSvgWidget.h" />
     <ClInclude Include="include\OTWidgets\TemporaryDir.h" />
     <QtMoc Include="include\OTWidgets\TextEdit.h" />
     <ClInclude Include="include\OTWidgets\TreeItemDelegate.h" />
@@ -547,20 +551,20 @@
   </ImportGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;widgets;svg;svgwidgets</QtModules>
+    <QtModules>core;gui;widgets;svg;xml;svgwidgets</QtModules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;widgets;svg;svgwidgets</QtModules>
+    <QtModules>core;gui;widgets;svg;xml;svgwidgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;widgets;svg;svgwidgets</QtModules>
+    <QtModules>core;gui;widgets;svg;xml;svgwidgets</QtModules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;widgets;svg;svgwidgets</QtModules>
+    <QtModules>core;gui;widgets;svg;xml;svgwidgets</QtModules>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />

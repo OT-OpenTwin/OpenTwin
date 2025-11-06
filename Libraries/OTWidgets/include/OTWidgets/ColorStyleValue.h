@@ -64,17 +64,25 @@ namespace ot {
 		// Setter/Getter
 
 		void setEntryKey(ColorStyleValueEntry _key) { m_entryKey = _key; };
-		ColorStyleValueEntry getEntryKey(void) const { return m_entryKey; };
+		ColorStyleValueEntry getEntryKey() const { return m_entryKey; };
 
-		QString toQss(void) const;
-		QColor toColor(void) const;
-		QBrush toBrush(void) const;
+		QString toQss() const;
+
+		//! @brief Generates an SVG paint server with the specified ID.
+		//! The paint server ID is used to reference the paint server in SVG elements.
+		//! The string returned contains the SVG definitions needed for the paint server.
+		//! @param _id The ID to use for the paint server.
+		//! @return A byteArray string containing the SVG definitions for the paint server.
+		QByteArray toSvgColorString(const std::string& _id) const;
+
+		QColor toColor() const;
+		QBrush toBrush() const;
 
 		//! @brief Set the painter which will also set the brush
 		//! The object takes ownership
 		void setPainter(Painter2D* _painter);
 		void setPainter(const Painter2D* _painter);
-		Painter2D* painter(void) const { return m_painter; };
+		Painter2D* painter() const { return m_painter; };
 
 		void setColor(DefaultColor _color);
 		void setColor(Color _color);

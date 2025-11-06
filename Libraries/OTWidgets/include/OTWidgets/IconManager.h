@@ -66,8 +66,12 @@ namespace ot {
 		//! @brief Return or import and return the movie.
 		static std::shared_ptr<QMovie> getMovie(const QString& _subPath);
 
-		//! @brief Return or import and return the pixmap.
+		//! @brief Return or import and return the svg data.
 		static const QByteArray& getSvgData(const QString& _subPath);
+
+		//! @brief Return or import, parse and return the svg data.
+		//! @param _subPath The sub path of the svg file to load and parse.
+		static const QByteArray& getParsedSvgData(const QString& _subPath);
 
 		//! @brief Stores the application icon.
 		static void setApplicationIcon(const QIcon& _icon);
@@ -82,6 +86,8 @@ namespace ot {
 
 		//! @brief Returns the default project icon.
 		static const QIcon& getDefaultProjectIcon(void);
+
+		static void clearParsedSvgDataCache();
 
 	private:
 		template <class T>
@@ -104,10 +110,11 @@ namespace ot {
 		std::map<QString, std::shared_ptr<QPixmap>> m_pixmaps;
 		std::map<QString, std::shared_ptr<QMovie>> m_movies;
 		std::map<QString, std::shared_ptr<QByteArray>> m_svgData;
+		std::map<QString, QByteArray> m_parsedSvgData;
 		std::shared_ptr<QIcon> m_emptyIcon;
 		std::shared_ptr<QPixmap> m_emptyPixmap;
 		std::shared_ptr<QMovie> m_emptyMovie;
-		std::shared_ptr<QByteArray> m_emptySvgData;
+		QByteArray m_emptyByteArray;
 		QIcon m_applicationIcon;
 		QIcon m_defaultProjectIcon;
 	};

@@ -18,11 +18,16 @@
 // @otlicense-end
 
 #pragma once
+
+// OpenTwin header
 #include "OTGui/StyleRefPainter2D.h"
+
+// std header
 #include <memory>
+
 namespace ot
 {
-	class __declspec(dllexport) PainterRainbowIterator
+	class OT_GUI_API_EXPORT PainterRainbowIterator
 	{
 		public:
 			PainterRainbowIterator();
