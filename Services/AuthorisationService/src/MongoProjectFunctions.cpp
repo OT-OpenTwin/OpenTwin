@@ -462,8 +462,11 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 
 	// Add text filter if specified
 	if (!_textFilter.empty()) {
-		auto projectNameFilter = bsoncxx::types::b_regex(".*" + _textFilter + ".*", "i");
-		filterBuilder.append(document{} << "project_name" << projectNameFilter << finalize);
+		filterBuilder.append(document{} 
+			<< "project_name" 
+			<< bsoncxx::types::b_regex(std::string(".*" + _textFilter + ".*"), "i") 
+			<< finalize
+		);
 	}
 
 	value filterDoc = document{} << "$and" << filterBuilder << finalize;
