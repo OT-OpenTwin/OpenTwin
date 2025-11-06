@@ -123,24 +123,24 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
-	_ui->addMenuPage("Project");
+	_ui->addMenuPage("LTSpice Project");
 	
-	_ui->addMenuGroup("Project", "Local Project");
-	_ui->addMenuGroup("Project", "Versions");
+	_ui->addMenuGroup("LTSpice Project", "Local Project");
+	_ui->addMenuGroup("LTSpice Project", "Versions");
 
 	ot::LockTypes modelWrite(ot::LockType::ModelWrite);
 
-	_ui->addMenuButton("Project", "Local Project", "Import", "Import", modelWrite, "Import", "Default");
-	_ui->addMenuButton("Project", "Local Project", "Set File", "Set File", modelWrite, "ProjectSaveAs", "Default");
-	_ui->addMenuButton("Project", "Versions", "Information", "Information", modelWrite, "Information", "Default");
-	_ui->addMenuButton("Project", "Versions", "Commit", "Commit", modelWrite, "AddSolver", "Default");
-	_ui->addMenuButton("Project", "Versions", "Checkout", "Checkout", modelWrite, "ArrowGreenDown", "Default");
+	_ui->addMenuButton("LTSpice Project", "Local Project", "Import", "Import", modelWrite, "Import", "Default");
+	_ui->addMenuButton("LTSpice Project", "Local Project", "Set File", "Set File", modelWrite, "ProjectSaveAs", "Default");
+	_ui->addMenuButton("LTSpice Project", "Versions", "Information", "Information", modelWrite, "Information", "Default");
+	_ui->addMenuButton("LTSpice Project", "Versions", "Commit", "Commit", modelWrite, "AddSolver", "Default");
+	_ui->addMenuButton("LTSpice Project", "Versions", "Checkout", "Checkout", modelWrite, "ArrowGreenDown", "Default");
 
-	connectToolBarButton("Project:Local Project:Import", this, &Application::importProject);
-	connectToolBarButton("Project:Local Project:Set File", this, &Application::setLTSpiceFile);
-	connectToolBarButton("Project:Versions:Information", this, &Application::showInformation);
-	connectToolBarButton("Project:Versions:Commit", this, &Application::commitChanges);
-	connectToolBarButton("Project:Versions:Checkout", this, &Application::getChanges);
+	connectToolBarButton("LTSpice Project:Local Project:Import", this, &Application::importProject);
+	connectToolBarButton("LTSpice Project:Local Project:Set File", this, &Application::setLTSpiceFile);
+	connectToolBarButton("LTSpice Project:Versions:Information", this, &Application::showInformation);
+	connectToolBarButton("LTSpice Project:Versions:Commit", this, &Application::commitChanges);
+	connectToolBarButton("LTSpice Project:Versions:Checkout", this, &Application::getChanges);
 
 	modelSelectionChanged();
 

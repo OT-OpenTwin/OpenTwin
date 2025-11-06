@@ -71,23 +71,23 @@
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
-	m_importProjectButton = ot::ToolBarButtonCfg("Project", "Local Project", "Import", "Default/Import");
+	m_importProjectButton = ot::ToolBarButtonCfg("CST Studio Suite Project", "Local Project", "Import", "Default/Import");
 	m_importProjectButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	connectToolBarButton(m_importProjectButton, this, &Application::handleImportProject);
 
-	m_setCSTFileButton = ot::ToolBarButtonCfg("Project", "Local Project", "Set File", "Default/ProjectSaveAs");
+	m_setCSTFileButton = ot::ToolBarButtonCfg("CST Studio Suite Project", "Local Project", "Set File", "Default/ProjectSaveAs");
 	m_setCSTFileButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	connectToolBarButton(m_setCSTFileButton, this, &Application::handleSetCSTFile);
 
-	m_showInformationButton = ot::ToolBarButtonCfg("Project", "Versions", "Information", "Default/Information");
+	m_showInformationButton = ot::ToolBarButtonCfg("CST Studio Suite Project", "Versions", "Information", "Default/Information");
 	m_showInformationButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	connectToolBarButton(m_showInformationButton, this, &Application::handleShowInformation);
 
-	m_commitChangesButton = ot::ToolBarButtonCfg("Project", "Versions", "Commit", "Default/AddSolver");
+	m_commitChangesButton = ot::ToolBarButtonCfg("CST Studio Suite Project", "Versions", "Commit", "Default/AddSolver");
 	m_commitChangesButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	connectToolBarButton(m_commitChangesButton, this, &Application::handleCommitChanges);
 
-	m_getChangesButton = ot::ToolBarButtonCfg("Project", "Versions", "Checkout", "Default/ArrowGreenDown");
+	m_getChangesButton = ot::ToolBarButtonCfg("CST Studio Suite Project", "Versions", "Checkout", "Default/ArrowGreenDown");
 	m_getChangesButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	connectToolBarButton(m_getChangesButton, this, &Application::handleGetChanges);
 }
@@ -191,10 +191,10 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
-	_ui->addMenuPage("Project");
+	_ui->addMenuPage("CST Studio Suite Project");
 	
-	_ui->addMenuGroup("Project", "Local Project");
-	_ui->addMenuGroup("Project", "Versions");
+	_ui->addMenuGroup("CST Studio Suite Project", "Local Project");
+	_ui->addMenuGroup("CST Studio Suite Project", "Versions");
 
 	_ui->addMenuButton(m_importProjectButton);
 	_ui->addMenuButton(m_setCSTFileButton);
