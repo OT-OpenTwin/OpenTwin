@@ -991,6 +991,11 @@ void Viewer::settingsItemChanged(const ot::Property* _item) {
 		refresh(true);
 		updateRequired = true;  // We always need to store these settings right away, since they will not be stored later.
 	}
+	else if (meshSettingsItemChanged(logicalName, _item, updateRequired)) {
+		// geometry has to get updated
+		refresh(true);
+		updateRequired = true;  // We always need to store these settings right away, since they will not be stored later.
+	}
 	else if (cutplaneSettingsItemChanged(logicalName, _item, updateRequired)) {
 		// cutplane has to get updated
 		refreshCutplane();
@@ -1267,6 +1272,24 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, const 
 	return false;
 }
 
+bool Viewer::meshSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired) {
+	ViewerSettings* settings = ViewerSettings::instance();
+
+	// Check the item (Group:Subgroup:...:Item)
+	if (_logicalName == "Mesh/Edge Color") {
+		const ot::PropertyColor* actualItem = dynamic_cast<const ot::PropertyColor*>(_item);
+		if (actualItem == nullptr) {
+			OTAssert(0, "Cast item fialed");
+			return true;
+		}
+		settings->meshEdgeColor = actualItem->getValue();
+		getModel()->updateMeshEdgeColor();
+		refresh();
+		return true;
+	}
+	return false;
+}
+
 bool Viewer::displaySettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired) {
 	ViewerSettings *settings = ViewerSettings::instance();
 
@@ -1381,6 +1404,8 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	const ot::PropertyColor *geometryViewBackgroundColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Background Color"));
 	const ot::PropertyColor *geometryViewForegroundColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Foreground Color"));
 
+	const ot::PropertyColor* meshEdgeColor = dynamic_cast<const ot::PropertyColor*>(_dataset.findPropertyByPath("Mesh/Edge Color"));
+
 	const ot::PropertyBool* cutplaneDrawSolidProp = dynamic_cast<const ot::PropertyBool*>(_dataset.findPropertyByPath("Cutplane/Solid Cutplane"));
 	const ot::PropertyBool* cutplaneTextureProp = dynamic_cast<const ot::PropertyBool*>(_dataset.findPropertyByPath("Cutplane/Enable Hatching"));
 	const ot::PropertyBool* cutplaneColorFromObjProp = dynamic_cast<const ot::PropertyBool*>(_dataset.findPropertyByPath("Cutplane/Use Object Color For Cutplane"));
@@ -1425,6 +1450,8 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	if (geometryViewBackgroundColorAutomatic) { settings->viewBackgroundColorAutomatic = geometryViewBackgroundColorAutomatic->getValue(); }
 	if (geometryViewBackgroundColor) { settings->viewBackgroundColor = geometryViewBackgroundColor->getValue(); }
 	if (geometryViewForegroundColor) { settings->viewForegroundColor = geometryViewForegroundColor->getValue(); }
+
+	if (meshEdgeColor) { settings->meshEdgeColor = meshEdgeColor->getValue(); }
 
 	if (cutplaneDrawSolidProp) { settings->cutplaneDrawSolid = cutplaneDrawSolidProp->getValue(); }
 	if(cutplaneTextureProp) { settings->cutplaneTexture = cutplaneTextureProp->getValue(); }
@@ -1617,6 +1644,18 @@ ot::PropertyGridCfg Viewer::createSettings(void) {
 		geometry->addProperty(viewForegroundColor);
 
 		config.addRootGroup(geometry);
+	}
+
+	// ## Mesh ##
+	{
+		// Data#
+		PropertyGroup* mesh = new ot::PropertyGroup("Mesh");
+		PropertyColor* meshEdgeColor = new PropertyColor("Edge Color", settings->meshEdgeColor);
+
+		// Add items
+		mesh->addProperty(meshEdgeColor);
+
+		config.addRootGroup(mesh);
 	}
 
 	// ## Cutplane ##

@@ -869,7 +869,7 @@ osg::Node *SceneNodeMesh::createEdgeNode(bsoncxx::document::view view, double *c
 		// Now create the osg node for the edges
 
 		osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-		colors->push_back(osg::Vec4(edgeColorRGB[0], edgeColorRGB[1], edgeColorRGB[2], 1.0f));
+		colors->push_back(osg::Vec4(getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2), 1.0f));
 
 		// Create the geometry object to store the data
 		osg::ref_ptr<osg::Geometry> newGeometry = new osg::Geometry;
@@ -966,7 +966,7 @@ osg::Node *SceneNodeMesh::createEdgeNodeBackwardCompatible(bsoncxx::document::vi
 	// Now create the osg node for the edges
 
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(edgeColorRGB[0], edgeColorRGB[1], edgeColorRGB[2], 1.0f));
+	colors->push_back(osg::Vec4(getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2), 1.0f));
 
 	// Create the geometry object to store the data
 	osg::ref_ptr<osg::Geometry> newGeometry = new osg::Geometry;
@@ -1010,7 +1010,7 @@ void SceneNodeMesh::addOwner(SceneNodeMeshItem *item, int faceID)
 	faceOwners[faceID].push_back(info);
 }
 
-void SceneNodeMesh::updateFaceStatus(const std::vector<int> &faceID)
+void SceneNodeMesh::updateFaceStatus(const std::vector<int> &faceID, bool edgeColorChanged)
 {
 	for (auto signedFace : faceID)
 	{
@@ -1022,7 +1022,7 @@ void SceneNodeMesh::updateFaceStatus(const std::vector<int> &faceID)
 		if (faceOwners[face].size() == 0)
 		{
 			// This face has no owner -> it belongs to a mesh item which was deleted -> the face is hidden
-			setFaceStatus(face, false, false, false, false, false, 0.0, 0.0, 0.0, nullptr);
+			setFaceStatus(face, false, false, false, false, false, 0.0, 0.0, 0.0, edgeColorChanged, nullptr);
 		}
 		else if (faceOwners[face].size() == 1)
 		{
@@ -1031,7 +1031,7 @@ void SceneNodeMesh::updateFaceStatus(const std::vector<int> &faceID)
 			SceneNodeMeshItem *item = faceOwners[face].at(0).second;
 
 			// The face is visible of the owner is visible
-			setFaceStatus(face, item->isVisible(), forward, !item->getIsVolume(), item->isTransparent(), item->isWireframe(), item->getColorR(), item->getColorG(), item->getColorB(), item);
+			setFaceStatus(face, item->isVisible(), forward, !item->getIsVolume(), item->isTransparent(), item->isWireframe(), item->getColorR(), item->getColorG(), item->getColorB(), edgeColorChanged, item);
 		}
 		else if (faceOwners[face].size() == 2)
 		{
@@ -1050,21 +1050,21 @@ void SceneNodeMesh::updateFaceStatus(const std::vector<int> &faceID)
 				if (isWireframe())
 				{
 					// Here, we just draw the first face
-					setFaceStatus(face, item1->isVisible(), forward1, !item1->getIsVolume(), false, item1->isWireframe(), item1->getColorR(), item1->getColorG(), item1->getColorB(), item1);
+					setFaceStatus(face, item1->isVisible(), forward1, !item1->getIsVolume(), false, item1->isWireframe(), item1->getColorR(), item1->getColorG(), item1->getColorB(), edgeColorChanged, item1);
 				}
 				else
 				{
 					// The face is hidden inside the object and therefore invisible
-					setFaceStatus(face, false, false, false, false, false, 0.0, 0.0, 0.0, nullptr);
+					setFaceStatus(face, false, false, false, false, false, 0.0, 0.0, 0.0, edgeColorChanged, nullptr);
 				}
 			}
 			else if (drawOpaqueItem1)
 			{
-				setFaceStatus(face, item1->isVisible(), forward1, !item1->getIsVolume(), false, item1->isWireframe(), item1->getColorR(), item1->getColorG(), item1->getColorB(), item1);
+				setFaceStatus(face, item1->isVisible(), forward1, !item1->getIsVolume(), false, item1->isWireframe(), item1->getColorR(), item1->getColorG(), item1->getColorB(), edgeColorChanged, item1);
 			}
 			else if (drawOpaqueItem2)
 			{
-				setFaceStatus(face, item2->isVisible(), forward2, !item2->getIsVolume(), false, item2->isWireframe(), item2->getColorR(), item2->getColorG(), item2->getColorB(), item2);
+				setFaceStatus(face, item2->isVisible(), forward2, !item2->getIsVolume(), false, item2->isWireframe(), item2->getColorR(), item2->getColorG(), item2->getColorB(), edgeColorChanged, item2);
 			}
 			else
 			{
@@ -1073,22 +1073,22 @@ void SceneNodeMesh::updateFaceStatus(const std::vector<int> &faceID)
 				if (!item1->isVisible() && !item2->isVisible())
 				{
 					// None of the two items is visible -> hide the face
-					setFaceStatus(face, false, false, false, false, false, 0.0, 0.0, 0.0, nullptr);
+					setFaceStatus(face, false, false, false, false, false, 0.0, 0.0, 0.0, edgeColorChanged, nullptr);
 				}
 				else if (item1->isVisible() && item2->isVisible())
 				{
 					// Both items are visible -> hide the face
-					setFaceStatus(face, false, false, false, false, false, 0.0, 0.0, 0.0, nullptr);
+					setFaceStatus(face, false, false, false, false, false, 0.0, 0.0, 0.0, edgeColorChanged, nullptr);
 				}
 				else
 				{
 					if (item1->isVisible())
 					{
-						setFaceStatus(face, true, forward1, !item1->getIsVolume(), true, item1->isWireframe(), item1->getColorR(), item1->getColorG(), item1->getColorB(), item1);
+						setFaceStatus(face, true, forward1, !item1->getIsVolume(), true, item1->isWireframe(), item1->getColorR(), item1->getColorG(), item1->getColorB(), edgeColorChanged, item1);
 					}
 					else if (item2->isVisible())
 					{
-						setFaceStatus(face, true, forward2, !item2->getIsVolume(), true, item2->isWireframe(), item2->getColorR(), item2->getColorG(), item2->getColorB(), item2);
+						setFaceStatus(face, true, forward2, !item2->getIsVolume(), true, item2->isWireframe(), item2->getColorR(), item2->getColorG(), item2->getColorB(), edgeColorChanged, item2);
 					}
 				}
 			}
@@ -1100,7 +1100,7 @@ void SceneNodeMesh::updateFaceStatus(const std::vector<int> &faceID)
 	}
 }
 
-void SceneNodeMesh::setFaceStatus(int face, bool visible, bool forward, bool doublesided, bool transparent, bool wireframe, double r, double g, double b, SceneNodeBase *owner)
+void SceneNodeMesh::setFaceStatus(int face, bool visible, bool forward, bool doublesided, bool transparent, bool wireframe, double r, double g, double b, bool edgeColorChanged, SceneNodeBase *owner)
 {
 	// Check whether face status has really changed
 
@@ -1124,7 +1124,7 @@ void SceneNodeMesh::setFaceStatus(int face, bool visible, bool forward, bool dou
 		if (statusCache.wireframe == wireframe) wireframeChanged = false;
 		if (fabs(statusCache.r - r) < 1e-10 && fabs(statusCache.g - g) < 1e-10 && fabs(statusCache.b - b) < 1e-10) colorChanged = false;
 
-		if (!visibilityChanged && !forwardChanged && !doublesidedChanged && !transparentChanged && !wireframeChanged && !colorChanged)
+		if (!visibilityChanged && !forwardChanged && !doublesidedChanged && !transparentChanged && !wireframeChanged && !colorChanged && !edgeColorChanged)
 		{
 			// The face has not changed
 			return;
@@ -1201,13 +1201,13 @@ void SceneNodeMesh::setFaceStatus(int face, bool visible, bool forward, bool dou
 		faceRefreshNeeded = true;
 	}
 
-	if (colorChanged || wireframeChanged)
+	if (colorChanged || wireframeChanged || edgeColorChanged)
 	{
 		// Modify the color of the edge
 		osg::Vec4Array *edgeColorArray = dynamic_cast<osg::Vec4Array *>(edgeGeometry->getColorArray());
 		if (edgeColorArray != nullptr)
 		{
-			edgeColorArray->at(0) = wireframe ? osg::Vec4(r, g, b, 1.0f) : osg::Vec4(edgeColorRGB[0], edgeColorRGB[1], edgeColorRGB[2], 1.0f);
+			edgeColorArray->at(0) = wireframe ? osg::Vec4(r, g, b, 1.0f) : osg::Vec4(getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2), 1.0f);
 			edgeColorArray->dirty();
 		}
 		edgeRefreshNeeded = true;
@@ -1297,7 +1297,7 @@ void SceneNodeMesh::removeOwner(SceneNodeMeshItem *item, const std::vector<int> 
 		}
 	}
 
-	updateFaceStatus(faceID);
+	updateFaceStatus(faceID, false);
 }
 
 void SceneNodeMesh::setTransparency(double value)
@@ -1320,5 +1320,25 @@ void SceneNodeMesh::setTransparency(double value)
 
 		faceGeometry->dirtyGLObjects();
 	}
+}
+
+double SceneNodeMesh::getActualEdgeColor(const double colorRGB[], int index)
+{
+	double color[] = { ViewerSettings::instance()->meshEdgeColor.r() / 255.0,
+						ViewerSettings::instance()->meshEdgeColor.g() / 255.0,
+						ViewerSettings::instance()->meshEdgeColor.b() / 255.0 };
+	return color[index];
+}
+
+void SceneNodeMesh::updateEdgeColor()
+{
+	std::vector<int> faceIDList;
+
+	for (auto& face : faceTriangles)
+	{
+		faceIDList.push_back(face.first);
+	}
+
+	updateFaceStatus(faceIDList, true);
 }
 

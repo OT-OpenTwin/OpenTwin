@@ -74,6 +74,9 @@ public:
 	ot::Color geometryEdgeColor;
 	std::string geometryLightSourceDistance;
 
+	// Mesh attributes
+	ot::Color   meshEdgeColor;
+
 	// Display attributes
 	bool useDisplayLists;
 	bool useVertexBufferObjects;

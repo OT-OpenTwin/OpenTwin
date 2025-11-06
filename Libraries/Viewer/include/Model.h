@@ -188,6 +188,7 @@ public:
 	void setHighlightColor(const ot::Color &colorValue);
 	void setHighlightLineWidth(double lineWidthValue);
 	void updateEdgeColorMode();
+	void updateMeshEdgeColor();
 
 private:
 	// Methods

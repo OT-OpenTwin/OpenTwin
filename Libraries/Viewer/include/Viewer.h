@@ -99,6 +99,7 @@ public:
 	bool axisCrossSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
 	bool snappingSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
 	bool geometrySettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
+	bool meshSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
 	bool cutplaneSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
 	bool displaySettingsItemChanged(const std::string& _logicalName, const ot::Property*_item, bool& _settingsUpdateRequired);
 

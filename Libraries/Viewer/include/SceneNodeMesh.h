@@ -68,7 +68,7 @@ public:
 
 	void addOwner(SceneNodeMeshItem *item, int faceID);
 	void removeOwner(SceneNodeMeshItem *item, const std::vector<int> &faceID);
-	void updateFaceStatus(const std::vector<int> &faceID);
+	void updateFaceStatus(const std::vector<int> &faceID, bool edgeColorChanged);
 
 	void ensureDataLoaded(void);
 
@@ -83,6 +83,8 @@ public:
 
 	virtual void setTransparency(double value) override;
 
+	void updateEdgeColor();
+
 private:
 	void loadMeshData(bsoncxx::builder::basic::document &doc);
 	void loadCoordinates(unsigned long long meshNodesID, unsigned long long meshNodesVersion, double *&coordX, double *&coordY, double *&coordZ);
@@ -93,7 +95,7 @@ private:
 	osg::Node *createEdgeNode(bsoncxx::document::view view, double *coordX, double *coordY, double *coordZ);
 	osg::Node *createEdgeNodeBackwardCompatible(bsoncxx::document::view view, double *coordX, double *coordY, double *coordZ);
 	void addEdge(size_t p1, size_t p2, std::map<std::pair<size_t, size_t>, bool> &edgeMap);
-	void setFaceStatus(int face, bool visible, bool forward, bool doublesided, bool transparent, bool wireframe, double r, double g, double b, SceneNodeBase *owner);
+	void setFaceStatus(int face, bool visible, bool forward, bool doublesided, bool transparent, bool wireframe, double r, double g, double b, bool edgeColorChanged, SceneNodeBase *owner);
 	void setTransparent(osg::Geometry *faceGeometry, bool transparent);
 	void recursivelySetDisplayEdges(bool displayEdges, SceneNodeBase *root);
 	void getPrefetchForAllChildNodes(SceneNodeBase *root, std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
@@ -108,6 +110,7 @@ private:
 	void addTriangle(size_t n1Index, size_t n2Index, size_t n3Index, osg::ref_ptr<osg::Vec3Array> &vertices, osg::ref_ptr<osg::Vec3Array> &normals, size_t &nVertex, size_t &nNormal);
 	void averageNormals(size_t n1Index, size_t n2Index, size_t n3Index, osg::ref_ptr<osg::Vec3Array> &normals, size_t &nNormalBase);
 	void averageNormals(size_t n1Index, size_t n2Index, size_t n3Index, size_t n4Index, size_t n5Index, size_t n6Index, osg::ref_ptr<osg::Vec3Array> &normals, size_t &nNormalBase);
+	double getActualEdgeColor(const double color[], int index);
 
 	std::map<int, osg::Node *> faceTriangles;
 	std::map<int, osg::Node *> faceEdges;

@@ -3542,3 +3542,22 @@ void Model::updateEdgeColorMode()
 
 	setUpdateEdgeColorModeRecursive(sceneNodesRoot, setUpdateEdgeColorModeRecursive);
 }
+
+void Model::updateMeshEdgeColor()
+{
+	auto setupdateMeshEdgeColorModeRecursive = [&](SceneNodeBase* node, auto&& setupdateMeshEdgeColorModeRecursiveRef) -> void
+		{
+			SceneNodeMesh* meshNode = dynamic_cast<SceneNodeMesh*>(node);
+			if (meshNode != nullptr)
+			{
+				meshNode->updateEdgeColor();
+			}
+
+			for (auto child : node->getChildren())
+			{
+				setupdateMeshEdgeColorModeRecursiveRef(child, setupdateMeshEdgeColorModeRecursiveRef);
+			}
+		};
+
+	setupdateMeshEdgeColorModeRecursive(sceneNodesRoot, setupdateMeshEdgeColorModeRecursive);
+}

@@ -142,7 +142,7 @@ void SceneNodeMeshItem::ensureDataLoaded(void)
 
 void SceneNodeMeshItem::updateVisibility(void)
 {
-	getMesh()->updateFaceStatus(faceID);
+	getMesh()->updateFaceStatus(faceID, false);
 }
 
 void SceneNodeMeshItem::setTransparent(bool t)
@@ -426,6 +426,6 @@ void SceneNodeMeshItem::updateObjectColor(double r, double g, double b)
 	// Now update the colors of the faces
 	if (mesh != nullptr)
 	{
-		mesh->updateFaceStatus(faceID);
+		mesh->updateFaceStatus(faceID, false);
 	}
 }

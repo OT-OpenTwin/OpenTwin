@@ -43,7 +43,7 @@ ViewerSettings::ViewerSettings()
 	geometryEdgeColorMode_noColor("No Color"), geometryEdgeColor(125, 125, 125, 255), geometryLightSourceDistance("Medium"),
 	viewBackgroundColorAutomatic(true), viewBackgroundColor(255, 255, 255, 255), viewForegroundColor(0, 0, 0, 255), useDisplayLists(false), useVertexBufferObjects(true),
 	cutplaneDrawSolid(true), cutplaneColorFromObject(true), cutplaneFillColor(255, 0, 0), cutplaneOutlineColor(0, 255, 0), cutplaneOutlineWidth(2.0), cutplaneTexture(true),
-	geometrySelectionTransparency(0.85), geometryHighlightLineWidth(2.0)
+	geometrySelectionTransparency(0.85), geometryHighlightLineWidth(2.0), meshEdgeColor(255, 255, 255, 255)
 {}
 
 ViewerSettings::~ViewerSettings() {}
