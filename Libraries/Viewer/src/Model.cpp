@@ -24,6 +24,7 @@
 #include "ViewerView.h"
 #include "FrontendAPI.h"
 #include "ViewerToolBar.h"
+#include "ViewerSettings.h"
 
 #include "OTWidgets/Table.h"
 #include "OTWidgets/TableView.h"
@@ -2988,11 +2989,11 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 
 					if (isFaceSelected(selectedItem, faceId))
 					{
-						selectedItem->setEdgeHighlight(faceId, true, 3.0);
+						selectedItem->setEdgeHighlight(faceId, true, ViewerSettings::instance()->geometryHighlightLineWidth);
 					}
 					else
 					{
-						selectedItem->setEdgeHighlight(faceId, true, 2.5);
+						selectedItem->setEdgeHighlight(faceId, true, ViewerSettings::instance()->geometryHighlightLineWidth);
 					}
 					currentHoverItem = selectedItem;
 				}
@@ -3471,4 +3472,54 @@ void Model::setTransparency(double transparencyValue)
 	};
 
 	setTransparencyRecursive(sceneNodesRoot, setTransparencyRecursive);
+}
+
+void Model::setHighlightColor(const ot::Color& colorValue)
+{
+	auto setHighlightColorRecursive = [&](SceneNodeBase* node, auto&& setHighlightColorRecursiveRef) -> void
+	{
+		SceneNodeGeometry* geometryNode = dynamic_cast<SceneNodeGeometry*>(node);
+		if (geometryNode != nullptr)
+		{
+			geometryNode->setHighlightColor(colorValue);
+		}
+
+		SceneNodeAnnotation* annotationNode = dynamic_cast<SceneNodeAnnotation*>(node);
+		if (annotationNode != nullptr)
+		{
+			annotationNode->setHighlightColor(colorValue);
+		}
+
+		for (auto child : node->getChildren())
+		{
+			setHighlightColorRecursiveRef(child, setHighlightColorRecursiveRef);
+		}
+	};
+
+	setHighlightColorRecursive(sceneNodesRoot, setHighlightColorRecursive);
+}
+
+void Model::setHighlightLineWidth(double lineWidthValue)
+{
+	auto setHighlightLineWidthRecursive = [&](SceneNodeBase* node, auto&& setHighlightLineWidthRecursiveRef) -> void
+	{
+		SceneNodeGeometry* geometryNode = dynamic_cast<SceneNodeGeometry*>(node);
+		if (geometryNode != nullptr)
+		{
+			geometryNode->setHighlightLineWidth(lineWidthValue);
+		}
+
+		SceneNodeAnnotation* annotationNode = dynamic_cast<SceneNodeAnnotation*>(node);
+		if (annotationNode != nullptr)
+		{
+			annotationNode->setHighlightLineWidth(lineWidthValue);
+		}
+
+		for (auto child : node->getChildren())
+		{
+			setHighlightLineWidthRecursiveRef(child, setHighlightLineWidthRecursiveRef);
+		}
+	};
+
+	setHighlightLineWidthRecursive(sceneNodesRoot, setHighlightLineWidthRecursive);
 }

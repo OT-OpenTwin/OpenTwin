@@ -185,6 +185,8 @@ public:
 	void setCursorText(const std::string& text);
 
 	void setTransparency(double transparencyValue);
+	void setHighlightColor(const ot::Color &colorValue);
+	void setHighlightLineWidth(double lineWidthValue);
 
 private:
 	// Methods

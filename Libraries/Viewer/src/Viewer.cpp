@@ -1188,6 +1188,8 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, const 
 			return true;
 		}
 		settings->geometryHighlightColor = actualItem->getValue();
+		getModel()->setHighlightColor(settings->geometryHighlightColor);
+		refresh();
 		return true;
 	}
 	else if (_logicalName == "Geometry/Highlight Line Width") {
@@ -1197,6 +1199,8 @@ bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, const 
 			return true;
 		}
 		settings->geometryHighlightLineWidth = actualItem->getValue();
+		getModel()->setHighlightLineWidth(settings->geometryHighlightLineWidth);
+		refresh();
 		return true;
 	}
 	else if (_logicalName == "Geometry/Edge Color Mode") {

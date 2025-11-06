@@ -28,6 +28,9 @@ namespace osg
 #include "Geometry.h"
 #include "Viewer.h"
 #include "SceneNodeBase.h"
+
+#include "OTCore/Color.h"
+
 #include <osg/Material>
 #include <osg/TexGen>
 #include <osg/TexEnv>
@@ -124,6 +127,9 @@ public:
 	void deleteCutCapGeometryEdges();
 
 	virtual void setTransparency(double value) override;
+
+	void setHighlightColor(const ot::Color & colorValue);
+	void setHighlightLineWidth(double lineWidth);
 
 private:
 	void deleteShapeNode(void);

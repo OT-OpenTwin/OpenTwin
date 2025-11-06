@@ -361,11 +361,15 @@ void SceneNodeAnnotation::createOSGNodeFromEdges(const double colorRGB[3],
 	}
 
 	// Now build the osg nodes for the edge and the selected edge
-	edgesNode = buildEdgesOSGNode(nEdges, vertices, colorRGB[0], colorRGB[1], colorRGB[2], true);
-	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices, 1.0, 0.0, 0.0, false);
+	edgesNode = buildEdgesOSGNode(nEdges, vertices, colorRGB[0], colorRGB[1], colorRGB[2], true, 1.0);
+	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices, 
+											 ViewerSettings::instance()->geometryHighlightColor.r() / 255.0,
+											 ViewerSettings::instance()->geometryHighlightColor.g() / 255.0,
+											 ViewerSettings::instance()->geometryHighlightColor.b() / 255.0, 
+											 false, ViewerSettings::instance()->geometryHighlightLineWidth);
 }
 
-osg::Node *SceneNodeAnnotation::buildEdgesOSGNode(unsigned long long nEdges, osg::ref_ptr<osg::Vec3Array> &vertices, double r, double g, double b, bool depthTest)
+osg::Node *SceneNodeAnnotation::buildEdgesOSGNode(unsigned long long nEdges, osg::ref_ptr<osg::Vec3Array> &vertices, double r, double g, double b, bool depthTest, double lineWidth)
 {
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
 	colors->push_back(osg::Vec4(r, g, b, 1.0f));
@@ -397,7 +401,7 @@ osg::Node *SceneNodeAnnotation::buildEdgesOSGNode(unsigned long long nEdges, osg
 	ss->setMode(GL_BLEND, osg::StateAttribute::ON);
 	ss->setAttributeAndModes(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE));
 	ss->setMode(GL_LINE_SMOOTH, osg::StateAttribute::ON);
-	ss->setAttribute(new osg::LineWidth(1.0), osg::StateAttribute::ON);
+	ss->setAttribute(new osg::LineWidth(lineWidth), osg::StateAttribute::ON);
 
 	if (!depthTest)
 	{
@@ -426,7 +430,7 @@ void SceneNodeAnnotation::createOSGNodeFromVertices(const std::vector<std::array
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array(nVertices);
 
 	osg::ref_ptr<osg::Vec4Array> highlightColor = new osg::Vec4Array;
-	highlightColor->push_back(osg::Vec4(1.0, 0.0, 0.0, 1.0f));
+	highlightColor->push_back(osg::Vec4(ViewerSettings::instance()->geometryHighlightColor.r() / 255.0, ViewerSettings::instance()->geometryHighlightColor.g() / 255.0, ViewerSettings::instance()->geometryHighlightColor.b() / 255.0, 1.0f));
 
 	for (unsigned long long nV = 0; nV < nVertices; nV++)
 	{
@@ -569,3 +573,65 @@ void SceneNodeAnnotation::setTransparency(double value)
 	}
 }
 
+void SceneNodeAnnotation::setHighlightColor(const ot::Color& colorValue)
+{
+	// Change the color for the highlight edges of the faces
+	osg::Geode* edgesHighlightedGeode = dynamic_cast<osg::Geode*>(edgesHighlighted);
+
+	if (edgesHighlightedGeode != nullptr)
+	{
+		osg::Geometry* edgesGeometry = dynamic_cast<osg::Geometry*>(edgesHighlightedGeode->getDrawable(0));
+		assert(edgesGeometry != nullptr);
+
+		osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(edgesGeometry->getColorArray());
+		if (colorArray != nullptr)
+		{
+			for (auto& color : *colorArray)
+			{
+				color[0] = colorValue.toColorF().r();
+				color[1] = colorValue.toColorF().g();
+				color[2] = colorValue.toColorF().b();
+			}
+		}
+
+		colorArray->dirty();
+		edgesGeometry->dirtyGLObjects();
+	}
+
+	// Change the color for highlighting the vertices
+	osg::Geode* verticesGeode = dynamic_cast<osg::Geode*>(verticesHighlighted);
+	if (verticesGeode != nullptr)
+	{
+		osg::Geometry* verticesGeometry = dynamic_cast<osg::Geometry*>(verticesGeode->getDrawable(0));
+		assert(verticesGeometry != nullptr);
+
+		osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(verticesGeometry->getColorArray());
+		if (colorArray != nullptr)
+		{
+			for (auto& color : *colorArray)
+			{
+				color[0] = colorValue.toColorF().r();
+				color[1] = colorValue.toColorF().g();
+				color[2] = colorValue.toColorF().b();
+			}
+		}
+
+		colorArray->dirty();
+		verticesGeometry->dirtyGLObjects();
+	}
+}
+
+void SceneNodeAnnotation::setHighlightLineWidth(double lineWidth)
+{
+	// Change the width for the highlight edges of the faces
+	if (edgesHighlighted != nullptr)
+	{
+		osg::StateSet* ss = edgesHighlighted->getStateSet();
+
+		if (ss != nullptr)
+		{
+			auto* lw = dynamic_cast<osg::LineWidth*>(ss->getAttribute(osg::StateAttribute::LINEWIDTH));
+			lw->setWidth(lineWidth);
+		}
+	}
+}
