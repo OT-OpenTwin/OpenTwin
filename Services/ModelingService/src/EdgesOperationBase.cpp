@@ -52,10 +52,10 @@ void EdgesOperationBase::addParametricProperty(EntityGeometry* geometryEntity, c
 {
 	EntityPropertiesDouble* doubleProp = new EntityPropertiesDouble("#" + name, value);
 	doubleProp->setVisible(false);
-	geometryEntity->getProperties().createProperty(doubleProp, "Dimensions", true);
+	geometryEntity->getProperties().createProperty(doubleProp, "Shape properties", true);
 
 	EntityPropertiesString* stringProp = new EntityPropertiesString(name, std::to_string(value));
-	geometryEntity->getProperties().createProperty(stringProp, "Dimensions", true);
+	geometryEntity->getProperties().createProperty(stringProp, "Shape properties", true);
 }
 
 void EdgesOperationBase::performOperation(const std::string &selectionInfo)
@@ -148,6 +148,11 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 
 	deleteNonStandardProperties(geometryEntity);
 
+	storeEdgeListInProperties(edgeList, geometryEntity->getProperties());
+
+	EntityPropertiesBoolean* enabledProp = new EntityPropertiesBoolean("Active", true);
+	geometryEntity->getProperties().createProperty(enabledProp, "Shape properties", true);
+
 	addSpecificProperties(geometryEntity);
 
 	EntityPropertiesString* baseShapeProperty = new EntityPropertiesString("baseShape", std::to_string(baseEntity->getEntityID()));
@@ -166,8 +171,6 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 		typeProperty->setVisible(false);
 		geometryEntity->getProperties().createProperty(typeProperty, "Internal");
 	}
-
-	storeEdgeListInProperties(edgeList, geometryEntity->getProperties());
 
 	// The geometry entity has two children: brep and facets. We need to assign ids to both of them (since we do not have a model state object here)
 	geometryEntity->getBrepEntity()->setEntityID(brepID);
@@ -204,18 +207,22 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 
 void EdgesOperationBase::storeEdgeListInProperties(std::list<EdgesData> &edgeList, EntityProperties &properties)
 {
-	EntityPropertiesInteger::createProperty("Edges", "Number of edges", (int) edgeList.size(), "", properties);
-
-	size_t edgeCounter = 1;
-	for (auto edge : edgeList)
+	// We are putting all items to the front of the property list, so we need to add them in reverse order
+	size_t edgeCounter = edgeList.size();
+	for (auto edge = edgeList.rbegin(); edge != edgeList.rend(); ++edge)
 	{
 		std::string index;
 		index = "(" + std::to_string(edgeCounter) + ")";
 
-		EntityPropertiesString::createProperty("Edges", "Edge name " + index, edge.getEdgeName(), "", properties);
+		EntityPropertiesString* stringProp = new EntityPropertiesString("Edge name " + index, edge->getEdgeName());
+		properties.createProperty(stringProp, "Edges", true);
 
-		edgeCounter++;
+		edgeCounter--;
 	}
+
+	EntityPropertiesInteger* numberEdgesProp = new EntityPropertiesInteger("Number of edges", (int)edgeList.size());
+	numberEdgesProp->setReadOnly(true);
+	properties.createProperty(numberEdgesProp, "Edges", true);
 }
 
 std::list<EdgesData> EdgesOperationBase::readEdgeListFromProperties(EntityProperties& properties)

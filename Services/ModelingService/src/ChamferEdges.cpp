@@ -74,7 +74,10 @@ bool ChamferEdges::operationActive(EntityGeometry* geometryEntity)
 	EntityPropertiesDouble* width = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Chamfer width"));
 	double chamferWidth = width->getValue();
 
-	return (chamferWidth != 0.0);
+	EntityPropertiesBoolean* active = dynamic_cast<EntityPropertiesBoolean*>(geometryEntity->getProperties().getProperty("Active"));
+	bool operationActive = active->getValue();
+
+	return (chamferWidth != 0.0 && operationActive);
 }
 
 bool ChamferEdges::performActualOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation, TopoDS_Shape& shape, TopTools_ListOfShape& listOfProcessedEdges, BRepTools_History*& history)

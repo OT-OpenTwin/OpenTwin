@@ -43,7 +43,7 @@ public:
 	virtual ~BlendEdges() {}
 
 protected:
-	void addSpecificProperties(EntityGeometry* geometryEntity);
+	void addSpecificProperties(EntityGeometry* geometryEntity) override;
 	ot::components::UiComponent::entitySelectionAction getSelectionAction();
 	std::string getOperationDescription();
 	std::string getVisibleTreeItemName();

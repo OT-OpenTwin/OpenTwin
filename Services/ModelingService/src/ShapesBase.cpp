@@ -164,7 +164,7 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 
 	for (auto prop : shapeParameters)
 	{
-		EntityPropertiesString::createProperty("Dimensions", prop.first, prop.second, "", geometryEntity->getProperties());
+		EntityPropertiesString::createProperty("Shape properties", prop.first, prop.second, "", geometryEntity->getProperties());
 
 		double value = geometryEntity->evaluateExpressionDouble(prop.second);
 
@@ -172,7 +172,7 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 		EntityPropertiesDouble *doubleProp = new EntityPropertiesDouble("#" + prop.first, value);
 		doubleProp->setVisible(false);
 
-		geometryEntity->getProperties().createProperty(doubleProp, "Dimensions");
+		geometryEntity->getProperties().createProperty(doubleProp, "Shape properties");
 	}
 
 	geometryEntity->createNonMaterialProperties();
