@@ -64,6 +64,10 @@ ot::ProjectOverviewPreviewBox::ProjectOverviewPreviewBox(QWidget* _parent)
 	m_tags->setWordWrap(true);
 	infoLayout->addWidget(m_tags, r++, 1);
 
+	infoLayout->addWidget(new ot::Label("Owner:", this), r, 0);
+	m_owner = new ot::Label(this);
+	infoLayout->addWidget(m_owner, r++, 1);
+
 	infoLayout->addWidget(new ot::Label("Access:", this), r, 0);
 	m_userGroups = new ot::Label(this);
 	m_userGroups->setWordWrap(true);
@@ -175,6 +179,7 @@ void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation&
 	m_name->setText(QString::fromStdString(_projectInfo.getProjectName()));
 	m_type->setText(QString::fromStdString(_projectInfo.getProjectType()));
 	m_projectGroup->setText(QString::fromStdString(_projectInfo.getProjectGroup()));
+	m_owner->setText(QString::fromStdString(_projectInfo.getUserName()));
 
 	std::string tagsString;
 	for (const std::string& tag : _projectInfo.getTags()) {

@@ -65,6 +65,7 @@ namespace ot {
 		ImagePainterWidget* m_imageWidget;
 		Label* m_name;
 		Label* m_type;
+		Label* m_owner;
 		Label* m_projectGroup;
 		Label* m_tags;
 		Label* m_userGroups;
