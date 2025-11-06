@@ -57,12 +57,6 @@ ot::OnePropertyDialog::OnePropertyDialog(const OnePropertyDialogCfg& _config, QW
 	this->connect(btnCancel, &PushButton::clicked, this, &OnePropertyDialog::closeCancel);
 }
 
-ot::OnePropertyDialog::~OnePropertyDialog() {
-	if (m_input) {
-		delete m_input;
-	}
-}
-
 void ot::OnePropertyDialog::addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) {
 	if (m_input) {
 		m_input->addPropertyInputValueToJson(_object, _memberNameValue, _allocator);

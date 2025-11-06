@@ -38,10 +38,7 @@ ot::PropertyGrid::PropertyGrid(QWidget* _parent) :
 	this->connect(m_tree, &QTreeWidget::itemExpanded, this, &PropertyGrid::slotItemExpanded);
 }
 
-ot::PropertyGrid::~PropertyGrid() {
-	this->clear();
-	delete m_tree;
-}
+ot::PropertyGrid::~PropertyGrid() {}
 
 QWidget* ot::PropertyGrid::getQWidget() {
 	return m_tree;

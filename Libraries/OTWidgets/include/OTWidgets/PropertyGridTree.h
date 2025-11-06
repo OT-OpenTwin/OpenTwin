@@ -33,7 +33,7 @@ namespace ot {
 		OT_DECL_NODEFAULT(PropertyGridTree)
 	public:
 		PropertyGridTree(QWidget* _parent);
-		virtual ~PropertyGridTree();
+		virtual ~PropertyGridTree() = default;
 
 	protected:
 		virtual void mousePressEvent(QMouseEvent* _event) override;

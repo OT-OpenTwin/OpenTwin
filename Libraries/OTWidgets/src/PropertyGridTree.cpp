@@ -33,11 +33,6 @@ ot::PropertyGridTree::PropertyGridTree(QWidget* _parent) : TreeWidget(_parent), 
 	m_delegate = new PropertyGridItemDelegate(this);
 }
 
-ot::PropertyGridTree::~PropertyGridTree() {
-	delete m_delegate;
-	m_delegate = nullptr;
-}
-
 void ot::PropertyGridTree::mousePressEvent(QMouseEvent* _event) {
 	QModelIndex index = indexAt(_event->pos());
 	bool last_state = isExpanded(index);

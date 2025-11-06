@@ -32,7 +32,7 @@ namespace ot {
 		OT_DECL_NOMOVE(OnePropertyDialog)
 	public:
 		OnePropertyDialog(const OnePropertyDialogCfg& _config, QWidget* _parent = (QWidget*)nullptr);
-		virtual ~OnePropertyDialog();
+		virtual ~OnePropertyDialog() = default;
 
 		void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator);
 		QVariant getCurrentValue(void) const;

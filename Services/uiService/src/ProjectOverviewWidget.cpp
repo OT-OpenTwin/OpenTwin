@@ -342,22 +342,39 @@ void ot::ProjectOverviewWidget::setProjects(const std::list<ProjectInformation>&
 		}
 	}
 
-	clear();
-
-	for (const ot::ProjectInformation& proj : _projects) {
-		std::string editorName("< Unknown >");
-		addEntry(new ProjectOverviewEntry(proj));
+	// Store selected projects
+	std::set<std::string> selectedProjects;
+	for (const QTreeWidgetItem* item : m_tree->selectedItems()) {
+		const ProjectOverviewEntry* entry = dynamic_cast<const ProjectOverviewEntry*>(item);
+		if (entry) {
+			selectedProjects.insert(entry->getProjectInformation().getProjectName());
+		}
 	}
 
-	// Restore expanded project groups
-	if (!expandedProjectGroups.empty()) {
-		for (auto& it : m_projectGroupItems) {
-			TreeWidgetItem* groupItem = it.second;
-			if (expandedProjectGroups.find(it.first) != expandedProjectGroups.end()) {
-				groupItem->setExpanded(true);
+	{
+		QSignalBlocker sigBlock(m_tree);
+
+		clear();
+
+		for (const ot::ProjectInformation& proj : _projects) {
+			std::string editorName("< Unknown >");
+			ProjectOverviewEntry* newEntry = new ProjectOverviewEntry(proj);
+			addEntry(newEntry);
+			if (selectedProjects.find(proj.getProjectName()) != selectedProjects.end()) {
+				newEntry->setSelected(true);
 			}
-			else {
-				groupItem->setExpanded(false);
+		}
+
+		// Restore expanded project groups
+		if (!expandedProjectGroups.empty()) {
+			for (auto& it : m_projectGroupItems) {
+				TreeWidgetItem* groupItem = it.second;
+				if (expandedProjectGroups.find(it.first) != expandedProjectGroups.end()) {
+					groupItem->setExpanded(true);
+				}
+				else {
+					groupItem->setExpanded(false);
+				}
 			}
 		}
 	}
@@ -385,6 +402,8 @@ void ot::ProjectOverviewWidget::setProjects(const std::list<ProjectInformation>&
 			m_countLabel->setText(QString::number(count) + " projects found");
 		}
 	}
+
+	slotSelectionChanged();
 }
 
 void ot::ProjectOverviewWidget::startLoading(const ProjectInformation& _projectInfo) {

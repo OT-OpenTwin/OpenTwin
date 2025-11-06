@@ -37,7 +37,6 @@ ot::PropertyGridItemDelegate::PropertyGridItemDelegate(TreeWidget* _tree)
 }
 
 ot::PropertyGridItemDelegate::~PropertyGridItemDelegate() {
-	m_tree->setItemDelegate(nullptr);
 	m_tree = nullptr;
 }
 
