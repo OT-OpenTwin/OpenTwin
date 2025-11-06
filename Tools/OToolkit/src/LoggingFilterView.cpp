@@ -74,27 +74,27 @@ LoggingFilterView::LoggingFilterView()
 
 	m_msgTypeFilterDetailed = new ot::CheckBox("Detailed", filterByMessageTypeBox);
 	filterByMessageTypeLayout->addWidget(m_msgTypeFilterDetailed);
+	m_msgTypeFilterDetailed->setChecked(true);
 	this->connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
 	this->connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	m_msgTypeFilterDetailed->setChecked(true);
 
 	m_msgTypeFilterInfo = new ot::CheckBox("Info", filterByMessageTypeBox);
 	filterByMessageTypeLayout->addWidget(m_msgTypeFilterInfo);
+	m_msgTypeFilterInfo->setChecked(true);
 	this->connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
 	this->connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	m_msgTypeFilterInfo->setChecked(true);
 
 	m_msgTypeFilterWarning = new ot::CheckBox("Warning", filterByMessageTypeBox);
 	filterByMessageTypeLayout->addWidget(m_msgTypeFilterWarning);
+	m_msgTypeFilterWarning->setChecked(true);
 	this->connect(m_msgTypeFilterWarning, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
 	this->connect(m_msgTypeFilterWarning, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	m_msgTypeFilterWarning->setChecked(true);
 
 	m_msgTypeFilterError = new ot::CheckBox("Error", filterByMessageTypeBox);
 	filterByMessageTypeLayout->addWidget(m_msgTypeFilterError);
+	m_msgTypeFilterError->setChecked(true);
 	this->connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
 	this->connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	m_msgTypeFilterError->setChecked(true);
 
 	m_msgTypeFilterMsgIn = new ot::CheckBox("Inbound Message", filterByMessageTypeBox);
 	filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgIn);
