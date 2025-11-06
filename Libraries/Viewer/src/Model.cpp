@@ -3553,6 +3553,12 @@ void Model::updateMeshEdgeColor()
 				meshNode->updateEdgeColor();
 			}
 
+			SceneNodeCartesianMesh* cartesianMeshNode = dynamic_cast<SceneNodeCartesianMesh*>(node);
+			if (cartesianMeshNode != nullptr)
+			{
+				cartesianMeshNode->updateEdgeColor();
+			}
+
 			for (auto child : node->getChildren())
 			{
 				setupdateMeshEdgeColorModeRecursiveRef(child, setupdateMeshEdgeColorModeRecursiveRef);

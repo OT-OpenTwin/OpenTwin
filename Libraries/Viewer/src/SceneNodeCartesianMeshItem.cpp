@@ -54,7 +54,7 @@ SceneNodeCartesianMeshItem::~SceneNodeCartesianMeshItem()
 
 void SceneNodeCartesianMeshItem::updateVisibility(void)
 {
-	getMesh()->updateFaceStatus(faceID);
+	getMesh()->updateFaceStatus(faceID, false);
 }
 
 void SceneNodeCartesianMeshItem::setTransparent(bool t)

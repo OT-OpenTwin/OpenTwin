@@ -70,7 +70,7 @@ public:
 
 	void addOwner(SceneNodeCartesianMeshItem *item, int faceID);
 	void removeOwner(SceneNodeCartesianMeshItem *item, const std::vector<int> &faceID);
-	void updateFaceStatus(const std::vector<int> &faceID);
+	void updateFaceStatus(const std::vector<int> &faceID, bool edgeColorChanged);
 
 	void ensureDataLoaded(void);
 
@@ -88,6 +88,8 @@ public:
 
 	virtual void setTransparency(double value) override;
 
+	void updateEdgeColor();
+
 private:
 	osg::Node *createOSGNodeFromCoordinates(const std::vector<double> &x, const std::vector<double> &y, const std::vector<double> &z);
 	void get1DBounds(const std::vector<double> &coords, double &min, double &max);
@@ -100,11 +102,12 @@ private:
 	void loadFace(unsigned long long faceStorageID, unsigned long long faceStorageVersion, osg::Node *&faceNode, osg::Node *&edgeNode, size_t numberPoints, double *coordX, double *coordY, double *coordZ);
 	osg::Node *createFaceNode(osg::ref_ptr<osg::Vec3Array> &vertices, osg::ref_ptr<osg::Vec3Array> &normals);
 	osg::Node *createEdgeNode(osg::ref_ptr<osg::Vec3Array> &vertices, osg::ref_ptr<osg::Vec3Array> &normals);
-	void setFaceStatus(int face, bool visible, bool forward, bool doublesided, bool transparent, bool wireframe, double r, double g, double b, SceneNodeBase *owner);
+	void setFaceStatus(int face, bool visible, bool forward, bool doublesided, bool transparent, bool wireframe, double r, double g, double b, bool edgeColorChanged, SceneNodeBase *owner);
 	void setTransparent(osg::Geometry *faceGeometry, bool transparent);
 	void createFaceFromIndices(bsoncxx::document::view view, osg::ref_ptr<osg::Vec3Array> &vertices, osg::ref_ptr<osg::Vec3Array> &normals);
 	void createFaceFromPoints(bsoncxx::document::view view, osg::ref_ptr<osg::Vec3Array> &vertices, osg::ref_ptr<osg::Vec3Array> &normals, size_t numberPoints, double *coordX, double *coordY, double *coordZ);
 	void calculateNormal(double normal[3], double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2);
+	double getActualEdgeColor(const double color[], int index);
 
 	std::map<int, osg::Node *> faceTriangles;
 	std::map<int, osg::Node *> faceEdges;
