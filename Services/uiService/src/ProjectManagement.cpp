@@ -424,7 +424,7 @@ bool ProjectManagement::findProjects(const std::string& _projectNameFilter, int 
 	return true;
 }
 
-bool ProjectManagement::findProjects(const ot::ProjectFilterData& _projectFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded) {
+bool ProjectManagement::findProjects(const ot::ProjectFilterData& _projectFilter, const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded) {
 	assert(!m_authServerURL.empty());
 
 	_projectsFound.clear();
@@ -444,6 +444,7 @@ bool ProjectManagement::findProjects(const ot::ProjectFilterData& _projectFilter
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_projectFilter, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(_projectNameFilter, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults + 1, doc.GetAllocator());
 
 	std::string response;

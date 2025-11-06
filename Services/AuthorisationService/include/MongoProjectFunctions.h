@@ -74,7 +74,7 @@ public:
 	static std::vector<Project> getAllGroupProjects(Group& group, mongocxx::client& userClient);
 
 	static std::vector<Project> getAllUserProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient);
-	static std::vector<Project> getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& filter, int limit, mongocxx::client& userClient);
+	static std::vector<Project> getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& filter, const std::string& _textFilter, int limit, mongocxx::client& userClient);
 
 	static std::vector<Project> getAllProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient);
 	static size_t getAllProjectCount(User& loggedInUser, mongocxx::client& userClient);

@@ -95,6 +95,7 @@ namespace ot {
 		const QSize c_buttonPadding;
 		int m_hoveredFilter;
 		int m_pressedFilter;
+		int m_activeFilter;
 	};
 
 }

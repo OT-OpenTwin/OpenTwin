@@ -368,7 +368,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 	return projects;
 }
 
-std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& _filter, int limit, mongocxx::client& _adminClient) {
+std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUser, const ot::ProjectFilterData& _filter, const std::string& _textFilter, int limit, mongocxx::client& _adminClient) {
 	OT_LOG_D("Searching projects of user: " + loggedInUser.username);
 
 	std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(loggedInUser, _adminClient);
@@ -459,6 +459,12 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 		filterBuilder.append(std::move(f));
 	}
 	filterBuilder.append(std::move(userAccessDoc));
+
+	// Add text filter if specified
+	if (!_textFilter.empty()) {
+		auto projectNameFilter = bsoncxx::types::b_regex(".*" + _textFilter + ".*", "i");
+		filterBuilder.append(document{} << "project_name" << projectNameFilter << finalize);
+	}
 
 	value filterDoc = document{} << "$and" << filterBuilder << finalize;
 

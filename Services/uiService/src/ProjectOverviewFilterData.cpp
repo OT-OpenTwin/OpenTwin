@@ -70,7 +70,6 @@ ot::ProjectFilterData ot::ProjectOverviewFilterData::toProjectFilterData() const
 		break;
 
 	default:
-		OT_LOG_E("Invalid logical index (" + std::to_string(m_logicalIndex) + ")");
 		break;
 	}
 

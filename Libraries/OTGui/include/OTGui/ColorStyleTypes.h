@@ -135,6 +135,7 @@ namespace ot {
 		HeaderFilterIcon,
 		HeaderFilterHoverIcon,
 		HeaderFilterPressedIcon,
+		HeaderFilterActiveIcon,
 		HeaderFilterDisabledIcon,
 
 		WindowCloseIcon,

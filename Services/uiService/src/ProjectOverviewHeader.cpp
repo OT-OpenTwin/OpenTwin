@@ -31,7 +31,7 @@
 ot::ProjectOverviewHeader::ProjectOverviewHeader(ProjectOverviewWidget* _overview, QWidget* _parent)
 	: QHeaderView(Qt::Orientation::Horizontal, _parent), m_overview(_overview),
     c_buttonSize(14, 14), c_buttonPadding(4, 4),
-    m_hoveredFilter(-1), m_pressedFilter(-1)
+    m_hoveredFilter(-1), m_pressedFilter(-1), m_activeFilter(-1)
 {
 	setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	setMouseTracking(true);
@@ -152,6 +152,9 @@ void ot::ProjectOverviewHeader::paintSection(QPainter* _painter, const QRect& _r
     }
     else if (m_hoveredFilter == _logicalIndex) {
         icon = QIcon(cs.getFile(ColorStyleFileEntry::HeaderFilterHoverIcon));
+    }
+    else if (m_activeFilter == _logicalIndex) {
+        icon = QIcon(cs.getFile(ColorStyleFileEntry::HeaderFilterActiveIcon));
     }
     else {
         icon = QIcon(cs.getFile(ColorStyleFileEntry::HeaderFilterIcon));
@@ -329,6 +332,16 @@ void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
     
     if (filter.isConfirmed()) {
 		m_lastFilter = filter.getFilterData();
+
+        if (m_lastFilter.getSelectedFilters().empty()) {
+            m_activeFilter = -1;
+        }
+        else {
+            m_activeFilter = m_lastFilter.getLogicalIndex();
+        }
+
         m_overview->filterProjects(m_lastFilter);
+
+        update();
 	}
 }

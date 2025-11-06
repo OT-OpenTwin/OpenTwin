@@ -99,6 +99,7 @@ namespace ot {
 				{ ot::ColorStyleFileEntry::HeaderFilterIcon, "Header Filter Icon" },
 				{ ot::ColorStyleFileEntry::HeaderFilterHoverIcon, "Header Filter Hover Icon" },
 				{ ot::ColorStyleFileEntry::HeaderFilterPressedIcon, "Header Filter Pressed Icon" },
+				{ ot::ColorStyleFileEntry::HeaderFilterActiveIcon, "Header Filter Active Icon" },
 				{ ot::ColorStyleFileEntry::HeaderFilterDisabledIcon, "Header Filter Disabled Icon" },
 
 				{ ot::ColorStyleFileEntry::WindowCloseIcon, "Window Close Icon" },

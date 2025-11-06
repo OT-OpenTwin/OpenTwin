@@ -164,6 +164,7 @@ void WelcomeWidget::slotCreateProject() {
 
 void WelcomeWidget::slotRefreshProjectList() {
 	m_overview->refreshProjects();
+	m_overview->updateFilterOptions();
 
 	this->updateToolButtonsEnabledState();
 }

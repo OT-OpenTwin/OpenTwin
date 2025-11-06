@@ -44,6 +44,7 @@ SelectProjectDialog::SelectProjectDialog(const ot::DialogCfg& _config, QWidget* 
 	m_overview->setMultiSelectionEnabled(false);
 	m_overview->setViewMode(AppBase::instance()->getWelcomeScreenViewMode());
 	m_overview->refreshProjects();
+	m_overview->updateFilterOptions();
 	mainLayout->addWidget(m_overview->getQWidget(), 1);
 
 	QHBoxLayout* bottomLayout = new QHBoxLayout;

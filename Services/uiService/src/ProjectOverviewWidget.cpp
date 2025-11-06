@@ -110,7 +110,7 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	connect(m_tree, &ot::TreeWidget::itemChanged, this, &ot::ProjectOverviewWidget::slotItemChanged);
 	connect(m_tree, &ot::TreeWidget::itemSelectionChanged, this, &ot::ProjectOverviewWidget::slotSelectionChanged);
 	connect(m_tree, &ot::TreeWidget::itemDoubleClicked, this, &ot::ProjectOverviewWidget::slotOpenRequested);
-	connect(&m_basicFilterTimer, &QTimer::timeout, this, &ot::ProjectOverviewWidget::slotApplyTextFilterDelayed);
+	connect(&m_basicFilterTimer, &QTimer::timeout, this, &ot::ProjectOverviewWidget::refreshProjects);
 }
 
 ot::ProjectOverviewWidget::~ProjectOverviewWidget() {
@@ -220,14 +220,18 @@ void ot::ProjectOverviewWidget::clear() {
 }
 
 void ot::ProjectOverviewWidget::refreshProjects() {
+	ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
+
 	std::list<ot::ProjectInformation> projects;
 	m_resultsExceeded = false;
-
-	ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
-	projectManager.findProjects("", ProjectManagement::defaultMaxProjects(), projects, m_resultsExceeded);
-
+	projectManager.findProjects(m_currentFilter, m_basicFilter->text().toStdString(), ProjectManagement::defaultMaxProjects(), projects, m_resultsExceeded);
 	setProjects(projects);
-	updateFilterOptions();
+}
+
+void ot::ProjectOverviewWidget::updateFilterOptions() {
+	ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
+	ProjectFilterData data = projectManager.getProjectFilterData();
+	m_header->setFilterData(std::move(data));
 }
 
 void ot::ProjectOverviewWidget::sort(int _logicalIndex, Qt::SortOrder _sortOrder) {
@@ -240,16 +244,8 @@ void ot::ProjectOverviewWidget::sort(int _logicalIndex, Qt::SortOrder _sortOrder
 
 void ot::ProjectOverviewWidget::filterProjects(const ProjectOverviewFilterData& _filterData) {
 	if (_filterData.getLogicalIndex() >= 0) {
-		ot::ProjectFilterData filter = _filterData.toProjectFilterData();
+		m_currentFilter = _filterData.toProjectFilterData();
 
-		ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
-
-		std::list<ot::ProjectInformation> projects;
-		m_resultsExceeded = false;
-		projectManager.findProjects(filter, ProjectManagement::defaultMaxProjects(), projects, m_resultsExceeded);
-		setProjects(projects);
-	}
-	else {
 		refreshProjects();
 	}
 }
@@ -326,15 +322,6 @@ void ot::ProjectOverviewWidget::slotBasicFilterReturnPressed() {
 void ot::ProjectOverviewWidget::slotBasicFilterTextChanged() {
 	m_basicFilterTimer.stop();
 	m_basicFilterTimer.start();
-}
-
-void ot::ProjectOverviewWidget::slotApplyTextFilterDelayed() {
-	ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
-
-	std::list<ot::ProjectInformation> projects;
-	m_resultsExceeded = false;
-	projectManager.findProjects(m_basicFilter->text().toStdString(), ProjectManagement::defaultMaxProjects(), projects, m_resultsExceeded);
-	setProjects(projects);
 }
 
 void ot::ProjectOverviewWidget::slotWorkerFinished() {
@@ -485,12 +472,6 @@ void ot::ProjectOverviewWidget::getAllProjects(const QTreeWidgetItem* _parent, s
 			_lst.push_back(entry->getProjectInformation());
 		}
 	}
-}
-
-void ot::ProjectOverviewWidget::updateFilterOptions() {
-	ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
-	ProjectFilterData data = projectManager.getProjectFilterData();
-	m_header->setFilterData(std::move(data));
 }
 
 ot::TreeWidgetItem* ot::ProjectOverviewWidget::getOrCreateProjectGroupItem(const std::string& _groupName) {

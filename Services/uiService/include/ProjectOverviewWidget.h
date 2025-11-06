@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "ProjectOverviewFilterData.h"
+#include "OTCore/ProjectFilterData.h"
 #include "OTCore/ProjectInformation.h"
 #include "OTGui/ExtendedProjectInformation.h"
 #include "OTWidgets/WidgetBase.h"
@@ -101,6 +102,7 @@ namespace ot {
 	public Q_SLOTS:
 		void clear();
 		void refreshProjects();
+		void updateFilterOptions();
 		void sort(int _logicalIndex, Qt::SortOrder _sortOrder);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -113,7 +115,6 @@ namespace ot {
 		void slotOpenRequested(QTreeWidgetItem* _item, int _column);
 		void slotBasicFilterReturnPressed();
 		void slotBasicFilterTextChanged();
-		void slotApplyTextFilterDelayed();
 		void slotWorkerFinished();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -129,8 +130,6 @@ namespace ot {
 		void updateCheckStates(QTreeWidgetItem* _parent);
 		int getProjectCount(const QTreeWidgetItem* _parent) const;
 		void getAllProjects(const QTreeWidgetItem* _parent, std::list<ProjectInformation>& _lst) const;
-		
-		void updateFilterOptions();
 
 		TreeWidgetItem* getOrCreateProjectGroupItem(const std::string& _groupName);
 
@@ -139,6 +138,8 @@ namespace ot {
 		std::unique_ptr<std::thread> m_loadingThread;
 		ProjectInformation m_currentlyLoadingProject;
 		ExtendedProjectInformation m_importedProjectData;
+
+		ot::ProjectFilterData m_currentFilter;
 
 		std::map<std::string, TreeWidgetItem*> m_projectGroupItems;
 

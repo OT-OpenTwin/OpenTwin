@@ -62,7 +62,7 @@ public:
 	bool projectExists(const std::string &projectName, bool &canBeDeleted);
 	std::string getProjectCollection(const std::string &projectName);
 	bool findProjects(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded);
-	bool findProjects(const ot::ProjectFilterData& _projectFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded);
+	bool findProjects(const ot::ProjectFilterData& _projectFilter, const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded);
 	ot::ProjectInformation getProjectInformation(const std::string& _projectName);
 	bool readProjectsInfo(std::list<std::string>& _projects);
 	bool copyProject(const std::string &sourceProjectName, const std::string &destinationProjectName, const std::string &userName);

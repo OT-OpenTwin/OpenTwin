@@ -569,6 +569,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterIcon), new PropertyString("/icons/Filter.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterDisabledIcon), new PropertyString("/icons/Filter_Disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterHoverIcon), new PropertyString("/icons/Filter_Focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterActiveIcon), new PropertyString("/icons/Filter_Active.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterPressedIcon), new PropertyString("/icons/Filter_Pressed.png"));
 
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseIcon), new PropertyString("/icons/window_close.png"));
@@ -790,6 +791,7 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterIcon), new PropertyString("/icons/Filter.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterDisabledIcon), new PropertyString("/icons/Filter_Disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterHoverIcon), new PropertyString("/icons/Filter_Focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterActiveIcon), new PropertyString("/icons/Filter_Active.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterPressedIcon), new PropertyString("/icons/Filter_Pressed.png"));
 
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseIcon), new PropertyString("/icons/window_close.png"));
@@ -1012,6 +1014,7 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterIcon), new PropertyString("/icons/Filter.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterDisabledIcon), new PropertyString("/icons/Filter_Disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterHoverIcon), new PropertyString("/icons/Filter_Focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterActiveIcon), new PropertyString("/icons/Filter_Active.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::HeaderFilterPressedIcon), new PropertyString("/icons/Filter_Pressed.png"));
 
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseIcon), new PropertyString("/icons/window_close.png"));
