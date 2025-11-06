@@ -1357,6 +1357,7 @@ osg::Node* SceneNodeGeometry::addSelectedEdge(unsigned long long faceId1, unsign
 void SceneNodeGeometry::setTransparency(double value)
 {
 	SceneNodeBase::setTransparency(value);
+	edgeTransparency = value;
 
 	updateObjectColor(surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective);
 }
