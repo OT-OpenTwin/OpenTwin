@@ -476,14 +476,14 @@ public:
 
 	virtual ot::MessageDialogCfg::BasicButton showPrompt(const ot::MessageDialogCfg& _config, QWidget* _parent) override;
 
-	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
+	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
 
 public Q_SLOTS:
-	void slotShowInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
+	void slotShowInfoPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage);
 
-	void slotShowWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
+	void slotShowWarningPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage);
 
-	void slotShowErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
+	void slotShowErrorPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage);
 
 public:
 
