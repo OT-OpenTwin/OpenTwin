@@ -32,8 +32,30 @@ namespace ot {
 		OT_DECL_NOCOPY(GraphicsActionHandler)
 		OT_DECL_NOMOVE(GraphicsActionHandler)
 	public:
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Static: Document creators
+
+		static JsonDocument createItemRequestedDocument(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos);
+
+		static JsonDocument createItemChangedDocument(const ot::GraphicsItemCfg* _item);
+
+		static JsonDocument createItemDoubleClickedDocument(const std::string& _name, ot::UID _uid);
+
+		static JsonDocument createConnectionRequestedDocument(const ot::GraphicsConnectionPackage& _connectionData);
+
+		static JsonDocument createConnectionToConnectionRequestedDocument(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos);
+
+		static JsonDocument createConnectionChangedDocument(const ot::GraphicsConnectionCfg& _connectionData);
+
+		static JsonDocument createChangeEventDocument(const ot::GraphicsChangeEvent& _changeEvent);
+
 		GraphicsActionHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
 		virtual ~GraphicsActionHandler() = default;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected: Callbacks
 
 	protected:
 
@@ -55,12 +77,6 @@ namespace ot {
 		//! @param _uid The uid of the item that was double clicked.
 		virtual ot::ReturnMessage graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 
-		//! @brief Is called when the removal of items and/or connections is requested.
-		//! @param _document The original document of the request.
-		//! @param _itemUids The uids of the items to be removed.
-		//! @param _connectionUids The uids of the connections to be removed.
-		virtual ot::ReturnMessage graphicsRemoveRequested(const ot::UIDList& _itemUids, const ot::UIDList& _connectionUids) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
-
 		//! @brief Is called when a new connection between two items is requested.
 		//! @param _document The original document of the request.
 		//! @param _connectionData Information about the new connection.
@@ -81,14 +97,16 @@ namespace ot {
 		//! @param _changeEvent The change event containing all changes.
 		virtual ot::ReturnMessage graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private: Handlers
+
 	private:
 		ActionHandler m_actionHandler;
 
 		ReturnMessage handleGraphicsItemRequested(JsonDocument& _document);
 		ReturnMessage handleGraphicsItemChanged(JsonDocument& _document);
 		ReturnMessage handleGraphicsItemDoubleClicked(JsonDocument& _document);
-
-		ReturnMessage handleGraphicsRemoveRequested(JsonDocument& _document);
 
 		ReturnMessage handleGraphicsConnectionRequested(JsonDocument& _document);
 		ReturnMessage handleGraphicsConnectionToConnectionRequested(JsonDocument& _document);

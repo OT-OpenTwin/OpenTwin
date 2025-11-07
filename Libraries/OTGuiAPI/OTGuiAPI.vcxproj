@@ -38,7 +38,7 @@
     <ClCompile Include="src\FrontendActionHandler.cpp" />
     <ClCompile Include="src\Frontend.cpp" />
     <ClCompile Include="src\GraphicsFlowItem.cpp" />
-    <ClCompile Include="src\GraphicsHandler.cpp" />
+    <ClCompile Include="src\GraphicsActionHandler.cpp" />
     <ClCompile Include="src\GuiAPIManager.cpp" />
     <ClCompile Include="src\LineEditHandler.cpp" />
     <ClCompile Include="src\TableActionHandler.cpp" />

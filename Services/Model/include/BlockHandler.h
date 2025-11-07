@@ -31,6 +31,7 @@ public:
 	~BlockHandler() = default;
 	
 	bool addViewBlockRelation(std::string _viewName, ot::UID _blockId, ot::UID _connectionId);
+
 protected:
 	virtual ot::ReturnMessage graphicsItemChanged(const ot::GraphicsItemCfg* _item) override;
 	virtual ot::ReturnMessage graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData) override;

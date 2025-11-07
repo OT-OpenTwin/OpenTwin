@@ -86,7 +86,7 @@
     <ClCompile Include="src\CheckBoxHandler.cpp">
       <Filter>Source Files\CommunicationAPIs</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsHandler.cpp">
+    <ClCompile Include="src\GraphicsActionHandler.cpp">
       <Filter>Source Files\CommunicationAPIs</Filter>
     </ClCompile>
     <ClCompile Include="src\TextEditorActionHandler.cpp">

@@ -21,14 +21,83 @@
 #include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 
+ot::JsonDocument ot::GraphicsActionHandler::createItemRequestedDocument(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) {
+	JsonDocument doc;
+	
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, JsonString(_viewName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, JsonString(_itemName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, JsonObject(_pos, doc.GetAllocator()), doc.GetAllocator());
+	
+	return doc;
+}
+
+ot::JsonDocument ot::GraphicsActionHandler::createItemChangedDocument(const ot::GraphicsItemCfg* _item) {
+	JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, JsonObject(_item, doc.GetAllocator()), doc.GetAllocator());
+
+	return doc;
+}
+
+ot::JsonDocument ot::GraphicsActionHandler::createItemDoubleClickedDocument(const std::string& _name, ot::UID _uid) {
+	JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_NAME, JsonString(_name, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UID, _uid, doc.GetAllocator());
+
+	return doc;
+}
+
+ot::JsonDocument ot::GraphicsActionHandler::createConnectionRequestedDocument(const ot::GraphicsConnectionPackage& _connectionData) {
+	JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, JsonObject(_connectionData, doc.GetAllocator()), doc.GetAllocator());
+
+	return doc;
+}
+
+ot::JsonDocument ot::GraphicsActionHandler::createConnectionToConnectionRequestedDocument(const ot::GraphicsConnectionPackage& _connectionData, const Point2DD& _pos) {
+	JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, JsonObject(_connectionData, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_POSITION, JsonObject(_pos, doc.GetAllocator()), doc.GetAllocator());
+
+	return doc;
+}
+
+ot::JsonDocument ot::GraphicsActionHandler::createConnectionChangedDocument(const ot::GraphicsConnectionCfg& _connectionData) {
+	JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, JsonObject(_connectionData, doc.GetAllocator()), doc.GetAllocator());
+
+	return doc;
+}
+
+ot::JsonDocument ot::GraphicsActionHandler::createChangeEventDocument(const ot::GraphicsChangeEvent& _changeEvent) {
+	JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ChangeEvent, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Event, JsonObject(_changeEvent, doc.GetAllocator()), doc.GetAllocator());
+
+	return doc;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Constructor
+
 ot::GraphicsActionHandler::GraphicsActionHandler(ActionDispatcherBase* _dispatcher)
 	: m_actionHandler(_dispatcher) 
 {
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, this, &GraphicsActionHandler::handleGraphicsItemRequested, ot::SECURE_MESSAGE_TYPES);
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, this, &GraphicsActionHandler::handleGraphicsItemChanged, ot::SECURE_MESSAGE_TYPES);
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, this, &GraphicsActionHandler::handleGraphicsItemDoubleClicked, ot::SECURE_MESSAGE_TYPES);
-	
-	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, this, &GraphicsActionHandler::handleGraphicsRemoveRequested, ot::SECURE_MESSAGE_TYPES);
 	
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, this, &GraphicsActionHandler::handleGraphicsConnectionRequested, ot::SECURE_MESSAGE_TYPES);
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, this, &GraphicsActionHandler::handleGraphicsConnectionToConnectionRequested, ot::SECURE_MESSAGE_TYPES);
@@ -37,6 +106,10 @@ ot::GraphicsActionHandler::GraphicsActionHandler(ActionDispatcherBase* _dispatch
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ChangeEvent, this, &GraphicsActionHandler::handleGraphicsChangeEvent, ot::SECURE_MESSAGE_TYPES);
 
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Handlers
 
 ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsItemRequested(JsonDocument& _document) {
 	std::string itemName = json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
@@ -62,13 +135,6 @@ ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsItemDoubleClicked(Jso
 	UID uid = json::getUInt64(_document, OT_ACTION_PARAM_UID);
 
 	return graphicsItemDoubleClicked(name, uid);
-}
-
-ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsRemoveRequested(JsonDocument& _document) {
-	ot::UIDList items = json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
-	ot::UIDList connections = json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds);
-	
-	return graphicsRemoveRequested(items, connections);
 }
 
 ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsConnectionRequested(JsonDocument& _document) {

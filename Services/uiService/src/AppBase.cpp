@@ -72,12 +72,14 @@
 #include "OTGui/PropertyStringList.h"
 
 #include "OTGuiAPI/TableActionHandler.h"
+#include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTGuiAPI/TextEditorActionHandler.h"
 
 #include "OTWidgets/Label.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/PlotView.h"
 #include "OTWidgets/TableView.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/TextEditor.h"
@@ -2333,15 +2335,6 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 		return;
 	}
 	
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName, ot::JsonString(_name.toStdString(), doc.GetAllocator()), doc.GetAllocator());
-	
-	ot::Point2DD itmPos(_pos.x(), _pos.y());
-	ot::JsonObject itemPosObj;
-	itmPos.addToJsonObject(itemPosObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj, doc.GetAllocator());
-
 	try {
 		// Find the view from the graphics view widget
 		ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView->getQWidget()));
@@ -2351,7 +2344,9 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 		}
 
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemRequestedDocument(view->getGraphicsView()->getGraphicsViewName(), _name.toStdString(), ot::QtFactory::toPoint2D(_pos));
+
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2386,16 +2381,11 @@ void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, doc.GetAllocator()), doc.GetAllocator());
-	
-	ot::JsonObject configObj;
-	_newConfig->addToJsonObject(configObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
-
 	try {
 		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemChangedDocument(_newConfig);
+
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2430,14 +2420,11 @@ void AppBase::slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConf
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, doc.GetAllocator()), doc.GetAllocator());
-
-	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_itemConfig->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UID, _itemConfig->getUid(), doc.GetAllocator());
-
 	try {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemDoubleClickedDocument(_itemConfig->getName(), _itemConfig->getUid());
+
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2471,20 +2458,16 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, doc.GetAllocator()), doc.GetAllocator());
-
 	ot::GraphicsConnectionPackage pckg(view->getGraphicsView()->getGraphicsViewName());
 	ot::GraphicsConnectionCfg connectionConfig(_fromUid, _fromConnector, _toUid, _toConnector);
 	connectionConfig.setLineStyle(ot::PenFCfg(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection)));
 	pckg.addConnection(connectionConfig);
-
-	ot::JsonObject pckgObj;
-	pckg.addToJsonObject(pckgObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
-	
+		
 	try {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(pckg);
+
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2518,24 +2501,16 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, doc.GetAllocator()), doc.GetAllocator());
-
 	ot::GraphicsConnectionPackage pckg(view->getGraphicsView()->getGraphicsViewName());
 	ot::GraphicsConnectionCfg connectionConfig(_fromItemUid, _fromItemConnector, _toConnectionUid, std::string());
 	connectionConfig.setLineStyle(ot::PenFCfg(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
 	pckg.addConnection(connectionConfig);
 
-	ot::JsonObject pckgObj;
-	pckg.addToJsonObject(pckgObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
-
-	ot::JsonObject controlPosObj;
-	_newControlPoint.addToJsonObject(controlPosObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_POSITION, controlPosObj, doc.GetAllocator());
-
 	try {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionToConnectionRequestedDocument(pckg, _newControlPoint);
+
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2570,16 +2545,11 @@ void AppBase::slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _ne
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, doc.GetAllocator()), doc.GetAllocator());
-
-	ot::JsonObject configObj;
-	_newConfig.addToJsonObject(configObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
-
 	try {
 		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionChangedDocument(_newConfig);
+
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2664,40 +2634,6 @@ void AppBase::slotGraphicsSelectionChanged() {
 
 	OT_SLECTION_TEST_LOG(">> Graphics selection change completed. Running selection handling");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
-}
-
-void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections) {
-	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
-	if (graphicsView == nullptr) {
-		OT_LOG_E("GraphicsView cast failed");
-		return;
-	}
-
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
-	if (!view) {
-		OT_LOG_E("View not found");
-		return;
-	}
-
-	if (_items.empty() && _connections.empty()) return;
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(_items, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds, ot::JsonArray(_connections, doc.GetAllocator()), doc.GetAllocator());
-	ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
-
-	std::string response;
-	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
-		OT_LOG_EA("Failed to send http request");
-		return;
-	}
-
-	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
-	if (rMsg != ot::ReturnMessage::Ok) {
-		OT_LOG_E("Request failed: " + rMsg.getWhat());
-		return;
-	}
 }
 
 void AppBase::slotCopyRequested(const ot::CopyInformation& _info) {
