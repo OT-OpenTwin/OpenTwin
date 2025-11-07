@@ -104,15 +104,6 @@ public:
 	//! @brief Will be called when a model service connected to the session and is ready to work
 	virtual void modelConnected(ot::components::ModelComponent * _model) override;
 
-	// ##################################################################################################################################################################################################################
-
-	// Protected: Callback functions
-
-protected:
-	virtual ot::ReturnMessage graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) override;
-	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) override;
-	virtual ot::ReturnMessage graphicsConnectionToConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos) override;
-
 private:
 	SubprocessHandler* m_subprocessHandler = nullptr;
 	QtWrapper* m_qtWrapper = nullptr;

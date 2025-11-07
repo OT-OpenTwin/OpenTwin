@@ -32,5 +32,6 @@ public:
 
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
+	virtual std::string getBlockFolderName() const override { return "Containers"; };
 };
 

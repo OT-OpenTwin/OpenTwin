@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
+#include "OTGui/GuiEvent.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsChangeEvent.h"
 #include "OTCommunication/ActionHandler.h"
@@ -36,17 +37,17 @@ namespace ot {
 
 		// Static: Document creators
 
-		static JsonDocument createItemRequestedDocument(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos);
+		static JsonDocument createItemRequestedDocument(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos, const GuiEvent& _eventData);
 
-		static JsonDocument createItemChangedDocument(const ot::GraphicsItemCfg* _item);
+		static JsonDocument createItemChangedDocument(const ot::GraphicsItemCfg* _item, const GuiEvent& _eventData);
 
-		static JsonDocument createItemDoubleClickedDocument(const std::string& _name, ot::UID _uid);
+		static JsonDocument createItemDoubleClickedDocument(const std::string& _name, ot::UID _uid, const GuiEvent& _eventData);
 
-		static JsonDocument createConnectionRequestedDocument(const ot::GraphicsConnectionPackage& _connectionData);
+		static JsonDocument createConnectionRequestedDocument(const ot::GraphicsConnectionPackage& _connectionData, const GuiEvent& _eventData);
 
-		static JsonDocument createConnectionToConnectionRequestedDocument(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos);
+		static JsonDocument createConnectionToConnectionRequestedDocument(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos, const GuiEvent& _eventData);
 
-		static JsonDocument createConnectionChangedDocument(const ot::GraphicsConnectionCfg& _connectionData);
+		static JsonDocument createConnectionChangedDocument(const ot::GraphicsConnectionCfg& _connectionData, const GuiEvent& _eventData);
 
 		static JsonDocument createChangeEventDocument(const ot::GraphicsChangeEvent& _changeEvent);
 
@@ -64,37 +65,44 @@ namespace ot {
 		//! @param _viewName The name of the view the item should be added to.
 		//! @param _itemName The name of the item to be added.
 		//! @param _pos The position where the item should be added.
-		virtual ot::ReturnMessage graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
+		//! @param _forceHandle If true, the handler must process the event even if the corresponding entity DataHandle callback is set.
+		virtual ot::ReturnMessage graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos, const ot::GuiEvent& _eventData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 
 		//! @brief Is called when a graphics item has changed.
 		//! @param _document The original document of the request.
 		//! @param _item The configuration of the changed item.
-		virtual ot::ReturnMessage graphicsItemChanged(const ot::GraphicsItemCfg* _item) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
+		//! @param _forceHandle If true, the handler must process the event even if the corresponding entity DataHandle callback is set.
+		virtual ot::ReturnMessage graphicsItemChanged(const ot::GraphicsItemCfg* _item, const ot::GuiEvent& _eventData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 
 		//! @brief Is caled when a item was double clicked.
 		//! @param _document The original document of the request.
 		//! @param _name The name of the item that was double clicked.
 		//! @param _uid The uid of the item that was double clicked.
-		virtual ot::ReturnMessage graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
+		//! @param _forceHandle If true, the handler must process the event even if the corresponding entity DataHandle callback is set.
+		virtual ot::ReturnMessage graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid, const ot::GuiEvent& _eventData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 
 		//! @brief Is called when a new connection between two items is requested.
 		//! @param _document The original document of the request.
 		//! @param _connectionData Information about the new connection.
-		virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
+		//! @param _forceHandle If true, the handler must process the event even if the corresponding entity DataHandle callback is set.
+		virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::GuiEvent& _eventData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 
 		//! @brief Is called when a connection to an existing connection is requested.
 		//! @param _document The original document of the request.
 		//! @param _connectionData Information about the new connection.
 		//! @param _pos The position where the connection to connection was requested.
-		virtual ot::ReturnMessage graphicsConnectionToConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
+		//! @param _forceHandle If true, the handler must process the event even if the corresponding entity DataHandle callback is set.
+		virtual ot::ReturnMessage graphicsConnectionToConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos, const ot::GuiEvent& _eventData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 
 		//! @brief Is called when a graphics connection has changed.
 		//! @param _document The original document of the request.
 		//! @param _connectionData Information about the changed connection.
-		virtual ot::ReturnMessage graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
+		//! @param _forceHandle If true, the handler must process the event even if the corresponding entity DataHandle callback is set.
+		virtual ot::ReturnMessage graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData, const ot::GuiEvent& _eventData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 		
 		//! @brief Is called when a graphics change event occurs.
 		//! @param _changeEvent The change event containing all changes.
+		//! @param _forceHandle If true, the handler must process the event even if the corresponding entity DataHandle callback is set.
 		virtual ot::ReturnMessage graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################

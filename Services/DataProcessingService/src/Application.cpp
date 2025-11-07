@@ -173,49 +173,6 @@ void Application::runPipeline()
 	}
 }
 
-
-// ##################################################################################################################################################################################################################
-
-// Protected: Callback functions
-
-ot::ReturnMessage Application::graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) {
-	ExternalDependencies dependencies;
-	if (dependencies.getPythonScriptFolderID() == 0) {
-		ot::EntityInformation entityInfo;
-		ot::ModelServiceAPI::getEntityInformation(ot::FolderNames::PythonScriptFolder, entityInfo);
-		ExternalDependencies dependencies;
-		dependencies.setPythonScriptFolderID(entityInfo.getEntityID());
-	}
-
-	_blockEntityHandler.createBlockEntity(_viewName, _itemName, _pos);
-
-	return ot::ReturnMessage::Ok;
-}
-
-ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
-	_blockEntityHandler.addBlockConnection(_connectionData.getConnections(), _connectionData.getName());
-
-	//EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
-	//std::list<std::string> selectedSolverName;
-	//for (ot::EntityInformation& selectedEntity : m_selectedEntityInfos)
-	//{
-	//	if (selectedEntity.getEntityType() == solver.getClassName())
-	//	{
-	//		selectedSolverName.push_back(selectedEntity.getEntityName());
-	//	}
-	//}
-
-	//if (selectedSolverName.size() == 1)
-	//{
-	//}
-	//else
-	//{
-	//	assert(0); //A connection should be drawn in only one graphics view.
-	//}
-
-	return ot::ReturnMessage::Ok;
-}
-
 // ##################################################################################################################################################################################################################
 
 // Required functions

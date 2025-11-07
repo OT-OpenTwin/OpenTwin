@@ -344,7 +344,7 @@ void Model::resetToNew()
 		hierarchicalRoot->registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection |
-			ot::EntityCallbackBase::Callback::DataNotify,
+			ot::EntityCallbackBase::Callback::DataHandle,
 			OT_INFO_SERVICE_TYPE_HierarchicalProjectService
 		);
 		addEntityToModel(hierarchicalRoot->getName(), hierarchicalRoot, entityRoot, true, allNewEntities);

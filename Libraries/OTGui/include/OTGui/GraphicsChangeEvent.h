@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Serializable.h"
+#include "OTGui/GuiEvent.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 
@@ -29,7 +29,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT GraphicsChangeEvent : public Serializable {
+	class OT_GUI_API_EXPORT GraphicsChangeEvent : public GuiEvent {
 		OT_DECL_NOCOPY(GraphicsChangeEvent)
 	public:
 		GraphicsChangeEvent() = default;

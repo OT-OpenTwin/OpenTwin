@@ -71,11 +71,6 @@ public:
 
 	virtual void propertyChanged(ot::JsonDocument& _doc) override;
 
-protected:
-	virtual ot::ReturnMessage graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) override;
-	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) override;
-
-
 private:
 	Application();
 	virtual ~Application();

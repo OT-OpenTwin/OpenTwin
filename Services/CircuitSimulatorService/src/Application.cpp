@@ -527,24 +527,3 @@ void Application::modelConnected(ot::components::ModelComponent * _model) {
 // ##################################################################################################################################################################################################################
 
 // Protected: Callback functions
-
-ot::ReturnMessage Application::graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) {
-	m_blockEntityHandler.setPackageName(_viewName);
-	auto temp = m_blockEntityHandler.CreateBlockEntity(_viewName, _itemName, _pos);
-
-	return ot::ReturnMessage::Ok;
-}
-
-ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
-	m_blockEntityHandler.setPackageName(_connectionData.getName());
-	m_blockEntityHandler.addBlockConnection(_connectionData.getConnections(), _connectionData.getName());
-
-	return ot::ReturnMessage::Ok;
-}
-
-ot::ReturnMessage Application::graphicsConnectionToConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::Point2DD& _pos) {
-	m_blockEntityHandler.setPackageName(_connectionData.getName());
-	m_blockEntityHandler.addConnectionToConnection(_connectionData.getConnections(), _connectionData.getName(), _pos);
-
-	return ot::ReturnMessage::Ok;
-}

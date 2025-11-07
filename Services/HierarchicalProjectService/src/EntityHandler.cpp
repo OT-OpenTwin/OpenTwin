@@ -100,7 +100,7 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 		blockEntity.registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection |
-			ot::EntityCallbackBase::Callback::DataNotify,
+			ot::EntityCallbackBase::Callback::DataHandle,
 			serviceName
 		);
 		blockEntity.setEntityID(_modelComponent->createEntityUID());
@@ -195,7 +195,7 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	connectionEntity.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
-		ot::EntityCallbackBase::Callback::DataNotify,
+		ot::EntityCallbackBase::Callback::DataHandle,
 		Application::instance().getServiceName()
 	);
 	connectionEntity.storeToDataBase();
@@ -260,7 +260,7 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 	blockEntity.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
-		ot::EntityCallbackBase::Callback::DataNotify,
+		ot::EntityCallbackBase::Callback::DataHandle,
 		serviceName
 	);
 	blockEntity.setEntityID(blockUid);
@@ -344,7 +344,7 @@ void EntityHandler::addBackgroundImage(const std::string& _fileName, const std::
 	backgroundImageEntity.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
-		ot::EntityCallbackBase::Callback::DataNotify,
+		ot::EntityCallbackBase::Callback::DataHandle,
 		serviceName
 	);
 	backgroundImageEntity.setEntityID(_modelComponent->createEntityUID());
@@ -574,12 +574,6 @@ void EntityHandler::addContainer() {
 	newContainer.setEditable(true);
 	newContainer.setEntityID(_modelComponent->createEntityUID());
 	newContainer.setName(CreateNewUniqueTopologyName(c_containerFolder, "Container"));
-	newContainer.registerCallbacks(
-		ot::EntityCallbackBase::Callback::Properties |
-		ot::EntityCallbackBase::Callback::Selection |
-		ot::EntityCallbackBase::Callback::DataNotify,
-		serviceName
-	);
 	newContainer.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	newContainer.setGraphicsScenePackageChildName(c_containerFolderName);
 	newContainer.setSelectChildren(false);

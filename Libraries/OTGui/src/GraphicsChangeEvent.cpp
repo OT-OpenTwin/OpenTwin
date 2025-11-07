@@ -26,7 +26,9 @@ ot::GraphicsChangeEvent::GraphicsChangeEvent(const ConstJsonObject& _jsonObject)
 	setFromJsonObject(_jsonObject);
 }
 
-ot::GraphicsChangeEvent::GraphicsChangeEvent(GraphicsChangeEvent&& _other) noexcept {
+ot::GraphicsChangeEvent::GraphicsChangeEvent(GraphicsChangeEvent&& _other) noexcept 
+	: GuiEvent(std::move(_other))
+{
 	m_editorName = std::move(_other.m_editorName);
 	m_changedItems = std::move(_other.m_changedItems);
 	m_changedConnections = std::move(_other.m_changedConnections);
@@ -42,6 +44,8 @@ ot::GraphicsChangeEvent::~GraphicsChangeEvent() {
 ot::GraphicsChangeEvent& ot::GraphicsChangeEvent::operator=(GraphicsChangeEvent&& _other) noexcept {
 	if (this != &_other) {
 		memFree();
+
+		GuiEvent::operator=(std::move(_other));
 
 		m_editorName = std::move(_other.m_editorName);
 		m_changedItems = std::move(_other.m_changedItems);
@@ -59,6 +63,8 @@ ot::GraphicsChangeEvent& ot::GraphicsChangeEvent::operator=(GraphicsChangeEvent&
 // Virtual methods
 
 void ot::GraphicsChangeEvent::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	GuiEvent::addToJsonObject(_object, _allocator);
+
 	_object.AddMember("EditorName", JsonString(m_editorName, _allocator), _allocator);
 	
 	JsonArray itemsArr;
@@ -76,6 +82,8 @@ void ot::GraphicsChangeEvent::addToJsonObject(JsonValue& _object, JsonAllocator&
 
 void ot::GraphicsChangeEvent::setFromJsonObject(const ConstJsonObject& _object) {
 	memFree();
+
+	GuiEvent::setFromJsonObject(_object);
 	
 	m_editorName = json::getString(_object, "EditorName");
 	

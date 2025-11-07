@@ -193,7 +193,19 @@ void Application::modelSelectionChanged() {
 
 // Protected: Callback functions
 
-ot::ReturnMessage Application::graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid) {
+ot::ReturnMessage Application::graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos, const ot::GuiEvent& _eventData) {
+	OT_LOG_W("Unexpected graphics item request");
+	return ot::ReturnMessage::Failed;
+}
+
+ot::ReturnMessage Application::graphicsItemChanged(const ot::GraphicsItemCfg* _item, const ot::GuiEvent& _eventData) {
+	// This should be handled by the model
+	ot::JsonDocument doc = ot::GraphicsActionHandler::createItemChangedDocument(_item, ot::GuiEvent::createForwardingEvent(_eventData));
+	sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc);
+	return ot::ReturnMessage::Ok;
+}
+
+ot::ReturnMessage Application::graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid, const ot::GuiEvent& _eventData) {
 	// Get entity information
 	ot::EntityInformation info;
 	if (!ot::ModelServiceAPI::getEntityInformation(_name, info)) {
@@ -214,12 +226,26 @@ ot::ReturnMessage Application::graphicsItemDoubleClicked(const std::string& _nam
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
+ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::GuiEvent& _eventData) {
 	for (const ot::GraphicsConnectionCfg& cfg : _connectionData.getConnections()) {
 		if (!m_entityHandler.addConnection(cfg)) {
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Could not add connection entity for connection request");
 		}
 	}
+	return ot::ReturnMessage::Ok;
+}
+
+ot::ReturnMessage Application::graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData, const ot::GuiEvent& _eventData) {
+	// This should be handled by the model
+	ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionChangedDocument(_connectionData, ot::GuiEvent::createForwardingEvent(_eventData));
+	sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc);
+	return ot::ReturnMessage::Ok;
+}
+
+ot::ReturnMessage Application::graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) {
+	// This should be handled by the model
+	ot::JsonDocument doc = ot::GraphicsActionHandler::createChangeEventDocument(_changeEvent);
+	sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc);
 	return ot::ReturnMessage::Ok;
 }
 

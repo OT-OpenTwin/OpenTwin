@@ -33,6 +33,8 @@ public:
 	virtual std::string getClassName(void) const override { return EntityBlockHierarchicalProjectItem::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
+	virtual std::string getBlockFolderName() const override { return "Projects"; };
+
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	virtual bool updateFromProperties() override;
 
