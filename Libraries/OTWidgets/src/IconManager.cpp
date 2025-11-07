@@ -26,8 +26,9 @@
 #include <QtCore/qdir.h>
 #include <QtCore/qfile.h>
 #include <QtGui/qicon.h>
-#include <QtGui/qpixmap.h>
 #include <QtGui/qmovie.h>
+#include <QtGui/qpixmap.h>
+#include <QtWidgets/qapplication.h>
 
 ot::IconManager& ot::IconManager::instance(void) {
 	static ot::IconManager g_instance;
@@ -133,6 +134,12 @@ const QByteArray& ot::IconManager::getParsedSvgData(const QString& _subPath) {
 
 void ot::IconManager::setApplicationIcon(const QIcon& _icon) {
 	IconManager::instance().m_applicationIcon = _icon;
+	QApplication* app = dynamic_cast<QApplication*>(QApplication::instance());
+	if (!app) {
+		OT_LOG_E("Failed to set application icon. QApplication instance is null.");
+		return;
+	}
+	app->setWindowIcon(_icon);
 }
 
 const QIcon& ot::IconManager::getApplicationIcon(void) {

@@ -120,7 +120,7 @@ QApplication* initializeQt(int &_argc, char* _argv[]) {
 
 	QApplication* newApp = new QApplication(_argc, _argv);
 	ak::uiAPI::ini(newApp, "OpenTwin", "UserFrontend");
-
+	
 	ot::GlobalColorStyle::instance().setApplication(newApp);
 
 	return newApp;
@@ -189,7 +189,7 @@ bool initializeOpenGL(bool checkGraphics) {
 	}
 }
 
-bool initializeAssets(void) {
+bool initializeAssets() {
 	int iconPathCounter = 0;
 	int stylePathCounter = 0;
 	int graphicsPathCounter = 0;
