@@ -209,6 +209,14 @@ namespace ot {
 		//! @param _requestFlags Flags to control the request behavior.
 		bool sendMessage(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
 
+		//! @brief Will send the message to the services with the specified names.
+		//! @param _queue If true, the message will be queued.
+		//! @param _serviceNames The names of the services.
+		//! @param _doc The document containing the message.
+		//! @param _requestFlags Flags to control the request behavior.
+		//! @return True if the message was sent to all services, false otherwise.
+		bool sendMessage(bool _queue, const std::list<std::string>& _serviceNames, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
+
 		//! @brief Will send the message to the service with the specified name.
 		//! @param _queue If true, the message will be queued.
 		//! @param _serviceName The name of the service.
@@ -232,6 +240,13 @@ namespace ot {
 		//! @param _doc The document containing the message.
 		//! @param _requestFlags Flags to control the request behavior.
 		bool sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
+
+		//! @brief Will send the message asynchronously to the services with the specified names.
+		//! @param _queue If true, the message will be queued.
+		//! @param _serviceName The name of the service.
+		//! @param _doc The document containing the message.
+		//! @param _requestFlags Flags to control the request behavior.
+		bool sendMessageAsync(bool _queue, const std::list<std::string>& _serviceNames, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
 
 		//! @brief Will send the message asynchronously to the service with the specified name.
 		//! @param _queue If true, the message will be queued.

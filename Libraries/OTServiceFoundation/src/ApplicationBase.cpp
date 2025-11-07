@@ -206,6 +206,18 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string& _serviceNa
 	return this->sendMessage(_queue, _serviceName, _doc, prefetchIds, tmp, _requestFlags);
 }
 
+bool ot::ApplicationBase::sendMessage(bool _queue, const std::list<std::string>& _serviceNames, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags) {
+	bool allOk = true;
+	std::list<std::pair<UID, UID>> prefetchIds;
+	for (const std::string& serviceName : _serviceNames) {
+		std::string tmp;
+		if (!this->sendMessage(_queue, serviceName, _doc, prefetchIds, tmp, _requestFlags)) {
+			allOk = false;
+		}
+	}
+	return allOk;
+}
+
 bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::string& _response, const ot::msg::RequestFlags& _requestFlags)
 {
 	std::list<std::pair<UID, UID>> prefetchIds;
@@ -238,6 +250,17 @@ bool ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serv
 	return this->sendMessageAsync(_queue, _serviceName, _doc, prefetchIds, _requestFlags);
 }
 
+bool ot::ApplicationBase::sendMessageAsync(bool _queue, const std::list<std::string>& _serviceNames, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags) {
+	bool allOk = true;
+	for (const std::string& serviceName : _serviceNames) {
+		std::list<std::pair<UID, UID>> prefetchIds;
+		if (!this->sendMessageAsync(_queue, serviceName, _doc, prefetchIds, _requestFlags)) {
+			allOk = false;
+		}
+	}
+	return allOk;
+}
+
 bool ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>>& _prefetchIds, const ot::msg::RequestFlags& _requestFlags) {
 	auto serviceInfoByServiceName = m_serviceNameMap.find(_serviceName);
 	if (serviceInfoByServiceName == m_serviceNameMap.end()) {
@@ -246,7 +269,7 @@ bool ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serv
 	}
 
 	ServiceBase* destinationServiceInfo = serviceInfoByServiceName->second;
-	ot::msg::sendAsync(this->getServiceURL(), destinationServiceInfo->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), 0, _requestFlags);
+	ot::msg::sendAsync(this->getServiceURL(), destinationServiceInfo->getServiceURL(), (_queue ? QUEUE : EXECUTE), std::move(_doc.toJson()), 0, _requestFlags);
 	return true;
 }
 

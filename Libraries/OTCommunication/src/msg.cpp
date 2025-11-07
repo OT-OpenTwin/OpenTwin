@@ -100,7 +100,7 @@ namespace ot {
 			std::atomic_int m_timeout;
 		};
 
-		void sendAsyncWorker(const std::string& _senderURL, const std::string& _receiverURL, ot::MessageType _type, const std::string& _message, int _timeout, const ot::msg::RequestFlags& _flags);
+		void sendAsyncWorker(std::string _senderURL, std::string _receiverURL, ot::MessageType _type, std::string&& _message, int _timeout, const ot::msg::RequestFlags& _flags);
 	}
 }
 
@@ -311,12 +311,12 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 	}
 }
 
-void ot::msg::sendAsync(const std::string& _senderIP, const std::string& _receiverIP, MessageType _type, const std::string& _message, int _timeout, const RequestFlags& _flags) {
-	std::thread t(ot::intern::sendAsyncWorker, _senderIP, _receiverIP, _type, _message, _timeout, _flags);
+void ot::msg::sendAsync(const std::string& _senderIP, const std::string& _receiverIP, MessageType _type, std::string&& _message, int _timeout, const RequestFlags& _flags) {
+	std::thread t(ot::intern::sendAsyncWorker, _senderIP, _receiverIP, _type, std::move(_message), _timeout, _flags);
 	t.detach();
 }
 
-void ot::intern::sendAsyncWorker(const std::string& _senderIP, const std::string& _receiverIP, ot::MessageType _type, const std::string& _message, int _timeout, const ot::msg::RequestFlags& _flags) {
+void ot::intern::sendAsyncWorker(std::string _senderIP, std::string _receiverIP, ot::MessageType _type, std::string&& _message, int _timeout, const ot::msg::RequestFlags& _flags) {
 	std::string response;
 	if (!ot::msg::send(_senderIP, _receiverIP, _type, _message, response, _timeout, _flags)) {
 		OT_LOG_E("[ASYNC] Failed to send message to \"" + _receiverIP + "\"");

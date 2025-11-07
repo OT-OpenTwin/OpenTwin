@@ -58,7 +58,7 @@ namespace ot {
 		//! @param _receiverIP The receiver IP address
 		//! @param _message The message to send
 		//! @param _response Here the response will be written to
-		OT_COMMUNICATION_API_EXPORT void sendAsync(const std::string& _senderIP, const std::string& _receiverIP, ot::MessageType _type, const std::string& _message, int _timeout = 0, const RequestFlags& _flags = msg::DefaultFlags);
+		OT_COMMUNICATION_API_EXPORT void sendAsync(const std::string& _senderIP, const std::string& _receiverIP, ot::MessageType _type, std::string&& _message, int _timeout = 0, const RequestFlags& _flags = msg::DefaultFlags);
 	}
 }
 
