@@ -25,7 +25,7 @@
 FixturePythonWrapper::FixturePythonWrapper()
 {
 	int errorCode = PyImport_AppendInittab("InitialTestModule", TestingPythonExtensions::PyInit_Testing);
-	_wrapper.InitializePythonInterpreter();
+	_wrapper.initializePythonInterpreter();
 }
 
 void FixturePythonWrapper::ExecuteString(const std::string& command, const std::string& moduleName)
@@ -36,7 +36,7 @@ void FixturePythonWrapper::ExecuteString(const std::string& command, const std::
 std::string FixturePythonWrapper::ExecuteFunctionWithReturnValue(const std::string& functionName, const std::string& moduleName)
 {
 	CPythonObjectNew parameter(nullptr);
-	CPythonObjectNew returnVal = _wrapper.ExecuteFunction(functionName, parameter, moduleName);
+	CPythonObjectNew returnVal = _wrapper.executeFunction(functionName, parameter, moduleName);
 	PythonObjectBuilder pyObBuilder;
 	return pyObBuilder.getStringValue(returnVal, "return Value");
 }
@@ -49,7 +49,7 @@ int FixturePythonWrapper::ExecuteFunctionWithParameter(const std::string& functi
 	pyObBuilder << &value;
 	CPythonObjectNew pythonParameter = pyObBuilder.getAssembledTuple();
 
-	CPythonObjectNew returnVal = _wrapper.ExecuteFunction(functionName, pythonParameter, moduleName);
+	CPythonObjectNew returnVal = _wrapper.executeFunction(functionName, pythonParameter, moduleName);
 	return pyObBuilder.getInt32Value(returnVal, "return Value");
 }
 
@@ -66,31 +66,31 @@ int FixturePythonWrapper::ExecuteFunctionWithMultipleParameter(const std::string
 
 	CPythonObjectNew pythonParameter = pyObBuilder.getAssembledTuple();
 	
-	CPythonObjectNew returnVal = _wrapper.ExecuteFunction(functionName, pythonParameter, moduleName);
+	CPythonObjectNew returnVal = _wrapper.executeFunction(functionName, pythonParameter, moduleName);
 	return pyObBuilder.getInt32Value(returnVal, "return Value");
 }
 
 
-int32_t FixturePythonWrapper::GetGlobalVariable(const std::string& varName, const std::string& moduleName)
+int32_t FixturePythonWrapper::getGlobalVariable(const std::string& varName, const std::string& moduleName)
 {
 	PythonObjectBuilder pyObBuilder;
-	CPythonObjectBorrowed variable = _wrapper.GetGlobalVariable(varName, moduleName);
+	CPythonObjectBorrowed variable = _wrapper.getGlobalVariable(varName, moduleName);
 	return pyObBuilder.getInt32Value(variable, varName);
 }
 
 std::list<std::string> FixturePythonWrapper::GetPathVariable(const std::string& moduleName)
 {
 	PythonObjectBuilder pyObBuilder;
-	CPythonObjectBorrowed variable = _wrapper.GetGlobalVariable("path", moduleName);
+	CPythonObjectBorrowed variable = _wrapper.getGlobalVariable("path", moduleName);
 	return pyObBuilder.getStringList(variable, "path");
 }
 
 void FixturePythonWrapper::AddNumpyToPath()
 {
-	_wrapper.AddToSysPath("C:\\ThirdParty\\Python\\Python310\\Lib\\site-packages");
+	_wrapper.addToSysPath("C:\\ThirdParty\\Python\\Python310\\Lib\\site-packages");
 }
 
 void FixturePythonWrapper::ResetPythonPath()
 {
-	_wrapper.ResetSysPath();
+	_wrapper.resetSysPath();
 }

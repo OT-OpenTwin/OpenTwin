@@ -41,7 +41,7 @@ TEST_F(FixturePythonWrapper, ThrowWhenPythonSIGABR)
 TEST_F(FixturePythonWrapper, GetGlobalVariableValue)
 {
 	ExecuteString("variable = 13",getMainModulName());
-	int returnValue = GetGlobalVariable("variable", getMainModulName());
+	int returnValue = getGlobalVariable("variable", getMainModulName());
 	EXPECT_EQ(returnValue, 13);
 }
 
@@ -49,20 +49,20 @@ TEST_F(FixturePythonWrapper, GetGlobalVariableValue_NewModule)
 {
 	const std::string modulName = "Example";
 	ExecuteString("variable = 13", modulName);
-	EXPECT_NO_THROW(GetGlobalVariable("variable", modulName));
+	EXPECT_NO_THROW(getGlobalVariable("variable", modulName));
 }
 TEST_F(FixturePythonWrapper, GetGlobalVariableValue_WrongModule)
 {
 	const std::string modulName = "Bubble";
 	ExecuteString("variable = 13", modulName);
-	EXPECT_ANY_THROW(GetGlobalVariable("variable", getMainModulName()));
+	EXPECT_ANY_THROW(getGlobalVariable("variable", getMainModulName()));
 }
 
 TEST_F(FixturePythonWrapper, GetGlobalVariableValue_NotExisting)
 {
 	const std::string modulName = "Example";
 	ExecuteString("variable = 13", modulName);
-	EXPECT_ANY_THROW(GetGlobalVariable("NotExisting", getMainModulName()));
+	EXPECT_ANY_THROW(getGlobalVariable("NotExisting", getMainModulName()));
 }
 
 TEST_F(FixturePythonWrapper, FunctionWithReturnValue)
@@ -259,7 +259,7 @@ TEST_F(FixturePythonWrapper, PythonExtensionFunctionGetter)
 
 	const std::string script = "import InitialTestModule\n"
 		"def main():\n"
-		"\tfunct = InitialTestModule.GetFunction(\"anotherModule\",\"add\")\n"
+		"\tfunct = InitialTestModule.getFunction(\"anotherModule\",\"add\")\n"
 		"\treturnValue = funct(3,5)\n"
 		"\treturn str(returnValue)\n"
 		;

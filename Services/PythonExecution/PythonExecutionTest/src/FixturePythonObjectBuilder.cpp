@@ -21,5 +21,5 @@
 
 FixturePythonObjectBuilder::FixturePythonObjectBuilder()
 {
-	_wrapper.InitializePythonInterpreter();
+	_wrapper.initializePythonInterpreter();
 }

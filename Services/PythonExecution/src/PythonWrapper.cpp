@@ -40,14 +40,14 @@ std::string PythonWrapper::m_customSitePackage;
 bool PythonWrapper::m_redirectOutput = false;
 
 PythonWrapper::PythonWrapper() : m_outputWorkerThread(nullptr) {
-	_pythonRoot = DeterminePythonRootDirectory();
+	m_pythonRoot = determinePythonRootDirectory();
 	
-	OT_LOG_D("Setting Python root path: " + _pythonRoot);
-	_pythonPath.push_back(_pythonRoot);
-	_pythonPath.push_back(_pythonRoot + "\\Lib");
-	_pythonPath.push_back(_pythonRoot + "\\DLLs");
+	OT_LOG_D("Setting Python root path: " + m_pythonRoot);
+	m_pythonPath.push_back(m_pythonRoot);
+	m_pythonPath.push_back(m_pythonRoot + "\\Lib");
+	m_pythonPath.push_back(m_pythonRoot + "\\DLLs");
 	std::string sitePackageDirectory = determineMandatoryPythonSitePackageDirectory();
-	_pythonPath.push_back(sitePackageDirectory);
+	m_pythonPath.push_back(sitePackageDirectory);
 
 	if (m_customSitePackage.empty())
 	{
@@ -60,7 +60,7 @@ PythonWrapper::PythonWrapper() : m_outputWorkerThread(nullptr) {
 	if (m_redirectOutput)
 	{
 		// Create a pipe for getting the standard output
-		if (_pipe(pipe_fds, 4096, _O_TEXT) == -1) {
+		if (_pipe(m_pipe_fds, 4096, _O_TEXT) == -1) {
 			OT_LOG_EA("Creating pipe for capturing Python output failed.");
 		}
 	}
@@ -71,9 +71,9 @@ void PythonWrapper::readOutput() {
 	while (m_redirectOutput)
 	{
 		DWORD bytes_available = 0;
-		if (PeekNamedPipe((HANDLE)_get_osfhandle(pipe_fds[0]), NULL, 0, NULL, &bytes_available, NULL)) {
+		if (PeekNamedPipe((HANDLE)_get_osfhandle(m_pipe_fds[0]), NULL, 0, NULL, &bytes_available, NULL)) {
 			if (bytes_available > 0) {
-				int count = _read(pipe_fds[0], buffer, sizeof(buffer) - 1);
+				int count = _read(m_pipe_fds[0], buffer, sizeof(buffer) - 1);
 				if (count > 0) {
 					buffer[count] = '\0';
 					//Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::to_string(strlen(buffer)) + ":" + std::string(buffer));
@@ -96,15 +96,15 @@ int PythonWrapper::initiateNumpy() {
 std::string PythonWrapper::checkNumpyVersion() {
 	execute("import numpy\n"
 		"numpyVersion = numpy.version.version", "__main__");
-	CPythonObjectBorrowed variable = GetGlobalVariable("numpyVersion","__main__");
+	CPythonObjectBorrowed variable = getGlobalVariable("numpyVersion","__main__");
 	PythonObjectBuilder builder;
 	const std::string numpyVersion = builder.getStringValue(variable, "numpyVersion");
 	return numpyVersion;
 }
 
 PythonWrapper::~PythonWrapper() {
-	if (!_interpreterSuccessfullyInitialized) {
-		ClosePythonInterpreter();
+	if (!m_interpreterSuccessfullyInitialized) {
+		closePythonInterpreter();
 	}
 
 	if (m_outputWorkerThread)
@@ -117,17 +117,17 @@ PythonWrapper::~PythonWrapper() {
 	}
 }
 
-void PythonWrapper::ClosePythonInterpreter() {
+void PythonWrapper::closePythonInterpreter() {
 	int success = Py_FinalizeEx();
 	if (success == -1) {
 		throw PythonException();
 	}
 }
 
-void PythonWrapper::InitializePythonInterpreter() {
+void PythonWrapper::initializePythonInterpreter() {
 	std::wstring allPaths;
 	std::string debugPathOverview("");
-	for (std::string& pathComponent : _pythonPath) {
+	for (std::string& pathComponent : m_pythonPath) {
 		std::wstring temp(pathComponent.begin(), pathComponent.end());
 		allPaths += temp + L";";
 		debugPathOverview += pathComponent;
@@ -144,7 +144,7 @@ void PythonWrapper::InitializePythonInterpreter() {
 	if (Py_IsInitialized() != 1) {
 		throw PythonException();
 	}
-	_interpreterSuccessfullyInitialized = true;
+	m_interpreterSuccessfullyInitialized = true;
 	int numpyErrorCode = initiateNumpy();
 	if (numpyErrorCode == 0) {
 		throw PythonException("Numpy Initialization failed. Make sure that the file numpy/ndarrayobject.h exists. Details: ");
@@ -160,7 +160,7 @@ void PythonWrapper::InitializePythonInterpreter() {
 			"import sys\n"
 			"import os\n"
 			"import logging\n"
-			"sys.stdout = os.fdopen(" + std::to_string(pipe_fds[1]) + ", 'w')\n"
+			"sys.stdout = os.fdopen(" + std::to_string(m_pipe_fds[1]) + ", 'w')\n"
 			"sys.stdout.reconfigure(line_buffering = True)\n"
 			"logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))\n";
 			
@@ -170,23 +170,23 @@ void PythonWrapper::InitializePythonInterpreter() {
 	}
 }
 
-void PythonWrapper::ResetSysPath() {
+void PythonWrapper::resetSysPath() {
 	std::string resetPythonPath = "import sys\n"
 		"sys.path.clear()\n";
 	
-	for (std::string& pathComponent : _pythonPath) {
+	for (std::string& pathComponent : m_pythonPath) {
 		resetPythonPath += "sys.path.append(\"" +pathComponent +"\")\n";
 	}
 	execute(resetPythonPath);
 }
 
-void PythonWrapper::AddToSysPath(const std::string& newPathComponent) {
+void PythonWrapper::addToSysPath(const std::string& _newPathComponent) {
 	const std::string addToPythonPath = "import sys\n"
-		"sys.path.append(\""+newPathComponent+"\")\n";
+		"sys.path.append(\""+_newPathComponent+"\")\n";
 	execute(addToPythonPath);
 }
 
-std::string PythonWrapper::DeterminePythonRootDirectory() {
+std::string PythonWrapper::determinePythonRootDirectory() {
 	std::string path;
 
 	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
@@ -204,7 +204,7 @@ std::string PythonWrapper::DeterminePythonRootDirectory() {
 
 std::string PythonWrapper::determineMandatoryPythonSitePackageDirectory() {
 
-	std::string path = DeterminePythonRootDirectory();
+	std::string path = determinePythonRootDirectory();
 
 	if (!m_customSitePackage.empty())
 	{
@@ -225,11 +225,11 @@ void PythonWrapper::addOptionalUserPythonSitePackageDirectory()
 
 	if (pythonSitePackagePath != nullptr)
 	{
-		_pythonPath.push_back(pythonSitePackagePath);
+		m_pythonPath.push_back(pythonSitePackagePath);
 	}
 }
 
-void PythonWrapper::signalHandlerAbort(int sig) {
+void PythonWrapper::signalHandlerAbort(int _sig) {
 	signal(SIGABRT, &signalHandlerAbort);
 	throw std::exception("Abort was called.");
 }
@@ -249,7 +249,7 @@ void PythonWrapper::flushOutput()
 }
 
 CPythonObjectNew PythonWrapper::execute(const std::string& _executionCommand, const std::string& _moduleName) {
-	CPythonObjectNew module(GetModule(_moduleName));
+	CPythonObjectNew module(getModule(_moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
 	CPythonObjectNew result(PyRun_String(_executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
 
@@ -263,9 +263,9 @@ CPythonObjectNew PythonWrapper::execute(const std::string& _executionCommand, co
 	return result;
 }
 
-CPythonObjectNew PythonWrapper::ExecuteFunction(const std::string& functionName, CPythonObject& parameter, const std::string& moduleName) {
-	CPythonObjectNew function(GetFunction(functionName, moduleName)); //Really borrowed?
-	CPythonObjectNew returnValue(PyObject_CallObject(function, parameter));
+CPythonObjectNew PythonWrapper::executeFunction(const std::string& _functionName, CPythonObject& _parameter, const std::string& _moduleName) {
+	CPythonObjectNew function(getFunction(_functionName, _moduleName)); //Really borrowed?
+	CPythonObjectNew returnValue(PyObject_CallObject(function, _parameter));
 	
 	flushOutput();
 
@@ -276,10 +276,10 @@ CPythonObjectNew PythonWrapper::ExecuteFunction(const std::string& functionName,
 	return returnValue;
 }
 
-CPythonObjectBorrowed PythonWrapper::GetGlobalVariable(const std::string& varName, const std::string& moduleName) {
-	CPythonObjectNew module = (GetModule(moduleName));
+CPythonObjectBorrowed PythonWrapper::getGlobalVariable(const std::string& _varName, const std::string& _moduleName) {
+	CPythonObjectNew module = (getModule(_moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
-	CPythonObjectBorrowed pythonVar(PyDict_GetItemString(globalDirectory, varName.c_str()));
+	CPythonObjectBorrowed pythonVar(PyDict_GetItemString(globalDirectory, _varName.c_str()));
 	if (pythonVar == nullptr)
 	{
 		throw PythonException();
@@ -287,15 +287,15 @@ CPythonObjectBorrowed PythonWrapper::GetGlobalVariable(const std::string& varNam
 	return pythonVar;
 }
 
-CPythonObjectBorrowed PythonWrapper::GetGlobalDictionary(const std::string& moduleName) {
-	CPythonObjectBorrowed module(PyImport_AddModule(moduleName.c_str()));
+CPythonObjectBorrowed PythonWrapper::getGlobalDictionary(const std::string& _moduleName) {
+	CPythonObjectBorrowed module(PyImport_AddModule(_moduleName.c_str()));
 	return PyModule_GetDict(module);
 }
 
-CPythonObjectNew PythonWrapper::GetFunction(const std::string& functionName, const std::string& moduleName) {
+CPythonObjectNew PythonWrapper::getFunction(const std::string& _functionName, const std::string& _moduleName) {
 
-	CPythonObjectNew module = GetModule(moduleName);
-	CPythonObjectNew function(PyObject_GetAttrString(module, functionName.c_str()));
+	CPythonObjectNew module = getModule(_moduleName);
+	CPythonObjectNew function(PyObject_GetAttrString(module, _functionName.c_str()));
 	if (function == nullptr)
 	{
 		throw PythonException();
@@ -303,25 +303,25 @@ CPythonObjectNew PythonWrapper::GetFunction(const std::string& functionName, con
 
 	if (PyCallable_Check(function) != 1)
 	{
-		throw std::exception(("Function " + functionName + " does not exist in module " + moduleName).c_str());
+		throw std::exception(("Function " + _functionName + " does not exist in module " + _moduleName).c_str());
 	}
 	return function;
 }
 
-CPythonObjectNew PythonWrapper::GetModule(const std::string& moduleName) {
+CPythonObjectNew PythonWrapper::getModule(const std::string& _moduleName) {
 	PythonObjectBuilder builder;
-	PyObject* module(PyImport_ImportModule(moduleName.c_str()));
+	PyObject* module(PyImport_ImportModule(_moduleName.c_str()));
 
 	if (module == nullptr)
 	{
 		PyObject* type, * value, * traceback;
 		PyErr_Fetch(&type, &value, &traceback);
-		if (moduleName == "__main__")
+		if (_moduleName == "__main__")
 		{
 			throw PythonException();
 		}
-		CPythonObjectBorrowed newModule(PyImport_AddModule(moduleName.c_str()));
-		return PyImport_ImportModule(moduleName.c_str());
+		CPythonObjectBorrowed newModule(PyImport_AddModule(_moduleName.c_str()));
+		return PyImport_ImportModule(_moduleName.c_str());
 	}
 	else
 	{

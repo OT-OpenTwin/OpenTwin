@@ -21,5 +21,5 @@
 
 FixturePropertyPythonObjectInterface::FixturePropertyPythonObjectInterface()
 {
-	_wrapper.InitializePythonInterpreter();
+	_wrapper.initializePythonInterpreter();
 }

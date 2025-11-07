@@ -29,7 +29,7 @@
 
 PythonAPI::PythonAPI()
 {
-	m_wrapper.InitializePythonInterpreter();
+	m_wrapper.initializePythonInterpreter();
 }
 
 void PythonAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)
@@ -56,7 +56,7 @@ void PythonAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot
 			}
 
 			OT_LOG_D("Execute script " + scriptEntity.getEntityName());
-			CPythonObjectNew pReturnValue = m_wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
+			CPythonObjectNew pReturnValue = m_wrapper.executeFunction(entryPoint, pythonParameterSet, moduleName);
 			try
 			{
 				if (pReturnValue)

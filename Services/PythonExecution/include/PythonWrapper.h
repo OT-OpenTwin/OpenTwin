@@ -35,52 +35,47 @@ class PythonWrapper {
 	friend class FixturePythonWrapper;
 public:
 	PythonWrapper();
-	PythonWrapper(const PythonWrapper& other) = delete;
-	PythonWrapper& operator=(const PythonWrapper& other) = delete;
-	PythonWrapper(const PythonWrapper&& other) = delete;
-	PythonWrapper& operator=(const PythonWrapper&& other) = delete;
-
+	PythonWrapper(const PythonWrapper& _other) = delete;
+	PythonWrapper& operator=(const PythonWrapper& _other) = delete;
+	PythonWrapper(const PythonWrapper&& _other) = delete;
+	PythonWrapper& operator=(const PythonWrapper&& _other) = delete;
 
 	~PythonWrapper();
 
-	static void setSitePackage(const std::string& sitePackageName) { m_customSitePackage = sitePackageName; }
-	static void setRedirectOutput(bool redirectOutput) { m_redirectOutput = redirectOutput; }
+	static void setSitePackage(const std::string& _sitePackageName) { m_customSitePackage = _sitePackageName; }
+	static void setRedirectOutput(bool _redirectOutput) { m_redirectOutput = _redirectOutput; }
 
-	void InitializePythonInterpreter();
-	void ResetSysPath();
-	void AddToSysPath(const std::string& newPathComponent);
-	void ClosePythonInterpreter();
+	void initializePythonInterpreter();
+	void resetSysPath();
+	void addToSysPath(const std::string& _newPathComponent);
+	void closePythonInterpreter();
 
 	CPythonObjectNew execute(const std::string& _executionCommand, const std::string& _moduleName = "__main__");
-
-	CPythonObjectNew ExecuteFunction(const std::string& functionName, CPythonObject& parameter, const std::string& moduleName = "__main__");
-
-	CPythonObjectBorrowed GetGlobalVariable(const std::string& varName, const std::string& moduleName);
-
-	CPythonObjectBorrowed GetGlobalDictionary(const std::string& moduleName);
-	CPythonObjectNew GetFunction(const std::string& functionName, const std::string& moduleName = "__main__");
+	CPythonObjectNew executeFunction(const std::string& _functionName, CPythonObject& _parameter, const std::string& _moduleName = "__main__");
+	CPythonObjectBorrowed getGlobalVariable(const std::string& _varName, const std::string& _moduleName);
+	CPythonObjectBorrowed getGlobalDictionary(const std::string& _moduleName);
+	CPythonObjectNew getFunction(const std::string& _functionName, const std::string& _moduleName = "__main__");
 
 private:
-	std::list<std::string> _pythonPath;
-	std::string _pythonRoot;
-	std::string _defaultSitePackagesPath;
-	bool _interpreterSuccessfullyInitialized = false;
-	int pipe_fds[2];
+	static std::string m_customSitePackage;
+	static bool m_redirectOutput;
+
+	std::list<std::string> m_pythonPath;
+	std::string m_pythonRoot;
+	std::string m_defaultSitePackagesPath;
+	bool m_interpreterSuccessfullyInitialized = false;
+	int m_pipe_fds[2];
+	std::thread* m_outputWorkerThread;
+	std::atomic<long long> m_outputProcessingCount = 0;
+
+	static void signalHandlerAbort(int sig);
 
 	int initiateNumpy();
 	std::string checkNumpyVersion();
-	std::string DeterminePythonRootDirectory();
+	std::string determinePythonRootDirectory();
 	std::string determineMandatoryPythonSitePackageDirectory();
 	void addOptionalUserPythonSitePackageDirectory();
 	void readOutput();
 	void flushOutput();
-
-	static void signalHandlerAbort(int sig);
-
-	CPythonObjectNew GetModule(const std::string& moduleName);
-
-	static std::string m_customSitePackage;
-	static bool m_redirectOutput;
-	std::thread* m_outputWorkerThread;
-	std::atomic<long long> m_outputProcessingCount = 0;
+	CPythonObjectNew getModule(const std::string& _moduleName);
 };

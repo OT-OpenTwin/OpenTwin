@@ -33,7 +33,7 @@ public:
 	std::string ExecuteFunctionWithReturnValue(const std::string& functionName, const std::string& moduleName);
 	int ExecuteFunctionWithParameter(const std::string& functionName, int parameter, const std::string& moduleName);
 	int ExecuteFunctionWithMultipleParameter(const std::string& functionName, int parameter1, int parameter2, std::string parameter3, const std::string& moduleName);
-	int32_t GetGlobalVariable(const std::string& varName, const std::string& moduleName);
+	int32_t getGlobalVariable(const std::string& varName, const std::string& moduleName);
 	std::list<std::string> GetPathVariable(const std::string& moduleName);
 	void AddNumpyToPath();
 	void ResetPythonPath();

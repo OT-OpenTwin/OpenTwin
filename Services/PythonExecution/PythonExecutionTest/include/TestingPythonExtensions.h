@@ -25,7 +25,7 @@
 namespace TestingPythonExtensions
 {
  
-    static PyObject* GetFunction(PyObject* self, PyObject* args)
+    static PyObject* getFunction(PyObject* self, PyObject* args)
     {
         PythonObjectBuilder pyObBuilder;
         std::string scriptName = pyObBuilder.getStringValue(PyTuple_GetItem(args, 0), "Parameter 1");
@@ -76,7 +76,7 @@ namespace TestingPythonExtensions
         {"WithOneParameter",  WithOneParameter, METH_VARARGS, "Test function with one parameter."},
         {"WithoutParameter",  WithoutParameter, METH_NOARGS, "Test function without parameter."},
         {"WithMultipleParameter",  WithMultipleParameter, METH_VARARGS, "Test function with multiple parameter."},
-        {"GetFunction",  GetFunction, METH_VARARGS, "Test function getter."},
+        {"getFunction",  getFunction, METH_VARARGS, "Test function getter."},
 
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
