@@ -60,6 +60,14 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Entity not found");
 	}
 
+	// Check if any service wants to handle this change
+	std::list<std::string> handlingServices = blockEnt->getServicesForCallback(EntityBase::Callback::DataHandle);
+	if (!handlingServices.empty()) {
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemChangedDocument(_item);
+		Application::instance()->sendMessageAsync(true, handlingServices, doc);
+		return ot::ReturnMessage::Ok;
+	}
+
 	bool storeTopologyEntity = false;
 
 	// Here i will update the rotation
@@ -124,14 +132,21 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 
 	_model->setModified();
 	_model->modelChangeOperationCompleted("Item changed");
+
+	// Check if any service wants to be notified about this change
+	std::list<std::string> notifyServices = blockEnt->getServicesForCallback(EntityBase::Callback::DataNotify);
+	if (!notifyServices.empty()) {
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemChangedDocument(_item);
+		Application::instance()->sendMessageAsync(false, notifyServices, doc);
+	}
+
 	return ot::ReturnMessage::Ok;
 }
 
 ot::ReturnMessage BlockHandler::graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData) {
-	
-
 	const ot::UID connectionID =  _connectionData.getUid();
 	Model* _model = Application::instance()->getModel();
+
 	auto entBase = _model->getEntityByID(connectionID);
 	EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entBase);
 	if (!connectionEntity) {
@@ -139,13 +154,29 @@ ot::ReturnMessage BlockHandler::graphicsConnectionChanged(const ot::GraphicsConn
 		return ot::ReturnMessage::Failed;
 	}
 
+	// Check if any service wants to handle this change
+	std::list<std::string> handlingServices = connectionEntity->getServicesForCallback(EntityBase::Callback::DataHandle);
+	if (!handlingServices.empty()) {
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionChangedDocument(_connectionData);
+		Application::instance()->sendMessageAsync(true, handlingServices, doc);
+		return ot::ReturnMessage::Ok;
+	}
+
+	// Update connection
 	connectionEntity->setConnectionCfg( _connectionData);
 	connectionEntity->storeToDataBase();
 	_model->getStateManager()->modifyEntityVersion(*connectionEntity);
 
-
 	_model->setModified();
 	_model->modelChangeOperationCompleted("Connection Changed");
+
+	// Check if any service wants to be notified about this change
+	std::list<std::string> notifyServices = connectionEntity->getServicesForCallback(EntityBase::Callback::DataNotify);
+	if (!notifyServices.empty()) {
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionChangedDocument(_connectionData);
+		Application::instance()->sendMessageAsync(false, notifyServices, doc);
+	}
+
 	return ot::ReturnMessage::Ok;
 
 }
@@ -153,24 +184,36 @@ ot::ReturnMessage BlockHandler::graphicsConnectionChanged(const ot::GraphicsConn
 ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos) {
 	Model* model = Application::instance()->getModel();
 
-	ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
-	std::list<bool> forceVis;
+	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(model->findEntityFromName(_viewName));
+	if (!editor) {
+		OT_LOG_E("Could not find graphics editor entity { \"ViewName\": \"" + _viewName + "\" }");
+		return ot::ReturnMessage::Failed;
+	}
+
+	// Check if any service wants to handle this change
+	std::list<std::string> handlingServices = editor->getServicesForCallback(EntityBase::Callback::DataHandle);
+	if (!handlingServices.empty()) {
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemRequestedDocument(_viewName, _itemName, _pos);
+		Application::instance()->sendMessageAsync(true, handlingServices, doc);
+		return ot::ReturnMessage::Ok;
+	}
 	
+	ot::NewModelStateInfo modelStateInfo;
+
+	// Create block entity
 	EntityBase* entBase = EntityFactory::instance().create(_itemName);
 	if (entBase == nullptr) {
 		OT_LOG_E("Could not create Entity: " + _itemName);
 		return ot::ReturnMessage::Failed;
 	}
 
-	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(entBase);
+	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
 	if (blockEnt == nullptr) {
 		OT_LOG_E("Could not cast to EntityBlock: " + entBase->getEntityID());
 		return ot::ReturnMessage::Failed;
 	}
 
-	EntityBase* editorBase = model->findEntityFromName(_viewName);
-	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
-
+	// Determine unique name
 	std::string blockFolderName;
 	if (!blockEnt->getBlockFolderName().empty()) {
 		blockFolderName = "/" + blockEnt->getBlockFolderName();
@@ -183,22 +226,28 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 
 	std::list<std::string> blocks = model->getListOfFolderItems(folderName, true);
 	std::string entName = CreateNewUniqueTopologyName(blockEnt->getNamingBehavior(), blocks, folderName, blockEnt->getBlockTitle());
+
+	// Setup block entity
 	blockEnt->setName(entName);
 	blockEnt->setEditable(true);
 	blockEnt->setGraphicsPickerKey(editor->getGraphicsPickerKey());
 	blockEnt->setCallbackData(editor->getCallbackData());
 	blockEnt->setEntityID(model->createEntityUID());
-
 	blockEnt->setGraphicsScenePackageChildName(blockEnt->getBlockFolderName());
 
+	// Create coordinate entity
 	EntityCoordinates2D* blockCoordinates = new EntityCoordinates2D(model->createEntityUID(), nullptr, nullptr, nullptr);
 	blockCoordinates->setCoordinates(_pos);
 	blockCoordinates->storeToDataBase();
+	modelStateInfo.addDataEntity(*blockEnt, *blockCoordinates);
 
+	// Link block and coordinate entity
 	blockEnt->setCoordinateEntityID(blockCoordinates->getEntityID());
 	blockEnt->createProperties();
+
+	// Special handling for python blocks
 	if (blockEnt->getClassName() == "EntityBlockPython") {
-		EntityBlockPython* pythonBlock = dynamic_cast<EntityBlockPython*>(blockEnt);
+		EntityBlockPython* pythonBlock = dynamic_cast<EntityBlockPython*>(blockEnt.get());
 		if (pythonBlock == nullptr) {
 			OT_LOG_E("Could not cast to EntityBlockPython: " + blockEnt->getEntityID());
 			return ot::ReturnMessage::Failed;
@@ -209,14 +258,16 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 	}
 
 	blockEnt->storeToDataBase();
+	modelStateInfo.addTopologyEntity(*blockEnt);
 
-	topoEntID.push_back(blockEnt->getEntityID());
-	topoEntVers.push_back(blockEnt->getEntityStorageVersion());
-	forceVis.push_back(false);
-	dataEntID.push_back(blockCoordinates->getEntityID());
-	dataEntVers.push_back(blockCoordinates->getEntityStorageVersion());
-	dataEntParent.push_back(blockEnt->getEntityID());
-	model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Added block", true, true, true);
+	model->addEntitiesToModel(modelStateInfo, "Added block", true, true, true);
+
+	// Check if any service wants to be notified about this change
+	std::list<std::string> notifyServices = blockEnt->getServicesForCallback(EntityBase::Callback::DataNotify);
+	if (!notifyServices.empty()) {
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemRequestedDocument(_viewName, _itemName, _pos);
+		Application::instance()->sendMessageAsync(false, notifyServices, doc);
+	}
 
 	return ot::ReturnMessage::Ok;
 }
@@ -224,50 +275,61 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
 	Model* model = Application::instance()->getModel();
 	
-	auto connections = _connectionData.getConnections();
+	const auto& connections = _connectionData.getConnections();
 	std::string viewName = _connectionData.getName();
-	EntityBase* editorBase = model->findEntityFromName(viewName);
-	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
-	std::list<EntityBlockConnection> entitiesForUpdate;
-	ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
+	
+	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(model->findEntityFromName(viewName));
+	if (!editor) {
+		OT_LOG_E("Could not find graphics editor entity { \"ViewName\": \"" + viewName + "\" }");
+		return ot::ReturnMessage::Failed;
+	}
+
+	// Check if any service wants to handle this change
+	std::list<std::string> handlingServices = editor->getServicesForCallback(EntityBase::Callback::DataHandle);
+	if (!handlingServices.empty()) {
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(_connectionData);
+		Application::instance()->sendMessageAsync(true, handlingServices, doc);
+		return ot::ReturnMessage::Ok;
+	}
+
+	ot::NewModelStateInfo modelStateInfo;
 	std::list<bool> forceVis;
 
-
-	for (auto& _connection : connections) {
+	for (ot::GraphicsConnectionCfg connection : connections) {
+		// Create connection entity
 		EntityBlockConnection connectionEntity(model->createEntityUID(), nullptr, nullptr, nullptr);
 		connectionEntity.createProperties();
 		connectionEntity.setCallbackData(editor->getCallbackData());
-		
-		auto connectionsFolder = model->getListOfFolderItems(_connectionData.getName() + "/" + m_connectionsFolder, true);
-		const std::string connectionName = CreateNewUniqueTopologyName(connectionsFolder, _connectionData.getName() + "/" + m_connectionsFolder, "Connection");
-		connectionEntity.setName(connectionName);
 		connectionEntity.setGraphicsPickerKey(_connectionData.getPickerKey());
 		connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
 
-		EntityBase* originEntityBase = model->getEntityByID(_connection.getOriginUid());
-		EntityBlock* originBlock = dynamic_cast<EntityBlock*>(originEntityBase);
-
-		EntityBase* destinationEntityBase = model->getEntityByID(_connection.getDestinationUid());
-		EntityBlock* destinationBlock = dynamic_cast<EntityBlock*>(destinationEntityBase);
+		// Determine unique name
+		auto connectionsFolder = model->getListOfFolderItems(_connectionData.getName() + "/" + m_connectionsFolder, true);
+		const std::string connectionName = CreateNewUniqueTopologyName(connectionsFolder, _connectionData.getName() + "/" + m_connectionsFolder, "Connection");
+		connectionEntity.setName(connectionName);
 		
-	
-		_connection.setLineShape(originBlock->getDefaultConnectionShape());
-		
-		connectionEntity.setConnectionCfg(_connection);
+		// Get connectors
+		EntityBlock* originBlock = dynamic_cast<EntityBlock*>(model->getEntityByID(connection.getOriginUid()));
+		EntityBlock* destinationBlock = dynamic_cast<EntityBlock*>(model->getEntityByID(connection.getDestinationUid()));
 
 		if (originBlock == nullptr || destinationBlock == nullptr) {
 			OT_LOG_E("Could not find origin or destination block for connection");
 			return ot::ReturnMessage::Failed;
 		}
 
-		auto originConnectorIt = originBlock->getAllConnectorsByName().find(_connection.getOriginConnectable());
-		auto destinationConnectorIt = destinationBlock->getAllConnectorsByName().find(_connection.getDestConnectable());
+		connection.setLineShape(originBlock->getDefaultConnectionShape());
+		connectionEntity.setConnectionCfg(connection);
+
+		// Find connectors
+		auto originConnectorIt = originBlock->getAllConnectorsByName().find(connection.getOriginConnectable());
+		auto destinationConnectorIt = destinationBlock->getAllConnectorsByName().find(connection.getDestConnectable());
 
 		if (originConnectorIt == originBlock->getAllConnectorsByName().end() || destinationConnectorIt == destinationBlock->getAllConnectorsByName().end()) {
 			OT_LOG_E("Could not find origin or destination connector for connection");
 			return ot::ReturnMessage::Failed;
 		}
 
+		// Check connector types
 		auto originConnectorType = originConnectorIt->second.getConnectorType();
 		auto destinationConnectorType = destinationConnectorIt->second.getConnectorType();
 
@@ -282,18 +344,19 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 			return ot::ReturnMessage::Ok;
 		}
 		
-		
-		entitiesForUpdate.push_back(connectionEntity);
+		connectionEntity.storeToDataBase();
+		modelStateInfo.addTopologyEntity(connectionEntity);
 	}
 
-	for (auto& _entityForUpdate : entitiesForUpdate) {
-		_entityForUpdate.storeToDataBase();
-		topoEntID.push_back(_entityForUpdate.getEntityID());
-		topoEntVers.push_back(_entityForUpdate.getEntityStorageVersion());
-		forceVis.push_back(false);
+	model->addEntitiesToModel(modelStateInfo, "Added connections", true, true, true);
+
+	// Check if any service wants to be notified about this change
+	std::list<std::string> notifyServices = editor->getServicesForCallback(EntityBase::Callback::DataNotify);
+	if (!notifyServices.empty()) {
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(_connectionData);
+		Application::instance()->sendMessageAsync(false, notifyServices, doc);
 	}
 
-	model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Added connections", true, true, true);
 	return ot::ReturnMessage::Ok;
 }
 

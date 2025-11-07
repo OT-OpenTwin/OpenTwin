@@ -2201,13 +2201,16 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 	ot::LockTypes lockFlag(ot::LockType::ModelWrite | ot::LockType::NavigationWrite | ot::LockType::ViewWrite | ot::LockType::Properties);
 	ot::UILockWrapper uiLock(Application::instance()->getUiComponent(), lockFlag);
 
-	for (auto serviceUpdate : otherServicesUpdate)
+	for (const auto& serviceUpdate : otherServicesUpdate)
 	{
+		if (serviceUpdate.first == Application::instance()->getServiceName()) {
+			continue;
+		}
+
 		std::list<ot::UID> entityIDs, entityVersions, brepVersions;
 		ot::JsonArray changedEntitiesInfos;
 		ot::JsonDocument notify;
-		for (auto entity : serviceUpdate.second)
-		{
+		for (const auto& entity : serviceUpdate.second) {
 			ot::UID brepVersion = 0;
 
 			EntityGeometry *geomEntity = dynamic_cast<EntityGeometry *>(getEntityByID(entity.first));
