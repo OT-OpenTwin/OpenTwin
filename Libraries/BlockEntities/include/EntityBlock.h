@@ -71,7 +71,7 @@ public:
 	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const;
 
 	virtual EntityNamingBehavior getNamingBehavior() const { return EntityNamingBehavior(); } ;
-	virtual std::string getBlockFolderName() const { return "/Blocks"; };
+	virtual std::string getBlockFolderName() const { return "Blocks"; };
 
 	std::string createBlockHeadline();
 

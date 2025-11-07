@@ -171,21 +171,28 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 	EntityBase* editorBase = model->findEntityFromName(_viewName);
 	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
 
-	std::list<std::string> blocks = model->getListOfFolderItems(_viewName + blockEnt->getBlockFolderName(), true);
-	std::string entName = CreateNewUniqueTopologyName(blockEnt->getNamingBehavior(), blocks, _viewName + blockEnt->getBlockFolderName(), blockEnt->getBlockTitle());
+	std::string blockFolderName;
+	if (!blockEnt->getBlockFolderName().empty()) {
+		blockFolderName = "/" + blockEnt->getBlockFolderName();
+	}
+	else {
+		blockFolderName = blockEnt->getBlockFolderName();
+	}
+
+	std::string folderName = _viewName + blockFolderName;
+
+	std::list<std::string> blocks = model->getListOfFolderItems(folderName, true);
+	std::string entName = CreateNewUniqueTopologyName(blockEnt->getNamingBehavior(), blocks, folderName, blockEnt->getBlockTitle());
 	blockEnt->setName(entName);
 	blockEnt->setEditable(true);
 	blockEnt->setGraphicsPickerKey(editor->getGraphicsPickerKey());
 	blockEnt->setOwningService(editor->getOwningService());
 	blockEnt->setEntityID(model->createEntityUID());
 
-	std::string blockfolderName = blockEnt->getBlockFolderName();
-	if (!blockfolderName.empty() && blockfolderName[0] == '/') {
-		blockfolderName = blockfolderName.substr(1);
-	}
-	blockEnt->setGraphicsScenePackageChildName(blockfolderName);
+	
+	blockEnt->setGraphicsScenePackageChildName(blockEnt->getBlockFolderName());
 
-	EntityCoordinates2D* blockCoordinates = new EntityCoordinates2D(model->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+	EntityCoordinates2D* blockCoordinates = new EntityCoordinates2D(model->createEntityUID(), nullptr, nullptr, nullptr, "");
 	blockCoordinates->setCoordinates(_pos);
 	blockCoordinates->storeToDataBase();
 
