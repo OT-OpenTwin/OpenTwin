@@ -478,7 +478,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WarningForeground), new PropertyPainter2D(new FillPainter2D(ot::Orange)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::LogoLight), new PropertyPainter2D(new FillPainter2D(228, 228, 228)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::LogoLight), new PropertyPainter2D(new FillPainter2D(240, 240, 240)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
 
