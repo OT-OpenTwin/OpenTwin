@@ -25,7 +25,7 @@
 
 static EntityFactoryRegistrar<EntitySolverElmerFEM> registrar("EntitySolverElmerFEM");
 
-EntitySolverElmerFEM::EntitySolverElmerFEM(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) : EntitySolver(ID, parent, obs, ms, owner)
+EntitySolverElmerFEM::EntitySolverElmerFEM(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) : EntitySolver(ID, parent, obs, ms)
 {
 }
 

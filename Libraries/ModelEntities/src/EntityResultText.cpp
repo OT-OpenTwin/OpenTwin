@@ -31,8 +31,8 @@
 
 static EntityFactoryRegistrar<EntityResultText> registrar("EntityResultText");
 
-EntityResultText::EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner)
+EntityResultText::EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms)
 {
 }
 
@@ -166,11 +166,6 @@ ot::TextEditorCfg EntityResultText::createConfig(bool _includeData)
 	return result;
 }
 
-ot::ContentChangedHandling EntityResultText::getTextContentChangedHandling()
-{
-	return m_contentChangedHandling;
-}
-
 void EntityResultText::deleteTextData(void)
 {
 	m_textData = nullptr;
@@ -212,7 +207,7 @@ void EntityResultText::ensureTextDataLoaded(void)
 	{
 		if (m_textDataStorageId == 0)
 		{
-			m_textData = new EntityResultTextData(getUidGenerator()->getUID(), this, getObserver(), getModelState(), getOwningService());
+			m_textData = new EntityResultTextData(getUidGenerator()->getUID(), this, getObserver(), getModelState());
 		}
 		else
 		{

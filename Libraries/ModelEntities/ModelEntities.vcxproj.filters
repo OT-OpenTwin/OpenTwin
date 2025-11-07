@@ -349,9 +349,6 @@
     <ClInclude Include="include\IVisualisationText.h">
       <Filter>Header Files\EntityInterfaces</Filter>
     </ClInclude>
-    <ClInclude Include="include\ContentChangedHandling.h">
-      <Filter>Header Files\EntityInterfaces</Filter>
-    </ClInclude>
     <ClInclude Include="include\EntityResultText.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -455,6 +452,9 @@
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\EntityNamingBehavior.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityCallbackBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -788,6 +788,9 @@
     </ClCompile>
     <ClCompile Include="src\EntityDatabaseIndexManipulator.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityCallbackBase.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

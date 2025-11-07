@@ -26,8 +26,8 @@
 class OT_MODELENTITIES_API_EXPORT EntityFile: public EntityBase
 {
 public:
-	EntityFile() : EntityFile(0, nullptr, nullptr, nullptr, "") {};
-	EntityFile(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityFile() : EntityFile(0, nullptr, nullptr, nullptr) {};
+	EntityFile(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityFile() = default;
 	virtual bool getEntityBox(double &_xmin, double &_xmax, double &_ymin, double &_ymax, double &_zmin, double &_zmax) override;
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };

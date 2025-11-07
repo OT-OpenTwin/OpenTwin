@@ -20,8 +20,8 @@
 #include "EntityBlockCircuitElement.h"
 #include "OTCommunication/ActionTypes.h"
 
-EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner) 
-	:EntityBlock(ID, parent, obs, ms, owner)
+EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) 
+	:EntityBlock(ID, parent, obs, ms)
 {
 	
 }

@@ -26,8 +26,8 @@
 class __declspec(dllexport) EntityMaterial : public EntityBase
 {
 public:
-	EntityMaterial() : EntityMaterial(0, nullptr, nullptr, nullptr, "") {};
-	EntityMaterial(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, const std::string &owner);
+	EntityMaterial() : EntityMaterial(0, nullptr, nullptr, nullptr) {};
+	EntityMaterial(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms);
 	virtual ~EntityMaterial();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

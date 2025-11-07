@@ -39,7 +39,7 @@ TableReader::~TableReader()
 
 }
 
-std::string TableReader::readFromFile(const std::string fileName, const std::string &itemName, EntityObserver *obs, ModelState *ms, const std::string &owner)
+std::string TableReader::readFromFile(const std::string fileName, const std::string &itemName, EntityObserver *obs, ModelState *ms, const ot::EntityCallbackBase& _callbackData)
 {
 	assert(model != nullptr);
 
@@ -75,7 +75,8 @@ std::string TableReader::readFromFile(const std::string fileName, const std::str
 	while (readNextLine(file, line)) dataContent.push_back(line);
 
 	// Create the new table item
-	EntityResultTable<double> *tableItem = new EntityResultTable<double>(model->createEntityUID(), nullptr, model, ms, owner);
+	EntityResultTable<double> *tableItem = new EntityResultTable<double>(model->createEntityUID(), nullptr, model, ms);
+	tableItem->setCallbackData(_callbackData.getCallbackData());
 
 	tableItem->setName(itemName);
 	tableItem->setEditable(false);

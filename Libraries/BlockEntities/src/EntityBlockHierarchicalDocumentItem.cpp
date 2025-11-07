@@ -27,8 +27,8 @@
 
 static EntityFactoryRegistrar<EntityBlockHierarchicalDocumentItem> registrar(EntityBlockHierarchicalDocumentItem::className());
 
-EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	: EntityBlock(_ID, _parent, _obs, _ms, _owner), m_documentUID(ot::invalidUID), m_documentVersion(ot::invalidUID), m_documentData(nullptr) {
+EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+	: EntityBlock(_ID, _parent, _obs, _ms), m_documentUID(ot::invalidUID), m_documentVersion(ot::invalidUID), m_documentData(nullptr) {
 	OldTreeIcon icon;
 	icon.visibleIcon = "Hierarchical/Document";
 	icon.hiddenIcon = "Hierarchical/Document";
@@ -111,10 +111,6 @@ ot::TextEditorCfg EntityBlockHierarchicalDocumentItem::createConfig(bool _includ
 	}
 
 	return cfg;
-}
-
-ot::ContentChangedHandling EntityBlockHierarchicalDocumentItem::getTextContentChangedHandling() {
-	return ot::ContentChangedHandling::ModelServiceSaves;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -31,8 +31,8 @@
 class __declspec(dllexport) EntityVisUnstructuredScalarSurface : public EntityVis2D3D
 {
 public:
-	EntityVisUnstructuredScalarSurface() : EntityVisUnstructuredScalarSurface(0, nullptr, nullptr, nullptr, "") {};
-	EntityVisUnstructuredScalarSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityVisUnstructuredScalarSurface() : EntityVisUnstructuredScalarSurface(0, nullptr, nullptr, nullptr) {};
+	EntityVisUnstructuredScalarSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 	virtual ~EntityVisUnstructuredScalarSurface();
 
 	virtual std::string getClassName(void) const override { return "EntityVisUnstructuredScalarSurface"; };

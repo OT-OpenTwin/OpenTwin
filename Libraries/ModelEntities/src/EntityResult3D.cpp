@@ -21,8 +21,8 @@
 
 static EntityFactoryRegistrar<EntityResult3D> registrar(EntityResult3D::className());
 
-EntityResult3D::EntityResult3D(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
-	: EntityVis2D3D(ID, parent, obs, ms, owner) {}
+EntityResult3D::EntityResult3D(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms)
+	: EntityVis2D3D(ID, parent, obs, ms) {}
 
 void EntityResult3D::createProperties(void)
 {

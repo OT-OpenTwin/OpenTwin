@@ -21,8 +21,8 @@
 class __declspec(dllexport) EntityBlockCircuitDiode : public EntityBlockCircuitElement
 {
 public:
-	EntityBlockCircuitDiode() : EntityBlockCircuitDiode(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockCircuitDiode() : EntityBlockCircuitDiode(0, nullptr, nullptr, nullptr) {};
+	EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 
 	static std::string className() { return "EntityBlockCircuitDiode"; }
 	virtual std::string getClassName(void) const override { return EntityBlockCircuitDiode::className(); };

@@ -27,8 +27,8 @@
 
 static EntityFactoryRegistrar<EntityCompressedVector> registrar(EntityCompressedVector::className());
 
-EntityCompressedVector::EntityCompressedVector(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner),
+EntityCompressedVector::EntityCompressedVector(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms),
 	uncompressedLength(0),
 	tolerance(0.0),
 	maximumDataSize(5e6),

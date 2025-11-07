@@ -213,10 +213,10 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 
 	// Create EntityFile Text
 	std::unique_ptr<EntityFileText> circuitModel;
-	circuitModel.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
+	circuitModel.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr));
 
 	//Create the data entity
-	EntityBinaryData fileContent(entIDData, circuitModel.get(), nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+	EntityBinaryData fileContent(entIDData, circuitModel.get(), nullptr, nullptr);
 	fileContent.setData(modelText.data(), modelText.size());
 	fileContent.storeToDataBase();
 

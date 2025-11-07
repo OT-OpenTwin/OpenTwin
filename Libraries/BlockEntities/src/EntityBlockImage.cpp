@@ -28,8 +28,8 @@
 
 static EntityFactoryRegistrar<EntityBlockImage> registrar(EntityBlockImage::className());
 
-EntityBlockImage::EntityBlockImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	: EntityBlock(_ID, _parent, _obs, _ms, _owner), m_imageUID(ot::invalidUID), m_imageVersion(ot::invalidUID),
+EntityBlockImage::EntityBlockImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+	: EntityBlock(_ID, _parent, _obs, _ms), m_imageUID(ot::invalidUID), m_imageVersion(ot::invalidUID),
 	m_image(nullptr), m_imageFormat(ot::ImageFileFormat::PNG)
 {
 	OldTreeIcon icon;

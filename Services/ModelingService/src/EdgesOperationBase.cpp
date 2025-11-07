@@ -136,13 +136,19 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 	ot::UID brepID   = modelComponent->createEntityUID();
 	ot::UID facetsID = modelComponent->createEntityUID();
 
-	EntityGeometry* geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr, serviceName);
+	EntityGeometry* geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr);
 	geometryEntity->setName(baseEntity->getName());
 	geometryEntity->setEditable(true);
 	geometryEntity->setSelectChildren(false);
 	geometryEntity->setManageChildVisibility(false);
 	geometryEntity->setBrep(shape);
 	geometryEntity->setOldTreeIcons(getVisibleTreeItemName(), getHiddenTreeItemName());
+	geometryEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		serviceName
+	);
 
 	geometryEntity->getProperties() = baseEntity->getProperties();
 

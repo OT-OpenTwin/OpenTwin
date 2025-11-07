@@ -32,8 +32,8 @@ class __declspec(dllexport) EntityResultUnstructuredMeshVtk : public EntityBase,
 public:
 	enum eQuantityType {SCALAR, VECTOR};
 
-	EntityResultUnstructuredMeshVtk() : EntityResultUnstructuredMeshVtk(0, nullptr, nullptr, nullptr, "") {};
-	EntityResultUnstructuredMeshVtk(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityResultUnstructuredMeshVtk() : EntityResultUnstructuredMeshVtk(0, nullptr, nullptr, nullptr) {};
+	EntityResultUnstructuredMeshVtk(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityResultUnstructuredMeshVtk();
 	
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;

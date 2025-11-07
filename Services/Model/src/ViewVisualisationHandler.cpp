@@ -55,9 +55,6 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 	
 	document.AddMember(OT_ACTION_PARAM_Visualisation_Config, ot::JsonObject(_visualisationCfg, document.GetAllocator()), document.GetAllocator());
 	
-	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
-	info.addToJsonObject(document, document.GetAllocator());
-
 	if (_visualisationCfg.getVisualisationType() == OT_ACTION_CMD_UI_TABLE_Setup)
 	{
 
@@ -154,8 +151,6 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 			editor->addToJsonObject(pckgObj, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, document.GetAllocator());
 			
-			ot::BasicServiceInformation info(baseEntity->getOwningService());
-			info.addToJsonObject(document, document.GetAllocator());
 			setupGraphicsScene(baseEntity);
 		}
 	}
@@ -179,8 +174,6 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 	IVisualisationTable* tableEntity = dynamic_cast<IVisualisationTable*>(baseEntity);
 	
 	ot::JsonDocument documentBase;
-	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
-	info.addToJsonObject(documentBase, documentBase.GetAllocator());
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setAsActiveView(true);
 	visualisationCfg.setOverrideViewerContent(true);

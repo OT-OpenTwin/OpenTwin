@@ -30,8 +30,8 @@ template <class T>
 class __declspec(dllexport) EntityResultTable : public EntityBase
 {
 public:
-	EntityResultTable() : EntityResultTable(0, nullptr, nullptr, nullptr, "") {};
-	EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, const std::string &owner);
+	EntityResultTable() : EntityResultTable(0, nullptr, nullptr, nullptr) {};
+	EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms);
 	virtual ~EntityResultTable();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

@@ -500,10 +500,16 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 					ot::UID brepID = application->getModelComponent()->createEntityUID();
 					ot::UID facetsID = application->getModelComponent()->createEntityUID();
 
-					EntityGeometry *entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, serviceName);
+					EntityGeometry *entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr);
 					entityGeom->setName(thisName);
 					entityGeom->setEditable(true);
 					entityGeom->setBrep(itemShape);
+					entityGeom->registerCallbacks(
+						ot::EntityCallbackBase::Callback::Properties |
+						ot::EntityCallbackBase::Callback::Selection |
+						ot::EntityCallbackBase::Callback::DataNotify,
+						Application::instance().getServiceName()
+					);
 
 					std::map< const opencascade::handle<TopoDS_TShape>, std::string> allFaceNames;
 

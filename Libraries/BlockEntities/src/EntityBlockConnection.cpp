@@ -26,8 +26,8 @@
 
 static EntityFactoryRegistrar<EntityBlockConnection> registrar(EntityBlockConnection::className());
 
-EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityBase(ID, parent, obs, ms, owner), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)),
+EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityBase(ID, parent, obs, ms), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)),
 	_blockIDOrigin(-1), _blockIDDestination(-1)
 {
 	m_navigationIcon.visibleIcon = "connection";
@@ -108,9 +108,6 @@ void EntityBlockConnection::CreateConnections()
 	ot::JsonDocument reqDoc;
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 	
-	ot::BasicServiceInformation ownerInfo(this->getOwningService());
-	ownerInfo.addToJsonObject(reqDoc, reqDoc.GetAllocator());
-
 	ot::VisualisationCfg visualisationCfg;
 	ot::JsonObject visualisationCfgJson;
 	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
@@ -239,9 +236,13 @@ void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view
 	}
 	else {
 		// Legacy support
-		m_pickerKey = getOwningService();
-		if (m_pickerKey.empty()) {
-			OT_LOG_W("Block connection entity has no GraphicsPickerKey and no owning service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
+		auto lst = getServicesForCallback(Callback::DataNotify);
+		if (!lst.empty()) {
+			m_pickerKey = lst.front();
+		}
+		else {
+			OT_LOG_W("Block connection entity has no GraphicsPickerKey and no callback service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
+			m_pickerKey = OT_INFO_SERVICE_TYPE_MODEL;
 		}
 	}
 }

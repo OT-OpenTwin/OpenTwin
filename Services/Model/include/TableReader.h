@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "EntityCallbackBase.h"
+
 #include <string>
 #include <list>
 
@@ -34,7 +36,7 @@ public:
 
 	void setModel(Model *mdl) { model = mdl; }
 
-	std::string readFromFile(const std::string fileName, const std::string &itemName, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	std::string readFromFile(const std::string fileName, const std::string &itemName, EntityObserver *obs, ModelState *ms, const ot::EntityCallbackBase& _callbackInfo);
 
 private:
 	bool readNextLine(std::ifstream &file, std::string &line);

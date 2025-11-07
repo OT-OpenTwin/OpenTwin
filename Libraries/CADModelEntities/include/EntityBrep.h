@@ -33,8 +33,8 @@
 class __declspec(dllexport) EntityBrep : public EntityBase
 {
 public:
-	EntityBrep() : EntityBrep(0, nullptr, nullptr, nullptr, "") {};
-	EntityBrep(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityBrep() : EntityBrep(0, nullptr, nullptr, nullptr) {};
+	EntityBrep(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityBrep();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

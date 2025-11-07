@@ -17,14 +17,14 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "..\include\EntitySolverMonitor.h"
+#include "EntitySolverMonitor.h"
 
 #include "OTCommunication/ActionTypes.h"
 
 static EntityFactoryRegistrar<EntitySolverMonitor> registrar("EntitySolverMonitor");
 
-EntitySolverMonitor::EntitySolverMonitor(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
-	:EntityContainer(ID,parent,obs,ms,owner){}
+EntitySolverMonitor::EntitySolverMonitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityContainer(ID, parent, obs, ms) {}
 
 EntitySolverMonitor::~EntitySolverMonitor(){}
 

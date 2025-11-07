@@ -29,8 +29,8 @@ class EntityResultTextData;
 class __declspec(dllexport) EntityResultText : public EntityBase, public IVisualisationText
 {
 public:
-	EntityResultText() : EntityResultText(0, nullptr, nullptr, nullptr, "") {};
-	EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, const std::string &owner);
+	EntityResultText() : EntityResultText(0, nullptr, nullptr, nullptr) {};
+	EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms);
 	virtual ~EntityResultText();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
@@ -63,8 +63,7 @@ public:
 	std::string getText() override;
 	bool visualiseText() override;
 	ot::TextEditorCfg createConfig(bool _includeData) override;
-	ot::ContentChangedHandling getTextContentChangedHandling() override;
-
+	
 private:
 	void ensureTextDataLoaded(void);
 	virtual int getSchemaVersion(void) override { return 1; };
@@ -75,7 +74,6 @@ private:
 	EntityResultTextData *m_textData = nullptr;
 	ot::UID m_textDataStorageId = 0;
 	ot::UID m_textDataStorageVersion = 0;
-	ot::ContentChangedHandling m_contentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
 };
 
 

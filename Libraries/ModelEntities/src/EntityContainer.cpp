@@ -28,8 +28,8 @@
 
 static EntityFactoryRegistrar<EntityContainer> registrar(EntityContainer::className());
 
-EntityContainer::EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner),
+EntityContainer::EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms),
 	createVisualizationItem(true)
 {
 	m_treeIcon.size = 32;

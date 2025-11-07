@@ -25,8 +25,8 @@
 class __declspec(dllexport) EntitySolverPort : public EntityContainer
 {
 public:
-	EntitySolverPort() : EntitySolverPort(0, nullptr, nullptr, nullptr, "") {};
-	EntitySolverPort(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntitySolverPort() : EntitySolverPort(0, nullptr, nullptr, nullptr) {};
+	EntitySolverPort(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntitySolverPort();
 
 	static std::string className() { return "EntitySolverPort"; }

@@ -43,8 +43,8 @@
 
 static EntityFactoryRegistrar<EntityFileCSV> registrar(EntityFileCSV::className());
 
-EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
-: EntityFileText(ID, parent, obs, ms, owner) {}
+EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms)
+: EntityFileText(ID, parent, obs, ms) {}
 
 bool EntityFileCSV::updateFromProperties(void)
 {
@@ -251,9 +251,4 @@ ot::TableCfg EntityFileCSV::getTableConfig(bool _includeData)
 bool EntityFileCSV::visualiseTable()
 {
 	return true;
-}
-
-ot::ContentChangedHandling EntityFileCSV::getTableContentChangedHandling()
-{
-	return m_tableContentChangedHandling;
 }

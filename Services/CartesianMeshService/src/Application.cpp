@@ -138,10 +138,16 @@ void Application::createMesh(void)
 	ot::UID entityID = this->getModelComponent()->createEntityUID();
 
 	// Create the new mesh item
-	EntityMeshCartesian *meshEntity = new EntityMeshCartesian(entityID, nullptr, nullptr, nullptr, getServiceName());
+	EntityMeshCartesian *meshEntity = new EntityMeshCartesian(entityID, nullptr, nullptr, nullptr);
 
 	meshEntity->setName(meshName);
 	meshEntity->setEditable(true);
+	meshEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
 
 	if (materialsFolder.empty())
 	{

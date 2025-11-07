@@ -28,8 +28,8 @@
 
 static EntityFactoryRegistrar<EntityVisUnstructuredScalarSurface> registrar("EntityVisUnstructuredScalarSurface");
 
-EntityVisUnstructuredScalarSurface::EntityVisUnstructuredScalarSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner) :
-	EntityVis2D3D(ID, parent, obs, ms, owner)
+EntityVisUnstructuredScalarSurface::EntityVisUnstructuredScalarSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) :
+	EntityVis2D3D(ID, parent, obs, ms)
 {
 }
 

@@ -32,8 +32,8 @@
 class __declspec(dllexport) EntityVisUnstructuredVectorSurface : public EntityVis2D3D
 {
 public:
-	EntityVisUnstructuredVectorSurface() : EntityVisUnstructuredVectorSurface(0, nullptr, nullptr, nullptr, "") {};
-	EntityVisUnstructuredVectorSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityVisUnstructuredVectorSurface() : EntityVisUnstructuredVectorSurface(0, nullptr, nullptr, nullptr) {};
+	EntityVisUnstructuredVectorSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 	virtual ~EntityVisUnstructuredVectorSurface();
 
 	virtual std::string getClassName(void) const override { return "EntityVisUnstructuredVectorSurface"; };

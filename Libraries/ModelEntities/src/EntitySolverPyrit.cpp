@@ -25,7 +25,7 @@
 
 static EntityFactoryRegistrar<EntitySolverPyrit> registrar("EntitySolverPyrit");
 
-EntitySolverPyrit::EntitySolverPyrit(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) : EntitySolver(ID, parent, obs, ms, owner)
+EntitySolverPyrit::EntitySolverPyrit(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) : EntitySolver(ID, parent, obs, ms)
 {
 }
 

@@ -41,7 +41,11 @@ bool SolverReport::storeReport()
 		{
 			EntityResultText solverReport;
 			solverReport.setEntityID(Application::instance()->getModelComponent()->createEntityUID());
-			solverReport.setOwningService(Application::instance()->getServiceName());
+			solverReport.registerCallbacks(
+				ot::EntityCallbackBase::Callback::Properties |
+				ot::EntityCallbackBase::Callback::Selection,
+				Application::instance()->getServiceName()
+			);
 			solverReport.setText(m_reportContent);
 			solverReport.setName(m_solverName + "/Report");
 			solverReport.storeToDataBase();

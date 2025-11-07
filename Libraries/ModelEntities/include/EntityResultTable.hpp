@@ -29,8 +29,8 @@
 #include "OTGui/VisualisationTypes.h"
 
 template <class T>
-EntityResultTable<T>::EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner),
+EntityResultTable<T>::EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms),
 	tableDataStorageId(-1),
 	tableDataStorageVersion(-1)
 {

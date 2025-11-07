@@ -29,8 +29,8 @@
 class __declspec(dllexport) EntityBinaryData : public EntityBase
 {
 public:
-	EntityBinaryData() : EntityBinaryData(0, nullptr, nullptr, nullptr, "") {};
-	EntityBinaryData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityBinaryData() : EntityBinaryData(0, nullptr, nullptr, nullptr) {};
+	EntityBinaryData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityBinaryData();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

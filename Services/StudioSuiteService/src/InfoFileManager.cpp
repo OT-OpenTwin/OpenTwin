@@ -178,11 +178,17 @@ void InfoFileManager::writeInformation()
 	if (!ot::ModelServiceAPI::getEntityInformation("Files/Information", triangleInfoItem))
 	{
 		// The item does not exist -> create a new item
-		fileEntity = new EntityFile(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+		fileEntity = new EntityFile(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 
 		fileEntity->setName("Files/Information");
 		fileEntity->setFileProperties("", "", "Absolute");
 		fileEntity->setEditable(false);
+		fileEntity->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			Application::instance().getServiceName()
+		);
 	}
 	else
 	{
@@ -191,7 +197,7 @@ void InfoFileManager::writeInformation()
 	}
 
 	// Now create a new data item
-	EntityBinaryData* dataEntity = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+	EntityBinaryData* dataEntity = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 
 	// Store the data in the item
 	std::stringstream dataContent;

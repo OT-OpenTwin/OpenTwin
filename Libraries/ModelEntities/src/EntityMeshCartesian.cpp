@@ -30,8 +30,8 @@
 
 static EntityFactoryRegistrar<EntityMeshCartesian> registrar("EntityMeshCartesian");
 
-EntityMeshCartesian::EntityMeshCartesian(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityMesh(ID, parent, obs, ms, owner),
+EntityMeshCartesian::EntityMeshCartesian(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityMesh(ID, parent, obs, ms),
 	meshData(nullptr),
 	meshDataStorageId(-1),
 	meshValid(false)
@@ -291,7 +291,7 @@ void EntityMeshCartesian::EnsureMeshDataLoaded(void)
 	{
 		if (meshDataStorageId == -1)
 		{
-			meshData = new EntityMeshCartesianData(0, nullptr, getObserver(), getModelState(), getOwningService());
+			meshData = new EntityMeshCartesianData(0, nullptr, getObserver(), getModelState());
 		}
 		else
 		{

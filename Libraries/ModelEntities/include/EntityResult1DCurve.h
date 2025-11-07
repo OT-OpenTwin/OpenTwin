@@ -40,8 +40,8 @@ public:
 
 	// Constructor / Destructor
 
-	EntityResult1DCurve() : EntityResult1DCurve(0, nullptr, nullptr, nullptr, "") {};
-	EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, const std::string& _owner);
+	EntityResult1DCurve() : EntityResult1DCurve(0, nullptr, nullptr, nullptr) {};
+	EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms);
 	EntityResult1DCurve(const EntityResult1DCurve& _other) = default;
 	EntityResult1DCurve(EntityResult1DCurve&& _other) noexcept = default;
 	~EntityResult1DCurve() = default;

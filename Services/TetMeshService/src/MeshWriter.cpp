@@ -116,7 +116,7 @@ void MeshWriter::convertFaces(void)
 		assert(!faceInverted);
 
 		// Create a new mesh face object to store the triangles
-		EntityMeshTetFace *meshFace = new EntityMeshTetFace(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, application->getServiceName());
+		EntityMeshTetFace *meshFace = new EntityMeshTetFace(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 
 		meshFace->setSurfaceId(faceTag.second);
 
@@ -215,9 +215,15 @@ void MeshWriter::storeMeshEntity(const std::string &entityName, EntityBase *enti
 								const std::string &materialsFolder, ot::UID materialsFolderID,
 								 FaceAnnotationsManager *faceAnnotationsManager, ProgressLogger *progressLogger)
 {
-	EntityMeshTetItem *meshItem = new EntityMeshTetItem(0, nullptr, nullptr, nullptr, application->getServiceName());
+	EntityMeshTetItem *meshItem = new EntityMeshTetItem(0, nullptr, nullptr, nullptr);
 	meshItem->setName(entityName);
 	meshItem->setMesh(entityMesh);
+	meshItem->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		Application::instance()->getServiceName()
+	);
 
 	allMeshItems.push_back(meshItem);
 
@@ -639,8 +645,14 @@ void MeshWriter::checkForInvalidFaceMeshes(const std::string &entityName, gmsh::
 				else invalidFaceList = std::to_string(faceTag);
 
 				// Create an error annotation
-				EntityAnnotation *annotation = new EntityAnnotation(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, application->getServiceName());
+				EntityAnnotation *annotation = new EntityAnnotation(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 				annotation->getAnnotationData()->setEntityID(application->getModelComponent()->createEntityUID());
+				annotation->registerCallbacks(
+					ot::EntityCallbackBase::Callback::Properties |
+					ot::EntityCallbackBase::Callback::Selection |
+					ot::EntityCallbackBase::Callback::DataNotify,
+					Application::instance()->getServiceName()
+				);
 
 				std::vector<int> elementTypes2;
 				std::vector<std::vector<size_t>> elementTags2;
@@ -858,7 +870,7 @@ bool MeshWriter::storeMeshFile(void)
 	gmsh::write(meshFileName);
 
 	// Save the file to the database
-	EntityBinaryData *fileData = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, application->getServiceName());
+	EntityBinaryData *fileData = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 
 	// Read the file content to the entity
 	readMeshFile(meshFileName, fileData);
@@ -938,9 +950,15 @@ int MeshWriter::getNumberOfNodesFromElementType(int type)
 void MeshWriter::storeMeshEntityFromPhysicalGroup(const std::string& entityName, int entityTag, double colorR, double colorG, double colorB, const std::string& materialsFolder, ot::UID materialsFolderID)
 {
 	// Create a new mesh entity
-	EntityMeshTetItem* meshItem = new EntityMeshTetItem(0, nullptr, nullptr, nullptr, application->getServiceName());
+	EntityMeshTetItem* meshItem = new EntityMeshTetItem(0, nullptr, nullptr, nullptr);
 	meshItem->setName(entityName);
 	meshItem->setMesh(entityMesh);
+	meshItem->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		Application::instance()->getServiceName()
+	);
 
 	allMeshItems.push_back(meshItem);
 

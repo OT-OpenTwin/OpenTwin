@@ -23,8 +23,8 @@
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalContainerItem : public EntityBlock {
 public:
-	EntityBlockHierarchicalContainerItem() : EntityBlockHierarchicalContainerItem(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockHierarchicalContainerItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityBlockHierarchicalContainerItem() : EntityBlockHierarchicalContainerItem(0, nullptr, nullptr, nullptr) {};
+	EntityBlockHierarchicalContainerItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 
 	static std::string className() { return "EntityBlockHierarchicalContainerItem"; }
 	virtual std::string getClassName(void) const override { return EntityBlockHierarchicalContainerItem::className(); };

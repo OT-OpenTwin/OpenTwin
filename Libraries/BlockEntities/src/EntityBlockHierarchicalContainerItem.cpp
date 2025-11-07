@@ -27,8 +27,8 @@
 
 static EntityFactoryRegistrar<EntityBlockHierarchicalContainerItem> registrar(EntityBlockHierarchicalContainerItem::className());
 
-EntityBlockHierarchicalContainerItem::EntityBlockHierarchicalContainerItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	: EntityBlock(_ID, _parent, _obs, _ms, _owner) {
+EntityBlockHierarchicalContainerItem::EntityBlockHierarchicalContainerItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+	: EntityBlock(_ID, _parent, _obs, _ms) {
 	OldTreeIcon icon;
 	icon.visibleIcon = "Hierarchical/Container";
 	icon.hiddenIcon = "Hierarchical/Container";

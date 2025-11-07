@@ -93,10 +93,15 @@ void Application::createNewCircuit() {
 	std::list<std::string> existingCircuits = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::CircuitsFolder);
 	std::string circuitName = ot::EntityName::createUniqueEntityName(ot::FolderNames::CircuitsFolder, "Circuit", existingCircuits);
 
-	std::unique_ptr<EntityGraphicsScene> entityCircuitRoot(new EntityGraphicsScene(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
+	std::unique_ptr<EntityGraphicsScene> entityCircuitRoot(new EntityGraphicsScene(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr));
 	entityCircuitRoot->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	entityCircuitRoot->setEditable(true);
 	entityCircuitRoot->setName(circuitName);
+	entityCircuitRoot->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection,
+		getServiceName()
+	);
 
 	entityCircuitRoot->storeToDataBase();
 	ot::ModelServiceAPI::addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added new circuit");
@@ -123,7 +128,7 @@ void Application::createInitialCircuit() {
 	std::list<std::string> circuits = ot::ModelServiceAPI::getListOfFolderItems("Circuits");
 	if (circuits.empty()) {
 	
-		EntityContainer* entityCircuitRoot = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		EntityContainer* entityCircuitRoot = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 		entityCircuitRoot->setName(getCircuitRootName() + m_blockEntityHandler.getInitialCircuitName());
 
 		entityCircuitRoot->storeToDataBase();
@@ -172,9 +177,14 @@ void Application::addSolver() {
 	ot::UID circuitFolderID{ 0 }, circuitID{ 0 };
 
 	// Create the new solver item and store it in the data base
-	EntitySolverCircuitSimulator* solverEntity = new EntitySolverCircuitSimulator(entityID, nullptr, nullptr, nullptr, getServiceName());
+	EntitySolverCircuitSimulator* solverEntity = new EntitySolverCircuitSimulator(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
+	solverEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection,
+		getServiceName()
+	);
 
 	ot::EntityInformation entityInfo;
 	ot::ModelServiceAPI::getEntityInformation("Circuits", entityInfo);

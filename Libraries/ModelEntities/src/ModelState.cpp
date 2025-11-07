@@ -1281,16 +1281,17 @@ void ModelState::loadVersionGraph() {
 
 		std::string label;
 		std::string description;
-
-		try {
-			label = result["Label"].get_utf8().value.data();
-		}
-		catch (...) {}
-
-		try {
-			description = result["Description"].get_utf8().value.data();
-		} catch (...) {}
 		
+		auto labelIt = result.find("Label");
+		if (labelIt != result.end()) {
+			label = labelIt->get_utf8().value.data();
+		}
+
+		auto descIt = result.find("Description");
+		if (descIt != result.end()) {
+			description = descIt->get_utf8().value.data();
+		}
+
 		m_graphCfg.insertVersion(version, parentVersion, label, description);
 	}
 }

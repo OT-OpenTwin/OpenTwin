@@ -26,8 +26,8 @@ class EntityBinaryData;
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockImage : public EntityBlock {
 public:
-	EntityBlockImage() : EntityBlockImage(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityBlockImage() : EntityBlockImage(0, nullptr, nullptr, nullptr) {};
+	EntityBlockImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 
 	static std::string className() { return "EntityBlockImage"; }
 	virtual std::string getClassName(void) const override { return EntityBlockImage::className(); };

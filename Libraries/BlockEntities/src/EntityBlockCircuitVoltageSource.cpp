@@ -30,8 +30,8 @@
 
 static EntityFactoryRegistrar<EntityBlockCircuitVoltageSource> registrar(EntityBlockCircuitVoltageSource::className());
 
-EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) 
+EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityBlockCircuitElement(ID, parent, obs, ms) 
 {
 	OldTreeIcon icon;
 	icon.visibleIcon = "VoltageSource";

@@ -25,8 +25,8 @@
 
 static EntityFactoryRegistrar<EntitySolverPHREEC> registrar("EntitySolverPHREEC");
 
-EntitySolverPHREEC::EntitySolverPHREEC(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntitySolver(ID, parent, obs, ms, owner)
+EntitySolverPHREEC::EntitySolverPHREEC(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntitySolver(ID, parent, obs, ms)
 {
 }
 

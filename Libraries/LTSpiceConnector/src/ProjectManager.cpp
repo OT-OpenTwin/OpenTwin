@@ -593,6 +593,12 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 	int fileCount = 0;
 	int lastPercent = 15;
 
+	ot::EntityCallbackBase::CallbackFlags callbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify
+	);
+
 	for (const auto& file : uploadFileList)
 	{
 		ot::UID dataEntityID = entityIDList.front(); entityIDList.pop_front();
@@ -606,7 +612,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 		dependentDataFiles[file] = std::pair<ot::UID, ot::UID>(dataEntityID, dataVersion);
 
 		// upload the binary data entity
-		EntityBinaryData *dataEntity = new EntityBinaryData(dataEntityID, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+		EntityBinaryData *dataEntity = new EntityBinaryData(dataEntityID, nullptr, nullptr, nullptr);
 
 		std::ifstream dataFile(file, std::ios::binary | std::ios::ate);
 
@@ -629,7 +635,8 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 		memBlock = nullptr;
 
 		// Upload the file entity
-		EntityFile* fileEntity = new EntityFile(fileEntityID, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+		EntityFile* fileEntity = new EntityFile(fileEntityID, nullptr, nullptr, nullptr);
+		fileEntity->registerCallbacks(callbacks, OT_INFO_SERVICE_TYPE_LTSPICE);
 
 		std::string pathName = file.substr(projectRoot.size() + 1);
 		std::filesystem::path filePath(pathName);

@@ -31,8 +31,8 @@
 
 static EntityFactoryRegistrar<EntityFile> registrar(EntityFile::className());
 
-EntityFile::EntityFile(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner) :
-	EntityBase(_ID, _parent, _obs, _ms, _owner), m_fileFilter(ot::FileExtension::toFilterString(ot::FileExtension::AllFiles)),
+EntityFile::EntityFile(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms) :
+	EntityBase(_ID, _parent, _obs, _ms), m_fileFilter(ot::FileExtension::toFilterString(ot::FileExtension::AllFiles)),
 	m_dataUID(ot::invalidUID), m_dataVersion(ot::invalidUID)
 {
 }

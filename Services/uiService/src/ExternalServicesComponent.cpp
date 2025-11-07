@@ -3296,9 +3296,6 @@ void ExternalServicesComponent::handleFillGraphicsPicker(ot::JsonDocument& _docu
 }
 
 void ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _document) {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
-
 	ot::GraphicsNewEditorPackage pckg("", "");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
@@ -3313,7 +3310,7 @@ void ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _do
 	AppBase::instance()->addGraphicsPickerPackage(pckg);
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getTitle()), info, pckg.getPickerKey(), insertFlags, visualisationCfg);
+	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getTitle()), pckg.getPickerKey(), insertFlags, visualisationCfg);
 
 	if (suppressViewHandling) {
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
@@ -3321,9 +3318,6 @@ void ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _do
 }
 
 void ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _document) {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
-
 	ot::GraphicsScenePackage pckg("");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
@@ -3331,7 +3325,7 @@ void ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _documen
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
 	
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getName()), info, pckg.getPickerKey(), insertFlags, visualisationCfg);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getName()), pckg.getPickerKey(), insertFlags, visualisationCfg);
 
 	for (auto graphicsItemCfg : pckg.getItems()) {
 		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::itemFromConfig(graphicsItemCfg, true);
@@ -3379,9 +3373,6 @@ void ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument& _docu
 }
 
 void ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _document) {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
-
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
@@ -3389,7 +3380,7 @@ void ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _d
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
 	
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getName()), info, pckg.getPickerKey(), insertFlags, visualisationCfg);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getName()), pckg.getPickerKey(), insertFlags, visualisationCfg);
 
 	for (const auto& connection : pckg.getConnections()) {
 		editor->getGraphicsView()->addConnection(connection);
@@ -3433,10 +3424,6 @@ void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument&
 // Action handler: Plot
 
 void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
-	// Get infos from message document
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
-
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
@@ -3460,7 +3447,7 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
 
-	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, info, insertFlags, visualizingEntities);
+	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, insertFlags, visualizingEntities);
 	ot::Plot* plot = plotView->getPlot();
 
 	// If the data needs to be refreshed, all curves are newly build. Other changes can be performed on already loaded curves.
@@ -3631,9 +3618,6 @@ void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _documen
 // Action handler: Text Editor
 
 void ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _document) {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
-
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
 	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
@@ -3664,7 +3648,7 @@ void ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _documen
 		}
 	}
 	else {
-		editor = AppBase::instance()->createNewTextEditor(config, info, insertFlags, visualizingEntities);
+		editor = AppBase::instance()->createNewTextEditor(config, insertFlags, visualizingEntities);
 	}
 
 	if (suppressViewHandling) {
@@ -3714,9 +3698,6 @@ void ExternalServicesComponent::handleCloseAllTextEditors(ot::JsonDocument& _doc
 // Action handler: Table
 
 void ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document) {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
-
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
 
@@ -3725,8 +3706,6 @@ void ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document) {
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
 	
-	
-
 	bool overrideCurrentContent = visualisationCfg.getOverrideViewerContent();
 	
 	bool keepCurrentEntitySelection = false;
@@ -3752,7 +3731,7 @@ void ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document) {
 
 	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName(), visualizingEntities);
 	if (table == nullptr) {
-		table = AppBase::instance()->createNewTable(config, info, insertFlags, visualizingEntities);
+		table = AppBase::instance()->createNewTable(config, insertFlags, visualizingEntities);
 	}
 	else if (overrideCurrentContent) {
 		table->getTable()->setupFromConfig(config);

@@ -46,8 +46,8 @@ private:
 class __declspec(dllexport) EntityMeshTetFace : public EntityBase
 {
 public:
-	EntityMeshTetFace() : EntityMeshTetFace(0, nullptr, nullptr, nullptr, "") {};
-	EntityMeshTetFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityMeshTetFace() : EntityMeshTetFace(0, nullptr, nullptr, nullptr) {};
+	EntityMeshTetFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityMeshTetFace() {};
 
 	void setNumberTriangles(size_t nT) { triangles.resize(nT); setModified(); };

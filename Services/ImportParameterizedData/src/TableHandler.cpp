@@ -39,10 +39,18 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 	{
 		assert(0); // Only EntityFile should reach here.
 	}
-	auto topoEnt = std::unique_ptr< EntityParameterizedDataTable>(new EntityParameterizedDataTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+	auto topoEnt = std::unique_ptr<EntityParameterizedDataTable>(new EntityParameterizedDataTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr));
 	std::list<std::string> takenNames;
 	std::string fullName = CreateNewUniqueTopologyNamePlainPossible(_tableFolder, sourceFile->getFileName(), takenNames);
 	topoEnt->setName(fullName);
+
+	topoEnt->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		Application::instance()->getServiceName()
+	);
+
 	std::string type = sourceFile->getFileType();
 	auto tableExtractor = FileToTableExtractorFactory::GetInstance()->Create(sourceFile->getFileType());
 
@@ -103,7 +111,13 @@ std::shared_ptr<EntityResultTableData<std::string>> TableHandler::ExtractTableDa
 		}
 	}
 	
-	auto tableData = std::make_shared<EntityResultTableData<std::string>>(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	auto tableData = std::make_shared<EntityResultTableData<std::string>>(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	tableData->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		Application::instance()->getServiceName()
+	);
 	uint64_t numberOfColumns = 0;
 	for (auto it = processedTableData.begin(); it != processedTableData.end();it++)
 	{

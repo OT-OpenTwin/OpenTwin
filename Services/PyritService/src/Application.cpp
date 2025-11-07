@@ -226,10 +226,16 @@ void Application::handleAddSolver()
 	ot::ModelServiceAPI::getAvailableScripts(scriptFolderName, scriptFolderID, scriptName, scriptID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverPyrit* solverEntity = new EntitySolverPyrit(entityID, nullptr, nullptr, nullptr, getServiceName());
+	EntitySolverPyrit* solverEntity = new EntitySolverPyrit(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID, scriptFolderName, scriptFolderID, scriptName, scriptID);
+	solverEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
 
 	solverEntity->storeToDataBase();
 
@@ -512,22 +518,28 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 
 void Application::addScalarResult(const std::string &resultName, char* fileData, int data_length, EntityBase* solverEntity)
 {
-	EntityBinaryData* vtkData = new EntityBinaryData(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	EntityBinaryData* vtkData = new EntityBinaryData(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	vtkData->setData(fileData, data_length + 1);
 	vtkData->storeToDataBase();
 
 	ot::UID vtkDataEntityID = vtkData->getEntityID();
 	ot::UID vtkDataEntityVersion = vtkData->getEntityStorageVersion();
 
-	EntityResultUnstructuredMeshVtk* vtkResult = new EntityResultUnstructuredMeshVtk(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	EntityResultUnstructuredMeshVtk* vtkResult = new EntityResultUnstructuredMeshVtk(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	vtkResult->setData(resultName, EntityResultUnstructuredMeshVtk::SCALAR, vtkData);
 	vtkResult->storeToDataBase();
 
-	EntityVisUnstructuredScalarSurface* visualizationEntity = new EntityVisUnstructuredScalarSurface(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	EntityVisUnstructuredScalarSurface* visualizationEntity = new EntityVisUnstructuredScalarSurface(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
 	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
 	visualizationEntity->setEditable(true);
 	visualizationEntity->setInitiallyHidden(true);
+	visualizationEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
 
 	visualizationEntity->createProperties();
 
@@ -548,22 +560,28 @@ void Application::addScalarResult(const std::string &resultName, char* fileData,
 
 void Application::addVectorResult(const std::string& resultName, char* fileData, int data_length, EntityBase* solverEntity)
 {
-	EntityBinaryData* vtkData = new EntityBinaryData(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	EntityBinaryData* vtkData = new EntityBinaryData(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	vtkData->setData(fileData, data_length + 1);
 	vtkData->storeToDataBase();
 
 	ot::UID vtkDataEntityID = vtkData->getEntityID();
 	ot::UID vtkDataEntityVersion = vtkData->getEntityStorageVersion();
 
-	EntityResultUnstructuredMeshVtk* vtkResult = new EntityResultUnstructuredMeshVtk(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	EntityResultUnstructuredMeshVtk* vtkResult = new EntityResultUnstructuredMeshVtk(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	vtkResult->setData(resultName, EntityResultUnstructuredMeshVtk::VECTOR, vtkData);
 	vtkResult->storeToDataBase();
 
-	EntityVisUnstructuredVectorSurface* visualizationEntity = new EntityVisUnstructuredVectorSurface(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	EntityVisUnstructuredVectorSurface* visualizationEntity = new EntityVisUnstructuredVectorSurface(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
 	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_VECTOR);
 	visualizationEntity->setEditable(true);
 	visualizationEntity->setInitiallyHidden(true);
+	visualizationEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
 
 	visualizationEntity->createProperties();
 

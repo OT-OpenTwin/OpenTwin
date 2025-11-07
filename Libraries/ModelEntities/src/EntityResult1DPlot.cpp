@@ -28,8 +28,8 @@
 
 static EntityFactoryRegistrar<EntityResult1DPlot> registrar("EntityResult1DPlot_New");
 
-EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	:EntityContainer(_ID,_parent,_obs,_ms,_owner)
+EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+	:EntityContainer(_ID,_parent,_obs,_ms)
 {}
 
 void EntityResult1DPlot::storeToDataBase(void)

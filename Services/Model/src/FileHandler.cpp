@@ -172,32 +172,26 @@ ot::ReturnMessage FileHandler::textEditorSaveRequested(const std::string& _entit
 		IVisualisationText* textVisualisationEntity = dynamic_cast<IVisualisationText*>(entityBase);
 		if(textVisualisationEntity != nullptr)
 		{
-			ot::ContentChangedHandling changedHandling = textVisualisationEntity->getTextContentChangedHandling();
-			if (changedHandling == ot::ContentChangedHandling::ModelServiceSaves)
+			std::list<std::string> handlingServices = entityBase->getServicesForCallback(EntityBase::Callback::DataHandle);
+			if (!handlingServices.empty())
 			{
-				
-				storeChangedText(textVisualisationEntity, _text);
-			}
-			else if (changedHandling == ot::ContentChangedHandling::OwnerHandles)
-			{
-				const std::string& owner =	entityBase->getOwningService();
-				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
-				{
-					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(_entityName, _text)), owner);
-					workerThread.detach();
+				for (const std::string& owner : handlingServices) {
+					if (owner != OT_INFO_SERVICE_TYPE_MODEL) {
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(_entityName, _text)), owner);
+						workerThread.detach();
+					}
 				}
 			}
-			else if (changedHandling == ot::ContentChangedHandling::ModelServiceSavesNotifyOwner)
-			{
+			else {
 				storeChangedText(textVisualisationEntity, _text);
-				
-				const std::string& owner = entityBase->getOwningService();
-				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
-				{
-					ot::JsonDocument notify;
-					notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
-					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), owner);
-					workerThread.detach();
+
+				for (const std::string& notifyService : entityBase->getServicesForCallback(EntityBase::Callback::DataNotify)) {
+					if (notifyService != OT_INFO_SERVICE_TYPE_MODEL) {
+						ot::JsonDocument notify;
+						notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), notifyService);
+						workerThread.detach();
+					}
 				}
 			}
 
@@ -231,25 +225,27 @@ ot::ReturnMessage FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
 		EntityBase* entityBase = model->getEntityByID(entityID);
 		IVisualisationTable* tableVisualisationEntity = dynamic_cast<IVisualisationTable*>(entityBase);
 		if (tableVisualisationEntity != nullptr) {
-			ot::ContentChangedHandling changedHandling = tableVisualisationEntity->getTableContentChangedHandling();
-			if (changedHandling == ot::ContentChangedHandling::ModelServiceSaves) {
-				storeChangedTable(tableVisualisationEntity, _cfg);
-			}
-			else if (changedHandling == ot::ContentChangedHandling::OwnerHandles) {
-				const std::string& owner = entityBase->getOwningService();
-				if (owner != OT_INFO_SERVICE_TYPE_MODEL) {
-					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TableActionHandler::createTableSaveRequestDocument(_cfg)), owner);
-					workerThread.detach();
+			std::list<std::string> handlingServices = entityBase->getServicesForCallback(EntityBase::Callback::DataHandle);
+
+			if (!handlingServices.empty()) {
+				for (const std::string& owner : handlingServices) {
+					if (owner != OT_INFO_SERVICE_TYPE_MODEL) {
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TableActionHandler::createTableSaveRequestDocument(_cfg)), owner);
+						workerThread.detach();
+					}
 				}
+				return ot::ReturnMessage::Ok;
 			}
-			else if (changedHandling == ot::ContentChangedHandling::ModelServiceSavesNotifyOwner) {
+			else {
 				storeChangedTable(tableVisualisationEntity, _cfg);
-				const std::string& owner = entityBase->getOwningService();
-				if (owner != OT_INFO_SERVICE_TYPE_MODEL) {
-					ot::JsonDocument notify;
-					notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
-					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), owner);
-					workerThread.detach();
+
+				for (const std::string& notifyService : entityBase->getServicesForCallback(EntityBase::Callback::DataNotify)) {
+					if (notifyService != OT_INFO_SERVICE_TYPE_MODEL) {
+						ot::JsonDocument notify;
+						notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), notifyService);
+						workerThread.detach();
+					}
 				}
 			}
 
@@ -302,14 +298,14 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	std::unique_ptr<EntityFileText> textFile;
 	if (type == "csv")
 	{
-		textFile.reset(new EntityFileCSV (entIDTopo, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
+		textFile.reset(new EntityFileCSV (entIDTopo, nullptr, nullptr, nullptr));
 	}
 	else
 	{
-		textFile.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
+		textFile.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr));
 	}
 
-	EntityBinaryData fileContent(entIDData, textFile.get(), nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+	EntityBinaryData fileContent(entIDData, textFile.get(), nullptr, nullptr);
 	fileContent.setData(_text.data(), _text.size());
 	fileContent.storeToDataBase();
 

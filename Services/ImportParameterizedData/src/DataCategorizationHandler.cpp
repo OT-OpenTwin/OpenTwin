@@ -369,10 +369,16 @@ void DataCategorizationHandler::addParamOrQuantityEntries(std::list<std::unique_
 void DataCategorizationHandler::addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive)
 {
 	ot::UID entID = _modelComponent->createEntityUID();
-	auto newEntity(std::make_shared<EntityParameterizedDataCategorization>(entID, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+	auto newEntity(std::make_shared<EntityParameterizedDataCategorization>(entID, nullptr, nullptr, nullptr));
 	newEntity->CreateProperties(category);
 	newEntity->setName(name);
 	newEntity->setEditable(true);
+	newEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		Application::instance()->getServiceName()
+	);
 	m_markedForStorringEntities.push_back(newEntity);
 	if (addToActive)
 	{
@@ -445,8 +451,15 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		for (size_t i = 0; i < _ranges.size(); i++)
 		{
 			std::unique_ptr<EntityTableSelectedRanges> tableRange
-			(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+			(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr));
 		
+			tableRange->registerCallbacks(
+				ot::EntityCallbackBase::Callback::Properties |
+				ot::EntityCallbackBase::Callback::Selection |
+				ot::EntityCallbackBase::Callback::DataNotify,
+				Application::instance()->getServiceName()
+			);
+
 			// We need to initialise the entityProperty with the python folder
 			ot::EntityInformation entityInfo;
 			std::list<std::string> allScripts = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::PythonScriptFolder);
@@ -654,9 +667,15 @@ void DataCategorizationHandler::logWarnings(std::map<std::string, std::string>& 
 {	
 	if (!_logMessagesByErrorType.empty())
 	{
-		EntityResultText logText(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		EntityResultText logText(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+		logText.registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			Application::instance()->getServiceName()
+		);
 		logText.createProperties();
-	
+
 		std::string message("");
 		for (auto& entry : _logMessagesByErrorType)
 		{

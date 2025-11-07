@@ -22,8 +22,8 @@
 
 static EntityFactoryRegistrar<EntityParameterizedDataTable> registrar("EntityParameterizedDataTable");
 
-EntityParameterizedDataTable::EntityParameterizedDataTable(ot::UID ID, EntityBase * parent, EntityObserver * mdl, ModelState * ms, const std::string & owner)
-: EntityResultTable<std::string>(ID,parent,mdl,ms,owner)
+EntityParameterizedDataTable::EntityParameterizedDataTable(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms)
+	: EntityResultTable<std::string>(ID, parent, mdl, ms)
 {
 }
 

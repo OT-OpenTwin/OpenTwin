@@ -22,7 +22,7 @@
 class __declspec(dllexport) EntityBlockCircuitElement : public EntityBlock
 {
 public:
-	EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 	virtual void createProperties() override;
 	virtual std::string getTypeAbbreviation() = 0;
 	virtual std::string getFolderName() = 0;

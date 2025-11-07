@@ -30,8 +30,8 @@
 
 static EntityFactoryRegistrar<EntityBlockCircuitInductor> registrar(EntityBlockCircuitInductor::className());
 
-EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
+EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	OldTreeIcon icon;
 	icon.visibleIcon = "Inductor";

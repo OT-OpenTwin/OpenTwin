@@ -156,10 +156,16 @@ void Application::addSolver(void)
 	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverFDTD *solverEntity = new EntitySolverFDTD(entityID, nullptr, nullptr, nullptr, getServiceName());
+	EntitySolverFDTD *solverEntity = new EntitySolverFDTD(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);
+	solverEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
 
 	solverEntity->storeToDataBase();
 

@@ -169,9 +169,15 @@ void Application::addSolver(void)
 	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverPHREEC *solverEntity = new EntitySolverPHREEC(entityID, nullptr, nullptr, nullptr, getServiceName());
+	EntitySolverPHREEC *solverEntity = new EntitySolverPHREEC(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
+	solverEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
 
 	solverEntity->getProperties().createProperty(new EntityPropertiesEntityList("Mesh", meshFolderName, meshFolderID, meshName, meshID), "Mesh");
 	EntityPropertiesDouble::createProperty("Solver", "Frequency [MHz]", 0.0, "PHREEC", solverEntity->getProperties());

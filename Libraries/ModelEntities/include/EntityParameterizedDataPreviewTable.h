@@ -30,8 +30,8 @@
 class __declspec(dllexport) EntityParameterizedDataPreviewTable : public EntityResultTable<std::string>
 {
 public:
-	EntityParameterizedDataPreviewTable() : EntityParameterizedDataPreviewTable(0, nullptr, nullptr, nullptr, "") {};
-	EntityParameterizedDataPreviewTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, const std::string &owner);
+	EntityParameterizedDataPreviewTable() : EntityParameterizedDataPreviewTable(0, nullptr, nullptr, nullptr) {};
+	EntityParameterizedDataPreviewTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms);
 	virtual std::string getClassName(void) const override { return "EntityParameterizedDataPreviewTable"; };
 	
 	std::vector<std::pair<ot::UID, ot::UID>> GetLastStatusOfPreview() { return _displayedRanges; };

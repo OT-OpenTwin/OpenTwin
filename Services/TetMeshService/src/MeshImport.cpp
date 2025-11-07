@@ -119,7 +119,13 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 	gmsh::model::mesh::renumberElements();
 
 	// Create a new tet mesh entity
-	EntityMeshTet* meshEntity = new EntityMeshTet(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, application->getServiceName());
+	EntityMeshTet* meshEntity = new EntityMeshTet(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	meshEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		application->getServiceName()
+	);
 
 	EntityPropertiesString::createProperty("General", "File name", originalName, "", meshEntity->getProperties());
 

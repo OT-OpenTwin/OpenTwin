@@ -218,7 +218,7 @@ void Model::resetToNew()
 
 	ProjectTypeManager typeManager(projectType);
 
-	entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+	entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 	entityMap[entityRoot->getEntityID()] = entityRoot;
 
 	GeometryOperations::EntityList allNewEntities;
@@ -226,64 +226,70 @@ void Model::resetToNew()
 	// Create the various root items
 	if (typeManager.hasGeometryRoot())
 	{
-		EntityBase* entityGeometryRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		EntityBase* entityGeometryRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityGeometryRoot->setName(getGeometryRootName());
 		addEntityToModel(entityGeometryRoot->getName(), entityGeometryRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasCircuitsRoot())
 	{
-		EntityBase* entityCircuitsRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		EntityBase* entityCircuitsRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityCircuitsRoot->setName(getCircuitsRootName());
 		addEntityToModel(entityCircuitsRoot->getName(), entityCircuitsRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasCircuit())
 	{
-		EntityGraphicsScene* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		EntityGraphicsScene* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, nullptr, nullptr);
 		entityCircuit->setName(typeManager.getCircuitName());
 		entityCircuit->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		entityCircuit->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			OT_INFO_SERVICE_TYPE_CircuitSimulatorService
+		);
 		addEntityToModel(entityCircuit->getName(), entityCircuit, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasMaterialRoot())
 	{
-		EntityBase* entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		EntityBase* entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityMaterialRoot->setName(getMaterialRootName());
 		addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasMeshRoot())
 	{
-		EntityBase* entityMeshRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		EntityBase* entityMeshRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityMeshRoot->setName(getMeshRootName());
 		addEntityToModel(entityMeshRoot->getName(), entityMeshRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasSolverRoot())
 	{
-		EntityContainer* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		EntityContainer* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entitySolverRoot->setName(getSolverRootName());
 		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasScriptsRoot())
 	{
-		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityScriptRoot->setName(getScriptsRootName());
 		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasDataProcessingRoot())
 	{
-		EntityContainer* dataProcessingRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		EntityContainer* dataProcessingRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		dataProcessingRoot->setName(ot::FolderNames::DataProcessingFolder);
 		addEntityToModel(dataProcessingRoot->getName(), dataProcessingRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasUnitRoot())
 	{
-		auto entityUnits = new EntityUnits(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		auto entityUnits = new EntityUnits(createEntityUID(), nullptr, this, getStateManager());
 		entityUnits->setName(getUnitRootName());
 		entityUnits->createProperties();
 		//entityUnits->storeToDataBase();
@@ -292,14 +298,14 @@ void Model::resetToNew()
 
 	if (typeManager.hasDataCategorizationRoot())
 	{
-		EntityBase* entityRMDCategorizationRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		EntityBase* entityRMDCategorizationRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityRMDCategorizationRoot->setName(typeManager.getDataCategorizationRootName());
 		addEntityToModel(entityRMDCategorizationRoot->getName(), entityRMDCategorizationRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasRMDCategorization())
 	{
-		auto newDataCatEntity = (new EntityParameterizedDataCategorization(createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName()));
+		auto newDataCatEntity = (new EntityParameterizedDataCategorization(createEntityUID(), nullptr, nullptr, nullptr));
 		newDataCatEntity->CreateProperties(EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
 		newDataCatEntity->setName(typeManager.getRMDCategorizationName());
 		newDataCatEntity->setEditable(false);
@@ -315,20 +321,32 @@ void Model::resetToNew()
 
 	if (typeManager.hasDatasetRoot())
 	{
-		EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityDatasetRoot->setName(typeManager.getDatasetRootName());
 		addEntityToModel(entityDatasetRoot->getName(), entityDatasetRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasDatasetRMD())
 	{
-		EntityMetadataCampaign* rmd = (new EntityMetadataCampaign(createEntityUID(), nullptr, this, getStateManager(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+		EntityMetadataCampaign* rmd = (new EntityMetadataCampaign(createEntityUID(), nullptr, this, getStateManager()));
 		rmd->setName(typeManager.getDatasetRMD());
+		rmd->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			OT_INFO_SERVICE_TYPE_ImportParameterizedDataService
+		);
 		addEntityToModel(rmd->getName(), rmd, entityRoot, true, allNewEntities);
 	}
 	
 	if (typeManager.hasHierarchicalRoot()) {
-		EntityHierarchicalScene* hierarchicalRoot = new EntityHierarchicalScene(createEntityUID(), nullptr, this, getStateManager(), OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		EntityHierarchicalScene* hierarchicalRoot = new EntityHierarchicalScene(createEntityUID(), nullptr, this, getStateManager());
+		hierarchicalRoot->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			OT_INFO_SERVICE_TYPE_HierarchicalProjectService
+		);
 		addEntityToModel(hierarchicalRoot->getName(), hierarchicalRoot, entityRoot, true, allNewEntities);
 	}
 
@@ -557,7 +575,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 		if (container == nullptr)
 		{
 			// The container does not exist, create a new item
-			container = new EntityContainer(createEntityUID(), root, this, getStateManager(), Application::instance()->getServiceName());
+			container = new EntityContainer(createEntityUID(), root, this, getStateManager());
 
 			container->setName(folderName);
 			container->setEditable(entity->getEditable() && entityRoot != containerRoot); // If the entity is editable, a newly created container 
@@ -633,7 +651,7 @@ void  Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool ke
 		getStateManager()->removeEntity(entity->getEntityID(),considerChildren);
 	}
 
-	Application::instance()->getSelectionHandler().deselectEntity(entity->getEntityID(), entity->getOwningService());
+	Application::instance()->getSelectionHandler().deselectEntity(entity->getEntityID());
 	setModified();
 }
 
@@ -834,7 +852,8 @@ void Model::importTableFile(const std::string &fileName, bool removeFile)
 {
 	TableReader reader;
 	reader.setModel(this);
-	std::string error = reader.readFromFile(fileName, newTableItemName, this, getStateManager(), Application::instance()->getServiceName());
+	ot::EntityCallbackBase cb;
+	std::string error = reader.readFromFile(fileName, newTableItemName, this, getStateManager(), cb);
 
 	if (removeFile)
 	{
@@ -886,7 +905,7 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 	EntityContainer *entityParameterRoot = dynamic_cast<EntityContainer*>(findEntityFromName(getParameterRootName()));
 	if (entityParameterRoot == nullptr)
 	{
-		entityParameterRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
+		entityParameterRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityParameterRoot->setName(getParameterRootName());
 
 		GeometryOperations::EntityList allNewEntities;
@@ -895,7 +914,7 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 		addVisualizationContainerNode(entityParameterRoot->getName(), entityParameterRoot->getEntityID(), entityParameterRoot->getEditable());
 	}
 
-	EntityParameter *parameterItem = new EntityParameter(createEntityUID(), entityParameterRoot, this, getStateManager(), Application::instance()->getServiceName());
+	EntityParameter *parameterItem = new EntityParameter(createEntityUID(), entityParameterRoot, this, getStateManager());
 	
 	parameterItem->setName(parameterName);
 	parameterItem->setEditable(true);
@@ -1532,7 +1551,7 @@ void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const 
 		setProperties(entities, properties);
 
 		if (update) {
-			updateEntities(itemsVisible);
+			updateEntityProperties(itemsVisible);
 		}
 	}
 }
@@ -2074,7 +2093,7 @@ bool Model::entitiesNeedUpdate()
 	return (!pendingEntityUpdates.empty());
 }
 
-void Model::updateEntities(bool itemsVisible)
+void Model::updateEntityProperties(bool itemsVisible)
 {
 	enableQueuingHttpRequests(true);
 
@@ -2114,12 +2133,16 @@ void Model::updateEntities(bool itemsVisible)
 		updateEntity(entity);
 		setEntityUpdated(entity);
 
-		if (entity->getOwningService() != "Model")
-		{
-			// We need to notify the owner. We also need to store entity to the database, since the other service may need to access its properties.
-			entity->storeToDataBase();
-			otherServicesUpdate[entity->getOwningService()].push_back(std::pair<ot::UID, ot::UID>(entity->getEntityID(), entity->getEntityStorageVersion()));
-			needsWritingQueueFlush = true;
+		bool stored = false;
+
+		for (const std::string& cbService : entity->getServicesForCallback(EntityBase::Callback::Properties)) {
+			if (!stored) {
+				// Store the entity to the database only once
+				entity->storeToDataBase();
+				needsWritingQueueFlush = true;
+				stored = true;
+			}
+			otherServicesUpdate[cbService].push_back(std::pair<ot::UID, ot::UID>(entity->getEntityID(), entity->getEntityStorageVersion()));
 		}
 
 		if (dynamic_cast<EntityParameter *>(entity) != nullptr)
@@ -2136,7 +2159,6 @@ void Model::updateEntities(bool itemsVisible)
 				{
 					dependentEntity->getProperties().getProperty(propertyDependency.first)->setNeedsUpdate();
 				}
-
 
 				dependentEntity->setModified();
 				setEntityOutdated(dependentEntity);
@@ -2234,7 +2256,7 @@ void Model::updateEntity(EntityBase *entity)
 	entity->getProperties().checkWhetherUpdateNecessary();
 
 	// Now check whether there are still any missing updates (other services may still take care of updating their entities
-	assert(!entity->getProperties().anyPropertyNeedsUpdate() || entity->getOwningService() != "Model");
+	assert(!entity->getProperties().anyPropertyNeedsUpdate());
 
 	// If there are any changes in the properties due to the update, we need to update the property grid
 	if (updatePropertiesGrid)
@@ -3083,7 +3105,7 @@ void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &anno
 
 	} while (entityNameToIDMap[annotationName]);
 
-	EntityFaceAnnotation *annotationEntity = new EntityFaceAnnotation(0, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+	EntityFaceAnnotation *annotationEntity = new EntityFaceAnnotation(0, nullptr, nullptr, nullptr);
 
 	annotationEntity->setName(annotationName);
 	annotationEntity->setColor(r, g, b);
@@ -3419,7 +3441,7 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	// Serialize the model content to the data base
 
 	// First make sure that all entities are updated from their properties
-	updateEntities(true);
+	updateEntityProperties(true);
 
 	// First recursively store the entities
 	if (entityRoot != nullptr)
@@ -4431,11 +4453,11 @@ void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
 	entityVersions.push_back(visEntity->getEntityStorageVersion());
 	brepVersions.push_back(0);
 
-	std::thread workerThread(&Model::performUpdateVisualizationEntity, this, entityIDs, entityVersions, brepVersions, visEntity->getOwningService());
+	std::thread workerThread(&Model::performUpdateVisualizationEntity, this, entityIDs, entityVersions, brepVersions, visEntity->getServicesForCallback(EntityBase::Callback::DataNotify));
 	workerThread.detach();
 }
 
-void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::string owningService)
+void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::list<std::string> _callbackServices)
 {
 	ot::LockTypes lockFlag(ot::LockType::ModelWrite | ot::LockType::NavigationWrite | ot::LockType::ViewWrite | ot::LockType::Properties);
 	ot::UILockWrapper uiLock(Application::instance()->getUiComponent(), lockFlag);
@@ -4459,8 +4481,9 @@ void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::
 	notify.AddMember(OT_ACTION_PARAM_MODEL_BrepVersionList, ot::JsonArray(brepVersions, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, true, notify.GetAllocator());
 
-	Application::instance()->getNotifier()->sendMessageToService(false, owningService, notify);
-
+	for (const std::string& owningService : _callbackServices) {
+		Application::instance()->getNotifier()->sendMessageToService(false, owningService, notify);
+	}
 }
 
 void Model::getEntityVersions(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersions)

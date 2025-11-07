@@ -30,8 +30,8 @@
 
 static EntityFactoryRegistrar<EntityAnnotation> registrar(EntityAnnotation::className());
 
-EntityAnnotation::EntityAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner),
+EntityAnnotation::EntityAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms),
 	annotationData(nullptr),
 	annotationDataStorageId(-1)
 {
@@ -132,7 +132,7 @@ void EntityAnnotation::ensureAnnotationDataIsLoaded(void)
 	{
 		if (annotationDataStorageId == -1)
 		{
-			annotationData = new EntityAnnotationData(createEntityUID(), this, getObserver(), getModelState(), getOwningService());
+			annotationData = new EntityAnnotationData(createEntityUID(), this, getObserver(), getModelState());
 		}
 		else
 		{

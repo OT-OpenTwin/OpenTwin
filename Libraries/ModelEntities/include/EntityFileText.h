@@ -26,8 +26,8 @@
 class __declspec(dllexport) EntityFileText : public EntityFile, public IVisualisationText
 {
 public:
-	EntityFileText() : EntityFileText(0, nullptr, nullptr, nullptr, "") {};
-	EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityFileText() : EntityFileText(0, nullptr, nullptr, nullptr) {};
+	EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 	virtual ~EntityFileText() = default;
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
@@ -43,11 +43,9 @@ public:
 	void setText(const std::string& _text) override;
 	bool visualiseText() override { return true; }
 	ot::TextEditorCfg createConfig(bool _includeData) override;
-	ot::ContentChangedHandling getTextContentChangedHandling() override;
 
 	bool updateFromProperties() override;
 
-	void setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling);
 protected:
 	void setSpecializedProperties() override;
 	
@@ -59,6 +57,5 @@ protected:
 
 private:
 	bool m_requiresDataUpdate = false;
-	ot::ContentChangedHandling m_contentChangedHandlingText = ot::ContentChangedHandling::ModelServiceSaves;
 	ot::TextEncoding::EncodingStandard m_encoding = ot::TextEncoding::EncodingStandard::UNKNOWN;
 };

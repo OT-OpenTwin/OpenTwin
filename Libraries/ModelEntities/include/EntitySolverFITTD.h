@@ -28,8 +28,8 @@
 class __declspec(dllexport) EntitySolverFITTD : public EntitySolver
 {
 public:
-	EntitySolverFITTD() : EntitySolverFITTD(0, nullptr, nullptr, nullptr, "") {};
-	EntitySolverFITTD(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntitySolverFITTD() : EntitySolverFITTD(0, nullptr, nullptr, nullptr) {};
+	EntitySolverFITTD(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntitySolverFITTD();
 
 	virtual std::string getClassName(void) const override { return "EntitySolverFITTD"; } ;

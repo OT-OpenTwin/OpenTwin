@@ -154,7 +154,7 @@ void Application::addMonitor(void)
 	
 	//Create new monitor
 	ot::UID newMonitorID = this->getModelComponent()->createEntityUID();
-	auto newMonitor = new EntitySolverMonitor(newMonitorID, nullptr, nullptr, nullptr, "Model");
+	auto newMonitor = new EntitySolverMonitor(newMonitorID, nullptr, nullptr, nullptr);
 
 	// Get a list of all items of this specific solver
 	std::string solverName = selectedSolver->getEntityName();
@@ -204,7 +204,7 @@ void Application::addPort(void) {
 
 	//Create new monitor
 	ot::UID newPortID = this->getModelComponent()->createEntityUID();
-	auto newPort = new EntitySolverPort(newPortID, nullptr, nullptr, nullptr, "Model");
+	auto newPort = new EntitySolverPort(newPortID, nullptr, nullptr, nullptr);
 
 	// Find the next free numbered entity name
 	std::string solverName = selectedSolver->getEntityName();
@@ -280,7 +280,7 @@ void Application::addSignalType(void) {
 
 	//Create new Signal Type
 	ot::UID newSignalID = this->getModelComponent()->createEntityUID();
-	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr, "Model");
+	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr);
 	
 	//Set properties
 	newSignal->setName(signalName);
@@ -328,16 +328,22 @@ void Application::addSolver(void) {
 	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverFITTD *solverEntity = new EntitySolverFITTD(entityID, nullptr, nullptr, nullptr, getServiceName());
+	EntitySolverFITTD *solverEntity = new EntitySolverFITTD(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);	
+	solverEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
 
 	solverEntity->storeToDataBase();
 
 	//Create default signal
 	ot::UID newSignalID = this->getModelComponent()->createEntityUID();
-	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr, "Model");
+	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr);
 	newSignal->setName(solverName + "/" + FolderNames::GetFolderNameSignalType() + "/DefaultSignal");
 	newSignal->setInitiallyHidden(false);
 	newSignal->setEditable(false);

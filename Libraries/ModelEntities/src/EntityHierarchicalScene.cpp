@@ -23,8 +23,8 @@
 
 static EntityFactoryRegistrar<EntityHierarchicalScene> registrar(EntityHierarchicalScene::className());
 
-EntityHierarchicalScene::EntityHierarchicalScene(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner) 
-	: EntityContainer(_ID, _parent, _obs, _ms, _owner)
+EntityHierarchicalScene::EntityHierarchicalScene(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms) 
+	: EntityContainer(_ID, _parent, _obs, _ms)
 {
 	OldTreeIcon treeIcons;
 	treeIcons.size = 32;

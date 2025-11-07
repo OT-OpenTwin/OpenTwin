@@ -30,8 +30,8 @@ class EntityMeshCartesianFace;
 class __declspec(dllexport) EntityMeshCartesianFaceList : public EntityBase
 {
 public:
-	EntityMeshCartesianFaceList() : EntityMeshCartesianFaceList(0, nullptr, nullptr, nullptr, "") {};
-	EntityMeshCartesianFaceList(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityMeshCartesianFaceList() : EntityMeshCartesianFaceList(0, nullptr, nullptr, nullptr) {};
+	EntityMeshCartesianFaceList(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityMeshCartesianFaceList();
 
 	static std::string className() { return "EntityMeshCartesianFaceList"; }

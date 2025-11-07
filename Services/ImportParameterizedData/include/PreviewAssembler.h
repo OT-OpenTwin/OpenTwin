@@ -33,8 +33,7 @@ class PreviewAssembler
 {
 public:
 	PreviewAssembler(ot::components::ModelComponent* modelComponent, std::string tableFolder) : _modelComponent(modelComponent), _tableFolder(tableFolder) {};
-	std::shared_ptr<EntityParameterizedDataPreviewTable> AssembleTable(ot::UIDList& existingRanges);
-
+	
 protected:
 	int _numberOfFields = 0;
 	std::vector<std::shared_ptr<EntityTableSelectedRanges>> _selectedRangeEntities;

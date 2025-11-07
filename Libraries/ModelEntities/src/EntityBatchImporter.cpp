@@ -23,8 +23,8 @@
 
 static EntityFactoryRegistrar<EntityBatchImporter> registrar(EntityBatchImporter::className());
 
-EntityBatchImporter::EntityBatchImporter(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	:EntityBase(_ID, _parent, _obs, _ms, _owner)
+EntityBatchImporter::EntityBatchImporter(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+	:EntityBase(_ID, _parent, _obs, _ms)
 {
 }
 

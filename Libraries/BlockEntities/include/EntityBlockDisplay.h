@@ -23,8 +23,8 @@
 class __declspec(dllexport) EntityBlockDisplay : public EntityBlock
 {
 public:
-	EntityBlockDisplay() : EntityBlockDisplay(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockDisplay() : EntityBlockDisplay(0, nullptr, nullptr, nullptr) {};
+	EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 
 	static std::string className() { return "EntityBlockDisplay"; }
 	virtual std::string getClassName(void) const override { return EntityBlockDisplay::className(); };

@@ -37,8 +37,8 @@
 
 static EntityFactoryRegistrar<EntityFaceAnnotation> registrar(EntityFaceAnnotation::className());
 
-EntityFaceAnnotation::EntityFaceAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner),
+EntityFaceAnnotation::EntityFaceAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms),
 	facetsStorageID(-1)
 {
 	EntityPropertiesColor::createProperty(  "General", "Color",           {0, 0, 0}, "", getProperties());
@@ -341,7 +341,7 @@ void EntityFaceAnnotation::renewFacets(void)
 		facets = nullptr;
 	}
 
-	facets = new EntityFacetData(createEntityUID(), this, getObserver(), getModelState(), getOwningService());
+	facets = new EntityFacetData(createEntityUID(), this, getObserver(), getModelState());
 
 	boundingBox.reset();
 }

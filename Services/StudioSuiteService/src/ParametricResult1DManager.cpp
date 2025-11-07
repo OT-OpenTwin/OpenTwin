@@ -17,10 +17,10 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "ParametricResult1DManager.h"
-#include "Result1DManager.h"
-#include "Application.h"
 #include "DataBase.h"
+#include "Application.h"
+#include "Result1DManager.h"
+#include "ParametricResult1DManager.h"
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -108,8 +108,14 @@ void ParametricResult1DManager::storeDataInResultCollection()
 	//First we access the result collection of the current project
 	std::string collectionName = DataBase::instance().getCollectionName();
 
-	ResultCollectionExtender resultCollectionExtender(collectionName, *m_application->getModelComponent(), OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+	ResultCollectionExtender resultCollectionExtender(collectionName, *m_application->getModelComponent());
 	resultCollectionExtender.setSaveModel(false);
+	resultCollectionExtender.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		Application::instance().getServiceName()
+	);
 
 	std::string seriesName = CreateNewUniqueTopologyName(m_resultFolderName, m_seriesNameBase);
 	

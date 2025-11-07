@@ -128,7 +128,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 void Application::createMesh(void)
 {
-	if (this->getUiComponent() == nullptr) {
+	if (this->getModelComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -148,10 +148,15 @@ void Application::createMesh(void)
 	ot::UID entityID = this->getModelComponent()->createEntityUID();
 
 	// Create the new mesh item
-	EntityMeshTet *meshEntity = new EntityMeshTet(entityID, nullptr, nullptr, nullptr, getServiceName());
-
+	EntityMeshTet *meshEntity = new EntityMeshTet(entityID, nullptr, nullptr, nullptr);
 	meshEntity->setName(meshName);
 	meshEntity->setEditable(true);
+	meshEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
 
 	if (materialsFolder.empty())
 	{

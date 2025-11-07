@@ -26,8 +26,8 @@
 #include "EntityBlockConnection.h"
 #include "ConfigurationHelper.h"
 
-EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityBase(ID, parent, obs, ms, owner)
+EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityBase(ID, parent, obs, ms)
 {
 	
 }
@@ -157,7 +157,7 @@ bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation,
 		setEntityID(createEntityUID());
 
 		ot::ConstJsonObject positionObjJson = ot::json::getObject(_serialisation, "SerialisationOfPosition");
-		std::unique_ptr<EntityCoordinates2D> position(new EntityCoordinates2D(createEntityUID(), nullptr, nullptr, nullptr, getOwningService()));
+		std::unique_ptr<EntityCoordinates2D> position(new EntityCoordinates2D(createEntityUID(), nullptr, nullptr, nullptr));
 		position->deserialiseFromJSON(positionObjJson, _copyInformation, _entityMap);
 		position->setParent(this);
 		m_coordinateEntity = position.release();
@@ -230,9 +230,13 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	}
 	else {
 		// Legacy support
-		m_graphicsPickerKey = getOwningService();
-		if (m_graphicsPickerKey.empty()) {
-			OT_LOG_W("Block entity has no GraphicsPickerKey and no owning service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
+		auto lst = getServicesForCallback(Callback::DataNotify);
+		if (!lst.empty()) {
+			m_graphicsPickerKey = lst.front();
+		}
+		else {
+			OT_LOG_W("Block entity has no GraphicsPickerKey and no callback service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
+			m_graphicsPickerKey = OT_INFO_SERVICE_TYPE_MODEL;
 		}
 	}
 }
@@ -277,9 +281,6 @@ void EntityBlock::createBlockItem()
 	ot::JsonDocument reqDoc;
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	ot::BasicServiceInformation ownerInfo(this->getOwningService());
-	ownerInfo.addToJsonObject(reqDoc, reqDoc.GetAllocator());
-
 	ot::VisualisationCfg visualisationCfg;
 	ot::JsonObject visualisationCfgJson;
 	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
@@ -291,7 +292,6 @@ void EntityBlock::createBlockItem()
 
 	getObserver()->sendMessageToViewer(reqDoc);
 }
-
 
 void EntityBlock::addConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 {

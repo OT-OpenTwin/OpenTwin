@@ -25,8 +25,8 @@
 class __declspec(dllexport) EntityFileCSV : public EntityFileText, public IVisualisationTable
 {
 public:
-	EntityFileCSV() : EntityFileCSV(0, nullptr, nullptr, nullptr, "") {};
-	EntityFileCSV(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityFileCSV() : EntityFileCSV(0, nullptr, nullptr, nullptr) {};
+	EntityFileCSV(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	~EntityFileCSV() = default;
 	void setRowDelimiter(std::string _delimiter); 
 	void setColumnDelimiter(std::string _delimiter);
@@ -41,7 +41,6 @@ public:
 	ot::TableCfg getTableConfig(bool _includeData) override;
 	bool visualiseTable() override;
 	virtual bool updateFromProperties(void) override;
-	ot::ContentChangedHandling getTableContentChangedHandling() override;
 
 	ot::TableCfg::TableHeaderMode getHeaderMode(void) override;
 	bool visualiseText() override;
@@ -57,5 +56,4 @@ private:
 	std::string m_columnDelimiterDefault = ";";
 	bool m_evaluateEscapeCharacterDefault = false;
 
-	ot::ContentChangedHandling m_tableContentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
 };

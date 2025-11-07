@@ -21,8 +21,8 @@
 #include "EntityBlockCircuitElement.h"
 class __declspec(dllexport) EntityBlockCircuitTransmissionLine : public EntityBlockCircuitElement {
 public:
-	EntityBlockCircuitTransmissionLine() : EntityBlockCircuitTransmissionLine(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockCircuitTransmissionLine(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockCircuitTransmissionLine() : EntityBlockCircuitTransmissionLine(0, nullptr, nullptr, nullptr) {};
+	EntityBlockCircuitTransmissionLine(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 
 	static std::string className() { return "EntityBlockCircuitTransmissionLine"; }
 	virtual std::string getClassName(void) const override { return EntityBlockCircuitTransmissionLine::className(); };

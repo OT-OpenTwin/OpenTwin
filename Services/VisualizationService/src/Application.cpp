@@ -183,7 +183,7 @@ void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bo
 
 std::pair<ot::UID, ot::UID> Application::storeBinaryData(const char *data, size_t dataLength)
 {
-	EntityBinaryData *dataItem = new EntityBinaryData(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
+	EntityBinaryData *dataItem = new EntityBinaryData(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 
 	dataItem->setData(data, dataLength);
 	dataItem->storeToDataBase();

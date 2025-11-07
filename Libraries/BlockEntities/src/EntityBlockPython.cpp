@@ -25,8 +25,8 @@
 
 static EntityFactoryRegistrar<EntityBlockPython> registrar(EntityBlockPython::className());
 
-EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityBlock(ID, parent, obs, ms, owner)
+EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityBlock(ID, parent, obs, ms)
 {
 	OldTreeIcon icon;
 	icon.visibleIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();

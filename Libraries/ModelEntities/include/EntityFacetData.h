@@ -30,8 +30,8 @@
 class __declspec(dllexport) EntityFacetData : public EntityBase
 {
 public:
-	EntityFacetData() : EntityFacetData(0, nullptr, nullptr, nullptr, "") {};
-	EntityFacetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityFacetData() : EntityFacetData(0, nullptr, nullptr, nullptr) {};
+	EntityFacetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityFacetData();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override {return false;};

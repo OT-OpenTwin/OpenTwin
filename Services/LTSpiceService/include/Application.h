@@ -38,9 +38,10 @@ class EntityUnits;
 class ParametricCombination;
 
 class Application : public ot::ApplicationBase, public ot::ButtonHandler {
-public:
 	Application();
 	virtual ~Application();
+public:
+	static Application& instance();
 
 	// ##################################################################################################################################
 

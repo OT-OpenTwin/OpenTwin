@@ -27,15 +27,6 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include <vector>
 
-MetadataEntityInterface::MetadataEntityInterface(const std::string& _ownerServiceName):m_ownerServiceName(_ownerServiceName)
-{
-}
-
-MetadataEntityInterface::MetadataEntityInterface()
-	:m_ownerServiceName("")
-{
-}
-
 MetadataCampaign MetadataEntityInterface::createCampaign(std::shared_ptr<EntityMetadataCampaign> _rmd, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds)
 {
 	MetadataCampaign measurementCampaign;
@@ -237,7 +228,9 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 
 void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _modelComponent, MetadataCampaign& _metaDataCampaign)
 {
-	EntityMetadataCampaign entityCampaign(_modelComponent.createEntityUID(), nullptr, nullptr, nullptr, m_ownerServiceName);
+	EntityMetadataCampaign entityCampaign(_modelComponent.createEntityUID(), nullptr, nullptr, nullptr);
+	entityCampaign.setCallbackData(this->getCallbackData());
+
 	for (auto& metadata : _metaDataCampaign.getMetaData())
 	{
 		insertMetadata(&entityCampaign, metadata.second.get());
@@ -259,9 +252,11 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 	for (auto& newSeriesMetadata : _seriesMetadata)
 	{
 		const std::string name = newSeriesMetadata->getName();
-		EntityMetadataSeries entitySeries(newSeriesMetadata->getSeriesIndex(), nullptr, nullptr, nullptr, m_ownerServiceName);
+		EntityMetadataSeries entitySeries(newSeriesMetadata->getSeriesIndex(), nullptr, nullptr, nullptr);
 		entitySeries.setName(name);
 		entitySeries.setEditable(true);
+		entitySeries.setCallbackData(this->getCallbackData());
+
 		for (const MetadataParameter& parameter : newSeriesMetadata->getParameter())
 		{
 			MetadataParameter& parameterForChange = const_cast<MetadataParameter&>(parameter);

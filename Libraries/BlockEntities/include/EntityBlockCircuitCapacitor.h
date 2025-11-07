@@ -24,8 +24,8 @@
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockCircuitCapacitor : public EntityBlockCircuitElement
 {
 public:
-	EntityBlockCircuitCapacitor() : EntityBlockCircuitCapacitor(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockCircuitCapacitor() : EntityBlockCircuitCapacitor(0, nullptr, nullptr, nullptr) {};
+	EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 
 	static std::string className() { return "EntityBlockCircuitCapacitor"; }
 	virtual std::string getClassName(void) const override { return EntityBlockCircuitCapacitor::className(); };

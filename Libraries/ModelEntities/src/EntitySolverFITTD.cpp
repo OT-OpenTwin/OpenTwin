@@ -25,8 +25,8 @@
 
 static EntityFactoryRegistrar<EntitySolverFITTD> registrar("EntitySolverFITTD");
 
-EntitySolverFITTD::EntitySolverFITTD(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntitySolver(ID, parent, obs, ms, owner)
+EntitySolverFITTD::EntitySolverFITTD(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntitySolver(ID, parent, obs, ms)
 {
 }
 

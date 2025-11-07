@@ -28,8 +28,8 @@
 class __declspec(dllexport) EntitySolver : public EntityContainer
 {
 public:
-	EntitySolver() : EntitySolver(0, nullptr, nullptr, nullptr, "") {};
-	EntitySolver(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntitySolver() : EntitySolver(0, nullptr, nullptr, nullptr) {};
+	EntitySolver(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntitySolver();
 
 	static std::string className() { return "EntitySolver"; }

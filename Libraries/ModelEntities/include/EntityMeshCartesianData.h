@@ -34,8 +34,8 @@ class EntityCartesianVector;
 class __declspec(dllexport) EntityMeshCartesianData : public EntityContainer
 {
 public:
-	EntityMeshCartesianData() : EntityMeshCartesianData(0, nullptr, nullptr, nullptr, "") {};
-	EntityMeshCartesianData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityMeshCartesianData() : EntityMeshCartesianData(0, nullptr, nullptr, nullptr) {};
+	EntityMeshCartesianData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityMeshCartesianData();
 
 	virtual bool considerForPropertyFilter(void) override { return true; };

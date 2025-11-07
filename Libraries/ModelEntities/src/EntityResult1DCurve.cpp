@@ -67,8 +67,8 @@ ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _
 	return cfg;
 }
 
-EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, const std::string& _owner)
-	: EntityBase(_ID,_parent,_mdl,_ms,_owner)
+EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms)
+	: EntityBase(_ID, _parent, _mdl, _ms)
 {
 }
 

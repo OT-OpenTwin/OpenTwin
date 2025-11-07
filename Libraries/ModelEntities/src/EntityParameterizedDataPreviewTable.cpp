@@ -21,8 +21,8 @@
 
 static EntityFactoryRegistrar<EntityParameterizedDataPreviewTable> registrar("EntityParameterizedDataPreviewTable");
 
-EntityParameterizedDataPreviewTable::EntityParameterizedDataPreviewTable(ot::UID ID, EntityBase * parent, EntityObserver * mdl, ModelState * ms, const std::string & owner)
-	: EntityResultTable<std::string>(ID, parent, mdl, ms, owner)
+EntityParameterizedDataPreviewTable::EntityParameterizedDataPreviewTable(ot::UID ID, EntityBase * parent, EntityObserver * mdl, ModelState * ms)
+	: EntityResultTable<std::string>(ID, parent, mdl, ms)
 {
 }
 

@@ -24,8 +24,8 @@
 class __declspec(dllexport) EntityBlockPython : public EntityBlock
 {
 public:
-	EntityBlockPython() : EntityBlockPython(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockPython() : EntityBlockPython(0, nullptr, nullptr, nullptr) {};
+	EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 
 	static std::string className() { return "EntityBlockPython"; }
 	virtual std::string getClassName(void) const override { return EntityBlockPython::className(); };

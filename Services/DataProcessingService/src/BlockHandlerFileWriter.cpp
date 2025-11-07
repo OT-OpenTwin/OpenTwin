@@ -17,6 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
+#include "Application.h"
 #include "BlockHandlerFileWriter.h"
 
 #include "OTSystem/OTAssert.h"
@@ -89,11 +90,16 @@ void BlockHandlerFileWriter::createFile()
 	const std::string resultFolder = solverName + "/" + ot::FolderNames::FilesFolder;
 	const std::string fileName = CreateNewUniqueTopologyName(resultFolder, m_fileName);
 
-	EntityFileText textFile(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+	EntityFileText textFile(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 	textFile.setName(fileName);
+	textFile.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection,
+		Application::instance()->getServiceName()
+	);
 
 	textFile.setFileProperties("", m_fileName, m_fileType);
-	EntityBinaryData data(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+	EntityBinaryData data(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 	const std::string fileContent = m_fileStream.str();
 	
 	ot::EncodingGuesser guesser;

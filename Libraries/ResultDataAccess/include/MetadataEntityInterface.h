@@ -19,6 +19,7 @@
 
 #pragma once
 #include "MetadataCampaign.h"
+#include "EntityCallbackBase.h"
 #include "EntityMetadataSeries.h"
 #include "EntityMetadataCampaign.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -26,11 +27,10 @@
 
 #include <stdint.h>
 
-class __declspec(dllexport) MetadataEntityInterface
+class __declspec(dllexport) MetadataEntityInterface : public ot::EntityCallbackBase
 {
 public:
-	MetadataEntityInterface(const std::string& _ownerServiceName);
-	MetadataEntityInterface();
+	MetadataEntityInterface() = default;
 	MetadataCampaign createCampaign(std::shared_ptr<EntityMetadataCampaign> _rmd, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds);
 	MetadataSeries createSeries(std::shared_ptr<EntityMetadataSeries> _seriesMetadataEntity);
 	MetadataSeries createSeries(EntityMetadataSeries* _seriesMetadataEntity);
@@ -39,8 +39,6 @@ public:
 	void storeCampaign(ot::components::ModelComponent& _modelComponent,  MetadataCampaign& _metaDataCampaign, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);
 
 private:
-	const std::string& m_ownerServiceName;
-	
 	const std::string m_dataDimensionsField = "DataDimensions";
 	const std::string m_dependingParameterField = "ParameterDependencies";
 	const std::string m_valueDescriptionsField = "ValueDescriptions";

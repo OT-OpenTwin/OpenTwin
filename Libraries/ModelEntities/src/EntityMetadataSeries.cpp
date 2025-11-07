@@ -23,8 +23,8 @@
 
 static EntityFactoryRegistrar<EntityMetadataSeries> registrar("EntityMetadataSeries");
 
-EntityMetadataSeries::EntityMetadataSeries(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, const std::string& owner)
-	: EntityWithDynamicFields(ID,parent,mdl,ms,owner)
+EntityMetadataSeries::EntityMetadataSeries(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms)
+	: EntityWithDynamicFields(ID, parent, mdl, ms)
 {
 	CreatePlainDocument(_parameterDocument);
 	CreatePlainDocument(_quantityDocument);

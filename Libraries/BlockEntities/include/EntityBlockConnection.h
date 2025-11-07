@@ -23,8 +23,8 @@
 class __declspec(dllexport) EntityBlockConnection : public EntityBase
 {
 public:
-	EntityBlockConnection() : EntityBlockConnection(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockConnection() : EntityBlockConnection(0, nullptr, nullptr, nullptr) {};
+	EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 	virtual ~EntityBlockConnection();
 
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };

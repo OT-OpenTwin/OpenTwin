@@ -26,8 +26,8 @@
 
 static EntityFactoryRegistrar<EntityMeshCartesianFace> registrar("EntityMeshCartesianFace");
 
-EntityMeshCartesianFace::EntityMeshCartesianFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner),
+EntityMeshCartesianFace::EntityMeshCartesianFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms),
 	type(INDEX_BASED),
 	surfaceId(0)
 {

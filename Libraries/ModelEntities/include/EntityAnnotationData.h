@@ -28,8 +28,8 @@
 class __declspec(dllexport) EntityAnnotationData : public EntityBase
 {
 public:
-	EntityAnnotationData() : EntityAnnotationData(0, nullptr, nullptr, nullptr, "") {};
-	EntityAnnotationData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityAnnotationData() : EntityAnnotationData(0, nullptr, nullptr, nullptr) {};
+	EntityAnnotationData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityAnnotationData();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

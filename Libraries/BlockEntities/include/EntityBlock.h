@@ -38,7 +38,7 @@
 class OT_BLOCKENTITIES_API_EXPORT EntityBlock : public EntityBase
 {
 public:
-	EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 	EntityBlock(const EntityBlock& _other) = default;
 	EntityBlock(EntityBlock&& _other) = default;
 	EntityBlock& operator=(const EntityBlock& _other) = default;

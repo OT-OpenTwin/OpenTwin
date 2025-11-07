@@ -27,8 +27,8 @@ class __declspec(dllexport) EntityParameterizedDataCategorization: public Entity
 public:
 	enum DataCategorie { researchMetadata, measurementSeriesMetadata, quantity, parameter, UNKNOWN};
 
-	EntityParameterizedDataCategorization() : EntityParameterizedDataCategorization(0, nullptr, nullptr, nullptr, "") {};
-	EntityParameterizedDataCategorization(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityParameterizedDataCategorization() : EntityParameterizedDataCategorization(0, nullptr, nullptr, nullptr) {};
+	EntityParameterizedDataCategorization(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 
 	virtual std::string getClassName(void) const override { return "EntityParameterizedDataCategorization"; };
 	virtual void addVisualizationNodes() override;

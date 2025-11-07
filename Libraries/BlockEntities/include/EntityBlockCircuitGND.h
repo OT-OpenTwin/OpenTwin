@@ -23,8 +23,8 @@
 class __declspec(dllexport) EntityBlockCircuitGND : public EntityBlockCircuitElement
 {
 public:
-	EntityBlockCircuitGND() : EntityBlockCircuitGND(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockCircuitGND() : EntityBlockCircuitGND(0, nullptr, nullptr, nullptr) {};
+	EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 
 	static std::string className() { return "EntityBlockCircuitGND"; }
 	virtual std::string getClassName(void) const override { return EntityBlockCircuitGND::className(); };

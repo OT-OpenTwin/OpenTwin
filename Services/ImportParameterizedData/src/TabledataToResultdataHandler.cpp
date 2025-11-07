@@ -72,7 +72,14 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	}
 
 	//Load all existing metadata. They are henceforth neglected in selections.
-	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent);
+	resultCollectionExtender.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		Application::instance()->getServiceName()
+	);
+
 	ResultImportLogger& logger = resultCollectionExtender.getLogger();
 	logger.clearLog();
 	resultCollectionExtender.setSaveModel(false);
@@ -236,11 +243,19 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 
 	if (newDataHasBeenAdded)
 	{
-		EntityResultText importReport(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		EntityResultText importReport(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		const std::string reportName = CreateNewUniqueTopologyName(ot::FolderNames::DatasetFolder + "/Reports", "Import from Table");
 		importReport.setName(reportName);
 		importReport.setText(fullReport);
 		importReport.createProperties();
+
+		importReport.registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			Application::instance()->getServiceName()
+		);
+
 		importReport.storeToDataBase();
 
 		ot::ModelServiceAPI::addEntitiesToModel({ importReport.getEntityID() },

@@ -28,8 +28,8 @@
 class __declspec(dllexport) EntityVisCartesianFaceScalar : public EntityVis2D3D
 {
 public:
-	EntityVisCartesianFaceScalar() : EntityVisCartesianFaceScalar(0, nullptr, nullptr, nullptr, "") {};
-	EntityVisCartesianFaceScalar(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityVisCartesianFaceScalar() : EntityVisCartesianFaceScalar(0, nullptr, nullptr, nullptr) {};
+	EntityVisCartesianFaceScalar(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityVisCartesianFaceScalar();
 
 	virtual std::string getClassName(void) const override { return "EntityVisCartesianFaceScalar"; } ;

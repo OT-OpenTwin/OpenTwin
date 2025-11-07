@@ -34,8 +34,8 @@ class EntityBinaryData;
 class __declspec(dllexport) EntityMeshTetData : public EntityContainer
 {
 public:
-	EntityMeshTetData() : EntityMeshTetData(0, nullptr, nullptr, nullptr, "") {};
-	EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityMeshTetData() : EntityMeshTetData(0, nullptr, nullptr, nullptr) {};
+	EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityMeshTetData();
 
 	virtual bool considerForPropertyFilter(void) override { return true; };

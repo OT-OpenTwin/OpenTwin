@@ -73,7 +73,12 @@ bool BlockHandlerStorage::executeSpecialized()
 
 		const auto modelComponent = Application::instance()->getModelComponent();
 		const std::string collectionName = Application::instance()->getCollectionName();
-		ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, OT_INFO_SERVICE_TYPE_DataProcessingService);
+		ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent);
+		resultCollectionExtender.registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection,
+			Application::instance()->getServiceName()
+		);
 		resultCollectionExtender.setSaveModel(!m_createPlot); //If a plot shall be added as well, we create more entities later on.
 
 		ot::JSONToVariableConverter converter;
@@ -294,7 +299,12 @@ bool BlockHandlerStorage::executeSpecialized()
 				curveConfig.setLinePenPainter(painter.release());
 				CurveFactory::addToConfig(*series, curveConfig);
 
-				EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+				EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+				newCurve.registerCallbacks(
+					ot::EntityCallbackBase::Callback::Properties |
+					ot::EntityCallbackBase::Callback::Selection,
+					Application::instance()->getServiceName()
+				);
 
 				const std::string fullNameSeries = series->getName();
 				std::optional<std::string> shortNameSeries = ot::EntityName::getSubName(fullNameSeries);
@@ -311,8 +321,13 @@ bool BlockHandlerStorage::executeSpecialized()
 		
 		if (m_createPlot)
 		{
-			EntityResult1DPlot newPlot(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+			EntityResult1DPlot newPlot(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 			newPlot.setName(plotName);
+			newPlot.registerCallbacks(
+				ot::EntityCallbackBase::Callback::Properties |
+				ot::EntityCallbackBase::Callback::Selection,
+				Application::instance()->getServiceName()
+			);
 
 			ot::Plot1DCfg plotCfg;
 			const std::string shortName = plotName.substr(plotName.find_last_of("/") + 1);

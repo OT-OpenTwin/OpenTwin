@@ -186,13 +186,12 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 	blockEnt->setName(entName);
 	blockEnt->setEditable(true);
 	blockEnt->setGraphicsPickerKey(editor->getGraphicsPickerKey());
-	blockEnt->setOwningService(editor->getOwningService());
+	blockEnt->setCallbackData(editor->getCallbackData());
 	blockEnt->setEntityID(model->createEntityUID());
 
-	
 	blockEnt->setGraphicsScenePackageChildName(blockEnt->getBlockFolderName());
 
-	EntityCoordinates2D* blockCoordinates = new EntityCoordinates2D(model->createEntityUID(), nullptr, nullptr, nullptr, "");
+	EntityCoordinates2D* blockCoordinates = new EntityCoordinates2D(model->createEntityUID(), nullptr, nullptr, nullptr);
 	blockCoordinates->setCoordinates(_pos);
 	blockCoordinates->storeToDataBase();
 

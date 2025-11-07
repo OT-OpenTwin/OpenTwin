@@ -34,8 +34,8 @@
 
 static EntityFactoryRegistrar<EntityFileRawData> registrar(EntityFileRawData::className());
 
-EntityFileRawData::EntityFileRawData(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	: EntityFile(_ID, _parent, _obs, _ms, _owner), m_format(ot::ImageFileFormat::PNG) {
+EntityFileRawData::EntityFileRawData(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+	: EntityFile(_ID, _parent, _obs, _ms), m_format(ot::ImageFileFormat::PNG) {
 }
 
 bool EntityFileRawData::updateFromProperties() {

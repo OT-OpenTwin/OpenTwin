@@ -24,8 +24,8 @@
 
 class OT_MODELENTITIES_API_EXPORT EntityHierarchicalScene : public EntityContainer, public IVisualisationGraphicsView {
 public:
-	EntityHierarchicalScene() : EntityHierarchicalScene(0, nullptr, nullptr, nullptr, "") {};
-	EntityHierarchicalScene(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityHierarchicalScene() : EntityHierarchicalScene(0, nullptr, nullptr, nullptr) {};
+	EntityHierarchicalScene(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 
 	static std::string defaultName() { return "Project"; };
 	static std::string className() { return "EntityHierarchicalScene"; };

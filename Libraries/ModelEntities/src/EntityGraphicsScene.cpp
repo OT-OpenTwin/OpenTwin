@@ -23,8 +23,8 @@
 
 static EntityFactoryRegistrar<EntityGraphicsScene> registrar(EntityGraphicsScene::className());
 
-EntityGraphicsScene::EntityGraphicsScene(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityContainer(ID,parent,obs,ms,owner)
+EntityGraphicsScene::EntityGraphicsScene(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityContainer(ID, parent, obs, ms)
 {
 }
 
@@ -52,9 +52,6 @@ void EntityGraphicsScene::addVisualizationNodes()
 	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-
-	ot::BasicServiceInformation ownerInfo(this->getOwningService());
-	ownerInfo.addToJsonObject(doc, doc.GetAllocator());
 
 	ot::VisualisationTypes visTypes;
 	visTypes.addGraphicsViewVisualisation();
@@ -91,9 +88,13 @@ void EntityGraphicsScene::readSpecificDataFromDataBase(bsoncxx::document::view& 
 	}
 	else {
 		// Legacy support: Use owning service as picker key
-		m_graphicsPickerKey = getOwningService();
-		if (m_graphicsPickerKey.empty()) {
-			OT_LOG_W("Graphics scene entity has no GraphicsPickerKey and no owning service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
+		auto lst = getServicesForCallback(EntityBase::Callback::DataNotify);
+		if (lst.empty()) {
+			OT_LOG_W("Graphics scene entity has no GraphicsPickerKey and no owning service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }. Defaulting to Model");
+			m_graphicsPickerKey = OT_INFO_SERVICE_TYPE_MODEL;
+		}
+		else {
+			m_graphicsPickerKey = lst.front();
 		}
 	}
 }

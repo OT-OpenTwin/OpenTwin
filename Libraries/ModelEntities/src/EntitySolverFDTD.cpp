@@ -25,7 +25,7 @@
 
 static EntityFactoryRegistrar<EntitySolverFDTD> registrar("EntitySolverFDTD");
 
-EntitySolverFDTD::EntitySolverFDTD(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner) : EntitySolver(ID, parent, obs, ms, owner)
+EntitySolverFDTD::EntitySolverFDTD(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) : EntitySolver(ID, parent, obs, ms)
 {
 }
 

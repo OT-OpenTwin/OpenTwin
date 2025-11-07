@@ -24,8 +24,8 @@
 
 class OT_MODELENTITIES_API_EXPORT EntityFileRawData : public EntityFile {
 public:
-	EntityFileRawData() : EntityFileRawData(0, nullptr, nullptr, nullptr, "") {};
-	EntityFileRawData(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityFileRawData() : EntityFileRawData(0, nullptr, nullptr, nullptr) {};
+	EntityFileRawData(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 	virtual ~EntityFileRawData() = default;
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };

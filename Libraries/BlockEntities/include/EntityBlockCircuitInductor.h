@@ -22,8 +22,8 @@
 class __declspec(dllexport) EntityBlockCircuitInductor : public EntityBlockCircuitElement
 {
 public:
-	EntityBlockCircuitInductor() : EntityBlockCircuitInductor(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockCircuitInductor() : EntityBlockCircuitInductor(0, nullptr, nullptr, nullptr) {};
+	EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 
 	static std::string className() { return "EntityBlockCircuitInductor"; }
 	virtual std::string getClassName(void) const override { return EntityBlockCircuitInductor::className(); };

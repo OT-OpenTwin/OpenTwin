@@ -44,9 +44,11 @@ namespace ot {
 class EntityUnits;
 
 class Application : public ot::ApplicationBase, public ot::ButtonHandler {
-public:
+private:
 	Application();
 	virtual ~Application();
+public:
+	static Application& instance();
 
 	// ##################################################################################################################################
 

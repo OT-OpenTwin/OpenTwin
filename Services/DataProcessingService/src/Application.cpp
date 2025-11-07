@@ -72,8 +72,13 @@ Application::~Application()
 void Application::createPipeline()
 {
 	auto modelComponent = Application::instance()->getModelComponent();
-	EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+	EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 	newDataprocessing.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
+	newDataprocessing.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection,
+		getServiceName()
+	);
 
 	auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
 	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
@@ -89,7 +94,12 @@ void Application::createPipeline()
 void Application::createSolver()
 {
 	auto modelComponent = Application::instance()->getModelComponent();
-	EntitySolverDataProcessing newSolver(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+	EntitySolverDataProcessing newSolver(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	newSolver.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection,
+		getServiceName()
+	);
 
 	if (m_dataProcessingFolderID == ot::getInvalidUID())
 	{

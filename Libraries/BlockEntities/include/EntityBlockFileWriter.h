@@ -23,8 +23,8 @@
 class __declspec(dllexport) EntityBlockFileWriter : public EntityBlock
 {
 public:
-	EntityBlockFileWriter() : EntityBlockFileWriter(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockFileWriter() : EntityBlockFileWriter(0, nullptr, nullptr, nullptr) {};
+	EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 
 	static std::string className() { return "EntityBlockFileWriter"; }
 	virtual std::string getClassName(void) const override { return EntityBlockFileWriter::className(); };

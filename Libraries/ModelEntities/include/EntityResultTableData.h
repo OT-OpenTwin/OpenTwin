@@ -31,8 +31,8 @@ template <class T>
 class __declspec(dllexport) EntityResultTableData : public EntityBase
 {
 public:
-	EntityResultTableData() : EntityResultTableData(0, nullptr, nullptr, nullptr, "") {};
-	EntityResultTableData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityResultTableData() : EntityResultTableData(0, nullptr, nullptr, nullptr) {};
+	EntityResultTableData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityResultTableData();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

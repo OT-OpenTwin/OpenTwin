@@ -26,8 +26,8 @@ class EntityBinaryData;
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalDocumentItem : public EntityBlock, public IVisualisationText {
 public:
-	EntityBlockHierarchicalDocumentItem() : EntityBlockHierarchicalDocumentItem(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityBlockHierarchicalDocumentItem() : EntityBlockHierarchicalDocumentItem(0, nullptr, nullptr, nullptr) {};
+	EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 
 	static std::string className() { return "EntityBlockHierarchicalDocumentItem"; }
 	virtual std::string getClassName(void) const override { return EntityBlockHierarchicalDocumentItem::className(); };
@@ -57,8 +57,7 @@ public:
 	virtual void setText(const std::string& _text) override;
 	virtual bool visualiseText() override { return false; };
 	virtual ot::TextEditorCfg createConfig(bool _includeData) override;
-	virtual ot::ContentChangedHandling getTextContentChangedHandling() override;
-
+	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Property accessors

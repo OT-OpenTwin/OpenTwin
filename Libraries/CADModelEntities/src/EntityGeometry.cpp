@@ -36,15 +36,15 @@
 
 static EntityFactoryRegistrar<EntityGeometry> registrar(EntityGeometry::className());
 
-EntityGeometry::EntityGeometry(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityContainer(ID, parent, obs, ms, owner),
+EntityGeometry::EntityGeometry(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityContainer(ID, parent, obs, ms),
 	brepStorageID(-1),
 	facetsStorageID(-1),
 	showWhenSelected(false),
 	tmpData(nullptr)
 {
-	brep   = new EntityBrep(0, this, obs, ms, owner);
-	facets = new EntityFacetData(0, this, obs, ms, owner);
+	brep   = new EntityBrep(0, this, obs, ms);
+	facets = new EntityFacetData(0, this, obs, ms);
 
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "ModelVisible";
@@ -74,7 +74,7 @@ void EntityGeometry::resetBrep(void)
 		brep = nullptr;
 	}
 
-	brep = new EntityBrep(0, this, getObserver(), getModelState(), getOwningService());
+	brep = new EntityBrep(0, this, getObserver(), getModelState());
 	brepStorageID = -1;
 }
 
@@ -86,7 +86,7 @@ void EntityGeometry::resetFacets(void)
 		facets = nullptr;
 	}
 
-	facets = new EntityFacetData(0, this, getObserver(), getModelState(), getOwningService());
+	facets = new EntityFacetData(0, this, getObserver(), getModelState());
 	facetsStorageID = -1;
 }
 

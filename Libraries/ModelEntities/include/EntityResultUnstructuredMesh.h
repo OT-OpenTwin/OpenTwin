@@ -29,8 +29,8 @@
 class __declspec(dllexport) EntityResultUnstructuredMesh : public EntityBase
 {
 public:
-	EntityResultUnstructuredMesh() : EntityResultUnstructuredMesh(0, nullptr, nullptr, nullptr, "") {};
-	EntityResultUnstructuredMesh(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityResultUnstructuredMesh() : EntityResultUnstructuredMesh(0, nullptr, nullptr, nullptr) {};
+	EntityResultUnstructuredMesh(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityResultUnstructuredMesh();
 	
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;

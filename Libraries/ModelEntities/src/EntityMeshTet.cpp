@@ -31,8 +31,8 @@
 
 static EntityFactoryRegistrar<EntityMeshTet> registrar("EntityMeshTet");
 
-EntityMeshTet::EntityMeshTet(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityMesh(ID, parent, obs, ms, owner),
+EntityMeshTet::EntityMeshTet(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityMesh(ID, parent, obs, ms),
 	meshData(nullptr),
 	meshDataStorageId(-1),
 	meshValid(false)
@@ -259,7 +259,7 @@ void EntityMeshTet::EnsureMeshDataLoaded(void)
 	{
 		if (meshDataStorageId == -1)
 		{
-			meshData = new EntityMeshTetData(0, nullptr, getObserver(), getModelState(), getOwningService());
+			meshData = new EntityMeshTetData(0, nullptr, getObserver(), getModelState());
 		}
 		else
 		{

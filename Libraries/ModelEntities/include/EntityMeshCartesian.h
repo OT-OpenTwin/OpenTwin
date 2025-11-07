@@ -30,8 +30,8 @@ class EntityMeshCartesianData;
 class __declspec(dllexport) EntityMeshCartesian : public EntityMesh
 {
 public:
-	EntityMeshCartesian() : EntityMeshCartesian(0, nullptr, nullptr, nullptr, "") {};
-	EntityMeshCartesian(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityMeshCartesian() : EntityMeshCartesian(0, nullptr, nullptr, nullptr) {};
+	EntityMeshCartesian(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityMeshCartesian();
 
 	void createProperties(const std::string materialsFolder, ot::UID materialsFolderID);

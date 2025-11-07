@@ -30,8 +30,8 @@
 
 static EntityFactoryRegistrar<EntityBlockCircuitVoltageMeter> registrar(EntityBlockCircuitVoltageMeter::className());
 
-EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
+EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	OldTreeIcon icon;
 	icon.visibleIcon = "VoltMeter";

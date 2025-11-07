@@ -32,12 +32,12 @@
 
 #include "IndexHandler.h"
 
-ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, const std::string& _ownerServiceName)
-	:ResultCollectionMetadataAccess(_collectionName,&_modelComponent), m_requiresUpdateMetadataCampaign(false), m_ownerServiceName(_ownerServiceName)
+ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent)
+	: ResultCollectionMetadataAccess(_collectionName,&_modelComponent), m_requiresUpdateMetadataCampaign(false)
 {}
 
 ResultCollectionExtender::ResultCollectionExtender(ot::ApplicationBase* _applicationBase)
-	:ResultCollectionExtender(_applicationBase->getCollectionName(), *_applicationBase->getModelComponent(),_applicationBase->getServiceName())
+	: ResultCollectionExtender(_applicationBase->getCollectionName(), *_applicationBase->getModelComponent())
 {}
 
 ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
@@ -160,7 +160,9 @@ void ResultCollectionExtender::addCampaignMetadata(std::shared_ptr<MetadataEntry
 
 void ResultCollectionExtender::storeCampaignChanges()
 {
-	MetadataEntityInterface entityCreator(m_ownerServiceName);
+	MetadataEntityInterface entityCreator;
+	entityCreator.setCallbackData(this->getCallbackData());
+
 	if (m_requiresUpdateMetadataCampaign && m_seriesMetadataForStorage.size() != 0)
 	{
 		entityCreator.storeCampaign(*m_modelComponent, m_metadataCampaign, m_seriesMetadataForStorage, m_saveModel);

@@ -33,8 +33,8 @@
 class __declspec(dllexport) EntityResult3DData : public EntityBase , public EntityResultBase
 {
 public:
-	EntityResult3DData() : EntityResult3DData(0, nullptr, nullptr, nullptr, "") {};
-	EntityResult3DData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityResult3DData() : EntityResult3DData(0, nullptr, nullptr, nullptr) {};
+	EntityResult3DData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityResult3DData();
 	
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;

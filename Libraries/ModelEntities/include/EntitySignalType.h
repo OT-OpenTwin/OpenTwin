@@ -24,8 +24,8 @@
 class __declspec(dllexport) EntitySignalType : public EntityContainer
 {
 public:
-	EntitySignalType() : EntitySignalType(0, nullptr, nullptr, nullptr, "") {};
-	EntitySignalType(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntitySignalType() : EntitySignalType(0, nullptr, nullptr, nullptr) {};
+	EntitySignalType(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntitySignalType();
 	virtual void addVisualizationNodes(void) override;
 

@@ -17,6 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
+#include "Application.h"
 #include "MicroServiceSolver.h"
 
 #include "EntitySolverFITTD.h"
@@ -348,25 +349,32 @@ void MicroServiceSolver::addResultFD(std::string name, std::string title, double
 		ot::UID zUID = modelComponent->createEntityUID();
 
 		//EntityResult3DData memory managment is taken over by container parent EntityResult3D
-		auto dataEntity = new EntityResult3DData(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, "Model");
-		std::unique_ptr< EntityResult3D> topoEntity(new EntityResult3D(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, "VisualizationService"));
+		auto dataEntity = new EntityResult3DData(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+		std::unique_ptr< EntityResult3D> topoEntity(new EntityResult3D(modelComponent->createEntityUID(), nullptr, nullptr, nullptr));
+		topoEntity->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			Application::instance().getServiceName()
+		);
+
 		std::string rawDataFolder = solverName + "/" + FolderNames::GetFolderNameRawResultBase() + "/";
 		dataEntity->setName(rawDataFolder + "3DResultData");
 		dataEntity->setParent(topoEntity.get());
 		
-		std::unique_ptr<EntityCompressedVector> xComponentDataEnt (new EntityCompressedVector(xUID, dataEntity, nullptr, nullptr, "Model"));
+		std::unique_ptr<EntityCompressedVector> xComponentDataEnt (new EntityCompressedVector(xUID, dataEntity, nullptr, nullptr));
 		xComponentDataEnt->setName("DFTVectorResultXComponent");
 		xComponentDataEnt->setValues(xComponent, size);
 		xComponentDataEnt->storeToDataBase();
 		ot::UID xVersion = xComponentDataEnt->getEntityStorageVersion();
 
-		std::unique_ptr<EntityCompressedVector> yComponentDataEnt (new EntityCompressedVector(yUID, dataEntity, nullptr, nullptr, "Model"));
+		std::unique_ptr<EntityCompressedVector> yComponentDataEnt (new EntityCompressedVector(yUID, dataEntity, nullptr, nullptr));
 		yComponentDataEnt->setName("DFTVectorResultYComponent");
 		yComponentDataEnt->setValues(yComponent, size);
 		yComponentDataEnt->storeToDataBase();
 		ot::UID yVersion = yComponentDataEnt->getEntityStorageVersion();
 
-		std::unique_ptr<EntityCompressedVector> zComponentDataEnt (new EntityCompressedVector(zUID, dataEntity, nullptr, nullptr, "Model"));
+		std::unique_ptr<EntityCompressedVector> zComponentDataEnt (new EntityCompressedVector(zUID, dataEntity, nullptr, nullptr));
 		zComponentDataEnt->setName("DFTVectorResultZComponent");
 		zComponentDataEnt->setValues(zComponent, size);
 		zComponentDataEnt->storeToDataBase();

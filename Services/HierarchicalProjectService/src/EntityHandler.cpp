@@ -66,7 +66,7 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 	// Create container if it does not exist
 	ot::EntityInformation containerInfo;
 	if (!ot::ModelServiceAPI::getEntityInformation(c_projectsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
-		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_projectsFolder);
 
 		container.storeToDataBase();
@@ -92,13 +92,17 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 		// Create coordinates
 		EntityCoordinates2D blockCoordinates;
 		blockCoordinates.setEntityID(_modelComponent->createEntityUID());
-		blockCoordinates.setOwningService(serviceName);
 		blockCoordinates.storeToDataBase();
 
 		// Create block
 		EntityBlockHierarchicalProjectItem blockEntity;
 		blockEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
-		blockEntity.setOwningService(serviceName);
+		blockEntity.registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			serviceName
+		);
 		blockEntity.setEntityID(_modelComponent->createEntityUID());
 		blockEntity.setName(newEntityName);
 		blockEntity.setCoordinateEntity(blockCoordinates);
@@ -114,7 +118,6 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 		if (ModelState::readProjectPreviewImage(_projectInfo.getCollectionName(), previewImageData, previewImageFormat)) {
 			// Create data entity for preview image
 			EntityBinaryData previewImageDataEntity;
-			previewImageDataEntity.setOwningService(serviceName);
 			previewImageDataEntity.setEntityID(_modelComponent->createEntityUID());
 			previewImageDataEntity.setData(std::move(previewImageData));
 			previewImageDataEntity.storeToDataBase();
@@ -163,7 +166,7 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	// Create container if it does not exist
 	ot::EntityInformation containerInfo;
 	if (!ot::ModelServiceAPI::getEntityInformation(c_connectionsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
-		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_connectionsFolder);
 		
 		container.storeToDataBase();
@@ -174,7 +177,7 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	std::string newConnectionName = CreateNewUniqueTopologyName(c_connectionsFolder, connectionFromName + " >> " + connectionToName);
 
 	// Create connection entity
-	EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+	EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 	connectionEntity.createProperties();
 	connectionEntity.setName(newConnectionName);
 
@@ -189,7 +192,12 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	connectionEntity.setName(newConnectionName);
 	connectionEntity.setGraphicsScenePackageChildName(c_connectionsFolderName);
 	connectionEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
-	connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+	connectionEntity.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		Application::instance().getServiceName()
+	);
 	connectionEntity.storeToDataBase();
 
 	newEntities.addTopologyEntity(connectionEntity);
@@ -219,7 +227,6 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 
 	// Create data entity
 	EntityBinaryData dataEntity;
-	dataEntity.setOwningService(serviceName);
 	dataEntity.setEntityID(_modelComponent->createEntityUID());
 	dataEntity.setData(std::move(fileData));
 	dataEntity.storeToDataBase();
@@ -243,7 +250,6 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 
 	// Create coordinate entity
 	EntityCoordinates2D coord;
-	coord.setOwningService(serviceName);
 	coord.setEntityID(_modelComponent->createEntityUID());
 	coord.storeToDataBase();
 	_newEntities.addDataEntity(blockUid, coord);
@@ -251,7 +257,12 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 	// Create block entity
 	EntityBlockHierarchicalDocumentItem blockEntity;
 	blockEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
-	blockEntity.setOwningService(serviceName);
+	blockEntity.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		serviceName
+	);
 	blockEntity.setEntityID(blockUid);
 	blockEntity.setName(newDocumentName);
 	blockEntity.setGraphicsScenePackageChildName(c_documentsFolderName);
@@ -269,7 +280,7 @@ void EntityHandler::addDocuments(const std::list<std::string>& _fileNames, const
 	// Create container if it does not exist
 	ot::EntityInformation containerInfo;
 	if (!ot::ModelServiceAPI::getEntityInformation(c_documentsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
-		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_documentsFolder);
 
 		container.storeToDataBase();
@@ -318,21 +329,24 @@ void EntityHandler::addBackgroundImage(const std::string& _fileName, const std::
 
 	// Create data entity
 	EntityBinaryData imageDataEntity;
-	imageDataEntity.setOwningService(serviceName);
 	imageDataEntity.setEntityID(_modelComponent->createEntityUID());
 	imageDataEntity.setData(std::move(fileData));
 	imageDataEntity.storeToDataBase();
 
 	// Create coordinate entity
 	EntityCoordinates2D coord;
-	coord.setOwningService(serviceName);
 	coord.setEntityID(_modelComponent->createEntityUID());
 	coord.storeToDataBase();
 
 	// Create background image block entity
 	EntityBlockImage backgroundImageEntity;
 	backgroundImageEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
-	backgroundImageEntity.setOwningService(serviceName);
+	backgroundImageEntity.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		serviceName
+	);
 	backgroundImageEntity.setEntityID(_modelComponent->createEntityUID());
 	backgroundImageEntity.setName(CreateNewUniqueTopologyName(c_backgroundFolder, newName));
 	backgroundImageEntity.setGraphicsScenePackageChildName(c_backgroundFolderName);
@@ -354,7 +368,7 @@ void EntityHandler::addBackgroundImages(const std::list<std::string>& _fileNames
 	// Create container if it does not exist
 	ot::EntityInformation containerInfo;
 	if (!ot::ModelServiceAPI::getEntityInformation(c_backgroundFolder, containerInfo) || containerInfo.getEntityName().empty()) {
-		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_backgroundFolder);
 
 		container.storeToDataBase();
@@ -398,7 +412,6 @@ void EntityHandler::updateProjectImage(const ot::EntityInformation& _projectInfo
 		const std::string serviceName = Application::instance().getServiceName();
 		// Create data entity for preview image
 		EntityBinaryData previewImageDataEntity;
-		previewImageDataEntity.setOwningService(serviceName);
 		previewImageDataEntity.setEntityID(_modelComponent->createEntityUID());
 		previewImageDataEntity.setData(std::move(previewImageData));
 		previewImageDataEntity.storeToDataBase();
@@ -487,7 +500,6 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 
 		// Create file data entity
 		EntityBinaryData imageDataEntity;
-		imageDataEntity.setOwningService(serviceName);
 		imageDataEntity.setEntityID(_modelComponent->createEntityUID());
 		imageDataEntity.setData(unpackedData.c_str(), unpackedData.size());
 		imageDataEntity.storeToDataBase();
@@ -554,7 +566,6 @@ void EntityHandler::addContainer() {
 
 	// Create coordinate entity
 	EntityCoordinates2D coord;
-	coord.setOwningService(serviceName);
 	coord.setEntityID(_modelComponent->createEntityUID());
 	coord.storeToDataBase();
 
@@ -563,9 +574,14 @@ void EntityHandler::addContainer() {
 	newContainer.setEditable(true);
 	newContainer.setEntityID(_modelComponent->createEntityUID());
 	newContainer.setName(CreateNewUniqueTopologyName(c_containerFolder, "Container"));
+	newContainer.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		serviceName
+	);
 	newContainer.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	newContainer.setGraphicsScenePackageChildName(c_containerFolderName);
-	newContainer.setOwningService(serviceName);
 	newContainer.setSelectChildren(false);
 	newContainer.setCoordinateEntityID(coord.getEntityID());
 	newContainer.storeToDataBase();

@@ -27,8 +27,8 @@
 class __declspec(dllexport) EntityUnits : public EntityBase
 {
 public:
-	EntityUnits() : EntityUnits(0, nullptr, nullptr, nullptr, "") {};
-	EntityUnits(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityUnits() : EntityUnits(0, nullptr, nullptr, nullptr) {};
+	EntityUnits(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }

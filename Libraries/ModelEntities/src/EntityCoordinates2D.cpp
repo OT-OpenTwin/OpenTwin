@@ -21,8 +21,8 @@
 
 static EntityFactoryRegistrar<EntityCoordinates2D> registrar(EntityCoordinates2D::className());
 
-EntityCoordinates2D::EntityCoordinates2D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityBase(ID, parent, obs, ms, owner), m_location(0.,0.)
+EntityCoordinates2D::EntityCoordinates2D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityBase(ID, parent, obs, ms), m_location(0.,0.)
 {
 
 }

@@ -29,8 +29,8 @@
 
 static EntityFactoryRegistrar<EntityMeshTetItemDataTetedges> registrar("EntityMeshTetItemDataTetedges");
 
-EntityMeshTetItemDataTetedges::EntityMeshTetItemDataTetedges(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner)
+EntityMeshTetItemDataTetedges::EntityMeshTetItemDataTetedges(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms)
 {
 	
 }

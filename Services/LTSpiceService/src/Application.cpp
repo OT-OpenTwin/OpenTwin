@@ -77,6 +77,11 @@ Application::~Application()
 
 }
 
+Application& Application::instance() {
+	static Application g_instance;
+	return g_instance;
+}
+
 // ##################################################################################################################################
 
 // Required functions

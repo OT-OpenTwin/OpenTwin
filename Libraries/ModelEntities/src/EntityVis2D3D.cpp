@@ -28,8 +28,8 @@
 
 static EntityFactoryRegistrar<EntityVis2D3D> registrar("EntityVis2D3D");
 
-EntityVis2D3D::EntityVis2D3D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityContainer(ID, parent, obs, ms, owner),
+EntityVis2D3D::EntityVis2D3D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityContainer(ID, parent, obs, ms),
 	resultType(EntityResultBase::UNKNOWN),
 	sourceID(0),
 	sourceVersion(0),

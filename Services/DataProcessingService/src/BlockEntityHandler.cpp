@@ -44,13 +44,17 @@ void BlockEntityHandler::createBlockEntity(const std::string& editorName, const 
 
 	std::string entName = CreateNewUniqueTopologyName(editorName + "/" + m_blockFolder, blockEntity->getBlockTitle());
 	blockEntity->setName(entName);
-	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
+	blockEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection,
+		Application::instance()->getServiceName()
+	);
 	blockEntity->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	blockEntity->setGraphicsScenePackageChildName(m_blockFolder);
 	blockEntity->setEditable(true);
 
-	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
+	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr));
 	blockCoordinates->setCoordinates(position);
 	blockCoordinates->storeToDataBase();
 
@@ -70,7 +74,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 	const std::string connectionFolderName = _baseFolderName + "/" + m_connectionFolder;
 	for (auto& connection : connections)
 	{
-		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
+		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		connectionEntity.createProperties();
 		ot::GraphicsConnectionCfg newConnection(connection);
 		newConnection.setUid(connectionEntity.getEntityID());
@@ -80,7 +84,11 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionEntity.setName(connectionName);
 		connectionEntity.setConnectionCfg(newConnection);
 		connectionEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
-		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
+		connectionEntity.registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection,
+			Application::instance()->getServiceName()
+		);
 		connectionEntity.setGraphicsScenePackageChildName(m_connectionFolder);
 		connectionEntity.createProperties();
 

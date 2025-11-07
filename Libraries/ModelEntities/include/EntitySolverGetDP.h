@@ -29,8 +29,8 @@
 class __declspec(dllexport) EntitySolverGetDP : public EntitySolver
 {
 public:
-	EntitySolverGetDP() : EntitySolverGetDP(0, nullptr, nullptr, nullptr, "") {};
-	EntitySolverGetDP(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntitySolverGetDP() : EntitySolverGetDP(0, nullptr, nullptr, nullptr) {};
+	EntitySolverGetDP(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntitySolverGetDP();
 
 	virtual std::string getClassName(void) const override { return "EntitySolverGetDP"; } ;

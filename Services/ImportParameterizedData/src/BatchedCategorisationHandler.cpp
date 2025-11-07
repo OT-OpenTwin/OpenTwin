@@ -122,9 +122,15 @@ void BatchedCategorisationHandler::addCreator()
 	const std::string entityName = CreateNewUniqueTopologyName(nameRoot, name);
 	const std::string serviceName = Application::instance()->getServiceName();
 	
-	EntityBatchImporter importer(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, serviceName);
+	EntityBatchImporter importer(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 	importer.setName(entityName);
 	importer.createProperties();
+	importer.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		serviceName
+	);
 	importer.storeToDataBase();
 	
 	ot::NewModelStateInfo newEntities;
@@ -275,7 +281,7 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 	for (auto& elements : _allRelevantTableSelectionsByMSMD)
 	{
 		//First we create the new series metadata entity
-		std::unique_ptr<EntityParameterizedDataCategorization> newMSMD(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+		std::unique_ptr<EntityParameterizedDataCategorization> newMSMD(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr));
 		std::string nameBase = "";
 		if (m_uniqueEntityNameCreator.getNameBase().empty())
 		{
@@ -285,6 +291,12 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 		const std::string newSMDName = m_uniqueEntityNameCreator.create(m_rmdEntityName);
 
 		newMSMD->setName(newSMDName);
+		newMSMD->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			Application::instance()->getServiceName()
+		);
 		allMSMDNames += newMSMD->getName() + ", ";
 		newMSMD->CreateProperties(EntityParameterizedDataCategorization::measurementSeriesMetadata);
 		newMSMD->storeToDataBase();
@@ -311,9 +323,15 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 			//Now we check if we need to create a parameter/quantity entity as well
 			if (parameter == nullptr && newSelectionName.find(CategorisationFolderNames::getParameterFolderName()) != std::string::npos)
 			{
-				parameter.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+				parameter.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr));
 				parameter->CreateProperties(EntityParameterizedDataCategorization::parameter);
 				parameter->setName(prefix + "/" + CategorisationFolderNames::getParameterFolderName());
+				parameter->registerCallbacks(
+					ot::EntityCallbackBase::Callback::Properties |
+					ot::EntityCallbackBase::Callback::Selection |
+					ot::EntityCallbackBase::Callback::DataNotify,
+					Application::instance()->getServiceName()
+				);
 				parameter->storeToDataBase();
 				topoVers.push_back(parameter->getEntityStorageVersion());
 				topoIDs.push_back(parameter->getEntityID());
@@ -322,9 +340,15 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 
 			if (quantity == nullptr && newSelectionName.find(CategorisationFolderNames::getQuantityFolderName()) != std::string::npos)
 			{
-				quantity.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+				quantity.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr));
 				quantity->CreateProperties(EntityParameterizedDataCategorization::quantity);
 				quantity->setName(prefix + "/" + CategorisationFolderNames::getQuantityFolderName());
+				quantity->registerCallbacks(
+					ot::EntityCallbackBase::Callback::Properties |
+					ot::EntityCallbackBase::Callback::Selection |
+					ot::EntityCallbackBase::Callback::DataNotify,
+					Application::instance()->getServiceName()
+				);
 				quantity->storeToDataBase();
 				topoVers.push_back(quantity->getEntityStorageVersion());
 				topoIDs.push_back(quantity->getEntityID());
@@ -332,8 +356,14 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 			}
 
 			//Now we create a new selection range entity with new values
-			std::unique_ptr<EntityTableSelectedRanges> newSelection(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+			std::unique_ptr<EntityTableSelectedRanges> newSelection(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr));
 			newSelection->setName(newSelectionName);
+			newSelection->registerCallbacks(
+				ot::EntityCallbackBase::Callback::Properties |
+				ot::EntityCallbackBase::Callback::Selection |
+				ot::EntityCallbackBase::Callback::DataNotify,
+				Application::instance()->getServiceName()
+			);
 			std::string dataType = selection->getSelectedType();
 			const std::string scriptName = selection->getScriptName();
 			auto pythonScriptIt = _pythonScriptsByName.find(scriptName);

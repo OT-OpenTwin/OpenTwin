@@ -22,8 +22,8 @@
 class __declspec(dllexport) EntityBatchImporter : public EntityBase
 {
 public:
-	EntityBatchImporter() : EntityBatchImporter(0, nullptr, nullptr, nullptr, "") {};
-	EntityBatchImporter(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityBatchImporter() : EntityBatchImporter(0, nullptr, nullptr, nullptr) {};
+	EntityBatchImporter(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 
 	void createProperties(void);
 	bool getEntityBox(double& _xmin, double& _xmax, double& _ymin, double& _ymax, double& _zmin, double& _zmax) override { return false; };

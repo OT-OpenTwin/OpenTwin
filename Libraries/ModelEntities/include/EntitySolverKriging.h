@@ -28,8 +28,8 @@
 class __declspec(dllexport) EntitySolverKriging : public EntitySolver
 {
 public:
-	EntitySolverKriging() : EntitySolverKriging(0, nullptr, nullptr, nullptr, "") {};
-	EntitySolverKriging(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntitySolverKriging() : EntitySolverKriging(0, nullptr, nullptr, nullptr) {};
+	EntitySolverKriging(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntitySolverKriging();
 
 	virtual std::string getClassName(void) const override { return "EntitySolverKriging"; } ;

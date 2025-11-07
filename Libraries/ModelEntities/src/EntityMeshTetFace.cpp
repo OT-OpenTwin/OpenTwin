@@ -27,8 +27,8 @@
 
 static EntityFactoryRegistrar<EntityMeshTetFace> registrar("EntityMeshTetFace");
 
-EntityMeshTetFace::EntityMeshTetFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner),
+EntityMeshTetFace::EntityMeshTetFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms),
 	surfaceId(0)
 {
 

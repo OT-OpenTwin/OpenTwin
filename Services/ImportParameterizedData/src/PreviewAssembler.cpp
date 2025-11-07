@@ -23,23 +23,6 @@
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-std::shared_ptr<EntityParameterizedDataPreviewTable> PreviewAssembler::AssembleTable(ot::UIDList& existingRanges)
-{
-	LoadSelectedRangesAndTableSources(existingRanges);
-	std::shared_ptr<EntityParameterizedDataPreviewTable> newPreviewTable(new EntityParameterizedDataPreviewTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-	std::shared_ptr<EntityResultTableData<std::string>> newPreviewTableData(new EntityResultTableData<std::string>(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-	//CountPreviewFieldsFromSelectedRanges();
-	InitiatePreviewTable(newPreviewTableData);
-	
-	AddFieldsToTable(newPreviewTableData);
-
-
-	newPreviewTableData->storeToDataBase();
-	newPreviewTable->setTableData(newPreviewTableData);
-
-	return newPreviewTable;
-}
-
 void PreviewAssembler::LoadSelectedRangesAndTableSources(ot::UIDList & existingRanges)
 {
 	Application::instance()->prefetchDocumentsFromStorage(existingRanges);

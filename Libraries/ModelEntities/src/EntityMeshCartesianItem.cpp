@@ -29,8 +29,8 @@
 
 static EntityFactoryRegistrar<EntityMeshCartesianItem> registrar("EntityMeshCartesianItem");
 
-EntityMeshCartesianItem::EntityMeshCartesianItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner),
+EntityMeshCartesianItem::EntityMeshCartesianItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms),
 	mesh(nullptr),
 	colorRGB{0.0, 0.0, 0.0}
 {

@@ -148,11 +148,17 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 	ot::UID facetsID = modelComponent->createEntityUID();
 
 	// Let's create the new geometry item
-	EntityGeometry *geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr, serviceName);
+	EntityGeometry *geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr);
 	geometryEntity->setName(itemName);
 	geometryEntity->setEditable(true);
 	geometryEntity->setBrep(shape);
 	geometryEntity->getBrepEntity()->setTransform(transform);
+	geometryEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		serviceName
+	);
 
 	applyFaceNames(geometryEntity, shape, faceNames);
 

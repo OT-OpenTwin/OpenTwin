@@ -90,7 +90,7 @@ public:
 	void        deleteProperty(const std::list<ot::UID>& entityIDList, const std::string &propertyName, const std::string& propertyGroup);
 
 	bool entitiesNeedUpdate();
-	void updateEntities(bool itemsVisible);
+	void updateEntityProperties(bool itemsVisible);
 
 	void deleteEntity(EntityBase *entity);
 	void facetEntity(EntityGeometry *entity, double deflection, bool isHidden, bool notifyViewer);
@@ -281,7 +281,7 @@ private:
 	void recursivelyAddEntityInfo(EntityBase *entity, std::map<ot::UID, ot::UID> &entityVersionMap);
 	void determineIDandVersionForEntityWithChildren(EntityBase *entity, std::list<ot::UID> &entityInfoIDList, std::list<ot::UID> &entityInfoVersionList);
 	void otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> otherServicesUpdate, bool itemsVisible);
-	void performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::string owningService);
+	void performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::list<std::string> callbackServices);
 	bool updateNumericalValues(EntityBase *entity);
 	bool evaluateExpressionDouble(const std::string &expression, double &value, ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup);
 	void setParameter(const std::string &name, double value, EntityParameter *parameter);

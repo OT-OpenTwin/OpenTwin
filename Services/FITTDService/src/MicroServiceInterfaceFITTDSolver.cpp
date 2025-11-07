@@ -563,7 +563,13 @@ void MicroServiceInterfaceFITTDSolver::HandleResultPipelines()
 	ot::components::ModelComponent* modelComponent = Application::instance().getModelComponent();
 	const std::string serviceName = Application::instance().getServiceName();
 
-	ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, serviceName);
+	ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent);
+	resultCollectionExtender.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		Application::instance().getServiceName()
+	);
 	PlotBuilder plotBuilder(resultCollectionExtender);
 
 	for (auto pipeLine : pipelines)

@@ -69,7 +69,7 @@ void SelectionHandler::clearAllBuffer()
 	m_ownersWithSelection.clear();
 }
 
-void SelectionHandler::deselectEntity(ot::UID _entityID, const std::string& _owner)
+void SelectionHandler::deselectEntity(ot::UID _entityID)
 {
 	std::lock_guard<std::mutex> guard(m_changeSelectedEntitiesBuffer);
 
@@ -153,10 +153,8 @@ void SelectionHandler::notifyOwners()
 	for (auto entityID : m_selectedEntityIDs)
 	{
 		EntityBase* entity = model->getEntityByID(entityID);
-		const std::string ownerName = entity->getOwningService();
-		if (ownerName != modelServiceName)
-		{
-			ownerEntityListMap[ownerName].push_back(ot::EntityInformation(entity));
+		for (const std::string& cb : entity->getServicesForCallback(EntityBase::Callback::Selection)) {
+			ownerEntityListMap[cb].push_back(ot::EntityInformation(entity));
 		}
 	}
 
@@ -208,7 +206,9 @@ void SelectionHandler::notifyOwnerWorker()
 				}
 				notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfo, entityInfos, notify.GetAllocator());
 
-				Application::instance()->getNotifier()->sendMessageToService(true, owner.first, notify);
+				if (owner.first != OT_INFO_SERVICE_TYPE_MODEL) {
+					Application::instance()->getNotifier()->sendMessageToService(true, owner.first, notify);
+				}
 			}
 		}
 		else {

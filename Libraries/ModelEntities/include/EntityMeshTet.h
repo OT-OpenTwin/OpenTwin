@@ -31,8 +31,8 @@ class EntityMeshTetFace;
 class __declspec(dllexport) EntityMeshTet : public EntityMesh
 {
 public:
-	EntityMeshTet() : EntityMeshTet(0, nullptr, nullptr, nullptr, "") {};
-	EntityMeshTet(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityMeshTet() : EntityMeshTet(0, nullptr, nullptr, nullptr) {};
+	EntityMeshTet(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityMeshTet();
 
 	void createProperties(const std::string materialsFolder, ot::UID materialsFolderID);

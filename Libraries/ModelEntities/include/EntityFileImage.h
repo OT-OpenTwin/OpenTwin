@@ -25,8 +25,8 @@
 
 class OT_MODELENTITIES_API_EXPORT EntityFileImage : public EntityFile, public IVisualisationImage {
 public:
-	EntityFileImage() : EntityFileImage(0, nullptr, nullptr, nullptr, "") {};
-	EntityFileImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityFileImage() : EntityFileImage(0, nullptr, nullptr, nullptr) {};
+	EntityFileImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 	virtual ~EntityFileImage() = default;
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };

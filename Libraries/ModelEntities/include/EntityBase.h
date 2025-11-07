@@ -20,21 +20,26 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-#include <string>
-#include <list>
-
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-
-#include "EntityProperties.h"
+// OpenTwin header
 #include "ModelState.h"
-#include "EntityFactoryRegistrar.h"
 #include "OldTreeIcon.h"
+#include "EntityProperties.h"
+#include "EntityCallbackBase.h"
+#include "EntityFactoryRegistrar.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/BasicEntityInformation.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
+
+// BSON header
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+
+// std header
+#include <map>
+#include <list>
+#include <string>
 
 class EntityBase;
 
@@ -54,11 +59,11 @@ public:
 
 };
 
-//! \brief The Entity class is the base class for model entities and provides basic access properties to model entities. 
-class  OT_MODELENTITIES_API_EXPORT EntityBase
+//! @brief The Entity class is the base class for model entities and provides basic access properties to model entities. 
+class  OT_MODELENTITIES_API_EXPORT EntityBase : public ot::EntityCallbackBase
 {
 public:
-	EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 	EntityBase(const EntityBase& _other) = default;
 	EntityBase(EntityBase&& _other) = default;
 
@@ -70,7 +75,7 @@ public:
 	void setName(std::string n) { m_name = n; setModified(); };
 	std::string getName() const { return m_name; };
 
-	//! \brief Returns the name of the entity without the parent entity names.
+	//! @brief Returns the name of the entity without the parent entity names.
 	//! If the name is "root/entity" then the function will return "entity".
 	std::string getNameOnly() const;
 
@@ -142,9 +147,6 @@ public:
 	enum entityType {TOPOLOGY, DATA};
 	virtual entityType getEntityType() const = 0;
 
-	void setOwningService(const std::string &owner) { m_owningService = owner; };
-	const std::string &getOwningService() { return m_owningService; };
-
 	virtual void detachFromHierarchy();
 
 	void setDeletable(bool deletable) { m_isDeletable = deletable; };
@@ -170,6 +172,8 @@ public:
 	}
 
 protected:
+	virtual void callbackDataChanged() override { setModified(); };
+
 	virtual int getSchemaVersion() { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) {};
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
@@ -193,7 +197,6 @@ private:
 	bool				 m_manageParentVisibility;
 	bool				 m_manageChildVisibility;
 	EntityProperties     m_properties;
-	std::string			 m_owningService;
 
 	// Temporary attributes
 	EntityBase*          m_parentEntity;
@@ -202,3 +205,4 @@ private:
 	ModelState*          m_modelState;
 };
 
+OT_ADD_FLAG_FUNCTIONS(EntityBase::Callback, EntityBase::CallbackFlags)

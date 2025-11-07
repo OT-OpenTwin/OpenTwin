@@ -49,8 +49,8 @@
 static EntityFactoryRegistrar<EntityFileText> registrar(EntityFileText::className());
 static EntityFactoryRegistrar<EntityFileText> extensionRegistrar({ ot::FileExtension::Text, ot::FileExtension::Markdown, ot::FileExtension::JSON });
 
-EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
-	: EntityFile(_ID, _parent, _obs, _ms, _owner)
+EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+	: EntityFile(_ID, _parent, _obs, _ms)
 {
 }
 
@@ -160,11 +160,6 @@ ot::TextEditorCfg EntityFileText::createConfig(bool _includeData) {
 	return result;
 }
 
-ot::ContentChangedHandling EntityFileText::getTextContentChangedHandling()
-{
-	return m_contentChangedHandlingText;
-}
-
 bool EntityFileText::updateFromProperties()
 {
 	assert(getProperties().anyPropertyNeedsUpdate());
@@ -184,12 +179,6 @@ bool EntityFileText::updateFromProperties()
 	getProperties().forceResetUpdateForAllProperties();
 
 	return false;
-}
-
-void EntityFileText::setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling)
-{
-	m_contentChangedHandlingText = _contentChangedHandling;
-	setModified();
 }
 
 void EntityFileText::setSpecializedProperties()
@@ -241,7 +230,6 @@ void EntityFileText::addStorageData(bsoncxx::builder::basic::document& _storage)
 	ot::TextEncoding encoding;
 	std::string encodingStr = encoding.getString(m_encoding);
 	_storage.append(bsoncxx::builder::basic::kvp("TextEncoding", encodingStr));
-	_storage.append(bsoncxx::builder::basic::kvp("ContentChangedHandler", static_cast<int32_t>(m_contentChangedHandlingText)));
 }
 
 void EntityFileText::readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap)
@@ -249,25 +237,7 @@ void EntityFileText::readSpecificDataFromDataBase(bsoncxx::document::view& _doc_
 	EntityFile::readSpecificDataFromDataBase(_doc_view,_entityMap);
 	
 	const std::string encodingStr(_doc_view["TextEncoding"].get_utf8().value.data());
-	int32_t contentChangedHandling = _doc_view["ContentChangedHandler"].get_int32().value;
-
-	if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::ModelServiceSavesNotifyOwner))
-	{
-		m_contentChangedHandlingText = ot::ContentChangedHandling::ModelServiceSavesNotifyOwner;
-	}
-	else if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::OwnerHandles))
-	{
-		m_contentChangedHandlingText = ot::ContentChangedHandling::OwnerHandles;
-	}
-	else if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::ModelServiceSaves))
-	{
-		m_contentChangedHandlingText = ot::ContentChangedHandling::ModelServiceSaves;
-	}
-	else
-	{
-		assert(false);
-	}
-
+	
 	ot::TextEncoding encoding;
 	m_encoding = encoding.getType(encodingStr);
 }

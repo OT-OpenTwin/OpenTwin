@@ -424,11 +424,11 @@ public:
 	//! \brief Clears the graphics picker and stored service picker data.
 	void clearGraphicsPickerData();
 
-	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const std::string& _pickerKey, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig);
+	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _entityName, const QString& _title, const std::string& _pickerKey, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig);
 
 	ot::GraphicsViewView* findGraphicsEditor(const std::string& _entityName, const ot::UIDList& _visualizingEntities);
 
-	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const std::string& _pickerKey, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig);
+	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const std::string& _pickerKey, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig);
 
 	std::list<ot::GraphicsViewView*> getAllGraphicsEditors();
 
@@ -436,11 +436,11 @@ public:
 
 	// Text Editor
 
-	ot::TextEditorView* createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
+	ot::TextEditorView* createNewTextEditor(const ot::TextEditorCfg& _config, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
 	ot::TextEditorView* findTextEditor(const std::string& _entityName, const ot::UIDList& _visualizingEntities);
 
-	ot::TextEditorView* findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
+	ot::TextEditorView* findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
 	void closeTextEditor(const std::string& _entityName);
 
@@ -450,11 +450,11 @@ public:
 
 	// Table
 
-	ot::TableView* createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
+	ot::TableView* createNewTable(const ot::TableCfg& _config, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
 	ot::TableView* findTable(const std::string& _entityName, const ot::UIDList& _visualizingEntities);
 
-	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
+	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
 	void closeTable(const std::string& _name);
 
@@ -462,11 +462,11 @@ public:
 
 	// Plot
 
-	ot::PlotView* createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
+	ot::PlotView* createNewPlot(const ot::Plot1DCfg& _config, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
 	ot::PlotView* findPlot(const std::string& _entityName, const ot::UIDList& _visualizingEntities);
 
-	ot::PlotView* findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
+	ot::PlotView* findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
 	void closePlot(const std::string& _name);
 

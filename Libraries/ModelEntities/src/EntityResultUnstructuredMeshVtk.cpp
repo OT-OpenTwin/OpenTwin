@@ -23,8 +23,8 @@
 
 static EntityFactoryRegistrar<EntityResultUnstructuredMeshVtk> registrar("EntityResultUnstructuredMeshVtk");
 
-EntityResultUnstructuredMeshVtk::EntityResultUnstructuredMeshVtk(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
-	:EntityBase(ID,parent,obs,ms,owner)
+EntityResultUnstructuredMeshVtk::EntityResultUnstructuredMeshVtk(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityBase(ID, parent, obs, ms)
 {}
 
 EntityResultUnstructuredMeshVtk::~EntityResultUnstructuredMeshVtk()

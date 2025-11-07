@@ -22,8 +22,8 @@
 class __declspec(dllexport) EntityBlockCircuitCurrentMeter : public EntityBlockCircuitElement
 {
 public:
-	EntityBlockCircuitCurrentMeter() : EntityBlockCircuitCurrentMeter(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockCircuitCurrentMeter() : EntityBlockCircuitCurrentMeter(0, nullptr, nullptr, nullptr) {};
+	EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 
 	static std::string className() { return "EntityBlockCircuitCurrentMeter"; }
 	virtual std::string getClassName(void) const override { return EntityBlockCircuitCurrentMeter::className(); };

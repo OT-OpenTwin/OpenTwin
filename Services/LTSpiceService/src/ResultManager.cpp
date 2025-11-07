@@ -17,6 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
+#include "Application.h"
 #include "ResultManager.h"
 
 #include "ParametricCombination.h"
@@ -300,7 +301,13 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 	//First we access the result collection of the current project
 	std::string collectionName = DataBase::instance().getCollectionName();
 
-	ResultCollectionExtender resultCollectionExtender(collectionName, *_modelComponent, OT_INFO_SERVICE_TYPE_LTSPICE);
+	ResultCollectionExtender resultCollectionExtender(collectionName, *_modelComponent);
+	resultCollectionExtender.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		Application::instance().getServiceName()
+	);
 	resultCollectionExtender.setSaveModel(false);
 
 	std::string seriesName = CreateNewUniqueTopologyName(ot::FolderNames::DatasetFolder, "LTSpice Imported Results");

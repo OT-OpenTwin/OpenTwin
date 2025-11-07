@@ -26,8 +26,8 @@
 
 static EntityFactoryRegistrar<EntityVisCartesianFaceScalar> registrar("EntityVisCartesianFaceScalar");
 
-EntityVisCartesianFaceScalar::EntityVisCartesianFaceScalar(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityVis2D3D(ID, parent, obs, ms, owner)
+EntityVisCartesianFaceScalar::EntityVisCartesianFaceScalar(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityVis2D3D(ID, parent, obs, ms)
 {
 }
 

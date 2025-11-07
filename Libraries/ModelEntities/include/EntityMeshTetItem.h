@@ -38,8 +38,8 @@ class EntityMeshTetItemDataTetedges;
 class __declspec(dllexport) EntityMeshTetItem : public EntityBase
 {
 public:
-	EntityMeshTetItem() : EntityMeshTetItem(0, nullptr, nullptr, nullptr, "") {};
-	EntityMeshTetItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
+	EntityMeshTetItem() : EntityMeshTetItem(0, nullptr, nullptr, nullptr) {};
+	EntityMeshTetItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityMeshTetItem();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

@@ -23,8 +23,8 @@
 
 static EntityFactoryRegistrar<EntityResult3DData> registrar("EntityResult3DData");
 
-EntityResult3DData::EntityResult3DData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
-	:EntityBase(ID,parent,obs,ms,owner)
+EntityResult3DData::EntityResult3DData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms)
+	:EntityBase(ID,parent,obs,ms)
 {}
 
 EntityResult3DData::~EntityResult3DData()

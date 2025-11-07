@@ -17,16 +17,15 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "EntitySolverKriging.h"
 #include "OldTreeIcon.h"
+#include "EntitySolverKriging.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
 static EntityFactoryRegistrar<EntitySolverKriging> registrar("EntitySolverKriging");
 
-EntitySolverKriging::EntitySolverKriging(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntitySolver(ID, parent, obs, ms, owner)
+EntitySolverKriging::EntitySolverKriging(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntitySolver(ID, parent, obs, ms)
 {
 }
 

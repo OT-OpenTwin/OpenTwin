@@ -23,8 +23,8 @@
 
 static EntityFactoryRegistrar<EntityResultUnstructuredMeshData> registrar("EntityResultUnstructuredMeshData");
 
-EntityResultUnstructuredMeshData::EntityResultUnstructuredMeshData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
-	:EntityBase(ID,parent,obs,ms,owner)
+EntityResultUnstructuredMeshData::EntityResultUnstructuredMeshData(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityBase(ID, parent, obs, ms)
 {}
 
 EntityResultUnstructuredMeshData::~EntityResultUnstructuredMeshData()

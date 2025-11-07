@@ -23,8 +23,8 @@
 
 static EntityFactoryRegistrar<EntityParameterizedDataCategorization> registrar("EntityParameterizedDataCategorization");
 
-EntityParameterizedDataCategorization::EntityParameterizedDataCategorization(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
-	:EntityContainer(ID, parent, obs,ms,owner)
+EntityParameterizedDataCategorization::EntityParameterizedDataCategorization(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityContainer(ID, parent, obs, ms)
 {
 }
 

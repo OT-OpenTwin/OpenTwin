@@ -34,8 +34,8 @@
 
 static EntityFactoryRegistrar<EntityBrep> registrar(EntityBrep::className());
 
-EntityBrep::EntityBrep(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner)
+EntityBrep::EntityBrep(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms)
 {
 	transformMatrix = gp_Trsf();
 }

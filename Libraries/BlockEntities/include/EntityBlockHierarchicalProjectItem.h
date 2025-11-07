@@ -26,8 +26,8 @@ class EntityBinaryData;
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalProjectItem : public EntityBlock {
 public:
-	EntityBlockHierarchicalProjectItem() : EntityBlockHierarchicalProjectItem(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockHierarchicalProjectItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
+	EntityBlockHierarchicalProjectItem() : EntityBlockHierarchicalProjectItem(0, nullptr, nullptr, nullptr) {};
+	EntityBlockHierarchicalProjectItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 
 	static std::string className() { return "EntityBlockHierarchicalProjectItem"; }
 	virtual std::string getClassName(void) const override { return EntityBlockHierarchicalProjectItem::className(); };

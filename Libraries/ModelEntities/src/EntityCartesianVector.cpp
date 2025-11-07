@@ -27,8 +27,8 @@
 
 static EntityFactoryRegistrar<EntityCartesianVector> registrar(EntityCartesianVector::className());
 
-EntityCartesianVector::EntityCartesianVector(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityCompressedVector(ID, parent, obs, ms, owner)
+EntityCartesianVector::EntityCartesianVector(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityCompressedVector(ID, parent, obs, ms)
 {
 }
 

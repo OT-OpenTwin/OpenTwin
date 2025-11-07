@@ -33,8 +33,8 @@ class __declspec(dllexport) EntityWithDynamicFields : public EntityContainer
 {
 	friend class FixtureEntityWithDynamicFields;
 public:
-	EntityWithDynamicFields() : EntityWithDynamicFields(0, nullptr, nullptr, nullptr, "") {};
-	EntityWithDynamicFields(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, const std::string& owner);
+	EntityWithDynamicFields() : EntityWithDynamicFields(0, nullptr, nullptr, nullptr) {};
+	EntityWithDynamicFields(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms);
 
 	void InsertInField(std::string fieldName, std::list<ot::Variable>&& values, std::string documentName = "/");
 	void InsertInField(std::string fieldName, const std::list<ot::Variable>& values, std::string documentName = "/");
@@ -50,7 +50,7 @@ protected:
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:
-	std::map<std::string, GenericBsonDocument> _bsonDocumentsByName;
+	std::map<std::string, GenericBsonDocument> m_bsonDocumentsByName;
 	void OrderGenericDocumentsHierarchical();
 	void AddGenericDocumentToBsonDocument(const GenericBsonDocument* genericDocument, bsoncxx::builder::basic::document& bsonDocument);
 	void ExtractElementValues(const bsoncxx::document::element& element, std::string documentName);

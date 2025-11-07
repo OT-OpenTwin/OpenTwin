@@ -19,24 +19,27 @@
 
 #pragma once
 
-#include "ResultCollectionMetadataAccess.h"
+// OpenTwin header
+#include "MetadataEntry.h"
+#include "MetadataSeries.h"
 #include "MetadataCampaign.h"
 #include "MetadataQuantity.h"
 #include "MetadataParameter.h"
-#include "MetadataSeries.h"
-#include "MetadataEntry.h"
 #include "QuantityContainer.h"
+#include "EntityCallbackBase.h"
 #include "ResultImportLogger.h"
-
 #include "DatasetDescription.h"
 #include "ResultDataStorageAPI.h"
-#include <string>
+#include "ResultCollectionMetadataAccess.h"
+
 #include "OTServiceFoundation/ApplicationBase.h"
 
-class __declspec(dllexport) ResultCollectionExtender : public ResultCollectionMetadataAccess
-{
+// std header
+#include <string>
+
+class __declspec(dllexport) ResultCollectionExtender : public ResultCollectionMetadataAccess, public ot::EntityCallbackBase {
 public:
-	ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, const std::string& _ownerServiceName);
+	ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent);
 	ResultCollectionExtender(ot::ApplicationBase* _applicationBase);
 	ResultCollectionExtender(const ResultCollectionExtender& _other) = delete;
 	ResultCollectionExtender& operator=(const ResultCollectionExtender& _other) = delete;
@@ -64,7 +67,6 @@ public:
 
 	ResultImportLogger& getLogger() { return m_logger; }
 
-	const std::string getOwner() { return m_ownerServiceName; }
 protected:
 	inline bool invariant() { return true; }
 
@@ -73,7 +75,6 @@ protected:
 	std::list<const MetadataSeries*> m_seriesMetadataForStorage;
 	
 	std::map<std::string,uint32_t> m_parameterBuckets;
-	const std::string m_ownerServiceName;
 
 	ResultImportLogger m_logger;
 

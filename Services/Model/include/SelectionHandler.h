@@ -50,7 +50,7 @@ public:
 	void processSelectionChanged(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>&  _selectedVisibleEntityIDs);
 	void clearAllBufferAndNotify();
 	void clearAllBuffer();
-	void deselectEntity(ot::UID _entityID, const std::string& _owner);
+	void deselectEntity(ot::UID _entityID);
 
 	std::list<ot::UID> getSelectedEntityIDs();
 	std::list<ot::UID> getSelectedVisibleEntityIDs();

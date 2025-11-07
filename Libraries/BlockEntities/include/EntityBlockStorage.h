@@ -37,8 +37,8 @@ struct __declspec(dllexport) QuantityProperties
 class __declspec(dllexport) EntityBlockStorage : public EntityBlock
 {
 public:
-	EntityBlockStorage() : EntityBlockStorage(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockStorage() : EntityBlockStorage(0, nullptr, nullptr, nullptr) {};
+	EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
 	static std::string className() { return "EntityBlockStorage"; }

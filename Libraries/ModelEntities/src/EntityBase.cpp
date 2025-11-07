@@ -29,7 +29,7 @@
 
 _declspec(dllexport) DataStorageAPI::UniqueUIDGenerator *globalUidGenerator = nullptr;
 
-EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner) :
+EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms) :
 	m_entityID(_ID),
 	m_entityStorageVersion(0),
 	m_initiallyHidden(false),
@@ -41,7 +41,6 @@ EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	m_manageParentVisibility(true),
 	m_manageChildVisibility(true),
 	m_modelState(_ms),
-	m_owningService(_owner),
 	m_name(""),
 	m_isDeletable(true)
 {}
@@ -146,49 +145,51 @@ void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view,
 		m_initiallyHidden      = doc_view["initiallyHidden"].get_bool();
 		auto bsonObj           = doc_view["Properties"].get_document();
 
-		m_owningService = "Model";
-		try {
-			m_owningService = doc_view["Owner"].get_utf8().value.data();
+		clearCallbacks(true);
+
+		auto docIt = doc_view.find("Owner");
+		if (docIt != doc_view.end()) {
+			registerCallbacks(Callback::Properties | Callback::Selection | Callback::DataNotify, docIt->get_utf8().value.data(), true);
 		}
-		catch (std::exception)
-		{
+		
+		docIt = doc_view.find("Callbacks");
+		if (docIt != doc_view.end()) {
+			for (auto&& it : docIt->get_array().value) {
+				auto kvp = it.get_document().view();
+				CallbackFlags cb(DataBase::getIntFromView(kvp, "Callbacks"));
+				std::string serviceName = kvp["ServiceName"].get_utf8().value.data();
+				registerCallbacks(cb, serviceName, true);
+			}
 		}
 
 		m_isEditable = false;
-		try {
-			m_isEditable = doc_view["isEditable"].get_bool();
+		docIt = doc_view.find("isEditable");
+		if (docIt != doc_view.end()) {
+			m_isEditable = docIt->get_bool();
 		}
-		catch (std::exception)
-		{
-		}
-
+		
 		m_selectChildren = true;
-		try {
-			m_selectChildren = doc_view["selectChildren"].get_bool();
+		docIt = doc_view.find("selectChildren");
+		if (docIt != doc_view.end()) {
+			m_selectChildren = docIt->get_bool();
 		}
-		catch (std::exception)
-		{
-		}
-
+		
 		m_manageParentVisibility = true;
-		try {
-			m_manageParentVisibility = doc_view["manageParentVisibility"].get_bool();
+		docIt = doc_view.find("manageParentVisibility");
+		if (docIt != doc_view.end()) {
+			m_manageParentVisibility = docIt->get_bool();
 		}
-		catch (std::exception)
-		{
-		}
-
+		
 		m_manageChildVisibility = true;
-		try {
-			m_manageChildVisibility = doc_view["manageChildVisibility"].get_bool();
-		}
-		catch (std::exception)
-		{
+		docIt = doc_view.find("manageChildVisibility");
+		if (docIt != doc_view.end()) {
+			m_manageChildVisibility = docIt->get_bool();
 		}
 
 		m_isDeletable = true;
-		if (doc_view.find("isDeletable") != doc_view.end()) {
-			m_isDeletable = doc_view["isDeletable"].get_bool();
+		docIt = doc_view.find("isDeletable");
+		if (docIt != doc_view.end()) {
+			m_isDeletable = docIt->get_bool();
 		}
 
 		std::string propertiesJSON = bsoncxx::to_json(bsonObj);
@@ -284,9 +285,36 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 
 	doc.append(bsoncxx::builder::basic::kvp("SchemaType", getClassName()));
 
-	assert(!m_owningService.empty());
-
 	bsoncxx::document::value bsonObj = bsoncxx::from_json(m_properties.createJSON(nullptr, false));
+
+	// Prepare the callback array
+	std::map<std::string, CallbackFlags> serviceCallbacksMap;
+	for (const auto& pair : getCallbackData()) {
+		Callback cb = pair.first;
+		const std::list<std::string>& services = pair.second;
+		for (const auto& serviceName : services) {
+			auto it = serviceCallbacksMap.find(serviceName);
+			if (it != serviceCallbacksMap.end()) {
+				it->second |= cb;
+
+			}
+			else {
+				serviceCallbacksMap.emplace(serviceName, cb);
+			}
+		}
+	}
+
+	// Fill the callback array
+	bsoncxx::builder::basic::array callbackArray;
+
+	for (const auto& pair : serviceCallbacksMap) {
+		const std::string& serviceName = pair.first;
+		CallbackFlags cb = pair.second;
+		bsoncxx::builder::basic::document cbDoc;
+		cbDoc.append(bsoncxx::builder::basic::kvp("ServiceName", serviceName));
+		cbDoc.append(bsoncxx::builder::basic::kvp("Callbacks", static_cast<int64_t>(cb)));
+		callbackArray.append(cbDoc.extract());
+	}
 
 	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_" + getClassName(), getSchemaVersion()),
 		bsoncxx::builder::basic::kvp("EntityID", (long long)m_entityID),
@@ -298,8 +326,8 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 		bsoncxx::builder::basic::kvp("selectChildren", m_selectChildren),
 		bsoncxx::builder::basic::kvp("manageParentVisibility", m_manageParentVisibility),
 		bsoncxx::builder::basic::kvp("manageChildVisibility", m_manageChildVisibility),
-		bsoncxx::builder::basic::kvp("Owner", m_owningService),
-		bsoncxx::builder::basic::kvp("Properties", bsonObj)
+		bsoncxx::builder::basic::kvp("Properties", bsonObj),
+		bsoncxx::builder::basic::kvp("Callbacks", callbackArray)
 	);
 
 	addStorageData(doc);

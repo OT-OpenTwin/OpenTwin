@@ -32,8 +32,8 @@
 
 static EntityFactoryRegistrar<EntityBlockCircuitGND> registrar(EntityBlockCircuitGND::className());
 
-EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	: EntityBlockCircuitElement(ID, parent, obs, ms, owner)
+EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	: EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	OldTreeIcon icon;
 	icon.visibleIcon = "GND";

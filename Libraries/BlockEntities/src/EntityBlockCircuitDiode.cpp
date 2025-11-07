@@ -30,8 +30,8 @@
 
 static EntityFactoryRegistrar<EntityBlockCircuitDiode> registrar(EntityBlockCircuitDiode::className());
 
-EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner) 
-	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
+EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) 
+	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	OldTreeIcon icon;
 	icon.visibleIcon = "Diod2";

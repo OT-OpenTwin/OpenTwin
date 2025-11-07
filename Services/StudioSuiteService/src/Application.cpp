@@ -97,6 +97,11 @@ Application::~Application()
 
 }
 
+Application& Application::instance() {
+	static Application g_instance;
+	return g_instance;
+}
+
 // ##################################################################################################################################
 
 // Required functions
@@ -576,8 +581,14 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	if (material == nullptr)
 	{
 		// We have a new material to create
-		material = new EntityMaterial(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
+		material = new EntityMaterial(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 		material->setName("Materials/" + materialName);
+		material->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			getServiceName()
+		);
 		material->createProperties();
 
 		EntityPropertiesSelection* type = dynamic_cast<EntityPropertiesSelection*>(material->getProperties().getProperty("Material type"));
@@ -678,11 +689,11 @@ void Application::changeHistory(const std::string& content)
 		else
 		{
 			// A new history item needs to be created
-			history = new EntityFileText(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+			history = new EntityFileText(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 			history->setFileProperties("", "history", "txt");
 			history->setName("History");
 
-			data = std::make_shared<EntityBinaryData>(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+			data = std::make_shared<EntityBinaryData>(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 		}
 
 		data->setData(content.data(), content.size());
@@ -735,9 +746,15 @@ void Application::processParameterBuffer(std::stringstream& buffer, std::map<std
 		if (parameter == nullptr)
 		{
 			// We have a new parameter to create
-			parameter = new EntityParameter(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
+			parameter = new EntityParameter(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 			parameter->setName("Parameters/" + parameterName);
 			parameter->createProperties();
+			parameter->registerCallbacks(
+				ot::EntityCallbackBase::Callback::Properties |
+				ot::EntityCallbackBase::Callback::Selection |
+				ot::EntityCallbackBase::Callback::DataNotify,
+				getServiceName()
+			);
 
 			EntityPropertiesString* stringValue = dynamic_cast<EntityPropertiesString*>(parameter->getProperties().getProperty("Value"));
 			EntityPropertiesDouble* doubleValue = dynamic_cast<EntityPropertiesDouble*>(parameter->getProperties().getProperty("#Value"));
@@ -941,9 +958,15 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 	ot::UID entityID = getModelComponent()->createEntityUID();
 	ot::UID facetsID = getModelComponent()->createEntityUID();
 
-	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, getServiceName());
+	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr);
 	entityGeom->setName(otName);
 	entityGeom->setEditable(false);
+	entityGeom->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
 
 	entityGeom->createProperties(colorR, colorG, colorB, materialsFolder, materialsFolderID);
 

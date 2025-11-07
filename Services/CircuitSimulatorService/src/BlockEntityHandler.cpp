@@ -61,12 +61,16 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 	std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 
 	blockEntity->setEditable(true);
-	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+	blockEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection,
+		Application::instance()->getServiceName()
+	);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	blockEntity->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	// Here i want to add the items to the corresponding editor	
 
-	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
+	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr));
 	blockCoordinates->setCoordinates(position);
 	blockCoordinates->storeToDataBase();
 
@@ -212,7 +216,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		//std::string connectionName = ot::EntityName::createUniqueEntityName(connectionFolderName, "Connection", connectionItems);
 	
 		//Here i create the connectionEntity
-		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		connectionEntity.createProperties();
 		
 		
@@ -229,9 +233,12 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionEntity.setName(connectionName);
 		connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
 		connectionEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
-		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		connectionEntity.registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection,
+			Application::instance()->getServiceName()
+		);
 
-		
 		if (blockEntitiesByBlockID.find(newConnection.getOriginUid()) != blockEntitiesByBlockID.end()) {
 			auto& blockEntity = blockEntitiesByBlockID[newConnection.getOriginUid()];
 		}

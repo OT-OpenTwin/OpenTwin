@@ -22,8 +22,8 @@
 class __declspec(dllexport) EntityBlockCircuitVoltageMeter : public EntityBlockCircuitElement
 {
 public:
-	EntityBlockCircuitVoltageMeter() : EntityBlockCircuitVoltageMeter(0, nullptr, nullptr, nullptr, "") {};
-	EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
+	EntityBlockCircuitVoltageMeter() : EntityBlockCircuitVoltageMeter(0, nullptr, nullptr, nullptr) {};
+	EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 
 	static std::string className() { return "EntityBlockCircuitVoltageMeter"; }
 	virtual std::string getClassName(void) const override { return "EntityBlockCircuitVoltageMeter"; };

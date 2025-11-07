@@ -30,8 +30,8 @@
 
 static EntityFactoryRegistrar<EntityParameter> registrar("EntityParameter");
 
-EntityParameter::EntityParameter(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, owner)
+EntityParameter::EntityParameter(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityBase(ID, parent, obs, ms)
 {
 	
 }
