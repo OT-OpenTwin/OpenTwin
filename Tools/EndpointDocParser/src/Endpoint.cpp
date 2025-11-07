@@ -29,7 +29,7 @@
 #include <sstream>
 
 Endpoint::Endpoint()
-    : m_messageType(MessageType::mTLS) {
+    : m_messageType(MessageType::unknown) {
 }
 
 void Endpoint::printDetailedDescription() const {
@@ -42,6 +42,7 @@ std::string Endpoint::getMessageTypeString() const {
     switch (m_messageType) {
         case mTLS:    return "mTLS";
         case TLS:     return "TLS";
+        case unknown: return "Unknown";
         default:      return "Unknown";
     }
 }

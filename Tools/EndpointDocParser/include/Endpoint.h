@@ -30,7 +30,8 @@ class Endpoint {
 public:
 	enum MessageType {
 		mTLS,
-		TLS
+		TLS,
+		unknown
 	};
 
 	enum DescriptionType {

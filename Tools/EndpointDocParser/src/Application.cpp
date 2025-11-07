@@ -505,7 +505,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 				if (inApiBlock) {
 					// end of api block, add endpoint to service
 					
-					if (!endpoint.getName().empty()) {
+					if (!endpoint.getName().empty() && !endpoint.getBriefDescription().empty()) {
+						// set mTLS as the default message type, if no message type has been set
+						if (endpoint.getMessageType() == Endpoint::unknown) {
+							endpoint.setMessageType(Endpoint::mTLS);
+							
+							OT_LOG_W(_service.getName() + " " + endpoint.getAction() + ": message type was missing, default message type was set.");
+						}
+						
 						OT_LOG_D("The parsed endpoint is:");
 						endpoint.printEndpoint();
 
@@ -527,7 +534,27 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						inWarningBlock = false;
 					}
 					else {
-						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Invalid Endpoint can't be added to service: Endpoint has no name.");
+						std::vector<std::string> missingItems;
+
+						if (endpoint.getName().empty()) {
+							missingItems.push_back("name");
+						}
+						if (endpoint.getBriefDescription().empty()) {
+							missingItems.push_back("brief description");
+						}
+						if (endpoint.getMessageType() == Endpoint::unknown) {
+							missingItems.push_back("message type");
+						}
+
+						std::string missing;
+						for (size_t i = 0; i < missingItems.size(); ++i) {
+							if (i > 0) {
+								missing += (i == missingItems.size() - 1) ? " and " : ", ";
+							}
+							missing += missingItems[i];
+						}
+
+						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": Invalid Endpoint can't be added to service - missing: " + missing);
 						return true;
 					}
 				}
