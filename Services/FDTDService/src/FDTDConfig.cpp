@@ -23,6 +23,8 @@
 #include "Excitation/GaussianExcitation.h"
 #include "Excitation/SinusoidalExcitation.h"
 
+#include "Materials/MaterialBase.h"
+
 FDTDConfig::FDTDConfig()
 {
 }
@@ -149,6 +151,10 @@ void FDTDConfig::setFromEntity(EntityBase* _solverEntity) {
 	m_meshGrid.loadMeshGridDataFromEntity(_solverEntity);
 }
 
+void FDTDConfig::setMaterialProperties(std::map<std::string, EntityProperties> _materialProperties) {
+	m_materialProperties.loadMaterialData(_materialProperties);
+}
+
 tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLElement& _parentElement) {
 	// Defining the boundary names used for the solver XML parser
 	// These must match the expected names in the XML and will be different from the GUI
@@ -231,6 +237,9 @@ void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {
 	// load and write the excitation properties
 	auto& excitations = m_excitation->getExciteProperties();
 	CSXProperties->InsertEndChild(excitations.writeExciteProperties(*root));
+	auto materials = m_materialProperties.writeMaterialProperties(*root);
+	CSXProperties->InsertEndChild(materials);
+
 	CSX->InsertEndChild(CSXProperties);
 	auto CSXRectGrid = m_meshGrid.writeCSXMeshGrid(*root);
 	CSX->InsertEndChild(CSXRectGrid);

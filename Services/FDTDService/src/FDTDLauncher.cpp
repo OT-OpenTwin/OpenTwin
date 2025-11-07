@@ -88,6 +88,7 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 		// Create the FDTD configuration and write the XML file
 		FDTDConfig cfg;
 		cfg.setFromEntity(solverEntity);
+		cfg.setMaterialProperties(materialProperties);
 		tinyxml2::XMLDocument doc;
 		cfg.addToXML(doc);
 		std::string tempFilePath = tempDirPath + "\\FDTD.xml";
