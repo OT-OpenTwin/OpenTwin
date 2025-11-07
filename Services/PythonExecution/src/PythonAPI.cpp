@@ -26,6 +26,8 @@
 #include "EntityBuffer.h"
 #include "EntityFileText.h"
 #include "DataBuffer.h"
+#include "PackageHandler.h"
+
 
 PythonAPI::PythonAPI()
 {
@@ -150,6 +152,9 @@ void PythonAPI::loadScipt(const ot::EntityInformation& _entityInformation)
 		EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(_entityInformation.getEntityID(), _entityInformation.getEntityVersion());
 		std::unique_ptr<EntityFileText> script(dynamic_cast<EntityFileText*>(baseEntity));
 		std::string execution = script->getText();
+
+		PackageHandler packageHandler;
+		packageHandler.importMissingPackages(execution);
 
 		//First we add a module for the script execution. This way there won't be any namespace conflicts between the scripts since they are all executed in the same namespace
 		const std::string moduleName = PythonLoadedModules::instance().addModuleForEntity(_entityInformation);

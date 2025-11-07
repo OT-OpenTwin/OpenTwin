@@ -286,6 +286,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\CommunicationHandler.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\PackageHandler.cpp" />
     <ClCompile Include="src\PortData.cpp" />
     <ClCompile Include="src\EntityBuffer.cpp" />
     <ClCompile Include="src\DataBuffer.cpp" />
@@ -299,6 +300,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ActionHandler.h" />
+    <ClInclude Include="include\PackageHandler.h" />
     <ClInclude Include="include\Timeouts.h" />
     <QtMoc Include="include\Application.h" />
     <QtMoc Include="include\CommunicationHandler.h" />

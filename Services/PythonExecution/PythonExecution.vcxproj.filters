@@ -57,6 +57,9 @@
     <ClCompile Include="src\PythonException.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\PackageHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CPythonObject.h">
@@ -108,6 +111,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Timeouts.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PackageHandler.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
