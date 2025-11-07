@@ -234,8 +234,9 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 
 
 	for (auto& _connection : connections) {
-		EntityBlockConnection connectionEntity(model->createEntityUID(), nullptr, nullptr, nullptr, editor->getOwningService());
+		EntityBlockConnection connectionEntity(model->createEntityUID(), nullptr, nullptr, nullptr);
 		connectionEntity.createProperties();
+		connectionEntity.setCallbackData(editor->getCallbackData());
 		
 		auto connectionsFolder = model->getListOfFolderItems(_connectionData.getName() + "/" + m_connectionsFolder, true);
 		const std::string connectionName = CreateNewUniqueTopologyName(connectionsFolder, _connectionData.getName() + "/" + m_connectionsFolder, "Connection");
