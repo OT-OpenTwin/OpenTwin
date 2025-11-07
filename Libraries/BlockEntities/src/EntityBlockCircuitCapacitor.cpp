@@ -40,12 +40,12 @@ EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase*
 
 	setBlockTitle("C");
 
-	const std::string connectorNameLeft = "Left7";
-	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
+	const std::string connectorNameLeft = "positivePole";
+	m_LeftConnector = { ot::ConnectorType::Any,connectorNameLeft,connectorNameLeft };
 	addConnector(m_LeftConnector);
 
-	const std::string connectorNameRight = "Right7";
-	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
+	const std::string connectorNameRight = "negativePole";
+	m_RightConnector = { ot::ConnectorType::Any,connectorNameRight,connectorNameRight };
 	addConnector(m_RightConnector);
 
 	resetModified();

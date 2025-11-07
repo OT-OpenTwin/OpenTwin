@@ -28,7 +28,8 @@ public:
 	virtual std::string getClassName(void) const override { return EntityBlockCircuitConnector::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
-	
+	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine; };
+	virtual std::string getBlockFolderName() const override { return ""; };
 	
 	
 private:

@@ -43,6 +43,7 @@ public:
 
 	static std::string className() { return "EntityBlockStorage"; }
 	virtual std::string getClassName(void) const override { return EntityBlockStorage::className(); };
+	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 	virtual void createProperties() override;
 	virtual bool updateFromProperties() override;

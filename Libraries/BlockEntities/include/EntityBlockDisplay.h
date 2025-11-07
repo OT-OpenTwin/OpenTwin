@@ -33,6 +33,7 @@ public:
 	virtual void createProperties() override;
 	const std::string& getDescription();
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
+	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
 	const ot::Connector& getConnectorInput() const { return _inputConnector; }
 
 	static const std::string getIconName() { return "Monitor.svg"; }

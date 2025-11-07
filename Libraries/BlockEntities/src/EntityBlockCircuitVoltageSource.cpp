@@ -41,11 +41,11 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 	setBlockTitle("V");
 
 	const std::string connectorPositive = "positivePole";
-	m_positiveConnector = { ot::ConnectorType::In,connectorPositive,connectorPositive };
+	m_positiveConnector = { ot::ConnectorType::Any,connectorPositive,connectorPositive };
 	addConnector(m_positiveConnector);
 
 	const std::string connectorNegative = "negativePole";
-	m_negativeConnector = { ot::ConnectorType::Out,connectorNegative,connectorNegative };
+	m_negativeConnector = { ot::ConnectorType::Any,connectorNegative,connectorNegative };
 	addConnector(m_negativeConnector);
 
 	resetModified();

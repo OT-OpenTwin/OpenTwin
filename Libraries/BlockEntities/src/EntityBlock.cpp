@@ -36,6 +36,10 @@ void EntityBlock::createProperties() {
 
 }
 
+ot::GraphicsConnectionCfg::ConnectionShape EntityBlock::getDefaultConnectionShape() const {
+	return ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
+}
+
 EntityBlock::~EntityBlock()
 {
 	if (m_coordinateEntity != nullptr)

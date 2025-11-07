@@ -25,7 +25,7 @@
 
 namespace ot
 {
-	enum ConnectorType {In = 0, Out = 1, InOptional = 2, UNKNOWN = -1};
+	enum ConnectorType {In = 0, Out = 1, InOptional = 2, Any = 3, UNKNOWN = -1};
 
 	class __declspec(dllexport) Connector : public SerializeWithBSON
 	{

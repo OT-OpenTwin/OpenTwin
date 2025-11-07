@@ -34,6 +34,7 @@ public:
 	std::string getSelectedScript();
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	virtual bool updateFromProperties() override;
+	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
 	void setScriptFolder(const std::string& _scriptFolder, ot::UID _scriptFolderID);
 
 	static const std::string getIconName() { return "Script.svg"; }

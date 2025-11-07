@@ -34,6 +34,7 @@ public:
 	const std::string& getHeadline();
 	const std::string& getFileName();
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
+	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
 	const ot::Connector& getConnectorInput() const { return m_inputConnector; }
 	const std::string& getFileModeAppend() const { return m_fileModeAppend; }
 	const std::string& getFileModeOverride() const { return m_fileModeOverride; }

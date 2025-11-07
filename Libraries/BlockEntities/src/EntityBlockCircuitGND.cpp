@@ -42,8 +42,8 @@ EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, Ent
 
 	setBlockTitle("GND");
 
-	const std::string connectorNameLeft = "GND";
-	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
+	const std::string connectorNameLeft = "GNDPole";
+	m_LeftConnector = { ot::ConnectorType::Any,connectorNameLeft,connectorNameLeft };
 	addConnector(m_LeftConnector);
 
 	resetModified();

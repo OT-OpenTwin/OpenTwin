@@ -36,6 +36,7 @@
 #include "EntityBlockConnection.h"
 #include "EntityBlockPython.h"
 #include "EntityGraphicsScene.h"
+#include "EntityBlockCircuitElement.h"
 
 bool BlockHandler::addViewBlockRelation(std::string _viewName, ot::UID _blockId, ot::UID _connectionId) {
 	auto& blocks = m_viewBlockConnectionMap[_viewName];
@@ -170,13 +171,19 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 	EntityBase* editorBase = model->findEntityFromName(_viewName);
 	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
 
-	std::list<std::string> blocks = model->getListOfFolderItems(_viewName, true);
-	std::string entName = CreateNewUniqueTopologyName(blockEnt->getNamingBehavior(), blocks, _viewName, blockEnt->getBlockTitle());
+	std::list<std::string> blocks = model->getListOfFolderItems(_viewName + blockEnt->getBlockFolderName(), true);
+	std::string entName = CreateNewUniqueTopologyName(blockEnt->getNamingBehavior(), blocks, _viewName + blockEnt->getBlockFolderName(), blockEnt->getBlockTitle());
 	blockEnt->setName(entName);
 	blockEnt->setEditable(true);
 	blockEnt->setGraphicsPickerKey(editor->getGraphicsPickerKey());
 	blockEnt->setOwningService(editor->getOwningService());
 	blockEnt->setEntityID(model->createEntityUID());
+
+	std::string blockfolderName = blockEnt->getBlockFolderName();
+	if (!blockfolderName.empty() && blockfolderName[0] == '/') {
+		blockfolderName = blockfolderName.substr(1);
+	}
+	blockEnt->setGraphicsScenePackageChildName(blockfolderName);
 
 	EntityCoordinates2D* blockCoordinates = new EntityCoordinates2D(model->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 	blockCoordinates->setCoordinates(_pos);
@@ -205,6 +212,81 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 	dataEntParent.push_back(blockEnt->getEntityID());
 	model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Added block", true, true, true);
 
+	return ot::ReturnMessage::Ok;
+}
+
+ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData) {
+	Model* model = Application::instance()->getModel();
+	
+	auto connections = _connectionData.getConnections();
+	std::string viewName = _connectionData.getName();
+	EntityBase* editorBase = model->findEntityFromName(viewName);
+	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+	std::list<EntityBlockConnection> entitiesForUpdate;
+	ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
+	std::list<bool> forceVis;
+
+
+	for (auto& _connection : connections) {
+		EntityBlockConnection connectionEntity(model->createEntityUID(), nullptr, nullptr, nullptr, editor->getOwningService());
+		connectionEntity.createProperties();
+		
+		auto connectionsFolder = model->getListOfFolderItems(_connectionData.getName() + "/" + m_connectionsFolder, true);
+		const std::string connectionName = CreateNewUniqueTopologyName(connectionsFolder, _connectionData.getName() + "/" + m_connectionsFolder, "Connection");
+		connectionEntity.setName(connectionName);
+		connectionEntity.setGraphicsPickerKey(_connectionData.getPickerKey());
+		connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
+
+		EntityBase* originEntityBase = model->getEntityByID(_connection.getOriginUid());
+		EntityBlock* originBlock = dynamic_cast<EntityBlock*>(originEntityBase);
+
+		EntityBase* destinationEntityBase = model->getEntityByID(_connection.getDestinationUid());
+		EntityBlock* destinationBlock = dynamic_cast<EntityBlock*>(destinationEntityBase);
+		
+	
+		_connection.setLineShape(originBlock->getDefaultConnectionShape());
+		
+		connectionEntity.setConnectionCfg(_connection);
+
+		if (originBlock == nullptr || destinationBlock == nullptr) {
+			OT_LOG_E("Could not find origin or destination block for connection");
+			return ot::ReturnMessage::Failed;
+		}
+
+		auto originConnectorIt = originBlock->getAllConnectorsByName().find(_connection.getOriginConnectable());
+		auto destinationConnectorIt = destinationBlock->getAllConnectorsByName().find(_connection.getDestConnectable());
+
+		if (originConnectorIt == originBlock->getAllConnectorsByName().end() || destinationConnectorIt == destinationBlock->getAllConnectorsByName().end()) {
+			OT_LOG_E("Could not find origin or destination connector for connection");
+			return ot::ReturnMessage::Failed;
+		}
+
+		auto originConnectorType = originConnectorIt->second.getConnectorType();
+		auto destinationConnectorType = destinationConnectorIt->second.getConnectorType();
+
+		if ((originConnectorType == ot::ConnectorType::In || originConnectorType == ot::ConnectorType::InOptional) &&
+			(destinationConnectorType == ot::ConnectorType::In || destinationConnectorType == ot::ConnectorType::InOptional)) {
+			Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
+			return ot::ReturnMessage::Ok;
+		}
+		else if (originConnectorType == ot::ConnectorType::Out &&
+			destinationConnectorType == ot::ConnectorType::Out) {
+			Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
+			return ot::ReturnMessage::Ok;
+		}
+		
+		
+		entitiesForUpdate.push_back(connectionEntity);
+	}
+
+	for (auto& _entityForUpdate : entitiesForUpdate) {
+		_entityForUpdate.storeToDataBase();
+		topoEntID.push_back(_entityForUpdate.getEntityID());
+		topoEntVers.push_back(_entityForUpdate.getEntityStorageVersion());
+		forceVis.push_back(false);
+	}
+
+	model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Added connections", true, true, true);
 	return ot::ReturnMessage::Ok;
 }
 

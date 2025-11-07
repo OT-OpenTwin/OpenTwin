@@ -42,12 +42,12 @@ EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* p
 
 	setBlockTitle("R");
 
-	const std::string connectorNameLeft = "Left1";
-	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
+	const std::string connectorNameLeft = "positivePole";
+	m_LeftConnector = { ot::ConnectorType::Any,connectorNameLeft,connectorNameLeft };
 	addConnector(m_LeftConnector);
 
-	const std::string connectorNameRight = "Right1";
-	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
+	const std::string connectorNameRight = "negativePole";
+	m_RightConnector = { ot::ConnectorType::Any,connectorNameRight,connectorNameRight };
 	addConnector(m_RightConnector);
 
 	resetModified();

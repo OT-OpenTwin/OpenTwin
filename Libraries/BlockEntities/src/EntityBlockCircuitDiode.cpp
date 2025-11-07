@@ -40,12 +40,12 @@ EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent,
 
 	setBlockTitle("D");
 
-	const std::string connectorNameLeft = "Left2";
-	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
+	const std::string connectorNameLeft = "positivePole";
+	m_LeftConnector = { ot::ConnectorType::Any,connectorNameLeft,connectorNameLeft };
 	addConnector(m_LeftConnector);
 
-	const std::string connectorNameRight = "Right2";
-	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
+	const std::string connectorNameRight = "negativePole";
+	m_RightConnector = { ot::ConnectorType::Any,connectorNameRight,connectorNameRight };
 	addConnector(m_RightConnector);
 
 	resetModified();

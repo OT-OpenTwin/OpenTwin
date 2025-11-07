@@ -62,6 +62,8 @@ public:
 
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
+	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
+
 	bool getReproducableOrder() ;
 
 	static const std::string getIconName() {return "Database_access.svg"; }

@@ -33,6 +33,7 @@ public:
 	virtual std::string getClassName(void) const override { return EntityBlockImage::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
+	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	virtual bool updateFromProperties() override;
 

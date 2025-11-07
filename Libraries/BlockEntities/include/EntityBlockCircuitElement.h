@@ -30,6 +30,8 @@ public:
 
 	virtual EntityNamingBehavior getNamingBehavior() const override;
 	virtual std::string getCircuitModel();
+	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine; };
+	virtual std::string getBlockFolderName() const override { return ""; };
 
 protected:
 	virtual const std::string getCollectionType() { return "CircuitModels"; }

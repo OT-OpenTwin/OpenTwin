@@ -68,8 +68,10 @@ public:
 
 	virtual ot::GraphicsItemCfg* createBlockCfg() = 0;
 	virtual void createProperties();
+	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const;
 
 	virtual EntityNamingBehavior getNamingBehavior() const { return EntityNamingBehavior(); } ;
+	virtual std::string getBlockFolderName() const { return "/Blocks"; };
 
 	std::string createBlockHeadline();
 

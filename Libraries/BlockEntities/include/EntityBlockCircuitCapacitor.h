@@ -42,6 +42,7 @@ public:
 	const ot::Connector getLeftConnector() const { return m_LeftConnector; }
 	const ot::Connector getRightConnector() const { return m_RightConnector; }
 	virtual bool updateFromProperties(void) override;
+	
 private:
 
 	ot::Connector m_LeftConnector;

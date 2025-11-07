@@ -41,19 +41,19 @@ EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID I
 	setBlockTitle("T");
 
 	const std::string connectorNameLeftPos1 = "PositivePole1";
-	m_LeftConnectorPos1 = { ot::ConnectorType::Out,connectorNameLeftPos1,connectorNameLeftPos1 };
+	m_LeftConnectorPos1 = { ot::ConnectorType::Any,connectorNameLeftPos1,connectorNameLeftPos1 };
 	addConnector(m_LeftConnectorPos1);
 
 	const std::string connectorNameRightNeg1 = "NegativePole1";
-	m_RightConnectorNeg1 = { ot::ConnectorType::In,connectorNameRightNeg1,connectorNameRightNeg1 };
+	m_RightConnectorNeg1 = { ot::ConnectorType::Any,connectorNameRightNeg1,connectorNameRightNeg1 };
 	addConnector(m_RightConnectorNeg1);
 
 	const std::string connectorNameLeftPos2 = "PositivePole2";
-	m_LeftConnectorPos2 = { ot::ConnectorType::Out,connectorNameLeftPos2,connectorNameLeftPos2 };
+	m_LeftConnectorPos2 = { ot::ConnectorType::Any,connectorNameLeftPos2,connectorNameLeftPos2 };
 	addConnector(m_LeftConnectorPos2);
 
 	const std::string connectorNameRightNeg2 = "NegativePole2";
-	m_RightConnectorNeg2 = { ot::ConnectorType::In,connectorNameRightNeg2,connectorNameRightNeg2 };
+	m_RightConnectorNeg2 = { ot::ConnectorType::Any,connectorNameRightNeg2,connectorNameRightNeg2 };
 	addConnector(m_RightConnectorNeg2);
 
 	resetModified();

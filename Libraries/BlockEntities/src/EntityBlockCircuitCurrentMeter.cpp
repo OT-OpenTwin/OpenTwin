@@ -40,12 +40,12 @@ EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, Entit
 
 	setBlockTitle("CM");
 
-	const std::string connectorNameLeft = "Left6";
-	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
+	const std::string connectorNameLeft = "positivePole";
+	m_LeftConnector = { ot::ConnectorType::Any,connectorNameLeft,connectorNameLeft };
 	addConnector(m_LeftConnector);
 
-	const std::string connectorNameRight = "Right6";
-	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
+	const std::string connectorNameRight = "negativePole";
+	m_RightConnector = { ot::ConnectorType::Any,connectorNameRight,connectorNameRight };
 	addConnector(m_RightConnector);
 
 	resetModified();
