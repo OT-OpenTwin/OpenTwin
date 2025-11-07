@@ -32,6 +32,7 @@
     <ClInclude Include="include\OTGui\GraphicsChangeEvent.h" />
     <ClInclude Include="include\OTGui\GraphicsHierarchicalProjectItemBuilder.h" />
     <ClInclude Include="include\OTGui\GraphicsZValues.h" />
+    <ClInclude Include="include\OTGui\GuiEvent.h" />
     <ClInclude Include="include\OTGui\LibraryModel.h" />
     <ClInclude Include="include\OTGui\LineEditCfg.h" />
     <ClInclude Include="include\OTGui\ManagedPropertyObject.h" />
@@ -175,6 +176,7 @@
     <ClCompile Include="src\GraphicsPolygonItemCfg.cpp" />
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp" />
     <ClCompile Include="src\Grid.cpp" />
+    <ClCompile Include="src\GuiEvent.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />
     <ClCompile Include="src\LibraryModel.cpp" />
     <ClCompile Include="src\LineEditCfg.cpp" />
