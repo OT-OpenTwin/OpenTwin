@@ -239,14 +239,14 @@ namespace ot {
 		//! @param _serviceName The name of the service.
 		//! @param _doc The document containing the message.
 		//! @param _requestFlags Flags to control the request behavior.
-		bool sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
+		void sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
 
 		//! @brief Will send the message asynchronously to the services with the specified names.
 		//! @param _queue If true, the message will be queued.
 		//! @param _serviceName The name of the service.
 		//! @param _doc The document containing the message.
 		//! @param _requestFlags Flags to control the request behavior.
-		bool sendMessageAsync(bool _queue, const std::list<std::string>& _serviceNames, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
+		void sendMessageAsync(bool _queue, const std::list<std::string>& _serviceNames, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
 
 		//! @brief Will send the message asynchronously to the service with the specified name.
 		//! @param _queue If true, the message will be queued.
@@ -254,7 +254,7 @@ namespace ot {
 		//! @param _doc The document containing the message.
 		//! @param _prefetchIds A list containing the prefetched IDs.
 		//! @param _requestFlags Flags to control the request behavior.
-		bool sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>>& _prefetchIds, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
+		void sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>>& _prefetchIds, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
 
 		//! @brief Will be called whenever the selection in the UI has changed.
 		virtual void modelSelectionChanged() {};

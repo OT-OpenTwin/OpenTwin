@@ -100,7 +100,7 @@ namespace ot {
 			std::atomic_int m_timeout;
 		};
 
-		void sendAsyncWorker(std::string _senderURL, std::string _receiverURL, ot::MessageType _type, std::string&& _message, int _timeout, const ot::msg::RequestFlags& _flags);
+		void sendAsyncWorker(std::string _senderURL, std::list<std::string>&& _receiverURLs, ot::MessageType _type, std::string&& _message, int _timeout, const ot::msg::RequestFlags& _flags);
 	}
 }
 
@@ -128,9 +128,9 @@ const std::string ot::msg::getLastError()
 	return g_lastError;
 }
 
-bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP, MessageType _type, const std::string& _message, std::string& _response, int _timeout, const RequestFlags& _flags) {
+bool ot::msg::send(const std::string& _senderUrl, const std::string& _receiverUrl, MessageType _type, const std::string& _message, std::string& _response, int _timeout, const RequestFlags& _flags) {
 	// Ensure receiver url was provided
-	if (_receiverIP.empty()) {
+	if (_receiverUrl.empty()) {
 		if (_flags & msg::CreateLogMessage) {
 			OT_LOG_WA("Receiver url is empty. Ignoring message...");
 		}
@@ -138,16 +138,16 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 	}
 
 	// Block explicit self message (allow by providing empty sender)
-	if (_senderIP == _receiverIP) {
+	if (_senderUrl == _receiverUrl) {
 		if (_flags & msg::CreateLogMessage) {
-			OT_LOG_W("Receiver is the same as sender: \"" + _receiverIP + "\". Ignoring message...");
+			OT_LOG_W("Receiver is the same as sender: \"" + _receiverUrl + "\". Ignoring message...");
 		}
 		return true;
 	}
 
 	// If log message should be generated, do so now
 	if (_flags & msg::CreateLogMessage) {
-		OT_LOG("Sending message to { \"Sender\": \"" + _senderIP + "\", \"Receiver\": \"" + _receiverIP + "\", \"Endpoint\": \"" + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "\" }. Message: \"" + _message + "\"", ot::OUTGOING_MESSAGE_LOG);
+		OT_LOG("Sending message to { \"Sender\": \"" + _senderUrl + "\", \"Receiver\": \"" + _receiverUrl + "\", \"Endpoint\": \"" + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "\" }. Message: \"" + _message + "\"", ot::OUTGOING_MESSAGE_LOG);
 	}
 
 	// Update timeout if needed
@@ -181,7 +181,7 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 	}
 
 	std::string curlURL("https://");
-	curlURL.append(_receiverIP).append("/");
+	curlURL.append(_receiverUrl).append("/");
 
 	switch (_type) {
 	case QUEUE: curlURL.append("queue"); break;
@@ -283,7 +283,7 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 
 	if (errorCode == CURLE_OK) {
 		if (_flags & msg::CreateLogMessage)  {
-			OT_LOG(".. Message sent successful { \"Sender\": \"" + _senderIP + "\", \"Receiver\": \"" + _receiverIP + "\", \"Endpoint\": \"" + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "\" }. Response = \"" + _response + "\"", ot::OUTGOING_MESSAGE_LOG);
+			OT_LOG(".. Message sent successful { \"Sender\": \"" + _senderUrl + "\", \"Receiver\": \"" + _receiverUrl + "\", \"Endpoint\": \"" + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "\" }. Response = \"" + _response + "\"", ot::OUTGOING_MESSAGE_LOG);
 		}
 		return true;
 	}
@@ -291,8 +291,8 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 		// Store last error as error string
 		g_lastError = "{ \"Error message\": \"" + std::string(curl_easy_strerror(errorCode)) +
 			"\", \"Error buffer\": \"" + errbuf +
-			"\", \"Sender\": \"" + _senderIP +
-			"\", \"Receiver\": \"" + _receiverIP +
+			"\", \"Sender\": \"" + _senderUrl +
+			"\", \"Receiver\": \"" + _receiverUrl +
 			"\", \"Endpoint\": " + (_type == ot::EXECUTE ? "\"Execute\"" : (_type == ot::QUEUE ? "\"Queue\"" : "\"Execute one way TLS\"")) +
 			" }";
 
@@ -311,20 +311,24 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 	}
 }
 
-void ot::msg::sendAsync(const std::string& _senderIP, const std::string& _receiverIP, MessageType _type, std::string&& _message, int _timeout, const RequestFlags& _flags) {
-	std::thread t(ot::intern::sendAsyncWorker, _senderIP, _receiverIP, _type, std::move(_message), _timeout, _flags);
+void ot::msg::sendAsync(const std::string& _senderUrl, const std::string& _receiverIP, MessageType _type, std::string&& _message, int _timeout, const RequestFlags& _flags) {
+	std::list<std::string> receiverList{ _receiverIP };
+	std::thread t(ot::intern::sendAsyncWorker, _senderUrl, std::move(receiverList), _type, std::move(_message), _timeout, _flags);
 	t.detach();
 }
 
-void ot::intern::sendAsyncWorker(std::string _senderIP, std::string _receiverIP, ot::MessageType _type, std::string&& _message, int _timeout, const ot::msg::RequestFlags& _flags) {
+void ot::msg::sendAsync(const std::string& _senderUrl, const std::list<std::string>& _receiverUrls, ot::MessageType _type, std::string&& _message, int _timeout, const RequestFlags& _flags) {
+	std::list<std::string> receiverList = _receiverUrls;
+	std::thread t(ot::intern::sendAsyncWorker, _senderUrl, std::move(receiverList), _type, std::move(_message), _timeout, _flags);
+	t.detach();
+}
+
+void ot::intern::sendAsyncWorker(std::string _senderIP, std::list<std::string>&& _receiverUrls, ot::MessageType _type, std::string&& _message, int _timeout, const ot::msg::RequestFlags& _flags) {
 	std::string response;
-	if (!ot::msg::send(_senderIP, _receiverIP, _type, _message, response, _timeout, _flags)) {
-		OT_LOG_E("[ASYNC] Failed to send message to \"" + _receiverIP + "\"");
-	}
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		OT_LOG_E("[ASYNC] " + response);
-	}
-	OT_ACTION_IF_RESPONSE_WARNING(response) {
-		OT_LOG_W("[ASYNC] " + response);
+	for (const std::string& receiver : _receiverUrls) {
+		response.clear();
+		if (!ot::msg::send(_senderIP, receiver, _type, _message, response, _timeout, _flags)) {
+			OT_LOG_E("[ASYNC] Failed to send message to \"" + receiver + "\"");
+		}
 	}
 }

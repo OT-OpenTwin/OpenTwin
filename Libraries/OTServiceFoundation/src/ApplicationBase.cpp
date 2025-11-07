@@ -226,6 +226,11 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 
 bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds, std::string& _response, const ot::msg::RequestFlags& _requestFlags)
 {
+	if (_serviceName == this->getServiceName()) {
+		OT_LOG_EA("Attempt to send message to self detected. Aborting message send.");
+		return false;
+	}
+
 	auto serviceInfoByServiceName = m_serviceNameMap.find(_serviceName);
 	if (serviceInfoByServiceName == m_serviceNameMap.end()) {
 		OT_LOG_EAS("Could not find service by name: \"" + _serviceName + "\"");
@@ -245,32 +250,44 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 	}
 }
 
-bool ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags) {
+void ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags) {
 	std::list<std::pair<UID, UID>> prefetchIds;
 	return this->sendMessageAsync(_queue, _serviceName, _doc, prefetchIds, _requestFlags);
 }
 
-bool ot::ApplicationBase::sendMessageAsync(bool _queue, const std::list<std::string>& _serviceNames, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags) {
-	bool allOk = true;
+void ot::ApplicationBase::sendMessageAsync(bool _queue, const std::list<std::string>& _serviceNames, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags) {
+	std::list<std::string> receiverUrls;
 	for (const std::string& serviceName : _serviceNames) {
-		std::list<std::pair<UID, UID>> prefetchIds;
-		if (!this->sendMessageAsync(_queue, serviceName, _doc, prefetchIds, _requestFlags)) {
-			allOk = false;
+		if (serviceName != this->getServiceName()) {
+			auto serviceInfoByServiceName = m_serviceNameMap.find(serviceName);
+			if (serviceInfoByServiceName == m_serviceNameMap.end()) {
+				OT_LOG_EAS("Could not find service by name: \"" + serviceName + "\"");
+				continue;
+			}
+			ServiceBase* destinationServiceInfo = serviceInfoByServiceName->second;
+			receiverUrls.push_back(destinationServiceInfo->getServiceURL());
 		}
 	}
-	return allOk;
+
+	if (!receiverUrls.empty()) {
+		ot::msg::sendAsync(this->getServiceURL(), receiverUrls, (_queue ? QUEUE : EXECUTE), std::move(_doc.toJson()), 0, _requestFlags);
+	}
 }
 
-bool ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>>& _prefetchIds, const ot::msg::RequestFlags& _requestFlags) {
+void ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>>& _prefetchIds, const ot::msg::RequestFlags& _requestFlags) {
+	if (_serviceName == this->getServiceName()) {
+		OT_LOG_EA("Attempt to send message to self detected. Aborting async message send.");
+		return;
+	}
+
 	auto serviceInfoByServiceName = m_serviceNameMap.find(_serviceName);
 	if (serviceInfoByServiceName == m_serviceNameMap.end()) {
 		OT_LOG_EAS("Could not find service by name: \"" + _serviceName + "\"");
-		return false;
+		return;
 	}
 
 	ServiceBase* destinationServiceInfo = serviceInfoByServiceName->second;
 	ot::msg::sendAsync(this->getServiceURL(), destinationServiceInfo->getServiceURL(), (_queue ? QUEUE : EXECUTE), std::move(_doc.toJson()), 0, _requestFlags);
-	return true;
 }
 
 void ot::ApplicationBase::addModalCommand(ot::ModalCommandBase *command)

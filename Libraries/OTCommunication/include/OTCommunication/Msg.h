@@ -46,19 +46,32 @@ namespace ot {
 		
 		OT_COMMUNICATION_API_EXPORT const std::string getLastError();
 
-		//! @brief Will send the provided message to the microservice framework. Returns true if succeeded
-		//! @param _senderIP The sender IP address
-		//! @param _receiverIP The receiver IP address
+		//! @brief Will send the provided message to the microservice framework.
+		//! @param _senderUrl The sender url.
+		//! @param _receiverUrl The receiver url.
 		//! @param _message The message to send
-		//! @param _response Here the response will be written to
-		OT_COMMUNICATION_API_EXPORT bool send(const std::string& _senderIP, const std::string& _receiverIP, ot::MessageType _type, const std::string& _message, std::string& _response, int _timeout = 0, const RequestFlags& _flags = msg::DefaultFlags);
+		//! @param _response Here the response will be written to.
+		//! @param _timeout Timeout in milliseconds. If 0 or negative the default timeout will be used.
+		//! @param _flags Flags modifying the request behavior.
+		OT_COMMUNICATION_API_EXPORT bool send(const std::string& _senderUrl, const std::string& _receiverUrl, ot::MessageType _type, const std::string& _message, std::string& _response, int _timeout = 0, const RequestFlags& _flags = msg::DefaultFlags);
 
 		//! @brief Will send the provided message to the microservice framework. The massage will be send asynchronously
-		//! @param _senderIP The sender IP address
-		//! @param _receiverIP The receiver IP address
-		//! @param _message The message to send
-		//! @param _response Here the response will be written to
-		OT_COMMUNICATION_API_EXPORT void sendAsync(const std::string& _senderIP, const std::string& _receiverIP, ot::MessageType _type, std::string&& _message, int _timeout = 0, const RequestFlags& _flags = msg::DefaultFlags);
+		//! @param _senderUrl The sender url.
+		//! @param _receiverUrl The receiver url.
+		//! @param _type Endpoint type to use for sending the message.
+		//! @param _message The message to send.
+		//! @param _timeout Timeout in milliseconds. If 0 or negative the default timeout will be used.
+		//! @param _flags Flags modifying the request behavior.
+		OT_COMMUNICATION_API_EXPORT void sendAsync(const std::string& _senderUrl, const std::string& _receiverUrl, ot::MessageType _type, std::string&& _message, int _timeout = 0, const RequestFlags& _flags = msg::DefaultFlags);
+
+		//! @brief Will send the provided message to the microservice framework. The massage will be send asynchronously.
+		//! @param _senderIP The sender url.
+		//! @param _receiverUrls The list of receiver urls.
+		//! @param _type Endpoint type to use for sending the message.
+		//! @param _message The message to send.
+		//! @param _timeout Timeout in milliseconds. If 0 or negative the default timeout will be used.
+		//! @param _flags Flags modifying the request behavior.
+		OT_COMMUNICATION_API_EXPORT void sendAsync(const std::string& _senderUrl, const std::list<std::string>& _receiverUrls, ot::MessageType _type, std::string&& _message, int _timeout = 0, const RequestFlags& _flags = msg::DefaultFlags);
 	}
 }
 
