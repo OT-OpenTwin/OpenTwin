@@ -31,10 +31,10 @@
 //! @param ___prefix Prefix for the functions, e.g. 'friend'.
 //! @param ___enumName Name of the enum.
 //! @param ___flagsType Name of the Flags typedef for the enum.
-#define OT_ADD_FLAG_FUNCTIONS_IMPL(___prefix, ___enumName, ___flagsType) ___prefix constexpr ___flagsType operator | (___enumName _lhv, ___enumName _rhv) { return ___flagsType(_lhv) | _rhv; }; \
-___prefix constexpr ___flagsType operator & (___enumName _lhv, ___enumName _rhv) { return ___flagsType(_lhv) & _rhv; };  \
-___prefix constexpr ___flagsType operator ^ (___enumName _lhv, ___enumName _rhv) { return ___flagsType(_lhv) ^ _rhv; };  \
-___prefix constexpr ___flagsType operator ~ (___enumName _lhv) { return ~(___flagsType(_lhv)); };
+#define OT_ADD_FLAG_FUNCTIONS_IMPL(___prefix, ___enumName, ___flagsType) ___prefix constexpr ___flagsType operator | (___enumName _lhv, ___enumName _rhv) noexcept { return ___flagsType(_lhv) | _rhv; }; \
+___prefix constexpr ___flagsType operator & (___enumName _lhv, ___enumName _rhv) noexcept { return ___flagsType(_lhv) & _rhv; };  \
+___prefix constexpr ___flagsType operator ^ (___enumName _lhv, ___enumName _rhv) noexcept { return ___flagsType(_lhv) ^ _rhv; };  \
+___prefix constexpr ___flagsType operator ~ (___enumName _lhv) noexcept { return ~(___flagsType(_lhv)); };
 
 //! @def OT_ADD_FLAG_FUNCTIONS
 //! @brief Add default bitwise operations (global) for the provided enum bitfield.
@@ -116,9 +116,10 @@ namespace ot {
 		//! @param _initialData Initial data.
 		constexpr Flags(T _initialData) noexcept : m_data{ toStorage(_initialData) } {};
 
-		//! @brief Assignment constructor.
+		//! @brief Assignment constructor from raw storage.
 		//! @param _initialData Initial data.
-		explicit constexpr Flags(Storage _raw) noexcept : m_data{ _raw } {};
+		template<typename U, std::enable_if_t<std::is_same_v<std::decay_t<U>, Storage>, int> = 0>
+		explicit constexpr Flags(U _raw) noexcept : m_data{ _raw } {};
 
 		//! @brief Copy constructor.
 		//! @param _other Other flags.
