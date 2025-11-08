@@ -44,17 +44,17 @@ namespace ot {
 	typedef unsigned short serviceID_t;
 
 	//! @brief Invalid service ID, a Service must not have this ID assigned at any point.
-	static constexpr serviceID_t invalidServiceID = 0U;
+	inline constexpr serviceID_t invalidServiceID = 0U;
 
 	//! @brief Maximum number a service ID may reach.
-	static constexpr serviceID_t maxServiceID = std::numeric_limits<serviceID_t>::max();
+	inline constexpr serviceID_t maxServiceID = std::numeric_limits<serviceID_t>::max();
 
 	//! @brief Unique identifier (64 bit unsigned integer).
 	//! Mainly used for entities.
 	typedef uint64_t UID;
 
 	//! @brief Invalid unique identifier.
-	static constexpr UID invalidUID = std::numeric_limits<UID>::max();
+	inline constexpr UID invalidUID = std::numeric_limits<UID>::max();
 
 	//! @brief Unique identifier list
 	typedef std::list<UID> UIDList;

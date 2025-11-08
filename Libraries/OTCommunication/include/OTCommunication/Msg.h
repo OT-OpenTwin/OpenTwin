@@ -30,7 +30,7 @@ namespace ot {
 	namespace msg {
 
 		//! @brief Default OpenTwin message send timeout (30 seconds).
-		static const int defaultTimeout = 30000;
+		inline constexpr int defaultTimeout = 30000;
 
 		enum RequestFlag {
 			NoRequestFlags    = 0 << 0,
