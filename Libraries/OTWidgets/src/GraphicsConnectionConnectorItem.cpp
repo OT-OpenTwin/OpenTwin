@@ -36,7 +36,7 @@ ot::GraphicsConnectionConnectorItem::GraphicsConnectionConnectorItem() {
 	cfg.setRadiusX(r);
 	cfg.setRadiusY(r);
 	cfg.setGraphicsItemFlags(GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemHandlesState | 
-		GraphicsItemCfg::ItemSnapsToGridCenter //| GraphicsItemCfg::ItemSilencesNotifcations
+		GraphicsItemCfg::ItemIsSelectable |	GraphicsItemCfg::ItemSnapsToGridCenter //| GraphicsItemCfg::ItemSilencesNotifcations
 	);
 	
 	this->setupFromConfig(&cfg);

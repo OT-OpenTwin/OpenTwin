@@ -2619,8 +2619,11 @@ void AppBase::slotGraphicsSelectionChanged() {
 	for (auto selectedItem : selectedItems) {
 		ot::GraphicsItem* selectedGraphicsItem = dynamic_cast<ot::GraphicsItem*>(selectedItem);
 		if (selectedGraphicsItem) {
-			selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->getGraphicsItemUid());
-			newVisualizingEntities.push_back(ViewerAPI::getTreeIDFromModelEntityID(selectedGraphicsItem->getGraphicsItemUid()));
+			if (selectedGraphicsItem->getGraphicsItemUid() != ot::invalidUID) {
+				selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->getGraphicsItemUid());
+				newVisualizingEntities.push_back(ViewerAPI::getTreeIDFromModelEntityID(selectedGraphicsItem->getGraphicsItemUid()));
+			}
+
 			continue;
 		}
 		
