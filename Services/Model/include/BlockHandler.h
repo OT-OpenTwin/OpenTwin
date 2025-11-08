@@ -66,6 +66,18 @@ private:
 	//! @return True if the connection was handled successfully, false otherwise.
 	bool createBlockToConnectionConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlockConnection* _destinationConnection, const ot::GraphicsConnectionDropEvent& _eventData, bool _connectionReversed);
 
+	//! @brief Handles the change of a block.
+	//! @param _changedBlock The block that changed.
+	//! @param _changeEvent The event data associated with the changed event.
+	//! @return True if theblock change was handled successfully, false otherwise.
+	bool updateBlock(const ot::GraphicsItemCfg* _changedBlock, const ot::GraphicsChangeEvent& _changeEvent);
+
+	//! @brief Handles the change of a connection.
+	//! @param _changedConnection The connection that changed.
+	//! qparam _changeEvent The event data associated with the changed event.
+	//! @return True if the connection change was handled successfully, false otherwise.
+	bool updateConnection(const ot::GraphicsConnectionCfg& _changedConnection, const ot::GraphicsChangeEvent& _changeEvent);
+
 	std::unordered_map<std::string, std::unordered_map<ot::UID, ot::UID>> m_viewBlockConnectionMap;
 	const std::string m_connectionsFolder = "Connections";
 

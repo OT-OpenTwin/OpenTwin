@@ -37,6 +37,7 @@
 #include "EntityBlockPython.h"
 #include "EntityGraphicsScene.h"
 #include "EntityBlockCircuitElement.h"
+#include "PropertyHelper.h"
 
 bool BlockHandler::addViewBlockRelation(std::string _viewName, ot::UID _blockId, ot::UID _connectionId) {
 	auto& blocks = m_viewBlockConnectionMap[_viewName];
@@ -50,6 +51,7 @@ bool BlockHandler::addViewBlockRelation(std::string _viewName, ot::UID _blockId,
 
 ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
 
 	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(model->findEntityFromName(_eventData.getEditorName()));
 	if (!editor) {
@@ -146,107 +148,10 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 
 	return ot::ReturnMessage::Ok;
 }
-/*
-ot::ReturnMessage BlockHandler::graphicsItemChanged(const GraphicsDoubleClickEvent& _eventData) {
-	const ot::UID blockID = _item->getUid();
-	const ot::Transform transform = _item->getTransform();
 
-	Model* _model = Application::instance()->getModel();
-	auto entBase = _model->getEntityByID(blockID);
-	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(entBase);
-	if (!blockEnt) {
-		OT_LOG_E("BlockEntity not fond");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Entity not found");
-	}
-
-	// Check if any service wants to handle this change
-	if (!_eventData.isEventFlagSet(ot::GuiEvent::ForceHandle)) {
-		std::list<std::string> handlingServices = blockEnt->getServicesForCallback(EntityBase::Callback::DataHandle);
-		if (!handlingServices.empty()) {
-			ot::JsonDocument doc = ot::GraphicsActionHandler::createItemChangedDocument(_item, ot::GuiEvent::createForwardingEvent(_eventData));
-			Application::instance()->sendMessageAsync(true, handlingServices, doc);
-			return ot::ReturnMessage::Ok;
-		}
-	}
-
-	bool storeTopologyEntity = false;
-
-	// Here i will update the rotation
-	auto propertyBase = blockEnt->getProperties().getProperty("Rotation");
-	if (propertyBase != nullptr) {
-		auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
-		if (propertyRotation->getValue() != transform.getRotation()) {
-			propertyRotation->setValue(transform.getRotation());
-			storeTopologyEntity = true;
-		}
-	}
-
-	// Here i update the flip
-	std::map<ot::Transform::FlipState, std::string > stringFlipMap;
-	stringFlipMap.insert_or_assign(ot::Transform::NoFlip, "NoFlip");
-	stringFlipMap.insert_or_assign(ot::Transform::FlipVertically, "FlipVertically");
-	stringFlipMap.insert_or_assign(ot::Transform::FlipHorizontally, "FlipHorizontally");
-
-	auto propertyBaseFlip = blockEnt->getProperties().getProperty("Flip");
-	if (propertyBaseFlip != nullptr) {
-		auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBaseFlip);
-		if (transform.getFlipStateFlags() & ot::Transform::FlipHorizontally) {
-			if (propertyFlip->getValue() != stringFlipMap[static_cast<ot::Transform::FlipState>(transform.getFlipStateFlags() & ot::Transform::FlipHorizontally)]) {
-				propertyFlip->setValue(stringFlipMap[ot::Transform::FlipHorizontally]);
-				storeTopologyEntity = true;
-			}
-		}
-		if (transform.getFlipStateFlags() & ot::Transform::FlipVertically) {
-			if (propertyFlip->getValue() != stringFlipMap[static_cast<ot::Transform::FlipState>(transform.getFlipStateFlags() & ot::Transform::FlipVertically)]) {
-				propertyFlip->setValue(stringFlipMap[ot::Transform::FlipVertically]);
-				storeTopologyEntity = true;
-			}
-		}
-
-	}
-
-	// Here update block positition
-	ot::UID positionID = blockEnt->getCoordinateEntityID();
-	std::map<ot::UID, EntityBase*> map;
-	auto coordinateEntBase = _model->readEntityFromEntityID(blockEnt, positionID, map);
-
-	EntityCoordinates2D* coordinateEntity = dynamic_cast<EntityCoordinates2D*>(coordinateEntBase);
-	auto parent = coordinateEntity->getParent();
-	if (!coordinateEntity) {
-		OT_LOG_E("Coordinate Entity is null");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Coordinate entity not found");
-	}
-
-	if (coordinateEntity->getCoordinates() != _item->getPosition()) {
-		coordinateEntity->setCoordinates(_item->getPosition());
-		coordinateEntity->storeToDataBase();
-		blockEnt->setCoordinateEntity(*coordinateEntity);
-		_model->getStateManager()->modifyEntityVersion(*coordinateEntity);
-		storeTopologyEntity = true;
-	}
-
-	if (storeTopologyEntity) {
-		blockEnt->storeToDataBase();
-		_model->getStateManager()->modifyEntityVersion(*blockEnt);
-	}
-
-	_model->setModified();
-	_model->modelChangeOperationCompleted("Item changed");
-
-	// Check if any service wants to be notified about this change
-	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
-		std::list<std::string> notifyServices = blockEnt->getServicesForCallback(EntityBase::Callback::DataNotify);
-		if (!notifyServices.empty()) {
-			ot::JsonDocument doc = ot::GraphicsActionHandler::createItemChangedDocument(_item, ot::GuiEvent::createForwardingEvent(_eventData));
-			Application::instance()->sendMessageAsync(false, notifyServices, doc);
-		}
-	}
-
-	return ot::ReturnMessage::Ok;
-}
-*/
 ot::ReturnMessage BlockHandler::graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
 
 	ot::GraphicsDoubleClickEvent fwdEvent(_eventData);
 	fwdEvent.setForwarding();
@@ -279,6 +184,7 @@ ot::ReturnMessage BlockHandler::graphicsItemDoubleClicked(const ot::GraphicsDoub
 
 ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsConnectionDropEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
 
 	std::string viewName = _eventData.getEditorName();
 
@@ -387,6 +293,67 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 }
 
 ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+
+	std::string viewName = _changeEvent.getEditorName();
+
+	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(model->findEntityFromName(viewName));
+	if (!editor) {
+		OT_LOG_E("Could not find graphics editor entity { \"ViewName\": \"" + viewName + "\" }");
+		return ot::ReturnMessage::Failed;
+	}
+
+	// Check if any service wants to handle this change
+	if (!_changeEvent.isEventFlagSet(ot::GuiEvent::ForceHandle)) {
+		std::list<std::string> handlingServices = editor->getServicesForCallback(EntityBase::Callback::DataHandle);
+		if (!handlingServices.empty()) {
+			ot::GraphicsChangeEvent fwdEvent(_changeEvent);
+			fwdEvent.setForwarding();
+			ot::JsonDocument doc = ot::GraphicsActionHandler::createChangeEventDocument(fwdEvent);
+			Application::instance()->sendMessageAsync(true, handlingServices, doc);
+			return ot::ReturnMessage::Ok;
+		}
+	}
+
+
+	// Fist handle the block changed requests
+	const std::list<ot::GraphicsItemCfg*>& changedItems = _changeEvent.getChangedItems();
+	if (!changedItems.empty()) {
+		for (const ot::GraphicsItemCfg* item : changedItems) {
+			OTAssertNullptr(item);
+			if (!updateBlock(item, _changeEvent)) {
+				OT_LOG_E("Could not handle block changed event");
+				return ot::ReturnMessage::Failed;
+			}
+		}
+	}
+
+	// Now handle the connection changed requests
+	const std::list<ot::GraphicsConnectionCfg>& changedConnections = _changeEvent.getChangedConnections();
+	if(!changedConnections.empty()) {
+		for(const ot::GraphicsConnectionCfg& connectionCfg : changedConnections) {
+			if(!updateConnection(connectionCfg, _changeEvent)) {
+				OT_LOG_E("Could not handle connection changed event");
+				return ot::ReturnMessage::Failed;
+			}
+		}
+	}
+
+	model->setModified();
+	model->modelChangeOperationCompleted("Items and connections changed");
+
+	// Check if any service wants to be notified about this change
+	if (!_changeEvent.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
+		std::list<std::string> notifyServices = editor->getServicesForCallback(EntityBase::Callback::DataNotify);
+		if (!notifyServices.empty()) {
+			ot::GraphicsChangeEvent fwdEvent(_changeEvent);
+			fwdEvent.setForwarding();
+			ot::JsonDocument doc = ot::GraphicsActionHandler::createChangeEventDocument(fwdEvent);
+			Application::instance()->sendMessageAsync(false, notifyServices, doc);
+		}
+	}
 
 	return ot::ReturnMessage::Ok;
 }
@@ -397,7 +364,8 @@ ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEven
 
 bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlock* _destinationBlock, const ot::GraphicsConnectionDropEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
-	
+	OTAssertNullptr(model);
+
 	ot::NewModelStateInfo modelStateInfo;
 	std::list<bool> forceVis;
 
@@ -457,45 +425,104 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	return false;
 }
 
-/*
-ot::ReturnMessage BlockHandler::graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData, const ot::GuiEvent& _eventData) {
-	const ot::UID connectionID =  _connectionData.getUid();
-	Model* _model = Application::instance()->getModel();
+bool BlockHandler::updateBlock(const ot::GraphicsItemCfg* _changedBlock, const ot::GraphicsChangeEvent& _changeEvent) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
 
-	auto entBase = _model->getEntityByID(connectionID);
+	// Get uid and transform
+	const ot::UID blockID = _changedBlock->getUid();
+	const ot::Transform transform = _changedBlock->getTransform();
+
+	// Get EntityBlock
+	auto entBase = model->getEntityByID(blockID);
+	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(entBase);
+	if (!blockEnt) {
+		OT_LOG_E("BlockEntity not found");
+		return false;
+	}
+
+	bool storeTopologyEntity = false;
+
+	// Here i will update the rotation
+	if (PropertyHelper::hasProperty(blockEnt, "Rotation")) {
+		EntityPropertiesDouble* propertyRotation = PropertyHelper::getDoubleProperty(blockEnt, "Rotation");
+		if (propertyRotation->getValue() != transform.getRotation()) {
+			propertyRotation->setValue(transform.getRotation());
+			storeTopologyEntity = true;
+		}
+	}
+
+	// Here i update the flip
+	std::map<ot::Transform::FlipState, std::string > stringFlipMap;
+	stringFlipMap.insert_or_assign(ot::Transform::NoFlip, "NoFlip");
+	stringFlipMap.insert_or_assign(ot::Transform::FlipVertically, "FlipVertically");
+	stringFlipMap.insert_or_assign(ot::Transform::FlipHorizontally, "FlipHorizontally");
+
+	if(PropertyHelper::hasProperty(blockEnt, "Flip")) {
+		EntityPropertiesSelection* propertyFlip = PropertyHelper::getSelectionProperty(blockEnt, "Flip");
+		auto propertyBaseFlip = blockEnt->getProperties().getProperty("Flip");
+		if (transform.getFlipStateFlags() & ot::Transform::FlipHorizontally) {
+			if (propertyFlip->getValue() != stringFlipMap[static_cast<ot::Transform::FlipState>(transform.getFlipStateFlags() & ot::Transform::FlipHorizontally)]) {
+				propertyFlip->setValue(stringFlipMap[ot::Transform::FlipHorizontally]);
+				storeTopologyEntity = true;
+			}
+		}
+
+		if (transform.getFlipStateFlags() & ot::Transform::FlipVertically) {
+			if (propertyFlip->getValue() != stringFlipMap[static_cast<ot::Transform::FlipState>(transform.getFlipStateFlags() & ot::Transform::FlipVertically)]) {
+				propertyFlip->setValue(stringFlipMap[ot::Transform::FlipVertically]);
+				storeTopologyEntity = true;
+			}
+		}
+	}
+
+	// Here update block positition
+	ot::UID positionID = blockEnt->getCoordinateEntityID();
+	std::map<ot::UID, EntityBase*> map;
+	auto coordinateEntBase = model->readEntityFromEntityID(blockEnt, positionID, map);
+
+	EntityCoordinates2D* coordinateEntity = dynamic_cast<EntityCoordinates2D*>(coordinateEntBase);
+	auto parent = coordinateEntity->getParent();
+	if (!coordinateEntity) {
+		OT_LOG_E("Coordinate Entity is null");
+		return false;
+	}
+
+	if (coordinateEntity->getCoordinates() != _changedBlock->getPosition()) {
+		coordinateEntity->setCoordinates(_changedBlock->getPosition());
+		coordinateEntity->storeToDataBase();
+		blockEnt->setCoordinateEntity(*coordinateEntity);
+		model->getStateManager()->modifyEntityVersion(*coordinateEntity);
+		storeTopologyEntity = true;
+	}
+	
+	if (storeTopologyEntity) {
+		blockEnt->storeToDataBase();
+		model->getStateManager()->modifyEntityVersion(*blockEnt);
+	}
+	return true;
+}
+
+bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedConnection, const ot::GraphicsChangeEvent& _changeEvent) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+	// Get uid of changed connection
+	const ot::UID connectionID = _changedConnection.getUid();
+	
+	// Get connection entity
+	auto entBase = model->getEntityByID(connectionID);
 	EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entBase);
 	if (!connectionEntity) {
 		OT_LOG_E("BlockEntity is null");
-		return ot::ReturnMessage::Failed;
-	}
-
-	// Check if any service wants to handle this change
-	if (!_eventData.isEventFlagSet(ot::GuiEvent::ForceHandle)) {
-		std::list<std::string> handlingServices = connectionEntity->getServicesForCallback(EntityBase::Callback::DataHandle);
-		if (!handlingServices.empty()) {
-			ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionChangedDocument(_connectionData, ot::GuiEvent::createForwardingEvent(_eventData));
-			Application::instance()->sendMessageAsync(true, handlingServices, doc);
-			return ot::ReturnMessage::Ok;
-		}
+		return false;
 	}
 
 	// Update connection
-	connectionEntity->setConnectionCfg( _connectionData);
+	connectionEntity->setConnectionCfg(_changedConnection);
 	connectionEntity->storeToDataBase();
-	_model->getStateManager()->modifyEntityVersion(*connectionEntity);
+	model->getStateManager()->modifyEntityVersion(*connectionEntity);
 
-	_model->setModified();
-	_model->modelChangeOperationCompleted("Connection Changed");
-
-	// Check if any service wants to be notified about this change
-	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
-		std::list<std::string> notifyServices = connectionEntity->getServicesForCallback(EntityBase::Callback::DataNotify);
-		if (!notifyServices.empty()) {
-			ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionChangedDocument(_connectionData, ot::GuiEvent::createForwardingEvent(_eventData));
-			Application::instance()->sendMessageAsync(false, notifyServices, doc);
-		}
-	}
-
-	return ot::ReturnMessage::Ok;
+	return true;
 }
-*/
+
