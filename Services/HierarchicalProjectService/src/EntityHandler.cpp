@@ -189,13 +189,13 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	connectionEntity.createProperties();
 	connectionEntity.setName(newConnectionName);
 
-	//Now i create the GraphicsConnectionCfg and set it with the information
+	// Create the GraphicsConnectionCfg and set it with the information
 	ot::GraphicsConnectionCfg newConnection(_connection);
 	newConnection.setUid(connectionEntity.getEntityID());
 	newConnection.setLineShape(ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine);
 	newConnection.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
 
-	//Now i set the attirbutes of connectionEntity
+	// Set the attirbutes of connectionEntity
 	connectionEntity.setConnectionCfg(newConnection);
 	connectionEntity.setName(newConnectionName);
 	connectionEntity.setGraphicsScenePackageChildName(c_connectionsFolderName);

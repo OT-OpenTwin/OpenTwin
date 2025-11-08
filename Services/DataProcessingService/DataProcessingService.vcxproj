@@ -200,7 +200,6 @@
     <ClCompile Include="src\BlockEntityHandler.cpp" />
     <ClCompile Include="src\BlockHandlerDatabaseAccess.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\ExternalDependencies.cpp" />
     <ClCompile Include="src\MeasurementCampaignHandler.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\PipelineData.cpp" />
@@ -221,7 +220,6 @@
     <ClInclude Include="include\BlockHandlerPython.h" />
     <ClInclude Include="include\BlockHandlerStorage.h" />
     <ClInclude Include="include\DataDocument.h" />
-    <ClInclude Include="include\ExternalDependencies.h" />
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />
     <ClInclude Include="include\ModelNotifier.h" />

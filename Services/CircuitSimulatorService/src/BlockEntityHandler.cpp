@@ -55,63 +55,10 @@
 #include <algorithm>
 #include <queue>
 
-std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName, const ot::Point2DD& position) {
-	EntityBase* baseEntity = EntityFactory::instance().create(blockName);
-	assert(baseEntity != nullptr);
-	std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
-
-	blockEntity->setEditable(true);
-	blockEntity->registerCallbacks(
-		ot::EntityCallbackBase::Callback::Properties |
-		ot::EntityCallbackBase::Callback::Selection,
-		Application::instance()->getServiceName()
-	);
-	blockEntity->setEntityID(_modelComponent->createEntityUID());
-	blockEntity->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
-	// Here i want to add the items to the corresponding editor	
-
-	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr));
-	blockCoordinates->setCoordinates(position);
-	blockCoordinates->storeToDataBase();
-
-	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
-	
-	
-
-	//Von Blockentity in CircuitEntity casten und createProperties aufrufen
-
-	std::string elementName = InitSpecialisedCircuitElementEntity(blockEntity);
-	if (elementName != "") {
-	//Create block Titles
-	//First get a list of all folder items of the Circuit folder
-		std::list<std::string> circuitItems = ot::ModelServiceAPI::getListOfFolderItems(editorName);
-		// Create a unique name for the new circuit item
-		int count = 1;
-		std::string circuitItemName;
-		std::string circuitAbbraviationName;
-		do {
-			circuitAbbraviationName = editorName +"/"+ elementName + std::to_string(count);
-			count++;
-		} while (std::find(circuitItems.begin(), circuitItems.end(), circuitAbbraviationName) != circuitItems.end());
-		blockEntity->setName(circuitAbbraviationName);
-	}
-	else {
-		std::string entName = CreateNewUniqueTopologyName(editorName, blockEntity->getBlockTitle());
-		blockEntity->setName(entName);
-	}
-
-
-
-	blockEntity->storeToDataBase();
-	ot::ModelServiceAPI::addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
-
-	return blockEntity;
-}
-
-void BlockEntityHandler::OrderUIToCreateBlockPicker() {
+void BlockEntityHandler::createBlockPicker() {
 	ot::JsonDocument doc;
 	
-	auto pckg = BuildUpBlockPicker();
+	auto pckg = buildUpBlockPicker();
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, ot::JsonObject(pckg, doc.GetAllocator()), doc.GetAllocator());
 	
@@ -181,173 +128,7 @@ std::shared_ptr<EntityFileText> BlockEntityHandler::getCircuitModel(const std::s
 
 }
 
-void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnectionCfg>& _connections,std::string _baseFolderName) {
-	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(_baseFolderName);
-
-	std::list<ot::UID> topologyEntityIDList;
-	std::list<ot::UID> topologyEntityVersionList;
-	std::list<bool> topologyEntityForceVisible = { false };
-	std::list<ot::UID> dataEntityIDList;
-	std::list<ot::UID> dataEntityVersionList;
-	std::list<ot::UID> dataEntityParentList;
-
-	std::string blockName = "EntityBlockConnection";
-	int count = 1;
-	std::list< EntityBlockConnection> entitiesForUpdate;
-	const std::string connectionFolderName = _baseFolderName + "/" + m_connectionsFolder;
-	for (auto& connection : _connections) {
-
-		std::list<std::string> connectionItems = ot::ModelServiceAPI::getListOfFolderItems(connectionFolderName);
-
-		//Now I first create the needed parameters for entName
-		ot::UID entityID = _modelComponent->createEntityUID();
-		
-		// Use a manual counter because all connections are added to the model at the end.
-		// CreateNewUniqueEntityName only considers connections already in the model,
-        // which could otherwise result in duplicate names.
-		std::string connectionName;
-		do {
-			connectionName = connectionFolderName + "/Connection" + std::to_string(count);
-			count++;
-		} while (std::find(connectionItems.begin(), connectionItems.end(), connectionName) != connectionItems.end());
-
-
-
-		//std::string connectionName = ot::EntityName::createUniqueEntityName(connectionFolderName, "Connection", connectionItems);
-	
-		//Here i create the connectionEntity
-		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
-		connectionEntity.createProperties();
-		
-		
-		//Now i create the GraphicsConnectionCfg and set it with the information
-		ot::GraphicsConnectionCfg newConnection(connection);
-		newConnection.setUid(connectionEntity.getEntityID());
-		newConnection.setLineShape(ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine);
-		newConnection.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
-		newConnection.setOriginPos(connection.getOriginPos());
-		newConnection.setDestPos(connection.getDestPos());
-
-		//Now i set the attirbutes of connectionEntity
-		connectionEntity.setConnectionCfg(newConnection);
-		connectionEntity.setName(connectionName);
-		connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
-		connectionEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
-		connectionEntity.registerCallbacks(
-			ot::EntityCallbackBase::Callback::Properties |
-			ot::EntityCallbackBase::Callback::Selection,
-			Application::instance()->getServiceName()
-		);
-
-		if (blockEntitiesByBlockID.find(newConnection.getOriginUid()) != blockEntitiesByBlockID.end()) {
-			auto& blockEntity = blockEntitiesByBlockID[newConnection.getOriginUid()];
-		}
-		else {
-			OT_LOG_EAS("Could not create connection since block " + std::to_string(newConnection.getOriginUid()) + " was not found");
-			continue;
-		}
-
-		if (blockEntitiesByBlockID.find(newConnection.getDestinationUid()) != blockEntitiesByBlockID.end()) {
-			auto& blockEntity = blockEntitiesByBlockID[newConnection.getDestinationUid()];
-		}
-		else {
-			OT_LOG_EAS("Could not create connection since block " + std::to_string(newConnection.getDestinationUid()) + " was not found.");
-			continue;
-		}
-		
-		entitiesForUpdate.push_back(connectionEntity);
-	}
-
-	for (auto& entityForUpdate : entitiesForUpdate) {
-		entityForUpdate.storeToDataBase();
-		topologyEntityIDList.push_back(entityForUpdate.getEntityID());
-		topologyEntityVersionList.push_back(entityForUpdate.getEntityStorageVersion());
-	}
-		
-	ot::ModelServiceAPI::updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, "Added new connection to BlockEntities");
-		
-	
-
-}
-
-void BlockEntityHandler::addConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& _connections, std::string _editorName, ot::Point2DD _pos)
-{
-	
-	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(_editorName);
-
-	auto connectionEntitiesByID = findAllEntityBlockConnections(_editorName);
-	std::list<std::string> entitiesToDelete;
-	std::list<ot::UID> topologyEntityIDList;
-	std::list<ot::UID> topologyEntityVersionList;
-
-	std::queue<std::pair<std::string,std::shared_ptr<EntityBlock>>> connectedElements;
-	std::list<ot::GraphicsConnectionCfg> connectionsNew;
-	
-	for (auto connection : _connections)
-	{
-		//First i get the connection which i want to delete by the connection to be added
-		if (connectionEntitiesByID.find(connection.getDestinationUid()) == connectionEntitiesByID.end()) {
-			OT_LOG_EAS("Connection not found: " + connection.getDestinationUid());
-			continue;
-		}
-
-		//Now i got the connection and want to delete it at the blocks
-		std::shared_ptr<EntityBlockConnection> connectionToDelete = connectionEntitiesByID[connection.getDestinationUid()];
-		ot::GraphicsConnectionCfg connectionCfg = connectionToDelete->getConnectionCfg();
-		//Saving connected Element and connector
-		connectedElements.push(std::make_pair(connection.getOriginConnectable(), blockEntitiesByBlockID[connection.getOriginUid()]));
-
-		// Here I check if the the blocks which are connected to the connection exist
-		if (blockEntitiesByBlockID.find(connectionCfg.getDestinationUid()) == blockEntitiesByBlockID.end() ||
-			blockEntitiesByBlockID.find(connectionCfg.getOriginUid()) == blockEntitiesByBlockID.end()) {
-			OT_LOG_EA("BlockEntity not found");
-			continue;
-		}
-
-		//Saving  connected Elements and connectors
-		connectedElements.push(std::make_pair(connectionCfg.getDestConnectable(),blockEntitiesByBlockID[connectionCfg.getDestinationUid()]));
-		connectedElements.push(std::make_pair(connectionCfg.getOriginConnectable(),blockEntitiesByBlockID[connectionCfg.getOriginUid()]));
-
-		entitiesToDelete.push_back(connectionToDelete->getName());
-
-		// Now i remove the connections from model
-		ot::ModelServiceAPI::deleteEntitiesFromModel(entitiesToDelete);
-
-		// As next step i need to add the intersection item 
-		std::shared_ptr<EntityBlock> connector = CreateBlockEntity(_editorName, "EntityBlockCircuitConnector", _pos);
-
-		//Now i create a GraphicsConnectionCfg for all elements
-		while (!connectedElements.empty()) {
-			ot::GraphicsConnectionCfg temp(connection);
-			temp.setDestUid(connector->getEntityID());
-			temp.setDestConnectable(connector->getName());
-			temp.setOriginUid(connectedElements.front().second->getEntityID());
-			temp.setOriginConnectable(connectedElements.front().first);
-			connectionsNew.push_back(temp);
-			connectedElements.pop();
-		}
-
-		addBlockConnection(connectionsNew, _editorName);
-	}
-}
-
-std::string BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity) {
-	EntityBlockCircuitElement* element = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
-
-	if (element != nullptr) {
-		element->createProperties();
-		return element->getTypeAbbreviation();
-		
-	} else if(blockEntity->getClassName() != "EntityBlockCircuitGND" && blockEntity->getClassName() != "EntityBlockCircuitConnector") {
-		OT_LOG_E("EntityBlockCircuitElement is null");
-	}
-	
-	return "";
-}
-
-
-
-ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker() {
+ot::GraphicsPickerCollectionPackage BlockEntityHandler::buildUpBlockPicker() {
 	ot::GraphicsPickerCollectionPackage graphicsPicker;
 	ot::GraphicsPickerCollectionCfg a("CircuitElements", "Circuit Elements");
 	ot::GraphicsPickerCollectionCfg a1("PassiveElements", "Passive Elements");
@@ -378,10 +159,6 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker() {
 	graphicsPicker.setPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	return graphicsPicker;
 }
-
-
-
-
 
 void BlockEntityHandler::createResultCurves(std::string solverName,std::string simulationType,std::string circuitName) 
 {
@@ -590,16 +367,6 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		plotCfg.setEntityName(fullPlotNameCurrent);
 		plotBuilderCurrent.buildPlot(plotCfg, false);
 	}
-}
-
-// Setter
-void BlockEntityHandler::setPackageName(std::string name) {
-	this->_packageName = name;
-}
-
-// Getter
-const std::string BlockEntityHandler::getPackageName() const {
-	return this->_packageName;
 }
 
 const std::string BlockEntityHandler::getInitialCircuitName() const {

@@ -38,11 +38,9 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "Helper.h"
 
-#include "ExternalDependencies.h"
 #include "EntitySolverDataProcessing.h"
 
 #include "OTServiceFoundation/UILockWrapper.h"
-#include "EntitySolverDataProcessing.h"
 #include "EntityGraphicsScene.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
 
@@ -227,7 +225,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(m_buttonGraphicsScene.setButtonLockFlags(modelWrite));
 
 	_blockEntityHandler.setUIComponent(_ui);
-	_blockEntityHandler.orderUIToCreateBlockPicker();
+	_blockEntityHandler.createBlockPicker();
 	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 

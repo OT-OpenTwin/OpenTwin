@@ -261,7 +261,7 @@ void Application::runCircuitSimulation() {
 	m_modelVersion = ot::ModelServiceAPI::getCurrentModelVersion();
 
 	if (!m_solverInfo.empty()) {
-		auto solver = m_solverInfo.front();
+		ot::EntityInformation solver = m_solverInfo.front();
 		m_solverInfo.pop_front();
 		runSingleSolver(solver, m_modelVersion, m_solverMap[solver.getEntityName()]);
 		m_solverMap.erase(solver.getEntityName());
@@ -272,7 +272,7 @@ void Application::runNextSolvers() {
 	// run next solver
 
 	if (!m_solverInfo.empty()) {
-		auto solver = m_solverInfo.front();
+		ot::EntityInformation solver = m_solverInfo.front();
 		m_solverInfo.pop_front();
 		runSingleSolver(solver, m_modelVersion, m_solverMap[solver.getEntityName()]);
 		m_solverMap.erase(solver.getEntityName());
@@ -510,7 +510,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 
 	m_blockEntityHandler.setUIComponent(_ui);
 	
-	m_blockEntityHandler.OrderUIToCreateBlockPicker();
+	m_blockEntityHandler.createBlockPicker();
 	m_blockEntityHandler.setPackageName("Circuit 1");
 	//createInitialCircuit();
 	SimulationResults::getInstance()->setUIComponent(_ui);
