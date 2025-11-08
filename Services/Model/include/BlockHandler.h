@@ -24,6 +24,8 @@
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 
 class EntityBlock;
+class EntityGraphicsScene;
+class EntityBlockConnection;
 
 class BlockHandler : public BusinessLogicHandler, public ot::GraphicsActionHandler {
 	OT_DECL_NOCOPY(BlockHandler)
@@ -42,7 +44,28 @@ protected:
 	
 	virtual ot::ReturnMessage graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) override;
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Helper
+
 private:
+	//! @brief Handles the connection of one block to another block.
+	//! @param _scene The graphics scene in which the connection is being made.
+	//! @param _originBlock The block from which the connection originates.
+	//! @param _destinationBlock The block to which the connection is made.
+	//! @param _eventData The event data associated with the connection drop event.
+	//! @return True if the connection was handled successfully, false otherwise.
+	bool createBlockToBlockConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlock* _destinationBlock, const ot::GraphicsConnectionDropEvent& _eventData);
+
+	//! @brief Handles the connection of a block to another connection.
+	//! @param _scene The graphics scene in which the connection is being made.
+	//! @param _originBlock The block from which the connection originates.
+	//! @param _destinationConnection The connection to which the block is being connected.
+	//! @param _eventData The event data associated with the connection drop event.
+	//! @param _connectionReversed If true, the origin of the event data is considered the destination and vice versa.
+	//! @return True if the connection was handled successfully, false otherwise.
+	bool createBlockToConnectionConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlockConnection* _destinationConnection, const ot::GraphicsConnectionDropEvent& _eventData, bool _connectionReversed);
+
 	std::unordered_map<std::string, std::unordered_map<ot::UID, ot::UID>> m_viewBlockConnectionMap;
 	const std::string m_connectionsFolder = "Connections";
 

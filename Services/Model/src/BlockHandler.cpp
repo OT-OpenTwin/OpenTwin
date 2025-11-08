@@ -278,11 +278,9 @@ ot::ReturnMessage BlockHandler::graphicsItemDoubleClicked(const ot::GraphicsDoub
 }
 
 ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsConnectionDropEvent& _eventData) {
-	/*
 	Model* model = Application::instance()->getModel();
 
-	const auto& connections = _connectionData.getConnections();
-	std::string viewName = _connectionData.getName();
+	std::string viewName = _eventData.getEditorName();
 
 	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(model->findEntityFromName(viewName));
 	if (!editor) {
@@ -302,63 +300,77 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 		}
 	}
 
-	ot::NewModelStateInfo modelStateInfo;
-	std::list<bool> forceVis;
-
-	for (ot::GraphicsConnectionCfg connection : connections) {
-		// Create connection entity
-		EntityBlockConnection connectionEntity(model->createEntityUID(), nullptr, nullptr, nullptr);
-		connectionEntity.createProperties();
-		connectionEntity.setCallbackData(editor->getCallbackData());
-		connectionEntity.setGraphicsPickerKey(_connectionData.getPickerKey());
-		connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
-
-		// Determine unique name
-		auto connectionsFolder = model->getListOfFolderItems(_connectionData.getName() + "/" + m_connectionsFolder, true);
-		const std::string connectionName = CreateNewUniqueTopologyName(connectionsFolder, _connectionData.getName() + "/" + m_connectionsFolder, "Connection");
-		connectionEntity.setName(connectionName);
-
-		// Get connectors
-		EntityBlock* originBlock = dynamic_cast<EntityBlock*>(model->getEntityByID(connection.getOriginUid()));
-		EntityBlock* destinationBlock = dynamic_cast<EntityBlock*>(model->getEntityByID(connection.getDestinationUid()));
-
-		if (originBlock == nullptr || destinationBlock == nullptr) {
-			OT_LOG_E("Could not find origin or destination block for connection");
-			return ot::ReturnMessage::Failed;
-		}
-
-		connection.setLineShape(originBlock->getDefaultConnectionShape());
-		connectionEntity.setConnectionCfg(connection);
-
-		// Find connectors
-		auto originConnectorIt = originBlock->getAllConnectorsByName().find(connection.getOriginConnectable());
-		auto destinationConnectorIt = destinationBlock->getAllConnectorsByName().find(connection.getDestConnectable());
-
-		if (originConnectorIt == originBlock->getAllConnectorsByName().end() || destinationConnectorIt == destinationBlock->getAllConnectorsByName().end()) {
-			OT_LOG_E("Could not find origin or destination connector for connection");
-			return ot::ReturnMessage::Failed;
-		}
-
-		// Check connector types
-		auto originConnectorType = originConnectorIt->second.getConnectorType();
-		auto destinationConnectorType = destinationConnectorIt->second.getConnectorType();
-
-		if ((originConnectorType == ot::ConnectorType::In || originConnectorType == ot::ConnectorType::InOptional) &&
-			(destinationConnectorType == ot::ConnectorType::In || destinationConnectorType == ot::ConnectorType::InOptional)) {
-			Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
-			return ot::ReturnMessage::Ok;
-		}
-		else if (originConnectorType == ot::ConnectorType::Out &&
-			destinationConnectorType == ot::ConnectorType::Out) {
-			Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
-			return ot::ReturnMessage::Ok;
-		}
-
-		connectionEntity.storeToDataBase();
-		modelStateInfo.addTopologyEntity(connectionEntity);
+	// Ensure that both origin and destination are set
+	if (!_eventData.getConnectionCfg().hasOrigin() || !_eventData.getConnectionCfg().hasDestination()) {
+		OT_LOG_D("Ignoring connection request, no origin or destination entity set");
+		return ot::ReturnMessage::Ok;
 	}
 
-	model->addEntitiesToModel(modelStateInfo, "Added connections", true, true, true);
+	// Get origin and destination entities
+	EntityBase* originEntityBase = model->getEntityByID(_eventData.getConnectionCfg().getOriginUid());
+	if (!originEntityBase) {
+		OT_LOG_E("Could not find origin entity for connection { \"OriginUID\": " + std::to_string(_eventData.getConnectionCfg().getOriginUid()) + " }");
+		return ot::ReturnMessage::Failed;
+	}
+
+	EntityBase* destinationEntityBase = model->getEntityByID(_eventData.getConnectionCfg().getDestinationUid());
+	if (!destinationEntityBase) {
+		OT_LOG_E("Could not find destination entity for connection { \"DestinationUID\": " + std::to_string(_eventData.getConnectionCfg().getDestinationUid()) + " }");
+		return ot::ReturnMessage::Failed;
+	}
+
+	// Check connection type
+	EntityBlockConnection* originConnection = dynamic_cast<EntityBlockConnection*>(originEntityBase);
+	if (originConnection)
+	{
+		EntityBlockConnection* destinationConnection = dynamic_cast<EntityBlockConnection*>(destinationEntityBase);
+		if (destinationConnection) {
+			// Conenction to connection
+			OT_LOG_W("Connection to connection not supported yet");
+		}
+		else {
+			// Block to connection (reversed)
+			EntityBlock* destinationBlock = dynamic_cast<EntityBlock*>(destinationEntityBase);
+			if (!destinationBlock) {
+				OT_LOG_E("Could not cast to EntityBlock { \"EntityUID\": " + std::to_string(destinationEntityBase->getEntityID()) + "\" }");
+				return ot::ReturnMessage::Failed;
+			}
+
+			if (!createBlockToConnectionConnection(editor, destinationBlock, originConnection, _eventData, true)) {
+				OT_LOG_E("Could not handle block to connection (reversed) connection");
+				return ot::ReturnMessage::Failed;
+			}
+		}
+	}
+	else {
+		EntityBlock* originBlock = dynamic_cast<EntityBlock*>(originEntityBase);
+		if (!originBlock) {
+			OT_LOG_E("Could not cast to EntityBlock { \"EntityUID\": " + std::to_string(originEntityBase->getEntityID()) + "\" }");
+			return ot::ReturnMessage::Failed;
+		}
+
+		EntityBlockConnection* destinationConnection = dynamic_cast<EntityBlockConnection*>(destinationEntityBase);
+		if (destinationConnection) {
+			// Block to connection
+			if (!createBlockToConnectionConnection(editor, originBlock, destinationConnection, _eventData, false)) {
+				OT_LOG_E("Could not handle block to connection connection");
+				return ot::ReturnMessage::Failed;
+			}
+		}
+		else {
+			// Block to block
+			EntityBlock* destinationBlock = dynamic_cast<EntityBlock*>(destinationEntityBase);
+			if (!destinationBlock) {
+				OT_LOG_E("Could not cast to EntityBlock { \"EntityUID\": " + std::to_string(destinationEntityBase->getEntityID()) + "\" }");
+				return ot::ReturnMessage::Failed;
+			}
+
+			if (!createBlockToBlockConnection(editor, originBlock, destinationBlock, _eventData)) {
+				OT_LOG_E("Could not handle block to block connection");
+				return ot::ReturnMessage::Failed;
+			}
+		}
+	}
 
 	// Check if any service wants to be notified about this change
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
@@ -370,13 +382,79 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 			Application::instance()->sendMessageAsync(false, notifyServices, doc);
 		}
 	}
-	*/
+	
 	return ot::ReturnMessage::Ok;
 }
 
 ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) {
 
 	return ot::ReturnMessage::Ok;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper
+
+bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlock* _destinationBlock, const ot::GraphicsConnectionDropEvent& _eventData) {
+	Model* model = Application::instance()->getModel();
+	
+	ot::NewModelStateInfo modelStateInfo;
+	std::list<bool> forceVis;
+
+	ot::GraphicsConnectionCfg connection = _eventData.getConnectionCfg();
+
+	// Create connection entity
+	EntityBlockConnection connectionEntity(model->createEntityUID(), nullptr, nullptr, nullptr);
+	connectionEntity.createProperties();
+	connectionEntity.setCallbackData(_scene->getCallbackData());
+	connectionEntity.setGraphicsPickerKey(_scene->getGraphicsPickerKey());
+	connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
+
+	// Determine unique name
+	auto connectionsFolder = model->getListOfFolderItems(_scene->getName() + "/" + m_connectionsFolder, true);
+	const std::string connectionName = CreateNewUniqueTopologyName(connectionsFolder, _scene->getName() + "/" + m_connectionsFolder, "Connection");
+	connectionEntity.setName(connectionName);
+
+	// Get connectors
+	connection.setLineShape(_originBlock->getDefaultConnectionShape());
+	connectionEntity.setConnectionCfg(connection);
+
+	// Find connectors
+	auto originConnectorIt = _originBlock->getAllConnectorsByName().find(connection.getOriginConnectable());
+	auto destinationConnectorIt = _destinationBlock->getAllConnectorsByName().find(connection.getDestConnectable());
+
+	if (originConnectorIt == _originBlock->getAllConnectorsByName().end() || destinationConnectorIt == _destinationBlock->getAllConnectorsByName().end()) {
+		OT_LOG_E("Could not find origin or destination connector for connection");
+		return false;
+	}
+
+	// Check connector types
+	auto originConnectorType = originConnectorIt->second.getConnectorType();
+	auto destinationConnectorType = destinationConnectorIt->second.getConnectorType();
+
+	if ((originConnectorType == ot::ConnectorType::In || originConnectorType == ot::ConnectorType::InOptional) &&
+		(destinationConnectorType == ot::ConnectorType::In || destinationConnectorType == ot::ConnectorType::InOptional)) {
+		Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
+		return true;
+	}
+	else if (originConnectorType == ot::ConnectorType::Out &&
+		destinationConnectorType == ot::ConnectorType::Out) {
+		Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
+		return true;
+	}
+
+	connectionEntity.storeToDataBase();
+	modelStateInfo.addTopologyEntity(connectionEntity);
+
+	model->addEntitiesToModel(modelStateInfo, "Added connections", true, true, true);
+
+	return true;
+}
+
+bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlockConnection* _destinationConnection, const ot::GraphicsConnectionDropEvent& _eventData, bool _connectionReversed) {
+	Model* model = Application::instance()->getModel();
+
+	return false;
 }
 
 /*
