@@ -59,7 +59,7 @@ ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionCfg::stringToSh
 }
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg()
-	: m_lineShape(ConnectionShape::DirectLine), m_destUID(0), m_originUID(0), m_uid(0), m_handlesState(true)
+	: m_lineShape(ConnectionShape::DirectLine), m_destUID(ot::invalidUID), m_originUID(ot::invalidUID), m_uid(ot::invalidUID), m_handlesState(true)
 {
 	m_lineStyle.setWidth(2.);
 }
@@ -69,7 +69,7 @@ ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const ConstJsonObject& _jsonObj
 }
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const ot::UID& _originUid, const std::string& _originConnectableName, const ot::UID& _destinationUid, const std::string& _destinationName)
-	: m_lineShape(ConnectionShape::DirectLine), m_uid(0),
+	: m_lineShape(ConnectionShape::DirectLine), m_uid(ot::invalidUID),
 	m_originUID(_originUid), m_originConnectable(_originConnectableName), m_destUID(_destinationUid), m_destConnectable(_destinationName), m_handlesState(true)
 {
 	m_lineStyle.setWidth(2.);

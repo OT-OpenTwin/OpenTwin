@@ -1,4 +1,21 @@
 // @otlicense
+// File: GuiEvent.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
 
 #pragma once
 
@@ -19,8 +36,6 @@ namespace ot {
 		};
 		typedef ot::Flags<EventFlag> EventFlags;
 
-		static GuiEvent createForwardingEvent(const GuiEvent& _originalEvent);
-
 		GuiEvent();
 		GuiEvent(const EventFlags& _flags);
 		GuiEvent(const ConstJsonObject& _jsonObject);
@@ -28,6 +43,10 @@ namespace ot {
 
 		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ConstJsonObject& _jsonObject) override;
+
+		//! @brief Prepares the event to be forwarded to a notifier.
+		//! The base implementation removes flags that would cause the event to be forwarded again.
+		virtual void setForwarding();
 
 		void setEventFlag(EventFlag _flag, bool _set = true) { m_flags.set(_flag, _set); };
 		void setEventFlags(const EventFlags& _flags) { m_flags = _flags; };

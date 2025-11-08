@@ -69,6 +69,9 @@ namespace ot {
 		//! @brief Create a copy of this connection but the origin an destination are swapped
 		GraphicsConnectionCfg getReversedConnection() const;
 
+		//! @brief Returns true if the origin UID is valid.
+		bool hasOrigin() const { return m_originUID != ot::invalidUID; };
+
 		void setOriginUid(const ot::UID& _uid) { m_originUID = _uid; };
 		const ot::UID& getOriginUid() const { return m_originUID; };
 
@@ -78,6 +81,9 @@ namespace ot {
 		void setOriginPos(double _x, double _y) { m_originPos.set(_x, _y); };
 		void setOriginPos(const ot::Point2DD& _pos) { m_originPos = _pos; };
 		const ot::Point2DD& getOriginPos() const { return m_originPos; };
+
+		//! @brief Returns true if the destination UID is valid.
+		bool hasDestination() const { return m_destUID != ot::invalidUID; };
 
 		void setDestUid(const ot::UID& _uid) { m_destUID = _uid; };
 		const ot::UID& getDestinationUid() const { return m_destUID; };

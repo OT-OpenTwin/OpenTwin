@@ -48,12 +48,12 @@ bool BlockHandler::addViewBlockRelation(std::string _viewName, ot::UID _blockId,
 	return true;
 }
 
-ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos, const ot::GuiEvent& _eventData) {
+ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
 
-	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(model->findEntityFromName(_viewName));
+	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(model->findEntityFromName(_eventData.getEditorName()));
 	if (!editor) {
-		OT_LOG_E("Could not find graphics editor entity { \"ViewName\": \"" + _viewName + "\" }");
+		OT_LOG_E("Could not find graphics editor entity { \"ViewName\": \"" + _eventData.getEditorName() + "\" }");
 		return ot::ReturnMessage::Failed;
 	}
 
@@ -61,7 +61,9 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::ForceHandle)) {
 		std::list<std::string> handlingServices = editor->getServicesForCallback(EntityBase::Callback::DataHandle);
 		if (!handlingServices.empty()) {
-			ot::JsonDocument doc = ot::GraphicsActionHandler::createItemRequestedDocument(_viewName, _itemName, _pos, ot::GuiEvent::createForwardingEvent(_eventData));
+			ot::GraphicsItemDropEvent fwdEvent(_eventData);
+			fwdEvent.setForwarding();
+			ot::JsonDocument doc = ot::GraphicsActionHandler::createItemRequestedDocument(fwdEvent);
 			Application::instance()->sendMessageAsync(true, handlingServices, doc);
 			return ot::ReturnMessage::Ok;
 		}
@@ -70,9 +72,9 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 	ot::NewModelStateInfo modelStateInfo;
 
 	// Create block entity
-	EntityBase* entBase = EntityFactory::instance().create(_itemName);
+	EntityBase* entBase = EntityFactory::instance().create(_eventData.getItemName());
 	if (entBase == nullptr) {
-		OT_LOG_E("Could not create Entity: " + _itemName);
+		OT_LOG_E("Could not create Entity: " + _eventData.getItemName());
 		return ot::ReturnMessage::Failed;
 	}
 
@@ -91,7 +93,7 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 		blockFolderName = blockEnt->getBlockFolderName();
 	}
 
-	std::string folderName = _viewName + blockFolderName;
+	std::string folderName = _eventData.getEditorName() + blockFolderName;
 
 	std::list<std::string> blocks = model->getListOfFolderItems(folderName, true);
 	std::string entName = CreateNewUniqueTopologyName(blockEnt->getNamingBehavior(), blocks, folderName, blockEnt->getBlockTitle());
@@ -106,7 +108,7 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 
 	// Create coordinate entity
 	EntityCoordinates2D* blockCoordinates = new EntityCoordinates2D(model->createEntityUID(), nullptr, nullptr, nullptr);
-	blockCoordinates->setCoordinates(_pos);
+	blockCoordinates->setCoordinates(_eventData.getScenePos());
 	blockCoordinates->storeToDataBase();
 	modelStateInfo.addDataEntity(*blockEnt, *blockCoordinates);
 
@@ -135,15 +137,17 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const std::string& _viewNa
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
 		std::list<std::string> notifyServices = blockEnt->getServicesForCallback(EntityBase::Callback::DataNotify);
 		if (!notifyServices.empty()) {
-			ot::JsonDocument doc = ot::GraphicsActionHandler::createItemRequestedDocument(_viewName, _itemName, _pos, ot::GuiEvent::createForwardingEvent(_eventData));
+			ot::GraphicsItemDropEvent fwdEvent(_eventData);
+			fwdEvent.setForwarding();
+			ot::JsonDocument doc = ot::GraphicsActionHandler::createItemRequestedDocument(fwdEvent);
 			Application::instance()->sendMessageAsync(false, notifyServices, doc);
 		}
 	}
 
 	return ot::ReturnMessage::Ok;
 }
-
-ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _item, const ot::GuiEvent& _eventData) {
+/*
+ot::ReturnMessage BlockHandler::graphicsItemChanged(const GraphicsDoubleClickEvent& _eventData) {
 	const ot::UID blockID = _item->getUid();
 	const ot::Transform transform = _item->getTransform();
 
@@ -240,21 +244,25 @@ ot::ReturnMessage BlockHandler::graphicsItemChanged(const ot::GraphicsItemCfg* _
 
 	return ot::ReturnMessage::Ok;
 }
-
-ot::ReturnMessage BlockHandler::graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid, const ot::GuiEvent& _eventData) {
+*/
+ot::ReturnMessage BlockHandler::graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
 
-	EntityBlock* block = dynamic_cast<EntityBlock*>(model->getEntityByID(_uid));
+	ot::GraphicsDoubleClickEvent fwdEvent(_eventData);
+	fwdEvent.setForwarding();
+
+	const ot::JsonDocument fwdDoc = ot::GraphicsActionHandler::createItemDoubleClickedDocument(fwdEvent);
+
+	EntityBlock* block = dynamic_cast<EntityBlock*>(model->getEntityByID(_eventData.getItemUid()));
 	if (!block) {
-		OT_LOG_E("Could not find block entity { \"BlockName\": \"" + _name + "\" }");
+		OT_LOG_E("Could not find block entity { \"UID\": " + std::to_string(_eventData.getItemUid()) + ", \"Name\": \"" + _eventData.getItemName() + "\" }");
 		return ot::ReturnMessage::Failed;
 	}
 
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::ForceHandle)) {
 		std::list<std::string> handlingServices = block->getServicesForCallback(EntityBase::Callback::DataHandle);
 		if (!handlingServices.empty()) {
-			ot::JsonDocument doc = ot::GraphicsActionHandler::createItemDoubleClickedDocument(_name, _uid, ot::GuiEvent::createForwardingEvent(_eventData));
-			Application::instance()->sendMessageAsync(true, handlingServices, doc);
+			Application::instance()->sendMessageAsync(true, handlingServices, fwdDoc);
 			return ot::ReturnMessage::Ok;
 		}
 	}
@@ -262,15 +270,15 @@ ot::ReturnMessage BlockHandler::graphicsItemDoubleClicked(const std::string& _na
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
 		std::list<std::string> notifyServices = block->getServicesForCallback(EntityBase::Callback::DataNotify);
 		if (!notifyServices.empty()) {
-			ot::JsonDocument doc = ot::GraphicsActionHandler::createItemDoubleClickedDocument(_name, _uid, ot::GuiEvent::createForwardingEvent(_eventData));
-			Application::instance()->sendMessageAsync(false, notifyServices, doc);
+			Application::instance()->sendMessageAsync(false, notifyServices, fwdDoc);
 		}
 	}
 
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::GuiEvent& _eventData) {
+ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsConnectionDropEvent& _eventData) {
+	/*
 	Model* model = Application::instance()->getModel();
 
 	const auto& connections = _connectionData.getConnections();
@@ -286,7 +294,9 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::ForceHandle)) {
 		std::list<std::string> handlingServices = editor->getServicesForCallback(EntityBase::Callback::DataHandle);
 		if (!handlingServices.empty()) {
-			ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(_connectionData, ot::GuiEvent::createForwardingEvent(_eventData));
+			ot::GraphicsConnectionDropEvent fwdEvent(_eventData);
+			fwdEvent.setForwarding();
+			const ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(fwdEvent);
 			Application::instance()->sendMessageAsync(true, handlingServices, doc);
 			return ot::ReturnMessage::Ok;
 		}
@@ -354,14 +364,22 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
 		std::list<std::string> notifyServices = editor->getServicesForCallback(EntityBase::Callback::DataNotify);
 		if (!notifyServices.empty()) {
-			ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(_connectionData, ot::GuiEvent::createForwardingEvent(_eventData));
+			ot::GraphicsConnectionDropEvent fwdEvent(_eventData);
+			fwdEvent.setForwarding();
+			const ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(fwdEvent);
 			Application::instance()->sendMessageAsync(false, notifyServices, doc);
 		}
 	}
+	*/
+	return ot::ReturnMessage::Ok;
+}
+
+ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) {
 
 	return ot::ReturnMessage::Ok;
 }
 
+/*
 ot::ReturnMessage BlockHandler::graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData, const ot::GuiEvent& _eventData) {
 	const ot::UID connectionID =  _connectionData.getUid();
 	Model* _model = Application::instance()->getModel();
@@ -401,5 +419,5 @@ ot::ReturnMessage BlockHandler::graphicsConnectionChanged(const ot::GraphicsConn
 	}
 
 	return ot::ReturnMessage::Ok;
-
 }
+*/

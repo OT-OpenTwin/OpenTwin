@@ -23,6 +23,8 @@
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 
+class EntityBlock;
+
 class BlockHandler : public BusinessLogicHandler, public ot::GraphicsActionHandler {
 	OT_DECL_NOCOPY(BlockHandler)
 	OT_DECL_NOMOVE(BlockHandler)
@@ -33,14 +35,15 @@ public:
 	bool addViewBlockRelation(std::string _viewName, ot::UID _blockId, ot::UID _connectionId);
 
 protected:
-	virtual ot::ReturnMessage graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos, const ot::GuiEvent& _eventData) override;
-	virtual ot::ReturnMessage graphicsItemChanged(const ot::GraphicsItemCfg* _item, const ot::GuiEvent& _eventData) override;
-	virtual ot::ReturnMessage graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid, const ot::GuiEvent& _eventData) override;
+	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;
+	virtual ot::ReturnMessage graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) override;
 
-	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::GuiEvent& _eventData) override;
-	virtual ot::ReturnMessage graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData, const ot::GuiEvent& _eventData) override;
+	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionDropEvent& _eventData) override;
 	
+	virtual ot::ReturnMessage graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) override;
+
 private:
 	std::unordered_map<std::string, std::unordered_map<ot::UID, ot::UID>> m_viewBlockConnectionMap;
 	const std::string m_connectionsFolder = "Connections";
+
 };

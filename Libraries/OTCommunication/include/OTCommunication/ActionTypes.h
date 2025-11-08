@@ -305,11 +305,8 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem "UI.GraphicsEditor.Item.Remove"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ChangeEvent "UI.GraphicsEditor.ChangeEvent"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection "UI.GraphicsEditor.Connection.Add"
-#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection "UI.GraphicsEditor.Connection.AddToConnection"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection "UI.GraphicsEditor.Connection.Remove"
-#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged "UI.GraphicsEditor.ItemChanged"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked "UI.GraphicsEditor.ItemDoubleClicked"
-#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged "UI.GraphicsEditor.ConnectionChanged"
 #define OT_ACTION_CMD_SelectedEntitiesSerialise "SerialiseSelectedEntities"
 #define OT_ACTION_CMD_PasteEntities "PasteEntities"
 

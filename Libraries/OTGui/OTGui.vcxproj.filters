@@ -81,6 +81,12 @@
     <Filter Include="Source Files\ManagedProperties">
       <UniqueIdentifier>{1779e56e-4a15-4482-afc2-44e3841eb269}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Events">
+      <UniqueIdentifier>{6163f63c-0cd6-4ea5-abb9-8e67b9a0ade6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Events">
+      <UniqueIdentifier>{08a3d542-92e2-40dd-bb5b-034a1b5fff3e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GraphicsPickerCollectionCfg.h">
@@ -470,11 +476,20 @@
     <ClInclude Include="include\OTGui\ExtendedProjectInformation.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\GraphicsChangeEvent.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTGui\GuiEvent.h">
-      <Filter>Header Files\General</Filter>
+      <Filter>Header Files\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsChangeEvent.h">
+      <Filter>Header Files\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsItemDropEvent.h">
+      <Filter>Header Files\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsConnectionDropEvent.h">
+      <Filter>Header Files\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsDoubleClickEvent.h">
+      <Filter>Header Files\Events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -841,11 +856,20 @@
     <ClCompile Include="src\ExtendedProjectInformation.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsChangeEvent.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\GuiEvent.cpp">
-      <Filter>Source Files\General</Filter>
+      <Filter>Source Files\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsChangeEvent.cpp">
+      <Filter>Source Files\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemDropEvent.cpp">
+      <Filter>Source Files\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsConnectionDropEvent.cpp">
+      <Filter>Source Files\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsDoubleClickEvent.cpp">
+      <Filter>Source Files\Events</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

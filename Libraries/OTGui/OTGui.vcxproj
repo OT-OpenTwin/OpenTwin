@@ -30,7 +30,10 @@
     <ClInclude Include="include\OTGui\ExtendedProjectInformation.h" />
     <ClInclude Include="include\OTGui\FileExtension.h" />
     <ClInclude Include="include\OTGui\GraphicsChangeEvent.h" />
+    <ClInclude Include="include\OTGui\GraphicsConnectionDropEvent.h" />
     <ClInclude Include="include\OTGui\GraphicsHierarchicalProjectItemBuilder.h" />
+    <ClInclude Include="include\OTGui\GraphicsDoubleClickEvent.h" />
+    <ClInclude Include="include\OTGui\GraphicsItemDropEvent.h" />
     <ClInclude Include="include\OTGui\GraphicsZValues.h" />
     <ClInclude Include="include\OTGui\GuiEvent.h" />
     <ClInclude Include="include\OTGui\LibraryModel.h" />
@@ -166,10 +169,13 @@
     <ClCompile Include="src\GraphicsArcItemCfg.cpp" />
     <ClCompile Include="src\GraphicsConnectionCalculationData.cpp" />
     <ClCompile Include="src\GraphicsChangeEvent.cpp" />
+    <ClCompile Include="src\GraphicsConnectionDropEvent.cpp" />
+    <ClCompile Include="src\GraphicsDoubleClickEvent.cpp" />
     <ClCompile Include="src\GraphicsGroupItemCfg.cpp" />
     <ClCompile Include="src\GraphicsHierarchicalProjectItemBuilder.cpp" />
     <ClCompile Include="src\GraphicsInvisibleItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfgFactory.cpp" />
+    <ClCompile Include="src\GraphicsItemDropEvent.cpp" />
     <ClCompile Include="src\GraphicsItemFileCfg.cpp" />
     <ClCompile Include="src\GraphicsLineItemCfg.cpp" />
     <ClCompile Include="src\GraphicsPickerItemInfo.cpp" />

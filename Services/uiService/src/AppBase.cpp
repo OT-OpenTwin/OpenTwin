@@ -2345,7 +2345,11 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 
-		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemRequestedDocument(view->getGraphicsView()->getGraphicsViewName(), _name.toStdString(), ot::QtFactory::toPoint2D(_pos), ot::GuiEvent());
+		ot::GraphicsItemDropEvent eventData;
+		eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
+		eventData.setItemName(_name.toStdString());
+		eventData.setScenePos(ot::QtFactory::toPoint2D(_pos));
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemRequestedDocument(eventData);
 
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
@@ -2384,7 +2388,10 @@ void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
 	try {
 		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
 		
-		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemChangedDocument(_newConfig, ot::GuiEvent());
+		ot::GraphicsChangeEvent eventData;
+		eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
+		eventData.addChangedItem(_newConfig->createCopy());
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createChangeEventDocument(eventData);
 
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
@@ -2423,7 +2430,11 @@ void AppBase::slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConf
 	try {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 
-		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemDoubleClickedDocument(_itemConfig->getName(), _itemConfig->getUid(), ot::GuiEvent());
+		ot::GraphicsDoubleClickEvent eventData;
+		eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
+		eventData.setItemName(_itemConfig->getName());
+		eventData.setItemUid(_itemConfig->getUid());
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemDoubleClickedDocument(eventData);
 
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
@@ -2458,15 +2469,16 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 		return;
 	}
 
-	ot::GraphicsConnectionPackage pckg(view->getGraphicsView()->getGraphicsViewName());
+	ot::GraphicsConnectionDropEvent eventData;
+	eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
 	ot::GraphicsConnectionCfg connectionConfig(_fromUid, _fromConnector, _toUid, _toConnector);
 	connectionConfig.setLineStyle(ot::PenFCfg(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection)));
-	pckg.addConnection(connectionConfig);
+	eventData.setConnectionCfg(connectionConfig);
 		
 	try {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 
-		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(pckg, ot::GuiEvent());
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(eventData);
 
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
@@ -2501,15 +2513,16 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 		return;
 	}
 
-	ot::GraphicsConnectionPackage pckg(view->getGraphicsView()->getGraphicsViewName());
+	ot::GraphicsConnectionDropEvent eventData;
+	eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
 	ot::GraphicsConnectionCfg connectionConfig(_fromItemUid, _fromItemConnector, _toConnectionUid, std::string());
 	connectionConfig.setLineStyle(ot::PenFCfg(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
-	pckg.addConnection(connectionConfig);
+	connectionConfig.setDestPos(_newControlPoint);
 
 	try {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 
-		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionToConnectionRequestedDocument(pckg, _newControlPoint, ot::GuiEvent());
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(eventData);
 
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
@@ -2548,7 +2561,10 @@ void AppBase::slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _ne
 	try {
 		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
 
-		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionChangedDocument(_newConfig, ot::GuiEvent());
+		ot::GraphicsChangeEvent changeEvent;
+		changeEvent.addChangedConnection(_newConfig);
+
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createChangeEventDocument(changeEvent);
 
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {

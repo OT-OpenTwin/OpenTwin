@@ -163,6 +163,14 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 		connectionToName = ot::EntityName::getSubName(itemInfos.back().getEntityName()).value();
 	}
 
+	// Ensure origin and destination entites are both blocks
+	for (const ot::EntityInformation& info : itemInfos) {
+		if (info.getEntityType() == EntityBlockConnection::className()) {
+			OT_LOG_D("Connections between connection entities are not allowed");
+			return true;
+		}
+	}
+
 	// Create container if it does not exist
 	ot::EntityInformation containerInfo;
 	if (!ot::ModelServiceAPI::getEntityInformation(c_connectionsFolder, containerInfo) || containerInfo.getEntityName().empty()) {

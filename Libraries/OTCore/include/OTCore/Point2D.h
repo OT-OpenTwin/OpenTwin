@@ -34,6 +34,7 @@ namespace ot {
 	public:
 		Point2D() : m_x(0), m_y(0) {};
 		Point2D(int _x, int _y) : m_x(_x), m_y(_y) {};
+		Point2D(const ConstJsonObject& _jsonObject);
 		Point2D(const Point2D& _other) : m_x(_other.m_x), m_y(_other.m_y) {};
 		virtual ~Point2D() {};
 
@@ -134,6 +135,7 @@ namespace ot {
 	public:
 		Point2DF() : m_x(0.f), m_y(0.f) {};
 		Point2DF(float _x, float _y) : m_x(_x), m_y(_y) {};
+		Point2DF(const ConstJsonObject& _jsonObject);
 		Point2DF(const Point2DF& _other) : m_x(_other.m_x), m_y(_other.m_y) {};
 		virtual ~Point2DF() {};
 
@@ -218,6 +220,7 @@ namespace ot {
 	public:
 		Point2DD() : m_x(0.), m_y(0.) {};
 		Point2DD(double _x, double _y) : m_x(_x), m_y(_y) {};
+		Point2DD(const ConstJsonObject& _jsonObject);
 		Point2DD(const Point2DD& _other) : m_x(_other.m_x), m_y(_other.m_y) {};
 		virtual ~Point2DD() {};
 

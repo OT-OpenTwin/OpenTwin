@@ -193,23 +193,16 @@ void Application::modelSelectionChanged() {
 
 // Protected: Callback functions
 
-ot::ReturnMessage Application::graphicsItemRequested(const std::string& _viewName, const std::string& _itemName, const ot::Point2DD& _pos, const ot::GuiEvent& _eventData) {
+ot::ReturnMessage Application::graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) {
 	OT_LOG_W("Unexpected graphics item request");
 	return ot::ReturnMessage::Failed;
 }
 
-ot::ReturnMessage Application::graphicsItemChanged(const ot::GraphicsItemCfg* _item, const ot::GuiEvent& _eventData) {
-	// This should be handled by the model
-	ot::JsonDocument doc = ot::GraphicsActionHandler::createItemChangedDocument(_item, ot::GuiEvent::createForwardingEvent(_eventData));
-	sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc);
-	return ot::ReturnMessage::Ok;
-}
-
-ot::ReturnMessage Application::graphicsItemDoubleClicked(const std::string& _name, ot::UID _uid, const ot::GuiEvent& _eventData) {
+ot::ReturnMessage Application::graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) {
 	// Get entity information
 	ot::EntityInformation info;
-	if (!ot::ModelServiceAPI::getEntityInformation(_name, info)) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information for entity: " + _name);
+	if (!ot::ModelServiceAPI::getEntityInformation(_eventData.getItemName(), info)) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information for entity: " + _eventData.getItemName());
 		OT_LOG_E(ret.getWhat());
 		return ret;
 	}
@@ -226,25 +219,24 @@ ot::ReturnMessage Application::graphicsItemDoubleClicked(const std::string& _nam
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionPackage& _connectionData, const ot::GuiEvent& _eventData) {
-	for (const ot::GraphicsConnectionCfg& cfg : _connectionData.getConnections()) {
-		if (!m_entityHandler.addConnection(cfg)) {
-			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Could not add connection entity for connection request");
-		}
+ot::ReturnMessage Application::graphicsConnectionRequested(const ot::GraphicsConnectionDropEvent& _eventData) {
+	if (!_eventData.getConnectionCfg().hasOrigin() || !_eventData.getConnectionCfg().hasDestination()) {
+		return ot::ReturnMessage(ot::ReturnMessage::Ok, "Connections are only allowed between items");
 	}
-	return ot::ReturnMessage::Ok;
+
+	if (!m_entityHandler.addConnection(_eventData.getConnectionCfg())) {
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Could not add connection entity for connection request");
+	}
+	else {
+		return ot::ReturnMessage::Ok;
+	}
 }
 
-ot::ReturnMessage Application::graphicsConnectionChanged(const ot::GraphicsConnectionCfg& _connectionData, const ot::GuiEvent& _eventData) {
+ot::ReturnMessage Application::graphicsChangeEvent(const ot::GraphicsChangeEvent& _eventData) {
 	// This should be handled by the model
-	ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionChangedDocument(_connectionData, ot::GuiEvent::createForwardingEvent(_eventData));
-	sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc);
-	return ot::ReturnMessage::Ok;
-}
-
-ot::ReturnMessage Application::graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) {
-	// This should be handled by the model
-	ot::JsonDocument doc = ot::GraphicsActionHandler::createChangeEventDocument(_changeEvent);
+	ot::GraphicsChangeEvent fwdEvent(_eventData);
+	fwdEvent.setForwarding();
+	const ot::JsonDocument doc = ot::GraphicsActionHandler::createChangeEventDocument(fwdEvent);
 	sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc);
 	return ot::ReturnMessage::Ok;
 }

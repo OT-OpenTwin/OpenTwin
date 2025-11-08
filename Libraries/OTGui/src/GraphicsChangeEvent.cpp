@@ -26,6 +26,10 @@ ot::GraphicsChangeEvent::GraphicsChangeEvent(const ConstJsonObject& _jsonObject)
 	setFromJsonObject(_jsonObject);
 }
 
+ot::GraphicsChangeEvent::GraphicsChangeEvent(const GraphicsChangeEvent& _other) : GraphicsChangeEvent() {
+	operator=(_other);
+}
+
 ot::GraphicsChangeEvent::GraphicsChangeEvent(GraphicsChangeEvent&& _other) noexcept 
 	: GuiEvent(std::move(_other))
 {
@@ -39,6 +43,24 @@ ot::GraphicsChangeEvent::GraphicsChangeEvent(GraphicsChangeEvent&& _other) noexc
 
 ot::GraphicsChangeEvent::~GraphicsChangeEvent() {
 	memFree();
+}
+
+ot::GraphicsChangeEvent& ot::GraphicsChangeEvent::operator=(const GraphicsChangeEvent& _other) {
+	if (this != &_other) {
+		memFree();
+
+		GuiEvent::operator=(_other);
+
+		m_editorName = _other.m_editorName;
+
+		for (const GraphicsItemCfg* item : _other.m_changedItems) {
+			m_changedItems.push_back(item->createCopy());
+		}
+
+		m_changedConnections = _other.m_changedConnections;
+	}
+
+	return *this;
 }
 
 ot::GraphicsChangeEvent& ot::GraphicsChangeEvent::operator=(GraphicsChangeEvent&& _other) noexcept {

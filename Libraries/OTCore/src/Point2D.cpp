@@ -21,6 +21,10 @@
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/Point2D.h"
 
+ot::Point2D::Point2D(const ConstJsonObject& _jsonObject) : Point2D() {
+	setFromJsonObject(_jsonObject);
+}
+
 void ot::Point2D::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember("x", m_x, _allocator);
 	_object.AddMember("y", m_y, _allocator);
@@ -45,6 +49,10 @@ ot::Point2DD ot::Point2D::toPoint2DD(void) const {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+ot::Point2DF::Point2DF(const ConstJsonObject& _jsonObject) : Point2DF() {
+	setFromJsonObject(_jsonObject);
+}
+
 void ot::Point2DF::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember("x", m_x, _allocator);
 	_object.AddMember("y", m_y, _allocator);
@@ -68,6 +76,10 @@ ot::Point2DD ot::Point2DF::toPoint2DD(void) const {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
+
+ot::Point2DD::Point2DD(const ConstJsonObject& _jsonObject) : Point2DD() {
+	setFromJsonObject(_jsonObject);
+}
 
 void ot::Point2DD::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember("x", m_x, _allocator);

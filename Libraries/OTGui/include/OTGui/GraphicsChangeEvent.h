@@ -30,13 +30,14 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsChangeEvent : public GuiEvent {
-		OT_DECL_NOCOPY(GraphicsChangeEvent)
 	public:
 		GraphicsChangeEvent() = default;
 		GraphicsChangeEvent(const ConstJsonObject& _jsonObject);
+		GraphicsChangeEvent(const GraphicsChangeEvent& _other);
 		GraphicsChangeEvent(GraphicsChangeEvent&& _other) noexcept;
 		virtual ~GraphicsChangeEvent();
 
+		GraphicsChangeEvent& operator=(const GraphicsChangeEvent& _other);
 		GraphicsChangeEvent& operator=(GraphicsChangeEvent&& _other) noexcept;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -53,6 +54,9 @@ namespace ot {
 		void setEditorName(const std::string& _name) { m_editorName = _name; };
 		const std::string& getEditorName() const { return m_editorName; };
 
+		//! @brief Adds a changed item to the event.
+		//! The event takes ownership of the item.
+		//! @param _item Pointer to the changed item.
 		void addChangedItem(GraphicsItemCfg* _item) { m_changedItems.push_back(_item); };
 		const std::list<GraphicsItemCfg*>& getChangedItems() const { return m_changedItems; };
 
