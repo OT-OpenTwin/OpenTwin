@@ -1067,7 +1067,8 @@ void Application::shuttingDown() {
 
 void Application::addButtons()
 {
-	if (this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL) {
+	if (this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL &&
+		this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_FILEMANAGEMENT) {
 		m_fileHandler.addButtons(getUiComponent());
 
 		m_plotHandler.addButtons(getUiComponent());

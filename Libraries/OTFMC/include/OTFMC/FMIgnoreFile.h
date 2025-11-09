@@ -20,8 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
-#include "OTFMC/FMConnectorAPIExport.h"
+#include "OTFMC/FMCTypes.h"
 
 // std header
 #include <list>
@@ -49,8 +48,13 @@ namespace ot {
         //! @brief Clear all rules.
         void clear();
 
+		bool hasPatterns() const { return !m_patterns.empty(); };
+
+        const std::string& getRawText() const { return m_rawText; };
+
     private:
         std::list<std::regex> m_patterns;
+		std::string m_rawText;
 
         // ###########################################################################################################################################################################################################################################################################################################################
 

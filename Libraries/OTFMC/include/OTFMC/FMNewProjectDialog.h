@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTWidgets/Dialog.h"
-#include "OTFMC/FMConnectorAPIExport.h"
+#include "OTFMC/FMCTypes.h"
 #include "OTFMC/FMNewProjectInfo.h"
 
 // std header
@@ -36,6 +36,7 @@ namespace ot {
 	class OT_FMC_API_EXPORT FMNewProjectDialog : public ot::Dialog {
 		OT_DECL_NOCOPY(FMNewProjectDialog)
 		OT_DECL_NOMOVE(FMNewProjectDialog)
+		OT_DECL_NODEFAULT(FMNewProjectDialog)
 	public:
 		FMNewProjectDialog(QWidget* _parent);
 		virtual ~FMNewProjectDialog();
@@ -62,6 +63,8 @@ namespace ot {
 		};
 
 		void applyProgrammingIgnorePattern();
+
+		bool m_replaceIgnoreFile;
 
 		PathBrowseEdit* m_directory;
 		ComboBox* m_defaultIgnorePatterns;

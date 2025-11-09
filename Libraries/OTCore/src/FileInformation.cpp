@@ -29,7 +29,7 @@ ot::FileInformation ot::FileInformation::fromFileSystem(const std::filesystem::p
 	FileInformation fileInfo;
 
 	if (std::filesystem::exists(_path)) {
-		fileInfo.setPath(_path.string());
+		fileInfo.setPath(std::filesystem::path(_path.string()).generic_string());
 		fileInfo.setSize(static_cast<uint64_t>(std::filesystem::file_size(_path)));
 
 		// Get last modification time
@@ -61,13 +61,13 @@ ot::FileInformation::FileInformation(const ConstJsonObject& _jsonObject) : FileI
 }
 
 void ot::FileInformation::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const {
-	_jsonObject.AddMember("Path", JsonString(m_path, _allocator), _allocator);
-	_jsonObject.AddMember("Size", m_size, _allocator);
-	_jsonObject.AddMember("LastModified", m_lastModified, _allocator);
+	_jsonObject.AddMember("P", JsonString(m_path, _allocator), _allocator);
+	_jsonObject.AddMember("S", m_size, _allocator);
+	_jsonObject.AddMember("M", m_lastModified, _allocator);
 }
 
 void ot::FileInformation::setFromJsonObject(const ConstJsonObject& _jsonObject) {
-	m_path = json::getString(_jsonObject, "Path");
-	m_size = json::getUInt64(_jsonObject, "Size");
-	m_lastModified = json::getUInt64(_jsonObject, "LastModified");
+	m_path = json::getString(_jsonObject, "P");
+	m_size = json::getUInt64(_jsonObject, "S");
+	m_lastModified = json::getUInt64(_jsonObject, "M");
 }

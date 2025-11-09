@@ -245,6 +245,8 @@
 
 #define OT_ACTION_CMD_FM_InitializeAPI "FileManager.InitializeAPI"
 #define OT_ACTION_CMD_FM_InitializeNewProject "FileManager.InitializeNewProject"
+#define OT_ACTION_CMD_FM_Commit "FileManager.Commit"
+#define OT_ACTION_CMD_FM_Checkout "FileManager.Checkout"
 
 #define OT_ACTION_CMD_UI_MODEL_Create "UI.Model.Create"
 

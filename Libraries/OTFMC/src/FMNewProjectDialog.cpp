@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
+#include "OTFMC/FMDirectory.h"
 #include "OTFMC/FMNewProjectDialog.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/ComboBox.h"
@@ -36,7 +37,8 @@
 #include <QtWidgets/qlayout.h>
 
 ot::FMNewProjectDialog::FMNewProjectDialog(QWidget* _parent) 
-	: Dialog(_parent)
+	: Dialog(_parent), m_replaceIgnoreFile(false),
+	m_directory(nullptr), m_ignoreText(nullptr), m_defaultIgnorePatterns(nullptr)
 {
 	setDialogFlags(DialogCfg::IdealFit | DialogCfg::RecenterOnF11);
 
@@ -97,7 +99,8 @@ ot::FMNewProjectDialog::~FMNewProjectDialog() {
 ot::FMNewProjectInfo ot::FMNewProjectDialog::getNewProjectInfo() const {
 	FMNewProjectInfo info;
 	info.setRootDirectory(m_directory->getPath().toStdString());
-	
+	info.setReplaceIgnoreFile(m_replaceIgnoreFile);
+
 	FMIgnoreFile ignoreFile;
 	ignoreFile.parseFromText(m_ignoreText->toPlainText().toStdString());
 	info.setIgnoreFile(std::move(ignoreFile));
@@ -110,39 +113,26 @@ ot::FMNewProjectInfo ot::FMNewProjectDialog::getNewProjectInfo() const {
 // Private: Slots
 
 void ot::FMNewProjectDialog::slotConfirm() {
+	// Reset values
+	m_replaceIgnoreFile = false;
+
+	// Ensure directory provided
 	QString pth = m_directory->getPath();
 	if (pth.isEmpty()) {
-		QPoint pos = m_directory->getLineEdit()->mapToGlobal(m_directory->getLineEdit()->geometry().bottomLeft());
+		QPoint pos = m_directory->getLineEdit()->mapToGlobal(m_directory->getLineEdit()->rect().bottomLeft());
 		ToolTipHandler::showToolTip(pos, "Please select a directory to initialize the project at");
 		return;
 	}
 
+	// Ensure directory exists
 	QDir dir(pth);
 	if (!dir.exists()) {
-		QPoint pos = m_directory->getLineEdit()->mapToGlobal(m_directory->getLineEdit()->geometry().bottomLeft());
+		QPoint pos = m_directory->getLineEdit()->mapToGlobal(m_directory->getLineEdit()->rect().bottomLeft());
 		ToolTipHandler::showToolTip(pos, "The specified directory does not exist");
 		return;
 	}
 	
-	QString ignoreText = m_ignoreText->toPlainText();
-	ignoreText.remove(' ');
-	ignoreText.remove('\t');
-	ignoreText.remove('\r');
-	ignoreText.remove('\n');
-	if (ignoreText.isEmpty()) {
-		MessageDialogCfg cfg;
-		cfg.setButtons(MessageDialogCfg::Yes | MessageDialogCfg::Cancel);
-		cfg.setIcon(MessageDialogCfg::Warning);
-		cfg.setTitle("Ignore Patterns Empty");
-		cfg.setText("No ignore patterns specified. "
-			"This will include all files in the project directory. "
-			"Are you sure you want to continue?");
-
-		if (MessageDialog::showDialog(cfg, this) != MessageDialogCfg::Yes) {
-			return;
-		}
-	}
-
+	// Check ignore patterns
 	FMIgnoreFile ignoreFile;
 	if (!ignoreFile.parseFromText(m_ignoreText->toPlainText().toStdString())) {
 		MessageDialogCfg cfg;
@@ -153,6 +143,46 @@ void ot::FMNewProjectDialog::slotConfirm() {
 			"Do you want to proceed anyway?");
 		if (MessageDialog::showDialog(cfg, this) != MessageDialogCfg::Yes) {
 			return;
+		}
+	}
+
+	// Check for existing project
+	FMDirectory root = FMDirectory::fromFileSystem(pth.toStdString(), FMIgnoreFile(), FMDirectory::ScanFlag::ScanFiles);
+	auto cacheFileInfo = root.getFile(OpenTwinCacheFileName);
+	if (cacheFileInfo.has_value()) {
+		MessageDialogCfg cfg;
+		cfg.setButtons(MessageDialogCfg::Ok);
+		cfg.setIcon(MessageDialogCfg::Warning);
+		cfg.setTitle("Existing Project Detected");
+		cfg.setText("An existing OpenTwin project was detected in the selected directory. "
+			"Please select a different directory to initialize a new project or delete the \"" + std::string(OpenTwinCacheFileName) + "\".");
+		
+		MessageDialog::showDialog(cfg, this);
+		return;
+	}
+
+	// Check for existing ignore file
+	auto ignoreFileInfo = root.getFile(OpenTwinIgnoreFileName);
+	if (ignoreFileInfo.has_value()) {
+		if (!ignoreFile.hasPatterns()) {
+			// No ignore patterns provided, no need to replace existing ignore file
+			m_replaceIgnoreFile = false;
+		}
+		else {
+			MessageDialogCfg cfg;
+			cfg.setButtons(MessageDialogCfg::Yes | MessageDialogCfg::No | MessageDialogCfg::Cancel);
+			cfg.setIcon(MessageDialogCfg::Question);
+			cfg.setTitle("Existing Ignore File");
+			cfg.setText("An existing " + std::string(OpenTwinIgnoreFileName) + " file was found in the selected directory. "
+				"Do you want to replace the existing ignore file?");
+			
+			auto result = MessageDialog::showDialog(cfg, this);
+			if (result == MessageDialogCfg::Yes) {
+				m_replaceIgnoreFile = true;
+			}
+			else if (result != MessageDialogCfg::No) {
+				return;
+			}
 		}
 	}
 

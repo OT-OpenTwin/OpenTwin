@@ -20,9 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
+#include "OTFMC/FMCTypes.h"
 #include "OTFMC/FMIgnoreFile.h"
-#include "OTFMC/FMConnectorAPIExport.h"
 
 namespace ot {
 
@@ -36,11 +35,15 @@ namespace ot {
 		void setRootDirectory(const std::string& _rootDirectory) { m_rootDirectory = _rootDirectory; };
 		const std::string& getRootDirectory() const { return m_rootDirectory; };
 
+		void setReplaceIgnoreFile(bool _replaceIgnoreFile) { m_replaceIgnoreFile = _replaceIgnoreFile; };
+		bool getReplaceIgnoreFile() const { return m_replaceIgnoreFile; };
+
 		void setIgnoreFile(const FMIgnoreFile& _ignoreFile) { m_ignoreFile = _ignoreFile; };
 		void setIgnoreFile(FMIgnoreFile&& _ignoreFile) { m_ignoreFile = std::move(_ignoreFile); };
 		const FMIgnoreFile& getIgnoreFile() const { return m_ignoreFile; };
 
 	private:
+		bool m_replaceIgnoreFile = false;
 		std::string m_rootDirectory;
 		FMIgnoreFile m_ignoreFile;
 		

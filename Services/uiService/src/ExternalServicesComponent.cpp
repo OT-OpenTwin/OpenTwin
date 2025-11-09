@@ -1437,6 +1437,10 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			m_lastKeepAlive = 0;
 		}
 
+		// Shutdown external APIs
+		ot::FMConnectorAPI::shutdown();
+
+		// Process all pending events to ensure that all queued events are processed before we start deleting things
 		QEventLoop eventLoop;
 		//eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 		eventLoop.processEvents(QEventLoop::AllEvents);

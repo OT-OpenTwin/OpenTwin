@@ -30,7 +30,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT MessageDialogCfg : public DialogCfg {
 	public:
-		enum BasicButton {
+		enum BasicButton : uint64_t {
 			NoButtons       = 0 << 0,
 			Ok              = 1 << 0,
 			Save            = 1 << 1,

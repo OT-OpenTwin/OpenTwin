@@ -11,22 +11,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\CommitDialog.cpp" />
     <ClCompile Include="src\FileManager.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\FMCache.cpp" />
     <ClCompile Include="src\FMConnectorAPI.cpp" />
     <ClCompile Include="src\FMDirectory.cpp" />
     <ClCompile Include="src\FMIgnoreFile.cpp" />
     <ClCompile Include="src\FMNewProjectDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTFMC\CommitDialog.h" />
     <ClInclude Include="include\OTFMC\FileManager.h" />
     <ClInclude Include="include\OTFMC\FMConnectorAPI.h" />
     <ClInclude Include="include\OTFMC\FMConnectorAPIExport.h" />
+    <ClInclude Include="include\OTFMC\FMCTypes.h" />
     <ClInclude Include="include\OTFMC\FMDirectory.h" />
     <ClInclude Include="include\OTFMC\FMIgnoreFile.h" />
     <ClInclude Include="include\OTFMC\FMNewProjectDialog.h" />
     <ClInclude Include="include\OTFMC\FMNewProjectInfo.h" />
-    <ClInclude Include="include\OTFMC\FMState.h" />
+    <ClInclude Include="include\OTFMC\FMCache.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}</ProjectGuid>

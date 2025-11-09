@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTFMC/FMDirectory.h"
+#include "OTFMC/FMCache.h"
 #include "OTFMC/FMNewProjectInfo.h"
 
 // std header
@@ -39,14 +39,16 @@ namespace ot {
 
 	private:
 
-		FMDirectory m_root;
+		FMCache m_cache;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Action handler
 
 	private:
-		ot::ReturnMessage initializeNewProject();
+		ReturnMessage initializeNewProject();
+		ReturnMessage commitData(JsonDocument& _doc);
+		ReturnMessage checkoutData(JsonDocument& _doc);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

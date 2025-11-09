@@ -1,5 +1,5 @@
 // @otlicense
-// File: FMState.h
+// File: FMCTypes.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -25,13 +25,7 @@
 
 namespace ot {
 
-	class OT_FMC_API_EXPORT FMState {
-		OT_DECL_NOCOPY(FMState)
-		OT_DECL_DEFMOVE(FMState)
-	public:
-
-	private:
-
-
-	};
+	constexpr const char* OpenTwinIgnoreFileName = ".otignore";
+	constexpr const char* OpenTwinCacheFileName = ".otcache";
+	
 }

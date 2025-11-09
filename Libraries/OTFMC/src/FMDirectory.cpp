@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTFMC/FMDirectory.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
@@ -56,25 +57,81 @@ ot::FMDirectory ot::FMDirectory::fromFileSystem(const std::filesystem::path& _pa
 
 		// Process directories and files
         if (entry.is_directory(ec)) {
-            if (_flags & ScanFlag::ScanChilds) {
-                dir.m_childDirectories.push_back(FMDirectory::fromFileSystem(p.string(), _ignoreData, _flags));
-            }
-            else {
-                // Only add top-level directory info without recursion
-                FMDirectory child;
-                child.m_path = p;
-                dir.m_childDirectories.push_back(std::move(child));
+            if (_flags.has(ScanFlag::ScanDirectories)) {
+                if (_flags.has(ScanFlag::ScanChildDirectories)) {
+                    dir.m_childDirectories.push_back(FMDirectory::fromFileSystem(p.string(), _ignoreData, _flags));
+                }
+                else {
+                    // Only add top-level directory info without recursion
+                    FMDirectory child;
+                    child.m_path = p;
+                    dir.m_childDirectories.push_back(std::move(child));
+                }
             }
         }
         else if (entry.is_regular_file(ec)) {
-            if (_flags & ScanFlag::WriteOutput) {
-				WindowAPI::appendOutputMessage("  Found file: " + p.generic_string() + "\n");
-            }
+            if (_flags.has(ScanFlag::ScanFiles)) {
+                if (_flags & ScanFlag::WriteOutput) {
+                    WindowAPI::appendOutputMessage("  Found file: " + p.generic_string() + "\n");
+                }
 
-            FileInformation info = FileInformation::fromFileSystem(entry.path());   
-            dir.m_files.push_back(std::move(info));
+                FileInformation info = FileInformation::fromFileSystem(entry.path());
+                dir.m_files.push_back(std::move(info));
+            }
         }
     }
 
     return dir;
+}
+
+void ot::FMDirectory::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const {
+	_jsonObject.AddMember("P", JsonString(m_path.generic_string(), _allocator), _allocator);
+    JsonArray childDirsArr;
+    for (const FMDirectory& childDir : m_childDirectories) {
+		JsonObject childDirObj;
+        childDir.addToJsonObject(childDirObj, _allocator);
+		childDirsArr.PushBack(childDirObj, _allocator);
+	}
+    _jsonObject.AddMember("D", childDirsArr, _allocator);
+    
+    JsonArray filesArr;
+    for (const FileInformation& fileInfo : m_files) {
+        JsonObject fileObj;
+        fileInfo.addToJsonObject(fileObj, _allocator);
+        filesArr.PushBack(fileObj, _allocator);
+	}
+	_jsonObject.AddMember("F", filesArr, _allocator);
+}
+
+void ot::FMDirectory::setFromJsonObject(const ConstJsonObject& _jsonObject) {
+	m_childDirectories.clear();
+	m_files.clear();
+
+	m_path = std::filesystem::path(json::getString(_jsonObject, "P"));
+    for (const ConstJsonObject& childDirObj : json::getObjectList(_jsonObject, "D")) {
+        FMDirectory childDir;
+        childDir.setFromJsonObject(childDirObj);
+        m_childDirectories.push_back(std::move(childDir));
+    }
+    for (const ConstJsonObject& fileObj : json::getObjectList(_jsonObject, "F")) {
+        FileInformation fileInfo;
+        fileInfo.setFromJsonObject(fileObj);
+        m_files.push_back(std::move(fileInfo));
+	}
+}
+
+std::optional<ot::FileInformation> ot::FMDirectory::getFile(const std::string& _fileName) const {
+	std::string normalizedFileName = "/" + _fileName;
+    std::replace(normalizedFileName.begin(), normalizedFileName.end(), '\\', '/');
+
+    for (const FileInformation& fileInfo : m_files) {
+		std::string normalizedPath = fileInfo.getPath();
+		std::replace(normalizedPath.begin(), normalizedPath.end(), '\\', '/');
+
+        if (String::endsWith(normalizedPath, normalizedFileName)) {
+            return fileInfo;
+		}
+	}
+
+	return std::nullopt;
 }

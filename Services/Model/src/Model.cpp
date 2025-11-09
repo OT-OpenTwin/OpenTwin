@@ -410,7 +410,8 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 	_ui->addMenuButton(m_redoButton);
 	_ui->addMenuButton(m_deleteButton);
 
-	if (this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL) {
+	if (this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL &&
+		this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_FILEMANAGEMENT) {
 		// Add pages, groups and buttons for non-hierarchical projects
 
 		_ui->addMenuPage("View");

@@ -21,9 +21,8 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCore/CoreTypes.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTFMC/FMConnectorAPIExport.h"
+#include "OTFMC/FMCTypes.h"
 
 // std header
 #include <string>
@@ -38,12 +37,16 @@ namespace ot {
 	public:
 		static bool initialize();
 
+		//! @brief Shutdown the API.
+		static void shutdown();
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Helper
 
 	private:
 		bool initializePrivate();
+		void shutdownPrivate();
 
 		static FMConnectorAPI& instance();
 

@@ -40,6 +40,7 @@ bool ot::FMIgnoreFile::parseFromFile(const std::filesystem::path& _filePath) {
 bool ot::FMIgnoreFile::parseFromText(const std::string& _text) {
 	bool success = true;
     m_patterns.clear();
+	m_rawText = _text;
 
     std::istringstream stream(_text);
     std::string line;
@@ -87,6 +88,7 @@ bool ot::FMIgnoreFile::isIgnored(const std::filesystem::path& _path) const {
 
 void ot::FMIgnoreFile::clear() {
     m_patterns.clear();
+	m_rawText.clear();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

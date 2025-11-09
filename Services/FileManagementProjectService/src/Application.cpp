@@ -31,6 +31,7 @@
 
 // OpenTwin Gui header
 #include "OTGui/DialogCfg.h"
+#include "OTGui/MessageDialogCfg.h"
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"
@@ -140,6 +141,23 @@ void Application::handleProjcetInitialized(ot::JsonDocument& _document) {
 
 }
 
+void Application::handlePromtResponse(ot::JsonDocument& _document) {
+	std::string promptType = ot::json::getString(_document, OT_ACTION_PARAM_RESPONSE);
+	std::string promptResult = ot::json::getString(_document, OT_ACTION_PARAM_ANSWER);
+
+	ot::MessageDialogCfg::BasicButton result = ot::MessageDialogCfg::stringToButton(promptResult);
+
+	if (promptType == OT_ACTION_CMD_FM_Checkout) {
+		if (result != ot::MessageDialogCfg::Yes) {
+			return;
+		}
+
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_FM_Checkout, doc.GetAllocator()), doc.GetAllocator());
+		sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc);
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Button callbacks
@@ -156,11 +174,36 @@ void Application::handleInitializeProject() {
 }
 
 void Application::handleCommit() {
+	if (!isUiConnected()) {
+		OT_LOG_E("UI not connected");
+		return;
+	}
 
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_FM_Commit, doc.GetAllocator()), doc.GetAllocator());
+	sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc);
 }
 
 void Application::handleCheckout() {
+	if (!isUiConnected()) {
+		OT_LOG_E("UI not connected");
+		return;
+	}
+	
+	ot::JsonDocument doc;
+	ot::MessageDialogCfg cfg;
+	cfg.setTitle("Checkout Confirmation");
+	cfg.setText("Do you want to checkout a specific version from the versioning system? "
+		"This will replace all files in the working directory with the selected version."
+	);
+	cfg.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
+	cfg.setIcon(ot::MessageDialogCfg::Question);
 
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptInformation, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(cfg, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_RESPONSE, ot::JsonString(OT_ACTION_CMD_FM_Checkout, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_PARAMETER1, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
+	sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

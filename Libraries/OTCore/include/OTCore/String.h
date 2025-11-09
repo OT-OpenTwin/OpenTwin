@@ -62,6 +62,26 @@ namespace ot {
 		//! Input: pattern = "OO", string = "OOOOO" Output : 4
 		static size_t count(const std::string& _string, const std::string& _searchString);
 
+		//! @brief Returns true if the provided string starts with the specified start string.
+		//! @param _string String to check.
+		//! @param _prefix Start string.
+		static bool startsWith(const std::string& _string, const std::string& _prefix);
+
+		//! @brief Returns true if the provided wide string starts with the specified start string.
+		//! @param _string String to check.
+		//! @param _prefix Start string.
+		static bool startsWith(const std::wstring& _string, const std::wstring& _prefix);
+
+		//! @brief Returns true if the provided string ends with the specified end string.
+		//! @param _string String to check.
+		//! @param _suffix End string.
+		static bool endsWith(const std::string& _string, const std::string& _suffix);
+
+		//! @brief Returns true if the provided wide string ends with the specified end string.
+		//! @param _string String to check.
+		//! @param _suffix End string.
+		static bool endsWith(const std::wstring& _string, const std::wstring& _suffix);
+
 		//! @brief Split the provided string
 		//! @param _str String to split
 		//! @param _splitBy Char to split at

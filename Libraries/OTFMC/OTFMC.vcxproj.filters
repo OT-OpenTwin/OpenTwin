@@ -19,6 +19,12 @@
     <ClCompile Include="src\FMNewProjectDialog.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\FMCache.cpp">
+      <Filter>src\Management</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommitDialog.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -47,7 +53,7 @@
     <ClInclude Include="include\OTFMC\FMConnectorAPI.h">
       <Filter>include\Management</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTFMC\FMState.h">
+    <ClInclude Include="include\OTFMC\FMCache.h">
       <Filter>include\Management</Filter>
     </ClInclude>
     <ClInclude Include="include\OTFMC\FMConnectorAPIExport.h">
@@ -63,6 +69,12 @@
       <Filter>include\Management</Filter>
     </ClInclude>
     <ClInclude Include="include\OTFMC\FMNewProjectDialog.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTFMC\FMCTypes.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTFMC\CommitDialog.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
   </ItemGroup>

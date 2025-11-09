@@ -70,6 +70,7 @@ public:
 private:
 	
 	void handleProjcetInitialized(ot::JsonDocument& _document);
+	void handlePromtResponse(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -90,6 +91,8 @@ private:
 	// Private: Worker
 
 	EntityHandler m_entityHandler;
+
+	const std::string c_checkoutConfirmationAction = "FileManager.CheckoutConfirmed";
 
 	const std::string c_pageName = "Project";
 	const std::string c_managementGroupName = "Management";

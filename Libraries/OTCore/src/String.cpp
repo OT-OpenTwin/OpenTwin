@@ -120,6 +120,22 @@ size_t ot::String::count(const std::string& _string, const std::string& _searchS
 	return count;
 }
 
+bool ot::String::startsWith(const std::string& _string, const std::string& _prefix) {
+	return _string.size() >= _prefix.size() && _string.compare(0, _prefix.size(), _prefix) == 0;
+}
+
+bool ot::String::startsWith(const std::wstring& _string, const std::wstring& _prefix) {
+	return _string.size() >= _prefix.size() && _string.compare(0, _prefix.size(), _prefix) == 0;
+}
+
+bool ot::String::endsWith(const std::string& _string, const std::string& _suffix) {
+	return _string.size() >= _suffix.size() && _string.compare(_string.size() - _suffix.size(), _suffix.size(), _suffix) == 0;
+}
+
+bool ot::String::endsWith(const std::wstring& _string, const std::wstring& _suffix) {
+	return _string.size() >= _suffix.size() && _string.compare(_string.size() - _suffix.size(), _suffix.size(), _suffix) == 0;
+}
+
 inline std::list<std::string> ot::String::split(const std::string& _str, char _splitBy, bool _skipEmpty) {
 	std::string temp = _str;
 	std::list<std::string> ret;

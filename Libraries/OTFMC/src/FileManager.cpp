@@ -19,14 +19,19 @@
 
 // OpenTwin header
 #include "OTFMC/FileManager.h"
+#include "OTFMC/FMDirectory.h"
+#include "OTFMC/CommitDialog.h"
 #include "OTFMC/FMNewProjectDialog.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 
 // std header
 #include <thread>
+#include <fstream>
 
 ot::FileManager::FileManager() {
 	connectAction(OT_ACTION_CMD_FM_InitializeNewProject, this, &FileManager::initializeNewProject);
+	connectAction(OT_ACTION_CMD_FM_Commit, this, &FileManager::commitData);
+	connectAction(OT_ACTION_CMD_FM_Checkout, this, &FileManager::checkoutData);
 }
 
 ot::FileManager::~FileManager() {
@@ -54,6 +59,22 @@ ot::ReturnMessage ot::FileManager::initializeNewProject() {
 	return ReturnMessage::Ok;
 }
 
+ot::ReturnMessage ot::FileManager::commitData(JsonDocument& _doc) {
+	CommitDialog dia(WindowAPI::getRootWidget());
+	if (dia.showDialog() != Dialog::Ok) {
+		return ReturnMessage::Ok;
+	}
+
+
+
+	return ReturnMessage::Ok;
+}
+
+ot::ReturnMessage ot::FileManager::checkoutData(JsonDocument& _doc) {
+
+	return ReturnMessage::Ok;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Workers
@@ -62,10 +83,65 @@ void ot::FileManager::workerInitializeNewProject(FMNewProjectInfo&& _newProjectI
 	try {
 		WindowAPI::setProgressBarVisibility("Initialize Project", true, false);
 		WindowAPI::setProgressBarValue(0);
+
+		m_cache.clear();
+
 		WindowAPI::appendOutputMessage("Initializing new project at: " + _newProjectInfo.getRootDirectory() + "\n");
 
-		FMDirectory rootDir = FMDirectory::fromFileSystem(_newProjectInfo.getRootDirectory(), _newProjectInfo.getIgnoreFile(), FMDirectory::ScanChilds | FMDirectory::WriteOutput);
+		// Check for existing ignore file
+		FMDirectory rootDir = FMDirectory::fromFileSystem(_newProjectInfo.getRootDirectory(), FMIgnoreFile(), FMDirectory::ScanFlag::ScanFiles);
+		auto ignoreFileInfo = rootDir.getFile(ot::OpenTwinIgnoreFileName);
 
+		FMIgnoreFile ignoreFile;
+
+		if (ignoreFileInfo.has_value()) {
+			if (_newProjectInfo.getReplaceIgnoreFile()) {
+				// Remove existing ignore file
+				std::error_code ec;
+				std::filesystem::remove(ignoreFileInfo->getPath(), ec);
+				if (ec) {
+					throw Exception::File("Failed to remove existing ignore file: \"" + ignoreFileInfo->getPath() + "\". Error: " + ec.message());
+				}
+
+				// Write new ignore file
+				std::ofstream file(ignoreFileInfo->getPath());
+				if (!file.is_open()) {
+					throw Exception::File("Failed to create new ignore file: \"" + ignoreFileInfo->getPath() + "\".");
+				}
+				file << _newProjectInfo.getIgnoreFile().getRawText();
+				file.close();
+
+				WindowAPI::appendOutputMessage("Ignore file replaced: " + ignoreFileInfo->getPath() + "\n");
+				ignoreFile = _newProjectInfo.getIgnoreFile();
+			}
+			else {
+				// Read existing ignore file
+				if (!ignoreFile.parseFromFile(ignoreFileInfo->getPath())) {
+					throw Exception::File("Failed to parse existing ignore file: \"" + ignoreFileInfo->getPath() + "\".");
+				}
+			}
+		}
+		else {
+			ignoreFile = _newProjectInfo.getIgnoreFile();
+		}
+		
+		WindowAPI::setProgressBarValue(5);
+
+		// Load project structure with ignore rules applied
+		FMDirectory::ScanFlags flags = FMDirectory::ScanFlag::ScanFiles | FMDirectory::ScanFlag::ScanDirectories | FMDirectory::ScanFlag::ScanChildDirectories | FMDirectory::ScanFlag::WriteOutput;
+		rootDir = FMDirectory::fromFileSystem(_newProjectInfo.getRootDirectory(), ignoreFile, flags);
+
+		WindowAPI::setProgressBarVisibility("Upload files", true, false);
+		WindowAPI::setProgressBarValue(50);
+
+		// Update cache and write to database
+		FMCache::UpdateFlags updateFlags = FMCache::UpdateFlag::UpdateDatabase | FMCache::UpdateFlag::WriteToDisk;
+		//FMCache::UpdateFlags updateFlags = FMCache::UpdateFlag::UpdateDatabase | FMCache::UpdateFlag::WriteToDisk | FMCache::UpdateFlag::ShowProgress | FMCache::WriteOutput;
+		m_cache.updateCache(std::move(rootDir), updateFlags);
+
+		WindowAPI::setProgressBarValue(100);
+		WindowAPI::appendOutputMessage("Project initialization completed successfully.\n");
+		WindowAPI::setProgressBarVisibility("Upload files", false, false);
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_E("Error occured while initializing new project: " + std::string(_e.what()));
