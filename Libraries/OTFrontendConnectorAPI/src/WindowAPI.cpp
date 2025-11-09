@@ -24,6 +24,10 @@
 
 // Public API
 
+QWidget* ot::WindowAPI::getRootWidget() {
+	return WindowAPI::instance()->getRootWidgetAPI();
+}
+
 void ot::WindowAPI::lockUI(bool _flag) {
 	WindowAPI::instance()->lockUIAPI(_flag);
 }

@@ -243,6 +243,9 @@
 #define OT_ACTION_CMD_UI_LTS_SET_LOCAL_FILENAME "LTSpice.SetLocalFileName"
 #define OT_ACTION_CMD_UI_LTS_GET_SIMPLE_FILENAME "LTSpice.GetSimpleFileName"
 
+#define OT_ACTION_CMD_FM_InitializeAPI "FileManager.InitializeAPI"
+#define OT_ACTION_CMD_FM_InitializeNewProject "FileManager.InitializeNewProject"
+
 #define OT_ACTION_CMD_UI_MODEL_Create "UI.Model.Create"
 
 #define OT_ACTION_CMD_UI_VIEW_Create "UI.View.Create"
@@ -520,6 +523,7 @@
 
 #define OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT "Development"
 #define OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL "Hierarchical"
+#define OT_ACTION_PARAM_SESSIONTYPE_FILEMANAGEMENT "File Management"
 #define OT_ACTION_PARAM_SESSIONTYPE_3DSIM "3D Simulation"
 #define OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE "Data Pipeline"
 #define OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE "CST Studio Suite"
@@ -766,6 +770,7 @@
 #define OT_INFO_SERVICE_TYPE_PYRIT "PyritService"
 #define OT_INFO_SERVICE_TYPE_LibraryManagementService "LibraryManagementService"
 #define OT_INFO_SERVICE_TYPE_HierarchicalProjectService "HierarchicalProjectService"
+#define OT_INFO_SERVICE_TYPE_FileManagementProjectService "FileManagementProjectService"
 
 #define OT_INFO_MESSAGE_LogIn "UI.LogIn"
 

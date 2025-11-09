@@ -105,6 +105,7 @@
 #include "CurveDatasetFactory.h"
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
+#include "OTFMC/FMConnectorAPI.h"
 #include "ProgressUpdater.h"
 
 // uiCore header
@@ -353,6 +354,8 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 			OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE
 		},
 		this, & ExternalServicesComponent::handleLTSpiceAction);
+
+	connectAction(OT_ACTION_CMD_FM_InitializeAPI, this, &ExternalServicesComponent::handleInitializeFileManagerAPI);
 }
 
 ExternalServicesComponent::~ExternalServicesComponent()
@@ -4185,6 +4188,10 @@ void ExternalServicesComponent::handleLTSpiceAction(ot::JsonDocument& _document)
 
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
 	LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectInfo().getProjectName());
+}
+
+void ExternalServicesComponent::handleInitializeFileManagerAPI(ot::JsonDocument& _document) {
+	ot::FMConnectorAPI::initialize();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -64,7 +64,8 @@ set OT_LOCALDIRECTORYSERVICE_CONFIGURATION={^
 		"StudioSuiteService",^
 		"LTSpiceService",^
 		"PyritService",^
-		"HierarchicalProjectService"^
+		"HierarchicalProjectService",^
+		"FileManagementProjectService"^
 		]^
 	}
 set OT_LOCALDIRECTORYSERVICE_CONFIGURATION_DEFINED=1

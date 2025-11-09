@@ -26,10 +26,14 @@
 // Qt header
 #include <QtCore/qstring.h>
 
+class QWidget;
+
 namespace ot {
 
 	class OT_FRONTEND_CONNECTOR_API_EXPORT WindowAPI {
 	public:
+		static QWidget* getRootWidget();
+
 		static void lockUI(bool _flag = true);
 		static void unlockUI() { WindowAPI::lockUI(false); };
 		static void lockSelectionAndModification(bool _flag);
@@ -48,6 +52,8 @@ namespace ot {
 		static void appendOutputMessage(const StyledTextBuilder& _message);
 
 	protected:
+		virtual QWidget* getRootWidgetAPI() = 0;
+
 		virtual void lockUIAPI(bool _flag) = 0;
 		virtual void lockSelectionAndModificationAPI(bool _flag) = 0;
 

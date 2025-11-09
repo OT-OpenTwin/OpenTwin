@@ -59,6 +59,7 @@ private:
 	void initializeProjectTypeLTSpice();
 	void initializeProjectTypePyrit();
 	void initializeProjectTypeCircuitSimulation();
+	void initializeProjectTypeFileManagement();
 
 	bool m_hasGeometryRoot				= true;
 	bool m_hasCircuitsRoot				= true;

@@ -386,6 +386,24 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 		result.PushBack(objDev, result.GetAllocator());
 	}
 
+	{
+		using namespace ot;
+		ProjectTemplateInformation defaultFileManagement;
+		defaultFileManagement.setName(OT_ACTION_PARAM_SESSIONTYPE_FILEMANAGEMENT);
+		defaultFileManagement.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_FILEMANAGEMENT);
+		defaultFileManagement.setIsDefault(true);
+
+		StyledTextBuilder description;
+		description << StyledText::Header1 << "File management project" << StyledText::Text <<
+			"Add source control to a directory with all of its file.";
+
+		defaultFileManagement.setDescription(description);
+
+		JsonObject objFilemanagement;
+		defaultFileManagement.addToJsonObject(objFilemanagement, result.GetAllocator());
+		result.PushBack(objFilemanagement, result.GetAllocator());
+	}
+
 	return result.toJson();
 }
 

@@ -583,6 +583,8 @@ protected:
 
 	// Window API
 
+	virtual QWidget* getRootWidgetAPI() override;
+
 	virtual void lockUIAPI(bool _flag) override;
 	virtual void lockSelectionAndModificationAPI(bool _flag) override;
 

@@ -209,6 +209,11 @@ ECHO ===============================================================
 CALL "%OT_FRONTEND_CONNECTOR_API_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Library: File Manager Connector
+ECHO ===============================================================
+CALL "%OT_FILE_MANAGER_CONNECTOR_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Library: StudioSuiteConnector
 ECHO ===============================================================
 CALL "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\build.bat" %1 %2
@@ -376,6 +381,11 @@ ECHO ===============================================================
 ECHO Build Service: HierarchicalProjectService
 ECHO ===============================================================
 CALL "%OT_HIERARCHICAL_PROJECT_SERVICE_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
+ECHO Build Service: FileManagementProjectService
+ECHO ===============================================================
+CALL "%OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT%\build.bat" %1 %2
 
 REM ====================================================================
 REM Build the executables

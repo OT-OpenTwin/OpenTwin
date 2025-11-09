@@ -2384,7 +2384,7 @@ void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
 		OT_LOG_E("View not found");
 		return;
 	}
-
+	
 	try {
 		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
 		
@@ -3634,6 +3634,10 @@ void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModi
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected: Connector API methods
+
+QWidget* AppBase::getRootWidgetAPI() {
+	return this->mainWindow();
+}
 
 void AppBase::lockUIAPI(bool _flag) {
 	if (QThread::currentThread() != this->thread()) {

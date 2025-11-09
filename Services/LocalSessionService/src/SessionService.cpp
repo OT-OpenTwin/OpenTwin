@@ -137,6 +137,14 @@ SessionService::SessionService()
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL, std::move(HierarchicalSessionServices));
 	
 	//
+	// File management services list (this contains all services relevant for a file management project)
+	//
+	std::list<ot::ServiceBase> FileManagementSessionServices;
+	FileManagementSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	FileManagementSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FileManagementProjectService, OT_INFO_SERVICE_TYPE_FileManagementProjectService));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_FILEMANAGEMENT, std::move(FileManagementSessionServices));
+
+	//
 	// 3D Simulation services list (this contains all services relevant for 3D simulation)
 	//
 	std::list<ot::ServiceBase> Simulation3DSessionServices;

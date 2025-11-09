@@ -66,6 +66,10 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 	{
 		initializeProjectTypeHierarchical();
 	}
+	else if (projectType == OT_ACTION_PARAM_SESSIONTYPE_FILEMANAGEMENT)
+	{
+		initializeProjectTypeFileManagement();
+	}
 	else
 	{
 		OT_LOG_WAS("Unknown project type \"" + projectType + "\". Defaulting to project type: \"" OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT "\"...");
@@ -209,6 +213,29 @@ void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
 
 	m_has3DView = false;
 	m_hasBlockPicker = true;
+}
+
+void ProjectTypeManager::initializeProjectTypeFileManagement() {
+	m_hasGeometryRoot = false;
+	m_hasCircuitsRoot = false;
+	m_hasCircuit = false;
+	m_hasMaterialRoot = false;
+	m_hasMeshRoot = false;
+	m_hasSolverRoot = false;
+	m_hasScriptsRoot = false;
+	m_hasUnitRoot = false;
+	m_hasDataCategorizationRoot = false;
+	m_hasRMDCategorization = false;
+	m_hasRMDCategorizationPreview = false;
+	m_hasDataProcessingRoot = false;
+
+	m_hasDatasetRoot = false;
+	m_hasDatasetRMD = false;
+
+	m_hasHierarchicalRoot = false;
+
+	m_has3DView = false;
+	m_hasBlockPicker = false;
 }
 
 std::string ProjectTypeManager::getViews(void)

@@ -47,6 +47,11 @@ ECHO ===============================================================
 CALL "%OT_DATASTORAGE_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
+ECHO Clean Library: DataManagerConnector
+ECHO ===============================================================
+CALL "%OT_FILE_MANAGER_CONNECTOR_ROOT%\Clean.bat" 
+
+ECHO ===============================================================
 ECHO Clean Library: LTSpiceConnector
 ECHO ===============================================================
 CALL "%OT_LTSPICE_CONNECTOR_ROOT%\Clean.bat" 
@@ -203,6 +208,11 @@ ECHO ===============================================================
 ECHO Clean Service: HierarchicalProjectService
 ECHO ===============================================================
 CALL "%OT_HIERARCHICAL_PROJECT_SERVICE_ROOT%\Clean.bat" 
+
+ECHO ===============================================================
+ECHO Clean Service: FilemanagementProjectService
+ECHO ===============================================================
+CALL "%OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
 ECHO Clean Service: ImportParameterizedData

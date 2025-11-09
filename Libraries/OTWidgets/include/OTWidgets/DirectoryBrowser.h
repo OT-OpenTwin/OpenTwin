@@ -50,8 +50,8 @@ namespace ot {
 		void currentPathChanged(const QString& _path);
 
 	private Q_SLOTS:
-		void slotRootChanged(void);
-		void slotSelectionChanged(void);
+		void slotRootChanged();
+		void slotSelectionChanged();
 
 	private:
 		QString getItemText(const QModelIndex& _ix);

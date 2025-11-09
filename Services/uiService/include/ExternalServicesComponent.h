@@ -410,6 +410,7 @@ public:
 
 	void handleStudioSuiteAction(ot::JsonDocument& _document);
 	void handleLTSpiceAction(ot::JsonDocument& _document);
+	void handleInitializeFileManagerAPI(ot::JsonDocument& _document);
 
 public Q_SLOTS:
 	void queueAction(const std::string& _json, const std::string& _senderIP);
