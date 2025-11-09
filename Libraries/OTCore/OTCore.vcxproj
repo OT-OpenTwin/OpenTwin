@@ -30,6 +30,7 @@
     <ClCompile Include="src\BasicEntityInformation.cpp" />
     <ClCompile Include="src\EntityName.cpp" />
     <ClCompile Include="src\ExplicitStringValueConverter.cpp" />
+    <ClCompile Include="src\FileInformation.cpp" />
     <ClCompile Include="src\GenericDataStruct.cpp" />
     <ClCompile Include="src\GenericDataStructFactory.cpp" />
     <ClCompile Include="src\GenericDataStructMatrix.cpp" />
@@ -91,6 +92,7 @@
     <ClInclude Include="include\OTCore\BasicEntityInformation.h" />
     <ClInclude Include="include\OTCore\EntityName.h" />
     <ClInclude Include="include\OTCore\ExplicitStringValueConverter.h" />
+    <ClInclude Include="include\OTCore\FileInformation.h" />
     <ClInclude Include="include\OTCore\JSONArray.h" />
     <ClInclude Include="include\OTCore\JSONArray.hpp" />
     <ClInclude Include="include\OTCore\JSONDocument.h" />

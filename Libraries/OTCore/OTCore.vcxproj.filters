@@ -163,6 +163,9 @@
     <ClCompile Include="src\ProjectFilterData.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\FileInformation.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -463,6 +466,9 @@
       <Filter>ThirdParty</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\ProjectFilterData.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\FileInformation.h">
       <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
