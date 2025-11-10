@@ -4,6 +4,7 @@
 #include <Python.h>
 #include "CPythonObjectNew.h"
 #include "OTCore/LogDispatcher.h"
+#include "PythonException.h"
 
 void PackageHandler::importMissingPackages(const std::string _scriptContent)
 {
@@ -90,28 +91,71 @@ bool PackageHandler::isPackageInstalled(const std::string& _packageName)
 
 void PackageHandler::installPackage(const std::string& _packageName)
 {
-    // Import sys and set sys.argv
-    PyObject* sys_module = PyImport_ImportModule("sys");
-    PyObject* sys_argv = PyObject_GetAttrString(sys_module, "argv");
 
-    // Build argv = ['pip', 'install', 'package', '--target=target_path']
-    PyObject* argv = Py_BuildValue("[s,s,s,s]",
+    // Import sys module
+    CPythonObjectNew sys_module = PyImport_ImportModule("sys");
+    if (!sys_module) 
+    {
+        throw std::exception("Failed to import sys module\n");
+    }
+
+    // Build sys.argv = ['pip', 'install', packageName, '--target=targetPath']
+    CPythonObjectNew argv = Py_BuildValue(
+        "[s,s,s,s]",
         "pip",
         "install",
         _packageName.c_str(),
-        ("--target=" + m_targetPath).c_str());
-
-    PyObject_SetAttrString(sys_module, "argv", argv);
-    Py_DECREF(argv);
-
-    // Run pip as a module
-    PyRun_SimpleString(
-        "import runpy\n"
-        "runpy.run_module('pip', run_name='__main__', alter_sys=True)\n"
+        ("--target=" + m_targetPath).c_str()
     );
 
-    // Restore original sys.argv
-    PyObject_SetAttrString(sys_module, "argv", sys_argv);
-    Py_DECREF(sys_argv);
-    Py_DECREF(sys_module);
+    PyObject_SetAttrString(sys_module, "argv", argv);
+    
+    // Import runpy
+    CPythonObjectNew runpy = PyImport_ImportModule("runpy");
+    if (!runpy) 
+    {
+        throw std::exception("Failed to import runpy\n");
+    }
+
+    CPythonObjectNew run_module = PyObject_GetAttrString(runpy, "run_module");
+    if (!run_module) 
+    {
+        throw std::exception("Failed to get run_module\n");
+    }
+
+    // Prepare arguments and keyword arguments for run_module('pip', run_name='__main__', alter_sys=True)
+    CPythonObjectNew args = Py_BuildValue("(s)", "pip");
+    CPythonObjectNew kwargs = Py_BuildValue("{s:s,s:O}",
+        "run_name", "__main__",
+        "alter_sys", Py_True);
+
+    CPythonObjectNew result = PyObject_Call(run_module, args, kwargs);
+
+    // Check for SystemExit
+    if (!result) 
+    {
+        if (PyErr_ExceptionMatches(PyExc_SystemExit)) 
+        {
+            std::string message = "Failed to pip install package";
+            PyObject* exc, * val, * tb;
+            PyErr_Fetch(&exc, &val, &tb);
+
+            CPythonObjectNew code = PyObject_GetAttrString(val, "code");
+            long exit_code = 0;
+            if (code && code != Py_None) 
+            {
+                exit_code = PyLong_AsLong(code);
+            }
+
+            if(exit_code != 0)
+            {
+                message += " '" + _packageName + "' with exit code " + std::to_string(exit_code);
+                throw PythonException(message);
+            }
+        }
+        else {
+            
+            PyErr_Print();
+        }
+    }
 }
