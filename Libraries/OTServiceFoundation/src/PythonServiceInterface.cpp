@@ -120,7 +120,10 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 	m_scriptNamesWithParameter.clear();
 
 	std::string gridFSDocumentID = writePortDataToDatabase();
-	doc.AddMember(OT_ACTION_CMD_PYTHON_Portdata, ot::JsonString(gridFSDocumentID, doc.GetAllocator()), doc.GetAllocator());
+	if (!gridFSDocumentID.empty())
+	{
+		doc.AddMember(OT_ACTION_CMD_PYTHON_Portdata, ot::JsonString(gridFSDocumentID, doc.GetAllocator()), doc.GetAllocator());
+	}
 
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, allparameter, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, doc.GetAllocator());
@@ -161,13 +164,20 @@ std::string ot::PythonServiceInterface::writePortDataToDatabase()
 		m_portDataByPortName.clear();
 	}
 
-	const std::string portData = ot::json::toJson(doc);
-	std::stringstream stream(portData);
+	if (!doc.Empty())
+	{
+		const std::string portData = ot::json::toJson(doc);
+		std::stringstream stream(portData);
 	
-	DataStorageAPI::DocumentAPI gridFSHandle;
-	auto documentID = gridFSHandle.InsertDocumentUsingCollectionGridFs(&stream, DataBase::instance().getCollectionName());
-	const std::string gridFSDocumentID = documentID.get_oid().value.to_string();
-	return gridFSDocumentID;
+		DataStorageAPI::DocumentAPI gridFSHandle;
+		auto documentID = gridFSHandle.InsertDocumentUsingCollectionGridFs(&stream, DataBase::instance().getCollectionName());
+		const std::string gridFSDocumentID = documentID.get_oid().value.to_string();
+		return gridFSDocumentID;
+	}
+	else
+	{
+		return "";
+	}
 }
 
 ot::JsonDocument ot::PythonServiceInterface::readPortDataFromDatabase(const std::string& _gridFSDocumentID)
