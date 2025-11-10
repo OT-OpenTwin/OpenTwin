@@ -6,9 +6,12 @@ class PackageHandler
 {
 public:
 	void importMissingPackages(const std::string _scriptContent);
-
+	void setTargetPath(const std::string& _targetPath) 
+	{ 
+		m_targetPath = _targetPath; 
+	}
 private:
-	const std::string m_targetPath = "C:\\OpenTwin\\Deployment\\Python\\Lib\\site-packages";
+	std::string m_targetPath = "";
 
 	const std::list<std::string> parseImportedPackages(const std::string _scriptContent);
 	bool isPackageInstalled(const std::string& _packageName);

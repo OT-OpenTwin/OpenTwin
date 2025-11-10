@@ -3,9 +3,16 @@
 #include "OTCore/String.h"
 #include <Python.h>
 #include "CPythonObjectNew.h"
+#include "OTCore/LogDispatcher.h"
 
 void PackageHandler::importMissingPackages(const std::string _scriptContent)
 {
+    if(m_targetPath.empty())
+    {
+        OT_LOG_E("Target path for package installation is not set.");
+        return;
+	}
+
 	std::list<std::string> moduleNames = parseImportedPackages(_scriptContent);
     for(const std::string moduleName : moduleNames)
     {

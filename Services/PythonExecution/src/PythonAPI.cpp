@@ -154,6 +154,7 @@ void PythonAPI::loadScipt(const ot::EntityInformation& _entityInformation)
 		std::string execution = script->getText();
 
 		PackageHandler packageHandler;
+		packageHandler.setTargetPath(m_wrapper.getSidePackagesPath());
 		packageHandler.importMissingPackages(execution);
 
 		//First we add a module for the script execution. This way there won't be any namespace conflicts between the scripts since they are all executed in the same namespace

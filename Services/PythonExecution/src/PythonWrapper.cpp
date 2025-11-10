@@ -46,15 +46,15 @@ PythonWrapper::PythonWrapper() : m_outputWorkerThread(nullptr) {
 	m_pythonPath.push_back(m_pythonRoot);
 	m_pythonPath.push_back(m_pythonRoot + "\\Lib");
 	m_pythonPath.push_back(m_pythonRoot + "\\DLLs");
-	std::string sitePackageDirectory = determineMandatoryPythonSitePackageDirectory();
-	m_pythonPath.push_back(sitePackageDirectory);
+	m_sitePackagesPath = determineMandatoryPythonSitePackageDirectory();
+	m_pythonPath.push_back(m_sitePackagesPath);
 
 	if (m_customSitePackage.empty())
 	{
 		addOptionalUserPythonSitePackageDirectory();
 	}
 
-	OT_LOG_D("Setting Python site-package path: " + sitePackageDirectory);
+	OT_LOG_D("Setting Python site-package path: " + m_sitePackagesPath);
 	signal(SIGABRT, &signalHandlerAbort);
 
 	if (m_redirectOutput)
