@@ -84,23 +84,53 @@ void ResultManager::getParametricCombinations(const std::string& logFileName, st
 	}
 
 	// Finally, we need to process each line and extract its parameter combinations
-	std::vector<std::pair<std::string, double>> params;
-	std::regex stepRegex(R"((\w+)=([-+]?\d*\.?\d+))"); // Regex for Parameter=Value
-	std::smatch match;
+	static const std::regex kvRegex(
+		// Parameter name: letters followed by letters/digits/_/./-
+		// Value: number with optional decimal point + optional exponent
+		R"(([A-Za-z][A-Za-z0-9_.-]*)\s*=\s*([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?))",
+		std::regex_constants::optimize
+	);
 
-	for (auto line : stepLines)
+	static const std::regex stepPrefix(
+		// Matches `.step` at beginning of line, case-insensitive
+		R"(^\s*\.\s*step\b\s*)",
+		std::regex_constants::icase
+	);
+
+	for (const auto& lineRaw : stepLines)
 	{
+		std::string line = lineRaw;
+
+		// Remove optional ".step" prefix from beginning of the line
+		line = std::regex_replace(line, stepPrefix, "");
+
 		ParametricCombination parameterCombination;
 
-		auto searchStart = line.cbegin();
-		while (std::regex_search(searchStart, line.cend(), match, stepRegex)) {
-			std::string param = match[1].str();           // parameter name
-			double value = std::stod(match[2].str());     // parameter value
-			parameterCombination.addParameter(param, value);
-			searchStart = match.suffix().first;
+		// Iterate over all key=value pairs
+		for (std::sregex_iterator it(line.begin(), line.end(), kvRegex), end; it != end; ++it)
+		{
+			const std::string paramName = (*it)[1].str();
+			const std::string valueString = (*it)[2].str();
+
+			// Locale-independent parsing of a floating-point number:
+			// Use an istringstream with classic ("C") locale so '.' is always recognized.
+			std::istringstream iss(valueString);
+			iss.imbue(std::locale::classic());
+
+			double value = 0.0;
+			iss >> value;
+
+			if (iss.fail()) {
+				// Optionally handle parsing error here (log or skip)
+				continue;
+			}
+
+			// Add parsed parameter to the combination
+			parameterCombination.addParameter(paramName, value);
 		}
 
-		parameterRuns.push_back(parameterCombination);
+		// Store the parsed parameter combination
+		parameterRuns.push_back(std::move(parameterCombination));
 	}
 }
 
