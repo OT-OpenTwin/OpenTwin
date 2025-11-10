@@ -241,6 +241,9 @@ namespace ot {
 
 		static std::vector<char> decompressedVectorBase64(const std::string& _compressedString, uint64_t _decompressedLength);
 
+		static void removeControlCharacters(std::string& _value);
+
+		static void removeWhitespaces(std::string& _value);
 	};
 }
 

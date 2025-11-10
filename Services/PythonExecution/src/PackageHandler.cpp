@@ -50,6 +50,13 @@ const std::list<std::string> PackageHandler::parseImportedPackages(const std::st
         }
 	}
     
+
+    for (std::string& packageName : packageList)
+    {
+		ot::String::removeControlCharacters(packageName);
+		ot::String::removeWhitespaces(packageName);
+	}
+
 	return packageList;
 }
 

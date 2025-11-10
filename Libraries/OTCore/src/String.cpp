@@ -838,3 +838,15 @@ std::vector<char> ot::String::decompressedVectorBase64(const std::string& _compr
 	decompressedData.resize(destLen);
 	return decompressedData;
 }
+
+void ot::String::removeControlCharacters(std::string& _value)
+{
+	_value.erase(std::remove(_value.begin(), _value.end(), '\n'), _value.end());
+	_value.erase(std::remove(_value.begin(), _value.end(), '\r'), _value.end());
+	_value.erase(std::remove(_value.begin(), _value.end(), '\t'), _value.end());
+}
+
+void ot::String::removeWhitespaces(std::string& _value)
+{
+	_value.erase(std::remove(_value.begin(), _value.end(), ' '), _value.end());
+}
