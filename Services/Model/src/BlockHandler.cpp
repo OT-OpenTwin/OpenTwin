@@ -388,7 +388,7 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 
 	// As next step i need to add the intersection item
 	ot::NewModelStateInfo _modelStateInfo;
-	std::shared_ptr<EntityBlock> connector = createBlockEntity(_modelStateInfo, EntityBlockCircuitConnector::className(), _eventData.getScenePos(), _scene);
+	
 	
 	// The destination connection is the connection to be deleted
     // Get connection cfg
@@ -398,10 +398,12 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	if (!_connectionReversed) {
 		//Saving connected Element and connector
 		connectedElements.push(std::make_pair(requestedConnection.getOriginConnectable(), blockEntities[requestedConnection.getOriginUid()]));
+		std::shared_ptr<EntityBlock> connector = createBlockEntity(_modelStateInfo, EntityBlockCircuitConnector::className(), requestedConnection.getDestPos(), _scene);
 	}
 	else {
 		//Saving connected Element and connector
 		connectedElements.push(std::make_pair(requestedConnection.getDestConnectable(), blockEntities[requestedConnection.getDestinationUid()]));
+		std::shared_ptr<EntityBlock> connector = createBlockEntity(_modelStateInfo, EntityBlockCircuitConnector::className(), requestedConnection.getOriginPos(), _scene);
 	}
 
 	// Here I check if the the blocks which are connected to the connection exist
@@ -544,7 +546,7 @@ bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedCon
 	return true;
 }
 
-std::shared_ptr<EntityBlock> BlockHandler::createBlockEntity(ot::NewModelStateInfo& _newModelStateInfo, const std::string& _itemName, const ot::Point2DD& _scenePos , EntityGraphicsScene* _editor) {
+std::shared_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene* _editor, const ot::Point2DD& _scenePos, const std::string& _itemName, ot::NewModelStateInfo& _newModelStateInfo) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 	
@@ -610,11 +612,10 @@ std::shared_ptr<EntityBlock> BlockHandler::createBlockEntity(ot::NewModelStateIn
 	return blockEnt;
 }
 
-void BlockHandler::createConnection(ot::NewModelStateInfo& _newModelStateInfo, EntityGraphicsScene* _scene, ot::GraphicsConnectionCfg& _connectionCfg, EntityBlock* _originBlock, EntityNamingBehavior& _connectionNaming) {
+void BlockHandler::createConnection( EntityGraphicsScene* _scene, EntityBlock* _originBlock, ot::GraphicsConnectionCfg& _connectionCfg, EntityNamingBehavior& _connectionNaming, ot::NewModelStateInfo& _newModelStateInfo) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 
-	
 	// Create connection entity
 	EntityBlockConnection _connectionEntity(model->createEntityUID(), nullptr, nullptr, nullptr);
 	_connectionEntity.createProperties();
