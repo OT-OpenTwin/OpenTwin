@@ -400,44 +400,45 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	ot::NewModelStateInfo _modelStateInfo;
 	std::shared_ptr<EntityBlock> connector = createBlockEntity(_modelStateInfo, EntityBlockCircuitConnector::className(), _eventData.getScenePos(), _scene);
 	
+	// The destination connection is the connection to be deleted
+    // Get connection cfg
+	ot::GraphicsConnectionCfg connectionCfg = _destinationConnection->getConnectionCfg();
 
 	//First i get the connection which i want to delete by the connection to be added
 	if (!_connectionReversed) {
-
-		// The destination connection is the connection to be deleted
-		// Get connection cfg
-		ot::GraphicsConnectionCfg connectionCfg = _destinationConnection->getConnectionCfg();
-
 		//Saving connected Element and connector
 		connectedElements.push(std::make_pair(requestedConnection.getOriginConnectable(), blockEntities[requestedConnection.getOriginUid()]));
+	}
+	else {
+		//Saving connected Element and connector
+		connectedElements.push(std::make_pair(requestedConnection.getDestConnectable(), blockEntities[requestedConnection.getDestinationUid()]));
+	}
 
-		// Here I check if the the blocks which are connected to the connection exist
-		if (blockEntities.find(connectionCfg.getDestinationUid()) == blockEntities.end() ||
-			blockEntities.find(connectionCfg.getOriginUid()) == blockEntities.end()) {
-			OT_LOG_E("BlockEntity not found");
-			return false;
-		}
+	// Here I check if the the blocks which are connected to the connection exist
+	if (blockEntities.find(connectionCfg.getDestinationUid()) == blockEntities.end() ||
+		blockEntities.find(connectionCfg.getOriginUid()) == blockEntities.end()) {
+		OT_LOG_E("BlockEntity not found");
+		return false;
+	}
 
-		//Saving  connected Elements and connectors
-		connectedElements.push(std::make_pair(connectionCfg.getDestConnectable(), blockEntities[connectionCfg.getDestinationUid()]));
-		connectedElements.push(std::make_pair(connectionCfg.getOriginConnectable(), blockEntities[connectionCfg.getOriginUid()]));
+	//Saving  connected Elements and connectors
+	connectedElements.push(std::make_pair(connectionCfg.getDestConnectable(), blockEntities[connectionCfg.getDestinationUid()]));
+	connectedElements.push(std::make_pair(connectionCfg.getOriginConnectable(), blockEntities[connectionCfg.getOriginUid()]));
 
-		entitiesToDelete.push_back(_destinationConnection->getName());
+	entitiesToDelete.push_back(_destinationConnection->getName());
+	// Now I can delete the connection
+	model->deleteEntitiesFromModel(entitiesToDelete, false);
 
-		// Now I can delete the connection
-		model->deleteEntitiesFromModel(entitiesToDelete, false);
-
-		//Now i create a GraphicsConnectionCfg for all elements
-		while (!connectedElements.empty()) {
-			ot::GraphicsConnectionCfg temp(_eventData.getConnectionCfg());
-			temp.setDestUid(connector->getEntityID());
-			temp.setDestConnectable(connector->getName());
-			temp.setOriginUid(connectedElements.front().second->getEntityID());
-			temp.setOriginConnectable(connectedElements.front().first);
-			temp.setLineShape(_originBlock->getDefaultConnectionShape());
-			newConnections.push_back(temp);
-			connectedElements.pop();
-		}
+	//Now i create a GraphicsConnectionCfg for all elements
+	while (!connectedElements.empty()) {
+		ot::GraphicsConnectionCfg temp(_eventData.getConnectionCfg());
+		temp.setDestUid(connector->getEntityID());
+		temp.setDestConnectable(connector->getName());
+		temp.setOriginUid(connectedElements.front().second->getEntityID());
+		temp.setOriginConnectable(connectedElements.front().first);
+		temp.setLineShape(_originBlock->getDefaultConnectionShape());
+		newConnections.push_back(temp);
+		connectedElements.pop();
 	}
 
 	EntityNamingBehavior _connectionNaming;
