@@ -65,7 +65,7 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 
 	ot::NewModelStateInfo modelStateInfo;
 
-	std::shared_ptr<EntityBlock> createdBlock = createBlockEntity(modelStateInfo, _eventData.getItemName(),_eventData.getScenePos(), editor);
+	std::shared_ptr<EntityBlock> createdBlock = createBlockEntity(editor, _eventData.getScenePos(), _eventData.getItemName(), modelStateInfo);
 	if (createdBlock == nullptr) {
 		OT_LOG_E("Could not create block entity {\"BlockName\": \"" + _eventData.getItemName() + "\" } ");
 		return ot::ReturnMessage::Failed;
@@ -308,9 +308,8 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, Ent
 	// Get connectionCfg
 	ot::GraphicsConnectionCfg connection = _eventData.getConnectionCfg();
 	EntityNamingBehavior connectionNaming;
-	createConnection(modelStateInfo, _scene, connection, _originBlock, connectionNaming);
+	createConnection(_scene, _originBlock, connection, connectionNaming, modelStateInfo);
 
-	
 	// Find connectors
 	auto originConnectorIt = _originBlock->getAllConnectorsByName().find(connection.getOriginConnectable());
 	auto destinationConnectorIt = _destinationBlock->getAllConnectorsByName().find(connection.getDestConnectable());
