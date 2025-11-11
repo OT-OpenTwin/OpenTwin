@@ -41,16 +41,6 @@
 #include "EntityBlockCircuitConnector.h"
 #include "PropertyHelper.h"
 
-bool BlockHandler::addViewBlockRelation(std::string _viewName, ot::UID _blockId, ot::UID _connectionId) {
-	auto& blocks = m_viewBlockConnectionMap[_viewName];
-	if (blocks.find(_blockId) != blocks.end()) {
-		return false;
-	}
-
-	blocks.emplace(_blockId, _connectionId);
-	return true;
-}
-
 ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
@@ -653,7 +643,6 @@ void BlockHandler::createConnection(ot::NewModelStateInfo& _newModelStateInfo, E
 		auto connectionsFolder = model->getListOfFolderItems(_scene->getName() + "/" + m_connectionsFolder, true);
 		const std::string connectionName = CreateNewUniqueTopologyName(connectionsFolder, _scene->getName() + "/" + m_connectionsFolder, "Connection");
 		_connectionEntity.setName(connectionName);
-
 	}
 
 	_connectionEntity.storeToDataBase();

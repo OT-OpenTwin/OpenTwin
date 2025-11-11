@@ -29,12 +29,10 @@ class EntityBlockConnection;
 
 class BlockHandler : public BusinessLogicHandler, public ot::GraphicsActionHandler {
 	OT_DECL_NOCOPY(BlockHandler)
-		OT_DECL_NOMOVE(BlockHandler)
+	OT_DECL_NOMOVE(BlockHandler)
 public:
 	BlockHandler() = default;
 	~BlockHandler() = default;
-
-	bool addViewBlockRelation(std::string _viewName, ot::UID _blockId, ot::UID _connectionId);
 
 protected:
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;
@@ -86,10 +84,15 @@ private:
 	//! @return A unique pointer to the created block entity.
 	std::shared_ptr<EntityBlock> createBlockEntity(ot::NewModelStateInfo& _newModelStateInfo, const std::string& _itemName, const ot::Point2DD& _scenePos, EntityGraphicsScene* _editor);
 
+	//! @brief Creates a new connection entity based on the provided parameters.
+	//! @param _newModelStateInfo Information about the new model state.
+	//! @param _requestedConnection The connection that is requested.
+	//! @param _originBlock The block from which the connection originates.
+	//! @param _connectionNaming The naming convention for the requested connection.
+	//! @return void 
+	void createConnection(ot::NewModelStateInfo& _newModelStateInfo, EntityGraphicsScene* scene, ot::GraphicsConnectionCfg& _requestedConnection, EntityBlock* _originBlock, EntityNamingBehavior& _connectionNaming);
 
-	void createConnection(ot::NewModelStateInfo& _newModelStateInfo, EntityGraphicsScene* scene, ot::GraphicsConnectionCfg& _requestedConnection, EntityBlock* _originBlock, EntityNamingBehavior& _connectioNaming);
-
-	std::unordered_map<std::string, std::unordered_map<ot::UID, ot::UID>> m_viewBlockConnectionMap;
+	std::map<ot::UID, std::map<ot::UID, ot::UIDList>> m_viewBlockConnectionsMap;
 	const std::string m_connectionsFolder = "Connections";
 
 };
