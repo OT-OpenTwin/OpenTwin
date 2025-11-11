@@ -388,13 +388,12 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	// As next step i need to add the intersection item
 	ot::NewModelStateInfo _modelStateInfo;
 	
-	
 	// The destination connection is the connection to be deleted
     // Get connection cfg
 	ot::GraphicsConnectionCfg connectionCfg = _destinationConnection->getConnectionCfg();
 
 	//First i get the connection which i want to delete by the connection to be added
-	std::unique_ptr<EntityBlock> connector;
+	std::unique_ptr<EntityBlock> connector = nullptr;
 	if (!_connectionReversed) {
 		//Saving connected Element and connector
 		connectedElements.push(std::make_pair(requestedConnection.getOriginConnectable(), blockEntities[requestedConnection.getOriginUid()]));
