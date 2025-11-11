@@ -19,6 +19,7 @@
 
 // std header
 #include <stdafx.h>
+#include <queue>
 
 // Service header
 #include "Model.h"
@@ -37,6 +38,7 @@
 #include "EntityBlockPython.h"
 #include "EntityGraphicsScene.h"
 #include "EntityBlockCircuitElement.h"
+#include "EntityBlockCircuitConnector.h"
 #include "PropertyHelper.h"
 
 bool BlockHandler::addViewBlockRelation(std::string _viewName, ot::UID _blockId, ot::UID _connectionId) {
@@ -73,71 +75,17 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 
 	ot::NewModelStateInfo modelStateInfo;
 
-	// Create block entity
-	EntityBase* entBase = EntityFactory::instance().create(_eventData.getItemName());
-	if (entBase == nullptr) {
-		OT_LOG_E("Could not create Entity: " + _eventData.getItemName());
+	std::shared_ptr<EntityBlock> createdBlock = createBlockEntity(modelStateInfo, _eventData.getItemName(),_eventData.getScenePos(), editor);
+	if (createdBlock == nullptr) {
+		OT_LOG_E("Could not create block entity {\"BlockName\": \"" + _eventData.getItemName() + "\" } ");
 		return ot::ReturnMessage::Failed;
 	}
-
-	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
-	if (blockEnt == nullptr) {
-		OT_LOG_E("Could not cast to EntityBlock: " + entBase->getEntityID());
-		return ot::ReturnMessage::Failed;
-	}
-
-	// Determine unique name
-	std::string blockFolderName;
-	if (!blockEnt->getBlockFolderName().empty()) {
-		blockFolderName = "/" + blockEnt->getBlockFolderName();
-	}
-	else {
-		blockFolderName = blockEnt->getBlockFolderName();
-	}
-
-	std::string folderName = _eventData.getEditorName() + blockFolderName;
-
-	std::list<std::string> blocks = model->getListOfFolderItems(folderName, true);
-	std::string entName = CreateNewUniqueTopologyName(blockEnt->getNamingBehavior(), blocks, folderName, blockEnt->getBlockTitle());
-
-	// Setup block entity
-	blockEnt->setName(entName);
-	blockEnt->setEditable(true);
-	blockEnt->setGraphicsPickerKey(editor->getGraphicsPickerKey());
-	blockEnt->setCallbackData(editor->getCallbackData());
-	blockEnt->setEntityID(model->createEntityUID());
-	blockEnt->setGraphicsScenePackageChildName(blockEnt->getBlockFolderName());
-
-	// Create coordinate entity
-	EntityCoordinates2D* blockCoordinates = new EntityCoordinates2D(model->createEntityUID(), nullptr, nullptr, nullptr);
-	blockCoordinates->setCoordinates(_eventData.getScenePos());
-	blockCoordinates->storeToDataBase();
-	modelStateInfo.addDataEntity(*blockEnt, *blockCoordinates);
-
-	// Link block and coordinate entity
-	blockEnt->setCoordinateEntityID(blockCoordinates->getEntityID());
-	blockEnt->createProperties();
-
-	// Special handling for python blocks
-	if (blockEnt->getClassName() == "EntityBlockPython") {
-		EntityBlockPython* pythonBlock = dynamic_cast<EntityBlockPython*>(blockEnt.get());
-		if (pythonBlock == nullptr) {
-			OT_LOG_E("Could not cast to EntityBlockPython: " + blockEnt->getEntityID());
-			return ot::ReturnMessage::Failed;
-		}
-		ot::EntityInformation entityInfo;
-		EntityBase* entity = model->findEntityFromName(ot::FolderNames::PythonScriptFolder);
-		pythonBlock->setScriptFolder(ot::FolderNames::PythonScriptFolder, entity->getEntityID());
-	}
-
-	blockEnt->storeToDataBase();
-	modelStateInfo.addTopologyEntity(*blockEnt);
 
 	model->addEntitiesToModel(modelStateInfo, "Added block", true, true, true);
 
 	// Check if any service wants to be notified about this change
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
-		std::list<std::string> notifyServices = blockEnt->getServicesForCallback(EntityBase::Callback::DataNotify);
+		std::list<std::string> notifyServices = createdBlock->getServicesForCallback(EntityBase::Callback::DataNotify);
 		if (!notifyServices.empty()) {
 			ot::GraphicsItemDropEvent fwdEvent(_eventData);
 			fwdEvent.setForwarding();
@@ -241,7 +189,6 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 				OT_LOG_E("Could not cast to EntityBlock { \"EntityUID\": " + std::to_string(destinationEntityBase->getEntityID()) + "\" }");
 				return ot::ReturnMessage::Failed;
 			}
-
 			if (!createBlockToConnectionConnection(editor, destinationBlock, originConnection, _eventData, true)) {
 				OT_LOG_E("Could not handle block to connection (reversed) connection");
 				return ot::ReturnMessage::Failed;
@@ -270,8 +217,7 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 				OT_LOG_E("Could not cast to EntityBlock { \"EntityUID\": " + std::to_string(destinationEntityBase->getEntityID()) + "\" }");
 				return ot::ReturnMessage::Failed;
 			}
-
-			if (!createBlockToBlockConnection(editor, originBlock, destinationBlock, _eventData)) {
+			if (!createBlockToBlockConnection( editor, originBlock, destinationBlock, _eventData)) {
 				OT_LOG_E("Could not handle block to block connection");
 				return ot::ReturnMessage::Failed;
 			}
@@ -369,24 +315,12 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, Ent
 	ot::NewModelStateInfo modelStateInfo;
 	std::list<bool> forceVis;
 
+	// Get connectionCfg
 	ot::GraphicsConnectionCfg connection = _eventData.getConnectionCfg();
+	EntityNamingBehavior connectionNaming;
+	createConnection(modelStateInfo, _scene, connection, _originBlock, connectionNaming);
 
-	// Create connection entity
-	EntityBlockConnection connectionEntity(model->createEntityUID(), nullptr, nullptr, nullptr);
-	connectionEntity.createProperties();
-	connectionEntity.setCallbackData(_scene->getCallbackData());
-	connectionEntity.setGraphicsPickerKey(_scene->getGraphicsPickerKey());
-	connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
-
-	// Determine unique name
-	auto connectionsFolder = model->getListOfFolderItems(_scene->getName() + "/" + m_connectionsFolder, true);
-	const std::string connectionName = CreateNewUniqueTopologyName(connectionsFolder, _scene->getName() + "/" + m_connectionsFolder, "Connection");
-	connectionEntity.setName(connectionName);
-
-	// Get connectors
-	connection.setLineShape(_originBlock->getDefaultConnectionShape());
-	connectionEntity.setConnectionCfg(connection);
-
+	
 	// Find connectors
 	auto originConnectorIt = _originBlock->getAllConnectorsByName().find(connection.getOriginConnectable());
 	auto destinationConnectorIt = _destinationBlock->getAllConnectorsByName().find(connection.getDestConnectable());
@@ -411,18 +345,111 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, Ent
 		return true;
 	}
 
-	connectionEntity.storeToDataBase();
-	modelStateInfo.addTopologyEntity(connectionEntity);
-
-	model->addEntitiesToModel(modelStateInfo, "Added connections", true, true, true);
+	model->addEntitiesToModel(modelStateInfo, "Added Connection", true, true, true);
 
 	return true;
 }
 
 bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlockConnection* _destinationConnection, const ot::GraphicsConnectionDropEvent& _eventData, bool _connectionReversed) {
 	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
 
-	return false;
+
+	// Here I want to get all block/connection entities
+	std::map<ot::UID, EntityBlock*> blockEntities;
+	std::map<ot::UID, EntityBlockConnection*> connectionEntities;
+	std::list<std::string> entitiesToDelete;
+	std::list<ot::GraphicsConnectionCfg> newConnections;
+
+	std::queue<std::pair<std::string, EntityBlock*>> connectedElements;
+	auto blocks = model->getListOfFolderItems(_scene->getName(), true);
+	auto connections = model->getListOfFolderItems(_scene->getName() + "/" + m_connectionsFolder, true);
+
+	for (auto& block : blocks) {
+		EntityBase* baseEntity = model->findEntityFromName(block);
+		if (!baseEntity) {
+			OT_LOG_E("Could not find block entity { \"Name\": \"" + block + "\" }");
+			return false;
+		}
+		EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(baseEntity);
+		if (!blockEntity) {
+			//OT_LOG_E("Could not cast to EntityBlock { \"Name\": \"" + block + "\" }");
+			continue;
+		}
+		blockEntities.insert_or_assign(blockEntity->getEntityID(), blockEntity);
+	}
+
+	for(auto & connection : connections) {
+		EntityBase* baseEntity = model->findEntityFromName(connection);
+		if (!baseEntity) {
+			OT_LOG_E("Could not find connection entity { \"Name\": \"" + connection + "\" }");
+			return false;
+		}
+		EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(baseEntity);
+		if (!connectionEntity) {
+			//OT_LOG_E("Could not cast to EntityBlockConnection { \"Name\": \"" + connection + "\" }");
+			continue;
+		}
+		connectionEntities.insert_or_assign(connectionEntity->getEntityID(), connectionEntity);
+	}
+
+	// The connection to be added
+	ot::GraphicsConnectionCfg requestedConnection = _eventData.getConnectionCfg();
+
+	// As next step i need to add the intersection item
+	ot::NewModelStateInfo _modelStateInfo;
+	std::shared_ptr<EntityBlock> connector = createBlockEntity(_modelStateInfo, EntityBlockCircuitConnector::className(), _eventData.getScenePos(), _scene);
+	
+
+	//First i get the connection which i want to delete by the connection to be added
+	if (!_connectionReversed) {
+
+		// The destination connection is the connection to be deleted
+		// Get connection cfg
+		ot::GraphicsConnectionCfg connectionCfg = _destinationConnection->getConnectionCfg();
+
+		//Saving connected Element and connector
+		connectedElements.push(std::make_pair(requestedConnection.getOriginConnectable(), blockEntities[requestedConnection.getOriginUid()]));
+
+		// Here I check if the the blocks which are connected to the connection exist
+		if (blockEntities.find(connectionCfg.getDestinationUid()) == blockEntities.end() ||
+			blockEntities.find(connectionCfg.getOriginUid()) == blockEntities.end()) {
+			OT_LOG_E("BlockEntity not found");
+			return false;
+		}
+
+		//Saving  connected Elements and connectors
+		connectedElements.push(std::make_pair(connectionCfg.getDestConnectable(), blockEntities[connectionCfg.getDestinationUid()]));
+		connectedElements.push(std::make_pair(connectionCfg.getOriginConnectable(), blockEntities[connectionCfg.getOriginUid()]));
+
+		entitiesToDelete.push_back(_destinationConnection->getName());
+
+		// Now I can delete the connection
+		model->deleteEntitiesFromModel(entitiesToDelete, false);
+
+		//Now i create a GraphicsConnectionCfg for all elements
+		while (!connectedElements.empty()) {
+			ot::GraphicsConnectionCfg temp(_eventData.getConnectionCfg());
+			temp.setDestUid(connector->getEntityID());
+			temp.setDestConnectable(connector->getName());
+			temp.setOriginUid(connectedElements.front().second->getEntityID());
+			temp.setOriginConnectable(connectedElements.front().first);
+			temp.setLineShape(_originBlock->getDefaultConnectionShape());
+			newConnections.push_back(temp);
+			connectedElements.pop();
+		}
+	}
+
+	EntityNamingBehavior _connectionNaming;
+	_connectionNaming.explicitNaming = true;
+
+	for (auto& connectionCfg : newConnections) {
+		createConnection(_modelStateInfo, _scene, connectionCfg, _originBlock, _connectionNaming);
+	}
+
+	model->addEntitiesToModel(_modelStateInfo, "Added Connection to Connection", true, true, true);
+
+	return true;
 }
 
 bool BlockHandler::updateBlock(const ot::GraphicsItemCfg* _changedBlock, const ot::GraphicsChangeEvent& _changeEvent) {
@@ -524,5 +551,112 @@ bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedCon
 	model->getStateManager()->modifyEntityVersion(*connectionEntity);
 
 	return true;
+}
+
+std::shared_ptr<EntityBlock> BlockHandler::createBlockEntity(ot::NewModelStateInfo& _newModelStateInfo, const std::string& _itemName, const ot::Point2DD& _scenePos , EntityGraphicsScene* _editor) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+	
+	// Create block entity
+	EntityBase* entBase = EntityFactory::instance().create(_itemName);
+	if (entBase == nullptr) {
+		OT_LOG_E("Could not create Entity: " + _itemName);
+		return nullptr;
+	}
+
+	std::shared_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
+	if (blockEnt == nullptr) {
+		OT_LOG_E("Could not cast to EntityBlock: " + entBase->getEntityID());
+		return nullptr;
+	}
+
+	// Determine unique name
+	std::string blockFolderName;
+	if (!blockEnt->getBlockFolderName().empty()) {
+		blockFolderName = "/" + blockEnt->getBlockFolderName();
+	}
+	else {
+		blockFolderName = blockEnt->getBlockFolderName();
+	}
+
+	std::string folderName = _editor->getName() + blockFolderName;
+
+	std::list<std::string> blocks = model->getListOfFolderItems(folderName, true);
+	std::string entName = CreateNewUniqueTopologyName(blockEnt->getNamingBehavior(), blocks, folderName, blockEnt->getBlockTitle());
+
+	// Setup block entity
+	blockEnt->setName(entName);
+	blockEnt->setEditable(true);
+	blockEnt->setGraphicsPickerKey(_editor->getGraphicsPickerKey());
+	blockEnt->setCallbackData(_editor->getCallbackData());
+	blockEnt->setEntityID(model->createEntityUID());
+	blockEnt->setGraphicsScenePackageChildName(blockEnt->getBlockFolderName());
+
+	// Create coordinate entity
+	EntityCoordinates2D* blockCoordinates = new EntityCoordinates2D(model->createEntityUID(), nullptr, nullptr, nullptr);
+	blockCoordinates->setCoordinates(_scenePos);
+	blockCoordinates->storeToDataBase();
+	_newModelStateInfo.addDataEntity(*blockEnt, *blockCoordinates);
+
+	// Link block and coordinate entity
+	blockEnt->setCoordinateEntityID(blockCoordinates->getEntityID());
+	blockEnt->createProperties();
+
+	// Special handling for python blocks
+	if (blockEnt->getClassName() == "EntityBlockPython") {
+		EntityBlockPython* pythonBlock = dynamic_cast<EntityBlockPython*>(blockEnt.get());
+		if (pythonBlock == nullptr) {
+			OT_LOG_E("Could not cast to EntityBlockPython: " + blockEnt->getEntityID());
+			return nullptr;
+		}
+		ot::EntityInformation entityInfo;
+		EntityBase* entity = model->findEntityFromName(ot::FolderNames::PythonScriptFolder);
+		pythonBlock->setScriptFolder(ot::FolderNames::PythonScriptFolder, entity->getEntityID());
+	}
+
+	blockEnt->storeToDataBase();
+	_newModelStateInfo.addTopologyEntity(*blockEnt);
+	return blockEnt;
+}
+
+void BlockHandler::createConnection(ot::NewModelStateInfo& _newModelStateInfo, EntityGraphicsScene* _scene, ot::GraphicsConnectionCfg& _connectionCfg, EntityBlock* _originBlock, EntityNamingBehavior& _connectionNaming) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+	
+	// Create connection entity
+	EntityBlockConnection _connectionEntity(model->createEntityUID(), nullptr, nullptr, nullptr);
+	_connectionEntity.createProperties();
+	_connectionEntity.setCallbackData(_scene->getCallbackData());
+	_connectionEntity.setGraphicsPickerKey(_scene->getGraphicsPickerKey());
+	_connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
+	_connectionCfg.setLineShape(_originBlock->getDefaultConnectionShape());
+	_connectionEntity.setConnectionCfg(_connectionCfg);
+
+	if (_connectionNaming.explicitNaming) {
+		std::list<std::string> connectionItems = model->getListOfFolderItems(_scene->getName() + "/" + m_connectionsFolder, true);
+
+		// Use a manual counter because all connections are added to the model at the end.
+		// CreateNewUniqueEntityName only considers connections already in the model,
+		// which could otherwise result in duplicate names.
+		std::string connectionName;
+		do {
+			connectionName = _scene->getName() + "/" + m_connectionsFolder + "/Connection" + std::to_string(_connectionNaming.namingCounter);
+			_connectionNaming.namingCounter++;
+		} while (std::find(connectionItems.begin(), connectionItems.end(), connectionName) != connectionItems.end());
+
+		_connectionEntity.setName(connectionName);
+	}
+	else {
+		// Determine unique name
+		auto connectionsFolder = model->getListOfFolderItems(_scene->getName() + "/" + m_connectionsFolder, true);
+		const std::string connectionName = CreateNewUniqueTopologyName(connectionsFolder, _scene->getName() + "/" + m_connectionsFolder, "Connection");
+		_connectionEntity.setName(connectionName);
+
+	}
+
+	_connectionEntity.storeToDataBase();
+	_newModelStateInfo.addTopologyEntity(_connectionEntity);
+	return;
 }
 

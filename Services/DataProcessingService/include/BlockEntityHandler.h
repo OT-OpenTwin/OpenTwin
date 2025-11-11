@@ -43,5 +43,4 @@ private:
 	const std::string m_connectionsFolder = "Connections";
 
 	ot::GraphicsPickerCollectionPackage BuildUpBlockPicker();
-	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 };

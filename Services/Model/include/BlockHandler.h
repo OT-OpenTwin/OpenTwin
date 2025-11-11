@@ -29,11 +29,11 @@ class EntityBlockConnection;
 
 class BlockHandler : public BusinessLogicHandler, public ot::GraphicsActionHandler {
 	OT_DECL_NOCOPY(BlockHandler)
-	OT_DECL_NOMOVE(BlockHandler)
+		OT_DECL_NOMOVE(BlockHandler)
 public:
 	BlockHandler() = default;
 	~BlockHandler() = default;
-	
+
 	bool addViewBlockRelation(std::string _viewName, ot::UID _blockId, ot::UID _connectionId);
 
 protected:
@@ -41,7 +41,7 @@ protected:
 	virtual ot::ReturnMessage graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) override;
 
 	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionDropEvent& _eventData) override;
-	
+
 	virtual ot::ReturnMessage graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -74,9 +74,20 @@ private:
 
 	//! @brief Handles the change of a connection.
 	//! @param _changedConnection The connection that changed.
-	//! qparam _changeEvent The event data associated with the changed event.
+	//! param _changeEvent The event data associated with the changed event.
 	//! @return True if the connection change was handled successfully, false otherwise.
 	bool updateConnection(const ot::GraphicsConnectionCfg& _changedConnection, const ot::GraphicsChangeEvent& _changeEvent);
+
+	//! @brief Creates a new block entity based on the provided parameters.
+	//! @param _newModelStateInfo Information about the new model state.
+	//! @param _itemName The name of the item.
+	//! @param _scenePos The position in the scene where the block should be created.
+	//! @param _editor The graphics scene editor.
+	//! @return A unique pointer to the created block entity.
+	std::shared_ptr<EntityBlock> createBlockEntity(ot::NewModelStateInfo& _newModelStateInfo, const std::string& _itemName, const ot::Point2DD& _scenePos, EntityGraphicsScene* _editor);
+
+
+	void createConnection(ot::NewModelStateInfo& _newModelStateInfo, EntityGraphicsScene* scene, ot::GraphicsConnectionCfg& _requestedConnection, EntityBlock* _originBlock, EntityNamingBehavior& _connectioNaming);
 
 	std::unordered_map<std::string, std::unordered_map<ot::UID, ot::UID>> m_viewBlockConnectionMap;
 	const std::string m_connectionsFolder = "Connections";

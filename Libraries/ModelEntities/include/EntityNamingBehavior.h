@@ -23,4 +23,6 @@
 struct EntityNamingBehavior {
 	std::string delimiter = "_";
 	bool alwaysNumbered = false;
+	bool explicitNaming = false;
+	int namingCounter = 1;
 };
