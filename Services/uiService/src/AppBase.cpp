@@ -2518,6 +2518,7 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 	ot::GraphicsConnectionCfg connectionConfig(_fromItemUid, _fromItemConnector, _toConnectionUid, std::string());
 	connectionConfig.setLineStyle(ot::PenFCfg(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
 	connectionConfig.setDestPos(_newControlPoint);
+	eventData.setConnectionCfg(connectionConfig);
 
 	try {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
