@@ -194,7 +194,7 @@ bool EntityBlockDatabaseAccess::updateFromProperties()
 		}
 	}
 
-
+	getProperties().forceResetUpdateForAllProperties();
 	//updateBlockConfig();
 
 	return requiresUpdate;

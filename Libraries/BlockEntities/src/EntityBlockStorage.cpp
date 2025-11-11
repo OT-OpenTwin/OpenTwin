@@ -73,7 +73,7 @@ bool EntityBlockStorage::updateFromProperties()
 		createConnectors();
 		createBlockItem();
 	}
-
+	getProperties().forceResetUpdateForAllProperties();
 	return true;
 }
 
