@@ -314,6 +314,9 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 
 		meshData->storeToDataBase();
 
+		// Copy the geometry Entities
+		copyGeometryEntities(geometryEntities, entityList, meshData->getName());
+
 		// Now add the visualization for all matrices, if this debug option is turned on
 		if (visualizeMatrices && getDsMatrix() != nullptr)
 		{
@@ -409,6 +412,29 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 	closeProgressInformation();
 	setUILock(false, MODEL_CHANGE);
 	reportTime("Cartesian meshing completed, total time", timer);
+}
+
+void CartesianMeshCreation::copyGeometryEntities(std::list<EntityGeometry*>& geometryEntities, std::list<EntityBase*> &entityList, const std::string& meshDataName)
+{
+	for (auto geomEntity : geometryEntities)
+	{
+		std::string copyName = meshDataName + "/" + geomEntity->getName();
+
+		geomEntity->setName(copyName);
+		geomEntity->setEntityID(getApplication()->getModelComponent()->createEntityUID());
+		geomEntity->removeBrep();
+
+		geomEntity->getFacets()->setEntityID(getApplication()->getModelComponent()->createEntityUID());
+		geomEntity->getFacets()->setParent(geomEntity);
+
+		geomEntity->setInitiallyHidden(true);
+		geomEntity->getProperties().setAllPropertiesReadOnly();
+
+		geomEntity->storeToDataBase();
+
+		entityList.push_back(geomEntity);
+		entityList.push_back(geomEntity->getFacets());
+	}
 }
 
 void CartesianMeshCreation::addMatrixPlot(EntityResultBase::tResultType resultType, const std::string &plotName, EntityCartesianVector *matrix, EntityMeshCartesianData *mesh,

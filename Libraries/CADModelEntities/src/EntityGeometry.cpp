@@ -78,6 +78,18 @@ void EntityGeometry::resetBrep(void)
 	brepStorageID = -1;
 }
 
+
+void EntityGeometry::removeBrep(void)
+{
+	if (brep != nullptr)
+	{
+		delete brep;
+		brep = nullptr;
+	}
+
+	brepStorageID = -1;
+}
+
 void EntityGeometry::resetFacets(void)
 {
 	if (facets != nullptr)

@@ -60,6 +60,8 @@ public:
 	void resetBrep(void);
 	void resetFacets(void);
 
+	void removeBrep(void);
+
 	static std::string className() { return "EntityGeometry"; };
 	virtual std::string getClassName(void) const override  { return EntityGeometry::className(); };
 
