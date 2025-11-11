@@ -82,7 +82,7 @@ private:
 	//! @param _scenePos The position in the scene where the block should be created.
 	//! @param _editor The graphics scene editor.
 	//! @return A unique pointer to the created block entity.
-	std::shared_ptr<EntityBlock> createBlockEntity(EntityGraphicsScene* _editor, const ot::Point2DD& _scenePos, const std::string& _itemName,  ot::NewModelStateInfo& _newModelStateInfo);
+	std::unique_ptr<EntityBlock> createBlockEntity(EntityGraphicsScene* _editor, const ot::Point2DD& _scenePos, const std::string& _itemName,  ot::NewModelStateInfo& _newModelStateInfo);
 
 	//! @brief Creates a new connection entity based on the provided parameters.
 	//! @param _newModelStateInfo Information about the new model state.

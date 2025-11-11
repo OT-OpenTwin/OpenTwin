@@ -395,15 +395,21 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	ot::GraphicsConnectionCfg connectionCfg = _destinationConnection->getConnectionCfg();
 
 	//First i get the connection which i want to delete by the connection to be added
+	std::unique_ptr<EntityBlock> connector;
 	if (!_connectionReversed) {
 		//Saving connected Element and connector
 		connectedElements.push(std::make_pair(requestedConnection.getOriginConnectable(), blockEntities[requestedConnection.getOriginUid()]));
-		std::shared_ptr<EntityBlock> connector = createBlockEntity(_modelStateInfo, EntityBlockCircuitConnector::className(), requestedConnection.getDestPos(), _scene);
+		connector = createBlockEntity(_scene, requestedConnection.getDestPos(), EntityBlockCircuitConnector::className(), _modelStateInfo);
 	}
 	else {
 		//Saving connected Element and connector
 		connectedElements.push(std::make_pair(requestedConnection.getDestConnectable(), blockEntities[requestedConnection.getDestinationUid()]));
-		std::shared_ptr<EntityBlock> connector = createBlockEntity(_modelStateInfo, EntityBlockCircuitConnector::className(), requestedConnection.getOriginPos(), _scene);
+		connector = createBlockEntity(_scene, requestedConnection.getOriginPos(), EntityBlockCircuitConnector::className(), _modelStateInfo);
+	}
+
+	if (!connector) {
+		OT_LOG_E("Failed to create BlockEntity");
+		return false;
 	}
 
 	// Here I check if the the blocks which are connected to the connection exist
@@ -437,7 +443,7 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	_connectionNaming.explicitNaming = true;
 
 	for (auto& connectionCfg : newConnections) {
-		createConnection(_modelStateInfo, _scene, connectionCfg, _originBlock, _connectionNaming);
+		createConnection(_scene, _originBlock, connectionCfg,  _connectionNaming, _modelStateInfo);
 	}
 
 	model->addEntitiesToModel(_modelStateInfo, "Added Connection to Connection", true, true, true);
@@ -546,7 +552,7 @@ bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedCon
 	return true;
 }
 
-std::shared_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene* _editor, const ot::Point2DD& _scenePos, const std::string& _itemName, ot::NewModelStateInfo& _newModelStateInfo) {
+std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene* _editor, const ot::Point2DD& _scenePos, const std::string& _itemName, ot::NewModelStateInfo& _newModelStateInfo) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 	
@@ -557,7 +563,7 @@ std::shared_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 		return nullptr;
 	}
 
-	std::shared_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
+	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
 	if (blockEnt == nullptr) {
 		OT_LOG_E("Could not cast to EntityBlock: " + entBase->getEntityID());
 		return nullptr;
