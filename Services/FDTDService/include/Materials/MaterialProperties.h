@@ -49,11 +49,18 @@ public:
 	void setConductivity(double _sigma) { m_conductivity = _sigma; }
 	void setPriority(double _priority) { m_priority = _priority; }
 	void setPrimitives(double _x, double _y, double _z);
+	void setPrimitivesX(double _x) { m_primitives_X = _x; }
+	void setPrimitivesY(double _y) { m_primitives_Y = _y; }
+	void setPrimitivesZ(double _z) { m_primitives_Z = _z; }
 
 	std::string getType() const { return m_type; }
 	double getPermittivityRelative() const { return m_permittivityRel; }
 	double getPermeabilityRelative() const { return m_permeabilityRel; }
 	double getConductivity() const { return m_conductivity; }
+	double getPriority() const { return m_priority; }
+	double getPrimitivesX() const { return m_primitives_X; }
+	double getPrimitivesY() const { return m_primitives_Y; }
+	double getPrimitivesZ() const { return m_primitives_Z; }
 
 	//! @brief Writes the material properties to an XML element
 	//! @param _parentElement The parent XML element to write to

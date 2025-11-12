@@ -19,6 +19,7 @@
 
 #pragma once
 
+// OPENTWIN
 #include "ExcitationProperties.h"
 
 // STD

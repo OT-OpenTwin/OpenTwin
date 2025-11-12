@@ -19,7 +19,6 @@
 
 // OPENTWIN
 #include "Materials/MaterialProperties.h"
-
 #include "OTCore/CoreTypes.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityProperties.h"

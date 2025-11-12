@@ -89,6 +89,7 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 		// Create the FDTD configuration and write the XML file
 		FDTDConfig cfg;
 		cfg.setFromEntity(solverEntity);
+		// Set the material properties from the material property map
 		cfg.setMaterialProperties(materialProperties);
 		tinyxml2::XMLDocument doc;
 		cfg.addToXML(doc);
