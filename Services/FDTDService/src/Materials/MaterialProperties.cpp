@@ -78,9 +78,8 @@ void MaterialProperties::loadMaterialData(std::map<std::string, EntityProperties
 	const EntityProperties& matProps = it->second;
 
 	// Set type to the entity name as a sensible default
-	setType(selectedName);
+	m_type = selectedName;
 
-	// Read typed properties from EntityProperties and apply to this object
 	const auto* materialTypeProp = matProps.getProperty("Material Type");
 	if (materialTypeProp != nullptr) {
 		const EntityPropertiesSelection* selection = dynamic_cast<const EntityPropertiesSelection*>(materialTypeProp);

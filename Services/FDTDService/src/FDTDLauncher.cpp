@@ -150,7 +150,7 @@ void FDTDLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::En
 	std::list<ot::EntityInformation> info;
 	ot::ModelServiceAPI::getEntityChildInformation(meshDataID, info, true);
 
-	for (auto item : info)
+	for (const auto& item : info)
 	{
 		meshItemInfo[item.getEntityID()] = item;
 	}
@@ -164,7 +164,7 @@ void FDTDLauncher::readMaterialProperties(std::map<std::string, EntityProperties
 	ot::ModelServiceAPI::getEntityProperties("Materials", true, "", entityProperties);
 
 	ot::UIDList entityIDList;
-	for (auto item : entityProperties)
+	for (const auto& item : entityProperties)
 	{
 		entityIDList.push_back(item.first);
 	}
