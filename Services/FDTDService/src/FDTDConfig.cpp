@@ -23,8 +23,6 @@
 #include "Excitation/GaussianExcitation.h"
 #include "Excitation/SinusoidalExcitation.h"
 
-#include "Materials/MaterialBase.h"
-
 FDTDConfig::FDTDConfig()
 {
 }

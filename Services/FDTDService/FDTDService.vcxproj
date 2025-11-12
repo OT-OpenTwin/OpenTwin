@@ -204,7 +204,6 @@
     <ClCompile Include="src\FDTDConfig.cpp" />
     <ClCompile Include="src\FDTDLauncher.cpp" />
     <ClCompile Include="src\Materials\MaterialProperties.cpp" />
-    <ClCompile Include="src\Materials\Volumetric.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\SolverBase.cpp" />
     <ClCompile Include="src\SolverFDTD.cpp" />
@@ -220,9 +219,7 @@
     <ClInclude Include="include\Excitation\SinusoidalExcitation.h" />
     <ClInclude Include="include\FDTDConfig.h" />
     <ClInclude Include="include\FDTDLauncher.h" />
-    <ClInclude Include="include\Materials\MaterialBase.h" />
     <ClInclude Include="include\Materials\MaterialProperties.h" />
-    <ClInclude Include="include\Materials\Volumetric.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\SolverBase.h" />
     <ClInclude Include="include\SolverFDTD.h" />
