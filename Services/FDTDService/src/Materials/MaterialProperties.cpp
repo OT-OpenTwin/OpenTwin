@@ -42,21 +42,18 @@ void MaterialProperties::setPrimitives(double _x, double _y, double _z) {
 
 void MaterialProperties::loadMaterialData(std::map<std::string, EntityProperties>& _materialProperty) {
 	if (_materialProperty.empty()) {
-		setType("Default");
-		setPermittivityRelative(0.0);
-		setPermeabilityRelative(0.0);
-		setConductivity(0.0);
-		setPriority(0.0);
+		m_type = "Volumetric";
+		m_permittivityRel = 0.0;
+		m_permeabilityRel = 0.0;
+		m_conductivity = 0.0;
+		m_priority = 0.0;
 		return;
 	}
 	auto it = _materialProperty.begin();
-	
 	const std::string selectedName = it->first;
 	const EntityProperties& matProps = it->second;
 
-	// Set type to the entity name as a sensible default
 	m_type = selectedName;
-
 	const auto* materialTypeProp = matProps.getProperty("Material type", "General");
 	if (materialTypeProp != nullptr) {
 		const EntityPropertiesSelection* selection = dynamic_cast<const EntityPropertiesSelection*>(materialTypeProp);
