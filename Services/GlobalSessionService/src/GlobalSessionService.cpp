@@ -401,7 +401,7 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 
 		JsonObject objFilemanagement;
 		defaultFileManagement.addToJsonObject(objFilemanagement, result.GetAllocator());
-		result.PushBack(objFilemanagement, result.GetAllocator());
+		//result.PushBack(objFilemanagement, result.GetAllocator());
 	}
 
 	return result.toJson();
