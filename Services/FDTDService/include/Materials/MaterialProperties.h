@@ -33,12 +33,16 @@
 // Forward declaration
 class EntityBase;
 
+// !brief Container class to manage material properties
 class MaterialProperties {
 public:
 	MaterialProperties();
 	virtual ~MaterialProperties();
 
+	//! @brief Loads the material properties from an map
+	//! @param _materialProperty The already loaded map containing material properties
 	void loadMaterialData(std::map<std::string, EntityProperties>& _materialProperty);
+
 	void setType(const std::string& _type) { m_type = _type; }
 	void setPermittivityRelative(double _epsilonR) { m_permittivityRel = _epsilonR; }
 	void setPermeabilityRelative(double _muR) { m_permeabilityRel = _muR; }
@@ -46,18 +50,18 @@ public:
 	void setPriority(double _priority) { m_priority = _priority; }
 	void setPrimitives(double _x, double _y, double _z);
 
-	
-
 	std::string getType() const { return m_type; }
 	double getPermittivityRelative() const { return m_permittivityRel; }
 	double getPermeabilityRelative() const { return m_permeabilityRel; }
 	double getConductivity() const { return m_conductivity; }
 
+	//! @brief Writes the material properties to an XML element
+	//! @param _parentElement The parent XML element to write to
+	//! @return The created XML element containing the material properties
 	tinyxml2::XMLElement* writeMaterialProperties(tinyxml2::XMLElement& _parentElement) const;
 
 private:
-
-	std::string m_type = "Default";
+	std::string m_type = "Volumetric";
 	double m_permittivityRel = 0.0;
 	double m_permeabilityRel = 0.0;
 	double m_conductivity = 0.0;
