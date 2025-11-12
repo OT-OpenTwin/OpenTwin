@@ -107,6 +107,7 @@ private:
 
 	// CSX Mesh Grid
 	CSXMeshGrid m_meshGrid;
+	// Material properties container class
 	MaterialProperties m_materialProperties;
 
 	// Excitation object for different excitation types
@@ -115,5 +116,6 @@ private:
 	//! @brief Sets the excitation properties based on the selected excitation type
 	void setExcitationProperties();
 
+	//! @brief Performs property checking and adjustments after reading the FDTD properties from the entity
 	void FDTDpropertyChecking();
 };

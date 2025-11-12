@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "FDTDLauncher.h"
+#include "FDTDConfig.h"
 
 #include "DataBase.h"
 #include "Application.h"

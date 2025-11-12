@@ -33,8 +33,6 @@
 #include "EntityInformation.h"
 #include "EntityProperties.h"
 
-#include "FDTDConfig.h"
-
 namespace ot {
 	namespace components {
 		class ModelComponent;

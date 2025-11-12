@@ -41,25 +41,6 @@ void MaterialProperties::setPrimitives(double _x, double _y, double _z) {
 }
 
 void MaterialProperties::loadMaterialData(std::map<std::string, EntityProperties>& _materialProperty) {
-	// Populate the map of all materials (name -> EntityProperties)
-	_materialProperty.clear();
-	std::map<ot::UID, EntityProperties> allMaterialProps;
-	ot::ModelServiceAPI::getEntityProperties("Materials", true, "", allMaterialProps);
-
-	for (const auto& kv : allMaterialProps) {
-		std::list<ot::UID> idList;
-		idList.push_back(kv.first);
-
-		std::list<ot::EntityInformation> infoList;
-		ot::ModelServiceAPI::getEntityInformation(idList, infoList);
-
-		if (!infoList.empty()) {
-			std::string name = infoList.front().getEntityName();
-			_materialProperty[name] = kv.second;
-		}
-	}
-
-	// If no materials found, reset to defaults and return
 	if (_materialProperty.empty()) {
 		setType("Default");
 		setPermittivityRelative(0.0);
@@ -68,19 +49,15 @@ void MaterialProperties::loadMaterialData(std::map<std::string, EntityProperties
 		setPriority(0.0);
 		return;
 	}
-
-	auto it = _materialProperty.find("Default");
-	if (it == _materialProperty.end()) {
-		it = _materialProperty.begin();
-	}
-
+	auto it = _materialProperty.begin();
+	
 	const std::string selectedName = it->first;
 	const EntityProperties& matProps = it->second;
 
 	// Set type to the entity name as a sensible default
 	m_type = selectedName;
 
-	const auto* materialTypeProp = matProps.getProperty("Material Type");
+	const auto* materialTypeProp = matProps.getProperty("Material type", "General");
 	if (materialTypeProp != nullptr) {
 		const EntityPropertiesSelection* selection = dynamic_cast<const EntityPropertiesSelection*>(materialTypeProp);
 		if (selection != nullptr) {
@@ -88,7 +65,7 @@ void MaterialProperties::loadMaterialData(std::map<std::string, EntityProperties
 		}
 	}
 
-	const auto* epsProp = matProps.getProperty("Permittivity (relative)");
+	const auto* epsProp = matProps.getProperty("Permittivity (relative)", "Electromagnetic");
 	if (epsProp != nullptr) {
 		const EntityPropertiesDouble* doubleProp = dynamic_cast<const EntityPropertiesDouble*>(epsProp);
 		if (doubleProp != nullptr) {
@@ -102,7 +79,7 @@ void MaterialProperties::loadMaterialData(std::map<std::string, EntityProperties
 		m_permittivityRel = 0.0;
 	}
 
-	const auto* muProp = matProps.getProperty("Permeability (relative)");
+	const auto* muProp = matProps.getProperty("Permeability (relative)", "Electromagnetic");
 	if (muProp != nullptr) {
 		const EntityPropertiesDouble* doubleProp = dynamic_cast<const EntityPropertiesDouble*>(muProp);
 		if (doubleProp != nullptr) {
@@ -116,7 +93,7 @@ void MaterialProperties::loadMaterialData(std::map<std::string, EntityProperties
 		m_permeabilityRel = 0.0;
 	}
 
-	const auto* sigmaProp = matProps.getProperty("Conductivity");
+	const auto* sigmaProp = matProps.getProperty("Conductivity", "Electromagnetic");
 	if (sigmaProp != nullptr) {
 		const EntityPropertiesDouble* doubleProp = dynamic_cast<const EntityPropertiesDouble*>(sigmaProp);
 		if (doubleProp != nullptr) {
@@ -130,7 +107,7 @@ void MaterialProperties::loadMaterialData(std::map<std::string, EntityProperties
 		m_conductivity = 0.0;
 	}
 
-	const auto* priProp = matProps.getProperty("Mesh priority");
+	const auto* priProp = matProps.getProperty("Mesh priority", "General");
 	if (priProp != nullptr) {
 		const EntityPropertiesDouble* doubleProp = dynamic_cast<const EntityPropertiesDouble*>(priProp);
 		if (doubleProp != nullptr) {
@@ -156,15 +133,14 @@ tinyxml2::XMLElement* MaterialProperties::writeMaterialProperties(tinyxml2::XMLE
 		propertyElement->SetAttribute("Epsilon", m_permittivityRel);
 	}
 	if (m_permeabilityRel != 0.0) {
-		propertyElement->SetAttribute("Kappa", m_permeabilityRel);
+		propertyElement->SetAttribute("Mu", m_permeabilityRel);
 	}
 	if (m_conductivity != 0.0) {
 		propertyElement->SetAttribute("Sigma", m_conductivity);
 	}
+	materialElement->InsertEndChild(propertyElement);
+
 	primitivesElement->InsertEndChild(boxElement);
-	if (propertyElement->ChildElementCount() > 0) {
-		materialElement->InsertEndChild(propertyElement);
-	}
 	materialElement->InsertEndChild(primitivesElement);
 	return materialElement;
 }

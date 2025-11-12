@@ -38,14 +38,15 @@ public:
 	MaterialProperties();
 	virtual ~MaterialProperties();
 
-	void loadMaterialData(std::map<std::string, EntityProperties>& materialsByName);
-
+	void loadMaterialData(std::map<std::string, EntityProperties>& _materialProperty);
 	void setType(const std::string& _type) { m_type = _type; }
 	void setPermittivityRelative(double _epsilonR) { m_permittivityRel = _epsilonR; }
 	void setPermeabilityRelative(double _muR) { m_permeabilityRel = _muR; }
 	void setConductivity(double _sigma) { m_conductivity = _sigma; }
 	void setPriority(double _priority) { m_priority = _priority; }
 	void setPrimitives(double _x, double _y, double _z);
+
+	
 
 	std::string getType() const { return m_type; }
 	double getPermittivityRelative() const { return m_permittivityRel; }
