@@ -49,6 +49,10 @@ int Application::run(void) {
 		exitCode = 2;
 	}
 
+	if (documentParseErrors()) {
+		exitCode = 3;
+	}
+
 	return exitCode;
 }
 
@@ -191,6 +195,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 	bool inNoteBlock = false;
 	bool inWarningBlock = false;
 	bool hasError = false;  // track errors but don't stop parsing
+	size_t lineNumber = 0;
 
 	// read lines from given file and parse them
 	try {
@@ -198,6 +203,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 //		OT_LOG_D("Read lines:");
 
 		for (const std::string& line : lines) {
+			lineNumber++;
 			std::string trimmedLine = ot::String::removePrefix(line, blackList);
 			std::string lowerCaseTrimmedLine = ot::String::toLower(trimmedLine);
 
@@ -234,7 +240,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						OT_LOG_D("Message Type mTLS set in endpoint: " + endpoint.getMessageTypeString());
 					}
 					else {
-						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Invalid @security input: Message Type must be TLS or mTLS: " + security);
+						ParseError error{
+							_file,
+							lineNumber,
+							_service.getName(),
+							"Message Type must be TLS or mTLS, got: " + security,
+							apiContent
+						};
+						reportError(error);
 						hasError = true;
 					}
 
@@ -260,7 +273,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						OT_LOG_D("Name set in endpoint: " + endpoint.getName());
 					}
 					else {
-						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Key not found in m_actionMacros: " + action);
+						ParseError error{
+							_file,
+							lineNumber,
+							_service.getName(),
+							"Key not found in m_actionMacros: " + action,
+							apiContent
+						};
+						reportError(error);
 						hasError = true;
 					}
 
@@ -293,8 +313,15 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					param = ot::String::removePrefixSuffix(param, " \t");
 //					OT_LOG_D("[PARAM] -> " + param);
 					
-					if (parseParameter(parameter, param, endpoint, _service, ParameterType::FunctionParam)) {
-						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": Failed to parse parameter: " + param);
+					if (parseParameter(parameter, param, endpoint, _service, _file, lineNumber, ParameterType::FunctionParam)) {
+						ParseError error{
+							_file,
+							lineNumber,
+							_service.getName(),
+							"Failed to parse parameter.",
+							apiContent
+						};
+						reportError(error);
 						hasError = true;
 					}
 
@@ -328,8 +355,15 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					rparam = ot::String::removePrefixSuffix(rparam, " \t");
 //					OT_LOG_D("[RPARAM] -> " + rparam);
 
-					if (parseParameter(parameter, rparam, endpoint, _service, ParameterType::ReturnParam)) {
-						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": Failed to parse response parameter: " + rparam);
+					if (parseParameter(parameter, rparam, endpoint, _service, _file, lineNumber, ParameterType::ReturnParam)) {
+						ParseError error{
+							_file,
+							lineNumber,
+							_service.getName(),
+							"Failed to parse response parameter.",
+							apiContent
+						};
+						reportError(error);
 						hasError = true;
 					}
 
@@ -377,7 +411,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = apiContent.substr(8);
 
 						if (!apiContent.empty()) {
-							OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Invalid input: @endnote must be empty.");
+							ParseError error{
+								_file,
+								lineNumber,
+								_service.getName(),
+								"Invalid input: @endnote must be empty.",
+								apiContent
+							};
+							reportError(error);
 							hasError = true;
 						}
 
@@ -388,7 +429,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = apiContent.substr(11);
 
 						if (!apiContent.empty()) {
-							OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Invalid input: @endwarning must be empty.");
+							ParseError error{
+								_file,
+								lineNumber,
+								_service.getName(),
+								"Invalid input: @endwarning must be empty.",
+								apiContent
+							};
+							reportError(error);
 							hasError = true;
 						}
 
@@ -463,7 +511,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = apiContent.substr(8);
 
 						if (!apiContent.empty()) {
-							OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Invalid input: @endnote must be empty.");
+							ParseError error{
+								_file,
+								lineNumber,
+								_service.getName(),
+								"Invalid input: @endnote must be empty.",
+								apiContent
+							};
+							reportError(error);
 							hasError = true;
 						}
 
@@ -474,7 +529,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = apiContent.substr(11);
 
 						if (!apiContent.empty()) {
-							OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Invalid input: @endwarning must be empty.");
+							ParseError error{
+								_file,
+								lineNumber,
+								_service.getName(),
+								"Invalid input: @endwarning must be empty.",
+								apiContent
+							};
+							reportError(error);
 							hasError = true;
 						}
 
@@ -492,7 +554,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					}
 				}
 				else {
-					OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "[UNKNOWN] -> " + apiContent);
+					ParseError error{
+								_file,
+								lineNumber,
+								_service.getName(),
+								"Unknown content.",
+								apiContent
+					};
+					reportError(error);
 					hasError = true;
 				}
 			}
@@ -502,7 +571,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 
 					// report any syntax errors in the documentation and do not add the endpoint to the service
 					if (hasError) {
-						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Error(s) by parsing " + endpoint.getAction() + ". Enpoint was not added to service.");
+						ParseError error{
+								_file,
+								lineNumber,
+								_service.getName(),
+								"Error(s) by parsing " + endpoint.getAction() + ". Enpoint was not added to service.",
+								""
+						};
+						reportError(error);
 					}
 
 					// add the endpoint to the service if name and brief description have been set
@@ -511,7 +587,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						if (endpoint.getMessageType() == Endpoint::unknown) {
 							endpoint.setMessageType(Endpoint::mTLS);
 
-							OT_LOG_W(_service.getName() + " " + endpoint.getAction() + ": message type was missing, default message type was set.");
+							ParseError error{
+								_file,
+								lineNumber,
+								_service.getName(),
+								"Message type is missing, default message type mTLS was set.",
+								""
+							};
+							reportError(error);
 						}
 
 						OT_LOG_D("The parsed endpoint is:");
@@ -524,7 +607,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						_service.printService();
 					}
 
-					// give an error error message if name, brief description or message type have not been set
+					// give an error message if name, brief description or message type have not been set
 					// and do not add the endpoint to the service
 					else {
 						std::vector<std::string> missingItems;
@@ -547,7 +630,14 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 							missing += missingItems[i];
 						}
 
-						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": Invalid Endpoint can't be added to service - missing: " + missing);
+						ParseError error{
+								_file,
+								lineNumber,
+								_service.getName(),
+								"Invalid Endpoint can't be added to service - missing: " + missing,
+								""
+						};
+						reportError(error);
 					}
 
 					// Reset state for next endpoint
@@ -583,7 +673,7 @@ bool Application::startsWith(const std::string& _line, const std::string& _prefi
 	return _line.compare(0, _prefix.size(), _prefix) == 0;
 }
 
-bool Application::parseParameter(Parameter& _parameter, const std::string& _param, Endpoint& _endpoint, Service& _service, ParameterType _parameterType) {
+bool Application::parseParameter(Parameter& _parameter, const std::string& _param, Endpoint& _endpoint, Service& _service, const std::string& _file, const size_t& _lineNumber, ParameterType _parameterType) {
 	OT_LOG_D("Parsing parameter: " + _param);
 	std::list<std::string> splittedParamList = ot::String::split(_param, " ");
 	std::vector<std::string> splittedParamVector(splittedParamList.begin(), splittedParamList.end());
@@ -601,7 +691,14 @@ bool Application::parseParameter(Parameter& _parameter, const std::string& _para
 //		OT_LOG_D("Macroname set in parameter: " + _parameter.getName());
 	}
 	else {
-		OT_LOG_E(_service.getName() + " " + _endpoint.getAction() + ": " + "Key not found in m_actionMacros: " + macro);
+		ParseError error{
+			_file,
+			_lineNumber,
+			_service.getName(),
+			"Key not found in m_actionMacros: " + macro,
+			""
+		};
+		reportError(error);
 		return true;
 	}
 
@@ -670,7 +767,14 @@ bool Application::parseParameter(Parameter& _parameter, const std::string& _para
 //			OT_LOG_D("Data type Enum set in parameter: " + _parameter.getDataTypeString());
 		}
 		else {
-			OT_LOG_E(_service.getName() + " " + _endpoint.getAction() + ": " + "Invalid parameter datatype: " + dataType);
+			ParseError error{
+				_file,
+				_lineNumber,
+				_service.getName(),
+				"Invalid parameter datatype: " + dataType,
+				""
+			};
+			reportError(error);
 			return true;
 		}
 
@@ -692,7 +796,14 @@ bool Application::parseParameter(Parameter& _parameter, const std::string& _para
 		OT_LOG_D("Added Parameter to response parameters.");
 		break;
 	default:
-		OT_LOG_E(_service.getName() + " " + _endpoint.getAction() + ": " + "Unknown parameter type.");
+		ParseError error{
+				_file,
+				_lineNumber,
+				_service.getName(),
+				"Unknown parameter type: " + _parameterType,
+				""
+		};
+		reportError(error);
 		return true;
 		break;
 	}
@@ -967,6 +1078,54 @@ bool Application::writeServiceRstFile(const std::string& _path, const std::strin
 	return false;
 }
 
+bool Application::documentParseErrors(void) {
+	std::string txt = generateAllErrorsTxtContent();
+	bool hasError = writeAllErrorsTxtFile(txt);
+	
+	return hasError;
+}
+
+void Application::reportError(const ParseError& _error) {
+	m_parseErrors.push_back(_error);
+	OT_LOG_E(_error.toString());
+}
+
+std::string Application::generateAllErrorsTxtContent(void) {
+	std::ostringstream out;
+
+	if (!m_parseErrors.empty()) {
+		out << "======== PARSE ERRORS SUMMARY ========\n\n";
+		for (ParseError e : m_parseErrors) {
+			out << e.toString() << "\n";
+		}
+		out << "======================================";
+	}
+
+	return out.str();
+}
+
+bool Application::writeAllErrorsTxtFile(const std::string& _txt) {
+	std::string path = getPathToOTEndPointDocParser();
+	OT_LOG_D("Writing into " + path);
+
+	if (!_txt.empty()) {
+		std::ofstream file(path);
+
+		if (!file.is_open()) {
+			OT_LOG_E("Could not write file: " + path);
+			return true;
+		}
+
+		file << _txt;
+		file.close();
+	}
+	else {
+		OT_LOG_D("Could not write into " + path + "because txt content is empty.");
+	}
+
+	return false;
+}
+
 // helper functions
 std::string Application::getPathFromEnvironmentVariable(const std::string& _envVar, const std::string& _subPath) {
 	std::string fullPath;
@@ -989,6 +1148,13 @@ std::string Application::getPathToOTServices(void) {
 
 std::string Application::getPathToOTDocumentation(void) {
 	return getPathFromEnvironmentVariable("OPENTWIN_DEV_ROOT", "Documentation\\Developer\\documented_endpoints");
+}
+
+std::string Application::getPathToOTEndPointDocParser(void) {
+	std::filesystem::path currentPath = std::filesystem::current_path();
+	std::filesystem::path filePath = currentPath / "parseErrors.txt";
+
+	return filePath.string();
 }
 
 std::string Application::serviceNameToSnakeCase(const std::string& _serviceName) {

@@ -26,6 +26,24 @@
 #include <list>
 #include <map>
 
+struct ParseError {
+	std::string file;
+	size_t lineNumber;
+	std::string serviceName;
+	std::string errorMessage;
+	std::string context;
+
+	std::string toString() const {
+		std::string parseErrorAsString = "at " + serviceName + " - " + file + " - line " + std::to_string(lineNumber) + " - " + errorMessage;
+
+		if (!context.empty()) {
+			parseErrorAsString += " - Context: " + context;
+		}
+
+		return parseErrorAsString;
+	}
+};
+
 class Application {
 public:
 	enum ParameterType{
@@ -62,7 +80,7 @@ public:
 
 	static bool startsWith(const std::string& _line, const std::string& _prefix);
 
-	bool parseParameter(Parameter& _parameter, const std::string& _param, Endpoint& _endpoint, Service& _service, ParameterType _parameterType);
+	bool parseParameter(Parameter& _parameter, const std::string& _param, Endpoint& _endpoint, Service& _service, const std::string& _file, const size_t& _lineNumber, ParameterType _parameterType);
 
 	void addService(const Service& _service);
 
@@ -78,14 +96,24 @@ public:
 
 	bool writeServiceRstFile(const std::string& _path, const std::string& _rst);
 
+	bool documentParseErrors(void);
+
+	void reportError(const ParseError& _error);
+	
+	std::string generateAllErrorsTxtContent(void);
+
+	bool writeAllErrorsTxtFile(const std::string& _txt);
+
 	// helper functions
 	std::string getPathFromEnvironmentVariable(const std::string& _envVar, const std::string& _subPath);
 	std::string getPathToOTServices(void);
 	std::string getPathToOTDocumentation(void);
+	std::string getPathToOTEndPointDocParser(void);
 
 	std::string serviceNameToSnakeCase(const std::string& _serviceName);
 
 private:
 	std::list<Service> m_services;
 	std::map<std::string, std::string> m_actionMacros;
+	std::list<ParseError> m_parseErrors;
 };
