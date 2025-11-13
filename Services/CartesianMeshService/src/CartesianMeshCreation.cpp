@@ -315,7 +315,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		meshData->storeToDataBase();
 
 		// Copy the geometry Entities
-		copyGeometryEntities(geometryEntities, entityList, meshData->getName());
+		copyGeometryEntities(geometryEntities, entityList, getEntityMesh()->getName());
 
 		// Now add the visualization for all matrices, if this debug option is turned on
 		if (visualizeMatrices && getDsMatrix() != nullptr)
@@ -414,11 +414,11 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 	reportTime("Cartesian meshing completed, total time", timer);
 }
 
-void CartesianMeshCreation::copyGeometryEntities(std::list<EntityGeometry*>& geometryEntities, std::list<EntityBase*> &entityList, const std::string& meshDataName)
+void CartesianMeshCreation::copyGeometryEntities(std::list<EntityGeometry*>& geometryEntities, std::list<EntityBase*> &entityList, const std::string& meshName)
 {
 	for (auto geomEntity : geometryEntities)
 	{
-		std::string copyName = meshDataName + "/" + geomEntity->getName();
+		std::string copyName = meshName + "/" + geomEntity->getName();
 
 		geomEntity->setName(copyName);
 		geomEntity->setEntityID(getApplication()->getModelComponent()->createEntityUID());
@@ -618,7 +618,7 @@ void CartesianMeshCreation::deleteMesh(void)
 	getEntityMesh()->deleteMeshData();
 
 	// Delete previous mesh data from the model (if it exsits)
-	std::list<std::string> entityList{getEntityMesh()->getName() + "/Mesh"};
+	std::list<std::string> entityList{getEntityMesh()->getName() + "/Mesh", getEntityMesh()->getName() + "/Geometry"};
 	ot::ModelServiceAPI::deleteEntitiesFromModel(entityList);
 }
 

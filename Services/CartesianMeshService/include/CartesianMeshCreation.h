@@ -373,7 +373,7 @@ private:
 	void calcDepsW(double *matrix, long long nu, long long nv, long long nw, long long mu, long long mv, long long mw, double *meshLinesU,double *meshLinesV, EntityGeometry **meshFill);
 	void calcDsigmaW(double *matrix, long long nu, long long nv, long long nw, long long mu, long long mv, long long mw, double *meshLinesU, double *meshLinesV, EntityGeometry **meshFill);
 	void addMatrixPlot(EntityResultBase::tResultType resultType, const std::string &plotName, EntityCartesianVector *matrix, EntityMeshCartesianData *mesh, std::list<EntityBase *> &entityList, std::map<ot::UID,bool> &topologyEntityForceVisible);
-	void copyGeometryEntities(std::list<EntityGeometry*>& geometryEntities, std::list<EntityBase*>& entityList, const std::string &meshDataName);
+	void copyGeometryEntities(std::list<EntityGeometry*>& geometryEntities, std::list<EntityBase*>& entityList, const std::string &meshName);
 
 	enum lockType {ANY_OPERATION, MODEL_CHANGE};
 	void setUILock(bool flag, lockType type);
