@@ -135,13 +135,7 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _replace
 	m_fileExtensionFilter = _config.getFileExtensionFilters();
 
 	if (_replaceText) {
-		m_completeText = _config.getPlainText();
-		const std::string displayText = m_completeText.substr(0, m_maxOfDisplayedChars);
-		if(m_completeText.size() > m_maxOfDisplayedChars) 
-		{
-			OT_LOG_W("TextEditor: The provided text exceeds the maximum of " + std::to_string(m_maxOfDisplayedChars) + " characters. The text will be truncated for display purposes.");
-		}
-		QString newText = QString::fromStdString(displayText);
+		QString newText = QString::fromStdString(_config.getPlainText());
 		newText.remove('\r');
 		if (newText != this->toPlainText()) {
 			this->setPlainText(newText);
@@ -256,7 +250,7 @@ bool ot::TextEditor::saveToFile(const QString& _fileName) {
 		return false;
 	}
 	else {
-		QByteArray data = QByteArray::fromStdString(m_completeText);
+		QByteArray data = QByteArray::fromStdString(this->toPlainText().toStdString());
 		result = file.write(data) == data.size();
 		file.close();
 	}
