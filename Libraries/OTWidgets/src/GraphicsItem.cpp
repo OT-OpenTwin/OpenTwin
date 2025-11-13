@@ -764,7 +764,8 @@ void ot::GraphicsItem::setCurrentPosAsMoveStart() {
 	m_moveStartPt = this->getQGraphicsItem()->pos();
 }
 
-void ot::GraphicsItem::notifyMoveIfRequired() {
+void ot::GraphicsItem::notifyMoveIfRequired(GraphicsChangeEvent& _changeEvent) {
+	OTAssertNullptr(this->getConfiguration());
 	OTAssertNullptr(this->getQGraphicsItem());
 	OTAssertNullptr(this->getGraphicsScene());
 	OTAssertNullptr(this->getGraphicsScene()->getGraphicsView());
@@ -772,11 +773,9 @@ void ot::GraphicsItem::notifyMoveIfRequired() {
 	if (m_moveStartPt != newPos) {
 		m_moveStartPt = newPos;
 
-		if (this->isSilencingConfigNotifications()) {
-			return;
+		if (!this->isSilencingConfigNotifications()) {
+			_changeEvent.addChangedItem(getConfiguration()->createCopy());
 		}
-		this->getGraphicsScene()->getGraphicsView()->notifyItemMoved(this);
-		this->getGraphicsScene()->getGraphicsView()->notifyItemConfigurationChanged(this);
 	}
 }
 

@@ -26,6 +26,7 @@
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/GraphicsSnapEvent.h"
+#include "OTGui/GraphicsChangeEvent.h"
 #include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -189,11 +190,9 @@ namespace ot {
 
 		// Callback handling
 
-		void notifyItemMoved(const ot::GraphicsItem* _item);
-
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
 
-		void notifyConnectionChanged(const ot::GraphicsConnectionItem* _connection);
+		void notifyConnectionConfigurationChanged(const ot::GraphicsConnectionItem* _connection);
 
 	Q_SIGNALS:
 		//! @brief Will be emitted when an item was dropped into the scene by the user.
@@ -215,19 +214,15 @@ namespace ot {
 		//! @param _newControlPoint New control point in scene coordinates.
 		void connectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 
-		void itemMoved(const ot::UID& _uid, const QPointF& _newPos);
-
-		void itemConfigurationChanged(const ot::GraphicsItemCfg* _newConfig);
-
 		void itemDoubleClicked(const ot::GraphicsItemCfg* _itemConfig);
-
-		void connectionChanged(const ot::GraphicsConnectionCfg& _newConfig);
 
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
 		void copyRequested(CopyInformation& _info);
 		  
 		void pasteRequested(CopyInformation& _info);
+
+		void elementsChanged(const GraphicsChangeEvent& _changeEvent);
 
 		void connectionSnapRequested(const GraphicsSnapEvent& _snapEvent);
 

@@ -432,11 +432,6 @@ void ot::GraphicsView::requestConnectionToConnection(const ot::UID& _fromItemUid
 
 // Callback handling
 
-void ot::GraphicsView::notifyItemMoved(const ot::GraphicsItem* _item) {
-	if (m_viewStateFlags & ItemMoveInProgress) return;
-	Q_EMIT itemMoved(_item->getGraphicsItemUid(), QtFactory::toQPoint(_item->getGraphicsItemPos()));
-}
-
 void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _item) {
 	// Avoid notification of child items
 	if (_item != _item->getRootItem()) {
@@ -449,17 +444,21 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 
 	// Ensure item is not a connector
 	if (!_item->isInternalItem()) {
-		Q_EMIT itemConfigurationChanged(_item->getConfiguration());
-	}
-	
-	// Notify about connections
-	for (const GraphicsConnectionItem* connection : _item->getAllConnections()) {
-		this->notifyConnectionChanged(connection);
+		GraphicsChangeEvent evt;
+		evt.addChangedItem(_item->getConfiguration()->createCopy());
+
+		for (const GraphicsConnectionItem* connection : _item->getAllConnections()) {
+			evt.addChangedConnection(connection->getConfiguration());
+		}
+
+		Q_EMIT elementsChanged(evt);
 	}
 }
 
-void ot::GraphicsView::notifyConnectionChanged(const ot::GraphicsConnectionItem* _connection) {
-	Q_EMIT connectionChanged(_connection->getConfiguration());
+void ot::GraphicsView::notifyConnectionConfigurationChanged(const ot::GraphicsConnectionItem* _connection) {
+	GraphicsChangeEvent evt;
+	evt.addChangedConnection(_connection->getConfiguration());
+	Q_EMIT elementsChanged(evt);
 }
 
 // ########################################################################################################
@@ -764,18 +763,25 @@ void ot::GraphicsView::endItemMove() {
 
 	m_viewStateFlags.set(ItemMoveInProgress, false);
 
-	// Notify about item move
+	// Notify about move
+	GraphicsChangeEvent changeEvent;
+	changeEvent.setEditorName(m_viewName);
+
 	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
-		if (otItem) {
-			otItem->notifyMoveIfRequired();
+		if (otItem && !otItem->isInternalItem()) {
+			otItem->notifyMoveIfRequired(changeEvent);
 		}
 	}
 
+	if (!changeEvent.isEmpty()) {
+		Q_EMIT elementsChanged(changeEvent);
+	}
+
+	// Notify about connection snap
 	GraphicsSnapEvent snapEvent;
 	snapEvent.setEditorName(m_viewName);
 
-	// Notify about connection snap
 	for (auto& itm : m_items) {
 		itm.second->checkConnectionSnapRequest(snapEvent);
 	}

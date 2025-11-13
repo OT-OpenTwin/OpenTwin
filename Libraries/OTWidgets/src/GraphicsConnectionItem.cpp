@@ -398,11 +398,11 @@ void ot::GraphicsConnectionItem::disconnectRequested(GraphicsDisconnectItem* _di
 
 	if (_disconnector == m_originDisconnect) {
 		this->disconnectItem(m_origin, true);
-		view->notifyConnectionChanged(this);
+		view->notifyConnectionConfigurationChanged(this);
 	}
 	else if (_disconnector == m_destDisconnect) {
 		this->disconnectItem(m_dest, true);
-		view->notifyConnectionChanged(this);
+		view->notifyConnectionConfigurationChanged(this);
 	}
 	else {
 		OT_LOG_EA("Unknown disconnector");

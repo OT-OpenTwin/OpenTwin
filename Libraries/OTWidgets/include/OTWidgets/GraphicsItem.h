@@ -23,6 +23,7 @@
 #include "OTGui/Margins.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsSnapEvent.h"
+#include "OTGui/GraphicsChangeEvent.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/GraphicsElement.h"
 
@@ -319,8 +320,9 @@ namespace ot {
 		//! @brief Sets the current item position as move start point.
 		void setCurrentPosAsMoveStart();
 
-		//! @brief Notifies the view if the items current position changed relative to the move start point.
-		void notifyMoveIfRequired();
+		//! @brief If the item position has changed the item information will be added to the change event.
+		//! @param _changeEvent Event to fill.
+		void notifyMoveIfRequired(GraphicsChangeEvent& _changeEvent);
 
 		//! @brief Checks for connection snap requests and fills the result event accordingly.
 		void checkConnectionSnapRequest(GraphicsSnapEvent& _result);

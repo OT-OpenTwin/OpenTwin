@@ -54,6 +54,8 @@ namespace ot {
 		void setEditorName(const std::string& _name) { m_editorName = _name; };
 		const std::string& getEditorName() const { return m_editorName; };
 
+		bool isEmpty() const { return m_changedItems.empty() && m_changedConnections.empty(); };
+
 		//! @brief Adds a changed item to the event.
 		//! The event takes ownership of the item.
 		//! @param _item Pointer to the changed item.

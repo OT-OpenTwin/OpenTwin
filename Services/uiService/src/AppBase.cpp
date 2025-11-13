@@ -1966,8 +1966,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	connect(graphics, &ot::GraphicsView::copyRequested, this, &AppBase::slotCopyRequested);
 	connect(graphics, &ot::GraphicsView::pasteRequested, this, &AppBase::slotPasteRequested);
 	connect(graphics, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
-	connect(graphics, &ot::GraphicsView::itemConfigurationChanged, this, &AppBase::slotGraphicsItemChanged);
-	connect(graphics, &ot::GraphicsView::connectionChanged, this, &AppBase::slotGraphicsConnectionChanged);
+	connect(graphics, &ot::GraphicsView::elementsChanged, this, &AppBase::slotGraphicsElementsChanged);
 	connect(graphics, &ot::GraphicsView::itemDoubleClicked, this, &AppBase::slotGraphicsItemDoubleClicked);
 	connect(graphics, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(graphics, &ot::GraphicsView::connectionSnapRequested, this, &AppBase::slotGraphicsSnapEvent);
@@ -2373,26 +2372,11 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 	}
 }
 
-void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
-	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
-	if (graphicsView == nullptr) {
-		OT_LOG_E("GraphicsView cast failed");
-		return;
-	}
-
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
-	if (!view) {
-		OT_LOG_E("View not found");
-		return;
-	}
-	
+void AppBase::slotGraphicsElementsChanged(const ot::GraphicsChangeEvent& _event) {	
 	try {
 		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
 		
-		ot::GraphicsChangeEvent eventData;
-		eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
-		eventData.addChangedItem(_newConfig->createCopy());
-		ot::JsonDocument doc = ot::GraphicsActionHandler::createChangeEventDocument(eventData);
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createChangeEventDocument(_event);
 
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
@@ -2537,49 +2521,6 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 			OT_LOG_E("Request failed: " + responseObj.getWhat());
 			return;
 		}
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_E(_e.what());
-	}
-	catch (...) {
-		OT_LOG_E("[FATAL] Unknown error");
-	}
-}
-
-void AppBase::slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _newConfig) {
-	return;
-	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
-	if (graphicsView == nullptr) {
-		OT_LOG_E("GraphicsView cast failed");
-		return;
-	}
-
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
-	if (!view) {
-		OT_LOG_E("View not found");
-		return;
-	}
-
-	try {
-		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
-
-		ot::GraphicsChangeEvent changeEvent;
-		changeEvent.addChangedConnection(_newConfig);
-
-		ot::JsonDocument doc = ot::GraphicsActionHandler::createChangeEventDocument(changeEvent);
-
-		std::string response;
-		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
-			OT_LOG_E("Failed to send http request");
-			return;
-		}
-
-		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
-		if (responseObj != ot::ReturnMessage::Ok) {
-			OT_LOG_E("Request failed: " + responseObj.getWhat());
-			return;
-		}
-
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_E(_e.what());

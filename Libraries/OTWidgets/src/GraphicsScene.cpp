@@ -172,7 +172,10 @@ void ot::GraphicsScene::deselectAll(void) {
 }
 
 void ot::GraphicsScene::moveAllSelectedItems(const Point2DD& _delta) {
-	if (_delta.x() == 0. && _delta.y() == 0.) return;
+	if (_delta.x() == 0. && _delta.y() == 0.) {
+		return;
+	}
+
 	for (QGraphicsItem* item : this->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(item);
 		if (otItem) {
