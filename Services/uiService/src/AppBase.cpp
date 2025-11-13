@@ -176,7 +176,7 @@ const QString c_promtIcoPath = "Default";
 #define TITLE_DOCK_PROPERTIES "Properties"
 
 #define APP_SETTINGS_VERSION "1.0"
-#define BUILD_INFO "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n"
+#define BUILD_INFO "OpenTwin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n"
 
 #define WAITING_ANIMATION_NAME "OpenTwinLoading"
 
@@ -305,7 +305,7 @@ bool AppBase::logIn() {
 	// Create default UI
 	OT_LOG_D("Creating default GUI");
 	m_mainWindow = uiAPI::createWindow(m_uid);
-	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
+	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
 	uiAPI::window::setWindowIcon(m_mainWindow, ot::IconManager::getApplicationIcon());
 
 	// Create UI
@@ -383,10 +383,10 @@ void AppBase::setCurrentProjectIsModified(bool _isModified) {
 	assert(m_currentProjectInfo.getProjectName().length());	// No project is open
 	QString title(m_currentProjectInfo.getProjectName().c_str());
 	if (_isModified) {
-		uiAPI::window::setTitle(m_mainWindow, title.append(" [modified] - Open twin"));
+		uiAPI::window::setTitle(m_mainWindow, title.append(" [modified] - OpenTwin"));
 	}
 	else {
-		uiAPI::window::setTitle(m_mainWindow, title.append(" - Open twin"));
+		uiAPI::window::setTitle(m_mainWindow, title.append(" - OpenTwin"));
 	}
 	m_projectStateIsModified = _isModified;
 }
@@ -1487,7 +1487,7 @@ void AppBase::closeAllViewerTabs() {
 
 void AppBase::clearSessionInformation() {
 	m_currentProjectInfo = ot::ProjectInformation();
-	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
+	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
 }
 
 void AppBase::restoreSessionState() {
@@ -1639,7 +1639,7 @@ bool AppBase::checkForContinue(const std::string& _title) {
 		}
 	}
 
-	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
+	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
 	return true;
 }
 

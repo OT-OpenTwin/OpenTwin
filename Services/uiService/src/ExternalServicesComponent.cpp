@@ -135,7 +135,7 @@
 #include "OTCore/EntityName.h"
 #include "CurveColourSetter.h"
 
-const QString c_buildInfo = "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n";
+const QString c_buildInfo = "OpenTwin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n";
 
 //! @brief Timeout for dispatching actions in seconds.
 const int64_t c_dispatchTimeoutSeconds = 30;
