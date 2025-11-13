@@ -120,10 +120,37 @@ void ot::FMDirectory::setFromJsonObject(const ConstJsonObject& _jsonObject) {
 	}
 }
 
-std::optional<ot::FileInformation> ot::FMDirectory::getFile(const std::string& _fileName) const {
+ot::FMDirectory* ot::FMDirectory::getChildDirectory(const std::string& _directoryName, GetFileMode _mode) {
+    std::string normalizedDirectoryName = "/" + _directoryName;
+    std::replace(normalizedDirectoryName.begin(), normalizedDirectoryName.end(), '\\', '/');
+
+	// Check child directories in the current directory
+    for (FMDirectory& childDir : m_childDirectories) {
+        std::string normalizedPath = childDir.getPath().generic_string();
+        std::replace(normalizedPath.begin(), normalizedPath.end(), '\\', '/');
+        if (normalizedPath == normalizedDirectoryName) {
+            return &childDir;
+        }
+	}
+
+	// Directory not found in this directory, check child directories if recursive mode is enabled
+    if (_mode == GetFileMode::Recursive) {
+        for (FMDirectory& childDir : m_childDirectories) {
+            FMDirectory* result = childDir.getChildDirectory(_directoryName, _mode);
+            if (result != nullptr) {
+                return result;
+            }
+        }
+	}
+
+	return nullptr;
+}
+
+std::optional<ot::FileInformation> ot::FMDirectory::getFile(const std::string& _fileName, GetFileMode _mode) const {
 	std::string normalizedFileName = "/" + _fileName;
     std::replace(normalizedFileName.begin(), normalizedFileName.end(), '\\', '/');
 
+	// Check files in the current directory
     for (const FileInformation& fileInfo : m_files) {
 		std::string normalizedPath = fileInfo.getPath();
 		std::replace(normalizedPath.begin(), normalizedPath.end(), '\\', '/');
@@ -133,5 +160,32 @@ std::optional<ot::FileInformation> ot::FMDirectory::getFile(const std::string& _
 		}
 	}
 
+	// File not found in this directory, check child directories if recursive mode is enabled
+    if (_mode == GetFileMode::Recursive) {
+        for (const FMDirectory& childDir : m_childDirectories) {
+            std::optional<FileInformation> result = childDir.getFile(_fileName, _mode);
+            if (result.has_value()) {
+                return result;
+            }
+        }
+	}
+
 	return std::nullopt;
+}
+
+std::list<ot::FileInformation> ot::FMDirectory::getAllFiles(GetFileMode _mode) const {
+    std::list<FileInformation> ret;
+
+    for (const FileInformation& fileInfo : m_files) {
+        ret.push_back(fileInfo);
+	}
+
+    if (_mode == GetFileMode::Recursive) {
+        for (const FMDirectory& childDir : m_childDirectories) {
+            std::list<FileInformation> childFiles = childDir.getAllFiles(_mode);
+            ret.splice(ret.end(), std::move(childFiles));
+        }
+    }
+
+	return ret;
 }

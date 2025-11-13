@@ -26,6 +26,7 @@
 namespace ot {
 
 	constexpr const char* OpenTwinIgnoreFileName = ".otignore";
-	constexpr const char* OpenTwinCacheFileName = ".otcache";
+	constexpr const char* OpenTwinCacheFolderName = ".otcache";
+	constexpr const char* OpenTwinCacheInfoFileName = "otinfo.cache.json";
 	
 }

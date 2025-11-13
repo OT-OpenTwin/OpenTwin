@@ -35,9 +35,11 @@ bool ot::FMCache::updateCache(const std::string& _rootPath, const UpdateFlags& _
 		WindowAPI::setProgressBarValue(0);
 	}
 
+	// Scan for ignore file
 	FMIgnoreFile ignoreFile;
-	FMDirectory rootDir = FMDirectory::fromFileSystem(_rootPath, ignoreFile, FMDirectory::ScanFlag::ScanFiles);
-	auto ignoreFileInfo = rootDir.getFile(ot::OpenTwinIgnoreFileName);
+	FMDirectory::ScanFlags scanFlags = FMDirectory::ScanFlag::ScanFiles | FMDirectory::ScanFlag::ScanDirectories;
+	FMDirectory rootDir = FMDirectory::fromFileSystem(_rootPath, ignoreFile, scanFlags);
+	auto ignoreFileInfo = rootDir.getFile(ot::OpenTwinIgnoreFileName, FMDirectory::TopLevelOnly);
 	if (ignoreFileInfo.has_value()) {
 		if (!ignoreFile.parseFromFile(ignoreFileInfo->getPath())) {
 			WindowAPI::appendOutputMessage(StyledTextBuilder() << "[" << StyledText::Error << "Error" << StyledText::ClearStyle << "] Failed to parse ignore file: " + ignoreFileInfo->getPath() + "\n");
@@ -46,16 +48,22 @@ bool ot::FMCache::updateCache(const std::string& _rootPath, const UpdateFlags& _
 		}
 	}
 
-	FMDirectory::ScanFlags scanFlags = FMDirectory::ScanFlag::ScanFiles | FMDirectory::ScanFlag::ScanDirectories | FMDirectory::ScanFlag::ScanChildDirectories;
+	// Create cache directory if needed
+	if (!rootDir.getChildDirectory(ot::OpenTwinCacheFolderName, FMDirectory::TopLevelOnly)) {
+		std::filesystem::create_directories(rootDir.getPath() / ot::OpenTwinCacheFolderName);
+	}
+
+
+	// Scan top level directories and files
 	if (_updateFlags.has(UpdateFlag::WriteOutput)) {
 		scanFlags.set(FMDirectory::ScanFlag::WriteOutput);
 	}
 
 	rootDir = FMDirectory::fromFileSystem(_rootPath, ignoreFile, scanFlags);
 
-	return updateCache(std::move(rootDir), _updateFlags);
+	return true;
 }
-
+/*
 bool ot::FMCache::updateCache(FMDirectory&& _rootDirectory, const UpdateFlags& _updateFlags) {
 	if (_updateFlags.has(UpdateFlag::WriteOutput)) {
 		WindowAPI::appendOutputMessage("Updating cache for root path: " + _rootDirectory.getPath().generic_string() + "\n");
@@ -113,7 +121,7 @@ bool ot::FMCache::updateCache(FMDirectory&& _rootDirectory, const UpdateFlags& _
 
 	return true;
 }
-
+*/
 bool ot::FMCache::updateDirectory(FMDirectory& _cachedDir, const FMDirectory& _newDir, UpdateInfo& _resultInfo, const UpdateFlags& _updateFlags) {
 	if (_newDir.getPath() != _cachedDir.getPath()) {
 		// Directory did not exist before, add it
@@ -149,7 +157,7 @@ bool ot::FMCache::updateDirectory(FMDirectory& _cachedDir, const FMDirectory& _n
 
 		// Check for modified and removed files
 		for (ot::FileInformation& cachedFileInfo : _cachedDir.getFiles()) {
-			auto newFileInfo = _newDir.getFile(cachedFileInfo.getPath());
+			auto newFileInfo = _newDir.getFile(cachedFileInfo.getPath(), FMDirectory::TopLevelOnly);
 			if (newFileInfo.has_value()) {
 				// File exists, check for modification
 				if (newFileInfo->getLastModified() != cachedFileInfo.getLastModified() || newFileInfo->getSize() != cachedFileInfo.getSize()) {
@@ -171,7 +179,7 @@ bool ot::FMCache::updateDirectory(FMDirectory& _cachedDir, const FMDirectory& _n
 
 		// Check for new files
 		for (const ot::FileInformation& newFileInfo : _newDir.getFiles()) {
-			auto cachedFileInfo = _cachedDir.getFile(newFileInfo.getPath());
+			auto cachedFileInfo = _cachedDir.getFile(newFileInfo.getPath(), FMDirectory::TopLevelOnly);
 			if (!cachedFileInfo.has_value()) {
 				// New file
 				_resultInfo.newFiles.push_back(newFileInfo);

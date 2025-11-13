@@ -147,22 +147,22 @@ void ot::FMNewProjectDialog::slotConfirm() {
 	}
 
 	// Check for existing project
-	FMDirectory root = FMDirectory::fromFileSystem(pth.toStdString(), FMIgnoreFile(), FMDirectory::ScanFlag::ScanFiles);
-	auto cacheFileInfo = root.getFile(OpenTwinCacheFileName);
-	if (cacheFileInfo.has_value()) {
+	FMDirectory root = FMDirectory::fromFileSystem(pth.toStdString(), FMIgnoreFile(), FMDirectory::ScanFlag::ScanDirectories);
+	auto cacheDir = root.getChildDirectory(pth.toStdString() + "/" + OpenTwinCacheFolderName, FMDirectory::TopLevelOnly);
+	if (cacheDir) {
 		MessageDialogCfg cfg;
 		cfg.setButtons(MessageDialogCfg::Ok);
 		cfg.setIcon(MessageDialogCfg::Warning);
 		cfg.setTitle("Existing Project Detected");
 		cfg.setText("An existing OpenTwin project was detected in the selected directory. "
-			"Please select a different directory to initialize a new project or delete the \"" + std::string(OpenTwinCacheFileName) + "\".");
+			"Please select a different directory to initialize a new project or delete the \"" + std::string(OpenTwinCacheFolderName) + "\" folder.");
 		
 		MessageDialog::showDialog(cfg, this);
 		return;
 	}
 
 	// Check for existing ignore file
-	auto ignoreFileInfo = root.getFile(OpenTwinIgnoreFileName);
+	auto ignoreFileInfo = root.getFile(OpenTwinIgnoreFileName, FMDirectory::TopLevelOnly);
 	if (ignoreFileInfo.has_value()) {
 		if (!ignoreFile.hasPatterns()) {
 			// No ignore patterns provided, no need to replace existing ignore file

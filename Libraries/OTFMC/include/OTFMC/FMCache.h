@@ -49,9 +49,6 @@ namespace ot {
 
 		bool updateCache(const std::string& _rootPath, const UpdateFlags& _updateFlags);
 
-		//! @brief Update the cache with new root directory data.
-		//! @param _rootDirectory The new root directory data.
-		bool updateCache(FMDirectory&& _rootDirectory, const UpdateFlags& _updateFlags);
 		const FMDirectory& getRootDirectory() const { return m_rootDirectory; };
 
 	private:

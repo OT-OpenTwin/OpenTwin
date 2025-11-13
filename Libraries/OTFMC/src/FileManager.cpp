@@ -84,13 +84,11 @@ void ot::FileManager::workerInitializeNewProject(FMNewProjectInfo&& _newProjectI
 		WindowAPI::setProgressBarVisibility("Initialize Project", true, false);
 		WindowAPI::setProgressBarValue(0);
 
-		m_cache.clear();
-
 		WindowAPI::appendOutputMessage("Initializing new project at: " + _newProjectInfo.getRootDirectory() + "\n");
 
 		// Check for existing ignore file
 		FMDirectory rootDir = FMDirectory::fromFileSystem(_newProjectInfo.getRootDirectory(), FMIgnoreFile(), FMDirectory::ScanFlag::ScanFiles);
-		auto ignoreFileInfo = rootDir.getFile(ot::OpenTwinIgnoreFileName);
+		auto ignoreFileInfo = rootDir.getFile(ot::OpenTwinIgnoreFileName, FMDirectory::TopLevelOnly);
 
 		FMIgnoreFile ignoreFile;
 
@@ -125,19 +123,11 @@ void ot::FileManager::workerInitializeNewProject(FMNewProjectInfo&& _newProjectI
 			ignoreFile = _newProjectInfo.getIgnoreFile();
 		}
 		
-		WindowAPI::setProgressBarValue(5);
-
-		// Load project structure with ignore rules applied
-		FMDirectory::ScanFlags flags = FMDirectory::ScanFlag::ScanFiles | FMDirectory::ScanFlag::ScanDirectories | FMDirectory::ScanFlag::ScanChildDirectories | FMDirectory::ScanFlag::WriteOutput;
-		rootDir = FMDirectory::fromFileSystem(_newProjectInfo.getRootDirectory(), ignoreFile, flags);
-
-		WindowAPI::setProgressBarVisibility("Upload files", true, false);
-		WindowAPI::setProgressBarValue(50);
+		FMCache cache;
 
 		// Update cache and write to database
-		FMCache::UpdateFlags updateFlags = FMCache::UpdateFlag::UpdateDatabase | FMCache::UpdateFlag::WriteToDisk;
-		//FMCache::UpdateFlags updateFlags = FMCache::UpdateFlag::UpdateDatabase | FMCache::UpdateFlag::WriteToDisk | FMCache::UpdateFlag::ShowProgress | FMCache::WriteOutput;
-		m_cache.updateCache(std::move(rootDir), updateFlags);
+		FMCache::UpdateFlags updateFlags = FMCache::UpdateFlag::UpdateDatabase | FMCache::UpdateFlag::ShowProgress | FMCache::WriteOutput;
+		cache.updateCache(_newProjectInfo.getRootDirectory(), updateFlags);
 
 		WindowAPI::setProgressBarValue(100);
 		WindowAPI::appendOutputMessage("Project initialization completed successfully.\n");

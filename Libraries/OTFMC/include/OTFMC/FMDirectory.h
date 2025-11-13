@@ -40,9 +40,15 @@ namespace ot {
 			ScanFiles			  = 1 << 0,
 			ScanDirectories       = 1 << 1,
 			ScanChildDirectories  = 1 << 2,
-			WriteOutput           = 1 << 3
+			UseRelativePaths      = 1 << 3,
+			WriteOutput           = 1 << 4
 		};
 		typedef Flags<ScanFlag> ScanFlags;
+
+		enum GetFileMode {
+			TopLevelOnly,
+			Recursive
+		};
 
 		//! @brief Creates an FMDirectory object from the file system.
 		//! @param _path The path to the directory to scan.
@@ -64,14 +70,16 @@ namespace ot {
 		const std::filesystem::path& getPath() const { return m_path; };
 
 		void addChildDirectory(FMDirectory&& _childDirectory) { m_childDirectories.push_back(std::move(_childDirectory)); };
+		FMDirectory* getChildDirectory(const std::string& _directoryName, GetFileMode _mode);
 		const std::list<FMDirectory>& getChildDirectories() const { return m_childDirectories; };
 
 		void addFile(const FileInformation& _fileInfo) { m_files.push_back(_fileInfo); };
 		void addFile(FileInformation&& _fileInfo) { m_files.push_back(std::move(_fileInfo)); };
-		std::optional<FileInformation> getFile(const std::string& _fileName) const;
+		std::optional<FileInformation> getFile(const std::string& _fileName, GetFileMode _mode) const;
 		std::list<FileInformation>& getFiles() { return m_files; };
 		const std::list<FileInformation>& getFiles() const { return m_files; };
-
+		std::list<FileInformation> getAllFiles(GetFileMode _mode) const;
+		
 	private:
 		std::filesystem::path m_path;
 		std::list<FMDirectory> m_childDirectories;
