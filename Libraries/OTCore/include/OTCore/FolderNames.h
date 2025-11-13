@@ -34,6 +34,7 @@ namespace ot
 		const std::string DataCategorisationFolder = "Data Categorization";
 		const std::string CircuitsFolder = "Circuits";
 		const std::string CircuitModelsFolder = "Circuit Models";
+		const std::string HierarchicalProjectRoot = "Project";
 
 	}
 }

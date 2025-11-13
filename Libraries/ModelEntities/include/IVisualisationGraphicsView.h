@@ -25,4 +25,7 @@ public:
 
 	virtual ot::GraphicsNewEditorPackage* getGraphicsEditorPackage() = 0;
 	virtual bool visualiseGraphicsView() = 0;
+
+	virtual void setGraphicsPickerKey(const std::string& _key) = 0;
+	virtual std::string getGraphicsPickerKey() const = 0;
 };

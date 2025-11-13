@@ -57,7 +57,7 @@
 #include "EntityFileText.h"
 #include "EntityBinaryData.h"
 #include "EntityFileRawData.h"
-#include "EntityHierarchicalScene.h"
+#include "EntityGraphicsScene.h"
 #include "EntityBlockHierarchicalProjectItem.h"
 #include "EntityBlockHierarchicalDocumentItem.h"
 
@@ -66,7 +66,7 @@
 
 Application::Application() :
 	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_HierarchicalProjectService, OT_INFO_SERVICE_TYPE_HierarchicalProjectService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier()),
-	m_entityHandler(EntityHierarchicalScene::defaultName())
+	m_entityHandler(ot::FolderNames::HierarchicalProjectRoot)
 {
 	// Connect callback action handlers
 	connectAction(c_setProjectEntitySelectedAction, this, &Application::handleSetProjectEntitySelected);
@@ -255,7 +255,7 @@ void Application::handleSetProjectEntitySelected() {
 	ot::JsonDocument uiDoc;
 	uiDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetEntitySelected, uiDoc.GetAllocator()), uiDoc.GetAllocator());
 	uiDoc.AddMember(OT_ACTION_PARAM_IsSelected, true, uiDoc.GetAllocator());
-	uiDoc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(EntityHierarchicalScene::defaultName(), uiDoc.GetAllocator()), uiDoc.GetAllocator());
+	uiDoc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(ot::FolderNames::HierarchicalProjectRoot, uiDoc.GetAllocator()), uiDoc.GetAllocator());
 
 	std::string tmp;
 	// We can ignore the return code since the application will exit on send failed

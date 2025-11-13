@@ -32,8 +32,8 @@ public:
 	bool visualiseGraphicsView() override;
 	void addVisualizationNodes() override;
 
-	void setGraphicsPickerKey(const std::string& _key);
-	const std::string& getGraphicsPickerKey() const { return m_graphicsPickerKey; }
+	virtual void setGraphicsPickerKey(const std::string& _key) override;
+	virtual std::string getGraphicsPickerKey() const override { return m_graphicsPickerKey; };
 
 protected:
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;

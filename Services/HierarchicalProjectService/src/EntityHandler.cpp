@@ -37,8 +37,8 @@
 #include "EntityFileImage.h"
 #include "EntityBlockImage.h"
 #include "EntityFileRawData.h"
+#include "EntityGraphicsScene.h"
 #include "EntityBlockConnection.h"
-#include "EntityHierarchicalScene.h"
 #include "EntityBlockHierarchicalProjectItem.h"
 #include "EntityBlockHierarchicalDocumentItem.h"
 #include "EntityBlockHierarchicalContainerItem.h"
@@ -68,6 +68,9 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 	if (!ot::ModelServiceAPI::getEntityInformation(c_projectsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
 		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_projectsFolder);
+		container.setSelectChildren(false);
+		container.setManageChildVisibility(false);
+		container.setManageParentVisibility(false);
 
 		container.storeToDataBase();
 
@@ -176,6 +179,9 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	if (!ot::ModelServiceAPI::getEntityInformation(c_connectionsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
 		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_connectionsFolder);
+		container.setSelectChildren(false);
+		container.setManageChildVisibility(false);
+		container.setManageParentVisibility(false);
 		
 		container.storeToDataBase();
 
@@ -290,6 +296,9 @@ void EntityHandler::addDocuments(const std::list<std::string>& _fileNames, const
 	if (!ot::ModelServiceAPI::getEntityInformation(c_documentsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
 		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_documentsFolder);
+		container.setSelectChildren(false);
+		container.setManageChildVisibility(false);
+		container.setManageParentVisibility(false);
 
 		container.storeToDataBase();
 
@@ -378,6 +387,9 @@ void EntityHandler::addBackgroundImages(const std::list<std::string>& _fileNames
 	if (!ot::ModelServiceAPI::getEntityInformation(c_backgroundFolder, containerInfo) || containerInfo.getEntityName().empty()) {
 		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_backgroundFolder);
+		container.setSelectChildren(false);
+		container.setManageChildVisibility(false);
+		container.setManageParentVisibility(false);
 
 		container.storeToDataBase();
 

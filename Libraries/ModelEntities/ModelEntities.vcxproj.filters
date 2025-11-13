@@ -433,9 +433,6 @@
     <ClInclude Include="include\EntityFactoryRegistrar.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityHierarchicalScene.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="include\EntityFileImage.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -772,9 +769,6 @@
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityResultTableData.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EntityHierarchicalScene.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityFileImage.cpp">

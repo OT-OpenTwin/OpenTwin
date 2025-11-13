@@ -34,7 +34,6 @@
     <ClInclude Include="include\EntityFileRawData.h" />
     <ClInclude Include="include\EntityFileImage.h" />
     <ClInclude Include="include\EntityGraphicsScene.h" />
-    <ClInclude Include="include\EntityHierarchicalScene.h" />
     <ClInclude Include="include\EntityInformation.h" />
     <ClInclude Include="include\EntityNamingBehavior.h" />
     <ClInclude Include="include\EntityResult1DCurve.h" />
@@ -179,7 +178,6 @@
     <ClCompile Include="src\EntityFileRawData.cpp" />
     <ClCompile Include="src\EntityFileText.cpp" />
     <ClCompile Include="src\EntityGraphicsScene.cpp" />
-    <ClCompile Include="src\EntityHierarchicalScene.cpp" />
     <ClCompile Include="src\EntityInformation.cpp" />
     <ClCompile Include="src\EntityMaterial.cpp" />
     <ClCompile Include="src\EntityMesh.cpp" />

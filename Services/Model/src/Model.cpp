@@ -36,7 +36,6 @@
 #include "EntityMeshCartesian.h"
 #include "EntityFaceAnnotation.h"
 #include "EntityMetadataCampaign.h"
-#include "EntityHierarchicalScene.h"
 #include "EntityParameterizedDataPreviewTable.h"
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityBlockConnection.h"
@@ -340,7 +339,18 @@ void Model::resetToNew()
 	}
 	
 	if (typeManager.hasHierarchicalRoot()) {
-		EntityHierarchicalScene* hierarchicalRoot = new EntityHierarchicalScene(createEntityUID(), nullptr, this, getStateManager());
+		EntityGraphicsScene* hierarchicalRoot = new EntityGraphicsScene(createEntityUID(), nullptr, this, getStateManager());
+		hierarchicalRoot->setName(ot::FolderNames::HierarchicalProjectRoot);
+		hierarchicalRoot->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		hierarchicalRoot->setSelectChildren(false);
+		hierarchicalRoot->setManageChildVisibility(false);
+		hierarchicalRoot->setManageParentVisibility(false);
+
+		OldTreeIcon icons;
+		icons.visibleIcon = "Default/Hierarchical";
+		icons.hiddenIcon = "Default/Hierarchical";
+		hierarchicalRoot->setTreeIcon(icons);
+
 		hierarchicalRoot->registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection |

@@ -47,7 +47,7 @@ void EntityGraphicsScene::addVisualizationNodes()
 	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-
+	
 	ot::VisualisationTypes visTypes;
 	visTypes.addGraphicsViewVisualisation();
 	visTypes.addToJsonObject(doc, doc.GetAllocator());
