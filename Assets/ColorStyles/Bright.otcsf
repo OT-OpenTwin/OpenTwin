@@ -2340,12 +2340,24 @@ ot--ComboButton[IsSelected="false"]:hover:pressed {
 
 /* ##################################################################################### */
 
-/* Text Edit Search Popup */
+/* Text Editor */
 
 ot--TextEditorSearchPopup {
     background-color: rgba(211,211,211,255);
     padding: 4px;
     border: 1px solid rgba(0,0,0,255);
+}
+
+#OT_TextEditor_ShowMoreLabel {
+    color:rgba(0,0,0,255);
+}
+
+#OT_TextEditor_ShowMoreLabel:hover {
+    color:rgba(0,215,255,255);
+}
+
+#OT_TextEditor_ShowMoreLabel:pressed {
+    color:rgba(0,255,0,255);
 }
 
 /* ##################################################################################### */

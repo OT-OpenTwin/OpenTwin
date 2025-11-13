@@ -22,6 +22,7 @@
 #include "OTCore/RuntimeTests.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTGui/DefaultSyntaxHighlighterRules.h"
+#include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/PushButton.h"
@@ -75,7 +76,8 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 ot::TextEditor::TextEditor(QWidget* _parent)
 	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_searchPopup(nullptr),
 	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false), m_enableSameTextHighlighting(false),
-	m_sameTextHighlightingMinimum(2), m_documentSyntax(DocumentSyntax::PlainText), m_fileExtensionFilter(FileExtension::toFilterString(FileExtension::AllFiles))
+	m_sameTextHighlightingMinimum(2), m_documentSyntax(DocumentSyntax::PlainText), m_fileExtensionFilter(FileExtension::toFilterString(FileExtension::AllFiles)),
+	m_loadedChunkCount(0), m_showMoreLabel(nullptr)
 {
 	this->setObjectName("OT_TextEditor");
 
@@ -88,6 +90,13 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 
 	QFontMetrics fm(f);
 	this->setTabStopDistance(4 * fm.horizontalAdvance(QChar(' ')));
+
+	// "Show more" overlay label
+	m_showMoreLabel = new Label("Show more...", this);
+	m_showMoreLabel->setObjectName("OT_TextEditor_ShowMoreLabel");
+	m_showMoreLabel->hide();
+	connect(m_showMoreLabel, &Label::mouseClicked, this, &TextEditor::slotShowMore);
+	connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::slotUpdateShowMorePosition);
 
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
@@ -135,7 +144,8 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _replace
 		QString newText = QString::fromStdString(displayText);
 		newText.remove('\r');
 		if (newText != this->toPlainText()) {
-			this->setCode(newText);
+			this->setPlainText(newText);
+			this->setContentSaved();
 		}
 	}
 
@@ -205,7 +215,7 @@ bool ot::TextEditor::getContentChanged() const {
 	return this->document()->isModified();
 }
 
-void ot::TextEditor::setCode(const QString& _text) {
+void ot::TextEditor::setPlainText(const QString& _text) {
 	bool tmp = this->signalsBlocked();
 	bool tmpSyn = false;
 	if (m_syntaxHighlighter) {
@@ -213,39 +223,22 @@ void ot::TextEditor::setCode(const QString& _text) {
 		m_syntaxHighlighter->blockSignals(true);
 	}
 	this->blockSignals(true);
-		
-	this->setPlainText(_text);
+	
+	m_textBuffer = _text;
+	splitTextBufferIntoChunks();
+	
+	if (!m_textChunks.empty()) {
+		QPlainTextEdit::setPlainText(m_textChunks[0].toString());
+		m_loadedChunkCount = 1;
+	}
+
 	this->document()->clearUndoRedoStacks();
 	
 	this->setContentSaved();
 
 	this->slotUpdateLineNumberAreaWidth(0);
 
-	if (m_syntaxHighlighter) {
-		m_syntaxHighlighter->blockSignals(tmpSyn);
-	}
-	this->blockSignals(tmp);
-
-	this->setContentChanged();
-}
-
-void ot::TextEditor::setCode(const QStringList& _lines) {
-	bool tmp = this->signalsBlocked();
-	this->blockSignals(true);
-
-	bool tmpSyn = false;
-	if (m_syntaxHighlighter) {
-		tmpSyn = m_syntaxHighlighter->signalsBlocked();
-		m_syntaxHighlighter->blockSignals(true);
-	}
-
-	this->clear();
-	for (auto l : _lines) this->appendPlainText(l);
-	this->document()->clearUndoRedoStacks();
-
-	this->setContentSaved();
-	
-	this->slotUpdateLineNumberAreaWidth(0);
+	this->slotUpdateShowMorePosition();
 
 	if (m_syntaxHighlighter) {
 		m_syntaxHighlighter->blockSignals(tmpSyn);
@@ -271,8 +264,15 @@ bool ot::TextEditor::saveToFile(const QString& _fileName) {
 	return result;
 }
 
-QStringList ot::TextEditor::code() const {
-	return this->toPlainText().split("\n", Qt::KeepEmptyParts);
+QString ot::TextEditor::toPlainText() const {
+	QString txt = QPlainTextEdit::toPlainText();
+	
+	// Append remaining chunks
+	for (size_t i = m_loadedChunkCount; i < m_textChunks.size(); ++i) {
+		txt.append(m_textChunks[i].toString());
+	}
+
+	return txt;
 }
 
 void ot::TextEditor::slotSaveRequested() {
@@ -285,6 +285,10 @@ void ot::TextEditor::slotSaveRequested() {
 void ot::TextEditor::setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions) {
 	m_fileExtensionFilter = FileExtension::toFilterString(_extensions);
 }
+
+// ###################################################################################################################################
+
+// Protected: Event handling
 
 void ot::TextEditor::keyPressEvent(QKeyEvent* _event) {
 	if (_event->key() == Qt::Key_Tab && m_tabSpaces > 0) {
@@ -341,6 +345,8 @@ void ot::TextEditor::resizeEvent(QResizeEvent * _event) {
 
 	QRect cr = contentsRect();
 	m_lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+
+	this->slotUpdateShowMorePosition();
 }
 
 void ot::TextEditor::wheelEvent(QWheelEvent* _event) {
@@ -358,6 +364,15 @@ void ot::TextEditor::wheelEvent(QWheelEvent* _event) {
 		QPlainTextEdit::wheelEvent(_event);
 	}
 }
+
+void ot::TextEditor::showEvent(QShowEvent* _event) {
+	QPlainTextEdit::showEvent(_event);
+	this->slotUpdateShowMorePosition();
+}
+
+// ###################################################################################################################################
+
+// Private: Slots
 
 void ot::TextEditor::slotUpdateLineNumberAreaWidth(int _newBlockCount) {
 	setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
@@ -428,6 +443,47 @@ void ot::TextEditor::slotSelectionChanged() {
 	this->slotHighlightCurrentLine();
 }
 
+void ot::TextEditor::slotShowMore() {
+	if (m_loadedChunkCount < m_textChunks.size()) {
+		QSignalBlocker sigBlock(this);
+
+		auto cursor = this->textCursor();
+		cursor.movePosition(QTextCursor::End);
+		cursor.insertText(m_textChunks[m_loadedChunkCount].toString());
+		this->setTextCursor(cursor);
+
+		m_loadedChunkCount++;
+
+		if (m_loadedChunkCount >= m_textChunks.size()) {
+			m_showMoreLabel->hide();
+		}
+
+		this->document()->clearUndoRedoStacks();
+		this->document()->setModified(false);
+
+		slotUpdateShowMorePosition();
+	}
+	else {
+		m_showMoreLabel->hide();
+	}
+}
+
+void ot::TextEditor::slotUpdateShowMorePosition() {
+	QRect r = this->viewport()->rect();
+	QPoint bottomRight = r.bottomRight();
+	int y = bottomRight.y() - m_showMoreLabel->height() - 8;
+	int x = bottomRight.x() - (m_showMoreLabel->width() + 10);
+	m_showMoreLabel->move(x, y);
+	if (this->isVisible()) {
+		m_showMoreLabel->show();
+	}
+	m_showMoreLabel->raise();
+}
+
+// ###################################################################################################################################
+
+// Private: Helper
+
 void ot::TextEditor::getCurrentLineSelection(QList<QTextEdit::ExtraSelection>& _selections) {
 	if (!isReadOnly()) {
 		QTextEdit::ExtraSelection selection;
@@ -489,4 +545,33 @@ void ot::TextEditor::updateDocumentSyntax() {
 	}
 	m_syntaxHighlighter->setRules(DefaultSyntaxHighlighterRules::create(m_documentSyntax));
 	m_syntaxHighlighter->rehighlight();
+}
+
+void ot::TextEditor::splitTextBufferIntoChunks() {
+	m_textChunks.clear();
+	const int totalLength = m_textBuffer.size();
+	const int approxChunkSize = 100000;
+	//const int approxChunkSize = 10;
+
+	int start = 0;
+	while (start < totalLength) {
+		int end = qMin(start + approxChunkSize, totalLength);
+
+		// Try to find a word boundary going backwards
+		if (end < totalLength) {
+			while (end > start && !m_textBuffer.at(end - 1).isSpace()) {
+				end--;
+			}
+
+			// If no space found (very long word), just break hard
+			if (end == start) {
+				end = qMin(start + approxChunkSize, totalLength);
+			}
+		}
+
+		m_textChunks.append(QStringView(m_textBuffer).mid(start, end - start));
+		start = end;
+	}
+
+	m_loadedChunkCount = 0;
 }

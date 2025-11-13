@@ -33,6 +33,8 @@ class QPaintEvent;
 class QResizeEvent;
 
 namespace ot {
+
+	class Label;
 	class TextEditor;
 	class SyntaxHighlighter;
 	class TextEditorSearchPopup;
@@ -81,12 +83,11 @@ namespace ot {
 		void setContentSaved();
 		bool getContentChanged() const;
 
-		void setCode(const QString& _text);
-		void setCode(const QStringList& _lines);
+		void setPlainText(const QString& _text);
 
 		bool saveToFile(const QString& _fileName);
 
-		QStringList code() const;
+		QString toPlainText() const;
 
 		//! @brief Returns the current syntax highlighter.
 		//! The TextEditor keeps ownership of the highlighter.
@@ -114,11 +115,20 @@ namespace ot {
 	public Q_SLOTS:
 		void slotSaveRequested();
 
+		// ###################################################################################################################################
+
+		// Protected: Event handling
+
 	protected:
 		virtual void keyPressEvent(QKeyEvent* _event) override;
 		virtual void resizeEvent(QResizeEvent * _event) override;
 		virtual void wheelEvent(QWheelEvent* _event) override;
+		virtual void showEvent(QShowEvent* _event) override;
 		
+		// ###################################################################################################################################
+
+		// Private: Slots
+
 	private Q_SLOTS:
 		void slotUpdateLineNumberAreaWidth(int _newBlockCount);
 		void slotHighlightCurrentLine();
@@ -128,6 +138,12 @@ namespace ot {
 		void slotDuplicateLine();
 		void slotCurrentColorStyleChanged();
 		void slotSelectionChanged();
+		void slotShowMore();
+		void slotUpdateShowMorePosition();
+
+		// ###################################################################################################################################
+
+		// Private: Helper
 
 	private:
 		friend class TextEditorSearchPopup;
@@ -135,6 +151,8 @@ namespace ot {
 		void getCurrentLineSelection(QList<QTextEdit::ExtraSelection>& _selections);
 		void addAdditionalSelections(QList<QTextEdit::ExtraSelection>& _selections);
 		void updateDocumentSyntax();
+
+		void splitTextBufferIntoChunks();
 
 		TextEditorSearchPopup* m_searchPopup;
 		
@@ -152,5 +170,11 @@ namespace ot {
 		SyntaxHighlighter*		  m_syntaxHighlighter;
 
 		std::string m_fileExtensionFilter;
+
+		Label* m_showMoreLabel;
+
+		QString m_textBuffer;
+		int m_loadedChunkCount;
+		QVector<QStringView> m_textChunks;
 	};
 }

@@ -2334,12 +2334,24 @@ ot--ComboButton[IsSelected="false"]:hover:pressed {
 
 /* ##################################################################################### */
 
-/* Text Edit Search Popup */
+/* Text Editor */
 
 ot--TextEditorSearchPopup {
     background-color: %color:Title Background%;
     padding: 4px;
     border: 1px solid %color:Border Color%;
+}
+
+#OT_TextEditor_ShowMoreLabel {
+    color:%color:Widget Foreground%;
+}
+
+#OT_TextEditor_ShowMoreLabel:hover {
+    color:%color:Widget Hover Background%;
+}
+
+#OT_TextEditor_ShowMoreLabel:pressed {
+    color:%color:Widget Selection Background%;
 }
 
 /* ##################################################################################### */
