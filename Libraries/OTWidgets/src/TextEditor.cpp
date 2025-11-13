@@ -280,6 +280,20 @@ void ot::TextEditor::setFileExtensionFilter(const std::list<FileExtension::Defau
 	m_fileExtensionFilter = FileExtension::toFilterString(_extensions);
 }
 
+void ot::TextEditor::setShowMoreLabelVisible(bool _visible) {
+	if (_visible) {
+		m_showMoreLabel->show();
+		this->slotUpdateShowMorePosition();
+	}
+	else {
+		m_showMoreLabel->hide();
+	}
+}
+
+bool ot::TextEditor::getShowMoreLabelVisible() const {
+	return m_showMoreLabel->isVisible();
+}
+
 // ###################################################################################################################################
 
 // Protected: Event handling
@@ -460,6 +474,8 @@ void ot::TextEditor::slotShowMore() {
 	else {
 		m_showMoreLabel->hide();
 	}
+
+	Q_EMIT loadMoreRequested();
 }
 
 void ot::TextEditor::slotUpdateShowMorePosition() {

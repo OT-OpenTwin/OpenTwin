@@ -109,8 +109,12 @@ namespace ot {
 		void setFileExtensionFilter(const std::string& _filter) { m_fileExtensionFilter = _filter; };
 		const std::string& getFileExtensionFilter() const { return m_fileExtensionFilter; };
 
+		void setShowMoreLabelVisible(bool _visible);
+		bool getShowMoreLabelVisible() const;
+
 	Q_SIGNALS:							
 		void saveRequested();
+		void loadMoreRequested();
 
 	public Q_SLOTS:
 		void slotSaveRequested();
