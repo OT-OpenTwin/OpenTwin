@@ -194,6 +194,8 @@ void EntityContainer::addStorageData(bsoncxx::builder::basic::document &storage)
 
 	storage.append(bsoncxx::builder::basic::kvp("ChildID", childID));
 	storage.append(bsoncxx::builder::basic::kvp("VisualizationItem", createVisualizationItem));
+	storage.append(bsoncxx::builder::basic::kvp("VisibleTreeIcon", m_treeIcon.visibleIcon));
+	storage.append(bsoncxx::builder::basic::kvp("HiddenTreeIcon", m_treeIcon.hiddenIcon));
 }
 
 void EntityContainer::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
@@ -210,7 +212,7 @@ void EntityContainer::readSpecificDataFromDataBase(bsoncxx::document::view &doc_
 		{
 			auto childID = doc_view["ChildID"].get_array();
 
-			for (bsoncxx::array::element child : childID.value)
+			for (const bsoncxx::array::element& child : childID.value)
 			{
 				ot::UID childID = child.get_int64();
 
@@ -229,12 +231,18 @@ void EntityContainer::readSpecificDataFromDataBase(bsoncxx::document::view &doc_
 	}
 
 	createVisualizationItem = true;
-	try
-	{
-		createVisualizationItem = doc_view["VisualizationItem"].get_bool();
+	auto docIt = doc_view.find("VisualizationItem");
+	if (docIt != doc_view.end()) {
+		createVisualizationItem = docIt->get_bool();
 	}
-	catch (std::exception) 
-	{
+
+	docIt = doc_view.find("VisibleTreeIcon");
+	if (docIt != doc_view.end()) {
+		m_treeIcon.visibleIcon = docIt->get_utf8().value.data();
+	}
+	docIt = doc_view.find("HiddenTreeIcon");
+	if (docIt != doc_view.end()) {
+		m_treeIcon.hiddenIcon = docIt->get_utf8().value.data();
 	}
 
 	resetModified();
