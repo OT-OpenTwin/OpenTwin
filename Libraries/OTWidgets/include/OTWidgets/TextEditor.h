@@ -144,6 +144,9 @@ namespace ot {
 		bool m_enableSameTextHighlighting;
 		int m_sameTextHighlightingMinimum;
 
+		std::string m_completeText = "";
+		const uint32_t m_maxOfDisplayedChars = 40000;
+
 		TextEditorLineNumberArea* m_lineNumberArea;
 		DocumentSyntax            m_documentSyntax;
 		SyntaxHighlighter*		  m_syntaxHighlighter;
