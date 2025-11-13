@@ -237,7 +237,8 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid) {
 	OTAssertNullptr(graphicsItem);
 
 	for (GraphicsConnectionItem* connection : graphicsItem->getAllConnections()) {
-		connection->disconnectItem(graphicsItem, true);
+		// Removing an item may occur during undo/redo operations, therefore we don't want to update the config
+		connection->disconnectItem(graphicsItem, false);
 	}
 
 	m_scene->itemAboutToBeRemoved(graphicsItem);
