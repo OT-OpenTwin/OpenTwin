@@ -1970,6 +1970,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	connect(graphics, &ot::GraphicsView::connectionChanged, this, &AppBase::slotGraphicsConnectionChanged);
 	connect(graphics, &ot::GraphicsView::itemDoubleClicked, this, &AppBase::slotGraphicsItemDoubleClicked);
 	connect(graphics, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
+	connect(graphics, &ot::GraphicsView::connectionSnapRequested, this, &AppBase::slotGraphicsSnapEvent);
 	connect(graphics, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
 	connect(graphics->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
 
@@ -2579,6 +2580,32 @@ void AppBase::slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _ne
 			return;
 		}
 
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+	catch (...) {
+		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
+void AppBase::slotGraphicsSnapEvent(const ot::GraphicsSnapEvent& _event) {
+	try {
+		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
+
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createSnapEventDocument(_event);
+
+		std::string response;
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
+			OT_LOG_E("Failed to send http request");
+			return;
+		}
+
+		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
+		if (responseObj != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + responseObj.getWhat());
+			return;
+		}
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_E(_e.what());

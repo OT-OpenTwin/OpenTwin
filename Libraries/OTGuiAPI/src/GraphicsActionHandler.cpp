@@ -57,6 +57,15 @@ ot::JsonDocument ot::GraphicsActionHandler::createChangeEventDocument(const ot::
 	return doc;
 }
 
+ot::JsonDocument ot::GraphicsActionHandler::createSnapEventDocument(const ot::GraphicsSnapEvent& _snapEvent) {
+	JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_SnapEvent, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Event, JsonObject(_snapEvent, doc.GetAllocator()), doc.GetAllocator());
+
+	return doc;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Constructor
@@ -70,6 +79,7 @@ ot::GraphicsActionHandler::GraphicsActionHandler(ActionDispatcherBase* _dispatch
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, this, &GraphicsActionHandler::handleGraphicsConnectionRequested, ot::SECURE_MESSAGE_TYPES);
 
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ChangeEvent, this, &GraphicsActionHandler::handleGraphicsChangeEvent, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_SnapEvent, this, &GraphicsActionHandler::handleGraphicsSnapEvent, ot::SECURE_MESSAGE_TYPES);
 
 }
 
@@ -98,4 +108,9 @@ ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsConnectionRequested(J
 ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsChangeEvent(JsonDocument& _document) {
 	GraphicsChangeEvent event(json::getObject(_document, OT_ACTION_PARAM_Event));
 	return graphicsChangeEvent(event);
+}
+
+ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsSnapEvent(JsonDocument& _document) {
+	GraphicsSnapEvent event(json::getObject(_document, OT_ACTION_PARAM_Event));
+	return graphicsSnapEvent(event);
 }

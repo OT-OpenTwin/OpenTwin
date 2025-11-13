@@ -241,6 +241,15 @@ ot::ReturnMessage Application::graphicsChangeEvent(const ot::GraphicsChangeEvent
 	return ot::ReturnMessage::Ok;
 }
 
+ot::ReturnMessage Application::graphicsSnapEvent(const ot::GraphicsSnapEvent& _snapEvent) {
+	// This should be handled by the model
+	ot::GraphicsSnapEvent fwdEvent(_snapEvent);
+	fwdEvent.setForwarding();
+	const ot::JsonDocument doc = ot::GraphicsActionHandler::createSnapEventDocument(fwdEvent);
+	sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc);
+	return ot::ReturnMessage::Ok;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Action handler

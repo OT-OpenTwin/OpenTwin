@@ -764,10 +764,23 @@ void ot::GraphicsView::endItemMove() {
 
 	m_viewStateFlags.set(ItemMoveInProgress, false);
 
+	// Notify about item move
 	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
 		if (otItem) {
 			otItem->notifyMoveIfRequired();
 		}
+	}
+
+	GraphicsSnapEvent snapEvent;
+	snapEvent.setEditorName(m_viewName);
+
+	// Notify about connection snap
+	for (auto& itm : m_items) {
+		itm.second->checkConnectionSnapRequest(snapEvent);
+	}
+
+	if (!snapEvent.isEmpty()) {
+		Q_EMIT connectionSnapRequested(snapEvent);
 	}
 }

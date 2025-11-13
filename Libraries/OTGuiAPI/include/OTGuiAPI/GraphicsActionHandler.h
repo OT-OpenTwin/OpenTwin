@@ -23,6 +23,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTGui/GuiEvent.h"
 #include "OTGui/GraphicsPackage.h"
+#include "OTGui/GraphicsSnapEvent.h"
 #include "OTGui/GraphicsChangeEvent.h"
 #include "OTGui/GraphicsItemDropEvent.h"
 #include "OTGui/GraphicsDoubleClickEvent.h"
@@ -47,6 +48,8 @@ namespace ot {
 		static JsonDocument createConnectionRequestedDocument(const GraphicsConnectionDropEvent& _eventData);
 
 		static JsonDocument createChangeEventDocument(const ot::GraphicsChangeEvent& _changeEvent);
+
+		static JsonDocument createSnapEventDocument(const ot::GraphicsSnapEvent& _snapEvent);
 
 		GraphicsActionHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
 		virtual ~GraphicsActionHandler() = default;
@@ -73,6 +76,10 @@ namespace ot {
 		//! @param _changeEvent Contains all information about the change event.
 		virtual ot::ReturnMessage graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 
+		//! @brief  Is called when a graphics snap event occurs.
+		//! @param _snapEvent Contains all information about the snap event.
+		virtual ot::ReturnMessage graphicsSnapEvent(const ot::GraphicsSnapEvent& _snapEvent) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Handlers
@@ -86,6 +93,7 @@ namespace ot {
 		ReturnMessage handleGraphicsConnectionRequested(JsonDocument& _document);
 
 		ReturnMessage handleGraphicsChangeEvent(JsonDocument& _document);
+		ReturnMessage handleGraphicsSnapEvent(JsonDocument& _document);
 	};
 
 }

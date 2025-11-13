@@ -42,6 +42,8 @@ protected:
 
 	virtual ot::ReturnMessage graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) override;
 
+	virtual ot::ReturnMessage graphicsSnapEvent(const ot::GraphicsSnapEvent& _snapEvent) override;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Helper

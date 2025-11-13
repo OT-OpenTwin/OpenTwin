@@ -78,6 +78,7 @@ protected:
 	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionDropEvent& _eventData) override;
 	
 	virtual ot::ReturnMessage graphicsChangeEvent(const ot::GraphicsChangeEvent& _eventData) override;
+	virtual ot::ReturnMessage graphicsSnapEvent(const ot::GraphicsSnapEvent& _snapEvent) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

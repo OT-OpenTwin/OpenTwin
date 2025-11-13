@@ -46,6 +46,7 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/VisualisationCfg.h"
+#include "OTGui/GraphicsSnapEvent.h"
 #include "OTGui/ExtendedProjectInformation.h"
 
 // OpenTwin Widgets header
@@ -510,8 +511,9 @@ public Q_SLOTS:
 	void slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 	void slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 	void slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _newConfig);
+	void slotGraphicsSnapEvent(const ot::GraphicsSnapEvent& _event);
 	void slotGraphicsSelectionChanged();
-	
+
 	void slotCopyRequested(const ot::CopyInformation& _info);
 	void slotPasteRequested(const ot::CopyInformation& _info);
 

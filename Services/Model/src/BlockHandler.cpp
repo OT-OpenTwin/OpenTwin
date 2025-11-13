@@ -294,6 +294,42 @@ ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEven
 	return ot::ReturnMessage::Ok;
 }
 
+ot::ReturnMessage BlockHandler::graphicsSnapEvent(const ot::GraphicsSnapEvent& _snapEvent) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+	EntityGraphicsScene* scene = dynamic_cast<EntityGraphicsScene*>(model->findEntityFromName(_snapEvent.getEditorName()));
+	if (!scene) {
+		OT_LOG_E("Could not find scene entity { \"Name\": \"" + _snapEvent.getEditorName() + "\" }");
+		return ot::ReturnMessage::Failed;
+	}
+
+	if (!_snapEvent.isEventFlagSet(ot::GuiEvent::ForceHandle)) {
+		std::list<std::string> handlingServices = scene->getServicesForCallback(EntityBase::Callback::DataHandle);
+		if (!handlingServices.empty()) {
+			ot::GraphicsSnapEvent fwdEvent(_snapEvent);
+			fwdEvent.setForwarding();
+			const ot::JsonDocument fwdDoc = ot::GraphicsActionHandler::createSnapEventDocument(fwdEvent);
+			Application::instance()->sendMessageAsync(true, handlingServices, fwdDoc);
+			return ot::ReturnMessage::Ok;
+		}
+	}
+
+	// add snap logic here
+
+	if (!_snapEvent.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
+		std::list<std::string> notifyServices = scene->getServicesForCallback(EntityBase::Callback::DataNotify);
+		if (!notifyServices.empty()) {
+			ot::GraphicsSnapEvent fwdEvent(_snapEvent);
+			fwdEvent.setForwarding();
+			const ot::JsonDocument fwdDoc = ot::GraphicsActionHandler::createSnapEventDocument(fwdEvent);
+			Application::instance()->sendMessageAsync(false, notifyServices, fwdDoc);
+		}
+	}
+
+	return ot::ReturnMessage::Ok;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Helper

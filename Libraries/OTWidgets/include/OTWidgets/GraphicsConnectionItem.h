@@ -151,6 +151,9 @@ namespace ot {
 
 		void updateConnectionView();
 
+		QPointF getOriginPos() const;
+		QPointF getDestPos() const;
+
 	protected:
 		virtual void graphicsSceneSet(GraphicsScene* _scene) override;
 		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _flags) override;
@@ -164,8 +167,6 @@ namespace ot {
 		//! If no destination is set the destination connectable name will be an empty string and the UID 0.
 		void updateDestConnectionInformation();
 
-		QPointF calculateOriginPos() const;
-		QPointF calculateDestPos() const;
 		ConnectionDirection calculateOriginDirection() const;
 		ConnectionDirection calculateDestDirection() const;
 

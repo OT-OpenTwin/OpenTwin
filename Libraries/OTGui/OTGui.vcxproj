@@ -34,6 +34,7 @@
     <ClInclude Include="include\OTGui\GraphicsHierarchicalProjectItemBuilder.h" />
     <ClInclude Include="include\OTGui\GraphicsDoubleClickEvent.h" />
     <ClInclude Include="include\OTGui\GraphicsItemDropEvent.h" />
+    <ClInclude Include="include\OTGui\GraphicsSnapEvent.h" />
     <ClInclude Include="include\OTGui\GraphicsZValues.h" />
     <ClInclude Include="include\OTGui\GuiEvent.h" />
     <ClInclude Include="include\OTGui\LibraryModel.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="src\GraphicsPickerItemInfo.cpp" />
     <ClCompile Include="src\GraphicsPolygonItemCfg.cpp" />
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsSnapEvent.cpp" />
     <ClCompile Include="src\Grid.cpp" />
     <ClCompile Include="src\GuiEvent.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />

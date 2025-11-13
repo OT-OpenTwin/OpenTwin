@@ -22,6 +22,7 @@
 // OpenTwin header
 #include "OTGui/Margins.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsSnapEvent.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/GraphicsElement.h"
 
@@ -294,6 +295,8 @@ namespace ot {
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size);
 		const QSizeF& graphicsItemRequestedSize() const { return m_requestedSize; };
 
+		std::list<GraphicsItem*> getAllConnectors();
+
 		virtual std::list<GraphicsConnectionItem*> getAllConnections() const { return m_connections; };
 
 		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs();
@@ -318,6 +321,9 @@ namespace ot {
 
 		//! @brief Notifies the view if the items current position changed relative to the move start point.
 		void notifyMoveIfRequired();
+
+		//! @brief Checks for connection snap requests and fills the result event accordingly.
+		void checkConnectionSnapRequest(GraphicsSnapEvent& _result);
 
 		void parentItemTransformChanged(const QTransform& _parentTransform);
 
