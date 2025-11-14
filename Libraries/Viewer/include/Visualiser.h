@@ -47,6 +47,11 @@ public:
 	//! @return True if a new view was requested, false otherwise.
 	virtual bool requestVisualization(const VisualiserState& _state) = 0;
 
+	//! @brief Request the next data chunk for the visualisation.
+	//! @param _currentChunkEndIndex The index of the last data item that has been received so far.
+	//! @return True if a new data chunk was requested, false otherwise.
+	virtual bool requestNextDataChunk(size_t _currentChunkEndIndex) { return false; };
+
 	//! @brief Show or undim the visualization for thentity.
 	//! This is called if the entity has already been visualized before.
 	virtual void showVisualisation(const VisualiserState& _state) = 0;

@@ -58,7 +58,7 @@ public:
 	virtual std::string getText() override;
 	virtual void setText(const std::string& _text) override;
 	virtual bool visualiseText() override { return false; };
-	virtual ot::TextEditorCfg createConfig(bool _includeData) override;
+	virtual ot::TextEditorCfg createConfig(const ot::VisualisationCfg& _visConfig) override;
 	
 	// ###########################################################################################################################################################################################################################################################################################################################
 

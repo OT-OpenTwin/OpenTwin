@@ -153,6 +153,8 @@ public:
 
 	void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);
 
+	void loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _curentChunkEndIndex);
+
 	void hideEntities(std::list<unsigned long long> hiddenID);
 
 	void showBranch(const std::string &branchName);

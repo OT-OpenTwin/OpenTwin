@@ -52,6 +52,12 @@ namespace ot
 		void setOverrideViewerContent(bool _overrideViewerContent) { m_overrideViewerContent = _overrideViewerContent; };
 		bool getOverrideViewerContent() const { return m_overrideViewerContent; };
 
+		void setLoadNextChunkOnly(bool _loadNextChunkOnly) { m_loadNextChunkOnly = _loadNextChunkOnly; };
+		bool getLoadNextChunkOnly() const { return m_loadNextChunkOnly; };
+
+		void setNextChunkStartIndex(size_t _nextChunkStartIndex) { m_nextChunkStartIndex = _nextChunkStartIndex; };
+		size_t getNextChunkStartIndex() const { return m_nextChunkStartIndex; };
+
 		void setSupressViewHandling(bool _supressViewHandling) { m_supressViewHandling = _supressViewHandling; };
 		bool getSupressViewHandling() const { return m_supressViewHandling; };
 		
@@ -65,6 +71,8 @@ namespace ot
 		bool m_setAsActiveView = true;
 		ot::UIDList m_visualisingEntities;
 		bool m_overrideViewerContent = true;
+		bool m_loadNextChunkOnly = false;
+		size_t m_nextChunkStartIndex = 0;
 		bool m_supressViewHandling = false;
 		std::string m_visualisationType = "";
 		std::optional<ot::WidgetViewBase::ViewFlags> m_customViewFlags = std::nullopt;

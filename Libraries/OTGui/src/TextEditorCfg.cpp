@@ -38,8 +38,13 @@
 
 ot::TextEditorCfg::TextEditorCfg() :
 	WidgetViewBase(WidgetViewBase::ViewText, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle | WidgetViewBase::ViewCloseOnEmptySelection),
-	m_syntax(DocumentSyntax::PlainText), m_readOnly(false), m_fileExtensionFilter(FileExtension::toFilterString(FileExtension::AllFiles))
+	m_syntax(DocumentSyntax::PlainText), m_readOnly(false), m_fileExtensionFilter(FileExtension::toFilterString(FileExtension::AllFiles)),
+	m_hasMore(false), m_nextChunkStartIx(0), m_isChunk(false)
 {}
+
+ot::TextEditorCfg::TextEditorCfg(const ConstJsonObject & _jsonObject) : TextEditorCfg() {
+	setFromJsonObject(_jsonObject);
+}
 
 ot::TextEditorCfg::~TextEditorCfg() {}
 
@@ -49,6 +54,9 @@ void ot::TextEditorCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 	WidgetViewBase::addToJsonObject(_object, _allocator);
 
 	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
+	_object.AddMember("IsChunk", m_isChunk, _allocator);
+	_object.AddMember("HasMore", m_hasMore, _allocator);
+	_object.AddMember("NextChunkStart", m_nextChunkStartIx, _allocator);
 	_object.AddMember("ReadOnly", m_readOnly, _allocator);
 	_object.AddMember("Syntax", JsonString(ot::toString(m_syntax), _allocator), _allocator);
 	_object.AddMember("FileExtensionsFilter", JsonString(m_fileExtensionFilter, _allocator), _allocator);
@@ -60,9 +68,48 @@ void ot::TextEditorCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	WidgetViewBase::setFromJsonObject(_object);
 	
 	m_text = json::getString(_object, "Text");
+	m_isChunk = json::getBool(_object, "IsChunk");
+	m_hasMore = json::getBool(_object, "HasMore");
+	m_nextChunkStartIx = json::getUInt64(_object, "NextChunkStart");
 	m_readOnly = json::getBool(_object, "ReadOnly");
 	m_syntax = stringToDocumentSyntax(json::getString(_object, "Syntax"));
 	m_fileExtensionFilter = json::getString(_object, "FileExtensionsFilter");
+}
+
+void ot::TextEditorCfg::setNextChunk(const std::string& _fullText, size_t _startIndex, size_t _chunkSize) {
+	if (_fullText.empty()) {
+		return;
+	}
+
+	size_t endIx = std::min(_fullText.size() - 1, (_startIndex + _chunkSize - 1));
+	if (endIx < _startIndex) {
+		OT_LOG_W("Start index is beyond the full text size.");
+		return;
+	}
+
+	if (endIx < _fullText.size() - 1) {
+
+		// Try to end at end of word
+		for (; endIx > _startIndex; endIx--) {
+			const char c = _fullText[endIx];
+			if (isspace(_fullText[endIx])) {
+				if (endIx > 0) {
+					endIx--;
+				}
+				break;
+			}
+		}
+
+		// If no end of word found in chunk, hard break
+		if (endIx <= _startIndex) {
+			endIx = std::min(_fullText.size() - 1, (_startIndex + _chunkSize - 1));
+		}
+	}
+
+	m_text = _fullText.substr(_startIndex, (endIx - _startIndex) + 1);
+	m_isChunk = true;
+	m_hasMore = (endIx < _fullText.size() - 1);
+	m_nextChunkStartIx = endIx + 1;
 }
 
 void ot::TextEditorCfg::setFileExtensionFilter(const std::initializer_list<FileExtension::DefaultFileExtension>& _extensions) {

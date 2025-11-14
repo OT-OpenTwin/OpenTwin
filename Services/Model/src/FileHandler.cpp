@@ -158,7 +158,7 @@ void FileHandler::storeChangedTable(IVisualisationTable* _entity, const ot::Tabl
 	model->modelChangeOperationCompleted("Updated Table.");
 }
 
-ot::ReturnMessage FileHandler::textEditorSaveRequested(const std::string& _entityName, const std::string& _text)
+ot::ReturnMessage FileHandler::textEditorSaveRequested(const std::string& _entityName, const std::string& _text, size_t _nextChunkStartIndex)
 {
 	Model* model =	Application::instance()->getModel();
 	assert(model != nullptr);
@@ -177,13 +177,13 @@ ot::ReturnMessage FileHandler::textEditorSaveRequested(const std::string& _entit
 			{
 				for (const std::string& owner : handlingServices) {
 					if (owner != OT_INFO_SERVICE_TYPE_MODEL) {
-						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(_entityName, _text)), owner);
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(_entityName, _text, _nextChunkStartIndex)), owner);
 						workerThread.detach();
 					}
 				}
 			}
 			else {
-				storeChangedText(textVisualisationEntity, _text);
+				storeChangedText(textVisualisationEntity, _text, _nextChunkStartIndex);
 
 				for (const std::string& notifyService : entityBase->getServicesForCallback(EntityBase::Callback::DataNotify)) {
 					if (notifyService != OT_INFO_SERVICE_TYPE_MODEL) {
@@ -264,13 +264,21 @@ ot::ReturnMessage FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
 	}
 }
 
-void FileHandler::storeChangedText(IVisualisationText* _entity, const std::string _text)
+void FileHandler::storeChangedText(IVisualisationText* _entity, const std::string _text, size_t _nextChunkStartIndex)
 {
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);
 	assert(_entity != nullptr);
 
-	_entity->setText(_text);
+	if (_nextChunkStartIndex > 0) {
+		std::string existingTextEnd = _entity->getText().substr(_nextChunkStartIndex);
+		std::string newText = _text + existingTextEnd;
+		_entity->setText(newText);
+	}
+	else {
+		_entity->setText(_text);
+	}
+
 	model->setModified();
 	model->modelChangeOperationCompleted("Updated Text.");
 }

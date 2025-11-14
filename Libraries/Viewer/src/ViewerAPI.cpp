@@ -738,6 +738,12 @@ void ViewerAPI::viewerTabChanged(const ot::WidgetViewBase& _viewInfo) {
 	}
 }
 
+void ViewerAPI::loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _curentChunkEndIndex) {
+	if (GlobalModel::instance() != nullptr) {
+		GlobalModel::instance()->loadNextDataChunk(_entityName, _type, _curentChunkEndIndex);
+	}
+}
+
 void ViewerAPI::viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, bool _isModified) {
 	ViewerToolBar::instance().viewDataModifiedHasChanged(_type, _isModified);
 }

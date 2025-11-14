@@ -69,7 +69,7 @@ private:
 	ot::ActionHandler m_actionHandler;
 	void handleImportTextFile(ot::JsonDocument& _document);
 	void handleImportPythonScript(ot::JsonDocument& _document);
-	virtual ot::ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _text) override;
+	virtual ot::ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _text, size_t _nextChunkStartIndex) override;
 	virtual ot::ReturnMessage tableSaveRequested(const ot::TableCfg& _cfg) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -82,7 +82,7 @@ private:
 	void addTextFilesToModel();
 	void clearBuffer();
 	
-	void storeChangedText(IVisualisationText* _entity, const std::string _text);
+	void storeChangedText(IVisualisationText* _entity, const std::string _text, size_t _nextChunkStartIndex);
 	void storeChangedTable(IVisualisationTable* _entity, const ot::TableCfg& _cfg);
 	void NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner);
 	//! @brief Filecontent is stored as binary, thus the encoding does not matter. The filename however is stored in properties and used in the visualisation. 

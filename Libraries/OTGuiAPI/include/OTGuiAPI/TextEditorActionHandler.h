@@ -28,7 +28,7 @@ namespace ot {
 
 	class OT_GUIAPI_API_EXPORT TextEditorActionHandler {
 		OT_DECL_NOCOPY(TextEditorActionHandler)
-			OT_DECL_NOMOVE(TextEditorActionHandler)
+		OT_DECL_NOMOVE(TextEditorActionHandler)
 	public:
 		TextEditorActionHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
 		virtual ~TextEditorActionHandler() = default;
@@ -37,7 +37,7 @@ namespace ot {
 
 		// Public: Action document helper
 
-		static ot::JsonDocument createTextEditorSaveRequestDocument(const std::string& _entityName, const std::string& _content);
+		static ot::JsonDocument createTextEditorSaveRequestDocument(const std::string& _entityName, const std::string& _content, size_t _nextChunkStartIndex);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -50,7 +50,7 @@ namespace ot {
 		//! @param _content The content to be saved.
 		//! @return ReturnMessage indicating success or failure of the save operation.
 		//! A return status of type OK will result in the text editor modified flag being cleared.
-		virtual ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _content) { return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unhandled save request"); };
+		virtual ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _content, size_t _nextChunkStartIndex) { return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unhandled save request"); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

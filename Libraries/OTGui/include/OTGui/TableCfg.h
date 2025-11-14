@@ -60,16 +60,16 @@ namespace ot {
 		//! @throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		GenericDataStructMatrix createMatrix(void) const;
+		GenericDataStructMatrix createMatrix() const;
 
 		//! @brief Clears all the data.
 		//! Resets the row and column count back to 0.
-		void clear(void);
+		void clear();
 
-		int getRowCount(void) const { return m_rows; };
-		int getColumnCount(void) const { return m_columns; };
+		int getRowCount() const { return m_rows; };
+		int getColumnCount() const { return m_columns; };
 
-		const std::vector<std::vector<std::string>>& getRows(void) const { return m_data; };
+		const std::vector<std::vector<std::string>>& getRows() const { return m_data; };
 		const std::vector<std::string>& getRow(int _row) const;
 
 		void setCellText(int _row, int _column, const std::string& _text);
@@ -84,15 +84,15 @@ namespace ot {
 		const TableHeaderItemCfg* getColumnHeader(int _column) const;
 
 		void setSortingEnabled(bool _enable = true) { m_sortingEnabled = _enable; };
-		bool getSortingEnabled(void) const { return m_sortingEnabled; };
+		bool getSortingEnabled() const { return m_sortingEnabled; };
 
 		//! @brief If set the sorting can be cleared when pressing the sort button repeatadly.
 		//! This has no effect if sorting is not enabled.
 		void setSortingClearable(bool _enable = true) { m_sortingClearable = _enable; };
-		bool getSortingClearable(void) const { return m_sortingClearable; };
+		bool getSortingClearable() const { return m_sortingClearable; };
 
 	private:
-		void initialize(void);
+		void initialize();
 		void initialize(int _rows, int _columns);
 
 		int m_rows = 0;

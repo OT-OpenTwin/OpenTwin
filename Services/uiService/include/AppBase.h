@@ -518,6 +518,8 @@ public Q_SLOTS:
 	void slotPasteRequested(const ot::CopyInformation& _info);
 
 	void slotTextEditorSaveRequested();
+	void slotTextLoadNextRequested(size_t _nextChunkStartIndex);
+
 	void slotTableSaveRequested();
 
 	// ###########################################################################################################################################################################################################################################################################################################################

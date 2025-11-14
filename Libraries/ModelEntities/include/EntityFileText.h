@@ -37,12 +37,14 @@ public:
 	void setTextEncoding(ot::TextEncoding::EncodingStandard _encoding);
 	ot::TextEncoding::EncodingStandard getTextEncoding();
 
-	//Text visualisation interface
+	// Text visualisation interface
+
 	std::string getText(void) override;
+
 	//! @brief Setting a text will change the underlying data entity. If the modelstate is set, the data entity is directly stored and added to the modelstate.
 	void setText(const std::string& _text) override;
 	bool visualiseText() override { return true; }
-	ot::TextEditorCfg createConfig(bool _includeData) override;
+	ot::TextEditorCfg createConfig(const ot::VisualisationCfg& _visualizationConfig) override;
 
 	bool updateFromProperties() override;
 

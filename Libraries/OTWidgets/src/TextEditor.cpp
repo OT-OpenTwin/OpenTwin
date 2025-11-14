@@ -77,7 +77,7 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_searchPopup(nullptr),
 	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false), m_enableSameTextHighlighting(false),
 	m_sameTextHighlightingMinimum(2), m_documentSyntax(DocumentSyntax::PlainText), m_fileExtensionFilter(FileExtension::toFilterString(FileExtension::AllFiles)),
-	m_loadedChunkCount(0), m_showMoreLabel(nullptr)
+	m_nextChunkStartIx(0), m_showMoreLabel(nullptr)
 {
 	this->setObjectName("OT_TextEditor");
 
@@ -134,14 +134,24 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _replace
 	m_documentSyntax = _config.getDocumentSyntax();
 	m_fileExtensionFilter = _config.getFileExtensionFilters();
 
+	m_nextChunkStartIx = _config.getNextChunkStartIndex();
+
 	if (_replaceText) {
 		QString newText = QString::fromStdString(_config.getPlainText());
 		newText.remove('\r');
-		if (newText != this->toPlainText()) {
+		if (_config.getIsChunk()) {
+			auto cursor = this->textCursor();
+			cursor.movePosition(QTextCursor::End);
+			cursor.insertText(newText);
+			this->setTextCursor(cursor);
+		}
+		else if (newText != this->toPlainText()) {
 			this->setPlainText(newText);
 			this->setContentSaved();
 		}
 	}
+
+	this->setShowMoreLabelVisible(_config.getHasMore());
 
 	this->setReadOnly(_config.getTextReadOnly());
 
@@ -218,13 +228,7 @@ void ot::TextEditor::setPlainText(const QString& _text) {
 	}
 	this->blockSignals(true);
 	
-	m_textBuffer = _text;
-	splitTextBufferIntoChunks();
-	
-	if (!m_textChunks.empty()) {
-		QPlainTextEdit::setPlainText(m_textChunks[0].toString());
-		m_loadedChunkCount = 1;
-	}
+	QPlainTextEdit::setPlainText(_text);
 
 	this->document()->clearUndoRedoStacks();
 	
@@ -259,14 +263,7 @@ bool ot::TextEditor::saveToFile(const QString& _fileName) {
 }
 
 QString ot::TextEditor::toPlainText() const {
-	QString txt = QPlainTextEdit::toPlainText();
-	
-	// Append remaining chunks
-	for (size_t i = m_loadedChunkCount; i < m_textChunks.size(); ++i) {
-		txt.append(m_textChunks[i].toString());
-	}
-
-	return txt;
+	return QPlainTextEdit::toPlainText();
 }
 
 void ot::TextEditor::slotSaveRequested() {
@@ -281,8 +278,8 @@ void ot::TextEditor::setFileExtensionFilter(const std::list<FileExtension::Defau
 }
 
 void ot::TextEditor::setShowMoreLabelVisible(bool _visible) {
-	if (_visible) {
-		m_showMoreLabel->show();
+	m_showMoreLabelVisible = _visible;
+	if (m_showMoreLabelVisible) {
 		this->slotUpdateShowMorePosition();
 	}
 	else {
@@ -452,33 +449,14 @@ void ot::TextEditor::slotSelectionChanged() {
 }
 
 void ot::TextEditor::slotShowMore() {
-	if (m_loadedChunkCount < m_textChunks.size()) {
-		QSignalBlocker sigBlock(this);
-
-		auto cursor = this->textCursor();
-		cursor.movePosition(QTextCursor::End);
-		cursor.insertText(m_textChunks[m_loadedChunkCount].toString());
-		this->setTextCursor(cursor);
-
-		m_loadedChunkCount++;
-
-		if (m_loadedChunkCount >= m_textChunks.size()) {
-			m_showMoreLabel->hide();
-		}
-
-		this->document()->clearUndoRedoStacks();
-		this->document()->setModified(false);
-
-		slotUpdateShowMorePosition();
-	}
-	else {
-		m_showMoreLabel->hide();
-	}
-
-	Q_EMIT loadMoreRequested();
+	Q_EMIT loadMoreRequested(m_nextChunkStartIx);
 }
 
 void ot::TextEditor::slotUpdateShowMorePosition() {
+	if (!m_showMoreLabelVisible) {
+		return;
+	}
+
 	QRect r = this->viewport()->rect();
 	QPoint bottomRight = r.bottomRight();
 	int y = bottomRight.y() - m_showMoreLabel->height() - 8;
@@ -555,33 +533,4 @@ void ot::TextEditor::updateDocumentSyntax() {
 	}
 	m_syntaxHighlighter->setRules(DefaultSyntaxHighlighterRules::create(m_documentSyntax));
 	m_syntaxHighlighter->rehighlight();
-}
-
-void ot::TextEditor::splitTextBufferIntoChunks() {
-	m_textChunks.clear();
-	const int totalLength = m_textBuffer.size();
-	const int approxChunkSize = 100000;
-	//const int approxChunkSize = 10;
-
-	int start = 0;
-	while (start < totalLength) {
-		int end = qMin(start + approxChunkSize, totalLength);
-
-		// Try to find a word boundary going backwards
-		if (end < totalLength) {
-			while (end > start && !m_textBuffer.at(end - 1).isSpace()) {
-				end--;
-			}
-
-			// If no space found (very long word), just break hard
-			if (end == start) {
-				end = qMin(start + approxChunkSize, totalLength);
-			}
-		}
-
-		m_textChunks.append(QStringView(m_textBuffer).mid(start, end - start));
-		start = end;
-	}
-
-	m_loadedChunkCount = 0;
 }

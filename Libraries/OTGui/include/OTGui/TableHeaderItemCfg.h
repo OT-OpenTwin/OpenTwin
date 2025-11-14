@@ -45,7 +45,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		void setText(const std::string& _text) { m_text = _text; };
-		const std::string& getText(void) const { return m_text; };
+		const std::string& getText() const { return m_text; };
 
 	private:
 		std::string m_text;

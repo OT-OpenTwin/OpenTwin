@@ -18,8 +18,14 @@
 // @otlicense-end
 
 #pragma once
+
+// OpenTwin header
 #include "Visualiser.h"
+#include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
+#include "OTGui/VisualisationCfg.h"
+
+// std header
 #include <string>
 
 class TextVisualiser : public Visualiser {
@@ -30,9 +36,14 @@ public:
 	//! @brief Visualisation logic for different types of visualisation. Mostly requests to the model service which actually has the needed data.
 	//! @return true, if a new visualisation was requested
 	virtual bool requestVisualization(const VisualiserState& _state) override;
+	virtual bool requestNextDataChunk(size_t _nextChunkStartIndex) override;
 	virtual void showVisualisation(const VisualiserState& _state) override;
 	virtual void hideVisualisation(const VisualiserState& _state) override;
 
 protected:
 	virtual std::string getVisualiserTypeString() const override { return "Text"; };
+
+private:
+	ot::JsonDocument createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex) const;
+
 };

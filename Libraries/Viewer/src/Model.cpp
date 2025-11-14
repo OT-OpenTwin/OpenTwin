@@ -3296,6 +3296,22 @@ void Model::viewerTabChanged(const ot::WidgetViewBase& _viewInfo) {
 	}
 }
 
+void Model::loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _curentChunkEndIndex) {
+	auto nodeIt = m_nameToSceneNodesMap.find(_entityName);
+	if (nodeIt == m_nameToSceneNodesMap.end()) {
+		OT_LOG_E("Could not find entity \"" + _entityName + "\"");
+		return;
+	}
+
+	for (Visualiser* vis : nodeIt->second->getVisualiser()) {
+		if (vis->getViewType() == _type) {
+			if (!vis->requestNextDataChunk(_curentChunkEndIndex)) {
+				OT_LOG_E("Failed to request next data chunk { \"EntityName\": \"" + _entityName + "\", \"ViewType\": \"" + ot::WidgetViewBase::toString(_type) + "\", \"CurrentChunkEndIndex\": " + std::to_string(_curentChunkEndIndex) + " }");
+			}
+		}
+	}
+}
+
 void Model::addVTKNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
 {
 	// Check whether the item already exists

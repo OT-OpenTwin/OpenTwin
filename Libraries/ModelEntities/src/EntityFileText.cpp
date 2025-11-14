@@ -141,7 +141,7 @@ void EntityFileText::setText(const std::string& _text)
 	}
 }
 
-ot::TextEditorCfg EntityFileText::createConfig(bool _includeData) {
+ot::TextEditorCfg EntityFileText::createConfig(const ot::VisualisationCfg& _visualizationConfig) {
 	OT_TEST_ENTITYFILETEXT_Interval("Create config");
 
 	ot::TextEditorCfg result;
@@ -149,8 +149,18 @@ ot::TextEditorCfg EntityFileText::createConfig(bool _includeData) {
 	result.setTitle(this->getName());
 	result.setFileExtensionFilter(this->getFileFilter());
 
-	if (_includeData) {
-		result.setPlainText(this->getText());
+	if (_visualizationConfig.getOverrideViewerContent()) {
+		std::string txt = this->getText();
+		if (_visualizationConfig.getLoadNextChunkOnly()) {
+			//const size_t approxChunkSize = 10;
+			const size_t approxChunkSize = 100000; // <= 100 KB chunk size
+
+			result.setNextChunk(txt, _visualizationConfig.getNextChunkStartIndex(), approxChunkSize);
+		}
+		else {
+			result.setPlainText(std::move(txt));
+		}
+		
 	}
 
 	const std::string highlight = PropertyHelper::getSelectionPropertyValue(this, "Syntax Highlight", "Text Properties");

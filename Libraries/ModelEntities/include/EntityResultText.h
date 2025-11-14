@@ -62,7 +62,7 @@ public:
 	void setText(const std::string &text) override;
 	std::string getText() override;
 	bool visualiseText() override;
-	ot::TextEditorCfg createConfig(bool _includeData) override;
+	ot::TextEditorCfg createConfig(const ot::VisualisationCfg& _visualizationConfig) override;
 	
 private:
 	void ensureTextDataLoaded(void);

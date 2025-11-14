@@ -37,6 +37,7 @@ namespace ot {
 		OT_DECL_DEFMOVE(TextEditorCfg)
 	public:
 		TextEditorCfg();
+		TextEditorCfg(const ConstJsonObject& _jsonObject);
 		virtual ~TextEditorCfg();
 
 		//! @brief Add the object contents to the provided JSON object.
@@ -49,16 +50,34 @@ namespace ot {
 		//! @throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		//! @brief Sets the next chunk of text from the full text.
+		//! Will set all relevant members to represent the chunk.
+		//! Will attemt to not break words when extracting the chunk.
+		//! @param _fullText The full text to extract the chunk from.
+		//! @param _startIndex The offset in the full text where the chunk starts.
+		//! @param _chunkSize The size of the chunk to extract.
+		void setNextChunk(const std::string& _fullText, size_t _startIndex, size_t _chunkSize);
+
 		void setPlainText(const std::string& _text) { m_text = _text; };
-		const std::string& getPlainText(void) const { return m_text; };
+		void setPlainText(std::string&& _text) { m_text = std::move(_text); };
+		const std::string& getPlainText() const { return m_text; };
+
+		void setIsChunk(bool _isChunk) { m_isChunk = _isChunk; };
+		bool getIsChunk() const { return m_isChunk; };
+
+		void setHasMore(bool _hasMore) { m_hasMore = _hasMore; };
+		bool getHasMore() const { return m_hasMore; };
+
+		void setNextChunkStartIndex(size_t _index) { m_nextChunkStartIx = _index; };
+		size_t getNextChunkStartIndex() const { return m_nextChunkStartIx; };
 
 		//! @brief Set read only enabled.
 		//! @param _readOnly If true the text in the text editor can not be edited by the user.
 		void setTextReadOnly(bool _readOnly) { m_readOnly = _readOnly; };
-		bool getTextReadOnly(void) const { return m_readOnly; };
-		
+		bool getTextReadOnly() const { return m_readOnly; };
+
 		void setDocumentSyntax(DocumentSyntax _syntax) { m_syntax = _syntax; };
-		DocumentSyntax getDocumentSyntax(void) const { return m_syntax; };
+		DocumentSyntax getDocumentSyntax() const { return m_syntax; };
 
 		void setFileExtensionFilter(const std::initializer_list<FileExtension::DefaultFileExtension>& _extensions);
 		void setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions);
@@ -67,6 +86,9 @@ namespace ot {
 
 	private:
 		std::string m_text;
+		bool m_isChunk;
+		bool m_hasMore;
+		size_t m_nextChunkStartIx;
 		bool m_readOnly;
 		DocumentSyntax m_syntax;
 		std::string m_fileExtensionFilter;

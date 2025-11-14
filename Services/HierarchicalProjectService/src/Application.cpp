@@ -637,12 +637,14 @@ ot::ReturnMessage Application::requestToOpenTextDocument(EntityBinaryData* _data
 	ot::VisualisationCfg visCfg;
 	visCfg.setAsActiveView(true);
 	visCfg.setOverrideViewerContent(true);
+	visCfg.setLoadNextChunkOnly(true);
+	visCfg.setNextChunkStartIndex(0);
 	doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, ot::JsonObject(visCfg, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::BasicServiceInformation modelInfo(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
 	modelInfo.addToJsonObject(doc, doc.GetAllocator());
 
-	ot::TextEditorCfg configuration = _block->createConfig(false);
+	ot::TextEditorCfg configuration = _block->createConfig(visCfg);
 	configuration.setPlainText(std::string(_data->getData().begin(), _data->getData().end()));
 
 	ot::JsonObject cfgObj;

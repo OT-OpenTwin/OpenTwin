@@ -2035,6 +2035,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	ot::WidgetViewManager::instance().addView(modelInfo, newEditor, _viewInsertFlags);
 
 	this->connect(newEditor, &ot::TextEditorView::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
+	this->connect(newEditor->getTextEditor(), &ot::TextEditor::loadMoreRequested, this, &AppBase::slotTextLoadNextRequested);
 
 	OT_LOG_D("TextEditor created { \"Editor.Name\": \"" + _config.getEntityName() + "\" }");
 
@@ -2724,7 +2725,11 @@ void AppBase::slotTextEditorSaveRequested() {
 	{
 		try {
 			ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
-			ot::JsonDocument doc = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(view->getViewData().getEntityName(), view->getTextEditor()->toPlainText().toStdString());
+			ot::JsonDocument doc = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(
+				view->getViewData().getEntityName(), 
+				view->getTextEditor()->toPlainText().toStdString(),
+				view->getTextEditor()->getNextChunkStartIndex()
+			);
 
 			std::string response;
 			if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
@@ -2749,6 +2754,21 @@ void AppBase::slotTextEditorSaveRequested() {
 		}
 		catch (...) {
 			OT_LOG_EA("[FATAL] Unknown error");
+		}
+	}
+}
+
+void AppBase::slotTextLoadNextRequested(size_t _nextChunkStartIndex) {
+	ot::TextEditor* editor = dynamic_cast<ot::TextEditor*>(sender());
+	if (!editor) {
+		OT_LOG_E("Invalid sender");
+		return;
+	}
+
+	for (const auto& viewPair : m_textEditors) {
+		if (viewPair.second->getTextEditor() == editor) {
+			ViewerAPI::loadNextDataChunk(viewPair.second->getViewData().getEntityName(), ot::WidgetViewBase::ViewText, _nextChunkStartIndex);
+			break;
 		}
 	}
 }

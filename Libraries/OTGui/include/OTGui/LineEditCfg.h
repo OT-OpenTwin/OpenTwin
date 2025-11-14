@@ -35,20 +35,20 @@ namespace ot {
 		LineEditCfg& operator = (const LineEditCfg&) = default;
 		LineEditCfg& operator = (LineEditCfg&&) = default;
 
-		static std::string getLineEditCfgTypeString(void) { return "LineEditCfg"; };
-		virtual std::string getWidgetBaseTypeString(void) const override { return LineEditCfg::getLineEditCfgTypeString(); };
+		static std::string getLineEditCfgTypeString() { return "LineEditCfg"; };
+		virtual std::string getWidgetBaseTypeString() const override { return LineEditCfg::getLineEditCfgTypeString(); };
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		void setReadOnly(bool _isReadOnly) { m_readOnly = _isReadOnly; };
-		bool getReadOnly(void) const { return m_readOnly; };
+		bool getReadOnly() const { return m_readOnly; };
 
 		void setText(const std::string& _text) { m_text = _text; };
-		const std::string& getText(void) const { return m_text; };
+		const std::string& getText() const { return m_text; };
 
 		void setPlaceholderText(const std::string& _text) { m_text = _text; };
-		const std::string& getPlaceholderText(void) const { return m_text; };
+		const std::string& getPlaceholderText() const { return m_text; };
 
 	private:
 		bool m_readOnly;

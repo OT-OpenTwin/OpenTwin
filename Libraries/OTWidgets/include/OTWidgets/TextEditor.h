@@ -109,12 +109,15 @@ namespace ot {
 		void setFileExtensionFilter(const std::string& _filter) { m_fileExtensionFilter = _filter; };
 		const std::string& getFileExtensionFilter() const { return m_fileExtensionFilter; };
 
+		void setNextChunkStartIndex(size_t _index) { m_nextChunkStartIx = _index; };
+		size_t getNextChunkStartIndex() const { return m_nextChunkStartIx; };
+		
 		void setShowMoreLabelVisible(bool _visible);
 		bool getShowMoreLabelVisible() const;
 
 	Q_SIGNALS:							
 		void saveRequested();
-		void loadMoreRequested();
+		void loadMoreRequested(size_t _nextChunkStartIndex);
 
 	public Q_SLOTS:
 		void slotSaveRequested();
@@ -156,8 +159,6 @@ namespace ot {
 		void addAdditionalSelections(QList<QTextEdit::ExtraSelection>& _selections);
 		void updateDocumentSyntax();
 
-		void splitTextBufferIntoChunks();
-
 		TextEditorSearchPopup* m_searchPopup;
 		
 		int m_tabSpaces;
@@ -172,10 +173,9 @@ namespace ot {
 
 		std::string m_fileExtensionFilter;
 
+		bool m_showMoreLabelVisible;
 		Label* m_showMoreLabel;
 
-		QString m_textBuffer;
-		int m_loadedChunkCount;
-		QVector<QStringView> m_textChunks;
+		size_t m_nextChunkStartIx;
 	};
 }

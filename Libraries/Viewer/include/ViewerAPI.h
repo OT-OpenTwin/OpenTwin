@@ -149,6 +149,8 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);
 
+	__declspec(dllexport) void loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _curentChunkEndIndex);
+
 	__declspec(dllexport) void viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, bool _isModified);
 
 	__declspec(dllexport) void shortcutActivated(const std::string & _keySequence);

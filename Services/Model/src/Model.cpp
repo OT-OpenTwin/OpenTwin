@@ -641,7 +641,7 @@ void Model::removeEntityWithChildrenFromMap(EntityBase *entity, bool keepInProje
 	removedEntities.push_back(entity);
 }
 
-void  Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, bool considerChildren)
+void Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, bool considerChildren)
 {
 	if (!keepParameterDependency)
 	{

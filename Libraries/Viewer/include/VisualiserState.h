@@ -30,8 +30,8 @@ class SceneNodeBase;
 
 struct VisualiserState
 {
-	bool m_selected;
-	bool m_singleSelection;
+	bool m_selected = false;
+	bool m_singleSelection = false;
 	bool m_setFocus = true;
 	bool m_anyVisualiserHasFocus = false;
 	ot::SelectionData m_selectionData; 

@@ -151,14 +151,23 @@ bool EntityResultText::visualiseText()
 	return true;
 }
 
-ot::TextEditorCfg EntityResultText::createConfig(bool _includeData)
+ot::TextEditorCfg EntityResultText::createConfig(const ot::VisualisationCfg& _visualizationConfig)
 {
 	ot::TextEditorCfg result;
 	result.setEntityName(this->getName());
 	result.setTitle(this->getName());
-	if (_includeData)
-	{
-		result.setPlainText(this->getText());
+
+	if (_visualizationConfig.getOverrideViewerContent()) {
+		std::string txt = this->getText();
+		if (_visualizationConfig.getLoadNextChunkOnly()) {
+			const size_t approxChunkSize = 100000; // <= 100 KB chunk size
+
+			result.setNextChunk(txt, _visualizationConfig.getNextChunkStartIndex(), approxChunkSize);
+		}
+		else {
+			result.setPlainText(std::move(txt));
+		}
+
 	}
 
 	result.setDocumentSyntax(ot::DocumentSyntax::PlainText);

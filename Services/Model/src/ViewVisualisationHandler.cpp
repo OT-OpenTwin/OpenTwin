@@ -87,7 +87,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 		{
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, document.GetAllocator());
 
-			ot::TextEditorCfg configuration = textEntity->createConfig(_visualisationCfg.getOverrideViewerContent());
+			ot::TextEditorCfg configuration = textEntity->createConfig(_visualisationCfg);
 
 			if (_visualisationCfg.getCustomViewFlags().has_value()) {
 				configuration.setViewFlags(_visualisationCfg.getCustomViewFlags().value());
@@ -205,7 +205,10 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 
 		singleRequest.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, singleRequest.GetAllocator());
 
-		ot::TextEditorCfg configuration = textEntity->createConfig(includeData);
+		ot::VisualisationCfg vizCfg;
+		vizCfg.setOverrideViewerContent(false);
+
+		ot::TextEditorCfg configuration = textEntity->createConfig(vizCfg);
 		ot::JsonObject cfgObj;
 		configuration.addToJsonObject(cfgObj, singleRequest.GetAllocator());
 

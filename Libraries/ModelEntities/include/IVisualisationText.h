@@ -20,6 +20,7 @@
 #pragma once
 #include <string>
 #include "OTGui/TextEditorCfg.h"
+#include "OTGui/VisualisationCfg.h"
 
 class __declspec(dllexport) IVisualisationText
 {
@@ -28,5 +29,5 @@ public:
 	virtual std::string getText() = 0;
 	virtual void setText(const std::string& _text) = 0;
 	virtual bool visualiseText() = 0;
-	virtual ot::TextEditorCfg createConfig(bool _includeData) = 0;
+	virtual ot::TextEditorCfg createConfig(const ot::VisualisationCfg& _visualizationConfig) = 0;
 };

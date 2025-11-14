@@ -100,14 +100,20 @@ void EntityBlockHierarchicalDocumentItem::setText(const std::string& _text) {
 	setModified();
 }
 
-ot::TextEditorCfg EntityBlockHierarchicalDocumentItem::createConfig(bool _includeData) {
+ot::TextEditorCfg EntityBlockHierarchicalDocumentItem::createConfig(const ot::VisualisationCfg& _visConfig) {
 	ot::TextEditorCfg cfg;
 	cfg.setDocumentSyntax(ot::DocumentSyntax::PlainText);
 	cfg.setEntityInformation(getBasicEntityInformation());
 	cfg.setTitle(getName());
 	
-	if (_includeData) {
-		cfg.setPlainText(getText());
+	if (_visConfig.getOverrideViewerContent()) {
+		if (_visConfig.getLoadNextChunkOnly()) {
+			const size_t chunkSize = 100000; // <= 100k characters per chunk
+			cfg.setNextChunk(getText(), _visConfig.getNextChunkStartIndex(), chunkSize);
+		}
+		else {
+			cfg.setPlainText(getText());
+		}
 	}
 
 	return cfg;
