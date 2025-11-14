@@ -34,6 +34,18 @@ public:
 	BlockHandler() = default;
 	~BlockHandler() = default;
 
+	// Getter
+	const std::map<ot::UID, ot::UIDList>& getBlocksForEditor(ot::UID editorId) const;
+	ot::UIDList& getConnections(ot::UID editorId, ot::UID blockId);
+
+	// Setter
+	void addConnection(ot::UID editorId, ot::UID blockId, ot::UID connection);
+	bool addEmptyBlockToEditor(ot::UID editorId, ot::UID blockId);
+	bool addEditor(ot::UID editorId);
+
+	// Remover
+	void removeAnyEntry(EntityBase* entBase);
+
 protected:
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;
 	virtual ot::ReturnMessage graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) override;
@@ -94,6 +106,8 @@ private:
 	//! @return void 
 	void createConnection(EntityGraphicsScene* scene, EntityBlock* _originBlock, ot::GraphicsConnectionCfg& _requestedConnection,  EntityNamingBehavior& _connectionNaming, ot::NewModelStateInfo& _newModelStateInfo);
 
+	void modifyConnection(const ot::UID& _entityID, EntityBase* _connectedBlockEntity);
+	
 	std::map<ot::UID, std::map<ot::UID, ot::UIDList>> m_viewBlockConnectionsMap;
 	const std::string m_connectionsFolder = "Connections";
 

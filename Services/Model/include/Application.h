@@ -211,6 +211,7 @@ public:
 
 	ViewVisualisationHandler& getVisualisationHandler() { return m_visualisationHandler; }
 	LibraryManagementWrapper& getLibraryManagementWrapper() { return m_libraryManagementWrapper	; }
+	BlockHandler& getBlockHandler() { return m_blockHandler; }
 
 	//! @brief Stores the given content in a temporary file and returns the path to that file.
 	//! @param _content The content to store in the temporary file.

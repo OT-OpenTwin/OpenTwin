@@ -41,6 +41,108 @@
 #include "EntityBlockCircuitConnector.h"
 #include "PropertyHelper.h"
 
+const std::map<ot::UID, ot::UIDList>& BlockHandler::getBlocksForEditor(ot::UID editorId) const {
+	static const std::map<ot::UID, ot::UIDList> emptyMap{};
+	auto it = m_viewBlockConnectionsMap.find(editorId);
+	if (it != m_viewBlockConnectionsMap.end()) {
+		return it->second;
+	}
+	return emptyMap;
+}
+
+ot::UIDList& BlockHandler::getConnections(ot::UID editorId, ot::UID blockId) {
+	static ot::UIDList emptyList{}; 
+	auto itEditor = m_viewBlockConnectionsMap.find(editorId);
+	if (itEditor != m_viewBlockConnectionsMap.end()) {
+		auto itBlock = itEditor->second.find(blockId);
+		if (itBlock != itEditor->second.end()) {
+			return itBlock->second; 
+		}
+	}
+	return emptyList; 
+}
+
+void BlockHandler::addConnection(ot::UID editorId, ot::UID blockId, ot::UID connection) {
+	m_viewBlockConnectionsMap[editorId][blockId].push_back(connection);
+}
+
+bool BlockHandler::addEmptyBlockToEditor(ot::UID editorId, ot::UID blockId) {
+	auto& blocksMap = m_viewBlockConnectionsMap[editorId];
+	auto result = blocksMap.emplace(blockId, ot::UIDList{});
+	return result.second; 
+}
+
+bool BlockHandler::addEditor(ot::UID editorId) {
+	auto result = m_viewBlockConnectionsMap.emplace(editorId, std::map<ot::UID, ot::UIDList>{});
+	return result.second;
+}
+
+void BlockHandler::removeAnyEntry(EntityBase* _entBase) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+	
+	if (_entBase->getEntityID() == ot::invalidUID) {
+		OT_LOG_E("Invalid UID");
+		return;
+	}
+
+	// Check if editor with id exists - if yes remove the whole entry
+	EntityGraphicsScene* entGraphicsScene = dynamic_cast<EntityGraphicsScene*>(_entBase);
+	if (entGraphicsScene) {
+		// Editor: Entferne Editor komplett, falls vorhanden
+		auto itEditor = m_viewBlockConnectionsMap.find(_entBase->getEntityID());
+		if (itEditor != m_viewBlockConnectionsMap.end()) {
+			m_viewBlockConnectionsMap.erase(itEditor);
+		}
+		return;
+	}
+
+	// Check if block with id exists - if yes remove the block with its connections
+	EntityBlock* entBlock = dynamic_cast<EntityBlock*>(_entBase);
+	if (entBlock) {
+		for (auto itEditor = m_viewBlockConnectionsMap.begin(); itEditor != m_viewBlockConnectionsMap.end();) {
+			auto& blocks = itEditor->second;
+			auto itBlock = blocks.find(_entBase->getEntityID());
+			if (itBlock != blocks.end()) {
+				ot::UIDList connections = getConnections(itEditor->first, itBlock->first);
+				for (const ot::UID& connection : connections) {
+					modifyConnection(connection,_entBase);
+				}
+				model->setModified();
+				model->modelChangeOperationCompleted("Connection updated");
+				blocks.erase(itBlock);
+				return;
+			}
+			else {
+				++itEditor;
+			}
+		}
+		return;
+	}
+
+
+	// Check if connection with id exists - if yes remove the connection
+	EntityBlockConnection* entBlockConnection = dynamic_cast<EntityBlockConnection*>(_entBase);
+	if (entBlockConnection) {
+		for (auto itEditor = m_viewBlockConnectionsMap.begin(); itEditor != m_viewBlockConnectionsMap.end(); ++itEditor) {
+			ot::UID editorId = itEditor->first;
+			std::map<ot::UID, ot::UIDList>& blocks = itEditor->second;
+
+			for (auto itBlock = blocks.begin(); itBlock != blocks.end(); ++itBlock) {
+				ot::UID blockId = itBlock->first;
+				ot::UIDList& connections = itBlock->second;
+
+				auto itConn = std::find(connections.begin(), connections.end(), _entBase->getEntityID());
+				while (itConn != connections.end()) {
+					itConn = connections.erase(itConn);
+					itConn = std::find(connections.begin(), connections.end(), _entBase->getEntityID());
+				}
+			}
+		}
+		return;
+	}
+}
+
 ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
@@ -72,6 +174,9 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 	}
 
 	model->addEntitiesToModel(modelStateInfo, "Added block", true, true, true);
+
+	// Add Block to Map
+	addEmptyBlockToEditor(editor->getEntityID(), createdBlock->getEntityID());
 
 	// Check if any service wants to be notified about this change
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
@@ -481,7 +586,6 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	}
 
 	model->addEntitiesToModel(_modelStateInfo, "Added Connection to Connection", true, true, true);
-
 	return true;
 }
 
@@ -578,8 +682,12 @@ bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedCon
 		return false;
 	}
 
-	// Update connection
-	connectionEntity->setConnectionCfg(_changedConnection);
+	// Ui does not update the connectionCfg anymore means that originUid/destinationUid could exist even if the block with corresponding uid does not exits
+	// Only update the position of the connections means no need of checking if originUid or destinationUid exists
+	ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
+	connectionCfg.setOriginPos(_changedConnection.getOriginPos());
+	connectionCfg.setDestPos(_changedConnection.getDestPos());
+	connectionEntity->setConnectionCfg(connectionCfg);
 	connectionEntity->storeToDataBase();
 	model->getStateManager()->modifyEntityVersion(*connectionEntity);
 
@@ -688,6 +796,50 @@ void BlockHandler::createConnection( EntityGraphicsScene* _scene, EntityBlock* _
 
 	_connectionEntity.storeToDataBase();
 	_newModelStateInfo.addTopologyEntity(_connectionEntity);
+
+	// Add connection to map
+	addConnection(_scene->getEntityID(), _connectionEntity.getConnectionCfg().getOriginUid(), _connectionEntity.getEntityID());
+	addConnection(_scene->getEntityID(), _connectionEntity.getConnectionCfg().getDestinationUid(), _connectionEntity.getEntityID());
 	return;
+}
+
+void BlockHandler::modifyConnection(const ot::UID& _entityID, EntityBase* _connectedBlockEntity){
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+	auto entBase = model->getEntityByID(_entityID);
+	if (!entBase) {
+		OT_LOG_E("Failed to get Entity by ID");
+		return;
+	}
+	EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entBase);
+	if (!connectionEntity) {
+		OT_LOG_E("ConnectionEntity is null");
+		return;
+	}
+
+	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(_connectedBlockEntity);
+	if (!blockEnt) {
+		OT_LOG_E("ConnectionEntity is null");
+		return;
+	}
+
+	ot::GraphicsConnectionCfg _oldConnectionCfg = connectionEntity->getConnectionCfg();
+	if (_oldConnectionCfg.getOriginUid() == _connectedBlockEntity->getEntityID()) {
+		_oldConnectionCfg.setOriginUid(ot::invalidUID);
+		_oldConnectionCfg.setOriginConnectable("");
+	}
+	else if (_oldConnectionCfg.getDestinationUid() == _connectedBlockEntity->getEntityID()) {
+		_oldConnectionCfg.setDestUid(ot::invalidUID);
+		_oldConnectionCfg.setDestConnectable("");
+	}
+	else {
+		OT_LOG_E("Connection is not connected to: " + _connectedBlockEntity->getEntityID());
+		return;
+	}
+	
+	connectionEntity->setConnectionCfg(_oldConnectionCfg);
+	connectionEntity->storeToDataBase();
+	model->getStateManager()->modifyEntityVersion(*connectionEntity);
 }
 
