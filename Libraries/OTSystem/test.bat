@@ -43,11 +43,11 @@ IF "%1"=="DEBUG" (
 )
 
 IF %DEBUG%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestBuildSingleProject.bat" "%OT_SYSTEM_ROOT%" DEBUG
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_SYSTEM_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestBuildSingleProject.bat" "%OT_SYSTEM_ROOT%" RELEASE
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_SYSTEM_ROOT%" RELEASE
 ) 
   
 GOTO END
