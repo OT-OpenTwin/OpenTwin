@@ -217,7 +217,8 @@ AppBase::AppBase() :
 	m_lastFocusedView(nullptr),
 	m_lastFocusedCentralView(nullptr),
 	m_defaultView(nullptr),
-	m_loginDialog(nullptr)
+	m_loginDialog(nullptr),
+	m_outputWasHtml(false)
 {
 	m_currentStateWindow.viewShown = false;
 
@@ -1816,11 +1817,16 @@ void AppBase::focusPropertyGridItem(const std::string& _group, const std::string
 
 void AppBase::replaceInfoMessage(const QString& _message) {
 	m_output->getPlainTextEdit()->setPlainText(_message);
+	m_outputWasHtml = false;
 }
 
 void AppBase::appendInfoMessage(const QString & _message) {
 	if (m_output) {
 		m_output->getPlainTextEdit()->moveCursor(QTextCursor::End);
+		if (m_outputWasHtml) {
+			m_output->getPlainTextEdit()->insertPlainText("\n");
+			m_outputWasHtml = false;
+		}
 		m_output->getPlainTextEdit()->insertPlainText(_message);
 		m_output->getPlainTextEdit()->moveCursor(QTextCursor::End);
 	}
@@ -1829,6 +1835,7 @@ void AppBase::appendInfoMessage(const QString & _message) {
 void AppBase::appendHtmlInfoMessage(const QString& _html) {
 	if (m_output) {
 		m_output->getPlainTextEdit()->appendHtml(_html);
+		m_outputWasHtml = true;
 	}
 }
 

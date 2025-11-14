@@ -686,6 +686,7 @@ private:
 
 	ToolBar *					m_ttb;
 	ot::PropertyGridView*  m_propertyGrid;
+	bool m_outputWasHtml;
 	ot::PlainTextEditView* m_output;
 	ot::GraphicsPickerView* m_graphicsPicker;
 	ot::GraphicsPickerManager m_graphicsPickerManager;
