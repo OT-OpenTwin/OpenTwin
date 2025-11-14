@@ -103,7 +103,7 @@ namespace ot
 		void setWhat(const std::string& _what) { m_what = _what; };
 
 		//! @brief Get the return message content
-		std::string getWhat() const { return m_what; }
+		const std::string& getWhat() const { return m_what; }
 
 		void setStatus(const ReturnMessageStatus& _status) { m_status = _status; };
 
