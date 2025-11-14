@@ -807,13 +807,13 @@ void ot::GraphicsItem::checkConnectionSnapRequest(GraphicsSnapEvent& _result) {
 		for (QGraphicsItem* itm : scene->items(triggerRect)) {
 			GraphicsConnectionItem* connection = dynamic_cast<GraphicsConnectionItem*>(itm);
 			if (connection) {
-				if (connection->getOriginItem() != item && triggerRect.contains(connection->getOriginPos())) {
+				if (!connection->getOriginItem() && triggerRect.contains(connection->getOriginPos())) {
 					GraphicsConnectionCfg cfg = connection->getConfiguration();
 					cfg.setOriginUid(this->getGraphicsItemUid());
 					cfg.setOriginConnectable(item->getGraphicsItemName());
 					_result.addSnapInfo(cfg, true);
 				}
-				else if (connection->getDestItem() != item && triggerRect.contains(connection->getDestPos())) {
+				else if (!connection->getDestItem() && triggerRect.contains(connection->getDestPos())) {
 					GraphicsConnectionCfg cfg = connection->getConfiguration();
 					cfg.setDestUid(this->getGraphicsItemUid());
 					cfg.setDestConnectable(item->getGraphicsItemName());
