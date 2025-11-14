@@ -100,23 +100,27 @@ void EntityBlockHierarchicalDocumentItem::setText(const std::string& _text) {
 	setModified();
 }
 
-ot::TextEditorCfg EntityBlockHierarchicalDocumentItem::createConfig(const ot::VisualisationCfg& _visConfig) {
-	ot::TextEditorCfg cfg;
-	cfg.setDocumentSyntax(ot::DocumentSyntax::PlainText);
-	cfg.setEntityInformation(getBasicEntityInformation());
-	cfg.setTitle(getName());
+ot::TextEditorCfg EntityBlockHierarchicalDocumentItem::createConfig(const ot::VisualisationCfg& _visualizationConfig) {
+	ot::TextEditorCfg result;
+	result.setDocumentSyntax(ot::DocumentSyntax::PlainText);
+	result.setEntityInformation(getBasicEntityInformation());
+	result.setTitle(getName());
 	
-	if (_visConfig.getOverrideViewerContent()) {
-		if (_visConfig.getLoadNextChunkOnly()) {
-			const size_t chunkSize = 100000; // <= 100k characters per chunk
-			cfg.setNextChunk(getText(), _visConfig.getNextChunkStartIndex(), chunkSize);
+	if (_visualizationConfig.getOverrideViewerContent()) {
+		const std::string txt = this->getText();
+
+		if (_visualizationConfig.getLoadNextChunkOnly()) {
+			result.setNextChunk(txt, _visualizationConfig.getNextChunkStartIndex());
 		}
 		else {
-			cfg.setPlainText(getText());
+			std::string remainingText = txt.substr(_visualizationConfig.getNextChunkStartIndex());
+			result.setPlainText(std::move(remainingText));
+			result.setIsChunk(_visualizationConfig.getNextChunkStartIndex() > 0);
+			result.setHasMore(false);
 		}
 	}
 
-	return cfg;
+	return result;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

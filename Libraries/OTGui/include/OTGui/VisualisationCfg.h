@@ -52,10 +52,19 @@ namespace ot
 		void setOverrideViewerContent(bool _overrideViewerContent) { m_overrideViewerContent = _overrideViewerContent; };
 		bool getOverrideViewerContent() const { return m_overrideViewerContent; };
 
+		//! @ref VisualisationCfg::getLoadNextChunkOnly
 		void setLoadNextChunkOnly(bool _loadNextChunkOnly) { m_loadNextChunkOnly = _loadNextChunkOnly; };
+
+		//! @brief If enabled only the next chunk of data will be loaded for visualisation.
+		//! This option only affects the size of data loaded for visualisation.
+		//! @note To load the complete data set, load next chunk only must be disabled and the next chunk start index must be set to zero.
 		bool getLoadNextChunkOnly() const { return m_loadNextChunkOnly; };
 
 		void setNextChunkStartIndex(size_t _nextChunkStartIndex) { m_nextChunkStartIndex = _nextChunkStartIndex; };
+
+		//! @brief Get the start index for the next chunk to be loaded.
+		//! This option will always be taken into account, regardless of the state of getLoadNextChunkOnly.
+		//! @note To load the complete data set, load next chunk only must be disabled and the next chunk start index must be set to zero.
 		size_t getNextChunkStartIndex() const { return m_nextChunkStartIndex; };
 
 		void setSupressViewHandling(bool _supressViewHandling) { m_supressViewHandling = _supressViewHandling; };

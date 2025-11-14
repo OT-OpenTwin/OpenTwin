@@ -2348,16 +2348,24 @@ ot--TextEditorSearchPopup {
     border: 1px solid rgba(70,70,70,255);
 }
 
-#OT_TextEditor_ShowMoreLabel {
+#OT_TextEditor_ShowMoreLabel,
+#OT_TextEditor_ShowAllLabel {
     color:rgba(255,255,255,255);
 }
 
-#OT_TextEditor_ShowMoreLabel:hover {
+#OT_TextEditor_ShowMoreLabel:hover,
+#OT_TextEditor_ShowAllLabel:hover {
     color:rgba(0,215,255,255);
 }
 
-#OT_TextEditor_ShowMoreLabel:pressed {
+#OT_TextEditor_ShowMoreLabel:pressed,
+#OT_TextEditor_ShowAllLabel:pressed {
     color:rgba(0,255,0,255);
+}
+
+#OT_TextEditor_LabelsFrame {
+    border: 1px solid rgba(70,70,70,255);
+    border-radius: 4;
 }
 
 /* ##################################################################################### */

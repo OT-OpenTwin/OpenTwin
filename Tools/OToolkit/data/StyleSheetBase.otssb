@@ -2342,16 +2342,24 @@ ot--TextEditorSearchPopup {
     border: 1px solid %color:Border Color%;
 }
 
-#OT_TextEditor_ShowMoreLabel {
+#OT_TextEditor_ShowMoreLabel,
+#OT_TextEditor_ShowAllLabel {
     color:%color:Widget Foreground%;
 }
 
-#OT_TextEditor_ShowMoreLabel:hover {
+#OT_TextEditor_ShowMoreLabel:hover,
+#OT_TextEditor_ShowAllLabel:hover {
     color:%color:Widget Hover Background%;
 }
 
-#OT_TextEditor_ShowMoreLabel:pressed {
+#OT_TextEditor_ShowMoreLabel:pressed,
+#OT_TextEditor_ShowAllLabel:pressed {
     color:%color:Widget Selection Background%;
+}
+
+#OT_TextEditor_LabelsFrame {
+    border: 1px solid %color:Border Color%;
+    border-radius: %double:Border Radius Small%;
 }
 
 /* ##################################################################################### */

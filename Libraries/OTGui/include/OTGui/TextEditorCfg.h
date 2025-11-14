@@ -36,6 +36,8 @@ namespace ot {
 		OT_DECL_DEFCOPY(TextEditorCfg)
 		OT_DECL_DEFMOVE(TextEditorCfg)
 	public:
+		static constexpr size_t defaultChunkSize = 1024 * 100; // 100 KB
+
 		TextEditorCfg();
 		TextEditorCfg(const ConstJsonObject& _jsonObject);
 		virtual ~TextEditorCfg();
@@ -56,7 +58,7 @@ namespace ot {
 		//! @param _fullText The full text to extract the chunk from.
 		//! @param _startIndex The offset in the full text where the chunk starts.
 		//! @param _chunkSize The size of the chunk to extract.
-		void setNextChunk(const std::string& _fullText, size_t _startIndex, size_t _chunkSize);
+		void setNextChunk(const std::string& _fullText, size_t _startIndex, size_t _chunkSize = TextEditorCfg::defaultChunkSize);
 
 		void setPlainText(const std::string& _text) { m_text = _text; };
 		void setPlainText(std::string&& _text) { m_text = std::move(_text); };
@@ -70,6 +72,9 @@ namespace ot {
 
 		void setNextChunkStartIndex(size_t _index) { m_nextChunkStartIx = _index; };
 		size_t getNextChunkStartIndex() const { return m_nextChunkStartIx; };
+
+		void setRemainingSize(size_t _size) { m_remainingSize = _size; };
+		size_t getRemainingSize() const { return m_remainingSize; };
 
 		//! @brief Set read only enabled.
 		//! @param _readOnly If true the text in the text editor can not be edited by the user.
@@ -89,6 +94,7 @@ namespace ot {
 		bool m_isChunk;
 		bool m_hasMore;
 		size_t m_nextChunkStartIx;
+		size_t m_remainingSize;
 		bool m_readOnly;
 		DocumentSyntax m_syntax;
 		std::string m_fileExtensionFilter;

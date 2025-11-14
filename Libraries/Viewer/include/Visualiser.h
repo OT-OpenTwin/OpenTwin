@@ -48,9 +48,14 @@ public:
 	virtual bool requestVisualization(const VisualiserState& _state) = 0;
 
 	//! @brief Request the next data chunk for the visualisation.
-	//! @param _currentChunkEndIndex The index of the last data item that has been received so far.
+	//! @param _nextChunkStartIndex The index where the next data chunk should start.
 	//! @return True if a new data chunk was requested, false otherwise.
-	virtual bool requestNextDataChunk(size_t _currentChunkEndIndex) { return false; };
+	virtual bool requestNextDataChunk(size_t _nextChunkStartIndex) { return false; };
+
+	//! @brief Request the remaining data for the visualisation.
+	//! @param _nextChunkStartIndex The index where the next data chunk should start.
+	//! @return True if the remaining data was requested, false otherwise.
+	virtual bool requestRemainingData(size_t _nextChunkStartIndex) { return false; };
 
 	//! @brief Show or undim the visualization for thentity.
 	//! This is called if the entity has already been visualized before.

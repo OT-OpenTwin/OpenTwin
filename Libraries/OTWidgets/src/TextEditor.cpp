@@ -35,6 +35,7 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 #include <QtGui/qtextlist.h>
+#include <QtWidgets/qframe.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qscrollbar.h>
@@ -77,7 +78,8 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_searchPopup(nullptr),
 	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false), m_enableSameTextHighlighting(false),
 	m_sameTextHighlightingMinimum(2), m_documentSyntax(DocumentSyntax::PlainText), m_fileExtensionFilter(FileExtension::toFilterString(FileExtension::AllFiles)),
-	m_nextChunkStartIx(0), m_showMoreLabel(nullptr)
+	m_nextChunkStartIx(0), m_loadWidgets(nullptr), m_loadLabelsVisible(false), m_loadMoreLabelVisible(false), m_showMoreLabel(nullptr), m_showAllLabel(nullptr),
+	m_spacerLabel(nullptr)
 {
 	this->setObjectName("OT_TextEditor");
 
@@ -92,11 +94,26 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	this->setTabStopDistance(4 * fm.horizontalAdvance(QChar(' ')));
 
 	// "Show more" overlay label
-	m_showMoreLabel = new Label("Show more...", this);
+	m_loadWidgets = new QFrame(this);
+	m_loadWidgets->setObjectName("OT_TextEditor_LabelsFrame");
+	m_loadWidgets->setFrameShape(QFrame::Box);
+	m_loadWidgets->setHidden(true);
+	m_loadWidgets->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	QHBoxLayout* loadLayout = new QHBoxLayout(m_loadWidgets);
+	connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::slotUpdateLabelsPosition);
+
+	m_showMoreLabel = new Label("Load more...", this);
 	m_showMoreLabel->setObjectName("OT_TextEditor_ShowMoreLabel");
-	m_showMoreLabel->hide();
+	loadLayout->addWidget(m_showMoreLabel);
 	connect(m_showMoreLabel, &Label::mouseClicked, this, &TextEditor::slotShowMore);
-	connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::slotUpdateShowMorePosition);
+
+	m_spacerLabel = new Label("   ", this);
+	loadLayout->addWidget(m_spacerLabel);
+
+	m_showAllLabel = new Label("Load all...", this);
+	m_showAllLabel->setObjectName("OT_TextEditor_ShowAllLabel");
+	loadLayout->addWidget(m_showAllLabel);
+	connect(m_showAllLabel, &Label::mouseClicked, this, &TextEditor::slotShowAll);
 
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
@@ -109,6 +126,9 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 
 	this->slotUpdateLineNumberAreaWidth(0);
 	this->slotHighlightCurrentLine();
+
+	this->setMinimumWidth(200);
+	this->setMinimumHeight(100);
 
 	this->connect(this, &TextEditor::blockCountChanged, this, &TextEditor::slotUpdateLineNumberAreaWidth);
 	this->connect(this, &TextEditor::updateRequest, this, &TextEditor::slotUpdateLineNumberArea);
@@ -151,7 +171,12 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _replace
 		}
 	}
 
-	this->setShowMoreLabelVisible(_config.getHasMore());
+	updateLabelText(m_showAllLabel, "Load remaining ", _config.getRemainingSize(), "...");
+	updateLabelText(m_showMoreLabel, "Load next ", std::min(TextEditorCfg::defaultChunkSize, _config.getRemainingSize()), "...");
+
+	m_loadLabelsVisible = _config.getHasMore();
+	m_loadMoreLabelVisible = m_loadLabelsVisible && (_config.getRemainingSize() > TextEditorCfg::defaultChunkSize);
+	slotUpdateLabelsPosition();
 
 	this->setReadOnly(_config.getTextReadOnly());
 
@@ -236,7 +261,7 @@ void ot::TextEditor::setPlainText(const QString& _text) {
 
 	this->slotUpdateLineNumberAreaWidth(0);
 
-	this->slotUpdateShowMorePosition();
+	this->slotUpdateLabelsPosition();
 
 	if (m_syntaxHighlighter) {
 		m_syntaxHighlighter->blockSignals(tmpSyn);
@@ -266,6 +291,10 @@ QString ot::TextEditor::toPlainText() const {
 	return QPlainTextEdit::toPlainText();
 }
 
+bool ot::TextEditor::hasMoreToLoad() const {
+	return m_loadLabelsVisible;
+}
+
 void ot::TextEditor::slotSaveRequested() {
 	if (!this->document()->isModified()) {
 		return;
@@ -275,20 +304,6 @@ void ot::TextEditor::slotSaveRequested() {
 
 void ot::TextEditor::setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions) {
 	m_fileExtensionFilter = FileExtension::toFilterString(_extensions);
-}
-
-void ot::TextEditor::setShowMoreLabelVisible(bool _visible) {
-	m_showMoreLabelVisible = _visible;
-	if (m_showMoreLabelVisible) {
-		this->slotUpdateShowMorePosition();
-	}
-	else {
-		m_showMoreLabel->hide();
-	}
-}
-
-bool ot::TextEditor::getShowMoreLabelVisible() const {
-	return m_showMoreLabel->isVisible();
 }
 
 // ###################################################################################################################################
@@ -351,7 +366,7 @@ void ot::TextEditor::resizeEvent(QResizeEvent * _event) {
 	QRect cr = contentsRect();
 	m_lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 
-	this->slotUpdateShowMorePosition();
+	this->slotUpdateLabelsPosition();
 }
 
 void ot::TextEditor::wheelEvent(QWheelEvent* _event) {
@@ -372,7 +387,7 @@ void ot::TextEditor::wheelEvent(QWheelEvent* _event) {
 
 void ot::TextEditor::showEvent(QShowEvent* _event) {
 	QPlainTextEdit::showEvent(_event);
-	this->slotUpdateShowMorePosition();
+	this->slotUpdateLabelsPosition();
 }
 
 // ###################################################################################################################################
@@ -452,20 +467,33 @@ void ot::TextEditor::slotShowMore() {
 	Q_EMIT loadMoreRequested(m_nextChunkStartIx);
 }
 
-void ot::TextEditor::slotUpdateShowMorePosition() {
-	if (!m_showMoreLabelVisible) {
+void ot::TextEditor::slotShowAll() {
+	Q_EMIT loadAllRequested(m_nextChunkStartIx);
+}
+
+void ot::TextEditor::slotUpdateLabelsPosition() {
+	if (!m_loadLabelsVisible) {
+		m_loadWidgets->hide();
 		return;
 	}
 
 	QRect r = this->viewport()->rect();
 	QPoint bottomRight = r.bottomRight();
-	int y = bottomRight.y() - m_showMoreLabel->height() - 8;
-	int x = bottomRight.x() - (m_showMoreLabel->width() + 10);
-	m_showMoreLabel->move(x, y);
+	int y = bottomRight.y() - m_loadWidgets->height();
+	int x = bottomRight.x() - m_loadWidgets->width();
+	m_loadWidgets->move(x, y);
 	if (this->isVisible()) {
-		m_showMoreLabel->show();
+		m_loadWidgets->show();
+		if (m_loadMoreLabelVisible) {
+			m_spacerLabel->show();
+			m_showMoreLabel->show();
+		}
+		else {
+			m_spacerLabel->hide();
+			m_showMoreLabel->hide();
+		}
+		m_loadWidgets->raise();
 	}
-	m_showMoreLabel->raise();
 }
 
 // ###################################################################################################################################
@@ -533,4 +561,46 @@ void ot::TextEditor::updateDocumentSyntax() {
 	}
 	m_syntaxHighlighter->setRules(DefaultSyntaxHighlighterRules::create(m_documentSyntax));
 	m_syntaxHighlighter->rehighlight();
+}
+
+void ot::TextEditor::updateLabelText(Label* _label, const QString& _prefix, size_t _dataSize, const QString& _suffix) {
+	enum class SizeUnit {
+		Bytes,
+		KB,
+		MB,
+		GB
+	};
+	SizeUnit unit = SizeUnit::Bytes;
+	while (_dataSize > (1024Ui64 * 1024Ui64) && unit != SizeUnit::GB) {
+		_dataSize /= 1024Ui64;
+		unit = static_cast<SizeUnit>(static_cast<int>(unit) + 1);
+	}
+
+	double displaySize = static_cast<double>(_dataSize);
+	if (displaySize > 1024Ui64 && unit != SizeUnit::GB) {
+		displaySize /= 1024.;
+		unit = static_cast<SizeUnit>(static_cast<int>(unit) + 1);
+	}
+
+	QString unitStr = QString::number(displaySize, 'f', 1);
+	switch (unit) {
+	case SizeUnit::Bytes:
+		unitStr += " Bytes";
+		break;
+	case SizeUnit::KB:
+		unitStr += " KB";
+		break;
+	case SizeUnit::MB:
+		unitStr += " MB";
+		break;
+	case SizeUnit::GB:
+		unitStr += " GB";
+		break;
+	default:
+		OT_LOG_E("Invalid size unit");
+		break;
+	}
+
+	_label->setText(_prefix + unitStr + _suffix);
+
 }

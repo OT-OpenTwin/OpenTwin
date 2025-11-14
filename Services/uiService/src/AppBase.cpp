@@ -2043,6 +2043,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 
 	this->connect(newEditor, &ot::TextEditorView::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
 	this->connect(newEditor->getTextEditor(), &ot::TextEditor::loadMoreRequested, this, &AppBase::slotTextLoadNextRequested);
+	this->connect(newEditor->getTextEditor(), &ot::TextEditor::loadAllRequested, this, &AppBase::slotTextLoadAllRequested);
 
 	OT_LOG_D("TextEditor created { \"Editor.Name\": \"" + _config.getEntityName() + "\" }");
 
@@ -2775,6 +2776,21 @@ void AppBase::slotTextLoadNextRequested(size_t _nextChunkStartIndex) {
 	for (const auto& viewPair : m_textEditors) {
 		if (viewPair.second->getTextEditor() == editor) {
 			ViewerAPI::loadNextDataChunk(viewPair.second->getViewData().getEntityName(), ot::WidgetViewBase::ViewText, _nextChunkStartIndex);
+			break;
+		}
+	}
+}
+
+void AppBase::slotTextLoadAllRequested(size_t _nextChunkStartIndex) {
+	ot::TextEditor* editor = dynamic_cast<ot::TextEditor*>(sender());
+	if (!editor) {
+		OT_LOG_E("Invalid sender");
+		return;
+	}
+
+	for (const auto& viewPair : m_textEditors) {
+		if (viewPair.second->getTextEditor() == editor) {
+			ViewerAPI::loadRemainingData(viewPair.second->getViewData().getEntityName(), ot::WidgetViewBase::ViewText, _nextChunkStartIndex);
 			break;
 		}
 	}

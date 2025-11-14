@@ -519,6 +519,7 @@ public Q_SLOTS:
 
 	void slotTextEditorSaveRequested();
 	void slotTextLoadNextRequested(size_t _nextChunkStartIndex);
+	void slotTextLoadAllRequested(size_t _nextChunkStartIndex);
 
 	void slotTableSaveRequested();
 

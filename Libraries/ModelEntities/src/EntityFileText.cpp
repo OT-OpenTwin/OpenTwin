@@ -150,17 +150,17 @@ ot::TextEditorCfg EntityFileText::createConfig(const ot::VisualisationCfg& _visu
 	result.setFileExtensionFilter(this->getFileFilter());
 
 	if (_visualizationConfig.getOverrideViewerContent()) {
-		std::string txt = this->getText();
-		if (_visualizationConfig.getLoadNextChunkOnly()) {
-			//const size_t approxChunkSize = 10;
-			const size_t approxChunkSize = 100000; // <= 100 KB chunk size
+		const std::string txt = this->getText();
 
-			result.setNextChunk(txt, _visualizationConfig.getNextChunkStartIndex(), approxChunkSize);
+		if (_visualizationConfig.getLoadNextChunkOnly()) {
+			result.setNextChunk(txt, _visualizationConfig.getNextChunkStartIndex());
 		}
 		else {
-			result.setPlainText(std::move(txt));
+			std::string remainingText = txt.substr(_visualizationConfig.getNextChunkStartIndex());
+			result.setPlainText(std::move(remainingText));
+			result.setIsChunk(_visualizationConfig.getNextChunkStartIndex() > 0);
+			result.setHasMore(false);
 		}
-		
 	}
 
 	const std::string highlight = PropertyHelper::getSelectionPropertyValue(this, "Syntax Highlight", "Text Properties");

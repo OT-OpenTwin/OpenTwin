@@ -39,7 +39,7 @@ bool TextVisualiser::requestVisualization(const VisualiserState& _state)
 		{
 			if(_state.m_selected)
 			{
-				FrontendAPI::instance()->messageModelService(createRequestDoc(_state, 0).toJson());
+				FrontendAPI::instance()->messageModelService(createRequestDoc(_state, 0, true).toJson());
 				return true;
 			}
 		}
@@ -56,7 +56,16 @@ bool TextVisualiser::requestNextDataChunk(size_t _nextChunkStartIndex) {
 
 	VisualiserState state;
 	state.m_setFocus = false;
-	FrontendAPI::instance()->messageModelService(createRequestDoc(state, _nextChunkStartIndex).toJson());
+	FrontendAPI::instance()->messageModelService(createRequestDoc(state, _nextChunkStartIndex, true).toJson());
+	return true;
+}
+
+bool TextVisualiser::requestRemainingData(size_t _nextChunkStartIndex) {
+	OTAssertNullptr(this->getSceneNode());
+
+	VisualiserState state;
+	state.m_setFocus = false;
+	FrontendAPI::instance()->messageModelService(createRequestDoc(state, _nextChunkStartIndex, false).toJson());
 	return true;
 }
 
@@ -68,10 +77,10 @@ void TextVisualiser::hideVisualisation(const VisualiserState& _state) {
 
 }
 
-ot::JsonDocument TextVisualiser::createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex) const {
+ot::JsonDocument TextVisualiser::createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex, bool _nextChunkOnly) const {
 	ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
 	visualisationCfg.setNextChunkStartIndex(_nextChunkStartIndex);
-	visualisationCfg.setLoadNextChunkOnly(true);
+	visualisationCfg.setLoadNextChunkOnly(_nextChunkOnly);
 	visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TEXTEDITOR_Setup);
 
 	ot::JsonDocument doc;

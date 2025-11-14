@@ -37,6 +37,7 @@ public:
 	//! @return true, if a new visualisation was requested
 	virtual bool requestVisualization(const VisualiserState& _state) override;
 	virtual bool requestNextDataChunk(size_t _nextChunkStartIndex) override;
+	virtual bool requestRemainingData(size_t _nextChunkStartIndex) override;
 	virtual void showVisualisation(const VisualiserState& _state) override;
 	virtual void hideVisualisation(const VisualiserState& _state) override;
 
@@ -44,6 +45,6 @@ protected:
 	virtual std::string getVisualiserTypeString() const override { return "Text"; };
 
 private:
-	ot::JsonDocument createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex) const;
+	ot::JsonDocument createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex, bool _nextChunkOnly) const;
 
 };

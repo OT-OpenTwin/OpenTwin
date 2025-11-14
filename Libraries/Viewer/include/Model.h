@@ -153,7 +153,8 @@ public:
 
 	void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);
 
-	void loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _curentChunkEndIndex);
+	void loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _nextChunkStartIndex);
+	void loadRemainingData(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _nextChunkStartIndex);
 
 	void hideEntities(std::list<unsigned long long> hiddenID);
 

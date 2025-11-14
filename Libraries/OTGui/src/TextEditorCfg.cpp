@@ -39,7 +39,7 @@
 ot::TextEditorCfg::TextEditorCfg() :
 	WidgetViewBase(WidgetViewBase::ViewText, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle | WidgetViewBase::ViewCloseOnEmptySelection),
 	m_syntax(DocumentSyntax::PlainText), m_readOnly(false), m_fileExtensionFilter(FileExtension::toFilterString(FileExtension::AllFiles)),
-	m_hasMore(false), m_nextChunkStartIx(0), m_isChunk(false)
+	m_hasMore(false), m_nextChunkStartIx(0), m_isChunk(false), m_remainingSize(0)
 {}
 
 ot::TextEditorCfg::TextEditorCfg(const ConstJsonObject & _jsonObject) : TextEditorCfg() {
@@ -57,6 +57,7 @@ void ot::TextEditorCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 	_object.AddMember("IsChunk", m_isChunk, _allocator);
 	_object.AddMember("HasMore", m_hasMore, _allocator);
 	_object.AddMember("NextChunkStart", m_nextChunkStartIx, _allocator);
+	_object.AddMember("RemainingSize", m_remainingSize, _allocator);
 	_object.AddMember("ReadOnly", m_readOnly, _allocator);
 	_object.AddMember("Syntax", JsonString(ot::toString(m_syntax), _allocator), _allocator);
 	_object.AddMember("FileExtensionsFilter", JsonString(m_fileExtensionFilter, _allocator), _allocator);
@@ -71,6 +72,7 @@ void ot::TextEditorCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_isChunk = json::getBool(_object, "IsChunk");
 	m_hasMore = json::getBool(_object, "HasMore");
 	m_nextChunkStartIx = json::getUInt64(_object, "NextChunkStart");
+	m_remainingSize = json::getUInt64(_object, "RemainingSize");
 	m_readOnly = json::getBool(_object, "ReadOnly");
 	m_syntax = stringToDocumentSyntax(json::getString(_object, "Syntax"));
 	m_fileExtensionFilter = json::getString(_object, "FileExtensionsFilter");
@@ -110,6 +112,7 @@ void ot::TextEditorCfg::setNextChunk(const std::string& _fullText, size_t _start
 	m_isChunk = true;
 	m_hasMore = (endIx < _fullText.size() - 1);
 	m_nextChunkStartIx = endIx + 1;
+	m_remainingSize = (m_hasMore ? (_fullText.size() - m_nextChunkStartIx) : 0);
 }
 
 void ot::TextEditorCfg::setFileExtensionFilter(const std::initializer_list<FileExtension::DefaultFileExtension>& _extensions) {

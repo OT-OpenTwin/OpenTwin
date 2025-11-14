@@ -29,6 +29,7 @@
 #include <QtCore/qstringlist.h>
 #include <QtCore/qregularexpression.h>
 
+class QFrame;
 class QPaintEvent;
 class QResizeEvent;
 
@@ -112,12 +113,12 @@ namespace ot {
 		void setNextChunkStartIndex(size_t _index) { m_nextChunkStartIx = _index; };
 		size_t getNextChunkStartIndex() const { return m_nextChunkStartIx; };
 		
-		void setShowMoreLabelVisible(bool _visible);
-		bool getShowMoreLabelVisible() const;
+		bool hasMoreToLoad() const;
 
 	Q_SIGNALS:							
 		void saveRequested();
 		void loadMoreRequested(size_t _nextChunkStartIndex);
+		void loadAllRequested(size_t _nextChunkStartIndex);
 
 	public Q_SLOTS:
 		void slotSaveRequested();
@@ -146,7 +147,8 @@ namespace ot {
 		void slotCurrentColorStyleChanged();
 		void slotSelectionChanged();
 		void slotShowMore();
-		void slotUpdateShowMorePosition();
+		void slotShowAll();
+		void slotUpdateLabelsPosition();
 
 		// ###################################################################################################################################
 
@@ -158,6 +160,7 @@ namespace ot {
 		void getCurrentLineSelection(QList<QTextEdit::ExtraSelection>& _selections);
 		void addAdditionalSelections(QList<QTextEdit::ExtraSelection>& _selections);
 		void updateDocumentSyntax();
+		void updateLabelText(Label* _label, const QString& _prefix, size_t _dataSize, const QString& _suffix);
 
 		TextEditorSearchPopup* m_searchPopup;
 		
@@ -173,8 +176,12 @@ namespace ot {
 
 		std::string m_fileExtensionFilter;
 
-		bool m_showMoreLabelVisible;
+		bool m_loadLabelsVisible;
+		bool m_loadMoreLabelVisible;
+		QFrame* m_loadWidgets;
+		Label* m_spacerLabel;
 		Label* m_showMoreLabel;
+		Label* m_showAllLabel;
 
 		size_t m_nextChunkStartIx;
 	};

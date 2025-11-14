@@ -738,9 +738,15 @@ void ViewerAPI::viewerTabChanged(const ot::WidgetViewBase& _viewInfo) {
 	}
 }
 
-void ViewerAPI::loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _curentChunkEndIndex) {
+void ViewerAPI::loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _nextChunkStartIndex) {
 	if (GlobalModel::instance() != nullptr) {
-		GlobalModel::instance()->loadNextDataChunk(_entityName, _type, _curentChunkEndIndex);
+		GlobalModel::instance()->loadNextDataChunk(_entityName, _type, _nextChunkStartIndex);
+	}
+}
+
+void ViewerAPI::loadRemainingData(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _nextChunkStartIndex) {
+	if (GlobalModel::instance() != nullptr) {
+		GlobalModel::instance()->loadRemainingData(_entityName, _type, _nextChunkStartIndex);
 	}
 }
 

@@ -149,7 +149,8 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);
 
-	__declspec(dllexport) void loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _curentChunkEndIndex);
+	__declspec(dllexport) void loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _nextChunkStartIndex);
+	__declspec(dllexport) void loadRemainingData(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _nextChunkStartIndex);
 
 	__declspec(dllexport) void viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, bool _isModified);
 
