@@ -108,8 +108,6 @@ void BlockHandler::removeAnyEntry(EntityBase* _entBase) {
 				for (const ot::UID& connection : connections) {
 					modifyConnection(connection,_entBase);
 				}
-				model->setModified();
-				model->modelChangeOperationCompleted("Connection updated");
 				blocks.erase(itBlock);
 				return;
 			}
