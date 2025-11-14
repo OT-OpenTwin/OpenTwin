@@ -769,8 +769,14 @@ void ot::GraphicsView::endItemMove() {
 
 	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
-		if (otItem && !otItem->isInternalItem()) {
-			otItem->notifyMoveIfRequired(changeEvent);
+		GraphicsConnectionItem* otConn = dynamic_cast<GraphicsConnectionItem*>(qItm);
+		if (otItem) {
+			if (otItem->isInternalItem()) {
+				otItem->notifyConnectionsMove(changeEvent);
+			}
+			else {
+				otItem->notifyMoveIfRequired(changeEvent);
+			}
 		}
 	}
 

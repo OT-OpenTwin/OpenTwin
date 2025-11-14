@@ -324,6 +324,10 @@ namespace ot {
 		//! @param _changeEvent Event to fill.
 		void notifyMoveIfRequired(GraphicsChangeEvent& _changeEvent);
 
+		//! @brief Adds all connections to the change event to notify about the move.
+		//! @param _changeEvent Event to fill.
+		void notifyConnectionsMove(GraphicsChangeEvent& _changeEvent);
+
 		//! @brief Checks for connection snap requests and fills the result event accordingly.
 		void checkConnectionSnapRequest(GraphicsSnapEvent& _result);
 

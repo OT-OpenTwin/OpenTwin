@@ -775,6 +775,22 @@ void ot::GraphicsItem::notifyMoveIfRequired(GraphicsChangeEvent& _changeEvent) {
 
 		if (!this->isSilencingConfigNotifications()) {
 			_changeEvent.addChangedItem(getConfiguration()->createCopy());
+			notifyConnectionsMove(_changeEvent);
+		}
+	}
+}
+
+void ot::GraphicsItem::notifyConnectionsMove(GraphicsChangeEvent& _changeEvent) {
+	for (GraphicsConnectionItem* conn : this->getAllConnections()) {
+		bool found = false;
+		for (const auto& changedConn : _changeEvent.getChangedConnections()) {
+			if (changedConn.getUid() == conn->getConfiguration().getUid()) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			_changeEvent.addChangedConnection(conn->getConfiguration());
 		}
 	}
 }
