@@ -23,6 +23,8 @@
 # Build Logs
 buildLog_Debug.txt
 buildLog_Release.txt
+testLog_Debug.txt
+testLog_Release.txt
 
 # Compiled Static libraries
 *.lai
@@ -42,6 +44,9 @@ packages
 
 # VS internal build directory
 /**/.vs
+
+# build directories
+build-*
 
 [Dd]ebug/
 [Dd]ebugPublic/
