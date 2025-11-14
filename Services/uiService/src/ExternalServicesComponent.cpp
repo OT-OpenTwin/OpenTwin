@@ -894,8 +894,7 @@ bool ExternalServicesComponent::sendRelayedRequest(RequestType _operation, const
 	return this->sendRelayedRequest(_operation, _url, _doc.toJson(), _response);
 }
 
-void ExternalServicesComponent::sendToModelService(const std::string& _message, std::string _response)
-{
+void ExternalServicesComponent::sendToModelService(const std::string& _message, std::string& _response) {
 	sendRelayedRequest(EXECUTE, m_modelServiceURL, _message, _response);
 }
 

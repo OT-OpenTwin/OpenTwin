@@ -48,6 +48,8 @@ FileHandler::FileHandler() {
 
 	m_actionHandler.connectAction(OT_ACTION_CMD_ImportTextFile, this, &FileHandler::handleImportTextFile);
 	m_actionHandler.connectAction(OT_ACTION_CMD_ImportPyhtonScript, this, &FileHandler::handleImportPythonScript);
+
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_RequestTextData, this, &FileHandler::handleRequestTextData);
 }
 
 void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
@@ -262,6 +264,30 @@ ot::ReturnMessage FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
 		OT_LOG_E(ret.getWhat());
 		return ret;
 	}
+}
+
+ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document) {
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+
+	std::string entityName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
+	EntityBase* entityBase = model->findEntityFromName(entityName);
+	if (!entityBase) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity not found  { \"Name\": \"" + entityName + "\" }");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	IVisualisationText* textVisualisationEntity = dynamic_cast<IVisualisationText*>(entityBase);
+	if (!textVisualisationEntity) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity has no text visualization interface { \"Name\": \"" + entityName + "\", \"Type\": \"" + entityBase->getClassName() + "\" }");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	ot::ReturnMessage ret(ot::ReturnMessage::Ok);
+	ret.setWhat(textVisualisationEntity->getText());
+	return ret;
 }
 
 void FileHandler::storeChangedText(IVisualisationText* _entity, const std::string _text, size_t _nextChunkStartIndex)

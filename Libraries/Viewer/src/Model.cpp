@@ -31,6 +31,8 @@
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/TextEditorView.h"
 
+#include "OTCommunication/ActionTypes.h"
+
 #include <osg/BlendFunc>
 #include <osg/CullFace>
 #include <osg/Switch>
@@ -46,7 +48,9 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
+#include "OTCore/ReturnMessage.h"
 #include "OTCore/LogDispatcher.h"
+
 #include "SceneNodeBase.h"
 #include "SceneNodeContainer.h"
 #include "SceneNodeGeometry.h"
@@ -71,7 +75,7 @@
 
 #include <QtWidgets/qheaderview.h>
 
-
+#include <fstream>
 
 Model::Model() :
 	osgRootNode(nullptr),
@@ -1599,12 +1603,10 @@ void Model::exportTextEditor(void) {
 	);
 
 	if (!filePath.empty()) {
-		if (edit->saveToFile(QString::fromStdString(filePath))) {
-			api->displayText("Exported successfully: \"" + filePath + "\"\n");
-		}
-		else {
-			OT_LOG_E("File export failed");
-		}
+		FrontendAPI::instance()->lockSelectionAndModification(true);
+		FrontendAPI::instance()->setProgressBarVisibility("Export text", true, true);
+		std::thread exportThread(&Model::exportTextWorker, this, filePath, view->getViewData().getEntityName());
+		exportThread.detach();
 	}
 }
 
@@ -3474,6 +3476,30 @@ void Model::removeFromMaps(const SceneNodeBase* _node) {
 	}
 	treeItemToSceneNodesMap.erase(_node->getTreeItemID());
 	modelItemToSceneNodesMap.erase(_node->getModelEntityID());
+}
+
+void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestTextData, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(_entityName, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::ReturnMessage retMsg = ot::ReturnMessage::fromJson(FrontendAPI::instance()->messageModelService(doc.toJson()));
+	if (!retMsg.isOk()) {
+		OT_LOG_E("Could not get text data from model: " + retMsg.getWhat());
+	} else if (!retMsg.getWhat().empty()) {
+		std::ofstream outFile(_filePath);
+		if (outFile.is_open()) {
+			outFile << retMsg.getWhat();
+			outFile.close();
+			FrontendAPI::instance()->displayText("File exported successfully: " + _filePath + "\n");
+		}
+		else {
+			OT_LOG_E("Could not open file for writing: " + _filePath);
+		}
+	}
+
+	FrontendAPI::instance()->lockSelectionAndModification(false);
+	FrontendAPI::instance()->setProgressBarVisibility("Export text", false, true);
 }
 
 void Model::setTransparency(double transparencyValue)

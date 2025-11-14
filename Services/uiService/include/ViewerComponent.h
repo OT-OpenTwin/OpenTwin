@@ -76,13 +76,17 @@ public:
 
 	virtual void updateVTKEntity(unsigned long long modelEntityID) override;
 
-	virtual void messageModelService(const std::string& _message) override;
+	virtual std::string messageModelService(const std::string& _message) override;
 
 	virtual void removeGraphicsElements(ot::UID _modelID) override;
 
 	virtual std::string getOpenFileName(const std::string& _title, const std::string& _path, const std::string& _filters) override;
 
 	virtual std::string getSaveFileName(const std::string& _title, const std::string& _path, const std::string& _filters) override;
+
+	virtual void setProgressBarVisibility(const QString& _text, bool _visible, bool _continous) override;
+
+	virtual void setProgressBarValue(int _value) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	

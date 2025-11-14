@@ -265,6 +265,8 @@ private:
 	void storeInMaps(SceneNodeBase* _node);
 	void removeFromMaps(const SceneNodeBase* _node);
 
+	void exportTextWorker(std::string _filePath, std::string _entityName);
+
 	// Attributes
 	enum { ITEM_SELECTED = 1, ITEM_EXPANDED = 2 };
 

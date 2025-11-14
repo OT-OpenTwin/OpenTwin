@@ -86,7 +86,7 @@ void ViewerComponent::addKeyShortcut(const std::string& keySequence) {
 }
 
 void ViewerComponent::lockSelectionAndModification(bool flag) {
-	AppBase::instance()->slotLockSelectionAndModification(flag);
+	ot::WindowAPI::lockUI(flag);
 }
 
 void ViewerComponent::removeViewer(ot::UID viewerID) {
@@ -178,9 +178,10 @@ void ViewerComponent::updateVTKEntity(unsigned long long modelEntityID) {
 	AppBase::instance()->getExternalServicesComponent()->requestUpdateVTKEntity(modelEntityID);
 }
 
-void ViewerComponent::messageModelService(const std::string& _message) {
+std::string ViewerComponent::messageModelService(const std::string& _message) {
 	std::string response;
 	AppBase::instance()->getExternalServicesComponent()->sendToModelService(_message, response);
+	return response;
 }
 
 void ViewerComponent::removeGraphicsElements(ot::UID _modelID) {
@@ -209,6 +210,14 @@ std::string ViewerComponent::getSaveFileName(const std::string& _title, const st
 		QString::fromStdString(_path),
 		QString::fromStdString(_filters)
 	).toStdString();
+}
+
+void ViewerComponent::setProgressBarVisibility(const QString& _text, bool _visible, bool _continous) {
+	ot::WindowAPI::setProgressBarVisibility(_text, _visible, _continous);
+}
+
+void ViewerComponent::setProgressBarValue(int _value) {
+	ot::WindowAPI::setProgressBarValue(_value);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

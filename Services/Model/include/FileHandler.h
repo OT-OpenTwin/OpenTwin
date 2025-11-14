@@ -72,6 +72,8 @@ private:
 	virtual ot::ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _text, size_t _nextChunkStartIndex) override;
 	virtual ot::ReturnMessage tableSaveRequested(const ot::TableCfg& _cfg) override;
 
+	ot::ReturnMessage handleRequestTextData(ot::JsonDocument& _document);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Helper

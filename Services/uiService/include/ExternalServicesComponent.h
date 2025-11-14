@@ -157,7 +157,7 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Messaging
-	void sendToModelService(const std::string& _message, std::string _response);
+	void sendToModelService(const std::string& _message, std::string& _response);
 
 	bool sendRelayedRequest(RequestType _operation, ot::OwnerService _service, const ot::JsonDocument& _doc, std::string& _response);
 	bool sendRelayedRequest(RequestType _operation, const ot::BasicServiceInformation& _serviceInformation, ot::JsonDocument& _doc, std::string& _response);

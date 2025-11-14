@@ -27,6 +27,9 @@
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
 
+// Qt header
+#include <QtCore/qstring.h>
+
 // std header
 #include <list>
 #include <string>
@@ -72,12 +75,15 @@ public:
 
 	virtual void updateVTKEntity(unsigned long long modelEntityID) {};
 
-	virtual void messageModelService(const std::string& _message) {};
+	virtual std::string messageModelService(const std::string& _message) { return std::string(); };
 
 	virtual void removeGraphicsElements(ot::UID _modelID) {};
 
 	virtual std::string getOpenFileName(const std::string& _title, const std::string& _path, const std::string& _filters) { return std::string(); };
 	virtual std::string getSaveFileName(const std::string& _title, const std::string& _path, const std::string& _filters) { return std::string(); };
+
+	virtual void setProgressBarVisibility(const QString& _text, bool _visible, bool _continous) {};
+	virtual void setProgressBarValue(int _value) {};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
