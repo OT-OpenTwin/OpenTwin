@@ -1603,10 +1603,23 @@ void Model::exportTextEditor(void) {
 	);
 
 	if (!filePath.empty()) {
-		FrontendAPI::instance()->lockSelectionAndModification(true);
-		FrontendAPI::instance()->setProgressBarVisibility("Export text", true, true);
-		std::thread exportThread(&Model::exportTextWorker, this, filePath, view->getViewData().getEntityName());
-		exportThread.detach();
+		if (edit->getShowMoreLabelVisible()) {
+			FrontendAPI::instance()->lockSelectionAndModification(true);
+			FrontendAPI::instance()->setProgressBarVisibility("Export text", true, true);
+			std::thread exportThread(&Model::exportTextWorker, this, filePath, view->getViewData().getEntityName());
+			exportThread.detach();
+		}
+		else {
+			std::ofstream outFile(filePath);
+			if (outFile.is_open()) {
+				outFile << edit->toPlainText().toStdString();
+				outFile.close();
+				FrontendAPI::instance()->displayText("File exported successfully: " + filePath + "\n");
+			}
+			else {
+				OT_LOG_E("Could not open file for writing: " + filePath);
+			}
+		}
 	}
 }
 
