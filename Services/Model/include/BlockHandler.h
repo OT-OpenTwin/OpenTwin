@@ -34,14 +34,17 @@ public:
 	BlockHandler() = default;
 	~BlockHandler() = default;
 
+	//Fill map function
+	void processEntity(EntityBase* entBase);
+
 	// Getter
 	const std::map<ot::UID, ot::UIDList>& getBlocksForEditor(ot::UID editorId) const;
 	ot::UIDList& getConnections(ot::UID editorId, ot::UID blockId);
 
 	// Setter
-	void addConnection(ot::UID editorId, ot::UID blockId, ot::UID connection);
-	bool addEmptyBlockToEditor(ot::UID editorId, ot::UID blockId);
-	bool addEditor(ot::UID editorId);
+	void addConnection(ot::UID editorId, EntityBlockConnection& _toBeAddedConnection);
+	void addBlock(ot::UID editorId, ot::UID blockId);
+	void addEditor(ot::UID editorId);
 
 	// Remover
 	void removeFromMap(EntityBase* entBase);

@@ -3418,44 +3418,7 @@ void Model::projectOpen(const std::string& _customVersion)
 		}
 		
 		auto& blockHandler = Application::instance()->getBlockHandler();
-		EntityBase* entBase = entity.second;
-		EntityBlock* entBlock = dynamic_cast<EntityBlock*>(entBase);
-		EntityBlockConnection* entBlockConnection = dynamic_cast<EntityBlockConnection*>(entBase);
-		EntityGraphicsScene* entGraphicsScene = dynamic_cast<EntityGraphicsScene*>(entBase);
-		if (entGraphicsScene) {
-			blockHandler.addEditor(entGraphicsScene->getEntityID());
-		}
-		else if (entBlock) {
-			std::string rootName = ot::EntityName::getSubName(entBlock->getName(), 0).value();
-			std::string editorName = ot::EntityName::getSubName(entBlock->getName(), 1).value();
-			std::string editorFullPath = rootName + "/" + editorName;
-			EntityBase* editorBase = findEntityFromName(editorFullPath);
-			EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
-			if (!editor) {
-				OT_LOG_E("Failed to cast into EntityGraphicsScene");
-				continue;
-			}
-
-			bool successFull = blockHandler.addEmptyBlockToEditor(editor->getEntityID(), entBlock->getEntityID());
-			if (!successFull) {
-				OT_LOG_E("Failed to add block to BlockHandlerMap");
-				continue;
-			}
-		}
-		else if (entBlockConnection) {
-			std::string rootName = ot::EntityName::getSubName(entBlockConnection->getName(), 0).value();
-			std::string editorName = ot::EntityName::getSubName(entBlockConnection->getName(), 1).value();
-			std::string editorFullPath = rootName + "/" + editorName;
-			EntityBase* editorBase = findEntityFromName(editorFullPath);
-			EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
-			if (!editor) {
-				OT_LOG_E("Failed to cast into EntityGraphicsScene");
-				continue;
-			}
-			
-			blockHandler.addConnection(editor->getEntityID(),entBlockConnection->getConnectionCfg().getOriginUid(),entBlockConnection->getEntityID());
-			blockHandler.addConnection(editor->getEntityID(),entBlockConnection->getConnectionCfg().getDestinationUid(),entBlockConnection->getEntityID());
-		}
+		blockHandler.processEntity(entity.second);
 	}
 
 	

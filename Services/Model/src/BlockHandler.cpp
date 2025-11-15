@@ -40,6 +40,53 @@
 #include "EntityBlockCircuitElement.h"
 #include "EntityBlockCircuitConnector.h"
 #include "PropertyHelper.h"
+#include "OTCore/EntityName.h"
+
+void BlockHandler::processEntity(EntityBase* _entBase) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+	if (_entBase == nullptr) {
+		OT_LOG_E("EntityBase pointer is null");
+		return;
+	}
+	
+	EntityGraphicsScene* entGraphicsScene = dynamic_cast<EntityGraphicsScene*>(_entBase);
+	if (entGraphicsScene) {
+		addEditor(entGraphicsScene->getEntityID());
+		return;
+	}
+
+	EntityBlock* entBlock = dynamic_cast<EntityBlock*>(_entBase);
+	if (entBlock) {
+		std::string rootName = ot::EntityName::getSubName(entBlock->getName(), 0).value();
+		std::string editorName = ot::EntityName::getSubName(entBlock->getName(), 1).value();
+		std::string editorFullPath = rootName + "/" + editorName;
+		EntityBase* editorBase = model->findEntityFromName(editorFullPath);
+		EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+		if (!editor) {
+			OT_LOG_E("Failed to cast into EntityGraphicsScene");
+			return;
+		}
+		addBlock(editor->getEntityID(), entBlock->getEntityID());
+		return;
+	}
+
+	EntityBlockConnection* entBlockConnection = dynamic_cast<EntityBlockConnection*>(_entBase);
+	if (entBlockConnection) {
+		std::string rootName = ot::EntityName::getSubName(entBlockConnection->getName(), 0).value();
+		std::string editorName = ot::EntityName::getSubName(entBlockConnection->getName(), 1).value();
+		std::string editorFullPath = rootName + "/" + editorName;
+		EntityBase* editorBase = model->findEntityFromName(editorFullPath);
+		EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+		if (!editor) {
+			OT_LOG_E("Failed to cast into EntityGraphicsScene");
+			return;
+		}
+		addConnection(editor->getEntityID(), *entBlockConnection);
+		return;
+	}
+}
 
 const std::map<ot::UID, ot::UIDList>& BlockHandler::getBlocksForEditor(ot::UID editorId) const {
 	static const std::map<ot::UID, ot::UIDList> emptyMap{};
@@ -62,19 +109,25 @@ ot::UIDList& BlockHandler::getConnections(ot::UID editorId, ot::UID blockId) {
 	return emptyList; 
 }
 
-void BlockHandler::addConnection(ot::UID editorId, ot::UID blockId, ot::UID connection) {
-	m_viewBlockConnectionsMap[editorId][blockId].push_back(connection);
+void BlockHandler::addConnection(ot::UID editorId, EntityBlockConnection& _toBeAddedConnection) {
+	auto& originList = m_viewBlockConnectionsMap[editorId][_toBeAddedConnection.getConnectionCfg().getOriginUid()];
+	if (std::find(originList.begin(), originList.end(), _toBeAddedConnection.getEntityID()) == originList.end()) {
+		originList.push_back(_toBeAddedConnection.getEntityID());
+	}
+
+	auto& destList = m_viewBlockConnectionsMap[editorId][_toBeAddedConnection.getConnectionCfg().getDestinationUid()];
+	if (std::find(destList.begin(), destList.end(), _toBeAddedConnection.getEntityID()) == destList.end()) {
+		destList.push_back(_toBeAddedConnection.getEntityID());
+	}
 }
 
-bool BlockHandler::addEmptyBlockToEditor(ot::UID editorId, ot::UID blockId) {
+void BlockHandler::addBlock(ot::UID editorId, ot::UID blockId) {
 	auto& blocksMap = m_viewBlockConnectionsMap[editorId];
-	auto result = blocksMap.emplace(blockId, ot::UIDList{});
-	return result.second; 
+	blocksMap.emplace(blockId, ot::UIDList{});
 }
 
-bool BlockHandler::addEditor(ot::UID editorId) {
-	auto result = m_viewBlockConnectionsMap.emplace(editorId, std::map<ot::UID, ot::UIDList>{});
-	return result.second;
+void BlockHandler::addEditor(ot::UID editorId) {
+	m_viewBlockConnectionsMap.emplace(editorId, std::map<ot::UID, ot::UIDList>{});
 }
 
 void BlockHandler::removeFromMap(EntityBase* _entBase) {
@@ -201,7 +254,7 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 	model->addEntitiesToModel(modelStateInfo, "Added block", true, true, true);
 
 	// Add Block to Map
-	addEmptyBlockToEditor(editor->getEntityID(), createdBlock->getEntityID());
+	addBlock(editor->getEntityID(), createdBlock->getEntityID());
 
 	// Check if any service wants to be notified about this change
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
@@ -400,7 +453,7 @@ ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEven
 	const std::list<ot::GraphicsConnectionCfg>& changedConnections = _changeEvent.getChangedConnections();
 	if(!changedConnections.empty()) {
 		for(const ot::GraphicsConnectionCfg& connectionCfg : changedConnections) {
-			if(!updateConnection(connectionCfg, _changeEvent)) {
+	if(!updateConnection(connectionCfg, _changeEvent)) {
 				OT_LOG_E("Could not handle connection changed event");
 				return ot::ReturnMessage::Failed;
 			}
@@ -823,8 +876,8 @@ void BlockHandler::createConnection( EntityGraphicsScene* _scene, EntityBlock* _
 	_newModelStateInfo.addTopologyEntity(_connectionEntity);
 
 	// Add connection to map
-	addConnection(_scene->getEntityID(), _connectionEntity.getConnectionCfg().getOriginUid(), _connectionEntity.getEntityID());
-	addConnection(_scene->getEntityID(), _connectionEntity.getConnectionCfg().getDestinationUid(), _connectionEntity.getEntityID());
+	addConnection(_scene->getEntityID(), _connectionEntity);
+
 	return;
 }
 
