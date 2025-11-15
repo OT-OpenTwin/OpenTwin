@@ -4786,6 +4786,9 @@ void Model::updateModelStateForUndoRedo()
 	for (auto entity : entityMap)
 	{
 		entity.second->resetModified();
+
+		// Need to process all entities to ensure that the map is being filled up after the removing of entities
+		Application::instance()->getBlockHandler().processEntity(entity.second);
 	}
 
 	resetModified();
