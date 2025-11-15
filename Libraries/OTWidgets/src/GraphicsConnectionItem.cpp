@@ -495,7 +495,7 @@ void ot::GraphicsConnectionItem::updateOriginConnectionInformation() {
 	}
 	else {
 		m_config.setOriginConnectable("");
-		m_config.setOriginUid(0);
+		m_config.setOriginUid(ot::invalidUID);
 	}
 }
 
@@ -506,7 +506,7 @@ void ot::GraphicsConnectionItem::updateDestConnectionInformation() {
 	}
 	else {
 		m_config.setDestConnectable("");
-		m_config.setDestUid(0);
+		m_config.setDestUid(ot::invalidUID);
 	}
 }
 
