@@ -18,13 +18,12 @@
 // @otlicense-end
 
 
+#include "DataBase.h"
+#include "EntityMeshTet.h"
 #include "EntityMeshTetItem.h"
+#include "EntityMeshTetFace.h"
 #include "EntityMeshTetItemDataTets.h"
 #include "EntityMeshTetItemDataTetedges.h"
-#include "EntityMeshTet.h"
-#include "EntityMeshTetFace.h"
-#include "DataBase.h"
-#include "OldTreeIcon.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -44,7 +43,10 @@ EntityMeshTetItem::EntityMeshTetItem(ot::UID ID, EntityBase* parent, EntityObser
 	numberOfTets(0),
 	numberOfTetEdges(0)
 {
-
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("MeshItemVisible");
+	treeItem.setHiddenIcon("MeshItemHidden");
+	this->setTreeItem(treeItem, true);
 }
 
 EntityMeshTetItem::~EntityMeshTetItem()
@@ -364,23 +366,20 @@ void EntityMeshTetItem::addVisualizationNodes(void)
 
 void EntityMeshTetItem::addVisualizationItem(bool isHidden)
 {
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "MeshItemVisible";
-	treeIcons.hiddenIcon = "MeshItemHidden";
+	
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+	
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(DataBase::instance().getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, this->getCurrentEntityVersion(this->getEntityID()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_TETEDGES_ID, meshDataTetEdgesStorageId, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_TETEDGES_Version, this->getCurrentEntityVersion(meshDataTetEdgesStorageId), doc.GetAllocator());
-
-	treeIcons.addToJsonDoc(doc);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(getEntityID(), getCurrentEntityVersion(getEntityID())));

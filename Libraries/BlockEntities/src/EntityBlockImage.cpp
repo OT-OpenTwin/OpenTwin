@@ -32,10 +32,10 @@ EntityBlockImage::EntityBlockImage(ot::UID _ID, EntityBase* _parent, EntityObser
 	: EntityBlock(_ID, _parent, _obs, _ms), m_imageUID(ot::invalidUID), m_imageVersion(ot::invalidUID),
 	m_image(nullptr), m_imageFormat(ot::ImageFileFormat::PNG)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "Tree/Image";
-	icon.hiddenIcon = "Tree/Image";
-	setNavigationTreeIcon(icon);
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("Tree/Image");
+	treeItem.setHiddenIcon("Tree/Image");
+	this->setTreeItem(treeItem, true);
 
 	setBlockTitle("Image");
 

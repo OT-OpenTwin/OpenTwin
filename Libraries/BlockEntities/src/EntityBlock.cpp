@@ -144,7 +144,7 @@ std::string EntityBlock::serialiseAsJSON()
 	return entireDoc.toJson();
 }
 
-bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
 {
 	try
 	{
@@ -182,9 +182,7 @@ void EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 	storage.append(
 		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(m_coordinate2DEntityID)),
 		bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName),
-		bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_graphicsPickerKey),
-		bsoncxx::builder::basic::kvp("NavigationIconVisible", m_navigationTreeIcon.visibleIcon),
-		bsoncxx::builder::basic::kvp("NavigationIconHidden", m_navigationTreeIcon.hiddenIcon)
+		bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_graphicsPickerKey)
 	);
 
 	auto connectorsArray = bsoncxx::builder::basic::array();
@@ -212,17 +210,6 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 		m_connectorsByName[connector.getConnectorName()]=(connector);
 	}
 
-	auto iconVisibleIt = doc_view.find("NavigationIconVisible");
-	if (iconVisibleIt != doc_view.end())
-	{
-		m_navigationTreeIcon.visibleIcon = iconVisibleIt->get_utf8().value.data();
-	}
-	auto iconHiddenIt = doc_view.find("NavigationIconHidden");
-	if (iconHiddenIt != doc_view.end())
-	{
-		m_navigationTreeIcon.hiddenIcon = iconHiddenIt->get_utf8().value.data();
-	}
-
 	auto pickerIt = doc_view.find("GraphicsPickerKey");
 	if (pickerIt != doc_view.end())
 	{
@@ -245,11 +232,10 @@ void EntityBlock::createNavigationTreeEntry()
 {
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-		m_navigationTreeIcon.addToJsonDoc(doc);
+		doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+
 		getObserver()->sendMessageToViewer(doc);
 }
 
@@ -284,7 +270,7 @@ void EntityBlock::createBlockItem()
 	ot::VisualisationCfg visualisationCfg;
 	ot::JsonObject visualisationCfgJson;
 	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJson, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, reqDoc.GetAllocator());
 
 	ot::JsonObject pckgObj;
 	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());

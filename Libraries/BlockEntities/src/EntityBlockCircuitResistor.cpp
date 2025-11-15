@@ -35,10 +35,10 @@ static EntityFactoryRegistrar<EntityBlockCircuitResistor> registrar(EntityBlockC
 EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms) 
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "ResistorBG";
-	icon.hiddenIcon = "ResistorBG";
-	setNavigationTreeIcon(icon);
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("ResistorBG");
+	treeItem.setHiddenIcon("ResistorBG");
+	this->setTreeItem(treeItem, true);
 
 	setBlockTitle("R");
 

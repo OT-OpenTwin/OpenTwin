@@ -17,10 +17,8 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "EntityVisCartesianFaceScalar.h"
-#include "OldTreeIcon.h"
 #include "Database.h"
+#include "EntityVisCartesianFaceScalar.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

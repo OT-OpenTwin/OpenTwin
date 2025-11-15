@@ -29,8 +29,6 @@ public:
 	EntitySolverMonitor(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntitySolverMonitor();
 
-	virtual void addVisualizationNodes(void) override;
-
 	virtual std::string getClassName(void) const override { return "EntitySolverMonitor"; };
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };

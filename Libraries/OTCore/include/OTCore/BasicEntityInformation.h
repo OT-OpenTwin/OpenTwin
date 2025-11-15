@@ -52,6 +52,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		void setEntityName(const std::string& _entityName) { m_entityName = _entityName; };
+		void setEntityName(std::string&& _entityName) { m_entityName = std::move(_entityName); };
 		const std::string& getEntityName(void) const { return m_entityName; };
 
 		void setEntityID(UID _entityId) { m_entityId = _entityId; };

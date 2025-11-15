@@ -20,9 +20,8 @@
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 
-#include "EntityParameter.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityParameter.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -33,7 +32,10 @@ static EntityFactoryRegistrar<EntityParameter> registrar("EntityParameter");
 EntityParameter::EntityParameter(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
 	EntityBase(ID, parent, obs, ms)
 {
-	
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("ParameterVisible");
+	treeItem.setHiddenIcon("ParameterHidden");
+	this->setTreeItem(treeItem, true);
 }
 
 EntityParameter::~EntityParameter()
@@ -130,18 +132,11 @@ void EntityParameter::addVisualizationNodes(void)
 
 void EntityParameter::addVisualizationItem(bool isHidden)
 {
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "ParameterVisible";
-	treeIcons.hiddenIcon = "ParameterHidden";
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-	treeIcons.addToJsonDoc(doc);
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 }

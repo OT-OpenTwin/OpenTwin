@@ -33,11 +33,11 @@ static EntityFactoryRegistrar<EntityBlockCircuitInductor> registrar(EntityBlockC
 EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "Inductor";
-	icon.hiddenIcon = "Inductor";
-	setNavigationTreeIcon(icon);
-
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("Inductor");
+	treeItem.setHiddenIcon("Inductor");
+	this->setTreeItem(treeItem, true);
+	
 	setBlockTitle("L");
 
 	const std::string connectorNameLeft = "positivePole";

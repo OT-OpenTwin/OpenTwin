@@ -33,11 +33,11 @@ static EntityFactoryRegistrar<EntityBlockCircuitDiode> registrar(EntityBlockCirc
 EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) 
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "Diod2";
-	icon.hiddenIcon = "Diod2";
-	setNavigationTreeIcon(icon);
-
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("Diod2");
+	treeItem.setHiddenIcon("Diod2");
+	this->setTreeItem(treeItem, true);
+	
 	setBlockTitle("D");
 
 	const std::string connectorNameLeft = "positivePole";

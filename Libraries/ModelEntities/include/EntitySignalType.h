@@ -27,8 +27,7 @@ public:
 	EntitySignalType() : EntitySignalType(0, nullptr, nullptr, nullptr) {};
 	EntitySignalType(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntitySignalType();
-	virtual void addVisualizationNodes(void) override;
-
+	
 	virtual std::string getClassName(void) const override { return "EntitySignalType"; };
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };

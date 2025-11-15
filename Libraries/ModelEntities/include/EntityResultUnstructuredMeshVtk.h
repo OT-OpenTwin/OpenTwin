@@ -24,7 +24,6 @@
 
 #include "EntityBase.h"
 #include "EntityResultBase.h"
-#include "OldTreeIcon.h"
 #include "EntityBinaryData.h"
 
 class __declspec(dllexport) EntityResultUnstructuredMeshVtk : public EntityBase, public EntityResultBase

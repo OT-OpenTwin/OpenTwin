@@ -25,6 +25,7 @@
 #include "EntityBlockHierarchicalProjectItem.h"
 
 #include "OTGui/GraphicsHierarchicalProjectItemBuilder.h"
+#include "OTCommunication/ActionTypes.h"
 
 static EntityFactoryRegistrar<EntityBlockHierarchicalProjectItem> registrar(EntityBlockHierarchicalProjectItem::className());
 
@@ -32,10 +33,10 @@ EntityBlockHierarchicalProjectItem::EntityBlockHierarchicalProjectItem(ot::UID _
 	: EntityBlock(_ID, _parent, _obs, _ms), m_previewUID(ot::invalidUID), m_previewVersion(ot::invalidUID), m_previewData(nullptr),
 	m_previewFormat(ot::ImageFileFormat::PNG)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "ProjectTemplates/DefaultIcon";
-	icon.hiddenIcon = "ProjectTemplates/DefaultIcon";
-	setNavigationTreeIcon(icon);
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("ProjectTemplates/DefaultIcon");
+	treeItem.setHiddenIcon("ProjectTemplates/DefaultIcon");
+	this->setTreeItem(treeItem, true);
 
 	setBlockTitle("Hierarchical Project Item");
 
@@ -97,6 +98,22 @@ void EntityBlockHierarchicalProjectItem::createProperties() {
 	prop->setVisible(false);
 }
 
+void EntityBlockHierarchicalProjectItem::addVisualizationNodes() {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::EntityTreeItem treeItem = this->getTreeItem();
+	treeItem.setVisibleIcon("ProjectTemplates/" + this->getProjectInformation().getProjectType());
+	treeItem.setHiddenIcon("ProjectTemplates/" + this->getProjectInformation().getProjectType());
+
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(treeItem, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+
+	getObserver()->sendMessageToViewer(doc);
+
+	this->createBlockItem();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Data accessors
@@ -133,11 +150,6 @@ void EntityBlockHierarchicalProjectItem::setProjectInformation(const ot::Project
 	m_projectName = _info.getProjectName();
 	m_projectType = _info.getProjectType();
 	m_collectionName = _info.getCollectionName();
-
-	OldTreeIcon icon;
-	icon.visibleIcon = "ProjectTemplates/" + _info.getProjectType();
-	icon.hiddenIcon = "ProjectTemplates/" + _info.getProjectType();
-	setNavigationTreeIcon(icon);
 
 	setModified();
 }

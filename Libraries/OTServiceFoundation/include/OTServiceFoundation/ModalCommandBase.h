@@ -29,7 +29,6 @@
 #include <list>
 #include <string>
 #include <map>
-#include "OldTreeIcon.h"
 
 namespace ot {
 

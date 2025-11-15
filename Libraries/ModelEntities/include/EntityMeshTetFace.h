@@ -23,7 +23,6 @@
 #include "EntityContainer.h"
 #include "BoundingBox.h"
 #include "EntityBase.h"
-#include "OldTreeIcon.h"
 
 #include <list>
 

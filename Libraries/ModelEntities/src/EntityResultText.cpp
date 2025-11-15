@@ -20,12 +20,11 @@
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 
+#include "OTGui/VisualisationTypes.h"
 #include "OTCommunication/ActionTypes.h"
+#include "DataBase.h"
 #include "EntityResultText.h"
 #include "EntityResultTextData.h"
-#include "DataBase.h"
-#include "OldTreeIcon.h"
-#include "OTGui/VisualisationTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -34,6 +33,14 @@ static EntityFactoryRegistrar<EntityResultText> registrar("EntityResultText");
 EntityResultText::EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
 	EntityBase(ID, parent, obs, ms)
 {
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("TextVisible");
+	treeItem.setHiddenIcon("TextHidden");
+	this->setTreeItem(treeItem, true);
+
+	ot::VisualisationTypes visTypes;
+	visTypes.addTextVisualisation();
+	this->setVisualizationTypes(visTypes, true);
 }
 
 EntityResultText::~EntityResultText()
@@ -91,22 +98,11 @@ void EntityResultText::addVisualizationNodes(void)
 
 void EntityResultText::addVisualizationItem(bool isHidden)
 {
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "TextVisible";
-	treeIcons.hiddenIcon = "TextHidden";
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-	ot::VisualisationTypes visTypes;
-	visTypes.addTextVisualisation();
-
-	visTypes.addToJsonObject(doc, doc.GetAllocator());
-	treeIcons.addToJsonDoc(doc);
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 }

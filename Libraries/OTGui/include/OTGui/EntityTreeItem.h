@@ -35,6 +35,13 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
+		// Operators
+
+		bool operator == (const EntityTreeItem& _other) const;
+		bool operator != (const EntityTreeItem& _other) const;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
 		// Public: Virtual methods
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
@@ -44,7 +51,7 @@ namespace ot {
 
 		// Setter / Getter
 
-		void resetChangeFlags() {
+		void resetModified() {
 			m_iconsChanged = false;
 			m_isEditableChanged = false;
 			m_selectChildsChanged = false;

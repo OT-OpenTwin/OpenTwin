@@ -58,8 +58,9 @@ EntityResultText *ot::components::ModelComponent::addResultTextEntity(const std:
 {
 	EntityResultText *textItem = new EntityResultText(createEntityUID(), nullptr, nullptr, nullptr);
 
+	textItem->setTreeItemEditable(false);
+
 	textItem->setName(name);
-	textItem->setEditable(false);
 
 	// Now we store the data in the entity
 	textItem->setText(text);

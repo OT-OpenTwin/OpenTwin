@@ -17,10 +17,8 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "EntityVis2D3D.h"
-#include "OldTreeIcon.h"
 #include "Database.h"
+#include "EntityVis2D3D.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -39,6 +37,10 @@ EntityVis2D3D::EntityVis2D3D(ot::UID ID, EntityBase *parent, EntityObserver *obs
 	visualizationDataVersion(0)
 	//source(nullptr)
 {
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("Vis2DVisible");
+	treeItem.setHiddenIcon("Vis2DHidden");
+	this->setTreeItem(treeItem, true);
 }
 
 EntityVis2D3D::~EntityVis2D3D()
@@ -109,16 +111,8 @@ void EntityVis2D3D::addVisualizationNodes(void)
 {
 	if (!getName().empty())
 	{
-		OldTreeIcon treeIcons;
-		treeIcons.size = 32;
-		treeIcons.visibleIcon = "Vis2DVisible";
-		treeIcons.hiddenIcon = "Vis2DHidden";
-
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(DataBase::instance().getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_DataID, visualizationDataID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_DataVersion, visualizationDataVersion, doc.GetAllocator());
@@ -128,7 +122,8 @@ void EntityVis2D3D::addVisualizationNodes(void)
 		doc.AddMember(OT_ACTION_PARAM_MODEL_MeshVersion, meshVersion, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, this->getInitiallyHidden(), doc.GetAllocator());
 
-		treeIcons.addToJsonDoc(doc);
+		doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 		getObserver()->sendMessageToViewer(doc);
 	}

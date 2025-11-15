@@ -33,11 +33,11 @@ static EntityFactoryRegistrar<EntityBlockCircuitCapacitor> registrar(EntityBlock
 EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "Capacitor";
-	icon.hiddenIcon = "Capacitor";
-	setNavigationTreeIcon(icon);
-
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("Capacitor");
+	treeItem.setHiddenIcon("Capacitor");
+	this->setTreeItem(treeItem, true);
+	
 	setBlockTitle("C");
 
 	const std::string connectorNameLeft = "positivePole";

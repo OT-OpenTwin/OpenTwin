@@ -33,11 +33,11 @@ static EntityFactoryRegistrar<EntityBlockCircuitTransmissionLine> registrar(Enti
 EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "TranLine";
-	icon.hiddenIcon = "TranLine";
-	setNavigationTreeIcon(icon);
-
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("TranLine");
+	treeItem.setHiddenIcon("TranLine");
+	this->setTreeItem(treeItem, true);
+	
 	setBlockTitle("T");
 
 	const std::string connectorNameLeftPos1 = "PositivePole1";

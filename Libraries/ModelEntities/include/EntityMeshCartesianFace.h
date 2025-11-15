@@ -20,10 +20,9 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-#include "EntityContainer.h"
-#include "BoundingBox.h"
 #include "EntityBase.h"
-#include "OldTreeIcon.h"
+#include "BoundingBox.h"
+#include "EntityContainer.h"
 
 #include <list>
 

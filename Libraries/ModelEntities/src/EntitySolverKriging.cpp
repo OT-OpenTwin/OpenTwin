@@ -17,7 +17,6 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OldTreeIcon.h"
 #include "EntitySolverKriging.h"
 
 #include <bsoncxx/builder/basic/array.hpp>

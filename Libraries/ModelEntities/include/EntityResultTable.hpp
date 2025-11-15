@@ -18,10 +18,9 @@
 // @otlicense-end
 
 #pragma once
+#include "DataBase.h"
 #include "EntityResultTable.h"
 #include "EntityResultTableData.h"
-#include "DataBase.h"
-#include "OldTreeIcon.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -31,10 +30,19 @@
 template <class T>
 EntityResultTable<T>::EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
 	EntityBase(ID, parent, obs, ms),
-	tableDataStorageId(-1),
-	tableDataStorageVersion(-1)
+	m_tableDataStorageId(-1),
+	m_tableDataStorageVersion(-1)
 {
-	className = "EntityResultTable_" + ot::TemplateTypeName<T>::getTypeName();
+	m_className = "EntityResultTable_" + ot::TemplateTypeName<T>::getTypeName();
+
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("TableVisible");
+	treeItem.setHiddenIcon("TableHidden");
+	this->setTreeItem(treeItem, true);
+
+	ot::VisualisationTypes visType;
+	visType.addTableVisualisation();
+	this->setVisualizationTypes(visType, true);
 }
 
 template <class T>
@@ -62,12 +70,12 @@ void EntityResultTable<T>::addStorageData(bsoncxx::builder::basic::document &sto
 
 	// Now we store the particular information about the current object
 	storage.append(
-		bsoncxx::builder::basic::kvp("TableDataID", tableDataStorageId),
-		bsoncxx::builder::basic::kvp("TableDataVersion", tableDataStorageVersion),
-		bsoncxx::builder::basic::kvp("MinCol", _minCol),
-		bsoncxx::builder::basic::kvp("MaxCol", _maxCol),
-		bsoncxx::builder::basic::kvp("MinRow", _minRow),
-		bsoncxx::builder::basic::kvp("MaxRow", _maxRow)
+		bsoncxx::builder::basic::kvp("TableDataID", m_tableDataStorageId),
+		bsoncxx::builder::basic::kvp("TableDataVersion", m_tableDataStorageVersion),
+		bsoncxx::builder::basic::kvp("MinCol", m_minCol),
+		bsoncxx::builder::basic::kvp("MaxCol", m_maxCol),
+		bsoncxx::builder::basic::kvp("MinRow", m_minRow),
+		bsoncxx::builder::basic::kvp("MaxRow", m_maxRow)
 	);
 }
 
@@ -78,18 +86,18 @@ void EntityResultTable<T>::readSpecificDataFromDataBase(bsoncxx::document::view 
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
-	if (tableData.use_count() == 0 && tableData != nullptr)
+	if (m_tableData.use_count() == 0 && m_tableData != nullptr)
 	{
-		tableData = nullptr;
+		m_tableData = nullptr;
 	}
 
 	// Here we can load any special information about the entity
-	tableDataStorageId = doc_view["TableDataID"].get_int64();
-	tableDataStorageVersion = doc_view["TableDataVersion"].get_int64();
-	_minCol =	doc_view["MinCol"].get_int32();
-	_maxCol =	doc_view["MaxCol"].get_int32();
-	_minRow =	doc_view["MinRow"].get_int32();
-	_maxRow =	doc_view["MaxRow"].get_int32();
+	m_tableDataStorageId = doc_view["TableDataID"].get_int64();
+	m_tableDataStorageVersion = doc_view["TableDataVersion"].get_int64();
+	m_minCol =	doc_view["MinCol"].get_int32();
+	m_maxCol =	doc_view["MaxCol"].get_int32();
+	m_minRow =	doc_view["MinRow"].get_int32();
+	m_maxRow =	doc_view["MaxRow"].get_int32();
 
 	resetModified();
 }
@@ -97,18 +105,11 @@ void EntityResultTable<T>::readSpecificDataFromDataBase(bsoncxx::document::view 
 template <class T>
 void EntityResultTable<T>::addVisualizationNodes()
 {
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "TableVisible";
-	treeIcons.hiddenIcon = "TableHidden";
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-	treeIcons.addToJsonDoc(doc);
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 
@@ -121,22 +122,11 @@ void EntityResultTable<T>::addVisualizationNodes()
 template <class T>
 void EntityResultTable<T>::addVisualizationItem(bool isHidden)
 {
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "TableVisible";
-	treeIcons.hiddenIcon = "TableHidden";
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-	ot::VisualisationTypes visType;
-	visType.addTableVisualisation();
-	visType.addToJsonObject(doc, doc.GetAllocator());
-
-	treeIcons.addToJsonDoc(doc);
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 }
@@ -147,10 +137,10 @@ void EntityResultTable<T>::createProperties()
 {
 	const std::string visibleTableSize = "Visible Table Dimensions";
 
-	EntityPropertiesInteger::createProperty(visibleTableSize, "Min Row", _minRow, "default", getProperties());
-	EntityPropertiesInteger::createProperty(visibleTableSize, "Max Row", _maxRow, "default", getProperties());
-	EntityPropertiesInteger::createProperty(visibleTableSize, "Min Column", _minCol, "default", getProperties());
-	EntityPropertiesInteger::createProperty(visibleTableSize, "Max Column", _maxCol, "default", getProperties());
+	EntityPropertiesInteger::createProperty(visibleTableSize, "Min Row", m_minRow, "default", getProperties());
+	EntityPropertiesInteger::createProperty(visibleTableSize, "Max Row", m_maxRow, "default", getProperties());
+	EntityPropertiesInteger::createProperty(visibleTableSize, "Min Column", m_minCol, "default", getProperties());
+	EntityPropertiesInteger::createProperty(visibleTableSize, "Max Column", m_maxCol, "default", getProperties());
 	getProperties().forceResetUpdateForAllProperties();
 }
 
@@ -172,23 +162,23 @@ template <class T>
 std::shared_ptr<EntityResultTableData<T>> EntityResultTable<T>::getTableData()
 {
 	ensureTableDataLoaded();
-	return tableData;
+	return m_tableData;
 }
 
 template <class T>
 void EntityResultTable<T>::ensureTableDataLoaded()
 {
-	if (tableData == nullptr)
+	if (m_tableData == nullptr)
 	{
-		if (tableDataStorageId != -1)
+		if (m_tableDataStorageId != -1)
 		{
-			if (tableDataStorageVersion != -1)
+			if (m_tableDataStorageVersion != -1)
 			{
 				std::map<ot::UID, EntityBase*> entitymap;
-				auto tempPtr = dynamic_cast<EntityResultTableData<T>*>(readEntityFromEntityIDAndVersion(this, tableDataStorageId, tableDataStorageVersion, entitymap));
+				auto tempPtr = dynamic_cast<EntityResultTableData<T>*>(readEntityFromEntityIDAndVersion(this, m_tableDataStorageId, m_tableDataStorageVersion, entitymap));
 				if (tempPtr != nullptr)
 				{
-					tableData = std::shared_ptr <EntityResultTableData<T>>(tempPtr);
+					m_tableData = std::shared_ptr <EntityResultTableData<T>>(tempPtr);
 				}
 				else
 				{
@@ -197,7 +187,7 @@ void EntityResultTable<T>::ensureTableDataLoaded()
 			}
 		}
 
-		assert(tableData != nullptr);
+		assert(m_tableData != nullptr);
 	}
 }
 
@@ -208,9 +198,9 @@ void EntityResultTable<T>::setTableData(std::shared_ptr<EntityResultTableData<T>
 	{
 		setModified();
 	}
-	tableData = data;
-	tableDataStorageId = tableData->getEntityID();
-	tableDataStorageVersion = tableData->getEntityStorageVersion();
+	m_tableData = data;
+	m_tableDataStorageId = m_tableData->getEntityID();
+	m_tableDataStorageVersion = m_tableData->getEntityStorageVersion();
 }
 
 
@@ -285,9 +275,9 @@ inline void EntityResultTable<T>::setMaxRow(int maxRow)
 template <class T>
 void EntityResultTable<T>::deleteTableData(void)
 {
-	tableData = nullptr;
-	tableDataStorageId = -1;
-	tableDataStorageVersion = -1;
+	m_tableData = nullptr;
+	m_tableDataStorageId = -1;
+	m_tableDataStorageVersion = -1;
 
 	setModified();
 }
@@ -295,10 +285,10 @@ void EntityResultTable<T>::deleteTableData(void)
 template <class T>
 void EntityResultTable<T>::releaseTableData(void)
 {
-	if (tableData == nullptr)
+	if (m_tableData == nullptr)
 	{
 		return;
 	};
-	tableData = nullptr;
+	m_tableData = nullptr;
 }
 

@@ -33,11 +33,11 @@ static EntityFactoryRegistrar<EntityBlockCircuitCurrentMeter> registrar(EntityBl
 EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "CurrentMeter";
-	icon.hiddenIcon = "CurrentMeter";
-	setNavigationTreeIcon(icon);
-
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("CurrentMeter");
+	treeItem.setHiddenIcon("CurrentMeter");
+	this->setTreeItem(treeItem, true);
+	
 	setBlockTitle("CM");
 
 	const std::string connectorNameLeft = "positivePole";

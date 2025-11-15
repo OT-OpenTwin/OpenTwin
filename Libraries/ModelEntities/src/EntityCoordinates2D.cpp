@@ -39,7 +39,7 @@ std::string EntityCoordinates2D::serialiseAsJSON()
 	return jsonDoc;
 }
 
-bool EntityCoordinates2D::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+bool EntityCoordinates2D::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
 {
 	try
 	{

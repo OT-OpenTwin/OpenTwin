@@ -24,37 +24,15 @@
 static EntityFactoryRegistrar<EntitySolverMonitor> registrar("EntitySolverMonitor");
 
 EntitySolverMonitor::EntitySolverMonitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
-	:EntityContainer(ID, parent, obs, ms) {}
+	:EntityContainer(ID, parent, obs, ms) 
+{
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("Monitor");
+	treeItem.setHiddenIcon("Monitor");
+	this->setTreeItem(treeItem, true);
+}
 
 EntitySolverMonitor::~EntitySolverMonitor(){}
-
-void EntitySolverMonitor::addVisualizationNodes(void)
-{
-	if (!getName().empty())
-	{
-		OldTreeIcon treeIcons;
-		treeIcons.size = 32;
-		treeIcons.visibleIcon = "Monitor";
-		treeIcons.hiddenIcon = "Monitor";
-
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-
-		treeIcons.addToJsonDoc(doc);
-
-		getObserver()->sendMessageToViewer(doc);
-	}
-
-	for (auto child : getChildrenList())
-	{
-		child->addVisualizationNodes();
-	}
-
-	EntityBase::addVisualizationNodes();
-}
 
 bool EntitySolverMonitor::updateFromProperties(void)
 {

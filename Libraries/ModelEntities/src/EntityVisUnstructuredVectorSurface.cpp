@@ -17,10 +17,8 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "EntityVisUnstructuredVectorSurface.h"
-#include "OldTreeIcon.h"
 #include "Database.h"
+#include "EntityVisUnstructuredVectorSurface.h"
 
 #include "OTCommunication/ActionTypes.h"
 

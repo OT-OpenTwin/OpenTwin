@@ -28,12 +28,13 @@
 static EntityFactoryRegistrar<EntityBlockHierarchicalContainerItem> registrar(EntityBlockHierarchicalContainerItem::className());
 
 EntityBlockHierarchicalContainerItem::EntityBlockHierarchicalContainerItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
-	: EntityBlock(_ID, _parent, _obs, _ms) {
-	OldTreeIcon icon;
-	icon.visibleIcon = "Hierarchical/Container";
-	icon.hiddenIcon = "Hierarchical/Container";
-	setNavigationTreeIcon(icon);
-
+	: EntityBlock(_ID, _parent, _obs, _ms) 
+{
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("Hierarchical/Container");
+	treeItem.setHiddenIcon("Hierarchical/Container");
+	this->setTreeItem(treeItem, true);
+	
 	setBlockTitle("Container");
 
 	resetModified();

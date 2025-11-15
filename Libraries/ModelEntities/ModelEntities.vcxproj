@@ -150,9 +150,7 @@
     <ClInclude Include="include\ScalingProperties.h" />
     <ClInclude Include="include\SerializeWithBSON.h" />
     <ClInclude Include="include\TemplateDefaultManager.h" />
-    <ClInclude Include="include\OldTreeIcon.h" />
     <ClInclude Include="include\VariableToBSONConverter.h" />
-    <ClInclude Include="include\VisualisationTypeSerialiser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\PropertyBundleDataHandle.h" />
@@ -262,9 +260,7 @@
     <ClCompile Include="src\PropertyBundleVisUnstructuredVectorVolume.cpp" />
     <ClCompile Include="src\PropertyHelper.cpp" />
     <ClCompile Include="src\TemplateDefaultManager.cpp" />
-    <ClCompile Include="src\OldTreeIcon.cpp" />
     <ClCompile Include="src\VariableToBSONConverter.cpp" />
-    <ClCompile Include="src\VisualisationTypeSerialiser.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}</ProjectGuid>

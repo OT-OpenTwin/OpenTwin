@@ -19,15 +19,18 @@
 
 #pragma once
 
-#include <string>
-#include <assert.h>
-#include <vector>
-#include <list>
-#include <map>
+// OpenTwin header
+#include "OTCore/CoreTypes.h"
 
+// MongoDB header
 #include <bsoncxx/builder/basic/document.hpp>
 
-#include "OldTreeIcon.h"
+// std header
+#include <map>
+#include <list>
+#include <vector>
+#include <string>
+#include <assert.h>
 
 namespace Geometry {
 

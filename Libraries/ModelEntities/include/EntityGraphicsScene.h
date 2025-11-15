@@ -30,8 +30,7 @@ public:
 	virtual std::string getClassName(void) const override { return EntityGraphicsScene::className(); };
 	ot::GraphicsNewEditorPackage* getGraphicsEditorPackage() override;
 	bool visualiseGraphicsView() override;
-	void addVisualizationNodes() override;
-
+	
 	virtual void setGraphicsPickerKey(const std::string& _key) override;
 	virtual std::string getGraphicsPickerKey() const override { return m_graphicsPickerKey; };
 

@@ -21,7 +21,6 @@
 #pragma warning(disable : 4251)
 
 #include "EntityBase.h"
-#include "OldTreeIcon.h"
 #include "EntityResultTableData.h"
 
 #include <memory>
@@ -40,15 +39,15 @@ public:
 	virtual void storeToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
 	void addVisualizationItem(bool isHidden);
-	virtual std::string getClassName(void) const override { return className; };
+	virtual std::string getClassName(void) const override { return m_className; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(void);
 	virtual bool updateFromProperties(void) override;
 
 	void deleteTableData(void);
 	void releaseTableData(void);
-	long long getTableDataStorageId(void) { return tableDataStorageId; }
-	long long getTableDataStorageVersion(void) { return tableDataStorageVersion; }
+	long long getTableDataStorageId(void) { return m_tableDataStorageId; }
+	long long getTableDataStorageVersion(void) { return m_tableDataStorageVersion; }
 	std::shared_ptr<EntityResultTableData<T>> getTableData(void);
 	void setTableData(std::shared_ptr<EntityResultTableData<T>> tableData);
 
@@ -65,18 +64,18 @@ public:
 protected:
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
-	int _minCol = 0;
-	int _minRow = 1;
+	int m_minCol = 0;
+	int m_minRow = 1;
 
 private:
-	int _maxCol = 50;
-	int _maxRow = 50;
+	int m_maxCol = 50;
+	int m_maxRow = 50;
 	virtual int getSchemaVersion(void) override { return 1; };
 	void ensureTableDataLoaded(void);
-	std::string className; 
-	std::shared_ptr<EntityResultTableData<T>> tableData = nullptr;
-	long long tableDataStorageId;
-	long long tableDataStorageVersion;
+	std::string m_className;
+	std::shared_ptr<EntityResultTableData<T>> m_tableData = nullptr;
+	long long m_tableDataStorageId;
+	long long m_tableDataStorageVersion;
 };
 
 #include "EntityResultTable.hpp"

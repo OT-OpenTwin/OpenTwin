@@ -17,9 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-
 #include "EntitySolverPyrit.h"
-#include "OldTreeIcon.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

@@ -20,10 +20,9 @@
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 
+#include "DataBase.h"
 #include "EntityAnnotation.h"
 #include "EntityAnnotationData.h"
-#include "DataBase.h"
-#include "OldTreeIcon.h"
 
 #include <OTCommunication/ActionTypes.h>
 #include <bsoncxx/builder/basic/array.hpp>
@@ -35,7 +34,10 @@ EntityAnnotation::EntityAnnotation(ot::UID ID, EntityBase *parent, EntityObserve
 	annotationData(nullptr),
 	annotationDataStorageId(-1)
 {
-	
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("WarningVisible");
+	treeItem.setHiddenIcon("WarningHidden");
+	this->setTreeItem(treeItem, true);
 }
 
 EntityAnnotation::~EntityAnnotation()
@@ -219,23 +221,16 @@ void EntityAnnotation::addVisualizationItem(bool isHidden)
 		assert(annotationDataStorageId != -1);
 	}
 
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "WarningVisible";
-	treeIcons.hiddenIcon = "WarningHidden";
-
 	ot::UID storageVersion = getCurrentEntityVersion(annotationDataStorageId);
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNodeFromDatabase, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(DataBase::instance().getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, (unsigned long long) annotationDataStorageId, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, storageVersion, doc.GetAllocator());
-
-	treeIcons.addToJsonDoc(doc);
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(annotationDataStorageId, storageVersion));

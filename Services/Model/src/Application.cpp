@@ -657,7 +657,7 @@ ot::ReturnMessage Application::handleVisualisationDataRequest(ot::JsonDocument& 
 	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
 
 	ot::VisualisationCfg visualisationCfg;
-	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 
 	try {
 		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationCfg);
@@ -912,7 +912,7 @@ void Application::handlePromptResponse(ot::JsonDocument& _document) {
 ot::ReturnMessage Application::handleShowTable(ot::JsonDocument& _document) {
 	const std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 	ot::VisualisationCfg visualisationCfg;
-	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 	visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
 
 	std::map<std::string, ot::UID> entityMap = m_model->getEntityNameToIDMap();

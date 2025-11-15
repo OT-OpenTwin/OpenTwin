@@ -23,7 +23,6 @@
 // OpenTwin header
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/Painter2DDialogFilter.h"
-#include "OldTreeIcon.h"
 #include "ModelEntitiesAPIExport.h"
 
 // std header

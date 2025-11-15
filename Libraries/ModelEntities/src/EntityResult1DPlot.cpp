@@ -30,7 +30,16 @@ static EntityFactoryRegistrar<EntityResult1DPlot> registrar("EntityResult1DPlot_
 
 EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	:EntityContainer(_ID,_parent,_obs,_ms)
-{}
+{
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("Plot1DVisible");
+	treeItem.setHiddenIcon("Plot1DHidden");
+	this->setTreeItem(treeItem, true);
+
+	ot::VisualisationTypes visTypes;
+	visTypes.addPlot1DVisualisation();
+	this->setVisualizationTypes(visTypes, true);
+}
 
 void EntityResult1DPlot::storeToDataBase(void)
 {
@@ -39,23 +48,11 @@ void EntityResult1DPlot::storeToDataBase(void)
 
 void EntityResult1DPlot::addVisualizationNodes(void)
 {
-
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "Plot1DVisible";
-	treeIcons.hiddenIcon = "Plot1DHidden";
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-	ot::VisualisationTypes visTypes;
-	visTypes.addPlot1DVisualisation();
-
-	visTypes.addToJsonObject(doc, doc.GetAllocator());
-	treeIcons.addToJsonDoc(doc);
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 

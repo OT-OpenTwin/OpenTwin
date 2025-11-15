@@ -30,8 +30,10 @@ EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, Ent
 	:EntityBase(ID, parent, obs, ms), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)),
 	_blockIDOrigin(-1), _blockIDDestination(-1)
 {
-	m_navigationIcon.visibleIcon = "connection";
-	m_navigationIcon.hiddenIcon = "connection";
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("connection");
+	treeItem.setHiddenIcon("connection");
+	this->setTreeItem(treeItem, true);
 }
 
 EntityBlockConnection::~EntityBlockConnection()
@@ -111,7 +113,7 @@ void EntityBlockConnection::CreateConnections()
 	ot::VisualisationCfg visualisationCfg;
 	ot::JsonObject visualisationCfgJson;
 	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJson, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, reqDoc.GetAllocator());
 
 	ot::JsonObject pckgObj;
 	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
@@ -155,11 +157,10 @@ void EntityBlockConnection::CreateNavigationTreeEntry()
 {
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
+		
+		doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
-		m_navigationIcon.addToJsonDoc(doc);
 		getObserver()->sendMessageToViewer(doc);
 }
 

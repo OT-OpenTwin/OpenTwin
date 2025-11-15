@@ -21,7 +21,6 @@
 #pragma warning(disable : 4251)
 
 #include "EntityContainer.h"
-#include "OldTreeIcon.h"
 
 #include <list>
 #include <string>

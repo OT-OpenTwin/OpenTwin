@@ -50,7 +50,6 @@ public:
 	virtual int getSchemaVersion(void) override { return 1; };
 
 private:
-	OldTreeIcon m_navigationIcon;
 	ot::GraphicsConnectionCfg::ConnectionShape _lineShape = ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
 	ot::PenFCfg m_lineStyle;
 

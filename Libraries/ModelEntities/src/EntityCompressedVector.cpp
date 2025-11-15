@@ -18,10 +18,9 @@
 // @otlicense-end
 
 
-#include "EntityCompressedVector.h"
-#include "EntityBinaryData.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityBinaryData.h"
+#include "EntityCompressedVector.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

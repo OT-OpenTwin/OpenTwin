@@ -24,7 +24,6 @@
 #include "EntityFacetData.h"
 #include "EntityBrep.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -41,6 +40,11 @@ EntityFaceAnnotation::EntityFaceAnnotation(ot::UID ID, EntityBase *parent, Entit
 	EntityBase(ID, parent, obs, ms),
 	facetsStorageID(-1)
 {
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("FaceAnnotationVisible");
+	treeItem.setHiddenIcon("FaceAnnotationHidden");
+	this->setTreeItem(treeItem, true);
+	
 	EntityPropertiesColor::createProperty(  "General", "Color",           {0, 0, 0}, "", getProperties());
 	EntityPropertiesInteger::createProperty("General", "Number of faces",         0, "", getProperties());
 
@@ -163,11 +167,6 @@ void EntityFaceAnnotation::updateVisualization(bool isHidden)
 	std::string errors;
 
 	// Note: this call will modify a potentially existing node rather than creating a new one
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "FaceAnnotationVisible";
-	treeIcons.hiddenIcon = "FaceAnnotationHidden";
-
 	ot::UID storageVersion = getCurrentEntityVersion(facetsStorageID);
 
 	std::string materialType = "Rough";
@@ -175,17 +174,18 @@ void EntityFaceAnnotation::updateVisualization(bool isHidden)
 	ot::JsonDocument doc;
 
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, ot::JsonArray(colorRGB, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, ot::JsonArray(colorRGB, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_MaterialType, ot::JsonString(materialType, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureType, ot::JsonString("None", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureReflective, false, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, false, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, 0.5, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(DataBase::instance().getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, (unsigned long long) facetsStorageID, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, storageVersion, doc.GetAllocator());
@@ -193,9 +193,7 @@ void EntityFaceAnnotation::updateVisualization(bool isHidden)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageParentVis, this->getManageParentVisibility(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, this->getManageChildVisibility(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, false, doc.GetAllocator());
-	
-	treeIcons.addToJsonDoc(doc);	
-	
+
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(facetsStorageID, storageVersion));
 

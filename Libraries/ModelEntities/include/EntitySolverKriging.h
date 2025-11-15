@@ -21,7 +21,6 @@
 #pragma warning(disable : 4251)
 
 #include "EntitySolver.h"
-#include "OldTreeIcon.h"
 
 #include <list>
 

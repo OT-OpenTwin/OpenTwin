@@ -20,9 +20,8 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-#include "EntityCompressedVector.h"
 #include "EntityResultBase.h"
-#include "OldTreeIcon.h"
+#include "EntityCompressedVector.h"
 
 #include <list>
 #include <vector>

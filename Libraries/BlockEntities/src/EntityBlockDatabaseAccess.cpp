@@ -29,11 +29,11 @@ static EntityFactoryRegistrar<EntityBlockDatabaseAccess> registrar(EntityBlockDa
 EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlock(ID, parent, obs, ms)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	icon.hiddenIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	setNavigationTreeIcon(icon);
-
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
+	treeItem.setHiddenIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
+	this->setTreeItem(treeItem, true);
+	
 	setBlockTitle("Database Access");
 
 	const std::string connectorNameOutput= "Output";

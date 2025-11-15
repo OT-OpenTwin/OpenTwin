@@ -20,9 +20,8 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-#include "EntityBase.h"
 #include "Geometry.h"
-#include "OldTreeIcon.h"
+#include "EntityBase.h"
 
 #include <list>
 #include <vector>

@@ -21,7 +21,6 @@
 //
 
 #include "EntityAnnotationData.h"
-#include "OldTreeIcon.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

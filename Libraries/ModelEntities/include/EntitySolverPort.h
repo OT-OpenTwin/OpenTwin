@@ -32,8 +32,6 @@ public:
 	static std::string className() { return "EntitySolverPort"; }
 	virtual std::string getClassName(void) const override { return EntitySolverPort::className(); }
 
-	virtual void addVisualizationNodes(void) override;
-
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
 	virtual bool considerForPropertyFilter(void) override { return true; };

@@ -17,10 +17,8 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "EntityVisUnstructuredScalarVolume.h"
-#include "OldTreeIcon.h"
 #include "Database.h"
+#include "EntityVisUnstructuredScalarVolume.h"
 
 #include "OTCommunication/ActionTypes.h"
 

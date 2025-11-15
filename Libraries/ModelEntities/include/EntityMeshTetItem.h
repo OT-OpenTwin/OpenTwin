@@ -20,10 +20,9 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-#include "EntityBase.h"
 #include "Geometry.h"
+#include "EntityBase.h"
 #include "BoundingBox.h"
-#include "OldTreeIcon.h"
 
 class EntityMeshTet;
 class EntityMeshTetFace;

@@ -37,7 +37,11 @@ static EntityFactoryRegistrar<EntityFileImage> extensionRegistrar({ ot::FileExte
 
 EntityFileImage::EntityFileImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	: EntityFile(_ID, _parent, _obs, _ms), m_format(ot::ImageFileFormat::PNG)
-{}
+{
+	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
+	visTypes.visualiseAsImage();
+	this->setVisualizationTypes(visTypes, true);
+}
 
 bool EntityFileImage::updateFromProperties() {
 	return EntityFile::updateFromProperties();

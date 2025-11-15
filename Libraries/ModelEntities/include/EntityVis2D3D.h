@@ -22,7 +22,6 @@
 
 #include "EntityContainer.h"
 #include "EntityResultBase.h"
-#include "OldTreeIcon.h"
 
 #include <list>
 

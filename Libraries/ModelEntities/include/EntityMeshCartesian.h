@@ -46,8 +46,7 @@ public:
 	virtual void storeToDataBase(void) override;
 
 	virtual std::string getClassName(void) const override { return "EntityMeshCartesian"; };
-	virtual void addVisualizationNodes(void) override;
-
+	
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
 

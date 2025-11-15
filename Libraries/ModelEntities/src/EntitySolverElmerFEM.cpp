@@ -19,7 +19,6 @@
 
 
 #include "EntitySolverElmerFEM.h"
-#include "OldTreeIcon.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

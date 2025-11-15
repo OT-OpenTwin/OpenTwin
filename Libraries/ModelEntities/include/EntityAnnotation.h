@@ -21,7 +21,6 @@
 #pragma warning(disable : 4251)
 
 #include "EntityBase.h"
-#include "OldTreeIcon.h"
 #include <vector>
 #include <array>
 

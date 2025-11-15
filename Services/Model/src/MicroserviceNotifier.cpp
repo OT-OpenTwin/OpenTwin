@@ -25,7 +25,6 @@
 #include "Application.h"
 
 #include "Model.h"
-#include "OldTreeIcon.h"
 
 // OpenTwin header
 #include "DataBase.h"

@@ -26,6 +26,9 @@ static EntityFactoryRegistrar<EntityGraphicsScene> registrar(EntityGraphicsScene
 EntityGraphicsScene::EntityGraphicsScene(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityContainer(ID, parent, obs, ms)
 {
+	ot::VisualisationTypes visTypes;
+	visTypes.addGraphicsViewVisualisation();
+	setVisualizationTypes(visTypes, true);
 }
 
 ot::GraphicsNewEditorPackage* EntityGraphicsScene::getGraphicsEditorPackage()
@@ -38,29 +41,6 @@ ot::GraphicsNewEditorPackage* EntityGraphicsScene::getGraphicsEditorPackage()
 bool EntityGraphicsScene::visualiseGraphicsView()
 {
 	return true;
-}
-
-void EntityGraphicsScene::addVisualizationNodes()
-{
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-	
-	ot::VisualisationTypes visTypes;
-	visTypes.addGraphicsViewVisualisation();
-	visTypes.addToJsonObject(doc, doc.GetAllocator());
-
-	getTreeIcon().addToJsonDoc(doc);
-
-	getObserver()->sendMessageToViewer(doc);
-
-	for (auto child : getChildrenList())
-	{
-		child->addVisualizationNodes();
-	}
-
 }
 
 void EntityGraphicsScene::setGraphicsPickerKey(const std::string& _key) {
