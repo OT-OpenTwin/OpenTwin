@@ -22,6 +22,9 @@
     ],
     "BlacklistDirectories": [
         "x64",
+        "build",
+        "build-vs2022-debug",
+        "build-vs2022-release",
         ".vs",
         "AdminPanel",
         "package",
