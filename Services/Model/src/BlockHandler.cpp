@@ -77,7 +77,7 @@ bool BlockHandler::addEditor(ot::UID editorId) {
 	return result.second;
 }
 
-void BlockHandler::removeAnyEntry(EntityBase* _entBase) {
+void BlockHandler::removeFromMap(EntityBase* _entBase) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 	
@@ -89,7 +89,6 @@ void BlockHandler::removeAnyEntry(EntityBase* _entBase) {
 	// Check if editor with id exists - if yes remove the whole entry
 	EntityGraphicsScene* entGraphicsScene = dynamic_cast<EntityGraphicsScene*>(_entBase);
 	if (entGraphicsScene) {
-		// Editor: Entferne Editor komplett, falls vorhanden
 		auto itEditor = m_viewBlockConnectionsMap.find(_entBase->getEntityID());
 		if (itEditor != m_viewBlockConnectionsMap.end()) {
 			m_viewBlockConnectionsMap.erase(itEditor);
@@ -104,10 +103,6 @@ void BlockHandler::removeAnyEntry(EntityBase* _entBase) {
 			auto& blocks = itEditor->second;
 			auto itBlock = blocks.find(_entBase->getEntityID());
 			if (itBlock != blocks.end()) {
-				ot::UIDList connections = getConnections(itEditor->first, itBlock->first);
-				for (const ot::UID& connection : connections) {
-					modifyConnection(connection,_entBase);
-				}
 				blocks.erase(itBlock);
 				return;
 			}
@@ -118,23 +113,55 @@ void BlockHandler::removeAnyEntry(EntityBase* _entBase) {
 		return;
 	}
 
-
 	// Check if connection with id exists - if yes remove the connection
 	EntityBlockConnection* entBlockConnection = dynamic_cast<EntityBlockConnection*>(_entBase);
 	if (entBlockConnection) {
-		for (auto itEditor = m_viewBlockConnectionsMap.begin(); itEditor != m_viewBlockConnectionsMap.end(); ++itEditor) {
-			ot::UID editorId = itEditor->first;
-			std::map<ot::UID, ot::UIDList>& blocks = itEditor->second;
-
-			for (auto itBlock = blocks.begin(); itBlock != blocks.end(); ++itBlock) {
-				ot::UID blockId = itBlock->first;
-				ot::UIDList& connections = itBlock->second;
-
-				auto itConn = std::find(connections.begin(), connections.end(), _entBase->getEntityID());
-				while (itConn != connections.end()) {
-					itConn = connections.erase(itConn);
-					itConn = std::find(connections.begin(), connections.end(), _entBase->getEntityID());
+		for (auto& [editorId, blocks] : m_viewBlockConnectionsMap) {
+			for (auto& [blockId, connections] : blocks) {
+				// Looks for connection id in block
+				auto itConn = std::find(connections.begin(), connections.end(), entBlockConnection->getEntityID());
+				if (itConn != connections.end()) {
+				// Erase the connection from the map (only one connection with same UID can be related to the same block
+					connections.erase(itConn);
 				}
+			}
+		}
+		return;
+	}
+}
+
+void BlockHandler::entityRemoved(EntityBase* _entityToRemove, const std::list<EntityBase*>& _otherEntitiesToRemove) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+	if (_entityToRemove->getEntityID() == ot::invalidUID) {
+		OT_LOG_E("Invalid UID");
+		return;
+	}
+
+	EntityBlock* blockToRemove = dynamic_cast<EntityBlock*>(_entityToRemove);
+	if (blockToRemove) {
+		for (auto itEditor = m_viewBlockConnectionsMap.begin(); itEditor != m_viewBlockConnectionsMap.end();) {
+			auto& blocks = itEditor->second;
+			auto itBlock = blocks.find(blockToRemove->getEntityID());
+			if (itBlock != blocks.end()) {
+				ot::UIDList connections = getConnections(itEditor->first, itBlock->first);
+				for (const ot::UID& connection : connections) {
+					EntityBase* connectionEntity = model->getEntityByID(connection);
+					if (!connectionEntity) {
+						OT_LOG_E("EditorBlockConnections map is not correct sychronized with entitymap");
+						return;
+					}
+					if (std::find(_otherEntitiesToRemove.begin(), _otherEntitiesToRemove.end(), model->getEntityByID(connection)) != _otherEntitiesToRemove.end()) {
+						continue;
+					}
+					modifyConnection(connectionEntity->getEntityID(), _entityToRemove);
+					continue;
+				}
+				return;
+			}
+			else {
+				++itEditor;
 			}
 		}
 		return;
@@ -832,7 +859,7 @@ void BlockHandler::modifyConnection(const ot::UID& _entityID, EntityBase* _conne
 		_oldConnectionCfg.setDestConnectable("");
 	}
 	else {
-		OT_LOG_E("Connection is not connected to: " + _connectedBlockEntity->getEntityID());
+		OT_LOG_E("Connection is not connected to: " + std::to_string(_connectedBlockEntity->getEntityID()));
 		return;
 	}
 	

@@ -664,7 +664,7 @@ void Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool kee
 	}
 
 	// Removed entity from blockHandler map
-	Application::instance()->getBlockHandler().removeAnyEntry(entity);
+	Application::instance()->getBlockHandler().removeFromMap(entity);
 
 	Application::instance()->getSelectionHandler().deselectEntity(entity->getEntityID());
 	setModified();
@@ -1299,6 +1299,9 @@ void Model::handleDeleteSelectedShapes()
 	for (auto entity : selectedTopLevelEntities)
 	{
 		removeFromDisplay.push_back(entity->getEntityID());
+
+		// Update connections in blockHandler map before deleting the blockEntity
+		Application::instance()->getBlockHandler().entityRemoved(entity, selectedTopLevelEntities);
 
 		// Remove the entity from the entity map and also from the model state
 		removeEntityFromMap(entity, false, false);

@@ -44,7 +44,8 @@ public:
 	bool addEditor(ot::UID editorId);
 
 	// Remover
-	void removeAnyEntry(EntityBase* entBase);
+	void removeFromMap(EntityBase* entBase);
+	void entityRemoved(EntityBase* _entity, const std::list<EntityBase*>& _otherEntitiesToRemove);
 
 protected:
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;
