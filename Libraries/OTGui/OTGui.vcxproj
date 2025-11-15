@@ -27,6 +27,7 @@
     <ClInclude Include="include\OTGui\CopyEntityInformation.h" />
     <ClInclude Include="include\OTGui\CopyInformation.h" />
     <ClInclude Include="include\OTGui\DefaultPropertyValues.h" />
+    <ClInclude Include="include\OTGui\EntityTreeItem.h" />
     <ClInclude Include="include\OTGui\ExtendedProjectInformation.h" />
     <ClInclude Include="include\OTGui\FileExtension.h" />
     <ClInclude Include="include\OTGui\GraphicsChangeEvent.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="src\CopyInformation.cpp" />
     <ClCompile Include="src\DefaultPropertyValues.cpp" />
     <ClCompile Include="src\DefaultSyntaxHighlighterRules.cpp" />
+    <ClCompile Include="src\EntityTreeItem.cpp" />
     <ClCompile Include="src\ExtendedProjectInformation.cpp" />
     <ClCompile Include="src\FileExtension.cpp" />
     <ClCompile Include="src\GraphicsArcItemCfg.cpp" />

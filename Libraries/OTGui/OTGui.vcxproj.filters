@@ -491,6 +491,9 @@
     <ClInclude Include="include\OTGui\GraphicsDoubleClickEvent.h">
       <Filter>Header Files\Events</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\EntityTreeItem.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -870,6 +873,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsDoubleClickEvent.cpp">
       <Filter>Source Files\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityTreeItem.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
