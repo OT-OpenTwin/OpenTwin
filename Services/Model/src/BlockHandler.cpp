@@ -221,6 +221,22 @@ void BlockHandler::entityRemoved(EntityBase* _entityToRemove, const std::list<En
 	}
 }
 
+bool BlockHandler::findBlock(ot::UID _editor, ot::UID _block) {
+	auto itEditor = m_viewBlockConnectionsMap.find(_editor);
+	if (itEditor == m_viewBlockConnectionsMap.end()) {
+		OT_LOG_E("Editor not found - EntityID: " + std::to_string(_editor));
+		return false;
+	}
+
+	const auto& blocksMap = itEditor->second;
+	auto itBlock = blocksMap.find(_block);
+	if (itBlock == blocksMap.end()) {
+		return false;
+	}
+
+	return true;
+}
+
 ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
@@ -498,7 +514,11 @@ ot::ReturnMessage BlockHandler::graphicsSnapEvent(const ot::GraphicsSnapEvent& _
 		}
 	}
 
-	// add snap logic here
+	/* add snap logic here*/
+	if (!snapConnection(scene, _snapEvent)) {
+		OT_LOG_E("Could not handle snap event");
+		return ot::ReturnMessage::Failed;
+	}
 
 	if (!_snapEvent.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
 		std::list<std::string> notifyServices = scene->getServicesForCallback(EntityBase::Callback::DataNotify);
@@ -526,9 +546,7 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, Ent
 
 	// Get connectionCfg
 	ot::GraphicsConnectionCfg connection = _eventData.getConnectionCfg();
-	EntityNamingBehavior connectionNaming;
-	createConnection(_scene, _originBlock, connection, connectionNaming, modelStateInfo);
-
+	
 	// Find connectors
 	auto originConnectorIt = _originBlock->getAllConnectorsByName().find(connection.getOriginConnectable());
 	auto destinationConnectorIt = _destinationBlock->getAllConnectorsByName().find(connection.getDestConnectable());
@@ -552,6 +570,11 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, Ent
 		Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
 		return true;
 	}
+
+	EntityNamingBehavior connectionNaming;
+	connection.setUid(model->createEntityUID());
+	createConnection(_scene, _originBlock, connection, connectionNaming, modelStateInfo);
+
 
 	model->addEntitiesToModel(modelStateInfo, "Added Connection", true, true, true);
 
@@ -660,6 +683,7 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	_connectionNaming.explicitNaming = true;
 
 	for (auto& connectionCfg : newConnections) {
+		connectionCfg.setUid(model->createEntityUID());
 		createConnection(_scene, _originBlock, connectionCfg,  _connectionNaming, _modelStateInfo);
 	}
 
@@ -843,7 +867,7 @@ void BlockHandler::createConnection( EntityGraphicsScene* _scene, EntityBlock* _
 	OTAssertNullptr(model);
 
 	// Create connection entity
-	EntityBlockConnection _connectionEntity(model->createEntityUID(), nullptr, nullptr, nullptr);
+	EntityBlockConnection _connectionEntity(_connectionCfg.getUid(), nullptr, nullptr, nullptr);
 	_connectionEntity.createProperties();
 	_connectionEntity.setCallbackData(_scene->getCallbackData());
 	_connectionEntity.setGraphicsPickerKey(_scene->getGraphicsPickerKey());
@@ -920,4 +944,145 @@ void BlockHandler::modifyConnection(const ot::UID& _entityID, EntityBase* _conne
 	connectionEntity->storeToDataBase();
 	model->getStateManager()->modifyEntityVersion(*connectionEntity);
 }
+
+bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsSnapEvent& _snapEvent) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+	ot::NewModelStateInfo modelStateInfo;
+	ot::UIDList entitiesToDelete;
+
+	std::list<ot::GraphicsSnapEvent::SnapInfo> snapInfos = _snapEvent.getSnapInfos();
+	for (ot::GraphicsSnapEvent::SnapInfo snapInfo : snapInfos) {
+		ot::GraphicsConnectionCfg connectionCfg = snapInfo.connectionCfg;
+		bool isOrigin = snapInfo.isOrigin;
+
+		EntityBase* entBase = nullptr;
+		EntityBase* entBase2 = nullptr;
+
+		std::string originConnector;
+		std::string destConnector;
+
+		bool bothItemsExist = true;
+		if (isOrigin){
+			entBase = model->getEntityByID(connectionCfg.getOriginUid());
+
+			//Check if destination of connectionCfg really exists
+			if (!findBlock(_scene->getEntityID(), connectionCfg.getDestinationUid())) {
+				connectionCfg.setDestUid(ot::invalidUID);
+				connectionCfg.setDestConnectable("");
+				bothItemsExist = false;
+			}
+			else {
+				entBase2 = model->getEntityByID(connectionCfg.getDestinationUid());
+				if (!entBase2) {
+					OT_LOG_E("EditorBlockConnections map is not correct sychronized with entitymap");
+					return false;
+				}
+			}
+		}
+		else {
+			entBase = model->getEntityByID(connectionCfg.getDestinationUid());
+
+			//Check if origin of connectionCfg really exists
+			if(!findBlock(_scene->getEntityID(), connectionCfg.getOriginUid())) {
+				connectionCfg.setOriginUid(ot::invalidUID);
+				connectionCfg.setOriginConnectable("");
+				bothItemsExist = false;
+			}
+			else {
+				entBase2 = model->getEntityByID(connectionCfg.getOriginUid());
+				if (!entBase2) {
+					OT_LOG_E("EditorBlockConnections map is not correct sychronized with entitymap");
+					return false;
+				}
+			}	
+		}
+		
+		if(!entBase) {
+			OT_LOG_E("Failed to get Entity by ID");
+			return false;
+		}
+
+		EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(entBase);
+		if(!blockEnt) {
+			OT_LOG_E("BlockEntity is null");
+			return false;
+		}
+
+
+		if (bothItemsExist) {
+			EntityBlock* blockEnt2 = dynamic_cast<EntityBlock*>(entBase2);
+			if (!blockEnt2) {
+				OT_LOG_E("BlockEntity is null");
+				return false;
+			}
+
+			if(blockEnt->getClassName() != "EntityBlockCircuitConnector" && blockEnt2->getClassName() != "EntityBlockCircuitConnector") {
+				
+				ot::ConnectorType originConnectorType = ot::ConnectorType::UNKNOWN;
+				ot::ConnectorType destinationConnectorType = ot::ConnectorType::UNKNOWN;
+
+				if (isOrigin) {
+
+					// Find connectors
+					auto originConnectorIt = blockEnt->getAllConnectorsByName().find(connectionCfg.getOriginConnectable());
+					auto destinationConnectorIt = blockEnt2->getAllConnectorsByName().find(connectionCfg.getDestConnectable());
+
+					if (originConnectorIt == blockEnt->getAllConnectorsByName().end() || destinationConnectorIt == blockEnt2->getAllConnectorsByName().end()) {
+						OT_LOG_E("Could not find origin or destination connector for connection");
+						return false;
+					}
+
+					// Check connector types
+					originConnectorType = originConnectorIt->second.getConnectorType();
+					destinationConnectorType = destinationConnectorIt->second.getConnectorType();
+				}
+				else {
+
+					// Find connectors
+					auto originConnectorIt = blockEnt->getAllConnectorsByName().find(connectionCfg.getDestConnectable());
+					auto destinationConnectorIt = blockEnt2->getAllConnectorsByName().find(connectionCfg.getOriginConnectable());
+
+					if (originConnectorIt == blockEnt->getAllConnectorsByName().end() || destinationConnectorIt == blockEnt2->getAllConnectorsByName().end()) {
+						OT_LOG_E("Could not find origin or destination connector for connection");
+						return false;
+					}
+
+					// Check connector types
+					originConnectorType = originConnectorIt->second.getConnectorType();
+					destinationConnectorType = destinationConnectorIt->second.getConnectorType();
+				}
+
+				if (originConnectorType == ot::ConnectorType::UNKNOWN || destinationConnectorType == ot::ConnectorType::UNKNOWN) {
+					OT_LOG_E("Could not determine connector types for connection");
+					return false;
+				}
+				
+				if ((originConnectorType == ot::ConnectorType::In || originConnectorType == ot::ConnectorType::InOptional) &&
+					(destinationConnectorType == ot::ConnectorType::In || destinationConnectorType == ot::ConnectorType::InOptional)) {
+					Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
+					return true;
+				}
+				else if (originConnectorType == ot::ConnectorType::Out &&
+					destinationConnectorType == ot::ConnectorType::Out) {
+					Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
+					return true;
+				}
+			}
+		}
+		EntityNamingBehavior namingBehavior;
+		namingBehavior.explicitNaming = true;
+		
+		EntityBlockConnection* connectionEnt = dynamic_cast<EntityBlockConnection*>(model->getEntityByID(snapInfo.connectionCfg.getUid()));
+		connectionEnt->setConnectionCfg(connectionCfg);
+		connectionEnt->storeToDataBase();
+		modelStateInfo.addTopologyEntity(*connectionEnt);
+	}
+	
+	model->updateTopologyEntities(modelStateInfo, "Snapped Connections", true);
+	return true;
+}
+
+
 
