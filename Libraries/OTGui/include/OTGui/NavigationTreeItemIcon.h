@@ -31,13 +31,12 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT NavigationTreeItemIcon : public Serializable {
+		OT_DECL_DEFCOPY(NavigationTreeItemIcon)
+		OT_DECL_DEFMOVE(NavigationTreeItemIcon)
 	public:
-		NavigationTreeItemIcon();
+		NavigationTreeItemIcon() = default;
 		NavigationTreeItemIcon(const std::string& _visibleIcon, const std::string& _hiddenIcon);
-		NavigationTreeItemIcon(const NavigationTreeItemIcon& _other);
-		virtual ~NavigationTreeItemIcon();
-
-		NavigationTreeItemIcon& operator = (const NavigationTreeItemIcon& _other);
+		virtual ~NavigationTreeItemIcon() = default;
 
 		bool operator == (const NavigationTreeItemIcon& _other) const;
 		bool operator != (const NavigationTreeItemIcon& _other) const;
