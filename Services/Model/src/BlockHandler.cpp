@@ -53,7 +53,7 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 	
 	EntityGraphicsScene* entGraphicsScene = dynamic_cast<EntityGraphicsScene*>(_entBase);
 	if (entGraphicsScene) {
-		addEditor(entGraphicsScene->getEntityID());
+		addEditor(entGraphicsScene);
 		return;
 	}
 
@@ -68,7 +68,7 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 			OT_LOG_E("Failed to cast into EntityGraphicsScene");
 			return;
 		}
-		addBlock(editor->getEntityID(), entBlock->getEntityID());
+		addBlock(editor->getEntityID(), entBlock);
 		return;
 	}
 
@@ -121,13 +121,13 @@ void BlockHandler::addConnection(ot::UID editorId, EntityBlockConnection& _toBeA
 	}
 }
 
-void BlockHandler::addBlock(ot::UID editorId, ot::UID blockId) {
+void BlockHandler::addBlock(ot::UID editorId, const EntityBlock* _block) {
 	auto& blocksMap = m_viewBlockConnectionsMap[editorId];
-	blocksMap.emplace(blockId, ot::UIDList{});
+	blocksMap.emplace(_block->getEntityID(), ot::UIDList{});
 }
 
-void BlockHandler::addEditor(ot::UID editorId) {
-	m_viewBlockConnectionsMap.emplace(editorId, std::map<ot::UID, ot::UIDList>{});
+void BlockHandler::addEditor(const EntityGraphicsScene* _editor) {
+	m_viewBlockConnectionsMap.emplace(_editor->getEntityID(), std::map<ot::UID, ot::UIDList>{});
 }
 
 void BlockHandler::removeFromMap(EntityBase* _entBase) {
@@ -270,7 +270,7 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 	model->addEntitiesToModel(modelStateInfo, "Added block", true, true, true);
 
 	// Add Block to Map
-	addBlock(editor->getEntityID(), createdBlock->getEntityID());
+	addBlock(editor->getEntityID(), createdBlock.get());
 
 	// Check if any service wants to be notified about this change
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {

@@ -43,8 +43,8 @@ public:
 
 	// Setter
 	void addConnection(ot::UID editorId, EntityBlockConnection& _toBeAddedConnection);
-	void addBlock(ot::UID editorId, ot::UID blockId);
-	void addEditor(ot::UID editorId);
+	void addBlock(ot::UID editorId, const EntityBlock* _block);
+	void addEditor(const EntityGraphicsScene* _editor);
 
 	// Remover
 	void removeFromMap(EntityBase* entBase);
