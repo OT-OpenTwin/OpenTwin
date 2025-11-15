@@ -121,7 +121,7 @@ private:
 	//! @param _scene The graphics scene where the snapping event occurred.
 	//! @param _snapEvent The snap event containing details about the snapping action.
 	//! @return True if the snapping was handled successfully, false otherwise.
-	//bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsSnapEvent& _snapEvent);
+	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::NewModelStateInfo& _modelStateInfo);
 
 	
 	std::map<ot::UID, std::map<ot::UID, ot::UIDList>> m_viewBlockConnectionsMap;
