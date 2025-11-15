@@ -552,7 +552,7 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 	else {
 		// Origin not set
 		if (!m_originConnector) {
-			m_originConnector = new GraphicsConnectionConnectorItem;
+			m_originConnector = new GraphicsConnectionConnectorItem(this);
 			if (sc) {
 				sc->addItem(m_originConnector);
 				m_originConnector->setGraphicsScene(sc);
@@ -584,7 +584,7 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 	else {
 		// Destination not set
 		if (!m_destConnector) {
-			m_destConnector = new GraphicsConnectionConnectorItem;
+			m_destConnector = new GraphicsConnectionConnectorItem(this);
 			if (sc) {
 				sc->addItem(m_destConnector);
 				m_destConnector->setGraphicsScene(sc);

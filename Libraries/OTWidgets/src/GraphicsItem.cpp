@@ -764,7 +764,11 @@ void ot::GraphicsItem::setCurrentPosAsMoveStart() {
 	m_moveStartPt = this->getQGraphicsItem()->pos();
 }
 
-void ot::GraphicsItem::notifyMoveIfRequired(GraphicsChangeEvent& _changeEvent) {
+bool ot::GraphicsItem::hasMoved() const {
+	return this->getQGraphicsItem()->pos() != m_moveStartPt;
+}
+
+bool ot::GraphicsItem::notifyMoveIfRequired(GraphicsChangeEvent& _changeEvent) {
 	OTAssertNullptr(this->getConfiguration());
 	OTAssertNullptr(this->getQGraphicsItem());
 	OTAssertNullptr(this->getGraphicsScene());
@@ -777,6 +781,11 @@ void ot::GraphicsItem::notifyMoveIfRequired(GraphicsChangeEvent& _changeEvent) {
 			_changeEvent.addChangedItem(getConfiguration()->createCopy());
 			notifyConnectionsMove(_changeEvent);
 		}
+
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 
@@ -819,6 +828,32 @@ void ot::GraphicsItem::checkConnectionSnapRequest(GraphicsChangeEvent& _result) 
 					cfg.setDestConnectable(item->getGraphicsItemName());
 					_result.addSnapInfo(cfg, false);
 				}
+			}
+		}
+	}
+}
+
+void ot::GraphicsItem::checkConnectionSnapRequest(const QRectF& _connectionConnectorRect, const GraphicsConnectionItem* _connection, GraphicsChangeEvent& _result) {
+	GraphicsScene* scene = this->getGraphicsScene();
+	if (!scene) {
+		OT_LOG_EA("No graphics scene set");
+		return;
+	}
+
+	for (GraphicsItem* item : this->getAllConnectors()) {
+		const QRectF triggerRect = item->getTriggerBoundingRect();
+		if (triggerRect.intersects(_connectionConnectorRect)) {
+			if (!_connection->getOriginItem() && triggerRect.contains(_connection->getOriginPos())) {
+				GraphicsConnectionCfg cfg = _connection->getConfiguration();
+				cfg.setOriginUid(this->getGraphicsItemUid());
+				cfg.setOriginConnectable(item->getGraphicsItemName());
+				_result.addSnapInfo(cfg, true);
+			}
+			else if (!_connection->getDestItem() && triggerRect.contains(_connection->getDestPos())) {
+				GraphicsConnectionCfg cfg = _connection->getConfiguration();
+				cfg.setDestUid(this->getGraphicsItemUid());
+				cfg.setDestConnectable(item->getGraphicsItemName());
+				_result.addSnapInfo(cfg, false);
 			}
 		}
 	}

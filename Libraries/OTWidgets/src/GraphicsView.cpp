@@ -771,19 +771,35 @@ void ot::GraphicsView::endItemMove() {
 
 	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
-		GraphicsConnectionItem* otConn = dynamic_cast<GraphicsConnectionItem*>(qItm);
 		if (otItem) {
 			if (otItem->isInternalItem()) {
-				otItem->notifyConnectionsMove(changeEvent);
+				// Item is internal item
+
+				if (otItem->hasMoved()) {
+					otItem->notifyConnectionsMove(changeEvent);
+
+					// Check items around for snapping
+					GraphicsConnectionConnectorItem* connectorItem = dynamic_cast<GraphicsConnectionConnectorItem*>(otItem);
+					if (connectorItem) {
+						QGraphicsItem* gItem = connectorItem->getQGraphicsItem();
+						const QRectF connectorRect = gItem->mapToScene(gItem->boundingRect()).boundingRect();
+						for (QGraphicsItem* qSnapItm : m_scene->items(connectorRect.marginsAdded(QMarginsF(100., 100., 100., 100.)))) {
+							GraphicsItem* otSnapItem = dynamic_cast<GraphicsItem*>(qSnapItm);
+							if (otSnapItem && otSnapItem != otItem) {
+								otSnapItem->checkConnectionSnapRequest(connectorRect, connectorItem->getConnection(), changeEvent);
+							}
+						}
+					}
+				}
 			}
 			else {
-				otItem->notifyMoveIfRequired(changeEvent);
+				// Item is public item
+
+				if (otItem->notifyMoveIfRequired(changeEvent)) {
+					otItem->checkConnectionSnapRequest(changeEvent);
+				}
 			}
 		}
-	}
-
-	for (auto& itm : m_items) {
-		itm.second->checkConnectionSnapRequest(changeEvent);
 	}
 
 	if (!changeEvent.isEmpty()) {

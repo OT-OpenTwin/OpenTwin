@@ -24,15 +24,24 @@
 
 namespace ot {
 
+	class GraphicsConnectionItem;
+
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionConnectorItem : public GraphicsEllipseItem {
 		OT_DECL_NOCOPY(GraphicsConnectionConnectorItem)
 		OT_DECL_NOMOVE(GraphicsConnectionConnectorItem)
+		OT_DECL_NODEFAULT(GraphicsConnectionConnectorItem)
 	public:
-		GraphicsConnectionConnectorItem();
+		GraphicsConnectionConnectorItem(GraphicsConnectionItem* _connection);
 		virtual ~GraphicsConnectionConnectorItem();
 
 		//! @brief Returns true if this item is a connection connector item.
 		virtual bool isInternalItem() const { return true; };
+
+		GraphicsConnectionItem* getConnection() { return m_connection; };
+		const GraphicsConnectionItem* getConnection() const { return m_connection; };
+
+	private:
+		GraphicsConnectionItem* m_connection;
 	};
 
 }

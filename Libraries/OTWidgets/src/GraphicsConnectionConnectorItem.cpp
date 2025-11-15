@@ -22,7 +22,9 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTWidgets/GraphicsConnectionConnectorItem.h"
 
-ot::GraphicsConnectionConnectorItem::GraphicsConnectionConnectorItem() {
+ot::GraphicsConnectionConnectorItem::GraphicsConnectionConnectorItem(GraphicsConnectionItem* _connection)
+	: m_connection(_connection)
+{
 	const double r = 8.;
 	GraphicsEllipseItemCfg cfg;
 	cfg.setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemConnectionConnectable));

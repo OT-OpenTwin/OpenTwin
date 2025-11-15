@@ -319,9 +319,13 @@ namespace ot {
 		//! @brief Sets the current item position as move start point.
 		void setCurrentPosAsMoveStart();
 
+		//! @brief Returns true if the item has moved after the last call to setCurrentPosAsMoveStart().
+		bool hasMoved() const;
+
 		//! @brief If the item position has changed the item information will be added to the change event.
 		//! @param _changeEvent Event to fill.
-		void notifyMoveIfRequired(GraphicsChangeEvent& _changeEvent);
+		//! @return Returns true if the item has moved and the event was updated.
+		bool notifyMoveIfRequired(GraphicsChangeEvent& _changeEvent);
 
 		//! @brief Adds all connections to the change event to notify about the move.
 		//! @param _changeEvent Event to fill.
@@ -329,6 +333,8 @@ namespace ot {
 
 		//! @brief Checks for connection snap requests and fills the result event accordingly.
 		void checkConnectionSnapRequest(GraphicsChangeEvent& _result);
+
+		void checkConnectionSnapRequest(const QRectF& _connectionConnectorRect, const GraphicsConnectionItem* _connection, GraphicsChangeEvent& _result);
 
 		void parentItemTransformChanged(const QTransform& _parentTransform);
 

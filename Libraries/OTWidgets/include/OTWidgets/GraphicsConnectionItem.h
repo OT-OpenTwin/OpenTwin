@@ -144,8 +144,10 @@ namespace ot {
 
 		void disconnectRequested(GraphicsDisconnectItem* _disconnector);
 
-		GraphicsItem* getOriginItem() const { return m_origin; };
-		GraphicsItem* getDestItem() const { return m_dest; };
+		GraphicsItem* getOriginItem() { return m_origin; };
+		const GraphicsItem* getOriginItem() const { return m_origin; };
+		GraphicsItem* getDestItem() { return m_dest; };
+		const GraphicsItem* getDestItem() const { return m_dest; };
 
 		void updatePositionsFromItems();
 
