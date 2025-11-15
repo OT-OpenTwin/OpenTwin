@@ -61,8 +61,6 @@ protected:
 
 	virtual ot::ReturnMessage graphicsChangeEvent(const ot::GraphicsChangeEvent& _changeEvent) override;
 
-	virtual ot::ReturnMessage graphicsSnapEvent(const ot::GraphicsSnapEvent& _snapEvent) override;
-
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Helper
@@ -123,7 +121,7 @@ private:
 	//! @param _scene The graphics scene where the snapping event occurred.
 	//! @param _snapEvent The snap event containing details about the snapping action.
 	//! @return True if the snapping was handled successfully, false otherwise.
-	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsSnapEvent& _snapEvent);
+	//bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsSnapEvent& _snapEvent);
 
 	
 	std::map<ot::UID, std::map<ot::UID, ot::UIDList>> m_viewBlockConnectionsMap;

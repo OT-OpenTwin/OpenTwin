@@ -491,9 +491,6 @@
     <ClInclude Include="include\OTGui\GraphicsDoubleClickEvent.h">
       <Filter>Header Files\Events</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\GraphicsSnapEvent.h">
-      <Filter>Header Files\Events</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -872,9 +869,6 @@
       <Filter>Source Files\Events</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsDoubleClickEvent.cpp">
-      <Filter>Source Files\Events</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GraphicsSnapEvent.cpp">
       <Filter>Source Files\Events</Filter>
     </ClCompile>
   </ItemGroup>

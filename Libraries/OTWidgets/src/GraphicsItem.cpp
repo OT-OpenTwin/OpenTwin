@@ -795,7 +795,7 @@ void ot::GraphicsItem::notifyConnectionsMove(GraphicsChangeEvent& _changeEvent) 
 	}
 }
 
-void ot::GraphicsItem::checkConnectionSnapRequest(GraphicsSnapEvent& _result) {
+void ot::GraphicsItem::checkConnectionSnapRequest(GraphicsChangeEvent& _result) {
 	GraphicsScene* scene = this->getGraphicsScene();
 	if (!scene) {
 		OT_LOG_EA("No graphics scene set");

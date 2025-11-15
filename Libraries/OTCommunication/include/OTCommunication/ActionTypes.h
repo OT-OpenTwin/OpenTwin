@@ -307,7 +307,6 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker "UI.GraphicsPicker.Fill"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor "UI.GraphicsEditor.Create"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem "UI.GraphicsEditor.Item.Add"
-#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_SnapEvent "UI.GraphicsEditor.SnapEvent"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem "UI.GraphicsEditor.Item.Remove"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ChangeEvent "UI.GraphicsEditor.ChangeEvent"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection "UI.GraphicsEditor.Connection.Add"

@@ -36,9 +36,11 @@ ot::GraphicsChangeEvent::GraphicsChangeEvent(GraphicsChangeEvent&& _other) noexc
 	m_editorName = std::move(_other.m_editorName);
 	m_changedItems = std::move(_other.m_changedItems);
 	m_changedConnections = std::move(_other.m_changedConnections);
+	m_snapInfos = std::move(_other.m_snapInfos);
 
 	_other.m_changedItems.clear();
 	_other.m_changedConnections.clear();
+	_other.m_snapInfos.clear();
 }
 
 ot::GraphicsChangeEvent::~GraphicsChangeEvent() {
@@ -58,6 +60,7 @@ ot::GraphicsChangeEvent& ot::GraphicsChangeEvent::operator=(const GraphicsChange
 		}
 
 		m_changedConnections = _other.m_changedConnections;
+		m_snapInfos = _other.m_snapInfos;
 	}
 
 	return *this;
@@ -72,9 +75,11 @@ ot::GraphicsChangeEvent& ot::GraphicsChangeEvent::operator=(GraphicsChangeEvent&
 		m_editorName = std::move(_other.m_editorName);
 		m_changedItems = std::move(_other.m_changedItems);
 		m_changedConnections = std::move(_other.m_changedConnections);
+		m_snapInfos = std::move(_other.m_snapInfos);
 		
 		_other.m_changedItems.clear();
 		_other.m_changedConnections.clear();
+		_other.m_snapInfos.clear();
 	}
 
 	return *this;
@@ -100,6 +105,15 @@ void ot::GraphicsChangeEvent::addToJsonObject(JsonValue& _object, JsonAllocator&
 		connectionsArr.PushBack(JsonObject(conn, _allocator), _allocator);
 	}
 	_object.AddMember("ChangedConnections", connectionsArr, _allocator);
+
+	JsonArray snapArr;
+	for (const SnapInfo& snapInfo : m_snapInfos) {
+		JsonObject snapObj;
+		snapObj.AddMember("IsOrigin", snapInfo.isOrigin, _allocator);
+		snapObj.AddMember("ConnectionCfg", JsonObject(snapInfo.connectionCfg, _allocator), _allocator);
+		snapArr.PushBack(snapObj, _allocator);
+	}
+	_object.AddMember("SnapInfos", snapArr, _allocator);
 }
 
 void ot::GraphicsChangeEvent::setFromJsonObject(const ConstJsonObject& _object) {
@@ -122,6 +136,21 @@ void ot::GraphicsChangeEvent::setFromJsonObject(const ConstJsonObject& _object) 
 	for (const ConstJsonObject& connObj : json::getObjectList(_object, "ChangedConnections")) {
 		m_changedConnections.push_back(GraphicsConnectionCfg(connObj));
 	}
+
+	for (const ConstJsonObject& snapObj : json::getObjectList(_object, "SnapInfos")) {
+		SnapInfo snapInfo;
+		snapInfo.isOrigin = json::getBool(snapObj, "IsOrigin");
+		snapInfo.connectionCfg = GraphicsConnectionCfg(json::getObject(snapObj, "ConnectionCfg"));
+		m_snapInfos.push_back(std::move(snapInfo));
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
+void ot::GraphicsChangeEvent::addSnapInfo(const GraphicsConnectionCfg& _connectionCfg, bool _isOrigin) {
+	m_snapInfos.push_back(SnapInfo(_connectionCfg, _isOrigin));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -135,5 +164,6 @@ void ot::GraphicsChangeEvent::memFree() {
 	}
 	m_changedItems.clear();
 	m_changedConnections.clear();
+	m_snapInfos.clear();
 	m_editorName.clear();
 }

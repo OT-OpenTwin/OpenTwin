@@ -22,7 +22,6 @@
 // OpenTwin header
 #include "OTGui/Margins.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/GraphicsSnapEvent.h"
 #include "OTGui/GraphicsChangeEvent.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/GraphicsElement.h"
@@ -329,7 +328,7 @@ namespace ot {
 		void notifyConnectionsMove(GraphicsChangeEvent& _changeEvent);
 
 		//! @brief Checks for connection snap requests and fills the result event accordingly.
-		void checkConnectionSnapRequest(GraphicsSnapEvent& _result);
+		void checkConnectionSnapRequest(GraphicsChangeEvent& _result);
 
 		void parentItemTransformChanged(const QTransform& _parentTransform);
 

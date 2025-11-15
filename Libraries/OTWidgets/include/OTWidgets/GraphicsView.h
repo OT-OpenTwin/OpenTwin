@@ -25,7 +25,6 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/CopyInformation.h"
-#include "OTGui/GraphicsSnapEvent.h"
 #include "OTGui/GraphicsChangeEvent.h"
 #include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
@@ -223,8 +222,6 @@ namespace ot {
 		void pasteRequested(CopyInformation& _info);
 
 		void elementsChanged(const GraphicsChangeEvent& _changeEvent);
-
-		void connectionSnapRequested(const GraphicsSnapEvent& _snapEvent);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

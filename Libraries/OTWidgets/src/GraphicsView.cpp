@@ -780,19 +780,11 @@ void ot::GraphicsView::endItemMove() {
 		}
 	}
 
+	for (auto& itm : m_items) {
+		itm.second->checkConnectionSnapRequest(changeEvent);
+	}
+
 	if (!changeEvent.isEmpty()) {
 		Q_EMIT elementsChanged(changeEvent);
-	}
-
-	// Notify about connection snap
-	GraphicsSnapEvent snapEvent;
-	snapEvent.setEditorName(m_viewName);
-
-	for (auto& itm : m_items) {
-		itm.second->checkConnectionSnapRequest(snapEvent);
-	}
-
-	if (!snapEvent.isEmpty()) {
-		Q_EMIT connectionSnapRequested(snapEvent);
 	}
 }

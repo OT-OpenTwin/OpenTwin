@@ -46,7 +46,6 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/VisualisationCfg.h"
-#include "OTGui/GraphicsSnapEvent.h"
 #include "OTGui/GraphicsChangeEvent.h"
 #include "OTGui/ExtendedProjectInformation.h"
 
@@ -511,7 +510,6 @@ public Q_SLOTS:
 	void slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConfig);
 	void slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 	void slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
-	void slotGraphicsSnapEvent(const ot::GraphicsSnapEvent& _event);
 	void slotGraphicsSelectionChanged();
 
 	void slotCopyRequested(const ot::CopyInformation& _info);

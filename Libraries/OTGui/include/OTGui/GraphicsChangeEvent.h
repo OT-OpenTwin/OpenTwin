@@ -31,6 +31,22 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsChangeEvent : public GuiEvent {
 	public:
+		struct SnapInfo {
+			OT_DECL_DEFCOPY(SnapInfo)
+				OT_DECL_DEFMOVE(SnapInfo)
+
+				SnapInfo() = default;
+			SnapInfo(const GraphicsConnectionCfg& _connectionCfg, bool _isOrigin)
+				: connectionCfg(_connectionCfg), isOrigin(_isOrigin) {
+			}
+			SnapInfo(GraphicsConnectionCfg&& _connectionCfg, bool _isOrigin)
+				: connectionCfg(std::move(_connectionCfg)), isOrigin(_isOrigin) {
+			}
+
+			GraphicsConnectionCfg connectionCfg;
+			bool isOrigin = false; // true: origin, false: destination
+		};
+
 		GraphicsChangeEvent() = default;
 		GraphicsChangeEvent(const ConstJsonObject& _jsonObject);
 		GraphicsChangeEvent(const GraphicsChangeEvent& _other);
@@ -54,7 +70,7 @@ namespace ot {
 		void setEditorName(const std::string& _name) { m_editorName = _name; };
 		const std::string& getEditorName() const { return m_editorName; };
 
-		bool isEmpty() const { return m_changedItems.empty() && m_changedConnections.empty(); };
+		bool isEmpty() const { return m_changedItems.empty() && m_changedConnections.empty() && m_snapInfos.empty(); };
 
 		//! @brief Adds a changed item to the event.
 		//! The event takes ownership of the item.
@@ -65,6 +81,9 @@ namespace ot {
 		void addChangedConnection(const GraphicsConnectionCfg& _connection) { m_changedConnections.push_back(_connection); };
 		const std::list<GraphicsConnectionCfg>& getChangedConnections() const { return m_changedConnections; };
 
+		void addSnapInfo(const GraphicsConnectionCfg& _connectionCfg, bool _isOrigin);
+		const std::list<SnapInfo>& getSnapInfos() const { return m_snapInfos; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Helper
@@ -73,6 +92,7 @@ namespace ot {
 		void memFree();
 
 		std::string m_editorName;
+		std::list<SnapInfo> m_snapInfos;
 		std::list<GraphicsItemCfg*> m_changedItems;
 		std::list<GraphicsConnectionCfg> m_changedConnections;
 	};
