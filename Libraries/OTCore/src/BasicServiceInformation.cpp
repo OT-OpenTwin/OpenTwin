@@ -26,16 +26,6 @@ ot::BasicServiceInformation::BasicServiceInformation(const std::string& _service
 
 ot::BasicServiceInformation::BasicServiceInformation(const std::string& _serviceName, const std::string& _serviceType) : m_name(_serviceName), m_type(_serviceType) {}
 
-ot::BasicServiceInformation::BasicServiceInformation(const BasicServiceInformation& _other) : m_name(_other.m_name), m_type(_other.m_type) {}
-
-ot::BasicServiceInformation::~BasicServiceInformation() {}
-
-ot::BasicServiceInformation& ot::BasicServiceInformation::operator = (const BasicServiceInformation& _other) {
-	m_name = _other.m_name;
-	m_type = _other.m_type;
-	return *this;
-}
-
 bool ot::BasicServiceInformation::operator == (const BasicServiceInformation& _other) const {
 	return m_name == _other.m_name && m_type == _other.m_type;
 }

@@ -30,16 +30,13 @@
 namespace ot {
 
 	class OT_CORE_API_EXPORT BasicEntityInformation : public Serializable {
+		OT_DECL_DEFCOPY(BasicEntityInformation)
+		OT_DECL_DEFMOVE(BasicEntityInformation)
 	public:
 		BasicEntityInformation();
 		explicit BasicEntityInformation(UID _entityId, UID _entityVersion);
 		explicit BasicEntityInformation(const std::string& _entityName, UID _entityId, UID _entityVersion);
-		BasicEntityInformation(BasicEntityInformation&& _other) noexcept;
-		BasicEntityInformation(const BasicEntityInformation& _other);
-		virtual ~BasicEntityInformation();
-
-		BasicEntityInformation& operator = (BasicEntityInformation&& _other) noexcept;
-		BasicEntityInformation& operator = (const BasicEntityInformation& _other);
+		virtual ~BasicEntityInformation() = default;
 
 		bool operator == (const BasicEntityInformation& _other) const;
 		bool operator != (const BasicEntityInformation& _other) const;
