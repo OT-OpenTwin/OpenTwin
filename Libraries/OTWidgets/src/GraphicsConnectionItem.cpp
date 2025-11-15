@@ -602,13 +602,13 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 void ot::GraphicsConnectionItem::updateDisconnectVisibility() {
 	if (this->getGraphicsElementState() & GraphicsElement::SelectedState) {
 		if (m_origin) {
-			//m_originDisconnect->setVisible(true);
+			m_originDisconnect->setVisible(true);
 		}
 		else {
 			m_originDisconnect->setVisible(false);
 		}
 		if (m_dest) {
-			//m_destDisconnect->setVisible(true);
+			m_destDisconnect->setVisible(true);
 		}
 		else {
 			m_destDisconnect->setVisible(false);

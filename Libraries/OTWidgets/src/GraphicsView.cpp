@@ -445,6 +445,7 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 	// Ensure item is not a connector
 	if (!_item->isInternalItem()) {
 		GraphicsChangeEvent evt;
+		evt.setEditorName(m_viewName);
 		evt.addChangedItem(_item->getConfiguration()->createCopy());
 
 		for (const GraphicsConnectionItem* connection : _item->getAllConnections()) {
@@ -457,6 +458,7 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 
 void ot::GraphicsView::notifyConnectionConfigurationChanged(const ot::GraphicsConnectionItem* _connection) {
 	GraphicsChangeEvent evt;
+	evt.setEditorName(m_viewName);
 	evt.addChangedConnection(_connection->getConfiguration());
 	Q_EMIT elementsChanged(evt);
 }
