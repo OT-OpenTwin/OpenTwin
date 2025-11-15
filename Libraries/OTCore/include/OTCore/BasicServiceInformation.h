@@ -33,14 +33,14 @@ namespace ot {
 	//! @brief The BasicServiceInformation class is used to hold a service name and type.
 	//! The BasicServiceInformation can be used as a key in a map.
 	class OT_CORE_API_EXPORT BasicServiceInformation : public ot::Serializable {
+		OT_DECL_DEFCOPY(BasicServiceInformation)
+		OT_DECL_DEFMOVE(BasicServiceInformation)
 	public:
 		BasicServiceInformation();
 		explicit BasicServiceInformation(const std::string& _serviceNameAndType);
 		explicit BasicServiceInformation(const std::string& _serviceName, const std::string& _serviceType);
-		BasicServiceInformation(const BasicServiceInformation& _other);
-		virtual ~BasicServiceInformation();
+		virtual ~BasicServiceInformation() = default;
 
-		BasicServiceInformation& operator = (const BasicServiceInformation& _other);
 		bool operator == (const BasicServiceInformation& _other) const;
 		bool operator != (const BasicServiceInformation& _other) const;
 		bool operator < (const BasicServiceInformation& _other) const;
