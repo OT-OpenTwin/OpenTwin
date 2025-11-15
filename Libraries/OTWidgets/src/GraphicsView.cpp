@@ -772,6 +772,10 @@ void ot::GraphicsView::endItemMove() {
 	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
 		if (otItem) {
+			if (otItem->getParentGraphicsItem() != nullptr) {
+				// Ignore child items
+				continue;
+			}
 			if (otItem->isInternalItem()) {
 				// Item is internal item
 
@@ -783,9 +787,9 @@ void ot::GraphicsView::endItemMove() {
 					if (connectorItem) {
 						QGraphicsItem* gItem = connectorItem->getQGraphicsItem();
 						const QRectF connectorRect = gItem->mapToScene(gItem->boundingRect()).boundingRect();
-						for (QGraphicsItem* qSnapItm : m_scene->items(connectorRect.marginsAdded(QMarginsF(100., 100., 100., 100.)))) {
+						for (QGraphicsItem* qSnapItm : m_scene->items(connectorRect.marginsAdded(QMarginsF(m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance())))) {
 							GraphicsItem* otSnapItem = dynamic_cast<GraphicsItem*>(qSnapItm);
-							if (otSnapItem && otSnapItem != otItem) {
+							if (otSnapItem && (otSnapItem != otItem) && !otSnapItem->isInternalItem() && otSnapItem->getParentGraphicsItem() == nullptr) {
 								otSnapItem->checkConnectionSnapRequest(connectorRect, connectorItem->getConnection(), changeEvent);
 							}
 						}

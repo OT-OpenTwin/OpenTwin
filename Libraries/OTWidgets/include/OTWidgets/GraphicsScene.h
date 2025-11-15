@@ -65,55 +65,57 @@ namespace ot {
 		//! @param _pos The new control point position.
 		void startConnectionToConnection(ot::GraphicsConnectionItem* _targetedConnection, const Point2DD& _pos);
 
-		void stopConnection(void);
+		void stopConnection();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
 
 		void setGrid(const Grid& _grid) { m_grid = _grid; };
-		Grid& getGrid(void) { return m_grid; };
-		const Grid& getGrid(void) const { return m_grid; };
+		Grid& getGrid() { return m_grid; };
+		const Grid& getGrid() const { return m_grid; };
 
 		void setGridStep(int _step) { m_grid.setGridStep(_step); };
 		void setGridStep(const Point2D& _step) { m_grid.setGridStep(_step); };
-		Point2D getGridStep(void) const { return m_grid.getGridStep(); };
+		Point2D getGridStep() const { return m_grid.getGridStep(); };
 
 		void setWideGridLineCounter(int _counter) { m_grid.setWideGridLineCounter(_counter); };
 		void setWideGridLineCounter(const Point2D& _counter) { m_grid.setWideGridLineCounter(_counter); };
-		Point2D getWideGridLineCounter(void) const { return m_grid.getWideGridLineCounter(); };
+		Point2D getWideGridLineCounter() const { return m_grid.getWideGridLineCounter(); };
 
 		void setGridFlag(Grid::GridFlag _flag, bool _active = true) { m_grid.setGridFlag(_flag, _active); };
 		void setGridFlags(const Grid::GridFlags& _flags) { m_grid.setGridFlags(_flags); };
-		const Grid::GridFlags& getGridFlags(void) const { return m_grid.getGridFlags(); };
+		const Grid::GridFlags& getGridFlags() const { return m_grid.getGridFlags(); };
 
 		void setGridSnapMode(Grid::GridSnapMode _mode) { m_grid.setGridSnapMode(_mode); };
-		Grid::GridSnapMode getGridSnapMode(void) const { return m_grid.getGridSnapMode(); };
+		Grid::GridSnapMode getGridSnapMode() const { return m_grid.getGridSnapMode(); };
 
 		void setGridLineStyle(const PenFCfg& _outline) { m_grid.setGridLineStyle(_outline); };
-		const PenFCfg& getGridLineStyle(void) const { return m_grid.getGridLineStyle(); };
+		const PenFCfg& getGridLineStyle() const { return m_grid.getGridLineStyle(); };
 		
 		void setMultiselectionEnabled(bool _enabled) { m_multiselectionEnabled = _enabled; };
-		bool getMultiselectionEnabled(void) const { return m_multiselectionEnabled; };
+		bool getMultiselectionEnabled() const { return m_multiselectionEnabled; };
 
 		void checkMaxTriggerDistance(double _triggerDistance);
 		void checkMaxTriggerDistance(const MarginsD& _triggerDistance);
 
-		GraphicsView* getGraphicsView(void) { return m_view; };
-		const GraphicsView* getGraphicsView(void) const { return m_view; };
+		GraphicsView* getGraphicsView() { return m_view; };
+		const GraphicsView* getGraphicsView() const { return m_view; };
 
 		void setConnectionPreviewShape(GraphicsConnectionCfg::ConnectionShape _shape) { m_connectionPreviewShape = _shape; };
-		GraphicsConnectionCfg::ConnectionShape getConnectionPreviewShape(void) const { return m_connectionPreviewShape; };
+		GraphicsConnectionCfg::ConnectionShape getConnectionPreviewShape() const { return m_connectionPreviewShape; };
 
 		void setIgnoreEvents(bool _ignore) { m_ignoreEvents = _ignore; };
-		bool getIgnoreEvents(void) const { return m_ignoreEvents; };
+		bool getIgnoreEvents() const { return m_ignoreEvents; };
+
+		double getMaxTriggerDistance() const { return m_maxTriggerDistance; };
 
 		QPointF snapToGrid(const QPointF& _pt) const;
 
 		//! @brief Snaps the item to the grid according to the item flags and returns the top left pos.
 		QPointF snapToGrid(const GraphicsItem* _item) const;
 
-		void deselectAll(void);
+		void deselectAll();
 
 		void moveAllSelectedItems(const Point2DD& _delta);
 
@@ -127,10 +129,10 @@ namespace ot {
 
 		void elementAboutToBeRemoved(GraphicsElement* _element);
 
-		void handleSelectionChanged(void);
+		void handleSelectionChanged();
 
 	Q_SIGNALS:
-		void selectionChangeFinished(void);
+		void selectionChangeFinished();
 		void graphicsItemDoubleClicked(ot::GraphicsItem* _item);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -138,7 +140,7 @@ namespace ot {
 		// Public: Slots
 
 	public Q_SLOTS:
-		void slotSelectionChanged(void);
+		void slotSelectionChanged();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -168,8 +170,8 @@ namespace ot {
 		QList<QGraphicsItem*> findItemsInTriggerDistance(const QPointF& _pos) const;
 
 	private:
-		void handleMultiSelectionChanged(void);
-		void handleSingleSelectionChanged(void);
+		void handleMultiSelectionChanged();
+		void handleSingleSelectionChanged();
 
 
 		std::list<GraphicsElement *> m_lastHoverElements;
