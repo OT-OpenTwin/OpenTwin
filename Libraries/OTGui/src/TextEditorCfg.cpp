@@ -89,25 +89,6 @@ void ot::TextEditorCfg::setNextChunk(const std::string& _fullText, size_t _start
 		return;
 	}
 
-	if (endIx < _fullText.size() - 1) {
-
-		// Try to end at end of word
-		for (; endIx > _startIndex; endIx--) {
-			const char c = _fullText[endIx];
-			if (isspace(_fullText[endIx])) {
-				if (endIx > 0) {
-					endIx--;
-				}
-				break;
-			}
-		}
-
-		// If no end of word found in chunk, hard break
-		if (endIx <= _startIndex) {
-			endIx = std::min(_fullText.size() - 1, (_startIndex + _chunkSize - 1));
-		}
-	}
-
 	m_text = _fullText.substr(_startIndex, (endIx - _startIndex) + 1);
 	m_isChunk = true;
 	m_hasMore = (endIx < _fullText.size() - 1);
