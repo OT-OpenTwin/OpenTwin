@@ -110,6 +110,7 @@ public:
 	std::string getPathToOTEndPointDocParser(void);
 
 	std::string serviceNameToSnakeCase(const std::string& _serviceName);
+	std::string endpointNameToKebabCase(const std::string& _endpointName);
 
 private:
 	std::list<Service> m_services;

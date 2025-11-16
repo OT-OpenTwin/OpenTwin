@@ -953,7 +953,7 @@ std::string Application::generateServiceRstContent(const Service& _service) {
 		<< "      - Macro\n";
 
 	for (const Endpoint& ep : _service.getEndpoints()) {
-		out << "    * - " << ep.getName() << "\n"
+		out << "    * - :ref:`" << ep.getName() << " <reference-" << endpointNameToKebabCase(ep.getName()) << ">`" << "\n"
 			<< "      - " << ep.getBriefDescription() << "\n"
 			<< "      - " << ep.getAction() << "\n";
 	}
@@ -969,7 +969,8 @@ std::string Application::generateServiceRstContent(const Service& _service) {
 	std::string response = "Response";
 
 	for (const Endpoint& ep : _service.getEndpoints()) {
-		out << ep.getName() << "\n"			// name
+		out << ".. _reference-" << endpointNameToKebabCase(ep.getName()) << ":\n\n"	// reference
+			<< ep.getName() << "\n"			// name
 			<< std::string(ep.getName().size(), '^') << "\n\n"
 			<< briefDescription << "\n"		// brief description
 			<< std::string(briefDescription.size(), '"') << "\n\n"
@@ -1162,6 +1163,45 @@ std::string Application::serviceNameToSnakeCase(const std::string& _serviceName)
 			}
 			result += tolower(currentChar);
 		}
+		else {
+			result += currentChar;
+		}
+	}
+
+	OT_LOG_D(result);
+	return result;
+}
+
+std::string Application::endpointNameToKebabCase(const std::string& _endpointName) {
+	OT_LOG_D("Converting " + _endpointName + " into kebab-case:");
+
+	std::string result;
+	result.reserve(_endpointName.length() * 2);
+
+	for (size_t i = 0; i < _endpointName.length(); i++) {
+		char currentChar = _endpointName[i];
+
+		// Replace dots with hyphens
+		if (currentChar == '.') {
+			result += '-';
+		}
+		// Handle uppercase letters
+		else if (isupper(currentChar)) {
+			if (i > 0) {
+				char prevChar = _endpointName[i - 1];
+				// Don not add a hyphen if the previous char was a dot (already converted to hyphen)
+				if (prevChar != '.') {
+					bool needHyphen = islower(prevChar) ||
+						(isupper(prevChar) && i + 1 < _endpointName.length() && islower(_endpointName[i + 1]));
+
+					if (needHyphen) {
+						result += '-';
+					}
+				}
+			}
+			result += tolower(currentChar);
+		}
+		// Handle lowercase letters and other characters
 		else {
 			result += currentChar;
 		}
