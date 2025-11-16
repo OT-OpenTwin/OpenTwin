@@ -36,10 +36,10 @@ SET OT_DLLD=x64\Debug
 SET OT_DLLR=x64\Release
 SET OT_LIBD=x64\Debug
 SET OT_LIBR=x64\Release
-SET OT_CDLLD=build-vs2022-debug\Debug
-SET OT_CDLLR=build-vs2022-release\Release
-SET OT_CLIBD=build-vs2022-debug\Debug
-SET OT_CLIBR=build-vs2022-release\Release
+SET OT_CDLLD=build\windows-debug\Debug
+SET OT_CDLLR=build\windows-release\Release
+SET OT_CLIBD=build\windows-debug\Debug
+SET OT_CLIBR=build\windows-release\Release
 
 SET OT_TEST=test
 SET OT_LIBTESTD=\x64\DebugTest

@@ -46,7 +46,7 @@ packages
 /**/.vs
 
 # build directories
-build-*
+build
 
 [Dd]ebug/
 [Dd]ebugPublic/
