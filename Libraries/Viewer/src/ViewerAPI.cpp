@@ -236,17 +236,17 @@ void ViewerAPI::freeze3DView(unsigned long long osgModelID, bool flag)
 	getModelFromID(osgModelID)->freeze3DView(flag);
 }
 
-void ViewerAPI::addNodeFromFacetData(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-									 double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors,
-									 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
+void ViewerAPI::addNodeFromFacetData(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, double _surfaceColorRGB[3], double _edgeColorRGB[3], bool _backFaceCulling,
+	double _offsetFactor, std::vector<Geometry::Node>& _nodes, std::list<Geometry::Triangle>& _triangles, std::list<Geometry::Edge>& _edges, std::map<ot::UID, std::string>& _faceNameMap, std::string& _errors,
+	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 		
-		model->addNodeFromFacetData(treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, false, isEditable, nodes, triangles, edges, faceNameMap,
-								    errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
-		cancelAllRubberbands(osgModelID);
+		model->addNodeFromFacetData(_treeItem, _surfaceColorRGB, _edgeColorRGB, _backFaceCulling, _offsetFactor, _nodes, _triangles, _edges, _faceNameMap,
+								    _errors, _manageParentVisibility, _manageChildVisibility, _showWhenSelected);
+		cancelAllRubberbands(_osgModelID);
 	}
 	catch (std::out_of_range)
 	{

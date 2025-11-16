@@ -71,8 +71,9 @@ public:
 
 	void setTreeStateRecording(bool flag);
 
-	void addNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors,
-							  bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
+	void addNodeFromFacetData(const ot::EntityTreeItem& _treeItem, double _surfaceColorRGB[3], double _edgeColorRGB[3], bool _backFaceCulling,
+		double _offsetFactor, std::vector<Geometry::Node>& _nodes, std::list<Geometry::Triangle>& _triangles, std::list<Geometry::Edge>& _edges, std::map<ot::UID, std::string>& _faceNameMap, std::string& _errors,
+		bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected);
 	void addNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, 
 								  bool reflective, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, 
 								  bool isEditable, const std::string &projectName, unsigned long long entityID, unsigned long long version,
@@ -240,8 +241,7 @@ private:
 	void	   edgeSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2);
 	SceneNodeBase *getParentNode(const std::string &treeName);
 	void	   endCurrentSelectionMode(bool cancelled);
-	SceneNodeGeometry *createNewGeometryNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool isEditable,
-											 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility);
+	SceneNodeGeometry *createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool isHidden, bool manageParentVisibility, bool manageChildVisibility);
 	void       setItemVisibleState(SceneNodeBase *item, bool visible);
 	void	   showAllSceneNodesAction(void);
 	void	   showSelectedSceneNodesAction(void);

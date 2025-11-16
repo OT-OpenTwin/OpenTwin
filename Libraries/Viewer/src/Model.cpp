@@ -865,11 +865,10 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 
 }
 
-SceneNodeGeometry *Model::createNewGeometryNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, 
-												bool isHidden, bool isEditable, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility)
+SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool isHidden, bool manageParentVisibility, bool manageChildVisibility)
 {
 	// Check whether the item already exists
-	SceneNodeBase *item = modelItemToSceneNodesMap[modelEntityID];
+	SceneNodeBase *item = modelItemToSceneNodesMap[_treeItem.getEntityID()];
 
 	SceneNodeGeometry *geometryNode = nullptr;
 
@@ -1033,8 +1032,9 @@ void Model::renameEntityPath(const std::string &oldPath, const std::string &newP
 	}
 }
 
-void Model::addNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors,
-								 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
+void Model::addNodeFromFacetData(const ot::EntityTreeItem& _treeItem, double _surfaceColorRGB[3], double _edgeColorRGB[3], bool _backFaceCulling,
+	double _offsetFactor, std::vector<Geometry::Node>& _nodes, std::list<Geometry::Triangle>& _triangles, std::list<Geometry::Edge>& _edges, std::map<ot::UID, std::string>& _faceNameMap, std::string& _errors,
+	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected)
 {
 	SceneNodeGeometry *geometryNode = createNewGeometryNode(treeName, modelEntityID, treeIcons, isHidden, isEditable, selectChildren, manageParentVisibility, manageChildVisibility);
 

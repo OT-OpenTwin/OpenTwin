@@ -20,13 +20,13 @@
 #pragma once
 
 #include "Geometry.h"
-#include "OldTreeIcon.h"
 
 #include "OTCore/JSON.h"
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTGui/GuiTypes.h"
+#include "OTGui/EntityTreeItem.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/Plot1DDataBaseCfg.h"
@@ -77,36 +77,35 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void setHoverTreeItem(ot::UID hoverItemID);
 
-	__declspec(dllexport) void addNodeFromFacetData(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-												    double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors,
-													bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
-	__declspec(dllexport) void addNodeFromFacetDataBase(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-														double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion,
-													    bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
+	__declspec(dllexport) void addNodeFromFacetData(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, double _surfaceColorRGB[3], double _edgeColorRGB[3], bool _backFaceCulling,
+												    double _offsetFactor, std::vector<Geometry::Node>& _nodes, std::list<Geometry::Triangle>& _triangles, std::list<Geometry::Edge>& _edges, std::map<ot::UID, std::string>& _faceNameMap, std::string& _errors,
+													bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected);
+	__declspec(dllexport) void addNodeFromFacetDataBase(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, double _surfaceColorRGB[3], double _edgeColorRGB[3], const std::string& _materialType, const std::string& _textureType, bool _reflective, bool _backFaceCulling,
+														double _offsetFactor, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion,
+													    bool _selectChildren, bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation);
 	
-	__declspec(dllexport) void addVisualizationContainerNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable, const ot::VisualisationTypes& _visualisationTypes);
+	__declspec(dllexport) void addVisualizationContainerNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes);
 	
-	__declspec(dllexport) void addVisualizationNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable, ot::VisualisationTypes _visualisationTypes);
-	__declspec(dllexport) void addVTKNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
-	__declspec(dllexport) void updateVTKNode(ot::UID osgModelID, unsigned long long modelEntityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
+	__declspec(dllexport) void addVisualizationNode(ot::UID osgModelID, const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes);
+	__declspec(dllexport) void addVTKNode(ot::UID osgModelID, const ot::EntityTreeItem& _treeItem, bool isHidden, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
+	__declspec(dllexport) void updateVTKNode(ot::UID osgModelID, const ot::EntityTreeItem& _treeItem, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 
-	__declspec(dllexport) void addVisualizationAnnotationNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID,
-															  const OldTreeIcon &treeIcons, bool isHidden,
-															  const double edgeColorRGB[3],
+	__declspec(dllexport) void addVisualizationAnnotationNode(ot::UID osgModelID, const ot::EntityTreeItem& _treeItem,
+															  bool isHidden, const double edgeColorRGB[3],
 															  const std::vector<std::array<double, 3>> &points,
 															  const std::vector<std::array<double, 3>> &points_rgb,
 															  const std::vector<std::array<double, 3>> &triangle_p1,
 															  const std::vector<std::array<double, 3>> &triangle_p2,
 															  const std::vector<std::array<double, 3>> &triangle_p3,
 															  const std::vector<std::array<double, 3>> &triangle_rgb);
-	__declspec(dllexport) void addVisualizationAnnotationNodeDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion);
-	__declspec(dllexport) void addVisualizationMeshNodeFromFacetDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion);
-	__declspec(dllexport) void addVisualizationMeshItemNodeFromFacetDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion, long long tetEdgesID, long long tetEdgesVersion);
-	__declspec(dllexport) void addVisualizationCartesianMeshNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, double edgeColorRGB[3], double meshLineColorRGB[3], bool showMeshLines, const std::vector<double> &meshCoordsX, const std::vector<double> &meshCoordsY, const std::vector<double> &meshCoordsZ,
+	__declspec(dllexport) void addVisualizationAnnotationNodeDataBase(ot::UID osgModelID, const ot::EntityTreeItem& _treeItem, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion);
+	__declspec(dllexport) void addVisualizationMeshNodeFromFacetDataBase(ot::UID osgModelID, const ot::EntityTreeItem& _treeItem, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion);
+	__declspec(dllexport) void addVisualizationMeshItemNodeFromFacetDataBase(ot::UID osgModelID, const ot::EntityTreeItem& _treeItem, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion, long long tetEdgesID, long long tetEdgesVersion);
+	__declspec(dllexport) void addVisualizationCartesianMeshNode(ot::UID osgModelID, const ot::EntityTreeItem& _treeItem, bool isHidden, double edgeColorRGB[3], double meshLineColorRGB[3], bool showMeshLines, const std::vector<double> &meshCoordsX, const std::vector<double> &meshCoordsY, const std::vector<double> &meshCoordsZ,
 																 const std::string &projectName, unsigned long long faceListEntityID, unsigned long long faceListEntityVersion, unsigned long long nodeListEntityID, unsigned long long nodeListEntityVersion);
-	__declspec(dllexport) void visualizationCartesianMeshNodeShowLines(ot::UID osgModelID, unsigned long long modelEntityID, bool showMeshLines);
-	__declspec(dllexport) void addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3]);
-	__declspec(dllexport) void visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned long long modelEntityID, bool displayTetEdges);
+	__declspec(dllexport) void visualizationCartesianMeshNodeShowLines(ot::UID osgModelID, ot::UID modelEntityID, bool showMeshLines);
+	__declspec(dllexport) void addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const ot::EntityTreeItem& _treeItem, bool isHidden, std::vector<int> &facesList, double color[3]);
+	__declspec(dllexport) void visualizationTetMeshNodeTetEdges(ot::UID osgModelID, ot::UID modelEntityID, bool displayTetEdges);
 	
 	__declspec(dllexport) void notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 	

@@ -19,11 +19,9 @@
 
 #pragma once
 
-// Viewer header
-#include "OldTreeIcon.h"
-
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
+#include "OTGui/EntityTreeItem.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
 
@@ -91,7 +89,7 @@ public:
 
 	virtual void createTree(void) {};
 	virtual void clearTree(void) {};
-	virtual ot::UID addTreeItem(const std::string& treePath, bool editable, bool selectChildren) { return 0; };
+	virtual ot::UID addTreeItem(const ot::EntityTreeItem& _treeItem) { return 0; };
 	virtual void removeTreeItems(std::list<ot::UID> treeItemIDList) {};
 	virtual void selectTreeItem(ot::UID treeItemID) {};
 	virtual void selectSingleTreeItem(ot::UID treeItemID) {};
