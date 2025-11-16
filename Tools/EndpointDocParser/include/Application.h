@@ -29,12 +29,11 @@
 struct ParseError {
 	std::string file;
 	size_t lineNumber;
-	std::string serviceName;
 	std::string errorMessage;
 	std::string context;
 
 	std::string toString() const {
-		std::string parseErrorAsString = "at " + serviceName + " - " + file + " - line " + std::to_string(lineNumber) + " - " + errorMessage;
+		std::string parseErrorAsString = "at " + file + " - line " + std::to_string(lineNumber) + " - " + errorMessage;
 
 		if (!context.empty()) {
 			parseErrorAsString += " - Context: " + context;

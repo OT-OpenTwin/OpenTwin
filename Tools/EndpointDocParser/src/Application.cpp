@@ -243,7 +243,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						ParseError error{
 							_file,
 							lineNumber,
-							_service.getName(),
 							"Message Type must be TLS or mTLS, got: " + security,
 							apiContent
 						};
@@ -276,7 +275,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						ParseError error{
 							_file,
 							lineNumber,
-							_service.getName(),
 							"Key not found in m_actionMacros: " + action,
 							apiContent
 						};
@@ -317,7 +315,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						ParseError error{
 							_file,
 							lineNumber,
-							_service.getName(),
 							"Failed to parse parameter.",
 							apiContent
 						};
@@ -359,7 +356,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						ParseError error{
 							_file,
 							lineNumber,
-							_service.getName(),
 							"Failed to parse response parameter.",
 							apiContent
 						};
@@ -414,7 +410,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 							ParseError error{
 								_file,
 								lineNumber,
-								_service.getName(),
 								"Invalid input: @endnote must be empty.",
 								apiContent
 							};
@@ -432,7 +427,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 							ParseError error{
 								_file,
 								lineNumber,
-								_service.getName(),
 								"Invalid input: @endwarning must be empty.",
 								apiContent
 							};
@@ -514,7 +508,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 							ParseError error{
 								_file,
 								lineNumber,
-								_service.getName(),
 								"Invalid input: @endnote must be empty.",
 								apiContent
 							};
@@ -532,7 +525,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 							ParseError error{
 								_file,
 								lineNumber,
-								_service.getName(),
 								"Invalid input: @endwarning must be empty.",
 								apiContent
 							};
@@ -557,7 +549,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					ParseError error{
 								_file,
 								lineNumber,
-								_service.getName(),
 								"Unknown content.",
 								apiContent
 					};
@@ -574,7 +565,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						ParseError error{
 								_file,
 								lineNumber,
-								_service.getName(),
 								"Error(s) by parsing " + endpoint.getAction() + ". Enpoint was not added to service.",
 								""
 						};
@@ -590,7 +580,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 							ParseError error{
 								_file,
 								lineNumber,
-								_service.getName(),
 								"Message type is missing, default message type mTLS was set.",
 								""
 							};
@@ -633,7 +622,6 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						ParseError error{
 								_file,
 								lineNumber,
-								_service.getName(),
 								"Invalid Endpoint can't be added to service - missing: " + missing,
 								""
 						};
@@ -694,7 +682,6 @@ bool Application::parseParameter(Parameter& _parameter, const std::string& _para
 		ParseError error{
 			_file,
 			_lineNumber,
-			_service.getName(),
 			"Key not found in m_actionMacros: " + macro,
 			""
 		};
@@ -770,7 +757,6 @@ bool Application::parseParameter(Parameter& _parameter, const std::string& _para
 			ParseError error{
 				_file,
 				_lineNumber,
-				_service.getName(),
 				"Invalid parameter datatype: " + dataType,
 				""
 			};
@@ -799,7 +785,6 @@ bool Application::parseParameter(Parameter& _parameter, const std::string& _para
 		ParseError error{
 				_file,
 				_lineNumber,
-				_service.getName(),
 				"Unknown parameter type: " + _parameterType,
 				""
 		};
