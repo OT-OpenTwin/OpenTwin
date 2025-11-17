@@ -49,9 +49,11 @@ public:
 	// Remover
 	void removeFromMap(EntityBase* entBase);
 	void entityRemoved(EntityBase* _entity, const std::list<EntityBase*>& _otherEntitiesToRemove);
+	void removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, EntityBlockConnection* _connectionEntity, const ot::GraphicsConnectionCfg& _changedConnection);
 
 	// Finder
 	bool findBlock(ot::UID _editor, ot::UID _block);
+	bool blockExists(ot::UID _blockUID);
 
 protected:
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;
