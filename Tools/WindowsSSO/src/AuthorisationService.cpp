@@ -92,14 +92,14 @@ void AuthorisationService::authorizeClient(const std::string& _token3)
     outDesc.pBuffers = &outBuf;
 
     unsigned long ctxAttr;
-    CtxtHandle hCtx{};
+    CtxtHandle completedContext{};
 
     SECURITY_STATUS securityStatus = AcceptSecurityContext(
         &m_credHandle,
         m_partialContext,
         &inDesc,
         ASC_REQ_DELEGATE | ASC_REQ_CONFIDENTIALITY | ASC_REQ_MUTUAL_AUTH, SECURITY_NATIVE_DREP,
-        &hCtx,
+        &completedContext,
         &outDesc,
         &ctxAttr,
         &m_credTimeStamp);
@@ -112,8 +112,8 @@ void AuthorisationService::authorizeClient(const std::string& _token3)
 
     if (securityStatus == SEC_E_OK)
     {
-        readUserName(hCtx);
-        readUserGroups(hCtx);
+        readUserName(completedContext);
+        readUserGroups(completedContext);
     }
 }
 

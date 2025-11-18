@@ -126,13 +126,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\AuthorisationService.cpp" />
+    <ClCompile Include="src\Client.cpp" />
     <ClCompile Include="src\Helper.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Client.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="include\AuthorisationService.h" />
+    <ClInclude Include="include\Client.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

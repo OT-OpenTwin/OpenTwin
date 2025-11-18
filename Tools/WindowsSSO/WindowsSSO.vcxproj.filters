@@ -24,15 +24,18 @@
     <ClCompile Include="src\AuthorisationService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Client.h">
+    <ClInclude Include="include\AuthorisationService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\AuthorisationService.h">
+    <ClInclude Include="include\Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

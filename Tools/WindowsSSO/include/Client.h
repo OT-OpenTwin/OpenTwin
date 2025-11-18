@@ -15,87 +15,20 @@
 class Client
 {
 public:
-    Client()
-        : m_hCtx{}
-    {
-        auto securityStatus = acquireCredentialsHandle(m_credHandle, m_credTimeStamp, SECPKG_CRED_OUTBOUND);
-        if (securityStatus != SEC_E_OK)
-        {
-            throw std::exception("AcquireCredentialsHandle inbound failed");
-        }
-    }
+    Client();
 
-    std::vector<BYTE> generateClientToken(const std::vector<BYTE>& _inputToken, bool _firstCall)
-    {
 
-        TimeStamp lpExpiry;
-        ULONG ctxAttr = 0;
-
-        // Input buffer
-
-        SecBuffer inBuf;
-        SecBufferDesc inDesc;
-        if (!_firstCall)
-        {
-            
-            inBuf.BufferType = SECBUFFER_TOKEN;
-            inBuf.cbBuffer = (ULONG)_inputToken.size();
-            inBuf.pvBuffer = (BYTE*)_inputToken.data();
-
-            inDesc.ulVersion = SECBUFFER_VERSION;
-            inDesc.cBuffers = 1;
-            inDesc.pBuffers = &inBuf;
-        }
-        else
-        {
-            assert(_inputToken.size() == 0);
-        }
-
-        // Output buffer
-        BYTE outBufBytes[8192];
-        SecBuffer outBuf;
-        outBuf.BufferType = SECBUFFER_TOKEN;
-        outBuf.cbBuffer = sizeof(outBufBytes);
-        outBuf.pvBuffer = outBufBytes;
-
-        SecBufferDesc outDesc;
-        outDesc.ulVersion = SECBUFFER_VERSION;
-        outDesc.cBuffers = 1;
-        outDesc.pBuffers = &outBuf;
-
-        SECURITY_STATUS securityStatus = InitializeSecurityContextW(
-            &m_credHandle,
-            m_pCtxHandle,
-            (LPWSTR)L"",    // target name (SPN) – can be empty if NTLM/Negotiate
-            ISC_REQ_CONFIDENTIALITY | ISC_REQ_MUTUAL_AUTH,
-            0,
-            SECURITY_NATIVE_DREP,
-            _firstCall ? NULL : &inDesc,
-            0,
-            &m_hCtx,
-            &outDesc,
-            &ctxAttr,
-            &lpExpiry);
-
-        if (securityStatus != SEC_E_OK && securityStatus != SEC_I_CONTINUE_NEEDED)
-        {
-            std::cout << "InitializeSecurityContext failed: " << std::hex << securityStatus << "\n";
-        }
-        
-        
-        m_pCtxHandle = &m_hCtx;
-        // Copy output token
-        std::vector<BYTE> outputToken;
-        outputToken.assign((BYTE*)outBuf.pvBuffer, (BYTE*)outBuf.pvBuffer + outBuf.cbBuffer);
-
-        return outputToken;
-    }
+    std::vector<BYTE> generateClientToken(const std::vector<BYTE>& _inputToken, bool _firstCall);
 
 private:
     CredHandle m_credHandle;
     TimeStamp m_credTimeStamp;
-    CtxtHandle m_hCtx;
-    CtxtHandle* m_pCtxHandle = nullptr;
+    // On the first call to AcceptSecurityContext(CredSSP), this pointer receives the new context handle.
+    // On subsequent calls, m_partialContext can be the same as this handle.
+    CtxtHandle m_currentContext;
+    // On the first call to AcceptSecurityContext (CredSSP), this pointer is NULL. 
+    // On subsequent calls, phContext specifies the partially formed context returned in the phNewContext parameter by the first call.
+    CtxtHandle* m_partialContext = nullptr;
 };
 
 
