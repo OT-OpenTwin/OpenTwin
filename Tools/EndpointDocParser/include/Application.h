@@ -95,6 +95,12 @@ public:
 
 	bool writeServiceRstFile(const std::string& _path, const std::string& _rst);
 
+	bool updateDocumentedEndpointsIndex(const std::list<Service>& m_services);
+
+	std::string generateDocumentedEndpointsIndexContent(const std::list<std::string>& _serviceFileNames);
+
+	bool writeDocumentedEndpointsIndexFile(const std::string& _path, const std::string& _content);
+
 	bool documentParseErrors(void);
 
 	void reportError(const ParseError& _error);

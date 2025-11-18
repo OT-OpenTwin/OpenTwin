@@ -929,6 +929,8 @@ bool Application::generateDocumentation(const std::list<Service>& m_services) {
 	hasError |= writeServiceRstFile(path + "\\" + serviceName + ".rst", rst);
 	}
 
+	hasError |= updateDocumentedEndpointsIndex(m_services);
+
 	return hasError;
 }
 
@@ -1061,6 +1063,68 @@ bool Application::writeServiceRstFile(const std::string& _path, const std::strin
 		return true;
 	}
 	
+	return false;
+}
+
+bool Application::updateDocumentedEndpointsIndex(const std::list<Service>& m_services) {
+	OT_LOG_D("Updating documented_endpoints.rst index file:");
+
+	std::list<std::string> serviceFileNames;
+	for (const Service& service : m_services) {
+		std::string serviceName = serviceNameToSnakeCase(service.getName());
+		serviceFileNames.push_back(serviceName);
+	}
+
+	serviceFileNames.sort();
+	std::string content = generateDocumentedEndpointsIndexContent(serviceFileNames);
+	std::string path = getPathToOTDocumentation();
+	std::string indexFilePath = path + "\\documented_endpoints.rst";
+
+	return writeDocumentedEndpointsIndexFile(indexFilePath, content);
+}
+
+std::string Application::generateDocumentedEndpointsIndexContent(const std::list<std::string>& _serviceFileNames) {
+	OT_LOG_D("Generating documented_endpoints.rst content.");
+
+	std::ostringstream out;
+
+	// Header
+	out << "Documented Endpoints\n"
+		<< "====================\n\n"
+		<< "This section contains documented endpoints for the OpenTwin services.\n\n"
+		<< ".. toctree::\n"
+		<< "   :maxdepth: 3\n"
+		<< "   :caption: Documented Endpoints\n\n";
+
+	// Service file names (without .rst extension)
+	for (const std::string& fileName : _serviceFileNames) {
+		out << "   " << fileName << "\n";
+	}
+
+	OT_LOG_D("Generated content:\n" + out.str());
+
+	return out.str();
+}
+
+bool Application::writeDocumentedEndpointsIndexFile(const std::string& _path, const std::string& _content) {
+	OT_LOG_D("Writing documented_endpoints.rst index file to: " + _path);
+
+	if (_content.empty()) {
+		OT_LOG_E("Could not write into " + _path + " because content is empty.");
+		return true;
+	}
+
+	std::ofstream file(_path);
+
+	if (!file.is_open()) {
+		OT_LOG_E("Could not write file: " + _path);
+		return true;
+	}
+
+	file << _content;
+	file.close();
+
+	OT_LOG_D("Successfully wrote documented_endpoints.rst index file.");
 	return false;
 }
 
