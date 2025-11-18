@@ -18,26 +18,14 @@ public:
     Client()
         : m_hCtx{}
     {
-        SECURITY_STATUS ss = AcquireCredentialsHandleW(
-            NULL,
-            (LPWSTR)L"Negotiate",
-            SECPKG_CRED_OUTBOUND,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            &m_hCred,
-            &m_lifetime);
-
-        if (ss != SEC_E_OK)
+        auto securityStatus = acquireCredentialsHandle(m_credHandle, m_credTimeStamp, SECPKG_CRED_OUTBOUND);
+        if (securityStatus != SEC_E_OK)
         {
-            std::cout << "AcquireCredentialsHandle failed\n";
+            throw std::exception("AcquireCredentialsHandle inbound failed");
         }
     }
 
-    std::vector<BYTE> generateClientToken(
-        const std::vector<BYTE>& inputToken,
-        bool firstCall)
+    std::vector<BYTE> generateClientToken(const std::vector<BYTE>& _inputToken, bool _firstCall)
     {
 
         TimeStamp lpExpiry;
@@ -47,15 +35,20 @@ public:
 
         SecBuffer inBuf;
         SecBufferDesc inDesc;
-        if (!firstCall)
+        if (!_firstCall)
         {
+            
             inBuf.BufferType = SECBUFFER_TOKEN;
-            inBuf.cbBuffer = (ULONG)inputToken.size();
-            inBuf.pvBuffer = (BYTE*)inputToken.data();
+            inBuf.cbBuffer = (ULONG)_inputToken.size();
+            inBuf.pvBuffer = (BYTE*)_inputToken.data();
 
             inDesc.ulVersion = SECBUFFER_VERSION;
             inDesc.cBuffers = 1;
             inDesc.pBuffers = &inBuf;
+        }
+        else
+        {
+            assert(_inputToken.size() == 0);
         }
 
         // Output buffer
@@ -70,25 +63,26 @@ public:
         outDesc.cBuffers = 1;
         outDesc.pBuffers = &outBuf;
 
-        SECURITY_STATUS ss = InitializeSecurityContextW(
-            &m_hCred,
+        SECURITY_STATUS securityStatus = InitializeSecurityContextW(
+            &m_credHandle,
             m_pCtxHandle,
             (LPWSTR)L"",    // target name (SPN) – can be empty if NTLM/Negotiate
             ISC_REQ_CONFIDENTIALITY | ISC_REQ_MUTUAL_AUTH,
             0,
             SECURITY_NATIVE_DREP,
-            firstCall ? NULL : &inDesc,
+            _firstCall ? NULL : &inDesc,
             0,
             &m_hCtx,
             &outDesc,
             &ctxAttr,
             &lpExpiry);
 
-        if (ss != SEC_E_OK && ss != SEC_I_CONTINUE_NEEDED)
+        if (securityStatus != SEC_E_OK && securityStatus != SEC_I_CONTINUE_NEEDED)
         {
-            std::cout << "InitializeSecurityContext failed: " << std::hex << ss << "\n";
+            std::cout << "InitializeSecurityContext failed: " << std::hex << securityStatus << "\n";
         }
-
+        
+        
         m_pCtxHandle = &m_hCtx;
         // Copy output token
         std::vector<BYTE> outputToken;
@@ -98,8 +92,8 @@ public:
     }
 
 private:
-    CredHandle m_hCred;
-    TimeStamp m_lifetime;
+    CredHandle m_credHandle;
+    TimeStamp m_credTimeStamp;
     CtxtHandle m_hCtx;
     CtxtHandle* m_pCtxHandle = nullptr;
 };
