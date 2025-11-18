@@ -67,6 +67,14 @@ std::string Parameter::getDetailedDescriptionFormattedForSphinx() const {
     std::list<std::string> detailedDescription = getDescription();
     std::ostringstream out;
 
+    // Parameter has no detailed description
+    if (detailedDescription.size() == 1) {
+        const std::string& briefDescription = detailedDescription.front();
+
+            return briefDescription;
+    }
+
+    // Parameter has a detailed description
     bool inNoteBlock = false;
     bool inWarningBlock = false;
     bool isFirstLine = true;
