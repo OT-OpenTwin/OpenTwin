@@ -71,109 +71,72 @@ private:
 
 	// Action handler: No authentication required
 
-	//api @SECURITY TLS
-	//api @Action OT_ACTION_LOGIN_ADMIN 
-	//api @Brief Processes the login of an administrator.
-	//api This is the detailed description.
-	//api This is the second line of the detailed description.
-	//api @NOTE This is an important note.
-	//api This line belongs to the note block.
-	//api @Endnote
-	//api @warNing This is a warning.
-	//api
-	//api This line belongs to the warning block.
-	//api @Endwarning	
-	//api This is the third line of the detailed description.
-	//api @PARAM OT_PARAM_AUTH_USERNAME String User name
-	//api This is the detailed description of OT_PARAM_AUTH_USERNAME.
-	//api
-	//api This is the second line of the detailed description of OT_PARAM_AUTH_USERNAME.
-	//api @NOte This is a note in the detailed description of OT_PARAM_AUTH_USERNAME.
-	//api
-	//api This is the second line in the note block of OT_PARAM_AUTH_USERNAME.
-	//api @WARNING This warning follows the note block.
-	//api This is the second line in the warning block of OT_PARAM_AUTH_USERNAME.
-	//api @endwarning
-	//api This is the third line in the detailed description of OT_PARAM_AUTH_USERNAME.
-	//api @note This is a note.
-	//api @endnote
+	//api @action OT_ACTION_LOGIN_ADMIN 
+	//api @brief Processes the login of an administrator. 
+	//api @security TLS
+	//api @param OT_PARAM_AUTH_USERNAME String User name
 	//api @param OT_PARAM_AUTH_PASSWORD String User password
-	//api This is the detailed description of OT_PARAM_AUTH_PASSWORD.
-	//api
-	//api This is the second line of the detailed description of OT_PARAM_AUTH_PASSWORD.
 	//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 
-	//api This is the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api This is the second line of the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @Rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
-	//api This is the detailed description of OT_ACTION_AUTH_SUCCESS.
-	//api This is the second line of the detailed description of OT_ACTION_AUTH_SUCCESS. 
+	//api @rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
 	//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
-	//api This is the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api This is the second line of the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @NOTE This is a note in the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api This is the second line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @Warning This warning follows the note block.
-	//api This is the second line in the warning block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @endwarning
-	//api This is the third line in the response description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @return This is the response desciption of OT_ACTION_LOGIN_ADMIN.
-	//api This is the second line of the response description of OT_ACTION_LOGIN_ADMIN.
-	//api
-	//api @note This is an important note of OT_ACTION_LOGIN_ADMIN.
-	//api This line belongs to the note block.
-	//api @endnote
-	//api @Warning This is a warning of OT_ACTION_LOGIN_ADMIN.
-	//api
-	//api This line belongs to the warning block.
-	//api @endwarning
-	//api This is the third line of the response description of OT_ACTION_LOGIN_ADMIN.
 	std::string handleAdminLogIn(const ot::ConstJsonObject& _actionDocument);
 	
-	//api @security TLS
 	//api @action OT_ACTION_LOGIN
 	//api @brief Processes the login of a user.
-	//api This is the detailed description.
-	//api This is the second line of the detailed description.
+	//api Authenticates the user and, if successful, creates a new session including a temporary user. 
+	//api @security TLS
 	//api @param OT_PARAM_AUTH_USERNAME String User name
-	//api This is the detailed description of OT_PARAM_AUTH_USERNAME.
-	//api This is the second line of the detailed description of OT_PARAM_AUTH_USERNAME.
-	//api @note This is a note in the detailed description of OT_PARAM_AUTH_USERNAME.
-	//api This is the second line in the note block of OT_PARAM_AUTH_USERNAME.
 	//api @param OT_PARAM_AUTH_PASSWORD String User password
 	//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 
 	//api @rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
 	//api @rparam OT_PARAM_AUTH_PASSWORD String Unencrypted password (if successful)
 	//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
-	//api This is the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api This is the second line of the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @note This is a note in the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api This is the second line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @warning This warning follows the note block.
-	//api This is the second line in the warning block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @endwarning
-	//api This is the third line in the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @return This is the response desciption of OT_ACTION_LOGIN.
-	//api This is the second line of the response description of OT_ACTION_LOGIN.
-	//api
-	//api @note This is an important note of OT_ACTION_LOGIN.
-	//api This line belongs to the note block.
-	//api @endnote
-	//api @warning This is a warning of OT_ACTION_LOGIN.
-	//api
-	//api This line belongs to the warning block.
-	//api @endwarning
-	//api This is the third line of the response description of OT_ACTION_LOGIN.
 	std::string handleLogIn(const ot::ConstJsonObject& _actionDocument);
+
+	//api @action OT_ACTION_REGISTER
+	//api @brief Registers a user. 
+	//api Throws a std::runtime_error if the user name already exists as an admin user name in the database. 
+	//api @security TLS
+	//api @param OT_PARAM_AUTH_USERNAME String User name
+	//api @param OT_PARAM_AUTH_PASSWORD String User password
+	//api @rparam OT_ACTION_AUTH_SUCCESS Boolean Is the registration successfull
 	std::string handleRegister(const ot::ConstJsonObject& _actionDocument);
+
+	//api @action OT_ACTION_REFRESH_SESSION
+	//api @brief Refreshes a user session.
+	//api @security TLS
+	//api @param OT_PARAM_DB_USERNAME String User name
+	//api @return An empty String.
 	std::string handleRefreshSession(const ot::ConstJsonObject& _actionDocument);
+
+	//api @action OT_ACTION_CMD_SetGlobalLogFlags
+	//api @brief Sets the global logging mode. 
+	//api @security TLS
+	//api @param OT_ACTION_PARAM_Flags Array Log flags 
+	//api @rparam OT_ACTION_RETURN_VALUE_OK String Return value OK 
 	std::string handleSetGlobalLoggingMode(const ot::ConstJsonObject& _actionDocument);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	
 	// Action handler: Authentication required: User functions
 
+	//api @action OT_ACTION_GET_USER_DATA
+	//api @brief Gets the user data from the database.
+	//api @security TLS
+	//api @param OT_PARAM_AUTH_USERNAME String User name 
+	//api @return A String containing the user data.
 	std::string handleGetUserData(const ot::ConstJsonObject& _actionDocument);
+
+	//api @action OT_ACTION_GET_ALL_USERS
+	//api @brief Gets all users from the database.
+	//api @security TLS
+	//api @return A String containing a list of all user data. 
 	std::string handleGetAllUsers(const ot::ConstJsonObject& _actionDocument);
+
+	//api @action OT_ACTION_GET_ALL_USER_COUNT
+	//api @brief Counts all users in the database.
+	//api @security TLS
+	//api @return A String containing the count of all users.
 	std::string handleGetAllUsersCount(const ot::ConstJsonObject& _actionDocument);
 	std::string handleChangeUserNameByUser(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser, const std::string& _loggedInUserPassword);
 	std::string handleChangeUserPasswordByUser(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser, const std::string& _loggedInUserPassword);
@@ -205,6 +168,13 @@ private:
 	std::string handleCreateProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleProjectOpened(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleUpdateAdditionalProjectInformation(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	
+	//api @action OT_ACTION_GET_PROJECT_DATA
+	//api @brief Gets the project data.
+	//api @security TLS
+	//api @param OT_PARAM_AUTH_PROJECT_NAME String Project name
+	//api @return A String containing an ot::ReturnMessage.
+	//api In case of success it will contain the project data. 
 	std::string handleGetProjectData(const ot::ConstJsonObject& _actionDocument);
 	std::string handleGetProjectsInfo(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleGetAllUserProjects(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
