@@ -1,77 +1,61 @@
 #include "Client.h"
 
-Client::Client()
-    : m_currentContext{}
+#include <boost/asio.hpp>
+#include <iostream>
+#include <string>
+#include "Base64Encoding.h"
+using boost::asio::ip::tcp;
+
+Client::Client(int _port, ClientLogInAPI& _clientLogIn)
 {
-    auto securityStatus = acquireCredentialsHandle(m_credHandle, m_credTimeStamp, SECPKG_CRED_OUTBOUND);
-    if (securityStatus != SEC_E_OK)
-    {
-        throw std::exception("AcquireCredentialsHandle inbound failed");
-    }
-}
+    boost::asio::io_context io;
+    tcp::socket socket (io);
 
-std::vector<BYTE> Client::generateClientToken(const std::vector<BYTE>& _inputToken, bool _firstCall)
-{
+   socket.connect(tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), _port));
+   std::cout << "Connected to server on port " + std::to_string(_port) + "\n";
 
-    TimeStamp lpExpiry;
-    ULONG ctxAttr = 0;
+   std::vector<unsigned char> token1 = _clientLogIn.generateClientToken({}, true);
+   const std::string token1_enc = encode(token1);
+   std::string msg = token1_enc +  "\n";  // protocol: newline terminated
+   std::cout << "Sending token1: " << token1_enc << "\n";
+   std::cout << "Token size: " << token1_enc.size() << "\n";
+   boost::asio::write(socket, boost::asio::buffer(msg));
+   std::cout << "Token1 sent.\n";
 
-    // Input buffer
+   boost::asio::streambuf buf;
+   boost::asio::read_until(socket, buf, '\n');
+   std::string reply(boost::asio::buffer_cast<const char*>(buf.data()),buf.size());
+   std::string token2Encoded = reply.substr(0, reply.length() - 1); // remove newline
+   
+   std::cout << "Received token2: " << token2Encoded << "\n";
+   std::cout << "Token size: " << token2Encoded.size() << "\n";
+   std::cin.get();
 
-    SecBuffer inBuf;
-    SecBufferDesc inDesc;
-    if (!_firstCall)
-    {
+   std::vector<unsigned char> token2 = decode(token2Encoded);
+   std::vector<unsigned char> token3 = _clientLogIn.generateClientToken(token2, false);
+   const std::string token3_enc = encode(token3);
+   msg = token3_enc + "\n";  // protocol: newline terminated
+   std::cout << "Sending token3: " << token3_enc << "\n"; 
+   std::cout << "Token size: " << token3_enc.size() << "\n";
+   boost::asio::write(socket, boost::asio::buffer(msg));
+   std::cout << "Token3 sent.\n";
 
-        inBuf.BufferType = SECBUFFER_TOKEN;
-        inBuf.cbBuffer = (ULONG)_inputToken.size();
-        inBuf.pvBuffer = (BYTE*)_inputToken.data();
+   std::cin.get();
+   // Just for testing, keep the client alive to see server logs
+    //for (;;) {
+    //    std::string msg;
+    //    std::cout << "Enter message: ";
+    //    std::getline(std::cin, msg);
 
-        inDesc.ulVersion = SECBUFFER_VERSION;
-        inDesc.cBuffers = 1;
-        inDesc.pBuffers = &inBuf;
-    }
-    else
-    {
-        assert(_inputToken.size() == 0);
-    }
+    //    msg += "\n";  // protocol: newline terminated
+    //    boost::asio::write(socket, boost::asio::buffer(msg));
 
-    // Output buffer
-    BYTE outBufBytes[8192];
-    SecBuffer outBuf;
-    outBuf.BufferType = SECBUFFER_TOKEN;
-    outBuf.cbBuffer = sizeof(outBufBytes);
-    outBuf.pvBuffer = outBufBytes;
+    //    // Read server reply
+    //    boost::asio::streambuf buf;
+    //    boost::asio::read_until(socket, buf, '\n');
+    //    std::string reply = boost::asio::buffer_cast<const char*>(buf.data());
 
-    SecBufferDesc outDesc;
-    outDesc.ulVersion = SECBUFFER_VERSION;
-    outDesc.cBuffers = 1;
-    outDesc.pBuffers = &outBuf;
+    //    std::cout << "Reply: " << reply;
+    //}
 
-    SECURITY_STATUS securityStatus = InitializeSecurityContextW(
-        &m_credHandle,
-        m_partialContext,
-        (LPWSTR)L"",    // target name (SPN) – can be empty if NTLM/Negotiate
-        ISC_REQ_CONFIDENTIALITY | ISC_REQ_MUTUAL_AUTH,
-        0,
-        SECURITY_NATIVE_DREP,
-        _firstCall ? NULL : &inDesc,
-        0,
-        &m_currentContext,
-        &outDesc,
-        &ctxAttr,
-        &lpExpiry);
-
-    if (securityStatus != SEC_E_OK && securityStatus != SEC_I_CONTINUE_NEEDED)
-    {
-        std::cout << "InitializeSecurityContext failed: " << std::hex << securityStatus << "\n";
-    }
-
-
-    m_partialContext = &m_currentContext;
-    // Copy output token
-    std::vector<BYTE> outputToken;
-    outputToken.assign((BYTE*)outBuf.pvBuffer, (BYTE*)outBuf.pvBuffer + outBuf.cbBuffer);
-
-    return outputToken;
 }

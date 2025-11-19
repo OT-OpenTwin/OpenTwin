@@ -24,7 +24,16 @@
     <ClCompile Include="src\AuthorisationService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ClientLogIn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Base64Encoding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,7 +44,22 @@
     <ClInclude Include="include\AuthorisationService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ClientLogIn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AuthorisationServiceAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ClientLogInAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Base64Encoding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,5 +1,5 @@
 #include "AuthorisationService.h"
-
+#include "Base64Encoding.h"
 AuthorisationService::AuthorisationService()
     : m_currentContext{}
 {

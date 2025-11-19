@@ -11,26 +11,24 @@
 #pragma comment(lib, "winhttp.lib")
 #include <cassert>
 #include "Helper.h"
-#include "AuthorisationServiceAPI.h"
-class AuthorisationService :public AuthorisationServiceAPI
+#include "ClientLogInAPI.h"
+
+class ClientLogIn :public ClientLogInAPI
 {
 public:
-    AuthorisationService();
-    std::string generateToken2(const std::string& _token1) override;
-    void authorizeClient(const std::string& _token3) override;
+    ClientLogIn();
+
+    std::vector<unsigned char> generateClientToken(const std::vector<unsigned char>& _inputToken, bool _firstCall) override;
 
 private:
     CredHandle m_credHandle;
     TimeStamp m_credTimeStamp;
-
     // On the first call to AcceptSecurityContext(CredSSP), this pointer receives the new context handle.
     // On subsequent calls, m_partialContext can be the same as this handle.
     CtxtHandle m_currentContext;
     // On the first call to AcceptSecurityContext (CredSSP), this pointer is NULL. 
     // On subsequent calls, phContext specifies the partially formed context returned in the phNewContext parameter by the first call.
     CtxtHandle* m_partialContext = nullptr;
-
-    void readUserName(CtxtHandle& _completedContext);
-    void readUserGroups(CtxtHandle _completedContext);
 };
+
 
