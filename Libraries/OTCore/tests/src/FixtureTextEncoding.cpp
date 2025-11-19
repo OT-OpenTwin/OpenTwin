@@ -22,7 +22,7 @@
 
 std::vector<char> FixtureTextEncoding::ReadFile(ot::TextEncoding::EncodingStandard encoding)
 {
-	std::string projectDir = PROJECT_DIR;
+	std::string projectDir = "";// PROJECT_DIR;
 	projectDir += "TestEncodingTypeFiles\\";
 	if (encoding == ot::TextEncoding::ANSI)
 	{

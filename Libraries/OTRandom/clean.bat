@@ -28,8 +28,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 )
 
 RMDIR /S /Q "%OT_RANDOM_ROOT%\.vs"
-RMDIR /S /Q "%OT_RANDOM_ROOT%\build-vs2022-debug"
-RMDIR /S /Q "%OT_RANDOM_ROOT%\build-vs2022-release"
+RMDIR /S /Q "%OT_RANDOM_ROOT%\build"
 
 GOTO END
 

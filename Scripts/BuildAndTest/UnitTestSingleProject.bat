@@ -62,7 +62,7 @@ ECHO ===========================================================================
 ECHO Testing project: %1 >> testlog_Debug.txt
 ECHO ======================================================================================== >> testlog_Debug.txt
 PUSHD "%1"
-ctest -C Debug --test-dir build/windows-debug >> "%ORIGINAL_DIR%\testlog_Debug.txt"
+ctest -C Debug --test-dir build/windows-debug -V >> "%ORIGINAL_DIR%\testlog_Debug.txt"
 POPD
 
 :RELEASE_TEST
@@ -76,7 +76,7 @@ ECHO ===========================================================================
 ECHO Testing project: %1 >> testlog_Release.txt
 ECHO ======================================================================================== >> testlog_Release.txt
 PUSHD "%1"
-ctest -C Debug --test-dir build/windows-release >> "%ORIGINAL_DIR%\testlog_Release.txt"
+ctest -C Release --test-dir build/windows-release -V >> "%ORIGINAL_DIR%\testlog_Release.txt"
 POPD
 
 
