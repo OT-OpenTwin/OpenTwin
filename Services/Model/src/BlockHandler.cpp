@@ -298,7 +298,9 @@ bool BlockHandler::findBlock(ot::UID _editor, ot::UID _block) {
 bool BlockHandler::blockExists(ot::UID _blockUID) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
-	if(model->getEntityByID(_blockUID) != nullptr) {
+
+	std::map<ot::UID, EntityBase*>& entityMap = model->getAllEntitiesByUID();
+	if (entityMap.find(_blockUID) != entityMap.end()) {
 		return true;
 	}
 	return false;

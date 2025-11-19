@@ -4231,6 +4231,8 @@ void Model::deleteEntitiesFromModel(const std::list<EntityBase*>& _entityList, b
 	for (EntityBase* entity : topLevelEntities) {
 		removeFromDisplay.push_back(entity->getEntityID());
 
+		Application::instance()->getBlockHandler().entityRemoved(entity,topLevelEntities);
+
 		// Remove the entity from the entity map and also from the model state
 		removeEntityFromMap(entity, false, false);
 
