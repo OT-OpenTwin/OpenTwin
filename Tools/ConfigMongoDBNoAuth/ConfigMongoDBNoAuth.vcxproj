@@ -115,7 +115,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_RANDOM_ROOT)\$(OT_CLIBD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_CLIBD);$(OT_RANDOM_ROOT)\$(OT_CLIBD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTRandom.lib;bcrypt.lib;OTServiceFoundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -159,7 +159,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_RANDOM_ROOT)\$(OT_CLIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_CLIBR);$(OT_RANDOM_ROOT)\$(OT_CLIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTRandom.lib;bcrypt.lib;OTServiceFoundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

@@ -38,8 +38,15 @@ endfunction()
 
 # Small helper for source_group mapping
 function(assign_filter FILTER_NAME)
-    foreach(FILE ${ARGN})
-        if(EXISTS "${FILE}")
+    foreach(FILE IN LISTS ARGN)
+        # Build absolute path for the existence check
+        set(_full_path "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}")
+
+        if(EXISTS "${_full_path}")
+            # IMPORTANT:
+            # Use the *same* path string that was used in add_library(...)
+            # (i.e. "src/Variable.cpp" etc.), otherwise CMake won't match
+            # the file against the filter.
             source_group("${FILTER_NAME}" FILES "${FILE}")
         endif()
     endforeach()

@@ -136,7 +136,7 @@ TEST(VariableTest, NumberConversionDoubleToInt)
 	rapidjson::Value var(expected);
 
 	ot::JSONToVariableConverter converter;
-	EXPECT_ANY_THROW(converter(var, ot::TypeNames::getInt32TypeName()), ::testing::ExitedWithCode(3), "");
+	EXPECT_EXIT(converter(var, ot::TypeNames::getInt32TypeName()), ::testing::ExitedWithCode(3), "");
 }
 
 TEST(VariableTest, NumberConversionInt64ToInt)

@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommandArguments>Output.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>PATH=$(OT_SYSTEM_ROOT)\$(OT_DLLD);$(OT_CORE_ROOT)\$(OT_DLLD);%PATH%
+    <LocalDebuggerEnvironment>PATH=$(OT_SYSTEM_ROOT)\$(OT_DLLD);$(OT_CORE_ROOT)\$(OT_CDLLD);%PATH%
 $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
   </PropertyGroup>
 </Project>

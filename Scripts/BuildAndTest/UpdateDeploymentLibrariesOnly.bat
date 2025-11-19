@@ -116,7 +116,7 @@ REM ====================================================================
 
 ECHO Copy libraries
 
-COPY "%OT_CORE_ROOT%\%OT_DLLR%\OTCore.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_CORE_ROOT%\%OT_CDLLR%\OTCore.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_RANDOM_ROOT%\%OT_CDLLR%\OTRandom.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_SYSTEM_ROOT%\%OT_CDLLR%\OTSystem.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_COMMUNICATION_ROOT%\%OT_DLLR%\OTCommunication.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
