@@ -260,13 +260,13 @@
     <ClCompile Include="src\Server.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Helper.h" />
     <ClInclude Include="include\AuthorisationService.h" />
     <ClInclude Include="include\AuthorisationServiceAPI.h" />
     <ClInclude Include="include\Base64Encoding.h" />
     <ClInclude Include="include\Client.h" />
     <ClInclude Include="include\ClientLogIn.h" />
     <ClInclude Include="include\ClientLogInAPI.h" />
+    <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\Server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
