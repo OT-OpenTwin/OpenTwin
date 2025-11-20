@@ -42,6 +42,7 @@ public:
 	void setMesh(EntityMeshCartesianData *m) { mesh = m; };
 
 	void setNumberFaces(size_t nT) { faces.resize(nT); setModified(); };
+	size_t getNumberFaces() { return faces.size(); }
 
 	int getFaceId(size_t nF) { return faces[nF]; };
 	void setFace(size_t nF, int faceId) { faces[nF] = faceId; setModified(); };

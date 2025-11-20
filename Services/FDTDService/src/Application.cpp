@@ -35,6 +35,7 @@
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
 #include "EntityResultText.h"
+#include "CartesianMeshToSTL.h"
 
 #include <thread>
 
@@ -329,6 +330,8 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 		getUiComponent()->displayMessage("ERROR: The specified mesh does not exist: " + mesh->getValueName() + "\n");
 		return;
 	}
+
+	//CartesianMeshToSTL exportTest(mesh->getValueName(), "C:\\Users\\Peter\\Desktop\\stl");
 
 	deleteSingleSolverResults(solverEntity);
 

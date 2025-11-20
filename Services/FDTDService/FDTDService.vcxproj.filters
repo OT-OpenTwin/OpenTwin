@@ -72,6 +72,9 @@
     <ClCompile Include="src\Materials\MaterialProperties.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
+    <ClCompile Include="src\CartesianMeshToSTL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -115,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="include\Materials\MaterialProperties.h">
       <Filter>Header Files\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CartesianMeshToSTL.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

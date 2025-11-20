@@ -21,6 +21,7 @@
 #include "EntityMeshCartesianFace.h"
 #include "DataBase.h"
 #include "OldTreeIcon.h"
+#include "EntityAPI.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -75,8 +76,7 @@ void EntityMeshCartesianFaceList::EnsureFacesLoaded(void)
 
 		for (auto fp : meshFaceStorageIds)
 		{
-			std::map<ot::UID, EntityBase *> entityMap;
-			EntityMeshCartesianFace *face = dynamic_cast<EntityMeshCartesianFace *>(readEntityFromEntityID(this, fp.second.first, entityMap));
+			EntityMeshCartesianFace *face = dynamic_cast<EntityMeshCartesianFace *>(ot::EntityAPI::readEntityFromEntityIDandVersion(fp.second.first, fp.second.second));
 			meshFaces[fp.first] = face;
 			meshFacesIndex[face] = fp.first;
 		}

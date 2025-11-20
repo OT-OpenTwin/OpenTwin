@@ -37,6 +37,7 @@ public:
 	virtual ~EntityMeshCartesianFace() {};
 
 	void setType(eType t) { type = t; }
+	eType getType() { return type; }
 
 	// Access the index based data
 	void setNumberCellFaces(int direction, size_t nT);

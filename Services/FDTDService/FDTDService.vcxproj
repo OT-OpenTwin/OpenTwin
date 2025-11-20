@@ -196,6 +196,7 @@
   <ItemGroup>
     <ClCompile Include="$(OPENTWIN_THIRDPARTY_ROOT)\tinyxml2\tinyxml2-11.0.0\tinyxml2.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\CartesianMeshToSTL.cpp" />
     <ClCompile Include="src\CSXMeshGrid.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Excitation\ExcitationProperties.cpp" />
@@ -211,6 +212,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\CartesianMeshToSTL.h" />
     <ClInclude Include="include\CSXMeshGrid.h" />
     <ClInclude Include="include\Excitation\ExcitationBase.h" />
     <ClInclude Include="include\Excitation\ExcitationProperties.h" />
