@@ -331,7 +331,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 		return;
 	}
 
-	//CartesianMeshToSTL exportTest(mesh->getValueName(), "C:\\Users\\Peter\\Desktop\\stl");
+	//CartesianMeshToSTL exportTest(mesh->getValueName(), "This is the folder path where the stl files shall be stored, e.g. C:\\...");
 
 	deleteSingleSolverResults(solverEntity);
 
