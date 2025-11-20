@@ -1545,6 +1545,9 @@ void CartesianMeshCreation::extractAndStoreMesh(std::vector<EntityGeometry *> &m
 	{
 		EntityPropertiesColor *color = dynamic_cast<EntityPropertiesColor*>(shape->getProperties().getProperty("Color"));
 		assert(color != nullptr);
+		
+		EntityPropertiesEntityList* material = dynamic_cast<EntityPropertiesEntityList*>(shape->getProperties().getProperty("Material"));
+		assert(material != nullptr);
 
 		EntityMeshCartesianItem *meshEntity = new EntityMeshCartesianItem(0, nullptr, nullptr, nullptr);
 		newTopologyEntities.push_back(meshEntity);
@@ -1560,6 +1563,7 @@ void CartesianMeshCreation::extractAndStoreMesh(std::vector<EntityGeometry *> &m
 		meshEntity->setName(name);
 		meshEntity->setMesh(meshData);
 		meshEntity->setColor(color->getColorR(), color->getColorG(), color->getColorB());
+		meshEntity->setMaterial(material->getValueName());
 
 		meshEntity->setNumberFaces(boundaryFacesForShape[shape].size());
 		size_t faceIndex = 0;

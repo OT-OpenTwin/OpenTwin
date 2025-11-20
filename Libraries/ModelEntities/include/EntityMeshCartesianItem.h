@@ -58,6 +58,9 @@ public:
 
 	void setColor(double r, double g, double b) { colorRGB[0] = r; colorRGB[1] = g; colorRGB[2] = b; };
 
+	void setMaterial(const std::string& materialName);
+	std::string getMaterial();
+
 	virtual std::string getClassName(void) const override { return "EntityMeshCartesianItem"; };
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };

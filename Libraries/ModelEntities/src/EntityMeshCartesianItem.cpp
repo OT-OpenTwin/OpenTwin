@@ -81,6 +81,28 @@ void EntityMeshCartesianItem::addStorageData(bsoncxx::builder::basic::document &
 	storage.append(bsoncxx::builder::basic::kvp("Faces", f));
 }
 
+void EntityMeshCartesianItem::setMaterial(const std::string& materialName)
+{
+	EntityPropertiesString* material = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Material"));
+	if (material == nullptr)
+	{
+		EntityPropertiesString::createProperty("Solver", "Material", materialName, "", getProperties());
+		getProperties().getProperty("Material")->setReadOnly(true);
+	}
+	else
+	{
+		material->setValue(materialName);
+	}
+}
+
+std::string EntityMeshCartesianItem::getMaterial()
+{
+	EntityPropertiesString* material = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Material"));
+	if (material == nullptr) return "";
+
+	return material->getValue();
+}
+
 void EntityMeshCartesianItem::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
