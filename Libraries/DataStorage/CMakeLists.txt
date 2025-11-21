@@ -93,7 +93,6 @@ get_env_libname(MONGO_C_LIBS_NAME      MONGO_C_LIB)     # e.g. "bson-1.0.lib;mon
 # FTP / cURL / OpenTwinCommunication (used mainly in tests)
 get_env_path(FTP_LIBCURL_ROOT_PATH     FTP_LIBCURL_ROOT)
 get_env_path(FTP_CLIENT_ROOT_PATH      FTP_CLIENT_ROOT)
-get_env_path(SIM_PLAT_ROOT_PATH        SIM_PLAT_ROOT)
 
 # ============================================================
 # C++ standard
