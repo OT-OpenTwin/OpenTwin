@@ -27,7 +27,6 @@
 
 #define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include "numpy/ndarrayobject.h"
 
 #include "PythonObjectBuilder.h"
 
@@ -89,7 +88,7 @@ void PythonWrapper::readOutput() {
 }
 
 int PythonWrapper::initiateNumpy() {
-	import_array1(0);
+	
 	return 1;
 }
 

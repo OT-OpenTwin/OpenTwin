@@ -63,8 +63,8 @@ public:
 	std::list<std::string> getStringList(const CPythonObject& pValue, const std::string& varName);
 	std::list<bool> getBoolList(const CPythonObject& pValue, const std::string& varName);
 
-	ot::GenericDataStructList getGenericDataStructList(CPythonObject& pValue);
-	ot::GenericDataStruct* getGenericDataStruct(CPythonObject& pValue);
+	
+	
 	std::list<ot::Variable> getVariableList(CPythonObject& pValue);
 	std::optional<ot::Variable> getVariable(CPythonObject& pValue);
 
@@ -81,16 +81,11 @@ public:
 	
 	CPythonObjectNew setVariable(const ot::Variable& value);
 
-	CPythonObjectNew setGenericDataStruct(ot::GenericDataStruct* genericDataStruct);
-	CPythonObjectNew setGenericDataStructList(ot::GenericDataStructList& values);
-
 private:
 	PyObject* _assembly = nullptr;
 	int _assemblySize = 0;
 	int _currentSize = 0;
 
-	void* variableArrayToVoidArray(const ot::Variable* values, const uint32_t size, int& pType);
-	const ot::Variable* voidArrayToVariableArray(void* data, const uint32_t size, int pType);
 };
 
 
