@@ -3,8 +3,8 @@
 #include "Client.h"
 #include "Server.h"
 #include "Base64Encoding.h"
-  
-int main()
+ 
+int main(int argc, char* argv[])
 {
 #ifndef DISTRIBUTED
         ClientLogIn client;
@@ -27,14 +27,24 @@ int main()
 	    authorisationService.authorizeClient(token3Decoded);
     
 #else
-    int32_t port = 5555;
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <ip>:string <port>:int32\n";
+        return 1;
+    }
+
+    // First argument: string
+    std::string ip = argv[1];
+
+    // Second argument: int32_t
+    int32_t port = static_cast<int32_t>(std::strtol(argv[2], nullptr, 10));
+
     #ifdef SERVER
         AuthorisationService authorisationService;
-	    Server server(port, authorisationService);
+	    Server server(ip,port, authorisationService);
         
     #else
         ClientLogIn clientLogin;
-	    Client client(port, clientLogin);
+	    Client client(ip,port, clientLogin);
     #endif 
 
 #endif // DEBUG

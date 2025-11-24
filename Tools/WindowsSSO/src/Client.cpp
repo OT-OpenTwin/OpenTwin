@@ -6,13 +6,20 @@
 #include "Base64Encoding.h"
 using boost::asio::ip::tcp;
 
-Client::Client(int _port, ClientLogInAPI& _clientLogIn)
+Client::Client(const std::string& _ip, int _port, ClientLogInAPI& _clientLogIn)
 {
     boost::asio::io_context io;
+
     tcp::socket socket (io);
 
-   socket.connect(tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), _port));
-   std::cout << "Connected to server on port " + std::to_string(_port) + "\n";
+    tcp::endpoint endpoint(
+        boost::asio::ip::make_address(_ip),
+        _port
+    );
+    std::cout << "Connecting to server " + _ip + ":" + std::to_string(_port) + "\n";
+   socket.connect(endpoint);
+
+   std::cout << "Connection established";
 
    std::vector<unsigned char> token1 = _clientLogIn.generateClientToken({}, true);
    const std::string token1_enc = encode(token1);

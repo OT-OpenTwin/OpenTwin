@@ -5,12 +5,15 @@
 #include "Base64Encoding.h"
 
 using boost::asio::ip::tcp;
-Server::Server(int _port, AuthorisationServiceAPI& _authorisationService)
+Server::Server(const std::string& _ip, int _port, AuthorisationServiceAPI& _authorisationService)
 {
     boost::asio::io_context io;
-
-    tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), _port));
-    std::cout << "Server listening on port " + std::to_string(_port) + "...\n";
+    tcp::endpoint endpoint(
+        boost::asio::ip::make_address(_ip), 
+        _port                                        
+    );
+    tcp::acceptor acceptor(io, endpoint);
+    std::cout << "Server listening on " + _ip + ":" + std::to_string(_port) + "...\n";
 
     tcp::socket socket(io);
     acceptor.accept(socket);
