@@ -42,11 +42,10 @@ public:
 
 	~PythonWrapper();
 
-	static void setSitePackage(const std::string& _sitePackageName) { m_customSitePackage = _sitePackageName; }
 	static void setRedirectOutput(bool _redirectOutput) { m_redirectOutput = _redirectOutput; }
 
-	void initializePythonInterpreter();
-	void resetSysPath();
+	void initializePythonInterpreter(const std::string& _environmentName);
+
 	void addToSysPath(const std::string& _newPathComponent);
 	void closePythonInterpreter();
 
@@ -56,14 +55,9 @@ public:
 	CPythonObjectBorrowed getGlobalDictionary(const std::string& _moduleName);
 	CPythonObjectNew getFunction(const std::string& _functionName, const std::string& _moduleName = "__main__");
 
-	std::string getSidePackagesPath() const { return m_sitePackagesPath; }
 private:
-	static std::string m_customSitePackage;
 	static bool m_redirectOutput;
 
-	std::list<std::string> m_pythonPath;
-	std::string m_pythonRoot;
-	std::string m_sitePackagesPath;
 	bool m_interpreterSuccessfullyInitialized = false;
 	int m_pipe_fds[2];
 	std::thread* m_outputWorkerThread;
@@ -72,10 +66,7 @@ private:
 	static void signalHandlerAbort(int sig);
 
 	int initiateNumpy();
-	std::string checkNumpyVersion();
-	std::string determinePythonRootDirectory();
-	std::string determineMandatoryPythonSitePackageDirectory();
-	void addOptionalUserPythonSitePackageDirectory();
+		
 	void readOutput();
 	void flushOutput();
 	CPythonObjectNew getModule(const std::string& _moduleName);

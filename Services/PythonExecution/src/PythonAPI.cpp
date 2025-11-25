@@ -31,7 +31,7 @@
 
 PythonAPI::PythonAPI()
 {
-	m_wrapper.initializePythonInterpreter();
+	m_wrapper.initializePythonInterpreter("TestEnvironment");
 }
 
 void PythonAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)
@@ -153,9 +153,9 @@ void PythonAPI::loadScipt(const ot::EntityInformation& _entityInformation)
 		std::unique_ptr<EntityFileText> script(dynamic_cast<EntityFileText*>(baseEntity));
 		std::string execution = script->getText();
 
-		PackageHandler packageHandler;
-		packageHandler.setTargetPath(m_wrapper.getSidePackagesPath());
-		packageHandler.importMissingPackages(execution);
+		//PackageHandler packageHandler;
+		//packageHandler.setTargetPath(m_wrapper.getSidePackagesPath());
+		//packageHandler.importMissingPackages(execution);
 
 		//First we add a module for the script execution. This way there won't be any namespace conflicts between the scripts since they are all executed in the same namespace
 		const std::string moduleName = PythonLoadedModules::instance().addModuleForEntity(_entityInformation);

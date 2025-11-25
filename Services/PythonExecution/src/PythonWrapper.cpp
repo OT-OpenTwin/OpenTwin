@@ -35,25 +35,10 @@
 #include <io.h>
 #include <iostream>
 
-std::string PythonWrapper::m_customSitePackage;
 bool PythonWrapper::m_redirectOutput = false;
 
-PythonWrapper::PythonWrapper() : m_outputWorkerThread(nullptr) {
-	m_pythonRoot = determinePythonRootDirectory();
-	
-	OT_LOG_D("Setting Python root path: " + m_pythonRoot);
-	m_pythonPath.push_back(m_pythonRoot);
-	m_pythonPath.push_back(m_pythonRoot + "\\Lib");
-	m_pythonPath.push_back(m_pythonRoot + "\\DLLs");
-	m_sitePackagesPath = determineMandatoryPythonSitePackageDirectory();
-	m_pythonPath.push_back(m_sitePackagesPath);
-
-	if (m_customSitePackage.empty())
-	{
-		addOptionalUserPythonSitePackageDirectory();
-	}
-
-	OT_LOG_D("Setting Python site-package path: " + m_sitePackagesPath);
+PythonWrapper::PythonWrapper() : m_outputWorkerThread(nullptr) 
+{
 	signal(SIGABRT, &signalHandlerAbort);
 
 	if (m_redirectOutput)
@@ -92,14 +77,6 @@ int PythonWrapper::initiateNumpy() {
 	return 1;
 }
 
-std::string PythonWrapper::checkNumpyVersion() {
-	execute("import numpy\n"
-		"numpyVersion = numpy.version.version", "__main__");
-	CPythonObjectBorrowed variable = getGlobalVariable("numpyVersion","__main__");
-	PythonObjectBuilder builder;
-	const std::string numpyVersion = builder.getStringValue(variable, "numpyVersion");
-	return numpyVersion;
-}
 
 PythonWrapper::~PythonWrapper() {
 	if (!m_interpreterSuccessfullyInitialized) {
@@ -123,35 +100,74 @@ void PythonWrapper::closePythonInterpreter() {
 	}
 }
 
-void PythonWrapper::initializePythonInterpreter() {
-	std::wstring allPaths;
-	std::string debugPathOverview("");
-	for (std::string& pathComponent : m_pythonPath) {
-		std::wstring temp(pathComponent.begin(), pathComponent.end());
-		allPaths += temp + L";";
-		debugPathOverview += pathComponent;
+#include "OTCore/String.h"
+
+void PythonWrapper::initializePythonInterpreter(const std::string& _environmentName)
+{
+	std::list<std::wstring> lookupPaths;
+	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
+	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
+	std::wstring devEnvRootW = ot::String::toWString(devEnvRoot);
+#ifdef _DEBUG
+	const std::string pythonRootEnvVarName = "OT_PYTHON_ROOT";
+	const char* pythonRoot = ot::OperatingSystem::getEnvironmentVariable(pythonRootEnvVarName.c_str());
+	assert(pythonRoot != nullptr);
+	std::wstring pythonRootW = ot::String::toWString(pythonRoot);
+	//Here we have the standart libs
+	lookupPaths.push_back(pythonRootW + std::wstring(L"\\Environments\\CoreEnvironment\\Debug\\DLLs"));
+	lookupPaths.push_back(pythonRootW + std::wstring(L"\\Environments\\CoreEnvironment\\Debug\\Lib"));
+
+	//Here we have the third party packages
+	lookupPaths.push_back(devEnvRootW + std::wstring(L"\\Deployment\\Environments\\") + ot::String::toWString(_environmentName));
+	//Here we have the dlls
+	lookupPaths.push_back(pythonRootW + std::wstring(L"\\Interpreter\\Debug"));
+#else
+	// If not found, we are in deployment mode
+	std::wstring pathBase;
+	if (devEnvRoot == nullptr)
+	{
+		pathBase = L".\\Python";
+	}
+	else
+	{
+		pathBase = devEnvRootW + L"\\Deployment\\Python";
 	}
 
+	//Here we have the standart libs
+	lookupPaths.push_back(pathBase + std::wstring(L"\\Environments\\CoreEnvironment\\DLLs"));
+	lookupPaths.push_back(pathBase + std::wstring(L"\\Environments\\CoreEnvironment\\Lib"));
+
+	//Here we have the third party packages
+	lookupPaths.push_back(pathBase + std::wstring(L"\\Environments\\") + ot::String::toWString(_environmentName)); 
+	//Here we have the dlls
+	lookupPaths.push_back(pathBase + std::wstring(L"\\Interpreter"));
+#endif
+
+	PyConfig config;
+	PyConfig_InitPythonConfig(&config);
+
+	std::string debugPathOverview = "";
+	for(std::wstring& pathComponent : lookupPaths) {
+		PyWideStringList_Append(&config.module_search_paths, pathComponent.c_str());
+		debugPathOverview += ot::String::toString(pathComponent) + ";";
+	}
 	OT_LOG_D("Python path: " + debugPathOverview);
 	
+	//config.executable = L"CoreEnvironment/Debug/python_d.exe";
+	//config.prefix = L"CoreEnvironment/Debug";
+	//config.home = L"CoreEnvironment/Debug";
+
+		
 	int errorCode = PyImport_AppendInittab("OpenTwin", PythonExtensions::PyInit_OpenTwin);
-	Py_SetPath(allPaths.c_str());
-	int skipSignalHandlerRegistration = 0; //0: Skips; 1: not skipping (equivalent to Py_Initialize())
+	
 	Py_DontWriteBytecodeFlag = 1;
 	Py_QuietFlag = 1;
-	Py_InitializeEx(skipSignalHandlerRegistration);
+	Py_InitializeFromConfig(&config);
 	if (Py_IsInitialized() != 1) {
 		throw PythonException();
 	}
 	m_interpreterSuccessfullyInitialized = true;
-	int numpyErrorCode = initiateNumpy();
-	if (numpyErrorCode == 0) {
-		throw PythonException("Numpy Initialization failed. Make sure that the file numpy/ndarrayobject.h exists. Details: ");
-	}
-
-	const std::string numpyVersion = checkNumpyVersion();
-	OT_LOG_D("Initiated numpy version: " + numpyVersion);
-
+	
 	if (m_redirectOutput)
 	{
 		// Redirect output to pipe
@@ -169,63 +185,11 @@ void PythonWrapper::initializePythonInterpreter() {
 	}
 }
 
-void PythonWrapper::resetSysPath() {
-	std::string resetPythonPath = "import sys\n"
-		"sys.path.clear()\n";
-	
-	for (std::string& pathComponent : m_pythonPath) {
-		resetPythonPath += "sys.path.append(\"" +pathComponent +"\")\n";
-	}
-	execute(resetPythonPath);
-}
 
 void PythonWrapper::addToSysPath(const std::string& _newPathComponent) {
 	const std::string addToPythonPath = "import sys\n"
 		"sys.path.append(\""+_newPathComponent+"\")\n";
 	execute(addToPythonPath);
-}
-
-std::string PythonWrapper::determinePythonRootDirectory() {
-	std::string path;
-
-	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
-	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
-	if (devEnvRoot == nullptr)
-	{
-		path = ".\\Python";
-	}
-	else
-	{
-		path = std::string(devEnvRoot) + "\\Deployment\\Python";
-	}
-	return path;
-}
-
-std::string PythonWrapper::determineMandatoryPythonSitePackageDirectory() {
-
-	std::string path = determinePythonRootDirectory();
-
-	if (!m_customSitePackage.empty())
-	{
-		path += "\\Lib\\" + m_customSitePackage;
-
-	}
-	else
-	{
-		path += "\\Lib\\site-packages";
-	}
-	return path;
-}
-
-void PythonWrapper::addOptionalUserPythonSitePackageDirectory()
-{
-	std::string envName = "OT_PYTHON_SITE_PACKAGE_PATH";
-	const char* pythonSitePackagePath = ot::OperatingSystem::getEnvironmentVariable(envName.c_str());
-
-	if (pythonSitePackagePath != nullptr)
-	{
-		m_pythonPath.push_back(pythonSitePackagePath);
-	}
 }
 
 void PythonWrapper::signalHandlerAbort(int _sig) {

@@ -267,7 +267,7 @@ std::string ActionHandler::writeReturnDataToDatabase()
 		returnDataDoc.AddMember(ot::JsonValue(scriptName.c_str(), returnDataDoc.GetAllocator()).Move(), scriptDataEntry.Move(), returnDataDoc.GetAllocator());
 	}
 
-	if(returnDataDoc.Empty())
+	if(returnDataDoc.ObjectEmpty())
 	{
 		return "";
 	}

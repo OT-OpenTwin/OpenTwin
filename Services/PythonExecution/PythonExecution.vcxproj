@@ -145,19 +145,20 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(OT_PYTHON_INC);$(QT_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
-      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus /DQT_NO_KEYWORDS</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_PYTHON_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(QT_LIBPATH)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python39.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Cored.lib;Qt6Networkd.lib;Qt6Widgetsd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_PYTHON_LIBPATH)\Debug;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python311_d.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Cored.lib;Qt6Networkd.lib;Qt6Widgetsd.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -186,8 +187,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(QT_LIBPATH)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);python39.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Core.lib;Qt6Network.lib;Qt6Widgets.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH)\Release;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);python311.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Core.lib;Qt6Network.lib;Qt6Widgets.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">
@@ -200,7 +201,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_RELEASEDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_PYTHON_INC);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_NUMPY_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_PYTHON_INC);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_NUMPY_INC);C:\ThirdParty\Python\Python3_11_9\Environments\BasicEnvironment\numpy\_core\include</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -216,8 +217,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(OT_PYTHON_LIBPATH);%(AdditionalLibraryDirectories);$(Qt_LIBPATH_)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);BlockEntities.lib;python39.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(OT_PYTHON_LIBPATH)\Release;%(AdditionalLibraryDirectories);$(Qt_LIBPATH_)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);BlockEntities.lib;python311.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">

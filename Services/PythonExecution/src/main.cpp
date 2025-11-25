@@ -32,7 +32,7 @@
 namespace ot {
 	namespace intern {
 		void initializeLogger(void) {
-#ifdef _RELEASEDEBUG
+#ifdef _DEBUG
 			ot::ServiceLogNotifier::initialize("PythonSubprocess", "", true);
 #else
 			ot::ServiceLogNotifier::initialize("PythonSubprocess", "", false);
@@ -40,7 +40,7 @@ namespace ot {
 		}
 
 		bool initializeConnection(int _argc, char* _argv[]) {
-#ifdef _RELEASEDEBUG
+#ifdef _DEBUG
 			Application::instance().getCommunicationHandler().setServerName("TestServerPython");
 			PythonWrapper::setRedirectOutput(true);
 
@@ -60,7 +60,7 @@ namespace ot {
 				OT_LOG_D("arg 2: " + customSitePackagePath);
 				if (!customSitePackagePath.empty())
 				{
-					PythonWrapper::setSitePackage(_argv[2]);
+					//PythonWrapper::setSitePackage(_argv[2]);
 				}
 			}
 
