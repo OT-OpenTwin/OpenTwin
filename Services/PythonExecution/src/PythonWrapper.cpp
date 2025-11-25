@@ -26,9 +26,9 @@
 #include "OTCore/LogDispatcher.h"
 
 #define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 #include "PythonObjectBuilder.h"
+#include "OTCore/String.h"
 
 #include <fcntl.h>
 #include <windows.h>
@@ -100,7 +100,6 @@ void PythonWrapper::closePythonInterpreter() {
 	}
 }
 
-#include "OTCore/String.h"
 
 void PythonWrapper::initializePythonInterpreter(const std::string& _environmentName)
 {
