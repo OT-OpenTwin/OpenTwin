@@ -43,6 +43,17 @@ struct ParseError {
 	}
 };
 
+struct UndocumentedEndpoint {
+	std::string action;
+	std::string serviceName;
+	std::string file;
+	size_t lineNumber;
+
+	std::string toString() const {
+		return " at " + file + " - line " + std::to_string(lineNumber) + " - " + "Action: " + action;
+	}
+};
+
 class Application {
 public:
 	enum ParameterType{
@@ -109,6 +120,8 @@ public:
 
 	bool writeAllErrorsTxtFile(const std::string& _txt);
 
+	void reportEndpointsToBeDocumented();
+
 	// helper functions
 	std::string getPathFromEnvironmentVariable(const std::string& _envVar, const std::string& _subPath);
 	std::string getPathToOTServices(void);
@@ -122,4 +135,5 @@ private:
 	std::list<Service> m_services;
 	std::map<std::string, std::string> m_actionMacros;
 	std::list<ParseError> m_parseErrors;
+	std::list<UndocumentedEndpoint> m_endpointsToBeDocumented;
 };

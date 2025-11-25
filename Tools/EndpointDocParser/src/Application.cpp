@@ -53,6 +53,8 @@ int Application::run(void) {
 		exitCode = 3;
 	}
 
+	reportEndpointsToBeDocumented();
+
 	return exitCode;
 }
 
@@ -556,90 +558,112 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					hasError = true;
 				}
 			}
+			// detected end of api block
+			else if (inApiBlock) {
+
+				// report any syntax errors in the documentation and do not add the endpoint to the service
+				if (hasError) {
+					ParseError error{
+							_file,
+							lineNumber,
+							"Error(s) by parsing " + endpoint.getAction() + ". Enpoint was not added to service.",
+							""
+					};
+					reportError(error);
+				}
+
+				// add the endpoint to the service if name and brief description have been set
+				else if (!endpoint.getName().empty() && !endpoint.getBriefDescription().empty()) {
+					// set mTLS as the default message type, if no message type has been set
+					if (endpoint.getMessageType() == Endpoint::unknown) {
+						endpoint.setMessageType(Endpoint::mTLS);
+
+						ParseError error{
+							_file,
+							lineNumber,
+							"Message type is missing, default message type mTLS was set.",
+							""
+						};
+						reportError(error);
+					}
+
+					OT_LOG_D("The parsed endpoint is:");
+					endpoint.printEndpoint();
+
+					OT_LOG_D("The service is " + _service.getName() + ".");
+
+					_service.addEndpoint(endpoint);
+					OT_LOG_D("Added endpoint to service.");
+					_service.printService();
+				}
+
+				// give an error message if name, brief description or message type have not been set
+				// and do not add the endpoint to the service
+				else {
+					std::vector<std::string> missingItems;
+
+					if (endpoint.getName().empty()) {
+						missingItems.push_back("name");
+					}
+					if (endpoint.getBriefDescription().empty()) {
+						missingItems.push_back("brief description");
+					}
+					if (endpoint.getMessageType() == Endpoint::unknown) {
+						missingItems.push_back("message type");
+					}
+
+					std::string missing;
+					for (size_t i = 0; i < missingItems.size(); ++i) {
+						if (i > 0) {
+							missing += (i == missingItems.size() - 1) ? " and " : ", ";
+						}
+						missing += missingItems[i];
+					}
+
+					ParseError error{
+							_file,
+							lineNumber,
+							"Invalid Endpoint can't be added to service - missing: " + missing,
+							""
+					};
+					reportError(error);
+				}
+
+				// Reset state for next endpoint
+				inApiBlock = false;
+				OT_LOG_D("Detected end of api documentation block.");
+				OT_LOG_D("-----------------------------------------------------------------------------------");
+
+				inBriefDescriptionBlock = false;
+				inResponseDescriptionBlock = false;
+				inParameterBlock = false;
+				inReturnParameterBlock = false;
+				inNoteBlock = false;
+				inWarningBlock = false;
+				hasError = false;
+			}			
 			else {
-				if (inApiBlock) {
-					// end of api block
+				// detected connectAction as indicator for an endpoint that needs to be documented
+				if (startsWith(trimmedLine, "connectAction(")) {
+					OT_LOG_D("Detected connectAction: " + trimmedLine);
 
-					// report any syntax errors in the documentation and do not add the endpoint to the service
-					if (hasError) {
-						ParseError error{
-								_file,
-								lineNumber,
-								"Error(s) by parsing " + endpoint.getAction() + ". Enpoint was not added to service.",
-								""
-						};
-						reportError(error);
-					}
+					// extract endpoint action
+					std::string content = trimmedLine.substr(14);					
+					std::list<std::string> splittedContentList = ot::String::split(content, " ");
+					std::vector<std::string> splittedContentVector(splittedContentList.begin(), splittedContentList.end());
+					std::string endpointAction = splittedContentVector[0];
+					endpointAction = ot::String::removeSuffix(endpointAction, ",");
+					
+					UndocumentedEndpoint undocumented{
+							endpointAction,
+							_service.getName(),
+							_file,
+							lineNumber
+					};
 
-					// add the endpoint to the service if name and brief description have been set
-					else if (!endpoint.getName().empty() && !endpoint.getBriefDescription().empty()) {
-						// set mTLS as the default message type, if no message type has been set
-						if (endpoint.getMessageType() == Endpoint::unknown) {
-							endpoint.setMessageType(Endpoint::mTLS);
+					m_endpointsToBeDocumented.push_back(undocumented);
 
-							ParseError error{
-								_file,
-								lineNumber,
-								"Message type is missing, default message type mTLS was set.",
-								""
-							};
-							reportError(error);
-						}
-
-						OT_LOG_D("The parsed endpoint is:");
-						endpoint.printEndpoint();
-
-						OT_LOG_D("The service is " + _service.getName() + ".");
-
-						_service.addEndpoint(endpoint);
-						OT_LOG_D("Added endpoint to service.");
-						_service.printService();
-					}
-
-					// give an error message if name, brief description or message type have not been set
-					// and do not add the endpoint to the service
-					else {
-						std::vector<std::string> missingItems;
-
-						if (endpoint.getName().empty()) {
-							missingItems.push_back("name");
-						}
-						if (endpoint.getBriefDescription().empty()) {
-							missingItems.push_back("brief description");
-						}
-						if (endpoint.getMessageType() == Endpoint::unknown) {
-							missingItems.push_back("message type");
-						}
-
-						std::string missing;
-						for (size_t i = 0; i < missingItems.size(); ++i) {
-							if (i > 0) {
-								missing += (i == missingItems.size() - 1) ? " and " : ", ";
-							}
-							missing += missingItems[i];
-						}
-
-						ParseError error{
-								_file,
-								lineNumber,
-								"Invalid Endpoint can't be added to service - missing: " + missing,
-								""
-						};
-						reportError(error);
-					}
-
-					// Reset state for next endpoint
-					inApiBlock = false;
-					OT_LOG_D("Detected end of api documentation block.");
-					OT_LOG_D("-----------------------------------------------------------------------------------");
-
-					inBriefDescriptionBlock = false;
-					inResponseDescriptionBlock = false;
-					inParameterBlock = false;
-					inReturnParameterBlock = false;
-					inNoteBlock = false;
-					inWarningBlock = false;
-					hasError = false;
+					OT_LOG_D("Stored undocumented endpoint: " + undocumented.toString());
 				}
 			}
 		}
@@ -1174,6 +1198,42 @@ bool Application::writeAllErrorsTxtFile(const std::string& _txt) {
 	}
 
 	return false;
+}
+
+void Application::reportEndpointsToBeDocumented() {
+	OT_LOG_D("Checking for undocumented endpoints...");
+
+	if (m_endpointsToBeDocumented.empty()) {
+		OT_LOG_D("No undocumented endpoints found.");
+		return;
+	}
+
+	size_t count = 0;
+
+	for (const UndocumentedEndpoint& undocumented : m_endpointsToBeDocumented) {
+		bool found = false;
+
+		// search the service
+		for (const Service& service : m_services) {
+			if (service.getName() == undocumented.serviceName) {
+				// search the endpoint
+				for (const Endpoint& endpoint : service.getEndpoints()) {
+					if (endpoint.getAction() == undocumented.action) {
+						found = true;
+						OT_LOG_D("Found documentation for: " + undocumented.action + " in service " + service.getName());
+						break;
+					}
+				}
+				break;
+			}
+		}
+
+		if (!found) {
+			OT_LOG_W(undocumented.toString());
+			count++;
+		}
+	}
+	OT_LOG_W("Found " + std::to_string(count) + " undocumented endpoint(s).");
 }
 
 // helper functions
