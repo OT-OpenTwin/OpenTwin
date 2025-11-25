@@ -104,59 +104,77 @@ void PythonWrapper::closePythonInterpreter() {
 
 void PythonWrapper::initializePythonInterpreter(const std::string& _environmentName)
 {
-	std::list<std::wstring> lookupPaths;
+	
 	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
 	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
 	std::wstring devEnvRootW = ot::String::toWString(devEnvRoot);
+
+	std::wstring environmentsBase, home, dllPath, binPath;
 #ifdef _DEBUG
 	const std::string pythonRootEnvVarName = "OT_PYTHON_ROOT";
 	const char* pythonRoot = ot::OperatingSystem::getEnvironmentVariable(pythonRootEnvVarName.c_str());
 	assert(pythonRoot != nullptr);
 	std::wstring pythonRootW = ot::String::toWString(pythonRoot);
-	//Here we have the standart libs
-	lookupPaths.push_back(pythonRootW + std::wstring(L"\\Environments\\CoreEnvironment\\Debug\\DLLs"));
-	lookupPaths.push_back(pythonRootW + std::wstring(L"\\Environments\\CoreEnvironment\\Debug\\Lib"));
+	
+	environmentsBase = pythonRootW + L"\\Environments";
+	home = environmentsBase + std::wstring(L"\\CoreEnvironment");
+	dllPath = +L"\\DLLs\\Debug";
+	binPath = pythonRootW + L"\\Interpreter\\Debug";
 
-	//Here we have the third party packages
-	lookupPaths.push_back(devEnvRootW + std::wstring(L"\\Deployment\\Environments\\") + ot::String::toWString(_environmentName));
-	//Here we have the dlls
-	lookupPaths.push_back(pythonRootW + std::wstring(L"\\Interpreter\\Debug"));
+#elif _RELEASEDEBUG
+	const std::string pythonRootEnvVarName = "OT_PYTHON_ROOT";
+	const char* pythonRoot = ot::OperatingSystem::getEnvironmentVariable(pythonRootEnvVarName.c_str());
+	assert(pythonRoot != nullptr);
+		
+	std::wstring pythonRootW = ot::String::toWString(pythonRoot);
+	environmentsBase = pythonRootW + L"\\Environments";
+	home = environmentsBase + std::wstring(L"\\CoreEnvironment");
+	dllPath = + L"\\DLLs\\Release";
+	binPath = pythonRootW + L"\\Interpreter\\Release";
 #else
 	// If not found, we are in deployment mode
-	std::wstring pathBase;
 	if (devEnvRoot == nullptr)
 	{
-		pathBase = L".\\Python";
+		environmentsBase = L".\\PythonEnvironments";
+		binPath = L".";
 	}
 	else
 	{
-		pathBase = devEnvRootW + L"\\Deployment\\Python";
+		environmentsBase = devEnvRootW + L"\\Deployment\\PythonEnvironments";
+		binPath = devEnvRootW + L"\\Deployment";
 	}
+	dllPath = L"\\DLLs";
 
 	//Here we have the standart libs
-	lookupPaths.push_back(pathBase + std::wstring(L"\\Environments\\CoreEnvironment\\DLLs"));
-	lookupPaths.push_back(pathBase + std::wstring(L"\\Environments\\CoreEnvironment\\Lib"));
+	home = environmentsBase + std::wstring(L"\\CoreEnvironment");
 
-	//Here we have the third party packages
-	lookupPaths.push_back(pathBase + std::wstring(L"\\Environments\\") + ot::String::toWString(_environmentName)); 
-	//Here we have the dlls
-	lookupPaths.push_back(pathBase + std::wstring(L"\\Interpreter"));
 #endif
 
+	std::list<std::wstring> lookupPaths;
+
+	lookupPaths.push_back(environmentsBase + std::wstring(L"\\PythonBuildTools"));
+	lookupPaths.push_back(environmentsBase + std::wstring(L"\\PyritEnvironment"));
+	lookupPaths.push_back(home);
+	lookupPaths.push_back(home + L"\\Lib");
+	lookupPaths.push_back(home+ dllPath);
+	lookupPaths.push_back(binPath);
+
+	lookupPaths.push_back(environmentsBase + L"\\" + ot::String::toWString(_environmentName));
+	
 	PyConfig config;
 	PyConfig_InitPythonConfig(&config);
+	config.module_search_paths_set = 1;
 
 	std::string debugPathOverview = "";
 	for(std::wstring& pathComponent : lookupPaths) {
 		PyWideStringList_Append(&config.module_search_paths, pathComponent.c_str());
 		debugPathOverview += ot::String::toString(pathComponent) + ";";
 	}
-	OT_LOG_D("Python path: " + debugPathOverview);
-	
-	//config.executable = L"CoreEnvironment/Debug/python_d.exe";
-	//config.prefix = L"CoreEnvironment/Debug";
-	//config.home = L"CoreEnvironment/Debug";
 
+	PyConfig_SetString(&config,&config.home, home.c_str());
+
+	OT_LOG_D("Python path: " + debugPathOverview);
+	OT_LOG_D("Python home: " + ot::String::toString(home));
 		
 	int errorCode = PyImport_AppendInittab("OpenTwin", PythonExtensions::PyInit_OpenTwin);
 	

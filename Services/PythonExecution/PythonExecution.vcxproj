@@ -201,7 +201,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_RELEASEDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_PYTHON_INC);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_NUMPY_INC);C:\ThirdParty\Python\Python3_11_9\Environments\BasicEnvironment\numpy\_core\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_PYTHON_INC);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
       <LanguageStandard>stdcpp17</LanguageStandard>
