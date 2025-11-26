@@ -27,13 +27,14 @@
 #include "OTCore/ReturnValues.h"
 
 //! @brief This class deals with the workflow of loading python script entities, executing them and sending the results back to the service that requested the execution.
-class PythonAPI
+class PythonInterpreterAPI
 {
 	friend class FixturePythonAPI;
 public:
-	PythonAPI();
+	void initializeEnvironment(const std::string& _environmentName);
 	void execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet) noexcept(false);
 	void execute(const std::string& _command) noexcept(false);
+
 private:
 	std::map<std::string , std::string> m_moduleEntrypointByModuleName;
 	PythonWrapper m_wrapper;

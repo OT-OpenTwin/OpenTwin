@@ -55,8 +55,12 @@ public:
 	CPythonObjectBorrowed getGlobalDictionary(const std::string& _moduleName);
 	CPythonObjectNew getFunction(const std::string& _functionName, const std::string& _moduleName = "__main__");
 
+	std::string getEnvironmentPath() const { return m_environmentPath; }
+
+
 private:
 	static bool m_redirectOutput;
+	std::string m_environmentPath;
 
 	bool m_interpreterSuccessfullyInitialized = false;
 	int m_pipe_fds[2];

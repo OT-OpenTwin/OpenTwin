@@ -103,7 +103,6 @@ void PythonWrapper::closePythonInterpreter() {
 
 void PythonWrapper::initializePythonInterpreter(const std::string& _environmentName)
 {
-	
 	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
 	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
 	std::wstring devEnvRootW = ot::String::toWString(devEnvRoot);
@@ -158,8 +157,10 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	lookupPaths.push_back(home+ dllPath);
 	lookupPaths.push_back(binPath);
 
-	lookupPaths.push_back(environmentsBase + L"\\" + ot::String::toWString(_environmentName));
-	
+	std::wstring environmentPathW = environmentsBase + L"\\" + ot::String::toWString(_environmentName);
+	lookupPaths.push_back(environmentPathW);
+	m_environmentPath = ot::String::toString(environmentPathW);
+
 	PyConfig config;
 	PyConfig_InitPythonConfig(&config);
 	config.module_search_paths_set = 1;

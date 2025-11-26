@@ -1,5 +1,5 @@
 // @otlicense
-// File: PythonAPI.cpp
+// File: PythonInterpreterAPI.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "PythonAPI.h"
+#include "PythonInterpreterAPI.h"
 #include "Application.h"
 #include "EntityAPI.h"
 
@@ -28,13 +28,21 @@
 #include "DataBuffer.h"
 #include "PackageHandler.h"
 
+#include <filesystem>
 
-PythonAPI::PythonAPI()
+void PythonInterpreterAPI::initializeEnvironment(const std::string& _environmentName)
 {
-	m_wrapper.initializePythonInterpreter("TestEnvironment");
+	//Pyrit next to a custom environment or instead ?
+	if (_environmentName == "Pyrit")
+	{
+		// Environment is a special, which already exists in the python interpreter installation
+		OT_LOG_D("Initialize Pyrit environment");
+		m_wrapper.initializePythonInterpreter("PyritEnvironment");
+		//m_wrapper.initializePythonInterpreter(_environmentName);
+	}
 }
 
-void PythonAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)
+void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)
 {
 	assert(_scripts.size() == _parameterSet.size());
 	std::list<ot::EntityInformation> scriptEntities = ensureScriptsAreLoaded(_scripts);
@@ -80,7 +88,7 @@ void PythonAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot
 	EntityBuffer::instance().saveChangedEntities();
 }
 
-void PythonAPI::execute(const std::string& command) noexcept(false)
+void PythonInterpreterAPI::execute(const std::string& command) noexcept(false)
 {
 	std::string moduleName = std::to_string(EntityBase::getUidGenerator()->getUID());
 	CPythonObjectNew pReturnValue = m_wrapper.execute(command,moduleName);
@@ -95,7 +103,7 @@ void PythonAPI::execute(const std::string& command) noexcept(false)
 	}
 }
 
-std::list<ot::EntityInformation> PythonAPI::ensureScriptsAreLoaded(const std::list<std::string>& _scripts)
+std::list<ot::EntityInformation> PythonInterpreterAPI::ensureScriptsAreLoaded(const std::list<std::string>& _scripts)
 {
 	//First we get the information of the used scripts
 	std::list<std::string> uniqueScriptNames = _scripts;
@@ -109,7 +117,7 @@ std::list<ot::EntityInformation> PythonAPI::ensureScriptsAreLoaded(const std::li
 	{
 		entityInfosByName[entityInfo.getEntityName()] = entityInfo;
 	}
-
+ 
 	//If some of the requested scripts are not existend in the current model state, we end the execution here
 	if (entityInfos.size() != uniqueScriptNames.size())
 	{
@@ -145,7 +153,7 @@ std::list<ot::EntityInformation> PythonAPI::ensureScriptsAreLoaded(const std::li
 	return scriptEntityInfoList;
 }
 
-void PythonAPI::loadScipt(const ot::EntityInformation& _entityInformation)
+void PythonInterpreterAPI::loadScipt(const ot::EntityInformation& _entityInformation)
 {
 	try
 	{
@@ -153,9 +161,9 @@ void PythonAPI::loadScipt(const ot::EntityInformation& _entityInformation)
 		std::unique_ptr<EntityFileText> script(dynamic_cast<EntityFileText*>(baseEntity));
 		std::string execution = script->getText();
 
-		//PackageHandler packageHandler;
-		//packageHandler.setTargetPath(m_wrapper.getSidePackagesPath());
-		//packageHandler.importMissingPackages(execution);
+		PackageHandler packageHandler;
+		packageHandler.setTargetPath(m_wrapper.getEnvironmentPath());
+		packageHandler.importMissingPackages(execution);
 
 		//First we add a module for the script execution. This way there won't be any namespace conflicts between the scripts since they are all executed in the same namespace
 		const std::string moduleName = PythonLoadedModules::instance().addModuleForEntity(_entityInformation);

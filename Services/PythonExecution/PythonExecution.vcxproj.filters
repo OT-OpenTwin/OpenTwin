@@ -21,7 +21,7 @@
     <ClCompile Include="src\PropertyPythonObjectConverter.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\PythonAPI.cpp">
+    <ClCompile Include="src\PythonInterpreterAPI.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\PythonModuleAPI.cpp">
@@ -77,7 +77,7 @@
     <ClInclude Include="include\PropertyPythonObjectConverter.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\PythonAPI.h">
+    <ClInclude Include="include\PythonInterpreterAPI.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PythonException.h">

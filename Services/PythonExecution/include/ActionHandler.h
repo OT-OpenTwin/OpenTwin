@@ -23,7 +23,7 @@
 #include <functional>
 #include "OTCore/JSON.h"
 #include "OTCommunication/ActionTypes.h"
-#include "PythonAPI.h"
+#include "PythonInterpreterAPI.h"
 #include "OTCore/ReturnMessage.h"
 
 class ActionHandler {
@@ -44,7 +44,7 @@ private:
 	std::map<std::string, handlerMethod> m_checkParameterFunctions;
 	
 	handlerMethod m_noParameterCheck = [](const ot::JsonDocument& _doc) { return ot::ReturnMessage(ot::ReturnMessage::Ok, "No check performed."); };
-	PythonAPI m_pythonAPI;
+	PythonInterpreterAPI m_pythonAPI;
 
 	ot::ReturnMessage handlePing(const ot::JsonDocument& _doc);
 	ot::ReturnMessage shutdownProcess(const ot::JsonDocument& _doc);

@@ -112,6 +112,9 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
+		
+		const std::string environmentName = ot::json::getString(doc, OT_ACTION_PARAM_EnvironmentName);
+		m_pythonAPI.initializeEnvironment(environmentName);
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_PYRIT) {
 		OT_LOG_D("Initialise UID Generator");
@@ -130,7 +133,8 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 		Application::instance().setUIServiceURL(url);
 	}
-	else {
+	else 
+	{
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported initialisation order.");
 	}
 

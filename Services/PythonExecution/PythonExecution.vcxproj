@@ -292,7 +292,7 @@
     <ClCompile Include="src\EntityBuffer.cpp" />
     <ClCompile Include="src\DataBuffer.cpp" />
     <ClCompile Include="src\PropertyPythonObjectConverter.cpp" />
-    <ClCompile Include="src\PythonAPI.cpp" />
+    <ClCompile Include="src\PythonInterpreterAPI.cpp" />
     <ClCompile Include="src\PythonException.cpp" />
     <ClCompile Include="src\PythonLoadedModules.cpp" />
     <ClCompile Include="src\PythonModuleAPI.cpp" />
@@ -312,7 +312,7 @@
     <ClInclude Include="include\EntityBuffer.h" />
     <ClInclude Include="include\DataBuffer.h" />
     <ClInclude Include="include\PropertyPythonObjectConverter.h" />
-    <ClInclude Include="include\PythonAPI.h" />
+    <ClInclude Include="include\PythonInterpreterAPI.h" />
     <ClInclude Include="include\PythonException.h" />
     <ClInclude Include="include\PythonExtension.h" />
     <ClInclude Include="include\PythonExtension.hpp" />
