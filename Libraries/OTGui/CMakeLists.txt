@@ -87,6 +87,7 @@ set(OTGUI_HEADER_FILES
     include/OTGui/CopyEntityInformation.h
     include/OTGui/CopyInformation.h
     include/OTGui/DefaultPropertyValues.h
+    include/OTGui/EntityTreeItem.h
     include/OTGui/ExtendedProjectInformation.h
     include/OTGui/FileExtension.h
     include/OTGui/GraphicsChangeEvent.h
@@ -225,6 +226,7 @@ set(OTGUI_SOURCE_FILES
     src/CopyInformation.cpp
     src/DefaultPropertyValues.cpp
     src/DefaultSyntaxHighlighterRules.cpp
+    src/EntityTreeItem.cpp
     src/ExtendedProjectInformation.cpp
     src/FileExtension.cpp
     src/GraphicsArcItemCfg.cpp
