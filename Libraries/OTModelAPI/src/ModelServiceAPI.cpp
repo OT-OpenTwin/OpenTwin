@@ -21,6 +21,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelAPI/ModelAPIManager.h"
+#include "OTCore/FolderNames.h"
 
 std::list<std::string> ot::ModelServiceAPI::getListOfFolderItems(const std::string& _folder, bool recursive) {
 	std::list<std::string> folderItems;
@@ -138,7 +139,7 @@ void ot::ModelServiceAPI::getAvailableMeshes(std::string& _meshFolderName, UID& 
 }
 
 void ot::ModelServiceAPI::getAvailableScripts(std::string& _scriptFolderName, UID& _scriptFolderID, std::string& _scriptName, UID& _scriptID) {
-	std::list<std::string> scriptFolder = { "Scripts" };
+	std::list<std::string> scriptFolder = { ot::FolderNames::PythonScriptFolder };
 	std::list<EntityInformation> scriptFolderInfo;
 	getEntityInformation(scriptFolder, scriptFolderInfo);
 

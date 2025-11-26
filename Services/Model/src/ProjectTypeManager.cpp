@@ -83,7 +83,7 @@ void ProjectTypeManager::initializeProjectTypeHierarchical() {
 	m_hasMaterialRoot = false;
 	m_hasMeshRoot = false;
 	m_hasSolverRoot = false;
-	m_hasScriptsRoot = false;
+	m_hasPythonRoot = false;
 	m_hasUnitRoot = false;
 	m_hasDataCategorizationRoot = false;
 	m_hasRMDCategorization = false;
@@ -107,7 +107,7 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 	m_hasMaterialRoot				= true;
 	m_hasMeshRoot					= true;
 	m_hasSolverRoot					= true;
-	m_hasScriptsRoot				= false;
+	m_hasPythonRoot				= false;
 	m_hasUnitRoot					= true;
 	m_hasDataCategorizationRoot		= false;
 	m_hasRMDCategorization			= false;
@@ -126,7 +126,7 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 	m_hasMaterialRoot				= false;
 	m_hasMeshRoot					= false;
 	m_hasSolverRoot					= true;
-	m_hasScriptsRoot				= true;
+	m_hasPythonRoot				= true;
 	m_hasUnitRoot					= true;
 	m_hasDataCategorizationRoot		= true;
 	m_hasRMDCategorization			= true;
@@ -144,7 +144,7 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 	m_hasMaterialRoot = true;
 	m_hasMeshRoot = false;
 	m_hasSolverRoot = false;
-	m_hasScriptsRoot = false;
+	m_hasPythonRoot = false;
 	m_hasUnitRoot = true;
 	m_hasDataCategorizationRoot = false;
 	m_hasRMDCategorization = false;
@@ -163,7 +163,7 @@ void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 	m_hasMaterialRoot = false;
 	m_hasMeshRoot = false;
 	m_hasSolverRoot = false;
-	m_hasScriptsRoot = false;
+	m_hasPythonRoot = false;
 	m_hasUnitRoot = false;
 	m_hasDataCategorizationRoot = false;
 	m_hasRMDCategorization = false;
@@ -184,7 +184,7 @@ void ProjectTypeManager::initializeProjectTypePyrit(void)
 	m_hasMaterialRoot = true;
 	m_hasMeshRoot = true;
 	m_hasSolverRoot = true;
-	m_hasScriptsRoot = false;
+	m_hasPythonRoot = false;
 	m_hasUnitRoot = true;
 	m_hasDataCategorizationRoot = false;
 	m_hasRMDCategorization = false;
@@ -203,7 +203,7 @@ void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
 	m_hasMaterialRoot = false;
 	m_hasMeshRoot = false;
 	m_hasSolverRoot = true;
-	m_hasScriptsRoot = false;
+	m_hasPythonRoot = false;
 	m_hasUnitRoot = true;
 	m_hasDataCategorizationRoot = false;
 	m_hasRMDCategorization = false;
@@ -222,7 +222,7 @@ void ProjectTypeManager::initializeProjectTypeFileManagement() {
 	m_hasMaterialRoot = false;
 	m_hasMeshRoot = false;
 	m_hasSolverRoot = false;
-	m_hasScriptsRoot = false;
+	m_hasPythonRoot = false;
 	m_hasUnitRoot = false;
 	m_hasDataCategorizationRoot = false;
 	m_hasRMDCategorization = false;

@@ -273,10 +273,10 @@ void Model::resetToNew()
 		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
 	}
 
-	if (typeManager.hasScriptsRoot())
+	if (typeManager.hasPythonRoot())
 	{
 		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
-		entityScriptRoot->setName(getScriptsRootName());
+		entityScriptRoot->setName(getPythonRootName());
 		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
 	}
 

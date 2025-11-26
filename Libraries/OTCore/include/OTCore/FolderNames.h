@@ -24,7 +24,10 @@ namespace ot
 {
 	namespace FolderNames
 	{
-		const std::string PythonScriptFolder = "Scripts";
+		const std::string PythonFolder = "Python";
+		const std::string PythonScriptFolder = PythonFolder + "/Scripts";
+		const std::string PythonManifestFolder = PythonFolder + "/Manifests";
+
 		const std::string FilesFolder = "Text Files";
 		const std::string DatasetFolder = "Dataset";
 		const std::string DataProcessingFolder = "Data Processing";
