@@ -103,6 +103,20 @@ std::string PropertyHelper::getProjectPropertyValue(const EntityBase* _base, con
 	return selectedProjectName;
 }
 
+std::string PropertyHelper::getEntityListPropertyValueName(const EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	const EntityPropertiesEntityList* entityList = getEntityListProperty(_base, _name, _groupName);
+	const std::string valueName = entityList->getValueName();
+	return valueName;
+}
+
+ot::UID PropertyHelper::getEntityListPropertyValueID(const EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	const EntityPropertiesEntityList* entityList = getEntityListProperty(_base, _name, _groupName);
+	const ot::UID valueID = entityList->getValueID();
+	return valueID;
+}
+
 const EntityPropertiesProjectList* PropertyHelper::getEntityProjectListProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
 	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
