@@ -48,6 +48,8 @@ namespace ot {
 
 			// !!! Do not forget to update CallbackIteratorLast when adding new values !!!
 
+			DefaultCallbacks = Properties | Selection, //! @brief Default callbacks.
+
 			CallbackIteratorFirst = Properties, //! @brief First value for iteration.
 			CallbackIteratorLast = DataHandle //! @brief Last value for iteration.
 		};
@@ -65,6 +67,11 @@ namespace ot {
 		//! @param _serviceName Name of the service registering for the callback.
 		//! @param _supressChangedNotification If true the callbackDataChanged() method will not be called.
 		void registerCallback(Callback _callback, const std::string& _serviceName, bool _supressChangedNotification = false);
+
+		//! @brief Adds the provided services for the default callbacks.
+		//! @param _serviceName Name of the service registering for the callbacks.
+		//! @param _supressChangedNotification If true the callbackDataChanged() method will not be called.
+		void registerDefaultCallbacks(const std::string& _serviceName, bool _supressChangedNotification = false) { this->registerCallbacks(Callback::DefaultCallbacks, _serviceName, _supressChangedNotification); };
 
 		//! @brief Adds the provided services for the provided callbacks.
 		//! @param _callbacks Callbacks to register.
