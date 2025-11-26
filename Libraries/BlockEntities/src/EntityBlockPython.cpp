@@ -22,6 +22,7 @@
 #include "PythonHeaderInterpreter.h"
 #include "SharedResources.h"
 #include "PropertyHelper.h"
+#include "OTCore/FolderNames.h"
 
 static EntityFactoryRegistrar<EntityBlockPython> registrar(EntityBlockPython::className());
 
@@ -40,16 +41,23 @@ EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObser
 
 void EntityBlockPython::createProperties()
 {
-	EntityPropertiesEntityList::createProperty("Script properties",_propertyNameScripts , "", ot::invalidUID, "", -1, "default", getProperties());
+	EntityPropertiesEntityList::createProperty("Python properties", m_propertyNameScripts , ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, "default", getProperties());
+	EntityPropertiesEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", ot::invalidUID, "default", getProperties());
 }
 
 std::string EntityBlockPython::getSelectedScript()
 {
-	auto propBase = getProperties().getProperty(_propertyNameScripts);
+	auto propBase = getProperties().getProperty(m_propertyNameScripts);
 	auto scriptSelection = dynamic_cast<EntityPropertiesEntityList*>(propBase);
 	assert(scriptSelection != nullptr);
 
 	return scriptSelection->getValueName();
+}
+
+ot::UID EntityBlockPython::getSelectedEnvironment()
+{
+	ot::UID selectedManifest = PropertyHelper::getEntityListPropertyValueID(this, m_propertyNameEnvironments);
+	return selectedManifest;
 }
 
 ot::GraphicsItemCfg* EntityBlockPython::createBlockCfg()
@@ -75,7 +83,7 @@ ot::GraphicsItemCfg* EntityBlockPython::createBlockCfg()
 
 bool EntityBlockPython::updateFromProperties()
 {
-	auto scriptSelectionProperty =	getProperties().getProperty(_propertyNameScripts);
+	auto scriptSelectionProperty =	getProperties().getProperty(m_propertyNameScripts);
 	if (scriptSelectionProperty->needsUpdate())
 	{
 		updateBlockAccordingToScriptHeader();
@@ -85,19 +93,23 @@ bool EntityBlockPython::updateFromProperties()
 	return true;
 }
 
-void EntityBlockPython::setScriptFolder(const std::string& _scriptFolder, ot::UID _scriptFolderID) {
-	auto basePropertyScript = getProperties().getProperty(_propertyNameScripts);
-	auto scriptProperty = dynamic_cast<EntityPropertiesEntityList*>(basePropertyScript);
-
-	scriptProperty->setEntityContainerName(_scriptFolder);
+void EntityBlockPython::setScriptFolder(ot::UID _scriptFolderID) {
+	
+	auto scriptProperty = PropertyHelper::getEntityListProperty(this, m_propertyNameScripts);
 	scriptProperty->setEntityContainerID(_scriptFolderID);
+}
+
+void EntityBlockPython::setManifestFolder(ot::UID _manifestFolderID)
+{
+	auto manifestProperty = PropertyHelper::getEntityListProperty(this, m_propertyNameEnvironments);
+	manifestProperty->setEntityContainerID(_manifestFolderID);
 }
 
 void EntityBlockPython::updateBlockAccordingToScriptHeader()
 {
 	resetBlockRelatedAttributes();
 
-	auto propertyBase =	getProperties().getProperty(_propertyNameScripts);
+	auto propertyBase =	getProperties().getProperty(m_propertyNameScripts);
 	auto propertyEntityList = dynamic_cast<EntityPropertiesEntityList*>(propertyBase);
 	ot::UID scriptID = propertyEntityList->getValueID();
 	std::map<ot::UID,EntityBase*> entityMap;
@@ -147,7 +159,7 @@ void EntityBlockPython::resetBlockRelatedAttributes()
 		const std::string propertyName = property->getName();
 		const std::string propertyGroupName = property->getGroup();
 
-		if (propertyName != _propertyNameScripts)
+		if (propertyName != m_propertyNameScripts && propertyName != m_propertyNameEnvironments)
 		{
 			getProperties().deleteProperty(propertyName, propertyGroupName);
 		}

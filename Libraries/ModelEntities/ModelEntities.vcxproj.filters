@@ -454,6 +454,9 @@
     <ClInclude Include="include\EntityCallbackBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntityPythonManifest.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -785,6 +788,9 @@
     </ClCompile>
     <ClCompile Include="src\EntityCallbackBase.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityPythonManifest.cpp">
+      <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

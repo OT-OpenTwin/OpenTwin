@@ -36,6 +36,7 @@
     <ClInclude Include="include\EntityGraphicsScene.h" />
     <ClInclude Include="include\EntityInformation.h" />
     <ClInclude Include="include\EntityNamingBehavior.h" />
+    <ClInclude Include="include\EntityPythonManifest.h" />
     <ClInclude Include="include\EntityResult1DCurve.h" />
     <ClInclude Include="include\EntityResult1DPlot.h" />
     <ClInclude Include="include\EntityResultText.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="src\EntityParameter.cpp" />
     <ClCompile Include="src\EntityParameterizedDataCategorization.cpp" />
     <ClCompile Include="src\EntityMetadataCampaign.cpp" />
+    <ClCompile Include="src\EntityPythonManifest.cpp" />
     <ClCompile Include="src\EntityResult1DCurve.cpp" />
     <ClCompile Include="src\EntityResult1DPlot.cpp" />
     <ClCompile Include="src\EntityResultTable.cpp" />

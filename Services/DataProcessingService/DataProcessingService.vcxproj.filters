@@ -92,6 +92,9 @@
     <ClCompile Include="src\SolverReport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\EntityCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -152,6 +155,9 @@
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
     <ClInclude Include="include\SolverReport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityCreator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

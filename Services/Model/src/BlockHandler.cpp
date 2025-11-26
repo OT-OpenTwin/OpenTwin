@@ -920,8 +920,10 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 			return nullptr;
 		}
 		ot::EntityInformation entityInfo;
-		EntityBase* entity = model->findEntityFromName(ot::FolderNames::PythonScriptFolder);
-		pythonBlock->setScriptFolder(ot::FolderNames::PythonScriptFolder, entity->getEntityID());
+		EntityBase* scriptFolder= model->findEntityFromName(ot::FolderNames::PythonScriptFolder);
+		EntityBase* manifestFolder= model->findEntityFromName(ot::FolderNames::PythonManifestFolder);
+		pythonBlock->setScriptFolder(scriptFolder->getEntityID());
+		pythonBlock->setManifestFolder(manifestFolder->getEntityID());
 	}
 
 	blockEnt->storeToDataBase();
