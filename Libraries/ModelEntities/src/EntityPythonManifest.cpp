@@ -28,6 +28,15 @@ void EntityPythonManifest::addVisualizationNodes()
 	getObserver()->sendMessageToViewer(doc);
 }
 
+void EntityPythonManifest::setEntityID(ot::UID id)
+{
+	EntityBase::setEntityID(id);
+	if (m_manifestID == ot::invalidUID)
+	{
+		m_manifestID = id;
+	}
+}
+
 std::string EntityPythonManifest::getText()
 {
 	return m_manifestText;

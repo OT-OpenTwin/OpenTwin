@@ -79,7 +79,7 @@ public:
 	//! If the name is "root/entity" then the function will return "entity".
 	std::string getNameOnly() const;
 
-	void setEntityID(ot::UID id) { m_entityID = id; setModified(); };
+	virtual void setEntityID(ot::UID id) { m_entityID = id; setModified(); };
 	ot::UID getEntityID() const { return m_entityID; };
 
 	ot::UID getEntityStorageVersion() const { return m_entityStorageVersion; };

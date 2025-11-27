@@ -16,7 +16,7 @@ public:
 	bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; }
 	entityType getEntityType() const override { return TOPOLOGY; }
 	virtual void addVisualizationNodes() override;
-
+	void setEntityID(ot::UID id) override;
 	// Inherited via IVisualisationText
 	std::string getText() override;
 	
@@ -35,7 +35,7 @@ public:
 	void replaceManifest(const std::string& _newManifestText);
 
 private:
-	ot::UID m_manifestID = 0;
+	ot::UID m_manifestID = ot::invalidUID;
 	std::string m_manifestText;
 
 	bool environmentHasChanged(const std::string& _newContent);
