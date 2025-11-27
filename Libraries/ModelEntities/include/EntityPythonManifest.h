@@ -22,7 +22,7 @@ public:
 	
 	//! @brief Replaces the manifest text. If the environment has changed a new manifest ID is generated.
 	void setText(const std::string& _text) override;
-	ot::TextEditorCfg createConfig(bool _includeData) override;
+	ot::TextEditorCfg createConfig(const ot::VisualisationCfg& _visualizationConfig) override;
 	bool visualiseText() override { return true; }
 	
 	ot::UID getManifestID() const { return m_manifestID; }
