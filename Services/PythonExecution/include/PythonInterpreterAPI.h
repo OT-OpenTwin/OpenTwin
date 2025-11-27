@@ -31,7 +31,7 @@ class PythonInterpreterAPI
 {
 	friend class FixturePythonAPI;
 public:
-	void initializeEnvironment(const std::string& _environmentName);
+	void initializeEnvironment(std::string& _environmentName);
 	void execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet) noexcept(false);
 	void execute(const std::string& _command) noexcept(false);
 

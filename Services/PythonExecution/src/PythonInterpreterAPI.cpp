@@ -30,16 +30,17 @@
 
 #include <filesystem>
 
-void PythonInterpreterAPI::initializeEnvironment(const std::string& _environmentName)
+void PythonInterpreterAPI::initializeEnvironment(std::string& _environmentName)
 {
 	//Pyrit next to a custom environment or instead ?
 	if (_environmentName == "Pyrit")
 	{
 		// Environment is a special, which already exists in the python interpreter installation
 		OT_LOG_D("Initialize Pyrit environment");
-		m_wrapper.initializePythonInterpreter("PyritEnvironment");
+		_environmentName = "PythonEnvironment";
 		//m_wrapper.initializePythonInterpreter(_environmentName);
 	}
+	m_wrapper.initializePythonInterpreter(_environmentName);
 }
 
 void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)

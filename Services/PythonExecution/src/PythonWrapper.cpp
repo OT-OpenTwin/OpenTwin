@@ -157,9 +157,17 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	lookupPaths.push_back(home+ dllPath);
 	lookupPaths.push_back(binPath);
 
-	std::wstring environmentPathW = environmentsBase + L"\\" + ot::String::toWString(_environmentName);
-	lookupPaths.push_back(environmentPathW);
-	m_environmentPath = ot::String::toString(environmentPathW);
+	if (_environmentName != std::to_string(ot::invalidUID))
+	{
+		std::wstring environmentPathW = environmentsBase + L"\\" + ot::String::toWString(_environmentName);
+		lookupPaths.push_back(environmentPathW);
+		m_environmentPath = ot::String::toString(environmentPathW);
+		OT_LOG_D("Custom environment: " + m_environmentPath);
+	}
+	else
+	{
+		OT_LOG_D("Running without custom environment");
+	}
 
 	PyConfig config;
 	PyConfig_InitPythonConfig(&config);

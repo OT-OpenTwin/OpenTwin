@@ -60,7 +60,7 @@ public:
 
 private:
 	static bool m_redirectOutput;
-	std::string m_environmentPath;
+	std::string m_environmentPath = "";
 
 	bool m_interpreterSuccessfullyInitialized = false;
 	int m_pipe_fds[2];

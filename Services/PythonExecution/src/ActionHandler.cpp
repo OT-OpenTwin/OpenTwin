@@ -112,15 +112,21 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
-		
-		const std::string environmentName = ot::json::getString(doc, OT_ACTION_PARAM_EnvironmentName);
-		m_pythonAPI.initializeEnvironment(environmentName);
+		std::string environmentID = std::to_string(ot::invalidUID);
+		if (ot::json::exists(doc, OT_ACTION_PARAM_MODEL_EntityID))
+		{
+			environmentID = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_EntityID);
+		}
+		OT_LOG_D("Initialise Python with additional environment: " + environmentID);
+		m_pythonAPI.initializeEnvironment(environmentID);
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_PYRIT) {
 		OT_LOG_D("Initialise UID Generator");
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
+		std::string environmentName = "Pyrit";
+		m_pythonAPI.initializeEnvironment(environmentName);
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL) {
 		OT_LOG_D("Connecting with modelService");

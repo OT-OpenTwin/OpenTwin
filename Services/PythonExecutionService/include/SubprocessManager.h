@@ -25,7 +25,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
-
+#include "OTCore/CoreTypes.h"
 // std header
 #include <mutex>
 
@@ -45,6 +45,7 @@ public:
 	void setModelUrl(const std::string& _url);
 	void setFrontendUrl(const std::string& _url);
 	void setDataBaseInfo(const DataBaseInfo& _info);
+	void setManifestUID(const std::string& _manifestUID);
 
 	//! @brief Sends the request to the Subprocess.
 	//! Will start the subprocess if needed.

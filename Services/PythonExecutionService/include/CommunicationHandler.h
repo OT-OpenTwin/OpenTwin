@@ -55,6 +55,11 @@ public:
 
 	bool isDisconnected() const { return m_clientState == ClientState::Disconnected; };
 
+	void setEnvironmentID(const std::string& _manifestUID)
+	{
+		m_manifestUID = _manifestUID;
+	}
+
 private Q_SLOTS:
 	void slotNewConnection(void);
 	void slotMessageReceived(void);
@@ -107,5 +112,6 @@ private:
 	bool m_databaseInfoSet;
 
 	std::string m_response;
+	std::string m_manifestUID;
 
 };
