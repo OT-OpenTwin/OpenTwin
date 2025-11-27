@@ -22,7 +22,7 @@
 
 TEST_F(FixtureEntityWithDynamicFields, FindInsertedDocument)
 {
-	EntityWithDynamicFields entity(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityWithDynamicFields entity;
 	const std::string documentName = "FirstDocument";
 	entity.InsertInField("FirstField", { ot::Variable(1.3) }, documentName);
 	EXPECT_NO_THROW(entity.getDocument(documentName));
@@ -30,7 +30,7 @@ TEST_F(FixtureEntityWithDynamicFields, FindInsertedDocument)
 
 TEST_F(FixtureEntityWithDynamicFields, FindInsertedDocument_RootInName)
 {
-	EntityWithDynamicFields entity(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityWithDynamicFields entity;
 	const std::string documentName = "/FirstDocument";
 	entity.InsertInField("FirstField", { ot::Variable(1.3) }, documentName);
 	EXPECT_NO_THROW(entity.getDocument(documentName));
@@ -38,7 +38,7 @@ TEST_F(FixtureEntityWithDynamicFields, FindInsertedDocument_RootInName)
 
 TEST_F(FixtureEntityWithDynamicFields, InsertedDocumentCount)
 {
-	EntityWithDynamicFields entity(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityWithDynamicFields entity;
 	const std::string documentName = "FirstDocument";
 	entity.InsertInField("FirstField", { ot::Variable(1.3) }, documentName);
 	EXPECT_EQ(entity.getDocumentsNames().size(), 2);
@@ -46,19 +46,19 @@ TEST_F(FixtureEntityWithDynamicFields, InsertedDocumentCount)
 
 TEST_F(FixtureEntityWithDynamicFields, FindRootDocument_viaName)
 {
-	EntityWithDynamicFields entity(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityWithDynamicFields entity;
 	EXPECT_NO_THROW(entity.getDocument("/"));
 }
 
 TEST_F(FixtureEntityWithDynamicFields, FindRootDocument_asTopLevelDoc)
 {
-	EntityWithDynamicFields entity(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityWithDynamicFields entity;
 	EXPECT_NO_THROW(entity.getDocumentTopLevel());
 }
 
 TEST_F(FixtureEntityWithDynamicFields, OrderDocuments)
 {
-	EntityWithDynamicFields entity(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityWithDynamicFields entity;
 	
 	const std::string firstDocumentName = "FirstDocument";
 	entity.InsertInField("FirstField", { ot::Variable(1.3) }, firstDocumentName);
@@ -77,7 +77,7 @@ TEST_F(FixtureEntityWithDynamicFields, OrderDocuments)
 
 TEST_F(FixtureEntityWithDynamicFields, OrderDocumentsWithGaps)
 {
-	EntityWithDynamicFields entity(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityWithDynamicFields entity;
 
 	const std::string documentName = "FirstDocument/SecondDocument/ThirdDocument";
 	entity.InsertInField("FirstField", { ot::Variable(1.3) }, documentName);

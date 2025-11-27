@@ -35,12 +35,14 @@
     <ClCompile Include="src\TestCSVToTableTransformer.cpp" />
     <ClCompile Include="src\TestEntityWithDynamicFields.cpp" />
     <ClCompile Include="src\TestParameterInitialisation.cpp" />
+    <ClCompile Include="src\TestPythonManifestUpdate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FileHelper.h" />
     <ClInclude Include="include\FixtureBsonArrayTypeGetterWrapper.h" />
     <ClInclude Include="include\FixtureEntityWithDynamicFields.h" />
     <ClInclude Include="include\FixtureCSVToTableTransformer.h" />
+    <ClInclude Include="include\FixturePythonManifest.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Files\WorkingTestMaskedDelimitter.csv" />
@@ -49,6 +51,13 @@
     <None Include="Files\WorkingTestTableForAnalytics.csv" />
     <None Include="Files\WorkingTestTableSemicolon.csv" />
     <None Include="Files\WorkingTestTableTab.csv" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Files\ManifestA.txt" />
+    <Text Include="Files\ManifestB.txt" />
+    <Text Include="Files\ManifestC.txt" />
+    <Text Include="Files\ManifestD.txt" />
+    <Text Include="Files\ManifestE.txt" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -44,6 +44,13 @@ std::vector<char> FileHelper::extractFileContentAsBinary(const std::string& file
 	}
 }
 
+std::string FileHelper::extractFileContentAsString(const std::string& _fileName)
+{
+	auto fileContent = FileHelper::extractFileContentAsBinary(_fileName);
+	std::string fileText(fileContent.begin(), fileContent.end());
+	return fileText;
+}
+
 std::string FileHelper::getFilePath()
 {
 	std::string executablePath = ot::OperatingSystem::getCurrentExecutableDirectory();

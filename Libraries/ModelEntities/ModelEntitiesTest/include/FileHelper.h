@@ -24,7 +24,7 @@ class FileHelper
 {
 public:
 	static std::vector<char> extractFileContentAsBinary(const std::string& fileName);
-
+	static std::string extractFileContentAsString(const std::string& _fileName);
 	static std::string getFilePath();
 };
 

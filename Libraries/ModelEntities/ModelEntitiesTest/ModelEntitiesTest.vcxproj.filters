@@ -42,6 +42,9 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestPythonManifestUpdate.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixtureBsonArrayTypeGetterWrapper.h">
@@ -54,6 +57,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\FileHelper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixturePythonManifest.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -76,5 +82,22 @@
     <None Include="Files\WorkingTestTableTab.csv">
       <Filter>Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Files\ManifestA.txt">
+      <Filter>Files</Filter>
+    </Text>
+    <Text Include="Files\ManifestB.txt">
+      <Filter>Files</Filter>
+    </Text>
+    <Text Include="Files\ManifestC.txt">
+      <Filter>Files</Filter>
+    </Text>
+    <Text Include="Files\ManifestD.txt">
+      <Filter>Files</Filter>
+    </Text>
+    <Text Include="Files\ManifestE.txt">
+      <Filter>Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
