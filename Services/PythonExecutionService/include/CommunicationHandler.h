@@ -55,7 +55,7 @@ public:
 
 	bool isDisconnected() const { return m_clientState == ClientState::Disconnected; };
 
-	void setEnvironmentID(const std::string& _manifestUID)
+	void setManifestUID(ot::UID _manifestUID)
 	{
 		m_manifestUID = _manifestUID;
 	}
@@ -112,6 +112,5 @@ private:
 	bool m_databaseInfoSet;
 
 	std::string m_response;
-	std::string m_manifestUID;
-
+	ot::UID m_manifestUID = ot::invalidUID;
 };

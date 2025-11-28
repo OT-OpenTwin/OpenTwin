@@ -98,10 +98,10 @@ void SubprocessManager::setDataBaseInfo(const DataBaseInfo& _info) {
 	return m_communicationHandler->setDataBaseInfo(_info);
 }
 
-void SubprocessManager::setManifestUID(const std::string& _manifestUID)
+void SubprocessManager::setManifestUID(ot::UID _manifestUID)
 {
 	assert(m_communicationHandler != nullptr);
-	m_communicationHandler->setEnvironmentID(_manifestUID);
+	m_communicationHandler->setManifestUID(_manifestUID);
 }
 
 bool SubprocessManager::sendRequest(const ot::JsonDocument& _document, std::string& _response) {

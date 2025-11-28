@@ -28,7 +28,16 @@
 #include "DataBuffer.h"
 #include "PackageHandler.h"
 
-#include <filesystem>
+#include "PackageHandler.h"
+
+void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestUID)
+{
+	PackageHandler::instance().initializeManifest(_manifestUID);
+	const std::string environmentName = PackageHandler::instance().getEnvironmentName();
+	m_wrapper.initializePythonInterpreter(environmentName);
+	const std::string environmentPath = m_wrapper.getEnvironmentPath();
+	PackageHandler::instance().initializeEnvironmentWithManifest(environmentPath);
+}
 
 void PythonInterpreterAPI::initializeEnvironment(std::string& _environmentName)
 {
@@ -37,10 +46,13 @@ void PythonInterpreterAPI::initializeEnvironment(std::string& _environmentName)
 	{
 		// Environment is a special, which already exists in the python interpreter installation
 		OT_LOG_D("Initialize Pyrit environment");
-		_environmentName = "PythonEnvironment";
-		//m_wrapper.initializePythonInterpreter(_environmentName);
+		_environmentName = "PyritEnvironment";
+		m_wrapper.initializePythonInterpreter(_environmentName);
 	}
-	m_wrapper.initializePythonInterpreter(_environmentName);
+	else
+	{
+		throw std::exception(("Initialisation with unknown environment: " + _environmentName).c_str());
+	}
 }
 
 void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)
@@ -143,6 +155,7 @@ std::list<ot::EntityInformation> PythonInterpreterAPI::ensureScriptsAreLoaded(co
 		OT_LOG_D("Loading script " + entityInfo.getEntityName());
 		loadScipt(entityInfo);
 	}
+	PackageHandler::instance().importMissingPackages();
 
 	//Now we build up a list of the execution scripts but with their entityInformation instead of their plain names
 	std::list<ot::EntityInformation> scriptEntityInfoList;
@@ -162,9 +175,7 @@ void PythonInterpreterAPI::loadScipt(const ot::EntityInformation& _entityInforma
 		std::unique_ptr<EntityFileText> script(dynamic_cast<EntityFileText*>(baseEntity));
 		std::string execution = script->getText();
 
-		PackageHandler packageHandler;
-		packageHandler.setTargetPath(m_wrapper.getEnvironmentPath());
-		packageHandler.importMissingPackages(execution);
+		PackageHandler::instance().extractMissingPackages(execution);
 
 		//First we add a module for the script execution. This way there won't be any namespace conflicts between the scripts since they are all executed in the same namespace
 		const std::string moduleName = PythonLoadedModules::instance().addModuleForEntity(_entityInformation);

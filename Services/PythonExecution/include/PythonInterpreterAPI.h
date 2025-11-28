@@ -31,6 +31,9 @@ class PythonInterpreterAPI
 {
 	friend class FixturePythonAPI;
 public:
+	//! @brief Initialise an environment described by a manifest entity
+	//! @param _environmentName 
+	void initializeEnvironment(ot::UID _manifestUID);
 	void initializeEnvironment(std::string& _environmentName);
 	void execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet) noexcept(false);
 	void execute(const std::string& _command) noexcept(false);
@@ -38,6 +41,7 @@ public:
 private:
 	std::map<std::string , std::string> m_moduleEntrypointByModuleName;
 	PythonWrapper m_wrapper;
+	
 	std::list<ot::EntityInformation> ensureScriptsAreLoaded(const std::list<std::string>& _scripts);
 	void loadScipt(const ot::EntityInformation& _entityInformation);
 };

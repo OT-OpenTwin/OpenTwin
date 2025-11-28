@@ -32,7 +32,7 @@
 #include "DataBase.h"
 #include "EntityBase.h"
 #include "DocumentAPI.h"
-
+#include "PackageHandler.h"
 
 #include "OTServiceFoundation/TimeFormatter.h"
 
@@ -106,19 +106,15 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		DataBase::instance().setCollectionName(collectionName);
 		DataBase::instance().setUserCredentials(userName, psw);
 		DataBase::instance().initializeConnection(url);
+
+		ot::UID manifestUID = ot::json::getUInt64(doc, OT_ACTION_PARAM_Python_Environment);
+		m_pythonAPI.initializeEnvironment(manifestUID);
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE) {
 		OT_LOG_D("Initialise UID Generator");
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
-		std::string environmentID = std::to_string(ot::invalidUID);
-		if (ot::json::exists(doc, OT_ACTION_PARAM_MODEL_EntityID))
-		{
-			environmentID = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_EntityID);
-		}
-		OT_LOG_D("Initialise Python with additional environment: " + environmentID);
-		m_pythonAPI.initializeEnvironment(environmentID);
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_PYRIT) {
 		OT_LOG_D("Initialise UID Generator");
@@ -169,6 +165,8 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 		//Extract script entity names from json doc
 		std::list<std::string> scripts = ot::json::getStringList(doc, OT_ACTION_CMD_PYTHON_Scripts);
 		OT_LOG_D("Number of scripts being executed: " + std::to_string(scripts.size()));
+		ot::UID manifestUID = ot::json::getUInt64(doc, OT_ACTION_PARAM_Python_Environment);
+		PackageHandler::instance().initializeManifest(manifestUID);
 
 		//Extract parameter array from json doc
 		auto parameterArrayArray = ot::json::getArray(doc, OT_ACTION_CMD_PYTHON_Parameter);

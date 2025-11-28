@@ -49,7 +49,7 @@ BlockHandlerPython::BlockHandlerPython(EntityBlockPython* _blockEntity, const Ha
       }     
       m_entityName = _blockEntity->getName();
       m_scriptName = _blockEntity->getSelectedScript();
-	  m_environmentID =  _blockEntity->getSelectedEnvironment();
+      m_manifestUID =  _blockEntity->getSelectedEnvironment();
 }
 
 bool BlockHandlerPython::executeSpecialized()
@@ -71,7 +71,7 @@ bool BlockHandlerPython::executeSpecialized()
         //First assemble the job for the python service
         ot::PythonServiceInterface::scriptParameter parameter{ {ot::Variable(m_entityName)} };
         m_pythonServiceInterface->addScriptWithParameter(m_scriptName, parameter);
-		m_pythonServiceInterface->addEnvironmentID(m_environmentID);
+		m_pythonServiceInterface->addManifestUID(m_manifestUID);
 
         for (auto& dataPortEntry : m_dataPerPort)
         {

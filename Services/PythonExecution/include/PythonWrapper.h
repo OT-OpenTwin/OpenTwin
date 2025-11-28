@@ -57,6 +57,7 @@ public:
 
 	std::string getEnvironmentPath() const { return m_environmentPath; }
 
+	bool isInitialized() const { return m_interpreterSuccessfullyInitialized; }
 
 private:
 	static bool m_redirectOutput;

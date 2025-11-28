@@ -136,7 +136,6 @@ bool CommunicationHandler::sendServiceInfoToClient(void) {
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, ot::JsonString(m_manifestUID,doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonArray logFlags;
 	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logFlags, doc.GetAllocator());
@@ -253,6 +252,15 @@ bool CommunicationHandler::sendDataBaseConfigToClient(void) {
 		doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(m_databaseInfo.getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(m_databaseInfo.getUserName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(m_databaseInfo.getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+
+		if (m_manifestUID != ot::invalidUID)
+		{
+			doc.AddMember(OT_ACTION_PARAM_Python_Environment, m_manifestUID, doc.GetAllocator());
+		}
+		else
+		{
+			assert(false);
+		}
 
 		QByteArray request = QByteArray::fromStdString(doc.toJson());
 		request.append('\n');

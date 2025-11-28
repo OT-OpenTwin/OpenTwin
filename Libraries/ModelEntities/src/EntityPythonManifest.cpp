@@ -75,6 +75,7 @@ void EntityPythonManifest::setManifestID(ot::UID _id)
 ot::UID EntityPythonManifest::generateNewManifestID()
 {
 	m_manifestID = createEntityUID(); 
+	setModified();
 	return m_manifestID;
 }
 void EntityPythonManifest::replaceManifest(const std::string& _newManifestText)
@@ -133,7 +134,7 @@ std::list<std::string> EntityPythonManifest::getPackageList(const std::string _t
 		}
 		if(!moduleName.empty() && !version.empty())
 		{
-			packageList.push_back(moduleName + version);
+			packageList.push_back(line);
 		}
 		else
 		{

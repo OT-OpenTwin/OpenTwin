@@ -39,8 +39,8 @@ namespace ot
 		PythonServiceInterface(const std::string& _pythonExecutionServiceURL);
 		void addScriptWithParameter(const std::string& _scriptName, const scriptParameter& _scriptParameter);
 		void addPortData(const std::string& _portName, const ot::JsonValue*  _data, const JsonValue* _metadata);
-		void addEnvironmentID(ot::UID _environmentID);
-
+		void addManifestUID(ot::UID _manifestUID);
+		
 		ot::ReturnMessage sendExecutionOrder();
 
 		ot::ReturnMessage sendSingleExecutionCommand(const std::string& command);
@@ -48,6 +48,7 @@ namespace ot
 	private:
 		const std::string m_pythonExecutionServiceURL;
 		ot::UID m_manifestUID = ot::invalidUID;
+		
 		std::list<std::tuple<std::string, scriptParameter>> m_scriptNamesWithParameter;
 
 		std::map<std::string, std::pair<const ot::JsonValue*, const ot::JsonValue*>> m_portDataByPortName;

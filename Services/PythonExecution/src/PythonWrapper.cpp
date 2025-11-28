@@ -157,7 +157,7 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	lookupPaths.push_back(home+ dllPath);
 	lookupPaths.push_back(binPath);
 
-	if (_environmentName != std::to_string(ot::invalidUID))
+	if (!_environmentName.empty())
 	{
 		std::wstring environmentPathW = environmentsBase + L"\\" + ot::String::toWString(_environmentName);
 		lookupPaths.push_back(environmentPathW);

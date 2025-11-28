@@ -662,6 +662,9 @@
 #define OT_ACTION_PARAM_MESH_NODE_ID "Mesh.Node.ID"
 #define OT_ACTION_PARAM_MESH_NODE_VERSION "Mesh.Node.Version"
 
+#define OT_ACTION_PARAM_Python_Environment "Python.Environment"
+
+
 //Needed in new API
 #define OT_ACTION_PARAM_VIEW1D_CurveConfigs "View1D.CurveConfigs"
 #define OT_ACTION_CMD_VIEW1D_Setup "View1D.Setup"

@@ -30,7 +30,7 @@ public:
 	
 	//! @brief  Creates a new manifest ID and returns it
 	ot::UID generateNewManifestID();
-	
+	std::list<std::string> getManifestPackages() { return getPackageList(m_manifestText); }
 	//! @brief Replaces manifest text without generating a new manifest ID
 	void replaceManifest(const std::string& _newManifestText);
 

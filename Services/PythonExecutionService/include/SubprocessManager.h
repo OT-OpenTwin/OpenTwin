@@ -45,8 +45,8 @@ public:
 	void setModelUrl(const std::string& _url);
 	void setFrontendUrl(const std::string& _url);
 	void setDataBaseInfo(const DataBaseInfo& _info);
-	void setManifestUID(const std::string& _manifestUID);
-
+	void setManifestUID(ot::UID _manifestUID);
+	
 	//! @brief Sends the request to the Subprocess.
 	//! Will start the subprocess if needed.
 	bool sendRequest(const ot::JsonDocument& _document, std::string& _response);

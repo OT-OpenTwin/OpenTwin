@@ -139,12 +139,12 @@ void Application::logFlagsChanged(const ot::LogFlags& _flags) {
 
 std::string Application::handleForwardToSubprocess(ot::JsonDocument& _doc) 
 {
-	std::string manifestUID = std::to_string(ot::invalidUID);
-	if (ot::json::exists(_doc, OT_ACTION_PARAM_MODEL_EntityID))
+	
+	if (ot::json::exists(_doc, OT_ACTION_PARAM_Python_Environment))
 	{
-		 manifestUID = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_EntityID);
+		ot::UID manifestUID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_Python_Environment);
+		m_subprocessManager->setManifestUID(manifestUID);
 	}
-	m_subprocessManager->setManifestUID(manifestUID);
 	std::string returnMessage;
 
 	if (!m_subprocessManager->sendRequest(_doc, returnMessage)) {

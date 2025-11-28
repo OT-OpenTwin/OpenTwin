@@ -42,10 +42,11 @@ void ot::PythonServiceInterface::addPortData(const std::string& _portName, const
 	m_portDataByPortName.insert(std::pair<std::string, std::pair<const ot::JsonValue*, const ot::JsonValue*>>(_portName, std::pair(_data,_metadata)));
 }
 
-void ot::PythonServiceInterface::addEnvironmentID(ot::UID _manifestUID)
+void ot::PythonServiceInterface::addManifestUID(ot::UID _manifestUID)
 {
 	m_manifestUID = _manifestUID;
 }
+
 
 ot::ReturnMessage ot::PythonServiceInterface::sendExecutionOrder()
 {
@@ -133,7 +134,15 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, allparameter, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Scripts, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, ot::JsonString(std::to_string(m_manifestUID),doc.GetAllocator()), doc.GetAllocator());
+	
+	if (m_manifestUID != ot::invalidUID)
+	{
+		doc.AddMember(OT_ACTION_PARAM_Python_Environment, m_manifestUID,doc.GetAllocator()), doc.GetAllocator();
+	}
+	else
+	{
+		assert(false);
+	}
 	m_manifestUID = ot::invalidUID;
 	return doc;
 }
