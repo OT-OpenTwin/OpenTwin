@@ -28,6 +28,7 @@
 #include "EntityAPI.h"
 #include "EntityPythonManifest.h"
 #include "Application.h"
+#include "OutputPipeline.h"
 
 #include <filesystem>
 #include "PythonObjectBuilder.h"
@@ -35,7 +36,7 @@
 PackageHandler::~PackageHandler()
 {
     delete m_currentManifest;
-	m_currentManifest = nullptr;
+    m_currentManifest = nullptr;
 }
 
 void PackageHandler::initializeManifest(ot::UID _manifestUID)
@@ -45,15 +46,20 @@ void PackageHandler::initializeManifest(ot::UID _manifestUID)
         throw std::exception("Invalid manifest UID provided.");
     }
 
-    if (m_currentManifest != nullptr && m_currentManifest->getManifestID() != _manifestUID)
+    if (m_currentManifest == nullptr)
     {
-        OT_LOG_D("Manifest change requires interpreter restart.");
-		requestRestart();
+        m_currentManifest = loadManifestEntity(_manifestUID);
     }
-    else if (m_currentManifest == nullptr)
+    else 
     {
-        loadManifestEntity(_manifestUID);
+        std::unique_ptr<EntityPythonManifest>newManifest(loadManifestEntity(_manifestUID));
+        if (m_currentManifest->getManifestID() != newManifest->getManifestID())
+        {
+	        requestRestart();
+            OT_LOG_D("Manifest change requires interpreter restart.");
+        }
     }
+    
 }
 
 void PackageHandler::initializeEnvironmentWithManifest(const std::string& _environmentPath)
@@ -81,22 +87,29 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
     }
 
 	assert(m_currentManifest != nullptr);
-    std::list<std::string> packagesInManifest = m_currentManifest->getManifestPackages();
-    if(packagesInManifest.size() == 0)
+    std::optional<std::list<std::string>> packagesInManifest = m_currentManifest->getManifestPackages();
+    if (!packagesInManifest.has_value())
     {
-        OT_LOG_D("Manifest does not contain any packages.");
-	}
+        throw std::exception("Invalid manifest");
+    }
     else
     {
-        assert(m_environmentState == EnvironmentState::empty); //Otherwise the manifest UID should have been a different one
-
-        OT_LOG_D("Initialize environment with manifest packages.");
-        for (const std::string& packageName : packagesInManifest)
+        if(packagesInManifest.value().size() == 0)
         {
-            if (!isPackageInstalled(packageName))
+            OT_LOG_D("Manifest does not contain any packages.");
+	    }
+        else
+        {
+            assert(m_environmentState == EnvironmentState::empty); //Otherwise the manifest UID should have been a different one
+
+            OT_LOG_D("Initialize environment with manifest packages.");
+            for (const std::string& packageName : packagesInManifest.value())
             {
-                installPackage(packageName);
-                m_environmentState = EnvironmentState::firstFilling;
+                if (!isPackageInstalled(packageName))
+                {
+                    installPackage(packageName);
+                    m_environmentState = EnvironmentState::firstFilling;
+                }
             }
         }
     }
@@ -120,10 +133,12 @@ void PackageHandler::importMissingPackages()
     if (m_uninstalledPackages.size() != 0 && m_currentManifest == nullptr)
     {
         // In this case we have no defined manifest and the Pyrit environment is used. An extension is currently not supported.
+        m_uninstalledPackages.clear();
         throw std::exception("The script uses packages that are not part of the pyrit environment. An extension is currently not supported.");
     }
     else if (m_uninstalledPackages.size() != 0)
     {
+        OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
         if (m_environmentState == EnvironmentState::initialised)
         {
             //Here we have an initialised environment, so we need to restart the interpreter with a new environment
@@ -153,7 +168,7 @@ void PackageHandler::importMissingPackages()
             {
                 installPackage(packageName);
             }
-
+            const std::string installLog = OutputPipeline::instance().flushOutput();
             //Update manifest
             std::string newManifest = getListOfInstalledPackages();
             m_currentManifest->replaceManifest(newManifest);
@@ -162,7 +177,10 @@ void PackageHandler::importMissingPackages()
             newModelStateInfo.addTopologyEntity(*m_currentManifest);
             ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, "Manifest requires a new environment");
         }
+        m_uninstalledPackages.clear();
+        OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
     }
+
 }
 
 std::string PackageHandler::getEnvironmentName()
@@ -250,7 +268,7 @@ bool PackageHandler::isPackageInstalled(const std::string& _packageName)
 
 void PackageHandler::installPackage(const std::string& _packageName)
 {
-
+    Application::instance().getCommunicationHandler().writeToServer("OUTPUT:Installing package: " + _packageName);
     // Import sys module
     CPythonObjectNew sys_module = PyImport_ImportModule("sys");
     if (!sys_module) 
@@ -319,7 +337,7 @@ void PackageHandler::installPackage(const std::string& _packageName)
     }
 }
 
-void PackageHandler::loadManifestEntity(ot::UID _manifestUID)
+EntityPythonManifest* PackageHandler::loadManifestEntity(ot::UID _manifestUID)
 {
     ot::EntityInformation info;
     ot::ModelServiceAPI::getEntityInformation(_manifestUID, info);
@@ -328,7 +346,7 @@ void PackageHandler::loadManifestEntity(ot::UID _manifestUID)
     {
         throw std::exception("Failed to load manifest entity from database.");
 	}
-    m_currentManifest = dynamic_cast<EntityPythonManifest*>(entityBase);        
+    return dynamic_cast<EntityPythonManifest*>(entityBase);        
 }
 
 ot::UID PackageHandler::getUIDFromString(const std::string& _uid)
@@ -339,7 +357,7 @@ ot::UID PackageHandler::getUIDFromString(const std::string& _uid)
         ot::UID manifestUID = static_cast<ot::UID>(temp);
         return manifestUID;
     }
-    catch (std::exception& _e)
+    catch (std::exception&)
     {
         return ot::invalidUID;
     }
@@ -385,7 +403,14 @@ std::string PackageHandler::getListOfInstalledPackages()
     );
 
     CPythonObjectNew result = PyObject_Call(run_module, args, kwargs);
-    
+	std::string allInstalledPackages = OutputPipeline::instance().flushOutput();
+    // Extract the "result" variable (a Python list)
+
+        /*for(const std::string& pkg : installedPackages)
+        {
+            allInstalledPackages += pkg + "\n";
+        }*/
+
     // Check if the error was SystemExit
     if (PyErr_ExceptionMatches(PyExc_SystemExit))
     {
@@ -398,15 +423,6 @@ std::string PackageHandler::getListOfInstalledPackages()
         PyErr_Print();
         throw std::exception("pip execution failed");
     }
-  
-
-    // Extract the "result" variable (a Python list)
-
-	std::string allInstalledPackages = "";
-    /*for(const std::string& pkg : installedPackages)
-    {
-		allInstalledPackages += pkg + "\n";
-	}*/
 
     return allInstalledPackages;
 }

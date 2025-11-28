@@ -30,12 +30,12 @@
 #include "PythonObjectBuilder.h"
 #include "OTCore/String.h"
 #include <iostream>
-
+#include "OutputPipeline.h"
 
 PythonWrapper::PythonWrapper()
 {
 	signal(SIGABRT, &signalHandlerAbort);
-	m_output.setupOutputPipeline();
+	OutputPipeline::instance().setupOutputPipeline();
 }
 
 PythonWrapper::~PythonWrapper() {
@@ -147,7 +147,7 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	}
 	m_interpreterSuccessfullyInitialized = true;
 	
-	m_output.initiateRedirect();
+	OutputPipeline::instance().initiateRedirect();
 }
 
 
@@ -169,7 +169,7 @@ CPythonObjectNew PythonWrapper::execute(const std::string& _executionCommand, co
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
 	CPythonObjectNew result(PyRun_String(_executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
 
-	m_output.flushOutput();
+	OutputPipeline::instance().flushOutput();
 
 	if (result == nullptr)
 	{
@@ -183,7 +183,7 @@ CPythonObjectNew PythonWrapper::executeFunction(const std::string& _functionName
 	CPythonObjectNew function(getFunction(_functionName, _moduleName)); //Really borrowed?
 	CPythonObjectNew returnValue(PyObject_CallObject(function, _parameter));
 	
-	m_output.flushOutput();
+	OutputPipeline::instance().flushOutput();
 
 	if (!returnValue.ReferenceIsSet())
 	{

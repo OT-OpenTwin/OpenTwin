@@ -30,7 +30,7 @@ public:
 	
 	//! @brief  Creates a new manifest ID and returns it
 	ot::UID generateNewManifestID();
-	std::list<std::string> getManifestPackages() { return getPackageList(m_manifestText); }
+	std::optional <std::list<std::string>> getManifestPackages() { return getPackageList(m_manifestText); }
 	//! @brief Replaces manifest text without generating a new manifest ID
 	void replaceManifest(const std::string& _newManifestText);
 
@@ -40,7 +40,7 @@ private:
 
 	bool environmentHasChanged(const std::string& _newContent);
 	std::string trim(const std::string& _line);
-	std::list<std::string> getPackageList(const std::string _text);
+	std::optional <std::list<std::string>> getPackageList(const std::string _text);
 
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;

@@ -87,7 +87,8 @@ bool EntityPythonManifest::environmentHasChanged(const std::string& _newContent)
 {
 	auto currentPackageList = getPackageList(m_manifestText);
 	auto newPackageList = getPackageList(_newContent);
-	return currentPackageList != newPackageList;
+	
+	return (currentPackageList.has_value() != newPackageList.has_value()) || (currentPackageList.value() != newPackageList.value());
 }
 
 std::string EntityPythonManifest::trim(const std::string& _line) {
@@ -100,9 +101,9 @@ std::string EntityPythonManifest::trim(const std::string& _line) {
 	return _line.substr(start, end - start + 1);
 }
 
-std::list<std::string> EntityPythonManifest::getPackageList(const std::string _text)
+std::optional<std::list<std::string>> EntityPythonManifest::getPackageList(const std::string _text)
 {
-	std::list<std::string> packageList;
+	std::optional<std::list<std::string>> packageList = std::list<std::string>();
 	std::stringstream scriptStream(_text);
 	std::string line;
 	int32_t lineNumber = 0;
@@ -134,11 +135,15 @@ std::list<std::string> EntityPythonManifest::getPackageList(const std::string _t
 		}
 		if(!moduleName.empty() && !version.empty())
 		{
-			packageList.push_back(line);
+			if (packageList.has_value())
+			{
+				packageList.value().push_back(line);
+			}
 		}
 		else
 		{
-			throw std::exception(("Invalid line in manifest: line" + std::to_string(lineNumber)).c_str());
+			packageList.reset();
+			OT_LOG_E("Invalid line in manifest: line" + std::to_string(lineNumber));
 		}
 	}
 

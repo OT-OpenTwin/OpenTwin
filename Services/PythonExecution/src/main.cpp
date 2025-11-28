@@ -42,7 +42,7 @@ namespace ot {
 		bool initializeConnection(int _argc, char* _argv[]) {
 #ifdef _RELEASEDEBUG
 			Application::instance().getCommunicationHandler().setServerName("TestServerPython");
-			OutputPipeline::setRedirectOutput(true);
+			OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
 
 #else
 			if (_argc < 2) {
@@ -69,7 +69,7 @@ namespace ot {
 				OT_LOG_D("arg 3: " + std::string(_argv[3]));
 				if (std::string(_argv[3]) == "1")
 				{
-					OutputPipeline::setRedirectOutput(true);
+					OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
 				}
 			}
 

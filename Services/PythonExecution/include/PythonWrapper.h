@@ -29,8 +29,6 @@
 #include "CPythonObjectNew.h"
 #include "PythonException.h"
 
-#include "OutputPipeline.h"
-
 //! @brief Wrapper around python code execution.
 class PythonWrapper {
 	friend class FixturePythonWrapper;
@@ -59,7 +57,6 @@ public:
 	bool isInitialized() const { return m_interpreterSuccessfullyInitialized; }
 
 private:
-	OutputPipeline m_output;
 	std::string m_environmentPath = "";
 
 	bool m_interpreterSuccessfullyInitialized = false;
