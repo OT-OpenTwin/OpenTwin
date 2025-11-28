@@ -275,9 +275,19 @@ void Model::resetToNew()
 
 	if (typeManager.hasPythonRoot())
 	{
+		EntityContainer* entityPythonRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
+		entityPythonRoot->setName(getPythonRootName());
+		addEntityToModel(entityPythonRoot->getName(), entityPythonRoot, entityRoot, true, allNewEntities);
+
 		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
-		entityScriptRoot->setName(getPythonRootName());
+		entityScriptRoot->setName(ot::FolderNames::PythonScriptFolder);
+		entityScriptRoot->setDeletable(false);
 		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
+
+		EntityContainer* entityManifestRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
+		entityManifestRoot->setName(ot::FolderNames::PythonManifestFolder);
+		entityManifestRoot->setDeletable(false);
+		addEntityToModel(entityManifestRoot->getName(), entityManifestRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasDataProcessingRoot())
