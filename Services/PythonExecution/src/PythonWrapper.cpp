@@ -29,68 +29,21 @@
 
 #include "PythonObjectBuilder.h"
 #include "OTCore/String.h"
-
-#include <fcntl.h>
-#include <windows.h>
-#include <io.h>
 #include <iostream>
 
-bool PythonWrapper::m_redirectOutput = false;
 
-PythonWrapper::PythonWrapper() : m_outputWorkerThread(nullptr) 
+PythonWrapper::PythonWrapper()
 {
 	signal(SIGABRT, &signalHandlerAbort);
-
-	if (m_redirectOutput)
-	{
-		// Create a pipe for getting the standard output
-		if (_pipe(m_pipe_fds, 4096, _O_TEXT) == -1) {
-			OT_LOG_EA("Creating pipe for capturing Python output failed.");
-		}
-	}
+	m_output.setupOutputPipeline();
 }
-
-void PythonWrapper::readOutput() {
-	char buffer[256];
-	while (m_redirectOutput)
-	{
-		DWORD bytes_available = 0;
-		if (PeekNamedPipe((HANDLE)_get_osfhandle(m_pipe_fds[0]), NULL, 0, NULL, &bytes_available, NULL)) {
-			if (bytes_available > 0) {
-				int count = _read(m_pipe_fds[0], buffer, sizeof(buffer) - 1);
-				if (count > 0) {
-					buffer[count] = '\0';
-					//Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::to_string(strlen(buffer)) + ":" + std::string(buffer));
-					Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::string(buffer));
-				}
-			}
-		}
-
-		m_outputProcessingCount++;
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(20));
-	}
-}
-
-int PythonWrapper::initiateNumpy() {
-	
-	return 1;
-}
-
 
 PythonWrapper::~PythonWrapper() {
 	if (!m_interpreterSuccessfullyInitialized) {
 		closePythonInterpreter();
 	}
 
-	if (m_outputWorkerThread)
-	{
-		m_redirectOutput = false;
-		m_outputWorkerThread->join();
 
-		delete m_outputWorkerThread;
-		m_outputWorkerThread = nullptr;
-	}
 }
 
 void PythonWrapper::closePythonInterpreter() {
@@ -194,21 +147,7 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	}
 	m_interpreterSuccessfullyInitialized = true;
 	
-	if (m_redirectOutput)
-	{
-		// Redirect output to pipe
-		std::string command =
-			"import sys\n"
-			"import os\n"
-			"import logging\n"
-			"sys.stdout = os.fdopen(" + std::to_string(m_pipe_fds[1]) + ", 'w')\n"
-			"sys.stdout.reconfigure(line_buffering = True)\n"
-			"logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))\n";
-			
-		PyRun_SimpleString(command.c_str());
-
-		m_outputWorkerThread = new std::thread(&PythonWrapper::readOutput, this);
-	}
+	m_output.initiateRedirect();
 }
 
 
@@ -223,26 +162,14 @@ void PythonWrapper::signalHandlerAbort(int _sig) {
 	throw std::exception("Abort was called.");
 }
 
-void PythonWrapper::flushOutput()
-{
-	if (m_redirectOutput && m_outputWorkerThread != nullptr)
-	{
-		long long currentOutputProcessingCount = m_outputProcessingCount;
 
-		// Wait until all messages have been sent
-		while (m_outputProcessingCount < currentOutputProcessingCount + 2)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		}
-	}
-}
 
 CPythonObjectNew PythonWrapper::execute(const std::string& _executionCommand, const std::string& _moduleName) {
 	CPythonObjectNew module(getModule(_moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
 	CPythonObjectNew result(PyRun_String(_executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
 
-	flushOutput();
+	m_output.flushOutput();
 
 	if (result == nullptr)
 	{
@@ -256,7 +183,7 @@ CPythonObjectNew PythonWrapper::executeFunction(const std::string& _functionName
 	CPythonObjectNew function(getFunction(_functionName, _moduleName)); //Really borrowed?
 	CPythonObjectNew returnValue(PyObject_CallObject(function, _parameter));
 	
-	flushOutput();
+	m_output.flushOutput();
 
 	if (!returnValue.ReferenceIsSet())
 	{

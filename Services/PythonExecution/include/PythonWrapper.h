@@ -23,12 +23,13 @@
 #include <string>
 #include <vector>
 #include <list>
-#include <thread>
-#include <atomic>
+
 
 #include "CPythonObjectBorrowed.h"
 #include "CPythonObjectNew.h"
 #include "PythonException.h"
+
+#include "OutputPipeline.h"
 
 //! @brief Wrapper around python code execution.
 class PythonWrapper {
@@ -41,8 +42,6 @@ public:
 	PythonWrapper& operator=(const PythonWrapper&& _other) = delete;
 
 	~PythonWrapper();
-
-	static void setRedirectOutput(bool _redirectOutput) { m_redirectOutput = _redirectOutput; }
 
 	void initializePythonInterpreter(const std::string& _environmentName);
 
@@ -60,19 +59,12 @@ public:
 	bool isInitialized() const { return m_interpreterSuccessfullyInitialized; }
 
 private:
-	static bool m_redirectOutput;
+	OutputPipeline m_output;
 	std::string m_environmentPath = "";
 
 	bool m_interpreterSuccessfullyInitialized = false;
-	int m_pipe_fds[2];
-	std::thread* m_outputWorkerThread;
-	std::atomic<long long> m_outputProcessingCount = 0;
 
 	static void signalHandlerAbort(int sig);
 
-	int initiateNumpy();
-		
-	void readOutput();
-	void flushOutput();
 	CPythonObjectNew getModule(const std::string& _moduleName);
 };

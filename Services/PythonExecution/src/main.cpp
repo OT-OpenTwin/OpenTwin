@@ -28,7 +28,7 @@
 
 #undef slots
 #include "PythonWrapper.h"
-
+#include "OutputPipeline.h"
 namespace ot {
 	namespace intern {
 		void initializeLogger(void) {
@@ -42,7 +42,7 @@ namespace ot {
 		bool initializeConnection(int _argc, char* _argv[]) {
 #ifdef _RELEASEDEBUG
 			Application::instance().getCommunicationHandler().setServerName("TestServerPython");
-			PythonWrapper::setRedirectOutput(true);
+			OutputPipeline::setRedirectOutput(true);
 
 #else
 			if (_argc < 2) {
@@ -69,7 +69,7 @@ namespace ot {
 				OT_LOG_D("arg 3: " + std::string(_argv[3]));
 				if (std::string(_argv[3]) == "1")
 				{
-					PythonWrapper::setRedirectOutput(true);
+					OutputPipeline::setRedirectOutput(true);
 				}
 			}
 
