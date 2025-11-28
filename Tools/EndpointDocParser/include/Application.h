@@ -78,6 +78,23 @@ public:
 	// Other methods
 	int run(void);
 
+	//! @brief Goes through all include and src directory files of the OpenTwin services
+	//! 
+	//! Searches line by line for:
+	//! - Prefix "//api":
+	//!   - Indicates the beginning of an API documentation block
+	//!   - Or indicates that you are in an API documentation block if the "inApiBlock" flag is also set
+	//!   - Recognizes the end of an API documentation block if the prefix is missing but the flag is still set
+	//! - Prefix "connectAction":
+	//!   - As an indicator for endpoints to be documented
+	//! 
+	//! Operations performed:
+	//! - Parses an API documentation block and adds an error-free documented endpoint to the list of endpoints "m_endpoints" in the service
+	//! - Adds a service that has documented endpoints to the list of services "m_services"
+	//! - Collects incorrectly documented endpoints in the "m_parseErrors" list
+	//! - Collects endpoints to be documented in the "m_endpointsToBeDocumented" list
+	//! 
+	//! @return True if there were serious errors (unable to open the file, etc.), false otherwise
 	bool searchForServices(void);
 	
 	bool searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service);
@@ -94,12 +111,33 @@ public:
 
 	void addService(const Service& _service);
 
+	//! @brief Parses the ActionTypes.h file of the OTCommunication library
+	//! 
+	//! Operations performed:
+	//! - Searches for the prefix "#define" to identify the relevant lines
+	//! - Fills the map "m_actionMacros" with entries consisting of Macro : Definition
+	//! 
+	//! Takes various cases into account:
+	//! - OT_ACTION_PASSWORD_SUBTEXT "Password"
+	//! - OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE "CST Studio Suite"
+	//! - OT_ACTION_RETURN_UnknownError OT_ACTION_RETURN_INDICATOR_Error "Unknown error"
+	//! - OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD "LoggedInUser" OT_ACTION_PASSWORD_SUBTEXT
+	//! - OT_PARAM_AUTH_PASSWORD OT_ACTION_PASSWORD_SUBTEXT
 	void importActionTypes(void);
 
 	void parseMacroDefinition(const std::string& _content);
 
 	void addDescriptionToLastParameter(std::list<Parameter>& _paramList, const std::string& _description);
 	
+	//! @brief Generates the endpoint documentation in Sphinx 
+	//! 
+	//! Operations performed:
+	//! - For each service from the list of services:
+	//!   - creates a syntactically correct Sphinx documentation
+	//!   - writes its content to an .rst file carrying the name of the service
+	//! - Then creates the index file "documented_endpoints.rst" and fills the table of contents with references to all .rst files created for the services
+	//! 
+	//! @return True if there were serious errors (unable to open the file, etc.), false otherwise
 	bool generateDocumentation(const std::list<Service>& m_services);
 
 	std::string generateServiceRstContent(const Service& _service);
@@ -112,6 +150,9 @@ public:
 
 	bool writeDocumentedEndpointsIndexFile(const std::string& _path, const std::string& _content);
 
+	//! @brief Reports incorrectly documented endpoints
+	//! 
+	//! Writes all incorrectly documented endpoints collected in "m_parseErrors" to a file named "parseErrors.txt" and stores it in the EnpointDocParser directory
 	bool documentParseErrors(void);
 
 	void reportError(const ParseError& _error);
@@ -120,6 +161,11 @@ public:
 
 	bool writeAllErrorsTxtFile(const std::string& _txt);
 
+	//! @brief Searches for endpoints to be documented and reports those that are still undocumented
+	//! 
+	//! Operations performed:
+	//! - Uses the endpoint action to compare whether the endpoints to be documented, which are contained in the "m_endpointsToBeDocumented" list, are also present in the list of documented endpoints "m_endpoints" in the relevant service
+	//! - If not present, an OT_LOG_W is thrown for undocumented endpoints and the number of undocumented endpoints is output as OT_LOG_D
 	void reportEndpointsToBeDocumented();
 
 	// helper functions
