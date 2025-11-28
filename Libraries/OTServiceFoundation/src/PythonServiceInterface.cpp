@@ -179,7 +179,7 @@ std::string ot::PythonServiceInterface::writePortDataToDatabase()
 		m_portDataByPortName.clear();
 	}
 
-	if (!doc.Empty())
+	if (!doc.ObjectEmpty())
 	{
 		const std::string portData = ot::json::toJson(doc);
 		std::stringstream stream(portData);
