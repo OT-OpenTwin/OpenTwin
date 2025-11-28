@@ -31,6 +31,11 @@
 //! @brief Provides helper and utility functions shared between DataProcessingService and CircuitSimulatorService.
 class __declspec(dllexport) Helper {
 public:
+	
+	//! @brief Builds a mapping from block UIDs to lists of attached connection entity IDs.
+	//! @param _blockConnectionMap Map of block UIDs to EntityBlockConnection shared pointers.
+	//!  @param _allEntitiesByBlockID Map of block UIDs to EntityBlock shared pointers.
+	//! @return Map associating each participating block UID with its attached connection entity IDs.
 	static std::map<ot::UID, ot::UIDList> buildMap(const std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _blockConnectionMap, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allEntitiesByBlockID);
 };
 
