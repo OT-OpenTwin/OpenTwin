@@ -39,7 +39,7 @@ public:
 	void initializeManifest(ot::UID _manifestUID);
 	void initializeEnvironmentWithManifest(const std::string& _environmentPath);
 
-	void extractMissingPackages(const std::string _scriptContent);
+	void extractMissingPackages(const std::string& _scriptContent);
 	void importMissingPackages();
 	std::string getEnvironmentName();
 

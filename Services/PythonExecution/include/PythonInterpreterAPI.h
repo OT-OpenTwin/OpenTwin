@@ -43,5 +43,6 @@ private:
 	PythonWrapper m_wrapper;
 	
 	std::list<ot::EntityInformation> ensureScriptsAreLoaded(const std::list<std::string>& _scripts);
-	void loadScipt(const ot::EntityInformation& _entityInformation);
+	std::string loadScipt(const ot::EntityInformation& _entityInformation);
+	void addScriptAsModule(const std::string _execution, const ot::EntityInformation& _entityInformation);
 };

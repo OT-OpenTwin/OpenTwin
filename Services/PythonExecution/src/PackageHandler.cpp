@@ -102,7 +102,7 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
     }
 }
 
-void PackageHandler::extractMissingPackages(const std::string _scriptContent)
+void PackageHandler::extractMissingPackages(const std::string& _scriptContent)
 {
     std::list<std::string> moduleNames = parseImportedPackages(_scriptContent);
 
@@ -347,34 +347,66 @@ ot::UID PackageHandler::getUIDFromString(const std::string& _uid)
 
 std::string PackageHandler::getListOfInstalledPackages()
 {
-    std::string code =
-        "import sys, subprocess\n"
-        "cmd = [sys.executable, '-m', 'pip', 'freeze']\n"
-        "try:\n"
-        "    out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)\n"
-        "    result = out.decode().splitlines()\n"
-        "except Exception as e:\n"
-        "    result = [f'ERROR: {e}']\n";
-
-    // Run Python code in a new dictionary
-    CPythonObjectNew global = PyDict_New();
-    PyDict_SetItemString(global, "__builtins__", PyEval_GetBuiltins());
-
-    CPythonObjectNew result = PyRun_String(code.c_str(), Py_file_input, global, global);
-    if (result == nullptr) 
+    CPythonObjectNew sys_module = PyImport_ImportModule("sys");
+    if (!sys_module)
     {
-        PyErr_Print();
-		throw std::exception("Failed extract installed python packages.");
+        throw std::exception("Failed to import sys module");
     }
 
+    // sys.argv = ["pip", "freeze"]
+    CPythonObjectNew argv = PyList_New(2);
+    PyList_SetItem(argv, 0, PyUnicode_FromString("pip"));
+    PyList_SetItem(argv, 1, PyUnicode_FromString("freeze"));
+
+    if (PyObject_SetAttrString(sys_module, "argv", argv) != 0)
+    {
+        throw std::exception("Failed to set sys.argv");
+    }
+
+    // Import runpy
+    CPythonObjectNew runpy = PyImport_ImportModule("runpy");
+    if (!runpy)
+    {
+        throw std::exception("Failed to import runpy");
+    }
+
+    CPythonObjectNew run_module = PyObject_GetAttrString(runpy, "run_module");
+    if (!run_module)
+    {
+        throw std::exception("Failed to get run_module");
+    }
+
+    // run_module('pip.__main__', run_name='__main__', alter_sys=True)
+    CPythonObjectNew args = Py_BuildValue("(s)", "pip.__main__");
+    CPythonObjectNew kwargs = Py_BuildValue(
+        "{s:s, s:O}",
+        "run_name", "__main__",
+        "alter_sys", Py_True
+    );
+
+    CPythonObjectNew result = PyObject_Call(run_module, args, kwargs);
+    
+    // Check if the error was SystemExit
+    if (PyErr_ExceptionMatches(PyExc_SystemExit))
+    {
+        // Clear the error and continue
+        PyErr_Clear();
+        // Pip ran successfully but exited the interpreter
+    }
+    else
+    {
+        PyErr_Print();
+        throw std::exception("pip execution failed");
+    }
+  
+
     // Extract the "result" variable (a Python list)
-    PythonObjectBuilder objectBuilder;
-    auto installedPackages = objectBuilder.getStringList(result, "List of installed python packages.");
+
 	std::string allInstalledPackages = "";
-    for(const std::string& pkg : installedPackages)
+    /*for(const std::string& pkg : installedPackages)
     {
 		allInstalledPackages += pkg + "\n";
-	}
+	}*/
 
     return allInstalledPackages;
 }

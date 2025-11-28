@@ -150,13 +150,29 @@ std::list<ot::EntityInformation> PythonInterpreterAPI::ensureScriptsAreLoaded(co
 	
 	//Now we load all scripts
 	Application::instance().prefetchDocumentsFromStorage(entityInfos);
+	std::list<std::string> scriptExecutions;
 	for (ot::EntityInformation& entityInfo : entityInfos)
 	{
 		OT_LOG_D("Loading script " + entityInfo.getEntityName());
-		loadScipt(entityInfo);
+		const std::string scriptExecution = loadScipt(entityInfo);
+		scriptExecutions.push_back(scriptExecution);
 	}
-	PackageHandler::instance().importMissingPackages();
 
+	for (const std::string& scriptExecution : scriptExecutions)
+	{
+		PackageHandler::instance().extractMissingPackages(scriptExecution);
+	}
+	
+	PackageHandler::instance().importMissingPackages();
+	auto entityInfo = entityInfos.begin();
+	for (const std::string& scriptExecution : scriptExecutions)
+	{
+		addScriptAsModule(scriptExecution, *entityInfo);
+		if (entityInfo != entityInfos.end())
+		{
+			entityInfo++;
+		}
+	}
 	//Now we build up a list of the execution scripts but with their entityInformation instead of their plain names
 	std::list<ot::EntityInformation> scriptEntityInfoList;
 	for (const std::string& scriptName : _scripts)
@@ -167,37 +183,40 @@ std::list<ot::EntityInformation> PythonInterpreterAPI::ensureScriptsAreLoaded(co
 	return scriptEntityInfoList;
 }
 
-void PythonInterpreterAPI::loadScipt(const ot::EntityInformation& _entityInformation)
+std::string PythonInterpreterAPI::loadScipt(const ot::EntityInformation& _entityInformation)
 {
 	try
 	{
 		EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(_entityInformation.getEntityID(), _entityInformation.getEntityVersion());
 		std::unique_ptr<EntityFileText> script(dynamic_cast<EntityFileText*>(baseEntity));
 		std::string execution = script->getText();
-
-		PackageHandler::instance().extractMissingPackages(execution);
-
-		//First we add a module for the script execution. This way there won't be any namespace conflicts between the scripts since they are all executed in the same namespace
-		const std::string moduleName = PythonLoadedModules::instance().addModuleForEntity(_entityInformation);
-		if (moduleName == "")
-		{
-			const std::string message = "failed to determine a module name for script: " + _entityInformation.getEntityName();
-			throw std::exception(message.c_str());
-		}
-		
-		//Executing the script in this module will only add the contained functions to the module. No return value expected. Error handling by the wrapper
-		auto result = m_wrapper.execute(execution, moduleName);
-		
-		//Since potentially multiple functions exist in a module, an entry point needs to be explicitly defined
-		PythonModuleAPI moduleAPI;
-		const std::string entryPoint = moduleAPI.getModuleEntryPoint(moduleName);
-		OT_LOG_D("Determined entry point for " + _entityInformation.getEntityName() + " to be: " + entryPoint);
-		m_moduleEntrypointByModuleName[moduleName] = entryPoint;
+		return execution;
 	}
 	catch (std::exception& e)
 	{
 		const std::string message = "Failed to load script: " + _entityInformation.getEntityName() + " due to: " + e.what();
 		throw std::exception(message.c_str());
 	}
+}
+
+void PythonInterpreterAPI::addScriptAsModule(const std::string _execution, const ot::EntityInformation& _entityInformation)
+{
+
+	//First we add a module for the script execution. This way there won't be any namespace conflicts between the scripts since they are all executed in the same namespace
+	const std::string moduleName = PythonLoadedModules::instance().addModuleForEntity(_entityInformation);
+	if (moduleName == "")
+	{
+		const std::string message = "failed to determine a module name for script: " + _entityInformation.getEntityName();
+		throw std::exception(message.c_str());
+	}
+
+	//Executing the script in this module will only add the contained functions to the module. No return value expected. Error handling by the wrapper
+	auto result = m_wrapper.execute(_execution, moduleName);
+
+	//Since potentially multiple functions exist in a module, an entry point needs to be explicitly defined
+	PythonModuleAPI moduleAPI;
+	const std::string entryPoint = moduleAPI.getModuleEntryPoint(moduleName);
+	OT_LOG_D("Determined entry point for " + _entityInformation.getEntityName() + " to be: " + entryPoint);
+	m_moduleEntrypointByModuleName[moduleName] = entryPoint;
 }
 
