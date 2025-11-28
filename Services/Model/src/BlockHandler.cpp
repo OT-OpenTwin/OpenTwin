@@ -922,6 +922,11 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 		ot::EntityInformation entityInfo;
 		EntityBase* scriptFolder= model->findEntityFromName(ot::FolderNames::PythonScriptFolder);
 		EntityBase* manifestFolder= model->findEntityFromName(ot::FolderNames::PythonManifestFolder);
+		if (manifestFolder == nullptr || scriptFolder == nullptr)
+		{
+			OT_LOG_E("Could not create Entity: " + _itemName);
+			return nullptr;
+		}
 		pythonBlock->setScriptFolder(scriptFolder->getEntityID());
 		pythonBlock->setManifestFolder(manifestFolder->getEntityID());
 	}
