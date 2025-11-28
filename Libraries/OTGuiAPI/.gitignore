@@ -37,10 +37,11 @@ buildLog_Release.txt
 *.out
 *.app
 
+# Google test directory
+packages
+
 # VS internal build directory
 /**/.vs
-
-/**/packages
 
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -55,7 +56,4 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
-
-__pycache__/
-
-
+build/

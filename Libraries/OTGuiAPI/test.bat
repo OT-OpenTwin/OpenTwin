@@ -27,7 +27,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Testing Project : OTGuiAPI
+SETLOCAL enabledelayedexpansion
 
 REM Open project
 
@@ -44,32 +44,20 @@ IF "%1"=="DEBUG" (
   SET DEBUG=1
 )
 
-SET TYPE=/Rebuild
-SET TYPE_NAME=REBUILD
-
-IF "%2"=="BUILD" (
-	SET TYPE=/Build
-	SET TYPE_NAME=BUILD
-)
+SET "OLDPATH=%PATH%"
 
 IF %DEBUG%==1 (
-	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_GUIAPI_ROOT%\OTGuiAPI.vcxproj" %TYPE% "DebugTest|x64"  
-	ECHO %TYPE% DEBUG
-	"%OT_GUIAPI_ROOT%\%(OT_DLLD)%\OTGuiAPITest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTGuiAPIDebugReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTGuiAPIDebugReport.xml" "OTGuiAPI" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTGuiAPIDebugReport.xml"
+	SET "PATH=%OT_ALL_DLLD%;%ZLIB_DLLPATHD%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_GUIAPI_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_GUIAPI_ROOT%\OTGuiAPI.vcxproj" %TYPE% "ReleaseTest|x64"
-	ECHO %TYPE% RELEASE
-	"%OT_GUIAPI_ROOT%\%(OT_DLLR)%\OTGuiAPITest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTGuiAPIReleaseReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTGuiAPIReleaseReport.xml" "OTGuiAPI" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTGuiAPIReleaseReport.xml"
+	SET "PATH=%OT_ALL_DLLR%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_GUIAPI_ROOT%" RELEASE
 ) 
-  
+
+SET "PATH=%OLDPATH%"
+
 GOTO END
 
 :PAUSE_END
