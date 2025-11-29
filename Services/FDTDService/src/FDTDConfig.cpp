@@ -149,8 +149,8 @@ void FDTDConfig::setFromEntity(EntityBase* _solverEntity) {
 	m_meshGrid.loadMeshGridDataFromEntity(_solverEntity);
 }
 
-void FDTDConfig::setMaterialProperties(std::map<std::string, EntityProperties> _materialProperties) {
-	m_materialProperties.loadMaterialData(_materialProperties);
+void FDTDConfig::loadSTLMesh(const std::string& _meshName, const std::string& _tmpFolderName) {
+	m_stlExporter = std::make_unique<CartesianMeshToSTL>(_meshName, _tmpFolderName);
 }
 
 tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLElement& _parentElement) {
@@ -235,8 +235,10 @@ void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {
 	// load and write the excitation properties
 	auto& excitations = m_excitation->getExciteProperties();
 	CSXProperties->InsertEndChild(excitations.writeExciteProperties(*root));
-	auto materials = m_materialProperties.writeMaterialProperties(*root);
-	CSXProperties->InsertEndChild(materials);
+	// auto materials = m_materialProperties.writeMaterialProperties(*CSXProperties);
+	// CSXProperties->InsertEndChild(materials);
+	auto stlFile = m_stlExporter->writeToXML(*CSXProperties);
+	CSXProperties->InsertEndChild(stlFile);
 
 	CSX->InsertEndChild(CSXProperties);
 	auto CSXRectGrid = m_meshGrid.writeCSXMeshGrid(*root);

@@ -29,10 +29,10 @@
 #include "PropertyHelper.h"
 #include "EntityProperties.h"
 
-#include "Materials/MaterialProperties.h"
 #include "Excitation/ExcitationProperties.h"
 #include "Excitation/ExcitationTypes.h"
 #include "CSXMeshGrid.h"
+#include "CartesianMeshToSTL.h"
 
 // STD
 #include <string>
@@ -44,7 +44,6 @@
 // Forward declaration
 class EntityBase;
 class ExcitationBase;
-class MaterialBase;
 
 //! @brief Class to hold the FDTD configuration for the openEMS solver
 //! @brief This class containts the central addToXML function to write the complete configuration to an XML file
@@ -77,9 +76,7 @@ public:
 	//! @param _solverEntity The solver entity containing the configuration properties
 	void setFromEntity(EntityBase* _solverEntity);
 
-	//! @brief This function sets the material properties used in the simulation
-	//! @param _materialProperties A map of material names to their properties
-	void setMaterialProperties(std::map<std::string, EntityProperties> _materialProperties);
+	void loadSTLMesh(const std::string& _meshName, const std::string& _tmpFolderName);
 
 	//! @brief This function creates an XML element for the FDTD configuration 
 	//! @param _parentElement The parent XML element to which the FDTD configuration will be added
@@ -107,11 +104,11 @@ private:
 
 	// CSX Mesh Grid
 	CSXMeshGrid m_meshGrid;
-	// Material properties container class
-	MaterialProperties m_materialProperties;
 
 	// Excitation object for different excitation types
 	std::unique_ptr<ExcitationBase> m_excitation;
+
+	std::unique_ptr<CartesianMeshToSTL> m_stlExporter;
 
 	//! @brief Sets the excitation properties based on the selected excitation type
 	void setExcitationProperties();
