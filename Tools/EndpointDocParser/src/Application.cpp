@@ -45,7 +45,7 @@ int Application::run(void) {
 		exitCode = 1;
 	}
 
-	if (generateDocumentation(m_services)) {
+	if (generateDocumentation()) {
 		exitCode = 2;
 	}
 
@@ -826,7 +826,7 @@ void Application::addService(const Service& _service) {
 
 void Application::importActionTypes(void) {
 	// search in ActionTypes.h in Open Twin OTCommunication Library
-	const std::string pathToActionTypesHeaderFile = "C:\\OT\\OpenTwin\\Libraries\\OTCommunication\\include\\OTCommunication\\ActionTypes.h";
+	const std::string pathToActionTypesHeaderFile = getPathToOTLibraryOTCommunication();
 	std::string blackList = " \t\n";
 
 	// read lines from given file and parse them
@@ -939,7 +939,7 @@ void Application::addDescriptionToLastParameter(std::list<Parameter>& _paramList
 	}
 }
 
-bool Application::generateDocumentation(const std::list<Service>& m_services) {
+bool Application::generateDocumentation() {
 	OT_LOG_D("Generating the documentation:");
 
 	bool hasError = false;
@@ -1025,10 +1025,8 @@ std::string Application::generateServiceRstContent(const Service& _service) {
 				out << "    * - " << param.getName() << "\n"
 					<< "      - " << param.getDataTypeString() << "\n"
 					<< "      - " << param.getDetailedDescriptionFormattedForSphinx() << "\n"
-					<< "      - " << param.getMacro() << "\n";
-				
+					<< "      - " << param.getMacro() << "\n";				
 			}
-
 			out << "\n";
 		}
 
@@ -1056,10 +1054,8 @@ std::string Application::generateServiceRstContent(const Service& _service) {
 					<< "      - " << rparam.getMacro() << "\n";
 			}
 		}
-
 		out << "\n----\n\n";
 	}
-
 
 	OT_LOG_D("The generated documentation is:\n" + out.str());
 
@@ -1250,6 +1246,10 @@ std::string Application::getPathFromEnvironmentVariable(const std::string& _envV
 	return fullPath;
 }
 
+std::string Application::getPathToOTLibraryOTCommunication(void) {
+	return getPathFromEnvironmentVariable("OPENTWIN_DEV_ROOT", "Libraries\\OTCommunication\\include\\OTCommunication\\ActionTypes.h");
+}
+
 std::string Application::getPathToOTServices(void) {
 	return getPathFromEnvironmentVariable("OPENTWIN_DEV_ROOT", "Services");
 }
@@ -1265,7 +1265,7 @@ std::string Application::getPathToOTEndPointDocParser(void) {
 	return filePath.string();
 }
 
-// // Convert the name of the service into snake_case
+// Convert the name of the service into snake_case
 std::string Application::serviceNameToSnakeCase(const std::string& _serviceName) {
 	OT_LOG_D("Converting " + _serviceName + " into snake_case:");
 

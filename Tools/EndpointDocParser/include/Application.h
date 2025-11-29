@@ -138,7 +138,7 @@ public:
 	//! - Then creates the index file "documented_endpoints.rst" and fills the table of contents with references to all .rst files created for the services
 	//! 
 	//! @return True if there were serious errors (unable to open the file, etc.), false otherwise
-	bool generateDocumentation(const std::list<Service>& m_services);
+	bool generateDocumentation(void);
 
 	std::string generateServiceRstContent(const Service& _service);
 
@@ -170,6 +170,7 @@ public:
 
 	// helper functions
 	std::string getPathFromEnvironmentVariable(const std::string& _envVar, const std::string& _subPath);
+	std::string getPathToOTLibraryOTCommunication(void);
 	std::string getPathToOTServices(void);
 	std::string getPathToOTDocumentation(void);
 	std::string getPathToOTEndPointDocParser(void);
