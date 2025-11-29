@@ -235,8 +235,6 @@ void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {
 	// load and write the excitation properties
 	auto& excitations = m_excitation->getExciteProperties();
 	CSXProperties->InsertEndChild(excitations.writeExciteProperties(*root));
-	// auto materials = m_materialProperties.writeMaterialProperties(*CSXProperties);
-	// CSXProperties->InsertEndChild(materials);
 	auto stlFile = m_stlExporter->writeToXML(*CSXProperties);
 	CSXProperties->InsertEndChild(stlFile);
 

@@ -22,12 +22,6 @@
     <Filter Include="ThirdParty">
       <UniqueIdentifier>{73d1a39b-ef31-4ddc-a6b9-5359dbd704cd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Materials">
-      <UniqueIdentifier>{da4e7460-09ae-4c3e-8218-772a81ba09b7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Materials">
-      <UniqueIdentifier>{529b4a4d-5f27-4b7f-9b6f-72e2139762ea}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -68,9 +62,6 @@
     </ClCompile>
     <ClCompile Include="$(OPENTWIN_THIRDPARTY_ROOT)\tinyxml2\tinyxml2-11.0.0\tinyxml2.cpp">
       <Filter>ThirdParty</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Materials\MaterialProperties.cpp">
-      <Filter>Source Files\Materials</Filter>
     </ClCompile>
     <ClCompile Include="src\CartesianMeshToSTL.cpp">
       <Filter>Source Files</Filter>
@@ -115,9 +106,6 @@
     </ClInclude>
     <ClInclude Include="include\Excitation\SinusoidalExcitation.h">
       <Filter>Header Files\Excitations</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Materials\MaterialProperties.h">
-      <Filter>Header Files\Materials</Filter>
     </ClInclude>
     <ClInclude Include="include\CartesianMeshToSTL.h">
       <Filter>Header Files</Filter>
