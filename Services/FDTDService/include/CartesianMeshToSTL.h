@@ -1,8 +1,12 @@
+// @otlicense
+
 #pragma once
 
 #include <string>
 #include <vector>
 #include <list>
+
+#include <tinyxml2.h>
 
 #include "EntityInformation.h"
 
@@ -14,12 +18,14 @@ class EntityMeshCartesianFaceList;
 class CartesianMeshToSTL
 {
 public:
-	CartesianMeshToSTL(const std::string &meshName, const std::string& tmpFolderName);
-	~CartesianMeshToSTL();
+	CartesianMeshToSTL(const std::string& meshName, const std::string& tmpFolderName);
+	virtual ~CartesianMeshToSTL();
 
-	size_t getNumberOfObjects() { return materialsOfObjects.size(); }
-	std::string getFileNameOfObject(size_t id) { if (id < 0 || id >= fileNamesOfObjects.size()) return "";  return fileNamesOfObjects[id]; }
-	EntityMaterial* getMaterialOfObject(size_t id) { if (id < 0 || id >= materialsOfObjects.size()) return nullptr; return materialsOfObjects[id]; }
+	size_t getNumberOfObjects() const { return materialsOfObjects.size(); }
+	std::string getFileNameOfObject(size_t id) const { if (id < 0 || id >= fileNamesOfObjects.size()) return "";  return fileNamesOfObjects[id]; }
+	EntityMaterial* getMaterialOfObject(size_t id) const { if (id < 0 || id >= materialsOfObjects.size()) return nullptr; return materialsOfObjects[id]; }
+	void writeMaterialProperties(const EntityMaterial* _material, tinyxml2::XMLDocument* _doc, tinyxml2::XMLElement* _materialElement, tinyxml2::XMLElement* _polyReaderElement) const;
+	tinyxml2::XMLElement* writeToXML(tinyxml2::XMLElement& _parentElement) const;
 	 
 private:
 	EntityMeshCartesianData* loadMeshDataEntity(const std::string& meshName);

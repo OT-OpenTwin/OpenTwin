@@ -1,3 +1,5 @@
+// @otlicense
+
 #include "CartesianMeshToSTL.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -9,6 +11,8 @@
 #include "EntityMeshCartesianItem.h"
 #include "EntityMeshCartesianFaceList.h"
 #include "EntityMeshCartesianFace.h"
+
+#include <tinyxml2.h>
 
 #include <fstream>
 #include <map>
@@ -52,6 +56,58 @@ CartesianMeshToSTL::CartesianMeshToSTL(const std::string& meshName, const std::s
 
 	// As a last step, we load all relevant materials and assign them to the materialsOfObjects vector
 	processRequiredMaterials(objectMaterialNames);
+}
+
+void CartesianMeshToSTL::writeMaterialProperties(const EntityMaterial* _material, tinyxml2::XMLDocument* _doc, tinyxml2::XMLElement* _materialElement, tinyxml2::XMLElement* _polyReaderElement) const {
+	const EntityProperties& props = _material->getProperties();
+	auto type = _material->getProperties().getProperty("Material type", "General");
+	auto& materialType = dynamic_cast<const EntityPropertiesSelection*>(type)->getValue();
+	auto* priority = props.getProperty("Mesh priority", "General");
+	double priorityValue = dynamic_cast<const EntityPropertiesDouble*>(priority)->getValue();
+	_polyReaderElement->SetAttribute("Priority", priorityValue);
+	if (materialType != "PEC") {
+		tinyxml2::XMLElement* propertyElement = _doc->NewElement("Property");
+		auto* permittivity = props.getProperty("Permittivity (relative)", "Electromagnetic");
+		auto* permeability = props.getProperty("Permeability (relative)", "Electromagnetic");
+		auto* conductivity = props.getProperty("Conductivity", "Electromagnetic");
+		if (permittivity) {
+			double epsilon = dynamic_cast<const EntityPropertiesDouble*>(permittivity)->getValue();
+			propertyElement->SetAttribute("Epsilon", epsilon);
+		}
+		if (permeability) {
+			double kappa = dynamic_cast<const EntityPropertiesDouble*>(permeability)->getValue();
+			propertyElement->SetAttribute("Kappa", kappa);
+		}
+		if (conductivity) {
+			double mue = dynamic_cast<const EntityPropertiesDouble*>(conductivity)->getValue();
+			propertyElement->SetAttribute("Mue", mue);
+		}
+		_materialElement->InsertEndChild(propertyElement);
+	}
+}
+
+tinyxml2::XMLElement* CartesianMeshToSTL::writeToXML(tinyxml2::XMLElement& _parentElement) const {
+	auto doc = _parentElement.GetDocument();
+	tinyxml2::XMLElement* lastMaterialElement = nullptr;
+	for (size_t objIndex = 0; objIndex < getNumberOfObjects(); objIndex++) {
+		tinyxml2::XMLElement* materialElement = doc->NewElement("Material");
+		lastMaterialElement = materialElement;
+		EntityMaterial* material = getMaterialOfObject(objIndex);
+		if (material != nullptr) {
+			materialElement->SetAttribute("Name", material->getName().c_str());
+		}
+		tinyxml2::XMLElement* primitivesElement = doc->NewElement("Primitives");
+		tinyxml2::XMLElement* polyReaderElement = doc->NewElement("PolyhedronReader");
+		polyReaderElement->SetAttribute("FileName", getFileNameOfObject(objIndex).c_str());
+		polyReaderElement->SetAttribute("FileType", "STL");
+		if (material != nullptr) {
+			writeMaterialProperties(material, doc, materialElement, polyReaderElement);
+		}
+		primitivesElement->InsertEndChild(polyReaderElement);
+		materialElement->InsertEndChild(primitivesElement);
+		_parentElement.InsertEndChild(materialElement);
+	}
+	return lastMaterialElement;
 }
 
 std::string CartesianMeshToSTL::processMeshEntity(const ot::EntityInformation &meshEntity, const std::string &objectName, const std::string &fileName, 
