@@ -75,6 +75,7 @@
     <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp" />
     <ClCompile Include="src\GraphicsDisconnectItem.cpp" />
     <ClCompile Include="src\GraphicsPickerManager.cpp" />
+    <ClCompile Include="src\GraphicsSnapInfo.cpp" />
     <ClCompile Include="src\ImagePainterWidget.cpp" />
     <ClCompile Include="src\IndicatorWidget.cpp" />
     <ClCompile Include="src\ModelLibraryDialog.cpp" />
@@ -284,6 +285,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsDisconnectItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerManager.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsSnapInfo.h" />
     <ClInclude Include="include\OTWidgets\GraphicsZValues.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />

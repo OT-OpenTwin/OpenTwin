@@ -769,6 +769,8 @@ void ot::GraphicsView::endItemMove() {
 	GraphicsChangeEvent changeEvent;
 	changeEvent.setEditorName(m_viewName);
 
+	GraphicsSnapInfo snapInfo;
+
 	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
 		if (otItem) {
@@ -790,7 +792,7 @@ void ot::GraphicsView::endItemMove() {
 						for (QGraphicsItem* qSnapItm : m_scene->items(connectorRect.marginsAdded(QMarginsF(m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance())))) {
 							GraphicsItem* otSnapItem = dynamic_cast<GraphicsItem*>(qSnapItm);
 							if (otSnapItem && (otSnapItem != otItem) && !otSnapItem->isInternalItem() && otSnapItem->getParentGraphicsItem() == nullptr) {
-								otSnapItem->checkConnectionSnapRequest(connectorRect, connectorItem->getConnection(), changeEvent);
+								otSnapItem->checkConnectionSnapRequest(connectorRect, connectorItem->getConnection(), snapInfo);
 							}
 						}
 					}
@@ -800,11 +802,13 @@ void ot::GraphicsView::endItemMove() {
 				// Item is public item
 
 				if (otItem->notifyMoveIfRequired(changeEvent)) {
-					otItem->checkConnectionSnapRequest(changeEvent);
+					otItem->checkConnectionSnapRequest(snapInfo);
 				}
 			}
 		}
 	}
+
+	snapInfo.fillEvent(changeEvent);
 
 	if (!changeEvent.isEmpty()) {
 		Q_EMIT elementsChanged(changeEvent);
