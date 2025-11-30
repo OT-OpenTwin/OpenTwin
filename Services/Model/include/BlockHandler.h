@@ -54,6 +54,7 @@ public:
 	// Finder
 	bool findBlock(ot::UID _editor, ot::UID _block);
 	bool blockExists(ot::UID _blockUID);
+	EntityGraphicsScene* findGraphicsScene(const std::string& _graphicsElementName);
 
 protected:
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;

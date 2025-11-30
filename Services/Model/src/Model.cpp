@@ -626,6 +626,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 void  Model::addEntityToMap(EntityBase *entity)
 {
 	entityMap[entity->getEntityID()] = entity;
+	Application::instance()->getBlockHandler().processEntity(entity);
 	setModified();
 
 	// Check whether a parameter has been added

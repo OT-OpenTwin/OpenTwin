@@ -59,13 +59,9 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 
 	EntityBlock* entBlock = dynamic_cast<EntityBlock*>(_entBase);
 	if (entBlock) {
-		std::string rootName = ot::EntityName::getSubName(entBlock->getName(), 0).value();
-		std::string editorName = ot::EntityName::getSubName(entBlock->getName(), 1).value();
-		std::string editorFullPath = rootName + "/" + editorName;
-		EntityBase* editorBase = model->findEntityFromName(editorFullPath);
-		EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+		EntityGraphicsScene* editor = findGraphicsScene(entBlock->getName());
 		if (!editor) {
-			OT_LOG_E("Failed to cast into EntityGraphicsScene");
+			OT_LOG_E("Failed to determine EntityGraphicsScene.");
 			return;
 		}
 		addBlock(editor->getEntityID(), entBlock);
@@ -74,13 +70,9 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 
 	EntityBlockConnection* entBlockConnection = dynamic_cast<EntityBlockConnection*>(_entBase);
 	if (entBlockConnection) {
-		std::string rootName = ot::EntityName::getSubName(entBlockConnection->getName(), 0).value();
-		std::string editorName = ot::EntityName::getSubName(entBlockConnection->getName(), 1).value();
-		std::string editorFullPath = rootName + "/" + editorName;
-		EntityBase* editorBase = model->findEntityFromName(editorFullPath);
-		EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+		EntityGraphicsScene* editor = findGraphicsScene(entBlockConnection->getName());
 		if (!editor) {
-			OT_LOG_E("Failed to cast into EntityGraphicsScene");
+			OT_LOG_E("Failed to determine EntityGraphicsScene.");
 			return;
 		}
 		addConnection(editor->getEntityID(), *entBlockConnection);
@@ -116,7 +108,7 @@ void BlockHandler::addConnection(ot::UID editorId, EntityBlockConnection& _toBeA
 
 	auto editorIt = m_viewBlockConnectionsMap.find(editorId);
 	if (editorIt == m_viewBlockConnectionsMap.end()) {
-		OT_LOG_E("Could not find editor - EntityID: " + editorId);
+		OT_LOG_E("Could not find editor - EntityID: " + std::to_string(editorId));
 		return;
 	}
 
@@ -304,6 +296,20 @@ bool BlockHandler::blockExists(ot::UID _blockUID) {
 		return true;
 	}
 	return false;
+}
+
+EntityGraphicsScene* BlockHandler::findGraphicsScene(const std::string& _graphicsElementName) {
+	std::string parentName = ot::EntityName::getParentPath(_graphicsElementName);
+	if(parentName.empty()) {
+		OT_LOG_E("Could not extract root name from graphics element { \"Name\": \"" + _graphicsElementName + "\" }");
+		return nullptr;
+	}
+	EntityBase* editorBase = Application::instance()->getModel()->findEntityFromName(parentName);
+	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+	if(!editor){
+		editor = findGraphicsScene(parentName);
+	}
+	return editor;
 }
 
 ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) {
@@ -876,7 +882,7 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 
 	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
 	if (blockEnt == nullptr) {
-		OT_LOG_E("Could not cast to EntityBlock: " + entBase->getEntityID());
+		OT_LOG_E("Could not cast to EntityBlock: " + std::to_string(entBase->getEntityID()));
 		return nullptr;
 	}
 
@@ -916,7 +922,7 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 	if (blockEnt->getClassName() == "EntityBlockPython") {
 		EntityBlockPython* pythonBlock = dynamic_cast<EntityBlockPython*>(blockEnt.get());
 		if (pythonBlock == nullptr) {
-			OT_LOG_E("Could not cast to EntityBlockPython: " + blockEnt->getEntityID());
+			OT_LOG_E("Could not cast to EntityBlockPython: " + std::to_string(blockEnt->getEntityID()));
 			return nullptr;
 		}
 		ot::EntityInformation entityInfo;
@@ -1095,8 +1101,8 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 
 		if(blockEnt->getClassName() != "EntityBlockCircuitConnector" && blockEnt2->getClassName() != "EntityBlockCircuitConnector") {
 				
-			ot::ConnectorType originConnectorType = ot::ConnectorType::UNKNOWN;
-			ot::ConnectorType destinationConnectorType = ot::ConnectorType::UNKNOWN;
+			ot::ConnectorType originConnectorType = ot::ConnectorType::Any;
+			ot::ConnectorType destinationConnectorType = ot::ConnectorType::Any;
 
 			if (isOrigin) {
 
@@ -1104,14 +1110,13 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 				auto originConnectorIt = blockEnt->getAllConnectorsByName().find(connectionCfg.getOriginConnectable());
 				auto destinationConnectorIt = blockEnt2->getAllConnectorsByName().find(connectionCfg.getDestConnectable());
 
-				if (originConnectorIt == blockEnt->getAllConnectorsByName().end() || destinationConnectorIt == blockEnt2->getAllConnectorsByName().end()) {
-					OT_LOG_E("Could not find origin or destination connector for connection");
-					return false;
+				if (originConnectorIt != blockEnt->getAllConnectorsByName().end() && destinationConnectorIt != blockEnt2->getAllConnectorsByName().end()) {
+					// Check connector types
+					originConnectorType = originConnectorIt->second.getConnectorType();
+					destinationConnectorType = destinationConnectorIt->second.getConnectorType();
 				}
 
-				// Check connector types
-				originConnectorType = originConnectorIt->second.getConnectorType();
-				destinationConnectorType = destinationConnectorIt->second.getConnectorType();
+
 			}
 			else {
 
@@ -1119,14 +1124,11 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 				auto originConnectorIt = blockEnt->getAllConnectorsByName().find(connectionCfg.getDestConnectable());
 				auto destinationConnectorIt = blockEnt2->getAllConnectorsByName().find(connectionCfg.getOriginConnectable());
 
-				if (originConnectorIt == blockEnt->getAllConnectorsByName().end() || destinationConnectorIt == blockEnt2->getAllConnectorsByName().end()) {
-					OT_LOG_E("Could not find origin or destination connector for connection");
-					return false;
+				if (originConnectorIt != blockEnt->getAllConnectorsByName().end() && destinationConnectorIt != blockEnt2->getAllConnectorsByName().end()) {
+					// Check connector types
+					originConnectorType = originConnectorIt->second.getConnectorType();
+					destinationConnectorType = destinationConnectorIt->second.getConnectorType();
 				}
-
-				// Check connector types
-				originConnectorType = originConnectorIt->second.getConnectorType();
-				destinationConnectorType = destinationConnectorIt->second.getConnectorType();
 			}
 
 			if (originConnectorType == ot::ConnectorType::UNKNOWN || destinationConnectorType == ot::ConnectorType::UNKNOWN) {
