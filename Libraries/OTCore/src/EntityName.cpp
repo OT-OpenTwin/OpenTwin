@@ -92,8 +92,11 @@ std::string ot::EntityName::changeParentWithTopo(const std::string& _currentEnti
 
 std::string ot::EntityName::getParentPath(const std::string& _entityName)
 {
+	std::string parentPath;
 	auto pos = _entityName.find_last_of('/');
-	const std::string parentPath = _entityName.substr(0, pos);
+	if (pos != std::string::npos) {
+		parentPath = _entityName.substr(0, pos);
+	}
 	return parentPath;
 }
 
