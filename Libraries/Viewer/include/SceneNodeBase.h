@@ -45,62 +45,64 @@ public:
 	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 	void setTreeItem(const ot::EntityTreeItem& _treeItem) { m_treeItem = _treeItem; };
+	const ot::EntityTreeItem& getTreeItem() const { return m_treeItem; };
 	
-	const std::string& getName(void) const { return m_treeItem.getEntityName(); };
-	ot::UID getModelEntityID(void) const { return m_treeItem.getEntityID(); };
-	bool getTreeItemEditable(void) const { return m_treeItem.getIsEditable(); };
-	bool getSelectChildren(void) const { return m_treeItem.getSelectChilds(); };
+	void setName(const std::string& name) { m_treeItem.setEntityName(name); };
+	const std::string& getName() const { return m_treeItem.getEntityName(); };
+	ot::UID getModelEntityID() const { return m_treeItem.getEntityID(); };
+	bool getTreeItemEditable() const { return m_treeItem.getIsEditable(); };
+	bool getSelectChildren() const { return m_treeItem.getSelectChilds(); };
 
 	void setShapeNode(osg::Switch *node) { m_shapeNode = node; };
-	osg::Switch *getShapeNode(void) const { return m_shapeNode; };
+	osg::Switch *getShapeNode() const { return m_shapeNode; };
 
 	void setTreeItemID(ot::UID iD) { m_treeItemID = iD; };
-	ot::UID getTreeItemID(void) const { return m_treeItemID; };
+	ot::UID getTreeItemID() const { return m_treeItemID; };
 
-	bool isVisible(void) const { return m_visible; };
+	bool isVisible() const { return m_visible; };
 	virtual void setVisible(bool v) { m_visible = v; };
 
-	bool isSelected(void) const { return m_selected; };
+	bool isSelected() const { return m_selected; };
 
 	//! \return Returns true if the selection has requested a new view.
 	virtual ot::SelectionHandlingResult setSelected(bool _selected, const ot::SelectionData& _selectionData, bool singleSelection, const std::list<SceneNodeBase*>& _selectedNodes);
 	
-	bool isTransparent(void) const { return m_transparent; };
+	bool isTransparent() const { return m_transparent; };
 	virtual void setTransparent(bool t) { m_transparent = t; };
 	virtual void setTransparency(double value) { m_transparency = value; };
 
-	bool isWireframe(void) const { return m_wireframe; };
+	bool isWireframe() const { return m_wireframe; };
 	virtual void setWireframe(bool w) { m_wireframe = w; };
 
-	bool isHighlighted(void) const { return m_highlighted; };
+	bool isHighlighted() const { return m_highlighted; };
 	virtual void setHighlighted(bool _highlight);
 
 	void setErrors(std::string &e) { m_errors = e; };
-	bool hasErrors(void) const { return !m_errors.empty(); };
-	std::string getErrors(void) const { return m_errors; };
+	bool hasErrors() const { return !m_errors.empty(); };
+	std::string getErrors() const { return m_errors; };
 
 	void setOffset(double value) { m_offset = value; };
-	double getOffset(void) const { return m_offset; };
+	double getOffset() const { return m_offset; };
 
 	void setSelectionHandled(bool _flag) { m_selectionHandled = _flag; }
-	bool getSelectionHandled(void) const { return m_selectionHandled; }
+	bool getSelectionHandled() const { return m_selectionHandled; }
 
 	void setManageVisibilityOfParent(bool flag) { m_manageVisibilityOfParent = flag; }
-	bool getManageVisibilityOfParent(void) const { return m_manageVisibilityOfParent; }
+	bool getManageVisibilityOfParent() const { return m_manageVisibilityOfParent; }
 
 	void setManageVisibilityOfChildren(bool flag) { m_manageVisibilityOfChildren = flag; }
-	bool getManageVisibilityOfChildren(void) const { return m_manageVisibilityOfChildren; }
+	bool getManageVisibilityOfChildren() const { return m_manageVisibilityOfChildren; }
 
 	void setParent(SceneNodeBase *item) { m_parent = item; };
-	SceneNodeBase *getParent(void) { return m_parent; };
+	SceneNodeBase *getParent() { return m_parent; };
 
 	void addChild(SceneNodeBase *child) { assert(std::find(m_children.begin(), m_children.end(), child) == m_children.end()); m_children.push_back(child); child->setParent(this); };
 	void removeChild(SceneNodeBase *child) { assert(std::find(m_children.begin(), m_children.end(), child) != m_children.end());  m_children.remove(child); };
-	const std::list<SceneNodeBase*>& getChildren(void) const { return m_children; };
+	const std::list<SceneNodeBase*>& getChildren() const { return m_children; };
 
 	virtual void getPrefetch(std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs) {};
 
-	virtual bool isItem3D(void) const = 0;
+	virtual bool isItem3D() const = 0;
 
 	void addVisualiser(Visualiser* _visualiser) { m_visualiser.push_back(_visualiser); }
 	const std::list<Visualiser*>& getVisualiser() const { return m_visualiser; }

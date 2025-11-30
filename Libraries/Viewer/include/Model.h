@@ -25,7 +25,6 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/Plot1DDataBaseCfg.h"
 #include "OTWidgets/SelectionData.h"
-#include "OldTreeIcon.h"
 #include "Geometry.h"
 #include "SceneNodeBase.h"
 #include "ViewChangedStates.h"
@@ -71,39 +70,41 @@ public:
 
 	void setTreeStateRecording(bool flag);
 
-	void addNodeFromFacetData(const ot::EntityTreeItem& _treeItem, double _surfaceColorRGB[3], double _edgeColorRGB[3], bool _backFaceCulling,
+	void addNodeFromFacetData(const ot::EntityTreeItem& _treeItem, bool _isHidden, double _surfaceColorRGB[3], double _edgeColorRGB[3], bool _backFaceCulling,
 		double _offsetFactor, std::vector<Geometry::Node>& _nodes, std::list<Geometry::Triangle>& _triangles, std::list<Geometry::Edge>& _edges, std::map<ot::UID, std::string>& _faceNameMap, std::string& _errors,
 		bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected);
-	void addNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, 
-								  bool reflective, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, 
-								  bool isEditable, const std::string &projectName, unsigned long long entityID, unsigned long long version,
-							      bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
-	void addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, const OldTreeIcon& _treeIcons, bool _editable, ot::VisualisationTypes _visualisationTypes);
 	
-	void addVisualizationContainerNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable, const ot::VisualisationTypes& _visualisationTypes);
-	void addVisualizationAnnotationNode(const std::string &treeName, unsigned long long modelEntityID, 
-									const OldTreeIcon &treeIcons, bool isHidden,
-									const double edgeColorRGB[3],
-									const std::vector<std::array<double, 3>> &points,
-									const std::vector<std::array<double, 3>> &points_rgb,
-									const std::vector<std::array<double, 3>> &triangle_p1,
-									const std::vector<std::array<double, 3>> &triangle_p2,
-									const std::vector<std::array<double, 3>> &triangle_p3,
-									const std::vector<std::array<double, 3>> &triangle_rgb);
-	void addVisualizationAnnotationNodeDataBase(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long version);
-	void addVisualizationMeshNodeFromFacetDataBase(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, unsigned long long entityID, unsigned long long version);
-	void addVisualizationMeshItemNodeFromFacetDataBase(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long version, long long tetEdgesID, long long tetEdgesVersion);
-	void addVisualizationCartesianMeshNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, double edgeColorRGB[3], double meshLineColorRGB[3], bool showMeshLines, const std::vector<double> &meshCoordsX, const std::vector<double> &meshCoordsY, const std::vector<double> &meshCoordsZ,
-										   const std::string &projectName, unsigned long long faceListEntityID, unsigned long long faceListEntityVersion, unsigned long long nodeListEntityID, unsigned long long nodeListEntityVersion);
+	void addNodeFromFacetDataBase(const ot::EntityTreeItem& _treeItem, bool _isHidden, double _surfaceColorRGB[3], double _edgeColorRGB[3], const std::string& _materialType, const std::string& _textureType, bool _reflective, bool _backFaceCulling,
+		double _offsetFactor, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion,
+		bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation);
+
+	void addSceneNode(const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes);
+	
+	void addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes);
+
+	void addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
+		bool _isHidden, const double _edgeColorRGB[3],
+		const std::vector<std::array<double, 3>>& _points,
+		const std::vector<std::array<double, 3>>& _pointsRgb,
+		const std::vector<std::array<double, 3>>& _triangleP1,
+		const std::vector<std::array<double, 3>>& _triangleP2,
+		const std::vector<std::array<double, 3>>& _triangleP3,
+		const std::vector<std::array<double, 3>>& _triangleRgb);
+
+	void addVisualizationAnnotationNodeDataBase(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion);
+	void addVisualizationMeshNodeFromFacetDataBase(const ot::EntityTreeItem& _treeItem, double _edgeColorRGB[3], bool _displayTetEdges, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion);
+	void addVisualizationMeshItemNodeFromFacetDataBase(const ot::EntityTreeItem& _treeItem, bool isHidden, const std::string& _projectName, ot::UID _tetEdgesID, ot::UID _tetEdgesVersion);
+	void addVisualizationCartesianMeshNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, double _edgeColorRGB[3], double _meshLineColorRGB[3], bool _showMeshLines, const std::vector<double>& _meshCoordsX, const std::vector<double>& _meshCoordsY, const std::vector<double>& _meshCoordsZ,
+		const std::string& _projectName, ot::UID _faceListEntityID, ot::UID _faceListEntityVersion, ot::UID _nodeListEntityID, ot::UID _nodeListEntityVersion);
 	void visualizationCartesianMeshNodeShowLines(unsigned long long modelEntityID, bool showMeshLines);
-	void addVisualizationCartesianMeshItemNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3]);
+	void addVisualizationCartesianMeshItemNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::vector<int>& _facesList, double _color[3]);
 	void visualizationTetMeshNodeTetEdges(unsigned long long modelEntityID, bool displayTetEdges);
 
-	void addVTKNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
-	void updateVTKNode(unsigned long long modelEntityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
+	void addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion);
+	void updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 
-	void setEntityName(unsigned long long modelEntityID, const std::string &newName);
-	std::string getEntityName(unsigned long long modelEntityID) const;
+	void setEntityName(ot::UID _modelEntityID, const std::string& _newName);
+	std::string getEntityName(ot::UID _modelEntityID) const;
 	ot::UID getEntityID(const std::string& _entityName) const;
 	void renameEntityPath(const std::string &oldPath, const std::string &newPath);
 
@@ -113,7 +114,7 @@ public:
 
 	//! \return Returns true if the selection has requested a new view.
 	ot::SelectionHandlingResult setSelectedTreeItems(const ot::SelectionData& _selectionData, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems);
-	void executeAction(unsigned long long _buttonID);
+	void executeAction(ot::UID _buttonID);
 	void setHoverTreeItem(ot::UID hoverTreeItemID);
 	void clearHoverView(void);
 	void setHoverView(SceneNodeBase *selectedItem);
@@ -229,7 +230,7 @@ private:
 	void       setAllShapesOpaque(SceneNodeBase *root);
 	void       setSelectedShapesOpaqueAndOthersTransparent(SceneNodeBase *root);
 	void       setWireframeStateForAllSceneNodes(SceneNodeBase *root, bool wireframe);
-	void	   addSceneNodesToTree(SceneNodeBase *root);
+	void	   addSceneNodesToTree(SceneNodeBase* _root);
 	void	   addSelectedModelEntityIDToList(SceneNodeBase *root, std::list<unsigned long long> &selectedModelEntityID);
 	void	   addSelectedVisibleModelEntityIDToList(SceneNodeBase *root, std::list<unsigned long long> &selectedVisibleModelEntityID);
 	void	   addSelectedTreeItemIDToList(SceneNodeBase *root, std::list<ot::UID> &selectedTreeItemID);
@@ -241,8 +242,8 @@ private:
 	void	   edgeSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2);
 	SceneNodeBase *getParentNode(const std::string &treeName);
 	void	   endCurrentSelectionMode(bool cancelled);
-	SceneNodeGeometry *createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool isHidden, bool manageParentVisibility, bool manageChildVisibility);
-	void       setItemVisibleState(SceneNodeBase *item, bool visible);
+	SceneNodeGeometry *createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, bool _manageParentVisibility, bool _manageChildVisibility);
+	void       setItemVisibleState(SceneNodeBase* _item, bool _visible);
 	void	   showAllSceneNodesAction(void);
 	void	   showSelectedSceneNodesAction(void);
 	void	   hideSelectedSceneNodesAction(void);

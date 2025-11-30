@@ -296,7 +296,7 @@ void Model::lockSelectionAndModification(bool flag)
 	FrontendAPI::instance()->lockSelectionAndModification(flag);
 }
 
-void Model::addSceneNodesToTree(SceneNodeBase *root)
+void Model::addSceneNodesToTree(SceneNodeBase* _root)
 {
 	// here we add the current item and all its children to the tree. 
 	// We assume that all parent items already exist.
@@ -306,18 +306,18 @@ void Model::addSceneNodesToTree(SceneNodeBase *root)
 		assert(FrontendAPI::instance() != nullptr);
 		if (FrontendAPI::instance() != nullptr)
 		{
-			if (root != sceneNodesRoot)  // The toplevel scene node is invisible and therefore not added to the tree.
+			if (_root != sceneNodesRoot)  // The toplevel scene node is invisible and therefore not added to the tree.
 			{
-				ot::UID treeItemID = FrontendAPI::instance()->addTreeItem(root->getName(), root->isEditable(), root->getSelectChildren());
-				FrontendAPI::instance()->setTreeItemIcon(treeItemID, root->getOldTreeIcons().size, root->isVisible() ? root->getOldTreeIcons().visibleIcon : root->getOldTreeIcons().hiddenIcon);
+				ot::UID treeItemID = FrontendAPI::instance()->addTreeItem(_root->getTreeItem());
+				FrontendAPI::instance()->setTreeItemIcon(treeItemID, _root->isVisible() ? _root->getTreeItem().getIcons().getVisibleIcon() : _root->getTreeItem().getIcons().getHiddenIcon());
 
-				root->setTreeItemID(treeItemID);
+				_root->setTreeItemID(treeItemID);
 
 				// Now add the node to the map fro faster access
-				treeItemToSceneNodesMap[treeItemID] = root;
+				treeItemToSceneNodesMap[treeItemID] = _root;
 
 				// Now we check whether the current item is visible
-				manageParentVisibility(root);
+				manageParentVisibility(_root);
 
 				//if (root->isVisible())
 				//{
@@ -329,16 +329,16 @@ void Model::addSceneNodesToTree(SceneNodeBase *root)
 				//}
 			}
 
-			if (root->getParent() != nullptr)
+			if (_root->getParent() != nullptr)
 			{
-				if (root->getParent()->isSelected())
+				if (_root->getParent()->isSelected())
 				{
-					FrontendAPI::instance()->selectTreeItem(root->getTreeItemID());
+					FrontendAPI::instance()->selectTreeItem(_root->getTreeItemID());
 				}
 			}
 
 			// Finally process all children of the current item
-			for (auto child : root->getChildren())
+			for (auto child : _root->getChildren())
 			{
 				addSceneNodesToTree(child);
 			}
@@ -470,12 +470,14 @@ void Model::centerMouseCursor(void)
 	}
 }
 
-void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable, const ot::VisualisationTypes& _visualisationTypes)
+void Model::addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes)
 {
 	// Check whether we already have a container node
-	if (m_nameToSceneNodesMap.count(treeName) != 0)
+	if (m_nameToSceneNodesMap.count(_treeItem.getEntityName()) != 0)
 	{
-		if (dynamic_cast<SceneNodeContainer *>(m_nameToSceneNodesMap[treeName]) != nullptr) return;
+		if (dynamic_cast<SceneNodeContainer*>(m_nameToSceneNodesMap[_treeItem.getEntityName()]) != nullptr) {
+			return;
+		}
 		assert(0); // This is not a container node -> overwrite
 	}
 
@@ -483,15 +485,12 @@ void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned
 
 	SceneNodeBase *containerNode = new SceneNodeContainer;
 
-	containerNode->setName(treeName);
-	containerNode->setEditable(editable);
-	containerNode->setModelEntityID(modelEntityID);
-	containerNode->setOldTreeIcons(treeIcons);
+	containerNode->setTreeItem(_treeItem);
 	
 	VisualiserHelper::addVisualizer(containerNode, _visualisationTypes);
 
 	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(treeName);
+	SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
 	assert(parentNode != nullptr); // We assume that the parent node already exists
 
 	if (parentNode == nullptr)
@@ -514,23 +513,22 @@ void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned
 	storeInMaps(containerNode);
 }
 
-void Model::addVisualizationAnnotationNode(const std::string &treeName, unsigned long long modelEntityID, 
-										   const OldTreeIcon &treeIcons, bool isHidden,
-										   const double edgeColorRGB[3],
-										   const std::vector<std::array<double, 3>> &points,
-										   const std::vector<std::array<double, 3>> &points_rgb,
-										   const std::vector<std::array<double, 3>> &triangle_p1,
-										   const std::vector<std::array<double, 3>> &triangle_p2,
-										   const std::vector<std::array<double, 3>> &triangle_p3,
-										   const std::vector<std::array<double, 3>> &triangle_rgb)
+void Model::addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
+	bool _isHidden, const double _edgeColorRGB[3],
+	const std::vector<std::array<double, 3>>& _points,
+	const std::vector<std::array<double, 3>>& _pointsRgb,
+	const std::vector<std::array<double, 3>>& _triangleP1,
+	const std::vector<std::array<double, 3>>& _triangleP2,
+	const std::vector<std::array<double, 3>>& _triangleP3,
+	const std::vector<std::array<double, 3>>& _triangleRgb)
 {
 	SceneNodeAnnotation *annotationNode = nullptr;
 	bool nodeAlreadyExists = false;
 
 	// Check whether we already have a container node
-	if (m_nameToSceneNodesMap.count(treeName) != 0)
+	if (m_nameToSceneNodesMap.count(_treeItem.getEntityName()) != 0)
 	{
-		annotationNode = dynamic_cast<SceneNodeAnnotation *>(m_nameToSceneNodesMap[treeName]);
+		annotationNode = dynamic_cast<SceneNodeAnnotation *>(m_nameToSceneNodesMap[_treeItem.getEntityName()]);
 		if (annotationNode == nullptr)
 		{
 			assert(0); // There already exists a node with this name, but it is not an annotation node
@@ -544,17 +542,15 @@ void Model::addVisualizationAnnotationNode(const std::string &treeName, unsigned
 		annotationNode = new SceneNodeAnnotation;
 	}
 
-	annotationNode->setName(treeName);
-	annotationNode->setModelEntityID(modelEntityID);
-	annotationNode->setOldTreeIcons(treeIcons);	
+	annotationNode->setTreeItem(_treeItem);
 	annotationNode->setWireframe(wireFrameState);
 
-	annotationNode->initializeFromData(edgeColorRGB, points, points_rgb, triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
+	annotationNode->initializeFromData(_edgeColorRGB, _points, _pointsRgb, _triangleP1, _triangleP2, _triangleP3, _triangleRgb);
 
 	if (!nodeAlreadyExists)
 	{
 		// Get the parent scene node
-		SceneNodeBase *parentNode = getParentNode(treeName);
+		SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
 		assert(parentNode != nullptr); // We assume that the parent node already exists
 
 		// Now add the current node as child to the parent
@@ -568,7 +564,7 @@ void Model::addVisualizationAnnotationNode(const std::string &treeName, unsigned
 	}
 
 	// Make the node invisible, if needed
-	if (isHidden)
+	if (_isHidden)
 	{
 		setItemVisibleState(annotationNode, false);
 	}
@@ -577,9 +573,9 @@ void Model::addVisualizationAnnotationNode(const std::string &treeName, unsigned
 	storeInMaps(annotationNode);
 }
 
-void Model::addVisualizationAnnotationNodeDataBase(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long version)
+void Model::addVisualizationAnnotationNodeDataBase(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
 {
-	double edgeColorRGB[3];
+	double edgeColorRGB[3] = { 0., 0., 0. };
 
 	std::vector<std::array<double, 3>> points;
 	std::vector<std::array<double, 3>> points_rgb;
@@ -591,7 +587,7 @@ void Model::addVisualizationAnnotationNodeDataBase(const std::string &treeName, 
 
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, version, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(_dataEntityID, _dataEntityVersion, doc))
 	{
 		assert(0);
 		return;
@@ -775,30 +771,28 @@ void Model::addVisualizationAnnotationNodeDataBase(const std::string &treeName, 
 
 	// Finally create the entry
 
-	addVisualizationAnnotationNode(treeName, modelEntityID, treeIcons, isHidden, edgeColorRGB, points, points_rgb, triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
+	addVisualizationAnnotationNode(_treeItem, _isHidden, edgeColorRGB, points, points_rgb, triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
 }
 
 
-void Model::addNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, 
-									 const std::string &textureType, bool reflective, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling, 
-									 double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long entityID, unsigned long long version,
-									 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation)
+void Model::addNodeFromFacetDataBase(const ot::EntityTreeItem& _treeItem, bool _isHidden, double _surfaceColorRGB[3], double _edgeColorRGB[3], const std::string& _materialType, const std::string& _textureType, bool _reflective, bool _backFaceCulling,
+	double _offsetFactor, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion,
+	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation)
 {
-	SceneNodeGeometry *geometryNode = createNewGeometryNode(treeName, modelEntityID, treeIcons, isHidden, isEditable, selectChildren, manageParentVisibility, manageChildVisibility);
+	SceneNodeGeometry *geometryNode = createNewGeometryNode(_treeItem, _isHidden, _manageParentVisibility, _manageChildVisibility);
 
 	if (geometryNode != nullptr)
 	{
-		geometryNode->setSurfaceColorRGB(surfaceColorRGB);
-		geometryNode->setEdgeColorRGB(edgeColorRGB);
-		geometryNode->setMaterialType(materialType);
-		geometryNode->setTextureType(textureType, reflective);
-		geometryNode->setBackFaceCulling(backFaceCulling);
-		geometryNode->setOffsetFactor(offsetFactor);
-		geometryNode->setStorage(projectName, entityID, version);
-		geometryNode->setOldTreeIcons(treeIcons);
+		geometryNode->setSurfaceColorRGB(_surfaceColorRGB);
+		geometryNode->setEdgeColorRGB(_edgeColorRGB);
+		geometryNode->setMaterialType(_materialType);
+		geometryNode->setTextureType(_textureType, _reflective);
+		geometryNode->setBackFaceCulling(_backFaceCulling);
+		geometryNode->setOffsetFactor(_offsetFactor);
+		geometryNode->setStorage(_projectName, _dataEntityID, _dataEntityVersion);
 		geometryNode->setWireframe(wireFrameState);
-		geometryNode->setShowWhenSelected(showWhenSelected);
-		geometryNode->setTransformation(transformation);
+		geometryNode->setShowWhenSelected(_showWhenSelected);
+		geometryNode->setTransformation(_transformation);
 
 		//if (isHidden)
 		//{
@@ -810,17 +804,17 @@ void Model::addNodeFromFacetDataBase(const std::string &treeName, double surface
 		//}
 		geometryNode->initializeFromDataStorage(); // We want to have the hover preview function for hidden items as well
 
-		if (isHidden)
+		if (_isHidden)
 		{
 			setItemVisibleState(geometryNode, false);
 		}
 	}
 }
 
-void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, const OldTreeIcon& _treeIcons, bool _editable, ot::VisualisationTypes _visualisationTypes)
+void Model::addSceneNode(const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes) 
 {
 	// Check whether we already have a node with this name
-	auto existingSceneNode = m_nameToSceneNodesMap.find(_treeName);
+	auto existingSceneNode = m_nameToSceneNodesMap.find(_treeItem.getEntityName());
 	if (existingSceneNode != m_nameToSceneNodesMap.end())
 	{
 		if (dynamic_cast<SceneNodeMultiVisualisation*>(existingSceneNode->second) != nullptr)
@@ -832,20 +826,17 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 
 	// Create the new container node
 	SceneNodeBase* sceneNode = new SceneNodeMultiVisualisation();
-
-	sceneNode->setName(_treeName);
-	sceneNode->setEditable(_editable);
-	sceneNode->setModelEntityID(_modelEntityID);
-	sceneNode->setOldTreeIcons(_treeIcons);
+	sceneNode->setTreeItem(_treeItem);
 	
 	VisualiserHelper::addVisualizer(sceneNode, _visualisationTypes);
 
 	// Get the parent scene node
-	SceneNodeBase* parentNode = getParentNode(_treeName);
-	assert(parentNode != nullptr); // We assume that the parent node already exists
-
+	SceneNodeBase* parentNode = getParentNode(_treeItem.getEntityName());
+	
 	if (parentNode == nullptr)
 	{
+		OTAssert(0, "Corrupt model: parent node not found");
+
 		// If the model is corrupt, this might happen. We deal with this by ignoring the current item
 		delete sceneNode;
 		return;
@@ -865,7 +856,7 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 
 }
 
-SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool isHidden, bool manageParentVisibility, bool manageChildVisibility)
+SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, bool _manageParentVisibility, bool _manageChildVisibility)
 {
 	// Check whether the item already exists
 	SceneNodeBase *item = modelItemToSceneNodesMap[_treeItem.getEntityID()];
@@ -877,11 +868,10 @@ SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeI
 		// The item exists and needs to be updated
 
 		geometryNode = dynamic_cast<SceneNodeGeometry *>(item);
-		assert(geometryNode != nullptr);
 
 		if (geometryNode == nullptr)
 		{
-			assert(0);
+			OTAssertNullptr("The existing item is not a geometry node");
 			return nullptr;
 		}
 	}
@@ -890,24 +880,20 @@ SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeI
 		// The item is new and needs to be created
 
 		geometryNode = new SceneNodeGeometry;
-
-		geometryNode->setName(treeName);
-		geometryNode->setModelEntityID(modelEntityID);
-		geometryNode->setOldTreeIcons(treeIcons);
-		geometryNode->setEditable(isEditable);
+		geometryNode->setTreeItem(_treeItem);
 		geometryNode->setWireframe(wireFrameState);
-		geometryNode->setVisible(!isHidden);
-		geometryNode->setSelectChildren(selectChildren);
-		geometryNode->setManageVisibilityOfParent(manageParentVisibility);
-		geometryNode->setManageVisibilityOfChildren(manageChildVisibility);
+		geometryNode->setVisible(!_isHidden);
+		geometryNode->setManageVisibilityOfParent(_manageParentVisibility);
+		geometryNode->setManageVisibilityOfChildren(_manageChildVisibility);
 
 		// Get the parent scene node
-		SceneNodeBase *parentNode = getParentNode(treeName);
-		assert(parentNode != nullptr); // We assume that the parent node already exists
+		SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
 
 		// Deal with potentially corrupt models
 		if (parentNode == nullptr)
 		{
+			OTAssert(0, "Corrupt model: parent node not found");
+
 			delete geometryNode;
 			return nullptr;
 		}
@@ -919,7 +905,7 @@ SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeI
 		addSceneNodesToTree(geometryNode);
 
 		// Make the node invisible, if needed
-		if (isHidden)
+		if (_isHidden)
 		{
 			setItemVisibleState(geometryNode, false);
 		}
@@ -927,40 +913,34 @@ SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeI
 		geometryNode->setModel(this);
 
 		// Add the node to the maps for faster access
-		m_nameToSceneNodesMap[treeName] = geometryNode;
-		treeItemToSceneNodesMap[geometryNode->getTreeItemID()] = geometryNode;
-		modelItemToSceneNodesMap[modelEntityID] = geometryNode;
+		storeInMaps(geometryNode);
 	}
 
 	return geometryNode;
 }
 
-void Model::setEntityName(unsigned long long modelEntityID, const std::string &newName)
-{
-	SceneNodeBase *item = modelItemToSceneNodesMap[modelEntityID];
-	assert(item != nullptr);
-
-	if (item != nullptr)
-	{
-		std::string newText;
-
-		size_t index = newName.rfind("/");
-		if (index == std::string::npos)
-		{
-			newText = newName;
-		}
-		else
-		{
-			newText = newName.substr(index + 1);
-		}
-
-		m_nameToSceneNodesMap[newName] = item;
-		m_nameToSceneNodesMap.erase(item->getName());
-
-		item->setName(newName);
-
-		FrontendAPI::instance()->setTreeItemText(item->getTreeItemID(), newText);
+void Model::setEntityName(ot::UID _modelEntityID, const std::string& _newName) {
+	SceneNodeBase* item = modelItemToSceneNodesMap[_modelEntityID];
+	if (item == nullptr) {
+		OT_LOG_W("SceneNode not found { \"EntityID\": " + std::to_string(_modelEntityID) + " }");
+		return;
 	}
+
+	std::string newText;
+	size_t index = _newName.rfind("/");
+	if (index == std::string::npos) {
+		newText = _newName;
+	}
+	else {
+		newText = _newName.substr(index + 1);
+	}
+
+	m_nameToSceneNodesMap[_newName] = item;
+	m_nameToSceneNodesMap.erase(item->getName());
+
+	item->setName(_newName);
+
+	FrontendAPI::instance()->setTreeItemText(item->getTreeItemID(), newText);
 }
 
 std::string Model::getEntityName(unsigned long long modelEntityID) const {
@@ -1032,25 +1012,24 @@ void Model::renameEntityPath(const std::string &oldPath, const std::string &newP
 	}
 }
 
-void Model::addNodeFromFacetData(const ot::EntityTreeItem& _treeItem, double _surfaceColorRGB[3], double _edgeColorRGB[3], bool _backFaceCulling,
+void Model::addNodeFromFacetData(const ot::EntityTreeItem& _treeItem, bool _isHidden, double _surfaceColorRGB[3], double _edgeColorRGB[3], bool _backFaceCulling,
 	double _offsetFactor, std::vector<Geometry::Node>& _nodes, std::list<Geometry::Triangle>& _triangles, std::list<Geometry::Edge>& _edges, std::map<ot::UID, std::string>& _faceNameMap, std::string& _errors,
 	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected)
 {
-	SceneNodeGeometry *geometryNode = createNewGeometryNode(treeName, modelEntityID, treeIcons, isHidden, isEditable, selectChildren, manageParentVisibility, manageChildVisibility);
+	SceneNodeGeometry *geometryNode = createNewGeometryNode(_treeItem, _isHidden, _manageParentVisibility, _manageChildVisibility);
 
 	if (geometryNode != nullptr)
 	{
-		geometryNode->setErrors(errors);
+		geometryNode->setErrors(_errors);
 
-		geometryNode->setSurfaceColorRGB(surfaceColorRGB);
-		geometryNode->setEdgeColorRGB(edgeColorRGB);
-		geometryNode->setBackFaceCulling(backFaceCulling);
-		geometryNode->setOffsetFactor(offsetFactor);
-		geometryNode->setOldTreeIcons(treeIcons);
+		geometryNode->setSurfaceColorRGB(_surfaceColorRGB);
+		geometryNode->setEdgeColorRGB(_edgeColorRGB);
+		geometryNode->setBackFaceCulling(_backFaceCulling);
+		geometryNode->setOffsetFactor(_offsetFactor);
 		geometryNode->setWireframe(wireFrameState);
-		geometryNode->setShowWhenSelected(showWhenSelected);
+		geometryNode->setShowWhenSelected(_showWhenSelected);
 
-		geometryNode->initializeFromFacetData(nodes, triangles, edges, faceNameMap);
+		geometryNode->initializeFromFacetData(_nodes, _triangles, _edges, _faceNameMap);
 	}
 }
 
@@ -1289,14 +1268,14 @@ void Model::manageParentVisibility(SceneNodeBase *item)
 	}
 }
 
-void Model::setItemVisibleState(SceneNodeBase *item, bool visible)
+void Model::setItemVisibleState(SceneNodeBase* _item, bool _visible)
 {
-	if (visible != item->isVisible())
+	if (_visible != _item->isVisible())
 	{
-		item->setVisible(visible);
-		FrontendAPI::instance()->setTreeItemIcon(item->getTreeItemID(), item->getOldTreeIcons().size, item->isVisible() ? item->getOldTreeIcons().visibleIcon : item->getOldTreeIcons().hiddenIcon);
+		_item->setVisible(_visible);
+		FrontendAPI::instance()->setTreeItemIcon(_item->getTreeItemID(), _item->isVisible() ? _item->getTreeItem().getIcons().getVisibleIcon() : _item->getTreeItem().getIcons().getHiddenIcon());
 
-		manageParentVisibility(item);
+		manageParentVisibility(_item);
 	}
 }
 
@@ -1878,7 +1857,7 @@ void Model::viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo) {
 	m_currentCentralView = _viewInfo;
 }
 
-void Model::executeAction(unsigned long long _buttonID) {
+void Model::executeAction(ot::UID _buttonID) {
 	ViewerToolBar::ButtonType button = ViewerToolBar::instance().getButtonTypeFromUID(_buttonID);
 	switch (button) {
 	case ViewerToolBar::Reset3DViewButton: resetAllViews3D(); break;
@@ -3100,18 +3079,16 @@ void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, co
 	sceneNodeIt->second->setViewChange(_state, _viewType);
 }
 
-void Model::addVisualizationMeshNodeFromFacetDataBase(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, unsigned long long entityID, unsigned long long version)
+void Model::addVisualizationMeshNodeFromFacetDataBase(const ot::EntityTreeItem& _treeItem, double _edgeColorRGB[3], bool _displayTetEdges, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
 {
 	SceneNodeMesh *meshNode = new SceneNodeMesh;
 
-	meshNode->setName(treeName);
-	meshNode->setModelEntityID(modelEntityID);
-	meshNode->setOldTreeIcons(treeIcons);
-	meshNode->setDisplayTetEdges(displayTetEdges);
+	meshNode->setTreeItem(_treeItem);
+	meshNode->setDisplayTetEdges(_displayTetEdges);
 	meshNode->setWireframe(wireFrameState);
 
 	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(treeName);
+	SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
 	assert(parentNode != nullptr); // We assume that the parent node already exists
 
 	// Now add the current node as child to the parent
@@ -3121,29 +3098,24 @@ void Model::addVisualizationMeshNodeFromFacetDataBase(const std::string &treeNam
 	addSceneNodesToTree(meshNode);
 
 	// Add the node to the maps for faster access
-	m_nameToSceneNodesMap[treeName] = meshNode;
-	treeItemToSceneNodesMap[meshNode->getTreeItemID()] = meshNode;
-	modelItemToSceneNodesMap[modelEntityID] = meshNode;
+	storeInMaps(meshNode);
 
-	meshNode->setStorage(projectName, entityID, version);
-	meshNode->setEdgeColor(edgeColorRGB);
+	meshNode->setStorage(_projectName, _dataEntityID, _dataEntityVersion);
+	meshNode->setEdgeColor(_edgeColorRGB);
 
 	meshNode->setModel(this);
 	meshNode->setNeedsInitialization();
 }
 
-void Model::addVisualizationMeshItemNodeFromFacetDataBase(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, 
-														  unsigned long long entityID, unsigned long long version, long long tetEdgesID, long long tetEdgesVersion)
+void Model::addVisualizationMeshItemNodeFromFacetDataBase(const ot::EntityTreeItem& _treeItem, bool isHidden, const std::string& _projectName, ot::UID _tetEdgesID, ot::UID _tetEdgesVersion)
 {
 	SceneNodeMeshItem *meshNode = new SceneNodeMeshItem;
 
-	meshNode->setName(treeName);
-	meshNode->setModelEntityID(modelEntityID);
-	meshNode->setOldTreeIcons(treeIcons);
+	meshNode->setTreeItem(_treeItem);
 	meshNode->setWireframe(wireFrameState);
 
 	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(treeName);
+	SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
 	assert(parentNode != nullptr); // We assume that the parent node already exists
 
 	// Now add the current node as child to the parent
@@ -3153,11 +3125,9 @@ void Model::addVisualizationMeshItemNodeFromFacetDataBase(const std::string &tre
 	addSceneNodesToTree(meshNode);
 
 	// Add the node to the maps for faster access
-	m_nameToSceneNodesMap[treeName] = meshNode;
-	treeItemToSceneNodesMap[meshNode->getTreeItemID()] = meshNode;
-	modelItemToSceneNodesMap[modelEntityID] = meshNode;
+	storeInMaps(meshNode);
 
-	meshNode->setStorage(projectName, entityID, version, tetEdgesID, tetEdgesVersion);
+	meshNode->setStorage(_projectName, _treeItem.getEntityID(), _treeItem.getEntityVersion(), _tetEdgesID, _tetEdgesVersion);
 
 	// Now find the owning mesh
 	SceneNodeBase *masterMeshNode = parentNode;
@@ -3183,18 +3153,16 @@ void Model::addVisualizationMeshItemNodeFromFacetDataBase(const std::string &tre
 	}
 }
 
-void Model::addVisualizationCartesianMeshNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, double edgeColorRGB[3], double meshLineColorRGB[3], bool showMeshLines, const std::vector<double> &meshCoordsX, const std::vector<double> &meshCoordsY, const std::vector<double> &meshCoordsZ,
-											  const std::string &projectName, unsigned long long faceListEntityID, unsigned long long faceListEntityVersion, unsigned long long nodeListEntityID, unsigned long long nodeListEntityVersion)
+void Model::addVisualizationCartesianMeshNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, double _edgeColorRGB[3], double _meshLineColorRGB[3], bool _showMeshLines, const std::vector<double>& _meshCoordsX, const std::vector<double>& _meshCoordsY, const std::vector<double>& _meshCoordsZ,
+	const std::string& _projectName, ot::UID _faceListEntityID, ot::UID _faceListEntityVersion, ot::UID _nodeListEntityID, ot::UID _nodeListEntityVersion)
 {
 	SceneNodeCartesianMesh *meshNode = new SceneNodeCartesianMesh;
 
-	meshNode->setName(treeName);
-	meshNode->setModelEntityID(modelEntityID);
-	meshNode->setOldTreeIcons(treeIcons);
+	meshNode->setTreeItem(_treeItem);
 	meshNode->setWireframe(wireFrameState);
 
 	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(treeName);
+	SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
 	assert(parentNode != nullptr); // We assume that the parent node already exists
 
 	// Now add the current node as child to the parent
@@ -3209,16 +3177,16 @@ void Model::addVisualizationCartesianMeshNode(const std::string &treeName, unsig
 	// Add the node to the maps for faster access
 	storeInMaps(meshNode);
 
-	meshNode->setEdgeColor(edgeColorRGB);
-	meshNode->setMeshLineColor(meshLineColorRGB);
-	meshNode->setMeshLines(meshCoordsX, meshCoordsY, meshCoordsZ);
-	meshNode->setFaceListStorage(projectName, faceListEntityID, faceListEntityVersion);
-	meshNode->setNodeListStorage(nodeListEntityID, nodeListEntityVersion);
+	meshNode->setEdgeColor(_edgeColorRGB);
+	meshNode->setMeshLineColor(_meshLineColorRGB);
+	meshNode->setMeshLines(_meshCoordsX, _meshCoordsY, _meshCoordsZ);
+	meshNode->setFaceListStorage(_projectName, _faceListEntityID, _faceListEntityVersion);
+	meshNode->setNodeListStorage(_nodeListEntityID, _nodeListEntityVersion);
 	meshNode->setNeedsInitialization();
 
 	meshNode->setModel(this);
 
-	if (!isHidden)
+	if (!_isHidden)
 	{
 		meshNode->ensureDataLoaded();
 	}
@@ -3227,7 +3195,7 @@ void Model::addVisualizationCartesianMeshNode(const std::string &treeName, unsig
 		setItemVisibleState(meshNode, false);
 	}
 
-	meshNode->showMeshLines(showMeshLines);
+	meshNode->showMeshLines(_showMeshLines);
 }
 
 void Model::visualizationCartesianMeshNodeShowLines(unsigned long long modelEntityID, bool showMeshLines)
@@ -3254,18 +3222,16 @@ void Model::visualizationTetMeshNodeTetEdges(unsigned long long modelEntityID, b
 	refreshAllViews();
 }
 
-void Model::addVisualizationCartesianMeshItemNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3])
+void Model::addVisualizationCartesianMeshItemNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::vector<int>& _facesList, double _color[3])
 {
 	SceneNodeCartesianMeshItem *meshNode = new SceneNodeCartesianMeshItem;
 
-	meshNode->setName(treeName);
-	meshNode->setModelEntityID(modelEntityID);
-	meshNode->setOldTreeIcons(treeIcons);
+	meshNode->setTreeItem(_treeItem);
 	meshNode->setModel(this);
 	meshNode->setWireframe(wireFrameState);
 
 	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(treeName);
+	SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
 	assert(parentNode != nullptr); // We assume that the parent node already exists
 
 	// Now add the current node as child to the parent
@@ -3275,9 +3241,7 @@ void Model::addVisualizationCartesianMeshItemNode(const std::string &treeName, u
 	addSceneNodesToTree(meshNode);
 
 	// Add the node to the maps for faster access
-	m_nameToSceneNodesMap[treeName] = meshNode;
-	treeItemToSceneNodesMap[meshNode->getTreeItemID()] = meshNode;
-	modelItemToSceneNodesMap[modelEntityID] = meshNode;
+	storeInMaps(meshNode);
 
 	// Now find the owning mesh
 	SceneNodeBase *masterMeshNode = parentNode;
@@ -3290,10 +3254,10 @@ void Model::addVisualizationCartesianMeshItemNode(const std::string &treeName, u
 	meshNode->setMesh(dynamic_cast<SceneNodeCartesianMesh*>(masterMeshNode));
 
 	// Set the data
-	meshNode->setColor(color[0], color[1], color[2]);
-	meshNode->setFacesList(facesList);
+	meshNode->setColor(_color[0], _color[1], _color[2]);
+	meshNode->setFacesList(_facesList);
 
-	if (isHidden)
+	if (_isHidden)
 	{
 		setItemVisibleState(meshNode, false);
 	}
@@ -3343,10 +3307,10 @@ void Model::loadRemainingData(const std::string& _entityName, ot::WidgetViewBase
 	}
 }
 
-void Model::addVTKNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
+void Model::addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
 {
 	// Check whether the item already exists
-	SceneNodeBase *item = modelItemToSceneNodesMap[modelEntityID];
+	SceneNodeBase *item = modelItemToSceneNodesMap[_treeItem.getEntityID()];
 
 	SceneNodeVTK *vtkNode = nullptr;
 
@@ -3369,13 +3333,10 @@ void Model::addVTKNode(const std::string &treeName, unsigned long long modelEnti
 
 		vtkNode = new SceneNodeVTK;
 
-		vtkNode->setName(treeName);
-		vtkNode->setModelEntityID(modelEntityID);
-		vtkNode->setOldTreeIcons(treeIcons);
-		vtkNode->setEditable(isEditable);
+		vtkNode->setTreeItem(_treeItem);
 
 		// Get the parent scene node
-		SceneNodeBase *parentNode = getParentNode(treeName);
+		SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
 		assert(parentNode != nullptr); // We assume that the parent node already exists
 
 									   // Deal with potentially corrupt models
@@ -3393,7 +3354,7 @@ void Model::addVTKNode(const std::string &treeName, unsigned long long modelEnti
 		addSceneNodesToTree(vtkNode);
 
 		// Make the node invisible, if needed
-		if (isHidden)
+		if (_isHidden)
 		{
 			setItemVisibleState(vtkNode, false);
 		}
@@ -3401,18 +3362,16 @@ void Model::addVTKNode(const std::string &treeName, unsigned long long modelEnti
 		vtkNode->setModel(this);
 
 		// Now update the vtk node
-		vtkNode->updateVTKNode(projectName, visualizationDataID, visualizationDataVersion);
+		vtkNode->updateVTKNode(_projectName, _dataEntityID, _dataEntityVersion);
 
 		// Add the node to the maps for faster access
-		m_nameToSceneNodesMap[treeName] = vtkNode;
-		treeItemToSceneNodesMap[vtkNode->getTreeItemID()] = vtkNode;
-		modelItemToSceneNodesMap[modelEntityID] = vtkNode;
+		storeInMaps(vtkNode);
 	}
 }
 
-void Model::updateVTKNode(unsigned long long modelEntityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
+void Model::updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
 {
-	SceneNodeVTK *vtkNode = dynamic_cast<SceneNodeVTK *>(modelItemToSceneNodesMap[modelEntityID]);
+	SceneNodeVTK *vtkNode = dynamic_cast<SceneNodeVTK *>(modelItemToSceneNodesMap[_entityID]);
 	assert(vtkNode != nullptr);
 	if (vtkNode == nullptr) return;
 

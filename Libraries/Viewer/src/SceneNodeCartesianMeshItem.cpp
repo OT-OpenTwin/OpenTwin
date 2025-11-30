@@ -39,22 +39,22 @@
 #include <osg/LightModel>
 
 SceneNodeCartesianMeshItem::SceneNodeCartesianMeshItem() :
-	model(nullptr),
-	mesh(nullptr),
-	colorRGB{0.0, 0.0, 0.0},
-	isVolume(false)
+	m_model(nullptr),
+	m_mesh(nullptr),
+	m_colorRGB{0.0, 0.0, 0.0},
+	m_isVolume(false)
 {
 
 }
 
 SceneNodeCartesianMeshItem::~SceneNodeCartesianMeshItem()
 {
-	getMesh()->removeOwner(this, faceID);
+	getMesh()->removeOwner(this, m_faceID);
 }
 
 void SceneNodeCartesianMeshItem::updateVisibility(void)
 {
-	getMesh()->updateFaceStatus(faceID, false);
+	getMesh()->updateFaceStatus(m_faceID, false);
 }
 
 void SceneNodeCartesianMeshItem::setTransparent(bool t)
@@ -95,11 +95,11 @@ void SceneNodeCartesianMeshItem::setHighlighted(bool h)
 	updateVisibility();
 }
 
-void SceneNodeCartesianMeshItem::setFacesList(std::vector<int> &faces)
+void SceneNodeCartesianMeshItem::setFacesList(const std::vector<int>& _faces)
 { 
-	faceID = faces; 
+	m_faceID = _faces;
 
-	for (auto face : faceID)
+	for (int face : m_faceID)
 	{
 		getMesh()->addOwner(this, face);
 	}

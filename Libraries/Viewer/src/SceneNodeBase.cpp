@@ -67,10 +67,8 @@ SceneNodeBase::~SceneNodeBase() {
 }
 
 void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember("Name", ot::JsonString(m_name, _allocator), _allocator);
+	_object.AddMember("TreeItem", ot::JsonObject(m_treeItem, _allocator), _allocator);
 	_object.AddMember("TreeItemID", m_treeItemID, _allocator);
-	_object.AddMember("ModelEntityID", m_modelEntityID, _allocator);
-	_object.AddMember("Editable", m_editable, _allocator);
 	_object.AddMember("Visible", m_visible, _allocator);
 	_object.AddMember("Selected", m_selected, _allocator);
 	_object.AddMember("SelectionFromNavigationTree", m_selectionFromNavigationTree, _allocator);
@@ -78,7 +76,6 @@ void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocat
 	_object.AddMember("Wireframe", m_wireframe, _allocator);
 	_object.AddMember("Highlighted", m_highlighted, _allocator);
 	_object.AddMember("Offset", m_offset, _allocator);
-	_object.AddMember("SelectChildren", m_selectChildren, _allocator);
 	_object.AddMember("ManageVisibilityOfParent", m_manageVisibilityOfParent, _allocator);
 	_object.AddMember("ManageVisibilityOfChildren", m_manageVisibilityOfChildren, _allocator);
 	_object.AddMember("SelectionHandled", m_selectionHandled, _allocator);
@@ -187,7 +184,7 @@ void SceneNodeBase::setHighlighted(bool _highlight)
 	if (m_highlighted != _highlight) 
 	{
 		m_highlighted = _highlight;
-		if (m_selectChildren) 
+		if (getSelectChildren()) 
 		{ 
 			for (auto child : m_children)
 			{

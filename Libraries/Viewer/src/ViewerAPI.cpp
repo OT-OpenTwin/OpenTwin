@@ -236,7 +236,7 @@ void ViewerAPI::freeze3DView(unsigned long long osgModelID, bool flag)
 	getModelFromID(osgModelID)->freeze3DView(flag);
 }
 
-void ViewerAPI::addNodeFromFacetData(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, double _surfaceColorRGB[3], double _edgeColorRGB[3], bool _backFaceCulling,
+void ViewerAPI::addNodeFromFacetData(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, double _surfaceColorRGB[3], double _edgeColorRGB[3], bool _backFaceCulling,
 	double _offsetFactor, std::vector<Geometry::Node>& _nodes, std::list<Geometry::Triangle>& _triangles, std::list<Geometry::Edge>& _edges, std::map<ot::UID, std::string>& _faceNameMap, std::string& _errors,
 	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected)
 {
@@ -244,7 +244,7 @@ void ViewerAPI::addNodeFromFacetData(ot::UID _osgModelID, const ot::EntityTreeIt
 	{
 		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 		
-		model->addNodeFromFacetData(_treeItem, _surfaceColorRGB, _edgeColorRGB, _backFaceCulling, _offsetFactor, _nodes, _triangles, _edges, _faceNameMap,
+		model->addNodeFromFacetData(_treeItem, false, _surfaceColorRGB, _edgeColorRGB, _backFaceCulling, _offsetFactor, _nodes, _triangles, _edges, _faceNameMap,
 								    _errors, _manageParentVisibility, _manageChildVisibility, _showWhenSelected);
 		cancelAllRubberbands(_osgModelID);
 	}
@@ -254,18 +254,17 @@ void ViewerAPI::addNodeFromFacetData(ot::UID _osgModelID, const ot::EntityTreeIt
 	}
 }
 
-void ViewerAPI::addNodeFromFacetDataBase(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, 
-										 const std::string &textureType, bool reflective, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-										 double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long entityID, unsigned long long version,
-										 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation)
+void ViewerAPI::addNodeFromFacetDataBase(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, double _surfaceColorRGB[3], double _edgeColorRGB[3], const std::string& _materialType, const std::string& _textureType, bool _reflective, bool _backFaceCulling,
+	double _offsetFactor, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion,
+	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addNodeFromFacetDataBase(treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective, modelEntityID, treeIcons, backFaceCulling, offsetFactor, 
-										isHidden, isEditable, projectName, entityID, version, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation);
-		cancelAllRubberbands(osgModelID);
+		model->addNodeFromFacetDataBase(_treeItem, _isHidden, _surfaceColorRGB, _edgeColorRGB, _materialType, _textureType, _reflective, _backFaceCulling, _offsetFactor, 
+										_projectName, _dataEntityID, _dataEntityVersion, _manageParentVisibility, _manageChildVisibility, _showWhenSelected, _transformation);
+		cancelAllRubberbands(_osgModelID);
 	}
 	catch (std::out_of_range)
 	{
@@ -273,13 +272,13 @@ void ViewerAPI::addNodeFromFacetDataBase(ot::UID osgModelID, const std::string &
 	}
 }
 
-void ViewerAPI::addVisualizationContainerNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable, const ot::VisualisationTypes& _visualisationTypes)
+void ViewerAPI::addVisualizationContainerNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addVisualizationContainerNode(treeName, modelEntityID, treeIcons, editable, _visualisationTypes);
+		model->addVisualizationContainerNode(_treeItem, _visualisationTypes);
 	}
 	catch (std::out_of_range)
 	{
@@ -288,13 +287,13 @@ void ViewerAPI::addVisualizationContainerNode(ot::UID osgModelID, const std::str
 }
 
 
-void ViewerAPI::addVisualizationNode(ot::UID osgModelID, const std::string& treeName, unsigned long long modelEntityID, const OldTreeIcon& treeIcons, bool editable, ot::VisualisationTypes _visualisationTypes)
+void ViewerAPI::addVisualizationNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes)
 {
 	try
 	{
-		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addSceneNode(treeName, modelEntityID, treeIcons, editable,_visualisationTypes);
+		model->addSceneNode(_treeItem, _visualisationTypes);
 	}
 	catch (std::out_of_range)
 	{
@@ -302,13 +301,13 @@ void ViewerAPI::addVisualizationNode(ot::UID osgModelID, const std::string& tree
 	}
 }
 
-void ViewerAPI::addVTKNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
+void ViewerAPI::addVTKNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addVTKNode(treeName, modelEntityID, treeIcons, isHidden, editable, projectName, visualizationDataID, visualizationDataVersion);
+		model->addVTKNode(_treeItem, _isHidden, _projectName, _dataEntityID, _dataEntityVersion);
 	}
 	catch (std::out_of_range)
 	{
@@ -316,13 +315,13 @@ void ViewerAPI::addVTKNode(ot::UID osgModelID, const std::string &treeName, unsi
 	}
 }
 
-void ViewerAPI::updateVTKNode(ot::UID osgModelID, unsigned long long modelEntityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
+void ViewerAPI::updateVTKNode(ot::UID _osgModelID, ot::UID _entityID, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->updateVTKNode(modelEntityID, projectName, visualizationDataID, visualizationDataVersion);
+		model->updateVTKNode(_entityID, _projectName, _dataEntityID, _dataEntityVersion);
 	}
 	catch (std::out_of_range)
 	{
@@ -330,21 +329,20 @@ void ViewerAPI::updateVTKNode(ot::UID osgModelID, unsigned long long modelEntity
 	}
 }
 
-void ViewerAPI::addVisualizationAnnotationNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, 
-											   const OldTreeIcon &treeIcons, bool isHidden,
-										       const double edgeColorRGB[3],
-											   const std::vector<std::array<double, 3>> &points,
-											   const std::vector<std::array<double, 3>> &points_rgb,
-											   const std::vector<std::array<double, 3>> &triangle_p1,
-											   const std::vector<std::array<double, 3>> &triangle_p2,
-											   const std::vector<std::array<double, 3>> &triangle_p3,
-											   const std::vector<std::array<double, 3>> &triangle_rgb)
+void ViewerAPI::addVisualizationAnnotationNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem,
+	bool _isHidden, const double _edgeColorRGB[3],
+	const std::vector<std::array<double, 3>>& _points,
+	const std::vector<std::array<double, 3>>& _pointsRgb,
+	const std::vector<std::array<double, 3>>& _triangleP1,
+	const std::vector<std::array<double, 3>>& _triangleP2,
+	const std::vector<std::array<double, 3>>& _triangleP3,
+	const std::vector<std::array<double, 3>>& _triangleRgb)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addVisualizationAnnotationNode(name, modelEntityID, treeIcons, isHidden, edgeColorRGB, points, points_rgb, triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
+		model->addVisualizationAnnotationNode(_treeItem, _isHidden, _edgeColorRGB, _points, _pointsRgb, _triangleP1, _triangleP2, _triangleP3, _triangleRgb);
 	}
 	catch (std::out_of_range)
 	{
@@ -352,13 +350,13 @@ void ViewerAPI::addVisualizationAnnotationNode(ot::UID osgModelID, const std::st
 	}
 }
 
-void ViewerAPI::addVisualizationAnnotationNodeDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long version)
+void ViewerAPI::addVisualizationAnnotationNodeDataBase(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addVisualizationAnnotationNodeDataBase(name, modelEntityID, treeIcons, isHidden, projectName, entityID, version);
+		model->addVisualizationAnnotationNodeDataBase(_treeItem, _isHidden, _projectName, _dataEntityID, _dataEntityVersion);
 	}
 	catch (std::out_of_range)
 	{
@@ -366,13 +364,13 @@ void ViewerAPI::addVisualizationAnnotationNodeDataBase(ot::UID osgModelID, const
 	}
 }
 
-void ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, unsigned long long entityID, unsigned long long version)
+void ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, double _edgeColorRGB[3], bool _displayTetEdges, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addVisualizationMeshNodeFromFacetDataBase(name, modelEntityID, treeIcons, edgeColorRGB, displayTetEdges, projectName, entityID, version);
+		model->addVisualizationMeshNodeFromFacetDataBase(_treeItem, _edgeColorRGB, _displayTetEdges, _projectName, _dataEntityID, _dataEntityVersion);
 	}
 	catch (std::out_of_range)
 	{
@@ -380,14 +378,14 @@ void ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(ot::UID osgModelID, co
 	}
 }
 
-void ViewerAPI::addVisualizationCartesianMeshNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, double edgeColorRGB[3], double meshLineColorRGB[3], bool showMeshLines, const std::vector<double> &meshCoordsX, const std::vector<double> &meshCoordsY, const std::vector<double> &meshCoordsZ,
-												  const std::string &projectName, unsigned long long faceListEntityID, unsigned long long faceListEntityVersion, unsigned long long nodeListEntityID, unsigned long long nodeListEntityVersion)
+void ViewerAPI::addVisualizationCartesianMeshNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, double _edgeColorRGB[3], double _meshLineColorRGB[3], bool _showMeshLines, const std::vector<double>& _meshCoordsX, const std::vector<double>& _meshCoordsY, const std::vector<double>& _meshCoordsZ,
+	const std::string& _projectName, ot::UID _faceListEntityID, ot::UID _faceListEntityVersion, ot::UID _nodeListEntityID, ot::UID _nodeListEntityVersion)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addVisualizationCartesianMeshNode(name, modelEntityID, treeIcons, isHidden, edgeColorRGB, meshLineColorRGB, showMeshLines, meshCoordsX, meshCoordsY, meshCoordsZ, projectName, faceListEntityID, faceListEntityVersion, nodeListEntityID, nodeListEntityVersion);
+		model->addVisualizationCartesianMeshNode(_treeItem, _isHidden, _edgeColorRGB, _meshLineColorRGB, _showMeshLines, _meshCoordsX, _meshCoordsY, _meshCoordsZ, _projectName, _faceListEntityID, _faceListEntityVersion, _nodeListEntityID, _nodeListEntityVersion);
 	}
 	catch (std::out_of_range)
 	{
@@ -445,13 +443,13 @@ void ViewerAPI::notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::st
 	}
 }
 
-void ViewerAPI::addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3])
+void ViewerAPI::addVisualizationCartesianMeshItemNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::vector<int>& _facesList, double _color[3])
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addVisualizationCartesianMeshItemNode(name, modelEntityID, treeIcons, isHidden, facesList, color);
+		model->addVisualizationCartesianMeshItemNode(_treeItem, _isHidden, _facesList, _color);
 	}
 	catch (std::out_of_range)
 	{
@@ -459,13 +457,13 @@ void ViewerAPI::addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const 
 	}
 }
 
-void ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long version, long long tetEdgesID, long long tetEdgesVersion)
+void ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _tetEdgesID, ot::UID _tetEdgesVersion)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addVisualizationMeshItemNodeFromFacetDataBase(name, modelEntityID, treeIcons, isHidden, projectName, entityID, version, tetEdgesID, tetEdgesVersion);
+		model->addVisualizationMeshItemNodeFromFacetDataBase(_treeItem, _isHidden, _projectName, _tetEdgesID, _tetEdgesVersion);
 	}
 	catch (std::out_of_range)
 	{
@@ -551,11 +549,11 @@ ot::SelectionHandlingResult ViewerAPI::setSelectedTreeItems(const ot::SelectionD
 	return result;
 }
 
-void ViewerAPI::executeAction(unsigned long long buttonID)
+void ViewerAPI::executeAction(ot::UID _buttonID)
 {
 	if (GlobalModel::instance() == nullptr) return;
 
-	GlobalModel::instance()->executeAction(buttonID);
+	GlobalModel::instance()->executeAction(_buttonID);
 }
 
 void ViewerAPI::setHoverTreeItem(ot::UID hoverItemID)
