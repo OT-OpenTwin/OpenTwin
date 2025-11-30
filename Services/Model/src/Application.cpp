@@ -1008,6 +1008,7 @@ void Application::initialize() {
 	}
 
 	m_model = new Model(this->getProjectName(), this->getProjectType(), this->getCollectionName());
+	m_model->initialize();
 }
 
 void Application::uiConnected(ot::components::UiComponent* _ui) {

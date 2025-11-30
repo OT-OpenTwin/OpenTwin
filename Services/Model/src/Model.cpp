@@ -157,21 +157,6 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	m_deleteButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Delete));
 	m_deleteButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonHandler.connectToolBarButton(m_deleteButton, this, &Model::handleDeleteSelectedShapes);
-	
-	// Create a new project structure
-	resetToNew();
-
-	// Create the UI ribbon and actions
-	auto ui = Application::instance()->getUiComponent();
-	if (ui)
-	{
-		enableQueuingHttpRequests(true);
-		setupUIControls(ui);
-		enableQueuingHttpRequests(false);
-	}
-
-	// Here we set a dummy project name (needs to be changed later on)
-	DataBase::instance().setCollectionName(collectionName);
 }
 
 void Model::clearAll()
@@ -407,6 +392,22 @@ Model::~Model()
 		delete stateManager;
 		stateManager = nullptr;
 	}
+}
+
+void Model::initialize() {
+	// Create a new project structure
+	resetToNew();
+
+	// Create the UI ribbon and actions
+	auto ui = Application::instance()->getUiComponent();
+	if (ui) {
+		enableQueuingHttpRequests(true);
+		setupUIControls(ui);
+		enableQueuingHttpRequests(false);
+	}
+
+	// Here we set a dummy project name (needs to be changed later on)
+	DataBase::instance().setCollectionName(collectionName);
 }
 
 void Model::detachAllViewer()

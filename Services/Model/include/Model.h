@@ -68,6 +68,7 @@ public:
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName);
 	virtual ~Model();
+	void initialize();
 
 	ot::UID				createEntityUID();
 	void			addEntityToMap(EntityBase *entity);
