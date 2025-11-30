@@ -60,7 +60,7 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
 	std::wstring devEnvRootW = ot::String::toWString(devEnvRoot);
 
-	std::wstring environmentsBase, home, dllPath, binPath;
+	std::wstring environmentsBase, home, dllPath, binPath, customEnvBase;
 #ifdef _DEBUG
 	const std::string pythonRootEnvVarName = "OT_PYTHON_ROOT";
 	const char* pythonRoot = ot::OperatingSystem::getEnvironmentVariable(pythonRootEnvVarName.c_str());
@@ -72,16 +72,6 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	dllPath = +L"\\DLLs\\Debug";
 	binPath = pythonRootW + L"\\Interpreter\\Debug";
 
-#elif _RELEASEDEBUG
-	const std::string pythonRootEnvVarName = "OT_PYTHON_ROOT";
-	const char* pythonRoot = ot::OperatingSystem::getEnvironmentVariable(pythonRootEnvVarName.c_str());
-	assert(pythonRoot != nullptr);
-		
-	std::wstring pythonRootW = ot::String::toWString(pythonRoot);
-	environmentsBase = pythonRootW + L"\\Environments";
-	home = environmentsBase + std::wstring(L"\\CoreEnvironment");
-	dllPath = + L"\\DLLs\\Release";
-	binPath = pythonRootW + L"\\Interpreter\\Release";
 #else
 	// If not found, we are in deployment mode
 	if (devEnvRoot == nullptr)
@@ -98,7 +88,7 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 
 	//Here we have the standart libs
 	home = environmentsBase + std::wstring(L"\\CoreEnvironment");
-
+	customEnvBase = environmentsBase;
 #endif
 
 	std::list<std::wstring> lookupPaths;
