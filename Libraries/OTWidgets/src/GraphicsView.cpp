@@ -208,7 +208,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	OT_LOG_D("Item added { \"UID\": " + std::to_string(_item->getGraphicsItemUid()) + " }");
 
 	// Check if any connection in the buffer can be created now
-	for (auto connection : m_connections) {
+	for (auto& connection : m_connections) {
 		if (connection.second->getConfiguration().getOriginUid() == _item->getGraphicsItemUid()) {
 			GraphicsItem* connector = _item->findItem(connection.second->getConfiguration().getOriginConnectable());
 			if (connector) {
