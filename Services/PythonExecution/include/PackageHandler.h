@@ -23,6 +23,7 @@
 #include <list>
 #include "EntityPythonManifest.h"
 #include "PythonWrapper.h"
+#include <map>
 
 class PackageHandler
 {
@@ -52,6 +53,9 @@ private:
 	};
 	
 	PackageHandler() = default;
+
+	std::map<std::string, std::string> m_installedPackageVersionsByName;
+
 	void requestRestart();
 	
 	EntityPythonManifest* m_currentManifest = nullptr;
@@ -66,5 +70,8 @@ private:
 	ot::UID getUIDFromString(const std::string& _uid);
 	std::string getListOfInstalledPackages();
 
+	void buildPackageMap(const std::string& _packageList);
+
 	std::string trim(const std::string& _line);
+	std::pair<std::string, std::string> splitPackageIntoNameAndVersion(const std::string& _requirementLine);
 };

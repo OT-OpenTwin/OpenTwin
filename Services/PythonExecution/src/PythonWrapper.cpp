@@ -104,7 +104,6 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	std::list<std::wstring> lookupPaths;
 
 	lookupPaths.push_back(environmentsBase + std::wstring(L"\\PythonBuildTools"));
-	lookupPaths.push_back(environmentsBase + std::wstring(L"\\PyritEnvironment"));
 	lookupPaths.push_back(home);
 	lookupPaths.push_back(home + L"\\Lib");
 	lookupPaths.push_back(home+ dllPath);
@@ -124,8 +123,10 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 
 	PyConfig config;
 	PyConfig_InitPythonConfig(&config);
+	config.isolated = 1;
+	config.use_environment = 0;
 	config.module_search_paths_set = 1;
-
+	config.site_import = 1;
 	std::string debugPathOverview = "";
 	for(std::wstring& pathComponent : lookupPaths) {
 		PyWideStringList_Append(&config.module_search_paths, pathComponent.c_str());
@@ -139,8 +140,6 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 		
 	int errorCode = PyImport_AppendInittab("OpenTwin", PythonExtensions::PyInit_OpenTwin);
 	
-	Py_DontWriteBytecodeFlag = 1;
-	Py_QuietFlag = 1;
 	Py_InitializeFromConfig(&config);
 	if (Py_IsInitialized() != 1) {
 		throw PythonException();
@@ -148,6 +147,7 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	m_interpreterSuccessfullyInitialized = true;
 	
 	OutputPipeline::instance().initiateRedirect();
+
 }
 
 

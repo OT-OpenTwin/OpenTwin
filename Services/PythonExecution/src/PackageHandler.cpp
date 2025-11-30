@@ -85,6 +85,11 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
     {
         m_environmentState = EnvironmentState::empty;
     }
+    OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
+    const std::string installedPackages = getListOfInstalledPackages();
+    OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
+
+    buildPackageMap(installedPackages);
 
 	assert(m_currentManifest != nullptr);
     std::optional<std::list<std::string>> packagesInManifest = m_currentManifest->getManifestPackages();
@@ -118,7 +123,7 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
 void PackageHandler::extractMissingPackages(const std::string& _scriptContent)
 {
     std::list<std::string> moduleNames = parseImportedPackages(_scriptContent);
-
+    
     for (const std::string moduleName : moduleNames)
     {
         if (!isPackageInstalled(moduleName))
@@ -176,6 +181,8 @@ void PackageHandler::importMissingPackages()
             ot::NewModelStateInfo newModelStateInfo;
             newModelStateInfo.addTopologyEntity(*m_currentManifest);
             ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, "Manifest requires a new environment");
+
+            buildPackageMap(newManifest);
         }
         m_uninstalledPackages.clear();
         OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
@@ -199,7 +206,6 @@ void PackageHandler::requestRestart()
 {
     Application::instance().getCommunicationHandler().writeToServer("Restart");
 }
-
 
 const std::list<std::string> PackageHandler::parseImportedPackages(const std::string _scriptContent)
 {
@@ -252,17 +258,56 @@ const std::list<std::string> PackageHandler::parseImportedPackages(const std::st
     return _line.substr(start, end - start + 1);
 }
 
+ std::pair<std::string, std::string> PackageHandler::splitPackageIntoNameAndVersion(const std::string& _requirementLine)
+ {
+     const std::string delim = "==";
+     size_t pos = _requirementLine.find(delim);
+
+     if (pos != std::string::npos)
+     {
+        std::string package = _requirementLine.substr(0, pos);
+        std::string version = _requirementLine.substr(pos + delim.length());
+        
+        auto pair = std::make_pair(package, version);
+        return pair;
+     }
+     else
+     {
+        return std::make_pair("", "");
+     }
+ }
 
 bool PackageHandler::isPackageInstalled(const std::string& _packageName)
 {
-    CPythonObjectNew module = PyImport_ImportModule(_packageName.c_str());
-    if (module) 
+    //First option, does not work with packages like tensorflow
+    CPythonObjectNew temp = PyImport_ImportModule(_packageName.c_str());
+    bool importableModule = temp != nullptr;
+    if (importableModule)
     {
-        return true;  // Module exists
+        return true;
     }
-    else {
-        PyErr_Clear(); // Clear import error
-        return false; // Module not found
+    else
+    {
+        //Alternative way checks the list of pip insstalled packages.
+        auto nameAndVersion = splitPackageIntoNameAndVersion(_packageName);
+        if (!nameAndVersion.first.empty())
+        {
+            auto installedPackage = m_installedPackageVersionsByName.find(nameAndVersion.first);
+            if (installedPackage != m_installedPackageVersionsByName.end())
+            {
+                bool fits = installedPackage->second == nameAndVersion.second;
+                return fits;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            bool found = m_installedPackageVersionsByName.find(_packageName) != m_installedPackageVersionsByName.end();
+            return found;
+        }
     }
 }
 
@@ -427,5 +472,17 @@ std::string PackageHandler::getListOfInstalledPackages()
     return allInstalledPackages;
 }
 
-
-
+void PackageHandler::buildPackageMap(const std::string& _packageList)
+{
+    std::stringstream stringStream(_packageList);
+    std::string line;
+    const std::string delim = "==";
+    while (std::getline(stringStream, line))
+    {
+        auto nameAndVersion = splitPackageIntoNameAndVersion(line);
+        if (!nameAndVersion.first.empty())
+        {
+            m_installedPackageVersionsByName[nameAndVersion.first] = nameAndVersion.second;
+        }
+    }
+}
