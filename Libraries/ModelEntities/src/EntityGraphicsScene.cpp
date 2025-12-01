@@ -20,6 +20,7 @@
 #include "EntityGraphicsScene.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/VisualisationTypes.h"
+#include "DataBase.h"
 
 static EntityFactoryRegistrar<EntityGraphicsScene> registrar(EntityGraphicsScene::className());
 
@@ -106,6 +107,6 @@ void EntityGraphicsScene::readSpecificDataFromDataBase(bsoncxx::document::view& 
 
 	auto flagsIt = _docView.find("SceneFlags");
 	if (flagsIt != _docView.end()) {
-		m_sceneFlags = SceneFlags(flagsIt->get_int64().value);
+		m_sceneFlags = SceneFlags(DataBase::getIntFromView(_docView, "SceneFlags"));
 	}
 }
