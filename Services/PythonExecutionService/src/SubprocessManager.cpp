@@ -23,10 +23,13 @@
 #include "SubprocessManager.h"
 #include "SubprocessHandler.h"
 #include "CommunicationHandler.h"
+#include "DataBase.h"
 
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 // Qt header
 #include <QtCore/qcoreapplication.h>
@@ -155,7 +158,37 @@ bool SubprocessManager::isConnected() {
 }
 
 void SubprocessManager::shutdownSubprocess(void) {
+	m_communicationHandler->close();
+	m_communicationHandler->cleanupAfterCrash();
+	
 	m_subprocessHandler->shutdownSubprocess();
+}
+
+
+void SubprocessManager::restartSubprocess(void)
+{
+	m_communicationHandler->close();
+	m_communicationHandler->cleanupAfterCrash();
+	m_subprocessHandler->shutdownSubprocess();
+	
+	m_communicationHandler->restart("TestServerPython");
+
+	DataBaseInfo info;
+	info.setSiteID(Application::instance()->getSiteID());
+	info.setDataBaseUrl(DataBase::instance().getDataBaseServerURL());
+	info.setCollectionName(Application::instance()->getCollectionName());
+	info.setUserName(DataBase::instance().getUserName());
+	info.setUserPassword(DataBase::instance().getUserPassword());
+	setDataBaseInfo(info);
+
+	if (Application::instance()->getUiComponent())
+	{
+		setFrontendUrl(Application::instance()->getUiComponent()->getServiceURL());
+	}
+	
+	if (Application::instance()->getModelComponent()) {
+		setModelUrl(Application::instance()->getModelComponent()->getServiceURL());
+	}
 }
 
 //! @brief Waits for currently 30 sec and checks in an interval of 10 msec, if the qt server is listening

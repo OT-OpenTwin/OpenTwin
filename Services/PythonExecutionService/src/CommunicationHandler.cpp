@@ -87,6 +87,12 @@ void CommunicationHandler::cleanupAfterCrash(void) {
 	this->slotClientDisconnected();
 }
 
+void CommunicationHandler::restart(const std::string& _serverName)
+{
+
+	this->listen(QString::fromStdString(_serverName));
+}
+
 void CommunicationHandler::slotMessageReceived(void) {
 	if (!m_client) {
 		OT_LOG_EA("Client not set");

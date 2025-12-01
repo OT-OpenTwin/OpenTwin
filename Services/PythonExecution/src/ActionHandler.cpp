@@ -212,6 +212,7 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 	}
 	catch (ExceptionRestartRequired&)
 	{
+		OT_LOG_D("Restart of the interpreter necessary.\n");
 		ot::ReturnMessage message;
 		message.setStatus(ot::ReturnMessage::Ok);
 		message.setWhat("<Restart>");

@@ -155,7 +155,7 @@ std::string Application::handleForwardToSubprocess(ot::JsonDocument& _doc)
 	ot::ReturnMessage message = ot::ReturnMessage::fromJson(returnMessage);
 	if (message.getWhat() == "<Restart>")
 	{
-		m_subprocessManager->shutdownSubprocess();
+		m_subprocessManager->restartSubprocess();
 
 		if (!m_subprocessManager->sendRequest(_doc, returnMessage))
 		{

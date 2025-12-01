@@ -59,7 +59,7 @@ public:
 	{
 		m_manifestUID = _manifestUID;
 	}
-
+	void restart(const std::string& _serverName);
 private Q_SLOTS:
 	void slotNewConnection(void);
 	void slotMessageReceived(void);

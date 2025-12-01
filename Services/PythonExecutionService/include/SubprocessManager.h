@@ -64,6 +64,7 @@ public:
 	bool isConnected();
 
 	void shutdownSubprocess(void);
+	void restartSubprocess(void);
 private:
 
 
