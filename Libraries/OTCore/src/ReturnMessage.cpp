@@ -28,6 +28,7 @@ std::string ot::ReturnMessage::statusToString(ot::ReturnMessage::ReturnMessageSt
 	case ot::ReturnMessage::Failed: return "Failed";
 	case ot::ReturnMessage::True: return "True";
 	case ot::ReturnMessage::False: return "False";
+	case ot::ReturnMessage::Retry: return "Retry";
 	default:
 		OT_LOG_EA("Unknown Return Message Status");
 		return "Failed";
@@ -39,6 +40,7 @@ ot::ReturnMessage::ReturnMessageStatus ot::ReturnMessage::stringToStatus(const s
 	else if (_status == statusToString(ReturnMessage::Failed)) return ReturnMessage::Failed;
 	else if (_status == statusToString(ReturnMessage::True)) return ReturnMessage::True;
 	else if (_status == statusToString(ReturnMessage::False)) return ReturnMessage::False;
+	else if (_status == statusToString(ReturnMessage::Retry)) return ReturnMessage::Retry;
 	else {
 		OT_LOG_EAS("Unknown Return Message Status \"" + _status + "\"");
 		return ReturnMessage::Failed;
