@@ -317,7 +317,7 @@ bool PackageHandler::isPackageInstalled(const std::string& _packageName)
 
 void PackageHandler::installPackage(const std::string& _packageName)
 {
-    Application::instance().getCommunicationHandler().writeToServer("OUTPUT:Installing package: " + _packageName);
+    Application::instance().getCommunicationHandler().writeToServer("OUTPUT:Installing package: " + _packageName + "\n");
     // Import sys module
     CPythonObjectNew sys_module = PyImport_ImportModule("sys");
     if (!sys_module) 
