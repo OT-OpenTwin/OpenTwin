@@ -149,18 +149,15 @@ std::string Application::handleForwardToSubprocess(ot::JsonDocument& _doc)
 
 	if (!m_subprocessManager->sendRequest(_doc, returnMessage)) 
 	{
-		ot::ReturnMessage message;
-		message.fromJson(returnMessage);
-		if (message.getWhat() == "<Restart>")
-		{
-			m_subprocessManager->shutdownSubprocess();
+		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send request").toJson();
+	}
 
-			if (!m_subprocessManager->sendRequest(_doc, returnMessage))
-			{
-				returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send request").toJson();
-			}
-		}
-		else
+	ot::ReturnMessage message = ot::ReturnMessage::fromJson(returnMessage);
+	if (message.getWhat() == "<Restart>")
+	{
+		m_subprocessManager->shutdownSubprocess();
+
+		if (!m_subprocessManager->sendRequest(_doc, returnMessage))
 		{
 			returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send request").toJson();
 		}
