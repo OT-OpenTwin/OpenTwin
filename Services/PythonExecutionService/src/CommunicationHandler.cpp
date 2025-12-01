@@ -103,7 +103,7 @@ void CommunicationHandler::slotMessageReceived(void) {
 void CommunicationHandler::slotClientDisconnected(void) {
 	OT_LOG_D("Client disconnected");
 	if (m_client) {
-		delete m_client;
+		m_client->deleteLater();
 		m_client = nullptr;
 	}
 
