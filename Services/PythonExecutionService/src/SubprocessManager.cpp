@@ -167,29 +167,19 @@ void SubprocessManager::shutdownSubprocess(void) {
 
 void SubprocessManager::restartSubprocess(void)
 {
-	m_communicationHandler->close();
-	m_communicationHandler->cleanupAfterCrash();
 	m_subprocessHandler->shutdownSubprocess();
-	
+	std::unique_lock<std::mutex> lock(m_mutex);
+
+#ifdef  _DEBUG
 	m_communicationHandler->restart("TestServerPython");
+#else
 
-	DataBaseInfo info;
-	info.setSiteID(Application::instance()->getSiteID());
-	info.setDataBaseUrl(DataBase::instance().getDataBaseServerURL());
-	info.setCollectionName(Application::instance()->getCollectionName());
-	info.setUserName(DataBase::instance().getUserName());
-	info.setUserPassword(DataBase::instance().getUserPassword());
-	setDataBaseInfo(info);
-
-	if (Application::instance()->getUiComponent())
-	{
-		setFrontendUrl(Application::instance()->getUiComponent()->getServiceURL());
-	}
-	
-	if (Application::instance()->getModelComponent()) {
-		setModelUrl(Application::instance()->getModelComponent()->getServiceURL());
-	}
+	const std::string hexString = ot::String::toBase64Url(Application::instance()->getProjectName());
+	m_communicationHandler->restart(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE "_" + hexString);
+#endif //  _DEBUG
+	m_restarted.wait(lock);
 }
+
 
 //! @brief Waits for currently 30 sec and checks in an interval of 10 msec, if the qt server is listening
 bool SubprocessManager::ensureWorkerRunning(void) {

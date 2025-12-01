@@ -33,6 +33,7 @@
 
 // std header
 #include <thread>
+#include "SubprocessManager.h"
 
 CommunicationHandler::CommunicationHandler(SubprocessManager* _manager, const std::string& _serverName)
 	: m_manager(_manager), m_serverName(_serverName), m_client(nullptr), m_clientState(ClientState::Disconnected),
@@ -89,8 +90,7 @@ void CommunicationHandler::cleanupAfterCrash(void) {
 
 void CommunicationHandler::restart(const std::string& _serverName)
 {
-
-	this->listen(QString::fromStdString(_serverName));
+	QMetaObject::invokeMethod(this, &CommunicationHandler::slotRestart, Qt::QueuedConnection, _serverName);
 }
 
 void CommunicationHandler::slotMessageReceived(void) {
@@ -359,6 +359,17 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 	else {
 		OT_LOG_W("Client send unexpected message: \"" + _message + "\"");
 	}
+}
+
+void CommunicationHandler::slotRestart(const std::string& _serverName)
+{
+	if (m_client) 
+	{
+		m_client->abort();	
+	}
+	
+	cleanupAfterCrash();
+	m_manager->socketDeltedCompleted();
 }
 
 bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response) {

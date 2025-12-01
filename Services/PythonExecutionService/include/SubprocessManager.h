@@ -26,6 +26,8 @@
 #include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/CoreTypes.h"
+#include <condition_variable>
+
 // std header
 #include <mutex>
 
@@ -65,6 +67,12 @@ public:
 
 	void shutdownSubprocess(void);
 	void restartSubprocess(void);
+
+	void socketDeltedCompleted()
+	{
+		m_restarted.notify_one();
+	}
+
 private:
 
 
@@ -83,6 +91,7 @@ private:
 	std::mutex m_mutex;
 
 	Application* m_app;
+	std::condition_variable m_restarted;
 
 	SubprocessHandler* m_subprocessHandler;
 	CommunicationHandler* m_communicationHandler;

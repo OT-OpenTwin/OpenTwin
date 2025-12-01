@@ -60,11 +60,13 @@ public:
 		m_manifestUID = _manifestUID;
 	}
 	void restart(const std::string& _serverName);
+
 private Q_SLOTS:
 	void slotNewConnection(void);
 	void slotMessageReceived(void);
 	void slotClientDisconnected(void);
 	void slotProcessMessage(std::string _message);
+	void slotRestart(const std::string& _serverName);
 
 private:
 	enum class ClientState {
