@@ -66,6 +66,7 @@ private:
 	const std::list<std::string> parseImportedPackages(const std::string _scriptContent);
 	bool isPackageInstalled(const std::string& _packageName);
 	void installPackage(const std::string& _packageName);
+	void dropImportCache();
 	EntityPythonManifest* loadManifestEntity(ot::UID _manifestUID);
 	ot::UID getUIDFromString(const std::string& _uid);
 	std::string getListOfInstalledPackages();

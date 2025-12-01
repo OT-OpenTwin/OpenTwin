@@ -117,6 +117,7 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
                     m_environmentState = EnvironmentState::firstFilling;
                 }
             }
+            dropImportCache();
         }
     }
 }
@@ -158,6 +159,7 @@ void PackageHandler::importMissingPackages()
             {
                 installPackage(packageName);
             }
+            dropImportCache();
             //We still need to update the manifest text. But we won't get it with the pip freeze command since we are still in the old environment
 
             m_currentManifest->storeToDataBase();
@@ -174,6 +176,7 @@ void PackageHandler::importMissingPackages()
             {
                 installPackage(packageName);
             }
+            dropImportCache();
             const std::string installLog = OutputPipeline::instance().flushOutput();
             //Update manifest
             std::string newManifest = getListOfInstalledPackages();
@@ -381,6 +384,12 @@ void PackageHandler::installPackage(const std::string& _packageName)
             PyErr_Print();
         }
     }
+}
+
+void PackageHandler::dropImportCache()
+{
+    CPythonObjectNew importlib = PyImport_ImportModule("importlib");
+    PyObject_CallMethod(importlib, "invalidate_caches", nullptr);
 }
 
 EntityPythonManifest* PackageHandler::loadManifestEntity(ot::UID _manifestUID)
