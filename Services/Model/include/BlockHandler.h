@@ -52,8 +52,8 @@ public:
 	void removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, EntityBlockConnection* _connectionEntity, const ot::GraphicsConnectionCfg& _changedConnection);
 
 	// Finder
-	bool findBlock(ot::UID _editor, ot::UID _block);
-	bool blockExists(ot::UID _blockUID);
+	bool blockExists(ot::UID _blockID);
+	bool blockExists(ot::UID _editorID, ot::UID _blockID);
 	EntityGraphicsScene* findGraphicsScene(const std::string& _graphicsElementName);
 
 protected:
@@ -115,10 +115,10 @@ private:
 	void createConnection(EntityGraphicsScene* scene, EntityBlock* _originBlock, ot::GraphicsConnectionCfg& _requestedConnection,  EntityNamingBehavior& _connectionNaming, ot::NewModelStateInfo& _newModelStateInfo);
 
 	//! @brief Modifies the connection information for a given entity.
-	//! @param _entityID The unique identifier of the entity whose connection is to be modified.
+	//! @param _connectionID Connection ID of the connection to be modified.
 	//! @param _connectedBlockEntity A pointer to the block entity that is connected to the entity
 	//! @return void
-	void modifyConnection(const ot::UID& _entityID, EntityBase* _connectedBlockEntity);
+	void modifyConnection(const ot::UID& _connectionID, EntityBase* _connectedBlockEntity);
 
 	//! @brief Handles the snapping of connections in the graphics scene.
 	//! @param _scene The graphics scene where the snapping event occurred.
@@ -126,7 +126,7 @@ private:
 	//! @return True if the snapping was handled successfully, false otherwise.
 	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::NewModelStateInfo& _modelStateInfo);
 
-	
+	//! @brief Maps scenes to a map of blocks and their connections.
 	std::map<ot::UID, std::map<ot::UID, ot::UIDList>> m_viewBlockConnectionsMap;
 	const std::string m_connectionsFolder = "Connections";
 
