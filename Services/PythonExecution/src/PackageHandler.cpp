@@ -32,6 +32,7 @@
 
 #include <filesystem>
 #include "PythonObjectBuilder.h"
+#include "ExceptionRestartRequired.h"
 
 PackageHandler::~PackageHandler()
 {
@@ -204,7 +205,7 @@ std::string PackageHandler::getEnvironmentName()
 
 void PackageHandler::requestRestart()
 {
-    Application::instance().getCommunicationHandler().writeToServer("Restart");
+    throw ExceptionRestartRequired();
 }
 
 const std::list<std::string> PackageHandler::parseImportedPackages(const std::string _scriptContent)

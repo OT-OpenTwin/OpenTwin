@@ -122,6 +122,9 @@
     <ClInclude Include="include\OutputPipeline.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\ExceptionRestartRequired.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\CommunicationHandler.h">

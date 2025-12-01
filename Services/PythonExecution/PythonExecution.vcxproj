@@ -302,6 +302,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ActionHandler.h" />
+    <ClInclude Include="include\ExceptionRestartRequired.h" />
     <ClInclude Include="include\OutputPipeline.h" />
     <ClInclude Include="include\PackageHandler.h" />
     <ClInclude Include="include\Timeouts.h" />

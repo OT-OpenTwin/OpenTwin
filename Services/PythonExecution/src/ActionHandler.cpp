@@ -35,6 +35,7 @@
 #include "PackageHandler.h"
 
 #include "OTServiceFoundation/TimeFormatter.h"
+#include "ExceptionRestartRequired.h"
 
 ActionHandler& ActionHandler::instance(void) {
 	static ActionHandler g_instance;
@@ -208,6 +209,13 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 			returnValues.addData(OT_ACTION_CMD_PYTHON_Portdata, ot::JsonString(gridFSDocumentID, returnValues.getAllocator()));
 			return ot::ReturnMessage(std::move(returnValues));;
 		}
+	}
+	catch (ExceptionRestartRequired&)
+	{
+		ot::ReturnMessage message;
+		message.setStatus(ot::ReturnMessage::Ok);
+		message.setWhat("<Restart>");
+		return message;
 	}
 	catch (std::exception& e) {
 		OT_LOG_D("Script execution failed due to exception: " + std::string(e.what()));
