@@ -634,6 +634,10 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 
+	// Ensure connection on connection is allowed
+	if (!_scene->getSceneFlags().has(EntityGraphicsScene::AllowConnectionsOnConnections)) {
+		return true; // Ingore processing but return success
+	}
 
 	// Here I want to get all block/connection entities
 	std::map<ot::UID, EntityBlock*> blockEntities;

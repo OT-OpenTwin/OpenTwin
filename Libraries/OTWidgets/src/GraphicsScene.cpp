@@ -294,7 +294,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 			this->startConnection(graphicsItem);
 		}
 		else if (connectionItem) {
-			this->startConnectionToConnection(connectionItem, QtFactory::toPoint2D(_event->scenePos()));
+			this->startConnectionToConnection(connectionItem, QtFactory::toPoint2D(snapToGrid(_event->scenePos())));
 		}
 	}
 	else {

@@ -228,6 +228,7 @@ void Model::resetToNew()
 		EntityGraphicsScene* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, nullptr, nullptr);
 		entityCircuit->setName(typeManager.getCircuitName());
 		entityCircuit->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		entityCircuit->setSceneFlags(EntityGraphicsScene::DefaultFlags | EntityGraphicsScene::AllowConnectionsOnConnections);
 		entityCircuit->registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection |

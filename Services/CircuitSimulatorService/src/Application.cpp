@@ -97,6 +97,7 @@ void Application::createNewCircuit() {
 	entityCircuitRoot->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	entityCircuitRoot->setEditable(true);
 	entityCircuitRoot->setName(circuitName);
+	entityCircuitRoot->setSceneFlags(EntityGraphicsScene::DefaultFlags | EntityGraphicsScene::AllowConnectionsOnConnections);
 	entityCircuitRoot->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection,
