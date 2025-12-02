@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
+#include "OTGui/Painter2D.h"
 #include "OTGui/GraphicsArcItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
@@ -79,14 +80,12 @@ void ot::GraphicsArcItem::paintCustomItem(QPainter* _painter, const QStyleOption
 
 	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
 		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
-			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
-			borderPen.setBrush(QtFactory::toQBrush(newPainter));
-			delete newPainter;
+			std::unique_ptr<Painter2D> newPainter(GraphicsItem::createSelectionBorderPainter());
+			borderPen.setBrush(QtFactory::toQBrush(newPainter.get()));
 		}
 		else if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
-			Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
-			borderPen.setBrush(QtFactory::toQBrush(newPainter));
-			delete newPainter;
+			std::unique_ptr<Painter2D> newPainter(GraphicsItem::createHoverBorderPainter());
+			borderPen.setBrush(QtFactory::toQBrush(newPainter.get()));
 		}
 	}
 

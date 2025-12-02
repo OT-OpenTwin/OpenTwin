@@ -48,7 +48,10 @@ ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget * _dockWidget, QWidget* _paren
 }
 
 ot::WidgetViewTab::~WidgetViewTab() {
-	
+	this->disconnect(m_closeButton, &ToolButton::clicked, this, &WidgetViewTab::slotClose);
+	this->disconnect(m_pinButton, &ToolButton::clicked, this, &WidgetViewTab::slotTogglePinned);
+	delete m_closeButton;
+	delete m_pinButton;
 }
 
 void ot::WidgetViewTab::setIsPinned(bool _pinned) {

@@ -129,7 +129,7 @@ void ot::Painter2DEditDialogGradientBase::rebuild(const std::vector<GradientPain
 		this->disconnect(e.color, &ColorPickButton::colorChanged, this, &Painter2DEditDialogGradientBase::slotValueChanged);
 		e.box->hide();
 		m_layout->removeWidget(e.box);
-		delete e.box;
+		e.box->deleteLater();
 	}
 
 	m_stops.clear();

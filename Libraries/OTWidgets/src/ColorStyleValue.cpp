@@ -101,7 +101,9 @@ QBrush ot::ColorStyleValue::toBrush() const {
 
 void ot::ColorStyleValue::setPainter(Painter2D* _painter) {
 	OTAssertNullptr(_painter);
-	if (m_painter == _painter) return;
+	if (m_painter == _painter) {
+		return;
+	}
 	if (m_painter) {
 		delete m_painter;
 	}

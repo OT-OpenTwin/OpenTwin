@@ -97,18 +97,16 @@ void ot::ApplicationPropertiesManager::setDialogTitle(const QString& _title) {
 
 void ot::ApplicationPropertiesManager::slotPropertyChanged(const Property* _property) {
 	std::string owner;
-	Property* cleanedProperty = this->createCleanedSlotProperty(_property, owner);
+	std::unique_ptr<Property> cleanedProperty(this->createCleanedSlotProperty(_property, owner));
 	OTAssertNullptr(cleanedProperty);
-	Q_EMIT propertyChanged(owner, cleanedProperty);
-	if (cleanedProperty) delete cleanedProperty;
+	Q_EMIT propertyChanged(owner, cleanedProperty.get());
 }
 
 void ot::ApplicationPropertiesManager::slotPropertyDeleteRequested(const Property* _property) {
 	std::string owner;
-	Property* cleanedProperty = this->createCleanedSlotProperty(_property, owner);
+	std::unique_ptr<Property> cleanedProperty(this->createCleanedSlotProperty(_property, owner));
 	OTAssertNullptr(cleanedProperty);
-	Q_EMIT propertyDeleteRequested(owner, cleanedProperty);
-	if (cleanedProperty) delete cleanedProperty;
+	Q_EMIT propertyDeleteRequested(owner, cleanedProperty.get());
 }
 
 ot::PropertyGridCfg ot::ApplicationPropertiesManager::findData(const std::string& _owner) {
@@ -180,4 +178,8 @@ ot::ApplicationPropertiesManager::ApplicationPropertiesManager() :
 
 ot::ApplicationPropertiesManager::~ApplicationPropertiesManager() {
 	m_data.clear();
+	if (m_dialog) {
+		delete m_dialog;
+		m_dialog = nullptr;
+	}
 }

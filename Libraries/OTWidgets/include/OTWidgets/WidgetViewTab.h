@@ -37,7 +37,7 @@ namespace ot {
 		OT_DECL_NOMOVE(WidgetViewTab)
 		OT_DECL_NODEFAULT(WidgetViewTab)
 	public:
-		explicit WidgetViewTab(ads::CDockWidget* _dockWidget, QWidget* _parent);
+		explicit WidgetViewTab(ads::CDockWidget* _dockWidget, QWidget* _parent = (QWidget*)nullptr);
 		virtual ~WidgetViewTab();
 
 		void setIsPinned(bool _pinned);

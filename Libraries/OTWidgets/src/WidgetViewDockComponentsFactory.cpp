@@ -36,6 +36,6 @@ ot::WidgetViewDockComponentsFactory::~WidgetViewDockComponentsFactory() {
 }
 
 ads::CDockWidgetTab* ot::WidgetViewDockComponentsFactory::createDockWidgetTab(ads::CDockWidget* _dockWidget) const {
-	return new WidgetViewTab(_dockWidget, _dockWidget);
+	return new WidgetViewTab(_dockWidget);
 }
 

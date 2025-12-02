@@ -86,7 +86,6 @@ namespace ot {
 
 		QWidget* m_parentWidget;
 
-		ot::Property* m_signalProperty;
 		PropertyGridGroup* m_parentGroup;
 
 		QWidget* m_titleLayoutW;
