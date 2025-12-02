@@ -49,6 +49,10 @@ void PythonInterpreterAPI::initializeEnvironment(std::string& _environmentName)
 		_environmentName = "PyritEnvironment";
 		m_wrapper.initializePythonInterpreter(_environmentName);
 	}
+	else if (_environmentName == "StudioSuite")
+	{
+		m_wrapper.initializePythonInterpreter("");
+	}
 	else
 	{
 		throw std::exception(("Initialisation with unknown environment: " + _environmentName).c_str());

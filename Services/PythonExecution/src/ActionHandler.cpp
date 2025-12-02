@@ -125,6 +125,15 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		std::string environmentName = "Pyrit";
 		m_pythonAPI.initializeEnvironment(environmentName);
 	}
+	else if (serviceName == OT_INFO_SERVICE_TYPE_STUDIOSUITE)
+	{
+		OT_LOG_D("Initialise UID Generator");
+		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
+		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
+		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
+		std::string environmentName = "StudioSuite";
+		m_pythonAPI.initializeEnvironment(environmentName);
+	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL) {
 		OT_LOG_D("Connecting with modelService");
 		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
