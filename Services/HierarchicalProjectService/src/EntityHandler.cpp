@@ -273,8 +273,7 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 	blockEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	blockEntity.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
-		ot::EntityCallbackBase::Callback::Selection |
-		ot::EntityCallbackBase::Callback::DataHandle,
+		ot::EntityCallbackBase::Callback::Selection,
 		serviceName
 	);
 	blockEntity.setEntityID(blockUid);
