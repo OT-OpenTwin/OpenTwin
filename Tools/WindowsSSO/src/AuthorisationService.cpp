@@ -115,6 +115,22 @@ void AuthorisationService::authorizeClient(const std::string& _token3)
         readUserName(completedContext);
         readUserGroups(completedContext);
     }
+
+    SecPkgContext_PackageInfo pkgInfo;
+
+    SECURITY_STATUS s = QueryContextAttributes(
+        &completedContext,
+        SECPKG_ATTR_PACKAGE_INFO,
+        &pkgInfo
+    );
+
+    if (s == SEC_E_OK)
+    {
+        wprintf(L"Package used: %s\n", pkgInfo.PackageInfo->Name);
+        // Typically "Kerberos" or "NTLM"
+        FreeContextBuffer(pkgInfo.PackageInfo);
+    }
+
 }
 
 void AuthorisationService::readUserName(CtxtHandle& _completedContext)
