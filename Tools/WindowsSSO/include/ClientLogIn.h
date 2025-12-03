@@ -16,7 +16,7 @@
 class ClientLogIn :public ClientLogInAPI
 {
 public:
-    ClientLogIn();
+    ClientLogIn(const std::string& _targetName = "");
 
     std::vector<unsigned char> generateClientToken(const std::vector<unsigned char>& _inputToken, bool _firstCall) override;
 
@@ -29,6 +29,10 @@ private:
     // On the first call to AcceptSecurityContext (CredSSP), this pointer is NULL. 
     // On subsequent calls, phContext specifies the partially formed context returned in the phNewContext parameter by the first call.
     CtxtHandle* m_partialContext = nullptr;
+
+private:
+    LPWSTR m_targetName;
+    std::vector<wchar_t> m_buffer;
 };
 
 

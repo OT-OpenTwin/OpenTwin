@@ -1,8 +1,14 @@
 #include "ClientLogIn.h"
 
-ClientLogIn::ClientLogIn()
+ClientLogIn::ClientLogIn(const std::string& _targetName)
     : m_currentContext{}
 {
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, _targetName.c_str(), -1, NULL, 0);
+    m_buffer.resize(size_needed);
+    MultiByteToWideChar(CP_UTF8, 0, _targetName.c_str(), -1, m_buffer.data(), size_needed);
+
+    m_targetName = m_buffer.data();
+    
     auto securityStatus = acquireCredentialsHandle(m_credHandle, m_credTimeStamp, SECPKG_CRED_OUTBOUND);
     if (securityStatus != SEC_E_OK)
     {
@@ -51,7 +57,7 @@ std::vector<unsigned char> ClientLogIn::generateClientToken(const std::vector<un
     SECURITY_STATUS securityStatus = InitializeSecurityContextW(
         &m_credHandle,
         m_partialContext,
-        (LPWSTR)L"",    // target name (SPN) – can be empty if NTLM/Negotiate
+        m_targetName,    // target name (SPN) – can be empty if NTLM/Negotiate
         ISC_REQ_CONFIDENTIALITY | ISC_REQ_MUTUAL_AUTH,
         0,
         SECURITY_NATIVE_DREP,
