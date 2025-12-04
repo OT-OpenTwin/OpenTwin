@@ -187,7 +187,7 @@ void EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document& st
 	
 }
 
-void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockConnection::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 

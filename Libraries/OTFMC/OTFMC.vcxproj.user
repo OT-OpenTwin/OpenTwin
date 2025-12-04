@@ -12,12 +12,12 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2025-11-09T01:11:45.8742751Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-12-04T15:49:11.4502987Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2025-11-09T01:11:46.0991355Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-12-04T15:49:11.5333397Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>

@@ -157,7 +157,7 @@ void EntityPythonManifest::addStorageData(bsoncxx::builder::basic::document& _st
 	_storage.append(bsoncxx::builder::basic::kvp("ManifestText", m_manifestText));
 }
 
-void EntityPythonManifest::readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap)
+void EntityPythonManifest::readSpecificDataFromDataBase(const bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(_doc_view, _entityMap);
 	m_manifestID = static_cast<ot::UID>(_doc_view["ManifestID"].get_int64().value);

@@ -160,7 +160,7 @@ void EntityBlockImage::addStorageData(bsoncxx::builder::basic::document& _storag
 	);
 }
 
-void EntityBlockImage::readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+void EntityBlockImage::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 
 	m_imageUID = static_cast<ot::UID>(_docView["ImageDataID"].get_int64());

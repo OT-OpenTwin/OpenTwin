@@ -31,7 +31,7 @@ EntityCompressedVector::EntityCompressedVector(ot::UID ID, EntityBase *parent, E
 	EntityBase(ID, parent, obs, ms),
 	uncompressedLength(0),
 	tolerance(0.0),
-	maximumDataSize(5e6),
+	maximumDataSize(5000000),
 	valuesSize(0),
 	countSize(0)
 {
@@ -68,22 +68,22 @@ void EntityCompressedVector::addStorageData(bsoncxx::builder::basic::document &s
 		arrayValues.append(v);
 	}
 
-	for (double c : compressedDataCount)
+	for (int64_t c : compressedDataCount)
 	{
 		arrayCount.append(c);
 	}
 
 	storage.append(
 		bsoncxx::builder::basic::kvp("tolerance", tolerance),
-		bsoncxx::builder::basic::kvp("uncompressedLength", uncompressedLength),
-		bsoncxx::builder::basic::kvp("dataValuesSize", valuesSize),
-		bsoncxx::builder::basic::kvp("dataCountSize", countSize),
+		bsoncxx::builder::basic::kvp("uncompressedLength", (long long) uncompressedLength),
+		bsoncxx::builder::basic::kvp("dataValuesSize", (long long) valuesSize),
+		bsoncxx::builder::basic::kvp("dataCountSize", (long long) countSize),
 		bsoncxx::builder::basic::kvp("dataValues", arrayValues),
 		bsoncxx::builder::basic::kvp("dataCount", arrayCount)
 	);
 }
 
-void EntityCompressedVector::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityCompressedVector::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -132,7 +132,7 @@ void EntityCompressedVector::readSpecificDataFromDataBase(bsoncxx::document::vie
 
 	for (unsigned long index = 0; index < nArrayCount; index++)
 	{
-		compressedDataCount.push_back(iCount->get_double());
+		compressedDataCount.push_back(iCount->get_int64());
 		iCount++;
 	}
 
@@ -304,12 +304,12 @@ void EntityCompressedVector::compressData(const double *values, size_t length, b
 				compressedDataValuesSize++;
 				compressedDataCountSize++;
 
-				lastDataCount = -same;
+				lastDataCount = -1 * same;
 
 				if (storeData)
 				{
 					compressedDataValues.push_back(values[index]);
-					compressedDataCount.push_back(-same);
+					compressedDataCount.push_back(-1 * same);
 				}
 
 				index += same-1;

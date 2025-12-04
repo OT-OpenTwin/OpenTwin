@@ -38,7 +38,7 @@ void PropertyBundleVis2D3D::setProperties(EntityBase * _thisObject)
 	//Not used yet
 	/*EntityPropertiesDouble::createProperty(groupName, properties.GetNamePhase(), 0.0, defaultCategory, thisObject->getProperties());
 	EntityPropertiesDouble::createProperty(groupName, properties.GetNameTime(), 0.0, defaultCategory, thisObject->getProperties());*/
-	EntityPropertiesInteger::createProperty(m_groupName, m_properties.GetNamePlotDownSampling(), 0., m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesInteger::createProperty(m_groupName, m_properties.GetNamePlotDownSampling(), 0, m_defaultCategory, _thisObject->getProperties());
 }
 
 bool PropertyBundleVis2D3D::updatePropertyVisibility(EntityBase * _thisObject)

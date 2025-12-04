@@ -138,7 +138,7 @@ void EntityBlockHierarchicalDocumentItem::addStorageData(bsoncxx::builder::basic
 	);
 }
 
-void EntityBlockHierarchicalDocumentItem::readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+void EntityBlockHierarchicalDocumentItem::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 
 	m_documentUID = static_cast<ot::UID>(_docView["DocumentID"].get_int64());

@@ -43,5 +43,5 @@ private:
 	std::optional <std::list<std::string>> getPackageList(const std::string _text);
 
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
-	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
 };

@@ -65,9 +65,9 @@ public:
 private:
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
-	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
-	void readCellFaces(bsoncxx::document::view &doc_view, int direction, const std::string &itemName);
-	void readPoints(bsoncxx::document::view &doc_view, int index, const std::string &itemName);
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
+	void readCellFaces(const bsoncxx::document::view &doc_view, int direction, const std::string &itemName);
+	void readPoints(const bsoncxx::document::view &doc_view, int index, const std::string &itemName);
 
 	eType type;
 	int surfaceId;

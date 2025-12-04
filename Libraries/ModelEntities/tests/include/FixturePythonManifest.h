@@ -9,7 +9,7 @@ public:
 	std::list<std::string> getPackageList(const std::string _text)
 	{
 		EntityPythonManifest manifest;
-		return manifest.getPackageList(_text);
+		return manifest.getPackageList(_text).value_or(std::list<std::string>{});;
 	}
 	bool environmentHasChanged(const std::string& _oldContent, const std::string& _newContent){
 		EntityPythonManifest manifest;
@@ -19,7 +19,7 @@ public:
 	//! @brief Base manifest with multiple packages
 	std::string getManifestA()
 	{
-		const std::string path = "C:\\OpenTwin\\Libraries\\ModelEntities\\ModelEntitiesTest\\Files\\";
+		const std::string path = FileHelper::getFilePath();
 		const std::string manifest = FileHelper::extractFileContentAsString(path + "ManifestA.txt");
 		return manifest;
 	}

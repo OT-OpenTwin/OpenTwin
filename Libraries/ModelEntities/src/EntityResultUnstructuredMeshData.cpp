@@ -216,7 +216,7 @@ void EntityResultUnstructuredMeshData::addStorageData(bsoncxx::builder::basic::d
 	);
 }
 
-void EntityResultUnstructuredMeshData::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityResultUnstructuredMeshData::readSpecificDataFromDataBase(const bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 

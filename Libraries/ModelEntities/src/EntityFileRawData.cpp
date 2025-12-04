@@ -50,6 +50,6 @@ void EntityFileRawData::addStorageData(bsoncxx::builder::basic::document& _stora
 	EntityFile::addStorageData(_storage);
 }
 
-void EntityFileRawData::readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) {
+void EntityFileRawData::readSpecificDataFromDataBase(const bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityFile::readSpecificDataFromDataBase(_doc_view, _entityMap);
 }

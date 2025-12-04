@@ -78,7 +78,7 @@ void EntityBlockCircuitElement::addStorageData(bsoncxx::builder::basic::document
 	EntityBlock::addStorageData(storage);
 }
 
-void EntityBlockCircuitElement::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockCircuitElement::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

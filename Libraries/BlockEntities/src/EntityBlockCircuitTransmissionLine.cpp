@@ -155,7 +155,7 @@ void EntityBlockCircuitTransmissionLine::addStorageData(bsoncxx::builder::basic:
 	EntityBlock::addStorageData(storage);
 }
 
-void EntityBlockCircuitTransmissionLine::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) {
+void EntityBlockCircuitTransmissionLine::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }
 

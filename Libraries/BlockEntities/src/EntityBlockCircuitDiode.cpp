@@ -180,7 +180,7 @@ void EntityBlockCircuitDiode::addStorageData(bsoncxx::builder::basic::document& 
 	EntityBlock::addStorageData(storage);
 }
 
-void EntityBlockCircuitDiode::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockCircuitDiode::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

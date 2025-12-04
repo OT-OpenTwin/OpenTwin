@@ -401,12 +401,12 @@ void EntityPropertiesInteger::addToJsonObject(ot::JsonObject& _jsonObject, ot::J
 void EntityPropertiesInteger::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
 {
 	EntityPropertiesBase::readFromJsonObject(_object, _root);
-	this->setValue(ot::json::getInt64(_object, "Value"));
+	this->setValue((long) ot::json::getInt64(_object, "Value"));
 	if (_object.HasMember("MinValue")) {
-		this->setMin(ot::json::getInt64(_object, "MinValue", std::numeric_limits<long>::lowest()));
+		this->setMin((long) ot::json::getInt64(_object, "MinValue", std::numeric_limits<long>::lowest()));
 	}
 	if (_object.HasMember("MaxValue")) {
-		this->setMax(ot::json::getInt64(_object, "MaxValue", std::numeric_limits<long>::max()));
+		this->setMax((long) ot::json::getInt64(_object, "MaxValue", std::numeric_limits<long>::max()));
 	}
 	if (_object.HasMember("AllowCustom")) {
 		this->setAllowCustomValues(ot::json::getBool(_object, "AllowCustom", true));

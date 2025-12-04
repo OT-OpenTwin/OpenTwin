@@ -136,7 +136,7 @@ public:
 
 	//! @brief Calls readSpecificDataFromDataBase to load entity specific data from the bson document. Topology entities are added to the entity map. 
 	//! The map is intended to be the centralized map in the model service, which is only supposed to hold topology entities.
-	void restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
+	void restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
 
 	virtual void addVisualizationNodes() {};
 
@@ -176,7 +176,7 @@ protected:
 
 	virtual int getSchemaVersion() { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) {};
-	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
 
 	ot::UID createEntityUID();
 	EntityBase *readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap);

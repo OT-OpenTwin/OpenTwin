@@ -55,7 +55,7 @@ protected:
 	bool requiresDataUpdate();
 	
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
-	void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
+	void readSpecificDataFromDataBase(const bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 private:
 	bool m_requiresDataUpdate = false;

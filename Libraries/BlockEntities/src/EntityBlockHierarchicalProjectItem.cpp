@@ -181,7 +181,7 @@ void EntityBlockHierarchicalProjectItem::addStorageData(bsoncxx::builder::basic:
 	);
 }
 
-void EntityBlockHierarchicalProjectItem::readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+void EntityBlockHierarchicalProjectItem::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 
 	m_projectName = _docView["ProjectName"].get_utf8().value.data();

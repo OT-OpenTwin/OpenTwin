@@ -53,7 +53,7 @@ void EntityBlockCircuitConnector::addStorageData(bsoncxx::builder::basic::docume
 	EntityBlock::addStorageData(storage);
 }
 
-void EntityBlockCircuitConnector::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockCircuitConnector::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

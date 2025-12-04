@@ -102,7 +102,7 @@ void EntityParameterizedDataTable::addStorageData(bsoncxx::builder::basic::docum
 	);
 }
 
-void EntityParameterizedDataTable::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityParameterizedDataTable::readSpecificDataFromDataBase(const bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityResultTable::readSpecificDataFromDataBase(doc_view, entityMap);
 	_numberOfRows = static_cast<uint32_t>(doc_view["NumberOfRows"].get_int32());

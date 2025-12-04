@@ -296,7 +296,7 @@ void EntityResult3DData::addStorageData(bsoncxx::builder::basic::document & stor
 
 }
 
-void EntityResult3DData::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityResult3DData::readSpecificDataFromDataBase(const bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
