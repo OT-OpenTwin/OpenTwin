@@ -27,11 +27,8 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Building Project
-
 RMDIR /S /Q "%OT_FOUNDATION_ROOT%\.vs"
-RMDIR /S /Q "%OT_FOUNDATION_ROOT%\x64"
-RMDIR /S /Q "%OT_FOUNDATION_ROOT%\packages"
+RMDIR /S /Q "%OT_FOUNDATION_ROOT%\build"
 
 GOTO END
 
@@ -40,3 +37,4 @@ pause
 GOTO END
 
 :END
+

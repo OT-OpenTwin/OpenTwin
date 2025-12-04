@@ -27,7 +27,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Testing Project : OTServiceFoundation
+SETLOCAL enabledelayedexpansion
 
 REM Open project
 
@@ -44,32 +44,20 @@ IF "%1"=="DEBUG" (
   SET DEBUG=1
 )
 
-SET TYPE=/Rebuild
-SET TYPE_NAME=REBUILD
-
-IF "%2"=="BUILD" (
-	SET TYPE=/Build
-	SET TYPE_NAME=BUILD
-)
+SET "OLDPATH=%PATH%"
 
 IF %DEBUG%==1 (
-	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_FOUNDATION_ROOT%\OTServiceFoundation.vcxproj" %TYPE% "DebugTest|x64"  
-	ECHO %TYPE% DEBUG
-	"%OT_FOUNDATION_ROOT%\x64\Debug\OTServiceFoundationTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTServiceFoundationDebugReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTServiceFoundationDebugReport.xml" "OTServiceFoundation" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTServiceFoundationDebugReport.xml"
+	SET "PATH=%OT_ALL_DLLD%;%ZLIB_DLLPATHD%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_FOUNDATION_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_FOUNDATION_ROOT%\OTServiceFoundation.vcxproj" %TYPE% "ReleaseTest|x64"
-	ECHO %TYPE% RELEASE
-	"%OT_FOUNDATION_ROOT%\x64\Release\OTServiceFoundationTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTServiceFoundationReleaseReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTServiceFoundationReleaseReport.xml" "OTServiceFoundation" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTServiceFoundationReleaseReport.xml"
+	SET "PATH=%OT_ALL_DLLR%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_FOUNDATION_ROOT%" RELEASE
 ) 
-  
+
+SET "PATH=%OLDPATH%"
+
 GOTO END
 
 :PAUSE_END
