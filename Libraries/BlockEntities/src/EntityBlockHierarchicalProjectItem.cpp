@@ -184,12 +184,12 @@ void EntityBlockHierarchicalProjectItem::addStorageData(bsoncxx::builder::basic:
 void EntityBlockHierarchicalProjectItem::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 
-	m_projectName = _docView["ProjectName"].get_utf8().value.data();
-	m_projectType = _docView["ProjectType"].get_utf8().value.data();
-	m_collectionName = _docView["CollectionName"].get_utf8().value.data();
+	m_projectName = _docView["ProjectName"].get_string().value.data();
+	m_projectType = _docView["ProjectType"].get_string().value.data();
+	m_collectionName = _docView["CollectionName"].get_string().value.data();
 	m_previewUID = static_cast<ot::UID>(_docView["PreviewImageID"].get_int64());
 	m_previewVersion = static_cast<ot::UID>(_docView["PreviewImageVersion"].get_int64());
-	m_previewFormat = ot::stringToImageFileFormat(_docView["PreviewImageType"].get_utf8().value.data());
+	m_previewFormat = ot::stringToImageFileFormat(_docView["PreviewImageType"].get_string().value.data());
 }
 
 void EntityBlockHierarchicalProjectItem::ensurePreviewLoaded() {
