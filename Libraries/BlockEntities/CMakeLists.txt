@@ -118,6 +118,8 @@ set(BLOCKENTITIES_SOURCE_FILES
     src/EntityBlockCircuitResistor.cpp
     src/EntityBlockConnection.cpp
     src/EntityBlockDatabaseAccess.cpp
+    src/EntityBlockDecoLabel.cpp
+    src/EntityBlockDecoration.cpp
     src/EntityBlockDisplay.cpp
     src/EntityBlockFileWriter.cpp
     src/EntityBlockHierarchicalContainerItem.cpp

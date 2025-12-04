@@ -95,6 +95,6 @@ void EntityBlockDecoLabel::addStorageData(bsoncxx::builder::basic::document& _st
 	EntityBlockDecoration::addStorageData(_storage);
 }
 
-void EntityBlockDecoLabel::readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+void EntityBlockDecoLabel::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityBlockDecoration::readSpecificDataFromDataBase(_docView, _entityMap);
 }

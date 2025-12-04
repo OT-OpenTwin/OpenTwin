@@ -108,7 +108,7 @@ void EntityBlockDecoration::addStorageData(bsoncxx::builder::basic::document& _s
 	EntityBlock::addStorageData(_storage);
 }
 
-void EntityBlockDecoration::readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+void EntityBlockDecoration::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 }
 
