@@ -88,10 +88,11 @@ private:
 	void handleSetProjectEntitySelected();
 	void handleProjectSelected(ot::JsonDocument& _doc);
 	void handleDocumentSelected(ot::JsonDocument& _doc);
-	void handleBackgroundImageSelected(ot::JsonDocument& _doc);
 
-	void handleImageSelected(ot::JsonDocument& _doc);
+	void handleProjectImageSelected(ot::JsonDocument& _doc);
 	
+	void handleImageSelected(ot::JsonDocument& _doc);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Button callbacks
@@ -99,7 +100,9 @@ private:
 	void handleAddProject();
 	void handleAddContainer();
 	void handleAddDocument();
-	void handleAddBackgroundImage();
+
+	void handleAddLabel();
+	void handleAddImage();
 
 	void handleOpenSelectedItems();
 
@@ -138,17 +141,23 @@ private:
 	const std::string c_setProjectEntitySelectedAction = "SetProjectEntitySelected";
 	const std::string c_projectSelectedAction = "ProjectSelected";
 	const std::string c_documentSelectedAction = "DocumentSelected";
+	const std::string c_projectImageSelectedAction = "ProjectImageSelected";
+
 	const std::string c_imageSelectedAction = "ImageSelected";
-	const std::string c_backgroundImageSelectedAction = "BackgroundImageSelected";
 
 	const std::string c_pageName = "Project";
 	const std::string c_managementGroupName = "Management";
 	const std::string c_selectionGroupName = "Selection";
 
+	const std::string c_decorationGroupName = "Decoration";
+	const std::string c_decorationSub1Name = "Sub1";
+
 	ot::ToolBarButtonCfg m_addProjectButton;
 	ot::ToolBarButtonCfg m_addContainerButton;
 	ot::ToolBarButtonCfg m_addDocumentButton;
-	ot::ToolBarButtonCfg m_addBackgroundImageButton;
+
+	ot::ToolBarButtonCfg m_addLabelButton;
+	ot::ToolBarButtonCfg m_addImageButton;
 
 	ot::ToolBarButtonCfg m_openSelectedItems;
 
