@@ -2693,49 +2693,40 @@ void AppBase::slotTextEditorSaveRequested() {
 		OT_LOG_E("View not found");
 		return;
 	}
-	
-	/*
-	ot::MessageDialogCfg cfg;
 
-	cfg.setButtons(ot::MessageDialogCfg::BasicButton::Cancel | ot::MessageDialogCfg::BasicButton::Save);
-	cfg.setTitle("Save changed text?");
-	ot::MessageDialogCfg::BasicButton result = ot::MessageDialog::showDialog(cfg);
-	
-	if (result == ot::MessageDialogCfg::BasicButton::Save)
-	*/
-	{
-		try {
-			ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
-			ot::JsonDocument doc = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(
-				view->getViewData().getEntityName(), 
-				view->getTextEditor()->toPlainText().toStdString(),
-				view->getTextEditor()->getNextChunkStartIndex()
-			);
+	try {
+		ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
+		ot::TextEditor* edit = view->getTextEditor();
+		const std::string txt = edit->toPlainText().toStdString();
+		ot::JsonDocument doc = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(
+			view->getViewData().getEntityName(),
+			txt,
+			edit->getNextChunkStartIndex()
+		);
 
-			std::string response;
-			if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
-				OT_LOG_EA("Failed to send http request");
-				return;
-			}
+		std::string response;
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+			OT_LOG_EA("Failed to send http request");
+			return;
+		}
 
-			ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
-			if (rMsg != ot::ReturnMessage::Ok) {
-				OT_LOG_E("Request failed: " + rMsg.getWhat());
-				return;
-			}
-			else
-			{
-				view->getTextEditor()->setContentSaved();
-				ot::UID globalActiveViewModel = -1;
-				ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, view->getViewData().getEntityName(), ot::ViewChangedStates::changesSaved, view->getViewData().getViewType());
-			}
+		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+		if (rMsg != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + rMsg.getWhat());
+			return;
 		}
-		catch (const std::exception& _e) {
-			OT_LOG_EAS(_e.what());
+		else {
+			edit->setContentSaved();
+			edit->setNextChunkStartIndex(txt.size());
+			ot::UID globalActiveViewModel = -1;
+			ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, view->getViewData().getEntityName(), ot::ViewChangedStates::changesSaved, view->getViewData().getViewType());
 		}
-		catch (...) {
-			OT_LOG_EA("[FATAL] Unknown error");
-		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
 	}
 }
 
