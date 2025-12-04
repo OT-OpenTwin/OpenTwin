@@ -32,14 +32,6 @@ EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, Mo
 	
 }
 
-void EntityBlock::createProperties() {
-
-}
-
-ot::GraphicsConnectionCfg::ConnectionShape EntityBlock::getDefaultConnectionShape() const {
-	return ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
-}
-
 EntityBlock::~EntityBlock()
 {
 	if (m_coordinateEntity != nullptr)
@@ -118,6 +110,14 @@ void EntityBlock::setGraphicsPickerKey(const std::string& _key) {
 	}
 }
 
+void EntityBlock::createProperties() {
+
+}
+
+ot::GraphicsConnectionCfg::ConnectionShape EntityBlock::getDefaultConnectionShape() const {
+	return ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
+}
+
 std::string EntityBlock::createBlockHeadline()
 {
 	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
@@ -173,7 +173,6 @@ bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation,
 		return false;
 	}
 }
-
 
 void EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 {

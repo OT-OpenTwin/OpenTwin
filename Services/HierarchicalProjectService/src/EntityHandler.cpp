@@ -38,6 +38,7 @@
 #include "EntityBlockImage.h"
 #include "EntityFileRawData.h"
 #include "EntityGraphicsScene.h"
+#include "EntityBlockDecoLabel.h"
 #include "EntityBlockConnection.h"
 #include "EntityBlockHierarchicalProjectItem.h"
 #include "EntityBlockHierarchicalDocumentItem.h"
@@ -405,12 +406,50 @@ void EntityHandler::addImages(const std::list<std::string>& _fileNames, const st
 	}
 
 	if (newEntities.hasEntities()) {
-		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added background image", true, true);
+		std::string changeDesc;
+		if (_fileNames.size() == 1) {
+			changeDesc = "Added image";
+		}
+		else {
+			changeDesc = "Added images";
+		}
+		ot::ModelServiceAPI::addEntitiesToModel(newEntities, changeDesc, true, true);
 	}
 }
 
 void EntityHandler::addLabel() {
+	const std::string serviceName = Application::instance().getServiceName();
 
+	ot::NewModelStateInfo newEntities;
+
+	// Create coordinate entity
+	EntityCoordinates2D coord;
+	coord.setEntityID(_modelComponent->createEntityUID());
+	coord.storeToDataBase();
+
+	// Create background image block entity
+	EntityBlockDecoLabel labelEntity;
+	labelEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+	labelEntity.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataHandle,
+		serviceName
+	);
+	labelEntity.setEntityID(_modelComponent->createEntityUID());
+	labelEntity.setName(CreateNewUniqueTopologyName(c_decorationFolder, "Label"));
+	labelEntity.setGraphicsScenePackageChildName(c_decorationFolderName);
+	labelEntity.createProperties();
+	labelEntity.setEditable(true);
+	labelEntity.setCoordinateEntityID(coord.getEntityID());
+	labelEntity.setText("New Label");
+	labelEntity.storeToDataBase();
+	
+	// Add to new entities
+	newEntities.addDataEntity(labelEntity.getEntityID(), coord);
+	newEntities.addTopologyEntity(labelEntity);
+
+	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added label", true, true);
 }
 
 void EntityHandler::updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities) {

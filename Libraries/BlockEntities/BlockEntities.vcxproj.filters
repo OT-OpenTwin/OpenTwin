@@ -21,6 +21,12 @@
     <Filter Include="Source Files\Hierarchical Entities">
       <UniqueIdentifier>{4638493e-dd3c-464a-87b9-c236eab58e7c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Decoration Elements">
+      <UniqueIdentifier>{cbb7ce8d-aa24-4a3a-94ec-63cba326ca34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Decoration Elements">
+      <UniqueIdentifier>{97146a11-3d7a-414b-b718-7a3db3e3fb23}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\EntityBlock.h">
@@ -107,6 +113,12 @@
     <ClInclude Include="include\EntityBlockHierarchicalProjectItem.h">
       <Filter>Header Files\Hierarchical Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntityBlockDecoLabel.h">
+      <Filter>Header Files\Decoration Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityBlockDecoration.h">
+      <Filter>Header Files\Decoration Elements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityBlockDatabaseAccess.cpp">
@@ -183,6 +195,12 @@
     </ClCompile>
     <ClCompile Include="src\EntityBlockHierarchicalProjectItem.cpp">
       <Filter>Source Files\Hierarchical Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityBlockDecoLabel.cpp">
+      <Filter>Source Files\Decoration Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityBlockDecoration.cpp">
+      <Filter>Source Files\Decoration Elements</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

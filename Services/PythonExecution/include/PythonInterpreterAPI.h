@@ -1,5 +1,5 @@
 // @otlicense
-// File: PythonAPI.h
+// File: PythonInterpreterAPI.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
