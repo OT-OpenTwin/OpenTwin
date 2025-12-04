@@ -32,39 +32,53 @@
 class FixtureBsonArrayTypeGetterWrapper : public testing::Test
 {
 public:
-	bsoncxx::v_noabi::array::view GetUTF8StringArray();
-	bsoncxx::v_noabi::array::view GetCharArray();
-	bsoncxx::v_noabi::array::view GetInt32Array();
-	bsoncxx::v_noabi::array::view GetInt64Array();
-	bsoncxx::v_noabi::array::view GetDoubleArray();
-	bsoncxx::v_noabi::array::view GetFloatArray();
+	FixtureBsonArrayTypeGetterWrapper() {
+		m_exampleDataUTF8String.append("a");
+		m_exampleDataUTF8String.append("b");
+		m_exampleDataUTF8String.append("c");
+		m_exampleDataUTF8String.append("d");
+
+		m_exampleDataChar.append('a');
+		m_exampleDataChar.append('b');
+		m_exampleDataChar.append('c');
+		m_exampleDataChar.append('d');
+
+		m_exampleDataInt32.append(int32_t(1));
+		m_exampleDataInt32.append(int32_t(2));
+		m_exampleDataInt32.append(int32_t(3));
+		m_exampleDataInt32.append(int32_t(4));
+
+		m_exampleDataInt64.append(int64_t(1));
+		m_exampleDataInt64.append(int64_t(2));
+		m_exampleDataInt64.append(int64_t(3));
+		m_exampleDataInt64.append(int64_t(4));
+
+		m_exampleDataDouble.append(double(1.0));
+		m_exampleDataDouble.append(double(2.0));
+		m_exampleDataDouble.append(double(3.0));
+		m_exampleDataDouble.append(double(4.0));
+
+		m_exampleDataFloat.append(float(1.0f));
+		m_exampleDataFloat.append(float(2.0f));
+		m_exampleDataFloat.append(float(3.0f));
+		m_exampleDataFloat.append(float(4.0f));
+	}
+
+	const bsoncxx::v_noabi::array::view& GetUTF8StringArray() { return m_exampleDataUTF8String.view(); };
+	const bsoncxx::v_noabi::array::view& GetCharArray() { return m_exampleDataChar.view(); };
+	const bsoncxx::v_noabi::array::view& GetInt32Array() { return m_exampleDataInt32.view(); };
+	const bsoncxx::v_noabi::array::view& GetInt64Array() { return m_exampleDataInt64.view(); };
+	const bsoncxx::v_noabi::array::view& GetDoubleArray() { return m_exampleDataDouble.view(); };
+	const bsoncxx::v_noabi::array::view& GetFloatArray() { return m_exampleDataFloat.view(); };
 	~FixtureBsonArrayTypeGetterWrapper() {};
 
 private:
-	std::vector<std::string> exampleDataUTF8String{ "a", "b", "c", "d" };
-	std::vector<char> exampleDataChar{ 'a', 'b', 'c', 'd' };
-	std::vector<int32_t> exampleDataInt32{1,2,3,4};
-	std::vector<int64_t> exampleDataInt64{1,2,3,4};
-	std::vector<double> exampleDataDouble{1.,2.,3.,4.};
+	bsoncxx::builder::basic::array m_exampleDataUTF8String;
+	bsoncxx::builder::basic::array m_exampleDataChar;
+	bsoncxx::builder::basic::array m_exampleDataInt32;
+	bsoncxx::builder::basic::array m_exampleDataInt64;
+	bsoncxx::builder::basic::array m_exampleDataDouble;
 	//Float is not supported and is being used as an example for the template default case.
-	std::vector<float> exampleDataFloat{1.f,2.f,3.f,4.f};
-
-	template<class T> 
-	bsoncxx::v_noabi::array::view CreateArrayView(std::vector<T> exampleData);
+	bsoncxx::builder::basic::array m_exampleDataFloat;
 
 };
-
-template<class T>
-inline bsoncxx::v_noabi::array::view FixtureBsonArrayTypeGetterWrapper::CreateArrayView(std::vector<T> exampleData)
-{
-	auto dataArray = bsoncxx::builder::basic::array();
-
-	for (int i = 0; i < exampleData.size(); i++)
-	{
-		dataArray.append(exampleData[i]);
-	}
-
-	bsoncxx::builder::basic::document storage;
-	storage.append(bsoncxx::builder::basic::kvp("exampleData", dataArray));
-	return storage.view()["exampleData"].get_array().value;
-}
