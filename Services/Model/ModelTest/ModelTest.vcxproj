@@ -57,7 +57,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(OT_DLLD);$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD);$(OC_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_LIBD)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(OT_DLLD);$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBD);$(OC_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_LIBD)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Model.lib; $(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBD);BlockEntities.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
