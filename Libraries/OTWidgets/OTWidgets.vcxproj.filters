@@ -601,6 +601,9 @@
     <ClCompile Include="src\GraphicsSnapInfo.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\GlobalWidgetViewManager.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1123,6 +1126,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsSnapInfo.h">
       <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GlobalWidgetViewManager.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

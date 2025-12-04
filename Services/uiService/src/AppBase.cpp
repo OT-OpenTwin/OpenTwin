@@ -99,11 +99,10 @@
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/PropertyGridView.h"
 #include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/WidgetProperties.h"
 #include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/PlainTextEditView.h"
-#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/MessageBoxManager.h"
 #include "OTWidgets/GraphicsItemLoader.h"
 #include "OTWidgets/GraphicsPickerView.h"
@@ -112,6 +111,7 @@
 #include "OTWidgets/CreateProjectDialog.h"
 #include "OTWidgets/StyledTextConverter.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
 #include "OTWidgets/PropertyInputStringList.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
@@ -346,7 +346,7 @@ bool AppBase::logIn() {
 		// Restore view state
 		ViewStateCfg viewStateCfg = ViewStateCfg::fromJson(m_currentStateWindow.view);
 		if (!viewStateCfg.getViewConfig().empty()) {
-			ot::WidgetViewManager::instance().restoreState(viewStateCfg.getViewConfig());
+			ot::GlobalWidgetViewManager::instance().restoreState(viewStateCfg.getViewConfig());
 		}
 
 		this->initializeDefaultUserSettings();
@@ -393,7 +393,7 @@ void AppBase::setCurrentProjectIsModified(bool _isModified) {
 }
 
 bool AppBase::getCurrentProjectIsModified() const {
-	return m_projectStateIsModified || ot::WidgetViewManager::instance().getAnyViewContentModified();
+	return m_projectStateIsModified || ot::GlobalWidgetViewManager::instance().getAnyViewContentModified();
 }
 
 aWindow * AppBase::mainWindow() {
@@ -437,7 +437,7 @@ void AppBase::notify(UID _senderId, eventType _eventType, int _info1, int _info2
 				}
 				else if (m_widgetIsWelcome) {
 					// Changing from welcome screen to other tabView
-					uiAPI::window::setCentralWidget(m_mainWindow, ot::WidgetViewManager::instance().getDockManager());
+					uiAPI::window::setCentralWidget(m_mainWindow, ot::GlobalWidgetViewManager::instance().getDockManager());
 					m_currentStateWindow.viewShown = true;
 					m_widgetIsWelcome = false;
 				}
@@ -470,7 +470,7 @@ bool AppBase::closeEvent() {
 
 		if (m_currentStateWindow.viewShown) {
 			ViewStateCfg viewStateCfg;
-			viewStateCfg.setViewConfig(ot::WidgetViewManager::instance().saveState());
+			viewStateCfg.setViewConfig(ot::GlobalWidgetViewManager::instance().saveState());
 			m_currentStateWindow.view = viewStateCfg.toJson();
 		}
 	}
@@ -506,7 +506,7 @@ bool AppBase::closeEvent() {
 	// Close all views to avoid dangling pointers in viewer
 	m_versionGraph = nullptr;
 	this->closeAllViewerTabs();
-	ot::WidgetViewManager::instance().closeViews();
+	ot::GlobalWidgetViewManager::instance().closeViews();
 
 	return true;
 }
@@ -831,7 +831,7 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 	}
 
 	// Update views in view manager
-	ot::WidgetViewManager::instance().renameView(_fromPath, _toPath);
+	ot::GlobalWidgetViewManager::instance().renameView(_fromPath, _toPath);
 
 	// Update views in local map
 	
@@ -948,7 +948,7 @@ void AppBase::createUi() {
 			// Create dock views
 			OT_LOG_D("Creating views");
 
-			QWidget* dockManagerWidget = ot::WidgetViewManager::instance().getDockManager();
+			QWidget* dockManagerWidget = ot::GlobalWidgetViewManager::instance().getDockManager();
 
 			QWidget* defaultWidget = new QWidget;
 			QGridLayout* defaultWidgetLayout = new QGridLayout(defaultWidget);
@@ -1048,14 +1048,14 @@ void AppBase::createUi() {
 			// Display docks
 			OT_LOG_D("Settings up dock window visibility");
 	
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_defaultView);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
+			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_defaultView);
+			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
+			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
+			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
 			
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker);
+			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker);
 
-			ot::WidgetViewManager::instance().setConfigFlags(
+			ot::GlobalWidgetViewManager::instance().setConfigFlags(
 				ot::WidgetViewManager::InputFocusCentralViewOnFocusChange |
 				ot::WidgetViewManager::IgnoreInputFocusOnViewInsert |
 				ot::WidgetViewManager::UseBestAreaFinderOnViewInsert
@@ -1087,10 +1087,10 @@ void AppBase::createUi() {
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
 			this->connect(&m_navigationManager, &ot::NavigationSelectionManager::selectionHasChanged, this, &AppBase::slotHandleSelectionHasChanged);
 
-			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &AppBase::slotViewFocusChanged);
-			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
-			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewTabClicked, this, &AppBase::slotViewTabClicked);
-			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewDataModifiedChanged, this, &AppBase::slotViewDataModifiedChanged);
+			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &AppBase::slotViewFocusChanged);
+			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
+			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewTabClicked, this, &AppBase::slotViewTabClicked);
+			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewDataModifiedChanged, this, &AppBase::slotViewDataModifiedChanged);
 
 			uiAPI::registerUidNotifier(m_mainWindow, this);
 			
@@ -1253,7 +1253,7 @@ std::string AppBase::getDebugInformation() const {
 	// Widget view manager
 
 	JsonObject widgetViewManagerObj;
-	ot::WidgetViewManager::instance().getDebugInformation(widgetViewManagerObj, doc.GetAllocator());
+	ot::GlobalWidgetViewManager::instance().getDebugInformation(widgetViewManagerObj, doc.GetAllocator());
 	doc.AddMember("WidgetViewManager", widgetViewManagerObj, doc.GetAllocator());
 
 	// Viewer component
@@ -1282,7 +1282,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 	ot::Color col(255, 255, 255);
 	ot::Color overlayCol;
 
-	QWidget* viewManagerWidget = ot::WidgetViewManager::instance().getDockManager();
+	QWidget* viewManagerWidget = ot::GlobalWidgetViewManager::instance().getDockManager();
 
 	ViewerUIDtype viewID = m_viewerComponent->createViewer(_modelUID, DPIRatio, DPIRatio,
 		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b(), viewManagerWidget);
@@ -1299,7 +1299,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
 		wv->setViewData(ot::WidgetViewBase(text3D.toStdString(), text3D.toStdString(), ot::WidgetViewBase::View3D, ot::WidgetViewBase::ViewIsCentral));
 
-		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv, ot::WidgetView::KeepCurrentFocus);
+		ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv, ot::WidgetView::KeepCurrentFocus);
 	}
 	else
 	{
@@ -1326,7 +1326,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 		
 		this->lockManager()->uiElementCreated(this->getViewerComponent()->getBasicServiceInformation(), m_versionGraph->getVersionGraphManager()->getGraph(), ot::LockType::All | ot::LockType::ModelWrite);
 		
-		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph, ot::WidgetView::KeepCurrentFocus, m_output);
+		ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph, ot::WidgetView::KeepCurrentFocus, m_output);
 	}
 	
 	m_graphicsPicker->getGraphicsPicker()->getQWidget()->setVisible(getVisibleBlockPicker());
@@ -1360,27 +1360,27 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 void AppBase::setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
 	OT_SLECTION_TEST_LOG("Set current visualization tab from name \"" + _entityName + "\" and type \"" + ot::WidgetViewBase::toString(_viewType) + "\"");
 
-	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
-	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
+	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::GlobalWidgetViewManager::instance().getConfigFlags();
+	ot::GlobalWidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
 
-	ot::WidgetViewManager::instance().setCurrentView(_entityName, _viewType);
+	ot::GlobalWidgetViewManager::instance().setCurrentView(_entityName, _viewType);
 
-	ot::WidgetViewManager::instance().setConfigFlags(managerFlags);
+	ot::GlobalWidgetViewManager::instance().setConfigFlags(managerFlags);
 }
 
 void AppBase::setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {
 	OT_SLECTION_TEST_LOG("Set current vis tab from title \"" + _tabTitle + "\"");
 
-	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
-	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
+	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::GlobalWidgetViewManager::instance().getConfigFlags();
+	ot::GlobalWidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
 
-	ot::WidgetViewManager::instance().setCurrentViewFromTitle(_tabTitle);
+	ot::GlobalWidgetViewManager::instance().setCurrentViewFromTitle(_tabTitle);
 
-	ot::WidgetViewManager::instance().setConfigFlags(managerFlags);
+	ot::GlobalWidgetViewManager::instance().setConfigFlags(managerFlags);
 }
 
 std::string AppBase::getCurrentVisualizationTabTitle() {
-	ot::WidgetView* view = ot::WidgetViewManager::instance().getLastFocusedCentralView();
+	ot::WidgetView* view = ot::GlobalWidgetViewManager::instance().getLastFocusedCentralView();
 	if (view) return view->getViewData().getTitle();
 	else return "";
 }
@@ -1480,10 +1480,10 @@ void AppBase::closeAllViewerTabs() {
 	m_plots.clear();
 	m_versionGraph = nullptr;
 	m_lastFocusedCentralView = nullptr;
-	ot::WidgetViewManager::instance().closeViews();
+	ot::GlobalWidgetViewManager::instance().closeViews();
 
-	QSignalBlocker sigBlock(&ot::WidgetViewManager::instance());
-	ot::WidgetViewManager::instance().slotViewFocused(nullptr, m_defaultView->getViewDockWidget());
+	QSignalBlocker sigBlock(&ot::GlobalWidgetViewManager::instance());
+	ot::GlobalWidgetViewManager::instance().slotViewFocused(nullptr, m_defaultView->getViewDockWidget());
 }
 
 void AppBase::clearSessionInformation() {
@@ -1515,7 +1515,7 @@ void AppBase::restoreSessionState() {
 
 	ViewStateCfg viewStateCfg = ViewStateCfg::fromJson(m_currentStateWindow.view);
 	if (!viewStateCfg.getViewConfig().empty()) {
-		ot::WidgetViewManager::instance().restoreState(viewStateCfg.getViewConfig());
+		ot::GlobalWidgetViewManager::instance().restoreState(viewStateCfg.getViewConfig());
 	}
 
 	// Set first tab as current view in central view
@@ -1547,7 +1547,7 @@ void AppBase::storeSessionState() {
 	UserManagement uM(m_loginData);
 
 	ViewStateCfg viewStateCfg;
-	viewStateCfg.setViewConfig(ot::WidgetViewManager::instance().saveState());
+	viewStateCfg.setViewConfig(ot::GlobalWidgetViewManager::instance().saveState());
 	m_currentStateWindow.view = viewStateCfg.toJson();
 	uM.storeSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectInfo.getProjectType(), m_currentStateWindow.view);
 
@@ -1645,13 +1645,13 @@ bool AppBase::checkForContinue(const std::string& _title) {
 }
 
 QString AppBase::availableTabText(const QString& _initialTabText) {
-	if (!ot::WidgetViewManager::instance().getViewTitleExists(_initialTabText.toStdString())) {
+	if (!ot::GlobalWidgetViewManager::instance().getViewTitleExists(_initialTabText.toStdString())) {
 		return _initialTabText;
 	}
 
 	int v = 1;
 	QString nxt = _initialTabText + " [" + QString::number(v) + "]";
-	while (ot::WidgetViewManager::instance().getViewTitleExists(nxt.toStdString())) {
+	while (ot::GlobalWidgetViewManager::instance().getViewTitleExists(nxt.toStdString())) {
 		nxt = _initialTabText + " [" + QString::number(++v) + "]";
 	}
 	return nxt;
@@ -1860,7 +1860,7 @@ void AppBase::appendLogMessage(const ot::LogMessage& _message) {
 void AppBase::autoCloseUnpinnedViews(bool _ignoreCurrent) {
 	OT_SLECTION_TEST_LOG("Auto close unpinned views");
 
-	ot::WidgetViewManager::instance().requestCloseUnpinnedViews(
+	ot::GlobalWidgetViewManager::instance().requestCloseUnpinnedViews(
 		ot::WidgetViewBase::ViewIsCloseable | ot::WidgetViewBase::ViewIsPinnable,
 		this->getSelectedNavigationTreeItems(),
 		_ignoreCurrent
@@ -1932,12 +1932,12 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 		return newEditor;
 	}
 
-	if (ot::WidgetViewManager::instance().findView(_entityName, ot::WidgetViewBase::ViewGraphics)) {
+	if (ot::GlobalWidgetViewManager::instance().findView(_entityName, ot::WidgetViewBase::ViewGraphics)) {
 		OT_LOG_EAS("GraphicsEditor managed data mismatch { \"Entity\": \"" + _entityName + "\" }");
 		return nullptr;
 	}
 
-	newEditor = new ot::GraphicsViewView(ot::WidgetViewManager::instance().getDockManager());
+	newEditor = new ot::GraphicsViewView(ot::GlobalWidgetViewManager::instance().getDockManager());
 	ot::WidgetViewBase baseData(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewNameAsTitle | ot::WidgetViewBase::ViewIsPinnable | ot::WidgetViewBase::ViewIsCloseable);
 
 	if (_visualizationConfig.getCustomViewFlags().has_value()) {
@@ -1968,7 +1968,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	this->lockManager()->uiElementCreated(modelInfo, graphics, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_graphicsViews.insert_or_assign(_entityName, newEditor);
-	ot::WidgetViewManager::instance().addView(modelInfo, newEditor, _viewInsertFlags);
+	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newEditor, _viewInsertFlags);
 
 	connect(graphics, &ot::GraphicsView::copyRequested, this, &AppBase::slotCopyRequested);
 	connect(graphics, &ot::GraphicsView::pasteRequested, this, &AppBase::slotPasteRequested);
@@ -2021,12 +2021,12 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 		return newEditor;
 	}
 
-	if (ot::WidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::ViewText)) {
+	if (ot::GlobalWidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::ViewText)) {
 		OT_LOG_EAS("TextEditor managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
 		return nullptr;
 	}
 
-	newEditor = new ot::TextEditorView(ot::WidgetViewManager::instance().getDockManager());
+	newEditor = new ot::TextEditorView(ot::GlobalWidgetViewManager::instance().getDockManager());
 	newEditor->setViewData(_config);
 	this->addVisualizingEntityInfoToView(newEditor, _visualizingEntities);
 
@@ -2038,7 +2038,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	this->lockManager()->uiElementCreated(modelInfo, textEdit, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
-	ot::WidgetViewManager::instance().addView(modelInfo, newEditor, _viewInsertFlags);
+	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newEditor, _viewInsertFlags);
 
 	this->connect(newEditor, &ot::TextEditorView::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
 	this->connect(newEditor->getTextEditor(), &ot::TextEditor::loadMoreRequested, this, &AppBase::slotTextLoadNextRequested);
@@ -2077,11 +2077,11 @@ void AppBase::closeTextEditor(const std::string& _entityName) {
 	}
 
 	this->cleanupWidgetViewInfo(view);
-	ot::WidgetViewManager::instance().closeView(view);
+	ot::GlobalWidgetViewManager::instance().closeView(view);
 }
 
 void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInfo) {
-	for (const std::string& editorName : ot::WidgetViewManager::instance().getViewNamesFromOwner(_serviceInfo, ot::WidgetViewBase::ViewText)) {
+	for (const std::string& editorName : ot::GlobalWidgetViewManager::instance().getViewNamesFromOwner(_serviceInfo, ot::WidgetViewBase::ViewText)) {
 		this->closeTextEditor(editorName);
 	}
 }
@@ -2097,12 +2097,12 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Wi
 		return newTable;
 	}
 
-	if (ot::WidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::ViewTable)) {
+	if (ot::GlobalWidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::ViewTable)) {
 		OT_LOG_EAS("TextEditor managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
 		return nullptr;
 	}
 
-	newTable = new ot::TableView(ot::WidgetViewManager::instance().getDockManager());
+	newTable = new ot::TableView(ot::GlobalWidgetViewManager::instance().getDockManager());
 	newTable->setViewData(_config);
 	this->addVisualizingEntityInfoToView(newTable, _visualizingEntities);
 
@@ -2114,7 +2114,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Wi
 	this->lockManager()->uiViewCreated(modelInfo, newTable, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_tables.insert_or_assign(_config.getEntityName(), newTable);
-	ot::WidgetViewManager::instance().addView(modelInfo, newTable, _viewInsertFlags);
+	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newTable, _viewInsertFlags);
 
 	this->connect(newTable->getTable(), &ot::Table::saveRequested, this, &AppBase::slotTableSaveRequested);
 
@@ -2152,7 +2152,7 @@ void AppBase::closeTable(const std::string& _entityName) {
 	}
 
 	this->cleanupWidgetViewInfo(view);
-	ot::WidgetViewManager::instance().closeView(view);
+	ot::GlobalWidgetViewManager::instance().closeView(view);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -2166,12 +2166,12 @@ ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::Wid
 		return newPlot;
 	}
 
-	if (ot::WidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::View1D)) {
+	if (ot::GlobalWidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::View1D)) {
 		OT_LOG_EAS("Plot managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
 		return nullptr;
 	}
 
-	newPlot = new ot::PlotView(ot::WidgetViewManager::instance().getDockManager());
+	newPlot = new ot::PlotView(ot::GlobalWidgetViewManager::instance().getDockManager());
 	newPlot->setViewData(_config);
 	this->addVisualizingEntityInfoToView(newPlot, _visualizingEntities);
 
@@ -2180,7 +2180,7 @@ ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::Wid
 	this->lockManager()->uiViewCreated(modelInfo, newPlot, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_plots.insert_or_assign(_config.getEntityName(), newPlot);
-	ot::WidgetViewManager::instance().addView(modelInfo, newPlot, _viewInsertFlags);
+	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newPlot, _viewInsertFlags);
 	
 	this->connect(newPlot->getPlot(), &ot::Plot::resetItemSelectionRequest, this, &AppBase::slotPlotResetItemSelectionRequest);
 	this->connect(newPlot->getPlot(), &ot::Plot::curveDoubleClicked, this, &AppBase::slotPlotCurveDoubleClicked);
@@ -2217,7 +2217,7 @@ void AppBase::closePlot(const std::string& _name) {
 		return;
 	}
 	this->cleanupWidgetViewInfo(view);
-	ot::WidgetViewManager::instance().closeView(view);
+	ot::GlobalWidgetViewManager::instance().closeView(view);
 }
 
 // ######################################################################################################################
@@ -2273,8 +2273,8 @@ void AppBase::destroyObjects(const std::vector<ot::UID> & _objects) {
 }
 
 void AppBase::makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool _ignoreEntitySelect) {
-	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
-	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
+	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::GlobalWidgetViewManager::instance().getConfigFlags();
+	ot::GlobalWidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
 
 	ot::ViewHandlingFlags viewFlags = m_viewHandling;
 	if (_ignoreEntitySelect) {
@@ -2285,7 +2285,7 @@ void AppBase::makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool
 
 	m_viewHandling = viewFlags;
 
-	ot::WidgetViewManager::instance().setConfigFlags(managerFlags);
+	ot::GlobalWidgetViewManager::instance().setConfigFlags(managerFlags);
 }
 
 AppBase * AppBase::instance() {
@@ -2345,13 +2345,13 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 	
 	try {
 		// Find the view from the graphics view widget
-		ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView->getQWidget()));
+		ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::GlobalWidgetViewManager::instance().findViewFromWidget(graphicsView->getQWidget()));
 		if (!view) {
 			OT_LOG_E("View not found");
 			return;
 		}
 
-		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+		ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
 
 		ot::GraphicsItemDropEvent eventData;
 		eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
@@ -2414,14 +2414,14 @@ void AppBase::slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConf
 		return;
 	}
 
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::GlobalWidgetViewManager::instance().findViewFromWidget(graphicsView));
 	if (!view) {
 		OT_LOG_E("View not found");
 		return;
 	}
 
 	try {
-		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+		ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
 
 		ot::GraphicsDoubleClickEvent eventData;
 		eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
@@ -2456,7 +2456,7 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 		return;
 	}
 
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::GlobalWidgetViewManager::instance().findViewFromWidget(graphicsView));
 	if (!view) {
 		OT_LOG_E("View not found");
 		return;
@@ -2469,7 +2469,7 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 	eventData.setConnectionCfg(connectionConfig);
 		
 	try {
-		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+		ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
 
 		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(eventData);
 
@@ -2500,7 +2500,7 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 		return;
 	}
 
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::GlobalWidgetViewManager::instance().findViewFromWidget(graphicsView));
 	if (!view) {
 		OT_LOG_E("View not found");
 		return;
@@ -2514,7 +2514,7 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 	eventData.setConnectionCfg(connectionConfig);
 
 	try {
-		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+		ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
 
 		ot::JsonDocument doc = ot::GraphicsActionHandler::createConnectionRequestedDocument(eventData);
 
@@ -2705,7 +2705,7 @@ void AppBase::slotTextEditorSaveRequested() {
 	*/
 	{
 		try {
-			ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+			ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
 			ot::JsonDocument doc = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(
 				view->getViewData().getEntityName(), 
 				view->getTextEditor()->toPlainText().toStdString(),
@@ -2777,13 +2777,13 @@ void AppBase::slotTableSaveRequested() {
 	}
 
 	try {
-		ot::TableView* view = dynamic_cast<ot::TableView*>(ot::WidgetViewManager::instance().findViewFromWidget(table));
+		ot::TableView* view = dynamic_cast<ot::TableView*>(ot::GlobalWidgetViewManager::instance().findViewFromWidget(table));
 		if (!view) {
 			OT_LOG_W("View not found");
 			return;
 		}
 
-		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+		ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
 
 		ot::TableCfg cfg = table->createConfig();
 		ot::BasicEntityInformation entityInfo(view->getViewData());
@@ -2936,7 +2936,7 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	OT_SLECTION_TEST_LOG("+ Deselecting navigation items");
 
 	// Store current selection and view information
-	ot::WidgetView* lastStoredView = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	ot::WidgetView* lastStoredView = ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView();
 
 	// Deselect navigation item if exists
 	const ot::SelectionInformation& viewSelectionInfo = _view->getVisualizingItems();
@@ -2950,10 +2950,10 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	OT_SLECTION_TEST_LOG("+ Closing actual view");
 
 	// Now close the view
-	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
+	ot::GlobalWidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
 
 	// Restore selection if the view did not change during close
-	if (lastStoredView && _view != lastStoredView && ot::WidgetViewManager::instance().getCurrentlyFocusedView() == lastStoredView) {
+	if (lastStoredView && _view != lastStoredView && ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView() == lastStoredView) {
 		OT_SLECTION_TEST_LOG("+ Restore view selection");
 
 		QSignalBlocker sigBlock(m_projectNavigation->getTree());

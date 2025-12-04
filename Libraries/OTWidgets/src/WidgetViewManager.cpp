@@ -39,9 +39,24 @@
 #include <QtCore/qtimer.h>
 #include <QtWidgets/qmenu.h>
 
-ot::WidgetViewManager& ot::WidgetViewManager::instance() {
-	static WidgetViewManager g_instance;
-	return g_instance;
+ot::WidgetViewManager::WidgetViewManager() :
+	m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState),
+	m_dockComponentsFactory(nullptr), m_initialStateVersion(0), m_autoCloseTimer(this)
+{
+	m_focusInfo.last = nullptr;
+	m_focusInfo.lastSide = nullptr;
+	m_focusInfo.lastTool = nullptr;
+	m_focusInfo.lastCentral = nullptr;
+
+	m_autoCloseTimer.setInterval(0);
+	m_autoCloseTimer.setSingleShot(true);
+	this->connect(&m_autoCloseTimer, &QTimer::timeout, this, &WidgetViewManager::slotCloseUnpinnedViews);
+}
+
+ot::WidgetViewManager::~WidgetViewManager() {
+	this->disconnect(&m_autoCloseTimer, &QTimer::timeout, this, &WidgetViewManager::slotCloseUnpinnedViews);
+
+	this->deleteLater();
 }
 
 void ot::WidgetViewManager::initialize(WidgetViewDockManager* _dockManager) {
@@ -753,26 +768,6 @@ void ot::WidgetViewManager::slotViewPinnedChanged(bool _pinned) {
 
 // Private
 
-ot::WidgetViewManager::WidgetViewManager() :
-	m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState), 
-	m_dockComponentsFactory(nullptr), m_initialStateVersion(0), m_autoCloseTimer(this)
-{
-	m_focusInfo.last = nullptr;
-	m_focusInfo.lastSide = nullptr;
-	m_focusInfo.lastTool = nullptr;
-	m_focusInfo.lastCentral = nullptr;
-
-	m_autoCloseTimer.setInterval(0);
-	m_autoCloseTimer.setSingleShot(true);
-	this->connect(&m_autoCloseTimer, &QTimer::timeout, this, &WidgetViewManager::slotCloseUnpinnedViews);
-}
-
-ot::WidgetViewManager::~WidgetViewManager() {
-	this->disconnect(&m_autoCloseTimer, &QTimer::timeout, this, &WidgetViewManager::slotCloseUnpinnedViews);
-
-	this->deleteLater();
-}
-
 bool ot::WidgetViewManager::getViewExists(const ViewNameTypeListEntry& _entry) const {
 	return this->findView(_entry) != nullptr;
 }
@@ -837,6 +832,7 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	// Add the new view
 	m_state |= InsertViewState;
 	m_dockManager->addView(_view, area, _insertFlags);
+	_view->setManager(this);
 	m_state &= (~InsertViewState);
 
 	// Add view toggle (only visible if dock is closeable)

@@ -72,6 +72,7 @@
     </ClCompile>
     <ClCompile Include="src\ExpanderWidget.cpp" />
     <ClCompile Include="src\FlowLayout.cpp" />
+    <ClCompile Include="src\GlobalWidgetViewManager.cpp" />
     <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp" />
     <ClCompile Include="src\GraphicsDisconnectItem.cpp" />
     <ClCompile Include="src\GraphicsPickerManager.cpp" />
@@ -291,6 +292,7 @@
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
     <QtMoc Include="include\OTWidgets\IndicatorWidget.h" />
     <ClInclude Include="include\OTWidgets\ImagePainterWidget.h" />
+    <ClInclude Include="include\OTWidgets\GlobalWidgetViewManager.h" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
     <QtMoc Include="include\OTWidgets\ManagedPropertyLink.h" />

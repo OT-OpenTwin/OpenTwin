@@ -22,13 +22,15 @@
 #include "ControlsManager.h"
 #include "UserSettings.h"
 
-// openTwin header
+// OpenTwin header
 #include "OTSystem/Flags.h"
 #include "OTGui/GuiTypes.h"
 #include "OTWidgets/IconManager.h"
-#include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
+
 #include <ads/DockManager.h>
 #include <TabToolbar/Group.h>
+
 // uiCore header
 #include <akAPI/uiAPI.h>
 #include <akWidgets/aToolButtonWidget.h>
@@ -81,7 +83,7 @@ ToolBar::ToolBar(AppBase * _owner)
 	cont = uiAPI::object::get<aTtbGroup>(m_view.gUserInterface);
 	OTAssertNullptr(cont);
 	m_view.gUserInterface_aSettings = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Settings", c_icoSettings, c_icoPath);
-	QAction* toggleAction = ot::WidgetViewManager::instance().getDockToggleAction();
+	QAction* toggleAction = ot::GlobalWidgetViewManager::instance().getDockToggleAction();
 	toggleAction->setIcon(ot::IconManager::getIcon("Default/Docks.png"));
 	toggleAction->setToolTip(c_tipDocks);
 

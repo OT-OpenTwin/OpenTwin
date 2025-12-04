@@ -40,9 +40,9 @@
 #include "OTWidgets/TagListWidget.h"
 #include "OTWidgets/PlainTextEdit.h"
 #include "OTWidgets/BasicValidator.h"
-#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/ImagePainterWidget.h"
 #include "OTWidgets/ImagePainterManager.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
 #include "OTCommunication/ActionTypes.h"
 
 // Qt header
@@ -460,7 +460,7 @@ void EditProjectInformationDialog::updateDescriptionPreview() {
 }
 
 QWidget* EditProjectInformationDialog::getWidgetForScreenshot() {
-	ot::WidgetView* view = ot::WidgetViewManager::instance().getLastFocusedCentralView();
+	ot::WidgetView* view = ot::GlobalWidgetViewManager::instance().getLastFocusedCentralView();
 	if (view == nullptr) {
 		return nullptr;
 	}

@@ -22,8 +22,7 @@
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/TreeItemViewLink.h"
-#include "OTWidgets/WidgetViewManager.h"
-#include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
 
 // Qt header
 #include <QtWidgets/qtreewidget.h>
@@ -35,7 +34,7 @@ ot::TreeItemViewLink::TreeItemViewLink(QTreeWidgetItem* _treeItem, WidgetView* _
 	OTAssertNullptr(m_treeItem);
 
 	this->connect(m_treeItem->treeWidget(), &QTreeWidget::itemSelectionChanged, this, &TreeItemViewLink::slotTreeSelectionChanged);
-	this->connect(&WidgetViewManager::instance(), &WidgetViewManager::viewFocusChanged, this, &TreeItemViewLink::slotViewFocusChanged);
+	this->connect(&GlobalWidgetViewManager::instance(), &WidgetViewManager::viewFocusChanged, this, &TreeItemViewLink::slotViewFocusChanged);
 }
 
 ot::TreeItemViewLink::~TreeItemViewLink() {
