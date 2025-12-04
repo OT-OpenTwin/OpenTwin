@@ -187,6 +187,11 @@ void PropertyHelper::setPainterPropertyValue(const ot::Painter2D* _painter, Enti
 	painterProperty->setValue(_painter);
 }
 
+void PropertyHelper::setIntegerPropertyValue(int32_t _value, EntityBase* _base, const std::string& _name, const std::string& _groupName) {
+	EntityPropertiesInteger* intProperty = getIntegerProperty(_base, _name, _groupName);
+	intProperty->setValue(_value);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Writable property access
