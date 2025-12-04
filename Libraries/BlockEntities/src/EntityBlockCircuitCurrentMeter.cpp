@@ -180,6 +180,6 @@ void EntityBlockCircuitCurrentMeter::addStorageData(bsoncxx::builder::basic::doc
 	EntityBlock::addStorageData(storage);
 }
 
-void EntityBlockCircuitCurrentMeter::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) {
+void EntityBlockCircuitCurrentMeter::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

@@ -258,7 +258,7 @@ void EntityMeshCartesianData::addStorageData(bsoncxx::builder::basic::document &
 	storage.append(bsoncxx::builder::basic::kvp("MatrixDsigmaVersion", matrixDsigmaStorageVersion));
 }
 
-void EntityMeshCartesianData::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityMeshCartesianData::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -349,7 +349,7 @@ void EntityMeshCartesianData::readSpecificDataFromDataBase(bsoncxx::document::vi
 	resetModified();
 }
 
-long long EntityMeshCartesianData::getStorageId(bsoncxx::document::view &doc_view, const std::string dataName)
+long long EntityMeshCartesianData::getStorageId(const bsoncxx::document::view &doc_view, const std::string dataName)
 {
 	long long storageId = -1;
 	try

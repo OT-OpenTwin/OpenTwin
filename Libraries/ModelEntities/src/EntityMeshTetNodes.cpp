@@ -74,7 +74,7 @@ void EntityMeshTetNodes::addStorageData(bsoncxx::builder::basic::document &stora
 	storage.append(bsoncxx::builder::basic::kvp("CoordZ", coordZ));
 }
 
-void EntityMeshTetNodes::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityMeshTetNodes::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);

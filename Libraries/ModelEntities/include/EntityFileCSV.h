@@ -50,7 +50,7 @@ public:
 private:
 	void setSpecializedProperties() override;
 	void addStorageData(bsoncxx::builder::basic::document& storage) override;
-	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
+	void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 	std::string m_rowDelimiterDefault = "\\n";
 	std::string m_columnDelimiterDefault = ";";

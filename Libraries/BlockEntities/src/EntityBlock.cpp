@@ -195,12 +195,12 @@ void EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 	storage.append(bsoncxx::builder::basic::kvp("Connectors", connectorsArray));
 }
 
-void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlock::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	
 	m_coordinate2DEntityID = static_cast<ot::UID>(doc_view["CoordinatesEntityID"].get_int64());
-	m_graphicsScenePackageChildName = doc_view["GraphicPackageChildName"].get_utf8().value.data();
+	m_graphicsScenePackageChildName = doc_view["GraphicPackageChildName"].get_string().value.data();
 
 	auto allConnectors = doc_view["Connectors"].get_array();
 	for (auto& element : allConnectors.value)
@@ -214,18 +214,18 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	auto iconVisibleIt = doc_view.find("NavigationIconVisible");
 	if (iconVisibleIt != doc_view.end())
 	{
-		m_navigationTreeIcon.visibleIcon = iconVisibleIt->get_utf8().value.data();
+		m_navigationTreeIcon.visibleIcon = iconVisibleIt->get_string().value.data();
 	}
 	auto iconHiddenIt = doc_view.find("NavigationIconHidden");
 	if (iconHiddenIt != doc_view.end())
 	{
-		m_navigationTreeIcon.hiddenIcon = iconHiddenIt->get_utf8().value.data();
+		m_navigationTreeIcon.hiddenIcon = iconHiddenIt->get_string().value.data();
 	}
 
 	auto pickerIt = doc_view.find("GraphicsPickerKey");
 	if (pickerIt != doc_view.end())
 	{
-		m_graphicsPickerKey = pickerIt->get_utf8().value.data();
+		m_graphicsPickerKey = pickerIt->get_string().value.data();
 	}
 	else {
 		// Legacy support

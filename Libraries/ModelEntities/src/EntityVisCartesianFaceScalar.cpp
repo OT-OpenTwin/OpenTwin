@@ -42,7 +42,7 @@ void EntityVisCartesianFaceScalar::addStorageData(bsoncxx::builder::basic::docum
 	EntityVis2D3D::addStorageData(storage);
 }
 
-void EntityVisCartesianFaceScalar::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityVisCartesianFaceScalar::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityVis2D3D::readSpecificDataFromDataBase(doc_view, entityMap);

@@ -198,7 +198,7 @@ void EntityContainer::addStorageData(bsoncxx::builder::basic::document &storage)
 	storage.append(bsoncxx::builder::basic::kvp("HiddenTreeIcon", m_treeIcon.hiddenIcon));
 }
 
-void EntityContainer::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityContainer::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);

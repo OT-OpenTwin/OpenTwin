@@ -54,7 +54,7 @@ public:
 protected:
 	virtual void setSpecializedProperties() {};
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
-	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase *>& _entityMap) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase *>& _entityMap) override;
 
 	long long m_dataUID;
 	long long m_dataVersion;

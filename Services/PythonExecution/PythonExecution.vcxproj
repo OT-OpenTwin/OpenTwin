@@ -157,7 +157,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_PYTHON_LIBPATH)\Debug;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_PYTHON_LIBPATH)\Debug;$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBD);$(QT_LIBPATH)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python311_d.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Cored.lib;Qt6Networkd.lib;Qt6Widgetsd.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -187,7 +187,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH)\Release;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH)\Release;$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBR);$(QT_LIBPATH)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);python311.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Core.lib;Qt6Network.lib;Qt6Widgets.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -217,7 +217,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(OT_PYTHON_LIBPATH)\Release;%(AdditionalLibraryDirectories);$(Qt_LIBPATH_)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBD);$(OT_PYTHON_LIBPATH)\Release;%(AdditionalLibraryDirectories);$(Qt_LIBPATH_)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);BlockEntities.lib;python311.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

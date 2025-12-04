@@ -35,7 +35,7 @@ void PropertyBundleScaling::setProperties(EntityBase * _thisObject)
 	EntityPropertiesDouble::createProperty(m_groupName, m_properties.GetPropertyNameRangeMin(), 0.0, m_defaultCategory, _thisObject->getProperties());
 	EntityPropertiesDouble::createProperty(m_groupName, m_properties.GetPropertyNameRangeMax(), 0.0, m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesInteger::createProperty(m_groupName, m_properties.GetPropertyNameColourResolution(), 30., m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesInteger::createProperty(m_groupName, m_properties.GetPropertyNameColourResolution(), 30, m_defaultCategory, _thisObject->getProperties());
 }
 
 bool PropertyBundleScaling::updatePropertyVisibility(EntityBase * _thisObject)

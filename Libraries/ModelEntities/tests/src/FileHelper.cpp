@@ -56,6 +56,8 @@ std::string FileHelper::getFilePath()
 	std::string executablePath = ot::OperatingSystem::getCurrentExecutableDirectory();
 	executablePath = executablePath.substr(0, executablePath.find_last_of("\\/")); //One level up
 	executablePath = executablePath.substr(0, executablePath.find_last_of("\\/")); // Other level up
-	const std::string filePath = executablePath + "\\ModelEntitiesTest\\Files\\";
+	executablePath = executablePath.substr(0, executablePath.find_last_of("\\/")); // Other level up
+	executablePath = executablePath.substr(0, executablePath.find_last_of("\\/")); // Other level up
+	const std::string filePath = executablePath + "\\tests\\Files\\";
 	return filePath;
 }

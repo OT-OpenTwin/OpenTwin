@@ -192,7 +192,7 @@ void EntityBlockCircuitInductor::addStorageData(bsoncxx::builder::basic::documen
 	EntityBlock::addStorageData(storage);
 }
 
-void EntityBlockCircuitInductor::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockCircuitInductor::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

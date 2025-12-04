@@ -87,7 +87,7 @@ void EntityGraphicsScene::addStorageData(bsoncxx::builder::basic::document& _sto
 	}
 }
 
-void EntityGraphicsScene::readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+void EntityGraphicsScene::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityContainer::readSpecificDataFromDataBase(_docView, _entityMap);
 	auto keyIt = _docView.find("GraphicsPickerKey");
 	if (keyIt != _docView.end()) {

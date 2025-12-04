@@ -404,14 +404,14 @@ void EntityResult1DCurve::addStorageData(bsoncxx::builder::basic::document& stor
 	
 }
 
-void EntityResult1DCurve::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
 	m_queryInformation.m_query = doc_view["Query"].get_string();
 	m_queryInformation.m_projection = doc_view["Projection"].get_string();
 
-	auto& quantityDescriptionDoc =	doc_view["QuantityDescription"].get_document();
+	const auto& quantityDescriptionDoc = doc_view["QuantityDescription"].get_document();
 
 	m_queryInformation.m_quantityDescription = deserialise(quantityDescriptionDoc);
 
@@ -419,7 +419,7 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(bsoncxx::document::view& 
 	
 	for (auto parameterDescription = parameterDescriptions.begin(); parameterDescription != parameterDescriptions.end(); parameterDescription++)
 	{
-		auto& parameterDoc = parameterDescription->get_document();
+		const auto& parameterDoc = parameterDescription->get_document();
 		ot::QuantityContainerEntryDescription parameterDesc = deserialise(parameterDoc);
 		m_queryInformation.m_parameterDescriptions.push_back(parameterDesc);
 	}

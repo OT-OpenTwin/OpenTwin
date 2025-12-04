@@ -111,7 +111,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_DLLD);$(ZLIB_LIBPATHD);$(EMBREE_LIBPATHD);$(GMP_LIBPATHD);$(OC_LIBPATHD);$(GMSH_ROOT_BIN);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBD);$(ZLIB_LIBPATHD);$(EMBREE_LIBPATHD);$(GMP_LIBPATHD);$(OC_LIBPATHD);$(GMSH_ROOT_BIN);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib;zlibd.lib;embree3.lib;libgmp-10.lib;gmsh.lib;$(CFG_OC_LIBS);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -160,7 +160,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_DLLR);$(ZLIB_LIBPATHR);$(EMBREE_LIBPATHR);$(GMP_LIBPATHR);$(OC_LIBPATHR);$(GMSH_ROOT_BIN);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBR);$(ZLIB_LIBPATHR);$(EMBREE_LIBPATHR);$(GMP_LIBPATHR);$(OC_LIBPATHR);$(GMSH_ROOT_BIN);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib;zlib.lib;embree3.lib;libgmp-10.lib;gmsh.lib;$(CFG_OC_LIBS)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

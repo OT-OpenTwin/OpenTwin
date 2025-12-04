@@ -120,7 +120,7 @@ void EntitySolverMonitor::createProperties()
 	EntityPropertiesDouble::createProperty("Monitor settings", GetPropertyNameObservFreq(), 0., "Monitor", getProperties());
 	EntityPropertiesInteger::createProperty("Monitor settings", GetPropertyNameMonitorFrequency(), 1, "Monitor", getProperties());
 	EntityPropertiesSelection::createProperty("Volume selection", GetPropertyNameVolume(), { GetPropertyValueVolumeFull(),GetPropertyValueVolumePoint() }, GetPropertyValueVolumeFull(), "Monitor", getProperties());
-	EntityPropertiesInteger::createProperty("Monitor settings", GetPropertyNameObservedTimeStep(), 0., "Monitor", getProperties());
+	EntityPropertiesInteger::createProperty("Monitor settings", GetPropertyNameObservedTimeStep(), 0, "Monitor", getProperties());
 
 	updatePropertyVisibilities();
 }

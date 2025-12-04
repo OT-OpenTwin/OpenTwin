@@ -76,7 +76,7 @@ public:
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
-	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 
 private:
