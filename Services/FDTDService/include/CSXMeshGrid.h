@@ -57,7 +57,7 @@ public:
 	//! @brief Is being used by FDTDConfig to then write the complete solver XML
 	//! @param _parentElement The parent XML element to which the mesh grid data will be added
 	//! @return The created mesh grid XML element
-	tinyxml2::XMLElement* writeCSXMeshGrid(tinyxml2::XMLElement& _parentElement) const;
+	tinyxml2::XMLElement* writeToXML(tinyxml2::XMLElement& _parentElement) const;
 
 private:
 	// Mesh grid data

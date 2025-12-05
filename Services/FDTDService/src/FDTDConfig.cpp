@@ -116,7 +116,7 @@ void FDTDConfig::loadSTLMesh(const std::string& _meshName, const std::string& _t
 	m_stlExporter = std::make_unique<CartesianMeshToSTL>(_meshName, _tmpFolderName);
 }
 
-tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLElement& _parentElement) {
+tinyxml2::XMLElement* FDTDConfig::writeToXML(tinyxml2::XMLElement& _parentElement) {
 	// Defining the boundary names used for the solver XML parser
 	// These must match the expected names in the XML and will be different from the GUI
 	const std::array<std::string, 6> solverBoundaryNames = { "xmax", "xmin", "ymax", "ymin", "zmax", "zmin" };
@@ -188,21 +188,29 @@ void FDTDConfig::FDTDpropertyChecking() {
 void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {
 	auto declaration = _doc.NewDeclaration("xml version=\"1.0\" encoding=\"utf-8\"");
 	_doc.InsertFirstChild(declaration);
+	// openEMS root element
 	auto root = _doc.NewElement("openEMS");
 	_doc.InsertEndChild(root);
-	auto FDTD = writeFDTD(*root);
+	
+	// Now we add the FDTD node
+	auto FDTD = writeToXML(*root);
 	root->InsertEndChild(FDTD);
+	
+	// Now we add the ContinuousStructure node
 	auto CSX = _doc.NewElement("ContinuousStructure");
 	auto CSXProperties = _doc.NewElement("Properties");
 
 	// load and write the excitation properties
 	auto& excitations = m_excitation->getExciteProperties();
-	CSXProperties->InsertEndChild(excitations.writeExciteProperties(*CSXProperties));
+	CSXProperties->InsertEndChild(excitations.writeToXML(*CSXProperties));
+	// write the STL mesh to the CSX properties node
 	auto stlFile = m_stlExporter->writeToXML(*CSXProperties);
 	CSXProperties->InsertEndChild(stlFile);
-
+	// Now we add the CSXProperties and the mesh grid to the CSX node
 	CSX->InsertEndChild(CSXProperties);
-	auto CSXRectGrid = m_meshGrid.writeCSXMeshGrid(*root);
+	auto CSXRectGrid = m_meshGrid.writeToXML(*root);
 	CSX->InsertEndChild(CSXRectGrid);
+
+	// Finally, we add the CSX node to the root
 	root->InsertEndChild(CSX);
 }

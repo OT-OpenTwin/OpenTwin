@@ -24,10 +24,12 @@
 // STD
 #include <cstdint>
 
+//! @brief Class representing a Sinusoidal excitation for FDTD simulations
 class SinusoidalExcitation : public ExcitationBase {
 public:
 	SinusoidalExcitation();
 	virtual ~SinusoidalExcitation();
 
+	//! @brief Applies the Sinusoidal excitation properties to the ExcitationProperties object
 	virtual void applyProperties() override;
 };

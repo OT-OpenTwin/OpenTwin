@@ -91,7 +91,7 @@ std::string CSXMeshGrid::vectorToString(const std::vector<double>& _vector) cons
 	return result;
 }
 
-tinyxml2::XMLElement* CSXMeshGrid::writeCSXMeshGrid(tinyxml2::XMLElement& _parentElement) const {
+tinyxml2::XMLElement* CSXMeshGrid::writeToXML(tinyxml2::XMLElement& _parentElement) const {
 	auto rectGrid = _parentElement.GetDocument()->NewElement("RectilinearGrid");
 	auto xElem = _parentElement.GetDocument()->NewElement("XLines");
 	auto yElem = _parentElement.GetDocument()->NewElement("YLines");

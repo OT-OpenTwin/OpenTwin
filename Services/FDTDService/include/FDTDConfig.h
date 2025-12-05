@@ -73,14 +73,15 @@ public:
 	void setFromEntity(EntityBase* _solverEntity);
 
 	//! @brief This function loads the STL mesh from the given mesh name and puts the STL files in the temporary folder
-	//! @param _meshName The name of the mesh to loa
+	//! @brief Wrapper for the CartesianMeshToSTL constructor to load the mesh
+	//! @param _meshName The name of the mesh to load
 	//! @param _tmpFolderName The temporary folder where the mesh files are located
 	void loadSTLMesh(const std::string& _meshName, const std::string& _tmpFolderName);
 
 	//! @brief This function creates an XML element for the FDTD configuration 
 	//! @param _parentElement The parent XML element to which the FDTD configuration will be added
 	//! @return The created FDTD XML element
-	tinyxml2::XMLElement* writeFDTD(tinyxml2::XMLElement& _parentElement);
+	tinyxml2::XMLElement* writeToXML(tinyxml2::XMLElement& _parentElement);
 
 	//! @brief Reads the configuration from the entity properties and writes the XML file
 	//! @param _doc The XML document to which the configuration will be added
