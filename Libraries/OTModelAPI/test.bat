@@ -27,10 +27,36 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Launching development enviroment
+SETLOCAL enabledelayedexpansion
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_MODELAPI_ROOT%"
+
+SET RELEASE=1
+SET DEBUG=1
+
+IF "%1"=="RELEASE" (
+  SET RELEASE=1
+  SET DEBUG=0
+)
+
+IF "%1"=="DEBUG" (
+  SET RELEASE=0
+  SET DEBUG=1
+)
+
+SET "OLDPATH=%PATH%"
+
+IF %DEBUG%==1 (
+	SET "PATH=%OT_ALL_DLLD%;%ZLIB_DLLPATHD%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_MODELAPI_ROOT%" DEBUG
+)
+
+IF %RELEASE%==1 (
+	SET "PATH=%OT_ALL_DLLR%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_MODELAPI_ROOT%" RELEASE
+) 
+
+SET "PATH=%OLDPATH%"
 
 GOTO END
 

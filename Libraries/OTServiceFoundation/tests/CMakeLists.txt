@@ -308,13 +308,13 @@ if(WIN32)
     endif()
 
     if(OT_MODELAPI_ROOT_PATH AND OT_LIBD_PATH)
-        join_paths(OT_MODELAPI_DEBUG_LIB_DIR "${OT_MODELAPI_ROOT_PATH}" "${OT_LIBD_PATH}")
+        join_paths(OT_MODELAPI_DEBUG_LIB_DIR "${OT_MODELAPI_ROOT_PATH}" "${OT_CLIBD_PATH}")
         target_link_directories(OTServiceFoundation_tests PRIVATE
             $<$<CONFIG:Debug>:${OT_MODELAPI_DEBUG_LIB_DIR}>
         )
     endif()
     if(OT_MODELAPI_ROOT_PATH AND OT_LIBR_PATH)
-        join_paths(OT_MODELAPI_RELEASE_LIB_DIR "${OT_MODELAPI_ROOT_PATH}" "${OT_LIBR_PATH}")
+        join_paths(OT_MODELAPI_RELEASE_LIB_DIR "${OT_MODELAPI_ROOT_PATH}" "${OT_CLIBR_PATH}")
         target_link_directories(OTServiceFoundation_tests PRIVATE
             $<$<NOT:$<CONFIG:Debug>>:${OT_MODELAPI_RELEASE_LIB_DIR}>
         )
