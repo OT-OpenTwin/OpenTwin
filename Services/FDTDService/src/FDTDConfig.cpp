@@ -17,11 +17,22 @@
 // limitations under the License.
 // @otlicense-end
 
+// OpenTwin
 #include "FDTDConfig.h"
 
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "OTCore/LogDispatcher.h"
+#include "PropertyHelper.h"
+#include "EntityProperties.h"
+
+#include "Excitation/ExcitationProperties.h"
 #include "Excitation/ExcitationBase.h"
 #include "Excitation/GaussianExcitation.h"
 #include "Excitation/SinusoidalExcitation.h"
+
+// STD
+#include <stdexcept>
+
 
 FDTDConfig::FDTDConfig()
 {
@@ -29,30 +40,6 @@ FDTDConfig::FDTDConfig()
 
 FDTDConfig::~FDTDConfig()
 {
-}
-
-uint32_t FDTDConfig::getTimeSteps() const {
-	return m_timeSteps;
-}
-
-double FDTDConfig::getEndCriteria() const {
-	return m_endCriteria;
-}
-
-double FDTDConfig::getFrequencyStart() const {
-	return m_freqStart;
-}
-
-double FDTDConfig::getFrequencyStop() const {
-	return m_freqStop;
-}
-
-uint32_t FDTDConfig::getOversampling() const {
-	return m_oversampling;
-}
-
-std::array<std::string, 6> FDTDConfig::getBoundaryConditions() const {
-	return m_boundaryConditions;
 }
 
 std::string FDTDConfig::getBoundaryConditions(size_t _index) const {
@@ -66,35 +53,11 @@ uint32_t FDTDConfig::getExcitationType() const {
 	return static_cast<uint32_t>(m_excitationType);
 }
 
-void FDTDConfig::setTimeSteps(uint32_t _timeSteps) {
-	m_timeSteps = _timeSteps;
-}
-
-void FDTDConfig::setExcitationType(ExcitationTypes _excitationType) {
-	m_excitationType = _excitationType;
-}
-
 void FDTDConfig::setExcitationType(uint32_t _value) {
-	if (_value > 2 || _value < 0) {
-		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 0 (Gaussian), 1 (Sinusoidal), or 2 (Ramp)");
+	if (_value > 1 || _value < 0) {
+		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 0 (Gaussian), 1 (Sinusoidal)");
 	}
 	m_excitationType = static_cast<ExcitationTypes>(_value);
-}
-
-void FDTDConfig::setEndCriteria(double _endCriteria) {
-	m_endCriteria = _endCriteria;
-}
-
-void FDTDConfig::setFrequencyStart(double _freqStart) {
-	m_freqStart = _freqStart;
-}
-
-void FDTDConfig::setFrequencyStop(double _freqStop) {
-	m_freqStop = _freqStop;
-}
-
-void FDTDConfig::setOverSampling(uint32_t _overSampling) {
-	m_oversampling = _overSampling;
 }
 
 void FDTDConfig::setBoundaryCondition(const std::array<std::string, 6>& _values) {
@@ -234,7 +197,7 @@ void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {
 
 	// load and write the excitation properties
 	auto& excitations = m_excitation->getExciteProperties();
-	CSXProperties->InsertEndChild(excitations.writeExciteProperties(*root));
+	CSXProperties->InsertEndChild(excitations.writeExciteProperties(*CSXProperties));
 	auto stlFile = m_stlExporter->writeToXML(*CSXProperties);
 	CSXProperties->InsertEndChild(stlFile);
 
