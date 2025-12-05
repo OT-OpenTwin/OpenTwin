@@ -75,18 +75,39 @@ CartesianMeshToSTL::CartesianMeshToSTL(const std::string& meshName, const std::s
 	processRequiredMaterials(objectMaterialNames);
 }
 
+std::string CartesianMeshToSTL::getMaterialTag(const EntityMaterial* _material) const {
+	if (!_material) {
+		// fallback to material
+		return "Material";
+	}
+	const EntityProperties& properties = _material->getProperties();
+	const auto type = _material->getProperties().getProperty("Material type", "General");
+	if (!type) {
+		// fallback to material
+		return "Material";
+	}
+	auto selection = dynamic_cast<const EntityPropertiesSelection*>(type);
+	if (!selection) {
+		// fallback to material
+		return "Material";
+	}
+	// Determine if PEC or general material
+	const std::string& materialType = selection->getValue();
+	return (materialType == "PEC") ? "Metal" : "Material";
+}
+
 void CartesianMeshToSTL::writeMaterialProperties(const EntityMaterial* _material, tinyxml2::XMLDocument* _doc, tinyxml2::XMLElement* _materialElement, tinyxml2::XMLElement* _polyReaderElement) const {
-	const EntityProperties& props = _material->getProperties();
-	auto type = _material->getProperties().getProperty("Material type", "General");
-	auto& materialType = dynamic_cast<const EntityPropertiesSelection*>(type)->getValue();
-	auto* priority = props.getProperty("Mesh priority", "General");
+	const EntityProperties& properties = _material->getProperties();
+	const auto materialType = properties.getProperty("Material type", "General");
+	const auto& materialSelection = dynamic_cast<const EntityPropertiesSelection*>(materialType)->getValue();
+	auto* priority = properties.getProperty("Mesh priority", "General");
 	double priorityValue = dynamic_cast<const EntityPropertiesDouble*>(priority)->getValue();
 	_polyReaderElement->SetAttribute("Priority", priorityValue);
-	if (materialType != "PEC") {
+	if (materialSelection != "PEC") {
 		tinyxml2::XMLElement* propertyElement = _doc->NewElement("Property");
-		auto* permittivity = props.getProperty("Permittivity (relative)", "Electromagnetic");
-		auto* permeability = props.getProperty("Permeability (relative)", "Electromagnetic");
-		auto* conductivity = props.getProperty("Conductivity", "Electromagnetic");
+		auto* permittivity = properties.getProperty("Permittivity (relative)", "Electromagnetic");
+		auto* permeability = properties.getProperty("Permeability (relative)", "Electromagnetic");
+		auto* conductivity = properties.getProperty("Conductivity", "Electromagnetic");
 		if (permittivity) {
 			double epsilon = dynamic_cast<const EntityPropertiesDouble*>(permittivity)->getValue();
 			propertyElement->SetAttribute("Epsilon", epsilon);
@@ -107,7 +128,8 @@ tinyxml2::XMLElement* CartesianMeshToSTL::writeToXML(tinyxml2::XMLElement& _pare
 	auto doc = _parentElement.GetDocument();
 	tinyxml2::XMLElement* lastMaterialElement = nullptr;
 	for (size_t objIndex = 0; objIndex < getNumberOfObjects(); objIndex++) {
-		tinyxml2::XMLElement* materialElement = doc->NewElement("Material");
+		const auto& materialTag = getMaterialTag(getMaterialOfObject(objIndex));
+		tinyxml2::XMLElement* materialElement = doc->NewElement(materialTag.c_str());
 		lastMaterialElement = materialElement;
 		EntityMaterial* material = getMaterialOfObject(objIndex);
 		if (material != nullptr) {

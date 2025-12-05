@@ -41,7 +41,20 @@ public:
 	size_t getNumberOfObjects() const { return materialsOfObjects.size(); }
 	std::string getFileNameOfObject(size_t id) const { if (id < 0 || id >= fileNamesOfObjects.size()) return "";  return fileNamesOfObjects[id]; }
 	EntityMaterial* getMaterialOfObject(size_t id) const { if (id < 0 || id >= materialsOfObjects.size()) return nullptr; return materialsOfObjects[id]; }
+
+	//! @brief Helper function to get the XML tag for a material. "Metal" (PEC) or "Material" (Volumetric)
+	std::string getMaterialTag(const EntityMaterial* _material) const;
+
+	//! @brief Helper function to write the material properties into the provided XML elements
+	//! @param _material The material to write
+	//! @param _doc The XML document
+	//! @param _materialElement The XML element to write the material properties into
+	//! @param _polyReaderElement The XML element to write the polyhedron reader properties into
 	void writeMaterialProperties(const EntityMaterial* _material, tinyxml2::XMLDocument* _doc, tinyxml2::XMLElement* _materialElement, tinyxml2::XMLElement* _polyReaderElement) const;
+
+	//! @brief Write the object information into an XML element
+	//! @parmam _parentElement The parent XML element of the central XML element to write
+	//! @return The created XML element containing the object information
 	tinyxml2::XMLElement* writeToXML(tinyxml2::XMLElement& _parentElement) const;
 	 
 private:
@@ -54,4 +67,5 @@ private:
 
 	std::vector<std::string> fileNamesOfObjects;
 	std::vector<EntityMaterial*> materialsOfObjects;
+
 };
