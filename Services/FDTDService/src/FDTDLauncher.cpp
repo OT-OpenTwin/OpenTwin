@@ -72,10 +72,6 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 		return "ERROR: Unable to create temporary working directory (TMP environment variable needs to be set)";
 	}
 
-	// Get all the material property infomation
-	std::map<std::string, EntityProperties> materialProperties;
-	readMaterialProperties(materialProperties);
-
 	EntityPropertiesEntityList *mesh = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Mesh"));
 	assert(mesh != nullptr);
 	if (mesh == nullptr) {
@@ -99,15 +95,9 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 		cfg.loadSTLMesh(mesh->getValueName(), tempDirPath);
 		tinyxml2::XMLDocument doc;
 		cfg.addToXML(doc);
+		// Save the XML file
 		std::string tempFilePath = tempDirPath + "\\FDTD.xml";
 		doc.SaveFile(tempFilePath.c_str());
-		// Build the solver input file in the temp folder
-		std::string controlFileName = tempDirPath + "\\model.pro";
-		std::ofstream controlFile(controlFileName);
-		
-		//solver->setData(solverEntity, meshDataName, meshItemInfo, entityProperties, groupNameToIdMap, materialProperties);
-		solver->writeInputFile(controlFile, application);
-		controlFile.close();
 
 		// Run the solver
 		logFileText = solver->runSolver(tempDirPath, application->getUiComponent());
