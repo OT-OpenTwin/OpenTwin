@@ -19,26 +19,16 @@
 
 #pragma once
 
-// TINYXML2
+// OpenTwin
+#include "OTCore/OTClassHelper.h"
+
+// tinyxml2
 #include <tinyxml2.h>
 
-// OpenTwin
-#include "OTCore/CoreTypes.h"
-#include "OTCore/LogDispatcher.h"
-#include "OTCore/OTClassHelper.h"
-#include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityMeshCartesianData.h"
-#include "EntityProperties.h"
-#include "EntityInformation.h"
-#include "EntityAPI.h"
-
 // STD
-#include <memory>
 #include <cstdint>
 #include <string>
-#include <list>
 #include <vector>
-#include <map>
 
 // Forward declaration
 class EntityBase;
@@ -56,17 +46,11 @@ public:
 	//! @param _solverEntity The solver entity to load data from
 	void loadMeshGridDataFromEntity(EntityBase* _solverEntity);
 
-	//! @brief Getters for the mesh grid X lines
 	const std::vector<double>& getXLines() const { return m_gridX; }
-	//! @brief Getters for the mesh grid Y lines
 	const std::vector<double>& getYLines() const { return m_gridY; }
-	//! @brief Getters for the mesh grid Z lines
 	const std::vector<double>& getZLines() const { return m_gridZ; }
-	//! @brief Getter for the delta unit
 	double getDeltaUnit() const { return m_deltaUnit; }
-	//! @brief Getter for the step ratio
 	double getStepRatio() const { return m_stepRatio; }
-	//! @brief Getter for the coordinate system
 	uint32_t getCoordSystem() const { return m_coordSystem; }
 
 	//! @brief Creates an XML element for the mesh grid data
@@ -83,8 +67,8 @@ private:
 
 	// Mesh grid properties
 	uint32_t m_coordSystem = 0; // 0 = Cartesian
-	double m_deltaUnit = 0.001; // in mm
-	double m_stepRatio = 1.0; //1.0
+	double m_deltaUnit = 0.0; // default 0.0
+	double m_stepRatio = 0.0; // default 0.0
 
 	//! @brief Converts a vector of doubles to a comma-separated string
 	//! @brief Formating for solver XML

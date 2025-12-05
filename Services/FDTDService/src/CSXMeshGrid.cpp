@@ -17,7 +17,22 @@
 // limitations under the License.
 // @otlicense-end
 
+// OpenTwin
 #include "CSXMeshGrid.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/LogDispatcher.h"
+#include "OTCore/OTClassHelper.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "EntityMeshCartesianData.h"
+#include "EntityProperties.h"
+#include "EntityInformation.h"
+#include "EntityAPI.h"
+
+// STD
+#include <memory>
+#include <list>
+#include <map>
+
 
 CSXMeshGrid::CSXMeshGrid() {
 }
@@ -59,7 +74,6 @@ void CSXMeshGrid::loadMeshGridDataFromEntity(EntityBase* _solverEntity) {
 	m_gridX = meshDataEntity->getMeshLinesX();
 	m_gridY = meshDataEntity->getMeshLinesY();
 	m_gridZ = meshDataEntity->getMeshLinesZ();
-
 	m_deltaUnit = meshDataEntity->getSmallestStepWidth();
 	m_stepRatio = meshDataEntity->getStepRatio();
 
@@ -85,6 +99,7 @@ tinyxml2::XMLElement* CSXMeshGrid::writeCSXMeshGrid(tinyxml2::XMLElement& _paren
 	xElem->SetText((vectorToString(m_gridX)).c_str());
 	yElem->SetText((vectorToString(m_gridY)).c_str());
 	zElem->SetText((vectorToString(m_gridZ)).c_str());
+	rectGrid->SetAttribute("DeltaUnit", m_deltaUnit);
 	rectGrid->InsertEndChild(xElem);
 	rectGrid->InsertEndChild(yElem);
 	rectGrid->InsertEndChild(zElem);
