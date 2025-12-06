@@ -586,6 +586,7 @@ EntityPropertiesString* EntityPropertiesString::createProperty(const std::string
 
 	// Finally create the new property
 	EntityPropertiesString* newProperty = new EntityPropertiesString(name, value);
+	newProperty->setIsMultiline(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultBool(defaultCategory, name + "_Multiline", false));
 	properties.createProperty(newProperty, group);
 	return newProperty;
 }
@@ -594,6 +595,7 @@ void EntityPropertiesString::addToConfiguration(ot::PropertyGridCfg& _configurat
 {
 	ot::PropertyString* newProp = new ot::PropertyString(this->getName(), m_value);
 	this->setupPropertyData(_configuration, newProp);
+	newProp->setMultiline(m_isMultiline);
 }
 
 void EntityPropertiesString::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
@@ -606,18 +608,23 @@ void EntityPropertiesString::setFromConfiguration(const ot::Property* _property,
 	}
 
 	setValue(actualProperty->getValue());
+	setIsMultiline(actualProperty->isMultiline());
 }
 
 void EntityPropertiesString::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
 {
 	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
 	_jsonObject.AddMember("Value", ot::JsonString(m_value, _allocator), _allocator);
+	_jsonObject.AddMember("IsMultiline", m_isMultiline, _allocator);
 }
 
 void EntityPropertiesString::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
 {
 	EntityPropertiesBase::readFromJsonObject(_object, _root);
 	this->setValue(ot::json::getString(_object, "Value"));
+	if (_object.HasMember("IsMultiline")) {
+		this->setIsMultiline(ot::json::getBool(_object, "IsMultiline", false));
+	}
 }
 
 void EntityPropertiesString::copySettings(EntityPropertiesBase *other, EntityBase *root)
@@ -630,6 +637,7 @@ void EntityPropertiesString::copySettings(EntityPropertiesBase *other, EntityBas
 	if (entity != nullptr)
 	{
 		setValue(entity->getValue());
+		setIsMultiline(entity->getIsMultiline());
 	}
 }
 

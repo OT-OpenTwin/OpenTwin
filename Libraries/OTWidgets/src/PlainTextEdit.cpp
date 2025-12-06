@@ -22,11 +22,12 @@
 #include "OTWidgets/CustomValidator.h"
 
 // Qt header
+#include <QtCore/qmimedata.h>
 #include <QtGui/qfontmetrics.h>
 #include <QtWidgets/qscrollbar.h>
 
 ot::PlainTextEdit::PlainTextEdit(QWidget* _parent)
-	: QPlainTextEdit(_parent), m_autoScrollToBottom(false), m_validator(nullptr)
+	: QPlainTextEdit(_parent), m_autoScrollToBottom(false), m_validator(nullptr), m_maxLength(0)
 {
 	QFontMetrics f(this->font());
 	this->setTabStopDistance(4 * f.horizontalAdvance(QChar(' ')));
@@ -74,25 +75,75 @@ void ot::PlainTextEdit::scrollToBottom(void) {
 	}
 }
 
+void ot::PlainTextEdit::setMaxTextLength(int _maxLength) {
+	m_maxLength = _maxLength;
+	if (m_maxLength > 0) {
+		QSignalBlocker sigBlock(this);
+		QString currentText = this->toPlainText();
+		if (currentText.length() > m_maxLength) {
+			currentText = currentText.left(m_maxLength);
+			this->setPlainText(currentText);
+		}
+	}
+}
+
 void ot::PlainTextEdit::keyPressEvent(QKeyEvent* _event) {
+	int len = this->toPlainText().length();
 	if (_event->key() == Qt::Key_Return && _event->modifiers() == Qt::ControlModifier) {
 		QSignalBlocker sigBlock(this);
 		_event->accept();
-		this->insertPlainText("\n");
+		if (m_maxLength <= 0 || len < m_maxLength) {
+			this->insertPlainText("\n");
+		}
 	}
 	else if (_event->key() == Qt::Key_Tab && _event->modifiers() == Qt::ControlModifier) {
 		QSignalBlocker sigBlock(this);
 		_event->accept();
-		this->insertPlainText("\t");
+		if (m_maxLength <= 0 || len < m_maxLength) {
+			this->insertPlainText("\t");
+		}
+	}
+	else if (m_maxLength > 0 && len >= m_maxLength && !_event->text().isEmpty() && !_event->matches(QKeySequence::Paste)) {
+		_event->ignore();
+		return;
 	}
 	else {
 		QPlainTextEdit::keyPressEvent(_event);
 	}
-	
 }
 
 void ot::PlainTextEdit::keyReleaseEvent(QKeyEvent* _event) {
 
+}
+
+void ot::PlainTextEdit::insertFromMimeData(const QMimeData* _source) {
+	if (m_maxLength <= 0) {
+		QPlainTextEdit::insertFromMimeData(_source);
+		return;
+	}
+
+	QString current = toPlainText();
+	QString incoming;
+
+	if (_source->hasText()) {
+		incoming = _source->text();
+	}
+	else {
+		QPlainTextEdit::insertFromMimeData(_source);
+		return;
+	}
+
+	int available = m_maxLength - current.length();
+	if (available <= 0) {
+		return;
+	}
+
+	if (incoming.length() > available) {
+		incoming = incoming.left(available);
+	}
+
+	QTextCursor cursor = textCursor();
+	cursor.insertText(incoming);
 }
 
 void ot::PlainTextEdit::slotTextChanged(void) {
@@ -107,10 +158,22 @@ void ot::PlainTextEdit::slotTextChanged(void) {
 			pos = cursor.position();
 
 			m_validator->fixup(currentText, pos);
+
+			if (m_maxLength > 0 && currentText.length() > m_maxLength) {
+				currentText = currentText.left(m_maxLength);
+			}
+
 			this->setPlainText(currentText);
 
 			cursor.setPosition(pos);
 			this->setTextCursor(cursor);
+		}
+		else if (m_maxLength > 0) {
+			QSignalBlocker sigBlock(this);
+			if (currentText.length() > m_maxLength) {
+				currentText = currentText.left(m_maxLength);
+				this->setPlainText(currentText);
+			}
 		}
 	}
 

@@ -56,6 +56,9 @@ namespace ot {
 		void setMaxLength(int _length) { m_maxLength = _length; };
 		int getMaxLength(void) const { return m_maxLength; };
 
+		void setMultiline(bool _multiline) { m_multiline = _multiline; };
+		bool isMultiline(void) const { return m_multiline; };
+
 	protected:
 		//! @brief Add the property data to the provided JSON object
 		//! The property type is already added
@@ -72,6 +75,7 @@ namespace ot {
 		std::string m_value;
 		std::string m_placeholderText;
 		unsigned int m_maxLength;
+		bool m_multiline;
 	};
 
 }

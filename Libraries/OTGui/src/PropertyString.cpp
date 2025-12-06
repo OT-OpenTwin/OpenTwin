@@ -26,23 +26,23 @@
 static ot::PropertyFactoryRegistrar<ot::PropertyString> propertyStringRegistrar(ot::PropertyString::propertyTypeString());
 
 ot::PropertyString::PropertyString(const PropertyString* _other) 
-	: Property(_other), m_value(_other->m_value), m_placeholderText(_other->m_placeholderText), m_maxLength(_other->m_maxLength)
+	: Property(_other), m_value(_other->m_value), m_placeholderText(_other->m_placeholderText), m_maxLength(_other->m_maxLength), m_multiline(_other->m_multiline)
 {}
 
 ot::PropertyString::PropertyString(const PropertyBase & _base)
-	: Property(_base), m_maxLength(0)
+	: Property(_base), m_maxLength(0), m_multiline(false)
 {}
 
 ot::PropertyString::PropertyString(PropertyFlags _flags)
-	: Property(_flags), m_maxLength(0)
+	: Property(_flags), m_maxLength(0), m_multiline(false)
 {}
 
 ot::PropertyString::PropertyString(const std::string& _value, PropertyFlags _flags)
-	: Property(_flags), m_value(_value), m_maxLength(0)
+	: Property(_flags), m_value(_value), m_maxLength(0), m_multiline(false)
 {}
 
 ot::PropertyString::PropertyString(const std::string& _name, const std::string& _value, PropertyFlags _flags)
-	: Property(_name, _flags), m_value(_value), m_maxLength(0)
+	: Property(_name, _flags), m_value(_value), m_maxLength(0), m_multiline(false)
 {}
 
 void ot::PropertyString::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
@@ -57,6 +57,7 @@ void ot::PropertyString::mergeWith(const Property* _other, const MergeMode& _mer
 	if (_mergeMode & PropertyBase::MergeConfig) {
 		m_placeholderText = other->m_placeholderText;
 		m_maxLength = other->m_maxLength;
+		m_multiline = other->m_multiline;
 	}
 }
 
@@ -68,10 +69,14 @@ void ot::PropertyString::getPropertyData(ot::JsonValue& _object, ot::JsonAllocat
 	_object.AddMember("Value", JsonString(m_value, _allocator), _allocator);
 	_object.AddMember("Placeholder", JsonString(m_placeholderText, _allocator), _allocator);
 	_object.AddMember("MaxLength", m_maxLength, _allocator);
+	_object.AddMember("Multiline", m_multiline, _allocator);
 }
 
 void ot::PropertyString::setPropertyData(const ot::ConstJsonObject& _object) {
 	m_value = json::getString(_object, "Value");
 	m_placeholderText = json::getString(_object, "Placeholder");
 	m_maxLength = json::getUInt(_object, "MaxLength");
+	if (_object.HasMember("Multiline")) {
+		m_multiline = json::getBool(_object, "Multiline");
+	}
 }

@@ -50,16 +50,21 @@ namespace ot {
 
 		void scrollToBottom();
 
+		void setMaxTextLength(int _maxLength);
+		int getMaxTextLength() const { return m_maxLength; };
+
 	public Q_SLOTS:
 		void slotTextChanged();
 
 	protected:
 		virtual void keyPressEvent(QKeyEvent* _event) override;
 		virtual void keyReleaseEvent(QKeyEvent* _event) override;
+		virtual void insertFromMimeData(const QMimeData* _source) override;
 
 	private:
 		CustomValidator* m_validator;
 		bool m_autoScrollToBottom;
+		int m_maxLength;
 
 	};
 

@@ -286,8 +286,11 @@ public:
 	virtual eType getType() const override { return STRING; };
 	virtual std::string getTypeString() const override { return EntityPropertiesString::typeString(); };
 
-	void setValue(const std::string &s) { if (m_value != s) setNeedsUpdate(); m_value = s; };
+	void setValue(const std::string& s) { if (m_value != s) { setNeedsUpdate(); m_value = s; } };
 	const std::string& getValue() const { return m_value; };
+
+	void setIsMultiline(bool _flag) { if (m_isMultiline != _flag) { m_isMultiline = _flag; setNeedsUpdate(); } };
+	bool getIsMultiline() const { return m_isMultiline; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
@@ -303,6 +306,7 @@ public:
 
 private:
 	std::string m_value;
+	bool m_isMultiline;
 };
 
 // ################################################################################################################################################################

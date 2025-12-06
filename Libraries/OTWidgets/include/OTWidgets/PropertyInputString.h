@@ -28,6 +28,7 @@
 namespace ot {
 
 	class LineEdit;
+	class PlainTextEdit;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputString : public PropertyInput {
 		Q_OBJECT
@@ -54,6 +55,7 @@ namespace ot {
 
 	private:
 		LineEdit* m_lineEdit;
+		PlainTextEdit* m_textEdit;
 		QString m_text;
 	};
 
