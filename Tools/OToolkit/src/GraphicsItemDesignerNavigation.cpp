@@ -66,7 +66,6 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 	}
 	_item->getGraphicsItem()->setGraphicsItemName(itemName.toStdString());
 	_item->setNavigation(this);
-	_item->getGraphicsItem()->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft);
 	_item->setDesignerItemFlag(GraphicsItemDesignerItemBase::DesignerItemFlag::DesignerItemIgnoreEvents, false);
 
 	OTAssertNullptr(_item->getGraphicsItem());
@@ -243,6 +242,7 @@ void GraphicsItemDesignerNavigation::clearDesignerItems(void) {
 	m_rootItems.clear();
 
 	m_selectionChangeInProgress = true;
+	m_currentPropertyHandler = nullptr;
 	this->deselectAll();
 
 	// Remove from view

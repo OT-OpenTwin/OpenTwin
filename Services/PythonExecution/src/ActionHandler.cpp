@@ -32,9 +32,10 @@
 #include "DataBase.h"
 #include "EntityBase.h"
 #include "DocumentAPI.h"
-
+#include "PackageHandler.h"
 
 #include "OTServiceFoundation/TimeFormatter.h"
+#include "ExceptionRestartRequired.h"
 
 ActionHandler& ActionHandler::instance(void) {
 	static ActionHandler g_instance;
@@ -106,6 +107,9 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		DataBase::instance().setCollectionName(collectionName);
 		DataBase::instance().setUserCredentials(userName, psw);
 		DataBase::instance().initializeConnection(url);
+
+		ot::UID manifestUID = ot::json::getUInt64(doc, OT_ACTION_PARAM_Python_Environment);
+		m_pythonAPI.initializeEnvironment(manifestUID);
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE) {
 		OT_LOG_D("Initialise UID Generator");
@@ -118,6 +122,17 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
+		std::string environmentName = "Pyrit";
+		m_pythonAPI.initializeEnvironment(environmentName);
+	}
+	else if (serviceName == OT_INFO_SERVICE_TYPE_STUDIOSUITE)
+	{
+		OT_LOG_D("Initialise UID Generator");
+		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
+		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
+		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
+		std::string environmentName = "StudioSuite";
+		m_pythonAPI.initializeEnvironment(environmentName);
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL) {
 		OT_LOG_D("Connecting with modelService");
@@ -130,7 +145,8 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 		Application::instance().setUIServiceURL(url);
 	}
-	else {
+	else 
+	{
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported initialisation order.");
 	}
 
@@ -159,6 +175,8 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 		//Extract script entity names from json doc
 		std::list<std::string> scripts = ot::json::getStringList(doc, OT_ACTION_CMD_PYTHON_Scripts);
 		OT_LOG_D("Number of scripts being executed: " + std::to_string(scripts.size()));
+		ot::UID manifestUID = ot::json::getUInt64(doc, OT_ACTION_PARAM_Python_Environment);
+		PackageHandler::instance().initializeManifest(manifestUID);
 
 		//Extract parameter array from json doc
 		auto parameterArrayArray = ot::json::getArray(doc, OT_ACTION_CMD_PYTHON_Parameter);
@@ -200,6 +218,14 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 			returnValues.addData(OT_ACTION_CMD_PYTHON_Portdata, ot::JsonString(gridFSDocumentID, returnValues.getAllocator()));
 			return ot::ReturnMessage(std::move(returnValues));;
 		}
+	}
+	catch (ExceptionRestartRequired&)
+	{
+		OT_LOG_D("Restart of the interpreter necessary.\n");
+		ot::ReturnMessage message;
+		message.setStatus(ot::ReturnMessage::Ok);
+		message.setWhat("<Restart>");
+		return message;
 	}
 	catch (std::exception& e) {
 		OT_LOG_D("Script execution failed due to exception: " + std::string(e.what()));
@@ -267,7 +293,7 @@ std::string ActionHandler::writeReturnDataToDatabase()
 		returnDataDoc.AddMember(ot::JsonValue(scriptName.c_str(), returnDataDoc.GetAllocator()).Move(), scriptDataEntry.Move(), returnDataDoc.GetAllocator());
 	}
 
-	if(returnDataDoc.Empty())
+	if(returnDataDoc.ObjectEmpty())
 	{
 		return "";
 	}

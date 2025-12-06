@@ -53,7 +53,7 @@
 #include "OTWidgets/PlainTextEdit.h"
 #include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
 #include "OTWidgets/PlainTextEditView.h"
 
 // Qt header
@@ -197,7 +197,7 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 	settings->setValue("PosX", pos().x());
 	settings->setValue("PosY", pos().y());
 	settings->setValue("WindowState", saveState());
-	settings->setValue("ViewState", QByteArray::fromStdString(ot::WidgetViewManager::instance().saveState()));
+	settings->setValue("ViewState", QByteArray::fromStdString(ot::GlobalWidgetViewManager::instance().saveState()));
 
 	// Clear tools
 	m_toolManager->stopAll();
@@ -440,10 +440,10 @@ void AppBase::slotRecenter(void) {
 }
 
 void AppBase::slotFinalizeInit(void) {
-	ot::WidgetViewManager::instance().restoreState(this->createSettingsInstance()->value("ViewState", QByteArray()).toByteArray().toStdString());
+	ot::GlobalWidgetViewManager::instance().restoreState(this->createSettingsInstance()->value("ViewState", QByteArray()).toByteArray().toStdString());
 	
 	// Check current view to correctly display toolbar, statusbar and so on
-	ot::WidgetView* currentView = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	ot::WidgetView* currentView = ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView();
 	if (currentView) {
 		m_toolManager->getToolViewManager()->slotViewFocusChanged(currentView, nullptr);
 	}
@@ -492,9 +492,9 @@ AppBase::AppBase(QApplication* _app)
 	ot::LogDispatcher::instance().addReceiver(this);
 
 	// Initialize dock manager
-	ot::WidgetViewManager::instance().initialize();
+	ot::GlobalWidgetViewManager::instance().initialize();
 
-	QWidget* widgetViewWidget = ot::WidgetViewManager::instance().getDockManager();
+	QWidget* widgetViewWidget = ot::GlobalWidgetViewManager::instance().getDockManager();
 
 	// Create output
 	m_output = new ot::PlainTextEditView(widgetViewWidget);
@@ -528,14 +528,14 @@ AppBase::AppBase(QApplication* _app)
 	m_output->getPlainTextEdit()->setFont(f);
 	m_output->getPlainTextEdit()->setReadOnly(true);
 	
-	this->setCentralWidget(ot::WidgetViewManager::instance().getDockManager());
+	this->setCentralWidget(ot::GlobalWidgetViewManager::instance().getDockManager());
 	this->setWindowTitle("OToolkit");
 	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 
-	ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(), defaultView);
-	ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(), m_output);
+	ot::GlobalWidgetViewManager::instance().addView(ot::BasicServiceInformation(), defaultView);
+	ot::GlobalWidgetViewManager::instance().addView(ot::BasicServiceInformation(), m_output);
 
-	ot::WidgetViewManager::instance().setConfigFlags(
+	ot::GlobalWidgetViewManager::instance().setConfigFlags(
 		ot::WidgetViewManager::InputFocusCentralViewOnFocusChange |
 		ot::WidgetViewManager::UseBestAreaFinderOnViewInsert
 	);

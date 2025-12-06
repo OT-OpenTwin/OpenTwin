@@ -127,7 +127,7 @@ void EntityBase::storeToDataBase(ot::UID _givenEntityVersion) {
 	resetModified();
 }
 
-void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
+void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
 	setParent(parent);
 	setObserver(obs);
 	setModelState(ms);
@@ -166,7 +166,7 @@ void EntityBase::setVisualizationTypes(const ot::VisualisationTypes& _types, boo
 	}
 }
 
-void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
+void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
 	try {
 		std::string schemaVersionKey = "SchemaVersion_" + getClassName();
 		int schemaVersion = (int) DataBase::getIntFromView(doc_view, schemaVersionKey.c_str());

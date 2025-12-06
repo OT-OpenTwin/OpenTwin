@@ -72,9 +72,11 @@
     </ClCompile>
     <ClCompile Include="src\ExpanderWidget.cpp" />
     <ClCompile Include="src\FlowLayout.cpp" />
+    <ClCompile Include="src\GlobalWidgetViewManager.cpp" />
     <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp" />
     <ClCompile Include="src\GraphicsDisconnectItem.cpp" />
     <ClCompile Include="src\GraphicsPickerManager.cpp" />
+    <ClCompile Include="src\GraphicsSnapInfo.cpp" />
     <ClCompile Include="src\ImagePainterWidget.cpp" />
     <ClCompile Include="src\IndicatorWidget.cpp" />
     <ClCompile Include="src\ModelLibraryDialog.cpp" />
@@ -284,11 +286,13 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsDisconnectItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerManager.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsSnapInfo.h" />
     <ClInclude Include="include\OTWidgets\GraphicsZValues.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
     <QtMoc Include="include\OTWidgets\IndicatorWidget.h" />
     <ClInclude Include="include\OTWidgets\ImagePainterWidget.h" />
+    <ClInclude Include="include\OTWidgets\GlobalWidgetViewManager.h" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
     <QtMoc Include="include\OTWidgets\ManagedPropertyLink.h" />
@@ -589,7 +593,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qtadvanceddockingd.lib;$(QT_TT_LIBD);$(QWT_LIB_LIBD);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(QT_TT_LIBPATHD);$(QT_ADS_ROOT)\lib;$(QWT_LIB_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_CLIBD);$(OT_GUI_ROOT)\$(OT_CLIBD);$(QT_TT_LIBPATHD);$(QT_ADS_ROOT)\lib;$(QWT_LIB_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -632,7 +636,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qtadvanceddocking.lib;$(QT_TT_LIBR);$(QWT_LIB_LIBR);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(QT_TT_LIBPATHR);$(QT_ADS_ROOT)\lib;$(QWT_LIB_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_CLIBR);$(OT_GUI_ROOT)\$(OT_CLIBR);$(QT_TT_LIBPATHR);$(QT_ADS_ROOT)\lib;$(QWT_LIB_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">

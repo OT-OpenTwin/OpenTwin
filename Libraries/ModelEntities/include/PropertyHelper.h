@@ -45,6 +45,8 @@ public:
 	static const ot::Painter2D* getPainterPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	static int32_t getIntegerPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	static std::string getProjectPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static std::string getEntityListPropertyValueName (const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static ot::UID getEntityListPropertyValueID (const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -57,6 +59,7 @@ public:
 	static void setBoolPropertyValue(bool _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	static void setColourPropertyValue(ot::Color _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	static void setPainterPropertyValue(const ot::Painter2D* _painter, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static void setIntegerPropertyValue(int32_t _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

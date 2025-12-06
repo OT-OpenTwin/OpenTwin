@@ -33,6 +33,7 @@
 
 // std header
 #include <thread>
+#include "SubprocessManager.h"
 
 CommunicationHandler::CommunicationHandler(SubprocessManager* _manager, const std::string& _serverName)
 	: m_manager(_manager), m_serverName(_serverName), m_client(nullptr), m_clientState(ClientState::Disconnected),
@@ -87,6 +88,11 @@ void CommunicationHandler::cleanupAfterCrash(void) {
 	this->slotClientDisconnected();
 }
 
+void CommunicationHandler::restart(const std::string& _serverName)
+{
+	QMetaObject::invokeMethod(this, &CommunicationHandler::slotRestart, Qt::QueuedConnection, _serverName);
+}
+
 void CommunicationHandler::slotMessageReceived(void) {
 	if (!m_client) {
 		OT_LOG_EA("Client not set");
@@ -103,7 +109,7 @@ void CommunicationHandler::slotMessageReceived(void) {
 void CommunicationHandler::slotClientDisconnected(void) {
 	OT_LOG_D("Client disconnected");
 	if (m_client) {
-		delete m_client;
+		m_client->deleteLater();
 		m_client = nullptr;
 	}
 
@@ -136,7 +142,7 @@ bool CommunicationHandler::sendServiceInfoToClient(void) {
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
-	
+
 	ot::JsonArray logFlags;
 	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logFlags, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_LogFlags, logFlags, doc.GetAllocator());
@@ -253,6 +259,15 @@ bool CommunicationHandler::sendDataBaseConfigToClient(void) {
 		doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(m_databaseInfo.getUserName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(m_databaseInfo.getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
+		if (m_manifestUID != ot::invalidUID)
+		{
+			doc.AddMember(OT_ACTION_PARAM_Python_Environment, m_manifestUID, doc.GetAllocator());
+		}
+		else
+		{
+			assert(false);
+		}
+
 		QByteArray request = QByteArray::fromStdString(doc.toJson());
 		request.append('\n');
 
@@ -344,6 +359,17 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 	else {
 		OT_LOG_W("Client send unexpected message: \"" + _message + "\"");
 	}
+}
+
+void CommunicationHandler::slotRestart(const std::string& _serverName)
+{
+	if (m_client) 
+	{
+		m_client->abort();	
+	}
+	
+	cleanupAfterCrash();
+	m_manager->socketDeltedCompleted();
 }
 
 bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response) {

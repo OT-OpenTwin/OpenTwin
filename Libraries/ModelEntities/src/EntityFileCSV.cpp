@@ -199,7 +199,7 @@ void EntityFileCSV::addStorageData(bsoncxx::builder::basic::document & storage)
 	EntityFile::addStorageData(storage);
 }
 
-void EntityFileCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityFileCSV::readSpecificDataFromDataBase(const bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityFile::readSpecificDataFromDataBase(doc_view, entityMap);
 }

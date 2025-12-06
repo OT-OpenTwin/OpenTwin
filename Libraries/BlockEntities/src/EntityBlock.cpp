@@ -32,14 +32,6 @@ EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, Mo
 	
 }
 
-void EntityBlock::createProperties() {
-
-}
-
-ot::GraphicsConnectionCfg::ConnectionShape EntityBlock::getDefaultConnectionShape() const {
-	return ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
-}
-
 EntityBlock::~EntityBlock()
 {
 	if (m_coordinateEntity != nullptr)
@@ -118,6 +110,14 @@ void EntityBlock::setGraphicsPickerKey(const std::string& _key) {
 	}
 }
 
+void EntityBlock::createProperties() {
+
+}
+
+ot::GraphicsConnectionCfg::ConnectionShape EntityBlock::getDefaultConnectionShape() const {
+	return ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
+}
+
 std::string EntityBlock::createBlockHeadline()
 {
 	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
@@ -174,7 +174,6 @@ bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation,
 	}
 }
 
-
 void EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBase::addStorageData(storage);
@@ -194,12 +193,12 @@ void EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 	storage.append(bsoncxx::builder::basic::kvp("Connectors", connectorsArray));
 }
 
-void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlock::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	
 	m_coordinate2DEntityID = static_cast<ot::UID>(doc_view["CoordinatesEntityID"].get_int64());
-	m_graphicsScenePackageChildName = doc_view["GraphicPackageChildName"].get_utf8().value.data();
+	m_graphicsScenePackageChildName = doc_view["GraphicPackageChildName"].get_string().value.data();
 
 	auto allConnectors = doc_view["Connectors"].get_array();
 	for (auto& element : allConnectors.value)
@@ -210,10 +209,21 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 		m_connectorsByName[connector.getConnectorName()]=(connector);
 	}
 
+	auto iconVisibleIt = doc_view.find("NavigationIconVisible");
+	if (iconVisibleIt != doc_view.end())
+	{
+		m_navigationTreeIcon.visibleIcon = iconVisibleIt->get_string().value.data();
+	}
+	auto iconHiddenIt = doc_view.find("NavigationIconHidden");
+	if (iconHiddenIt != doc_view.end())
+	{
+		m_navigationTreeIcon.hiddenIcon = iconHiddenIt->get_string().value.data();
+	}
+	
 	auto pickerIt = doc_view.find("GraphicsPickerKey");
 	if (pickerIt != doc_view.end())
 	{
-		m_graphicsPickerKey = pickerIt->get_utf8().value.data();
+		m_graphicsPickerKey = pickerIt->get_string().value.data();
 	}
 	else {
 		// Legacy support

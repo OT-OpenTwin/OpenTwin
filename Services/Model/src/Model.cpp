@@ -157,21 +157,6 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	m_deleteButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Delete));
 	m_deleteButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonHandler.connectToolBarButton(m_deleteButton, this, &Model::handleDeleteSelectedShapes);
-	
-	// Create a new project structure
-	resetToNew();
-
-	// Create the UI ribbon and actions
-	auto ui = Application::instance()->getUiComponent();
-	if (ui)
-	{
-		enableQueuingHttpRequests(true);
-		setupUIControls(ui);
-		enableQueuingHttpRequests(false);
-	}
-
-	// Here we set a dummy project name (needs to be changed later on)
-	DataBase::instance().setCollectionName(collectionName);
 }
 
 void Model::clearAll()
@@ -243,6 +228,7 @@ void Model::resetToNew()
 		EntityGraphicsScene* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, nullptr, nullptr);
 		entityCircuit->setName(typeManager.getCircuitName());
 		entityCircuit->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		entityCircuit->setSceneFlags(EntityGraphicsScene::DefaultFlags | EntityGraphicsScene::AllowConnectionsOnConnections);
 		entityCircuit->registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection |
@@ -273,11 +259,21 @@ void Model::resetToNew()
 		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
 	}
 
-	if (typeManager.hasScriptsRoot())
+	if (typeManager.hasPythonRoot())
 	{
+		EntityContainer* entityPythonRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
+		entityPythonRoot->setName(getPythonRootName());
+		addEntityToModel(entityPythonRoot->getName(), entityPythonRoot, entityRoot, true, allNewEntities);
+
 		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
-		entityScriptRoot->setName(getScriptsRootName());
+		entityScriptRoot->setName(ot::FolderNames::PythonScriptFolder);
+		entityScriptRoot->setDeletable(false);
 		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
+
+		EntityContainer* entityManifestRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
+		entityManifestRoot->setName(ot::FolderNames::PythonManifestFolder);
+		entityManifestRoot->setDeletable(false);
+		addEntityToModel(entityManifestRoot->getName(), entityManifestRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasDataProcessingRoot())
@@ -395,6 +391,22 @@ Model::~Model()
 		delete stateManager;
 		stateManager = nullptr;
 	}
+}
+
+void Model::initialize() {
+	// Create a new project structure
+	resetToNew();
+
+	// Create the UI ribbon and actions
+	auto ui = Application::instance()->getUiComponent();
+	if (ui) {
+		enableQueuingHttpRequests(true);
+		setupUIControls(ui);
+		enableQueuingHttpRequests(false);
+	}
+
+	// Here we set a dummy project name (needs to be changed later on)
+	DataBase::instance().setCollectionName(collectionName);
 }
 
 void Model::detachAllViewer()
@@ -613,6 +625,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 void  Model::addEntityToMap(EntityBase *entity)
 {
 	entityMap[entity->getEntityID()] = entity;
+	Application::instance()->getBlockHandler().processEntity(entity);
 	setModified();
 
 	// Check whether a parameter has been added
@@ -4107,6 +4120,8 @@ void Model::deleteEntitiesFromModel(const std::list<EntityBase*>& _entityList, b
 
 	for (EntityBase* entity : topLevelEntities) {
 		removeFromDisplay.push_back(entity->getEntityID());
+
+		Application::instance()->getBlockHandler().entityRemoved(entity,topLevelEntities);
 
 		// Remove the entity from the entity map and also from the model state
 		removeEntityFromMap(entity, false, false);

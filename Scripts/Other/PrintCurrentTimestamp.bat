@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 REM Get current date and time
-for /f "delims=" %%a in ('wmic OS Get localdatetime ^| find "."') do set datetime=%%a
+for /f "delims=" %%a in ('powershell -NoProfile -Command "(Get-Date).ToString(\"yyyyMMddHHmmss\")"') do set datetime=%%a
 
 SET OT_TIMESTAMP=!datetime:~0,4!-!datetime:~4,2!-!datetime:~6,2! !datetime:~8,2!:!datetime:~10,2!:!datetime:~12,2!
 

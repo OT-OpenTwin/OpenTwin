@@ -583,7 +583,7 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
         ot::EntityCallbackBase::Callback::Properties |
         ot::EntityCallbackBase::Callback::Selection |
         ot::EntityCallbackBase::Callback::DataNotify,
-        app->getServiceName()
+        OT_INFO_SERVICE_TYPE_VisualizationService
 	);
 
     visualizationEntity->createProperties();
@@ -722,7 +722,7 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
 				ot::EntityCallbackBase::Callback::Properties |
 				ot::EntityCallbackBase::Callback::Selection |
 				ot::EntityCallbackBase::Callback::DataNotify,
-				app->getServiceName()
+                OT_INFO_SERVICE_TYPE_VisualizationService
             );
 
             visualizationEntity->createProperties();
@@ -909,7 +909,7 @@ void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Applica
         ot::EntityCallbackBase::Callback::Properties |
         ot::EntityCallbackBase::Callback::Selection |
         ot::EntityCallbackBase::Callback::DataNotify,
-        app->getServiceName()
+        OT_INFO_SERVICE_TYPE_VisualizationService
     );
 
     visualizationEntity->createProperties();

@@ -281,7 +281,7 @@ private:
 	//! Will clear the UID/version information of the additional information entries if no information is found in the document.
 	//! @param _documentView The document view to read the information from.
 	//! @return True on success, false otherwise.
-	bool readAdditionalProjectInformation(bsoncxx::v_noabi::document::view& _documentView);
+	bool readAdditionalProjectInformation(const bsoncxx::v_noabi::document::view& _documentView);
 
 	// Get the parent branch of the given branch (remove the part after the last .)
 	std::string getParentBranch(const std::string &branch);

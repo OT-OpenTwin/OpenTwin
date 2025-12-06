@@ -84,12 +84,12 @@
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/OnePropertyDialog.h"
 #include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/ModelLibraryDialog.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/StyledTextConverter.h"
 #include "OTWidgets/VersionGraphManager.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
 // OpenTwin Communication header
@@ -1493,7 +1493,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		// Close all the tabs in the tab widget for the viewer
 		{
-			QSignalBlocker sigBlock(&ot::WidgetViewManager::instance());
+			QSignalBlocker sigBlock(&ot::GlobalWidgetViewManager::instance());
 			app->closeAllViewerTabs();
 		}
 

@@ -274,6 +274,18 @@ bool DataBase::getAllDocumentsFromFilter(std::map<std::string, bsoncxx::types::v
 	return true;
 }
 
+void DataBase::prefetchDocumentsFromStorage(std::list<ot::EntityInformation> _entitiesInfo)
+{
+	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsSolver;
+
+	for (auto &info : _entitiesInfo)
+	{
+		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
+	}
+
+	prefetchDocumentsFromStorage(prefetchIdsSolver);
+}
+
 void DataBase::prefetchDocumentsFromStorage(const std::list<std::pair<ot::UID, ot::UID>>& _prefetchIdandVersion) {
 	if (_prefetchIdandVersion.empty()) return;
 

@@ -72,8 +72,8 @@ Application::Application() :
 	connectAction(c_setProjectEntitySelectedAction, this, &Application::handleSetProjectEntitySelected);
 	connectAction(c_projectSelectedAction, this, &Application::handleProjectSelected);
 	connectAction(c_documentSelectedAction, this, &Application::handleDocumentSelected);
+	connectAction(c_projectImageSelectedAction, this, &Application::handleProjectImageSelected);
 	connectAction(c_imageSelectedAction, this, &Application::handleImageSelected);
-	connectAction(c_backgroundImageSelectedAction, this, &Application::handleBackgroundImageSelected);
 
 	// Initialize toolbar buttons
 	m_addProjectButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Project", "Hierarchical/AddProject");
@@ -91,11 +91,6 @@ Application::Application() :
 	);
 	connectToolBarButton(m_addContainerButton, this, &Application::handleAddContainer);
 	
-	m_addBackgroundImageButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Background Image", "Hierarchical/AddImage");
-	m_addBackgroundImageButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
-	m_addBackgroundImageButton.setButtonToolTip("Add a background image to the hierarchical scene.");
-	connectToolBarButton(m_addBackgroundImageButton, this, &Application::handleAddBackgroundImage);
-
 	m_addDocumentButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Document", "Hierarchical/AddDocument");
 	m_addDocumentButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_addDocumentButton.setButtonToolTip("Add a new document.");
@@ -120,6 +115,16 @@ Application::Application() :
 	m_updateImageFromProjectButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_updateImageFromProjectButton.setButtonToolTip("Update the image of the selected project(s) from the current projects' preview image.");
 	connectToolBarButton(m_updateImageFromProjectButton, this, &Application::handleUpdateImageFromProject);
+
+	m_addLabelButton = ot::ToolBarButtonCfg(c_pageName, c_decorationGroupName, c_decorationSub1Name, "Add Label", "Hierarchical/AddLabel");
+	m_addLabelButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
+	m_addLabelButton.setButtonToolTip("Add a label to the hierarchical scene.");
+	connectToolBarButton(m_addLabelButton, this, &Application::handleAddLabel);
+
+	m_addImageButton = ot::ToolBarButtonCfg(c_pageName, c_decorationGroupName, c_decorationSub1Name, "Add Image", "Hierarchical/AddImage");
+	m_addImageButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
+	m_addImageButton.setButtonToolTip("Add a image to the hierarchical scene.");
+	connectToolBarButton(m_addImageButton, this, &Application::handleAddImage);
 }
 
 Application::~Application() {
@@ -154,7 +159,6 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	_ui->addMenuButton(m_addProjectButton);
 	_ui->addMenuButton(m_addContainerButton);
 	_ui->addMenuButton(m_addDocumentButton);
-	_ui->addMenuButton(m_addBackgroundImageButton);
 
 	_ui->addMenuGroup(c_pageName, c_selectionGroupName);
 
@@ -163,6 +167,12 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	_ui->addMenuButton(m_addImageToProjectButton);
 	_ui->addMenuButton(m_removeImageFromProjectButton);
 	_ui->addMenuButton(m_updateImageFromProjectButton);
+
+	_ui->addMenuGroup(c_pageName, c_decorationGroupName);
+
+	_ui->addMenuSubGroup(c_pageName, c_decorationGroupName, c_decorationSub1Name);
+	_ui->addMenuButton(m_addLabelButton);
+	_ui->addMenuButton(m_addImageButton);
 
 	_ui->switchMenuTab(c_pageName);
 
@@ -282,16 +292,7 @@ void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
 	m_entityHandler.addDocuments(fileNames, contents, uncompressedDataLengths, fileFilter);
 }
 
-void Application::handleBackgroundImageSelected(ot::JsonDocument& _doc) {
-	std::list<std::string> contents = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Content);
-	std::list<int64_t> uncompressedDataLengths = ot::json::getInt64List(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
-	std::list<std::string> fileNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
-	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
-
-	m_entityHandler.addBackgroundImages(fileNames, contents, uncompressedDataLengths, fileFilter);
-}
-
-void Application::handleImageSelected(ot::JsonDocument& _doc) {
+void Application::handleProjectImageSelected(ot::JsonDocument& _doc) {
 	if (!isModelConnected()) {
 		OT_LOG_E("No model connected");
 		return;
@@ -304,6 +305,15 @@ void Application::handleImageSelected(ot::JsonDocument& _doc) {
 	std::string projectEntityName = ot::json::getString(_doc, OT_ACTION_PARAM_Info);
 
 	m_entityHandler.addImageToProject(projectEntityName, fileName, content, uncompressedDataLength, fileFilter);
+}
+
+void Application::handleImageSelected(ot::JsonDocument& _doc) {
+	std::list<std::string> contents = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Content);
+	std::list<int64_t> uncompressedDataLengths = ot::json::getInt64List(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+	std::list<std::string> fileNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+
+	m_entityHandler.addImages(fileNames, contents, uncompressedDataLengths, fileFilter);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -348,14 +358,23 @@ void Application::handleAddDocument() {
 	ot::Frontend::requestFileForReading(c_documentSelectedAction, "Select Document", filter, true, true);
 }
 
-void Application::handleAddBackgroundImage() {
+void Application::handleAddLabel() {
+	if (!this->isUiConnected()) {
+		OT_LOG_E("No UI connected");
+		return;
+	}
+
+	m_entityHandler.addLabel();
+}
+
+void Application::handleAddImage() {
 	if (!this->isUiConnected()) {
 		OT_LOG_E("No UI connected");
 		return;
 	}
 
 	auto filter = ot::FileExtension::toFilterString({ ot::FileExtension::Png, ot::FileExtension::Jpeg, ot::FileExtension::Svg });
-	ot::Frontend::requestFileForReading(c_backgroundImageSelectedAction, "Select Background Image", filter, true, true);
+	ot::Frontend::requestFileForReading(c_imageSelectedAction, "Select Image", filter, true, true);
 }
 
 void Application::handleOpenSelectedItems() {
@@ -391,7 +410,7 @@ void Application::handleAddImageToProject() {
 	}
 
 	auto filter = ot::FileExtension::toFilterString({ ot::FileExtension::Png, ot::FileExtension::Jpeg, ot::FileExtension::Svg });
-	ot::Frontend::requestFileForReading(c_imageSelectedAction, "Select Project Image", filter, true, false, projects.front().getEntityName());
+	ot::Frontend::requestFileForReading(c_projectImageSelectedAction, "Select Project Image", filter, true, false, projects.front().getEntityName());
 }
 
 void Application::handleRemoveImageFromProject() {

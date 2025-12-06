@@ -26,80 +26,16 @@
 #include "OTCore/LogDispatcher.h"
 
 #define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include "numpy/ndarrayobject.h"
 
 #include "PythonObjectBuilder.h"
-
-#include <fcntl.h>
-#include <windows.h>
-#include <io.h>
+#include "OTCore/String.h"
 #include <iostream>
+#include "OutputPipeline.h"
 
-std::string PythonWrapper::m_customSitePackage;
-bool PythonWrapper::m_redirectOutput = false;
-
-PythonWrapper::PythonWrapper() : m_outputWorkerThread(nullptr) {
-	m_pythonRoot = determinePythonRootDirectory();
-	
-	OT_LOG_D("Setting Python root path: " + m_pythonRoot);
-	m_pythonPath.push_back(m_pythonRoot);
-	m_pythonPath.push_back(m_pythonRoot + "\\Lib");
-	m_pythonPath.push_back(m_pythonRoot + "\\DLLs");
-	m_sitePackagesPath = determineMandatoryPythonSitePackageDirectory();
-	m_pythonPath.push_back(m_sitePackagesPath);
-
-	if (m_customSitePackage.empty())
-	{
-		addOptionalUserPythonSitePackageDirectory();
-	}
-
-	OT_LOG_D("Setting Python site-package path: " + m_sitePackagesPath);
+PythonWrapper::PythonWrapper()
+{
 	signal(SIGABRT, &signalHandlerAbort);
-
-	if (m_redirectOutput)
-	{
-		// Create a pipe for getting the standard output
-		if (_pipe(m_pipe_fds, 4096, _O_TEXT) == -1) {
-			OT_LOG_EA("Creating pipe for capturing Python output failed.");
-		}
-	}
-}
-
-void PythonWrapper::readOutput() {
-	char buffer[256];
-	while (m_redirectOutput)
-	{
-		DWORD bytes_available = 0;
-		if (PeekNamedPipe((HANDLE)_get_osfhandle(m_pipe_fds[0]), NULL, 0, NULL, &bytes_available, NULL)) {
-			if (bytes_available > 0) {
-				int count = _read(m_pipe_fds[0], buffer, sizeof(buffer) - 1);
-				if (count > 0) {
-					buffer[count] = '\0';
-					//Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::to_string(strlen(buffer)) + ":" + std::string(buffer));
-					Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::string(buffer));
-				}
-			}
-		}
-
-		m_outputProcessingCount++;
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(20));
-	}
-}
-
-int PythonWrapper::initiateNumpy() {
-	import_array1(0);
-	return 1;
-}
-
-std::string PythonWrapper::checkNumpyVersion() {
-	execute("import numpy\n"
-		"numpyVersion = numpy.version.version", "__main__");
-	CPythonObjectBorrowed variable = getGlobalVariable("numpyVersion","__main__");
-	PythonObjectBuilder builder;
-	const std::string numpyVersion = builder.getStringValue(variable, "numpyVersion");
-	return numpyVersion;
+	OutputPipeline::instance().setupOutputPipeline();
 }
 
 PythonWrapper::~PythonWrapper() {
@@ -107,14 +43,7 @@ PythonWrapper::~PythonWrapper() {
 		closePythonInterpreter();
 	}
 
-	if (m_outputWorkerThread)
-	{
-		m_redirectOutput = false;
-		m_outputWorkerThread->join();
 
-		delete m_outputWorkerThread;
-		m_outputWorkerThread = nullptr;
-	}
 }
 
 void PythonWrapper::closePythonInterpreter() {
@@ -124,61 +53,93 @@ void PythonWrapper::closePythonInterpreter() {
 	}
 }
 
-void PythonWrapper::initializePythonInterpreter() {
-	std::wstring allPaths;
-	std::string debugPathOverview("");
-	for (std::string& pathComponent : m_pythonPath) {
-		std::wstring temp(pathComponent.begin(), pathComponent.end());
-		allPaths += temp + L";";
-		debugPathOverview += pathComponent;
+
+void PythonWrapper::initializePythonInterpreter(const std::string& _environmentName)
+{
+	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
+	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
+	std::wstring devEnvRootW = ot::String::toWString(devEnvRoot);
+
+	std::wstring environmentsBase, home, dllPath, binPath, customEnvBase;
+#ifdef _DEBUG
+	const std::string pythonRootEnvVarName = "OT_PYTHON_ROOT";
+	const char* pythonRoot = ot::OperatingSystem::getEnvironmentVariable(pythonRootEnvVarName.c_str());
+	assert(pythonRoot != nullptr);
+	std::wstring pythonRootW = ot::String::toWString(pythonRoot);
+	
+	environmentsBase = pythonRootW + L"\\Environments";
+	home = environmentsBase + std::wstring(L"\\CoreEnvironment");
+	dllPath = +L"\\DLLs\\Debug";
+	binPath = pythonRootW + L"\\Interpreter\\Debug";
+
+#else
+	// If not found, we are in deployment mode
+	if (devEnvRoot == nullptr)
+	{
+		environmentsBase = L".\\PythonEnvironments";
+		binPath = L".";
+	}
+	else
+	{
+		environmentsBase = devEnvRootW + L"\\Deployment\\PythonEnvironments";
+		binPath = devEnvRootW + L"\\Deployment";
+	}
+	dllPath = L"\\DLLs";
+
+	//Here we have the standart libs
+	home = environmentsBase + std::wstring(L"\\CoreEnvironment");
+	customEnvBase = environmentsBase;
+#endif
+
+	std::list<std::wstring> lookupPaths;
+
+	lookupPaths.push_back(environmentsBase + std::wstring(L"\\PythonBuildTools"));
+	lookupPaths.push_back(home);
+	lookupPaths.push_back(home + L"\\Lib");
+	lookupPaths.push_back(home+ dllPath);
+	lookupPaths.push_back(binPath);
+
+	if (!_environmentName.empty())
+	{
+		std::wstring environmentPathW = environmentsBase + L"\\" + ot::String::toWString(_environmentName);
+		lookupPaths.push_back(environmentPathW);
+		m_environmentPath = ot::String::toString(environmentPathW);
+		OT_LOG_D("Custom environment: " + m_environmentPath);
+	}
+	else
+	{
+		OT_LOG_D("Running without custom environment");
 	}
 
+	PyConfig config;
+	PyConfig_InitPythonConfig(&config);
+	config.isolated = 1;
+	config.use_environment = 0;
+	config.module_search_paths_set = 1;
+	config.site_import = 1;
+	std::string debugPathOverview = "";
+	for(std::wstring& pathComponent : lookupPaths) {
+		PyWideStringList_Append(&config.module_search_paths, pathComponent.c_str());
+		debugPathOverview += ot::String::toString(pathComponent) + ";";
+	}
+
+	PyConfig_SetString(&config,&config.home, home.c_str());
+
 	OT_LOG_D("Python path: " + debugPathOverview);
-	
+	OT_LOG_D("Python home: " + ot::String::toString(home));
+		
 	int errorCode = PyImport_AppendInittab("OpenTwin", PythonExtensions::PyInit_OpenTwin);
-	Py_SetPath(allPaths.c_str());
-	int skipSignalHandlerRegistration = 0; //0: Skips; 1: not skipping (equivalent to Py_Initialize())
-	Py_DontWriteBytecodeFlag = 1;
-	Py_QuietFlag = 1;
-	Py_InitializeEx(skipSignalHandlerRegistration);
+	
+	Py_InitializeFromConfig(&config);
 	if (Py_IsInitialized() != 1) {
 		throw PythonException();
 	}
 	m_interpreterSuccessfullyInitialized = true;
-	int numpyErrorCode = initiateNumpy();
-	if (numpyErrorCode == 0) {
-		throw PythonException("Numpy Initialization failed. Make sure that the file numpy/ndarrayobject.h exists. Details: ");
-	}
-
-	const std::string numpyVersion = checkNumpyVersion();
-	OT_LOG_D("Initiated numpy version: " + numpyVersion);
-
-	if (m_redirectOutput)
-	{
-		// Redirect output to pipe
-		std::string command =
-			"import sys\n"
-			"import os\n"
-			"import logging\n"
-			"sys.stdout = os.fdopen(" + std::to_string(m_pipe_fds[1]) + ", 'w')\n"
-			"sys.stdout.reconfigure(line_buffering = True)\n"
-			"logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))\n";
-			
-		PyRun_SimpleString(command.c_str());
-
-		m_outputWorkerThread = new std::thread(&PythonWrapper::readOutput, this);
-	}
-}
-
-void PythonWrapper::resetSysPath() {
-	std::string resetPythonPath = "import sys\n"
-		"sys.path.clear()\n";
 	
-	for (std::string& pathComponent : m_pythonPath) {
-		resetPythonPath += "sys.path.append(\"" +pathComponent +"\")\n";
-	}
-	execute(resetPythonPath);
+	OutputPipeline::instance().initiateRedirect();
+
 }
+
 
 void PythonWrapper::addToSysPath(const std::string& _newPathComponent) {
 	const std::string addToPythonPath = "import sys\n"
@@ -186,74 +147,19 @@ void PythonWrapper::addToSysPath(const std::string& _newPathComponent) {
 	execute(addToPythonPath);
 }
 
-std::string PythonWrapper::determinePythonRootDirectory() {
-	std::string path;
-
-	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
-	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
-	if (devEnvRoot == nullptr)
-	{
-		path = ".\\Python";
-	}
-	else
-	{
-		path = std::string(devEnvRoot) + "\\Deployment\\Python";
-	}
-	return path;
-}
-
-std::string PythonWrapper::determineMandatoryPythonSitePackageDirectory() {
-
-	std::string path = determinePythonRootDirectory();
-
-	if (!m_customSitePackage.empty())
-	{
-		path += "\\Lib\\" + m_customSitePackage;
-
-	}
-	else
-	{
-		path += "\\Lib\\site-packages";
-	}
-	return path;
-}
-
-void PythonWrapper::addOptionalUserPythonSitePackageDirectory()
-{
-	std::string envName = "OT_PYTHON_SITE_PACKAGE_PATH";
-	const char* pythonSitePackagePath = ot::OperatingSystem::getEnvironmentVariable(envName.c_str());
-
-	if (pythonSitePackagePath != nullptr)
-	{
-		m_pythonPath.push_back(pythonSitePackagePath);
-	}
-}
-
 void PythonWrapper::signalHandlerAbort(int _sig) {
 	signal(SIGABRT, &signalHandlerAbort);
 	throw std::exception("Abort was called.");
 }
 
-void PythonWrapper::flushOutput()
-{
-	if (m_redirectOutput && m_outputWorkerThread != nullptr)
-	{
-		long long currentOutputProcessingCount = m_outputProcessingCount;
 
-		// Wait until all messages have been sent
-		while (m_outputProcessingCount < currentOutputProcessingCount + 2)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		}
-	}
-}
 
 CPythonObjectNew PythonWrapper::execute(const std::string& _executionCommand, const std::string& _moduleName) {
 	CPythonObjectNew module(getModule(_moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
 	CPythonObjectNew result(PyRun_String(_executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
 
-	flushOutput();
+	OutputPipeline::instance().flushOutput();
 
 	if (result == nullptr)
 	{
@@ -267,7 +173,7 @@ CPythonObjectNew PythonWrapper::executeFunction(const std::string& _functionName
 	CPythonObjectNew function(getFunction(_functionName, _moduleName)); //Really borrowed?
 	CPythonObjectNew returnValue(PyObject_CallObject(function, _parameter));
 	
-	flushOutput();
+	OutputPipeline::instance().flushOutput();
 
 	if (!returnValue.ReferenceIsSet())
 	{

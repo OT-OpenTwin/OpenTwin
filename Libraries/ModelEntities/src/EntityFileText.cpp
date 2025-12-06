@@ -245,7 +245,7 @@ void EntityFileText::addStorageData(bsoncxx::builder::basic::document& _storage)
 	_storage.append(bsoncxx::builder::basic::kvp("TextEncoding", encodingStr));
 }
 
-void EntityFileText::readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap)
+void EntityFileText::readSpecificDataFromDataBase(const bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap)
 {
 	EntityFile::readSpecificDataFromDataBase(_doc_view,_entityMap);
 	

@@ -177,7 +177,7 @@ void TemplateDefaultManager::loadDefaults(const std::string &category)
 				break;
 			case bsoncxx::type::k_int64:
 				value.type = DefaultValue::LONG;
-				value.l = elem.get_int64();
+				value.l = (long) elem.get_int64();
 				break;
 			case bsoncxx::type::k_array:
 			{
@@ -198,7 +198,7 @@ void TemplateDefaultManager::loadDefaults(const std::string &category)
 							value.c[index] = pv->get_int32();
 							break;
 						case bsoncxx::type::k_int64:
-							value.c[index] = pv->get_int64();
+							value.c[index] = (int) pv->get_int64();
 							break;
 						default:
 							value.type = DefaultValue::UNDEFINED;  // The types do not match, so we don't have a color
@@ -438,7 +438,7 @@ std::string TemplateDefaultManager::loadDefaultMaterials(void)
 						break;
 					case bsoncxx::type::k_int64:
 						value.type = DefaultValue::LONG;
-						value.l = elem.get_int64();
+						value.l = (long) elem.get_int64();
 						break;
 					case bsoncxx::type::k_array:
 					{
@@ -459,7 +459,7 @@ std::string TemplateDefaultManager::loadDefaultMaterials(void)
 									value.c[index] = pv->get_int32();
 									break;
 								case bsoncxx::type::k_int64:
-									value.c[index] = pv->get_int64();
+									value.c[index] = (int) pv->get_int64();
 									break;
 								default:
 									value.type = DefaultValue::UNDEFINED;  // The types do not match, so we don't have a color

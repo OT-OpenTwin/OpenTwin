@@ -363,6 +363,7 @@ void GraphicsItemDesigner::slotUpdateConfigRequested(void) {
 void GraphicsItemDesigner::slotDrawFinished(void) {
 	GraphicsItemDesignerItemBase* newItem = m_drawHandler->stopDraw();
 	if (newItem) {
+		newItem->getGraphicsItem()->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft);
 		m_navigation->addRootItem(newItem, false);
 	}
 

@@ -124,7 +124,7 @@ void EntityWithDynamicFields::addStorageData(bsoncxx::builder::basic::document& 
 	storage.append(bsoncxx::builder::basic::kvp("DynamicFields", dynamicFields));
 }
 
-void EntityWithDynamicFields::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityWithDynamicFields::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	m_bsonDocumentsByName.insert({ "/", GenericBsonDocument() });

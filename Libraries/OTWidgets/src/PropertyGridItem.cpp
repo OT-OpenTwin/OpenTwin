@@ -33,8 +33,7 @@
 #include <QtWidgets/qlayout.h>
 
 ot::PropertyGridItem::PropertyGridItem(QWidget* _parent) 
-	: m_input(nullptr), m_parentGroup(nullptr), m_signalProperty(nullptr),
-	m_parentWidget(_parent)
+	: m_input(nullptr), m_parentGroup(nullptr), m_parentWidget(_parent)
 {
 	m_titleLayoutW = new QWidget(_parent);
 	m_titleLayoutW->setObjectName("PropertyGridItemTitleLayout");
@@ -67,17 +66,12 @@ ot::PropertyGridItem::~PropertyGridItem() {
 		delete m_input;
 		m_input = nullptr;
 	}
-
-	if (m_signalProperty) {
-		delete m_signalProperty;
-		m_signalProperty = nullptr;
-	}
 }
 
 bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
 	if (m_input) {
 		this->disconnect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::slotValueChanged);
-		delete m_input;
+		m_input->deleteLater();
 		m_input = nullptr;
 	}
 
@@ -130,7 +124,8 @@ void ot::PropertyGridItem::setInput(PropertyInput* _input) {
 	if (m_input) {
 		this->disconnect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::slotValueChanged);
 		tree->removeItemWidget(this, 1);
-		delete m_input;
+		m_input->deleteLater();
+		m_input = nullptr;
 	}
 	m_input = _input;
 	
@@ -149,23 +144,13 @@ std::string ot::PropertyGridItem::getPropertyType() const {
 }
 
 void ot::PropertyGridItem::slotValueChanged() {
-	if (m_signalProperty) {
-		delete m_signalProperty;
-		m_signalProperty = nullptr;
-	}
-
-	m_signalProperty = this->createSignalProperty();
-	Q_EMIT inputValueChanged(m_signalProperty);
+	std::unique_ptr<Property> sigProp(this->createSignalProperty());
+	Q_EMIT inputValueChanged(sigProp.get());
 }
 
 void ot::PropertyGridItem::slotDeleteRequested() {
-	if (m_signalProperty) {
-		delete m_signalProperty;
-		m_signalProperty = nullptr;
-	}
-	
-	m_signalProperty = this->createSignalProperty();
-	Q_EMIT deleteRequested(m_signalProperty);
+	std::unique_ptr<Property> sigProp(this->createSignalProperty());
+	Q_EMIT deleteRequested(sigProp.get());
 }
 
 void ot::PropertyGridItem::slotGlobalStyleChanged() {

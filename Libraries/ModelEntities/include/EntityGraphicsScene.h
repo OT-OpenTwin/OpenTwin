@@ -24,6 +24,14 @@
 class __declspec(dllexport) EntityGraphicsScene : public EntityContainer, public IVisualisationGraphicsView
 {
 public:
+	enum SceneFlag : int64_t {
+		NoFlags                       = 0 << 0, //! @brief No special flags.
+		AllowConnectionsOnConnections = 1 << 0, //! @brief Allows connections on connections.
+
+		DefaultFlags = NoFlags //! @brief Default flags.
+	};
+	typedef ot::Flags<SceneFlag, int64_t> SceneFlags;
+
 	EntityGraphicsScene() : EntityGraphicsScene(0, nullptr, nullptr, nullptr) {};
 	EntityGraphicsScene(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 	static std::string className() { return "EntityGraphicsScene"; };
@@ -34,11 +42,16 @@ public:
 	virtual void setGraphicsPickerKey(const std::string& _key) override;
 	virtual std::string getGraphicsPickerKey() const override { return m_graphicsPickerKey; };
 
+	void setSceneFlags(const SceneFlags& _flags);
+	const SceneFlags& getSceneFlags() const { return m_sceneFlags; };
+
 protected:
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
-	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 private:
 	std::string m_graphicsPickerKey;
-
+	SceneFlags m_sceneFlags;
 };
+
+OT_ADD_FLAG_FUNCTIONS(EntityGraphicsScene::SceneFlag, EntityGraphicsScene::SceneFlags)

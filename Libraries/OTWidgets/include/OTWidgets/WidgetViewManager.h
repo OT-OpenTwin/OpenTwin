@@ -54,6 +54,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT WidgetViewManager : public QObject {
 		Q_OBJECT
 		OT_DECL_NOCOPY(WidgetViewManager)
+		OT_DECL_NOMOVE(WidgetViewManager)
 	public:
 		typedef std::pair<std::string, WidgetViewBase::ViewType> ViewNameTypeListEntry;
 		typedef std::list<ViewNameTypeListEntry> ViewNameTypeList;
@@ -82,8 +83,8 @@ namespace ot {
 		};
 		typedef Flags<ManagerConfigFlag> ManagerConfigFlags;
 
-		//! @brief Return the clobal instance
-		static WidgetViewManager& instance();
+		WidgetViewManager();
+		~WidgetViewManager();
 
 		//! @brief Must be called upon startup, if no dock manager is provided a new one will be created
 		void initialize(WidgetViewDockManager* _dockManager = nullptr);
@@ -264,9 +265,6 @@ namespace ot {
 			bool ignoreCurrent;
 			std::list<WidgetView*> viewsToClose; //! @brief Views that are currently in the process of being closed.
 		};
-
-		WidgetViewManager();
-		~WidgetViewManager();
 
 		bool getViewExists(const ViewNameTypeListEntry& _entry) const;
 

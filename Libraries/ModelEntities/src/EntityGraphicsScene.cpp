@@ -20,15 +20,17 @@
 #include "EntityGraphicsScene.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/VisualisationTypes.h"
+#include "DataBase.h"
 
 static EntityFactoryRegistrar<EntityGraphicsScene> registrar(EntityGraphicsScene::className());
 
 EntityGraphicsScene::EntityGraphicsScene(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
-	:EntityContainer(ID, parent, obs, ms)
+	:EntityContainer(ID, parent, obs, ms), m_sceneFlags(SceneFlag::DefaultFlags)
 {
 	ot::VisualisationTypes visTypes;
 	visTypes.addGraphicsViewVisualisation();
 	setVisualizationTypes(visTypes, true);
+
 }
 
 ot::GraphicsNewEditorPackage* EntityGraphicsScene::getGraphicsEditorPackage()
@@ -50,12 +52,22 @@ void EntityGraphicsScene::setGraphicsPickerKey(const std::string& _key) {
 	}
 }
 
+void EntityGraphicsScene::setSceneFlags(const SceneFlags& _flags) {
+	if (m_sceneFlags != _flags) {
+		m_sceneFlags = _flags;
+		setModified();
+	}
+}
+
 void EntityGraphicsScene::addStorageData(bsoncxx::builder::basic::document& _storage) {
 	EntityContainer::addStorageData(_storage);
 	_storage.append(bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_graphicsPickerKey));
+	if (m_sceneFlags != SceneFlag::DefaultFlags) {
+		_storage.append(bsoncxx::builder::basic::kvp("SceneFlags", static_cast<int64_t>(m_sceneFlags.underlying())));
+	}
 }
 
-void EntityGraphicsScene::readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+void EntityGraphicsScene::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityContainer::readSpecificDataFromDataBase(_docView, _entityMap);
 	auto keyIt = _docView.find("GraphicsPickerKey");
 	if (keyIt != _docView.end()) {
@@ -71,5 +83,10 @@ void EntityGraphicsScene::readSpecificDataFromDataBase(bsoncxx::document::view& 
 		else {
 			m_graphicsPickerKey = lst.front();
 		}
+	}
+
+	auto flagsIt = _docView.find("SceneFlags");
+	if (flagsIt != _docView.end()) {
+		m_sceneFlags = SceneFlags(DataBase::getIntFromView(_docView, "SceneFlags"));
 	}
 }

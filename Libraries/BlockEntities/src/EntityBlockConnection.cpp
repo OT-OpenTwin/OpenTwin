@@ -188,15 +188,15 @@ void EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document& st
 	
 }
 
-void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockConnection::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
 	//Now we read the information about the ConnectionCfg
-	m_graphicsScenePackageChildName = std::string(doc_view["GraphicPackageChildName"].get_utf8().value.data());
+	m_graphicsScenePackageChildName = std::string(doc_view["GraphicPackageChildName"].get_string().value.data());
 	
-	_connectorNameOrigin = std::string(doc_view["FromConnectable"].get_utf8().value.data());
-	_connectorNameDestination = std::string(doc_view["ToConnectable"].get_utf8().value.data());
+	_connectorNameOrigin = std::string(doc_view["FromConnectable"].get_string().value.data());
+	_connectorNameDestination = std::string(doc_view["ToConnectable"].get_string().value.data());
 	_blockIDOrigin = static_cast<ot::UID>(doc_view["FromUID"].get_int64());
 	_blockIDDestination = static_cast<ot::UID>(doc_view["ToUID"].get_int64());
 
@@ -233,7 +233,7 @@ void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view
 	auto pickerIt = doc_view.find("GraphicsPickerKey");
 	if (pickerIt != doc_view.end())
 	{
-		m_pickerKey = pickerIt->get_utf8().value.data();
+		m_pickerKey = pickerIt->get_string().value.data();
 	}
 	else {
 		// Legacy support

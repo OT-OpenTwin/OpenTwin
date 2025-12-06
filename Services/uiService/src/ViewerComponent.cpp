@@ -30,18 +30,18 @@
 
 #include "OTSystem/OTAssert.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTWidgets/DoubleSpinBox.h"
-#include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/PropertyInputDouble.h"
-#include "OTWidgets/GraphicsView.h"
-#include "OTWidgets/GraphicsViewView.h"
-#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/TableView.h"
 #include "OTWidgets/TextEditor.h"
-#include "OTWidgets/TextEditorView.h"
 #include "OTWidgets/PlotView.h"
 #include "OTWidgets/PlotDataset.h"
+#include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/DoubleSpinBox.h"
+#include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/GraphicsViewView.h"
+#include "OTWidgets/PropertyInputDouble.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
 
 // C++ header
 #include <exception>
@@ -468,7 +468,7 @@ void ViewerComponent::closeView(const std::string& _entityName, ot::WidgetViewBa
 }
 
 bool ViewerComponent::hasViewFocus(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
-	const ot::WidgetView* view = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	const ot::WidgetView* view = ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView();
 	if (!view) {
 		return false;
 	}
@@ -481,32 +481,32 @@ bool ViewerComponent::hasViewFocus(const std::string& _entityName, ot::WidgetVie
 }
 
 void ViewerComponent::addVisualizingEntityToView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
-	ot::WidgetView* view = ot::WidgetViewManager::instance().findView(_entityName, _viewType);
+	ot::WidgetView* view = ot::GlobalWidgetViewManager::instance().findView(_entityName, _viewType);
 	if (view) {
 		view->addVisualizingItem(_treeItemId);
 	}
 }
 
 void ViewerComponent::removeVisualizingEntityFromView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
-	ot::WidgetView* view = ot::WidgetViewManager::instance().findView(_entityName, _viewType);
+	ot::WidgetView* view = ot::GlobalWidgetViewManager::instance().findView(_entityName, _viewType);
 	if (view) {
 		view->removeVisualizingItem(_treeItemId);
 	}
 }
 
 void ViewerComponent::clearVisualizingEntitesFromView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
-	ot::WidgetView* view = ot::WidgetViewManager::instance().findView(_entityName, _viewType);
+	ot::WidgetView* view = ot::GlobalWidgetViewManager::instance().findView(_entityName, _viewType);
 	if (view) {
 		view->clearVisualizingItems();
 	}
 }
 
 ot::WidgetView* ViewerComponent::getCurrentView(void) {
-	return ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	return ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView();
 }
 
 ot::WidgetView* ViewerComponent::getLastFocusedCentralView(void) {
-	return ot::WidgetViewManager::instance().getLastFocusedCentralView();
+	return ot::GlobalWidgetViewManager::instance().getLastFocusedCentralView();
 }
 
 bool ViewerComponent::getCurrentViewIsModified(void) {
@@ -532,7 +532,7 @@ std::string ViewerComponent::getCurrentVisualizationTabTitle(void) {
 }
 
 void ViewerComponent::requestSaveForCurrentVisualizationTab(void) {
-	ot::WidgetView* view = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	ot::WidgetView* view = ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView();
 	if (!view) {
 		OT_LOG_W("No view focused");
 		return;

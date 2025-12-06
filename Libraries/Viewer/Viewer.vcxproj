@@ -285,7 +285,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(Qt_LIBS_);OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;DataStorage.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;OTCommunication.lib;OTServiceFoundation.lib;ModelEntities.lib;$(MONGO_CXX_LIB);$(OSG_LIBD);$(QWT_LIB_LIBD);qtadvanceddockingd.lib;libgmp-10.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OT_WIDGETS_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBPATHD);$(OT_MODELENTITIES_ROOT)\$(OT_LIBD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_LIBD);$(QWT_LIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBD);$(OT_RUBBERBAND_ROOT)\$(OT_LIBD);$(OSG_LIBPATHD);$(QT_ADS_ROOT)\lib;$(GMP_LIBPATHD);$(BOOST_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_CLIBD);$(OT_GUI_ROOT)\$(OT_CLIBD);$(OT_WIDGETS_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBPATHD);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBD);$(OT_FOUNDATION_ROOT)\$(OT_CLIBD);$(OT_COMMUNICATION_ROOT)\$(OT_CLIBD);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBD);$(QWT_LIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBD);$(OT_RUBBERBAND_ROOT)\$(OT_LIBD);$(OSG_LIBPATHD);$(QT_ADS_ROOT)\lib;$(GMP_LIBPATHD);$(BOOST_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -307,7 +307,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(Qt_LIBS_);OpenTwinSystem.lib;OpenTwinCore.lib;DataStorage.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;$(MONGO_CXX_LIBD);$(MONGO_C_LIBD);$(OSG_LIBD);$(QWT_LIB_LIBD);$(QWTPOLAR_LIB_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(OT_MODELENTITIES_ROOT)\$(OT_LIBD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_LIBD);$(QWT_LIB_LIBPATHD);$(QWTPOLAR_LIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBD);$(OT_RUBBERBAND_ROOT)\$(OT_LIBD);$(OSG_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_CLIBD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBD);$(OT_FOUNDATION_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_CLIBD);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBD);$(QWT_LIB_LIBPATHD);$(QWTPOLAR_LIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBD);$(OT_RUBBERBAND_ROOT)\$(OT_LIBD);$(OSG_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -328,7 +328,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>$(Qt_LIBS_);OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;DataStorage.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;OTCommunication.lib;OTServiceFoundation.lib;ModelEntities.lib;$(MONGO_CXX_LIB);$(OSG_LIBR);$(QWT_LIB_LIBR);qtadvanceddocking.lib;libgmp-10.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(OT_WIDGETS_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_LIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(QWT_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBR);$(OT_RUBBERBAND_ROOT)\$(OT_LIBR);$(OSG_LIBPATHR);$(QT_ADS_ROOT)\lib;$(GMP_LIBPATHR);$(BOOST_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_CLIBR);$(OT_GUI_ROOT)\$(OT_CLIBR);$(OT_WIDGETS_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBR);$(OT_FOUNDATION_ROOT)\$(OT_CLIBR);$(OT_COMMUNICATION_ROOT)\$(OT_CLIBR);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBR);$(QWT_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBR);$(OT_RUBBERBAND_ROOT)\$(OT_LIBR);$(OSG_LIBPATHR);$(QT_ADS_ROOT)\lib;$(GMP_LIBPATHR);$(BOOST_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleasePerfTest|x64'">
@@ -347,7 +347,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>$(Qt_LIBS_);OpenTwinSystem.lib;OpenTwinCore.lib;OTGui.lib;OTWidgets.lib;DataStorage.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);$(OSG_LIBR);$(QWT_LIB_LIBR);$(QWTPOLAR_LIB_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(OT_WIDGETS_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_LIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBR);$(OT_RUBBERBAND_ROOT)\$(OT_LIBR);$(OSG_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_CLIBR);$(OT_GUI_ROOT)\$(OT_CLIBR);$(OT_WIDGETS_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_CLIBR);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBR);$(OT_RUBBERBAND_ROOT)\$(OT_LIBR);$(OSG_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -366,7 +366,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>$(Qt_LIBS_);OpenTwinSystem.lib;OpenTwinCore.lib;DataStorage.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;OpenTwinCommunication.lib;OpenTwinServiceFoundation.lib;ModelEntities.lib;$(MONGO_CXX_LIBR);$(MONGO_C_LIBR);$(OSG_LIBR);$(QWT_LIB_LIBR);$(QWTPOLAR_LIB_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_LIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBR);$(OT_RUBBERBAND_ROOT)\$(OT_LIBR);$(OSG_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_CLIBR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_CLIBR);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_LIBR);$(OT_RUBBERBAND_ROOT)\$(OT_LIBR);$(OSG_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

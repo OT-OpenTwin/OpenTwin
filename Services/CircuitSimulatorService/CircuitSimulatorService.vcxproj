@@ -129,7 +129,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(NGSPICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLD);%(AdditionalLibraryDirectories);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(NGSPICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_CLIBD);%(AdditionalLibraryDirectories);$(QT_LIBPATH)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);ngspice.lib;ResultDataAccess.lib;BlockEntities.lib;$(Qt_LIBS_);Qt6Cored.lib;Qt6Networkd.lib;Qt6Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -178,7 +178,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(NGSPICE_LIBPATHR);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLR);%(AdditionalLibraryDirectories);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(NGSPICE_LIBPATHR);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBR);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_CLIBR);%(AdditionalLibraryDirectories);$(QT_LIBPATH)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);ngspice.lib;ResultDataAccess.lib;BlockEntities.lib;Qt6Core.lib;Qt6Network.lib;Qt6Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

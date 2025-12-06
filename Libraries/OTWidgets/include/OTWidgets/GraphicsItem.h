@@ -25,6 +25,7 @@
 #include "OTGui/GraphicsChangeEvent.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/GraphicsElement.h"
+#include "OTWidgets/GraphicsSnapInfo.h"
 
 // Qt header
 #include <QtCore/qpoint.h>
@@ -332,9 +333,9 @@ namespace ot {
 		void notifyConnectionsMove(GraphicsChangeEvent& _changeEvent);
 
 		//! @brief Checks for connection snap requests and fills the result event accordingly.
-		void checkConnectionSnapRequest(GraphicsChangeEvent& _result);
+		void checkConnectionSnapRequest(GraphicsSnapInfo& _result);
 
-		void checkConnectionSnapRequest(const QRectF& _connectionConnectorRect, const GraphicsConnectionItem* _connection, GraphicsChangeEvent& _result);
+		void checkConnectionSnapRequest(const QRectF& _connectionConnectorRect, const GraphicsConnectionItem* _connection, GraphicsSnapInfo& _result);
 
 		void parentItemTransformChanged(const QTransform& _parentTransform);
 

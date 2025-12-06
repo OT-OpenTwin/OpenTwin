@@ -320,13 +320,13 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		// Now add the visualization for all matrices, if this debug option is turned on
 		if (visualizeMatrices && getDsMatrix() != nullptr)
 		{
-			addMatrixPlot(EntityResultBase::CARTESIAN_EDGES_3D,	     meshData->getName() + "/Matrices/Ds",	   getDsMatrix(),		meshData, entityList, topologyEntityForceVisibleMap);
-			addMatrixPlot(EntityResultBase::CARTESIAN_DUAL_EDGES_3D, meshData->getName() + "/Matrices/DualDs", getDualDsMatrix(),	meshData, entityList, topologyEntityForceVisibleMap);
-			addMatrixPlot(EntityResultBase::CARTESIAN_FACES_3D,      meshData->getName() + "/Matrices/Da",	   getDaMatrix(),		meshData, entityList, topologyEntityForceVisibleMap);
-			addMatrixPlot(EntityResultBase::CARTESIAN_DUAL_FACES_3D, meshData->getName() + "/Matrices/DualDa", getDualDaMatrix(),	meshData, entityList, topologyEntityForceVisibleMap);
-			addMatrixPlot(EntityResultBase::CARTESIAN_DUAL_FACES_3D, meshData->getName() + "/Matrices/Deps",   getDepsMatrix(),	    meshData, entityList, topologyEntityForceVisibleMap);
-			addMatrixPlot(EntityResultBase::CARTESIAN_FACES_3D,      meshData->getName() + "/Matrices/Dmu",	   getDmuMatrix(),	    meshData, entityList, topologyEntityForceVisibleMap);
-			addMatrixPlot(EntityResultBase::CARTESIAN_DUAL_FACES_3D, meshData->getName() + "/Matrices/Dsigma", getDsigmaMatrix(),	meshData, entityList, topologyEntityForceVisibleMap);
+			addMatrixPlot(EntityResultBase::CARTESIAN_EDGES_3D,		 getEntityMesh()->getName() + "/Matrices/Ds", getDsMatrix(), meshData, entityList, topologyEntityForceVisibleMap);
+			addMatrixPlot(EntityResultBase::CARTESIAN_DUAL_EDGES_3D, getEntityMesh()->getName() + "/Matrices/DualDs", getDualDsMatrix(), meshData, entityList, topologyEntityForceVisibleMap);
+			addMatrixPlot(EntityResultBase::CARTESIAN_FACES_3D,      getEntityMesh()->getName() + "/Matrices/Da", getDaMatrix(), meshData, entityList, topologyEntityForceVisibleMap);
+			addMatrixPlot(EntityResultBase::CARTESIAN_DUAL_FACES_3D, getEntityMesh()->getName() + "/Matrices/DualDa", getDualDaMatrix(), meshData, entityList, topologyEntityForceVisibleMap);
+			addMatrixPlot(EntityResultBase::CARTESIAN_DUAL_FACES_3D, getEntityMesh()->getName() + "/Matrices/Deps", getDepsMatrix(), meshData, entityList, topologyEntityForceVisibleMap);
+			addMatrixPlot(EntityResultBase::CARTESIAN_FACES_3D,      getEntityMesh()->getName() + "/Matrices/Dmu", getDmuMatrix(), meshData, entityList, topologyEntityForceVisibleMap);
+			addMatrixPlot(EntityResultBase::CARTESIAN_DUAL_FACES_3D, getEntityMesh()->getName() + "/Matrices/Dsigma", getDsigmaMatrix(), meshData, entityList, topologyEntityForceVisibleMap);
 		}
 
 		for (auto entity : entityList)
@@ -466,7 +466,7 @@ void CartesianMeshCreation::addMatrixPlot(EntityResultBase::tResultType resultTy
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
 		ot::EntityCallbackBase::Callback::DataNotify,
-		Application::instance()->getServiceName()
+		OT_INFO_SERVICE_TYPE_VisualizationService
 	);
 
 	visualizationEntity->createProperties();
@@ -618,7 +618,7 @@ void CartesianMeshCreation::deleteMesh(void)
 	getEntityMesh()->deleteMeshData();
 
 	// Delete previous mesh data from the model (if it exsits)
-	std::list<std::string> entityList{getEntityMesh()->getName() + "/Mesh", getEntityMesh()->getName() + "/Geometry"};
+	std::list<std::string> entityList{ getEntityMesh()->getName() + "/Mesh", getEntityMesh()->getName() + "/Geometry", getEntityMesh()->getName() + "/Matrices" };
 	ot::ModelServiceAPI::deleteEntitiesFromModel(entityList);
 }
 
@@ -1545,6 +1545,9 @@ void CartesianMeshCreation::extractAndStoreMesh(std::vector<EntityGeometry *> &m
 	{
 		EntityPropertiesColor *color = dynamic_cast<EntityPropertiesColor*>(shape->getProperties().getProperty("Color"));
 		assert(color != nullptr);
+		
+		EntityPropertiesEntityList* material = dynamic_cast<EntityPropertiesEntityList*>(shape->getProperties().getProperty("Material"));
+		assert(material != nullptr);
 
 		EntityMeshCartesianItem *meshEntity = new EntityMeshCartesianItem(0, nullptr, nullptr, nullptr);
 		newTopologyEntities.push_back(meshEntity);
@@ -1560,6 +1563,7 @@ void CartesianMeshCreation::extractAndStoreMesh(std::vector<EntityGeometry *> &m
 		meshEntity->setName(name);
 		meshEntity->setMesh(meshData);
 		meshEntity->setColor(color->getColorR(), color->getColorG(), color->getColorB());
+		meshEntity->setMaterial(material->getValueName());
 
 		meshEntity->setNumberFaces(boundaryFacesForShape[shape].size());
 		size_t faceIndex = 0;

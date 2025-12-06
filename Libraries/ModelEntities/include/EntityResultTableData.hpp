@@ -87,7 +87,7 @@ void EntityResultTableData<T>::addStorageData(bsoncxx::builder::basic::document 
 }
 
 template <class T>
-void EntityResultTableData<T>::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityResultTableData<T>::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);

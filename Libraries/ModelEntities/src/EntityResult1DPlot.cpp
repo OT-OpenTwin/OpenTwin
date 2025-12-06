@@ -341,7 +341,7 @@ void EntityResult1DPlot::addStorageData(bsoncxx::builder::basic::document& stora
 	EntityContainer::addStorageData(storage);
 }
 
-void EntityResult1DPlot::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityResult1DPlot::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);
 	m_querySettings.reload(this);

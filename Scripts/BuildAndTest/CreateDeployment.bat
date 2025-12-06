@@ -46,7 +46,6 @@ RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Deployment_Documentation"
 
 MKDIR "%OT_DEPLOYMENT_DIR%"
 MKDIR "%OT_DEPLOYMENT_DIR%\Certificates"
-MKDIR "%OT_DEPLOYMENT_DIR%\Python"
 
 REM ===========================================================================
 REM Copy the library files
@@ -215,16 +214,16 @@ MKDIR "%OT_DEPLOYMENT_DIR%\ElmerFEM"
 XCOPY /S "%ELMERFEM_BIN%\*.*" "%OT_DEPLOYMENT_DIR%\ElmerFEM"
 
 REM PYTHON
-COPY "%OT_PYTHON_ROOT%\python.exe" "%OT_DEPLOYMENT_DIR%"
-COPY "%OT_PYTHON_ROOT%\python39.dll" "%OT_DEPLOYMENT_DIR%"
-XCOPY /S "%OT_PYTHON_ROOT%\Lib" "%OT_DEPLOYMENT_DIR%\Python\Lib\" 
-XCOPY /S "%OT_PYTHON_ROOT%\DLLs" "%OT_DEPLOYMENT_DIR%\Python\DLLs\" 
+COPY "%OT_PYTHON_BIN%\Release\python.exe" "%OT_DEPLOYMENT_DIR%"
+COPY "%OT_PYTHON_BIN%\Release\python311_release._pth" "%OT_DEPLOYMENT_DIR%\python311._pth"
+COPY "%OT_PYTHON_BIN%\Release\python311.dll" "%OT_DEPLOYMENT_DIR%"
+XCOPY /S "%OT_PYTHON_ROOT%\Environments\PyritEnvironment\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\PyritEnvironment\" 
+XCOPY /S "%OT_PYTHON_ROOT%\Environments\PythonBuildTools\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\PythonBuildTools\" 
+XCOPY /S "%OT_PYTHON_ROOT%\Environments\CoreEnvironment\Lib\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\CoreEnvironment\Lib\" 
+XCOPY /S "%OT_PYTHON_ROOT%\Environments\CoreEnvironment\DLLs\Release\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\CoreEnvironment\DLLs\" 
+
 REM NGSpice
 COPY "%NGSPICE_ROOT%\visualc\sharedspice\Release.x64\ngspice.dll" "%OT_DEPLOYMENT_DIR%"
-
-REM PYRIT
-MKDIR "%OT_DEPLOYMENT_DIR%\Python\Lib\pyrit-packages" 
-XCOPY /S "%OT_PYRIT_ROOT%\pyrit-packages\*.*" "%OT_DEPLOYMENT_DIR%\Python\Lib\pyrit-packages"
 
 REM CircuitModels
 MKDIR "%OT_DEPLOYMENT_DIR%\CircuitModels"

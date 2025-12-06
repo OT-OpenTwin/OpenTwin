@@ -30,6 +30,8 @@
 #include "EntityBinaryData.h"
 #include "EntityProperties.h"
 
+#include "CartesianMeshToSTL.h"
+
 #include "OTCore/LogDispatcher.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -64,15 +66,16 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 	std::string tempDirPath = getUniqueTempDir();
 	if (tempDirPath.empty()) return "ERROR: Unable to create temporary working directory (TMP environment variable needs to be set)";
 
-	if (_mkdir(tempDirPath.c_str()) == -1)
-	{
+	if (_mkdir(tempDirPath.c_str()) == -1) {
 		return "ERROR: Unable to create temporary working directory (TMP environment variable needs to be set)";
 	}
 
-	// Get all the material property infomation
-	std::map<std::string, EntityProperties> materialProperties;
-	readMaterialProperties(materialProperties);
-
+	EntityPropertiesEntityList *mesh = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Mesh"));
+	assert(mesh != nullptr);
+	if (mesh == nullptr) {
+		return "ERROR: Unable to read mesh information for solver.";
+	}
+	
 	// Create a solver depending on the type
 	std::string problemType = getProblemType(solverEntity);
 
@@ -87,24 +90,12 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 		// Create the FDTD configuration and write the XML file
 		FDTDConfig cfg;
 		cfg.setFromEntity(solverEntity);
-		// Set the material properties from the material property map
-		cfg.setMaterialProperties(materialProperties);
+		cfg.loadSTLMesh(mesh->getValueName(), tempDirPath);
 		tinyxml2::XMLDocument doc;
 		cfg.addToXML(doc);
+		// Save the XML file
 		std::string tempFilePath = tempDirPath + "\\FDTD.xml";
-		if (doc.SaveFile(tempFilePath.c_str()) == tinyxml2::XML_SUCCESS) {
-			outputText = "\nFDTD XML file generated successfully!";
-		}
-		else {
-			outputText = "\nERROR: Unable to save FDTD XML file!";
-		}
-		// Build the solver input file in the temp folder
-		std::string controlFileName = tempDirPath + "\\model.pro";
-		std::ofstream controlFile(controlFileName);
-		
-		//solver->setData(solverEntity, meshDataName, meshItemInfo, entityProperties, groupNameToIdMap, materialProperties);
-		solver->writeInputFile(controlFile, application);
-		controlFile.close();
+		doc.SaveFile(tempFilePath.c_str());
 
 		// Run the solver
 		logFileText = solver->runSolver(tempDirPath, application->getUiComponent());

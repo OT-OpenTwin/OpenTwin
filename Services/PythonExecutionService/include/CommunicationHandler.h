@@ -55,11 +55,18 @@ public:
 
 	bool isDisconnected() const { return m_clientState == ClientState::Disconnected; };
 
+	void setManifestUID(ot::UID _manifestUID)
+	{
+		m_manifestUID = _manifestUID;
+	}
+	void restart(const std::string& _serverName);
+
 private Q_SLOTS:
 	void slotNewConnection(void);
 	void slotMessageReceived(void);
 	void slotClientDisconnected(void);
 	void slotProcessMessage(std::string _message);
+	void slotRestart(const std::string& _serverName);
 
 private:
 	enum class ClientState {
@@ -107,5 +114,5 @@ private:
 	bool m_databaseInfoSet;
 
 	std::string m_response;
-
+	ot::UID m_manifestUID = ot::invalidUID;
 };

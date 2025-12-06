@@ -137,11 +137,30 @@ void Application::logFlagsChanged(const ot::LogFlags& _flags) {
 	m_subprocessManager->sendRequest(doc, response);
 }
 
-std::string Application::handleForwardToSubprocess(ot::JsonDocument& _doc) {
+std::string Application::handleForwardToSubprocess(ot::JsonDocument& _doc) 
+{
+	
+	if (ot::json::exists(_doc, OT_ACTION_PARAM_Python_Environment))
+	{
+		ot::UID manifestUID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_Python_Environment);
+		m_subprocessManager->setManifestUID(manifestUID);
+	}
 	std::string returnMessage;
 
-	if (!m_subprocessManager->sendRequest(_doc, returnMessage)) {
+	if (!m_subprocessManager->sendRequest(_doc, returnMessage)) 
+	{
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send request").toJson();
+	}
+
+	ot::ReturnMessage message = ot::ReturnMessage::fromJson(returnMessage);
+	if (message.getWhat() == "<Restart>")
+	{
+		m_subprocessManager->restartSubprocess();
+
+		if (!m_subprocessManager->sendRequest(_doc, returnMessage))
+		{
+			returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send request").toJson();
+		}
 	}
 
 	return returnMessage;

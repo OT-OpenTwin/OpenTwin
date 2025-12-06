@@ -143,13 +143,13 @@ void EntityBlockHierarchicalDocumentItem::addStorageData(bsoncxx::builder::basic
 	);
 }
 
-void EntityBlockHierarchicalDocumentItem::readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+void EntityBlockHierarchicalDocumentItem::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 
 	m_documentUID = static_cast<ot::UID>(_docView["DocumentID"].get_int64());
 	m_documentVersion = static_cast<ot::UID>(_docView["DocumentVersion"].get_int64());
-	m_documentType = _docView["DocumentType"].get_utf8().value.data();
-	m_documentExtension = _docView["DocumentExtension"].get_utf8().value.data();
+	m_documentType = _docView["DocumentType"].get_string().value.data();
+	m_documentExtension = _docView["DocumentExtension"].get_string().value.data();
 }
 
 void EntityBlockHierarchicalDocumentItem::ensureDocumentDataLoaded() {

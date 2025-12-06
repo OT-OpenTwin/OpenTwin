@@ -85,7 +85,7 @@ void ot::SVGWidgetGrid::clear(void) {
 		if (w) {
 			w->getQWidget()->setHidden(true);
 			m_layout->removeWidget(w->getQWidget());
-			delete w;
+			w->deleteLater();
 		}
 	}
 	m_widgets.clear();

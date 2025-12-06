@@ -48,7 +48,7 @@ void EntityParameterizedDataPreviewTable::addStorageData(bsoncxx::builder::basic
 	);
 }
 
-void EntityParameterizedDataPreviewTable::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityParameterizedDataPreviewTable::readSpecificDataFromDataBase(const bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	// We read the parent class information first 
 	EntityResultTable::readSpecificDataFromDataBase(doc_view, entityMap);

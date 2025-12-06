@@ -177,6 +177,7 @@ ot::ImagePainter* ot::ImagePainterManager::removeImagePainter(const std::string&
 
 void ot::ImagePainterManager::clear(void) {
 	for (const auto& it : m_painter) {
+		OTAssertNullptr(it.second);
 		delete it.second;
 	}
 	m_painter.clear();

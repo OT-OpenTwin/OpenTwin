@@ -25,6 +25,7 @@
 // STD
 #include <cstdint>
 
+//! @brief Abstract base class for different types of excitations in FDTD simulations
 class ExcitationBase {
 public:
 	ExcitationBase() {}

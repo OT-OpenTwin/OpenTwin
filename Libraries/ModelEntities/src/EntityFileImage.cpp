@@ -67,7 +67,7 @@ void EntityFileImage::addStorageData(bsoncxx::builder::basic::document& _storage
 	_storage.append(bsoncxx::builder::basic::kvp("ImageFormat", ot::toString(m_format)));
 }
 
-void EntityFileImage::readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) {
+void EntityFileImage::readSpecificDataFromDataBase(const bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityFile::readSpecificDataFromDataBase(_doc_view, _entityMap);
 
 	m_format = ot::stringToImageFileFormat(_doc_view["ImageFormat"].get_utf8().value.data());

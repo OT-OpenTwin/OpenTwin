@@ -63,18 +63,18 @@ public:
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
-	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 private:
 	void compressData(const double *values, size_t length, bool storeData, long long &compressedDataValuesSize, long long &compressedDataCountSize);
 
 	const size_t			maximumDataSize;
 	double					tolerance;
-	long long				uncompressedLength;
+	size_t					uncompressedLength;
 	std::vector<double>		compressedDataValues;
 	std::vector<long long>	compressedDataCount;
-	long long				valuesSize;
-	long long				countSize;
+	size_t					valuesSize;
+	size_t					countSize;
 };
 
 

@@ -36,6 +36,7 @@ ot::ImagePainterWidget::ImagePainterWidget(QWidget* _parent)
 ot::ImagePainterWidget::~ImagePainterWidget() {
 	if (m_painter) {
 		delete m_painter;
+		m_painter = nullptr;
 	}
 }
 
@@ -51,6 +52,7 @@ void ot::ImagePainterWidget::setPainter(ImagePainter* _painter) {
 		delete m_painter;
 	}
 	m_painter = _painter;
+	update();
 }
 
 

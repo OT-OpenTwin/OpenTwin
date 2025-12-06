@@ -183,7 +183,7 @@ void EntityBlockCircuitVoltageMeter::addStorageData(bsoncxx::builder::basic::doc
 	EntityBlock::addStorageData(storage);
 }
 
-void EntityBlockCircuitVoltageMeter::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockCircuitVoltageMeter::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

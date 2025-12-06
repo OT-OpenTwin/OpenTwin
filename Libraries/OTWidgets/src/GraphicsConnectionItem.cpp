@@ -596,6 +596,7 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 		}
 	}
 
+	this->updateConnectionView();
 	this->updateDisconnectVisibility();
 }
 

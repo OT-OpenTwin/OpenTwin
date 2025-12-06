@@ -355,7 +355,7 @@ void MicroServiceSolver::addResultFD(std::string name, std::string title, double
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection |
 			ot::EntityCallbackBase::Callback::DataNotify,
-			Application::instance().getServiceName()
+			OT_INFO_SERVICE_TYPE_VisualizationService
 		);
 
 		std::string rawDataFolder = solverName + "/" + FolderNames::GetFolderNameRawResultBase() + "/";

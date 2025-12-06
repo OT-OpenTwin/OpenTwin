@@ -59,13 +59,9 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 
 	EntityBlock* entBlock = dynamic_cast<EntityBlock*>(_entBase);
 	if (entBlock) {
-		std::string rootName = ot::EntityName::getSubName(entBlock->getName(), 0).value();
-		std::string editorName = ot::EntityName::getSubName(entBlock->getName(), 1).value();
-		std::string editorFullPath = rootName + "/" + editorName;
-		EntityBase* editorBase = model->findEntityFromName(editorFullPath);
-		EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+		EntityGraphicsScene* editor = findGraphicsScene(entBlock->getName());
 		if (!editor) {
-			OT_LOG_E("Failed to cast into EntityGraphicsScene");
+			OT_LOG_E("Failed to determine EntityGraphicsScene for block { \"BlockID\": " + std::to_string(entBlock->getEntityID()) + " }");
 			return;
 		}
 		addBlock(editor->getEntityID(), entBlock);
@@ -74,13 +70,9 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 
 	EntityBlockConnection* entBlockConnection = dynamic_cast<EntityBlockConnection*>(_entBase);
 	if (entBlockConnection) {
-		std::string rootName = ot::EntityName::getSubName(entBlockConnection->getName(), 0).value();
-		std::string editorName = ot::EntityName::getSubName(entBlockConnection->getName(), 1).value();
-		std::string editorFullPath = rootName + "/" + editorName;
-		EntityBase* editorBase = model->findEntityFromName(editorFullPath);
-		EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+		EntityGraphicsScene* editor = findGraphicsScene(entBlockConnection->getName());
 		if (!editor) {
-			OT_LOG_E("Failed to cast into EntityGraphicsScene");
+			OT_LOG_E("Failed to determine EntityGraphicsScene for connection { \"ConnectionID\": " + std::to_string(entBlockConnection->getEntityID()) + " }");
 			return;
 		}
 		addConnection(editor->getEntityID(), *entBlockConnection);
@@ -110,14 +102,32 @@ ot::UIDList& BlockHandler::getConnections(ot::UID editorId, ot::UID blockId) {
 }
 
 void BlockHandler::addConnection(ot::UID editorId, EntityBlockConnection& _toBeAddedConnection) {
-	auto& originList = m_viewBlockConnectionsMap[editorId][_toBeAddedConnection.getConnectionCfg().getOriginUid()];
-	if (std::find(originList.begin(), originList.end(), _toBeAddedConnection.getEntityID()) == originList.end()) {
-		originList.push_back(_toBeAddedConnection.getEntityID());
+	ot::UID originUid = _toBeAddedConnection.getConnectionCfg().getOriginUid();
+	ot::UID destUid = _toBeAddedConnection.getConnectionCfg().getDestinationUid();
+	ot::UID connectionId = _toBeAddedConnection.getEntityID();
+
+	auto editorIt = m_viewBlockConnectionsMap.find(editorId);
+	if (editorIt == m_viewBlockConnectionsMap.end()) {
+		OT_LOG_E("Could not find editor { \"EntityID\": " + std::to_string(editorId) + " }");
+		return;
 	}
 
-	auto& destList = m_viewBlockConnectionsMap[editorId][_toBeAddedConnection.getConnectionCfg().getDestinationUid()];
-	if (std::find(destList.begin(), destList.end(), _toBeAddedConnection.getEntityID()) == destList.end()) {
-		destList.push_back(_toBeAddedConnection.getEntityID());
+	auto& blocks = editorIt->second;
+
+	auto blockOriginIt = blocks.find(originUid);
+	if (blockOriginIt != blocks.end()) {
+		auto& connectionList = blockOriginIt->second;
+		if (std::find(connectionList.begin(), connectionList.end(), connectionId) == connectionList.end()) {
+			connectionList.push_back(connectionId);
+		}
+	}
+
+	auto blockDestIt = blocks.find(destUid);
+	if (blockDestIt != blocks.end()) {
+		auto& connectionList = blockDestIt->second;
+		if (std::find(connectionList.begin(), connectionList.end(), connectionId) == connectionList.end()) {
+			connectionList.push_back(connectionId);
+		}
 	}
 }
 
@@ -202,7 +212,7 @@ void BlockHandler::entityRemoved(EntityBase* _entityToRemove, const std::list<En
 				for (const ot::UID& connection : connections) {
 					EntityBase* connectionEntity = model->getEntityByID(connection);
 					if (!connectionEntity) {
-						OT_LOG_E("EditorBlockConnections map is not correct sychronized with entitymap");
+						OT_LOG_E("EditorBlockConnections map is not correct sychronized with entity map { \"SceneID\": " + std::to_string(itEditor->first) + ", \"ConnectionID\": " + std::to_string(connection) + " }");
 						return;
 					}
 					if (std::find(_otherEntitiesToRemove.begin(), _otherEntitiesToRemove.end(), model->getEntityByID(connection)) != _otherEntitiesToRemove.end()) {
@@ -221,20 +231,85 @@ void BlockHandler::entityRemoved(EntityBase* _entityToRemove, const std::list<En
 	}
 }
 
-bool BlockHandler::findBlock(ot::UID _editor, ot::UID _block) {
-	auto itEditor = m_viewBlockConnectionsMap.find(_editor);
+void BlockHandler::removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, EntityBlockConnection* _connectionEntity, const ot::GraphicsConnectionCfg& _changedConnection) {
+
+	ot::UID origin = _changedConnection.getOriginUid();
+	ot::UID destination = _changedConnection.getDestinationUid();
+
+	for (auto itEditor = m_viewBlockConnectionsMap.begin(); itEditor != m_viewBlockConnectionsMap.end(); ++itEditor) {
+		if (itEditor->first != _editor->getEntityID()) {
+			continue;
+		}
+		
+		if (origin == ot::invalidUID) {
+			auto& blocks = itEditor->second;
+			for(auto itBlock = blocks.begin(); itBlock != blocks.end(); ++itBlock) {
+				if(itBlock->first != _connectionEntity->getConnectionCfg().getOriginUid()) {
+					continue;
+				}
+				auto& connections = itBlock->second;
+				auto itConn = std::find(connections.begin(), connections.end(), _connectionEntity->getEntityID());
+				if (itConn != connections.end()) {
+					connections.erase(itConn);
+					return;
+				}
+			}
+		} else if (destination == ot::invalidUID) {
+			auto& blocks = itEditor->second;
+			for (auto itBlock = blocks.begin(); itBlock != blocks.end(); ++itBlock) {
+				if (itBlock->first != _connectionEntity->getConnectionCfg().getDestinationUid()) {
+					continue;
+				}
+				auto& connections = itBlock->second;
+				auto itConn = std::find(connections.begin(), connections.end(), _connectionEntity->getEntityID());
+				if (itConn != connections.end()) {
+					connections.erase(itConn);
+					return;
+				}
+			}
+		}
+	}
+}
+
+bool BlockHandler::blockExists(ot::UID _blockID) {
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+	std::map<ot::UID, EntityBase*>& entityMap = model->getAllEntitiesByUID();
+	if (entityMap.find(_blockID) != entityMap.end()) {
+		return true;
+	}
+	return false;
+}
+
+bool BlockHandler::blockExists(ot::UID _editorID, ot::UID _blockID) {
+	auto itEditor = m_viewBlockConnectionsMap.find(_editorID);
 	if (itEditor == m_viewBlockConnectionsMap.end()) {
-		OT_LOG_E("Editor not found - EntityID: " + std::to_string(_editor));
+		OT_LOG_E("Editor not found { \"EntityID\": " + std::to_string(_editorID) + " }");
 		return false;
 	}
 
 	const auto& blocksMap = itEditor->second;
-	auto itBlock = blocksMap.find(_block);
+	auto itBlock = blocksMap.find(_blockID);
 	if (itBlock == blocksMap.end()) {
 		return false;
 	}
 
 	return true;
+}
+
+EntityGraphicsScene* BlockHandler::findGraphicsScene(const std::string& _graphicsElementName) {
+	std::string parentName = ot::EntityName::getParentPath(_graphicsElementName);
+	if(parentName.empty()) {
+		OT_LOG_E("Could not extract root name from graphics element { \"Name\": \"" + _graphicsElementName + "\" }");
+		return nullptr;
+	}
+	EntityBase* editorBase = Application::instance()->getModel()->findEntityFromName(parentName);
+	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+	if(!editor){
+		editor = findGraphicsScene(parentName);
+	}
+	return editor;
 }
 
 ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) {
@@ -263,14 +338,11 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 
 	std::shared_ptr<EntityBlock> createdBlock = createBlockEntity(editor, _eventData.getScenePos(), _eventData.getItemName(), modelStateInfo);
 	if (createdBlock == nullptr) {
-		OT_LOG_E("Could not create block entity {\"BlockName\": \"" + _eventData.getItemName() + "\" } ");
+		OT_LOG_E("Could not create block entity { \"BlockName\": \"" + _eventData.getItemName() + "\" }");
 		return ot::ReturnMessage::Failed;
 	}
 
 	model->addEntitiesToModel(modelStateInfo, "Added block", true, true, true);
-
-	// Add Block to Map
-	addBlock(editor->getEntityID(), createdBlock.get());
 
 	// Check if any service wants to be notified about this change
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
@@ -466,7 +538,7 @@ ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEven
 	}
 
 	// Now handle the connection changed requests
-	const std::list<ot::GraphicsConnectionCfg>& changedConnections = _changeEvent.getChangedConnections();
+   const std::list<ot::GraphicsConnectionCfg>& changedConnections = _changeEvent.getChangedConnections();
 	if(!changedConnections.empty()) {
 		for(const ot::GraphicsConnectionCfg& connectionCfg : changedConnections) {
 			if(!updateConnection(connectionCfg, _changeEvent)) {
@@ -562,6 +634,10 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 
+	// Ensure connection on connection is allowed
+	if (!_scene->getSceneFlags().has(EntityGraphicsScene::AllowConnectionsOnConnections)) {
+		return true; // Ingore processing but return success
+	}
 
 	// Here I want to get all block/connection entities
 	std::map<ot::UID, EntityBlock*> blockEntities;
@@ -604,14 +680,14 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	// The connection to be added
 	ot::GraphicsConnectionCfg requestedConnection = _eventData.getConnectionCfg();
 
-	// As next step i need to add the intersection item
+	// Add the intersection item
 	ot::NewModelStateInfo _modelStateInfo;
 	
 	// The destination connection is the connection to be deleted
     // Get connection cfg
 	ot::GraphicsConnectionCfg connectionCfg = _destinationConnection->getConnectionCfg();
 
-	//First i get the connection which i want to delete by the connection to be added
+	// First get the connection which needs to be deleted by the new connection
 	std::unique_ptr<EntityBlock> connector = nullptr;
 	if (!_connectionReversed) {
 		//Saving connected Element and connector
@@ -619,7 +695,7 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 		connector = createBlockEntity(_scene, requestedConnection.getDestPos(), EntityBlockCircuitConnector::className(), _modelStateInfo);
 	}
 	else {
-		//Saving connected Element and connector
+		// Saving connected Element and connector
 		connectedElements.push(std::make_pair(requestedConnection.getDestConnectable(), blockEntities[requestedConnection.getDestinationUid()]));
 		connector = createBlockEntity(_scene, requestedConnection.getOriginPos(), EntityBlockCircuitConnector::className(), _modelStateInfo);
 	}
@@ -629,22 +705,22 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 		return false;
 	}
 
-	// Here I check if the the blocks which are connected to the connection exist
+	// Check if the the blocks which are connected to the connection exist
 	if (blockEntities.find(connectionCfg.getDestinationUid()) == blockEntities.end() ||
 		blockEntities.find(connectionCfg.getOriginUid()) == blockEntities.end()) {
-		OT_LOG_E("BlockEntity not found");
+		OT_LOG_E("BlockEntity not found { \"OriginID\": " + std::to_string(connectionCfg.getOriginUid()) + ", \"DestinationID\": " + std::to_string(connectionCfg.getDestinationUid()) + " }");
 		return false;
 	}
 
-	//Saving  connected Elements and connectors
+	// Saving connected Elements and connectors
 	connectedElements.push(std::make_pair(connectionCfg.getDestConnectable(), blockEntities[connectionCfg.getDestinationUid()]));
 	connectedElements.push(std::make_pair(connectionCfg.getOriginConnectable(), blockEntities[connectionCfg.getOriginUid()]));
 
 	entitiesToDelete.push_back(_destinationConnection->getName());
-	// Now I can delete the connection
+	// Delete the connection
 	model->deleteEntitiesFromModel(entitiesToDelete, false);
 
-	//Now i create a GraphicsConnectionCfg for all elements
+	// Create a GraphicsConnectionCfg for all elements
 	while (!connectedElements.empty()) {
 		ot::GraphicsConnectionCfg temp(_eventData.getConnectionCfg());
 		temp.setDestUid(connector->getEntityID());
@@ -656,12 +732,12 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 		connectedElements.pop();
 	}
 
-	EntityNamingBehavior _connectionNaming;
-	_connectionNaming.explicitNaming = true;
+	EntityNamingBehavior connectionNaming;
+	connectionNaming.explicitNaming = true;
 
 	for (auto& connectionCfg : newConnections) {
 		connectionCfg.setUid(model->createEntityUID());
-		createConnection(_scene, _originBlock, connectionCfg,  _connectionNaming, _modelStateInfo);
+		createConnection(_scene, _originBlock, connectionCfg, connectionNaming, _modelStateInfo);
 	}
 
 	model->addEntitiesToModel(_modelStateInfo, "Added Connection to Connection", true, true, true);
@@ -680,7 +756,7 @@ bool BlockHandler::updateBlock(const ot::GraphicsItemCfg* _changedBlock, const o
 	auto entBase = model->getEntityByID(blockID);
 	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(entBase);
 	if (!blockEnt) {
-		OT_LOG_E("BlockEntity not found");
+		OT_LOG_E("BlockEntity not found { \"EntityID\": " + std::to_string(blockID) + " }");
 		return false;
 	}
 
@@ -725,12 +801,11 @@ bool BlockHandler::updateBlock(const ot::GraphicsItemCfg* _changedBlock, const o
 	auto coordinateEntBase = model->readEntityFromEntityID(blockEnt, positionID, map);
 
 	EntityCoordinates2D* coordinateEntity = dynamic_cast<EntityCoordinates2D*>(coordinateEntBase);
-	auto parent = coordinateEntity->getParent();
 	if (!coordinateEntity) {
-		OT_LOG_E("Coordinate Entity is null");
+		OT_LOG_E("Coordinate Entity not found { \"EntityID\": " + std::to_string(positionID) + " }");
 		return false;
 	}
-
+	
 	if (coordinateEntity->getCoordinates() != _changedBlock->getPosition()) {
 		coordinateEntity->setCoordinates(_changedBlock->getPosition());
 		coordinateEntity->storeToDataBase();
@@ -747,23 +822,47 @@ bool BlockHandler::updateBlock(const ot::GraphicsItemCfg* _changedBlock, const o
 }
 
 bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedConnection, const ot::GraphicsChangeEvent& _changeEvent) {
-	Model* model = Application::instance()->getModel();
+Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
+
+	EntityBase* baseEditor = model->findEntityFromName(_changeEvent.getEditorName());
+	if(!baseEditor) {
+		OT_LOG_E("Could not find graphics editor entity { \"ViewName\": \"" + _changeEvent.getEditorName() + "\" }");
+		return false;
+	}
+	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(baseEditor);
+	if(!editor) {
+		OT_LOG_E("Could not cast to EntityGraphicsScene { \"ViewName\": \"" + _changeEvent.getEditorName() + "\" }");
+		return false;
+	}
 
 	// Get uid of changed connection
 	const ot::UID connectionID = _changedConnection.getUid();
-	
+
 	// Get connection entity
 	auto entBase = model->getEntityByID(connectionID);
 	EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entBase);
 	if (!connectionEntity) {
-		OT_LOG_E("BlockEntity is null");
+		OT_LOG_E("BlockEntity not found { \"EntityID\": " + std::to_string(connectionID) + " }");
 		return false;
 	}
 
 	// Ui does not update the connectionCfg anymore means that originUid/destinationUid could exist even if the block with corresponding uid does not exits
 	// Only update the position of the connections means no need of checking if originUid or destinationUid exists
 	ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
+
+	if(_changedConnection.getOriginUid() == ot::invalidUID || blockExists(_changedConnection.getOriginUid())) {
+		connectionCfg.setOriginUid(_changedConnection.getOriginUid());
+		connectionCfg.setOriginConnectable(_changedConnection.getOriginConnectable());
+	}
+
+	if(_changedConnection.getDestinationUid() == ot::invalidUID || blockExists(_changedConnection.getDestinationUid())) {
+		connectionCfg.setDestUid(_changedConnection.getDestinationUid());
+		connectionCfg.setDestConnectable(_changedConnection.getDestConnectable());
+	}
+
+	removeConnectionIfUnsnapped(editor, connectionEntity, _changedConnection);
+
 	connectionCfg.setOriginPos(_changedConnection.getOriginPos());
 	connectionCfg.setDestPos(_changedConnection.getDestPos());
 	connectionEntity->setConnectionCfg(connectionCfg);
@@ -780,13 +879,13 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 	// Create block entity
 	EntityBase* entBase = EntityFactory::instance().create(_itemName);
 	if (entBase == nullptr) {
-		OT_LOG_E("Could not create Entity: " + _itemName);
+		OT_LOG_E("Failed to create Entity { \"ClassName\": \"" + _itemName + "\" }");
 		return nullptr;
 	}
 
 	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
 	if (blockEnt == nullptr) {
-		OT_LOG_E("Could not cast to EntityBlock: " + entBase->getEntityID());
+		OT_LOG_E("Could not cast to EntityBlock { \"EntityID\": " + std::to_string(entBase->getEntityID()) + " }");
 		return nullptr;
 	}
 
@@ -826,16 +925,26 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 	if (blockEnt->getClassName() == "EntityBlockPython") {
 		EntityBlockPython* pythonBlock = dynamic_cast<EntityBlockPython*>(blockEnt.get());
 		if (pythonBlock == nullptr) {
-			OT_LOG_E("Could not cast to EntityBlockPython: " + blockEnt->getEntityID());
+			OT_LOG_E("Could not cast to EntityBlockPython { \"EntityID\": " + std::to_string(blockEnt->getEntityID()) + " }");
 			return nullptr;
 		}
 		ot::EntityInformation entityInfo;
-		EntityBase* entity = model->findEntityFromName(ot::FolderNames::PythonScriptFolder);
-		pythonBlock->setScriptFolder(ot::FolderNames::PythonScriptFolder, entity->getEntityID());
+		EntityBase* scriptFolder = model->findEntityFromName(ot::FolderNames::PythonScriptFolder);
+		EntityBase* manifestFolder = model->findEntityFromName(ot::FolderNames::PythonManifestFolder);
+		if (manifestFolder == nullptr || scriptFolder == nullptr)
+		{
+			OT_LOG_E(std::string("Python folders not found { \"ScriptFolderFound\": ") + (scriptFolder ? "true" : "false") + ", \"ManifestFolderFound\": " + (manifestFolder ? "true" : "false") + " }");
+			return nullptr;
+		}
+		pythonBlock->setScriptFolder(scriptFolder->getEntityID());
+		pythonBlock->setManifestFolder(manifestFolder->getEntityID());
 	}
 
 	blockEnt->storeToDataBase();
 	_newModelStateInfo.addTopologyEntity(*blockEnt);
+
+	// Add Block to Map
+	addBlock(_editor->getEntityID(), blockEnt.get());
 	return blockEnt;
 }
 
@@ -882,42 +991,49 @@ void BlockHandler::createConnection( EntityGraphicsScene* _scene, EntityBlock* _
 	return;
 }
 
-void BlockHandler::modifyConnection(const ot::UID& _entityID, EntityBase* _connectedBlockEntity){
+void BlockHandler::modifyConnection(const ot::UID& _connectionID, EntityBase* _connectedBlockEntity){
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
+	OTAssertNullptr(_connectedBlockEntity);
 
-	auto entBase = model->getEntityByID(_entityID);
+	auto entBase = model->getEntityByID(_connectionID);
 	if (!entBase) {
-		OT_LOG_E("Failed to get Entity by ID");
+		OT_LOG_E("Entity not found { \"ConnectionID\": " + std::to_string(_connectionID) + " }");
 		return;
 	}
 	EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entBase);
 	if (!connectionEntity) {
-		OT_LOG_E("ConnectionEntity is null");
+		OT_LOG_E("EntityBlockConnection cast failed { \"ConnectionID\": " + std::to_string(_connectionID) + " }");
 		return;
 	}
 
 	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(_connectedBlockEntity);
 	if (!blockEnt) {
-		OT_LOG_E("ConnectionEntity is null");
+		OT_LOG_E("EntityBlock cast failed { \"EntityID\": " + std::to_string(_connectedBlockEntity->getEntityID()) + " }");
 		return;
 	}
 
-	ot::GraphicsConnectionCfg _oldConnectionCfg = connectionEntity->getConnectionCfg();
-	if (_oldConnectionCfg.getOriginUid() == _connectedBlockEntity->getEntityID()) {
-		_oldConnectionCfg.setOriginUid(ot::invalidUID);
-		_oldConnectionCfg.setOriginConnectable("");
+	ot::GraphicsConnectionCfg oldConnectionCfg = connectionEntity->getConnectionCfg();
+	if (oldConnectionCfg.getOriginUid() == _connectedBlockEntity->getEntityID()) {
+		oldConnectionCfg.setOriginUid(ot::invalidUID);
+		oldConnectionCfg.setOriginConnectable("");
 	}
-	else if (_oldConnectionCfg.getDestinationUid() == _connectedBlockEntity->getEntityID()) {
-		_oldConnectionCfg.setDestUid(ot::invalidUID);
-		_oldConnectionCfg.setDestConnectable("");
+	else if (oldConnectionCfg.getDestinationUid() == _connectedBlockEntity->getEntityID()) {
+		oldConnectionCfg.setDestUid(ot::invalidUID);
+		oldConnectionCfg.setDestConnectable("");
 	}
 	else {
-		OT_LOG_E("Connection is not connected to: " + std::to_string(_connectedBlockEntity->getEntityID()));
+		OT_LOG_E("Origin and destination differ for existing connection, can not modify "
+			"{ \"ConnectedBlockID\": " + std::to_string(_connectedBlockEntity->getEntityID()) +
+			", \"ConnectionID\": " + std::to_string(_connectionID) +
+			", \"ConnectionOriginID\": " + std::to_string(oldConnectionCfg.getOriginUid()) +
+			", \"ConnectionDestinationID\": " + std::to_string(oldConnectionCfg.getDestinationUid()) +
+			" }"
+		);
 		return;
 	}
 	
-	connectionEntity->setConnectionCfg(_oldConnectionCfg);
+	connectionEntity->setConnectionCfg(oldConnectionCfg);
 	connectionEntity->storeToDataBase();
 	model->getStateManager()->modifyEntityVersion(*connectionEntity);
 }
@@ -941,9 +1057,13 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 	bool bothItemsExist = true;
 	if (isOrigin){
 		entBase = model->getEntityByID(connectionCfg.getOriginUid());
+		if (!entBase) {
+			OT_LOG_E("Origin entity not found { \"EntityID\": " + std::to_string(connectionCfg.getOriginUid()) + " }");
+			return false;
+		}
 
-		//Check if destination of connectionCfg really exists
-		if (!findBlock(_scene->getEntityID(), connectionCfg.getDestinationUid())) {
+		// Check if destination of connectionCfg really exists
+		if (!blockExists(_scene->getEntityID(), connectionCfg.getDestinationUid())) {
 			connectionCfg.setDestUid(ot::invalidUID);
 			connectionCfg.setDestConnectable("");
 			bothItemsExist = false;
@@ -951,16 +1071,20 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 		else {
 			entBase2 = model->getEntityByID(connectionCfg.getDestinationUid());
 			if (!entBase2) {
-				OT_LOG_E("EditorBlockConnections map is not correct sychronized with entitymap");
+				OT_LOG_E("Destination entity not found { \"EntityID\": " + std::to_string(connectionCfg.getDestinationUid()) + " }");
 				return false;
 			}
 		}
 	}
 	else {
 		entBase = model->getEntityByID(connectionCfg.getDestinationUid());
+		if (!entBase) {
+			OT_LOG_E("Destination entity not found { \"EntityID\": " + std::to_string(connectionCfg.getDestinationUid()) + " }");
+			return false;
+		}
 
-		//Check if origin of connectionCfg really exists
-		if(!findBlock(_scene->getEntityID(), connectionCfg.getOriginUid())) {
+		// Check if origin of connectionCfg really exists
+		if (!blockExists(_scene->getEntityID(), connectionCfg.getOriginUid())) {
 			connectionCfg.setOriginUid(ot::invalidUID);
 			connectionCfg.setOriginConnectable("");
 			bothItemsExist = false;
@@ -968,20 +1092,17 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 		else {
 			entBase2 = model->getEntityByID(connectionCfg.getOriginUid());
 			if (!entBase2) {
-				OT_LOG_E("EditorBlockConnections map is not correct sychronized with entitymap");
+				OT_LOG_E("Origin entity not found { \"EntityID\": " + std::to_string(connectionCfg.getOriginUid()) + " }");
 				return false;
 			}
 		}	
 	}
 		
-	if(!entBase) {
-		OT_LOG_E("Failed to get Entity by ID");
-		return false;
-	}
+	OTAssertNullptr(entBase);
 
 	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(entBase);
 	if(!blockEnt) {
-		OT_LOG_E("BlockEntity is null");
+		OT_LOG_E("BlockEntity cast failed { \"EntityID\": " + std::to_string(entBase->getEntityID()) + " }");
 		return false;
 	}
 
@@ -989,14 +1110,14 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 	if (bothItemsExist) {
 		EntityBlock* blockEnt2 = dynamic_cast<EntityBlock*>(entBase2);
 		if (!blockEnt2) {
-			OT_LOG_E("BlockEntity is null");
+			OT_LOG_E("BlockEntity cast failed { \"EntityID\": " + std::to_string(entBase2->getEntityID()) + " }");
 			return false;
 		}
 
 		if(blockEnt->getClassName() != "EntityBlockCircuitConnector" && blockEnt2->getClassName() != "EntityBlockCircuitConnector") {
 				
-			ot::ConnectorType originConnectorType = ot::ConnectorType::UNKNOWN;
-			ot::ConnectorType destinationConnectorType = ot::ConnectorType::UNKNOWN;
+			ot::ConnectorType originConnectorType = ot::ConnectorType::Any;
+			ot::ConnectorType destinationConnectorType = ot::ConnectorType::Any;
 
 			if (isOrigin) {
 
@@ -1004,14 +1125,13 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 				auto originConnectorIt = blockEnt->getAllConnectorsByName().find(connectionCfg.getOriginConnectable());
 				auto destinationConnectorIt = blockEnt2->getAllConnectorsByName().find(connectionCfg.getDestConnectable());
 
-				if (originConnectorIt == blockEnt->getAllConnectorsByName().end() || destinationConnectorIt == blockEnt2->getAllConnectorsByName().end()) {
-					OT_LOG_E("Could not find origin or destination connector for connection");
-					return false;
+				if (originConnectorIt != blockEnt->getAllConnectorsByName().end() && destinationConnectorIt != blockEnt2->getAllConnectorsByName().end()) {
+					// Check connector types
+					originConnectorType = originConnectorIt->second.getConnectorType();
+					destinationConnectorType = destinationConnectorIt->second.getConnectorType();
 				}
 
-				// Check connector types
-				originConnectorType = originConnectorIt->second.getConnectorType();
-				destinationConnectorType = destinationConnectorIt->second.getConnectorType();
+
 			}
 			else {
 
@@ -1019,14 +1139,11 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 				auto originConnectorIt = blockEnt->getAllConnectorsByName().find(connectionCfg.getDestConnectable());
 				auto destinationConnectorIt = blockEnt2->getAllConnectorsByName().find(connectionCfg.getOriginConnectable());
 
-				if (originConnectorIt == blockEnt->getAllConnectorsByName().end() || destinationConnectorIt == blockEnt2->getAllConnectorsByName().end()) {
-					OT_LOG_E("Could not find origin or destination connector for connection");
-					return false;
+				if (originConnectorIt != blockEnt->getAllConnectorsByName().end() && destinationConnectorIt != blockEnt2->getAllConnectorsByName().end()) {
+					// Check connector types
+					originConnectorType = originConnectorIt->second.getConnectorType();
+					destinationConnectorType = destinationConnectorIt->second.getConnectorType();
 				}
-
-				// Check connector types
-				originConnectorType = originConnectorIt->second.getConnectorType();
-				destinationConnectorType = destinationConnectorIt->second.getConnectorType();
 			}
 
 			if (originConnectorType == ot::ConnectorType::UNKNOWN || destinationConnectorType == ot::ConnectorType::UNKNOWN) {

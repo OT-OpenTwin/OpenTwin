@@ -24,10 +24,13 @@
 // STD
 #include <cstdint>
 
+//! @brief Class representing a Gaussian excitation for FDTD simulations
+//! @brief Inherits from ExcitationBase and implements the application of Gaussian excitation properties
 class GaussianExcitation : public ExcitationBase {
 public:
 	GaussianExcitation();
 	virtual ~GaussianExcitation();
 
+	//! @brief Applies the Gaussian excitation properties to the ExcitationProperties object
 	virtual void applyProperties() override;
 };

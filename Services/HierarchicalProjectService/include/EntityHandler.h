@@ -47,9 +47,11 @@ public:
 	void addDocuments(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
 
 private:
-	void addBackgroundImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities);
+	void addImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities);
 public:
-	void addBackgroundImages(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
+	void addImages(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
+
+	void addLabel();
 
 private:
 	void updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities);
@@ -72,8 +74,8 @@ private:
 	const std::string c_documentsFolderName;
 	const std::string c_containerFolder;
 	const std::string c_containerFolderName;
-	const std::string c_backgroundFolder;
-	const std::string c_backgroundFolderName;
+	const std::string c_decorationFolder;
+	const std::string c_decorationFolderName;
 	const std::string c_connectionsFolder;
 	const std::string c_connectionsFolderName;
 

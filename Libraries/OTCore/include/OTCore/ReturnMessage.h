@@ -37,7 +37,8 @@ namespace ot
 			Ok,     //! @brief Ok
 			Failed, //! @brief Error
 			True,
-			False
+			False,
+			Retry
 		};
 
 		static std::string statusToString(ReturnMessageStatus _status);

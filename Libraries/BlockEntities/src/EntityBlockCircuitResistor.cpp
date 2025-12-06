@@ -227,7 +227,7 @@ void EntityBlockCircuitResistor::addStorageData(bsoncxx::builder::basic::documen
 	EntityBlock::addStorageData(storage);
 }
 
-void EntityBlockCircuitResistor::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockCircuitResistor::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

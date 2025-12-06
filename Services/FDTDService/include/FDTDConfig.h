@@ -19,24 +19,17 @@
 
 #pragma once
 
-// TINYXML2
-#include <tinyxml2.h>
-
 // OpenTwin
-#include "OTModelAPI/ModelServiceAPI.h"
-#include "OTCore/LogDispatcher.h"
-#include "OTCore/OTClassHelper.h"
-#include "PropertyHelper.h"
-#include "EntityProperties.h"
-
-#include "Materials/MaterialProperties.h"
-#include "Excitation/ExcitationProperties.h"
 #include "Excitation/ExcitationTypes.h"
 #include "CSXMeshGrid.h"
+#include "CartesianMeshToSTL.h"
+#include "OTCore/OTClassHelper.h"
+
+// tinyxml2
+#include <tinyxml2.h>
 
 // STD
 #include <string>
-#include <stdexcept>
 #include <cstdint>
 #include <array>
 #include <memory>
@@ -44,7 +37,7 @@
 // Forward declaration
 class EntityBase;
 class ExcitationBase;
-class MaterialBase;
+class CartesianMeshToSTL;
 
 //! @brief Class to hold the FDTD configuration for the openEMS solver
 //! @brief This class containts the central addToXML function to write the complete configuration to an XML file
@@ -54,22 +47,24 @@ public:
 	FDTDConfig();
 	virtual ~FDTDConfig();
 
-	uint32_t getTimeSteps() const;
-	double getEndCriteria() const;
-	double getFrequencyStart() const;
-	double getFrequencyStop() const;
-	uint32_t getOversampling() const;
-	std::array<std::string, 6> getBoundaryConditions() const;
+	uint32_t getTimeSteps() const { return m_timeSteps; }
+	double getEndCriteria() const { return m_endCriteria; }
+	double getFrequencyStart() const { return m_freqStart; }
+	double getFrequencyStop() const { return m_freqStop; }
+	uint32_t getOversampling() const { return m_oversampling; }
+	std::array<std::string, 6> getBoundaryConditions() const { return m_boundaryConditions; }
 	std::string getBoundaryConditions(size_t index) const;
 	uint32_t getExcitationType() const;
 
-	void setTimeSteps(uint32_t _timeSteps);
-	void setExcitationType(ExcitationTypes _excitationType);
-	void setExcitationType(uint32_t _value);	
-	void setEndCriteria(double _endCriteria);
-	void setFrequencyStart(double _freqStart);
-	void setFrequencyStop(double _freqStop);
-	void setOverSampling(uint32_t _overSampling);
+	void setTimeSteps(uint32_t _timeSteps) { m_timeSteps = _timeSteps; }
+	void setExcitationType(ExcitationTypes _excitationType) { m_excitationType = _excitationType; }
+	//! @brief Sets the excitation type from a uint32_t value
+	//! @param _value The excitation type as uint32_t (currently supporting 0: Gaussian, 1: Sinusoidal)
+	void setExcitationType(uint32_t _value);
+	void setEndCriteria(double _endCriteria) { m_endCriteria = _endCriteria; }
+	void setFrequencyStart(double _freqStart) { m_freqStart = _freqStart; }
+	void setFrequencyStop(double _freqStop) { m_freqStop = _freqStop; }
+	void setOverSampling(uint32_t _overSampling) { m_oversampling = _overSampling; }
 	void setBoundaryCondition(const std::array<std::string, 6>& _values);
 	void setBoundaryCondition(size_t _index, const std::string& _value);
 
@@ -77,14 +72,16 @@ public:
 	//! @param _solverEntity The solver entity containing the configuration properties
 	void setFromEntity(EntityBase* _solverEntity);
 
-	//! @brief This function sets the material properties used in the simulation
-	//! @param _materialProperties A map of material names to their properties
-	void setMaterialProperties(std::map<std::string, EntityProperties> _materialProperties);
+	//! @brief This function loads the STL mesh from the given mesh name and puts the STL files in the temporary folder
+	//! @brief Wrapper for the CartesianMeshToSTL constructor to load the mesh
+	//! @param _meshName The name of the mesh to load
+	//! @param _tmpFolderName The temporary folder where the mesh files are located
+	void loadSTLMesh(const std::string& _meshName, const std::string& _tmpFolderName);
 
 	//! @brief This function creates an XML element for the FDTD configuration 
 	//! @param _parentElement The parent XML element to which the FDTD configuration will be added
 	//! @return The created FDTD XML element
-	tinyxml2::XMLElement* writeFDTD(tinyxml2::XMLElement& _parentElement);
+	tinyxml2::XMLElement* writeToXML(tinyxml2::XMLElement& _parentElement);
 
 	//! @brief Reads the configuration from the entity properties and writes the XML file
 	//! @param _doc The XML document to which the configuration will be added
@@ -103,19 +100,18 @@ private:
 	const std::array<std::string, 4> m_boundaryConditionTypes = { "PEC", "PMC", "MUR", "PML_8" };
 	const std::array<std::string, 6> m_boundaryNames = { "Xmax", "Xmin", "Ymax", "Ymin", "Zmax", "Zmin" };
 
+	// Excitation type string for property reading
 	std::string m_excitationString;
 
 	// CSX Mesh Grid
 	CSXMeshGrid m_meshGrid;
-	// Material properties container class
-	MaterialProperties m_materialProperties;
-
 	// Excitation object for different excitation types
 	std::unique_ptr<ExcitationBase> m_excitation;
+	// STL Exporter for the mesh
+	std::unique_ptr<CartesianMeshToSTL> m_stlExporter;
 
 	//! @brief Sets the excitation properties based on the selected excitation type
 	void setExcitationProperties();
-
 	//! @brief Performs property checking and adjustments after reading the FDTD properties from the entity
 	void FDTDpropertyChecking();
 };

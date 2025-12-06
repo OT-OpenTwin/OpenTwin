@@ -7,21 +7,21 @@
   },
   "configurePresets": [
     {
-      "name": "vs2022-Debug",
-      "displayName": "VS2022 Debug",
+      "name": "windows-debug",
+      "displayName": "Windows Debug",
       "generator": "Visual Studio 17 2022",
-      "binaryDir": "${sourceDir}/build-vs2022-debug",
+      "binaryDir": "${sourceDir}/build/windows-debug",
       "cacheVariables": {
         "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
         "BUILD_TESTING": "ON"
       }
     },
     {
-      "name": "vs2022-Release",
-      "displayName": "VS2022 Release",
+      "name": "windows-release",
+      "displayName": "Windows Release",
       "generator": "Visual Studio 17 2022",
-      "binaryDir": "${sourceDir}/build-vs2022-release",
-        "cacheVariables": {
+      "binaryDir": "${sourceDir}/build/windows-release",
+      "cacheVariables": {
         "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
         "BUILD_TESTING": "ON"
       }
@@ -29,24 +29,24 @@
   ],
   "buildPresets": [
     {
-      "name": "build-vs2022-Debug",
-      "configurePreset": "vs2022-Debug",
+      "name": "build-windows-debug",
+      "configurePreset": "windows-debug",
       "configuration": "Debug"
     },
     {
-      "name": "build-vs2022-Release",
-      "configurePreset": "vs2022-Release",
+      "name": "build-windows-release",
+      "configurePreset": "windows-release",
       "configuration": "Release"
     }
   ],
   "testPresets": [
     {
-      "name": "test-vs2022-Debug",
-      "configurePreset": "vs2022-Debug"
+      "name": "test-windows-debug",
+      "configurePreset": "windows-debug"
     },
     {
-      "name": "test-vs2022-Release",
-      "configurePreset": "vs2022-Release"
+      "name": "test-windows-release",
+      "configurePreset": "windows-release"
     }
   ]
 }

@@ -54,7 +54,6 @@ namespace ot {
 
 		//! @brief Sets the next chunk of text from the full text.
 		//! Will set all relevant members to represent the chunk.
-		//! Will attemt to not break words when extracting the chunk.
 		//! @param _fullText The full text to extract the chunk from.
 		//! @param _startIndex The offset in the full text where the chunk starts.
 		//! @param _chunkSize The size of the chunk to extract.

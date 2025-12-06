@@ -55,7 +55,7 @@ void ExcitationProperties::setExciteDirection(bool _exciteX, bool _exciteY, bool
 	}
 }
 
-tinyxml2::XMLElement* ExcitationProperties::writeExciteProperties(tinyxml2::XMLElement& _parentElement) const {
+tinyxml2::XMLElement* ExcitationProperties::writeToXML(tinyxml2::XMLElement& _parentElement) const {
 	auto excitationProperty = _parentElement.GetDocument()->NewElement("Excitation");
 	excitationProperty->SetAttribute("Excite", m_excite.c_str());
 	excitationProperty->SetAttribute("Name", m_name.c_str());

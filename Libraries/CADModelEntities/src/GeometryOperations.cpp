@@ -139,9 +139,7 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep *brep, doub
 		bool normalOk = true;
 
 		if (!aTr.IsNull())
-		{
-			const Poly_Array1OfTriangle& facetriangles = aTr->Triangles();
-			
+		{			
 			for (Standard_Integer i = 1; i <= aTr->NbNodes(); i++)
 			{
 				gp_Pnt   point = aTr->Node(i).Transformed(aLocation);
@@ -202,11 +200,11 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep *brep, doub
 			{
 				if (faceOrientation == TopAbs_Orientation::TopAbs_FORWARD)
 				{
-					facetriangles(nt).Get(n1, n2, n3);
+					aTr->Triangle(nt).Get(n1, n2, n3);
 				}
 				else
 				{
-					facetriangles(nt).Get(n3, n2, n1);
+					aTr->Triangle(nt).Get(n3, n2, n1);
 				}
 
 				triangles.push_back(Geometry::Triangle(n1-1 + pointOffset, n2-1 + pointOffset, n3-1 + pointOffset, faceId));

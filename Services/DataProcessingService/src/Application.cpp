@@ -41,8 +41,9 @@
 #include "EntitySolverDataProcessing.h"
 
 #include "OTServiceFoundation/UILockWrapper.h"
-#include "EntityGraphicsScene.h"
+
 #include "OTServiceFoundation/ProgressUpdater.h"
+
 
 Application * g_instance{ nullptr };
 
@@ -224,6 +225,10 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonGraphicsScene = ot::ToolBarButtonCfg(pageName, groupName, "Create Pipeline", "Default/AddSolver");
 	_ui->addMenuButton(m_buttonGraphicsScene.setButtonLockFlags(modelWrite));
 
+	m_buttonCreateManifest = ot::ToolBarButtonCfg(pageName, groupName, "Create Manifest", "Default/AddMaterial");
+	_ui->addMenuButton(m_buttonCreateManifest.setButtonLockFlags(modelWrite));
+
+
 	_blockEntityHandler.setUIComponent(_ui);
 	_blockEntityHandler.createBlockPicker();
 	
@@ -233,8 +238,9 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_pipelineHandler.setUIComponent(_ui);
 	m_propertyHandlerDatabaseAccessBlock.setUIComponent(_ui);
 	
-	connectToolBarButton(m_buttonGraphicsScene, this, &Application::createPipeline);
-	connectToolBarButton(m_buttonCreateSolver, this, &Application::createSolver);
+	connectToolBarButton(m_buttonGraphicsScene, &m_entityCreator, &EntityCreator::createPipeline);
+	connectToolBarButton(m_buttonCreateSolver, &m_entityCreator, &EntityCreator::createSolver);
+	connectToolBarButton(m_buttonCreateManifest, &m_entityCreator, &EntityCreator::createManifests);
 	connectToolBarButton(m_buttonRunPipeline, [this]() 
 		{
 			std::thread worker(&Application::runPipeline, this);

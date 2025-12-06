@@ -54,7 +54,7 @@ public:
 	//! @brief Writes the excitation properties to an XML element
 	//! @param _parentElement The parent XML element to which the excitation properties will be added
 	//! @return The created Excitation XML element
-	tinyxml2::XMLElement* writeExciteProperties(tinyxml2::XMLElement& _parentElement) const;
+	tinyxml2::XMLElement* writeToXML(tinyxml2::XMLElement& _parentElement) const;
 
 private:
 	std::string m_name = "excite"; //default name

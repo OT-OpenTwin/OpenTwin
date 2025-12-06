@@ -23,10 +23,13 @@
 #include "SubprocessManager.h"
 #include "SubprocessHandler.h"
 #include "CommunicationHandler.h"
+#include "DataBase.h"
 
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 // Qt header
 #include <QtCore/qcoreapplication.h>
@@ -98,6 +101,12 @@ void SubprocessManager::setDataBaseInfo(const DataBaseInfo& _info) {
 	return m_communicationHandler->setDataBaseInfo(_info);
 }
 
+void SubprocessManager::setManifestUID(ot::UID _manifestUID)
+{
+	assert(m_communicationHandler != nullptr);
+	m_communicationHandler->setManifestUID(_manifestUID);
+}
+
 bool SubprocessManager::sendRequest(const ot::JsonDocument& _document, std::string& _response) {
 	if (!this->ensureWorkerRunning()) {
 		return false;
@@ -149,8 +158,28 @@ bool SubprocessManager::isConnected() {
 }
 
 void SubprocessManager::shutdownSubprocess(void) {
+	m_communicationHandler->close();
+	m_communicationHandler->cleanupAfterCrash();
+	
 	m_subprocessHandler->shutdownSubprocess();
 }
+
+
+void SubprocessManager::restartSubprocess(void)
+{
+	m_subprocessHandler->shutdownSubprocess();
+	std::unique_lock<std::mutex> lock(m_mutex);
+
+#ifdef  _DEBUG
+	m_communicationHandler->restart("TestServerPython");
+#else
+
+	const std::string hexString = ot::String::toBase64Url(Application::instance()->getProjectName());
+	m_communicationHandler->restart(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE "_" + hexString);
+#endif //  _DEBUG
+	m_restarted.wait(lock);
+}
+
 
 //! @brief Waits for currently 30 sec and checks in an interval of 10 msec, if the qt server is listening
 bool SubprocessManager::ensureWorkerRunning(void) {

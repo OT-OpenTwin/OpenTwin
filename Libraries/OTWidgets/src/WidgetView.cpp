@@ -41,7 +41,8 @@ std::string ot::WidgetView::createStoredViewName(const std::string& _entityName,
 
 ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType, QWidget* _parent) :
 	m_isPermanent(false), m_isDeletedByManager(false),
-	m_isModified(false), m_dockWidget(nullptr), m_data(_viewType)
+	m_isModified(false), m_dockWidget(nullptr), m_data(_viewType),
+	m_manager(nullptr)
 {
 	m_dockWidget = new WidgetViewDock(this, _parent);
 
@@ -52,8 +53,8 @@ ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType, QWidget* _parent)
 ot::WidgetView::~WidgetView() {
 	m_dockWidget->takeWidget();
 
-	if (!m_isDeletedByManager) {
-		WidgetViewManager::instance().forgetView(this);
+	if (!m_isDeletedByManager && m_manager) {
+		m_manager->forgetView(this);
 	}
 
 	ads::CDockManager* adsManager = m_dockWidget->dockManager();

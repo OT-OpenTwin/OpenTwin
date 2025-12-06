@@ -32,6 +32,7 @@
 #include "OTGui/PropertyStringList.h"
 
 #include "OTWidgets/Splitter.h"
+#include "OTWidgets/TableView.h"
 #include "OTWidgets/TabToolBar.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/TreeWidget.h"
@@ -43,6 +44,7 @@
 #include "OTWidgets/StatusBarManager.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/VersionGraphManager.h"
 #include "OTWidgets/CentralWidgetManager.h"
 
@@ -159,6 +161,25 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		l->setRowStretch(2, 1);
 
 		_content.addView(this->createCentralWidgetView(w, "Test Logo"));
+	}
+
+	if (true) {
+		WidgetViewManager* man = new WidgetViewManager;
+		man->initialize();
+
+		TextEditorView* txt = new TextEditorView(man->getDockManager());
+		WidgetViewBase txtBase(WidgetViewBase::ViewText, WidgetViewBase::ViewIsCentral);
+		txtBase.setEntityName("Txt test");
+		txt->setViewData(txtBase);
+		man->addView(BasicServiceInformation(), txt);
+
+		TableView* table = new TableView(man->getDockManager());
+		WidgetViewBase tableBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral);
+		tableBase.setEntityName("Table test");
+		table->setViewData(tableBase);
+		man->addView(BasicServiceInformation(), table);
+
+		_content.addView(this->createCentralWidgetView(man->getDockManager(), "Test Container"));
 	}
 
 	TestToolBar* test = new TestToolBar(this);

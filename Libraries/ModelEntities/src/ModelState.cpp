@@ -1337,7 +1337,7 @@ void ModelState::checkAndUpgradeDataBaseSchema()
 	auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
 	if (!result) return; // Model state not found
 
-	int schemaVersion = result->view()["SchemaVersion_Model"].get_int64();
+	long long schemaVersion = result->view()["SchemaVersion_Model"].get_int64();
 
 	if (schemaVersion == 1)
 	{
@@ -1525,7 +1525,7 @@ bool ModelState::isVersionInBranch(const std::string &version, const std::string
 			// The version may be in a parent branch of this active branch
 			// We need to strip off the branch counter after the dot and obtain the version from which 
 			// the branch was created.
-			int index = branch.rfind('.');
+			size_t index = branch.rfind('.');
 			assert(index != std::string::npos);
 
 			std::string previousVersion = branch.substr(0, index);
@@ -1545,7 +1545,7 @@ bool ModelState::isVersionInBranch(const std::string &version, const std::string
 	return false; // The specified version is not in the active branch
 }
 
-bool ModelState::readAdditionalProjectInformation(bsoncxx::v_noabi::document::view& _documentView) {
+bool ModelState::readAdditionalProjectInformation(const bsoncxx::v_noabi::document::view& _documentView) {
 	// Reset preview image information
 	m_previewImageUID = ot::invalidUID;
 	m_previewImageVersion = ot::invalidUID;
@@ -1592,7 +1592,7 @@ bool ModelState::readAdditionalProjectInformation(bsoncxx::v_noabi::document::vi
 
 std::string ModelState::getParentBranch(const std::string &branch)
 {
-	int index = branch.rfind('.');
+	size_t index = branch.rfind('.');
 	assert(index != std::string::npos);
 
 	return branch.substr(0, index);
@@ -1614,7 +1614,7 @@ void ModelState::activateBranch(const std::string& _version)
 {
 	// We need to remove the last . part from the version in order to obtain the branch
 
-	int index = _version.rfind('.');
+	size_t index = _version.rfind('.');
 
 	if (index == std::string::npos)
 	{

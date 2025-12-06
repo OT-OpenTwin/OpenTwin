@@ -67,7 +67,7 @@ void EntityVis2D3D::addStorageData(bsoncxx::builder::basic::document &storage)
 	);
 }
 
-void EntityVis2D3D::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityVis2D3D::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);

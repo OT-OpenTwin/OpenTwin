@@ -33,7 +33,7 @@ public:
 	bool hasMaterialRoot()				{ return m_hasMaterialRoot; }
 	bool hasMeshRoot()					{ return m_hasMeshRoot; }
 	bool hasSolverRoot()				{ return m_hasSolverRoot; }
-	bool hasScriptsRoot()				{ return m_hasScriptsRoot; }
+	bool hasPythonRoot()				{ return m_hasPythonRoot; }
 	bool hasDataProcessingRoot()		{ return m_hasDataProcessingRoot; }
 	bool hasUnitRoot()					{ return m_hasUnitRoot; }
 	bool hasDataCategorizationRoot()	{ return m_hasDataCategorizationRoot; }
@@ -67,7 +67,7 @@ private:
 	bool m_hasMaterialRoot				= true;
 	bool m_hasMeshRoot					= true;
 	bool m_hasSolverRoot				= true;
-	bool m_hasScriptsRoot				= true;
+	bool m_hasPythonRoot				= true;
 	bool m_hasUnitRoot					= true;
 	bool m_hasDataCategorizationRoot	= true;
 	bool m_hasRMDCategorization			= true;

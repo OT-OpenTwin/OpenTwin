@@ -187,7 +187,7 @@ void ot::ModelLibraryDialog::slotModelChanged() {
 	for (QWidget* w : m_infoWidgets) {
 		w->setVisible(false);
 		m_infoLayout->removeWidget(w);
-		delete w;
+		w->deleteLater();
 	}
 
 	m_infoWidgets.clear();

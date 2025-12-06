@@ -213,15 +213,27 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 	m_max = actualProperty->getMax();
 
 	if (this->data().getPropertyFlags() & Property::AllowCustomValues) {
-		if (m_spinBox) delete m_spinBox;
-		m_spinBox = nullptr;
-		if (!m_lineEdit) m_lineEdit = new LineEdit(m_parentWidget);
-		this->connect(m_lineEdit, &LineEdit::textChanged, this, &PropertyInputInt::lclTextChanged);
-		this->connect(m_lineEdit, &LineEdit::editingFinished, this, &PropertyInputInt::lclEditingFinishedChanged);
+		if (m_spinBox) {
+			m_spinBox->setVisible(false);
+			m_spinBox->deleteLater();
+			m_spinBox = nullptr;
+		}
+		if (!m_lineEdit) {
+			m_lineEdit = new LineEdit(m_parentWidget);
+			this->connect(m_lineEdit, &LineEdit::textChanged, this, &PropertyInputInt::lclTextChanged);
+			this->connect(m_lineEdit, &LineEdit::editingFinished, this, &PropertyInputInt::lclEditingFinishedChanged);
+		}
 	}
-	else if (m_spinBox == nullptr) {
-		m_spinBox = new SpinBox(m_parentWidget);
-		this->connect(m_spinBox, &SpinBox::valueChangeCompleted, this, &PropertyInputInt::lclValueChanged);
+	else {
+		if (m_lineEdit) {
+			m_lineEdit->setVisible(false);
+			m_lineEdit->deleteLater();
+			m_lineEdit = nullptr;
+		}
+		if (!m_spinBox) {
+			m_spinBox = new SpinBox(m_parentWidget);
+			this->connect(m_spinBox, &SpinBox::valueChangeCompleted, this, &PropertyInputInt::lclValueChanged);
+		}
 	}
 
 	if (m_spinBox) {

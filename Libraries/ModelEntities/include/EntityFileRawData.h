@@ -38,7 +38,7 @@ protected:
 	void setSpecializedProperties() override;
 
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
-	void readSpecificDataFromDataBase(bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+	void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 private:
 	ot::ImageFileFormat m_format;

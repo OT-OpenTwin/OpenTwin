@@ -32,14 +32,19 @@ public:
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 	virtual void createProperties() override;
 	std::string getSelectedScript();
+	ot::UID getSelectedEnvironment();
+
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	virtual bool updateFromProperties() override;
 	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
-	void setScriptFolder(const std::string& _scriptFolder, ot::UID _scriptFolderID);
+	
+	void setScriptFolder(ot::UID _scriptFolderID);
+	void setManifestFolder(ot::UID _manifestFolderID);
 
 	static const std::string getIconName() { return "Script.svg"; }
 private:
-	const std::string _propertyNameScripts = "Scripts";
+	const std::string m_propertyNameScripts = "Scripts";
+	const std::string m_propertyNameEnvironments = "Environment";
 
 	void updateBlockAccordingToScriptHeader();
 	void resetBlockRelatedAttributes();

@@ -67,7 +67,7 @@ void EntityBinaryData::addStorageData(bsoncxx::builder::basic::document &storage
 	{
 		// The data is small enough and can be stored directly in the document
 		bsoncxx::types::b_binary bin_data;
-		bin_data.size = data.size();
+		bin_data.size = (uint32_t) data.size();
 		bin_data.bytes = (uint8_t*)(data.data());
 
 		storage.append(
@@ -77,7 +77,7 @@ void EntityBinaryData::addStorageData(bsoncxx::builder::basic::document &storage
 	}
 }
 
-void EntityBinaryData::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityBinaryData::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);

@@ -239,7 +239,8 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 
 	if (this->data().getPropertyFlags() & Property::AllowCustomValues) {
 		if (m_spinBox) {
-			delete m_spinBox;
+			m_spinBox->setVisible(false);
+			m_spinBox->deleteLater();
 			m_spinBox = nullptr;
 		}
 		
@@ -252,7 +253,8 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 	}
 	else {
 		if (m_lineEdit) {
-			delete m_lineEdit;
+			m_lineEdit->setVisible(false);
+			m_lineEdit->deleteLater();
 			m_lineEdit = nullptr;
 		}
 

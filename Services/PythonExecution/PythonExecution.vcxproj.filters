@@ -21,7 +21,7 @@
     <ClCompile Include="src\PropertyPythonObjectConverter.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\PythonAPI.cpp">
+    <ClCompile Include="src\PythonInterpreterAPI.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\PythonModuleAPI.cpp">
@@ -60,6 +60,9 @@
     <ClCompile Include="src\PackageHandler.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\OutputPipeline.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CPythonObject.h">
@@ -77,7 +80,7 @@
     <ClInclude Include="include\PropertyPythonObjectConverter.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\PythonAPI.h">
+    <ClInclude Include="include\PythonInterpreterAPI.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PythonException.h">
@@ -114,6 +117,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PackageHandler.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OutputPipeline.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ExceptionRestartRequired.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

@@ -341,7 +341,7 @@ void EntityTableSelectedRanges::addStorageData(bsoncxx::builder::basic::document
 	
 }
 
-void EntityTableSelectedRanges::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityTableSelectedRanges::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	_tableID = static_cast<ot::UID>(doc_view["TableID"].get_int64());

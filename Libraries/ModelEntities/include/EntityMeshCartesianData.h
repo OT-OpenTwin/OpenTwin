@@ -103,11 +103,11 @@ public:
 private:
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
-	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	void EnsureFacesLoaded(void);
 	void EnsureNodesLoaded(void);
 	void EnsureMatrixLoaded(EntityCartesianVector *&matrix, long long storageId, long long storageVersion);
-	long long getStorageId(bsoncxx::document::view &doc_view, const std::string dataName);
+	long long getStorageId(const bsoncxx::document::view &doc_view, const std::string dataName);
 	EntityCartesianVector* getDsMatrix(void);
 	EntityCartesianVector* getDualDsMatrix(void);
 	EntityCartesianVector* getDaMatrix(void);

@@ -84,8 +84,8 @@ ot::GenericDataStructMatrix CSVToTableTransformer::transformRawMatrixToGenericDa
 		size_t  numberOfColumns = row.size();
 		maxNumberOfColumns = maxNumberOfColumns > numberOfColumns ? maxNumberOfColumns : numberOfColumns;
 	}
-	matrixDimensions.m_column = maxNumberOfColumns;
-	matrixDimensions.m_row = _rawMatrix.size();
+	matrixDimensions.m_column = (uint32_t) maxNumberOfColumns;
+	matrixDimensions.m_row = (uint32_t)_rawMatrix.size();
 	ot::GenericDataStructMatrix matrix(matrixDimensions);
 
 	ot::MatrixEntryPointer entryPointer;

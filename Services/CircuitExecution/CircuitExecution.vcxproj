@@ -130,7 +130,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(Qt_LIBPATH_);$(NGSPICE_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBD);$(Qt_LIBPATH_);$(NGSPICE_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);BlockEntities.lib;%(AdditionalDependencies);$(Qt_LIBS_);ngspice.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -177,7 +177,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(NGSPICE_LIBPATHR);$(QT_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(NGSPICE_LIBPATHR);$(QT_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);ngspice.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Core.lib;Qt6Network.lib;Qt6Widgets.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

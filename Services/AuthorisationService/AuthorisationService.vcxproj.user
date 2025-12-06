@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>$(TargetPath) "127.0.0.1:8092" "127.0.0.1:27017tls@" "$(OPEN_TWIN_MONGODB_PWD)" "$(OPEN_TWIN_LOGGING_URL)"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>$(TargetPath) "127.0.0.1:8092" "127.0.0.1:27017" "$(OPEN_TWIN_MONGODB_PWD)" "$(OPEN_TWIN_LOGGING_URL)"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>

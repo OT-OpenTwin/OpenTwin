@@ -145,19 +145,20 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(OT_PYTHON_INC);$(QT_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
-      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus /DQT_NO_KEYWORDS</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_PYTHON_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(QT_LIBPATH)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python39.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Cored.lib;Qt6Networkd.lib;Qt6Widgetsd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_PYTHON_LIBPATH)\Debug;$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBD);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);python311_d.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Cored.lib;Qt6Networkd.lib;Qt6Widgetsd.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -186,8 +187,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(QT_LIBPATH)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);python39.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Core.lib;Qt6Network.lib;Qt6Widgets.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH)\Release;$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBR);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);python311.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Core.lib;Qt6Network.lib;Qt6Widgets.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">
@@ -200,7 +201,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_RELEASEDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_PYTHON_INC);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC);$(OT_PYTHON_NUMPY_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_PYTHON_INC);%(AdditionalIncludeDirectories);$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(QT_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -216,8 +217,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(OT_PYTHON_LIBPATH);%(AdditionalLibraryDirectories);$(Qt_LIBPATH_)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);BlockEntities.lib;python39.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBD);$(OT_PYTHON_LIBPATH)\Release;%(AdditionalLibraryDirectories);$(Qt_LIBPATH_)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);BlockEntities.lib;python311.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -286,12 +287,13 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\CommunicationHandler.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\OutputPipeline.cpp" />
     <ClCompile Include="src\PackageHandler.cpp" />
     <ClCompile Include="src\PortData.cpp" />
     <ClCompile Include="src\EntityBuffer.cpp" />
     <ClCompile Include="src\DataBuffer.cpp" />
     <ClCompile Include="src\PropertyPythonObjectConverter.cpp" />
-    <ClCompile Include="src\PythonAPI.cpp" />
+    <ClCompile Include="src\PythonInterpreterAPI.cpp" />
     <ClCompile Include="src\PythonException.cpp" />
     <ClCompile Include="src\PythonLoadedModules.cpp" />
     <ClCompile Include="src\PythonModuleAPI.cpp" />
@@ -300,6 +302,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ActionHandler.h" />
+    <ClInclude Include="include\ExceptionRestartRequired.h" />
+    <ClInclude Include="include\OutputPipeline.h" />
     <ClInclude Include="include\PackageHandler.h" />
     <ClInclude Include="include\Timeouts.h" />
     <QtMoc Include="include\Application.h" />
@@ -311,7 +315,7 @@
     <ClInclude Include="include\EntityBuffer.h" />
     <ClInclude Include="include\DataBuffer.h" />
     <ClInclude Include="include\PropertyPythonObjectConverter.h" />
-    <ClInclude Include="include\PythonAPI.h" />
+    <ClInclude Include="include\PythonInterpreterAPI.h" />
     <ClInclude Include="include\PythonException.h" />
     <ClInclude Include="include\PythonExtension.h" />
     <ClInclude Include="include\PythonExtension.hpp" />

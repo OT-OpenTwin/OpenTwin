@@ -96,7 +96,7 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		std::string ltSpiceServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 		std::string version = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
 
-		if (ot::MessageDialogCfg::Yes != ot::MessageBoxManager::showWarningPrompt("Getting another project version from the repository will override the local project data.\nDo you really want to continue?", "", "Get")) 
+		if (ot::MessageDialogCfg::Yes != ot::MessageBoxManager::showWarningPrompt("Getting another project version from the repository will override the local project data.\nDo you really want to continue?", "", "Get", ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No)) 
 		{
 			return "";
 		}

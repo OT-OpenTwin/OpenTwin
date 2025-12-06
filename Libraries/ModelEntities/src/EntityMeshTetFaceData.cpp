@@ -146,7 +146,7 @@ void EntityMeshTetFaceData::addStorageData(bsoncxx::builder::basic::document &st
 	);
 }
 
-void EntityMeshTetFaceData::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityMeshTetFaceData::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);

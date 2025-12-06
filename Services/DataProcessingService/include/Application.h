@@ -32,6 +32,7 @@
 #include "InvalidUID.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
+#include "EntityCreator.h"
 
 // Forward declaration
 namespace ot {
@@ -78,15 +79,14 @@ private:
 	ot::ToolBarButtonCfg m_buttonRunPipeline;
 	ot::ToolBarButtonCfg m_buttonCreateSolver;
 	ot::ToolBarButtonCfg m_buttonGraphicsScene;
+	ot::ToolBarButtonCfg m_buttonCreateManifest;
 
 	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
 	GraphHandler _graphHandler;
 	PropertyHandlerDatabaseAccessBlock m_propertyHandlerDatabaseAccessBlock;
-	
-	ot::UID m_dataProcessingFolderID = ot::getInvalidUID();
+	EntityCreator m_entityCreator;
 
-	void createPipeline();
-	void createSolver();
 	void runPipeline();
+	
 };

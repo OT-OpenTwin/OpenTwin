@@ -804,7 +804,7 @@ void ot::GraphicsItem::notifyConnectionsMove(GraphicsChangeEvent& _changeEvent) 
 	}
 }
 
-void ot::GraphicsItem::checkConnectionSnapRequest(GraphicsChangeEvent& _result) {
+void ot::GraphicsItem::checkConnectionSnapRequest(GraphicsSnapInfo& _result) {
 	GraphicsScene* scene = this->getGraphicsScene();
 	if (!scene) {
 		OT_LOG_EA("No graphics scene set");
@@ -817,23 +817,17 @@ void ot::GraphicsItem::checkConnectionSnapRequest(GraphicsChangeEvent& _result) 
 			GraphicsConnectionItem* connection = dynamic_cast<GraphicsConnectionItem*>(itm);
 			if (connection) {
 				if (!connection->getOriginItem() && triggerRect.contains(connection->getOriginPos())) {
-					GraphicsConnectionCfg cfg = connection->getConfiguration();
-					cfg.setOriginUid(this->getGraphicsItemUid());
-					cfg.setOriginConnectable(item->getGraphicsItemName());
-					_result.addSnapInfo(cfg, true);
+					_result.addOriginSnap(this, item, connection);
 				}
 				else if (!connection->getDestItem() && triggerRect.contains(connection->getDestPos())) {
-					GraphicsConnectionCfg cfg = connection->getConfiguration();
-					cfg.setDestUid(this->getGraphicsItemUid());
-					cfg.setDestConnectable(item->getGraphicsItemName());
-					_result.addSnapInfo(cfg, false);
+					_result.addDestSnap(this, item, connection);
 				}
 			}
 		}
 	}
 }
 
-void ot::GraphicsItem::checkConnectionSnapRequest(const QRectF& _connectionConnectorRect, const GraphicsConnectionItem* _connection, GraphicsChangeEvent& _result) {
+void ot::GraphicsItem::checkConnectionSnapRequest(const QRectF& _connectionConnectorRect, const GraphicsConnectionItem* _connection, GraphicsSnapInfo& _result) {
 	GraphicsScene* scene = this->getGraphicsScene();
 	if (!scene) {
 		OT_LOG_EA("No graphics scene set");
@@ -844,16 +838,10 @@ void ot::GraphicsItem::checkConnectionSnapRequest(const QRectF& _connectionConne
 		const QRectF triggerRect = item->getTriggerBoundingRect();
 		if (triggerRect.intersects(_connectionConnectorRect)) {
 			if (!_connection->getOriginItem() && triggerRect.contains(_connection->getOriginPos())) {
-				GraphicsConnectionCfg cfg = _connection->getConfiguration();
-				cfg.setOriginUid(this->getGraphicsItemUid());
-				cfg.setOriginConnectable(item->getGraphicsItemName());
-				_result.addSnapInfo(cfg, true);
+				_result.addOriginSnap(this, item, _connection);
 			}
 			else if (!_connection->getDestItem() && triggerRect.contains(_connection->getDestPos())) {
-				GraphicsConnectionCfg cfg = _connection->getConfiguration();
-				cfg.setDestUid(this->getGraphicsItemUid());
-				cfg.setDestConnectable(item->getGraphicsItemName());
-				_result.addSnapInfo(cfg, false);
+				_result.addDestSnap(this, item, _connection);
 			}
 		}
 	}

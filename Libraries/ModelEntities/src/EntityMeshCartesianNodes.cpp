@@ -73,7 +73,7 @@ void EntityMeshCartesianNodes::addStorageData(bsoncxx::builder::basic::document 
 	storage.append(bsoncxx::builder::basic::kvp("CoordZ", coordZ));
 }
 
-void EntityMeshCartesianNodes::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityMeshCartesianNodes::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);

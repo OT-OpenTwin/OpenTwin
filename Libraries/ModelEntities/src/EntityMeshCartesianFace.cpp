@@ -133,7 +133,7 @@ void EntityMeshCartesianFace::addStorageData(bsoncxx::builder::basic::document &
 	}
 }
 
-void EntityMeshCartesianFace::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityMeshCartesianFace::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -157,7 +157,7 @@ void EntityMeshCartesianFace::readSpecificDataFromDataBase(bsoncxx::document::vi
 	resetModified();
 }
 
-void EntityMeshCartesianFace::readCellFaces(bsoncxx::document::view &doc_view, int direction, const std::string &itemName)
+void EntityMeshCartesianFace::readCellFaces(const bsoncxx::document::view &doc_view, int direction, const std::string &itemName)
 {
 	try
 	{
@@ -181,7 +181,7 @@ void EntityMeshCartesianFace::readCellFaces(bsoncxx::document::view &doc_view, i
 	}
 }
 
-void EntityMeshCartesianFace::readPoints(bsoncxx::document::view &doc_view, int index, const std::string &itemName)
+void EntityMeshCartesianFace::readPoints(const bsoncxx::document::view &doc_view, int index, const std::string &itemName)
 {
 	try
 	{

@@ -538,7 +538,7 @@ void Application::addScalarResult(const std::string &resultName, char* fileData,
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
 		ot::EntityCallbackBase::Callback::DataNotify,
-		getServiceName()
+		OT_INFO_SERVICE_TYPE_VisualizationService
 	);
 
 	visualizationEntity->createProperties();
@@ -580,7 +580,7 @@ void Application::addVectorResult(const std::string& resultName, char* fileData,
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
 		ot::EntityCallbackBase::Callback::DataNotify,
-		getServiceName()
+		OT_INFO_SERVICE_TYPE_VisualizationService
 	);
 
 	visualizationEntity->createProperties();

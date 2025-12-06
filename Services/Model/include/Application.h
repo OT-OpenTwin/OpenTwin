@@ -52,9 +52,9 @@ public:
 
 	// Action handler
 
-	//api @security mTLS
 	//api @action OT_ACTION_CMD_PROJ_Save
 	//api @brief Saves a project in the database.
+	//api @security mTLS
 	//api @return In case of success will return an empty String.
 	//api In case of error will return a String with prefix "Error: ".
 	void handleProjectSave();
@@ -62,14 +62,43 @@ public:
 //	//api @security mTLS
 	ot::ReturnMessage handleCheckProjectOpen();
 
+	//api @action OT_ACTION_CMD_MODEL_SelectionChanged
+	//api @brief Changes a selection.
+	//api @security mTLS
+	//api @return An empty String. 
 	void handleSelectionChanged(ot::JsonDocument& _document);
 
+	//api @action OT_ACTION_CMD_MODEL_ItemRenamed
+	//api @brief Renames a model item.
+	//api @security mTLS
+	//api @param OT_ACTION_PARAM_MODEL_ID Unsigned Integer 64 Model ID (if model exists)
+	//api @param OT_ACTION_PARAM_MODEL_ITM_Name String New name (if model exists)
+	//api @return In case of success will return an empty String.
+	//api In case of error will return a String with prefix "Error: ".
 	void handleItemRenamed(ot::JsonDocument& _document);
 
+	//api @action OT_ACTION_CMD_SetVisualizationModel
+	//api @brief Visualizes a model.
+	//api Opens a project and visualizes a model.
+	//api @security mTLS
+	//api @param OT_ACTION_PARAM_MODEL_ID Unsigned Integer 64 Model ID (if model exists)
+	//api @param OT_ACTION_PARAM_VIEW_ID Unsigned Integer 64 View ID
+	//api @return In case of success will return an empty String.
+	//api In case of error will return a String with prefix "Error: ".
 	void handleSetVisualizationModel(ot::JsonDocument& _document);
 
+	//api @action OT_ACTION_CMD_GetVisualizationModel
+	//api @brief Gets the visualization Model ID.
+	//api @security mTLS
+	//api @rparam OT_ACTION_PARAM_BASETYPE_UID Unsigned Integer 64 Visualization Model ID (if successful)
+	//api @return In case of error will return a String with prefix "Error: ".
 	std::string handleGetVisualizationModel(ot::JsonDocument& _document);
 
+	//api @action OT_ACTION_CMD_MODEL_GetIsModified
+	//api @brief Checks if the model has been modified.
+	//api @security mTLS
+	//api @rparam OT_ACTION_PARAM_BASETYPE_Bool Boolean Is model modified (if successful)
+	//api @return In case of error will return a String with prefix "Error: ".
 	std::string handleGetIsModified(ot::JsonDocument& _document);
 
 	std::string handleGenerateEntityIDs(ot::JsonDocument& _document);
@@ -124,6 +153,12 @@ public:
 
 	std::string handleViewsFromProjectType();
 
+	//api @action OT_ACTION_CMD_MODEL_RequestVisualisationData
+	//api @brief Shows a data view in the UI.
+	//api @security mTLS
+	//api @param OT_ACTION_PARAM_MODEL_EntityID Unsigned Integer 64 Entity ID
+	//api @param OT_ACTION_PARAM_Visualisation_Config Object Visualisation configuration
+	//api @return A String containing an ot::ReturnMessage.
 	ot::ReturnMessage handleVisualisationDataRequest(ot::JsonDocument& _document);
 
 	void handleImportTableFile(ot::JsonDocument& _document);
@@ -166,6 +201,12 @@ public:
 
 	void handlePromptResponse(ot::JsonDocument& _document);
 
+	//api @action OT_ACTION_CMD_UI_TABLE_Setup
+	//api @brief Shows a table view in the UI.
+	//api @security mTLS
+	//api @param OT_ACTION_PARAM_NAME String Table name
+	//api @param OT_ACTION_PARAM_Visualisation_Config Object Visualisation configuration
+	//api @return A String containing an ot::ReturnMessage.
 	ot::ReturnMessage handleShowTable(ot::JsonDocument& _document);
 
 	void handleModelDialogConfirmed(ot::JsonDocument& _document);

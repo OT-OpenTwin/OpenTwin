@@ -22,6 +22,7 @@
 // STD
 #include <cstdint>
 
+//! @brief Enumeration of the currently available excitation types
 enum class ExcitationTypes : uint32_t {
 	GAUSSIAN = 0,
 	SINUSOIDAL = 1,

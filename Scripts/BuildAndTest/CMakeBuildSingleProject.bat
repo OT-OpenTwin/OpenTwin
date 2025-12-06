@@ -76,13 +76,13 @@ ECHO Building project: %1 >> buildlog_Debug.txt
 ECHO ======================================================================================== >> buildlog_Debug.txt
 PUSHD "%1"
 
-"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --preset vs2022-Debug >> "%ORIGINAL_DIR%\buildlog_Debug.txt"
+"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --preset windows-debug >> "%ORIGINAL_DIR%\buildlog_Debug.txt"
 
 if %REBUILD% neq 0 (
-	"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build --preset build-vs2022-Debug --target clean >> "%ORIGINAL_DIR%\buildlog_Debug.txt"
+	"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build --preset build-windows-debug --target clean >> "%ORIGINAL_DIR%\buildlog_Debug.txt"
 )
 
-"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build --preset build-vs2022-Debug %PARALLEL_BUILD% >> "%ORIGINAL_DIR%\buildlog_Debug.txt"
+"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build --preset build-windows-debug %PARALLEL_BUILD% >> "%ORIGINAL_DIR%\buildlog_Debug.txt"
 
 POPD
 if !ERRORLEVEL! neq 0 (
@@ -103,13 +103,13 @@ ECHO Building project: %1 >> buildlog_Release.txt
 ECHO ======================================================================================== >> buildlog_Release.txt
 PUSHD "%1"
 
-"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --preset vs2022-Release >> "%ORIGINAL_DIR%\buildlog_Release.txt"
+"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --preset windows-release >> "%ORIGINAL_DIR%\buildlog_Release.txt"
 
 if %REBUILD% neq 0 (
-	"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build --preset build-vs2022-Release --target clean >> "%ORIGINAL_DIR%\buildlog_Release.txt"
+	"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build --preset build-windows-release --target clean >> "%ORIGINAL_DIR%\buildlog_Release.txt"
 )
 
-"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build --preset build-vs2022-Release %PARALLEL_BUILD% >> "%ORIGINAL_DIR%\buildlog_Release.txt"
+"%DEVENV_ROOT_2022%\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build --preset build-windows-release %PARALLEL_BUILD% >> "%ORIGINAL_DIR%\buildlog_Release.txt"
 
 POPD
 if !ERRORLEVEL! neq 0 (

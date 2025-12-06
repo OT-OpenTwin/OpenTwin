@@ -67,6 +67,7 @@ public:
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName);
 	virtual ~Model();
+	void initialize();
 
 	ot::UID				createEntityUID();
 	void			addEntityToMap(EntityBase *entity);
@@ -108,7 +109,7 @@ public:
 	std::string getParameterRootName() { return "Parameters"; };
 	std::string getMeshRootName() { return "Meshes"; };
 	std::string getSolverRootName() { return ot::FolderNames::SolverFolder; };
-	std::string getScriptsRootName() { return ot::FolderNames::PythonScriptFolder; };
+	std::string getPythonRootName() { return ot::FolderNames::PythonFolder; };
 	std::string getUnitRootName() { return "Units"; };
 
 	void removeShapesFromVisualization(std::list<ot::UID> &removeFromDisplay);

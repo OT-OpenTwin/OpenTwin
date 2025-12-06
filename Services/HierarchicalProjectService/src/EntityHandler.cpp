@@ -38,6 +38,7 @@
 #include "EntityBlockImage.h"
 #include "EntityFileRawData.h"
 #include "EntityGraphicsScene.h"
+#include "EntityBlockDecoLabel.h"
 #include "EntityBlockConnection.h"
 #include "EntityBlockHierarchicalProjectItem.h"
 #include "EntityBlockHierarchicalDocumentItem.h"
@@ -46,12 +47,13 @@
 EntityHandler::EntityHandler(const std::string& _rootFolderPath) :
 	// Initialize constants: Paths
 	c_rootFolderPath(_rootFolderPath), c_projectsFolder(_rootFolderPath + "/Projects"),
-	c_backgroundFolder(_rootFolderPath + "/Background"), c_documentsFolder(_rootFolderPath + "/Documents"),
+	c_documentsFolder(_rootFolderPath + "/Documents"),
 	c_containerFolder(_rootFolderPath + "/Container"), c_connectionsFolder(_rootFolderPath + "/Connections"),
+	c_decorationFolder(_rootFolderPath + "/Decorations"),
 
 	// Initialize constants: Names
 	c_projectsFolderName("Projects"), c_documentsFolderName("Documents"), c_containerFolderName("Container"), 
-	c_backgroundFolderName("Background"), c_connectionsFolderName("Connections")
+	c_decorationFolderName("Decorations"), c_connectionsFolderName("Connections")
 {
 
 }
@@ -273,8 +275,7 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 	blockEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	blockEntity.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
-		ot::EntityCallbackBase::Callback::Selection |
-		ot::EntityCallbackBase::Callback::DataHandle,
+		ot::EntityCallbackBase::Callback::Selection,
 		serviceName
 	);
 	blockEntity.setEntityID(blockUid);
@@ -318,7 +319,7 @@ void EntityHandler::addDocuments(const std::list<std::string>& _fileNames, const
 	}
 }
 
-void EntityHandler::addBackgroundImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
+void EntityHandler::addImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
 	// Unpack data
 	std::string unpackedData = ot::String::decompressedBase64(_fileContent, _uncompressedDataLength);
 
@@ -365,8 +366,8 @@ void EntityHandler::addBackgroundImage(const std::string& _fileName, const std::
 		serviceName
 	);
 	backgroundImageEntity.setEntityID(_modelComponent->createEntityUID());
-	backgroundImageEntity.setName(CreateNewUniqueTopologyName(c_backgroundFolder, newName));
-	backgroundImageEntity.setGraphicsScenePackageChildName(c_backgroundFolderName);
+	backgroundImageEntity.setName(CreateNewUniqueTopologyName(c_decorationFolder, newName));
+	backgroundImageEntity.setGraphicsScenePackageChildName(c_decorationFolderName);
 	backgroundImageEntity.createProperties();
 	backgroundImageEntity.setTreeItemEditable(true);
 	backgroundImageEntity.setCoordinateEntityID(coord.getEntityID());
@@ -379,14 +380,14 @@ void EntityHandler::addBackgroundImage(const std::string& _fileName, const std::
 	_newEntities.addTopologyEntity(backgroundImageEntity);
 }
 
-void EntityHandler::addBackgroundImages(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
+void EntityHandler::addImages(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
 	ot::NewModelStateInfo newEntities;
 
 	// Create container if it does not exist
 	ot::EntityInformation containerInfo;
-	if (!ot::ModelServiceAPI::getEntityInformation(c_backgroundFolder, containerInfo) || containerInfo.getEntityName().empty()) {
+	if (!ot::ModelServiceAPI::getEntityInformation(c_decorationFolder, containerInfo) || containerInfo.getEntityName().empty()) {
 		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
-		container.setName(c_backgroundFolder);
+		container.setName(c_decorationFolder);
 		container.setSelectChildren(false);
 		container.setManageChildVisibility(false);
 		container.setManageParentVisibility(false);
@@ -401,12 +402,54 @@ void EntityHandler::addBackgroundImages(const std::list<std::string>& _fileNames
 	auto lengthIt = _uncompressedDataLength.begin();
 	
 	for (; nameIt != _fileNames.end() && contentIt != _fileContent.end() && lengthIt != _uncompressedDataLength.end(); nameIt++, contentIt++, lengthIt++) {
-		addBackgroundImage(*nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
+		addImage(*nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
 	}
 
 	if (newEntities.hasEntities()) {
-		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added background image", true, true);
+		std::string changeDesc;
+		if (_fileNames.size() == 1) {
+			changeDesc = "Added image";
+		}
+		else {
+			changeDesc = "Added images";
+		}
+		ot::ModelServiceAPI::addEntitiesToModel(newEntities, changeDesc, true, true);
 	}
+}
+
+void EntityHandler::addLabel() {
+	const std::string serviceName = Application::instance().getServiceName();
+
+	ot::NewModelStateInfo newEntities;
+
+	// Create coordinate entity
+	EntityCoordinates2D coord;
+	coord.setEntityID(_modelComponent->createEntityUID());
+	coord.storeToDataBase();
+
+	// Create background image block entity
+	EntityBlockDecoLabel labelEntity;
+	labelEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+	labelEntity.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataHandle,
+		serviceName
+	);
+	labelEntity.setEntityID(_modelComponent->createEntityUID());
+	labelEntity.setName(CreateNewUniqueTopologyName(c_decorationFolder, "Label"));
+	labelEntity.setGraphicsScenePackageChildName(c_decorationFolderName);
+	labelEntity.createProperties();
+	labelEntity.setEditable(true);
+	labelEntity.setCoordinateEntityID(coord.getEntityID());
+	labelEntity.setText("New Label");
+	labelEntity.storeToDataBase();
+	
+	// Add to new entities
+	newEntities.addDataEntity(labelEntity.getEntityID(), coord);
+	newEntities.addTopologyEntity(labelEntity);
+
+	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added label", true, true);
 }
 
 void EntityHandler::updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities) {

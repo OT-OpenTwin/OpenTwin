@@ -41,7 +41,7 @@ bsoncxx::builder::basic::document ot::Connector::SerializeBSON() const
 
 void ot::Connector::DeserializeBSON(bsoncxx::v_noabi::types::b_document& storage)
 {
-	_connectorName = std::string(storage.view()["connectorName"].get_utf8().value.data());
+	_connectorName = std::string(storage.view()["connectorName"].get_string().value.data());
 	_connectorType = static_cast<ConnectorType>(storage.view()["connectorType"].get_int32().value);
-	_connectorTitle = std::string(storage.view()["connectorTitle"].get_utf8().value.data());
+	_connectorTitle = std::string(storage.view()["connectorTitle"].get_string().value.data());
 }

@@ -93,7 +93,7 @@ void EntityParameterizedDataCategorization::addStorageData(bsoncxx::builder::bas
 	storage.append(bsoncxx::builder::basic::kvp("Locked", m_locked));
 }
 
-void EntityParameterizedDataCategorization::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityParameterizedDataCategorization::readSpecificDataFromDataBase(const bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);
 

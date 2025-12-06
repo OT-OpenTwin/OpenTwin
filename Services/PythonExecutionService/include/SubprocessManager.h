@@ -25,6 +25,8 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCore/CoreTypes.h"
+#include <condition_variable>
 
 // std header
 #include <mutex>
@@ -45,7 +47,8 @@ public:
 	void setModelUrl(const std::string& _url);
 	void setFrontendUrl(const std::string& _url);
 	void setDataBaseInfo(const DataBaseInfo& _info);
-
+	void setManifestUID(ot::UID _manifestUID);
+	
 	//! @brief Sends the request to the Subprocess.
 	//! Will start the subprocess if needed.
 	bool sendRequest(const ot::JsonDocument& _document, std::string& _response);
@@ -62,8 +65,16 @@ public:
 
 	bool isConnected();
 
-private:
 	void shutdownSubprocess(void);
+	void restartSubprocess(void);
+
+	void socketDeltedCompleted()
+	{
+		m_restarted.notify_one();
+	}
+
+private:
+
 
 	//! @brief Runs the subservice if needed and checks connection with a ping.
 	//! @return Return false if the connection could not be established.
@@ -80,6 +91,7 @@ private:
 	std::mutex m_mutex;
 
 	Application* m_app;
+	std::condition_variable m_restarted;
 
 	SubprocessHandler* m_subprocessHandler;
 	CommunicationHandler* m_communicationHandler;

@@ -142,6 +142,9 @@ namespace ot {
 	private:
 		friend class WidgetViewManager;
 
+		void setManager(WidgetViewManager* _manager) { m_manager = _manager; };
+		WidgetViewManager* m_manager;
+
 		WidgetViewDock* m_dockWidget; //! @brief Dock widget for this widget view
 
 		WidgetViewBase m_data;

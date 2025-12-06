@@ -23,11 +23,11 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
 
 ToolViewManager::ToolViewManager() {
-	this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &ToolViewManager::slotViewFocusChanged);
-	this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &ToolViewManager::slotViewCloseRequested);
+	this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &ToolViewManager::slotViewFocusChanged);
+	this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &ToolViewManager::slotViewCloseRequested);
 }
 
 ToolViewManager::~ToolViewManager() {
@@ -49,7 +49,7 @@ void ToolViewManager::addTool(ToolRuntimeHandler* _handler) {
 }
 
 void ToolViewManager::removeTool(const QString& _toolName) {
-	ot::WidgetViewManager::instance().closeViews(ot::BasicServiceInformation(_toolName.toStdString()));
+	ot::GlobalWidgetViewManager::instance().closeViews(ot::BasicServiceInformation(_toolName.toStdString()));
 }
 
 void ToolViewManager::updateViews(const QString& _toolName) {
@@ -68,7 +68,7 @@ void ToolViewManager::updateViews(const QString& _toolName) {
 			m_viewMap.insert_or_assign(view, it->second);
 
 			// Display view
-			ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(_toolName.toStdString()), view);
+			ot::GlobalWidgetViewManager::instance().addView(ot::BasicServiceInformation(_toolName.toStdString()), view);
 		}
 	}
 }

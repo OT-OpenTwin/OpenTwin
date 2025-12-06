@@ -43,7 +43,7 @@ void EntityVisUnstructuredVectorVolume::addStorageData(bsoncxx::builder::basic::
 
 }
 
-void EntityVisUnstructuredVectorVolume::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityVisUnstructuredVectorVolume::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	// We read the parent class information first 
 	EntityVis2D3D::readSpecificDataFromDataBase(doc_view, entityMap);

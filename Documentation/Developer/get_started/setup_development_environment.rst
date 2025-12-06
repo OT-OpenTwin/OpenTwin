@@ -67,7 +67,7 @@ This folder contains a “bin” directory where the configuration file is store
 Now open the configuration file ``mongod.cfg`` in a text editor (e.g., notepad.exe). Please note that will usually be necessary to have administrator privileges in order to edit the file content. Therefore, make sure to run the editor in administrator mode.
 
 .. code-block::
-    :emphasize-lines: 8,16,20,21,22,23,24,27
+    :emphasize-lines: 8,16,20,21,22,23,24,27,29,30
 
     # mongod.conf
 
@@ -96,6 +96,9 @@ Now open the configuration file ``mongod.cfg`` in a text editor (e.g., notepad.e
 
     security:
       authorization: disabled
+
+    #setParameter:
+    #  tlsUseSystemCA: true
 
 
 .. warning::
@@ -144,7 +147,7 @@ Now, a user for database administration needs to be created. Therefore, type or 
 In a next step, the authentication should be enabled for the data base. Therefore, edit the database server configuration file as shown below (switch the authentication to enabled and remove the comment signs “#” in front of the lines related to configuring the TLS security):
 
 .. code-block::
-    :emphasize-lines: 22,23,24,27
+    :emphasize-lines: 22,23,24,27,29,30
 
     # mongod.conf
 
@@ -174,18 +177,21 @@ In a next step, the authentication should be enabled for the data base. Therefor
     security:
       authorization: enabled
 
+    setParameter:
+      tlsUseSystemCA: true
+
 
 .. warning::
    Note that MongoDB uses two blank spaces for the settings indentation. An invalid indentation may lead to the Mongo Database Server crashing upon startup.
 
 
-Afterward, restart the database server as described above and ensure that the server is running properly.
-
-For secure connections to the database, a certificate authority is necessary to validate the certificates. In order to store the root certificate in the certificate store, you can open a command shell in administrator mode and run the following command:
+For secure connections to the database, a certificate authority is necessary to validate the certificates. In order to store the root certificate in the certificate store, open a command shell in administrator mode and run the following command:
 
 .. code-block::
 
     certutil -addstore root X:\OpenTwin\Repo\Deployment\Certificates\ca.pem
+
+Now restart the database server as described above and ensure that the server is running properly.
 
 .. _Installation of the OpenTwin Server Components for Network Usage:
 
