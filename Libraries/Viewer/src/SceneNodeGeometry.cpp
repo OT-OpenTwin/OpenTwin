@@ -54,31 +54,31 @@
 #include <osg/MatrixTransform>
 
 SceneNodeGeometry::SceneNodeGeometry() :
-	triangles(nullptr), 
-	edges(nullptr), 
-	edgesHighlighted(nullptr), 
-	faceEdgesHighlightNode(nullptr),
-	highlightNode(nullptr),
-	surfaceColorRGB{ 0.0, 0.0, 0.0 },
-	edgeColorRGB{ 0.0, 0.0, 0.0 },
-	backFaceCulling(false),
-	offsetFactor(1.0),
-	entityID(0),
-	entityVersion(0),
-	needsInitialization(false),
-	model(nullptr),
-	materialType("Rough"),
-	textureType("None"),
-	reflective(false),
-	showWhenSelected(false),
-	textureAttribute(nullptr),
-	textureAttributeGen(nullptr),
-	textureAttributeEnv(nullptr),
-	cutCapGeometryTriangles(nullptr),
-	cutCapGeometryEdges(nullptr)
+	m_triangles(nullptr),
+	m_edges(nullptr),
+	m_edgesHighlighted(nullptr),
+	m_faceEdgesHighlightNode(nullptr),
+	m_highlightNode(nullptr),
+	m_surfaceColorRGB{ 0.0, 0.0, 0.0 },
+	m_edgeColorRGB{ 0.0, 0.0, 0.0 },
+	m_backFaceCulling(false),
+	m_offsetFactor(1.0),
+	m_dataEntityID(0),
+	m_dataEntityVersion(0),
+	m_needsInitialization(false),
+	m_model(nullptr),
+	m_materialType("Rough"),
+	m_textureType("None"),
+	m_reflective(false),
+	m_showWhenSelected(false),
+	m_textureAttribute(nullptr),
+	m_textureAttributeGen(nullptr),
+	m_textureAttributeEnv(nullptr),
+	m_cutCapGeometryTriangles(nullptr),
+	m_cutCapGeometryEdges(nullptr)
 {
-	edgeTransparency = m_transparency = ViewerSettings::instance()->geometrySelectionTransparency;
-	enableEdgesDisplay = (ViewerSettings::instance()->geometryEdgeColorMode != ViewerSettings::instance()->geometryEdgeColorMode_noColor);
+	m_edgeTransparency = m_transparency = ViewerSettings::instance()->geometrySelectionTransparency;
+	m_enableEdgesDisplay = (ViewerSettings::instance()->geometryEdgeColorMode != ViewerSettings::instance()->geometryEdgeColorMode_noColor);
 }
 
 SceneNodeGeometry::~SceneNodeGeometry()
@@ -106,22 +106,22 @@ void SceneNodeGeometry::deleteShapeNode(void)
 
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
 		//m_shapeNode		    = nullptr;  The shape node is a reference pointer belonging to this object and will be deleted when this object is deleted
-		triangles				= nullptr;
-		edges                   = nullptr;
-		edgesHighlighted		= nullptr;
-		faceEdgesHighlightNode	= nullptr;
+		m_triangles				= nullptr;
+		m_edges                   = nullptr;
+		m_edgesHighlighted		= nullptr;
+		m_faceEdgesHighlightNode	= nullptr;
 
-		faceEdgesHighlight.clear();
-		triangleToFaceId.clear();
+		m_faceEdgesHighlight.clear();
+		m_triangleToFaceId.clear();
 	}
 }
 
-void SceneNodeGeometry::setTransformation(std::vector<double> &transformation)
+void SceneNodeGeometry::setTransformation(const std::vector<double>& _transformation)
 {
-	if (!transformation.empty())
+	if (!_transformation.empty())
 	{
-		transformationMatrix.set(transformation.data());
-		transformationMatrix.transpose(transformationMatrix);
+		m_transformationMatrix.set(_transformation.data());
+		m_transformationMatrix.transpose(m_transformationMatrix);
 	}
 }
 
@@ -149,10 +149,10 @@ osg::Matrix SceneNodeGeometry::getTransformation(void)
 	{
 		osg::Matrix parentMatrix = geometryParent->getTransformation();
 
-		return  transformationMatrix * parentMatrix;
+		return m_transformationMatrix * parentMatrix;
 	}
 
-	return transformationMatrix; 
+	return m_transformationMatrix;
 }
 
 void SceneNodeGeometry::setTransparent(bool t)
@@ -167,7 +167,7 @@ void SceneNodeGeometry::setTransparent(bool t)
 	bool transparent = isTransparent();
 	bool wireframe = isWireframe();
 
-	if (showWhenSelected && isSelected())
+	if (m_showWhenSelected && isSelected())
 	{
 		visible = true;
 		transparent = false;
@@ -217,7 +217,7 @@ void SceneNodeGeometry::updateTransparentState(bool visible, bool transparent, b
 			if (!wireframe)
 			{
 				getShapeNode()->setChildValue(getTriangles(), true);
-				getShapeNode()->setChildValue(getEdges(), enableEdgesDisplay);
+				getShapeNode()->setChildValue(getEdges(), m_enableEdgesDisplay);
 			}
 			else
 			{
@@ -244,7 +244,7 @@ void SceneNodeGeometry::updateTransparentState(bool visible, bool transparent, b
 		osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc;
 		statesetEdge->setAttributeAndModes(blendFunc, osg::StateAttribute::OFF);
 
-		if (backFaceCulling)
+		if (m_backFaceCulling)
 		{
 			statesetEdge->setRenderingHint(osg::StateSet::OPAQUE_BIN);
 
@@ -262,7 +262,7 @@ void SceneNodeGeometry::updateTransparentState(bool visible, bool transparent, b
 		getShapeNode()->setChildValue(getTriangles(), visible && !wireframe);
 
 		// Turn on edge display (if visible)
-		getShapeNode()->setChildValue(getEdges(), visible && enableEdgesDisplay);
+		getShapeNode()->setChildValue(getEdges(), visible && m_enableEdgesDisplay);
 
 		getShapeNode()->setNodeMask(getShapeNode()->getNodeMask() | 1);  // Set last bit of node mask
 	}
@@ -294,7 +294,7 @@ void SceneNodeGeometry::updateWireframeState(bool visible, bool wireframe, bool 
 			getShapeNode()->setChildValue(getEdges(), true);
 		}
 
-		setEdgesColor(surfaceColorRGB);
+		setEdgesColor(m_surfaceColorRGB);
 
 		if (isTransparent())
 		{
@@ -313,10 +313,10 @@ void SceneNodeGeometry::updateWireframeState(bool visible, bool wireframe, bool 
 		if (visible)
 		{
 			getShapeNode()->setChildValue(getTriangles(), true);
-			getShapeNode()->setChildValue(getEdges(), !isTransparent() && enableEdgesDisplay);
+			getShapeNode()->setChildValue(getEdges(), !isTransparent() && m_enableEdgesDisplay);
 		}
 
-		double color[] = { getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2) };
+		double color[] = { getActualEdgeColor(m_edgeColorRGB, 0), getActualEdgeColor(m_edgeColorRGB, 1), getActualEdgeColor(m_edgeColorRGB, 2) };
 		setEdgesColor(color);
 
 		lineWidth = 1.0;
@@ -350,7 +350,7 @@ void SceneNodeGeometry::setVisible(bool v)
 {
 	if (isVisible() == v) return;  // No change necessary
 
-	if (v && needsInitialization)
+	if (v && m_needsInitialization)
 	{
 		// This item has not yet been loaded from the storage 
 		initializeFromDataStorage();
@@ -371,7 +371,7 @@ void SceneNodeGeometry::setVisibleState(bool visible, bool transparent, bool wir
 
 			if (!transparent)
 			{
-				getShapeNode()->setChildValue(getEdges(), enableEdgesDisplay || wireframe);
+				getShapeNode()->setChildValue(getEdges(), m_enableEdgesDisplay || wireframe);
 			}
 
 			if (!wireframe)
@@ -401,7 +401,7 @@ void SceneNodeGeometry::setHighlighted(bool h)
 	if (isHighlighted() == h) return;  // No change necessary
 
 	getShapeNode()->setChildValue(getEdgesHighlighted(), h);
-	getShapeNode()->setChildValue(getEdges(), enableEdgesDisplay && (!isVisible() ? false : !h));
+	getShapeNode()->setChildValue(getEdges(), m_enableEdgesDisplay && (!isVisible() ? false : !h));
 	getFaceEdgesHighlight()->setAllChildrenOff();
 
 	SceneNodeBase::setHighlighted(h);
@@ -410,10 +410,10 @@ void SceneNodeGeometry::setHighlighted(bool h)
 void SceneNodeGeometry::setEdgeHighlight(unsigned long long faceId, bool h, double thickness)
 {
 //	getFaceEdgesHighlight()->setAllChildrenOff();
-	getFaceEdgesHighlight()->setChildValue(faceEdgesHighlight[faceId], h);
+	getFaceEdgesHighlight()->setChildValue(m_faceEdgesHighlight[faceId], h);
 	if (h)
 	{
-		osg::StateSet *ss = faceEdgesHighlight[faceId]->getOrCreateStateSet();
+		osg::StateSet *ss = m_faceEdgesHighlight[faceId]->getOrCreateStateSet();
 
 		osg::LineWidth *lineWidthAttribute = dynamic_cast<osg::LineWidth*>(ss->getAttribute(osg::StateAttribute::Type::LINEWIDTH));
 
@@ -429,7 +429,7 @@ ot::SelectionHandlingResult SceneNodeGeometry::setSelected(bool selected, const 
 	ot::SelectionHandlingResult result = SceneNodeBase::setSelected(selected, _selectionData,_singleSelection, _selectedNodes);
 
 	// Handle visibility state
-	if (showWhenSelected)
+	if (m_showWhenSelected)
 	{
 		if (selected)
 		{
@@ -493,27 +493,27 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 		if (getEdgesHighlighted() != nullptr) m_shapeNode->removeChild(getEdgesHighlighted());
 		if (getFaceEdgesHighlight() != nullptr) m_shapeNode->removeChild(getFaceEdgesHighlight());
 
-		triangleToFaceId.clear();
-		faceEdgesHighlight.clear();
+		m_triangleToFaceId.clear();
+		m_faceEdgesHighlight.clear();
 	}
 
 	// Store the triangle / face information
 
 	for (auto t : triangles)
 	{
-		triangleToFaceId.push_back(t.getFaceId());
+		m_triangleToFaceId.push_back(t.getFaceId());
 	}
 
-	faceIdToNameMap = faceNameMap;
+	m_faceIdToNameMap = faceNameMap;
 
 	// Create the triangle node
-	osg::Node* triangleNode = createOSGNodeFromTriangles(surfaceColorRGB, materialType, textureType, reflective, backFaceCulling, offsetFactor, nodes, triangles);
+	osg::Node* triangleNode = createOSGNodeFromTriangles(m_surfaceColorRGB, m_materialType, m_textureType, m_reflective, m_backFaceCulling, m_offsetFactor, nodes, triangles);
 
 	// Create the edges node
 	osg::Node *edgeNode(nullptr), *edgeHighlightedNode(nullptr);
 	osg::Switch *faceEdgesHighlightNode(nullptr);
 
-	double color[] = { getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2) };
+	double color[] = { getActualEdgeColor(m_edgeColorRGB, 0), getActualEdgeColor(m_edgeColorRGB, 1), getActualEdgeColor(m_edgeColorRGB, 2) };
 	createOSGNodeFromEdges(color, edges, edgeNode, edgeHighlightedNode, faceEdgesHighlightNode);
 
 	// Create a new entry in the shape map for this object
@@ -549,7 +549,7 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 	updateWireframeState(isVisible(), isWireframe(), isTransparent());
 
 	// Initialization is completed
-	needsInitialization = false;
+	m_needsInitialization = false;
 }
 
 //void SceneNodeGeometry::assignMaterial(const std::string& materialType) {
@@ -673,16 +673,16 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 
 	std::map<unsigned long long, std::list<Geometry::Edge *>> faceIdToEdgesList;
 
-	edgeStartIndex.clear();
-	edgeFaceId.clear();
+	m_edgeStartIndex.clear();
+	m_edgeFaceId.clear();
 
-	edgeStartIndex.reserve(edges.size());
-	edgeFaceId.reserve(edges.size());
+	m_edgeStartIndex.reserve(edges.size());
+	m_edgeFaceId.reserve(edges.size());
 
 	for (auto &edge : edges)
 	{
-		edgeStartIndex.push_back(nEdges);
-		edgeFaceId.push_back(edge.getFaceId());
+		m_edgeStartIndex.push_back(nEdges);
+		m_edgeFaceId.push_back(edge.getFaceId());
 
 		nEdges += edge.getNpoints() - 1;
 		faceIdToEdgesList[edge.getFaceId()].push_back(&edge);
@@ -707,14 +707,14 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 	}
 
 	// Now build the osg nodes for the edge and the selected edge
-	edgesNode = buildEdgesOSGNode(nEdges, vertices, colorRGB[0], colorRGB[1], colorRGB[2], 1.0-edgeTransparency, true, 1.0);
+	edgesNode = buildEdgesOSGNode(nEdges, vertices, colorRGB[0], colorRGB[1], colorRGB[2], 1.0- m_edgeTransparency, true, 1.0);
 	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices, 
 											 ViewerSettings::instance()->geometryHighlightColor.r() / 255.0, 
 											 ViewerSettings::instance()->geometryHighlightColor.g() / 255.0,
 											 ViewerSettings::instance()->geometryHighlightColor.b() / 255.0, 
 											 1.0, true, ViewerSettings::instance()->geometryHighlightLineWidth);
 
-	if (!backFaceCulling)
+	if (!m_backFaceCulling)
 	{
 		osg::StateSet *ss = edgesNode->getOrCreateStateSet();
 		ss->setRenderBinDetails(-2, "RenderBin");
@@ -756,7 +756,7 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 													 ViewerSettings::instance()->geometryHighlightColor.b() / 255.0, 
 													 1.0, false, ViewerSettings::instance()->geometryHighlightLineWidth);
 
-		faceEdgesHighlight[faceEdges.first] = faceEdgesNode;
+		m_faceEdgesHighlight[faceEdges.first] = faceEdgesNode;
 		faceEdgesHighlightNode->addChild(faceEdgesNode);
 	}
 }
@@ -783,10 +783,10 @@ std::string SceneNodeGeometry::getEdgeNameFromFaceIds(unsigned long long faceId1
 ot::UID SceneNodeGeometry::getFaceIdFromEdgePrimitiveIndex(unsigned long long hitIndex)
 {
 	// First, we need to determine the correponding edge. Lets find the closes start index lower than the hitIndex
-	if (edgeStartIndex.size() == 0) return -1;
+	if (m_edgeStartIndex.size() == 0) return -1;
 
 	unsigned long long start = 0;
-	unsigned long long end = edgeStartIndex.size()-1;
+	unsigned long long end = m_edgeStartIndex.size()-1;
 
 	long long center = -1;
 
@@ -794,21 +794,21 @@ ot::UID SceneNodeGeometry::getFaceIdFromEdgePrimitiveIndex(unsigned long long hi
 	{
 		center = (start + end) / 2;
 
-		if (edgeStartIndex[start] == hitIndex)
+		if (m_edgeStartIndex[start] == hitIndex)
 		{
 			center = start;
 			break;
 		}
-		else if (edgeStartIndex[end] == hitIndex)
+		else if (m_edgeStartIndex[end] == hitIndex)
 		{
 			center = end;
 			break;
 		}
-		else if (edgeStartIndex[center] < hitIndex)
+		else if (m_edgeStartIndex[center] < hitIndex)
 		{
 			start = center;
 		}
-		else if (edgeStartIndex[center] > hitIndex)
+		else if (m_edgeStartIndex[center] > hitIndex)
 		{
 			end = center;
 		}
@@ -818,13 +818,13 @@ ot::UID SceneNodeGeometry::getFaceIdFromEdgePrimitiveIndex(unsigned long long hi
 			break;
 		}
 
-		if (end - start == 1 && edgeStartIndex[start] <= hitIndex && edgeStartIndex[end] > hitIndex)
+		if (end - start == 1 && m_edgeStartIndex[start] <= hitIndex && m_edgeStartIndex[end] > hitIndex)
 		{
 			center = start;
 			break;
 		}
 
-		if (end - start == 1 && edgeStartIndex[end] <= hitIndex)
+		if (end - start == 1 && m_edgeStartIndex[end] <= hitIndex)
 		{
 			center = end;
 			break;
@@ -838,10 +838,10 @@ ot::UID SceneNodeGeometry::getFaceIdFromEdgePrimitiveIndex(unsigned long long hi
 		}
 	}
 
-	if (center >= 0 && center < edgeStartIndex.size())
+	if (center >= 0 && center < m_edgeStartIndex.size())
 	{
 		// Now we have the edge index -> get the correponding faceId
-		ot::UID faceId = edgeFaceId[center];
+		ot::UID faceId = m_edgeFaceId[center];
 
 		return faceId;
 	}
@@ -924,10 +924,10 @@ void SceneNodeGeometry::setEdgeHighlightNode(unsigned long long faceId1, unsigne
 
 osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2, double lineWidth)
 {
-	if (edges == nullptr) return nullptr;
+	if (m_edges == nullptr) return nullptr;
 
 	// First, we get the geometry drawable of the edges
-	osg::MatrixTransform* transformNode = dynamic_cast<osg::MatrixTransform*>(edges);
+	osg::MatrixTransform* transformNode = dynamic_cast<osg::MatrixTransform*>(m_edges);
 	if (transformNode == nullptr) return nullptr;
 
 	osg::ref_ptr<osg::Geode> edgesNode = dynamic_cast<osg::Geode*>(transformNode->getChild(0));
@@ -950,9 +950,9 @@ osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, u
 
 	for (unsigned int i = 0; i < vertices->size()-1; i+=2)
 	{
-		if (edgeIndex + 1 < edgeStartIndex.size())
+		if (edgeIndex + 1 < m_edgeStartIndex.size())
 		{
-			if (edgeStartIndex[edgeIndex + 1] == edgeCount)
+			if (m_edgeStartIndex[edgeIndex + 1] == edgeCount)
 			{
 				edgeIndex++;
 			}
@@ -962,12 +962,12 @@ osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, u
 		osg::Vec3& v1 = (*vertices)[i];
 		osg::Vec3& v2 = (*vertices)[i+1];
 
-		if (edgeFaceId[edgeIndex] == faceId1)
+		if (m_edgeFaceId[edgeIndex] == faceId1)
 		{
 			faceEdges1.push_back(v1);
 			faceEdges1.push_back(v2);
 		}
-		else if (edgeFaceId[edgeIndex] == faceId2)
+		else if (m_edgeFaceId[edgeIndex] == faceId2)
 		{
 			faceEdges2.push_back(v1);
 			faceEdges2.push_back(v2);
@@ -1052,13 +1052,13 @@ void SceneNodeGeometry::setCutCapGeometryTriangles(osg::ref_ptr<osg::Geometry>& 
 	if (triangleNode != nullptr)
 	{
 		triangleNode->addDrawable(geometry);
-		cutCapGeometryTriangles = geometry;
+		m_cutCapGeometryTriangles = geometry;
 	}
 }
 
 void SceneNodeGeometry::deleteCutCapGeometryTriangles()
 {
-	if (cutCapGeometryTriangles == nullptr) return;
+	if (m_cutCapGeometryTriangles == nullptr) return;
 
 	// First, update the color of the triangles
 	osg::Transform* triangleTransform = dynamic_cast<osg::Transform*>(getTriangles());
@@ -1070,7 +1070,7 @@ void SceneNodeGeometry::deleteCutCapGeometryTriangles()
 
 	if (triangleNode != nullptr)
 	{
-		triangleNode->removeDrawable(cutCapGeometryTriangles);
+		triangleNode->removeDrawable(m_cutCapGeometryTriangles);
 	}
 }
 
@@ -1088,13 +1088,13 @@ void SceneNodeGeometry::setCutCapGeometryEdges(osg::ref_ptr<osg::Geometry>& geom
 	if (triangleNode != nullptr)
 	{
 		triangleNode->addDrawable(geometry);
-		cutCapGeometryEdges = geometry;
+		m_cutCapGeometryEdges = geometry;
 	}
 }
 
 void SceneNodeGeometry::deleteCutCapGeometryEdges()
 {
-	if (cutCapGeometryEdges == nullptr) return;
+	if (m_cutCapGeometryEdges == nullptr) return;
 
 	// First, update the color of the triangles
 	osg::Transform* triangleTransform = dynamic_cast<osg::Transform*>(getTriangles());
@@ -1106,7 +1106,7 @@ void SceneNodeGeometry::deleteCutCapGeometryEdges()
 
 	if (triangleNode != nullptr)
 	{
-		triangleNode->removeDrawable(cutCapGeometryEdges);
+		triangleNode->removeDrawable(m_cutCapGeometryEdges);
 	}
 }
 
@@ -1135,13 +1135,13 @@ void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], const doubl
 
 				geometry->getOrCreateStateSet()->setAttribute(material);
 
-				if (textureAttribute != nullptr) geometry->getOrCreateStateSet()->removeTextureAttribute(0, textureAttribute);
-				if (textureAttributeGen != nullptr) geometry->getOrCreateStateSet()->removeTextureAttribute(0, textureAttributeGen);
-				if (textureAttributeEnv != nullptr) geometry->getOrCreateStateSet()->removeTextureAttribute(0, textureAttributeEnv);
+				if (m_textureAttribute != nullptr) geometry->getOrCreateStateSet()->removeTextureAttribute(0, m_textureAttribute);
+				if (m_textureAttributeGen != nullptr) geometry->getOrCreateStateSet()->removeTextureAttribute(0, m_textureAttributeGen);
+				if (m_textureAttributeEnv != nullptr) geometry->getOrCreateStateSet()->removeTextureAttribute(0, m_textureAttributeEnv);
 
-				textureAttribute = nullptr;
-				textureAttributeGen = nullptr;
-				textureAttributeEnv = nullptr;
+				m_textureAttribute = nullptr;
+				m_textureAttributeGen = nullptr;
+				m_textureAttributeEnv = nullptr;
 
 				if (textureType != "None")
 				{
@@ -1173,11 +1173,11 @@ double SceneNodeGeometry::getActualEdgeColor(const double colorRGB[], int index)
 	}
 }
 
-void SceneNodeGeometry::updateObjectFacetsFromDataBase(unsigned long long entityID, unsigned long long entityVersion)
+void SceneNodeGeometry::updateObjectFacetsFromDataBase(ot::UID _dataEntityID, ot::UID _dataEntityVersion)
 {
 	deleteShapeNode();
 
-	setStorage(projectName, entityID, entityVersion);
+	setStorage(m_projectName, _dataEntityID, _dataEntityVersion);
 
 	if (!isVisible())
 	{
@@ -1201,7 +1201,7 @@ void SceneNodeGeometry::initializeFromDataStorage(void)
 
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(m_dataEntityID, m_dataEntityVersion, doc))
 	{
 		assert(0);
 		return;
@@ -1271,19 +1271,19 @@ void SceneNodeGeometry::assignTexture(osg::Geometry *geometry, const std::string
 		if (reflective)
 		{
 			geometry->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture2D, osg::StateAttribute::ON);
-			textureAttribute = texture2D;
+			m_textureAttribute = texture2D;
 
 			//Set automatically generated coordinates
 			osg::ref_ptr<osg::TexGen> texgen = new osg::TexGen;
 			texgen->setMode(osg::TexGen::SPHERE_MAP);
-			textureAttributeGen = texgen;
+			m_textureAttributeGen = texgen;
 
 			//Set the arts and science environment, the mode is BLEND
 			osg::ref_ptr<osg::TexEnv> texenv = new osg::TexEnv;
 			texenv->setMode(osg::TexEnv::BLEND);
 			//Set the color of BLEND operation
 			texenv->setColor(osg::Vec4((float) r, (float) g, (float) b, 0.0f));
-			textureAttributeEnv = texenv;
+			m_textureAttributeEnv = texenv;
 
 			geometry->getOrCreateStateSet()->setTextureAttributeAndModes(0, texgen, osg::StateAttribute::ON);
 
@@ -1300,7 +1300,7 @@ void SceneNodeGeometry::assignTexture(osg::Geometry *geometry, const std::string
 			texture2D->setFilter(osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR);
 
 			geometry->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture2D, osg::StateAttribute::ON);
-			textureAttribute = texture2D;
+			m_textureAttribute = texture2D;
 		}
 	}
 	else
@@ -1311,9 +1311,9 @@ void SceneNodeGeometry::assignTexture(osg::Geometry *geometry, const std::string
 
 std::string SceneNodeGeometry::getFaceNameFromId(unsigned long long faceId)
 {
-	auto item = faceIdToNameMap.find(faceId);
+	auto item = m_faceIdToNameMap.find(faceId);
 
-	if (item != faceIdToNameMap.end())
+	if (item != m_faceIdToNameMap.end())
 	{
 		return item->second;
 	}
@@ -1325,16 +1325,16 @@ void SceneNodeGeometry::setHighlightNode(osg::Node* highlight)
 {
 	if (getShapeNode() == nullptr) return;
 
-	if (highlightNode != nullptr)
+	if (m_highlightNode != nullptr)
 	{
-		getShapeNode()->removeChild(highlightNode);
-		highlightNode = nullptr;
+		getShapeNode()->removeChild(m_highlightNode);
+		m_highlightNode = nullptr;
 	}
 
 	if (highlight != nullptr)
 	{
 		getShapeNode()->addChild(highlight);
-		highlightNode = highlight;
+		m_highlightNode = highlight;
 	}
 }
 
@@ -1359,16 +1359,16 @@ osg::Node* SceneNodeGeometry::addSelectedEdge(unsigned long long faceId1, unsign
 void SceneNodeGeometry::setTransparency(double value)
 {
 	SceneNodeBase::setTransparency(value);
-	edgeTransparency = value;
+	m_edgeTransparency = value;
 
-	double color[] = { getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2) };
-	updateObjectColor(surfaceColorRGB, color, materialType, textureType, reflective);
+	double color[] = { getActualEdgeColor(m_edgeColorRGB, 0), getActualEdgeColor(m_edgeColorRGB, 1), getActualEdgeColor(m_edgeColorRGB, 2) };
+	updateObjectColor(m_surfaceColorRGB, color, m_materialType, m_textureType, m_reflective);
 }
 
 void SceneNodeGeometry::setHighlightColor(const ot::Color& colorValue)
 {
 	// Change the color for the highlight edges of the solids
-	osg::Transform* edgeTransform = dynamic_cast<osg::Transform*>(edgesHighlighted);
+	osg::Transform* edgeTransform = dynamic_cast<osg::Transform*>(m_edgesHighlighted);
 	assert(edgeTransform != nullptr);
 
 	assert(edgeTransform->getNumChildren() == 1);
@@ -1396,11 +1396,11 @@ void SceneNodeGeometry::setHighlightColor(const ot::Color& colorValue)
 	}
 
 	// Now we change the color for the highlight edges of the faces
-	unsigned int numChildren = faceEdgesHighlightNode->getNumChildren();
+	unsigned int numChildren = m_faceEdgesHighlightNode->getNumChildren();
 
 	for (unsigned int i = 0; i < numChildren; ++i)
 	{
-		osg::Node* child = faceEdgesHighlightNode->getChild(i);
+		osg::Node* child = m_faceEdgesHighlightNode->getChild(i);
 
 		osg::Transform* edgeTransform = dynamic_cast<osg::Transform*>(child);
 		assert(edgeTransform != nullptr);
@@ -1434,7 +1434,7 @@ void SceneNodeGeometry::setHighlightColor(const ot::Color& colorValue)
 void SceneNodeGeometry::setHighlightLineWidth(double lineWidth)
 {
 	// Change the width for the highlight edges of the solids
-	osg::Transform* edgeTransform = dynamic_cast<osg::Transform*>(edgesHighlighted);
+	osg::Transform* edgeTransform = dynamic_cast<osg::Transform*>(m_edgesHighlighted);
 	assert(edgeTransform != nullptr);
 
 	osg::StateSet* ss = edgeTransform->getStateSet();
@@ -1448,10 +1448,10 @@ void SceneNodeGeometry::setHighlightLineWidth(double lineWidth)
 
 void SceneNodeGeometry::updateEdgeColorMode()
 {
-	enableEdgesDisplay = (ViewerSettings::instance()->geometryEdgeColorMode != ViewerSettings::instance()->geometryEdgeColorMode_noColor);
+	m_enableEdgesDisplay = (ViewerSettings::instance()->geometryEdgeColorMode != ViewerSettings::instance()->geometryEdgeColorMode_noColor);
 
-	double color[] = { getActualEdgeColor(edgeColorRGB, 0), getActualEdgeColor(edgeColorRGB, 1), getActualEdgeColor(edgeColorRGB, 2) };
-	updateObjectColor(surfaceColorRGB, color, materialType, textureType, reflective);
+	double color[] = { getActualEdgeColor(m_edgeColorRGB, 0), getActualEdgeColor(m_edgeColorRGB, 1), getActualEdgeColor(m_edgeColorRGB, 2) };
+	updateObjectColor(m_surfaceColorRGB, color, m_materialType, m_textureType, m_reflective);
 
 	updateWireframeState(isVisible(), isWireframe(), isTransparent());
 	updateTransparentState(isVisible(), isTransparent(), isWireframe());
@@ -1479,7 +1479,7 @@ void SceneNodeGeometry::setEdgesColor(const double color[])
 
 				if (colorArray != nullptr)
 				{
-					(*colorArray)[0] = osg::Vec4(color[0], color[1], color[2], 1.0 - edgeTransparency);
+					(*colorArray)[0] = osg::Vec4(color[0], color[1], color[2], 1.0 - m_edgeTransparency);
 				}
 
 				geometry->dirtyGLObjects();

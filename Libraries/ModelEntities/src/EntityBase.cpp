@@ -21,7 +21,6 @@
 
 #include "EntityBase.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
 #include "EntityFactory.h"
 #include "OTCore/String.h"
 
@@ -30,10 +29,7 @@
 _declspec(dllexport) DataStorageAPI::UniqueUIDGenerator *globalUidGenerator = nullptr;
 
 EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms) :
-	m_entityID(_ID),
-	m_entityStorageVersion(0),
 	m_initiallyHidden(false),
-	m_isEditable(false),
 	m_parentEntity(_parent),
 	m_observer(_obs),
 	m_isModified(true),
@@ -41,9 +37,10 @@ EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	m_manageParentVisibility(true),
 	m_manageChildVisibility(true),
 	m_modelState(_ms),
-	m_name(""),
 	m_isDeletable(true)
-{}
+{
+	m_treeItem.setEntityID(_ID);
+}
 
 EntityBase::~EntityBase() {
 	if (m_parentEntity != nullptr) {
@@ -67,6 +64,11 @@ DataStorageAPI::UniqueUIDGenerator *EntityBase::getUidGenerator(void) {
 	return globalUidGenerator;
 }
 
+void EntityBase::setName(const std::string& _name) {
+	m_treeItem.setEntityName(_name);
+	setModified();
+}
+
 std::string EntityBase::getNameOnly() const {
 	std::list<std::string> tmp = ot::String::split(this->getName(), '/', true);
 	if (tmp.empty()) {
@@ -74,6 +76,13 @@ std::string EntityBase::getNameOnly() const {
 	}
 	else {
 		return tmp.back();
+	}
+}
+
+void EntityBase::setEntityID(ot::UID _id) {
+	if (_id != m_treeItem.getEntityID()) {
+		m_treeItem.setEntityID(_id);
+		setModified();
 	}
 }
 
@@ -106,10 +115,10 @@ void EntityBase::storeToDataBase(void) {
 	storeToDataBase(entityVersion);
 }
 
-void EntityBase::storeToDataBase(ot::UID givenEntityVersion) {
+void EntityBase::storeToDataBase(ot::UID _givenEntityVersion) {
 	if (!getModified()) return;
 
-	m_entityStorageVersion = givenEntityVersion;
+	m_treeItem.setEntityVersion(_givenEntityVersion);
 	entityIsStored();
 
 	// This item collects all information about the entity and adds it to the storage data 
@@ -139,9 +148,9 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 		int schemaVersion = (int) DataBase::getIntFromView(doc_view, schemaVersionKey.c_str());
 		if (schemaVersion != getSchemaVersion()) throw (std::exception());
 
-		m_entityID             = DataBase::getIntFromView(doc_view, "EntityID");
-		m_entityStorageVersion = DataBase::getIntFromView(doc_view, "Version");
-		m_name                 = doc_view["Name"].get_utf8().value.data();
+		m_treeItem.setEntityID(DataBase::getIntFromView(doc_view, "EntityID"));
+		m_treeItem.setEntityVersion(DataBase::getIntFromView(doc_view, "Version"));
+		m_treeItem.setEntityName(std::string(doc_view["Name"].get_utf8().value.data()));
 		m_initiallyHidden      = doc_view["initiallyHidden"].get_bool();
 		auto bsonObj           = doc_view["Properties"].get_document();
 
@@ -162,12 +171,6 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 			}
 		}
 
-		m_isEditable = false;
-		docIt = doc_view.find("isEditable");
-		if (docIt != doc_view.end()) {
-			m_isEditable = docIt->get_bool();
-		}
-		
 		m_selectChildren = true;
 		docIt = doc_view.find("selectChildren");
 		if (docIt != doc_view.end()) {
@@ -190,6 +193,51 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 		docIt = doc_view.find("isDeletable");
 		if (docIt != doc_view.end()) {
 			m_isDeletable = docIt->get_bool();
+		}
+
+		docIt = doc_view.find("isEditable");
+		if (docIt != doc_view.end()) {
+			m_treeItem.setIsEditable(docIt->get_bool());
+		}
+
+		docIt = doc_view.find("SelectTreeChilds");
+		if (docIt != doc_view.end()) {
+			m_treeItem.setSelectChilds(docIt->get_bool());
+		}
+
+		docIt = doc_view.find("VisibleTreeIcon");
+		if (docIt != doc_view.end()) {
+			m_treeItem.setVisibleIcon(docIt->get_string().value.data());
+			if (m_treeItem.getIcons().getVisibleIcon().find('/') == std::string::npos) {
+				// Old format without path, update to new format
+				m_treeItem.setVisibleIcon("Default/" + m_treeItem.getIcons().getVisibleIcon());
+			}
+		}
+
+		docIt = doc_view.find("HiddenTreeIcon");
+		if (docIt != doc_view.end()) {
+			m_treeItem.setHiddenIcon(docIt->get_string().value.data());
+			if (m_treeItem.getIcons().getHiddenIcon().find('/') == std::string::npos) {
+				// Old format without path, update to new format
+				m_treeItem.setHiddenIcon("Default/" + m_treeItem.getIcons().getHiddenIcon());
+			}
+		}
+
+		docIt = doc_view.find("VisualizationTypes");
+		if (docIt != doc_view.end()) {
+			m_visualizationTypes.setVisualisations(ot::VisualisationTypes::VisTypes(static_cast<uint64_t>(DataBase::getIntFromView(doc_view, "VisualizationTypes"))));
+		}
+
+		docIt = doc_view.find("CustomViewFlags");
+		if (docIt != doc_view.end()) {
+			m_visualizationTypes.clearCustomViewFlags();
+			auto customViewFlagsArray = docIt->get_array().value;
+			for (auto&& it : customViewFlagsArray) {
+				auto kvp = it.get_document().view();
+				ot::VisualisationTypes::VisualisationType visType = static_cast<ot::VisualisationTypes::VisualisationType>(static_cast<uint64_t>(DataBase::getIntFromView(kvp, "VisualisationType")));
+				ot::WidgetViewBase::ViewFlags flags(static_cast<uint64_t>(DataBase::getIntFromView(kvp, "ViewFlags")));
+				m_visualizationTypes.setCustomViewFlags(visType, flags);
+			}
 		}
 
 		std::string propertiesJSON = bsoncxx::to_json(bsonObj);
@@ -317,18 +365,43 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 	}
 
 	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_" + getClassName(), getSchemaVersion()),
-		bsoncxx::builder::basic::kvp("EntityID", (long long)m_entityID),
-		bsoncxx::builder::basic::kvp("Version", (long long)m_entityStorageVersion),
-		bsoncxx::builder::basic::kvp("Name", m_name),
+		bsoncxx::builder::basic::kvp("EntityID", (long long)m_treeItem.getEntityID()),
+		bsoncxx::builder::basic::kvp("Version", (long long)m_treeItem.getEntityVersion()),
+		bsoncxx::builder::basic::kvp("Name", m_treeItem.getEntityName()),
 		bsoncxx::builder::basic::kvp("isDeletable", m_isDeletable),
 		bsoncxx::builder::basic::kvp("initiallyHidden", m_initiallyHidden),
-		bsoncxx::builder::basic::kvp("isEditable", m_isEditable),
 		bsoncxx::builder::basic::kvp("selectChildren", m_selectChildren),
 		bsoncxx::builder::basic::kvp("manageParentVisibility", m_manageParentVisibility),
 		bsoncxx::builder::basic::kvp("manageChildVisibility", m_manageChildVisibility),
 		bsoncxx::builder::basic::kvp("Properties", bsonObj),
 		bsoncxx::builder::basic::kvp("Callbacks", callbackArray)
 	);
+
+	if (m_treeItem.getIsEditableChanged()){
+		doc.append(bsoncxx::builder::basic::kvp("isEditable", m_treeItem.getIsEditable()));
+	}
+	if (m_treeItem.getSelectChildsChanged()) {
+		doc.append(bsoncxx::builder::basic::kvp("SelectTreeChilds", m_treeItem.getSelectChilds()));
+	}
+	if (m_treeItem.getIconsChanged()) {
+		doc.append(bsoncxx::builder::basic::kvp("VisibleTreeIcon", m_treeItem.getIcons().getVisibleIcon()));
+		doc.append(bsoncxx::builder::basic::kvp("HiddenTreeIcon", m_treeItem.getIcons().getHiddenIcon()));
+	}
+	if (m_visualizationTypes.getVisualizationsModified()) {
+		doc.append(bsoncxx::builder::basic::kvp("VisualizationTypes", static_cast<int64_t>(m_visualizationTypes.getVisualisations().underlying())));
+	}
+	if (m_visualizationTypes.getCustomViewFlagsModified()) {
+		bsoncxx::builder::basic::array customViewFlagsArray;
+		for (const auto& pair : m_visualizationTypes.getCustomViewFlags()) {
+			ot::VisualisationTypes::VisualisationType visType = pair.first;
+			ot::WidgetViewBase::ViewFlags flags = pair.second;
+			bsoncxx::builder::basic::document cvfDoc;
+			cvfDoc.append(bsoncxx::builder::basic::kvp("VisualisationType", static_cast<int64_t>(visType)));
+			cvfDoc.append(bsoncxx::builder::basic::kvp("ViewFlags", static_cast<int64_t>(flags.underlying())));
+			customViewFlagsArray.append(cvfDoc.extract());
+		}
+		doc.append(bsoncxx::builder::basic::kvp("CustomViewFlags", customViewFlagsArray));
+	}
 
 	addStorageData(doc);
 
@@ -343,4 +416,32 @@ void EntityBase::detachFromHierarchy(void) {
 	}
 }
 
+void EntityBase::addVisualizationType(ot::VisualisationTypes::VisualisationType _type) {
+	m_visualizationTypes.addVisualisation(_type);
+}
+
+void EntityBase::removeVisualizationType(ot::VisualisationTypes::VisualisationType _type) {
+	m_visualizationTypes.removeVisualisation(_type);
+}
+
+void EntityBase::setCustomVisualizationViewFlags(ot::VisualisationTypes::VisualisationType _visType, ot::WidgetViewBase::ViewFlags _flags) {
+	m_visualizationTypes.setCustomViewFlags(_visType, _flags);
+}
+
+void EntityBase::setDefaultTreeItem(const ot::EntityTreeItem& _treeItem) {
+	ot::UID uid = m_treeItem.getEntityID();
+	ot::UID ver = m_treeItem.getEntityVersion();
+
+	m_treeItem = _treeItem;
+
+	m_treeItem.setEntityID(uid);
+	m_treeItem.setEntityVersion(ver);
+
+	m_treeItem.resetModified();
+}
+
+void EntityBase::setDefaultVisualizationTypes(const ot::VisualisationTypes& _types) {
+	m_visualizationTypes = _types;
+	m_visualizationTypes.resetModified();
+}
 

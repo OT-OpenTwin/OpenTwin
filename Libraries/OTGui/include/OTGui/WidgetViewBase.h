@@ -39,7 +39,7 @@ namespace ot {
 		OT_DECL_NODEFAULT(WidgetViewBase)
 	public:
 		//! @brief ViewFlags are used to describe the view behaviour in the frontend.
-		enum ViewFlag {
+		enum ViewFlag : uint64_t {
 			NoViewFlags               = 0 << 0, //! @brief Default value (no flags set)
 			ViewIsCloseable           = 1 << 0, //! @brief If set the view may be closed
 			ViewDefaultCloseHandling  = 1 << 1, //! @brief If set and 'ViewIsCloseable' is set the view will close with the default close behaviour (close the view), otherwise a closeRequested signal is emitted.
@@ -50,7 +50,7 @@ namespace ot {
 			ViewNameAsTitle           = 1 << 6, //! @brief If set the view name is going to be used as the view title.
 			ViewCloseOnEmptySelection = 1 << 7  //! @brief If set the view will be closed when the selection becomes empty (no selected entities).
 		};
-		typedef Flags<ViewFlag> ViewFlags; //! /ref ViewFlag "ViewFlag"
+		typedef Flags<ViewFlag, uint64_t> ViewFlags; //! /ref ViewFlag "ViewFlag"
 
 		//! @brief The ViewDockLocation is used to determine the dock location when adding the view to the manager.
 		enum ViewDockLocation {

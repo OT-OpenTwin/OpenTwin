@@ -49,32 +49,32 @@ public:
 	virtual void setVisible(bool v) override;
 	virtual void setHighlighted(bool h) override;
 	
-	Model *getModel(void) { return model; };
-	void setModel(Model *m) { model = m; };
+	Model *getModel(void) { return m_model; };
+	void setModel(Model *m) { m_model = m; };
 
-	SceneNodeCartesianMesh *getMesh(void) { return mesh; };
-	void setMesh(SceneNodeCartesianMesh *m) { mesh = m; };
+	SceneNodeCartesianMesh *getMesh(void) { return m_mesh; };
+	void setMesh(SceneNodeCartesianMesh *m) { m_mesh = m; };
 
-	bool getIsVolume(void) { return isVolume; };
+	bool getIsVolume(void) { return m_isVolume; };
 
-	double getColorR(void) { return colorRGB[0]; };
-	double getColorG(void) { return colorRGB[1]; };
-	double getColorB(void) { return colorRGB[2]; };
+	double getColorR(void) { return m_colorRGB[0]; };
+	double getColorG(void) { return m_colorRGB[1]; };
+	double getColorB(void) { return m_colorRGB[2]; };
 
 	virtual bool isItem3D(void) const override { return true; };
 
-	void setFacesList(std::vector<int> &faces);
-	void setColor(double r, double g, double b) { colorRGB[0] = r; colorRGB[1] = g; colorRGB[2] = b; }
+	void setFacesList(const std::vector<int>& _faces);
+	void setColor(double r, double g, double b) { m_colorRGB[0] = r; m_colorRGB[1] = g; m_colorRGB[2] = b; }
 
 private:
 	void updateVisibility(void);
 
-	Model *model;
-	SceneNodeCartesianMesh *mesh;
+	Model* m_model;
+	SceneNodeCartesianMesh* m_mesh;
 
-	double colorRGB[3];
-	bool isVolume;
+	double m_colorRGB[3];
+	bool m_isVolume;
 
-	std::vector<int> faceID;
+	std::vector<int> m_faceID;
 };
 

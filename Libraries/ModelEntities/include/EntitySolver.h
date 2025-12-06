@@ -21,7 +21,6 @@
 #pragma warning(disable : 4251)
 
 #include "EntityContainer.h"
-#include "OldTreeIcon.h"
 
 #include <list>
 
@@ -34,8 +33,6 @@ public:
 
 	static std::string className() { return "EntitySolver"; }
 	virtual std::string getClassName(void) const override { return EntitySolver::className(); }
-
-	virtual void addVisualizationNodes(void) override;
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 

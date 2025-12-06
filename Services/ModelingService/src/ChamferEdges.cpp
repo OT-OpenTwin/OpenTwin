@@ -51,12 +51,12 @@ std::string ChamferEdges::getOperationDescription()
 
 std::string ChamferEdges::getVisibleTreeItemName()
 {
-	return "ChamferEdgesVisible";
+	return "Default/ChamferEdgesVisible";
 }
 
 std::string ChamferEdges::getHiddenTreeItemName()
 {
-	return "ChamferEdgesHidden";
+	return "Default/ChamferEdgesHidden";
 }
 
 std::string ChamferEdges::getShapeType()

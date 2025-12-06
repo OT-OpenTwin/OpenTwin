@@ -21,7 +21,7 @@
 #include "OTCore/BasicEntityInformation.h"
 
 ot::BasicEntityInformation::BasicEntityInformation()
-	: m_entityId(0), m_entityVersion(0)
+	: m_entityId(ot::invalidUID), m_entityVersion(ot::invalidUID)
 {}
 
 ot::BasicEntityInformation::BasicEntityInformation(UID _entityId, UID _entityVersion)

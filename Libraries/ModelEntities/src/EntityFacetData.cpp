@@ -18,9 +18,8 @@
 // @otlicense-end
 
 
-#include "EntityFacetData.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityFacetData.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

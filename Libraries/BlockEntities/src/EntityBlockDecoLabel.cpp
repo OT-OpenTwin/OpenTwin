@@ -30,10 +30,10 @@ static EntityFactoryRegistrar<EntityBlockDecoLabel> registrar(EntityBlockDecoLab
 EntityBlockDecoLabel::EntityBlockDecoLabel(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	: EntityBlockDecoration(_ID, _parent, _obs, _ms)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "Tree/Image";
-	icon.hiddenIcon = "Tree/Image";
-	setNavigationTreeIcon(icon);
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Tree/Image");
+	treeItem.setHiddenIcon("Tree/Image");
+	setDefaultTreeItem(treeItem);
 
 	setBlockTitle("Image");
 

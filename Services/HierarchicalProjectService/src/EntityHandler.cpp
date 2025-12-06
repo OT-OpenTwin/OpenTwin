@@ -282,7 +282,7 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 	blockEntity.setName(newDocumentName);
 	blockEntity.setGraphicsScenePackageChildName(c_documentsFolderName);
 	blockEntity.createProperties();
-	blockEntity.setEditable(true);
+	blockEntity.setTreeItemEditable(true);
 	blockEntity.setCoordinateEntityID(coord.getEntityID());
 	blockEntity.setDocument(dataEntity, dataTypeString, extensionString);
 	blockEntity.storeToDataBase();
@@ -369,7 +369,7 @@ void EntityHandler::addImage(const std::string& _fileName, const std::string& _f
 	backgroundImageEntity.setName(CreateNewUniqueTopologyName(c_decorationFolder, newName));
 	backgroundImageEntity.setGraphicsScenePackageChildName(c_decorationFolderName);
 	backgroundImageEntity.createProperties();
-	backgroundImageEntity.setEditable(true);
+	backgroundImageEntity.setTreeItemEditable(true);
 	backgroundImageEntity.setCoordinateEntityID(coord.getEntityID());
 	backgroundImageEntity.setImageEntity(imageDataEntity, format);
 	backgroundImageEntity.storeToDataBase();
@@ -440,7 +440,7 @@ void EntityHandler::addLabel() {
 	labelEntity.setName(CreateNewUniqueTopologyName(c_decorationFolder, "Label"));
 	labelEntity.setGraphicsScenePackageChildName(c_decorationFolderName);
 	labelEntity.createProperties();
-	labelEntity.setEditable(true);
+	labelEntity.setTreeItemEditable(true);
 	labelEntity.setCoordinateEntityID(coord.getEntityID());
 	labelEntity.setText("New Label");
 	labelEntity.storeToDataBase();
@@ -634,7 +634,7 @@ void EntityHandler::addContainer() {
 
 	EntityBlockHierarchicalContainerItem newContainer;
 
-	newContainer.setEditable(true);
+	newContainer.setTreeItemEditable(true);
 	newContainer.setEntityID(_modelComponent->createEntityUID());
 	newContainer.setName(CreateNewUniqueTopologyName(c_containerFolder, "Container"));
 	newContainer.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);

@@ -18,10 +18,9 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "EntityContainer.h"
-#include "OldTreeIcon.h"
 #include "OTCore/JSON.h"
 #include <OTCommunication/ActionTypes.h>
+#include "EntityContainer.h"
 
 // MongoDB header
 #include <bsoncxx/builder/basic/array.hpp>
@@ -32,9 +31,11 @@ EntityContainer::EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver 
 	EntityBase(ID, parent, obs, ms),
 	createVisualizationItem(true)
 {
-	m_treeIcon.size = 32;
-	m_treeIcon.visibleIcon = "ContainerVisible";
-	m_treeIcon.hiddenIcon = "ContainerHidden";
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/ContainerVisible");
+	treeItem.setHiddenIcon("Default/ContainerHidden");
+	treeItem.setSelectChilds(true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityContainer::~EntityContainer()
@@ -194,8 +195,6 @@ void EntityContainer::addStorageData(bsoncxx::builder::basic::document &storage)
 
 	storage.append(bsoncxx::builder::basic::kvp("ChildID", childID));
 	storage.append(bsoncxx::builder::basic::kvp("VisualizationItem", createVisualizationItem));
-	storage.append(bsoncxx::builder::basic::kvp("VisibleTreeIcon", m_treeIcon.visibleIcon));
-	storage.append(bsoncxx::builder::basic::kvp("HiddenTreeIcon", m_treeIcon.hiddenIcon));
 }
 
 void EntityContainer::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
@@ -236,15 +235,6 @@ void EntityContainer::readSpecificDataFromDataBase(const bsoncxx::document::view
 		createVisualizationItem = docIt->get_bool();
 	}
 
-	docIt = doc_view.find("VisibleTreeIcon");
-	if (docIt != doc_view.end()) {
-		m_treeIcon.visibleIcon = docIt->get_utf8().value.data();
-	}
-	docIt = doc_view.find("HiddenTreeIcon");
-	if (docIt != doc_view.end()) {
-		m_treeIcon.hiddenIcon = docIt->get_utf8().value.data();
-	}
-
 	resetModified();
 }
 
@@ -256,11 +246,9 @@ void EntityContainer::addVisualizationNodes(void)
 	{
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-
-		m_treeIcon.addToJsonDoc(doc);
+		
+		doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 		getObserver()->sendMessageToViewer(doc);
 	}

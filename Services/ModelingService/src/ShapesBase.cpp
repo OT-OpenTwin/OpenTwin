@@ -150,7 +150,7 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 	// Let's create the new geometry item
 	EntityGeometry *geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr);
 	geometryEntity->setName(itemName);
-	geometryEntity->setEditable(true);
+	geometryEntity->setTreeItemEditable(true);
 	geometryEntity->setBrep(shape);
 	geometryEntity->getBrepEntity()->setTransform(transform);
 	geometryEntity->registerCallbacks(

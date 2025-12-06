@@ -31,7 +31,15 @@ namespace ot {
 	public:
 		EntityTreeItem();
 		EntityTreeItem(const BasicEntityInformation& _entityInfo);
+		EntityTreeItem(const ot::ConstJsonObject& _jsonObject);
 		virtual ~EntityTreeItem() = default;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Operators
+
+		bool operator == (const EntityTreeItem& _other) const;
+		bool operator != (const EntityTreeItem& _other) const;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -44,7 +52,7 @@ namespace ot {
 
 		// Setter / Getter
 
-		void resetChangeFlags() {
+		void resetModified() {
 			m_iconsChanged = false;
 			m_isEditableChanged = false;
 			m_selectChildsChanged = false;

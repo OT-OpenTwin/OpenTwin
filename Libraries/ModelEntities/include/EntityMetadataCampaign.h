@@ -30,5 +30,4 @@ public:
 	std::string getClassName() const override { return "EntityMetadataCampaign"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override;
-	virtual void addVisualizationNodes() override;
 };

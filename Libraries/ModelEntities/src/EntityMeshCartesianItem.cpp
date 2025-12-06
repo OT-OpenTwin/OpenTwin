@@ -18,10 +18,9 @@
 // @otlicense-end
 
 
-#include "EntityMeshCartesianItem.h"
-#include "EntityMeshCartesian.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityMeshCartesian.h"
+#include "EntityMeshCartesianItem.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -34,6 +33,10 @@ EntityMeshCartesianItem::EntityMeshCartesianItem(ot::UID ID, EntityBase *parent,
 	mesh(nullptr),
 	colorRGB{0.0, 0.0, 0.0}
 {
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/MeshItemVisible");
+	treeItem.setHiddenIcon("Default/MeshItemHidden");
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityMeshCartesianItem::~EntityMeshCartesianItem()
@@ -150,22 +153,17 @@ void EntityMeshCartesianItem::addVisualizationNodes(void)
 
 void EntityMeshCartesianItem::addVisualizationItem(bool isHidden)
 {
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "MeshItemVisible";
-	treeIcons.hiddenIcon = "MeshItemHidden";
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshItem, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+	
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_FacesList, ot::JsonArray(faces, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESH_ITEM_COLOR_R, colorRGB[0], doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESH_ITEM_COLOR_G, colorRGB[1], doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESH_ITEM_COLOR_B, colorRGB[2], doc.GetAllocator());
-
-	treeIcons.addToJsonDoc(doc);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	getObserver()->sendMessageToViewer(doc, prefetchIds);

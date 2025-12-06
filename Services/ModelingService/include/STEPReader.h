@@ -23,7 +23,7 @@
 #include <list>
 #include <map>
 
-#include "OldTreeIcon.h"
+#include "OTCore/CoreTypes.h"
 
 #include "XCAFDoc_ColorTool.hxx"
 #include "XCAFDoc_ShapeTool.hxx"

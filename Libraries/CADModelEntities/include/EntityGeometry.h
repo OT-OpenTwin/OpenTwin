@@ -23,7 +23,6 @@
 #include "EntityContainer.h"
 #include "EntityBrep.h"
 #include "EntityFacetData.h"
-#include "OldTreeIcon.h"
 
 #include <string>
 
@@ -91,9 +90,6 @@ public:
 	virtual bool considerForPropertyFilter(void) override { return true; };
 	virtual bool considerChildrenForPropertyFilter(void) override { return false; };
 
-	void setOldTreeIcons(const std::string &visible, const std::string &hidden) { treeIcons.visibleIcon = visible; treeIcons.hiddenIcon = hidden; }
-	void getOldTreeIcons(std::string &visible, std::string &hidden) { visible = treeIcons.visibleIcon; hidden = treeIcons.hiddenIcon; }
-
 	bool isTextureReflective(const std::string textureType);
 
 	void storeBrep(void);
@@ -128,8 +124,6 @@ private:
 
 	long long brepStorageID;
 	long long facetsStorageID;
-
-	OldTreeIcon treeIcons;
 
 	bool showWhenSelected;
 

@@ -379,6 +379,7 @@
 #define OT_ACTION_PARAM_Detailed "Detailed"
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
+#define OT_ACTION_PARAM_TreeItem "Tree.Item"
 #define OT_ACTION_PARAM_Requested "Requested"
 #define OT_ACTION_PARAM_ModelType "ModelType"
 #define OT_ACTION_PARAM_ModelInfo "ModelInfo"
@@ -391,8 +392,9 @@
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
 #define OT_ACTION_PARAM_ReceiveBroadcast "ReceiveBroadcast"
+#define OT_ACTION_PARAM_VisualizationTypes "VisualizationTypes"
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
-#define OT_ACTION_PARAM_Visualisation_Config "Config.Visualisation"
+#define OT_ACTION_PARAM_VisualisationConfig "Visualization.Config"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
@@ -441,10 +443,6 @@
 #define OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText "UI.Label.Text"
 #define OT_ACTION_PARAM_UI_CONTROL_SelectionType "UI.Control.SelectionType"
 
-#define OT_ACTION_PARAM_UI_TREE_Name "UI.Tree.Name"
-#define OT_ACTION_PARAM_UI_TREE_IconSize "UI.Tree.IconSize"
-#define OT_ACTION_PARAM_UI_TREE_IconItemVisible "UI.Tree.ItemVisibleIcon"
-#define OT_ACTION_PARAM_UI_TREE_IconItemHidden "UI.Tree.ItemHiddenIcon"
 #define OT_ACTION_PARAM_UI_TREE_Items "UI.Tree.Items"
 #define OT_ACTION_PARAM_UI_TREE_SelectedItems "UI.Tree.SelectedItems"
 

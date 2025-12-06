@@ -236,11 +236,10 @@ void ViewerComponent::clearTree(void) {
 	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to clear naviagtion tree.", _e.what()); }
 }
 
-ot::UID ViewerComponent::addTreeItem(const std::string& treePath, bool editable, bool selectChildren) {
+ot::UID ViewerComponent::addTreeItem(const ot::EntityTreeItem& _treeItem) {
 	try {
 		try {
-			ot::UID id = AppBase::instance()->addNavigationTreeItem(treePath.c_str(), '/', editable, selectChildren);
-			return id;
+			return AppBase::instance()->addNavigationTreeItem(_treeItem);
 		}
 		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::addTreeItem()"); }
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addTreeItem()"); }
@@ -250,12 +249,12 @@ ot::UID ViewerComponent::addTreeItem(const std::string& treePath, bool editable,
 	return 0;
 }
 
-void ViewerComponent::setTreeItemIcon(ot::UID treeItemID, int iconSize, const std::string& iconName) {
+void ViewerComponent::setTreeItemIcon(ot::UID _treeItemID, const std::string& _iconName) {
 	try {
 		try {
-			if (!iconName.empty()) {
+			if (!_iconName.empty()) {
 				//NOTE, add proper item path
-				AppBase::instance()->setNavigationTreeItemIcon(treeItemID, iconName.c_str(), "Default");
+				AppBase::instance()->setNavigationTreeItemIcon(_treeItemID, _iconName.c_str(), "Default");
 			}
 		}
 		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::setTreeItemIcon()"); }
@@ -850,90 +849,6 @@ void ViewerComponent::selectObject(ModelUIDtype visualizationModelID, ot::UID en
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::selectObject()"); }
 	}
 	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to select object.", _e.what()); }
-}
-
-void ViewerComponent::addNodeFromFacetData(ViewerUIDtype visModelID, const std::string& treeName, double surfaceColorRGB[3],
-	double edgeColorRGB[3], ViewerUIDtype modelEntityID, const OldTreeIcon& treeIcons, bool backFaceCulling, double offsetFactor, bool isEditable, std::vector<Geometry::Node>& nodes,
-	std::list<Geometry::Triangle>& triangles, std::list<Geometry::Edge>& edges, std::map<ot::UID, std::string>& faceNameMap, std::string& errors,
-	bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected) {
-	try {
-		try {
-			ViewerAPI::addNodeFromFacetData(visModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons,
-				backFaceCulling, offsetFactor, isEditable, nodes, triangles, edges, faceNameMap, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
-		}
-		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::addNodeFromFacetData()"); }
-		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addNodeFromFacetData()"); }
-		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addNodeFromFacetData()"); }
-	}
-	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to add node from facet data.", _e.what()); }
-}
-
-void ViewerComponent::addNodeFromFacetDataBase(ViewerUIDtype visModelID, const std::string& treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string& materialType, const std::string& textureType, bool reflective, ModelUIDtype modelEntityID, const OldTreeIcon& treeIcons, bool backFaceCulling,
-	double offsetFactor, bool isHidden, bool isEditable, const std::string& projectName, ot::UID entityID, ot::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double>& transformation
-) {
-	try {
-		ViewerAPI::addNodeFromFacetDataBase(visModelID, treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective, modelEntityID, treeIcons,
-			backFaceCulling, offsetFactor, isHidden, isEditable, projectName, entityID, entityVersion, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation);
-	}
-	catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::addNodeFromFacetData()"); }
-	catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addNodeFromFacetData()"); }
-	catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addNodeFromFacetData()"); }
-}
-
-void ViewerComponent::addVisualizationContainerNode(ViewerUIDtype visModelID, const std::string& treeName, ViewerUIDtype modelEntityID, const OldTreeIcon& treeIcons, bool editable, const ot::VisualisationTypes& _visualisationTypes) {
-	try {
-		try {
-			ViewerAPI::addVisualizationContainerNode(visModelID, treeName, modelEntityID, treeIcons, editable, _visualisationTypes);
-		}
-		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::addVisualizationContainerNode()"); }
-		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addVisualizationContainerNode()"); }
-		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addVisualizationContainerNode()"); }
-	}
-	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to add visualization container node.", _e.what()); }
-}
-
-void ViewerComponent::addVisualizationVis2D3DNode(ViewerUIDtype visModelID, const std::string& treeName, ModelUIDtype modelEntityID, const OldTreeIcon& treeIcons, bool isHidden, bool editable, const std::string& projectName, ViewerUIDtype visualizationDataID, ViewerUIDtype visualizationDataVersion) {
-	try {
-		try {
-			ViewerAPI::addVTKNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, editable, projectName, visualizationDataID, visualizationDataVersion);
-		}
-		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::addVisualizationVis2D3DNode()"); }
-		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addVisualizationVis2D3DNode()"); }
-		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addVisualizationVis2D3DNode()"); }
-	}
-	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to add visualization 2D3D node.", _e.what()); }
-}
-
-void ViewerComponent::updateVisualizationVis2D3DNode(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, const std::string& projectName, ViewerUIDtype visualizationDataID, ViewerUIDtype visualizationDataVersion) {
-	try {
-		try {
-			ViewerAPI::updateVTKNode(visModelID, modelEntityID, projectName, visualizationDataID, visualizationDataVersion);
-		}
-		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::updateVisualizationVis2D3DNode()"); }
-		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::updateVisualizationVis2D3DNode()"); }
-		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::updateVisualizationVis2D3DNode()"); }
-	}
-	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to update visualization 2D3D node.", _e.what()); }
-}
-
-void ViewerComponent::addVisualizationAnnotationNode(ViewerUIDtype visModelID, const std::string& treeName, ViewerUIDtype modelEntityID, const OldTreeIcon& treeIcons, bool isHidden,
-	const double edgeColorRGB[3],
-	const std::vector<std::array<double, 3>>& points,
-	const std::vector<std::array<double, 3>>& points_rgb,
-	const std::vector<std::array<double, 3>>& triangle_p1,
-	const std::vector<std::array<double, 3>>& triangle_p2,
-	const std::vector<std::array<double, 3>>& triangle_p3,
-	const std::vector<std::array<double, 3>>& triangle_rgb) {
-	try {
-		try {
-			ViewerAPI::addVisualizationAnnotationNode(visModelID, treeName, modelEntityID, treeIcons, isHidden, edgeColorRGB,
-				points, points_rgb, triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
-		}
-		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::addVisualizationAnnotationNode()"); }
-		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addVisualizationAnnotationNode()"); }
-		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addVisualizationAnnotationNode()"); }
-	}
-	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to add visualization annotation node.", _e.what()); }
 }
 
 void ViewerComponent::updateObjectColor(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string& materialType, const std::string& textureType, bool reflective) {

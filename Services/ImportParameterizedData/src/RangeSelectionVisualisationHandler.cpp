@@ -249,7 +249,7 @@ bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 	visualisationCfg.setVisualisingEntities(_visualizingEntities);
 	ot::JsonObject visualisationCfgJSon;
 	visualisationCfg.addToJsonObject(visualisationCfgJSon, document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJSon, document.GetAllocator());
+	document.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, document.GetAllocator());
 
 	document.AddMember(OT_ACTION_PARAM_KeepCurrentEntitySelection, true, document.GetAllocator());
 	

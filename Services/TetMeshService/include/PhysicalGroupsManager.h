@@ -32,8 +32,6 @@ class EntityMesh;
 class TopoDS_Shape;
 class TopoDS_TShape;
 
-#include "OldTreeIcon.h"
-
 #include <list>
 #include <vector>
 #include <map>

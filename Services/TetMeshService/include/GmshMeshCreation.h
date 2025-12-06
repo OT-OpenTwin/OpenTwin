@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include "OldTreeIcon.h"
-
 class EntityBase;
 class EntityMeshTet;
 class EntityMeshTetItem;
@@ -31,6 +29,8 @@ class EntityPropertiesEntityList;
 class SelfIntersectionCheck;
 class EntityAnnotation;
 class Application;
+
+#include "OTCore/CoreTypes.h"
 
 #include <vector>
 #include <string>

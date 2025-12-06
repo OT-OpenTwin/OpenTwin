@@ -19,11 +19,9 @@
 
 #pragma once
 
-// Viewer header
-#include "OldTreeIcon.h"
-
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
+#include "OTGui/EntityTreeItem.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
 
@@ -91,7 +89,7 @@ public:
 
 	virtual void createTree(void) {};
 	virtual void clearTree(void) {};
-	virtual ot::UID addTreeItem(const std::string& treePath, bool editable, bool selectChildren) { return 0; };
+	virtual ot::UID addTreeItem(const ot::EntityTreeItem& _treeItem) { return 0; };
 	virtual void removeTreeItems(std::list<ot::UID> treeItemIDList) {};
 	virtual void selectTreeItem(ot::UID treeItemID) {};
 	virtual void selectSingleTreeItem(ot::UID treeItemID) {};
@@ -99,8 +97,8 @@ public:
 	virtual bool isTreeItemExpanded(ot::UID treeItemID) { return false; };
 	virtual void toggleTreeItemSelection(ot::UID treeItemID, bool considerChilds) {};
 	virtual void clearTreeSelection(void) {};
-	virtual void setTreeItemIcon(ot::UID treeItemID, int iconSize, const std::string& iconName) {};
-	virtual void setTreeItemText(ot::UID treeItemID, const std::string& text) {};
+	virtual void setTreeItemIcon(ot::UID _treeItemID, const std::string& _iconName) {};
+	virtual void setTreeItemText(ot::UID _treeItemID, const std::string& _text) {};
 	virtual void refreshSelection(void) {};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

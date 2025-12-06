@@ -68,7 +68,6 @@ Application::~Application()
 
 }
 
-
 void Application::runPipeline()
 {
 	ot::UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockType::ModelWrite);

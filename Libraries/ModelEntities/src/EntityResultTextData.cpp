@@ -18,9 +18,8 @@
 // @otlicense-end
 
 
-#include "EntityResultTextData.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityResultTextData.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

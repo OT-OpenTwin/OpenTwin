@@ -18,12 +18,11 @@
 // @otlicense-end
 
 
+#include "DataBase.h"
 #include "EntityMeshTetData.h"
 #include "EntityMeshTetNodes.h"
 #include "EntityMeshTetFace.h"
 #include "EntityMeshTetFaceData.h"
-#include "DataBase.h"
-#include "OldTreeIcon.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -39,7 +38,10 @@ EntityMeshTetData::EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObser
 	meshFacesStorageId(-1),
 	gmshDataStorageId(-1)
 {
-	
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/ContainerVisible");
+	treeItem.setHiddenIcon("Default/ContainerHidden");
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityMeshTetData::~EntityMeshTetData()
@@ -312,10 +314,6 @@ void EntityMeshTetData::addVisualizationItem(void)
 {
 	if (getObserver() == nullptr) return;
 
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "ContainerVisible";
-	treeIcons.hiddenIcon = "ContainerHidden";
 	double edgeColorRGB[3] = { 1.0, 1.0, 1.0 };
 
 	bool displayTetEdges = false;
@@ -327,8 +325,10 @@ void EntityMeshTetData::addVisualizationItem(void)
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshNodeFromFacetDatabase, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+	
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_R, edgeColorRGB[0], doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_G, edgeColorRGB[1], doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_B, edgeColorRGB[2], doc.GetAllocator());
@@ -336,8 +336,6 @@ void EntityMeshTetData::addVisualizationItem(void)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, this->getCurrentEntityVersion(this->getEntityID()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES, displayTetEdges, doc.GetAllocator());
-
-	treeIcons.addToJsonDoc(doc);
 
 	getObserver()->sendMessageToViewer(doc);
 }

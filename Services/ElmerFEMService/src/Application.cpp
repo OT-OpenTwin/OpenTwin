@@ -165,7 +165,7 @@ void Application::addSolver(void) {
 	// Create the new solver item and store it in the data base
 	EntitySolverElmerFEM*solverEntity = new EntitySolverElmerFEM(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
-	solverEntity->setEditable(true);
+	solverEntity->setTreeItemEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);
 	solverEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |

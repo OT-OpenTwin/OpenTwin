@@ -26,38 +26,14 @@ static EntityFactoryRegistrar<EntitySignalType> registrar("EntitySignalType");
 EntitySignalType::EntitySignalType(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityContainer(ID, parent, obs, ms)
 {
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/Signal");
+	treeItem.setHiddenIcon("Default/Signal");
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntitySignalType::~EntitySignalType()
 {
-}
-
-void EntitySignalType::addVisualizationNodes(void)
-{
-	if (!getName().empty())
-	{
-		OldTreeIcon treeIcons;
-		treeIcons.size = 32;
-		treeIcons.visibleIcon = "Signal";
-		treeIcons.hiddenIcon = "Signal";
-
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-
-		treeIcons.addToJsonDoc(doc);
-
-		getObserver()->sendMessageToViewer(doc);
-	}
-
-	for (auto child : getChildrenList())
-	{
-		child->addVisualizationNodes();
-	}
-
-	EntityBase::addVisualizationNodes();
 }
 
 bool EntitySignalType::updateFromProperties(void)

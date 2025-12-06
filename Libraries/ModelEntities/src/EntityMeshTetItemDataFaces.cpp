@@ -17,10 +17,8 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "EntityMeshTetItemDataFaces.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityMeshTetItemDataFaces.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

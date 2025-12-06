@@ -44,7 +44,13 @@
 static EntityFactoryRegistrar<EntityFileCSV> registrar(EntityFileCSV::className());
 
 EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms)
-: EntityFileText(ID, parent, obs, ms) {}
+	: EntityFileText(ID, parent, obs, ms) 
+{
+	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
+	visTypes.visualiseAsTable();
+	visTypes.visualiseAsText();
+	this->setDefaultVisualizationTypes(visTypes);
+}
 
 bool EntityFileCSV::updateFromProperties(void)
 {

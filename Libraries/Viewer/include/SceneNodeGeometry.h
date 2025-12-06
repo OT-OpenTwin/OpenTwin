@@ -53,27 +53,27 @@ public:
 	SceneNodeGeometry();
 	virtual ~SceneNodeGeometry();
 
-	void setTriangles(osg::Node *t) { triangles = t; };
-	void setEdges(osg::Node* e) { edges = e; };
-	void setEdgesHighlighted(osg::Node *e) { edgesHighlighted = e; };
-	void setFaceEdgesHighlighted(osg::Switch *e) { faceEdgesHighlightNode = e; };
-	void setMaterialType(const std::string &material) { materialType = material; }
-	void setTextureType(const std::string &texture, bool reflect) { textureType = texture; reflective = reflect; }
+	void setTriangles(osg::Node *t) { m_triangles = t; };
+	void setEdges(osg::Node* e) { m_edges = e; };
+	void setEdgesHighlighted(osg::Node *e) { m_edgesHighlighted = e; };
+	void setFaceEdgesHighlighted(osg::Switch *e) { m_faceEdgesHighlightNode = e; };
+	void setMaterialType(const std::string &material) { m_materialType = material; }
+	void setTextureType(const std::string &texture, bool reflect) { m_textureType = texture; m_reflective = reflect; }
 	void setMaterialProperties(osg::ref_ptr<osg::Material>& mat,double r , double g, double b);
-	void setTransformation(std::vector<double> &transformation);
+	void setTransformation(const std::vector<double>& _transformation);
 	void setHighlightNode(osg::Node* highlight);
 
 	osg::Matrix getTransformation(void);
 	osg::Matrix getParentTransformation(void);
-	osg::Matrix getOwnTransformation(void) { return transformationMatrix; }
-	void		setOwnTransformation(const osg::Matrix &matrix) { transformationMatrix = matrix; }
+	osg::Matrix getOwnTransformation(void) { return m_transformationMatrix; }
+	void		setOwnTransformation(const osg::Matrix &matrix) { m_transformationMatrix = matrix; }
 
 	void applyTransform(osg::Matrix matrix);
 
-	osg::Node *getTriangles(void) { return triangles; };
-	osg::Node* getEdges(void) { return edges; };
-	osg::Node *getEdgesHighlighted(void) { return edgesHighlighted; };
-	osg::Switch *getFaceEdgesHighlight(void) { return faceEdgesHighlightNode; };
+	osg::Node *getTriangles(void) { return m_triangles; };
+	osg::Node* getEdges(void) { return m_edges; };
+	osg::Node *getEdgesHighlighted(void) { return m_edgesHighlighted; };
+	osg::Switch *getFaceEdgesHighlight(void) { return m_faceEdgesHighlightNode; };
 
 	void setEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2);
 
@@ -83,37 +83,37 @@ public:
 	virtual void setHighlighted(bool h) override;
 	virtual ot::SelectionHandlingResult setSelected(bool selected, const ot::SelectionData& _selectionData, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes) override;
 
-	void setShowWhenSelected(bool flag) { showWhenSelected = flag; };
+	void setShowWhenSelected(bool flag) { m_showWhenSelected = flag; };
 
 	void initializeFromFacetData(std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string> &faceNameMap);
 	//void assignMaterial(const std::string & materialType);
 	void updateObjectColor(double surfaceColorRGB[3], const double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective);
-	void updateObjectFacetsFromDataBase(unsigned long long entityID, unsigned long long entityVersion);
+	void updateObjectFacetsFromDataBase(ot::UID _dataEntityID, ot::UID _dataEntityVersion);
 
 	void setEdgeHighlight(unsigned long long faceId, bool h, double thickness);
-	unsigned long long getFaceIdFromTriangleIndex(unsigned long long index) { return triangleToFaceId[index]; };
+	unsigned long long getFaceIdFromTriangleIndex(unsigned long long index) { return m_triangleToFaceId[index]; };
 	ot::UID getFaceIdFromEdgePrimitiveIndex(unsigned long long hitIndex);
 
 	std::string getFaceNameFromId(unsigned long long faceId);
 
 	std::string getEdgeNameFromFaceIds(unsigned long long faceId1, unsigned long long faceId2);
 
-	void setSurfaceColorRGB(double color[3]) { surfaceColorRGB[0] = color[0]; surfaceColorRGB[1] = color[1]; surfaceColorRGB[2] = color[2]; };
-	void setEdgeColorRGB(double color[3]) { edgeColorRGB[0] = color[0]; edgeColorRGB[1] = color[1]; edgeColorRGB[2] = color[2]; };
-	void setBackFaceCulling(bool b) { backFaceCulling = b; };
-	void setOffsetFactor(double o) { offsetFactor = o; };
-	void setStorage(const std::string &proj, unsigned long long id, unsigned long long version) { projectName = proj; entityID = id, entityVersion = version; };
+	void setSurfaceColorRGB(double color[3]) { m_surfaceColorRGB[0] = color[0]; m_surfaceColorRGB[1] = color[1]; m_surfaceColorRGB[2] = color[2]; };
+	void setEdgeColorRGB(double color[3]) { m_edgeColorRGB[0] = color[0]; m_edgeColorRGB[1] = color[1]; m_edgeColorRGB[2] = color[2]; };
+	void setBackFaceCulling(bool b) { m_backFaceCulling = b; };
+	void setOffsetFactor(double o) { m_offsetFactor = o; };
+	void setStorage(const std::string &proj, ot::UID _dataID, ot::UID _dataVersion) { m_projectName = proj; m_dataEntityID = _dataID, m_dataEntityVersion = _dataVersion; };
 
-	void getSurfaceColorRGB(double color[3]) { color[0] = surfaceColorRGB[0]; color[1] = surfaceColorRGB[1]; color[2] = surfaceColorRGB[2]; };
+	void getSurfaceColorRGB(double color[3]) { color[0] = m_surfaceColorRGB[0]; color[1] = m_surfaceColorRGB[1]; color[2] = m_surfaceColorRGB[2]; };
 
-	void setNeedsInitialization(void) { needsInitialization = true; };
+	void setNeedsInitialization(void) { m_needsInitialization = true; };
 	
-	std::string getProjectName(void) { return projectName; };
+	std::string getProjectName(void) { return m_projectName; };
 
 	void initializeFromDataStorage(void);
 
-	Model *getModel(void) { return model; };
-	void setModel(Model *m) { model = m; };
+	Model *getModel(void) { return m_model; };
+	void setModel(Model *m) { m_model = m; };
 
 	virtual bool isItem3D(void) const override { return true; };
 
@@ -146,38 +146,38 @@ private:
 	double getActualEdgeColor(const double color[], int index);
 	void setEdgesColor(const double color[]);
 
-	osg::Node   *      triangles;
-	osg::Node   *      edges;
-	osg::Node	*	   edgesHighlighted;
-	osg::Switch *      faceEdgesHighlightNode;
-	osg::Node   *      highlightNode;
+	osg::Node* m_triangles;
+	osg::Node* m_edges;
+	osg::Node* m_edgesHighlighted;
+	osg::Switch* m_faceEdgesHighlightNode;
+	osg::Node* m_highlightNode;
 
-	std::map<unsigned long long, osg::Node *> faceEdgesHighlight;
-	std::vector<unsigned long long> triangleToFaceId;
-	std::map<ot::UID, std::string> faceIdToNameMap;
-	std::vector<unsigned long long> edgeStartIndex;
-	std::vector<ot::UID> edgeFaceId;
+	std::map<unsigned long long, osg::Node *> m_faceEdgesHighlight;
+	std::vector<unsigned long long> m_triangleToFaceId;
+	std::map<ot::UID, std::string> m_faceIdToNameMap;
+	std::vector<unsigned long long> m_edgeStartIndex;
+	std::vector<ot::UID> m_edgeFaceId;
 
-	double surfaceColorRGB[3];
-	double edgeColorRGB[3];
-	bool backFaceCulling;
-	double offsetFactor;
-	std::string materialType;
-	std::string textureType;
-	bool reflective;
-	bool showWhenSelected;
-	std::string projectName;
-	unsigned long long entityID;
-	unsigned long long entityVersion;
-	bool needsInitialization;
-	Model *model;
-	osg::StateAttribute *textureAttribute;
-	osg::TexGen *textureAttributeGen;
-	osg::TexEnv *textureAttributeEnv;
-	double edgeTransparency;
-	osg::Matrix transformationMatrix;
-	osg::ref_ptr<osg::Geometry> cutCapGeometryTriangles;
-	osg::ref_ptr<osg::Geometry> cutCapGeometryEdges;
-	bool enableEdgesDisplay;
+	double m_surfaceColorRGB[3];
+	double m_edgeColorRGB[3];
+	bool m_backFaceCulling;
+	double m_offsetFactor;
+	std::string m_materialType;
+	std::string m_textureType;
+	bool m_reflective;
+	bool m_showWhenSelected;
+	std::string m_projectName;
+	ot::UID m_dataEntityID;
+	ot::UID m_dataEntityVersion;
+	bool m_needsInitialization;
+	Model* m_model;
+	osg::StateAttribute* m_textureAttribute;
+	osg::TexGen* m_textureAttributeGen;
+	osg::TexEnv* m_textureAttributeEnv;
+	double m_edgeTransparency;
+	osg::Matrix m_transformationMatrix;
+	osg::ref_ptr<osg::Geometry> m_cutCapGeometryTriangles;
+	osg::ref_ptr<osg::Geometry> m_cutCapGeometryEdges;
+	bool m_enableEdgesDisplay;
 };
 

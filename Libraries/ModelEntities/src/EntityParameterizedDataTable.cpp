@@ -58,8 +58,8 @@ void EntityParameterizedDataTable::createProperties(ot::TableCfg::TableHeaderMod
 
 	if (_defaultHeaderMode == ot::TableCfg::TableHeaderMode::Vertical)
 	{
-		_minRow = 0;
-		_minCol = 1;
+		m_minRow = 0;
+		m_minCol = 1;
 	}
 
 	EntityPropertiesSelection::createProperty("Table header", "Header position", { 

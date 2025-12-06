@@ -86,7 +86,7 @@ ot::JsonDocument TextVisualiser::createRequestDoc(const VisualiserState& _state,
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
 
 	return doc;
 }

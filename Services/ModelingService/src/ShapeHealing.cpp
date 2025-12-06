@@ -78,7 +78,7 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	{
 		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(shape.getEntityID(), shape.getEntityVersion()));
 
-		if (geometryEntity->getEditable())
+		if (geometryEntity->getTreeItemEditable())
 		{
 			long long brepPrefetchID = geometryEntity->getBrepPrefetchID();
 

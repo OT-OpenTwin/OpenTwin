@@ -51,12 +51,12 @@ std::string BlendEdges::getOperationDescription()
 
 std::string BlendEdges::getVisibleTreeItemName()
 {
-	return "BlendEdgesVisible";
+	return "Default/BlendEdgesVisible";
 }
 
 std::string BlendEdges::getHiddenTreeItemName()
 {
-	return "BlendEdgesHidden";
+	return "Default/BlendEdgesHidden";
 }
 
 std::string BlendEdges::getShapeType()

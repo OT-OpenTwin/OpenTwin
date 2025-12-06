@@ -64,13 +64,13 @@ EntityMaterial* MaterialHandler::createNewMaterial(const std::string& _materialN
 		GeometryOperations::EntityList allNewEntities;
 		model->addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, model->getRootNode(), true, allNewEntities);
 
-		model->addVisualizationContainerNode(entityMaterialRoot->getName(), entityMaterialRoot->getEntityID(), entityMaterialRoot->getEditable());
+		model->addVisualizationContainerNode(entityMaterialRoot->getName(), entityMaterialRoot->getEntityID(), entityMaterialRoot->getTreeItemEditable());
 	}
 
 	EntityMaterial* materialItem = new EntityMaterial(model->createEntityUID(), entityMaterialRoot, model, model->getStateManager());
 
 	materialItem->setName(_materialName);
-	materialItem->setEditable(true);
+	materialItem->setTreeItemEditable(true);
 	entityMaterialRoot->addChild(materialItem);
 
 	model->addEntityToMap(materialItem);
@@ -243,12 +243,8 @@ void MaterialHandler::handleCreateNewMaterial() {
 	EntityMaterial* materialItem = createNewMaterial(materialName);
 
 	// Here we also need to add a new visualitation container item to the visualization model
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "MaterialVisible";
-	treeIcons.hiddenIcon = "MaterialHidden";
 	ot::UID visualizationModelID = model->getVisualizationModel();
-	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, materialName, materialItem->getEntityID(), treeIcons, materialItem->getEditable());
+	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, materialItem->getTreeItem(), materialItem->getVisualizationTypes());
 
 	model->setModified();
 

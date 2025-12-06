@@ -22,14 +22,15 @@
 
 // OpenTwin header
 #include "ModelState.h"
-#include "OldTreeIcon.h"
 #include "EntityProperties.h"
 #include "EntityCallbackBase.h"
 #include "EntityFactoryRegistrar.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/BasicEntityInformation.h"
+#include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
+#include "OTGui/VisualisationTypes.h"
 
 // BSON header
 #include <bsoncxx/json.hpp>
@@ -52,8 +53,8 @@ public:
 	virtual void entityRemoved(EntityBase *entity) {};
 	virtual void entityModified(EntityBase *entity) {};
 
-	virtual void sendMessageToViewer(ot::JsonDocument& doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(doc, prefetchIds); };
-	virtual void sendMessageToViewer(ot::JsonDocument& doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {};
+	virtual void sendMessageToViewer(ot::JsonDocument& _doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(_doc, prefetchIds); };
+	virtual void sendMessageToViewer(ot::JsonDocument& _doc, std::list<std::pair<ot::UID, ot::UID>>& _prefetchIds) {};
 	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _elementType) {};
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
@@ -72,25 +73,22 @@ public:
 	static void setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator);
 	static DataStorageAPI::UniqueUIDGenerator *getUidGenerator();
 
-	void setName(std::string n) { m_name = n; setModified(); };
-	std::string getName() const { return m_name; };
+	void setName(const std::string& _name);
+	std::string getName() const { return m_treeItem.getEntityName(); };
 
 	//! @brief Returns the name of the entity without the parent entity names.
 	//! If the name is "root/entity" then the function will return "entity".
 	std::string getNameOnly() const;
 
-	virtual void setEntityID(ot::UID id) { m_entityID = id; setModified(); };
-	ot::UID getEntityID() const { return m_entityID; };
+	virtual void setEntityID(ot::UID _id);
+	ot::UID getEntityID() const { return m_treeItem.getEntityID(); };
 
-	ot::UID getEntityStorageVersion() const { return m_entityStorageVersion; };
+	ot::UID getEntityStorageVersion() const { return m_treeItem.getEntityVersion(); };
 
-	ot::BasicEntityInformation getBasicEntityInformation() const { return ot::BasicEntityInformation(m_name, m_entityID, m_entityStorageVersion); };
+	ot::BasicEntityInformation getBasicEntityInformation() const { return m_treeItem; };
 
 	void setInitiallyHidden(bool flag) { m_initiallyHidden = flag; };
 	bool getInitiallyHidden() { return m_initiallyHidden; };
-
-	void setEditable(bool flag) { m_isEditable = flag; }
-	bool getEditable() { return m_isEditable; }
 
 	void setSelectChildren(bool flag) { m_selectChildren = flag; }
 	bool getSelectChildren() { return m_selectChildren; }
@@ -122,13 +120,13 @@ public:
 	EntityProperties& getProperties() { return m_properties; };
 	const EntityProperties& getProperties() const { return m_properties; };
 
-	virtual EntityBase *getEntityFromName(const std::string &n) { if (m_name == n) return this; return nullptr; };
+	virtual EntityBase *getEntityFromName(const std::string& _name) { return (m_treeItem.getEntityName() == _name ? this : nullptr); };
 
 	virtual bool considerForPropertyFilter() { return true; };
 	virtual bool considerChildrenForPropertyFilter() { return true; };
 
 	virtual void storeToDataBase();
-	virtual void storeToDataBase(ot::UID givenEntityVersion);
+	virtual void storeToDataBase(ot::UID _givenEntityVersion);
 
 	void setModified();
 	void resetModified() { m_isModified = false; };
@@ -150,7 +148,7 @@ public:
 	virtual void detachFromHierarchy();
 
 	void setDeletable(bool deletable) { m_isDeletable = deletable; };
-	const bool deletable() const { return m_isDeletable; }
+	bool getDeletable() const { return m_isDeletable; }
 
 	//! @brief Creates a copy of the entity. The override from instantiable classes need to set the observer=nullptr and the parent=nullptr. 
 	//! Otherwise the originals are deleted from the modelstate, if the clone happens in the model service
@@ -161,17 +159,64 @@ public:
 	//! @return Empty string if entity does not support copy. 
 	virtual std::string serialiseAsJSON() { return ""; };
 
-	//! @brief Entity specific (optional) implementation of a deserialisation fro a string (copy/paste functionality). 
+	//! @brief Entity specific (optional) implementation of a deserialisation from a string (copy/paste functionality). 
 	//! In this function, it is necessary to create new IDs. Don't store the entity. Storing and unique name creation are taken care of by the model service.
 	//! @param _copyInformation Additional information from the ui are located here. E.g. the cursor position.
 	//! @param _entityMap Any entity that is deserialised in the process needs to be added to the map. This will be used for storing and adding to model state
 	//! @return true if the serialisation was successfull
-	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
 	{ 
 		return false; 
 	}
 
+	virtual ot::EntityTreeItem getTreeItem() const { return m_treeItem; };
+
+	//! @brief Sets the icon for the "entity visible" state.
+	//! @note This method should only be called to set instance specific icons.
+	//! To set the default icon of a entity the setDefaultTreeItem() method should be used.
+	void setVisibleTreeItemIcon(const std::string& _icon) { m_treeItem.setVisibleIcon(_icon); };
+
+	//! @brief Sets the icon for the "entity hidden" state.
+	//! @note This method should only be called to set instance specific icons.
+	//! To set the default icon of a entity the setDefaultTreeItem() method should be used.
+	void setHiddenTreeItemIcon(const std::string& _icon) { m_treeItem.setHiddenIcon(_icon); };
+
+	//! @brief Sets the icons for this entity.
+	//! @note This method should only be called to set instance specific icons.
+	//! To set the default icons of a entity the setDefaultTreeItem() method should be used.
+	void setTreeItemIcons(const ot::NavigationTreeItemIcon& _icons) { m_treeItem.setIcons(_icons); };
+	const ot::NavigationTreeItemIcon& getTreeItemIcons() const { return m_treeItem.getIcons(); };
+
+	//! @brief Sets the editable flag for this entity.
+	//! @note This method should only be called to set instance specific flag.
+	//! To set the default flag(s) of a entity the setDefaultTreeItem() method should be used.
+	void setTreeItemEditable(bool _editable) { m_treeItem.setIsEditable(_editable); };
+	bool getTreeItemEditable() { return m_treeItem.getIsEditable(); };
+
+	//! @brief Sets the select children flag for this entity.
+	//! @note This method should only be called to set instance specific flag.
+	//! To set the default flag(s) of a entity the setDefaultTreeItem() method should be used.
+	void setTreeItemSelectChildren(bool _selectChildren) { m_treeItem.setSelectChilds(_selectChildren); };
+	bool getTreeItemSelectChildren() { return m_treeItem.getSelectChilds(); };
+
+	void addVisualizationType(ot::VisualisationTypes::VisualisationType _type);
+	void removeVisualizationType(ot::VisualisationTypes::VisualisationType _type);
+	void setCustomVisualizationViewFlags(ot::VisualisationTypes::VisualisationType _visType, ot::WidgetViewBase::ViewFlags _flags);
+	virtual ot::VisualisationTypes getVisualizationTypes() const { return m_visualizationTypes; };
+
 protected:
+	//! @brief Will set the default tree item.
+	//! Will reset the modified flags for all entries of the tree item.
+	//! This method should be called from the constructor of a entity to set the default item.
+	//! If a custom behavior for a entity is desired use the setters for the icons and the item flags.
+	void setDefaultTreeItem(const ot::EntityTreeItem& _treeItem);
+
+	//! @brief Set the default visualization types for this entity.
+	//! @note This method should be called from the constructor of a entity to set the default visualization types config.
+	//! If a custom behavior for a entity instance is desired use the setters for single visualization types and config.
+	//! @param _types The types to set.
+	void setDefaultVisualizationTypes(const ot::VisualisationTypes& _types);
+
 	virtual void callbackDataChanged() override { setModified(); };
 
 	virtual int getSchemaVersion() { return 1; };
@@ -187,22 +232,22 @@ protected:
 
 private:
 	// Persistent attributes
-	std::string		     m_name;
-	ot::UID              m_entityID;
-	ot::UID				 m_entityStorageVersion;
-	bool                 m_initiallyHidden;
-	bool			 	 m_isEditable;
-	bool				 m_isDeletable;
-	bool				 m_selectChildren;
-	bool				 m_manageParentVisibility;
-	bool				 m_manageChildVisibility;
-	EntityProperties     m_properties;
+	bool                    m_initiallyHidden;
+	bool				    m_isDeletable;
+	bool				    m_selectChildren;
+	bool				    m_manageParentVisibility;
+	bool				    m_manageChildVisibility;
+	EntityProperties        m_properties;
+
+	// Optionally persistent attributes
+	ot::EntityTreeItem      m_treeItem;           // Holds name, id, version and tree item information (persistent), other info is stored when modified
+	ot::VisualisationTypes  m_visualizationTypes; // Only stored when modified
 
 	// Temporary attributes
-	EntityBase*          m_parentEntity;
-	EntityObserver*      m_observer;
-	bool			     m_isModified;
-	ModelState*          m_modelState;
+	EntityBase*             m_parentEntity;
+	EntityObserver*         m_observer;
+	bool			        m_isModified;
+	ModelState*             m_modelState;
 };
 
 OT_ADD_FLAG_FUNCTIONS(EntityBase::Callback, EntityBase::CallbackFlags)

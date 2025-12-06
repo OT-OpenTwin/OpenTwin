@@ -141,7 +141,7 @@ void Application::createMesh(void)
 	EntityMeshCartesian *meshEntity = new EntityMeshCartesian(entityID, nullptr, nullptr, nullptr);
 
 	meshEntity->setName(meshName);
-	meshEntity->setEditable(true);
+	meshEntity->setTreeItemEditable(true);
 	meshEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |

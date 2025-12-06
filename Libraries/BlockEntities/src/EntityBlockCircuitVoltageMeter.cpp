@@ -33,10 +33,10 @@ static EntityFactoryRegistrar<EntityBlockCircuitVoltageMeter> registrar(EntityBl
 EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "VoltMeter";
-	icon.hiddenIcon = "VoltMeter";
-	setNavigationTreeIcon(icon);
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/VoltMeter");
+	treeItem.setHiddenIcon("Default/VoltMeter");
+	this->setDefaultTreeItem(treeItem);
 
 	setBlockTitle("VM");
 

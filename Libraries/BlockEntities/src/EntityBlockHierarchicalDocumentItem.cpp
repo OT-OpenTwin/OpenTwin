@@ -28,11 +28,16 @@
 static EntityFactoryRegistrar<EntityBlockHierarchicalDocumentItem> registrar(EntityBlockHierarchicalDocumentItem::className());
 
 EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
-	: EntityBlock(_ID, _parent, _obs, _ms), m_documentUID(ot::invalidUID), m_documentVersion(ot::invalidUID), m_documentData(nullptr) {
-	OldTreeIcon icon;
-	icon.visibleIcon = "Hierarchical/Document";
-	icon.hiddenIcon = "Hierarchical/Document";
-	setNavigationTreeIcon(icon);
+	: EntityBlock(_ID, _parent, _obs, _ms), m_documentUID(ot::invalidUID), m_documentVersion(ot::invalidUID), m_documentData(nullptr)
+{
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Hierarchical/Document");
+	treeItem.setHiddenIcon("Hierarchical/Document");
+	this->setDefaultTreeItem(treeItem);
+
+	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
+	visTypes.visualiseAsText();
+	this->setDefaultVisualizationTypes(visTypes);
 
 	setBlockTitle("Hierarchical Document Item");
 

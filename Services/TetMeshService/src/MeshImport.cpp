@@ -130,7 +130,7 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 	EntityPropertiesString::createProperty("General", "File name", originalName, "", meshEntity->getProperties());
 
 	meshEntity->setName(meshName);
-	meshEntity->setEditable(true);
+	meshEntity->setTreeItemEditable(true);
 
 	// Create a new empty data entity
 	meshEntity->getMeshData()->setName(meshEntity->getName() + "/Mesh");

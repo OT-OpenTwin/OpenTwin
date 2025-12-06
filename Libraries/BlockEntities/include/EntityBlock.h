@@ -25,7 +25,6 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "EntityCoordinates2D.h"
-#include "OldTreeIcon.h"
 #include "EntityNamingBehavior.h"
 
 #include "Connector.h"
@@ -76,7 +75,7 @@ public:
 	std::string createBlockHeadline();
 
 	virtual std::string serialiseAsJSON() override;
-	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
 
 	void createBlockItem();
 
@@ -95,9 +94,6 @@ protected:
 	void createNavigationTreeEntry();
 	void addConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
 
-	void setNavigationTreeIcon(const OldTreeIcon& icon) { m_navigationTreeIcon = icon; setModified(); };
-	const OldTreeIcon& getNavigationTreeIcon() const { return m_navigationTreeIcon; };
-
 	void setBlockTitle(const std::string& title) { m_blockTitle = title; setModified(); };
 
 private:
@@ -107,7 +103,6 @@ private:
 	std::string	m_graphicsScenePackageChildName = "";
 
 	std::string m_graphicsPickerKey;
-	OldTreeIcon m_navigationTreeIcon;
 
 	std::map<std::string, ot::Connector> m_connectorsByName;
 };

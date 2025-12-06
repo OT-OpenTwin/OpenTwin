@@ -25,7 +25,6 @@
 #include "Application.h"
 
 #include "Model.h"
-#include "OldTreeIcon.h"
 
 // OpenTwin header
 #include "DataBase.h"
@@ -348,93 +347,29 @@ void MicroserviceNotifier::refreshAllViews(ot::UID visualizationModelID)
 	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::addVisualizationNodeFromFacetData(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-															 double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors,
-															 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
-{
-	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData);
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, rapidjson::Value(treeName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, surfaceColorRGB, 3);
-	MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, edgeColorRGB, 3);
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, rapidjson::Value(modelEntityID), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, rapidjson::Value(backFaceCulling), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, rapidjson::Value(offsetFactor), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, rapidjson::Value(isEditable), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SelectChildren, rapidjson::Value(selectChildren), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageParentVis, rapidjson::Value(manageParentVisibility), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, rapidjson::Value(manageChildVisibility), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, rapidjson::Value(showWhenSelected), inDoc.GetAllocator());
-
-	MicroserviceAPI::AddNodeToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_Nodes, nodes);
-	MicroserviceAPI::AddTriangleToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_Triangles, triangles);
-	MicroserviceAPI::AddEdgeToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_Edges, edges);
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Errors, rapidjson::Value(errors.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	MicroserviceAPI::addOldTreeIconsToJsonDoc(inDoc, treeIcons);
-
-	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
-}
-
-void MicroserviceNotifier::addVisualizationNodeFromFacetDataBase(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-																 double offsetFactor, bool isHidden, bool isEditable, const std::string & collectionName, ot::UID entityID, ot::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation)
-{
-	ot::JsonDocument inDoc;
-	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, visModelID, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(treeName, inDoc.GetAllocator()), inDoc.GetAllocator());
-	MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, surfaceColorRGB, 3);
-	MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, edgeColorRGB, 3);
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_MaterialType, ot::JsonString(materialType, inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureType, ot::JsonString(textureType, inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureReflective, textureReflective, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, modelEntityID, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, backFaceCulling, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, offsetFactor, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, isEditable, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, entityID, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, entityVersion, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SelectChildren, selectChildren, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageParentVis, manageParentVisibility, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, manageChildVisibility, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, showWhenSelected, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Transformation, ot::JsonArray(transformation, inDoc.GetAllocator()), inDoc.GetAllocator());
-
-	MicroserviceAPI::addOldTreeIconsToJsonDoc(inDoc, treeIcons);
-
-	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(entityID, entityVersion));
-	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
-}
-
-void MicroserviceNotifier::addVisualizationContainerNode(ot::UID visModelID, const std::string &treeName, ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool isEditable)
+void MicroserviceNotifier::addVisualizationContainerNode(ot::UID visModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visTypes)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_AddContainerNode);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, rapidjson::Value(treeName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, rapidjson::Value(modelEntityID), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, rapidjson::Value(isEditable), inDoc.GetAllocator());
-	MicroserviceAPI::addOldTreeIconsToJsonDoc(inDoc, treeIcons);
+	inDoc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(_treeItem, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(_visTypes, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::addVisualizationAnnotationNode(ot::UID visModelID, const std::string &name, ot::UID uid, const OldTreeIcon &treeIcons, bool isHidden,
-														  const double edgeColorRGB[3],
-														  const std::vector<std::array<double, 3>> &points,
-														  const std::vector<std::array<double, 3>> &points_rgb,
-														  const std::vector<std::array<double, 3>> &triangle_p1,
-														  const std::vector<std::array<double, 3>> &triangle_p2,
-														  const std::vector<std::array<double, 3>> &triangle_p3,
-														  const std::vector<std::array<double, 3>> &triangle_rgb)
+void MicroserviceNotifier::addVisualizationAnnotationNode(ot::UID visModelID, const ot::EntityTreeItem& _treeItem, bool isHidden,
+	const double edgeColorRGB[3],
+	const std::vector<std::array<double, 3>>& points,
+	const std::vector<std::array<double, 3>>& points_rgb,
+	const std::vector<std::array<double, 3>>& triangle_p1,
+	const std::vector<std::array<double, 3>>& triangle_p2,
+	const std::vector<std::array<double, 3>>& triangle_p3,
+	const std::vector<std::array<double, 3>>& triangle_rgb)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNode);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, rapidjson::Value(name.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_UI_UID, rapidjson::Value(uid), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(_treeItem, inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, rapidjson::Value(isHidden), inDoc.GetAllocator());
 	MicroserviceAPI::AddDoubleArrayPointerToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, edgeColorRGB,3);
 	MicroserviceAPI::AddDoubleArrayVectorToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_Points, points);
@@ -443,8 +378,7 @@ void MicroserviceNotifier::addVisualizationAnnotationNode(ot::UID visModelID, co
 	MicroserviceAPI::AddDoubleArrayVectorToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_p2, triangle_p2);
 	MicroserviceAPI::AddDoubleArrayVectorToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_p3, triangle_p3);
 	MicroserviceAPI::AddDoubleArrayVectorToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_Color, triangle_rgb);
-	MicroserviceAPI::addOldTreeIconsToJsonDoc(inDoc, treeIcons);
-
+	
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }

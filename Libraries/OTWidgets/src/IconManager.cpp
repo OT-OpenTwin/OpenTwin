@@ -77,7 +77,27 @@ bool ot::IconManager::fileExists(const QString& _subPath) {
 
 const QIcon& ot::IconManager::getIcon(const QString& _subPath) {
 	IconManager& manager = IconManager::instance();
-	return *manager.getOrCreate<QIcon>(_subPath, manager.m_icons, manager.m_emptyIcon);
+	if (_subPath.contains('.')) {
+		return *manager.getOrCreate<QIcon>(_subPath, manager.m_icons, manager.m_emptyIcon);
+	}
+	else {
+		if (manager.fileExists(_subPath + ".svg")) {
+			return *manager.getOrCreate<QIcon>(_subPath + ".svg", manager.m_icons, manager.m_emptyIcon);
+		}
+		else if (manager.fileExists(_subPath + ".png")) {
+			return *manager.getOrCreate<QIcon>(_subPath + ".png", manager.m_icons, manager.m_emptyIcon);
+		}
+		else if (manager.fileExists(_subPath + ".jpg")) {
+			return *manager.getOrCreate<QIcon>(_subPath + ".jpg", manager.m_icons, manager.m_emptyIcon);
+		}
+		else if (manager.fileExists(_subPath + ".jpeg")) {
+			return *manager.getOrCreate<QIcon>(_subPath + ".jpeg", manager.m_icons, manager.m_emptyIcon);
+		}
+		else {
+			OT_LOG_E("Icon not found { \"SubPath\": \"" + _subPath.toStdString() + "\" }");
+			return *manager.m_emptyIcon;
+		}
+	}
 }
 
 const QPixmap& ot::IconManager::getPixmap(const QString& _subPath) {

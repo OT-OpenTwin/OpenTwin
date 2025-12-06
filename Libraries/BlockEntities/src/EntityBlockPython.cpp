@@ -29,11 +29,11 @@ static EntityFactoryRegistrar<EntityBlockPython> registrar(EntityBlockPython::cl
 EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlock(ID, parent, obs, ms)
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	icon.hiddenIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	setNavigationTreeIcon(icon);
-
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
+	treeItem.setHiddenIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
+	this->setDefaultTreeItem(treeItem);
+	
 	setBlockTitle("Python");
 
 	resetModified();

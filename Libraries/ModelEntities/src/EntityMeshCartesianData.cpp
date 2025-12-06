@@ -18,12 +18,11 @@
 // @otlicense-end
 
 
-#include "EntityMeshCartesianData.h"
-#include "EntityMeshCartesianFaceList.h"
-#include "EntityMeshCartesianNodes.h"
-#include "EntityCartesianVector.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityCartesianVector.h"
+#include "EntityMeshCartesianData.h"
+#include "EntityMeshCartesianNodes.h"
+#include "EntityMeshCartesianFaceList.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -61,7 +60,10 @@ EntityMeshCartesianData::EntityMeshCartesianData(ot::UID ID, EntityBase *parent,
 	matrixDsigmaStorageId(-1),
 	matrixDsigmaStorageVersion(-1)
 {
-	
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/CartesianMeshDataVisible");
+	treeItem.setHiddenIcon("Default/CartesianMeshDataHidden");
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityMeshCartesianData::~EntityMeshCartesianData()
@@ -401,17 +403,15 @@ void EntityMeshCartesianData::addVisualizationItem(bool isHidden)
 		showMesh = showMeshLines->getValue();
 	}
 
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "CartesianMeshDataVisible";
-	treeIcons.hiddenIcon = "CartesianMeshDataHidden";
 	double edgeColorRGB[3] = { 1.0, 1.0, 1.0 };
 	double meshLineColorRGB[3] = { 0.5, 0.5, 0.5 };
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshNode, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
+	
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_R, edgeColorRGB[0], doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EDGE_COLOR_G, edgeColorRGB[1], doc.GetAllocator());
@@ -428,8 +428,6 @@ void EntityMeshCartesianData::addVisualizationItem(bool isHidden)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, meshFacesStorageVersion == -1 ? 0 : (unsigned long long) meshFacesStorageVersion, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESH_NODE_ID, meshNodesStorageId == -1 ? 0 : (unsigned long long) meshNodesStorageId, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESH_NODE_VERSION, meshNodesStorageVersion == -1 ? 0 : (unsigned long long) meshNodesStorageVersion, doc.GetAllocator());
-
-	treeIcons.addToJsonDoc(doc);
 
 	getObserver()->sendMessageToViewer(doc);
 }

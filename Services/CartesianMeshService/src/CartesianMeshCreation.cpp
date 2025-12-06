@@ -460,7 +460,7 @@ void CartesianMeshCreation::addMatrixPlot(EntityResultBase::tResultType resultTy
 
 	visualizationEntity->setResultType(resultType);
 	visualizationEntity->setName(plotName);
-	visualizationEntity->setEditable(true);
+	visualizationEntity->setTreeItemEditable(true);
 	visualizationEntity->setInitiallyHidden(true);
 	visualizationEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |

@@ -6,24 +6,26 @@
 
 static EntityFactoryRegistrar<EntityPythonManifest> registrar(EntityPythonManifest::className());
 
+EntityPythonManifest::EntityPythonManifest(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+	: EntityBase(_ID, _parent, _obs, _ms) 
+{
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/TextVisible");
+	treeItem.setHiddenIcon("Default/TextHidden");
+	setDefaultTreeItem(treeItem);
+	
+	ot::VisualisationTypes visTypes = getVisualizationTypes();
+	visTypes.addTextVisualisation();
+	this->setDefaultVisualizationTypes(visTypes);
+}
+
 void EntityPythonManifest::addVisualizationNodes()
 {
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "TextVisible";
-	treeIcons.hiddenIcon = "TextHidden";
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-	ot::VisualisationTypes visTypes;
-	visTypes.addTextVisualisation();
-	visTypes.addToJsonObject(doc, doc.GetAllocator());
-
-	treeIcons.addToJsonDoc(doc);
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 }

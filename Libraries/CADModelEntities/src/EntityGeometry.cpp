@@ -46,9 +46,10 @@ EntityGeometry::EntityGeometry(ot::UID ID, EntityBase *parent, EntityObserver *o
 	brep   = new EntityBrep(0, this, obs, ms);
 	facets = new EntityFacetData(0, this, obs, ms);
 
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "ModelVisible";
-	treeIcons.hiddenIcon = "ModelHidden";
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/ModelVisible");
+	treeItem.setHiddenIcon("Default/ModelHidden");
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityGeometry::~EntityGeometry()
@@ -351,8 +352,6 @@ void EntityGeometry::addStorageData(bsoncxx::builder::basic::document &storage)
 	storage.append(
 		bsoncxx::builder::basic::kvp("Brep", brepStorageID),
 		bsoncxx::builder::basic::kvp("Facets", facetsStorageID),
-		bsoncxx::builder::basic::kvp("visibleIcon", treeIcons.visibleIcon),
-		bsoncxx::builder::basic::kvp("hiddenIcon", treeIcons.hiddenIcon),
 		bsoncxx::builder::basic::kvp("showWhenSelected", showWhenSelected)
 	);
 }
@@ -365,25 +364,6 @@ void EntityGeometry::readSpecificDataFromDataBase(const bsoncxx::document::view 
 	// Now we read the information about the Brep and Facet objects
 	brepStorageID   = doc_view["Brep"].get_int64();
 	facetsStorageID = doc_view["Facets"].get_int64();
-
-	treeIcons.visibleIcon = "ModelVisible";
-	treeIcons.hiddenIcon = "ModelHidden";
-
-	try
-	{
-		treeIcons.visibleIcon = doc_view["visibleIcon"].get_utf8().value.data();
-	}
-	catch (std::exception)
-	{
-	}
-
-	try
-	{
-		treeIcons.hiddenIcon = doc_view["hiddenIcon"].get_utf8().value.data();
-	}
-	catch (std::exception)
-	{
-	}
 
 	showWhenSelected = false;
 
@@ -483,17 +463,18 @@ void EntityGeometry::addVisualizationNodes(void)
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_SurfaceRGB, ot::JsonArray(colorRGB, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_EdgeRGB, ot::JsonArray(colorRGB, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_MaterialType, ot::JsonString(materialType, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureType, ot::JsonString(textureType, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureReflective, this->isTextureReflective(textureType), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, true, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, 1., doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, this->getInitiallyHidden(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(DataBase::instance().getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, (unsigned long long) facetsStorageID, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, storageVersion, doc.GetAllocator());
@@ -502,8 +483,6 @@ void EntityGeometry::addVisualizationNodes(void)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, this->getManageChildVisibility(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, this->getShowWhenSelected(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Transformation, ot::JsonArray(transformation, doc.GetAllocator()), doc.GetAllocator());
-
-	treeIcons.addToJsonDoc(doc);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(facetsStorageID, storageVersion));

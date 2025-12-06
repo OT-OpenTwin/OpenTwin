@@ -29,28 +29,25 @@ static EntityFactoryRegistrar<EntityTableSelectedRanges> registrar("EntityTableS
 EntityTableSelectedRanges::EntityTableSelectedRanges(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms)
 	:EntityBase(ID,parent,obs,ms)
 {
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/SelectedRange");
+	treeItem.setHiddenIcon("Default/SelectedRange");
+	this->setDefaultTreeItem(treeItem);
+
+	ot::VisualisationTypes visTypes = getVisualizationTypes();
+	visTypes.addRangeVisualisation();
+	this->setDefaultVisualizationTypes(visTypes);
 }
 
 void EntityTableSelectedRanges::addVisualizationNodes()
 {
 	if (!getName().empty())
 	{
-		OldTreeIcon treeIcons;
-		treeIcons.size = 32;
-		treeIcons.visibleIcon = "SelectedRange";
-		treeIcons.hiddenIcon = "SelectedRange";
-
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-		treeIcons.addToJsonDoc(doc);
-
-		ot::VisualisationTypes visTypes;
-		visTypes.addRangeVisualisation();
-		visTypes.addToJsonObject(doc, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 		getObserver()->sendMessageToViewer(doc);
 	}

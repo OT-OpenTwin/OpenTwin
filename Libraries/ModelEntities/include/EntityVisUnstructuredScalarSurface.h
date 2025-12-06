@@ -22,7 +22,6 @@
 
 #include "EntityVis2D3D.h"
 #include "EntityResultBase.h"
-#include "OldTreeIcon.h"
 #include "PropertyBundleScaling.h"
 #include "PropertyBundleVisUnstructuredScalarSurface.h"
 

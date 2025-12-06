@@ -24,8 +24,6 @@ class DataSourceManagerItem;
 #include <string>
 #include <map>
 
-#include "OldTreeIcon.h"
-
 #include "OTServiceFoundation/ModelComponent.h"
 
 class DataSourceManager

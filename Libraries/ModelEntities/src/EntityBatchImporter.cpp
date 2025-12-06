@@ -26,6 +26,10 @@ static EntityFactoryRegistrar<EntityBatchImporter> registrar(EntityBatchImporter
 EntityBatchImporter::EntityBatchImporter(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	:EntityBase(_ID, _parent, _obs, _ms)
 {
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/BatchProcessing");
+	treeItem.setHiddenIcon("Default/BatchProcessing");
+	this->setDefaultTreeItem(treeItem);
 }
 
 void EntityBatchImporter::createProperties(void)
@@ -37,18 +41,11 @@ void EntityBatchImporter::createProperties(void)
 
 void EntityBatchImporter::addVisualizationNodes(void)
 {
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "BatchProcessing";
-	treeIcons.hiddenIcon = "BatchProcessing";
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-
-	treeIcons.addToJsonDoc(doc);
+	
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 }

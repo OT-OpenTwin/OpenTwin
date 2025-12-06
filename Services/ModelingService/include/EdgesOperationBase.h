@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "OldTreeIcon.h"
 #include "ShapesBase.h"
 
 #include "TopoDS_TShape.hxx"

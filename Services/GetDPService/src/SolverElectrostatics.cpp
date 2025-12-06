@@ -577,7 +577,7 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
 
     visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
     visualizationEntity->setName(solverEntity->getName() + "/Results/Potential/Volume");
-    visualizationEntity->setEditable(true);
+    visualizationEntity->setTreeItemEditable(true);
     visualizationEntity->setInitiallyHidden(true);
     visualizationEntity->registerCallbacks(
         ot::EntityCallbackBase::Callback::Properties |
@@ -716,7 +716,7 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
 
             visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
             visualizationEntity->setName(solverEntity->getName() + "/Results/Potential/Surface/" + item.first.substr(1));
-            visualizationEntity->setEditable(true);
+            visualizationEntity->setTreeItemEditable(true);
             visualizationEntity->setInitiallyHidden(true);
             visualizationEntity->registerCallbacks(
 				ot::EntityCallbackBase::Callback::Properties |
@@ -903,7 +903,7 @@ void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Applica
 
     visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_VECTOR);
     visualizationEntity->setName(solverEntity->getName() + "/Results/E-Field");
-    visualizationEntity->setEditable(true);
+    visualizationEntity->setTreeItemEditable(true);
     visualizationEntity->setInitiallyHidden(true);
     visualizationEntity->registerCallbacks(
         ot::EntityCallbackBase::Callback::Properties |

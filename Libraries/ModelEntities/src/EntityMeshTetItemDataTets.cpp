@@ -18,9 +18,8 @@
 // @otlicense-end
 
 
-#include "EntityMeshTetItemDataTets.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityMeshTetItemDataTets.h"
 
 #include "Connection\ConnectionAPI.h"
 

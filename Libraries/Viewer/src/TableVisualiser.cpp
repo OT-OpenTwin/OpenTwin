@@ -45,7 +45,7 @@ bool TableVisualiser::requestVisualization(const VisualiserState& _state) {
 
 				ot::JsonObject visualisationCfgJSon;
 				visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJSon, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, doc.GetAllocator());
 
 				FrontendAPI::instance()->messageModelService(doc.toJson());
 				return true;

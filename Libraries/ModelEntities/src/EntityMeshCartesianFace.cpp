@@ -17,10 +17,8 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "EntityMeshCartesianFace.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityMeshCartesianFace.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

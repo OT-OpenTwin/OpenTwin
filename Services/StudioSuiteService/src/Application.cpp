@@ -704,7 +704,7 @@ void Application::changeHistory(const std::string& content)
 		history->setDataEntity(*data);
 		history->setTextEncoding(guesser(content.data(), content.size()));
 		history->getProperties().setAllPropertiesReadOnly();
-		history->setEditable(false);
+		history->setTreeItemEditable(false);
 		history->storeToDataBase();
 
 		getModelComponent()->addNewDataEntity(data->getEntityID(), data->getEntityStorageVersion(), history->getEntityID());
@@ -960,7 +960,7 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 
 	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr);
 	entityGeom->setName(otName);
-	entityGeom->setEditable(false);
+	entityGeom->setTreeItemEditable(false);
 	entityGeom->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |

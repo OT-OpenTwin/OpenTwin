@@ -70,6 +70,14 @@ ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _
 EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms)
 	: EntityBase(_ID, _parent, _mdl, _ms)
 {
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/Plot1DVisible");
+	treeItem.setHiddenIcon("Default/Plot1DHidden");
+	this->setDefaultTreeItem(treeItem);
+
+	ot::VisualisationTypes visTypes = getVisualizationTypes();
+	visTypes.addCurveVisualisation();
+	this->setDefaultVisualizationTypes(visTypes);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -78,22 +86,11 @@ EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, Entit
 
 void EntityResult1DCurve::addVisualizationNodes()
 {
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "Plot1DVisible";
-	treeIcons.hiddenIcon = "Plot1DHidden";
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-	ot::VisualisationTypes visTypes;
-	visTypes.addCurveVisualisation();
-
-	visTypes.addToJsonObject(doc, doc.GetAllocator());
-	treeIcons.addToJsonDoc(doc);
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 }
@@ -116,7 +113,7 @@ bool EntityResult1DCurve::updateFromProperties() {
 	visualisationCfg.setOverrideViewerContent(false);
 	visualisationCfg.setAsActiveView(true);
 
-	doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
 	getObserver()->sendMessageToViewer(doc);
 
 	return this->updatePropertyVisibilities();

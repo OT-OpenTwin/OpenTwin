@@ -22,7 +22,6 @@
 #include "EntityMeshCartesianData.h"
 
 #include "DataBase.h"
-#include "OldTreeIcon.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -36,6 +35,10 @@ EntityMeshCartesian::EntityMeshCartesian(ot::UID ID, EntityBase *parent, EntityO
 	meshDataStorageId(-1),
 	meshValid(false)
 {
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/CartesianMeshVisible");
+	treeItem.setHiddenIcon("Default/CartesianMeshHidden");
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityMeshCartesian::~EntityMeshCartesian()
@@ -363,35 +366,6 @@ void EntityMeshCartesian::readSpecificDataFromDataBase(const bsoncxx::document::
 	meshDataStorageId = doc_view["MeshData"].get_int64();
 
 	resetModified();
-}
-
-void EntityMeshCartesian::addVisualizationNodes(void)
-{
-	if (!getName().empty())
-	{
-		OldTreeIcon treeIcons;
-		treeIcons.size = 32;
-		treeIcons.visibleIcon = "CartesianMeshVisible";
-		treeIcons.hiddenIcon  = "CartesianMeshHidden";
-
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-
-		treeIcons.addToJsonDoc(doc);
-
-		getObserver()->sendMessageToViewer(doc);
-	}
-
-	auto childList = getChildrenList();
-	for (auto child : childList)
-	{
-		child->addVisualizationNodes();
-	}
-
-	EntityBase::addVisualizationNodes();
 }
 
 void EntityMeshCartesian::removeChild(EntityBase *child)

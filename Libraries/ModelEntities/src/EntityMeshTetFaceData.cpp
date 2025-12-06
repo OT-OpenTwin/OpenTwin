@@ -18,11 +18,10 @@
 // @otlicense-end
 
 
-#include "EntityMeshTetFaceData.h"
+#include "DataBase.h"
 #include "EntityMeshTetFace.h"
 #include "EntityMeshTetInfo.h"
-#include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityMeshTetFaceData.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

@@ -32,8 +32,6 @@
 
 #include "CartesianMeshToSTL.h"
 
-#include "OldTreeIcon.h"
-
 #include "OTCore/LogDispatcher.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"

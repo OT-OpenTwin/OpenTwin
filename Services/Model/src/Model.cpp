@@ -304,7 +304,7 @@ void Model::resetToNew()
 		auto newDataCatEntity = (new EntityParameterizedDataCategorization(createEntityUID(), nullptr, nullptr, nullptr));
 		newDataCatEntity->CreateProperties(EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
 		newDataCatEntity->setName(typeManager.getRMDCategorizationName());
-		newDataCatEntity->setEditable(false);
+		newDataCatEntity->setTreeItemEditable(false);
 		addEntityToModel(newDataCatEntity->getName(), newDataCatEntity, entityRoot, true, allNewEntities);
 	}
 
@@ -343,10 +343,8 @@ void Model::resetToNew()
 		hierarchicalRoot->setManageChildVisibility(false);
 		hierarchicalRoot->setManageParentVisibility(false);
 
-		OldTreeIcon icons;
-		icons.visibleIcon = "Default/Hierarchical";
-		icons.hiddenIcon = "Default/Hierarchical";
-		hierarchicalRoot->setTreeIcon(icons);
+		hierarchicalRoot->setVisibleTreeItemIcon("Default/Hierarchical");
+		hierarchicalRoot->setHiddenTreeItemIcon("Default/Hierarchical");
 
 		hierarchicalRoot->registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
@@ -602,7 +600,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 			container = new EntityContainer(createEntityUID(), root, this, getStateManager());
 
 			container->setName(folderName);
-			container->setEditable(entity->getEditable() && entityRoot != containerRoot); // If the entity is editable, a newly created container 
+			container->setTreeItemEditable(entity->getTreeItemEditable() && entityRoot != containerRoot); // If the entity is editable, a newly created container 
 																						  // should be editable, too - if it is not a top level container
 			container->setCreateVisualizationItem(addVisualizationContainers);
 
@@ -615,7 +613,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 			// Here we also need to add a new visualitation container item to the visualization model
 			if (addVisualizationContainers)
 			{
-				addVisualizationContainerNode(folderName, container->getEntityID(), container->getEditable());
+				addVisualizationContainerNode(folderName, container->getEntityID(), container->getTreeItemEditable());
 			}
 		}
 
@@ -822,7 +820,7 @@ void Model::createVisualizationItems()
 		auto temp = dynamic_cast<EntityContainer*>(entity);
 		if (temp != nullptr && false)
 		{
-			addVisualizationContainerNode(entity->getName(), entity->getEntityID(), entity->getEditable());
+			addVisualizationContainerNode(entity->getName(), entity->getEntityID(), entity->getTreeItemEditable());
 		}
 		else
 		{
@@ -833,20 +831,14 @@ void Model::createVisualizationItems()
 
 void Model::addVisualizationContainerNode(const std::string &name, ot::UID entityID, bool isEditable)
 {
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "ContainerVisible";
-	treeIcons.hiddenIcon = "ContainerHidden";
-	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, name, entityID, treeIcons, isEditable);
-}
-
-void Model::addVisualizationMeshNode(const std::string &name, ot::UID entityID)
-{
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "MeshVisible";
-	treeIcons.hiddenIcon = "MeshHidden";
-	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, name, entityID, treeIcons, false);
+	ot::EntityTreeItem treeItem;
+	treeItem.setEntityID(entityID);
+	treeItem.setEntityName(name);
+	treeItem.setHiddenIcon("Default/ContainerHidden");
+	treeItem.setVisibleIcon("Default/ContainerVisible");
+	
+	ot::VisualisationTypes visTypes;
+	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, treeItem, visTypes);
 }
 
 ot::UID Model::getVisualizationModel()
@@ -913,11 +905,16 @@ void Model::handleCreateNewParameter()
 	EntityParameter *parameterItem = createNewParameterItem(parameterName);
 
 	// Here we also need to add a new visualitation container item to the visualization model
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "ParameterVisible";
-	treeIcons.hiddenIcon = "ParameterHidden";
-	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, parameterName, parameterItem->getEntityID(), treeIcons, parameterItem->getEditable());
+
+	ot::EntityTreeItem treeItem;
+	treeItem.setEntityID(parameterItem->getEntityID());
+	treeItem.setEntityName(parameterName);
+	treeItem.setHiddenIcon("Default/ParameterHidden");
+	treeItem.setVisibleIcon("Default/ParameterVisible");
+
+	ot::VisualisationTypes visTypes;
+
+	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, treeItem, visTypes);
 
 	setModified();
 
@@ -939,13 +936,13 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 		GeometryOperations::EntityList allNewEntities;
 		addEntityToModel(entityParameterRoot->getName(), entityParameterRoot, entityRoot, true, allNewEntities);
 
-		addVisualizationContainerNode(entityParameterRoot->getName(), entityParameterRoot->getEntityID(), entityParameterRoot->getEditable());
+		addVisualizationContainerNode(entityParameterRoot->getName(), entityParameterRoot->getEntityID(), entityParameterRoot->getTreeItemEditable());
 	}
 
 	EntityParameter *parameterItem = new EntityParameter(createEntityUID(), entityParameterRoot, this, getStateManager());
 	
 	parameterItem->setName(parameterName);
-	parameterItem->setEditable(true);
+	parameterItem->setTreeItemEditable(true);
 	parameterItem->createProperties();
 
 	entityParameterRoot->addChild(parameterItem);
@@ -1031,98 +1028,6 @@ void Model::removeParameterDependency(ot::UID entityID)
 		// Now we need to replace the parameter by its value in all depending expressions
 		replaceParameterByString(parameterEntity, "(" + parameterEntity->getValue() + ")");
 	}
-}
-
-void Model::facetEntity(EntityGeometry *entity, double deflection, bool isHidden, bool notifyViewer)
-{	
-	double colorRGB[3] = { 0.8, 0.8, 0.8 };
-	std::string name;
-
-	EntityPropertiesColor *colorProp = dynamic_cast<EntityPropertiesColor*>(entity->getProperties().getProperty("Color"));
-	assert(colorProp != nullptr);
-
-	if (colorProp != nullptr)
-	{
-		colorRGB[0] = colorProp->getColorR();
-		colorRGB[1] = colorProp->getColorG();
-		colorRGB[2] = colorProp->getColorB();
-	}
-
-	std::string materialType = "Rough";
-
-	EntityPropertiesSelection *typeProp = dynamic_cast<EntityPropertiesSelection*>(entity->getProperties().getProperty("Type"));
-
-	if (typeProp != nullptr)
-	{
-		materialType = typeProp->getValue();
-	}
-
-	std::string textureType = "None";
-
-	EntityPropertiesSelection *textureProp = dynamic_cast<EntityPropertiesSelection*>(entity->getProperties().getProperty("Texture"));
-
-	if (textureProp != nullptr)
-	{
-		textureType = textureProp->getValue();
-	}
-
-	bool textureReflective = entity->isTextureReflective(textureType);
-
-	entity->getFacets()->resetErrors();
-
-	entity->getFacets()->getNodeVector().clear();
-	entity->getFacets()->getTriangleList().clear();
-	entity->getFacets()->getEdgeList().clear();
-
-	GeometryOperations::facetEntity(entity->getBrep(), entity->getBrepEntity(), deflection, 
-									entity->getFacets()->getNodeVector(), entity->getFacets()->getTriangleList(), entity->getFacets()->getEdgeList(), entity->getFacets()->getFaceNameMap(), entity->getFacets()->getErrorString());
-	entity->getFacets()->setModified();
-
-	entity->storeToDataBase();
-
-	if (notifyViewer)
-	{
-		name = entity->getName();
-		ot::UID modelEntityID = entity->getEntityID();
-
-		std::vector<double> transformation;
-		entity->getTransformation(transformation);
-
-		OldTreeIcon treeIcons;
-		treeIcons.size = 32;
-		treeIcons.visibleIcon = "ModelVisible";
-		treeIcons.hiddenIcon = "ModelHidden";
-		addVisualizationNodeFromFacetDataBase(name, colorRGB, colorRGB, materialType, textureType, textureReflective, modelEntityID, treeIcons, true, 1.0, isHidden, entity->getEditable(),
-									  		  DataBase::instance().getCollectionName(), entity->getFacetsStorageObjectID(), entity->getSelectChildren(), entity->getManageParentVisibility(), entity->getManageChildVisibility(), entity->getShowWhenSelected(), transformation);
-
-		if (!entity->getFacets()->getErrorString().empty()) displayMessage("Shape: " + name + "\n" + entity->getFacets()->getErrorString());
-	}
-
-	setModified();
-
-	// We do not need to keep the facets in memory. Allow the object to clear memory data
-	entity->releaseFacets();
-}
-
-void Model::addVisualizationNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-										      double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors,
-											  bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
-{
-	Application::instance()->getNotifier()->addVisualizationNodeFromFacetData(visualizationModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, isEditable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
-}
-
-void Model::addVisualizationNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-										          double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ot::UID entityID, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation
-)
-{
-	ot::UID entityVersion = getStateManager()->getCurrentEntityVersion(entityID);
-	Application::instance()->getNotifier()->addVisualizationNodeFromFacetDataBase(visualizationModelID, treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, textureReflective, modelEntityID, treeIcons, backFaceCulling, offsetFactor, isHidden, isEditable, projectName, entityID, entityVersion, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation);
-}
-
-void Model::updateObjectFacetsFromDataBase(ot::UID modelEntityID, ot::UID entityID)
-{
-	ot::UID entityVersion = getStateManager()->getCurrentEntityVersion(entityID);
-	Application::instance()->getNotifier()->updateObjectFacetsFromDataBase(getVisualizationModel(), modelEntityID, entityID, entityVersion);
 }
 
 double Model::calculateDeflectionFromAllEntities()
@@ -1357,7 +1262,7 @@ bool Model::isProtectedEntity(EntityBase *entity)
 	if (entity->getParent() == nullptr) return true;
 	if (entity->getParent() == entityRoot) return true;
 	
-	return !entity->deletable();
+	return !entity->getDeletable();
 }
 
 bool Model::anyMeshItemSelected(std::list<ot::UID> &selectedEntityID)
@@ -3037,31 +2942,6 @@ size_t Model::getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geom
 	return numberTriangles;
 }
 
-void Model::addAnnotationEntities(std::list<EntityAnnotation *> &errorAnnotations)
-{
-	GeometryOperations::EntityList allNewEntities;
-
-	for (auto annotation : errorAnnotations)
-	{
-		addEntityToModel(annotation->getName(), annotation, entityRoot, true, allNewEntities);
-
-		annotation->addVisualizationItem(false);
-	}
-}
-
-void Model::addVisualizationAnnotationNode(const std::string &name, ot::UID UID, const OldTreeIcon &treeIcons, bool isHidden,
-										   const double edgeColorRGB[3],
-										   const std::vector<std::array<double, 3>> &points,
-										   const std::vector<std::array<double, 3>> &points_rgb,
-										   const std::vector<std::array<double, 3>> &triangle_p1,
-										   const std::vector<std::array<double, 3>> &triangle_p2, 
-										   const std::vector<std::array<double, 3>> &triangle_p3, 
-										   const std::vector<std::array<double, 3>> &triangle_rgb)
-{
-	Application::instance()->getNotifier()->addVisualizationAnnotationNode(visualizationModelID, name, UID, treeIcons, isHidden, edgeColorRGB, points, points_rgb,
-												  triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
-}
-
 void Model::getFaceCurvatureRadius(const TopoDS_Shape *shape, std::list<double> &faceCurvatureRadius)
 {
 	// Loop through all faces of the entity and store the maximum curvatures in the list
@@ -3143,7 +3023,7 @@ void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &anno
 
 	annotationEntity->setName(annotationName);
 	annotationEntity->setColor(r, g, b);
-	annotationEntity->setEditable(true);
+	annotationEntity->setTreeItemEditable(true);
 
 	for (auto annotation : annotations)
 	{
@@ -4143,13 +4023,10 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 			EntityGeometry *geomEntity = dynamic_cast<EntityGeometry *>(childrenNameMap[childName]);
 			if (geomEntity != nullptr)
 			{
-				std::string iconVisible, iconHidden;
-				geomEntity->getOldTreeIcons(iconVisible, iconHidden);
-
-				iconVisible += "Base";
-				iconHidden += "Base";
-
-				geomEntity->setOldTreeIcons(iconVisible, iconHidden);
+				ot::NavigationTreeItemIcon icons = geomEntity->getTreeItemIcons();
+				icons.setVisibleIcon(icons.getVisibleIcon() + "Base");
+				icons.setHiddenIcon(icons.getHiddenIcon() + "Base");
+				geomEntity->setTreeItemIcons(icons);
 			}
 
 			isBaseShape = false;

@@ -6,9 +6,7 @@ class __declspec(dllexport) EntityPythonManifest : public IVisualisationText, pu
 	friend class FixturePythonManifest;
 public:
 	EntityPythonManifest() : EntityPythonManifest(0, nullptr, nullptr, nullptr) {};
-	EntityPythonManifest(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
-	: EntityBase(_ID,_parent,_obs,_ms){};
-
+	EntityPythonManifest(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 	virtual std::string getClassName(void) const override { return EntityPythonManifest::className(); };
 	static std::string className() { return "EntityPythonManifest"; };
 
@@ -16,7 +14,9 @@ public:
 	bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; }
 	entityType getEntityType() const override { return TOPOLOGY; }
 	virtual void addVisualizationNodes() override;
-	void setEntityID(ot::UID id) override;
+	
+	virtual void setEntityID(ot::UID id) override;
+
 	// Inherited via IVisualisationText
 	std::string getText() override;
 	

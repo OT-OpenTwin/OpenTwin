@@ -19,9 +19,8 @@
 
 #pragma once
 
-#include "EntityResultTableData.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
+#include "EntityResultTableData.h"
 
 #include <exception>
 #include <bsoncxx/builder/basic/array.hpp>

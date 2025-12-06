@@ -33,11 +33,11 @@ static EntityFactoryRegistrar<EntityBlockCircuitVoltageSource> registrar(EntityB
 EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms) 
 {
-	OldTreeIcon icon;
-	icon.visibleIcon = "VoltageSource";
-	icon.hiddenIcon = "VoltageSource";
-	setNavigationTreeIcon(icon);
-
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/VoltageSource");
+	treeItem.setHiddenIcon("Default/VoltageSource");
+	this->setDefaultTreeItem(treeItem);
+	
 	setBlockTitle("V");
 
 	const std::string connectorPositive = "positivePole";

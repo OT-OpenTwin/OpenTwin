@@ -216,7 +216,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 		EntityGeometry *geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr);
 		geometryEntity->setName(baseEntity->getName());
-		geometryEntity->setEditable(true);
+		geometryEntity->setTreeItemEditable(true);
 		geometryEntity->setSelectChildren(false);
 		geometryEntity->setManageChildVisibility(false);
 		geometryEntity->registerCallbacks(
@@ -228,7 +228,8 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 		//geometryEntity->setManageParentVisibility(false);  // The new boolean entity should manage the parent visibility as usual
 		geometryEntity->setBrep(shape);
-		geometryEntity->setOldTreeIcons(treeIconVisible, treeIconHidden);
+		geometryEntity->setVisibleTreeItemIcon(treeIconVisible);
+		geometryEntity->setHiddenTreeItemIcon(treeIconHidden);
 		geometryEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
 
 		geometryEntity->getProperties() = baseEntity->getProperties();
@@ -531,22 +532,22 @@ bool BooleanOperations::performOperation(const std::string &selectionAction, Ent
 	{
 		success = add(baseBrepEntity, brepEntities, shape, resultFaceNames);
 
-		treeIconVisible = "BooleanAddVisible";
-		treeIconHidden  = "BooleanAddHidden";
+		treeIconVisible = "Default/BooleanAddVisible";
+		treeIconHidden  = "Default/BooleanAddHidden";
 	}
 	else if (selectionAction == "BOOLEAN_SUBTRACT")
 	{
 		success = subtract(baseBrepEntity, brepEntities, shape, resultFaceNames);
 
-		treeIconVisible = "BooleanSubtractVisible";
-		treeIconHidden  = "BooleanSubtractHidden";
+		treeIconVisible = "Default/BooleanSubtractVisible";
+		treeIconHidden  = "Default/BooleanSubtractHidden";
 	}
 	else if (selectionAction == "BOOLEAN_INTERSECT")
 	{
 		success = intersect(baseBrepEntity, brepEntities, shape, resultFaceNames);
 
-		treeIconVisible = "BooleanIntersectVisible";
-		treeIconHidden  = "BooleanIntersectHidden";
+		treeIconVisible = "Default/BooleanIntersectVisible";
+		treeIconHidden  = "Default/BooleanIntersectHidden";
 	}
 	else
 	{

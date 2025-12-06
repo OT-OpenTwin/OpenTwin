@@ -29,8 +29,7 @@ public:
 	std::string getClassName() const override { return "EntityMetadataSeries"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override;
-	virtual void addVisualizationNodes() override;
-
+	
 	std::vector<std::string> getAllParameterDocumentNames();
 	std::vector<std::string> getAllQuantityDocumentNames();
 	const std::string getParameterDocumentName() const { return _parameterDocument; }

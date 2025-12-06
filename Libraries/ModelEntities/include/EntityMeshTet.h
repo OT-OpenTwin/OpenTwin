@@ -60,8 +60,7 @@ public:
 	virtual void storeToDataBase(void) override;
 
 	virtual std::string getClassName(void) const override { return "EntityMeshTet"; };
-	virtual void addVisualizationNodes(void) override;
-
+	
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
 

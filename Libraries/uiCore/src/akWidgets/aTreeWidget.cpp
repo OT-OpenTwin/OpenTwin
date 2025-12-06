@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/BasicScopedBoolWrapper.h"
+#include "OTWidgets/IconManager.h"
 #include "OTWidgets/TreeItemDelegate.h"
 
 // AK header
@@ -188,6 +189,13 @@ ak::UID ak::aTreeWidget::add(const QString& _cmd, char _delimiter, textAlignment
 	selectionChangedEvent(false);
 
 	return currentItem->id();
+}
+
+ot::UID ak::aTreeWidget::add(const ot::EntityTreeItem& _itemInfo) {
+	UID id = add(QString::fromStdString(_itemInfo.getEntityName()), '/', ak::alignLeft, ot::IconManager::getIcon(QString::fromStdString(_itemInfo.getIcons().getVisibleIcon())));
+	setItemIsEditable(id, _itemInfo.getIsEditable());
+	setItemSelectChildren(id, _itemInfo.getSelectChilds());
+	return id;
 }
 
 void ak::aTreeWidget::clear(bool _emitEvent) {

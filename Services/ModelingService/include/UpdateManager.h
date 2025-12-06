@@ -20,7 +20,6 @@
 #pragma once
 
 #include "OTCore/CoreTypes.h"
-#include "OldTreeIcon.h"
 
 #include "TopoDS_TShape.hxx"
 

@@ -32,6 +32,23 @@ ot::EntityTreeItem::EntityTreeItem(const BasicEntityInformation& _entityInfo)
 	BasicEntityInformation::operator=(_entityInfo);
 }
 
+ot::EntityTreeItem::EntityTreeItem(const ot::ConstJsonObject& _jsonObject)
+	: EntityTreeItem()
+{
+	setFromJsonObject(_jsonObject);
+}
+
+bool ot::EntityTreeItem::operator==(const EntityTreeItem& _other) const {
+	return BasicEntityInformation::operator==(_other)
+		&& (m_icons == _other.m_icons)
+		&& (m_isEditable == _other.m_isEditable)
+		&& (m_selectChilds == _other.m_selectChilds);
+}
+
+bool ot::EntityTreeItem::operator!=(const EntityTreeItem& _other) const {
+	return !(*this == _other);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Public: Virtual methods

@@ -18,10 +18,9 @@
 // @otlicense-end
 
 
-#include "EntityBinaryData.h"
 #include "DataBase.h"
-#include "OldTreeIcon.h"
 #include "DocumentAPI.h"
+#include "EntityBinaryData.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

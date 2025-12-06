@@ -171,7 +171,7 @@ void Application::addSolver(void)
 	// Create the new solver item and store it in the data base
 	EntitySolverPHREEC *solverEntity = new EntitySolverPHREEC(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
-	solverEntity->setEditable(true);
+	solverEntity->setTreeItemEditable(true);
 	solverEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
