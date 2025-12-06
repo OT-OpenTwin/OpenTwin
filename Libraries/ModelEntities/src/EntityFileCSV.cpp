@@ -49,7 +49,7 @@ EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * o
 	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
 	visTypes.visualiseAsTable();
 	visTypes.visualiseAsText();
-	this->setVisualizationTypes(visTypes, true);
+	this->setDefaultVisualizationTypes(visTypes);
 }
 
 bool EntityFileCSV::updateFromProperties(void)

@@ -30,10 +30,10 @@ static EntityFactoryRegistrar<EntityBlockHierarchicalContainerItem> registrar(En
 EntityBlockHierarchicalContainerItem::EntityBlockHierarchicalContainerItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	: EntityBlock(_ID, _parent, _obs, _ms) 
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Hierarchical/Container");
 	treeItem.setHiddenIcon("Hierarchical/Container");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 	
 	setBlockTitle("Container");
 

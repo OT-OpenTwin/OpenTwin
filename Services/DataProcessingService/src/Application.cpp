@@ -68,57 +68,6 @@ Application::~Application()
 
 }
 
-void Application::createPipeline()
-{
-	auto modelComponent = Application::instance()->getModelComponent();
-	EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
-	newDataprocessing.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
-	newDataprocessing.registerCallbacks(
-		ot::EntityCallbackBase::Callback::Properties |
-		ot::EntityCallbackBase::Callback::Selection,
-		getServiceName()
-	);
-
-	auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
-	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
-	newDataprocessing.setName(entityName);
-	newDataprocessing.setTreeItemEditable(true);
-	newDataprocessing.storeToDataBase();
-
-	ot::NewModelStateInfo infos;
-	infos.addTopologyEntity(newDataprocessing);
-	ot::ModelServiceAPI::addEntitiesToModel(infos, "Added pipeline");
-}
-
-void Application::createSolver()
-{
-	auto modelComponent = Application::instance()->getModelComponent();
-	EntitySolverDataProcessing newSolver(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
-	newSolver.registerCallbacks(
-		ot::EntityCallbackBase::Callback::Properties |
-		ot::EntityCallbackBase::Callback::Selection,
-		getServiceName()
-	);
-
-	if (m_dataProcessingFolderID == ot::getInvalidUID())
-	{
-		ot::EntityInformation entityInfo;
-		ot::ModelServiceAPI::getEntityInformation(ot::FolderNames::DataProcessingFolder, entityInfo);
-		m_dataProcessingFolderID = entityInfo.getEntityID();
-	}
-	newSolver.createProperties(ot::FolderNames::DataProcessingFolder, m_dataProcessingFolderID);
-
-	auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::SolverFolder);
-	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::SolverFolder, "Pipeline Solver", allPipelines);
-	newSolver.setName(entityName);
-
-	newSolver.storeToDataBase();
-	ot::NewModelStateInfo entityInfos;
-	entityInfos.addTopologyEntity(newSolver);
-	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added solver");
-
-}
-
 void Application::runPipeline()
 {
 	ot::UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockType::ModelWrite);

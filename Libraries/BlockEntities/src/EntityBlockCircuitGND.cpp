@@ -35,10 +35,10 @@ static EntityFactoryRegistrar<EntityBlockCircuitGND> registrar(EntityBlockCircui
 EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	: EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/GND");
 	treeItem.setHiddenIcon("Default/GND");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
 	setBlockTitle("GND");
 

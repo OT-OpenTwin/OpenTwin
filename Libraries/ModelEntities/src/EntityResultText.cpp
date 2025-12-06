@@ -33,14 +33,14 @@ static EntityFactoryRegistrar<EntityResultText> registrar("EntityResultText");
 EntityResultText::EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
 	EntityBase(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/TextVisible");
 	treeItem.setHiddenIcon("Default/TextHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
-	ot::VisualisationTypes visTypes;
+	ot::VisualisationTypes visTypes = getVisualizationTypes();
 	visTypes.addTextVisualisation();
-	this->setVisualizationTypes(visTypes, true);
+	this->setDefaultVisualizationTypes(visTypes);
 }
 
 EntityResultText::~EntityResultText()

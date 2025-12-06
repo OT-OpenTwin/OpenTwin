@@ -27,10 +27,10 @@ static EntityFactoryRegistrar<EntityUnits> registrar("EntityUnits");
 EntityUnits::EntityUnits(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms)
 	: EntityBase(ID,parent,obs,ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Units");
 	treeItem.setHiddenIcon("Default/Units");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
 	setUnitLists();
 }

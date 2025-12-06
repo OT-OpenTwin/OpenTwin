@@ -57,6 +57,20 @@ void ot::VisualisationTypes::setVisualisations(const VisTypes& _types) {
 	}
 }
 
+void ot::VisualisationTypes::addVisualisation(VisualisationType _type) {
+	if (!m_visualisations.has(_type)) {
+		m_visualisations.set(_type);
+		m_visualisationsModified = true;
+	}
+}
+
+void ot::VisualisationTypes::removeVisualisation(VisualisationType _type) {
+	if (m_visualisations.has(_type)) {
+		m_visualisations.remove(_type);
+		m_visualisationsModified = true;
+	}
+}
+
 void ot::VisualisationTypes::addTextVisualisation() {
 	if (m_visualisations.has(VisualisationType::Text) == false) {
 		m_visualisations |= VisualisationType::Text;

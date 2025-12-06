@@ -225,9 +225,7 @@ set(MODELENTITIES_HEADER_FILES
     include/ScalingProperties.h
     include/SerializeWithBSON.h
     include/TemplateDefaultManager.h
-    include/OldTreeIcon.h
     include/VariableToBSONConverter.h
-    include/VisualisationTypeSerialiser.h
 )
 
 set(MODELENTITIES_SOURCE_FILES
@@ -339,9 +337,7 @@ set(MODELENTITIES_SOURCE_FILES
     src/PropertyBundleVisUnstructuredVectorVolume.cpp
     src/PropertyHelper.cpp
     src/TemplateDefaultManager.cpp
-    src/OldTreeIcon.cpp
     src/VariableToBSONConverter.cpp
-    src/VisualisationTypeSerialiser.cpp
 )
 
 # ============================================================

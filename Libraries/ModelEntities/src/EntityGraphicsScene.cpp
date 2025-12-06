@@ -27,9 +27,9 @@ static EntityFactoryRegistrar<EntityGraphicsScene> registrar(EntityGraphicsScene
 EntityGraphicsScene::EntityGraphicsScene(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityContainer(ID, parent, obs, ms), m_sceneFlags(SceneFlag::DefaultFlags)
 {
-	ot::VisualisationTypes visTypes;
+	ot::VisualisationTypes visTypes = getVisualizationTypes();
 	visTypes.addGraphicsViewVisualisation();
-	setVisualizationTypes(visTypes, true);
+	setDefaultVisualizationTypes(visTypes);
 
 }
 

@@ -33,10 +33,10 @@ static EntityFactoryRegistrar<EntityBlockCircuitInductor> registrar(EntityBlockC
 EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Inductor");
 	treeItem.setHiddenIcon("Default/Inductor");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 	
 	setBlockTitle("L");
 

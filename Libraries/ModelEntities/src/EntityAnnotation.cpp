@@ -34,10 +34,10 @@ EntityAnnotation::EntityAnnotation(ot::UID ID, EntityBase *parent, EntityObserve
 	annotationData(nullptr),
 	annotationDataStorageId(-1)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/WarningVisible");
 	treeItem.setHiddenIcon("Default/WarningHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityAnnotation::~EntityAnnotation()

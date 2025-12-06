@@ -53,8 +53,8 @@ public:
 	virtual void entityRemoved(EntityBase *entity) {};
 	virtual void entityModified(EntityBase *entity) {};
 
-	virtual void sendMessageToViewer(ot::JsonDocument& doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(doc, prefetchIds); };
-	virtual void sendMessageToViewer(ot::JsonDocument& doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {};
+	virtual void sendMessageToViewer(ot::JsonDocument& _doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(_doc, prefetchIds); };
+	virtual void sendMessageToViewer(ot::JsonDocument& _doc, std::list<std::pair<ot::UID, ot::UID>>& _prefetchIds) {};
 	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _elementType) {};
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
@@ -80,7 +80,7 @@ public:
 	//! If the name is "root/entity" then the function will return "entity".
 	std::string getNameOnly() const;
 
-	void setEntityID(ot::UID _id);
+	virtual void setEntityID(ot::UID _id);
 	ot::UID getEntityID() const { return m_treeItem.getEntityID(); };
 
 	ot::UID getEntityStorageVersion() const { return m_treeItem.getEntityVersion(); };
@@ -169,25 +169,54 @@ public:
 		return false; 
 	}
 
+	virtual ot::EntityTreeItem getTreeItem() const { return m_treeItem; };
 
-	void setTreeItem(const ot::EntityTreeItem& _treeItem, bool _resetTreeItemModified = false);
-	const ot::EntityTreeItem& getTreeItem() const { return m_treeItem; };
-
+	//! @brief Sets the icon for the "entity visible" state.
+	//! @note This method should only be called to set instance specific icons.
+	//! To set the default icon of a entity the setDefaultTreeItem() method should be used.
 	void setVisibleTreeItemIcon(const std::string& _icon) { m_treeItem.setVisibleIcon(_icon); };
+
+	//! @brief Sets the icon for the "entity hidden" state.
+	//! @note This method should only be called to set instance specific icons.
+	//! To set the default icon of a entity the setDefaultTreeItem() method should be used.
 	void setHiddenTreeItemIcon(const std::string& _icon) { m_treeItem.setHiddenIcon(_icon); };
+
+	//! @brief Sets the icons for this entity.
+	//! @note This method should only be called to set instance specific icons.
+	//! To set the default icons of a entity the setDefaultTreeItem() method should be used.
 	void setTreeItemIcons(const ot::NavigationTreeItemIcon& _icons) { m_treeItem.setIcons(_icons); };
 	const ot::NavigationTreeItemIcon& getTreeItemIcons() const { return m_treeItem.getIcons(); };
 
+	//! @brief Sets the editable flag for this entity.
+	//! @note This method should only be called to set instance specific flag.
+	//! To set the default flag(s) of a entity the setDefaultTreeItem() method should be used.
 	void setTreeItemEditable(bool _editable) { m_treeItem.setIsEditable(_editable); };
 	bool getTreeItemEditable() { return m_treeItem.getIsEditable(); };
 
+	//! @brief Sets the select children flag for this entity.
+	//! @note This method should only be called to set instance specific flag.
+	//! To set the default flag(s) of a entity the setDefaultTreeItem() method should be used.
 	void setTreeItemSelectChildren(bool _selectChildren) { m_treeItem.setSelectChilds(_selectChildren); };
 	bool getTreeItemSelectChildren() { return m_treeItem.getSelectChilds(); };
 
-	void setVisualizationTypes(const ot::VisualisationTypes& _types, bool _resetVisualizationTypesModified = false);
-	const ot::VisualisationTypes& getVisualizationTypes() const { return m_visualizationTypes; };
+	void addVisualizationType(ot::VisualisationTypes::VisualisationType _type);
+	void removeVisualizationType(ot::VisualisationTypes::VisualisationType _type);
+	void setCustomVisualizationViewFlags(ot::VisualisationTypes::VisualisationType _visType, ot::WidgetViewBase::ViewFlags _flags);
+	virtual ot::VisualisationTypes getVisualizationTypes() const { return m_visualizationTypes; };
 
 protected:
+	//! @brief Will set the default tree item.
+	//! Will reset the modified flags for all entries of the tree item.
+	//! This method should be called from the constructor of a entity to set the default item.
+	//! If a custom behavior for a entity is desired use the setters for the icons and the item flags.
+	void setDefaultTreeItem(const ot::EntityTreeItem& _treeItem);
+
+	//! @brief Set the default visualization types for this entity.
+	//! @note This method should be called from the constructor of a entity to set the default visualization types config.
+	//! If a custom behavior for a entity instance is desired use the setters for single visualization types and config.
+	//! @param _types The types to set.
+	void setDefaultVisualizationTypes(const ot::VisualisationTypes& _types);
+
 	virtual void callbackDataChanged() override { setModified(); };
 
 	virtual int getSchemaVersion() { return 1; };

@@ -63,7 +63,8 @@ namespace ot
 		bool getCustomViewFlagsModified() const { return m_customViewFlagsModified; };
 
 		void setVisualisations(const VisTypes& _types);
-		void addVisualisation(VisualisationType _type) { m_visualisations |= _type; };
+		void addVisualisation(VisualisationType _type);
+		void removeVisualisation(VisualisationType _type);
 
 		void addTextVisualisation();
 		void addTableVisualisation();

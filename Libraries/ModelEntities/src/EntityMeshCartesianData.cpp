@@ -60,10 +60,10 @@ EntityMeshCartesianData::EntityMeshCartesianData(ot::UID ID, EntityBase *parent,
 	matrixDsigmaStorageId(-1),
 	matrixDsigmaStorageVersion(-1)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/CartesianMeshDataVisible");
 	treeItem.setHiddenIcon("Default/CartesianMeshDataHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityMeshCartesianData::~EntityMeshCartesianData()

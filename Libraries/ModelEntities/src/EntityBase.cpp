@@ -80,8 +80,10 @@ std::string EntityBase::getNameOnly() const {
 }
 
 void EntityBase::setEntityID(ot::UID _id) {
-	m_treeItem.setEntityID(_id);
-	setModified();
+	if (_id != m_treeItem.getEntityID()) {
+		m_treeItem.setEntityID(_id);
+		setModified();
+	}
 }
 
 void EntityBase::setModified(void) {
@@ -137,32 +139,6 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 	if (getEntityType() != DATA)
 	{
 		entityMap[getEntityID()] = this;
-	}
-}
-
-void EntityBase::setTreeItem(const ot::EntityTreeItem& _treeItem, bool _resetTreeItemModified) {
-	if (m_treeItem != _treeItem) {
-		ot::UID uid = m_treeItem.getEntityID();
-		ot::UID ver = m_treeItem.getEntityVersion();
-
-		m_treeItem = _treeItem;
-		
-		m_treeItem.setEntityID(uid);
-		m_treeItem.setEntityVersion(ver);
-		
-		if (_resetTreeItemModified) {
-			m_treeItem.resetModified();
-		}
-	}
-}
-
-void EntityBase::setVisualizationTypes(const ot::VisualisationTypes& _types, bool _resetVisualizationTypesModified) {
-	if (m_visualizationTypes != _types) {
-		m_visualizationTypes = _types;
-
-		if (_resetVisualizationTypesModified) {
-			m_visualizationTypes.resetModified();
-		}
 	}
 }
 
@@ -440,4 +416,32 @@ void EntityBase::detachFromHierarchy(void) {
 	}
 }
 
+void EntityBase::addVisualizationType(ot::VisualisationTypes::VisualisationType _type) {
+	m_visualizationTypes.addVisualisation(_type);
+}
+
+void EntityBase::removeVisualizationType(ot::VisualisationTypes::VisualisationType _type) {
+	m_visualizationTypes.removeVisualisation(_type);
+}
+
+void EntityBase::setCustomVisualizationViewFlags(ot::VisualisationTypes::VisualisationType _visType, ot::WidgetViewBase::ViewFlags _flags) {
+	m_visualizationTypes.setCustomViewFlags(_visType, _flags);
+}
+
+void EntityBase::setDefaultTreeItem(const ot::EntityTreeItem& _treeItem) {
+	ot::UID uid = m_treeItem.getEntityID();
+	ot::UID ver = m_treeItem.getEntityVersion();
+
+	m_treeItem = _treeItem;
+
+	m_treeItem.setEntityID(uid);
+	m_treeItem.setEntityVersion(ver);
+
+	m_treeItem.resetModified();
+}
+
+void EntityBase::setDefaultVisualizationTypes(const ot::VisualisationTypes& _types) {
+	m_visualizationTypes = _types;
+	m_visualizationTypes.resetModified();
+}
 

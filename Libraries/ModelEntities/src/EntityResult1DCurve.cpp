@@ -70,14 +70,14 @@ ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _
 EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms)
 	: EntityBase(_ID, _parent, _mdl, _ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Plot1DVisible");
 	treeItem.setHiddenIcon("Default/Plot1DHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
-	ot::VisualisationTypes visTypes;
+	ot::VisualisationTypes visTypes = getVisualizationTypes();
 	visTypes.addCurveVisualisation();
-	this->setVisualizationTypes(visTypes, true);
+	this->setDefaultVisualizationTypes(visTypes);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -33,10 +33,10 @@ static EntityFactoryRegistrar<EntityBlockCircuitCurrentMeter> registrar(EntityBl
 EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/CurrentMeter");
 	treeItem.setHiddenIcon("Default/CurrentMeter");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 	
 	setBlockTitle("CM");
 

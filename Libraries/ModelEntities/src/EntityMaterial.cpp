@@ -31,10 +31,10 @@ static EntityFactoryRegistrar<EntityMaterial> registrar(EntityMaterial::classNam
 EntityMaterial::EntityMaterial(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
 	EntityBase(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/MaterialVisible");
 	treeItem.setHiddenIcon("Default/MaterialHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityMaterial::~EntityMaterial()

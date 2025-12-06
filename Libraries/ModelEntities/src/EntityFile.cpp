@@ -34,10 +34,10 @@ EntityFile::EntityFile(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	EntityBase(_ID, _parent, _obs, _ms), m_fileFilter(ot::FileExtension::toFilterString(ot::FileExtension::AllFiles)),
 	m_dataUID(ot::invalidUID), m_dataVersion(ot::invalidUID)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/TextVisible");
 	treeItem.setHiddenIcon("Default/TextHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 bool EntityFile::getEntityBox(double & _xmin, double & _xmax, double & _ymin, double & _ymax, double & _zmin, double & _zmax)

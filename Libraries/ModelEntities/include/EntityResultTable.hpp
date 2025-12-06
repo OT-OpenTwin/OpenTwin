@@ -35,14 +35,14 @@ EntityResultTable<T>::EntityResultTable(ot::UID ID, EntityBase *parent, EntityOb
 {
 	m_className = "EntityResultTable_" + ot::TemplateTypeName<T>::getTypeName();
 
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/TableVisible");
 	treeItem.setHiddenIcon("Default/TableHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
-	ot::VisualisationTypes visType;
+	ot::VisualisationTypes visType = getVisualizationTypes();
 	visType.addTableVisualisation();
-	this->setVisualizationTypes(visType, true);
+	this->setDefaultVisualizationTypes(visType);
 }
 
 template <class T>

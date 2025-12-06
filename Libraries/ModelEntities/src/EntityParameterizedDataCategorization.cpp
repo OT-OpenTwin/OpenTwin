@@ -26,10 +26,10 @@ static EntityFactoryRegistrar<EntityParameterizedDataCategorization> registrar("
 EntityParameterizedDataCategorization::EntityParameterizedDataCategorization(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityContainer(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon(c_unlockedIcon);
 	treeItem.setHiddenIcon(c_unlockedIcon);
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 void EntityParameterizedDataCategorization::addVisualizationNodes()

@@ -33,10 +33,10 @@ static EntityFactoryRegistrar<EntityBlockCircuitDiode> registrar(EntityBlockCirc
 EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) 
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Diod2");
 	treeItem.setHiddenIcon("Default/Diod2");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 	
 	setBlockTitle("D");
 

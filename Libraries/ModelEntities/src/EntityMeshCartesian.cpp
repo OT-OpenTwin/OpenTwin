@@ -35,10 +35,10 @@ EntityMeshCartesian::EntityMeshCartesian(ot::UID ID, EntityBase *parent, EntityO
 	meshDataStorageId(-1),
 	meshValid(false)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/CartesianMeshVisible");
 	treeItem.setHiddenIcon("Default/CartesianMeshHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityMeshCartesian::~EntityMeshCartesian()

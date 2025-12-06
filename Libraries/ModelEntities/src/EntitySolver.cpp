@@ -28,10 +28,10 @@ static EntityFactoryRegistrar<EntitySolver> registrar("EntitySolver");
 EntitySolver::EntitySolver(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
 	EntityContainer(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/SolverVisible");
 	treeItem.setHiddenIcon("Default/SolverHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntitySolver::~EntitySolver()

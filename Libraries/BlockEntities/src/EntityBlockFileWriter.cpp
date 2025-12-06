@@ -26,10 +26,10 @@ static EntityFactoryRegistrar<EntityBlockFileWriter> registrar(EntityBlockFileWr
 EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlock(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
 	treeItem.setHiddenIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
 	setBlockTitle("File Writer");
 

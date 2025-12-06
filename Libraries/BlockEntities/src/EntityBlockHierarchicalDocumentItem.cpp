@@ -30,14 +30,14 @@ static EntityFactoryRegistrar<EntityBlockHierarchicalDocumentItem> registrar(Ent
 EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	: EntityBlock(_ID, _parent, _obs, _ms), m_documentUID(ot::invalidUID), m_documentVersion(ot::invalidUID), m_documentData(nullptr)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Hierarchical/Document");
 	treeItem.setHiddenIcon("Hierarchical/Document");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
 	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
 	visTypes.visualiseAsText();
-	this->setVisualizationTypes(visTypes, true);
+	this->setDefaultVisualizationTypes(visTypes);
 
 	setBlockTitle("Hierarchical Document Item");
 

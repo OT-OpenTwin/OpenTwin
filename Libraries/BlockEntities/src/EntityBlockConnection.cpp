@@ -30,10 +30,10 @@ EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, Ent
 	:EntityBase(ID, parent, obs, ms), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)),
 	_blockIDOrigin(-1), _blockIDDestination(-1)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/connection");
 	treeItem.setHiddenIcon("Default/connection");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityBlockConnection::~EntityBlockConnection()

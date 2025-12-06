@@ -26,10 +26,10 @@ static EntityFactoryRegistrar<EntityMetadataSeries> registrar("EntityMetadataSer
 EntityMetadataSeries::EntityMetadataSeries(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms)
 	: EntityWithDynamicFields(ID, parent, mdl, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/MSMD");
 	treeItem.setHiddenIcon("Default/MSMD");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
 	CreatePlainDocument(_parameterDocument);
 	CreatePlainDocument(_quantityDocument);

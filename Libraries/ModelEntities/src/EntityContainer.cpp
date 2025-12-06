@@ -31,11 +31,11 @@ EntityContainer::EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver 
 	EntityBase(ID, parent, obs, ms),
 	createVisualizationItem(true)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/ContainerVisible");
 	treeItem.setHiddenIcon("Default/ContainerHidden");
 	treeItem.setSelectChilds(true);
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityContainer::~EntityContainer()

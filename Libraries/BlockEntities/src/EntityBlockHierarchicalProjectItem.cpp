@@ -33,10 +33,10 @@ EntityBlockHierarchicalProjectItem::EntityBlockHierarchicalProjectItem(ot::UID _
 	: EntityBlock(_ID, _parent, _obs, _ms), m_previewUID(ot::invalidUID), m_previewVersion(ot::invalidUID), m_previewData(nullptr),
 	m_previewFormat(ot::ImageFileFormat::PNG)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("ProjectTemplates/DefaultIcon");
 	treeItem.setHiddenIcon("ProjectTemplates/DefaultIcon");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
 	setBlockTitle("Hierarchical Project Item");
 

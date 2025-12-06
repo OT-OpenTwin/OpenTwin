@@ -54,7 +54,7 @@ EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver*
 {
 	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
 	visTypes.visualiseAsText();
-	this->setVisualizationTypes(visTypes, true);
+	this->setDefaultVisualizationTypes(visTypes);
 }
 
 void EntityFileText::setTextEncoding(ot::TextEncoding::EncodingStandard _encoding)

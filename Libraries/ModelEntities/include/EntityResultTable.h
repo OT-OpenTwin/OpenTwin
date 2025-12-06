@@ -65,6 +65,9 @@ protected:
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
+	int m_minCol = 0;
+	int m_minRow = 1;
+
 private:
 	int m_maxCol = 50;
 	int m_maxRow = 50;

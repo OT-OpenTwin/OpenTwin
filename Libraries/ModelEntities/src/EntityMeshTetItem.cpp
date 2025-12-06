@@ -43,10 +43,10 @@ EntityMeshTetItem::EntityMeshTetItem(ot::UID ID, EntityBase* parent, EntityObser
 	numberOfTets(0),
 	numberOfTetEdges(0)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/MeshItemVisible");
 	treeItem.setHiddenIcon("Default/MeshItemHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityMeshTetItem::~EntityMeshTetItem()

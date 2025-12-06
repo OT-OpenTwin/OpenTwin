@@ -26,10 +26,10 @@ static EntityFactoryRegistrar<EntityBatchImporter> registrar(EntityBatchImporter
 EntityBatchImporter::EntityBatchImporter(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	:EntityBase(_ID, _parent, _obs, _ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/BatchProcessing");
 	treeItem.setHiddenIcon("Default/BatchProcessing");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 void EntityBatchImporter::createProperties(void)

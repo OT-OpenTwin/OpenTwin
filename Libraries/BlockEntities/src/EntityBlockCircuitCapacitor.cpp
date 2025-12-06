@@ -33,10 +33,10 @@ static EntityFactoryRegistrar<EntityBlockCircuitCapacitor> registrar(EntityBlock
 EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Capacitor");
 	treeItem.setHiddenIcon("Default/Capacitor");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 	
 	setBlockTitle("C");
 

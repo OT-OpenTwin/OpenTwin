@@ -26,10 +26,10 @@ static EntityFactoryRegistrar<EntitySignalType> registrar("EntitySignalType");
 EntitySignalType::EntitySignalType(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityContainer(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Signal");
 	treeItem.setHiddenIcon("Default/Signal");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntitySignalType::~EntitySignalType()

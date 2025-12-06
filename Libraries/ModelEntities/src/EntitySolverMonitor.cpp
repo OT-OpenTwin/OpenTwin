@@ -26,10 +26,10 @@ static EntityFactoryRegistrar<EntitySolverMonitor> registrar("EntitySolverMonito
 EntitySolverMonitor::EntitySolverMonitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityContainer(ID, parent, obs, ms) 
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Monitor");
 	treeItem.setHiddenIcon("Default/Monitor");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntitySolverMonitor::~EntitySolverMonitor(){}

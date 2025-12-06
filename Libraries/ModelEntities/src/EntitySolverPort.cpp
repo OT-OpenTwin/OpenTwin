@@ -26,10 +26,10 @@ static EntityFactoryRegistrar<EntitySolverPort> registrar(EntitySolverPort::clas
 EntitySolverPort::EntitySolverPort(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	: EntityContainer(ID, parent, obs, ms) 
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Port");
 	treeItem.setHiddenIcon("Default/Port");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntitySolverPort::~EntitySolverPort(){}

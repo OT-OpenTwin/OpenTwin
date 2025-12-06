@@ -31,14 +31,14 @@ static EntityFactoryRegistrar<EntityResult1DPlot> registrar("EntityResult1DPlot_
 EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	:EntityContainer(_ID,_parent,_obs,_ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Plot1DVisible");
 	treeItem.setHiddenIcon("Default/Plot1DHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
-	ot::VisualisationTypes visTypes;
+	ot::VisualisationTypes visTypes = getVisualizationTypes();
 	visTypes.addPlot1DVisualisation();
-	this->setVisualizationTypes(visTypes, true);
+	this->setDefaultVisualizationTypes(visTypes);
 }
 
 void EntityResult1DPlot::storeToDataBase(void)

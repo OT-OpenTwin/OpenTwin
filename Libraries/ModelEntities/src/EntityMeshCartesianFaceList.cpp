@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "DataBase.h"
+#include "EntityAPI.h"
 #include "EntityMeshCartesianFace.h"
 #include "EntityMeshCartesianFaceList.h"
 

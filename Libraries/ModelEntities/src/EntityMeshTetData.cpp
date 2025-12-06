@@ -38,10 +38,10 @@ EntityMeshTetData::EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObser
 	meshFacesStorageId(-1),
 	gmshDataStorageId(-1)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/ContainerVisible");
 	treeItem.setHiddenIcon("Default/ContainerHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityMeshTetData::~EntityMeshTetData()

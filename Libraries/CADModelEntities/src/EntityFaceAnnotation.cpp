@@ -40,15 +40,13 @@ EntityFaceAnnotation::EntityFaceAnnotation(ot::UID ID, EntityBase *parent, Entit
 	EntityBase(ID, parent, obs, ms),
 	facetsStorageID(-1)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/FaceAnnotationVisible");
 	treeItem.setHiddenIcon("Default/FaceAnnotationHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 	
 	EntityPropertiesColor::createProperty(  "General", "Color",           {0, 0, 0}, "", getProperties());
-	EntityPropertiesInteger::createProperty("General", "Number of faces",         0, "", getProperties());
-
-	getProperties().getProperty("Number of faces")->setReadOnly(true);
+	EntityPropertiesInteger::createProperty("General", "Number of faces",         0, "", getProperties())->setReadOnly(true);
 
 	facets = nullptr;
 }

@@ -40,7 +40,7 @@ EntityFileImage::EntityFileImage(ot::UID _ID, EntityBase* _parent, EntityObserve
 {
 	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
 	visTypes.visualiseAsImage();
-	this->setVisualizationTypes(visTypes, true);
+	this->setDefaultVisualizationTypes(visTypes);
 }
 
 bool EntityFileImage::updateFromProperties() {

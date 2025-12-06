@@ -33,10 +33,10 @@ static EntityFactoryRegistrar<EntityBlockCircuitVoltageSource> registrar(EntityB
 EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlockCircuitElement(ID, parent, obs, ms) 
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/VoltageSource");
 	treeItem.setHiddenIcon("Default/VoltageSource");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 	
 	setBlockTitle("V");
 

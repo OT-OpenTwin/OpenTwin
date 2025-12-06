@@ -29,14 +29,14 @@ static EntityFactoryRegistrar<EntityTableSelectedRanges> registrar("EntityTableS
 EntityTableSelectedRanges::EntityTableSelectedRanges(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms)
 	:EntityBase(ID,parent,obs,ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/SelectedRange");
 	treeItem.setHiddenIcon("Default/SelectedRange");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 
-	ot::VisualisationTypes visTypes;
+	ot::VisualisationTypes visTypes = getVisualizationTypes();
 	visTypes.addRangeVisualisation();
-	this->setVisualizationTypes(visTypes, true);
+	this->setDefaultVisualizationTypes(visTypes);
 }
 
 void EntityTableSelectedRanges::addVisualizationNodes()

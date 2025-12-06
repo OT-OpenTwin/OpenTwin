@@ -209,17 +209,6 @@ void EntityBlock::readSpecificDataFromDataBase(const bsoncxx::document::view& do
 		m_connectorsByName[connector.getConnectorName()]=(connector);
 	}
 
-	auto iconVisibleIt = doc_view.find("NavigationIconVisible");
-	if (iconVisibleIt != doc_view.end())
-	{
-		m_navigationTreeIcon.visibleIcon = iconVisibleIt->get_string().value.data();
-	}
-	auto iconHiddenIt = doc_view.find("NavigationIconHidden");
-	if (iconHiddenIt != doc_view.end())
-	{
-		m_navigationTreeIcon.hiddenIcon = iconHiddenIt->get_string().value.data();
-	}
-	
 	auto pickerIt = doc_view.find("GraphicsPickerKey");
 	if (pickerIt != doc_view.end())
 	{

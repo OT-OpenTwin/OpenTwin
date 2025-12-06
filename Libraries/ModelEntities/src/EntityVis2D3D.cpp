@@ -37,10 +37,10 @@ EntityVis2D3D::EntityVis2D3D(ot::UID ID, EntityBase *parent, EntityObserver *obs
 	visualizationDataVersion(0)
 	//source(nullptr)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Vis2DVisible");
 	treeItem.setHiddenIcon("Default/Vis2DHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityVis2D3D::~EntityVis2D3D()

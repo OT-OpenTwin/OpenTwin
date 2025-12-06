@@ -32,10 +32,10 @@ static EntityFactoryRegistrar<EntityParameter> registrar("EntityParameter");
 EntityParameter::EntityParameter(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
 	EntityBase(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/ParameterVisible");
 	treeItem.setHiddenIcon("Default/ParameterHidden");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 EntityParameter::~EntityParameter()

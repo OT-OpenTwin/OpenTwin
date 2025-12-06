@@ -26,10 +26,10 @@ static EntityFactoryRegistrar<EntityMetadataCampaign> registrar("EntityMetadataC
 EntityMetadataCampaign::EntityMetadataCampaign(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms)
 	: EntityWithDynamicFields(ID, parent, mdl, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/RMD");
 	treeItem.setHiddenIcon("Default/RMD");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 }
 
 bool EntityMetadataCampaign::getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax)

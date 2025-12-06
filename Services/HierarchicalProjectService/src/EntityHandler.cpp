@@ -440,7 +440,7 @@ void EntityHandler::addLabel() {
 	labelEntity.setName(CreateNewUniqueTopologyName(c_decorationFolder, "Label"));
 	labelEntity.setGraphicsScenePackageChildName(c_decorationFolderName);
 	labelEntity.createProperties();
-	labelEntity.setEditable(true);
+	labelEntity.setTreeItemEditable(true);
 	labelEntity.setCoordinateEntityID(coord.getEntityID());
 	labelEntity.setText("New Label");
 	labelEntity.storeToDataBase();

@@ -27,10 +27,10 @@ static EntityFactoryRegistrar<EntityBlockCircuitConnector> registrar(EntityBlock
 EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlock(ID, parent, obs, ms)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Diod2");
 	treeItem.setHiddenIcon("Default/Diod2");
-	this->setTreeItem(treeItem, true);
+	this->setDefaultTreeItem(treeItem);
 	
 	setBlockTitle("Connector");
 
