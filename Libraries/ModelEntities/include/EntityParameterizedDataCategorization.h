@@ -56,8 +56,8 @@ private:
 	static const std::string c_dataCategoryParam;
 	static const std::string c_dataCategoryQuant;
 
-	const std::string c_unlockedIcon = "Categorization";
-	const std::string c_lockedIcon = "CategorizationLocked";
+	const std::string c_unlockedIcon = "Default/Categorization";
+	const std::string c_lockedIcon = "Default/CategorizationLocked";
 	bool m_locked = false;
 
 	DataCategorie m_selectedCategory = UNKNOWN;

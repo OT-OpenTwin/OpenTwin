@@ -36,8 +36,8 @@ EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* p
 	:EntityBlockCircuitElement(ID, parent, obs, ms) 
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("ResistorBG");
-	treeItem.setHiddenIcon("ResistorBG");
+	treeItem.setVisibleIcon("Default/ResistorBG");
+	treeItem.setHiddenIcon("Default/ResistorBG");
 	this->setTreeItem(treeItem, true);
 
 	setBlockTitle("R");

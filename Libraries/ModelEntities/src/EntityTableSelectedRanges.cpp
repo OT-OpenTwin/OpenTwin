@@ -30,8 +30,8 @@ EntityTableSelectedRanges::EntityTableSelectedRanges(ot::UID ID, EntityBase * pa
 	:EntityBase(ID,parent,obs,ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("SelectedRange");
-	treeItem.setHiddenIcon("SelectedRange");
+	treeItem.setVisibleIcon("Default/SelectedRange");
+	treeItem.setHiddenIcon("Default/SelectedRange");
 	this->setTreeItem(treeItem, true);
 
 	ot::VisualisationTypes visTypes;

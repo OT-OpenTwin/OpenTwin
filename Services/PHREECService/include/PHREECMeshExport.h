@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "OldTreeIcon.h"
+#include "OTCore/CoreTypes.h"
 
 #include <string>
 #include <vector>

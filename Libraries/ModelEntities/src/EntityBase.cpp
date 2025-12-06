@@ -38,7 +38,9 @@ EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	m_manageChildVisibility(true),
 	m_modelState(_ms),
 	m_isDeletable(true)
-{}
+{
+	m_treeItem.setEntityID(_ID);
+}
 
 EntityBase::~EntityBase() {
 	if (m_parentEntity != nullptr) {
@@ -140,7 +142,14 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 
 void EntityBase::setTreeItem(const ot::EntityTreeItem& _treeItem, bool _resetTreeItemModified) {
 	if (m_treeItem != _treeItem) {
+		ot::UID uid = m_treeItem.getEntityID();
+		ot::UID ver = m_treeItem.getEntityVersion();
+
 		m_treeItem = _treeItem;
+		
+		m_treeItem.setEntityID(uid);
+		m_treeItem.setEntityVersion(ver);
+		
 		if (_resetTreeItemModified) {
 			m_treeItem.resetModified();
 		}
@@ -223,11 +232,19 @@ void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view,
 		docIt = doc_view.find("VisibleTreeIcon");
 		if (docIt != doc_view.end()) {
 			m_treeItem.setVisibleIcon(docIt->get_string().value.data());
+			if (m_treeItem.getIcons().getVisibleIcon().find('/') == std::string::npos) {
+				// Old format without path, update to new format
+				m_treeItem.setVisibleIcon("Default/" + m_treeItem.getIcons().getVisibleIcon());
+			}
 		}
 
 		docIt = doc_view.find("HiddenTreeIcon");
 		if (docIt != doc_view.end()) {
 			m_treeItem.setHiddenIcon(docIt->get_string().value.data());
+			if (m_treeItem.getIcons().getHiddenIcon().find('/') == std::string::npos) {
+				// Old format without path, update to new format
+				m_treeItem.setHiddenIcon("Default/" + m_treeItem.getIcons().getHiddenIcon());
+			}
 		}
 
 		docIt = doc_view.find("VisualizationTypes");

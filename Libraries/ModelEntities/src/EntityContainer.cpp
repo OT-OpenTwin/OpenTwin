@@ -32,8 +32,8 @@ EntityContainer::EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver 
 	createVisualizationItem(true)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("ContainerVisible");
-	treeItem.setHiddenIcon("ContainerHidden");
+	treeItem.setVisibleIcon("Default/ContainerVisible");
+	treeItem.setHiddenIcon("Default/ContainerHidden");
 	treeItem.setSelectChilds(true);
 	this->setTreeItem(treeItem, true);
 }

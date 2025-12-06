@@ -228,7 +228,7 @@ void Application::handleAddSolver()
 	// Create the new solver item and store it in the data base
 	EntitySolverPyrit* solverEntity = new EntitySolverPyrit(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
-	solverEntity->setEditable(true);
+	solverEntity->setTreeItemEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID, scriptFolderName, scriptFolderID, scriptName, scriptID);
 	solverEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
@@ -532,7 +532,7 @@ void Application::addScalarResult(const std::string &resultName, char* fileData,
 	EntityVisUnstructuredScalarSurface* visualizationEntity = new EntityVisUnstructuredScalarSurface(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
 	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
-	visualizationEntity->setEditable(true);
+	visualizationEntity->setTreeItemEditable(true);
 	visualizationEntity->setInitiallyHidden(true);
 	visualizationEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
@@ -574,7 +574,7 @@ void Application::addVectorResult(const std::string& resultName, char* fileData,
 	EntityVisUnstructuredVectorSurface* visualizationEntity = new EntityVisUnstructuredVectorSurface(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
 	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_VECTOR);
-	visualizationEntity->setEditable(true);
+	visualizationEntity->setTreeItemEditable(true);
 	visualizationEntity->setInitiallyHidden(true);
 	visualizationEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |

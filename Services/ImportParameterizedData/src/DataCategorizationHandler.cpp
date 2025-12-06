@@ -372,7 +372,7 @@ void DataCategorizationHandler::addNewCategorizationEntity(std::string name, Ent
 	auto newEntity(std::make_shared<EntityParameterizedDataCategorization>(entID, nullptr, nullptr, nullptr));
 	newEntity->CreateProperties(category);
 	newEntity->setName(name);
-	newEntity->setEditable(true);
+	newEntity->setTreeItemEditable(true);
 	newEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
@@ -495,7 +495,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 
 			tableRange->setRange(userRange);
 			tableRange->setTableProperties(tableBase->getName(), tableBase->getEntityID(), ot::TableCfg::toString(tableEntPtr->getHeaderMode()));
-			tableRange->setEditable(true);
+			tableRange->setTreeItemEditable(true);
 			
 			// The name of the entity should correspond to the header value of the table. This header value will later be used as key of the database entry
 			std::string name = "";

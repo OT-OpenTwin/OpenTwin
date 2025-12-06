@@ -34,8 +34,8 @@ EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent,
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("Diod2");
-	treeItem.setHiddenIcon("Diod2");
+	treeItem.setVisibleIcon("Default/Diod2");
+	treeItem.setHiddenIcon("Default/Diod2");
 	this->setTreeItem(treeItem, true);
 	
 	setBlockTitle("D");

@@ -182,7 +182,7 @@ void InfoFileManager::writeInformation()
 
 		fileEntity->setName("Files/Information");
 		fileEntity->setFileProperties("", "", "Absolute");
-		fileEntity->setEditable(false);
+		fileEntity->setTreeItemEditable(false);
 		fileEntity->registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection |

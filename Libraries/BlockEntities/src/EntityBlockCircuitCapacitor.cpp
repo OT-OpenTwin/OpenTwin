@@ -34,8 +34,8 @@ EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase*
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("Capacitor");
-	treeItem.setHiddenIcon("Capacitor");
+	treeItem.setVisibleIcon("Default/Capacitor");
+	treeItem.setHiddenIcon("Default/Capacitor");
 	this->setTreeItem(treeItem, true);
 	
 	setBlockTitle("C");

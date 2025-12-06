@@ -502,7 +502,7 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 
 					EntityGeometry *entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr);
 					entityGeom->setName(thisName);
-					entityGeom->setEditable(true);
+					entityGeom->setTreeItemEditable(true);
 					entityGeom->setBrep(itemShape);
 					entityGeom->registerCallbacks(
 						ot::EntityCallbackBase::Callback::Properties |

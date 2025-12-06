@@ -20,6 +20,12 @@
 // OpenTwin header
 #include "OTGui/VisualisationTypes.h"
 
+ot::VisualisationTypes::VisualisationTypes(const ConstJsonObject& _object) 
+	: VisualisationTypes()
+{
+	setFromJsonObject(_object);
+}
+
 bool ot::VisualisationTypes::operator==(const VisualisationTypes& _other) const {
 	if (m_visualisations != _other.m_visualisations) {
 		return false;

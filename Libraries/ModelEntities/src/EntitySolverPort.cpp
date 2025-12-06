@@ -27,8 +27,8 @@ EntitySolverPort::EntitySolverPort(ot::UID ID, EntityBase* parent, EntityObserve
 	: EntityContainer(ID, parent, obs, ms) 
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("Port");
-	treeItem.setHiddenIcon("Port");
+	treeItem.setVisibleIcon("Default/Port");
+	treeItem.setHiddenIcon("Default/Port");
 	this->setTreeItem(treeItem, true);
 }
 

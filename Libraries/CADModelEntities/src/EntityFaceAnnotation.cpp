@@ -41,8 +41,8 @@ EntityFaceAnnotation::EntityFaceAnnotation(ot::UID ID, EntityBase *parent, Entit
 	facetsStorageID(-1)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("FaceAnnotationVisible");
-	treeItem.setHiddenIcon("FaceAnnotationHidden");
+	treeItem.setVisibleIcon("Default/FaceAnnotationVisible");
+	treeItem.setHiddenIcon("Default/FaceAnnotationHidden");
 	this->setTreeItem(treeItem, true);
 	
 	EntityPropertiesColor::createProperty(  "General", "Color",           {0, 0, 0}, "", getProperties());

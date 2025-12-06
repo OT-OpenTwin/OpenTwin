@@ -35,8 +35,8 @@ EntityFile::EntityFile(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	m_dataUID(ot::invalidUID), m_dataVersion(ot::invalidUID)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("TextVisible");
-	treeItem.setHiddenIcon("TextHidden");
+	treeItem.setVisibleIcon("Default/TextVisible");
+	treeItem.setHiddenIcon("Default/TextHidden");
 	this->setTreeItem(treeItem, true);
 }
 

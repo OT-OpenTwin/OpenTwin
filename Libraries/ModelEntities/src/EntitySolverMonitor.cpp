@@ -27,8 +27,8 @@ EntitySolverMonitor::EntitySolverMonitor(ot::UID ID, EntityBase* parent, EntityO
 	:EntityContainer(ID, parent, obs, ms) 
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("Monitor");
-	treeItem.setHiddenIcon("Monitor");
+	treeItem.setVisibleIcon("Default/Monitor");
+	treeItem.setHiddenIcon("Default/Monitor");
 	this->setTreeItem(treeItem, true);
 }
 

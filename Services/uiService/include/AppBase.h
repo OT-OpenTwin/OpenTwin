@@ -41,6 +41,7 @@
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/TextEditorCfg.h"
+#include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
@@ -336,7 +337,7 @@ public:
 
 	void clearNavigationTree();
 
-	ot::UID addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren);
+	ot::UID addNavigationTreeItem(const ot::EntityTreeItem& _itemInfo);
 
 	void setNavigationTreeItemIcon(ot::UID _itemID, const QString & _iconName, const QString & _iconDefaultPath);
 

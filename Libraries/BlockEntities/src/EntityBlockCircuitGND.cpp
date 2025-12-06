@@ -36,8 +36,8 @@ EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, Ent
 	: EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("GND");
-	treeItem.setHiddenIcon("GND");
+	treeItem.setVisibleIcon("Default/GND");
+	treeItem.setHiddenIcon("Default/GND");
 	this->setTreeItem(treeItem, true);
 
 	setBlockTitle("GND");

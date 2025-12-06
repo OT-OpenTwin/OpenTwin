@@ -39,8 +39,8 @@ EntityMeshTetData::EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObser
 	gmshDataStorageId(-1)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("ContainerVisible");
-	treeItem.setHiddenIcon("ContainerHidden");
+	treeItem.setVisibleIcon("Default/ContainerVisible");
+	treeItem.setHiddenIcon("Default/ContainerHidden");
 	this->setTreeItem(treeItem, true);
 }
 

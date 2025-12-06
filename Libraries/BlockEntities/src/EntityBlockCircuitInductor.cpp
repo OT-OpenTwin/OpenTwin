@@ -34,8 +34,8 @@ EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* p
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("Inductor");
-	treeItem.setHiddenIcon("Inductor");
+	treeItem.setVisibleIcon("Default/Inductor");
+	treeItem.setHiddenIcon("Default/Inductor");
 	this->setTreeItem(treeItem, true);
 	
 	setBlockTitle("L");

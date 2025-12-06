@@ -27,8 +27,8 @@ EntitySignalType::EntitySignalType(ot::UID ID, EntityBase* parent, EntityObserve
 	:EntityContainer(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("Signal");
-	treeItem.setHiddenIcon("Signal");
+	treeItem.setVisibleIcon("Default/Signal");
+	treeItem.setHiddenIcon("Default/Signal");
 	this->setTreeItem(treeItem, true);
 }
 

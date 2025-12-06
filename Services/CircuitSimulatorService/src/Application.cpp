@@ -95,7 +95,7 @@ void Application::createNewCircuit() {
 
 	std::unique_ptr<EntityGraphicsScene> entityCircuitRoot(new EntityGraphicsScene(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr));
 	entityCircuitRoot->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
-	entityCircuitRoot->setEditable(true);
+	entityCircuitRoot->setTreeItemEditable(true);
 	entityCircuitRoot->setName(circuitName);
 	entityCircuitRoot->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
@@ -179,7 +179,7 @@ void Application::addSolver() {
 	// Create the new solver item and store it in the data base
 	EntitySolverCircuitSimulator* solverEntity = new EntitySolverCircuitSimulator(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
-	solverEntity->setEditable(true);
+	solverEntity->setTreeItemEditable(true);
 	solverEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection,

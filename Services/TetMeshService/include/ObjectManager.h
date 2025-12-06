@@ -27,11 +27,11 @@ class ProgressLogger;
 class EntityBase;
 class EntityMeshTet;
 
+#include "OTCore/CoreTypes.h"
+
 #include <vector>
 #include <map>
 #include <string>
-
-#include "OldTreeIcon.h"
 
 namespace gmsh
 {

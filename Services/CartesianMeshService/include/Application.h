@@ -23,7 +23,6 @@
 #include "OTCore/CoreTypes.h"					// open twins rapid json layer
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
-#include "OldTreeIcon.h"
 #include "EntityInformation.h"
 
 // C++ header

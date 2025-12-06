@@ -1681,11 +1681,8 @@ void AppBase::clearNavigationTree() {
 	m_projectNavigation->getTree()->clear();
 }
 
-ot::UID AppBase::addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren) {
-	ot::UID id = m_projectNavigation->getTree()->add(_treePath, _delimiter);
-	m_projectNavigation->getTree()->setItemIsEditable(id, _isEditable);
-	m_projectNavigation->getTree()->setItemSelectChildren(id, selectChildren);
-	return id;
+ot::UID AppBase::addNavigationTreeItem(const ot::EntityTreeItem& _itemInfo) {
+	return m_projectNavigation->getTree()->add(_itemInfo);
 }
 
 void AppBase::setNavigationTreeItemIcon(ot::UID _itemID, const QString & _iconName, const QString & _iconDefaultPath) {

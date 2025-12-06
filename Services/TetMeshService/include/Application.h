@@ -24,8 +24,6 @@
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "EntityInformation.h"
 
-#include "OldTreeIcon.h"
-
 // C++ header
 #include <string>
 

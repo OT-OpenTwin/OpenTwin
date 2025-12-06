@@ -71,8 +71,8 @@ EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, Entit
 	: EntityBase(_ID, _parent, _mdl, _ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("Plot1DVisible");
-	treeItem.setHiddenIcon("Plot1DHidden");
+	treeItem.setVisibleIcon("Default/Plot1DVisible");
+	treeItem.setHiddenIcon("Default/Plot1DHidden");
 	this->setTreeItem(treeItem, true);
 
 	ot::VisualisationTypes visTypes;

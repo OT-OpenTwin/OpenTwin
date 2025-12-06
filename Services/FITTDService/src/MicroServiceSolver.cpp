@@ -384,12 +384,12 @@ void MicroServiceSolver::addResultFD(std::string name, std::string title, double
 									  yComponentDataEnt->getEntityID(), yComponentDataEnt->getEntityStorageVersion(),
 									  zComponentDataEnt->getEntityID(), zComponentDataEnt->getEntityStorageVersion());
 		dataEntity->setMeshData(meshDataEntityID, meshDataVersion);
-		dataEntity->setEditable(true);
+		dataEntity->setTreeItemEditable(true);
 		dataEntity->setResultType(EntityResultBase::CARTESIAN_NODE_VECTORS);
 		dataEntity->storeToDataBase();
 
 		topoEntity->setName(name + "/Plot");
-		topoEntity->setEditable(true);
+		topoEntity->setTreeItemEditable(true);
 		topoEntity->setInitiallyHidden(true);
 		topoEntity->setResultType(EntityResultBase::CARTESIAN_NODE_VECTORS);
 		topoEntity->createProperties();

@@ -26,7 +26,7 @@ class EntityBrep;
 class TopoDS_Shape;
 class TopoDS_TShape;
 
-#include "OldTreeIcon.h"
+#include "OTCore/CoreTypes.h"
 
 #include <list>
 #include <vector>

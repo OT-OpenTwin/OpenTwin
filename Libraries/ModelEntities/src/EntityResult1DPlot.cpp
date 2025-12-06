@@ -32,8 +32,8 @@ EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityO
 	:EntityContainer(_ID,_parent,_obs,_ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("Plot1DVisible");
-	treeItem.setHiddenIcon("Plot1DHidden");
+	treeItem.setVisibleIcon("Default/Plot1DVisible");
+	treeItem.setHiddenIcon("Default/Plot1DHidden");
 	this->setTreeItem(treeItem, true);
 
 	ot::VisualisationTypes visTypes;

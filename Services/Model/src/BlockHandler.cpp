@@ -806,7 +806,7 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 
 	// Setup block entity
 	blockEnt->setName(entName);
-	blockEnt->setEditable(true);
+	blockEnt->setTreeItemEditable(true);
 	blockEnt->setGraphicsPickerKey(_editor->getGraphicsPickerKey());
 	blockEnt->setCallbackData(_editor->getCallbackData());
 	blockEnt->setEntityID(model->createEntityUID());

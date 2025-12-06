@@ -23,7 +23,6 @@
 #include "MicroserviceNotifier.h"
 #include "ProjectTypeManager.h"
 #include "Model.h"
-#include "OldTreeIcon.h"
 #include "curl/curl.h"
 
 #include "EntityGeometry.h"
@@ -64,13 +63,6 @@ ot::JsonDocument MicroserviceAPI::BuildJsonDocFromString(std::string json)
 	assert(doc.IsObject());
 
 	return doc;
-}
-
-void MicroserviceAPI::addOldTreeIconsToJsonDoc(ot::JsonDocument &doc, const OldTreeIcon &treeIcons)
-{
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconSize, rapidjson::Value(treeIcons.size), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconItemVisible, rapidjson::Value(treeIcons.visibleIcon.c_str(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconItemHidden, rapidjson::Value(treeIcons.hiddenIcon.c_str(), doc.GetAllocator()), doc.GetAllocator());
 }
 
 void MicroserviceAPI::AddDoubleArrayVectorToJsonDoc(ot::JsonDocument &doc, const std::string &name, const std::vector<std::array<double, 3>> &vector)

@@ -354,7 +354,7 @@ EntityGeometry *ModelBuilder::createGeometryEntity(const std::string &name, Topo
 	EntityGeometry *entityGeom = new EntityGeometry(0, nullptr, nullptr, nullptr);
 
 	entityGeom->setName(name);
-	entityGeom->setEditable(true);
+	entityGeom->setTreeItemEditable(true);
 	entityGeom->setBrep(shape);
 	entityGeom->setInitiallyHidden(true);
 	entityGeom->registerCallbacks(

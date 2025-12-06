@@ -27,8 +27,8 @@ EntityMetadataSeries::EntityMetadataSeries(ot::UID ID, EntityBase* parent, Entit
 	: EntityWithDynamicFields(ID, parent, mdl, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("MSMD");
-	treeItem.setHiddenIcon("MSMD");
+	treeItem.setVisibleIcon("Default/MSMD");
+	treeItem.setHiddenIcon("Default/MSMD");
 	this->setTreeItem(treeItem, true);
 
 	CreatePlainDocument(_parameterDocument);

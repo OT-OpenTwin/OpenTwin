@@ -29,7 +29,6 @@ namespace ot
 }
 
 #include "OTCore/CoreTypes.h"
-#include "OldTreeIcon.h"
 
 #include <map>
 #include <list>

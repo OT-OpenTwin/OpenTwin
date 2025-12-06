@@ -79,7 +79,7 @@ std::string TableReader::readFromFile(const std::string fileName, const std::str
 	tableItem->setCallbackData(_callbackData.getCallbackData());
 
 	tableItem->setName(itemName);
-	tableItem->setEditable(false);
+	tableItem->setTreeItemEditable(false);
 
 	// Now we store the data in the entity
 

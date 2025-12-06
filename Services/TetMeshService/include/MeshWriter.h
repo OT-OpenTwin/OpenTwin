@@ -32,13 +32,13 @@ class EntityBase;
 class EntityBinaryData;
 class EntityProperties;
 
+#include "OTCore/CoreTypes.h"
+
 #include <vector>
 #include <map>
 #include <list>
 #include <array>
 #include <string>
-
-#include "OldTreeIcon.h"
 
 namespace gmsh
 {

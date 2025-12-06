@@ -20,6 +20,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/EntityTreeItem.h"
 #include "OTWidgets/WidgetBase.h"
 
  // AK header
@@ -104,6 +105,8 @@ namespace ak {
 		//! @param _cmd The tree command
 		//! @param _delimiter The delimiter used in the command which seperates the items
 		UID add(const QString& _cmd, char _delimiter = '|', textAlignment _textAlignment = alignLeft, const QIcon& _icon = QIcon());
+
+		UID add(const ot::EntityTreeItem& _itemInfo);
 
 		//! @brief Will clear all tree items, receivers will get a destroyed message for each item
 		void clear(bool _emitEvent = true);

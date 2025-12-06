@@ -81,7 +81,7 @@ void Application::createPipeline()
 	auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
 	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
 	newDataprocessing.setName(entityName);
-	newDataprocessing.setEditable(true);
+	newDataprocessing.setTreeItemEditable(true);
 	newDataprocessing.storeToDataBase();
 
 	ot::NewModelStateInfo infos;

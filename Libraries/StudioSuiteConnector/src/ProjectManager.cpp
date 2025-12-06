@@ -809,7 +809,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 		fileEntity->setName("Files/" + pathName);
 		fileEntity->setFileProperties(pathName, filePath.filename().string(), "Absolute");
 		fileEntity->setDataEntity(dataEntityID, dataVersion);
-		fileEntity->setEditable(false);
+		fileEntity->setTreeItemEditable(false);
 
 		fileEntity->storeToDataBase(fileVersion);
 

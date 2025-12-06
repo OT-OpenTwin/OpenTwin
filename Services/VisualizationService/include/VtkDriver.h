@@ -20,8 +20,9 @@
 #pragma once
 
 #include <string>
-#include "OldTreeIcon.h"
 #include <ctime>
+
+#include "OTCore/CoreTypes.h"
 
 class EntityVis2D3D;
 class DataSourceManagerItem;

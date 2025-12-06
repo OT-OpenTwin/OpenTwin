@@ -33,8 +33,8 @@ EntityParameter::EntityParameter(ot::UID ID, EntityBase *parent, EntityObserver 
 	EntityBase(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("ParameterVisible");
-	treeItem.setHiddenIcon("ParameterHidden");
+	treeItem.setVisibleIcon("Default/ParameterVisible");
+	treeItem.setHiddenIcon("Default/ParameterHidden");
 	this->setTreeItem(treeItem, true);
 }
 

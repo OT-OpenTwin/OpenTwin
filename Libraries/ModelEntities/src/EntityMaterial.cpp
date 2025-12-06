@@ -32,8 +32,8 @@ EntityMaterial::EntityMaterial(ot::UID ID, EntityBase *parent, EntityObserver *o
 	EntityBase(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("MaterialVisible");
-	treeItem.setHiddenIcon("MaterialHidden");
+	treeItem.setVisibleIcon("Default/MaterialVisible");
+	treeItem.setHiddenIcon("Default/MaterialHidden");
 	this->setTreeItem(treeItem, true);
 }
 

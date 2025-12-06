@@ -31,8 +31,8 @@ EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, Ent
 	_blockIDOrigin(-1), _blockIDDestination(-1)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("connection");
-	treeItem.setHiddenIcon("connection");
+	treeItem.setVisibleIcon("Default/connection");
+	treeItem.setHiddenIcon("Default/connection");
 	this->setTreeItem(treeItem, true);
 }
 

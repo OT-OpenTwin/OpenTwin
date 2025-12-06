@@ -96,7 +96,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 
 		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry *>(entityCache->getEntity(entity.getEntityID(), entity.getEntityVersion()));
 
-		if (geometryEntity->getEditable())
+		if (geometryEntity->getTreeItemEditable())
 		{
 			entityBreps.push_back(geometryEntity->getBrepStorageObjectID());
 		}
@@ -138,7 +138,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 
 		if (geometryEntity != nullptr)
 		{
-			if (geometryEntity->getEditable())
+			if (geometryEntity->getTreeItemEditable())
 			{
 				if (removeFacesFromEntity(geometryEntity, geometryEntity->getBrepStorageObjectID(), entityVersionMap[geometryEntity->getBrepStorageObjectID()], shape.second, modifiedEntities))
 				{

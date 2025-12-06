@@ -37,8 +37,8 @@ EntityMeshTet::EntityMeshTet(ot::UID ID, EntityBase *parent, EntityObserver *obs
 	meshValid(false)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("TetrahedralMeshVisible");
-	treeItem.setHiddenIcon("TetrahedralMeshHidden");
+	treeItem.setVisibleIcon("Default/TetrahedralMeshVisible");
+	treeItem.setHiddenIcon("Default/TetrahedralMeshHidden");
 	this->setTreeItem(treeItem, true);
 }
 

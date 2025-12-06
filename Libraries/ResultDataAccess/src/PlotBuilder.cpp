@@ -69,7 +69,7 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 		m_parameterLabels.push_back(parameterDescription.m_label);
 	}
 	curveEntity.setCurve(_config);
-	curveEntity.setEditable(true);
+	curveEntity.setTreeItemEditable(true);
 	m_curves.push_back(curveEntity);
 }
 
@@ -163,7 +163,7 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 	m_quantityLabel.unique();
 	plotEntity.createProperties();
 	plotEntity.setPlot(_plotCfg);
-	plotEntity.setEditable(true);
+	plotEntity.setTreeItemEditable(true);
 	plotEntity.storeToDataBase();
 	m_newModelStateInformation.addTopologyEntity(plotEntity);
 

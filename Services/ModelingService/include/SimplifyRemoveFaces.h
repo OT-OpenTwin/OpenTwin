@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "OldTreeIcon.h"
 #include "ShapesBase.h"
 
 #include "BRepAlgoAPI_Defeaturing.hxx"

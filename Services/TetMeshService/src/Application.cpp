@@ -150,7 +150,7 @@ void Application::createMesh(void)
 	// Create the new mesh item
 	EntityMeshTet *meshEntity = new EntityMeshTet(entityID, nullptr, nullptr, nullptr);
 	meshEntity->setName(meshName);
-	meshEntity->setEditable(true);
+	meshEntity->setTreeItemEditable(true);
 	meshEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |

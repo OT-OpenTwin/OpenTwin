@@ -31,6 +31,7 @@ namespace ot {
 	public:
 		EntityTreeItem();
 		EntityTreeItem(const BasicEntityInformation& _entityInfo);
+		EntityTreeItem(const ot::ConstJsonObject& _jsonObject);
 		virtual ~EntityTreeItem() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################

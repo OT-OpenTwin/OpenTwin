@@ -254,7 +254,7 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 		const std::string name = newSeriesMetadata->getName();
 		EntityMetadataSeries entitySeries(newSeriesMetadata->getSeriesIndex(), nullptr, nullptr, nullptr);
 		entitySeries.setName(name);
-		entitySeries.setEditable(true);
+		entitySeries.setTreeItemEditable(true);
 		entitySeries.setCallbackData(this->getCallbackData());
 
 		for (const MetadataParameter& parameter : newSeriesMetadata->getParameter())

@@ -36,8 +36,8 @@ EntityResultTable<T>::EntityResultTable(ot::UID ID, EntityBase *parent, EntityOb
 	m_className = "EntityResultTable_" + ot::TemplateTypeName<T>::getTypeName();
 
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("TableVisible");
-	treeItem.setHiddenIcon("TableHidden");
+	treeItem.setVisibleIcon("Default/TableVisible");
+	treeItem.setHiddenIcon("Default/TableHidden");
 	this->setTreeItem(treeItem, true);
 
 	ot::VisualisationTypes visType;

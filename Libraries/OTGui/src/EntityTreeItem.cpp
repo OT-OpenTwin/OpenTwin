@@ -32,6 +32,12 @@ ot::EntityTreeItem::EntityTreeItem(const BasicEntityInformation& _entityInfo)
 	BasicEntityInformation::operator=(_entityInfo);
 }
 
+ot::EntityTreeItem::EntityTreeItem(const ot::ConstJsonObject& _jsonObject)
+	: EntityTreeItem()
+{
+	setFromJsonObject(_jsonObject);
+}
+
 bool ot::EntityTreeItem::operator==(const EntityTreeItem& _other) const {
 	return BasicEntityInformation::operator==(_other)
 		&& (m_icons == _other.m_icons)

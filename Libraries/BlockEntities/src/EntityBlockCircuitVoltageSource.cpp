@@ -34,8 +34,8 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 	:EntityBlockCircuitElement(ID, parent, obs, ms) 
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("VoltageSource");
-	treeItem.setHiddenIcon("VoltageSource");
+	treeItem.setVisibleIcon("Default/VoltageSource");
+	treeItem.setHiddenIcon("Default/VoltageSource");
 	this->setTreeItem(treeItem, true);
 	
 	setBlockTitle("V");

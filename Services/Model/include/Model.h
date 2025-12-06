@@ -26,7 +26,6 @@
 
 #include "EntityContainer.h"
 #include "Geometry.h"
-#include "OldTreeIcon.h"
 #include "ModelState.h"
 #include "EntityBase.h"
 #include "EntityFaceAnnotation.h"
@@ -93,7 +92,6 @@ public:
 	void updateEntityProperties(bool itemsVisible);
 
 	void deleteEntity(EntityBase *entity);
-	void facetEntity(EntityGeometry *entity, double deflection, bool isHidden, bool notifyViewer);
 	double calculateDeflectionFromListOfEntities(std::list<EntityBase *> &entities);
 	double calculateDeflectionFromAllEntities();
 	void refreshAllViews();
@@ -112,23 +110,6 @@ public:
 	std::string getSolverRootName() { return ot::FolderNames::SolverFolder; };
 	std::string getScriptsRootName() { return ot::FolderNames::PythonScriptFolder; };
 	std::string getUnitRootName() { return "Units"; };
-
-	void addVisualizationNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-										   double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
-	void addVisualizationNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-										       double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ot::UID entityID, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
-
-	void addAnnotationEntities(std::list<EntityAnnotation *> &errorAnnotations);
-	void addVisualizationAnnotationNode(const std::string &name, ot::UID UID, const OldTreeIcon &treeIcons, bool isHidden,
-									    const double edgeColorRGB[3],
-										const std::vector<std::array<double, 3>> &points,
-										const std::vector<std::array<double, 3>> &points_rgb,
-										const std::vector<std::array<double, 3>> &triangle_p1,
-									    const std::vector<std::array<double, 3>> &triangle_p2,
-									    const std::vector<std::array<double, 3>> &triangle_p3,
-									    const std::vector<std::array<double, 3>> &triangle_rgb);
-
-	void updateObjectFacetsFromDataBase(ot::UID modelEntityID, ot::UID entityID);
 
 	void removeShapesFromVisualization(std::list<ot::UID> &removeFromDisplay);
 	void setShapeVisibility(std::list<ot::UID> &visibleEntityIDs, std::list<ot::UID> &hiddenEntityIDs);
@@ -161,8 +142,7 @@ public:
 	void prefetchDocumentsFromStorage(std::list<ot::UID> &prefetchIds);
 
 	void addVisualizationContainerNode(const std::string &name, ot::UID entityID, bool isEditable);
-	void addVisualizationMeshNode(const std::string &name, ot::UID entityID);
-
+	
 	bool isProjectOpen() const { return m_isProjectOpen; };
 	void projectOpen(const std::string& _customVersion = std::string());
 	void projectSave(const std::string &comment, bool silentlyCreateBranch);

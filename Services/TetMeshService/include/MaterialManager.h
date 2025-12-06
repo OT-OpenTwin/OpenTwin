@@ -20,7 +20,6 @@
 #pragma once
 
 #include "Properties.h"
-#include "OldTreeIcon.h"
 
 #include <list>
 #include <string>

@@ -34,8 +34,8 @@ EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, Entit
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("VoltMeter");
-	treeItem.setHiddenIcon("VoltMeter");
+	treeItem.setVisibleIcon("Default/VoltMeter");
+	treeItem.setHiddenIcon("Default/VoltMeter");
 	this->setTreeItem(treeItem, true);
 
 	setBlockTitle("VM");

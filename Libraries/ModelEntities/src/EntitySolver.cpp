@@ -29,8 +29,8 @@ EntitySolver::EntitySolver(ot::UID ID, EntityBase *parent, EntityObserver *obs, 
 	EntityContainer(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("SolverVisible");
-	treeItem.setHiddenIcon("SolverHidden");
+	treeItem.setVisibleIcon("Default/SolverVisible");
+	treeItem.setHiddenIcon("Default/SolverHidden");
 	this->setTreeItem(treeItem, true);
 }
 

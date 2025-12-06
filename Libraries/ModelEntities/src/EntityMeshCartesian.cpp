@@ -36,8 +36,8 @@ EntityMeshCartesian::EntityMeshCartesian(ot::UID ID, EntityBase *parent, EntityO
 	meshValid(false)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("CartesianMeshVisible");
-	treeItem.setHiddenIcon("CartesianMeshHidden");
+	treeItem.setVisibleIcon("Default/CartesianMeshVisible");
+	treeItem.setHiddenIcon("Default/CartesianMeshHidden");
 	this->setTreeItem(treeItem, true);
 }
 

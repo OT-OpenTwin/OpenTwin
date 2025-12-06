@@ -330,7 +330,7 @@ void Application::addSolver(void) {
 	// Create the new solver item and store it in the data base
 	EntitySolverFITTD *solverEntity = new EntitySolverFITTD(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
-	solverEntity->setEditable(true);
+	solverEntity->setTreeItemEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);	
 	solverEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
@@ -346,7 +346,7 @@ void Application::addSolver(void) {
 	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr);
 	newSignal->setName(solverName + "/" + FolderNames::GetFolderNameSignalType() + "/DefaultSignal");
 	newSignal->setInitiallyHidden(false);
-	newSignal->setEditable(false);
+	newSignal->setTreeItemEditable(false);
 	newSignal->createProperties();
 
 	newSignal->storeToDataBase();

@@ -34,8 +34,8 @@ EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID I
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("TranLine");
-	treeItem.setHiddenIcon("TranLine");
+	treeItem.setVisibleIcon("Default/TranLine");
+	treeItem.setHiddenIcon("Default/TranLine");
 	this->setTreeItem(treeItem, true);
 	
 	setBlockTitle("T");

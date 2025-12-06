@@ -27,8 +27,8 @@ EntityMetadataCampaign::EntityMetadataCampaign(ot::UID ID, EntityBase* parent, E
 	: EntityWithDynamicFields(ID, parent, mdl, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("RMD");
-	treeItem.setHiddenIcon("RMD");
+	treeItem.setVisibleIcon("Default/RMD");
+	treeItem.setHiddenIcon("Default/RMD");
 	this->setTreeItem(treeItem, true);
 }
 

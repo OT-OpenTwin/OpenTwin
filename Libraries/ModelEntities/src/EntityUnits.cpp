@@ -28,8 +28,8 @@ EntityUnits::EntityUnits(ot::UID ID, EntityBase * parent, EntityObserver * obs, 
 	: EntityBase(ID,parent,obs,ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("Units");
-	treeItem.setHiddenIcon("Units");
+	treeItem.setVisibleIcon("Default/Units");
+	treeItem.setHiddenIcon("Default/Units");
 	this->setTreeItem(treeItem, true);
 
 	setUnitLists();

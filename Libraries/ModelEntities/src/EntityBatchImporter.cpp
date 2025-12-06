@@ -27,8 +27,8 @@ EntityBatchImporter::EntityBatchImporter(ot::UID _ID, EntityBase* _parent, Entit
 	:EntityBase(_ID, _parent, _obs, _ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("BatchProcessing");
-	treeItem.setHiddenIcon("BatchProcessing");
+	treeItem.setVisibleIcon("Default/BatchProcessing");
+	treeItem.setHiddenIcon("Default/BatchProcessing");
 	this->setTreeItem(treeItem, true);
 }
 

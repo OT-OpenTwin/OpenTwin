@@ -34,8 +34,8 @@ EntityResultText::EntityResultText(ot::UID ID, EntityBase *parent, EntityObserve
 	EntityBase(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("TextVisible");
-	treeItem.setHiddenIcon("TextHidden");
+	treeItem.setVisibleIcon("Default/TextVisible");
+	treeItem.setHiddenIcon("Default/TextHidden");
 	this->setTreeItem(treeItem, true);
 
 	ot::VisualisationTypes visTypes;

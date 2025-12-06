@@ -30,8 +30,6 @@
 #include "EntityBinaryData.h"
 #include "EntityProperties.h"
 
-#include "OldTreeIcon.h"
-
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "EntityAPI.h"

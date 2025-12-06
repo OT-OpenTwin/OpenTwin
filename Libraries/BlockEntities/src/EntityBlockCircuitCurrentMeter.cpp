@@ -34,8 +34,8 @@ EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, Entit
 	:EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("CurrentMeter");
-	treeItem.setHiddenIcon("CurrentMeter");
+	treeItem.setVisibleIcon("Default/CurrentMeter");
+	treeItem.setHiddenIcon("Default/CurrentMeter");
 	this->setTreeItem(treeItem, true);
 	
 	setBlockTitle("CM");

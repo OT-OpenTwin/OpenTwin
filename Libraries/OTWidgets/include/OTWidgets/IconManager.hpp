@@ -37,7 +37,7 @@ std::shared_ptr<T>& ot::IconManager::getOrCreate(const QString& _subPath, std::m
 	// Find new
 	QString path = this->findFullPath(_subPath);
 	if (path.isEmpty()) {
-		OT_LOG_E("Icon \"" + _subPath.toStdString() + "\" not found");
+		OT_LOG_EAS("Asset not found { \"SubPath\": \"" + _subPath.toStdString() + "\" }");
 		return _default;
 	}
 

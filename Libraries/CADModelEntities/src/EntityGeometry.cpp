@@ -47,8 +47,8 @@ EntityGeometry::EntityGeometry(ot::UID ID, EntityBase *parent, EntityObserver *o
 	facets = new EntityFacetData(0, this, obs, ms);
 
 	ot::EntityTreeItem treeItem;
-	treeItem.setVisibleIcon("ModelVisible");
-	treeItem.setHiddenIcon("ModelHidden");
+	treeItem.setVisibleIcon("Default/ModelVisible");
+	treeItem.setHiddenIcon("Default/ModelHidden");
 	this->setTreeItem(treeItem, true);
 }
 

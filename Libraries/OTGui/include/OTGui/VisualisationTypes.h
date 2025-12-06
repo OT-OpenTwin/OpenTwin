@@ -52,6 +52,7 @@ namespace ot
 		typedef Flags<VisualisationType, uint64_t> VisTypes;
 
 		VisualisationTypes() = default;
+		VisualisationTypes(const ConstJsonObject& _object);
 		~VisualisationTypes() = default;
 
 		bool operator == (const VisualisationTypes& _other) const;
