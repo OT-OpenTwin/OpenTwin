@@ -109,7 +109,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBD);$(OC_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLD);$(ZLIB_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBD);$(OC_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_CLIBD);$(ZLIB_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(CFG_OC_LIBS);CADModelEntities.lib;$(OC_LIBD);RubberbandEngineCore.lib;$(ZLIB_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -154,7 +154,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBR);$(OC_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLD);$(ZLIB_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBR);$(OC_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_CLIBR);$(ZLIB_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib;$(OC_LIBR);$(CFG_OC_LIBS);RubberbandEngineCore.lib;$(ZLIB_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
