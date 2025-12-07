@@ -134,12 +134,13 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 
 	if (actualProperty->isMultiline()) {
 		if (m_lineEdit) {
+			disconnect(m_lineEdit, &LineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
 			delete m_lineEdit;
 			m_lineEdit = nullptr;
 		}
 		if (!m_textEdit) {
 			m_textEdit = new PlainTextEdit(nullptr);
-			this->connect(m_textEdit, &PlainTextEdit::textChanged, this, &PropertyInputString::lclValueChanged);
+			this->connect(m_textEdit, &PlainTextEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
 		}
 
 		QSignalBlocker sigBlock(m_textEdit);
@@ -161,12 +162,13 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 	}
 	else {
 		if (m_textEdit) {
-			delete m_lineEdit;
-			m_lineEdit = nullptr;
+			disconnect(m_textEdit, &PlainTextEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
+			delete m_textEdit;
+			m_textEdit = nullptr;
 		}
 		if (!m_lineEdit) {
 			m_lineEdit = new LineEdit(nullptr);
-			this->connect(m_lineEdit, &LineEdit::textChanged, this, &PropertyInputString::lclValueChanged);
+			this->connect(m_lineEdit, &LineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
 		}
 
 		QSignalBlocker sigBlock(m_lineEdit);

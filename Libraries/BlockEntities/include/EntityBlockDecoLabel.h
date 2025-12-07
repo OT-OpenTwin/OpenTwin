@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "OTGui/Font.h"
 #include "EntityBlockDecoration.h"
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockDecoLabel : public EntityBlockDecoration {
@@ -45,6 +46,25 @@ public:
 
 	void setTextPainter(const ot::Painter2D* _painter);
 	const ot::Painter2D* getTextPainter() const;
+
+	void setFontFamily(ot::FontFamily _fontFamily);
+	void setFontFamily(const std::string& _fontFamily);
+	std::string getFontFamily() const;
+
+	void setFontSize(int _fontSize);
+	int getFontSize() const;
+
+	void setBold(bool _bold);
+	bool getBold() const;
+
+	void setItalic(bool _italic);
+	bool getItalic() const;
+
+	void setFont(const ot::Font& _font);
+	ot::Font getFont() const;
+
+	void setAlignment(ot::Alignment _alignment);
+	ot::Alignment getAlignment() const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

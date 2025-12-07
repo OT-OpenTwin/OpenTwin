@@ -34,7 +34,7 @@ static ot::GraphicsItemFactoryRegistrar<ot::GraphicsTextItem> textItemRegistrar(
 ot::GraphicsTextItem::GraphicsTextItem()
 	: ot::CustomGraphicsItem(new GraphicsTextItemCfg)
 {
-
+	
 }
 
 ot::GraphicsTextItem::~GraphicsTextItem() {
@@ -67,8 +67,23 @@ QMarginsF ot::GraphicsTextItem::getOutlineMargins(void) const {
 QSizeF ot::GraphicsTextItem::getPreferredGraphicsItemSize(void) const {
 	const GraphicsTextItemCfg* cfg = this->getItemConfiguration<GraphicsTextItemCfg>();
 
-	QFontMetrics m(QtFactory::toQFont(cfg->getTextFont()));
-	return m.size(Qt::TextSingleLine, QString::fromStdString(cfg->getText()));
+	QString text = QString::fromStdString(cfg->getText());
+	QFont font = QtFactory::toQFont(cfg->getTextFont());
+	QFontMetrics fm(font);
+
+	// Split into explicit lines
+	QStringList lines = text.split('\n');
+
+	qreal width = 0;
+	qreal height = 0;
+
+	for (const QString& line : lines) {
+		QSizeF lineSize = fm.size(Qt::TextSingleLine, line);
+		width = std::max(width, lineSize.width());
+		height += lineSize.height();
+	}
+
+	return QSizeF(width, height);
 }
 
 void ot::GraphicsTextItem::finalizeGraphicsItem(void) {
@@ -154,5 +169,7 @@ void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptio
 	_painter->setFont(QtFactory::toQFont(cfg->getTextFont()));
 	_painter->setPen(textPen);
 	
-	_painter->drawText(_rect, QString::fromStdString(cfg->getText()), QTextOption(QtFactory::toQAlignment(this->getGraphicsItemAlignment())));
+	QTextOption textOption(QtFactory::toQAlignment(this->getGraphicsItemAlignment()));
+	textOption.setWrapMode(QTextOption::NoWrap);
+	_painter->drawText(_rect, QString::fromStdString(cfg->getText()), textOption);
 }
