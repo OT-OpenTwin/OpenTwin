@@ -27,7 +27,7 @@
 #include <QtWidgets/qscrollbar.h>
 
 ot::PlainTextEdit::PlainTextEdit(QWidget* _parent)
-	: QPlainTextEdit(_parent), m_autoScrollToBottom(false), m_validator(nullptr), m_maxLength(0)
+	: QPlainTextEdit(_parent), m_autoScrollToBottom(false), m_validator(nullptr), m_maxLength(0), m_hasChanged(false)
 {
 	QFontMetrics f(this->font());
 	this->setTabStopDistance(4 * f.horizontalAdvance(QChar(' ')));
@@ -146,7 +146,16 @@ void ot::PlainTextEdit::insertFromMimeData(const QMimeData* _source) {
 	cursor.insertText(incoming);
 }
 
+void ot::PlainTextEdit::focusOutEvent(QFocusEvent* _event) {
+	QPlainTextEdit::focusOutEvent(_event);
+	if (m_hasChanged) {
+		emit editingFinished();
+		m_hasChanged = false;
+	}
+}
+
 void ot::PlainTextEdit::slotTextChanged(void) {
+	m_hasChanged = true;
 	if (m_validator) {
 		QString currentText = this->toPlainText();
 		int pos = 0;

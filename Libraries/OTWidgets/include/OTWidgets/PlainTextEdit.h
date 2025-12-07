@@ -53,6 +53,12 @@ namespace ot {
 		void setMaxTextLength(int _maxLength);
 		int getMaxTextLength() const { return m_maxLength; };
 
+		void setTextChanged(bool _changed) { m_hasChanged = _changed; };
+		bool getTextChanged() const { return m_hasChanged; };
+		
+	Q_SIGNALS:
+		void editingFinished();
+
 	public Q_SLOTS:
 		void slotTextChanged();
 
@@ -60,8 +66,10 @@ namespace ot {
 		virtual void keyPressEvent(QKeyEvent* _event) override;
 		virtual void keyReleaseEvent(QKeyEvent* _event) override;
 		virtual void insertFromMimeData(const QMimeData* _source) override;
+		virtual void focusOutEvent(QFocusEvent* _event) override;
 
 	private:
+		bool m_hasChanged;
 		CustomValidator* m_validator;
 		bool m_autoScrollToBottom;
 		int m_maxLength;
