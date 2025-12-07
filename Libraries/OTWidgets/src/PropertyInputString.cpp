@@ -161,7 +161,12 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 
 		m_textEdit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 		m_textEdit->setReadOnly(this->data().getPropertyFlags() & Property::IsReadOnly);
-		m_textEdit->setMaxTextLength(actualProperty->getMaxLength());
+		if (actualProperty->getMaxLength() > 0) {
+			m_textEdit->setMaxTextLength(actualProperty->getMaxLength());
+		}
+		else {
+			m_textEdit->setMaxTextLength(std::numeric_limits<int>::max());
+		}
 	}
 	else {
 		if (m_textEdit) {
@@ -190,7 +195,13 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 
 		m_lineEdit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 		m_lineEdit->setReadOnly(this->data().getPropertyFlags() & Property::IsReadOnly);
-		m_lineEdit->setMaxLength(actualProperty->getMaxLength());
+		if (actualProperty->getMaxLength() > 0) {
+			m_lineEdit->setMaxLength(actualProperty->getMaxLength());
+		}
+		else {
+			m_lineEdit->setMaxLength(std::numeric_limits<int>::max());
+		}
+		
 	}
 
 	return true;
