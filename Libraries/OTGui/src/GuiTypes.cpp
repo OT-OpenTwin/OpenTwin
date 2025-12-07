@@ -125,6 +125,22 @@ ot::FontFamily ot::stringToFontFamily(const std::string& _string) {
 	}
 }
 
+std::list<std::string> ot::getAllFontFamilyStringList() {
+	return std::list<std::string>({
+		toString(FontFamily::Arial),
+		toString(FontFamily::ComicSansMS),
+		toString(FontFamily::Consolas),
+		toString(FontFamily::CourierNew),
+		toString(FontFamily::Georgia),
+		toString(FontFamily::Helvetica),
+		toString(FontFamily::Impact),
+		toString(FontFamily::Palatino),
+		toString(FontFamily::TimesNewRoman),
+		toString(FontFamily::TrebuchetMS),
+		toString(FontFamily::Verdana)
+		});
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Size Policy

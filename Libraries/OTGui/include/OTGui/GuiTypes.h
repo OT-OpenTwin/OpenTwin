@@ -84,6 +84,7 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::string toString(FontFamily _fontFamily);
 	OT_GUI_API_EXPORT FontFamily stringToFontFamily(const std::string& _string);
+	OT_GUI_API_EXPORT std::list<std::string> getAllFontFamilyStringList();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
