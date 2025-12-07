@@ -33,7 +33,6 @@ EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	m_parentEntity(_parent),
 	m_observer(_obs),
 	m_isModified(true),
-	m_selectChildren(true),
 	m_manageParentVisibility(true),
 	m_manageChildVisibility(true),
 	m_modelState(_ms),
@@ -170,13 +169,7 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 				registerCallbacks(cb, serviceName, true);
 			}
 		}
-
-		m_selectChildren = true;
-		docIt = doc_view.find("selectChildren");
-		if (docIt != doc_view.end()) {
-			m_selectChildren = docIt->get_bool();
-		}
-		
+				
 		m_manageParentVisibility = true;
 		docIt = doc_view.find("manageParentVisibility");
 		if (docIt != doc_view.end()) {
@@ -200,7 +193,7 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 			m_treeItem.setIsEditable(docIt->get_bool());
 		}
 
-		docIt = doc_view.find("SelectTreeChilds");
+		docIt = doc_view.find("selectChildren");
 		if (docIt != doc_view.end()) {
 			m_treeItem.setSelectChilds(docIt->get_bool());
 		}
@@ -370,7 +363,6 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 		bsoncxx::builder::basic::kvp("Name", m_treeItem.getEntityName()),
 		bsoncxx::builder::basic::kvp("isDeletable", m_isDeletable),
 		bsoncxx::builder::basic::kvp("initiallyHidden", m_initiallyHidden),
-		bsoncxx::builder::basic::kvp("selectChildren", m_selectChildren),
 		bsoncxx::builder::basic::kvp("manageParentVisibility", m_manageParentVisibility),
 		bsoncxx::builder::basic::kvp("manageChildVisibility", m_manageChildVisibility),
 		bsoncxx::builder::basic::kvp("Properties", bsonObj),
@@ -381,7 +373,7 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 		doc.append(bsoncxx::builder::basic::kvp("isEditable", m_treeItem.getIsEditable()));
 	}
 	if (m_treeItem.getSelectChildsChanged()) {
-		doc.append(bsoncxx::builder::basic::kvp("SelectTreeChilds", m_treeItem.getSelectChilds()));
+		doc.append(bsoncxx::builder::basic::kvp("selectChildren", m_treeItem.getSelectChilds()));
 	}
 	if (m_treeItem.getIconsChanged()) {
 		doc.append(bsoncxx::builder::basic::kvp("VisibleTreeIcon", m_treeItem.getIcons().getVisibleIcon()));

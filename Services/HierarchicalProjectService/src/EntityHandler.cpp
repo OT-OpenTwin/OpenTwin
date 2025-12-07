@@ -70,7 +70,7 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 	if (!ot::ModelServiceAPI::getEntityInformation(c_projectsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
 		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_projectsFolder);
-		container.setSelectChildren(false);
+		container.setTreeItemSelectChildren(false);
 		container.setManageChildVisibility(false);
 		container.setManageParentVisibility(false);
 
@@ -181,7 +181,7 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	if (!ot::ModelServiceAPI::getEntityInformation(c_connectionsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
 		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_connectionsFolder);
-		container.setSelectChildren(false);
+		container.setTreeItemSelectChildren(false);
 		container.setManageChildVisibility(false);
 		container.setManageParentVisibility(false);
 		
@@ -297,7 +297,7 @@ void EntityHandler::addDocuments(const std::list<std::string>& _fileNames, const
 	if (!ot::ModelServiceAPI::getEntityInformation(c_documentsFolder, containerInfo) || containerInfo.getEntityName().empty()) {
 		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_documentsFolder);
-		container.setSelectChildren(false);
+		container.setTreeItemSelectChildren(false);
 		container.setManageChildVisibility(false);
 		container.setManageParentVisibility(false);
 
@@ -388,7 +388,7 @@ void EntityHandler::addImages(const std::list<std::string>& _fileNames, const st
 	if (!ot::ModelServiceAPI::getEntityInformation(c_decorationFolder, containerInfo) || containerInfo.getEntityName().empty()) {
 		EntityContainer container(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		container.setName(c_decorationFolder);
-		container.setSelectChildren(false);
+		container.setTreeItemSelectChildren(false);
 		container.setManageChildVisibility(false);
 		container.setManageParentVisibility(false);
 
@@ -639,7 +639,7 @@ void EntityHandler::addContainer() {
 	newContainer.setName(CreateNewUniqueTopologyName(c_containerFolder, "Container"));
 	newContainer.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	newContainer.setGraphicsScenePackageChildName(c_containerFolderName);
-	newContainer.setSelectChildren(false);
+	newContainer.setTreeItemSelectChildren(false);
 	newContainer.setCoordinateEntityID(coord.getEntityID());
 	newContainer.storeToDataBase();
 

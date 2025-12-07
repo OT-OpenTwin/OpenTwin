@@ -90,9 +90,6 @@ public:
 	void setInitiallyHidden(bool flag) { m_initiallyHidden = flag; };
 	bool getInitiallyHidden() { return m_initiallyHidden; };
 
-	void setSelectChildren(bool flag) { m_selectChildren = flag; }
-	bool getSelectChildren() { return m_selectChildren; }
-
 	void setManageParentVisibility(bool flag) { m_manageParentVisibility = flag; }
 	bool getManageParentVisibility() { return m_manageParentVisibility; }
 
@@ -234,7 +231,6 @@ private:
 	// Persistent attributes
 	bool                    m_initiallyHidden;
 	bool				    m_isDeletable;
-	bool				    m_selectChildren;
 	bool				    m_manageParentVisibility;
 	bool				    m_manageChildVisibility;
 	EntityProperties        m_properties;

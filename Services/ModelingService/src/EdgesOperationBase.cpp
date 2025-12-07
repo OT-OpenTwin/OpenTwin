@@ -139,7 +139,7 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 	EntityGeometry* geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr);
 	geometryEntity->setName(baseEntity->getName());
 	geometryEntity->setTreeItemEditable(true);
-	geometryEntity->setSelectChildren(false);
+	geometryEntity->setTreeItemSelectChildren(false);
 	geometryEntity->setManageChildVisibility(false);
 	geometryEntity->setBrep(shape);
 	geometryEntity->setVisibleTreeItemIcon(getVisibleTreeItemName());

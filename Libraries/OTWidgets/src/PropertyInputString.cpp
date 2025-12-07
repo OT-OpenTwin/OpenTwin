@@ -28,7 +28,7 @@
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputString> propertyInputStringRegistrar(ot::PropertyString::propertyTypeString());
 
 ot::PropertyInputString::PropertyInputString(QWidget* _parent) 
-	: m_textEdit(nullptr)
+	: m_textEdit(nullptr), m_lineEdit(nullptr)
 {
 	m_lineEdit = new LineEdit(_parent);
 	m_lineEdit->setFocusPolicy(Qt::ClickFocus);
@@ -135,6 +135,7 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 	if (actualProperty->isMultiline()) {
 		if (m_lineEdit) {
 			disconnect(m_lineEdit, &LineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
+			m_lineEdit->hide();
 			delete m_lineEdit;
 			m_lineEdit = nullptr;
 		}
@@ -163,6 +164,7 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 	else {
 		if (m_textEdit) {
 			disconnect(m_textEdit, &PlainTextEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
+			m_textEdit->hide();
 			delete m_textEdit;
 			m_textEdit = nullptr;
 		}

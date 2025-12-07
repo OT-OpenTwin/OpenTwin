@@ -339,7 +339,7 @@ void Model::resetToNew()
 		EntityGraphicsScene* hierarchicalRoot = new EntityGraphicsScene(createEntityUID(), nullptr, this, getStateManager());
 		hierarchicalRoot->setName(ot::FolderNames::HierarchicalProjectRoot);
 		hierarchicalRoot->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
-		hierarchicalRoot->setSelectChildren(false);
+		hierarchicalRoot->setTreeItemSelectChildren(false);
 		hierarchicalRoot->setManageChildVisibility(false);
 		hierarchicalRoot->setManageParentVisibility(false);
 
@@ -4048,7 +4048,7 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 		entity->detachFromHierarchy();
 
 		// The children should no longer control the parent visibility
-		entity->setSelectChildren(false);
+		entity->setTreeItemSelectChildren(false);
 		entity->setManageChildVisibility(false);
 		entity->setManageParentVisibility(false);
 
