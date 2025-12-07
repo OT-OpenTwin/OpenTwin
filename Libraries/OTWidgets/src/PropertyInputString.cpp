@@ -115,7 +115,7 @@ ot::Property* ot::PropertyInputString::createPropertyConfiguration(void) const {
 		newProperty->setMultiline(true);
 	}
 	else {
-		OT_LOG_E("No widget created");
+		OT_LOG_EA("No widget created");
 	}
 	
 	return newProperty;
@@ -133,14 +133,16 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 	}
 
 	if (actualProperty->isMultiline()) {
+		QWidget* parentWidget = nullptr;
 		if (m_lineEdit) {
+			parentWidget = m_lineEdit->parentWidget();
 			disconnect(m_lineEdit, &LineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
-			m_lineEdit->hide();
+			m_lineEdit->setVisible(false);
 			delete m_lineEdit;
 			m_lineEdit = nullptr;
 		}
 		if (!m_textEdit) {
-			m_textEdit = new PlainTextEdit(nullptr);
+			m_textEdit = new PlainTextEdit(parentWidget);
 			this->connect(m_textEdit, &PlainTextEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
 		}
 
@@ -164,7 +166,7 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 	else {
 		if (m_textEdit) {
 			disconnect(m_textEdit, &PlainTextEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
-			m_textEdit->hide();
+			m_textEdit->setVisible(false);
 			delete m_textEdit;
 			m_textEdit = nullptr;
 		}
@@ -201,6 +203,9 @@ void ot::PropertyInputString::focusPropertyInput(void) {
 	else if (m_textEdit) {
 		m_textEdit->setFocus();
 	}
+	else {
+		OT_LOG_E("No widget created");
+	}
 }
 
 void ot::PropertyInputString::setText(const QString& _text) {
@@ -210,5 +215,8 @@ void ot::PropertyInputString::setText(const QString& _text) {
 	}
 	else if (m_textEdit) {
 		m_textEdit->setPlainText(m_text);
+	}
+	else {
+		OT_LOG_E("No widget created");
 	}
 }

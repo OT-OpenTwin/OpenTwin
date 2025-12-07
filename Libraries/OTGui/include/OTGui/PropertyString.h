@@ -40,24 +40,24 @@ namespace ot {
 		explicit PropertyString(const std::string& _name, const std::string& _value, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyString() {};
 
-		static std::string propertyTypeString(void) { return "String"; };
-		virtual std::string getPropertyType(void) const override { return PropertyString::propertyTypeString(); };
+		static std::string propertyTypeString() { return "String"; };
+		virtual std::string getPropertyType() const override { return PropertyString::propertyTypeString(); };
 
 		virtual void mergeWith(const Property* _other, const MergeMode& _mergeMode) override;
 
-		virtual Property* createCopy(void) const override;
+		virtual Property* createCopy() const override;
 
 		void setValue(const std::string& _value) { m_value = _value; };
-		const std::string& getValue(void) const { return m_value; };
+		const std::string& getValue() const { return m_value; };
 
 		void setPlaceholderText(const std::string& _text) { m_placeholderText = _text; };
-		const std::string& getPlaceholderText(void) const { return m_placeholderText; };
+		const std::string& getPlaceholderText() const { return m_placeholderText; };
 
 		void setMaxLength(int _length) { m_maxLength = _length; };
-		int getMaxLength(void) const { return m_maxLength; };
+		int getMaxLength() const { return m_maxLength; };
 
 		void setMultiline(bool _multiline) { m_multiline = _multiline; };
-		bool isMultiline(void) const { return m_multiline; };
+		bool isMultiline() const { return m_multiline; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object

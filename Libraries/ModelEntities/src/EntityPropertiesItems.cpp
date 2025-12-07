@@ -591,6 +591,23 @@ EntityPropertiesString* EntityPropertiesString::createProperty(const std::string
 	return newProperty;
 }
 
+EntityPropertiesString::EntityPropertiesString()
+	: m_isMultiline(false)
+{}
+
+EntityPropertiesString::EntityPropertiesString(const std::string& n, const std::string& v)
+	: m_value(v), m_isMultiline(false)
+{
+	this->setName(n);
+}
+
+EntityPropertiesString::EntityPropertiesString(const EntityPropertiesString& other) 
+	: EntityPropertiesBase(other)
+{
+	m_value = other.m_value;
+	m_isMultiline = other.m_isMultiline;
+}
+
 void EntityPropertiesString::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
 {
 	ot::PropertyString* newProp = new ot::PropertyString(this->getName(), m_value);

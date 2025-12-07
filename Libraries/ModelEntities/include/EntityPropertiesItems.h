@@ -272,12 +272,14 @@ class OT_MODELENTITIES_API_EXPORT EntityPropertiesString : public EntityProperti
 public:
 	static std::string typeString() { return "string"; };
 
-	EntityPropertiesString() {};
-	virtual ~EntityPropertiesString() {};
+	static EntityPropertiesString* createProperty(const std::string& group, const std::string& name, const std::string& defaultValue, const std::string& defaultCategory, EntityProperties& properties);
 
-	EntityPropertiesString(const std::string &n, const std::string &v) : m_value(v) { setName(n); };
+	EntityPropertiesString();
+	virtual ~EntityPropertiesString() = default;
 
-	EntityPropertiesString(const EntityPropertiesString &other) : EntityPropertiesBase(other) { m_value = other.m_value; };
+	EntityPropertiesString(const std::string &n, const std::string &v);
+
+	EntityPropertiesString(const EntityPropertiesString &other);
 
 	virtual EntityPropertiesBase *createCopy() const override { return new EntityPropertiesString(*this); };
 
@@ -302,11 +304,9 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
-	static EntityPropertiesString* createProperty(const std::string &group, const std::string &name, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
-
 private:
 	std::string m_value;
-	bool m_isMultiline;
+	bool m_isMultiline = false;
 };
 
 // ################################################################################################################################################################
