@@ -1,0 +1,55 @@
+// @otlicense
+
+#pragma once
+
+// OpenTwin header
+#include "OTWidgets/WidgetBase.h"
+
+namespace ot {
+
+	class LineEdit;
+	class ToolButton;
+
+	class OT_WIDGETS_API_EXPORT PopupTextEdit : public QWidget, public WidgetBase {
+		Q_OBJECT
+		OT_DECL_NOCOPY(PopupTextEdit)
+		OT_DECL_NOMOVE(PopupTextEdit)
+		OT_DECL_NODEFAULT(PopupTextEdit)
+	public:
+		explicit PopupTextEdit(QWidget* _parent);
+		explicit PopupTextEdit(const QString& _text, QWidget* _parent);
+		virtual ~PopupTextEdit();
+
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
+
+		void setText(const QString& _text);
+		const QString& getText() const { return m_text; };
+
+		void setPlaceholderText(const QString& _text);
+		QString getPlaceholderText() const;
+
+		void setReadOnly(bool _readOnly) { m_readOnly = _readOnly; };
+		bool getReadOnly() const { return m_readOnly; };
+
+		void setMaxTextLength(int _maxLength) { m_maxLength = _maxLength; };
+		int getMaxTextLength() const { return m_maxLength; };
+
+	Q_SIGNALS:
+		void textChanged(const QString& _newText);
+
+	private Q_SLOTS:
+		void openEditor();
+
+	private:
+		void updatePreview();
+
+		QString m_text;
+		LineEdit* m_preview;
+		bool m_readOnly;
+		int m_maxLength;
+
+		ToolButton* m_button;
+	};
+
+}

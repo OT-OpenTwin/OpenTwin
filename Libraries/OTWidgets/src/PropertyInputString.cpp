@@ -21,7 +21,7 @@
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/PropertyString.h"
 #include "OTWidgets/LineEdit.h"
-#include "OTWidgets/PlainTextEdit.h"
+#include "OTWidgets/PopupTextEdit.h"
 #include "OTWidgets/PropertyInputString.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
@@ -86,7 +86,7 @@ void ot::PropertyInputString::lclValueChanged(void) {
 		txt = m_lineEdit->text();
 	}
 	else if (m_textEdit) {
-		txt = m_textEdit->toPlainText();
+		txt = m_textEdit->getText();
 	}
 
 	// Avoid input on multiple values
@@ -110,8 +110,8 @@ ot::Property* ot::PropertyInputString::createPropertyConfiguration(void) const {
 	}
 	else if (m_textEdit) {
 		newProperty->setMaxLength(m_textEdit->getMaxTextLength());
-		newProperty->setPlaceholderText(m_textEdit->placeholderText().toStdString());
-		newProperty->setValue(m_textEdit->toPlainText().toStdString());
+		newProperty->setPlaceholderText(m_textEdit->getPlaceholderText().toStdString());
+		newProperty->setValue(m_textEdit->getText().toStdString());
 		newProperty->setMultiline(true);
 	}
 	else {
@@ -142,8 +142,8 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 			m_lineEdit = nullptr;
 		}
 		if (!m_textEdit) {
-			m_textEdit = new PlainTextEdit(parentWidget);
-			this->connect(m_textEdit, &PlainTextEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
+			m_textEdit = new PopupTextEdit(parentWidget);
+			this->connect(m_textEdit, &PopupTextEdit::textChanged, this, &PropertyInputString::lclValueChanged);
 		}
 
 		QSignalBlocker sigBlock(m_textEdit);
@@ -153,10 +153,10 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 		m_textEdit->setPlaceholderText(QString::fromStdString(actualProperty->getPlaceholderText()));
 
 		if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
-			m_textEdit->setPlainText("...");
+			m_textEdit->setText("...");
 		}
 		else {
-			m_textEdit->setPlainText(m_text);
+			m_textEdit->setText(m_text);
 		}
 
 		m_textEdit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
@@ -170,7 +170,7 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 	}
 	else {
 		if (m_textEdit) {
-			disconnect(m_textEdit, &PlainTextEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
+			disconnect(m_textEdit, &PopupTextEdit::textChanged, this, &PropertyInputString::lclValueChanged);
 			m_textEdit->setVisible(false);
 			delete m_textEdit;
 			m_textEdit = nullptr;
@@ -225,7 +225,7 @@ void ot::PropertyInputString::setText(const QString& _text) {
 		m_lineEdit->setText(m_text);
 	}
 	else if (m_textEdit) {
-		m_textEdit->setPlainText(m_text);
+		m_textEdit->setText(m_text);
 	}
 	else {
 		OT_LOG_E("No widget created");

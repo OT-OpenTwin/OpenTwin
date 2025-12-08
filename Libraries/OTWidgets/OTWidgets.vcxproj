@@ -129,6 +129,7 @@
     <ClCompile Include="src\PlotPointMapper.cpp" />
     <ClCompile Include="src\PlotView.cpp" />
     <ClCompile Include="src\PolarPlotCurve.cpp" />
+    <ClCompile Include="src\PopupTextEdit.cpp" />
     <ClCompile Include="src\SelectionData.cpp" />
     <ClCompile Include="src\OTSVGDataParser.cpp" />
     <ClCompile Include="src\StyledSvgWidget.cpp" />
@@ -310,6 +311,7 @@
     <ClInclude Include="include\OTWidgets\PlotPointMapper.h" />
     <ClInclude Include="include\OTWidgets\PlotView.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotCurve.h" />
+    <QtMoc Include="include\OTWidgets\PopupTextEdit.h" />
     <ClInclude Include="include\OTWidgets\SelectionData.h" />
     <QtMoc Include="include\OTWidgets\TagListWidget.h" />
     <ClInclude Include="include\OTWidgets\OTSVGDataParser.h" />

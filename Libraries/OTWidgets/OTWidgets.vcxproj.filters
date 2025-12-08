@@ -604,6 +604,9 @@
     <ClCompile Include="src\GlobalWidgetViewManager.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\PopupTextEdit.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1361,6 +1364,9 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\StyledSvgWidget.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PopupTextEdit.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
