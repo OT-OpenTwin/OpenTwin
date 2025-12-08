@@ -21,6 +21,10 @@ Client::Client(const std::string& _ip, int _port, ClientLogInAPI& _clientLogIn)
 
    std::cout << "Connection established";
 
+
+
+
+
    std::vector<unsigned char> token1 = _clientLogIn.generateClientToken({}, true);
    const std::string token1_enc = encode(token1);
    std::string msg = token1_enc +  "\n";  // protocol: newline terminated
