@@ -27,15 +27,11 @@ int main(int argc, char* argv[])
 	    authorisationService.authorizeClient(token3Decoded);
     
 #else
-    std::string targetName = "";
-    if (argc < 3) {
+    if (argc != 3) {
         std::cerr << "Usage: " << argv[0] << " <ip>:string <port>:int32\n";
         return 1;
     }
-    else if (argc == 4)
-    {
-        targetName = argv[3];
-    }
+
     // First argument: string
     std::string ip = argv[1];
 
@@ -47,7 +43,7 @@ int main(int argc, char* argv[])
 	    Server server(ip,port, authorisationService);
         
     #else
-        ClientLogIn clientLogin(targetName);
+        ClientLogIn clientLogin;
 	    Client client(ip,port, clientLogin);
     #endif 
 

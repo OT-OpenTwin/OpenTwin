@@ -20,7 +20,6 @@ public:
 
     std::vector<unsigned char> generateClientToken(const std::vector<unsigned char>& _inputToken, bool _firstCall) override;
 
-
 private:
     CredHandle m_credHandle;
     TimeStamp m_credTimeStamp;
@@ -32,11 +31,8 @@ private:
     CtxtHandle* m_partialContext = nullptr;
 
 private:
-    LPWSTR m_targetName = nullptr;
+    LPWSTR m_targetName;
     std::vector<wchar_t> m_buffer;
-
-    // Inherited via ClientLogInAPI
-    std::vector<unsigned char> sendToken(std::string& _token) override;
 };
 
 
