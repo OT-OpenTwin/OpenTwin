@@ -24,24 +24,73 @@
 
 void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg& _config)
 {
+	addToConfig(_series, _config, "", "", "");
+}
+
+void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg& _config, const std::string& _quantityNameOnYAxis, const std::string& _quantityValueDescriptionNameOnYAxis, const std::string& _defaultParameterForXAxis)
+{
 	ot::QueryInformation queryInformation;
 	queryInformation.m_query = createQuery(_series.getSeriesIndex());
 	queryInformation.m_projection = createProjection();
 
 	const std::list<MetadataQuantity>& quantities = _series.getQuantities();
+
 	assert(quantities.size() == 1);
-	if (quantities.size() != 1)
+	
+	const MetadataQuantity* selectedQuantity = nullptr;
+	const MetadataQuantityValueDescription* selectedValueDescription = nullptr;
+	if (!_quantityNameOnYAxis.empty())
 	{
-		throw std::invalid_argument("Creating a curve is only possible with a single quantity");
+		for (const MetadataQuantity& quantity : quantities)
+		{
+			if (quantity.quantityName == _quantityNameOnYAxis)
+			{
+				selectedQuantity = &quantity;
+				break;
+			}
+		}
 	}
-	auto quantity = quantities.begin()->valueDescriptions.begin();
+	else
+	{
+		if (quantities.size() > 1)
+		{
+			throw std::invalid_argument("Creating a curve is only possible with a single quantity");
+		}
+		selectedQuantity = &(*quantities.begin());
+	}
+
+	if (selectedQuantity == nullptr)
+	{
+		throw std::exception("Curve creation failed to extract the y-axis information");
+	}
+	
+	if (!_quantityValueDescriptionNameOnYAxis.empty())
+	{
+		for (auto& valueDescription : selectedQuantity->valueDescriptions)
+		{
+			if (valueDescription.quantityValueLabel == _quantityValueDescriptionNameOnYAxis)
+			{
+				selectedValueDescription = &valueDescription;
+				break;
+			}
+		}
+	}
+	else
+	{
+		selectedValueDescription = &(*selectedQuantity->valueDescriptions.begin());
+	}
+	
+	if (selectedValueDescription == nullptr)
+	{
+		throw std::exception("Curve creation failed to extract the y-axis information");
+	}
 
 	ot::QuantityContainerEntryDescription quantityInformation;
 	quantityInformation.m_fieldName = QuantityContainer::getFieldName();
-	quantityInformation.m_label = quantities.begin()->quantityName;
-	quantityInformation.m_unit = quantity->unit;
-	quantityInformation.m_dataType = quantity->dataTypeName;
-	quantityInformation.m_dimension = quantities.begin()->dataDimensions;
+	quantityInformation.m_label = selectedQuantity->quantityName + selectedValueDescription->quantityValueName;
+	quantityInformation.m_unit = selectedValueDescription->unit;
+	quantityInformation.m_dataType = selectedValueDescription->dataTypeName;
+	quantityInformation.m_dimension = selectedQuantity->dataDimensions;
 	queryInformation.m_quantityDescription = quantityInformation;
 
 	const std::list<MetadataParameter>& parameters = _series.getParameter();
@@ -53,10 +102,18 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 		qcDescription.m_dataType = parameter.typeName;
 		qcDescription.m_fieldName = std::to_string(parameter.parameterUID);
 		qcDescription.m_unit = parameter.unit;
-		queryInformation.m_parameterDescriptions.push_back(qcDescription);
+		if (!_defaultParameterForXAxis.empty() && _defaultParameterForXAxis == parameter.parameterName)
+		{
+			queryInformation.m_parameterDescriptions.push_front(qcDescription);
+		}
+		else
+		{
+			queryInformation.m_parameterDescriptions.push_back(qcDescription);
+		}
 	}
 
 	_config.setQueryInformation(queryInformation);
+
 }
 
 const std::string CurveFactory::createQuery(ot::UID _seriesID)
