@@ -4674,6 +4674,9 @@ void Model::updateModelStateForUndoRedo()
 			}
 		} while (!topologyEntitiesLeft.empty());
 	}
+
+	// Clear the whole m_viewBlockConnectionsMap to ensure that no remove is missed and that the map is filled up correctly
+	Application::instance()->getBlockHandler().clearMap();
 	// Now reset the modified flag for all entities and the model itself
 	for (auto entity : entityMap)
 	{

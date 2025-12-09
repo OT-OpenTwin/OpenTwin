@@ -271,6 +271,10 @@ void BlockHandler::removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, Ent
 	}
 }
 
+void BlockHandler::clearMap() {
+	this->m_viewBlockConnectionsMap.clear();
+}
+
 bool BlockHandler::blockExists(ot::UID _blockID) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
