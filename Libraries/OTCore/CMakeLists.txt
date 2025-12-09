@@ -65,14 +65,6 @@ get_env_path(OT_INC_PATH           OT_INC)
 get_env_path(R_JSON_INCD_PATH      R_JSON_INCD)
 get_env_path(R_JSON_INCR_PATH      R_JSON_INCR)
 
-# cURL
-get_env_path(CURL_INCD_PATH        CURL_INCD)
-get_env_path(CURL_INCR_PATH        CURL_INCR)
-get_env_path(CURL_LIBPATHD_PATH    CURL_LIBPATHD)
-get_env_path(CURL_LIBPATHR_PATH    CURL_LIBPATHR)
-get_env_libname(CURL_LIBD_NAME     CURL_LIBD)
-get_env_libname(CURL_LIBR_NAME     CURL_LIBR)
-
 # OTSystem and OTCore lib directories
 get_env_path(OT_CLIBD_PATH         OT_CLIBD)
 get_env_path(OT_CLIBR_PATH         OT_CLIBR)
@@ -231,14 +223,6 @@ if(ZLIB_INCD_PATH)
 endif()
 if(ZLIB_INCR_PATH AND NOT ZLIB_INCR_PATH STREQUAL ZLIB_INCD_PATH)
     target_include_directories(OTCore_core PRIVATE "${ZLIB_INCR_PATH}")
-endif()
-
-# cURL
-if(CURL_INCD_PATH)
-    target_include_directories(OTCore_core PRIVATE "${CURL_INCD_PATH}")
-endif()
-if(CURL_INCR_PATH AND NOT CURL_INCR_PATH STREQUAL CURL_INCD_PATH)
-    target_include_directories(OTCore_core PRIVATE "${CURL_INCR_PATH}")
 endif()
 
 # base64 include
@@ -566,7 +550,6 @@ if(WIN32)
             $<$<CONFIG:RelWithDebInfo>:zlib>
             $<$<CONFIG:MinSizeRel>:zlib>
             Userenv
-            Bcrypt
     )
 
     if(MSVC)
