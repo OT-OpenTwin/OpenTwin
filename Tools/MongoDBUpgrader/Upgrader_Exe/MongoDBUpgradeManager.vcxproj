@@ -113,7 +113,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(OT_SYSTEM_ROOT)\$(OT_DLLD);$(OT_CORE_ROOT)\$(OT_CDLLD)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(OT_SYSTEM_ROOT)\$(OT_CDLLD);$(OT_CORE_ROOT)\$(OT_CDLLD)</AdditionalLibraryDirectories>
       <AdditionalDependencies>boost_filesystem-vc143-mt-gd-x64-1_86.lib;$(MONGO_C_LIB);$(MONGO_CXX_LIB);OTSystem.lib;OTCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -138,7 +138,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_LIBPATHR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(OT_SYSTEM_ROOT)\$(OT_DLLR);$(OT_CORE_ROOT)\$(OT_CDLLR)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIBPATHR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(OT_SYSTEM_ROOT)\$(OT_CDLLR);$(OT_CORE_ROOT)\$(OT_CDLLR)</AdditionalLibraryDirectories>
       <AdditionalDependencies>boost_filesystem-vc143-mt-x64-1_86.lib;$(MONGO_C_LIB);$(MONGO_CXX_LIB);OTSystem.lib;OTCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
