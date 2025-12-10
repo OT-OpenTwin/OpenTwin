@@ -48,12 +48,21 @@ void PackageHandler::initializeManifest(ot::UID _manifestUID)
 
     if (_manifestUID != ot::invalidUID)
     {
+        if (m_environmentState == EnvironmentState::core)
+        {
+            //Here we have only the core instantiated and want to run a script within a custom environment
+            requestRestart();
+        }
+
         if (m_currentManifest == nullptr)
         {
+            //This is the initial state.
+            assert(m_environmentState == EnvironmentState::empty);
             m_currentManifest = loadManifestEntity(_manifestUID);
         }
         else 
         {
+            //Here we have a potential switch of a manifest. We need to check if the manifest id has changed.
             std::unique_ptr<EntityPythonManifest>newManifest(loadManifestEntity(_manifestUID));
             if (m_currentManifest->getManifestID() != newManifest->getManifestID())
             {
@@ -138,19 +147,20 @@ void PackageHandler::extractMissingPackages(const std::string& _scriptContent)
 
 void PackageHandler::importMissingPackages()
 {
-    if (m_uninstalledPackages.size() != 0 && m_currentManifest == nullptr)
+
+    if (m_uninstalledPackages.size() != 0)
     {
-        // In this case we have no defined manifest and the Pyrit environment is used. An extension is currently not supported.
-        m_uninstalledPackages.clear();
-        throw std::exception("The script uses packages that are not part of the default environment. Select a custom environment, those can be extended.");
-    }
-    else if (m_uninstalledPackages.size() != 0)
-    {
-        OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
+
         if (m_environmentState == EnvironmentState::initialised)
         {
             //Here we have an initialised environment, so we need to restart the interpreter with a new environment
-            //First we copy the current environment and give it the name of the new manifest
+            //In case that we have a named environment like Pyrit (not connected) we can not extend the environment
+            if (m_currentManifest == nullptr)
+            {
+                throw std::exception("Packages can only be added if the execution is happening in a custom environment. Select an environment and run again.");
+            }
+            
+
             ot::UID newManifestUID = m_currentManifest->generateNewManifestID();
             //std::filesystem::path sourcePath(m_environmentPath);
             //std::filesystem::path targetPath = sourcePath.parent_path() / std::to_string(newManifestUID);
@@ -186,6 +196,7 @@ void PackageHandler::importMissingPackages()
         }
         else
         {
+            OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
             //Environment is not yet initialised, so we can just install the packages but we need to update the manifest
             for (const std::string& packageName : m_uninstalledPackages)
             {
@@ -194,6 +205,7 @@ void PackageHandler::importMissingPackages()
             dropImportCache();
             const std::string installLog = OutputPipeline::instance().flushOutput();
             //Update manifest
+
             std::string newManifest = getListOfInstalledPackages();
             m_currentManifest->replaceManifest(newManifest);
             m_currentManifest->storeToDataBase();
@@ -202,9 +214,9 @@ void PackageHandler::importMissingPackages()
             ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, "Manifest requires a new environment");
 
             buildPackageMap(newManifest);
+            OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
         }
         m_uninstalledPackages.clear();
-        OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
     }
 
 }
