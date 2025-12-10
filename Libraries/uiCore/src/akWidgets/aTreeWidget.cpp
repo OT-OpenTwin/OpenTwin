@@ -235,7 +235,26 @@ void ak::aTreeWidget::setItemSelected(
 
 	m_ignoreEvents = true;
 	itm->second->setSelected(_selected);
-	if (m_selectAndDeselectChildren) { itm->second->setChildsSelected(_selected); }
+	if (m_selectAndDeselectChildren && !_selected) {
+		// Only when deselecting, selectionChangeEvent will handle selection of childs when selecting
+		itm->second->setChildsSelected(_selected);
+	}
+	m_ignoreEvents = false;
+	selectionChangedEvent(true);
+}
+
+void ak::aTreeWidget::setItemsSelected(const ot::UIDList& _itemIds, bool _selected) {
+	m_ignoreEvents = true;
+	for (auto id : _itemIds) {
+		auto itm = m_items.find(id);
+		if (itm != m_items.end()) {
+			itm->second->setSelected(_selected);
+			if (m_selectAndDeselectChildren && !_selected) {
+				// Only when deselecting, selectionChangeEvent will handle selection of childs when selecting
+				itm->second->setChildsSelected(_selected);
+			}
+		}
+	}
 	m_ignoreEvents = false;
 	selectionChangedEvent(true);
 }

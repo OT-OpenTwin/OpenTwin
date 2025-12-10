@@ -2862,9 +2862,7 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 				QSignalBlocker sigBlock(tree);
 
 				OT_SLECTION_TEST_LOG("+ View focus changed: Restoring selection");
-				for (ot::UID uid : _focusedView->getVisualizingItems().getSelectedNavigationItems()) {
-					tree->setItemSelected(uid, true);
-				}
+				tree->setItemsSelected(_focusedView->getVisualizingItems().getSelectedNavigationItems(), true);
 
 				//m_navigationManager.setSelectedItems(tree->selectedItems());
 			}

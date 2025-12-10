@@ -135,6 +135,8 @@ namespace ak {
 			bool						_selected = true
 		);
 
+		void setItemsSelected(const ot::UIDList& _itemIds, bool _selected = true);
+
 		//! @brief Will set enabled state of the provided item
 		//! @param _itemId The UID of the item
 		//! @param _enabled The enabled state of the item
