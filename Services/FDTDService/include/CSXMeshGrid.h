@@ -38,6 +38,13 @@ class EntityBase;
 class CSXMeshGrid {
 	OT_DECL_DEFCOPY(CSXMeshGrid)
 public:
+	//! @brief Coordinate system enumeration
+	//! represents the different coordinate systems available for the mesh grid
+	enum class CoordSystem : uint32_t {
+		Cartesian = 0,
+		Cylindrical = 1,
+		Spherical = 2
+	};
 	CSXMeshGrid();
 	virtual ~CSXMeshGrid();
 
@@ -51,7 +58,7 @@ public:
 	const std::vector<double>& getZLines() const { return m_gridZ; }
 	double getDeltaUnit() const { return m_deltaUnit; }
 	double getStepRatio() const { return m_stepRatio; }
-	uint32_t getCoordSystem() const { return m_coordSystem; }
+	CoordSystem getCoordSystem() const { return m_coordSystem; }
 
 	//! @brief Creates an XML element for the mesh grid data
 	//! @brief Is being used by FDTDConfig to then write the complete solver XML
@@ -66,7 +73,7 @@ private:
 	std::vector<double> m_gridZ;
 
 	// Mesh grid properties
-	uint32_t m_coordSystem = 0; // 0 = Cartesian
+	CoordSystem m_coordSystem = CoordSystem::Cartesian;
 	double m_deltaUnit = 0.0; // default 0.0
 	double m_stepRatio = 0.0; // default 0.0
 

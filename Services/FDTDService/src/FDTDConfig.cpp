@@ -198,6 +198,7 @@ void FDTDConfig::addToXML(tinyxml2::XMLDocument& _doc) {
 	
 	// Now we add the ContinuousStructure node
 	auto CSX = _doc.NewElement("ContinuousStructure");
+	CSX->SetAttribute("CoordSystem", static_cast<uint32_t>(m_meshGrid.getCoordSystem()));
 	auto CSXProperties = _doc.NewElement("Properties");
 
 	// load and write the excitation properties

@@ -99,6 +99,7 @@ tinyxml2::XMLElement* CSXMeshGrid::writeToXML(tinyxml2::XMLElement& _parentEleme
 	xElem->SetText((vectorToString(m_gridX)).c_str());
 	yElem->SetText((vectorToString(m_gridY)).c_str());
 	zElem->SetText((vectorToString(m_gridZ)).c_str());
+	rectGrid->SetAttribute("CoordSystem", static_cast<uint32_t>(m_coordSystem));
 	rectGrid->SetAttribute("DeltaUnit", m_deltaUnit);
 	rectGrid->InsertEndChild(xElem);
 	rectGrid->InsertEndChild(yElem);
