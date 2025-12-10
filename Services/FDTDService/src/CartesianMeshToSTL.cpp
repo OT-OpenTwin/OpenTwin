@@ -96,29 +96,47 @@ std::string CartesianMeshToSTL::getMaterialTag(const EntityMaterial* _material) 
 	return (materialType == "PEC") ? "Metal" : "Material";
 }
 
-void CartesianMeshToSTL::writeMaterialProperties(const EntityMaterial* _material, tinyxml2::XMLDocument* _doc, tinyxml2::XMLElement* _materialElement, tinyxml2::XMLElement* _polyReaderElement) const {
+void CartesianMeshToSTL::writeMaterialProperties(const EntityMaterial* _material, tinyxml2::XMLDocument* _doc, tinyxml2::XMLElement* _materialElement, bool _writeForPolyhedron) const {
 	const EntityProperties& properties = _material->getProperties();
 	const auto materialType = properties.getProperty("Material type", "General");
 	const auto& materialSelection = dynamic_cast<const EntityPropertiesSelection*>(materialType)->getValue();
-	auto* priority = properties.getProperty("Mesh priority", "General");
-	double priorityValue = dynamic_cast<const EntityPropertiesDouble*>(priority)->getValue();
-	_polyReaderElement->SetAttribute("Priority", priorityValue);
+
+	// write priority only for polyhedron definitions, if requested
+	if (_writeForPolyhedron) {
+		const auto* priority = properties.getProperty("Mesh priority", "General");
+		if (priority) {
+			const EntityPropertiesDouble* priorityValue = dynamic_cast<const EntityPropertiesDouble*>(priority);
+			if (priorityValue) {
+				_materialElement->SetAttribute("Priority", priorityValue->getValue());
+			}
+		}
+		return;
+	}
+	
 	if (materialSelection != "PEC") {
 		tinyxml2::XMLElement* propertyElement = _doc->NewElement("Property");
-		auto* permittivity = properties.getProperty("Permittivity (relative)", "Electromagnetic");
-		auto* permeability = properties.getProperty("Permeability (relative)", "Electromagnetic");
-		auto* conductivity = properties.getProperty("Conductivity", "Electromagnetic");
+		const auto* permittivity = properties.getProperty("Permittivity (relative)", "Electromagnetic");
+		const auto* permeability = properties.getProperty("Permeability (relative)", "Electromagnetic");
+		const auto* conductivity = properties.getProperty("Conductivity", "Electromagnetic");
 		if (permittivity) {
-			double epsilon = dynamic_cast<const EntityPropertiesDouble*>(permittivity)->getValue();
-			propertyElement->SetAttribute("Epsilon", epsilon);
+			const EntityPropertiesDouble* epsilonValue = dynamic_cast<const EntityPropertiesDouble*>(permittivity);
+			if (epsilonValue) {
+				propertyElement->SetAttribute("Epsilon", epsilonValue->getValue());
+			}
 		}
+		
 		if (permeability) {
-			double kappa = dynamic_cast<const EntityPropertiesDouble*>(permeability)->getValue();
-			propertyElement->SetAttribute("Kappa", kappa);
+			const EntityPropertiesDouble* kappaValue = dynamic_cast<const EntityPropertiesDouble*>(permeability);
+			if (kappaValue) {
+				propertyElement->SetAttribute("Kappa", kappaValue->getValue());
+			}
 		}
+		
 		if (conductivity) {
-			double mue = dynamic_cast<const EntityPropertiesDouble*>(conductivity)->getValue();
-			propertyElement->SetAttribute("Mue", mue);
+			const EntityPropertiesDouble* mueValue = dynamic_cast<const EntityPropertiesDouble*>(conductivity);
+			if (mueValue) {
+				propertyElement->SetAttribute("Mue", mueValue->getValue());
+			}
 		}
 		_materialElement->InsertEndChild(propertyElement);
 	}
@@ -127,22 +145,35 @@ void CartesianMeshToSTL::writeMaterialProperties(const EntityMaterial* _material
 tinyxml2::XMLElement* CartesianMeshToSTL::writeToXML(tinyxml2::XMLElement& _parentElement) const {
 	auto doc = _parentElement.GetDocument();
 	tinyxml2::XMLElement* lastMaterialElement = nullptr;
+	// Creating a map of materials to object indices
+	std::map<EntityMaterial*, std::vector<size_t>> materialObjectsMap;
 	for (size_t objIndex = 0; objIndex < getNumberOfObjects(); objIndex++) {
-		const auto& materialTag = getMaterialTag(getMaterialOfObject(objIndex));
+		EntityMaterial* material = getMaterialOfObject(objIndex);
+		materialObjectsMap[material].push_back(objIndex);
+	}
+
+	// Iterate through the map and create XML elements for each material and assign the objects to that material
+	for (const auto& [material, objIndices] : materialObjectsMap) {
+		const auto& materialTag = getMaterialTag(material);
 		tinyxml2::XMLElement* materialElement = doc->NewElement(materialTag.c_str());
 		lastMaterialElement = materialElement;
-		EntityMaterial* material = getMaterialOfObject(objIndex);
 		if (material != nullptr) {
 			materialElement->SetAttribute("Name", material->getName().c_str());
+			writeMaterialProperties(material, doc, materialElement, false);
 		}
+
 		tinyxml2::XMLElement* primitivesElement = doc->NewElement("Primitives");
-		tinyxml2::XMLElement* polyReaderElement = doc->NewElement("PolyhedronReader");
-		polyReaderElement->SetAttribute("FileName", getFileNameOfObject(objIndex).c_str());
-		polyReaderElement->SetAttribute("FileType", "STL");
-		if (material != nullptr) {
-			writeMaterialProperties(material, doc, materialElement, polyReaderElement);
+		for (const auto& objIndex : objIndices) {
+			tinyxml2::XMLElement* polyReaderElement = doc->NewElement("PolyhedronReader");
+			polyReaderElement->SetAttribute("FileName", getFileNameOfObject(objIndex).c_str());
+			polyReaderElement->SetAttribute("FileType", "STL");
+			if (material != nullptr) {
+				// Write material properties for the polyhedron
+				// Other material properties will be ignored for the polyhedron definition
+				writeMaterialProperties(material, doc, polyReaderElement, true);
+			}
+			primitivesElement->InsertEndChild(polyReaderElement);
 		}
-		primitivesElement->InsertEndChild(polyReaderElement);
 		materialElement->InsertEndChild(primitivesElement);
 		_parentElement.InsertEndChild(materialElement);
 	}
@@ -171,7 +202,7 @@ std::string CartesianMeshToSTL::processMeshEntity(const ot::EntityInformation &m
 	// Iterate through the faces assigned to this mesh item
 	for (size_t faceIndex = 0; faceIndex < meshItem->getNumberFaces(); faceIndex++)
 	{
-		bool reverseFace = !meshItem->getFaceOrientation(faceIndex);
+		// bool reverseFace = meshItem->getFaceOrientation(faceIndex);
 		int  faceId = abs(meshItem->getFaceId(faceIndex));
 
 		EntityMeshCartesianFace* meshFace = meshFacesList->getFace(faceId);
@@ -186,7 +217,7 @@ std::string CartesianMeshToSTL::processMeshEntity(const ot::EntityInformation &m
 		}
 
 		// Now we iterate through all directions and create the triangles for the quads belonging to this face
-		processFaceQuads(objectFile, meshDataEntity, meshFace, reverseFace);
+		processFaceQuads(objectFile, meshDataEntity, meshFace, true);
 	}
 
 	objectFile << "endsolid " << objectName << std::endl;

@@ -49,11 +49,11 @@ public:
 	//! @param _material The material to write
 	//! @param _doc The XML document
 	//! @param _materialElement The XML element to write the material properties into
-	//! @param _polyReaderElement The XML element to write the polyhedron reader properties into
-	void writeMaterialProperties(const EntityMaterial* _material, tinyxml2::XMLDocument* _doc, tinyxml2::XMLElement* _materialElement, tinyxml2::XMLElement* _polyReaderElement) const;
+	//! @param _writeForPolyhedron If true, write the properties for a polyhedron definition, otherwise for a standard material definition
+	void writeMaterialProperties(const EntityMaterial* _material, tinyxml2::XMLDocument* _doc, tinyxml2::XMLElement* _materialElement, bool _writeForPolyhedron) const;
 
 	//! @brief Write the object information into an XML element
-	//! @parmam _parentElement The parent XML element of the central XML element to write
+	//! @param _parentElement The parent XML element of the central XML element to write
 	//! @return The created XML element containing the object information
 	tinyxml2::XMLElement* writeToXML(tinyxml2::XMLElement& _parentElement) const;
 	 
