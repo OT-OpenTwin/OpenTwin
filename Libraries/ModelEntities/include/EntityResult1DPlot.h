@@ -35,13 +35,13 @@ public:
 	virtual bool considerChildrenForPropertyFilter(void) override { return false; };
 	virtual void storeToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
-	virtual std::string getClassName(void) const override { return "EntityResult1DPlot_New"; };
+	virtual std::string getClassName(void) const override { return "EntityResult1DPlot"; };
+	virtual int getSchemaVersion() override { return 2; };
 	virtual bool updateFromProperties(void) override;
 	bool updatePropertyVisibilities(void);
 	
 	virtual void addChild(EntityBase* _child) override;
 	virtual void removeChild(EntityBase* _child) override;
-
 
 	void createProperties(void);
 	
