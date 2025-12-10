@@ -40,11 +40,13 @@ public:
 	void prefetchDocumentsFromStorage(const std::list<ot::EntityInformation>& entityInfo);
 	ot::UID getPrefetchedEntityVersion(ot::UID entityID);
 
+	void initialiseUIDGenerator(const int _sessionCount, const int _serviceID);
+	DataStorageAPI::UniqueUIDGenerator* getUIDGenerator() { return m_uidGenerator; }
 private:
 	Application();
 
 	CommunicationHandler m_communicationHandler;
-
+	DataStorageAPI::UniqueUIDGenerator* m_uidGenerator = nullptr;
 	std::map<ot::UID, ot::UID> m_prefetchedEntityVersions;
 	std::string m_uiURL;
 };

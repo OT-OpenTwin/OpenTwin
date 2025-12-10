@@ -259,14 +259,7 @@ bool CommunicationHandler::sendDataBaseConfigToClient(void) {
 		doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(m_databaseInfo.getUserName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(m_databaseInfo.getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
-		if (m_manifestUID != ot::invalidUID)
-		{
-			doc.AddMember(OT_ACTION_PARAM_Python_Environment, m_manifestUID, doc.GetAllocator());
-		}
-		else
-		{
-			assert(false);
-		}
+		doc.AddMember(OT_ACTION_PARAM_Python_Environment, m_manifestUID, doc.GetAllocator());
 
 		QByteArray request = QByteArray::fromStdString(doc.toJson());
 		request.append('\n');

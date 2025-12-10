@@ -33,6 +33,9 @@
 #include <filesystem>
 #include "PythonObjectBuilder.h"
 #include "ExceptionRestartRequired.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "OTCore/FolderNames.h"
+#include "OTCore/EntityName.h"
 
 PackageHandler::~PackageHandler()
 {
@@ -42,25 +45,23 @@ PackageHandler::~PackageHandler()
 
 void PackageHandler::initializeManifest(ot::UID _manifestUID)
 {
-    if (_manifestUID == ot::invalidUID)
-    {
-        throw std::exception("Invalid manifest UID provided.");
-    }
 
-    if (m_currentManifest == nullptr)
+    if (_manifestUID != ot::invalidUID)
     {
-        m_currentManifest = loadManifestEntity(_manifestUID);
-    }
-    else 
-    {
-        std::unique_ptr<EntityPythonManifest>newManifest(loadManifestEntity(_manifestUID));
-        if (m_currentManifest->getManifestID() != newManifest->getManifestID())
+        if (m_currentManifest == nullptr)
         {
-	        requestRestart();
-            OT_LOG_D("Manifest change requires interpreter restart.");
+            m_currentManifest = loadManifestEntity(_manifestUID);
+        }
+        else 
+        {
+            std::unique_ptr<EntityPythonManifest>newManifest(loadManifestEntity(_manifestUID));
+            if (m_currentManifest->getManifestID() != newManifest->getManifestID())
+            {
+	            requestRestart();
+                OT_LOG_D("Manifest change requires interpreter restart.");
+            }
         }
     }
-    
 }
 
 void PackageHandler::initializeEnvironmentWithManifest(const std::string& _environmentPath)
@@ -151,15 +152,15 @@ void PackageHandler::importMissingPackages()
             //Here we have an initialised environment, so we need to restart the interpreter with a new environment
             //First we copy the current environment and give it the name of the new manifest
             ot::UID newManifestUID = m_currentManifest->generateNewManifestID();
-            std::filesystem::path sourcePath(m_environmentPath);
-            std::filesystem::path targetPath = sourcePath.parent_path() / std::to_string(newManifestUID);
-            std::filesystem::copy(sourcePath, targetPath);
-            m_environmentPath = targetPath.string();
-            for (const std::string& packageName : m_uninstalledPackages)
-            {
-                installPackage(packageName);
-            }
-            dropImportCache();
+            //std::filesystem::path sourcePath(m_environmentPath);
+            //std::filesystem::path targetPath = sourcePath.parent_path() / std::to_string(newManifestUID);
+            ////std::filesystem::copy(sourcePath, targetPath);
+            //m_environmentPath = targetPath.string();
+            //for (const std::string& packageName : m_uninstalledPackages)
+            //{
+            //    installPackage(packageName);
+            //}
+            //dropImportCache();
             //We still need to update the manifest text. But we won't get it with the pip freeze command since we are still in the old environment
 
             m_currentManifest->storeToDataBase();
@@ -168,6 +169,20 @@ void PackageHandler::importMissingPackages()
             ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, "Manifest requires a new environment");
 
             requestRestart();
+        }
+        else if (m_environmentState == EnvironmentState::core)
+        {
+            throw std::exception("Packages can only be added if the execution is happening in a custom environment. Select an environment and run again.");
+            //EntityPythonManifest newManifest;
+            //std::list<std::string> folderContent = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::PythonManifestFolder);
+            //const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::PythonManifestFolder, "Environment", folderContent);
+            //newManifest.setName(entityName);
+            //newManifest.setEntityID(Application::instance().getUIDGenerator()->getUID());
+            //newManifest.storeToDataBase();
+
+            
+            //Needs to hand back a new manifest UID for the execution request
+            //requestRestart();
         }
         else
         {

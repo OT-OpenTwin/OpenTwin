@@ -36,7 +36,14 @@ void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestUID)
 	const std::string environmentName = PackageHandler::instance().getEnvironmentName();
 	m_wrapper.initializePythonInterpreter(environmentName);
 	const std::string environmentPath = m_wrapper.getEnvironmentPath();
-	PackageHandler::instance().initializeEnvironmentWithManifest(environmentPath);
+	if (environmentPath.empty())
+	{
+		m_wrapper.initializePythonInterpreter("");
+	}
+	else
+	{
+		PackageHandler::instance().initializeEnvironmentWithManifest(environmentPath);
+	}
 }
 
 void PythonInterpreterAPI::initializeEnvironment(std::string& _environmentName)
@@ -49,7 +56,7 @@ void PythonInterpreterAPI::initializeEnvironment(std::string& _environmentName)
 		_environmentName = "PyritEnvironment";
 		m_wrapper.initializePythonInterpreter(_environmentName);
 	}
-	else if (_environmentName == "StudioSuite")
+	else if (_environmentName == "Core")
 	{
 		m_wrapper.initializePythonInterpreter("");
 	}

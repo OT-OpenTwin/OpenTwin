@@ -145,6 +145,10 @@ std::string Application::handleForwardToSubprocess(ot::JsonDocument& _doc)
 		ot::UID manifestUID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_Python_Environment);
 		m_subprocessManager->setManifestUID(manifestUID);
 	}
+	else
+	{
+		m_subprocessManager->setManifestUID(ot::invalidUID);
+	}
 	std::string returnMessage;
 
 	if (!m_subprocessManager->sendRequest(_doc, returnMessage)) 

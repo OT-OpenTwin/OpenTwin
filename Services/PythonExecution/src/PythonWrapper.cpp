@@ -31,6 +31,7 @@
 #include "OTCore/String.h"
 #include <iostream>
 #include "OutputPipeline.h"
+#include "PackageHandler.h"
 
 PythonWrapper::PythonWrapper()
 {
@@ -108,6 +109,7 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	}
 	else
 	{
+		PackageHandler::instance().setRunningInCoreEnvironment();
 		OT_LOG_D("Running without custom environment");
 	}
 
@@ -139,7 +141,6 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	OutputPipeline::instance().initiateRedirect();
 
 }
-
 
 void PythonWrapper::addToSysPath(const std::string& _newPathComponent) {
 	const std::string addToPythonPath = "import sys\n"

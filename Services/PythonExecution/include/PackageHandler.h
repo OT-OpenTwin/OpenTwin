@@ -42,14 +42,21 @@ public:
 
 	void extractMissingPackages(const std::string& _scriptContent);
 	void importMissingPackages();
+
+	//! @return empty string if the manifest was not set, otherwise returns the manifest id 
 	std::string getEnvironmentName();
 
+	void setRunningInCoreEnvironment()
+	{
+		m_environmentState = EnvironmentState::core;
+	}
 private:
 	enum class EnvironmentState
 	{
 		empty,
 		firstFilling,
 		initialised,
+		core
 	};
 	
 	PackageHandler() = default;

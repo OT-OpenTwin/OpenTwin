@@ -70,5 +70,17 @@ ot::UID Application::getPrefetchedEntityVersion(ot::UID entityID)
 	return m_prefetchedEntityVersions[entityID];
 }
 
+void Application::initialiseUIDGenerator(const int _sessionCount, const int _serviceID)
+{
+	if (m_uidGenerator != nullptr)
+	{
+		delete m_uidGenerator;
+		m_uidGenerator = nullptr;
+		assert(false);
+	}
+
+	m_uidGenerator = new DataStorageAPI::UniqueUIDGenerator(_sessionCount, _serviceID);
+}
+
 Application::Application() {
 }

@@ -40,7 +40,7 @@ public:
 	PythonWrapper& operator=(const PythonWrapper&& _other) = delete;
 
 	~PythonWrapper();
-
+	//! @brief Initialises the lookup-paths and the entire interpreter. If _environmentName is not empty, it will be added as additional lookup, existing as parallel folder to the CoreEnvironment folder
 	void initializePythonInterpreter(const std::string& _environmentName);
 
 	void addToSysPath(const std::string& _newPathComponent);
