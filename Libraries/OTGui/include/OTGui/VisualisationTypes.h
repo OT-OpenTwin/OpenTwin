@@ -80,17 +80,17 @@ namespace ot
 		bool hasVisualisations() const { return m_visualisations != VisualisationType::None; };
 		bool hasVisualisation(VisualisationType _type) const { return m_visualisations & _type; };
 
-		const VisTypes& getVisualisations() const { return m_visualisations; };
-		bool visualiseAsText() const { return m_visualisations & Text; };
-		bool visualiseAsTable() const { return m_visualisations & Table; };
-		bool visualiseAsPlot1D() const { return m_visualisations & Plot1D; };
-		bool visualiseAsCurve() const { return m_visualisations & Curve; };
-		bool visualiseAsRange() const { return m_visualisations & Range; };
-		bool visualiseAsGraphicsView() const { return m_visualisations & GraphicsView; };
-		bool visualiseAsGraphicsItem() const { return m_visualisations & GraphicsItem; };
-		bool visualiseAsGraphicsConnection() const { return m_visualisations & GraphicsConnection; };
-		bool visualiseAsImage() const { return m_visualisations & Image; };
-		bool visualiseAsPDF() const { return m_visualisations & PDF; };
+		OT_DECL_NODISCARD const VisTypes& getVisualisations() const { return m_visualisations; };
+		OT_DECL_NODISCARD bool visualiseAsText() const { return m_visualisations & Text; };
+		OT_DECL_NODISCARD bool visualiseAsTable() const { return m_visualisations & Table; };
+		OT_DECL_NODISCARD bool visualiseAsPlot1D() const { return m_visualisations & Plot1D; };
+		OT_DECL_NODISCARD bool visualiseAsCurve() const { return m_visualisations & Curve; };
+		OT_DECL_NODISCARD bool visualiseAsRange() const { return m_visualisations & Range; };
+		OT_DECL_NODISCARD bool visualiseAsGraphicsView() const { return m_visualisations & GraphicsView; };
+		OT_DECL_NODISCARD bool visualiseAsGraphicsItem() const { return m_visualisations & GraphicsItem; };
+		OT_DECL_NODISCARD bool visualiseAsGraphicsConnection() const { return m_visualisations & GraphicsConnection; };
+		OT_DECL_NODISCARD bool visualiseAsImage() const { return m_visualisations & Image; };
+		OT_DECL_NODISCARD bool visualiseAsPDF() const { return m_visualisations & PDF; };
 
 		void clearCustomViewFlags() { m_customViewFlags.clear(); m_customViewFlagsModified = true; };
 
@@ -102,9 +102,9 @@ namespace ot
 		//! @brief Retrieves custom view flags for a specific visualisation type, if they exist.
 		//! @param _visType The visualisation type for which to retrieve custom flags.
 		//! @return An optional containing the custom view flags if they exist, or std::nullopt if not.
-		std::optional<ot::WidgetViewBase::ViewFlags> getCustomViewFlags(VisualisationType _visType) const;
+		OT_DECL_NODISCARD std::optional<ot::WidgetViewBase::ViewFlags> getCustomViewFlags(VisualisationType _visType) const;
 
-		const std::map<VisualisationType, ot::WidgetViewBase::ViewFlags>& getCustomViewFlags() const { return m_customViewFlags; };
+		OT_DECL_NODISCARD const std::map<VisualisationType, ot::WidgetViewBase::ViewFlags>& getCustomViewFlags() const { return m_customViewFlags; };
 
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;

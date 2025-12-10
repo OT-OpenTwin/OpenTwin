@@ -53,7 +53,7 @@ EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver*
 	: EntityFile(_ID, _parent, _obs, _ms)
 {
 	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
-	visTypes.visualiseAsText();
+	visTypes.addTextVisualisation();
 	this->setDefaultVisualizationTypes(visTypes);
 }
 

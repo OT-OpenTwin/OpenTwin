@@ -47,8 +47,8 @@ EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * o
 	: EntityFileText(ID, parent, obs, ms) 
 {
 	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
-	visTypes.visualiseAsTable();
-	visTypes.visualiseAsText();
+	visTypes.addTableVisualisation();
+	visTypes.addTextVisualisation();
 	this->setDefaultVisualizationTypes(visTypes);
 }
 

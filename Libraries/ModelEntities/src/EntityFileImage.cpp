@@ -39,7 +39,7 @@ EntityFileImage::EntityFileImage(ot::UID _ID, EntityBase* _parent, EntityObserve
 	: EntityFile(_ID, _parent, _obs, _ms), m_format(ot::ImageFileFormat::PNG)
 {
 	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
-	visTypes.visualiseAsImage();
+	visTypes.addImageVisualisation();
 	this->setDefaultVisualizationTypes(visTypes);
 }
 

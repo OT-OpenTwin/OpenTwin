@@ -36,7 +36,7 @@ EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot::UID
 	this->setDefaultTreeItem(treeItem);
 
 	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
-	visTypes.visualiseAsText();
+	visTypes.addTextVisualisation();
 	this->setDefaultVisualizationTypes(visTypes);
 
 	setBlockTitle("Hierarchical Document Item");
