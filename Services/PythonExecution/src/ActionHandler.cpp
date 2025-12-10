@@ -246,6 +246,7 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 	}
 	catch (std::exception& e) {
 		OT_LOG_D("Script execution failed due to exception: " + std::string(e.what()));
+		PackageHandler::instance().clearBuffer();
 		return ot::ReturnMessage(ot::ReturnMessage::ReturnMessageStatus::Failed, e.what());
 	}
 

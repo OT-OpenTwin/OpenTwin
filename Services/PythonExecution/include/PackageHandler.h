@@ -45,6 +45,10 @@ public:
 
 	//! @return empty string if the manifest was not set, otherwise returns the manifest id 
 	std::string getEnvironmentName();
+	void clearBuffer() 
+	{ 
+		m_uninstalledPackages.clear(); 
+	}
 
 	void setRunningInCoreEnvironment()
 	{
