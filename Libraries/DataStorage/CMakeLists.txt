@@ -117,6 +117,7 @@ set(DATASTORAGE_SOURCE_FILES
     src/DocumentAPI.cpp
     src/DocumentAccessBase.cpp
     src/DocumentManager.cpp
+    src/GridFSFileInfo.cpp
     src/MongoDBAssertions.cpp
     src/QueryBuilder.cpp
     src/ResultDataStorageAPI.cpp
@@ -141,10 +142,12 @@ set(DATASTORAGE_HEADER_FILES
     include/Helper/QueryBuilder.h
     include/MongoDBAssertions.h
     include/Response/DataStorageResponse.h
+    include/DataStorageAPIExport.h
     include/Document/DocumentAccess.h
     include/DocumentAPI.h
     include/Document/DocumentAccessBase.h
     include/Document/DocumentManager.h
+    include/GridFSFileInfo.h
     include/ResultDataStorageAPI.h
     include/stdafx.h
     include/System/SystemDataAccess.h
