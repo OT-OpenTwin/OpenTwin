@@ -142,7 +142,7 @@ void PackageHandler::importMissingPackages()
     {
         // In this case we have no defined manifest and the Pyrit environment is used. An extension is currently not supported.
         m_uninstalledPackages.clear();
-        throw std::exception("The script uses packages that are not part of the pyrit environment. An extension is currently not supported.");
+        throw std::exception("The script uses packages that are not part of the default environment. Select a custom environment, those can be extended.");
     }
     else if (m_uninstalledPackages.size() != 0)
     {
@@ -243,7 +243,12 @@ const std::list<std::string> PackageHandler::parseImportedPackages(const std::st
         if (line.find("import ") == 0) {
             std::string rest = line.substr(7); // after "import "
             
-            auto modules = ot::String::split(rest, ','); // handle multiple imports
+            //we may have a statement like import numpy as np
+            auto positionOfAs = rest.find(" as ");
+            rest = rest.substr(0, positionOfAs);
+
+            // handle multiple imports
+            auto modules = ot::String::split(rest, ','); 
 			packageList.insert(packageList.end(), modules.begin(), modules.end());
         }
         // Check for "from ... import ..." statements
