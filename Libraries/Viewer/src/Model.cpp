@@ -26,6 +26,8 @@
 #include "ViewerToolBar.h"
 #include "ViewerSettings.h"
 
+#include "OTCore/String.h"
+
 #include "OTWidgets/Table.h"
 #include "OTWidgets/TableView.h"
 #include "OTWidgets/TextEditor.h"
@@ -67,6 +69,8 @@
 
 #include "DataBase.h"
 #include "PlotManager.h"
+#include "DocumentAPI.h"
+#include "GridFSFileInfo.h"
 #include "PlotManagerView.h"
 
 #include "VisualiserHelper.h"
@@ -3401,6 +3405,7 @@ void Model::deleteCapGeometry()
 
 void Model::updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d &normal, const osg::Vec3d &point, double radius)
 {
+	OTAssertNullptr(root);
 	if (root->isVisible() && dynamic_cast<SceneNodeGeometry*>(root) != nullptr)
 	{
 		// We have a SceneNodeGeometry item -> process it
@@ -3415,6 +3420,7 @@ void Model::updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d
 
 void Model::deleteCapGeometryForSceneNodes(SceneNodeBase* root)
 {
+	OTAssertNullptr(root);
 	if (dynamic_cast<SceneNodeGeometry*>(root) != nullptr)
 	{
 		// We have a SceneNodeGeometry item -> process it
@@ -3479,15 +3485,47 @@ void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
 	ot::ReturnMessage retMsg = ot::ReturnMessage::fromJson(FrontendAPI::instance()->messageModelService(doc.toJson()));
 	if (!retMsg.isOk()) {
 		OT_LOG_E("Could not get text data from model: " + retMsg.getWhat());
-	} else if (!retMsg.getWhat().empty()) {
-		std::ofstream outFile(_filePath);
-		if (outFile.is_open()) {
-			outFile << retMsg.getWhat();
-			outFile.close();
-			FrontendAPI::instance()->displayText("File exported successfully: " + _filePath + "\n");
+	} 
+	else if (!retMsg.getWhat().empty()) {
+		ot::JsonDocument doc;
+
+		// Parse the returned GridFS info
+		if (!doc.fromJson(retMsg.getWhat())) {
+			OT_LOG_E("Could not parse grid fs info");
 		}
 		else {
-			OT_LOG_E("Could not open file for writing: " + _filePath);
+			ot::GridFSFileInfo fileInfo(doc.getConstObject());
+
+			// Now get the actual data from GridFS
+			DataStorageAPI::DocumentAPI api;
+			uint8_t* dataBuffer = nullptr;
+			size_t length = 0;
+
+			bsoncxx::oid oid_obj{ fileInfo.getDocumentId() };
+			bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+
+			api.GetDocumentUsingGridFs(id, dataBuffer, length, fileInfo.getFileName());
+			api.DeleteGridFSData(id, fileInfo.getFileName());
+
+			std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
+
+			// Decompress if needed
+			if (fileInfo.isFileCompressed()) {
+				stringData = ot::String::decompressedBase64(stringData, fileInfo.getUncompressedSize());
+			}
+
+			// Now write the data to file
+			std::ofstream outFile(_filePath, std::ios_base::binary);
+			if (outFile.is_open()) {
+				outFile << stringData;
+				outFile.close();
+				FrontendAPI::instance()->displayText("File exported successfully: " + _filePath + "\n");
+			}
+			else {
+				OT_LOG_E("Could not open file for writing: " + _filePath);
+			}
+
+			delete[] dataBuffer;
 		}
 	}
 

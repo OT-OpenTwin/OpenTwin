@@ -72,6 +72,12 @@ private:
 	virtual ot::ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _text, size_t _nextChunkStartIndex) override;
 	virtual ot::ReturnMessage tableSaveRequested(const ot::TableCfg& _cfg) override;
 
+	//api @sercurity mTLS
+	//api @action OT_ACTION_CMD_UI_RequestTextData
+	//api @brief Request text data from a entity.
+	//api The data is written to a GridFS file and the corresponding file info is returned.
+	//api @param OT_ACTION_PARAM_MODEL_EntityName Name of the entity to request the text data from.
+	//api @return Returns a ot::ReturnMessage containing the ot::GridFSFileInfo in JSON format in case of success.
 	ot::ReturnMessage handleRequestTextData(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################

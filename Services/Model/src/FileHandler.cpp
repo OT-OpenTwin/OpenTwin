@@ -33,6 +33,9 @@
 #include "QueuingDatabaseWritingRAII.h"
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
+#include "DataBase.h"
+#include "DocumentAPI.h"
+#include "GridFSFileInfo.h"
 #include <assert.h>
 
 FileHandler::FileHandler() {
@@ -285,9 +288,18 @@ ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document
 		return ret;
 	}
 
-	ot::ReturnMessage ret(ot::ReturnMessage::Ok);
-	ret.setWhat(textVisualisationEntity->getText());
-	return ret;
+	std::string text = textVisualisationEntity->getText();
+
+	ot::GridFSFileInfo info;
+	info.setFileName(DataBase::instance().getCollectionName() + "_" + entityName + "_textdata");
+
+	// Upload the data to gridFS
+	DataStorageAPI::DocumentAPI db;
+
+	bsoncxx::types::value result = db.InsertBinaryDataUsingGridFs(reinterpret_cast<const uint8_t*>(text.c_str()), text.size(), info.getFileName());
+	info.setDocumentId(result.get_oid().value.to_string());
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, info.toJson());
 }
 
 void FileHandler::storeChangedText(IVisualisationText* _entity, const std::string _text, size_t _nextChunkStartIndex)
