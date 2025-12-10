@@ -29,6 +29,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 
 RMDIR /S /Q "%OT_GUI_ROOT%\.vs"
 RMDIR /S /Q "%OT_GUI_ROOT%\build"
+RMDIR /S /Q "%OT_GUI_ROOT%\x64"
 
 GOTO END
 
