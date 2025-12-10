@@ -1573,6 +1573,11 @@ void Model::exportTextEditor(void) {
 
 	if (view->getViewContentModified()) {
 		edit->slotSaveRequested();
+
+		if (view->getViewContentModified()) {
+			OT_LOG_E("Could not export text editor content because saving failed");
+			return;
+		}
 	}
 	
 	std::string filePath = api->getSaveFileName(
