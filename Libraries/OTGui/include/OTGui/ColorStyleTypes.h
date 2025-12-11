@@ -259,6 +259,13 @@ namespace ot {
 		PythonFunction,
 		PythonComment,
 
+		JsonWidgetKey,
+		JsonWidgetString,
+		JsonWidgetNumber,
+		JsonWidgetBoolean,
+		JsonWidgetNull,
+		JsonWidgetBracket,
+
 		PlotCurve,
 		PlotCurveDimmed,
 		PlotCurveHighlight,

@@ -607,6 +607,15 @@
     <ClCompile Include="src\PopupTextEdit.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\JsonTreeWidgetNode.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JsonTreeWidgetModel.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JsonTreeWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1133,6 +1142,9 @@
     <ClInclude Include="include\OTWidgets\GlobalWidgetViewManager.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\JsonTreeWidgetNode.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -1367,6 +1379,12 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PopupTextEdit.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\JsonTreeWidget.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\JsonTreeWidgetModel.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

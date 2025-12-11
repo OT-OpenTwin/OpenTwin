@@ -468,6 +468,13 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonFunction), new PropertyPainter2D(new FillPainter2D(Color(160, 82, 45))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonKeyword), new PropertyPainter2D(new FillPainter2D(Color(30, 100, 230))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonString), new PropertyPainter2D(new FillPainter2D(Color(220, 31, 31))));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetKey), new PropertyPainter2D(new FillPainter2D(Color(86, 170, 230))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetString), new PropertyPainter2D(new FillPainter2D(Color(220, 31, 31))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetNumber), new PropertyPainter2D(new FillPainter2D(Color(30, 100, 230))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetBoolean), new PropertyPainter2D(new FillPainter2D(Color(30, 100, 230))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetNull), new PropertyPainter2D(new FillPainter2D(Color(30, 100, 230))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetBracket), new PropertyPainter2D(new FillPainter2D(Color(160, 82, 45))));
 	
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
@@ -693,6 +700,13 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonKeyword), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonString), new PropertyPainter2D(new FillPainter2D(Color(214, 157, 133))));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetKey), new PropertyPainter2D(new FillPainter2D(Color(78, 201, 176))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetString), new PropertyPainter2D(new FillPainter2D(Color(214, 157, 133))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetNumber), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetBoolean), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetNull), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetBracket), new PropertyPainter2D(new FillPainter2D(Color(220, 220, 170))));
+
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
@@ -917,6 +931,13 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonFunction), new PropertyPainter2D(new FillPainter2D(Color(255, 255, 200))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonKeyword), new PropertyPainter2D(new FillPainter2D(Color(150, 220, 250))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonString), new PropertyPainter2D(new FillPainter2D(Color(255, 160, 122))));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetKey), new PropertyPainter2D(new FillPainter2D(Color(102, 255, 240))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetString), new PropertyPainter2D(new FillPainter2D(Color(255, 160, 122))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetNumber), new PropertyPainter2D(new FillPainter2D(Color(150, 220, 250))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetBoolean), new PropertyPainter2D(new FillPainter2D(Color(150, 220, 250))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetNull), new PropertyPainter2D(new FillPainter2D(Color(150, 220, 250))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetBracket), new PropertyPainter2D(new FillPainter2D(Color(255, 255, 200))));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));

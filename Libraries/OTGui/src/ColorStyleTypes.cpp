@@ -220,6 +220,13 @@ namespace ot {
 				{ ot::ColorStyleValueEntry::PythonFunction, "Python Function" },
 				{ ot::ColorStyleValueEntry::PythonComment, "Python Comment" },
 
+				{ ot::ColorStyleValueEntry::JsonWidgetKey, "JSON Widget Key" },
+				{ ot::ColorStyleValueEntry::JsonWidgetString, "JSON Widget String" },
+				{ ot::ColorStyleValueEntry::JsonWidgetNumber, "JSON Widget Number" },
+				{ ot::ColorStyleValueEntry::JsonWidgetBoolean, "JSON Widget Boolean" },
+				{ ot::ColorStyleValueEntry::JsonWidgetNull, "JSON Widget Null" },
+				{ ot::ColorStyleValueEntry::JsonWidgetBracket, "JSON Widget Bracket" },
+
 				{ ot::ColorStyleValueEntry::PlotCurve, "Plot Curve" },
 				{ ot::ColorStyleValueEntry::PlotCurveDimmed, "Plot Curve Dimmed" },
 				{ ot::ColorStyleValueEntry::PlotCurveHighlight, "Plot Curve Highlight" },

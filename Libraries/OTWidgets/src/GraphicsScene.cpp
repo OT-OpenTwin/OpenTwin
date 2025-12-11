@@ -338,7 +338,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 
 	for (QGraphicsItem* itm : itms) {
 		ot::GraphicsItem* actualItem = dynamic_cast<ot::GraphicsItem*>(itm);
-		if (actualItem) {
+		if (actualItem && !actualItem->isInternalItem()) {
 			if (!actualItem->getParentGraphicsItem()) {
 				double dist = Math::euclideanDistance(clickPos, QtFactory::toPoint2D(actualItem->getQGraphicsItem()->mapToScene(actualItem->getQGraphicsItem()->boundingRect().center())));
 				const double zValue = actualItem->getQGraphicsItem()->zValue();

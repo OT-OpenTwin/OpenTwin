@@ -38,6 +38,7 @@
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/MainWindow.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/JsonTreeWidget.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/TextEditorView.h"
 #include "OTWidgets/StyledSvgWidget.h"
@@ -148,7 +149,7 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		table->setSortingEnabled(true);
 	}
 
-	if (true) {
+	if (false) {
 		QWidget* w = new QWidget;
 		QGridLayout* l = new QGridLayout(w);
 		ot::StyledSvgWidget* svg = new ot::StyledSvgWidget("Application/OpenTwinBackground.svg", w);
@@ -163,7 +164,7 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		_content.addView(this->createCentralWidgetView(w, "Test Logo"));
 	}
 
-	if (true) {
+	if (false) {
 		WidgetViewManager* man = new WidgetViewManager;
 		man->initialize();
 
@@ -180,6 +181,43 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		man->addView(BasicServiceInformation(), table);
 
 		_content.addView(this->createCentralWidgetView(man->getDockManager(), "Test Container"));
+	}
+
+	if (true) {
+		JsonTreeWidget* jsonTree = new JsonTreeWidget(nullptr);
+		_content.addView(this->createCentralWidgetView(jsonTree, "Test JSON Tree"));
+
+		QJsonObject obj;
+		QJsonArray arr1;
+		arr1.append("Item 1");
+		arr1.append("Item 2");
+		arr1.append(3);
+		arr1.append(4);
+		arr1.append(true);
+		obj.insert("Array 1", arr1);
+		obj.insert("String 1", "This is a test string");
+		obj.insert("Number 1", 42);
+		obj.insert("Boolean 1", false);
+		obj.insert("Null 1", QJsonValue::Null);
+
+		QJsonArray objArr;
+		QJsonObject subObj1;
+		subObj1.insert("Sub String 1", "Sub item 1");
+		subObj1.insert("Sub Number 1", 3.14);
+		objArr.append(subObj1);
+		QJsonObject subObj2;
+		subObj2.insert("Sub String 2", "Sub item 2");
+		subObj2.insert("Sub Number 2", 2.71);
+		QJsonArray subArr;
+		subArr.append(1);
+		subArr.append(2);
+		subArr.append(3);
+		subObj2.insert("Sub Array", subArr);
+		objArr.append(subObj2);
+		obj.insert("Object Array", objArr);
+
+		QJsonDocument doc(obj);
+		jsonTree->setJsonDocument(doc);
 	}
 
 	TestToolBar* test = new TestToolBar(this);
