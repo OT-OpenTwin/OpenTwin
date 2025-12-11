@@ -39,7 +39,8 @@ bool CurveVisualiser::requestVisualization(const VisualiserState& _state) {
 
 	const std::list<Visualiser*>& allVisualiser = plot->getVisualiser();
 	assert(allVisualiser.size() == 1); //Currently, the plot has only a single visualiser
-	
+	if (allVisualiser.size() == 0) return false;
+
 	auto visualiser = *allVisualiser.begin();
 	PlotVisualiser* plotVisualiser = dynamic_cast<PlotVisualiser*>(visualiser);
 	

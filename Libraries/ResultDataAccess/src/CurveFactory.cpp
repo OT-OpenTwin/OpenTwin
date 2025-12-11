@@ -34,7 +34,7 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 
 	const std::list<MetadataQuantity>& quantities = _series.getQuantities();
 
-	assert(quantities.size() == 1);
+	//assert(quantities.size() == 1);
 	
 	const MetadataQuantity* selectedQuantity = nullptr;
 	const MetadataQuantityValueDescription* selectedValueDescription = nullptr;

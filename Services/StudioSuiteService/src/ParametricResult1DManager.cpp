@@ -32,6 +32,8 @@
 #include "MetadataSeries.h"
 #include "MetadataParameter.h"
 #include "MetadataEntrySingle.h"
+#include "CurveFactory.h"
+#include "EntityResult1DPlot.h"
 
 #include "QuantityDescription.h"
 #include "QuantityDescriptionCurve.h"
@@ -40,6 +42,8 @@
 
 #include <boost/algorithm/string.hpp>
 #include "ValueFormatSetter.h"
+
+#include <set>
 
 ParametricResult1DManager::ParametricResult1DManager(Application *app) :
 	m_resultFolderName(ot::FolderNames::DatasetFolder),
@@ -122,12 +126,65 @@ void ParametricResult1DManager::storeDataInResultCollection()
 	std::list<std::shared_ptr<MetadataEntry>> seriesMetadata;
 	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(m_allDataDescriptions, seriesName, seriesMetadata);
 	resultCollectionExtender.storeCampaignChanges();
+	const MetadataSeries *series = resultCollectionExtender.findMetadataSeries(seriesMetadataIndex);
+
+	// First, create all necessary plots
+	std::set<std::string> createdPlots;
+	for (DatasetDescription& dataDescription : m_allDataDescriptions)
+	{
+		const std::string fullName = dataDescription.getQuantityDescription()->getName();
+		const std::string plotName = fullName.substr(0, fullName.find_last_of("/"));
+		const std::string curveName = fullName.substr(fullName.find_last_of("/") + 1);
+
+		if (createdPlots.count(plotName) == 0 && curveName != "S-Parameters")
+		{
+			EntityResult1DPlot newPlot(m_application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+			newPlot.setName(plotName);
+
+			ot::Plot1DCfg plotCfg;
+			const std::string shortName = plotName.substr(plotName.find_last_of("/") + 1);
+			plotCfg.setTitle(shortName);
+			newPlot.createProperties();
+			newPlot.setPlot(plotCfg);
+			newPlot.storeToDataBase();
+
+			m_application->getModelComponent()->addNewTopologyEntity(newPlot.getEntityID(), newPlot.getEntityStorageVersion(), false);
+
+			createdPlots.emplace(plotName);
+		}
+	}
+
 	//Now we store all data points in the result collection
+	std::set<std::string> createdCurves;
+
 	for (DatasetDescription& dataDescription : m_allDataDescriptions)
 	{
 		try
 		{
 			resultCollectionExtender.processDataPoints(&dataDescription, seriesMetadataIndex);
+
+			// Add the curve to the plots
+			const std::string fullName = dataDescription.getQuantityDescription()->getName();
+			const std::string plotName = fullName.substr(0, fullName.find_last_of("/"));
+			const std::string shortName = fullName.substr(fullName.find_last_of("/") + 1);
+
+			if (createdCurves.count(fullName) == 0 && shortName != "S-Parameters")
+			{
+				ot::Plot1DCurveCfg curveConfig;
+				CurveFactory::addToConfig(*series, curveConfig, fullName, "", "");
+
+				std::cout << fullName << std::endl;
+
+				EntityResult1DCurve newCurve(m_application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+				newCurve.setName(fullName);
+				newCurve.createProperties();
+				newCurve.setCurve(curveConfig);
+				newCurve.storeToDataBase();
+
+				m_application->getModelComponent()->addNewTopologyEntity(newCurve.getEntityID(), newCurve.getEntityStorageVersion(), false);
+
+				createdCurves.emplace(fullName);
+			}
 		}
 		catch (std::exception e)
 		{
