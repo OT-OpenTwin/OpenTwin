@@ -111,8 +111,8 @@ REM	"!SEVENZIP_REG_DATA!\7z.exe" x !PLUGIN_ZIPFILE! -o!NSIS_REG_VALUE! -y -aos
 	copy %OPENTWIN_THIRDPARTY_ROOT%\MongoDb\mongo-cxx-driver-r3.10.0\x64\Release\bin .\Upgrader_Exe
 	copy %OPENTWIN_THIRDPARTY_ROOT%\MongoDb\mongo-c-driver-1.27.3\x64\Release\bin .\Upgrader_Exe
 	copy %OPENTWIN_THIRDPARTY_ROOT%\zlib\zlib-1.2.11\x64\Release\bin\zlib.dll .\Upgrader_Exe\zlib.dll
-	copy %OPENTWIN_DEV_ROOT%\Libraries\OTSystem\x64\Release\OTSystem.dll .\Upgrader_Exe\OTSystem.dll
-	copy %OPENTWIN_DEV_ROOT%\Libraries\OTCore\x64\Release\OTCore.dll .\Upgrader_Exe\OTCore.dll
+	copy %OPENTWIN_DEV_ROOT%\Libraries\OTSystem\build\windows-release\Release\OTSystem.dll .\Upgrader_Exe\OTSystem.dll
+	copy %OPENTWIN_DEV_ROOT%\Libraries\OTCore\build\windows-release\Release\OTCore.dll .\Upgrader_Exe\OTCore.dll
 	
 	REM Copying the required MongoDB files
 		
