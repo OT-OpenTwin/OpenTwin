@@ -268,7 +268,7 @@ ot::ReturnMessage FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
 		return ret;
 	}
 }
-
+#include "OTCore/RuntimeTests.h"
 ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document) {
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);
@@ -288,7 +288,17 @@ ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document
 		return ret;
 	}
 
+	ot::RuntimeIntervalTest test1;
+
 	std::string text = textVisualisationEntity->getText();
+
+	test1.logCurrentInterval("Get text from entity");
+
+
+
+
+
+	ot::RuntimeIntervalTest test3;
 
 	ot::GridFSFileInfo info;
 	info.setFileName(DataBase::instance().getCollectionName() + "_" + entityName + "_textdata");
@@ -298,6 +308,8 @@ ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document
 
 	bsoncxx::types::value result = db.InsertBinaryDataUsingGridFs(reinterpret_cast<const uint8_t*>(text.c_str()), text.size(), info.getFileName());
 	info.setDocumentId(result.get_oid().value.to_string());
+
+	test3.logCurrentInterval("Store text data in GridFS");
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, info.toJson());
 }
