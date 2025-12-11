@@ -1850,8 +1850,7 @@ void AppBase::appendLogMessage(const ot::LogMessage& _message) {
 		message << "[" << StyledText::Highlight << StyledText::Bold << "TEST" << StyledText::ClearStyle << "]";
 	}
 	message << " [" << _message.getServiceName() << "] " << _message.getText();
-
-	this->appendHtmlInfoMessage(StyledTextConverter::toHtml(message) + "\n");
+	appendOutputMessage(message);
 }
 
 void AppBase::autoCloseUnpinnedViews(bool _ignoreCurrent) {
