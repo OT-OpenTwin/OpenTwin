@@ -286,6 +286,7 @@
     <ClCompile Include="src\ActionHandler.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\CommunicationHandler.cpp" />
+    <ClCompile Include="src\EnvironmentsGarbageCollector.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OutputPipeline.cpp" />
     <ClCompile Include="src\PackageHandler.cpp" />
@@ -302,9 +303,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ActionHandler.h" />
+    <ClInclude Include="include\EnvironmentsGarbageCollector.h" />
     <ClInclude Include="include\ExceptionRestartRequired.h" />
     <ClInclude Include="include\OutputPipeline.h" />
     <ClInclude Include="include\PackageHandler.h" />
+    <ClInclude Include="include\PredefinedEnvironments.h" />
     <ClInclude Include="include\Timeouts.h" />
     <QtMoc Include="include\Application.h" />
     <QtMoc Include="include\CommunicationHandler.h" />

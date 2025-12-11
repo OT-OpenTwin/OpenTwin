@@ -124,13 +124,14 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		OT_LOG_D("Initialise UID Generator");
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
-		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
+		Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
+		
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_PYRIT) {
 		OT_LOG_D("Initialise UID Generator");
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
-		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
+		Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
 		std::string environmentName = "Pyrit";
 		m_pythonAPI.initializeEnvironment(environmentName);
 	}
@@ -139,7 +140,8 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		OT_LOG_D("Initialise UID Generator");
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
-		EntityBase::setUidGenerator(Application::instance().getUIDGenerator());
+		Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
+		
 		std::string environmentName = "Core";
 		m_pythonAPI.initializeEnvironment(environmentName);
 	}

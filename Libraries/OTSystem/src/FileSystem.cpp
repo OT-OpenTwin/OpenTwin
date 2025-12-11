@@ -20,9 +20,14 @@
 // OpenTwin header
 #include "OTSystem/Exception.h"
 #include "OTSystem/FileSystem.h"
-
+#include <assert.h>
 // std header
 #include <filesystem>
+#ifdef OT_OS_WINDOWS
+    #include <Windows.h>
+#else
+    #include <sys/stat.h>
+#endif
 
 namespace ot {
     namespace intern {
@@ -75,6 +80,41 @@ std::list<std::string> ot::FileSystem::getDirectories(const std::string& _path, 
     }
 
     return result;
+}
+
+ot::DateTime::Time ot::FileSystem::getLastAccessTime(const std::string& _path)
+{
+    ot::DateTime::Time accessTime;
+#ifdef OT_OS_WINDOWS
+    HANDLE handle = CreateFileA(_path.c_str(),
+        GENERIC_READ,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        NULL,
+        OPEN_EXISTING,
+        FILE_FLAG_BACKUP_SEMANTICS,
+        NULL);
+    FILETIME atime, mtime, ctime;
+    GetFileTime(handle, &ctime, &atime, &mtime);
+
+    SYSTEMTIME st;
+    FileTimeToSystemTime(&atime, &st);
+    accessTime.m_year = std::to_string(st.wYear);    
+    accessTime.m_month = std::to_string(st.wMonth);
+    accessTime.m_day = std::to_string(st.wDay);
+#else
+    assert(false); //Not tested yet
+    struct stat info {};
+    stat(_path.c_str(), &info);
+
+    std::time_t atime = info.st_atime;   // last access
+    struct tm* tm_info = localtime(&atime);
+
+    accessTime.m_year = std::to_string(tm_info->tm_year + 1900);
+    accessTime.m_month = std::to_string(tm_info->tm_mon + 1);
+    accessTime.m_day = std::to_string(tm_info->tm_mday);
+        
+#endif
+    return accessTime;
 }
 
 std::list<std::string> ot::FileSystem::getFiles(const std::string& _path, const std::list<std::string>& _extensions, const FileSystemOptions& _options) {

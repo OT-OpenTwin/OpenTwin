@@ -102,6 +102,45 @@ std::string ot::DateTime::currentTimestamp(DateFormat _format) {
 	return intern::toTimeStamp(now, _format);
 }
 
+ot::DateTime::Time ot::DateTime::currentTimestampAsStruct()
+{
+    ot::DateTime::Time time;
+    auto now = std::chrono::system_clock::now();
+    const std::string timeStamp = intern::toTimeStamp(now, DateFormat::Simple);
+
+
+    // Split into date and time parts
+    auto pos = timeStamp.find(" ");
+    std::string datePart = timeStamp.substr(0, pos);
+    std::string timePart = timeStamp.substr(pos + 1); // skip the space
+
+    // --- Date: yyyy-mm-dd ---
+    pos = datePart.find("-");
+    time.m_year = datePart.substr(0, pos);
+
+    std::string rest = datePart.substr(pos + 1);
+    pos = rest.find("-");
+    time.m_month = rest.substr(0, pos);
+
+    time.m_day = rest.substr(pos + 1);
+
+    // --- Time: hh:MM:ss.zzz ---
+    pos = timePart.find(":");
+    time.m_hour = timePart.substr(0, pos);
+
+    rest = timePart.substr(pos + 1);
+    pos = rest.find(":");
+    time.m_minute = rest.substr(0, pos);
+
+    rest = rest.substr(pos + 1);
+    pos = rest.find(".");
+    time.m_second = rest.substr(0, pos);
+
+    time.m_millisec = rest.substr(pos + 1);
+
+    return time;
+}
+
 int64_t ot::DateTime::msSinceEpoch() {
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }

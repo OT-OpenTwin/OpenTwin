@@ -29,6 +29,7 @@
 #include "PackageHandler.h"
 
 #include "PackageHandler.h"
+#include "PredefinedEnvironments.h"
 
 void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestUID)
 {
@@ -53,7 +54,7 @@ void PythonInterpreterAPI::initializeEnvironment(std::string& _environmentName)
 	{
 		// Environment is a special, which already exists in the python interpreter installation
 		OT_LOG_D("Initialize Pyrit environment");
-		_environmentName = "PyritEnvironment";
+		_environmentName = PredefinedEnvironments::getPythonEnvironmentName();
 		m_wrapper.initializePythonInterpreter(_environmentName);
 	}
 	else if (_environmentName == "Core")

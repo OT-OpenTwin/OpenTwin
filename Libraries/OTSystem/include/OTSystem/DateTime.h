@@ -31,6 +31,17 @@ namespace ot {
     class OT_SYS_API_EXPORT DateTime {
     public:
 
+		struct Time
+		{
+			std::string m_year = "";
+			std::string m_month = "";
+			std::string m_day = "";
+			std::string m_hour = "";
+			std::string m_minute = "";
+			std::string m_second = "";
+			std::string m_millisec = "";
+		};
+
         //! @brief Date format.
         enum DateFormat {
             Simple,     //! @brief Simple format, current timezone ("yyyy-mm-dd hh:MM:ss.zzz", e.g. "2000-01-01 00:00:00.000").
@@ -43,6 +54,8 @@ namespace ot {
         //! @brief Returns the current time as a string with the given format.
 		//! @param _format Format of the timestamp string.
         static std::string currentTimestamp(DateFormat _format);
+		
+		static ot::DateTime::Time currentTimestampAsStruct();
 
         //! @brief Current milliseconds since epoch.
         static int64_t msSinceEpoch();
@@ -60,6 +73,7 @@ namespace ot {
 		//! @brief Converts a time interval in milliseconds to a human-readable string.
 		//! @param _msecInterval Time interval in milliseconds.
 		static std::string intervalToString(int64_t _msecInterval);
+
     };
 
 }

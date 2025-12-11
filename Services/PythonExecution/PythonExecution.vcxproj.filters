@@ -63,6 +63,9 @@
     <ClCompile Include="src\OutputPipeline.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\EnvironmentsGarbageCollector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CPythonObject.h">
@@ -123,6 +126,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\ExceptionRestartRequired.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EnvironmentsGarbageCollector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PredefinedEnvironments.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

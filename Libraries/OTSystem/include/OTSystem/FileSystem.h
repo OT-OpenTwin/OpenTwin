@@ -27,6 +27,7 @@
 #include <list>
 #include <string>
 #include <fstream>
+#include "DateTime.h"
 
 namespace ot {
 
@@ -46,6 +47,8 @@ namespace ot {
 		//! @param _options Search and format options.
 		//! @throw std::filesystem::filesystem_error in case of filesystem related error.
 		static std::list<std::string> getDirectories(const std::string& _path, const FileSystemOptions& _options = FileSystemOption::NoOptions);
+
+		static ot::DateTime::Time getLastAccessTime(const std::string& _path);
 
 		//! @brief Returns all files at the given path.
 		//! @param _path Top level path to search at.
