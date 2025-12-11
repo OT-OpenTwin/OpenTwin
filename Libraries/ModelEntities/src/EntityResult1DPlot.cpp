@@ -26,7 +26,7 @@
 #include "OTCore/EntityName.h"
 #include "EntityResult1DCurve.h"
 
-static EntityFactoryRegistrar<EntityResult1DPlot> registrar("EntityResult1DPlot_New");
+static EntityFactoryRegistrar<EntityResult1DPlot> registrar("EntityResult1DPlot");
 
 EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	:EntityContainer(_ID,_parent,_obs,_ms)
