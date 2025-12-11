@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/Math.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/QtFactory.h"
@@ -61,13 +62,15 @@ ot::GraphicsScene::~GraphicsScene() {}
 
 // Connection handling
 
-void ot::GraphicsScene::startConnectionToConnection(ot::GraphicsConnectionItem* _targetedConnection, const Point2DD& _pos) {
+bool ot::GraphicsScene::startConnectionToConnection(ot::GraphicsConnectionItem* _targetedConnection, const Point2DD& _pos) {
 	OTAssertNullptr(m_view);
-	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) return;
+	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) {
+		return false;
+	}
 
 	// Currently a connection may be used as a destiantion only for other connections
 	if (!m_connectionOrigin) {
-		return;
+		return false;
 	}
 
 	OT_LOG_D("New conncetion to connection");
@@ -76,16 +79,19 @@ void ot::GraphicsScene::startConnectionToConnection(ot::GraphicsConnectionItem* 
 	UID targetUid = _targetedConnection->getConfiguration().getUid();
 	this->stopConnection();
 	m_view->requestConnectionToConnection(originUid, originConnectable, targetUid, _pos);
+	return true;
 }
 
-void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
+bool ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 	OTAssertNullptr(m_view);
-	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) return;
+	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) {
+		return false;
+	}
 
 	// Ignore new connection on read only mode
 	if (m_view->isReadOnly()) {
 		this->stopConnection(); // Stop connection if read only was set during drag
-		return;
+		return false;
 	}
 
 	if (m_connectionOrigin == nullptr) {
@@ -102,15 +108,11 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		m_connectionPreview->setDestPos(m_connectionPreview->originPos());
 		m_connectionPreview->setDestDir(ot::inversedConnectionDirection(m_connectionOrigin->getConnectionDirection()));
 		this->addItem(m_connectionPreview);
-
-		return;
+	}
+	else if (m_connectionOrigin == _item) {
+		this->stopConnection();
 	}
 	else {
-		if (m_connectionOrigin == _item) {
-			this->stopConnection();
-			return;
-		}
-
 		OT_LOG_D("New conncetion");
 		UID originUid = m_connectionOrigin->getRootItem()->getGraphicsItemUid();
 		std::string originConnectable = m_connectionOrigin->getGraphicsItemName();
@@ -119,6 +121,8 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		this->stopConnection();
 		m_view->requestConnection(originUid, originConnectable, destUid, destConnectable);
 	}
+
+	return true;
 }
 
 void ot::GraphicsScene::stopConnection() {
@@ -145,8 +149,12 @@ void ot::GraphicsScene::checkMaxTriggerDistance(const MarginsD& _triggerDistance
 	this->checkMaxTriggerDistance(std::max({ _triggerDistance.left(), _triggerDistance.top(), _triggerDistance.right(), _triggerDistance.bottom() }));
 }	
 
+ot::Point2DD ot::GraphicsScene::snapToGrid(const Point2DD& _pt) const {
+	return m_grid.snapToGrid(_pt);
+}
+
 QPointF ot::GraphicsScene::snapToGrid(const QPointF& _pt) const {
-	return QtFactory::toQPoint(m_grid.snapToGrid(QtFactory::toPoint2D(_pt)));
+	return QtFactory::toQPoint(snapToGrid(QtFactory::toPoint2D(_pt)));
 }
 
 QPointF ot::GraphicsScene::snapToGrid(const GraphicsItem* _item) const {
@@ -301,36 +309,53 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 	// Check for a new connection
 	GraphicsElement* targetedElement = this->findClosestConnectableElement(_event->scenePos());
 
+	Point2DD clickPos = QtFactory::toPoint2D(_event->scenePos());
+
 	// Check if a base item was found next to the click position.
 	if (targetedElement) {
 		GraphicsItem* graphicsItem = dynamic_cast<ot::GraphicsItem*>(targetedElement);
 		GraphicsConnectionItem* connectionItem = dynamic_cast<GraphicsConnectionItem*>(targetedElement);
 
 		if (graphicsItem) {
-			this->startConnection(graphicsItem);
+			if (this->startConnection(graphicsItem)) {
+				return;
+			}
 		}
 		else if (connectionItem) {
-			this->startConnectionToConnection(connectionItem, QtFactory::toPoint2D(snapToGrid(_event->scenePos())));
+			if (this->startConnectionToConnection(connectionItem, snapToGrid(clickPos))) {
+				return;
+			}
 		}
 	}
-	else {
-		this->stopConnection();
 
-		QList<QGraphicsItem*> itms = this->items(_event->scenePos());
-		ot::GraphicsItem* itemUnder = nullptr;
-		for (QGraphicsItem* itm : itms) {
-			ot::GraphicsItem* actualItem = dynamic_cast<ot::GraphicsItem*>(itm);
-			if (actualItem) {
-				if (!actualItem->getParentGraphicsItem()) {
-					if (itemUnder) return;
-					else itemUnder = actualItem;
+	this->stopConnection();
+
+	QList<QGraphicsItem*> itms = this->items(_event->scenePos());
+
+	ot::GraphicsItem* itemUnder = nullptr;
+	double minDistance(std::numeric_limits<double>::max());
+	double maxZValue = std::numeric_limits<int>::lowest();
+
+	for (QGraphicsItem* itm : itms) {
+		ot::GraphicsItem* actualItem = dynamic_cast<ot::GraphicsItem*>(itm);
+		if (actualItem) {
+			if (!actualItem->getParentGraphicsItem()) {
+				double dist = Math::euclideanDistance(clickPos, QtFactory::toPoint2D(actualItem->getQGraphicsItem()->mapToScene(actualItem->getQGraphicsItem()->boundingRect().center())));
+				const double zValue = actualItem->getQGraphicsItem()->zValue();
+
+				if (!itemUnder ||
+					(zValue > maxZValue) ||
+					(zValue == maxZValue && dist < minDistance)) {
+					itemUnder = actualItem;
+					minDistance = dist;
+					maxZValue = zValue;
 				}
 			}
 		}
+	}
 
-		if (itemUnder) {
-			Q_EMIT graphicsItemDoubleClicked(itemUnder);
-		}
+	if (itemUnder) {
+		Q_EMIT graphicsItemDoubleClicked(itemUnder);
 	}
 }
 
