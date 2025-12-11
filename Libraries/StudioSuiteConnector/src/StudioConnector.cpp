@@ -36,7 +36,7 @@
 #include <sstream>
 #include <filesystem>
 
-//#define DEBUG_PYTHON_SERVER
+#define DEBUG_PYTHON_SERVER
 
 std::string StudioConnector::searchProjectAndExtractData(const std::string& fileName, const std::string& projectRoot, bool includeResults, bool includeParametricResults)
 {
@@ -531,7 +531,7 @@ void StudioConnector::startSubprocess() {
 	initiateProcess();
 
 #ifdef DEBUG_PYTHON_SERVER
-	serverName = "TestServer";
+	m_serverName = "TestServerPython";
 #endif
 	m_server.listen(m_serverName.c_str());
 #ifndef DEBUG_PYTHON_SERVER
