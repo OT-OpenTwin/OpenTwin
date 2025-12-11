@@ -30,7 +30,6 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg& _config, const std::string& _quantityNameOnYAxis, const std::string& _quantityValueDescriptionNameOnYAxis, const std::string& _defaultParameterForXAxis)
 {
 	ot::QueryInformation queryInformation;
-	queryInformation.m_query = createQuery(_series.getSeriesIndex());
 	queryInformation.m_projection = createProjection();
 
 	const std::list<MetadataQuantity>& quantities = _series.getQuantities();
@@ -84,31 +83,35 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 	{
 		throw std::exception("Curve creation failed to extract the y-axis information");
 	}
+	queryInformation.m_query = createQuery(_series.getSeriesIndex(), selectedValueDescription->quantityIndex);
 
 	ot::QuantityContainerEntryDescription quantityInformation;
 	quantityInformation.m_fieldName = QuantityContainer::getFieldName();
-	quantityInformation.m_label = selectedQuantity->quantityName + selectedValueDescription->quantityValueName;
+	quantityInformation.m_label = selectedQuantity->quantityName +" " + selectedValueDescription->quantityValueName;
 	quantityInformation.m_unit = selectedValueDescription->unit;
 	quantityInformation.m_dataType = selectedValueDescription->dataTypeName;
 	quantityInformation.m_dimension = selectedQuantity->dataDimensions;
 	queryInformation.m_quantityDescription = quantityInformation;
 
 	const std::list<MetadataParameter>& parameters = _series.getParameter();
-
+	auto& dependingParameter = selectedQuantity->dependingParameterIds;
 	for (const auto& parameter : parameters)
 	{
-		ot::QuantityContainerEntryDescription qcDescription;
-		qcDescription.m_label = parameter.parameterLabel;
-		qcDescription.m_dataType = parameter.typeName;
-		qcDescription.m_fieldName = std::to_string(parameter.parameterUID);
-		qcDescription.m_unit = parameter.unit;
-		if (!_defaultParameterForXAxis.empty() && _defaultParameterForXAxis == parameter.parameterName)
+		if (std::find(dependingParameter.begin(), dependingParameter.end(), parameter.parameterUID) != dependingParameter.end())
 		{
-			queryInformation.m_parameterDescriptions.push_front(qcDescription);
-		}
-		else
-		{
-			queryInformation.m_parameterDescriptions.push_back(qcDescription);
+			ot::QuantityContainerEntryDescription qcDescription;
+			qcDescription.m_label = parameter.parameterLabel;
+			qcDescription.m_dataType = parameter.typeName;
+			qcDescription.m_fieldName = std::to_string(parameter.parameterUID);
+			qcDescription.m_unit = parameter.unit;
+			if (!_defaultParameterForXAxis.empty() && _defaultParameterForXAxis == parameter.parameterName)
+			{
+				queryInformation.m_parameterDescriptions.push_front(qcDescription);
+			}
+			else
+			{
+				queryInformation.m_parameterDescriptions.push_back(qcDescription);
+			}
 		}
 	}
 
@@ -116,10 +119,18 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 
 }
 
-const std::string CurveFactory::createQuery(ot::UID _seriesID)
+const std::string CurveFactory::createQuery(ot::UID _seriesID, ot::UID _quantityID)
 {
-	const std::string query = "{\"" + MetadataSeries::getFieldName() + "\":" + std::to_string(_seriesID) + "}";
-	return query;
+	AdvancedQueryBuilder builder;
+	ValueComparisionDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(_seriesID), ot::TypeNames::getInt64TypeName(), "");
+	auto firstComparision = builder.createComparison(seriesComparision);
+
+	ValueComparisionDefinition quantityComparision(MetadataQuantity::getFieldName(), "=", std::to_string(_quantityID), ot::TypeNames::getInt64TypeName(), "");
+	auto secondComparision = builder.createComparison(quantityComparision);
+	auto finalQuery = builder.connectWithAND({ firstComparision,secondComparision });
+
+	const std::string debugQuery = bsoncxx::to_json(finalQuery.view());
+	return debugQuery;
 }
 
 const std::string CurveFactory::createProjection()

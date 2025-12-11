@@ -86,7 +86,7 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 	bsoncxx::document::value docProjection = bsoncxx::from_json(_queryInformation.m_projection);
 	bsoncxx::document::view_or_value projection(docProjection);
 
-	bsoncxx::document::value  docQuery = bsoncxx::from_json(_queryInformation.m_query);
+	bsoncxx::document::value docQuery = bsoncxx::from_json(_queryInformation.m_query);
 	bsoncxx::document::view_or_value query (docQuery);
 	if (additionalComparisions.size() > 0)
 	{
