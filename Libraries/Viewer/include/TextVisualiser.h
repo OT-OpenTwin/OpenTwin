@@ -51,7 +51,7 @@ protected:
 	virtual std::string getVisualiserTypeString() const override { return "Text"; };
 
 private Q_SLOTS:
-	void slotRequestRemainingDataCompleted(uint8_t* _text);
+	void slotRequestRemainingDataCompleted(uint8_t* _text, size_t _textLength);
 
 private:
 	void workerRequestRemainingData(size_t _nextChunkStartIndex);

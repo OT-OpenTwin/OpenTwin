@@ -295,6 +295,14 @@ bool ot::TextEditor::hasMoreToLoad() const {
 	return m_loadLabelsVisible;
 }
 
+void ot::TextEditor::setNoMoreDataAvailable() {
+	m_loadLabelsVisible = false;
+	m_loadMoreLabelVisible = false;
+	m_nextChunkStartIx = 0;
+	slotUpdateLabelsPosition();
+	update();
+}
+
 void ot::TextEditor::slotSaveRequested() {
 	if (!this->document()->isModified()) {
 		return;

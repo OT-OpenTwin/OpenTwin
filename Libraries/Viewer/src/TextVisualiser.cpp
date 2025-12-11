@@ -18,6 +18,8 @@
 // @otlicense-end
 
 #include <stdafx.h>
+
+// OpenTwin header
 #include "TextVisualiser.h"
 #include "OTCore/JSON.h"
 #include "OTCore/String.h"
@@ -31,6 +33,9 @@
 #include "DocumentAPI.h"
 #include "SceneNodeBase.h"
 #include "GridFSFileInfo.h"
+
+// std header
+#include <thread>
 
 TextVisualiser::TextVisualiser(SceneNodeBase* _sceneNode)
 	: Visualiser(_sceneNode, ot::WidgetViewBase::ViewText)
@@ -67,11 +72,24 @@ bool TextVisualiser::requestNextDataChunk(size_t _nextChunkStartIndex) {
 }
 
 bool TextVisualiser::requestRemainingData(size_t _nextChunkStartIndex) {
-	OTAssertNullptr(this->getSceneNode());
+	ot::TextEditorView* view = dynamic_cast<ot::TextEditorView*>(ot::GlobalWidgetViewManager::instance().findView(getSceneNode()->getName(), ot::WidgetViewBase::ViewText));
+	if (!view) {
+		OT_LOG_E("Could not find text view for entity: " + getSceneNode()->getName());
+		return false;
+	}
 
-	VisualiserState state;
-	state.m_setFocus = false;
-	FrontendAPI::instance()->messageModelService(createRequestDoc(state, _nextChunkStartIndex, false).toJson());
+	if (view->getViewContentModified()) {
+		view->getTextEditor()->saveRequested();
+		if (view->getViewContentModified()) {
+			OT_LOG_W("Failed to save text data. Cancelling load...");
+			return false;
+		}
+	}
+
+	FrontendAPI::instance()->lockSelectionAndModification(true);
+	FrontendAPI::instance()->setProgressBarVisibility("Load text", true, true);
+	std::thread t(&TextVisualiser::workerRequestRemainingData, this, _nextChunkStartIndex);
+	t.detach();
 	return true;
 }
 
@@ -83,8 +101,8 @@ void TextVisualiser::hideVisualisation(const VisualiserState& _state) {
 
 }
 
-void TextVisualiser::slotRequestRemainingDataCompleted(uint8_t* _text) {
-	QString text(reinterpret_cast<const char*>(_text));
+void TextVisualiser::slotRequestRemainingDataCompleted(uint8_t* _text, size_t _textLength) {
+	QString text = QString::fromLocal8Bit(reinterpret_cast<const char*>(_text), _textLength);
 	delete[]_text;
 
 	ot::TextEditorView* view = dynamic_cast<ot::TextEditorView*>(ot::GlobalWidgetViewManager::instance().findView(getSceneNode()->getName(), ot::WidgetViewBase::ViewText));
@@ -93,6 +111,8 @@ void TextVisualiser::slotRequestRemainingDataCompleted(uint8_t* _text) {
 	}
 	else {
 		view->getTextEditor()->setPlainText(text);
+		view->getTextEditor()->setNoMoreDataAvailable();
+		view->getTextEditor()->setContentSaved();
 	}
 
 	FrontendAPI::instance()->lockSelectionAndModification(false);
@@ -138,9 +158,10 @@ void TextVisualiser::workerRequestRemainingData(size_t _nextChunkStartIndex) {
 				uint8_t* decompr = ot::String::decompressBase64(reinterpret_cast<const char*>(dataBuffer), decompressedSize);
 				delete[] dataBuffer;
 				dataBuffer = decompr;
+				length = decompressedSize;
 			}
 
-			QMetaObject::invokeMethod(this, &TextVisualiser::slotRequestRemainingDataCompleted, Qt::QueuedConnection, dataBuffer);
+			QMetaObject::invokeMethod(this, &TextVisualiser::slotRequestRemainingDataCompleted, Qt::QueuedConnection, dataBuffer, length);
 			return;
 		}
 	}

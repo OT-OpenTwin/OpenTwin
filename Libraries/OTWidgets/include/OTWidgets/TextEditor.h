@@ -115,6 +115,8 @@ namespace ot {
 		
 		bool hasMoreToLoad() const;
 
+		void setNoMoreDataAvailable();
+
 	Q_SIGNALS:							
 		void saveRequested();
 		void loadMoreRequested(size_t _nextChunkStartIndex);
