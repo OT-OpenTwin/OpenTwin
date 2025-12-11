@@ -22,6 +22,9 @@
 #include "Visualiser.h"
 
 class GraphicsConnectionVisualiser : public Visualiser {
+	OT_DECL_NOCOPY(GraphicsConnectionVisualiser)
+	OT_DECL_NOMOVE(GraphicsConnectionVisualiser)
+	OT_DECL_NODEFAULT(GraphicsConnectionVisualiser)
 public:
 	GraphicsConnectionVisualiser(SceneNodeBase* _sceneNode);
 	bool requestVisualization(const VisualiserState& _state) override;

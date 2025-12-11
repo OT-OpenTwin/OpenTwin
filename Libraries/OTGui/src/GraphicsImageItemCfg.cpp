@@ -45,7 +45,8 @@ ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
-	_object.AddMember("Data", JsonString(String::compressedVectorBase64(m_imageData), _allocator), _allocator);
+	std::unique_ptr<char> compressed(String::compressBase64(reinterpret_cast<const uint8_t*>(m_imageData.data()), static_cast<uint64_t>(m_imageData.size())));
+	_object.AddMember("Data", JsonString(std::string(compressed.get()), _allocator), _allocator);
 	_object.AddMember("DataLen", m_imageData.size(), _allocator);
 	_object.AddMember("DataFileFormat", JsonString(ot::toString(m_imageDataFileType), _allocator), _allocator);
 	_object.AddMember("Path", JsonString(m_imageSubPath, _allocator), _allocator);
@@ -56,8 +57,10 @@ void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator
 void ot::GraphicsImageItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 	
-	uint64_t dataLen = json::getUInt64(_object, "DataLen");
-	m_imageData = String::decompressedVectorBase64(json::getString(_object, "Data"), dataLen);
+	std::string data = json::getString(_object, "Data");
+	uint64_t decompressedSize = json::getUInt64(_object, "DataLen");
+	std::unique_ptr<uint8_t> decompressed(String::decompressBase64(data.c_str(), decompressedSize));
+	m_imageData = std::vector<char>(reinterpret_cast<char*>(decompressed.get()), reinterpret_cast<char*>(decompressed.get()) + decompressedSize);
 	m_imageDataFileType = ot::stringToImageFileFormat(json::getString(_object, "DataFileFormat"));
 	m_imageSubPath = json::getString(_object, "Path");
 	m_maintainAspectRatio = json::getBool(_object, "MaintainRatio");

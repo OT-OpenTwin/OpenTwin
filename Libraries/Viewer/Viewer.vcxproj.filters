@@ -285,9 +285,6 @@
     <ClInclude Include="include\Visualiser.h">
       <Filter>include\Visualiser</Filter>
     </ClInclude>
-    <ClInclude Include="include\TextVisualiser.h">
-      <Filter>include\Visualiser</Filter>
-    </ClInclude>
     <ClInclude Include="include\SceneNodeMultiVisualisation.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
@@ -352,6 +349,9 @@
   <ItemGroup>
     <QtMoc Include="include\Viewer.h">
       <Filter>include</Filter>
+    </QtMoc>
+    <QtMoc Include="include\TextVisualiser.h">
+      <Filter>include\Visualiser</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -3511,7 +3511,10 @@ void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
 
 			// Decompress if needed
 			if (fileInfo.isFileCompressed()) {
-				stringData = ot::String::decompressedBase64(stringData, fileInfo.getUncompressedSize());
+				size_t decompressedSize = fileInfo.getUncompressedSize();
+				uint8_t* decompr = ot::String::decompressBase64(stringData.c_str(), decompressedSize);
+				stringData = std::string(reinterpret_cast<char*>(decompr), decompressedSize);
+				delete[] decompr;
 			}
 
 			// Now write the data to file

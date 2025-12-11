@@ -21,6 +21,9 @@
 #include "Visualiser.h"
 
 class RangeVisualiser : public Visualiser {
+	OT_DECL_NOCOPY(RangeVisualiser)
+	OT_DECL_NOMOVE(RangeVisualiser)
+	OT_DECL_NODEFAULT(RangeVisualiser)
 public:
 	RangeVisualiser(SceneNodeBase* _sceneNode);
 	virtual bool requestVisualization(const VisualiserState& _state) override;

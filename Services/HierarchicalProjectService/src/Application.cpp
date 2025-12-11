@@ -621,7 +621,7 @@ ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBinaryData* _d
 	OTAssertNullptr(_data);
 	
 	uint64_t uncompressedDataLength = _data->getData().size();
-	std::string compressedData = ot::String::compressedBase64(std::string(_data->getData().begin(), _data->getData().end()));
+	std::string compressedData = ot::String::compressBase64(reinterpret_cast<const uint8_t*>(_data->getData().data()), _data->getData().size());
 
 	std::string fileNameOnly = ot::EntityName::getSubName(_block->getName()).value();
 

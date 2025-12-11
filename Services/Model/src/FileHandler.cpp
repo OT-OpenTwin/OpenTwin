@@ -132,10 +132,10 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 		for (std::string& fileName : fileNames)
 		{
 			counter++;
-
-			std::string fileContent = ot::String::decompressedBase64(*content, *uncompressedDataLength);
+			uint64_t dataLen = static_cast<uint64_t>(*uncompressedDataLength);
+			std::unique_ptr<uint8_t> data(ot::String::decompressBase64(content->c_str(), dataLen));
 		
-			storeFileInDataBase(fileContent, fileName, folderContent,_folderName, fileFilter);
+			storeFileInDataBase(std::string(reinterpret_cast<const char*>(data.get()), dataLen), fileName, folderContent, _folderName, fileFilter);
 			uncompressedDataLength++;
 			content++;
 			updater.triggerUpdate(counter);

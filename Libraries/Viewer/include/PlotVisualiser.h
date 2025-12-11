@@ -20,8 +20,10 @@
 #pragma once
 #include "Visualiser.h"
 
-class PlotVisualiser : public Visualiser
-{
+class PlotVisualiser : public Visualiser {
+	OT_DECL_NOCOPY(PlotVisualiser)
+	OT_DECL_NOMOVE(PlotVisualiser)
+	OT_DECL_NODEFAULT(PlotVisualiser)
 public:
 	PlotVisualiser(SceneNodeBase* _sceneNode);
 	bool requestVisualization(const VisualiserState& _state) override;

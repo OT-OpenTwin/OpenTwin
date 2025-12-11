@@ -232,12 +232,13 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 	}
 
 	// Unpack data
-	std::string unpackedData = ot::String::decompressedBase64(_fileContent, _uncompressedDataLength);
+	uint64_t uncompressedLength = static_cast<uint64_t>(_uncompressedDataLength);
+	std::unique_ptr<uint8_t> unpackedData(ot::String::decompressBase64(_fileContent.c_str(), uncompressedLength));
 
 	const std::string serviceName = Application::instance().getServiceName();
 
 	// Create container
-	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
+	std::vector<char> fileData(reinterpret_cast<const char*>(unpackedData.get()), reinterpret_cast<const char*>(unpackedData.get()) + uncompressedLength);
 
 	const ot::UID blockUid = _modelComponent->createEntityUID();
 
@@ -321,12 +322,13 @@ void EntityHandler::addDocuments(const std::list<std::string>& _fileNames, const
 
 void EntityHandler::addImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
 	// Unpack data
-	std::string unpackedData = ot::String::decompressedBase64(_fileContent, _uncompressedDataLength);
+	uint64_t uncompressedLength = static_cast<uint64_t>(_uncompressedDataLength);
+	std::unique_ptr<uint8_t> unpackedData(ot::String::decompressBase64(_fileContent.c_str(), uncompressedLength));
 
 	const std::string serviceName = Application::instance().getServiceName();
 
 	// Create container
-	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
+	std::vector<char> fileData(reinterpret_cast<const char*>(unpackedData.get()), reinterpret_cast<const char*>(unpackedData.get()) + uncompressedLength);
 
 	std::string fileNameOnly, extension;
 	ot::ImageFileFormat format;
@@ -504,10 +506,11 @@ void EntityHandler::updateProjectImages(const std::list<ot::EntityInformation>& 
 
 bool EntityHandler::addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter) {
 	// Unpack data
-	std::string unpackedData = ot::String::decompressedBase64(_fileContent, _uncompressedDataLength);
+	uint64_t uncompressedLength = static_cast<uint64_t>(_uncompressedDataLength);
+	std::unique_ptr<uint8_t> unpackedData(ot::String::decompressBase64(_fileContent.c_str(), uncompressedLength));
 
 	// Create container
-	std::vector<char> fileData(unpackedData.begin(), unpackedData.end());
+	std::vector<char> fileData(reinterpret_cast<const char*>(unpackedData.get()), reinterpret_cast<const char*>(unpackedData.get()) + uncompressedLength);
 
 	std::string fileNameOnly, extension;
 	ot::ImageFileFormat format;
@@ -564,7 +567,7 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 		// Create file data entity
 		EntityBinaryData imageDataEntity;
 		imageDataEntity.setEntityID(_modelComponent->createEntityUID());
-		imageDataEntity.setData(unpackedData.c_str(), unpackedData.size());
+		imageDataEntity.setData(reinterpret_cast<const char*>(unpackedData.get()), uncompressedLength);
 		imageDataEntity.storeToDataBase();
 
 		newData.addDataEntity(*projectEntity, imageDataEntity);

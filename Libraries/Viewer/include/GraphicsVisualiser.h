@@ -20,8 +20,10 @@
 #pragma once
 #include "Visualiser.h"
 
-class GraphicsVisualiser : public Visualiser
-{
+class GraphicsVisualiser : public Visualiser {
+	OT_DECL_NOCOPY(GraphicsVisualiser)
+	OT_DECL_NOMOVE(GraphicsVisualiser)
+	OT_DECL_NODEFAULT(GraphicsVisualiser)
 public:
 	GraphicsVisualiser(SceneNodeBase* _sceneNode);
 	virtual bool requestVisualization(const VisualiserState& _state) override;

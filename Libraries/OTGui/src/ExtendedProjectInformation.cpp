@@ -34,7 +34,8 @@ ot::ExtendedProjectInformation::ExtendedProjectInformation(const ProjectInformat
 void ot::ExtendedProjectInformation::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const {
 	ProjectInformation::addToJsonObject(_jsonObject, _allocator);
 
-	_jsonObject.AddMember("ImageData", JsonString(String::compressedVectorBase64(m_imageData), _allocator), _allocator);
+	std::unique_ptr<char> compressed(String::compressBase64(reinterpret_cast<const uint8_t*>(m_imageData.data()), static_cast<uint64_t>(m_imageData.size())));
+	_jsonObject.AddMember("ImageData", JsonString(std::string(compressed.get()), _allocator), _allocator);
 	_jsonObject.AddMember("ImageDataLength", static_cast<uint64_t>(m_imageData.size()), _allocator);
 	_jsonObject.AddMember("ImageFormat", JsonString(toString(m_imageFormat), _allocator), _allocator);
 	
@@ -46,7 +47,9 @@ void ot::ExtendedProjectInformation::setFromJsonObject(const ConstJsonObject& _j
 	ProjectInformation::setFromJsonObject(_jsonObject);
 
 	std::string data = json::getString(_jsonObject, "ImageData");
-	m_imageData = String::decompressedVectorBase64(data, json::getUInt64(_jsonObject, "ImageDataLength"));
+	uint64_t decompressedSize = json::getUInt64(_jsonObject, "ImageDataLength");
+	std::unique_ptr<uint8_t> decompressed(String::decompressBase64(data.c_str(), decompressedSize));
+	m_imageData = std::vector<char>(reinterpret_cast<char*>(decompressed.get()), reinterpret_cast<char*>(decompressed.get()) + decompressedSize);
 	m_imageFormat = stringToImageFileFormat(json::getString(_jsonObject, "ImageFormat"));
 	
 	m_description = json::getString(_jsonObject, "Description");

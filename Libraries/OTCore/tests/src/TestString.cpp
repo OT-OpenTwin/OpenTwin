@@ -376,7 +376,7 @@ TEST(StringTests, Hex_WithUmlauts2) {
 	const std::string input = "\xC3\x9C\x62\x65\x72\x70\x72\xFC\x66\x75\x6E\x67";
 	std::string result = ot::String::toHex(input);
 
-	EXPECT_EQ(result, "c39c6265727072c3bc66756e67");
+	EXPECT_EQ(result, "c39c6265727072fc66756e67");
 }
 
 TEST(StringTests, Hex_Empty) {
@@ -436,7 +436,7 @@ TEST(StringTests, Base64Url_WithUmlauts2) {
 	// "Ueberpruefung" with umlauts in UTF-8 = 0xC3 0x9C 0x62 0x65 0x72 0x70 0x72 0xFC 0x66 0x75 0x6E 0x67
 	const std::string input = "\xC3\x9C\x62\x65\x72\x70\x72\xFC\x66\x75\x6E\x67";
 	std::string result = ot::String::toBase64Url(input);
-	const std::string expected = "w5xiZXJwcsO8ZnVuZw";
+	const std::string expected = "w5xiZXJwcvxmdW5n";
 	EXPECT_EQ(result, expected);
 }
 
@@ -476,4 +476,26 @@ TEST(StringTests, Base64Url_Inverse2) {
 	const std::string encoded = ot::String::toBase64Url(input);
 	const std::string decoded = ot::String::fromBase64Url(encoded);
 	EXPECT_EQ(input, decoded);
+}
+
+TEST(StringTests, CompressRaw) {
+	std::string input = "This is a test string. This is a test string. This is a test string. This is a test string. This is a test string.";
+	size_t originalSize = input.size();
+	int compressedSize = 0;
+	std::unique_ptr<uint8_t> compressed(ot::String::compressRaw(reinterpret_cast<const uint8_t*>(input.data()), originalSize, compressedSize));
+	size_t decompressedSize = originalSize;
+	std::unique_ptr<uint8_t> decompressed(ot::String::decompressRaw(compressed.get(), compressedSize, decompressedSize));
+	EXPECT_EQ(originalSize, decompressedSize);
+	std::string output(reinterpret_cast<char*>(decompressed.get()), decompressedSize);
+	EXPECT_EQ(input, output);
+}
+
+TEST(StringTests, CompressBase64String) {
+	const std::string input = "This is a test string. This is a test string. This is a test string. This is a test string. This is a test string.";
+	size_t decompressedSize = input.size();
+	std::unique_ptr<const char> compressed(ot::String::compressBase64(reinterpret_cast<const uint8_t*>(input.data()), input.size()));
+	std::unique_ptr<uint8_t> decompressed(ot::String::decompressBase64(compressed.get(), decompressedSize));
+	EXPECT_EQ(input.size(), decompressedSize);
+	std::string output(reinterpret_cast<char*>(decompressed.get()), decompressedSize);
+	EXPECT_EQ(input, output);
 }

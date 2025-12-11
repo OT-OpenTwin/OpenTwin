@@ -21,8 +21,10 @@
 
 #include "Visualiser.h"
 
-class CurveVisualiser : public Visualiser
-{
+class CurveVisualiser : public Visualiser {
+	OT_DECL_NOCOPY(CurveVisualiser)
+	OT_DECL_NOMOVE(CurveVisualiser)
+	OT_DECL_NODEFAULT(CurveVisualiser)
 public:
 	CurveVisualiser(SceneNodeBase* _sceneNode);
 	bool requestVisualization(const VisualiserState& _state) override;

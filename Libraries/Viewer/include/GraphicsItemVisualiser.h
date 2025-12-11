@@ -22,6 +22,9 @@
 #include "Visualiser.h"
 
 class GraphicsItemVisualiser : public Visualiser {
+	OT_DECL_NOCOPY(GraphicsItemVisualiser)
+	OT_DECL_NOMOVE(GraphicsItemVisualiser)
+	OT_DECL_NODEFAULT(GraphicsItemVisualiser)
 public:
 	GraphicsItemVisualiser(SceneNodeBase* _sceneNode);
 	bool requestVisualization(const VisualiserState& _state) override;

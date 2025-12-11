@@ -145,7 +145,7 @@
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\TableVisualiser.h" />
     <ClInclude Include="include\TextureMapManager.h" />
-    <ClInclude Include="include\TextVisualiser.h" />
+    <QtMoc Include="include\TextVisualiser.h" />
     <ClInclude Include="include\TransformManipulator.h" />
     <ClInclude Include="include\ViewerSettings.h" />
     <ClInclude Include="include\ViewerView.h" />

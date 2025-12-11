@@ -20,8 +20,10 @@
 #pragma once
 #include "Visualiser.h"
 
-class TableVisualiser : public Visualiser
-{
+class TableVisualiser : public Visualiser {
+	OT_DECL_NOCOPY(TableVisualiser)
+	OT_DECL_NOMOVE(TableVisualiser)
+	OT_DECL_NODEFAULT(TableVisualiser)
 public:
 	TableVisualiser(SceneNodeBase* _sceneNode);
 	virtual bool requestVisualization(const VisualiserState& _state) override;

@@ -243,23 +243,33 @@ namespace ot {
 		//! @throws ot::InvalidArgumentException if input contains invalid Base64Url characters.
 		static std::string fromBase64Url(const std::string& _base64UrlString);
 
-		//! @brief Compresses the provided string using zlib compression.
-		//! @param _string String to compress.
-		//! @return Compressed string.
-		static std::string compressedBase64(const std::string& _string);
+		//! @brief Compresses the provided data using zlib compression.
+		//! @param _data Data to compress.
+		//! @param _dataLength Length of the data to compress.
+		//! @param _compressedSize Will be set to the size of the compressed data.
+		//! @return Compressed data. The caller takes ownership of the returned pointer.
+		//! @throw ot::GeneralException if compression fails.
+		static uint8_t* compressRaw(const uint8_t* _data, uint64_t _dataLength, int& _compressedSize);
 
-		//! @brief Decompresses the provided compressed string using zlib decompression.
-		//! @param _compressedString Compressed string to decompress.
-		//! @param _decompressedLength Expected length of the decompressed string.
-		//! @return Decompressed string.
-		static std::string decompressedBase64(const std::string& _compressedString, uint64_t _decompressedLength);
+		//! @brief Decompresses the provided data using zlib decompression.
+		//! @param _compressedData Compressed data to decompress.
+		//! @return Decompressed data. The caller takes ownership of the returned pointer.
+		//! @throw ot::GeneralException if decompression fails.
+		static uint8_t* decompressRaw(const uint8_t* _compressedData, int _compressedSize, uint64_t& _decompressedSize);
 
-		//! @brief Compresses the provided char vector using zlib compression.
-		//! @param _string String to compress.
-		//! @return Compressed string.
-		static std::string compressedVectorBase64(const std::vector<char>& _data);
+		//! @brief Compresses the provided data using zlib compression and then encodes it to Base64Url.
+		//! @param _data Data to compress.
+		//! @param _dataLength Length of the data to compress.
+		//! @return Compressed data. The caller takes ownership of the returned pointer.
+		//! @throw ot::GeneralException if compression fails.
+		static char* compressBase64(const uint8_t* _data, uint64_t _dataLength);
 
-		static std::vector<char> decompressedVectorBase64(const std::string& _compressedString, uint64_t _decompressedLength);
+		//! @brief Decompresses the provided compressed Base64Url encoded data using zlib decompression.
+		//! @param _compressedData Compressed data to decompress.
+		//! @param _decompressedLength Expected length of the decompressed data. Will be set to the actual length after decompression.
+		//! @return Decompressed data. The caller takes ownership of the returned pointer.
+		//! @throw ot::GeneralException if decompression fails.
+		static uint8_t* decompressBase64(const char* _compressedData, uint64_t& _decompressedLength);
 
 		static void removeControlCharacters(std::string& _value);
 

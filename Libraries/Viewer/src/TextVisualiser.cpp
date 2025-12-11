@@ -20,11 +20,17 @@
 #include <stdafx.h>
 #include "TextVisualiser.h"
 #include "OTCore/JSON.h"
-#include "OTCommunication/ActionTypes.h"
-#include "FrontendAPI.h"
-#include "SceneNodeBase.h"
+#include "OTCore/String.h"
 #include "OTCore/LogDispatcher.h"
-
+#include "OTCore/ReturnMessage.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTWidgets/TextEditor.h"
+#include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
+#include "FrontendAPI.h"
+#include "DocumentAPI.h"
+#include "SceneNodeBase.h"
+#include "GridFSFileInfo.h"
 
 TextVisualiser::TextVisualiser(SceneNodeBase* _sceneNode)
 	: Visualiser(_sceneNode, ot::WidgetViewBase::ViewText)
@@ -75,6 +81,72 @@ void TextVisualiser::showVisualisation(const VisualiserState& _state) {
 
 void TextVisualiser::hideVisualisation(const VisualiserState& _state) {
 
+}
+
+void TextVisualiser::slotRequestRemainingDataCompleted(uint8_t* _text) {
+	QString text(reinterpret_cast<const char*>(_text));
+	delete[]_text;
+
+	ot::TextEditorView* view = dynamic_cast<ot::TextEditorView*>(ot::GlobalWidgetViewManager::instance().findView(getSceneNode()->getName(), ot::WidgetViewBase::ViewText));
+	if (!view) {
+		OT_LOG_E("Could not find text view for entity: " + getSceneNode()->getName());
+	}
+	else {
+		view->getTextEditor()->setPlainText(text);
+	}
+
+	FrontendAPI::instance()->lockSelectionAndModification(false);
+	FrontendAPI::instance()->setProgressBarVisibility("Export text", false, true);
+}
+
+void TextVisualiser::workerRequestRemainingData(size_t _nextChunkStartIndex) {
+	OTAssertNullptr(this->getSceneNode());
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestTextData, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(getSceneNode()->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Index, _nextChunkStartIndex, doc.GetAllocator());
+
+	ot::ReturnMessage retMsg = ot::ReturnMessage::fromJson(FrontendAPI::instance()->messageModelService(doc.toJson()));
+	if (!retMsg.isOk()) {
+		OT_LOG_E("Could not get text data from model: " + retMsg.getWhat());
+	}
+	else if (!retMsg.getWhat().empty()) {
+		ot::JsonDocument doc;
+
+		// Parse the returned GridFS info
+		if (!doc.fromJson(retMsg.getWhat())) {
+			OT_LOG_E("Could not parse grid fs info");
+		}
+		else {
+			ot::GridFSFileInfo fileInfo(doc.getConstObject());
+
+			// Now get the actual data from GridFS
+			DataStorageAPI::DocumentAPI api;
+			uint8_t* dataBuffer = nullptr;
+			size_t length = 0;
+
+			bsoncxx::oid oid_obj{ fileInfo.getDocumentId() };
+			bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+
+			api.GetDocumentUsingGridFs(id, dataBuffer, length, fileInfo.getFileName());
+			api.DeleteGridFSData(id, fileInfo.getFileName());
+
+			// Decompress if needed
+			if (fileInfo.isFileCompressed()) {
+				size_t decompressedSize = fileInfo.getUncompressedSize();
+				uint8_t* decompr = ot::String::decompressBase64(reinterpret_cast<const char*>(dataBuffer), decompressedSize);
+				delete[] dataBuffer;
+				dataBuffer = decompr;
+			}
+
+			QMetaObject::invokeMethod(this, &TextVisualiser::slotRequestRemainingDataCompleted, Qt::QueuedConnection, dataBuffer);
+			return;
+		}
+	}
+
+	FrontendAPI::instance()->lockSelectionAndModification(false);
+	FrontendAPI::instance()->setProgressBarVisibility("Export text", false, true);
 }
 
 ot::JsonDocument TextVisualiser::createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex, bool _nextChunkOnly) const {

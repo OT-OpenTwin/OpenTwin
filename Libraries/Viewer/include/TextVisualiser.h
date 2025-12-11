@@ -25,12 +25,18 @@
 #include "OTCore/CoreTypes.h"
 #include "OTGui/VisualisationCfg.h"
 
+// Qt header
+#include <QtCore/qobject.h>
+
 // std header
 #include <string>
 
-class TextVisualiser : public Visualiser {
+class TextVisualiser : public QObject, public Visualiser {
+	Q_OBJECT
+	OT_DECL_NOCOPY(TextVisualiser)
+	OT_DECL_NOMOVE(TextVisualiser)
+	OT_DECL_NODEFAULT(TextVisualiser)
 public:
-
 	TextVisualiser(SceneNodeBase* _sceneNode);
 	
 	//! @brief Visualisation logic for different types of visualisation. Mostly requests to the model service which actually has the needed data.
@@ -44,7 +50,11 @@ public:
 protected:
 	virtual std::string getVisualiserTypeString() const override { return "Text"; };
 
+private Q_SLOTS:
+	void slotRequestRemainingDataCompleted(uint8_t* _text);
+
 private:
+	void workerRequestRemainingData(size_t _nextChunkStartIndex);
 	ot::JsonDocument createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex, bool _nextChunkOnly) const;
 
 };

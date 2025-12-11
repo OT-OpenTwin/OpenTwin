@@ -31,8 +31,10 @@
 
 class SceneNodeBase;
 
-class Visualiser
-{
+class Visualiser {
+	OT_DECL_NOCOPY(Visualiser)
+	OT_DECL_NOMOVE(Visualiser)
+	OT_DECL_NODEFAULT(Visualiser)
 public:
 	Visualiser(SceneNodeBase* _sceneNode, ot::WidgetViewBase::ViewType _viewType);
 	virtual ~Visualiser();

@@ -20,9 +20,11 @@
 *.mod
 *.smod
 
-# Build Logs
+# Logs
 buildLog_Debug.txt
 buildLog_Release.txt
+testlog_Debug.txt
+testlog_Release.txt
 
 # Compiled Static libraries
 *.lai
