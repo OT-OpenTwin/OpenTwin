@@ -21,13 +21,13 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
+#include "OTSystem/DateTime.h"
 #include "OTSystem/SystemAPIExport.h"
 
 // std header
 #include <list>
 #include <string>
 #include <fstream>
-#include "DateTime.h"
 
 namespace ot {
 
@@ -48,7 +48,15 @@ namespace ot {
 		//! @throw std::filesystem::filesystem_error in case of filesystem related error.
 		static std::list<std::string> getDirectories(const std::string& _path, const FileSystemOptions& _options = FileSystemOption::NoOptions);
 
-		static ot::DateTime::Time getLastAccessTime(const std::string& _path);
+		//! @brief Returns the last modification time of the given file or directory.
+		//! @param _path Path to the file or directory.
+		//! @param _useLocalTime If true local time is used, otherwise UTC time is used.
+		static DateTime getLastModifiedTime(const std::string& _path, bool _useLocalTime = false);
+
+		//! @brief Returns the last access time of the given file or directory.
+		//! @param _path Path to the file or directory.
+		//! @param _useLocalTime If true local time is used, otherwise UTC time is used.
+		static DateTime getLastAccessTime(const std::string& _path, bool _useLocalTime = false);
 
 		//! @brief Returns all files at the given path.
 		//! @param _path Top level path to search at.

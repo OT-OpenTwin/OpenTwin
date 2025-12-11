@@ -102,45 +102,6 @@ std::string ot::DateTime::currentTimestamp(DateFormat _format) {
 	return intern::toTimeStamp(now, _format);
 }
 
-ot::DateTime::Time ot::DateTime::currentTimestampAsStruct()
-{
-    ot::DateTime::Time time;
-    auto now = std::chrono::system_clock::now();
-    const std::string timeStamp = intern::toTimeStamp(now, DateFormat::Simple);
-
-
-    // Split into date and time parts
-    auto pos = timeStamp.find(" ");
-    std::string datePart = timeStamp.substr(0, pos);
-    std::string timePart = timeStamp.substr(pos + 1); // skip the space
-
-    // --- Date: yyyy-mm-dd ---
-    pos = datePart.find("-");
-    time.m_year = datePart.substr(0, pos);
-
-    std::string rest = datePart.substr(pos + 1);
-    pos = rest.find("-");
-    time.m_month = rest.substr(0, pos);
-
-    time.m_day = rest.substr(pos + 1);
-
-    // --- Time: hh:MM:ss.zzz ---
-    pos = timePart.find(":");
-    time.m_hour = timePart.substr(0, pos);
-
-    rest = timePart.substr(pos + 1);
-    pos = rest.find(":");
-    time.m_minute = rest.substr(0, pos);
-
-    rest = rest.substr(pos + 1);
-    pos = rest.find(".");
-    time.m_second = rest.substr(0, pos);
-
-    time.m_millisec = rest.substr(pos + 1);
-
-    return time;
-}
-
 int64_t ot::DateTime::msSinceEpoch() {
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
@@ -313,4 +274,40 @@ std::string ot::DateTime::intervalToString(int64_t _msecInterval) {
     }
 
     return oss.str();
+}
+
+ot::DateTime ot::DateTime::current(bool _useLocalTime) {
+    const auto now = std::chrono::system_clock::now();
+    const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+
+    // Convert to time_t for calendar breakdown
+    const std::time_t nowTimeT = std::chrono::system_clock::to_time_t(now);
+
+    std::tm tmResult;
+
+#if defined(OT_OS_WINDOWS)
+    if (_useLocalTime) {
+        localtime_s(&tmResult, &nowTimeT);
+    }
+    else {
+        gmtime_s(&tmResult, &nowTimeT);
+    }
+#else
+    if (_useLocalTime) {
+        localtime_r(&nowTimeT, &tmResult);
+    }
+    else {
+        gmtime_r(&nowTimeT, &tmResult);
+    }
+#endif
+
+    return DateTime{
+        tmResult.tm_year + 1900,
+        tmResult.tm_mon + 1,
+        tmResult.tm_mday,
+        tmResult.tm_hour,
+        tmResult.tm_min,
+        tmResult.tm_sec,
+        static_cast<int>(ms.count())
+    };
 }

@@ -81,10 +81,8 @@ std::list<std::string> ot::FileSystem::getDirectories(const std::string& _path, 
 
     return result;
 }
-
-ot::DateTime::Time ot::FileSystem::getLastAccessTime(const std::string& _path)
-{
-    ot::DateTime::Time accessTime;
+ot::DateTime ot::FileSystem::getLastModifiedTime(const std::string& _path, bool _useLocalTime) {
+    DateTime modifiedTime;
 #ifdef OT_OS_WINDOWS
     HANDLE handle = CreateFileA(_path.c_str(),
         GENERIC_READ,
@@ -93,26 +91,151 @@ ot::DateTime::Time ot::FileSystem::getLastAccessTime(const std::string& _path)
         OPEN_EXISTING,
         FILE_FLAG_BACKUP_SEMANTICS,
         NULL);
+
+    if (handle == INVALID_HANDLE_VALUE) {
+        return DateTime();
+    }
+
     FILETIME atime, mtime, ctime;
     GetFileTime(handle, &ctime, &atime, &mtime);
 
     SYSTEMTIME st;
-    FileTimeToSystemTime(&atime, &st);
-    accessTime.m_year = std::to_string(st.wYear);    
-    accessTime.m_month = std::to_string(st.wMonth);
-    accessTime.m_day = std::to_string(st.wDay);
+
+    if (_useLocalTime) {
+        FILETIME localFt;
+        FileTimeToLocalFileTime(&mtime, &localFt);
+        FileTimeToSystemTime(&localFt, &st);
+    }
+    else {
+        FileTimeToSystemTime(&mtime, &st);
+    }
+
+    modifiedTime = DateTime(
+        static_cast<int>(st.wYear),
+        static_cast<int>(st.wMonth),
+        static_cast<int>(st.wDay),
+        static_cast<int>(st.wHour),
+        static_cast<int>(st.wMinute),
+        static_cast<int>(st.wSecond),
+        static_cast<int>(st.wMilliseconds)
+    );
+
+    CloseHandle(handle);
+
 #else
-    assert(false); //Not tested yet
     struct stat info {};
-    stat(_path.c_str(), &info);
 
-    std::time_t atime = info.st_atime;   // last access
-    struct tm* tm_info = localtime(&atime);
+    if (stat(_path.c_str(), &info) != 0) {
+        return DateTime();
+    }
 
-    accessTime.m_year = std::to_string(tm_info->tm_year + 1900);
-    accessTime.m_month = std::to_string(tm_info->tm_mon + 1);
-    accessTime.m_day = std::to_string(tm_info->tm_mday);
-        
+    std::time_t mtime = info.st_mtime;
+    struct tm tmResult;
+
+    if (_useLocalTime) {
+        localtime_r(&mtime, &tmResult);
+    }
+    else {
+        gmtime_r(&mtime, &tmResult);
+    }
+
+    long millisec = 0;
+
+#if defined(OT_OS_MAC)
+    millisec = info.st_mtimespec.tv_nsec / 1000000;
+#else
+    millisec = info.st_mtim.tv_nsec / 1000000;
+#endif
+
+    modifiedTime = DateTime(
+        tmResult.tm_year + 1900,
+        tmResult.tm_mon + 1,
+        tmResult.tm_mday,
+        tmResult.tm_hour,
+        tmResult.tm_min,
+        tmResult.tm_sec,
+        static_cast<int>(millisec)
+    );
+#endif
+    return modifiedTime;
+}
+
+
+ot::DateTime ot::FileSystem::getLastAccessTime(const std::string& _path, bool _useLocalTime) {
+    DateTime accessTime;
+#ifdef OT_OS_WINDOWS
+    HANDLE handle = CreateFileA(_path.c_str(),
+        GENERIC_READ,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        NULL,
+        OPEN_EXISTING,
+        FILE_FLAG_BACKUP_SEMANTICS,
+        NULL);
+
+    if (handle == INVALID_HANDLE_VALUE) {
+        return DateTime();
+    }
+
+    FILETIME atime, mtime, ctime;
+    GetFileTime(handle, &ctime, &atime, &mtime);
+
+    SYSTEMTIME st;
+
+    if (_useLocalTime) {
+        FILETIME localFt;
+        FileTimeToLocalFileTime(&atime, &localFt);
+        FileTimeToSystemTime(&localFt, &st);
+    }
+    else {
+        FileTimeToSystemTime(&atime, &st);
+    }
+
+    accessTime = DateTime(
+        static_cast<int>(st.wYear),
+        static_cast<int>(st.wMonth),
+        static_cast<int>(st.wDay),
+        static_cast<int>(st.wHour),
+        static_cast<int>(st.wMinute),
+        static_cast<int>(st.wSecond),
+        static_cast<int>(st.wMilliseconds)
+    );
+
+    CloseHandle(handle);
+
+#else
+    struct stat info {};
+
+    if (stat(_path.c_str(), &info) != 0) {
+        return DateTime();
+    }
+
+    std::time_t atime = info.st_atime;
+    struct tm tmResult;
+
+    if (_useLocalTime) {
+        localtime_r(&atime, &tmResult);
+    }
+    else {
+        gmtime_r(&atime, &tmResult);
+    }
+
+    long millisec = 0;
+
+#if defined(OT_OS_MAC)
+    millisec = info.st_atimespec.tv_nsec / 1000000;
+#else
+    millisec = info.st_atim.tv_nsec / 1000000;
+#endif
+
+    accessTime = DateTime(
+        tmResult.tm_year + 1900,
+        tmResult.tm_mon + 1,
+        tmResult.tm_mday,
+        tmResult.tm_hour,
+        tmResult.tm_min,
+        tmResult.tm_sec,
+        static_cast<int>(millisec)
+    );
 #endif
     return accessTime;
 }

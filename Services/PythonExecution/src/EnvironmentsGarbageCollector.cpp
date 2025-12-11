@@ -8,7 +8,7 @@
 
 void EnvironmentsGarbageCollector::removeEnvironmentsIfNecessary()
 {
-    ot::DateTime::Time currentTime = ot::DateTime::currentTimestampAsStruct();
+    ot::DateTime currentTime = ot::DateTime::current();
     const std::string homePath = "";
     std::list<std::filesystem::path> allEnvironments;
     for (const auto& entry : std::filesystem::directory_iterator(homePath)) 
@@ -27,11 +27,10 @@ void EnvironmentsGarbageCollector::removeEnvironmentsIfNecessary()
             std::string fileName = environment.filename().string();
             if (std::find(allPredefinedEnvironments.begin(), allPredefinedEnvironments.end(), fileName) != allPredefinedEnvironments.end())
             {
-                ot::DateTime::Time lastAccessTime = ot::FileSystem::getLastAccessTime(environment.string());
+                ot::DateTime lastAccessTime = ot::FileSystem::getLastAccessTime(environment.string());
+				lastAccessTime.addDays(m_daysUntilRemoval);
 
-                if (std::stoi(currentTime.m_year) > std::stoi(lastAccessTime.m_year) || 
-                    std::stoi(currentTime.m_month) > std::stoi(lastAccessTime.m_month) || 
-                    std::stoi(currentTime.m_day) > std::stoi(lastAccessTime.m_day) + m_daysUntilRemoval)
+                if (currentTime > lastAccessTime)
                 {
                     std::filesystem::remove_all(environment.string());
                 }
