@@ -3480,6 +3480,10 @@ void Model::removeFromMaps(const SceneNodeBase* _node) {
 #include "OTCore/RuntimeTests.h"
 
 void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
+	ot::RuntimeIntervalTest totalTest;
+	totalTest.logOnDelete("Viewer export worker total");
+
+	ot::RuntimeIntervalTest untileWriteTest;
 
 	ot::RuntimeIntervalTest test1;
 
@@ -3531,6 +3535,8 @@ void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
 
 				test3.logCurrentInterval("Decompress Text Data");
 			}
+
+			untileWriteTest.logCurrentInterval("Until Write Text Data to File");
 
 			ot::RuntimeIntervalTest test4;
 

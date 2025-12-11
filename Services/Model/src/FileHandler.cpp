@@ -270,6 +270,9 @@ ot::ReturnMessage FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
 }
 #include "OTCore/RuntimeTests.h"
 ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document) {
+	ot::RuntimeIntervalTest totalTest;
+	totalTest.logOnDelete("Total model request processing time");
+
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);
 
