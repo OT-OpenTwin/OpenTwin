@@ -36,7 +36,7 @@
 #include <sstream>
 #include <filesystem>
 
-#define DEBUG_PYTHON_SERVER
+//#define DEBUG_PYTHON_SERVER
 
 std::string StudioConnector::searchProjectAndExtractData(const std::string& fileName, const std::string& projectRoot, bool includeResults, bool includeParametricResults)
 {
