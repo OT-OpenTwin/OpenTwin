@@ -270,9 +270,8 @@ std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs() const {
 	std::list<ot::UID> sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
-		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
 
-		if (itm) {
+		if (itm && !itm->isInternalItem()) {
 			// Item selected
 			sel.push_back(itm->getGraphicsItemUid());
 		}
@@ -389,16 +388,23 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID) {
 }
 
 ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs() const {
-	ot::UIDList sel; // Selected items
+	UIDList sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {
-		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
+		GraphicsConnectionItem* citm = dynamic_cast<GraphicsConnectionItem*>(s);
 
 		if (citm) {
 			// Connection selected
 			sel.push_back(citm->getConfiguration().getUid());
 		}
+		else {
+			GraphicsConnectionConnectorItem* conItm = dynamic_cast<GraphicsConnectionConnectorItem*>(s);
+			if (conItm && conItm->getConnection()) {
+				sel.push_back(conItm->getConnection()->getConfiguration().getUid());
+			}
+		}
 	}
 
+	sel.unique();
 	return sel;
 }
 
@@ -411,8 +417,16 @@ std::list<ot::GraphicsConnectionItem*> ot::GraphicsView::getSelectedConnectionIt
 			// Connection selected
 			sel.push_back(citm);
 		}
+		else {
+			// Connection selected trough connector
+			GraphicsConnectionConnectorItem* conItm = dynamic_cast<GraphicsConnectionConnectorItem*>(s);
+			if (conItm && conItm->getConnection()) {
+				sel.push_back(conItm->getConnection());
+			}
+		}
 	}
 
+	sel.unique();
 	return sel;
 }
 

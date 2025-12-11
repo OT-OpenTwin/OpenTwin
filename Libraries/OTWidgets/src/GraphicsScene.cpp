@@ -27,6 +27,7 @@
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsConnectionPreviewItem.h"
+#include "OTWidgets/GraphicsConnectionConnectorItem.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
@@ -120,7 +121,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 	}
 }
 
-void ot::GraphicsScene::stopConnection(void) {
+void ot::GraphicsScene::stopConnection() {
 	// Stop connection
 	if (m_connectionPreview) {
 		this->removeItem(m_connectionPreview);
@@ -161,7 +162,7 @@ QPointF ot::GraphicsScene::snapToGrid(const GraphicsItem* _item) const {
 	return newPos;
 }
 
-void ot::GraphicsScene::deselectAll(void) {
+void ot::GraphicsScene::deselectAll() {
 	bool blocked = this->signalsBlocked();
 	this->blockSignals(true);
 	for (QGraphicsItem* itm : this->selectedItems()) {
@@ -263,17 +264,32 @@ void ot::GraphicsScene::elementAboutToBeRemoved(GraphicsElement* _element) {
 	}
 }
 
-void ot::GraphicsScene::handleSelectionChanged(void) {
-	if (m_multiselectionEnabled) this->handleMultiSelectionChanged();
-	else this->handleSingleSelectionChanged();
+void ot::GraphicsScene::handleSelectionChanged() {
+	// Check selected connector items
+	for (auto itm : this->selectedItems()) {
+		GraphicsConnectionConnectorItem* conItm = dynamic_cast<GraphicsConnectionConnectorItem*>(itm);
+		if (conItm && conItm->getConnection()) {
+			QSignalBlocker blocker(this);
+			conItm->getConnection()->setSelected(true);
+		}
+	}
+
+	if (m_multiselectionEnabled) {
+		this->handleMultiSelectionChanged();
+	}
+	else {
+		this->handleSingleSelectionChanged();
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Public: Slots
 
-void ot::GraphicsScene::slotSelectionChanged(void) {
-	if (m_ignoreEvents || m_mouseIsPressed) return;
+void ot::GraphicsScene::slotSelectionChanged() {
+	if (m_ignoreEvents || m_mouseIsPressed) {
+		return;
+	}
 	this->handleSelectionChanged();
 }
 
@@ -630,7 +646,7 @@ QList<QGraphicsItem*> ot::GraphicsScene::findItemsInTriggerDistance(const QPoint
 
 // Private: Helper
 
-void ot::GraphicsScene::handleMultiSelectionChanged(void) {
+void ot::GraphicsScene::handleMultiSelectionChanged() {
 	QList<QGraphicsItem*> tmp = m_lastSelection;
 	m_lastSelection = this->selectedItems();
 
@@ -654,7 +670,7 @@ void ot::GraphicsScene::handleMultiSelectionChanged(void) {
 	}
 }
 
-void ot::GraphicsScene::handleSingleSelectionChanged(void) {
+void ot::GraphicsScene::handleSingleSelectionChanged() {
 	QList<QGraphicsItem*> deselectList = m_lastSelection;
 	QList<QGraphicsItem*> selectList = this->selectedItems();
 	

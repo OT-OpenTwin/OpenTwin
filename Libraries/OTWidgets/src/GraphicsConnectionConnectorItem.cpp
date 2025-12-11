@@ -20,6 +20,7 @@
 // OpenTwin Widgets header
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsConnectionConnectorItem.h"
 
 ot::GraphicsConnectionConnectorItem::GraphicsConnectionConnectorItem(GraphicsConnectionItem* _connection)
@@ -47,4 +48,17 @@ ot::GraphicsConnectionConnectorItem::GraphicsConnectionConnectorItem(GraphicsCon
 
 ot::GraphicsConnectionConnectorItem::~GraphicsConnectionConnectorItem() {
 
+}
+
+void ot::GraphicsConnectionConnectorItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {
+	GraphicsEllipseItem::graphicsElementStateChanged(_state);
+	if (!m_connection) {
+		return;
+	}
+
+	// Propagate hover state to connection
+	// Selection state is handled by view
+	if (_state.has(GraphicsElement::HoverState)) {
+		m_connection->setGraphicsElementState(GraphicsElement::HoverState, true);
+	}
 }

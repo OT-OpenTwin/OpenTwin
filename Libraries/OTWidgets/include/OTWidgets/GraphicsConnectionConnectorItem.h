@@ -40,6 +40,9 @@ namespace ot {
 		GraphicsConnectionItem* getConnection() { return m_connection; };
 		const GraphicsConnectionItem* getConnection() const { return m_connection; };
 
+	protected:
+		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) override;
+
 	private:
 		GraphicsConnectionItem* m_connection;
 	};
