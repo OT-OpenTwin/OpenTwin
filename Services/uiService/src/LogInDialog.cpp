@@ -83,6 +83,8 @@ LogInDialog::LogInDialog()
 	Label* gssLabel = new Label("Global Session Service:", this);
 	m_gss = new ComboBox(this);
 	m_gss->setEditable(false);
+	m_gss->setPlaceholderText("Choose Service");
+	m_gss->setToolTip("Select the Global Session Service to connect to. Select the \"" EDIT_GSS_TEXT "\" option to add/edit available connections.");
 
 	Label* usernameLabel = new Label("Username:", this);
 	m_username = new LineEdit(this);
