@@ -219,22 +219,28 @@ bool ot::JsonTreeWidgetModel::setData(const QModelIndex& _index, const QVariant&
 
 void ot::JsonTreeWidgetModel::addToJsonObject(QJsonObject& _object, JsonTreeWidgetNode* _node) const {
 	OTAssert(_node->getValue().isObject(), "Node is not an object");
+    _node->loadChildren();
     const auto& children = _node->getChildren();
     
     if (_node->isContainer()) {
         for (const auto& child : children) {
+			QString key = child->getKey();
+            OTAssert(key.length() >= 3, "Invalid key size");
+            key.removeFirst();
+            key.removeLast();
+            key.removeLast();
             if (child->getValue().type() == QJsonValue::Object) {
                 QJsonObject childObject;
                 addToJsonObject(childObject, child);
-                _object.insert(child->getKey(), childObject);
+                _object.insert(key, childObject);
             }
             else if (child->getValue().type() == QJsonValue::Array) {
                 QJsonArray childArray;
                 addToJsonArray(childArray, child);
-                _object.insert(child->getKey(), childArray);
+                _object.insert(key, childArray);
             }
             else {
-                _object.insert(child->getKey(), child->getValue());
+                _object.insert(key, child->getValue());
 			}
 		}
     }
@@ -261,6 +267,7 @@ void ot::JsonTreeWidgetModel::addToJsonObject(QJsonObject& _object, JsonTreeWidg
 
 void ot::JsonTreeWidgetModel::addToJsonArray(QJsonArray& _array, JsonTreeWidgetNode* _node) const {
     OTAssert(_node->getValue().isArray(), "Node is not an array");
+    _node->loadChildren();
     const auto& children = _node->getChildren();
     
     if (_node->isContainer()) {

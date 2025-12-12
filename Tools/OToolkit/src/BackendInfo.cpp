@@ -44,6 +44,7 @@
 #include <QtWidgets/qscrollarea.h>
 #include <QtWidgets/qheaderview.h>
 #include <QtWidgets/qlistwidget.h>
+#include <QtWidgets/qfiledialog.h>
 
 #define BACKINFO_LOG(___message) OTOOLKIT_LOG("Backend Info", ___message)
 #define BACKINFO_LOGW(___message) OTOOLKIT_LOGW("Backend Info", ___message)
@@ -80,10 +81,39 @@ namespace intern {
 			filterEdit->setMinimumWidth(150);
 			controlLayout->addWidget(filterEdit);
 			connect(filterEdit, &ot::LineEdit::textChanged, m_tree, &ot::JsonTreeWidget::filterItems);
+
 			controlLayout->addStretch(1);
+
+			ot::PushButton* exportButton = new ot::PushButton("Export", this);
+			controlLayout->addWidget(exportButton);
+			connect(exportButton, &ot::PushButton::clicked, this, &CustomJsonTree::slotExport);
 		}
 
 		ot::JsonTreeWidget* getTree() const { return m_tree; };
+
+	private Q_SLOTS:
+		void slotExport() {
+			QJsonDocument doc = m_tree->toJsonDocument();
+			QByteArray jsonString = doc.toJson(QJsonDocument::Indented);
+			if (jsonString.length() < 3) {
+				BACKINFO_LOGW("No data to export");
+				return;
+			}
+
+			QString fileName = QFileDialog::getSaveFileName(this, "Export Debug Info", "", "JSON Files (*.json);;All Files (*)");
+			if (fileName.isEmpty()) {
+				return;
+			}
+
+			QFile file(fileName);
+			if (!file.open(QIODevice::WriteOnly)) {
+				BACKINFO_LOGE("Could not open file for writing: " + fileName);
+				return;
+			}
+
+			file.write(jsonString);
+			file.close();
+		}
 
 	private:
 		ot::JsonTreeWidget* m_tree;
