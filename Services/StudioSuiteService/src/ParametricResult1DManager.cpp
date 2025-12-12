@@ -170,8 +170,10 @@ void ParametricResult1DManager::storeDataInResultCollection()
 
 			if (createdCurves.count(fullName) == 0 && shortName != "S-Parameters")
 			{
+				std::string defaultAxis = getDefaultAxisFromData(series, fullName);
+
 				ot::Plot1DCurveCfg curveConfig;
-				CurveFactory::addToConfig(*series, curveConfig, fullName, "", "");
+				CurveFactory::addToConfig(*series, curveConfig, fullName, "", defaultAxis);
 
 				std::cout << fullName << std::endl;
 
@@ -191,6 +193,38 @@ void ParametricResult1DManager::storeDataInResultCollection()
 			OT_LOG_E("Unable to import data: " + dataDescription.getQuantityDescription()->getName() + " (" + e.what() + ")");
 		}
 	}
+}
+
+std::string ParametricResult1DManager::getDefaultAxisFromData(const MetadataSeries* series, const std::string &quantityName)
+{
+	// Here we search for either "Frequency" or "Time" in the parameters. This indicates whether the curve is a function of time or frequency.
+
+	const std::list<MetadataQuantity>& quantities = series->getQuantities();
+
+	const MetadataQuantity* selectedQuantity = nullptr;
+
+	for (const MetadataQuantity& quantity : quantities)
+	{
+		if (quantity.quantityName == quantityName)
+		{
+			selectedQuantity = &quantity;
+			break;
+		}
+	}
+
+	if (selectedQuantity == nullptr) return "";
+
+	const std::list<MetadataParameter>& parameters = series->getParameter();
+	auto& dependingParameter = selectedQuantity->dependingParameterIds;
+	for (const auto& parameter : parameters)
+	{
+		if (std::find(dependingParameter.begin(), dependingParameter.end(), parameter.parameterUID) != dependingParameter.end())
+		{
+			if (parameter.parameterName == "Frequency" || parameter.parameterName == "Time") return parameter.parameterName;
+		}
+	}
+
+	return "";
 }
 
 std::string ParametricResult1DManager::determineRunIDLabel(std::list<int> &runIDList)
