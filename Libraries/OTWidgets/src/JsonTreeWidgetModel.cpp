@@ -305,7 +305,21 @@ QString ot::JsonTreeWidgetModel::jsonValueToString(const QJsonValue& _value) {
     switch (_value.type()) {
     case QJsonValue::Null: return "null";
     case QJsonValue::Bool: return _value.toBool() ? "true" : "false";
-    case QJsonValue::Double: return QString::number(_value.toDouble());
+    case QJsonValue::Double: 
+    {
+        double d = _value.toDouble();
+        qint64 i = static_cast<qint64>(d);
+
+        // Check if value is an integer
+        if (d == static_cast<double>(i)) {
+            return QString::number(i);
+        }
+        else {
+            // Non-integer or too large for 64-bit integer
+            return QString::number(d, 'g', 15);
+        }
+        
+    }
     case QJsonValue::String: return _value.toString();
     default: return ""; // Object or Array handled elsewhere
     }
