@@ -27,6 +27,7 @@
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTCore/FolderNames.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTGui/PainterRainbowIterator.h"
 
 #include "ResultCollectionExtender.h"
 #include "MetadataSeries.h"
@@ -130,6 +131,8 @@ void ParametricResult1DManager::storeDataInResultCollection()
 
 	// First, create all necessary plots
 	std::set<std::string> createdPlots;
+	std::map<std::string, ot::PainterRainbowIterator> plotPainters;
+
 	for (DatasetDescription& dataDescription : m_allDataDescriptions)
 	{
 		const std::string fullName = dataDescription.getQuantityDescription()->getName();
@@ -151,6 +154,7 @@ void ParametricResult1DManager::storeDataInResultCollection()
 			m_application->getModelComponent()->addNewTopologyEntity(newPlot.getEntityID(), newPlot.getEntityStorageVersion(), false);
 
 			createdPlots.emplace(plotName);
+			plotPainters[plotName] = ot::PainterRainbowIterator();
 		}
 	}
 
@@ -173,6 +177,10 @@ void ParametricResult1DManager::storeDataInResultCollection()
 				std::string defaultAxis = getDefaultAxisFromData(series, fullName);
 
 				ot::Plot1DCurveCfg curveConfig;
+
+				auto painter = plotPainters[plotName].getNextPainter();
+				curveConfig.setLinePenPainter(painter.release());
+
 				CurveFactory::addToConfig(*series, curveConfig, fullName, "", defaultAxis);
 
 				std::cout << fullName << std::endl;

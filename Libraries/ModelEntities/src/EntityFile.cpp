@@ -40,6 +40,17 @@ EntityFile::EntityFile(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	this->setDefaultTreeItem(treeItem);
 }
 
+EntityFile::~EntityFile()
+{
+	// If we are deleted, it might happen that there is still an outside pointer to the data entity. In this case, the data entity
+	// will still exist if we are deleted. The parent entry in the data entity would then be invalid, since we are already deleted.
+
+	if (m_data != nullptr)
+	{
+		m_data->setParent(nullptr); // Remove ourself from the potentially still existing data entity.
+	}
+}
+
 bool EntityFile::getEntityBox(double & _xmin, double & _xmax, double & _ymin, double & _ymax, double & _zmin, double & _zmax)
 {
 	return false;
