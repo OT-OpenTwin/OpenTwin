@@ -80,6 +80,7 @@
     <ClCompile Include="src\ImagePainterWidget.cpp" />
     <ClCompile Include="src\IndicatorWidget.cpp" />
     <ClCompile Include="src\JsonTreeWidget.cpp" />
+    <ClCompile Include="src\JsonTreeWidgetFilterModel.cpp" />
     <ClCompile Include="src\JsonTreeWidgetModel.cpp" />
     <ClCompile Include="src\JsonTreeWidgetNode.cpp" />
     <ClCompile Include="src\ModelLibraryDialog.cpp" />
@@ -299,6 +300,7 @@
     <ClInclude Include="include\OTWidgets\GlobalWidgetViewManager.h" />
     <QtMoc Include="include\OTWidgets\JsonTreeWidget.h" />
     <QtMoc Include="include\OTWidgets\JsonTreeWidgetModel.h" />
+    <ClInclude Include="include\OTWidgets\JsonTreeWidgetFilterModel.h" />
     <ClInclude Include="include\OTWidgets\JsonTreeWidgetNode.h" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />

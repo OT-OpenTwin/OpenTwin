@@ -616,6 +616,9 @@
     <ClCompile Include="src\JsonTreeWidget.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\JsonTreeWidgetFilterModel.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1143,6 +1146,9 @@
       <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\JsonTreeWidgetNode.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\JsonTreeWidgetFilterModel.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
   </ItemGroup>

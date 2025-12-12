@@ -10,7 +10,9 @@ ot::JsonTreeWidget::JsonTreeWidget(QWidget* _parent)
     : QTreeView(_parent), m_readOnly(false)
 {
     m_model = new JsonTreeWidgetModel(this);
-    setModel(m_model);
+	m_filterModel = new JsonTreeWidgetFilterModel(this);
+	m_filterModel->setSourceModel(m_model);
+    setModel(m_filterModel);
 
     setUniformRowHeights(true);
     setExpandsOnDoubleClick(true);
@@ -32,12 +34,25 @@ void ot::JsonTreeWidget::setJsonDocument(const QJsonDocument& _doc) {
     m_model->setJson(_doc);
     expandToDepth(0);
 	header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-	header()->setSectionResizeMode(0, QHeaderView::Interactive);
+    header()->setSectionResizeMode(0, QHeaderView::Interactive);
 }
 
 QJsonDocument ot::JsonTreeWidget::toJsonDocument() const {
     OTAssertNullptr(m_model);
     return m_model->toJsonDocument();
+}
+
+void ot::JsonTreeWidget::filterItems(const QString& _filterText) {
+    OTAssertNullptr(m_model);
+    m_filterModel->setFilterText(_filterText);
+
+    if (_filterText.isEmpty()) {
+        // Show full tree again
+        expandToDepth(0);
+    }
+    else {
+        expandAll();
+    }
 }
 
 bool ot::JsonTreeWidget::edit(const QModelIndex& _index, QAbstractItemView::EditTrigger _trigger, QEvent* _event) {

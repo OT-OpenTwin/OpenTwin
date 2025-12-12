@@ -49,6 +49,48 @@
 #define BACKINFO_LOGW(___message) OTOOLKIT_LOGW("Backend Info", ___message)
 #define BACKINFO_LOGE(___message) OTOOLKIT_LOGE("Backend Info", ___message)
 
+namespace intern {
+
+	class CustomJsonTree : public QWidget {
+	public:
+		CustomJsonTree(QWidget* _parent)
+			: QWidget(_parent)
+		{
+			QVBoxLayout* layout = new QVBoxLayout(this);
+			QScrollArea* serviceArea = new QScrollArea(this);
+			layout->addWidget(serviceArea, 1);
+			serviceArea->setWidgetResizable(true);
+			m_tree = new ot::JsonTreeWidget(serviceArea);
+			serviceArea->setWidget(m_tree);
+
+			QHBoxLayout* controlLayout = new QHBoxLayout;
+			layout->addLayout(controlLayout);
+
+			ot::PushButton* expandButton = new ot::PushButton("Expand All", this);
+			controlLayout->addWidget(expandButton);
+			connect(expandButton, &ot::PushButton::clicked, m_tree, &ot::JsonTreeWidget::expandAll);
+
+			ot::PushButton* collapseButton = new ot::PushButton("Collapse All", this);
+			controlLayout->addWidget(collapseButton);
+			connect(collapseButton, &ot::PushButton::clicked, m_tree, &ot::JsonTreeWidget::collapseAll);
+
+			controlLayout->addWidget(new ot::Label("Filter:", this));
+			ot::LineEdit* filterEdit = new ot::LineEdit(this);
+			filterEdit->setPlaceholderText("Filter...");
+			filterEdit->setMinimumWidth(150);
+			controlLayout->addWidget(filterEdit);
+			connect(filterEdit, &ot::LineEdit::textChanged, m_tree, &ot::JsonTreeWidget::filterItems);
+			controlLayout->addStretch(1);
+		}
+
+		ot::JsonTreeWidget* getTree() const { return m_tree; };
+
+	private:
+		ot::JsonTreeWidget* m_tree;
+	};
+
+}
+
 BackendInfo::BackendInfo() 
 	: m_sectionsLayout(nullptr), m_loadButton(nullptr), m_cancelButton(nullptr),
 	m_clearButton(nullptr), m_gssUrl(nullptr), m_loadThread(nullptr)
@@ -768,13 +810,10 @@ void BackendInfo::slotAddService(const std::string& _serviceName, const std::str
 
 	// Create widget
 	ot::ExpanderWidget* serviceExpander = new ot::ExpanderWidget(QString::fromStdString("Service { \"Name\": \"" + _serviceName + "\", \"ID\": \"" + _serviceId + "\", \"Url\": \"" + _serviceUrl + "\" }"), m_sectionsLayout->widget());
-	QScrollArea* serviceArea = new QScrollArea(serviceExpander);
-	serviceArea->setWidgetResizable(true);
-	ot::JsonTreeWidget* serviceTree = new ot::JsonTreeWidget(serviceArea);
-	serviceTree->setReadOnly(true);
-	serviceTree->setJsonDocument(doc);
-	serviceArea->setWidget(serviceTree);
-	serviceExpander->setWidget(serviceArea);
+	intern::CustomJsonTree* tree = new intern::CustomJsonTree(serviceExpander);
+	tree->getTree()->setReadOnly(true);
+	tree->getTree()->setJsonDocument(doc);
+	serviceExpander->setWidget(tree);
 
 	m_sectionsLayout->addWidget(serviceExpander);
 	m_sections.push_back(serviceExpander);
