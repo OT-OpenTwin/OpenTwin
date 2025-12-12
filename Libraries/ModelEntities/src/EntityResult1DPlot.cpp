@@ -321,18 +321,21 @@ void EntityResult1DPlot::setQuerySelections()
 			filterOptions.push_back(queryInformation.m_quantityDescription.m_label);
 			for (auto& parameterDescr : queryInformation.m_parameterDescriptions)
 			{
-				filterOptions.push_back(parameterDescr.m_label);
-				parameterOptions.push_back(parameterDescr.m_label);
+				if (find(filterOptions.begin(), filterOptions.end(), parameterDescr.m_label) == filterOptions.end())
+				{
+					filterOptions.push_back(parameterDescr.m_label);
+				}
+				if (find(parameterOptions.begin(), parameterOptions.end(), parameterDescr.m_label) == parameterOptions.end())
+				{
+					parameterOptions.push_back(parameterDescr.m_label);
+				}
 			}
 		}
 	}
 	filterOptions.push_back("");
-	filterOptions.sort();
-	filterOptions.unique();
-	parameterOptions.sort();
-	parameterOptions.unique();
 
 	PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->resetOptions(parameterOptions);
+	PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->setValue(*parameterOptions.begin());
 	m_querySettings.updateQuerySettings(this, filterOptions);
 }
 
