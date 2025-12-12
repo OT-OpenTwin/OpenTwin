@@ -145,6 +145,4 @@ private:
 	ot::PushButton* m_loadButton;
 	ot::PushButton* m_cancelButton;
 	ot::PushButton* m_clearButton;
-
-	QWidget* m_stretchWidget;
 };

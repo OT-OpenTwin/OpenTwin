@@ -70,6 +70,7 @@ ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std
 	m_actionHandler.connectAction(OT_ACTION_CMD_KeySequenceActivated, this, &ApplicationBase::handleKeySequenceActivated, ot::SECURE_MESSAGE_TYPES);
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_SettingsItemChanged, this, &ApplicationBase::handleSettingsItemChanged, ot::SECURE_MESSAGE_TYPES);
 	m_actionHandler.connectAction(OT_ACTION_CMD_RegisterNewLibraryManagementService, this, &ApplicationBase::handleRegisterNewLMS, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_GetDebugInformation, this, &ApplicationBase::handleGetDebugInformation, ot::SECURE_MESSAGE_TYPES);
 }
 
 ot::ApplicationBase::~ApplicationBase()

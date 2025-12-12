@@ -2460,7 +2460,8 @@ void ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument& _docum
 }
 
 void ExternalServicesComponent::handleGetDebugInformation(ot::JsonDocument& _document) {
-	std::string debugInfo = AppBase::instance()->getDebugInformation();
+	AppBase* app = AppBase::instance();
+	std::string debugInfo = app->getDebugInformation();
 
 	if (_document.HasMember(OT_ACTION_PARAM_SENDER_URL) && _document.HasMember(OT_ACTION_PARAM_CallbackAction)) {
 		std::string senderUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
@@ -2468,6 +2469,9 @@ void ExternalServicesComponent::handleGetDebugInformation(ot::JsonDocument& _doc
 
 		ot::JsonDocument responseDoc;
 		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(callbackAction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(app->getServiceName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, ot::JsonString(std::to_string(app->getServiceID()), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(app->getServiceURL(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 		responseDoc.AddMember(OT_ACTION_PARAM_Data, ot::JsonString(debugInfo, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 		std::string response;
@@ -2479,7 +2483,7 @@ void ExternalServicesComponent::handleGetDebugInformation(ot::JsonDocument& _doc
 		}
 	}
 	else {
-		AppBase::instance()->appendInfoMessage("Debug Information:\n" + QString::fromStdString(debugInfo));
+		app->appendInfoMessage("Debug Information:\n" + QString::fromStdString(debugInfo));
 		OT_LOG_I(debugInfo);
 	}
 }

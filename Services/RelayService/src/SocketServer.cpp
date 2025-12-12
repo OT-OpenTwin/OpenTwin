@@ -184,6 +184,11 @@ QString SocketServer::performAction(const std::string& _json, const std::string&
 			this->sendQueueWSMessage(_senderIP, _json);
 			return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Ok));
 		}
+		else if (action == OT_ACTION_CMD_GetDebugInformation) {
+			// Debug information forward as queue
+			this->sendQueueWSMessage(_senderIP, _json);
+			return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Ok));
+		}
 
 		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
 

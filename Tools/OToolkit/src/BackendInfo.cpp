@@ -51,7 +51,7 @@
 
 BackendInfo::BackendInfo() 
 	: m_sectionsLayout(nullptr), m_loadButton(nullptr), m_cancelButton(nullptr),
-	m_clearButton(nullptr), m_gssUrl(nullptr), m_loadThread(nullptr), m_stretchWidget(nullptr)
+	m_clearButton(nullptr), m_gssUrl(nullptr), m_loadThread(nullptr)
 {
 	connectAction(c_addServiceDebugInfoAction, this, &BackendInfo::handleAddServiceDebugInfo);
 }
@@ -98,7 +98,11 @@ bool BackendInfo::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	QWidget* scrollContent = new QWidget;
 	scrollArea->setWidget(scrollContent);
 	
-	m_sectionsLayout = new QVBoxLayout(scrollContent);
+	QVBoxLayout* sectionsLayoutWrap = new QVBoxLayout(scrollContent);
+	sectionsLayoutWrap->setContentsMargins(0, 0, 0, 0);
+	m_sectionsLayout = new QVBoxLayout;
+	sectionsLayoutWrap->addLayout(m_sectionsLayout);
+	sectionsLayoutWrap->addStretch(1);
 	layout->addWidget(scrollArea, 1);
 
 	_content.addView(this->createCentralWidgetView(root, this->getToolName()));
@@ -127,12 +131,6 @@ void BackendInfo::slotClear() {
 			m_sectionsLayout->removeWidget(w);
 			delete w;
 		}
-	}
-
-	if (m_stretchWidget) {
-		m_sectionsLayout->removeWidget(m_stretchWidget);
-		delete m_stretchWidget;
-		m_stretchWidget = nullptr;
 	}
 	
 	m_sections.clear();
@@ -754,13 +752,21 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 }
 
 void BackendInfo::slotAddService(const std::string& _serviceName, const std::string& _serviceId, const std::string& _serviceUrl, const std::string& _debugInfoJson) {
+	if (_debugInfoJson.empty()) {
+		BACKINFO_LOGW("No debug information provided { \"Name\": \"" + QString::fromStdString(_serviceName) + "\", \"ID\": \"" + QString::fromStdString(_serviceId) + "\", \"Url\": \"" + QString::fromStdString(_serviceUrl) + "\" }");
+		return;
+	}
+
+	// Parse JSON
 	QJsonParseError err;
 	QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(_debugInfoJson), &err);
 	if (err.error != QJsonParseError::NoError) {
 		BACKINFO_LOGW("Failed to parse service debug information { \"Name\": \"" + QString::fromStdString(_serviceName) + "\", \"ID\": \"" + QString::fromStdString(_serviceId) + "\", \"Url\": \"" + QString::fromStdString(_serviceUrl) + "\", \"Error\": \"" + err.errorString() + "\" }");
+		BACKINFO_LOGW("JSON: " + QString::fromStdString(_debugInfoJson));
 		return;
 	}
 
+	// Create widget
 	ot::ExpanderWidget* serviceExpander = new ot::ExpanderWidget(QString::fromStdString("Service { \"Name\": \"" + _serviceName + "\", \"ID\": \"" + _serviceId + "\", \"Url\": \"" + _serviceUrl + "\" }"), m_sectionsLayout->widget());
 	QScrollArea* serviceArea = new QScrollArea(serviceExpander);
 	serviceArea->setWidgetResizable(true);
@@ -786,11 +792,6 @@ void BackendInfo::loadWorkerFinished() {
 	m_cancelButton->setEnabled(false);
 	m_loadButton->setEnabled(true);
 	m_clearButton->setEnabled(true);
-
-	if (!m_stretchWidget) {
-		m_stretchWidget = new QWidget;
-		m_sectionsLayout->addWidget(m_stretchWidget, 1);
-	}
 
 	BACKINFO_LOG("Getting Backend data worker finished");
 }
@@ -844,7 +845,7 @@ void BackendInfo::loadWorker(std::string _gssUrl) {
 		for (const auto& session : lss.getSessions()) {
 			for (const auto& service : session.services) {
 				if (service.isRunning) {
-					serviceLoad(service.url, std::to_string(service.id), service.url);
+					serviceLoad(service.name, std::to_string(service.id), service.url);
 				}
 			}
 		}
@@ -977,6 +978,11 @@ void BackendInfo::serviceLoad(const std::string& _serviceName, const std::string
 		return;
 	}
 
+	// Check JSON received, queue might have queued the message and returned an generic OK response
+	if (response.getWhat().empty() || response.getWhat().at(0) != '{') {
+		return;
+	}
+	
 	QMetaObject::invokeMethod(this, &BackendInfo::slotAddService, Qt::QueuedConnection, _serviceName, _serviceId, _serviceUrl, response.getWhat());
 }
 
