@@ -2106,6 +2106,91 @@ void ModelState::restoreOriginalVersionIfNeeded() {
 	// We can skip restoring
 }
 
+void ModelState::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	using namespace ot;
+
+	_object.AddMember("CurrentModelBaseStateVersion", JsonString(m_currentModelBaseStateVersion, _allocator), _allocator);
+
+	JsonArray entitiesArr;
+	for (const auto& it : m_entities) {
+		JsonObject entityObj;
+		entityObj.AddMember("ID", it.first, _allocator);
+		JsonObject infoObj;
+		it.second.addToJsonObject(infoObj, _allocator);
+		entityObj.AddMember("Info", infoObj, _allocator);
+		entitiesArr.PushBack(entityObj, _allocator);
+	}
+	_object.AddMember("Entities", entitiesArr, _allocator);
+
+	JsonArray addedOrModifiedArr;
+	for (const auto& it : m_addedOrModifiedEntities) {
+		JsonObject entityObj;
+		entityObj.AddMember("ID", it.first, _allocator);
+		JsonObject infoObj;
+		it.second.addToJsonObject(infoObj, _allocator);
+		entityObj.AddMember("Info", infoObj, _allocator);
+		addedOrModifiedArr.PushBack(entityObj, _allocator);
+	}
+	_object.AddMember("AddedOrModifiedEntities", addedOrModifiedArr, _allocator);
+
+	JsonArray removedArr;
+	for (const auto& it : m_removedEntities) {
+		JsonObject entityObj;
+		entityObj.AddMember("ID", it.first, _allocator);
+		JsonObject infoObj;
+		it.second.addToJsonObject(infoObj, _allocator);
+		entityObj.AddMember("Info", infoObj, _allocator);
+		removedArr.PushBack(entityObj, _allocator);
+	}
+	_object.AddMember("RemovedEntities", removedArr, _allocator);
+
+	JsonArray childrenListArr;
+	for (const auto& it : m_entityChildrenList) {
+		JsonObject childObj;
+		childObj.AddMember("ID", it.first, _allocator);
+		JsonArray childArr;
+		for (const auto& child : it.second) {
+			childArr.PushBack(child, _allocator);
+		}
+		childObj.AddMember("Childs", childArr, _allocator);
+		childrenListArr.PushBack(childObj, _allocator);
+	}
+	_object.AddMember("EntityChildrenList", childrenListArr, _allocator);
+
+	_object.AddMember("StateModified", m_stateModified, _allocator);
+	_object.AddMember("MaxNumberArrayEntitiesPerState", m_maxNumberArrayEntitiesPerState, _allocator);
+
+	_object.AddMember("ActiveBranchInModelEntity", JsonString(m_activeBranchInModelEntity, _allocator), _allocator);
+	_object.AddMember("ActiveVersionInModelEntity", JsonString(m_activeVersionInModelEntity, _allocator), _allocator);
+
+	_object.AddMember("PreviewImageUID", m_previewImageUID, _allocator);
+	_object.AddMember("PreviewImageVersion", m_previewImageVersion, _allocator);
+	_object.AddMember("PreviewImageFormat", JsonString(ot::toString(m_previewImageFormat), _allocator), _allocator);
+
+	_object.AddMember("DescriptionUID", m_descriptionUID, _allocator);
+	_object.AddMember("DescriptionVersion", m_descriptionVersion, _allocator);
+	_object.AddMember("DescriptionSyntax", JsonString(ot::toString(m_descriptionSyntax), _allocator), _allocator);
+
+	auto AddVersionInfoDebugInfo = [](const VersionInformation& _info, JsonObject& _obj, JsonAllocator& _allocator) {
+		_obj.AddMember("Branch", JsonString(_info.branch, _allocator), _allocator);
+		_obj.AddMember("Version", JsonString(_info.version, _allocator), _allocator);
+		_obj.AddMember("IsOriginalBranch", _info.isOriginalBranch, _allocator);
+		_obj.AddMember("IsEndOfBranch", _info.isEndOfBranch, _allocator);
+		};
+
+	JsonObject versionGraphObj;
+	m_graphCfg.addToJsonObject(versionGraphObj, _allocator);
+	_object.AddMember("VersionGraph", versionGraphObj, _allocator);
+
+	JsonObject originalInitialVersionObj;
+	AddVersionInfoDebugInfo(m_originalInitialVersion, originalInitialVersionObj, _allocator);
+	_object.AddMember("OriginalInitialVersion", originalInitialVersionObj, _allocator);
+
+	JsonObject customInitialVersionObj;
+	AddVersionInfoDebugInfo(m_customInitialVersion, customInitialVersionObj, _allocator);
+	_object.AddMember("CustomInitialVersion", customInitialVersionObj, _allocator);
+}
+
 void ModelState::createAndActivateNewBranch()
 {
 	std::string newBranch;

@@ -53,6 +53,12 @@ public:
 	ot::UID getEntityVersion() const { return m_entityVersion; };
 	tEntityType getEntityType() const { return m_entityType; };
 
+	void addToJsonObject(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+		_object.AddMember("Version", static_cast<uint64_t>(m_entityVersion), _allocator);
+		_object.AddMember("ParentID", static_cast<uint64_t>(m_parentEntityID), _allocator);
+		_object.AddMember("Type", ot::JsonString((m_entityType == TOPOLOGY ? "Topology" : "Data"), _allocator), _allocator);
+	}
+
 private:
 	ot::UID m_entityVersion;
 	ot::UID m_parentEntityID;
@@ -199,6 +205,8 @@ public:
 	//! Will only modify the model entity without loading the model state.
 	//! @note This function should be called immediately before closing the project.
 	void restoreOriginalVersionIfNeeded();
+
+	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

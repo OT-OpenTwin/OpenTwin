@@ -1112,6 +1112,35 @@ std::string Application::storeTemporaryFile(const std::string& _content, uint64_
 	return tmpFileName;
 }
 
+void Application::addDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) {
+	using namespace ot;
+	JsonArray queueArr;
+	for (const auto& action : m_queuedActions) {
+		JsonObject actionObj;
+		actionObj.AddMember("Type", static_cast<int>(action.type), _allocator);
+		actionObj.AddMember("DocumentSize", action.document.size(), _allocator);
+		queueArr.PushBack(actionObj, _allocator);
+	}
+	_object.AddMember("AsyncActionQueue", queueArr, _allocator);
+
+	if (m_model) {
+		JsonObject modelObj;
+		m_model->getDebugInformation(modelObj, _allocator);
+		_object.AddMember("Model", modelObj, _allocator);
+	}
+	else {
+		_object.AddMember("Model", JsonNullValue(), _allocator);
+	}
+
+	JsonObject selectionObj;
+	m_selectionHandler.getDebugInformation(selectionObj, _allocator);
+	_object.AddMember("SelectionHandler", selectionObj, _allocator);
+
+	JsonObject blockObj;
+	m_blockHandler.getDebugInformation(blockObj, _allocator);
+	_object.AddMember("BlockHandler", blockObj, _allocator);
+}
+
 void Application::queueAction(ActionType _type, const ot::JsonDocument& _document) {
 	ActionData newData;
 	newData.type = _type;

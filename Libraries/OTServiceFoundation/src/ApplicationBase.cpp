@@ -701,8 +701,10 @@ ot::ReturnMessage ot::ApplicationBase::handleGetDebugInformation(JsonDocument& _
 
 	JsonObject customInfo;
 	this->addDebugInformation(customInfo, debugInfo.GetAllocator());
-	basicInfo.AddMember("CustomInformation", customInfo, debugInfo.GetAllocator());
-
+	if (customInfo.MemberCount() > 0) {
+		debugInfo.AddMember("CustomInformation", customInfo, debugInfo.GetAllocator());
+	}
+	
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, debugInfo);
 }
 

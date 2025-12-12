@@ -96,6 +96,52 @@ void SelectionHandler::subscribe(SelectionChangedObserver* _observer)
 	m_observer.push_back(_observer);
 }
 
+void SelectionHandler::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) {
+	using namespace ot;
+	_object.AddMember("ObserverCount", static_cast<uint64_t>(m_observer.size()), _allocator);
+
+	JsonArray ownersWithSelectionArr;
+	for (const auto& ownerEntry : m_ownersWithSelection) {
+		JsonObject ownerObj;
+		ownerObj.AddMember("Owner", JsonString(ownerEntry.first, _allocator), _allocator);
+		JsonArray entityInfosArr;
+		for (const auto& entityInfo : ownerEntry.second) {
+			JsonObject entityInfoObj;
+			entityInfo.addToJsonObject(entityInfoObj, _allocator);
+			entityInfosArr.PushBack(entityInfoObj, _allocator);
+		}
+		ownerObj.AddMember("Entities", entityInfosArr,  _allocator);
+		ownersWithSelectionArr.PushBack(ownerObj, _allocator);
+	}
+	_object.AddMember("OwnersWithSelection", ownersWithSelectionArr, _allocator);
+	{
+		std::lock_guard<std::mutex> guard(m_changeSelectedEntitiesBuffer);
+		_object.AddMember("SelectedEntities", JsonArray(m_selectedEntityIDs, _allocator), _allocator);
+		_object.AddMember("SelectedVisibleEntities", JsonArray(m_selectedVisibleEntityIDs, _allocator), _allocator);
+	}
+	
+	_object.AddMember("NotifyOwnerThreadRunning", m_notifyOwnerThreadRunning.load(), _allocator);
+	_object.AddMember("NeedNotifyOwner", m_needNotifyOwner.load(), _allocator);
+
+	JsonArray ownerNotifyMapArr;
+	{
+		std::lock_guard<std::mutex> guard(m_ownerNotifyMutex);
+		for (const auto& ownerEntry : m_ownerNotifyMap) {
+			JsonObject ownerObj;
+			ownerObj.AddMember("Owner", JsonString(ownerEntry.first, _allocator), _allocator);
+			JsonArray entityInfosArr;
+			for (const auto& entityInfo : ownerEntry.second) {
+				JsonObject entityInfoObj;
+				entityInfo.addToJsonObject(entityInfoObj, _allocator);
+				entityInfosArr.PushBack(entityInfoObj, _allocator);
+			}
+			ownerObj.AddMember("Entities", entityInfosArr, _allocator);
+			ownerNotifyMapArr.PushBack(ownerObj, _allocator);
+		}
+		_object.AddMember("OwnerNotifyMap", ownerNotifyMapArr, _allocator);
+	}
+}
+
 void SelectionHandler::toggleButtonEnabledState()
 {
 	std::list<std::string> enabled;

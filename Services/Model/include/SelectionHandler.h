@@ -56,6 +56,9 @@ public:
 	std::list<ot::UID> getSelectedVisibleEntityIDs();
 
 	void subscribe(SelectionChangedObserver* _observer);
+
+	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator);
+
 private:
 	typedef std::map<std::string, std::list<ot::EntityInformation>> OwnerEntityMap;
 

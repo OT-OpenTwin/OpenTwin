@@ -220,6 +220,9 @@ public:
 	EntityBase* getEntityByID(ot::UID _entityID) const;
 
 	std::map<ot::UID, EntityBase*>& getAllEntitiesByUID() { return entityMap; }
+
+	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator);
+
 private:
 	// Methods
 	void clearAll();

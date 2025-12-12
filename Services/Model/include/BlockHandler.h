@@ -22,6 +22,7 @@
 // OpenTwin header
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
+#include "NewModelStateInfo.h"
 
 class EntityBlock;
 class EntityGraphicsScene;
@@ -56,6 +57,8 @@ public:
 	bool blockExists(ot::UID _blockID);
 	bool blockExists(ot::UID _editorID, ot::UID _blockID);
 	EntityGraphicsScene* findGraphicsScene(const std::string& _graphicsElementName);
+
+	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 protected:
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;

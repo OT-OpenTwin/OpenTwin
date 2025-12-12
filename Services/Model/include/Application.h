@@ -260,6 +260,9 @@ public:
 	//! @return The path to the temporary file.
 	std::string storeTemporaryFile(const std::string& _content, uint64_t _uncompressedDataLength);
 
+protected:
+	void addDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) override;
+	
 private:
 	void queueAction(ActionType _type, const ot::JsonDocument& _document);
 

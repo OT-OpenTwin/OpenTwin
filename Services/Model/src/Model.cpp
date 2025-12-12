@@ -3474,6 +3474,89 @@ EntityBase* Model::getEntityByID(ot::UID _entityID) const
 	}
 }
 
+void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) {
+	using namespace ot;
+	if (entityRoot) {
+		_object.AddMember("EntityRoot", JsonObject(entityRoot->getTreeItem(), _allocator), _allocator);
+	}
+	else {
+		_object.AddMember("EntityRoot", JsonNullValue(), _allocator);
+	}
+
+	_object.AddMember("ModelStorageVersion", modelStorageVersion, _allocator);
+	_object.AddMember("AnyDataChangeSinceLastWrite", anyDataChangeSinceLastWrite, _allocator);
+
+	JsonArray entityMapArr;
+	for (const auto& it : entityMap) {
+		JsonObject entityObj;
+		entityObj.AddMember("ID", it.first, _allocator);
+		if (it.second) {
+			entityObj.AddMember("Entity", JsonObject(it.second->getTreeItem(), _allocator), _allocator);
+		}
+		else {
+			entityObj.AddMember("Entity", JsonNullValue(), _allocator);
+		}
+		entityMapArr.PushBack(entityObj, _allocator);
+	}
+	_object.AddMember("EntityMap", entityMapArr, _allocator);
+
+	JsonArray pendingEntityUpdatesArr;
+	for (const auto& it : pendingEntityUpdates) {
+		if (it.first) {
+			pendingEntityUpdatesArr.PushBack(JsonObject(it.first->getTreeItem(), _allocator), _allocator);
+		}
+		else {
+			pendingEntityUpdatesArr.PushBack(JsonNullValue(), _allocator);
+		}
+	}
+	_object.AddMember("PendingEntityUpdates", pendingEntityUpdatesArr, _allocator);
+
+	_object.AddMember("IsProjectOpen", m_isProjectOpen, _allocator);
+	_object.AddMember("VisualizationModelID", visualizationModelID, _allocator);
+	_object.AddMember("IsModified", isModified, _allocator);
+	_object.AddMember("ProjectName", JsonString(projectName, _allocator), _allocator);
+	_object.AddMember("ProjectType", JsonString(projectType, _allocator), _allocator);
+	_object.AddMember("CollectionName", JsonString(collectionName, _allocator), _allocator);
+
+	_object.AddMember("UiCreated", uiCreated, _allocator);
+	_object.AddMember("VersionGraphCreated", versionGraphCreated, _allocator);
+	_object.AddMember("NewTableItemName", JsonString(newTableItemName, _allocator), _allocator);
+
+	JsonArray meshingActiveArr;
+	for (const auto& it : meshingActive) {
+		meshingActiveArr.PushBack(it.first, _allocator);
+	}
+	_object.AddMember("MeshingActive", meshingActiveArr, _allocator);
+
+	_object.AddMember("SelectedVersion", JsonString(m_selectedVersion, _allocator), _allocator);
+
+	JsonArray parameterMapArr;
+	for (const auto& it : parameterMap) {
+		JsonObject paramObj;
+		paramObj.AddMember("Name", JsonString(it.first, _allocator), _allocator);
+		JsonObject entryObj;
+		entryObj.AddMember("Value", it.second.first, _allocator);
+		if (it.second.second) {
+			paramObj.AddMember("Parameter", JsonObject(it.second.second->getTreeItem(), _allocator), _allocator);
+		}
+		else {
+			paramObj.AddMember("Parameter", JsonNullValue(), _allocator);
+		}
+		parameterMapArr.PushBack(paramObj, _allocator);
+	}
+
+	if (stateManager) {
+		JsonObject stateManagerObj;
+		stateManager->getDebugInformation(stateManagerObj, _allocator);
+		_object.AddMember("StateManager", stateManagerObj, _allocator);
+	}
+	else {
+		_object.AddMember("StateManager", JsonNullValue(), _allocator);
+	}
+
+	_object.AddMember("IsShutdown", shutdown, _allocator);
+}
+
 void Model::enableQueuingHttpRequests(bool flag)
 {
 	Application::instance()->getNotifier()->enableQueuingHttpRequests(flag);
@@ -4692,7 +4775,6 @@ void Model::updateModelStateForUndoRedo()
 
 	Application::instance()->getNotifier()->setTreeStateRecording(visualizationModelID, false);
 }
-
 
 void Model::hideEntities(std::list<ot::UID> &hiddenEntityIDs)
 {

@@ -316,6 +316,28 @@ EntityGraphicsScene* BlockHandler::findGraphicsScene(const std::string& _graphic
 	return editor;
 }
 
+void BlockHandler::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	using namespace ot;
+	JsonArray viewMapArr;
+	for (const auto& it : m_viewBlockConnectionsMap) {
+		JsonObject viewObj;
+		viewObj.AddMember("ViewID", it.first, _allocator);
+		JsonArray blocksArr;
+		for (const auto& blockIt : it.second) {
+			JsonObject blockObj;
+			blockObj.AddMember("BlockID", blockIt.first, _allocator);
+			JsonArray connectionsArr;
+			for (const auto& connId : blockIt.second) {
+				connectionsArr.PushBack(connId, _allocator);
+			}
+			blockObj.AddMember("Connections", connectionsArr, _allocator);
+			blocksArr.PushBack(blockObj, _allocator);
+		}
+		viewObj.AddMember("Blocks", blocksArr, _allocator);
+	}
+	_object.AddMember("ViewBlockConnectionsMap", viewMapArr, _allocator);
+}
+
 ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
