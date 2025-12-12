@@ -304,7 +304,7 @@ ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document
 	ot::RuntimeIntervalTest test3;
 
 	ot::GridFSFileInfo info;
-	info.setFileName(DataBase::instance().getCollectionName() + "_" + entityName + "_textdata");
+	info.setFileName(DataBase::instance().getCollectionName());
 
 	// Upload the data to gridFS
 	DataStorageAPI::DocumentAPI db;
