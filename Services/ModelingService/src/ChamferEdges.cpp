@@ -24,6 +24,7 @@
 #include "EntityCache.h"
 #include "UpdateManager.h"
 
+#include "PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -75,7 +76,7 @@ bool ChamferEdges::operationActive(EntityGeometry* geometryEntity)
 	double chamferWidth = width->getValue();
 
 	EntityPropertiesBoolean* active = dynamic_cast<EntityPropertiesBoolean*>(geometryEntity->getProperties().getProperty("Active"));
-	bool operationActive = active->getValue();
+	bool operationActive = active ? active->getValue() : true;
 
 	return (chamferWidth != 0.0 && operationActive);
 }

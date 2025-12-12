@@ -75,7 +75,7 @@ bool BlendEdges::operationActive(EntityGeometry* geometryEntity)
 	double chamferWidth = width->getValue();
 
 	EntityPropertiesBoolean* active = dynamic_cast<EntityPropertiesBoolean*>(geometryEntity->getProperties().getProperty("Active"));
-	bool operationActive = active->getValue();
+	bool operationActive = active ? active->getValue() : true;
 
 	return (chamferWidth != 0.0 && operationActive);
 }
