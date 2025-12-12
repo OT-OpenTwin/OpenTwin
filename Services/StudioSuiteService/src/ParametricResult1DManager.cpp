@@ -62,7 +62,7 @@ ParametricResult1DManager::~ParametricResult1DManager()
 void ParametricResult1DManager::clear()
 {
 	// We delete all previous result data (series), since there was a non-parametric change
-	std::list<std::string> resultEntity{ m_resultFolderName + "/1D Results" };
+	std::list<std::string> resultEntity{ m_resultFolderName + "/1D Results", "1D Results"};
 
 	std::string resultSeriesName = ot::FolderNames::DatasetFolder + "/" + m_seriesNameBase;
 	resultEntity.push_back(resultSeriesName);
