@@ -58,7 +58,7 @@ public:
 	// Virtual methods
 
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
-
+	virtual int getSchemaVersion() override { return 2; };
 	virtual bool considerForPropertyFilter() override { return true; };
 	virtual bool considerChildrenForPropertyFilter() override { return false; };
 	virtual entityType getEntityType() const override { return TOPOLOGY; };
@@ -66,7 +66,7 @@ public:
 	virtual void addVisualizationNodes() override;
 	virtual bool updateFromProperties() override;
 
-	virtual std::string getClassName() const override { return "EntityResult1DCurve_New"; };
+	virtual std::string getClassName() const override { return "EntityResult1DCurve"; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

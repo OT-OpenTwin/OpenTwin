@@ -27,7 +27,7 @@
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/Painter2DDialogFilterDefaults.h"
 
-static EntityFactoryRegistrar<EntityResult1DCurve> registrar("EntityResult1DCurve_New");
+static EntityFactoryRegistrar<EntityResult1DCurve> registrar("EntityResult1DCurve");
 
 ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _plotName, const std::string& _curveName, DefaultCurveStyle _style) {
 	ot::Plot1DCurveCfg cfg;
