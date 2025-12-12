@@ -132,6 +132,7 @@ void ParametricResult1DManager::storeDataInResultCollection()
 	// First, create all necessary plots
 	std::set<std::string> createdPlots;
 	std::map<std::string, ot::PainterRainbowIterator> plotPainters;
+	std::map<std::string, std::string> plotAliases;
 
 	for (DatasetDescription& dataDescription : m_allDataDescriptions)
 	{
@@ -142,6 +143,19 @@ void ParametricResult1DManager::storeDataInResultCollection()
 		if (curveName == "S-Parameters")
 		{
 			plotName = fullName;
+		}
+
+		std::string parentName = plotName.substr(0, plotName.find_last_of("/"));
+
+		if (createdPlots.count(parentName) != 0)
+		{
+			// Our current plot is a child in a parent -> we need to move it outside
+			const std::string plotSuffix = plotName.substr(plotName.find_last_of("/") + 1);
+			std::string newPlotName = parentName + " - " + plotSuffix;
+
+			plotAliases[plotName] = newPlotName;
+
+			plotName = newPlotName;
 		}
 
 		if (createdPlots.count(plotName) == 0)
@@ -185,6 +199,12 @@ void ParametricResult1DManager::storeDataInResultCollection()
 				shortName = "S Matrix";
 			}
 
+			if (plotAliases.count(plotName) != 0)
+			{
+				plotName = plotAliases[plotName];
+				curveName = plotName + "/" + shortName;
+			}
+
 			if (createdCurves.count(curveName) == 0)
 			{
 				std::string defaultAxis = getDefaultAxisFromData(series, fullName);
@@ -195,8 +215,6 @@ void ParametricResult1DManager::storeDataInResultCollection()
 				curveConfig.setLinePenPainter(painter.release());
 
 				CurveFactory::addToConfig(*series, curveConfig, fullName, "", defaultAxis);
-
-				std::cout << fullName << std::endl;
 
 				EntityResult1DCurve newCurve(m_application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 				newCurve.setName(curveName);
