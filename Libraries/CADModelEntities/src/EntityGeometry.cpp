@@ -375,6 +375,27 @@ void EntityGeometry::readSpecificDataFromDataBase(const bsoncxx::document::view 
 	{
 	}
 
+	// Legacy support for icons
+	auto docIt = doc_view.find("visibleIcon");
+	if (docIt != doc_view.end()) {
+		std::string ico = docIt->get_string().value.data();
+		if (ico.find('/') == std::string::npos) {
+			// Old format without path, update to new format
+			ico = "Default/" + ico;
+		}
+		setVisibleTreeItemIcon(ico);
+	}
+
+	docIt = doc_view.find("hiddenIcon");
+	if (docIt != doc_view.end()) {
+		std::string ico = docIt->get_string().value.data();
+		if (ico.find('/') == std::string::npos) {
+			// Old format without path, update to new format
+			ico = "Default/" + ico;
+		}
+		setHiddenTreeItemIcon(ico);
+	}
+
 	// Clean the objects from memory -> will be loaded on demand
 	delete brep;
 	brep = nullptr;
