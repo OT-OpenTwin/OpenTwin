@@ -570,12 +570,12 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 					bool datasetHasSingleDatapoint = curveData.m_xData.size() == 1;
 					curveColourSetter.setPainter(newCurveCfgSub, datasetHasSingleDatapoint);
 				
-					newCurveCfg.setTitle(curveTitleWithIndex);
+					newCurveCfgSub.setTitle(curveTitleWithIndex);
 					std::unique_ptr<ot::ComplexNumberContainerCartesian> yData(new ot::ComplexNumberContainerCartesian());
 					yData->m_real = std::move(curveData.m_yData);
 
 					ot::PlotDatasetData datasetData(std::move(curveData.m_xData), yData.release());
-					auto dataset = new ot::PlotDataset(nullptr, newCurveCfg, std::move(datasetData));
+					auto dataset = new ot::PlotDataset(nullptr, newCurveCfgSub, std::move(datasetData));
 					dataset->setCurveNameBase(simpleNameBase);
 					dataSets.push_back(dataset);
 				}
