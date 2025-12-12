@@ -29,6 +29,8 @@
 #include "DatasetDescription.h"
 #include "ParameterDescription.h"
 
+class MetadataSeries;
+
 namespace ltspice
 {
 	class RawData;
@@ -37,7 +39,7 @@ namespace ltspice
 class ResultManager : public BusinessLogicHandler
 {
 public:
-	ResultManager(ot::components::ModelComponent* modelComponent);
+	ResultManager(ot::components::ModelComponent* _modelComponent);
 	virtual ~ResultManager();
 
 	void extractResults(const std::string& ltSpicefileNameBase);
@@ -50,4 +52,5 @@ private:
 	void storeCurves(std::list<DatasetDescription>& allCurveDescriptions);
 	void clear();
 	std::string getUnitFromType(const std::string& type);
+	std::string getDefaultAxisFromData(const MetadataSeries* series, const std::string& quantityName);
 };

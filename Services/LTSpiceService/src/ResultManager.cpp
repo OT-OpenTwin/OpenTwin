@@ -35,13 +35,17 @@
 
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/FolderNames.h"
+#include "OTGui/PainterRainbowIterator.h"
 
 #include "EntityFile.h"
 #include "EntityAPI.h"
 #include "DataBase.h"
+#include "EntityResult1DPlot.h"
+#include "CurveFactory.h"
 
 #include <regex>
 #include <filesystem>
+#include <set>
 
 ResultManager::ResultManager(ot::components::ModelComponent* modelComponent)
 {
@@ -173,7 +177,7 @@ void ResultManager::extractResults(const std::string &ltSpicefileNameBase)
 void ResultManager::clear()
 {
 	// We delete all previous result data (series), since we will recreate it if necessary
-	std::list<std::string> resultEntity{ ot::FolderNames::DatasetFolder + "/LTSpice Imported Results" };
+	std::list<std::string> resultEntity{ ot::FolderNames::DatasetFolder + "/LTSpice Imported Results", "1D Results"};
 	ot::ModelServiceAPI::deleteEntitiesFromModel(resultEntity, false);
 }
 
@@ -345,12 +349,108 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 	std::list<std::shared_ptr<MetadataEntry>> seriesMetadata;
 	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(allCurveDescriptions, seriesName, seriesMetadata);
 	resultCollectionExtender.storeCampaignChanges();
+
+	const MetadataSeries* series = resultCollectionExtender.findMetadataSeries(seriesMetadataIndex);
+
+	// First, we create new plots for voltages and currents
+	const std::string plotNameVoltages = "1D Results/Voltages";
+	const std::string plotNameCurrents = "1D Results/Currents";
+
+	bool hasVoltages = false;
+	bool hasCurrents = false;
+
+	for (DatasetDescription& dataDescription : allCurveDescriptions)
+	{
+		std::string fullName = dataDescription.getQuantityDescription()->getName();
+
+		if (fullName[0] == 'V' || fullName[0] == 'v') hasVoltages = true;
+		if (fullName[0] == 'I' || fullName[0] == 'i') hasCurrents = true;
+
+		if (hasVoltages && hasCurrents) break;
+	}
+
+	ot::PainterRainbowIterator plotPainterVoltages, plotPainterCurrents;
+
+	if (hasVoltages)
+	{
+		EntityResult1DPlot newPlotVoltages(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+		newPlotVoltages.setName(plotNameVoltages);
+
+		ot::Plot1DCfg plotCfg;
+		plotCfg.setTitle("Voltages");
+		newPlotVoltages.createProperties();
+		newPlotVoltages.setPlot(plotCfg);
+		newPlotVoltages.storeToDataBase();
+
+		_modelComponent->addNewTopologyEntity(newPlotVoltages.getEntityID(), newPlotVoltages.getEntityStorageVersion(), false);
+	}
+
+	if (hasCurrents)
+	{
+		EntityResult1DPlot newPlotCurrents(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+		newPlotCurrents.setName(plotNameCurrents);
+
+		ot::Plot1DCfg plotCfg;
+		plotCfg.setTitle("Currents");
+		newPlotCurrents.createProperties();
+		newPlotCurrents.setPlot(plotCfg);
+		newPlotCurrents.storeToDataBase();
+
+		_modelComponent->addNewTopologyEntity(newPlotCurrents.getEntityID(), newPlotCurrents.getEntityStorageVersion(), false);
+	}
+
 	//Now we store all data points in the result collection
+	std::set<std::string> createdCurves;
+
 	for (DatasetDescription& dataDescription : allCurveDescriptions)
 	{
 		try
 		{
 			resultCollectionExtender.processDataPoints(&dataDescription, seriesMetadataIndex);
+
+			// Add the curve to the plots
+			std::string fullName = dataDescription.getQuantityDescription()->getName();
+
+			std::string plotName;
+			ot::PainterRainbowIterator* plotPainter = nullptr;
+
+			if (fullName[0] == 'V' || fullName[0] == 'v')
+			{
+				plotName    = plotNameVoltages;
+				plotPainter = &plotPainterVoltages;
+			}
+			else if (fullName[0] == 'I' || fullName[0] == 'i')
+			{
+				plotName    = plotNameCurrents;
+				plotPainter = &plotPainterCurrents;
+			}
+
+			if (!plotName.empty())
+			{
+				std::string curveName = plotName + "/" + fullName;
+
+				if (createdCurves.count(curveName) == 0)
+				{
+					std::string defaultAxis = getDefaultAxisFromData(series, fullName);
+
+					ot::Plot1DCurveCfg curveConfig;
+
+					auto painter = plotPainter->getNextPainter();
+					curveConfig.setLinePenPainter(painter.release());
+
+					CurveFactory::addToConfig(*series, curveConfig, fullName, "", defaultAxis);
+
+					EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+					newCurve.setName(curveName);
+					newCurve.createProperties();
+					newCurve.setCurve(curveConfig);
+					newCurve.storeToDataBase();
+
+					_modelComponent->addNewTopologyEntity(newCurve.getEntityID(), newCurve.getEntityStorageVersion(), false);
+
+					createdCurves.emplace(curveName);
+				}
+			}
 		}
 		catch (std::exception e)
 		{
@@ -359,3 +459,34 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 	}
 }
 
+std::string ResultManager::getDefaultAxisFromData(const MetadataSeries* series, const std::string& quantityName)
+{
+	// Here we search for either "frequency" or "time" in the parameters. This indicates whether the curve is a function of time or frequency.
+
+	const std::list<MetadataQuantity>& quantities = series->getQuantities();
+
+	const MetadataQuantity* selectedQuantity = nullptr;
+
+	for (const MetadataQuantity& quantity : quantities)
+	{
+		if (quantity.quantityName == quantityName)
+		{
+			selectedQuantity = &quantity;
+			break;
+		}
+	}
+
+	if (selectedQuantity == nullptr) return "";
+
+	const std::list<MetadataParameter>& parameters = series->getParameter();
+	auto& dependingParameter = selectedQuantity->dependingParameterIds;
+	for (const auto& parameter : parameters)
+	{
+		if (std::find(dependingParameter.begin(), dependingParameter.end(), parameter.parameterUID) != dependingParameter.end())
+		{
+			if (parameter.parameterName == "frequency" || parameter.parameterName == "time") return parameter.parameterName;
+		}
+	}
+
+	return "";
+}
