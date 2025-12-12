@@ -343,6 +343,8 @@ namespace ot {
 		//! Will be called after the connection to the database was established.
 		virtual void initializeDefaultTemplate();
 
+		virtual void addDebugInformation(JsonObject& _object, JsonAllocator& _allocator) const {};
+
 		bool storeSettingToDataBase(const PropertyGridCfg& _config, const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection);
 
 		PropertyGridCfg getSettingsFromDataBase(const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection);
@@ -357,7 +359,8 @@ namespace ot {
 		std::string handleKeySequenceActivated(JsonDocument& _document);
 		ot::ReturnMessage handleSettingsItemChanged(JsonDocument& _document);
 		ot::ReturnMessage handleRegisterNewLMS(JsonDocument& _document);
-
+		ot::ReturnMessage handleGetDebugInformation(JsonDocument& _document);
+		
 		// ##########################################################################################################################################
 
 		// Private: Internal functions

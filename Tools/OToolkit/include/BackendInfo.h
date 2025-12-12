@@ -27,6 +27,7 @@
 #include "OTCommunication/LSSDebugInfo.h"
 #include "OTCommunication/GDSDebugInfo.h"
 #include "OTCommunication/LDSDebugInfo.h"
+#include "OTCommunication/ActionHandler.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -44,7 +45,7 @@ namespace ot { class PushButton; }
 namespace ot { class ExpanderWidget; }
 namespace ot { class IndicatorWidget; }
 
-class BackendInfo : public QObject, public otoolkit::Tool {
+class BackendInfo : public QObject, public otoolkit::Tool, public ot::ActionHandler {
 	Q_OBJECT
 public:
 	BackendInfo();
@@ -78,6 +79,7 @@ private Q_SLOTS:
 	void slotAddLSS(const ot::LSSDebugInfo& _info);
 	void slotAddGDS(const ot::GDSDebugInfo& _info);
 	void slotAddLDS(const ot::LDSDebugInfo& _info);
+	void slotAddService(const std::string& _serviceName, const std::string& _serviceId, const std::string& _serviceUrl, const std::string& _debugInfoJson);
 	void loadWorkerFinished();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -100,6 +102,19 @@ private:
 	bool lssLoad(const std::string& _lssUrl, ot::LSSDebugInfo& _lssInfo);
 	bool gdsLoad(const std::string& _gdsUrl, ot::GDSDebugInfo& _gdsInfo);
 	bool ldsLoad(const std::string& _ldsUrl, ot::LDSDebugInfo& _ldsInfo);
+	void serviceLoad(const std::string& _serviceName, const std::string& _serviceId, const std::string& _serviceUrl);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Callbacks
+
+	const std::string c_addServiceDebugInfoAction = "BackendInfo.AddServiceDebugInfo";
+
+	//api @security mTLS
+	//api @action BackendInfo.AddServiceDebugInfo
+	//api @brief Adds debug information about a service to the tool display.
+	//api @param 
+	void handleAddServiceDebugInfo(ot::JsonDocument& _doc);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

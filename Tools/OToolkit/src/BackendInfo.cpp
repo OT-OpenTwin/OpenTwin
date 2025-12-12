@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OToolkit header
+#include "AppBase.h"
 #include "BackendInfo.h"
 #include "OToolkitAPI/OToolkitAPI.h"
 
@@ -30,11 +31,13 @@
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/TreeWidgetItem.h"
 #include "OTWidgets/ExpanderWidget.h"
+#include "OTWidgets/JsonTreeWidget.h"
 #include "OTWidgets/IndicatorWidget.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
 // Qt header
+#include <QtCore/qjsonparseerror.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qgroupbox.h>
@@ -50,7 +53,7 @@ BackendInfo::BackendInfo()
 	: m_sectionsLayout(nullptr), m_loadButton(nullptr), m_cancelButton(nullptr),
 	m_clearButton(nullptr), m_gssUrl(nullptr), m_loadThread(nullptr), m_stretchWidget(nullptr)
 {
-
+	connectAction(c_addServiceDebugInfoAction, this, &BackendInfo::handleAddServiceDebugInfo);
 }
 
 BackendInfo::~BackendInfo() {
@@ -593,7 +596,7 @@ void BackendInfo::slotAddGDS(const ot::GDSDebugInfo& _info) {
 		ldsLayout->addWidget(new ot::Label("Services:", ldsContent));
 		ldsLayout->addWidget(this->createGdsServicesTable(it.services, ldsContent), 1);
 
-		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("LDS { \"ID\": " + std::to_string(it.serviceID) + ", \"URL\": \"" + it.url + "\" }"), ldsContent);
+		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("LDS { \"ID\": " + std::to_string(it.serviceID) + ", \"URL\": \"" + it.url + "\" }"), ldsArea);
 		//expander->setMinExpandedHeight(450);
 		expander->setWidget(ldsWidget);
 		ldsMainLayout->addWidget(expander);
@@ -750,6 +753,27 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 	
 }
 
+void BackendInfo::slotAddService(const std::string& _serviceName, const std::string& _serviceId, const std::string& _serviceUrl, const std::string& _debugInfoJson) {
+	QJsonParseError err;
+	QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(_debugInfoJson), &err);
+	if (err.error != QJsonParseError::NoError) {
+		BACKINFO_LOGW("Failed to parse service debug information { \"Name\": \"" + QString::fromStdString(_serviceName) + "\", \"ID\": \"" + QString::fromStdString(_serviceId) + "\", \"Url\": \"" + QString::fromStdString(_serviceUrl) + "\", \"Error\": \"" + err.errorString() + "\" }");
+		return;
+	}
+
+	ot::ExpanderWidget* serviceExpander = new ot::ExpanderWidget(QString::fromStdString("Service { \"Name\": \"" + _serviceName + "\", \"ID\": \"" + _serviceId + "\", \"Url\": \"" + _serviceUrl + "\" }"), m_sectionsLayout->widget());
+	QScrollArea* serviceArea = new QScrollArea(serviceExpander);
+	serviceArea->setWidgetResizable(true);
+	ot::JsonTreeWidget* serviceTree = new ot::JsonTreeWidget(serviceArea);
+	serviceTree->setReadOnly(true);
+	serviceTree->setJsonDocument(doc);
+	serviceArea->setWidget(serviceTree);
+	serviceExpander->setWidget(serviceArea);
+
+	m_sectionsLayout->addWidget(serviceExpander);
+	m_sections.push_back(serviceExpander);
+}
+
 void BackendInfo::loadWorkerFinished() {
 	if (m_loadThread) {
 		if (m_loadThread->joinable()) {
@@ -812,6 +836,17 @@ void BackendInfo::loadWorker(std::string _gssUrl) {
 		if (this->ldsLoad(lds.url, ldsInfo)) {
 			m_ldsInfos.push_back(ldsInfo);
 			QMetaObject::invokeMethod(this, &BackendInfo::slotAddLDS, Qt::QueuedConnection, ldsInfo);
+		}
+	}
+
+	// Get service infos
+	for (const auto& lss : m_lssInfos) {
+		for (const auto& session : lss.getSessions()) {
+			for (const auto& service : session.services) {
+				if (service.isRunning) {
+					serviceLoad(service.url, std::to_string(service.id), service.url);
+				}
+			}
 		}
 	}
 
@@ -920,6 +955,51 @@ bool BackendInfo::ldsLoad(const std::string& _ldsUrl, ot::LDSDebugInfo& _ldsInfo
 
 	_ldsInfo.setFromJsonObject(ldsResponseDoc.getConstObject());
 	return true;
+}
+
+void BackendInfo::serviceLoad(const std::string& _serviceName, const std::string& _serviceId, const std::string& _serviceUrl) {
+	BACKINFO_LOG("Gathering Service information { \"ServiceName\": \"" + QString::fromStdString(_serviceName) + "\", \"Url\": \"" + QString::fromStdString(_serviceUrl) + "\" }...");
+	
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetDebugInformation, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString(c_addServiceDebugInfoAction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(AppBase::instance()->url().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+
+	std::string responseStr;
+	if (!ot::msg::send("", _serviceUrl, ot::EXECUTE, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlags)) {
+		BACKINFO_LOGE("Failed to get Service debug information from Service at \"" + QString::fromStdString(_serviceUrl) + "\"");
+		return;
+	}
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk()) {
+		BACKINFO_LOGE("Service at \"" + QString::fromStdString(_serviceUrl) + "\" returned error: " + QString::fromStdString(response.getWhat()));
+		return;
+	}
+
+	QMetaObject::invokeMethod(this, &BackendInfo::slotAddService, Qt::QueuedConnection, _serviceName, _serviceId, _serviceUrl, response.getWhat());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Callbacks
+
+void BackendInfo::handleAddServiceDebugInfo(ot::JsonDocument& _doc) {
+	if (!m_sectionsLayout) {
+		return;
+	}
+
+	std::string name = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_NAME);
+	std::string id = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_ID);
+	std::string url = ot::json::getString(_doc, OT_ACTION_PARAM_SERVICE_URL);
+	std::string jsonData = ot::json::getString(_doc, OT_ACTION_PARAM_Data);
+
+	if (jsonData.empty()) {
+		BACKINFO_LOGE("Received empty debug information from Service { \"ServiceName\": \"" + QString::fromStdString(name) + "\", \"Url\": \"" + QString::fromStdString(url) + "\" }");
+		return;
+	}
+
+	QMetaObject::invokeMethod(this, &BackendInfo::slotAddService, Qt::QueuedConnection, name, id, url, jsonData);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -602,6 +602,109 @@ ot::ReturnMessage ot::ApplicationBase::handleRegisterNewLMS(JsonDocument& _docum
 	return ot::ReturnMessage::Ok;
 }
 
+ot::ReturnMessage ot::ApplicationBase::handleGetDebugInformation(JsonDocument& _document) {
+	JsonDocument debugInfo;
+	JsonObject basicInfo;
+
+	JsonObject serviceInfo;
+	ServiceBase::addToJsonObject(serviceInfo, debugInfo.GetAllocator());
+	basicInfo.AddMember("ServiceInformation", serviceInfo, debugInfo.GetAllocator());
+
+	basicInfo.AddMember("UiMessageQueuingEnabled", m_uiMessageQueuingEnabled, debugInfo.GetAllocator());
+
+	// Service Name Map
+	JsonArray serviceNameArr;
+	for (const auto& servicePair : m_serviceNameMap) {
+		JsonObject obj;
+		obj.AddMember("Key", JsonString(servicePair.first, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+		if (servicePair.second) {
+			JsonObject serviceObj;
+			servicePair.second->addToJsonObject(serviceObj, debugInfo.GetAllocator());
+			obj.AddMember("Value", serviceObj, debugInfo.GetAllocator());
+		}
+		else {
+			obj.AddMember("Value", JsonNullValue(), debugInfo.GetAllocator());
+		}
+	}
+	basicInfo.AddMember("ServiceNameMap", serviceNameArr, debugInfo.GetAllocator());
+
+	// Service ID Map
+	JsonArray serviceIdArr;
+	for (const auto& servicePair : m_serviceIdMap) {
+		JsonObject obj;
+		obj.AddMember("Key", servicePair.first, debugInfo.GetAllocator());
+		if (servicePair.second) {
+			JsonObject serviceObj;
+			servicePair.second->addToJsonObject(serviceObj, debugInfo.GetAllocator());
+			obj.AddMember("Value", serviceObj, debugInfo.GetAllocator());
+		}
+		else {
+			obj.AddMember("Value", JsonNullValue(), debugInfo.GetAllocator());
+		}
+	}
+	
+	// LSS
+	if (m_sessionService) {
+		JsonObject sessionServiceObj;
+		m_sessionService->addToJsonObject(sessionServiceObj, debugInfo.GetAllocator());
+		basicInfo.AddMember("SessionService", sessionServiceObj, debugInfo.GetAllocator());
+	}
+	else {
+		basicInfo.AddMember("SessionService", JsonNullValue(), debugInfo.GetAllocator());
+	}
+
+	// LDS
+	if (m_directoryService) {
+		JsonObject directoryServiceObj;
+		m_directoryService->addToJsonObject(directoryServiceObj, debugInfo.GetAllocator());
+		basicInfo.AddMember("DirectoryService", directoryServiceObj, debugInfo.GetAllocator());
+	}
+	else {
+		basicInfo.AddMember("DirectoryService", JsonNullValue(), debugInfo.GetAllocator());
+	}
+
+	// Info
+	basicInfo.AddMember("AuthorizationUrl", JsonString(m_authUrl, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	basicInfo.AddMember("DatabaseUrl", JsonString(m_databaseURL, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	basicInfo.AddMember("SiteID", JsonString(m_siteID, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	basicInfo.AddMember("LMS.Url", JsonString(m_lmsUrl, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	
+	basicInfo.AddMember("SessionID", JsonString(m_sessionID, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	basicInfo.AddMember("ProjectName", JsonString(m_projectName, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	basicInfo.AddMember("CollectionName", JsonString(m_collectionName, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	basicInfo.AddMember("ProjectType", JsonString(m_projectType, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+
+	basicInfo.AddMember("Login.UserName", JsonString(m_loggedInUserName, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	basicInfo.AddMember("Login.Password", JsonString(m_loggedInUserPassword, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	basicInfo.AddMember("DataBase.UserName", JsonString(m_dataBaseUserName, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	basicInfo.AddMember("DataBase.Password", JsonString(m_dataBaseUserPassword, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+
+	basicInfo.AddMember("ModalCommands.Count", static_cast<uint64_t>(m_modalCommands.size()), debugInfo.GetAllocator());
+
+	JsonArray selectedEntitiesArr;
+	for (const auto& entityID : m_selectedEntities) {
+		selectedEntitiesArr.PushBack(entityID, debugInfo.GetAllocator());
+	}
+	basicInfo.AddMember("SelectedEntities", selectedEntitiesArr, debugInfo.GetAllocator());
+
+	JsonArray prefetchedEntitiesArr;
+	for (const auto& entityPair : m_prefetchedEntityVersions) {
+		JsonObject obj;
+		obj.AddMember("EntityID", entityPair.first, debugInfo.GetAllocator());
+		obj.AddMember("VersionID", entityPair.second, debugInfo.GetAllocator());
+		prefetchedEntitiesArr.PushBack(obj, debugInfo.GetAllocator());
+	}
+
+	basicInfo.AddMember("UserCollection", JsonString(m_dbUserCollection, debugInfo.GetAllocator()), debugInfo.GetAllocator());
+	debugInfo.AddMember("BasicInformation", basicInfo, debugInfo.GetAllocator());
+
+	JsonObject customInfo;
+	this->addDebugInformation(customInfo, debugInfo.GetAllocator());
+	basicInfo.AddMember("CustomInformation", customInfo, debugInfo.GetAllocator());
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, debugInfo);
+}
+
 // ##########################################################################################################################################
 
 // Private: Internal functions
