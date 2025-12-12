@@ -22,9 +22,6 @@
     <ClCompile Include="src\ViewManipulator.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\AbstractPlot.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\SceneNodeMaterialFactory.cpp">
       <Filter>src\Materials</Filter>
     </ClCompile>
@@ -184,9 +181,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\ViewManipulator.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\AbstractPlot.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\SceneNodeMaterialFactory.h">

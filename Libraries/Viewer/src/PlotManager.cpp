@@ -39,7 +39,7 @@ ot::PlotManager::~PlotManager() {
 // Virtual methods
 
 ot::PlotDataset* ot::PlotManager::findDataset(QwtPlotCurve* _curve) {
-	for (auto itm : m_cache) {
+	for (auto& itm : m_cache) {
 		if (itm.second.second->getCartesianCurve() == _curve) {
 			return itm.second.second;
 		}
@@ -48,7 +48,7 @@ ot::PlotDataset* ot::PlotManager::findDataset(QwtPlotCurve* _curve) {
 }
 
 ot::PlotDataset* ot::PlotManager::findDataset(QwtPolarCurve* _curve) {
-	for (auto itm : m_cache) {
+	for (auto& itm : m_cache) {
 		if (itm.second.second->getPolarCurve() == _curve) {
 			return itm.second.second;
 		}
@@ -122,14 +122,14 @@ bool ot::PlotManager::changeCachedDatasetEntityVersion(UID _entityID, UID _newEn
 // Protected virtual methods
 
 void ot::PlotManager::clearCache(void) {
-	for (auto itm : m_cache) {
+	for (auto& itm : m_cache) {
 		delete itm.second.second;
 	}
 	m_cache.clear();
 }
 
 void ot::PlotManager::detachAllCached(void) {
-	for (auto itm : m_cache) {
+	for (auto& itm : m_cache) {
 		itm.second.second->detach();
 	}
 }

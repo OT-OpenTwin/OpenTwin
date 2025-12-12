@@ -23,7 +23,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\AbstractPlot.cpp" />
     <ClCompile Include="src\AxisCenterCross.cpp" />
     <ClCompile Include="src\AxisCross.cpp" />
     <ClCompile Include="src\ClipPlaneManipulator.cpp" />
@@ -96,7 +95,6 @@
     <ClCompile Include="src\WorkingPlane.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\AbstractPlot.h" />
     <ClInclude Include="include\AxisCenterCross.h" />
     <ClInclude Include="include\AxisCross.h" />
     <ClInclude Include="include\ClipPlaneManipulator.h" />

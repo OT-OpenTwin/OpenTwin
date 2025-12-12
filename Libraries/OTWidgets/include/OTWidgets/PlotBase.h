@@ -63,8 +63,8 @@ namespace ot {
 
 		// Getter
 
-		virtual QWidget* getQWidget(void) override { return m_centralWidget; };
-		virtual const QWidget* getQWidget(void) const override { return m_centralWidget; };
+		virtual QWidget* getQWidget() override { return m_centralWidget; };
+		virtual const QWidget* getQWidget() const override { return m_centralWidget; };
 
 		AbstractPlot* getPlot();
 		
@@ -76,9 +76,9 @@ namespace ot {
 		Plot1DCfg::PlotType getCurrentPlotType() { return m_currentPlotType; }
 
 		void setConfig(const Plot1DCfg& _config) { m_config = _config; };
-		const Plot1DCfg& getConfig(void) const { return m_config; };
+		const Plot1DCfg& getConfig() const { return m_config; };
 
-		void resetView(void);
+		void resetView();
 
 		void renameDataset(const std::string& _oldEntityPath, const std::string& _newEntityPath);
 
@@ -88,9 +88,9 @@ namespace ot {
 
 		void setErrorState(bool _isError, const QString& _message = QString());
 
-		void setIncompatibleData(void);
+		void setIncompatibleData();
 
-		void refresh(void);
+		void refresh();
 
 		void clear(bool _clearCache);
 
@@ -112,7 +112,7 @@ namespace ot {
 		virtual void addDatasetToCache(PlotDataset* _dataset) = 0;
 
 		//! @brief Returns all datasets.
-		virtual std::list<PlotDataset*> getAllDatasets(void) const = 0;
+		virtual std::list<PlotDataset*> getAllDatasets() const = 0;
 
 		//! @brief Sets the selected state of the curves in the plot.
 		//! Curves not in the list will be deselected.
@@ -127,11 +127,11 @@ namespace ot {
 		void curveDoubleClicked(UID _entityID, bool _hasControlModifier);
 
 	protected:
-		virtual void clearCache(void) = 0;
-		virtual void detachAllCached(void) = 0;
+		virtual void clearCache() = 0;
+		virtual void detachAllCached() = 0;
 	
 		void replaceConfig(Plot1DCfg&& _config) { m_config = std::move(_config); };
-		void applyConfig(void);
+		void applyConfig();
 		
 	private:
 		Plot1DCfg m_config;
@@ -147,8 +147,6 @@ namespace ot {
 
 		bool m_isError;
 		
-
-		std::string createAxisLabel(const std::string& _axisTitle, std::string _unit);
 	};
 
 }

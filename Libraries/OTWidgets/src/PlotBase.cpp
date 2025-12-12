@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/PlotBase.h"
@@ -304,13 +305,4 @@ void ot::PlotBase::applyConfig(void) {
 	m_polarPlot->updateGrid();
 	m_polarPlot->updateLegend();
 	m_polarPlot->updateWholePlot();
-}
-
-std::string ot::PlotBase::createAxisLabel(const std::string& _axisTitle, std::string _unit) {
-	_unit.erase(std::remove_if(_unit.begin(), _unit.end(), isspace), _unit.end());	
-	if (!_unit.empty())
-	{
-		return _axisTitle + " [" + _unit + "]";
-	}
-	return _axisTitle;
 }

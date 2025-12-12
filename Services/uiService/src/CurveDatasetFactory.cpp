@@ -60,9 +60,14 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	return dataSets;
 }
 
-std::string CurveDatasetFactory::createAxisLabel(const std::string& _title, const std::string& _unit)
-{
-	return _title + " [" + _unit +"]";
+std::string CurveDatasetFactory::createAxisLabel(const std::string& _title, const std::string& _unit) {
+	std::string unit = ot::String::removePrefixSuffix(_unit, " \t\n\r");
+	if (unit.empty()) {
+		return _title;
+	}
+	else {
+		return _title + " (" + _unit + ")";
+	}
 }
 
 ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions)
