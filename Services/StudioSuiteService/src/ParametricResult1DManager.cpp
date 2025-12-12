@@ -136,10 +136,15 @@ void ParametricResult1DManager::storeDataInResultCollection()
 	for (DatasetDescription& dataDescription : m_allDataDescriptions)
 	{
 		const std::string fullName = dataDescription.getQuantityDescription()->getName();
-		const std::string plotName = fullName.substr(0, fullName.find_last_of("/"));
 		const std::string curveName = fullName.substr(fullName.find_last_of("/") + 1);
+		std::string plotName = fullName.substr(0, fullName.find_last_of("/"));
 
-		if (createdPlots.count(plotName) == 0 && curveName != "S-Parameters")
+		if (curveName == "S-Parameters")
+		{
+			plotName = fullName;
+		}
+
+		if (createdPlots.count(plotName) == 0)
 		{
 			EntityResult1DPlot newPlot(m_application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 			newPlot.setName(plotName);
@@ -168,11 +173,19 @@ void ParametricResult1DManager::storeDataInResultCollection()
 			resultCollectionExtender.processDataPoints(&dataDescription, seriesMetadataIndex);
 
 			// Add the curve to the plots
-			const std::string fullName = dataDescription.getQuantityDescription()->getName();
-			const std::string plotName = fullName.substr(0, fullName.find_last_of("/"));
-			const std::string shortName = fullName.substr(fullName.find_last_of("/") + 1);
+			std::string fullName  = dataDescription.getQuantityDescription()->getName();
+			std::string plotName  = fullName.substr(0, fullName.find_last_of("/"));
+			std::string shortName = fullName.substr(fullName.find_last_of("/") + 1);
+			std::string curveName = fullName;
 
-			if (createdCurves.count(fullName) == 0 && shortName != "S-Parameters")
+			if (shortName == "S-Parameters")
+			{
+				plotName = fullName;
+				curveName += "/S Matrix";
+				shortName = "S Matrix";
+			}
+
+			if (createdCurves.count(curveName) == 0)
 			{
 				std::string defaultAxis = getDefaultAxisFromData(series, fullName);
 
@@ -186,14 +199,14 @@ void ParametricResult1DManager::storeDataInResultCollection()
 				std::cout << fullName << std::endl;
 
 				EntityResult1DCurve newCurve(m_application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-				newCurve.setName(fullName);
+				newCurve.setName(curveName);
 				newCurve.createProperties();
 				newCurve.setCurve(curveConfig);
 				newCurve.storeToDataBase();
 
 				m_application->getModelComponent()->addNewTopologyEntity(newCurve.getEntityID(), newCurve.getEntityStorageVersion(), false);
 
-				createdCurves.emplace(fullName);
+				createdCurves.emplace(curveName);
 			}
 		}
 		catch (std::exception e)
