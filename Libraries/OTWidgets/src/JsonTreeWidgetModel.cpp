@@ -319,7 +319,7 @@ QString ot::JsonTreeWidgetModel::jsonValueToString(const QJsonValue& _value) {
 
         // Check if value is an integer
         if (d == static_cast<double>(i)) {
-            return QString::number(i);
+            return QString::number(_value.toInt());
         }
         else {
             // Non-integer or too large for 64-bit integer
