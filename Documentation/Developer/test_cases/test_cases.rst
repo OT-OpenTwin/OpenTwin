@@ -15,3 +15,4 @@ Test Cases
     test_cases_text_table
     test_cases_logger_and_otoolkit
     test_cases_management
+    test_cases_connection_handling
