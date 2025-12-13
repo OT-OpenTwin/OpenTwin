@@ -254,7 +254,9 @@ void BlockHandler::removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, Ent
 					return;
 				}
 			}
-		} else if (destination == ot::invalidUID) {
+		}
+		
+		if (destination == ot::invalidUID) {
 			auto& blocks = itEditor->second;
 			for (auto itBlock = blocks.begin(); itBlock != blocks.end(); ++itBlock) {
 				if (itBlock->first != _connectionEntity->getConnectionCfg().getDestinationUid()) {
@@ -855,7 +857,7 @@ bool BlockHandler::updateBlock(const ot::GraphicsItemCfg* _changedBlock, const o
 }
 
 bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedConnection, const ot::GraphicsChangeEvent& _changeEvent) {
-Model* model = Application::instance()->getModel();
+    Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 
 	EntityBase* baseEditor = model->findEntityFromName(_changeEvent.getEditorName());
@@ -1104,7 +1106,7 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 
 	const bool isOrigin = _snapInfo.isOrigin;
 
-	// Determine UIDs and connector names based on isOrigin
+	// Determine UIDs and connector names based on isOrigin once
 	const ot::UID snapUid = isOrigin ? connectionCfg.getOriginUid() : connectionCfg.getDestinationUid();
 	const ot::UID otherUid = isOrigin ? connectionCfg.getDestinationUid() : connectionCfg.getOriginUid();
 	const std::string& snapConnectable = isOrigin ? connectionCfg.getOriginConnectable() : connectionCfg.getDestConnectable();
