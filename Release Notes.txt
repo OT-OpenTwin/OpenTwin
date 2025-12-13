@@ -4,5 +4,7 @@ Features/Changes
 - Data processing now follows the solver concept, i.e. pipeline design is separate from solver with run settings
 - Multiple data pipelines are now possible
 - Renaming of graphics scenes is now possible
+- Snapping and unsnapping of connections is now possible
+- Multi drag/drop of blocks is now handled in one state
 
 Bugs
