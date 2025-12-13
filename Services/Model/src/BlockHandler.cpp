@@ -336,6 +336,7 @@ void BlockHandler::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocato
 			blocksArr.PushBack(blockObj, _allocator);
 		}
 		viewObj.AddMember("Blocks", blocksArr, _allocator);
+		viewMapArr.PushBack(viewObj, _allocator);
 	}
 	_object.AddMember("ViewBlockConnectionsMap", viewMapArr, _allocator);
 }
