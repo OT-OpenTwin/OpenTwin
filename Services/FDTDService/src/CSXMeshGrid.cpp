@@ -33,7 +33,6 @@
 #include <list>
 #include <map>
 
-
 CSXMeshGrid::CSXMeshGrid() {
 }
 

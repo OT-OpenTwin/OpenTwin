@@ -104,40 +104,51 @@ void CartesianMeshToSTL::writeMaterialProperties(const EntityMaterial* _material
 	// write priority only for polyhedron definitions, if requested
 	if (_writeForPolyhedron) {
 		const auto* priority = properties.getProperty("Mesh priority", "General");
-		if (priority) {
-			const EntityPropertiesDouble* priorityValue = dynamic_cast<const EntityPropertiesDouble*>(priority);
-			if (priorityValue) {
-				_materialElement->SetAttribute("Priority", priorityValue->getValue());
-			}
+		if (!priority) return;
+		
+		const EntityPropertiesDouble* priorityValue = dynamic_cast<const EntityPropertiesDouble*>(priority);
+		if (priorityValue) {
+			_materialElement->SetAttribute("Priority", priorityValue->getValue());
 		}
 		return;
 	}
 	
 	if (materialSelection != "PEC") {
 		tinyxml2::XMLElement* propertyElement = _doc->NewElement("Property");
+
+		// Permittivity
 		const auto* permittivity = properties.getProperty("Permittivity (relative)", "Electromagnetic");
+		if (!permittivity) {
+			throw std::runtime_error("[CartesianMeshToSTL::writeMaterialProperties] Missing permittivity property");
+		}
+		const EntityPropertiesDouble* epsilonValue = dynamic_cast<const EntityPropertiesDouble*>(permittivity);
+		if (!epsilonValue || epsilonValue->getValue() < 0.0) {
+			throw std::runtime_error("[CartesianMeshToSTL::writeMaterialProperties] Invalid permittivity value");
+		}
+		propertyElement->SetAttribute("Epsilon", epsilonValue->getValue());
+
+		// Permeability
 		const auto* permeability = properties.getProperty("Permeability (relative)", "Electromagnetic");
+		if (!permeability) {
+			throw std::runtime_error("[CartesianMeshToSTL::writeMaterialProperties] Missing permeability property");
+		}
+		const EntityPropertiesDouble* mueValue = dynamic_cast<const EntityPropertiesDouble*>(permeability);
+		if (!mueValue || mueValue->getValue() < 0.0) {
+			throw std::runtime_error("[CartesianMeshToSTL::writeMaterialProperties] Invalid permeability value");
+		}
+		propertyElement->SetAttribute("Mue", mueValue->getValue());
+		
+		// Conductivity
 		const auto* conductivity = properties.getProperty("Conductivity", "Electromagnetic");
-		if (permittivity) {
-			const EntityPropertiesDouble* epsilonValue = dynamic_cast<const EntityPropertiesDouble*>(permittivity);
-			if (epsilonValue) {
-				propertyElement->SetAttribute("Epsilon", epsilonValue->getValue());
-			}
+		if (!conductivity) {
+			throw std::runtime_error("[CartesianMeshToSTL::writeMaterialProperties] Missing conductivity property");
 		}
-		
-		if (permeability) {
-			const EntityPropertiesDouble* kappaValue = dynamic_cast<const EntityPropertiesDouble*>(permeability);
-			if (kappaValue) {
-				propertyElement->SetAttribute("Kappa", kappaValue->getValue());
-			}
+		const EntityPropertiesDouble* kappaValue = dynamic_cast<const EntityPropertiesDouble*>(conductivity);
+		if (!kappaValue || kappaValue->getValue() < 0.0) {
+			throw std::runtime_error("[CartesianMeshToSTL::writeMaterialProperties] Invalid conductivity value");
 		}
-		
-		if (conductivity) {
-			const EntityPropertiesDouble* mueValue = dynamic_cast<const EntityPropertiesDouble*>(conductivity);
-			if (mueValue) {
-				propertyElement->SetAttribute("Mue", mueValue->getValue());
-			}
-		}
+
+		propertyElement->SetAttribute("Kappa", kappaValue->getValue());
 		_materialElement->InsertEndChild(propertyElement);
 	}
 }
@@ -145,6 +156,7 @@ void CartesianMeshToSTL::writeMaterialProperties(const EntityMaterial* _material
 tinyxml2::XMLElement* CartesianMeshToSTL::writeToXML(tinyxml2::XMLElement& _parentElement) const {
 	auto doc = _parentElement.GetDocument();
 	tinyxml2::XMLElement* lastMaterialElement = nullptr;
+	
 	// Creating a map of materials to object indices
 	std::map<EntityMaterial*, std::vector<size_t>> materialObjectsMap;
 	for (size_t objIndex = 0; objIndex < getNumberOfObjects(); objIndex++) {

@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <list>
+#include "EntityInformation.h"
 
 #include <tinyxml2.h>
 
-#include "EntityInformation.h"
+#include <string>
+#include <vector>
+#include <list>
 
 class EntityMaterial;
 class EntityMeshCartesianData;
