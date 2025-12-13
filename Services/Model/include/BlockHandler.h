@@ -19,6 +19,9 @@
 
 #pragma once
 
+//std header
+#include <set>
+
 // OpenTwin header
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
@@ -128,7 +131,7 @@ private:
 	//! @param _scene The graphics scene where the snapping event occurred.
 	//! @param _snapEvent The snap event containing details about the snapping action.
 	//! @return True if the snapping was handled successfully, false otherwise.
-	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::NewModelStateInfo& _modelStateInfo);
+	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::GraphicsConnectionCfg& _connectionCfg , std::set<EntityBlockConnection*>& _processedConnections);
 
 	//! @brief Maps scenes to a map of blocks and their connections.
 	std::map<ot::UID, std::map<ot::UID, ot::UIDList>> m_viewBlockConnectionsMap;
