@@ -104,12 +104,14 @@ void CartesianMeshToSTL::writeMaterialProperties(const EntityMaterial* _material
 	// write priority only for polyhedron definitions, if requested
 	if (_writeForPolyhedron) {
 		const auto* priority = properties.getProperty("Mesh priority", "General");
-		if (!priority) return;
-		
-		const EntityPropertiesDouble* priorityValue = dynamic_cast<const EntityPropertiesDouble*>(priority);
-		if (priorityValue) {
-			_materialElement->SetAttribute("Priority", priorityValue->getValue());
+		if (!priority) {
+			throw std::runtime_error("[CartesianMeshToSTL::writeMaterialProperties] Missing mesh priority property");
 		}
+		const EntityPropertiesDouble* priorityValue = dynamic_cast<const EntityPropertiesDouble*>(priority);
+		if (!priorityValue || priorityValue->getValue() < 0.0) {
+			throw std::runtime_error("[CartesianMeshToSTL::writeMaterialProperties] Invalid mesh priority value");
+		}
+		_materialElement->SetAttribute("Priority", priorityValue->getValue());
 		return;
 	}
 	
