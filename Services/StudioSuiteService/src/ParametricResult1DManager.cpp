@@ -130,6 +130,10 @@ void ParametricResult1DManager::storeDataInResultCollection()
 	const MetadataSeries *series = resultCollectionExtender.findMetadataSeries(seriesMetadataIndex);
 
 	// First, create all necessary plots
+	// If we have a parametric change, the addition will create an additional series extending the previous one. Therefore, all
+	// previous curves point to the outdated series and need to be re-created here.
+	ot::ModelServiceAPI::deleteEntitiesFromModel({ "1D Results" }, false);
+
 	std::set<std::string> createdPlots;
 	std::map<std::string, ot::PainterRainbowIterator> plotPainters;
 	std::map<std::string, std::string> plotAliases;
