@@ -407,6 +407,10 @@ void Model::resetToNew()
 			ot::EntityCallbackBase::Callback::DataHandle,
 			OT_INFO_SERVICE_TYPE_HierarchicalProjectService
 		);
+
+		ot::VisualisationTypes visTypes = hierarchicalRoot->getVisualizationTypes();
+		hierarchicalRoot->setCustomVisualizationViewFlags(ot::VisualisationTypes::GraphicsView, ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewNameAsTitle);
+
 		addEntityToModel(hierarchicalRoot->getName(), hierarchicalRoot, entityRoot, true, allNewEntities);
 	}
 
