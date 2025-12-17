@@ -34,6 +34,27 @@
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qtablewidget.h>
 
+
+LogInGSSEditDialogTableHeader::LogInGSSEditDialogTableHeader(QWidget* _parent)
+	: QHeaderView(Qt::Orientation::Horizontal, nullptr)
+{
+	
+}
+
+QSize LogInGSSEditDialogTableHeader::sectionSizeFromContents(int _logicalIndex) const {
+	QSize size = QHeaderView::sectionSizeFromContents(_logicalIndex);
+	if (_logicalIndex != (int)LogInGSSEditDialog::TableColumn::Delete) {
+		size.setWidth(std::max(size.width(), 220));
+	}
+	return size;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 LogInGSSEditDialogEntry::LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, LogInGSSEditDialog* _dialog)
 	: m_dialog(_dialog), m_dataChanged(false)
 {
@@ -240,10 +261,11 @@ LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entrie
 	}
 
 	m_table->setFocusPolicy(Qt::NoFocus);
-	m_table->horizontalHeader()->setSectionResizeMode((int)TableColumn::Name, QHeaderView::Stretch);
-	m_table->horizontalHeader()->setSectionResizeMode((int)TableColumn::Url, QHeaderView::ResizeToContents);
-	m_table->horizontalHeader()->setSectionResizeMode((int)TableColumn::Port, QHeaderView::ResizeToContents);
-	m_table->horizontalHeader()->setSectionResizeMode((int)TableColumn::Delete, QHeaderView::ResizeToContents);
+	m_table->setHorizontalHeader(new LogInGSSEditDialogTableHeader(m_table));
+	m_table->horizontalHeader()->setSectionResizeMode((int)LogInGSSEditDialog::TableColumn::Name, QHeaderView::Stretch);
+	m_table->horizontalHeader()->setSectionResizeMode((int)LogInGSSEditDialog::TableColumn::Url, QHeaderView::ResizeToContents);
+	m_table->horizontalHeader()->setSectionResizeMode((int)LogInGSSEditDialog::TableColumn::Port, QHeaderView::ResizeToContents);
+	m_table->horizontalHeader()->setSectionResizeMode((int)LogInGSSEditDialog::TableColumn::Delete, QHeaderView::ResizeToContents);
 
 	for (const LogInGSSEntry& entry : _entries) {
 		this->addEntry(entry);
@@ -271,6 +293,7 @@ LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entrie
 	this->setWindowTitle("Edit Global Session Services");
 	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 	this->setMinimumSize(550, 300);
+	this->resize(800, 400);
 
 	// Connect signals
 	this->connect(addButton, &PushButton::clicked, this, &LogInGSSEditDialog::slotAdd);

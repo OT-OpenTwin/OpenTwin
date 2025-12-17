@@ -26,6 +26,9 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTWidgets/Dialog.h"
 
+// Qt header
+#include <QtWidgets/qheaderview.h>
+
 // std header
 #include <vector>
 
@@ -37,6 +40,17 @@ namespace ot {
 	class Label;
 	class LineEdit;
 }
+
+class LogInGSSEditDialogTableHeader : public QHeaderView {
+	OT_DECL_NOCOPY(LogInGSSEditDialogTableHeader)
+	OT_DECL_NOMOVE(LogInGSSEditDialogTableHeader)
+	OT_DECL_NODEFAULT(LogInGSSEditDialogTableHeader)
+public:
+	LogInGSSEditDialogTableHeader(QWidget* _parent);
+
+protected:
+	QSize sectionSizeFromContents(int _logicalIndex) const override;
+};
 
 class LogInGSSEditDialogEntry : public QObject {
 	Q_OBJECT
@@ -87,6 +101,14 @@ class LogInGSSEditDialog : public ot::Dialog {
 	OT_DECL_NOMOVE(LogInGSSEditDialog)
 	OT_DECL_NODEFAULT(LogInGSSEditDialog)
 public:
+	enum class TableColumn {
+		Name,
+		Url,
+		Port,
+		Delete,
+		TableColumnCount
+	};
+
 	explicit LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entries, QWidget* _parent);
 	virtual ~LogInGSSEditDialog() {};
 
@@ -107,14 +129,6 @@ private:
 	void requestDeleteEntry(int _row);
 
 	QTableWidget* getTable(void) const { return m_table; };
-
-	enum class TableColumn {
-		Name,
-		Url,
-		Port,
-		Delete,
-		TableColumnCount
-	};
 
 	bool m_dataChanged;
 	QTableWidget* m_table;
