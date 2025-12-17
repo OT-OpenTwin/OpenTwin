@@ -216,7 +216,7 @@ std::string CartesianMeshToSTL::processMeshEntity(const ot::EntityInformation &m
 	// Iterate through the faces assigned to this mesh item
 	for (size_t faceIndex = 0; faceIndex < meshItem->getNumberFaces(); faceIndex++)
 	{
-		// bool reverseFace = meshItem->getFaceOrientation(faceIndex);
+		bool reverseFace = meshItem->getFaceOrientation(faceIndex);
 		int  faceId = abs(meshItem->getFaceId(faceIndex));
 
 		EntityMeshCartesianFace* meshFace = meshFacesList->getFace(faceId);
@@ -231,7 +231,7 @@ std::string CartesianMeshToSTL::processMeshEntity(const ot::EntityInformation &m
 		}
 
 		// Now we iterate through all directions and create the triangles for the quads belonging to this face
-		processFaceQuads(objectFile, meshDataEntity, meshFace, true);
+		processFaceQuads(objectFile, meshDataEntity, meshFace, reverseFace);
 	}
 
 	objectFile << "endsolid " << objectName << std::endl;
