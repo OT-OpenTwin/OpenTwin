@@ -205,8 +205,7 @@ ot::ReturnMessage FileHandler::textEditorSaveRequested(const std::string& _entit
 
 				for (const std::string& notifyService : entityBase->getServicesForCallback(EntityBase::Callback::DataNotify)) {
 					if (notifyService != OT_INFO_SERVICE_TYPE_MODEL) {
-						ot::JsonDocument notify;
-						notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
+						ot::JsonDocument notify = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(_entityName, _text, _nextChunkStartIndex);
 						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), notifyService);
 						workerThread.detach();
 					}
@@ -259,8 +258,7 @@ ot::ReturnMessage FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
 
 				for (const std::string& notifyService : entityBase->getServicesForCallback(EntityBase::Callback::DataNotify)) {
 					if (notifyService != OT_INFO_SERVICE_TYPE_MODEL) {
-						ot::JsonDocument notify;
-						notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
+						ot::JsonDocument notify = ot::TableActionHandler::createTableSaveRequestDocument(_cfg);
 						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), notifyService);
 						workerThread.detach();
 					}
