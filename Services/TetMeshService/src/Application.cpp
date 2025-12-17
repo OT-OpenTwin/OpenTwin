@@ -35,6 +35,8 @@
 #include "EntityAPI.h"
 
 #include "ModelState.h"
+#include "DocumentAPI.h"
+#include "GridFSFileInfo.h"
 
 #include <thread>	
 #include <filesystem>
@@ -327,11 +329,23 @@ void Application::importMesh(void)
 void Application::handleImportMesh(ot::JsonDocument& _doc) {
 	std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 
-	std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-	ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+	// Read data from GridFS
+	ot::GridFSFileInfo gridInfo(ot::json::getObject(_doc, OT_ACTION_PARAM_FILE_Content));
+
+	DataStorageAPI::DocumentAPI api;
+	uint8_t* dataBuffer = nullptr;
+	size_t length = 0;
+
+	bsoncxx::oid oid_obj{ gridInfo.getDocumentId() };
+	bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+
+	api.GetDocumentUsingGridFs(id, dataBuffer, length, gridInfo.getCollectionName());
+	api.DeleteGridFSData(id, gridInfo.getCollectionName());
+
+	std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
 
 	// Process the file content
-	importMeshFile(originalName, content, uncompressedDataLength);
+	importMeshFile(originalName, stringData, gridInfo.getUncompressedSize());
 }
 
 void Application::handleExportMesh(ot::JsonDocument& _doc) {

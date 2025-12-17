@@ -107,6 +107,8 @@
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
 #include "OTFMC/FMConnectorAPI.h"
 #include "ProgressUpdater.h"
+#include "DataBase.h"
+#include "DocumentAPI.h"
 #include "GridFSFileInfo.h"
 
 // uiCore header
@@ -4341,13 +4343,24 @@ void ExternalServicesComponent::workerImportSingleFile(QString _fileToImport, Im
 
 			std::string localEncodingFileName = _fileToImport.toLocal8Bit().constData();
 
-			// The file can not be directly accessed from the remote site and we need to send the file content over the communication
+			// The file can not be directly accessed from the remote site and we need to send the file content by using GridFS
 			ReadFileContent(localEncodingFileName, fileContent, uncompressedDataLength);
 
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
-			// We need to send the file content
+			ot::GridFSFileInfo info;
+			info.setCollectionName(DataBase::instance().getCollectionName());
+			info.setFileCompressed(uncompressedDataLength);
+
+			// Upload the data to gridFS
+			DataStorageAPI::DocumentAPI db;
+
+			bsoncxx::types::value result = db.InsertBinaryDataUsingGridFs(reinterpret_cast<const uint8_t*>(fileContent.c_str()), fileContent.size(), info.getCollectionName());
+			info.setDocumentId(result.get_oid().value.to_string());
+
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonObject(info, inDoc.GetAllocator()), inDoc.GetAllocator());
 			inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+		}
+		else {
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Name, inDoc.GetAllocator()), inDoc.GetAllocator());
 		}
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonString(_fileToImport.toStdString(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
@@ -4371,7 +4384,7 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(_info.fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(_info.additionalInfo, inDoc.GetAllocator()), inDoc.GetAllocator());
 
-		ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;
+		ot::JsonArray fileNamesJson, gridFSConfigs;
 		{
 			std::string progressBarMessage = "Importing files";
 			std::unique_ptr<ProgressUpdater> updater(nullptr);
@@ -4383,6 +4396,8 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 			std::string message = ("Import of " + std::to_string(_filesToImport.size()) + " file(s): ");
 
 			QMetaObject::invokeMethod(AppBase::instance(), &AppBase::appendInfoMessage, Qt::QueuedConnection, QString::fromStdString(message));
+
+			DataStorageAPI::DocumentAPI db;
 
 			auto startTime = std::chrono::system_clock::now();
 			for (const QString& fileName : _filesToImport) {
@@ -4397,9 +4412,18 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 					uint64_t uncompressedDataLength{ 0 };
 					// The file can not be directly accessed from the remote site and we need to send the file content over the communication
 					ReadFileContent(localEncodingString, fileContent, uncompressedDataLength);
-					fileContents.PushBack(ot::JsonString(fileContent, inDoc.GetAllocator()), inDoc.GetAllocator());
-					uncompressedDataLengths.PushBack(static_cast<int64_t>(uncompressedDataLength), inDoc.GetAllocator());
-					fileModes.PushBack(ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+
+					ot::GridFSFileInfo info;
+					info.setCollectionName(DataBase::instance().getCollectionName());
+					info.setFileCompressed(uncompressedDataLength);
+
+					// Upload the data to gridFS
+					DataStorageAPI::DocumentAPI db;
+
+					bsoncxx::types::value result = db.InsertBinaryDataUsingGridFs(reinterpret_cast<const uint8_t*>(fileContent.c_str()), fileContent.size(), info.getCollectionName());
+					info.setDocumentId(result.get_oid().value.to_string());
+
+					gridFSConfigs.PushBack(ot::JsonObject(info, inDoc.GetAllocator()), inDoc.GetAllocator());
 					assert(updater != nullptr);
 					updater->triggerUpdate(counter);
 				}
@@ -4412,9 +4436,11 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 		}
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, fileNamesJson, inDoc.GetAllocator());
 		if (_info.loadContent) {
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, fileContents, inDoc.GetAllocator());
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLengths, inDoc.GetAllocator());
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, fileModes, inDoc.GetAllocator());
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, gridFSConfigs, inDoc.GetAllocator());
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+		}
+		else {
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Name, inDoc.GetAllocator()), inDoc.GetAllocator());
 		}
 
 		std::string json = inDoc.toJson();

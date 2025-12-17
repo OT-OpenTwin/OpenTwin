@@ -45,6 +45,9 @@
 #include "OTGui/PainterRainbowIterator.h"
 
 #include "EntityAPI.h"
+#include "GridFSFileInfo.h"
+#include "DataBase.h"
+#include "DocumentAPI.h"
 #include "EntityBatchImporter.h"
 #include "InvalidUID.h"
 
@@ -311,10 +314,23 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		else if (_action == "importTouchstoneData") {
 			std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 
-			std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-			ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+			// Read data from GridFS
+			ot::GridFSFileInfo gridInfo(ot::json::getObject(_doc, OT_ACTION_PARAM_FILE_Content));
+
+			DataStorageAPI::DocumentAPI api;
+			uint8_t* dataBuffer = nullptr;
+			size_t length = 0;
+
+			bsoncxx::oid oid_obj{ gridInfo.getDocumentId() };
+			bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+
+			api.GetDocumentUsingGridFs(id, dataBuffer, length, gridInfo.getCollectionName());
+			api.DeleteGridFSData(id, gridInfo.getCollectionName());
+
+			std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
+
 			int32_t numberOfPorts = _touchstoneToResultdata->getAssumptionOfPortNumber(originalName);
-			_touchstoneToResultdata->setResultdata(originalName, fileContent, uncompressedDataLength);
+			_touchstoneToResultdata->setResultdata(originalName, stringData, gridInfo.getUncompressedSize());
 
 			ot::JsonDocument requestNumberOfPortsDoc;
 			requestNumberOfPortsDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_OnePropertyDialog, requestNumberOfPortsDoc.GetAllocator());

@@ -109,16 +109,17 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 {
 	auto uiComponent =	Application::instance()->getUiComponent();
 	ot::UILockWrapper uiLock(uiComponent, ot::LockType::ModelWrite);
-	std::list<std::string> contents = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_Content);
-	std::list<int64_t> 	uncompressedDataLengths = ot::json::getInt64List(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+	std::list<ot::GridFSFileInfo> fileInfos;
+	for (const ot::ConstJsonObject& fileInfoObj : ot::json::getObjectList(_document, OT_ACTION_PARAM_FILE_Content)) {
+		fileInfos.push_back(ot::GridFSFileInfo(fileInfoObj));
+	}
 	std::list<std::string> fileNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_OriginalName);
 	std::string fileFilter = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
 
-	assert(fileNames.size() == contents.size() && contents.size() == uncompressedDataLengths.size());
+	assert(fileInfos.size() == fileNames.size());
 	{
 		QueuingDatabaseWritingRAII queueDatabase;
-		auto uncompressedDataLength = uncompressedDataLengths.begin();
-		auto content = contents.begin();
+		auto info = fileInfos.begin();
 		
 		ProgressUpdater updater(uiComponent, "Importing files");
 		updater.setTotalNumberOfSteps(fileNames.size());
@@ -132,12 +133,24 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 		for (std::string& fileName : fileNames)
 		{
 			counter++;
-			uint64_t dataLen = static_cast<uint64_t>(*uncompressedDataLength);
-			std::unique_ptr<uint8_t> data(ot::String::decompressBase64(content->c_str(), dataLen));
+			uint64_t dataLen = static_cast<uint64_t>(info->getUncompressedSize());
+
+			DataStorageAPI::DocumentAPI api;
+			uint8_t* dataBuffer = nullptr;
+			size_t length = 0;
+
+			bsoncxx::oid oid_obj{ info->getDocumentId() };
+			bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+
+			api.GetDocumentUsingGridFs(id, dataBuffer, length, info->getCollectionName());
+			api.DeleteGridFSData(id, info->getCollectionName());
+
+			std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
+
+			std::unique_ptr<uint8_t> data(ot::String::decompressBase64(stringData.c_str(), dataLen));
 		
 			storeFileInDataBase(std::string(reinterpret_cast<const char*>(data.get()), dataLen), fileName, folderContent, _folderName, fileFilter);
-			uncompressedDataLength++;
-			content++;
+			info++;
 			updater.triggerUpdate(counter);
 		}
 		auto end = std::chrono::system_clock::now();

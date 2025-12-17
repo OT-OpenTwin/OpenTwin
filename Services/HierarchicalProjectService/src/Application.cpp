@@ -61,6 +61,10 @@
 #include "EntityBlockHierarchicalProjectItem.h"
 #include "EntityBlockHierarchicalDocumentItem.h"
 
+// DataBase
+#include "DocumentAPI.h"
+#include "GridFSFileInfo.h"
+
 // std header
 #include <thread>
 
@@ -284,10 +288,33 @@ void Application::handleProjectSelected(ot::JsonDocument& _doc) {
 }
 
 void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
-	std::list<std::string> contents = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Content);
-	std::list<int64_t> uncompressedDataLengths = ot::json::getInt64List(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 	std::list<std::string> fileNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+	std::list<ot::ConstJsonObject> gridInfos = ot::json::getObjectList(_doc, OT_ACTION_PARAM_FILE_Content);
+
+	// Read data from GridFS
+	DataStorageAPI::DocumentAPI api;
+
+	std::list<std::string> contents;
+	std::list<int64_t> uncompressedDataLengths;
+
+	for (const ot::ConstJsonObject& gridInfoObj : gridInfos) {
+		ot::GridFSFileInfo gridInfo(gridInfoObj);
+
+		uint8_t* dataBuffer = nullptr;
+		size_t length = 0;
+
+		bsoncxx::oid oid_obj{ gridInfo.getDocumentId() };
+		bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+
+		api.GetDocumentUsingGridFs(id, dataBuffer, length, gridInfo.getCollectionName());
+		api.DeleteGridFSData(id, gridInfo.getCollectionName());
+
+		std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
+
+		contents.push_back(std::move(stringData));
+		uncompressedDataLengths.push_back(gridInfo.getUncompressedSize());
+	}
 
 	m_entityHandler.addDocuments(fileNames, contents, uncompressedDataLengths, fileFilter);
 }
@@ -298,20 +325,57 @@ void Application::handleProjectImageSelected(ot::JsonDocument& _doc) {
 		return;
 	}
 
-	std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-	int64_t uncompressedDataLength = ot::json::getInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+	// Read data from GridFS
+	ot::GridFSFileInfo gridInfo(ot::json::getObject(_doc, OT_ACTION_PARAM_FILE_Content));
+	DataStorageAPI::DocumentAPI api;
+
+	uint8_t* dataBuffer = nullptr;
+	size_t length = 0;
+
+	bsoncxx::oid oid_obj{ gridInfo.getDocumentId() };
+	bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+
+	api.GetDocumentUsingGridFs(id, dataBuffer, length, gridInfo.getCollectionName());
+	api.DeleteGridFSData(id, gridInfo.getCollectionName());
+
+	std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
+
 	std::string fileName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
 	std::string projectEntityName = ot::json::getString(_doc, OT_ACTION_PARAM_Info);
 
-	m_entityHandler.addImageToProject(projectEntityName, fileName, content, uncompressedDataLength, fileFilter);
+	m_entityHandler.addImageToProject(projectEntityName, fileName, stringData, gridInfo.getUncompressedSize(), fileFilter);
 }
 
 void Application::handleImageSelected(ot::JsonDocument& _doc) {
-	std::list<std::string> contents = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Content);
-	std::list<int64_t> uncompressedDataLengths = ot::json::getInt64List(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 	std::list<std::string> fileNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
+
+	std::list<ot::ConstJsonObject> gridInfos = ot::json::getObjectList(_doc, OT_ACTION_PARAM_FILE_Content);
+
+	// Read data from GridFS
+	DataStorageAPI::DocumentAPI api;
+
+	std::list<std::string> contents;
+	std::list<int64_t> uncompressedDataLengths;
+
+	for (const ot::ConstJsonObject& gridInfoObj : gridInfos) {
+		ot::GridFSFileInfo gridInfo(gridInfoObj);
+
+		uint8_t* dataBuffer = nullptr;
+		size_t length = 0;
+
+		bsoncxx::oid oid_obj{ gridInfo.getDocumentId() };
+		bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+
+		api.GetDocumentUsingGridFs(id, dataBuffer, length, gridInfo.getCollectionName());
+		api.DeleteGridFSData(id, gridInfo.getCollectionName());
+
+		std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
+
+		contents.push_back(std::move(stringData));
+		uncompressedDataLengths.push_back(gridInfo.getUncompressedSize());
+	}
 
 	m_entityHandler.addImages(fileNames, contents, uncompressedDataLengths, fileFilter);
 }

@@ -42,6 +42,20 @@ namespace ot {
 
 		// File operations
 
+		//! @brief Requests a file for reading from the frontend.
+		//! @param _callbackAction The action to be called when the file has been selected.
+		//! The will receive the following parameters:
+		//! - OT_ACTION_PARAM_FILE_Mask: The file mask that was used in the request.
+		//! - OT_ACTION_PARAM_Info: The additional info that was used in the request.
+		//! - OT_ACTION_PARAM_FILE_Mode: Only if _loadContent was true.
+		//! - OT_ACTION_PARAM_FILE_Content: The GridFSFileInfo config holding the file information if _loadContent was true (Array if _loadMultiple was true).
+		//! - OT_ACTION_PARAM_FILE_OriginalName: The original file path as selected by the user (Array if _loadMultiple was true).
+		//! @param _dialogTitle The title of the file dialog.
+		//! @param _fileMask The file mask to be used in the dialog.
+		//! @param _loadContent Whether the file content should be loaded and sent to the service.
+		//! @param _loadMultiple Whether multiple files may be selected.
+		//! @param _additionalInfo Additional info that will be sent back with the callback action.
+		//! @return True if the request was sent successfully, false otherwise.
 		static bool requestFileForReading(const std::string& _callbackAction, const std::string& _dialogTitle, const std::string& _fileMask, bool _loadContent, bool _loadMultiple, const std::string& _additionalInfo = std::string());
 
 		static bool requestFileForWriting(const std::string& _callbackAction, const std::string& _dialogTitle, const std::string& _fileMask, const std::string& _additionalInfo = std::string());
