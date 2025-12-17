@@ -28,6 +28,7 @@ void ot::VisualisationCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloc
 	_object.AddMember("VisualisingEntities", JsonArray(m_visualisingEntities, _allocator), _allocator);
 	_object.AddMember("SupressViewHandling", m_supressViewHandling, _allocator);
 	_object.AddMember("VisualisationType", JsonString(m_visualisationType, _allocator), _allocator);
+	_object.AddMember("IsAppend", m_isAppend, _allocator);
 
 	if (m_customViewFlags.has_value()) {
 		_object.AddMember("CustomViewFlags", JsonArray(WidgetViewBase::toStringList(m_customViewFlags.value()), _allocator), _allocator);
@@ -45,6 +46,7 @@ void ot::VisualisationCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	m_visualisingEntities = json::getUInt64List(_object, "VisualisingEntities");
 	m_supressViewHandling = json::getBool(_object, "SupressViewHandling");
 	m_visualisationType = json::getString(_object, "VisualisationType");
+	m_isAppend = json::getBool(_object, "IsAppend");
 
 	if (_object["CustomViewFlags"].IsNull()) {
 		m_customViewFlags = std::nullopt;

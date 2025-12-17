@@ -55,6 +55,6 @@ private Q_SLOTS:
 
 private:
 	void workerRequestRemainingData(size_t _nextChunkStartIndex);
-	ot::JsonDocument createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex, bool _nextChunkOnly) const;
+	ot::JsonDocument createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex, bool _nextChunkOnly, bool _isAppend) const;
 
 };

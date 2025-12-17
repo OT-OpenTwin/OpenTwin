@@ -85,7 +85,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 
 		IVisualisationText* textEntity = dynamic_cast<IVisualisationText*>(baseEntity);
 		assert(textEntity != nullptr);
-		if (textEntity != nullptr && textEntity->visualiseText())
+		if (textEntity != nullptr && (textEntity->visualiseText() || _visualisationCfg.getIsAppend()))
 		{
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, document.GetAllocator());
 

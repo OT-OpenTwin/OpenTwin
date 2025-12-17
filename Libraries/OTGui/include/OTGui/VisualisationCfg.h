@@ -76,11 +76,15 @@ namespace ot
 		void setCustomViewFlags(const ot::WidgetViewBase::ViewFlags& _flags) { m_customViewFlags = _flags; };
 		const std::optional<ot::WidgetViewBase::ViewFlags>& getCustomViewFlags() const { return m_customViewFlags; };
 
+		void setIsAppend(bool _isAppend) { m_isAppend = _isAppend; };
+		bool getIsAppend() const { return m_isAppend; };
+
 	private:
 		bool m_setAsActiveView = true;
 		ot::UIDList m_visualisingEntities;
 		bool m_overrideViewerContent = true;
 		bool m_loadNextChunkOnly = false;
+		bool m_isAppend = false;
 		size_t m_nextChunkStartIndex = 0;
 		bool m_supressViewHandling = false;
 		std::string m_visualisationType = "";

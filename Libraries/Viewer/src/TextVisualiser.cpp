@@ -50,7 +50,7 @@ bool TextVisualiser::requestVisualization(const VisualiserState& _state)
 		{
 			if(_state.m_selected)
 			{
-				FrontendAPI::instance()->messageModelService(createRequestDoc(_state, 0, true).toJson());
+				FrontendAPI::instance()->messageModelService(createRequestDoc(_state, 0, true, false).toJson());
 				return true;
 			}
 		}
@@ -67,7 +67,7 @@ bool TextVisualiser::requestNextDataChunk(size_t _nextChunkStartIndex) {
 
 	VisualiserState state;
 	state.m_setFocus = false;
-	FrontendAPI::instance()->messageModelService(createRequestDoc(state, _nextChunkStartIndex, true).toJson());
+	FrontendAPI::instance()->messageModelService(createRequestDoc(state, _nextChunkStartIndex, true, true).toJson());
 	return true;
 }
 
@@ -170,11 +170,12 @@ void TextVisualiser::workerRequestRemainingData(size_t _nextChunkStartIndex) {
 	FrontendAPI::instance()->setProgressBarVisibility("Export text", false, true);
 }
 
-ot::JsonDocument TextVisualiser::createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex, bool _nextChunkOnly) const {
+ot::JsonDocument TextVisualiser::createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex, bool _nextChunkOnly, bool _isAppend) const {
 	ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
 	visualisationCfg.setNextChunkStartIndex(_nextChunkStartIndex);
 	visualisationCfg.setLoadNextChunkOnly(_nextChunkOnly);
 	visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TEXTEDITOR_Setup);
+	visualisationCfg.setIsAppend(_isAppend);
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
