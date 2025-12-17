@@ -41,7 +41,7 @@ class EntityBinaryData;
 class EntityBlockHierarchicalDocumentItem;
 
 class Application : public ot::ApplicationBase, public ot::ActionHandler, 
-	public ot::ButtonHandler, public ot::GraphicsActionHandler
+	public ot::ButtonHandler, public ot::GraphicsActionHandler, public ot::TextEditorActionHandler, public ot::TableActionHandler
 {
 private:
 	Application();
