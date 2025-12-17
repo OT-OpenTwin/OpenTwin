@@ -190,7 +190,7 @@ void Application::addSolver() {
 	ot::EntityInformation entityInfo;
 	ot::ModelServiceAPI::getEntityInformation("Circuits", entityInfo);
 
-	solverEntity->createProperties("Circuits", entityInfo.getEntityID(), circuitName, circuitID);
+	solverEntity->createProperties("Circuits", entityInfo.getEntityID(), circuitName);
 	solverEntity->storeToDataBase();
 
 	// Register the new solver item in the model

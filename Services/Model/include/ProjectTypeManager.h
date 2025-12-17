@@ -45,7 +45,11 @@ public:
 
 	std::string getRMDCategorizationName()          { return m_RMDCategorizationName; }
 	std::string getDatasetRMD()                     { return m_datasetRMD; }
-	std::string getCircuitName()						{ return m_circuitName; }
+	std::string getCircuitName()					{ return m_circuitName; }
+	std::string getCircuitSolverName()              { return m_circuitSolverName; }
+	std::string getPiplineSolverName()				{ return m_pipelineSolverName; }
+	std::string getPipelineName()					{ return m_pipelineName; }	
+	std::string getSolverRootName()					{ return m_solverRootName; }
 	std::string getViews();
 
 	std::string getDatasetRootName();
@@ -86,6 +90,10 @@ private:
 	std::string m_RMDCategorizationName;
 	std::string m_datasetRMD;
 	std::string m_circuitName;
+	std::string m_circuitSolverName;
+	std::string m_pipelineSolverName;
+	std::string m_pipelineName;
+	std::string m_solverRootName;
 };
 
 

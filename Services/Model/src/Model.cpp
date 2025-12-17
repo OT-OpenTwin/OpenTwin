@@ -41,6 +41,8 @@
 #include "EntityBlockConnection.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
 #include "OTGuiAPI/Frontend.h"
+#include "EntitySolverCircuitSimulator.h"
+#include "EntitySolverDataProcessing.h"
 
 #include "MicroserviceNotifier.h"
 #include "GeometryOperations.h"
@@ -97,6 +99,7 @@
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyString.h"
 #include "OTGui/VersionGraphVersionCfg.h"
+#include "PropertyHelper.h"
 
 #include "MetadataEntityInterface.h"
 
@@ -221,11 +224,8 @@ void Model::resetToNew()
 		EntityBase* entityCircuitsRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityCircuitsRoot->setName(getCircuitsRootName());
 		addEntityToModel(entityCircuitsRoot->getName(), entityCircuitsRoot, entityRoot, true, allNewEntities);
-	}
 
-	if (typeManager.hasCircuit())
-	{
-		EntityGraphicsScene* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, nullptr, nullptr);
+		EntityGraphicsScene* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, this, getStateManager());
 		entityCircuit->setName(typeManager.getCircuitName());
 		entityCircuit->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		entityCircuit->setSceneFlags(EntityGraphicsScene::DefaultFlags | EntityGraphicsScene::AllowConnectionsOnConnections);
@@ -236,6 +236,28 @@ void Model::resetToNew()
 			OT_INFO_SERVICE_TYPE_CircuitSimulatorService
 		);
 		addEntityToModel(entityCircuit->getName(), entityCircuit, entityRoot, true, allNewEntities);
+
+		EntityBase* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
+		entitySolverRoot->setName(typeManager.getSolverRootName());
+		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
+
+		EntitySolverCircuitSimulator* circuitSolver = new EntitySolverCircuitSimulator(createEntityUID(), nullptr, this, getStateManager());
+		circuitSolver->setName(typeManager.getCircuitSolverName());
+		circuitSolver->setTreeItemEditable(true);
+		circuitSolver->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection,
+			OT_INFO_SERVICE_TYPE_CircuitSimulatorService
+		);
+		circuitSolver->createProperties(ot::FolderNames::CircuitsFolder, entityCircuitsRoot->getEntityID(), entityCircuitsRoot->getName());
+
+		if (PropertyHelper::hasProperty(circuitSolver, "Circuit")) {
+			EntityPropertiesEntityList* circuitProperty = PropertyHelper::getEntityListProperty(circuitSolver,"Circuit");
+			circuitProperty->setValueName(entityCircuit->getName());
+			circuitProperty->setValueID(entityCircuit->getEntityID());
+		}
+
+		addEntityToModel(circuitSolver->getName(), circuitSolver, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasMaterialRoot())
@@ -281,6 +303,39 @@ void Model::resetToNew()
 		EntityContainer* dataProcessingRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		dataProcessingRoot->setName(ot::FolderNames::DataProcessingFolder);
 		addEntityToModel(dataProcessingRoot->getName(), dataProcessingRoot, entityRoot, true, allNewEntities);
+
+		EntityGraphicsScene* entityPipeline = new EntityGraphicsScene(createEntityUID(), nullptr, this, getStateManager());
+		entityPipeline->setName(typeManager.getPipelineName());
+		entityPipeline->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
+		entityPipeline->setSceneFlags(EntityGraphicsScene::DefaultFlags);
+		entityPipeline->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection,
+			OT_INFO_SERVICE_TYPE_DataProcessingService
+		);
+		addEntityToModel(entityPipeline->getName(), entityPipeline, entityRoot, true, allNewEntities);
+
+		EntityBase* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
+		entitySolverRoot->setName(typeManager.getSolverRootName());
+		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
+
+		EntitySolverDataProcessing* pipelineSolver = new EntitySolverDataProcessing(createEntityUID(), nullptr, this, getStateManager());
+		pipelineSolver->setName(typeManager.getPiplineSolverName());
+		pipelineSolver->setTreeItemEditable(true);
+		pipelineSolver->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection,
+			OT_INFO_SERVICE_TYPE_DataProcessingService
+		);
+		pipelineSolver->createProperties(dataProcessingRoot->getName(), dataProcessingRoot->getEntityID());
+
+		if (PropertyHelper::hasProperty(pipelineSolver, "Pipeline to run")) {
+			EntityPropertiesEntityList* pipelineProperty = PropertyHelper::getEntityListProperty(pipelineSolver, "Pipeline to run");
+			pipelineProperty->setValueName(entityPipeline->getName());
+			pipelineProperty->setValueID(entityPipeline->getEntityID());
+		}
+
+		addEntityToModel(pipelineSolver->getName(), pipelineSolver, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasUnitRoot())

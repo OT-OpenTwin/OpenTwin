@@ -32,7 +32,7 @@ EntitySolverCircuitSimulator::~EntitySolverCircuitSimulator()
 {
 }
 
-void EntitySolverCircuitSimulator::createProperties(const std::string circuitFolderName, ot::UID circuitFolderID, const std::string circuitName, ot::UID circuitID)
+void EntitySolverCircuitSimulator::createProperties(const std::string circuitFolderName, ot::UID circuitFolderID, const std::string circuitName)
 {
 	EntityPropertiesSelection::createProperty("Settings","Simulation Type", {".dc",".TRAN",".ac"}, ".dc", "default", getProperties());
 	EntityPropertiesEntityList::createProperty("Settings", "Circuit", circuitFolderName, circuitFolderID, "", -1, "default", getProperties());

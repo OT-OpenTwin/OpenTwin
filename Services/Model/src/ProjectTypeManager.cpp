@@ -31,7 +31,11 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 {
 	m_RMDCategorizationName = getDataCategorizationRootName() + "/Campaign Metadata";
 	m_datasetRMD = getDatasetRootName() + "/Campaign Metadata";
-	m_circuitName = ot::FolderNames::CircuitsFolder + "/Circuit 1";
+	m_circuitName = ot::FolderNames::CircuitsFolder + "/Circuit";
+	m_circuitSolverName = ot::FolderNames::SolverFolder + "/CircuitSimulator";
+	m_pipelineSolverName = ot::FolderNames::SolverFolder + "/Pipeline Solver";
+	m_pipelineName = ot::FolderNames::DataProcessingFolder + "/Pipeline";
+	m_solverRootName = ot::FolderNames::SolverFolder;
 
 	if (projectType == OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT)
 	{
