@@ -126,9 +126,9 @@ private:
 
 	ot::ReturnMessage requestToOpenRawDataDocument(EntityBinaryData* _data, const EntityBlockHierarchicalDocumentItem* _block);
 
-	ot::ReturnMessage requestToOpenTextDocument(EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block);
+	ot::ReturnMessage requestToOpenTextDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block);
 
-	ot::ReturnMessage requestToOpenCSVDocument(EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block);
+	ot::ReturnMessage requestToOpenCSVDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

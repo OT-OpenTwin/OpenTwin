@@ -674,7 +674,7 @@ ot::ReturnMessage Application::requestToOpenDocument(const ot::EntityInformation
 
 	// Dispatch based on document type
 	if (documentEntity->getDocumentType() == EntityFileText::className()) {
-		return this->requestToOpenTextDocument(data, documentEntity);
+		return this->requestToOpenTextDocument(documentEntity->getEntityID(), data, documentEntity);
 	}
 	else {
 		return this->requestToOpenRawDataDocument(data, documentEntity);
@@ -703,7 +703,7 @@ ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBinaryData* _d
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage Application::requestToOpenTextDocument(EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block) {
+ot::ReturnMessage Application::requestToOpenTextDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block) {
 	OTAssertNullptr(_data);
 	
 	ot::JsonDocument doc;
@@ -713,18 +713,14 @@ ot::ReturnMessage Application::requestToOpenTextDocument(EntityBinaryData* _data
 	visCfg.setOverrideViewerContent(true);
 	visCfg.setLoadNextChunkOnly(true);
 	visCfg.setNextChunkStartIndex(0);
+	visCfg.addVisualisingEntity(_visualizingEntity);
 	doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, ot::JsonObject(visCfg, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::BasicServiceInformation modelInfo(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
 	modelInfo.addToJsonObject(doc, doc.GetAllocator());
 
-	ot::TextEditorCfg configuration = _block->createConfig(visCfg);
-	configuration.setPlainText(std::string(_data->getData().begin(), _data->getData().end()));
-
-	ot::JsonObject cfgObj;
-	configuration.addToJsonObject(cfgObj, doc.GetAllocator());
-
-	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
+	const ot::TextEditorCfg configuration = _block->createConfig(visCfg);
+	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(configuration, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
 	this->getUiComponent()->sendMessage(true, doc, tmp);
@@ -732,7 +728,7 @@ ot::ReturnMessage Application::requestToOpenTextDocument(EntityBinaryData* _data
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage Application::requestToOpenCSVDocument(EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block) {
+ot::ReturnMessage Application::requestToOpenCSVDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block) {
 	
 
 	return ot::ReturnMessage::Ok;
