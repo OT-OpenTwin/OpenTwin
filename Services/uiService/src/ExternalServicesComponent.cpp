@@ -42,6 +42,7 @@
 #include "OTCore/String.h"
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"
+#include "OTSystem/FileSystem.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/OwnerServiceGlobal.h"
@@ -1559,28 +1560,60 @@ void ExternalServicesComponent::saveProject() {
 
 // File operations
 
-void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std::string &fileContent, unsigned long long &uncompressedDataLength)
+bool ExternalServicesComponent::readFileContent(const std::string &fileName, std::string &fileContent, unsigned long long &uncompressedDataLength)
 {
 	fileContent.clear();
+	uncompressedDataLength = 0;
+
+	/*
 
 	// Read the file content
 	std::ifstream file(fileName, std::ios::binary | std::ios::ate);
-	int data_length = (int)file.tellg();
+	if (!file.is_open()) {
+		OT_LOG_E("Failed to open file for reading: \"" + fileName + "\"");
+		return;
+	}
+
+	const std::ifstream::pos_type fileSize = file.tellg();
+	if (fileSize == 0) {
+		// File is empty
+		return;
+	}
+	else if (fileSize < 0) {
+		OT_LOG_E("Failed to determine file size: \"" + fileName + "\"");
+		return;
+	}
+
 	file.seekg(0, std::ios::beg);
 
-	char *data = new char[data_length];
-	if (!file.read(data, data_length)) return;
+	const uLong dataLength = static_cast<uLong>(fileSize);
+	char *data = new char[dataLength];
+	if (!file.read(data, dataLength)) {
+		delete[] data;
+		OT_LOG_E("Failed to read file content: \"" + fileName + "\"");
+		return;
+	}
 
-	uncompressedDataLength = data_length;
+	uncompressedDataLength = static_cast<unsigned long long>(dataLength);
+	*/
+
+	std::string uncompressedContent;
+	if (!ot::FileSystem::readFile(fileName, uncompressedContent, uncompressedDataLength)) {
+		OT_LOG_E("Failed to read file content: \"" + fileName + "\"");
+		return false;
+	}
+
+	constexpr uint64_t maxFileSize = ((uint64_t)1 * 1024 * 1024 * 1024); // 1 GB
+	if (uncompressedDataLength > maxFileSize) {
+		OT_LOG_E("File too large to be processed (max: 1GB, File Size: " + ot::FileSystem::toFileSizeString(uncompressedDataLength) + "): \"" + fileName + "\"");
+		return false;
+	}
 
 	// Compress the file data content
-	uLong compressedSize = compressBound((uLong)data_length);
+	uLong compressedSize = compressBound(uncompressedDataLength);
 
 	char *compressedData = new char[compressedSize];
-	compress((Bytef*)compressedData, &compressedSize, (Bytef*)data, data_length);
-
-	delete[] data;
-	data = nullptr;
+	compress((Bytef*)compressedData, &compressedSize, (Bytef*)uncompressedContent.c_str(), uncompressedDataLength);
 
 	// Convert the binary to an encoded string
 	int encoded_data_length = Base64encode_len(compressedSize);
@@ -1595,6 +1628,8 @@ void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std
 
 	delete[] base64_string;
 	base64_string = nullptr;
+
+	return true;
 }
 
 // Slots
@@ -4344,7 +4379,10 @@ void ExternalServicesComponent::workerImportSingleFile(QString _fileToImport, Im
 			std::string localEncodingFileName = _fileToImport.toLocal8Bit().constData();
 
 			// The file can not be directly accessed from the remote site and we need to send the file content by using GridFS
-			ReadFileContent(localEncodingFileName, fileContent, uncompressedDataLength);
+			if (!readFileContent(localEncodingFileName, fileContent, uncompressedDataLength)) {
+				QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, std::string(), std::string());
+				return;
+			}
 
 			ot::GridFSFileInfo info;
 			info.setCollectionName(DataBase::instance().getCollectionName());
@@ -4411,7 +4449,10 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 					std::string fileContent;
 					uint64_t uncompressedDataLength{ 0 };
 					// The file can not be directly accessed from the remote site and we need to send the file content over the communication
-					ReadFileContent(localEncodingString, fileContent, uncompressedDataLength);
+					if (!readFileContent(localEncodingString, fileContent, uncompressedDataLength)) {
+						QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, std::string(), std::string());
+						return;
+					}
 
 					ot::GridFSFileInfo info;
 					info.setCollectionName(DataBase::instance().getCollectionName());

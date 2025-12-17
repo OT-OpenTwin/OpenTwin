@@ -186,7 +186,7 @@ public:
 
 	// File operations
 	
-	void ReadFileContent(const std::string& fileName, std::string& fileContent, unsigned long long& uncompressedDataLength);
+	OT_DECL_NODISCARD bool readFileContent(const std::string& fileName, std::string& fileContent, unsigned long long& uncompressedDataLength);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
