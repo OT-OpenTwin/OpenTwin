@@ -77,6 +77,11 @@ namespace ot {
 		//! @throw ot::FileOpenException in case the file could not be opened.
 		//! @throw std::ios_base::failure in case of serious IO error.
 		static std::list<std::string> readLines(const std::string& _filePath, std::ifstream::iostate _exceptionMask = std::ifstream::badbit);
+
+		//! @brief Converts a file size in bytes to a human-readable string.
+		//! @param _bytes File size in bytes.
+		//! @param _precision Number of decimal places.
+		static std::string toFileSizeString(uint64_t _bytes, int _precision = 2);
 	};
 
 }

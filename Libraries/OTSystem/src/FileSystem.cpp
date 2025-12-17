@@ -18,11 +18,16 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTSystem/OTAssert.h"
 #include "OTSystem/Exception.h"
 #include "OTSystem/FileSystem.h"
-#include <assert.h>
+
 // std header
+#include <string>
+#include <vector>
+#include <sstream>
 #include <filesystem>
+
 #ifdef OT_OS_WINDOWS
     #include <Windows.h>
 #else
@@ -342,4 +347,40 @@ std::list<std::string> ot::FileSystem::readLines(const std::string& _filePath, s
     }
 
     return lines;
+}
+
+std::string ot::FileSystem::toFileSizeString(uint64_t _bytes, int _precision) {
+    static std::vector<std::string> units {
+        "B", "KB", "MB", "GB", "TB", "PB", "EB"
+    };
+
+    if (_bytes == 0) {
+        return "0B";
+    }
+
+    double value = static_cast<double>(_bytes);
+    size_t unitIndex = 0;
+
+    while (value >= 1024.0 && unitIndex + 1 < units.size()) {
+        value /= 1024.0;
+        unitIndex++;
+    }
+
+    std::ostringstream stream;
+    stream.imbue(std::locale::classic());
+    stream << std::fixed << std::setprecision(_precision) << value;
+
+    std::string result = stream.str();
+
+    // Remove trailing zeros and optional decimal point
+    if (_precision > 0) {
+        result.erase(result.find_last_not_of('0') + 1);
+        if (!result.empty() && result.back() == '.') {
+            result.pop_back();
+        }
+    }
+
+	OTAssert(unitIndex >= 0 && unitIndex < units.size(), "Unit index out of range");
+    result.append(units[unitIndex]);
+    return result;
 }
