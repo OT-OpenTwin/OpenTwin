@@ -75,6 +75,8 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 			tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
 
 			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
+
+			Application::instance()->queuedRequestToFrontend(document);
 		}
 	}
 	else if (_visualisationCfg.getVisualisationType() == OT_ACTION_CMD_UI_TEXTEDITOR_Setup)
@@ -97,6 +99,8 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 			configuration.addToJsonObject(cfgObj, document.GetAllocator());
 
 			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
+
+			Application::instance()->queuedRequestToFrontend(document);
 		}
 	}
 	else if (_visualisationCfg.getVisualisationType() == OT_ACTION_CMD_VIEW1D_Setup)
@@ -133,6 +137,8 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 
 				document.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgs, document.GetAllocator());
 			}
+
+			Application::instance()->queuedRequestToFrontend(document);
 		}
 		else
 		{
@@ -152,15 +158,14 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 			document.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, document.GetAllocator());
 			
 			setupGraphicsScene(baseEntity);
+
+			Application::instance()->queuedRequestToFrontend(document);
 		}
 	}
 	else
 	{
 		OT_LOG_WAS("Unknown visualization request: \"" + _visualisationCfg.getVisualisationType() + "\"");
-		return;
 	}
-
-	Application::instance()->queuedRequestToFrontend(document);
 }
 
 void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
