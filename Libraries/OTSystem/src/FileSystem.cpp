@@ -50,6 +50,60 @@ namespace ot {
     }
 }
 
+bool ot::FileSystem::readFile(const std::string& _filePath, std::string& _outputContent, uint64_t& _fileSize, std::ifstream::iostate _exceptionMask) {
+    _outputContent.clear();
+    _fileSize = 0;
+
+    std::ifstream file;
+    file.exceptions(_exceptionMask);
+
+    try {
+        // Open file
+        file.open(_filePath, std::ios::binary | std::ios::ate);
+        if (!file.is_open()) {
+            return false;
+        }
+
+        // Determine file size
+        const std::ifstream::pos_type pos = file.tellg();
+        if (pos == std::ifstream::pos_type(-1)) {
+            return false;
+        }
+
+        const std::streamoff sizeOff = static_cast<std::streamoff>(pos);
+        if (sizeOff < 0) {
+            return false;
+        }
+
+        _fileSize = static_cast<uint64_t>(sizeOff);
+
+        // Guard against std::string size overflow
+        if (_fileSize > _outputContent.max_size()) {
+            return false;
+        }
+
+        // Read file
+        _outputContent.resize(static_cast<std::size_t>(_fileSize));
+        file.seekg(0, std::ios::beg);
+
+        if (_fileSize > 0) {
+            file.read(&_outputContent[0], static_cast<std::streamsize>(_fileSize));
+            if (!file) {
+                _outputContent.clear();
+                _fileSize = 0;
+                return false;
+            }
+        }
+
+        return true;
+    }
+    catch (const std::ios_base::failure&) {
+        _outputContent.clear();
+        _fileSize = 0;
+        return false;
+    }
+}
+
 std::list<std::string> ot::FileSystem::getDirectories(const std::string& _path, const FileSystemOptions& _options) {
 	std::list<std::string> result;
 

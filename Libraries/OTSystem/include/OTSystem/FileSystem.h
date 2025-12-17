@@ -42,6 +42,13 @@ namespace ot {
 		};
 		typedef Flags<FileSystemOption> FileSystemOptions;
 
+		//! @brief Reads the entire content of a file.
+		//! @param _filePath File path.
+		//! @param _outputContent Output content.
+		//! @param _fileSize Output file size in bytes.
+		//! @param _exceptionMask Exception mask for file stream.
+		static bool readFile(const std::string& _filePath, std::string& _outputContent, uint64_t& _fileSize, std::ifstream::iostate _exceptionMask = std::ifstream::badbit);
+
 		//! @brief Returns all subdirectories at the given path.
 		//! @param _path Top level path to search at.
 		//! @param _options Search and format options.
