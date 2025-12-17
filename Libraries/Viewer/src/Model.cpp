@@ -3477,16 +3477,7 @@ void Model::removeFromMaps(const SceneNodeBase* _node) {
 	modelItemToSceneNodesMap.erase(_node->getModelEntityID());
 }
 
-#include "OTCore/RuntimeTests.h"
-
 void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
-	ot::RuntimeIntervalTest totalTest;
-	totalTest.logOnDelete("Viewer export worker total");
-
-	ot::RuntimeIntervalTest untileWriteTest;
-
-	ot::RuntimeIntervalTest test1;
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_RequestTextData, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(_entityName, doc.GetAllocator()), doc.GetAllocator());
@@ -3496,8 +3487,6 @@ void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
 		OT_LOG_E("Could not get text data from model: " + retMsg.getWhat());
 	} 
 	else if (!retMsg.getWhat().empty()) {
-		test1.logCurrentInterval("Request Text Data from Model");
-		
 		ot::JsonDocument doc;
 
 		// Parse the returned GridFS info
@@ -3505,8 +3494,6 @@ void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
 			OT_LOG_E("Could not parse grid fs info");
 		}
 		else {
-			ot::RuntimeIntervalTest test2;
-
 			ot::GridFSFileInfo fileInfo(doc.getConstObject());
 
 			// Now get the actual data from GridFS
@@ -3522,23 +3509,13 @@ void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
 
 			std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
 
-			test2.logCurrentInterval("Get Text Data from GridFS");
-
 			// Decompress if needed
 			if (fileInfo.isFileCompressed()) {
-				ot::RuntimeIntervalTest test3;
-
 				size_t decompressedSize = fileInfo.getUncompressedSize();
 				uint8_t* decompr = ot::String::decompressBase64(stringData.c_str(), decompressedSize);
 				stringData = std::string(reinterpret_cast<char*>(decompr), decompressedSize);
 				delete[] decompr;
-
-				test3.logCurrentInterval("Decompress Text Data");
 			}
-
-			untileWriteTest.logCurrentInterval("Until Write Text Data to File");
-
-			ot::RuntimeIntervalTest test4;
 
 			// Now write the data to file
 			std::ofstream outFile(_filePath, std::ios_base::binary);
@@ -3546,7 +3523,6 @@ void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
 				outFile << stringData;
 				outFile.close();
 				FrontendAPI::instance()->displayText("File exported successfully: " + _filePath + "\n");
-				test4.logCurrentInterval("Write Text Data to File");
 			}
 			else {
 				OT_LOG_E("Could not open file for writing: " + _filePath);
