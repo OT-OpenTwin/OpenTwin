@@ -149,8 +149,8 @@ void TextVisualiser::workerRequestRemainingData(size_t _nextChunkStartIndex) {
 			bsoncxx::oid oid_obj{ fileInfo.getDocumentId() };
 			bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 
-			api.GetDocumentUsingGridFs(id, dataBuffer, length, fileInfo.getFileName());
-			api.DeleteGridFSData(id, fileInfo.getFileName());
+			api.GetDocumentUsingGridFs(id, dataBuffer, length, fileInfo.getCollectionName());
+			api.DeleteGridFSData(id, fileInfo.getCollectionName());
 
 			// Decompress if needed
 			if (fileInfo.isFileCompressed()) {

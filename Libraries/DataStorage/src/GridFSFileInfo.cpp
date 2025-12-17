@@ -26,14 +26,14 @@ ot::GridFSFileInfo::GridFSFileInfo(const ConstJsonObject& _jsonObject) : GridFSF
 }
 
 void ot::GridFSFileInfo::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const {
-	_jsonObject.AddMember("File", JsonString(m_fileName, _allocator), _allocator);
+	_jsonObject.AddMember("Collection", JsonString(m_collectionName, _allocator), _allocator);
 	_jsonObject.AddMember("ID", JsonString(m_documentId, _allocator), _allocator);
 	_jsonObject.AddMember("IsCompressed", m_isCompressed, _allocator);
 	_jsonObject.AddMember("UncompressedSize", static_cast<uint64_t>(m_uncompressedSize), _allocator);
 }
 
 void ot::GridFSFileInfo::setFromJsonObject(const ConstJsonObject& _jsonObject) {
-	m_fileName = json::getString(_jsonObject, "File");
+	m_collectionName = json::getString(_jsonObject, "Collection");
 	m_documentId = json::getString(_jsonObject, "ID");
 	m_isCompressed = json::getBool(_jsonObject, "IsCompressed", false);
 	m_uncompressedSize = static_cast<size_t>(json::getUInt64(_jsonObject, "UncompressedSize", 0));

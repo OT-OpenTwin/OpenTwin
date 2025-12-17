@@ -40,12 +40,12 @@ namespace ot {
 
 		// Setter / Getter
 
-		//! @brief Set the name used to store the file in GridFS.
-		//! @param _fileName Name of the file.
-		void setFileName(const std::string& _fileName) { m_fileName = _fileName; };
+		//! @brief Set the collection name where the file is stored in GridFS.
+		//! @param _collectionName Name of the collection.
+		void setCollectionName(const std::string& _collectionName) { m_collectionName = _collectionName; };
 
-		//! @brief Returns the name used to store the file in GridFS.
-		const std::string& getFileName() const { return m_fileName; };
+		//! @brief Returns the collection name where the file is stored in GridFS.
+		const std::string& getCollectionName() const { return m_collectionName; };
 
 		//! @brief Set the document ID assigned to the file in GridFS.
 		//! @param _documentId Document ID as string.
@@ -69,7 +69,7 @@ namespace ot {
 		size_t getUncompressedSize() const { return m_uncompressedSize; };
 
 	private:
-		std::string m_fileName;
+		std::string m_collectionName;
 		std::string m_documentId;
 		size_t m_uncompressedSize = 0;
 		bool m_isCompressed = false;

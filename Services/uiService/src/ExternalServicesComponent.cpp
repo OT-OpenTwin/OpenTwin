@@ -107,6 +107,7 @@
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
 #include "OTFMC/FMConnectorAPI.h"
 #include "ProgressUpdater.h"
+#include "GridFSFileInfo.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -4333,7 +4334,7 @@ void ExternalServicesComponent::workerImportSingleFile(QString _fileToImport, Im
 		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(_info.subsequentFunctionName, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(_info.fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(_info.additionalInfo, inDoc.GetAllocator()), inDoc.GetAllocator());
-
+		
 		if (_info.loadContent) {
 			std::string fileContent;
 			unsigned long long uncompressedDataLength{ 0 };
@@ -4342,6 +4343,7 @@ void ExternalServicesComponent::workerImportSingleFile(QString _fileToImport, Im
 
 			// The file can not be directly accessed from the remote site and we need to send the file content over the communication
 			ReadFileContent(localEncodingFileName, fileContent, uncompressedDataLength);
+
 			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
 			// We need to send the file content

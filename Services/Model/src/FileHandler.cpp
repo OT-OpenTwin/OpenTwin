@@ -304,12 +304,12 @@ ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document
 	ot::RuntimeIntervalTest test3;
 
 	ot::GridFSFileInfo info;
-	info.setFileName(DataBase::instance().getCollectionName());
+	info.setCollectionName(DataBase::instance().getCollectionName());
 
 	// Upload the data to gridFS
 	DataStorageAPI::DocumentAPI db;
 
-	bsoncxx::types::value result = db.InsertBinaryDataUsingGridFs(reinterpret_cast<const uint8_t*>(text.c_str()), text.size(), info.getFileName());
+	bsoncxx::types::value result = db.InsertBinaryDataUsingGridFs(reinterpret_cast<const uint8_t*>(text.c_str()), text.size(), info.getCollectionName());
 	info.setDocumentId(result.get_oid().value.to_string());
 
 	test3.logCurrentInterval("Store text data in GridFS");
