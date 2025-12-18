@@ -28,7 +28,6 @@ void EnvironmentsGarbageCollector::removeEnvironmentsIfNecessary()
             if (std::find(allPredefinedEnvironments.begin(), allPredefinedEnvironments.end(), fileName) != allPredefinedEnvironments.end())
             {
                 ot::DateTime lastAccessTime = ot::FileSystem::getLastAccessTime(environment.string());
-				lastAccessTime.addDays(m_daysUntilRemoval);
 
                 if (currentTime.getYear() > lastAccessTime.getYear() || 
                     currentTime.getMonth() > lastAccessTime.getMonth() ||
