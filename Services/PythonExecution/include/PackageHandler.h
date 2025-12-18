@@ -24,6 +24,7 @@
 #include "EntityPythonManifest.h"
 #include "PythonWrapper.h"
 #include <map>
+#include "NewModelStateInfo.h"
 
 class PackageHandler
 {
@@ -73,6 +74,7 @@ private:
 	std::string m_environmentPath;
 	EnvironmentState m_environmentState = EnvironmentState::empty;
 	std::list<std::string> m_uninstalledPackages;
+	std::string m_installationLog;
 
 	const std::list<std::string> parseImportedPackages(const std::string _scriptContent);
 	bool isPackageInstalled(const std::string& _packageName);
@@ -81,6 +83,8 @@ private:
 	EntityPythonManifest* loadManifestEntity(ot::UID _manifestUID);
 	ot::UID getUIDFromString(const std::string& _uid);
 	std::string getListOfInstalledPackages();
+
+	void storeInstallationLog(ot::NewModelStateInfo& _newState);
 
 	void buildPackageMap(const std::string& _packageList);
 

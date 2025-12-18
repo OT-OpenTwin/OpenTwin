@@ -33,9 +33,9 @@
 #include <filesystem>
 #include "PythonObjectBuilder.h"
 #include "ExceptionRestartRequired.h"
-#include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/FolderNames.h"
 #include "OTCore/EntityName.h"
+#include "EntityResultText.h"
 
 PackageHandler::~PackageHandler()
 {
@@ -119,6 +119,7 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
             assert(m_environmentState == EnvironmentState::empty); //Otherwise the manifest UID should have been a different one
 
             OT_LOG_D("Initialize environment with manifest packages.");
+            OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
             for (const std::string& packageName : packagesInManifest.value())
             {
                 if (!isPackageInstalled(packageName))
@@ -127,6 +128,8 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
                     m_environmentState = EnvironmentState::firstFilling;
                 }
             }
+            m_installationLog = OutputPipeline::instance().flushOutput();
+            OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
             dropImportCache();
         }
     }
@@ -203,13 +206,15 @@ void PackageHandler::importMissingPackages()
                 installPackage(packageName);
             }
             dropImportCache();
-            const std::string installLog = OutputPipeline::instance().flushOutput();
+            m_installationLog = OutputPipeline::instance().flushOutput();
+			
             //Update manifest
+            ot::NewModelStateInfo newModelStateInfo;
+			storeInstallationLog(newModelStateInfo);
 
             std::string newManifest = getListOfInstalledPackages();
             m_currentManifest->replaceManifest(newManifest);
             m_currentManifest->storeToDataBase();
-            ot::NewModelStateInfo newModelStateInfo;
             newModelStateInfo.addTopologyEntity(*m_currentManifest);
             ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, "Manifest requires a new environment");
 
@@ -217,6 +222,17 @@ void PackageHandler::importMissingPackages()
             OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
         }
         m_uninstalledPackages.clear();
+		m_installationLog.clear();
+    }
+    else
+    {
+        if (!m_installationLog.empty())
+        {
+            ot::NewModelStateInfo newModelStateInfo;
+			storeInstallationLog(newModelStateInfo);
+            ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, "Installation log updated");
+			m_installationLog.clear();
+        }
     }
 
 }
@@ -410,6 +426,10 @@ void PackageHandler::installPackage(const std::string& _packageName)
                 message += " '" + _packageName + "' with exit code " + std::to_string(exit_code);
                 throw PythonException(message);
             }
+            else
+            {
+                Application::instance().getCommunicationHandler().writeToServer("OUTPUT:Installing completed\n");
+            }
         }
         else {
             
@@ -512,6 +532,20 @@ std::string PackageHandler::getListOfInstalledPackages()
     }
 
     return allInstalledPackages;
+}
+
+void PackageHandler::storeInstallationLog(ot::NewModelStateInfo& _newState)
+{
+    EntityResultText installLogEntity;
+    installLogEntity.setEntityID(Application::instance().getUIDGenerator()->getUID());
+    installLogEntity.setName(ot::FolderNames::PythonFolder + "/Installation log");
+    installLogEntity.setText(m_installationLog);
+    installLogEntity.storeToDataBase();
+
+
+    _newState.addTopologyEntity(installLogEntity);
+    _newState.addDataEntity(installLogEntity.getEntityID(), installLogEntity.getTextDataStorageId(), installLogEntity.getTextDataStorageVersion());
+    m_installationLog.clear();
 }
 
 void PackageHandler::buildPackageMap(const std::string& _packageList)
