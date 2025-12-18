@@ -120,6 +120,8 @@ std::string GetDPLauncher::startSolver(std::string &logFileText, const std::stri
 		logFileText = solver->runSolver(tempDirPath, application->getUiComponent());
 
 		// Convert the results
+		application->getUiComponent()->setProgressInformation("Storing results", true);
+
 		solver->convertResults(tempDirPath, application, solverEntity);
 	}
 	catch (std::string& error)

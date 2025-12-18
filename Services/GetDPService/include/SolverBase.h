@@ -27,6 +27,7 @@
 #include <list>
 #include <string>
 #include <sstream>
+#include <optional>
 #include <windows.h> 
 
 class EntityBase;
@@ -39,6 +40,12 @@ namespace ot {
 }
 
 #include "EntityProperties.h"
+
+struct SolverBaseParsedLine
+{
+	int number;
+	std::string textAfterColon;
+};
 
 class SolverBase {
 public:
@@ -59,7 +66,11 @@ protected:
 	bool runExecutableAndWaitForCompletion(std::string commandLine, std::string workingDirectory, ot::components::UiComponent* uiComponent);
 	std::string readEnvironmentVariable(const std::string& variableName);
 	bool isPECMaterial(const std::string& materialName);
-	void ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiComponent* uiComponent);
+	void readFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiComponent* uiComponent);
+	void updateSolverLogAndProgress(const std::string& text, ot::components::UiComponent* uiComponent, std::string& lastProgressText);
+	std::optional<SolverBaseParsedLine> parseLine(const std::string& line);
+	void normalizeLineEndings(std::string& text);
+
 
 	EntityBase* solverEntity;
 	std::string meshDataName;

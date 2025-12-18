@@ -141,7 +141,7 @@ bool SolverBase::runExecutableAndWaitForCompletion(std::string commandLine, std:
 			if (CreateProcess(NULL, cl, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT | ABOVE_NORMAL_PRIORITY_CLASS, penv, wd, &info, &processInfo))
 			{
 				CloseHandle(g_hChildStd_OUT_Wr);
-				ReadFromPipe(g_hChildStd_OUT_Rd, uiComponent);
+				readFromPipe(g_hChildStd_OUT_Rd, uiComponent);
 
 				WaitForSingleObject(processInfo.hProcess, INFINITE);
 				CloseHandle(processInfo.hProcess);
@@ -163,7 +163,7 @@ bool SolverBase::runExecutableAndWaitForCompletion(std::string commandLine, std:
 	return success;
 }
 
-void SolverBase::ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiComponent* uiComponent)
+void SolverBase::readFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiComponent* uiComponent)
 
 // Read output from the child process's pipe for STDOUT
 // and write to the parent process's pipe for STDOUT. 
@@ -175,6 +175,8 @@ void SolverBase::ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiCompo
 	CHAR chBuf[BUFSIZE];
 	BOOL bSuccess = FALSE;
 
+	std::string lastProgressText;
+
 	for (;;)
 	{
 		bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
@@ -182,13 +184,108 @@ void SolverBase::ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiCompo
 
 		std::string text(chBuf, dwRead);
 
-		solverOutput << text;
+		normalizeLineEndings(text);
 
-		text.erase(text.find_last_not_of(" \t\n\r\f\v") + 1);
-		uiComponent->displayMessage(text);
+		updateSolverLogAndProgress(text, uiComponent, lastProgressText);
 
 		if (!bSuccess) break;
 	}
+}
+
+void SolverBase::normalizeLineEndings(std::string& text)
+{
+	std::string normalized;
+	normalized.reserve(text.size());
+
+	for (std::size_t i = 0; i < text.size(); ++i)
+	{
+		if (text[i] == '\r')
+		{
+			// Convert '\r\n' or '\r' to '\n'
+			normalized.push_back('\n');
+
+			// Skip '\n' if this is a Windows line ending
+			if (i + 1 < text.size() && text[i + 1] == '\n')
+				++i;
+		}
+		else
+		{
+			normalized.push_back(text[i]);
+		}
+	}
+
+	text.swap(normalized);
+}
+
+std::optional<SolverBaseParsedLine> SolverBase::parseLine(const std::string& line)
+{
+	std::size_t i = 0;
+
+	// Skip leading whitespace
+	while (i < line.size() && std::isspace(static_cast<unsigned char>(line[i])))
+		++i;
+
+	// Parse the numeric value
+	if (i >= line.size() || !std::isdigit(static_cast<unsigned char>(line[i])))
+		return std::nullopt;
+
+	int value = 0;
+	while (i < line.size() && std::isdigit(static_cast<unsigned char>(line[i])))
+	{
+		value = value * 10 + (line[i] - '0');
+		++i;
+	}
+
+	// Expect a percent sign
+	if (i >= line.size() || line[i] != '%')
+		return std::nullopt;
+
+	// Find the colon after the percent sign
+	auto colonPos = line.find(':', i + 1);
+	if (colonPos == std::string::npos)
+		return std::nullopt;
+
+	// Extract the text after the colon
+	std::string text = line.substr(colonPos + 1);
+
+	// Optionally trim leading whitespace after the colon
+	std::size_t start = 0;
+	while (start < text.size() && std::isspace(static_cast<unsigned char>(text[start])))
+		++start;
+
+	text.erase(0, start);
+
+	return SolverBaseParsedLine{ value, text };
+}
+
+
+void SolverBase::updateSolverLogAndProgress(const std::string &text, ot::components::UiComponent* uiComponent, std::string &lastProgressText)
+{
+	std::istringstream input(text);
+	std::ostringstream output;
+
+	std::string line;
+
+	while (std::getline(input, line))
+	{
+		if (auto parsed = parseLine(line))
+		{
+			if (parsed->textAfterColon != lastProgressText)
+			{
+				uiComponent->setProgressInformation(parsed->textAfterColon, false);
+				lastProgressText = parsed->textAfterColon;
+			}
+
+			uiComponent->setProgress(parsed->number);
+		}
+		else
+		{
+			output << line << '\n';
+		}
+	}
+
+	uiComponent->displayMessage(output.str());
+	solverOutput << output.str();
 }
 
 std::string SolverBase::readEnvironmentVariable(const std::string& variableName)
