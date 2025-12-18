@@ -3233,8 +3233,10 @@ EntityBase *Model::readEntityFromEntityIDandVersion(EntityBase *parent, ot::UID 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
 	EntityBase *entity = EntityFactory::instance().create(entityType);
-
-	entity->restoreFromDataBase(parent, this, getStateManager(), doc_view, entityMap);
+	if (entity != nullptr)
+	{
+		entity->restoreFromDataBase(parent, this, getStateManager(), doc_view, entityMap);
+	}
 
 	return entity;
 }
@@ -4786,22 +4788,29 @@ void Model::updateModelStateForUndoRedo()
 							}
 
 							EntityBase *newEntity = readEntityFromEntityID(parentEntity, entity, entityMap);
-							newEntity->addVisualizationNodes();
-
-							if (dynamic_cast<EntityContainer*>(parentEntity) != nullptr)
+							if(newEntity != nullptr) 
 							{
-								dynamic_cast<EntityContainer*>(parentEntity)->addChild(newEntity);
-							}
+								newEntity->addVisualizationNodes();
 
-							// Check whether we are adding a parameter. If so, add it to the map
-							if (dynamic_cast<EntityParameter*>(newEntity) != nullptr)
+								if (dynamic_cast<EntityContainer*>(parentEntity) != nullptr)
+								{
+									dynamic_cast<EntityContainer*>(parentEntity)->addChild(newEntity);
+								}
+
+								// Check whether we are adding a parameter. If so, add it to the map
+								if (dynamic_cast<EntityParameter*>(newEntity) != nullptr)
+								{
+									EntityParameter *parameter = dynamic_cast<EntityParameter*>(newEntity);
+									setParameter(parameter->getName(), parameter->getNumericValue(), parameter);
+								}
+
+								if (entityMap.empty()) {
+									OT_LOG_EA("Entity map is empty after reading entity");
+								}
+							}
+							else
 							{
-								EntityParameter *parameter = dynamic_cast<EntityParameter*>(newEntity);
-								setParameter(parameter->getName(), parameter->getNumericValue(), parameter);
-							}
-
-							if (entityMap.empty()) {
-								OT_LOG_EA("Entity map is empty after reading entity");
+								OT_LOG_W("Failed to read entity during undo/redo operation");
 							}
 						}
 					}
