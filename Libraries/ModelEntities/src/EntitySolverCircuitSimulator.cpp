@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "EntitySolverCircuitSimulator.h"
+#include "PropertyHelper.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -179,4 +180,15 @@ bool EntitySolverCircuitSimulator::updateFromProperties()
 
 	
 	return refresh;
+}
+
+void EntitySolverCircuitSimulator::setCircuitFolder(const std::string _circuitFolderName, ot::UID _circuitFolderID) {
+	EntityPropertiesEntityList* circuit = PropertyHelper::getEntityListProperty(this, "Circuit");
+	if (circuit == nullptr) {
+		OT_LOG_E("Failed to get 'Circuit' property in EntitySolverCircuitSimulator");
+		return;
+	}
+	circuit->setValueName(_circuitFolderName);
+	circuit->setValueID(_circuitFolderID);
+	this->setModified();
 }

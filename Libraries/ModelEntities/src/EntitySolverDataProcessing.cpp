@@ -32,3 +32,14 @@ const std::string EntitySolverDataProcessing::getSelectedPipeline()
 	const std::string selectedPipeline = PropertyHelper::getEntityListProperty(this, "Pipeline to run","Pipeline")->getValueName();
 	return selectedPipeline;
 }
+
+void EntitySolverDataProcessing::setPipelineFolder(const std::string& _pipelineFolderName, const ot::UID _pipelineFolderID) {
+	EntityPropertiesEntityList* pipeline = PropertyHelper::getEntityListProperty(this, "Pipeline to run","Pipeline");
+	if (pipeline == nullptr) {
+		OT_LOG_E("Failed to get 'Pipeline' property in EntitySolverDataProcessing");
+		return;
+	}
+	pipeline->setValueName(_pipelineFolderName);
+	pipeline->setValueID(_pipelineFolderID);
+	this->setModified();
+}

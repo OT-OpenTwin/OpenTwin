@@ -28,7 +28,6 @@ public:
 	ProjectTypeManager() = delete;
 
 	bool hasGeometryRoot()				{ return m_hasGeometryRoot; }
-	bool hasCircuitsRoot()				{ return m_hasCircuitsRoot; }
 	bool hasCircuit()					{ return m_hasCircuit; }
 	bool hasMaterialRoot()				{ return m_hasMaterialRoot; }
 	bool hasMeshRoot()					{ return m_hasMeshRoot; }
@@ -66,7 +65,6 @@ private:
 	void initializeProjectTypeFileManagement();
 
 	bool m_hasGeometryRoot				= true;
-	bool m_hasCircuitsRoot				= true;
 	bool m_hasCircuit					= true;
 	bool m_hasMaterialRoot				= true;
 	bool m_hasMeshRoot					= true;

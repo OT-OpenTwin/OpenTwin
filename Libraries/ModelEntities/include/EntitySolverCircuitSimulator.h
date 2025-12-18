@@ -35,6 +35,8 @@ public:
 	virtual bool updateFromProperties(void) override;
 
 	virtual std::string getClassName(void) const override { return "EntitySolverCircuitSimulator"; };
+
+	void setCircuitFolder(const std::string circuitFolderName, ot::UID circuitFolderID);
 	
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };

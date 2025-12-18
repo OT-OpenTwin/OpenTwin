@@ -219,7 +219,7 @@ void Model::resetToNew()
 		addEntityToModel(entityGeometryRoot->getName(), entityGeometryRoot, entityRoot, true, allNewEntities);
 	}
 
-	if (typeManager.hasCircuitsRoot())
+	if (typeManager.hasCircuit())
 	{
 		EntityBase* entityCircuitsRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityCircuitsRoot->setName(getCircuitsRootName());
@@ -249,13 +249,9 @@ void Model::resetToNew()
 			ot::EntityCallbackBase::Callback::Selection,
 			OT_INFO_SERVICE_TYPE_CircuitSimulatorService
 		);
-		circuitSolver->createProperties(ot::FolderNames::CircuitsFolder, entityCircuitsRoot->getEntityID(), entityCircuitsRoot->getName());
 
-		if (PropertyHelper::hasProperty(circuitSolver, "Circuit")) {
-			EntityPropertiesEntityList* circuitProperty = PropertyHelper::getEntityListProperty(circuitSolver,"Circuit");
-			circuitProperty->setValueName(entityCircuit->getName());
-			circuitProperty->setValueID(entityCircuit->getEntityID());
-		}
+		circuitSolver->createProperties(ot::FolderNames::CircuitsFolder, entityCircuitsRoot->getEntityID(), entityCircuitsRoot->getName());
+		circuitSolver->setCircuitFolder(entityCircuit->getName(), entityCircuit->getEntityID());
 
 		addEntityToModel(circuitSolver->getName(), circuitSolver, entityRoot, true, allNewEntities);
 	}
@@ -327,13 +323,9 @@ void Model::resetToNew()
 			ot::EntityCallbackBase::Callback::Selection,
 			OT_INFO_SERVICE_TYPE_DataProcessingService
 		);
-		pipelineSolver->createProperties(dataProcessingRoot->getName(), dataProcessingRoot->getEntityID());
 
-		if (PropertyHelper::hasProperty(pipelineSolver, "Pipeline to run")) {
-			EntityPropertiesEntityList* pipelineProperty = PropertyHelper::getEntityListProperty(pipelineSolver, "Pipeline to run");
-			pipelineProperty->setValueName(entityPipeline->getName());
-			pipelineProperty->setValueID(entityPipeline->getEntityID());
-		}
+		pipelineSolver->createProperties(dataProcessingRoot->getName(), dataProcessingRoot->getEntityID());
+		pipelineSolver->setPipelineFolder(entityPipeline->getName(), dataProcessingRoot->getEntityID());
 
 		addEntityToModel(pipelineSolver->getName(), pipelineSolver, entityRoot, true, allNewEntities);
 	}
@@ -430,7 +422,7 @@ void Model::resetToNew()
 		enableQueuingHttpRequests(true);
 		createVisualizationItems();
 		enableQueuingHttpRequests(false);
-	}
+	}	
 }
 
 Model::~Model()
@@ -858,7 +850,6 @@ void Model::setVisualizationModel(ot::UID visModelID)
 		Application::instance()->getSelectionHandler().clearAllBufferAndNotify();
 
 		updateVersionGraph();
-
 		enableQueuingHttpRequests(false);
 	}
 	else

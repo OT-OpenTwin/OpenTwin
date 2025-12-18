@@ -33,4 +33,6 @@ public:
 
 	const std::string getSelectedPipeline() ;
 
+	void setPipelineFolder(const std::string& _pipelineFolderName, const ot::UID _pipelineFolderID);
+
 };

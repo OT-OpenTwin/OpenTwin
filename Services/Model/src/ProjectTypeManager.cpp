@@ -82,7 +82,6 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 
 void ProjectTypeManager::initializeProjectTypeHierarchical() {
 	m_hasGeometryRoot = false;
-	m_hasCircuitsRoot = false;
 	m_hasCircuit = false;
 	m_hasMaterialRoot = false;
 	m_hasMeshRoot = false;
@@ -106,7 +105,6 @@ void ProjectTypeManager::initializeProjectTypeHierarchical() {
 void ProjectTypeManager::initializeProjectType3DSimulation(void)
 {
 	m_hasGeometryRoot				= true;
-	m_hasCircuitsRoot				= false;
 	m_hasCircuit					= false;
 	m_hasMaterialRoot				= true;
 	m_hasMeshRoot					= true;
@@ -125,7 +123,6 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 {
 	m_hasGeometryRoot				= false;
-	m_hasCircuitsRoot				= false;
 	m_hasCircuit					= false;
 	m_hasMaterialRoot				= false;
 	m_hasMeshRoot					= false;
@@ -143,7 +140,6 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 {
 	m_hasGeometryRoot = true;
-	m_hasCircuitsRoot = false;
 	m_hasCircuit	= false;
 	m_hasMaterialRoot = true;
 	m_hasMeshRoot = false;
@@ -162,7 +158,6 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 {
 	m_hasGeometryRoot = false;
-	m_hasCircuitsRoot = false;
 	m_hasCircuit = false;
 	m_hasMaterialRoot = false;
 	m_hasMeshRoot = false;
@@ -183,7 +178,6 @@ void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 void ProjectTypeManager::initializeProjectTypePyrit(void)
 {
 	m_hasGeometryRoot = true;
-	m_hasCircuitsRoot = false;
 	m_hasCircuit = false;
 	m_hasMaterialRoot = true;
 	m_hasMeshRoot = true;
@@ -202,7 +196,6 @@ void ProjectTypeManager::initializeProjectTypePyrit(void)
 void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
 {
 	m_hasGeometryRoot = false;
-	m_hasCircuitsRoot = true;
 	m_hasCircuit = true;
 	m_hasMaterialRoot = false;
 	m_hasMeshRoot = false;
@@ -221,7 +214,6 @@ void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
 
 void ProjectTypeManager::initializeProjectTypeFileManagement() {
 	m_hasGeometryRoot = false;
-	m_hasCircuitsRoot = false;
 	m_hasCircuit = false;
 	m_hasMaterialRoot = false;
 	m_hasMeshRoot = false;
