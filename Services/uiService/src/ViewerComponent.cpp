@@ -86,7 +86,7 @@ void ViewerComponent::addKeyShortcut(const std::string& keySequence) {
 }
 
 void ViewerComponent::lockSelectionAndModification(bool flag) {
-	ot::WindowAPI::lockUI(flag);
+	ot::WindowAPI::lockSelectionAndModification(flag);
 }
 
 void ViewerComponent::removeViewer(ot::UID viewerID) {
