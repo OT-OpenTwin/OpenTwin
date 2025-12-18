@@ -54,10 +54,10 @@ public:
 
 private:
 	void storeVolumeFaces(EntityBase *entity, gmsh::vectorpair &meshElements);
+	bool isBackgroundEndity(const std::string& entityName);
 
 	Application *application;
 	std::map<std::string, gmsh::vectorpair> entityNameToMeshElementsMap;
 	std::map<std::string, EntityBase *>     nameToEntityMap;
 	std::map<int, gmsh::vectorpair>         volumeTagToFacesMap;
-	std::string								backgroundMeshEntityName;
 };

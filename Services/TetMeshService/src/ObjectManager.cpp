@@ -106,13 +106,24 @@ void ObjectManager::writeMeshEntities(MeshWriter *meshWriter, FaceAnnotationsMan
 			std::string plainName      = entity->first.substr(prefix.length());
 			std::string meshEntityName = mesh->getName() + "/Mesh" + plainName;
 
-			if (plainName == "/Background")
-			{
-				backgroundMeshEntityName = meshEntityName;
-			}
+			bool backgroundEntity = isBackgroundEndity(plainName);
 
-			meshWriter->storeMeshEntity(meshEntityName, nameToEntityMap[entityName], tag, volumeTagToFacesMap[tag], backgroundMeshEntityName == meshEntityName, 
+			meshWriter->storeMeshEntity(meshEntityName, nameToEntityMap[entityName], tag, volumeTagToFacesMap[tag], backgroundEntity,
 									    nodeTagToTetIndexMap, volumeTagToFacesMap, materialsFolder, materialsFolderID, faceAnnotationsManager, progressLogger);
 		}
+	}
+}
+
+bool ObjectManager::isBackgroundEndity(const std::string& entityName)
+{
+	// Search for the second / if any (the entityName always starts with a /)
+	size_t endIndex = entityName.find('/', 1);
+	if (endIndex != std::string::npos)
+	{
+		return (entityName.substr(0, endIndex) == "/Background");
+	}
+	else
+	{
+		return (entityName == "/Background");
 	}
 }
