@@ -157,6 +157,7 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 		uint64_t passedTime =	std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 		uiComponent->displayMessage(std::to_string(passedTime) + " ms\nModel update: ");
 	}
+	ProgressUpdater updater(uiComponent, "Performing model update",true);
 	auto start = std::chrono::system_clock::now();
 	addTextFilesToModel();
 	clearBuffer();
