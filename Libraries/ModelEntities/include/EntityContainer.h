@@ -27,6 +27,8 @@
 class __declspec(dllexport) EntityContainer : public EntityBase
 {
 public:
+	static ot::EntityTreeItem createDefaultTreeItem();
+
 	EntityContainer() : EntityContainer(0, nullptr, nullptr, nullptr) {};
 	EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityContainer();

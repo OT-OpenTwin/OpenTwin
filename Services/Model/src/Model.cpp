@@ -890,11 +890,9 @@ void Model::createVisualizationItems()
 
 void Model::addVisualizationContainerNode(const std::string &name, ot::UID entityID, bool isEditable)
 {
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = EntityContainer::createDefaultTreeItem();
 	treeItem.setEntityID(entityID);
 	treeItem.setEntityName(name);
-	treeItem.setHiddenIcon("Default/ContainerHidden");
-	treeItem.setVisibleIcon("Default/ContainerVisible");
 	
 	ot::VisualisationTypes visTypes;
 	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, treeItem, visTypes);
@@ -965,14 +963,11 @@ void Model::handleCreateNewParameter()
 
 	// Here we also need to add a new visualitation container item to the visualization model
 
-	ot::EntityTreeItem treeItem;
+	ot::EntityTreeItem treeItem = EntityContainer::createDefaultTreeItem();
 	treeItem.setEntityID(parameterItem->getEntityID());
 	treeItem.setEntityName(parameterName);
-	treeItem.setHiddenIcon("Default/ParameterHidden");
-	treeItem.setVisibleIcon("Default/ParameterVisible");
 
 	ot::VisualisationTypes visTypes;
-
 	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, treeItem, visTypes);
 
 	setModified();

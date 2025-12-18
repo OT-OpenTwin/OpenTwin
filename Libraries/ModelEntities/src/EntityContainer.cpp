@@ -27,15 +27,19 @@
 
 static EntityFactoryRegistrar<EntityContainer> registrar(EntityContainer::className());
 
+ot::EntityTreeItem EntityContainer::createDefaultTreeItem() {
+	ot::EntityTreeItem treeItem;
+	treeItem.setVisibleIcon("Default/ContainerVisible");
+	treeItem.setHiddenIcon("Default/ContainerHidden");
+	treeItem.setSelectChilds(true);
+	return treeItem;
+}
+
 EntityContainer::EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
 	EntityBase(ID, parent, obs, ms),
 	createVisualizationItem(true)
 {
-	ot::EntityTreeItem treeItem = getTreeItem();
-	treeItem.setVisibleIcon("Default/ContainerVisible");
-	treeItem.setHiddenIcon("Default/ContainerHidden");
-	treeItem.setSelectChilds(true);
-	this->setDefaultTreeItem(treeItem);
+	this->setDefaultTreeItem(createDefaultTreeItem());
 }
 
 EntityContainer::~EntityContainer()
