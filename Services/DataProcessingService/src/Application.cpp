@@ -99,6 +99,11 @@ void Application::runPipeline()
 				EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion);
 				std::unique_ptr<EntitySolverDataProcessing> solver(dynamic_cast<EntitySolverDataProcessing*>(baseEntity));
 				const std::string folderName = solver->getSelectedPipeline();
+				if(folderName.empty())
+				{
+					Application::instance()->getUiComponent()->displayMessage("No pipeline selected in solver: " + solver->getName() + "\n");
+					continue;
+				}
 				auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
 				auto allConnectionEntities = _blockEntityHandler.findAllEntityBlockConnections(folderName);
 				std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntities, allBlockEntities);
