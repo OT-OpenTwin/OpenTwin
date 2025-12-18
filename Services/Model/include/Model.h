@@ -104,7 +104,7 @@ public:
 	EntityBase *getRootNode() { return entityRoot; };
 
 	std::string getGeometryRootName() { return "Geometry"; };
-	std::string getCircuitsRootName() { return "Circuits"; };
+	std::string getCircuitsRootName() { return ot::FolderNames::CircuitsFolder; };
 	std::string getMaterialRootName() { return "Materials"; };
 	std::string getParameterRootName() { return "Parameters"; };
 	std::string getMeshRootName() { return "Meshes"; };

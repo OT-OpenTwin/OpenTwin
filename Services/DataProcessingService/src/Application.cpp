@@ -60,7 +60,7 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DataProcessingService, OT_INFO_SERVICE_TYPE_DataProcessingService, new UiNotifier(), new ModelNotifier())
 {
-	
+	initiallySelectFirstChildEntityOf(ot::FolderNames::DataProcessingFolder);
 }
 
 Application::~Application()

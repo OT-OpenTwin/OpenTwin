@@ -73,7 +73,6 @@ Application::Application() :
 	m_entityHandler(ot::FolderNames::HierarchicalProjectRoot)
 {
 	// Connect callback action handlers
-	connectAction(c_setProjectEntitySelectedAction, this, &Application::handleSetProjectEntitySelected);
 	connectAction(c_projectSelectedAction, this, &Application::handleProjectSelected);
 	connectAction(c_documentSelectedAction, this, &Application::handleDocumentSelected);
 	connectAction(c_projectImageSelectedAction, this, &Application::handleProjectImageSelected);
@@ -129,6 +128,8 @@ Application::Application() :
 	m_addImageButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_addImageButton.setButtonToolTip("Add a image to the hierarchical scene.");
 	connectToolBarButton(m_addImageButton, this, &Application::handleAddImage);
+
+	initiallySelectEntity(ot::FolderNames::HierarchicalProjectRoot);
 }
 
 Application::~Application() {
@@ -181,22 +182,10 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	_ui->switchMenuTab(c_pageName);
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
-
-	// If model and ui are connected, we can send the initial selection
-	if (this->isModelConnected()) {
-		std::thread worker(&Application::initialSelectionWorker, this, this->getModelComponent()->getServiceURL());
-		worker.detach();
-	}
 }
 
 void Application::modelConnected(ot::components::ModelComponent* _model) {
 	m_entityHandler.setModelComponent(_model);
-
-	// If model and ui are connected, we can send the initial selection
-	if (this->isUiConnected()) {
-		std::thread worker(&Application::initialSelectionWorker, this, _model->getServiceURL());
-		worker.detach();
-	}
 }
 
 void Application::modelSelectionChanged() {
@@ -258,23 +247,6 @@ ot::ReturnMessage Application::graphicsChangeEvent(const ot::GraphicsChangeEvent
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Action handler
-
-void Application::handleSetProjectEntitySelected() {
-	if (!this->isUiConnected()) {
-		OT_LOG_E("No UI connected");
-		exit(ot::AppExitCode::GeneralError);
-	}
-
-	// Send initial selection to UI
-	ot::JsonDocument uiDoc;
-	uiDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetEntitySelected, uiDoc.GetAllocator()), uiDoc.GetAllocator());
-	uiDoc.AddMember(OT_ACTION_PARAM_IsSelected, true, uiDoc.GetAllocator());
-	uiDoc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(ot::FolderNames::HierarchicalProjectRoot, uiDoc.GetAllocator()), uiDoc.GetAllocator());
-
-	std::string tmp;
-	// We can ignore the return code since the application will exit on send failed
-	ot::msg::send(Application::instance().getServiceURL(), this->getUiComponent()->getServiceURL(), ot::QUEUE, uiDoc.toJson(), tmp);
-}
 
 void Application::handleProjectSelected(ot::JsonDocument& _doc) {
 	ot::ProjectInformation info(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
@@ -732,46 +704,4 @@ ot::ReturnMessage Application::requestToOpenCSVDocument(ot::UID _visualizingEnti
 	
 
 	return ot::ReturnMessage::Ok;
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Private: Worker
-
-void Application::initialSelectionWorker(std::string _modelUrl) {
-	auto initialTime = ot::DateTime::msSinceEpoch();
-
-	// Ensure that the model is ready
-	bool modelReady = false;
-	while (!modelReady) {
-		auto currentTime = ot::DateTime::msSinceEpoch();
-		if ((currentTime - initialTime) > (5 * ot::msg::defaultTimeout)) {
-			OT_LOG_E("Timeout while waiting for model to open the project");
-			exit(ot::AppExitCode::GeneralTimeout);
-		}
-
-		std::string response;
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_IsProjectOpen, doc.GetAllocator()), doc.GetAllocator());
-		
-		// Send request. We can ignore the success since the application will exit on send failed
-		ot::msg::send(Application::instance().getServiceURL(), _modelUrl, ot::EXECUTE, doc.toJson(), response);
-
-		ot::ReturnMessage ret = ot::ReturnMessage::fromJson(response);
-		if (ret == ot::ReturnMessage::True) {
-			modelReady = true;
-		}
-		else {
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		}
-	}
-
-	if (!modelReady) {
-		exit(ot::AppExitCode::GeneralError);
-	}
-
-	// Dispatch selection request
-	ot::JsonDocument selfDoc;
-	selfDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(c_setProjectEntitySelectedAction, selfDoc.GetAllocator()), selfDoc.GetAllocator());
-	ot::ActionDispatcher::instance().dispatch(selfDoc, ot::EXECUTE);
 }

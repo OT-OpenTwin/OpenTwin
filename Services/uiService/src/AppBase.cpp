@@ -1704,6 +1704,18 @@ void AppBase::setNavigationTreeItemText(ot::UID _itemID, const QString & _itemNa
 	m_projectNavigation->getTree()->setItemText(_itemID, _itemName);
 }
 
+void AppBase::setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection) {
+	{
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+		if (_clearOtherSelection) {
+			m_projectNavigation->getTree()->deselectAllItems(false);
+		}
+		m_projectNavigation->getTree()->setItemsSelected(_itemIDs, _selected);
+	}
+
+	slotTreeItemSelectionChanged();
+}
+
 void AppBase::setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
 	m_projectNavigation->getTree()->setItemSelected(_itemID, _isSelected);
 }

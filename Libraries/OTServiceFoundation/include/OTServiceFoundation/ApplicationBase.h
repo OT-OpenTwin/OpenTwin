@@ -64,6 +64,7 @@ namespace ot {
 	class AbstractUiNotifier;
 	class AbstractSettingsItem;
 	class AbstractModelNotifier;
+	class InitialSelectionHelper;
 
 	//! @brief Base class for applications.
 	//! The ApplicationBase class is the base class for all applications that are built on top of the OpenTwin framework.
@@ -99,6 +100,16 @@ namespace ot {
 
 		//! @brief Set the project type.
 		void setProjectType(const std::string& _type) { m_projectType = _type; };
+
+		//! @brief Will initially select the specified entity in the UI.
+		//! @note This method should be used to initially select an entity while opening a session.
+		//! @param _entityName The name of the entity.
+		void initiallySelectEntity(const std::string& _entityName);
+
+		//! @brief Will initially select the first child entity of the specified parent entity in the UI.
+		//! @note This method should be used to initially select an entity while opening a session.
+		//! @param _parentEntityName The name of the parent entity.
+		void initiallySelectFirstChildEntityOf(const std::string& _parentEntityName);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -410,6 +421,8 @@ namespace ot {
 		std::map<UID, UID>                  m_prefetchedEntityVersions;
 
 		std::string                         m_dbUserCollection;
+
+		ot::InitialSelectionHelper* m_initialSelectionHelper;
 	};
 
 }

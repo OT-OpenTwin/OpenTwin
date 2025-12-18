@@ -2991,22 +2991,49 @@ void ExternalServicesComponent::handleSetEntitySelected(ot::JsonDocument& _docum
 	if (_document.HasMember(OT_ACTION_PARAM_IsSelected)) {
 		selected = ot::json::getBool(_document, OT_ACTION_PARAM_IsSelected);
 	}
-	
-	ot::UID entityID = ot::invalidUID;
-	if (_document.HasMember(OT_ACTION_PARAM_MODEL_ITM_ID)) {
-		entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
-	}
-	else {
-		if (!_document.HasMember(OT_ACTION_PARAM_NAME)) {
-			OT_LOG_E("No entity ID or name provided to set selection state");
-			return;
-		}
-		std::string name = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
-		entityID = ViewerAPI::getEntityID(name);
+	bool clearSelection = false;
+	if (_document.HasMember(OT_ACTION_PARAM_ClearSelection)) {
+		clearSelection = ot::json::getBool(_document, OT_ACTION_PARAM_ClearSelection);
 	}
 
-	ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(entityID);
-	AppBase::instance()->setNavigationTreeItemSelected(treeID, selected);
+	ot::UIDList selectedEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_MODEL_ITM_ID)) {
+		if (ot::json::isArray(_document, OT_ACTION_PARAM_MODEL_ITM_ID)) {
+			selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
+		}
+		else {
+			ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
+			selectedEntities.push_back(entityID);
+		}
+	}
+	else if (_document.HasMember(OT_ACTION_PARAM_NAME)) {
+		if (ot::json::isArray(_document, OT_ACTION_PARAM_NAME)) {
+			std::list<std::string> names = ot::json::getStringList(_document, OT_ACTION_PARAM_NAME);
+			for (const auto& name : names) {
+				ot::UID entityID = ViewerAPI::getEntityID(name);
+				selectedEntities.push_back(entityID);
+			}
+		}
+		else {
+			std::string name = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+			ot::UID entityID = ViewerAPI::getEntityID(name);
+			selectedEntities.push_back(entityID);
+		}
+	}
+	else {
+		OT_LOG_E("No entity ID or name provided to set navigation selection state");
+		return;
+	}
+
+	ot::UIDList treeIDs;
+	for (ot::UID entityID : selectedEntities) {
+		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(entityID);
+		treeIDs.push_back(treeID);
+	}
+
+	if (!treeIDs.empty()) {
+		AppBase::instance()->setNavigationTreeItemsSelected(treeIDs, selected, clearSelection);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -41,6 +41,7 @@
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 #include "OTServiceFoundation/ModalCommandBase.h"
 #include "OTServiceFoundation/FrontendLogNotifier.h"
+#include "OTServiceFoundation/InitialSelectionHelper.h"
 
 #include "DataBase.h"
 #include "Document\DocumentAccess.h"
@@ -58,11 +59,10 @@
 
 #undef GetObject
 
-#define OT_INFO_SERVICE_ID_SessionService ""
-
 ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std::string & _serviceType, AbstractUiNotifier * _uiNotifier, AbstractModelNotifier * _modelNotifier)
 	: ServiceBase(_serviceName, _serviceType), m_modelComponent(nullptr), m_uiComponent(nullptr), m_uiNotifier(_uiNotifier),
-	m_modelNotifier(_modelNotifier), m_uiMessageQueuingEnabled(false), m_sessionService(nullptr), m_directoryService(nullptr)
+	m_modelNotifier(_modelNotifier), m_uiMessageQueuingEnabled(false), m_sessionService(nullptr), m_directoryService(nullptr),
+	m_initialSelectionHelper(nullptr)
 {
 	new FrontendLogNotifier(this); // Log Dispatcher gets the ownership of the notifier.
 
@@ -75,8 +75,18 @@ ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std
 
 ot::ApplicationBase::~ApplicationBase()
 {
-	if (m_uiNotifier) { delete m_uiNotifier; }
-	if (m_modelNotifier) { delete m_modelNotifier; }
+	if (m_uiNotifier) {
+		delete m_uiNotifier;
+		m_uiNotifier = nullptr;
+	}
+	if (m_modelNotifier) {
+		delete m_modelNotifier;
+		m_modelNotifier = nullptr;
+	}
+	if (m_initialSelectionHelper) {
+		delete m_initialSelectionHelper;
+		m_initialSelectionHelper = nullptr;
+	}
 }
 
 // ##########################################################################################################################################
@@ -92,6 +102,46 @@ void ot::ApplicationBase::setSessionServiceURL(const std::string & _url)
 	}
 	
 	m_sessionService = new ServiceBase(OT_INFO_SERVICE_TYPE_LocalSessionService, OT_INFO_SERVICE_TYPE_LocalSessionService, _url, invalidServiceID);
+}
+
+void ot::ApplicationBase::initiallySelectEntity(const std::string& _entityName) {
+	if (m_initialSelectionHelper) {
+		OT_LOG_WA("Initial selection helper is already initialized...");
+		return;
+	}
+
+	m_initialSelectionHelper = new ot::InitialSelectionHelper;
+	m_initialSelectionHelper->setMode(ot::InitialSelectionHelper::Mode::SelectByName);
+	m_initialSelectionHelper->setEntityName(_entityName);
+
+	if (m_modelComponent) {
+		m_initialSelectionHelper->setModelUrl(m_modelComponent->getServiceURL());
+	}
+	if (m_uiComponent) {
+		m_initialSelectionHelper->setUiUrl(m_uiComponent->getServiceURL());
+	}
+
+	m_initialSelectionHelper->runIfReady();
+}
+
+void ot::ApplicationBase::initiallySelectFirstChildEntityOf(const std::string& _parentEntityName) {
+	if (m_initialSelectionHelper != nullptr) {
+		OT_LOG_WA("Initial selection helper is already initialized...");
+		return;
+	}
+
+	m_initialSelectionHelper = new ot::InitialSelectionHelper;
+	m_initialSelectionHelper->setMode(ot::InitialSelectionHelper::Mode::SelectFirstChild);
+	m_initialSelectionHelper->setEntityName(_parentEntityName);
+
+	if (m_modelComponent) {
+		m_initialSelectionHelper->setModelUrl(m_modelComponent->getServiceURL());
+	}
+	if (m_uiComponent) {
+		m_initialSelectionHelper->setUiUrl(m_uiComponent->getServiceURL());
+	}
+
+	m_initialSelectionHelper->runIfReady();
 }
 
 // ##########################################################################################################################################
@@ -738,7 +788,6 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 		OT_LOG_EAS("Service already registered { \"Name\": \"" + _service.getServiceName() + "\", \"Type\": \"" + _service.getServiceType() + "\", \"URL\": \"" + _service.getServiceURL() + "\", \"ID\": " + std::to_string(_service.getServiceID()) + " }");
 		return;
 	}
-
 	if (_service.getServiceType() == OT_INFO_SERVICE_TYPE_UI) {
 		if (m_uiComponent) {
 			OT_LOG_EA("UI component already registered. Multiple UIs not supported");
@@ -762,6 +811,10 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 		m_uiComponent->sendUpdatedControlState();
 		m_uiComponent->notifyUiSetupCompleted();
 		this->enableMessageQueuing(m_uiComponent->getServiceName(), false);
+		if (m_initialSelectionHelper) {
+			m_initialSelectionHelper->setUiUrl(_service.getServiceURL());
+			m_initialSelectionHelper->runIfReady();
+		}
 	}
 	else if (_service.getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
 		// Store information
@@ -773,6 +826,11 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 		m_serviceNameMap.insert_or_assign(_service.getServiceName(), m_modelComponent);
 
 		modelConnected(m_modelComponent);
+
+		if (m_initialSelectionHelper) {
+			m_initialSelectionHelper->setModelUrl(_service.getServiceURL());
+			m_initialSelectionHelper->runIfReady();
+		}
 	}
 	else {
 		// Store information
@@ -803,6 +861,10 @@ void ot::ApplicationBase::serviceDisconnectedPrivate(serviceID_t _id) {
 		}
 
 		GuiAPIManager::instance().frontendDisconnected();
+
+		if (m_initialSelectionHelper) {
+			m_initialSelectionHelper->setUiUrl(std::string());
+		}
 	}
 	else if (serviceInfo->getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
 		assert(serviceInfo == (ServiceBase*)m_modelComponent);
@@ -815,6 +877,9 @@ void ot::ApplicationBase::serviceDisconnectedPrivate(serviceID_t _id) {
 			m_modelComponent = nullptr;
 		}
 
+		if (m_initialSelectionHelper) {
+			m_initialSelectionHelper->setModelUrl(std::string());
+		}
 	}
 	else {
 		serviceDisconnected(*serviceInfo);

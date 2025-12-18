@@ -78,6 +78,7 @@ Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService, new UiNotifier(), new ModelNotifier()) 
 {
 	m_SimulationRunning = false;
+	initiallySelectFirstChildEntityOf(ot::FolderNames::CircuitsFolder);
 }
 
 Application::~Application() {

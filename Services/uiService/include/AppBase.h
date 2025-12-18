@@ -343,6 +343,8 @@ public:
 
 	void setNavigationTreeItemText(ot::UID _itemID, const QString & _itemName);
 
+	void setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection);
+
 	void setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
 
 	void setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);

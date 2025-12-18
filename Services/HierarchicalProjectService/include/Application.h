@@ -84,8 +84,6 @@ protected:
 	// Private: Callback action handler
 
 private:
-
-	void handleSetProjectEntitySelected();
 	void handleProjectSelected(ot::JsonDocument& _doc);
 	void handleDocumentSelected(ot::JsonDocument& _doc);
 
@@ -130,15 +128,8 @@ private:
 
 	ot::ReturnMessage requestToOpenCSVDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block);
 
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Private: Worker
-
-	void initialSelectionWorker(std::string _modelUrl);
-
 	EntityHandler m_entityHandler;
 
-	const std::string c_setProjectEntitySelectedAction = "SetProjectEntitySelected";
 	const std::string c_projectSelectedAction = "ProjectSelected";
 	const std::string c_documentSelectedAction = "DocumentSelected";
 	const std::string c_projectImageSelectedAction = "ProjectImageSelected";

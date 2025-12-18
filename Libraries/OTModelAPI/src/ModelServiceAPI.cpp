@@ -43,7 +43,7 @@ std::list<std::string> ot::ModelServiceAPI::getListOfFolderItems(const std::stri
 
 	// Check if the received document contains the required information
 	if (!responseDoc.HasMember(OT_ACTION_PARAM_BASETYPE_List)) {
-		OT_LOG_EA("ERROR: The member \"list\" is missing");
+		OT_LOG_EA("ERROR: The member \"" OT_ACTION_PARAM_BASETYPE_List "\" is missing");
 		return folderItems;
 	}
 
