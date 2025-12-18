@@ -62,9 +62,20 @@ namespace ot {
 		static void deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel = true);
 		static void deleteEntitiesFromModel(const UIDList& _entityIDList, bool _saveModel = true);
 
+		//! @brief Will fill the provided EntityInformation object with information about the requested entity. Only works for topology entities. 
+		//! Requesting information about data entities will result in a default EntityInformation object being returned.
 		static bool getEntityInformation(UID _entity, EntityInformation& _entityInfo);
+		
+		//! @brief Will fill the provided EntityInformation object with information about the requested entity. Only works for topology entities.
+		//! Requesting information about data entities will result in a default EntityInformation object being returned.
 		static bool getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo);
+		
+		//! @brief Will fill the provided EntityInformation object with information about the requested entity. Only works for topology entities.
+		//! Requesting information about data entities will result in a default EntityInformation object being returned.
 		static void getEntityInformation(const std::list<UID>& _entities, std::list<EntityInformation>& _entityInfo);
+		
+		//! @brief Will fill the provided EntityInformation object with information about the requested entity. Only works for topology entities.
+		//! Requesting information about data entities will result in a default EntityInformation object being returned.
 		static void getEntityInformation(const std::list<std::string>& _entities, std::list<EntityInformation>& _entityInfo);
 		
 		static void getEntityChildInformation(const std::string& _entity, std::list<EntityInformation>& _entityInfo, bool recursive);
