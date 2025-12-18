@@ -132,13 +132,31 @@ namespace ot {
 		// Setter / Getter
 
 		inline bool isValid() const noexcept {
-			if (m_month < 1 || m_month > 12) return false;
+			if (m_month < 1 || m_month > 12) 
+			{
+				return false;
+			}
 			int dim = daysInMonth(m_year, m_month);
-			if (m_day < 1 || m_day > dim) return false;
-			if (m_hour < 0 || m_hour > 23) return false;
-			if (m_minute < 0 || m_minute > 59) return false;
-			if (m_second < 0 || m_second > 59) return false;
-			if (m_millisec < 0 || m_millisec > 999) return false;
+			if (m_day < 1 || m_day > dim) 
+			{
+				return false;
+			}
+			if (m_hour < 0 || m_hour > 23) 
+			{
+				return false;
+			}
+			if (m_minute < 0 || m_minute > 59) 
+			{
+				return false;
+			}
+			if (m_second < 0 || m_second > 59) 
+			{
+				return false;
+			}
+			if (m_millisec < 0 || m_millisec > 999) 
+			{
+				return false;
+			}
 			return true;
 		};
 
