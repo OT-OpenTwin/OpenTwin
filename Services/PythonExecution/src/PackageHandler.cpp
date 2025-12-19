@@ -201,7 +201,7 @@ void PackageHandler::importMissingPackages()
 
             requestRestart();
         }
-        else if (m_environmentState == EnvironmentState::core)
+        else if (m_environmentState == EnvironmentState::core || m_environmentState == EnvironmentState::fixed)
         {
             throw std::exception("Packages can only be added if the execution is happening in a custom environment. Select an environment and run again.");
             //EntityPythonManifest newManifest;
