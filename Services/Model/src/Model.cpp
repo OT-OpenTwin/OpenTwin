@@ -955,7 +955,7 @@ void Model::handleCreateNewParameter()
 
 	// Here we also need to add a new visualitation container item to the visualization model
 
-	ot::EntityTreeItem treeItem = EntityContainer::createDefaultTreeItem();
+	ot::EntityTreeItem treeItem = parameterItem->getTreeItem();
 	treeItem.setEntityID(parameterItem->getEntityID());
 	treeItem.setEntityName(parameterName);
 
@@ -3513,7 +3513,7 @@ EntityBase* Model::getEntityByID(ot::UID _entityID) const
 	auto entityBaseIt = entityMap.find(_entityID);
 	if (entityBaseIt == entityMap.end())
 	{
-		assert(0); //Entity was not found
+		//assert(0); //Entity was not found -> No assertion since this might happen in some cases and will be handled by the callers
 		return nullptr;
 	}
 	else
