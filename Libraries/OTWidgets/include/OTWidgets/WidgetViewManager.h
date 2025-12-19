@@ -227,6 +227,7 @@ namespace ot {
 		void getDebugInformation(JsonObject& _object, JsonAllocator& _allocator) const;
 
 	Q_SIGNALS:
+		void viewAdded(WidgetView* _view);
 		void viewFocusChanged(WidgetView* _focusedView, WidgetView* _previousView);
 		void viewCloseRequested(WidgetView* _view);
 		void viewTabClicked(WidgetView* _view);

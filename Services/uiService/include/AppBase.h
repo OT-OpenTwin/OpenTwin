@@ -436,6 +436,8 @@ public:
 
 	std::list<ot::GraphicsViewView*> getAllGraphicsEditors();
 
+	void closeGraphicsEditor(const std::string& _entityName);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Text Editor
@@ -533,6 +535,7 @@ private Q_SLOTS:
 	void slotVersionDeselected();
 	void slotRequestVersion(const std::string& _versionName);
 
+	void slotViewAdded(ot::WidgetView* _newView);
 	void slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView);
 	void slotViewCloseRequested(ot::WidgetView* _view);
 	void slotViewTabClicked(ot::WidgetView* _view);

@@ -1087,6 +1087,7 @@ void AppBase::createUi() {
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
 			this->connect(&m_navigationManager, &ot::NavigationSelectionManager::selectionHasChanged, this, &AppBase::slotHandleSelectionHasChanged);
 
+			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewAdded, this, &AppBase::slotViewAdded);
 			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &AppBase::slotViewFocusChanged);
 			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
 			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewTabClicked, this, &AppBase::slotViewTabClicked);
@@ -2018,6 +2019,15 @@ std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors() {
 	return ot::ContainerHelper::getValues(m_graphicsViews);
 }
 
+void AppBase::closeGraphicsEditor(const std::string& _entityName) {
+	ot::GraphicsViewView* view = this->findGraphicsEditor(_entityName, {});
+	if (!view) {
+		return;
+	}
+	this->cleanupWidgetViewInfo(view);
+	ot::GlobalWidgetViewManager::instance().closeView(view);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Text Editor
@@ -2831,6 +2841,15 @@ void AppBase::slotVersionDeselected() {
 
 void AppBase::slotRequestVersion(const std::string& _versionName) {
 	m_ExternalServicesComponent->activateVersion(_versionName);
+}
+
+void AppBase::slotViewAdded(ot::WidgetView* _newView) {
+	OTAssertNullptr(_newView);
+	if (_newView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+		const auto& viewerType = _newView->getViewData().getViewType();
+		const ot::UID globalActiveViewModel = -1;
+		ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, _newView->getViewData().getEntityName(), ot::ViewChangedStates::viewOpened, viewerType);
+	}
 }
 
 void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView) {

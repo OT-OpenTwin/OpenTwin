@@ -2604,8 +2604,8 @@ void ExternalServicesComponent::handleCreateModel(ot::JsonDocument& _document) {
 
 	// Create a model and a view
 	ModelUIDtype modelID = app->createModel();
-	ViewerUIDtype viewID = app->createView(modelID, app->getCurrentProjectInfo().getProjectName());
 	app->getViewerComponent()->activateModel(modelID);
+	ViewerUIDtype viewID = app->createView(modelID, app->getCurrentProjectInfo().getProjectName());
 
 	auto service = m_serviceIdMap.find(ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID));
 	if (service == m_serviceIdMap.end()) {
@@ -3609,11 +3609,6 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 	if (suppressViewHandling) {
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
 	}
-
-	// Lastly we notify the scene nodes that they have a state change to view opened.
-	const auto& viewerType = plotView->getViewData().getViewType();
-	ot::UID globalActiveViewModel = -1;
-	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, plotConfig.getEntityName(), ot::ViewChangedStates::viewOpened, viewerType);
 }
 
 void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _document) {
@@ -3708,10 +3703,6 @@ void ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _documen
 	}
 
 	editor->getTextEditor()->setContentSaved();
-	const std::string& name = editor->getViewData().getEntityName();
-	const auto& viewerType = editor->getViewData().getViewType();
-	ot::UID globalActiveViewModel = -1;
-	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
 }
 
 void ExternalServicesComponent::handleSetTextEditorSaved(ot::JsonDocument& _document) {
@@ -3798,11 +3789,6 @@ void ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document) {
 	if (suppressViewHandling) {
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
 	}
-
-	const std::string& name = table->getViewData().getEntityName();
-	const auto& viewerType = table->getViewData().getViewType();
-	ot::UID globalActiveViewModel = -1;
-	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
 }
 
 void ExternalServicesComponent::handleSetTableSaved(ot::JsonDocument& _document) {

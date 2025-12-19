@@ -451,8 +451,11 @@ void ViewerComponent::closeView(const std::string& _entityName, ot::WidgetViewBa
 		AppBase::instance()->closePlot(_entityName);
 		break;
 
-	case ot::WidgetViewBase::ViewVersion:
 	case ot::WidgetViewBase::ViewGraphics:
+		AppBase::instance()->closeGraphicsEditor(_entityName);
+		break;
+
+	case ot::WidgetViewBase::ViewVersion:
 	case ot::WidgetViewBase::ViewGraphicsPicker:
 	case ot::WidgetViewBase::ViewProperties:
 	case ot::WidgetViewBase::ViewNavigation:

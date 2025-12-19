@@ -227,33 +227,10 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 	else
 	{
 		//Here we set/unset the viewer state isOpen for the opened visualisation.
-		const std::list< Visualiser*>& allVisualiser = getVisualiser();
-		bool viewIsOpen = _state == ot::ViewChangedStates::viewOpened ? true : false;
-		bool thisIsTheView = false;
-		for (Visualiser* visualiser : allVisualiser)
-		{
-			if (_viewType == ot::WidgetViewBase::ViewType::ViewText)
-			{
-				TextVisualiser* textVisualiser = dynamic_cast<TextVisualiser*>(visualiser);
-				thisIsTheView = textVisualiser != nullptr;
-			}
-			else if (_viewType == ot::WidgetViewBase::ViewType::ViewTable)
-			{
-				TableVisualiser* tableVisualiser = dynamic_cast<TableVisualiser*>(visualiser);
-				thisIsTheView = tableVisualiser != nullptr;
-			}
-			else if (_viewType == ot::WidgetViewBase::ViewType::View1D)
-			{
-				PlotVisualiser* plotVisualiser = dynamic_cast<PlotVisualiser*>(visualiser);
-				thisIsTheView |= plotVisualiser != nullptr;
-				CurveVisualiser* curveVisualiser = dynamic_cast<CurveVisualiser*>(visualiser);
-				thisIsTheView |= curveVisualiser != nullptr;
-
-			}
-			if (thisIsTheView)
-			{
+		const bool viewIsOpen = _state == ot::ViewChangedStates::viewOpened ? true : false;
+		for (Visualiser* visualiser : getVisualiser()) {
+			if (visualiser->getViewType() == _viewType) {
 				visualiser->setViewIsOpen(viewIsOpen);
-				break;
 			}
 		}
 	}

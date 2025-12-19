@@ -855,6 +855,8 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 
 	updateCentralViewTitles();
 
+	Q_EMIT viewAdded(_view);
+
 	// Update focus information or reset the current focus depending on the insert mode
 	if (_insertFlags & WidgetView::KeepCurrentFocus) {
 		for (WidgetView* view : focusedViews) {

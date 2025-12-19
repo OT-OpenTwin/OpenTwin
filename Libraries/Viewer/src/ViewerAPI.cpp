@@ -426,7 +426,7 @@ void ViewerAPI::notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::st
 	try
 	{
 		Model* model = nullptr;
-		if(osgModelID == -1)
+		if (osgModelID == -1)
 		{ 
 			model = GlobalModel::instance();
 		}
