@@ -6,5 +6,9 @@ Features/Changes
 - Renaming of graphics scenes is now possible
 - Snapping and unsnapping of connections is now possible
 - Multi drag/drop of blocks is now handled in one state
+- Python environments were added
+- Python packages are automatically installed, either per selected environment description or import statements in the executed script
+- Improved visual feedback for importing large numbers of files
+- Improved speed of data transport in pipeline by factor ~3
 
 Bugs
