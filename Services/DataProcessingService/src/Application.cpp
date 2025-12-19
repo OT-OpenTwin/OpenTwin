@@ -170,14 +170,14 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage(pageName);
 	_ui->addMenuGroup(pageName, groupName);
 	
-	m_buttonRunPipeline = ot::ToolBarButtonCfg(pageName, groupName, "Run", "Default/RunSolver");
-	_ui->addMenuButton(m_buttonRunPipeline.setButtonLockFlags(modelWrite));
+	m_buttonGraphicsScene = ot::ToolBarButtonCfg(pageName, groupName, "Create Pipeline", "Default/Add");
+	_ui->addMenuButton(m_buttonGraphicsScene.setButtonLockFlags(modelWrite));
 
 	m_buttonCreateSolver = ot::ToolBarButtonCfg(pageName, groupName, "Add Solver", "Default/AddSolver");
 	_ui->addMenuButton(m_buttonCreateSolver.setButtonLockFlags(modelWrite));
 
-	m_buttonGraphicsScene = ot::ToolBarButtonCfg(pageName, groupName, "Create Pipeline", "Default/AddSolver");
-	_ui->addMenuButton(m_buttonGraphicsScene.setButtonLockFlags(modelWrite));
+	m_buttonRunPipeline = ot::ToolBarButtonCfg(pageName, groupName, "Run", "Default/RunSolver");
+	_ui->addMenuButton(m_buttonRunPipeline.setButtonLockFlags(modelWrite));
 
 	m_buttonCreateManifest = ot::ToolBarButtonCfg(pageName, groupName, "Create Manifest", "Default/AddMaterial");
 	_ui->addMenuButton(m_buttonCreateManifest.setButtonLockFlags(modelWrite));

@@ -498,13 +498,13 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 
 	auto flags = ot::LockType::ModelWrite | ot::LockType::ViewRead | ot::LockType::ViewWrite;
 
-	m_buttonAddSolver = ot::ToolBarButtonCfg(page, groupEdit, "Add Solver", "Default/Add");
-	_ui->addMenuButton(m_buttonAddSolver.setButtonLockFlags(flags));
-	connectToolBarButton(m_buttonAddSolver, this, &Application::addSolver);
-
 	m_buttonAddCircuit = ot::ToolBarButtonCfg(page, groupEdit, "Add Circuit", "Default/Add");
 	_ui->addMenuButton(m_buttonAddCircuit.setButtonLockFlags(flags));
 	connectToolBarButton(m_buttonAddCircuit, this, &Application::createNewCircuit);
+
+	m_buttonAddSolver = ot::ToolBarButtonCfg(page, groupEdit, "Add Solver", "Default/AddSolver");
+	_ui->addMenuButton(m_buttonAddSolver.setButtonLockFlags(flags));
+	connectToolBarButton(m_buttonAddSolver, this, &Application::addSolver);
 
 	m_buttonRunSimulation = ot::ToolBarButtonCfg(page, groupSimulate, "Run Simulation", "Default/RunSolver");
 	_ui->addMenuButton(m_buttonRunSimulation.setButtonLockFlags(flags));
