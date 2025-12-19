@@ -90,11 +90,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	ot::LockTypes modelWrite(ot::LockType::ModelWrite);
 
 	// Setup buttons
-	_buttonRunSolver = ot::ToolBarButtonCfg(pageName, groupNameSolver, "Run Solver", "Default/RunSolver");
-	_buttonRunSolver.setButtonLockFlags(modelWrite);
-
 	_buttonCreateSolver = ot::ToolBarButtonCfg(pageName, groupNameSolver, "Create Solver", "Default/AddSolver");
 	_buttonCreateSolver.setButtonLockFlags(modelWrite);
+
+	_buttonRunSolver = ot::ToolBarButtonCfg(pageName, groupNameSolver, "Run Solver", "Default/RunSolver");
+	_buttonRunSolver.setButtonLockFlags(modelWrite);
 
 	_buttonAddPort = ot::ToolBarButtonCfg(pageName, groupNamePort, "Add Port", "Default/Port");
 	_buttonAddPort.setButtonLockFlags(modelWrite);
