@@ -19,7 +19,7 @@ InterpreterPathSettings::InterpreterPathSettings(const std::string& _predefinedE
 	{
 		// Environment is a special, which already exists in the python interpreter installation
 		OT_LOG_D("Initialize Pyrit environment");
-		m_customEnvironmentName = PredefinedEnvironments::getPythonEnvironmentName();
+		m_customEnvironmentName = PredefinedEnvironments::getPyritEnvironmentName();
 	}
 	else if (_predefinedEnvironmentName == "Core")
 	{

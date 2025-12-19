@@ -28,6 +28,8 @@
 #include "PackageHandler.h"
 #include "InterpreterPathSettings.h"
 #include "WorkerWaiterState.h"
+#include "EnvironmentsGarbageCollector.h"
+
 //! @brief This class deals with the workflow of loading python script entities, executing them and sending the results back to the service that requested the execution.
 class PythonInterpreterAPI
 {
@@ -47,7 +49,7 @@ private:
 	PythonWrapper m_wrapper;
 	PackageHandler m_packageHandler;
 	WorkerWaiterState m_workerWaiterState;
-
+	EnvironmentsGarbageCollector m_garbageCollector;
 	InterpreterPathSettings m_interpreterPathSettings;
 
 	std::list<ot::EntityInformation> ensureScriptsAreLoaded(const std::list<std::string>& _scripts);

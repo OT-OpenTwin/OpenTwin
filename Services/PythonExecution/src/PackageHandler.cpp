@@ -75,8 +75,11 @@ void PackageHandler::initializeManifest(ot::UID _manifestUID)
 
 void PackageHandler::initializeEnvironmentWithManifest(const std::string& _environmentPath)
 {
+    assert(m_installationNotifier != nullptr);
+    assert(m_currentManifest != nullptr);
+
 	m_environmentPath = _environmentPath;
-	m_workerWaiterState->m_isWorkDone = false; //Here we have to block other threads until the initialisation is done
+	m_installationNotifier->m_isWorkDone = false; //Here we have to block other threads until the initialisation is done
     try
     {
         //In this case we are in the process of a freshly started interpreter
@@ -107,7 +110,6 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
 
         buildInstalledPackageMap(installedPackages);
 
-        assert(m_currentManifest != nullptr);
         std::optional<std::list<std::string>> packagesInManifest = m_currentManifest->getManifestPackages();
         if (!packagesInManifest.has_value())
         {
@@ -140,8 +142,8 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
             }
         }
 
-        m_workerWaiterState->m_isWorkDone = true;
-        m_workerWaiterState->m_conditionalVariable.notify_all();
+        m_installationNotifier->m_isWorkDone = true;
+        m_installationNotifier->m_conditionalVariable.notify_all();
     }
     catch (const std::exception& e)
     {

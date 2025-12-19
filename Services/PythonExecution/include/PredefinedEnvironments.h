@@ -4,16 +4,24 @@
 
 namespace PredefinedEnvironments
 {
-	static std::string getPythonEnvironmentName() { return "PyritEnvironment"; }
+	static std::string getPyritEnvironmentName() { return "PyritEnvironment"; }
 	static std::string getBuildToolsEnvironmentName() { return "PythonBuildTools"; }
 	static std::string getCoreEnvironmentName() { return "CoreEnvironment"; }
-	static std::list<std::string> getAll()
+	static std::list<std::string> getMandatoryEnvironments()
 	{
 		return
 		{
-			getPythonEnvironmentName(),
 			getCoreEnvironmentName(),
 			getBuildToolsEnvironmentName()
+		};
+	}
+	static std::list<std::string> getAll()
+	{
+		return 
+		{
+			getCoreEnvironmentName(),
+			getBuildToolsEnvironmentName(),
+			getPyritEnvironmentName()
 		};
 	}
 }

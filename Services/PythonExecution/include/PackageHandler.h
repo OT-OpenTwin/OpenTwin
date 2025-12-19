@@ -63,9 +63,9 @@ public:
 		m_environmentState = EnvironmentState::fixed;
 	}
 
-	void setWorkerState(WorkerWaiterState* _workerWaiterState)
+	void setInstallationNotifier(WorkerWaiterState* _workerWaiterState)
 	{
-		m_workerWaiterState = _workerWaiterState;
+		m_installationNotifier = _workerWaiterState;
 	}
 
 private:
@@ -81,8 +81,7 @@ private:
 	std::map<std::string, std::string> m_installedPackageVersionsByName;
 	EntityPythonManifest* m_currentManifest = nullptr;
 	std::string m_environmentPath;
-	WorkerWaiterState* m_workerWaiterState = nullptr; //Used for letting other threads wait for the installation to finish
-
+	WorkerWaiterState* m_installationNotifier = nullptr; //Used for letting other threads wait for the installation to finish
 	EnvironmentState m_environmentState = EnvironmentState::empty;
 	std::list<std::string> m_uninstalledPackages;
 	std::string m_installationLog;

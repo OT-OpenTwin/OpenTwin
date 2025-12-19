@@ -54,6 +54,13 @@ public:
 		assert(m_pathsAreSet);
 		return m_customEnvironmentName;
 	}
+	std::string getEnvironmentsBasePath() const
+	{
+		assert(m_pathsAreSet);
+		assert(!m_environmentsBase.empty());
+		return m_environmentsBase;
+	}
+
 	std::string getLibPath() const
 	{
 		assert(m_pathsAreSet);

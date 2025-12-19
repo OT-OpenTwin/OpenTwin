@@ -40,7 +40,7 @@ void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);
 	
 	//Means to check installation progress from other threads
-	m_packageHandler.setWorkerState(&m_workerWaiterState);
+	m_packageHandler.setInstallationNotifier(&m_workerWaiterState);
 	
 	if (m_interpreterPathSettings.getCustomEnvironmentName().empty())
 	{
@@ -55,6 +55,9 @@ void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 	}
 
 	m_wrapper.setPackageHandler(&m_packageHandler);
+	m_garbageCollector.setInterpreterPathSettings(m_interpreterPathSettings);
+	std::thread garbageCollectorThread(&EnvironmentsGarbageCollector::run, &m_garbageCollector);
+	garbageCollectorThread.detach();
 }
 
 void PythonInterpreterAPI::initializeEnvironment(const std::string& _environmentName)
@@ -65,7 +68,7 @@ void PythonInterpreterAPI::initializeEnvironment(const std::string& _environment
 	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);
 
 	//Means to check installation progress from other threads
-	m_packageHandler.setWorkerState(&m_workerWaiterState);
+	m_packageHandler.setInstallationNotifier(&m_workerWaiterState);
 
 	if(m_interpreterPathSettings.getCustomEnvironmentName().empty())
 	{
@@ -78,6 +81,9 @@ void PythonInterpreterAPI::initializeEnvironment(const std::string& _environment
 		OT_LOG_D("Running with fixed environment. No additional installations allowed.");		
 	}
 	m_wrapper.setPackageHandler(&m_packageHandler);
+	m_garbageCollector.setInterpreterPathSettings(m_interpreterPathSettings);
+	std::thread garbageCollectorThread(&EnvironmentsGarbageCollector::run, &m_garbageCollector);
+	garbageCollectorThread.detach();
 }
 
 void PythonInterpreterAPI::checkEnvironmentIsInitialised(ot::UID _manifestEntityUID)
