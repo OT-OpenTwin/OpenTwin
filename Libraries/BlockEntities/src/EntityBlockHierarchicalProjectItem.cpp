@@ -38,6 +38,8 @@ EntityBlockHierarchicalProjectItem::EntityBlockHierarchicalProjectItem(ot::UID _
 	treeItem.setHiddenIcon("ProjectTemplates/DefaultIcon");
 	this->setDefaultTreeItem(treeItem);
 
+	this->setDefaultIsCopyable(false);
+
 	setBlockTitle("Hierarchical Project Item");
 
 	resetModified();

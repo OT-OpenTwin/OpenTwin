@@ -102,17 +102,19 @@ std::string CopyPasteHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& 
 	for (ot::UID uid : selectedEntities) {
 		// Find entity
 		EntityBase* entity = model->getEntityByID(uid);
-		const std::string serialisedEntity = entity->serialiseAsJSON();
-		if (!serialisedEntity.empty()) 
-		{	
-			ot::CopyEntityInformation entityInfo;
-			entityInfo.setName(entity->getName());
-			entityInfo.setUid(entity->getEntityID());
-			entityInfo.setRawData(serialisedEntity);
-			info.addEntity(entityInfo);
-		}
-		else {
-			OT_LOG_E("Selected Entity " + entity->getName() + " cannot be copied.");
+		OTAssertNullptr(entity);
+		if (entity->getIsCopyable()) {
+			std::string serialisedEntity = entity->serialiseAsJSON();
+			if (!serialisedEntity.empty()) {
+				ot::CopyEntityInformation entityInfo;
+				entityInfo.setName(entity->getName());
+				entityInfo.setUid(entity->getEntityID());
+				entityInfo.setRawData(std::move(serialisedEntity));
+				info.addEntity(std::move(entityInfo));
+			}
+			else {
+				OT_LOG_E("Failed to create copy information for Entity \"" + entity->getName() + "\".");
+			}
 		}
 	}
 	

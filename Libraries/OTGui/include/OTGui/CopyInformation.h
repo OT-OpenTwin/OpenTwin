@@ -101,6 +101,7 @@ namespace ot {
 
 		void addEntity(UID _uid, const std::string& _name, const std::string& _rawData = std::string());
 		void addEntity(const CopyEntityInformation& _entityInfo) { m_entities.push_back(_entityInfo); };
+		void addEntity(CopyEntityInformation&& _entityInfo) { m_entities.push_back(std::move(_entityInfo)); };
 		void setEntities(const std::list<CopyEntityInformation>& _entities) { m_entities = _entities; };
 		std::list<CopyEntityInformation>& getEntities(void) { return m_entities; };
 		const std::list<CopyEntityInformation>& getEntities(void) const { return m_entities; };

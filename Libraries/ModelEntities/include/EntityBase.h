@@ -201,6 +201,9 @@ public:
 	void setCustomVisualizationViewFlags(ot::VisualisationTypes::VisualisationType _visType, ot::WidgetViewBase::ViewFlags _flags);
 	virtual ot::VisualisationTypes getVisualizationTypes() const { return m_visualizationTypes; };
 
+	void setIsCopyable(bool _isCopyable);
+	bool getIsCopyable() const { return m_isCopyable; };
+
 protected:
 	//! @brief Will set the default tree item.
 	//! Will reset the modified flags for all entries of the tree item.
@@ -213,6 +216,10 @@ protected:
 	//! If a custom behavior for a entity instance is desired use the setters for single visualization types and config.
 	//! @param _types The types to set.
 	void setDefaultVisualizationTypes(const ot::VisualisationTypes& _types);
+
+	//! @brief Set the default copyable flag for this entity.
+	//! The EntityBase default is true.
+	void setDefaultIsCopyable(bool _isCopyable) { m_isCopyable = _isCopyable; m_isCopyableChanged = false; };
 
 	virtual void callbackDataChanged() override { setModified(); };
 
@@ -238,6 +245,8 @@ private:
 	// Optionally persistent attributes
 	ot::EntityTreeItem      m_treeItem;           // Holds name, id, version and tree item information (persistent), other info is stored when modified
 	ot::VisualisationTypes  m_visualizationTypes; // Only stored when modified
+	bool                    m_isCopyable;
+	bool                    m_isCopyableChanged;
 
 	// Temporary attributes
 	EntityBase*             m_parentEntity;

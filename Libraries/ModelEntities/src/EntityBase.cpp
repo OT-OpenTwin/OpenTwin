@@ -36,7 +36,9 @@ EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	m_manageParentVisibility(true),
 	m_manageChildVisibility(true),
 	m_modelState(_ms),
-	m_isDeletable(true)
+	m_isDeletable(true),
+	m_isCopyable(true),
+	m_isCopyableChanged(false)
 {
 	m_treeItem.setEntityID(_ID);
 }
@@ -233,6 +235,11 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 			}
 		}
 
+		docIt = doc_view.find("IsCopyable");
+		if (docIt != doc_view.end()) {
+			setIsCopyable(docIt->get_bool());
+		}
+
 		std::string propertiesJSON = bsoncxx::to_json(bsonObj);
 		m_properties.buildFromJSON(propertiesJSON, nullptr);
 		m_properties.forceResetUpdateForAllProperties();
@@ -394,6 +401,9 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 		}
 		doc.append(bsoncxx::builder::basic::kvp("CustomViewFlags", customViewFlagsArray));
 	}
+	if (m_isCopyableChanged) {
+		doc.append(bsoncxx::builder::basic::kvp("IsCopyable", m_isCopyable));
+	}
 
 	addStorageData(doc);
 
@@ -418,6 +428,14 @@ void EntityBase::removeVisualizationType(ot::VisualisationTypes::VisualisationTy
 
 void EntityBase::setCustomVisualizationViewFlags(ot::VisualisationTypes::VisualisationType _visType, ot::WidgetViewBase::ViewFlags _flags) {
 	m_visualizationTypes.setCustomViewFlags(_visType, _flags);
+}
+
+void EntityBase::setIsCopyable(bool _isCopyable) {
+	if (m_isCopyable != _isCopyable) {
+		m_isCopyable = _isCopyable;
+		m_isCopyableChanged = true;
+		setModified();
+	}
 }
 
 void EntityBase::setDefaultTreeItem(const ot::EntityTreeItem& _treeItem) {

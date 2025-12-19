@@ -54,6 +54,7 @@ namespace ot {
 		const std::string& getName(void) const { return m_name; };
 
 		void setRawData(const std::string& _data) { m_rawData = _data; };
+		void setRawData(std::string&& _data) { m_rawData = std::move(_data); };
 		const std::string& getRawData(void) const { return m_rawData; };
 
 	private:

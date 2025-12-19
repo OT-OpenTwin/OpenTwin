@@ -41,8 +41,6 @@ EntityBlock::~EntityBlock()
 	}
 }
 
-
-
 void EntityBlock::addVisualizationNodes(void)
 {
 	createNavigationTreeEntry();
