@@ -3354,6 +3354,8 @@ void Model::projectOpen(const std::string& _customVersion)
 	}
 	
 	// Process all entities and store the parameter values
+	BlockHandler& blockHandler = Application::instance()->getBlockHandler();
+
 	for (auto &entity : entityMap)
 	{
 		EntityParameter *parameter = dynamic_cast<EntityParameter *>(entity.second);
@@ -3362,11 +3364,8 @@ void Model::projectOpen(const std::string& _customVersion)
 			setParameter(parameter->getName(), parameter->getNumericValue(), parameter);
 		}
 		
-		auto& blockHandler = Application::instance()->getBlockHandler();
 		blockHandler.processEntity(entity.second);
 	}
-
-	
 
 	// Reset the modified flag
 	resetModified();

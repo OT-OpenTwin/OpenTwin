@@ -43,9 +43,6 @@
 #include "OTCore/EntityName.h"
 
 void BlockHandler::processEntity(EntityBase* _entBase) {
-	Model* model = Application::instance()->getModel();
-	OTAssertNullptr(model);
-
 	if (_entBase == nullptr) {
 		OT_LOG_E("EntityBase pointer is null");
 		return;
