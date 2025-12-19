@@ -115,7 +115,7 @@ std::string ot::json::toErrorString(rapidjson::ParseErrorCode _code) {
 	switch (_code) {
 	case rapidjson::kParseErrorNone:
 		result = "None";
-		return;
+		break;
 
 	case rapidjson::kParseErrorDocumentEmpty:
 		result = "The document is empty";

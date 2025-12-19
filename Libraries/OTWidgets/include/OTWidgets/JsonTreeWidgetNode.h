@@ -3,12 +3,11 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt header
-#include <QtCore/qjsonvalue.h>
-#include <QtCore/qjsonarray.h>
-#include <QtCore/qjsonobject.h>
+#include <QtCore/qstring.h>
 
 // std header
 #include <vector>
@@ -20,8 +19,23 @@ namespace ot {
 		OT_DECL_NOMOVE(JsonTreeWidgetNode)
 		OT_DECL_NODEFAULT(JsonTreeWidgetNode)
     public:
-        JsonTreeWidgetNode(const QString& _key, const QJsonValue& _value, JsonTreeWidgetNode* _parent = nullptr);
-        JsonTreeWidgetNode(const QString& _key, QJsonValue&& _value, JsonTreeWidgetNode* _parent = nullptr);
+        enum ValueType {
+            Null,
+            Bool,
+            String,
+            Number,
+            Object,
+            Array
+        };
+
+        enum NodeFlag : uint64_t {
+            NoFlags      = 0 << 0,
+            Container    = 1 << 0,
+			ContainerEnd = 1 << 1
+        };
+		typedef ot::Flags<NodeFlag> NodeFlags;
+
+        JsonTreeWidgetNode(const QString& _key, const JsonValue& _jsonValue, const NodeFlags& _flags = NodeFlag::NoFlags, JsonTreeWidgetNode* _parent = nullptr);
         ~JsonTreeWidgetNode();
 
         JsonTreeWidgetNode* getChild(int _row);
@@ -30,28 +44,27 @@ namespace ot {
 
         int getRow() const;
 
-        void loadChildren();
-
         const QString& getKey() const { return m_key; };
-		void setValue(const QJsonValue& _value) { m_value = _value; };
-		void setValue(QJsonValue&& _value) { m_value = std::move(_value); };
-		const QJsonValue& getValue() const { return m_value; };
+		const QString& getValue() const { return m_value; };
+		ValueType getType() const { return m_type; };
+		const QString& getTypeString() const { return m_typeString; };
 		JsonTreeWidgetNode* getParent() const { return m_parent; };
 		const std::vector<JsonTreeWidgetNode*>& getChildren() const { return m_children; };
-		bool getChildrenLoaded() const { return m_childrenLoaded; };
-
-		bool isContainer() const { return m_isContainer; };
-		bool isContainerEnd() const { return m_isContainerEnd; };
+		
+		bool isContainer() const { return m_flags.has(Container); };
+		bool isContainerEnd() const { return m_flags.has(ContainerEnd); };
         bool isEditProtected() const;
 
     private:
-        bool m_isContainer;
-        bool m_isContainerEnd;
+        NodeFlags m_flags;
         QString m_key;
-        QJsonValue m_value;
+        QString m_value;
+		ValueType m_type;
+        QString m_typeString;
         JsonTreeWidgetNode* m_parent;
         std::vector<JsonTreeWidgetNode*> m_children;
-        bool m_childrenLoaded;
     };
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::JsonTreeWidgetNode::NodeFlag, ot::JsonTreeWidgetNode::NodeFlags)

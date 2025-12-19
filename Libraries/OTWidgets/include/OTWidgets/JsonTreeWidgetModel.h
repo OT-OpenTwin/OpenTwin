@@ -7,7 +7,6 @@
 
 // Qt header
 #include <QtCore/qvariant.h>
-#include <QtCore/qjsondocument.h>
 #include <QtCore/qabstractitemmodel>
 
 namespace ot {
@@ -18,12 +17,19 @@ namespace ot {
 		OT_DECL_NOMOVE(JsonTreeWidgetModel)
 		OT_DECL_NODEFAULT(JsonTreeWidgetModel)
     public:
+        enum ColumnIndex : int32_t {
+            ColumnKey,
+            ColumnValue,
+            ColumnType,
+
+            ColumnCount
+        };
+
         JsonTreeWidgetModel(QObject* _parent);
         virtual ~JsonTreeWidgetModel();
 
-        void setJson(const QJsonDocument& _doc);
-		QJsonDocument toJsonDocument() const;
-
+        void setFromJsonDocument(const JsonDocument& _doc);
+        
         // Required overrides
         QModelIndex index(int _row, int _column, const QModelIndex& _parent = QModelIndex()) const override;
 
@@ -44,10 +50,6 @@ namespace ot {
     private:
         JsonTreeWidgetNode* m_rootNode;
 
-		void addToJsonObject(QJsonObject& _object, JsonTreeWidgetNode* _node) const;
-		void addToJsonArray(QJsonArray& _array, JsonTreeWidgetNode* _node) const;
-
-        static QString jsonValueToString(const QJsonValue& _value);
     };
 
 }

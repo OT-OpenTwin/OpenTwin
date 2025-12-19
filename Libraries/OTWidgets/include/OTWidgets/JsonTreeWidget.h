@@ -22,11 +22,14 @@ namespace ot {
         JsonTreeWidget(QWidget* _parent);
 		virtual ~JsonTreeWidget();
 
-        void setJsonDocument(const QJsonDocument& _doc);
-		QJsonDocument toJsonDocument() const;
+        void setFromJsonDocument(const JsonDocument& _doc);
+		JsonDocument toJsonDocument() const;
 
         void setReadOnly(bool _readOnly) { m_readOnly = _readOnly; };
 		bool isReadOnly() const { return m_readOnly; };
+
+    Q_SIGNALS:
+		void nodeDoubleClicked(int _column, ot::JsonTreeWidgetNode* _node);
 
     public Q_SLOTS:
 		void filterItems(const QString& _filterText);
@@ -36,6 +39,7 @@ namespace ot {
 
     private Q_SLOTS:
 		void slotItemExpanded(const QModelIndex& _index);
+		void slotDoubleClicked(const QModelIndex& _index);
 
     private:
         JsonTreeWidgetModel* m_model;

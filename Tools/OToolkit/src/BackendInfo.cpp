@@ -23,6 +23,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/LineEdit.h"
@@ -38,6 +39,7 @@
 
 // Qt header
 #include <QtCore/qjsonparseerror.h>
+#include <QtGui/qclipboard.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qgroupbox.h>
@@ -45,6 +47,7 @@
 #include <QtWidgets/qheaderview.h>
 #include <QtWidgets/qlistwidget.h>
 #include <QtWidgets/qfiledialog.h>
+#include <QtWidgets/qapplication.h>
 
 #define BACKINFO_LOG(___message) OTOOLKIT_LOG("Backend Info", ___message)
 #define BACKINFO_LOGW(___message) OTOOLKIT_LOGW("Backend Info", ___message)
@@ -63,6 +66,7 @@ namespace intern {
 			serviceArea->setWidgetResizable(true);
 			m_tree = new ot::JsonTreeWidget(serviceArea);
 			serviceArea->setWidget(m_tree);
+			connect(m_tree, &ot::JsonTreeWidget::nodeDoubleClicked, this, &CustomJsonTree::slotNodeDoubleClicked);
 
 			QHBoxLayout* controlLayout = new QHBoxLayout;
 			layout->addLayout(controlLayout);
@@ -93,8 +97,8 @@ namespace intern {
 
 	private Q_SLOTS:
 		void slotExport() {
-			QJsonDocument doc = m_tree->toJsonDocument();
-			QByteArray jsonString = doc.toJson(QJsonDocument::Indented);
+			ot::JsonDocument doc = m_tree->toJsonDocument();
+			QByteArray jsonString = QByteArray::fromStdString(doc.toJson());
 			if (jsonString.length() < 3) {
 				BACKINFO_LOGW("No data to export");
 				return;
@@ -113,6 +117,18 @@ namespace intern {
 
 			file.write(jsonString);
 			file.close();
+		}
+
+		void slotNodeDoubleClicked(int _column, ot::JsonTreeWidgetNode* _node) {
+			switch (_column) {
+			case ot::JsonTreeWidgetModel::ColumnValue:
+				QApplication::clipboard()->setText(_node->getValue());
+				BACKINFO_LOG("Copied value to clipboard: " + _node->getValue());
+				break;
+
+			default:
+				break;
+			}
 		}
 
 	private:
@@ -829,20 +845,17 @@ void BackendInfo::slotAddService(const std::string& _serviceName, const std::str
 		return;
 	}
 
-	// Parse JSON
-	QJsonParseError err;
-	QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(_debugInfoJson), &err);
-	if (err.error != QJsonParseError::NoError) {
-		BACKINFO_LOGW("Failed to parse service debug information { \"Name\": \"" + QString::fromStdString(_serviceName) + "\", \"ID\": \"" + QString::fromStdString(_serviceId) + "\", \"Url\": \"" + QString::fromStdString(_serviceUrl) + "\", \"Error\": \"" + err.errorString() + "\" }");
-		BACKINFO_LOGW("JSON: " + QString::fromStdString(_debugInfoJson));
-		return;
+	// Parse
+	ot::JsonDocument doc;
+	if (!doc.fromJson(_debugInfoJson)) {
+		BACKINFO_LOGW("Failed to parse service debug information { \"Name\": \"" + QString::fromStdString(_serviceName) + "\", \"ID\": \"" + QString::fromStdString(_serviceId) + "\", \"Url\": \"" + QString::fromStdString(_serviceUrl) + "\", \"Error\": \"" + QString::fromStdString(ot::json::toErrorString(doc.GetParseError(), doc.GetErrorOffset())) + "\" }");
 	}
 
 	// Create widget
 	ot::ExpanderWidget* serviceExpander = new ot::ExpanderWidget(QString::fromStdString("Service { \"Name\": \"" + _serviceName + "\", \"ID\": \"" + _serviceId + "\", \"Url\": \"" + _serviceUrl + "\" }"), m_sectionsLayout->widget());
 	intern::CustomJsonTree* tree = new intern::CustomJsonTree(serviceExpander);
 	tree->getTree()->setReadOnly(true);
-	tree->getTree()->setJsonDocument(doc);
+	tree->getTree()->setFromJsonDocument(doc);
 	serviceExpander->setWidget(tree);
 
 	m_sectionsLayout->addWidget(serviceExpander);

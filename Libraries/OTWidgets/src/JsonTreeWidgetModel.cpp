@@ -8,7 +8,7 @@
 ot::JsonTreeWidgetModel::JsonTreeWidgetModel(QObject* _parent)
     : QAbstractItemModel(_parent), m_rootNode(nullptr)
 {
-    m_rootNode = new JsonTreeWidgetNode("Document", QJsonValue::Object);
+    m_rootNode = new JsonTreeWidgetNode("", JsonNullValue());
 }
 
 ot::JsonTreeWidgetModel::~JsonTreeWidgetModel() {
@@ -18,7 +18,7 @@ ot::JsonTreeWidgetModel::~JsonTreeWidgetModel() {
 	}
 }
 
-void ot::JsonTreeWidgetModel::setJson(const QJsonDocument& _doc) {
+void ot::JsonTreeWidgetModel::setFromJsonDocument(const JsonDocument& _doc) {
     beginResetModel();
     
     if (m_rootNode) {
@@ -26,37 +26,15 @@ void ot::JsonTreeWidgetModel::setJson(const QJsonDocument& _doc) {
 		m_rootNode = nullptr;
     }
 
-    if (!_doc.isObject() && !_doc.isArray()) {
+    if (!_doc.IsObject() && !_doc.IsArray()) {
 		OT_LOG_E("Document is neither object nor array");
-        m_rootNode = new JsonTreeWidgetNode("Root", QJsonValue::Null);
+        m_rootNode = new JsonTreeWidgetNode("", JsonNullValue());
 	}
     else {
-        m_rootNode = new JsonTreeWidgetNode("Root", _doc.isObject() ? QJsonValue(_doc.object()) : QJsonValue(_doc.array()));
+        m_rootNode = new JsonTreeWidgetNode("", _doc);
     }
     
     endResetModel();
-}
-
-QJsonDocument ot::JsonTreeWidgetModel::toJsonDocument() const {
-    if (!m_rootNode) {
-        OT_LOG_W("No document set");
-        return QJsonDocument();
-	}
-
-    if (m_rootNode->getValue().isObject()) {
-        QJsonObject obj;
-        addToJsonObject(obj, m_rootNode);
-        return QJsonDocument(obj);
-    }
-    else if (m_rootNode->getValue().isArray()) {
-        QJsonArray arr;
-        addToJsonArray(arr, m_rootNode);
-        return QJsonDocument(arr);
-    }
-    else {
-        OT_LOG_W("Root node is neither object nor array");
-        return QJsonDocument();
-	}
 }
 
 QModelIndex ot::JsonTreeWidgetModel::index(int _row, int _column, const QModelIndex& _parent) const {
@@ -93,7 +71,7 @@ int ot::JsonTreeWidgetModel::rowCount(const QModelIndex& _parent) const {
 
 int ot::JsonTreeWidgetModel::columnCount(const QModelIndex& _parent) const {
 	OT_UNUSED(_parent);
-    return 3;
+    return ColumnIndex::ColumnCount;
 }
 
 QVariant ot::JsonTreeWidgetModel::data(const QModelIndex& _index, int _role) const {
@@ -103,57 +81,44 @@ QVariant ot::JsonTreeWidgetModel::data(const QModelIndex& _index, int _role) con
     JsonTreeWidgetNode* node = static_cast<JsonTreeWidgetNode*>(_index.internalPointer());
 
     if (_role == Qt::DisplayRole) {
-        if (_index.column() == 0) {
+        if (_index.column() == ColumnIndex::ColumnKey) {
             return node->getKey();
 		}
-        else if (_index.column() == 1) {
-            if (node->getValue().isObject()) {
-                return "";
-            }
-            else if (node->getValue().isArray()) {
-                return "";
-            }
-            else {
-                return jsonValueToString(node->getValue());
-            }
+        else if (_index.column() == ColumnIndex::ColumnValue) {
+            return node->getValue();
         }
-        else if (_index.column() == 2) {
+        else if (_index.column() == ColumnIndex::ColumnType) {
             if (!node->isContainer() && !node->isContainerEnd()) {
-                switch (node->getValue().type()) {
-                case QJsonValue::Null: return "Null";
-                case QJsonValue::Bool: return "Boolean";
-                case QJsonValue::Double: return "Number";
-                case QJsonValue::String: return "String";
-                case QJsonValue::Array: return "Array";
-                case QJsonValue::Object: return "Object";
-                default: return "Unknown";
-                }
+                return node->getTypeString();
             }
 		}
+        else {
+            OT_LOG_E("Invalid column index requested");
+        }
     }
     else if (_role == Qt::ForegroundRole) {
         const ColorStyle& style = GlobalColorStyle::instance().getCurrentStyle();
-        if (_index.column() == 1) {
-            if (node->getValue().isString()) {
+        if (_index.column() == ColumnIndex::ColumnKey) {
+            if (node->isContainer() || node->isContainerEnd()) {
+                return style.getValue(ColorStyleValueEntry::JsonWidgetBracket).toColor();
+            }
+            else if (node->getParent() && node->getParent()->getType() == JsonTreeWidgetNode::Object) {
+                return style.getValue(ColorStyleValueEntry::JsonWidgetKey).toColor();
+            }
+        }
+        else if (_index.column() == ColumnIndex::ColumnValue) {
+            if (node->getType() == JsonTreeWidgetNode::String) {
 				return style.getValue(ColorStyleValueEntry::JsonWidgetString).toColor();
             }
-            else if (node->getValue().isDouble()) {
+            else if (node->getType() == JsonTreeWidgetNode::Number) {
                 return style.getValue(ColorStyleValueEntry::JsonWidgetNumber).toColor();
             }
-            else if (node->getValue().isBool()) {
+            else if (node->getType() == JsonTreeWidgetNode::Bool) {
                 return style.getValue(ColorStyleValueEntry::JsonWidgetBoolean).toColor();
             }
-            else if (node->getValue().isNull()) {
+            else if (node->getType() == JsonTreeWidgetNode::Null) {
                 return style.getValue(ColorStyleValueEntry::JsonWidgetNull).toColor();
 			}
-        }
-        else if (_index.column() == 0) {
-            if (node->isContainer() || node->isContainerEnd()) {
-				return style.getValue(ColorStyleValueEntry::JsonWidgetBracket).toColor();
-            }
-            else if (node->getParent() && node->getParent()->getValue().isObject()) {
-				return style.getValue(ColorStyleValueEntry::JsonWidgetKey).toColor();
-            }
         }
     }
     return {};
@@ -184,9 +149,6 @@ Qt::ItemFlags ot::JsonTreeWidgetModel::flags(const QModelIndex& _index) const {
     }
     JsonTreeWidgetNode* node = static_cast<JsonTreeWidgetNode*>(_index.internalPointer());
     Qt::ItemFlags f = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-    if (!node->getValue().isObject() && !node->getValue().isArray() && _index.column() == 1) {
-        f |= Qt::ItemIsEditable;
-    }
     return f;
 }
 
@@ -196,138 +158,7 @@ bool ot::JsonTreeWidgetModel::setData(const QModelIndex& _index, const QVariant&
     }
     JsonTreeWidgetNode* node = static_cast<JsonTreeWidgetNode*>(_index.internalPointer());
     if (_index.column() == 1) {
-        // basic type conversion
-        if (node->getValue().isString()) {
-            node->setValue(_value.toString());
-        }
-        else if (node->getValue().isDouble()) {
-            node->setValue(_value.toDouble());
-        }
-        else if (node->getValue().isBool()) {
-            node->setValue(_value.toBool());
-        }
-        else {
-			OT_LOG_E("Unsupported type for editing");
-			return false;
-        }
-        
-        Q_EMIT dataChanged(_index, _index);
-        return true;
+       
     }
     return false;
-}
-
-void ot::JsonTreeWidgetModel::addToJsonObject(QJsonObject& _object, JsonTreeWidgetNode* _node) const {
-	OTAssert(_node->getValue().isObject(), "Node is not an object");
-    _node->loadChildren();
-    const auto& children = _node->getChildren();
-    
-    if (_node->isContainer()) {
-        for (const auto& child : children) {
-			QString key = child->getKey();
-            OTAssert(key.length() >= 3, "Invalid key size");
-            key.removeFirst();
-            key.removeLast();
-            key.removeLast();
-            if (child->getValue().type() == QJsonValue::Object) {
-                QJsonObject childObject;
-                addToJsonObject(childObject, child);
-                _object.insert(key, childObject);
-            }
-            else if (child->getValue().type() == QJsonValue::Array) {
-                QJsonArray childArray;
-                addToJsonArray(childArray, child);
-                _object.insert(key, childArray);
-            }
-            else {
-                _object.insert(key, child->getValue());
-			}
-		}
-    }
-    else {
-        // Find container
-        for (const auto& child : children) {
-            if (child->isContainerEnd()) {
-                continue;
-            }
-            else if (child->isContainer()) {
-                if (child->getValue().isObject()) {
-                    addToJsonObject(_object, child);
-                }
-                else {
-                    OT_LOG_E("Unexpected container type in object");
-                }
-            }
-            else {
-                OT_LOG_E("Unexpected object child");
-            }
-        }
-    }
-}
-
-void ot::JsonTreeWidgetModel::addToJsonArray(QJsonArray& _array, JsonTreeWidgetNode* _node) const {
-    OTAssert(_node->getValue().isArray(), "Node is not an array");
-    _node->loadChildren();
-    const auto& children = _node->getChildren();
-    
-    if (_node->isContainer()) {
-        for (const auto& child : children) {
-            if (child->getValue().type() == QJsonValue::Object) {
-                QJsonObject childObject;
-                addToJsonObject(childObject, child);
-                _array.append(childObject);
-            }
-            else if (child->getValue().type() == QJsonValue::Array) {
-                QJsonArray childArray;
-                addToJsonArray(childArray, child);
-                _array.append(childArray);
-            }
-            else {
-                _array.append(child->getValue());
-            }
-        }
-    }
-    else {
-        // Find container
-        for (const auto& child : children) {
-            if (child->isContainerEnd()) {
-                continue;
-            }
-            else if (child->isContainer()) {
-                if (child->getValue().isArray()) {
-                    addToJsonArray(_array, child);
-                }
-                else {
-                    OT_LOG_E("Unexpected container type in array");
-                }
-            }
-            else {
-                OT_LOG_E("Unexpected array child");
-            }
-        }
-	}
-}
-
-QString ot::JsonTreeWidgetModel::jsonValueToString(const QJsonValue& _value) {
-    switch (_value.type()) {
-    case QJsonValue::Null: return "null";
-    case QJsonValue::Bool: return _value.toBool() ? "true" : "false";
-    case QJsonValue::Double: 
-    {
-        double d = _value.toDouble();
-        qint64 i = static_cast<qint64>(d);
-
-        // Check if value is an integer
-        if (d == static_cast<double>(i)) {
-            return QString::number(_value.toInt());
-        }
-        else {
-            // Non-integer or too large for 64-bit integer
-            return QString::number(d, 'g', 15);
-        }
-        
-    }
-    case QJsonValue::String: return _value.toString();
-    default: return ""; // Object or Array handled elsewhere
-    }
 }

@@ -187,37 +187,31 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		JsonTreeWidget* jsonTree = new JsonTreeWidget(nullptr);
 		_content.addView(this->createCentralWidgetView(jsonTree, "Test JSON Tree"));
 
-		QJsonObject obj;
-		QJsonArray arr1;
-		arr1.append("Item 1");
-		arr1.append("Item 2");
-		arr1.append(3);
-		arr1.append(4);
-		arr1.append(true);
-		obj.insert("Array 1", arr1);
-		obj.insert("String 1", "This is a test string");
-		obj.insert("Number 1", 42);
-		obj.insert("Boolean 1", false);
-		obj.insert("Null 1", QJsonValue::Null);
+		JsonDocument doc;
+		JsonAllocator& alloc = doc.GetAllocator();
 
-		QJsonArray objArr;
-		QJsonObject subObj1;
-		subObj1.insert("Sub String 1", "Sub item 1");
-		subObj1.insert("Sub Number 1", 3.14);
-		objArr.append(subObj1);
-		QJsonObject subObj2;
-		subObj2.insert("Sub String 2", "Sub item 2");
-		subObj2.insert("Sub Number 2", 2.71);
-		QJsonArray subArr;
-		subArr.append(1);
-		subArr.append(2);
-		subArr.append(3);
-		subObj2.insert("Sub Array", subArr);
-		objArr.append(subObj2);
-		obj.insert("Object Array", objArr);
+		JsonObject obj1;
+		obj1.AddMember("Key1", JsonString("Value1", alloc), alloc);
+		obj1.AddMember("Key2", JsonString("Value2", alloc), alloc);
+		obj1.AddMember("Key3", std::numeric_limits<size_t>::max() - 1, alloc);
+		obj1.AddMember("Key4", true, alloc);
 
-		QJsonDocument doc(obj);
-		jsonTree->setJsonDocument(doc);
+		JsonArray arr1;
+		arr1.PushBack(JsonString("ArrayValue1", alloc), alloc);
+		arr1.PushBack(JsonString("ArrayValue2", alloc), alloc);
+		arr1.PushBack(JsonString("ArrayValue3", alloc), alloc);
+		obj1.AddMember("Key5", arr1, alloc);
+		doc.AddMember("Object1", obj1, alloc);
+
+		JsonObject obj2;
+		obj2.AddMember("AnotherKey1", JsonString("AnotherValue1", alloc), alloc);
+		obj2.AddMember("AnotherKey2", false, alloc);
+		obj2.AddMember("AnotherKey3", 3.14159, alloc);
+		obj2.AddMember("AnotherKey4", std::numeric_limits<int>::lowest(), alloc);
+		obj2.AddMember("AnotherKey5", std::numeric_limits<int>::max(), alloc);
+		doc.AddMember("Object2", obj2, alloc);
+
+		jsonTree->setFromJsonDocument(doc);
 	}
 
 	TestToolBar* test = new TestToolBar(this);
