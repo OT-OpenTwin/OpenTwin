@@ -919,7 +919,19 @@ void ProjectManager::sendParameterInformation(const std::string& projectRoot)
 void ProjectManager::sendHistoryInformation(const std::string& projectRoot)
 {
 	std::string fileContent;
-	readFileContent(projectRoot + "/Model/3D/Model.mod", fileContent);
+
+	if (std::filesystem::exists(projectRoot + "/Model/3D/Model.mod"))
+	{
+		readFileContent(projectRoot + "/Model/3D/Model.mod", fileContent);
+	}
+	else if (std::filesystem::exists(projectRoot + "/Model/3D/ModelHistory.json"))
+	{
+		readFileContent(projectRoot + "/Model/3D/ModelHistory.json", fileContent);
+	}
+	else
+	{
+		return; // No history information found
+	}
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_HISTORY, doc.GetAllocator()), doc.GetAllocator());
