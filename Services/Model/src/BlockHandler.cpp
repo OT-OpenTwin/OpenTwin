@@ -106,25 +106,17 @@ void BlockHandler::addConnection(ot::UID editorId, EntityBlockConnection& _toBeA
 	ot::UID destUid = _toBeAddedConnection.getConnectionCfg().getDestinationUid();
 	ot::UID connectionId = _toBeAddedConnection.getEntityID();
 
-	auto editorIt = m_viewBlockConnectionsMap.find(editorId);
-	if (editorIt == m_viewBlockConnectionsMap.end()) {
-		OT_LOG_E("Could not find editor { \"EntityID\": " + std::to_string(editorId) + " }");
-		return;
-	}
+	auto& blocks = m_viewBlockConnectionsMap[editorId];
 
-	auto& blocks = editorIt->second;
-
-	auto blockOriginIt = blocks.find(originUid);
-	if (blockOriginIt != blocks.end()) {
-		auto& connectionList = blockOriginIt->second;
+	if (originUid != ot::invalidUID) {
+		auto& connectionList = blocks[originUid];
 		if (std::find(connectionList.begin(), connectionList.end(), connectionId) == connectionList.end()) {
 			connectionList.push_back(connectionId);
 		}
 	}
 
-	auto blockDestIt = blocks.find(destUid);
-	if (blockDestIt != blocks.end()) {
-		auto& connectionList = blockDestIt->second;
+	if (destUid != ot::invalidUID) {
+		auto& connectionList = blocks[destUid];
 		if (std::find(connectionList.begin(), connectionList.end(), connectionId) == connectionList.end()) {
 			connectionList.push_back(connectionId);
 		}
