@@ -28,7 +28,7 @@
 #include "EntityAPI.h"
 #include "EntityPythonManifest.h"
 #include "Application.h"
-#include "OutputPipeline.h"
+#include "OutputPipelineRAII.h"
 
 #include <filesystem>
 #include "PythonObjectBuilder.h"
@@ -98,9 +98,12 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
         {
             m_environmentState = EnvironmentState::empty;
         }
-        OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
-        const std::string installedPackages = getListOfInstalledPackages();
-        OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
+        
+        std::string installedPackages;
+        {
+		    OutputPipelineRAII outputRedirectionGuard(OutputPipeline::RedirectionMode::applicationRead);
+            installedPackages = getListOfInstalledPackages();
+        }
 
         buildInstalledPackageMap(installedPackages);
 
@@ -121,17 +124,18 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
                 assert(m_environmentState == EnvironmentState::empty); //Otherwise the manifest UID should have been a different one
 
                 OT_LOG_D("Initialize environment with manifest packages.");
-                OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
-                for (const std::string& packageName : packagesInManifest.value())
                 {
-                    if (!isPackageInstalled(packageName))
+					OutputPipelineRAII outputRedirectionGuard(OutputPipeline::RedirectionMode::applicationRead);
+                    for (const std::string& packageName : packagesInManifest.value())
                     {
-                        installPackage(packageName);
-                        m_environmentState = EnvironmentState::firstFilling;
+                        if (!isPackageInstalled(packageName))
+                        {
+                            installPackage(packageName);
+                            m_environmentState = EnvironmentState::firstFilling;
+                        }
                     }
+                    m_installationLog = OutputPipeline::instance().flushOutput();
                 }
-                m_installationLog = OutputPipeline::instance().flushOutput();
-                OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
                 dropImportCache();
             }
         }
@@ -211,14 +215,17 @@ void PackageHandler::importMissingPackages()
         }
         else
         {
-            OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
-            //Environment is not yet initialised, so we can just install the packages but we need to update the manifest
-            for (const std::string& packageName : m_uninstalledPackages)
             {
-                installPackage(packageName);
+			    OutputPipelineRAII outputRedirectionGuard(OutputPipeline::RedirectionMode::applicationRead);
+
+                //Environment is not yet initialised, so we can just install the packages but we need to update the manifest
+                for (const std::string& packageName : m_uninstalledPackages)
+                {
+                    installPackage(packageName);
+                }
+                dropImportCache();
+                m_installationLog = OutputPipeline::instance().flushOutput();
             }
-            dropImportCache();
-            m_installationLog = OutputPipeline::instance().flushOutput();
 			
             //Update manifest
             ot::NewModelStateInfo newModelStateInfo;
@@ -231,7 +238,6 @@ void PackageHandler::importMissingPackages()
             ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, "Manifest requires a new environment");
 
             buildInstalledPackageMap(newManifest);
-            OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
         }
         m_uninstalledPackages.clear();
 		m_installationLog.clear();

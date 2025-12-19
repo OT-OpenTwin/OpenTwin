@@ -41,6 +41,7 @@ public:
 	};
 
 	~OutputPipeline();
+	RedirectionMode getRedirectOutputMode() const { return m_redirectionMode; }
 	void setRedirectOutputMode(RedirectionMode _mode);
 	void setupOutputPipeline();
 	void initiateRedirect();

@@ -143,6 +143,9 @@
     <ClInclude Include="include\InterpreterPathSettings.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\OutputPipelineRAII.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\CommunicationHandler.h">

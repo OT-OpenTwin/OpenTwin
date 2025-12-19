@@ -308,6 +308,7 @@
     <ClInclude Include="include\ExceptionRestartRequired.h" />
     <ClInclude Include="include\InterpreterPathSettings.h" />
     <ClInclude Include="include\OutputPipeline.h" />
+    <ClInclude Include="include\OutputPipelineRAII.h" />
     <ClInclude Include="include\PackageHandler.h" />
     <ClInclude Include="include\PredefinedEnvironments.h" />
     <ClInclude Include="include\Timeouts.h" />
