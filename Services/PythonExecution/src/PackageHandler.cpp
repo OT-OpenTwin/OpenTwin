@@ -76,62 +76,74 @@ void PackageHandler::initializeManifest(ot::UID _manifestUID)
 void PackageHandler::initializeEnvironmentWithManifest(const std::string& _environmentPath)
 {
 	m_environmentPath = _environmentPath;
-
-    //In this case we are in the process of a freshly started interpreter
-    //First check if the environment exists and is initialised
-    bool environmentExists = std::filesystem::is_directory(m_environmentPath);
-    if (environmentExists)
+	m_workerWaiterState->m_isWorkDone = false; //Here we have to block other threads until the initialisation is done
+    try
     {
-        //If the folder does not contains packages, we need to install them. 
-        if (std::filesystem::is_empty(m_environmentPath))
+        //In this case we are in the process of a freshly started interpreter
+        //First check if the environment exists and is initialised
+        bool environmentExists = std::filesystem::is_directory(m_environmentPath);
+        if (environmentExists)
         {
-			m_environmentState = EnvironmentState::empty;
-        }
-        else
-        {
-            m_environmentState = EnvironmentState::initialised;
-        }
-    }
-    else
-    {
-        m_environmentState = EnvironmentState::empty;
-    }
-    OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
-    const std::string installedPackages = getListOfInstalledPackages();
-    OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
-
-    buildPackageMap(installedPackages);
-
-	assert(m_currentManifest != nullptr);
-    std::optional<std::list<std::string>> packagesInManifest = m_currentManifest->getManifestPackages();
-    if (!packagesInManifest.has_value())
-    {
-        throw std::exception("Invalid manifest");
-    }
-    else
-    {
-        if(packagesInManifest.value().size() == 0)
-        {
-            OT_LOG_D("Manifest does not contain any packages.");
-	    }
-        else
-        {
-            assert(m_environmentState == EnvironmentState::empty); //Otherwise the manifest UID should have been a different one
-
-            OT_LOG_D("Initialize environment with manifest packages.");
-            OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
-            for (const std::string& packageName : packagesInManifest.value())
+            //If the folder does not contains packages, we need to install them. 
+            if (std::filesystem::is_empty(m_environmentPath))
             {
-                if (!isPackageInstalled(packageName))
-                {
-                    installPackage(packageName);
-                    m_environmentState = EnvironmentState::firstFilling;
-                }
+                m_environmentState = EnvironmentState::empty;
             }
-            m_installationLog = OutputPipeline::instance().flushOutput();
-            OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
-            dropImportCache();
+            else
+            {
+                m_environmentState = EnvironmentState::initialised;
+            }
         }
+        else
+        {
+            m_environmentState = EnvironmentState::empty;
+        }
+        OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
+        const std::string installedPackages = getListOfInstalledPackages();
+        OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
+
+        buildInstalledPackageMap(installedPackages);
+
+        assert(m_currentManifest != nullptr);
+        std::optional<std::list<std::string>> packagesInManifest = m_currentManifest->getManifestPackages();
+        if (!packagesInManifest.has_value())
+        {
+            throw std::exception(("Invalid manifest: " + m_currentManifest->getName()).c_str());
+        }
+        else
+        {
+            if (packagesInManifest.value().size() == 0)
+            {
+                OT_LOG_D("Manifest" + m_currentManifest->getName() + " does not contain any packages.");
+            }
+            else
+            {
+                assert(m_environmentState == EnvironmentState::empty); //Otherwise the manifest UID should have been a different one
+
+                OT_LOG_D("Initialize environment with manifest packages.");
+                OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::applicationRead);
+                for (const std::string& packageName : packagesInManifest.value())
+                {
+                    if (!isPackageInstalled(packageName))
+                    {
+                        installPackage(packageName);
+                        m_environmentState = EnvironmentState::firstFilling;
+                    }
+                }
+                m_installationLog = OutputPipeline::instance().flushOutput();
+                OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
+                dropImportCache();
+            }
+        }
+
+        m_workerWaiterState->m_isWorkDone = true;
+        m_workerWaiterState->m_conditionalVariable.notify_all();
+    }
+    catch (const std::exception& e)
+    {
+		OT_LOG_E("Failed to initialize environment: " + std::string(e.what()));
+        Application::instance().getCommunicationHandler().writeToServer("Failed to initialize environment: " + std::string(e.what()));
+        exit(0);
     }
 }
 
@@ -218,7 +230,7 @@ void PackageHandler::importMissingPackages()
             newModelStateInfo.addTopologyEntity(*m_currentManifest);
             ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, "Manifest requires a new environment");
 
-            buildPackageMap(newManifest);
+            buildInstalledPackageMap(newManifest);
             OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
         }
         m_uninstalledPackages.clear();
@@ -548,7 +560,7 @@ void PackageHandler::storeInstallationLog(ot::NewModelStateInfo& _newState)
     m_installationLog.clear();
 }
 
-void PackageHandler::buildPackageMap(const std::string& _packageList)
+void PackageHandler::buildInstalledPackageMap(const std::string& _packageList)
 {
     std::stringstream stringStream(_packageList);
     std::string line;

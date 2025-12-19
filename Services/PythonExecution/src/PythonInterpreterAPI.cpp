@@ -30,7 +30,7 @@
 
 #include "PackageHandler.h"
 #include "PredefinedEnvironments.h"
-
+#include <thread>
 
 void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 {
@@ -38,7 +38,10 @@ void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 	ot::UID manifestUID = (m_packageHandler.getManifestUID());
 	m_interpreterPathSettings = InterpreterPathSettings(manifestUID);
 	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);
-
+	
+	//Means to check installation progress from other threads
+	m_packageHandler.setWorkerState(&m_workerWaiterState);
+	
 	if (m_interpreterPathSettings.getCustomEnvironmentName().empty())
 	{
 		m_packageHandler.setRunningInCoreEnvironment();
@@ -46,7 +49,9 @@ void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 	}
 	else
 	{
-		m_packageHandler.initializeEnvironmentWithManifest(m_interpreterPathSettings.getCustomEnvironmentPath()); //Needs to run in parallel
+		//Installation may take some time, do it in a separate thread. Executions are stopped via the WorkerWaiterState until installation is done.
+		std::thread workerThread(&PackageHandler::initializeEnvironmentWithManifest, &m_packageHandler, m_interpreterPathSettings.getCustomEnvironmentPath());
+		workerThread.detach();
 	}
 
 	m_wrapper.setPackageHandler(&m_packageHandler);
@@ -58,6 +63,9 @@ void PythonInterpreterAPI::initializeEnvironment(const std::string& _environment
 	m_interpreterPathSettings = InterpreterPathSettings(_environmentName);
 	
 	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);
+
+	//Means to check installation progress from other threads
+	m_packageHandler.setWorkerState(&m_workerWaiterState);
 
 	if(m_interpreterPathSettings.getCustomEnvironmentName().empty())
 	{
@@ -79,6 +87,13 @@ void PythonInterpreterAPI::checkEnvironmentIsInitialised(ot::UID _manifestEntity
 
 void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)
 {
+	if (!m_workerWaiterState.m_isWorkDone)
+	{
+		OT_LOG_D("Waiting for environment initialisation to finish...");
+		std::unique_lock<std::mutex> lock(m_workerWaiterState.m_mutex);
+		m_workerWaiterState.m_conditionalVariable.wait(lock);
+		OT_LOG_D("... continue execution.");
+	}
 	assert(_scripts.size() == _parameterSet.size());
 	std::list<ot::EntityInformation> scriptEntities = ensureScriptsAreLoaded(_scripts);
 	auto currentParameterSet = _parameterSet.begin();
@@ -125,6 +140,14 @@ void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<s
 
 void PythonInterpreterAPI::execute(const std::string& command) noexcept(false)
 {
+	if (!m_workerWaiterState.m_isWorkDone)
+	{
+		OT_LOG_D("Waiting for environment initialisation to finish...");
+		std::unique_lock<std::mutex> lock(m_workerWaiterState.m_mutex);
+		m_workerWaiterState.m_conditionalVariable.wait(lock);
+		OT_LOG_D("... continue execution.");
+	}
+
 	std::string moduleName = std::to_string(EntityBase::getUidGenerator()->getUID());
 	CPythonObjectNew pReturnValue = m_wrapper.execute(command,moduleName);
 	ot::ReturnValues returnValues;

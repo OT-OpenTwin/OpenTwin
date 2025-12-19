@@ -54,11 +54,8 @@ public:
 	CPythonObjectBorrowed getGlobalDictionary(const std::string& _moduleName);
 	CPythonObjectNew getFunction(const std::string& _functionName, const std::string& _moduleName = "__main__");
 
-	bool isInitialized() const { return m_interpreterSuccessfullyInitialized; }
-
 private:
 	PackageHandler* m_packageHandler = nullptr;
-
 	bool m_interpreterSuccessfullyInitialized = false;
 
 	static void signalHandlerAbort(int sig);

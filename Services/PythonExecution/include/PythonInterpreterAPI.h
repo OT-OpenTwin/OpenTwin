@@ -27,6 +27,7 @@
 #include "OTCore/ReturnValues.h"
 #include "PackageHandler.h"
 #include "InterpreterPathSettings.h"
+#include "WorkerWaiterState.h"
 //! @brief This class deals with the workflow of loading python script entities, executing them and sending the results back to the service that requested the execution.
 class PythonInterpreterAPI
 {
@@ -45,6 +46,8 @@ private:
 	std::map<std::string , std::string> m_moduleEntrypointByModuleName;
 	PythonWrapper m_wrapper;
 	PackageHandler m_packageHandler;
+	WorkerWaiterState m_workerWaiterState;
+
 	InterpreterPathSettings m_interpreterPathSettings;
 
 	std::list<ot::EntityInformation> ensureScriptsAreLoaded(const std::list<std::string>& _scripts);

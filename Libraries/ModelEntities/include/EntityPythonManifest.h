@@ -52,6 +52,7 @@ public:
 	
 	//! @brief  Creates a new manifest ID and returns it
 	ot::UID generateNewManifestID();
+	//! @brief parses the manifest text and returns the list of packages defined in it. If the manifest text is invalid, an empty optional is returned. 
 	std::optional <std::list<std::string>> getManifestPackages() { return getPackageList(m_manifestText); }
 	//! @brief Replaces manifest text without generating a new manifest ID
 	void replaceManifest(const std::string& _newManifestText);

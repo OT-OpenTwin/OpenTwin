@@ -6,5 +6,5 @@
 struct WorkerWaiterState {
     std::mutex m_mutex;
     std::condition_variable m_conditionalVariable;
-    std::atomic_bool m_isWorkDone = false;
+    std::atomic_bool m_isWorkDone = true;
 };

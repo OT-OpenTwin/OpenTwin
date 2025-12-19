@@ -24,6 +24,7 @@
 #include "EntityPythonManifest.h"
 #include <map>
 #include "NewModelStateInfo.h"
+#include "WorkerWaiterState.h"
 
 class PackageHandler
 {
@@ -38,6 +39,8 @@ public:
 	//! @brief Checks if the manifest identified by _manifestUID is different from the current one. 
 	//! Requests a restart if needed and initializes the manifest if this is the first call.
 	void initializeManifest(ot::UID _manifestUID);
+	
+	//! @brief Analyses the current environment and installs missing packages according to the manifest. If anything fails it will kill the process.
 	void initializeEnvironmentWithManifest(const std::string& _environmentPath);
 
 	void extractMissingPackages(const std::string& _scriptContent);
@@ -60,6 +63,11 @@ public:
 		m_environmentState = EnvironmentState::fixed;
 	}
 
+	void setWorkerState(WorkerWaiterState* _workerWaiterState)
+	{
+		m_workerWaiterState = _workerWaiterState;
+	}
+
 private:
 	enum class EnvironmentState
 	{
@@ -69,10 +77,11 @@ private:
 		fixed,
 		core
 	};
-		
+	
 	std::map<std::string, std::string> m_installedPackageVersionsByName;
 	EntityPythonManifest* m_currentManifest = nullptr;
 	std::string m_environmentPath;
+	WorkerWaiterState* m_workerWaiterState = nullptr; //Used for letting other threads wait for the installation to finish
 
 	EnvironmentState m_environmentState = EnvironmentState::empty;
 	std::list<std::string> m_uninstalledPackages;
@@ -85,9 +94,11 @@ private:
 	void dropImportCache();
 	EntityPythonManifest* loadManifestEntity(ot::UID _manifestUID);
 	ot::UID getUIDFromString(const std::string& _uid);
+	
+	// Runs pip --freeze and returns the list of installed packages as a string
 	std::string getListOfInstalledPackages();
 	void storeInstallationLog(ot::NewModelStateInfo& _newState);
-	void buildPackageMap(const std::string& _packageList);
+	void buildInstalledPackageMap(const std::string& _packageList);
 	std::string trim(const std::string& _line);
 	std::pair<std::string, std::string> splitPackageIntoNameAndVersion(const std::string& _requirementLine);
 };

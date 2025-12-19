@@ -119,6 +119,7 @@ void PythonWrapper::signalHandlerAbort(int _sig) {
 
 
 CPythonObjectNew PythonWrapper::execute(const std::string& _executionCommand, const std::string& _moduleName) {
+	assert(m_interpreterSuccessfullyInitialized);
 	CPythonObjectNew module(getModule(_moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
 	CPythonObjectNew result(PyRun_String(_executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
@@ -134,6 +135,7 @@ CPythonObjectNew PythonWrapper::execute(const std::string& _executionCommand, co
 }
 
 CPythonObjectNew PythonWrapper::executeFunction(const std::string& _functionName, CPythonObject& _parameter, const std::string& _moduleName) {
+	assert(m_interpreterSuccessfullyInitialized);
 	CPythonObjectNew function(getFunction(_functionName, _moduleName)); //Really borrowed?
 	CPythonObjectNew returnValue(PyObject_CallObject(function, _parameter));
 	
@@ -147,6 +149,7 @@ CPythonObjectNew PythonWrapper::executeFunction(const std::string& _functionName
 }
 
 CPythonObjectBorrowed PythonWrapper::getGlobalVariable(const std::string& _varName, const std::string& _moduleName) {
+	assert(m_interpreterSuccessfullyInitialized);
 	CPythonObjectNew module = (getModule(_moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
 	CPythonObjectBorrowed pythonVar(PyDict_GetItemString(globalDirectory, _varName.c_str()));
@@ -158,12 +161,13 @@ CPythonObjectBorrowed PythonWrapper::getGlobalVariable(const std::string& _varNa
 }
 
 CPythonObjectBorrowed PythonWrapper::getGlobalDictionary(const std::string& _moduleName) {
+	assert(m_interpreterSuccessfullyInitialized);
 	CPythonObjectBorrowed module(PyImport_AddModule(_moduleName.c_str()));
 	return PyModule_GetDict(module);
 }
 
 CPythonObjectNew PythonWrapper::getFunction(const std::string& _functionName, const std::string& _moduleName) {
-
+	assert(m_interpreterSuccessfullyInitialized);
 	CPythonObjectNew module = getModule(_moduleName);
 	CPythonObjectNew function(PyObject_GetAttrString(module, _functionName.c_str()));
 	if (function == nullptr)
@@ -179,6 +183,7 @@ CPythonObjectNew PythonWrapper::getFunction(const std::string& _functionName, co
 }
 
 CPythonObjectNew PythonWrapper::getModule(const std::string& _moduleName) {
+	assert(m_interpreterSuccessfullyInitialized);
 	PythonObjectBuilder builder;
 	PyObject* module(PyImport_ImportModule(_moduleName.c_str()));
 
