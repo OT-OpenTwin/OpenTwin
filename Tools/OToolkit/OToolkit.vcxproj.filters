@@ -245,6 +245,9 @@
     <ClCompile Include="src\BackendInfo.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="src\TypeHelper.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -421,6 +424,9 @@
       <Filter>Header Files\Logger</Filter>
     </QtMoc>
     <QtMoc Include="include\BackendInfo.h">
+      <Filter>Header Files\Tools</Filter>
+    </QtMoc>
+    <QtMoc Include="include\TypeHelper.h">
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
   </ItemGroup>

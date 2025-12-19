@@ -76,6 +76,7 @@
     <ClCompile Include="src\ToolMenuManager.cpp" />
     <ClCompile Include="src\ToolRuntimeHandler.cpp" />
     <ClCompile Include="src\ToolViewManager.cpp" />
+    <ClCompile Include="src\TypeHelper.cpp" />
     <ClCompile Include="src\WidgetTest.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
@@ -115,6 +116,7 @@
     <QtMoc Include="include\LogServiceDebugInfo.h" />
     <ClInclude Include="include\LogServiceDebugInfoDialog.h" />
     <QtMoc Include="include\LogVisualizerColumnWidthSaveDialog.h" />
+    <QtMoc Include="include\TypeHelper.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

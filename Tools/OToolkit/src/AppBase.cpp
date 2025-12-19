@@ -22,21 +22,22 @@
 #include "AppBase.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "TypeHelper.h"
 #include "Randomizer.h"
+#include "SVGBrowser.h"
+#include "WidgetTest.h"
 #include "BackendInfo.h"
 #include "ToolManager.h"
 #include "MenuManager.h"
 #include "ImageEditor.h"
+#include "NetworkTools.h"
 #include "StatusManager.h"
-#include "SVGBrowser.h"
 #include "ToolViewManager.h"
+#include "ToolBarManager.h"
 #include "SettingsManager.h"
 #include "ColorStyleEditor.h"
-#include "ExternalLibraryManager.h"
-#include "ToolBarManager.h"
-#include "WidgetTest.h"
 #include "GraphicsItemDesigner.h"
-#include "NetworkTools.h"
+#include "ExternalLibraryManager.h"
 
 // OToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -411,16 +412,17 @@ void AppBase::slotInitializeTools(void) {
 
 	m_logger = new Logging;
 	
-	m_toolManager->addTool(m_logger);
-	m_toolManager->addTool(new Terminal);
-	m_toolManager->addTool(new FAR);
-	m_toolManager->addTool(new BackendInfo);
-	m_toolManager->addTool(new Randomizer);
 	m_toolManager->addTool(new ColorStyleEditor);
-	m_toolManager->addTool(new ImageEditor);
+	m_toolManager->addTool(new BackendInfo);
+	m_toolManager->addTool(new FAR);
 	m_toolManager->addTool(new GraphicsItemDesigner);
+	m_toolManager->addTool(new ImageEditor);
+	m_toolManager->addTool(m_logger);
 	m_toolManager->addTool(new NetworkTools);
+	m_toolManager->addTool(new Randomizer);
 	m_toolManager->addTool(new SVGBrowser);
+	m_toolManager->addTool(new Terminal);
+	m_toolManager->addTool(new TypeHelper);
 
 	QByteArray arr = qgetenv("OPENTWIN_DEV_ROOT");
 	if (!arr.isEmpty()) {
