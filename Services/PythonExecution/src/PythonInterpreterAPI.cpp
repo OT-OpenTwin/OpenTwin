@@ -37,6 +37,8 @@ void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 	m_packageHandler.initializeManifest(_manifestEntityUID);
 	ot::UID manifestUID = (m_packageHandler.getManifestUID());
 	m_interpreterPathSettings = InterpreterPathSettings(manifestUID);
+	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);
+
 	if (m_interpreterPathSettings.getCustomEnvironmentName().empty())
 	{
 		m_packageHandler.setRunningInCoreEnvironment();
@@ -46,7 +48,7 @@ void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 	{
 		m_packageHandler.initializeEnvironmentWithManifest(m_interpreterPathSettings.getCustomEnvironmentPath()); //Needs to run in parallel
 	}
-	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);
+
 	m_wrapper.setPackageHandler(&m_packageHandler);
 }
 
@@ -54,6 +56,9 @@ void PythonInterpreterAPI::initializeEnvironment(const std::string& _environment
 {
 	//Pyrit next to a custom environment or instead ?
 	m_interpreterPathSettings = InterpreterPathSettings(_environmentName);
+	
+	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);
+
 	if(m_interpreterPathSettings.getCustomEnvironmentName().empty())
 	{
 		m_packageHandler.setRunningInCoreEnvironment();
@@ -64,7 +69,6 @@ void PythonInterpreterAPI::initializeEnvironment(const std::string& _environment
 		m_packageHandler.setRunningInFixedEnvironment();
 		OT_LOG_D("Running with fixed environment. No additional installations allowed.");		
 	}
-	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);
 	m_wrapper.setPackageHandler(&m_packageHandler);
 }
 
