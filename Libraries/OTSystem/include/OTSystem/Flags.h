@@ -163,13 +163,17 @@ namespace ot {
 
 		// Modifiers
 
-		//! @brief Set the provided flag
-		//! @param _flag The flag to set
+		//! @brief Set the provided flag.
+		//! @param _flag The flag to set.
 		inline void set(T _flag) noexcept { m_data |= toStorage(_flag); };
 
-		//! @brief Set or remove the provided flag
-		//! @param _flag The flag to set
-		//! @param _flagIsSet If true the flag will be set, otherwise removed
+		//! @brief Set the provided flag(s)
+		//! @param _flag The flag(s) to set.
+		inline void set(const Flags& _flags) noexcept { m_data |= _flags.m_data; };
+
+		//! @brief Set or remove the provided flag.
+		//! @param _flag The flag to set.
+		//! @param _flagIsSet If true the flag will be set, otherwise removed.
 		inline void set(T _flag, bool _flagIsSet) noexcept {
 			if (_flagIsSet) {
 				m_data |= toStorage(_flag);
@@ -179,9 +183,25 @@ namespace ot {
 			}
 		};
 
-		//! @brief Remove the provided flag
-		//! @param _flag The flag to remove
+		//! @brief Set or remove the provided flag(s).
+		//! @param _flag The flag(s) to set.
+		//! @param _flagIsSet If true the flag will be set, otherwise removed.
+		inline void set(const Flags& _flags, bool _flagIsSet) noexcept {
+			if (_flagIsSet) {
+				m_data |= _flags.m_data;
+			}
+			else {
+				m_data &= ~(_flags.m_data);
+			}
+		};
+
+		//! @brief Remove the provided flag.
+		//! @param _flag The flag to remove.
 		inline void remove(T _flag) noexcept { m_data &= ~(toStorage(_flag)); };
+
+		//! @brief Remove the provided flag(s).
+		//! @param _flag The flag(s) to remove.
+		inline void remove(const Flags& _flags) noexcept { m_data &= ~(_flags.m_data); };
 
 		//! @brief Clears all flags (i.e. sets the data to 0).
 		inline void clear() noexcept { m_data = Storage{ 0 }; };
@@ -199,9 +219,19 @@ namespace ot {
 			return (m_data & toStorage(_mask)) == toStorage(_mask);
 		};
 
+		//! @brief Returns true if *all* bits in mask are set.
+		constexpr bool has(const Flags& _mask) const noexcept {
+			return (m_data & _mask.m_data) == _mask.m_data;
+		};
+
 		//! @brief Returns true if *any* bit in mask is set.
 		constexpr bool hasAny(T _mask) const noexcept {
 			return (m_data & toStorage(_mask)) != Storage{ 0 };
+		};
+
+		//! @brief Returns true if *any* bit in mask is set.
+		constexpr bool hasAny(const Flags& _mask) const noexcept {
+			return (m_data & _mask.m_data) != Storage{ 0 };
 		};
 
 		constexpr bool operator == (T _flag) const noexcept { return m_data == toStorage(_flag); };
