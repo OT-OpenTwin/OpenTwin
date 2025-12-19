@@ -34,6 +34,8 @@ EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, Ent
 	treeItem.setVisibleIcon("Default/connection");
 	treeItem.setHiddenIcon("Default/connection");
 	this->setDefaultTreeItem(treeItem);
+
+	this->setDefaultIsCopyable(false);
 }
 
 EntityBlockConnection::~EntityBlockConnection()
