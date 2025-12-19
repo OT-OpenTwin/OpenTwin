@@ -33,6 +33,10 @@ namespace ot {
 	//! @brief Provides helper functions to acces content of json objects and arrays
 	namespace json {
 
+		OT_CORE_API_EXPORT std::string toErrorString(rapidjson::ParseResult _result);
+		OT_CORE_API_EXPORT std::string toErrorString(rapidjson::ParseErrorCode _code);
+		OT_CORE_API_EXPORT std::string toErrorString(rapidjson::ParseErrorCode _code, size_t _offset);
+
 		//! @brief Returns true if the specified object member exists
 		OT_CORE_API_EXPORT bool exists(const JsonValue& _value, const char* _member);
 		OT_CORE_API_EXPORT bool exists(const JsonValue& _value, const std::string& _member);
@@ -572,7 +576,6 @@ namespace ot {
 
 		//! @brief Returns the serialized json array.
 		OT_CORE_API_EXPORT std::string toJson(const ConstJsonArray& _arr);
-		
 		
 		OT_CORE_API_EXPORT std::string toPrettyString(JsonValue& _value);
 

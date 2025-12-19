@@ -106,6 +106,100 @@ namespace ot {
 
 }
 
+std::string ot::json::toErrorString(rapidjson::ParseResult _result) {
+	return toErrorString(_result.Code(), _result.Offset());
+}
+
+std::string ot::json::toErrorString(rapidjson::ParseErrorCode _code) {
+	std::string result;
+	switch (_code) {
+	case rapidjson::kParseErrorNone:
+		result = "None";
+		return;
+
+	case rapidjson::kParseErrorDocumentEmpty:
+		result = "The document is empty";
+		break;
+
+	case rapidjson::kParseErrorDocumentRootNotSingular:
+		result = "The document root must not follow by other values";
+		break;
+
+	case rapidjson::kParseErrorValueInvalid:
+		result = "Invalid value";
+		break;
+
+	case rapidjson::kParseErrorObjectMissName:
+		result = "Missing a name for object member";
+		break;
+
+	case rapidjson::kParseErrorObjectMissColon:
+		result = "Missing a colon after a name of object member";
+		break;
+
+	case rapidjson::kParseErrorObjectMissCommaOrCurlyBracket:
+		result = "Missing a comma or curly backet '}' after an object member";
+		break;
+
+	case rapidjson::kParseErrorArrayMissCommaOrSquareBracket:
+		result = "Missing a comma or square bracket ']' after an array element";
+		break;
+
+	case rapidjson::kParseErrorStringUnicodeEscapeInvalidHex:
+		result = "Incorrect hex digit after \\u escape in string";
+		break;
+
+	case rapidjson::kParseErrorStringUnicodeSurrogateInvalid:
+		result = "The surrogate pair in string is invalid";
+		break;
+
+	case rapidjson::kParseErrorStringEscapeInvalid:
+		result = "Invalid escape character in string";
+		break;
+
+	case rapidjson::kParseErrorStringMissQuotationMark:
+		result = "Missing a closing quotation mark in string";
+		break;
+
+	case rapidjson::kParseErrorStringInvalidEncoding:
+		result = "Invalid encoding in string";
+		break;
+
+	case rapidjson::kParseErrorNumberTooBig:
+		result = "Number too big to be stored in double";
+		break;
+
+	case rapidjson::kParseErrorNumberMissFraction:
+		result = "Miss fraction part in number";
+		break;
+
+	case rapidjson::kParseErrorNumberMissExponent:
+		result = "Miss exponent in number";
+		break;
+
+	case rapidjson::kParseErrorTermination:
+		result = "Parsing was terminated";
+		break;
+
+	case rapidjson::kParseErrorUnspecificSyntaxError:
+		result = "Unspecific syntax error";
+		break;
+
+	default:
+		result = "Unknown error";
+		break;
+	}
+
+	return result;
+}
+
+std::string ot::json::toErrorString(rapidjson::ParseErrorCode _code, size_t _offset) {
+	std::string result = toErrorString(_code);
+	if (_code != rapidjson::kParseErrorNone && _code != rapidjson::kParseErrorDocumentEmpty) {
+		result.append(" (at offset ").append(std::to_string(_offset) + ")");
+	}
+	return result;
+}
 
 bool ot::json::exists(const JsonValue& _value, const char* _member) {
 	return _value.HasMember(_member);
@@ -1461,7 +1555,7 @@ std::string ot::json::toJson(const ConstJsonArray& _arr) {
 	return std::string(buffer.GetString());
 }
 
-OT_CORE_API_EXPORT std::string ot::json::toPrettyString(JsonValue& _value)
+std::string ot::json::toPrettyString(JsonValue& _value)
 {
 	rapidjson::StringBuffer buffer;
 	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);  // PrettyWriter = indented JSON
