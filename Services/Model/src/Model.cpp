@@ -188,6 +188,7 @@ void Model::clearAll()
 	pendingEntityUpdates.clear();
 	Application::instance()->getSelectionHandler().clearAllBuffer();
 	parameterMap.clear();
+	Application::instance()->getBlockHandler().clearMap();
 
 	// Now we delete all entities (recursively)
 	if (entityRoot != nullptr) delete entityRoot;
