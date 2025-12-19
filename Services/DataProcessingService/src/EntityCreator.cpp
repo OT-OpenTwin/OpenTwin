@@ -53,6 +53,8 @@ void EntityCreator::createPipeline()
 	auto modelComponent = Application::instance()->getModelComponent();
 	EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 	newDataprocessing.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
+	newDataprocessing.setVisibleTreeItemIcon("Tree/DataPipeline");
+	newDataprocessing.setHiddenTreeItemIcon("Tree/DataPipeline");
 	newDataprocessing.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection,

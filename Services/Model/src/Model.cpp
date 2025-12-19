@@ -230,6 +230,8 @@ void Model::resetToNew()
 		entityCircuit->setName(typeManager.getCircuitName());
 		entityCircuit->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		entityCircuit->setSceneFlags(EntityGraphicsScene::DefaultFlags | EntityGraphicsScene::AllowConnectionsOnConnections);
+		entityCircuit->setVisibleTreeItemIcon("Tree/Circuit");
+		entityCircuit->setHiddenTreeItemIcon("Tree/Circuit");
 		entityCircuit->registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection |
@@ -305,6 +307,8 @@ void Model::resetToNew()
 		entityPipeline->setName(typeManager.getPipelineName());
 		entityPipeline->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_DataProcessingService);
 		entityPipeline->setSceneFlags(EntityGraphicsScene::DefaultFlags);
+		entityPipeline->setVisibleTreeItemIcon("Tree/DataPipeline");
+		entityPipeline->setHiddenTreeItemIcon("Tree/DataPipeline");
 		entityPipeline->registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection,

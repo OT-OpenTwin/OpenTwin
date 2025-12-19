@@ -99,6 +99,8 @@ void Application::createNewCircuit() {
 	entityCircuitRoot->setTreeItemEditable(true);
 	entityCircuitRoot->setName(circuitName);
 	entityCircuitRoot->setSceneFlags(EntityGraphicsScene::DefaultFlags | EntityGraphicsScene::AllowConnectionsOnConnections);
+	entityCircuitRoot->setVisibleTreeItemIcon("Tree/Circuit");
+	entityCircuitRoot->setHiddenTreeItemIcon("Tree/Circuit");
 	entityCircuitRoot->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection,
