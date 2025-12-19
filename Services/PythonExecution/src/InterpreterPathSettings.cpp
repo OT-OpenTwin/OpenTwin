@@ -50,7 +50,7 @@ void InterpreterPathSettings::setupBasePaths()
 
 #else
 	// If not found, we are in deployment mode. The dlls are laying next to the executable and the environments are in a subfolder
-	if (!devEnvRoot.empty())
+	if (devEnvRoot.empty())
 	{
 		m_environmentsBase = ".\\PythonEnvironments";
 		m_binPath = ".";
