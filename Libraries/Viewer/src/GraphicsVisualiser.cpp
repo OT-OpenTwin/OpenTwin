@@ -35,19 +35,43 @@ bool GraphicsVisualiser::requestVisualization(const VisualiserState& _state)
 {
 	if (_state.m_selected)
 	{
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getVisualizationEntity(), doc.GetAllocator());
-			
-		ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
-		visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
+		bool isSingle = _state.m_singleSelection;
 
-		ot::JsonObject visualisationCfgJSon;
-		visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, doc.GetAllocator());
+		// Ensure only one graphics visualiser is selected
+		if (!isSingle) {
+			bool hasGraphics = false;
+			isSingle = true;
 
-		FrontendAPI::instance()->messageModelService(doc.toJson());
-		return true;
+			for (SceneNodeBase* node : _state.m_selectedNodes) {
+				for (Visualiser* vis : node->getVisualiser()) {
+					if (dynamic_cast<GraphicsVisualiser*>(vis) != nullptr) {
+						if (hasGraphics) {
+							isSingle = false;
+							break;
+						}
+						else {
+							hasGraphics = true;
+						}
+					}
+				}
+			}
+		}
+
+		if (isSingle) {
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getVisualizationEntity(), doc.GetAllocator());
+
+			ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
+			visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
+
+			ot::JsonObject visualisationCfgJSon;
+			visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, doc.GetAllocator());
+
+			FrontendAPI::instance()->messageModelService(doc.toJson());
+			return true;
+		}
 	}
 
 	return false;

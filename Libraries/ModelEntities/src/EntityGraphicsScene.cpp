@@ -27,6 +27,10 @@ static EntityFactoryRegistrar<EntityGraphicsScene> registrar(EntityGraphicsScene
 EntityGraphicsScene::EntityGraphicsScene(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityContainer(ID, parent, obs, ms), m_sceneFlags(SceneFlag::DefaultFlags)
 {
+	ot::EntityTreeItem treeItm = getTreeItem();
+	treeItm.setSelectChilds(false);
+	setDefaultTreeItem(treeItm);
+
 	ot::VisualisationTypes visTypes = getVisualizationTypes();
 	visTypes.addGraphicsViewVisualisation();
 	setDefaultVisualizationTypes(visTypes);

@@ -46,9 +46,9 @@ bool TextVisualiser::requestVisualization(const VisualiserState& _state)
 {
 	if (_state.m_selectionData.getSelectionOrigin() == ot::SelectionOrigin::User)
 	{
-		if(_state.m_singleSelection)
+		if (_state.m_singleSelection)
 		{
-			if(_state.m_selected)
+			if (_state.m_selected)
 			{
 				FrontendAPI::instance()->messageModelService(createRequestDoc(_state, 0, true, false).toJson());
 				return true;
