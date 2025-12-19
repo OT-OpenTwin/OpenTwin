@@ -513,6 +513,8 @@ void Model::addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, c
 	// Add the tree name to the tree
 	addSceneNodesToTree(containerNode);
 
+	containerNode->setModel(this);
+
 	// Add the node to the maps for faster access
 	storeInMaps(containerNode);
 }
@@ -565,6 +567,8 @@ void Model::addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
 
 		// Add the tree name to the tree
 		addSceneNodesToTree(annotationNode);
+
+		annotationNode->setModel(this);
 	}
 
 	// Make the node invisible, if needed
@@ -858,6 +862,7 @@ void Model::addSceneNode(const ot::EntityTreeItem& _treeItem, ot::VisualisationT
 	// Add the node to the maps for faster access
 	storeInMaps(sceneNode);
 
+	sceneNode->setModel(this);
 }
 
 SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, bool _manageParentVisibility, bool _manageChildVisibility)
@@ -3385,6 +3390,16 @@ void Model::updateVTKNode(ot::UID _entityID, const std::string &projectName, uns
 	if (vtkNode == nullptr) return;
 
 	vtkNode->updateVTKNode(projectName, visualizationDataID, visualizationDataVersion);
+}
+
+SceneNodeBase* Model::getSceneNodeByEntityID(ot::UID _modelEntityID) const {
+	const auto it = modelItemToSceneNodesMap.find(_modelEntityID);
+	if (it != modelItemToSceneNodesMap.end()) {
+		return it->second;
+	}
+	else {
+		return nullptr;
+	}
 }
 
 void Model::updateCapGeometry(osg::Vec3d normal, osg::Vec3d point, double radius)

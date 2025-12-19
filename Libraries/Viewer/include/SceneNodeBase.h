@@ -37,12 +37,17 @@
 
 #include <osg/Switch>
 
+class Model;
+
 class SceneNodeBase
 {
 public:
 	virtual ~SceneNodeBase();
 
 	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
+
+	void setModel(Model* model) { m_model = model; };
+	Model* getModel() const { return m_model; };
 
 	void setTreeItem(const ot::EntityTreeItem& _treeItem) { m_treeItem = _treeItem; };
 	const ot::EntityTreeItem& getTreeItem() const { return m_treeItem; };
@@ -100,6 +105,11 @@ public:
 	void removeChild(SceneNodeBase *child) { assert(std::find(m_children.begin(), m_children.end(), child) != m_children.end());  m_children.remove(child); };
 	const std::list<SceneNodeBase*>& getChildren() const { return m_children; };
 
+	//! @brief Returns true if this node is a child of the provided parent node.
+	//! Will check recursively up the parent chain.
+	//! @param _parent Pointer to the potential parent node.
+	bool isChildOf(const SceneNodeBase* _parent) const;
+
 	virtual void getPrefetch(std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs) {};
 
 	virtual bool isItem3D() const = 0;
@@ -118,6 +128,7 @@ protected:
 	float m_transparency = 0.85;
 
 private:
+	Model* m_model = nullptr;
 	ot::EntityTreeItem m_treeItem;
 	ot::UID			   m_treeItemID = 0;
 	bool               m_visible = true;

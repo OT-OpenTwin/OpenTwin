@@ -194,6 +194,18 @@ void SceneNodeBase::setHighlighted(bool _highlight)
 	}
 }
 
+bool SceneNodeBase::isChildOf(const SceneNodeBase* _parent) const {
+	if (_parent == nullptr) {
+		return false;
+	}
+	else if (_parent == m_parent) {
+		return true;
+	}
+	else {
+		return m_parent && m_parent->isChildOf(_parent);
+	}
+}
+
 ot::UIDList SceneNodeBase::getVisualisedEntities() const {
 	ot::UIDList entities;
 	for (auto visualiser : m_visualiser) {

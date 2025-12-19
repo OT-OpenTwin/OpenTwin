@@ -68,34 +68,40 @@ public:
 	//! The visualiser should only hide or dim the visualisation.
 	virtual void hideVisualisation(const VisualiserState& _state) = 0;
 
-	bool mayVisualise(void) const { return m_mayVisualise; };
+	bool mayVisualise() const { return m_mayVisualise; };
 
 	//! @brief Switch to turn a visualisation type off
 	void setMayVisualise(bool _visible) { m_mayVisualise = _visible;}
 
 	//! @brief Switch for deciding if a data pull is necessary or if a lookup is necessary, if the displayed data may still be up-to date
 	virtual void setViewIsOpen(bool _viewIsOpen) { m_viewIsOpen = _viewIsOpen; };
-	bool getViewIsOpen(void) const { return m_viewIsOpen; };
+	bool getViewIsOpen() const { return m_viewIsOpen; };
+
+	void setCloseViewOnDelete(bool _closeOnDelete) { m_closeViewOnDelete = _closeOnDelete; };
+	bool getCloseViewOnDelete() const { return m_closeViewOnDelete; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Information
 
-	SceneNodeBase* getSceneNode(void) const { return m_node; };
+	SceneNodeBase* getSceneNode() const { return m_node; };
 	
 	//! @brief Set the entity that is visualized by this visualiser.
 	//! @param _entity The entity ID of the entity that is visualized by this visualiser.
 	void setVisualizationEntity(ot::UID _entity) { m_visualizationEntity = _entity; };
-	ot::UID getVisualizationEntity(void) const { return m_visualizationEntity; };
+	ot::UID getVisualizationEntity() const { return m_visualizationEntity; };
 
 	void setCustomViewFlags(const ot::WidgetViewBase::ViewFlags& _flags) { m_customViewFlags = _flags; };
 	const std::optional<ot::WidgetViewBase::ViewFlags>& getCustomViewFlags() const { return m_customViewFlags; };
 
-	ot::WidgetViewBase::ViewType getViewType(void) const { return m_viewType; };
+	ot::WidgetViewBase::ViewType getViewType() const { return m_viewType; };
 
 	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
-	ot::VisualisationCfg createVisualiserConfig(const VisualiserState& _state) const;
+	//! @brief Create a visualiser configuration for this visualiser.
+	//! @param _state The state of the visualisation.
+	//! @param _rootNode Optional root node for the visualisation. If provided only this node and its children will be considered for the visualizing entities.
+	ot::VisualisationCfg createVisualiserConfig(const VisualiserState& _state, SceneNodeBase* _rootNode = nullptr) const;
 
 protected:
 	virtual std::string getVisualiserTypeString() const = 0;
@@ -104,6 +110,7 @@ protected:
 	SceneNodeBase* m_node = nullptr;
 	bool m_mayVisualise = true;
 	bool m_viewIsOpen = false;
+	bool m_closeViewOnDelete = true;
 	ot::WidgetViewBase::ViewType m_viewType;
 	std::optional<ot::WidgetViewBase::ViewFlags> m_customViewFlags = std::nullopt;
 };

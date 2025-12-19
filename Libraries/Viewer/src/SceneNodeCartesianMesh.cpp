@@ -45,7 +45,6 @@
 SceneNodeCartesianMesh::SceneNodeCartesianMesh() :
 	edgeColorRGB{ 0.0, 0.0, 0.0 },
 	meshLineColorRGB{ 0.0, 0.0, 0.0 },
-	model(nullptr),
 	meshLines(nullptr),
 	showMeshLinesFlag(true),
 	faceListEntityID(0),

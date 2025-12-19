@@ -66,7 +66,6 @@ SceneNodeGeometry::SceneNodeGeometry() :
 	m_dataEntityID(0),
 	m_dataEntityVersion(0),
 	m_needsInitialization(false),
-	m_model(nullptr),
 	m_materialType("Rough"),
 	m_textureType("None"),
 	m_reflective(false),

@@ -21,8 +21,10 @@
 #include "GraphicsVisualiser.h"
 
 #include "OTCore/JSON.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "FrontendAPI.h"
+#include "Model.h"
 #include "SceneNodeBase.h"
 #include "OTGui/VisualisationCfg.h"
 
@@ -62,9 +64,9 @@ bool GraphicsVisualiser::requestVisualization(const VisualiserState& _state)
 			doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
 			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getVisualizationEntity(), doc.GetAllocator());
 
-			ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
+			ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state, getSceneNode());
 			visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
-
+			
 			ot::JsonObject visualisationCfgJSon;
 			visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
 			doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, doc.GetAllocator());

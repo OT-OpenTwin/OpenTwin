@@ -53,9 +53,6 @@ public:
 	
 	std::string getProjectName(void) { return projectName; };
 
-	Model *getModel(void) { return model; };
-	void setModel(Model *m) { model = m; };
-
 	SceneNodeMesh *getMesh(void) { return mesh; };
 	void setMesh(SceneNodeMesh *m) { mesh = m; };
 
@@ -86,7 +83,6 @@ private:
 	unsigned long long meshDataTetEdgesVersion;
 	bool needsInitialization;
 
-	Model *model;
 	SceneNodeMesh *mesh;
 
 	double colorRGB[3];

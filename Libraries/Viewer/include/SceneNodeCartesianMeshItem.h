@@ -49,9 +49,6 @@ public:
 	virtual void setVisible(bool v) override;
 	virtual void setHighlighted(bool h) override;
 	
-	Model *getModel(void) { return m_model; };
-	void setModel(Model *m) { m_model = m; };
-
 	SceneNodeCartesianMesh *getMesh(void) { return m_mesh; };
 	void setMesh(SceneNodeCartesianMesh *m) { m_mesh = m; };
 
@@ -69,7 +66,6 @@ public:
 private:
 	void updateVisibility(void);
 
-	Model* m_model;
 	SceneNodeCartesianMesh* m_mesh;
 
 	double m_colorRGB[3];

@@ -30,9 +30,9 @@ Visualiser::Visualiser(SceneNodeBase* _sceneNode, ot::WidgetViewBase::ViewType _
 	m_visualizationEntity = m_node->getModelEntityID();
 }
 
-Visualiser::~Visualiser() 
+Visualiser::~Visualiser()
 {
-	if (m_viewIsOpen) 
+	if (m_viewIsOpen || m_closeViewOnDelete) 
 	{
 		FrontendAPI::instance()->closeView(m_node->getName(), m_viewType);
 	}
@@ -45,14 +45,21 @@ void Visualiser::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator&
 	_object.AddMember("Type", ot::JsonString(this->getVisualiserTypeString(), _allocator), _allocator);
 }
 
-ot::VisualisationCfg Visualiser::createVisualiserConfig(const VisualiserState& _state) const
+ot::VisualisationCfg Visualiser::createVisualiserConfig(const VisualiserState& _state, SceneNodeBase* _rootNode) const
 {
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setAsActiveView(_state.m_setFocus);
 
 	ot::UIDList visualizingEntities;
 	for (const SceneNodeBase* selectedNode : _state.m_selectedNodes) {
-		visualizingEntities.splice(visualizingEntities.end(), selectedNode->getVisualisedEntities());
+		if (_rootNode) {
+			if (selectedNode == _rootNode || selectedNode->isChildOf(_rootNode)) {
+				visualizingEntities.splice(visualizingEntities.end(), selectedNode->getVisualisedEntities());
+			}
+		}
+		else {
+			visualizingEntities.splice(visualizingEntities.end(), selectedNode->getVisualisedEntities());
+		}
 	}
 	
 	visualizingEntities.unique();

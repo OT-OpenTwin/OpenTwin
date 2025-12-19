@@ -47,7 +47,6 @@ SceneNodeMesh::SceneNodeMesh() :
 	entityVersion(0),
 	needsInitialization(true),
 	edgeColorRGB{ 0.0, 0.0, 0.0 },
-	model(nullptr),
 	coordX(nullptr),
 	coordY(nullptr),
 	coordZ(nullptr),

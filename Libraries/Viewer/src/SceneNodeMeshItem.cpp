@@ -50,7 +50,6 @@ SceneNodeMeshItem::SceneNodeMeshItem() :
 	entityID(0),
 	entityVersion(0),
 	needsInitialization(true),
-	model(nullptr),
 	mesh(nullptr),
 	colorRGB{0.0, 0.0, 0.0},
 	isVolume(false),

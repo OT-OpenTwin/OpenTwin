@@ -103,6 +103,8 @@ public:
 	void addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion);
 	void updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 
+	SceneNodeBase* getSceneNodeByEntityID(ot::UID _modelEntityID) const;
+
 	void setEntityName(ot::UID _modelEntityID, const std::string& _newName);
 	std::string getEntityName(ot::UID _modelEntityID) const;
 	ot::UID getEntityID(const std::string& _entityName) const;
@@ -277,7 +279,7 @@ private:
 	SceneNodeBase*     							   sceneNodesRoot;
 	std::map<std::string, SceneNodeBase *>		   m_nameToSceneNodesMap;
 	std::map <ot::UID, SceneNodeBase *>			   treeItemToSceneNodesMap;
-	std::map <unsigned long long, SceneNodeBase *> modelItemToSceneNodesMap;
+	std::map <ot::UID, SceneNodeBase *>            modelItemToSceneNodesMap;
 	std::map <osg::Node*, SceneNodeBase *>	       osgNodetoSceneNodesMap;
 	bool										   isActive;
 	bool										   wireFrameState;

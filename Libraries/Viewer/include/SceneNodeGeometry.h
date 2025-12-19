@@ -112,9 +112,6 @@ public:
 
 	void initializeFromDataStorage(void);
 
-	Model *getModel(void) { return m_model; };
-	void setModel(Model *m) { m_model = m; };
-
 	virtual bool isItem3D(void) const override { return true; };
 
 	osg::Node* addSelectedEdge(unsigned long long faceId1, unsigned long long faceId2);
@@ -170,7 +167,6 @@ private:
 	ot::UID m_dataEntityID;
 	ot::UID m_dataEntityVersion;
 	bool m_needsInitialization;
-	Model* m_model;
 	osg::StateAttribute* m_textureAttribute;
 	osg::TexGen* m_textureAttributeGen;
 	osg::TexEnv* m_textureAttributeEnv;

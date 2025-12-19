@@ -39,7 +39,6 @@
 #include <osg/LightModel>
 
 SceneNodeCartesianMeshItem::SceneNodeCartesianMeshItem() :
-	m_model(nullptr),
 	m_mesh(nullptr),
 	m_colorRGB{0.0, 0.0, 0.0},
 	m_isVolume(false)

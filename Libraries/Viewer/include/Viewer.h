@@ -27,7 +27,6 @@
 #include <QMainWindow>
 #include <QtOpenGLWidgets/qopenglwidget.h>
 
-class ViewerObjectSelectionHandler;
 class QWidget;
 class Model;
 class SceneNodeGeometry;
@@ -37,15 +36,13 @@ class AxisCross;
 class AxisCenterCross;
 class HandlerBase;
 class ClipPlaneManipulator;
+class ViewerObjectSelectionHandler;
 
 #include <osg/Group>
 #include <osg/ClipNode>
 #include <osgText/Font>
 #include <osgUtil/LineSegmentIntersector>
 
-class ViewerObjectSelectionHandler;
-class QWidget;
-class Model;
 namespace osgGA     { class EventQueue; };
 namespace osgViewer { class Viewer; };
 namespace osgViewer { class GraphicsWindowEmbedded; };

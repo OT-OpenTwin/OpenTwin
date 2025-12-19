@@ -65,9 +65,6 @@ public:
 	void setEdgeColor(double color[3]) { edgeColorRGB[0] = color[0]; edgeColorRGB[1] = color[1]; edgeColorRGB[2] = color[2]; };
 	void setMeshLineColor(double color[3]) { meshLineColorRGB[0] = color[0]; meshLineColorRGB[1] = color[1]; meshLineColorRGB[2] = color[2]; };
 
-	Model *getModel(void) { return model; };
-	void setModel(Model *m) { model = m; };
-
 	void addOwner(SceneNodeCartesianMeshItem *item, int faceID);
 	void removeOwner(SceneNodeCartesianMeshItem *item, const std::vector<int> &faceID);
 	void updateFaceStatus(const std::vector<int> &faceID, bool edgeColorChanged);
@@ -122,8 +119,6 @@ private:
 
 	double edgeColorRGB[3];
 	double meshLineColorRGB[3];
-
-	Model *model;
 
 	std::vector<double> meshCoords[3];
 

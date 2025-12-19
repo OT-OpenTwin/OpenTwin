@@ -50,9 +50,6 @@ public:
 	virtual void setVisible(bool v) override;
 	virtual void setHighlighted(bool h) override;
 	
-	Model *getModel(void) { return model; };
-	void setModel(Model *m) { model = m; };
-
 	virtual bool isItem3D(void) const override { return true; };
 
 	void updateVTKNode(const std::string &projName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
@@ -63,7 +60,6 @@ private:
 	void reportTime(const std::string &message, std::time_t &timer);
 	std::string loadDataItem(unsigned long long entityID, unsigned long long entityVersion);
 
-	Model *model;
 	bool initialized;
 	std::string projectName;
 	unsigned long long dataID;

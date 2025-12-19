@@ -49,7 +49,6 @@
 #include <osgDB/ReadFile>
 
 SceneNodeVTK::SceneNodeVTK() :
-	model(nullptr),
 	initialized(false),
 	dataID(0),
 	dataVersion(0)
