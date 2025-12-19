@@ -31,40 +31,46 @@
 #include "PackageHandler.h"
 #include "PredefinedEnvironments.h"
 
-void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestUID)
+
+void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 {
-	PackageHandler::instance().initializeManifest(_manifestUID);
-	const std::string environmentName = PackageHandler::instance().getEnvironmentName();
-	m_wrapper.initializePythonInterpreter(environmentName);
-	const std::string environmentPath = m_wrapper.getEnvironmentPath();
-	if (environmentPath.empty())
+	m_packageHandler.initializeManifest(_manifestEntityUID);
+	ot::UID manifestUID = (m_packageHandler.getManifestUID());
+	m_interpreterPathSettings = InterpreterPathSettings(manifestUID);
+	if (m_interpreterPathSettings.getCustomEnvironmentName().empty())
 	{
-		m_wrapper.initializePythonInterpreter("");
+		m_packageHandler.setRunningInCoreEnvironment();
+		OT_LOG_D("Running without custom environment. No additional installations allowed.");
 	}
 	else
 	{
-		PackageHandler::instance().initializeEnvironmentWithManifest(environmentPath);
+		m_packageHandler.initializeEnvironmentWithManifest(m_interpreterPathSettings.getCustomEnvironmentPath()); //Needs to run in parallel
 	}
+	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);
+	m_wrapper.setPackageHandler(&m_packageHandler);
 }
 
-void PythonInterpreterAPI::initializeEnvironment(std::string& _environmentName)
+void PythonInterpreterAPI::initializeEnvironment(const std::string& _environmentName)
 {
 	//Pyrit next to a custom environment or instead ?
-	if (_environmentName == "Pyrit")
+	m_interpreterPathSettings = InterpreterPathSettings(_environmentName);
+	if(m_interpreterPathSettings.getCustomEnvironmentName().empty())
 	{
-		// Environment is a special, which already exists in the python interpreter installation
-		OT_LOG_D("Initialize Pyrit environment");
-		_environmentName = PredefinedEnvironments::getPythonEnvironmentName();
-		m_wrapper.initializePythonInterpreter(_environmentName);
-	}
-	else if (_environmentName == "Core")
-	{
-		m_wrapper.initializePythonInterpreter("");
+		m_packageHandler.setRunningInCoreEnvironment();
+		OT_LOG_D("Running without custom environment. No additional installations allowed.");
 	}
 	else
 	{
-		throw std::exception(("Initialisation with unknown environment: " + _environmentName).c_str());
+		m_packageHandler.setRunningInFixedEnvironment();
+		OT_LOG_D("Running with fixed environment. No additional installations allowed.");		
 	}
+	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);
+	m_wrapper.setPackageHandler(&m_packageHandler);
+}
+
+void PythonInterpreterAPI::checkEnvironmentIsInitialised(ot::UID _manifestEntityUID)
+{
+	m_packageHandler.initializeManifest(_manifestEntityUID);
 }
 
 void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)
@@ -128,6 +134,11 @@ void PythonInterpreterAPI::execute(const std::string& command) noexcept(false)
 	}
 }
 
+void PythonInterpreterAPI::cleanup()
+{
+	m_packageHandler.clearBuffer();
+}
+
 std::list<ot::EntityInformation> PythonInterpreterAPI::ensureScriptsAreLoaded(const std::list<std::string>& _scripts)
 {
 	//First we get the information of the used scripts
@@ -172,10 +183,10 @@ std::list<ot::EntityInformation> PythonInterpreterAPI::ensureScriptsAreLoaded(co
 
 	for (const std::string& scriptExecution : scriptExecutions)
 	{
-		PackageHandler::instance().extractMissingPackages(scriptExecution);
+		m_packageHandler.extractMissingPackages(scriptExecution);
 	}
 	
-	PackageHandler::instance().importMissingPackages();
+	m_packageHandler.importMissingPackages();
 	auto entityInfo = entityInfos.begin();
 	for (const std::string& scriptExecution : scriptExecutions)
 	{

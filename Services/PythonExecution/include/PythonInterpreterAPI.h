@@ -25,7 +25,8 @@
 #include "PythonObjectBuilder.h"
 #include "EntityInformation.h"
 #include "OTCore/ReturnValues.h"
-
+#include "PackageHandler.h"
+#include "InterpreterPathSettings.h"
 //! @brief This class deals with the workflow of loading python script entities, executing them and sending the results back to the service that requested the execution.
 class PythonInterpreterAPI
 {
@@ -33,15 +34,19 @@ class PythonInterpreterAPI
 public:
 	//! @brief Initialise an environment described by a manifest entity
 	//! @param _environmentName 
-	void initializeEnvironment(ot::UID _manifestUID);
-	void initializeEnvironment(std::string& _environmentName);
+	void initializeEnvironment(ot::UID _manifestEntityUID);
+	void initializeEnvironment(const std::string& _environmentName);
+	void checkEnvironmentIsInitialised(ot::UID _manifestEntityUID);
 	void execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet) noexcept(false);
 	void execute(const std::string& _command) noexcept(false);
 
+	void cleanup();
 private:
 	std::map<std::string , std::string> m_moduleEntrypointByModuleName;
 	PythonWrapper m_wrapper;
-	
+	PackageHandler m_packageHandler;
+	InterpreterPathSettings m_interpreterPathSettings;
+
 	std::list<ot::EntityInformation> ensureScriptsAreLoaded(const std::list<std::string>& _scripts);
 	std::string loadScipt(const ot::EntityInformation& _entityInformation);
 	void addScriptAsModule(const std::string _execution, const ot::EntityInformation& _entityInformation);

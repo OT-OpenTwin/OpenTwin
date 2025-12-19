@@ -5,14 +5,15 @@
 namespace PredefinedEnvironments
 {
 	static std::string getPythonEnvironmentName() { return "PyritEnvironment"; }
-
+	static std::string getBuildToolsEnvironmentName() { return "PythonBuildTools"; }
+	static std::string getCoreEnvironmentName() { return "CoreEnvironment"; }
 	static std::list<std::string> getAll()
 	{
 		return
 		{
 			getPythonEnvironmentName(),
-			"CoreEnvironment",
-			"PythonBuildTools"
+			getCoreEnvironmentName(),
+			getBuildToolsEnvironmentName()
 		};
 	}
 }

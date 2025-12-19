@@ -55,64 +55,28 @@ void PythonWrapper::closePythonInterpreter() {
 }
 
 
-void PythonWrapper::initializePythonInterpreter(const std::string& _environmentName)
+void PythonWrapper::initializePythonInterpreter(InterpreterPathSettings& _interpreterPathSettings)
 {
-	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
-	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
-	std::wstring devEnvRootW = ot::String::toWString(devEnvRoot);
-
-	std::wstring environmentsBase, home, dllPath, binPath, customEnvBase;
-#ifdef _DEBUG
-	const std::string pythonRootEnvVarName = "OT_PYTHON_ROOT";
-	const char* pythonRoot = ot::OperatingSystem::getEnvironmentVariable(pythonRootEnvVarName.c_str());
-	assert(pythonRoot != nullptr);
-	std::wstring pythonRootW = ot::String::toWString(pythonRoot);
-	
-	environmentsBase = pythonRootW + L"\\Environments";
-	home = environmentsBase + std::wstring(L"\\CoreEnvironment");
-	dllPath = +L"\\DLLs\\Debug";
-	binPath = pythonRootW + L"\\Interpreter\\Debug";
-
-#else
-	// If not found, we are in deployment mode
-	if (devEnvRoot == nullptr)
-	{
-		environmentsBase = L".\\PythonEnvironments";
-		binPath = L".";
-	}
-	else
-	{
-		environmentsBase = devEnvRootW + L"\\Deployment\\PythonEnvironments";
-		binPath = devEnvRootW + L"\\Deployment";
-	}
-	dllPath = L"\\DLLs";
-
-	//Here we have the standart libs
-	home = environmentsBase + std::wstring(L"\\CoreEnvironment");
-	customEnvBase = environmentsBase;
-#endif
-
 	std::list<std::wstring> lookupPaths;
-
-	lookupPaths.push_back(environmentsBase + std::wstring(L"\\PythonBuildTools"));
-	lookupPaths.push_back(home);
-	lookupPaths.push_back(home + L"\\Lib");
-	lookupPaths.push_back(home+ dllPath);
-	lookupPaths.push_back(binPath);
-
-	if (!_environmentName.empty())
+	const std::list<std::string>& defaultPaths = _interpreterPathSettings.getDefaultEnvironments();
+	for (const std::string& defaultPath : defaultPaths)
 	{
-		std::wstring environmentPathW = environmentsBase + L"\\" + ot::String::toWString(_environmentName);
-		lookupPaths.push_back(environmentPathW);
-		m_environmentPath = ot::String::toString(environmentPathW);
-		OT_LOG_D("Custom environment: " + m_environmentPath);
+		lookupPaths.push_back(ot::String::toWString(defaultPath));
 	}
-	else
-	{
-		PackageHandler::instance().setRunningInCoreEnvironment();
-		OT_LOG_D("Running without custom environment");
-	}
+	std::wstring homeW = ot::String::toWString(_interpreterPathSettings.getHomePath());
+	lookupPaths.push_back(homeW);
+	lookupPaths.push_back(ot::String::toWString(_interpreterPathSettings.getLibPath()));
+	lookupPaths.push_back(ot::String::toWString(_interpreterPathSettings.getDllPath()));
+	lookupPaths.push_back(ot::String::toWString(_interpreterPathSettings.getBinPath()));
 
+	
+	if (!_interpreterPathSettings.getCustomEnvironmentName().empty())
+	{
+		std::string customEnvironmentPath = _interpreterPathSettings.getCustomEnvironmentPath();
+		lookupPaths.push_back(ot::String::toWString(customEnvironmentPath));
+		OT_LOG_D("Custom environment: " + customEnvironmentPath);
+	}
+	
 	PyConfig config;
 	PyConfig_InitPythonConfig(&config);
 	config.isolated = 1;
@@ -120,26 +84,25 @@ void PythonWrapper::initializePythonInterpreter(const std::string& _environmentN
 	config.module_search_paths_set = 1;
 	config.site_import = 1;
 	std::string debugPathOverview = "";
-	for(std::wstring& pathComponent : lookupPaths) {
+	for (std::wstring& pathComponent : lookupPaths) {
 		PyWideStringList_Append(&config.module_search_paths, pathComponent.c_str());
 		debugPathOverview += ot::String::toString(pathComponent) + ";";
 	}
 
-	PyConfig_SetString(&config,&config.home, home.c_str());
+	PyConfig_SetString(&config, &config.home, homeW.c_str());
 
 	OT_LOG_D("Python path: " + debugPathOverview);
-	OT_LOG_D("Python home: " + ot::String::toString(home));
-		
+	OT_LOG_D("Python home: " + _interpreterPathSettings.getHomePath());
+
 	int errorCode = PyImport_AppendInittab("OpenTwin", PythonExtensions::PyInit_OpenTwin);
-	
+
 	Py_InitializeFromConfig(&config);
 	if (Py_IsInitialized() != 1) {
 		throw PythonException();
 	}
 	m_interpreterSuccessfullyInitialized = true;
-	
-	OutputPipeline::instance().initiateRedirect();
 
+	OutputPipeline::instance().initiateRedirect();
 }
 
 void PythonWrapper::addToSysPath(const std::string& _newPathComponent) {

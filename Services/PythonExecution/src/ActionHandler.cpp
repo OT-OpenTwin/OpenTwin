@@ -32,7 +32,6 @@
 #include "DataBase.h"
 #include "EntityBase.h"
 #include "DocumentAPI.h"
-#include "PackageHandler.h"
 
 #include "OTServiceFoundation/TimeFormatter.h"
 #include "ExceptionRestartRequired.h"
@@ -115,8 +114,7 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		}
 		else
 		{
-			std::string environmentName = "Core";
-			m_pythonAPI.initializeEnvironment(environmentName);
+			m_pythonAPI.initializeEnvironment("Core");
 			OT_LOG_D("Running only with core environment");
 		}
 	}
@@ -132,8 +130,8 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
-		std::string environmentName = "Pyrit";
-		m_pythonAPI.initializeEnvironment(environmentName);
+
+		m_pythonAPI.initializeEnvironment("Pyrit");
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_STUDIOSUITE)
 	{
@@ -142,8 +140,7 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
 		
-		std::string environmentName = "Core";
-		m_pythonAPI.initializeEnvironment(environmentName);
+		m_pythonAPI.initializeEnvironment("Core");
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL) {
 		OT_LOG_D("Connecting with modelService");
@@ -195,7 +192,7 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 		{
 			manifestUID = ot::invalidUID;
 		}
-		PackageHandler::instance().initializeManifest(manifestUID);
+		m_pythonAPI.checkEnvironmentIsInitialised(manifestUID);
 
 		//Extract parameter array from json doc
 		auto parameterArrayArray = ot::json::getArray(doc, OT_ACTION_CMD_PYTHON_Parameter);
@@ -248,7 +245,7 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 	}
 	catch (std::exception& e) {
 		OT_LOG_D("Script execution failed due to exception: " + std::string(e.what()));
-		PackageHandler::instance().clearBuffer();
+		m_pythonAPI.cleanup();
 		return ot::ReturnMessage(ot::ReturnMessage::ReturnMessageStatus::Failed, e.what());
 	}
 
@@ -329,6 +326,18 @@ std::string ActionHandler::writeReturnDataToDatabase()
 
 ot::ReturnMessage ActionHandler::executeCommand(const ot::JsonDocument& doc) {
 	std::string executionCommand = ot::json::getString(doc, OT_ACTION_CMD_PYTHON_Command);
+
+	ot::UID manifestUID;
+	if (ot::json::exists(doc, OT_ACTION_PARAM_Python_Environment))
+	{
+		manifestUID = ot::json::getUInt64(doc, OT_ACTION_PARAM_Python_Environment);
+	}
+	else
+	{
+		manifestUID = ot::invalidUID;
+	}
+	m_pythonAPI.checkEnvironmentIsInitialised(manifestUID);
+
 	try {
 		m_pythonAPI.execute(executionCommand);
 		auto& result = DataBuffer::instance().getReturnDataByScriptName();

@@ -237,15 +237,15 @@ void PackageHandler::importMissingPackages()
 
 }
 
-std::string PackageHandler::getEnvironmentName()
+ot::UID PackageHandler::getManifestUID()
 {
     if(m_currentManifest != nullptr)
     {
-        return std::to_string(m_currentManifest->getManifestID());
+        return m_currentManifest->getManifestID();
 	}
     else
     {
-        return std::string();
+        return ot::invalidUID;
     }
 }
 

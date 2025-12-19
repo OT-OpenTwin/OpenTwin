@@ -22,30 +22,29 @@
 #include <string>
 #include <list>
 #include "EntityPythonManifest.h"
-#include "PythonWrapper.h"
 #include <map>
 #include "NewModelStateInfo.h"
 
 class PackageHandler
 {
 public:
-	static PackageHandler& instance(void)
-	{
-		static PackageHandler g_instance;
-		return g_instance;
-	}
-
+	PackageHandler() = default;
 	~PackageHandler();
-	//! @brief Handles package installation and manifest setting. 
-	//! returns false if a restart is necessary.
+	PackageHandler(const PackageHandler& _other) = delete;
+	PackageHandler(PackageHandler&& _other) = delete;
+	PackageHandler& operator=(const PackageHandler& _other) = delete;
+	PackageHandler& operator=(PackageHandler&& _other) = delete;
+
+	//! @brief Checks if the manifest identified by _manifestUID is different from the current one. 
+	//! Requests a restart if needed and initializes the manifest if this is the first call.
 	void initializeManifest(ot::UID _manifestUID);
 	void initializeEnvironmentWithManifest(const std::string& _environmentPath);
 
 	void extractMissingPackages(const std::string& _scriptContent);
 	void importMissingPackages();
 
-	//! @return empty string if the manifest was not set, otherwise returns the manifest id 
-	std::string getEnvironmentName();
+	ot::UID getManifestUID();
+	
 	void clearBuffer() 
 	{ 
 		m_uninstalledPackages.clear(); 
@@ -55,27 +54,31 @@ public:
 	{
 		m_environmentState = EnvironmentState::core;
 	}
+
+	void setRunningInFixedEnvironment()
+	{
+		m_environmentState = EnvironmentState::fixed;
+	}
+
 private:
 	enum class EnvironmentState
 	{
 		empty,
 		firstFilling,
 		initialised,
+		fixed,
 		core
 	};
-	
-	PackageHandler() = default;
-
+		
 	std::map<std::string, std::string> m_installedPackageVersionsByName;
-
-	void requestRestart();
-	
 	EntityPythonManifest* m_currentManifest = nullptr;
 	std::string m_environmentPath;
+
 	EnvironmentState m_environmentState = EnvironmentState::empty;
 	std::list<std::string> m_uninstalledPackages;
 	std::string m_installationLog;
 
+	void requestRestart();
 	const std::list<std::string> parseImportedPackages(const std::string _scriptContent);
 	bool isPackageInstalled(const std::string& _packageName);
 	void installPackage(const std::string& _packageName);
@@ -83,11 +86,8 @@ private:
 	EntityPythonManifest* loadManifestEntity(ot::UID _manifestUID);
 	ot::UID getUIDFromString(const std::string& _uid);
 	std::string getListOfInstalledPackages();
-
 	void storeInstallationLog(ot::NewModelStateInfo& _newState);
-
 	void buildPackageMap(const std::string& _packageList);
-
 	std::string trim(const std::string& _line);
 	std::pair<std::string, std::string> splitPackageIntoNameAndVersion(const std::string& _requirementLine);
 };

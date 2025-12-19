@@ -28,6 +28,8 @@
 #include "CPythonObjectBorrowed.h"
 #include "CPythonObjectNew.h"
 #include "PythonException.h"
+#include "InterpreterPathSettings.h"
+#include "PackageHandler.h"
 
 //! @brief Wrapper around python code execution.
 class PythonWrapper {
@@ -38,12 +40,12 @@ public:
 	PythonWrapper& operator=(const PythonWrapper& _other) = delete;
 	PythonWrapper(const PythonWrapper&& _other) = delete;
 	PythonWrapper& operator=(const PythonWrapper&& _other) = delete;
-
 	~PythonWrapper();
-	//! @brief Initialises the lookup-paths and the entire interpreter. If _environmentName is not empty, it will be added as additional lookup, existing as parallel folder to the CoreEnvironment folder
-	void initializePythonInterpreter(const std::string& _environmentName);
 
-	void addToSysPath(const std::string& _newPathComponent);
+	//! @brief Initialises the lookup-paths and the entire interpreter. 
+	//! If the custom environment name is not empty, it will be added as additional lookup
+	void initializePythonInterpreter(InterpreterPathSettings& _interpreterPathSettings);
+	void setPackageHandler(PackageHandler* _packageHandler) { m_packageHandler = _packageHandler; }
 	void closePythonInterpreter();
 
 	CPythonObjectNew execute(const std::string& _executionCommand, const std::string& _moduleName = "__main__");
@@ -52,16 +54,15 @@ public:
 	CPythonObjectBorrowed getGlobalDictionary(const std::string& _moduleName);
 	CPythonObjectNew getFunction(const std::string& _functionName, const std::string& _moduleName = "__main__");
 
-	std::string getEnvironmentPath() const { return m_environmentPath; }
-
 	bool isInitialized() const { return m_interpreterSuccessfullyInitialized; }
 
 private:
-	std::string m_environmentPath = "";
+	PackageHandler* m_packageHandler = nullptr;
 
 	bool m_interpreterSuccessfullyInitialized = false;
 
 	static void signalHandlerAbort(int sig);
+	void addToSysPath(const std::string& _newPathComponent);
 
 	CPythonObjectNew getModule(const std::string& _moduleName);
 };
