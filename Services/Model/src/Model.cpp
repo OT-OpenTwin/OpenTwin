@@ -224,6 +224,7 @@ void Model::resetToNew()
 	{
 		EntityBase* entityCircuitsRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityCircuitsRoot->setName(getCircuitsRootName());
+		entityCircuitsRoot->setTreeItemSelectChildren(false);
 		addEntityToModel(entityCircuitsRoot->getName(), entityCircuitsRoot, entityRoot, true, allNewEntities);
 
 		EntityGraphicsScene* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, this, getStateManager());
@@ -284,16 +285,20 @@ void Model::resetToNew()
 	{
 		EntityContainer* entityPythonRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityPythonRoot->setName(getPythonRootName());
+		entityPythonRoot->setDeletable(false);
+		entityPythonRoot->setTreeItemSelectChildren(false);
 		addEntityToModel(entityPythonRoot->getName(), entityPythonRoot, entityRoot, true, allNewEntities);
 
 		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityScriptRoot->setName(ot::FolderNames::PythonScriptFolder);
 		entityScriptRoot->setDeletable(false);
+		entityScriptRoot->setTreeItemSelectChildren(false);
 		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
 
 		EntityContainer* entityManifestRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityManifestRoot->setName(ot::FolderNames::PythonManifestFolder);
 		entityManifestRoot->setDeletable(false);
+		entityManifestRoot->setTreeItemSelectChildren(false);
 		addEntityToModel(entityManifestRoot->getName(), entityManifestRoot, entityRoot, true, allNewEntities);
 	}
 
@@ -301,6 +306,7 @@ void Model::resetToNew()
 	{
 		EntityContainer* dataProcessingRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		dataProcessingRoot->setName(ot::FolderNames::DataProcessingFolder);
+		dataProcessingRoot->setTreeItemSelectChildren(false);
 		addEntityToModel(dataProcessingRoot->getName(), dataProcessingRoot, entityRoot, true, allNewEntities);
 
 		EntityGraphicsScene* entityPipeline = new EntityGraphicsScene(createEntityUID(), nullptr, this, getStateManager());
@@ -391,6 +397,7 @@ void Model::resetToNew()
 		EntityGraphicsScene* hierarchicalRoot = new EntityGraphicsScene(createEntityUID(), nullptr, this, getStateManager());
 		hierarchicalRoot->setName(ot::FolderNames::HierarchicalProjectRoot);
 		hierarchicalRoot->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		hierarchicalRoot->setDeletable(false);
 		hierarchicalRoot->setTreeItemSelectChildren(false);
 		hierarchicalRoot->setManageChildVisibility(false);
 		hierarchicalRoot->setManageParentVisibility(false);

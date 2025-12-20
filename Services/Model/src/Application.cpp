@@ -28,16 +28,18 @@
 #include "base64.h"
 #include "zlib.h"
 #include "FileHandler.h"
-#include "OTCore/ReturnMessage.h"
+
 // OpenTwin header
 #include "DataBase.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCore/LogDispatcher.h"
+#include "OTGui/VisualisationCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/Encryption.h"
 #include "CrossCollectionDatabaseWrapper.h"
-#include "OTGui/VisualisationCfg.h"
+
 // std header
 #include <thread>
 
