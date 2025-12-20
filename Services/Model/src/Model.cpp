@@ -1239,7 +1239,13 @@ void Model::handleDeleteSelectedShapes()
 	std::list<EntityBase *> selectedEntities;
 	for (ot::UID entityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
 	{
-		selectedEntities.push_back(entityMap[entityID]);
+		EntityBase* entity = getEntityByID(entityID);
+		if (entity) {
+			// Only concider deleteble entities
+			if (entity->getDeletable()) {
+				selectedEntities.push_back(entity);
+			}
+		}
 	}
 
 	// No shapes are selected. Ignore
