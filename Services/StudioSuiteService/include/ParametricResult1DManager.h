@@ -35,6 +35,7 @@ class ResultCollectionExtender;
 #include <list>
 #include <map>
 #include <vector>
+#include <set>
 
 
 class ParametricResult1DManager : public BusinessLogicHandler
@@ -58,6 +59,7 @@ private:
 	bool extractDataDescriptionSParameter(const std::string& _category, RunIDContainer* _runIDContainer, int _runID, DatasetDescription &dataDescription);
 	std::list<std::shared_ptr<ParameterDescription>> extractParameterDescription(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
 	std::string getDefaultAxisFromData(const MetadataSeries* series, const std::string& quantityName);
+	std::string getParentPlot(const std::string& plotName, const std::set<std::string>& createdPlots);
 
 	int determineNumberOfPorts(const std::string& category, std::map<std::string, Result1DData*>& categoryResults, std::vector<Result1DData*>& sources);
 

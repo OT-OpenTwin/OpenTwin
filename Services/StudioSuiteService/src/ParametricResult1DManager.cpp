@@ -149,17 +149,23 @@ void ParametricResult1DManager::storeDataInResultCollection()
 			plotName = fullName;
 		}
 
-		std::string parentName = plotName.substr(0, plotName.find_last_of("/"));
+		std::string parentPlot = getParentPlot(plotName, createdPlots);
 
-		if (createdPlots.count(parentName) != 0)
+		if (!parentPlot.empty())
 		{
 			// Our current plot is a child in a parent -> we need to move it outside
-			const std::string plotSuffix = plotName.substr(plotName.find_last_of("/") + 1);
-			std::string newPlotName = parentName + " - " + plotSuffix;
+			// After the parent name, we need to replace all / characters by - to move the nested plot outside
+		
+			std::string origPlotName = plotName;
 
-			plotAliases[plotName] = newPlotName;
+			std::size_t pos = parentPlot.size();
+			while ((pos = plotName.find('/', pos)) != std::string::npos)
+			{
+				plotName.replace(pos, 1, " - ");
+				pos += 3; // length of " - "
+			}
 
-			plotName = newPlotName;
+			plotAliases[origPlotName] = plotName;
 		}
 
 		if (createdPlots.count(plotName) == 0)
@@ -236,6 +242,30 @@ void ParametricResult1DManager::storeDataInResultCollection()
 			OT_LOG_E("Unable to import data: " + dataDescription.getQuantityDescription()->getName() + " (" + e.what() + ")");
 		}
 	}
+}
+
+std::string ParametricResult1DManager::getParentPlot(const std::string &plotName, const std::set<std::string> &createdPlots)
+{
+	std::string parentName = plotName.substr(0, plotName.find_last_of("/"));
+
+	while (!parentName.empty())
+	{
+		if (createdPlots.count(parentName) != 0)
+		{
+			return parentName;
+		}
+
+		size_t slashIndex = parentName.find_last_of("/");
+
+		if (slashIndex == std::string::npos)
+		{
+			return "";
+		}
+
+		parentName = parentName.substr(0, parentName.find_last_of("/"));
+	}
+
+	return "";
 }
 
 std::string ParametricResult1DManager::getDefaultAxisFromData(const MetadataSeries* series, const std::string &quantityName)
