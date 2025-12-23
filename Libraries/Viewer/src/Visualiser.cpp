@@ -38,6 +38,15 @@ Visualiser::~Visualiser()
 	}
 }
 
+std::string Visualiser::getViewEntityName() const {
+	if (m_node) {
+		return m_node->getName();
+	}
+	else {
+		return std::string();
+	}
+}
+
 void Visualiser::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("MayVisualize", m_mayVisualise, _allocator);
 	_object.AddMember("ViewIsOpen", m_viewIsOpen, _allocator);

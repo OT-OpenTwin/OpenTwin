@@ -19,6 +19,8 @@
 
 #include "stdafx.h"
 #include "GraphicsVisualiser.h"
+#include "GraphicsItemVisualiser.h"
+#include "GraphicsConnectionVisualiser.h"
 
 #include "OTCore/JSON.h"
 #include "OTCore/LogDispatcher.h"
@@ -85,4 +87,28 @@ void GraphicsVisualiser::showVisualisation(const VisualiserState& _state)
 
 void GraphicsVisualiser::hideVisualisation(const VisualiserState& _state)
 {
+}
+
+void GraphicsVisualiser::setViewIsOpen(bool _viewIsOpen) {
+	Visualiser::setViewIsOpen(_viewIsOpen);
+	
+	// Propagate to child node visualisers
+	forwardViewOpenToChildren(_viewIsOpen, getSceneNode());
+}
+
+void GraphicsVisualiser::forwardViewOpenToChildren(bool _isOpen, SceneNodeBase* _parentNode) {
+	OTAssertNullptr(_parentNode);
+	for (SceneNodeBase* childNode : _parentNode->getChildren()) {
+		for (Visualiser* visualiser : childNode->getVisualiser()) {
+			GraphicsConnectionVisualiser* connectionVis = dynamic_cast<GraphicsConnectionVisualiser*>(visualiser);
+			if (connectionVis) {
+				connectionVis->setViewIsOpen(_isOpen);
+			}
+			GraphicsItemVisualiser* itemVis = dynamic_cast<GraphicsItemVisualiser*>(visualiser);
+			if (itemVis) {
+				itemVis->setViewIsOpen(_isOpen);
+			}
+		}
+		forwardViewOpenToChildren(_isOpen, childNode);
+	}
 }

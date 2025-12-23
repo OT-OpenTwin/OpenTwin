@@ -18,6 +18,8 @@
 // @otlicense-end
 
 #include <stdafx.h>
+#include "SceneNodeBase.h"
+#include "GraphicsVisualiser.h"
 #include "GraphicsConnectionVisualiser.h"
 
 GraphicsConnectionVisualiser::GraphicsConnectionVisualiser(SceneNodeBase* _sceneNode) :
@@ -35,4 +37,28 @@ void GraphicsConnectionVisualiser::showVisualisation(const VisualiserState& _sta
 
 void GraphicsConnectionVisualiser::hideVisualisation(const VisualiserState& _state) {
 
+}
+
+std::string GraphicsConnectionVisualiser::getViewEntityName() const {
+	std::string name;
+	SceneNodeBase* viewNode = findViewNode(getSceneNode());
+	if (viewNode) {
+		name = viewNode->getName();
+	}
+	return name;
+}
+
+SceneNodeBase* GraphicsConnectionVisualiser::findViewNode(SceneNodeBase* _childNode) const {
+	for (Visualiser* visualiser : _childNode->getVisualiser()) {
+		if (dynamic_cast<GraphicsVisualiser*>(visualiser) != nullptr) {
+			return _childNode;
+		}
+	}
+
+	if (_childNode->getParent()) {
+		return findViewNode(_childNode->getParent());
+	}
+	else {
+		return nullptr;
+	}
 }

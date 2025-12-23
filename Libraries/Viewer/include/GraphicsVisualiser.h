@@ -29,7 +29,11 @@ public:
 	virtual bool requestVisualization(const VisualiserState& _state) override;
 	virtual void showVisualisation(const VisualiserState& _state) override;
 	virtual void hideVisualisation(const VisualiserState& _state) override;
+	virtual void setViewIsOpen(bool _viewIsOpen) override;
 
 protected:
 	virtual std::string getVisualiserTypeString() const override { return "Graphics"; };
+
+private:
+	void forwardViewOpenToChildren(bool _isOpen, SceneNodeBase* _parentNode);
 };

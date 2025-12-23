@@ -31,6 +31,12 @@ public:
 	virtual void showVisualisation(const VisualiserState& _state) override;
 	virtual void hideVisualisation(const VisualiserState& _state) override;
 
+	virtual std::string getViewEntityName() const override;
+
 protected:
 	virtual std::string getVisualiserTypeString() const override { return "GraphicsConnection"; };
+
+private:
+	SceneNodeBase* findViewNode(SceneNodeBase* _childNode) const;
+
 };

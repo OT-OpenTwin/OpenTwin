@@ -86,6 +86,8 @@ public:
 
 	SceneNodeBase* getSceneNode() const { return m_node; };
 	
+	virtual std::string getViewEntityName() const;
+
 	//! @brief Set the entity that is visualized by this visualiser.
 	//! @param _entity The entity ID of the entity that is visualized by this visualiser.
 	void setVisualizationEntity(ot::UID _entity) { m_visualizationEntity = _entity; };

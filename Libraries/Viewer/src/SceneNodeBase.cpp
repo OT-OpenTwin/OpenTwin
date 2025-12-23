@@ -125,7 +125,7 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 
 		// Check if any visualiser has focus
 		for (Visualiser* visualiser : visualisers) {
-			if (FrontendAPI::instance()->hasViewFocus(getName(), visualiser->getViewType())) {
+			if (FrontendAPI::instance()->hasViewFocus(visualiser->getViewEntityName(), visualiser->getViewType())) {
 				state.m_anyVisualiserHasFocus = true;
 				break;
 			}
@@ -146,7 +146,7 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 					// We do not want to focus every visualiser, so if any visualiser has focus, we do not set the focus again
 					if (!state.m_anyVisualiserHasFocus) {
 						if (!skipViewHandling) {
-							FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
+							FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(visualiser->getViewEntityName(), visualiser->getViewType());
 						}
 						
 						result |= ot::SelectionHandlingEvent::ActiveViewChanged;
@@ -154,7 +154,7 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 						state.m_anyVisualiserHasFocus = true;
 					}
 					
-					FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, getName(), visualiser->getViewType());
+					FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, visualiser->getViewEntityName(), visualiser->getViewType());
 
 					// The visualizer may want to unhide/un-dim the visualisation
 					visualiser->showVisualisation(state);

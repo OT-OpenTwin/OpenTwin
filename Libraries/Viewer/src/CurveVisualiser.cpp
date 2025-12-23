@@ -18,13 +18,13 @@
 // @otlicense-end
 
 #include "stdafx.h"
+#include "SceneNodeBase.h"
+#include "PlotVisualiser.h"
 #include "CurveVisualiser.h"
+#include "FrontendAPI.h"
 #include "OTCore/JSON.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
-#include "FrontendAPI.h"
-#include "SceneNodeBase.h"
-#include "PlotVisualiser.h"
 
 CurveVisualiser::CurveVisualiser(SceneNodeBase * _sceneNode)
 	:Visualiser(_sceneNode, ot::WidgetViewBase::View1D) {
@@ -34,7 +34,7 @@ CurveVisualiser::CurveVisualiser(SceneNodeBase * _sceneNode)
 bool CurveVisualiser::requestVisualization(const VisualiserState& _state) {
 	bool newVisualisation = false;
 
-	SceneNodeBase* plot = m_node->getParent();
+	SceneNodeBase* plot = findPlotNode(getSceneNode());
 	OTAssertNullptr(plot);
 
 	const std::list<Visualiser*>& allVisualiser = plot->getVisualiser();
@@ -90,4 +90,28 @@ void CurveVisualiser::hideVisualisation(const VisualiserState& _state) {
 
 	OTAssertNullptr(plotVisualiser);
 	plotVisualiser->hideVisualisation(_state);
+}
+
+std::string CurveVisualiser::getViewEntityName() const {
+	std::string name;
+	SceneNodeBase* viewNode = findPlotNode(getSceneNode());
+	if (viewNode) {
+		name = viewNode->getName();
+	}
+	return name;
+}
+
+SceneNodeBase* CurveVisualiser::findPlotNode(SceneNodeBase* _childNode) const {
+	for (Visualiser* visualiser : _childNode->getVisualiser()) {
+		if (dynamic_cast<PlotVisualiser*>(visualiser) != nullptr) {
+			return _childNode;
+		}
+	}
+
+	if (_childNode->getParent()) {
+		return findPlotNode(_childNode->getParent());
+	}
+	else {
+		return nullptr;
+	}
 }

@@ -18,6 +18,8 @@
 // @otlicense-end
 
 #include <stdafx.h>
+#include "SceneNodeBase.h"
+#include "GraphicsVisualiser.h"
 #include "GraphicsItemVisualiser.h"
 
 GraphicsItemVisualiser::GraphicsItemVisualiser(SceneNodeBase* _sceneNode) :
@@ -36,3 +38,28 @@ void GraphicsItemVisualiser::showVisualisation(const VisualiserState& _state) {
 void GraphicsItemVisualiser::hideVisualisation(const VisualiserState& _state) {
 
 }
+
+std::string GraphicsItemVisualiser::getViewEntityName() const {
+	std::string name;
+	SceneNodeBase* viewNode = findViewNode(getSceneNode());
+	if (viewNode) {
+		name = viewNode->getName();
+	}
+	return name;
+}
+
+SceneNodeBase* GraphicsItemVisualiser::findViewNode(SceneNodeBase* _childNode) const {
+	for (Visualiser* visualiser : _childNode->getVisualiser()) {
+		if (dynamic_cast<GraphicsVisualiser*>(visualiser) != nullptr) {
+			return _childNode;
+		}
+	}
+
+	if (_childNode->getParent()) {
+		return findViewNode(_childNode->getParent());
+	}
+	else {
+		return nullptr;
+	}
+}
+
