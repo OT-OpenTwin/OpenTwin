@@ -444,6 +444,8 @@ private:
 
 	// Private functions
 
+	void clearSessionInformation();
+
 	void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 	
 	void removeServiceFromList(std::vector<ServiceDataUi *> &list, ServiceDataUi *service);

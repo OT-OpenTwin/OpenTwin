@@ -1156,6 +1156,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		ScopedLockManagerLock uiLock(m_lockManager, app->getBasicServiceInformation(), ot::LockType::All);
 
+		app->replaceInfoMessage(c_buildInfo);
+
 		StudioSuiteConnectorAPI::openProject();
 
 		m_currentSessionID = _projectName;
@@ -1171,13 +1173,13 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, gssDoc.toJson(), gssResponse)) {
 			OT_LOG_EA("Failed to send \"" OT_ACTION_CMD_CreateNewSession "\" request to the global session service");
 			app->slotShowErrorPrompt("Error", "Failed to send create new session request to the global session service", "");
-			ot::LogDispatcher::instance().setProjectName("");
+			clearSessionInformation();
 			return false;
 		}
 		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(gssResponse);
 		if (responseMessage != ot::ReturnMessage::Ok) {
 			app->slotShowErrorPrompt("Error", responseMessage.getWhat(), "");
-			ot::LogDispatcher::instance().setProjectName("");
+			clearSessionInformation();
 			return false;
 		}
 
@@ -1224,7 +1226,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, sessionDoc.toJson(), lssResponse)) {
 			OT_LOG_EAS("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
 			app->slotShowErrorPrompt("Connection Error", "Failed to send http request to Local Session Service", "");
-			ot::LogDispatcher::instance().setProjectName("");
+			clearSessionInformation();
 			return false;
 		}
 
@@ -1233,7 +1235,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		if (lssResult != ot::ReturnMessage::Ok) {
 			OT_LOG_EAS("Failed to create new session at Local Session Service at \"" + m_sessionServiceURL + "\": " + lssResult.getWhat());
 			app->slotShowErrorPrompt("Error", "Failed to create session. ", lssResult.getWhat());
-			ot::LogDispatcher::instance().setProjectName("");
+			clearSessionInformation();
 			return false;
 		}
 
@@ -1376,7 +1378,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 	catch (const std::exception & e) {
 		OT_LOG_EAS(e.what());
 		app->slotShowErrorPrompt("Error", "Open project failed due to exception.", e.what());
-		ot::LogDispatcher::instance().setProjectName("");
+		clearSessionInformation();
 		return false;
 	}
 }
@@ -1501,10 +1503,6 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			app->closeAllViewerTabs();
 		}
 
-		app->setServiceID(ot::invalidServiceID);
-		m_currentSessionID = "";
-		app->clearSessionInformation();
-
 		// Clean up temporary files
 		m_tempFolder.reset();
 
@@ -1519,10 +1517,11 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		
 		OT_LOG_D("Close project done");
 
-		ot::LogDispatcher::instance().setProjectName("");
+		clearSessionInformation();
 	}
 	catch (const std::exception & e) {
 		OT_LOG_E(e.what());
+		clearSessionInformation();
 	}
 }
 
@@ -1811,6 +1810,16 @@ void ExternalServicesComponent::getSelectedVisibleModelEntityIDs(std::list<Model
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private functions
+
+void ExternalServicesComponent::clearSessionInformation() {
+	AppBase* app = AppBase::instance();
+
+	app->setServiceID(ot::invalidServiceID);
+	m_currentSessionID = "";
+	app->clearSessionInformation();
+
+	ot::LogDispatcher::instance().setProjectName("");
+}
 
 void ExternalServicesComponent::removeServiceFromList(std::vector<ServiceDataUi *> &list, ServiceDataUi *service)
 {
