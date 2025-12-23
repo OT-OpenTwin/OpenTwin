@@ -58,6 +58,9 @@ public:
 
 	// Management
 
+	//! @brief Ping the LocalSessionService to check if it is reachable.
+	bool ping() const;
+
 	//! @brief Add the session to the list of sessions that wait for confirmation.
 	//! The current timestamp will be saved to check the timeout later.
 	//! @param _session The session to add.

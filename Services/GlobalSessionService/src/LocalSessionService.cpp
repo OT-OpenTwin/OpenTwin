@@ -23,6 +23,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
+#include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
 // std header
@@ -135,6 +136,18 @@ void LocalSessionService::setFromJsonObject(const ot::ConstJsonObject& _object) 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Management
+
+bool LocalSessionService::ping() const {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, doc.GetAllocator()), doc.GetAllocator());
+	std::string response;
+	if (!ot::msg::send("", m_url, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::NoRequestFlags)) {
+		return false;
+	}
+	else {
+		return response == OT_ACTION_CMD_Ping;
+	}
+}
 
 void LocalSessionService::addIniSession(Session&& _session) {
 	IniSessionType data(std::chrono::steady_clock::now(), std::move(_session));

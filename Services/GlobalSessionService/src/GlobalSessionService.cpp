@@ -695,7 +695,13 @@ bool GlobalSessionService::addSessionService(LocalSessionService&& _service, ot:
 
 	for (auto it = m_lssMap.begin(); it != m_lssMap.end(); it++) {
 		if (it->second.getUrl() == _service.getUrl()) {
-			OT_LOG_W("LSS with given url already registered, replacing data. { \"Lss.Url\": \"" + _service.getUrl() + "\" }");
+			// LSS with given URL already registered, check if "old" LSS is still alive
+			if (it->second.ping()) {
+				OT_LOG_WAS("LSS with given url already registered and alive. { \"Lss.Url\": \"" + _service.getUrl() + "\" }");
+				return false;
+			}
+
+			OT_LOG_W("LSS with given url already registered but not alive, replacing data. { \"Lss.Url\": \"" + _service.getUrl() + "\" }");
 
 			found = true;
 			_newId = it->first;

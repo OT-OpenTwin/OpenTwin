@@ -315,15 +315,17 @@ void GlobalSessionService::healthCheck() {
 
 			// Send registration
 			if (!this->sendMessage(ot::EXECUTE, registerDoc.toJson(), registerResponse)) {
-				OT_LOG_E("Failed to send register message to global session service");
-				continue;
+				OT_LOG_E("Failed to send register message to global session service. Shutting down...");
+				exit(ot::AppExitCode::GSSRegistrationFailed);
+				break;
 			}
 
 			ot::ReturnMessage response = ot::ReturnMessage::fromJson(registerResponse);
 
 			if (response != ot::ReturnMessage::Ok) {
-				OT_LOG_E("Failed to register at GSS: " + response.getWhat());
-				continue;
+				OT_LOG_E("Failed to register at GSS: " + response.getWhat() + ". Shutting down...");
+				exit(ot::AppExitCode::GSSRegistrationFailed);
+				break;
 			}
 
 			// Get new id and database url
