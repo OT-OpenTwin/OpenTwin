@@ -117,6 +117,7 @@ private:
 	std::list<ButtonInfo> m_testButtons;
 
 	void createManyCurvesPlot(const std::string& _plotName, int _numberOfCurves, float _numberOfPoints);
+	void createManyCurvesPlotWorker(const std::string& _plotName, int _numberOfCurves, float _numberOfPoints);
 
 public:
 

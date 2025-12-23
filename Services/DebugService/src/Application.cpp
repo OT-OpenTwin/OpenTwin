@@ -44,6 +44,7 @@
 
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/ProgressUpdater.h"
 #include "OTServiceFoundation/AbstractUiNotifier.h"
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 
@@ -734,24 +735,37 @@ Application::~Application()
 // Required functions
 
 void Application::createManyCurvesPlot(const std::string& _plotName, int _numberOfCurves, float _numberOfPoints) {
-	ot::RuntimeIntervalTest testGlob;
-	testGlob.logOnDelete("Application::createManyCurvesPlot(NoCurves: " + std::to_string(_numberOfCurves) + "; PtsPerCurve: " + std::to_string(_numberOfPoints) + ")");
-
-	ot::PainterRainbowIterator rainbowPainterIt;
+	getUiComponent()->lockUI(ot::LockType::ModelRead | ot::LockType::ModelWrite | ot::LockType::Properties);
 
 	std::string plotEntityName = "Test/" + _plotName;
 	int counter = 0;
 	std::list<std::string> existingPlots = ot::ModelServiceAPI::getListOfFolderItems("Test");
-	
+
 	while (ot::ContainerHelper::contains(existingPlots, plotEntityName)) {
 		plotEntityName = "Test/" + _plotName + "_" + std::to_string(++counter);
 	}
-	
+
+	std::thread t(&Application::createManyCurvesPlotWorker, this, plotEntityName, _numberOfCurves, _numberOfPoints);
+	t.detach();
+}
+
+void Application::createManyCurvesPlotWorker(const std::string& _plotName, int _numberOfCurves, float _numberOfPoints) {
+	ProgressUpdater progress(getUiComponent(), "Creating (" + _plotName + ")");
+	progress.setTotalNumberOfSteps(static_cast<uint64_t>(_numberOfCurves));
+	progress.setTriggerFrequency(1);
+
+	ot::RuntimeIntervalTest testGlob;
+	testGlob.logOnDelete("Application::createManyCurvesPlot(Curves: " + std::to_string(_numberOfCurves) + "; PtsPerCurve: " + std::to_string(_numberOfPoints) + ")");
+
+	ot::PainterRainbowIterator rainbowPainterIt;
+
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
 	PlotBuilder builder(extender);
 
 	for (int curveId = 0; curveId < _numberOfCurves; curveId++) {
+		progress.triggerUpdate(static_cast<uint64_t>(curveId));
+
 		// First curve
 		DatasetDescription description;
 		MetadataParameter parameter;
@@ -774,18 +788,20 @@ void Application::createManyCurvesPlot(const std::string& _plotName, int _number
 
 		ot::Plot1DCurveCfg curveCfg;
 		curveCfg.setLinePenPainter(rainbowPainterIt.getNextPainter().release());
-		curveCfg.setEntityName(plotEntityName + "/A_Curve" + std::to_string(curveId));
+		curveCfg.setEntityName(_plotName + "/A_Curve" + std::to_string(curveId));
 
 		builder.addCurve(std::move(description), curveCfg, "Curve" + std::to_string(curveId));
 	}
 
 	// Here the shared part
 	ot::Plot1DCfg plotCfg;
-	plotCfg.setEntityName(plotEntityName);
+	plotCfg.setEntityName(_plotName);
 
 	ot::RuntimeIntervalTest testBuild;
 	builder.buildPlot(plotCfg);
 	testBuild.logCurrentInterval("Application::createManyCurvesPlot - Build plot");
+
+	getUiComponent()->unlockUI(ot::LockType::ModelRead | ot::LockType::ModelWrite | ot::LockType::Properties);
 }
 
 void Application::initialize() {
