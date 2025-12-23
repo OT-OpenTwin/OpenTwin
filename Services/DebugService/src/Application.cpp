@@ -24,6 +24,7 @@
 #include "OTCore/FolderNames.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCore/ContainerHelper.h"
 #include "OTCore/ThisComputerInfo.h"
 
 #include "OTGui/TableCfg.h"
@@ -46,6 +47,8 @@
 #include "OTServiceFoundation/AbstractUiNotifier.h"
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 #include "PlotBuilder.h"
 #include "TemplateDefaultManager.h"
 #include "ResultCollectionExtender.h"
@@ -125,9 +128,11 @@ Application::Application() :
 	// Plot tests
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Single Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneCurve, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Two Curves", "Default/Plot1DVisible"), std::bind(&Application::createPlotTwoCurves, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "2 Curves x 1M", "Default/Plot1DVisible"), std::bind(&Application::createPlot2_1Mil, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "100 Curves x 100", "Default/Plot1DVisible"), std::bind(&Application::createPlot100_100, this)));
-	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "100 Curves x 1k", "Default/Plot1DVisible"), std::bind(&Application::createPlot100_1000, this)));
-	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "1k Curves x 1k", "Default/Plot1DVisible"), std::bind(&Application::createPlot1000_1000, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "100 Curves x 1K", "Default/Plot1DVisible"), std::bind(&Application::createPlot100_1000, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "100 Curves x 1M", "Default/Plot1DVisible"), std::bind(&Application::createPlot100_1Mil, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "1K Curves x 1K", "Default/Plot1DVisible"), std::bind(&Application::createPlot1000_1000, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Family of Curves", "Default/Plot1DVisible"), std::bind(&Application::createFamilyOfCurves, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Family of Curves 3P const", "Default/Plot1DVisible"), std::bind(&Application::createFamilyOfCurves3ParameterConst, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Family of Curves 3P", "Default/Plot1DVisible"), std::bind(&Application::createFamilyOfCurves3Parameter, this)));
@@ -314,16 +319,24 @@ void Application::createPlotTwoCurves() {
 	builder.buildPlot(plotCfg);
 }
 
+void Application::createPlot2_1Mil() {
+	createManyCurvesPlot("A_plot_2_x_1M", 2, 1000000.f);
+}
+
 void Application::createPlot100_100() {
-	createManyCurvesPlot("Test/A_plot_100_x_100", 100, 100.f);
+	createManyCurvesPlot("A_plot_100_x_100", 100, 100.f);
 }
 
 void Application::createPlot100_1000() {
-	createManyCurvesPlot("Test/A_plot_100_x_1k", 100, 1000.f);
+	createManyCurvesPlot("A_plot_100_x_1K", 100, 1000.f);
+}
+
+void Application::createPlot100_1Mil() {
+	createManyCurvesPlot("A_plot_100_x_1M", 100, 1000000.f);
 }
 
 void Application::createPlot1000_1000() {
-	createManyCurvesPlot("Test/A_plot_1K_x_1K", 1000, 1000.f);
+	createManyCurvesPlot("A_plot_1K_x_1K", 1000, 1000.f);
 }
 
 void Application::createFamilyOfCurves()
@@ -721,8 +734,19 @@ Application::~Application()
 // Required functions
 
 void Application::createManyCurvesPlot(const std::string& _plotName, int _numberOfCurves, float _numberOfPoints) {
+	ot::RuntimeIntervalTest testGlob;
+	testGlob.logOnDelete("Application::createManyCurvesPlot(NoCurves: " + std::to_string(_numberOfCurves) + "; PtsPerCurve: " + std::to_string(_numberOfPoints) + ")");
+
 	ot::PainterRainbowIterator rainbowPainterIt;
 
+	std::string plotEntityName = "Test/" + _plotName;
+	int counter = 0;
+	std::list<std::string> existingPlots = ot::ModelServiceAPI::getListOfFolderItems("Test");
+	
+	while (ot::ContainerHelper::contains(existingPlots, plotEntityName)) {
+		plotEntityName = "Test/" + _plotName + "_" + std::to_string(++counter);
+	}
+	
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
 	PlotBuilder builder(extender);
@@ -750,15 +774,18 @@ void Application::createManyCurvesPlot(const std::string& _plotName, int _number
 
 		ot::Plot1DCurveCfg curveCfg;
 		curveCfg.setLinePenPainter(rainbowPainterIt.getNextPainter().release());
-		curveCfg.setEntityName(_plotName + "/A_Curve" + std::to_string(curveId));
+		curveCfg.setEntityName(plotEntityName + "/A_Curve" + std::to_string(curveId));
 
 		builder.addCurve(std::move(description), curveCfg, "Curve" + std::to_string(curveId));
 	}
 
 	// Here the shared part
 	ot::Plot1DCfg plotCfg;
-	plotCfg.setEntityName(_plotName);
+	plotCfg.setEntityName(plotEntityName);
+
+	ot::RuntimeIntervalTest testBuild;
 	builder.buildPlot(plotCfg);
+	testBuild.logCurrentInterval("Application::createManyCurvesPlot - Build plot");
 }
 
 void Application::initialize() {

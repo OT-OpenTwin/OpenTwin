@@ -58,8 +58,10 @@ public:
 	
 	void createPlotOneCurve();
 	void createPlotTwoCurves();
+	void createPlot2_1Mil();
 	void createPlot100_100();
 	void createPlot100_1000();
+	void createPlot100_1Mil();
 	void createPlot1000_1000();
 	void createFamilyOfCurves();
 	void createFamilyOfCurves3ParameterConst();
