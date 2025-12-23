@@ -53,15 +53,16 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/LogDispatcher.h"
 
-#include "SceneNodeBase.h"
-#include "SceneNodeContainer.h"
-#include "SceneNodeGeometry.h"
-#include "SceneNodeAnnotation.h"
+#include "SceneNodeVTK.h"
 #include "SceneNodeMesh.h"
+#include "SceneNodeBase.h"
+#include "VisualiserInfo.h"
 #include "SceneNodeMeshItem.h"
+#include "SceneNodeGeometry.h"
+#include "SceneNodeContainer.h"
+#include "SceneNodeAnnotation.h"
 #include "SceneNodeCartesianMesh.h"
 #include "SceneNodeCartesianMeshItem.h"
-#include "SceneNodeVTK.h"
 #include "SceneNodeMultiVisualisation.h"
 
 #include "ManipulatorBase.h"
@@ -1115,8 +1116,13 @@ SceneNodeBase *Model::getParentNode(const std::string &treeName)
 
 void Model::resetSelection(SceneNodeBase *root)
 {
-	root->setSelected(false, ot::SelectionData(), isSingleItemSelected(), {});
+	ot::VisualiserInfo visInfo;
+	root->setSelected(false, ot::SelectionData(), isSingleItemSelected(), {}, visInfo);
 	root->setSelectionHandled(false);
+
+	for (Visualiser* vis : visInfo.handledVisualisers) {
+		vis->setRequestHandled(false);
+	}
 
 	for (auto child : root->getChildren())
 	{
@@ -1192,7 +1198,8 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 	}
 
 	// Now set the selected state for all selected nodes
-	
+	ot::VisualiserInfo visInfo;
+
 	for (SceneNodeBase* node : selectedNodes) {
 		assert(node != nullptr);
 
@@ -1205,12 +1212,16 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 			FrontendAPI::instance()->addVisualizingEntityToView(node->getTreeItemID(), "3D", ot::WidgetViewBase::View3D);
 		}
 		
-		result |= node->setSelected(true, _selectionData, isSingleItemSelected(), selectedNodes);
+		result |= node->setSelected(true, _selectionData, isSingleItemSelected(), selectedNodes, visInfo);
 		_selectedModelItems.push_back(node->getModelEntityID());
 
 		if (node->isVisible()) {
 			_selectedVisibleModelItems.push_back(node->getModelEntityID());
 		}
+	}
+
+	for (Visualiser* vis : visInfo.handledVisualisers) {
+		vis->setRequestHandled(false);
 	}
 
 	// Now update the transparent / opaque mode acoording to the selection

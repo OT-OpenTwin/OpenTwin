@@ -30,12 +30,13 @@ PlotVisualiser::PlotVisualiser(SceneNodeBase* _sceneNode)
 }
 
 bool PlotVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) {
-	if (_info.requestHandled) {
+	if (getRequestHandled()) {
 		// Request already handled
 		return false;
 	}
 
-	_info.requestHandled = true;
+	setRequestHandled(true);
+	_info.handledVisualisers.push_back(this);
 
 	bool isSingle = _state.singleSelection;
 
@@ -93,10 +94,13 @@ bool PlotVisualiser::requestVisualization(const VisualiserState& _state, ot::Vis
 }
 
 void PlotVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
-	if (_info.requestHandled) {
+	if (getRequestHandled()) {
 		// Show request already handled
 		return;
 	}
+
+	setRequestHandled(true);
+	_info.handledVisualisers.push_back(this);
 
 	if (!this->getSceneNode()->getSelectionHandled()) {
 		this->getSceneNode()->setSelectionHandled(true);
@@ -107,8 +111,6 @@ void PlotVisualiser::showVisualisation(const VisualiserState& _state, ot::Visual
 	for (const SceneNodeBase* node : this->getVisualizingEntities(_state)) {
 		FrontendAPI::instance()->addVisualizingEntityToView(node->getTreeItemID(), this->getSceneNode()->getName(), ot::WidgetViewBase::View1D);
 	}
-
-	_info.requestHandled = true;
 }
 
 void PlotVisualiser::hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
@@ -119,11 +121,21 @@ void PlotVisualiser::setViewIsOpen(bool _viewIsOpen)
 {
 	Visualiser::setViewIsOpen(_viewIsOpen);
 
-	for (SceneNodeBase* curve : m_node->getChildren())
+	for (SceneNodeBase* child : m_node->getChildren())
 	{
-		assert(curve->getVisualiser().size() == 1);
-		Visualiser* curveVisualiser = *curve->getVisualiser().begin();
-		curveVisualiser->setViewIsOpen(_viewIsOpen);
+		forwardViewOpen(child);
+	}
+}
+
+void PlotVisualiser::forwardViewOpen(SceneNodeBase* _node) {
+	for (Visualiser* vis : _node->getVisualiser()) {
+		CurveVisualiser* curveVis = dynamic_cast<CurveVisualiser*>(vis);
+		if (curveVis) {
+			curveVis->setViewIsOpen(this->getViewIsOpen());
+		}
+	}
+	for (SceneNodeBase* child : _node->getChildren()) {
+		forwardViewOpen(child);
 	}
 }
 
@@ -147,8 +159,9 @@ std::list<SceneNodeBase*> PlotVisualiser::getVisualizingEntities(const Visualise
 				CurveVisualiser* curveVis = dynamic_cast<CurveVisualiser*>(vis);
 				if (curveVis) {
 					SceneNodeBase* targetedPlotNode = curveVis->findPlotNode(node);
-					OTAssertNullptr(targetedPlotNode);
-					visualizingEntities.push_back(targetedPlotNode);
+					if (targetedPlotNode == getSceneNode()) {
+						visualizingEntities.push_back(node);
+					}
 				}
 			}
 		}

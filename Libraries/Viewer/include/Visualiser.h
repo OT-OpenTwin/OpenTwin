@@ -111,9 +111,13 @@ public:
 	//! @param _rootNode Optional root node for the visualisation. If provided only this node and its children will be considered for the visualizing entities.
 	ot::VisualisationCfg createVisualiserConfig(const VisualiserState& _state, SceneNodeBase* _rootNode = nullptr) const;
 
+	void setRequestHandled(bool _handled) { m_requestsHandled = _handled; };
+	bool getRequestHandled() const { return m_requestsHandled; };
+
 protected:
 	virtual std::string getVisualiserTypeString() const = 0;
 
+	bool m_requestsHandled = false;
 	ot::UID m_visualizationEntity;
 	SceneNodeBase* m_node = nullptr;
 	bool m_mayVisualise = true;

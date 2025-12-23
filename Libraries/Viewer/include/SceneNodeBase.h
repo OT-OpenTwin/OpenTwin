@@ -70,7 +70,7 @@ public:
 	bool isSelected() const { return m_selected; };
 
 	//! \return Returns true if the selection has requested a new view.
-	virtual ot::SelectionHandlingResult setSelected(bool _selected, const ot::SelectionData& _selectionData, bool singleSelection, const std::list<SceneNodeBase*>& _selectedNodes);
+	virtual ot::SelectionHandlingResult setSelected(bool _selected, const ot::SelectionData& _selectionData, bool singleSelection, const std::list<SceneNodeBase*>& _selectedNodes, ot::VisualiserInfo& _visualizersInfo);
 	
 	bool isTransparent() const { return m_transparent; };
 	virtual void setTransparent(bool t) { m_transparent = t; };

@@ -36,6 +36,9 @@ protected:
 	virtual std::string getVisualiserTypeString() const override { return "Plot"; };
 
 private:
+	//! @brief Forward the view open state to all child curve visualisers.
+	void forwardViewOpen(SceneNodeBase* _node);
+
 	ot::UIDList getVisualizingUIDs(const VisualiserState& _state) const;
 	std::list<SceneNodeBase*> getVisualizingEntities(const VisualiserState& _state) const;
 };

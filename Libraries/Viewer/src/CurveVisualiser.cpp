@@ -87,6 +87,16 @@ std::string CurveVisualiser::getViewEntityName() const {
 	return name;
 }
 
+void CurveVisualiser::setViewIsOpen(bool _viewIsOpen) {
+	Visualiser::setViewIsOpen(_viewIsOpen);
+
+	SceneNodeBase* plot = findPlotNode(getSceneNode());
+	OTAssertNullptr(plot);
+
+	// Initialize dimmed state
+	FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), !getSceneNode()->isSelected());
+}
+
 SceneNodeBase* CurveVisualiser::findPlotNode(SceneNodeBase* _childNode) const {
 	for (Visualiser* visualiser : _childNode->getVisualiser()) {
 		if (dynamic_cast<PlotVisualiser*>(visualiser) != nullptr) {

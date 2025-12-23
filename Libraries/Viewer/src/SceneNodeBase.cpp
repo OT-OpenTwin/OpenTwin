@@ -104,7 +104,7 @@ void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocat
 	_object.AddMember("Visualizers", visualizersArr, _allocator);
 }
 
-ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot::SelectionData& _selectionData, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes)
+ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot::SelectionData& _selectionData, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes, ot::VisualiserInfo& _visualisersInfo)
 {
 	ot::SelectionHandlingResult result = ot::SelectionHandlingEvent::Default;
 
@@ -132,9 +132,6 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 		}
 
 		for (Visualiser* visualiser : visualisers) {
-			// Per visualiser info
-			ot::VisualiserInfo info;
-
 			// We have a valid state change, so we visualise all views, if they are not already opened in a view and the selection origins from a user interaction
 			// In case that properties change, effectively a new entity is created (same ID, different version) and a new scene node is created. 
 			// Therefore it is not necessary to compare the states of scenenode and entity. This algorithm only deals with the state of the view being
@@ -159,12 +156,12 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 					FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, visualiser->getViewEntityName(), visualiser->getViewType());
 
 					// The visualizer may want to unhide/un-dim the visualisation
-					visualiser->showVisualisation(state, info);
+					visualiser->showVisualisation(state, _visualisersInfo);
 				}
 				else if (visualiser->mayVisualise()) {
 					// The view is not open and the visualiser is enabled
 					
-					if (visualiser->requestVisualization(state, info)) {
+					if (visualiser->requestVisualization(state, _visualisersInfo)) {
 						// Visualisation was requested
 						result |= ot::SelectionHandlingEvent::NewViewRequested;
 					}
@@ -172,7 +169,7 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 			}
 			else if (visualiser->getViewIsOpen()) {
 				// Entity was deselected, so we potentially want to hide or dim the visualisation
-				visualiser->hideVisualisation(state, info);
+				visualiser->hideVisualisation(state, _visualisersInfo);
 			}
 		}
 	}

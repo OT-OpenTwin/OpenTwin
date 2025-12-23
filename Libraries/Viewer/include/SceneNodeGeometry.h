@@ -81,7 +81,7 @@ public:
 	virtual void setWireframe(bool w) override;
 	virtual void setVisible(bool v) override;
 	virtual void setHighlighted(bool h) override;
-	virtual ot::SelectionHandlingResult setSelected(bool selected, const ot::SelectionData& _selectionData, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes) override;
+	virtual ot::SelectionHandlingResult setSelected(bool selected, const ot::SelectionData& _selectionData, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes, ot::VisualiserInfo& _visualisersInfo) override;
 
 	void setShowWhenSelected(bool flag) { m_showWhenSelected = flag; };
 
