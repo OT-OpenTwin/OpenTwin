@@ -30,10 +30,10 @@ class SceneNodeBase;
 
 struct VisualiserState
 {
-	bool m_selected = false;
-	bool m_singleSelection = false;
-	bool m_setFocus = true;
-	bool m_anyVisualiserHasFocus = false;
-	ot::SelectionData m_selectionData; 
-	std::list<SceneNodeBase*> m_selectedNodes;
+	bool selected = false;
+	bool singleSelection = false;
+	bool setFocus = true;
+	bool anyVisualiserHasFocus = false;
+	ot::SelectionData selectionData; 
+	std::list<SceneNodeBase*> selectedNodes;
 };

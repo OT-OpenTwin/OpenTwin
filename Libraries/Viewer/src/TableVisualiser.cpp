@@ -32,9 +32,9 @@ TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode)
 }
 
 bool TableVisualiser::requestVisualization(const VisualiserState& _state) {
-	if (_state.m_selectionData.getSelectionOrigin() == ot::SelectionOrigin::User) {
-		if (_state.m_singleSelection) {
-			if (_state.m_selected) {
+	if (_state.selectionData.getSelectionOrigin() == ot::SelectionOrigin::User) {
+		if (_state.singleSelection) {
+			if (_state.selected) {
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
 				

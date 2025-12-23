@@ -44,11 +44,11 @@ TextVisualiser::TextVisualiser(SceneNodeBase* _sceneNode)
 
 bool TextVisualiser::requestVisualization(const VisualiserState& _state)
 {
-	if (_state.m_selectionData.getSelectionOrigin() == ot::SelectionOrigin::User)
+	if (_state.selectionData.getSelectionOrigin() == ot::SelectionOrigin::User)
 	{
-		if (_state.m_singleSelection)
+		if (_state.singleSelection)
 		{
-			if (_state.m_selected)
+			if (_state.selected)
 			{
 				FrontendAPI::instance()->messageModelService(createRequestDoc(_state, 0, true, false).toJson());
 				return true;
@@ -62,7 +62,7 @@ bool TextVisualiser::requestNextDataChunk(size_t _nextChunkStartIndex) {
 	OTAssertNullptr(this->getSceneNode());
 
 	VisualiserState state;
-	state.m_setFocus = false;
+	state.setFocus = false;
 	FrontendAPI::instance()->messageModelService(createRequestDoc(state, _nextChunkStartIndex, true, true).toJson());
 	return true;
 }

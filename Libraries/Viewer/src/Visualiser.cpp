@@ -57,10 +57,10 @@ void Visualiser::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator&
 ot::VisualisationCfg Visualiser::createVisualiserConfig(const VisualiserState& _state, SceneNodeBase* _rootNode) const
 {
 	ot::VisualisationCfg visualisationCfg;
-	visualisationCfg.setAsActiveView(_state.m_setFocus);
+	visualisationCfg.setAsActiveView(_state.setFocus);
 
 	ot::UIDList visualizingEntities;
-	for (const SceneNodeBase* selectedNode : _state.m_selectedNodes) {
+	for (const SceneNodeBase* selectedNode : _state.selectedNodes) {
 		if (_rootNode) {
 			if (selectedNode == _rootNode || selectedNode->isChildOf(_rootNode)) {
 				visualizingEntities.splice(visualizingEntities.end(), selectedNode->getVisualisedEntities());
@@ -74,7 +74,7 @@ ot::VisualisationCfg Visualiser::createVisualiserConfig(const VisualiserState& _
 	visualizingEntities.unique();
 	visualisationCfg.setVisualisingEntities(visualizingEntities);
 
-	if (_state.m_selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier))
+	if (_state.selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier))
 	{
 		visualisationCfg.setSupressViewHandling(true);
 	}

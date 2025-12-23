@@ -37,16 +37,16 @@ GraphicsVisualiser::GraphicsVisualiser(SceneNodeBase* _sceneNode)
 
 bool GraphicsVisualiser::requestVisualization(const VisualiserState& _state)
 {
-	if (_state.m_selected)
+	if (_state.selected)
 	{
-		bool isSingle = _state.m_singleSelection;
+		bool isSingle = _state.singleSelection;
 
 		// Ensure only one graphics visualiser is selected
 		if (!isSingle) {
 			bool hasGraphics = false;
 			isSingle = true;
 
-			for (SceneNodeBase* node : _state.m_selectedNodes) {
+			for (SceneNodeBase* node : _state.selectedNodes) {
 				for (Visualiser* vis : node->getVisualiser()) {
 					if (dynamic_cast<GraphicsVisualiser*>(vis) != nullptr) {
 						if (hasGraphics) {

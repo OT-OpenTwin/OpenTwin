@@ -32,14 +32,14 @@ PlotVisualiser::PlotVisualiser(SceneNodeBase* _sceneNode)
 bool PlotVisualiser::requestVisualization(const VisualiserState& _state) {
 	if (!m_alreadyRequestedVisualisation) {
 
-		bool isSingle = _state.m_singleSelection;
+		bool isSingle = _state.singleSelection;
 
 		// Ensure only one plot will be visualized
 		if (!isSingle) {
 			SceneNodeBase* plotNode = nullptr;
 			isSingle = true;
 
-			for (SceneNodeBase* node : _state.m_selectedNodes) {
+			for (SceneNodeBase* node : _state.selectedNodes) {
 				for (Visualiser* vis : node->getVisualiser()) {
 					PlotVisualiser* plotVis = dynamic_cast<PlotVisualiser*>(vis);
 					SceneNodeBase* targetedPlotNode = nullptr;
@@ -131,7 +131,7 @@ ot::UIDList PlotVisualiser::getVisualizingUIDs(const VisualiserState& _state) co
 
 std::list<SceneNodeBase*> PlotVisualiser::getVisualizingEntities(const VisualiserState& _state) const {
 	std::list<SceneNodeBase*> visualizingEntities;
-	for (SceneNodeBase* node : _state.m_selectedNodes) {
+	for (SceneNodeBase* node : _state.selectedNodes) {
 		if (node == this->getSceneNode()) {
 			// Plot
 			visualizingEntities.push_back(this->getSceneNode());
