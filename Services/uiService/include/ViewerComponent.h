@@ -29,7 +29,7 @@
 #include "ViewerAPI.h"
 #include "FrontendAPI.h"
 
-// openTwin header
+// OpenTwin header
 #include "OTCore/ServiceBase.h"
 #include "OTWidgets/SelectionData.h"
 #include "OTWidgets/SelectionInformation.h"
@@ -37,14 +37,18 @@
 // AK header
 #include <akCore/aNotifier.h>
 
+// Qt header
+#include <QtCore/qobject.h>
+
 namespace ak { class aTreeWidget; };
 namespace ot { class Property; }
 namespace ot { class WidgetView; }
 
 #define VIEWER_SETTINGS_NAME "Viewer"
 
-class ViewerComponent : public FrontendAPI, public ak::aNotifier, public ot::ServiceBase
+class ViewerComponent : public QObject, public FrontendAPI, public ak::aNotifier, public ot::ServiceBase
 {
+	Q_OBJECT
 public:
 	ViewerComponent();
 	virtual ~ViewerComponent();
@@ -118,7 +122,7 @@ public:
 
 	// Plot
 
-	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed) override;
+	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed, bool _queue) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -230,6 +234,9 @@ public:
 	bool propertyGridValueChanged(const ot::Property* _property);
 	
 	void viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType, bool _isModified);
+
+private Q_SLOTS:
+	void slotSetCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed);
 
 private:
 	std::vector<ViewerUIDtype>		m_viewers;

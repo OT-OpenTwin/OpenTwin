@@ -130,7 +130,7 @@
     <ClInclude Include="include\uiServiceTypes.h" />
     <ClInclude Include="include\UserManagement.h" />
     <QtMoc Include="include\UserSettings.h" />
-    <ClInclude Include="include\ViewerComponent.h" />
+    <QtMoc Include="include\ViewerComponent.h" />
     <QtMoc Include="include\ExternalServicesComponent.h" />
     <QtMoc Include="include\AppBase.h" />
   </ItemGroup>

@@ -417,20 +417,13 @@ double ViewerComponent::getDoublePropertyValue(const std::string& _groupName, co
 
 // Plot
 
-void ViewerComponent::setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed) {
-	const ot::PlotView* plotView = AppBase::instance()->findPlot(_plotName, {});
-	if (!plotView) {
-		OT_LOG_E("Plot not found \"" + _plotName + "\"");
-		return;
+void ViewerComponent::setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed, bool _queue) {
+	if (_queue) {
+		QMetaObject::invokeMethod(this, &ViewerComponent::slotSetCurveDimmed, Qt::QueuedConnection, _plotName, _entityID, _setDimmed);
 	}
-	ot::Plot* plot = plotView->getPlot();
-	auto allCurves = plot->findDatasets(_entityID);
-
-	for (auto curve : allCurves) {
-		curve->setDimmed(_setDimmed, true);
+	else {
+		slotSetCurveDimmed(_plotName, _entityID, _setDimmed);
 	}
-
-	plot->refresh();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -1144,4 +1137,20 @@ bool ViewerComponent::propertyGridValueChanged(const ot::Property* _property) {
 
 void ViewerComponent::viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType, bool _isModified) {
 	ViewerAPI::viewDataModifiedChanged(_entityName, _viewType, _isModified);
+}
+
+void ViewerComponent::slotSetCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed) {
+	const ot::PlotView* plotView = AppBase::instance()->findPlot(_plotName, {});
+	if (!plotView) {
+		OT_LOG_E("Plot not found \"" + _plotName + "\"");
+		return;
+	}
+	ot::Plot* plot = plotView->getPlot();
+	auto allCurves = plot->findDatasets(_entityID);
+
+	for (auto curve : allCurves) {
+		curve->setDimmed(_setDimmed, true);
+	}
+
+	plot->refresh();
 }

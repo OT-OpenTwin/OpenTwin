@@ -114,7 +114,7 @@ public:
 
 	// Plot
 
-	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed) {};
+	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed, bool _queue) {};
 	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
