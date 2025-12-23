@@ -125,6 +125,9 @@ Application::Application() :
 	// Plot tests
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Single Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneCurve, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Two Curves", "Default/Plot1DVisible"), std::bind(&Application::createPlotTwoCurves, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "100 Curves x 100", "Default/Plot1DVisible"), std::bind(&Application::createPlot100_100, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "100 Curves x 1k", "Default/Plot1DVisible"), std::bind(&Application::createPlot100_1000, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "1k Curves x 1k", "Default/Plot1DVisible"), std::bind(&Application::createPlot1000_1000, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Family of Curves", "Default/Plot1DVisible"), std::bind(&Application::createFamilyOfCurves, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Family of Curves 3P const", "Default/Plot1DVisible"), std::bind(&Application::createFamilyOfCurves3ParameterConst, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Family of Curves 3P", "Default/Plot1DVisible"), std::bind(&Application::createFamilyOfCurves3Parameter, this)));
@@ -309,6 +312,18 @@ void Application::createPlotTwoCurves() {
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
+}
+
+void Application::createPlot100_100() {
+	createManyCurvesPlot("Test/A_plot_100_x_100", 100, 100.f);
+}
+
+void Application::createPlot100_1000() {
+	createManyCurvesPlot("Test/A_plot_100_x_1k", 100, 1000.f);
+}
+
+void Application::createPlot1000_1000() {
+	createManyCurvesPlot("Test/A_plot_1K_x_1K", 1000, 1000.f);
 }
 
 void Application::createFamilyOfCurves()
@@ -704,6 +719,47 @@ Application::~Application()
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Required functions
+
+void Application::createManyCurvesPlot(const std::string& _plotName, int _numberOfCurves, float _numberOfPoints) {
+	ot::PainterRainbowIterator rainbowPainterIt;
+
+	const std::string collName = getCollectionName();
+	ResultCollectionExtender extender(collName, *getModelComponent());
+	PlotBuilder builder(extender);
+
+	for (int curveId = 0; curveId < _numberOfCurves; curveId++) {
+		// First curve
+		DatasetDescription description;
+		MetadataParameter parameter;
+		parameter.parameterName = "Frequency";
+		parameter.typeName = ot::TypeNames::getFloatTypeName();
+		parameter.unit = "kHz";
+		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
+		quantDesc->setName("Magnitude");
+		quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "dB");
+
+		for (float i = 0.; i <= _numberOfPoints; i += 1.) {
+			quantDesc->addDatapoint(ot::Variable((curveId % 2) == 0 ? (static_cast<int32_t>(i) + curveId) : ((-static_cast<int32_t>(i)) - curveId)));
+			parameter.values.push_back(ot::Variable(i));
+		}
+
+		std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
+
+		description.setQuantityDescription(quantDesc.release());
+		description.addParameterDescription(parameterDesc);
+
+		ot::Plot1DCurveCfg curveCfg;
+		curveCfg.setLinePenPainter(rainbowPainterIt.getNextPainter().release());
+		curveCfg.setEntityName(_plotName + "/A_Curve" + std::to_string(curveId));
+
+		builder.addCurve(std::move(description), curveCfg, "Curve" + std::to_string(curveId));
+	}
+
+	// Here the shared part
+	ot::Plot1DCfg plotCfg;
+	plotCfg.setEntityName(_plotName);
+	builder.buildPlot(plotCfg);
+}
 
 void Application::initialize() {
 	if (this->getFeatureEnabled(DebugServiceConfig::ExitOnInit)) {

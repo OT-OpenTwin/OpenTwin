@@ -58,6 +58,9 @@ public:
 	
 	void createPlotOneCurve();
 	void createPlotTwoCurves();
+	void createPlot100_100();
+	void createPlot100_1000();
+	void createPlot1000_1000();
 	void createFamilyOfCurves();
 	void createFamilyOfCurves3ParameterConst();
 	void createFamilyOfCurves3Parameter();
@@ -111,7 +114,7 @@ private:
 
 	std::list<ButtonInfo> m_testButtons;
 
-	std::string getButtonKey(const ButtonInfo& _info) const;
+	void createManyCurvesPlot(const std::string& _plotName, int _numberOfCurves, float _numberOfPoints);
 
 public:
 
