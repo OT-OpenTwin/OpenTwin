@@ -35,6 +35,10 @@ EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, Ent
 	treeItem.setHiddenIcon("Default/connection");
 	this->setDefaultTreeItem(treeItem);
 
+	ot::VisualisationTypes visTypes = getVisualizationTypes();
+	visTypes.addGraphicsConnectionVisualisation();
+	setDefaultVisualizationTypes(visTypes);
+
 	this->setDefaultIsCopyable(false);
 }
 

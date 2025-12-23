@@ -29,7 +29,9 @@
 EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBase(ID, parent, obs, ms)
 {
-	
+	ot::VisualisationTypes visTypes = getVisualizationTypes();
+	visTypes.addGraphicsItemVisualisation();
+	setDefaultVisualizationTypes(visTypes);
 }
 
 EntityBlock::~EntityBlock()
