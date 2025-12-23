@@ -43,6 +43,7 @@
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"
 #include "OTSystem/FileSystem.h"
+#include "OTCore/RuntimeTests.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/OwnerServiceGlobal.h"
@@ -3485,6 +3486,8 @@ void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument&
 // Action handler: Plot
 
 void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
+	ot::RuntimeIntervalTest runt;
+	runt.logOnDelete("ExternalServicesComponent::handleAddPlot1D");
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
@@ -3514,6 +3517,9 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 	// If the data needs to be refreshed, all curves are newly build. Other changes can be performed on already loaded curves.
 	if (refreshData)
 	{
+		ot::RuntimeIntervalTest runt2;
+		runt2.logOnDelete("ExternalServicesComponent::handleAddPlot1D - refresh data");
+
 		// Clear plot if exists
 		plot->clear(true);
 
@@ -3621,6 +3627,9 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 }
 
 void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _document) {
+	ot::RuntimeIntervalTest runt;
+	runt.logOnDelete("ExternalServicesComponent::handleUpdatePlotCurve");
+
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
 	ot::VisualisationCfg visualisationCfg;

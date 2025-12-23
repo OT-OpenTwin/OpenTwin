@@ -20,6 +20,7 @@
 #include "CurveDatasetFactory.h"
 #include "ContainerFlexibleOwnership.h"
 #include "OTCore/TypeNames.h"
+#include "OTCore/RuntimeTests.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "AdvancedQueryBuilder.h"
 #include "OTCore/ExplicitStringValueConverter.h"
@@ -34,6 +35,9 @@
 
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {
+	ot::RuntimeIntervalTest runGlob;
+	runGlob.logOnDelete("CurveDatasetFactory::createCurves");
+
 	m_curveIDDescriptions.clear();
 	auto queryInformation = _config.getQueryInformation();
 
@@ -72,7 +76,9 @@ std::string CurveDatasetFactory::createAxisLabel(const std::string& _title, cons
 
 ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {
-	
+	ot::RuntimeIntervalTest runGlob;
+	runGlob.logOnDelete("CurveDatasetFactory::queryCurveData");
+
 	//First we find the valid value comparisions give them additional information from the query information
 	std::list<ValueComparisionDefinition> validQueries = extractValidValueDescriptions(_queryInformation, _valueComparisions);
 
@@ -98,9 +104,15 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 		additionalComparisions.push_back(query);
 		query = queryBuilder.connectWithAND(std::move(additionalComparisions));
 	}
-	const std::string temp = bsoncxx::to_json(query);
 
+
+
+	const std::string queryTmp = bsoncxx::to_json(query);
+	const std::string projectionTmp = bsoncxx::to_json(projection);
+	ot::RuntimeIntervalTest runt;
 	DataStorageAPI::DataStorageResponse dbResponse = m_dataAccess.searchInResultCollection(query, projection, 0);
+	runt.logCurrentInterval("CurveDatasetFactory::queryCurveData - m_dataAccess.searchInResultCollection");
+
 	if (dbResponse.getSuccess()) 
 	{
 		const std::string queryResponse = dbResponse.getResult();

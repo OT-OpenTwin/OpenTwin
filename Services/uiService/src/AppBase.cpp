@@ -59,8 +59,9 @@
 
 #include "OTSystem/Flags.h"
 #include "OTCore/String.h"
-#include "OTCore/LogDispatcher.h"
 #include "OTCore/Point2D.h"
+#include "OTCore/RuntimeTests.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 
@@ -3843,6 +3844,8 @@ void AppBase::addVisualizingEntityInfoToView(ot::WidgetView* _view, const ot::UI
 }
 
 void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
+	ot::RuntimeIntervalTest runTest;
+	runTest.logOnDelete("AppBase::runSelectionHandling");
 	OT_SLECTION_TEST_LOG("Running selection handling");
 
 	ot::SelectionHandlingResult selectionResult = m_navigationManager.runSelectionHandling(_eventOrigin, m_projectNavigation->getTree()->selectedItems());
