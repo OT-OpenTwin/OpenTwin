@@ -37,66 +37,59 @@ bool PlotVisualiser::requestVisualization(const VisualiserState& _state, ot::Vis
 
 	_info.requestHandled = true;
 
-	if (!m_alreadyRequestedVisualisation) {
+	bool isSingle = _state.singleSelection;
 
-		bool isSingle = _state.singleSelection;
+	// Ensure only one plot will be visualized
+	if (!isSingle) {
+		SceneNodeBase* plotNode = nullptr;
+		isSingle = true;
 
-		// Ensure only one plot will be visualized
-		if (!isSingle) {
-			SceneNodeBase* plotNode = nullptr;
-			isSingle = true;
+		for (SceneNodeBase* node : _state.selectedNodes) {
+			for (Visualiser* vis : node->getVisualiser()) {
+				PlotVisualiser* plotVis = dynamic_cast<PlotVisualiser*>(vis);
+				SceneNodeBase* targetedPlotNode = nullptr;
+				if (plotVis) {
+					targetedPlotNode = plotVis->getSceneNode();
+				}
+				else {
+					CurveVisualiser* curveVis = dynamic_cast<CurveVisualiser*>(vis);
+					if (curveVis) {
+						targetedPlotNode = curveVis->findPlotNode(node);
+					}
+				}
 
-			for (SceneNodeBase* node : _state.selectedNodes) {
-				for (Visualiser* vis : node->getVisualiser()) {
-					PlotVisualiser* plotVis = dynamic_cast<PlotVisualiser*>(vis);
-					SceneNodeBase* targetedPlotNode = nullptr;
-					if (plotVis) {
-						targetedPlotNode = plotVis->getSceneNode();
+				OTAssertNullptr(targetedPlotNode);
+				if (plotNode != targetedPlotNode) {
+					if (plotNode != nullptr) {
+						isSingle = false;
+						break;
 					}
 					else {
-						CurveVisualiser* curveVis = dynamic_cast<CurveVisualiser*>(vis);
-						if (curveVis) {
-							targetedPlotNode = curveVis->findPlotNode(node);
-						}
-					}
-
-					OTAssertNullptr(targetedPlotNode);
-					if (plotNode != targetedPlotNode) {
-						if (plotNode != nullptr) {
-							isSingle = false;
-							break;
-						}
-						else {
-							plotNode = targetedPlotNode;
-						}
+						plotNode = targetedPlotNode;
 					}
 				}
 			}
 		}
-
-		if (!isSingle) {
-			return false;
-		}
-
-		m_alreadyRequestedVisualisation = true;
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-		
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, getSceneNode()->getModelEntityID(), doc.GetAllocator());
-		ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
-		visualisationCfg.setVisualisingEntities(getVisualizingUIDs(_state));
-		visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
-
-		ot::JsonObject visualisationCfgJSon;
-		visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, doc.GetAllocator());
-
-		FrontendAPI::instance()->messageModelService(doc.toJson());
-		return true;
 	}
-	else {
+
+	if (!isSingle) {
 		return false;
 	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
+
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, getSceneNode()->getModelEntityID(), doc.GetAllocator());
+	ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
+	visualisationCfg.setVisualisingEntities(getVisualizingUIDs(_state));
+	visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
+
+	ot::JsonObject visualisationCfgJSon;
+	visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, doc.GetAllocator());
+
+	FrontendAPI::instance()->messageModelService(doc.toJson());
+	return true;
 }
 
 void PlotVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
@@ -124,8 +117,7 @@ void PlotVisualiser::hideVisualisation(const VisualiserState& _state, ot::Visual
 
 void PlotVisualiser::setViewIsOpen(bool _viewIsOpen)
 {
-	m_alreadyRequestedVisualisation = false;
-	m_viewIsOpen = _viewIsOpen;
+	Visualiser::setViewIsOpen(_viewIsOpen);
 
 	for (SceneNodeBase* curve : m_node->getChildren())
 	{

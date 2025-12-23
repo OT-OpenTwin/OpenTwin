@@ -30,7 +30,6 @@ public:
 	virtual void showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
 	virtual void hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
 
-	bool alreadyRequestedVisualisation() { return m_alreadyRequestedVisualisation; }
 	void setViewIsOpen(bool _viewIsOpen) override;
 
 protected:
@@ -39,7 +38,5 @@ protected:
 private:
 	ot::UIDList getVisualizingUIDs(const VisualiserState& _state) const;
 	std::list<SceneNodeBase*> getVisualizingEntities(const VisualiserState& _state) const;
-
-	bool m_alreadyRequestedVisualisation = false;
 };
 
