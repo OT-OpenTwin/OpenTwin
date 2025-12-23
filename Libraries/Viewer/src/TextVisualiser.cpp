@@ -54,10 +54,6 @@ bool TextVisualiser::requestVisualization(const VisualiserState& _state)
 				return true;
 			}
 		}
-		else
-		{
-			OT_LOG_I("Visualisation of a multiselection of texts is turned off for performance reasons.");
-		}
 	}
 	return false;
 }

@@ -33,8 +33,7 @@ public:
 
 	virtual std::string getViewEntityName() const override;
 
+	SceneNodeBase* findPlotNode(SceneNodeBase* _childNode) const;
 protected:
 	virtual std::string getVisualiserTypeString() const override { return "Curve"; };
-
-	SceneNodeBase* findPlotNode(SceneNodeBase* _childNode) const;
 };

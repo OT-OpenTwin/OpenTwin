@@ -19,6 +19,7 @@
 
 #include <stdafx.h>
 #include "PlotVisualiser.h"
+#include "CurveVisualiser.h"
 #include "OTCommunication/ActionTypes.h"
 #include "FrontendAPI.h"
 #include "SceneNodeBase.h"
@@ -30,6 +31,46 @@ PlotVisualiser::PlotVisualiser(SceneNodeBase* _sceneNode)
 
 bool PlotVisualiser::requestVisualization(const VisualiserState& _state) {
 	if (!m_alreadyRequestedVisualisation) {
+
+		bool isSingle = _state.m_singleSelection;
+
+		// Ensure only one plot will be visualized
+		if (!isSingle) {
+			SceneNodeBase* plotNode = nullptr;
+			isSingle = true;
+
+			for (SceneNodeBase* node : _state.m_selectedNodes) {
+				for (Visualiser* vis : node->getVisualiser()) {
+					PlotVisualiser* plotVis = dynamic_cast<PlotVisualiser*>(vis);
+					SceneNodeBase* targetedPlotNode = nullptr;
+					if (plotVis) {
+						targetedPlotNode = plotVis->getSceneNode();
+					}
+					else {
+						CurveVisualiser* curveVis = dynamic_cast<CurveVisualiser*>(vis);
+						if (curveVis) {
+							targetedPlotNode = curveVis->findPlotNode(node);
+						}
+					}
+
+					OTAssertNullptr(targetedPlotNode);
+					if (plotNode != targetedPlotNode) {
+						if (plotNode != nullptr) {
+							isSingle = false;
+							break;
+						}
+						else {
+							plotNode = targetedPlotNode;
+						}
+					}
+				}
+			}
+		}
+
+		if (!isSingle) {
+			return false;
+		}
+
 		m_alreadyRequestedVisualisation = true;
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
