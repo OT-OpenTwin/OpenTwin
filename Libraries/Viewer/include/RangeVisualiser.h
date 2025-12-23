@@ -26,9 +26,9 @@ class RangeVisualiser : public Visualiser {
 	OT_DECL_NODEFAULT(RangeVisualiser)
 public:
 	RangeVisualiser(SceneNodeBase* _sceneNode);
-	virtual bool requestVisualization(const VisualiserState& _state) override;
-	virtual void showVisualisation(const VisualiserState& _state) override;
-	virtual void hideVisualisation(const VisualiserState& _state) override;
+	virtual bool requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
+	virtual void showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
+	virtual void hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
 
 protected:
 	virtual std::string getVisualiserTypeString() const override { return "Range"; };

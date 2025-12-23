@@ -41,11 +41,11 @@ public:
 	
 	//! @brief Visualisation logic for different types of visualisation. Mostly requests to the model service which actually has the needed data.
 	//! @return true, if a new visualisation was requested
-	virtual bool requestVisualization(const VisualiserState& _state) override;
+	virtual bool requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
 	virtual bool requestNextDataChunk(size_t _nextChunkStartIndex) override;
 	virtual bool requestRemainingData(size_t _nextChunkStartIndex) override;
-	virtual void showVisualisation(const VisualiserState& _state) override;
-	virtual void hideVisualisation(const VisualiserState& _state) override;
+	virtual void showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
+	virtual void hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
 
 protected:
 	virtual std::string getVisualiserTypeString() const override { return "Text"; };

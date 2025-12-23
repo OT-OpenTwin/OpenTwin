@@ -132,6 +132,8 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 		}
 
 		for (Visualiser* visualiser : visualisers) {
+			// Per visualiser info
+			ot::VisualiserInfo info;
 
 			// We have a valid state change, so we visualise all views, if they are not already opened in a view and the selection origins from a user interaction
 			// In case that properties change, effectively a new entity is created (same ID, different version) and a new scene node is created. 
@@ -157,12 +159,12 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 					FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, visualiser->getViewEntityName(), visualiser->getViewType());
 
 					// The visualizer may want to unhide/un-dim the visualisation
-					visualiser->showVisualisation(state);
+					visualiser->showVisualisation(state, info);
 				}
 				else if (visualiser->mayVisualise()) {
 					// The view is not open and the visualiser is enabled
 					
-					if (visualiser->requestVisualization(state)) {
+					if (visualiser->requestVisualization(state, info)) {
 						// Visualisation was requested
 						result |= ot::SelectionHandlingEvent::NewViewRequested;
 					}
@@ -170,7 +172,7 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 			}
 			else if (visualiser->getViewIsOpen()) {
 				// Entity was deselected, so we potentially want to hide or dim the visualisation
-				visualiser->hideVisualisation(state);
+				visualiser->hideVisualisation(state, info);
 			}
 		}
 	}
@@ -220,7 +222,7 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 	// Here we switch the view state changes
 	if (_state == ot::ViewChangedStates::changesSaved)
 	{
-		const std::list< Visualiser*>& allVisualiser = getVisualiser();
+		const std::list<Visualiser*>& allVisualiser = getVisualiser();
 		// We initiated a model state change from the ui. Now we request a new visualisation for every visualiser which is not the one that initiated the 
 		// Model state change under the condition that the view is open.
 		VisualiserState state;
@@ -230,8 +232,11 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 		state.selectionData.setSelectionOrigin(ot::SelectionOrigin::User);
 		for (Visualiser* visualiser : allVisualiser)
 		{
+			// Per visualiser info
+			ot::VisualiserInfo info;
+
 			if (visualiser->getViewType() != _viewType && visualiser->getViewIsOpen()) {
-				visualiser->requestVisualization(state);
+				visualiser->requestVisualization(state, info);
 			}
 		}
 	}

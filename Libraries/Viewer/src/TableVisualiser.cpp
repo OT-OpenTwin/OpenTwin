@@ -31,7 +31,7 @@ TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode)
 
 }
 
-bool TableVisualiser::requestVisualization(const VisualiserState& _state) {
+bool TableVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 	if (_state.selectionData.getSelectionOrigin() == ot::SelectionOrigin::User) {
 		if (_state.singleSelection) {
 			if (_state.selected) {
@@ -59,10 +59,10 @@ bool TableVisualiser::requestVisualization(const VisualiserState& _state) {
 	return false;
 }
 
-void TableVisualiser::showVisualisation(const VisualiserState& _state) {
+void TableVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
 }
 
-void TableVisualiser::hideVisualisation(const VisualiserState& _state) {
+void TableVisualiser::hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
 }

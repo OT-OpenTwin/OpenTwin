@@ -27,9 +27,9 @@ class GraphicsItemVisualiser : public Visualiser {
 	OT_DECL_NODEFAULT(GraphicsItemVisualiser)
 public:
 	GraphicsItemVisualiser(SceneNodeBase* _sceneNode);
-	bool requestVisualization(const VisualiserState& _state) override;
-	virtual void showVisualisation(const VisualiserState& _state) override;
-	virtual void hideVisualisation(const VisualiserState& _state) override;
+	bool requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
+	virtual void showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
+	virtual void hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
 
 	virtual std::string getViewEntityName() const override;
 

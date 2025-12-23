@@ -27,15 +27,15 @@ GraphicsConnectionVisualiser::GraphicsConnectionVisualiser(SceneNodeBase* _scene
 
 }
 
-bool GraphicsConnectionVisualiser::requestVisualization(const VisualiserState& _state) {
+bool GraphicsConnectionVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 	return false;
 }
 
-void GraphicsConnectionVisualiser::showVisualisation(const VisualiserState& _state) {
+void GraphicsConnectionVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
 }
 
-void GraphicsConnectionVisualiser::hideVisualisation(const VisualiserState& _state) {
+void GraphicsConnectionVisualiser::hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
 }
 

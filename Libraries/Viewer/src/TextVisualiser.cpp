@@ -42,7 +42,7 @@ TextVisualiser::TextVisualiser(SceneNodeBase* _sceneNode)
 {
 }
 
-bool TextVisualiser::requestVisualization(const VisualiserState& _state)
+bool TextVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info)
 {
 	if (_state.selectionData.getSelectionOrigin() == ot::SelectionOrigin::User)
 	{
@@ -89,11 +89,11 @@ bool TextVisualiser::requestRemainingData(size_t _nextChunkStartIndex) {
 	return true;
 }
 
-void TextVisualiser::showVisualisation(const VisualiserState& _state) {
+void TextVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
 }
 
-void TextVisualiser::hideVisualisation(const VisualiserState& _state) {
+void TextVisualiser::hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
 }
 

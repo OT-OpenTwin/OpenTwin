@@ -23,6 +23,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/WidgetViewBase.h"
+#include "VisualiserInfo.h"
 #include "VisualiserState.h"
 #include "OTGui/VisualisationCfg.h"
 
@@ -46,8 +47,9 @@ public:
 	//! @brief Request a visualization for the entity.
 	//! This is called if the entity is currently not visualized.
 	//! @param _state The state of the visualisation.
+	//! @param _info Information about the request. The information should be forwarded to other visualisers if other visualisers are triggered by this visualiser.
 	//! @return True if a new view was requested, false otherwise.
-	virtual bool requestVisualization(const VisualiserState& _state) = 0;
+	virtual bool requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) = 0;
 
 	//! @brief Request the next data chunk for the visualisation.
 	//! @param _nextChunkStartIndex The index where the next data chunk should start.
@@ -61,12 +63,16 @@ public:
 
 	//! @brief Show or undim the visualization for thentity.
 	//! This is called if the entity has already been visualized before.
-	virtual void showVisualisation(const VisualiserState& _state) = 0;
+	//! @param _state The state of the visualisation.
+	//! @param _info Information about the request. The information should be forwarded to other visualisers if other visualisers are triggered by this visualiser.
+	virtual void showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) = 0;
 
 	//! @brief Hide or dim the visualisation.
 	//! @note The view close handling is performed by the view manager.
 	//! The visualiser should only hide or dim the visualisation.
-	virtual void hideVisualisation(const VisualiserState& _state) = 0;
+	//! @param _state The state of the visualisation.
+	//! @param _info Information about the request. The information should be forwarded to other visualisers if other visualisers are triggered by this visualiser.
+	virtual void hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) = 0;
 
 	bool mayVisualise() const { return m_mayVisualise; };
 

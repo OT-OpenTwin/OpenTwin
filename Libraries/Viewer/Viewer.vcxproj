@@ -148,6 +148,7 @@
     <ClInclude Include="include\ViewerSettings.h" />
     <ClInclude Include="include\ViewerView.h" />
     <ClInclude Include="include\VisualiserHelper.h" />
+    <ClInclude Include="include\VisualiserInfo.h" />
     <ClInclude Include="include\VisualiserState.h" />
     <ClInclude Include="include\WorkingPlane.h" />
     <QtMoc Include="include\Viewer.h" />

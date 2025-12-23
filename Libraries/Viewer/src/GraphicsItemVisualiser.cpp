@@ -27,15 +27,15 @@ GraphicsItemVisualiser::GraphicsItemVisualiser(SceneNodeBase* _sceneNode) :
 
 }
 
-bool GraphicsItemVisualiser::requestVisualization(const VisualiserState& _state) {
+bool GraphicsItemVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 	return false;
 }
 
-void GraphicsItemVisualiser::showVisualisation(const VisualiserState& _state) {
+void GraphicsItemVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
 }
 
-void GraphicsItemVisualiser::hideVisualisation(const VisualiserState& _state) {
+void GraphicsItemVisualiser::hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
 }
 

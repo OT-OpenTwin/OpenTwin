@@ -35,7 +35,7 @@ GraphicsVisualiser::GraphicsVisualiser(SceneNodeBase* _sceneNode)
 {
 }
 
-bool GraphicsVisualiser::requestVisualization(const VisualiserState& _state)
+bool GraphicsVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info)
 {
 	if (_state.selected)
 	{
@@ -81,11 +81,11 @@ bool GraphicsVisualiser::requestVisualization(const VisualiserState& _state)
 	return false;
 }
 
-void GraphicsVisualiser::showVisualisation(const VisualiserState& _state)
+void GraphicsVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info)
 {
 }
 
-void GraphicsVisualiser::hideVisualisation(const VisualiserState& _state)
+void GraphicsVisualiser::hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info)
 {
 }
 

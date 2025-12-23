@@ -26,14 +26,14 @@ RangeVisualiser::RangeVisualiser(SceneNodeBase* _sceneNode) :
 
 }
 
-bool RangeVisualiser::requestVisualization(const VisualiserState& _state) {
+bool RangeVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 	return true;
 }
 
-void RangeVisualiser::showVisualisation(const VisualiserState& _state) {
+void RangeVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
 }
 
-void RangeVisualiser::hideVisualisation(const VisualiserState& _state) {
+void RangeVisualiser::hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
 }

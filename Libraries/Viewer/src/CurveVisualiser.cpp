@@ -31,7 +31,7 @@ CurveVisualiser::CurveVisualiser(SceneNodeBase * _sceneNode)
 
 }
 
-bool CurveVisualiser::requestVisualization(const VisualiserState& _state) {
+bool CurveVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 	bool newVisualisation = false;
 
 	SceneNodeBase* plot = findPlotNode(getSceneNode());
@@ -53,14 +53,14 @@ bool CurveVisualiser::requestVisualization(const VisualiserState& _state) {
 		plotState.singleSelection = _state.singleSelection;
 		plotState.selectedNodes = _state.selectedNodes;
 		plotState.selectionData = _state.selectionData;
-		plotVisualiser->requestVisualization(plotState);
+		plotVisualiser->requestVisualization(plotState, _info);
 		newVisualisation = true;
 	}
 
 	return newVisualisation;
 }
 
-void CurveVisualiser::showVisualisation(const VisualiserState& _state) {
+void CurveVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 	SceneNodeBase* plot = m_node->getParent();
 	OTAssertNullptr(plot);
 
@@ -73,10 +73,10 @@ void CurveVisualiser::showVisualisation(const VisualiserState& _state) {
 	PlotVisualiser* plotVisualiser = dynamic_cast<PlotVisualiser*>(visualiser);
 
 	OTAssertNullptr(plotVisualiser);
-	plotVisualiser->showVisualisation(_state);
+	plotVisualiser->showVisualisation(_state, _info);
 }
 
-void CurveVisualiser::hideVisualisation(const VisualiserState& _state) {
+void CurveVisualiser::hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 	SceneNodeBase* plot = m_node->getParent();
 	OTAssertNullptr(plot);
 
@@ -89,7 +89,7 @@ void CurveVisualiser::hideVisualisation(const VisualiserState& _state) {
 	PlotVisualiser* plotVisualiser = dynamic_cast<PlotVisualiser*>(visualiser);
 
 	OTAssertNullptr(plotVisualiser);
-	plotVisualiser->hideVisualisation(_state);
+	plotVisualiser->hideVisualisation(_state, _info);
 }
 
 std::string CurveVisualiser::getViewEntityName() const {
