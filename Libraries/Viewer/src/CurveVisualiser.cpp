@@ -52,7 +52,13 @@ void CurveVisualiser::showVisualisation(const VisualiserState& _state, ot::Visua
 	SceneNodeBase* plot = findPlotNode(getSceneNode());
 	OTAssertNullptr(plot);
 
-	FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), false);
+	for (Visualiser* vis : plot->getVisualiser()) {
+		PlotVisualiser* plotVis = dynamic_cast<PlotVisualiser*>(vis);
+		if (plotVis && plotVis->getViewIsOpen()) {
+			FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), false);
+			break;
+		}
+	}
 
 	for (Visualiser* vis : plot->getVisualiser()) {
 		PlotVisualiser* plotVis = dynamic_cast<PlotVisualiser*>(vis);
@@ -67,7 +73,14 @@ void CurveVisualiser::hideVisualisation(const VisualiserState& _state, ot::Visua
 	SceneNodeBase* plot = findPlotNode(getSceneNode());
 	OTAssertNullptr(plot);
 
-	FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), true);
+	for (Visualiser* vis : plot->getVisualiser()) {
+		PlotVisualiser* plotVis = dynamic_cast<PlotVisualiser*>(vis);
+		if (plotVis && plotVis->getViewIsOpen()) {
+			FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), true);
+			break;
+		}
+	}
+	
 
 	for (Visualiser* vis : plot->getVisualiser()) {
 		PlotVisualiser* plotVis = dynamic_cast<PlotVisualiser*>(vis);
@@ -94,7 +107,9 @@ void CurveVisualiser::setViewIsOpen(bool _viewIsOpen) {
 	OTAssertNullptr(plot);
 
 	// Initialize dimmed state
-	FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), !getSceneNode()->isSelected());
+	if (_viewIsOpen) {
+		FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), !getSceneNode()->isSelected());
+	}
 }
 
 SceneNodeBase* CurveVisualiser::findPlotNode(SceneNodeBase* _childNode) const {
