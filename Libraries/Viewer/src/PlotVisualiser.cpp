@@ -152,7 +152,7 @@ std::list<SceneNodeBase*> PlotVisualiser::getVisualizingEntities(const Visualise
 	for (SceneNodeBase* node : _state.selectedNodes) {
 		for (Visualiser* vis : node->getVisualiser()) {
 			PlotVisualiser* plotVis = dynamic_cast<PlotVisualiser*>(vis);
-			if (plotVis) {
+			if (plotVis == this) {
 				visualizingEntities.push_back(node);
 			}
 			else {
