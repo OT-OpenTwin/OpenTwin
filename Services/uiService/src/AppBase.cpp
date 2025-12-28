@@ -2959,9 +2959,7 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	const ot::SelectionInformation& viewSelectionInfo = _view->getVisualizingItems();
 	{
 		QSignalBlocker sigBlock(m_projectNavigation->getTree());
-		for (ot::UID uid : viewSelectionInfo.getSelectedNavigationItems()) {
-			m_projectNavigation->getTree()->setItemSelected(uid, false);
-		}
+		m_projectNavigation->getTree()->setItemsSelected(viewSelectionInfo.getSelectedNavigationItems(), false);
 	}
 	
 	OT_SLECTION_TEST_LOG("+ Closing actual view");
@@ -2974,9 +2972,7 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 		OT_SLECTION_TEST_LOG("+ Restore view selection");
 
 		QSignalBlocker sigBlock(m_projectNavigation->getTree());
-		for (ot::UID uid : lastStoredView->getVisualizingItems().getSelectedNavigationItems()) {
-			m_projectNavigation->getTree()->setItemSelected(uid, true);
-		}
+		m_projectNavigation->getTree()->setItemsSelected(lastStoredView->getVisualizingItems().getSelectedNavigationItems(), true);
 	}
 
 	this->runSelectionHandling(ot::SelectionOrigin::User);
