@@ -175,5 +175,7 @@ void StartupDispatcher::serviceStartRequestFailed(const ot::ServiceInitData& _se
 	
 	// Send message
 	std::string response;
-	ot::msg::send(Application::instance().getServiceURL(), _serviceInfo.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+	if (!ot::msg::send(Application::instance().getServiceURL(), _serviceInfo.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to notify session service about failed service startup { \"LSS.Url\": \"" + _serviceInfo.getSessionServiceURL() + "\" }");
+	}
 }

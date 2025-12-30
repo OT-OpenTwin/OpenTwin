@@ -269,7 +269,7 @@ ServiceManager::RequestResult ServiceManager::requestStartRelayService(const ot:
 	for (int attempt = 0; attempt < 3; attempt++) {
 		std::string responseStr;
 		if (ot::msg::send("", newService.getUrl(), ot::EXECUTE, checkCommandString, responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+			ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr, true);
 			if (response == ot::ReturnMessage::True) {
 				checkOk = true;
 				break;
@@ -500,7 +500,9 @@ void ServiceManager::serviceStartFailed(const ot::ServiceInitData& _serviceInfor
 
 	// Fire message
 	std::string response;
-	ot::msg::send("", _serviceInformation.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+	if (!ot::msg::send("", _serviceInformation.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send service start failed message to session service { \"LssUrl\": \"" + _serviceInformation.getSessionServiceURL() + "\" }");
+	}
 }
 
 void ServiceManager::sendInitializeMessage(Service&& _info) {
@@ -518,7 +520,7 @@ void ServiceManager::sendInitializeMessage(Service&& _info) {
 		return;
 	}
 
-	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr, true);
 
 	if (response != ot::ReturnMessage::Ok) {
 		OT_LOG_W("Service initialize failed for service { \"ServiceID\": " + std::to_string(_info.getInfo().getServiceID()) + ", \"Name\": \"" + _info.getInfo().getServiceName() + "\", \"Type\": \"" +
@@ -565,7 +567,7 @@ void ServiceManager::notifyServiceShutdownCompleted(const Service& _service) {
 		OT_LOG_E("Failed to send shutdown completed message to session service { " + logInfo(_service) + " }");
 	}
 
-	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr, true);
 	if (!response.isOk()) {
 		OT_LOG_E("Service shutdown completed failed at session service { \"Response\": \"" + response.getWhat() + "\", " + logInfo(_service) + " }");
 	}
@@ -585,7 +587,9 @@ void ServiceManager::notifySessionEmergencyShutdown(const Service& _crashedServi
 	
 	// Fire message
 	std::string response;
-	ot::msg::send("", serviceInfo.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+	if (!ot::msg::send("", serviceInfo.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send service failure message to session service { \"LssUrl\": \"" + serviceInfo.getSessionServiceURL() + "\" }");
+	}
 }
 
 std::string ServiceManager::logInfo(const Service& _service) const {

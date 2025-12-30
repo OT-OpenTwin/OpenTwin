@@ -93,7 +93,7 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 		exit(ot::AppExitCode::GDSRegistrationFailed);
 	}
 
-	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr, true);
 	if (!response.isOk()) {
 		OT_LOG_E("Register at GDS failed: " + response.getWhat());
 		return;
@@ -138,7 +138,7 @@ void GlobalDirectoryService::healthCheck(void) {
 			break;
 		}
 
-		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr, true);
 
 		if (!response.isOk()) {
 			OT_LOG_E("Health check for GDS failed: " + response.getWhat());
