@@ -1121,7 +1121,7 @@ ot::ReturnMessage SessionService::handleRegisterNewLibraryManagementService(ot::
 
 	// Notify all sessions about the new LMS
 	for (auto& session : m_sessions) {
-		session.second.sendBroadcast(ot::invalidServiceID, message, ot::EXECUTE);
+		session.second.sendBroadcast(ot::invalidServiceID, message, ot::QUEUE);
 	}
 	
 	return ot::ReturnMessage::Ok;
