@@ -44,11 +44,11 @@
 #include "EditProjectInformationDialog.h"
 
 // uiCore header
-#include <akAPI/uiAPI.h>
-#include <akCore/aException.h>
-#include <akWidgets/aWindow.h>
-#include <akWidgets/aWindowManager.h>
-#include <akWidgets/aTreeWidget.h>
+#include "akAPI/uiAPI.h"
+#include "akCore/aException.h"
+#include "akWidgets/aWindow.h"
+#include "akWidgets/aWindowManager.h"
+#include "akWidgets/aTreeWidget.h"
 
 // OpenTwin header
 #include "DataBase.h"
@@ -119,8 +119,6 @@
 #include "OTCommunication/msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
-
-#include "akWidgets/aTreeWidget.h"
 
 // ADS header
 #include <ads/DockAreaWidget.h>
@@ -397,9 +395,10 @@ bool AppBase::getCurrentProjectIsModified() const {
 	return m_projectStateIsModified || ot::GlobalWidgetViewManager::instance().getAnyViewContentModified();
 }
 
-aWindow * AppBase::mainWindow() {
+aWindow * AppBase::mainWindow() const {
 	if (m_mainWindow == invalidUID) {
-		OTAssert(0, "Window not created"); return nullptr;
+		OTAssert(0, "Window not created");
+		return nullptr;
 	}
 	return uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
 }
@@ -820,8 +819,7 @@ void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _pr
 	}
 }
 
-void AppBase::setWaitingAnimationVisible(bool flag)
-{
+void AppBase::setWaitingAnimationVisible(bool flag) const {
 	ak::uiAPI::window::setWaitingAnimationVisible(m_mainWindow, flag);
 }
 
@@ -1442,7 +1440,7 @@ void AppBase::setRelayURLs(const std::string & _url) {
 
 std::string AppBase::getRelayURLs() const { return m_relayURLs; }
 
-void AppBase::switchToViewMenuTabIfNeeded() {
+void AppBase::switchToViewMenuTabIfNeeded() const {
 	if (uiAPI::window::getCurrentTabToolBarTab(m_mainWindow) == 0) {
 		uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, 1);
 	}
@@ -1459,16 +1457,16 @@ std::string AppBase::getCurrentMenuTab() {
 void AppBase::closeAllViewerTabs() {
 	LockManager* manager = this->lockManager();
 
-	for (auto element : m_graphicsViews) {
+	for (const auto& element : m_graphicsViews) {
 		manager->uiElementDestroyed(static_cast<ot::GraphicsView*>(element.second->getGraphicsView()));
 	}
-	for (auto element : m_textEditors) {
+	for (const auto& element : m_textEditors) {
 		manager->uiElementDestroyed(static_cast<ot::TextEditor*>(element.second->getTextEditor()));
 	}
-	for (auto element : m_tables) {
+	for (const auto& element : m_tables) {
 		manager->uiViewDestroyed(element.second);
 	}
-	for (auto element : m_plots) {
+	for (const auto& element : m_plots) {
 		manager->uiViewDestroyed(element.second);
 	}
 	if (m_versionGraph) {

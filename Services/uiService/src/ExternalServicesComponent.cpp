@@ -154,7 +154,7 @@ static bool g_runSessionServiceHealthCheck{ false };
 
 namespace ot {
 	namespace intern {
-		void exitAsync(int _code) {
+		static void exitAsync(int _code) {
 			exit(_code);
 		}
 	}
@@ -1284,7 +1284,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		// TabToolBar tab order
 		QStringList ttbOrder;
 		std::list<std::string> ttbOrderL = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_UI_ToolBarTabOrder);
-		for (auto orderItem : ttbOrderL) {
+		for (const auto& orderItem : ttbOrderL) {
 			ttbOrder.push_back(orderItem.c_str());
 		}
 		AppBase::instance()->setTabToolBarTabOrder(ttbOrder);
@@ -1875,7 +1875,7 @@ ServiceDataUi * ExternalServicesComponent::getService(ot::serviceID_t _serviceID
 
 ServiceDataUi * ExternalServicesComponent::getService(const ot::BasicServiceInformation& _serviceInfo) {
 
-	for (auto s : m_serviceIdMap) {
+	for (const auto& s : m_serviceIdMap) {
 		if (s.second->getBasicServiceInformation() == _serviceInfo) {
 			return s.second;
 		}
@@ -1885,7 +1885,7 @@ ServiceDataUi * ExternalServicesComponent::getService(const ot::BasicServiceInfo
 }
 
 ServiceDataUi* ExternalServicesComponent::getServiceFromName(const std::string& _serviceName) {
-	for (auto service : m_serviceIdMap)
+	for (const auto& service : m_serviceIdMap)
 	{
 		if (service.second->getServiceName() == _serviceName)
 		{
@@ -1902,7 +1902,7 @@ ServiceDataUi* ExternalServicesComponent::getServiceFromNameType(const ot::Basic
 }
 
 ServiceDataUi* ExternalServicesComponent::getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType) {
-	for (auto service : m_serviceIdMap)
+	for (const auto& service : m_serviceIdMap)
 	{
 		if (service.second->getServiceName() == _serviceName && service.second->getServiceType() == _serviceType)
 		{
@@ -2350,7 +2350,7 @@ void ExternalServicesComponent::handleRemoveElements(ot::JsonDocument& _document
 	std::list<std::string> itemList = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectNames);
 
 	std::vector<ot::UID> uidList;
-	for (auto itm : itemList) {
+	for (const std::string& itm : itemList) {
 		uidList.push_back(ak::uiAPI::object::getUidFromObjectUniqueName(itm.c_str()));
 	}
 	m_controlsManager->destroyUiControls(uidList);
@@ -2367,7 +2367,7 @@ void ExternalServicesComponent::handleSetControlsEnabledState(ot::JsonDocument& 
 
 	ServiceDataUi* service = getService(serviceId);
 
-	for (auto controlName : enabled) {
+	for (const std::string& controlName : enabled) {
 		//NOTE, add functionallity to uiServiceAPI
 		auto uid = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
 		if (uid != ak::invalidUID) {
@@ -2375,7 +2375,7 @@ void ExternalServicesComponent::handleSetControlsEnabledState(ot::JsonDocument& 
 		}
 	}
 
-	for (auto controlName : disabled) {
+	for (const std::string& controlName : disabled) {
 		//NOTE, add functionallity to uiServiceAPI
 		auto uid = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
 		if (uid != ak::invalidUID) {
@@ -4468,7 +4468,7 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 		const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
 		bool curveHasDataToVisualise = false;
 		if (xAxisParameter != "") {
-			for (auto parameter : queryInformation.m_parameterDescriptions) {
+			for (const auto& parameter : queryInformation.m_parameterDescriptions) {
 				if (parameter.m_label == xAxisParameter) {
 					curveHasDataToVisualise = true;
 				}
@@ -4613,7 +4613,7 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(const ot::Plot1DCfg
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-void sessionServiceHealthChecker(std::string _sessionServiceURL) {
+static void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 	// Create ping request
 	ot::JsonDocument pingDoc;
 	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());

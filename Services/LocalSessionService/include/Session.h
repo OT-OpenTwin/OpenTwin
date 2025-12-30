@@ -30,6 +30,7 @@
 #include "OTCommunication/LSSDebugInfo.h"
 #include "OTCommunication/ServiceRunData.h"
 #include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/CommunicationTypes.h"
 #include "OTServiceFoundation/UserCredentials.h"
 #include "OTServiceFoundation/IDManager.h"
 
@@ -159,7 +160,7 @@ public:
 	//! @brief Will broadcast the provided message to all services in this session.
 	//! @param _sender The sender of this message. The sender will not receive the broadcast message.
 	//! @param _message The message to broadcast.
-	void sendBroadcast(ot::serviceID_t _senderServiceID, const std::string& _message);
+	void sendBroadcast(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType);
 
 	void removeFailedService(ot::serviceID_t _failedServiceID, ot::PortManager& _debugPortManager);
 
@@ -173,14 +174,14 @@ private:
 	//! @warning The mutex must be locked before calling this function.
 	//! @param _senderService The sender of this message.
 	//! @param _action The action to broadcast.
-	void broadcastBasicAction(ot::serviceID_t _senderServiceID, const std::string& _action, bool _forceSend);
+	void broadcastBasicAction(ot::serviceID_t _senderServiceID, const std::string& _action, ot::MessageType _messageType, bool _forceSend);
 
 	//! @brief Will broadcast the provided message to all services in this session.
 	//! @param _sender The sender of this message. The sender will not receive the broadcast message.
 	//! @param _message The message to broadcast.
 	//! @param _async If true the massage(s) will be send from a worker thread.
 	//! @warning The mutex must be locked before calling this with the _async param set to false.
-	void broadcast(ot::serviceID_t _senderServiceID, const std::string& _message, bool _async, bool _forceSend);
+	void broadcast(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType, bool _async, bool _forceSend);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -207,7 +208,7 @@ private:
 	//! @return Empty optional if the service is not found, otherwise const reference to the specified service.
 	const Service& getServiceFromID(ot::serviceID_t _serviceID) const;
 
-	void broadcastImpl(ot::serviceID_t _senderServiceID, const std::string& _message, bool _forceSend);
+	void broadcastImpl(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType, bool _forceSend);
 
 	//! @brief Will prepare the broadcast document with the sender information.
 	//! @warning The mutex must be locked before calling this function.
@@ -222,7 +223,7 @@ private:
 
 	// Private: Worker
 
-	void broadcastWorker(ot::serviceID_t _senderServiceID, std::string _message, bool _forceSend);
+	void broadcastWorker(ot::serviceID_t _senderServiceID, std::string _message, ot::MessageType _messageType, bool _forceSend);
 
 	void healthCheckWorker();
 

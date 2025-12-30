@@ -178,7 +178,7 @@ public:
 	//! @brief Will return the current username
 	std::string getCurrentUserCollection() const { return m_currentUserCollection; };
 
-	ak::aWindow * mainWindow();
+	ak::aWindow * mainWindow() const;
 
 	ControlsManager * controlsManager();
 
@@ -214,7 +214,7 @@ public:
 
 	void settingsChanged(const std::string& _owner, const ot::Property* _property);
 
-	void setWaitingAnimationVisible(bool flag);
+	void setWaitingAnimationVisible(bool flag) const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -293,7 +293,7 @@ public:
 	void setCurrentProjectInfo(const ot::ProjectInformation& _info) { m_currentProjectInfo = _info; }
 	const ot::ProjectInformation& getCurrentProjectInfo() const { return m_currentProjectInfo; }
 
-	void switchToViewMenuTabIfNeeded();
+	void switchToViewMenuTabIfNeeded() const;
 
 	void switchToMenuTab(const std::string& _menu);
 
@@ -376,8 +376,8 @@ public:
 	void setVisible3D(bool visible3D) { m_visible3D = visible3D; }
 	void setVisibleBlockPicker(bool visibleBlockPicker) { m_visibleBlockPicker = visibleBlockPicker; }
 
-	bool getVisible3D() { return m_visible3D; }
-	bool getVisibleBlockPicker() { return m_visibleBlockPicker; }
+	bool getVisible3D() const { return m_visible3D; }
+	bool getVisibleBlockPicker() const { return m_visibleBlockPicker; }
 
 	// Info text output
 

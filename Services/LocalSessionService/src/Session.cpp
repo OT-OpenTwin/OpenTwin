@@ -279,7 +279,7 @@ void Session::setServiceAlive(ot::serviceID_t _serviceID, bool _notifyOthers) {
 	service.setAlive(true);
 
 	if (_notifyOthers) {
-		this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceConnected, false);
+		this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceConnected, ot::EXECUTE, false);
 	}
 }
 
@@ -295,7 +295,7 @@ void Session::setServiceAlive(ot::serviceID_t _serviceID, const std::string& _se
 	service.setServiceURL(_serviceUrl);
 
 	if (_notifyOthers)  {
-		this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceConnected, false);
+		this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceConnected, ot::EXECUTE, false);
 	}
 }
 
@@ -340,7 +340,7 @@ void Session::serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers
 			it->setShuttingDown(false);
 
 			if (_notifyOthers) {
-				this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceDisconnected, false);
+				this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceDisconnected, ot::EXECUTE, false);
 			}
 
 			if (it->isDebug()) {
@@ -454,7 +454,7 @@ void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyS
 
 	// In case of regular shutdown send pre shutdown command before shutting down the session.
 	if (!_emergencyShutdown) {
-		this->broadcastBasicAction(_senderServiceID, OT_ACTION_CMD_ServicePreShutdown, true);
+		this->broadcastBasicAction(_senderServiceID, OT_ACTION_CMD_ServicePreShutdown, ot::EXECUTE, true);
 	}
 
 	// Prepare the shutdown document
@@ -469,7 +469,7 @@ void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyS
 	}
 	
 	// Broadcast the shutdown document
-	this->broadcast(_senderServiceID, doc.toJson(), false, true);
+	this->broadcast(_senderServiceID, doc.toJson(), ot::EXECUTE, false, true);
 
 	// Remove debug services since the shutdown won't be detected by the LDS
 	for (auto it = m_services.begin(); it != m_services.end(); ) {
@@ -488,9 +488,9 @@ void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyS
 	}
 }
 
-void Session::sendBroadcast(ot::serviceID_t _senderServiceID, const std::string& _message) {
+void Session::sendBroadcast(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType) {
 	std::lock_guard<std::mutex> lock(m_mutex);
-	this->broadcast(_senderServiceID, _message, false, false);
+	this->broadcast(_senderServiceID, _message, _messageType, false, false);
 }
 
 void Session::removeFailedService(ot::serviceID_t _failedServiceID, ot::PortManager& _debugPortManager) {
@@ -518,19 +518,19 @@ void Session::removeFailedService(ot::serviceID_t _failedServiceID, ot::PortMana
 
 // Private: Messaging
 
-void Session::broadcastBasicAction(ot::serviceID_t _senderServiceID, const std::string& _action, bool _forceSend) {
+void Session::broadcastBasicAction(ot::serviceID_t _senderServiceID, const std::string& _action, ot::MessageType _messageType, bool _forceSend) {
 	ot::JsonDocument doc;
 	this->prepareBroadcastDocument(doc, _action, _senderServiceID);
-	this->broadcast(_senderServiceID, doc.toJson(), false, _forceSend);
+	this->broadcast(_senderServiceID, doc.toJson(), _messageType, false, _forceSend);
 }
 
-void Session::broadcast(ot::serviceID_t _senderServiceID, const std::string& _message, bool _async, bool _forceSend) {
+void Session::broadcast(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType, bool _async, bool _forceSend) {
 	if (_async) {
-		std::thread t(&Session::broadcastWorker, this, _senderServiceID, _message, _forceSend);
+		std::thread t(&Session::broadcastWorker, this, _senderServiceID, _message, _messageType, _forceSend);
 		t.detach();
 	}
 	else {
-		this->broadcastImpl(_senderServiceID, _message, _forceSend);
+		this->broadcastImpl(_senderServiceID, _message, _messageType, _forceSend);
 	}
 }
 
@@ -581,13 +581,13 @@ const Service& Session::getServiceFromID(ot::serviceID_t _serviceID) const {
 	throw ot::Exception::ObjectNotFound("Service not found { \"ServiceID\": " + std::to_string(_serviceID) + " }");
 }
 
-void Session::broadcastImpl(ot::serviceID_t _senderServiceID, const std::string& _message, bool _forceSend) {
+void Session::broadcastImpl(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType, bool _forceSend) {
 	std::string lssUrl = SessionService::instance().getUrl();
 
 	for (const Service& service : m_services) {
 		if (!service.getServiceURL().empty() && (_forceSend || (service.isRunning() && !service.isShuttingDown())) && service.getServiceID() != _senderServiceID) {
 			std::string response;
-			if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, _message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			if (!ot::msg::send(lssUrl, service.getServiceURL(), _messageType, _message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 				OT_LOG_E("Failed to send broadcast message to service { " + service.debugLogString(m_id) + " }");
 			}
 		}
@@ -631,9 +631,9 @@ ot::ServiceRunData Session::createServiceRunDataImpl(ot::serviceID_t _serviceID)
 
 // Private: Worker
 
-void Session::broadcastWorker(ot::serviceID_t _senderServiceID, std::string _message, bool _forceSend) {
+void Session::broadcastWorker(ot::serviceID_t _senderServiceID, std::string _message, ot::MessageType _messageType, bool _forceSend) {
 	std::lock_guard<std::mutex> lock(m_mutex);
-	this->broadcastImpl(_senderServiceID, _message, _forceSend);
+	this->broadcastImpl(_senderServiceID, _message, _messageType, _forceSend);
 }
 
 void Session::healthCheckWorker() {
@@ -726,7 +726,7 @@ void Session::showWorker(ot::serviceID_t _visibleService) {
 
 		service.setHidden(false);
 
-		this->broadcastBasicAction(_visibleService, OT_ACTION_CMD_ServiceConnected, false);
+		this->broadcastBasicAction(_visibleService, OT_ACTION_CMD_ServiceConnected, ot::EXECUTE, false);
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_E("Show worker failed with exception { \"ServiceID\": " + std::to_string(_visibleService) + 

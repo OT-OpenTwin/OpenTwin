@@ -336,7 +336,7 @@ void SessionService::updateLogMode(const ot::LogFlags& _newData) {
 	std::string notificationMessage = doc.toJson();
 
 	for (auto& it : m_sessions) {
-		it.second.sendBroadcast(ot::invalidServiceID, notificationMessage);
+		it.second.sendBroadcast(ot::invalidServiceID, notificationMessage, ot::EXECUTE);
 	}
 }
 
@@ -1121,7 +1121,7 @@ ot::ReturnMessage SessionService::handleRegisterNewLibraryManagementService(ot::
 
 	// Notify all sessions about the new LMS
 	for (auto& session : m_sessions) {
-		session.second.sendBroadcast(ot::invalidServiceID, message);
+		session.second.sendBroadcast(ot::invalidServiceID, message, ot::EXECUTE);
 	}
 	
 	return ot::ReturnMessage::Ok;
