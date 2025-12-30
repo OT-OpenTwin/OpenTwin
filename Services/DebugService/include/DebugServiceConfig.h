@@ -36,7 +36,8 @@ public:
 		ExitOnRun         = 1 << 1, //! @brief Exit the service on run action.
 		ExitOnPing        = 1 << 2, //! @brief Exit the service on ping action.
 		ExitOnPreShutdown = 1 << 3, //! @brief Exit the service on ping action.
-		ExportOnStart     = 1 << 4  //! @brief Export the configuration on service start.
+		IgnoreInit        = 1 << 4, //! @brief The service will ignore the init message.
+		ExportOnStart     = 1 << 5  //! @brief Export the configuration on service start.
 	};
 	typedef ot::Flags<FeatureFlag> Features; //! @brief Feature flags type.
 

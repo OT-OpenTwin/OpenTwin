@@ -45,13 +45,18 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 extern "C" {
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP) {
-		Application::instance().actionAboutToBePerformed(_json);
-		return ot::foundation::performAction(_json, _senderIP);
+		if (!Application::instance().actionAboutToBePerformed(_json)) {
+			char* tmp = new char[1];
+			tmp[0] = 0;
+			return tmp;
+		}
+		else {
+			return ot::foundation::performAction(_json, _senderIP);
+		}
 	};
 
 	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP) {
-		Application::instance().actionAboutToBePerformed(_json);
-		return ot::foundation::performAction(_json, _senderIP);
+		return performAction(_json, _senderIP);
 	};
 
 	_declspec(dllexport) const char *getServiceURL(void) {

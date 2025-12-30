@@ -149,6 +149,9 @@ Application::Application() :
 	//this->enableFeature(DebugServiceConfig::ExitOnPing);
 	//this->enableFeature(DebugServiceConfig::ExitOnRun);
 	//this->enableFeature(DebugServiceConfig::ExitOnPreShutdown);
+	
+	// Enable features (Ignore actions)
+	//this->enableFeature(DebugServiceConfig::IgnoreInit);
 		
 	// Enable features (Other)
 
@@ -695,11 +698,11 @@ void Application::sendTableWorker(int _rows, int _columns) {
 
 // General feature handling
 
-void Application::actionAboutToBePerformed(const char* _json) {
+bool Application::actionAboutToBePerformed(const char* _json) {
 	ot::JsonDocument doc;
 	if (!doc.fromJson(_json)) {
 		OT_LOG_EAS("Failed to deserialize request: \"" + std::string(_json) + "\"");
-		return;
+		return true;
 	}
 
 	std::string action = ot::json::getString(doc, OT_ACTION_MEMBER);
@@ -710,6 +713,14 @@ void Application::actionAboutToBePerformed(const char* _json) {
 			exit(0);
 		}
 	}
+	else if (action == OT_ACTION_CMD_Init) {
+		if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::IgnoreInit)) {
+			OT_LOG_T("Ignoring init");
+			return false;
+		}
+	}
+
+	return true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

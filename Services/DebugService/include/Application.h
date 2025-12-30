@@ -85,7 +85,9 @@ public:
 
 	DebugServiceConfig m_config;
 
-	void actionAboutToBePerformed(const char* _json);
+	//! @brief Will be called before an action is about the be performed.
+	//! @return True in the case that the action should be performed, if false the action should be ignored.
+	bool actionAboutToBePerformed(const char* _json);
 
 	void enableFeature(const DebugServiceConfig::FeatureFlag& _flag, bool _enabled = true) { m_config.setFeatureFlag(_flag, _enabled); };
 	void disableFeature(const DebugServiceConfig::FeatureFlag& _flag) { m_config.setFeatureFlag(_flag, false); };
