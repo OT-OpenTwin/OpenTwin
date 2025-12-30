@@ -3840,8 +3840,6 @@ void AppBase::addVisualizingEntityInfoToView(ot::WidgetView* _view, const ot::UI
 }
 
 void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
-	ot::RuntimeIntervalTest runTest;
-	runTest.logOnDelete("AppBase::runSelectionHandling");
 	OT_SLECTION_TEST_LOG("Running selection handling");
 
 	ot::SelectionHandlingResult selectionResult = m_navigationManager.runSelectionHandling(_eventOrigin, m_projectNavigation->getTree()->selectedItems());

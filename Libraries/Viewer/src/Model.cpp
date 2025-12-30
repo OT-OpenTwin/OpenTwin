@@ -1150,12 +1150,7 @@ void Model::setSelectedShapesOpaqueAndOthersTransparent(SceneNodeBase *root)
 	}
 }
 
-#include "OTCore/RuntimeTests.h"
-
 ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData& _selectionData, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems) {
-	ot::RuntimeIntervalTest runt;
-	runt.logOnDelete("Model::setSelectedTreeItems");
-
 	ot::SelectionHandlingResult result;
 
 	_selectedModelItems.clear();
@@ -3105,8 +3100,7 @@ void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, co
 	if (sceneNodeIt == m_nameToSceneNodesMap.end()) {
 		return;
 	}
-	ot::RuntimeIntervalTest runt;
-	runt.logOnDelete("Model::notifySceneNodeAboutViewChange(" + _sceneNodeName + ")");
+
 	sceneNodeIt->second->setViewChange(_state, _viewType);
 }
 
