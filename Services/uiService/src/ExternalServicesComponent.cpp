@@ -94,6 +94,8 @@
 #include "OTWidgets/GlobalWidgetViewManager.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
+#include "OTFrontendConnectorAPI/WindowAPI.h"
+
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -3488,124 +3490,40 @@ void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument&
 void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 	ot::RuntimeIntervalTest runt;
 	runt.logOnDelete("ExternalServicesComponent::handleAddPlot1D");
-	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
-	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
-	
-	if (!visualisationCfg.getSetAsActiveView()) {
-		insertFlags |= ot::WidgetView::KeepCurrentFocus;
-	}
 
 	bool refreshData = visualisationCfg.getOverrideViewerContent();
 	
 	// Get/create plot view that matches the plot config 
 	ot::Plot1DCfg plotConfig;
 	plotConfig.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-	
-
-	bool suppressViewHandling = visualisationCfg.getSupressViewHandling();
-	
-	if (suppressViewHandling) {
-		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
-		insertFlags |= ot::WidgetView::KeepCurrentFocus;
-	}
-
-	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, insertFlags, visualizingEntities);
-	ot::Plot* plot = plotView->getPlot();
 
 	// If the data needs to be refreshed, all curves are newly build. Other changes can be performed on already loaded curves.
 	if (refreshData)
 	{
-		ot::RuntimeIntervalTest runt2;
-		runt2.logOnDelete("ExternalServicesComponent::handleAddPlot1D - refresh data");
+		ot::WindowAPI::lockSelectionAndModification(true);
+		ot::WindowAPI::setProgressBarVisibility("Loading plot data", true, true);
+		ot::WindowAPI::appendOutputMessage("Loading plot data...\n");
 
-		// Clear plot if exists
-		plot->clear(true);
-
-		// Create curves
-		const std::string collectionName = AppBase::instance()->getCurrentProjectInfo().getCollectionName();
-		CurveDatasetFactory curveFactory(collectionName);
-
-		ot::ConstJsonArray curveCfgs = ot::json::getArray(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs);
-		std::list<ot::PlotDataset*> dataSets;
-		std::list<std::string> curveIDDescriptions;
-
-		const std::string xAxisParameter = plotConfig.getXAxisParameter();
-		const std::list<ValueComparisionDefinition>& queries = plotConfig.getQueries();
-		bool useLimitedNbOfCurves = plotConfig.getUseLimitNbOfCurves();
-		int32_t limitOfCurves = plotConfig.getLimitOfCurves();
-
-		for (uint32_t i = 0; i < curveCfgs.Size(); i++) {
-			ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
-			const std::string t = ot::json::toJson(curveCfgs);
-			ot::Plot1DCurveCfg curveCfg;
-
-			curveCfg.setFromJsonObject(curveCfgSerialised);
-
-			const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
-			bool curveHasDataToVisualise = false;
-			if (xAxisParameter != "") {
-				for (auto parameter : queryInformation.m_parameterDescriptions) {
-					if (parameter.m_label == xAxisParameter) {
-						curveHasDataToVisualise = true;
-					}
-				}
-			}
-			else {
-				curveHasDataToVisualise = true;
-			}
-
-			if (curveHasDataToVisualise) {
-				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(plotConfig, curveCfg, xAxisParameter, queries);
-				dataSets.splice(dataSets.begin(), newCurveDatasets);
-				
-				std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
-				curveIDDescriptions.splice(curveIDDescriptions.begin(), newCurveIDDescriptions);
-								
-				if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) {
-					break;
-				}
-			}
-			else
-			{
-				AppBase::instance()->appendInfoMessage(QString(("Curve " + curveCfg.getTitle() + " cannot be visualised since it does not have data for the selected X-Axis parameter: " + xAxisParameter + "\n").c_str()));
-			}
-		}
-
-		//Now we add the data sets to the plot and visualise them
-		int32_t curveCounter(1);
-		plot->setConfig(plotConfig);
-		std::string displayMessage("");
-		auto curveIDDescription = curveIDDescriptions.begin();
-
-		for (ot::PlotDataset* dataSet : dataSets) {
-			if (!useLimitedNbOfCurves || (useLimitedNbOfCurves && curveCounter <= limitOfCurves))
-			{
-				dataSet->setOwnerPlot(plot);
-				dataSet->updateCurveVisualization();
-				plot->addDatasetToCache(dataSet);
-				dataSet->attach();
-				if (curveIDDescription != curveIDDescriptions.end() && !curveIDDescription->empty())
-				{
-					displayMessage += *curveIDDescription;
-					curveIDDescription++;
-				}
-			}
-			else
-			{
-				delete dataSet;
-				dataSet = nullptr;
-			}
-			curveCounter++;
-		}
-		if (!displayMessage.empty())
-		{
-			AppBase::instance()->appendInfoMessage(QString::fromStdString(displayMessage));
-		}
+		std::thread t(&ExternalServicesComponent::workerLoadPlotData, this, std::move(_document), std::move(plotConfig), std::move(visualisationCfg));
+		t.detach();
 	}
 	else
 	{
+		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+		if (!visualisationCfg.getSetAsActiveView()) {
+			insertFlags |= ot::WidgetView::KeepCurrentFocus;
+		}
+
+		if (visualisationCfg.getSupressViewHandling()) {
+			AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
+			insertFlags |= ot::WidgetView::KeepCurrentFocus;
+		}
+
+		const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, insertFlags, visualisationCfg.getVisualisingEntities());
+		ot::Plot* plot = plotView->getPlot();
+
 		const ot::Plot1DCfg& oldConfig = plot->getConfig();
 		if (plotConfig.getXLabelAxisAutoDetermine())
 		{
@@ -3616,13 +3534,14 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 			plotConfig.setAxisLabelY(oldConfig.getAxisLabelY());
 		}
 		plot->setConfig(plotConfig);
-	}
-	// Now we refresh the plot visualisation.
-	plot->refresh();
-	plot->resetView();
-	
-	if (suppressViewHandling) {
-		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
+
+		// Now we refresh the plot visualisation.
+		plot->refresh();
+		plot->resetView();
+
+		if (visualisationCfg.getSupressViewHandling()) {
+			AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
+		}
 	}
 }
 
@@ -4528,6 +4447,64 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 	}
 }
 
+void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document, ot::Plot1DCfg&& _plotConfig, ot::VisualisationCfg&& _visualizationCfg) {
+	auto startTime = ot::DateTime::msSinceEpoch();
+
+	// Create curves
+	const std::string collectionName = AppBase::instance()->getCurrentProjectInfo().getCollectionName();
+	CurveDatasetFactory curveFactory(collectionName);
+
+	ot::ConstJsonArray curveCfgs = ot::json::getArray(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs);
+	std::list<ot::PlotDataset*> dataSets;
+	std::list<std::string> curveIDDescriptions;
+
+	const std::string xAxisParameter = _plotConfig.getXAxisParameter();
+	const std::list<ValueComparisionDefinition>& queries = _plotConfig.getQueries();
+	bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
+	int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
+
+	for (uint32_t i = 0; i < curveCfgs.Size(); i++) {
+		ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
+		const std::string t = ot::json::toJson(curveCfgs);
+		ot::Plot1DCurveCfg curveCfg;
+
+		curveCfg.setFromJsonObject(curveCfgSerialised);
+
+		const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
+		bool curveHasDataToVisualise = false;
+		if (xAxisParameter != "") {
+			for (auto parameter : queryInformation.m_parameterDescriptions) {
+				if (parameter.m_label == xAxisParameter) {
+					curveHasDataToVisualise = true;
+				}
+			}
+		}
+		else {
+			curveHasDataToVisualise = true;
+		}
+
+		if (curveHasDataToVisualise) {
+			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg, xAxisParameter, queries);
+			dataSets.splice(dataSets.begin(), newCurveDatasets);
+
+			std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
+			curveIDDescriptions.splice(curveIDDescriptions.begin(), newCurveIDDescriptions);
+
+			if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) {
+				break;
+			}
+		}
+		else
+		{
+			ot::WindowAPI::appendOutputMessage("Curve " + curveCfg.getTitle() + " cannot be visualised since it does not have data for the selected X-Axis parameter: " + xAxisParameter + "\n");
+		}
+	}
+
+	auto endTime = ot::DateTime::msSinceEpoch();
+
+	QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, _plotConfig, _visualizationCfg, dataSets, curveIDDescriptions, (endTime - startTime));
+}
+
 void ExternalServicesComponent::keepAlive() {
 	if (m_websocket && !m_modelServiceURL.empty()) {
 
@@ -4574,6 +4551,69 @@ void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _recei
 
 	std::string response;
 	this->sendRelayedRequest(EXECUTE, _receiverUrl, _message, response);
+}
+
+void ExternalServicesComponent::slotPlotDataLoadingCompleted(const ot::Plot1DCfg& _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, const std::list<std::string>& _curveIDDescriptions, unsigned long long _loadTimeMs)
+{
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	if (!_visualizationCfg.getSetAsActiveView()) {
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
+
+	if (_visualizationCfg.getSupressViewHandling()) {
+		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
+
+	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(_plotConfig, insertFlags, _visualizationCfg.getVisualisingEntities());
+	ot::Plot* plot = plotView->getPlot();
+
+	plot->clear(true);
+	plot->setConfig(_plotConfig);
+
+	// Now we add the data sets to the plot and visualise them
+	int32_t curveCounter = 0;
+	std::string displayMessage("");
+	auto curveIDDescription = _curveIDDescriptions.begin();
+
+	for (ot::PlotDataset* dataSet : _dataSets) {
+		if (!_plotConfig.getUseLimitNbOfCurves() || curveCounter < _plotConfig.getLimitOfCurves())
+		{
+			dataSet->setOwnerPlot(plot);
+			dataSet->updateCurveVisualization();
+			plot->addDatasetToCache(dataSet);
+			dataSet->attach();
+			if (curveIDDescription != _curveIDDescriptions.end() && !curveIDDescription->empty())
+			{
+				displayMessage += *curveIDDescription;
+				curveIDDescription++;
+			}
+		}
+		else
+		{
+			delete dataSet;
+			dataSet = nullptr;
+		}
+		curveCounter++;
+	}
+	if (!displayMessage.empty())
+	{
+		ot::WindowAPI::appendOutputMessage(displayMessage);
+	}
+
+	// Now we refresh the plot visualisation.
+	plot->refresh();
+	plot->resetView();
+	
+	if (_visualizationCfg.getSupressViewHandling()) {
+		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
+	}
+
+	ot::WindowAPI::appendOutputMessage("Loading plot data took " + ot::DateTime::intervalToString(_loadTimeMs) + "\n");
+
+	// Finally unlock the ui and hide the progress
+	ot::WindowAPI::lockSelectionAndModification(false);
+	ot::WindowAPI::setProgressBarVisibility("", false, false);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

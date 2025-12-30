@@ -32,6 +32,7 @@
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/VisualisationCfg.h"
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
@@ -423,6 +424,7 @@ public Q_SLOTS:
 	void keepAlive();
 	void slotProcessActionBuffer();
 	void slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message);
+	void slotPlotDataLoadingCompleted(const ot::Plot1DCfg& _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, const std::list<std::string>& _curveIDDescriptions, unsigned long long _loadTimeMs);
 
 private:
 	// ###################################################################################################
@@ -480,6 +482,8 @@ private:
 	void workerImportSingleFile(QString _fileToImport, ImportFileWorkerData _info);
 
 	void workerImportMultipleFiles(QStringList _filesToImport, ImportFileWorkerData _info);
+
+	void workerLoadPlotData(ot::JsonDocument&& _document, ot::Plot1DCfg&& _plotConfig, ot::VisualisationCfg&& _visualizationCfg);
 
 	// #################################################################
 
