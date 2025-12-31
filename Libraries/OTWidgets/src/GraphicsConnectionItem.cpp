@@ -674,11 +674,19 @@ void ot::GraphicsConnectionItem::calculateSmoothLineStep(const QPointF& _origin,
 	case ConnectionDirection::Any:
 	{
 		double ptx, pty;
-		if (_origin.x() > _destination.x()) ptx = _origin.x() - _halfdistX;
-		else ptx = _origin.x() + _halfdistX;
-		if (_origin.y() > _destination.y()) pty = _origin.y() - _halfdistY;
-		else pty = _origin.y() + _halfdistY;
-		_control = QPointF(_origin.x() + ptx, _origin.y() + pty);
+		if (_origin.x() > _destination.x()) {
+			ptx = _origin.x() - _halfdistX;
+		}
+		else {
+			ptx = _origin.x() + _halfdistX;
+		}
+		if (_origin.y() > _destination.y()) {
+			pty = _origin.y() - _halfdistY;
+		}
+		else {
+			pty = _origin.y() + _halfdistY;
+		}
+		_control = QPointF(ptx, pty);
 	}
 		break;
 	case ConnectionDirection::Left:
