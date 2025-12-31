@@ -2947,36 +2947,25 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	ot::WidgetViewBase::ViewType viewType = _view->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
-
-	OT_SLECTION_TEST_LOG("+ Deselecting navigation items");
-
-	// Store current selection and view information
-	ot::WidgetView* lastStoredView = ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView();
-
-	// Deselect navigation item if exists
-	const ot::SelectionInformation& viewSelectionInfo = _view->getVisualizingItems();
-	{
-		QSignalBlocker sigBlock(m_projectNavigation->getTree());
-		m_projectNavigation->getTree()->setItemsSelected(viewSelectionInfo.getSelectedNavigationItems(), false);
-	}
-	
+		
 	OT_SLECTION_TEST_LOG("+ Closing actual view");
 
 	// Now close the view
 	ot::GlobalWidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
 
-	// Restore selection if the view did not change during close
-	if (lastStoredView && _view != lastStoredView && ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView() == lastStoredView) {
-		OT_SLECTION_TEST_LOG("+ Restore view selection");
-
-		QSignalBlocker sigBlock(m_projectNavigation->getTree());
-		m_projectNavigation->getTree()->setItemsSelected(lastStoredView->getVisualizingItems().getSelectedNavigationItems(), true);
+	// If the new current view is not a central view, clear the selection
+	ot::WidgetView* newCurrentView = ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView();
+	if (newCurrentView) {
+		if (!(newCurrentView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral)) {
+			{
+				QSignalBlocker sigBlock(m_projectNavigation->getTree());
+				m_projectNavigation->getTree()->deselectAllItems(false);
+			}
+			this->runSelectionHandling(ot::SelectionOrigin::User);
+		}
 	}
 
-	this->runSelectionHandling(ot::SelectionOrigin::User);
-
 	OT_SLECTION_TEST_LOG(">> Closing view request completed");
-
 }
 
 void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
