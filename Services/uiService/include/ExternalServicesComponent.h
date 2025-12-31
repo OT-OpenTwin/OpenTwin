@@ -104,6 +104,8 @@ public:
 
 	LockManager* lockManager() { return m_lockManager; }
 
+	bool getAllServicesCompletedSetup() const;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Configuration
@@ -490,6 +492,13 @@ private:
 	bool                                            m_bufferActions;
 	std::list<std::string>                          m_actionBuffer;
 	ot::ActionDispatchProfiler                      m_actionProfiler;
+
+	struct InitialSelectionInfo {
+		ot::UIDList		treeIDs;
+		bool			selected;
+		bool			clearSelection;
+	};
+	std::list<InitialSelectionInfo>                 m_initialSelection;
 
 	int64_t                                         m_lastKeepAlive;
 

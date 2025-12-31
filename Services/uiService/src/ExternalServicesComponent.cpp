@@ -392,6 +392,19 @@ void ExternalServicesComponent::shutdown() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Getter
+
+bool ExternalServicesComponent::getAllServicesCompletedSetup() const {
+	for (const auto& it : m_serviceIdMap) {
+		if (!it.second->isUiInitializationCompleted()) {
+			return false;
+		}
+	}
+	return true;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // Configuration
 
 void ExternalServicesComponent::setMessagingRelay(const std::string &relayAddress)
@@ -1152,6 +1165,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 	AppBase * app{ AppBase::instance() };
 	try {
 		ot::BasicScopedBoolWrapper actionBuffer(m_bufferActions);
+
+		m_initialSelection.clear();
 
 		ot::LogDispatcher::instance().setProjectName(_projectName);
 
@@ -2080,10 +2095,8 @@ void ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocument& _d
 	it->second->setUiInitializationCompleted();
 
 	// Check if all services completed the startup
-	for (const auto& it : m_serviceIdMap) {
-		if (!it.second->isUiInitializationCompleted()) {
-			return;
-		}
+	if (!getAllServicesCompletedSetup()) {
+		return;
 	}
 
 	// Here we know that all services completed the startup -> switch to main view and restore state
@@ -2093,6 +2106,12 @@ void ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocument& _d
 	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockType::All);
 
 	AppBase::instance()->restoreSessionState();
+
+	// Apply initial selection
+	for (const InitialSelectionInfo& info : m_initialSelection) {
+		AppBase::instance()->setNavigationTreeItemsSelected(info.treeIDs, info.selected, info.clearSelection);
+	}
+	m_initialSelection.clear();
 }
 
 void ExternalServicesComponent::handleRegisterForModelEvents(ot::JsonDocument& _document) {
@@ -3044,7 +3063,16 @@ void ExternalServicesComponent::handleSetEntitySelected(ot::JsonDocument& _docum
 	}
 
 	if (!treeIDs.empty()) {
-		AppBase::instance()->setNavigationTreeItemsSelected(treeIDs, selected, clearSelection);
+		if (getAllServicesCompletedSetup()) {
+			AppBase::instance()->setNavigationTreeItemsSelected(treeIDs, selected, clearSelection);
+		}
+		else {
+			InitialSelectionInfo info;
+			info.clearSelection = clearSelection;
+			info.selected = selected;
+			info.treeIDs = std::move(treeIDs);
+			m_initialSelection.push_back(std::move(info));
+		}
 	}
 }
 
