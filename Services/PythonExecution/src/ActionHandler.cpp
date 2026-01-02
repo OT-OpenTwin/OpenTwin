@@ -130,7 +130,7 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
-
+		OT_LOG_D("Initialise Pyrit environment");
 		m_pythonAPI.initializeEnvironment("Pyrit");
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_STUDIOSUITE)
@@ -139,7 +139,7 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
-		
+		OT_LOG_D("Initialise core environment");
 		m_pythonAPI.initializeEnvironment("Core");
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL) {
