@@ -35,7 +35,7 @@
 #include <thread>
 
 #ifdef _DEBUG
-	//#define _SUBSERVICEDEBUG
+	#define _SUBSERVICEDEBUG
 #endif
 
 SubprocessManager::SubprocessManager(Application* _app) 
@@ -193,7 +193,7 @@ void SubprocessManager::worker(std::string _projectName) {
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
 #ifdef _SUBSERVICEDEBUG
-			m_communicationHandler = new CommunicationHandler(this, "TestServerPyrit");
+			m_communicationHandler = new CommunicationHandler(this, "TestServerPython");
 #else
 			// Encode project name to base64 to avoid issues with special characters
 			const std::string encodedString = ot::String::toBase64Url(_projectName);
