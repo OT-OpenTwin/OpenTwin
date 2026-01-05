@@ -1678,10 +1678,17 @@ void ExternalServicesComponent::queueAction(const std::string& _json, const std:
 	}
 	else {
 		m_actionProfiler.startAction();
-		ot::ActionDispatcher::instance().dispatch(_json, ot::QUEUE);
-		if (m_actionProfiler.endAction()) {
-			this->actionDispatchTimeout(_json);
+		ot::JsonDocument doc;
+		if (!doc.fromJson(_json)) {
+			OT_LOG_E("Failed to parse action JSON document");
 		}
+		else {
+			ot::ActionDispatcher::instance().dispatch(doc, ot::QUEUE);
+			if (m_actionProfiler.endAction()) {
+				this->actionDispatchTimeout(doc);
+			}
+		}
+		
 		this->keepAlive();
 
 		// If there are still buffered actions, we process them now
@@ -1689,12 +1696,21 @@ void ExternalServicesComponent::queueAction(const std::string& _json, const std:
 			std::string action = m_actionBuffer.front();
 			m_actionBuffer.pop_front();
 
-			m_actionProfiler.startAction();
-			ot::ActionDispatcher::instance().dispatch(action, ot::QUEUE);
-			if (m_actionProfiler.endAction()) {
-				this->actionDispatchTimeout(action);
+			ot::JsonDocument bufferDoc;
+			if (!bufferDoc.fromJson(action)) {
+				OT_LOG_E("Failed to parse buffered action JSON document");
+				continue;
 			}
-			this->keepAlive();
+			else {
+				m_actionProfiler.startAction();
+
+				ot::ActionDispatcher::instance().dispatch(bufferDoc, ot::QUEUE);
+				if (m_actionProfiler.endAction()) {
+					this->actionDispatchTimeout(bufferDoc);
+				}
+				this->keepAlive();
+			}
+			
 		}
 
 		lock = false;
@@ -4307,20 +4323,19 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	}
 }
 
-void ExternalServicesComponent::actionDispatchTimeout(const std::string& _json) {
-	std::string action = "<Invalid JSON format>";
-
-	ot::JsonDocument doc;
-	if (doc.fromJson(_json)) {
-		if (!doc.HasMember(OT_ACTION_MEMBER) || !doc[OT_ACTION_MEMBER].IsString()) {
-			action = "<Missing action member>";
-		}
-		else {
-			action = doc[OT_ACTION_MEMBER].GetString();
-		}
+void ExternalServicesComponent::actionDispatchTimeout(const ot::JsonDocument& _document) {
+	std::string action;
+	if (!_document.HasMember(OT_ACTION_MEMBER) || !_document[OT_ACTION_MEMBER].IsString()) {
+		action = "<Missing action member>";
 	}
+	else {
+		action = _document[OT_ACTION_MEMBER].GetString();
+	}
+	this->actionDispatchTimeout(action);
+}
 
-	std::string message = "Prcoessing action \"" + action + "\" took " + ot::DateTime::intervalToString(m_actionProfiler.getLastInterval()) + ".";
+void ExternalServicesComponent::actionDispatchTimeout(const std::string& _action) {
+	std::string message = "Prcoessing action \"" + _action + "\" took " + ot::DateTime::intervalToString(m_actionProfiler.getLastInterval()) + ".";
 	
 	if (ot::LogDispatcher::mayLog(ot::WARNING_LOG)) {
 		// Log notifier will display the message

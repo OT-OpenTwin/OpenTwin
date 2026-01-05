@@ -471,7 +471,8 @@ private:
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
-	void actionDispatchTimeout(const std::string& _json);
+	void actionDispatchTimeout(const ot::JsonDocument& _document);
+	void actionDispatchTimeout(const std::string& _action);
 
 	struct ImportFileWorkerData {
 		std::string receiverUrl;
