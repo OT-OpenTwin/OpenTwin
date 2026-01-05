@@ -99,9 +99,11 @@ std::string OutputPipeline::flushOutput()
 		long long currentOutputProcessingCount = m_outputProcessingCount;
 
 		// Wait until all messages have been sent
-		while (m_outputProcessingCount < currentOutputProcessingCount + 2)
+		int infinitGuard = 0;
+		while (m_outputProcessingCount < currentOutputProcessingCount + 2 && infinitGuard < 50)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			infinitGuard++;
 		}
 		return "";
 	}
