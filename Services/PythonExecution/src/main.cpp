@@ -42,7 +42,7 @@ namespace ot {
 		bool initializeConnection(int _argc, char* _argv[]) {
 #if defined(_RELEASEDEBUG) || defined(_DEBUG)
 			Application::instance().getCommunicationHandler().setServerName("TestServerPython");
-			//OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
+			OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
 
 #else
 			if (_argc < 2) {
