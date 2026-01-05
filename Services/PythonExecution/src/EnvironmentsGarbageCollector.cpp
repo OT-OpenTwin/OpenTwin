@@ -45,7 +45,7 @@ void EnvironmentsGarbageCollector::markForCleanup()
                     {
                         std::string renamedFullPath = environment.string() + m_removalMarker;
                         std::filesystem::rename(environment.string(),renamedFullPath);
-                        OT_LOG_D("Marked environment for removal: " + environment.string())
+                        OT_LOG_D("Marked environment for removal: " + environment.string());
                     }
                 }
             }
@@ -70,7 +70,7 @@ void EnvironmentsGarbageCollector::removeMarkedEnvironments()
         if (fileName.find(m_removalMarker) != std::string::npos)
         {
             std::filesystem::remove_all(environment.string());
-            OT_LOG_D("Removed environment: " + environment.string())
+            OT_LOG_D("Removed environment: " + environment.string());
         }
 	}
 }
