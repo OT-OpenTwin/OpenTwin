@@ -32,6 +32,7 @@
     </ClCompile>
     <ClCompile Include="src\ColorStyleEditor.cpp" />
     <ClCompile Include="src\ConnectToLoggerDialog.cpp" />
+    <ClCompile Include="src\DiagramGenerator.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ExternalLibrary.cpp" />
     <ClCompile Include="src\ExternalLibraryManager.cpp" />
@@ -101,6 +102,7 @@
   <ItemGroup>
     <QtMoc Include="include\SettingsManager.h" />
     <QtMoc Include="include\BackendInfo.h" />
+    <QtMoc Include="include\DiagramGenerator.h" />
     <ClInclude Include="include\ExternalLibrary.h" />
     <ClInclude Include="include\ExternalLibraryManager.h" />
     <QtMoc Include="include\FileLogImporterDialog.h" />

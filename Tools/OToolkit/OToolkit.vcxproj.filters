@@ -248,6 +248,9 @@
     <ClCompile Include="src\TypeHelper.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="src\DiagramGenerator.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -427,6 +430,9 @@
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
     <QtMoc Include="include\TypeHelper.h">
+      <Filter>Header Files\Tools</Filter>
+    </QtMoc>
+    <QtMoc Include="include\DiagramGenerator.h">
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
   </ItemGroup>

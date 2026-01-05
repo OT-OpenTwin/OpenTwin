@@ -32,9 +32,10 @@
 #include "ImageEditor.h"
 #include "NetworkTools.h"
 #include "StatusManager.h"
-#include "ToolViewManager.h"
 #include "ToolBarManager.h"
+#include "ToolViewManager.h"
 #include "SettingsManager.h"
+#include "DiagramGenerator.h"
 #include "ColorStyleEditor.h"
 #include "GraphicsItemDesigner.h"
 #include "ExternalLibraryManager.h"
@@ -412,8 +413,9 @@ void AppBase::slotInitializeTools(void) {
 
 	m_logger = new Logging;
 	
-	m_toolManager->addTool(new ColorStyleEditor);
 	m_toolManager->addTool(new BackendInfo);
+	m_toolManager->addTool(new ColorStyleEditor);
+	m_toolManager->addTool(new DiagramGenerator);
 	m_toolManager->addTool(new FAR);
 	m_toolManager->addTool(new GraphicsItemDesigner);
 	m_toolManager->addTool(new ImageEditor);
