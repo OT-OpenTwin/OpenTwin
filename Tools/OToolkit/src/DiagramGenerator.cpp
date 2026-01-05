@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/GraphicsLineItemCfg.h"
 #include "OTGui/GraphicsTextItemCfg.h"
 #include "OTGui/GraphicsGroupItemCfg.h"
@@ -1020,6 +1021,10 @@ DiagramGenerator::SequenceLifeLineItem DiagramGenerator::generateNewLifeLineItem
 	lifeLine.textBox->setSize(textRect.getSize());
 	lifeLine.textBox->setFixedSize(textRect.getSize());
 	lifeLine.textBox->setZValue(_viewData.lifeLineTextBoxZValue);
+	ot::PenFCfg boxPen = lifeLine.textBox->getOutline();
+	boxPen.setPainter(new ot::StyleRefPainter2D(ColorStyleValueEntry::SequenceLifelineTextBoxBorder));
+	lifeLine.textBox->setOutline(boxPen);
+	lifeLine.textBox->setBackgroundPainer(new ot::StyleRefPainter2D(ColorStyleValueEntry::SequenceLifelineTextBox));
 	lifeLine.group->addItem(lifeLine.textBox);
 
 	// Text
@@ -1030,6 +1035,7 @@ DiagramGenerator::SequenceLifeLineItem DiagramGenerator::generateNewLifeLineItem
 	lifeLine.text->setAlignment(Alignment::Center);
 	lifeLine.text->setText(name);
 	lifeLine.text->setZValue(_viewData.lifeLineTextZValue);
+	lifeLine.text->setTextPainter(new ot::StyleRefPainter2D(ColorStyleValueEntry::SequenceLifelineText));
 	lifeLine.group->addItem(lifeLine.text);
 
 	// Line
@@ -1043,6 +1049,7 @@ DiagramGenerator::SequenceLifeLineItem DiagramGenerator::generateNewLifeLineItem
 	));
 	lifeLine.lifeLine->setFrom(Point2DD(0., 0.));
 	lifeLine.lifeLine->setTo(Point2DD(0., 10.));
+	lifeLine.lifeLine->setPainter(new ot::StyleRefPainter2D(ColorStyleValueEntry::SequenceLifelineLine));
 	lifeLine.group->addItem(lifeLine.lifeLine);
 
 	return lifeLine;
@@ -1062,6 +1069,8 @@ void DiagramGenerator::generateNewCallItem(SequenceLifeLineItem& _from, Sequence
 	callItem.text->setTextFont(_viewData.callFont);
 	callItem.text->setText(std::to_string(_viewData.currentCallIndex) + ": " + (_callText.isEmpty() ? "-" : _callText.toStdString()));
 	callItem.text->setPosition(ot::Point2DD(0., callY));
+	callItem.text->setZValue(_viewData.callZValue);
+	callItem.text->setTextPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::SequenceMessageText));
 
 	callY += (_viewData.callTextLineSpacing + _viewData.callTextHeight);
 
@@ -1070,6 +1079,8 @@ void DiagramGenerator::generateNewCallItem(SequenceLifeLineItem& _from, Sequence
 	callItem.line->setPosition(ot::Point2DD(0., callY));
 	callItem.line->setFrom(ot::Point2DD(0., 0));
 	callItem.line->setTo(ot::Point2DD(10., 0));
+	callItem.line->setZValue(_viewData.callZValue);
+	callItem.line->setPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::SequenceMessageArrow));
 
 	if (_isReturnCall) {
 		ot::PenFCfg linePen = callItem.line->getLineStyle();

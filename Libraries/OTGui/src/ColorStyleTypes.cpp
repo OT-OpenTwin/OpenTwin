@@ -236,7 +236,16 @@ namespace ot {
 				{ ot::ColorStyleValueEntry::WarningForeground, "Warning Foreground" },
 				{ ot::ColorStyleValueEntry::ErrorForeground, "Error Foreground" },
 
-				{ ot::ColorStyleValueEntry::LogoLight, "Logo Light" }
+				{ ot::ColorStyleValueEntry::LogoLight, "Logo Light" },
+
+				{ ot::ColorStyleValueEntry::SequenceLifelineTextBox, "Sequence Lifeline Text Box" },
+				{ ot::ColorStyleValueEntry::SequenceLifelineTextBoxBorder, "Sequence Lifeline Text Box Border" },
+				{ ot::ColorStyleValueEntry::SequenceLifelineText, "Sequence Lifeline Text" },
+				{ ot::ColorStyleValueEntry::SequenceLifelineLine, "Sequence Lifeline Line" },
+				{ ot::ColorStyleValueEntry::SequenceLifelineProcess, "Sequence Lifeline Process" },
+				{ ot::ColorStyleValueEntry::SequenceLifelineProcessBorder, "Sequence Lifeline Process Border" },
+				{ ot::ColorStyleValueEntry::SequenceMessageText, "Sequence Message Text" },
+				{ ot::ColorStyleValueEntry::SequenceMessageArrow, "Sequence Message Arrow" }
 			};
 
 			return g_instance;

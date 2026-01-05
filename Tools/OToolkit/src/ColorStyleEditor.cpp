@@ -489,6 +489,15 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineLine), new PropertyPainter2D(new FillPainter2D(198, 115, 17)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineText), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineTextBox), new PropertyPainter2D(new FillPainter2D(250, 215, 172)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineTextBoxBorder), new PropertyPainter2D(new FillPainter2D(198, 115, 17)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineProcess), new PropertyPainter2D(new FillPainter2D(186, 200, 211)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineProcessBorder), new PropertyPainter2D(new FillPainter2D(35, 68, 93)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceMessageText), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceMessageArrow), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+
 	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
 	tehb->setStart(Point2DD(0.5, 0.));
 	tehb->setFinalStop(Point2DD(0.5, 1.));
@@ -720,6 +729,15 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(70, 100, 70))));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineLine), new PropertyPainter2D(new FillPainter2D(198, 115, 17)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineText), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineTextBox), new PropertyPainter2D(new FillPainter2D(250, 215, 172)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineTextBoxBorder), new PropertyPainter2D(new FillPainter2D(198, 115, 17)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineProcess), new PropertyPainter2D(new FillPainter2D(186, 200, 211)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineProcessBorder), new PropertyPainter2D(new FillPainter2D(35, 68, 93)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceMessageText), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceMessageArrow), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	
 	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
 	tehb->setStart(Point2DD(0.5, 0.));
 	tehb->setFinalStop(Point2DD(0.5, 1.));
@@ -951,6 +969,15 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::LogoLight), new PropertyPainter2D(new FillPainter2D(0, 60, 124)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 100, 180))));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineLine), new PropertyPainter2D(new FillPainter2D(198, 115, 17)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineText), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineTextBox), new PropertyPainter2D(new FillPainter2D(250, 215, 172)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineTextBoxBorder), new PropertyPainter2D(new FillPainter2D(198, 115, 17)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineProcess), new PropertyPainter2D(new FillPainter2D(181, 230, 29)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineProcessBorder), new PropertyPainter2D(new FillPainter2D(34, 177, 76)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceMessageText), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceMessageArrow), new PropertyPainter2D(new FillPainter2D(ot::White)));
 
 	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
 	tehb->setStart(Point2DD(0.5, 0.));
