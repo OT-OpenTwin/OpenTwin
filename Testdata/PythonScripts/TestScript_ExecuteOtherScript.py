@@ -2,7 +2,7 @@
 import OpenTwin
 
 def __main__(this):
-    testScript = OpenTwin.GetPythonScript("Scripts/TestScript_TableCell.py")
+    testScript = OpenTwin.GetPythonScript("Python/Scripts/TestScript_TableCell.py")
     testScript(this)
 
 
