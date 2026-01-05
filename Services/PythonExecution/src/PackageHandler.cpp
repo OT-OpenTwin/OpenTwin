@@ -29,6 +29,7 @@
 #include "EntityPythonManifest.h"
 #include "Application.h"
 #include "OutputPipelineRAII.h"
+#include "OTSystem/DateTime.h"
 
 #include <filesystem>
 #include "PythonObjectBuilder.h"
@@ -217,23 +218,24 @@ void PackageHandler::importMissingPackages()
         }
         else
         {
-            {
-			    OutputPipelineRAII outputRedirectionGuard(OutputPipeline::RedirectionMode::applicationRead);
+            
+			OutputPipelineRAII outputRedirectionGuard(OutputPipeline::RedirectionMode::applicationRead);
 
-                //Environment is not yet initialised, so we can just install the packages but we need to update the manifest
-                for (const std::string& packageName : m_uninstalledPackages)
-                {
-                    installPackage(packageName);
-                }
-                dropImportCache();
-                m_installationLog = OutputPipeline::instance().flushOutput();
+            //Environment is not yet initialised, so we can just install the packages but we need to update the manifest
+            for (const std::string& packageName : m_uninstalledPackages)
+            {
+                installPackage(packageName);
             }
+            dropImportCache();
+            ot::DateTime currentTime = ot::DateTime::current();
+            m_installationLog = "Installed at: "+ currentTime.currentTimestamp(ot::DateTime::Simple) + "\n" + OutputPipeline::instance().flushOutput();
 			
             //Update manifest
             ot::NewModelStateInfo newModelStateInfo;
 			storeInstallationLog(newModelStateInfo);
 
             std::string newManifest = getListOfInstalledPackages();
+            
             m_currentManifest->replaceManifest(newManifest);
             m_currentManifest->storeToDataBase();
             newModelStateInfo.addTopologyEntity(*m_currentManifest);
