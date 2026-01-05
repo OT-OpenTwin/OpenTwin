@@ -146,6 +146,9 @@
     <ClInclude Include="include\OutputPipelineRAII.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\PythonThreadGuard.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\CommunicationHandler.h">
