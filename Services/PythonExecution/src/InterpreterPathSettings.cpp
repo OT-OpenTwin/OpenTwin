@@ -44,9 +44,10 @@ void InterpreterPathSettings::setupBasePaths()
 	
 
 	m_environmentsBase = pythonRoot + "\\Environments";
-	m_home = m_environmentsBase + "\\CoreEnvironment";
-	m_dllPath = pythonRoot +"\\DLLs\\Debug";
 	m_binPath = pythonRoot + "\\Interpreter\\Debug";
+	m_home = m_environmentsBase + "\\CoreEnvironment";
+	m_dllPath = m_home +"\\DLLs\\Debug";
+	m_libPath = m_home + "\\Lib";
 
 #else
 	// If not found, we are in deployment mode. The dlls are laying next to the executable and the environments are in a subfolder

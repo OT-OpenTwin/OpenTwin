@@ -32,7 +32,7 @@
 namespace ot {
 	namespace intern {
 		void initializeLogger(void) {
-#ifdef _RELEASEDEBUG
+#if defined(_RELEASEDEBUG) || defined(_DEBUG)
 			ot::ServiceLogNotifier::initialize("PythonSubprocess", "", true);
 #else
 			ot::ServiceLogNotifier::initialize("PythonSubprocess", "", false);
@@ -40,9 +40,9 @@ namespace ot {
 		}
 
 		bool initializeConnection(int _argc, char* _argv[]) {
-#ifdef _RELEASEDEBUG
+#if defined(_RELEASEDEBUG) || defined(_DEBUG)
 			Application::instance().getCommunicationHandler().setServerName("TestServerPython");
-			OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
+			//OutputPipeline::instance().setRedirectOutputMode(OutputPipeline::RedirectionMode::sendToServer);
 
 #else
 			if (_argc < 2) {
@@ -85,16 +85,18 @@ int main(int _argc, char* _argv[], char* _envp[]) {
 	// Initialize
 	ot::intern::initializeLogger();
 	if (!ot::intern::initializeConnection(_argc, _argv)) {
+		assert(false);
 		return 1;
 	}
 
 	// Connect to server
 	if (!Application::instance().getCommunicationHandler().ensureConnectionToServer()) {
+		assert(false);
 		return 1;
 	}
 
 	// Run event loop
 	int result = app.exec();
-
+	assert(result == 0);
 	return result;
 }
