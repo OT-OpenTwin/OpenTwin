@@ -30,27 +30,31 @@
 #include "EntityFile.h"
 
 PyObject* PythonExtensions::OT_GetPropertyValue(PyObject* _self, PyObject* _args) {
-    auto numberOfArguments = PyTuple_Size(_args);
+    CPythonObjectBorrowed args(_args);
+
+    auto numberOfArguments = PyTuple_Size(args);
     const int expectedNumberOfArguments = 2;
     if (numberOfArguments != expectedNumberOfArguments) {
         throw std::exception("OT_GetPropertyValue expects two arguments");
     }
     PythonObjectBuilder pyObBuilder;
-    std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
-    std::string propertyName = pyObBuilder.getStringValueFromTuple(_args, 1, "Parameter 1");
+    std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+    std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
 
     PyObject* returnValue = EntityBuffer::instance().getEntityPropertyValue(absoluteEntityName, propertyName);
     return returnValue;
 }
 
 PyObject* PythonExtensions::OT_GetScript(PyObject* _self, PyObject* _args) {
-    auto numberOfArguments = PyTuple_Size(_args);
+    CPythonObjectBorrowed args(_args);
+
+    auto numberOfArguments = PyTuple_Size(args);
     const int expectedNumberOfArguments = 1;
     if (numberOfArguments != expectedNumberOfArguments) {
         throw std::exception("OT_GetScript expects one argument");
     }
     PythonObjectBuilder pyObBuilder;
-    std::string absoluteScriptName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
+    std::string absoluteScriptName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
 
 
     auto baseEntity = EntityBuffer::instance().getEntity(absoluteScriptName);
@@ -88,16 +92,17 @@ PyObject* PythonExtensions::OT_GetScript(PyObject* _self, PyObject* _args) {
 }
 
 PyObject* PythonExtensions::OT_SetPropertyValue(PyObject* _self, PyObject* _args) {
-    auto numberOfArguments = PyTuple_Size(_args);
+    CPythonObjectBorrowed args(_args);
+    auto numberOfArguments = PyTuple_Size(args);
     const int expectedNumberOfArguments = 3;
     if (numberOfArguments != expectedNumberOfArguments) {
         throw std::exception("OT_SetPropertyValue expects three arguments");
     }
 
     PythonObjectBuilder pyObBuilder;
-    std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
-    std::string propertyName = pyObBuilder.getStringValueFromTuple(_args, 1, "Parameter 1");
-    CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(_args, 2, "Parameter 2");
+    std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+    std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
+    CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 2, "Parameter 2");
 
     EntityBuffer::instance().updateEntityPropertyValue(absoluteEntityName, propertyName, pvalue);
     return PyBool_FromLong(true);
@@ -114,7 +119,8 @@ PyObject* PythonExtensions::OT_Flush(PyObject* _self, PyObject* _args) {
 }
 
 PyObject* PythonExtensions::OT_FlushEntity(PyObject* _self, PyObject* _args) {
-    auto numberOfArguments = PyTuple_Size(_args);
+    CPythonObjectBorrowed args(_args);
+    auto numberOfArguments = PyTuple_Size(args);
     const int expectedNumberOfArguments = 1;
     if (numberOfArguments != expectedNumberOfArguments) {
         throw std::exception("OT_FlushEntity expects one argument");
@@ -125,15 +131,16 @@ PyObject* PythonExtensions::OT_FlushEntity(PyObject* _self, PyObject* _args) {
 }
 
 PyObject* PythonExtensions::OT_GetTableCell(PyObject* _self, PyObject* _args) {
-    auto numberOfArguments = PyTuple_Size(_args);
+    CPythonObjectBorrowed args(_args);
+    auto numberOfArguments = PyTuple_Size(args);
     const int expectedNumberOfArguments = 3;
     if (numberOfArguments != expectedNumberOfArguments) {
         throw std::exception("OT_GetTableCell expects three arguments");
     }
     PythonObjectBuilder pyObBuilder;
-    std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
-    int32_t row = pyObBuilder.getInt32ValueFromTuple(_args, 1, "Parameter 1");
-    int32_t column = pyObBuilder.getInt32ValueFromTuple(_args, 2, "Parameter 2");
+    std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+    int32_t row = pyObBuilder.getInt32ValueFromTuple(args, 1, "Parameter 1");
+    int32_t column = pyObBuilder.getInt32ValueFromTuple(args, 2, "Parameter 2");
 
     if (row < 0 || column < 0)
     {
@@ -145,39 +152,42 @@ PyObject* PythonExtensions::OT_GetTableCell(PyObject* _self, PyObject* _args) {
 }
 
 PyObject* PythonExtensions::OT_GetPortData(PyObject* _self, PyObject* _args) {
-    auto numberOfArguments = PyTuple_Size(_args);
+    CPythonObjectBorrowed args(_args);
+    auto numberOfArguments = PyTuple_Size(args);
     const int expectedNumberOfArguments = 1;
     if (numberOfArguments != expectedNumberOfArguments) {
         throw std::exception("OT_GetPortData expects one arguments");
     }
     PythonObjectBuilder pyObBuilder;
-    std::string portName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
+    std::string portName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
     PyObject* returnValue = DataBuffer::instance().getPortData(portName);
     return returnValue;
 }
 
 PyObject* PythonExtensions::OT_GetPortMetaData(PyObject* _self, PyObject* _args)
 {
-    auto numberOfArguments = PyTuple_Size(_args);
+    CPythonObjectBorrowed args(_args);
+    auto numberOfArguments = PyTuple_Size(args);
     const int expectedNumberOfArguments = 1;
     if (numberOfArguments != expectedNumberOfArguments) {
         throw std::exception("OT_GetPortData expects one arguments");
     }
     PythonObjectBuilder pyObBuilder;
-    std::string portName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
+    std::string portName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
     PyObject* returnValue = DataBuffer::instance().getPortMetaData(portName);
     return returnValue;
 }
 
 PyObject* PythonExtensions::OT_SetPortData(PyObject* _self, PyObject* _args) {
-    auto numberOfArguments = PyTuple_Size(_args);
+    CPythonObjectBorrowed args(_args);
+    auto numberOfArguments = PyTuple_Size(args);
     const int expectedNumberOfArguments = 2;
     if (numberOfArguments != expectedNumberOfArguments) {
         throw std::exception("OT_GetPortData expects two argument");
     }
     PythonObjectBuilder pyObBuilder;
-    std::string portName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
-    CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(_args, 1, "Parameter 1");
+    std::string portName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+    CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 1, "Parameter 1");
     std::string values = pyObBuilder.getStringValue(pvalue, "port data");
     DataBuffer::instance().overridePortData(portName, std::move(values));
     return PyBool_FromLong(true);
@@ -185,14 +195,15 @@ PyObject* PythonExtensions::OT_SetPortData(PyObject* _self, PyObject* _args) {
 
 PyObject* PythonExtensions::OT_SetPortMetaData(PyObject* _self, PyObject* _args)
 {
-    auto numberOfArguments = PyTuple_Size(_args);
+    CPythonObjectBorrowed args(_args);
+    auto numberOfArguments = PyTuple_Size(args);
     const int expectedNumberOfArguments = 2;
     if (numberOfArguments != expectedNumberOfArguments) {
         throw std::exception("OT_GetPortData expects two argument");
     }
     PythonObjectBuilder pyObBuilder;
-    std::string portName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
-    CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(_args, 1, "Parameter 1");
+    std::string portName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+    CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 1, "Parameter 1");
     std::string values = pyObBuilder.getStringValue(pvalue, "port data");
     DataBuffer::instance().overridePortMetaData(portName, std::move(values));
     return PyBool_FromLong(true);

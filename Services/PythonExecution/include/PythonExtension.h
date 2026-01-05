@@ -24,6 +24,7 @@
 #include <string>
 
 //! @brief C Python Extension that hold functions for OpenTwin that can be called from a python script.
+//! Neither of the function parameter's memory is owned. They have to be turned into CPythonObjectBorrowed within the function implementation.
 namespace PythonExtensions {
 
     static PyObject* OT_GetPropertyValue(PyObject* _self, PyObject* _args);
