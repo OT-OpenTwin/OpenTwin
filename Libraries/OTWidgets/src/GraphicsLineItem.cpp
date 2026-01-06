@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/GraphicsLineItemCfg.h"
+#include "OTGui/Graphics/GraphicsLineItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsLineItem.h"

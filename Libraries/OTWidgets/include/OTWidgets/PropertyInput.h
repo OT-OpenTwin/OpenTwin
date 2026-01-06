@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTGui/PropertyBase.h"
+#include "OTGui/Properties/PropertyBase.h"
 #include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 

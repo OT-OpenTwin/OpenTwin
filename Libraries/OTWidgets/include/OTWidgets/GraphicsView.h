@@ -25,14 +25,14 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/CopyInformation.h"
-#include "OTGui/GraphicsChangeEvent.h"
+#include "OTGui/Event/GraphicsChangeEvent.h"
 #include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsConnectionCfg.h"
 
 // Qt header
 #include <QtWidgets/qgraphicsview.h>
-#include "OTGui/GraphicsPackage.h"
-#include "OTGui/GraphicsConnectionCfg.h"
 
 // std header
 #include <map>

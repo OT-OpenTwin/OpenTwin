@@ -30,7 +30,7 @@
 #include "OTCore/LogDispatcher.h"                    // Logging related methods and types
 
 // OpenTwin Gui header
-#include "OTGui/PropertyGridCfg.h"                   // Property grid configuration
+#include "OTGui/Properties/PropertyGridCfg.h"                   // Property grid configuration
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"                     // Message related methods and types

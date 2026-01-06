@@ -39,7 +39,7 @@
 #include "EntityParameterizedDataPreviewTable.h"
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityBlockConnection.h"
-#include "OTGui/SelectEntitiesDialogCfg.h"
+#include "OTGui/Dialog/SelectEntitiesDialogCfg.h"
 #include "OTGuiAPI/Frontend.h"
 #include "EntitySolverCircuitSimulator.h"
 #include "EntitySolverDataProcessing.h"
@@ -91,20 +91,20 @@
 #include "tinyexpr.h"
 
 // OpenTwin header
-#include "EntityBlock.h"
 #include "OTCore/String.h"
 #include "OTCore/EntityName.h"
+#include "OTCore/FolderNames.h"
 #include "OTGui/KeySequence.h"
 #include "OTGui/NavigationTreeItem.h"
-#include "OTGui/PropertyGroup.h"
-#include "OTGui/PropertyString.h"
 #include "OTGui/VersionGraphVersionCfg.h"
-#include "PropertyHelper.h"
+#include "OTGui/Properties/PropertyGroup.h"
+#include "OTGui/Properties/PropertyString.h"
+#include "OTServiceFoundation/UILockWrapper.h"
 
+#include "EntityBlock.h"
+#include "PropertyHelper.h"
 #include "MetadataEntityInterface.h"
 
-#include "OTServiceFoundation/UILockWrapper.h"
-#include "OTCore/FolderNames.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 

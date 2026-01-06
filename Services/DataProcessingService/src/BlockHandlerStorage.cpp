@@ -34,12 +34,12 @@
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTCore/EntityName.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTGui/PainterRainbowIterator.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
+#include "OTServiceFoundation/TimeFormatter.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 #include "CurveFactory.h"
 #include "NewModelStateInfo.h"
 #include "EntityResult1DPlot.h"
-#include "OTModelAPI/ModelServiceAPI.h"
-#include "OTServiceFoundation/TimeFormatter.h"
 
 BlockHandlerStorage::BlockHandlerStorage(EntityBlockStorage* blockEntityStorage, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntityStorage,handlerMap),m_blockEntityStorage(blockEntityStorage)

@@ -29,9 +29,9 @@
 #include "Model.h"
 
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/PropertyGridCfg.h"
-#include "OTGui/PropertyGroup.h"
-#include "OTGui/PropertyDouble.h"
+#include "OTGui/Properties/PropertyGroup.h"
+#include "OTGui/Properties/PropertyDouble.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"

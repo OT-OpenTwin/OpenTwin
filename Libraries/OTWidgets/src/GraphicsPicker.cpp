@@ -21,9 +21,9 @@
 #include "OTCore/LogDispatcher.h"
 
 // OpenTwin Gui header
-#include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/GraphicsPackage.h"
-#include "OTGui/GraphicsPickerCollectionCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsPickerCollectionCfg.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/Label.h"

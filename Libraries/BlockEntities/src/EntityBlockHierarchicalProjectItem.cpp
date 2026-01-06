@@ -24,7 +24,7 @@
 #include "EntityProperties.h"
 #include "EntityBlockHierarchicalProjectItem.h"
 
-#include "OTGui/GraphicsHierarchicalProjectItemBuilder.h"
+#include "OTGui/Graphics/GraphicsHierarchicalProjectItemBuilder.h"
 #include "OTCommunication/ActionTypes.h"
 
 static EntityFactoryRegistrar<EntityBlockHierarchicalProjectItem> registrar(EntityBlockHierarchicalProjectItem::className());

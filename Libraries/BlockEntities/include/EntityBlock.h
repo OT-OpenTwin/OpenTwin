@@ -29,9 +29,9 @@
 
 #include "Connector.h"
 
-#include "OTGui/GraphicsConnectionCfg.h"
-#include "OTGui/GraphicsFlowItemBuilder.h"
-#include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsConnectionCfg.h"
+#include "OTGui/Graphics/GraphicsFlowItemBuilder.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/CopyInformation.h"
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlock : public EntityBase

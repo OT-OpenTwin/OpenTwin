@@ -23,8 +23,8 @@
 #include "OTCore/BasicScopedBoolWrapper.h"
 
 // OpenTwin Gui header
-#include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/QtFactory.h"

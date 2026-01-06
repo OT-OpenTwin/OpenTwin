@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/Painter2D.h"
+#include "OTGui/Painter/Painter2D.h"
 #include "OTWidgets/OTSVGDataParser.h"
 #include "OTWidgets/GlobalColorStyle.h"
 

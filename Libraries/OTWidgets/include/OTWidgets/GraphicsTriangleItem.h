@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/GraphicsTriangleItemCfg.h"
+#include "OTGui/Graphics/GraphicsTriangleItemCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header

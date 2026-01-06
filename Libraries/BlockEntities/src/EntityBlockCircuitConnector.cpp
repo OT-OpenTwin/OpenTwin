@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #include "EntityBlockCircuitConnector.h"
-#include "OTGui/GraphicsItemFileCfg.h"
-#include "OTGui/BasicGraphicsIntersectionItem.h"
+#include "OTGui/Graphics/GraphicsItemFileCfg.h"
+#include "OTGui/Graphics/BasicGraphicsIntersectionItem.h"
 #include "OTCore/LogDispatcher.h"
 
 static EntityFactoryRegistrar<EntityBlockCircuitConnector> registrar(EntityBlockCircuitConnector::className());

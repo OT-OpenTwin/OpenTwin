@@ -37,9 +37,9 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/GraphicsGroupItemCfg.h"
-#include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsGroupItemCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"

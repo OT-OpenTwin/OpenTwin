@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/OnePropertyDialogCfg.h"
+#include "OTGui/Dialog/OnePropertyDialogCfg.h"
 #include "OTWidgets/Dialog.h"
 
 namespace ot {

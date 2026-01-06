@@ -19,14 +19,14 @@
 
 #include "EntityBlockCircuitTransmissionLine.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTGui/GraphicsStackItemCfg.h"
-#include "OTGui/GraphicsImageItemCfg.h"
-#include "OTGui/GraphicsHBoxLayoutItemCfg.h"
-#include "OTGui/GraphicsRectangularItemCfg.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/GraphicsGridLayoutItemCfg.h"
-#include "OTGui/GraphicsEllipseItemCfg.h"
-#include "OTGui/GraphicsItemFileCfg.h"
+#include "OTGui/Graphics/GraphicsStackItemCfg.h"
+#include "OTGui/Graphics/GraphicsImageItemCfg.h"
+#include "OTGui/Graphics/GraphicsHBoxLayoutItemCfg.h"
+#include "OTGui/Graphics/GraphicsRectangularItemCfg.h"
+#include "OTGui/Graphics/GraphicsGridLayoutItemCfg.h"
+#include "OTGui/Graphics/GraphicsEllipseItemCfg.h"
+#include "OTGui/Graphics/GraphicsItemFileCfg.h"
+#include "OTGui/Painter/FillPainter2D.h"
 
 static EntityFactoryRegistrar<EntityBlockCircuitTransmissionLine> registrar(EntityBlockCircuitTransmissionLine::className());
 

@@ -17,21 +17,23 @@
 // limitations under the License.
 // @otlicense-end
 
+// OpenTwin header
 #include "EntityProperties.h"
 
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/Property.h"
-#include "OTGui/PropertyGroup.h"
-#include "OTGui/PropertyInt.h"
-#include "OTGui/PropertyBool.h"
-#include "OTGui/PropertyColor.h"
-#include "OTGui/PropertyDouble.h"
-#include "OTGui/PropertyString.h"
-#include "OTGui/PropertyPainter2D.h"
-#include "OTGui/PropertyStringList.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyGroup.h"
+#include "OTGui/Properties/PropertyInt.h"
+#include "OTGui/Properties/PropertyBool.h"
+#include "OTGui/Properties/PropertyColor.h"
+#include "OTGui/Properties/PropertyDouble.h"
+#include "OTGui/Properties/PropertyString.h"
+#include "OTGui/Properties/PropertyPainter2D.h"
+#include "OTGui/Properties/PropertyStringList.h"
 
-#include <cassert>
+// std header
 #include <list>
+#include <cassert>
 
 EntityProperties::~EntityProperties()
 {

@@ -18,7 +18,10 @@
 // @otlicense-end
 
 #pragma once
-#include "OTGui/GraphicsPackage.h"
+
+// OpenTwin header
+#include "OTGui/Graphics/GraphicsPackage.h"
+
 class IVisualisationGraphicsView
 {
 public:

@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/Property.h"
+#include "OTGui/Properties/Property.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/PropertyInput.h"

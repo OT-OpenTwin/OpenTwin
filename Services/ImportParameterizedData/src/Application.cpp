@@ -25,24 +25,20 @@
 // Open twin header
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "EntityInformation.h"
 #include "OTGui/TableRange.h"
-#include "OTGui/OnePropertyDialogCfg.h"
-#include "OTGui/PropertyInt.h"
+#include "OTGui/Dialog/OnePropertyDialogCfg.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
+#include "OTGui/Properties/PropertyInt.h"
 #include "EntityFileCSV.h"
 #include "CategorisationFolderNames.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-//Application specific includes
 #include "TemplateDefaultManager.h"
-#include <string>
-#include <rapidjson/document.h>
-#include <rapidjson/rapidjson.h>
 #include "DatasetOverviewVisualiser.h"
 #include "EntityMetadataSeries.h"
-#include "OTServiceFoundation/UILockWrapper.h"
-#include "OTGui/PainterRainbowIterator.h"
 
 #include "EntityAPI.h"
 #include "GridFSFileInfo.h"
@@ -50,6 +46,11 @@
 #include "DocumentAPI.h"
 #include "EntityBatchImporter.h"
 #include "InvalidUID.h"
+
+#include <rapidjson/rapidjson.h>
+#include <rapidjson/document.h>
+
+#include <string>
 
 Application * g_instance{ nullptr };
 

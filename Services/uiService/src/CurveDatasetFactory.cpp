@@ -17,21 +17,24 @@
 // limitations under the License.
 // @otlicense-end
 
+// OpenTwin header
 #include "CurveDatasetFactory.h"
 #include "ContainerFlexibleOwnership.h"
-#include "OTCore/TypeNames.h"
-#include "OTCore/RuntimeTests.h"
-#include "OTGui/StyleRefPainter2D.h"
-#include "AdvancedQueryBuilder.h"
-#include "OTCore/ExplicitStringValueConverter.h"
 #include "OTCore/String.h"
-#include "bsoncxx/json.hpp"
+#include "OTCore/TypeNames.h"
+#include "OTCore/EntityName.h"
+#include "OTCore/RuntimeTests.h"
+#include "OTCore/ExplicitStringValueConverter.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "AdvancedQueryBuilder.h"
 #include "Datapoints.h"
 #include "ShortParameterDescription.h"
 #include "AppBase.h"
-#include "OTCore/EntityName.h"
-#include "OTGui/PainterRainbowIterator.h"
 #include "CurveColourSetter.h"
+
+// BSONCXX header
+#include "bsoncxx/json.hpp"
 
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {

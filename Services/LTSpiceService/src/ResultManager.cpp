@@ -33,9 +33,9 @@
 #include "QuantityDescriptionCurve.h"
 #include "QuantityDescriptionCurveComplex.h"
 
-#include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/FolderNames.h"
-#include "OTGui/PainterRainbowIterator.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include "EntityFile.h"
 #include "EntityAPI.h"

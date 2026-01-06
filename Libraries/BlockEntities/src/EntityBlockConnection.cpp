@@ -19,9 +19,9 @@
 
 #include "EntityBlockConnection.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/GraphicsPackage.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
 #include "ConfigurationHelper.h"
 
 static EntityFactoryRegistrar<EntityBlockConnection> registrar(EntityBlockConnection::className());

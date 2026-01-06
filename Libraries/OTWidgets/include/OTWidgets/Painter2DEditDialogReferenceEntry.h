@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Painter2DDialogFilter.h"
+#include "OTGui/Dialog/Painter2DDialogFilter.h"
 #include "OTWidgets/Painter2DEditDialogEntry.h"
 
 namespace ot {

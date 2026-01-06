@@ -20,7 +20,7 @@
 #pragma once
 
 #include "OTCore/JSON.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 
 #include <qobject.h>
 #include <qstring.h>

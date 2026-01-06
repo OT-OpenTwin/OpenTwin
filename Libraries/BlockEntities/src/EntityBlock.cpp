@@ -19,7 +19,7 @@
 
 #include "EntityBlock.h"
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTCommunication/ActionTypes.h"
 
 #include "EntityBlock.h"

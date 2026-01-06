@@ -35,7 +35,7 @@ class TopoDS_Shape;
 #include <vector>
 #include <map>
 
-#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 
 class ModelBuilder
 {

@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTModelAPI/OTModelAPIExport.h"
 #include "EntityBase.h"
 #include "NewModelStateInfo.h"

@@ -21,7 +21,7 @@
 #include "GraphicsItemDesignerPreview.h"
 
 // OpenTwin header
-#include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItemFactory.h"

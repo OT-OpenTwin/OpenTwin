@@ -18,8 +18,11 @@
 // @otlicense-end
 
 #pragma once
+
+// OpenTwin header
 #include "OTGui/Plot1DCurveCfg.h"
-#include "OTGui/PainterRainbowIterator.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
+
 class CurveColourSetter
 {
 public:

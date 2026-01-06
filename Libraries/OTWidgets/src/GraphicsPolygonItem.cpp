@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/GraphicsPolygonItemCfg.h"
+#include "OTGui/Graphics/GraphicsPolygonItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsPolygonItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"

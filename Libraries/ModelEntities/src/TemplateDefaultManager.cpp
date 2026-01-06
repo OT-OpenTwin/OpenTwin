@@ -21,7 +21,7 @@
 #include <cassert>
 
 #include "OTSystem/OTAssert.h"
-#include "OTGui/FillPainter2D.h"
+#include "OTGui/Painter/FillPainter2D.h"
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
 

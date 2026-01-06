@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/FactoryTemplate.h"
-#include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
 
 // std header
 #include <string>

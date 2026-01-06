@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/RadialGradientPainter2D.h"
+#include "OTGui/Painter/RadialGradientPainter2D.h"
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/DoubleSpinBox.h"

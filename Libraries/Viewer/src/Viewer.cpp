@@ -35,14 +35,14 @@
 #include "TransformManipulator.h"
 
 #include "OTSystem/OTAssert.h"
-#include "OTGui/Property.h"
-#include "OTGui/PropertyInt.h"
-#include "OTGui/PropertyBool.h"
-#include "OTGui/PropertyColor.h"
-#include "OTGui/PropertyDouble.h"
-#include "OTGui/PropertyString.h"
-#include "OTGui/PropertyStringList.h"
-#include "OTGui/PropertyGroup.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyInt.h"
+#include "OTGui/Properties/PropertyBool.h"
+#include "OTGui/Properties/PropertyColor.h"
+#include "OTGui/Properties/PropertyGroup.h"
+#include "OTGui/Properties/PropertyDouble.h"
+#include "OTGui/Properties/PropertyString.h"
+#include "OTGui/Properties/PropertyStringList.h"
 #include "OTWidgets/GlobalColorStyle.h"
 
 #include <qobject.h>

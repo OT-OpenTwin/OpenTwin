@@ -23,7 +23,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/WidgetViewBase.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 
 // Qt header
 #include <QtCore/qstring.h>

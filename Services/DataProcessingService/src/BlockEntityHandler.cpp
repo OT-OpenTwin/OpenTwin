@@ -17,11 +17,12 @@
 // limitations under the License.
 // @otlicense-end
 
+#include "EntityAPI.h"
 #include "BlockEntityHandler.h"
 #include "EntityBlockDatabaseAccess.h"
-#include "OTGui/StyleRefPainter2D.h"
+#include "OTCore/ComparisionSymbols.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTCommunication/ActionTypes.h"
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include "Application.h"
@@ -32,7 +33,6 @@
 #include "EntityBlockDisplay.h"
 #include "EntityBlockFileWriter.h"
 #include "SharedResources.h"
-#include "OTCore/ComparisionSymbols.h"
 
 void BlockEntityHandler::createBlockPicker()
 {

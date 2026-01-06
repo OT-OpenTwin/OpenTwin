@@ -21,7 +21,7 @@
 
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTWidgets/WidgetBase.h"
 
 #include <QMainWindow>

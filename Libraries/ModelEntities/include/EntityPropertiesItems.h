@@ -21,8 +21,8 @@
 #pragma warning(disable : 4251)
 
 // OpenTwin header
-#include "OTGui/PropertyGridCfg.h"
-#include "OTGui/Painter2DDialogFilter.h"
+#include "OTGui/Dialog/Painter2DDialogFilter.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "ModelEntitiesAPIExport.h"
 
 // std header

@@ -23,7 +23,7 @@
 #include "EntityProperties.h"
 #include "EntityBlockHierarchicalContainerItem.h"
 
-#include "OTGui/GraphicsHierarchicalProjectItemBuilder.h"
+#include "OTGui/Graphics/GraphicsHierarchicalProjectItemBuilder.h"
 
 static EntityFactoryRegistrar<EntityBlockHierarchicalContainerItem> registrar(EntityBlockHierarchicalContainerItem::className());
 

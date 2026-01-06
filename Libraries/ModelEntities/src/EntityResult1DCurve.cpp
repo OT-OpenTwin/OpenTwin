@@ -21,11 +21,11 @@
 #include "PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/EntityName.h"
-#include "OTGui/Painter2D.h"
 #include "OTGui/ColorStyleTypes.h"
-#include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/VisualisationTypes.h"
-#include "OTGui/Painter2DDialogFilterDefaults.h"
+#include "OTGui/Dialog/Painter2DDialogFilterDefaults.h"
+#include "OTGui/Painter/Painter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 
 static EntityFactoryRegistrar<EntityResult1DCurve> registrar("EntityResult1DCurve");
 

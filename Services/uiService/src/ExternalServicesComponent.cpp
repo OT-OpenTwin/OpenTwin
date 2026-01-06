@@ -55,15 +55,15 @@
 // OpenTwin Gui header
 #include "OTGui/GuiTypes.h"
 #include "OTGui/TableRange.h"
-#include "OTGui/GraphicsPackage.h"
-#include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/MessageDialogCfg.h"
-#include "OTGui/PropertyDialogCfg.h"
-#include "OTGui/PropertyStringList.h"
-#include "OTGui/OnePropertyDialogCfg.h"
-#include "OTGui/GraphicsLayoutItemCfg.h"
-#include "OTGui/SelectEntitiesDialogCfg.h"
 #include "OTGui/VisualisationCfg.h"
+#include "OTGui/Dialog/MessageDialogCfg.h"
+#include "OTGui/Dialog/PropertyDialogCfg.h"
+#include "OTGui/Dialog/OnePropertyDialogCfg.h"
+#include "OTGui/Dialog/SelectEntitiesDialogCfg.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsLayoutItemCfg.h"
+#include "OTGui/Properties/PropertyStringList.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/Table.h"

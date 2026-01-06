@@ -19,9 +19,9 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/Painter2D.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/Painter2DFactory.h"
+#include "OTGui/Painter/Painter2D.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/Painter2DFactory.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/ColorStyleValue.h"
 

@@ -25,8 +25,8 @@
 #include "EntityBlock.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/FolderNames.h"
-#include "OTGui/GraphicsConnectionCfg.h"
-#include "OTGui/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "EntityBlockConnection.h"
 
 class BlockEntityHandler : public BusinessLogicHandler

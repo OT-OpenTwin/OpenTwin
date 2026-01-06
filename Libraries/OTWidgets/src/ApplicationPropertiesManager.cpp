@@ -19,8 +19,8 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/Property.h"
-#include "OTGui/PropertyGroup.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyGroup.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/ApplicationPropertiesManager.h"
 

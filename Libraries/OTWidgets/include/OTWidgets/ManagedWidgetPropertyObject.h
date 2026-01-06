@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/ManagedPropertyObjectBase.h"
+#include "OTGui/Properties/ManagedPropertyObjectBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 namespace ot {

@@ -61,7 +61,7 @@
 
 #include "QuantityDescriptionCurve.h"
 #include "OTCore/FolderNames.h"
-#include "OTGui/PainterRainbowIterator.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
 
 MicroServiceInterfaceFITTDSolver::~MicroServiceInterfaceFITTDSolver()
 {

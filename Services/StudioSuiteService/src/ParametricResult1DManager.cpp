@@ -22,12 +22,12 @@
 #include "Result1DManager.h"
 #include "ParametricResult1DManager.h"
 
+#include "OTCore/FolderNames.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "OTCore/FolderNames.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTGui/PainterRainbowIterator.h"
 
 #include "ResultCollectionExtender.h"
 #include "MetadataSeries.h"

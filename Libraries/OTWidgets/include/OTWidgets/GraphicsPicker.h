@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/BasicServiceInformation.h"
-#include "OTGui/GraphicsPickerCollectionCfg.h"
+#include "OTGui/Graphics/GraphicsPickerCollectionCfg.h"
 #include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 

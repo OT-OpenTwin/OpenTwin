@@ -1,0 +1,269 @@
+// @otlicense
+// File: GraphicsFlowItemBuilder.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin header
+#include "OTCore/Color.h"
+#include "OTGui/Margins.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsTriangleItemCfg.h"
+
+namespace ot {
+
+	class GraphicsGridLayoutItemCfg;
+
+	class Painter2D;
+
+	class OT_GUI_API_EXPORT GraphicsFlowItemConnector {
+		OT_DECL_NOMOVE(GraphicsFlowItemConnector)
+	public:
+		enum ConnectorFigure {
+			Square,
+			TriangleRight,
+			TriangleLeft,
+			TriangleUp,
+			TriangleDown,
+			KiteRight,
+			KiteLeft,
+			KiteUp,
+			KiteDown,
+			IceConeRight,
+			IceConeLeft,
+			IceConeUp,
+			IceConeDown,
+			Circle
+		};
+
+		GraphicsFlowItemConnector();
+		GraphicsFlowItemConnector(const GraphicsFlowItemConnector& _other);
+		virtual ~GraphicsFlowItemConnector();
+		GraphicsFlowItemConnector& operator = (const GraphicsFlowItemConnector& _other);
+
+		void setName(const std::string& _name) { m_name = _name; };
+		const std::string& getName() const { return m_name; };
+
+		void setText(const std::string& _text) { m_text = _text; };
+		const std::string& getText() const { return m_text; };
+
+		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
+		const std::string& getToolTip() const { return m_toolTip; };
+
+		void setFont(const ot::Font& _font) { m_font = _font; };
+		const ot::Font& getFont() const { return m_font; };
+
+		void setTextColor(const ot::Color& _color) { m_textColor = _color; };
+		const ot::Color& getTextColor() const { return m_textColor; };
+
+		//! @brief Set custom primary painter.
+		//! Connector takes ownership of the painter.
+		//! Existing painter will be destroyed before replacing.
+		void setCustomPrimaryPainter(ot::Painter2D* _painter);
+		const ot::Painter2D* getCustomPrimaryPainter() const { return m_customPrimaryPainter; };
+
+		//! @brief Set custom secondary painter.
+		//! Connector takes ownership of the painter.
+		//! Existing painter will be destroyed before replacing.
+		void setCustomSecondaryPainter(ot::Painter2D* _painter);
+		const ot::Painter2D* getCustomSecondaryPainter() const { return m_customSecondaryPainter; };
+
+		void setFigure(GraphicsFlowItemConnector::ConnectorFigure _figure) { m_figure = _figure; };
+		GraphicsFlowItemConnector::ConnectorFigure getFigure() const { return m_figure; };
+
+		void addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft) const;
+
+	private:
+		Painter2D* createPrimaryPainter() const;
+		Painter2D* createSecondaryPainter() const;
+
+		ot::GraphicsItemCfg* createConnectorItem() const;
+		ot::GraphicsItemCfg* createSquareItem() const;
+		ot::GraphicsItemCfg* createCircleItem() const;
+		ot::GraphicsItemCfg* createTriangleItem(GraphicsTriangleItemCfg::TriangleDirection _direction, GraphicsTriangleItemCfg::TriangleShape _shape) const;
+
+		std::string m_name;
+		std::string m_text;
+		std::string m_toolTip;
+		ConnectorFigure m_figure;
+		ot::Color m_textColor;
+		ot::Font m_font;
+		ot::Painter2D* m_customPrimaryPainter;
+		ot::Painter2D* m_customSecondaryPainter;
+	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	class OT_GUI_API_EXPORTONLY GraphicsFlowItemBuilder {
+		OT_DECL_NOCOPY(GraphicsFlowItemBuilder)
+		OT_DECL_NOMOVE(GraphicsFlowItemBuilder)
+	public:
+		enum BackgroundImageInsertMode {
+			OnLayout,
+			OnStack
+		};
+
+		//! @brief Creates a GraphicsItemCfg in the "OpenTwin flow block" style that takes the current configuration into account.
+		//! The callee takes ownership of the item.
+		ot::GraphicsItemCfg* createGraphicsItem() const;
+
+		GraphicsFlowItemBuilder();
+		virtual ~GraphicsFlowItemBuilder();
+
+		//! @brief Sets the name for the root item
+		//! The item name will be used as a prefix for the created child items (layouts and stacks)
+		void setName(const std::string& _name) { m_name = _name; };
+
+		//! @brief Item name
+		const std::string& getName() const { return m_name; };
+
+		//! @brief Sets the title that will be displayed to the user
+		void setTitle(const std::string& _title) { m_title = _title; };
+
+		//! @brief Item title
+		const std::string& getTitle() const { return m_title; };
+
+		//! @brief Set the item tool tip
+		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
+
+		//! @brief Set the item tool tip
+		const std::string& getToolTip() const { return m_toolTip; };
+
+		//! @brief Add a connector on the left side of the FlowItem
+		//! The default connector style will be applied
+		//! @param _name Connector name
+		//! @param _title Connector title
+		//! @param _figure Conector figure
+		void addLeft(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure);
+
+		//! @brief Add a connector on the left side of the FlowItem
+		//! The default connector style will be applied
+		//! @param _name Connector name
+		//! @param _title Connector title
+		//! @param _figure Conector figure
+		void addLeft(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::DefaultColor _color);
+
+		//! @brief Add a connector on the left side of the FlowItem
+		//! The default connector style will be applied
+		//! @param _name Connector name
+		//! @param _title Connector title
+		//! @param _figure Conector figure
+		void addLeft(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, const ot::Color& _color);
+
+		//! @brief Add the provided connector as input
+		//! @param _input Connector configuration
+		void addLeft(const GraphicsFlowItemConnector& _left);
+
+		//! @brief Add a connector on the right side of the FlowItem
+		//! The default connector style will be applied
+		//! @param _name Connector name
+		//! @param _title Connector title
+		//! @param _figure Connector figure
+		void addRight(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure);
+
+		//! @brief Add a connector on the right side of the FlowItem
+		//! The default connector style will be applied
+		//! @param _name Connector name
+		//! @param _title Connector title
+		//! @param _figure Connector figure
+		void addRight(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::DefaultColor _color);
+
+		//! @brief Add a connector on the right side of the FlowItem
+		//! The default connector style will be applied
+		//! @param _name Connector name
+		//! @param _title Connector title
+		//! @param _figure Connector figure
+		void addRight(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, const ot::Color& _color);
+
+		//! @brief Add the provided connector as output
+		//! @param _input Connector configuration
+		void addRight(const GraphicsFlowItemConnector& _right);
+
+		//! @brief Replace the current title background painter
+		//! The item takes ownership
+		void setTitleBackgroundPainter(ot::Painter2D* _painter);
+
+		//! @brief Sets the title background color
+		//! Creates a FillPainter2D and replace the current title background painter
+		void setTitleBackgroundColor(const ot::Color& _color);
+
+		//! @brief Sets the title background painter
+		//! Creates a LinearGradientPainter2D and replace the current title background painter
+		void setTitleBackgroundGradientColor(const ot::Color& _color);
+
+		//! @brief Sets the title background color
+		//! Will create a FillPainter2D and replace the current title background painter
+		inline void setTitleBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setTitleBackgroundColor(ot::Color(_r, _g, _b, _a)); };
+
+		//! @brief Replace the current title foreground painter
+		//! The item takes ownership
+		void setTitleForegroundPainter(ot::Painter2D* _painter);
+
+		//! @brief Sets the title foreground painter
+		//! Create a FillPainter2D and replace the current title foreground painter
+		void setTitleForegroundColor(const ot::Color& _color);
+
+		//! @brief Sets the title foreground painter
+		//! Create a LinearGradientPainter2D and replace the current title foreground painter
+		//! @param _color The primary text color, other colors are calculated by 255-color
+		void setDefaultTitleForegroundGradient();
+
+		//! @brief Sets the default connector style
+		//! The new default style will only affect items added after settings the style.
+		//! The defualt style is applied to connetors added via addInput() or addOutput() (with exceptions, see function comments)
+		void setDefaultConnectorStyle(const GraphicsFlowItemConnector& _config) { m_defaultConnectorStyle = _config; };
+		const GraphicsFlowItemConnector& getDefaultConnectorStyle() const { return m_defaultConnectorStyle; };
+
+		void setBackgroundImagePath(const std::string& _path) { m_backgroundImagePath = _path; };
+		void setBackgroundImageAlignment(ot::Alignment _align) { m_backgroundImageAlignment = _align; };
+		void setBackgroundImageMargins(const ot::MarginsD& _margins) { m_backgroundImageMargins = _margins; };
+		void setBackgroundImageInsertMode(BackgroundImageInsertMode _mode) { m_backgroundImageInsertMode = _mode; };
+		void setBackgroundImageMaintainAspectRatio(bool _active) { m_backgroundImageMaintainAspectRatio = _active; };
+
+		void setLeftTitleCornerImagePath(const std::string& _path) { m_leftTitleImagePath = _path; };
+
+		void setRightTitleCornerImagePath(const std::string& _path) { m_rightTitleImagePath = _path; };
+
+	private:
+		std::string m_name;
+		std::string m_title;
+		std::string m_toolTip;
+
+		ot::Painter2D* m_titleBackgroundPainter;
+		ot::Painter2D* m_titleForegroundPainter;
+
+		std::string m_leftTitleImagePath;
+		std::string m_rightTitleImagePath;
+
+		std::string m_backgroundImagePath;
+		ot::Alignment m_backgroundImageAlignment;
+		ot::MarginsD m_backgroundImageMargins;
+		BackgroundImageInsertMode m_backgroundImageInsertMode;
+		bool m_backgroundImageMaintainAspectRatio;
+
+		GraphicsFlowItemConnector m_defaultConnectorStyle;
+
+		std::list<GraphicsFlowItemConnector> m_left;
+		std::list<GraphicsFlowItemConnector> m_right;
+	};
+
+}

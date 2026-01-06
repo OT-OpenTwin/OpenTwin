@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/ModelLibraryDialogCfg.h"
+#include "OTGui/Dialog/ModelLibraryDialogCfg.h"
 #include "OTWidgets/Dialog.h"
 
 // std header

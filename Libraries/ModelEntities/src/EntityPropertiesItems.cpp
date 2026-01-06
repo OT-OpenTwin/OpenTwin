@@ -25,17 +25,17 @@
 #include "TemplateDefaultManager.h"
 
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/Property.h"
-#include "OTGui/PropertyInt.h"
-#include "OTGui/PropertyBool.h"
-#include "OTGui/PropertyGroup.h"
-#include "OTGui/PropertyColor.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/PropertyDouble.h"
-#include "OTGui/PropertyString.h"
-#include "OTGui/Painter2DFactory.h"
-#include "OTGui/PropertyPainter2D.h"
-#include "OTGui/PropertyStringList.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/Painter2DFactory.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyInt.h"
+#include "OTGui/Properties/PropertyBool.h"
+#include "OTGui/Properties/PropertyGroup.h"
+#include "OTGui/Properties/PropertyColor.h"
+#include "OTGui/Properties/PropertyDouble.h"
+#include "OTGui/Properties/PropertyString.h"
+#include "OTGui/Properties/PropertyPainter2D.h"
+#include "OTGui/Properties/PropertyStringList.h"
 
 EntityPropertiesBase::EntityPropertiesBase()
 	: m_container(nullptr), m_needsUpdateFlag(false), m_multipleValues(false), m_readOnly(false), m_protectedProperty(true),

@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/PropertyManager.h"
+#include "OTGui/Properties/PropertyManager.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header

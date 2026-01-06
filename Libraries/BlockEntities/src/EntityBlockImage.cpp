@@ -23,8 +23,8 @@
 #include "EntityBinaryData.h"
 #include "EntityProperties.h"
 #include "EntityBlockImage.h"
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/GraphicsImageItemCfg.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Graphics/GraphicsImageItemCfg.h"
 
 static EntityFactoryRegistrar<EntityBlockImage> registrar(EntityBlockImage::className());
 

@@ -27,7 +27,7 @@
 #include "OTCore/LogDispatcher.h"
 #include "MetadataEntityInterface.h"
 #include "CurveFactory.h"
-#include "OTGui/PainterRainbowIterator.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
 #include "QueuingHttpRequestsRAII.h"
 
 PlotHandler::PlotHandler() {

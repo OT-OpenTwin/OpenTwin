@@ -25,7 +25,7 @@
 //Service Header
 
 //Ot Header
-#include "OTGui/GraphicsConnectionCfg.h"
+#include "OTGui/Graphics/GraphicsConnectionCfg.h"
 
 class Connection : public ot::GraphicsConnectionCfg
 {

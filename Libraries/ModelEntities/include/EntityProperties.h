@@ -25,7 +25,7 @@
 
 #include "EntityPropertiesItems.h"
 
-#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 
 class EntityBase;
 

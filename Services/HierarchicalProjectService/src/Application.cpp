@@ -30,9 +30,9 @@
 #include "OTCore/ProjectInformation.h"
 
 // OpenTwin Gui header
-#include "OTGui/DialogCfg.h"
 #include "OTGui/FileExtension.h"
-#include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTGui/Dialog/DialogCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"

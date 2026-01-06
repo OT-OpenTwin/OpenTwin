@@ -22,8 +22,8 @@
 #include "PropertyHelper.h"
 #include "EntityProperties.h"
 #include "EntityBlockDecoLabel.h"
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/GraphicsTextItemCfg.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Graphics/GraphicsTextItemCfg.h"
 
 static EntityFactoryRegistrar<EntityBlockDecoLabel> registrar(EntityBlockDecoLabel::className());
 

@@ -25,7 +25,7 @@
 #include "OTCore/String.h"
 #include "OTCore/EntityName.h"
 #include "OTGui/FileExtension.h"
-#include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "DataBase.h"
 #include "ModelState.h"

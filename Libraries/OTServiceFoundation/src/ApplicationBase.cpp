@@ -21,8 +21,8 @@
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/ThisService.h"
 
-#include "OTGui/Property.h"
-#include "OTGui/PropertyGroup.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyGroup.h"
 #include "OTGuiAPI/GuiAPIManager.h"
 
 #include "OTCommunication/Msg.h"				// message sending

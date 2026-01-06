@@ -24,7 +24,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/CheckBox.h"

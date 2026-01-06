@@ -23,7 +23,7 @@
 
 // OpenTwin header
 #include "OTCore/ServiceBase.h"
-#include "OTGui/ModelLibraryDialogCfg.h"
+#include "OTGui/Dialog/ModelLibraryDialogCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 

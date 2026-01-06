@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/GraphicsVBoxLayoutItemCfg.h"
+#include "OTGui/Graphics/GraphicsVBoxLayoutItemCfg.h"
 #include "OTWidgets/GraphicsVBoxLayoutItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 

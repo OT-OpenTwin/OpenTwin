@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/GraphicsChangeEvent.h"
+#include "OTGui/Event/GraphicsChangeEvent.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // std header

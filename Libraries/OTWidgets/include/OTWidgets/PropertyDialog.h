@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/PropertyGridCfg.h"
-#include "OTGui/PropertyDialogCfg.h"
+#include "OTGui/Dialog/PropertyDialogCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTWidgets/Dialog.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 

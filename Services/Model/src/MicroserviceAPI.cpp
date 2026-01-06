@@ -34,10 +34,10 @@
 #include <chrono>
 #include <thread>
 
-#include "OTCore/LogDispatcher.h"
-#include "OTCore/ServiceBase.h"
 #include "OTCore/CoreTypes.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/LogDispatcher.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"

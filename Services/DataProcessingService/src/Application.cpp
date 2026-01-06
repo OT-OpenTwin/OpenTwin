@@ -27,22 +27,22 @@
 #include "OTCore/EntityName.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
-#include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/UILockWrapper.h"
+#include "OTServiceFoundation/ProgressUpdater.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 #include "TemplateDefaultManager.h"
 #include "EntityAPI.h"
-#include "OTModelAPI/ModelServiceAPI.h"
 #include "Helper.h"
 
 #include "EntitySolverDataProcessing.h"
 
-#include "OTServiceFoundation/UILockWrapper.h"
 
-#include "OTServiceFoundation/ProgressUpdater.h"
 
 
 Application * g_instance{ nullptr };

@@ -1,0 +1,93 @@
+// @otlicense
+// File: PropertyPainter2D.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin header
+#include "OTGui/Properties/Property.h"
+#include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/Dialog/Painter2DDialogFilter.h"
+
+namespace ot {
+
+	class Painter2D;
+
+	class OT_GUI_API_EXPORT PropertyPainter2D : public Property {
+		OT_DECL_NOCOPY(PropertyPainter2D)
+		OT_DECL_NOMOVE(PropertyPainter2D)
+	public:
+		using PropertyValueType = Painter2D*;
+
+		explicit PropertyPainter2D(const PropertyPainter2D* _other);
+		explicit PropertyPainter2D(const PropertyBase& _base);
+
+		//! @brief Creates new instance.
+		//! Object creates and takes ownership of the painter.
+		explicit PropertyPainter2D(PropertyFlags _flags = PropertyFlags(NoFlags));
+
+		//! @brief Creates new instance.
+		//! Object takes ownership of the painter.
+		explicit PropertyPainter2D(Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
+
+		//! @brief Creates new instance.
+		//! Object creates copy the painter.
+		explicit PropertyPainter2D(const Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
+
+		//! @brief Creates new instance.
+		//! Object takes ownership of the painter.
+		explicit PropertyPainter2D(const std::string& _name, Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
+
+		//! @brief Creates new instance.
+		//! Object creates copy the painter.
+		explicit PropertyPainter2D(const std::string& _name, const Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
+		virtual ~PropertyPainter2D();
+
+		static std::string propertyTypeString(void) { return "Painter2D"; };
+		virtual std::string getPropertyType(void) const override { return PropertyPainter2D::propertyTypeString(); };
+
+		virtual void mergeWith(const Property* _other, const MergeMode& _mergeMode) override;
+
+		virtual Property* createCopy(void) const override;
+
+		//! @brief Set the painter for this property.
+		//! Object takes ownership of the painter.
+		void setPainter(Painter2D* _painter);
+		const Painter2D* getPainter(void) const { return m_painter; };
+
+		void setFilter(const Painter2DDialogFilter& _filter) { m_filter = _filter; };
+		const Painter2DDialogFilter& getFilter() const { return m_filter; };
+
+	protected:
+		//! @brief Add the property data to the provided JSON object
+		//! The property type is already added
+		//! @param _object Json object reference
+		//! @param _allocator Allocator
+		virtual void getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
+
+		//! @brief Set the property data from the provided JSON object
+		//! @param _object The JSON object containing the information
+		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
+		virtual void setPropertyData(const ot::ConstJsonObject& _object) override;
+
+	private:
+		Painter2D* m_painter;
+		Painter2DDialogFilter m_filter;
+	};
+
+}

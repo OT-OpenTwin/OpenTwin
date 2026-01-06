@@ -28,10 +28,11 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
+#include "OTCore/EntityName.h"
 #include "OTCore/FolderNames.h"
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/GraphicsConnectionCfg.h"
-#include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTGui/Graphics/GraphicsConnectionCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 #include "OTCommunication/ActionTypes.h"
 #include "EntityBlock.h"
 #include "EntityBlockConnection.h"
@@ -40,7 +41,6 @@
 #include "EntityBlockCircuitElement.h"
 #include "EntityBlockCircuitConnector.h"
 #include "PropertyHelper.h"
-#include "OTCore/EntityName.h"
 
 void BlockHandler::processEntity(EntityBase* _entBase) {
 	if (_entBase == nullptr) {

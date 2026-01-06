@@ -23,9 +23,9 @@
 #include "GraphicsItemDesignerNavigation.h"
 
 // OpenTwin header
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/GraphicsLineItemCfg.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Graphics/GraphicsLineItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 

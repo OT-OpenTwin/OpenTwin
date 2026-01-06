@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/Painter2DEditDialogReferenceEntry.h"
 

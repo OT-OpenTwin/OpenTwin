@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/GraphicsHBoxLayoutItemCfg.h"
+#include "OTGui/Graphics/GraphicsHBoxLayoutItemCfg.h"
 #include "OTWidgets/GraphicsHBoxLayoutItem.h"
 
 ot::GraphicsHBoxLayoutItem::GraphicsHBoxLayoutItem(QGraphicsLayoutItem* _parentItem)

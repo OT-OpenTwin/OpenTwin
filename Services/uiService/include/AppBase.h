@@ -36,19 +36,19 @@
 #include "OTCore/AbstractLogNotifier.h"
 
 // OpenTwin Gui header
-#include "OTGui/Property.h"
 #include "OTGui/TableCfg.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/TextEditorCfg.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"
-#include "OTGui/GraphicsPackage.h"
-#include "OTGui/PropertyGridCfg.h"
-#include "OTGui/MessageDialogCfg.h"
 #include "OTGui/VisualisationCfg.h"
-#include "OTGui/GraphicsChangeEvent.h"
 #include "OTGui/ExtendedProjectInformation.h"
+#include "OTGui/Dialog/MessageDialogCfg.h"
+#include "OTGui/Event/GraphicsChangeEvent.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/WidgetView.h"

@@ -7,12 +7,12 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/GraphicsLineItemCfg.h"
-#include "OTGui/GraphicsTextItemCfg.h"
-#include "OTGui/GraphicsGroupItemCfg.h"
-#include "OTGui/GraphicsEllipseItemCfg.h"
-#include "OTGui/GraphicsRectangularItemCfg.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Graphics/GraphicsLineItemCfg.h"
+#include "OTGui/Graphics/GraphicsTextItemCfg.h"
+#include "OTGui/Graphics/GraphicsGroupItemCfg.h"
+#include "OTGui/Graphics/GraphicsEllipseItemCfg.h"
+#include "OTGui/Graphics/GraphicsRectangularItemCfg.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/LineEdit.h"

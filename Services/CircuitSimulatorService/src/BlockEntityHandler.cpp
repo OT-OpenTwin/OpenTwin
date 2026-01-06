@@ -21,12 +21,14 @@
 #include "BlockEntityHandler.h"
 
 // Open twin header
-#include "OTCommunication/ActionTypes.h"
-#include "CircuitElement.h"
-#include "Connection.h"
 #include "EntityAPI.h"
+#include "Connection.h"
+#include "CircuitElement.h"
+#include "OTCore/EntityName.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
 
 //#include "ExternalDependencies.h"
 #include "Application.h"
@@ -46,8 +48,6 @@
 #include "PlotBuilder.h"
 #include "ResultCollectionExtender.h"
 #include "QuantityDescriptionCurve.h"
-#include "OTGui/PainterRainbowIterator.h"
-#include "OTCore/EntityName.h"
 
 // Third Party Header
 

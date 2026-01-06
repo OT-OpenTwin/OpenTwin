@@ -32,8 +32,8 @@
 #include "OTCore/FolderNames.h"
 
 #include "OTGui/GuiTypes.h"
-#include "OTGui/PropertyGridCfg.h"
-#include "OTGui/MessageDialogCfg.h"
+#include "OTGui/Dialog/MessageDialogCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "NewModelStateInfo.h"
 #include "OTCommunication/ActionHandler.h"

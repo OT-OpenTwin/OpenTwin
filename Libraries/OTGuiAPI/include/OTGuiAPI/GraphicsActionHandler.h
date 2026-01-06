@@ -21,12 +21,12 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
-#include "OTGui/GuiEvent.h"
-#include "OTGui/GraphicsPackage.h"
-#include "OTGui/GraphicsChangeEvent.h"
-#include "OTGui/GraphicsItemDropEvent.h"
-#include "OTGui/GraphicsDoubleClickEvent.h"
-#include "OTGui/GraphicsConnectionDropEvent.h"
+#include "OTGui/Event/GuiEvent.h"
+#include "OTGui/Event/GraphicsChangeEvent.h"
+#include "OTGui/Event/GraphicsItemDropEvent.h"
+#include "OTGui/Event/GraphicsDoubleClickEvent.h"
+#include "OTGui/Event/GraphicsConnectionDropEvent.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
