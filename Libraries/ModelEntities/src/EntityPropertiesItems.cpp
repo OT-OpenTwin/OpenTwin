@@ -806,9 +806,15 @@ bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase* other) const
 
 bool EntityPropertiesSelection::setValue(const std::string& s)
 {
-	if (std::find(m_options.begin(), m_options.end(), s) == m_options.end()) return false; // This value is not a valid option
+	if (std::find(m_options.begin(), m_options.end(), s) == m_options.end()) 
+	{
+		return false; // This value is not a valid option
+	}
 
-	if (m_value != s) setNeedsUpdate();
+	if (m_value != s) 
+	{
+		setNeedsUpdate();
+	}
 
 	m_value = s;
 	return true;

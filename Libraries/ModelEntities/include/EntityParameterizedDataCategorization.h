@@ -49,15 +49,15 @@ public:
 	bool getIsLocked() const { return m_locked; };
 
 private:
-	static const std::string c_dataCategoryGroup;
-	static const std::string c_defaultCategory;
-	static const std::string c_dataCategoryRMD;
-	static const std::string c_dataCategoryMSMD;
-	static const std::string c_dataCategoryParam;
-	static const std::string c_dataCategoryQuant;
+	static const std::string m_dataCategoryGroup;
+	static const std::string m_defaultCategory;
+	static const std::string m_dataCategoryRMD;
+	static const std::string m_dataCategoryMSMD;
+	static const std::string m_dataCategoryParam;
+	static const std::string m_dataCategoryQuant;
 
-	const std::string c_unlockedIcon = "Default/Categorization";
-	const std::string c_lockedIcon = "Default/CategorizationLocked";
+	const std::string m_unlockedIcon = "Default/Categorization";
+	const std::string m_lockedIcon = "Default/CategorizationLocked";
 	bool m_locked = false;
 
 	DataCategorie m_selectedCategory = UNKNOWN;
@@ -66,6 +66,6 @@ private:
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	virtual int getSchemaVersion() { return 1; };
 
-	static std::map<std::string, DataCategorie> g_stringDataCategorieMapping;
-	static std::map<DataCategorie, std::string> g_dataCategorieStringMapping;
+	static std::map<std::string, DataCategorie> m_stringDataCategorieMapping;
+	static std::map<DataCategorie, std::string> m_dataCategorieStringMapping;
 };
