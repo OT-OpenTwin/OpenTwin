@@ -41,13 +41,13 @@ namespace ot {
 
 		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 
-		virtual QMarginsF getOutlineMargins(void) const override;
+		virtual QMarginsF getOutlineMargins() const override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Base class functions: ot::CustomGraphicsItem
 
-		virtual QSizeF getPreferredGraphicsItemSize(void) const override;
+		virtual QSizeF getPreferredGraphicsItemSize() const override;
 
 	protected:
 
@@ -64,12 +64,13 @@ namespace ot {
 		void setLine(const Point2DD& _from, const Point2DD& _to);
 		void setLine(const QPointF& _from, const QPointF& _to);
 		void setLine(const QLineF& _line);
-		const Point2DD& getFrom(void) const;
-		const Point2DD& getTo(void) const;
-		QLineF getLine(void) const;
+		const Point2DD& getFrom() const;
+		const Point2DD& getTo() const;
+		QLineF getLine() const;
 
 		void setLineStyle(const PenFCfg& _style);
-		const PenFCfg& getLineStyle(void) const;
+		const PenFCfg& getLineStyle() const;
+
 	};
 
 

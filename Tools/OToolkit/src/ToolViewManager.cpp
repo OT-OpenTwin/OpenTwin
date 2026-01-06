@@ -140,7 +140,8 @@ void ToolViewManager::slotViewCloseRequested(ot::WidgetView* _view) {
 
 	const auto& it = m_viewMap.find(_view);
 	if (it == m_viewMap.end()) {
-		OT_LOG_E("View not found");
+		// View is not part of a tool, close it
+		ot::GlobalWidgetViewManager::instance().closeView(_view);
 		return;
 	}
 

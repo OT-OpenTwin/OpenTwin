@@ -144,3 +144,4 @@ const ot::PenFCfg& ot::GraphicsLineItem::getLineStyle(void) const {
 	const GraphicsLineItemCfg* cfg = this->getItemConfiguration<GraphicsLineItemCfg>();
 	return cfg->getLineStyle();
 }
+

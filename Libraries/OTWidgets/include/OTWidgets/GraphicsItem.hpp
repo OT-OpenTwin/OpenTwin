@@ -23,14 +23,14 @@
 #include "OTCore/LogDispatcher.h"
 
 template <class T>
-T* ot::GraphicsItem::getItemConfiguration(void) {
+T* ot::GraphicsItem::getItemConfiguration() {
 	T* ret = dynamic_cast<T*>(m_config);
 	OTAssertNullptr(ret);
 	return ret;
 }
 
 template <class T>
-const T* ot::GraphicsItem::getItemConfiguration(void) const {
+const T* ot::GraphicsItem::getItemConfiguration() const {
 	T* ret = dynamic_cast<T*>(m_config);
 	OTAssertNullptr(ret);
 	return ret;

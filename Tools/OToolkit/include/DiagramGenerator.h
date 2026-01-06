@@ -35,6 +35,7 @@ namespace ot {
 	class GraphicsLineItemCfg;
 	class GraphicsGroupItemCfg;
 	class GraphicsRectangularItemCfg;
+	class GraphicsDecoratedLineItemCfg;
 }
 
 class DiagramGenerator : public QObject, public otoolkit::Tool {
@@ -67,6 +68,14 @@ private:
 	enum class ParseSyntax {
 		Cpp
 	};
+
+	enum class CallFlag {
+		None        = 0,
+		ReturnCall  = 1 << 0,
+		ReverseCall = 1 << 1
+	};
+	typedef ot::Flags<CallFlag> CallFlags;
+	OT_ADD_FRIEND_FLAG_FUNCTIONS(CallFlag, CallFlags)
 
 	struct ParserData {
 		OT_DECL_DEFCOPY(ParserData)
@@ -163,10 +172,12 @@ private:
 		~SequenceCallItem() = default;
 
 		ot::GraphicsTextItemCfg* text = nullptr;
-		ot::GraphicsLineItemCfg* line = nullptr;
+		ot::GraphicsDecoratedLineItemCfg* line = nullptr;
 
 		QString fromLifeLine;
 		QString toLifeLine;
+
+		CallFlags flags = CallFlag::None;
 	};
 
 	struct SequenceLifeLineItem {
@@ -195,7 +206,7 @@ private:
 		double firstCallOffset = 20.;
 		double callTextLineSpacing = 2.;
 		double callTextMargin = 5.;
-		double callArrowHeadSize = 5.;
+		ot::Size2DD callArrowHeadSize = ot::Size2DD(5., 8.);
 		double callSpacing = 5.;
 		double callVStart = 0.; // Calculated start position
 		double callTextHeight = 0.; // Calculated height depending on font
@@ -289,7 +300,7 @@ private:
 	void clear(const SequenceCallItem& _callItem);
 
 	SequenceLifeLineItem generateNewLifeLineItem(const QString& _name, const SequenceViewData& _viewData);
-	void generateNewCallItem(SequenceLifeLineItem& _from, SequenceLifeLineItem& _to, SequenceViewData& _viewData, const QString& _callText, bool _isReturnCall);
+	void generateNewCallItem(SequenceLifeLineItem& _from, SequenceLifeLineItem& _to, SequenceViewData& _viewData, const QString& _callText, const CallFlags& _flags);
 
 	ot::Point2DD calculateNextLifeLinePosition(const SequenceViewData& _viewData);
 	ot::RectD calculateLifeLineTextBoxRect(const QString& _text, const SequenceViewData& _viewData, const ot::Point2DD& _position);

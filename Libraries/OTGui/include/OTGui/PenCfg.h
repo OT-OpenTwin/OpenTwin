@@ -102,6 +102,10 @@ namespace ot {
 		//! @param _other The other style.
 		PenCfg(const PenCfg& _other);
 
+		//! @brief Move constructor.
+		//! @param _other The other style.
+		PenCfg(PenCfg&& _other) noexcept;
+
 		//! @brief Destructor.
 		~PenCfg();
 
@@ -109,15 +113,19 @@ namespace ot {
 		//! @param _other The other style.
 		PenCfg& operator = (const PenCfg& _other);
 
+		//! @brief Move assignment operator.
+		//! @param _other The other style.
+		PenCfg& operator = (PenCfg&& _other) noexcept;
+
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
 		//! @param _allocator Allocator
-		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 		//! @brief Will set the object contents from the provided JSON object
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
-		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Set the color.
 		//! The current painter will be replaced by a FillPainter2D.
@@ -226,6 +234,10 @@ namespace ot {
 		//! @param _other The other style.
 		PenFCfg(const PenFCfg& _other);
 
+		//! @brief Move constructor.
+		//! @param _other The other style.
+		PenFCfg(PenFCfg&& _other) noexcept;
+
 		//! @brief Destructor.
 		~PenFCfg();
 
@@ -233,15 +245,19 @@ namespace ot {
 		//! @param _other The other style.
 		PenFCfg& operator = (const PenFCfg& _other);
 
+		//! @brief Move assignment operator.
+		//! @param _other The other style.
+		PenFCfg& operator = (PenFCfg&& _other) noexcept;
+
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
 		//! @param _allocator Allocator
-		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 
 		//! @brief Will set the object contents from the provided JSON object
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
-		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Set the color.
 		//! The current painter will be replaced by a FillPainter2D.

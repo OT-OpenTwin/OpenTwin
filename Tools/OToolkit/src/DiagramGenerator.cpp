@@ -13,6 +13,7 @@
 #include "OTGui/Graphics/GraphicsGroupItemCfg.h"
 #include "OTGui/Graphics/GraphicsEllipseItemCfg.h"
 #include "OTGui/Graphics/GraphicsRectangularItemCfg.h"
+#include "OTGui/Graphics/GraphicsDecoratedLineItemCfg.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/LineEdit.h"
@@ -409,8 +410,10 @@ DiagramGenerator::SequenceViewData DiagramGenerator::initializeSequenceViewData(
 	viewData.view = new ot::GraphicsView(nullptr);
 	WidgetView* view = createCentralWidgetView(viewData.view, _name);
 
-	view->getViewData().setViewFlag(WidgetViewBase::ViewIsCloseable, true);
-	view->getViewData().setViewFlag(WidgetViewBase::ViewDefaultCloseHandling, false);
+	WidgetViewBase vd = view->getViewData();
+	vd.setViewFlag(WidgetViewBase::ViewIsCloseable, true);
+	vd.setViewFlag(WidgetViewBase::ViewDefaultCloseHandling, false);
+	view->setViewData(vd);
 	
 	GlobalWidgetViewManager::instance().addView(BasicServiceInformation(), view);
 
@@ -418,7 +421,7 @@ DiagramGenerator::SequenceViewData DiagramGenerator::initializeSequenceViewData(
 
 	QFontMetrics cfm(QtFactory::toQFont(viewData.callFont));
 	viewData.callTextHeight = static_cast<double>(cfm.height());
-	viewData.callVSeparation = viewData.callTextHeight + viewData.callSpacing + viewData.callArrowHeadSize + viewData.callTextLineSpacing;
+	viewData.callVSeparation = viewData.callTextHeight + viewData.callSpacing + (viewData.callArrowHeadSize.height()) + viewData.callTextLineSpacing;
 
 	// Finally calculate call starting position
 	RectD titleRect = calculateLifeLineTextBoxRect("Title", viewData, Point2DD());
@@ -838,10 +841,10 @@ void DiagramGenerator::generateSequenceDiagramCalls(const SequenceFunction& _fun
 		
 		// Create call item
 		if (callToRight) {
-			generateNewCallItem(fromLifeLineIt->second, toLifeLineIt->second, _viewData, call.text, false);
+			generateNewCallItem(fromLifeLineIt->second, toLifeLineIt->second, _viewData, call.text, CallFlag::None);
 		}
 		else {
-			generateNewCallItem(toLifeLineIt->second, fromLifeLineIt->second, _viewData, call.text, false);
+			generateNewCallItem(toLifeLineIt->second, fromLifeLineIt->second, _viewData, call.text, CallFlag::ReverseCall);
 		}
 
 		// Process subsequent calls
@@ -849,10 +852,10 @@ void DiagramGenerator::generateSequenceDiagramCalls(const SequenceFunction& _fun
 
 		// Return call
 		if (callToRight) {
-			generateNewCallItem(fromLifeLineIt->second, toLifeLineIt->second, _viewData, funcIt->second.returnValue.text, true);
+			generateNewCallItem(fromLifeLineIt->second, toLifeLineIt->second, _viewData, funcIt->second.returnValue.text, CallFlag::ReturnCall);
 		}
 		else {
-			generateNewCallItem(toLifeLineIt->second, fromLifeLineIt->second, _viewData, funcIt->second.returnValue.text, true);
+			generateNewCallItem(toLifeLineIt->second, fromLifeLineIt->second, _viewData, funcIt->second.returnValue.text, CallFlag::ReturnCall | CallFlag::ReverseCall);
 		}
 	}
 }
@@ -933,10 +936,13 @@ void DiagramGenerator::repositionCalls(SequenceViewData& _viewData) {
 
 			// Recalculate line x positions
 			const double destX = toLifeLineIt->second.group->getPosition().x() + toLifeLineIt->second.lifeLine->getPosition().x() - (_viewData.lifeLineProcessWidth / 2.);
+			
 			callItem.line->setPosition(ot::Point2DD(startX, callItem.line->getPosition().y()));
-			callItem.line->setFrom(ot::Point2DD(0., 0.));
 			callItem.line->setTo(ot::Point2DD(destX - startX, 0.));
-			callItem.text->setPosition(ot::Point2DD(startX + _viewData.callTextMargin, callItem.text->getPosition().y()));
+			callItem.text->setPosition(ot::Point2DD(
+				startX + _viewData.callTextMargin + (_viewData.callArrowHeadSize.width() / 2.), 
+				callItem.text->getPosition().y()
+			));
 		}
 	}
 }
@@ -1055,7 +1061,9 @@ DiagramGenerator::SequenceLifeLineItem DiagramGenerator::generateNewLifeLineItem
 	return lifeLine;
 }
 
-void DiagramGenerator::generateNewCallItem(SequenceLifeLineItem& _from, SequenceLifeLineItem& _to, SequenceViewData& _viewData, const QString& _callText, bool _isReturnCall) {
+void DiagramGenerator::generateNewCallItem(SequenceLifeLineItem& _from, SequenceLifeLineItem& _to, SequenceViewData& _viewData, const QString& _callText, const CallFlags& _flags) {
+	using namespace ot;
+
 	// Calculate y position
 	double callY = _viewData.callVStart + (_viewData.callVSeparation * static_cast<double>(_viewData.currentCallIndex));
 	_viewData.currentCallIndex++;
@@ -1064,28 +1072,57 @@ void DiagramGenerator::generateNewCallItem(SequenceLifeLineItem& _from, Sequence
 
 	// Create call line
 	SequenceCallItem callItem;
-	callItem.text = new ot::GraphicsTextItemCfg;
+	callItem.flags = _flags;
+
+	callItem.text = new GraphicsTextItemCfg;
 	callItem.text->setName(callName + "_Text");
 	callItem.text->setTextFont(_viewData.callFont);
 	callItem.text->setText(std::to_string(_viewData.currentCallIndex) + ": " + (_callText.isEmpty() ? "-" : _callText.toStdString()));
-	callItem.text->setPosition(ot::Point2DD(0., callY));
+	callItem.text->setPosition(Point2DD(0., callY));
 	callItem.text->setZValue(_viewData.callZValue);
-	callItem.text->setTextPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::SequenceMessageText));
+	callItem.text->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::SequenceMessageText));
 
 	callY += (_viewData.callTextLineSpacing + _viewData.callTextHeight);
 
-	callItem.line = new ot::GraphicsLineItemCfg;
+	callItem.line = new GraphicsDecoratedLineItemCfg;
 	callItem.line->setName(callName + "_Line");
-	callItem.line->setPosition(ot::Point2DD(0., callY));
-	callItem.line->setFrom(ot::Point2DD(0., 0));
-	callItem.line->setTo(ot::Point2DD(10., 0));
+	callItem.line->setPosition(Point2DD(0., callY));
+	callItem.line->setFrom(Point2DD(0., 0));
+	callItem.line->setTo(Point2DD(10., 0));
 	callItem.line->setZValue(_viewData.callZValue);
-	callItem.line->setPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::SequenceMessageArrow));
+	callItem.line->setPainter(new StyleRefPainter2D(ColorStyleValueEntry::SequenceMessageArrow));
 
-	if (_isReturnCall) {
-		ot::PenFCfg linePen = callItem.line->getLineStyle();
-		linePen.setStyle(ot::LineStyle::DashLine);
+	GraphicsDecorationCfg arrowHead(GraphicsDecorationCfg::VArrow);
+	arrowHead.setSize(_viewData.callArrowHeadSize);
+	arrowHead.setFillPainter(new StyleRefPainter2D(ColorStyleValueEntry::SequenceMessageArrow));
+
+	PenFCfg arrowPen = arrowHead.getOutlinePen();
+	arrowPen.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::SequenceMessageArrow));
+	arrowHead.setOutlinePen(arrowPen);
+
+	if (_flags & CallFlag::ReturnCall) {
+		PenFCfg linePen = callItem.line->getLineStyle();
+		linePen.setStyle(LineStyle::DashLine);
 		callItem.line->setLineStyle(linePen);
+
+		arrowHead.setSymbol(GraphicsDecorationCfg::VArrow);
+
+		if (_flags & CallFlag::ReverseCall) {
+			callItem.line->setToDecoration(arrowHead);
+		}
+		else {
+			callItem.line->setFromDecoration(arrowHead);
+		}
+	}
+	else {
+		arrowHead.setSymbol(GraphicsDecorationCfg::Arrow);	
+
+		if (_flags & CallFlag::ReverseCall) {
+			callItem.line->setFromDecoration(arrowHead);
+		}
+		else {
+			callItem.line->setToDecoration(arrowHead);
+		}
 	}
 
 	callItem.fromLifeLine = _from.name;
@@ -1093,7 +1130,7 @@ void DiagramGenerator::generateNewCallItem(SequenceLifeLineItem& _from, Sequence
 
 	_from.calls.push_back(std::move(callItem));
 
-	double lifeLineEndY = callY + _viewData.callArrowHeadSize + _viewData.firstCallOffset;
+	double lifeLineEndY = callY + (_viewData.callArrowHeadSize.height() / 2.) + _viewData.firstCallOffset;
 
 	_from.lifeLine->setTo(ot::Point2DD(0., lifeLineEndY - _from.lifeLine->getPosition().y()));
 	_to.lifeLine->setTo(ot::Point2DD(0., lifeLineEndY - _from.lifeLine->getPosition().y()));

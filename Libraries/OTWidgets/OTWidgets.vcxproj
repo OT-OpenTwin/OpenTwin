@@ -74,6 +74,8 @@
     <ClCompile Include="src\FlowLayout.cpp" />
     <ClCompile Include="src\GlobalWidgetViewManager.cpp" />
     <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp" />
+    <ClCompile Include="src\GraphicsDecoratedLineItem.cpp" />
+    <ClCompile Include="src\GraphicsDecoration.cpp" />
     <ClCompile Include="src\GraphicsDisconnectItem.cpp" />
     <ClCompile Include="src\GraphicsPickerManager.cpp" />
     <ClCompile Include="src\GraphicsSnapInfo.cpp" />
@@ -289,6 +291,8 @@
     <ClInclude Include="include\OTWidgets\CustomValidator.h" />
     <ClInclude Include="include\OTWidgets\FlowLayout.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsDecoratedLineItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsDecoration.h" />
     <ClInclude Include="include\OTWidgets\GraphicsDisconnectItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerManager.h" />
     <ClInclude Include="include\OTWidgets\GraphicsSnapInfo.h" />

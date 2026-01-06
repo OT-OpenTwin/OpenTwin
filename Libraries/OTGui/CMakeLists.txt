@@ -93,6 +93,8 @@ set(OTGUI_HEADER_FILES
     include/OTGui/Event/GraphicsItemDropEvent.h
     include/OTGui/Graphics/GraphicsArcItemCfg.h
     include/OTGui/Graphics/GraphicsConnectionCalculationData.h
+    include/OTGui/Graphics/GraphicsDecorationCfg.h
+    include/OTGui/Graphics/GraphicsDecoratedLineItemCfg.h
     include/OTGui/Graphics/GraphicsGroupItemCfg.h
     include/OTGui/Graphics/GraphicsInvisibleItemCfg.h
     include/OTGui/Graphics/GraphicsItemCfgFactory.h
@@ -242,6 +244,8 @@ set(OTGUI_SOURCE_FILES
     src/Graphics/BasicGraphicsIntersectionItem.cpp
     src/Graphics/GraphicsArcItemCfg.cpp
     src/Graphics/GraphicsConnectionCalculationData.cpp
+    src/Graphics/GraphicsDecorationCfg.cpp
+    src/Graphics/GraphicsDecoratedLineItemCfg.cpp
     src/Graphics/GraphicsGroupItemCfg.cpp
     src/Graphics/GraphicsHierarchicalProjectItemBuilder.cpp
     src/Graphics/GraphicsInvisibleItemCfg.cpp
