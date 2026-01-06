@@ -25,10 +25,10 @@
 #include "AdvancedQueryBuilder.h"
 #include "OTCore/ExplicitStringValueConverter.h"
 #include "OTCore/String.h"
+#include "OTFrontendConnectorAPI/WindowAPI.h"
 #include "bsoncxx/json.hpp"
 #include "Datapoints.h"
 #include "ShortParameterDescription.h"
-#include "AppBase.h"
 #include "OTCore/EntityName.h"
 #include "OTGui/PainterRainbowIterator.h"
 #include "CurveColourSetter.h"
@@ -36,13 +36,13 @@
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {
 	m_curveIDDescriptions.clear();
-	auto queryInformation = _config.getQueryInformation();
+	const auto& queryInformation = _config.getQueryInformation();
 
 	ot::JsonDocument entireResult = queryCurveData(queryInformation, _valueComparisions);
 	ot::ConstJsonArray allMongoDocuments = ot::json::getArray(entireResult, "Documents");
 	if (allMongoDocuments.Size() == 0)
 	{
-		AppBase::instance()->appendInfoMessage(QString(("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n ").c_str()));
+		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n");
 		return {};
 	}
 
