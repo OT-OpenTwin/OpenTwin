@@ -31,6 +31,7 @@
 #include "OTCore/ExplicitStringValueConverter.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTFrontendConnectorAPI/WindowAPI.h"
 
 // BSONCXX header
 #include "bsoncxx/json.hpp"
