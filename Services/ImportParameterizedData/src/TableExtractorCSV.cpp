@@ -65,6 +65,17 @@ void TableExtractorCSV::ExtractFromEntitySource(EntityFile* source)
 		ot::EncodingConverter_UTF16ToUTF8 converter;
 		_fileContentStream.str(converter(selectedEncodingStandard,fileContent));
 	}
+	else if(selectedEncodingStandard == ot::TextEncoding::EncodingStandard::UTF8_BOM)
+	{
+		if (fileContent.size() >= 3 && static_cast<unsigned char>(fileContent[0]) == 0xEF && static_cast<unsigned char>(fileContent[1]) == 0xBB && static_cast<unsigned char>(fileContent[2]) == 0xBF)
+		{
+			_fileContentStream.str(std::string(fileContent.begin() + 3, fileContent.end()));
+		}
+		else
+		{
+			_fileContentStream.str(std::string(fileContent.begin(), fileContent.end()));
+		}
+	}
 	else
 	{
 		_fileContentStream.str(std::string(fileContent.begin(), fileContent.end()));

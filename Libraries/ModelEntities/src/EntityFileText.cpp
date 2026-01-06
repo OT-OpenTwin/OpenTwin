@@ -96,7 +96,7 @@ std::string EntityFileText::getText(void)
 	std::string textFromBinary(plainData.begin(), plainData.end());
 
 	ot::TextEncoding::EncodingStandard encoding = getTextEncoding();
-	if (encoding == ot::TextEncoding::EncodingStandard::UTF8 || encoding == ot::TextEncoding::EncodingStandard::UTF8_BOM)
+	if (encoding == ot::TextEncoding::EncodingStandard::UTF8)
 	{
 		return textFromBinary;
 	}
@@ -111,6 +111,18 @@ std::string EntityFileText::getText(void)
 		ot::EncodingConverter_UTF16ToUTF8 converter;
 		const std::string textAsUTF8 = converter(encoding,textFromBinary);
 		return textAsUTF8;
+	}
+	else if (encoding == ot::TextEncoding::EncodingStandard::UTF8_BOM)
+	{
+		if (textFromBinary.size() >= 3 && static_cast<unsigned char>(textFromBinary[0]) == 0xEF && static_cast<unsigned char>(textFromBinary[1]) == 0xBB && static_cast<unsigned char>(textFromBinary[2]) == 0xBF)
+		{
+			textFromBinary = (std::string(textFromBinary.begin() + 3, textFromBinary.end()));
+			return textFromBinary;
+		}
+		else
+		{
+			return textFromBinary;
+		}
 	}
 	else
 	{
