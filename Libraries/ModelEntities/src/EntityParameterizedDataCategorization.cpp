@@ -27,8 +27,8 @@ EntityParameterizedDataCategorization::EntityParameterizedDataCategorization(ot:
 	:EntityContainer(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
-	treeItem.setVisibleIcon(c_unlockedIcon);
-	treeItem.setHiddenIcon(c_unlockedIcon);
+	treeItem.setVisibleIcon(m_unlockedIcon);
+	treeItem.setHiddenIcon(m_unlockedIcon);
 	this->setDefaultTreeItem(treeItem);
 }
 
@@ -39,19 +39,19 @@ void EntityParameterizedDataCategorization::addVisualizationNodes()
 		ot::EntityTreeItem treeItem = this->getTreeItem();
 		if (m_locked)
 		{
-			treeItem.setVisibleIcon(c_lockedIcon);
-			treeItem.setHiddenIcon(c_lockedIcon);
+			treeItem.setVisibleIcon(m_lockedIcon);
+			treeItem.setHiddenIcon(m_lockedIcon);
 		}
 		else
 		{
-			treeItem.setVisibleIcon(c_unlockedIcon);
-			treeItem.setHiddenIcon(c_unlockedIcon);
+			treeItem.setVisibleIcon(m_unlockedIcon);
+			treeItem.setHiddenIcon(m_unlockedIcon);
 		}
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
 
-		doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(treeItem, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 		getObserver()->sendMessageToViewer(doc);
@@ -68,7 +68,7 @@ void EntityParameterizedDataCategorization::addVisualizationNodes()
 void EntityParameterizedDataCategorization::CreateProperties(DataCategorie category)
 {
 	std::string returnVal;
-	g_dataCategorieStringMapping.find(category) == g_dataCategorieStringMapping.end() ? returnVal = "" : returnVal = g_dataCategorieStringMapping.at(category);
+	m_dataCategorieStringMapping.find(category) == m_dataCategorieStringMapping.end() ? returnVal = "" : returnVal = m_dataCategorieStringMapping.at(category);
 	if (returnVal != "")
 	{
 		m_selectedCategory = category;
@@ -82,7 +82,7 @@ void EntityParameterizedDataCategorization::addStorageData(bsoncxx::builder::bas
 		throw std::runtime_error("Data category in EntityParameterizedDataCategorization was not set.");
 	}
 	std::string returnVal;
-	g_dataCategorieStringMapping.find(m_selectedCategory) == g_dataCategorieStringMapping.end() ? returnVal = "" : returnVal = g_dataCategorieStringMapping.at(m_selectedCategory);
+	m_dataCategorieStringMapping.find(m_selectedCategory) == m_dataCategorieStringMapping.end() ? returnVal = "" : returnVal = m_dataCategorieStringMapping.at(m_selectedCategory);
 	if (returnVal != "")
 	{
 		EntityContainer::addStorageData(storage);
@@ -99,7 +99,7 @@ void EntityParameterizedDataCategorization::readSpecificDataFromDataBase(const b
 
 	const std::string categorySerialized(doc_view["Category"].get_utf8().value.data());
 	DataCategorie category = UNKNOWN;
-	g_stringDataCategorieMapping.find(categorySerialized) == g_stringDataCategorieMapping.end() ? category = UNKNOWN: category = g_stringDataCategorieMapping.at(categorySerialized);
+	m_stringDataCategorieMapping.find(categorySerialized) == m_stringDataCategorieMapping.end() ? category = UNKNOWN: category = m_stringDataCategorieMapping.at(categorySerialized);
 	if (category != UNKNOWN)
 	{
 		m_selectedCategory = category;
@@ -111,19 +111,19 @@ void EntityParameterizedDataCategorization::readSpecificDataFromDataBase(const b
 	m_locked = doc_view["Locked"].get_bool();
 }
 
-const std::string EntityParameterizedDataCategorization::c_dataCategoryGroup = "Data Category";
-const std::string EntityParameterizedDataCategorization::c_defaultCategory = "DefaultCategory";
-const std::string EntityParameterizedDataCategorization::c_dataCategoryRMD = "Research";
-const std::string EntityParameterizedDataCategorization::c_dataCategoryMSMD = "Measurementseries";
-const std::string EntityParameterizedDataCategorization::c_dataCategoryParam = "Parameter";
-const std::string EntityParameterizedDataCategorization::c_dataCategoryQuant = "Quantity";
+const std::string EntityParameterizedDataCategorization::m_dataCategoryGroup = "Data Category";
+const std::string EntityParameterizedDataCategorization::m_defaultCategory = "DefaultCategory";
+const std::string EntityParameterizedDataCategorization::m_dataCategoryRMD = "Research";
+const std::string EntityParameterizedDataCategorization::m_dataCategoryMSMD = "Measurementseries";
+const std::string EntityParameterizedDataCategorization::m_dataCategoryParam = "Parameter";
+const std::string EntityParameterizedDataCategorization::m_dataCategoryQuant = "Quantity";
 
-std::map<EntityParameterizedDataCategorization::DataCategorie, std::string> EntityParameterizedDataCategorization::g_dataCategorieStringMapping = { {DataCategorie::researchMetadata, c_dataCategoryRMD}, { DataCategorie::measurementSeriesMetadata, c_dataCategoryMSMD }, { DataCategorie::parameter, c_dataCategoryParam }, { DataCategorie::quantity, c_dataCategoryQuant } };
-std::map<std::string, EntityParameterizedDataCategorization::DataCategorie> EntityParameterizedDataCategorization::g_stringDataCategorieMapping = { {c_dataCategoryRMD, DataCategorie::researchMetadata }, { c_dataCategoryMSMD, DataCategorie::measurementSeriesMetadata }, { c_dataCategoryParam, DataCategorie::parameter }, { c_dataCategoryQuant, DataCategorie::quantity } };
+std::map<EntityParameterizedDataCategorization::DataCategorie, std::string> EntityParameterizedDataCategorization::m_dataCategorieStringMapping = { {DataCategorie::researchMetadata, m_dataCategoryRMD}, { DataCategorie::measurementSeriesMetadata, m_dataCategoryMSMD }, { DataCategorie::parameter, m_dataCategoryParam }, { DataCategorie::quantity, m_dataCategoryQuant } };
+std::map<std::string, EntityParameterizedDataCategorization::DataCategorie> EntityParameterizedDataCategorization::m_stringDataCategorieMapping = { {m_dataCategoryRMD, DataCategorie::researchMetadata }, { m_dataCategoryMSMD, DataCategorie::measurementSeriesMetadata }, { m_dataCategoryParam, DataCategorie::parameter }, { m_dataCategoryQuant, DataCategorie::quantity } };
 
 std::string EntityParameterizedDataCategorization::GetStringDataCategorization(EntityParameterizedDataCategorization::DataCategorie category)
 {
 	std::string returnVal;
-	g_dataCategorieStringMapping.find(category) == g_dataCategorieStringMapping.end() ? returnVal = "" : returnVal = g_dataCategorieStringMapping.at(category);
+	m_dataCategorieStringMapping.find(category) == m_dataCategorieStringMapping.end() ? returnVal = "" : returnVal = m_dataCategorieStringMapping.at(category);
 	return returnVal;
 }

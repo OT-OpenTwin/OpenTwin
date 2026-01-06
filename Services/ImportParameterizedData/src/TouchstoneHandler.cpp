@@ -66,6 +66,17 @@ void TouchstoneHandler::analyseFile(const std::string& _fileContent, int32_t _nu
 		ot::EncodingConverter_UTF16ToUTF8 converter;
 		stream.str(converter(encodingStandard,_fileContent));
 	}
+	else if (encodingStandard == ot::TextEncoding::EncodingStandard::UTF8_BOM)
+	{
+		if (_fileContent.size() >= 3 && static_cast<unsigned char>(_fileContent[0]) == 0xEF && static_cast<unsigned char>(_fileContent[1]) == 0xBB && static_cast<unsigned char>(_fileContent[2]) == 0xBF)
+		{
+			stream.str(std::string(_fileContent.begin() + 3, _fileContent.end()));
+		}
+		else
+		{
+			stream.str(_fileContent);
+		}
+	}
 	else
 	{
 		stream.str(_fileContent);

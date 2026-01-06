@@ -64,12 +64,12 @@ public:
 		m_exampleDataFloat.append(float(4.0f));
 	}
 
-	const bsoncxx::v_noabi::array::view& GetUTF8StringArray() { return m_exampleDataUTF8String.view(); };
-	const bsoncxx::v_noabi::array::view& GetCharArray() { return m_exampleDataChar.view(); };
-	const bsoncxx::v_noabi::array::view& GetInt32Array() { return m_exampleDataInt32.view(); };
-	const bsoncxx::v_noabi::array::view& GetInt64Array() { return m_exampleDataInt64.view(); };
-	const bsoncxx::v_noabi::array::view& GetDoubleArray() { return m_exampleDataDouble.view(); };
-	const bsoncxx::v_noabi::array::view& GetFloatArray() { return m_exampleDataFloat.view(); };
+	const bsoncxx::v_noabi::array::view GetUTF8StringArray() { return m_exampleDataUTF8String.view(); };
+	const bsoncxx::v_noabi::array::view GetCharArray() { return m_exampleDataChar.view(); };
+	const bsoncxx::v_noabi::array::view GetInt32Array() { return m_exampleDataInt32.view(); };
+	const bsoncxx::v_noabi::array::view GetInt64Array() { return m_exampleDataInt64.view(); };
+	const bsoncxx::v_noabi::array::view GetDoubleArray() { return m_exampleDataDouble.view(); };
+	const bsoncxx::v_noabi::array::view GetFloatArray() { return m_exampleDataFloat.view(); };
 	~FixtureBsonArrayTypeGetterWrapper() {};
 
 private:
