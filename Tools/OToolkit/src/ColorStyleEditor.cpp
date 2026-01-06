@@ -733,8 +733,8 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineText), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineTextBox), new PropertyPainter2D(new FillPainter2D(250, 215, 172)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineTextBoxBorder), new PropertyPainter2D(new FillPainter2D(198, 115, 17)));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineProcess), new PropertyPainter2D(new FillPainter2D(186, 200, 211)));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineProcessBorder), new PropertyPainter2D(new FillPainter2D(35, 68, 93)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineProcess), new PropertyPainter2D(new FillPainter2D(35, 68, 93)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceLifelineProcessBorder), new PropertyPainter2D(new FillPainter2D(186, 200, 211)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceMessageText), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SequenceMessageArrow), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	
