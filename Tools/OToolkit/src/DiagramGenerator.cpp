@@ -784,6 +784,7 @@ void DiagramGenerator::generateSequenceDiagram(const SequenceFunction& _function
 void DiagramGenerator::generateSequenceDiagram(SequenceViewData& _viewData, const SequenceFunction& _function) {
 	generateSequenceDiagramLifeLines(_function, _viewData);
 	generateSequenceDiagramCalls(_function, _viewData);
+	mergeProcessBoxes(_viewData);
 	repositionLifelines(_viewData);
 	repositionCalls(_viewData);
 	generateItems(_viewData);
@@ -839,12 +840,15 @@ void DiagramGenerator::generateSequenceDiagramCalls(const SequenceFunction& _fun
 			callToRight = false;
 		}
 		
+		double processStartY = 0.;
+		double processEndY = 0.;
+
 		// Create call item
 		if (callToRight) {
-			generateNewCallItem(fromLifeLineIt->second, toLifeLineIt->second, _viewData, call.text, CallFlag::None);
+			processStartY = generateNewCallItem(fromLifeLineIt->second, toLifeLineIt->second, _viewData, call.text, CallFlag::None);
 		}
 		else {
-			generateNewCallItem(toLifeLineIt->second, fromLifeLineIt->second, _viewData, call.text, CallFlag::ReverseCall);
+			processStartY = generateNewCallItem(toLifeLineIt->second, fromLifeLineIt->second, _viewData, call.text, CallFlag::ReverseCall);
 		}
 
 		// Process subsequent calls
@@ -852,11 +856,15 @@ void DiagramGenerator::generateSequenceDiagramCalls(const SequenceFunction& _fun
 
 		// Return call
 		if (callToRight) {
-			generateNewCallItem(fromLifeLineIt->second, toLifeLineIt->second, _viewData, funcIt->second.returnValue.text, CallFlag::ReturnCall);
+			processEndY = generateNewCallItem(fromLifeLineIt->second, toLifeLineIt->second, _viewData, funcIt->second.returnValue.text, CallFlag::ReturnCall);
 		}
 		else {
-			generateNewCallItem(toLifeLineIt->second, fromLifeLineIt->second, _viewData, funcIt->second.returnValue.text, CallFlag::ReturnCall | CallFlag::ReverseCall);
+			processEndY = generateNewCallItem(toLifeLineIt->second, fromLifeLineIt->second, _viewData, funcIt->second.returnValue.text, CallFlag::ReturnCall | CallFlag::ReverseCall);
 		}
+
+		// Create process boxes
+		createProcessBox(fromLifeLineIt->second, processStartY, processEndY, _viewData);
+		createProcessBox(toLifeLineIt->second, processStartY, processEndY, _viewData);
 	}
 }
 
@@ -925,7 +933,7 @@ void DiagramGenerator::repositionLifelines(SequenceViewData& _viewData) {
 
 void DiagramGenerator::repositionCalls(SequenceViewData& _viewData) {
 	for (auto& lifeline : _viewData.lifelines) {
-		const double startX = lifeline.second.group->getPosition().x() + lifeline.second.lifeLine->getPosition().x() + (_viewData.lifeLineProcessWidth / 2.);
+		const double startX = lifeline.second.group->getPosition().x() + lifeline.second.lifeLine->getPosition().x() + (_viewData.lifeLineProcessWidth / 2.) + 1;
 
 		for (auto& callItem : lifeline.second.calls) {
 			auto toLifeLineIt = _viewData.lifelines.find(callItem.toLifeLine);
@@ -935,7 +943,7 @@ void DiagramGenerator::repositionCalls(SequenceViewData& _viewData) {
 			}
 
 			// Recalculate line x positions
-			const double destX = toLifeLineIt->second.group->getPosition().x() + toLifeLineIt->second.lifeLine->getPosition().x() - (_viewData.lifeLineProcessWidth / 2.);
+			const double destX = ((toLifeLineIt->second.group->getPosition().x() + toLifeLineIt->second.lifeLine->getPosition().x()) - (_viewData.lifeLineProcessWidth / 2.)) - 1;
 			
 			callItem.line->setPosition(ot::Point2DD(startX, callItem.line->getPosition().y()));
 			callItem.line->setTo(ot::Point2DD(destX - startX, 0.));
@@ -943,6 +951,39 @@ void DiagramGenerator::repositionCalls(SequenceViewData& _viewData) {
 				startX + _viewData.callTextMargin + (_viewData.callArrowHeadSize.width() / 2.), 
 				callItem.text->getPosition().y()
 			));
+		}
+	}
+}
+
+void DiagramGenerator::mergeProcessBoxes(SequenceViewData& _viewData) {
+	for (auto& lifeline : _viewData.lifelines) {
+		for (auto process = lifeline.second.processes.begin(); process != lifeline.second.processes.end(); process++) {
+			const double startY = (*process)->getPosition().y();
+			const double endY = startY + (*process)->getSize().height();
+
+			for (auto check = std::next(process); check != lifeline.second.processes.end(); ) {
+				const double cStartY = (*check)->getPosition().y();
+				const double cEndY = cStartY + (*check)->getSize().height();
+				
+				if ((cStartY <= endY && cStartY >= startY) || (cEndY <= endY && cEndY >= startY)) {
+					// Merge
+					const double newStartY = std::min(startY, cStartY);
+					const double newEndY = std::max(endY, cEndY);
+					(*process)->setPosition(ot::Point2DD(
+						(*process)->getPosition().x(),
+						newStartY
+					));
+					(*process)->setSize(ot::Size2DD(
+						(*process)->getSize().width(),
+						newEndY - newStartY
+					));
+
+					check = lifeline.second.processes.erase(check);
+				}
+				else {
+					check++;
+				}
+			}
 		}
 	}
 }
@@ -1061,7 +1102,7 @@ DiagramGenerator::SequenceLifeLineItem DiagramGenerator::generateNewLifeLineItem
 	return lifeLine;
 }
 
-void DiagramGenerator::generateNewCallItem(SequenceLifeLineItem& _from, SequenceLifeLineItem& _to, SequenceViewData& _viewData, const QString& _callText, const CallFlags& _flags) {
+double DiagramGenerator::generateNewCallItem(SequenceLifeLineItem& _from, SequenceLifeLineItem& _to, SequenceViewData& _viewData, const QString& _callText, const CallFlags& _flags) {
 	using namespace ot;
 
 	// Calculate y position
@@ -1134,6 +1175,8 @@ void DiagramGenerator::generateNewCallItem(SequenceLifeLineItem& _from, Sequence
 
 	_from.lifeLine->setTo(ot::Point2DD(0., lifeLineEndY - _from.lifeLine->getPosition().y()));
 	_to.lifeLine->setTo(ot::Point2DD(0., lifeLineEndY - _from.lifeLine->getPosition().y()));
+
+	return callY;
 }
 
 ot::Point2DD DiagramGenerator::calculateNextLifeLinePosition(const SequenceViewData& _viewData) {
@@ -1179,6 +1222,32 @@ double DiagramGenerator::calculateLifelineDistance(const SequenceLifeLineItem& _
 	}
 
 	return (rightPos - (_viewData.lifeLineProcessWidth / 2.)) - (leftPos + (_viewData.lifeLineProcessWidth / 2.));
+}
+
+ot::GraphicsRectangularItemCfg* DiagramGenerator::createProcessBox(SequenceLifeLineItem& _lifeLine, double _startYPos, double _endYPos, const SequenceViewData& _viewData) {
+	using namespace ot;
+
+
+	// Create new process box
+	GraphicsRectangularItemCfg* itm = new GraphicsRectangularItemCfg;
+	itm->setName(_lifeLine.name.toStdString() + "_Process_" + std::to_string(_lifeLine.processes.size() + 1));
+	itm->setPosition(Point2DD(
+		_lifeLine.lifeLine->getPosition().x() - (_viewData.lifeLineProcessWidth / 2.),
+		_startYPos - _lifeLine.group->getPosition().y()
+	));
+	itm->setSize(Size2DD(
+		_viewData.lifeLineProcessWidth,
+		_endYPos - _startYPos
+	));
+	itm->setZValue(_viewData.lifeLineProcessZValue);
+	PenFCfg processPen = itm->getOutline();
+	processPen.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::SequenceLifelineProcessBorder));
+	itm->setOutline(processPen);
+	itm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::SequenceLifelineProcess));
+	_lifeLine.group->addItem(itm);
+	_lifeLine.processes.push_back(itm);
+
+	return itm;
 }
 
 bool DiagramGenerator::filterKeyValue(const QString& _filePath, size_t _lineCounter, const QString& _command, QString& _cmd, QString& _key, QString& _value) {
