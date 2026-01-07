@@ -18,7 +18,6 @@
 // @otlicense-end
 
 #include "IndexHandler.h"
-#include "OTServiceFoundation/ProgressUpdater.h"
 
 IndexHandler::IndexHandler(const std::string& _collectionName)
 	: m_dataStorageAccess(_collectionName)

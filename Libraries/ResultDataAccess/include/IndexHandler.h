@@ -21,7 +21,7 @@
 #include <string>
 #include "ResultImportLogger.h"
 #include "ResultDataStorageAPI.h"
-#include "OTServiceFoundation/UiComponent.h"
+
 class __declspec(dllexport) IndexHandler
 {
 public:

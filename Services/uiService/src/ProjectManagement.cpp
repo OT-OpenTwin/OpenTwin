@@ -45,7 +45,7 @@
 #include <mongocxx/pipeline.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
-
+#include "IndexHandler.h"
 // std header
 #include <iomanip>
 
@@ -1055,9 +1055,10 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 
 		if (numberResultDocuments > 0)
 		{
+			IndexHandler indexHandler(collectionName);
+			indexHandler.createDefaultIndexes();
 			// Try to load the result data
 			auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
-
 			std::list<bsoncxx::builder::basic::document*> cachedDocuments;
 
 			for (size_t index = 0; index < numberResultDocuments; index++)
