@@ -18,13 +18,20 @@
 // @otlicense-end
 
 #pragma once
-#include "stdafx.h"
-#include "..\include\Document\DocumentAccess.h"
-#include <iostream>
-#include <fstream>
 
+#include "stdafx.h"
+
+// OpenTwin header
+#include "OTCore/LogDispatcher.h"
+#include "..\include\Document\DocumentAccess.h"
+
+// MongoDB header
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/document/element.hpp>
+
+// std header
+#include <fstream>
+
 namespace DataStorageAPI
 {
 	DocumentAccess::DocumentAccess(string databaseName, string collectionName) :
@@ -56,8 +63,8 @@ namespace DataStorageAPI
 		}
 		catch (std::exception& e)
 		{
-			std::cout << e.what();
 			response.updateDataStorageResponse("", false, e.what());
+			OT_LOG_E(e.what());
 			return response;
 		}
 	}
@@ -81,8 +88,8 @@ namespace DataStorageAPI
 		}
 		catch (std::exception& e)
 		{
-			std::cout << e.what();
 			response.updateDataStorageResponse("", false, e.what());
+			OT_LOG_E(e.what());
 			return response;
 		}
 	}
@@ -107,8 +114,8 @@ namespace DataStorageAPI
 		}
 		catch (std::exception& e)
 		{
-			std::cout << e.what();
 			response.updateDataStorageResponse("", false, e.what());
+			OT_LOG_E(e.what());
 			return response;
 		}
 	}
@@ -132,8 +139,8 @@ namespace DataStorageAPI
 		}
 		catch (std::exception& e)
 		{
-			std::cout << e.what();
 			response.updateDataStorageResponse("", false, e.what());
+			OT_LOG_E(e.what());
 			return response;
 		}
 	}
@@ -156,8 +163,8 @@ namespace DataStorageAPI
 		}
 		catch (std::exception& e)
 		{
-			std::cout << e.what();
 			response.updateDataStorageResponse("", false, e.what());
+			OT_LOG_E(e.what());
 			return response;
 		}
 	}
@@ -170,7 +177,7 @@ namespace DataStorageAPI
 			auto results = docBase->GetAllDocument(jsonQuery, jsonProjectionQuery, limit);
 			std::string responseData = "{ \"Documents\": [";
 			bool isFirst = true;
-			for (auto result : results) 
+			for (const auto& result : results) 
 			{
 				if (!isFirst)
 				{
@@ -185,8 +192,8 @@ namespace DataStorageAPI
 		}
 		catch (std::exception& e)
 		{
-			std::cout << e.what();
 			response.updateDataStorageResponse("", false, e.what());
+			OT_LOG_E(e.what());
 			return response;
 		}
 	}
@@ -199,7 +206,8 @@ namespace DataStorageAPI
 			auto results = docBase->GetAllDocument(std::move(queryFilter), std::move(projectionQuery), limit);
 			std::string responseData = "{ \"Documents\": [";
 			bool isFirst = true;
-			for (auto result : results)
+			
+			for (const auto& result : results)
 			{
 				if (!isFirst)
 				{
@@ -214,8 +222,8 @@ namespace DataStorageAPI
 		}
 		catch (std::exception& e)
 		{
-			std::cout << e.what();
 			response.updateDataStorageResponse("", false, e.what());
+			OT_LOG_E(e.what());
 			return response;
 		}
 	}
@@ -229,7 +237,7 @@ namespace DataStorageAPI
 			auto results = docBase->GetAllDocument(std::move(_queryFilter), std::move(_projectionQuery), std::move(_sort), limit);
 			std::string responseData = "{ \"Documents\": [";
 			bool isFirst = true;
-			for (auto result : results)
+			for (const auto& result : results)
 			{
 				if (!isFirst)
 				{
@@ -244,8 +252,8 @@ namespace DataStorageAPI
 		}
 		catch (std::exception& e)
 		{
-			std::cout << e.what();
 			response.updateDataStorageResponse("", false, e.what());
+			OT_LOG_E(e.what());
 			return response;
 		}
 	}
@@ -259,7 +267,7 @@ namespace DataStorageAPI
 			auto results = docBase->GetAllDocument(std::move(_queryFilter), _options);
 			std::string responseData = "{ \"Documents\": [";
 			bool isFirst = true;
-			for (auto result : results)
+			for (const auto& result : results)
 			{
 				if (!isFirst)
 				{
@@ -274,8 +282,8 @@ namespace DataStorageAPI
 		}
 		catch (std::exception& e)
 		{
-			std::cout << e.what();
 			response.updateDataStorageResponse("", false, e.what());
+			OT_LOG_E(e.what());
 			return response;
 		}
 	}
