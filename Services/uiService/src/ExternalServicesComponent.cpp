@@ -4486,61 +4486,67 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 }
 
 void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document, ot::Plot1DCfg&& _plotConfig, ot::VisualisationCfg&& _visualizationCfg) {
-	auto startTime = ot::DateTime::msSinceEpoch();
+	try {
+		auto startTime = ot::DateTime::msSinceEpoch();
 
-	// Create curves
-	const std::string collectionName = AppBase::instance()->getCurrentProjectInfo().getCollectionName();
-	CurveDatasetFactory curveFactory(collectionName);
+		// Create curves
+		const std::string collectionName = AppBase::instance()->getCurrentProjectInfo().getCollectionName();
+		CurveDatasetFactory curveFactory(collectionName);
 
-	ot::ConstJsonArray curveCfgs = ot::json::getArray(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs);
-	std::list<ot::PlotDataset*> dataSets;
-	std::list<std::string> curveIDDescriptions;
+		ot::ConstJsonArray curveCfgs = ot::json::getArray(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs);
+		std::list<ot::PlotDataset*> dataSets;
+		std::list<std::string> curveIDDescriptions;
 
-	const std::string xAxisParameter = _plotConfig.getXAxisParameter();
-	const std::list<ValueComparisionDefinition>& queries = _plotConfig.getQueries();
-	bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
-	int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
+		const std::string xAxisParameter = _plotConfig.getXAxisParameter();
+		const std::list<ValueComparisionDefinition>& queries = _plotConfig.getQueries();
+		bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
+		int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
 
-	for (uint32_t i = 0; i < curveCfgs.Size(); i++) {
-		ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
-		const std::string t = ot::json::toJson(curveCfgs);
-		ot::Plot1DCurveCfg curveCfg;
+		for (uint32_t i = 0; i < curveCfgs.Size(); i++) {
+			ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
+			const std::string t = ot::json::toJson(curveCfgs);
+			ot::Plot1DCurveCfg curveCfg;
 
-		curveCfg.setFromJsonObject(curveCfgSerialised);
+			curveCfg.setFromJsonObject(curveCfgSerialised);
 
-		const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
-		bool curveHasDataToVisualise = false;
-		if (xAxisParameter != "") {
-			for (const auto& parameter : queryInformation.m_parameterDescriptions) {
-				if (parameter.m_label == xAxisParameter) {
-					curveHasDataToVisualise = true;
+			const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
+			bool curveHasDataToVisualise = false;
+			if (xAxisParameter != "") {
+				for (const auto& parameter : queryInformation.m_parameterDescriptions) {
+					if (parameter.m_label == xAxisParameter) {
+						curveHasDataToVisualise = true;
+					}
 				}
 			}
-		}
-		else {
-			curveHasDataToVisualise = true;
-		}
+			else {
+				curveHasDataToVisualise = true;
+			}
 
-		if (curveHasDataToVisualise) {
-			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg, xAxisParameter, queries);
-			dataSets.splice(dataSets.begin(), newCurveDatasets);
+			if (curveHasDataToVisualise) {
+				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg, xAxisParameter, queries);
+				dataSets.splice(dataSets.begin(), newCurveDatasets);
 
-			std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
-			curveIDDescriptions.splice(curveIDDescriptions.begin(), newCurveIDDescriptions);
+				std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
+				curveIDDescriptions.splice(curveIDDescriptions.begin(), newCurveIDDescriptions);
 
-			if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) {
-				break;
+				if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) {
+					break;
+				}
+			}
+			else {
+				ot::WindowAPI::appendOutputMessage("Curve " + curveCfg.getTitle() + " cannot be visualised since it does not have data for the selected X-Axis parameter: " + xAxisParameter + "\n");
 			}
 		}
-		else
-		{
-			ot::WindowAPI::appendOutputMessage("Curve " + curveCfg.getTitle() + " cannot be visualised since it does not have data for the selected X-Axis parameter: " + xAxisParameter + "\n");
-		}
+
+		auto endTime = ot::DateTime::msSinceEpoch();
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, _plotConfig, _visualizationCfg, dataSets, curveIDDescriptions, (endTime - startTime));
 	}
-
-	auto endTime = ot::DateTime::msSinceEpoch();
-
-	QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, _plotConfig, _visualizationCfg, dataSets, curveIDDescriptions, (endTime - startTime));
+	catch (const std::exception& e) {
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingFailed, Qt::QueuedConnection, std::string("Exception during plot data loading: " + std::string(e.what())));
+	}
+	catch (...) {
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingFailed, Qt::QueuedConnection, std::string("Unknown error while loading plot data"));
+	}
 }
 
 void ExternalServicesComponent::keepAlive() {
@@ -4648,6 +4654,23 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(const ot::Plot1DCfg
 	}
 
 	ot::WindowAPI::appendOutputMessage("Loading plot data took " + ot::DateTime::intervalToString(_loadTimeMs) + "\n");
+
+	// Finally unlock the ui and hide the progress
+	ot::WindowAPI::lockSelectionAndModification(false);
+	ot::WindowAPI::setProgressBarVisibility("", false, false);
+}
+
+void ExternalServicesComponent::slotPlotDataLoadingFailed(const std::string& _errorMessage) {
+	if (ot::LogDispatcher::mayLog(ot::ERROR_LOG)) {
+		OT_LOG_EAS(_errorMessage);
+	}
+	else {
+		ot::LogMessage logMessage;
+		logMessage.setServiceName(OT_INFO_SERVICE_TYPE_UI);
+		logMessage.setFlags(ot::ERROR_LOG);
+		logMessage.setText(_errorMessage);
+		AppBase::instance()->appendLogMessage(logMessage);
+	}
 
 	// Finally unlock the ui and hide the progress
 	ot::WindowAPI::lockSelectionAndModification(false);
