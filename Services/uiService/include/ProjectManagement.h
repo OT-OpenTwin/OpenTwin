@@ -77,7 +77,7 @@ private:
 	bool createNewCollection(const std::string &collectionName, const std::string &defaultSettingTemplate);
 	bool hasError(const std::string &response);
 	bool hasSuccessful(const std::string &response);
-	void copyCollection(const std::string& sourceCollectionName, const std::string& destinationCollectionName);
+	bool copyCollection(const std::string& sourceCollectionName, const std::string& destinationCollectionName);
 	void flushCachedDocuments(std::list<bsoncxx::builder::basic::document*>& cachedDocuments, mongocxx::collection& collection);
 
 	bool m_isConnected;
