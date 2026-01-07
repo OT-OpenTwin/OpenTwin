@@ -32,7 +32,7 @@ bool ot::GraphicsDecoratedLineItem::setupFromConfig(const GraphicsItemCfg* _cfg)
 	return true;
 }
 
-QMarginsF ot::GraphicsDecoratedLineItem::getOutlineMargins(void) const {
+QMarginsF ot::GraphicsDecoratedLineItem::getOutlineMargins() const {
 	QMarginsF baseMargins = GraphicsLineItem::getOutlineMargins();
 
 	double decoPenWidth = m_fromDecoration.getConfiguration().getOutlinePen().getWidth();
@@ -50,7 +50,7 @@ QMarginsF ot::GraphicsDecoratedLineItem::getOutlineMargins(void) const {
 
 // Base class functions: ot::CustomGraphicsItem
 
-QSizeF ot::GraphicsDecoratedLineItem::getPreferredGraphicsItemSize(void) const {
+QSizeF ot::GraphicsDecoratedLineItem::getPreferredGraphicsItemSize() const {
 	QSizeF baseSize = GraphicsLineItem::getPreferredGraphicsItemSize();
 
 	QPainterPath fromPath = m_fromDecoration.createDecorationPath();
@@ -59,8 +59,7 @@ QSizeF ot::GraphicsDecoratedLineItem::getPreferredGraphicsItemSize(void) const {
 	QRectF fromRect = fromPath.boundingRect();
 	QRectF toRect = toPath.boundingRect();
 
-	baseSize.setWidth(baseSize.width() + (fromRect.width() / 2.) + (toRect.width() / 2.));
-	baseSize.setHeight(baseSize.height() + (fromRect.height() / 2.) + (toRect.height() / 2.));
+	baseSize += fromRect.size().expandedTo(toRect.size());
 
 	return baseSize;
 }

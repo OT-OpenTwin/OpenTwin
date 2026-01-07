@@ -66,3 +66,50 @@ extern "C" {
 		return ot::foundation::init(_ownUrl, &Application::instance(), false);
 	};
 }
+
+
+
+
+
+
+
+
+
+
+
+// @seq dia name = "Test"  func = "Func 1"
+
+// @seq func life="Life 1" name="Fun 1" default="Call"
+
+// @seq call Func 2
+
+
+
+// @seq func life="Life 2" name="Func 2" default="Call 2"
+
+// @seq call func="Func 3" text="Calling Func 3"
+
+// @seq return Nothing
+
+
+// @seq func life="Life 2" name="Func 2.1" default="Call 3"
+
+// @seq call Func 4
+
+
+
+// @seq func life="Life 3" name="Func 3"
+
+// @seq call func="Func 2.1" text="Calling Func 2.1"
+
+// @seq return Nothing
+
+
+
+// @seq func life="Life 4" name="Func 4" default="Call 4"
+
+// @seq call Func 5
+
+
+
+// @seq func life="Life 4" name="Func 5" default="Call 5"

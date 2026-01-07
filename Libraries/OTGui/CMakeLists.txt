@@ -79,9 +79,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ============================================================
 
 set(OTGUI_HEADER_FILES
+    include/OTGui/Diagram/SequenceDiaAbstractCall.h
+    include/OTGui/Diagram/SequenceDiaDirectCall.h
     include/OTGui/Dialog/DialogCfg.h
     include/OTGui/Dialog/PropertyDialogCfg.h
     include/OTGui/Dialog/Painter2DDialogFilter.h
+    include/OTGui/Dialog/SelectEntitiesDialogCfg.h
     include/OTGui/Dialog/Painter2DDialogFilterDefaults.h
     include/OTGui/Dialog/ModelLibraryDialogCfg.h
     include/OTGui/Dialog/MessageDialogCfg.h
@@ -218,6 +221,8 @@ set(OTGUI_HEADER_FILES
 )
 
 set(OTGUI_SOURCE_FILES
+    src/Diagram/SequenceDiaAbstractCall.cpp
+    src/Diagram/SequenceDiaDirectCall.cpp
     src/Dialog/PropertyDialogCfg.cpp
     src/Dialog/Painter2DDialogFilter.cpp
     src/Dialog/Painter2DDialogFilterDefaults.cpp
