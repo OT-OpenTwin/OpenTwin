@@ -34,6 +34,7 @@
 
 void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 {
+	OT_LOG_D("Initialize environment from manifest " + std::to_string(_manifestEntityUID));
 	m_packageHandler.initializeManifest(_manifestEntityUID);
 	ot::UID manifestUID = (m_packageHandler.getManifestUID());
 	m_interpreterPathSettings = InterpreterPathSettings(manifestUID);
@@ -62,6 +63,8 @@ void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 
 void PythonInterpreterAPI::initializeEnvironment(const std::string& _environmentName)
 {
+	OT_LOG_D("Initialize environment from predefined environment " + _environmentName);
+
 	//Pyrit next to a custom environment or instead ?
 	m_interpreterPathSettings = InterpreterPathSettings(_environmentName);
 	

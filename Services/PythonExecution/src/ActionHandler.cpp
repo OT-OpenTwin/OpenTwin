@@ -89,76 +89,85 @@ ActionHandler::ActionHandler() {
 	m_handlingFunctions[OT_ACTION_CMD_SetLogFlags] = std::bind(&ActionHandler::setLogFlags, this, arguments);
 }
 
-ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
-	if (doc.HasMember(OT_ACTION_PARAM_LogFlags)) {
-		ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(ot::json::getArray(doc, OT_ACTION_PARAM_LogFlags)));
-	}
+ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) 
+{
+	try
+	{
+		if (doc.HasMember(OT_ACTION_PARAM_LogFlags)) {
+			ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(ot::json::getArray(doc, OT_ACTION_PARAM_LogFlags)));
+		}
 
-	const std::string serviceName = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_NAME);
-	ot::ReturnMessage returnMessage = ot::ReturnMessage(ot::ReturnMessage::Ok, "Initialisation succeeded");
-	if (serviceName == OT_INFO_SERVICE_TYPE_DataBase) {
-		OT_LOG_D("Initialise Database Connection");
-		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
-		const std::string userName = ot::json::getString(doc, OT_PARAM_AUTH_USERNAME);
-		const std::string psw = ot::json::getString(doc, OT_PARAM_AUTH_PASSWORD);
-		const std::string collectionName = ot::json::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
-	
-		DataBase::instance().setCollectionName(collectionName);
-		DataBase::instance().setUserCredentials(userName, psw);
-		DataBase::instance().initializeConnection(url);
+		const std::string serviceName = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_NAME);
+		ot::ReturnMessage returnMessage = ot::ReturnMessage(ot::ReturnMessage::Ok, "Initialisation succeeded");
+		if (serviceName == OT_INFO_SERVICE_TYPE_DataBase) {
+			OT_LOG_D("Initialise Database Connection");
+			const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+			const std::string userName = ot::json::getString(doc, OT_PARAM_AUTH_USERNAME);
+			const std::string psw = ot::json::getString(doc, OT_PARAM_AUTH_PASSWORD);
+			const std::string collectionName = ot::json::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
 
-		if (doc.HasMember(OT_ACTION_PARAM_Python_Environment))
+			DataBase::instance().setCollectionName(collectionName);
+			DataBase::instance().setUserCredentials(userName, psw);
+			DataBase::instance().initializeConnection(url);
+
+			if (doc.HasMember(OT_ACTION_PARAM_Python_Environment))
+			{
+				ot::UID manifestUID = ot::json::getUInt64(doc, OT_ACTION_PARAM_Python_Environment);
+				m_pythonAPI.initializeEnvironment(manifestUID);
+			}
+			else
+			{
+				m_pythonAPI.initializeEnvironment("Core");
+				OT_LOG_D("Running only with core environment");
+			}
+		}
+		else if (serviceName == OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE) {
+			OT_LOG_D("Initialise UID Generator");
+			const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
+			const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
+			Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
+
+		}
+		else if (serviceName == OT_INFO_SERVICE_TYPE_PYRIT) {
+			OT_LOG_D("Initialise UID Generator");
+			const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
+			const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
+			Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
+			OT_LOG_D("Initialise Pyrit environment");
+			m_pythonAPI.initializeEnvironment("Pyrit");
+		}
+		else if (serviceName == OT_INFO_SERVICE_TYPE_STUDIOSUITE)
 		{
-			ot::UID manifestUID = ot::json::getUInt64(doc, OT_ACTION_PARAM_Python_Environment);
-			m_pythonAPI.initializeEnvironment(manifestUID);
+			OT_LOG_D("Initialise UID Generator");
+			const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
+			const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
+			Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
+			OT_LOG_D("Initialise core environment");
+			m_pythonAPI.initializeEnvironment("Core");
+		}
+		else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL) {
+			OT_LOG_D("Connecting with modelService");
+			const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+			Application::instance().setModelServiceURL(url);
+
+		}
+		else if (serviceName == OT_INFO_SERVICE_TYPE_UI) {
+			OT_LOG_D("Connecting with uiService");
+			const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+			Application::instance().setUIServiceURL(url);
 		}
 		else
 		{
-			m_pythonAPI.initializeEnvironment("Core");
-			OT_LOG_D("Running only with core environment");
+			returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported initialisation order.");
 		}
-	}
-	else if (serviceName == OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE) {
-		OT_LOG_D("Initialise UID Generator");
-		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
-		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
-		Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
-		
-	}
-	else if (serviceName == OT_INFO_SERVICE_TYPE_PYRIT) {
-		OT_LOG_D("Initialise UID Generator");
-		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
-		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
-		Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
-		OT_LOG_D("Initialise Pyrit environment");
-		m_pythonAPI.initializeEnvironment("Pyrit");
-	}
-	else if (serviceName == OT_INFO_SERVICE_TYPE_STUDIOSUITE)
-	{
-		OT_LOG_D("Initialise UID Generator");
-		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
-		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
-		Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
-		OT_LOG_D("Initialise core environment");
-		m_pythonAPI.initializeEnvironment("Core");
-	}
-	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL) {
-		OT_LOG_D("Connecting with modelService");
-		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
-		Application::instance().setModelServiceURL(url);
 
+		return returnMessage;
 	}
-	else if (serviceName == OT_INFO_SERVICE_TYPE_UI) {
-		OT_LOG_D("Connecting with uiService");
-		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
-		Application::instance().setUIServiceURL(url);
-	}
-	else 
+	catch (std::exception& e)
 	{
-		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported initialisation order.");
+		OT_LOG_EAS("Initialisation failed: " + std::string(e.what()));
+		exit(ot::AppExitCode::GeneralError);
 	}
-
-	return returnMessage;
 }
 
 ot::ReturnMessage ActionHandler::setLogFlags(const ot::JsonDocument& _doc) {

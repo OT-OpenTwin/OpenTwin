@@ -57,6 +57,7 @@ void PythonWrapper::closePythonInterpreter() {
 
 void PythonWrapper::initializePythonInterpreter(InterpreterPathSettings& _interpreterPathSettings)
 {
+	OT_LOG_D("Intializing Python interpreter");
 	std::list<std::wstring> lookupPaths;
 	const std::list<std::string>& defaultPaths = _interpreterPathSettings.getDefaultEnvironments();
 	for (const std::string& defaultPath : defaultPaths)
