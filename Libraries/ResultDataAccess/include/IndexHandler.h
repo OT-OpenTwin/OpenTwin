@@ -29,12 +29,6 @@ public:
 	
 	void createDefaultIndexes();
 
-	const static std::vector<std::string>& getDefaultIndexes() 
-	{ 
-		static std::vector<std::string> m_defaultIndexes = { "Quantity" ,"Series"};
-		return m_defaultIndexes;
-	}
-
 	//! @brief Drop all indexes in the collection except for the default _id index.
 	void dropAllIndexes();	
 

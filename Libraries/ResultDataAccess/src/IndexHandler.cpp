@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "IndexHandler.h"
-
+#include "OTCore/ResultCollectionDefaultIndexes.h"
 IndexHandler::IndexHandler(const std::string& _collectionName)
 	: m_dataStorageAccess(_collectionName)
 {}
@@ -31,11 +31,11 @@ void IndexHandler::createDefaultIndexes()
 	
 		mongocxx::collection& collection =	m_dataStorageAccess.getCollection();
 
-		for(size_t i = 0; i < getDefaultIndexes().size(); i++)
+		for(size_t i = 0; i < ResultCollectionDefaultIndexes::getDefaultIndexes().size(); i++)
 		{
 			if (!m_defaultIndexesSet[i])
 			{
-				const std::string& indexName = getDefaultIndexes()[i];
+				const std::string& indexName = ResultCollectionDefaultIndexes::getDefaultIndexes()[i];
 				bsoncxx::builder::basic::document index{};
 				index.append(bsoncxx::builder::basic::kvp(indexName, 1));
 				collection.create_index(index.view());
@@ -59,12 +59,12 @@ bool IndexHandler::checkIfDefaultIndexesAreSet()
 	auto allIndexes = collection.indexes().list();
 	for (auto&& index : allIndexes)
 	{
-		for (size_t i = 0; i < getDefaultIndexes().size(); ++i)
+		for (size_t i = 0; i < ResultCollectionDefaultIndexes::getDefaultIndexes().size(); ++i)
 		{
 			
 			auto&& key = index["key"].get_document();
 			
-			const std::string& defaultIndex = getDefaultIndexes()[i];
+			const std::string& defaultIndex = ResultCollectionDefaultIndexes::getDefaultIndexes()[i];
 			if (key.view().find(defaultIndex) != key.view().end()) {
 				m_defaultIndexesSet[i] = true;
 				break;

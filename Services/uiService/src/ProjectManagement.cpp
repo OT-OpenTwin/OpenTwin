@@ -29,6 +29,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCore/ResultCollectionDefaultIndexes.h"
 
 // DB header
 #include "DocumentAPI.h"
@@ -45,7 +46,7 @@
 #include <mongocxx/pipeline.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
-#include "IndexHandler.h"
+
 // std header
 #include <iomanip>
 
@@ -1078,10 +1079,17 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 
 		if (numberResultDocuments > 0)
 		{
-			IndexHandler indexHandler(collectionName);
-			indexHandler.createDefaultIndexes();
+
 			// Try to load the result data
 			auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
+			for (size_t i = 0; i < ResultCollectionDefaultIndexes::getDefaultIndexes().size(); i++)
+			{
+				const std::string& indexName = ResultCollectionDefaultIndexes::getDefaultIndexes()[i];
+				bsoncxx::builder::basic::document index{};
+				index.append(bsoncxx::builder::basic::kvp(indexName, 1));
+				collection.create_index(index.view());
+			}
+
 			std::list<bsoncxx::builder::basic::document*> cachedDocuments;
 
 			for (size_t index = 0; index < numberResultDocuments; index++)

@@ -39,6 +39,7 @@
 
 #include "OTServiceFoundation/TimeFormatter.h"
 #include "SolverReport.h"
+#include "OTCore/ResultCollectionDefaultIndexes.h"
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	: BlockHandler(blockEntity, handlerMap)
@@ -91,7 +92,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	{
 		options.sort(m_sort);
 		bsoncxx::builder::basic::document hintDoc;
-		const std::string firstDefaultIndex = IndexHandler::getDefaultIndexes().front();
+		const std::string firstDefaultIndex = ResultCollectionDefaultIndexes::getDefaultIndexes().front();
 		hintDoc.append(bsoncxx::builder::basic::kvp(firstDefaultIndex, 1));
 		SolverReport::instance().addToContent("Hint: " + bsoncxx::to_json(hintDoc) + "\n");
 
