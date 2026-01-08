@@ -16,6 +16,9 @@ namespace ot {
 			DirectCall,
 			SelfCall
 		};
+		
+		static std::string callTypeToString(CallType _type);
+		static CallType stringToCallType(const std::string& _str);
 
 		static std::string callTypeJsonKey() { return "CallType"; };
 
@@ -38,6 +41,9 @@ namespace ot {
 		// Setter / Getter
 
 		virtual CallType getCallType() const = 0;
+
+		void setText(const std::string& _text) { m_text = _text; };
+		const std::string& getText() const { return m_text; };
 
 	private:
 		std::string m_text;

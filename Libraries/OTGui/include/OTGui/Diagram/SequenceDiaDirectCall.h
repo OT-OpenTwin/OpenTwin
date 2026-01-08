@@ -3,7 +3,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/SequenceDiaAbstractCall.h"
+#include "OTGui/Diagram/SequenceDiaAbstractCall.h"
 
 namespace ot {
 
@@ -11,13 +11,19 @@ namespace ot {
 		OT_DECL_NOCOPY(SequenceDiaDirectCall)
 		OT_DECL_NOMOVE(SequenceDiaDirectCall)
 	public:
-		enum CallType {
-			DirectCall,
-			SelfCall
-		};
-
 		SequenceDiaDirectCall() = default;
 		virtual ~SequenceDiaDirectCall() = default;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Serialization
+
+		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
+		virtual void setFromJsonObject(const ConstJsonObject& _jsonObject) override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
 
 		virtual CallType getCallType() const override { return CallType::DirectCall; };
 
