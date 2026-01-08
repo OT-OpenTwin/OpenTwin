@@ -25,23 +25,17 @@ IndexHandler::IndexHandler(const std::string& _collectionName)
 
 void IndexHandler::createDefaultIndexes()
 {
-	if(!checkIfDefaultIndexesAreSet())
-	{
-		const bool continuousProgressbar = true;
+	const bool continuousProgressbar = true;
 	
-		mongocxx::collection& collection =	m_dataStorageAccess.getCollection();
+	mongocxx::collection& collection =	m_dataStorageAccess.getCollection();
 
-		for(size_t i = 0; i < ResultCollectionDefaultIndexes::getDefaultIndexes().size(); i++)
-		{
-			if (!m_defaultIndexesSet[i])
-			{
-				const std::string& indexName = ResultCollectionDefaultIndexes::getDefaultIndexes()[i];
-				bsoncxx::builder::basic::document index{};
-				index.append(bsoncxx::builder::basic::kvp(indexName, 1));
-				collection.create_index(index.view());
-			}
-		}
+	bsoncxx::builder::basic::document index{};
+	for(size_t i = 0; i < ResultCollectionDefaultIndexes::getDefaultIndexes().size(); i++)
+	{
+		const std::string& indexName = ResultCollectionDefaultIndexes::getDefaultIndexes()[i];
+		index.append(bsoncxx::builder::basic::kvp(indexName, 1));
 	}
+	collection.create_index(index.view());
 }
 
 void IndexHandler::dropAllIndexes()

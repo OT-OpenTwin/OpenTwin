@@ -1082,13 +1082,15 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 
 			// Try to load the result data
 			auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
+			
+			// IndexHandler class in the ResultDatabaseAccess lib also creates these indexes
+			bsoncxx::builder::basic::document index{};
 			for (size_t i = 0; i < ResultCollectionDefaultIndexes::getDefaultIndexes().size(); i++)
 			{
 				const std::string& indexName = ResultCollectionDefaultIndexes::getDefaultIndexes()[i];
-				bsoncxx::builder::basic::document index{};
 				index.append(bsoncxx::builder::basic::kvp(indexName, 1));
-				collection.create_index(index.view());
 			}
+			collection.create_index(index.view());
 
 			std::list<bsoncxx::builder::basic::document*> cachedDocuments;
 
