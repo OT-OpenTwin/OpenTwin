@@ -123,14 +123,17 @@ unsigned long long ot::OperatingSystem::getAvailableVirtualMemory(void) {
 
 char * ot::OperatingSystem::getEnvironmentVariable(const char * _variableName) {
 #if defined(OT_OS_WINDOWS)
-	char * ret = nullptr;
-	size_t ct = 0;
+	char * buffer = nullptr;
+	size_t numberOfElements = 0;
 	//_dupenv_s is return 0 on success
-	if (_dupenv_s(&ret, &ct, _variableName) != 0) {
-		if (ret) delete ret;
+	if (_dupenv_s(&buffer, &numberOfElements, _variableName) != 0) {
+		if (buffer != nullptr)
+		{
+			free(buffer);
+		}
 		return nullptr;
 	}
-	return ret;
+	return buffer;
 #endif
 }
 
