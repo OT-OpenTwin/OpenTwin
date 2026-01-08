@@ -1976,7 +1976,6 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	this->lockManager()->uiElementCreated(modelInfo, graphics, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_graphicsViews.insert_or_assign(_entityName, newEditor);
-	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newEditor, _viewInsertFlags);
 
 	connect(graphics, &ot::GraphicsView::copyRequested, this, &AppBase::slotCopyRequested);
 	connect(graphics, &ot::GraphicsView::pasteRequested, this, &AppBase::slotPasteRequested);
@@ -1986,6 +1985,8 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	connect(graphics, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(graphics, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
 	connect(graphics->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
+
+	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newEditor, _viewInsertFlags);
 
 	OT_LOG_D("GraphicsEditor created { \"Editor.Name\": \"" + _entityName + "\" }");
 
@@ -2055,11 +2056,12 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	this->lockManager()->uiElementCreated(modelInfo, textEdit, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
-	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newEditor, _viewInsertFlags);
 
 	this->connect(newEditor, &ot::TextEditorView::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
 	this->connect(newEditor->getTextEditor(), &ot::TextEditor::loadMoreRequested, this, &AppBase::slotTextLoadNextRequested);
 	this->connect(newEditor->getTextEditor(), &ot::TextEditor::loadAllRequested, this, &AppBase::slotTextLoadAllRequested);
+
+	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newEditor, _viewInsertFlags);
 
 	OT_LOG_D("TextEditor created { \"Editor.Name\": \"" + _config.getEntityName() + "\" }");
 
@@ -2131,9 +2133,10 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Wi
 	this->lockManager()->uiViewCreated(modelInfo, newTable, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_tables.insert_or_assign(_config.getEntityName(), newTable);
-	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newTable, _viewInsertFlags);
 
 	this->connect(newTable->getTable(), &ot::Table::saveRequested, this, &AppBase::slotTableSaveRequested);
+
+	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newTable, _viewInsertFlags);
 
 	OT_LOG_D("Table created { \"Editor.Name\": \"" + _config.getEntityName() + "\" }");
 
@@ -2197,11 +2200,12 @@ ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::Wid
 	this->lockManager()->uiViewCreated(modelInfo, newPlot, ot::LockType::All | ot::LockType::ModelWrite);
 
 	m_plots.insert_or_assign(_config.getEntityName(), newPlot);
-	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newPlot, _viewInsertFlags);
-	
+
 	this->connect(newPlot->getPlot(), &ot::Plot::resetItemSelectionRequest, this, &AppBase::slotPlotResetItemSelectionRequest);
 	this->connect(newPlot->getPlot(), &ot::Plot::curveDoubleClicked, this, &AppBase::slotPlotCurveDoubleClicked);
 
+	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newPlot, _viewInsertFlags);
+	
 	OT_LOG_D("Plot created { \"Plot.Name\": \"" + _config.getEntityName() + "\" }");
 
 	return newPlot;
@@ -2861,16 +2865,18 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 	// Newly focused (focus in)
 	if (_focusedView) {
+
 		// Avoid focus change to same view
 		if (_focusedView == m_lastFocusedView) {
 			return;
 		}
 		m_lastFocusedView = _focusedView;
+		ot::WidgetViewBase focusedData = _focusedView->getViewData();
 
 		m_navigationManager.slotViewSelected();
 
 		// Forward focus events of central views to the viewer component
-		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+		if (focusedData.getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
 			// Update graphics picker content
 			ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_focusedView);
 			if (graphicsView) {
@@ -2908,8 +2914,11 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			this->runSelectionHandling(ot::SelectionOrigin::View);
 		}
 
-		OT_SLECTION_TEST_LOG("+ View focus changed: Notify viewer component");
-		m_viewerComponent->viewerTabChanged(_focusedView->getViewData());
+		// Check if view still exists after selection handling and notify viewer component
+		if (ot::GlobalWidgetViewManager::instance().findView(focusedData.getEntityName(), focusedData.getViewType()) != nullptr) {
+			OT_SLECTION_TEST_LOG("+ View focus changed: Notify viewer component");
+			m_viewerComponent->viewerTabChanged(focusedData);
+		}
 
 		if (!(m_viewHandling & ot::ViewHandlingFlag::SkipViewHandling)) {
 			this->autoCloseUnpinnedViews(true);

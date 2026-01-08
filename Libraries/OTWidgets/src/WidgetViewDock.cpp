@@ -42,7 +42,14 @@ ot::WidgetViewDock::WidgetViewDock(WidgetView* _view, QWidget* _parent) :
 }
 
 ot::WidgetViewDock::~WidgetViewDock() {
-	
+	m_view = nullptr;
+
+	if (m_tab) {
+		this->disconnect(m_tab, &WidgetViewTab::viewCloseRequested, this, &WidgetViewDock::slotCloseRequested);
+		this->disconnect(m_tab, &WidgetViewTab::viewPinnedChanged, this, &WidgetViewDock::slotPinnedChanged);
+	}
+
+	this->disconnect(this, &ads::CDockWidget::closeRequested, this, &WidgetViewDock::slotCloseRequested);
 }
 
 void ot::WidgetViewDock::openView(void) {

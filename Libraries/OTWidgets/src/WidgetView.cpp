@@ -51,15 +51,22 @@ ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType, QWidget* _parent)
 }
 
 ot::WidgetView::~WidgetView() {
-	m_dockWidget->takeWidget();
-
 	if (!m_isDeletedByManager && m_manager) {
 		m_manager->forgetView(this);
+		m_manager = nullptr;
 	}
 
-	ads::CDockManager* adsManager = m_dockWidget->dockManager();
-	if (adsManager) {
-		adsManager->removeDockWidget(m_dockWidget);
+	if (m_dockWidget) {
+		m_dockWidget->takeWidget();
+
+		this->disconnect(m_dockWidget, &WidgetViewDock::dockCloseRequested, this, &WidgetView::slotCloseRequested);
+		this->disconnect(m_dockWidget, &WidgetViewDock::dockPinnedChanged, this, &WidgetView::slotPinnedChanged);
+
+		ads::CDockManager* adsManager = m_dockWidget->dockManager();
+		if (adsManager) {
+			adsManager->removeDockWidget(m_dockWidget);
+		}
+		m_dockWidget = nullptr;
 	}
 }
 

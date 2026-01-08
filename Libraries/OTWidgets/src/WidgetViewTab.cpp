@@ -28,7 +28,8 @@
 #include <QtWidgets/qlayout.h>
 
 ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget * _dockWidget, QWidget* _parent)
-	: ads::CDockWidgetTab(_dockWidget, _parent), m_isPinned(false), m_isMiddleButtonPressed(false)
+	: ads::CDockWidgetTab(_dockWidget, _parent), m_isPinned(false), m_isMiddleButtonPressed(false),
+	m_closeButton(nullptr), m_pinButton(nullptr)
 {
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 
@@ -48,10 +49,19 @@ ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget * _dockWidget, QWidget* _paren
 }
 
 ot::WidgetViewTab::~WidgetViewTab() {
-	this->disconnect(m_closeButton, &ToolButton::clicked, this, &WidgetViewTab::slotClose);
-	this->disconnect(m_pinButton, &ToolButton::clicked, this, &WidgetViewTab::slotTogglePinned);
-	delete m_closeButton;
-	delete m_pinButton;
+	this->blockSignals(true);
+
+	if (m_closeButton) {
+		this->disconnect(m_closeButton, &ToolButton::clicked, this, &WidgetViewTab::slotClose);
+		delete m_closeButton;
+		m_closeButton = nullptr;
+	}
+
+	if (m_pinButton) {
+		this->disconnect(m_pinButton, &ToolButton::clicked, this, &WidgetViewTab::slotTogglePinned);
+		delete m_pinButton;
+		m_pinButton = nullptr;
+	}
 }
 
 void ot::WidgetViewTab::setIsPinned(bool _pinned) {
