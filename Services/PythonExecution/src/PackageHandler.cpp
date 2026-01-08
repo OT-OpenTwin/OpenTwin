@@ -46,7 +46,7 @@ PackageHandler::~PackageHandler()
 
 void PackageHandler::initializeManifest(ot::UID _manifestUID)
 {
-
+    OT_LOG_D("Initialising manifest");
     if (_manifestUID != ot::invalidUID)
     {
         if (m_environmentState == EnvironmentState::core)
@@ -76,6 +76,7 @@ void PackageHandler::initializeManifest(ot::UID _manifestUID)
 
 void PackageHandler::initializeEnvironmentWithManifest(const std::string& _environmentPath)
 {
+	OT_LOG_D("Initialising environment at " + _environmentPath);
     assert(m_installationNotifier != nullptr);
     assert(m_currentManifest != nullptr);
 
@@ -91,15 +92,18 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
             //If the folder does not contains packages, we need to install them. 
             if (std::filesystem::is_empty(m_environmentPath))
             {
+                OT_LOG_D("Environment is empty. It will be filled.");
                 m_environmentState = EnvironmentState::empty;
             }
             else
             {
+                OT_LOG_D("Environment is already filled. New packages will trigger the switch of environment.");
                 m_environmentState = EnvironmentState::initialised;
             }
         }
         else
         {
+			OT_LOG_D("Environment folder does not exist. It will be created.");
             m_environmentState = EnvironmentState::empty;
         }
         
@@ -108,6 +112,7 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
 		    OutputPipelineRAII outputRedirectionGuard(OutputPipeline::RedirectionMode::applicationRead);
             installedPackages = getListOfInstalledPackages();
         }
+		OT_LOG_D("Installed packages:\n" + installedPackages);
 
         buildInstalledPackageMap(installedPackages);
 
@@ -150,7 +155,7 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
     {
 		OT_LOG_E("Failed to initialize environment: " + std::string(e.what()));
         Application::instance().getCommunicationHandler().writeToServer("Failed to initialize environment: " + std::string(e.what()));
-        exit(0);
+        exit(ot::AppExitCode::GeneralError);
     }
 }
 

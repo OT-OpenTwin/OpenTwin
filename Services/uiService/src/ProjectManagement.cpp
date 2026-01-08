@@ -45,7 +45,7 @@
 #include <mongocxx/pipeline.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
-
+#include "IndexHandler.h"
 // std header
 #include <iomanip>
 
@@ -606,34 +606,57 @@ bool ProjectManagement::copyProject(const std::string &sourceProjectName, const 
 	std::string destinationProjectCollection = getProjectCollection(destinationProjectName);
 
 	// Copy the project collection
-	copyCollection(sourceProjectCollection, destinationProjectCollection);
+	if (!copyCollection(sourceProjectCollection, destinationProjectCollection)) {
+		return false;
+	}
 
 	// Copy large data collections
-	copyCollection(sourceProjectCollection + ".files", destinationProjectCollection + ".files");
-	copyCollection(sourceProjectCollection + ".chunks", destinationProjectCollection + ".chunks");
+	if (!copyCollection(sourceProjectCollection + ".files", destinationProjectCollection + ".files")) {
+		// What to do here? The copy failed
+		return false;
+	}
+	if (!copyCollection(sourceProjectCollection + ".chunks", destinationProjectCollection + ".chunks")) {
+		// What to do here? The copy failed
+		return false;
+	}
 
 	// Copy result collection
-	copyCollection(sourceProjectCollection + ".results", destinationProjectCollection + ".results");
+	if (!copyCollection(sourceProjectCollection + ".results", destinationProjectCollection + ".results")) {
+		// What to do here? The copy failed
+		return false;
+	}
 
 	return true;
 }
 
-void ProjectManagement::copyCollection(const std::string& sourceCollectionName, const std::string& destinationCollectionName)
+bool ProjectManagement::copyCollection(const std::string& sourceCollectionName, const std::string& destinationCollectionName)
 {
-	if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(m_dataBaseName, sourceCollectionName)) return;
+	if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(m_dataBaseName, sourceCollectionName)) {
+		// Source collection does not exist, nothing to copy
+		return true;
+	}
 
-	// Get the collection pointers for both projects
-	auto sourceCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, sourceCollectionName);
+	try {
 
-	// Copy the content by using the collection.aggregate method
+		// Get the collection pointers for both projects
+		auto sourceCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, sourceCollectionName);
 
-	mongocxx::pipeline stages;
+		// Copy the content by using the collection.aggregate method
 
-	stages.match({});
-	stages.out(destinationCollectionName);
+		mongocxx::pipeline stages;
 
-	auto cursor = sourceCollection.aggregate(stages, mongocxx::options::aggregate{});
-	auto count = std::distance(cursor.begin(), cursor.end());
+		stages.match({});
+		stages.out(destinationCollectionName);
+
+		auto cursor = sourceCollection.aggregate(stages, mongocxx::options::aggregate{});
+		auto count = std::distance(cursor.begin(), cursor.end());
+
+		return true;
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E("Exception during collection copy: " + std::string(_e.what()));
+		return false;
+	}
 }
 
 std::vector<std::string> ProjectManagement::getDefaultTemplateList(void)
@@ -1055,9 +1078,10 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 
 		if (numberResultDocuments > 0)
 		{
+			IndexHandler indexHandler(collectionName);
+			indexHandler.createDefaultIndexes();
 			// Try to load the result data
 			auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
-
 			std::list<bsoncxx::builder::basic::document*> cachedDocuments;
 
 			for (size_t index = 0; index < numberResultDocuments; index++)

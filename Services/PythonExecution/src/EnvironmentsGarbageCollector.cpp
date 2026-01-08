@@ -9,6 +9,7 @@
 
 void EnvironmentsGarbageCollector::markForCleanup()
 {
+    OT_LOG_D("Marking environments for cleanup");
     ot::DateTime currentTime = ot::DateTime::current();
     const std::string homePath = m_interpreterPathSettings.getEnvironmentsBasePath();
     std::list<std::filesystem::path> allEnvironments;
@@ -55,6 +56,7 @@ void EnvironmentsGarbageCollector::markForCleanup()
 
 void EnvironmentsGarbageCollector::removeMarkedEnvironments()
 {
+    OT_LOG_D("Removing marked environments");
     const std::string homePath = m_interpreterPathSettings.getEnvironmentsBasePath();
     std::list<std::filesystem::path> allEnvironments;
     for (const auto& entry : std::filesystem::directory_iterator(homePath))
@@ -78,6 +80,7 @@ void EnvironmentsGarbageCollector::removeMarkedEnvironments()
 
 void EnvironmentsGarbageCollector::run()
 {
+    OT_LOG_D("Started garbage collector.");
     assert(!m_interpreterPathSettings.getBinPath().empty());
     try
     {

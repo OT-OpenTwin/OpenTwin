@@ -427,6 +427,7 @@ public Q_SLOTS:
 	void slotProcessActionBuffer();
 	void slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message);
 	void slotPlotDataLoadingCompleted(const ot::Plot1DCfg& _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, const std::list<std::string>& _curveIDDescriptions, unsigned long long _loadTimeMs);
+	void slotPlotDataLoadingFailed(const std::string& _errorMessage);
 
 private:
 	// ###################################################################################################

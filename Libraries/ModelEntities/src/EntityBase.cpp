@@ -26,6 +26,14 @@
 
 #include "OTCore/LogDispatcher.h"
 
+// Activate the following flag to display the (approximate) memory consumption of the entity while restoring it from the database.
+//#define DISPLAY_MEMORY_CONSUMPTION
+
+#ifdef DISPLAY_MEMORY_CONSUMPTION
+	#include <windows.h>
+	#include <psapi.h>
+#endif
+
 _declspec(dllexport) DataStorageAPI::UniqueUIDGenerator *globalUidGenerator = nullptr;
 
 EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms) :
@@ -135,7 +143,19 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 	setObserver(obs);
 	setModelState(ms);
 
+#ifdef DISPLAY_MEMORY_CONSUMPTION
+	PROCESS_MEMORY_COUNTERS_EX pmc;
+	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+	size_t sizeBefore = pmc.PrivateUsage;
+#endif	
+
 	readSpecificDataFromDataBase(doc_view, entityMap);
+
+#ifdef DISPLAY_MEMORY_CONSUMPTION
+	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+	size_t memoryConsumption = pmc.PrivateUsage > sizeBefore ? pmc.PrivateUsage - sizeBefore : 0;
+	std::cout << "Entity (" << getClassName() << "): " << getName() << " consumes(bytes) including childs : " << memoryConsumption << std::endl;
+#endif
 
 	if (getEntityType() != DATA)
 	{
