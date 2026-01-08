@@ -167,7 +167,7 @@ void TextVisualiser::workerRequestRemainingData(size_t _nextChunkStartIndex) {
 }
 
 ot::JsonDocument TextVisualiser::createRequestDoc(const VisualiserState& _state, size_t _nextChunkStartIndex, bool _nextChunkOnly, bool _isAppend) const {
-	ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
+	ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state, getSceneNode());
 	visualisationCfg.setNextChunkStartIndex(_nextChunkStartIndex);
 	visualisationCfg.setLoadNextChunkOnly(_nextChunkOnly);
 	visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TEXTEDITOR_Setup);

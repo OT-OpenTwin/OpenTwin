@@ -40,7 +40,7 @@ bool TableVisualiser::requestVisualization(const VisualiserState& _state, ot::Vi
 				
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
 
-				ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
+				ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state, getSceneNode());
 				visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
 
 				ot::JsonObject visualisationCfgJSon;
