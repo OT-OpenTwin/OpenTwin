@@ -199,8 +199,8 @@ void Configuration::importFromEnvironment() {
 	m_supportedServices.clear();
 
 	// Read configuration from env
-	const char * configurationEnv = ot::OperatingSystem::getEnvironmentVariable(LDS_CFG_ENV);
-	if (configurationEnv == nullptr) {
+	std::string configurationEnv = ot::OperatingSystem::getEnvironmentVariableString(LDS_CFG_ENV);
+	if (configurationEnv.empty()) {
 		exit(ot::AppExitCode::EnvironmentError);
 	}
 

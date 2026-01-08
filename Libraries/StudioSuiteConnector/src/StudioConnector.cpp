@@ -572,7 +572,7 @@ void StudioConnector::startSubprocess() {
 std::string StudioConnector::findSubprocessPath()
 {
 #ifdef _DEBUG
-	const std::string otRootFolder = ot::OperatingSystem::getEnvironmentVariable("OPENTWIN_DEV_ROOT");
+	const std::string otRootFolder = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
 	assert(otRootFolder != "");
 	return otRootFolder + "\\Deployment\\";
 
