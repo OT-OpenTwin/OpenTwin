@@ -25,4 +25,5 @@ class FixtureEntityWithDynamicFields : public testing::Test
 {
 public:
 	void OrderDocumentsHierarchical(EntityWithDynamicFields& entity);
+	EntityWithDynamicFields createEntityWithSampleData();
 };

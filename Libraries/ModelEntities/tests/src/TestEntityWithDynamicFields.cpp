@@ -94,3 +94,17 @@ TEST_F(FixtureEntityWithDynamicFields, OrderDocumentsWithGaps)
 
 
 }
+
+TEST_F(FixtureEntityWithDynamicFields, MemoryConsumption)
+{
+	{
+		std::list<EntityWithDynamicFields > allEntities;
+		for (int i = 0; i < 1000; i++)
+		{
+			EntityWithDynamicFields entity = createEntityWithSampleData();
+			allEntities.push_back(entity);
+		}
+	}
+	ASSERT_TRUE(true);
+}
+

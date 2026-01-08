@@ -23,3 +23,118 @@ void FixtureEntityWithDynamicFields::OrderDocumentsHierarchical(EntityWithDynami
 {
 	entity.OrderGenericDocumentsHierarchical();
 }
+
+EntityWithDynamicFields FixtureEntityWithDynamicFields::createEntityWithSampleData()
+{
+    EntityWithDynamicFields entity;
+    using ot::Variable;
+
+    const std::string base = "/DynamicFields";
+
+    // -------------------------------
+    // Parameter / Time(s)
+    // -------------------------------
+    const std::string paramId = "45999440657432576";
+    const std::string paramPath = base + "/Parameter/" + paramId;
+
+    entity.InsertInField(
+        "DataTypeName",
+        { Variable("double") },
+        paramPath
+    );
+
+    entity.InsertInField(
+        "Label",
+        { Variable("Time(s)") },
+        paramPath
+    );
+
+    entity.InsertInField(
+        "Name",
+        { Variable("Time(s)") },
+        paramPath
+    );
+
+    entity.InsertInField(
+        "Unit",
+        { Variable("") },
+        paramPath
+    );
+
+    // Values array
+    std::list<Variable> values;
+    constexpr double start = 5e-7;
+    constexpr double step = 2.5e-10;
+    constexpr int count = 1000; // matches your sequence length
+
+    for (int i = 0; i < count; ++i)
+    {
+        values.emplace_back(start + i * step);
+    }
+
+    entity.InsertInField(
+        "Values",
+        std::move(values),
+        paramPath
+    );
+
+    // -------------------------------
+    // Quantity / Current(A)
+    // -------------------------------
+    const std::string quantityId = "45999440657432577";
+    const std::string quantityPath = base + "/Quantity/" + quantityId;
+
+    entity.InsertInField(
+        "DataDimensions",
+        { Variable(1) },
+        quantityPath
+    );
+
+    entity.InsertInField(
+        "Label",
+        { Variable("Current(A)\r") },
+        quantityPath
+    );
+
+    entity.InsertInField(
+        "Name",
+        { Variable("Current(A)\r") },
+        quantityPath
+    );
+
+    // ParameterDependencies
+    entity.InsertInField(
+        "$numberLong",
+        { Variable(paramId) },
+        quantityPath + "/ParameterDependencies"
+    );
+
+    // ValueDescriptions
+    const std::string valueDescPath =
+        quantityPath + "/ValueDescriptions/" + quantityId;
+
+    entity.InsertInField(
+        "DataTypeName",
+        { Variable("double") },
+        valueDescPath
+    );
+
+    entity.InsertInField(
+        "Label",
+        { Variable("") },
+        valueDescPath
+    );
+
+    entity.InsertInField(
+        "Name",
+        { Variable("") },
+        valueDescPath
+    );
+
+    entity.InsertInField(
+        "Unit",
+        { Variable("") },
+        valueDescPath
+    );
+    return entity;
+}
