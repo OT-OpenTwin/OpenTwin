@@ -47,7 +47,11 @@ void EntityParameterizedDataCategorization::addVisualizationNodes()
 			treeItem.setVisibleIcon(m_unlockedIcon);
 			treeItem.setHiddenIcon(m_unlockedIcon);
 		}
-
+		
+		if (GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata )
+		{
+			treeItem.setSelectChilds(false);
+		}
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
 
