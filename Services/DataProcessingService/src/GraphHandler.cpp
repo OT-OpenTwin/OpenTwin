@@ -71,13 +71,6 @@ void GraphHandler::sortOutUnusedBlocks(std::map<ot::UID, std::shared_ptr<EntityB
 	
 		auto it = _connectionBlockMap.find(blockEntity->getEntityID());
 		if (it == _connectionBlockMap.end()) {
-			OT_LOG_E("BlockEntity not found - EntityID: " + std::to_string(blockEntity->getEntityID()));
-			continue;
-		}
-		auto& connectionUIdList = it->second;
-
-		if (connectionUIdList.size() == 0)
-		{
 			const std::string nameWithoutRoot = getNameWithoutRoot(blockEntity.get());
 			uiInfoMessage += "Block \"" + nameWithoutRoot + "\" is not concidered furthermore, since it has no connections.\n";
 			toBeErased.push_back(blockEntityByBlockID.first);
