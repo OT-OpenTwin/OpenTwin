@@ -39,7 +39,7 @@
 #include "NewModelStateInfo.h"
 #include "EntityResult1DPlot.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTServiceFoundation/TimeFormatter.h"
+#include "OTCore/TimeFormatter.h"
 
 BlockHandlerStorage::BlockHandlerStorage(EntityBlockStorage* blockEntityStorage, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntityStorage,handlerMap),m_blockEntityStorage(blockEntityStorage)

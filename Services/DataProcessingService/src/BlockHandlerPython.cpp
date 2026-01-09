@@ -25,7 +25,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/PythonServiceInterface.h"
 #include "OTCore/GenericDataStructSingle.h"
-#include "OTServiceFoundation/TimeFormatter.h"
+#include "OTCore/TimeFormatter.h"
 
 BlockHandlerPython::BlockHandlerPython(EntityBlockPython* _blockEntity, const HandlerMap& _handlerMap)
     : BlockHandler(_blockEntity, _handlerMap)

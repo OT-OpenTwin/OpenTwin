@@ -37,7 +37,7 @@
 #include "OTCore/ComparisionSymbols.h"
 #include "IndexHandler.h"
 
-#include "OTServiceFoundation/TimeFormatter.h"
+#include "OTCore/TimeFormatter.h"
 #include "SolverReport.h"
 #include "OTCore/ResultCollectionDefaultIndexes.h"
 
