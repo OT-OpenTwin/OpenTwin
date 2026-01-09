@@ -60,6 +60,7 @@
 #include "SceneNodeMeshItem.h"
 #include "SceneNodeGeometry.h"
 #include "SceneNodeContainer.h"
+#include "SceneNodeLCS.h"
 #include "SceneNodeAnnotation.h"
 #include "SceneNodeCartesianMesh.h"
 #include "SceneNodeCartesianMeshItem.h"
@@ -518,6 +519,42 @@ void Model::addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, c
 
 	// Add the node to the maps for faster access
 	storeInMaps(containerNode);
+}
+
+void Model::addLCSNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double> &coordinateSettings)
+{
+	// Create the new LCS node
+
+	SceneNodeBase* lcsNode = new SceneNodeLCS;
+
+	lcsNode->setTreeItem(_treeItem);
+
+	VisualiserHelper::addVisualizer(lcsNode, _visualisationTypes);
+
+	// Get the parent scene node
+	SceneNodeBase* parentNode = getParentNode(_treeItem.getEntityName());
+	assert(parentNode != nullptr); // We assume that the parent node already exists
+
+	if (parentNode == nullptr)
+	{
+		// If the model is corrupt, this might happen. We deal with this by ignoring the current item
+		delete lcsNode;
+		return;
+	}
+
+	// Now add the current node as child to the parent
+	parentNode->addChild(lcsNode);
+
+	// Now add the current nodes osg node to the parent's osg node
+	parentNode->getShapeNode()->addChild(lcsNode->getShapeNode());
+
+	// Add the tree name to the tree
+	addSceneNodesToTree(lcsNode);
+
+	lcsNode->setModel(this);
+
+	// Add the node to the maps for faster access
+	storeInMaps(lcsNode);
 }
 
 void Model::addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,

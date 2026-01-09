@@ -166,6 +166,9 @@
     <ClCompile Include="src\VisualiserHelper.cpp">
       <Filter>src\Visualiser</Filter>
     </ClCompile>
+    <ClCompile Include="src\SceneNodeLCS.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -341,6 +344,9 @@
     </ClInclude>
     <ClInclude Include="include\VisualiserInfo.h">
       <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeLCS.h">
+      <Filter>include\SceneNodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
