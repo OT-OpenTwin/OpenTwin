@@ -308,7 +308,7 @@ int main(int _argc, char *_argv[])
 
 		// Check if script was set
 		if (!argsParser.getScriptFile().isEmpty()) {
-			AppBase::instance()->setScript(argsParser.getScriptFile());
+			AppBase::instance()->runJSScriptFromFile(argsParser.getScriptFile());
 		}
 
 		// LogIn
