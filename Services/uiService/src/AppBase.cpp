@@ -435,11 +435,12 @@ bool AppBase::runJSScriptFromFile(const QString& _filePath) {
 	QByteArray data = scriptFile.readAll();
 	scriptFile.close();
 
-	return this->runJSScript(data);
+	return this->runJSScript(_filePath, data);
 }
 
-bool AppBase::runJSScript(const QString& _scriptData) {
+bool AppBase::runJSScript(const QString& _scriptName, const QString& _scriptData) {
 	if (m_scriptEngine == nullptr) {
+		OT_LOG_D("Initializing script engine");
 		m_scriptEngine = std::make_unique<ScriptEngine>(this);
 
 		// Initialize script engine
@@ -448,9 +449,12 @@ bool AppBase::runJSScript(const QString& _scriptData) {
 		}
 	}
 
+	OT_LOG_D("Running script: " + _scriptName.toStdString());
+	appendOutputMessageAPI("Running script: " + _scriptName.toStdString() + "\n");
+
 	QJSValue result = m_scriptEngine->evaluate(_scriptData);
 	if (result.isError()) {
-		OT_LOG_E("Script error at line " + std::to_string(result.property("lineNumber").toInt()) + ": " + result.toString().toStdString());
+		OT_LOG_E("Script error at " + _scriptName.toStdString() + "::" + std::to_string(result.property("lineNumber").toInt()) + ": " + result.toString().toStdString());
 		return false;
 	}
 
@@ -2487,6 +2491,45 @@ void AppBase::slotShowOutputContextMenu(QPoint _pos) {
 			m_output->getPlainTextEdit()->clear();
 		}
 	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Messaging slots
+
+QVariantMap AppBase::slotSendExecuteMessageToService(const QString& _serviceName, const QString& _message) {
+	auto service = m_ExternalServicesComponent->getServiceFromName(_serviceName.toStdString());
+	if (service) {
+		return slotSendExecuteMessageToUrl(QString::fromStdString(service->getServiceURL()), _message);
+	}
+	else {
+		QVariantMap result;
+		result.insert("success", false);
+		result.insert("response", "Service \"" + _serviceName + "\" not found");
+		return result;
+	}
+}
+
+QVariantMap AppBase::slotSendExecuteMessageToUrl(const QString& _serviceUrl, const QString& _message) {
+	QVariantMap result;
+	std::string response;
+	result.insert("success", sendExecuteAPI(_serviceUrl.toStdString(), _message.toStdString(), response));
+	result.insert("response", QString::fromStdString(response));
+	return result;
+}
+
+bool AppBase::slotSendQueueMessageToService(const QString& _serviceName, const QString& _message) {
+	auto service = m_ExternalServicesComponent->getServiceFromName(_serviceName.toStdString());
+	if (service) {
+		return slotSendQueueMessageToUrl(QString::fromStdString(service->getServiceURL()), _message);
+	}
+	else {
+		return false;
+	}
+}
+
+bool AppBase::slotSendQueueMessageToUrl(const QString& _serviceUrl, const QString& _message) {
+	return sendQueueAPI(_serviceUrl.toStdString(), _message.toStdString());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

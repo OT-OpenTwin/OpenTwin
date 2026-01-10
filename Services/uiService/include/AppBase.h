@@ -191,7 +191,7 @@ public:
 
 	bool runJSScriptFromFile(const QString& _filePath);
 
-	bool runJSScript(const QString& _scriptData);
+	bool runJSScript(const QString& _scriptName, const QString& _scriptData);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -517,6 +517,34 @@ public Q_SLOTS:
 	void appendHtmlInfoMessage(const QString& _html);
 
 	void slotShowOutputContextMenu(QPoint _pos);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Messaging slots
+
+	//! @brief Sends an execute message to the specified service and wait for the response.
+	//! @param _serviceName Name of the service to send the message to.
+	//! @param _message Message to send.
+	//! @return Map containing a boolean "success" indicating the success of the operation and a string "response" containing the response string.
+	QVariantMap slotSendExecuteMessageToService(const QString& _serviceName, const QString& _message);
+
+	//! @brief Sends an execute message to the specified service URL and wait for the response.
+	//! @param _serviceUrl URL of the service to send the message to.
+	//! @param _message Message to send.
+	//! @return Map containing a boolean "success" indicating the success of the operation and a string "response" containing the response string.
+	QVariantMap slotSendExecuteMessageToUrl(const QString& _serviceUrl, const QString& _message);
+
+	//! @brief Sends a queue message to the specified service.
+	//! @param _serviceName Name of the service to send the message to.
+	//! @param _message Message to send.
+	//! @return True on success, false on failure.
+	bool slotSendQueueMessageToService(const QString& _serviceName, const QString& _message);
+
+	//! @brief Sends a queue message to the specified service URL.
+	//! @param _serviceUrl URL of the service to send the message to.
+	//! @param _message Message to send.
+	//! @return True on success, false on failure.
+	bool slotSendQueueMessageToUrl(const QString& _serviceUrl, const QString& _message);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

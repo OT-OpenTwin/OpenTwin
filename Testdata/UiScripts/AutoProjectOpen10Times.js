@@ -10,7 +10,7 @@ AppBase.logInDialogAvailable.connect(function (dialog) {
 
 // After login open the first project
 AppBase.loginSuccessful.connect(function () {
-    AppBase.slotOpenProjectFromIndex(0);
+    AppBase.slotOpenProjectFromIndex(PROJECT_INDEX);
 });
 
 // After project open completed switch to other project
