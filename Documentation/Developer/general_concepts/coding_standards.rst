@@ -24,16 +24,16 @@ Naming Conventions
         - Note
     *   - Namespace
         - under\_scored
-        - Differentiate from class names
+        - Differentiate from class names.
     *   - Class name
         - CamelCase
-        - To differentiate from STL types which ISO recommends (do not use "C" or "T" prefixes) 
+        - To differentiate from STL types which ISO recommends (do not use "C" or "T" prefixes).
     *   - Function name 
         - camelCase 
-        - Lower case start is almost universal except for .Net world
+        - Lower case start is almost universal except for .Net world.
     *   - Parameters
         - \_camelCase
-        - Vast majority of standards recommends this because \_ is more readable to (C++ crowd :)) ... (although not much to Java/.Net crowd) 
+        - Vast majority of standards recommends this because \_ is more readable to C++ crowd.
     *   - Locals
         - camelCase
         - Vast majority of standards recommends this. 
@@ -42,15 +42,15 @@ Naming Conventions
         - It makes it very easy to differentiate between class members and everything else. We also use a second prefix for globals. These are the only two.
     *   - Enums and its members
         - CamelCase
-        - Most except very old standards agree with this one 
+        - Most except very old standards agree with this one.
     *   - Globals
         - g\_camelCase
         - You shouldn't have these in first place!
     *   - Defines
         - UPPER\_CASE
-        - Very contentious and we just have to pick one here, unless if is a private constant in class or method, then use naming for Members or Locals 
+        - Very contentious and we just have to pick one here, unless if is a private constant in class or method, then use naming for Members or Locals.
     *   - File names
-        - Match case of class name in file 
+        - Match case of class name in file
         - The file name should match the case of the class (e.g. MyClass -> MyClass.h. maclass.h would be wrong here). Lot of pro and cons either way but this removes inconsistency in auto generated code (important for ROS).
 
 Header Files
@@ -58,7 +58,7 @@ Header Files
 
 Use a #pragma once at the beginning of all header files.
 
-.. code:: c++
+.. code-block:: c++
 
     // MyHeader.h
     #pragma once
@@ -73,7 +73,7 @@ Outside that the Namespace, Class and methods levels use separate line for the o
 Note that curlies are not required if you have a single statement, but it is very easy to accidentally change a control flow if you do not use { and }.
 For instance:
 
-.. code:: c++
+.. code-block:: c++
 
     if (condition)
         do_something();
@@ -84,7 +84,7 @@ For instance:
 
 This code can change its behaviour simply by outcommanting one statement:
 
-.. code:: c++
+.. code-block:: c++
 
     if (condition)
         do_something();
@@ -97,7 +97,7 @@ This would cause the "must_always_do_this" method to be called only in the else 
 It is better to code unambiguously what is intended.
 Try to use the curlies for single statements as well to match the look.
 
-.. code:: c++
+.. code-block:: c++
 
     int main(int _argc, char* _argv[]) {
         while (x == y) {
@@ -123,7 +123,7 @@ Class Basics
 
 Whenever a class has a pointer attribute the constructor, destructor, copy constructor and assignment operator must be declared or explicitly deleted.
 
-.. code:: c++
+.. code-block:: c++
 
     class A {
         A();
@@ -145,7 +145,7 @@ Whenever a class has a pointer attribute the constructor, destructor, copy const
 
 The `OTCore/OTClassHelper.h` header provides helpers that may be used to explicitly delete default methods.
 
-.. code:: c++
+.. code-block:: c++
 
     #include "OTCore/OTClassHelper.h"
     class A {
@@ -171,11 +171,11 @@ Setter and Getter
 
 Setter must always have the "set" and getter always the "get" prefix.
 
-.. code:: c++
+.. code-block:: c++
 
     class A {
         void setX(int _x);
-        int getX(void) const;
+        int getX() const;
     };
 
 Member Initialization
@@ -183,7 +183,7 @@ Member Initialization
 
 Always initialize members and/or local variables as soon as they are added.
 
-.. code:: c++
+.. code-block:: c++
 
     class A {
     private:
@@ -194,7 +194,7 @@ Always initialize members and/or local variables as soon as they are added.
         {}
     };
 
-    void foo(void) {
+    void foo() {
         int lclValue; // wrong, ALWAYS initialize variables
         int lvlValue = 0; // correct
     }
@@ -204,17 +204,17 @@ Const Functions
 
 When adding functions which don't modify or dont allow to modify any content of the object make the functions const.
 
-.. code::c++
+.. code-block:: c++
     
     class A {
-        int getX(void) { return m_x; };       // wrong: function should be const.
-        int getX(void) const { return m_x; }; // correct.
-    }
+        int getX() { return m_x; };       // wrong: function should be const.
+        int getX() const { return m_x; }; // correct.
+    };
 
 Const variables
 ---------------
 
-.. code::c++
+.. code-block:: c++
 
     class A {
         const int m_ix; // Correct if the variable should only be initialized and not further modified.
@@ -225,7 +225,7 @@ Const and References
 
 Add the const suffix to a class function when returning a read only reference to an object.
 
-.. code:: c++
+.. code-block:: c++
 
     class A {
     public:
@@ -236,10 +236,11 @@ Add the const suffix to a class function when returning a read only reference to
 
     private:
         std::string m_string;
+    };
 
 Whenever passing an object as an argument to a method prefer passing a const reference instead of a copy.
 
-.. code::c++
+.. code-block:: c++
 
     void foo(const MyClass& _obj);  // We pass a const reference since we don't modify _obj
 
@@ -252,7 +253,7 @@ Overriding
 
 When overriding a virtual method, use the override suffix.
 
-.. code:: c++
+.. code-block:: c++
 
     class A {
     public:
@@ -263,22 +264,26 @@ When overriding a virtual method, use the override suffix.
     public:
         virtual void foo(void) {};          // wrong, use the override suffix
         virtual void foo(void) override {}; // correct
-    }
+    };
 
 Pointers
 --------
 
-This is really about memory management. A simulator has a lot of performance-critical code, and C++ provides mechanisms for high performance code. 
-However, these mechanisms are complex and should be properly understood. Make sure you understand the difference between heap and stack allocation. 
-In general, memory handling on the heap is less performant and errors can occur quickly. Typical examples are accessing freed memory (null pointer access) or 
-failing to free allocated memory (memory leak). Good practice for preventing null pointer access errors is to set a pointer directly to nullptr whenever it 
-does not reference an object, and to add appropriate tests if a pointer is equal to nullptr before it is used. Preventing memory leaks can be achieved in several ways. 
-The consideration of how to handle heap-allocated memory differs depending on the scope in which the pointer exists, and how it should be shared outside its scope. First, consider a pointer in the scope of a method. That is, we allocate memory within the scope of a method, and we also want to deallocate the memory:
+This is really about memory management.
+A simulator has a lot of performance-critical code, and C++ provides mechanisms for high performance code. 
+However, these mechanisms are complex and should be properly understood.
+Make sure you understand the difference between heap and stack allocation. 
+In general, memory handling on the heap is less performant and errors can occur quickly.
+Typical examples are accessing freed memory (null pointer access) or failing to free allocated memory (memory leak).
+Good practice for preventing null pointer access errors is to set a pointer directly to nullptr whenever it does not reference an object, and to add appropriate tests if a pointer is equal to nullptr before it is used.
+Preventing memory leaks can be achieved in several ways.
+The consideration of how to handle heap-allocated memory differs depending on the scope in which the pointer exists, and how it should be shared outside its scope.
+First, consider a pointer in the scope of a method.
+That is, we allocate memory within the scope of a method, and we also want to deallocate the memory:
 
-.. code:: c++
+.. code-block:: c++
 
-    void foo()
-    {
+    void foo() {
         int* ptr = new int[10];
         ... something is happening ...
         delete ptr;
@@ -291,34 +296,33 @@ The memory could then be freed in the catch block. Fortunately, C++11 provides a
 and its purpose is to encapsulate the live-time management of heap-allocated memory. 
 There are three types, weak, unique and shared. We only recommend the use of the latter two. Also, the appropriate memory allocation methods should be used, i.e:
 
-.. code:: c++
+.. code-block:: c++
 
-    void foo()
-    {
+    void foo() {
         std::unique_ptr<int[]> ptr = std::make_unique<int[]>(10);
         ... something is happening ...
     }
 
 
 
-Smart pointers are not free. They are objects of a class and come with attributes and methods. In performance critical sections, it may be better to use the good old raw pointer.
- Here the C++ operators new/delete should be used, NOT the C operator malloc/free, for various reasons.\\ 
- The second scope for pointers is at the class level, i.e. a pointer as a member of a class. Here, smart pointers are not needed and could add unnecessary complexity. 
- Instead, the very common technique `RAII (Resource Acquisition Is Initialization) <https://en.cppreference.com/w/cpp/language/raii>`_ 
- should be used. 
- Basically, it just says that resources should be allocated at object instantiation, i.e. within the constructor, and freed by calling the destructor.
+Smart pointers are not free. They are objects of a class and come with attributes and methods.
+In performance critical sections, it may be better to use the good old raw pointer.
+Here the C++ operators new/delete should be used, NOT the C operator malloc/free, for various reasons.
 
-.. code:: c++
+The second scope for pointers is at the class level, i.e. a pointer as a member of a class.
+Here, smart pointers are not needed and could add unnecessary complexity. 
+Instead, the very common technique `RAII (Resource Acquisition Is Initialization) <https://en.cppreference.com/w/cpp/language/raii>`_ should be used. 
+Basically, it just says that resources should be allocated at object instantiation, i.e. within the constructor, and freed by calling the destructor.
 
-    class Foo
-    {
+.. code-block:: c++
+
+    class Foo {
         public:
-            Foo()
-            {
+            Foo() {
                 m_ptr = new int[10];
             }
-            ~Foo()
-            {
+
+            ~Foo() {
                 if(m_ptr != nullptr)
                 {
                     delete m_ptr;
@@ -327,7 +331,7 @@ Smart pointers are not free. They are objects of a class and come with attribute
             }
         private:
             int* m_ptr = nullptr;
-    }
+    };
 
 Btw. this concept is very well applicable for any kind of resources, e.g. streams, locks, sockets and similar.\\ 
 
@@ -339,13 +343,13 @@ Line Breaks
 
 Files should be committed with Unix line breaks. When working on Windows, git can be configured to checkout files with Windows line breaks and automatically convert from Windows to Unix line breaks when committing by running the following command:
 
-.. code::
+.. code-block::
     
     git config --global core.autocrlf true
 
 When working on Linux, it is preferable to configure git to checkout files with Unix line breaks by running the following command:
 
-.. code::
+.. code-block::
 
     git config --global core.autocrlf input
 
@@ -370,7 +374,7 @@ Only include what you really need to include.
 If a pointer is needed in a header file use a forward declaration instead of an include.
 Adding more includes than needed will lead to increased compile times.
 
-.. code:: c++
+.. code-block:: c++
 
     #include <MyClass.h> // Wrong, a forward declaration is sufficient.
 
@@ -383,7 +387,7 @@ Adding more includes than needed will lead to increased compile times.
 For own and OpenTwin header files use the quotation marks `"` for includes.
 For others (e.g. std header) use the angle brackets.
 
-.. code:: c++
+.. code-block:: c++
 
     #include "MyHeader.h" // Own header, use "..."
     #include "OTCore/Logger.h" // OpenTwin header, use "..."

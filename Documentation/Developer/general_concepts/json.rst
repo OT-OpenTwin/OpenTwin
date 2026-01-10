@@ -2,7 +2,7 @@ JSON
 ====
 
 OpenTwin provides a JSON API which wraps the ``rapidJSON`` library.
-Classes that may be serialized should inherit from *ot::Serializable* (``OTCore/Serializable.h``).
+Classes that may be serialized should inherit from `ot::Serializable <../_static/codedochtml/classot_1_1_serializable.xhtml>`_.
 
 Full Example
 ------------

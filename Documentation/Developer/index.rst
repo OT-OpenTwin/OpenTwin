@@ -5,7 +5,7 @@
 
 
 Welcome
-=======
+#######
 
 OpenTwin is a microservices based open source platform for supporting multiphysical multiscale simulations. 
 
@@ -15,7 +15,8 @@ Communication between the services is based on HTTP with (m)TLS security. The so
 `Go to code documentation <_static/code/code_index.html>`_
 
 Overview
-^^^^^^^^
+********
+
 
 .. toctree::
    :maxdepth: 2
@@ -26,12 +27,13 @@ Overview
    ui_api/ui_api
    services/services
    documented_endpoints/documented_endpoints
+   scripting/scripting
    dev_tools/dev_tools
    code_docs/code_docs
    test_cases/test_cases
    
 Indices and tables
-==================
+##################
 
 * :ref:`genindex`
 * :ref:`modindex`
