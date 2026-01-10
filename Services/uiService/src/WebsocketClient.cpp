@@ -156,7 +156,7 @@ bool WebsocketClient::sendMessage(ot::RelayedMessageHandler::MessageType _type, 
 	// Wait for response if needed
 	if (_type == ot::RelayedMessageHandler::Execute) {
 		// Wait for the reponse
-		while (m_messageHandler.isWaitingForResponse(messageId) && m_isConnected) {
+		while (m_messageHandler.isWaitingForResponse(messageId) && m_isConnected && !m_sessionIsClosing) {
 			QEventLoop eventLoop;
 			eventLoop.connect(this, &WebsocketClient::responseReceived, &eventLoop, &QEventLoop::quit);
 			eventLoop.connect(this, &WebsocketClient::connectionClosed, &eventLoop, &QEventLoop::quit);
@@ -187,6 +187,11 @@ void WebsocketClient::prepareSessionClosing() {
 }
 
 void WebsocketClient::updateLogFlags(const ot::LogFlags& _flags) {
+	if (m_sessionIsClosing || !m_isConnected) {
+		// No need to update log flags if the session is closing or not connected
+		return;
+	}
+
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetGlobalLogFlags, doc.GetAllocator()), doc.GetAllocator());
 	ot::JsonArray arr;
@@ -286,7 +291,7 @@ void WebsocketClient::slotProcessMessageQueue() {
 	m_bufferHandlingRequested = false;
 
 	// Don't process buffer if we are already processing a message or if we are waiting for a response
-	if (m_currentlyProcessingQueuedMessage || this->anyWaitingForResponse()) {
+	if (m_currentlyProcessingQueuedMessage || m_sessionIsClosing || this->anyWaitingForResponse()) {
 		return;
 	}
 
@@ -393,7 +398,7 @@ bool WebsocketClient::ensureConnection() {
 }
 
 void WebsocketClient::queueBufferProcessingIfNeeded() {
-	if (!m_bufferHandlingRequested && (!m_newRequests.empty() || !m_currentRequests.empty()) && m_isConnected) {
+	if (!m_bufferHandlingRequested && !m_sessionIsClosing && m_isConnected && (!m_newRequests.empty() || !m_currentRequests.empty())) {
 		m_bufferHandlingRequested = true;
 		QMetaObject::invokeMethod(this, &WebsocketClient::slotProcessMessageQueue, Qt::QueuedConnection);
 	}
