@@ -160,7 +160,13 @@ bool WebsocketClient::sendMessage(ot::RelayedMessageHandler::MessageType _type, 
 			QEventLoop eventLoop;
 			eventLoop.connect(this, &WebsocketClient::responseReceived, &eventLoop, &QEventLoop::quit);
 			eventLoop.connect(this, &WebsocketClient::connectionClosed, &eventLoop, &QEventLoop::quit);
+			eventLoop.connect(this, &WebsocketClient::sessionIsClosing, &eventLoop, &QEventLoop::quit);
 			eventLoop.exec(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
+		}
+
+		// Check whether we are still connected
+		if (!m_isConnected || m_sessionIsClosing) {
+			return false;
 		}
 
 		// We have received a response and return the text
@@ -184,6 +190,8 @@ void WebsocketClient::prepareSessionClosing() {
 	m_sessionIsClosing = true;
 	m_newRequests.clear();
 	m_currentRequests.clear();
+
+	Q_EMIT sessionIsClosing();
 }
 
 void WebsocketClient::updateLogFlags(const ot::LogFlags& _flags) {

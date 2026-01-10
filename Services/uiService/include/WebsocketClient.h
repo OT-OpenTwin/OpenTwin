@@ -49,6 +49,7 @@ public:
 Q_SIGNALS:
 	void connectionClosed();
 	void responseReceived();
+	void sessionIsClosing();
 
 private Q_SLOTS:
 	void slotConnected();
