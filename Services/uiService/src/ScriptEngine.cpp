@@ -3,6 +3,7 @@
 // OpenTwin header
 #include "AppBase.h"
 #include "ScriptEngine.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
 
 ScriptEngine::ScriptEngine(QObject* _parent) 
 	: QJSEngine(_parent)
@@ -16,14 +17,11 @@ ScriptEngine::~ScriptEngine() {
 
 bool ScriptEngine::initialize(AppBase* _app) {
 	// Register global objects
-	globalObject().setProperty("Engine",newQObject(this));
+	
 	globalObject().setProperty("AppBase", newQObject(_app));
+	setObjectOwnership(_app, QJSEngine::CppOwnership);
 
+	globalObject().setProperty("ViewManager", newQObject(&ot::GlobalWidgetViewManager::instance()));
+	setObjectOwnership(&ot::GlobalWidgetViewManager::instance(), QJSEngine::CppOwnership);
 	return true;
-}
-
-void ScriptEngine::setLogInDialog(QObject* _dialogObject) {
-	if (_dialogObject) {
-		Q_EMIT logInDialogAvailable(_dialogObject);
-	}
 }

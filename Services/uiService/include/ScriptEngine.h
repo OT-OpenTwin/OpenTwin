@@ -21,10 +21,4 @@ public:
 	~ScriptEngine();
 	
 	bool initialize(AppBase* _app);
-
-	void setLogInDialog(QObject* _dialogObject);
-
-Q_SIGNALS:
-	void logInDialogAvailable(QObject* _dialogObject);
-
 };

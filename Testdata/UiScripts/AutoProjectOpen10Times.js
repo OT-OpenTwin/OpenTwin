@@ -2,7 +2,7 @@ var PROJECT_INDEX = 10;
 var MAX_SWITCHES = 10;
 
 // Auto Login
-Engine.logInDialogAvailable.connect(function (dialog) {
+AppBase.logInDialogAvailable.connect(function (dialog) {
     dialog.dialogShown.connect(function () {
         dialog.slotLogIn();
     });
@@ -24,5 +24,5 @@ AppBase.servicesUiSetupComplete.connect(function () {
     AppBase.slotRefreshProjectOverivew();
 
     projectSwitchCount++;
-    AppBase.slotOpenProjectFromIndex(10); 
+    AppBase.slotOpenProjectFromIndex(PROJECT_INDEX); 
 });

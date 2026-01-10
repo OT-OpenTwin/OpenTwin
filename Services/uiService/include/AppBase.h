@@ -341,6 +341,7 @@ public Q_SLOTS:
 	void projectCloseCompleted();
 
 Q_SIGNALS:
+	void logInDialogAvailable(LogInDialog* _dialog);
 	void loginSuccessful();
 	void projectOpened();
 	void projectClosed();

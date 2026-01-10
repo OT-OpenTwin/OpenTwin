@@ -284,9 +284,7 @@ bool AppBase::logIn() {
 	loginDia.initialize();
 	loginDia.showNormal();
 
-	if (m_scriptEngine != nullptr) {
-		m_scriptEngine->setLogInDialog(m_loginDialog);
-	}
+	Q_EMIT logInDialogAvailable(m_loginDialog);
 
 	if (loginDia.showDialog() != ot::Dialog::Ok) {
 		m_loginDialog = nullptr;
