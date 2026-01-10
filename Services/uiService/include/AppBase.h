@@ -324,39 +324,6 @@ public:
 
 	ToolBar * getToolBar() const { return m_ttb; }
 
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Navigation
-
-	void setNavigationTreeSortingEnabled(bool _enabled);
-	void setNavigationTreeMultiselectionEnabled(bool _enabled);
-
-	void clearNavigationTree();
-
-	ot::UID addNavigationTreeItem(const ot::EntityTreeItem& _itemInfo);
-
-	void setNavigationTreeItemIcon(ot::UID _itemID, const QString & _iconName, const QString & _iconDefaultPath);
-
-	void setNavigationTreeItemText(ot::UID _itemID, const QString & _itemName);
-
-	void setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection);
-
-	void setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
-
-	void setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
-
-	void expandSingleNavigationTreeItem(ot::UID _itemID, bool _isExpanded);
-
-	bool isTreeItemExpanded(ot::UID _itemID);
-
-	bool isTreeItemSelected(ot::UID _itemID);
-
-	void toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds);
-
-	void removeNavigationTreeItems(const std::vector<ot::UID> & itemIds);
-
-	void clearNavigationTreeSelection();
-	
 	void setupPropertyGrid(const ot::PropertyGridCfg& _configuration);
 
 	void clearModalPropertyGrid();
@@ -364,10 +331,6 @@ public:
 	void focusPropertyGridItem(const std::string& _group, const std::string& _name);
 
 	//void fillPropertyGrid(const std::string &settings);
-
-	QString getNavigationTreeItemText(ot::UID _itemID);
-
-	const ot::SelectionInformation& getSelectedNavigationTreeItems();
 
 	void setVisible3D(bool visible3D) { m_visible3D = visible3D; }
 	void setVisibleBlockPicker(bool visibleBlockPicker) { m_visibleBlockPicker = visibleBlockPicker; }
@@ -494,6 +457,13 @@ public Q_SLOTS:
 	void slotCopyRequested(const ot::CopyInformation& _info);
 	void slotPasteRequested(const ot::CopyInformation& _info);
 	void slotColorStyleChanged();
+
+	void slotLockUI(bool _flag);
+	void slotLockSelectionAndModification(bool _flag);
+	void slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous);
+	void slotSetProgressBarValue(int _progressPercentage);
+
+	void slotRunCustomTimer(const QString& _timerId, int _intervalMs);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -641,6 +611,41 @@ public Q_SLOTS:
 
 	// Tree slots
 
+	void setNavigationTreeSortingEnabled(bool _enabled);
+	void setNavigationTreeMultiselectionEnabled(bool _enabled);
+
+	void clearNavigationTree();
+
+	ot::UID findNavigationTreeItemByName(const QString& _itemName);
+
+	ot::UID addNavigationTreeItem(const ot::EntityTreeItem& _itemInfo);
+
+	void setNavigationTreeItemIcon(ot::UID _itemID, const QString& _iconName, const QString& _iconDefaultPath);
+
+	void setNavigationTreeItemText(ot::UID _itemID, const QString& _itemName);
+
+	void setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection);
+
+	void setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
+
+	void setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
+
+	void expandSingleNavigationTreeItem(ot::UID _itemID, bool _isExpanded);
+
+	bool isTreeItemExpanded(ot::UID _itemID);
+
+	bool isTreeItemSelected(ot::UID _itemID);
+
+	void toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds);
+
+	void removeNavigationTreeItems(const std::vector<ot::UID>& itemIds);
+
+	void clearNavigationTreeSelection();
+
+	QString getNavigationTreeItemText(ot::UID _itemID);
+
+	const ot::SelectionInformation& getSelectedNavigationTreeItems();
+
 	//! @brief Navigation tree item selection has changed.
 	//! @callgraph
 	void slotTreeItemSelectionChanged();
@@ -675,6 +680,10 @@ Q_SIGNALS:
 	//! @param _dialog Pointer to the log-in dialog.
 	void logInDialogAvailable(QObject* _dialog);
 
+	//! @brief Is emitted when the tool bar is available.
+	//! @param _toolBar Pointer to the tool bar.
+	void toolBarAvailable(QObject* _toolBar);
+
 	//! @brief Is emitted when the log-in was successful and the default ui was created.
 	void loginSuccessful();
 
@@ -686,6 +695,8 @@ Q_SIGNALS:
 
 	//! @brief Is emitted when the services UI setup of all services in the session is complete.
 	void servicesUiSetupComplete();
+
+	void customTimerTimeout(const QString& _timerID);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -720,16 +731,6 @@ protected:
 	// Current Project API
 
 	virtual void activateModelVersionAPI(const std::string& _versionName) override;
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Public: Connector API slots
-
-public Q_SLOTS:
-	void slotLockUI(bool _flag);
-	void slotLockSelectionAndModification(bool _flag);
-	void slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous);
-	void slotSetProgressBarValue(int _progressPercentage);
 
 private:
 	enum class AppState {

@@ -957,6 +957,8 @@ void AppBase::createUi() {
 				m_scriptEngine->registerToolBar(m_ttb);
 			}
 
+			Q_EMIT toolBarAvailable(m_ttb);
+
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Create docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 15);
 
@@ -1659,102 +1661,6 @@ bool AppBase::checkForContinue(const std::string& _title) {
 	return true;
 }
 
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Navigation
-
-void AppBase::setNavigationTreeSortingEnabled(bool _enabled) {
-	m_projectNavigation->getTree()->setSortingEnabled(_enabled);
-}
-
-void AppBase::setNavigationTreeMultiselectionEnabled(bool _enabled) {
-	m_projectNavigation->getTree()->setMultiSelectionEnabled(_enabled);
-}
-
-void AppBase::clearNavigationTree() {
-	m_projectNavigation->getTree()->clear();
-}
-
-ot::UID AppBase::addNavigationTreeItem(const ot::EntityTreeItem& _itemInfo) {
-	return m_projectNavigation->getTree()->add(_itemInfo);
-}
-
-void AppBase::setNavigationTreeItemIcon(ot::UID _itemID, const QString & _iconName, const QString & _iconDefaultPath) {
-	QString fullIconPath;
-	if (_iconName.indexOf('/') == -1)
-	{
-		fullIconPath += _iconDefaultPath + "/";
-	}
-	fullIconPath += _iconName;
-	//If no data type was set, png is set as default.
-	if (fullIconPath.indexOf('.') == -1)
-	{
-		fullIconPath += ".png";
-	}
-	m_projectNavigation->getTree()->setItemIcon(_itemID, ot::IconManager::getIcon(fullIconPath));
-}
-
-void AppBase::setNavigationTreeItemText(ot::UID _itemID, const QString & _itemName) {
-	m_projectNavigation->getTree()->setItemText(_itemID, _itemName);
-}
-
-void AppBase::setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection) {
-	{
-		QSignalBlocker sigBlock(m_projectNavigation->getTree());
-		if (_clearOtherSelection) {
-			m_projectNavigation->getTree()->deselectAllItems(false);
-		}
-		m_projectNavigation->getTree()->setItemsSelected(_itemIDs, _selected);
-	}
-
-	slotTreeItemSelectionChanged();
-}
-
-void AppBase::setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
-	m_projectNavigation->getTree()->setItemSelected(_itemID, _isSelected);
-}
-
-void AppBase::setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
-	m_projectNavigation->getTree()->setSingleItemSelected(_itemID, _isSelected);
-}
-
-void AppBase::expandSingleNavigationTreeItem(ot::UID _itemID, bool _isExpanded) {
-	m_projectNavigation->getTree()->expandItem(_itemID, _isExpanded);
-}
-
-bool AppBase::isTreeItemExpanded(ot::UID _itemID) {
-	return m_projectNavigation->getTree()->isItemExpanded(_itemID);
-}
-
-bool AppBase::isTreeItemSelected(ot::UID _itemID) {
-	const ot::UIDList& lst = m_projectNavigation->getTree()->selectedItems(); 
-	return std::find(lst.begin(), lst.end(), _itemID) != lst.end();
-}
-
-void AppBase::toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds) {
-	bool autoConsiderChilds = m_projectNavigation->getTree()->getAutoSelectAndDeselectChildrenEnabled();
-
-	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(_considerChilds);
-	m_projectNavigation->getTree()->toggleItemSelection(_itemID);
-	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(autoConsiderChilds);
-}
-
-void AppBase::removeNavigationTreeItems(const std::vector<ot::UID> & itemIds) {
-	m_projectNavigation->getTree()->deleteItems(itemIds);
-}
-
-void AppBase::clearNavigationTreeSelection() {
-	m_projectNavigation->getTree()->deselectAllItems(true);
-}
-
-QString AppBase::getNavigationTreeItemText(UID _itemID) {
-	return m_projectNavigation->getTree()->getItemText(_itemID);
-}
-
-const ot::SelectionInformation& AppBase::getSelectedNavigationTreeItems() {
-	return m_navigationManager.getSelectionInformation();
-}
-
 void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 	OTAssertNullptr(m_propertyGrid);
 
@@ -2411,6 +2317,53 @@ void AppBase::slotColorStyleChanged() {
 	const ot::ColorStyle& gStyle = ot::GlobalColorStyle::instance().getCurrentStyle();
 
 	uM.storeSetting(STATE_NAME_COLORSTYLE, gStyle.colorStyleName());
+}
+
+void AppBase::slotLockUI(bool _flag) {
+	ot::LockTypes lockFlags(ot::LockType::All);
+
+	if (_flag) {
+		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
+		uiAPI::window::enableTabToolBar(m_mainWindow, false);
+	}
+	else {
+		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
+		uiAPI::window::enableTabToolBar(m_mainWindow, true);
+	}
+}
+
+void AppBase::slotLockSelectionAndModification(bool _flag) {
+	ot::LockTypes lockFlags;
+	lockFlags.set(ot::LockType::ModelWrite);
+	lockFlags.set(ot::LockType::ModelRead);
+	lockFlags.set(ot::LockType::ViewWrite);
+	lockFlags.set(ot::LockType::NavigationWrite);
+
+	if (_flag) {
+		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
+	}
+	else {
+		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
+	}
+
+	m_projectNavigation->getTree()->setEnabled(!_flag);
+}
+
+void AppBase::slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
+	uiAPI::window::setStatusLabelText(m_mainWindow, _progressMessage);
+	uiAPI::window::setStatusProgressVisible(m_mainWindow, _progressBaseVisible, false);
+	uiAPI::window::setStatusLabelVisible(m_mainWindow, _progressBaseVisible, false);
+	uiAPI::window::setStatusProgressContinuous(m_mainWindow, _continuous);
+}
+
+void AppBase::slotSetProgressBarValue(int _progressPercentage) {
+	uiAPI::window::setStatusProgressValue(m_mainWindow, _progressPercentage);
+}
+
+void AppBase::slotRunCustomTimer(const QString& _timerId, int _intervalMs) {
+	QTimer::singleShot(_intervalMs, [=]() {
+		Q_EMIT customTimerTimeout(_timerId);
+	});
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -3635,6 +3588,100 @@ void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property
 
 // Tree slots
 
+void AppBase::setNavigationTreeSortingEnabled(bool _enabled) {
+	m_projectNavigation->getTree()->setSortingEnabled(_enabled);
+}
+
+void AppBase::setNavigationTreeMultiselectionEnabled(bool _enabled) {
+	m_projectNavigation->getTree()->setMultiSelectionEnabled(_enabled);
+}
+
+void AppBase::clearNavigationTree() {
+	m_projectNavigation->getTree()->clear();
+}
+
+ot::UID AppBase::findNavigationTreeItemByName(const QString& _itemName) {
+	return m_projectNavigation->getTree()->getItemUID(_itemName, '/');
+}
+
+ot::UID AppBase::addNavigationTreeItem(const ot::EntityTreeItem& _itemInfo) {
+	return m_projectNavigation->getTree()->add(_itemInfo);
+}
+
+void AppBase::setNavigationTreeItemIcon(ot::UID _itemID, const QString& _iconName, const QString& _iconDefaultPath) {
+	QString fullIconPath;
+	if (_iconName.indexOf('/') == -1) {
+		fullIconPath += _iconDefaultPath + "/";
+	}
+	fullIconPath += _iconName;
+	//If no data type was set, png is set as default.
+	if (fullIconPath.indexOf('.') == -1) {
+		fullIconPath += ".png";
+	}
+	m_projectNavigation->getTree()->setItemIcon(_itemID, ot::IconManager::getIcon(fullIconPath));
+}
+
+void AppBase::setNavigationTreeItemText(ot::UID _itemID, const QString& _itemName) {
+	m_projectNavigation->getTree()->setItemText(_itemID, _itemName);
+}
+
+void AppBase::setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection) {
+	{
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+		if (_clearOtherSelection) {
+			m_projectNavigation->getTree()->deselectAllItems(false);
+		}
+		m_projectNavigation->getTree()->setItemsSelected(_itemIDs, _selected);
+	}
+
+	slotTreeItemSelectionChanged();
+}
+
+void AppBase::setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
+	m_projectNavigation->getTree()->setItemSelected(_itemID, _isSelected);
+}
+
+void AppBase::setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
+	m_projectNavigation->getTree()->setSingleItemSelected(_itemID, _isSelected);
+}
+
+void AppBase::expandSingleNavigationTreeItem(ot::UID _itemID, bool _isExpanded) {
+	m_projectNavigation->getTree()->expandItem(_itemID, _isExpanded);
+}
+
+bool AppBase::isTreeItemExpanded(ot::UID _itemID) {
+	return m_projectNavigation->getTree()->isItemExpanded(_itemID);
+}
+
+bool AppBase::isTreeItemSelected(ot::UID _itemID) {
+	const ot::UIDList& lst = m_projectNavigation->getTree()->selectedItems();
+	return std::find(lst.begin(), lst.end(), _itemID) != lst.end();
+}
+
+void AppBase::toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds) {
+	bool autoConsiderChilds = m_projectNavigation->getTree()->getAutoSelectAndDeselectChildrenEnabled();
+
+	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(_considerChilds);
+	m_projectNavigation->getTree()->toggleItemSelection(_itemID);
+	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(autoConsiderChilds);
+}
+
+void AppBase::removeNavigationTreeItems(const std::vector<ot::UID>& itemIds) {
+	m_projectNavigation->getTree()->deleteItems(itemIds);
+}
+
+void AppBase::clearNavigationTreeSelection() {
+	m_projectNavigation->getTree()->deselectAllItems(true);
+}
+
+QString AppBase::getNavigationTreeItemText(UID _itemID) {
+	return m_projectNavigation->getTree()->getItemText(_itemID);
+}
+
+const ot::SelectionInformation& AppBase::getSelectedNavigationTreeItems() {
+	return m_navigationManager.getSelectionInformation();
+}
+
 void AppBase::slotTreeItemSelectionChanged() {
 	OT_SLECTION_TEST_LOG("Tree item selection changed");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
@@ -3909,51 +3956,6 @@ void AppBase::activateModelVersionAPI(const std::string& _versionName) {
 	else {
 		this->slotRequestVersion(_versionName);
 	}
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Public: Connector API slots
-
-void AppBase::slotLockUI(bool flag) {
-	ot::LockTypes lockFlags(ot::LockType::All);
-
-	if (flag) {
-		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
-		uiAPI::window::enableTabToolBar(m_mainWindow, false);
-	}
-	else {
-		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
-		uiAPI::window::enableTabToolBar(m_mainWindow, true);
-	}
-}
-
-void AppBase::slotLockSelectionAndModification(bool flag) {
-	ot::LockTypes lockFlags;
-	lockFlags.set(ot::LockType::ModelWrite);
-	lockFlags.set(ot::LockType::ModelRead);
-	lockFlags.set(ot::LockType::ViewWrite);
-	lockFlags.set(ot::LockType::NavigationWrite);
-
-	if (flag) {
-		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
-	}
-	else {
-		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
-	}
-
-	m_projectNavigation->getTree()->setEnabled(!flag);
-}
-
-void AppBase::slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
-	uiAPI::window::setStatusLabelText(m_mainWindow, _progressMessage);
-	uiAPI::window::setStatusProgressVisible(m_mainWindow, _progressBaseVisible, false);
-	uiAPI::window::setStatusLabelVisible(m_mainWindow, _progressBaseVisible, false);
-	uiAPI::window::setStatusProgressContinuous(m_mainWindow, _continuous);
-}
-
-void AppBase::slotSetProgressBarValue(int _progressPercentage) {
-	uiAPI::window::setStatusProgressValue(m_mainWindow, _progressPercentage);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
