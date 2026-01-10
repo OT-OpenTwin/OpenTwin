@@ -8,6 +8,8 @@
 // Qt header
 #include <QtQml/qjsengine.h>
 
+class AppBase;
+
 //! @brief The ScriptEngine class is used to execute JavaScript code within the OpenTwin frontend.
 class ScriptEngine : public QJSEngine {
 	Q_OBJECT
@@ -18,7 +20,7 @@ public:
 	ScriptEngine(QObject* _parent);
 	~ScriptEngine();
 	
-	bool initialize();
+	bool initialize(AppBase* _app);
 
 	void setLogInDialog(QObject* _dialogObject);
 

@@ -191,6 +191,18 @@ int ot::ProjectOverviewWidget::getProjectCount() const {
 	return getProjectCount(m_tree->invisibleRootItem());
 }
 
+std::optional<ot::ProjectInformation> ot::ProjectOverviewWidget::getProjectInformationAt(int _index) const {
+	int currentIndex = -1;
+	ProjectOverviewEntry* entry = getEntryAt(m_tree->invisibleRootItem(), _index, currentIndex);
+	if (entry) {
+		return entry->getProjectInformation();
+	}
+	else {
+		OT_LOG_E("Invalid project index: " + std::to_string(_index));
+		return std::optional<ProjectInformation>();
+	}
+}
+
 std::list<ot::ProjectInformation> ot::ProjectOverviewWidget::getAllProjects() const {
 	std::list<ProjectInformation> result;
 	getAllProjects(m_tree->invisibleRootItem(), result);
@@ -442,7 +454,7 @@ void ot::ProjectOverviewWidget::worker() {
 		m_importedProjectData.setDescriptionSyntax(syntax);
 	}
 
-		QMetaObject::invokeMethod(this, &ProjectOverviewWidget::slotWorkerFinished, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(this, &ProjectOverviewWidget::slotWorkerFinished, Qt::QueuedConnection);
 }
 
 void ot::ProjectOverviewWidget::addEntry(ProjectOverviewEntry* _entry) {
@@ -489,6 +501,28 @@ void ot::ProjectOverviewWidget::getAllProjects(const QTreeWidgetItem* _parent, s
 			_lst.push_back(entry->getProjectInformation());
 		}
 	}
+}
+
+ot::ProjectOverviewEntry* ot::ProjectOverviewWidget::getEntryAt(const QTreeWidgetItem* _parent, int _index, int& _currentIndex) const {
+	ProjectOverviewEntry* result = nullptr;
+
+	for (int i = 0; i < _parent->childCount(); i++) {
+		ProjectOverviewEntry* entry = dynamic_cast<ProjectOverviewEntry*>(_parent->child(i));
+		if (entry) {
+			_currentIndex++;
+			if (_currentIndex == _index) {
+				result = entry;
+				break;
+			}
+		}
+		else {
+			result = getEntryAt(_parent->child(i), _index, _currentIndex);
+			if (result) {
+				break;
+			}
+		}
+	}
+	return result;
 }
 
 ot::TreeWidgetItem* ot::ProjectOverviewWidget::getOrCreateProjectGroupItem(const std::string& _groupName) {

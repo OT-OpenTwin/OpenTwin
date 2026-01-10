@@ -372,6 +372,9 @@ bool AppBase::logIn() {
 			QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, projName, projVersion);
 		}
 	}
+
+	Q_EMIT loginSuccessful();
+
 	return true;
 }
 
@@ -440,7 +443,7 @@ bool AppBase::setScript(const QString& _filePath) {
 	scriptFile.close();
 
 	// Initialize script engine
-	if (!m_scriptEngine->initialize()) {
+	if (!m_scriptEngine->initialize(this)) {
 		m_scriptEngine.reset();
 		return false;
 	}
@@ -1705,6 +1708,22 @@ void AppBase::setTabToolBarTabOrder(const QStringList& _lst) {
 
 void AppBase::activateToolBarTab(const QString& _tab) {
 	uiAPI::window::activateToolBarTab(m_mainWindow, _tab);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Notifications
+
+void AppBase::servicesUiSetupCompleted() {
+	Q_EMIT servicesUiSetupComplete();
+}
+
+void AppBase::projectOpenCompleted() {
+	Q_EMIT projectOpened();
+}
+
+void AppBase::projectCloseCompleted() {
+	Q_EMIT projectClosed();
 }
 
 // ##############################################################################################
@@ -3193,11 +3212,36 @@ void AppBase::slotCreateProject() {
 
 void AppBase::slotOpenProject() {
 	auto selectedProjects = m_welcomeScreen->getSelectedProjects();
+	if (selectedProjects.empty()) {
+		return;
+	}
+
 	if (selectedProjects.size() != 1) {
 		OT_LOG_EA("Can not open multiple projects");
 		return;
 	}
 	this->slotOpenSpecificProject(selectedProjects.front().getProjectName(), std::string());
+}
+
+void AppBase::slotOpenProjectFromIndex(int _index) {
+	if (!m_welcomeScreen) {
+		OT_LOG_EA("No welcome screen available");
+		return;
+	}
+
+	auto projInfo = m_welcomeScreen->getProjectInformationAt(_index);
+	if (projInfo.has_value()) {
+		this->slotOpenSpecificProject(projInfo->getProjectName(), std::string());
+	}
+}
+
+void AppBase::slotRefreshProjectOverivew() {
+	if (!m_welcomeScreen) {
+		OT_LOG_EA("No welcome screen available");
+		return;
+	}
+
+	m_welcomeScreen->slotRefreshProjectList();
 }
 
 void AppBase::slotOpenSpecificProject(std::string _projectName, const std::string& _projectVersion) {

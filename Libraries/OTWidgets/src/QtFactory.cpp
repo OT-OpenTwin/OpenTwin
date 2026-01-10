@@ -102,7 +102,6 @@ QGradient::Spread ot::QtFactory::toQGradientSpread(ot::GradientSpread _spread) {
 
 QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 	if (!_painter) {
-		OTAssert(false, "nullptr Painter2D provided");
 		return QBrush();
 	}
 	

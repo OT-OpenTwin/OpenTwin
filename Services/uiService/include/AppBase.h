@@ -333,6 +333,23 @@ public:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	// Notifications
+
+public Q_SLOTS:
+	void servicesUiSetupCompleted();
+	void projectOpenCompleted();
+	void projectCloseCompleted();
+
+Q_SIGNALS:
+	void loginSuccessful();
+	void projectOpened();
+	void projectClosed();
+	void servicesUiSetupComplete();
+
+public:
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// Navigation
 
 	void setNavigationTreeSortingEnabled(bool _enabled);
@@ -553,6 +570,10 @@ private Q_SLOTS:
 
 	void slotCreateProject();
 	void slotOpenProject();
+public Q_SLOTS:
+	void slotOpenProjectFromIndex(int _index);
+	void slotRefreshProjectOverivew();
+private Q_SLOTS:
 	void slotOpenSpecificProject(std::string _projectName, const std::string& _projectVersion);
 	void slotCopyProject();
 	void slotRenameProject();

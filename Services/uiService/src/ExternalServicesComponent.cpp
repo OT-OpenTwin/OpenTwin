@@ -1391,6 +1391,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		// Process buffered actions
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotProcessActionBuffer, Qt::QueuedConnection);
 
+		app->projectOpenCompleted();
+
 		return true;
 	}
 	catch (const std::exception & e) {
@@ -1465,9 +1467,19 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		// Process all pending events to ensure that all queued events are processed before we start deleting things
 		QEventLoop eventLoop;
-		//eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
-		eventLoop.processEvents(QEventLoop::AllEvents);
+		if (m_websocket) {
+			// If we have a websocket, ensure that the queue request was handled before we continue
+			eventLoop.processEvents(QEventLoop::AllEvents);
 
+			while (m_websocket->isBufferHandlingRequested()) {
+				eventLoop.processEvents(QEventLoop::AllEvents);
+			}
+		}
+		else {
+			//eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
+			eventLoop.processEvents(QEventLoop::AllEvents);
+		}
+		
 		// Get the id of the curently active model
 		ModelUIDtype modelID = app->getViewerComponent()->getActiveDataModel();
 
@@ -1536,6 +1548,8 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		OT_LOG_D("Close project done");
 
 		clearSessionInformation();
+
+		app->projectCloseCompleted();
 	}
 	catch (const std::exception & e) {
 		OT_LOG_E(e.what());
@@ -2116,18 +2130,22 @@ void ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocument& _d
 	}
 
 	// Here we know that all services completed the startup -> switch to main view and restore state
-	m_servicesUiSetupCompleted = true;
+	if (!m_servicesUiSetupCompleted) {
+		m_servicesUiSetupCompleted = true;
 
-	AppBase::instance()->switchToViewMenuTabIfNeeded();
-	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockType::All);
+		AppBase::instance()->switchToViewMenuTabIfNeeded();
+		m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockType::All);
 
-	AppBase::instance()->restoreSessionState();
+		AppBase::instance()->restoreSessionState();
 
-	// Apply initial selection
-	for (const InitialSelectionInfo& info : m_initialSelection) {
-		AppBase::instance()->setNavigationTreeItemsSelected(info.treeIDs, info.selected, info.clearSelection);
+		// Apply initial selection
+		for (const InitialSelectionInfo& info : m_initialSelection) {
+			AppBase::instance()->setNavigationTreeItemsSelected(info.treeIDs, info.selected, info.clearSelection);
+		}
+		m_initialSelection.clear();
+
+		QMetaObject::invokeMethod(AppBase::instance(), &AppBase::servicesUiSetupCompleted, Qt::QueuedConnection);
 	}
-	m_initialSelection.clear();
 }
 
 void ExternalServicesComponent::handleRegisterForModelEvents(ot::JsonDocument& _document) {

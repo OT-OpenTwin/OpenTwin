@@ -44,6 +44,8 @@ public:
 	void prepareSessionClosing();
 	void updateLogFlags(const ot::LogFlags& _flags);
 
+	bool isBufferHandlingRequested() const { return m_bufferHandlingRequested; };
+
 Q_SIGNALS:
 	void connectionClosed();
 	void responseReceived();

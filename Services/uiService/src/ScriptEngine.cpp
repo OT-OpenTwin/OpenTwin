@@ -14,13 +14,10 @@ ScriptEngine::~ScriptEngine() {
 
 }
 
-bool ScriptEngine::initialize() {
+bool ScriptEngine::initialize(AppBase* _app) {
 	// Register global objects
-	globalObject().setProperty(
-		"Engine",
-		newQObject(this)
-	);
-	globalObject().setProperty("AppBase", newQObject(AppBase::instance()));
+	globalObject().setProperty("Engine",newQObject(this));
+	globalObject().setProperty("AppBase", newQObject(_app));
 
 	return true;
 }
