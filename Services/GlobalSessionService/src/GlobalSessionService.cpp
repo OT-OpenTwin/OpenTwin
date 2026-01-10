@@ -364,7 +364,7 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 
 		ot::JsonObject objPyrit;
 		defaultCircuitSimulation.addToJsonObject(objPyrit, result.GetAllocator());
-		result.PushBack(objPyrit, result.GetAllocator());
+		//result.PushBack(objPyrit, result.GetAllocator());
 	}
 
 	{

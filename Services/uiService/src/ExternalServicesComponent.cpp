@@ -3417,7 +3417,7 @@ void ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _do
 
 	AppBase::instance()->addGraphicsPickerPackage(pckg);
 
-	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getTitle()), pckg.getPickerKey(), insertFlags, visualisationCfg);
 
 	if (suppressViewHandling) {
@@ -3432,7 +3432,7 @@ void ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _documen
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 	
-	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getName()), pckg.getPickerKey(), insertFlags, visualisationCfg);
 
 	for (auto graphicsItemCfg : pckg.getItems()) {
@@ -3459,7 +3459,7 @@ void ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument& _docu
 
 		std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
-		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 		ot::GraphicsViewView* editor = AppBase::instance()->findGraphicsEditor(editorName, {});
 
 		if (editor) {
@@ -3487,7 +3487,7 @@ void ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _d
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 	
-	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getName()), pckg.getPickerKey(), insertFlags, visualisationCfg);
 
 	for (const auto& connection : pckg.getConnections()) {
@@ -3506,7 +3506,7 @@ void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument&
 
 	if (!pckg.getName().empty()) {
 		// Specific editor
-		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 		ot::GraphicsViewView* editor = AppBase::instance()->findGraphicsEditor(pckg.getName(), {});
 
 		if (editor) {
@@ -3553,7 +3553,7 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 	}
 	else
 	{
-		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 		if (!visualisationCfg.getSetAsActiveView()) {
 			insertFlags |= ot::WidgetView::KeepCurrentFocus;
 		}
@@ -3644,8 +3644,7 @@ void ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _documen
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
-
-	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!visualisationCfg.getSetAsActiveView()) {
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
@@ -3720,7 +3719,7 @@ void ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document) {
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 
-	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!visualisationCfg.getSetAsActiveView()) {
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
@@ -4599,7 +4598,7 @@ void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _recei
 
 void ExternalServicesComponent::slotPlotDataLoadingCompleted(const ot::Plot1DCfg& _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, const std::list<std::string>& _curveIDDescriptions, unsigned long long _loadTimeMs)
 {
-	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!_visualizationCfg.getSetAsActiveView()) {
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}

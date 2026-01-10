@@ -13,6 +13,7 @@ InterpreterPathSettings::InterpreterPathSettings(ot::UID _manifestUID)
 
 InterpreterPathSettings::InterpreterPathSettings(const std::string& _predefinedEnvironmentName)
 {
+	OT_LOG_D("Initialize interpreter path settings for predefined environment: " + _predefinedEnvironmentName);
 	setupBasePaths();
 
 	if (_predefinedEnvironmentName == "Pyrit")
@@ -35,11 +36,11 @@ InterpreterPathSettings::InterpreterPathSettings(const std::string& _predefinedE
 void InterpreterPathSettings::setupBasePaths()
 {
 	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
-	std::string devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
+	std::string devEnvRoot = ot::OperatingSystem::getEnvironmentVariableString(devEnvRootName.c_str());
 	
 #ifdef _DEBUG
 	const std::string pythonRootEnvVarName = "OT_PYTHON_ROOT";
-	std::string pythonRoot = ot::OperatingSystem::getEnvironmentVariable(pythonRootEnvVarName.c_str());
+	std::string pythonRoot = ot::OperatingSystem::getEnvironmentVariableString(pythonRootEnvVarName.c_str());
 	assert(!pythonRoot.empty());
 	
 

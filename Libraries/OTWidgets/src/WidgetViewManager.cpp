@@ -41,7 +41,7 @@
 
 ot::WidgetViewManager::WidgetViewManager() :
 	m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState),
-	m_dockComponentsFactory(nullptr), m_initialStateVersion(0), m_autoCloseTimer(this)
+	m_dockComponentsFactory(nullptr), m_initialStateVersion(0), m_autoCloseTimer(this), m_hasQueuedDelayedFocusUpdate(false)
 {
 	m_focusInfo.last = nullptr;
 	m_focusInfo.lastSide = nullptr;
@@ -174,6 +174,14 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 		_view->getViewDockWidget()->getWidgetViewTab()->disableButtons();
 	}
 	_view->blockSignals(true);
+
+	// Disconnect signals
+	this->disconnect(_view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->disconnect(_view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
+	this->disconnect(_view, &WidgetView::pinnedChanged, this, &WidgetViewManager::slotViewPinnedChanged);
+	if (_view->getViewDockWidget()->tabWidget()) {
+		this->disconnect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
+	}
 
 	// Since the view may be the origin of a signal that leads to the removal of the view, we delete it later
 	_view->deleteLater();
@@ -607,7 +615,7 @@ void ot::WidgetViewManager::getDebugInformation(JsonObject& _object, JsonAllocat
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus) {
-	if (m_state & MulticloseViewState) {
+	if (m_state.hasAny(MulticloseViewState | InsertViewState)) {
 		return;
 	}
 
@@ -764,6 +772,16 @@ void ot::WidgetViewManager::slotViewPinnedChanged(bool _pinned) {
 	view->getViewDockWidget()->setFocus();
 }
 
+void ot::WidgetViewManager::slotUpdateViewFocus() {
+	m_hasQueuedDelayedFocusUpdate = false;
+
+	ads::CDockWidget* currentFocus = m_dockManager->focusedDockWidget();
+	ads::CDockWidget* lastFocus = (m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr);
+	if (currentFocus != lastFocus) {
+		slotViewFocused(lastFocus, currentFocus);
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private
@@ -817,7 +835,6 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 
 	// If the current focus settings should not change store the current active views
 	std::list<WidgetView*> focusedViews;
-	bool dockSignalsBlocked = m_dockManager->signalsBlocked();
 
 	if (_insertFlags & WidgetView::KeepCurrentFocus) {
 		for (const ViewEntry& entry : m_views) {
@@ -825,15 +842,15 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 				focusedViews.push_back(entry.second);
 			}
 		}
-
-		m_dockManager->blockSignals(true);
 	}
 
 	// Add the new view
-	m_state |= InsertViewState;
+	m_state.set(InsertViewState);
+
 	m_dockManager->addView(_view, area, _insertFlags);
 	_view->setManager(this);
-	m_state &= (~InsertViewState);
+
+	m_state.remove(InsertViewState);
 
 	// Add view toggle (only visible if dock is closeable)
 	m_dockToggleRoot->menu()->addAction(_view->getViewDockWidget()->toggleViewAction());
@@ -859,16 +876,26 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 
 	// Update focus information or reset the current focus depending on the insert mode
 	if (_insertFlags & WidgetView::KeepCurrentFocus) {
+		m_state.set(InsertViewState);
 		for (WidgetView* view : focusedViews) {
 			view->setAsCurrentViewTab();
 		}
-		m_dockManager->blockSignals(dockSignalsBlocked);
+		m_state.remove(InsertViewState);
 	}
 	else {
-		m_state |= InsertViewState;
+		m_state.set(InsertViewState);
 		_view->setAsCurrentViewTab();
-		this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
-		m_state &= (~InsertViewState);
+		if (_insertFlags & WidgetView::UpdateFocusDelayed) {
+			if (!m_hasQueuedDelayedFocusUpdate) {
+				m_hasQueuedDelayedFocusUpdate = true;
+				QMetaObject::invokeMethod(this, &WidgetViewManager::slotUpdateViewFocus, Qt::QueuedConnection);
+			}
+			m_state.remove(InsertViewState);
+		}
+		else {
+			m_state.remove(InsertViewState);
+			this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
+		}
 	}
 
 	return true;

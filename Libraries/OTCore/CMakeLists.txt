@@ -147,6 +147,7 @@ set(OTCORE_SOURCE_FILES
     src/VariableToBSONStringConverter.cpp
     src/VariableToJSONConverter.cpp
     src/VariableToStringConverter.cpp
+    src/TimeFormatter.cpp
 )
 
 # Third-party source (base64.c)

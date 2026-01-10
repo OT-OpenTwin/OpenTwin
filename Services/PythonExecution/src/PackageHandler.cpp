@@ -67,10 +67,14 @@ void PackageHandler::initializeManifest(ot::UID _manifestUID)
             std::unique_ptr<EntityPythonManifest>newManifest(loadManifestEntity(_manifestUID));
             if (m_currentManifest->getManifestID() != newManifest->getManifestID())
             {
-	            requestRestart();
                 OT_LOG_D("Manifest change requires interpreter restart.");
+	            requestRestart();
             }
         }
+    }
+    else
+    {
+        OT_LOG_D("Invalid manifest uid. Using core libraries only.")
     }
 }
 
@@ -473,6 +477,7 @@ void PackageHandler::dropImportCache()
 
 EntityPythonManifest* PackageHandler::loadManifestEntity(ot::UID _manifestUID)
 {
+    OT_LOG_D("Loading manifest.");
     ot::EntityInformation info;
     ot::ModelServiceAPI::getEntityInformation(_manifestUID, info);
     EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(info);

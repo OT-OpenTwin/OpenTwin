@@ -49,8 +49,9 @@ namespace ot {
 		OT_DECL_NODEFAULT(WidgetView)
 	public:
 		enum InsertFlag {
-			NoInsertFlags = 0 << 0,
-			KeepCurrentFocus = 1 << 0
+			NoInsertFlags      = 0 << 0,
+			KeepCurrentFocus   = 1 << 0,
+			UpdateFocusDelayed = 1 << 1
 		};
 		typedef ot::Flags<InsertFlag> InsertFlags;
 

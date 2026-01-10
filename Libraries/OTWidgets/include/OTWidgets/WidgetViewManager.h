@@ -232,7 +232,7 @@ namespace ot {
 		void viewCloseRequested(WidgetView* _view);
 		void viewTabClicked(WidgetView* _view);
 		void viewDataModifiedChanged(ot::WidgetView* _view);
-
+		
 	public Q_SLOTS:
 		void slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus);
 
@@ -243,6 +243,7 @@ namespace ot {
 		void slotViewDataModifiedChanged();
 		void slotCloseUnpinnedViews();
 		void slotViewPinnedChanged(bool _pinned);
+		void slotUpdateViewFocus();
 
 	private:
 		enum ManagerState {
@@ -296,6 +297,7 @@ namespace ot {
 		std::string m_initialState;
 		int m_initialStateVersion;
 
+		bool m_hasQueuedDelayedFocusUpdate;
 		FocusInfo        m_focusInfo;
 
 		AutoCloseInfo    m_autoCloseInfo;
