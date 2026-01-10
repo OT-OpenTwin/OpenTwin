@@ -154,8 +154,13 @@ static bool g_runSessionServiceHealthCheck{ false };
 
 namespace ot {
 	namespace intern {
-		static void exitAsync(int _code) {
+		static void exitAsyncWorker(int _code) {
 			exit(_code);
+		}
+
+		static void exitAsync(int _code) {
+			std::thread exitThread(&ot::intern::exitAsyncWorker, _code);
+			exitThread.detach();
 		}
 	}
 }
@@ -1441,13 +1446,22 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		shutdownCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, shutdownCommand.GetAllocator()), shutdownCommand.GetAllocator());
 
 		std::string responseStr;
-		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, shutdownCommand, responseStr)) {
+		if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, shutdownCommand.toJson(), responseStr, 0, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_E("Failed to send shutdown session request to LSS");
+			ot::WindowAPI::showErrorPrompt("Error", "Failed to send shutdown session request to LSS.\nThe application will close now.", 
+				"{ \"LSS.Url\": \"" + m_sessionServiceURL + "\", \"Error\": \"" + ot::msg::getLastError() + "\" }");
+			
+			ot::intern::exitAsync(ot::AppExitCode::LSSNotRunning);
+			return;
 		}
 
 		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 		if (response != ot::ReturnMessage::Ok) {
 			OT_LOG_E("Failed to close session at LSS: " + response.getWhat());
+			ot::WindowAPI::showErrorPrompt("Error", "Failed to close session at LSS.\nThe application will close now.", 
+				"{ \"LSS.Url\": \"" + m_sessionServiceURL + "\", \"Error\": \"" + response.getWhat() + "\" }");
+			ot::intern::exitAsync(ot::AppExitCode::LSSNotRunning);
+			return;
 		}
 
 		// Stop the session service health check
@@ -1734,8 +1748,7 @@ void ExternalServicesComponent::queueAction(const std::string& _json, const std:
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected() {
 	ot::stopSessionServiceHealthCheck();
 	AppBase::instance()->slotShowErrorPrompt("Error", "The Local Session Service has died unexpectedly. The application will be closed now.", "");
-	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
-	exitThread.detach();
+	ot::intern::exitAsync(ot::AppExitCode::LSSNotRunning);
 }
 
 void ExternalServicesComponent::setProgressState(bool visible, const char* message, bool continuous)
@@ -2068,8 +2081,7 @@ void ExternalServicesComponent::handleShutdown() {
 	OT_LOG_D("Showdown received");
 	AppBase::instance()->slotShowErrorPrompt("Error", "Shutdown requested by Local Session Service.", "");
 	
-	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::Success);
-	exitThread.detach();
+	ot::intern::exitAsync(ot::AppExitCode::Success);
 }
 
 void ExternalServicesComponent::handlePreShutdown() {
@@ -2079,15 +2091,13 @@ void ExternalServicesComponent::handlePreShutdown() {
 void ExternalServicesComponent::handleEmergencyShutdown() {
 	AppBase::instance()->slotShowErrorPrompt("Error", "An unexpected error has occurred and the session needs to be closed.", "");
 	
-	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::EmergencyShutdown);
-	exitThread.detach();
+	ot::intern::exitAsync(ot::AppExitCode::EmergencyShutdown);
 }
 
 void ExternalServicesComponent::handleConnectionLoss() {
 	AppBase::instance()->slotShowErrorPrompt("Error", "The session needs to be closed, since the connection to the server has been lost.\n\nPlease note that the project may remain locked for up to two minutes before it can be reopened.", "");
 
-	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
-	exitThread.detach();
+	ot::intern::exitAsync(ot::AppExitCode::LSSNotRunning);
 }
 
 void ExternalServicesComponent::handleShutdownRequestedByService() {

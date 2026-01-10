@@ -210,6 +210,7 @@ SessionService::SessionService()
 	connectAction(OT_ACTION_CMD_GetAuthorisationServerUrl, this, &SessionService::handleGetAuthURL, ot::ALL_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_GetGlobalServicesUrl, this, &SessionService::handleGetGlobalServicesURL, ot::ALL_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_CreateNewSession, this, &SessionService::handleCreateNewSession, ot::ALL_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_ShutdownSession, this, &SessionService::handleShutdownSession, ot::ALL_MESSAGE_TYPES);
 
 	connectAction(OT_ACTION_CMD_GetSystemInformation, this, &SessionService::handleGetSystemInformation, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_GetMandatoryServices, this, &SessionService::handleGetMandatoryServices, ot::SECURE_MESSAGE_TYPES);
@@ -217,7 +218,6 @@ SessionService::SessionService()
 	connectAction(OT_ACTION_CMD_ShowService, this, &SessionService::handleShowService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_GetSessionExists, this, &SessionService::handleGetSessionExists, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_ServiceClosing, this, &SessionService::handleServiceClosing, ot::SECURE_MESSAGE_TYPES);
-	connectAction(OT_ACTION_CMD_ShutdownSession, this, &SessionService::handleShutdownSession, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_ServiceFailure, this, &SessionService::handleServiceFailure, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_ServiceShutdownCompleted, this, &SessionService::handleServiceShutdownCompleted, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_ServiceEnableDebug, this, &SessionService::handleEnableServiceDebug, ot::SECURE_MESSAGE_TYPES);
