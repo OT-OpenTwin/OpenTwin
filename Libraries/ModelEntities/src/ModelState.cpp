@@ -1812,70 +1812,76 @@ void ModelState::removePreviewImage() {
 }
 
 bool ModelState::readProjectPreviewImage(const std::string& _collectionName, std::vector<char>& _imageData, ot::ImageFileFormat _format) {
-	// Load the model entity
-	DataStorageAPI::DocumentAccessBase docBase("Projects", _collectionName);
-	auto zeroQueryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< bsoncxx::builder::stream::finalize;
+	try {
+		// Load the model entity
+		DataStorageAPI::DocumentAccessBase docBase("Projects", _collectionName);
+		auto zeroQueryDoc = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << "Model"
+			<< bsoncxx::builder::stream::finalize;
 
-	auto zeroEmptyFilterDoc = bsoncxx::builder::basic::document{};
+		auto zeroEmptyFilterDoc = bsoncxx::builder::basic::document{};
 
-	auto sortDoc = bsoncxx::builder::basic::document{};
-	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+		auto sortDoc = bsoncxx::builder::basic::document{};
+		sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
 
-	auto zeroDoc = docBase.GetDocument(std::move(zeroQueryDoc), std::move(zeroEmptyFilterDoc.extract()), std::move(sortDoc.extract()));
-	if (!zeroDoc) {
-		OT_LOG_E("No model entity found");
-		return false;  // No model entity found
+		auto zeroDoc = docBase.GetDocument(std::move(zeroQueryDoc), std::move(zeroEmptyFilterDoc.extract()), std::move(sortDoc.extract()));
+		if (!zeroDoc) {
+			OT_LOG_E("No model entity found");
+			return false;  // No model entity found
+		}
+
+		// Now check if we already have an image
+		auto idIt = zeroDoc->view().find("PreviewImageUID");
+		if (idIt == zeroDoc->view().end() || idIt->get_int64() == static_cast<int64_t>(ot::invalidUID)) {
+			// The project has no preview image
+			return false;
+		}
+
+		auto verIt = zeroDoc->view().find("PreviewImageVersion");
+		if (verIt == zeroDoc->view().end()) {
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
+			return false;
+		}
+		if (verIt->get_int64() == static_cast<int64_t>(ot::invalidUID)) {
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without valid PreviewImageVersion");
+			return false;
+		}
+		auto typeIt = zeroDoc->view().find("PreviewImageType");
+		if (typeIt == zeroDoc->view().end()) {
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageType");
+			return false;
+		}
+
+		_format = ot::stringToImageFileFormat(typeIt->get_utf8().value.data());
+
+		// Read the image data
+
+		auto imageQueryDoc = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << EntityBinaryData::className()
+			<< "EntityID" << static_cast<int64_t>(idIt->get_int64())
+			<< "Version" << static_cast<int64_t>(verIt->get_int64())
+			<< bsoncxx::builder::stream::finalize;
+
+		auto imageEmptyFilterDoc = bsoncxx::builder::basic::document{};
+
+		auto imageDoc = docBase.GetDocument(std::move(imageQueryDoc), std::move(imageEmptyFilterDoc.extract()));
+		if (!imageDoc) {
+			OT_LOG_E("Preview image entity not found");
+			return false;
+		}
+
+		std::map<ot::UID, EntityBase*> tmp;
+
+		EntityBinaryData imageData;
+		imageData.restoreFromDataBase(nullptr, nullptr, nullptr, imageDoc->view(), tmp);
+		_imageData = imageData.getData();
+
+		return true;
 	}
-
-	// Now check if we already have an image
-	auto idIt = zeroDoc->view().find("PreviewImageUID");
-	if (idIt == zeroDoc->view().end() || idIt->get_int64() == static_cast<int64_t>(ot::invalidUID)) {
-		// The project has no preview image
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
 		return false;
 	}
-
-	auto verIt = zeroDoc->view().find("PreviewImageVersion");
-	if (verIt == zeroDoc->view().end()) {
-		OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
-		return false;
-	}
-	if (verIt->get_int64() == static_cast<int64_t>(ot::invalidUID)) {
-		OT_LOG_E("Inconsistent model entity: PreviewImageUID without valid PreviewImageVersion");
-		return false;
-	}
-	auto typeIt = zeroDoc->view().find("PreviewImageType");
-	if (typeIt == zeroDoc->view().end()) {
-		OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageType");
-		return false;
-	}
-
-	_format = ot::stringToImageFileFormat(typeIt->get_utf8().value.data());
-
-	// Read the image data
-	
-	auto imageQueryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << EntityBinaryData::className()
-		<< "EntityID" << static_cast<int64_t>(idIt->get_int64())
-		<< "Version" << static_cast<int64_t>(verIt->get_int64())
-		<< bsoncxx::builder::stream::finalize;
-
-	auto imageEmptyFilterDoc = bsoncxx::builder::basic::document{};
-
-	auto imageDoc = docBase.GetDocument(std::move(imageQueryDoc), std::move(imageEmptyFilterDoc.extract()));
-	if (!imageDoc) {
-		OT_LOG_E("Preview image entity not found");
-		return false;
-	}
-
-	std::map<ot::UID, EntityBase*> tmp;
-
-	EntityBinaryData imageData;
-	imageData.restoreFromDataBase(nullptr, nullptr, nullptr, imageDoc->view(), tmp);
-	_imageData = imageData.getData();
-
-	return true;
 }
 
 bool ModelState::addProjectDescription(const std::string& _description, ot::DocumentSyntax _syntax) {
@@ -1998,74 +2004,80 @@ void ModelState::removeProjectDescription() {
 }
 
 bool ModelState::readProjectDescription(const std::string& _collectionName, std::string& _description, ot::DocumentSyntax& _syntax) {
-	// Load the model entity
-	DataStorageAPI::DocumentAccessBase docBase("Projects", _collectionName);
-	auto zeroQueryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< bsoncxx::builder::stream::finalize;
+	try {
+		// Load the model entity
+		DataStorageAPI::DocumentAccessBase docBase("Projects", _collectionName);
+		auto zeroQueryDoc = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << "Model"
+			<< bsoncxx::builder::stream::finalize;
 
-	auto zeroEmptyFilterDoc = bsoncxx::builder::basic::document{};
+		auto zeroEmptyFilterDoc = bsoncxx::builder::basic::document{};
 
-	auto sortDoc = bsoncxx::builder::basic::document{};
-	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+		auto sortDoc = bsoncxx::builder::basic::document{};
+		sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
 
-	auto zeroDoc = docBase.GetDocument(std::move(zeroQueryDoc), std::move(zeroEmptyFilterDoc.extract()), std::move(sortDoc.extract()));
-	if (!zeroDoc) {
-		OT_LOG_E("No model entity found");
-		return false;  // No model entity found
+		auto zeroDoc = docBase.GetDocument(std::move(zeroQueryDoc), std::move(zeroEmptyFilterDoc.extract()), std::move(sortDoc.extract()));
+		if (!zeroDoc) {
+			OT_LOG_E("No model entity found");
+			return false;  // No model entity found
+		}
+
+		// Now check if we already have an image
+		auto idIt = zeroDoc->view().find("DescriptionUID");
+		if (idIt == zeroDoc->view().end()) {
+			// The project has no preview image
+			return false;
+		}
+		if (idIt->get_int64() == ot::invalidUID) {
+			// The project has no preview image
+			return false;
+		}
+
+		auto verIt = zeroDoc->view().find("DescriptionVersion");
+		if (verIt == zeroDoc->view().end()) {
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
+			return false;
+		}
+		if (verIt->get_int64() == ot::invalidUID) {
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without valid PreviewImageVersion");
+			return false;
+		}
+		auto syntaxIt = zeroDoc->view().find("DescriptionSyntax");
+		if (syntaxIt == zeroDoc->view().end()) {
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageType");
+			return false;
+		}
+
+		_syntax = ot::stringToDocumentSyntax(syntaxIt->get_utf8().value.data());
+
+		// Read the image data
+
+		auto textQueryDoc = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << EntityBinaryData::className()
+			<< "EntityID" << static_cast<int64_t>(idIt->get_int64())
+			<< "Version" << static_cast<int64_t>(verIt->get_int64())
+			<< bsoncxx::builder::stream::finalize;
+
+		auto textEmptyFilterDoc = bsoncxx::builder::basic::document{};
+
+		auto imageDoc = docBase.GetDocument(std::move(textQueryDoc), std::move(textEmptyFilterDoc.extract()));
+		if (!imageDoc) {
+			OT_LOG_E("Description entity not found");
+			return false;
+		}
+
+		std::map<ot::UID, EntityBase*> tmp;
+
+		EntityBinaryData imageData;
+		imageData.restoreFromDataBase(nullptr, nullptr, nullptr, imageDoc->view(), tmp);
+		_description = std::string(imageData.getData().data());
+
+		return true;
 	}
-
-	// Now check if we already have an image
-	auto idIt = zeroDoc->view().find("DescriptionUID");
-	if (idIt == zeroDoc->view().end()) {
-		// The project has no preview image
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
 		return false;
 	}
-	if (idIt->get_int64() == ot::invalidUID) {
-		// The project has no preview image
-		return false;
-	}
-
-	auto verIt = zeroDoc->view().find("DescriptionVersion");
-	if (verIt == zeroDoc->view().end()) {
-		OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
-		return false;
-	}
-	if (verIt->get_int64() == ot::invalidUID) {
-		OT_LOG_E("Inconsistent model entity: PreviewImageUID without valid PreviewImageVersion");
-		return false;
-	}
-	auto syntaxIt = zeroDoc->view().find("DescriptionSyntax");
-	if (syntaxIt == zeroDoc->view().end()) {
-		OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageType");
-		return false;
-	}
-
-	_syntax = ot::stringToDocumentSyntax(syntaxIt->get_utf8().value.data());
-
-	// Read the image data
-
-	auto textQueryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << EntityBinaryData::className()
-		<< "EntityID" << static_cast<int64_t>(idIt->get_int64())
-		<< "Version" << static_cast<int64_t>(verIt->get_int64())
-		<< bsoncxx::builder::stream::finalize;
-
-	auto textEmptyFilterDoc = bsoncxx::builder::basic::document{};
-
-	auto imageDoc = docBase.GetDocument(std::move(textQueryDoc), std::move(textEmptyFilterDoc.extract()));
-	if (!imageDoc) {
-		OT_LOG_E("Description entity not found");
-		return false;
-	}
-
-	std::map<ot::UID, EntityBase*> tmp;
-
-	EntityBinaryData imageData;
-	imageData.restoreFromDataBase(nullptr, nullptr, nullptr, imageDoc->view(), tmp);
-	_description = std::string(imageData.getData().data());
-
-	return true;
 }
 
 void ModelState::restoreOriginalVersionIfNeeded() {
