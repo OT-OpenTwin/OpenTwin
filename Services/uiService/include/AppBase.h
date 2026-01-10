@@ -82,6 +82,7 @@
 class QWidget;
 class LogInDialog;
 class LockManager;
+class ScriptEngine;
 class QTreeWidgetItem;
 class ViewerComponent;
 class ControlsManager;
@@ -183,6 +184,8 @@ public:
 	ControlsManager * controlsManager();
 
 	LockManager * lockManager();
+
+	bool setScript(const QString& _filePath);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -686,6 +689,8 @@ private:
 
 	LogInDialog* m_loginDialog;
 	LoginData m_loginData;
+
+	std::unique_ptr<ScriptEngine> m_scriptEngine;
 
 	// Default UI
 

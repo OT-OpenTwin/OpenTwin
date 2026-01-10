@@ -57,6 +57,7 @@
     <ClCompile Include="src\ProjectOverviewPreviewBox.cpp" />
     <ClCompile Include="src\ProjectOverviewTree.cpp" />
     <ClCompile Include="src\ProjectOverviewWidget.cpp" />
+    <ClCompile Include="src\ScriptEngine.cpp" />
     <ClCompile Include="src\WelcomeWidget.cpp" />
     <ClCompile Include="src\RenameProjectDialog.cpp" />
     <ClCompile Include="src\SelectEntitiesDialog.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="include\ProjectOverviewFilterData.h" />
     <QtMoc Include="include\ProjectOverviewPreviewBox.h" />
     <ClInclude Include="include\ProjectOverviewTree.h" />
+    <QtMoc Include="include\ScriptEngine.h" />
     <ClInclude Include="include\ShortParameterDescription.h" />
     <ClInclude Include="include\StartArgumentParser.h" />
     <ClInclude Include="include\UITestLogs.h" />
@@ -288,22 +290,22 @@
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;network;widgets;openglwidgets;websockets</QtModules>
+    <QtModules>core;gui;network;qml;widgets;openglwidgets;websockets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;network;gui;websockets;widgets</QtModules>
+    <QtModules>core;gui;network;qml;widgets;openglwidgets;websockets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;network;widgets;openglwidgets;websockets</QtModules>
+    <QtModules>core;gui;network;qml;widgets;openglwidgets;websockets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;websockets;widgets</QtModules>
+    <QtModules>core;gui;network;qml;widgets;openglwidgets;websockets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">

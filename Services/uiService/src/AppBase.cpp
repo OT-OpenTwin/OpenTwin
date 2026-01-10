@@ -24,6 +24,7 @@
 #include "UITestLogs.h"
 #include "LogInDialog.h"
 #include "ManageOwner.h"
+#include "ScriptEngine.h"
 #include "ManageAccess.h"
 #include "ManageGroups.h"
 #include "UserSettings.h"
@@ -282,6 +283,11 @@ bool AppBase::logIn() {
 	m_loginDialog = &loginDia;
 	loginDia.initialize();
 	loginDia.showNormal();
+
+	if (m_scriptEngine != nullptr) {
+		m_scriptEngine->setLogInDialog(m_loginDialog);
+	}
+
 	if (loginDia.showDialog() != ot::Dialog::Ok) {
 		m_loginDialog = nullptr;
 		return false;
@@ -411,6 +417,42 @@ ControlsManager * AppBase::controlsManager() {
 LockManager * AppBase::lockManager() {
 	OTAssertNullptr(m_ExternalServicesComponent);
 	return m_ExternalServicesComponent->lockManager();
+}
+
+bool AppBase::setScript(const QString& _filePath) {
+	if (m_scriptEngine == nullptr) {
+		m_scriptEngine = std::make_unique<ScriptEngine>(this);
+	}
+	else {
+		OT_LOG_E("Frontend script already set");
+		return false;
+	}
+
+	// Read file
+	QFile scriptFile(_filePath);
+	if (!scriptFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		OT_LOG_E("Failed to open script file: " + _filePath.toStdString());
+		m_scriptEngine.reset();
+		return false;
+	}
+
+	QByteArray data = scriptFile.readAll();
+	scriptFile.close();
+
+	// Initialize script engine
+	if (!m_scriptEngine->initialize()) {
+		m_scriptEngine.reset();
+		return false;
+	}
+
+	QJSValue result = m_scriptEngine->evaluate(data);
+	if (result.isError()) {
+		OT_LOG_E("Script error at line " + std::to_string(result.property("lineNumber").toInt()) + ": " + result.toString().toStdString());
+		m_scriptEngine.reset();
+		return false;
+	}
+
+	return true;
 }
 
 // ##############################################################################################

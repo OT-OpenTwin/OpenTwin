@@ -306,6 +306,11 @@ int main(int _argc, char *_argv[])
 			return ot::AppExitCode::GeneralError;
 		}
 
+		// Check if script was set
+		if (!argsParser.getScriptFile().isEmpty()) {
+			AppBase::instance()->setScript(argsParser.getScriptFile());
+		}
+
 		// LogIn
 		if (!AppBase::instance()->logIn()) {
 			return ot::AppExitCode::Success;
