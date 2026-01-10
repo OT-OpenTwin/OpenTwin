@@ -35,7 +35,6 @@
 #include "OTCore/EntityName.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
-#include "OTServiceFoundation/TimeFormatter.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "CurveFactory.h"
 #include "NewModelStateInfo.h"
