@@ -156,7 +156,7 @@ bool WebsocketClient::sendMessage(ot::RelayedMessageHandler::MessageType _type, 
 	// Wait for response if needed
 	if (_type == ot::RelayedMessageHandler::Execute) {
 		// Wait for the reponse
-		while (m_messageHandler.isWaitingForResponse(messageId) && m_isConnected && !m_sessionIsClosing) {
+		while (isWaitingForResponse(messageId)) {
 			QEventLoop eventLoop;
 			eventLoop.connect(this, &WebsocketClient::responseReceived, &eventLoop, &QEventLoop::quit);
 			eventLoop.connect(this, &WebsocketClient::connectionClosed, &eventLoop, &QEventLoop::quit);
@@ -362,7 +362,7 @@ void WebsocketClient::dispatchQueueRequest(ot::RelayedMessageHandler::Request& _
 		ext->queueAction(_request.message, _request.receiverUrl);
 
 		// Now dispatch all remaining actions in the buffer
-		while (!m_currentRequests.empty() && m_isConnected) {
+		while (!m_currentRequests.empty() && m_isConnected && !m_sessionIsClosing) {
 			ot::RelayedMessageHandler::Request bufferedRequest = std::move(m_currentRequests.front());
 			m_currentRequests.pop_front();
 			ext->queueAction(bufferedRequest.message, bufferedRequest.receiverUrl);
@@ -413,5 +413,9 @@ void WebsocketClient::queueBufferProcessingIfNeeded() {
 }
 
 bool WebsocketClient::anyWaitingForResponse() {
-	return m_isConnected && m_messageHandler.anyWaitingForResponse();
+	return m_isConnected && !m_sessionIsClosing && m_messageHandler.anyWaitingForResponse();
+}
+
+bool WebsocketClient::isWaitingForResponse(uint64_t _messageId) {
+	return m_isConnected && !m_sessionIsClosing && m_messageHandler.isWaitingForResponse(_messageId);
 }

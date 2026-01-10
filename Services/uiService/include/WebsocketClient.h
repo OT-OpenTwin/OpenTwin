@@ -64,7 +64,13 @@ private:
 
 	bool ensureConnection();
 	void queueBufferProcessingIfNeeded();
+
 	bool anyWaitingForResponse();
+
+	//! @brief Check if a response for the provided message id is still pending.
+	//! @param _messageId Message id to check.
+	//! @return False if no response is pending or the session is closed, true otherwise.
+	bool isWaitingForResponse(uint64_t _messageId);
 
 	QWebSocket m_webSocket;
 	QUrl m_url;
