@@ -39,6 +39,8 @@ Examples
 Automatic Login
 ===============
 
+The following example demonstrates how to automatically login with the last set user credentials.
+
 .. code-block:: js
     :linenos:
 
@@ -56,6 +58,8 @@ Automatic Login
 Open Last Project
 =================
 
+The following example demonstrates how to open the latest project.
+
 .. code-block:: js
     :linenos:
 
@@ -69,6 +73,10 @@ Open Last Project
 
 Switch Project 10 times
 =======================
+
+The following example demonstrates how to switch the project ten times.
+
+The script will wait for the session to be open by connecting to the AppBase::servicesUiSetupComplete slot.
 
 .. code-block:: js
     :linenos:
@@ -100,4 +108,60 @@ Switch Project 10 times
         // Index 0 should not be used since 0 is the last accessed project
         // and therefore the currently open project
         AppBase.slotOpenProjectFromIndex(PROJECT_INDEX); 
+    });
+
+Send Message to Service
+=======================
+
+The following example demonstrates how to send a message to a service via name and via url.
+
+.. code-block:: js
+    :linenos:
+
+    // After project open completed send ping message
+    AppBase.servicesUiSetupComplete.connect(function () {
+        AppBase.appendInfoMessage("Script: Pinging Model service\n");
+
+        var message = "{ \"action\": \"Ping\" }";
+    
+        // Send ping message to service by name
+        var result = AppBase.slotSendExecuteMessageToService("Model", message);
+    
+        // Display information in output window.
+        if (result.success===true) {
+            AppBase.appendInfoMessage("Script: Ping send successful. Receiver: \"Model\". Response: " + result.response + "\n");
+        }
+        else {
+            AppBase.appendInfoMessage("Script: Ping send failed to service \"Model\"\n");
+        }
+
+        // Send ping message to service by url
+        var result2 = AppBase.slotSendExecuteMessageToUrl("127.0.0.1:8000", message);
+    
+        // Display information in output window.
+        if (result2.success===true) {
+            AppBase.appendInfoMessage("Script: Ping send successful. Receiver: 127.0.0.1:8000. Response: " + result2.response + "\n");
+        }
+        else {
+            AppBase.appendInfoMessage("Script: Ping send failed to 127.0.0.1:8000\n");
+        }
+    });
+
+Trigger Tool Bar Button Click
+=============================
+
+The following example demonstrates how to trigger a ToolBar button click.
+
+.. code-block:: js
+    :linenos:
+
+    // After project open completed trigger the create material button
+    AppBase.servicesUiSetupComplete.connect(function () {
+        var result = ToolBar.triggerToolBarButton("Model:Material:Create Material");
+        if (result===true) {
+            AppBase.appendInfoMessage("Script: Button triggered\n");
+        }
+        else {
+            AppBase.appendInfoMessage("Script: Failed to trigger button\n");
+        }
     });

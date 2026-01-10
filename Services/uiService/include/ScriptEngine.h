@@ -21,4 +21,9 @@ public:
 	~ScriptEngine();
 	
 	bool initialize(AppBase* _app);
+
+	void registerToolBar(QObject* _toolBar);
+
+private:
+	void registerObject(const QString& _name, QObject* _object);
 };

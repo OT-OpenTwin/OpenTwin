@@ -4,7 +4,7 @@
     <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);$(QT_ADS_ROOT)\lib;%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>$(TargetPath) --script C:\OpenTwin\OpenTwin\Testdata\UiScripts\PingModelService.js</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>$(TargetPath) --script C:\OpenTwin\OpenTwin\Testdata\UiScripts\CreateMaterial.js</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
     <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>

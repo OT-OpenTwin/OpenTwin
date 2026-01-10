@@ -214,9 +214,6 @@
     <ClInclude Include="include\ControlsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ToolBar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\QtMetaTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -355,6 +352,9 @@
       <Filter>Header Files\Components</Filter>
     </QtMoc>
     <QtMoc Include="include\ScriptEngine.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ToolBar.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

@@ -322,12 +322,7 @@ public:
 
 	ot::ProjectOverviewWidget::ViewMode getWelcomeScreenViewMode() const;
 
-	QString availableTabText(const QString& _initialTabText);
-
 	ToolBar * getToolBar() const { return m_ttb; }
-
-	void setTabToolBarTabOrder(const QStringList& _lst);
-	void activateToolBarTab(const QString& _tab);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -558,6 +553,13 @@ public Q_SLOTS:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	// ToolBar slots
+
+	void setTabToolBarTabOrder(const QStringList& _lst);
+	void activateToolBarTab(const QString& _tab);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// Graphics slots
 	
 	void slotGraphicsItemRequested(const QString& _name, const QPointF& _pos);
@@ -593,6 +595,7 @@ public Q_SLOTS:
 
 	// View management slots
 
+	QString determineAvailableViewTabText(const QString& _initialTabText);
 	void slotViewAdded(ot::WidgetView* _newView);
 	void slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView);
 	void slotViewCloseRequested(ot::WidgetView* _view);

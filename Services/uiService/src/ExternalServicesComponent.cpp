@@ -3205,7 +3205,7 @@ void ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _document)
 	}
 	//NOTE, add error handling
 	assert(parentUID != ak::invalidUID);
-
+	
 	// Here we need to pass the iconName as string once the functionality is added to the uiManager
 	ot::UID buttonID = AppBase::instance()->getToolBar()->addToolButton(getServiceUiUid(senderService), parentUID, iconName.c_str(), iconFolder.c_str(), text.c_str());
 

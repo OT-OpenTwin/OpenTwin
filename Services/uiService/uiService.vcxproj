@@ -127,7 +127,7 @@
     <QtMoc Include="include\SelectEntitiesDialog.h" />
     <QtMoc Include="include\RenameProjectDialog.h" />
     <ClInclude Include="include\ServiceDataUi.h" />
-    <ClInclude Include="include\ToolBar.h" />
+    <QtMoc Include="include\ToolBar.h" />
     <ClInclude Include="include\ProjectManagement.h" />
     <ClInclude Include="include\uiServiceTypes.h" />
     <ClInclude Include="include\UserManagement.h" />

@@ -952,7 +952,11 @@ void AppBase::createUi() {
 
 			// Setup tab toolbar
 			m_ttb = new ToolBar(this);
-			
+
+			if (m_scriptEngine) {
+				m_scriptEngine->registerToolBar(m_ttb);
+			}
+
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Create docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 15);
 
@@ -1302,12 +1306,9 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b(), viewManagerWidget);
 
 	//NOTE, in future need to store tab information
-	QString text3D = availableTabText("3D");
-	QString text1D = availableTabText("1D");
-	QString textVersion = availableTabText("Versions");
-	QString textBlock = availableTabText("BlockDiagram");
-	QString textTable = availableTabText("Table");
-
+	QString text3D = determineAvailableViewTabText("3D");
+	QString textVersion = determineAvailableViewTabText("Versions");
+	
 	if (getVisible3D())
 	{
 		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
@@ -1656,27 +1657,6 @@ bool AppBase::checkForContinue(const std::string& _title) {
 
 	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
 	return true;
-}
-
-QString AppBase::availableTabText(const QString& _initialTabText) {
-	if (!ot::GlobalWidgetViewManager::instance().getViewTitleExists(_initialTabText.toStdString())) {
-		return _initialTabText;
-	}
-
-	int v = 1;
-	QString nxt = _initialTabText + " [" + QString::number(v) + "]";
-	while (ot::GlobalWidgetViewManager::instance().getViewTitleExists(nxt.toStdString())) {
-		nxt = _initialTabText + " [" + QString::number(++v) + "]";
-	}
-	return nxt;
-}
-
-void AppBase::setTabToolBarTabOrder(const QStringList& _lst) {
-	uiAPI::window::setTabToolBarTabOrder(m_mainWindow, _lst);
-}
-
-void AppBase::activateToolBarTab(const QString& _tab) {
-	uiAPI::window::activateToolBarTab(m_mainWindow, _tab);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -2550,6 +2530,18 @@ void AppBase::slotShowErrorPrompt(const std::string& _title, const std::string& 
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Tool bar slots
+
+void AppBase::setTabToolBarTabOrder(const QStringList& _lst) {
+	uiAPI::window::setTabToolBarTabOrder(m_mainWindow, _lst);
+}
+
+void AppBase::activateToolBarTab(const QString& _tab) {
+	uiAPI::window::activateToolBarTab(m_mainWindow, _tab);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // Graphics slots
 
 void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _pos) {
@@ -2971,6 +2963,19 @@ void AppBase::slotRequestVersion(const std::string& _versionName) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // View management slots
+
+QString AppBase::determineAvailableViewTabText(const QString& _initialTabText) {
+	if (!ot::GlobalWidgetViewManager::instance().getViewTitleExists(_initialTabText.toStdString())) {
+		return _initialTabText;
+	}
+
+	int v = 1;
+	QString nxt = _initialTabText + " [" + QString::number(v) + "]";
+	while (ot::GlobalWidgetViewManager::instance().getViewTitleExists(nxt.toStdString())) {
+		nxt = _initialTabText + " [" + QString::number(++v) + "]";
+	}
+	return nxt;
+}
 
 void AppBase::slotViewAdded(ot::WidgetView* _newView) {
 	OTAssertNullptr(_newView);
