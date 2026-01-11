@@ -4,11 +4,19 @@ Features/Changes
 - Data processing now follows the solver concept, i.e. pipeline design is separate from solver with run settings
 - Multiple data pipelines are now possible
 - Renaming of graphics scenes is now possible
-- Snapping and unsnapping of connections is now possible
-- Multi drag/drop of blocks is now handled in one state
+- Snapping and unsnapping of graphics connections is now possible
+- Moving of multiple blocks is now handled in one state
 - Python environments were added
 - Python packages are automatically installed, either per selected environment description or import statements in the executed script
 - Improved visual feedback for importing large numbers of files
 - Improved speed of data transport in pipeline by factor ~3
+- Introduced "Hierarchical" project
+- Redesigned project overview and introduced columnwise project filter and sorting options
+- Introduced project preview image, project description, project tags and project grouping
+- Plot data is now loaded asynchronously
+- Large text files are now displayed chunkwise (chunk size 100kB)
+- Graphics view is not initially selected and open for Data Pipeline and Circuit Simulator projects
+- Added more customization properties to graphics connections and plot curves
+- Session now remains locked until all services have completed their shutdown
 
-Bugs
+- Various appearance, usability and performance improvements
