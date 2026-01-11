@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/BasicScopedBoolWrapper.h"
+#include "OTCore/RAII/ValueRAII.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/TreeItemDelegate.h"
 
@@ -647,7 +647,7 @@ void ak::aTreeWidget::selectionChangedEvent(
 	bool							_emitEvent
 ) {
 	{
-		ot::BasicScopedBoolWrapper lclIgnore(m_ignoreEvents, true);
+		ot::ValueRAII lclIgnore(m_ignoreEvents, true);
 		QSignalBlocker sigBlock(this);
 
 		// Get selected items

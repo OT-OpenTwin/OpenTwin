@@ -20,7 +20,7 @@
 // OpenTwin Core header
 #include "OTCore/Math.h"
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTCore/BasicScopedBoolWrapper.h"
+#include "OTCore/RAII/ValueRAII.h"
 
 // OpenTwin Gui header
 #include "OTGui/Graphics/GraphicsItemCfg.h"
@@ -93,7 +93,7 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 	OTAssertNullptr(this->getQGraphicsItem());
 	
-	BasicScopedBoolWrapper configBlock(m_blockConfigurationNotifications, true);
+	ValueRAII configBlock(m_blockConfigurationNotifications, true);
 	this->setConfiguration(_cfg->createCopy());
 
 	OTAssertNullptr(m_config);

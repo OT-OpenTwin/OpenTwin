@@ -170,6 +170,8 @@ file(GLOB OTCORE_HEADER_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/JSON/*.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/RAII/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/RAII/*.hpp"
 )
 
 # ============================================================

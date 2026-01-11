@@ -45,7 +45,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/BasicScopedBoolWrapper.h"
+#include "OTCore/RAII/ValueRAII.h"
 #include "OTCore/String.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
@@ -402,7 +402,7 @@ void AppBase::slotInitialize(void) {
 
 void AppBase::slotInitializeTools(void) {
 	// Create tools
-	ot::BasicScopedBoolWrapper autoStarting(m_ignoreToolAutoStart, m_ignoreToolAutoStart);
+	ot::ValueRAII autoStarting(m_ignoreToolAutoStart, m_ignoreToolAutoStart);
 
 	for (StartOption opt : m_startArgs) {
 		if (opt == AppBase::NoAutoStart) {

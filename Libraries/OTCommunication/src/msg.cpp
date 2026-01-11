@@ -23,7 +23,6 @@
 #include "OTSystem/ArchitectureInfo.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/String.h"
-#include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/ThisComputerInfo.h"
 #include "OTCommunication/Msg.h"			// Corresponding header
 #include "OTCommunication/ActionTypes.h"

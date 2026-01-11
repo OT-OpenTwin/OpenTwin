@@ -24,7 +24,7 @@
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/LocalStateStack.h"
 #include "OTCore/ContainerHelper.h"
-#include "OTCore/BasicNumberIncrementWrapper.h"
+#include "OTCore/RAII/IncrementRAII.h"
 
 ot::NavigationSelectionManager::NavigationSelectionManager() 
 	: m_stateStack(SelectionHandlingEvent::Default), m_selectionOrigin(SelectionOrigin::Custom), m_runCounter(0)
@@ -42,7 +42,7 @@ ot::SelectionHandlingResult ot::NavigationSelectionManager::runSelectionHandling
 		return SelectionHandlingEvent::Default;
 	}
 
-	BasicNumberIncrementWrapper ct(m_runCounter);
+	IncrementRAII ct(m_runCounter);
 
 	m_selectionOrigin = _eventOrigin;
 	m_previousSelectionInfo = m_selectionInfo;

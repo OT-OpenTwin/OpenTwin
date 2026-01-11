@@ -33,7 +33,6 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 

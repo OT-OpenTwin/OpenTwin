@@ -40,17 +40,17 @@
 // OpenTwin Core header
 #include "OTCore/Color.h"
 #include "OTCore/String.h"
+#include "OTCore/RAII/ValueRAII.h"
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"
 #include "OTSystem/FileSystem.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/OwnerServiceGlobal.h"
-#include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/GenericDataStructMatrix.h"
-#include "OTCore/ReturnMessage.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // OpenTwin Gui header
 #include "OTGui/GuiTypes.h"
@@ -1169,7 +1169,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 	AppBase * app{ AppBase::instance() };
 	try {
-		ot::BasicScopedBoolWrapper actionBuffer(m_bufferActions);
+		ot::ValueRAII actionBuffer(m_bufferActions, true);
 
 		m_initialSelection.clear();
 
@@ -1446,7 +1446,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		}
 
 		// Enable action buffering
-		ot::BasicScopedBoolWrapper actionBufferFlag(m_bufferActions, true);
+		ot::ValueRAII actionBufferFlag(m_bufferActions, true);
 
 		m_actionBuffer.clear();
 
