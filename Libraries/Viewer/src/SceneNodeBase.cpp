@@ -49,6 +49,7 @@ SceneNodeBase::~SceneNodeBase() {
 	{
 		delete child;
 	}
+	m_children.clear();
 
 	// Remove shape node from parent nodes
 	if (getShapeNode() != nullptr) {

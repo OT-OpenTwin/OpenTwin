@@ -83,31 +83,31 @@
 #include <fstream>
 
 Model::Model() :
-	osgRootNode(nullptr),
-	sceneNodesRoot(nullptr),
-	isActive(false),
-	wireFrameState(false),
-	currentHoverItem(nullptr),
-	dataModelID(0),
-	currentSelectionMode(ENTITY), 
-	currentSelectionMultiple(false),
-	viewerModelID(0),
-	singleItemSelected(false),
-	treeStateRecording(false),
-	currentManipulator(nullptr),
+	m_osgRootNode(nullptr),
+	m_sceneNodesRoot(nullptr),
+	m_isActive(false),
+	m_wireFrameState(false),
+	m_currentHoverItem(nullptr),
+	m_dataModelID(0),
+	m_currentSelectionMode(ENTITY),
+	m_currentSelectionMultiple(false),
+	m_viewerModelID(0),
+	m_singleItemSelected(false),
+	m_treeStateRecording(false),
+	m_currentManipulator(nullptr),
 	m_hasModalMenu(false),
 	m_currentCentralView(ot::WidgetViewBase::CustomView),
-	currentSelectionReplyTo(ot::invalidServiceID)
+	m_currentSelectionReplyTo(ot::invalidServiceID)
 {
-	sceneNodesRoot = new SceneNodeContainer();
-	osgRootNode = sceneNodesRoot->getShapeNode();
+	m_sceneNodesRoot = new SceneNodeContainer();
+	m_osgRootNode = m_sceneNodesRoot->getShapeNode();
 }
 
 Model::~Model()
 {
 	// Delete all shapes in the shapes list
-	delete 	sceneNodesRoot;
-	sceneNodesRoot = nullptr;
+	delete m_sceneNodesRoot;
+	m_sceneNodesRoot = nullptr;
 
 	ViewerToolBar::instance().removeUIControls();
 }
@@ -115,37 +115,37 @@ Model::~Model()
 void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
 	using namespace ot;
 	JsonArray viewerArr;
-	for (const auto& it : viewerList) {
+	for (const auto& it : m_viewerList) {
 		JsonObject viewerObj;
 		viewerObj.AddMember("ID", it->getViewerID(), _allocator);
 		viewerArr.PushBack(viewerObj, _allocator);
 	}
 	_object.AddMember("Viewers", viewerArr, _allocator);
 
-	if (sceneNodesRoot) {
+	if (m_sceneNodesRoot) {
 		JsonObject rootObj;
-		sceneNodesRoot->getDebugInformation(rootObj, _allocator);
+		m_sceneNodesRoot->getDebugInformation(rootObj, _allocator);
 		_object.AddMember("SceneNodesRoot", rootObj, _allocator);
 	}
 	else {
 		_object.AddMember("SceneNodesRoot", JsonNullValue(), _allocator);
 	}
 
-	_object.AddMember("IsActive", isActive, _allocator);
-	_object.AddMember("WireFrameState", wireFrameState, _allocator);
-	if (currentHoverItem) {
+	_object.AddMember("IsActive", m_isActive, _allocator);
+	_object.AddMember("WireFrameState", m_wireFrameState, _allocator);
+	if (m_currentHoverItem) {
 		JsonObject currentHoverItemObj;
-		currentHoverItemObj.AddMember("Name", JsonString(currentHoverItem->getName(), _allocator), _allocator);
-		currentHoverItemObj.AddMember("ModelID", currentHoverItem->getModelEntityID(), _allocator);
-		currentHoverItemObj.AddMember("TreeItemID", currentHoverItem->getTreeItemID(), _allocator);
+		currentHoverItemObj.AddMember("Name", JsonString(m_currentHoverItem->getName(), _allocator), _allocator);
+		currentHoverItemObj.AddMember("ModelID", m_currentHoverItem->getModelEntityID(), _allocator);
+		currentHoverItemObj.AddMember("TreeItemID", m_currentHoverItem->getTreeItemID(), _allocator);
 		_object.AddMember("CurrentHoverItem", currentHoverItemObj, _allocator);
 	}
 	else {
 		_object.AddMember("CurrentHoverItem", JsonNullValue(), _allocator);
 	}
-	_object.AddMember("DataModelID", dataModelID, _allocator);
+	_object.AddMember("DataModelID", m_dataModelID, _allocator);
 
-	switch (currentSelectionMode) {
+	switch (m_currentSelectionMode) {
 	case Model::ENTITY:
 		_object.AddMember("CurrentSelectionMode", JsonString("Entity", _allocator), _allocator);
 		break;
@@ -163,19 +163,19 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 		break;
 	}
 
-	_object.AddMember("CurrentSelectionReplyTo", currentSelectionReplyTo, _allocator);
-	_object.AddMember("CurrentSelectionAction", JsonString(currentSelectionAction, _allocator), _allocator);
-	_object.AddMember("CurrentSelectionOptionNames", JsonArray(currentSelectionOptionNames, _allocator), _allocator);
-	_object.AddMember("CurrentSelectionOptionValues", JsonArray(currentSelectionOptionValues, _allocator), _allocator);
-	_object.AddMember("CurrentSelectionMultiple", currentSelectionMultiple, _allocator);
+	_object.AddMember("CurrentSelectionReplyTo", m_currentSelectionReplyTo, _allocator);
+	_object.AddMember("CurrentSelectionAction", JsonString(m_currentSelectionAction, _allocator), _allocator);
+	_object.AddMember("CurrentSelectionOptionNames", JsonArray(m_currentSelectionOptionNames, _allocator), _allocator);
+	_object.AddMember("CurrentSelectionOptionValues", JsonArray(m_currentSelectionOptionValues, _allocator), _allocator);
+	_object.AddMember("CurrentSelectionMultiple", m_currentSelectionMultiple, _allocator);
 
 	JsonArray currentFaceSelectionArr;
-	for (const FaceSelection& faceSelection : currentFaceSelection) {
+	for (const FaceSelection& faceSelection : m_currentFaceSelection) {
 		if (faceSelection.getSelectedItem()) {
 			JsonObject faceSelectionObj;
-			faceSelectionObj.AddMember("SelectedItem.Name", JsonString(currentHoverItem->getName(), _allocator), _allocator);
-			faceSelectionObj.AddMember("SelectedItem.ModelID", currentHoverItem->getModelEntityID(), _allocator);
-			faceSelectionObj.AddMember("SelectedItem.TreeItemID", currentHoverItem->getTreeItemID(), _allocator);
+			faceSelectionObj.AddMember("SelectedItem.Name", JsonString(m_currentHoverItem->getName(), _allocator), _allocator);
+			faceSelectionObj.AddMember("SelectedItem.ModelID", m_currentHoverItem->getModelEntityID(), _allocator);
+			faceSelectionObj.AddMember("SelectedItem.TreeItemID", m_currentHoverItem->getTreeItemID(), _allocator);
 			currentFaceSelectionArr.PushBack(faceSelectionObj, _allocator);
 		}
 		else {
@@ -185,7 +185,7 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 	_object.AddMember("CurrentFaceSelection", currentFaceSelectionArr, _allocator);
 
 	JsonArray currentEdgeSelectionArr;
-	for (const EdgeSelection& edgeSelection : currentEdgeSelection) {
+	for (const EdgeSelection& edgeSelection : m_currentEdgeSelection) {
 		if (edgeSelection.getSelectedItem()) {
 			JsonObject edgeSelectionObj;
 			edgeSelectionObj.AddMember("SelectedItem.Name", JsonString(edgeSelection.getSelectedItem()->getName(), _allocator), _allocator);
@@ -199,9 +199,9 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 	}
 	_object.AddMember("CurrentEdgeSelection", currentEdgeSelectionArr, _allocator);
 
-	_object.AddMember("ViewerModelID", viewerModelID, _allocator);
-	_object.AddMember("SingleItemSelected", singleItemSelected, _allocator);
-	_object.AddMember("TreeStateRecording", treeStateRecording, _allocator);
+	_object.AddMember("ViewerModelID", m_viewerModelID, _allocator);
+	_object.AddMember("SingleItemSelected", m_singleItemSelected, _allocator);
+	_object.AddMember("TreeStateRecording", m_treeStateRecording, _allocator);
 
 	_object.AddMember("HasModalMenu", m_hasModalMenu, _allocator);
 	_object.AddMember("CurrentMenu", JsonString(m_currentMenu, _allocator), _allocator);
@@ -214,11 +214,11 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 
 void Model::attachViewer(Viewer *viewer)
 {
-	assert(std::find(viewerList.begin(), viewerList.end(), viewer) == viewerList.end());    // Check that the item is not in the list yet
+	assert(std::find(m_viewerList.begin(), m_viewerList.end(), viewer) == m_viewerList.end());    // Check that the item is not in the list yet
 
-	viewerList.push_back(viewer);
+	m_viewerList.push_back(viewer);
 
-	if (viewerList.size() == 1)
+	if (m_viewerList.size() == 1)
 	{
 		// The first viewer was registered. We assume that the 3D tab is active
 		ViewerToolBar::instance().setupUIControls3D();
@@ -227,19 +227,19 @@ void Model::attachViewer(Viewer *viewer)
 
 void Model::detachViewer(Viewer *viewer)
 {
-	std::list<Viewer *>::iterator v = std::find(viewerList.begin(), viewerList.end(), viewer);
-	assert(v != viewerList.end());    // Ensure that the item was found in the list
+	std::list<Viewer *>::iterator v = std::find(m_viewerList.begin(), m_viewerList.end(), viewer);
+	assert(v != m_viewerList.end());    // Ensure that the item was found in the list
 
-	viewerList.erase(v);
+	m_viewerList.erase(v);
 
-	if (viewerList.size() == 0)
+	if (m_viewerList.size() == 0)
 	{
 		// The last viewer was deregistered
 		ViewerToolBar::instance().removeUIControls();
 	}
 }
 
-void Model::deactivateModel(void)
+void Model::deactivateModel()
 {
 	// Clear the tree entries
 	if (FrontendAPI::instance() != nullptr)
@@ -247,17 +247,14 @@ void Model::deactivateModel(void)
 		FrontendAPI::instance()->clearTree();
 	}
 
-	if (isActive)
-	{
-		isActive = false;
-	}
+	m_isActive = false;
 }
 
-void Model::activateModel(void)
+void Model::activateModel()
 {
-	if (!isActive)
+	if (!m_isActive)
 	{
-		isActive = true;
+		m_isActive = true;
 		fillTree();
 
 		std::list<ot::UID> selectedTreeItemID;
@@ -288,9 +285,9 @@ double Model::getDoublePropertyGridValue(const std::string& _groupName, const st
 
 bool Model::propertyGridValueChanged(const ot::Property* _property)
 {
-	if (currentManipulator != nullptr)
+	if (m_currentManipulator != nullptr)
 	{
-		return currentManipulator->propertyGridValueChanged(_property);
+		return m_currentManipulator->propertyGridValueChanged(_property);
 	}
 
 	return false;
@@ -306,12 +303,12 @@ void Model::addSceneNodesToTree(SceneNodeBase* _root)
 	// here we add the current item and all its children to the tree. 
 	// We assume that all parent items already exist.
 
-	if (isActive)
+	if (m_isActive)
 	{
 		assert(FrontendAPI::instance() != nullptr);
 		if (FrontendAPI::instance() != nullptr)
 		{
-			if (_root != sceneNodesRoot)  // The toplevel scene node is invisible and therefore not added to the tree.
+			if (_root != m_sceneNodesRoot)  // The toplevel scene node is invisible and therefore not added to the tree.
 			{
 				ot::UID treeItemID = FrontendAPI::instance()->addTreeItem(_root->getTreeItem());
 				FrontendAPI::instance()->setTreeItemIcon(treeItemID, _root->isVisible() ? _root->getTreeItem().getIcons().getVisibleIcon() : _root->getTreeItem().getIcons().getHiddenIcon());
@@ -319,7 +316,7 @@ void Model::addSceneNodesToTree(SceneNodeBase* _root)
 				_root->setTreeItemID(treeItemID);
 
 				// Now add the node to the map fro faster access
-				treeItemToSceneNodesMap[treeItemID] = _root;
+				m_treeItemToSceneNodesMap[treeItemID] = _root;
 
 				// Now we check whether the current item is visible
 				manageParentVisibility(_root);
@@ -351,28 +348,28 @@ void Model::addSceneNodesToTree(SceneNodeBase* _root)
 	}
 }
 
-void Model::fillTree(void)
+void Model::fillTree()
 {
 	assert(FrontendAPI::instance() != nullptr);
 	if (FrontendAPI::instance() == nullptr) return;
 
 	FrontendAPI::instance()->clearTree();
 
-	addSceneNodesToTree(sceneNodesRoot);
+	addSceneNodesToTree(m_sceneNodesRoot);
 }
 
-void Model::resetAllViews3D(void)
+void Model::resetAllViews3D()
 {
-	for (auto viewer : viewerList)
+	for (auto viewer : m_viewerList)
 	{
 		viewer->reset();
 		viewer->refresh();
 	}
 }
 
-void Model::refreshAllViews(void)
+void Model::refreshAllViews()
 {
-	for (auto viewer : viewerList)
+	for (auto viewer : m_viewerList)
 	{
 		viewer->refresh();
 	}
@@ -380,23 +377,23 @@ void Model::refreshAllViews(void)
 
 void Model::setCursorText(const std::string &text)
 {
-	for (auto viewer : viewerList)
+	for (auto viewer : m_viewerList)
 	{
 		viewer->setCursorText(text);
 	}
 }
 
-void Model::clearSelection(void)
+void Model::clearSelection()
 {
 	selectSceneNode(nullptr, false);
 }
 
-void Model::refreshSelection(void)
+void Model::refreshSelection()
 {
 	std::list<unsigned long long> selectedEntities;
 	getSelectedModelEntityIDs(selectedEntities);
 
-	for (auto viewer : viewerList)
+	for (auto viewer : m_viewerList)
 	{
 		viewer->freeze3DView(true);
 	}
@@ -404,13 +401,13 @@ void Model::refreshSelection(void)
 	clearSelection();
 	for (auto item : selectedEntities)
 	{
-		SceneNodeBase *entity = modelItemToSceneNodesMap[item];
+		SceneNodeBase *entity = m_modelItemToSceneNodesMap[item];
 		assert(entity != nullptr);
 
 		selectSceneNode(entity, true);
 	}
 
-	for (auto viewer : viewerList)
+	for (auto viewer : m_viewerList)
 	{
 		viewer->freeze3DView(false);
 	}
@@ -420,9 +417,9 @@ void Model::selectObject(unsigned long long modelEntityID)
 {
 	SceneNodeBase *entity = nullptr;
 
-	if (modelItemToSceneNodesMap.count(modelEntityID) != 0)
+	if (m_modelItemToSceneNodesMap.count(modelEntityID) != 0)
 	{
-		entity = modelItemToSceneNodesMap[modelEntityID];
+		entity = m_modelItemToSceneNodesMap[modelEntityID];
 	}
 
 	selectSceneNode(entity, false);
@@ -432,14 +429,14 @@ void Model::setTreeStateRecording(bool flag)
 {
 	if (flag)
 	{
-		treeStateRecording = true;
-		treeInfoMap.clear();
+		m_treeStateRecording = true;
+		m_treeInfoMap.clear();
 	}
 	else
 	{
-		treeStateRecording = false;
+		m_treeStateRecording = false;
 
-		for (auto item : treeInfoMap)
+		for (const auto& item : m_treeInfoMap)
 		{
 			if (item.second & ITEM_SELECTED)
 			{
@@ -466,9 +463,9 @@ void Model::setTreeStateRecording(bool flag)
 	}
 }
 
-void Model::centerMouseCursor(void)
+void Model::centerMouseCursor()
 {
-	for (auto viewer : viewerList)
+	for (Viewer* viewer : m_viewerList)
 	{
 		QPoint centerPos(viewer->mapToGlobal(viewer->contentsRect().center()));
 		QCursor::setPos(centerPos);
@@ -550,7 +547,7 @@ void Model::addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
 	}
 
 	annotationNode->setTreeItem(_treeItem);
-	annotationNode->setWireframe(wireFrameState);
+	annotationNode->setWireframe(m_wireFrameState);
 
 	annotationNode->initializeFromData(_edgeColorRGB, _points, _pointsRgb, _triangleP1, _triangleP2, _triangleP3, _triangleRgb);
 
@@ -799,7 +796,7 @@ void Model::addNodeFromFacetDataBase(const ot::EntityTreeItem& _treeItem, bool _
 		geometryNode->setBackFaceCulling(_backFaceCulling);
 		geometryNode->setOffsetFactor(_offsetFactor);
 		geometryNode->setStorage(_projectName, _dataEntityID, _dataEntityVersion);
-		geometryNode->setWireframe(wireFrameState);
+		geometryNode->setWireframe(m_wireFrameState);
 		geometryNode->setShowWhenSelected(_showWhenSelected);
 		geometryNode->setTransformation(_transformation);
 
@@ -869,7 +866,7 @@ void Model::addSceneNode(const ot::EntityTreeItem& _treeItem, ot::VisualisationT
 SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, bool _manageParentVisibility, bool _manageChildVisibility)
 {
 	// Check whether the item already exists
-	SceneNodeBase *item = modelItemToSceneNodesMap[_treeItem.getEntityID()];
+	SceneNodeBase *item = m_modelItemToSceneNodesMap[_treeItem.getEntityID()];
 
 	SceneNodeGeometry *geometryNode = nullptr;
 
@@ -891,7 +888,7 @@ SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeI
 
 		geometryNode = new SceneNodeGeometry;
 		geometryNode->setTreeItem(_treeItem);
-		geometryNode->setWireframe(wireFrameState);
+		geometryNode->setWireframe(m_wireFrameState);
 		geometryNode->setVisible(!_isHidden);
 		geometryNode->setManageVisibilityOfParent(_manageParentVisibility);
 		geometryNode->setManageVisibilityOfChildren(_manageChildVisibility);
@@ -930,7 +927,7 @@ SceneNodeGeometry *Model::createNewGeometryNode(const ot::EntityTreeItem& _treeI
 }
 
 void Model::setEntityName(ot::UID _modelEntityID, const std::string& _newName) {
-	SceneNodeBase* item = modelItemToSceneNodesMap[_modelEntityID];
+	SceneNodeBase* item = m_modelItemToSceneNodesMap[_modelEntityID];
 	if (item == nullptr) {
 		OT_LOG_W("SceneNode not found { \"EntityID\": " + std::to_string(_modelEntityID) + " }");
 		return;
@@ -954,8 +951,8 @@ void Model::setEntityName(ot::UID _modelEntityID, const std::string& _newName) {
 }
 
 std::string Model::getEntityName(unsigned long long modelEntityID) const {
-	const auto it = modelItemToSceneNodesMap.find(modelEntityID);
-	if (it != modelItemToSceneNodesMap.end()) {
+	const auto it = m_modelItemToSceneNodesMap.find(modelEntityID);
+	if (it != m_modelItemToSceneNodesMap.end()) {
 		return it->second->getName();
 	}
 	else {
@@ -1036,7 +1033,7 @@ void Model::addNodeFromFacetData(const ot::EntityTreeItem& _treeItem, bool _isHi
 		geometryNode->setEdgeColorRGB(_edgeColorRGB);
 		geometryNode->setBackFaceCulling(_backFaceCulling);
 		geometryNode->setOffsetFactor(_offsetFactor);
-		geometryNode->setWireframe(wireFrameState);
+		geometryNode->setWireframe(m_wireFrameState);
 		geometryNode->setShowWhenSelected(_showWhenSelected);
 
 		geometryNode->initializeFromFacetData(_nodes, _triangles, _edges, _faceNameMap);
@@ -1046,7 +1043,7 @@ void Model::addNodeFromFacetData(const ot::EntityTreeItem& _treeItem, bool _isHi
 void Model::updateObjectColor(unsigned long long modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective)
 {
 	// First get the node
-	SceneNodeBase *item = modelItemToSceneNodesMap[modelEntityID];
+	SceneNodeBase *item = m_modelItemToSceneNodesMap[modelEntityID];
 	assert(item != nullptr);
 	if (item == nullptr) return;
 
@@ -1065,7 +1062,7 @@ void Model::updateObjectColor(unsigned long long modelEntityID, double surfaceCo
 void Model::updateMeshColor(unsigned long long modelEntityID, double colorRGB[3])
 {
 	// First get the node
-	SceneNodeBase* item = modelItemToSceneNodesMap[modelEntityID];
+	SceneNodeBase* item = m_modelItemToSceneNodesMap[modelEntityID];
 	assert(item != nullptr);
 	if (item == nullptr) return;
 
@@ -1080,7 +1077,7 @@ void Model::updateMeshColor(unsigned long long modelEntityID, double colorRGB[3]
 void Model::updateObjectFacetsFromDataBase(unsigned long long modelEntityID, unsigned long long entityID, unsigned long long entityVersion)
 {
 	// First get the node
-	SceneNodeBase *item = modelItemToSceneNodesMap[modelEntityID];
+	SceneNodeBase *item = m_modelItemToSceneNodesMap[modelEntityID];
 	assert(item != nullptr);
 	if (item == nullptr) return;
 
@@ -1102,7 +1099,7 @@ SceneNodeBase *Model::getParentNode(const std::string &treeName)
 	if ((pos = treeName.rfind(separator)) == std::string::npos)
 	{
 		// The item is a top level item. Therefore, the parent is the root node.
-		return sceneNodesRoot;
+		return m_sceneNodesRoot;
 	}
 
 	std::string parentName = treeName.substr(0, pos);
@@ -1156,11 +1153,11 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 	_selectedModelItems.clear();
 
 	// Set the selection and selection handled flags for all nodes to false
-	resetSelection(sceneNodesRoot);
+	resetSelection(m_sceneNodesRoot);
 
 	if (_selectionData.getSelectedTreeItems().empty()) {
 		// No shape selected -> Draw all shapes opaque
-		setAllShapesOpaque(sceneNodesRoot);
+		setAllShapesOpaque(m_sceneNodesRoot);
 
 		// Update the working plane transformation 
 		updateWorkingPlaneTransform();
@@ -1180,7 +1177,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 		return result;
 	}
 
-	singleItemSelected = (_selectionData.getSelectedTreeItems().size() == 1);
+	m_singleItemSelected = (_selectionData.getSelectedTreeItems().size() == 1);
 
 	// Now at least one shape is selected
 	// -> selected shapes are drawn opaque and all others are drawn transparent
@@ -1191,9 +1188,9 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 	std::list<SceneNodeBase*> selectedNodes;
 	
 	for (ot::UID item : _selectionData.getSelectedTreeItems()) {
-		SceneNodeBase* node = treeItemToSceneNodesMap[item];
-		if (node != nullptr) {
-			selectedNodes.push_back(node);
+		auto nodeIt = m_treeItemToSceneNodesMap.find(item);
+		if (nodeIt != m_treeItemToSceneNodesMap.end()) {
+			selectedNodes.push_back(nodeIt->second);
 		}
 	}
 
@@ -1225,7 +1222,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 	}
 
 	// Now update the transparent / opaque mode acoording to the selection
-	setSelectedShapesOpaqueAndOthersTransparent(sceneNodesRoot);
+	setSelectedShapesOpaqueAndOthersTransparent(m_sceneNodesRoot);
 	
 
 	if (isItem3DSelected) {
@@ -1245,7 +1242,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 	return result;
 }
 
-bool Model::ensure3DView(void) {
+bool Model::ensure3DView() {
 	if (FrontendAPI::instance()->getCurrentVisualizationTabTitle() != "Versions") {
 		FrontendAPI::instance()->setCurrentVisualizationTabFromTitle("3D");
 		return true;
@@ -1401,7 +1398,7 @@ void Model::hideEntities(std::list<unsigned long long> hiddenID)
 {
 	for (auto entity : hiddenID)
 	{
-		SceneNodeBase *node = modelItemToSceneNodesMap[entity];
+		SceneNodeBase *node = m_modelItemToSceneNodesMap[entity];
 		hideSceneNodeAndChilds(node);
 	}
 
@@ -1463,16 +1460,16 @@ void Model::setWireframeStateForAllSceneNodes(SceneNodeBase *root, bool wirefram
 	}
 }
 
-void Model::toggleWireframeView(void)
+void Model::toggleWireframeView()
 {
-	wireFrameState = !wireFrameState;
+	m_wireFrameState = !m_wireFrameState;
 
-	setWireframeStateForAllSceneNodes(sceneNodesRoot, wireFrameState);
+	setWireframeStateForAllSceneNodes(m_sceneNodesRoot, m_wireFrameState);
 }
 
-void Model::toggleWorkingPlane(void) 
+void Model::toggleWorkingPlane() 
 {
-	for (auto v : viewerList) 
+	for (Viewer* v : m_viewerList)
 	{
 		v->toggleWorkingPlane();
 	}
@@ -1527,12 +1524,12 @@ bool Model::getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, 
 	return true;
 }
 
-void Model::updateWorkingPlaneTransform(void) 
+void Model::updateWorkingPlaneTransform() 
 {
 	osg::Matrix matrix;
 	bool first = true;
 
-	if (!getTransformationOfSelectedShapes(sceneNodesRoot, first, matrix))
+	if (!getTransformationOfSelectedShapes(m_sceneNodesRoot, first, matrix))
 	{
 		// The transformations are not the same for all selected scene nodes -> we use as identity transform
 		matrix = osg::Matrix::identity();
@@ -1540,42 +1537,42 @@ void Model::updateWorkingPlaneTransform(void)
 
 	matrix.transpose(matrix); // We need to transpose the matrix, since the working plane transform needs to be transposed to match the shape transform
 
-	for (auto v : viewerList) {
+	for (auto v : m_viewerList) {
 		v->setWorkingPlaneTransform(matrix);
 	}
 
-	currentWorkingplaneTransform = matrix;
+	m_currentWorkingplaneTransform = matrix;
 
 
 	matrix.transpose(matrix);
-	currentWorkingplaneTransformTransposedInverse = currentWorkingplaneTransformTransposedInverse.inverse(matrix);
+	m_currentWorkingplaneTransformTransposedInverse = m_currentWorkingplaneTransformTransposedInverse.inverse(matrix);
 }
 
-void Model::toggleAxisCross(void) {
-	for (auto v : viewerList) {
+void Model::toggleAxisCross() {
+	for (auto v : m_viewerList) {
 		v->toggleAxisCross();
 	}
 }
 
-void Model::toggleCenterAxisCross(void) {
-	for (auto v : viewerList) {
+void Model::toggleCenterAxisCross() {
+	for (auto v : m_viewerList) {
 		v->toggleCenterAxisCross();
 	}
 }
 
-void Model::toggleCutplane(void) {
-	for (auto v : viewerList) {
+void Model::toggleCutplane() {
+	for (auto v : m_viewerList) {
 		v->toggleCutplane();
 	}
 }
 
-void Model::saveTextEditor(void) {
+void Model::saveTextEditor() {
 	if (FrontendAPI::instance()) {
 		FrontendAPI::instance()->requestSaveForCurrentVisualizationTab();
 	}
 }
 
-void Model::exportTextEditor(void) {
+void Model::exportTextEditor() {
 	FrontendAPI* api = FrontendAPI::instance();
 	
 	if (!api) {
@@ -1627,13 +1624,13 @@ void Model::exportTextEditor(void) {
 	}
 }
 
-void Model::saveTable(void) {
+void Model::saveTable() {
 	if (FrontendAPI::instance()) {
 		FrontendAPI::instance()->requestSaveForCurrentVisualizationTab();
 	}
 }
 
-void Model::exportTableAsCSV(void) {
+void Model::exportTableAsCSV() {
 	FrontendAPI* api = FrontendAPI::instance();
 
 	if (!api) {
@@ -1659,7 +1656,7 @@ void Model::exportTableAsCSV(void) {
 	}
 }
 
-void Model::addTableRowBefore(void) {
+void Model::addTableRowBefore() {
 	FrontendAPI* api = FrontendAPI::instance();
 
 	if (!api) {
@@ -1693,7 +1690,7 @@ void Model::addTableRowBefore(void) {
 	view->getTable()->setContentChanged(true);
 }
 
-void Model::addTableRowAfter(void) {
+void Model::addTableRowAfter() {
 	FrontendAPI* api = FrontendAPI::instance();
 
 	if (!api) {
@@ -1727,7 +1724,7 @@ void Model::addTableRowAfter(void) {
 	view->getTable()->setContentChanged(true);
 }
 
-void Model::removeTableRow(void) {
+void Model::removeTableRow() {
 	FrontendAPI* api = FrontendAPI::instance();
 
 	if (!api) {
@@ -1751,7 +1748,7 @@ void Model::removeTableRow(void) {
 	}
 }
 
-void Model::addTableColumnBefore(void) {
+void Model::addTableColumnBefore() {
 	FrontendAPI* api = FrontendAPI::instance();
 
 	if (!api) {
@@ -1785,7 +1782,7 @@ void Model::addTableColumnBefore(void) {
 	view->getTable()->setContentChanged(true);
 }
 
-void Model::addTableColumnAfter(void) {
+void Model::addTableColumnAfter() {
 	FrontendAPI* api = FrontendAPI::instance();
 
 	if (!api) {
@@ -1818,7 +1815,7 @@ void Model::addTableColumnAfter(void) {
 	view->getTable()->setContentChanged(true);
 }
 
-void Model::removeTableColumn(void) {
+void Model::removeTableColumn() {
 	FrontendAPI* api = FrontendAPI::instance();
 
 	if (!api) {
@@ -1914,48 +1911,48 @@ void Model::executeAction(ot::UID _buttonID) {
 	refreshAllViews();
 }
 
-void Model::showAllSceneNodesAction(void)
+void Model::showAllSceneNodesAction()
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
 	std::string projectName;
 
-	getPrefetchForAllSceneNodes(sceneNodesRoot, projectName, prefetchIDs);
+	getPrefetchForAllSceneNodes(m_sceneNodesRoot, projectName, prefetchIDs);
 
 	if (!prefetchIDs.empty())
 	{
 		DataBase::instance().prefetchDocumentsFromStorage(prefetchIDs);
 	}
 
-	showAllSceneNodes(sceneNodesRoot);
+	showAllSceneNodes(m_sceneNodesRoot);
 	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
 }
 
-void Model::showSelectedSceneNodesAction(void)
+void Model::showSelectedSceneNodesAction()
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
 	std::string projectName;
 
-	getPrefetchForSelectedSceneNodes(sceneNodesRoot, projectName, prefetchIDs);
+	getPrefetchForSelectedSceneNodes(m_sceneNodesRoot, projectName, prefetchIDs);
 
 	if (!prefetchIDs.empty())
 	{
 		DataBase::instance().prefetchDocumentsFromStorage(prefetchIDs);
 	}
 
-	showSelectedSceneNodes(sceneNodesRoot);
+	showSelectedSceneNodes(m_sceneNodesRoot);
 	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
 }
 
-void Model::hideSelectedSceneNodesAction(void)
+void Model::hideSelectedSceneNodesAction()
 {
-	hideSelectedSceneNodes(sceneNodesRoot);
+	hideSelectedSceneNodes(m_sceneNodesRoot);
 
 	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
 }
 
-void Model::hideUnselectedSceneNodesAction(void)
+void Model::hideUnselectedSceneNodesAction()
 {
-	hideUnselectedSceneNodes(sceneNodesRoot);
+	hideUnselectedSceneNodes(m_sceneNodesRoot);
 
 	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
 }
@@ -1994,7 +1991,7 @@ SceneNodeBase *Model::findSelectedItemByLineSegment(osgUtil::Intersector *inters
 	SceneNodeBase *closestItem = nullptr;
 
 	unsigned long long index = 0;
-	for (auto hitItem : hitItemList)
+	for (const auto& hitItem : hitItemList)
 	{
 		int nNodes = hitItem.size();
 
@@ -2003,14 +2000,13 @@ SceneNodeBase *Model::findSelectedItemByLineSegment(osgUtil::Intersector *inters
 			for (int i = nNodes - 1; i >= 0; i--)
 			{
 				osg::Node *node = hitItem[i];
-				if (osgNodetoSceneNodesMap.count(node) > 0)
-				{
-					SceneNodeBase *item = osgNodetoSceneNodesMap[node];
-
-					if (item->getOffset() < minOffset)
+				auto nodeIt = m_osgNodetoSceneNodesMap.find(node);
+				if (nodeIt != m_osgNodetoSceneNodesMap.end()) {
+				if (m_osgNodetoSceneNodesMap.count(node) > 0)
+					if (nodeIt->second->getOffset() < minOffset)
 					{
-						minOffset = item->getOffset();
-						closestItem = item;
+						minOffset = nodeIt->second->getOffset();
+						closestItem = nodeIt->second;
 						hitIndex = hitIndexList[index];
 					}
 
@@ -2077,13 +2073,13 @@ SceneNodeBase* Model::findSelectedItemByPolytope(osgUtil::Intersector* intersect
 			for (int i = nNodes - 1; i >= 0; i--)
 			{
 				osg::Node* node = hitItemList.front()[i];
-				if (osgNodetoSceneNodesMap.count(node) > 0)
+				if (m_osgNodetoSceneNodesMap.count(node) > 0)
 				{
 					if (item == nullptr)
 					{
-						item = osgNodetoSceneNodesMap[node];
+						item = m_osgNodetoSceneNodesMap[node];
 					}
-					else if (item != osgNodetoSceneNodesMap[node])
+					else if (item != m_osgNodetoSceneNodesMap[node])
 					{
 						// The found items belong to two different shapes
 						return nullptr;
@@ -2182,16 +2178,18 @@ void Model::selectSceneNode(SceneNodeBase *selectedItem, bool bCtrlKeyPressed)
 
 void Model::setHoverTreeItem(ot::UID hoverTreeItemID)
 {
-	if (currentSelectionMode != ENTITY) return;
+	if (m_currentSelectionMode != ENTITY) {
+		return;
+	}
 
 	if (hoverTreeItemID == 0)
 	{
 		// No hover item selected
 
-		if (currentHoverItem != nullptr)
+		if (m_currentHoverItem != nullptr)
 		{
-			currentHoverItem->setHighlighted(false);
-			currentHoverItem = nullptr;
+			m_currentHoverItem->setHighlighted(false);
+			m_currentHoverItem = nullptr;
 
 			refreshAllViews();
 		}
@@ -2199,25 +2197,25 @@ void Model::setHoverTreeItem(ot::UID hoverTreeItemID)
 	else
 	{
 		// A hover item is selected
-		SceneNodeBase *newHoverItem = treeItemToSceneNodesMap[hoverTreeItemID];
+		SceneNodeBase *newHoverItem = m_treeItemToSceneNodesMap[hoverTreeItemID];
 		assert(newHoverItem != nullptr);
 
-		if (newHoverItem != currentHoverItem)
+		if (newHoverItem != m_currentHoverItem)
 		{
 			// A new item is selected as hover item
 
 			// First reset the current hover item
-			if (currentHoverItem != nullptr)
+			if (m_currentHoverItem != nullptr)
 			{
-				currentHoverItem->setHighlighted(false);
-				currentHoverItem = nullptr;
+				m_currentHoverItem->setHighlighted(false);
+				m_currentHoverItem = nullptr;
 			}
 
 			// Now set the new hover item
 			if (newHoverItem != nullptr)
 			{
 				newHoverItem->setHighlighted(true);
-				currentHoverItem = newHoverItem;
+				m_currentHoverItem = newHoverItem;
 			}
 
 			refreshAllViews();
@@ -2227,7 +2225,7 @@ void Model::setHoverTreeItem(ot::UID hoverTreeItemID)
 
 unsigned long long Model::getModelEntityIDFromTreeID(ot::UID treeItem)
 {
-	SceneNodeBase *item = treeItemToSceneNodesMap[treeItem];
+	SceneNodeBase *item = m_treeItemToSceneNodesMap[treeItem];
 	assert(item != nullptr);
 
 	if (item == nullptr) return 0;
@@ -2237,7 +2235,7 @@ unsigned long long Model::getModelEntityIDFromTreeID(ot::UID treeItem)
 
 unsigned long long Model::getTreeIDFromModelID(ot::UID modelID)
 {
-	for (const auto& treeItem : treeItemToSceneNodesMap)
+	for (const auto& treeItem : m_treeItemToSceneNodesMap)
 	{
 		if (treeItem.second->getModelEntityID() == modelID)
 		{
@@ -2249,45 +2247,45 @@ unsigned long long Model::getTreeIDFromModelID(ot::UID modelID)
 
 void Model::setHoverView(SceneNodeBase *selectedItem)
 {
-	if (selectedItem != currentHoverItem)
+	if (selectedItem != m_currentHoverItem)
 	{
 		// A new item is selected as hover item
 
 		// First reset the current hover item
-		if (currentHoverItem != nullptr)
+		if (m_currentHoverItem != nullptr)
 		{
-			currentHoverItem->setHighlighted(false);
-			currentHoverItem = nullptr;
+			m_currentHoverItem->setHighlighted(false);
+			m_currentHoverItem = nullptr;
 		}
 
 		// Now set the new hover item
 		if (selectedItem != nullptr)
 		{
 			selectedItem->setHighlighted(true);
-			currentHoverItem = selectedItem;
+			m_currentHoverItem = selectedItem;
 		}
 
 		refreshAllViews();
 	}
 }
 
-void Model::clearHoverView(void)
+void Model::clearHoverView()
 {
-	if (currentHoverItem != nullptr)
+	if (m_currentHoverItem != nullptr)
 	{
-		currentHoverItem->setHighlighted(false);
+		m_currentHoverItem->setHighlighted(false);
 
-		if (dynamic_cast<SceneNodeGeometry*>(currentHoverItem))
+		if (dynamic_cast<SceneNodeGeometry*>(m_currentHoverItem))
 		{ 
-			dynamic_cast<SceneNodeGeometry*>(currentHoverItem)->setHighlightNode(nullptr);
+			dynamic_cast<SceneNodeGeometry*>(m_currentHoverItem)->setHighlightNode(nullptr);
 
-			if (dynamic_cast<SceneNodeGeometry*>(currentHoverItem)->getShapeNode() != nullptr)
+			if (dynamic_cast<SceneNodeGeometry*>(m_currentHoverItem)->getShapeNode() != nullptr)
 			{
-				dynamic_cast<SceneNodeGeometry*>(currentHoverItem)->getFaceEdgesHighlight()->setAllChildrenOff();
+				dynamic_cast<SceneNodeGeometry*>(m_currentHoverItem)->getFaceEdgesHighlight()->setAllChildrenOff();
 			}
 		}
 
-		currentHoverItem = nullptr;
+		m_currentHoverItem = nullptr;
 
 		setCursorText("");
 		updateSelectedFacesHighlight();
@@ -2308,7 +2306,7 @@ void Model::addSelectedModelEntityIDToList(SceneNodeBase *root, std::list<unsign
 void Model::getSelectedModelEntityIDs(std::list<unsigned long long> &selectedModelEntityID)
 {
 	selectedModelEntityID.clear();
-	addSelectedModelEntityIDToList(sceneNodesRoot, selectedModelEntityID);
+	addSelectedModelEntityIDToList(m_sceneNodesRoot, selectedModelEntityID);
 }
 
 void Model::addSelectedVisibleModelEntityIDToList(SceneNodeBase *root, std::list<unsigned long long> &selectedVisbleModelEntityID)
@@ -2324,7 +2322,7 @@ void Model::addSelectedVisibleModelEntityIDToList(SceneNodeBase *root, std::list
 void Model::getSelectedVisibleModelEntityIDs(std::list<unsigned long long> &selectedVisbleModelEntityID)
 {
 	selectedVisbleModelEntityID.clear();
-	addSelectedVisibleModelEntityIDToList(sceneNodesRoot, selectedVisbleModelEntityID);
+	addSelectedVisibleModelEntityIDToList(m_sceneNodesRoot, selectedVisbleModelEntityID);
 }
 
 void Model::addSelectedTreeItemIDToList(SceneNodeBase *root, std::list<ot::UID> &selectedTreeItemID)
@@ -2340,7 +2338,7 @@ void Model::addSelectedTreeItemIDToList(SceneNodeBase *root, std::list<ot::UID> 
 void Model::getSelectedTreeItemIDs(std::list<ot::UID> &selectedTreeItemID)
 {
 	selectedTreeItemID.clear();
-	addSelectedTreeItemIDToList(sceneNodesRoot, selectedTreeItemID);
+	addSelectedTreeItemIDToList(m_sceneNodesRoot, selectedTreeItemID);
 }
 
 void Model::removeSceneNodeAndChildren(SceneNodeBase *node, std::list<ot::UID> &treeItemDeleteList)
@@ -2359,16 +2357,16 @@ void Model::removeSceneNodeAndChildren(SceneNodeBase *node, std::list<ot::UID> &
 	FrontendAPI::instance()->removeGraphicsElements(node->getModelEntityID());
 
 	// Ensure that we are not deleting the current hover item
-	if (currentHoverItem == node)
+	if (m_currentHoverItem == node)
 	{
-		currentHoverItem = nullptr; // We don't need to reset any display information, since the object will be deleted anyway.
+		m_currentHoverItem = nullptr; // We don't need to reset any display information, since the object will be deleted anyway.
 	}
 
 	// Store the current status of the item, if tree state recording is turned on
-	if (treeStateRecording)
+	if (m_treeStateRecording)
 	{
 		bool isExpanded = FrontendAPI::instance()->isTreeItemExpanded(node->getTreeItemID());
-		treeInfoMap[node->getName()] = (node->isSelected() ? ITEM_SELECTED : 0) | (isExpanded ? ITEM_EXPANDED : 0);
+		m_treeInfoMap[node->getName()] = (node->isSelected() ? ITEM_SELECTED : 0) | (isExpanded ? ITEM_EXPANDED : 0);
 	}
 
 	// Remove the current scene node from the maps
@@ -2391,10 +2389,10 @@ void Model::removeShapes(std::list<unsigned long long> modelEntityIDList)
 
 	for (auto modelEntityID : modelEntityIDList)
 	{
-		if (modelItemToSceneNodesMap.count(modelEntityID) > 0)
+		if (m_modelItemToSceneNodesMap.count(modelEntityID) > 0)
 		{
 			// The item still exists
-			SceneNodeBase *sceneNode = modelItemToSceneNodesMap[modelEntityID];
+			SceneNodeBase *sceneNode = m_modelItemToSceneNodesMap[modelEntityID];
 			assert(sceneNode != nullptr);
 
 			if (sceneNode != nullptr)
@@ -2425,7 +2423,7 @@ void Model::setShapeVisibility(std::list<unsigned long long> visibleID, std::lis
 		nodeVisibility[entity] = false;
 	}
 
-	setSceneNodeVisibility(sceneNodesRoot, nodeVisibility);
+	setSceneNodeVisibility(m_sceneNodesRoot, nodeVisibility);
 
 	// Refresh the views 
 	refreshAllViews();
@@ -2440,7 +2438,7 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 		// Turn off wireframe
 		if (isWireFrameMode()) toggleWireframeView();
 
-		for (auto viewer : viewerList)
+		for (auto viewer : m_viewerList)
 		{
 			std::string firstText = allowMultipleSelection ? "Double-click to select faces to " : "Double-click to select a face to ";
 			std::string secondText = allowMultipleSelection ? " (press RETURN to complete or ESC to cancel)" : " (press ESC to cancel)";
@@ -2449,23 +2447,23 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 			viewer->setFreezeWorkingPlane(true);
 		}
 
-		if (!viewerList.empty())
+		if (!m_viewerList.empty())
 		{
-			viewerList.front()->setFocus();
+			m_viewerList.front()->setFocus();
 		}
 
-		currentSelectionMode         = FACE;
-		currentSelectionReplyTo      = replyTo;
-		currentSelectionAction       = selectionAction;
-		currentSelectionMultiple     = allowMultipleSelection;
-		currentSelectionOptionNames  = optionNames;
-		currentSelectionOptionValues = optionValues;
+		m_currentSelectionMode         = FACE;
+		m_currentSelectionReplyTo      = replyTo;
+		m_currentSelectionAction       = selectionAction;
+		m_currentSelectionMultiple     = allowMultipleSelection;
+		m_currentSelectionOptionNames  = optionNames;
+		m_currentSelectionOptionValues = optionValues;
 	}
 	else if (selectionType == "EDGE")
 	{
 		ensure3DView();
 
-		for (auto viewer : viewerList)
+		for (auto viewer : m_viewerList)
 		{
 			std::string firstText = allowMultipleSelection ? "Double-click to select edges to " : "Double-click to select an edge to ";
 			std::string secondText = allowMultipleSelection ? " (press RETURN to complete or ESC to cancel)" : " (press ESC to cancel)";
@@ -2474,23 +2472,23 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 			viewer->setFreezeWorkingPlane(true);
 		}
 
-		if (!viewerList.empty())
+		if (!m_viewerList.empty())
 		{
-			viewerList.front()->setFocus();
+			m_viewerList.front()->setFocus();
 		}
 
-		currentSelectionMode = EDGE;
-		currentSelectionReplyTo = replyTo;
-		currentSelectionAction = selectionAction;
-		currentSelectionMultiple = allowMultipleSelection;
-		currentSelectionOptionNames = optionNames;
-		currentSelectionOptionValues = optionValues;
+		m_currentSelectionMode = EDGE;
+		m_currentSelectionReplyTo = replyTo;
+		m_currentSelectionAction = selectionAction;
+		m_currentSelectionMultiple = allowMultipleSelection;
+		m_currentSelectionOptionNames = optionNames;
+		m_currentSelectionOptionValues = optionValues;
 	}
 	else if (selectionType == "SHAPE")
 	{
 		ensure3DView();
 
-		for (auto viewer : viewerList)
+		for (auto viewer : m_viewerList)
 		{
 			std::string firstText = allowMultipleSelection ? "Double-click to select shapes to " : "Double-click to select a shape to ";
 			std::string secondText = allowMultipleSelection ? " (press RETURN to complete or ESC to cancel)" : " (press ESC to cancel)";
@@ -2499,30 +2497,30 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 			viewer->setFreezeWorkingPlane(true);
 		}
 
-		if (!viewerList.empty())
+		if (!m_viewerList.empty())
 		{
-			viewerList.front()->setFocus();
+			m_viewerList.front()->setFocus();
 		}
 
-		currentSelectionMode         = SHAPE;
-		currentSelectionReplyTo      = replyTo;
-		currentSelectionAction       = selectionAction;
-		currentSelectionMultiple     = allowMultipleSelection;
-		currentSelectionOptionNames  = optionNames;
-		currentSelectionOptionValues = optionValues;
+		m_currentSelectionMode         = SHAPE;
+		m_currentSelectionReplyTo      = replyTo;
+		m_currentSelectionAction       = selectionAction;
+		m_currentSelectionMultiple     = allowMultipleSelection;
+		m_currentSelectionOptionNames  = optionNames;
+		m_currentSelectionOptionValues = optionValues;
 	}
 	else if (selectionType == "TRANSFORM")
 	{
 		ensure3DView();
 
-		for (auto viewer : viewerList)
+		for (auto viewer : m_viewerList)
 		{
 			viewer->setOverlayText("Move or rotate selected shapes (press RETURN to complete or ESC to cancel)");
 		}
 
-		if (!viewerList.empty())
+		if (!m_viewerList.empty())
 		{
-			viewerList.front()->setFocus();
+			m_viewerList.front()->setFocus();
 
 			std::list<SceneNodeBase *> objects;
 			for (auto item : optionValues)
@@ -2537,13 +2535,13 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 				}
 			}
 
-			TransformManipulator *transformManipulator = new TransformManipulator(viewerList.front(), objects);
+			TransformManipulator *transformManipulator = new TransformManipulator(m_viewerList.front(), objects);
 			transformManipulator->setReplyTo(replyTo);
 			transformManipulator->setAction(selectionAction);
 			transformManipulator->setOptionNames(optionNames);
 			transformManipulator->setOptionValues(optionValues);
 
-			currentManipulator = transformManipulator;
+			m_currentManipulator = transformManipulator;
 		}
 	}
 	else
@@ -2554,7 +2552,7 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 
 void Model::freeze3DView(bool flag)
 {
-	for (auto viewer : viewerList)
+	for (auto viewer : m_viewerList)
 	{
 		viewer->freeze3DView(flag);
 	}
@@ -2562,7 +2560,7 @@ void Model::freeze3DView(bool flag)
 
 void Model::processCurrentSelectionMode(osgUtil::Intersector *intersector, double sceneRadius, bool bCtrlKeyPressed)
 {
-	switch (currentSelectionMode)
+	switch (m_currentSelectionMode)
 	{
 	case ENTITY:
 	{
@@ -2613,50 +2611,50 @@ void Model::processCurrentSelectionMode(osgUtil::Intersector *intersector, doubl
 	}
 }
 
-void Model::clearEdgeSelection(void)
+void Model::clearEdgeSelection()
 {
-	for (auto edge : currentEdgeSelection)
+	for (auto edge : m_currentEdgeSelection)
 	{
 		edge.getSelectedItem()->removeSelectedEdge(edge.getNode());
 	}
-	currentEdgeSelection.clear();
+	m_currentEdgeSelection.clear();
 }
 
-void Model::escapeKeyPressed(void)
+void Model::escapeKeyPressed()
 {
-	currentFaceSelection.clear();
+	m_currentFaceSelection.clear();
 
 	clearEdgeSelection();
 
 	endCurrentSelectionMode(true);
 
-	if (currentManipulator != nullptr)
+	if (m_currentManipulator != nullptr)
 	{
-		for (auto viewer : viewerList)
+		for (auto viewer : m_viewerList)
 		{
 			viewer->removeOverlay();
 		}
 
-		currentManipulator->cancelOperation();
+		m_currentManipulator->cancelOperation();
 
-		delete currentManipulator;
-		currentManipulator = nullptr;
+		delete m_currentManipulator;
+		m_currentManipulator = nullptr;
 	}
 }
 
-void Model::returnKeyPressed(void)
+void Model::returnKeyPressed()
 {
-	if (currentManipulator != nullptr)
+	if (m_currentManipulator != nullptr)
 	{
-		for (auto viewer : viewerList)
+		for (auto viewer : m_viewerList)
 		{
 			viewer->removeOverlay();
 		}
 
-		currentManipulator->performOperation();
+		m_currentManipulator->performOperation();
 
-		delete currentManipulator;
-		currentManipulator = nullptr;
+		delete m_currentManipulator;
+		m_currentManipulator = nullptr;
 	}
 	else
 	{
@@ -2666,9 +2664,9 @@ void Model::returnKeyPressed(void)
 
 void Model::endCurrentSelectionMode(bool cancelled)
 {
-	if (currentSelectionMode != ENTITY)
+	if (m_currentSelectionMode != ENTITY)
 	{
-		for (auto viewer : viewerList)
+		for (auto viewer : m_viewerList)
 		{
 			viewer->removeOverlay();
 			viewer->setFreezeWorkingPlane(false);
@@ -2680,17 +2678,17 @@ void Model::endCurrentSelectionMode(bool cancelled)
 
 	if (cancelled)
 	{
-		currentSelectionMode = ENTITY;  // Switch back to the standard selection mode
+		m_currentSelectionMode = ENTITY;  // Switch back to the standard selection mode
 		return;
 	}
 
-	if (currentSelectionMode == FACE)
+	if (m_currentSelectionMode == FACE)
 	{
-		currentSelectionMode = ENTITY;  // Switch back to the standard selection mode
+		m_currentSelectionMode = ENTITY;  // Switch back to the standard selection mode
 
 		// Process selected faces
 
-		if (!currentFaceSelection.empty())
+		if (!m_currentFaceSelection.empty())
 		{
 			rapidjson::Document newDoc;
 			newDoc.SetObject();
@@ -2698,7 +2696,7 @@ void Model::endCurrentSelectionMode(bool cancelled)
 			rapidjson::Value modelID(rapidjson::kArrayType);
 			rapidjson::Value faceName(rapidjson::kArrayType);
 
-			for (auto selection : currentFaceSelection)
+			for (auto selection : m_currentFaceSelection)
 			{
 				modelID.PushBack(rapidjson::Value(selection.getModelID()), newDoc.GetAllocator());
 				faceName.PushBack(ot::JsonString(selection.getFaceName().c_str(), newDoc.GetAllocator()), newDoc.GetAllocator());
@@ -2717,18 +2715,18 @@ void Model::endCurrentSelectionMode(bool cancelled)
 			std::string selectionInfo = buffer.GetString();
 
 			// Send the selection message to the model
-			FrontendAPI::instance()->entitiesSelected(currentSelectionReplyTo, currentSelectionAction, selectionInfo, currentSelectionOptionNames, currentSelectionOptionValues);
+			FrontendAPI::instance()->entitiesSelected(m_currentSelectionReplyTo, m_currentSelectionAction, selectionInfo, m_currentSelectionOptionNames, m_currentSelectionOptionValues);
 
-			currentFaceSelection.clear();
+			m_currentFaceSelection.clear();
 		}
 	}
-	else if (currentSelectionMode == EDGE)
+	else if (m_currentSelectionMode == EDGE)
 	{
-		currentSelectionMode = ENTITY;  // Switch back to the standard selection mode
+		m_currentSelectionMode = ENTITY;  // Switch back to the standard selection mode
 
 		// Process selected edges
 
-		if (!currentEdgeSelection.empty())
+		if (!m_currentEdgeSelection.empty())
 		{
 			rapidjson::Document newDoc;
 			newDoc.SetObject();
@@ -2736,7 +2734,7 @@ void Model::endCurrentSelectionMode(bool cancelled)
 			rapidjson::Value modelID(rapidjson::kArrayType);
 			rapidjson::Value edgeName(rapidjson::kArrayType);
 
-			for (auto selection : currentEdgeSelection)
+			for (auto selection : m_currentEdgeSelection)
 			{
 				modelID.PushBack(rapidjson::Value(selection.getModelID()), newDoc.GetAllocator());
 				edgeName.PushBack(ot::JsonString(selection.getEdgeName().c_str(), newDoc.GetAllocator()), newDoc.GetAllocator());
@@ -2755,14 +2753,14 @@ void Model::endCurrentSelectionMode(bool cancelled)
 			std::string selectionInfo = buffer.GetString();
 
 			// Send the selection message to the model
-			FrontendAPI::instance()->entitiesSelected(currentSelectionReplyTo, currentSelectionAction, selectionInfo, currentSelectionOptionNames, currentSelectionOptionValues);
+			FrontendAPI::instance()->entitiesSelected(m_currentSelectionReplyTo, m_currentSelectionAction, selectionInfo, m_currentSelectionOptionNames, m_currentSelectionOptionValues);
 
 			clearEdgeSelection();
 		}
 	}
-	else if (currentSelectionMode == SHAPE)
+	else if (m_currentSelectionMode == SHAPE)
 	{
-		currentSelectionMode = ENTITY;  // Switch back to the standard selection mode
+		m_currentSelectionMode = ENTITY;  // Switch back to the standard selection mode
 
 		// Process selected entities
 		std::list<unsigned long long> selectedModelEntityID;
@@ -2792,7 +2790,7 @@ void Model::endCurrentSelectionMode(bool cancelled)
 			std::string selectionInfo = buffer.GetString();
 
 			// Send the selection message to the model
-			FrontendAPI::instance()->entitiesSelected(currentSelectionReplyTo, currentSelectionAction, selectionInfo, currentSelectionOptionNames, currentSelectionOptionValues);
+			FrontendAPI::instance()->entitiesSelected(m_currentSelectionReplyTo, m_currentSelectionAction, selectionInfo, m_currentSelectionOptionNames, m_currentSelectionOptionValues);
 		}
 	}
 	else
@@ -2808,12 +2806,12 @@ void Model::faceSelected(unsigned long long modelID, SceneNodeGeometry *selected
 
 	// Check whether the face is already in the selected list
 	bool addFace = true;
-	for (auto face : currentFaceSelection)
+	for (auto face : m_currentFaceSelection)
 	{
 		if (face.getSelectedItem() == selectedItem && face.getFaceId() == faceId)
 		{
 			addFace = false;
-			currentFaceSelection.remove(face);
+			m_currentFaceSelection.remove(face);
 
 			setSelectedFacesHighlight(selectedItem, faceId, false);
 			updateSelectedFacesHighlight();
@@ -2831,13 +2829,13 @@ void Model::faceSelected(unsigned long long modelID, SceneNodeGeometry *selected
 		selection.setFaceId(faceId);
 		selection.setFaceName(faceName);
 
-		currentFaceSelection.push_back(selection);
+		m_currentFaceSelection.push_back(selection);
 
 		setSelectedFacesHighlight(selectedItem, faceId, true);
 	}
 
 	// If multiselection is not active, we end the selection mode now
-	if (!currentSelectionMultiple) endCurrentSelectionMode(false);
+	if (!m_currentSelectionMultiple) endCurrentSelectionMode(false);
 }
 
 void Model::edgeSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2)
@@ -2849,7 +2847,7 @@ void Model::edgeSelected(unsigned long long modelID, SceneNodeGeometry* selected
 
 	// Check whether the face is already in the selected list
 	bool addEdge = true;
-	for (auto edge : currentEdgeSelection)
+	for (auto edge : m_currentEdgeSelection)
 	{
 		if (edge.getSelectedItem() == selectedItem && (   faceId1 == edge.getFaceId1() && faceId2 == edge.getFaceId2()
 													   || faceId1 == edge.getFaceId2() && faceId2 == edge.getFaceId1()))
@@ -2857,7 +2855,7 @@ void Model::edgeSelected(unsigned long long modelID, SceneNodeGeometry* selected
 			addEdge = false;
 			edge.getSelectedItem()->removeSelectedEdge(edge.getNode());
 
-			currentEdgeSelection.remove(edge);
+			m_currentEdgeSelection.remove(edge);
 
 			refreshAllViews();
 			break;
@@ -2874,32 +2872,32 @@ void Model::edgeSelected(unsigned long long modelID, SceneNodeGeometry* selected
 		selection.setNode(selectedItem->addSelectedEdge(faceId1, faceId2));
 		selection.setEdgeName(edgeName);
 
-		currentEdgeSelection.push_back(selection);
+		m_currentEdgeSelection.push_back(selection);
 
 		refreshAllViews();
 	}
 	
 	// If multiselection is not active, we end the selection mode now
-	if (!currentSelectionMultiple) endCurrentSelectionMode(false);
+	if (!m_currentSelectionMultiple) endCurrentSelectionMode(false);
 }
 
 void Model::setSelectedFacesHighlight(SceneNodeGeometry *selectedItem, unsigned long long faceId, bool highlight)
 {
 	if (highlight)
 	{
-		selectedFacesList[selectedItem].remove(faceId);
-		selectedFacesList[selectedItem].push_back(faceId);
+		m_selectedFacesList[selectedItem].remove(faceId);
+		m_selectedFacesList[selectedItem].push_back(faceId);
 	}
 	else
 	{
-		selectedFacesList[selectedItem].remove(faceId);
+		m_selectedFacesList[selectedItem].remove(faceId);
 	}
 
 }
 
-void Model::clearSelectedFacesHighlight(void)
+void Model::clearSelectedFacesHighlight()
 {
-	for (auto entity : selectedFacesList)
+	for (auto entity : m_selectedFacesList)
 	{
 		for (auto face : entity.second)
 		{
@@ -2907,12 +2905,12 @@ void Model::clearSelectedFacesHighlight(void)
 		}
 	}
 
-	selectedFacesList.clear();
+	m_selectedFacesList.clear();
 }
 
-void Model::updateSelectedFacesHighlight(void)
+void Model::updateSelectedFacesHighlight()
 {
-	for (auto entity : selectedFacesList)
+	for (auto entity : m_selectedFacesList)
 	{
 		for (auto face : entity.second)
 		{
@@ -2923,7 +2921,7 @@ void Model::updateSelectedFacesHighlight(void)
 
 bool Model::isFaceSelected(SceneNodeGeometry *selectedItem, unsigned long long faceId)
 {
-	for (auto face : currentFaceSelection)
+	for (auto face : m_currentFaceSelection)
 	{
 		if (face.getSelectedItem() == selectedItem && face.getFaceId() == faceId)
 		{
@@ -2934,23 +2932,23 @@ bool Model::isFaceSelected(SceneNodeGeometry *selectedItem, unsigned long long f
 	return false;
 }
 
-unsigned int Model::getFaceSelectionTraversalMask(void)
+unsigned int Model::getFaceSelectionTraversalMask()
 {
 	return 1;   // The last bit is not set if the shape is transparent. Therefore, we can use the last bit mask to exclude transparent objects
 				// The transparent flag is also not set for helper geometry, so this one will not be picked as well.
 }
 
-unsigned int Model::getEdgeSelectionTraversalMask(void)
+unsigned int Model::getEdgeSelectionTraversalMask()
 {
 	return 1;   // The last bit is not set if the shape is transparent. Therefore, we can use the last bit mask to exclude transparent objects
 				// The transparent flag is also not set for helper geometry, so this one will not be picked as well.
 }
 
-unsigned int Model::getCurrentTraversalMask(void)
+unsigned int Model::getCurrentTraversalMask()
 {
 	// The second bit is set if the shape shall be excluded from selection
 
-	switch (currentSelectionMode)
+	switch (m_currentSelectionMode)
 	{
 		case ENTITY:
 			return 2;   // We do not pick objects for which the second bit is not set.
@@ -2973,7 +2971,7 @@ unsigned int Model::getCurrentTraversalMask(void)
 
 void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadius)
 {
-	switch (currentSelectionMode)
+	switch (m_currentSelectionMode)
 	{
 	case ENTITY:
 		if (intersector->containsIntersections())
@@ -3014,7 +3012,7 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 					{
 						selectedItem->setEdgeHighlight(faceId, true, ViewerSettings::instance()->geometryHighlightLineWidth);
 					}
-					currentHoverItem = selectedItem;
+					m_currentHoverItem = selectedItem;
 				}
 			}
 			else
@@ -3035,7 +3033,7 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 			SceneNodeGeometry* selectedItem = dynamic_cast<SceneNodeGeometry*> (findSelectedItemByPolytope(intersector, sceneRadius, intersectionPoint, faceId1, faceId2));
 			if (selectedItem != nullptr)
 			{
-				if (currentHoverItem != selectedItem)
+				if (m_currentHoverItem != selectedItem)
 				{
 					clearHoverView();
 				}
@@ -3046,7 +3044,7 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 					selectedItem->setEdgeHighlightNode(faceId1, faceId2);
 					setCursorText(edgeName);
 
-					currentHoverItem = selectedItem;
+					m_currentHoverItem = selectedItem;
 				}
 			}
 			else
@@ -3080,18 +3078,18 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 void Model::storeShapeNode(SceneNodeBase *node)
 {
 	if (node->getShapeNode()) {
-		osgNodetoSceneNodesMap[node->getShapeNode()] = node; 
+		m_osgNodetoSceneNodesMap[node->getShapeNode()] = node;
 	}
 }
 
 void Model::storeShapeNode(osg::Node *node, SceneNodeBase *sceneNode)
 {
-	osgNodetoSceneNodesMap[node] = sceneNode;
+	m_osgNodetoSceneNodesMap[node] = sceneNode;
 }
 
 void Model::forgetShapeNode(osg::Node *node)
 {
-	osgNodetoSceneNodesMap.erase(node);
+	m_osgNodetoSceneNodesMap.erase(node);
 }
 
 void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
@@ -3110,7 +3108,7 @@ void Model::addVisualizationMeshNodeFromFacetDataBase(const ot::EntityTreeItem& 
 
 	meshNode->setTreeItem(_treeItem);
 	meshNode->setDisplayTetEdges(_displayTetEdges);
-	meshNode->setWireframe(wireFrameState);
+	meshNode->setWireframe(m_wireFrameState);
 
 	// Get the parent scene node
 	SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
@@ -3137,7 +3135,7 @@ void Model::addVisualizationMeshItemNodeFromFacetDataBase(const ot::EntityTreeIt
 	SceneNodeMeshItem *meshNode = new SceneNodeMeshItem;
 
 	meshNode->setTreeItem(_treeItem);
-	meshNode->setWireframe(wireFrameState);
+	meshNode->setWireframe(m_wireFrameState);
 
 	// Get the parent scene node
 	SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
@@ -3184,7 +3182,7 @@ void Model::addVisualizationCartesianMeshNode(const ot::EntityTreeItem& _treeIte
 	SceneNodeCartesianMesh *meshNode = new SceneNodeCartesianMesh;
 
 	meshNode->setTreeItem(_treeItem);
-	meshNode->setWireframe(wireFrameState);
+	meshNode->setWireframe(m_wireFrameState);
 
 	// Get the parent scene node
 	SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
@@ -3225,7 +3223,7 @@ void Model::addVisualizationCartesianMeshNode(const ot::EntityTreeItem& _treeIte
 
 void Model::visualizationCartesianMeshNodeShowLines(unsigned long long modelEntityID, bool showMeshLines)
 {
-	SceneNodeCartesianMesh *meshNode = dynamic_cast<SceneNodeCartesianMesh *>(modelItemToSceneNodesMap[modelEntityID]);
+	SceneNodeCartesianMesh *meshNode = dynamic_cast<SceneNodeCartesianMesh *>(m_modelItemToSceneNodesMap[modelEntityID]);
 
 	if (meshNode != nullptr)
 	{
@@ -3237,7 +3235,7 @@ void Model::visualizationCartesianMeshNodeShowLines(unsigned long long modelEnti
 
 void Model::visualizationTetMeshNodeTetEdges(unsigned long long modelEntityID, bool displayTetEdges)
 {
-	SceneNodeMesh *meshNode = dynamic_cast<SceneNodeMesh *>(modelItemToSceneNodesMap[modelEntityID]);
+	SceneNodeMesh *meshNode = dynamic_cast<SceneNodeMesh *>(m_modelItemToSceneNodesMap[modelEntityID]);
 
 	if (meshNode != nullptr)
 	{
@@ -3253,7 +3251,7 @@ void Model::addVisualizationCartesianMeshItemNode(const ot::EntityTreeItem& _tre
 
 	meshNode->setTreeItem(_treeItem);
 	meshNode->setModel(this);
-	meshNode->setWireframe(wireFrameState);
+	meshNode->setWireframe(m_wireFrameState);
 
 	// Get the parent scene node
 	SceneNodeBase *parentNode = getParentNode(_treeItem.getEntityName());
@@ -3335,7 +3333,7 @@ void Model::loadRemainingData(const std::string& _entityName, ot::WidgetViewBase
 void Model::addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
 {
 	// Check whether the item already exists
-	SceneNodeBase *item = modelItemToSceneNodesMap[_treeItem.getEntityID()];
+	SceneNodeBase *item = m_modelItemToSceneNodesMap[_treeItem.getEntityID()];
 
 	SceneNodeVTK *vtkNode = nullptr;
 
@@ -3396,7 +3394,7 @@ void Model::addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, cons
 
 void Model::updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
 {
-	SceneNodeVTK *vtkNode = dynamic_cast<SceneNodeVTK *>(modelItemToSceneNodesMap[_entityID]);
+	SceneNodeVTK *vtkNode = dynamic_cast<SceneNodeVTK *>(m_modelItemToSceneNodesMap[_entityID]);
 	assert(vtkNode != nullptr);
 	if (vtkNode == nullptr) return;
 
@@ -3404,8 +3402,8 @@ void Model::updateVTKNode(ot::UID _entityID, const std::string &projectName, uns
 }
 
 SceneNodeBase* Model::getSceneNodeByEntityID(ot::UID _modelEntityID) const {
-	const auto it = modelItemToSceneNodesMap.find(_modelEntityID);
-	if (it != modelItemToSceneNodesMap.end()) {
+	const auto it = m_modelItemToSceneNodesMap.find(_modelEntityID);
+	if (it != m_modelItemToSceneNodesMap.end()) {
 		return it->second;
 	}
 	else {
@@ -3418,7 +3416,7 @@ void Model::updateCapGeometry(osg::Vec3d normal, osg::Vec3d point, double radius
 	// This function gets called whenever the orientation or position of the cutplane is changed and the cap geometry therefore needs to be updated
 
 	// First, we traverse the tree and find all geometry nodes
-	updateCapGeometryForSceneNodes(sceneNodesRoot, normal, point, radius);
+	updateCapGeometryForSceneNodes(m_sceneNodesRoot, normal, point, radius);
 }
 
 void Model::deleteCapGeometry()
@@ -3426,7 +3424,7 @@ void Model::deleteCapGeometry()
 	// This function gets called whenever the orientation or position of the cutplane is changed and the cap geometry therefore needs to be updated
 
 	// First, we traverse the tree and find all geometry nodes
-	deleteCapGeometryForSceneNodes(sceneNodesRoot);
+	deleteCapGeometryForSceneNodes(m_sceneNodesRoot);
 }
 
 void Model::updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d &normal, const osg::Vec3d &point, double radius)
@@ -3488,19 +3486,19 @@ void Model::updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg:
 void Model::storeInMaps(SceneNodeBase* _node) {
 	m_nameToSceneNodesMap[_node->getName()] = _node;
 	if (_node->getShapeNode()) {
-		osgNodetoSceneNodesMap[_node->getShapeNode()] = _node;
+		m_osgNodetoSceneNodesMap[_node->getShapeNode()] = _node;
 	}
-	treeItemToSceneNodesMap[_node->getTreeItemID()] = _node;
-	modelItemToSceneNodesMap[_node->getModelEntityID()] = _node;
+	m_treeItemToSceneNodesMap[_node->getTreeItemID()] = _node;
+	m_modelItemToSceneNodesMap[_node->getModelEntityID()] = _node;
 }
 
 void Model::removeFromMaps(const SceneNodeBase* _node) {
 	m_nameToSceneNodesMap.erase(_node->getName());
 	if (_node->getShapeNode()) {
-		osgNodetoSceneNodesMap.erase(_node->getShapeNode());
+		m_osgNodetoSceneNodesMap.erase(_node->getShapeNode());
 	}
-	treeItemToSceneNodesMap.erase(_node->getTreeItemID());
-	modelItemToSceneNodesMap.erase(_node->getModelEntityID());
+	m_treeItemToSceneNodesMap.erase(_node->getTreeItemID());
+	m_modelItemToSceneNodesMap.erase(_node->getModelEntityID());
 }
 
 void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
@@ -3573,7 +3571,7 @@ void Model::setTransparency(double transparencyValue)
 		}
 	};
 
-	setTransparencyRecursive(sceneNodesRoot, setTransparencyRecursive);
+	setTransparencyRecursive(m_sceneNodesRoot, setTransparencyRecursive);
 }
 
 void Model::setHighlightColor(const ot::Color& colorValue)
@@ -3598,7 +3596,7 @@ void Model::setHighlightColor(const ot::Color& colorValue)
 		}
 	};
 
-	setHighlightColorRecursive(sceneNodesRoot, setHighlightColorRecursive);
+	setHighlightColorRecursive(m_sceneNodesRoot, setHighlightColorRecursive);
 }
 
 void Model::setHighlightLineWidth(double lineWidthValue)
@@ -3623,7 +3621,7 @@ void Model::setHighlightLineWidth(double lineWidthValue)
 		}
 	};
 
-	setHighlightLineWidthRecursive(sceneNodesRoot, setHighlightLineWidthRecursive);
+	setHighlightLineWidthRecursive(m_sceneNodesRoot, setHighlightLineWidthRecursive);
 }
 
 void Model::updateEdgeColorMode()
@@ -3642,7 +3640,7 @@ void Model::updateEdgeColorMode()
 			}
 		};
 
-	setUpdateEdgeColorModeRecursive(sceneNodesRoot, setUpdateEdgeColorModeRecursive);
+	setUpdateEdgeColorModeRecursive(m_sceneNodesRoot, setUpdateEdgeColorModeRecursive);
 }
 
 void Model::updateMeshEdgeColor()
@@ -3667,5 +3665,5 @@ void Model::updateMeshEdgeColor()
 			}
 		};
 
-	setupdateMeshEdgeColorModeRecursive(sceneNodesRoot, setupdateMeshEdgeColorModeRecursive);
+	setupdateMeshEdgeColorModeRecursive(m_sceneNodesRoot, setupdateMeshEdgeColorModeRecursive);
 }

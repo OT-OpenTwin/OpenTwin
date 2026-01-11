@@ -40,12 +40,12 @@ namespace ViewerAPI {
 		class OsgModelManager {
 			OT_DECL_STATICONLY(OsgModelManager)
 		public:
-			static std::map<ot::UID, Model*>& uidToModelMap(void) {
+			static std::map<ot::UID, Model*>& uidToModelMap() {
 				static std::map<ot::UID, Model*> g_instance;
 				return g_instance;
 			}
 
-			static ot::UID& modelCount(void) {
+			static ot::UID& modelCount() {
 				static ot::UID g_instance;
 				return g_instance;
 			}
@@ -54,12 +54,12 @@ namespace ViewerAPI {
 		class ViewerManager {
 			OT_DECL_STATICONLY(ViewerManager)
 		public:
-			static std::map<ot::UID, ot::ViewerView*>& uidToViewerMap(void) {
+			static std::map<ot::UID, ot::ViewerView*>& uidToViewerMap() {
 				static std::map<ot::UID, ot::ViewerView*> g_instance;
 				return g_instance;
 			}
 
-			static ot::UID& viewerCount(void) {
+			static ot::UID& viewerCount() {
 				static ot::UID g_instance;
 				return g_instance;
 			}
@@ -94,7 +94,7 @@ void ViewerAPI::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& 
 	_object.AddMember("Viewers", viewerArr, _allocator);
 }
 
-ot::UID ViewerAPI::createModel(void)
+ot::UID ViewerAPI::createModel()
 {
 	intern::OsgModelManager::modelCount()++;
 
@@ -120,7 +120,7 @@ void ViewerAPI::activateModel(ot::UID osgModelID)
 	GlobalModel::setInstance(newActiveModel);
 }
 
-void ViewerAPI::deactivateCurrentlyActiveModel(void)
+void ViewerAPI::deactivateCurrentlyActiveModel()
 {
 	if (GlobalModel::instance() != nullptr)
 	{
@@ -132,7 +132,16 @@ void ViewerAPI::deactivateCurrentlyActiveModel(void)
 
 void ViewerAPI::deleteModel(ot::UID osgModelID)
 {
-	Model *model = intern::OsgModelManager::uidToModelMap()[osgModelID];
+	auto modelIt = intern::OsgModelManager::uidToModelMap().find(osgModelID);
+	if (modelIt == intern::OsgModelManager::uidToModelMap().end()) {
+		throw std::exception("The specified model does not exist");
+	}
+
+	FrontendAPI* frontend = FrontendAPI::instance();
+	OTAssertNullptr(frontend);
+
+	Model* model = modelIt->second;
+	intern::OsgModelManager::uidToModelMap().erase(modelIt);
 
 	// Make sure that the to be deleted model is no longer active
 	if (model == GlobalModel::instance()) {
@@ -140,12 +149,13 @@ void ViewerAPI::deleteModel(ot::UID osgModelID)
 	}
 
 	// Get all viewers and delete them
-	std::list<Viewer *> viewerList = model->getViewerList();
+	std::list<Viewer*> viewerList = model->getViewerList();
 
 	for (auto viewer : viewerList)
 	{
-		assert(FrontendAPI::instance() != nullptr);
-		if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->removeViewer(viewer->getViewerID());
+		if (frontend != nullptr) {
+			frontend->removeViewer(viewer->getViewerID());
+		}
 
 		intern::ViewerManager::uidToViewerMap().erase(viewer->getViewerID());
 		viewer->detachFromModel();
@@ -155,20 +165,18 @@ void ViewerAPI::deleteModel(ot::UID osgModelID)
 	}
 
 	// Delete the model
-	intern::OsgModelManager::uidToModelMap().erase(osgModelID);
-
 	delete model;
 	model = nullptr;
 }
 
-ot::UID ViewerAPI::getActiveDataModel(void)
+ot::UID ViewerAPI::getActiveDataModel()
 {
 	if (GlobalModel::instance() == nullptr) return 0;
 
 	return GlobalModel::instance()->getDataModel();
 }
 
-ot::UID ViewerAPI::getActiveViewerModel(void)
+ot::UID ViewerAPI::getActiveViewerModel()
 {
 	if (GlobalModel::instance() == nullptr) return 0;
 

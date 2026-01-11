@@ -1429,8 +1429,17 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		app->storeSessionState();
 
-		// Notify the websocket that the project is closing (do not worry if the relay service shuts down)
+		// Stop the keep alive timer
+		if (m_keepAliveTimer != nullptr) {
+			m_keepAliveTimer->stop();
+			delete m_keepAliveTimer;
 
+			m_keepAliveTimer = nullptr;
+
+			m_lastKeepAlive = 0;
+		}
+
+		// Notify the websocket that the project is closing (do not worry if the relay service shuts down)
 		// This also prevents new received messages from being processed and will clear the message queue
 		if (m_websocket != nullptr) {
 			m_websocket->prepareSessionClosing();
@@ -1438,6 +1447,14 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		// Enable action buffering
 		ot::BasicScopedBoolWrapper actionBufferFlag(m_bufferActions, true);
+
+		m_actionBuffer.clear();
+
+		// Deactivate the visualization model (this will also remove the tree entries)
+		app->getViewerComponent()->deactivateCurrentlyActiveModel();
+
+		// Stop the session service health check
+		ot::stopSessionServiceHealthCheck();
 
 		// Notify the session service that the sesion should be closed now
 		ot::JsonDocument shutdownCommand;
@@ -1463,19 +1480,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			ot::intern::exitAsync(ot::AppExitCode::LSSNotRunning);
 			return;
 		}
-
-		// Stop the session service health check
-		ot::stopSessionServiceHealthCheck();
-
-		if (m_keepAliveTimer != nullptr) {
-			m_keepAliveTimer->stop();
-			delete m_keepAliveTimer;
-
-			m_keepAliveTimer = nullptr;
-
-			m_lastKeepAlive = 0;
-		}
-
+			
 		// Shutdown external APIs
 		ot::FMConnectorAPI::shutdown();
 
@@ -1494,27 +1499,9 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			eventLoop.processEvents(QEventLoop::AllEvents);
 		}
 		
-		// Get the id of the curently active model
-		ModelUIDtype modelID = app->getViewerComponent()->getActiveDataModel();
-
-		//NOTE, model ids will no longer be used in the future
-		if (modelID == 0) {
-			OT_LOG_W("No project currently active");
-			return;  // No project currently active
-		}
-		modelID = 1;
-
 		// Now get the id of the corresponding visualization model
 		ModelUIDtype visualizationModel = app->getViewerComponent()->getActiveViewerModel();
-
-		// Deactivate the visualization model (this will also remove the tree entries)
-		app->getViewerComponent()->deactivateCurrentlyActiveModel();
-
-		// Close the model (potentially with saving).
-		// This operation will also post delete queries. In this case, no attempt will be made to 
-		// remove entities in the visualization model
-
-
+		
 		// Delete the corresponding visualization model. This will also detach the currently active viewers such that 
 		// they no longer refer to the visualization model. The viewer widget itself can not be deleted, since it is still 
 		// attached to a tab. The tab with the dear viewer will therefore need to be removed separately.
@@ -1552,6 +1539,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		app->replaceInfoMessage(c_buildInfo);
 
+		// Delete the websocket connection
 		if (m_websocket != nullptr) {
 			delete m_websocket;
 			m_websocket = nullptr;
@@ -4765,7 +4753,9 @@ void ot::stopSessionServiceHealthCheck() {
 		return;
 	}
 	g_runSessionServiceHealthCheck = false;
-	if (g_sessionServiceHealthCheckThread->joinable()) { g_sessionServiceHealthCheckThread->join(); }
+	if (g_sessionServiceHealthCheckThread->joinable()) {
+		g_sessionServiceHealthCheckThread->join();
+	}
 	delete g_sessionServiceHealthCheckThread;
 	g_sessionServiceHealthCheckThread = nullptr;
 }

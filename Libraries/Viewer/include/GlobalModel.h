@@ -25,10 +25,10 @@
 class GlobalModel {
 	OT_DECL_STATICONLY(GlobalModel)
 public:
-	static Model* instance(void);
+	static Model* instance();
 	static void setInstance(Model* _model);
 
 private:
-	static Model*& getInstance(void);
+	static Model*& getInstance();
 
 };

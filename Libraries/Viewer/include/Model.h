@@ -53,19 +53,19 @@ public:
 
 	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
-	void setID(unsigned long long id) { viewerModelID = id; }
-	unsigned long long getID(void) { return viewerModelID; }
+	void setID(unsigned long long id) { m_viewerModelID = id; }
+	unsigned long long getID() { return m_viewerModelID; }
 
-	bool isModelActive(void) { return isActive; };
-	void activateModel(void);
-	void deactivateModel(void);
+	bool isModelActive() { return m_isActive; };
+	void activateModel();
+	void deactivateModel();
 
 	void attachViewer(Viewer *viewer);
 	void detachViewer(Viewer *viewer);
-	void resetAllViews3D(void);
-	void refreshAllViews(void);
-	void clearSelection(void);
-	void refreshSelection(void);
+	void resetAllViews3D();
+	void refreshAllViews();
+	void clearSelection();
+	void refreshSelection();
 	void selectObject(unsigned long long modelEntityID);
 
 	void setTreeStateRecording(bool flag);
@@ -118,15 +118,15 @@ public:
 	ot::SelectionHandlingResult setSelectedTreeItems(const ot::SelectionData& _selectionData, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems);
 	void executeAction(ot::UID _buttonID);
 	void setHoverTreeItem(ot::UID hoverTreeItemID);
-	void clearHoverView(void);
+	void clearHoverView();
 	void setHoverView(SceneNodeBase *selectedItem);
 	unsigned long long getModelEntityIDFromTreeID(ot::UID treeItem);
 	unsigned long long getTreeIDFromModelID(ot::UID modelID);
 
-	void setDataModel(unsigned long long modelID) { dataModelID = modelID; };
-	unsigned long long getDataModel(void) { return dataModelID; };
+	void setDataModel(unsigned long long modelID) { m_dataModelID = modelID; };
+	unsigned long long getDataModel() { return m_dataModelID; };
 
-	osg::Node *getOSGRootNode(void) { return osgRootNode; };
+	osg::Node *getOSGRootNode() { return m_osgRootNode; };
 
 	void getSelectedModelEntityIDs(std::list<unsigned long long> &selectedModelEntityID);
 	void getSelectedVisibleModelEntityIDs(std::list<unsigned long long> &selectedVisibleModelEntityID);
@@ -138,9 +138,9 @@ public:
 	void enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string &selectionType, bool allowMultipleSelection, const std::string &selectionFilter, const std::string &selectionAction, const std::string &selectionMessage, std::list<std::string> &optionNames, std::list<std::string> &optionValues);
 
 	enum eSelectionMode { ENTITY, FACE, SHAPE, EDGE };
-	eSelectionMode getCurrentSelectionMode(void) { return currentSelectionMode; };
-	void escapeKeyPressed(void);
-	void returnKeyPressed(void);
+	eSelectionMode getCurrentSelectionMode() { return m_currentSelectionMode; };
+	void escapeKeyPressed();
+	void returnKeyPressed();
 	void processCurrentSelectionMode(osgUtil::Intersector *intersector, double sceneRadius, bool bCtrlKeyPressed);
 	void processHoverView(osgUtil::Intersector *intersector, double sceneRadius);
 
@@ -149,11 +149,11 @@ public:
 	void forgetShapeNode(osg::Node *node);
 
 	void notifySceneNodeAboutViewChange(const std::string& _sceneNodeName,const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
-	std::list<Viewer *> getViewerList(void) { return viewerList; };
+	std::list<Viewer *> getViewerList() { return m_viewerList; };
 
-	unsigned int getCurrentTraversalMask(void);
-	unsigned int getFaceSelectionTraversalMask(void);
-	unsigned int getEdgeSelectionTraversalMask(void);
+	unsigned int getCurrentTraversalMask();
+	unsigned int getFaceSelectionTraversalMask();
+	unsigned int getEdgeSelectionTraversalMask();
 
 	void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);
 
@@ -168,15 +168,15 @@ public:
 	void freeze3DView(bool flag);
 
 	//! @return Return true if a view change was requested.
-	bool ensure3DView(void);
+	bool ensure3DView();
 
-	bool isSingleItemSelected(void) { return singleItemSelected; }
+	bool isSingleItemSelected() { return m_singleItemSelected; }
 
-	void centerMouseCursor(void);
-	bool isWireFrameMode(void) { return wireFrameState; }
+	void centerMouseCursor();
+	bool isWireFrameMode() { return m_wireFrameState; }
 
-	osg::Matrix getCurrentWorkingPlaneTransform(void) { return currentWorkingplaneTransform; }
-	osg::Matrix getCurrentWorkingPlaneTransformTransposedInverse(void) { return currentWorkingplaneTransformTransposedInverse; }
+	osg::Matrix getCurrentWorkingPlaneTransform() { return m_currentWorkingplaneTransform; }
+	osg::Matrix getCurrentWorkingPlaneTransformTransposedInverse() { return m_currentWorkingplaneTransformTransposedInverse; }
 
 	void   fillPropertyGrid(const ot::PropertyGridCfg& _configuration);
 	void   clearModalPropertyGrid();
@@ -199,7 +199,7 @@ public:
 
 private:
 	// Methods
-	void	   fillTree(void);
+	void	   fillTree();
 	
 	void	   showAllSceneNodes(SceneNodeBase *root);
 	void	   hideAllSceneNodes(SceneNodeBase *root);
@@ -208,23 +208,23 @@ private:
 	void       hideUnselectedSceneNodes(SceneNodeBase *root);
 	void	   hideSceneNodeAndChilds(SceneNodeBase *node);
 	void	   setSceneNodeVisibility(SceneNodeBase *root, std::map<unsigned long long, bool> nodeVisibility);
-	void	   toggleWireframeView(void);
-	void       toggleWorkingPlane(void);
-	void       toggleAxisCross(void);
-	void       toggleCenterAxisCross(void);
-	void	   toggleCutplane(void);
+	void	   toggleWireframeView();
+	void       toggleWorkingPlane();
+	void       toggleAxisCross();
+	void       toggleCenterAxisCross();
+	void	   toggleCutplane();
 
-	void saveTextEditor(void);
-	void exportTextEditor(void);
+	void saveTextEditor();
+	void exportTextEditor();
 
-	void saveTable(void);
-	void exportTableAsCSV(void);
-	void addTableRowBefore(void);
-	void addTableRowAfter(void);
-	void removeTableRow(void);
-	void addTableColumnBefore(void);
-	void addTableColumnAfter(void);
-	void removeTableColumn(void);
+	void saveTable();
+	void exportTableAsCSV();
+	void addTableRowBefore();
+	void addTableRowAfter();
+	void removeTableRow();
+	void addTableColumnBefore();
+	void addTableColumnAfter();
+	void removeTableColumn();
 
 	void viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo);
 
@@ -246,25 +246,25 @@ private:
 	void	   endCurrentSelectionMode(bool cancelled);
 	SceneNodeGeometry *createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, bool _manageParentVisibility, bool _manageChildVisibility);
 	void       setItemVisibleState(SceneNodeBase* _item, bool _visible);
-	void	   showAllSceneNodesAction(void);
-	void	   showSelectedSceneNodesAction(void);
-	void	   hideSelectedSceneNodesAction(void);
-	void	   hideUnselectedSceneNodesAction(void);
+	void	   showAllSceneNodesAction();
+	void	   showSelectedSceneNodesAction();
+	void	   hideSelectedSceneNodesAction();
+	void	   hideUnselectedSceneNodesAction();
 	void	   getPrefetchForSelectedSceneNodes(SceneNodeBase *root, std::string& projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 	void	   getPrefetchForAllSceneNodes(SceneNodeBase *root, std::string& projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
-	void	   updateSelectedFacesHighlight(void);
+	void	   updateSelectedFacesHighlight();
 	void	   setSelectedFacesHighlight(SceneNodeGeometry *selectedItem, unsigned long long faceId, bool highlight);
-	void       clearSelectedFacesHighlight(void);
+	void       clearSelectedFacesHighlight();
 	bool       isFaceSelected(SceneNodeGeometry *selectedItem, unsigned long long faceId);
 	void       manageParentVisibility(SceneNodeBase *item);
-	void	   updateWorkingPlaneTransform(void);
+	void	   updateWorkingPlaneTransform();
 	bool       getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, osg::Matrix &matrix);
 	bool       compareTransformations(osg::Matrix &matrix1, osg::Matrix &matrix2);
 	void       updateCapGeometryForSceneNodes(SceneNodeBase* root, const osg::Vec3d& normal, const osg::Vec3d& point, double radius);
 	void       deleteCapGeometryForSceneNodes(SceneNodeBase* root);
 	void       updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg::Vec3d &normal, const osg::Vec3d &point, double radius);
 	bool	   isLineDrawable(osg::Drawable *drawable);
-	void	   clearEdgeSelection(void);
+	void	   clearEdgeSelection();
 			
 	void storeInMaps(SceneNodeBase* _node);
 	void removeFromMaps(const SceneNodeBase* _node);
@@ -274,33 +274,33 @@ private:
 	// Attributes
 	enum { ITEM_SELECTED = 1, ITEM_EXPANDED = 2 };
 
-	osg::ref_ptr<osg::Group>					   osgRootNode;
-	std::list<Viewer *>							   viewerList;
-	SceneNodeBase*     							   sceneNodesRoot;
+	osg::ref_ptr<osg::Group>					   m_osgRootNode;
+	std::list<Viewer *>							   m_viewerList;
+	SceneNodeBase*     							   m_sceneNodesRoot;
 	std::map<std::string, SceneNodeBase *>		   m_nameToSceneNodesMap;
-	std::map <ot::UID, SceneNodeBase *>			   treeItemToSceneNodesMap;
-	std::map <ot::UID, SceneNodeBase *>            modelItemToSceneNodesMap;
-	std::map <osg::Node*, SceneNodeBase *>	       osgNodetoSceneNodesMap;
-	bool										   isActive;
-	bool										   wireFrameState;
-	SceneNodeBase*								   currentHoverItem;
-	unsigned long long							   dataModelID;
-	eSelectionMode								   currentSelectionMode;
-	ot::serviceID_t								   currentSelectionReplyTo;
-	std::string									   currentSelectionAction;
-	std::list<std::string>						   currentSelectionOptionNames;
-	std::list<std::string>						   currentSelectionOptionValues;
-	bool										   currentSelectionMultiple;
-	std::list<FaceSelection>					   currentFaceSelection;
-	std::list<EdgeSelection>					   currentEdgeSelection;
-	std::map < SceneNodeGeometry *, std::list<unsigned long long>> selectedFacesList;
-	unsigned long long							   viewerModelID;
-	bool										   singleItemSelected;
-	bool										   treeStateRecording;
-	std::map<std::string, char>					   treeInfoMap;
-	osg::Matrix									   currentWorkingplaneTransform;
-	osg::Matrix									   currentWorkingplaneTransformTransposedInverse;
-	ManipulatorBase							      *currentManipulator;
+	std::map <ot::UID, SceneNodeBase *>			   m_treeItemToSceneNodesMap;
+	std::map <ot::UID, SceneNodeBase *>            m_modelItemToSceneNodesMap;
+	std::map <osg::Node*, SceneNodeBase *>	       m_osgNodetoSceneNodesMap;
+	bool										   m_isActive;
+	bool										   m_wireFrameState;
+	SceneNodeBase*								   m_currentHoverItem;
+	unsigned long long							   m_dataModelID;
+	eSelectionMode								   m_currentSelectionMode;
+	ot::serviceID_t								   m_currentSelectionReplyTo;
+	std::string									   m_currentSelectionAction;
+	std::list<std::string>						   m_currentSelectionOptionNames;
+	std::list<std::string>						   m_currentSelectionOptionValues;
+	bool										   m_currentSelectionMultiple;
+	std::list<FaceSelection>					   m_currentFaceSelection;
+	std::list<EdgeSelection>					   m_currentEdgeSelection;
+	std::map < SceneNodeGeometry *, std::list<unsigned long long>> m_selectedFacesList;
+	unsigned long long							   m_viewerModelID;
+	bool										   m_singleItemSelected;
+	bool										   m_treeStateRecording;
+	std::map<std::string, char>					   m_treeInfoMap;
+	osg::Matrix									   m_currentWorkingplaneTransform;
+	osg::Matrix									   m_currentWorkingplaneTransformTransposedInverse;
+	ManipulatorBase*                               m_currentManipulator;
 
 	bool m_hasModalMenu;
 	std::string m_currentMenu;

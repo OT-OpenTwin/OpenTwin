@@ -28,7 +28,7 @@ void GlobalModel::setInstance(Model* _model) {
 	GlobalModel::getInstance() = _model;
 }
 
-Model*& GlobalModel::getInstance(void) {
+Model*& GlobalModel::getInstance() {
 	static Model* g_instance{ nullptr };
 	return g_instance;
 }

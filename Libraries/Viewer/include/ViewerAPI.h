@@ -53,13 +53,13 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator);
 
-	__declspec(dllexport) ot::UID createModel(void);
+	__declspec(dllexport) ot::UID createModel();
 	__declspec(dllexport) void activateModel(ot::UID _osgModelID);
-	__declspec(dllexport) void deactivateCurrentlyActiveModel(void);
+	__declspec(dllexport) void deactivateCurrentlyActiveModel();
 	__declspec(dllexport) void deleteModel(ot::UID _osgModelID);
 
-	__declspec(dllexport) ot::UID getActiveDataModel(void);
-	__declspec(dllexport) ot::UID getActiveViewerModel(void);
+	__declspec(dllexport) ot::UID getActiveDataModel();
+	__declspec(dllexport) ot::UID getActiveViewerModel();
 
 	__declspec(dllexport) ot::UID createViewer(ot::UID _osgModelID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB, QWidget* _parent);
 	__declspec(dllexport) ot::WidgetView* getViewerWidget(ot::UID viewer);
