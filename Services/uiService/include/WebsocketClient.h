@@ -74,16 +74,16 @@ private:
 
 	QWebSocket m_webSocket;
 	QUrl m_url;
-	bool m_isConnected;
+	std::atomic_bool m_isConnected;
 
 	ot::RelayedMessageHandler m_messageHandler;
 
-	bool m_bufferHandlingRequested;
-	bool m_currentlyProcessingQueuedMessage;
+	std::atomic_bool m_bufferHandlingRequested;
+	std::atomic_bool m_currentlyProcessingQueuedMessage;
 	std::list<ot::RelayedMessageHandler::Request> m_newRequests; //! @brief New commands that arrived while processing a queued message.
 	std::list<ot::RelayedMessageHandler::Request> m_currentRequests; //! @brief Buffer of commands that need to be processed after the current message handling.
 	
-	bool m_sessionIsClosing;
-	bool m_unexpectedDisconnect;
+	std::atomic_bool m_sessionIsClosing;
+	std::atomic_bool m_unexpectedDisconnect;
 };
 
