@@ -591,7 +591,7 @@ public Q_SLOTS:
 
 	void slotOpenProjectFromIndex(int _index);
 	void slotRefreshProjectOverivew();
-	void slotOpenSpecificProject(std::string _projectName, const std::string& _projectVersion);
+	void slotOpenSpecificProject(const QString& _projectName, const QString& _projectVersion);
 	void slotCopyProject();
 	void slotRenameProject();
 	void slotDeleteProject();
@@ -602,6 +602,8 @@ public Q_SLOTS:
 	//! @brief Refreshes the welcome screen content.
 	//! This function can be used to update the project list after projects were created, deleted, or modified.
 	void refreshWelcomeScreen();
+
+	QStringList getAvailableProjectNames() const;
 
 	//! @brief Downloads the installer from the provided GSS URL and runs it.
 	void downloadInstaller(QString gssUrl);

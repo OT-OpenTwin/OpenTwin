@@ -19,8 +19,8 @@ ScriptEngine::~ScriptEngine() {
 bool ScriptEngine::initialize(AppBase* _app) {
 	// Register global objects
 	
-	registerObject("AppBase", _app);
-	registerObject("ViewManager", &ot::GlobalWidgetViewManager::instance());
+	registerObject("app", _app);
+	registerObject("views", &ot::GlobalWidgetViewManager::instance());
 
 	if (_app->getToolBar()) {
 		registerToolBar(_app->getToolBar());
@@ -30,7 +30,7 @@ bool ScriptEngine::initialize(AppBase* _app) {
 }
 
 void ScriptEngine::registerToolBar(QObject* _toolBar) {
-	registerObject("ToolBar", _toolBar);
+	registerObject("ttb", _toolBar);
 }
 
 void ScriptEngine::registerObject(const QString& _name, QObject* _object) {

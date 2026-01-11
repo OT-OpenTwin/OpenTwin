@@ -16,32 +16,32 @@ The :ref:`examples <ui_scripting_examples>` showcase the basic usage.
 
 .. _ui_scripting_objects:
 
-Global Objects
-**************
+Objects
+*******
 
 .. list-table::
     :header-rows: 1
 
-    * - Name
+    * - Object Name
       - Class Name
       - Availability
     
-    * - AppBase
+    * - app
       - `Frontend/AppBase <../_static/codedochtml/class_app_base.xhtml>`_
       - Global
     
-    * - ViewManager
+    * - views
       - `OTWidgets/WidgetViewManager <../_static/codedochtml/classot_1_1_widget_view_manager.xhtml>`_
       - Global
     
-    * - ToolBar
+    * - ttb
       - `Frontend/ToolBar <../_static/codedochtml/class_tool_bar.xhtml>`_
       - After Login
         
         After a successful login the frontend will create the default UI.
         This will trigger the AppBase::toolBarAvailable(ToolBar) signal.
 
-        If it is enusured that the code snipped is executed then the ToolBar object can directly be used.
+        If it is enusured that the code snipped is executed after the login, then the ToolBar object can directly be used.
 
 .. _ui_scripting_examples:
 
@@ -55,11 +55,12 @@ The following example demonstrates how to automatically login with the last set 
 
 .. code-block:: js
     :linenos:
+    :emphasize-lines: 1, 4, 7
 
     // React to the "logInDialogAvailable" signal of the global "AppBase" object.
-    AppBase.logInDialogAvailable.connect(function (dialog) {
+    app.logInDialogAvailable.connect(function (dialog) {
 
-        // React to the "dialogShown" signal of the provided "dialog" object.
+        // React to the "dialogShown" signal of the provided dialog object.
         dialog.dialogShown.connect(function () {
 
             // Call the "slotLogIn" slot of the dialog.
@@ -74,53 +75,78 @@ The following example demonstrates how to open the latest project.
 
 .. code-block:: js
     :linenos:
+    :emphasize-lines: 3
 
     // Optionally log-in automatically ...
 
     // After login open the latest project
-
-    AppBase.loginSuccessful.connect(function () {
-        AppBase.slotOpenProjectFromIndex(0);
+    app.loginSuccessful.connect(function () {
+        app.slotOpenProjectFromIndex(0);
     });
 
 Switch Project 10 times
 =======================
 
-The following example demonstrates how to switch the project ten times.
+The following example demonstrates how to switch the project 10 times.
 
-The script will wait for the session to be open by connecting to the AppBase::servicesUiSetupComplete slot.
+After the login the script will get the available project names and open the first one.
+
+After project open completed the script will open the next project in the list.
 
 .. code-block:: js
     :linenos:
+    :emphasize-lines: 3, 9, 21, 34
 
     // Optionally log-in automatically ...
 
-    // Optionally open the last project after login ...
-
     // Declare variables
-    var PROJECT_INDEX = 10;
     var MAX_SWITCHES = 10;
+    var projectNameList;
+    var currentIndex = -1;
     var projectSwitchCount = 0;
 
-    // After all services have completed their setup switch to other project.
-    AppBase.servicesUiSetupComplete.connect(function () {
-        // Check if we reached the project switch limit
+    // After login
+    app.loginSuccessful.connect(function () {
+        // Refresh the project information
+        app.slotRefreshProjectOverivew();
+
+        // Get the available project names
+        projectNameList = app.getAvailableProjectNames();
+
+        // Open the first project
+        openNextProject();
+    });
+
+    // After project open completed
+    app.servicesUiSetupComplete.connect(function () {
+
+        // Check for project switch limit
         if (projectSwitchCount >= MAX_SWITCHES) {
             return;
         }
 
-        // Refresh the project overview
-        // This ensures the last accessed times are updated and the projects are sorted
-        AppBase.slotRefreshProjectOverivew();
-
-        // Increase the project switch cout
+        // Increase switch counter and open next project
         projectSwitchCount++;
-
-        // Open the project at the given index
-        // Index 0 should not be used since 0 is the last accessed project
-        // and therefore the currently open project
-        AppBase.slotOpenProjectFromIndex(PROJECT_INDEX); 
+        openNextProject();
     });
+
+    // Helper function to open the next project
+    function openNextProject() {
+    
+        // Ensure we have at least one project in the list
+        if (projectNameList.length==0) {
+            return false;
+        }
+
+        // Increase index and check for wrap around
+        currentIndex++;
+        if (currentIndex >= projectNameList.length) {
+            currentIndex = 0;
+        }
+
+        // Open the next project (name, version)
+        app.slotOpenSpecificProject(projectNameList[currentIndex], "");
+    }
 
 Send Message to Service
 =======================
@@ -129,33 +155,34 @@ The following example demonstrates how to send a message to a service via name a
 
 .. code-block:: js
     :linenos:
+    :emphasize-lines: 1, 7, 18
 
     // After project open completed send ping message
-    AppBase.servicesUiSetupComplete.connect(function () {
-        AppBase.appendInfoMessage("Script: Pinging Model service\n");
+    app.servicesUiSetupComplete.connect(function () {
+        app.appendInfoMessage("Script: Pinging Model service\n");
 
         var message = "{ \"action\": \"Ping\" }";
     
         // Send ping message to service by name
-        var result = AppBase.slotSendExecuteMessageToService("Model", message);
+        var result = app.slotSendExecuteMessageToService("Model", message);
     
         // Display information in output window.
         if (result.success===true) {
-            AppBase.appendInfoMessage("Script: Ping send successful. Receiver: \"Model\". Response: " + result.response + "\n");
+            app.appendInfoMessage("Script: Ping send successful. Receiver: \"Model\". Response: " + result.response + "\n");
         }
         else {
-            AppBase.appendInfoMessage("Script: Ping send failed to service \"Model\"\n");
+            app.appendInfoMessage("Script: Ping send failed to service \"Model\"\n");
         }
 
         // Send ping message to service by url
-        var result2 = AppBase.slotSendExecuteMessageToUrl("127.0.0.1:8000", message);
+        var result2 = app.slotSendExecuteMessageToUrl("127.0.0.1:8000", message);
     
         // Display information in output window.
         if (result2.success===true) {
-            AppBase.appendInfoMessage("Script: Ping send successful. Receiver: 127.0.0.1:8000. Response: " + result2.response + "\n");
+            app.appendInfoMessage("Script: Ping send successful. Receiver: 127.0.0.1:8000. Response: " + result2.response + "\n");
         }
         else {
-            AppBase.appendInfoMessage("Script: Ping send failed to 127.0.0.1:8000\n");
+            app.appendInfoMessage("Script: Ping send failed to 127.0.0.1:8000\n");
         }
     });
 
@@ -166,15 +193,16 @@ The following example demonstrates how to trigger a ToolBar button click.
 
 .. code-block:: js
     :linenos:
+    :emphasize-lines: 1
 
     // After project open completed trigger the create material button
-    AppBase.servicesUiSetupComplete.connect(function () {
-        var result = ToolBar.triggerToolBarButton("Model:Material:Create Material");
+    app.servicesUiSetupComplete.connect(function () {
+        var result = ttb.triggerToolBarButton("Model:Material:Create Material");
         if (result===true) {
-            AppBase.appendInfoMessage("Script: Button triggered\n");
+            app.appendInfoMessage("Script: Button triggered\n");
         }
         else {
-            AppBase.appendInfoMessage("Script: Failed to trigger button\n");
+            app.appendInfoMessage("Script: Failed to trigger button\n");
         }
     });
 
@@ -185,47 +213,42 @@ The following example demonstrates how a ToolBar button can be clicked, a timer 
 
 .. code-block:: js
     :linenos:
+    :emphasize-lines: 5, 10, 13, 16, 19, 23, 32, 36, 39, 42, 46, 50, 60, 63, 66, 71, 74
 
+    // Optionally log-in automatically ...
+
+    // Optionally automatically open a project ...
+
+    // Declare variables
     var TIMER_MATERIAL_SELECT = "Script_MaterialSelect";
     var MAX_SELECTION_ATTEMPTS = 30;
     var currentSelectionAttempt = 0;
 
-    // Auto Login
-    AppBase.logInDialogAvailable.connect(function (dialog) {
-        dialog.dialogShown.connect(function () {
-            dialog.slotLogIn();
-        });
-    });
-
-    // After login open the latest project
-    AppBase.loginSuccessful.connect(function () {
-        AppBase.slotOpenProjectFromIndex(0);
-    });
-
     // After project open completed trigger the create material logic
-    AppBase.servicesUiSetupComplete.connect(function () {
+    app.servicesUiSetupComplete.connect(function () {
 
         // If the material does not exist we create a new one
         if (selectMaterial()===false) {
 
             // To create a new material we trigger the corresponding button
-            var result = ToolBar.triggerToolBarButton("Model:Material:Create Material");
+            var result = ttb.triggerToolBarButton("Model:Material:Create Material");
 
+            // Check the result of the trigger command
             if (result===true) {
-                AppBase.appendInfoMessage("Script: Button triggered\n");
+                app.appendInfoMessage("Script: Button triggered\n");
 
                 // Run the timer to refresh the selection
-                AppBase.slotRunCustomTimer(TIMER_MATERIAL_SELECT, 100);
+                app.slotRunCustomTimer(TIMER_MATERIAL_SELECT, 100);
             }
             else {
-                AppBase.appendInfoMessage("Script: Failed to trigger button\n");
+                app.appendInfoMessage("Script: Failed to trigger button\n");
             }
         }
     });
 
     // Custom timer timeout
-    AppBase.customTimerTimeout.connect(function (timerId) {
-        AppBase.appendInfoMessage("Script: Handling timer timeout \"" + timerId + "\"\n");
+    app.customTimerTimeout.connect(function (timerId) {
+        app.appendInfoMessage("Script: Handling timer timeout \"" + timerId + "\"\n");
 
         // Check which timer has a timeout
         if (timerId == TIMER_MATERIAL_SELECT) {
@@ -238,11 +261,11 @@ The following example demonstrates how a ToolBar button can be clicked, a timer 
                     currentSelectionAttempt++;
 
                     // Run the timer to refresh the selection
-                    AppBase.slotRunCustomTimer(TIMER_MATERIAL_SELECT, 100);
+                    app.slotRunCustomTimer(TIMER_MATERIAL_SELECT, 100);
                 }
                 else {
                     // We reached the maximum number of attempts
-                    AppBase.appendInfoMessage("Script: Failed to select tree item after " + MAX_SELECTION_ATTEMPTS.toString() + " attempts\n");
+                    app.appendInfoMessage("Script: Failed to select tree item after " + MAX_SELECTION_ATTEMPTS.toString() + " attempts\n");
                 }
             }
             else {
@@ -255,7 +278,7 @@ The following example demonstrates how a ToolBar button can be clicked, a timer 
     function selectMaterial() {
 
         // The the ID of the desired navigation tree item
-        var treeId = AppBase.findNavigationTreeItemByName("Materials/material1");
+        var treeId = app.findNavigationTreeItemByName("Materials/material1");
 
         // ID 0 is the invalid ID. In that case we cancel and return false
         if (treeId===0) {
@@ -263,10 +286,10 @@ The following example demonstrates how a ToolBar button can be clicked, a timer 
         }
         else {
             // Clear the current selection
-            AppBase.clearNavigationTreeSelection();
+            app.clearNavigationTreeSelection();
 
             // Select the desired item by its ID
-            AppBase.setSingleNavigationTreeItemSelected(treeId, true);
+            app.setSingleNavigationTreeItemSelected(treeId, true);
 
             return true;
         }
