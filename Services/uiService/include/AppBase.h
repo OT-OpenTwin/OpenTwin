@@ -464,6 +464,12 @@ public Q_SLOTS:
 	void slotSetProgressBarValue(int _progressPercentage);
 
 	void slotRunCustomTimer(const QString& _timerId, int _intervalMs);
+	void queueCustomCallback(const QString& _callbackId);
+
+private Q_SLOTS:
+	void slotCustomQueueCallback(const QString& _callbackId);
+
+public Q_SLOTS:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -697,6 +703,8 @@ Q_SIGNALS:
 	void servicesUiSetupComplete();
 
 	void customTimerTimeout(const QString& _timerID);
+
+	void customQueueCallback(const QString& _callbackID);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

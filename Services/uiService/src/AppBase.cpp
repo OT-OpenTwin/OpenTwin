@@ -2366,6 +2366,14 @@ void AppBase::slotRunCustomTimer(const QString& _timerId, int _intervalMs) {
 	});
 }
 
+void AppBase::queueCustomCallback(const QString& _callbackId) {
+	QMetaObject::invokeMethod(this, &AppBase::slotCustomQueueCallback, Qt::QueuedConnection, _callbackId);
+}
+
+void AppBase::slotCustomQueueCallback(const QString& _callbackId) {
+	Q_EMIT customQueueCallback(_callbackId);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Output slots
