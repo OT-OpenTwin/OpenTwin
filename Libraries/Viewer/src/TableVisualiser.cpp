@@ -19,11 +19,11 @@
 
 #include "stdafx.h"
 #include "TableVisualiser.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 #include "FrontendAPI.h"
 #include "SceneNodeBase.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode) 
 	: Visualiser(_sceneNode, ot::WidgetViewBase::ViewTable)

@@ -19,7 +19,7 @@
 
 #include "CSVToTableTransformer.h"
 #include "OTCore/String.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/VariableToStringConverter.h"
 

@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSON.h"
-#include "OTCore/LogTypes.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogTypes.h"
 #include "OTCore/ServiceBase.h"
 
 class GSSRegistrationInfo {

@@ -32,7 +32,7 @@
 // OpenTwin header
 #include "DataBase.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/VisualisationCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"

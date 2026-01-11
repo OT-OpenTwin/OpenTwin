@@ -21,7 +21,7 @@
 
 #include "Geometry.h"
 
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/GenericDataStructMatrix.h"

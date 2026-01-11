@@ -19,8 +19,8 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
-#include "OTCore/LogMessage.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogMessage.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 #define OT_ACTION_PARAM_LOG_Service "Log.Service"
 #define OT_ACTION_PARAM_LOG_Function "Log.Function"

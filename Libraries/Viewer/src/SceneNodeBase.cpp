@@ -26,7 +26,7 @@
 
 #include "FrontendAPI.h"
 
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 #include <osg/Switch>
 

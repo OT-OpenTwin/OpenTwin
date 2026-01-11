@@ -20,7 +20,7 @@
 #include "EntityBlockCircuitConnector.h"
 #include "OTGui/Graphics/GraphicsItemFileCfg.h"
 #include "OTGui/Graphics/BasicGraphicsIntersectionItem.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 static EntityFactoryRegistrar<EntityBlockCircuitConnector> registrar(EntityBlockCircuitConnector::className());
 

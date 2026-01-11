@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/JSONObject.h"
 #include "OTCore/Serializable.h"
+#include "OTCore/JSON/JSONObject.h"
 
 ot::JsonObject::JsonObject() : JsonValue(rapidjson::kObjectType) {}
 

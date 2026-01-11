@@ -21,7 +21,7 @@
 #include "GraphicsItemDesignerPropertyHandler.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/PropertyGridItem.h"
 
 GraphicsItemDesignerPropertyHandler::GraphicsItemDesignerPropertyHandler()

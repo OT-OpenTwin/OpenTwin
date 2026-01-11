@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Grid.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"

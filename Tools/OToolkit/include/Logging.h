@@ -23,7 +23,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OT header
-#include "OTCore/LogDispatcher.h"		// LogMessage
+#include "OTCore/Logging/LogDispatcher.h"		// LogMessage
 #include "OTCommunication/ActionHandler.h"
 
 // Qt header

@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSONArray.h"
-#include "OTCore/JSONString.h"
+#include "OTCore/JSON/JSONArray.h"
+#include "OTCore/JSON/JSONString.h"
 
 inline ot::JsonArray::JsonArray() : JsonValue(rapidjson::kArrayType) {};
 

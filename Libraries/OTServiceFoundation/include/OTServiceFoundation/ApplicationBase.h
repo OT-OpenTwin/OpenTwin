@@ -23,11 +23,11 @@
 #include "OTSystem/Exception.h"                      // Exceptions
 
 // OpenTwin Core header
-#include "OTCore/JSON.h"                             // JSON related methods and types
+#include "OTCore/JSON/JSON.h"                             // JSON related methods and types
 #include "OTCore/CoreTypes.h"                        // Core types
 #include "OTCore/ServiceBase.h"                      // Base class for services
 #include "OTCore/ReturnMessage.h"                    // Return message related methods and types
-#include "OTCore/LogDispatcher.h"                    // Logging related methods and types
+#include "OTCore/Logging/LogDispatcher.h"                    // Logging related methods and types
 
 // OpenTwin Gui header
 #include "OTGui/Properties/PropertyGridCfg.h"                   // Property grid configuration

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/StyledTextBuilder.h"
 
 ot::StyledTextBuilder::StyledTextBuilder(const BuilderFlags& _flags) :

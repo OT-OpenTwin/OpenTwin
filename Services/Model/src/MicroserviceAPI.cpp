@@ -36,7 +36,7 @@
 
 #include "OTCore/CoreTypes.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"

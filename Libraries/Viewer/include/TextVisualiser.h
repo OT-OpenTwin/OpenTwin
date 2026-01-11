@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "Visualiser.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/VisualisationCfg.h"
 

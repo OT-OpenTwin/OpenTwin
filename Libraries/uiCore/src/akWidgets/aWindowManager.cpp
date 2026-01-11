@@ -31,7 +31,7 @@
 #include <akWidgets/aWindowManagerTimerSignalLinker.h>
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 
 // TabToolBar header
 #include <TabToolbar/TabToolbar.h>				// tt::TabToolbar

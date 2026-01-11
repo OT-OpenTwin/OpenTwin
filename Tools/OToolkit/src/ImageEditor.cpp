@@ -24,8 +24,8 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/SpinBox.h"

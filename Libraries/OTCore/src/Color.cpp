@@ -19,7 +19,7 @@
 
 // Project header
 #include "OTCore/Color.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 ot::Color::Color() : m_r(0), m_g(0), m_b(0), m_a(255) {}
 

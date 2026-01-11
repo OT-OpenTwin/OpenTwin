@@ -23,7 +23,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
 #include "OTCore/String.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCore/EncodingGuesser.h"
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"

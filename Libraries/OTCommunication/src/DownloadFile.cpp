@@ -24,7 +24,7 @@
  */
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/DownloadFile.h"			// Corresponding header
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"

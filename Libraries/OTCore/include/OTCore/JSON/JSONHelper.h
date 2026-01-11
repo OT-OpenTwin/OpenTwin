@@ -20,9 +20,9 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSONTypes.h"
-#include "OTCore/JSONDocument.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/JSON/JSONTypes.h"
+#include "OTCore/JSON/JSONDocument.h"
 
 // std header
 #include <string>

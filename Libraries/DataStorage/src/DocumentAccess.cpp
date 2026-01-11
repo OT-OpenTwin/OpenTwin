@@ -22,7 +22,7 @@
 #include "stdafx.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "..\include\Document\DocumentAccess.h"
 
 // MongoDB header

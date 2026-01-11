@@ -28,7 +28,7 @@
 #include "HandleWheel.h"
 #include "Model.h"
 
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGui/Properties/PropertyDouble.h"
 #include "OTGui/Properties/PropertyGridCfg.h"

@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogTypes.h"
+#include "OTCore/Logging/LogTypes.h"
 
 // Qt header
 #include <QtCore/qobject.h>

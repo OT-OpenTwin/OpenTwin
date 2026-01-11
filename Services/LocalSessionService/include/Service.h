@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTSystem/Flags.h"
 #include "OTSystem/SystemTypes.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/LSSDebugInfo.h"

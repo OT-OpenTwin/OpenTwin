@@ -25,7 +25,7 @@
 #include "OTGui/GraphicsVBoxLayoutItemCfg.h"
 #include "OTGui/GraphicsHBoxLayoutItemCfg.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/SimpleFactory.h"
 
 TEST(GraphicsLayoutITemCfgTest, Serialize)

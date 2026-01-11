@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTGui/GuiTypes.h"
 

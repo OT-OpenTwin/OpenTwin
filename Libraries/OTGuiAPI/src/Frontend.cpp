@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/ThisService.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGuiAPI/Frontend.h"
 #include "OTGuiAPI/GuiAPIManager.h"

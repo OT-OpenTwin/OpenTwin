@@ -25,7 +25,7 @@
 #include "ProjectOverviewWidget.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/CheckBox.h"

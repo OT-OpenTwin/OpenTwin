@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSONDocument.h"
+#include "OTCore/JSON/JSONDocument.h"
 
 inline ot::JsonDocument::JsonDocument() : rapidjson::Document(rapidjson::kObjectType) {};
 

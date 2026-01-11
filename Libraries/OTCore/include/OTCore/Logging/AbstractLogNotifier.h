@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogMessage.h"
+#include "OTCore/Logging/LogMessage.h"
 
 namespace ot {
 

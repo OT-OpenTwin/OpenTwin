@@ -24,7 +24,7 @@
 #include "OTSystem/Exception.h"
 #include "OTSystem/PortManager.h"
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTCore/DebugHelper.h"
 #include "OTCore/ReturnMessage.h"

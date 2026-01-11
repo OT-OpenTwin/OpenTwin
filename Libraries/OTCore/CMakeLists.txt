@@ -93,6 +93,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ============================================================
 
 set(OTCORE_SOURCE_FILES
+    src/JSON/JSONHelper.cpp
+    src/JSON/JsonObject.cpp
+    src/Logging/LogMessage.cpp
+    src/Logging/LogNotifierFileWriter.cpp
+    src/Logging/LogNotifierStdCout.cpp
+    src/Logging/LogTypes.cpp
+    src/Logging/LogDispatcher.cpp
     src/BasicServiceInformation.cpp
     src/Color.cpp
     src/DebugHelper.cpp
@@ -109,12 +116,6 @@ set(OTCORE_SOURCE_FILES
     src/GenericDataStructMatrix.cpp
     src/GenericDataStructSingle.cpp
     src/GenericDataStructVector.cpp
-    src/JSONHelper.cpp
-    src/JsonObject.cpp
-    src/LogMessage.cpp
-    src/LogNotifierFileWriter.cpp
-    src/LogNotifierStdCout.cpp
-    src/LogTypes.cpp
     src/ProjectFilterData.cpp
     src/ProjectInformation.cpp
     src/Serializable.cpp
@@ -132,7 +133,6 @@ set(OTCORE_SOURCE_FILES
     src/ReturnMessage.cpp
     src/ReturnValues.cpp
     src/ServiceBase.cpp
-    src/LogDispatcher.cpp
     src/OwnerService.cpp
     src/Size2D.cpp
     src/String.cpp
@@ -166,6 +166,10 @@ endif()
 file(GLOB OTCORE_HEADER_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/JSON/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/JSON/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.hpp"
 )
 
 # ============================================================
@@ -246,230 +250,6 @@ if(MSVC)
         /Zc:__cplusplus
     )
 endif()
-
-# ============================================================
-# Visual Studio filters (based on .filters file)
-# ============================================================
-
-# --- Source filters ---
-
-assign_filter("src\\Variable"
-    src/Variable.cpp
-    src/VariableToJSONConverter.cpp
-    src/VariableToBSONStringConverter.cpp
-    src/VariableListToStringListConverter.cpp
-    src/JSONToVariableConverter.cpp
-    src/StringToVariableConverter.cpp
-    src/ExplicitStringValueConverter.cpp
-)
-
-assign_filter("src\\Owner"
-    src/Owner.cpp
-    src/OwnerServiceGlobal.cpp
-    src/OwnerService.cpp
-)
-
-assign_filter("src\\ServiceReturnMessages"
-    src/ReturnMessage.cpp
-    src/ReturnValues.cpp
-)
-
-assign_filter("src\\GenericDataStruct"
-    src/GenericDataStructMatrix.cpp
-    src/GenericDataStructVector.cpp
-    src/GenericDataStruct.cpp
-    src/GenericDataStructSingle.cpp
-    src/GenericDataStructFactory.cpp
-)
-
-assign_filter("src\\Geometry"
-    src/Point2D.cpp
-    src/Size2D.cpp
-    src/Rect.cpp
-)
-
-assign_filter("src\\JSON"
-    src/JSONHelper.cpp
-    src/JsonObject.cpp
-)
-
-assign_filter("src\\Logger"
-    src/LogDispatcher.cpp
-    src/LogTypes.cpp
-    src/LogNotifierStdCout.cpp
-    src/LogNotifierFileWriter.cpp
-    src/LogMessage.cpp
-)
-
-assign_filter("src\\General"
-    src/BasicEntityInformation.cpp
-    src/BasicServiceInformation.cpp
-    src/Color.cpp
-    src/dllmain.cpp
-    src/EncodingConverter_ISO88591ToUTF8.cpp
-    src/EncodingConverter_UTF16ToUTF8.cpp
-    src/EncodingGuesser.cpp
-    src/Math.cpp
-    src/OTObject.cpp
-    src/RuntimeTests.cpp
-    src/ServiceBase.cpp
-    src/String.cpp
-    src/StringToNumericCheck.cpp
-    src/TextEncoding.cpp
-    src/ThisService.cpp
-    src/UIDNamePair.cpp
-    src/ThisComputerInfo.cpp
-    src/SystemServiceConfigInfo.cpp
-    src/DebugHelper.cpp
-    src/ServiceDebugInformation.cpp
-    src/Serializable.cpp
-    src/ProjectInformation.cpp
-    src/ProjectFilterData.cpp
-    src/FileInformation.cpp
-)
-
-assign_filter("src"
-    src/ValueComparisionDefinition.cpp
-)
-
-assign_filter("ThirdParty"
-    ${OTCORE_THIRDPARTY_SOURCE}
-)
-
-# --- Header filters ---
-
-assign_filter("include\\Owner"
-    include/OTCore/Owner.h
-    include/OTCore/OwnerService.h
-    include/OTCore/OwnerServiceGlobal.h
-)
-
-assign_filter("include\\TextEncoding"
-    include/OTCore/EncodingConverter_ISO88591ToUTF8.h
-    include/OTCore/EncodingConverter_UTF16ToUTF8.h
-    include/OTCore/EncodingGuesser.h
-    include/OTCore/TextEncoding.h
-)
-
-assign_filter("include\\VariableType"
-    include/OTCore/JSONToVariableConverter.h
-    include/OTCore/Variable.h
-    include/OTCore/VariableToJSONConverter.h
-    include/OTCore/ReturnMessage.h
-    include/OTCore/ReturnValues.h
-    include/OTCore/VariableToBSONStringConverter.h
-    include/OTCore/StringToVariableConverter.h
-    include/OTCore/VariableListToStringListConverter.h
-    include/OTCore/ComplexNumbers.h
-    include/OTCore/StringToNumericCheck.h
-    include/OTCore/ExplicitStringValueConverter.h
-)
-
-assign_filter("include\\ServiceReturnMessages"
-    include/OTCore/ReturnMessage.h
-    include/OTCore/ReturnValues.h
-    include/OTCore/ReturnMessageProposal.h
-)
-
-assign_filter("include\\GenericDataStruct"
-    include/OTCore/GenericDataStructVector.h
-    include/OTCore/GenericDataStruct.h
-    include/OTCore/GenericDataStructMatrix.h
-    include/OTCore/GenericDataStructSingle.h
-    include/OTCore/GenericDataStructFactory.h
-)
-
-assign_filter("include\\Geometry"
-    include/OTCore/Size2D.h
-    include/OTCore/Point2D.h
-    include/OTCore/Point3D.h
-    include/OTCore/Rect.h
-)
-
-assign_filter("include\\JSON"
-    include/OTCore/JSON.h
-    include/OTCore/JSONTypes.h
-    include/OTCore/JSONNullValue.h
-    include/OTCore/JSONNumber.h
-    include/OTCore/JSONString.h
-    include/OTCore/JSONObject.h
-    include/OTCore/JSONArray.h
-    include/OTCore/JSONDocument.h
-    include/OTCore/JSONHelper.h
-    include/OTCore/JSONArray.hpp
-    include/OTCore/JSONDocument.hpp
-    include/OTCore/JSONString.hpp
-)
-
-assign_filter("include\\Logger"
-    include/OTCore/LogTypes.h
-    include/OTCore/LogMessage.h
-    include/OTCore/AbstractLogNotifier.h
-    include/OTCore/LogNotifierStdCout.h
-    include/OTCore/LogNotifierFileWriter.h
-    include/OTCore/LogDispatcher.h
-)
-
-assign_filter("include\\RAII"
-    include/OTCore/BasicRAIIWrapper.h
-    include/OTCore/BasicNumberIncrementWrapper.h
-    include/OTCore/BasicScopedBoolWrapper.h
-)
-
-assign_filter("include\\Container"
-    include/OTCore/MatrixNested.h
-    include/OTCore/MatrixVectorizedXAlign.h
-    include/OTCore/ContainerHelper.h
-    include/OTCore/ContainerHelper.hpp
-    include/OTCore/Matrix2.h
-    include/OTCore/Matrix2.hpp
-    include/OTCore/Matrix2Factory.h
-    include/OTCore/Matrix2Factory.hpp
-    include/OTCore/Matrix.h
-    include/OTCore/PointerList.h
-    include/OTCore/PointerList.hpp
-)
-
-assign_filter("include\\General"
-    include/OTCore/BasicEntityInformation.h
-    include/OTCore/BasicServiceInformation.h
-    include/OTCore/Color.h
-    include/OTCore/CoreAPIExport.h
-    include/OTCore/CoreTypes.h
-    include/OTCore/DefensiveProgramming.h
-    include/OTCore/FactoryTemplate.h
-    include/OTCore/FactoryTemplate.hpp
-    include/OTCore/FolderNames.h
-    include/OTCore/GlobalTestingFlags.h
-    include/OTCore/LocalStateStack.h
-    include/OTCore/LocalStateStack.hpp
-    include/OTCore/Math.h
-    include/OTCore/ObjectManagerTemplate.h
-    include/OTCore/OTObject.h
-    include/OTCore/RuntimeTests.h
-    include/OTCore/Serializable.h
-    include/OTCore/ServiceBase.h
-    include/OTCore/StateStack.h
-    include/OTCore/StateStack.hpp
-    include/OTCore/String.h
-    include/OTCore/String.hpp
-    include/OTCore/TemplateTypeName.h
-    include/OTCore/TemplateTypeName.hpp
-    include/OTCore/ThisService.h
-    include/OTCore/TypeNames.h
-    include/OTCore/UIDNamePair.h
-    include/OTCore/ThisComputerInfo.h
-    include/OTCore/SystemServiceConfigInfo.h
-    include/OTCore/ComplexNumberContainer.h
-    include/OTCore/ComparisionSymbols.h
-    include/OTCore/ProjectInformation.h
-    include/OTCore/ProjectFilterData.h
-    include/OTCore/FileInformation.h
-)
-
-assign_filter("ThirdParty"
-    ${OTCORE_THIRDPARTY_HEADER}
-)
 
 # ============================================================
 # Shared Library (DLL)

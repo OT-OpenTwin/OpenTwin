@@ -23,7 +23,7 @@
 #include "GlobalSessionService.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"

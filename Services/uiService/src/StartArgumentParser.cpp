@@ -22,7 +22,7 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // Qt header
 #include <QtCore/qcommandlineparser.h>

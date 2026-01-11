@@ -24,7 +24,7 @@
 #include "EntityResult1DCurve.h"
 #include "EntityMetadataSeries.h"
 #include "Application.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "MetadataEntityInterface.h"
 #include "CurveFactory.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"

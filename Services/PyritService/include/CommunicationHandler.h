@@ -24,7 +24,7 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/OTClassHelper.h"
 
 // Qt header

@@ -1,5 +1,5 @@
 // @otlicense
-// File: JSONObject.h
+// File: LogNotifierFileWriter.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,23 +20,32 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSONTypes.h"
-#include "OTCore/CoreTypes.h"
+#include "OTCore/Logging/AbstractLogNotifier.h"
+
+// std header
+#include <mutex>
 
 namespace ot {
 
-	class Serializable;
-
-	//! @class JsonObject
-	//! @brief JSON Object value
-	class OT_CORE_API_EXPORT JsonObject : public JsonValue {
-		OT_DECL_NOCOPY(JsonObject)
-		OT_DECL_DEFMOVE(JsonObject)
+	class OT_CORE_API_EXPORT LogNotifierFileWriter : public AbstractLogNotifier {
+		OT_DECL_NODEFAULT(LogNotifierFileWriter)
+		OT_DECL_NOCOPY(LogNotifierFileWriter)
 	public:
-		JsonObject();
-		JsonObject(const Serializable& _serializable, JsonAllocator& _allocator);
-		JsonObject(const Serializable* _serializable, JsonAllocator& _allocator);
-		~JsonObject() {};
+		static std::string generateFileName(const std::string& _serviceName);
+
+		LogNotifierFileWriter(const std::string& _filePath);
+		virtual ~LogNotifierFileWriter();
+
+		//! @brief Called when the a log message was created.
+		virtual void log(const LogMessage& _message) override;
+
+		void flushAndCloseStream(void);
+
+		void closeStream(void);
+
+	private:
+		std::mutex m_mutex;
+		std::ofstream* m_stream;
 	};
 
 }

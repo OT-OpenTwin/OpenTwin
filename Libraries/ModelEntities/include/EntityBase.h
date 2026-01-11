@@ -25,7 +25,7 @@
 #include "EntityProperties.h"
 #include "EntityCallbackBase.h"
 #include "EntityFactoryRegistrar.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/BasicEntityInformation.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"

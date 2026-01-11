@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
-#include "OTCore/JSONTypes.h"
+#include "OTCore/JSON/JSONTypes.h"
 
 // std header
 #include <string>
@@ -64,4 +64,4 @@ namespace ot {
 
 }
 
-#include "OTCore/JSONDocument.hpp"
+#include "OTCore/JSON/JSONDocument.hpp"

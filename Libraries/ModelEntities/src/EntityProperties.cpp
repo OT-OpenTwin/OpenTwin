@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "EntityProperties.h"
 
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGui/Properties/PropertyInt.h"

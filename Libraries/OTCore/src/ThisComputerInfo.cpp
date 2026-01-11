@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTSystem/SystemProcess.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTCore/ThisComputerInfo.h"
 

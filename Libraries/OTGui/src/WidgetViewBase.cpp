@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/WidgetViewBase.h"
 
 std::string ot::WidgetViewBase::toString(ViewFlag _flag) {

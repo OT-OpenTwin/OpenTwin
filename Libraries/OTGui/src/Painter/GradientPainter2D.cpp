@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Painter/GradientPainter2D.h"
 
 #define OT_JSON_MEMBER_Stops "Stops"

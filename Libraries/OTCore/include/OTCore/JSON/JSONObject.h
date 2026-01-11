@@ -1,5 +1,5 @@
 // @otlicense
-// File: LogNotifierStdCout.h
+// File: JSONObject.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,17 +20,23 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/AbstractLogNotifier.h"
+#include "OTCore/CoreTypes.h"
+#include "OTCore/JSON/JSONTypes.h"
 
 namespace ot {
 
-	//! @brief Used to write created log messages to std cout in a way a human could read it.
-	class OT_CORE_API_EXPORT LogNotifierStdCout : public AbstractLogNotifier {
-	public:
-		virtual ~LogNotifierStdCout() {};
+	class Serializable;
 
-		//! @brief Called when the a log message was created.
-		virtual void log(const LogMessage& _message) override;
+	//! @class JsonObject
+	//! @brief JSON Object value
+	class OT_CORE_API_EXPORT JsonObject : public JsonValue {
+		OT_DECL_NOCOPY(JsonObject)
+		OT_DECL_DEFMOVE(JsonObject)
+	public:
+		JsonObject();
+		JsonObject(const Serializable& _serializable, JsonAllocator& _allocator);
+		JsonObject(const Serializable* _serializable, JsonAllocator& _allocator);
+		~JsonObject() {};
 	};
 
 }

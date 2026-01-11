@@ -22,7 +22,7 @@
 
 #include "Unittest/UnittestDocumentAccess.h"
 #include "Helper/QueryBuilder.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 
 using namespace std;
 

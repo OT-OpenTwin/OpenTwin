@@ -21,7 +21,7 @@
 #include "FDTDConfig.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "PropertyHelper.h"
 #include "EntityProperties.h"
 

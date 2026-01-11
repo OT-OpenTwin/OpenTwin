@@ -21,7 +21,7 @@
 #include <string>
 #include "ResultDataStorageAPI.h"
 #include "OTWidgets/PlotDataset.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 
 class CurveDatasetFactory
 {

@@ -32,7 +32,7 @@
 #include "ViewerToolBar.h"
 #include "GlobalFontPath.h"
 
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/VariableToStringConverter.h"
 
 namespace ViewerAPI {

@@ -24,7 +24,7 @@
 #include "EntityFactory.h"
 #include "OTCore/String.h"
 
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // Activate the following flag to display the (approximate) memory consumption of the entity while restoring it from the database.
 //#define DISPLAY_MEMORY_CONSUMPTION

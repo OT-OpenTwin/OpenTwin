@@ -23,7 +23,7 @@
 #include "OTSystem/Flags.h"
 
 // OpenTwin Core header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ServiceBase.h"			// Base class
 
 // OpenTwin Gui header

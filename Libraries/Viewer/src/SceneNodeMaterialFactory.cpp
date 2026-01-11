@@ -25,7 +25,7 @@
 #include "MaterialPolished.h"
 #include "MaterialMetal.h"
 
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 #include <cassert>
 

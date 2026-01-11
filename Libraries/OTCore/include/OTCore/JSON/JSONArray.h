@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSONTypes.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/JSON/JSONTypes.h"
 
 // std header
 #include <list>
@@ -103,4 +103,4 @@ namespace ot {
 
 }
 
-#include "OTCore/JSONArray.hpp"
+#include "OTCore/JSON/JSONArray.hpp"

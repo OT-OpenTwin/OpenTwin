@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #pragma once
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "Variable.h"
 
 namespace ot

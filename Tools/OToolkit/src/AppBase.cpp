@@ -44,7 +44,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/String.h"
 #include "OTGui/Painter/FillPainter2D.h"

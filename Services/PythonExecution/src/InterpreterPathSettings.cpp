@@ -20,7 +20,7 @@
 #include "InterpreterPathSettings.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/String.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "PredefinedEnvironments.h"
 
 InterpreterPathSettings::InterpreterPathSettings(ot::UID _manifestUID)

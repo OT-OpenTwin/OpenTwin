@@ -28,7 +28,7 @@
 #include "ProjectOverviewDelegate.h"
 #include "ProjectOverviewPreviewBox.h"
 #include "OTSystem/DateTime.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/TreeWidget.h"

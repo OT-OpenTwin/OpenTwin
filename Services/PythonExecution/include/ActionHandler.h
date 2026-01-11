@@ -21,7 +21,7 @@
 #include <mutex>
 #include <map>
 #include <functional>
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 #include "PythonInterpreterAPI.h"
 #include "OTCore/ReturnMessage.h"

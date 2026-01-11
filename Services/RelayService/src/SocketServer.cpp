@@ -22,8 +22,8 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/JSON.h"						// rapidjson wrapper
-#include "OTCore/LogDispatcher.h"						// Logger
+#include "OTCore/JSON/JSON.h"						// rapidjson wrapper
+#include "OTCore/Logging/LogDispatcher.h"						// Logger
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"				// message sending
 #include "OTCommunication/ActionTypes.h"		// action member and types definition

@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSONTypes.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/JSON/JSONTypes.h"
 
 namespace ot {
 

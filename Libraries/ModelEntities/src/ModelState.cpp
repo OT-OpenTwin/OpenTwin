@@ -23,7 +23,7 @@
 #undef min
 
 #include "ModelState.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 #include "DataBase.h"
 #include "EntityBase.h"

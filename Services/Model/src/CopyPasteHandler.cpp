@@ -20,7 +20,7 @@
 #include <stdafx.h>
 #include "CopyPasteHandler.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/CopyInformation.h"
 #include "Application.h"
 #include "Model.h"

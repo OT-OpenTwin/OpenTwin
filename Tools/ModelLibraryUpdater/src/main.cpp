@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
-#include "OTCore/LogNotifierFileWriter.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/LogNotifierFileWriter.h"
 
 // Service header
 #include "Application.h"

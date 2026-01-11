@@ -21,7 +21,7 @@
 #include "Application.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 #include "OTServiceFoundation/Foundation.h"

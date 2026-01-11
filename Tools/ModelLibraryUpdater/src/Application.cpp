@@ -24,7 +24,7 @@
 #include "OTServiceFoundation/UserCredentials.h"
 #include "Connection/ConnectionAPI.h"
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 
 // Thirdparty header

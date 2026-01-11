@@ -21,9 +21,9 @@
 
 // OpenTwin header
 #include "TextVisualiser.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/String.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTWidgets/TextEditor.h"

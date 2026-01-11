@@ -51,7 +51,7 @@
 #include "rapidjson/writer.h"
 
 #include "OTCore/ReturnMessage.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 #include "SceneNodeVTK.h"
 #include "SceneNodeMesh.h"

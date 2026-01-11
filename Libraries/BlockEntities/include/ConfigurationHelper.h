@@ -21,7 +21,7 @@
 #include <string>
 #include "OTCore/EntityName.h"
 #include "OTCore/String.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 namespace ot
 {

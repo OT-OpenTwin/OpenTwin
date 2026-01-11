@@ -24,7 +24,7 @@
 #include "ServiceStartupData.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCommunication/ServiceInitData.h"
 

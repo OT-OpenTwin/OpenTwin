@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "EntityFile.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTGui/FileExtension.h"
 #include "OTCommunication/ActionTypes.h"
 

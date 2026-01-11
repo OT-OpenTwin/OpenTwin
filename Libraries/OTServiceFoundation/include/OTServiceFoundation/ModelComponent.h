@@ -21,7 +21,7 @@
 
  // OpenTwin header
 #include "OTCore/ServiceBase.h" // Base class
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 
 #include "EntityInformation.h"

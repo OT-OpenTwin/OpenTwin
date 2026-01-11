@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Properties/PropertyInt.h"
 #include "OTGui/Properties/PropertyBool.h"
 #include "OTGui/Properties/PropertyColor.h"

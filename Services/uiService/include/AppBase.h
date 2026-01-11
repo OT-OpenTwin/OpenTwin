@@ -33,7 +33,7 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/ProjectInformation.h"
-#include "OTCore/AbstractLogNotifier.h"
+#include "OTCore/Logging/AbstractLogNotifier.h"
 
 // OpenTwin Gui header
 #include "OTGui/TableCfg.h"

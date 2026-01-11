@@ -62,7 +62,7 @@
 #include "OTCore/String.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 

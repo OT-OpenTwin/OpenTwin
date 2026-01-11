@@ -1,5 +1,5 @@
 // @otlicense
-// File: JSONString.hpp
+// File: JSON.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,12 +20,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSONString.h"
-
-inline ot::JsonString::JsonString(const char* _cstr, JsonAllocator& _allocator) :
-	JsonValue(_cstr, _allocator) {
-}
-
-inline ot::JsonString::JsonString(const std::string& _str, JsonAllocator& _allocator) :
-	JsonValue(_str.c_str(), _allocator) {
-}
+#include "OTCore/JSON/JSONTypes.h"
+#include "OTCore/JSON/JSONArray.h"
+#include "OTCore/JSON/JSONNumber.h"
+#include "OTCore/JSON/JSONString.h"
+#include "OTCore/JSON/JSONObject.h"
+#include "OTCore/JSON/JSONHelper.h"
+#include "OTCore/JSON/JSONDocument.h"
+#include "OTCore/JSON/JSONNullValue.h"

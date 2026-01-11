@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
-#include "OTCore/LogTypes.h"
-#include "OTCore/LogMessage.h"
+#include "OTCore/Logging/LogTypes.h"
+#include "OTCore/Logging/LogMessage.h"
 
 // std header
 #include <list>

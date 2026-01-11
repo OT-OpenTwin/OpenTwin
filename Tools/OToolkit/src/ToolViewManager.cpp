@@ -22,7 +22,7 @@
 #include "ToolRuntimeHandler.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/GlobalWidgetViewManager.h"
 
 ToolViewManager::ToolViewManager() {

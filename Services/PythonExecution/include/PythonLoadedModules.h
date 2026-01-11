@@ -24,7 +24,7 @@
 #include <optional>
 
 #include "EntityInformation.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 //! @brief Singleton that holds a map of all modules that were loaded in the python interpreter, sorted by the name of the corresponding script name.
 class PythonLoadedModules

@@ -36,8 +36,8 @@
 #include "Helper\BsonValuesHelper.h"
 
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/JSON.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 

@@ -30,7 +30,7 @@
 #include "OTCore/String.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/FolderNames.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 #include "OTCommunication/ActionTypes.h"

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include <OTCommunication/ActionTypes.h>
 #include "EntityContainer.h"
 

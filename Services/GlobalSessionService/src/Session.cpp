@@ -21,7 +21,7 @@
 #include "Session.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 
 Session::Session() : m_state(NoStateFlags) {}

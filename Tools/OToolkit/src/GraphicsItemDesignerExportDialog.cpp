@@ -23,7 +23,7 @@
 #include "GraphicsItemDesignerExportDialog.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"

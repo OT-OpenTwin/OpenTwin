@@ -22,8 +22,8 @@
 #include "PlotVisualiser.h"
 #include "CurveVisualiser.h"
 #include "FrontendAPI.h"
-#include "OTCore/JSON.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 
 CurveVisualiser::CurveVisualiser(SceneNodeBase * _sceneNode)

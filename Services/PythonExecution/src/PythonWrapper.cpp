@@ -23,7 +23,7 @@
 #include "Application.h"
 
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 #define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
 

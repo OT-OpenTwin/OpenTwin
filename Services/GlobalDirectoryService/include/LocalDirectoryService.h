@@ -23,7 +23,7 @@
 #include "LoadInformation.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/GDSDebugInfo.h"
 #include "OTCommunication/ServiceInitData.h"

@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/JSON.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/Painter2DFactory.h"

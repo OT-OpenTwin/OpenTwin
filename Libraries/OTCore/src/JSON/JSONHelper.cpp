@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
-#include "OTCore/JSONHelper.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/JSON/JSONHelper.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 

@@ -22,8 +22,8 @@
 #include "GraphicsItemVisualiser.h"
 #include "GraphicsConnectionVisualiser.h"
 
-#include "OTCore/JSON.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "FrontendAPI.h"
 #include "Model.h"

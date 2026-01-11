@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "EntityBlock.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTCommunication/ActionTypes.h"
 

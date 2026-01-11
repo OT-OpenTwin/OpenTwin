@@ -24,7 +24,7 @@
 #include "EntityContainer.h"
 #include "TemplateDefaultManager.h"
 
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/Painter2DFactory.h"
 #include "OTGui/Properties/Property.h"

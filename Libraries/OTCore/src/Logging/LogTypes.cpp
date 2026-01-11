@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogTypes.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogTypes.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 void ot::addLogFlagsToJsonArray(const LogFlags& _flags, JsonArray& _flagsArray, JsonAllocator& _allocator) {
 	if (_flags & INFORMATION_LOG) _flagsArray.PushBack(JsonString("Information", _allocator), _allocator);

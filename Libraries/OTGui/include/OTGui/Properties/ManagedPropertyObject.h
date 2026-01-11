@@ -20,7 +20,7 @@
 #pragma once
 
 // OT header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTGui/Properties/PropertyManagerNotifier.h"
 
 namespace ot {

@@ -21,9 +21,9 @@
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/String.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/LogDispatcher.h"
-#include "OTCore/LogNotifierStdCout.h"
-#include "OTCore/LogNotifierFileWriter.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/LogNotifierStdCout.h"
+#include "OTCore/Logging/LogNotifierFileWriter.h"
 
 // std header
 #include <thread>

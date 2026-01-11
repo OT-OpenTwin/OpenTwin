@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "ProjectOverviewHeader.h"
 #include "ProjectOverviewFilterData.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 ot::ProjectOverviewFilterData::ProjectOverviewFilterData(int _logicalIndex)
 	: m_logicalIndex(_logicalIndex)

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/MenuEntryCfg.h"
 
 std::string ot::MenuEntryCfg::toString(EntryType _type) {

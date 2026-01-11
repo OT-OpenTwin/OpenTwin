@@ -44,7 +44,7 @@
 #include "OTCore/OwnerService.h"
 #include "OTSystem/FileSystem.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTCore/BasicScopedBoolWrapper.h"

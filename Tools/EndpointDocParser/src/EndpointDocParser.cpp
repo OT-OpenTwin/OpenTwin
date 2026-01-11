@@ -20,7 +20,7 @@
 // EndpointDocParser.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 // Open Twin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // project header
 #include "Application.h"

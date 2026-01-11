@@ -20,7 +20,7 @@
 #include "ProjectToCollectionConverter.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ProjectInformation.h"
 

@@ -19,7 +19,7 @@
 
 // OpenTwin Core header
 #include "OTCore/Math.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/BasicScopedBoolWrapper.h"
 
 // OpenTwin Gui header

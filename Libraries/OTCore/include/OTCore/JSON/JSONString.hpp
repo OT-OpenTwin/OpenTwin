@@ -1,5 +1,5 @@
 // @otlicense
-// File: JSONNullValue.h
+// File: JSONString.hpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,19 +20,12 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSONTypes.h"
-#include "OTCore/CoreTypes.h"
+#include "OTCore/JSON/JSONString.h"
 
-namespace ot {
+inline ot::JsonString::JsonString(const char* _cstr, JsonAllocator& _allocator) :
+	JsonValue(_cstr, _allocator) {
+}
 
-	//! @class JsonNullValue
-	//! @brief JSON NULL value.
-	class JsonNullValue : public JsonValue {
-		OT_DECL_NOCOPY(JsonNullValue)
-		OT_DECL_DEFMOVE(JsonNullValue)
-	public:
-		JsonNullValue() : JsonValue(rapidjson::kNullType) {};
-		~JsonNullValue() {};
-	};
-
+inline ot::JsonString::JsonString(const std::string& _str, JsonAllocator& _allocator) :
+	JsonValue(_str.c_str(), _allocator) {
 }

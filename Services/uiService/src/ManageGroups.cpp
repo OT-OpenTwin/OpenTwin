@@ -24,7 +24,7 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/String.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Dialog/MessageDialogCfg.h"
 
 std::string ot::MessageDialogCfg::toString(BasicButton _button) {

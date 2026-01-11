@@ -19,7 +19,7 @@
 
 #pragma once
 #include "OTCore/Variable.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 
 #include <memory>
 

@@ -20,7 +20,7 @@
 // OpenTwin
 #include "CSXMeshGrid.h"
 #include "OTCore/CoreTypes.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityMeshCartesianData.h"

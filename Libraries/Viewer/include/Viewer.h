@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTWidgets/WidgetBase.h"
