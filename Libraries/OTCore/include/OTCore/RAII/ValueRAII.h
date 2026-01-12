@@ -52,6 +52,5 @@ namespace ot {
 	private:
 		T& m_value; //! @brief Value reference.
 		T m_reset; //! @brief Reset value to apply in the destructor.
-
 	};
 }

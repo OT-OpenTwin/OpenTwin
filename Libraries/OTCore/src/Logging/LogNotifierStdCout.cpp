@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogNotifierStdCout.h"
+#include "OTCore/Logging/LogNotifierStdCout.h"
 
 // std header
 #include <iostream>

@@ -52,7 +52,7 @@ namespace ot {
     //!     ...
     //! }
     //! @endcode
-    template <typename T> class FunctionRAII {
+    class FunctionRAII {
         OT_DECL_NOCOPY(FunctionRAII)
         OT_DECL_NOMOVE(FunctionRAII)
         OT_DECL_NODEFAULT(FunctionRAII)
@@ -61,11 +61,11 @@ namespace ot {
         //! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
         //! @param _onCreate Function that should be called when the wrapper instance is created.
         //! @param _onDelete Function that should be called when the wrapper instance is destroyed.
-        explicit FunctionRAII(T& _value, std::function<void(T&)> _onCreate, std::function<void(T&)> _onDelete)
-            : m_value(_value), m_onDelete(_onDelete)
+        explicit FunctionRAII(std::function<void()> _onCreate, std::function<void()> _onDelete)
+            : m_onDelete(_onDelete)
         {
             if (_onCreate) {
-                _onCreate(m_value);
+                _onCreate();
             }
         }
 
@@ -73,16 +73,14 @@ namespace ot {
         //! If the FunctionRAII#m_onDelete function was set it will be called.
         ~FunctionRAII() {
             if (m_onDelete) {
-                m_onDelete(m_value);
+                m_onDelete();
             }
         }
 
-        constexpr inline T& getValueRef() const { return m_value; };
-        constexpr inline const std::function<void(T&)>& getOnDeleteFunction() const { return m_onDelete; };
+        constexpr inline const std::function<void()>& getOnDeleteFunction() const { return m_onDelete; };
 
     private:
-        T& m_value; //! @brief Value reference.
-        std::function<void(T&)> m_onDelete; //! @brief Function that will be called in the destructor.
+        std::function<void()> m_onDelete; //! @brief Function that will be called in the destructor.
 
     };
 
