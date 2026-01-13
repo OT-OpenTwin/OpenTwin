@@ -4279,18 +4279,25 @@ void ExternalServicesComponent::determineViews(const std::string& _modelServiceU
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		assert(0); // WARNING
-		}
+	}
 
-		ot::JsonDocument responseDoc;
-		responseDoc.fromJson(response);
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
 
-		bool visible3D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible3D].GetBool();
-		bool visibleBlockPicker = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker].GetBool();
+	bool visible3D = false;
+	if (responseDoc.HasMember(OT_ACTION_PARAM_UI_TREE_Visible3D)) {
+		visible3D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible3D].GetBool();
+	}
 
-		AppBase* app{ AppBase::instance() };
+	bool visibleBlockPicker = false;
+	if (responseDoc.HasMember(OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker)) {
+		visibleBlockPicker = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker].GetBool();
+	}
 
-		app->setVisible3D(visible3D);
-		app->setVisibleBlockPicker(visibleBlockPicker);
+	AppBase* app{ AppBase::instance() };
+
+	app->setVisible3D(visible3D);
+	app->setVisibleBlockPicker(visibleBlockPicker);
 }
 
 void ExternalServicesComponent::sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table) {
