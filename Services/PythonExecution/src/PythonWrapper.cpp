@@ -115,7 +115,7 @@ void PythonWrapper::addToSysPath(const std::string& _newPathComponent) {
 
 void PythonWrapper::signalHandlerAbort(int _sig) {
 	signal(SIGABRT, &signalHandlerAbort);
-	Application::instance().getCommunicationHandler().writeToServer("OUTPUT:Abort was called and interpreter is being closes.");
+	Application::instance().getCommunicationHandler().writeToServer("OUTPUT:Abort was called and interpreter is being closed.");
 	exit(ot::AppExitCode::GeneralError);
 }
 
