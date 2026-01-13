@@ -3654,7 +3654,6 @@ void ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _documen
 
 	const bool overwriteContent = visualisationCfg.getOverrideViewerContent();
 	
-
 	bool suppressViewHandling = visualisationCfg.getSupressViewHandling();
 	if (suppressViewHandling) {
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
