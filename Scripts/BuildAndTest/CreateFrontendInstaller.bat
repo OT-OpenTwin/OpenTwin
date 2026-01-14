@@ -151,12 +151,12 @@ REM ZLib
 COPY "%ZLIB_DLLPATHR%\zlib.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM Python
-MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\Python"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\PythonEnvironments"
 
 COPY "%OT_PYTHON_ROOT%\python.exe" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OT_PYTHON_ROOT%\python39.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-XCOPY /S "%OT_PYTHON_ROOT%\Lib" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Python\Lib\" 
-XCOPY /S "%OT_PYTHON_ROOT%\DLLs" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Python\DLLs\" 
+COPY "%OT_PYTHON_BIN%\Release\python311.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+XCOPY /S "%OT_PYTHON_ROOT%\Environments\CoreEnvironment\Lib\*.*" "%OPENTWIN_FRONTEND_DEPLOYMENT%\PythonEnvironments\CoreEnvironment\Lib\" 
+XCOPY /S "%OT_PYTHON_ROOT%\Environments\CoreEnvironment\DLLs\Release\*.*" "%OPENTWIN_FRONTEND_DEPLOYMENT%\PythonEnvironments\CoreEnvironment\DLLs\" 
 
 REM ==========================================
 REM Copy OpenTwin Assets

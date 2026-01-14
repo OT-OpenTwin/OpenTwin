@@ -24,6 +24,7 @@
 
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/LogDispatcher.h"
+#include <thread>
 
 #define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
 
@@ -114,7 +115,8 @@ void PythonWrapper::addToSysPath(const std::string& _newPathComponent) {
 
 void PythonWrapper::signalHandlerAbort(int _sig) {
 	signal(SIGABRT, &signalHandlerAbort);
-	throw std::exception("Abort was called.");
+	Application::instance().getCommunicationHandler().writeToServer("OUTPUT:Abort was called and interpreter is being closed.");
+	exit(ot::AppExitCode::GeneralError);
 }
 
 

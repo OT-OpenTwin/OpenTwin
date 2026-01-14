@@ -284,6 +284,8 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 	if (view == m_focusInfo.lastSide) m_focusInfo.lastSide = nullptr;
 	if (view == m_focusInfo.lastTool) m_focusInfo.lastTool = nullptr;
 	if (view == m_focusInfo.lastCentral) m_focusInfo.lastCentral = nullptr;
+	if (view->getViewDockWidget() == m_focusChangeData.newFocus) m_focusChangeData.newFocus = nullptr;
+	if (view->getViewDockWidget() == m_focusChangeData.oldFocus) m_focusChangeData.oldFocus = nullptr;
 
 	// Find name list from owner and erase the view entry
 	ViewNameTypeList* lst = this->findViewNameTypeList(owner);
@@ -615,12 +617,23 @@ void ot::WidgetViewManager::getDebugInformation(JsonObject& _object, JsonAllocat
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus) {
+	m_focusChangeData.newFocus = _newFocus;
+	m_focusChangeData.oldFocus = _oldFocus;
+	if (!m_focusChangeData.queued) {
+		m_focusChangeData.queued = true;
+		QMetaObject::invokeMethod(this, &WidgetViewManager::slotViewFocusedImpl, Qt::QueuedConnection);
+	}
+}
+
+void ot::WidgetViewManager::slotViewFocusedImpl() {
+	m_focusChangeData.queued = false;
+
 	if (m_state.hasAny(MulticloseViewState | InsertViewState)) {
 		return;
 	}
 
-	WidgetView* o = this->getViewFromDockWidget(_oldFocus);
-	WidgetView* n = this->getViewFromDockWidget(_newFocus);
+	WidgetView* o = this->getViewFromDockWidget(m_focusChangeData.oldFocus);
+	WidgetView* n = this->getViewFromDockWidget(m_focusChangeData.newFocus);
 
 	if (n) {
 		m_focusInfo.last = n;

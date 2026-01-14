@@ -16,8 +16,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // @otlicense-end
-
-#include "OTServiceFoundation/TimeFormatter.h"
+#define _CRT_SECURE_NO_WARNINGS
+#include "OTCore/TimeFormatter.h"
 
 std::string TimeFormatter::formatDuration(const std::chrono::steady_clock::time_point _begin, const std::chrono::steady_clock::time_point& _end)
 {

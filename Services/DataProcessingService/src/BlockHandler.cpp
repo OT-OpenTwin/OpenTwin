@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "BlockHandler.h"
-#include "OTServiceFoundation/TimeFormatter.h"
+#include "OTCore/TimeFormatter.h"
 #include "SolverReport.h"
 BlockHandler::BlockHandler(EntityBlock* blockEntity, const HandlerMap& allHandler)
 	:m_allHandler(allHandler)

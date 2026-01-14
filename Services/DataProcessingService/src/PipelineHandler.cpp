@@ -34,7 +34,7 @@
 #include <string>
 #include <ctime>
 #include "SolverReport.h"
-#include "OTServiceFoundation/TimeFormatter.h"
+#include "OTCore/TimeFormatter.h"
 
 void PipelineHandler::runAll(const std::list<std::shared_ptr<GraphNode>>& _rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& _graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID)
 {

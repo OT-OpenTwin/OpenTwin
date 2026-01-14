@@ -4,11 +4,27 @@ Features/Changes
 - Data processing now follows the solver concept, i.e. pipeline design is separate from solver with run settings
 - Multiple data pipelines are now possible
 - Renaming of graphics scenes is now possible
-- Snapping and unsnapping of connections is now possible
-- Multi drag/drop of blocks is now handled in one state
+- Snapping and unsnapping of graphics connections is now possible
+- Moving of multiple blocks is now handled in one state
 - Python environments were added
 - Python packages are automatically installed, either per selected environment description or import statements in the executed script
 - Improved visual feedback for importing large numbers of files
 - Improved speed of data transport in pipeline by factor ~3
+- Introduced "Hierarchical" project
+- Redesigned project overview and introduced columnwise project filter and sorting options
+- Introduced project preview image, project description, project tags and project grouping
+- Plot data is now loaded asynchronously
+- Large text files are now displayed chunkwise (chunk size 100kB)
+- Graphics view is not initially selected and open for Data Pipeline and Circuit Simulator projects
+- Added more customization properties to graphics connections and plot curves
+- Session now remains locked until all services have completed their shutdown
+- CST Studio Suite project import now supports Studio Suite version 2025
+- CST Studio Suite 1D results can now be visualized directly without downloading / opening the project
+- LTSpice import now imports and displays 1D results
+- Added some more display settings for 3D visualization, accessible via the "Settings" dialog box
+- Improved quality of 3D visualization in general
+- Improved display of rubberbands during shape construction in 3D modeler
+- Added cutplane capping for 3D views
+- Creation of empty (= zero volume) geometrical shapes is now supported
 
-Bugs
+- Various appearance, usability, stability, and performance improvements

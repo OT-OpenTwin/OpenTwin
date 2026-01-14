@@ -33,7 +33,7 @@
 #include "EntityBase.h"
 #include "DocumentAPI.h"
 
-#include "OTServiceFoundation/TimeFormatter.h"
+#include "OTCore/TimeFormatter.h"
 #include "ExceptionRestartRequired.h"
 
 ActionHandler& ActionHandler::instance(void) {

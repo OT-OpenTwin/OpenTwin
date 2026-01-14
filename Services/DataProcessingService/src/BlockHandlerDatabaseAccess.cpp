@@ -37,7 +37,7 @@
 #include "OTCore/ComparisionSymbols.h"
 #include "IndexHandler.h"
 
-#include "OTServiceFoundation/TimeFormatter.h"
+#include "OTCore/TimeFormatter.h"
 #include "SolverReport.h"
 #include "OTCore/ResultCollectionDefaultIndexes.h"
 
@@ -92,8 +92,11 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	{
 		options.sort(m_sort);
 		bsoncxx::builder::basic::document hintDoc;
-		const std::string firstDefaultIndex = ResultCollectionDefaultIndexes::getDefaultIndexes().front();
-		hintDoc.append(bsoncxx::builder::basic::kvp(firstDefaultIndex, 1));
+		//Here we switched to a compound index. Bad style, but for now it works.
+		auto index = ResultCollectionDefaultIndexes::getDefaultIndexes().begin();
+		hintDoc.append(bsoncxx::builder::basic::kvp(*index, 1));
+		index++;
+		hintDoc.append(bsoncxx::builder::basic::kvp(*index, 1));
 		SolverReport::instance().addToContent("Hint: " + bsoncxx::to_json(hintDoc) + "\n");
 
 		mongocxx::v_noabi::hint hint(hintDoc.extract());
