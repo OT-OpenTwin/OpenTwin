@@ -18,5 +18,13 @@ Features/Changes
 - Graphics view is not initially selected and open for Data Pipeline and Circuit Simulator projects
 - Added more customization properties to graphics connections and plot curves
 - Session now remains locked until all services have completed their shutdown
+- CST Studio Suite project import now supports Studio Suite version 2025
+- CST Studio Suite 1D results can now be visualized directly without downloading / opening the project
+- LTSpice import now imports and displays 1D results
+- Added some more display settings for 3D visualization, accessible via the "Settings" dialog box
+- Improved quality of 3D visualization in general
+- Improved display of rubberbands during shape construction in 3D modeler
+- Added cutplane capping for 3D views
+- Creation of empty (= zero volume) geometrical shapes is now supported
 
-- Various appearance, usability and performance improvements
+- Various appearance, usability, stability, and performance improvements
