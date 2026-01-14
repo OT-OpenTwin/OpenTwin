@@ -90,7 +90,7 @@ void ot::TextEditorCfg::setNextChunk(const std::string& _fullText, size_t _start
 	}
 
 	m_text = _fullText.substr(_startIndex, (endIx - _startIndex) + 1);
-	m_isChunk = true;
+	m_isChunk = _startIndex > 0;
 	m_hasMore = (endIx < _fullText.size() - 1);
 	m_nextChunkStartIx = endIx + 1;
 	m_remainingSize = (m_hasMore ? (_fullText.size() - m_nextChunkStartIx) : 0);

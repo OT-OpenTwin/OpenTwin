@@ -2793,7 +2793,7 @@ void AppBase::slotTextEditorSaveRequested() {
 		ot::JsonDocument doc = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(
 			view->getViewData().getEntityName(),
 			txt,
-			edit->getNextChunkStartIndex()
+			edit->hasMoreToLoad() ? edit->getNextChunkStartIndex() : 0
 		);
 
 		std::string response;

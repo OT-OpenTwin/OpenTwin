@@ -139,10 +139,6 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 	{
 		doc.AddMember(OT_ACTION_PARAM_Python_Environment, m_manifestUID,doc.GetAllocator()), doc.GetAllocator();
 	}
-	else
-	{
-		assert(false);
-	}
 	m_manifestUID = ot::invalidUID;
 	return doc;
 }

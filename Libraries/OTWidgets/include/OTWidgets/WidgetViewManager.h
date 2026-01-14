@@ -235,6 +235,8 @@ namespace ot {
 		
 	public Q_SLOTS:
 		void slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus);
+	private Q_SLOTS:
+		void slotViewFocusedImpl();
 
 	private Q_SLOTS:
 		void slotViewCloseRequested();
@@ -253,6 +255,12 @@ namespace ot {
 			MulticloseViewState = 1 << 2 //! @brief Multiple views are closed at the same time.
 		};
 		typedef Flags<ManagerState> ManagerStateFlags;
+
+		struct FocusChangeData {
+			ads::CDockWidget* oldFocus = nullptr;
+			ads::CDockWidget* newFocus = nullptr;
+			bool queued = false;
+		};
 
 		struct FocusInfo {
 			WidgetView* last;
@@ -301,6 +309,8 @@ namespace ot {
 		FocusInfo        m_focusInfo;
 
 		AutoCloseInfo    m_autoCloseInfo;
+
+		FocusChangeData m_focusChangeData;
 
 		std::map<BasicServiceInformation, ViewNameTypeList*> m_viewOwnerMap; //! @brief Maps owners to widget view names and types
 		std::list<ViewEntry> m_views; //! @brief Contains all views and their owners.
