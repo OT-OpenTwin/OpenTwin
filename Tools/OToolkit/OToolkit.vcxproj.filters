@@ -266,6 +266,9 @@
     <ClCompile Include="src\ProjectHelperBatchHelperItem.cpp">
       <Filter>Source Files\ProjectHelper</Filter>
     </ClCompile>
+    <ClCompile Include="src\ScriptRunner.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -458,6 +461,9 @@
     </QtMoc>
     <QtMoc Include="include\ProjectHelperBatchHelperItem.h">
       <Filter>Header Files\ProjectHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ScriptRunner.h">
+      <Filter>Header Files\General</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

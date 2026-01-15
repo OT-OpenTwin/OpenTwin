@@ -58,5 +58,7 @@ bool ProjectHelper::prepareToolShutdown(QSettings& _settings) {
 // Private: Slots
 
 void ProjectHelper::slotRefillBatches() {
-	
+	if (m_batchHelper) {
+		m_batchHelper->slotRefreshData();
+	}
 }

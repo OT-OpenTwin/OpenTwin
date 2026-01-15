@@ -10,6 +10,7 @@
 
 namespace ot {
 	class TreeWidget;
+	class PushButton;
 }
 
 class ProjectHelperBatchHelperItem : public QObject, public ot::TreeWidgetItem {
@@ -22,7 +23,8 @@ public:
 		Edit,
 		Build,
 		Rebuild,
-		Clear,
+		Test,
+		Clean,
 
 		ColumnCount
 	};
@@ -32,16 +34,22 @@ public:
 	ProjectHelperBatchHelperItem();
 	virtual ~ProjectHelperBatchHelperItem();
 
+	QString getScriptName() const;
+
 private Q_SLOTS:
 	void slotBuild();
 	void slotRebuild();
-	void slotClear();
+	void slotClean();
 	void slotEdit();
+	void slotTest();
+	void slotBuildFinished();
 
 private:
+	static ot::PushButton* createScriptButton(ot::TreeWidget* _tree, ProjectHelperBatchHelperItem* _item, int _column, const QString& _text, const QString& _path);
+
 	QString m_rootPath;
 	QString m_editPath;
-	QString m_clearPath;
 	QString m_buildPath;
-
+	QString m_testPath;
+	QString m_cleanPath;
 };

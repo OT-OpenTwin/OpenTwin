@@ -60,6 +60,7 @@
 #include "OTWidgets/PlainTextEditView.h"
 
 // Qt header
+#include <QtCore/qprocess.h>
 #include <QtCore/qdatetime.h>
 #include <QtCore/qsettings.h>
 #include <QtGui/qevent.h>
