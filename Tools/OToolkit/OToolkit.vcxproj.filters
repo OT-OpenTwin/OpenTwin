@@ -66,6 +66,12 @@
     <Filter Include="Source Files\Logger">
       <UniqueIdentifier>{66c19ab9-f23c-4636-86ac-3f4f20aec99b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ProjectHelper">
+      <UniqueIdentifier>{14f4bc03-f027-4a33-a699-53ba2425e911}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ProjectHelper">
+      <UniqueIdentifier>{46996ac8-36b9-440d-9fa4-933a82492b7a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppBase.cpp">
@@ -251,6 +257,15 @@
     <ClCompile Include="src\DiagramGenerator.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProjectHelper.cpp">
+      <Filter>Source Files\ProjectHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProjectHelperBatchHelper.cpp">
+      <Filter>Source Files\ProjectHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProjectHelperBatchHelperItem.cpp">
+      <Filter>Source Files\ProjectHelper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -434,6 +449,15 @@
     </QtMoc>
     <QtMoc Include="include\DiagramGenerator.h">
       <Filter>Header Files\Tools</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectHelper.h">
+      <Filter>Header Files\ProjectHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectHelperBatchHelper.h">
+      <Filter>Header Files\ProjectHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectHelperBatchHelperItem.h">
+      <Filter>Header Files\ProjectHelper</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

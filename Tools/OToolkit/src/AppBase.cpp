@@ -31,6 +31,7 @@
 #include "MenuManager.h"
 #include "ImageEditor.h"
 #include "NetworkTools.h"
+#include "ProjectHelper.h"
 #include "StatusManager.h"
 #include "ToolBarManager.h"
 #include "ToolViewManager.h"
@@ -421,6 +422,7 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(new ImageEditor);
 	m_toolManager->addTool(m_logger);
 	m_toolManager->addTool(new NetworkTools);
+	m_toolManager->addTool(new ProjectHelper);
 	m_toolManager->addTool(new Randomizer);
 	m_toolManager->addTool(new SVGBrowser);
 	m_toolManager->addTool(new Terminal);

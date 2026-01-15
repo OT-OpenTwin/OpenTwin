@@ -66,6 +66,9 @@
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\NetworkTools.cpp" />
     <ClCompile Include="src\PortBlockerServer.cpp" />
+    <ClCompile Include="src\ProjectHelper.cpp" />
+    <ClCompile Include="src\ProjectHelperBatchHelper.cpp" />
+    <ClCompile Include="src\ProjectHelperBatchHelperItem.cpp" />
     <ClCompile Include="src\QuickLogExport.cpp" />
     <ClCompile Include="src\Randomizer.cpp" />
     <ClCompile Include="src\SettingsManager.cpp" />
@@ -119,6 +122,9 @@
     <ClInclude Include="include\LogServiceDebugInfoDialog.h" />
     <QtMoc Include="include\LogVisualizerColumnWidthSaveDialog.h" />
     <QtMoc Include="include\TypeHelper.h" />
+    <QtMoc Include="include\ProjectHelper.h" />
+    <QtMoc Include="include\ProjectHelperBatchHelper.h" />
+    <QtMoc Include="include\ProjectHelperBatchHelperItem.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />
