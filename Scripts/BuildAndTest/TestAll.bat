@@ -138,7 +138,7 @@ ECHO Test the libraries
 ECHO ====================================================================
 
 ECHO ===============================================================
-ECHO Test Datastorage: DataStorage
+ECHO Test Datastorage: OTDataStorage
 ECHO ===============================================================
 CALL "%OT_DATASTORAGE_ROOT%%testBat%" %1 %2
 
@@ -163,7 +163,7 @@ ECHO ===============================================================
 CALL "%OT_CADMODELENTITIES_ROOT%%testBat%" %1 %2
 
 ECHO ===============================================================
-ECHO Test Library: Core
+ECHO Test Library: OTCore
 ECHO ===============================================================
 CALL "%OT_CORE_ROOT%%testBat%" %1 %2
 

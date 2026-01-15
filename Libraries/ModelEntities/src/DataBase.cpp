@@ -36,15 +36,15 @@
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 
-#include "DocumentAPI.h"
-#include "Connection\ConnectionAPI.h"
-#include "Document\DocumentManager.h"
-#include "Document\DocumentAccessBase.h"
-#include "Document\DocumentAccess.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentManager.h"
+#include "OTDataStorage/Document/DocumentAccessBase.h"
+#include "OTDataStorage/Document/DocumentAccess.h"
 
-#include "Helper\UniqueFileName.h"
-#include "Helper\QueryBuilder.h"
-#include "Helper\BsonValuesHelper.h"
+#include "OTDataStorage/Helper/UniqueFileName.h"
+#include "OTDataStorage/Helper/QueryBuilder.h"
+#include "OTDataStorage/Helper/BsonValuesHelper.h"
 
 #include <cassert>
 

@@ -21,7 +21,7 @@
 #include "Datapoints.h"
 #include "CurveColourSetter.h"
 #include "CurveDatasetFactory.h"
-#include "AdvancedQueryBuilder.h"
+#include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "ShortParameterDescription.h"
 #include "ContainerFlexibleOwnership.h"
 #include "OTCore/String.h"

@@ -62,8 +62,8 @@
 #include "EntityBlockHierarchicalDocumentItem.h"
 
 // DataBase
-#include "DocumentAPI.h"
-#include "GridFSFileInfo.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 
 // std header
 #include <thread>

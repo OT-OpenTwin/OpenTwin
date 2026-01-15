@@ -19,12 +19,13 @@
 
 #pragma once
 
-class DataSourceManagerItem;
+#include "VisualizationServiceTypes.h"
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include <string>
 #include <map>
 
-#include "OTServiceFoundation/ModelComponent.h"
+class DataSourceManagerItem;
 
 class DataSourceManager
 {

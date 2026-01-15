@@ -476,7 +476,7 @@ if(WIN32)
             OPENTWINMODELENTITIES_EXPORTS
     )
 
-    # OTSystem / OTCore / OTGui / OTCommunication / DataStorage library directories
+    # OTSystem / OTCore / OTGui / OTCommunication / OTDataStorage library directories
     join_paths(OT_SYSTEM_DEBUG_LIB_DIR        "${OT_SYSTEM_ROOT_PATH}"        "${OT_CLIBD_PATH}")
     join_paths(OT_SYSTEM_RELEASE_LIB_DIR      "${OT_SYSTEM_ROOT_PATH}"        "${OT_CLIBR_PATH}")
     join_paths(OT_CORE_DEBUG_LIB_DIR          "${OT_CORE_ROOT_PATH}"          "${OT_CLIBD_PATH}")
@@ -594,7 +594,7 @@ if(WIN32)
             OTCore
             OTGui
             OTCommunication
-            DataStorage
+            OTDataStorage
             ${MONGO_CXX_LIBS_NAME}
             ${MONGO_C_LIBS_NAME}
     )

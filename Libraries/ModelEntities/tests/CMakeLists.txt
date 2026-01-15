@@ -1,7 +1,7 @@
 # ============================================================
 # ModelEntities test CMake
 # Reuses ModelEntities_core object files and links against
-# OTSystem, OTCore, OTGui, OTCommunication, DataStorage,
+# OTSystem, OTCore, OTGui, OTCommunication, OTDataStorage,
 # Mongo C++ / C and GoogleTest.
 # ============================================================
 
@@ -41,7 +41,7 @@ endfunction()
 
 # ------------------------------------------------------------
 # Environment: OTSystem / OTCore / OTGui / OTCommunication /
-#              DataStorage / RapidJSON / Mongo
+#              OTDataStorage / RapidJSON / Mongo
 # ------------------------------------------------------------
 
 # OT roots and include subdir
@@ -121,7 +121,7 @@ target_include_directories(ModelEntities_tests
         "${CMAKE_CURRENT_SOURCE_DIR}/../include"
 )
 
-# OTSystem / OTCore / OTGui / OTCommunication / DataStorage
+# OTSystem / OTCore / OTGui / OTCommunication / OTDataStorage
 if(OT_SYSTEM_ROOT_PATH AND OT_INC_PATH)
     target_include_directories(ModelEntities_tests PRIVATE
         "${OT_SYSTEM_ROOT_PATH}/${OT_INC_PATH}"
@@ -242,7 +242,7 @@ if(WIN32)
         )
     endif()
 
-    # DataStorage
+    # OTDataStorage
     if(OT_DATASTORAGE_DEBUG_LIB_DIR)
         target_link_directories(ModelEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${OT_DATASTORAGE_DEBUG_LIB_DIR}>
@@ -292,7 +292,7 @@ if(WIN32)
         OTCore
         OTGui
         OTCommunication
-        DataStorage
+        OTDataStorage
         ${MONGO_CXX_LIBS_NAME}
         ${MONGO_C_LIBS_NAME}
     )

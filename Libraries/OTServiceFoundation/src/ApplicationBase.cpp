@@ -44,8 +44,8 @@
 #include "OTServiceFoundation/InitialSelectionHelper.h"
 
 #include "DataBase.h"
-#include "Document\DocumentAccess.h"
-#include "Connection\ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentAccess.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
 
 #include "TemplateDefaultManager.h"
 

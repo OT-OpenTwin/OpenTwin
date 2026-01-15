@@ -25,9 +25,9 @@
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
 
-#include "Document\DocumentAccessBase.h"
-#include "Document\DocumentAccess.h"
-#include "Helper\QueryBuilder.h"
+#include "OTDataStorage/Document/DocumentAccessBase.h"
+#include "OTDataStorage/Document/DocumentAccess.h"
+#include "OTDataStorage/Helper/QueryBuilder.h"
 
 TemplateDefaultManager globalTemplateDefaultManager;
 

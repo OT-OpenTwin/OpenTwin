@@ -19,10 +19,10 @@
 
 #pragma once
 #include <gtest/gtest.h>
-#include "Unittest/UnittestDocumentAccess.h"
-#include "Helper\UniqueFileName.h"
-#include "Helper\QueryBuilder.h"
-#include "Helper\BsonValuesHelper.h"
+#include "OTDataStorage/Unittest/UnittestDocumentAccess.h"
+#include "OTDataStorage/Helper/UniqueFileName.h"
+#include "OTDataStorage/Helper/QueryBuilder.h"
+#include "OTDataStorage/Helper/BsonValuesHelper.h"
 
 class FixtureAdvancedQueryBuilder : public testing::Test
 {

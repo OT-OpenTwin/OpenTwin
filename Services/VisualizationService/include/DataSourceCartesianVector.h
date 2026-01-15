@@ -19,9 +19,10 @@
 
 #pragma once
 
-#include <string>
-
+#include "VisualizationServiceTypes.h"
 #include "DataSourceManagerItem.h"
+
+#include <string>
 
 class EntityCartesianVector;
 class EntityMeshCartesianData;

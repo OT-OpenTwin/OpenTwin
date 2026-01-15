@@ -70,8 +70,8 @@
 
 #include "DataBase.h"
 #include "PlotManager.h"
-#include "DocumentAPI.h"
-#include "GridFSFileInfo.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 #include "PlotManagerView.h"
 
 #include "VisualiserHelper.h"

@@ -32,12 +32,12 @@
 #include "OTCore/ResultCollectionDefaultIndexes.h"
 
 // DB header
-#include "DocumentAPI.h"
-#include "Connection\ConnectionAPI.h"
-#include "Document\DocumentAccess.h"
-#include "Document\DocumentAccessBase.h"
-#include "Helper\QueryBuilder.h"
-#include "Helper\BsonValuesHelper.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentAccess.h"
+#include "OTDataStorage/Document/DocumentAccessBase.h"
+#include "OTDataStorage/Helper/QueryBuilder.h"
+#include "OTDataStorage/Helper/BsonValuesHelper.h"
 
 // MongoDB header
 #include <bsoncxx/json.hpp>

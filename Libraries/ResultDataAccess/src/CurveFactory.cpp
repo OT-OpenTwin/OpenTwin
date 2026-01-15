@@ -20,7 +20,7 @@
 #include "CurveFactory.h"
 #include "QuantityContainer.h"
 #include "OTGui/QuantityContainerEntryDescription.h"
-#include "AdvancedQueryBuilder.h"
+#include "OTDataStorage/AdvancedQueryBuilder.h"
 
 void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg& _config)
 {

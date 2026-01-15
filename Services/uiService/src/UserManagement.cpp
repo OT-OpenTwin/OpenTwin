@@ -28,12 +28,12 @@
 #include <mongocxx/database.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 
-#include "DocumentAPI.h"
-#include "Connection\ConnectionAPI.h"
-#include "Document\DocumentAccess.h"
-#include "Document\DocumentAccessBase.h"
-#include "Helper\QueryBuilder.h"
-#include "Helper\BsonValuesHelper.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentAccess.h"
+#include "OTDataStorage/Document/DocumentAccessBase.h"
+#include "OTDataStorage/Helper/QueryBuilder.h"
+#include "OTDataStorage/Helper/BsonValuesHelper.h"
 
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON/JSON.h"

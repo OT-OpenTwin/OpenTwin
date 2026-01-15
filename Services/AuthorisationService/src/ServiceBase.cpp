@@ -29,7 +29,7 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/UserCredentials.h"
-#include "Connection/ConnectionAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
 
 // std header
 #include <random>

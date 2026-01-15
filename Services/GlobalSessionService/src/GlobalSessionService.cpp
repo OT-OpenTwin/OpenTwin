@@ -35,9 +35,9 @@
 #include "OTCommunication/ServiceLogNotifier.h"
 #include "DataBase.h"
 
-#include "DocumentAPI.h"
-#include "Connection\ConnectionAPI.h"
-#include "Document\DocumentAccess.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentAccess.h"
 
 // Third party header
 #include "zlib.h"

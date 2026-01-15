@@ -2,7 +2,7 @@
 # OTServiceFoundation tests
 # Reuses OTServiceFoundation_core object files and links
 # against OTSystem / OTCore / OTGui / OTGuiAPI /
-# OTCommunication / OTModelAPI / ModelEntities / DataStorage /
+# OTCommunication / OTModelAPI / ModelEntities / OTDataStorage /
 # CADModelEntities / Mongo / Zlib / cURL / OpenCascade, ...
 # ============================================================
 
@@ -427,7 +427,7 @@ if(WIN32)
         OTCommunication
         OTModelAPI
         ModelEntities
-        DataStorage
+        OTDataStorage
         CADModelEntities
 
         ${MONGO_CXX_LIBS_NAME}

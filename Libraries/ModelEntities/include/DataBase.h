@@ -35,7 +35,7 @@
 
 #include "OTCore/CoreTypes.h"
 #include "ModelEntitiesAPIExport.h"
-#include "Document\DocumentManager.h"
+#include "OTDataStorage/Document/DocumentManager.h"
 #include "EntityBase.h"
 #include "EntityInformation.h"
 

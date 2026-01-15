@@ -19,10 +19,11 @@
 
 #pragma once
 
+#include "VisualizationServiceTypes.h"
+#include "OTCore/CoreTypes.h"
+
 #include <string>
 #include <ctime>
-
-#include "OTCore/CoreTypes.h"
 
 class EntityVis2D3D;
 class DataSourceManagerItem;

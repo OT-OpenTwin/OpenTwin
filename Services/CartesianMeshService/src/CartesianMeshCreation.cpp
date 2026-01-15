@@ -17,9 +17,6 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "stdafx.h"
-
 #include "CartesianMeshCreation.h"
 
 #include "Application.h"

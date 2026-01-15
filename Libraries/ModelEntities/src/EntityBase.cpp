@@ -17,8 +17,6 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "stdafx.h"
-
 #include "EntityBase.h"
 #include "DataBase.h"
 #include "EntityFactory.h"

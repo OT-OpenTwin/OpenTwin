@@ -149,7 +149,7 @@ ECHO ===============================================================
 CALL "%OT_WIDGETS_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: DataStorage
+ECHO Build Library: OTDataStorage
 ECHO ===============================================================
 CALL "%OT_DATASTORAGE_ROOT%\build.bat" %1 %2
 

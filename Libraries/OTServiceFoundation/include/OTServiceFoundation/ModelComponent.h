@@ -27,7 +27,7 @@
 #include "EntityInformation.h"
 #include "EntityProperties.h"
 
-#include "UniqueUIDGenerator.h"
+#include "OTDataStorage/UniqueUIDGenerator.h"
 
 // C++ header
 #include <string>

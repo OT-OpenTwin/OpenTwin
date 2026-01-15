@@ -19,12 +19,13 @@
 
 #pragma once
 
-#include <string>
-
+#include "VisualizationServiceTypes.h"
 #include "DataSourceManagerItem.h"
 
 #include <vtkUnstructuredGrid.h>
 #include <vtkNew.h>
+
+#include <string>
 
 class EntityResultUnstructuredMesh;
 class EntityResultUnstructuredMeshData;

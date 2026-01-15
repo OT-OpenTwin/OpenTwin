@@ -22,7 +22,7 @@
 #include "EntityResult1DPlot.h"
 
 #include "MetadataSeries.h"
-#include "AdvancedQueryBuilder.h"
+#include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTGui/QueryInformation.h"
 #include "OTCore/FolderNames.h"
 #include "CurveFactory.h"

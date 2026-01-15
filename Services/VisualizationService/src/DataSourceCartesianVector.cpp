@@ -17,9 +17,6 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "stdafx.h"
-
 #include "DataSourceCartesianVector.h"
 #include "EntityBase.h"
 #include "EntityCartesianVector.h"

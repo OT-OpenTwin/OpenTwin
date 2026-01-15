@@ -19,10 +19,10 @@
 
 #pragma once
 
+#include "VtkDriver.h"
+
 #include <string>
 #include <ctime>
-
-#include "VtkDriver.h"
 
 class VtkDriverGeneric : public VtkDriver
 {

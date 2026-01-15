@@ -31,7 +31,7 @@
 #include "Application.h"
 #include "DataBase.h"
 #include "EntityBase.h"
-#include "DocumentAPI.h"
+#include "OTDataStorage/DocumentAPI.h"
 
 #include "OTCore/TimeFormatter.h"
 #include "ExceptionRestartRequired.h"

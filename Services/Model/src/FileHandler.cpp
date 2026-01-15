@@ -34,8 +34,8 @@
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
 #include "DataBase.h"
-#include "DocumentAPI.h"
-#include "GridFSFileInfo.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 #include <assert.h>
 
 FileHandler::FileHandler() {

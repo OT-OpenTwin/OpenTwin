@@ -47,8 +47,8 @@
 #include "zlib.h"
 
 // Open twin header
-#include "DocumentAPI.h"
-#include "GridFSFileInfo.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 #include "OTSystem/OTAssert.h"
 #include "OTGui/FileExtension.h"
 #include "OTGui/Properties/PropertyColor.h"

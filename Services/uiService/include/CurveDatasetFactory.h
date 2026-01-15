@@ -19,7 +19,7 @@
 
 #pragma once
 #include <string>
-#include "ResultDataStorageAPI.h"
+#include "OTDataStorage/ResultDataStorageAPI.h"
 #include "OTWidgets/PlotDataset.h"
 #include "OTCore/JSON/JSON.h"
 

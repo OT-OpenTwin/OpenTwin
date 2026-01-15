@@ -27,7 +27,7 @@
 
 #include "Application.h"
 #include "EntityBlockPython.h"
-#include "AdvancedQueryBuilder.h"
+#include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "EntityBlockStorage.h"
 #include "EntityBlockConnection.h"
 #include "EntityBlockDisplay.h"

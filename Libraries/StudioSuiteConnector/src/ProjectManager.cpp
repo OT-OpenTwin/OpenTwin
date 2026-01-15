@@ -29,7 +29,7 @@
 #include "EntityBinaryData.h"
 #include "EntityFile.h"
 #include "DataBase.h"
-#include "DocumentAPI.h"
+#include "OTDataStorage/DocumentAPI.h"
 
 #include <filesystem>
 #include <algorithm>

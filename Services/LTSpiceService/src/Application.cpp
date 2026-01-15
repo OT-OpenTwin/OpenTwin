@@ -30,8 +30,8 @@
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTCore/FolderNames.h"
 
-#include "Connection\ConnectionAPI.h"
-#include "Document\DocumentAccessBase.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentAccessBase.h"
 
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"

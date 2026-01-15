@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "VisualizationServiceTypes.h"
+
 class DataSourceManagerItem;
 class EntityBase;
 

@@ -17,9 +17,6 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "stdafx.h"
-
 #include "DataSourceUnstructuredMesh.h"
 #include "EntityBase.h"
 #include "EntityResultUnstructuredMesh.h"

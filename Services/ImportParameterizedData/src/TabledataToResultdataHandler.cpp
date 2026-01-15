@@ -30,7 +30,7 @@
 #include "Documentation.h"
 #include "DataCategorizationConsistencyChecker.h"
 
-#include "ResultDataStorageAPI.h"
+#include "OTDataStorage/ResultDataStorageAPI.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"

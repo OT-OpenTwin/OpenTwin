@@ -28,15 +28,16 @@
 #include "MeshExport.h"
 #include "MeshImport.h"
 
-// Open twin header
+// OpenTwin header
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityAPI.h"
 
 #include "ModelState.h"
-#include "DocumentAPI.h"
-#include "GridFSFileInfo.h"
+
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 
 #include <thread>	
 #include <filesystem>

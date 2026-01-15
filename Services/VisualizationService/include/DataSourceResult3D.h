@@ -18,6 +18,8 @@
 // @otlicense-end
 
 #pragma once
+
+#include "VisualizationServiceTypes.h"
 #include "DataSourceManagerItem.h"
 #include "EntityCompressedVector.h"
 #include "EntityMeshCartesianData.h"

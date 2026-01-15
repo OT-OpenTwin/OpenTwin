@@ -42,7 +42,7 @@ ECHO ===============================================================
 CALL "%OT_CADMODELENTITIES_ROOT%\Clean.bat"
 
 ECHO ===============================================================
-ECHO Clean Library: DataStorage
+ECHO Clean Library: OTDataStorage
 ECHO ===============================================================
 CALL "%OT_DATASTORAGE_ROOT%\Clean.bat" 
 

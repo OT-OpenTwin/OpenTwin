@@ -20,7 +20,7 @@
 #pragma once
 #include <string>
 #include "ResultImportLogger.h"
-#include "ResultDataStorageAPI.h"
+#include "OTDataStorage/ResultDataStorageAPI.h"
 
 class __declspec(dllexport) IndexHandler
 {

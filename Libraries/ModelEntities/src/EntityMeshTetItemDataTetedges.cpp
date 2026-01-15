@@ -17,11 +17,10 @@
 // limitations under the License.
 // @otlicense-end
 
-
 #include "DataBase.h"
 #include "EntityMeshTetItemDataTetedges.h"
 
-#include "Connection\ConnectionAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
 
 #include <mongocxx/client.hpp>
 #include <bsoncxx/builder/basic/array.hpp>

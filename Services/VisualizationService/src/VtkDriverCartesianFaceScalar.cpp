@@ -17,9 +17,6 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "stdafx.h"
-
 #include "VtkDriverCartesianFaceScalar.h"
 #include "DataSourceManager.h"
 #include "DataSourceManagerItem.h"

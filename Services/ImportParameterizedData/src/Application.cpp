@@ -40,10 +40,10 @@
 #include "DatasetOverviewVisualiser.h"
 #include "EntityMetadataSeries.h"
 
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 #include "EntityAPI.h"
-#include "GridFSFileInfo.h"
 #include "DataBase.h"
-#include "DocumentAPI.h"
 #include "EntityBatchImporter.h"
 #include "InvalidUID.h"
 

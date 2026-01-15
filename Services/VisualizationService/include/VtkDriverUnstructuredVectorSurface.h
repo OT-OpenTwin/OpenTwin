@@ -19,20 +19,21 @@
 
 #pragma once
 
+#include "VisualizationServiceTypes.h"
+#include "VtkDriver.h"
+#include "vtkRectilinearGrid.h"
+#include "EntityResultBase.h"
+#include "PropertyBundleDataHandlePlane.h"
+#include "PropertyBundleDataHandleScaling.h"
+#include "PropertyBundleDataHandleVisUnstructuredVectorSurface.h"
+#include "DataSourceUnstructuredMesh.h"
+
 #include <string>
 #include <ctime>
 #include <vector>
 #include <list>
 #include <vtkAlgorithmOutput.h>
 #include <vtkDataSetMapper.h>
-
-#include "vtkRectilinearGrid.h"
-#include "VtkDriver.h"
-#include "EntityResultBase.h"
-#include "PropertyBundleDataHandlePlane.h"
-#include "PropertyBundleDataHandleScaling.h"
-#include "PropertyBundleDataHandleVisUnstructuredVectorSurface.h"
-#include "DataSourceUnstructuredMesh.h"
 
 namespace osg {
 	class Node;

@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include "FixtureAdvancedQueryBuilder.h"
 #include "OTCore/JSON/JSON.h"
-#include "AdvancedQueryBuilder.h"
+#include "OTDataStorage/AdvancedQueryBuilder.h"
 
 // These tests are for outdated source code and need to be revised 
 

@@ -5,11 +5,11 @@
  * Distributed under the terms of the GNU Library General Public License (LGPL)
  * as published by the Free Software Foundation.
  */
- 
 
 #ifndef VTK_ACTOR_TO_OSG_H_
 #define VTK_ACTOR_TO_OSG_H_
 
+#include "VisualizationServiceTypes.h"
 #include <vtkActor.h>
 #include <vtkCellArray.h>
 

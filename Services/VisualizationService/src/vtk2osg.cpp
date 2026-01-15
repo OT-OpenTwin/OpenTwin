@@ -6,8 +6,6 @@
  * as published by the Free Software Foundation.
  */
 
-#include "stdafx.h"
- 
 #include "vtk2osg.h"
 
 #include <vtkCellData.h>

@@ -37,7 +37,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionDispatchProfiler.h"
-#include "ResultDataStorageAPI.h"
+#include "OTDataStorage/ResultDataStorageAPI.h"
 
 // Model header
 #include "Geometry.h"

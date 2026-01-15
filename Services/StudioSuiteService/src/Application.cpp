@@ -30,13 +30,13 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/EncodingGuesser.h"
 
-#include "Connection\ConnectionAPI.h"
-#include "Document\DocumentAccessBase.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentAccessBase.h"
 
 // Application specific includes
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
-#include "DocumentAPI.h"
 #include "EntityResultText.h"
 #include "EntityUnits.h"
 #include "EntityMaterial.h"

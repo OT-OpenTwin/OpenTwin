@@ -112,8 +112,8 @@
 #include "OTFMC/FMConnectorAPI.h"
 #include "ProgressUpdater.h"
 #include "DataBase.h"
-#include "DocumentAPI.h"
-#include "GridFSFileInfo.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>

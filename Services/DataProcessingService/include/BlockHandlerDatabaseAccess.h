@@ -22,9 +22,9 @@
 #include "EntityBlockDatabaseAccess.h"
 #include "MetadataCampaign.h"
 #include "MetadataParameter.h"
-#include "AdvancedQueryBuilder.h"
+#include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "ResultCollectionMetadataAccess.h"
-#include "ResultDataStorageAPI.h"
+#include "OTDataStorage/ResultDataStorageAPI.h"
 #include "OTCore/StringToVariableConverter.h"
 
 class BlockHandlerDatabaseAccess : public BlockHandler

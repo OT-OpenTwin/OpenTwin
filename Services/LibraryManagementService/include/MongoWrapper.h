@@ -22,12 +22,12 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTServiceFoundation/UserCredentials.h"
-#include "Connection/ConnectionAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
 #include "OTSystem/AppExitCodes.h"
 #include "DataBase.h"
-#include "Document/DocumentAccess.h"
-#include "Helper\QueryBuilder.h"
-#include "Helper\BsonValuesHelper.h"
+#include "OTDataStorage/Document/DocumentAccess.h"
+#include "OTDataStorage/Helper/QueryBuilder.h"
+#include "OTDataStorage/Helper/BsonValuesHelper.h"
 
 
 // ThirdParty header

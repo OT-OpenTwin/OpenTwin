@@ -17,7 +17,6 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "stdafx.h"
 #include "MeshSlicer.h"
 #include "EntityFacetData.h"
 

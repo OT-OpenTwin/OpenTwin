@@ -295,7 +295,7 @@ target_link_libraries(OTServiceFoundation
         OTCommunication
         OTModelAPI
         ModelEntities
-        DataStorage
+        OTDataStorage
         CADModelEntities
         ${MONGO_CXX_LIBS_NAME}
         ${OC_LIBS_NAME}
@@ -305,7 +305,7 @@ target_link_libraries(OTServiceFoundation
 # Windows-specific link directories and libs
 # ------------------------------------------------------------
 if(WIN32)
-    # OTSystem / OTCore / OTGui / OTGuiAPI / OTCommunication / OTModelAPI / ModelEntities / DataStorage / CADModelEntities
+    # OTSystem / OTCore / OTGui / OTGuiAPI / OTCommunication / OTModelAPI / ModelEntities / OTDataStorage / CADModelEntities
     if(OT_SYSTEM_ROOT_PATH AND OT_CLIBD_PATH)
         join_paths(OT_SYSTEM_DEBUG_LIB_DIR "${OT_SYSTEM_ROOT_PATH}" "${OT_CLIBD_PATH}")
         target_link_directories(OTServiceFoundation PRIVATE

@@ -26,7 +26,7 @@
 
 // OpenTwin header
 #include "DataBase.h"
-#include "Connection/ConnectionAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
 #include "OTCore/String.h"
 #include "OTCore/FolderNames.h"
 #include "OTCore/ReturnMessage.h"

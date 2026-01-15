@@ -29,7 +29,7 @@
 #include "EntityCallbackBase.h"
 #include "ResultImportLogger.h"
 #include "DatasetDescription.h"
-#include "ResultDataStorageAPI.h"
+#include "OTDataStorage/ResultDataStorageAPI.h"
 #include "ResultCollectionMetadataAccess.h"
 
 #include "OTServiceFoundation/ApplicationBase.h"

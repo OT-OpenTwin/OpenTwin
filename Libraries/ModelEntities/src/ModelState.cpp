@@ -17,8 +17,6 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "stdafx.h"
-
 #undef max
 #undef min
 
@@ -28,9 +26,9 @@
 #include "DataBase.h"
 #include "EntityBase.h"
 #include "EntityFileImage.h"
-#include "Connection\ConnectionAPI.h"
-#include "Document\DocumentAccessBase.h"
-#include "Helper\QueryBuilder.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentAccessBase.h"
+#include "OTDataStorage/Helper/QueryBuilder.h"
 #include "InvalidUID.h"
 
 #include <fstream>

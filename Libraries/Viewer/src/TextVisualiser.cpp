@@ -30,9 +30,9 @@
 #include "OTWidgets/TextEditorView.h"
 #include "OTWidgets/GlobalWidgetViewManager.h"
 #include "FrontendAPI.h"
-#include "DocumentAPI.h"
+#include "OTDataStorage/DocumentAPI.h"
 #include "SceneNodeBase.h"
-#include "GridFSFileInfo.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 
 // std header
 #include <thread>

@@ -21,7 +21,7 @@
 
 #include "Application.h"
 
-#include "AdvancedQueryBuilder.h"
+#include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTCore/String.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/GenericDataStructMatrix.h"
@@ -29,7 +29,7 @@
 
 #include "OTCore/ValueComparisionDefinition.h"
 
-#include "ResultDataStorageAPI.h"
+#include "OTDataStorage/ResultDataStorageAPI.h"
 #include "QuantityContainer.h"
 #include "PropertyHandlerDatabaseAccessBlock.h"
 
