@@ -53,6 +53,8 @@ ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescripti
 		addCampaignContextDataToQuantities(datasetDescription, parameterIDs);
 	}
 	const ot::UID newSeriesID = createNewSeries(_datasetDescriptions, _seriesName, _seriesMetadata);
+	m_quantitiesUpForStorageByName.clear();
+	m_parameterUpForStorageByName.clear();
 	return newSeriesID;
 }
 
@@ -195,7 +197,6 @@ bool ResultCollectionExtender::removeSeries(ot::UID _uid)
 
 ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(DatasetDescription& _dataDescription)
 {
-
 	ot::UIDList dependingParameterIDs;
 	auto& allParameterDescriptions = _dataDescription.getParameters();
 	assert(allParameterDescriptions.size() > 0);
