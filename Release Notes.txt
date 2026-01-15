@@ -15,7 +15,7 @@ Features/Changes
 - Introduced project preview image, project description, project tags and project grouping
 - Plot data is now loaded asynchronously
 - Large text files are now displayed chunkwise (chunk size 100kB)
-- Graphics view is not initially selected and open for Data Pipeline and Circuit Simulator projects
+- Graphics view and circuit/pipeline solvers are now initially created and corresponding view is initially open for Data Pipeline and Circuit Simulator projects
 - Added more customization properties to graphics connections and plot curves
 - Session now remains locked until all services have completed their shutdown
 - CST Studio Suite project import now supports Studio Suite version 2025
