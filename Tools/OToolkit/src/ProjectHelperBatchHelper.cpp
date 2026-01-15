@@ -3,6 +3,7 @@
 // OpenTwin header
 #include "ProjectHelperBatchHelper.h"
 #include "ProjectHelperBatchHelperItem.h"
+#include "ProjectHelperBatchHelperCustomItem.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PushButton.h"
@@ -62,7 +63,7 @@ void ProjectHelperBatchHelper::refreshDir(const QString& _rootPath, const QStrin
 	rootItm->setText(0, _childName);
 	m_tree->getTreeWidget()->addTopLevelItem(rootItm);
 
-	QDirIterator dirIt(_rootPath + _childName, QDir::Dirs | QDir::NoDotAndDotDot);
+	QDirIterator dirIt(_rootPath + "/" + _childName, QDir::Dirs | QDir::NoDotAndDotDot);
 	while (dirIt.hasNext()) {
 		dirIt.next();
 		QString pth = dirIt.filePath();
@@ -82,8 +83,8 @@ void ProjectHelperBatchHelper::slotRefreshData() {
 		return;
 	}
 	rootPath.replace('\\', '/');
-	if (!rootPath.endsWith('/')) {
-		rootPath.append('/');
+	while (rootPath.endsWith('/')) {
+		rootPath.chop(1);
 	}
 
 	TreeWidget* tree = m_tree->getTreeWidget();
@@ -92,4 +93,11 @@ void ProjectHelperBatchHelper::slotRefreshData() {
 	refreshDir(rootPath, "Libraries");
 	refreshDir(rootPath, "Services");
 	refreshDir(rootPath, "Tools");
+
+	TreeWidgetItem* generalItm = new TreeWidgetItem;
+	generalItm->setText(0, "General");
+	tree->addTopLevelItem(generalItm);
+	generalItm->setExpanded(true);
+
+	ProjectHelperBatchHelperCustomItem::createFromPath(tree, generalItm, rootPath);
 }

@@ -10,10 +10,12 @@ class ScriptRunner : public QObject {
 	Q_OBJECT
 public:
 	static ScriptRunner* runScript(const QString& _name, const QString& _scriptPath, const QStringList& _arguments, const QString& _workingDir, bool _defaultHandling = true);
+	static bool runDetached(const QString& _name, const QString& _scriptPath, const QStringList& _arguments, const QString& _workingDir);
 
 	ScriptRunner() = default;
 
 	bool run(const QString& _scriptPath, const QStringList& _arguments, const QString& _workingDir);
+	void stop();
 
 Q_SIGNALS:
     void stdOut(const QString& _output);

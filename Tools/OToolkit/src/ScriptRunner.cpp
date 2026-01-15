@@ -3,6 +3,10 @@
 // OpenTwin header
 #include "ScriptRunner.h"
 #include "OToolkitAPI/OToolkitAPI.h"
+#include "OTCore/Logging/LogDispatcher.h"
+
+// Qt header
+#include <QtCore/qdir.h>
 
 #define SCRIPT_LOG(___message) OTOOLKIT_LOG("Script", ___message)
 #define SCRIPT_LOGW(___message) OTOOLKIT_LOGW("Script", ___message)
@@ -18,6 +22,21 @@ ScriptRunner* ScriptRunner::runScript(const QString& _name, const QString& _scri
 		return nullptr;
 	}
 	return runner;
+}
+
+bool ScriptRunner::runDetached(const QString& _name, const QString& _scriptPath, const QStringList& _arguments, const QString& _workingDir) {
+#ifdef OT_OS_WINDOWS
+	// Launch detached cmd that launches the real script
+	QStringList args;
+	args.prepend(QDir::toNativeSeparators(_scriptPath));
+	args.prepend("/C");
+	args.prepend("start");
+	return QProcess::startDetached("cmd.exe", args, _workingDir);
+#else
+	// POSIX double-fork via shell
+	QString cmd = QString("nohup \"%1\" %2 > /dev/null 2>&1 &").arg(QDir::toNativeSeparators(_scriptPath), _arguments.join(' '));
+	return QProcess::startDetached("/bin/sh", { "-c", cmd }, _workingDir);
+#endif
 }
 
 bool ScriptRunner::run(const QString& _scriptPath, const QStringList& _arguments, const QString& _workingDir) {
@@ -56,6 +75,14 @@ bool ScriptRunner::run(const QString& _scriptPath, const QStringList& _arguments
 	m_process->start(cmd, args);
 
 	return true;
+}
+
+void ScriptRunner::stop() {
+	if (m_process) {
+		m_process->terminate();
+		SCRIPT_LOGW("Script terminated: \"" + m_name + "\"");
+	}
+	this->deleteLater();
 }
 
 void ScriptRunner::slotStdOut() {
