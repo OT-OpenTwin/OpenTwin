@@ -59,7 +59,7 @@ TEST(RAIITests, AtomicValueRAII_Int) {
 		ot::AtomicValueRAII raii(intValue, 1);
 		EXPECT_EQ(1, intValue.load());
 	}
-	EXPECT_FALSE(0, intValue.load());
+	EXPECT_EQ(0, intValue.load());
 }
 
 TEST(RAIITests, IncrementRAII_Int) {
