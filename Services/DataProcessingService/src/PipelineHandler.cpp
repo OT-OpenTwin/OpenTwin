@@ -18,11 +18,11 @@
 // @otlicense-end
 
 #include "PipelineHandler.h"
-#include "EntityBlockDatabaseAccess.h"
-#include "EntityBlockPython.h"
-#include "EntityBlockDisplay.h"
-#include "EntityBlockFileWriter.h"
-#include "EntityBlockStorage.h"
+#include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
+#include "OTBlockEntities/Pipeline/EntityBlockPython.h"
+#include "OTBlockEntities/Pipeline/EntityBlockDisplay.h"
+#include "OTBlockEntities/Pipeline/EntityBlockFileWriter.h"
+#include "OTBlockEntities/Pipeline/EntityBlockStorage.h"
 
 #include "BlockHandlerDatabaseAccess.h"
 #include "BlockHandlerPython.h"

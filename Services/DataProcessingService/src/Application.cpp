@@ -38,7 +38,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTModelEntities/EntityAPI.h"
-#include "Helper.h"
+#include "OTBlockEntities/BlockHelper.h"
 
 #include "OTModelEntities/EntitySolverDataProcessing.h"
 
@@ -103,7 +103,7 @@ void Application::runPipeline()
 				}
 				auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
 				auto allConnectionEntities = _blockEntityHandler.findAllEntityBlockConnections(folderName);
-				std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntities, allBlockEntities);
+				std::map<ot::UID, ot::UIDList> connectionBlockMap = BlockHelper::buildMap(allConnectionEntities, allBlockEntities);
 				const bool isValid = _graphHandler.blockDiagramIsValid(allConnectionEntities, allBlockEntities, connectionBlockMap);
 
 				if (isValid)

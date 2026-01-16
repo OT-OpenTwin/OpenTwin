@@ -24,7 +24,7 @@
 #include "OTGui/CopyInformation.h"
 #include "Application.h"
 #include "Model.h"
-#include "EntityBlock.h"
+#include "OTBlockEntities/EntityBlock.h"
 #include "OTCore/ReturnMessage.h"
 #include "SelectionHandler.h"
 

@@ -34,13 +34,13 @@
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 #include "OTCommunication/ActionTypes.h"
-#include "EntityBlock.h"
-#include "EntityBlockConnection.h"
-#include "EntityBlockPython.h"
+#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
+#include "OTBlockEntities/Pipeline/EntityBlockPython.h"
 #include "OTModelEntities/PropertyHelper.h"
 #include "OTModelEntities/EntityGraphicsScene.h"
-#include "EntityBlockCircuitElement.h"
-#include "EntityBlockCircuitConnector.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitConnector.h"
 
 void BlockHandler::processEntity(EntityBase* _entBase) {
 	if (_entBase == nullptr) {

@@ -32,7 +32,7 @@ REM ############################################################################
 REM LIBRARIES
 
 ECHO ===============================================================
-ECHO Clean Library: BlockEntities
+ECHO Clean Library: OTBlockEntities
 ECHO ===============================================================
 CALL "%OT_BLOCKENTITIES_ROOT%\Clean.bat"
 

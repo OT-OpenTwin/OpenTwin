@@ -19,7 +19,7 @@
 
 #pragma once
 #include "BlockHandler.h"
-#include "EntityBlockFileWriter.h"
+#include "OTBlockEntities/Pipeline/EntityBlockFileWriter.h"
 #include <sstream>
 
 class BlockHandlerFileWriter : public BlockHandler

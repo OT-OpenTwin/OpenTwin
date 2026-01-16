@@ -27,6 +27,7 @@
 #include "OTGui/FileExtension.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/ModelState.h"
 #include "OTModelEntities/NewModelStateInfo.h"
@@ -36,12 +37,14 @@
 #include "OTModelEntities/EntityFileImage.h"
 #include "OTModelEntities/EntityFileRawData.h"
 #include "OTModelEntities/EntityGraphicsScene.h"
-#include "EntityBlockImage.h"
-#include "EntityBlockDecoLabel.h"
-#include "EntityBlockConnection.h"
-#include "EntityBlockHierarchicalProjectItem.h"
-#include "EntityBlockHierarchicalDocumentItem.h"
-#include "EntityBlockHierarchicalContainerItem.h"
+
+#include "OTBlockEntities/EntityBlockConnection.h"
+#include "OTBlockEntities/Deco/EntityBlockImage.h"
+#include "OTBlockEntities/Deco/EntityBlockDecoLabel.h"
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalProjectItem.h"
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalDocumentItem.h"
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalContainerItem.h"
+
 #include "OTServiceFoundation/Encryption.h"
 
 EntityHandler::EntityHandler(const std::string& _rootFolderPath) :

@@ -28,8 +28,8 @@
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTModelEntities/NewModelStateInfo.h"
-#include "EntityBlockHierarchicalProjectItem.h"
-#include "EntityBlockHierarchicalDocumentItem.h"
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalProjectItem.h"
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalDocumentItem.h"
 
 class EntityHandler : public BusinessLogicHandler {
 public:

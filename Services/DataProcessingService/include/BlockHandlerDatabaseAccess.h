@@ -19,13 +19,13 @@
 
 #pragma once
 #include "BlockHandler.h"
-#include "EntityBlockDatabaseAccess.h"
 #include "MetadataCampaign.h"
 #include "MetadataParameter.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "ResultCollectionMetadataAccess.h"
 #include "OTDataStorage/ResultDataStorageAPI.h"
 #include "OTCore/StringToVariableConverter.h"
+#include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
 
 class BlockHandlerDatabaseAccess : public BlockHandler
 {

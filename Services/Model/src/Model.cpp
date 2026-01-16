@@ -58,7 +58,7 @@
 
 #include "EntityGeometry.h"
 #include "EntityFaceAnnotation.h"
-#include "EntityBlockConnection.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
 
 #include "MicroserviceNotifier.h"
 #include "GeometryOperations.h"
@@ -104,7 +104,7 @@
 
 #include "tinyexpr.h"
 
-#include "EntityBlock.h"
+#include "OTBlockEntities/EntityBlock.h"
 #include "MetadataEntityInterface.h"
 
 

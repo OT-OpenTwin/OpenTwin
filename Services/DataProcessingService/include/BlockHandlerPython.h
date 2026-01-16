@@ -19,7 +19,7 @@
 
 #pragma once
 #include "BlockHandler.h"
-#include "EntityBlockPython.h"
+#include "OTBlockEntities/Pipeline/EntityBlockPython.h"
 #include "OTServiceFoundation/PythonServiceInterface.h"
 
 class BlockHandlerPython : public BlockHandler

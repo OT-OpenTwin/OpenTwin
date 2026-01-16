@@ -26,8 +26,8 @@
 #include "OTModelEntities/IVisualisationPlot1D.h"
 #include "OTModelEntities/IVisualisationCurve.h"
 #include "OTModelEntities/IVisualisationGraphicsView.h"
-#include "EntityBlock.h"
-#include "EntityBlockConnection.h"
+#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
 #include "OTCore/RuntimeTests.h"
 
 

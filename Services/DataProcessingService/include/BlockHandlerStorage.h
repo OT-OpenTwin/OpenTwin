@@ -19,7 +19,7 @@
 
 #pragma once
 #include "BlockHandler.h"
-#include "EntityBlockStorage.h"
+#include "OTBlockEntities/Pipeline/EntityBlockStorage.h"
 #include "ResultCollectionExtender.h"
 #include "MetadataParameter.h"
 

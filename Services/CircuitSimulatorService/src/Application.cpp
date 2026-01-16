@@ -44,13 +44,13 @@
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/EntitySolverCircuitSimulator.h"
-#include "EntityBlockConnection.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityGraphicsScene.h"
 #include "OTCore/EntityName.h"
-#include "Helper.h"
+#include "OTBlockEntities/BlockHelper.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
 
 // Third Party Header
 #include <ngspice/sharedspice.h>
@@ -347,7 +347,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	}
 
 	// Now we get the blockConnectionMap from helper in BlockEntities
-	std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntitiesByID,allEntitiesByBlockID);
+	std::map<ot::UID, ot::UIDList> connectionBlockMap = BlockHelper::buildMap(allConnectionEntitiesByID,allEntitiesByBlockID);
 	if (connectionBlockMap.empty()) {
 		OT_LOG_E("No valid connections found in " + name);
 		finishFailedSimulation();

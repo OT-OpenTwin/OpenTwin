@@ -37,7 +37,7 @@
 #include "OTModelEntities/EntityFileText.h"
 #include "OTModelEntities/EntityResultTextData.h"
 #include "OTModelEntities/EntityBinaryData.h"
-#include "EntityBlock.h"
+#include "OTBlockEntities/EntityBlock.h"
 
 
 

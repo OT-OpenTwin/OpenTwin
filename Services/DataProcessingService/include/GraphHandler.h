@@ -20,8 +20,8 @@
 #pragma once
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTCore/FolderNames.h"
-#include "EntityBlock.h"
-#include "EntityBlockConnection.h"
+#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
 #include "Graph.h"
 
 #include<map>

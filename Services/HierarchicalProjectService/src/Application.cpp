@@ -58,8 +58,8 @@
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/EntityFileRawData.h"
 #include "OTModelEntities/EntityGraphicsScene.h"
-#include "EntityBlockHierarchicalProjectItem.h"
-#include "EntityBlockHierarchicalDocumentItem.h"
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalProjectItem.h"
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalDocumentItem.h"
 
 // DataBase
 #include "OTDataStorage/DocumentAPI.h"

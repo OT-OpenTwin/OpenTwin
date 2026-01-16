@@ -20,7 +20,7 @@
 #pragma once
 
 #include "OTCore/CoreTypes.h"
-#include "EntityBlockDatabaseAccess.h"
+#include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
 #include "MetadataCampaign.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "ResultCollectionMetadataAccess.h"

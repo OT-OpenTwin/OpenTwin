@@ -164,7 +164,7 @@ ECHO ===============================================================
 CALL "%OT_CADMODELENTITIES_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: BlockEntities
+ECHO Build Library: OTBlockEntities
 ECHO ===============================================================
 CALL "%OT_BLOCKENTITIES_ROOT%\build.bat" %1 %2
 

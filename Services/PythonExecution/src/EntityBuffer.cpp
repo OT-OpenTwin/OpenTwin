@@ -27,7 +27,7 @@
 #include "OTModelEntities/IVisualisationTable.h"
 #include "OTModelEntities/EntityTableSelectedRanges.h"
 
-#include "EntityBlock.h"
+#include "OTBlockEntities/EntityBlock.h"
 
 EntityBuffer& EntityBuffer::instance() {
 	static EntityBuffer g_instance;

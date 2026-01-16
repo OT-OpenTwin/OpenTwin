@@ -17,22 +17,23 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTModelEntities/EntityAPI.h"
+#include "Application.h"
 #include "BlockEntityHandler.h"
-#include "EntityBlockDatabaseAccess.h"
+
 #include "OTCore/ComparisionSymbols.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-
-#include "Application.h"
-#include "EntityBlockPython.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
-#include "EntityBlockStorage.h"
-#include "EntityBlockConnection.h"
-#include "EntityBlockDisplay.h"
-#include "EntityBlockFileWriter.h"
-#include "BlockImageNames.h"
+
+#include "OTBlockEntities/BlockImageNames.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
+#include "OTBlockEntities/Pipeline/EntityBlockPython.h"
+#include "OTBlockEntities/Pipeline/EntityBlockStorage.h"
+#include "OTBlockEntities/Pipeline/EntityBlockDisplay.h"
+#include "OTBlockEntities/Pipeline/EntityBlockFileWriter.h"
+#include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
 
 void BlockEntityHandler::createBlockPicker()
 {
