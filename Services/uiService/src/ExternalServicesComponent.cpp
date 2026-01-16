@@ -28,6 +28,7 @@
 #include "ShortcutManager.h"
 #include "WebsocketClient.h"
 #include "ProjectManagement.h"
+#include "NavigationTreeView.h"
 #include "StartArgumentParser.h"
 #include "SelectProjectDialog.h"
 #include "SelectEntitiesDialog.h"
@@ -119,6 +120,7 @@
 // uiCore header
 #include <akAPI/uiAPI.h>
 #include <akCore/akCore.h>
+#include "akWidgets/aTreeWidget.h"
 
 // Qt header
 #include <QtCore/qdir.h>						// QDir
@@ -2138,10 +2140,7 @@ void ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocument& _d
 		AppBase::instance()->restoreSessionState();
 
 		// Apply initial selection
-		for (const InitialSelectionInfo& info : m_initialSelection) {
-			AppBase::instance()->setNavigationTreeItemsSelected(info.treeIDs, info.selected, info.clearSelection);
-		}
-		m_initialSelection.clear();
+		applyInitialSelection();
 
 		QMetaObject::invokeMethod(AppBase::instance(), &AppBase::servicesUiSetupCompleted, Qt::QueuedConnection);
 	}
@@ -3096,15 +3095,13 @@ void ExternalServicesComponent::handleSetEntitySelected(ot::JsonDocument& _docum
 	}
 
 	if (!treeIDs.empty()) {
+		InitialSelectionInfo info;
+		info.clearSelection = clearSelection;
+		info.treeIDs = std::move(treeIDs);
+		m_initialSelection.push_back(std::move(info));
+
 		if (getAllServicesCompletedSetup()) {
-			AppBase::instance()->setNavigationTreeItemsSelected(treeIDs, selected, clearSelection);
-		}
-		else {
-			InitialSelectionInfo info;
-			info.clearSelection = clearSelection;
-			info.selected = selected;
-			info.treeIDs = std::move(treeIDs);
-			m_initialSelection.push_back(std::move(info));
+			applyInitialSelection();
 		}
 	}
 }
@@ -4343,6 +4340,37 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		OT_LOG_WAS(response);
 	}
+}
+
+void ExternalServicesComponent::applyInitialSelection() {
+	if (m_initialSelection.empty()) {
+		return;
+	}
+	else {
+		InitialSelectionInfo mergedSelection;
+		
+		bool clearSelection = false;
+
+		for (const InitialSelectionInfo& info : m_initialSelection) {
+			if (info.clearSelection) {
+				clearSelection = true;
+			}
+			for (ot::UID id : info.treeIDs) {
+				if (std::find(mergedSelection.treeIDs.begin(), mergedSelection.treeIDs.end(), id) == mergedSelection.treeIDs.end()) {
+					mergedSelection.treeIDs.push_back(id);
+				}
+			}
+		}
+		mergedSelection.clearSelection = clearSelection;
+
+		if (mergedSelection.treeIDs.empty()) {
+			return;
+		}
+
+		AppBase::instance()->setNavigationTreeItemsSelected(mergedSelection.treeIDs, true, mergedSelection.clearSelection);
+		m_initialSelection.clear();
+	}
+	
 }
 
 void ExternalServicesComponent::actionDispatchTimeout(const ot::JsonDocument& _document) {

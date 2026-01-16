@@ -106,21 +106,21 @@ public:
 	virtual bool updateFromProperties();
 
 	void setModelState(ModelState *ms) { m_modelState = ms; };
-	ModelState *getModelState() { return m_modelState; };
+	ModelState *getModelState() const { return m_modelState; };
 
 	EntityBase *getParent() { return m_parentEntity; };
 	void setParent(EntityBase *parent) { m_parentEntity = parent; };  // The parent information is not persistent. Changing it therefore does not set the modified flag for the entity.
 
 	void setObserver(EntityObserver *obs) { m_observer = obs; };
-	EntityObserver *getObserver() { return m_observer; };
+	EntityObserver *getObserver() const { return m_observer; };
 
 	EntityProperties& getProperties() { return m_properties; };
 	const EntityProperties& getProperties() const { return m_properties; };
 
 	virtual EntityBase *getEntityFromName(const std::string& _name) { return (m_treeItem.getEntityName() == _name ? this : nullptr); };
 
-	virtual bool considerForPropertyFilter() { return true; };
-	virtual bool considerChildrenForPropertyFilter() { return true; };
+	virtual bool considerForPropertyFilter() const { return true; };
+	virtual bool considerChildrenForPropertyFilter() const { return true; };
 
 	virtual void storeToDataBase();
 	virtual void storeToDataBase(ot::UID _givenEntityVersion);

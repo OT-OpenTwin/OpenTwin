@@ -37,8 +37,8 @@ public:
 	EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityMeshTetData();
 
-	virtual bool considerForPropertyFilter(void) override { return true; };
-	virtual bool considerChildrenForPropertyFilter(void) override { return false; };
+	virtual bool considerForPropertyFilter(void) const override { return true; };
+	virtual bool considerChildrenForPropertyFilter(void) const override { return false; };
 
 	virtual bool updateFromProperties(void) override;
 

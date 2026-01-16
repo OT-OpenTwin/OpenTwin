@@ -29,7 +29,7 @@ static EntityFactoryRegistrar<EntityBlockConnection> registrar(EntityBlockConnec
 
 EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBase(ID, parent, obs, ms), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)),
-	_blockIDOrigin(-1), _blockIDDestination(-1)
+	m_blockIDOrigin(ot::invalidUID), m_blockIDDestination(ot::invalidUID)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/connection");
@@ -48,23 +48,23 @@ EntityBlockConnection::~EntityBlockConnection()
 
 }
 
-ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
+ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg() const
 {
-	ot::GraphicsConnectionCfg cfg(_blockIDOrigin, _connectorNameOrigin, _blockIDDestination, _connectorNameDestination);
+	ot::GraphicsConnectionCfg cfg(m_blockIDOrigin, m_connectorNameOrigin, m_blockIDDestination, m_connectorNameDestination);
 	ot::PenFCfg outlineCfg;
 
-	EntityPropertiesGuiPainter* painterProperty = dynamic_cast<EntityPropertiesGuiPainter*>(this->getProperties().getProperty("Line Painter"));
+	const EntityPropertiesGuiPainter* painterProperty = dynamic_cast<const EntityPropertiesGuiPainter*>(this->getProperties().getProperty("Line Painter"));
 	outlineCfg.setPainter(painterProperty->getValue()->createCopy());
 	
-	auto lineWidthProperty = dynamic_cast<EntityPropertiesDouble*>(this->getProperties().getProperty("Line Width"));
+	const EntityPropertiesDouble* lineWidthProperty = dynamic_cast<const EntityPropertiesDouble*>(this->getProperties().getProperty("Line Width"));
 	outlineCfg.setWidth(lineWidthProperty->getValue());
 
-	auto lineStyleProperty = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Style"));
+	const EntityPropertiesSelection* lineStyleProperty = dynamic_cast<const EntityPropertiesSelection*>(this->getProperties().getProperty("Line Style"));
 	outlineCfg.setStyle(ot::stringToLineStyle(lineStyleProperty->getValue()));
 
 	cfg.setLineStyle(outlineCfg);
 
-	auto lineShapeProperty = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
+	const EntityPropertiesSelection* lineShapeProperty = dynamic_cast<const EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
 	cfg.setLineShape(ot::GraphicsConnectionCfg::stringToShape(lineShapeProperty->getValue()));
 
 	cfg.setDestPos(m_destPos);
@@ -77,23 +77,28 @@ ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
 void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg)
 {
 	EntityPropertiesGuiPainter* color = dynamic_cast<EntityPropertiesGuiPainter*>(this->getProperties().getProperty("Line Painter"));
+	OTAssertNullptr(color);
 	color->setValue(connectionCfg.getLineStyle().getPainter()->createCopy());
 
 	EntityPropertiesDouble* lineWidth = dynamic_cast<EntityPropertiesDouble*>(this->getProperties().getProperty("Line Width"));
+	OTAssertNullptr(lineWidth);
 	lineWidth->setValue(connectionCfg.getLineStyle().getWidth());
 
 	EntityPropertiesSelection* lineStyle = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Style"));
+	OTAssertNullptr(lineStyle);
 	lineStyle->setValue(ot::toString(connectionCfg.getLineStyle().getStyle()));
 	
 	EntityPropertiesSelection* lineShape = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
+	OTAssertNullptr(lineShape);
 	lineShape->setValue(ot::GraphicsConnectionCfg::shapeToString(connectionCfg.getLineShape()));
 
-	_blockIDOrigin = connectionCfg.getOriginUid();
-	_blockIDDestination = connectionCfg.getDestinationUid();
-	_connectorNameDestination = connectionCfg.getDestConnectable();
-	_connectorNameOrigin = connectionCfg.getOriginConnectable();
+	m_blockIDOrigin = connectionCfg.getOriginUid();
+	m_blockIDDestination = connectionCfg.getDestinationUid();
+	m_connectorNameDestination = connectionCfg.getDestConnectable();
+	m_connectorNameOrigin = connectionCfg.getOriginConnectable();
 	m_originPos = connectionCfg.getOriginPos();
 	m_destPos = connectionCfg.getDestPos();
+
 	setModified();
 }
 
@@ -104,8 +109,16 @@ void EntityBlockConnection::setGraphicsPickerKey(const std::string& _key) {
 	}
 }
 
-void EntityBlockConnection::CreateConnections()
-{
+void EntityBlockConnection::setLineShape(ot::GraphicsConnectionCfg::ConnectionShape _shape) {
+	if (m_lineShape != _shape) {
+		m_lineShape = _shape;
+		setModified();
+	}
+}
+
+void EntityBlockConnection::createConnectionItem() const {
+	OTAssertNullptr(getObserver());
+
 	const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
 	
 	ot::GraphicsConnectionPackage connectionPckg(graphicsSceneName);
@@ -146,29 +159,27 @@ void EntityBlockConnection::createProperties()
 
 bool EntityBlockConnection::updateFromProperties()
 {
-	CreateConnections();
+	createConnectionItem();
 	getProperties().forceResetUpdateForAllProperties();
 	return true;
 }
 
-
 void EntityBlockConnection::addVisualizationNodes(void)
 {
-	CreateNavigationTreeEntry();
-	CreateConnections();
+	createNavigationTreeEntry();
+	//createConnectionItem();
 }
 
+void EntityBlockConnection::createNavigationTreeEntry() {
+	OTAssertNullptr(getObserver());
 
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
 
-void EntityBlockConnection::CreateNavigationTreeEntry()
-{
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-		
-		doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
-		getObserver()->sendMessageToViewer(doc);
+	getObserver()->sendMessageToViewer(doc);
 }
 
 void EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document& storage)
@@ -183,10 +194,10 @@ void EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document& st
 	   bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName),
 		bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_pickerKey),
 
-		bsoncxx::builder::basic::kvp("FromConnectable", _connectorNameOrigin),
-		bsoncxx::builder::basic::kvp("ToConnectable", _connectorNameDestination),
-		bsoncxx::builder::basic::kvp("FromUID", static_cast<int64_t>(_blockIDOrigin)),
-		bsoncxx::builder::basic::kvp("ToUID", static_cast<int64_t>(_blockIDDestination)),
+		bsoncxx::builder::basic::kvp("FromConnectable", m_connectorNameOrigin),
+		bsoncxx::builder::basic::kvp("ToConnectable", m_connectorNameDestination),
+		bsoncxx::builder::basic::kvp("FromUID", static_cast<int64_t>(m_blockIDOrigin)),
+		bsoncxx::builder::basic::kvp("ToUID", static_cast<int64_t>(m_blockIDDestination)),
 		bsoncxx::builder::basic::kvp("OriginPosX", m_originPos.x()),
 		bsoncxx::builder::basic::kvp("OriginPosY", m_originPos.y()),
 		bsoncxx::builder::basic::kvp("DestinationPosX", m_destPos.x()),
@@ -202,10 +213,10 @@ void EntityBlockConnection::readSpecificDataFromDataBase(const bsoncxx::document
 	//Now we read the information about the ConnectionCfg
 	m_graphicsScenePackageChildName = std::string(doc_view["GraphicPackageChildName"].get_string().value.data());
 	
-	_connectorNameOrigin = std::string(doc_view["FromConnectable"].get_string().value.data());
-	_connectorNameDestination = std::string(doc_view["ToConnectable"].get_string().value.data());
-	_blockIDOrigin = static_cast<ot::UID>(doc_view["FromUID"].get_int64());
-	_blockIDDestination = static_cast<ot::UID>(doc_view["ToUID"].get_int64());
+	m_connectorNameOrigin = std::string(doc_view["FromConnectable"].get_string().value.data());
+	m_connectorNameDestination = std::string(doc_view["ToConnectable"].get_string().value.data());
+	m_blockIDOrigin = static_cast<ot::UID>(doc_view["FromUID"].get_int64());
+	m_blockIDDestination = static_cast<ot::UID>(doc_view["ToUID"].get_int64());
 
 	double originX = 0.0;
 	double originY = 0.0;

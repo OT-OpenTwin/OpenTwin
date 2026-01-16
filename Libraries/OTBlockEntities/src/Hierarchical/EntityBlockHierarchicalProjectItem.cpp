@@ -111,8 +111,6 @@ void EntityBlockHierarchicalProjectItem::addVisualizationNodes() {
 	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
-
-	this->createBlockItem();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

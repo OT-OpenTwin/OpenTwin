@@ -282,7 +282,7 @@ void ViewVisualisationHandler::setupGraphicsScene(EntityBase* _container)
 				EntityBlockConnection* connection = dynamic_cast<EntityBlockConnection*>(child);
 				if (connection != nullptr)
 				{
-					connection->CreateConnections();
+					connection->createConnectionItem();
 				}
 				else
 				{

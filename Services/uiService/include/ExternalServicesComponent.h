@@ -472,6 +472,8 @@ private:
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
+	void applyInitialSelection();
+
 	void actionDispatchTimeout(const ot::JsonDocument& _document);
 	void actionDispatchTimeout(const std::string& _action);
 
@@ -497,7 +499,6 @@ private:
 
 	struct InitialSelectionInfo {
 		ot::UIDList		treeIDs;
-		bool			selected;
 		bool			clearSelection;
 	};
 	std::list<InitialSelectionInfo>                 m_initialSelection;

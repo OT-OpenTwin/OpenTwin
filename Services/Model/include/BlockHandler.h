@@ -41,13 +41,9 @@ public:
 	//Fill map function
 	void processEntity(EntityBase* entBase);
 
-	// Getter
-	const std::map<ot::UID, ot::UIDList>& getBlocksForEditor(ot::UID editorId) const;
-	ot::UIDList& getConnections(ot::UID editorId, ot::UID blockId);
-
 	// Setter
-	void addConnection(ot::UID editorId, EntityBlockConnection& _toBeAddedConnection);
-	void addBlock(ot::UID editorId, const EntityBlock* _block);
+	void addConnection(ot::UID _editorId, const EntityBlockConnection& _toBeAddedConnection);
+	void addBlock(ot::UID _editorId, const EntityBlock* _block);
 	void addEditor(const EntityGraphicsScene* _editor);
 
 	// Remover
@@ -119,7 +115,7 @@ private:
 	//! @param _originBlock The block from which the connection originates.
 	//! @param _connectionNaming The naming convention for the requested connection.
 	//! @return void 
-	void createConnection(EntityGraphicsScene* scene, EntityBlock* _originBlock, ot::GraphicsConnectionCfg& _requestedConnection,  EntityNamingBehavior& _connectionNaming, ot::NewModelStateInfo& _newModelStateInfo);
+	std::unique_ptr<EntityBlockConnection> createConnection(EntityGraphicsScene* scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _requestedConnection,  EntityNamingBehavior& _connectionNaming, ot::NewModelStateInfo& _newModelStateInfo);
 
 	//! @brief Modifies the connection information for a given entity.
 	//! @param _connectionID Connection ID of the connection to be modified.
@@ -132,6 +128,9 @@ private:
 	//! @param _snapEvent The snap event containing details about the snapping action.
 	//! @return True if the snapping was handled successfully, false otherwise.
 	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::GraphicsConnectionCfg& _connectionCfg , std::set<EntityBlockConnection*>& _processedConnections);
+
+	std::map<ot::UID, ot::UIDList>& getOrCreateBlockMap(ot::UID _editorId);
+	ot::UIDList& getOrCreateConnectionList(ot::UID& _editorId, ot::UID& _blockId);
 
 	//! @brief Maps scenes to a map of blocks and their connections.
 	std::map<ot::UID, std::map<ot::UID, ot::UIDList>> m_viewBlockConnectionsMap;

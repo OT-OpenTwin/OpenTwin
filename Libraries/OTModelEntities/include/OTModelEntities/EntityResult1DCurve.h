@@ -59,8 +59,8 @@ public:
 
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 	virtual int getSchemaVersion() override { return 2; };
-	virtual bool considerForPropertyFilter() override { return true; };
-	virtual bool considerChildrenForPropertyFilter() override { return false; };
+	virtual bool considerForPropertyFilter() const override { return true; };
+	virtual bool considerChildrenForPropertyFilter() const override { return false; };
 	virtual entityType getEntityType() const override { return TOPOLOGY; };
 
 	virtual void addVisualizationNodes() override;

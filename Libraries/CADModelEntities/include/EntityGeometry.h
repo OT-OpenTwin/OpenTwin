@@ -87,8 +87,8 @@ public:
 
 	double evaluateExpressionDouble(const std::string &expr);
 
-	virtual bool considerForPropertyFilter(void) override { return true; };
-	virtual bool considerChildrenForPropertyFilter(void) override { return false; };
+	virtual bool considerForPropertyFilter(void) const override { return true; };
+	virtual bool considerChildrenForPropertyFilter(void) const override { return false; };
 
 	bool isTextureReflective(const std::string textureType);
 

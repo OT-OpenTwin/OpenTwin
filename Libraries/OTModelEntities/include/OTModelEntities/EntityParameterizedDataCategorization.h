@@ -33,8 +33,8 @@ public:
 	virtual std::string getClassName(void) const override { return "EntityParameterizedDataCategorization"; };
 	virtual void addVisualizationNodes() override;
 	
-	virtual bool considerForPropertyFilter(void) override { return true; };
-	virtual bool considerChildrenForPropertyFilter(void) override { return false; };
+	virtual bool considerForPropertyFilter(void) const override { return true; };
+	virtual bool considerChildrenForPropertyFilter(void) const override { return false; };
 
 	void CreateProperties(DataCategorie categorie);
 	DataCategorie GetSelectedDataCategorie() { return m_selectedCategory; };

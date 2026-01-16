@@ -38,8 +38,8 @@ public:
 
 	virtual bool updateFromProperties(void) override;
 
-	virtual bool considerForPropertyFilter(void) override { return true; };
-	virtual bool considerChildrenForPropertyFilter(void) override { return false; };
+	virtual bool considerForPropertyFilter(void) const override { return true; };
+	virtual bool considerChildrenForPropertyFilter(void) const override { return false; };
 
 	EntityMeshCartesianData *getMeshData(void);
 

@@ -31,8 +31,8 @@ public:
 
 	bool getEntityBox(double& _xmin, double& _xmax, double& _ymin, double& _ymax, double& _zmin, double& _zmax) override { return false; };
 	entityType getEntityType(void) const override { return entityType::TOPOLOGY; };
-	virtual bool considerForPropertyFilter(void) override { return true; };
-	virtual bool considerChildrenForPropertyFilter(void) override { return false; };
+	virtual bool considerForPropertyFilter(void) const override { return true; };
+	virtual bool considerChildrenForPropertyFilter(void) const override { return false; };
 	virtual void storeToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
 	virtual std::string getClassName(void) const override { return "EntityResult1DPlot"; };

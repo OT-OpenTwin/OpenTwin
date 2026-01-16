@@ -52,8 +52,8 @@ public:
 
 	virtual EntityBase *getEntityFromName(const std::string &n) override;
 
-	virtual bool considerForPropertyFilter(void) override { return false; };
-	virtual bool considerChildrenForPropertyFilter(void) override { return true; };
+	virtual bool considerForPropertyFilter(void) const override { return false; };
+	virtual bool considerChildrenForPropertyFilter(void) const override { return true; };
 
 	virtual void storeToDataBase(void) override;
 

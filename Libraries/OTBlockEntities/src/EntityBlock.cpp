@@ -241,8 +241,13 @@ void EntityBlock::createBlockItem()
 {
 	std::map<ot::UID, EntityBase*> entityMap;
 	EntityBase* entBase = readEntityFromEntityID(this, m_coordinate2DEntityID, entityMap);
-	if (entBase == nullptr) { throw std::exception("EntityBlock failed to load coordinate entity."); }
-	if (entBase->getObserver() != nullptr) { entBase->setObserver(nullptr); }
+	if (entBase == nullptr) {
+		throw std::exception("EntityBlock failed to load coordinate entity.");
+	}
+	if (entBase->getObserver() != nullptr) {
+		entBase->setObserver(nullptr);
+	}
+
 	std::unique_ptr<EntityCoordinates2D> entCoordinate(dynamic_cast<EntityCoordinates2D*>(entBase));
 	assert(entCoordinate != nullptr);
 

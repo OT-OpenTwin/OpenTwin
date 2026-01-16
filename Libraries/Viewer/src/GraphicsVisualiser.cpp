@@ -62,6 +62,7 @@ bool GraphicsVisualiser::requestVisualization(const VisualiserState& _state, ot:
 		}
 
 		if (isSingle) {
+			OT_LOG_T("Vis");
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
 			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getVisualizationEntity(), doc.GetAllocator());

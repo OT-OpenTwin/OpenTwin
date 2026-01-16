@@ -35,16 +35,22 @@ public:
 	virtual std::string getClassName(void) const override { return EntityBlockConnection::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
-	ot::GraphicsConnectionCfg getConnectionCfg();
 	void setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg);
+	ot::GraphicsConnectionCfg getConnectionCfg() const;
 	
 	void setGraphicsPickerKey(const std::string& _key);
 	const std::string& getGraphicsPickerKey() const { return m_pickerKey; };
 
+	void setLineShape(ot::GraphicsConnectionCfg::ConnectionShape _shape);
+	ot::GraphicsConnectionCfg::ConnectionShape getLineShape() const { return m_lineShape; };
+
 	//! @brief The name of the container below the graphics editor. This name need not be editable. 
 	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
 	void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
-	void CreateConnections();
+
+	//! @brief Create the connection in the graphics scene.
+	//! @note Requires that an observer is set that is able to send messages to the viewer.
+	void createConnectionItem() const;
 
 	void createProperties();
 	virtual bool updateFromProperties() override;
@@ -52,19 +58,19 @@ public:
 	virtual int getSchemaVersion(void) override { return 1; };
 
 private:
-	ot::GraphicsConnectionCfg::ConnectionShape _lineShape = ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
+	ot::GraphicsConnectionCfg::ConnectionShape m_lineShape = ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
 	ot::PenFCfg m_lineStyle;
 
 	std::string m_pickerKey;
 	std::string	m_graphicsScenePackageChildName = "";
-	ot::UID _blockIDOrigin;
-	ot::UID _blockIDDestination;
-	std::string _connectorNameOrigin;
-	std::string _connectorNameDestination;
+	ot::UID m_blockIDOrigin;
+	ot::UID m_blockIDDestination;
+	std::string m_connectorNameOrigin;
+	std::string m_connectorNameDestination;
 	ot::Point2DD m_originPos;
 	ot::Point2DD m_destPos;
 
-	void CreateNavigationTreeEntry();
+	void createNavigationTreeEntry();
 	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 };
