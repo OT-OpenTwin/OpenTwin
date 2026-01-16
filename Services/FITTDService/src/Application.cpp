@@ -26,17 +26,17 @@
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "EntityInformation.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityInformation.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/EntitySolverFITTD.h"
+#include "OTModelEntities/EntitySolverMonitor.h"
+#include "OTModelEntities/EntitySolverPort.h"
+#include "OTModelEntities/EntitySignalType.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/DataBase.h"
 
 // Application specific includes
-#include "EntitySolverFITTD.h"
-#include "EntitySolverMonitor.h"
-#include "EntitySolverPort.h"
-#include "EntitySignalType.h"
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
 #include "FolderNames.h"
 
 #include <thread>

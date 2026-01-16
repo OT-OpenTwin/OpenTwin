@@ -19,7 +19,7 @@
 
 #pragma once
 #include "OTCore/JSON/JSON.h"
-#include "EntityFile.h"
+#include "OTModelEntities/EntityFile.h"
 #include "Connector.h"
 #include <vector>
 class PythonHeaderInterpreter

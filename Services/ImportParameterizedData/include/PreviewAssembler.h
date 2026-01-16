@@ -18,10 +18,10 @@
 // @otlicense-end
 
 #pragma once
-#include "EntityParameterizedDataTable.h"
-#include "EntityParameterizedDataPreviewTable.h"
-#include "EntityTableSelectedRanges.h"
-#include "EntityResultTableData.h"
+#include "OTModelEntities/EntityParameterizedDataTable.h"
+#include "OTModelEntities/EntityParameterizedDataPreviewTable.h"
+#include "OTModelEntities/EntityTableSelectedRanges.h"
+#include "OTModelEntities/EntityResultTableData.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
 #include <memory>

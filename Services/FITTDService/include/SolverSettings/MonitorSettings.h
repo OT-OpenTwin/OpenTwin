@@ -22,7 +22,7 @@
 #include <string>
 #include <map>
 
-#include "EntitySolverMonitor.h"
+#include "OTModelEntities/EntitySolverMonitor.h"
 #include "Ports/SourceTarget.h"
 #include "PhysicalQuantities.h"
 

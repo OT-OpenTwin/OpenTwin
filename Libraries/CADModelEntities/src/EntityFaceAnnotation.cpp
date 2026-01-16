@@ -21,9 +21,9 @@
 #include "EntityFaceAnnotation.h"
 #include "EntityGeometry.h"
 #include "GeometryOperations.h"
-#include "EntityFacetData.h"
+#include "OTModelEntities/EntityFacetData.h"
 #include "EntityBrep.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 #include "OTCommunication/ActionTypes.h"
 

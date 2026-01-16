@@ -22,8 +22,8 @@
 
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/Logging/LogDispatcher.h"
-#include "PropertyHelper.h"
-#include "EntityProperties.h"
+#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/EntityProperties.h"
 
 #include "Excitation/ExcitationProperties.h"
 #include "Excitation/ExcitationBase.h"

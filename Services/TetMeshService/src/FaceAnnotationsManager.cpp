@@ -23,7 +23,7 @@
 
 #include "EntityFaceAnnotation.h"
 
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTServiceFoundation/ModelComponent.h"
 

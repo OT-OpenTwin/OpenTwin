@@ -25,7 +25,7 @@ namespace osg
 	class Switch;
 }
 
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 #include "SceneNodeBase.h"
 
 #include "OTCore/Color.h"

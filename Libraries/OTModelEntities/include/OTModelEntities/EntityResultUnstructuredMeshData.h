@@ -1,0 +1,75 @@
+// @otlicense
+// File: EntityResultUnstructuredMeshData.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+#pragma warning(disable : 4251)
+
+#include <list>
+
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/EntityResultBase.h"
+#include "OTModelEntities/EntityBinaryData.h"
+
+class __declspec(dllexport) EntityResultUnstructuredMeshData : public EntityBase, public EntityResultBase
+{
+public:
+	EntityResultUnstructuredMeshData() : EntityResultUnstructuredMeshData(0, nullptr, nullptr, nullptr) {};
+	EntityResultUnstructuredMeshData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
+	virtual ~EntityResultUnstructuredMeshData();
+	
+	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
+	
+	virtual std::string getClassName(void) const override { return "EntityResultUnstructuredMeshData"; };
+	
+	virtual entityType getEntityType(void) const override { return DATA;};
+
+	long long getNumberOfPoints(void) { return _numberPoints; };
+	long long getNumberOfCells(void) { return _numberCells; };
+
+	void getData(size_t& lenPointScalar, float*& pointScalar, size_t& lenPointVector, float*& pointVector, size_t& lenCellScalar, float*& cellScalar, size_t& lenCellVector, float*& cellVector);
+
+	// Please note that setting the data also transfers the ownership of the EntityBinaryData objects. The objects must not be deleted outside the EntityResultUnstructuredMesh.
+	void setData(long long numberPoints, long long numberCells, EntityBinaryData*& pointScalar, EntityBinaryData*& pointVector, EntityBinaryData*& cellScalar, EntityBinaryData*& cellVector);
+
+private:
+	
+	long long _numberPoints = 0;
+	long long _numberCells = 0;
+
+	EntityBinaryData* _pointScalar = nullptr;
+	EntityBinaryData* _pointVector = nullptr;
+	EntityBinaryData* _cellScalar = nullptr;
+	EntityBinaryData* _cellVector = nullptr;
+
+	long long _pointScalarID = -1;
+	long long _pointScalarVersion = -1;
+	long long _pointVectorID = -1;
+	long long _pointVectorVersion = -1;
+	long long _cellScalarID = -1;
+	long long _cellScalarVersion = -1;
+	long long _cellVectorID = -1;
+	long long _cellVectorVersion = -1;
+
+	void clearAllBinaryData(void);
+	void updateIDFromObjects(void);
+	void readData(EntityBinaryData* data, size_t& lenValues, float*& values);
+
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
+};

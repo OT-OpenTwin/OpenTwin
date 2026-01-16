@@ -20,19 +20,19 @@
 
 #include "GetDPLauncher.h"
 
-#include "DataBase.h"
 #include "Application.h"
 #include "SolverBase.h"
 #include "SolverElectrostatics.h"
 
-#include "EntityMeshTet.h"
-#include "EntityMeshTetData.h"
-#include "EntityBinaryData.h"
-#include "EntityProperties.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityMeshTet.h"
+#include "OTModelEntities/EntityMeshTetData.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/EntityProperties.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include <windows.h> // winapi

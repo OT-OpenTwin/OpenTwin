@@ -29,9 +29,9 @@
 #include "DataBuffer.h"
 
 #include "Application.h"
-#include "DataBase.h"
-#include "EntityBase.h"
 #include "OTDataStorage/DocumentAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityBase.h"
 
 #include "OTCore/TimeFormatter.h"
 #include "ExceptionRestartRequired.h"

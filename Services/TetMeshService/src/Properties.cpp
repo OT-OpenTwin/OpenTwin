@@ -19,7 +19,7 @@
 
 #include "Properties.h"
 
-#include "EntityMeshTet.h"
+#include "OTModelEntities/EntityMeshTet.h"
 
 #define _USE_MATH_DEFINES
 

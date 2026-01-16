@@ -154,7 +154,7 @@ ECHO ===============================================================
 CALL "%OT_DATASTORAGE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: ModelEntities
+ECHO Build Library: OTModelEntities
 ECHO ===============================================================
 CALL "%OT_MODELENTITIES_ROOT%\build.bat" %1 %2
 

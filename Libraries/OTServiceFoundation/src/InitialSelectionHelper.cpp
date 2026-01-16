@@ -24,7 +24,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/InitialSelectionHelper.h"
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
 
 ot::InitialSelectionHelper::InitialSelectionHelper()
 	: m_mode(Undefined), m_sessionOpenTimeout(5 * ot::msg::defaultTimeout), m_running(false) {

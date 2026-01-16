@@ -23,8 +23,8 @@
 #include <list>
 #include <map>
 
-#include "Geometry.h"
-#include "BoundingBox.h"
+#include "OTModelEntities/Geometry.h"
+#include "OTModelEntities/BoundingBox.h"
 
 class EntityBase;
 class EntityGeometry;

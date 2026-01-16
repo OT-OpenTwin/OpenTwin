@@ -24,10 +24,10 @@
 #include "MetadataEntityInterface.h"
 #include "OTCore/FolderNames.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "DataBase.h"
-#include "EntityAPI.h"
-#include "EntityMetadataCampaign.h"
-#include "EntityMetadataSeries.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityMetadataCampaign.h"
+#include "OTModelEntities/EntityMetadataSeries.h"
 
 ResultCollectionMetadataAccess::ResultCollectionMetadataAccess(const std::string& _collectionName, ot::components::ModelComponent* _modelComponent)
 	:m_modelComponent(_modelComponent), m_collectionName(_collectionName)

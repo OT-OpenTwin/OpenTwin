@@ -22,8 +22,8 @@
 #include "Application.h"
 #include "EntityCache.h"
 
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -63,7 +63,7 @@
 #include "TopOpeBRepBuild_Tools.hxx"
 
 #include "EntityGeometry.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool fixSmallFaces, bool sewFaces, bool makeSolids)
 {

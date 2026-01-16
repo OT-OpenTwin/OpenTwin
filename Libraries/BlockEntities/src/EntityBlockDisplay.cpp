@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "EntityBlockDisplay.h"
-#include "SharedResources.h"
+#include "BlockImageNames.h"
 
 static EntityFactoryRegistrar<EntityBlockDisplay> registrar(EntityBlockDisplay::className());
 
@@ -26,8 +26,8 @@ EntityBlockDisplay::EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObs
 	:EntityBlock(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
-	treeItem.setVisibleIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
-	treeItem.setHiddenIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
+	treeItem.setVisibleIcon(ot::BlockImageNames::getCornerImagePath() + getIconName());
+	treeItem.setHiddenIcon(ot::BlockImageNames::getCornerImagePath() + getIconName());
 	this->setDefaultTreeItem(treeItem);
 	
 	setBlockTitle("Display");
@@ -58,8 +58,8 @@ ot::GraphicsItemCfg* EntityBlockDisplay::createBlockCfg()
 	
 	const ot::Color colourTitle(ot::Yellow);
 	block.setTitleBackgroundGradientColor(colourTitle);
-	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameVis());
-	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
+	block.setLeftTitleCornerImagePath(ot::BlockImageNames::getCornerImagePath() + ot::BlockImageNames::getCornerImageNameVis());
+	block.setBackgroundImagePath(ot::BlockImageNames::getCornerImagePath() + getIconName());
 	addConnectors(block);
 
 	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();

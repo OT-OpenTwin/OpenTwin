@@ -68,7 +68,7 @@
 #include "ManipulatorBase.h"
 #include "TransformManipulator.h"
 
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "PlotManager.h"
 #include "OTDataStorage/DocumentAPI.h"
 #include "OTDataStorage/GridFSFileInfo.h"

@@ -20,7 +20,7 @@
 #include "VtkDriverGeneric.h"
 #include "DataSourceManager.h"
 #include "DataSourceManagerItem.h"
-#include "EntityVis2D3D.h"
+#include "OTModelEntities/EntityVis2D3D.h"
 
 #include <osg/StateSet>
 #include <osg/Node>

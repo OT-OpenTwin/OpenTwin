@@ -28,8 +28,8 @@
 
 #include "EntityGeometry.h"
 #include "EntityFaceAnnotation.h"
-#include "EntityMaterial.h"
-#include "EntityMesh.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/EntityMesh.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 

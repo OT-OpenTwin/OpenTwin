@@ -26,7 +26,6 @@
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/EncodingGuesser.h"
 
@@ -34,20 +33,21 @@
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 #include "OTDataStorage/Document/DocumentAccessBase.h"
 
-// Application specific includes
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
-#include "EntityResultText.h"
-#include "EntityUnits.h"
-#include "EntityMaterial.h"
-#include "EntityProperties.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityFile.h"
+#include "OTModelEntities/EntityUnits.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/EntityFileText.h"
+#include "OTModelEntities/EntityParameter.h"
+#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/EntityResultText.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 #include "EntityGeometry.h"
-#include "EntityFile.h"
-#include "EntityBinaryData.h"
-#include "EntityParameter.h"
-#include "EntityFileText.h"
-#include "EntityBinaryData.h"
 
+// Application specific includes
 #include "InfoFileManager.h"
 #include "Result1DManager.h"
 #include "ParametricResult1DManager.h"

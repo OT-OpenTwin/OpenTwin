@@ -19,7 +19,7 @@
 
 #include "PlotBuilder.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityResult1DPlot.h"
+#include "OTModelEntities/EntityResult1DPlot.h"
 
 #include "MetadataSeries.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"

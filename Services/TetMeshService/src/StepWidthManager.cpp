@@ -23,8 +23,8 @@
 #include "Properties.h"
 #include "ObjectManager.h"
 
-#include "BoundingBox.h"
-#include "EntityBase.h"
+#include "OTModelEntities/BoundingBox.h"
+#include "OTModelEntities/EntityBase.h"
 #include "GeometryOperations.h"
 
 #include "OTServiceFoundation/UiComponent.h"

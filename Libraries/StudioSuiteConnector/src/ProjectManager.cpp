@@ -26,9 +26,9 @@
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 #include "OTFrontendConnectorAPI/CommunicationAPI.h"
 
-#include "EntityBinaryData.h"
-#include "EntityFile.h"
-#include "DataBase.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/EntityFile.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTDataStorage/DocumentAPI.h"
 
 #include <filesystem>

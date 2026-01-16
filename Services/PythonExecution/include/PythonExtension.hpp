@@ -27,7 +27,7 @@
 #include "EntityBuffer.h"
 #include "DataBuffer.h"
 
-#include "EntityFile.h"
+#include "OTModelEntities/EntityFile.h"
 
 PyObject* PythonExtensions::OT_GetPropertyValue(PyObject* _self, PyObject* _args) 
 {

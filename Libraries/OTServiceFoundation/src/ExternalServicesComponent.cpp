@@ -40,7 +40,7 @@
 
 #include "OTServiceFoundation/MessageQueueHandler.h"
 
-#include <DataBase.h>
+#include "OTModelEntities/DataBase.h"
 
 // std header
 #include <exception>									// error handling

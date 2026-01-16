@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "MeshSlicer.h"
-#include "EntityFacetData.h"
+#include "OTModelEntities/EntityFacetData.h"
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Surface_mesh.h>

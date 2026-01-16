@@ -19,17 +19,19 @@
 
 #include "PythonInterpreterAPI.h"
 #include "Application.h"
-#include "EntityAPI.h"
 
 #include "PythonLoadedModules.h"
 #include "PythonModuleAPI.h"
 #include "EntityBuffer.h"
-#include "EntityFileText.h"
 #include "DataBuffer.h"
 #include "PackageHandler.h"
 
 #include "PackageHandler.h"
 #include "PredefinedEnvironments.h"
+
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityFileText.h"
+
 #include <thread>
 
 void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)

@@ -27,7 +27,7 @@
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "NewModelStateInfo.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 #include "EntityBlockHierarchicalProjectItem.h"
 #include "EntityBlockHierarchicalDocumentItem.h"
 

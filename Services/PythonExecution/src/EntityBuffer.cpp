@@ -19,13 +19,13 @@
 
 #include "EntityBuffer.h"
 #include "Application.h"
-#include "IVisualisationTable.h"
 
 #include "PropertyPythonObjectConverter.h"
 #include "PythonObjectBuilder.h"
-#include "EntityTableSelectedRanges.h"
 #include "OTGui/TableIndexSchemata.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/IVisualisationTable.h"
+#include "OTModelEntities/EntityTableSelectedRanges.h"
 
 #include "EntityBlock.h"
 

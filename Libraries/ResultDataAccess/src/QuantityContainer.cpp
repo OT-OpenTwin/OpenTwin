@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "QuantityContainer.h"
-#include "VariableToBSONConverter.h"
+#include "OTModelEntities/VariableToBSONConverter.h"
 #include "MetadataQuantity.h"
 #include "MetadataSeries.h"
 

@@ -32,28 +32,29 @@
 #include "MeshWriter.h"
 #include "PhysicalGroupsManager.h"
 
-#include "EntityMeshTet.h"
-#include "EntityMeshTetFace.h"
-#include "EntityMeshTetItem.h"
-#include "EntityMeshTetInfo.h"
-#include "EntityMeshTetData.h"
-#include "EntityMeshTetFaceData.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityMeshTet.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/EntityAnnotation.h"
+#include "OTModelEntities/EntityMeshTetFace.h"
+#include "OTModelEntities/EntityMeshTetItem.h"
+#include "OTModelEntities/EntityMeshTetInfo.h"
+#include "OTModelEntities/EntityMeshTetData.h"
+#include "OTModelEntities/EntityMeshTetFaceData.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+
 #include "EntityGeometry.h"
-#include "EntityAnnotation.h"
 #include "EntityFaceAnnotation.h"
-#include "EntityMaterial.h"
 #include "GeometryOperations.h"
 #include "SelfIntersectionCheck.h"
-#include "TemplateDefaultManager.h"
 #include "Application.h"
 
 #include <set>
 #include <cmath>
 #include <cassert>
-
-#include "TemplateDefaultManager.h"
-
-#include "DataBase.h"
 
 #include <gmsh.h_cwrap>
 
@@ -81,8 +82,6 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
-#include "EntityAPI.h"
-#include "OTModelAPI/ModelServiceAPI.h"
 
 GmshMeshCreation::GmshMeshCreation(Application *app) : 
 	application(app),

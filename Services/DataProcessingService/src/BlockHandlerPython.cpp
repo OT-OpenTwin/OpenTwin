@@ -18,9 +18,9 @@
 // @otlicense-end
 
 #include "BlockHandlerPython.h"
-#include "EntityProperties.h"
+#include "OTModelEntities/EntityProperties.h"
 #include "Application.h"
-#include "EntityFile.h"
+#include "OTModelEntities/EntityFile.h"
 #include "OTCore/ReturnValues.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/PythonServiceInterface.h"

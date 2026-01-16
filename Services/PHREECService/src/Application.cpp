@@ -26,15 +26,15 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTCommunication/ActionTypes.h"	// action member and types definition
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityResultText.h"
+#include "OTModelEntities/EntitySolverPHREEC.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 
 // Application specific includes
 #include "PHREECLauncher.h"
-#include "EntitySolverPHREEC.h"
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
-#include "EntityResultText.h"
 
 #include <thread>
 

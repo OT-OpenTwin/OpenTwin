@@ -28,7 +28,7 @@
 #include "OTCore/RuntimeTests.h"
 #include "OTGui/TableIndexSchemata.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 
 // std header
 #include <map>

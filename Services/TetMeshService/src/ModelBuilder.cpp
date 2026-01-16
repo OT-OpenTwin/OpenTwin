@@ -25,10 +25,10 @@
 #include "Application.h"
 
 #include "EntityGeometry.h"
-#include "EntityMaterial.h"
 #include "GeometryOperations.h"
-#include "TemplateDefaultManager.h"
-#include "Database.h"
+#include "OTModelEntities/Database.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 

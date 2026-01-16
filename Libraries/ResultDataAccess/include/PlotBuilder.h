@@ -23,9 +23,9 @@
 #include "DatasetDescription.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTGui/Plot1DCfg.h"
-#include "NewModelStateInfo.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 #include "ResultCollectionExtender.h"
-#include "EntityResult1DCurve.h"
+#include "OTModelEntities/EntityResult1DCurve.h"
 
 class __declspec(dllexport) PlotBuilder
 {

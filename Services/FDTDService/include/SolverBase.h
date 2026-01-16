@@ -20,7 +20,8 @@
 #pragma once
 
 #include "OTCore/TypeNames.h"
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
+#include "OTModelEntities/EntityProperties.h"
 
 // STD INCLUDES
 #include <algorithm>
@@ -42,8 +43,6 @@ namespace ot {
 		class UiComponent;
 	}
 }
-
-#include "EntityProperties.h"
 
 class SolverBase {
 public:

@@ -21,9 +21,9 @@
 
 #include "SceneNodeVTK.h"
 #include "SceneNodeMaterial.h"
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "Model.h"
 #include "FrontendAPI.h"
 

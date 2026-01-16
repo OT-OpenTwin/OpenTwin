@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 #include "BlockEntitiesAPIExport.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/BasicServiceInformation.h"
-#include "EntityCoordinates2D.h"
-#include "EntityNamingBehavior.h"
+#include "OTModelEntities/EntityCoordinates2D.h"
+#include "OTModelEntities/EntityNamingBehavior.h"
 
 #include "Connector.h"
 

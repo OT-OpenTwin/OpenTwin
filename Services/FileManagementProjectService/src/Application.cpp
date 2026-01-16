@@ -51,7 +51,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 
 // Entities
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 
 // std header
 #include <thread>

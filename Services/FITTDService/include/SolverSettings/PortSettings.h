@@ -20,7 +20,7 @@
 #pragma once
 
 #include <map>
-#include "EntitySolverPort.h"
+#include "OTModelEntities/EntitySolverPort.h"
 
 #include <string>
 #include "Ports/SourceTarget.h"

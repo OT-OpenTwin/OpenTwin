@@ -23,7 +23,7 @@
 
 #include "OTServiceFoundation/ModelComponent.h"
 
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 
 #include "MetadataCampaign.h"
 #include "MetadataQuantity.h"

@@ -25,7 +25,7 @@
 #include "EntityBlock.h"
 #include "EntityBlockConnection.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "EntityFileText.h"
+#include "OTModelEntities/EntityFileText.h"
 
 //ThirdPartyHeader
 #include <iostream>

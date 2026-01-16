@@ -18,10 +18,10 @@
 // @otlicense-end
 
 #include "DataSourceUnstructuredMesh.h"
-#include "EntityBase.h"
-#include "EntityResultUnstructuredMesh.h"
-#include "EntityResultUnstructuredMeshData.h"
-#include "EntityResultUnstructuredMeshVtk.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/EntityResultUnstructuredMesh.h"
+#include "OTModelEntities/EntityResultUnstructuredMeshData.h"
+#include "OTModelEntities/EntityResultUnstructuredMeshVtk.h"
 
 #include <vtkNew.h>
 #include <vtkStructuredGrid.h>

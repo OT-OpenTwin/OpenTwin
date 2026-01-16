@@ -22,7 +22,7 @@
 #include "OTGui/ToolBarButtonCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
-#include "EntityMaterial.h"
+#include "OTModelEntities/EntityMaterial.h"
 
 class MaterialHandler : public SelectionChangedObserver
 {

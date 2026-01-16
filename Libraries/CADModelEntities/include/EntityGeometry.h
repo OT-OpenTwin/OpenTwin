@@ -20,9 +20,9 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-#include "EntityContainer.h"
+#include "OTModelEntities/EntityContainer.h"
 #include "EntityBrep.h"
-#include "EntityFacetData.h"
+#include "OTModelEntities/EntityFacetData.h"
 
 #include <string>
 

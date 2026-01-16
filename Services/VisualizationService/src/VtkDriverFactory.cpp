@@ -17,11 +17,10 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "VtkDriverFactory.h"
+#include "OTModelEntities/EntityVis2D3D.h"
 
 #include "VtkDriver.h"
-#include "EntityVis2D3D.h"
-
+#include "VtkDriverFactory.h"
 #include "VtkDriverGeneric.h"
 #include "VtkDriverCartesianFaceScalar.h"
 #include "VtkDriverCartesianVectorfield.h"

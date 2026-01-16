@@ -18,10 +18,10 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "EntityFile.h"
-#include "PropertyHelper.h"
-#include "EntityFileImage.h"
-#include "EntityProperties.h"
+#include "OTModelEntities/EntityFile.h"
+#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/EntityFileImage.h"
+#include "OTModelEntities/EntityProperties.h"
 #include "EntityBlockHierarchicalProjectItem.h"
 
 #include "OTGui/Graphics/GraphicsHierarchicalProjectItemBuilder.h"

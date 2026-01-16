@@ -19,13 +19,13 @@
 
 #pragma once
 #include "PropertyHandlerDatabaseAccessBlock.h"
-#include "EntityPropertiesItems.h"
-#include "EntityProperties.h"
+#include "OTModelEntities/EntityPropertiesItems.h"
+#include "OTModelEntities/EntityProperties.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "Application.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 #include "ProjectToCollectionConverter.h"
 #include "ResultCollectionMetadataAccess.h"

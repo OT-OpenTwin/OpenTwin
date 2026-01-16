@@ -20,11 +20,11 @@
 #include "STEPReader.h"
 #include "EntityGeometry.h"
 #include "GeometryOperations.h"
-#include "DataBase.h"
 #include "ShapeHealing.h"
 #include "Application.h"
 
 #include "OTCommunication/Msg.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/uiComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"

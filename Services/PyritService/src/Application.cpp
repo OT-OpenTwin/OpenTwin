@@ -30,18 +30,16 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTGui/StyledTextBuilder.h"
-
-// Application specific includes
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
-#include "EntitySolverPyrit.h"
-#include "EntityResultText.h"
-#include "EntityFileText.h"
-#include "EntityResultUnstructuredMeshVtk.h"
-#include "EntityVisUnstructuredScalarSurface.h"
-#include "EntityVisUnstructuredVectorSurface.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntitySolverPyrit.h"
+#include "OTModelEntities/EntityResultText.h"
+#include "OTModelEntities/EntityFileText.h"
+#include "OTModelEntities/EntityResultUnstructuredMeshVtk.h"
+#include "OTModelEntities/EntityVisUnstructuredScalarSurface.h"
+#include "OTModelEntities/EntityVisUnstructuredVectorSurface.h"
 
 #include <fstream>
 

@@ -22,7 +22,7 @@
 #include "ApplicationSettings.h"
 #include "ModelNotifier.h"
 #include "UiNotifier.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 #include "PrimitiveManager.h"
 #include "PrimitiveCuboid.h"

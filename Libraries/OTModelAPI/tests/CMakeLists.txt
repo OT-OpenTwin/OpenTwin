@@ -275,7 +275,7 @@ if(WIN32)
             OTCore
             OTGui
             OTCommunication
-            ModelEntities
+            OTModelEntities
             OTDataStorage
             Userenv
             wsock32

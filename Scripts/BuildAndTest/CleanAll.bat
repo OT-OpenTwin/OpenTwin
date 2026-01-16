@@ -57,7 +57,7 @@ ECHO ===============================================================
 CALL "%OT_LTSPICE_CONNECTOR_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
-ECHO Clean Library: ModelEntities
+ECHO Clean Library: OTModelEntities
 ECHO ===============================================================
 CALL "%OT_MODELENTITIES_ROOT%\Clean.bat" 
 

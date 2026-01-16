@@ -43,15 +43,14 @@
 #include "OTServiceFoundation/FrontendLogNotifier.h"
 #include "OTServiceFoundation/InitialSelectionHelper.h"
 
-#include "DataBase.h"
 #include "OTDataStorage/Document/DocumentAccess.h"
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 
-#include "TemplateDefaultManager.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/InvalidUID.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 
 #include "OTServiceFoundation/ExternalServicesComponent.h"
-
-#include "InvalidUID.h"
 
 // Third party header
 #include "curl/curl.h"

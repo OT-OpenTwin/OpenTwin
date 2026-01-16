@@ -21,10 +21,10 @@
 
 #include "VisualizationServiceTypes.h"
 #include "DataSourceManagerItem.h"
-#include "EntityCompressedVector.h"
-#include "EntityMeshCartesianData.h"
-#include "EntityResultBase.h"
-#include "EntityResult3DData.h"
+#include "OTModelEntities/EntityCompressedVector.h"
+#include "OTModelEntities/EntityMeshCartesianData.h"
+#include "OTModelEntities/EntityResultBase.h"
+#include "OTModelEntities/EntityResult3DData.h"
 
 #include <vector>
 #include <vtkRectilinearGrid.h>

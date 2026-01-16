@@ -52,9 +52,6 @@
 #include "akWidgets/aTreeWidget.h"
 
 // OpenTwin header
-#include "DataBase.h"
-#include "PlotManagerView.h"
-
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/SystemProcess.h"
 
@@ -117,9 +114,13 @@
 #include "OTWidgets/PropertyInputStringList.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
+#include "PlotManagerView.h"
+
 #include "OTCommunication/msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
+
+#include "OTModelEntities/DataBase.h"
 
 // ADS header
 #include <ads/DockAreaWidget.h>

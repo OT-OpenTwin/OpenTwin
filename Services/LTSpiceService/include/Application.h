@@ -22,7 +22,7 @@
 // Open twin header
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
 #include "EntityGeometry.h"
 
 // C++ header

@@ -40,7 +40,7 @@
 #include "OTServiceFoundation/FoundationAPIExport.h" // OT_SERVICEFOUNDATION_API_EXPORT
 
 // OpenTwin ModelEntities header
-#include "EntityInformation.h"                        // Entity information
+#include "OTModelEntities/EntityInformation.h"                        // Entity information
 
 // std header
 #include <map>

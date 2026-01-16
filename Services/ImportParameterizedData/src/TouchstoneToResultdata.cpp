@@ -24,7 +24,7 @@
 
 #include "OTModelAPI/ModelServiceAPI.h"
 
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 #include "ResultCollectionExtender.h"
 #include "MetadataCampaign.h"

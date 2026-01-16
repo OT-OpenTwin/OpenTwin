@@ -27,14 +27,14 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 
 // Application specific includes
 #include "FDTDLauncher.h"
-#include "EntitySolverFDTD.h"
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
-#include "EntityResultText.h"
+#include "OTModelEntities/EntitySolverFDTD.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityResultText.h"
 
 #include <thread>
 

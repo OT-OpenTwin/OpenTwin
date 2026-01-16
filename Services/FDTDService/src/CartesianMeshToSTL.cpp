@@ -20,14 +20,14 @@
 #include "CartesianMeshToSTL.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityAPI.h"
 
-#include "DataBase.h"
-#include "EntityMaterial.h"
-#include "EntityMeshCartesianData.h"
-#include "EntityMeshCartesianItem.h"
-#include "EntityMeshCartesianFaceList.h"
-#include "EntityMeshCartesianFace.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/EntityMeshCartesianData.h"
+#include "OTModelEntities/EntityMeshCartesianItem.h"
+#include "OTModelEntities/EntityMeshCartesianFaceList.h"
+#include "OTModelEntities/EntityMeshCartesianFace.h"
 
 #include <tinyxml2.h>
 

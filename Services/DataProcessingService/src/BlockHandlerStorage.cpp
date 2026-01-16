@@ -37,8 +37,8 @@
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "CurveFactory.h"
-#include "NewModelStateInfo.h"
-#include "EntityResult1DPlot.h"
+#include "OTModelEntities/NewModelStateInfo.h"
+#include "OTModelEntities/EntityResult1DPlot.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/TimeFormatter.h"
 

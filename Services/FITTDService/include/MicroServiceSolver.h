@@ -22,10 +22,10 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 
-#include "ModelState.h"
+#include "OTModelEntities/ModelState.h"
+#include "OTModelEntities/EntityMeshCartesianData.h"
+#include "OTModelEntities/EntityUnits.h"
 
-#include "EntityMeshCartesianData.h"
-#include "EntityUnits.h"
 #include "SolverSettings/SolverSettings.h"
 #include "SolverSettings/PortSettings.h"
 #include "SolverSettings/MonitorSettings.h"

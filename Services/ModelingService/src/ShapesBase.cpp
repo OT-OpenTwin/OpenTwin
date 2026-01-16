@@ -21,14 +21,14 @@
 
 #include "ApplicationSettings.h"
 #include "EntityCache.h"
-#include "DataBase.h"
 
 #include "OTCore/CoreTypes.h"
 #include "EntityGeometry.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
-#include "EntityInformation.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityInformation.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
 

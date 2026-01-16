@@ -36,14 +36,11 @@
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "TemplateDefaultManager.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "Helper.h"
 
-#include "EntitySolverDataProcessing.h"
-
-
-
+#include "OTModelEntities/EntitySolverDataProcessing.h"
 
 Application * g_instance{ nullptr };
 

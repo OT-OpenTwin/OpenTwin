@@ -25,7 +25,7 @@
 #include "Model.h"
 
 // OpenTwin header
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 #include "OTCore/String.h"
 #include "OTCore/FolderNames.h"
@@ -34,9 +34,9 @@
 #include "OTGui/Properties/PropertyStringList.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "EntityFileText.h"
-#include "EntityResultTextData.h"
-#include "EntityBinaryData.h"
+#include "OTModelEntities/EntityFileText.h"
+#include "OTModelEntities/EntityResultTextData.h"
+#include "OTModelEntities/EntityBinaryData.h"
 #include "EntityBlock.h"
 
 

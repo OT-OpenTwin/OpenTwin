@@ -27,25 +27,25 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "EntityInformation.h"
 #include "OTGui/TableRange.h"
 #include "OTGui/Dialog/OnePropertyDialogCfg.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTGui/Properties/PropertyInt.h"
-#include "EntityFileCSV.h"
 #include "CategorisationFolderNames.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-#include "TemplateDefaultManager.h"
 #include "DatasetOverviewVisualiser.h"
-#include "EntityMetadataSeries.h"
 
 #include "OTDataStorage/DocumentAPI.h"
 #include "OTDataStorage/GridFSFileInfo.h"
-#include "EntityAPI.h"
-#include "DataBase.h"
-#include "EntityBatchImporter.h"
-#include "InvalidUID.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/InvalidUID.h"
+#include "OTModelEntities/EntityFileCSV.h"
+#include "OTModelEntities/EntityInformation.h"
+#include "OTModelEntities/EntityBatchImporter.h"
+#include "OTModelEntities/EntityMetadataSeries.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/document.h>

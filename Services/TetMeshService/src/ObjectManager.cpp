@@ -22,8 +22,8 @@
 #include "Application.h"
 #include "MeshWriter.h"
 
-#include "EntityBase.h"
-#include "EntityMeshTet.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/EntityMeshTet.h"
 
 #include "OTServiceFoundation/UiComponent.h"
 

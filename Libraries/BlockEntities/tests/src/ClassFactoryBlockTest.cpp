@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "gtest/gtest.h"
-#include "EntityFactory.h"
+#include "OTModelEntities/EntityFactory.h"
 
 TEST(BlockEntities, BlockEntityFound)
 {

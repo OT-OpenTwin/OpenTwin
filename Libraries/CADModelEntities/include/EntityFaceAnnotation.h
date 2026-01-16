@@ -20,9 +20,9 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-#include "EntityBase.h"
-#include "BoundingBox.h"
-#include "Geometry.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/BoundingBox.h"
+#include "OTModelEntities/Geometry.h"
 
 #include "TopoDS_Shape.hxx"
 

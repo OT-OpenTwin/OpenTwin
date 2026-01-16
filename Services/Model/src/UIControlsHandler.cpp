@@ -21,7 +21,7 @@
 
 #include "UIControlsHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
-#include "TemplateDefaultManager.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTGui/KeySequence.h"
 
 UIControlsHandler::UIControlsHandler()

@@ -29,13 +29,13 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityVis2D3D.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 
 // Application specific includes
-#include "EntityVis2D3D.h"
-#include "EntityBinaryData.h"
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
 #include "VtkDriverFactory.h"
 #include "VtkDriver.h"
 

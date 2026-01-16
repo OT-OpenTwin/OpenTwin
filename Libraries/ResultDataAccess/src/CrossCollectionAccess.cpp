@@ -21,9 +21,9 @@
 #include "CrossCollectionAccess.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTCore/FolderNames.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTCore/ReturnMessage.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"

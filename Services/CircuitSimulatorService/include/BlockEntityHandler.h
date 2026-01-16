@@ -28,7 +28,7 @@
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "EntityBlock.h"
-#include "EntityFileText.h"
+#include "OTModelEntities/EntityFileText.h"
 #include "EntityBlockConnection.h"
 
 // C++ header

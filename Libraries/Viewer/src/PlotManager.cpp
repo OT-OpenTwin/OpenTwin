@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "PlotManager.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTWidgets/PlotDataset.h"
 #include "OTWidgets/PolarPlotCurve.h"
 #include "OTWidgets/CartesianPlotCurve.h"

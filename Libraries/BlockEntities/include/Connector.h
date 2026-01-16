@@ -21,7 +21,7 @@
 #pragma warning(disable:4251)
 
 #include <string>
-#include "SerializeWithBSON.h"
+#include "OTModelEntities/SerializeWithBSON.h"
 
 namespace ot
 {

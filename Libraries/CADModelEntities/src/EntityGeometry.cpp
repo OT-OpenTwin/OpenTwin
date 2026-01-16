@@ -21,7 +21,7 @@
 //
 
 #include "EntityGeometry.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 #include "OTCommunication/ActionTypes.h"
 

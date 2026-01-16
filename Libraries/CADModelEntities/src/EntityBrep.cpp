@@ -21,7 +21,7 @@
 //
 
 #include "EntityBrep.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 #include "Bnd_Box.hxx"
 #include "BRepBndLib.hxx"

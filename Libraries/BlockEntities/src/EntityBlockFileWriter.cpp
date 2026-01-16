@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #include "EntityBlockFileWriter.h"
-#include "SharedResources.h"
-#include "PropertyHelper.h"
+#include "BlockImageNames.h"
+#include "OTModelEntities/PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntityBlockFileWriter> registrar(EntityBlockFileWriter::className());
 
@@ -27,8 +27,8 @@ EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, Ent
 	:EntityBlock(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
-	treeItem.setVisibleIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
-	treeItem.setHiddenIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
+	treeItem.setVisibleIcon(ot::BlockImageNames::getCornerImagePath() + getIconName());
+	treeItem.setHiddenIcon(ot::BlockImageNames::getCornerImagePath() + getIconName());
 	this->setDefaultTreeItem(treeItem);
 
 	setBlockTitle("File Writer");
@@ -77,8 +77,8 @@ ot::GraphicsItemCfg* EntityBlockFileWriter::createBlockCfg()
 
 	const ot::Color colourTitle(ot::Yellow);
 	block.setTitleBackgroundGradientColor(colourTitle);
-	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameDB());
-	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
+	block.setLeftTitleCornerImagePath(ot::BlockImageNames::getCornerImagePath() + ot::BlockImageNames::getCornerImageNameDB());
+	block.setBackgroundImagePath(ot::BlockImageNames::getCornerImagePath() + getIconName());
 	
 	addConnectors(block);
 

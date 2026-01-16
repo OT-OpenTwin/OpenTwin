@@ -22,7 +22,7 @@
 #include <string>
 
 #include "BusinessLogicHandler.h"
-#include "EntityResultTableData.h"
+#include "OTModelEntities/EntityResultTableData.h"
 #include "TableExtractor.h"
 
 //! @brief Central class for dealing with table views.

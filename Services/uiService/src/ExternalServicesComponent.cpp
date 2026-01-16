@@ -111,9 +111,10 @@
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
 #include "OTFMC/FMConnectorAPI.h"
 #include "ProgressUpdater.h"
-#include "DataBase.h"
 #include "OTDataStorage/DocumentAPI.h"
+
 #include "OTDataStorage/GridFSFileInfo.h"
+#include "OTModelEntities/DataBase.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>

@@ -20,7 +20,7 @@
 #pragma once
 
 #include "EntityBlock.h"
-#include "IVisualisationText.h"
+#include "OTModelEntities/IVisualisationText.h"
 
 class EntityBinaryData;
 

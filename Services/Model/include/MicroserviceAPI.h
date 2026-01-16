@@ -22,7 +22,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 
 #include <list>
 

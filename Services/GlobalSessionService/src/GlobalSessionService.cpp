@@ -33,7 +33,7 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 #include "OTDataStorage/DocumentAPI.h"
 #include "OTDataStorage/Connection/ConnectionAPI.h"

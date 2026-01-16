@@ -21,7 +21,7 @@
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
 
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTCommunication/ActionHandler.h"

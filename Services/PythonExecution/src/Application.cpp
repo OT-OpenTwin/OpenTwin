@@ -20,8 +20,8 @@
 #include "Application.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
-#include "DataBase.h"
 #include "OTModelAPI/ModelAPIManager.h"
+#include "OTModelEntities/DataBase.h"
 
 Application& Application::instance(void) {
 	static Application g_instance;

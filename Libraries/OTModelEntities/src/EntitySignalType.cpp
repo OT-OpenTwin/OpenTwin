@@ -1,0 +1,92 @@
+// @otlicense
+// File: EntitySignalType.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#include "OTModelEntities/EntitySignalType.h"
+
+#include "OTCommunication/ActionTypes.h"
+
+static EntityFactoryRegistrar<EntitySignalType> registrar("EntitySignalType");
+
+EntitySignalType::EntitySignalType(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+	:EntityContainer(ID, parent, obs, ms)
+{
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/Signal");
+	treeItem.setHiddenIcon("Default/Signal");
+	this->setDefaultTreeItem(treeItem);
+}
+
+EntitySignalType::~EntitySignalType()
+{
+}
+
+bool EntitySignalType::updateFromProperties(void)
+{
+	// Now we need to update the entity after a property change
+	assert(getProperties().anyPropertyNeedsUpdate());
+
+	// Since there is a change now, we need to set the modified flag
+	setModified();
+
+	getProperties().forceResetUpdateForAllProperties();
+
+	return false; // No property grid update necessary
+}
+
+void EntitySignalType::createProperties()
+{
+	EntityPropertiesSelection::createProperty("Signal definition", GetPropertyNameExcitationType(), { GetValueSinGuasSignal() }, GetValueSinGuasSignal(), "Signal type", getProperties());
+	EntityPropertiesDouble::createProperty("Signal definition", GetPropertyNameMinFrequency(), 1, "Signal type", getProperties());
+	EntityPropertiesDouble::createProperty("Signal definition", GetPropertyNameMaxFrequency(), 100, "Signal type", getProperties());
+}
+
+const std::string EntitySignalType::GetPropertyNameExcitationType()
+{
+	static const std::string propertyNameExcitationType = "Excitation type";
+	return propertyNameExcitationType;
+}
+
+const std::string EntitySignalType::GetPropertyNameMinFrequency()
+{
+	static const std::string propertyNameMinFrequency = "Minimum frequency";
+	return propertyNameMinFrequency;
+}
+
+const std::string EntitySignalType::GetPropertyNameMaxFrequency()
+{
+	static const std::string propertyNameMaxFrequency = "Maximum frequency";
+	return propertyNameMaxFrequency;
+}
+
+const std::string EntitySignalType::GetValueSinGuasSignal()
+{
+	static const std::string valueSignalTypeSinGausSignal = "Sinusoidal-Gauss";
+	return valueSignalTypeSinGausSignal;
+}
+
+bool EntitySignalType::getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax)
+{
+	return false;
+}
+
+
+
+
+
+

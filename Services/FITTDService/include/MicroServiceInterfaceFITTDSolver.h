@@ -19,7 +19,7 @@
 
 #pragma once
 #include "MicroServiceSolver.h"
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 
 #include "PerformanceTracker.h"
 

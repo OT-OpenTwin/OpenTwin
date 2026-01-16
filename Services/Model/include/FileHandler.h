@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "IVisualisationText.h"
-#include "IVisualisationTable.h"
+#include "OTModelEntities/IVisualisationText.h"
+#include "OTModelEntities/IVisualisationTable.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTGui/TableCfg.h"

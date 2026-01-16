@@ -22,19 +22,19 @@
 #include "ModelNotifier.h"
 #include "UiNotifier.h"
 #include "CartesianMeshCreation.h"
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
-#include "EntityMeshCartesian.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityMeshCartesian.h"
 
 // Open twin header
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-#include "ModelState.h"
+#include "OTModelEntities/ModelState.h"
 
 #include <thread>
 

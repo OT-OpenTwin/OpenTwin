@@ -48,10 +48,10 @@
 #include "OTServiceFoundation/AbstractUiNotifier.h"
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "PlotBuilder.h"
-#include "TemplateDefaultManager.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 #include "ResultCollectionExtender.h"
 #include "QuantityDescriptionCurve.h"
 

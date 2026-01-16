@@ -17,7 +17,6 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "DataBase.h"
 #include "Application.h"
 #include "Result1DManager.h"
 #include "ParametricResult1DManager.h"
@@ -28,13 +27,14 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityResult1DPlot.h"
 
 #include "ResultCollectionExtender.h"
 #include "MetadataSeries.h"
 #include "MetadataParameter.h"
 #include "MetadataEntrySingle.h"
 #include "CurveFactory.h"
-#include "EntityResult1DPlot.h"
 
 #include "QuantityDescription.h"
 #include "QuantityDescriptionCurve.h"

@@ -21,8 +21,8 @@
 #include "PHREECLauncher.h"
 #include "PHREECMeshExport.h"
 
-#include "DataBase.h"
 #include "Application.h"
+#include "OTModelEntities/DataBase.h"
 
 #include <windows.h> // winapi
 

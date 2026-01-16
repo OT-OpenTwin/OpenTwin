@@ -30,7 +30,7 @@
 #include "FileHandler.h"
 
 // OpenTwin header
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/VisualisationCfg.h"

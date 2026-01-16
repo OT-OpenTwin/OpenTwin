@@ -19,9 +19,9 @@
 
 #pragma once
 #include "MetadataCampaign.h"
-#include "EntityCallbackBase.h"
-#include "EntityMetadataSeries.h"
-#include "EntityMetadataCampaign.h"
+#include "OTModelEntities/EntityCallbackBase.h"
+#include "OTModelEntities/EntityMetadataSeries.h"
+#include "OTModelEntities/EntityMetadataCampaign.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "MetadataEntry.h"
 

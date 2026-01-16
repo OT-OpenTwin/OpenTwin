@@ -25,7 +25,7 @@
 // OpenTwin header
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "NewModelStateInfo.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 
 class EntityBlock;
 class EntityGraphicsScene;

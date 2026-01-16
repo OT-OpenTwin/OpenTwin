@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "DataSourceManagerItem.h"
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 
 #include <vtkNew.h>
 #include <vtkStructuredGrid.h>

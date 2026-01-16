@@ -24,11 +24,11 @@
 #include "Viewer.h"
 #include "ViewerView.h"
 #include "FrontendAPI.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "PlotManager.h"
 #include "PlotManagerView.h"
 #include "Rubberband.h"
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 #include "ViewerToolBar.h"
 #include "GlobalFontPath.h"
 

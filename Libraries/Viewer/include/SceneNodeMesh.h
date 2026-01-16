@@ -26,9 +26,9 @@ namespace osg
 	class Geometry;
 }
 
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 #include "SceneNodeContainer.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 #include <string>
 #include <map>

@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "BlockEntityHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "OTCore/ComparisionSymbols.h"
@@ -32,7 +32,7 @@
 #include "EntityBlockConnection.h"
 #include "EntityBlockDisplay.h"
 #include "EntityBlockFileWriter.h"
-#include "SharedResources.h"
+#include "BlockImageNames.h"
 
 void BlockEntityHandler::createBlockPicker()
 {
@@ -59,19 +59,19 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker()
 	ot::GraphicsPickerCollectionCfg customizedBlockCollection("Customized Blocks", "Customized Blocks");
 	
 	EntityBlockPython pythonBlock;
-	customizedBlockCollection.addItem(pythonBlock.getClassName(), pythonBlock.createBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockPython::getIconName());
+	customizedBlockCollection.addItem(pythonBlock.getClassName(), pythonBlock.createBlockHeadline(), ot::BlockImageNames::getCornerImagePath() + EntityBlockPython::getIconName());
 
 	EntityBlockDatabaseAccess dbAccessBlock;
-	controlBlockDatabaseCollection.addItem(dbAccessBlock.getClassName(), dbAccessBlock.createBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath()+ EntityBlockDatabaseAccess::getIconName());
+	controlBlockDatabaseCollection.addItem(dbAccessBlock.getClassName(), dbAccessBlock.createBlockHeadline(), ot::BlockImageNames::getCornerImagePath()+ EntityBlockDatabaseAccess::getIconName());
 
 	EntityBlockDisplay displayBlock;
-	controlBlockVisualizationCollection.addItem(displayBlock.getClassName(), displayBlock.createBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDisplay::getIconName());
+	controlBlockVisualizationCollection.addItem(displayBlock.getClassName(), displayBlock.createBlockHeadline(), ot::BlockImageNames::getCornerImagePath() + EntityBlockDisplay::getIconName());
 
 	EntityBlockStorage storage;
-	controlBlockDatabaseCollection.addItem(storage.getClassName(), storage.createBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockStorage::getIconName());
+	controlBlockDatabaseCollection.addItem(storage.getClassName(), storage.createBlockHeadline(), ot::BlockImageNames::getCornerImagePath() + EntityBlockStorage::getIconName());
 
 	EntityBlockFileWriter fileWriter;
-	controlBlockDatabaseCollection.addItem(fileWriter.getClassName(), fileWriter.createBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockFileWriter::getIconName());
+	controlBlockDatabaseCollection.addItem(fileWriter.getClassName(), fileWriter.createBlockHeadline(), ot::BlockImageNames::getCornerImagePath() + EntityBlockFileWriter::getIconName());
 
 	controlBlockCollection.addChildCollection(std::move(controlBlockDatabaseCollection));
 	controlBlockCollection.addChildCollection(std::move(controlBlockVisualizationCollection));

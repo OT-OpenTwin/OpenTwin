@@ -28,18 +28,17 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntitySolverGetDP.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityResultText.h"
 
 // Application specific includes
 #include "GetDPLauncher.h"
-#include "EntitySolverGetDP.h"
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
-#include "EntityResultText.h"
-
-#include <thread>
 
 #include <map>
+#include <thread>
 
 // The name of this service
 #define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_GETDP

@@ -22,10 +22,10 @@
 #include "SceneNodeCartesianMesh.h"
 #include "SceneNodeCartesianMeshItem.h"
 #include "SceneNodeMaterial.h"
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 #include "ViewerSettings.h"
 
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "Model.h"
 
 #include <osg/StateSet>

@@ -28,12 +28,12 @@
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTServiceFoundation/Encryption.h"
-#include "DataBase.h"
-#include "ModelState.h"
-#include "NewModelStateInfo.h"
-#include "EntityAPI.h"
-#include "EntityFileText.h"
-#include "EntityFileRawData.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/ModelState.h"
+#include "OTModelEntities/NewModelStateInfo.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityFileText.h"
+#include "OTModelEntities/EntityFileRawData.h"
 
 EntityHandler::EntityHandler(const std::string& _rootFolderPath) {
 

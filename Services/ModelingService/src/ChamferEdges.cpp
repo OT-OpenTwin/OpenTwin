@@ -20,12 +20,12 @@
 #include "ChamferEdges.h"
 #include "EntityGeometry.h"
 #include "EntityFaceAnnotation.h"
-#include "DataBase.h"
 #include "EntityCache.h"
 #include "UpdateManager.h"
 
-#include "PropertyHelper.h"
+#include "OTModelEntities/PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 

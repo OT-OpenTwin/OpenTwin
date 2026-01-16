@@ -21,7 +21,7 @@
 #include "BlockEntityHandler.h"
 
 // Open twin header
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "Connection.h"
 #include "CircuitElement.h"
 #include "OTCore/EntityName.h"

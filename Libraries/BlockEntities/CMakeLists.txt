@@ -425,7 +425,7 @@ if(WIN32)
             OTGui
             OTGuiAPI
             OTCommunication
-            ModelEntities
+            OTModelEntities
             OTDataStorage
             ${MONGO_CXX_LIBS_NAME}   # bsoncxx.lib;mongocxx.lib
             ${MONGO_C_LIBS_NAME}     # optional C driver, mainly used in "Test" cfg

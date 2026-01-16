@@ -21,10 +21,10 @@
 
 #include "SceneNodeMesh.h"
 #include "SceneNodeMeshItem.h"
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 #include "ViewerSettings.h"
 
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "Model.h"
 #include "SceneNodeMaterial.h"
 

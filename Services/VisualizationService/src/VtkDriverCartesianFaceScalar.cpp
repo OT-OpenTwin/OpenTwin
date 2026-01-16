@@ -21,9 +21,9 @@
 #include "DataSourceManager.h"
 #include "DataSourceManagerItem.h"
 #include "DataSourceCartesianVector.h"
-#include "EntityVis2D3D.h"
-#include "EntityCartesianVector.h"
-#include "EntityMeshCartesianData.h"
+#include "OTModelEntities/EntityVis2D3D.h"
+#include "OTModelEntities/EntityCartesianVector.h"
+#include "OTModelEntities/EntityMeshCartesianData.h"
 
 #include <osg/StateSet>
 #include <osg/Node>

@@ -25,7 +25,7 @@
 #include "OTCore/VariableToJSONConverter.h"
 
 #include "OTDataStorage/DocumentAPI.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 ot::PythonServiceInterface::PythonServiceInterface(const std::string& _pythonExecutionServiceURL)
 	: m_pythonExecutionServiceURL(_pythonExecutionServiceURL)

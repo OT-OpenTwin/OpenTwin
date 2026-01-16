@@ -19,8 +19,8 @@
 
 #include <gtest/gtest.h>	
 #include "FixtureResultCollectionExtender.h"
-#include "EntityContainer.h"
-#include "DataBase.h"
+#include "OTModelEntities/EntityContainer.h"
+#include "OTModelEntities/DataBase.h"
 
 TEST_F(FixtureResultCollectionExtender, AddingParameter_Same)
 {

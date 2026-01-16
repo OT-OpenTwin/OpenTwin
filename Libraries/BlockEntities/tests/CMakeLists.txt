@@ -348,7 +348,7 @@ if(WIN32)
             OTGui
             OTGuiAPI
             OTCommunication
-            ModelEntities
+            OTModelEntities
             OTDataStorage
             ${MONGO_CXX_LIBS_NAME}
             ${MONGO_C_LIBS_NAME}

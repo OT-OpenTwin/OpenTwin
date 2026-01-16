@@ -20,7 +20,7 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 #include "TopoDS_Shape.hxx"
 #include "TopoDS_TShape.hxx"
 #include "TopoDS_Face.hxx"

@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include "BoundingBox.h"
+#include "OTModelEntities/BoundingBox.h"
 
 class EntityMeshTet;
 class EntityPropertiesEntityList;

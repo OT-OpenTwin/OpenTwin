@@ -27,7 +27,7 @@
 #include <list>
 
 // OpenTwin header
-#include "EntityNamingBehavior.h"
+#include "OTModelEntities/EntityNamingBehavior.h"
 
 //! @brief Common methods for all central service handler classes.
 class OT_SERVICEFOUNDATION_API_EXPORT BusinessLogicHandler

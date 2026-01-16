@@ -143,7 +143,7 @@ ECHO ===============================================================
 CALL "%OT_DATASTORAGE_ROOT%%testBat%" %1 %2
 
 ECHO ===============================================================
-ECHO Test Library: ModelEntities
+ECHO Test Library: OTModelEntities
 ECHO ===============================================================
 CALL "%OT_MODELENTITIES_ROOT%%testBat%" %1 %2
 

@@ -19,7 +19,7 @@
 
 #pragma once
 #include "MetadataSeries.h"
-#include "EntityResult1DCurve.h"
+#include "OTModelEntities/EntityResult1DCurve.h"
 #include "OTGui/Plot1DCurveCfg.h"
 class __declspec(dllexport) CurveFactory
 {

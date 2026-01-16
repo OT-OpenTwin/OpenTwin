@@ -26,7 +26,7 @@
 #include "MetadataQuantity.h"
 #include "MetadataParameter.h"
 #include "QuantityContainer.h"
-#include "EntityCallbackBase.h"
+#include "OTModelEntities/EntityCallbackBase.h"
 #include "ResultImportLogger.h"
 #include "DatasetDescription.h"
 #include "OTDataStorage/ResultDataStorageAPI.h"

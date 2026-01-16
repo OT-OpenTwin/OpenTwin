@@ -24,8 +24,8 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 
-#include "EntityInformation.h"
-#include "EntityProperties.h"
+#include "OTModelEntities/EntityInformation.h"
+#include "OTModelEntities/EntityProperties.h"
 
 #include "OTDataStorage/UniqueUIDGenerator.h"
 

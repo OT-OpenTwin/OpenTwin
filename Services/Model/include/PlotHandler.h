@@ -21,11 +21,11 @@
 
 #include "OTServiceFoundation/UiComponent.h"
 #include "SelectionChangedObserver.h"
-#include "EntityMetadataSeries.h"
-#include "EntityResult1DPlot.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
-#include "NewModelStateInfo.h"
+#include "OTModelEntities/EntityMetadataSeries.h"
+#include "OTModelEntities/EntityResult1DPlot.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 
 class PlotHandler : public SelectionChangedObserver
 {

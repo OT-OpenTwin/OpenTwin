@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #include "EntityBlockStorage.h"
-#include "SharedResources.h"	 
-#include "PropertyHelper.h"
+#include "BlockImageNames.h"	 
+#include "OTModelEntities/PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntityBlockStorage> registrar(EntityBlockStorage::className());
 
@@ -27,8 +27,8 @@ EntityBlockStorage::EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObs
 	:EntityBlock(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
-	treeItem.setVisibleIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
-	treeItem.setHiddenIcon(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
+	treeItem.setVisibleIcon(ot::BlockImageNames::getCornerImagePath() + getIconName());
+	treeItem.setHiddenIcon(ot::BlockImageNames::getCornerImagePath() + getIconName());
 	this->setDefaultTreeItem(treeItem);
 
 	setBlockTitle("Store in Database");
@@ -45,8 +45,8 @@ ot::GraphicsItemCfg* EntityBlockStorage::createBlockCfg()
 	const ot::Color colourTitle(ot::Lime);
 	const ot::Color colourBackground(ot::White);
 	block.setTitleBackgroundGradientColor(colourTitle);
-	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameDB());
-	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
+	block.setLeftTitleCornerImagePath(ot::BlockImageNames::getCornerImagePath() + ot::BlockImageNames::getCornerImageNameDB());
+	block.setBackgroundImagePath(ot::BlockImageNames::getCornerImagePath() + getIconName());
 
 	addConnectors(block);
 

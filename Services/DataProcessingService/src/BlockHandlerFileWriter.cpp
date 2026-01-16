@@ -28,9 +28,9 @@
 #include "OTCore/GenericDataStructVector.h"
 #include "OTCore/GenericDataStructMatrix.h"
 
-#include "EntityFileText.h"
+#include "OTModelEntities/EntityFileText.h"
 #include "OTCommunication/ActionTypes.h"
-#include "EntityBinaryData.h"
+#include "OTModelEntities/EntityBinaryData.h"
 #include "StringConverter.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 

@@ -22,10 +22,10 @@
 #include "VisualizationServiceTypes.h"
 #include "VtkDriver.h"
 #include "vtkRectilinearGrid.h"
-#include "EntityResultBase.h"
-#include "PropertyBundleDataHandlePlane.h"
-#include "PropertyBundleDataHandleScaling.h"
-#include "PropertyBundleDataHandleVisUnstructuredScalar.h"
+#include "OTModelEntities/EntityResultBase.h"
+#include "OTModelEntities/PropertyBundleDataHandlePlane.h"
+#include "OTModelEntities/PropertyBundleDataHandleScaling.h"
+#include "OTModelEntities/PropertyBundleDataHandleVisUnstructuredScalar.h"
 #include "DataSourceUnstructuredMesh.h"
 
 #include <string>

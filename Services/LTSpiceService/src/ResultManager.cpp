@@ -37,10 +37,10 @@
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-#include "EntityFile.h"
-#include "EntityAPI.h"
-#include "DataBase.h"
-#include "EntityResult1DPlot.h"
+#include "OTModelEntities/EntityFile.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityResult1DPlot.h"
 #include "CurveFactory.h"
 
 #include <regex>

@@ -40,7 +40,7 @@
 #include "OTDataStorage/ResultDataStorageAPI.h"
 
 // Model header
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 
 // Viewer header
 #include "ViewerAPI.h"

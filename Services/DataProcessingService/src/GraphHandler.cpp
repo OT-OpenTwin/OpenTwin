@@ -21,7 +21,7 @@
 #include "GraphNode.h"
 #include "EntityBlockConnection.h"
 #include "Application.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 
 
 bool GraphHandler::blockDiagramIsValid(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, ot::UIDList>& _connectionBlockMap)

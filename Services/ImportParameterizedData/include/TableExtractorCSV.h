@@ -19,7 +19,7 @@
 
 #include <sstream>
 #include "TableExtractor.h"
-#include "EntityFileCSV.h"
+#include "OTModelEntities/EntityFileCSV.h"
 
 //! @brief Concrete Importer which interpretes a csv file.
 class TableExtractorCSV : public TableExtractor

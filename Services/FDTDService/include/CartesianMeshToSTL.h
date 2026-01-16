@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
 
 #include <tinyxml2.h>
 

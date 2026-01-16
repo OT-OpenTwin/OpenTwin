@@ -24,7 +24,7 @@
 #include <string>
 #include <map>
 
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 
 #include "OTCore/CoreTypes.h"
 #include "OTGui/GuiTypes.h"

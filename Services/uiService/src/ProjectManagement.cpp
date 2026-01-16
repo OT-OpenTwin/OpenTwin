@@ -21,7 +21,6 @@
 #include "ProjectManagement.h"
 #include "UserManagement.h"
 #include "AppBase.h"
-#include "DataBase.h"
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
@@ -30,6 +29,7 @@
 #include "OTCommunication/Msg.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ResultCollectionDefaultIndexes.h"
+#include "OTModelEntities/DataBase.h"
 
 // DB header
 #include "OTDataStorage/DocumentAPI.h"

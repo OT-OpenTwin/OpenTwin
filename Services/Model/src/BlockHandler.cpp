@@ -37,10 +37,10 @@
 #include "EntityBlock.h"
 #include "EntityBlockConnection.h"
 #include "EntityBlockPython.h"
-#include "EntityGraphicsScene.h"
+#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/EntityGraphicsScene.h"
 #include "EntityBlockCircuitElement.h"
 #include "EntityBlockCircuitConnector.h"
-#include "PropertyHelper.h"
 
 void BlockHandler::processEntity(EntityBase* _entBase) {
 	if (_entBase == nullptr) {

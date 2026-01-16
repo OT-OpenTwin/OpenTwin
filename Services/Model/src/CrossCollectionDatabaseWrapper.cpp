@@ -19,7 +19,7 @@
 
 #include <stdafx.h>
 #include "CrossCollectionDatabaseWrapper.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
 CrossCollectionDatabaseWrapper::CrossCollectionDatabaseWrapper(const std::string& collectionName)
 	:_oldCollectionName(DataBase::instance().getCollectionName())

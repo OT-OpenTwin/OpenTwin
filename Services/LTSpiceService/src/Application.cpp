@@ -33,19 +33,17 @@
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 #include "OTDataStorage/Document/DocumentAccessBase.h"
 
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-
-// Application specific includes
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
-#include "EntityResultText.h"
-#include "EntityUnits.h"
-#include "EntityMaterial.h"
-#include "EntityProperties.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityResultText.h"
+#include "OTModelEntities/EntityUnits.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/EntityFile.h"
+#include "OTModelEntities/EntityBinaryData.h"
 #include "EntityGeometry.h"
-#include "EntityFile.h"
-#include "EntityBinaryData.h"
 
 #include "ResultManager.h"
 

@@ -21,10 +21,11 @@
 
 #include "Application.h"
 #include "TmpFileManager.h"
-#include "EntityMeshTetData.h"
-#include "EntityBinaryData.h"
 
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/EntityMeshTetData.h"
+
 #include "OTServiceFoundation/ModelComponent.h"
 
 #include <gmsh.h_cwrap>

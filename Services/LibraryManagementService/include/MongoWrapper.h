@@ -24,7 +24,7 @@
 #include "OTServiceFoundation/UserCredentials.h"
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 #include "OTSystem/AppExitCodes.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTDataStorage/Document/DocumentAccess.h"
 #include "OTDataStorage/Helper/QueryBuilder.h"
 #include "OTDataStorage/Helper/BsonValuesHelper.h"

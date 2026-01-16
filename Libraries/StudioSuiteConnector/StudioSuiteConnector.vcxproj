@@ -154,7 +154,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTFrontendConnectorAPI.lib;OTDataStorage.lib;ModelEntities.lib;zlibd.lib;$(MONGO_CXX_LIB);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTFrontendConnectorAPI.lib;OTDataStorage.lib;OTModelEntities.lib;zlibd.lib;$(MONGO_CXX_LIB);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_CLIBD);$(OT_GUI_ROOT)\$(OT_CLIBD);$(OT_WIDGETS_ROOT)\$(OT_LIBD);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBD);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBD);$(ZLIB_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -195,7 +195,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTFrontendConnectorAPI.lib;OTDataStorage.lib;ModelEntities.lib;zlib.lib;$(MONGO_CXX_LIB);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTFrontendConnectorAPI.lib;OTDataStorage.lib;OTModelEntities.lib;zlib.lib;$(MONGO_CXX_LIB);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_CLIBR);$(OT_GUI_ROOT)\$(OT_CLIBR);$(OT_WIDGETS_ROOT)/$(OT_LIBR);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBR);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBR);$(ZLIB_LIBPATHR);$(MONGO_CXX_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

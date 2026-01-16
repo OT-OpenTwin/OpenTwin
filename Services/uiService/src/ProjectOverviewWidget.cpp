@@ -32,7 +32,7 @@
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/TreeWidget.h"
-#include "ModelState.h"
+#include "OTModelEntities/ModelState.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>

@@ -24,10 +24,11 @@
 #include <list>
 #include <atomic>
 
-#include "EntityContainer.h"
-#include "Geometry.h"
-#include "ModelState.h"
-#include "EntityBase.h"
+#include "OTModelEntities/Geometry.h"
+#include "OTModelEntities/ModelState.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/EntityContainer.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 #include "EntityFaceAnnotation.h"
 #include "OTCore/FolderNames.h"
 
@@ -35,7 +36,6 @@
 #include "OTGui/Dialog/MessageDialogCfg.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
-#include "NewModelStateInfo.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
 

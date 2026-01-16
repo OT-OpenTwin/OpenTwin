@@ -52,12 +52,12 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 
 // Entities
-#include "EntityAPI.h"
-#include "EntityFileCSV.h"
-#include "EntityFileText.h"
-#include "EntityBinaryData.h"
-#include "EntityFileRawData.h"
-#include "EntityGraphicsScene.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityFileCSV.h"
+#include "OTModelEntities/EntityFileText.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/EntityFileRawData.h"
+#include "OTModelEntities/EntityGraphicsScene.h"
 #include "EntityBlockHierarchicalProjectItem.h"
 #include "EntityBlockHierarchicalDocumentItem.h"
 

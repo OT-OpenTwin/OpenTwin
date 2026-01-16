@@ -21,10 +21,10 @@
 
 #include "Application.h"
 #include "TmpFileManager.h"
-#include "EntityMeshTet.h"
-#include "EntityMeshTetData.h"
-#include "EntityBinaryData.h"
-#include "Database.h"
+#include "OTModelEntities/EntityMeshTet.h"
+#include "OTModelEntities/EntityMeshTetData.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/Database.h"
 #include "MeshWriter.h"
 
 #include "OTGui/FileExtension.h"

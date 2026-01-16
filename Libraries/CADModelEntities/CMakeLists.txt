@@ -407,7 +407,7 @@ if(WIN32)
             OTGui
             OTGuiAPI
             OTCommunication
-            ModelEntities
+            OTModelEntities
             OTDataStorage
             ${MONGO_CXX_LIBS_NAME}
             # Mongo C libs are usually pulled transitively, but keep optional:

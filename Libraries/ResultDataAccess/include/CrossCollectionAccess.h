@@ -22,8 +22,8 @@
 #include <list>
 
 #include "OTCore/CoreTypes.h"
-#include "EntityMetadataSeries.h"
-#include "EntityMetadataCampaign.h"
+#include "OTModelEntities/EntityMetadataSeries.h"
+#include "OTModelEntities/EntityMetadataCampaign.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
 //! @brief Interface to access a different project and get its metadata regarding the result collection.

@@ -23,7 +23,7 @@
 
 #include "EntityGeometry.h"
 
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 

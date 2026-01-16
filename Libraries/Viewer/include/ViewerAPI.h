@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/Color.h"

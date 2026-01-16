@@ -25,7 +25,7 @@
 #include "OTGui/Plot1DDataBaseCfg.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTWidgets/SelectionData.h"
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 #include "SceneNodeBase.h"
 #include "ViewChangedStates.h"
 

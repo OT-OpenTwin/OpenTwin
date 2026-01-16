@@ -29,12 +29,12 @@
 #include "Documentation.h"
 #include "OTCore/StringToVariableConverter.h"
 #include "OTGui/TableIndexSchemata.h"
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityResultText.h"
 
 #include <algorithm>
 #include <bitset>
-#include "EntityResultText.h"
 #include "OTCore/EntityName.h"
 DataCategorizationHandler::DataCategorizationHandler(std::string _tableFolder, std::string _previewTableName)
 	:m_tableFolder(_tableFolder), m_previewTableName(_previewTableName)

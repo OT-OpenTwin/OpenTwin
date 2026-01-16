@@ -18,10 +18,10 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "EntityFile.h"
-#include "PropertyHelper.h"
-#include "EntityBinaryData.h"
-#include "EntityProperties.h"
+#include "OTModelEntities/EntityFile.h"
+#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/EntityProperties.h"
 #include "EntityBlockImage.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Graphics/GraphicsImageItemCfg.h"

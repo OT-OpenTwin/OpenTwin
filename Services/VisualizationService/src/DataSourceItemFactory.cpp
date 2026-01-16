@@ -20,7 +20,7 @@
 #include "DataSourceItemFactory.h"
 
 #include "DataSourceManagerItem.h"
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 
 #include "DataSourceCartesianVector.h"
 #include "DataSourceResult3D.h"
