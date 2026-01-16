@@ -46,7 +46,7 @@ EntityBlock::~EntityBlock()
 void EntityBlock::addVisualizationNodes(void)
 {
 	createNavigationTreeEntry();
-	createBlockItem();
+	//createBlockItem();
 }
 
 void EntityBlock::addConnector(const ot::Connector& connector)
