@@ -3,6 +3,7 @@
 // OpenTwin header
 #include "ScriptRunner.h"
 #include "OToolkitAPI/OToolkitAPI.h"
+#include "OTSystem/SystemProcess.h"
 #include "OTCore/Logging/LogDispatcher.h"
 
 // Qt header
@@ -26,16 +27,20 @@ ScriptRunner* ScriptRunner::runScript(const QString& _name, const QString& _scri
 
 bool ScriptRunner::runDetached(const QString& _name, const QString& _scriptPath, const QStringList& _arguments, const QString& _workingDir) {
 #ifdef OT_OS_WINDOWS
-	// Launch detached cmd that launches the real script
-	QStringList args;
-	args.prepend(QDir::toNativeSeparators(_scriptPath));
-	args.prepend("/C");
-	args.prepend("start");
-	return QProcess::startDetached("cmd.exe", args, _workingDir);
+	const QString nativePath = QDir::toNativeSeparators(_scriptPath);
+	const QString args = _arguments.join(' ');
+	const QString workingDir = _workingDir.isEmpty() ? QString() : QDir::toNativeSeparators(_workingDir);
+	auto result = ot::SystemProcess::runFileByShell(nativePath.toStdWString(), args.toStdWString(), workingDir.toStdWString());
+	if (result.isOk()) {
+		return true;
+	}
+	else {
+		SCRIPT_LOGE("Detached script execution failed: \"" + _name + "\". Error (" + QString::number(result.getErrorCode()) + "): " + QString::fromStdString(result.getErrorMessage()));
+		return false;
+	}
 #else
-	// POSIX double-fork via shell
-	QString cmd = QString("nohup \"%1\" %2 > /dev/null 2>&1 &").arg(QDir::toNativeSeparators(_scriptPath), _arguments.join(' '));
-	return QProcess::startDetached("/bin/sh", { "-c", cmd }, _workingDir);
+	SCRIPT_LOGE("Detached script execution is currently only supported on Windows.");
+	return false;
 #endif
 }
 

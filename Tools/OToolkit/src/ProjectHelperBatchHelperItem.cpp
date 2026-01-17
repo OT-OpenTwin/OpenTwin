@@ -123,7 +123,7 @@ void ProjectHelperBatchHelperItem::slotClean() {
 }
 
 void ProjectHelperBatchHelperItem::slotEdit() {
-	if (ScriptRunner::runScript(getScriptName() + " - Edit", m_editPath, {}, m_rootPath)) {
+	if (ScriptRunner::runDetached(getScriptName() + " - Edit", m_editPath, {}, m_rootPath)) {
 		PHBH_LOG("Edit batch executed successfully: \"" + m_editPath + "\"");
 	}
 	else {
