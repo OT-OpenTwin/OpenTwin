@@ -71,12 +71,24 @@ public:
 	virtual EntityNamingBehavior getNamingBehavior() const { return EntityNamingBehavior(); } ;
 	virtual std::string getBlockFolderName() const { return "Blocks"; };
 
-	std::string createBlockHeadline();
+	std::string createBlockHeadline() const;
 
 	virtual std::string serialiseAsJSON() override;
 	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
 
+	//! @brief Creates a block item in the graphics scene.
+	//! @note This method requires the observer and model state to be set.
 	void createBlockItem();
+
+	//! @brief Creates a block request document.
+	//! @note This method requires the observer and model state to be set.
+	//! @throws ot::GeneralException If the block configuration could not be created or the coordianate entity could not be loaded.
+	ot::JsonDocument createGraphicsRequestDocument();
+
+	//! @brief Creates a block request document with a specified position.
+	//! @param _position Block position.
+	//! @throws ot::GeneralException If the block configuration could not be created.
+	ot::JsonDocument createGraphicsRequestDocument(const ot::Point2DD& _position);
 
 protected:
 	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
@@ -91,7 +103,7 @@ protected:
 	size_t getConnectorCount() const { return m_connectorsByName.size(); }
 
 	void createNavigationTreeEntry();
-	void addConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
+	void addConnectors(ot::GraphicsFlowItemBuilder& _flowBlockBuilder) const;
 
 	void setBlockTitle(const std::string& title) { m_blockTitle = title; setModified(); };
 

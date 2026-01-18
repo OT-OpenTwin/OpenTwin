@@ -51,17 +51,17 @@ void EntityBlockCircuitInductor::createProperties()
 	EntityPropertiesString::createProperty("Element Property", "Inductance", "100mH", "default", getProperties());
 }
 
-const double EntityBlockCircuitInductor::getRotation() {
+const double EntityBlockCircuitInductor::getRotation() const {
 	auto propertyBase = getProperties().getProperty("Rotation");
-	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	auto propertyRotation = dynamic_cast<const EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
 	double value = propertyRotation->getValue();
 	return value;
 }
 
-const std::string EntityBlockCircuitInductor::getFlip() {
+const std::string EntityBlockCircuitInductor::getFlip() const {
 	auto propertyBase = getProperties().getProperty("Flip");
-	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	auto propertyFlip = dynamic_cast<const EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
 	std::string value = propertyFlip->getValue();
 	return value;

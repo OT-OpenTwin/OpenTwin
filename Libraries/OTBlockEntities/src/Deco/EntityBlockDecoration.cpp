@@ -112,7 +112,7 @@ void EntityBlockDecoration::readSpecificDataFromDataBase(const bsoncxx::document
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 }
 
-void EntityBlockDecoration::applyDecorationPropertiesToCfg(ot::GraphicsItemCfg* _cfg) {
+void EntityBlockDecoration::applyDecorationPropertiesToCfg(ot::GraphicsItemCfg* _cfg) const {
 	_cfg->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemIsMoveable, !getLockMovement());
 	_cfg->setZValue(getZValue());
 

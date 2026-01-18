@@ -35,8 +35,8 @@ public:
 	virtual std::string getTypeAbbreviation() override;
 	virtual std::string getFolderName() override;
 
-	const double getRotation();
-	const std::string getFlip();
+	const double getRotation() const;
+	const std::string getFlip() const;
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	virtual bool updateFromProperties(void) override;
 	const ot::Connector getLeftConnector() const { return m_LeftConnector; }

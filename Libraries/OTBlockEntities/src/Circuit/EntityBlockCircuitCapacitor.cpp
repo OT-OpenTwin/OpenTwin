@@ -51,23 +51,23 @@ void EntityBlockCircuitCapacitor::createProperties()
 	EntityPropertiesString::createProperty("Element Property", "Capacity", "10uF", "default", getProperties());
 }
 
-const double EntityBlockCircuitCapacitor::getRotation() {
+const double EntityBlockCircuitCapacitor::getRotation() const {
 	auto propertyBase = getProperties().getProperty("Rotation");
-	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	auto propertyRotation = dynamic_cast<const EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
 	double value = propertyRotation->getValue();
 	return value;
 }
 
-const std::string EntityBlockCircuitCapacitor::getFlip() {
+const std::string EntityBlockCircuitCapacitor::getFlip() const {
 	auto propertyBase = getProperties().getProperty("Flip");
-	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	auto propertyFlip = dynamic_cast<const EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
 	std::string value = propertyFlip->getValue();
 	return value;
 }
 
-bool EntityBlockCircuitCapacitor::updateFromProperties(void)
+bool EntityBlockCircuitCapacitor::updateFromProperties()
 {
 	bool refresh = false;
 	refresh = EntityBlockCircuitElement::updateFromProperties();
@@ -114,12 +114,9 @@ ot::GraphicsItemCfg* EntityBlockCircuitCapacitor::createBlockCfg()
 	stringFlipMap.insert_or_assign("FlipVertically", ot::Transform::FlipVertically);
 	stringFlipMap.insert_or_assign("FlipHorizontally", ot::Transform::FlipHorizontally);
 
-
-
 	double rotation = getRotation();
 	std::string flip = getFlip();
 	ot::Transform::FlipState flipState(stringFlipMap[flip]);
-
 
 	ot::Transform transform;
 	transform.setRotation(rotation);

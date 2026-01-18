@@ -59,17 +59,17 @@ std::string EntityBlockCircuitCurrentMeter::getFolderName() {
 	return "Current Meter";
 }
 
-const double EntityBlockCircuitCurrentMeter::getRotation() {
+const double EntityBlockCircuitCurrentMeter::getRotation() const {
 	auto propertyBase = getProperties().getProperty("Rotation");
-	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	auto propertyRotation = dynamic_cast<const EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
 	double value = propertyRotation->getValue();
 	return value;
 }
 
- const std::string EntityBlockCircuitCurrentMeter::getFlip() {
+ const std::string EntityBlockCircuitCurrentMeter::getFlip() const {
 	auto propertyBase = getProperties().getProperty("Flip");
-	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	auto propertyFlip = dynamic_cast<const EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
 	std::string value = propertyFlip->getValue();
 	return value;

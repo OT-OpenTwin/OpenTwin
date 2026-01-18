@@ -54,17 +54,17 @@ std::string EntityBlockCircuitDiode::getFolderName() {
 	return "Diode";
 }
 
-const double EntityBlockCircuitDiode::getRotation() {
+const double EntityBlockCircuitDiode::getRotation() const {
 	auto propertyBase = getProperties().getProperty("Rotation");
-	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	auto propertyRotation = dynamic_cast<const EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
 	double value = propertyRotation->getValue();
 	return value;
 }
 
-const std::string EntityBlockCircuitDiode::getFlip() {
+const std::string EntityBlockCircuitDiode::getFlip() const {
 	auto propertyBase = getProperties().getProperty("Flip");
-	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	auto propertyFlip = dynamic_cast<const EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
 	std::string value = propertyFlip->getValue();
 	return value;

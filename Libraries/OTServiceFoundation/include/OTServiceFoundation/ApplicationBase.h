@@ -220,6 +220,14 @@ namespace ot {
 		//! @param _requestFlags Flags to control the request behavior.
 		bool sendMessage(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
 
+		//! @brief Will send the message to the service with the specified name.
+		//! @param _queue If true, the message will be queued.
+		//! @param _serviceName The name of the service.
+		//! @param _doc The document containing the message.
+		//! @param _response The reponse will be written here.
+		//! @param _requestFlags Flags to control the request behavior.
+		bool sendMessage(bool _queue, const std::string& _serviceName, const std::list<JsonDocument>& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
+
 		//! @brief Will send the message to the services with the specified names.
 		//! @param _queue If true, the message will be queued.
 		//! @param _serviceNames The names of the services.

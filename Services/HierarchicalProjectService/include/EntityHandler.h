@@ -42,19 +42,19 @@ public:
 	bool addConnection(const ot::GraphicsConnectionCfg& _connection);
 
 private:
-	void addDocument(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities);
+	void addDocument(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities, std::list<ot::JsonDocument>& _visualizationRequests);
 public:
 	void addDocuments(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
 
 private:
-	void addImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities);
+	void addImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities, std::list<ot::JsonDocument>& _visualizationRequests);
 public:
 	void addImages(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter);
 
 	void addLabel();
 
 private:
-	void updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities);
+	void updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities, std::list<ot::JsonDocument>& _visualizationRequests);
 public:
 	void updateProjectImages(const std::list<ot::EntityInformation>& _projects);
 
@@ -66,7 +66,8 @@ public:
 private:
 	bool getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const;
 	bool getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) const;
-	
+	bool getCoordinate(const EntityBlock* _block, ot::Point2DD& _pos);
+
 	const std::string c_rootFolderPath;
 	const std::string c_projectsFolder;
 	const std::string c_projectsFolderName;

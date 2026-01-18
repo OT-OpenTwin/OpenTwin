@@ -256,6 +256,20 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string& _serviceNa
 	return this->sendMessage(_queue, _serviceName, _doc, prefetchIds, tmp, _requestFlags);
 }
 
+bool ot::ApplicationBase::sendMessage(bool _queue, const std::string& _serviceName, const std::list<JsonDocument>& _doc, const ot::msg::RequestFlags& _requestFlags) {
+	enableMessageQueuing(_serviceName, true);
+	bool allOk = true;
+	for (const JsonDocument& doc : _doc) {
+		std::list<std::pair<UID, UID>> prefetchIds;
+		std::string tmp;
+		if (!this->sendMessage(_queue, _serviceName, doc, prefetchIds, tmp, _requestFlags)) {
+			allOk = false;
+		}
+	}
+	enableMessageQueuing(_serviceName, false);
+	return allOk;
+}
+
 bool ot::ApplicationBase::sendMessage(bool _queue, const std::list<std::string>& _serviceNames, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags) {
 	bool allOk = true;
 	std::list<std::pair<UID, UID>> prefetchIds;

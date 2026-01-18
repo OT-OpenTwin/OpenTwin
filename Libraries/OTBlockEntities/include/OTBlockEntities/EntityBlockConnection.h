@@ -52,6 +52,8 @@ public:
 	//! @note Requires that an observer is set that is able to send messages to the viewer.
 	void createConnectionItem() const;
 
+	ot::JsonDocument createGraphicsRequestDocument() const;
+
 	void createProperties();
 	virtual bool updateFromProperties() override;
 	virtual void addVisualizationNodes(void) override;

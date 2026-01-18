@@ -117,7 +117,7 @@ ot::GraphicsConnectionCfg::ConnectionShape EntityBlock::getDefaultConnectionShap
 	return ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
 }
 
-std::string EntityBlock::createBlockHeadline()
+std::string EntityBlock::createBlockHeadline() const
 {
 	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
 	//const std::string blockTitel = m_blockTitle + ": " + nameWithoutRootDirectory;
@@ -239,10 +239,17 @@ void EntityBlock::createNavigationTreeEntry()
 
 void EntityBlock::createBlockItem()
 {
+	OTAssertNullptr(getObserver());
+	ot::JsonDocument doc = createGraphicsRequestDocument();
+	getObserver()->sendMessageToViewer(doc);
+}
+
+ot::JsonDocument EntityBlock::createGraphicsRequestDocument() {
+	OTAssertNullptr(getModelState());
 	std::map<ot::UID, EntityBase*> entityMap;
 	EntityBase* entBase = readEntityFromEntityID(this, m_coordinate2DEntityID, entityMap);
 	if (entBase == nullptr) {
-		throw std::exception("EntityBlock failed to load coordinate entity.");
+		throw ot::Exception::General("EntityBlock failed to load coordinate entity.");
 	}
 	if (entBase->getObserver() != nullptr) {
 		entBase->setObserver(nullptr);
@@ -251,15 +258,19 @@ void EntityBlock::createBlockItem()
 	std::unique_ptr<EntityCoordinates2D> entCoordinate(dynamic_cast<EntityCoordinates2D*>(entBase));
 	assert(entCoordinate != nullptr);
 
+	return createGraphicsRequestDocument(entCoordinate->getCoordinates());
+}
+
+ot::JsonDocument EntityBlock::createGraphicsRequestDocument(const ot::Point2DD& _position) {
 	ot::GraphicsItemCfg* blockCfg = createBlockCfg();
 
 	if (!blockCfg) {
 		OT_LOG_EAS("Failed to create block configuration for block entity  { \"EntityID\": " + std::to_string(getEntityID()) + " }");
-		return;
+		throw ot::Exception::General("Failed to create block configuration for block entity { \"EntityID\": " + std::to_string(getEntityID()) + " }");
 	}
 
 	blockCfg->setUid(getEntityID());
-	blockCfg->setPosition(entCoordinate->getCoordinates());
+	blockCfg->setPosition(_position);
 
 	const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
 
@@ -279,10 +290,10 @@ void EntityBlock::createBlockItem()
 	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
 	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
 
-	getObserver()->sendMessageToViewer(reqDoc);
+	return reqDoc;
 }
 
-void EntityBlock::addConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
+void EntityBlock::addConnectors(ot::GraphicsFlowItemBuilder& _flowBlockBuilder) const
 {
 	for (const auto& connectorByName : m_connectorsByName)
 	{
@@ -293,15 +304,15 @@ void EntityBlock::addConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 		const std::string connectorTitle = connector.getConnectorTitle();
 		if (connectorType == ot::ConnectorType::In)
 		{
-			flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::TriangleRight);
+			_flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::TriangleRight);
 		}
 		else if (connectorType == ot::ConnectorType::InOptional)
 		{
-			flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Circle);
+			_flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Circle);
 		}
 		else if (connectorType == ot::ConnectorType::Out)
 		{
-			flowBlockBuilder.addRight(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::TriangleRight);
+			_flowBlockBuilder.addRight(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::TriangleRight);
 		}
 	}
 }

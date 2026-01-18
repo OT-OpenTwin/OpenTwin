@@ -61,5 +61,5 @@ protected:
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
-	void applyDecorationPropertiesToCfg(ot::GraphicsItemCfg* _cfg);
+	void applyDecorationPropertiesToCfg(ot::GraphicsItemCfg* _cfg) const;
 };

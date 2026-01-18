@@ -38,15 +38,12 @@ EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase*
 	resetModified();
 }
 
-#define TEST_ITEM_LOADER true
 ot::GraphicsItemCfg* EntityBlockCircuitConnector::createBlockCfg() {
-#if TEST_ITEM_LOADER==true
 	ot::BasicGraphicsIntersectionItem* newConfig = new ot::BasicGraphicsIntersectionItem;
 	newConfig->setUid(this->getEntityID());
 	newConfig->setName(this->getName());
 
 	return newConfig;
-#endif
 }
 
 void EntityBlockCircuitConnector::addStorageData(bsoncxx::builder::basic::document& storage)

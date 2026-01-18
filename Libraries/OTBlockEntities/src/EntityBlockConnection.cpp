@@ -119,8 +119,13 @@ void EntityBlockConnection::setLineShape(ot::GraphicsConnectionCfg::ConnectionSh
 void EntityBlockConnection::createConnectionItem() const {
 	OTAssertNullptr(getObserver());
 
+	ot::JsonDocument reqDoc = createGraphicsRequestDocument();
+	getObserver()->sendMessageToViewer(reqDoc);
+}
+
+ot::JsonDocument EntityBlockConnection::createGraphicsRequestDocument() const {
 	const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
-	
+
 	ot::GraphicsConnectionPackage connectionPckg(graphicsSceneName);
 	ot::GraphicsConnectionCfg connectionCfg = this->getConnectionCfg();
 
@@ -129,7 +134,7 @@ void EntityBlockConnection::createConnectionItem() const {
 
 	ot::JsonDocument reqDoc;
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-	
+
 	ot::VisualisationCfg visualisationCfg;
 	ot::JsonObject visualisationCfgJson;
 	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
@@ -139,7 +144,7 @@ void EntityBlockConnection::createConnectionItem() const {
 	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
 	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
 
-	getObserver()->sendMessageToViewer(reqDoc);
+	return reqDoc;
 }
 
 void EntityBlockConnection::createProperties()

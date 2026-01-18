@@ -57,17 +57,17 @@ std::string EntityBlockCircuitGND::getFolderName() {
 
 
 
-double EntityBlockCircuitGND::getRotation() {
+double EntityBlockCircuitGND::getRotation() const {
 	auto propertyBase = getProperties().getProperty("Rotation");
-	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	auto propertyRotation = dynamic_cast<const EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
 	double value = propertyRotation->getValue();
 	return value;
 }
 
-std::string EntityBlockCircuitGND::getFlip() {
+std::string EntityBlockCircuitGND::getFlip() const {
 	auto propertyBase = getProperties().getProperty("Flip");
-	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	auto propertyFlip = dynamic_cast<const EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
 	std::string value = propertyFlip->getValue();
 	return value;
@@ -85,8 +85,6 @@ ot::GraphicsItemCfg* EntityBlockCircuitGND::createBlockCfg() {
 	stringFlipMap.insert_or_assign("NoFlip", ot::Transform::NoFlip);
 	stringFlipMap.insert_or_assign("FlipVertically", ot::Transform::FlipVertically);
 	stringFlipMap.insert_or_assign("FlipHorizontally", ot::Transform::FlipHorizontally);
-
-
 
 	double rotation = getRotation();
 	std::string flip = getFlip();
