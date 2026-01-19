@@ -254,6 +254,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	connectAction(OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData, this, &ExternalServicesComponent::handleAddNodeFromFacetData);
 	connectAction(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, this, &ExternalServicesComponent::handleAddNodeFromDataBase);
 	connectAction(OT_ACTION_CMD_UI_VIEW_AddContainerNode, this, &ExternalServicesComponent::handleAddContainerNode);
+	connectAction(OT_ACTION_CMD_UI_VIEW_AddLCSNode, this, &ExternalServicesComponent::handleAddLCSNode);
 	connectAction(OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode, this, &ExternalServicesComponent::handleAddVis2D3DNode);
 	connectAction(OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNode, this, &ExternalServicesComponent::handleAddAnnotationNode);
 	connectAction(OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNodeFromDatabase, this, &ExternalServicesComponent::handleAddAnnotationNodeFromDataBase);
@@ -2794,6 +2795,16 @@ void ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& _docume
 	ot::VisualisationTypes visTypes(ot::json::getObject(_document, OT_ACTION_PARAM_VisualizationTypes));
 
 	ViewerAPI::addVisualizationContainerNode(visModelID, item, visTypes);
+}
+
+void ExternalServicesComponent::handleAddLCSNode(ot::JsonDocument& _document) {
+	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+
+	ot::EntityTreeItem item(ot::json::getObject(_document, OT_ACTION_PARAM_TreeItem));
+	ot::VisualisationTypes visTypes(ot::json::getObject(_document, OT_ACTION_PARAM_VisualizationTypes));
+	std::vector<double> coordinateSettings = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_POSITION);
+
+	ViewerAPI::addLCSNode(visModelID, item, visTypes, coordinateSettings);
 }
 
 void ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _document) {

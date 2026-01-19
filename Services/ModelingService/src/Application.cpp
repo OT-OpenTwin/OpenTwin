@@ -39,6 +39,7 @@
 #include "BlendEdges.h"
 #include "SimplifyRemoveFaces.h"
 #include "ModalCommandHealing.h"
+#include "LCSManager.h"
 
 #include "STEPReader.h"
 
@@ -83,6 +84,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("Modeling", "Import");
 	_ui->addMenuGroup("Modeling", "Create");
 	_ui->addMenuGroup("Modeling", "Modify");
+	_ui->addMenuGroup("Modeling", "Local Coordinate Systems");
 	_ui->addMenuGroup("Modeling", "Repair");
 
 	_ui->addMenuButton(m_buttonImportStep);
@@ -101,6 +103,9 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(m_buttonTransform);
 	_ui->addMenuButton(m_buttonChamferEdges);
 	_ui->addMenuButton(m_buttonBlendEdges);
+
+	_ui->addMenuButton(m_buttonCreateLCS);
+	_ui->addMenuButton(m_buttonActivateLCS);
 
 	_ui->addMenuButton(m_buttonRemoveFaces);
 	_ui->addMenuButton(m_buttonHealing);
@@ -322,6 +327,16 @@ STEPReader *Application::getSTEPReader(void)
 	return stepReader; 
 }
 
+LCSManager* Application::getLCSManager(void)
+{
+	if (lcsManager == nullptr)
+	{
+		lcsManager = new LCSManager(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName());
+	}
+
+	return lcsManager;
+}
+
 std::string Application::CreateTmpFileFromCompressedData(const std::string &data, ot::UID uncompressedDataLength)
 {
 	// Decode the encoded string into binary data
@@ -498,6 +513,14 @@ void Application::handleHealing() {
 	new ModalCommandHealing(this, "Modeling", "Modeling:Repair:Heal");
 }
 
+void Application::handleCreateLCS() {
+	getLCSManager()->createNew();
+}
+
+void Application::handleActivateLCS() {
+	getLCSManager()->activateSelected();
+}
+
 Application::Application() :
 	ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()),
 	primitiveManager(nullptr),
@@ -578,6 +601,14 @@ Application::Application() :
 	m_buttonHealing = ot::ToolBarButtonCfg("Modeling", "Repair", "Heal", "Default/Healing");
 	m_buttonHealing.setButtonLockFlags(lockTypes);
 	connectToolBarButton(m_buttonHealing, this, &Application::handleHealing);
+
+	m_buttonCreateLCS = ot::ToolBarButtonCfg("Modeling", "Local Coordinate Systems", "Create", "Default/LocalCoordinateSystemCreate");
+	m_buttonCreateLCS.setButtonLockFlags(lockTypes);
+	connectToolBarButton(m_buttonCreateLCS, this, &Application::handleCreateLCS);
+
+	m_buttonActivateLCS = ot::ToolBarButtonCfg("Modeling", "Local Coordinate Systems", "Activate", "Default/LocalCoordinateSystemActivate");
+	m_buttonActivateLCS.setButtonLockFlags(lockTypes);
+	connectToolBarButton(m_buttonActivateLCS, this, &Application::handleActivateLCS);
 }
 
 Application::~Application() {

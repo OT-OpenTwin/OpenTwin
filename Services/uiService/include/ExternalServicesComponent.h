@@ -286,6 +286,7 @@ public:
 	void handleAddNodeFromFacetData(ot::JsonDocument& _document);
 	void handleAddNodeFromDataBase(ot::JsonDocument& _document);
 	void handleAddContainerNode(ot::JsonDocument& _document);
+	void handleAddLCSNode(ot::JsonDocument& _document);
 	void handleAddVis2D3DNode(ot::JsonDocument& _document);
 	void handleAddAnnotationNode(ot::JsonDocument& _document);
 	void handleAddAnnotationNodeFromDataBase(ot::JsonDocument& _document);

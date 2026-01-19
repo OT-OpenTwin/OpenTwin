@@ -45,6 +45,7 @@ class ChamferEdges;
 class BlendEdges;
 class SimplifyRemoveFaces;
 class STEPReader;
+class LCSManager;
 
 // Forward declaration
 namespace ot {
@@ -108,6 +109,7 @@ private:
 	BlendEdges          *getBlendEdgesManager(void);
 	SimplifyRemoveFaces *getRemoveFacesOperation(void);
 	STEPReader			*getSTEPReader(void);
+	LCSManager			*getLCSManager(void);
 
 private:
 	EntityCache          entityCache;
@@ -119,6 +121,7 @@ private:
 	BlendEdges          *blendEdges;
 	SimplifyRemoveFaces *removeFaces;
 	STEPReader			*stepReader;
+	LCSManager			*lcsManager;
 
 	void handleImportSTEP(ot::JsonDocument& _document);
 	void handleCreateGeometryFromRubberband(ot::JsonDocument& _document);
@@ -144,6 +147,9 @@ private:
 	ot::ToolBarButtonCfg m_buttonRemoveFaces;
 	ot::ToolBarButtonCfg m_buttonHealing;
 
+	ot::ToolBarButtonCfg m_buttonCreateLCS;
+	ot::ToolBarButtonCfg m_buttonActivateLCS;
+
 	void handleRequestImportSTEP();
 
 	void handleCreateCuboid();
@@ -162,6 +168,9 @@ private:
 
 	void handleRemoveFaces();
 	void handleHealing();
+
+	void handleCreateLCS();
+	void handleActivateLCS();
 
 	Application();
 	virtual ~Application();

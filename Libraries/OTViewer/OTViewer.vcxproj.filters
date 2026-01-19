@@ -163,6 +163,9 @@
     <ClCompile Include="src\VisualiserHelper.cpp">
       <Filter>src\Visualiser</Filter>
     </ClCompile>
+    <ClCompile Include="src\SceneNodeLCS.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTViewer\PlotManagerView.h">
@@ -335,6 +338,9 @@
     </ClInclude>
     <ClInclude Include="include\OTViewer\WorkingPlane.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeLCS.h">
+      <Filter>include\SceneNodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
