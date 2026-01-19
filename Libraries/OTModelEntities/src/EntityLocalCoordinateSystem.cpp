@@ -20,7 +20,7 @@
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 
-#include "EntityLocalCoordinateSystem.h"
+#include "OTModelEntities/EntityLocalCoordinateSystem.h"
 
 #include "OTCommunication/ActionTypes.h"
 

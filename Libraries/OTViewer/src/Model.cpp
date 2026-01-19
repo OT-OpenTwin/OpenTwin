@@ -42,6 +42,7 @@
 #include "OTViewer/ViewerSettings.h"
 
 #include "OTViewer/SceneNodeVTK.h"
+#include "OTViewer/SceneNodeLCS.h"
 #include "OTViewer/SceneNodeMesh.h"
 #include "OTViewer/SceneNodeBase.h"
 #include "OTViewer/VisualiserInfo.h"

@@ -17,9 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "stdafx.h"
-
-#include "SceneNodeLCS.h"
+#include "OTViewer/SceneNodeLCS.h"
 
 
 SceneNodeLCS::SceneNodeLCS()
