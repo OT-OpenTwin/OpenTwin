@@ -24,7 +24,6 @@
 #include "ProgressLogger.h"
 #include "TmpFileManager.h"
 
-#include "GeometryOperations.h"
 #include "OTModelEntities/BoundingBox.h"
 #include "OTModelEntities/EntityMeshTet.h"
 #include "OTModelEntities/EntityMeshTetData.h"
@@ -38,6 +37,7 @@
 #include "OTModelEntities/EntityAnnotationData.h"
 #include "OTModelEntities/EntityMeshTetInfo.h"
 #include "OTModelEntities/EntityBinaryData.h"
+#include "OTCADEntities/GeometryOperations.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -846,7 +846,7 @@ bool MeshWriter::getFaceIntersectsPoint(EntityMeshTetFace *face, double x, doubl
 		mesh->getNodeCoords(nodes[1], nodeCoord2);
 		mesh->getNodeCoords(nodes[2], nodeCoord3);
 
-		if (GeometryOperations::checkPointInTriangle(x, y, z, nodeCoord1, nodeCoord2, nodeCoord3, tolerance))
+		if (ot::GeometryOperations::checkPointInTriangle(x, y, z, nodeCoord1, nodeCoord2, nodeCoord3, tolerance))
 		{
 			return true;
 		}

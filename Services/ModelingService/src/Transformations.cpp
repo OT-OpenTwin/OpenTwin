@@ -19,7 +19,7 @@
 
 #include "Transformations.h"
 
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 #include "EntityCache.h"
 #include "UpdateManager.h"
 

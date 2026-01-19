@@ -20,16 +20,20 @@
 #pragma once
 #pragma warning(disable : 4251)
 
+// OpenTwin header
 #include "OTModelEntities/EntityBase.h"
+#include "OTCADEntities/CADModelEntitiesAPIExport.h"
+
 #include "TopoDS_Shape.hxx"
 #include "TopoDS_TShape.hxx"
 #include "TopoDS_Face.hxx"
 #include "TopoDS_TFace.hxx"
 
+// std header
 #include <list>
 #include <map>
 
-class __declspec(dllexport) EntityBrep : public EntityBase
+class OT_CADENTITIES_API_EXPORT EntityBrep : public EntityBase
 {
 public:
 	EntityBrep() : EntityBrep(0, nullptr, nullptr, nullptr) {};

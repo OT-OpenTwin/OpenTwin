@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #include "STEPReader.h"
-#include "EntityGeometry.h"
-#include "GeometryOperations.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
 #include "ShapeHealing.h"
 #include "Application.h"
 

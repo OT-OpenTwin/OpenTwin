@@ -20,16 +20,18 @@
 #pragma once
 #pragma warning(disable : 4251)
 
+// OpenTwin header
 #include "OTModelEntities/EntityContainer.h"
-#include "EntityBrep.h"
 #include "OTModelEntities/EntityFacetData.h"
+#include "OTCADEntities/EntityBrep.h"
 
+// std header
 #include <string>
 
 #include "TopoDS_Shape.hxx"
 
 //! The Entity class is the base class for model entities and provides basic access properties to model entities. 
-class __declspec(dllexport) EntityGeometry : public EntityContainer
+class OT_CADENTITIES_API_EXPORT EntityGeometry : public EntityContainer
 {
 public:
 	EntityGeometry() : EntityGeometry(0, nullptr, nullptr, nullptr) {};

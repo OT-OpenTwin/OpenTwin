@@ -17,9 +17,11 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "stdafx.h"
-
-#include <algorithm>
+// OpenTwin header
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTCADEntities/CheckGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
 
 #include "BRepMesh_IncrementalMesh.hxx"
 #include "TopExp_Explorer.hxx"
@@ -30,25 +32,28 @@
 #include "BRepPrimAPI_MakeSphere.hxx"
 #include "gp_Pnt.hxx"
 #include "gp_Cone.hxx"
+#include "gp_Sphere.hxx"
 #include "NCollection_Sequence.hxx"
 #include "TColgp_SequenceOfPnt.hxx"
 #include "BRepTools.hxx"
 
-#include <TopTools_IndexedMapOfShape.hxx>
-#include <TopExp.hxx>
-#include <TopoDS_TFace.hxx>
-#include <TopoDS_Compound.hxx>
+#include "TopTools_IndexedMapOfShape.hxx"
+#include "TopExp.hxx"
+#include "TopoDS_Face.hxx"
+#include "TopoDS_TFace.hxx"
+#include "TopoDS_Compound.hxx"
 
-#include "EntityGeometry.h"
-#include "GeometryOperations.h"
-#include "CheckGeometry.h"
-#include "OTModelEntities/TemplateDefaultManager.h"
-
-bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep* brep, double deflection, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNames, std::string &errors)
+bool ot::GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep *brep, double deflection, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNames, std::string &errors)
 {
 	bool success = true;
 
 	size_t pointOffset = nodes.size();
+
+	if (fabs(deflection) < Precision::Confusion())
+	{
+		// In case the shape is empty, we will have trouble using a deflection of 0.0 for the mesh generation
+		deflection = 1.0;
+	}
 
 	Standard_Real aDeflection = deflection;
 	BRepMesh_IncrementalMesh(shape, aDeflection);
@@ -134,7 +139,7 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep* brep, doub
 		bool normalOk = true;
 
 		if (!aTr.IsNull())
-		{
+		{			
 			for (Standard_Integer i = 1; i <= aTr->NbNodes(); i++)
 			{
 				gp_Pnt   point = aTr->Node(i).Transformed(aLocation);
@@ -144,7 +149,16 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep* brep, doub
 				surfaceProps.SetParameters(uv.X(), uv.Y());
 				if (surfaceProps.IsNormalDefined())
 				{
-					normal = surfaceProps.Normal();// .Transformed(aLocation);
+					if (surface.GetType() == GeomAbs_Sphere && fabs(uv.Y() - M_PI * 0.5) < 0.0001)
+					{
+						// We are in the tip of a sphere (the normal is not unique here)
+						normal = gp_Vec(0.0, 0.0, 1.0);
+					}
+					else
+					{
+						normal = surfaceProps.Normal();// .Transformed(aLocation);
+					}
+
 					if (faceOrientation != TopAbs_Orientation::TopAbs_FORWARD) normal *= -1.0;
 				}
 				else if (surface.GetType() == GeomAbs_Cone)
@@ -229,13 +243,13 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep* brep, doub
 
 		faceId++;
 	}
-	
-	std::cout << "Shape facetted, triangles generated: " << triangles.size() << std::endl;
 
+	std::cout << "Shape facetted, triangles generated: " << triangles.size() << std::endl;
+	
 	return success;
 }
 
-BoundingBox GeometryOperations::getBoundingBox(std::list<EntityGeometry *> &geometryEntities)
+BoundingBox ot::GeometryOperations::getBoundingBox(std::list<EntityGeometry *> &geometryEntities)
 {
 	BoundingBox boundingBox;
 
@@ -251,7 +265,7 @@ BoundingBox GeometryOperations::getBoundingBox(std::list<EntityGeometry *> &geom
 	return boundingBox;
 }
 
-bool GeometryOperations::checkPointInTriangle(double x, double y, double z,
+bool ot::GeometryOperations::checkPointInTriangle(double x, double y, double z,
 											  double nodeCoord1[], double nodeCoord2[], double nodeCoord3[],
 											  double tolerance)
 {
@@ -270,7 +284,7 @@ bool GeometryOperations::checkPointInTriangle(double x, double y, double z,
 	return false;
 }
 
-double GeometryOperations::calculateDistancePointToPlane(double p[], double v1[], double v2[], double v3[])
+double ot::GeometryOperations::calculateDistancePointToPlane(double p[], double v1[], double v2[], double v3[])
 {
 	// Calculate plane normal
 	double v21[3] = { v2[0] - v1[0], v2[1] - v1[1], v2[2] - v1[2] };
@@ -296,7 +310,7 @@ double GeometryOperations::calculateDistancePointToPlane(double p[], double v1[]
 	return distance;
 }
 
-bool GeometryOperations::SameSide(double p1[], double p2[], double a[], double b[])
+bool ot::GeometryOperations::SameSide(double p1[], double p2[], double a[], double b[])
 {
 	double bma[3]  = {  b[0] - a[0],  b[1] - a[1],  b[2] - a[2] };
 	double p1ma[3] = { p1[0] - a[0], p1[1] - a[1], p1[2] - a[2] };
@@ -312,19 +326,19 @@ bool GeometryOperations::SameSide(double p1[], double p2[], double a[], double b
 	return (dprod >= 0.0);
 }
 
-void GeometryOperations::calculateCrossProduct(double vector1[3], double vector2[3], double normal[3])
+void ot::GeometryOperations::calculateCrossProduct(double vector1[3], double vector2[3], double normal[3])
 {
 	normal[0] = vector1[1] * vector2[2] - vector1[2] * vector2[1];
 	normal[1] = vector1[2] * vector2[0] - vector1[0] * vector2[2];
 	normal[2] = vector1[0] * vector2[1] - vector1[1] * vector2[0];
 }
 
-double GeometryOperations::calculateDotProduct(double vector1[3], double vector2[3])
+double ot::GeometryOperations::calculateDotProduct(double vector1[3], double vector2[3])
 {
 	return (vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2]);
 }
 
-double GeometryOperations::getMaximumFaceCurvature(TopoDS_Face &aFace)
+double ot::GeometryOperations::getMaximumFaceCurvature(TopoDS_Face &aFace)
 {
 	BRepAdaptor_Surface surface(aFace, Standard_False);
 	BRepLProp_SLProps surfaceProps(surface, 2, 1e-5);
@@ -344,7 +358,7 @@ double GeometryOperations::getMaximumFaceCurvature(TopoDS_Face &aFace)
 	return maxCurvature;
 }
 
-std::vector<std::pair<std::pair<double, double>, int>> GeometryOperations::getCurvatureRadiusHistogram(std::list<double> &faceCurvatureRadius, int nbins)
+std::vector<std::pair<std::pair<double, double>, int>> ot::GeometryOperations::getCurvatureRadiusHistogram(std::list<double> &faceCurvatureRadius, int nbins)
 {
 	std::vector<std::pair<std::pair<double, double>, int>> histogram;
 

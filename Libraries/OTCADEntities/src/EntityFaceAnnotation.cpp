@@ -17,15 +17,14 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "EntityFaceAnnotation.h"
-#include "EntityGeometry.h"
-#include "GeometryOperations.h"
-#include "OTModelEntities/EntityFacetData.h"
-#include "EntityBrep.h"
-#include "OTModelEntities/DataBase.h"
-
+// OpenTwin header
 #include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityFacetData.h"
+#include "OTCADEntities/EntityBrep.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
+#include "OTCADEntities/EntityFaceAnnotation.h"
 
 #include "BRepExtrema_DistShapeShape.hxx"
 #include "BRepBuilderAPI_MakeVertex.hxx"

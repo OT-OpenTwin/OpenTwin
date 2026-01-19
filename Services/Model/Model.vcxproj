@@ -207,7 +207,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBD);OTBlockEntities.lib;ResultDataAccess.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTCADEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBD);OTBlockEntities.lib;ResultDataAccess.lib</AdditionalDependencies>
       <AssemblyDebug>false</AssemblyDebug>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBD);$(OC_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_CLIBD);$(OT_MODELAPI_ROOT)\$(OT_LIBD)</AdditionalLibraryDirectories>
     </Link>
@@ -228,7 +228,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTCADEntities.lib</AdditionalDependencies>
       <AssemblyDebug>false</AssemblyDebug>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBD)</AdditionalLibraryDirectories>
     </Link>
@@ -291,7 +291,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBR);$(OC_LIBPATHR);$(ZLIB_LIBPATHR);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBR);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_CLIBR);$(OT_MODELAPI_ROOT)\$(OT_LIBR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBR);OTBlockEntities.lib;OTModelAPI.lib;ResultDataAccess.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTCADEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBR);OTBlockEntities.lib;OTModelAPI.lib;ResultDataAccess.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -315,7 +315,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTCADEntities.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -338,7 +338,6 @@
     <ClCompile Include="src\CrossCollectionDatabaseWrapper.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FileHandler.cpp" />
-    <ClCompile Include="src\GeometryOperations.cpp" />
     <ClCompile Include="src\LibraryManagementWrapper.cpp" />
     <ClCompile Include="src\MaterialHandler.cpp" />
     <ClCompile Include="src\MicroserviceAPI.cpp" />
@@ -369,7 +368,6 @@
     <ClInclude Include="include\CheckGeometry.h" />
     <ClInclude Include="include\CrossCollectionDatabaseWrapper.h" />
     <ClInclude Include="include\FileHandler.h" />
-    <ClInclude Include="include\GeometryOperations.h" />
     <ClInclude Include="include\LibraryManagementWrapper.h" />
     <ClInclude Include="include\MaterialHandler.h" />
     <ClInclude Include="include\MicroserviceAPI.h" />

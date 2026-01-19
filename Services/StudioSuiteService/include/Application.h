@@ -23,7 +23,7 @@
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "OTModelEntities/EntityInformation.h"
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 
 #include "InfoFileManager.h"
 

@@ -4346,31 +4346,10 @@ void ExternalServicesComponent::applyInitialSelection() {
 	if (m_initialSelection.empty()) {
 		return;
 	}
-	else {
-		InitialSelectionInfo mergedSelection;
-		
-		bool clearSelection = false;
 
-		for (const InitialSelectionInfo& info : m_initialSelection) {
-			if (info.clearSelection) {
-				clearSelection = true;
-			}
-			for (ot::UID id : info.treeIDs) {
-				if (std::find(mergedSelection.treeIDs.begin(), mergedSelection.treeIDs.end(), id) == mergedSelection.treeIDs.end()) {
-					mergedSelection.treeIDs.push_back(id);
-				}
-			}
-		}
-		mergedSelection.clearSelection = clearSelection;
-
-		if (mergedSelection.treeIDs.empty()) {
-			return;
-		}
-
-		AppBase::instance()->setNavigationTreeItemsSelected(mergedSelection.treeIDs, true, mergedSelection.clearSelection);
-		m_initialSelection.clear();
-	}
-	
+	InitialSelectionInfo selection = m_initialSelection.back();
+	m_initialSelection.clear();
+	AppBase::instance()->setNavigationTreeItemsSelected(selection.treeIDs, true, selection.clearSelection);
 }
 
 void ExternalServicesComponent::actionDispatchTimeout(const ot::JsonDocument& _document) {

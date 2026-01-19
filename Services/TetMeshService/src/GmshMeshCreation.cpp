@@ -46,9 +46,9 @@
 #include "OTModelEntities/EntityMeshTetFaceData.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
 
-#include "EntityGeometry.h"
-#include "EntityFaceAnnotation.h"
-#include "GeometryOperations.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/EntityFaceAnnotation.h"
+#include "OTCADEntities/GeometryOperations.h"
 #include "SelfIntersectionCheck.h"
 #include "Application.h"
 
@@ -162,7 +162,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 		MaterialManager materialManager(application);
 		materialManager.loadNecessaryMaterials(geometryEntities, properties);
 
-		boundingBox = GeometryOperations::getBoundingBox(geometryEntities);
+		boundingBox = ot::GeometryOperations::getBoundingBox(geometryEntities);
 
 		stepWidthManager.determineBaseStepWidths(boundingBox, properties);
 

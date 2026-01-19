@@ -19,12 +19,12 @@
 
 #include "stdafx.h"
 #include "MaterialHandler.h"
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
 #include "Model.h"
 #include "Application.h"
 #include "MicroserviceNotifier.h"
 #include "QueuingHttpRequestsRAII.h"
-#include "GeometryOperations.h"
 
 MaterialHandler::MaterialHandler() {
 	const std::string pageName = Application::getToolBarPageName();
@@ -61,7 +61,7 @@ EntityMaterial* MaterialHandler::createNewMaterial(const std::string& _materialN
 		entityMaterialRoot = new EntityContainer(model->createEntityUID(), nullptr, model, model->getStateManager());
 		entityMaterialRoot->setName(model->getMaterialRootName());
 
-		GeometryOperations::EntityList allNewEntities;
+		ot::GeometryOperations::EntityList allNewEntities;
 		model->addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, model->getRootNode(), true, allNewEntities);
 
 		model->addVisualizationContainerNode(entityMaterialRoot->getName(), entityMaterialRoot->getEntityID(), entityMaterialRoot->getTreeItemEditable());

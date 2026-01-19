@@ -25,7 +25,7 @@
 #include "Model.h"
 #include "curl/curl.h"
 
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 
 #include "OTModelEntities/DataBase.h"
 #include <array>

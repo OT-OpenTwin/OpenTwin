@@ -23,7 +23,7 @@
 #include "EntityCache.h"
 
 #include "OTCore/CoreTypes.h"
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"

@@ -158,7 +158,7 @@ ECHO ===============================================================
 CALL "%OT_COMMUNICATION_ROOT%%testBat%" %1 %2
 
 ECHO ===============================================================
-ECHO Test Library: CADModelEntities
+ECHO Test Library: OTCADEntities
 ECHO ===============================================================
 CALL "%OT_CADMODELENTITIES_ROOT%%testBat%" %1 %2
 

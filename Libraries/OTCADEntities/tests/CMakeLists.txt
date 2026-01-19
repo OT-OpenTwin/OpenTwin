@@ -1,6 +1,6 @@
 # ============================================================
-# CADModelEntities test CMake
-# Reuses CADModelEntities_core object files and links against
+# OTCADEntities test CMake
+# Reuses OTCADEntities_core object files and links against
 # OT libraries, Mongo, OpenCascade and GTest.
 # ============================================================
 
@@ -99,20 +99,20 @@ join_paths(OT_DATASTORAGE_RELEASE_LIB_DIR "${OT_DATASTORAGE_ROOT_PATH}"  "${OT_C
 # ------------------------------------------------------------
 # Collect test sources
 # ------------------------------------------------------------
-file(GLOB_RECURSE CADModelEntities_TEST_SOURCES
+file(GLOB_RECURSE OTCADEntities_TEST_SOURCES
     CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
 # ------------------------------------------------------------
-# Test executable - reuse CADModelEntities_core
+# Test executable - reuse OTCADEntities_core
 # ------------------------------------------------------------
-add_executable(CADModelEntities_tests
-    ${CADModelEntities_TEST_SOURCES}
-    $<TARGET_OBJECTS:CADModelEntities_core>
+add_executable(OTCADEntities_tests
+    ${OTCADEntities_TEST_SOURCES}
+    $<TARGET_OBJECTS:OTCADEntities_core>
 )
 
-target_compile_definitions(CADModelEntities_tests
+target_compile_definitions(OTCADEntities_tests
     PRIVATE
         # no special export macro needed
         $<$<CONFIG:Debug>:_DEBUG>
@@ -122,7 +122,7 @@ target_compile_definitions(CADModelEntities_tests
 # ------------------------------------------------------------
 # Include directories
 # ------------------------------------------------------------
-target_include_directories(CADModelEntities_tests
+target_include_directories(OTCADEntities_tests
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/../include"
@@ -130,84 +130,84 @@ target_include_directories(CADModelEntities_tests
 
 # OT includes
 if(OT_SYSTEM_ROOT_PATH AND OT_INC_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE
+    target_include_directories(OTCADEntities_tests PRIVATE
         "${OT_SYSTEM_ROOT_PATH}/${OT_INC_PATH}"
     )
 endif()
 
 if(OT_CORE_ROOT_PATH AND OT_INC_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE
+    target_include_directories(OTCADEntities_tests PRIVATE
         "${OT_CORE_ROOT_PATH}/${OT_INC_PATH}"
     )
 endif()
 
 if(OT_GUI_ROOT_PATH AND OT_INC_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE
+    target_include_directories(OTCADEntities_tests PRIVATE
         "${OT_GUI_ROOT_PATH}/${OT_INC_PATH}"
     )
 endif()
 
 if(OT_GUIAPI_ROOT_PATH AND OT_INC_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE
+    target_include_directories(OTCADEntities_tests PRIVATE
         "${OT_GUIAPI_ROOT_PATH}/${OT_INC_PATH}"
     )
 endif()
 
 if(OT_COMMUNICATION_ROOT_PATH AND OT_INC_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE
+    target_include_directories(OTCADEntities_tests PRIVATE
         "${OT_COMMUNICATION_ROOT_PATH}/${OT_INC_PATH}"
     )
 endif()
 
 if(OT_MODELENTITIES_ROOT_PATH AND OT_INC_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE
+    target_include_directories(OTCADEntities_tests PRIVATE
         "${OT_MODELENTITIES_ROOT_PATH}/${OT_INC_PATH}"
     )
 endif()
 
 if(OT_DATASTORAGE_ROOT_PATH AND OT_INC_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE
+    target_include_directories(OTCADEntities_tests PRIVATE
         "${OT_DATASTORAGE_ROOT_PATH}/${OT_INC_PATH}"
     )
 endif()
 
 # RapidJSON
 if(R_JSON_INCD_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE "${R_JSON_INCD_PATH}")
+    target_include_directories(OTCADEntities_tests PRIVATE "${R_JSON_INCD_PATH}")
 endif()
 
 if(R_JSON_INCR_PATH AND NOT R_JSON_INCR_PATH STREQUAL R_JSON_INCD_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE "${R_JSON_INCR_PATH}")
+    target_include_directories(OTCADEntities_tests PRIVATE "${R_JSON_INCR_PATH}")
 endif()
 
 # Mongo includes
 if(MONGO_CXX_INC_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE "${MONGO_CXX_INC_PATH}")
+    target_include_directories(OTCADEntities_tests PRIVATE "${MONGO_CXX_INC_PATH}")
 endif()
 
 if(MONGO_C_INC_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE "${MONGO_C_INC_PATH}")
+    target_include_directories(OTCADEntities_tests PRIVATE "${MONGO_C_INC_PATH}")
 endif()
 
 if(MONGO_CXX_INCD_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE "${MONGO_CXX_INCD_PATH}")
+    target_include_directories(OTCADEntities_tests PRIVATE "${MONGO_CXX_INCD_PATH}")
 endif()
 
 if(MONGO_C_INCD_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE "${MONGO_C_INCD_PATH}")
+    target_include_directories(OTCADEntities_tests PRIVATE "${MONGO_C_INCD_PATH}")
 endif()
 
 if(MONGO_BOOST_ROOT_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE "${MONGO_BOOST_ROOT_PATH}")
+    target_include_directories(OTCADEntities_tests PRIVATE "${MONGO_BOOST_ROOT_PATH}")
 endif()
 
 # OpenCascade includes
 if(OC_INCD_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE "${OC_INCD_PATH}")
+    target_include_directories(OTCADEntities_tests PRIVATE "${OC_INCD_PATH}")
 endif()
 
 if(OC_INCR_PATH AND NOT OC_INCR_PATH STREQUAL OC_INCD_PATH)
-    target_include_directories(CADModelEntities_tests PRIVATE "${OC_INCR_PATH}")
+    target_include_directories(OTCADEntities_tests PRIVATE "${OC_INCR_PATH}")
 endif()
 
 # ------------------------------------------------------------
@@ -216,13 +216,13 @@ endif()
 if(WIN32)
     # OT lib directories
     if(OT_SYSTEM_DEBUG_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${OT_SYSTEM_DEBUG_LIB_DIR}>
         )
     endif()
 
     if(OT_SYSTEM_RELEASE_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Release>:${OT_SYSTEM_RELEASE_LIB_DIR}>
             $<$<CONFIG:RelWithDebInfo>:${OT_SYSTEM_RELEASE_LIB_DIR}>
             $<$<CONFIG:MinSizeRel>:${OT_SYSTEM_RELEASE_LIB_DIR}>
@@ -230,13 +230,13 @@ if(WIN32)
     endif()
 
     if(OT_CORE_DEBUG_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${OT_CORE_DEBUG_LIB_DIR}>
         )
     endif()
 
     if(OT_CORE_RELEASE_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Release>:${OT_CORE_RELEASE_LIB_DIR}>
             $<$<CONFIG:RelWithDebInfo>:${OT_CORE_RELEASE_LIB_DIR}>
             $<$<CONFIG:MinSizeRel>:${OT_CORE_RELEASE_LIB_DIR}>
@@ -244,13 +244,13 @@ if(WIN32)
     endif()
 
     if(OT_GUI_DEBUG_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${OT_GUI_DEBUG_LIB_DIR}>
         )
     endif()
 
     if(OT_GUI_RELEASE_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Release>:${OT_GUI_RELEASE_LIB_DIR}>
             $<$<CONFIG:RelWithDebInfo>:${OT_GUI_RELEASE_LIB_DIR}>
             $<$<CONFIG:MinSizeRel>:${OT_GUI_RELEASE_LIB_DIR}>
@@ -258,13 +258,13 @@ if(WIN32)
     endif()
 
     if(OT_GUIAPI_DEBUG_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${OT_GUIAPI_DEBUG_LIB_DIR}>
         )
     endif()
 
     if(OT_GUIAPI_RELEASE_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Release>:${OT_GUIAPI_RELEASE_LIB_DIR}>
             $<$<CONFIG:RelWithDebInfo>:${OT_GUIAPI_RELEASE_LIB_DIR}>
             $<$<CONFIG:MinSizeRel>:${OT_GUIAPI_RELEASE_LIB_DIR}>
@@ -272,13 +272,13 @@ if(WIN32)
     endif()
 
     if(OT_COMM_DEBUG_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${OT_COMM_DEBUG_LIB_DIR}>
         )
     endif()
 
     if(OT_COMM_RELEASE_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Release>:${OT_COMM_RELEASE_LIB_DIR}>
             $<$<CONFIG:RelWithDebInfo>:${OT_COMM_RELEASE_LIB_DIR}>
             $<$<CONFIG:MinSizeRel>:${OT_COMM_RELEASE_LIB_DIR}>
@@ -286,13 +286,13 @@ if(WIN32)
     endif()
 
     if(OT_MODELENTITIES_DEBUG_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${OT_MODELENTITIES_DEBUG_LIB_DIR}>
         )
     endif()
 
     if(OT_MODELENTITIES_RELEASE_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Release>:${OT_MODELENTITIES_RELEASE_LIB_DIR}>
             $<$<CONFIG:RelWithDebInfo>:${OT_MODELENTITIES_RELEASE_LIB_DIR}>
             $<$<CONFIG:MinSizeRel>:${OT_MODELENTITIES_RELEASE_LIB_DIR}>
@@ -300,13 +300,13 @@ if(WIN32)
     endif()
 
     if(OT_DATASTORAGE_DEBUG_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${OT_DATASTORAGE_DEBUG_LIB_DIR}>
         )
     endif()
 
     if(OT_DATASTORAGE_RELEASE_LIB_DIR)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Release>:${OT_DATASTORAGE_RELEASE_LIB_DIR}>
             $<$<CONFIG:RelWithDebInfo>:${OT_DATASTORAGE_RELEASE_LIB_DIR}>
             $<$<CONFIG:MinSizeRel>:${OT_DATASTORAGE_RELEASE_LIB_DIR}>
@@ -315,13 +315,13 @@ if(WIN32)
 
     # Mongo lib dirs
     if(MONGO_CXX_LIBPATHD_PATH)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${MONGO_CXX_LIBPATHD_PATH}>
         )
     endif()
 
     if(MONGO_CXX_LIBPATHR_PATH)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Release>:${MONGO_CXX_LIBPATHR_PATH}>
             $<$<CONFIG:RelWithDebInfo>:${MONGO_CXX_LIBPATHR_PATH}>
             $<$<CONFIG:MinSizeRel>:${MONGO_CXX_LIBPATHR_PATH}>
@@ -329,13 +329,13 @@ if(WIN32)
     endif()
 
     if(MONGO_C_LIBPATHD_PATH)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${MONGO_C_LIBPATHD_PATH}>
         )
     endif()
 
     if(MONGO_C_LIBPATHR_PATH)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Release>:${MONGO_C_LIBPATHR_PATH}>
             $<$<CONFIG:RelWithDebInfo>:${MONGO_C_LIBPATHR_PATH}>
             $<$<CONFIG:MinSizeRel>:${MONGO_C_LIBPATHR_PATH}>
@@ -344,13 +344,13 @@ if(WIN32)
 
     # OpenCascade lib dirs
     if(OC_LIBPATHD_PATH)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Debug>:${OC_LIBPATHD_PATH}>
         )
     endif()
 
     if(OC_LIBPATHR_PATH)
-        target_link_directories(CADModelEntities_tests PRIVATE
+        target_link_directories(OTCADEntities_tests PRIVATE
             $<$<CONFIG:Release>:${OC_LIBPATHR_PATH}>
             $<$<CONFIG:RelWithDebInfo>:${OC_LIBPATHR_PATH}>
             $<$<CONFIG:MinSizeRel>:${OC_LIBPATHR_PATH}>
@@ -358,7 +358,7 @@ if(WIN32)
     endif()
 
     # System + OT + Mongo + OC libs
-    target_link_libraries(CADModelEntities_tests
+    target_link_libraries(OTCADEntities_tests
         PRIVATE
             OTSystem
             OTCore
@@ -379,15 +379,15 @@ endif()
 # ------------------------------------------------------------
 # GoogleTest integration
 # ------------------------------------------------------------
-target_link_libraries(CADModelEntities_tests
+target_link_libraries(OTCADEntities_tests
     PRIVATE
         GTest::gtest_main
 )
 
 include(GoogleTest)
 
-add_test(NAME CADModelEntities_tests COMMAND CADModelEntities_tests)
+add_test(NAME OTCADEntities_tests COMMAND OTCADEntities_tests)
 
-set_tests_properties(CADModelEntities_tests PROPERTIES
-    WORKING_DIRECTORY $<TARGET_FILE_DIR:CADModelEntities_tests>
+set_tests_properties(OTCADEntities_tests PROPERTIES
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:OTCADEntities_tests>
 )

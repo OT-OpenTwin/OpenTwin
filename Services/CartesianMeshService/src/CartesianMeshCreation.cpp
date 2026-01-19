@@ -36,8 +36,8 @@
 #include "OTModelEntities/EntityVis2D3D.h"
 #include "OTModelEntities/EntityVisCartesianFaceScalar.h"
 
-#include "EntityGeometry.h"
-#include "GeometryOperations.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
 
 #include "BRepPrimAPI_MakeBox.hxx"
 

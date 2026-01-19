@@ -20,12 +20,11 @@
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 
-#include "EntityGeometry.h"
-#include "OTModelEntities/DataBase.h"
-
+// OpenTwin header
 #include "OTCommunication/ActionTypes.h"
-
-#include "GeometryOperations.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
 
 #include "Bnd_Box.hxx"
 #include "BRepBndLib.hxx"
@@ -942,7 +941,7 @@ void EntityGeometry::facetEntity(bool isHidden)
 	getFacets()->getTriangleList().clear();
 	getFacets()->getEdgeList().clear();
 
-	GeometryOperations::facetEntity(getBrep(), brep, deflection, 
+	ot::GeometryOperations::facetEntity(getBrep(), brep, deflection,
 									getFacets()->getNodeVector(), getFacets()->getTriangleList(), getFacets()->getEdgeList(), getFacets()->getFaceNameMap(), getFacets()->getErrorString());
 	getFacets()->setModified();
 

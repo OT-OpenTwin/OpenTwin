@@ -45,7 +45,7 @@
 #include "OTModelEntities/EntityResultText.h"
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 
 // Application specific includes
 #include "InfoFileManager.h"

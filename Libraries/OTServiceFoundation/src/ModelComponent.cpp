@@ -28,7 +28,7 @@
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/EntityResultText.h"
 
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 
 // std header
 #include <iostream>

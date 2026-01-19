@@ -17,15 +17,14 @@
 // limitations under the License.
 // @otlicense-end
 
-//#include "stdafx.h"
+// OpenTwin header
+#include "OTCADEntities/CheckGeometry.h"
 
 #include "TopoDS.hxx"
 #include "Geom_Surface.hxx"
 #include "Geom_ToroidalSurface.hxx"
 #include "BRepLProp_SLProps.hxx"
 #include "Precision.hxx"
-
-#include "CheckGeometry.h"
 
 std::string GeometryChecker::CheckFace(TopoDS_Face aFace)
 {

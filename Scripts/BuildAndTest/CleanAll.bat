@@ -37,7 +37,7 @@ ECHO ===============================================================
 CALL "%OT_BLOCKENTITIES_ROOT%\Clean.bat"
 
 ECHO ===============================================================
-ECHO Clean Library: CADModelEntities
+ECHO Clean Library: OTCADEntities
 ECHO ===============================================================
 CALL "%OT_CADMODELENTITIES_ROOT%\Clean.bat"
 

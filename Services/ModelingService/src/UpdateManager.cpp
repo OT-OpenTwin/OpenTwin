@@ -21,7 +21,7 @@
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/DataBase.h"
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 #include "Transformations.h"
 #include "BooleanOperations.h"
 #include "ChamferEdges.h"

@@ -60,9 +60,6 @@
     <ClCompile Include="$(EXPREVAL_ROOT)\tinyexpr.c">
       <Filter>Third Party Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GeometryOperations.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ProjectTypeManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -117,9 +114,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GeometryOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\CheckGeometry.h">

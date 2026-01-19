@@ -82,7 +82,7 @@ SET OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\FileMana
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library root paths
-SET OT_CADMODELENTITIES_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\CadModelEntities
+SET OT_CADMODELENTITIES_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTCADEntities
 SET OT_DATASTORAGE_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTDataStorage
 SET OT_MODELENTITIES_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTModelEntities
 SET OT_BLOCKENTITIES_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTBlockEntities

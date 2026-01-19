@@ -43,7 +43,6 @@
 #include "OTModelEntities/EntityProperties.h"
 #include "OTModelEntities/EntityFile.h"
 #include "OTModelEntities/EntityBinaryData.h"
-#include "EntityGeometry.h"
 
 #include "ResultManager.h"
 

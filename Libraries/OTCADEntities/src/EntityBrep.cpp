@@ -20,8 +20,9 @@
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 
-#include "EntityBrep.h"
+// OpenTwin header
 #include "OTModelEntities/DataBase.h"
+#include "OTCADEntities/EntityBrep.h"
 
 #include "Bnd_Box.hxx"
 #include "BRepBndLib.hxx"

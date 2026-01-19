@@ -1,5 +1,5 @@
 // @otlicense
-// File: CheckGeometry.h
+// File: CADModelEntitiesAPIExport.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,14 +18,9 @@
 // @otlicense-end
 
 #pragma once
-#pragma warning(disable : 4251)
 
-#include <string>
-
-#include "TopoDS.hxx"
-
-namespace GeometryChecker
-{
-	__declspec(dllexport) std::string CheckFace(TopoDS_Face aFace);
-}
-
+#ifdef OPENTWINCADMODELENTITIES_EXPORTS
+#define OT_CADENTITIES_API_EXPORT __declspec(dllexport)
+#else
+#define OT_CADENTITIES_API_EXPORT __declspec(dllimport)
+#endif

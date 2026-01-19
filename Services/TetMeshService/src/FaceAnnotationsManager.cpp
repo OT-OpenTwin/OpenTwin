@@ -21,7 +21,7 @@
 
 #include "Application.h"
 
-#include "EntityFaceAnnotation.h"
+#include "OTCADEntities/EntityFaceAnnotation.h"
 
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"

@@ -62,7 +62,7 @@
 #include "ShapeCustom_RestrictionParameters.hxx"
 #include "TopOpeBRepBuild_Tools.hxx"
 
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 #include "OTModelEntities/DataBase.h"
 
 void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool fixSmallFaces, bool sewFaces, bool makeSolids)

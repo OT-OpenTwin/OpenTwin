@@ -21,7 +21,7 @@
 
 #include "Application.h"
 
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 #include "OTModelEntities/EntityMaterial.h"
 
 #include "OTServiceFoundation/ModelComponent.h"

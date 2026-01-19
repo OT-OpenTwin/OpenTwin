@@ -20,18 +20,21 @@
 #pragma once
 #pragma warning(disable : 4251)
 
+// OpenTwin header
+#include "OTModelEntities/Geometry.h"
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/BoundingBox.h"
-#include "OTModelEntities/Geometry.h"
+#include "OTCADEntities/CADModelEntitiesAPIExport.h"
 
 #include "TopoDS_Shape.hxx"
 
+// std header
 #include <string>
 
 class EntityFacetData;
 class EntityBrep;
 
-class __declspec(dllexport) EntityFaceAnnotationData
+class OT_CADENTITIES_API_EXPORT EntityFaceAnnotationData
 {
 public:
 	EntityFaceAnnotationData() : modelID(0) {}
@@ -48,7 +51,7 @@ private:
 	unsigned long long modelID;
 };
 
-class __declspec(dllexport) EntityFaceAnnotation : public EntityBase
+class OT_CADENTITIES_API_EXPORT EntityFaceAnnotation : public EntityBase
 {
 public:
 	EntityFaceAnnotation() : EntityFaceAnnotation(0, nullptr, nullptr, nullptr) {};

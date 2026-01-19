@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #include "EdgesOperationBase.h"
-#include "EntityGeometry.h"
-#include "EntityFaceAnnotation.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/EntityFaceAnnotation.h"
 #include "EntityCache.h"
 #include "UpdateManager.h"
 

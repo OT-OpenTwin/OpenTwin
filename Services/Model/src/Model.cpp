@@ -56,12 +56,12 @@
 #include "OTModelEntities/EntityParameterizedDataPreviewTable.h"
 #include "OTModelEntities/EntityParameterizedDataCategorization.h"
 
-#include "EntityGeometry.h"
-#include "EntityFaceAnnotation.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
+#include "OTCADEntities/EntityFaceAnnotation.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
 
 #include "MicroserviceNotifier.h"
-#include "GeometryOperations.h"
 #include "TableReader.h"
 #include "ProgressReport.h"
 #include "ProjectTypeManager.h"
@@ -212,7 +212,7 @@ void Model::resetToNew()
 	entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 	entityMap[entityRoot->getEntityID()] = entityRoot;
 
-	GeometryOperations::EntityList allNewEntities;
+	ot::GeometryOperations::EntityList allNewEntities;
 
 	// Create the various root items
 	if (typeManager.hasGeometryRoot())
@@ -992,7 +992,7 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 		entityParameterRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityParameterRoot->setName(getParameterRootName());
 
-		GeometryOperations::EntityList allNewEntities;
+		ot::GeometryOperations::EntityList allNewEntities;
 		addEntityToModel(entityParameterRoot->getName(), entityParameterRoot, entityRoot, true, allNewEntities);
 
 		addVisualizationContainerNode(entityParameterRoot->getName(), entityParameterRoot->getEntityID(), entityParameterRoot->getTreeItemEditable());
@@ -1832,7 +1832,7 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*> _entities, const s
 			}
 		}
 
-		GeometryOperations::EntityList allNewEntities;
+		ot::GeometryOperations::EntityList allNewEntities;
 		addEntityToModel(entity->getName(), entity, entityRoot, addVisualizationContainer, allNewEntities);
 
 		// Now the parent should not be empty
@@ -2617,7 +2617,7 @@ void Model::performEntityMeshUpdate(EntityMeshTet *entity)
 			std::list<EntityGeometry *> geometryEntities;
 			getAllGeometryEntities(geometryEntities);
 
-			BoundingBox boundingBox = GeometryOperations::getBoundingBox(geometryEntities);
+			BoundingBox boundingBox = ot::GeometryOperations::getBoundingBox(geometryEntities);
 
 			if (boundingBox.getDiagonal() == 0.0)
 			{
@@ -2935,7 +2935,7 @@ void Model::handleShowSelectedShapeInformation()
 
 	if (!faceCurvatureRadius.empty())
 	{
-		std::vector<std::pair<std::pair<double, double>, int>> curvatureHistogram = GeometryOperations::getCurvatureRadiusHistogram(faceCurvatureRadius, 20);
+		std::vector<std::pair<std::pair<double, double>, int>> curvatureHistogram = ot::GeometryOperations::getCurvatureRadiusHistogram(faceCurvatureRadius, 20);
 
 		message += "  Curvature radius:\n";
 
@@ -3016,7 +3016,7 @@ void Model::getFaceCurvatureRadius(const TopoDS_Shape *shape, std::list<double> 
 	for (exp.Init(*shape, TopAbs_FACE); exp.More(); exp.Next())
 	{
 		TopoDS_Face aFace = TopoDS::Face(exp.Current());
-		double maxCurvature = GeometryOperations::getMaximumFaceCurvature(aFace);
+		double maxCurvature = ot::GeometryOperations::getMaximumFaceCurvature(aFace);
 
 		if (maxCurvature > 0.0) faceCurvatureRadius.push_back(1.0 / maxCurvature);
 	}
@@ -3095,7 +3095,7 @@ void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &anno
 		annotationEntity->addFacePick(annotation);
 	}
 
-	GeometryOperations::EntityList allNewEntities;
+	ot::GeometryOperations::EntityList allNewEntities;
 	addEntityToModel(annotationEntity->getName(), annotationEntity, entityRoot, true, allNewEntities);
 
 	updateAnnotationGeometry(annotationEntity);
@@ -3146,7 +3146,7 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 				double deflection = calculateDeflectionFromListOfEntities(entity);
 
 				std::string errors;
-				GeometryOperations::facetEntity(face, nullptr, deflection, annotationEntity->getFacets()->getNodeVector(), annotationEntity->getFacets()->getTriangleList(), annotationEntity->getFacets()->getEdgeList(), annotationEntity->getFacets()->getFaceNameMap(), errors);
+				ot::GeometryOperations::facetEntity(face, nullptr, deflection, annotationEntity->getFacets()->getNodeVector(), annotationEntity->getFacets()->getTriangleList(), annotationEntity->getFacets()->getEdgeList(), annotationEntity->getFacets()->getFaceNameMap(), errors);
 			}
 		}
 	}
