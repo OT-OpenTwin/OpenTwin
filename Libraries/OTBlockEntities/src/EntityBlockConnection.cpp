@@ -110,10 +110,15 @@ void EntityBlockConnection::setGraphicsPickerKey(const std::string& _key) {
 }
 
 void EntityBlockConnection::setLineShape(ot::GraphicsConnectionCfg::ConnectionShape _shape) {
-	if (m_lineShape != _shape) {
-		m_lineShape = _shape;
-		setModified();
-	}
+	EntityPropertiesSelection* lineShape = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
+	OTAssertNullptr(lineShape);
+	lineShape->setValue(ot::GraphicsConnectionCfg::shapeToString(_shape));
+}
+
+ot::GraphicsConnectionCfg::ConnectionShape EntityBlockConnection::getLineShape() const {
+	const EntityPropertiesSelection* lineShape = dynamic_cast<const EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
+	OTAssertNullptr(lineShape);
+	return ot::GraphicsConnectionCfg::stringToShape(lineShape->getValue());
 }
 
 void EntityBlockConnection::createConnectionItem() const {

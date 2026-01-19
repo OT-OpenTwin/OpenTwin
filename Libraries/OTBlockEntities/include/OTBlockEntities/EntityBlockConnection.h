@@ -42,7 +42,7 @@ public:
 	const std::string& getGraphicsPickerKey() const { return m_pickerKey; };
 
 	void setLineShape(ot::GraphicsConnectionCfg::ConnectionShape _shape);
-	ot::GraphicsConnectionCfg::ConnectionShape getLineShape() const { return m_lineShape; };
+	ot::GraphicsConnectionCfg::ConnectionShape getLineShape() const;
 
 	//! @brief The name of the container below the graphics editor. This name need not be editable. 
 	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
@@ -60,7 +60,6 @@ public:
 	virtual int getSchemaVersion(void) override { return 1; };
 
 private:
-	ot::GraphicsConnectionCfg::ConnectionShape m_lineShape = ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
 	ot::PenFCfg m_lineStyle;
 
 	std::string m_pickerKey;
