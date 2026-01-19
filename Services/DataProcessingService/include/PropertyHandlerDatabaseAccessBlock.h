@@ -21,9 +21,9 @@
 
 #include "OTCore/CoreTypes.h"
 #include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
-#include "MetadataCampaign.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "ResultCollectionMetadataAccess.h"
+#include "OTResultDataAccess/MetadataCampaign.h"
+#include "OTResultDataAccess/ResultCollectionMetadataAccess.h"
 #include <map>
 #include <memory>
 

@@ -25,9 +25,6 @@
 #include "Application.h"
 #include "CircuitElement.h"
 #include "SimulationResults.h"
-#include "PlotBuilder.h"
-#include "ResultCollectionExtender.h"
-#include "QuantityDescriptionCurve.h"
 
 #include "OTCore/EntityName.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
@@ -35,6 +32,10 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+
+#include "OTResultDataAccess/PlotBuilder.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/QuantityDescriptionCurve.h"
 
 #include "OTBlockEntities/EntityBlockConnection.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitVoltageSource.h"

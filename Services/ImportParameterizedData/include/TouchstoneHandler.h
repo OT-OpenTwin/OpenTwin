@@ -21,10 +21,10 @@
 #include <string>
 #include <list>
 #include "OptionSettings.h"
-#include "QuantityDescriptionSParameter.h"
-#include "DatasetDescription.h"
-#include "MetadataParameter.h"
 #include "OTCore/GenericDataStructMatrix.h"
+#include "OTResultDataAccess/QuantityDescriptionSParameter.h"
+#include "OTResultDataAccess/DatasetDescription.h"
+#include "OTResultDataAccess/MetadataParameter.h"
 
 class TouchstoneHandler
 {

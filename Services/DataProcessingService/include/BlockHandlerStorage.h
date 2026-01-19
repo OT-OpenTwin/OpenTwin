@@ -20,8 +20,8 @@
 #pragma once
 #include "BlockHandler.h"
 #include "OTBlockEntities/Pipeline/EntityBlockStorage.h"
-#include "ResultCollectionExtender.h"
-#include "MetadataParameter.h"
+#include "OTResultDataAccess/MetadataParameter.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
 
 class BlockHandlerStorage : public BlockHandler
 {

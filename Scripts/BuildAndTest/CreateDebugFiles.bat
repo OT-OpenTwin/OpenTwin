@@ -101,7 +101,7 @@ DEL "%OPENTWIN_DEBUG_FILES%\open_twin.exe" 2>NUL
 DEL "%OPENTWIN_DEBUG_FILES%\CircuitSimulatorService.dll" 2>NUL
 DEL "%OPENTWIN_DEBUG_FILES%\CircuitExecution.exe" 2>NUL
 DEL "%OPENTWIN_DEBUG_FILES%\OToolkit.dll" 2>NUL
-DEL "%OPENTWIN_DEBUG_FILES%\ResultDataAccess.dll" 2>NUL
+DEL "%OPENTWIN_DEBUG_FILES%\OTResultDataAccess.dll" 2>NUL
 
 REM ====================================================================
 REM  Copy libraries
@@ -128,7 +128,7 @@ COPY "%OT_WIDGETS_ROOT%\%OT_DLLR%\OTWidgets.dll" "%OPENTWIN_DEBUG_FILES%"
 COPY "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\%OT_DLLR%\StudioSuiteConnector.dll" "%OPENTWIN_DEBUG_FILES%"
 COPY "%OT_LTSPICE_CONNECTOR_ROOT%\%OT_DLLR%\LTSpiceConnector.dll" "%OPENTWIN_DEBUG_FILES%"
 COPY "%OT_BLOCKENTITIES_ROOT%\%OT_DLLR%\OTBlockEntities.dll" "%OPENTWIN_DEBUG_FILES%"
-COPY "%OT_RESULT_DATA_ACCESS_ROOT%\%OT_DLLR%\ResultDataAccess.dll" "%OPENTWIN_DEBUG_FILES%"
+COPY "%OT_RESULT_DATA_ACCESS_ROOT%\%OT_DLLR%\OTResultDataAccess.dll" "%OPENTWIN_DEBUG_FILES%"
 
 REM ====================================================================
 REM  Copy Services

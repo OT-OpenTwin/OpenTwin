@@ -21,10 +21,10 @@
 
 #include "DataDocument.h"
 
-#include "MetadataCampaign.h"
-#include "MetadataSeries.h"
-#include "MetadataParameter.h"
-#include "MetadataQuantity.h"
+#include "OTResultDataAccess/MetadataCampaign.h"
+#include "OTResultDataAccess/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataParameter.h"
+#include "OTResultDataAccess/MetadataQuantity.h"
 
 
 #include <memory>

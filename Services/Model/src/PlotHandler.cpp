@@ -18,17 +18,17 @@
 // @otlicense-end
 
 #include "stdafx.h"
-#include "PlotHandler.h"
 #include "Model.h"
+#include "PlotHandler.h"
+#include "Application.h"
+#include "QueuingHttpRequestsRAII.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
 #include "OTModelEntities/EntityMetadataSeries.h"
-#include "Application.h"
 #include "OTCore/Logging/LogDispatcher.h"
-#include "MetadataEntityInterface.h"
-#include "CurveFactory.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
-#include "QueuingHttpRequestsRAII.h"
+#include "OTResultDataAccess/MetadataEntityInterface.h"
+#include "OTResultDataAccess/CurveFactory.h"
 
 PlotHandler::PlotHandler() {
 	const std::string pageName = Application::getToolBarPageName();

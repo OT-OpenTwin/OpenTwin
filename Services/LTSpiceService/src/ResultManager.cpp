@@ -23,15 +23,15 @@
 #include "ParametricCombination.h"
 #include "LTSpiceRawReader.h"
 
-#include "ResultCollectionExtender.h"
-#include "MetadataSeries.h"
-#include "MetadataParameter.h"
-#include "MetadataEntrySingle.h"
-#include "ValueFormatSetter.h"
-
-#include "QuantityDescription.h"
-#include "QuantityDescriptionCurve.h"
-#include "QuantityDescriptionCurveComplex.h"
+#include "OTResultDataAccess/CurveFactory.h"
+#include "OTResultDataAccess/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataParameter.h"
+#include "OTResultDataAccess/ValueFormatSetter.h"
+#include "OTResultDataAccess/MetadataEntrySingle.h"
+#include "OTResultDataAccess/QuantityDescription.h"
+#include "OTResultDataAccess/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/QuantityDescriptionCurveComplex.h"
 
 #include "OTCore/FolderNames.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
@@ -41,7 +41,6 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
-#include "CurveFactory.h"
 
 #include <regex>
 #include <filesystem>

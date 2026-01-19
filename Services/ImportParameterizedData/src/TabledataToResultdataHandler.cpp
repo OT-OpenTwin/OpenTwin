@@ -22,7 +22,6 @@
 
 #include "KeyValuesExtractor.h"
 #include "BranchSynchronizer.h"
-#include "MetadataParameter.h"
 #include "Documentation.h"
 #include "DataCategorizationConsistencyChecker.h"
 
@@ -36,14 +35,15 @@
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTModelEntities/EntityMetadataCampaign.h"
 
-#include "ResultCollectionExtender.h"
-#include "MetadataEntryArray.h"
-#include "MetadataEntryObject.h"
-#include "MetadataEntrySingle.h"
+#include "OTResultDataAccess/MetadataParameter.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/MetadataEntryArray.h"
+#include "OTResultDataAccess/MetadataEntryObject.h"
+#include "OTResultDataAccess/MetadataEntrySingle.h"
 
-#include "QuantityDescription.h"
-#include "QuantityDescriptionCurve.h"
-#include "ParameterDescription.h"
+#include "OTResultDataAccess/QuantityDescription.h"
+#include "OTResultDataAccess/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/ParameterDescription.h"
 
 #include "CategorisationFolderNames.h"
 #include "OTCore/EntityName.h"

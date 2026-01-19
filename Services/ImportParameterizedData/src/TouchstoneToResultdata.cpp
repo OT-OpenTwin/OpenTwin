@@ -26,13 +26,13 @@
 
 #include "OTModelEntities/DataBase.h"
 
-#include "ResultCollectionExtender.h"
-#include "MetadataCampaign.h"
-#include "MetadataEntrySingle.h"
-#include "ParameterDescription.h"
-#include "QuantityDescription.h"
-#include "QuantityDescriptionSParameter.h"
-#include "ValueFormatSetter.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/MetadataCampaign.h"
+#include "OTResultDataAccess/MetadataEntrySingle.h"
+#include "OTResultDataAccess/ParameterDescription.h"
+#include "OTResultDataAccess/QuantityDescription.h"
+#include "OTResultDataAccess/QuantityDescriptionSParameter.h"
+#include "OTResultDataAccess/ValueFormatSetter.h"
 
 #include "OptionsParameterHandlerFormat.h"
 #include "OptionsParameterHandlerFrequency.h"

@@ -1,0 +1,74 @@
+// @otlicense
+// File: PlotBuilder.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin header
+#include "OTGui/Plot1DCurveCfg.h"
+#include "OTGui/Plot1DCfg.h"
+#include "OTModelEntities/NewModelStateInfo.h"
+#include "OTModelEntities/EntityResult1DCurve.h"
+#include "OTResultDataAccess/DatasetDescription.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
+
+// std header
+#include <string>
+
+class OT_RESULTDATAACCESS_API_EXPORT PlotBuilder
+{
+public:
+	PlotBuilder(ResultCollectionExtender& _extender);
+	//! @brief Creating a series metadata entity.
+	//! The datapoints are directly stored in the result database. 
+	//! Modelstate is created when the final plot is build
+	//! @param _dataSetDescription 
+	//! @param _config Curve title is used for entity name and added at the back of the plot entity name
+	//! @param _seriesName Name of the created series metadata entity. The the dataset folder name is automatically added in front of the series name.
+	void addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
+	
+	//! @brief Creating one series metadata entity for all dataset descriptions. 
+	//! The datapoints are directly stored in the result database, curve entity is directly stored as well. 
+	//! Modelstate is created when the final plot is build
+	//! @param _dataSetDescriptions 
+	//! @param _config Curve title is used for entity name and added at the back of the plot entity name
+	//! @param _seriesName Name of the created series metadata entity. The the dataset folder name is automatically added in front of the series name.
+	void addCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
+	
+	//! @brief Final method. All added curves and the plot are stored and added to the model state.
+	//! @param _plotCfg Needs entity name to be set.
+	//! @param _saveModelState 
+	void buildPlot(ot::Plot1DCfg& _plotCfg, bool _saveModelState = true);
+
+	uint64_t getNumberOfCurves() { return m_curves.size(); }
+
+private:
+	ot::NewModelStateInfo m_newModelStateInformation;
+	ResultCollectionExtender& m_extender;
+	std::list<std::string> m_parameterLabels;
+	std::list<std::string> m_quantityLabel;
+	std::list<EntityResult1DCurve> m_curves;
+
+	bool validityCheck(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config);
+
+	void storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
+	
+	void clearBuffer();
+
+	void createPlot(ot::Plot1DCfg& _plotCfg);
+};

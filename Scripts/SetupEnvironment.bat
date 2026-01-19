@@ -106,7 +106,7 @@ SET OT_RUBBERBAND_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\RubberbandEngineOsgWrapper
 SET OT_UICORE_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\uiCore
 SET OT_VIEWER_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\Viewer
 
-SET OT_RESULT_DATA_ACCESS_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\ResultDataAccess
+SET OT_RESULT_DATA_ACCESS_ROOT=%OPENTWIN_DEV_ROOT%\Libraries\OTResultDataAccess
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin documentation root path

@@ -23,11 +23,11 @@
 #include <list>
 #include <memory>
 
-#include "MetadataEntry.h"
-#include "DatasetDescription.h"
 #include "KeyValuesExtractor.h"
 #include "BusinessLogicHandler.h"
 #include "MetadataAssemblyData.h"
+#include "OTResultDataAccess/MetadataEntry.h"
+#include "OTResultDataAccess/DatasetDescription.h"
 #include "OTModelEntities/EntityMetadataCampaign.h"
 #include "OTModelEntities/IVisualisationTable.h"
 

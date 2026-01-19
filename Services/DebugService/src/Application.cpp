@@ -50,10 +50,10 @@
 
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "PlotBuilder.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
-#include "ResultCollectionExtender.h"
-#include "QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/PlotBuilder.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/QuantityDescriptionCurve.h"
 
 // std header
 #include <thread>
