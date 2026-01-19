@@ -23,7 +23,7 @@
 #include <map>
 #include <vector>
 
-#include "StudioSuiteConnector/Result1DFileData.h"
+#include "OTStudioSuiteConnector/Result1DFileData.h"
 
 class InfoFileManager;
 

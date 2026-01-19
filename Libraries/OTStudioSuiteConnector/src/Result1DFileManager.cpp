@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "StudioSuiteConnector/Result1DFileManager.h"
+#include "OTStudioSuiteConnector/Result1DFileManager.h"
 
 #include <cassert>
 

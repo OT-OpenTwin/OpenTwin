@@ -23,7 +23,7 @@
 #include <list>
 #include <map>
 
-#include "StudioSuiteConnector/Result1DRunIDContainer.h"
+#include "OTStudioSuiteConnector/Result1DRunIDContainer.h"
 
 
 class Result1DFileManager

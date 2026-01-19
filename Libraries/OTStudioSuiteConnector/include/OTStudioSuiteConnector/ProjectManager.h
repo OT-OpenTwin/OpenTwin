@@ -27,8 +27,8 @@
 
 #include "OTCore/CoreTypes.h"
 
-#include "StudioSuiteConnector/InfoFileManager.h"
-#include "StudioSuiteConnector/Result1DFileManager.h"
+#include "OTStudioSuiteConnector/InfoFileManager.h"
+#include "OTStudioSuiteConnector/Result1DFileManager.h"
 
 #include <qobject.h>
 

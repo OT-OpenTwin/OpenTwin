@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // Project header
-#include "StudioSuiteConnector/StudioConnector.h"
+#include "OTStudioSuiteConnector/StudioConnector.h"
 
 // OpenTwin header
 #include "OTSystem/OperatingSystem.h"

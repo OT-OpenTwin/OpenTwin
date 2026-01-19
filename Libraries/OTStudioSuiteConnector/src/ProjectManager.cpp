@@ -17,10 +17,10 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "StudioSuiteConnector/ProjectManager.h"
-#include "StudioSuiteConnector/StudioConnector.h"
-#include "StudioSuiteConnector/VersionFile.h"
-#include "StudioSuiteConnector/Result1DFileManager.h"
+#include "OTStudioSuiteConnector/ProjectManager.h"
+#include "OTStudioSuiteConnector/StudioConnector.h"
+#include "OTStudioSuiteConnector/VersionFile.h"
+#include "OTStudioSuiteConnector/Result1DFileManager.h"
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"

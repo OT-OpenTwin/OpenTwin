@@ -17,8 +17,8 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "StudioSuiteConnector/Result1DRunIDContainer.h"
-#include "StudioSuiteConnector/InfoFileManager.h"
+#include "OTStudioSuiteConnector/Result1DRunIDContainer.h"
+#include "OTStudioSuiteConnector/InfoFileManager.h"
 
 #include <filesystem>
 #include <sstream>

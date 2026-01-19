@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "StudioSuiteConnector/CommitMessageDialog.h"
+#include "OTStudioSuiteConnector/CommitMessageDialog.h"
 
 #include "OTWidgets/IconManager.h"
 

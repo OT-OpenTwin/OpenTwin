@@ -127,7 +127,7 @@ ECHO ===============================================================
 CALL "%OT_RUBBERBAND_OSG_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
-ECHO Clean Library: StudioSuiteConnector
+ECHO Clean Library: OTStudioSuiteConnector
 ECHO ===============================================================
 CALL "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\Clean.bat" 
 

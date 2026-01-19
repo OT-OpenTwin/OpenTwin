@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "StudioSuiteConnector/InfoFileManager.h"
+#include "OTStudioSuiteConnector/InfoFileManager.h"
 
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/DataBase.h"

@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "StudioSuiteConnector/Result1DFileData.h"
+#include "OTStudioSuiteConnector/Result1DFileData.h"
 
 #include <fstream>
 #include <cassert>

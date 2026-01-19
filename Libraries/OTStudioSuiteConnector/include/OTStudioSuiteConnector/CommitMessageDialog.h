@@ -19,8 +19,6 @@
 
 #pragma once
 
-#pragma once
-
 // Qt header
 #include <qobject.h>
 #include <qicon.h>

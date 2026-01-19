@@ -17,10 +17,10 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
-#include "StudioSuiteConnector/ProjectManager.h"
-#include "StudioSuiteConnector/CommitMessageDialog.h"
-#include "StudioSuiteConnector/ProjectInformationDialog.h"
+#include "OTStudioSuiteConnector/StudioSuiteConnectorAPI.h"
+#include "OTStudioSuiteConnector/ProjectManager.h"
+#include "OTStudioSuiteConnector/CommitMessageDialog.h"
+#include "OTStudioSuiteConnector/ProjectInformationDialog.h"
 
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/MessageBoxManager.h"
@@ -34,7 +34,7 @@
 
 #include <thread>
 
-std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonDocument& doc, std::string projectName)
+std::string ot::StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonDocument& doc, std::string projectName)
 {
 	if (action == OT_ACTION_CMD_UI_SS_IMPORT) {
 
@@ -231,7 +231,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 	return "";
 }
 
-std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForCommit(const std::string& projectName, const std::string &studioSuiteServiceURL)
+std::string ot::StudioSuiteConnectorAPI::getStudioSuiteFileNameForCommit(const std::string& projectName, const std::string &studioSuiteServiceURL)
 {
 	std::string localFileName = StudioSuiteConnectorAPI::getLocalFileName();
 
@@ -251,7 +251,7 @@ std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForCommit(const std::
 	return localFileName;
 }
 
-std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForGet(const std::string& projectName, const std::string& studioSuiteServiceURL)
+std::string ot::StudioSuiteConnectorAPI::getStudioSuiteFileNameForGet(const std::string& projectName, const std::string& studioSuiteServiceURL)
 {
 	std::string localFileName = StudioSuiteConnectorAPI::getLocalFileName();
 
@@ -270,7 +270,7 @@ std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForGet(const std::str
 	return localFileName;
 }
 
-std::string StudioSuiteConnectorAPI::getLocalFileNameFromProject(const std::string& studioSuiteServiceURL)
+std::string ot::StudioSuiteConnectorAPI::getLocalFileNameFromProject(const std::string& studioSuiteServiceURL)
 {
 	// Send a message to the service and request the filename
 
@@ -289,7 +289,7 @@ std::string StudioSuiteConnectorAPI::getLocalFileNameFromProject(const std::stri
 	return localFileName;
 }
 
-std::string StudioSuiteConnectorAPI::getSimpleFileNameFromProject(const std::string& studioSuiteServiceURL)
+std::string ot::StudioSuiteConnectorAPI::getSimpleFileNameFromProject(const std::string& studioSuiteServiceURL)
 {
 	// Send a message to the service and request the filename
 
@@ -305,7 +305,7 @@ std::string StudioSuiteConnectorAPI::getSimpleFileNameFromProject(const std::str
 	return simpleFileName;
 }
 
-void StudioSuiteConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& studioSuiteServiceURL)
+void ot::StudioSuiteConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& studioSuiteServiceURL)
 {
 	// Send a message to the service and set the filename on the server to be stored in the project
 	std::string hostName = QHostInfo::localHostName().toStdString();
@@ -325,62 +325,62 @@ void StudioSuiteConnectorAPI::setAndStoreLocalFileName(std::string fileName, con
 }
 
 
-void StudioSuiteConnectorAPI::openProject()
+void ot::StudioSuiteConnectorAPI::openProject()
 {
 	ProjectManager::getInstance().openProject();
 }
 
-void StudioSuiteConnectorAPI::setStudioServiceData(std::string studioSuiteServiceURL)
+void ot::StudioSuiteConnectorAPI::setStudioServiceData(std::string studioSuiteServiceURL)
 {
 	ProjectManager::getInstance().setStudioServiceData(studioSuiteServiceURL);
 }
 
-void StudioSuiteConnectorAPI::importProject(std::string fileName, std::string projectName, std::string message, bool includeResults, bool includeParametricResults)
+void ot::StudioSuiteConnectorAPI::importProject(std::string fileName, std::string projectName, std::string message, bool includeResults, bool includeParametricResults)
 {
 	ProjectManager::getInstance().importProject(fileName, projectName, message, includeResults, includeParametricResults);
 }
 
-std::string StudioSuiteConnectorAPI::getCurrentVersion(std::string fileName, std::string projectName)
+std::string ot::StudioSuiteConnectorAPI::getCurrentVersion(std::string fileName, std::string projectName)
 {
 	return ProjectManager::getInstance().getCurrentVersion(fileName, projectName);
 }
 
-void StudioSuiteConnectorAPI::commitProject(std::string fileName, std::string projectName, std::string changeComment, bool includeResults, bool includeParametricResults)
+void ot::StudioSuiteConnectorAPI::commitProject(std::string fileName, std::string projectName, std::string changeComment, bool includeResults, bool includeParametricResults)
 {
 	ProjectManager::getInstance().commitProject(fileName, projectName, changeComment, includeResults, includeParametricResults);
 }
 
-void StudioSuiteConnectorAPI::getProject(std::string fileName, std::string projectName, std::string version)
+void ot::StudioSuiteConnectorAPI::getProject(std::string fileName, std::string projectName, std::string version)
 {
 	ProjectManager::getInstance().getProject(fileName, projectName, version);
 }
 
-void StudioSuiteConnectorAPI::uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion)
+void ot::StudioSuiteConnectorAPI::uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion)
 {
 	ProjectManager::getInstance().uploadFiles(entityIDList, entityVersionList, infoEntityID, infoEntityVersion);
 }
 
-void StudioSuiteConnectorAPI::downloadFiles(std::string fileName, std::string projectName, std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, std::string version)
+void ot::StudioSuiteConnectorAPI::downloadFiles(std::string fileName, std::string projectName, std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, std::string version)
 {
 	ProjectManager::getInstance().downloadFiles(fileName, projectName, entityIDList, entityVersionList, version);
 }
 
-void StudioSuiteConnectorAPI::copyFiles(std::string newVersion)
+void ot::StudioSuiteConnectorAPI::copyFiles(std::string newVersion)
 {
 	ProjectManager::getInstance().copyFiles(newVersion);
 }
 
-std::string StudioSuiteConnectorAPI::getLocalFileName()
+std::string ot::StudioSuiteConnectorAPI::getLocalFileName()
 {
 	return ProjectManager::getInstance().getLocalFileName();
 }
 
-void StudioSuiteConnectorAPI::setLocalFileName(std::string fileName)
+void ot::StudioSuiteConnectorAPI::setLocalFileName(std::string fileName)
 {
 	ProjectManager::getInstance().setLocalFileName(fileName);
 }
 
-bool StudioSuiteConnectorAPI::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string& errorMessage)
+bool ot::StudioSuiteConnectorAPI::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string& errorMessage)
 {
 	return ProjectManager::getInstance().checkValidLocalFile(fileName, projectName, ensureProjectExists, errorMessage);
 }

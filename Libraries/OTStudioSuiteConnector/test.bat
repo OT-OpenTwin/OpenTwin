@@ -28,7 +28,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Testing Project : StudioSuiteConnector
+ECHO Testing Project : OTStudioSuiteConnector
 
 REM Open project
 
@@ -55,20 +55,20 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\StudioSuiteConnector.vcxproj" %TYPE% "DebugTest|x64"  
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\OTStudioSuiteConnector.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%OT_STUDIO_SUITE_CONNECTOR_ROOT%\x64\Debug\StudioSuiteConnectorTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\StudioSuiteConnectorDebugReport.xml"
+	"%OT_STUDIO_SUITE_CONNECTOR_ROOT%\x64\Debug\OTStudioSuiteConnectorTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTStudioSuiteConnectorDebugReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\StudioSuiteConnectorDebugReport.xml" "StudioSuiteConnector" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\StudioSuiteConnectorDebugReport.xml"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTStudioSuiteConnectorDebugReport.xml" "OTStudioSuiteConnector" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTStudioSuiteConnectorDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\StudioSuiteConnector.vcxproj" %TYPE% "ReleaseTest|x64"
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\OTStudioSuiteConnector.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%OT_STUDIO_SUITE_CONNECTOR_ROOT%\x64\Release\StudioSuiteConnectorTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\StudioSuiteConnectorReleaseReport.xml"
+	"%OT_STUDIO_SUITE_CONNECTOR_ROOT%\x64\Release\OTStudioSuiteConnectorTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTStudioSuiteConnectorReleaseReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\StudioSuiteConnectorReleaseReport.xml" "StudioSuiteConnector" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\StudioSuiteConnectorReleaseReport.xml"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTStudioSuiteConnectorReleaseReport.xml" "OTStudioSuiteConnector" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTStudioSuiteConnectorReleaseReport.xml"
 ) 
   
 GOTO END

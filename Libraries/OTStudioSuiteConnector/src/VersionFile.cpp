@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "StudioSuiteConnector/VersionFile.h"
+#include "OTStudioSuiteConnector/VersionFile.h"
 
 #include <cassert>
 #include <fstream>

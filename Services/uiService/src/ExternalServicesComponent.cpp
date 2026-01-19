@@ -108,7 +108,7 @@
 
 // OpenTwin header
 #include "CurveDatasetFactory.h"
-#include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
+#include "OTStudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "OTLTSpiceConnector/LTSpiceConnectorAPI.h"
 #include "OTFMC/FMConnectorAPI.h"
 #include "ProgressUpdater.h"
@@ -1185,7 +1185,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		app->replaceInfoMessage(c_buildInfo);
 
-		StudioSuiteConnectorAPI::openProject();
+		ot::StudioSuiteConnectorAPI::openProject();
 
 		m_currentSessionID = _projectName;
 		m_currentSessionID.append(":").append(_collectionName);
@@ -4214,7 +4214,7 @@ void ExternalServicesComponent::handleStudioSuiteAction(ot::JsonDocument& _docum
 	m_actionProfiler.ignoreCurrent();
 
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectInfo().getProjectName());
+	ot::StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectInfo().getProjectName());
 }
 
 void ExternalServicesComponent::handleLTSpiceAction(ot::JsonDocument& _document) {

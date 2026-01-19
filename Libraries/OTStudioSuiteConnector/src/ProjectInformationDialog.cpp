@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "StudioSuiteConnector/ProjectInformationDialog.h"
+#include "OTStudioSuiteConnector/ProjectInformationDialog.h"
 
 #include "OTWidgets/IconManager.h"
 

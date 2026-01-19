@@ -50,36 +50,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\StudioSuiteConnector\StudioSuiteConnectorAPI.h">
+    <ClInclude Include="include\OTStudioSuiteConnector\InfoFileManager.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\StudioSuiteConnector\ProjectManager.h">
+    <ClInclude Include="include\OTStudioSuiteConnector\ProjectManager.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\StudioSuiteConnector\StudioConnector.h">
+    <ClInclude Include="include\OTStudioSuiteConnector\Result1DFileData.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\StudioSuiteConnector\VersionFile.h">
+    <ClInclude Include="include\OTStudioSuiteConnector\Result1DFileManager.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\StudioSuiteConnector\InfoFileManager.h">
+    <ClInclude Include="include\OTStudioSuiteConnector\Result1DRunIDContainer.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\StudioSuiteConnector\Result1DFileManager.h">
+    <ClInclude Include="include\OTStudioSuiteConnector\StudioConnector.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\StudioSuiteConnector\Result1DRunIDContainer.h">
+    <ClInclude Include="include\OTStudioSuiteConnector\StudioSuiteConnectorAPI.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\StudioSuiteConnector\Result1DFileData.h">
+    <ClInclude Include="include\OTStudioSuiteConnector\VersionFile.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\StudioSuiteConnector\CommitMessageDialog.h">
+    <QtMoc Include="include\OTStudioSuiteConnector\CommitMessageDialog.h">
       <Filter>include</Filter>
     </QtMoc>
-    <QtMoc Include="include\StudioSuiteConnector\ProjectInformationDialog.h">
+    <QtMoc Include="include\OTStudioSuiteConnector\ProjectInformationDialog.h">
       <Filter>include</Filter>
     </QtMoc>
   </ItemGroup>
