@@ -151,6 +151,7 @@ set(MODELENTITIES_HEADER_FILES
     include/EntityFacetData.h
     include/EntityLoadingAPI.h
     include/EntityMaterial.h
+    include/EntityLocalCoordinateSystem.h
     include/EntityMesh.h
     include/EntityMeshCartesian.h
     include/EntityMeshCartesianData.h
@@ -254,6 +255,7 @@ set(MODELENTITIES_SOURCE_FILES
     src/EntityGraphicsScene.cpp
     src/EntityInformation.cpp
     src/EntityMaterial.cpp
+    src/EntityLocalCoordinateSystem.cpp
     src/EntityMesh.cpp
     src/EntityMetadataSeries.cpp
     src/EntityMeshCartesian.cpp
