@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "LTSpiceConnector/VersionFile.h"
+#include "OTLTSpiceConnector/VersionFile.h"
 
 #include <cassert>
 #include <fstream>

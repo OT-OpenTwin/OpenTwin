@@ -17,8 +17,8 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "LTSpiceConnector/ProjectManager.h"
-#include "LTSpiceConnector/VersionFile.h"
+#include "OTLTSpiceConnector/ProjectManager.h"
+#include "OTLTSpiceConnector/VersionFile.h"
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"

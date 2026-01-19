@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "LTSpiceConnector/ProjectInformationDialog.h"
+#include "OTLTSpiceConnector/ProjectInformationDialog.h"
 #include "OTWidgets/IconManager.h"
 
 #include <qwidget.h>

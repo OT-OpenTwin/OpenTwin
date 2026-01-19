@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "LTSpiceConnector/CommitMessageDialog.h"
+#include "OTLTSpiceConnector/CommitMessageDialog.h"
 #include "OTWidgets/IconManager.h"
 
 #include <qwidget.h>

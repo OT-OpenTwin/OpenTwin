@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "LTSpiceConnector/InfoFileManager.h"
+#include "OTLTSpiceConnector/InfoFileManager.h"
 
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/DataBase.h"

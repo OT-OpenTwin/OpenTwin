@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.5.33516.290
+VisualStudioVersion = 17.14.36623.8 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LTSpiceConnector", "LTSpiceConnector.vcxproj", "{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OTLTSpiceConnector", "OTLTSpiceConnector.vcxproj", "{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +26,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {4D465AC8-452D-4D5A-B7C4-4BC06FDE2379}
+		SolutionGuid = {33D23579-2276-4F4A-87D5-469BFF432B90}
 	EndGlobalSection
 EndGlobal

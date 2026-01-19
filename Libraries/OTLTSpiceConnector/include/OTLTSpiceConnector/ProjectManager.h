@@ -27,7 +27,7 @@
 
 #include "OTCore/CoreTypes.h"
 
-#include "LTSpiceConnector/InfoFileManager.h"
+#include "OTLTSpiceConnector/InfoFileManager.h"
 
 #include <qobject.h>
 

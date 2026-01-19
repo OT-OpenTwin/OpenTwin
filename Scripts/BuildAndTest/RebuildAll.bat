@@ -219,7 +219,7 @@ ECHO ===============================================================
 CALL "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: LTSpiceConnector
+ECHO Build Library: OTLTSpiceConnector
 ECHO ===============================================================
 CALL "%OT_LTSPICE_CONNECTOR_ROOT%\build.bat" %1 %2
 

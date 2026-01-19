@@ -29,19 +29,19 @@
     <ClCompile Include="src\VersionFile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\LTSpiceConnector\CommitMessageDialog.h" />
-    <QtMoc Include="include\LTSpiceConnector\ProjectInformationDialog.h" />
-    <ClInclude Include="include\LTSpiceConnector\ProjectManager.h" />
-    <ClInclude Include="include\LTSpiceConnector\InfoFileManager.h" />
-    <ClInclude Include="include\LTSpiceConnector\LTSpiceConnectorAPI.h" />
-    <ClInclude Include="include\LTSpiceConnector\VersionFile.h" />
+    <QtMoc Include="include\OTLTSpiceConnector\CommitMessageDialog.h" />
+    <QtMoc Include="include\OTLTSpiceConnector\ProjectInformationDialog.h" />
+    <ClInclude Include="include\OTLTSpiceConnector\ProjectManager.h" />
+    <ClInclude Include="include\OTLTSpiceConnector\InfoFileManager.h" />
+    <ClInclude Include="include\OTLTSpiceConnector\LTSpiceConnectorAPI.h" />
+    <ClInclude Include="include\OTLTSpiceConnector\VersionFile.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}</ProjectGuid>
     <Keyword>QtVS_v302</Keyword>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>LTSpiceConnector</ProjectName>
+    <ProjectName>OTLTSpiceConnector</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">

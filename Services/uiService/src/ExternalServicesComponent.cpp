@@ -109,7 +109,7 @@
 // OpenTwin header
 #include "CurveDatasetFactory.h"
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
-#include "LTSpiceConnector/LTSpiceConnectorAPI.h"
+#include "OTLTSpiceConnector/LTSpiceConnectorAPI.h"
 #include "OTFMC/FMConnectorAPI.h"
 #include "ProgressUpdater.h"
 #include "OTDataStorage/DocumentAPI.h"
@@ -4221,7 +4221,7 @@ void ExternalServicesComponent::handleLTSpiceAction(ot::JsonDocument& _document)
 	m_actionProfiler.ignoreCurrent();
 
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectInfo().getProjectName());
+	ot::LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectInfo().getProjectName());
 }
 
 void ExternalServicesComponent::handleInitializeFileManagerAPI(ot::JsonDocument& _document) {

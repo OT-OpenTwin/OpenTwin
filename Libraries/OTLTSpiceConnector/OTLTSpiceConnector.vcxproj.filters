@@ -38,24 +38,24 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\LTSpiceConnector\LTSpiceConnectorAPI.h">
+    <ClInclude Include="include\OTLTSpiceConnector\InfoFileManager.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\LTSpiceConnector\ProjectManager.h">
+    <ClInclude Include="include\OTLTSpiceConnector\LTSpiceConnectorAPI.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\LTSpiceConnector\VersionFile.h">
+    <ClInclude Include="include\OTLTSpiceConnector\ProjectManager.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\LTSpiceConnector\InfoFileManager.h">
+    <ClInclude Include="include\OTLTSpiceConnector\VersionFile.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\LTSpiceConnector\CommitMessageDialog.h">
+    <QtMoc Include="include\OTLTSpiceConnector\CommitMessageDialog.h">
       <Filter>include</Filter>
     </QtMoc>
-    <QtMoc Include="include\LTSpiceConnector\ProjectInformationDialog.h">
+    <QtMoc Include="include\OTLTSpiceConnector\ProjectInformationDialog.h">
       <Filter>include</Filter>
     </QtMoc>
   </ItemGroup>

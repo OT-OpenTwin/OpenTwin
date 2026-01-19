@@ -52,7 +52,7 @@ ECHO ===============================================================
 CALL "%OT_FILE_MANAGER_CONNECTOR_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
-ECHO Clean Library: LTSpiceConnector
+ECHO Clean Library: OTLTSpiceConnector
 ECHO ===============================================================
 CALL "%OT_LTSPICE_CONNECTOR_ROOT%\Clean.bat" 
 

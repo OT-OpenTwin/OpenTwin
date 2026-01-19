@@ -17,10 +17,10 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "LTSpiceConnector/LTSpiceConnectorAPI.h"
-#include "LTSpiceConnector/ProjectManager.h"
-#include "LTSpiceConnector/CommitMessageDialog.h"
-#include "LTSpiceConnector/ProjectInformationDialog.h"
+#include "OTLTSpiceConnector/LTSpiceConnectorAPI.h"
+#include "OTLTSpiceConnector/ProjectManager.h"
+#include "OTLTSpiceConnector/CommitMessageDialog.h"
+#include "OTLTSpiceConnector/ProjectInformationDialog.h"
 
 #include "OTWidgets/MessageBoxManager.h"
 #include "OTCommunication/ActionTypes.h"
@@ -33,7 +33,7 @@
 
 #include <thread>
 
-std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocument& doc, std::string projectName)
+std::string ot::LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocument& doc, std::string projectName)
 {
 	if (action == OT_ACTION_CMD_UI_LTS_IMPORT) {
 
@@ -224,7 +224,7 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 	return "";
 }
 
-std::string LTSpiceConnectorAPI::getLTSpiceFileNameForCommit(const std::string& projectName, const std::string &studioSuiteServiceURL)
+std::string ot::LTSpiceConnectorAPI::getLTSpiceFileNameForCommit(const std::string& projectName, const std::string &studioSuiteServiceURL)
 {
 	std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
 
@@ -244,7 +244,7 @@ std::string LTSpiceConnectorAPI::getLTSpiceFileNameForCommit(const std::string& 
 	return localFileName;
 }
 
-std::string LTSpiceConnectorAPI::getLTSpiceFileNameForGet(const std::string& projectName, const std::string& studioSuiteServiceURL)
+std::string ot::LTSpiceConnectorAPI::getLTSpiceFileNameForGet(const std::string& projectName, const std::string& studioSuiteServiceURL)
 {
 	std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
 
@@ -263,7 +263,7 @@ std::string LTSpiceConnectorAPI::getLTSpiceFileNameForGet(const std::string& pro
 	return localFileName;
 }
 
-std::string LTSpiceConnectorAPI::getLocalFileNameFromProject(const std::string& ltSpiceServiceURL)
+std::string ot::LTSpiceConnectorAPI::getLocalFileNameFromProject(const std::string& ltSpiceServiceURL)
 {
 	// Send a message to the service and request the filename
 
@@ -281,7 +281,7 @@ std::string LTSpiceConnectorAPI::getLocalFileNameFromProject(const std::string& 
 	return localFileName;
 }
 
-std::string LTSpiceConnectorAPI::getSimpleFileNameFromProject(const std::string& ltSpiceServiceURL)
+std::string ot::LTSpiceConnectorAPI::getSimpleFileNameFromProject(const std::string& ltSpiceServiceURL)
 {
 	// Send a message to the service and request the filename
 
@@ -298,7 +298,7 @@ std::string LTSpiceConnectorAPI::getSimpleFileNameFromProject(const std::string&
 	return simpleFileName;
 }
 
-void LTSpiceConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& ltSpiceServiceURL)
+void ot::LTSpiceConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& ltSpiceServiceURL)
 {
 	// Send a message to the service and set the filename on the server to be stored in the project
 	std::string hostName = QHostInfo::localHostName().toStdString();
@@ -317,63 +317,62 @@ void LTSpiceConnectorAPI::setAndStoreLocalFileName(std::string fileName, const s
 	ProjectManager::getInstance().setLocalFileName(fileName);
 }
 
-
-void LTSpiceConnectorAPI::openProject()
+void ot::LTSpiceConnectorAPI::openProject()
 {
 	ProjectManager::getInstance().openProject();
 }
 
-void LTSpiceConnectorAPI::setLTSpiceServiceData(std::string ltSpiceServiceURL)
+void ot::LTSpiceConnectorAPI::setLTSpiceServiceData(std::string ltSpiceServiceURL)
 {
 	ProjectManager::getInstance().setLTSpiceServiceData(ltSpiceServiceURL);
 }
 
-void LTSpiceConnectorAPI::importProject(std::string fileName, std::string projectName, std::string message, bool includeResults)
+void ot::LTSpiceConnectorAPI::importProject(std::string fileName, std::string projectName, std::string message, bool includeResults)
 {
 	ProjectManager::getInstance().importProject(fileName, projectName, message, includeResults);
 }
 
-std::string LTSpiceConnectorAPI::getCurrentVersion(std::string fileName, std::string projectName)
+std::string ot::LTSpiceConnectorAPI::getCurrentVersion(std::string fileName, std::string projectName)
 {
 	return ProjectManager::getInstance().getCurrentVersion(fileName, projectName);
 }
 
-void LTSpiceConnectorAPI::commitProject(std::string fileName, std::string projectName, std::string changeComment, bool includeResults)
+void ot::LTSpiceConnectorAPI::commitProject(std::string fileName, std::string projectName, std::string changeComment, bool includeResults)
 {
 	ProjectManager::getInstance().commitProject(fileName, projectName, changeComment, includeResults);
 }
 
-void LTSpiceConnectorAPI::getProject(std::string fileName, std::string projectName, std::string version)
+void ot::LTSpiceConnectorAPI::getProject(std::string fileName, std::string projectName, std::string version)
 {
 	ProjectManager::getInstance().getProject(fileName, projectName, version);
 }
 
-void LTSpiceConnectorAPI::uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList)
+void ot::LTSpiceConnectorAPI::uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList)
 {
 	ProjectManager::getInstance().uploadFiles(entityIDList, entityVersionList);
 }
 
-void LTSpiceConnectorAPI::downloadFiles(std::string fileName, std::string projectName, std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, std::string version)
+void ot::LTSpiceConnectorAPI::downloadFiles(std::string fileName, std::string projectName, std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, std::string version)
 {
 	ProjectManager::getInstance().downloadFiles(fileName, projectName, entityIDList, entityVersionList, version);
 }
 
-void LTSpiceConnectorAPI::copyFiles(std::string newVersion)
+void ot::LTSpiceConnectorAPI::copyFiles(std::string newVersion)
 {
 	ProjectManager::getInstance().copyFiles(newVersion);
 }
 
-std::string LTSpiceConnectorAPI::getLocalFileName()
+std::string ot::LTSpiceConnectorAPI::getLocalFileName()
 {
 	return ProjectManager::getInstance().getLocalFileName();
 }
 
-void LTSpiceConnectorAPI::setLocalFileName(std::string fileName)
+void ot::LTSpiceConnectorAPI::setLocalFileName(std::string fileName)
 {
 	ProjectManager::getInstance().setLocalFileName(fileName);
 }
 
-bool LTSpiceConnectorAPI::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string& errorMessage)
+bool ot::LTSpiceConnectorAPI::checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string& errorMessage)
 {
 	return ProjectManager::getInstance().checkValidLocalFile(fileName, projectName, ensureProjectExists, errorMessage);
 }
