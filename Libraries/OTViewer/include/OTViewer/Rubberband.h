@@ -24,7 +24,7 @@
 // C++ header
 #include <string>
 
-#include <rbeCore/dataTypes.h>
+#include "OTRubberband/Core/dataTypes.h"
 #include <osg/Array>
 
 namespace rbeWrapper {

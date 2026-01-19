@@ -32,8 +32,8 @@
 
 #include <osgViewer/Viewer>
 
-#include <rbeCore/Step.h>
-#include <rbeWrapper/RubberbandOsgWrapper.h>
+#include "OTRubberband/Core/Step.h"
+#include "OTRubberbandOSG/RubberbandOsgWrapper.h"
 
 #include <osgUtil/IntersectionVisitor>
 

@@ -23,8 +23,8 @@
 
 #include "OTServiceFoundation/UiComponent.h"
 
-#include <rbeCore/RubberbandConfiguration.h>
-#include <rbeCore/jsonMember.h>
+#include "OTRubberband/Core/RubberbandConfiguration.h"
+#include "OTRubberband/Core/jsonMember.h"
 
 #include <cassert>
 #include <algorithm>

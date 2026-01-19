@@ -189,9 +189,9 @@ ECHO ===============================================================
 CALL "%OT_RUBBERBANDAPI_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: RubberbandEngine: osg Wrapper
+ECHO Build Library: RubberbandEngine: OSG Wrapper
 ECHO ===============================================================
-CALL "%OT_RUBBERBAND_ROOT%\build.bat" %1 %2
+CALL "%OT_RUBBERBAND_OSG_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: OTViewer

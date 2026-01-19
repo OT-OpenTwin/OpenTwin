@@ -35,7 +35,7 @@
 #include <osg/BlendFunc>
 
 // Rubberband engine header
-#include <rbeCore/rbeAssert.h>
+#include "OTRubberband/Core/rbeAssert.h"
 
 AxisCross::AxisCross(osg::Group * _parentGroup, osgText::Font *_font)
 	: m_parentGroup(_parentGroup), m_isVisible(false), m_size(1.f),

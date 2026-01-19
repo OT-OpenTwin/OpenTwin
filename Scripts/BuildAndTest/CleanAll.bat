@@ -124,7 +124,7 @@ CALL "%OT_RUBBERBANDAPI_ROOT%\Clean.bat"
 ECHO ===============================================================
 ECHO Clean Library: RubberbandEngine: osg Wrapper
 ECHO ===============================================================
-CALL "%OT_RUBBERBAND_ROOT%\Clean.bat" 
+CALL "%OT_RUBBERBAND_OSG_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
 ECHO Clean Library: StudioSuiteConnector

@@ -198,9 +198,9 @@ ECHO ===============================================================
 CALL "%OT_RUBBERBANDAPI_ROOT%%testBat%" %1 %2
 
 ECHO ===============================================================
-ECHO Test Library: Rubberband
+ECHO Test Library: Rubberband OSG Wrapper
 ECHO ===============================================================
-CALL "%OT_RUBBERBAND_ROOT%%testBat%" %1 %2
+CALL "%OT_RUBBERBAND_OSG_ROOT%%testBat%" %1 %2
 
 ECHO ===============================================================
 ECHO Test Library: UICore

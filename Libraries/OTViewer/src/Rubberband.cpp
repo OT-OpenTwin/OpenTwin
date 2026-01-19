@@ -21,7 +21,7 @@
 #include "OTViewer/Rubberband.h"
 
 // RBE header
-#include <rbeWrapper/RubberbandOsgWrapper.h>
+#include "OTRubberbandOSG/RubberbandOsgWrapper.h"
 
 Rubberband::Rubberband(osg::Switch *_group, ot::serviceID_t _creator, const std::string& _note, const std::string& _configurationJson)
 	: m_engine(nullptr), m_creatorId(_creator), m_note(_note)
