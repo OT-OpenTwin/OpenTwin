@@ -118,7 +118,7 @@ void EntityBlockConnection::setLineShape(ot::GraphicsConnectionCfg::ConnectionSh
 
 void EntityBlockConnection::createConnectionItem() const {
 	OTAssertNullptr(getObserver());
-
+	
 	ot::JsonDocument reqDoc = createGraphicsRequestDocument();
 	getObserver()->sendMessageToViewer(reqDoc);
 }
@@ -172,7 +172,7 @@ bool EntityBlockConnection::updateFromProperties()
 void EntityBlockConnection::addVisualizationNodes(void)
 {
 	createNavigationTreeEntry();
-	//createConnectionItem();
+	createConnectionItem();
 }
 
 void EntityBlockConnection::createNavigationTreeEntry() {

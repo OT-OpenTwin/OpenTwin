@@ -337,15 +337,6 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 	// Add the created block to the model
 	model->addEntitiesToModel(modelStateInfo, "Added block", true, true, true);
 
-	// Create the graphics item for the created block
-	createdBlock->setModelState(model->getStateManager());
-	createdBlock->setObserver(model);
-	createdBlock->createBlockItem();
-
-	// Reset observer and model state
-	createdBlock->setObserver(nullptr);
-	createdBlock->setModelState(nullptr);
-
 	// Check if any service wants to be notified about this change
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {
 		std::list<std::string> notifyServices = createdBlock->getServicesForCallback(EntityBase::Callback::DataNotify);
@@ -638,15 +629,6 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, Ent
 	if (createdConnection) {
 		// Add the created connection to the model
 		model->addEntitiesToModel(modelStateInfo, "Added Connection", true, true, true);
-
-		// Create the graphics item for the created connection
-		createdConnection->setModelState(model->getStateManager());
-		createdConnection->setObserver(model);
-		createdConnection->createConnectionItem();
-
-		// Reset observer and model state
-		createdConnection->setObserver(nullptr);
-		createdConnection->setModelState(nullptr);
 
 		return true;
 	}

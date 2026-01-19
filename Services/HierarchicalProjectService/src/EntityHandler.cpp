@@ -153,9 +153,6 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 	newEntities.addTopologyEntity(blockEntity);
 
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added Child Project: " + _projectInfo.getProjectName());
-
-	ot::JsonDocument graphicsDoc = blockEntity.createGraphicsRequestDocument(blockCoordinates.getCoordinates());
-	Application::instance().sendMessage(true, OT_INFO_SERVICE_TYPE_UI, graphicsDoc);
 }
 
 bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) {
@@ -228,14 +225,10 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	// Add to model
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Connection added");
 
-	// Request visualization
-	ot::JsonDocument graphicsDoc = connectionEntity.createGraphicsRequestDocument();
-	Application::instance().sendMessage(true, OT_INFO_SERVICE_TYPE_UI, graphicsDoc);
-
 	return true;
 }
 
-void EntityHandler::addDocument(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities, std::list<ot::JsonDocument>& _visualizationRequests) {
+void EntityHandler::addDocument(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
 	ot::FileExtension::DefaultFileExtension extension = ot::FileExtension::DefaultFileExtension::Unknown;
 	std::string fileNameOnly;
 	std::string extensionString;
@@ -301,7 +294,6 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 	blockEntity.setDocument(dataEntity, dataTypeString, extensionString);
 	blockEntity.storeToDataBase();
 	_newEntities.addTopologyEntity(blockEntity);
-	_visualizationRequests.push_back(std::move(blockEntity.createGraphicsRequestDocument(coord.getCoordinates())));
 }
 
 void EntityHandler::addDocuments(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
@@ -325,18 +317,16 @@ void EntityHandler::addDocuments(const std::list<std::string>& _fileNames, const
 	auto contentIt = _fileContent.begin();
 	auto lengthIt = _uncompressedDataLength.begin();
 
-	std::list<ot::JsonDocument> visualizationRequests;
 	for (; nameIt != _fileNames.end() && contentIt != _fileContent.end() && lengthIt != _uncompressedDataLength.end(); nameIt++, contentIt++, lengthIt++) {
-		addDocument(*nameIt, *contentIt, *lengthIt, _fileFilter, newEntities, visualizationRequests);
+		addDocument(*nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
 	}
 
 	if (newEntities.hasEntities()) {
 		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added document", true, true);
-		Application::instance().sendMessage(true, OT_INFO_SERVICE_TYPE_UI, visualizationRequests);
 	}
 }
 
-void EntityHandler::addImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities, std::list<ot::JsonDocument>& _visualizationRequests) {
+void EntityHandler::addImage(const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities) {
 	// Unpack data
 	uint64_t uncompressedLength = static_cast<uint64_t>(_uncompressedDataLength);
 	std::unique_ptr<uint8_t> unpackedData(ot::String::decompressBase64(_fileContent.c_str(), uncompressedLength));
@@ -396,8 +386,6 @@ void EntityHandler::addImage(const std::string& _fileName, const std::string& _f
 	_newEntities.addDataEntity(backgroundImageEntity.getEntityID(), imageDataEntity);
 	_newEntities.addDataEntity(backgroundImageEntity.getEntityID(), coord);
 	_newEntities.addTopologyEntity(backgroundImageEntity);
-
-	_visualizationRequests.push_back(std::move(backgroundImageEntity.createGraphicsRequestDocument(coord.getCoordinates())));
 }
 
 void EntityHandler::addImages(const std::list<std::string>& _fileNames, const std::list<std::string>& _fileContent, const std::list<int64_t>& _uncompressedDataLength, const std::string& _fileFilter) {
@@ -421,9 +409,8 @@ void EntityHandler::addImages(const std::list<std::string>& _fileNames, const st
 	auto contentIt = _fileContent.begin();
 	auto lengthIt = _uncompressedDataLength.begin();
 	
-	std::list<ot::JsonDocument> visualizationRequests;
 	for (; nameIt != _fileNames.end() && contentIt != _fileContent.end() && lengthIt != _uncompressedDataLength.end(); nameIt++, contentIt++, lengthIt++) {
-		addImage(*nameIt, *contentIt, *lengthIt, _fileFilter, newEntities, visualizationRequests);
+		addImage(*nameIt, *contentIt, *lengthIt, _fileFilter, newEntities);
 	}
 
 	if (newEntities.hasEntities()) {
@@ -435,7 +422,6 @@ void EntityHandler::addImages(const std::list<std::string>& _fileNames, const st
 			changeDesc = "Added images";
 		}
 		ot::ModelServiceAPI::addEntitiesToModel(newEntities, changeDesc, true, true);
-		Application::instance().sendMessage(true, OT_INFO_SERVICE_TYPE_UI, visualizationRequests);
 	}
 }
 
@@ -472,10 +458,9 @@ void EntityHandler::addLabel() {
 	newEntities.addTopologyEntity(labelEntity);
 
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added label", true, true);
-	Application::instance().sendMessage(true, OT_INFO_SERVICE_TYPE_UI, labelEntity.createGraphicsRequestDocument(coord.getCoordinates()));
 }
 
-void EntityHandler::updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities, std::list<ot::JsonDocument>& _visualizationRequests) {
+void EntityHandler::updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities) {
 	// Load project entity
 	std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(_projectInfo.getEntityID(), _projectInfo.getEntityVersion()));
 	EntityBlockHierarchicalProjectItem* projectEntity = dynamic_cast<EntityBlockHierarchicalProjectItem*>(entity.get());
@@ -515,23 +500,20 @@ void EntityHandler::updateProjectImage(const ot::EntityInformation& _projectInfo
 	}
 
 	_updateEntities.addTopologyEntity(*projectEntity);
-	_visualizationRequests.push_back(std::move(projectEntity->createGraphicsRequestDocument(pos)));
 }
 
 void EntityHandler::updateProjectImages(const std::list<ot::EntityInformation>& _projects) {
 	std::list<ot::UID> removalUIDs;
 	ot::NewModelStateInfo newEntities;
 	ot::NewModelStateInfo updateEntities;
-	std::list<ot::JsonDocument> visualizationRequests;
-
+	
 	for (const ot::EntityInformation& proj : _projects) {
-		updateProjectImage(proj, newEntities, updateEntities, removalUIDs, visualizationRequests);
+		updateProjectImage(proj, newEntities, updateEntities, removalUIDs);
 	}
 	if (newEntities.hasEntities()) {
 		ot::ModelServiceAPI::deleteEntitiesFromModel(removalUIDs, false);
 		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Updated project images", false, false);
 		ot::ModelServiceAPI::updateTopologyEntities(updateEntities, "Updated project images");
-		Application::instance().sendMessage(true, OT_INFO_SERVICE_TYPE_UI, visualizationRequests);
 	}
 }
 
@@ -618,15 +600,12 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 		ot::ModelServiceAPI::updateTopologyEntities(existingTopo, "Set preview image for project item");
 	}
 
-	Application::instance().sendMessage(true, OT_INFO_SERVICE_TYPE_UI, projectEntity->createGraphicsRequestDocument(pos));
-
 	return true;
 }
 
 bool EntityHandler::removeImageFromProjects(const std::list<ot::EntityInformation>& _projects) {
 	ot::UIDList entitiesToDelete;
 	ot::NewModelStateInfo update;
-	std::list<ot::JsonDocument> visualizationRequests;
 
 	for (const ot::EntityInformation& proj : _projects) {
 		auto entity = ot::EntityAPI::readEntityFromEntityIDandVersion(proj.getEntityID(), proj.getEntityVersion());
@@ -657,7 +636,6 @@ bool EntityHandler::removeImageFromProjects(const std::list<ot::EntityInformatio
 		projectEntity->removePreviewFile();
 		projectEntity->storeToDataBase();
 		update.addTopologyEntity(*projectEntity);
-		visualizationRequests.push_back(std::move(projectEntity->createGraphicsRequestDocument(pos)));
 	}	
 
 	if (entitiesToDelete.empty()) {
@@ -667,8 +645,6 @@ bool EntityHandler::removeImageFromProjects(const std::list<ot::EntityInformatio
 
 	ot::ModelServiceAPI::deleteEntitiesFromModel(entitiesToDelete, false);
 	ot::ModelServiceAPI::updateTopologyEntities(update, "Removed preview images from project items");
-
-	Application::instance().sendMessage(true, OT_INFO_SERVICE_TYPE_UI, visualizationRequests);
 
 	return true;
 }
@@ -698,8 +674,6 @@ void EntityHandler::addContainer() {
 	newEntities.addTopologyEntity(newContainer);
 
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added hierarchical container", true, true);
-
-	Application::instance().sendMessage(true, OT_INFO_SERVICE_TYPE_UI, newContainer.createGraphicsRequestDocument(coord.getCoordinates()));
 }
 
 bool EntityHandler::getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const {
