@@ -23,7 +23,7 @@
 #include "ProgressReport.h"
 
 #include "OTSystem/Flags.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/GuiTypes.h"
 #include "OTCommunication/Msg.h"

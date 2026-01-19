@@ -25,7 +25,7 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ApplicationBase.h"
 
-#include "TemplateDefaultManager.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 
 #include <iostream>
 

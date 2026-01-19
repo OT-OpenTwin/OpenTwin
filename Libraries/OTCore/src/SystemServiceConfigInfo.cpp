@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTSystem/ArchitectureInfo.h"
 #include "OTCore/String.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/SystemServiceConfigInfo.h"
 
 #ifdef OT_OS_WINDOWS

@@ -149,22 +149,22 @@ ECHO ===============================================================
 CALL "%OT_WIDGETS_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: DataStorage
+ECHO Build Library: OTDataStorage
 ECHO ===============================================================
 CALL "%OT_DATASTORAGE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: ModelEntities
+ECHO Build Library: OTModelEntities
 ECHO ===============================================================
 CALL "%OT_MODELENTITIES_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: CADModelEntities
+ECHO Build Library: OTCADEntities
 ECHO ===============================================================
 CALL "%OT_CADMODELENTITIES_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: BlockEntities
+ECHO Build Library: OTBlockEntities
 ECHO ===============================================================
 CALL "%OT_BLOCKENTITIES_ROOT%\build.bat" %1 %2
 
@@ -194,7 +194,7 @@ ECHO ===============================================================
 CALL "%OT_RUBBERBAND_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: Viewer
+ECHO Build Library: OTViewer
 ECHO ===============================================================
 CALL "%OT_VIEWER_ROOT%\build.bat" %1 %2
 

@@ -21,33 +21,34 @@
 #include "BlockEntityHandler.h"
 
 // Open twin header
-#include "OTCommunication/ActionTypes.h"
-#include "CircuitElement.h"
 #include "Connection.h"
-#include "EntityAPI.h"
-#include "OTModelAPI/ModelServiceAPI.h"
-#include "OTGui/StyleRefPainter2D.h"
-
-//#include "ExternalDependencies.h"
 #include "Application.h"
-#include "EntityBlockCircuitVoltageSource.h"
-#include "EntityBlockCircuitResistor.h"
-#include "EntityBlockConnection.h"
+#include "CircuitElement.h"
 #include "SimulationResults.h"
-#include "EntityBlockCircuitDiode.h"
-#include "EntityBlockCircuitVoltageMeter.h"
-#include "EntityBlockCircuitCurrentMeter.h"
-#include "EntityBlockCircuitCapacitor.h"
-#include "EntityBlockCircuitInductor.h"
-#include "EntityBlockCircuitElement.h"
-#include "EntityBlockCircuitGND.h"
-#include "EntityBlockCircuitTransmissionLine.h"
 
-#include "PlotBuilder.h"
-#include "ResultCollectionExtender.h"
-#include "QuantityDescriptionCurve.h"
-#include "OTGui/PainterRainbowIterator.h"
 #include "OTCore/EntityName.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
+#include "OTResultDataAccess/PlotBuilder.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/QuantityDescriptionCurve.h"
+
+#include "OTBlockEntities/EntityBlockConnection.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitVoltageSource.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitResistor.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitDiode.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitVoltageMeter.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitCurrentMeter.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitCapacitor.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitInductor.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitGND.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitTransmissionLine.h"
+
 
 // Third Party Header
 

@@ -21,8 +21,8 @@
 #include "Application.h"
 #include "OTCore/FolderNames.h"
 #include "OTCommunication/ActionTypes.h"
-#include "DataBase.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
 
 void MeasurementCampaignHandler::ConnectToCollection(const std::string& collectionName, const std::string& projectName)
 {

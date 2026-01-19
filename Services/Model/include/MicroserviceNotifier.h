@@ -24,14 +24,14 @@
 #include <string>
 #include <map>
 
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 
 #include "OTCore/CoreTypes.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/EntityTreeItem.h"
-#include "OTGui/PropertyGridCfg.h"
-#include "OTGui/MessageDialogCfg.h"
 #include "OTGui/VisualisationTypes.h"
+#include "OTGui/Dialog/MessageDialogCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 
 class MicroserviceNotifier
 {

@@ -19,7 +19,7 @@
 
 #include "stdafx.h"
 #include "SelectionHandler.h"
-#include "EntityMaterial.h"
+#include "OTModelEntities/EntityMaterial.h"
 #include "QueuingHttpRequestsRAII.h"
 #include "Application.h"
 #include "Model.h"

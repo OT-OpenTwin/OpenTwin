@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
-#include "OTGui/GradientPainter2D.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Painter/GradientPainter2D.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/SpinBox.h"
 #include "OTWidgets/ComboBox.h"

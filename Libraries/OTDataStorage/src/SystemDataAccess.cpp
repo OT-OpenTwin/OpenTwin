@@ -1,0 +1,77 @@
+// @otlicense
+// File: SystemDataAccess.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+// OpenTwin header
+#include "OTDataStorage/System/SystemDataAccess.h"
+#include "OTDataStorage/Helper/QueryBuilder.h"
+#include "OTDataStorage/Document/DocumentAccessBase.h"
+
+// MongoDB header
+#include <bsoncxx/types/value.hpp>
+#include <bsoncxx/json.hpp>
+
+// std header
+#include <map>
+#include <vector>
+
+using value = bsoncxx::types::value;
+
+namespace DataStorageAPI
+{
+	SystemDataAccess::SystemDataAccess(string databaseName, string collectionName)
+	{
+		_mongoDbName = databaseName;
+		_mongoCollectionName = collectionName;
+	}
+
+	DataStorageResponse SystemDataAccess::GetSystemDetails(int siteId)
+	{
+		DataStorageResponse response;
+		try
+		{
+			std::map<std::string, value> filterKvps;
+			bsoncxx::types::value siteIdVal(bsoncxx::types::b_int32{ siteId });
+
+			filterKvps.insert(std::pair<std::string, value>("SiteId", siteIdVal));
+
+			QueryBuilder queryBuilder;
+			auto filterQuery = queryBuilder.GenerateFilterQuery(filterKvps);
+			auto projectileQuery = queryBuilder.GenerateSelectQuery(std::vector<std::string> {}, true);
+
+			DocumentAccessBase systemAccess(_mongoDbName, _mongoCollectionName);
+			auto result = systemAccess.GetDocument(std::move(filterQuery), std::move(projectileQuery));
+			if (result)
+			{
+				response.setBsonResult(result);
+				response.updateDataStorageResponse(bsoncxx::to_json(*result), true, "");
+			}
+			else
+			{
+				response.updateDataStorageResponse("", false, "Data not found!");
+			}
+			return response;
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what();
+			response.updateDataStorageResponse("", false, e.what());
+			return response;
+		}
+	}
+}

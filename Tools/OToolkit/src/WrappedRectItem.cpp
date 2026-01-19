@@ -23,8 +23,8 @@
 #include "GraphicsItemDesignerNavigation.h"
 
 // OpenTwin header
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/GraphicsRectangularItemCfg.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Graphics/GraphicsRectangularItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 

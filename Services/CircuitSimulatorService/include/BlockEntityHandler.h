@@ -22,14 +22,14 @@
 #include "NGSpice.h"
 
 // Open twin header
-#include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "EntityBlock.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/FolderNames.h"
-#include "OTGui/GraphicsConnectionCfg.h"
-#include "OTGui/GraphicsPackage.h"
-#include "EntityBlockConnection.h"
-#include "EntityFileText.h"
+#include "OTGui/Graphics/GraphicsConnectionCfg.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
+#include "OTModelEntities/EntityFileText.h"
+#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
 
 // C++ header
 #include <string>

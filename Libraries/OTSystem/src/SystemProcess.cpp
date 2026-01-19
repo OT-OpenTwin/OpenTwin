@@ -58,6 +58,15 @@ ot::RunResult ot::SystemProcess::runApplication(const std::string& _applicationP
 	return runApplication(strconverter.from_bytes(_applicationPath), strconverter.from_bytes(_commandLine), _processHandle, _flags);
 }
 
+ot::RunResult ot::SystemProcess::runFileByShell(const std::string& _filePath, const std::string& _args, const std::string& _workingDir) {
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
+	return runFileByShell(strconverter.from_bytes(_filePath), strconverter.from_bytes(_args), strconverter.from_bytes(_workingDir));
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Windows implementation
+
 #if defined(OT_OS_WINDOWS)
 ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath, const std::wstring& _commandLine, OT_PROCESS_HANDLE& _processHandle, const ProcessFlags& _flags) {
 	HANDLE hToken = NULL;
@@ -122,6 +131,32 @@ ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _application
 	DestroyEnvironmentBlock(penv);
 
 	return resultMessage;
+}
+
+ot::RunResult ot::SystemProcess::runFileByShell(const std::wstring& _filePath, const std::wstring& _args, const std::wstring& _workingDir) {
+	ot::RunResult result;
+
+	OTAssert(!_filePath.empty(), "File path is empty");
+
+	SHELLEXECUTEINFOW sei{};
+	sei.cbSize = sizeof(sei);
+	sei.fMask = SEE_MASK_FLAG_NO_UI | SEE_MASK_NOASYNC;
+	sei.lpVerb = L"open";
+	sei.lpFile = static_cast<LPCWSTR>(_filePath.c_str());
+	sei.lpParameters = _args.empty() ? nullptr : static_cast<LPCWSTR>(_args.c_str());
+	sei.lpDirectory = _workingDir.empty() ? nullptr : static_cast<LPCWSTR>(_workingDir.c_str());
+	sei.nShow = SW_SHOWNORMAL;
+
+	if (!ShellExecuteExW(&sei)) {
+		result.setAsError(GetLastError());
+		result.setErrorMessage("starting a process via ShellExecuteExW failed");
+	}
+
+	if (sei.hProcess) {
+		CloseHandle(sei.hProcess);
+	}
+
+	return result;
 }
 
 bool ot::SystemProcess::isApplicationRunning(OT_PROCESS_HANDLE& _processHandle) {

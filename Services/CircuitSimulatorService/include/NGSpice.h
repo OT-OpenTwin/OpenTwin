@@ -18,14 +18,16 @@
 // @otlicense-end
 
 #pragma once
+
 //Service Header
-#include <Circuit.h>
+#include "Circuit.h"
 #include "Connection.h"
-//Open Twin Header
-#include "EntityBlock.h"
-#include "EntityBlockConnection.h"
+
+//OpenTwin Header
+#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "EntityFileText.h"
+#include "OTModelEntities/EntityFileText.h"
 
 //ThirdPartyHeader
 #include <iostream>

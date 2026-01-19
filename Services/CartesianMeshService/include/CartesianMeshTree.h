@@ -24,7 +24,7 @@
 #include <map>
 #include <list>
 
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 
 class EntityGeometry;
 

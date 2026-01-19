@@ -1,0 +1,52 @@
+// @otlicense
+// File: EntitySolver.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#include "OTModelEntities/EntitySolver.h"
+
+#include "OTCommunication/ActionTypes.h"
+
+#include <bsoncxx/builder/basic/array.hpp>
+
+static EntityFactoryRegistrar<EntitySolver> registrar("EntitySolver");
+
+EntitySolver::EntitySolver(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+	EntityContainer(ID, parent, obs, ms)
+{
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/SolverVisible");
+	treeItem.setHiddenIcon("Default/SolverHidden");
+	this->setDefaultTreeItem(treeItem);
+}
+
+EntitySolver::~EntitySolver()
+{
+}
+
+bool EntitySolver::updateFromProperties(void)
+{
+	// Now we need to update the entity after a property change
+	assert(getProperties().anyPropertyNeedsUpdate());
+
+	// Since there is a change now, we need to set the modified flag
+	setModified();
+
+	getProperties().forceResetUpdateForAllProperties();
+
+	return false; // No property grid update necessary
+}

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/FillPainter2D.h"
+#include "OTGui/Painter/FillPainter2D.h"
 #include "OTWidgets/ColorPickButton.h"
 #include "OTWidgets/Painter2DEditDialogFillEntry.h"
 

@@ -291,7 +291,7 @@ if(WIN32)
         )
     endif()
 
-    # ModelEntities
+    # OTModelEntities
     if(OT_MODELENT_DEBUG_LIB_DIR)
         target_link_directories(OTModelAPI PRIVATE
             $<$<CONFIG:Debug>:${OT_MODELENT_DEBUG_LIB_DIR}>
@@ -362,8 +362,8 @@ if(WIN32)
             OTCore
             OTGui
             OTCommunication
-            ModelEntities
-            DataStorage
+            OTModelEntities
+            OTDataStorage
             Userenv
             wsock32
             Advapi32

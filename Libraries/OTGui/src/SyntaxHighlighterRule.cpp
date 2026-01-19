@@ -18,9 +18,9 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/Painter2DFactory.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/Painter2DFactory.h"
 #include "OTGui/SyntaxHighlighterRule.h"
 
 ot::SyntaxHighlighterRule::SyntaxHighlighterRule() {

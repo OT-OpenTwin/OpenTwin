@@ -34,6 +34,7 @@
 // std header
 #include <map>
 #include <mutex>
+#include <optional>
 
 class QTreeWidgetItem;
 
@@ -80,6 +81,12 @@ namespace ot {
 
 		int getProjectCount() const;
 		
+		//! @brief Returns the project information at the given index.
+		//! This index corresponds to the currently visible (i.e. filtered and sorted) projects.
+		//! @param _index Index of the project to retrieve.
+		//! @return Project information if the index is valid, std::nullopt otherwise.
+		std::optional<ProjectInformation> getProjectInformationAt(int _index) const;
+
 		std::list<ProjectInformation> getAllProjects() const;
 		std::list<ProjectInformation> getSelectedProjects() const;
 
@@ -131,6 +138,7 @@ namespace ot {
 		void updateCheckStates(QTreeWidgetItem* _parent);
 		int getProjectCount(const QTreeWidgetItem* _parent) const;
 		void getAllProjects(const QTreeWidgetItem* _parent, std::list<ProjectInformation>& _lst) const;
+		ProjectOverviewEntry* getEntryAt(const QTreeWidgetItem* _parent, int _index, int& _currentIndex) const;
 
 		TreeWidgetItem* getOrCreateProjectGroupItem(const std::string& _groupName);
 

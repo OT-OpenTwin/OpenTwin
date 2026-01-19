@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 project(OTCommunication LANGUAGES CXX)
 
 # ============================================================
-# Helper functions (same style as OTCore / DataStorage)
+# Helper functions (same style as OTCore / OTDataStorage)
 # ============================================================
 function(get_env_path OUT_VAR ENV_NAME)
     if(DEFINED ENV{${ENV_NAME}} AND NOT "$ENV{${ENV_NAME}}" STREQUAL "")
@@ -249,7 +249,7 @@ endif()
 # MSVC compiler flags
 # ============================================================
 if(MSVC)
-    # Use dynamic runtime (same pattern as OTCore / DataStorage)
+    # Use dynamic runtime (same pattern as OTCore / OTDataStorage)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
     target_compile_options(OTCommunication_core PRIVATE

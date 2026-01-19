@@ -32,17 +32,17 @@ REM ############################################################################
 REM LIBRARIES
 
 ECHO ===============================================================
-ECHO Clean Library: BlockEntities
+ECHO Clean Library: OTBlockEntities
 ECHO ===============================================================
 CALL "%OT_BLOCKENTITIES_ROOT%\Clean.bat"
 
 ECHO ===============================================================
-ECHO Clean Library: CADModelEntities
+ECHO Clean Library: OTCADEntities
 ECHO ===============================================================
 CALL "%OT_CADMODELENTITIES_ROOT%\Clean.bat"
 
 ECHO ===============================================================
-ECHO Clean Library: DataStorage
+ECHO Clean Library: OTDataStorage
 ECHO ===============================================================
 CALL "%OT_DATASTORAGE_ROOT%\Clean.bat" 
 
@@ -57,7 +57,7 @@ ECHO ===============================================================
 CALL "%OT_LTSPICE_CONNECTOR_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
-ECHO Clean Library: ModelEntities
+ECHO Clean Library: OTModelEntities
 ECHO ===============================================================
 CALL "%OT_MODELENTITIES_ROOT%\Clean.bat" 
 
@@ -137,7 +137,7 @@ ECHO ===============================================================
 CALL "%OT_UICORE_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
-ECHO Clean Library: Viewer
+ECHO Clean Library: OTViewer
 ECHO ===============================================================
 CALL "%OT_VIEWER_ROOT%\Clean.bat" 
 

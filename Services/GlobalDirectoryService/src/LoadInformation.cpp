@@ -21,7 +21,7 @@
 #include "LoadInformation.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTCommunication/ActionTypes.h"
 

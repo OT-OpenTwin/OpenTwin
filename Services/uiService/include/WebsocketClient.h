@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/RelayedMessageHandler.h"
 
 // Qt header
@@ -44,9 +44,12 @@ public:
 	void prepareSessionClosing();
 	void updateLogFlags(const ot::LogFlags& _flags);
 
+	bool isBufferHandlingRequested() const { return m_bufferHandlingRequested; };
+
 Q_SIGNALS:
 	void connectionClosed();
 	void responseReceived();
+	void sessionIsClosing();
 
 private Q_SLOTS:
 	void slotConnected();
@@ -61,20 +64,26 @@ private:
 
 	bool ensureConnection();
 	void queueBufferProcessingIfNeeded();
+
 	bool anyWaitingForResponse();
+
+	//! @brief Check if a response for the provided message id is still pending.
+	//! @param _messageId Message id to check.
+	//! @return False if no response is pending or the session is closed, true otherwise.
+	bool isWaitingForResponse(uint64_t _messageId);
 
 	QWebSocket m_webSocket;
 	QUrl m_url;
-	bool m_isConnected;
+	std::atomic_bool m_isConnected;
 
 	ot::RelayedMessageHandler m_messageHandler;
 
-	bool m_bufferHandlingRequested;
-	bool m_currentlyProcessingQueuedMessage;
+	std::atomic_bool m_bufferHandlingRequested;
+	std::atomic_bool m_currentlyProcessingQueuedMessage;
 	std::list<ot::RelayedMessageHandler::Request> m_newRequests; //! @brief New commands that arrived while processing a queued message.
 	std::list<ot::RelayedMessageHandler::Request> m_currentRequests; //! @brief Buffer of commands that need to be processed after the current message handling.
 	
-	bool m_sessionIsClosing;
-	bool m_unexpectedDisconnect;
+	std::atomic_bool m_sessionIsClosing;
+	std::atomic_bool m_unexpectedDisconnect;
 };
 

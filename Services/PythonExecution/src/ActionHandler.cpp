@@ -20,7 +20,7 @@
 #include "ActionHandler.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Variable.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/VariableToJSONConverter.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/ReturnValues.h"
@@ -29,9 +29,9 @@
 #include "DataBuffer.h"
 
 #include "Application.h"
-#include "DataBase.h"
-#include "EntityBase.h"
-#include "DocumentAPI.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityBase.h"
 
 #include "OTCore/TimeFormatter.h"
 #include "ExceptionRestartRequired.h"

@@ -22,7 +22,7 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // Qt header
 #include <QtCore/qcommandlineparser.h>
@@ -63,6 +63,11 @@ bool StartArgumentParser::parse() {
 		"Specify the project version to open.",
 		"string");
 	parser.addOption(projectVersionOption);
+
+	QCommandLineOption scriptFileOption("script",
+		"Execute the specified script file after initialization.",
+		"string");
+	parser.addOption(scriptFileOption);
 
 	// Process the actual command line arguments
 	parser.process(*QCoreApplication::instance());
@@ -118,6 +123,11 @@ bool StartArgumentParser::parse() {
 		}
 	}
 
+	// Check for script file option
+	if (parser.isSet(scriptFileOption)) {
+		m_scriptFile = parser.value(scriptFileOption);
+	}
+
     return true;
 }
 
@@ -148,6 +158,10 @@ QStringList StartArgumentParser::createCommandLineArgs() const {
 
 	if (!m_projectVersion.empty()) {
 		args << "--projversion" << QString::fromStdString(m_projectVersion);
+	}
+
+	if (!m_scriptFile.isEmpty()) {
+		args << "--script" << m_scriptFile;
 	}
 
 	return args;

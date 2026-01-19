@@ -24,6 +24,7 @@
 #include "UITestLogs.h"
 #include "LogInDialog.h"
 #include "ManageOwner.h"
+#include "ScriptEngine.h"
 #include "ManageAccess.h"
 #include "ManageGroups.h"
 #include "UserSettings.h"
@@ -51,9 +52,6 @@
 #include "akWidgets/aTreeWidget.h"
 
 // OpenTwin header
-#include "DataBase.h"
-#include "PlotManagerView.h"
-
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/SystemProcess.h"
 
@@ -61,16 +59,16 @@
 #include "OTCore/String.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 
-#include "OTGui/FillPainter2D.h"
 #include "OTGui/ColorStyleTypes.h"
-#include "OTGui/GraphicsPackage.h"
-#include "OTGui/MessageDialogCfg.h"
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/PropertyStringList.h"
+#include "OTGui/Dialog/MessageDialogCfg.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Properties/PropertyStringList.h"
 
 #include "OTGuiAPI/TableActionHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
@@ -116,9 +114,13 @@
 #include "OTWidgets/PropertyInputStringList.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
+#include "OTViewer/PlotManagerView.h"
+
 #include "OTCommunication/msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
+
+#include "OTModelEntities/DataBase.h"
 
 // ADS header
 #include <ads/DockAreaWidget.h>
@@ -235,7 +237,7 @@ AppBase::~AppBase() {
 	if (m_welcomeScreen != nullptr) { delete m_welcomeScreen; m_welcomeScreen = nullptr; }
 }
 
-// ##############################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Base functions
 
@@ -282,6 +284,9 @@ bool AppBase::logIn() {
 	m_loginDialog = &loginDia;
 	loginDia.initialize();
 	loginDia.showNormal();
+
+	Q_EMIT logInDialogAvailable(m_loginDialog);
+
 	if (loginDia.showDialog() != ot::Dialog::Ok) {
 		m_loginDialog = nullptr;
 		return false;
@@ -363,9 +368,12 @@ bool AppBase::logIn() {
 		if (args.getOpenProjectSet()) {
 			std::string projName = args.getProjectInfo().getProjectName();
 			std::string projVersion = args.getProjectVersion();
-			QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, projName, projVersion);
+			QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, QString::fromStdString(projName), QString::fromStdString(projVersion));
 		}
 	}
+
+	Q_EMIT loginSuccessful();
+
 	return true;
 }
 
@@ -375,7 +383,7 @@ std::shared_ptr<QSettings> AppBase::createSettingsInstance() const {
 	return std::shared_ptr<QSettings>(new QSettings("OpenTwin", "UserFrontend"));
 }
 
-// ##############################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Component functions
 
@@ -413,7 +421,48 @@ LockManager * AppBase::lockManager() {
 	return m_ExternalServicesComponent->lockManager();
 }
 
-// ##############################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Scripting
+
+bool AppBase::runJSScriptFromFile(const QString& _filePath) {
+	// Read file
+	QFile scriptFile(_filePath);
+	if (!scriptFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		OT_LOG_E("Failed to open script file: " + _filePath.toStdString());
+		return false;
+	}
+
+	QByteArray data = scriptFile.readAll();
+	scriptFile.close();
+
+	return this->runJSScript(_filePath, data);
+}
+
+bool AppBase::runJSScript(const QString& _scriptName, const QString& _scriptData) {
+	if (m_scriptEngine == nullptr) {
+		OT_LOG_D("Initializing script engine");
+		m_scriptEngine = std::make_unique<ScriptEngine>(this);
+
+		// Initialize script engine
+		if (!m_scriptEngine->initialize(this)) {
+			return false;
+		}
+	}
+
+	OT_LOG_D("Running script: " + _scriptName.toStdString());
+	appendOutputMessageAPI("Running script: " + _scriptName.toStdString() + "\n");
+
+	QJSValue result = m_scriptEngine->evaluate(_scriptData);
+	if (result.isError()) {
+		OT_LOG_E("Script error at " + _scriptName.toStdString() + "::" + std::to_string(result.property("lineNumber").toInt()) + ": " + result.toString().toStdString());
+		return false;
+	}
+
+	return true;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Event handling
 
@@ -516,40 +565,6 @@ bool AppBase::createNewProjectInDatabase(const QString& _projectName, const QStr
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 	return pManager.createProject(_projectName.toStdString(), _projectType.toStdString(), m_loginData.getUserName(), "");
-}
-
-void AppBase::refreshWelcomeScreen()
-{
-	m_welcomeScreen->slotRefreshProjectList();
-}
-
-void AppBase::downloadInstaller(QString gssUrl)
-{
-	std::string tempFolder;
-	std::string fileName = "Install_OpenTwin_Frontend.exe";
-	std::string error;
-	
-	if (downloadFrontendInstaller(gssUrl.toStdString(), fileName, tempFolder, error, m_loginDialog))
-	{
-		QMessageBox msgBox(QMessageBox::Information, "Update Download Successful", 
-			"The update has been downloaded successfully and will be installed after pressing the OK button.\n\n"
-			"Please wait until the login screen will be re-opened.", QMessageBox::Ok);
-
-		msgBox.setWindowIcon(ot::IconManager::getApplicationIcon());
-		msgBox.exec();
-
-		std::string applicationPath = tempFolder + "\\" + fileName;
-		std::string commandLine = "\"" + applicationPath + "\" /S";
-		OT_PROCESS_HANDLE processHandle;
-		ot::SystemProcess::runApplication(applicationPath, commandLine, processHandle);
-		exit(ot::AppExitCode::Success);
-	}
-	else
-	{
-		// Error in downloading the installer
-		QMessageBox msgBox(QMessageBox::Critical, "Login Error", error.c_str(), QMessageBox::Ok);
-		msgBox.exec();
-	}
 }
 
 void AppBase::exportProjectWorker(std::string selectedProjectName, std::string exportFileName)
@@ -901,7 +916,7 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 
 }
 
-// ##############################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // 
 
@@ -938,7 +953,13 @@ void AppBase::createUi() {
 
 			// Setup tab toolbar
 			m_ttb = new ToolBar(this);
-			
+
+			if (m_scriptEngine) {
+				m_scriptEngine->registerToolBar(m_ttb);
+			}
+
+			Q_EMIT toolBarAvailable(m_ttb);
+
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Create docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 15);
 
@@ -1288,12 +1309,9 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b(), viewManagerWidget);
 
 	//NOTE, in future need to store tab information
-	QString text3D = availableTabText("3D");
-	QString text1D = availableTabText("1D");
-	QString textVersion = availableTabText("Versions");
-	QString textBlock = availableTabText("BlockDiagram");
-	QString textTable = availableTabText("Table");
-
+	QString text3D = determineAvailableViewTabText("3D");
+	QString textVersion = determineAvailableViewTabText("Versions");
+	
 	if (getVisible3D())
 	{
 		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
@@ -1385,7 +1403,7 @@ std::string AppBase::getCurrentVisualizationTabTitle() {
 	else return "";
 }
 
-// #################################################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Private functions
 
@@ -1620,7 +1638,7 @@ ot::ProjectOverviewWidget::ViewMode AppBase::getWelcomeScreenViewMode() const {
 	}
 }
 
-// #################################################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Private functions
 
@@ -1642,123 +1660,6 @@ bool AppBase::checkForContinue(const std::string& _title) {
 
 	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
 	return true;
-}
-
-QString AppBase::availableTabText(const QString& _initialTabText) {
-	if (!ot::GlobalWidgetViewManager::instance().getViewTitleExists(_initialTabText.toStdString())) {
-		return _initialTabText;
-	}
-
-	int v = 1;
-	QString nxt = _initialTabText + " [" + QString::number(v) + "]";
-	while (ot::GlobalWidgetViewManager::instance().getViewTitleExists(nxt.toStdString())) {
-		nxt = _initialTabText + " [" + QString::number(++v) + "]";
-	}
-	return nxt;
-}
-
-void AppBase::setTabToolBarTabOrder(const QStringList& _lst) {
-	uiAPI::window::setTabToolBarTabOrder(m_mainWindow, _lst);
-}
-
-void AppBase::activateToolBarTab(const QString& _tab) {
-	uiAPI::window::activateToolBarTab(m_mainWindow, _tab);
-}
-
-// ##############################################################################################
-
-// Navigation
-
-void AppBase::setNavigationTreeSortingEnabled(bool _enabled) {
-	m_projectNavigation->getTree()->setSortingEnabled(_enabled);
-}
-
-void AppBase::setNavigationTreeMultiselectionEnabled(bool _enabled) {
-	m_projectNavigation->getTree()->setMultiSelectionEnabled(_enabled);
-}
-
-void AppBase::clearNavigationTree() {
-	m_projectNavigation->getTree()->clear();
-}
-
-ot::UID AppBase::addNavigationTreeItem(const ot::EntityTreeItem& _itemInfo) {
-	return m_projectNavigation->getTree()->add(_itemInfo);
-}
-
-void AppBase::setNavigationTreeItemIcon(ot::UID _itemID, const QString & _iconName, const QString & _iconDefaultPath) {
-	QString fullIconPath;
-	if (_iconName.indexOf('/') == -1)
-	{
-		fullIconPath += _iconDefaultPath + "/";
-	}
-	fullIconPath += _iconName;
-	//If no data type was set, png is set as default.
-	if (fullIconPath.indexOf('.') == -1)
-	{
-		fullIconPath += ".png";
-	}
-	m_projectNavigation->getTree()->setItemIcon(_itemID, ot::IconManager::getIcon(fullIconPath));
-}
-
-void AppBase::setNavigationTreeItemText(ot::UID _itemID, const QString & _itemName) {
-	m_projectNavigation->getTree()->setItemText(_itemID, _itemName);
-}
-
-void AppBase::setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection) {
-	{
-		QSignalBlocker sigBlock(m_projectNavigation->getTree());
-		if (_clearOtherSelection) {
-			m_projectNavigation->getTree()->deselectAllItems(false);
-		}
-		m_projectNavigation->getTree()->setItemsSelected(_itemIDs, _selected);
-	}
-
-	slotTreeItemSelectionChanged();
-}
-
-void AppBase::setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
-	m_projectNavigation->getTree()->setItemSelected(_itemID, _isSelected);
-}
-
-void AppBase::setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
-	m_projectNavigation->getTree()->setSingleItemSelected(_itemID, _isSelected);
-}
-
-void AppBase::expandSingleNavigationTreeItem(ot::UID _itemID, bool _isExpanded) {
-	m_projectNavigation->getTree()->expandItem(_itemID, _isExpanded);
-}
-
-bool AppBase::isTreeItemExpanded(ot::UID _itemID) {
-	return m_projectNavigation->getTree()->isItemExpanded(_itemID);
-}
-
-bool AppBase::isTreeItemSelected(ot::UID _itemID) {
-	const ot::UIDList& lst = m_projectNavigation->getTree()->selectedItems(); 
-	return std::find(lst.begin(), lst.end(), _itemID) != lst.end();
-}
-
-void AppBase::toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds) {
-	bool autoConsiderChilds = m_projectNavigation->getTree()->getAutoSelectAndDeselectChildrenEnabled();
-
-	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(_considerChilds);
-	m_projectNavigation->getTree()->toggleItemSelection(_itemID);
-	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(autoConsiderChilds);
-}
-
-void AppBase::removeNavigationTreeItems(const std::vector<ot::UID> & itemIds) {
-	m_projectNavigation->getTree()->deleteItems(itemIds);
-}
-
-void AppBase::clearNavigationTreeSelection() {
-	m_projectNavigation->getTree()->deselectAllItems(true);
-}
-
-QString AppBase::getNavigationTreeItemText(UID _itemID) {
-	return m_projectNavigation->getTree()->getItemText(_itemID);
-}
-
-const ot::SelectionInformation& AppBase::getSelectedNavigationTreeItems() {
-	return m_navigationManager.getSelectionInformation();
 }
 
 void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
@@ -1820,33 +1721,9 @@ void AppBase::focusPropertyGridItem(const std::string& _group, const std::string
 	m_propertyGrid->getPropertyGrid()->focusProperty(_group, _name);
 }
 
-// ##############################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Info text output
-
-void AppBase::replaceInfoMessage(const QString& _message) {
-	m_output->getPlainTextEdit()->setPlainText(_message);
-	m_outputWasHtml = false;
-}
-
-void AppBase::appendInfoMessage(const QString & _message) {
-	if (m_output) {
-		m_output->getPlainTextEdit()->moveCursor(QTextCursor::End);
-		if (m_outputWasHtml) {
-			m_output->getPlainTextEdit()->insertPlainText("\n");
-			m_outputWasHtml = false;
-		}
-		m_output->getPlainTextEdit()->insertPlainText(_message);
-		m_output->getPlainTextEdit()->moveCursor(QTextCursor::End);
-	}
-}
-
-void AppBase::appendHtmlInfoMessage(const QString& _html) {
-	if (m_output) {
-		m_output->getPlainTextEdit()->appendHtml(_html);
-		m_outputWasHtml = true;
-	}
-}
 
 void AppBase::appendLogMessage(const ot::LogMessage& _message) {
 	using namespace ot;
@@ -1877,7 +1754,7 @@ void AppBase::autoCloseUnpinnedViews(bool _ignoreCurrent) {
 	OT_SLECTION_TEST_LOG(">> Auto close unpinned views completed");
 }
 
-// ##############################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Property grid
 
@@ -2241,11 +2118,11 @@ void AppBase::closePlot(const std::string& _name) {
 	ot::GlobalWidgetViewManager::instance().closeView(view);
 }
 
-// ######################################################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// Slots
+// Prompt
 
-ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const ot::MessageDialogCfg & _config, QWidget* _parent) {
+ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const ot::MessageDialogCfg& _config, QWidget* _parent) {
 	if (!_parent) {
 		if (m_mainWindow != invalidUID) {
 			_parent = this->mainWindow();
@@ -2265,21 +2142,11 @@ ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _title,
 	return this->showPrompt(config, nullptr);
 }
 
-void AppBase::slotShowInfoPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
-	this->showPrompt(_title, _message, _detailedMessage, ot::MessageDialogCfg::Information, ot::MessageDialogCfg::Ok);
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-void AppBase::slotShowWarningPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
-	this->showPrompt(_title, _message, _detailedMessage, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Ok);
-}
+// General
 
-void AppBase::slotShowErrorPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
-	this->showPrompt(_title, _message, _detailedMessage, ot::MessageDialogCfg::Critical, ot::MessageDialogCfg::Ok);
-}
-
-// #######################################################################################################################
-
-void AppBase::destroyObjects(const std::vector<ot::UID> & _objects) {
+void AppBase::destroyObjects(const std::vector<ot::UID>& _objects) {
 	bool erased{ true };
 	while (erased) {
 		erased = false;
@@ -2309,7 +2176,7 @@ void AppBase::makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool
 	ot::GlobalWidgetViewManager::instance().setConfigFlags(managerFlags);
 }
 
-AppBase * AppBase::instance() {
+AppBase* AppBase::instance() {
 	if (g_app == nullptr) {
 		g_app = new AppBase;
 	}
@@ -2327,7 +2194,7 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo, const 
 	args.setProjectInfo(_projectInfo);
 	args.setProjectVersion(_customVersion);
 	//args.setDebug();
-	
+
 	QString appPath = QCoreApplication::applicationFilePath();
 
 	QStringList arguments = args.createCommandLineArgs();
@@ -2335,7 +2202,7 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo, const 
 
 	ot::StyledTextBuilder message;
 	message << "Opening project \"" << ot::StyledText::Bold << _projectInfo.getProjectName() << ot::StyledText::NotBold << "\"";
-	
+
 	if (!_customVersion.empty()) {
 		message << " (version: \"" << ot::StyledText::Bold << _customVersion << ot::StyledText::NotBold << "\")";
 	}
@@ -2356,6 +2223,288 @@ void AppBase::editProjectInformation(const std::string& _senderUrl, const std::s
 	EditProjectInformationDialog dia(_senderUrl, _callbackAction, m_loginData, m_currentProjectInfo.getProjectName(), mainWindow());
 	dia.showDialog();
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// General slots
+
+void AppBase::slotCopyRequested(const ot::CopyInformation& _info) {
+	ot::CopyInformation info(_info);
+	info.setOriginProjectName(m_currentProjectInfo.getProjectName());
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SelectedEntitiesSerialise, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::JsonObject infoObj;
+	info.addToJsonObject(infoObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, infoObj, doc.GetAllocator());
+
+	std::string response;
+	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
+	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
+		OT_LOG_EA("Failed to send http request");
+		return;
+	}
+
+	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+	if (rMsg != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Request failed: " + rMsg.getWhat());
+		return;
+	}
+
+	if (rMsg.getWhat().empty()) {
+		OT_LOG_E("Invalid response");
+		return;
+	}
+
+	// Copy serialized config to clipboard
+	QClipboard* clip = QApplication::clipboard();
+	clip->setText(QString::fromStdString(rMsg.getWhat()));
+}
+
+void AppBase::slotPasteRequested(const ot::CopyInformation& _info) {
+	// Get current copy info from clipboard
+	QClipboard* clip = QApplication::clipboard();
+	if (!clip) {
+		OT_LOG_E("No clipboard found");
+		return;
+	}
+
+	// Get clipboard text
+	std::string importString = clip->text().toStdString();
+	if (importString.empty()) {
+		return;
+	}
+
+	// Create copy information from raw string
+	ot::CopyInformation info = ot::CopyInformation::fromRawString(importString);
+
+	// Copy destination paste info
+	if (_info.getDestinationScenePosSet()) {
+		info.setDestinationScenePos(_info.getDestinationScenePos());
+	}
+	info.setDestinationViewInfo(_info.getDestinationViewInfo());
+
+	// Create request
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PasteEntities, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Raw, ot::JsonString(importString, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::JsonObject infoObj;
+	info.addToJsonObject(infoObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, infoObj, doc.GetAllocator());
+
+	// Send request
+	std::string response;
+	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
+	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
+		OT_LOG_EA("Failed to send http request");
+		return;
+	}
+
+	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+	if (rMsg != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Request failed: " + rMsg.getWhat());
+		return;
+	}
+}
+
+void AppBase::slotColorStyleChanged() {
+	if (m_state & AppState::RestoringSettingsState) return;
+	if (!(m_state & AppState::LoggedInState)) return;
+
+	UserManagement uM(m_loginData);
+
+	const ot::ColorStyle& gStyle = ot::GlobalColorStyle::instance().getCurrentStyle();
+
+	uM.storeSetting(STATE_NAME_COLORSTYLE, gStyle.colorStyleName());
+}
+
+void AppBase::slotLockUI(bool _flag) {
+	ot::LockTypes lockFlags(ot::LockType::All);
+
+	if (_flag) {
+		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
+		uiAPI::window::enableTabToolBar(m_mainWindow, false);
+	}
+	else {
+		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
+		uiAPI::window::enableTabToolBar(m_mainWindow, true);
+	}
+}
+
+void AppBase::slotLockSelectionAndModification(bool _flag) {
+	ot::LockTypes lockFlags;
+	lockFlags.set(ot::LockType::ModelWrite);
+	lockFlags.set(ot::LockType::ModelRead);
+	lockFlags.set(ot::LockType::ViewWrite);
+	lockFlags.set(ot::LockType::NavigationWrite);
+
+	if (_flag) {
+		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
+	}
+	else {
+		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
+	}
+
+	m_projectNavigation->getTree()->setEnabled(!_flag);
+}
+
+void AppBase::slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
+	uiAPI::window::setStatusLabelText(m_mainWindow, _progressMessage);
+	uiAPI::window::setStatusProgressVisible(m_mainWindow, _progressBaseVisible, false);
+	uiAPI::window::setStatusLabelVisible(m_mainWindow, _progressBaseVisible, false);
+	uiAPI::window::setStatusProgressContinuous(m_mainWindow, _continuous);
+}
+
+void AppBase::slotSetProgressBarValue(int _progressPercentage) {
+	uiAPI::window::setStatusProgressValue(m_mainWindow, _progressPercentage);
+}
+
+void AppBase::slotRunCustomTimer(const QString& _timerId, int _intervalMs) {
+	QTimer::singleShot(_intervalMs, [=]() {
+		Q_EMIT customTimerTimeout(_timerId);
+	});
+}
+
+void AppBase::queueCustomCallback(const QString& _callbackId) {
+	QMetaObject::invokeMethod(this, &AppBase::slotCustomQueueCallback, Qt::QueuedConnection, _callbackId);
+}
+
+void AppBase::slotCustomQueueCallback(const QString& _callbackId) {
+	Q_EMIT customQueueCallback(_callbackId);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Output slots
+
+void AppBase::replaceInfoMessage(const QString& _message) {
+	m_output->getPlainTextEdit()->setPlainText(_message);
+	m_outputWasHtml = false;
+}
+
+void AppBase::appendInfoMessage(const QString& _message) {
+	if (m_output) {
+		m_output->getPlainTextEdit()->moveCursor(QTextCursor::End);
+		if (m_outputWasHtml) {
+			m_output->getPlainTextEdit()->insertPlainText("\n");
+			m_outputWasHtml = false;
+		}
+		m_output->getPlainTextEdit()->insertPlainText(_message);
+		m_output->getPlainTextEdit()->moveCursor(QTextCursor::End);
+	}
+}
+
+void AppBase::appendHtmlInfoMessage(const QString& _html) {
+	if (m_output) {
+		m_output->getPlainTextEdit()->appendHtml(_html);
+		m_outputWasHtml = true;
+	}
+}
+
+void AppBase::slotShowOutputContextMenu(QPoint _pos) {
+	OTAssertNullptr(m_output);
+	QMenu menu(m_output->getPlainTextEdit());
+	menu.move(m_output->getPlainTextEdit()->mapToGlobal(_pos));
+
+	QAction* copyAction = new QAction("Copy");
+	copyAction->setShortcut(QKeySequence("Ctrl+C"));
+	copyAction->setShortcutVisibleInContextMenu(true);
+	menu.addAction(copyAction);
+
+	QAction* pasteAction = new QAction("Paste");
+	pasteAction->setShortcut(QKeySequence("Ctrl+V"));
+	pasteAction->setShortcutVisibleInContextMenu(true);
+	menu.addAction(pasteAction);
+
+	QAction* clearAction = new QAction("Clear");
+	menu.addAction(clearAction);
+
+	QAction* action = menu.exec();
+	if (action) {
+		if (action->text() == "Copy") {
+			m_output->getPlainTextEdit()->copy();
+		}
+		else if (action->text() == "Paste") {
+			m_output->getPlainTextEdit()->paste();
+		}
+		else if (action->text() == "Clear") {
+			m_output->getPlainTextEdit()->clear();
+		}
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Messaging slots
+
+QVariantMap AppBase::slotSendExecuteMessageToService(const QString& _serviceName, const QString& _message) {
+	auto service = m_ExternalServicesComponent->getServiceFromName(_serviceName.toStdString());
+	if (service) {
+		return slotSendExecuteMessageToUrl(QString::fromStdString(service->getServiceURL()), _message);
+	}
+	else {
+		QVariantMap result;
+		result.insert("success", false);
+		result.insert("response", "Service \"" + _serviceName + "\" not found");
+		return result;
+	}
+}
+
+QVariantMap AppBase::slotSendExecuteMessageToUrl(const QString& _serviceUrl, const QString& _message) {
+	QVariantMap result;
+	std::string response;
+	result.insert("success", sendExecuteAPI(_serviceUrl.toStdString(), _message.toStdString(), response));
+	result.insert("response", QString::fromStdString(response));
+	return result;
+}
+
+bool AppBase::slotSendQueueMessageToService(const QString& _serviceName, const QString& _message) {
+	auto service = m_ExternalServicesComponent->getServiceFromName(_serviceName.toStdString());
+	if (service) {
+		return slotSendQueueMessageToUrl(QString::fromStdString(service->getServiceURL()), _message);
+	}
+	else {
+		return false;
+	}
+}
+
+bool AppBase::slotSendQueueMessageToUrl(const QString& _serviceUrl, const QString& _message) {
+	return sendQueueAPI(_serviceUrl.toStdString(), _message.toStdString());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Prompt slots
+
+void AppBase::slotShowInfoPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
+	this->showPrompt(_title, _message, _detailedMessage, ot::MessageDialogCfg::Information, ot::MessageDialogCfg::Ok);
+}
+
+void AppBase::slotShowWarningPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
+	this->showPrompt(_title, _message, _detailedMessage, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Ok);
+}
+
+void AppBase::slotShowErrorPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
+	this->showPrompt(_title, _message, _detailedMessage, ot::MessageDialogCfg::Critical, ot::MessageDialogCfg::Ok);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Tool bar slots
+
+void AppBase::setTabToolBarTabOrder(const QStringList& _lst) {
+	uiAPI::window::setTabToolBarTabOrder(m_mainWindow, _lst);
+}
+
+void AppBase::activateToolBarTab(const QString& _tab) {
+	uiAPI::window::activateToolBarTab(m_mainWindow, _tab);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Graphics slots
 
 void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _pos) {
 	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
@@ -2627,86 +2776,9 @@ void AppBase::slotGraphicsSelectionChanged() {
 	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
-void AppBase::slotCopyRequested(const ot::CopyInformation& _info) {
-	ot::CopyInformation info(_info);
-	info.setOriginProjectName(m_currentProjectInfo.getProjectName());
-	
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SelectedEntitiesSerialise, doc.GetAllocator()), doc.GetAllocator());
+// ###########################################################################################################################################################################################################################################################################################################################
 
-	ot::JsonObject infoObj;
-	info.addToJsonObject(infoObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, infoObj, doc.GetAllocator());
-
-	std::string response;
-	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
-	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
-		OT_LOG_EA("Failed to send http request");
-		return;
-	}
-
-	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
-	if (rMsg != ot::ReturnMessage::Ok) {
-		OT_LOG_E("Request failed: " + rMsg.getWhat());
-		return;
-	}
-
-	if (rMsg.getWhat().empty()) {
-		OT_LOG_E("Invalid response");
-		return;
-	}
-
-	// Copy serialized config to clipboard
-	QClipboard* clip = QApplication::clipboard();
-	clip->setText(QString::fromStdString(rMsg.getWhat()));
-}
-
-void AppBase::slotPasteRequested(const ot::CopyInformation& _info) {
-	// Get current copy info from clipboard
-	QClipboard* clip = QApplication::clipboard();
-	if (!clip) {
-		OT_LOG_E("No clipboard found");
-		return;
-	}
-
-	// Get clipboard text
-	std::string importString = clip->text().toStdString();
-	if (importString.empty()) {
-		return;
-	}
-
-	// Create copy information from raw string
-	ot::CopyInformation info = ot::CopyInformation::fromRawString(importString);
-
-	// Copy destination paste info
-	if (_info.getDestinationScenePosSet()) {
-		info.setDestinationScenePos(_info.getDestinationScenePos());
-	}
-	info.setDestinationViewInfo(_info.getDestinationViewInfo());
-
-	// Create request
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PasteEntities, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Raw, ot::JsonString(importString, doc.GetAllocator()), doc.GetAllocator());
-
-	ot::JsonObject infoObj;
-	info.addToJsonObject(infoObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, infoObj, doc.GetAllocator());
-
-	// Send request
-	std::string response;
-	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
-	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
-		OT_LOG_EA("Failed to send http request");
-		return;
-	}
-
-	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
-	if (rMsg != ot::ReturnMessage::Ok) {
-		OT_LOG_E("Request failed: " + rMsg.getWhat());
-		return;
-	}
-}
+// Text editor slots
 
 void AppBase::slotTextEditorSaveRequested() {
 	ot::TextEditorView* view = dynamic_cast<ot::TextEditorView*>(sender());
@@ -2781,6 +2853,10 @@ void AppBase::slotTextLoadAllRequested(size_t _nextChunkStartIndex) {
 	}
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Table slots
+
 void AppBase::slotTableSaveRequested() {
 	ot::Table* table = dynamic_cast<ot::Table*>(sender());
 	if (table == nullptr) {
@@ -2831,7 +2907,7 @@ void AppBase::slotTableSaveRequested() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Private: Slots
+// Version graph slots
 
 void AppBase::slotVersionSelected(const std::string& _versionName) {
 	m_ExternalServicesComponent->versionSelected(_versionName);
@@ -2844,6 +2920,23 @@ void AppBase::slotVersionDeselected() {
 
 void AppBase::slotRequestVersion(const std::string& _versionName) {
 	m_ExternalServicesComponent->activateVersion(_versionName);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// View management slots
+
+QString AppBase::determineAvailableViewTabText(const QString& _initialTabText) {
+	if (!ot::GlobalWidgetViewManager::instance().getViewTitleExists(_initialTabText.toStdString())) {
+		return _initialTabText;
+	}
+
+	int v = 1;
+	QString nxt = _initialTabText + " [" + QString::number(v) + "]";
+	while (ot::GlobalWidgetViewManager::instance().getViewTitleExists(nxt.toStdString())) {
+		nxt = _initialTabText + " [" + QString::number(++v) + "]";
+	}
+	return nxt;
 }
 
 void AppBase::slotViewAdded(ot::WidgetView* _newView) {
@@ -3007,52 +3100,9 @@ void AppBase::slotViewDataModifiedChanged(ot::WidgetView* _view) {
 	}
 }
 
-void AppBase::slotColorStyleChanged() {
-	if (m_state & AppState::RestoringSettingsState) return;
-	if (!(m_state & AppState::LoggedInState)) return;
-
-	UserManagement uM(m_loginData);
-
-	const ot::ColorStyle& gStyle = ot::GlobalColorStyle::instance().getCurrentStyle();
-
-	uM.storeSetting(STATE_NAME_COLORSTYLE, gStyle.colorStyleName());
-}
-
-void AppBase::slotShowOutputContextMenu(QPoint _pos) {
-	OTAssertNullptr(m_output);
-	QMenu menu(m_output->getPlainTextEdit());
-	menu.move(m_output->getPlainTextEdit()->mapToGlobal(_pos));
-	
-	QAction* copyAction = new QAction("Copy");
-	copyAction->setShortcut(QKeySequence("Ctrl+C"));
-	copyAction->setShortcutVisibleInContextMenu(true);
-	menu.addAction(copyAction);
-
-	QAction* pasteAction = new QAction("Paste");
-	pasteAction->setShortcut(QKeySequence("Ctrl+V"));
-	pasteAction->setShortcutVisibleInContextMenu(true);
-	menu.addAction(pasteAction);
-
-	QAction* clearAction = new QAction("Clear");
-	menu.addAction(clearAction);
-
-	QAction* action = menu.exec();
-	if (action) {
-		if (action->text() == "Copy") {
-			m_output->getPlainTextEdit()->copy();
-		}
-		else if (action->text() == "Paste") {
-			m_output->getPlainTextEdit()->paste();
-		}
-		else if (action->text() == "Clear") {
-			m_output->getPlainTextEdit()->clear();
-		}
-	}
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Private: Welcome Screen Slots
+// Project management slots
 
 void AppBase::slotCreateProject() {
 	ProjectManagement projectManager(m_loginData);
@@ -3151,39 +3201,68 @@ void AppBase::slotCreateProject() {
 
 void AppBase::slotOpenProject() {
 	auto selectedProjects = m_welcomeScreen->getSelectedProjects();
+	if (selectedProjects.empty()) {
+		return;
+	}
+
 	if (selectedProjects.size() != 1) {
 		OT_LOG_EA("Can not open multiple projects");
 		return;
 	}
-	this->slotOpenSpecificProject(selectedProjects.front().getProjectName(), std::string());
+	this->slotOpenSpecificProject(QString::fromStdString(selectedProjects.front().getProjectName()), QString());
 }
 
-void AppBase::slotOpenSpecificProject(std::string _projectName, const std::string& _projectVersion) {
+void AppBase::slotOpenProjectFromIndex(int _index) {
+	if (!m_welcomeScreen) {
+		OT_LOG_EA("No welcome screen available");
+		return;
+	}
+
+	auto projInfo = m_welcomeScreen->getProjectInformationAt(_index);
+	if (projInfo.has_value()) {
+		this->slotOpenSpecificProject(QString::fromStdString(projInfo->getProjectName()), QString());
+	}
+}
+
+void AppBase::slotRefreshProjectOverivew() {
+	if (!m_welcomeScreen) {
+		OT_LOG_EA("No welcome screen available");
+		return;
+	}
+
+	m_welcomeScreen->slotRefreshProjectList();
+}
+
+void AppBase::slotOpenSpecificProject(const QString& _projectName, const QString& _projectVersion) {
 	// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 	if (!checkForContinue("Open Project")) {
 		return;
 	}
+
+	const std::string cProjectName = _projectName.toStdString();
+	const std::string cProjectVersion = _projectVersion.toStdString();
+
 	bool canBeDeleted = false;
 	ProjectManagement projectManager(m_loginData);
 
-	if (projectManager.projectExists(_projectName, canBeDeleted)) {
+	if (projectManager.projectExists(cProjectName, canBeDeleted)) {
 		// Check whether the project is currently opened in this or another other instance of the ui
-		if (_projectName == m_currentProjectInfo.getProjectName()) {
-			this->slotShowInfoPrompt("Open Project", "The project with the name \"" + _projectName + "\" is already opened in this instance.", "");
+		if (cProjectName == m_currentProjectInfo.getProjectName()) {
+			this->slotShowInfoPrompt("Open Project", "The project with the name \"" + cProjectName + "\" is already opened in this instance.", "");
 			return;
 		}
 		else {
 			// We have not currently opened this project, check if it is opened elsewhere
 			std::string projectUser;
-			if (m_ExternalServicesComponent->projectIsOpened(_projectName, projectUser)) {
-				this->slotShowErrorPrompt("Open Project", "The project with the name \"" + _projectName + "\" is already opened by user: \"" + projectUser + "\".", "");
+			if (m_ExternalServicesComponent->projectIsOpened(cProjectName, projectUser)) {
+				this->slotShowErrorPrompt("Open Project", "The project with the name \"" + cProjectName + "\" is already opened by user: \"" + projectUser + "\".", "");
 				return;
 			}
 		}
 
 		// Now we need to check whether we are able to open this project
-		std::string projectCollection = projectManager.getProjectCollection(_projectName);
-		std::string projectType = projectManager.getProjectType(_projectName);
+		std::string projectCollection = projectManager.getProjectCollection(cProjectName);
+		std::string projectType = projectManager.getProjectType(cProjectName);
 
 		UserManagement userManager(m_loginData);
 		assert(userManager.checkConnection()); // Failed to connect
@@ -3191,7 +3270,7 @@ void AppBase::slotOpenSpecificProject(std::string _projectName, const std::strin
 		if (!projectManager.canAccessProject(projectCollection)) {
 			this->slotShowErrorPrompt("Open Project", "Unable to access this project. The access permission might have been changed.", "");
 
-			userManager.removeRecentProject(_projectName);
+			userManager.removeRecentProject(cProjectName);
 			m_welcomeScreen->slotRefreshProjectList();
 			return;
 		}
@@ -3203,13 +3282,13 @@ void AppBase::slotOpenSpecificProject(std::string _projectName, const std::strin
 		}
 
 		// Open project
-		if (m_ExternalServicesComponent->openProject(_projectName, projectType, projectCollection, std::string())) {
-			userManager.addRecentProject(_projectName);
+		if (m_ExternalServicesComponent->openProject(cProjectName, projectType, projectCollection, cProjectVersion)) {
+			userManager.addRecentProject(cProjectName);
 			m_state |= AppState::ProjectOpenState;
 			m_welcomeScreen->slotRefreshProjectList();
 
 			// Notify authorization service about project open to update last access time
-			projectManager.notifyProjectOpened(_projectName);
+			projectManager.notifyProjectOpened(cProjectName);
 		}
 	}
 	else {
@@ -3219,7 +3298,7 @@ void AppBase::slotOpenSpecificProject(std::string _projectName, const std::strin
 
 		this->slotShowErrorPrompt("Open Project", "Unable to access this project. The access permission might have been changed or the project has been deleted.", "");
 
-		userManager.removeRecentProject(_projectName);
+		userManager.removeRecentProject(cProjectName);
 		m_welcomeScreen->slotRefreshProjectList();
 	}
 }
@@ -3471,9 +3550,54 @@ void AppBase::slotManageProjectOwner() {
 	m_welcomeScreen->slotRefreshProjectList();
 }
 
+void AppBase::refreshWelcomeScreen() {
+	m_welcomeScreen->slotRefreshProjectList();
+}
+
+QStringList AppBase::getAvailableProjectNames() const {
+	QStringList result;
+	if (m_welcomeScreen) {
+		auto projects = m_welcomeScreen->getAllProjects();
+		for (const auto& proj : projects) {
+			result.append(QString::fromStdString(proj.getProjectName()));
+		}
+		result.sort();
+	}
+	else {
+		OT_LOG_EA("No welcome screen available");
+	}
+	return result;
+}
+
+void AppBase::downloadInstaller(QString gssUrl) {
+	std::string tempFolder;
+	std::string fileName = "Install_OpenTwin_Frontend.exe";
+	std::string error;
+
+	if (downloadFrontendInstaller(gssUrl.toStdString(), fileName, tempFolder, error, m_loginDialog)) {
+		QMessageBox msgBox(QMessageBox::Information, "Update Download Successful",
+			"The update has been downloaded successfully and will be installed after pressing the OK button.\n\n"
+			"Please wait until the login screen will be re-opened.", QMessageBox::Ok);
+
+		msgBox.setWindowIcon(ot::IconManager::getApplicationIcon());
+		msgBox.exec();
+
+		std::string applicationPath = tempFolder + "\\" + fileName;
+		std::string commandLine = "\"" + applicationPath + "\" /S";
+		OT_PROCESS_HANDLE processHandle;
+		ot::SystemProcess::runApplication(applicationPath, commandLine, processHandle);
+		exit(ot::AppExitCode::Success);
+	}
+	else {
+		// Error in downloading the installer
+		QMessageBox msgBox(QMessageBox::Critical, "Login Error", error.c_str(), QMessageBox::Ok);
+		msgBox.exec();
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Private: Property grid slots
+// Property grid slots
 
 void AppBase::slotPropertyGridValueChanged(const ot::Property* _property) {
 	// We first ask the viewer whether it needs to handle the property grid change.
@@ -3490,7 +3614,101 @@ void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Private: Tree slots
+// Tree slots
+
+void AppBase::setNavigationTreeSortingEnabled(bool _enabled) {
+	m_projectNavigation->getTree()->setSortingEnabled(_enabled);
+}
+
+void AppBase::setNavigationTreeMultiselectionEnabled(bool _enabled) {
+	m_projectNavigation->getTree()->setMultiSelectionEnabled(_enabled);
+}
+
+void AppBase::clearNavigationTree() {
+	m_projectNavigation->getTree()->clear();
+}
+
+ot::UID AppBase::findNavigationTreeItemByName(const QString& _itemName) {
+	return m_projectNavigation->getTree()->getItemUID(_itemName, '/');
+}
+
+ot::UID AppBase::addNavigationTreeItem(const ot::EntityTreeItem& _itemInfo) {
+	return m_projectNavigation->getTree()->add(_itemInfo);
+}
+
+void AppBase::setNavigationTreeItemIcon(ot::UID _itemID, const QString& _iconName, const QString& _iconDefaultPath) {
+	QString fullIconPath;
+	if (_iconName.indexOf('/') == -1) {
+		fullIconPath += _iconDefaultPath + "/";
+	}
+	fullIconPath += _iconName;
+	//If no data type was set, png is set as default.
+	if (fullIconPath.indexOf('.') == -1) {
+		fullIconPath += ".png";
+	}
+	m_projectNavigation->getTree()->setItemIcon(_itemID, ot::IconManager::getIcon(fullIconPath));
+}
+
+void AppBase::setNavigationTreeItemText(ot::UID _itemID, const QString& _itemName) {
+	m_projectNavigation->getTree()->setItemText(_itemID, _itemName);
+}
+
+void AppBase::setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection) {
+	{
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+		if (_clearOtherSelection) {
+			m_projectNavigation->getTree()->deselectAllItems(false);
+		}
+		m_projectNavigation->getTree()->setItemsSelected(_itemIDs, _selected);
+	}
+
+	slotTreeItemSelectionChanged();
+}
+
+void AppBase::setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
+	m_projectNavigation->getTree()->setItemSelected(_itemID, _isSelected);
+}
+
+void AppBase::setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
+	m_projectNavigation->getTree()->setSingleItemSelected(_itemID, _isSelected);
+}
+
+void AppBase::expandSingleNavigationTreeItem(ot::UID _itemID, bool _isExpanded) {
+	m_projectNavigation->getTree()->expandItem(_itemID, _isExpanded);
+}
+
+bool AppBase::isTreeItemExpanded(ot::UID _itemID) {
+	return m_projectNavigation->getTree()->isItemExpanded(_itemID);
+}
+
+bool AppBase::isTreeItemSelected(ot::UID _itemID) {
+	const ot::UIDList& lst = m_projectNavigation->getTree()->selectedItems();
+	return std::find(lst.begin(), lst.end(), _itemID) != lst.end();
+}
+
+void AppBase::toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds) {
+	bool autoConsiderChilds = m_projectNavigation->getTree()->getAutoSelectAndDeselectChildrenEnabled();
+
+	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(_considerChilds);
+	m_projectNavigation->getTree()->toggleItemSelection(_itemID);
+	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(autoConsiderChilds);
+}
+
+void AppBase::removeNavigationTreeItems(const std::vector<ot::UID>& itemIds) {
+	m_projectNavigation->getTree()->deleteItems(itemIds);
+}
+
+void AppBase::clearNavigationTreeSelection() {
+	m_projectNavigation->getTree()->deselectAllItems(true);
+}
+
+QString AppBase::getNavigationTreeItemText(UID _itemID) {
+	return m_projectNavigation->getTree()->getItemText(_itemID);
+}
+
+const ot::SelectionInformation& AppBase::getSelectedNavigationTreeItems() {
+	return m_navigationManager.getSelectionInformation();
+}
 
 void AppBase::slotTreeItemSelectionChanged() {
 	OT_SLECTION_TEST_LOG("Tree item selection changed");
@@ -3552,7 +3770,7 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Private: Plot slots
+// Plot slots
 
 void AppBase::slotPlotResetItemSelectionRequest() {
 	OT_SLECTION_TEST_LOG("Plot reset item selection request");
@@ -3633,6 +3851,22 @@ void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModi
 
 	OT_SLECTION_TEST_LOG(">> Plot curve double clicked completed. Running selection handling");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Notifications
+
+void AppBase::servicesUiSetupCompleted() {
+	Q_EMIT servicesUiSetupComplete();
+}
+
+void AppBase::projectOpenCompleted() {
+	Q_EMIT projectOpened();
+}
+
+void AppBase::projectCloseCompleted() {
+	Q_EMIT projectClosed();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -3750,51 +3984,6 @@ void AppBase::activateModelVersionAPI(const std::string& _versionName) {
 	else {
 		this->slotRequestVersion(_versionName);
 	}
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Public: Connector API slots
-
-void AppBase::slotLockUI(bool flag) {
-	ot::LockTypes lockFlags(ot::LockType::All);
-
-	if (flag) {
-		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
-		uiAPI::window::enableTabToolBar(m_mainWindow, false);
-	}
-	else {
-		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
-		uiAPI::window::enableTabToolBar(m_mainWindow, true);
-	}
-}
-
-void AppBase::slotLockSelectionAndModification(bool flag) {
-	ot::LockTypes lockFlags;
-	lockFlags.set(ot::LockType::ModelWrite);
-	lockFlags.set(ot::LockType::ModelRead);
-	lockFlags.set(ot::LockType::ViewWrite);
-	lockFlags.set(ot::LockType::NavigationWrite);
-
-	if (flag) {
-		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
-	}
-	else {
-		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
-	}
-
-	m_projectNavigation->getTree()->setEnabled(!flag);
-}
-
-void AppBase::slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
-	uiAPI::window::setStatusLabelText(m_mainWindow, _progressMessage);
-	uiAPI::window::setStatusProgressVisible(m_mainWindow, _progressBaseVisible, false);
-	uiAPI::window::setStatusLabelVisible(m_mainWindow, _progressBaseVisible, false);
-	uiAPI::window::setStatusProgressContinuous(m_mainWindow, _continuous);
-}
-
-void AppBase::slotSetProgressBarValue(int _progressPercentage) {
-	uiAPI::window::setStatusProgressValue(m_mainWindow, _progressPercentage);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #pragma once
-#include "EntityParameterizedDataCategorization.h"
-#include "EntityTableSelectedRanges.h"
+#include "OTModelEntities/EntityParameterizedDataCategorization.h"
+#include "OTModelEntities/EntityTableSelectedRanges.h"
 
 //! @brief Container for groups of TableSelectionEntities that describe the same metadata categorization.
 struct MetadataAssemblyData

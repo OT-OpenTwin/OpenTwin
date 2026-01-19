@@ -20,8 +20,9 @@
 #pragma once
 
 // Open twin header
+#include "VisualizationServiceTypes.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
 
 // C++ header
 #include <string>

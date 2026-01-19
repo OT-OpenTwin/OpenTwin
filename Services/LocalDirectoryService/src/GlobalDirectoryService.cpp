@@ -24,7 +24,7 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 

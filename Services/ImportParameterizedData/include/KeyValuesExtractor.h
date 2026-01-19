@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #pragma once
-#include "EntityTableSelectedRanges.h"
-#include "IVisualisationTable.h"
+#include "OTModelEntities/EntityTableSelectedRanges.h"
+#include "OTModelEntities/IVisualisationTable.h"
 
 #include <map>
 #include <list>

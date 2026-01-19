@@ -79,10 +79,89 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ============================================================
 
 set(OTGUI_HEADER_FILES
-    include/OTGui/BasicGraphicsIntersectionItem.h
+    include/OTGui/Diagram/SequenceDiaAbstractCall.h
+    include/OTGui/Diagram/SequenceDiaDirectCall.h
+    include/OTGui/Dialog/DialogCfg.h
+    include/OTGui/Dialog/PropertyDialogCfg.h
+    include/OTGui/Dialog/Painter2DDialogFilter.h
+    include/OTGui/Dialog/SelectEntitiesDialogCfg.h
+    include/OTGui/Dialog/Painter2DDialogFilterDefaults.h
+    include/OTGui/Dialog/ModelLibraryDialogCfg.h
+    include/OTGui/Dialog/MessageDialogCfg.h
+    include/OTGui/Dialog/OnePropertyDialogCfg.h
+    include/OTGui/Event/GuiEvent.h
+    include/OTGui/Event/GraphicsChangeEvent.h
+    include/OTGui/Event/GraphicsConnectionDropEvent.h
+    include/OTGui/Event/GraphicsDoubleClickEvent.h
+    include/OTGui/Event/GraphicsItemDropEvent.h
+    include/OTGui/Graphics/GraphicsArcItemCfg.h
+    include/OTGui/Graphics/GraphicsConnectionCalculationData.h
+    include/OTGui/Graphics/GraphicsDecorationCfg.h
+    include/OTGui/Graphics/GraphicsDecoratedLineItemCfg.h
+    include/OTGui/Graphics/GraphicsGroupItemCfg.h
+    include/OTGui/Graphics/GraphicsInvisibleItemCfg.h
+    include/OTGui/Graphics/GraphicsItemCfgFactory.h
+    include/OTGui/Graphics/GraphicsItemFileCfg.h
+    include/OTGui/Graphics/GraphicsLineItemCfg.h
+    include/OTGui/Graphics/GraphicsPickerItemInfo.h
+    include/OTGui/Graphics/GraphicsPolygonItemCfg.h
+    include/OTGui/Graphics/GraphicsShapeItemCfg.h
+    include/OTGui/Graphics/GraphicsBoxLayoutItemCfg.h
+    include/OTGui/Graphics/GraphicsPickerCollectionCfg.h
+    include/OTGui/Graphics/GraphicsConnectionCfg.h
+    include/OTGui/Graphics/GraphicsEllipseItemCfg.h
+    include/OTGui/Graphics/GraphicsGridLayoutItemCfg.h
+    include/OTGui/Graphics/GraphicsHBoxLayoutItemCfg.h
+    include/OTGui/Graphics/GraphicsImageItemCfg.h
+    include/OTGui/Graphics/GraphicsPackage.h
+    include/OTGui/Graphics/GraphicsFlowItemBuilder.h
+    include/OTGui/Graphics/GraphicsItemCfg.h
+    include/OTGui/Graphics/GraphicsLayoutItemCfg.h
+    include/OTGui/Graphics/GraphicsRectangularItemCfg.h
+    include/OTGui/Graphics/GraphicsStackItemCfg.h
+    include/OTGui/Graphics/GraphicsTextItemCfg.h
+    include/OTGui/Graphics/GraphicsTriangleItemCfg.h
+    include/OTGui/Graphics/GraphicsVBoxLayoutItemCfg.h
+    include/OTGui/Graphics/BasicGraphicsIntersectionItem.h
+    include/OTGui/Graphics/GraphicsHierarchicalProjectItemBuilder.h
+    include/OTGui/Graphics/GraphicsZValues.h
+    include/OTGui/Properties/Property.h
+    include/OTGui/Properties/PropertyManagerIterator.h
+    include/OTGui/Properties/PropertyManagerSilencer.h
+    include/OTGui/Properties/PropertyReadCallbackNotifier.h
+    include/OTGui/Properties/PropertyBase.h
+    include/OTGui/Properties/PropertyBool.h
+    include/OTGui/Properties/PropertyColor.h
+    include/OTGui/Properties/PropertyDouble.h
+    include/OTGui/Properties/PropertyFactory.h
+    include/OTGui/Properties/PropertyFactoryRegistrar.h
+    include/OTGui/Properties/PropertyFactoryRegistrar.hpp
+    include/OTGui/Properties/PropertyPath.h
+    include/OTGui/Properties/PropertyGridCfg.h
+    include/OTGui/Properties/PropertyGroup.h
+    include/OTGui/Properties/PropertyInt.h
+    include/OTGui/Properties/PropertyManager.h
+    include/OTGui/Properties/PropertyManagerNotifier.h
+    include/OTGui/Properties/PropertyWriteCallbackNotifier.h
+    include/OTGui/Properties/PropertyPainter2D.h
+    include/OTGui/Properties/PropertyString.h
+    include/OTGui/Properties/PropertyStringList.h
+    include/OTGui/Properties/ManagedPropertyObject.h
+    include/OTGui/Properties/ManagedPropertyObjectBase.h
+    include/OTGui/Properties/ManagedPropertyRegistrar.h
+    include/OTGui/Properties/ManagedSpecialPropertyRegistrar.h
+    include/OTGui/Painter/FillPainter2D.h
+    include/OTGui/Painter/Painter2D.h
+    include/OTGui/Painter/Painter2DFactory.h
+    include/OTGui/Painter/CheckerboardPainter2D.h
+    include/OTGui/Painter/GradientPainter2D.h
+    include/OTGui/Painter/GradientPainterStop2D.h
+    include/OTGui/Painter/LinearGradientPainter2D.h
+    include/OTGui/Painter/RadialGradientPainter2D.h
+    include/OTGui/Painter/PainterRainbowIterator.h
+    include/OTGui/Painter/StyleRefPainter2D.h
     include/OTGui/Border.h
     include/OTGui/CheckBoxCfg.h
-    include/OTGui/CheckerboardPainter2D.h
     include/OTGui/ColorStyleTypes.h
     include/OTGui/CopyEntityInformation.h
     include/OTGui/CopyInformation.h
@@ -90,113 +169,38 @@ set(OTGUI_HEADER_FILES
     include/OTGui/EntityTreeItem.h
     include/OTGui/ExtendedProjectInformation.h
     include/OTGui/FileExtension.h
-    include/OTGui/GraphicsChangeEvent.h
-    include/OTGui/GraphicsConnectionDropEvent.h
-    include/OTGui/GraphicsHierarchicalProjectItemBuilder.h
-    include/OTGui/GraphicsDoubleClickEvent.h
-    include/OTGui/GraphicsItemDropEvent.h
-    include/OTGui/GraphicsZValues.h
-    include/OTGui/GuiEvent.h
     include/OTGui/LibraryModel.h
     include/OTGui/LineEditCfg.h
-    include/OTGui/ManagedPropertyObject.h
-    include/OTGui/ManagedPropertyObjectBase.h
-    include/OTGui/ManagedPropertyRegistrar.h
-    include/OTGui/ManagedSpecialPropertyRegistrar.h
     include/OTGui/MenuCfg.h
     include/OTGui/MenuClickableEntryCfg.h
     include/OTGui/MenuEntryCfg.h
     include/OTGui/MenuEntryCfgFactory.h
     include/OTGui/MenuButtonCfg.h
     include/OTGui/DefaultSyntaxHighlighterRules.h
-    include/OTGui/GraphicsArcItemCfg.h
-    include/OTGui/GraphicsConnectionCalculationData.h
-    include/OTGui/GraphicsGroupItemCfg.h
-    include/OTGui/GraphicsInvisibleItemCfg.h
-    include/OTGui/GraphicsItemCfgFactory.h
-    include/OTGui/GraphicsItemFileCfg.h
-    include/OTGui/GraphicsLineItemCfg.h
-    include/OTGui/GraphicsPickerItemInfo.h
-    include/OTGui/GraphicsPolygonItemCfg.h
-    include/OTGui/GraphicsShapeItemCfg.h
     include/OTGui/Grid.h
     include/OTGui/KeySequence.h
     include/OTGui/MenuSeparatorCfg.h
-    include/OTGui/ModelLibraryDialogCfg.h
     include/OTGui/NavigationTreeItemIcon.h
-    include/OTGui/Painter2DDialogFilter.h
-    include/OTGui/Painter2DDialogFilterDefaults.h
     include/OTGui/PDFWidgetCfg.h
     include/OTGui/PenCfg.h
-    include/OTGui/MessageDialogCfg.h
-    include/OTGui/DialogCfg.h
-    include/OTGui/FillPainter2D.h
     include/OTGui/Font.h
-    include/OTGui/GradientPainter2D.h
-    include/OTGui/GradientPainterStop2D.h
-    include/OTGui/GraphicsBoxLayoutItemCfg.h
-    include/OTGui/GraphicsPickerCollectionCfg.h
-    include/OTGui/GraphicsConnectionCfg.h
-    include/OTGui/GraphicsEllipseItemCfg.h
-    include/OTGui/GraphicsGridLayoutItemCfg.h
-    include/OTGui/GraphicsHBoxLayoutItemCfg.h
-    include/OTGui/GraphicsImageItemCfg.h
-    include/OTGui/GraphicsPackage.h
-    include/OTGui/GraphicsFlowItemBuilder.h
-    include/OTGui/GraphicsItemCfg.h
-    include/OTGui/GraphicsLayoutItemCfg.h
-    include/OTGui/GraphicsRectangularItemCfg.h
-    include/OTGui/GraphicsStackItemCfg.h
-    include/OTGui/GraphicsTextItemCfg.h
-    include/OTGui/GraphicsTriangleItemCfg.h
-    include/OTGui/GraphicsVBoxLayoutItemCfg.h
     include/OTGui/GuiTypes.h
-    include/OTGui/LinearGradientPainter2D.h
     include/OTGui/Margins.h
     include/OTGui/NavigationTreeItem.h
     include/OTGui/NavigationTreePackage.h
-    include/OTGui/OnePropertyDialogCfg.h
     include/OTGui/OTGuiAPIExport.h
-    include/OTGui/Painter2D.h
-    include/OTGui/Painter2DFactory.h
     include/OTGui/Path2D.h
     include/OTGui/Plot1DAxisCfg.h
     include/OTGui/Plot1DCfg.h
     include/OTGui/Plot1DCurveCfg.h
     include/OTGui/Plot1DDataBaseCfg.h
     include/OTGui/ProjectTemplateInformation.h
-    include/OTGui/Property.h
-    include/OTGui/PropertyManagerIterator.h
-    include/OTGui/PropertyManagerSilencer.h
-    include/OTGui/PropertyReadCallbackNotifier.h
-    include/OTGui/PropertyBase.h
-    include/OTGui/PropertyBool.h
-    include/OTGui/PropertyColor.h
-    include/OTGui/PropertyDialogCfg.h
-    include/OTGui/PropertyDouble.h
-    include/OTGui/PropertyFactory.h
-    include/OTGui/PropertyFactoryRegistrar.h
-    include/OTGui/PropertyFactoryRegistrar.hpp
-    include/OTGui/PropertyPath.h
-    include/OTGui/PropertyGridCfg.h
-    include/OTGui/PropertyGroup.h
-    include/OTGui/PropertyInt.h
-    include/OTGui/PropertyManager.h
-    include/OTGui/PropertyManagerNotifier.h
-    include/OTGui/PropertyWriteCallbackNotifier.h
-    include/OTGui/PropertyPainter2D.h
-    include/OTGui/PropertyString.h
-    include/OTGui/PropertyStringList.h
     include/OTGui/QuantityContainerEntryDescription.h
     include/OTGui/QueryInformation.h
-    include/OTGui/RadialGradientPainter2D.h
-    include/OTGui/PainterRainbowIterator.h
-    include/OTGui/SelectEntitiesDialogCfg.h
     include/OTGui/StyledText.h
     include/OTGui/StyledTextBuilder.h
     include/OTGui/StyledTextEntry.h
     include/OTGui/StyledTextStyle.h
-    include/OTGui/StyleRefPainter2D.h
     include/OTGui/StyleValue.h
     include/OTGui/SyntaxHighlighterRule.h
     include/OTGui/TableCfg.h
@@ -217,10 +221,81 @@ set(OTGUI_HEADER_FILES
 )
 
 set(OTGUI_SOURCE_FILES
-    src/BasicGraphicsIntersectionItem.cpp
+    src/Diagram/SequenceDiaAbstractCall.cpp
+    src/Diagram/SequenceDiaDirectCall.cpp
+    src/Dialog/PropertyDialogCfg.cpp
+    src/Dialog/Painter2DDialogFilter.cpp
+    src/Dialog/Painter2DDialogFilterDefaults.cpp
+    src/Dialog/ModelLibraryDialogCfg.cpp
+    src/Dialog/MessageDialogCfg.cpp
+    src/Dialog/DialogCfg.cpp
+    src/Dialog/OnePropertyDialogCfg.cpp
+    src/Dialog/SelectEntitiesDialogCfg.cpp
+    src/Event/GuiEvent.cpp
+    src/Event/GraphicsChangeEvent.cpp
+    src/Event/GraphicsConnectionDropEvent.cpp
+    src/Event/GraphicsDoubleClickEvent.cpp
+    src/Event/GraphicsItemDropEvent.cpp
+    src/Painter/CheckerboardPainter2D.cpp
+    src/Painter/FillPainter2D.cpp
+    src/Painter/GradientPainter2D.cpp
+    src/Painter/GradientPainterStop2D.cpp
+    src/Painter/LinearGradientPainter2D.cpp
+    src/Painter/Painter2D.cpp
+    src/Painter/Painter2DFactory.cpp
+    src/Painter/RadialGradientPainter2D.cpp
+    src/Painter/PainterRainbowIterator.cpp
+    src/Painter/StyleRefPainter2D.cpp
+    src/Graphics/BasicGraphicsIntersectionItem.cpp
+    src/Graphics/GraphicsArcItemCfg.cpp
+    src/Graphics/GraphicsConnectionCalculationData.cpp
+    src/Graphics/GraphicsDecorationCfg.cpp
+    src/Graphics/GraphicsDecoratedLineItemCfg.cpp
+    src/Graphics/GraphicsGroupItemCfg.cpp
+    src/Graphics/GraphicsHierarchicalProjectItemBuilder.cpp
+    src/Graphics/GraphicsInvisibleItemCfg.cpp
+    src/Graphics/GraphicsItemCfgFactory.cpp
+    src/Graphics/GraphicsItemFileCfg.cpp
+    src/Graphics/GraphicsLineItemCfg.cpp
+    src/Graphics/GraphicsPickerItemInfo.cpp
+    src/Graphics/GraphicsPolygonItemCfg.cpp
+    src/Graphics/GraphicsShapeItemCfg.cpp
+    src/Graphics/GraphicsBoxLayoutItemCfg.cpp
+    src/Graphics/GraphicsPickerCollectionCfg.cpp
+    src/Graphics/GraphicsConnectionCfg.cpp
+    src/Graphics/GraphicsEllipseItemCfg.cpp
+    src/Graphics/GraphicsGridLayoutItemCfg.cpp
+    src/Graphics/GraphicsHBoxLayoutItemCfg.cpp
+    src/Graphics/GraphicsImageItemCfg.cpp
+    src/Graphics/GraphicsPackage.cpp
+    src/Graphics/GraphicsFlowItemBuilder.cpp
+    src/Graphics/GraphicsItemCfg.cpp
+    src/Graphics/GraphicsLayoutItemCfg.cpp
+    src/Graphics/GraphicsRectangularItemCfg.cpp
+    src/Graphics/GraphicsStackItemCfg.cpp
+    src/Graphics/GraphicsTextItemCfg.cpp
+    src/Graphics/GraphicsTriangleItem.cpp
+    src/Graphics/GraphicsVBoxLayoutItemCfg.cpp
+    src/Properties/Property.cpp
+    src/Properties/PropertyManagerSilencer.cpp
+    src/Properties/PropertyReadCallbackNotifier.cpp
+    src/Properties/PropertyBase.cpp
+    src/Properties/PropertyBool.cpp
+    src/Properties/PropertyColor.cpp
+    src/Properties/PropertyDouble.cpp
+    src/Properties/PropertyFactory.cpp
+    src/Properties/PropertyPath.cpp
+    src/Properties/PropertyGridCfg.cpp
+    src/Properties/PropertyGroup.cpp
+    src/Properties/PropertyInt.cpp
+    src/Properties/PropertyManager.cpp
+    src/Properties/PropertyManagerNotifier.cpp
+    src/Properties/PropertyPainter2D.cpp
+    src/Properties/PropertyString.cpp
+    src/Properties/PropertyStringList.cpp
+    src/Properties/ManagedPropertyObject.cpp
     src/Border.cpp
     src/CheckBoxCfg.cpp
-    src/CheckerboardPainter2D.cpp
     src/ColorStyleTypes.cpp
     src/CopyEntityInformation.cpp
     src/CopyInformation.cpp
@@ -229,104 +304,37 @@ set(OTGUI_SOURCE_FILES
     src/EntityTreeItem.cpp
     src/ExtendedProjectInformation.cpp
     src/FileExtension.cpp
-    src/GraphicsArcItemCfg.cpp
-    src/GraphicsConnectionCalculationData.cpp
-    src/GraphicsChangeEvent.cpp
-    src/GraphicsConnectionDropEvent.cpp
-    src/GraphicsDoubleClickEvent.cpp
-    src/GraphicsGroupItemCfg.cpp
-    src/GraphicsHierarchicalProjectItemBuilder.cpp
-    src/GraphicsInvisibleItemCfg.cpp
-    src/GraphicsItemCfgFactory.cpp
-    src/GraphicsItemDropEvent.cpp
-    src/GraphicsItemFileCfg.cpp
-    src/GraphicsLineItemCfg.cpp
-    src/GraphicsPickerItemInfo.cpp
-    src/GraphicsPolygonItemCfg.cpp
-    src/GraphicsShapeItemCfg.cpp
     src/Grid.cpp
-    src/GuiEvent.cpp
     src/KeySequence.cpp
     src/LibraryModel.cpp
     src/LineEditCfg.cpp
-    src/ManagedPropertyObject.cpp
     src/MenuCfg.cpp
     src/MenuClickableEntryCfg.cpp
     src/MenuEntryCfg.cpp
     src/MenuEntryCfgFactory.cpp
     src/MenuButtonCfg.cpp
     src/MenuSeparatorCfg.cpp
-    src/ModelLibraryDialogCfg.cpp
     src/NavigationTreeItemIcon.cpp
-    src/Painter2DDialogFilter.cpp
-    src/Painter2DDialogFilterDefaults.cpp
     src/PDFWidgetCfg.cpp
     src/PenCfg.cpp
-    src/MessageDialogCfg.cpp
-    src/DialogCfg.cpp
     src/dllmain.cpp
-    src/FillPainter2D.cpp
     src/Font.cpp
-    src/GradientPainter2D.cpp
-    src/GradientPainterStop2D.cpp
-    src/GraphicsBoxLayoutItemCfg.cpp
-    src/GraphicsPickerCollectionCfg.cpp
-    src/GraphicsConnectionCfg.cpp
-    src/GraphicsEllipseItemCfg.cpp
-    src/GraphicsGridLayoutItemCfg.cpp
-    src/GraphicsHBoxLayoutItemCfg.cpp
-    src/GraphicsImageItemCfg.cpp
-    src/GraphicsPackage.cpp
-    src/GraphicsFlowItemBuilder.cpp
-    src/GraphicsItemCfg.cpp
-    src/GraphicsLayoutItemCfg.cpp
-    src/GraphicsRectangularItemCfg.cpp
-    src/GraphicsStackItemCfg.cpp
-    src/GraphicsTextItemCfg.cpp
-    src/GraphicsTriangleItem.cpp
-    src/GraphicsVBoxLayoutItemCfg.cpp
     src/GuiTypes.cpp
-    src/LinearGradientPainter2D.cpp
     src/Margins.cpp
     src/NavigationTreeItem.cpp
     src/NavigationTreePackage.cpp
-    src/OnePropertyDialogCfg.cpp
-    src/Painter2D.cpp
-    src/Painter2DFactory.cpp
     src/Path2D.cpp
     src/Plot1DAxisCfg.cpp
     src/Plot1DCfg.cpp
     src/Plot1DCurveCfg.cpp
     src/Plot1DDataBaseCfg.cpp
     src/ProjectTemplateInformation.cpp
-    src/Property.cpp
-    src/PropertyManagerSilencer.cpp
-    src/PropertyReadCallbackNotifier.cpp
-    src/PropertyBase.cpp
-    src/PropertyBool.cpp
-    src/PropertyColor.cpp
-    src/PropertyDialogCfg.cpp
-    src/PropertyDouble.cpp
-    src/PropertyFactory.cpp
-    src/PropertyPath.cpp
-    src/PropertyGridCfg.cpp
-    src/PropertyGroup.cpp
-    src/PropertyInt.cpp
-    src/PropertyManager.cpp
-    src/PropertyManagerNotifier.cpp
-    src/PropertyPainter2D.cpp
-    src/PropertyString.cpp
-    src/PropertyStringList.cpp
     src/QuantityContainerEntryDescription.cpp
     src/QueryInformation.cpp
-    src/RadialGradientPainter2D.cpp
-    src/PainterRainbowIterator.cpp
-    src/SelectEntitiesDialogCfg.cpp
     src/StyledText.cpp
     src/StyledTextBuilder.cpp
     src/StyledTextEntry.cpp
     src/StyledTextStyle.cpp
-    src/StyleRefPainter2D.cpp
     src/StyleValue.cpp
     src/SyntaxHighlighterRule.cpp
     src/TableCfg.cpp

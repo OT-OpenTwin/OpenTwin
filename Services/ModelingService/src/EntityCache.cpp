@@ -18,10 +18,10 @@
 // @otlicense-end
 
 #include "EntityCache.h"
-#include "EntityBase.h"
-#include "DataBase.h"
 #include "Application.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityBase.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 

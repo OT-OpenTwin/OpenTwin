@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
-#include "OTGui/StyleRefPainter2D.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/DefaultSyntaxHighlighterRules.h"
 
 std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::create(DocumentSyntax _syntax) {

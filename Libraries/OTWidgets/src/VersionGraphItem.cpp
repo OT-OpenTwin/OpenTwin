@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/VersionGraphItem.h"
 #include "OTWidgets/GraphicsTextItem.h"

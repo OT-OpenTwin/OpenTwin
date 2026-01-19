@@ -21,8 +21,9 @@
 #include "Model.h"
 #include "FileHandler.h"
 #include "Application.h"
-#include "EntityFileCSV.h"
-#include "EntityFileText.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityFileCSV.h"
+#include "OTModelEntities/EntityFileText.h"
 #include "OTCore/String.h"
 #include "OTCore/FolderNames.h"
 #include "OTCore/EncodingGuesser.h"
@@ -33,9 +34,8 @@
 #include "QueuingDatabaseWritingRAII.h"
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
-#include "DataBase.h"
-#include "DocumentAPI.h"
-#include "GridFSFileInfo.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 #include <assert.h>
 
 FileHandler::FileHandler() {

@@ -20,16 +20,16 @@
 #include "Application.h"
 #include "MicroServiceSolver.h"
 
-#include "EntitySolverFITTD.h"
-#include "EntityResult3D.h"
-#include "EntityResult3DData.h"
-#include "EntitySignalType.h"
-#include "EntityResultText.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntitySolverFITTD.h"
+#include "OTModelEntities/EntityResult3D.h"
+#include "OTModelEntities/EntityResult3DData.h"
+#include "OTModelEntities/EntitySignalType.h"
+#include "OTModelEntities/EntityResultText.h"
 
 #include "FolderNames.h"
 #include "PhysicalQuantities.h"
 
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
 MicroServiceSolver::MicroServiceSolver(std::string solverName, int serviceID, int sessionCount) :

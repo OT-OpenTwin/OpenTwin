@@ -23,13 +23,13 @@
 #include <list>
 #include <memory>
 
+#include "KeyValuesExtractor.h"
 #include "BusinessLogicHandler.h"
 #include "MetadataAssemblyData.h"
-#include "KeyValuesExtractor.h"
-#include "EntityMetadataCampaign.h"
-#include "MetadataEntry.h"
-#include "DatasetDescription.h"
-#include "IVisualisationTable.h"
+#include "OTResultDataAccess/MetadataEntry.h"
+#include "OTResultDataAccess/DatasetDescription.h"
+#include "OTModelEntities/EntityMetadataCampaign.h"
+#include "OTModelEntities/IVisualisationTable.h"
 
 //! @brief Handler for storring data in the result collection.
 class TabledataToResultdataHandler : public BusinessLogicHandler

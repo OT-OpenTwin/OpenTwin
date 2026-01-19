@@ -19,10 +19,10 @@
 
 // OpenTwin Core header
 #include "OTCore/Math.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // OpenTwin Gui header
-#include "OTGui/GraphicsConnectionCalculationData.h"
+#include "OTGui/Graphics/GraphicsConnectionCalculationData.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/QtFactory.h"

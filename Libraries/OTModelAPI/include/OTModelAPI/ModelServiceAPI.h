@@ -20,12 +20,13 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTModelAPI/OTModelAPIExport.h"
-#include "EntityBase.h"
-#include "NewModelStateInfo.h"
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/NewModelStateInfo.h"
+#include "OTModelEntities/EntityInformation.h"
+
 // std header
 #include <string>
 #include <list>

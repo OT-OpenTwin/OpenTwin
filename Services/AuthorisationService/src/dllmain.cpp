@@ -24,7 +24,7 @@
 #undef max
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"

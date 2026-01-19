@@ -23,7 +23,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/NavigationTreeItem.h"
 #include "OTGui/NavigationTreePackage.h"
-#include "OTGui/SelectEntitiesDialogCfg.h"
+#include "OTGui/Dialog/SelectEntitiesDialogCfg.h"
 #include "OTWidgets/Dialog.h"
 
 // Qt header

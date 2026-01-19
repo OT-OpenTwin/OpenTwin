@@ -21,8 +21,8 @@
 #include "ViewStateCfg.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 namespace intern {
 	static const std::string c_viewConfigVersion{ "1" };

@@ -26,8 +26,8 @@
 #include <uiServiceTypes.h>				// Model and View types
 
 // Viewer header
-#include "ViewerAPI.h"
-#include "FrontendAPI.h"
+#include "OTViewer/ViewerAPI.h"
+#include "OTViewer/FrontendAPI.h"
 
 // OpenTwin header
 #include "OTCore/ServiceBase.h"

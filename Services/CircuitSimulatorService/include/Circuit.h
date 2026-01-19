@@ -19,10 +19,13 @@
 
 #pragma once
 
-//Service Header
+// Service Header
 #include "CircuitElement.h"
-#include "EntityBlock.h"
-//C++ Header
+
+// OpenTwin header
+#include "OTBlockEntities/EntityBlock.h"
+
+// std Header
 #include <map>
 
 

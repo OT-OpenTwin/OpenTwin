@@ -49,8 +49,6 @@
 #include "ResultHandling/ExecutionBarrierFrequencyAndLast.h"
 #include "ResultHandling/ResultSinkFilePrinter.h"
 
-#include "OTModelAPI/ModelServiceAPI.h"
-
 #include "Application.h"
 #include "FolderNames.h"
 
@@ -59,9 +57,10 @@
 #include <sstream>
 #include <chrono>
 
-#include "QuantityDescriptionCurve.h"
 #include "OTCore/FolderNames.h"
-#include "OTGui/PainterRainbowIterator.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "OTResultDataAccess/QuantityDescriptionCurve.h"
 
 MicroServiceInterfaceFITTDSolver::~MicroServiceInterfaceFITTDSolver()
 {

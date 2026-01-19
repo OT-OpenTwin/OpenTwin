@@ -21,7 +21,7 @@
 
 #include "OTModelAPI/ModelServiceAPI.h"
 
-#include "EntityLocalCoordinateSystem.h"
+#include "OTModelEntities/EntityLocalCoordinateSystem.h"
 
 void LCSManager::createNew()
 {

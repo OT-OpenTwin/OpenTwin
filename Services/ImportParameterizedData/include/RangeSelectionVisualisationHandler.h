@@ -23,7 +23,7 @@
 
 #include "OTCore/CoreTypes.h"
 #include "OTGui/TableRange.h"
-#include "EntityTableSelectedRanges.h"
+#include "OTModelEntities/EntityTableSelectedRanges.h"
 #include "OTCore/Color.h"
 
 

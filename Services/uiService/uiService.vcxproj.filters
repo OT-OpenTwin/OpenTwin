@@ -197,6 +197,9 @@
     <ClCompile Include="src\ScreenshotDialog.cpp">
       <Filter>Source Files\ProjectOverview</Filter>
     </ClCompile>
+    <ClCompile Include="src\ScriptEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\uiServiceTypes.h">
@@ -209,9 +212,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ControlsManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ToolBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\QtMetaTypes.h">
@@ -350,6 +350,12 @@
     </QtMoc>
     <QtMoc Include="include\ViewerComponent.h">
       <Filter>Header Files\Components</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ScriptEngine.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ToolBar.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

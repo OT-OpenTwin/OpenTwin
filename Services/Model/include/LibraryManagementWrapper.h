@@ -23,7 +23,7 @@
 #include <string>
 #include <list>
 
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 

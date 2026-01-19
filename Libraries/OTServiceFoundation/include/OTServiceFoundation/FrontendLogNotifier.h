@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/AbstractLogNotifier.h"
+#include "OTCore/Logging/AbstractLogNotifier.h"
 
 namespace ot {
 

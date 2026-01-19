@@ -20,7 +20,7 @@
 #pragma once
 #include "OTCore/CoreTypes.h"
 #include <string>
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 #include "OTGui/VisualisationCfg.h"
 
 class ViewVisualisationHandler

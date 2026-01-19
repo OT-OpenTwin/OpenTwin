@@ -17,8 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "../include/DataSourceResult3D.h"
-
+#include "DataSourceResult3D.h"
 
 #include <vtkSmartPointer.h>
 #include <vtkDoubleArray.h>

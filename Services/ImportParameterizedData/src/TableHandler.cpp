@@ -20,13 +20,13 @@
 #include "TableHandler.h"
 #include "FileToTableExtractorFactory.h"
 
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include "TableStatisticAnalyser.h"
 
 #include "Application.h"
-#include "EntityParameterizedDataTable.h"
+#include "OTModelEntities/EntityParameterizedDataTable.h"
 #include <chrono>
 
 TableHandler::TableHandler(const std::string tableFolder) : _tableFolder(tableFolder)

@@ -57,6 +57,7 @@
     <ClCompile Include="src\ProjectOverviewPreviewBox.cpp" />
     <ClCompile Include="src\ProjectOverviewTree.cpp" />
     <ClCompile Include="src\ProjectOverviewWidget.cpp" />
+    <ClCompile Include="src\ScriptEngine.cpp" />
     <ClCompile Include="src\WelcomeWidget.cpp" />
     <ClCompile Include="src\RenameProjectDialog.cpp" />
     <ClCompile Include="src\SelectEntitiesDialog.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="include\ProjectOverviewFilterData.h" />
     <QtMoc Include="include\ProjectOverviewPreviewBox.h" />
     <ClInclude Include="include\ProjectOverviewTree.h" />
+    <QtMoc Include="include\ScriptEngine.h" />
     <ClInclude Include="include\ShortParameterDescription.h" />
     <ClInclude Include="include\StartArgumentParser.h" />
     <ClInclude Include="include\UITestLogs.h" />
@@ -125,7 +127,7 @@
     <QtMoc Include="include\SelectEntitiesDialog.h" />
     <QtMoc Include="include\RenameProjectDialog.h" />
     <ClInclude Include="include\ServiceDataUi.h" />
-    <ClInclude Include="include\ToolBar.h" />
+    <QtMoc Include="include\ToolBar.h" />
     <ClInclude Include="include\ProjectManagement.h" />
     <ClInclude Include="include\uiServiceTypes.h" />
     <ClInclude Include="include\UserManagement.h" />
@@ -194,14 +196,14 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
     <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
     <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
@@ -209,14 +211,14 @@
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
     <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
     <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
@@ -233,7 +235,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)/$(OT_CLIBD);$(OT_CORE_ROOT)/$(OT_CLIBD);$(OT_GUI_ROOT)/$(OT_CLIBD);$(OT_WIDGETS_ROOT)/$(OT_LIBD);$(OT_VIEWER_ROOT)/$(OT_LIBD);$(OT_UICORE_ROOT)/$(OT_LIBD);$(OT_COMMUNICATION_ROOT)/$(OT_CLIBD);$(OT_GUIAPI_ROOT)/$(OT_CLIBD);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBD);$(OT_MODELENTITIES_ROOT)/$(OT_CLIBD);$(QWT_LIB_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_CLIBD);$(OT_RUBBERBAND_ROOT)/$(OT_LIBD);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_LIBD);$(OT_LTSPICE_CONNECTOR_ROOT)/$(OT_LIBD);$(OT_FILE_MANAGER_CONNECTOR_ROOT)/$(OT_LIBD);$(QT_ADS_ROOT)\lib;$(QT_TT_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;Viewer.lib;OTCommunication.lib;OTGuiAPI.lib;OTFrontendConnectorAPI.lib;OTFMC.lib;ModelEntities.lib;uiCore.lib;qwtd.lib;zlibd.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;StudioSuiteConnector.lib;LTSpiceConnector.lib;DataStorage.lib;qtadvanceddockingd.lib;$(MONGO_CXX_LIB);$(QT_TT_LIBD);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTViewer.lib;OTCommunication.lib;OTGuiAPI.lib;OTFrontendConnectorAPI.lib;OTFMC.lib;OTModelEntities.lib;uiCore.lib;qwtd.lib;zlibd.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;StudioSuiteConnector.lib;LTSpiceConnector.lib;OTDataStorage.lib;qtadvanceddockingd.lib;$(MONGO_CXX_LIB);$(QT_TT_LIBD);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -248,7 +250,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_UICORE_ROOT)/$(OT_DLLD);$(OT_VIEWER_ROOT)/$(OT_DLLD);$(QWT_LIB_LIBPATHD);$(QWTPOLAR_LIB_LIBPATHD);$(Qt_LIBPATH_);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_DLLD);$(OT_BLOCKEDITOR_ROOT)/$(OT_DLLD);$(ZLIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLD);$(OT_RUBBERBAND_ROOT)/$(OT_DLLD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);uiCore.lib;Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlibd.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);uiCore.lib;OTViewer.lib;BlockEditorAPI.lib;BlockEditor.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlibd.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -264,7 +266,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)/$(OT_CLIBR);$(OT_CORE_ROOT)/$(OT_CLIBR);$(OT_GUI_ROOT)/$(OT_CLIBR);$(OT_WIDGETS_ROOT)/$(OT_LIBR);$(OT_VIEWER_ROOT)\$(OT_LIBR);$(OT_UICORE_ROOT)/$(OT_LIBR);$(OT_COMMUNICATION_ROOT)/$(OT_CLIBR);$(OT_GUIAPI_ROOT)/$(OT_CLIBR);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBR);$(OT_MODELENTITIES_ROOT)/$(OT_CLIBR);$(QWT_LIB_LIBPATHR);$(ZLIB_LIBPATHR);$(OT_RUBBERBAND_ROOT)/$(OT_LIBR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_CLIBR);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_LIBR);$(OT_LTSPICE_CONNECTOR_ROOT)/$(OT_LIBR);$(OT_FILE_MANAGER_CONNECTOR_ROOT)/$(OT_LIBR);$(QT_ADS_ROOT)\lib;$(QT_TT_LIBPATHR);$(MONGO_CXX_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;Viewer.lib;OTCommunication.lib;OTGuiAPI.lib;OTFrontendConnectorAPI.lib;OTFMC.lib;ModelEntities.lib;uiCore.lib;qwtd.lib;$(Qt_LIBS_);zlib.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;StudioSuiteConnector.lib;LTSpiceConnector.lib;DataStorage.lib;qtadvanceddocking.lib;$(MONGO_CXX_LIB);$(QT_TT_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTViewer.lib;OTCommunication.lib;OTGuiAPI.lib;OTFrontendConnectorAPI.lib;OTFMC.lib;OTModelEntities.lib;uiCore.lib;qwtd.lib;$(Qt_LIBS_);zlib.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;StudioSuiteConnector.lib;LTSpiceConnector.lib;OTDataStorage.lib;qtadvanceddocking.lib;$(MONGO_CXX_LIB);$(QT_TT_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -279,7 +281,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_UICORE_ROOT)/$(OT_DLLR);$(OT_VIEWER_ROOT)/$(OT_DLLR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(Qt_LIBPATH_);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_DLLR);$(OT_BLOCKEDITOR_ROOT)/$(OT_DLLR);$(ZLIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLR);$(OT_RUBBERBAND_ROOT)/$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);uiCore.lib;Viewer.lib;BlockEditorAPI.lib;BlockEditor.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlib.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);uiCore.lib;OTViewer.lib;BlockEditorAPI.lib;BlockEditor.lib;qwtd.lib;qwtpolard.lib;$(Qt_LIBS_);zlib.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -288,22 +290,22 @@
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;network;widgets;openglwidgets;websockets</QtModules>
+    <QtModules>core;gui;network;qml;widgets;openglwidgets;websockets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;network;gui;websockets;widgets</QtModules>
+    <QtModules>core;gui;network;qml;widgets;openglwidgets;websockets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;network;widgets;openglwidgets;websockets</QtModules>
+    <QtModules>core;gui;network;qml;widgets;openglwidgets;websockets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;websockets;widgets</QtModules>
+    <QtModules>core;gui;network;qml;widgets;openglwidgets;websockets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">

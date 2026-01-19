@@ -36,8 +36,8 @@
 #include <QtWidgets/qapplication.h>
 
 // Open Twin header
-#include "OTCore/JSON.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/IconManager.h"

@@ -18,17 +18,17 @@
 // @otlicense-end
 
 #include "BatchedCategorisationHandler.h"
-#include "EntityTableSelectedRanges.h"
 #include "CategorisationFolderNames.h"
 #include "Application.h"
 
-#include "EntityAPI.h"
-#include "OTModelAPI/ModelServiceAPI.h"
 #include "OTSystem/DateTime.h"
 #include "OTCore/EntityName.h"
-#include "EntityBatchImporter.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
-#include "EntityFileCSV.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityFileCSV.h"
+#include "OTModelEntities/EntityBatchImporter.h"
+#include "OTModelEntities/EntityTableSelectedRanges.h"
 
 BatchedCategorisationHandler::~BatchedCategorisationHandler()
 {

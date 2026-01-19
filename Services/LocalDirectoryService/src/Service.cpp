@@ -24,7 +24,7 @@
 #include "ServiceManager.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTSystem/SystemProcess.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"

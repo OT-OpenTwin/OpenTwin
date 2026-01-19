@@ -20,11 +20,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Grid.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/Painter2DFactory.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Painter/Painter2DFactory.h"
 
 // ###########################################################################################################################################################################################################################################################################################################################
 

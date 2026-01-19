@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 
 // std header
 #include <map>

@@ -23,11 +23,11 @@
 #include "SubprocessManager.h"
 #include "SubprocessHandler.h"
 #include "CommunicationHandler.h"
-#include "DataBase.h"
 
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 

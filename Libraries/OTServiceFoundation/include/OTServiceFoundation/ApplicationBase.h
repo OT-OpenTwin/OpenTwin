@@ -23,14 +23,14 @@
 #include "OTSystem/Exception.h"                      // Exceptions
 
 // OpenTwin Core header
-#include "OTCore/JSON.h"                             // JSON related methods and types
+#include "OTCore/JSON/JSON.h"                             // JSON related methods and types
 #include "OTCore/CoreTypes.h"                        // Core types
 #include "OTCore/ServiceBase.h"                      // Base class for services
 #include "OTCore/ReturnMessage.h"                    // Return message related methods and types
-#include "OTCore/LogDispatcher.h"                    // Logging related methods and types
+#include "OTCore/Logging/LogDispatcher.h"                    // Logging related methods and types
 
 // OpenTwin Gui header
-#include "OTGui/PropertyGridCfg.h"                   // Property grid configuration
+#include "OTGui/Properties/PropertyGridCfg.h"                   // Property grid configuration
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"                     // Message related methods and types
@@ -40,7 +40,7 @@
 #include "OTServiceFoundation/FoundationAPIExport.h" // OT_SERVICEFOUNDATION_API_EXPORT
 
 // OpenTwin ModelEntities header
-#include "EntityInformation.h"                        // Entity information
+#include "OTModelEntities/EntityInformation.h"                        // Entity information
 
 // std header
 #include <map>
@@ -219,6 +219,14 @@ namespace ot {
 		//! @param _response The reponse will be written here.
 		//! @param _requestFlags Flags to control the request behavior.
 		bool sendMessage(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
+
+		//! @brief Will send the message to the service with the specified name.
+		//! @param _queue If true, the message will be queued.
+		//! @param _serviceName The name of the service.
+		//! @param _doc The document containing the message.
+		//! @param _response The reponse will be written here.
+		//! @param _requestFlags Flags to control the request behavior.
+		bool sendMessage(bool _queue, const std::string& _serviceName, const std::list<JsonDocument>& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
 
 		//! @brief Will send the message to the services with the specified names.
 		//! @param _queue If true, the message will be queued.

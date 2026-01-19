@@ -17,32 +17,32 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "DataBase.h"
 #include "Application.h"
 #include "Result1DManager.h"
 #include "ParametricResult1DManager.h"
 
+#include "OTCore/FolderNames.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "OTCore/FolderNames.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTGui/PainterRainbowIterator.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityResult1DPlot.h"
 
-#include "ResultCollectionExtender.h"
-#include "MetadataSeries.h"
-#include "MetadataParameter.h"
-#include "MetadataEntrySingle.h"
-#include "CurveFactory.h"
-#include "EntityResult1DPlot.h"
+#include "OTResultDataAccess/CurveFactory.h"
+#include "OTResultDataAccess/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataParameter.h"
+#include "OTResultDataAccess/MetadataEntrySingle.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
 
-#include "QuantityDescription.h"
-#include "QuantityDescriptionCurve.h"
-#include "QuantityDescriptionCurveComplex.h"
-#include "QuantityDescriptionSParameter.h"
+#include "OTResultDataAccess/ValueFormatSetter.h"
+#include "OTResultDataAccess/QuantityDescription.h"
+#include "OTResultDataAccess/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/QuantityDescriptionCurveComplex.h"
+#include "OTResultDataAccess/QuantityDescriptionSParameter.h"
 
 #include <boost/algorithm/string.hpp>
-#include "ValueFormatSetter.h"
 
 #include <set>
 

@@ -1,0 +1,53 @@
+// @otlicense
+// File: ParameterDescription.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin header
+#include "OTCore/Variable.h"
+#include "OTResultDataAccess/MetadataParameter.h"
+
+// std header
+#include <list>
+
+//! @brief Acts as a container for the parameter data during the assembly. 
+class OT_RESULTDATAACCESS_API_EXPORT ParameterDescription
+{
+public:
+	ParameterDescription(const MetadataParameter& _metadataParameter, bool _constantForDataset)
+		:m_metadataParameter(_metadataParameter), m_constantForDataset(_constantForDataset){}
+	~ParameterDescription() = default;
+
+	ParameterDescription(ParameterDescription&& _other) noexcept = default;
+	ParameterDescription& operator=(ParameterDescription&& _other) = default;
+
+	ParameterDescription(const ParameterDescription& _other) =delete;
+	ParameterDescription& operator=(const ParameterDescription& _other) = delete;
+
+	MetadataParameter& getMetadataParameter() 
+	{ 
+		return m_metadataParameter; 
+	}
+
+	void setParameterConstantForDataset(bool _constantForDataset) { m_constantForDataset = _constantForDataset; };
+	bool getParameterConstantForDataset() const { return m_constantForDataset; }
+private:
+	MetadataParameter m_metadataParameter;
+	bool m_constantForDataset = false;
+};

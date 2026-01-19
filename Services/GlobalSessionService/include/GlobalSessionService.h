@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTCore/LogTypes.h"
+#include "OTCore/Logging/LogTypes.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"

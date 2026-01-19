@@ -20,7 +20,8 @@
 #pragma once
 
 #include "OTCore/TypeNames.h"
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/EntityInformation.h"
 
 #include <fstream>
 #include <map>
@@ -38,8 +39,6 @@ namespace ot {
 		class UiComponent;
 	}
 }
-
-#include "EntityProperties.h"
 
 struct SolverBaseParsedLine
 {

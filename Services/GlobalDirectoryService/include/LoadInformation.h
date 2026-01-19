@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 
 //! @brief The LoadInformation class provides information about the current system load.
 class LoadInformation {

@@ -26,10 +26,10 @@ class Result1DData;
 class ResultCollectionExtender;
 
 
-#include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "MetadataSeries.h"
-#include "DatasetDescription.h"
 #include "OTCore/DefensiveProgramming.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
+#include "OTResultDataAccess/MetadataSeries.h"
+#include "OTResultDataAccess/DatasetDescription.h"
 
 #include <string>
 #include <list>

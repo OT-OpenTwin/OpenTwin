@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/CommunicationTypes.h"
 
 ot::LogFlag ot::messageTypeToLogFlag(ot::MessageType _type) {

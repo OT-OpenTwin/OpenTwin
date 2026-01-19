@@ -27,7 +27,7 @@
 #include "Model.h"
 
 // OpenTwin header
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/GuiTypes.h"
 #include "OTCommunication/ActionTypes.h"

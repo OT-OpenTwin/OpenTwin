@@ -20,7 +20,7 @@
 #pragma once
 #include <list>
 
-#include "EntityBlock.h"
+#include "OTBlockEntities/EntityBlock.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "GraphNode.h"
 #include "BlockHandler.h"

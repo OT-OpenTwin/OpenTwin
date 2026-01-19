@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/MainWindow.h"
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/TabToolBar.h"

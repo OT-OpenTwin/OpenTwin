@@ -35,7 +35,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/BasicServiceInformation.h"
 
 ToolManager::ToolManager(AppBase* _app)

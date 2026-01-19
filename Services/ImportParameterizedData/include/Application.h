@@ -20,8 +20,11 @@
 #pragma once
 
 // Open twin header
-#include "OTServiceFoundation/ApplicationBase.h"		// Base class
+#include "OTCore/FolderNames.h"
 #include "OTGui/ToolBarButtonCfg.h"
+#include "OTServiceFoundation/UILockWrapper.h"
+#include "OTServiceFoundation/ApplicationBase.h"		// Base class
+#include "OTResultDataAccess/ResultCollectionMetadataAccess.h"
 
 // C++ header
 #include <list>
@@ -32,13 +35,8 @@
 #include "DataCategorizationHandler.h"
 #include "TabledataToResultdataHandler.h"
 #include "TouchstoneToResultdata.h"
-#include "ResultCollectionMetadataAccess.h"
 #include "RangeSelectionVisualisationHandler.h"
 #include "BatchedCategorisationHandler.h"
-
-
-#include "OTCore/FolderNames.h"
-#include "OTServiceFoundation/UILockWrapper.h"
 
 // Forward declaration
 namespace ot {

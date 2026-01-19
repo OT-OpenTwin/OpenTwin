@@ -25,25 +25,25 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/ProjectInformation.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GuiTypes.h"
-#include "OTGui/PropertyGridCfg.h"
 #include "OTGui/VisualisationCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionDispatchProfiler.h"
-#include "ResultDataStorageAPI.h"
+#include "OTDataStorage/ResultDataStorageAPI.h"
 
 // Model header
-#include "Geometry.h"
+#include "OTModelEntities/Geometry.h"
 
 // Viewer header
-#include "ViewerAPI.h"
+#include "OTViewer/ViewerAPI.h"
 
 // uiCore header
 #include "akCore/aNotifier.h"
@@ -473,6 +473,8 @@ private:
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
+	void applyInitialSelection();
+
 	void actionDispatchTimeout(const ot::JsonDocument& _document);
 	void actionDispatchTimeout(const std::string& _action);
 
@@ -498,7 +500,6 @@ private:
 
 	struct InitialSelectionInfo {
 		ot::UIDList		treeIDs;
-		bool			selected;
 		bool			clearSelection;
 	};
 	std::list<InitialSelectionInfo>                 m_initialSelection;

@@ -23,25 +23,24 @@
 #include "ParametricCombination.h"
 #include "LTSpiceRawReader.h"
 
-#include "ResultCollectionExtender.h"
-#include "MetadataSeries.h"
-#include "MetadataParameter.h"
-#include "MetadataEntrySingle.h"
-#include "ValueFormatSetter.h"
+#include "OTResultDataAccess/CurveFactory.h"
+#include "OTResultDataAccess/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataParameter.h"
+#include "OTResultDataAccess/ValueFormatSetter.h"
+#include "OTResultDataAccess/MetadataEntrySingle.h"
+#include "OTResultDataAccess/QuantityDescription.h"
+#include "OTResultDataAccess/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/QuantityDescriptionCurveComplex.h"
 
-#include "QuantityDescription.h"
-#include "QuantityDescriptionCurve.h"
-#include "QuantityDescriptionCurveComplex.h"
-
-#include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/FolderNames.h"
-#include "OTGui/PainterRainbowIterator.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
-#include "EntityFile.h"
-#include "EntityAPI.h"
-#include "DataBase.h"
-#include "EntityResult1DPlot.h"
-#include "CurveFactory.h"
+#include "OTModelEntities/EntityFile.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityResult1DPlot.h"
 
 #include <regex>
 #include <filesystem>

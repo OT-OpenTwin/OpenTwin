@@ -1,0 +1,122 @@
+// @otlicense
+// File: EntityParameterizedDataTable.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#include "OTModelEntities/EntityParameterizedDataTable.h"
+#include <bsoncxx/builder/basic/array.hpp>
+
+static EntityFactoryRegistrar<EntityParameterizedDataTable> registrar("EntityParameterizedDataTable");
+
+EntityParameterizedDataTable::EntityParameterizedDataTable(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms)
+	: EntityResultTable<std::string>(ID, parent, mdl, ms)
+{
+}
+
+void EntityParameterizedDataTable::SetTableDimensions(uint32_t numberOfRows, uint32_t numberOfColumns)
+{
+	_numberOfRows = numberOfRows;
+	_numberOfColumns = numberOfColumns;
+}
+
+void EntityParameterizedDataTable::SetSourceFile(std::string sourceFileName, std::string sourceFilePath)
+{
+	_sourceFileName = sourceFileName;
+	_sourceFilePath = sourceFilePath;
+}
+
+void EntityParameterizedDataTable::createProperties(ot::TableCfg::TableHeaderMode _defaultHeaderMode) {
+	auto numberOfRowsProperty = new EntityPropertiesInteger("Number of rows", _numberOfRows);
+	numberOfRowsProperty->setReadOnly(true);
+	getProperties().createProperty(numberOfRowsProperty,"Table properties");
+
+	auto numberOfColumnsProperty = new EntityPropertiesInteger("Number of columns", _numberOfColumns);
+	numberOfColumnsProperty->setReadOnly(true);
+	getProperties().createProperty(numberOfColumnsProperty, "Table properties");
+	
+	auto fileNameProperty = new EntityPropertiesString("File name", _sourceFileName);
+	fileNameProperty->setReadOnly(true);
+	getProperties().createProperty(fileNameProperty, "Source file");
+
+	auto filePathProperty = new EntityPropertiesString("File path", _sourceFilePath);
+	filePathProperty->setReadOnly(true);
+	getProperties().createProperty(filePathProperty, "Source file");
+
+	if (_defaultHeaderMode == ot::TableCfg::TableHeaderMode::Vertical)
+	{
+		m_minRow = 0;
+		m_minCol = 1;
+	}
+
+	EntityPropertiesSelection::createProperty("Table header", "Header position", { 
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Horizontal),
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Vertical),
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::NoHeader)
+		},
+		ot::TableCfg::toString(_defaultHeaderMode), _defaulCategory, getProperties());
+
+	EntityResultTable<std::string>::createProperties();
+}
+
+std::string EntityParameterizedDataTable::getSelectedHeaderModeString() {
+	auto selectedOrientation = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Header position"));
+	return selectedOrientation->getValue();
+}
+
+ot::TableCfg::TableHeaderMode EntityParameterizedDataTable::getSelectedHeaderMode() {
+	ot::TableCfg::TableHeaderMode mode = ot::TableCfg::stringToHeaderMode(this->getSelectedHeaderModeString());
+	return mode;
+}
+
+void EntityParameterizedDataTable::addStorageData(bsoncxx::builder::basic::document & storage)
+{
+	EntityResultTable::addStorageData(storage);
+
+	auto dataArray = bsoncxx::builder::basic::array();
+
+	for (int i = 0; i < _numberOfUniquesInColumns.size(); i++)
+	{
+		dataArray.append(static_cast<int32_t>(_numberOfUniquesInColumns[i]));
+	}
+	
+	storage.append(
+		bsoncxx::builder::basic::kvp("NumberOfRows",static_cast<int32_t>(_numberOfRows)),
+		bsoncxx::builder::basic::kvp("NumberOfColumns", static_cast<int32_t>(_numberOfColumns)),
+		bsoncxx::builder::basic::kvp("UniquesPerColumn", dataArray),
+		bsoncxx::builder::basic::kvp("SourceFileName",_sourceFileName),
+		bsoncxx::builder::basic::kvp("SourceFilePath",_sourceFilePath)
+	);
+}
+
+void EntityParameterizedDataTable::readSpecificDataFromDataBase(const bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+{
+	EntityResultTable::readSpecificDataFromDataBase(doc_view, entityMap);
+	_numberOfRows = static_cast<uint32_t>(doc_view["NumberOfRows"].get_int32());
+	_numberOfColumns = static_cast<uint32_t>(doc_view["NumberOfColumns"].get_int32());
+	_sourceFileName = doc_view["SourceFileName"].get_utf8().value.data();
+	_sourceFilePath = doc_view["SourceFilePath"].get_utf8().value.data();
+
+	auto dataArray = doc_view["UniquesPerColumn"].get_array().value;
+
+	_numberOfUniquesInColumns.clear();
+	_numberOfUniquesInColumns.reserve(dataArray.length());
+
+	for (auto& data : dataArray)
+	{
+		_numberOfUniquesInColumns.push_back(static_cast<uint32_t>(data.get_int32()));
+	}
+}

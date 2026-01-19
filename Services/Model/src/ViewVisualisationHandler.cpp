@@ -21,13 +21,13 @@
 #include "ViewVisualisationHandler.h"
 #include "Application.h"
 #include "Model.h"
-#include "IVisualisationText.h"
-#include "IVisualisationTable.h"
-#include "IVisualisationPlot1D.h"
-#include "IVisualisationCurve.h"
-#include "IVisualisationGraphicsView.h"
-#include "EntityBlock.h"
-#include "EntityBlockConnection.h"
+#include "OTModelEntities/IVisualisationText.h"
+#include "OTModelEntities/IVisualisationTable.h"
+#include "OTModelEntities/IVisualisationPlot1D.h"
+#include "OTModelEntities/IVisualisationCurve.h"
+#include "OTModelEntities/IVisualisationGraphicsView.h"
+#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
 #include "OTCore/RuntimeTests.h"
 
 
@@ -282,7 +282,7 @@ void ViewVisualisationHandler::setupGraphicsScene(EntityBase* _container)
 				EntityBlockConnection* connection = dynamic_cast<EntityBlockConnection*>(child);
 				if (connection != nullptr)
 				{
-					connection->CreateConnections();
+					connection->createConnectionItem();
 				}
 				else
 				{

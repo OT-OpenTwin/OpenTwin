@@ -1,0 +1,157 @@
+// @otlicense
+// File: FrontendAPI.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin header
+#include "OTCore/CoreTypes.h"
+#include "OTGui/EntityTreeItem.h"
+#include "OTGui/WidgetViewBase.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
+
+// Qt header
+#include <QtCore/qstring.h>
+
+// std header
+#include <list>
+#include <string>
+#include <vector>
+
+namespace ot { class WidgetView; };
+namespace ot { class TextEditor; };
+
+class __declspec(dllexport) FrontendAPI {
+public:
+	static void setInstance(FrontendAPI* _api);
+	static FrontendAPI* instance(void);
+
+	FrontendAPI() {};
+	virtual ~FrontendAPI() {};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// General
+
+	virtual void addKeyShortcut(const std::string& keySequence) {};
+	virtual void lockSelectionAndModification(bool flag) {};
+
+	virtual void removeViewer(ot::UID viewerID) {};
+
+	virtual void removeUIElements(std::list<unsigned long long>& itemIDList) {};
+
+	virtual void displayText(const std::string& text) {};
+
+	virtual void enableDisableControls(const ot::UIDList& _enabledControls, bool _resetDisabledCounterForEnabledControls, const ot::UIDList& _disabledControls) {};
+
+	virtual void entitiesSelected(ot::serviceID_t replyTo, const std::string& selectionAction, const std::string& selectionInfo, std::list<std::string>& optionNames, std::list<std::string>& optionValues) {};
+
+	virtual void fatalError(const std::string& message) {};
+
+	virtual void rubberbandFinished(ot::serviceID_t creatorId, const std::string& note, const std::string& pointJson, const std::vector<double>& transform) {}
+
+	virtual void updateSettings(const ot::PropertyGridCfg& _config) {};
+
+	virtual void loadSettings(ot::PropertyGridCfg& _config) {};
+
+	virtual void saveSettings(const ot::PropertyGridCfg& _config) {};
+
+	virtual void updateVTKEntity(unsigned long long modelEntityID) {};
+
+	virtual std::string messageModelService(const std::string& _message) { return std::string(); };
+
+	virtual void removeGraphicsElements(ot::UID _modelID) {};
+
+	virtual std::string getOpenFileName(const std::string& _title, const std::string& _path, const std::string& _filters) { return std::string(); };
+	virtual std::string getSaveFileName(const std::string& _title, const std::string& _path, const std::string& _filters) { return std::string(); };
+
+	virtual void setProgressBarVisibility(const QString& _text, bool _visible, bool _continous) {};
+	virtual void setProgressBarValue(int _value) {};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Tree
+
+	virtual void createTree(void) {};
+	virtual void clearTree(void) {};
+	virtual ot::UID addTreeItem(const ot::EntityTreeItem& _treeItem) { return 0; };
+	virtual void removeTreeItems(std::list<ot::UID> treeItemIDList) {};
+	virtual void selectTreeItem(ot::UID treeItemID) {};
+	virtual void selectSingleTreeItem(ot::UID treeItemID) {};
+	virtual void expandSingleTreeItem(ot::UID treeItemID) {};
+	virtual bool isTreeItemExpanded(ot::UID treeItemID) { return false; };
+	virtual void toggleTreeItemSelection(ot::UID treeItemID, bool considerChilds) {};
+	virtual void clearTreeSelection(void) {};
+	virtual void setTreeItemIcon(ot::UID _treeItemID, const std::string& _iconName) {};
+	virtual void setTreeItemText(ot::UID _treeItemID, const std::string& _text) {};
+	virtual void refreshSelection(void) {};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// PropertyGrid
+
+	virtual void fillPropertyGrid(const ot::PropertyGridCfg& _configuration) {};
+	virtual void clearModalPropertyGrid() {};
+	virtual void setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) {};
+	virtual double getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) { return 0.0; };
+	
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Plot
+
+	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed, bool _queue) {};
+	
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Views
+
+	virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
+	virtual bool hasViewFocus(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) { return false; };
+
+	virtual void addVisualizingEntityToView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
+	virtual void removeVisualizingEntityFromView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
+	virtual void clearVisualizingEntitesFromView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
+
+	virtual ot::WidgetView* getCurrentView(void) { return nullptr; };
+	virtual ot::WidgetView* getLastFocusedCentralView(void) { return nullptr; };
+
+	virtual bool getCurrentViewIsModified(void) { return false; };
+
+	virtual void setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
+	virtual void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {};
+	virtual std::string getCurrentVisualizationTabTitle(void) { return ""; };
+
+	virtual void requestSaveForCurrentVisualizationTab(void) {};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ToolBar
+
+	virtual unsigned long long addMenuPage(const std::string& pageName) { return 0; };
+	virtual unsigned long long addMenuGroup(unsigned long long menuPageID, const std::string& groupName) { return 0; };
+	virtual unsigned long long addMenuSubGroup(unsigned long long _menuGroupID, const std::string& _subGroupName) { return 0; };
+	virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string& buttonName, const std::string& iconName) { return 0; };
+	virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string& buttonName, const std::string& iconName, const std::string& keySequence) { return 0; };
+	virtual void setMenuPushButtonToolTip(unsigned long long _buttonID, const std::string& _toolTip) {};
+
+	virtual void setCurrentMenuPage(const std::string& _pageName) {};
+	virtual std::string getCurrentMenuPage(void) { return std::string(); };
+
+private:
+	static FrontendAPI*& getInstance(void);
+};

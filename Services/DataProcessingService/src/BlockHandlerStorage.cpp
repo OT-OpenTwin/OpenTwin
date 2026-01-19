@@ -21,25 +21,28 @@
 #include "BlockHandlerStorage.h"
 #include "Application.h"
 
-#include "QuantityDescriptionMatrix.h"
-#include "QuantityDescriptionCurve.h"
-#include "MetadataQuantity.h"
-#include <map>
+#include "OTCore/EntityName.h"
 #include "OTCore/FolderNames.h"
+#include "OTCore/TimeFormatter.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/ExplicitStringValueConverter.h"
-#include "ResultCollectionMetadataAccess.h"
-
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/Plot1DCurveCfg.h"
-#include "OTCore/EntityName.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTGui/PainterRainbowIterator.h"
-#include "CurveFactory.h"
-#include "NewModelStateInfo.h"
-#include "EntityResult1DPlot.h"
+
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTCore/TimeFormatter.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/NewModelStateInfo.h"
+#include "OTModelEntities/EntityResult1DPlot.h"
+
+#include "OTResultDataAccess/MetadataQuantity.h"
+#include "OTResultDataAccess/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/QuantityDescriptionMatrix.h"
+#include "OTResultDataAccess/ResultCollectionMetadataAccess.h"
+#include "OTResultDataAccess/CurveFactory.h"
+
+#include <map>
 
 BlockHandlerStorage::BlockHandlerStorage(EntityBlockStorage* blockEntityStorage, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntityStorage,handlerMap),m_blockEntityStorage(blockEntityStorage)

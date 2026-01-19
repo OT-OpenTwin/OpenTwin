@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTFMC/FMCTypes.h"
 #include "OTFMC/FMDirectory.h"
-#include "NewModelStateInfo.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 
 namespace ot {
 

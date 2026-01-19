@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/StyledText.h"
 
 std::string ot::StyledText::toString(SubstitutionToken _substitutionToken) {

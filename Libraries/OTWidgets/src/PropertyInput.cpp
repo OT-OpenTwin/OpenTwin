@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/Property.h"
+#include "OTGui/Properties/Property.h"
 #include "OTWidgets/PropertyInput.h"
 
 ot::PropertyInput::PropertyInput() : 

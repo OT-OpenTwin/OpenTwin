@@ -23,14 +23,14 @@
 #include "OTSystem/Flags.h"
 
 // OpenTwin Core header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ServiceBase.h"			// Base class
 
 // OpenTwin Gui header
 #include "OTGui/GuiTypes.h"
-#include "OTGui/PropertyGridCfg.h"
 #include "OTGui/ToolBarButtonCfg.h"
 #include "OTGui/StyledTextBuilder.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"

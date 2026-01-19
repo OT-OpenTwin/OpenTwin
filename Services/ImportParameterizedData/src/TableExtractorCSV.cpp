@@ -19,7 +19,7 @@
 
 #include "TableExtractorCSV.h"
 #include "FileToTableExtractorRegistrar.h"
-#include "EntityFileCSV.h"
+#include "OTModelEntities/EntityFileCSV.h"
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"
 

@@ -134,5 +134,8 @@
     <ClInclude Include="include\VtkDriverUnstructuredVectorSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\VisualizationServiceTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

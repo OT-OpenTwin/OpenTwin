@@ -27,17 +27,17 @@
 
 // OpenTwin header
 #include "OTSystem/SystemInformation.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 
-#include "DocumentAPI.h"
-#include "Connection\ConnectionAPI.h"
-#include "Document\DocumentAccess.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentAccess.h"
 
 // Third party header
 #include "zlib.h"

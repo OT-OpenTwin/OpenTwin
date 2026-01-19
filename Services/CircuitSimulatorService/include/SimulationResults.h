@@ -29,7 +29,7 @@
 
 //Open Twin Header
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "EntityResultText.h"
+#include "OTModelEntities/EntityResultText.h"
 //C++ Header
 #include <vector>
 #include <map>

@@ -36,7 +36,7 @@
 #include "WrappedTriangleItem.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // QtWidgets
 #include <QtWidgets/qscrollbar.h>

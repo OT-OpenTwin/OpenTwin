@@ -1,0 +1,104 @@
+// @otlicense
+// File: EntityFaceAnnotation.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+#pragma warning(disable : 4251)
+
+// OpenTwin header
+#include "OTModelEntities/Geometry.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/BoundingBox.h"
+#include "OTCADEntities/CADModelEntitiesAPIExport.h"
+
+#include "TopoDS_Shape.hxx"
+
+// std header
+#include <string>
+
+class EntityFacetData;
+class EntityBrep;
+
+class OT_CADENTITIES_API_EXPORT EntityFaceAnnotationData
+{
+public:
+	EntityFaceAnnotationData() : modelID(0) {}
+	virtual ~EntityFaceAnnotationData() {}
+
+	void setData(const std::string &name, unsigned long long _modelID, std::string &_faceName) { entityName = name;  modelID = _modelID, faceName = _faceName; }
+	unsigned long long getModelID(void) { return modelID; }
+	std::string getEntityName(void) { return entityName; }
+	std::string getFaceName(void) { return faceName; }
+
+private:
+	std::string entityName;
+	std::string faceName;
+	unsigned long long modelID;
+};
+
+class OT_CADENTITIES_API_EXPORT EntityFaceAnnotation : public EntityBase
+{
+public:
+	EntityFaceAnnotation() : EntityFaceAnnotation(0, nullptr, nullptr, nullptr) {};
+	EntityFaceAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
+	virtual ~EntityFaceAnnotation();
+
+	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
+
+	virtual bool updateFromProperties(void) override;
+
+	void addFacePick(EntityFaceAnnotationData annotation);
+	void setColor(double r, double g, double b);
+
+	std::list<TopoDS_Shape> findFacesFromShape(EntityBrep* brep);
+
+	virtual void storeToDataBase(void) override;
+
+	void releaseFacets(void);
+
+	virtual void addVisualizationNodes(void) override;
+
+	static std::string className() { return "EntityFaceAnnotation"; };
+	virtual std::string getClassName(void) const override { return EntityFaceAnnotation::className(); };
+
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
+	virtual void removeChild(EntityBase *child) override;
+
+	void getGeometryNames(std::list <std::string> &names);
+
+	void renewFacets(void);
+	void storeUpdatedFacets(void);
+	EntityFacetData *getFacets(void) { return facets; };
+	BoundingBox &getBoundingBox(void) { return boundingBox; };
+
+private:
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
+	void updateVisualization(bool isHidden);
+	void ensureFacetsAreLoaded(void);
+	void storeFacets(void);
+	void findFacesAtIndexFromShape(std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep);
+
+	// Persistent data
+	EntityFacetData *facets;
+	long long facetsStorageID;
+
+	BoundingBox boundingBox;
+};
+

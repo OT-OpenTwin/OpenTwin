@@ -17,15 +17,11 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "stdafx.h"
-
 #include "DataSourceManager.h"
 #include "DataSourceManagerItem.h"
 #include "DataSourceItemFactory.h"
-#include "EntityBase.h"
-
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityBase.h"
 
 std::map<std::pair<ot::UID, ot::UID>, DataSourceManagerItem *> DataSourceManager::dataItems;
 

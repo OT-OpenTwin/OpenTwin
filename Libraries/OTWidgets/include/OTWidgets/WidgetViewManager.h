@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTWidgets/WidgetView.h"

@@ -23,7 +23,7 @@
 #include <fcntl.h>
 #include "Application.h"
 #include <io.h>
-#include <OTCore/LogDispatcher.h>
+#include <OTCore/Logging/LogDispatcher.h>
 #undef slots
 #include "Python.h"
 

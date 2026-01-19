@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionHandleConnector.h"
 #include "OTCommunication/ActionHandleConnectorManager.h"
 

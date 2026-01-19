@@ -21,10 +21,10 @@
 
 #include <string>
 #include <list>
-#include "EntityPythonManifest.h"
 #include <map>
-#include "NewModelStateInfo.h"
 #include "WorkerWaiterState.h"
+#include "OTModelEntities/EntityPythonManifest.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 
 class PackageHandler
 {

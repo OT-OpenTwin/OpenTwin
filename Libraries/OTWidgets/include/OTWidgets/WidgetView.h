@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTWidgets/SelectionInformation.h"
 

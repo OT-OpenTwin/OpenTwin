@@ -30,7 +30,7 @@
 #include "QtCore/qcoreapplication.h"
 #include <QtCore/qelapsedtimer>
 // OpenTwin Header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTGui/StyledTextBuilder.h"

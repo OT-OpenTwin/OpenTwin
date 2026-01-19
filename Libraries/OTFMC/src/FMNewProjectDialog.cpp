@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTFMC/FMDirectory.h"
 #include "OTFMC/FMNewProjectDialog.h"
 #include "OTWidgets/Label.h"

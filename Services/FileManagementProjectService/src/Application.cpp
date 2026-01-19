@@ -30,8 +30,8 @@
 #include "OTCore/ProjectInformation.h"
 
 // OpenTwin Gui header
-#include "OTGui/DialogCfg.h"
-#include "OTGui/MessageDialogCfg.h"
+#include "OTGui/Dialog/DialogCfg.h"
+#include "OTGui/Dialog/MessageDialogCfg.h"
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"
@@ -51,7 +51,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 
 // Entities
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 
 // std header
 #include <thread>

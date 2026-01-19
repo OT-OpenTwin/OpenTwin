@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
-#include "OTGui/GraphicsLineItemCfg.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Graphics/GraphicsLineItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsLineItem.h"
@@ -144,3 +144,4 @@ const ot::PenFCfg& ot::GraphicsLineItem::getLineStyle(void) const {
 	const GraphicsLineItemCfg* cfg = this->getItemConfiguration<GraphicsLineItemCfg>();
 	return cfg->getLineStyle();
 }
+

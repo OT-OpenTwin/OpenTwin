@@ -276,11 +276,13 @@ bool LogInDialog::mayCloseDialogWindow() {
 
 void LogInDialog::showEvent(QShowEvent* _event) {
 	ot::Dialog::showEvent(_event);
+
+	Q_EMIT dialogShown();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Private slots
+// Slots
 
 void LogInDialog::slotLogIn() {
 	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker already running");

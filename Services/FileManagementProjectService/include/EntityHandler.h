@@ -24,8 +24,8 @@
 #include "OTCore/FolderNames.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ProjectInformation.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "NewModelStateInfo.h"
 
 class EntityHandler : public BusinessLogicHandler {
 public:

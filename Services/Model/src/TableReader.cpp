@@ -23,8 +23,8 @@
 #include "TableReader.h"
 #include "Model.h"
 
-#include "EntityResultTable.h"
-#include "EntityResultTableData.h"
+#include "OTModelEntities/EntityResultTable.h"
+#include "OTModelEntities/EntityResultTableData.h"
 
 #include <memory>
 

@@ -25,7 +25,7 @@
 #include "ProjectOverviewWidget.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/CheckBox.h"
@@ -131,6 +131,10 @@ QString WelcomeWidget::getCurrentQuickFilter() const {
 	return m_overview->getCurrentQuickFilter();
 }
 
+std::list<ot::ProjectInformation> WelcomeWidget::getAllProjects() const {
+	return m_overview->getAllProjects();
+}
+
 std::list<ot::ProjectInformation> WelcomeWidget::getSelectedProjects() const {
 	return m_overview->getSelectedProjects();
 }
@@ -157,6 +161,10 @@ void WelcomeWidget::setViewMode(ot::ProjectOverviewWidget::ViewMode _mode) {
 
 void WelcomeWidget::storeViewModeSetting(UserManagement& _userManager) {
 	_userManager.storeSetting("WelcomeWidget_ViewMode", ot::ProjectOverviewWidget::toString(m_overview->getViewMode()));
+}
+
+std::optional<ot::ProjectInformation> WelcomeWidget::getProjectInformationAt(int _index) const {
+	return m_overview->getProjectInformationAt(_index);
 }
 
 void WelcomeWidget::slotCreateProject() {

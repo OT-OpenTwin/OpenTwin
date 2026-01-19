@@ -29,8 +29,8 @@
 #include "ProgressLogger.h"
 #include "StepWidthManager.h"
 
-#include "EntityAnnotation.h"
-#include "EntityAnnotationData.h"
+#include "OTModelEntities/EntityAnnotation.h"
+#include "OTModelEntities/EntityAnnotationData.h"
 
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"

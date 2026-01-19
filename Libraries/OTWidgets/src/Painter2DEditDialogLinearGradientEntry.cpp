@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/LinearGradientPainter2D.h"
+#include "OTGui/Painter/LinearGradientPainter2D.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/DoubleSpinBox.h"
 #include "OTWidgets/Painter2DEditDialogGradientBase.h"

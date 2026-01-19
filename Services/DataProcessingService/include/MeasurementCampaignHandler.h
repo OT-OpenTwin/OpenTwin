@@ -22,7 +22,7 @@
 #include <string>
 
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "EntityMetadataSeries.h"
+#include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTCore/Variable.h"
 
 class MeasurementCampaignHandler : public BusinessLogicHandler

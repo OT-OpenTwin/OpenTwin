@@ -33,22 +33,22 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/ProjectInformation.h"
-#include "OTCore/AbstractLogNotifier.h"
+#include "OTCore/Logging/AbstractLogNotifier.h"
 
 // OpenTwin Gui header
-#include "OTGui/Property.h"
 #include "OTGui/TableCfg.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/TextEditorCfg.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"
-#include "OTGui/GraphicsPackage.h"
-#include "OTGui/PropertyGridCfg.h"
-#include "OTGui/MessageDialogCfg.h"
 #include "OTGui/VisualisationCfg.h"
-#include "OTGui/GraphicsChangeEvent.h"
 #include "OTGui/ExtendedProjectInformation.h"
+#include "OTGui/Dialog/MessageDialogCfg.h"
+#include "OTGui/Event/GraphicsChangeEvent.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/WidgetView.h"
@@ -82,6 +82,7 @@
 class QWidget;
 class LogInDialog;
 class LockManager;
+class ScriptEngine;
 class QTreeWidgetItem;
 class ViewerComponent;
 class ControlsManager;
@@ -184,6 +185,16 @@ public:
 
 	LockManager * lockManager();
 
+	ot::NavigationTreeView* getProjectNavigation() const { return m_projectNavigation; };
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Scripting
+
+	bool runJSScriptFromFile(const QString& _filePath);
+
+	bool runJSScript(const QString& _scriptName, const QString& _scriptData);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Event handling
@@ -203,8 +214,6 @@ public:
 	virtual bool closeEvent() override;
 
 	bool createNewProjectInDatabase(const QString& _projectName, const QString & _projectType);
-
-public:
 
 	void initializeDefaultUserSettings();
 
@@ -315,52 +324,8 @@ public:
 
 	ot::ProjectOverviewWidget::ViewMode getWelcomeScreenViewMode() const;
 
-public Q_SLOTS:
-	void refreshWelcomeScreen();
-	void downloadInstaller(QString gssUrl);
-
-public:
-
-	QString availableTabText(const QString& _initialTabText);
-
 	ToolBar * getToolBar() const { return m_ttb; }
 
-	void setTabToolBarTabOrder(const QStringList& _lst);
-	void activateToolBarTab(const QString& _tab);
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Navigation
-
-	void setNavigationTreeSortingEnabled(bool _enabled);
-	void setNavigationTreeMultiselectionEnabled(bool _enabled);
-
-	void clearNavigationTree();
-
-	ot::UID addNavigationTreeItem(const ot::EntityTreeItem& _itemInfo);
-
-	void setNavigationTreeItemIcon(ot::UID _itemID, const QString & _iconName, const QString & _iconDefaultPath);
-
-	void setNavigationTreeItemText(ot::UID _itemID, const QString & _itemName);
-
-	void setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection);
-
-	void setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
-
-	void setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
-
-	void expandSingleNavigationTreeItem(ot::UID _itemID, bool _isExpanded);
-
-	bool isTreeItemExpanded(ot::UID _itemID);
-
-	bool isTreeItemSelected(ot::UID _itemID);
-
-	void toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds);
-
-	void removeNavigationTreeItems(const std::vector<ot::UID> & itemIds);
-
-	void clearNavigationTreeSelection();
-	
 	void setupPropertyGrid(const ot::PropertyGridCfg& _configuration);
 
 	void clearModalPropertyGrid();
@@ -369,10 +334,6 @@ public:
 
 	//void fillPropertyGrid(const std::string &settings);
 
-	QString getNavigationTreeItemText(ot::UID _itemID);
-
-	const ot::SelectionInformation& getSelectedNavigationTreeItems();
-
 	void setVisible3D(bool visible3D) { m_visible3D = visible3D; }
 	void setVisibleBlockPicker(bool visibleBlockPicker) { m_visibleBlockPicker = visibleBlockPicker; }
 
@@ -380,15 +341,6 @@ public:
 	bool getVisibleBlockPicker() const { return m_visibleBlockPicker; }
 
 	// Info text output
-
-public Q_SLOTS:
-
-	void replaceInfoMessage(const QString& _message);
-	
-	void appendInfoMessage(const QString& _message);
-	void appendHtmlInfoMessage(const QString& _html);
-
-public:
 
 	//! @brief Append a log message to the output.
 	//! The following information will be used from the log message:
@@ -484,32 +436,110 @@ public:
 
 	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// General
+
+	void destroyObjects(const std::vector<ot::UID>& _objects);
+
+	void makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool _ignoreEntitySelect);
+
+	static AppBase* instance();
+
+	bool openNewInstance(const ot::ProjectInformation& _projectInfo, const std::string& _customVersion);
+
+	void editProjectInformation(const std::string& _senderUrl, const std::string& _callbackAction);
+
 public Q_SLOTS:
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// General slots
+
+	void slotCopyRequested(const ot::CopyInformation& _info);
+	void slotPasteRequested(const ot::CopyInformation& _info);
+	void slotColorStyleChanged();
+
+	void slotLockUI(bool _flag);
+	void slotLockSelectionAndModification(bool _flag);
+	void slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous);
+	void slotSetProgressBarValue(int _progressPercentage);
+
+	void slotRunCustomTimer(const QString& _timerId, int _intervalMs);
+	void queueCustomCallback(const QString& _callbackId);
+
+private Q_SLOTS:
+	void slotCustomQueueCallback(const QString& _callbackId);
+
+public Q_SLOTS:
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Output slots
+
+	//! @brief Replace the current output window text with the provided one.
+	//! @param _message The message to set.
+	void replaceInfoMessage(const QString& _message);
+
+	//! @brief Append a plain text message to the output.
+	//! @param _message The message to append.
+	void appendInfoMessage(const QString& _message);
+
+	//! @brief Append an HTML formatted message to the output.
+	//! @param _html The HTML formatted message to append.
+	void appendHtmlInfoMessage(const QString& _html);
+
+	void slotShowOutputContextMenu(QPoint _pos);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Messaging slots
+
+	//! @brief Sends an execute message to the specified service and wait for the response.
+	//! @param _serviceName Name of the service to send the message to.
+	//! @param _message Message to send.
+	//! @return Map containing a boolean "success" indicating the success of the operation and a string "response" containing the response string.
+	QVariantMap slotSendExecuteMessageToService(const QString& _serviceName, const QString& _message);
+
+	//! @brief Sends an execute message to the specified service URL and wait for the response.
+	//! @param _serviceUrl URL of the service to send the message to.
+	//! @param _message Message to send.
+	//! @return Map containing a boolean "success" indicating the success of the operation and a string "response" containing the response string.
+	QVariantMap slotSendExecuteMessageToUrl(const QString& _serviceUrl, const QString& _message);
+
+	//! @brief Sends a queue message to the specified service.
+	//! @param _serviceName Name of the service to send the message to.
+	//! @param _message Message to send.
+	//! @return True on success, false on failure.
+	bool slotSendQueueMessageToService(const QString& _serviceName, const QString& _message);
+
+	//! @brief Sends a queue message to the specified service URL.
+	//! @param _serviceUrl URL of the service to send the message to.
+	//! @param _message Message to send.
+	//! @return True on success, false on failure.
+	bool slotSendQueueMessageToUrl(const QString& _serviceUrl, const QString& _message);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Prompt slots
+
 	void slotShowInfoPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage);
 
 	void slotShowWarningPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage);
 
 	void slotShowErrorPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage);
 
-public:
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ToolBar slots
+
+	void setTabToolBarTabOrder(const QStringList& _lst);
+	void activateToolBarTab(const QString& _tab);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	void destroyObjects(const std::vector<ot::UID> & _objects);
-
-	void makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool _ignoreEntitySelect);
-
-	static AppBase * instance();
-
-	bool openNewInstance(const ot::ProjectInformation& _projectInfo, const std::string& _customVersion);
-
-	void editProjectInformation(const std::string& _senderUrl, const std::string& _callbackAction);
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Asynchronous callbacks
+	// Graphics slots
 	
-public Q_SLOTS:
 	void slotGraphicsItemRequested(const QString& _name, const QPointF& _pos);
 	void slotGraphicsElementsChanged(const ot::GraphicsChangeEvent& _event);
 	void slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConfig);
@@ -517,40 +547,53 @@ public Q_SLOTS:
 	void slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 	void slotGraphicsSelectionChanged();
 
-	void slotCopyRequested(const ot::CopyInformation& _info);
-	void slotPasteRequested(const ot::CopyInformation& _info);
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Text editor slots
 
 	void slotTextEditorSaveRequested();
 	void slotTextLoadNextRequested(size_t _nextChunkStartIndex);
 	void slotTextLoadAllRequested(size_t _nextChunkStartIndex);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Table slots
+
 	void slotTableSaveRequested();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private: Slots
+	// Version graph slots
 
-private Q_SLOTS:
 	void slotVersionSelected(const std::string& _versionName);
 	void slotVersionDeselected();
 	void slotRequestVersion(const std::string& _versionName);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// View management slots
+
+	QString determineAvailableViewTabText(const QString& _initialTabText);
 	void slotViewAdded(ot::WidgetView* _newView);
 	void slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView);
 	void slotViewCloseRequested(ot::WidgetView* _view);
 	void slotViewTabClicked(ot::WidgetView* _view);
 	void slotViewDataModifiedChanged(ot::WidgetView* _view);
-	void slotColorStyleChanged();
-
-	void slotShowOutputContextMenu(QPoint _pos);
-
+	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private: Welcome Screen Slots
+	// Project management slots
 
+	//! @brief Create a new project.
+	//! Will show the project creation dialog.
 	void slotCreateProject();
+
+	//! @brief Open the currently selected project in the welcome screen.
 	void slotOpenProject();
-	void slotOpenSpecificProject(std::string _projectName, const std::string& _projectVersion);
+
+	void slotOpenProjectFromIndex(int _index);
+	void slotRefreshProjectOverivew();
+	void slotOpenSpecificProject(const QString& _projectName, const QString& _projectVersion);
 	void slotCopyProject();
 	void slotRenameProject();
 	void slotDeleteProject();
@@ -558,16 +601,60 @@ private Q_SLOTS:
 	void slotManageProjectAccess();
 	void slotManageProjectOwner();
 
+	//! @brief Refreshes the welcome screen content.
+	//! This function can be used to update the project list after projects were created, deleted, or modified.
+	void refreshWelcomeScreen();
+
+	QStringList getAvailableProjectNames() const;
+
+	//! @brief Downloads the installer from the provided GSS URL and runs it.
+	void downloadInstaller(QString gssUrl);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private: Property grid slots
+	// Property grid slots
 
 	void slotPropertyGridValueChanged(const ot::Property* _property);
 	void slotPropertyGridValueDeleteRequested(const ot::Property* _property);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private: Tree slots
+	// Tree slots
+
+	void setNavigationTreeSortingEnabled(bool _enabled);
+	void setNavigationTreeMultiselectionEnabled(bool _enabled);
+
+	void clearNavigationTree();
+
+	ot::UID findNavigationTreeItemByName(const QString& _itemName);
+
+	ot::UID addNavigationTreeItem(const ot::EntityTreeItem& _itemInfo);
+
+	void setNavigationTreeItemIcon(ot::UID _itemID, const QString& _iconName, const QString& _iconDefaultPath);
+
+	void setNavigationTreeItemText(ot::UID _itemID, const QString& _itemName);
+
+	void setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection);
+
+	void setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
+
+	void setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
+
+	void expandSingleNavigationTreeItem(ot::UID _itemID, bool _isExpanded);
+
+	bool isTreeItemExpanded(ot::UID _itemID);
+
+	bool isTreeItemSelected(ot::UID _itemID);
+
+	void toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds);
+
+	void removeNavigationTreeItems(const std::vector<ot::UID>& itemIds);
+
+	void clearNavigationTreeSelection();
+
+	QString getNavigationTreeItemText(ot::UID _itemID);
+
+	const ot::SelectionInformation& getSelectedNavigationTreeItems();
 
 	//! @brief Navigation tree item selection has changed.
 	//! @callgraph
@@ -579,10 +666,49 @@ private Q_SLOTS:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private: Plot slots
+	// Plot slots
 
 	void slotPlotResetItemSelectionRequest();
 	void slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModifier);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Notifications
+
+	//! @brief Is called when the log-in dialog is available.
+	void servicesUiSetupCompleted();
+
+	//! @brief Is called when the project open operation is completed.
+	void projectOpenCompleted();
+
+	//! @brief Is called when the project close operation is completed.
+	void projectCloseCompleted();
+
+Q_SIGNALS:
+
+	//! @brief Is emitted when the log-in dialog is available.
+	//! @param _dialog Pointer to the log-in dialog.
+	void logInDialogAvailable(QObject* _dialog);
+
+	//! @brief Is emitted when the tool bar is available.
+	//! @param _toolBar Pointer to the tool bar.
+	void toolBarAvailable(QObject* _toolBar);
+
+	//! @brief Is emitted when the log-in was successful and the default ui was created.
+	void loginSuccessful();
+
+	//! @brief Is emitted when a project was opened.
+	void projectOpened();
+
+	//! @brief Is emitted when a project was closed.
+	void projectClosed();
+
+	//! @brief Is emitted when the services UI setup of all services in the session is complete.
+	void servicesUiSetupComplete();
+
+	void customTimerTimeout(const QString& _timerID);
+
+	void customQueueCallback(const QString& _callbackID);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -617,16 +743,6 @@ protected:
 	// Current Project API
 
 	virtual void activateModelVersionAPI(const std::string& _versionName) override;
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Public: Connector API slots
-
-public Q_SLOTS:
-	void slotLockUI(bool _flag);
-	void slotLockSelectionAndModification(bool _flag);
-	void slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous);
-	void slotSetProgressBarValue(int _progressPercentage);
 
 private:
 	enum class AppState {
@@ -686,6 +802,8 @@ private:
 
 	LogInDialog* m_loginDialog;
 	LoginData m_loginData;
+
+	std::unique_ptr<ScriptEngine> m_scriptEngine;
 
 	// Default UI
 

@@ -23,7 +23,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/LineEdit.h"

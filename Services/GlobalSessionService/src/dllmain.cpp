@@ -31,7 +31,7 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/DebugHelper.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"

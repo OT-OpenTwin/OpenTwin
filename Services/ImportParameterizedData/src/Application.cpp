@@ -25,31 +25,32 @@
 // Open twin header
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "EntityInformation.h"
 #include "OTGui/TableRange.h"
-#include "OTGui/OnePropertyDialogCfg.h"
-#include "OTGui/PropertyInt.h"
-#include "EntityFileCSV.h"
+#include "OTGui/Dialog/OnePropertyDialogCfg.h"
+#include "OTGui/Painter/PainterRainbowIterator.h"
+#include "OTGui/Properties/PropertyInt.h"
 #include "CategorisationFolderNames.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-//Application specific includes
-#include "TemplateDefaultManager.h"
-#include <string>
-#include <rapidjson/document.h>
-#include <rapidjson/rapidjson.h>
-#include "DatasetOverviewVisualiser.h"
-#include "EntityMetadataSeries.h"
-#include "OTServiceFoundation/UILockWrapper.h"
-#include "OTGui/PainterRainbowIterator.h"
+#include "OTResultDataAccess/DatasetOverviewVisualiser.h"
 
-#include "EntityAPI.h"
-#include "GridFSFileInfo.h"
-#include "DataBase.h"
-#include "DocumentAPI.h"
-#include "EntityBatchImporter.h"
-#include "InvalidUID.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/InvalidUID.h"
+#include "OTModelEntities/EntityFileCSV.h"
+#include "OTModelEntities/EntityInformation.h"
+#include "OTModelEntities/EntityBatchImporter.h"
+#include "OTModelEntities/EntityMetadataSeries.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+
+#include <rapidjson/rapidjson.h>
+#include <rapidjson/document.h>
+
+#include <string>
 
 Application * g_instance{ nullptr };
 

@@ -24,9 +24,9 @@
 #include <map>
 
 #include "OTCore/CoreTypes.h"
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
 
-#include "EntityProperties.h"
+#include "OTModelEntities/EntityProperties.h"
 
 namespace ot {
 	namespace components {

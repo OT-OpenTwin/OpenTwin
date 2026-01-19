@@ -56,6 +56,9 @@ public:
 
 	void initialize();
 	
+Q_SIGNALS:
+	void dialogShown();
+
 protected:
 	virtual bool mayCloseDialogWindow() override;
 	virtual void showEvent(QShowEvent* _event) override;
@@ -116,9 +119,9 @@ private:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private slots
+	// Slots
 
-private Q_SLOTS:
+public Q_SLOTS:
 	void slotLogIn();
 	void slotRegister();
 	void slotChangePassword();

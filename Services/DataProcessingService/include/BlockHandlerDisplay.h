@@ -19,7 +19,7 @@
 
 #pragma once
 #include "BlockHandler.h"
-#include "EntityBlockDisplay.h"
+#include "OTBlockEntities/Pipeline/EntityBlockDisplay.h"
 #include "OTCore/GenericDataStruct.h"
 
 class BlockHandlerDisplay : public BlockHandler

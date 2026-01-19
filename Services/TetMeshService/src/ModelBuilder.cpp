@@ -24,11 +24,11 @@
 #include "MaterialManager.h"
 #include "Application.h"
 
-#include "EntityGeometry.h"
-#include "EntityMaterial.h"
-#include "GeometryOperations.h"
-#include "TemplateDefaultManager.h"
-#include "Database.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
+#include "OTModelEntities/Database.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 
@@ -134,7 +134,7 @@ std::string ModelBuilder::addBoundingSphere(std::list<EntityGeometry *> &geometr
 	std::string error;
 
 	// Determine bounding box of geometry
-	BoundingBox boundingBox = GeometryOperations::getBoundingBox(geometryEntities);
+	BoundingBox boundingBox = ot::GeometryOperations::getBoundingBox(geometryEntities);
 
 	// Determine the sphere radius (consider whether the radius is specified in absolute or relative dimension)
 	double sphereRadius = properties.getBoundingSphereRadius();

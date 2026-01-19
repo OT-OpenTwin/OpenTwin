@@ -21,22 +21,23 @@
 #include "Application.h"
 #include "ModelNotifier.h"
 #include "UiNotifier.h"
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
-#include "EntityMeshTet.h"
 #include "GmshMeshCreation.h"
 #include "MeshExport.h"
 #include "MeshImport.h"
 
-// Open twin header
+// OpenTwin header
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 
-#include "ModelState.h"
-#include "DocumentAPI.h"
-#include "GridFSFileInfo.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/ModelState.h"
+#include "OTModelEntities/EntityMeshTet.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 
 #include <thread>	
 #include <filesystem>

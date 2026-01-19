@@ -18,13 +18,13 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
-#include "OTGui/Painter2D.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/CheckerboardPainter2D.h"
-#include "OTGui/LinearGradientPainter2D.h"
-#include "OTGui/RadialGradientPainter2D.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Painter/Painter2D.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Painter/CheckerboardPainter2D.h"
+#include "OTGui/Painter/LinearGradientPainter2D.h"
+#include "OTGui/Painter/RadialGradientPainter2D.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GlobalColorStyle.h"
 
@@ -102,7 +102,6 @@ QGradient::Spread ot::QtFactory::toQGradientSpread(ot::GradientSpread _spread) {
 
 QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 	if (!_painter) {
-		OT_LOG_W("Painter is 0. Ignoring");
 		return QBrush();
 	}
 	

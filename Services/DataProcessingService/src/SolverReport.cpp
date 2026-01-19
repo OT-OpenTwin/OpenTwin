@@ -18,10 +18,10 @@
 // @otlicense-end
 
 #include "SolverReport.h"
-#include "EntityResultText.h"
+#include "OTModelEntities/EntityResultText.h"
 
 #include "Application.h"
-#include "NewModelStateInfo.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 SolverReport::~SolverReport()
 {

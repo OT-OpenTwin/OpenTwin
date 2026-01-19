@@ -29,8 +29,8 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 
 Application * g_instance{ nullptr };
 

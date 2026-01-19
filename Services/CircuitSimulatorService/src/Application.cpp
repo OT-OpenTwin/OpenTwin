@@ -31,26 +31,26 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionDispatcher.h"
-#include "OTGui/GraphicsPackage.h"
-#include "OTGui/GraphicsLayoutItemCfg.h"
-#include "OTGui/GraphicsFlowItemBuilder.h"
-#include "OTGui/GraphicsStackItemCfg.h"
-#include "OTGui/GraphicsImageItemCfg.h"
-#include "OTGui/GraphicsHBoxLayoutItemCfg.h"
-#include "OTGui/GraphicsRectangularItemCfg.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/GraphicsGridLayoutItemCfg.h"
-#include "OTGui/GraphicsEllipseItemCfg.h"
-#include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsLayoutItemCfg.h"
+#include "OTGui/Graphics/GraphicsFlowItemBuilder.h"
+#include "OTGui/Graphics/GraphicsStackItemCfg.h"
+#include "OTGui/Graphics/GraphicsImageItemCfg.h"
+#include "OTGui/Graphics/GraphicsHBoxLayoutItemCfg.h"
+#include "OTGui/Graphics/GraphicsRectangularItemCfg.h"
+#include "OTGui/Graphics/GraphicsGridLayoutItemCfg.h"
+#include "OTGui/Graphics/GraphicsEllipseItemCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfgFactory.h"
+#include "OTGui/Painter/FillPainter2D.h"
 #include "OTCommunication/ActionTypes.h"
-#include "EntitySolverCircuitSimulator.h"
-#include "EntityBlockConnection.h"
-#include "DataBase.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntitySolverCircuitSimulator.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityGraphicsScene.h"
+#include "OTModelEntities/EntityGraphicsScene.h"
 #include "OTCore/EntityName.h"
-#include "Helper.h"
+#include "OTBlockEntities/BlockHelper.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
 
 // Third Party Header
 #include <ngspice/sharedspice.h>
@@ -347,7 +347,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	}
 
 	// Now we get the blockConnectionMap from helper in BlockEntities
-	std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntitiesByID,allEntitiesByBlockID);
+	std::map<ot::UID, ot::UIDList> connectionBlockMap = BlockHelper::buildMap(allConnectionEntitiesByID,allEntitiesByBlockID);
 	if (connectionBlockMap.empty()) {
 		OT_LOG_E("No valid connections found in " + name);
 		finishFailedSimulation();

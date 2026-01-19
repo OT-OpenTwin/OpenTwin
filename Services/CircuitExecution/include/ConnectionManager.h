@@ -20,7 +20,7 @@
 #pragma once
 #include "QtNetwork/qlocalsocket.h"
 #include "QtCore/qobject.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 

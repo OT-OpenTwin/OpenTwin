@@ -21,9 +21,9 @@
 #include "PythonWrapper.h"
 #include "PythonExtension.h"
 #include "Application.h"
-
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
+
 #include <thread>
 
 #define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API

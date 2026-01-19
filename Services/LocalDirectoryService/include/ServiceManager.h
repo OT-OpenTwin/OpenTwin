@@ -29,7 +29,7 @@
 #include "OTSystem/Network.h"
 #include "OTSystem/RunResult.h"
 #include "OTSystem/PortManager.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCommunication/LDSDebugInfo.h"
 #include "OTCommunication/ServiceInitData.h"
 

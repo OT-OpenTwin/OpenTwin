@@ -21,7 +21,7 @@
 #include <string>
 #include <map>
 
-#include "EntitySignalType.h"
+#include "OTModelEntities/EntitySignalType.h"
 #include "PhysicalQuantities.h"
 
 enum signalType {sinusoidalGauss};

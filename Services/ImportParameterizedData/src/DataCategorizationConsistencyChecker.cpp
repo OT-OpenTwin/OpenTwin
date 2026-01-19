@@ -19,7 +19,7 @@
 
 #include "DataCategorizationConsistencyChecker.h"
 #include "Documentation.h"
-#include "EntityTableSelectedRanges.h"
+#include "OTModelEntities/EntityTableSelectedRanges.h"
 #include <set>
 
 bool DataCategorizationConsistencyChecker::isValidAllMSMDHaveParameterAndQuantities(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName)

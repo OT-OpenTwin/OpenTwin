@@ -23,10 +23,10 @@
 #include "FileManager.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/AbstractLogNotifier.h"
+#include "OTCore/Logging/AbstractLogNotifier.h"
 #include "OTCommunication/ActionHandler.h"
 
 // std header

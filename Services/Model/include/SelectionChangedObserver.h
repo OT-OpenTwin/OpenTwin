@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #pragma once
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 
 class SelectionChangedObserver
 {

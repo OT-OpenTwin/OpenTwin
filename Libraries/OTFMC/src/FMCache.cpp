@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTFMC/FMCache.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 
 // std header

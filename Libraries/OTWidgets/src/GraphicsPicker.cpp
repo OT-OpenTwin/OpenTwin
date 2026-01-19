@@ -18,12 +18,12 @@
 // @otlicense-end
 
 // OpenTwin Core header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // OpenTwin Gui header
-#include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/GraphicsPackage.h"
-#include "OTGui/GraphicsPickerCollectionCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsPickerCollectionCfg.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/Label.h"
@@ -44,6 +44,7 @@
 // Qt header
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qsplitter.h>
+#include <QtWidgets/qscrollarea.h>
 
 // std header
 #include <string>
@@ -66,12 +67,18 @@ ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation, QWidget* _paren
 	m_navigation = new ot::TreeWidgetFilter(m_splitter);
 	m_navigation->getTreeWidget()->setHeaderHidden(true);
 	m_navigation->setOTWidgetFlags(ot::ApplyFilterOnTextChange);
-
-	m_viewLayoutW = new QWidget(m_splitter);
-	m_viewLayout = new FlowLayout(m_viewLayoutW);
-
 	m_splitter->addWidget(m_navigation->getQWidget());
-	m_splitter->addWidget(m_viewLayoutW);
+
+	QScrollArea* scrollArea = new QScrollArea(m_splitter);
+	scrollArea->setWidgetResizable(true);
+	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	m_splitter->addWidget(scrollArea);
+
+	m_viewLayoutW = new QWidget(scrollArea);
+	scrollArea->setWidget(m_viewLayoutW);
+
+	m_viewLayout = new FlowLayout(m_viewLayoutW);
 
 	connect(m_navigation->getTreeWidget(), &QTreeWidget::itemSelectionChanged, this, &GraphicsPicker::slotSelectionChanged);
 }

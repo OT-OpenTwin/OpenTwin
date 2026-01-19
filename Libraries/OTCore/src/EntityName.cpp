@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTSystem/Exception.h"
 #include "OTCore/String.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/EntityName.h"
 
 std::optional<std::string> ot::EntityName::getSubName(const std::string& _fullEntityName, int32_t _topologyLevel) {

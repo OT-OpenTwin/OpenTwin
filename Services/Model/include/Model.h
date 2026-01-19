@@ -19,25 +19,26 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTCore/FolderNames.h"
+#include "OTGui/GuiTypes.h"
+#include "OTGui/Dialog/MessageDialogCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTGuiAPI/ButtonHandler.h"
+#include "OTCommunication/ActionHandler.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTModelEntities/Geometry.h"
+#include "OTModelEntities/ModelState.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/EntityContainer.h"
+#include "OTModelEntities/NewModelStateInfo.h"
+#include "OTCADEntities/EntityFaceAnnotation.h"
+
+// std header
 #include <string>
 #include <map>
 #include <list>
 #include <atomic>
-
-#include "EntityContainer.h"
-#include "Geometry.h"
-#include "ModelState.h"
-#include "EntityBase.h"
-#include "EntityFaceAnnotation.h"
-#include "OTCore/FolderNames.h"
-
-#include "OTGui/GuiTypes.h"
-#include "OTGui/PropertyGridCfg.h"
-#include "OTGui/MessageDialogCfg.h"
-#include "OTGuiAPI/ButtonHandler.h"
-#include "NewModelStateInfo.h"
-#include "OTCommunication/ActionHandler.h"
-#include "OTServiceFoundation/UiComponent.h"
 
 class EntityMesh;
 class EntityMeshTet;

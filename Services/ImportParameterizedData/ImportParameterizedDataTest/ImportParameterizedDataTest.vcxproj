@@ -107,7 +107,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(GOOGLE_TEST_LIBPATHD);$(SolutionDir)$(OT_LIBTESTD);$(OT_MODELENTITIES_ROOT)\$(OT_DLLD);$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLD);$(ZLIB_LIBPATHD);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gtest.lib;ImportParameterizedDataService.lib;ModelEntities.lib;$(OT_DEFAULT_SERVICE_LIBD);ResultDataAccess.lib;zlibd.lib</AdditionalDependencies>
+      <AdditionalDependencies>gtest.lib;ImportParameterizedDataService.lib;OTModelEntities.lib;$(OT_DEFAULT_SERVICE_LIBD);OTResultDataAccess.lib;zlibd.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -147,7 +147,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(SolutionDir)$(OT_LIBTESTR);$(GOOGLE_TEST_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_DLLR);$(OT_DEFAULT_SERVICE_LIBPATHR);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ImportParameterizedDataService.lib;$(GOOGLE_TEST_LIB);ModelEntities.lib;$(OT_DEFAULT_SERVICE_LIBR)</AdditionalDependencies>
+      <AdditionalDependencies>ImportParameterizedDataService.lib;$(GOOGLE_TEST_LIB);OTModelEntities.lib;$(OT_DEFAULT_SERVICE_LIBR)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

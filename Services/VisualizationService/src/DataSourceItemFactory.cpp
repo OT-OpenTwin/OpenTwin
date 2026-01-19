@@ -20,12 +20,12 @@
 #include "DataSourceItemFactory.h"
 
 #include "DataSourceManagerItem.h"
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 
 #include "DataSourceCartesianVector.h"
 #include "DataSourceResult3D.h"
 #include "DataSourceUnstructuredMesh.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resultEntity)
 {

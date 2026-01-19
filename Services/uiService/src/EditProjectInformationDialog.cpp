@@ -22,7 +22,6 @@
 #include "ScreenshotDialog.h"
 #include "ProjectOverviewPreviewBox.h"
 #include "EditProjectInformationDialog.h"
-#include "ModelState.h"
 #include "UserManagement.h"
 #include "ProjectManagement.h"
 #include "OTCore/String.h"
@@ -44,6 +43,7 @@
 #include "OTWidgets/ImagePainterManager.h"
 #include "OTWidgets/GlobalWidgetViewManager.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/ModelState.h"
 
 // Qt header
 #include <QtCore/qfile.h>

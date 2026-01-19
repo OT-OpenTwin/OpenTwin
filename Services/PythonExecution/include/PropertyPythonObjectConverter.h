@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "EntityPropertiesItems.h"
+#include "OTModelEntities/EntityPropertiesItems.h"
 #include "CPythonObjectNew.h"
 
 //! @brief Class that converts a property value into a PythonObject and viceversa.

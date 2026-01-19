@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/GraphicsFlowItemBuilder.h"
+#include "OTGui/Graphics/GraphicsFlowItemBuilder.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
 namespace ot {

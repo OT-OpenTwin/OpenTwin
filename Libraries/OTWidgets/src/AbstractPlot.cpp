@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/AbstractPlot.h"
 
 ot::AbstractPlot::AbstractPlot(PlotBase* _ownerPlot) :

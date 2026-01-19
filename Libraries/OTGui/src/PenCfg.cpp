@@ -18,11 +18,11 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/PenCfg.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/Painter2DFactory.h"
-#include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/Painter2DFactory.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 
 std::string ot::toString(LineStyle _style) {
 	switch (_style)
@@ -118,34 +118,60 @@ ot::PenCfg::PenCfg(int _width, const Color& _color) : PenCfg(_width, new FillPai
 
 ot::PenCfg::PenCfg(int _width, Painter2D* _painter)
 	: m_width(_width), m_painter(_painter), m_style(LineStyle::SolidLine), m_cap(LineCapStyle::SquareCap), m_join(LineJoinStyle::BevelJoin)
-{
-	if (!m_painter) {
-		m_painter = new FillPainter2D(Black);
-	}
-}
+{}
 
 ot::PenCfg::PenCfg(const PenCfg& _other)
 	: m_width(_other.m_width), m_painter(nullptr), m_style(_other.m_style), m_cap(_other.m_cap), m_join(_other.m_join)
 {
-	this->setPainter(_other.m_painter->createCopy());
+	if (_other.m_painter) {
+		this->setPainter(_other.m_painter->createCopy());
+	}
+}
+
+ot::PenCfg::PenCfg(PenCfg&& _other) noexcept
+	: m_width(_other.m_width), m_painter(_other.m_painter), m_style(_other.m_style), m_cap(_other.m_cap), m_join(_other.m_join)
+{
+	_other.m_painter = nullptr;
 }
 
 ot::PenCfg::~PenCfg() {
-	if (m_painter) 
-	{
+	if (m_painter) {
 		delete m_painter;
 	}
 	m_painter = nullptr;
 }
 
 ot::PenCfg& ot::PenCfg::operator = (const PenCfg& _other) {
-	if (this == &_other) return *this;
-	m_width = _other.m_width;
-	m_style = _other.m_style;
-	m_cap = _other.m_cap;
-	m_join = _other.m_join;
+	if (this != &_other) {
+		m_width = _other.m_width;
+		m_style = _other.m_style;
+		m_cap = _other.m_cap;
+		m_join = _other.m_join;
 
-	this->setPainter(_other.m_painter->createCopy());
+		if (_other.m_painter) {
+			this->setPainter(_other.m_painter->createCopy());
+		}
+		else {
+			this->setPainter(nullptr);
+		}
+	}
+
+	return *this;
+}
+
+ot::PenCfg& ot::PenCfg::operator=(PenCfg&& _other) noexcept {
+	if (this != &_other) {
+		m_width = _other.m_width;
+		m_style = _other.m_style;
+		m_cap = _other.m_cap;
+		m_join = _other.m_join;
+		
+		if (m_painter) {
+			delete m_painter;
+		}
+		m_painter = _other.m_painter;
+		_other.m_painter = nullptr;
+	}
 
 	return *this;
 }
@@ -156,9 +182,12 @@ void ot::PenCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _all
 	_object.AddMember("Cap", JsonString(toString(m_cap), _allocator), _allocator);
 	_object.AddMember("Join", JsonString(toString(m_join), _allocator), _allocator);
 
-	JsonObject painterObj;
-	m_painter->addToJsonObject(painterObj, _allocator);
-	_object.AddMember("Painter", painterObj, _allocator);
+	if (m_painter) {
+		_object.AddMember("Painter", JsonObject(m_painter, _allocator), _allocator);
+	}
+	else {
+		_object.AddMember("Painter", JsonNullValue(), _allocator);
+	}
 }
 
 void ot::PenCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -167,10 +196,12 @@ void ot::PenCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_cap = stringToCapStyle(json::getString(_object, "Cap"));
 	m_join = stringToJoinStyle(json::getString(_object, "Join"));
 
-	ConstJsonObject painterObj = json::getObject(_object, "Painter");
-	Painter2D* p = Painter2DFactory::create(painterObj);
-	if (p) {
-		this->setPainter(p);
+	if (json::isObject(_object, "Painter")) {
+		ConstJsonObject painterObj = json::getObject(_object, "Painter");
+		this->setPainter(Painter2DFactory::create(painterObj));
+	}
+	else {
+		this->setPainter(nullptr);
 	}
 }
 
@@ -187,19 +218,18 @@ void ot::PenCfg::setColor(ColorStyleValueEntry _color) {
 }
 
 void ot::PenCfg::setPainter(Painter2D* _painter) {
-	if (m_painter == _painter) return;
-	if (!_painter) {
-		OT_LOG_W("Nullptr provided. Ignoring");
+	if (m_painter == _painter) {
 		return;
 	}
-
-	if (m_painter) delete m_painter;
+	if (m_painter) {
+		delete m_painter;
+	}
 	m_painter = _painter;
 }
 
 ot::Painter2D* ot::PenCfg::takePainter() {
 	Painter2D* ret = m_painter;
-	m_painter = new FillPainter2D(Black);
+	m_painter = nullptr;
 	return ret;
 }
 
@@ -208,7 +238,7 @@ ot::PenFCfg ot::PenCfg::toPenFCfg() const {
 		return PenFCfg(static_cast<double>(m_width), m_painter->createCopy());
 	}
 	else {
-		return PenFCfg(static_cast<double>(m_width), Color());
+		return PenFCfg(static_cast<double>(m_width), nullptr);
 	}
 }
 
@@ -232,31 +262,60 @@ ot::PenFCfg::PenFCfg(double _width, const Color& _color) : PenFCfg(_width, new F
 
 ot::PenFCfg::PenFCfg(double _width, Painter2D* _painter) : 
 	m_width(_width), m_painter(_painter), m_style(LineStyle::SolidLine), m_cap(LineCapStyle::SquareCap), m_join(LineJoinStyle::BevelJoin)
-{
-	if (!m_painter) {
-		m_painter = new FillPainter2D(Black);
-	}
-}
+{}
 
 ot::PenFCfg::PenFCfg(const PenFCfg& _other)
 	: m_width(_other.m_width), m_painter(nullptr), m_style(_other.m_style), m_cap(_other.m_cap), m_join(_other.m_join)
 {
-	this->setPainter(_other.m_painter->createCopy());
+	if (_other.m_painter) {
+		this->setPainter(_other.m_painter->createCopy());
+	}
+}
+
+ot::PenFCfg::PenFCfg(PenFCfg&& _other) noexcept 
+	: m_width(_other.m_width), m_painter(_other.m_painter), m_style(_other.m_style), m_cap(_other.m_cap), m_join(_other.m_join)
+{
+	_other.m_painter = nullptr;
 }
 
 ot::PenFCfg::~PenFCfg() {
-	if (m_painter) delete m_painter;
+	if (m_painter) {
+		delete m_painter;
+	}
 	m_painter = nullptr;
 }
 
 ot::PenFCfg& ot::PenFCfg::operator = (const PenFCfg& _other) {
-	if (this == &_other) return *this;
-	m_width = _other.m_width;
-	m_style = _other.m_style;
-	m_cap = _other.m_cap;
-	m_join = _other.m_join;
+	if (this != &_other) {
+		m_width = _other.m_width;
+		m_style = _other.m_style;
+		m_cap = _other.m_cap;
+		m_join = _other.m_join;
 
-	this->setPainter(_other.m_painter->createCopy());
+		if (_other.m_painter) {
+			this->setPainter(_other.m_painter->createCopy());
+		}
+		else {
+			this->setPainter(nullptr);
+		}
+	}
+
+	return *this;
+}
+
+ot::PenFCfg& ot::PenFCfg::operator=(PenFCfg&& _other) noexcept {
+	if (this != &_other) {
+		m_width = _other.m_width;
+		m_style = _other.m_style;
+		m_cap = _other.m_cap;
+		m_join = _other.m_join;
+
+		if (m_painter) {
+			delete m_painter;
+		}
+		m_painter = _other.m_painter;
+		_other.m_painter = nullptr;
+	}
 
 	return *this;
 }
@@ -267,9 +326,12 @@ void ot::PenFCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _al
 	_object.AddMember("Cap", JsonString(toString(m_cap), _allocator), _allocator);
 	_object.AddMember("Join", JsonString(toString(m_join), _allocator), _allocator);
 
-	JsonObject painterObj;
-	m_painter->addToJsonObject(painterObj, _allocator);
-	_object.AddMember("Painter", painterObj, _allocator);
+	if (m_painter) {
+		_object.AddMember("Painter", JsonObject(m_painter, _allocator), _allocator);
+	}
+	else {
+		_object.AddMember("Painter", JsonNullValue(), _allocator);
+	}
 }
 
 void ot::PenFCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -278,10 +340,12 @@ void ot::PenFCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_cap = stringToCapStyle(json::getString(_object, "Cap"));
 	m_join = stringToJoinStyle(json::getString(_object, "Join"));
 	
-	ConstJsonObject painterObj = json::getObject(_object, "Painter");
-	Painter2D* p = Painter2DFactory::create(painterObj);
-	if (p) {
-		this->setPainter(p);
+	if (json::isObject(_object, "Painter")) {
+		ConstJsonObject painterObj = json::getObject(_object, "Painter");
+		this->setPainter(Painter2DFactory::create(painterObj));
+	}
+	else {
+		this->setPainter(nullptr);
 	}
 }
 
@@ -298,19 +362,18 @@ void ot::PenFCfg::setColor(ColorStyleValueEntry _color) {
 }
 
 void ot::PenFCfg::setPainter(Painter2D* _painter) {
-	if (m_painter == _painter) return;
-	if (!_painter) {
-		OT_LOG_W("Nullptr provided. Ignoring");
+	if (m_painter == _painter) {
 		return;
 	}
-
-	if (m_painter) delete m_painter;
+	if (m_painter) {
+		delete m_painter;
+	}
 	m_painter = _painter;
 }
 
 ot::Painter2D* ot::PenFCfg::takePainter() {
 	Painter2D* ret = m_painter;
-	m_painter = new FillPainter2D(Black);
+	m_painter = nullptr;
 	return ret;
 }
 
@@ -319,6 +382,6 @@ ot::PenCfg ot::PenFCfg::toPenCfg() const {
 		return PenCfg(static_cast<int>(m_width), m_painter->createCopy());
 	}
 	else {
-		return PenCfg(static_cast<int>(m_width), Color());
+		return PenCfg(static_cast<int>(m_width), nullptr);
 	}
 }

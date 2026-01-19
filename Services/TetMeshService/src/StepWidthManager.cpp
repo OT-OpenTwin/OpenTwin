@@ -23,9 +23,9 @@
 #include "Properties.h"
 #include "ObjectManager.h"
 
-#include "BoundingBox.h"
-#include "EntityBase.h"
-#include "GeometryOperations.h"
+#include "OTModelEntities/BoundingBox.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTCADEntities/GeometryOperations.h"
 
 #include "OTServiceFoundation/UiComponent.h"
 
@@ -166,7 +166,7 @@ double StepWidthManager::getMaxStepWidthForFace(TopoDS_Face &face,
 
 	if (localCurvatureRefinement)
 	{
-		double maxCurvature = GeometryOperations::getMaximumFaceCurvature(face);
+		double maxCurvature = ot::GeometryOperations::getMaximumFaceCurvature(face);
 
 		if (maxCurvature > 0.0)
 		{

@@ -21,14 +21,14 @@
 #include <optional>
 #include <list>
 #include "PythonWrapper.h"
-#include "EntityFile.h"
 #include "PythonObjectBuilder.h"
-#include "EntityInformation.h"
 #include "OTCore/ReturnValues.h"
 #include "PackageHandler.h"
 #include "InterpreterPathSettings.h"
 #include "WorkerWaiterState.h"
 #include "EnvironmentsGarbageCollector.h"
+#include "OTModelEntities/EntityFile.h"
+#include "OTModelEntities/EntityInformation.h"
 
 //! @brief This class deals with the workflow of loading python script entities, executing them and sending the results back to the service that requested the execution.
 class PythonInterpreterAPI

@@ -19,9 +19,9 @@
 
 #pragma once
 #include "BlockHandler.h"
-#include "EntityBlockStorage.h"
-#include "ResultCollectionExtender.h"
-#include "MetadataParameter.h"
+#include "OTBlockEntities/Pipeline/EntityBlockStorage.h"
+#include "OTResultDataAccess/MetadataParameter.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
 
 class BlockHandlerStorage : public BlockHandler
 {

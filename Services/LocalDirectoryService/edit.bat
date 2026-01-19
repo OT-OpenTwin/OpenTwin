@@ -44,3 +44,5 @@ pause
 goto END
 
 :END
+
+exit /b

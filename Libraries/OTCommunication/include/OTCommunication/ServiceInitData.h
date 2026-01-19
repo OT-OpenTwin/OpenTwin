@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogTypes.h"
+#include "OTCore/Logging/LogTypes.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"

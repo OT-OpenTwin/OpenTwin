@@ -34,16 +34,16 @@
 
 
 //Open Twin Header
-#include "EntityBlockCircuitVoltageSource.h"
-#include "EntityBlockCircuitResistor.h"
-#include "EntityBlockConnection.h"
-#include "EntityBlockCircuitDiode.h"
-#include "EntityBlockCircuitVoltageMeter.h"
-#include "EntityBlockCircuitCapacitor.h"
-#include "EntityBlockCircuitInductor.h"
-#include "EntityBlockCircuitCurrentMeter.h"
-#include "EntityBlockCircuitGND.h"
-#include "EntityBlockCircuitTransmissionLine.h"
+#include "OTBlockEntities//EntityBlockConnection.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitGND.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitDiode.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitInductor.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitResistor.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitCapacitor.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitVoltageMeter.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitCurrentMeter.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitVoltageSource.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitTransmissionLine.h"
 
 //Third Party Header
 #include <string>

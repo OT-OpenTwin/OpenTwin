@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTCore/JSON.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // std header
 #include <string>

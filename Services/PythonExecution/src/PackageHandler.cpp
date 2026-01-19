@@ -22,11 +22,12 @@
 #include "OTCore/String.h"
 #include <Python.h>
 #include "CPythonObjectNew.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "PythonException.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityAPI.h"
-#include "EntityPythonManifest.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityResultText.h"
+#include "OTModelEntities/EntityPythonManifest.h"
 #include "Application.h"
 #include "OutputPipelineRAII.h"
 #include "OTSystem/DateTime.h"
@@ -36,7 +37,6 @@
 #include "ExceptionRestartRequired.h"
 #include "OTCore/FolderNames.h"
 #include "OTCore/EntityName.h"
-#include "EntityResultText.h"
 
 PackageHandler::~PackageHandler()
 {

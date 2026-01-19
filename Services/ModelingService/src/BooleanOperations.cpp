@@ -21,9 +21,9 @@
 #include "ShapesBase.h"
 #include "EntityCache.h"
 
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 

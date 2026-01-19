@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin Widgets header
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Graphics/GraphicsEllipseItemCfg.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsConnectionConnectorItem.h"
 

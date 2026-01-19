@@ -25,7 +25,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // std header
 #include <codecvt>

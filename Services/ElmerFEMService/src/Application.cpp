@@ -27,15 +27,15 @@
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityResultText.h"
+#include "OTModelEntities/EntitySolverElmerFEM.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 
 // Application specific includes
 #include "ElmerFEMLauncher.h"
-#include "EntitySolverElmerFEM.h"
-#include "TemplateDefaultManager.h"
-#include "DataBase.h"
-#include "EntityResultText.h"
 
 #include <thread>
 

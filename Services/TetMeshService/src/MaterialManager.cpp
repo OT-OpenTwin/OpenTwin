@@ -21,13 +21,13 @@
 
 #include "Application.h"
 
-#include "EntityGeometry.h"
-#include "EntityMaterial.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTModelEntities/EntityMaterial.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
 
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
 void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometryEntities, Properties &properties)

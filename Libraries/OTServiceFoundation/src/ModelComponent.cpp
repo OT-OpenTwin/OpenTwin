@@ -24,11 +24,11 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/ApplicationBase.h"
 
-#include "EntityBase.h"
-#include "EntityResultText.h"
-#include "EntityGeometry.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/EntityResultText.h"
 
-#include <DataBase.h>
+#include "OTCADEntities/EntityGeometry.h"
 
 // std header
 #include <iostream>

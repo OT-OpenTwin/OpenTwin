@@ -37,6 +37,7 @@
 #include <map>
 #include <list>
 #include <string>
+#include <optional>
 
 class QTableWidget;
 
@@ -64,12 +65,19 @@ public:
 	virtual const QWidget* getQWidget() const override { return m_widget; };
 
 	QString getCurrentQuickFilter() const;
+	std::list<ot::ProjectInformation> getAllProjects() const;
 	std::list<ot::ProjectInformation> getSelectedProjects() const;
 
 	void setViewMode(ot::ProjectOverviewWidget::ViewMode _mode);
 	ot::ProjectOverviewWidget::ViewMode getViewMode() const { return m_overview->getViewMode(); };
 
 	void storeViewModeSetting(UserManagement& _userManager);
+
+	//! @brief Returns the project information at the given index.
+	//! This index corresponds to the currently visible (i.e. filtered and sorted) projects.
+	//! @param _index Index of the project to retrieve.
+	//! @return Project information if the index is valid, std::nullopt otherwise.
+	std::optional<ot::ProjectInformation> getProjectInformationAt(int _index) const;
 
 Q_SIGNALS:
 	void createProjectRequest();

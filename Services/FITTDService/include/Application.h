@@ -21,7 +21,8 @@
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
+#include "OTModelEntities/EntityMeshCartesianData.h"
 #include "OTGui/ToolBarButtonCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
 
@@ -31,7 +32,6 @@
 #include <map>
 
 //Application specific includes
-#include "EntityMeshCartesianData.h"
 #include "MicroServiceInterfaceFITTDSolver.h"
 
 // Forward declaration

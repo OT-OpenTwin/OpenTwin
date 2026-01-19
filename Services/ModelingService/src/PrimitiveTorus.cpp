@@ -19,7 +19,7 @@
 
 #include "PrimitiveTorus.h"
 
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 
 #include "OTServiceFoundation/UiComponent.h"
 

@@ -17,11 +17,8 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "stdafx.h"
-
 #include "DataSourceManagerItem.h"
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 
 #include <vtkNew.h>
 #include <vtkStructuredGrid.h>

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/GraphicsImageItemCfg.h"
+#include "OTGui/Graphics/GraphicsImageItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Positioning.h"
 #include "OTWidgets/ImagePainter.h"

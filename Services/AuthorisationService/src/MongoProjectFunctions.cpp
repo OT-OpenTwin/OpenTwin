@@ -22,7 +22,7 @@
 #include "MongoRoleFunctions.h"
 #include "MongoConstants.h"
 #include "MongoUserFunctions.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 
 /*

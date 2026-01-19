@@ -23,7 +23,7 @@
 #include "GraphicsItemDesignerNavigation.h"
 
 // OpenTwin header
-#include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTWidgets/GraphicsScene.h"
 
 WrappedCircleItem::WrappedCircleItem() {

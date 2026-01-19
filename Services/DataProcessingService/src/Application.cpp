@@ -27,23 +27,20 @@
 #include "OTCore/EntityName.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
-#include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
-#include "TemplateDefaultManager.h"
-#include "EntityAPI.h"
-#include "OTModelAPI/ModelServiceAPI.h"
-#include "Helper.h"
-
-#include "EntitySolverDataProcessing.h"
-
+#include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/UILockWrapper.h"
-
 #include "OTServiceFoundation/ProgressUpdater.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTBlockEntities/BlockHelper.h"
 
+#include "OTModelEntities/EntitySolverDataProcessing.h"
 
 Application * g_instance{ nullptr };
 
@@ -106,7 +103,7 @@ void Application::runPipeline()
 				}
 				auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
 				auto allConnectionEntities = _blockEntityHandler.findAllEntityBlockConnections(folderName);
-				std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntities, allBlockEntities);
+				std::map<ot::UID, ot::UIDList> connectionBlockMap = BlockHelper::buildMap(allConnectionEntities, allBlockEntities);
 				const bool isValid = _graphHandler.blockDiagramIsValid(allConnectionEntities, allBlockEntities, connectionBlockMap);
 
 				if (isValid)

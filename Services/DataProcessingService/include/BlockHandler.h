@@ -22,8 +22,8 @@
 #include "OTCore/Variable.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "GraphNode.h"
-#include "EntityBlock.h"
 #include "PipelineData.h"
+#include "OTBlockEntities/EntityBlock.h"
 
 class BlockHandler : public BusinessLogicHandler
 {

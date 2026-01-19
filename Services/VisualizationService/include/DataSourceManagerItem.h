@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "VisualizationServiceTypes.h"
+
 #include <string>
 
 class EntityBase;

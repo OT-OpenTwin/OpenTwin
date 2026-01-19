@@ -21,7 +21,7 @@
 #include "DebugServiceConfig.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 std::string DebugServiceConfig::toString(FeatureFlag _flag) {
 	switch (_flag) {

@@ -18,18 +18,18 @@
 // @otlicense-end
 
 #include "SimplifyRemoveFaces.h"
-#include "EntityGeometry.h"
-#include "EntityFaceAnnotation.h"
-#include "DataBase.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/EntityFaceAnnotation.h"
 #include "EntityCache.h"
 #include "UpdateManager.h"
 
 #include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 
 #include "BRepExtrema_DistShapeShape.hxx"
 #include "BRepBuilderAPI_MakeVertex.hxx"

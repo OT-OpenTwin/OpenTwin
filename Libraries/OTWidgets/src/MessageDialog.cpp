@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/MessageDialog.h"
 
 ot::MessageDialogCfg::BasicButton ot::MessageDialog::showDialog(const MessageDialogCfg& _config, QWidget* _parent) {

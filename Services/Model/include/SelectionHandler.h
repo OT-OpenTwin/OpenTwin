@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
-#include "EntityInformation.h"
+#include "OTModelEntities/EntityInformation.h"
 
 // Model header
 #include "SelectionChangedObserver.h"

@@ -19,7 +19,7 @@
 
 #pragma once
 #include <mutex>
-#include "OTCore/Json.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/ServiceBase.h"
 #include "ApplicationBase.h"
 

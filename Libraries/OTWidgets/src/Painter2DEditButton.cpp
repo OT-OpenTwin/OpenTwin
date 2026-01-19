@@ -18,13 +18,13 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/StyleRefPainter2D.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Painter/LinearGradientPainter2D.h"
+#include "OTGui/Painter/RadialGradientPainter2D.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/Painter2DPreview.h"
-#include "OTGui/LinearGradientPainter2D.h"
-#include "OTGui/RadialGradientPainter2D.h"
 #include "OTWidgets/Painter2DEditButton.h"
 #include "OTWidgets/Painter2DEditDialog.h"
 

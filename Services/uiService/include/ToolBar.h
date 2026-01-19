@@ -23,23 +23,24 @@
 #include <akCore/globalDataTypes.h>
 #include <akCore/aNotifier.h>
 
-// Qt header
-#include <qstring.h>
-#include <qicon.h>
-
-// open twin header
+// OpenTwin header
 #include "OTSystem/Flags.h"
 #include "OTGui/GuiTypes.h"
-#include <qvectornd.h>
+
+// Qt header
+#include <QtCore/qstring.h>
+#include <QtCore/qobject.h>
+#include <QtGui/qicon.h>
 
 class AppBase;
 class LockManager;
 
 namespace tt { class Page; }
+namespace ak { class aToolButtonWidget; }
 
-class ToolBar : public ak::aNotifier {
+class ToolBar : public QObject, public ak::aNotifier {
+	Q_OBJECT
 public:
-
 	ToolBar(AppBase * _owner);
 
 	virtual void notify(
@@ -49,9 +50,13 @@ public:
 		int				_info2
 	) override;
 	
-	tt::Page* getStartPage(void);
+	tt::Page* getStartPage();
 
-	// ###################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Slots
+
+public Q_SLOTS:
 
 	ot::UID addPage(ot::UID _creator, const QString & _pageName);
 
@@ -69,9 +74,18 @@ public:
 
 	ot::UID addNiceLineEdit(ot::UID _creator, ot::UID _container, const QString & _title, const QString & _initialState);
 
-	void addDefaultControlsToLockManager(LockManager * _lockManger, ot::LockTypes& _flags);
+	bool triggerToolBarButton(ot::UID _buttonId);
+
+	//! @brief Will trigger the tool bar button specified by its path.
+	//! @param _buttonPath The path of the button to trigger (e.g. "View:Settings:Show Grid").
+	//! @return true on success, false if the button was not found.
+	bool triggerToolBarButton(const QString& _buttonPath);
 
 private:
+	//! @brief Will find the button specified by its path in the provided object list.
+	//! @param _buttonPath The path of the button to find (e.g. "View:Settings:Show Grid").
+	//! @param _objects The object list to search in.
+	ak::aToolButtonWidget* findButton(const QString& _buttonPath, const QObjectList& _objects);
 
 	struct structView {
 		ot::UID				page;

@@ -20,8 +20,8 @@
 #include "PreviewAssembler.h"
 #include "Application.h"
 
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 
 void PreviewAssembler::LoadSelectedRangesAndTableSources(ot::UIDList & existingRanges)
 {

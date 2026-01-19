@@ -24,20 +24,20 @@
 #include "ProgressLogger.h"
 #include "TmpFileManager.h"
 
-#include "BoundingBox.h"
-#include "GeometryOperations.h"
-#include "EntityMeshTet.h"
-#include "EntityMeshTetData.h"
-#include "EntityMeshTetFace.h"
-#include "EntityMeshTetNodes.h"
-#include "EntityMeshTetFaceData.h"
-#include "EntityMeshTetItem.h"
-#include "EntityMeshTetItemDataTets.h"
-#include "EntityMeshTetItemDataTetedges.h"
-#include "EntityAnnotation.h"
-#include "EntityAnnotationData.h"
-#include "EntityMeshTetInfo.h"
-#include "EntityBinaryData.h"
+#include "OTModelEntities/BoundingBox.h"
+#include "OTModelEntities/EntityMeshTet.h"
+#include "OTModelEntities/EntityMeshTetData.h"
+#include "OTModelEntities/EntityMeshTetFace.h"
+#include "OTModelEntities/EntityMeshTetNodes.h"
+#include "OTModelEntities/EntityMeshTetFaceData.h"
+#include "OTModelEntities/EntityMeshTetItem.h"
+#include "OTModelEntities/EntityMeshTetItemDataTets.h"
+#include "OTModelEntities/EntityMeshTetItemDataTetedges.h"
+#include "OTModelEntities/EntityAnnotation.h"
+#include "OTModelEntities/EntityAnnotationData.h"
+#include "OTModelEntities/EntityMeshTetInfo.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTCADEntities/GeometryOperations.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -846,7 +846,7 @@ bool MeshWriter::getFaceIntersectsPoint(EntityMeshTetFace *face, double x, doubl
 		mesh->getNodeCoords(nodes[1], nodeCoord2);
 		mesh->getNodeCoords(nodes[2], nodeCoord3);
 
-		if (GeometryOperations::checkPointInTriangle(x, y, z, nodeCoord1, nodeCoord2, nodeCoord3, tolerance))
+		if (ot::GeometryOperations::checkPointInTriangle(x, y, z, nodeCoord1, nodeCoord2, nodeCoord3, tolerance))
 		{
 			return true;
 		}

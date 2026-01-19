@@ -22,7 +22,7 @@
 #include "PortBlockerServer.h"
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/ComboBox.h"

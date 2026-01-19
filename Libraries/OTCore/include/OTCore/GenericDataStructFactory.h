@@ -19,8 +19,8 @@
 
 #pragma once
 #include <memory>
-#include "GenericDataStruct.h"
-#include "JSON.h"
+#include "OTCore/GenericDataStruct.h"
+#include "OTCore/JSON/JSON.h"
 
 namespace ot
 {

@@ -20,26 +20,24 @@
 #include "BlockHandlerDatabaseAccess.h"
 
 #include "Application.h"
+#include "SolverReport.h"
+#include "PropertyHandlerDatabaseAccessBlock.h"
 
-#include "AdvancedQueryBuilder.h"
+#include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTCore/String.h"
+#include "OTCore/TimeFormatter.h"
+#include "OTCore/ComparisionSymbols.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTCore/GenericDataStructSingle.h"
-
 #include "OTCore/ValueComparisionDefinition.h"
-
-#include "ResultDataStorageAPI.h"
-#include "QuantityContainer.h"
-#include "PropertyHandlerDatabaseAccessBlock.h"
-
 #include "OTCore/ExplicitStringValueConverter.h"
-#include "OTCore/ComparisionSymbols.h"
-#include "IndexHandler.h"
-
-#include "OTCore/TimeFormatter.h"
-#include "SolverReport.h"
 #include "OTCore/ResultCollectionDefaultIndexes.h"
+
+#include "OTDataStorage/ResultDataStorageAPI.h"
+
+#include "OTResultDataAccess/IndexHandler.h"
+#include "OTResultDataAccess/QuantityContainer.h"
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	: BlockHandler(blockEntity, handlerMap)

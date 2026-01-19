@@ -32,8 +32,8 @@ class EntityMeshCartesianNodes;
 class EntityCartesianVector;
 class EntityMaterial;
 
-#include "Geometry.h"
-#include "EntityResultBase.h"
+#include "OTModelEntities/Geometry.h"
+#include "OTModelEntities/EntityResultBase.h"
 
 #include <vector>
 #include <string>

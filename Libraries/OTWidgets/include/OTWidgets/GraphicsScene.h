@@ -23,7 +23,7 @@
 #include "OTSystem/Flags.h"
 #include "OTGui/Grid.h"
 #include "OTGui/Margins.h"
-#include "OTGui/GraphicsConnectionCfg.h"
+#include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header

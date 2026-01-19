@@ -19,8 +19,8 @@
 
 #include "StudioSuiteConnector/InfoFileManager.h"
 
-#include "EntityBinaryData.h"
-#include "DataBase.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/DataBase.h"
 
 #include <sstream>
 #include <stdexcept>

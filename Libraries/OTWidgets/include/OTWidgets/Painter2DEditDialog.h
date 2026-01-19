@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTGui/GuiTypes.h"
-#include "OTGui/Painter2DDialogFilter.h"
-#include "OTGui/GradientPainterStop2D.h"
+#include "OTGui/Dialog/Painter2DDialogFilter.h"
+#include "OTGui/Painter/GradientPainterStop2D.h"
 #include "OTWidgets/Dialog.h"
 #include "OTWidgets/ColorStyle.h"
 

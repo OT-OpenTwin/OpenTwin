@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/Exception.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 
 // Public API

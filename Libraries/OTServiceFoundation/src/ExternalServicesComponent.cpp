@@ -21,10 +21,10 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
 
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/DebugHelper.h"
 #include "OTCore/ThisService.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
 
@@ -40,7 +40,7 @@
 
 #include "OTServiceFoundation/MessageQueueHandler.h"
 
-#include <DataBase.h>
+#include "OTModelEntities/DataBase.h"
 
 // std header
 #include <exception>									// error handling

@@ -31,10 +31,12 @@
 #include "MenuManager.h"
 #include "ImageEditor.h"
 #include "NetworkTools.h"
+#include "ProjectHelper.h"
 #include "StatusManager.h"
-#include "ToolViewManager.h"
 #include "ToolBarManager.h"
+#include "ToolViewManager.h"
 #include "SettingsManager.h"
+#include "DiagramGenerator.h"
 #include "ColorStyleEditor.h"
 #include "GraphicsItemDesigner.h"
 #include "ExternalLibraryManager.h"
@@ -43,12 +45,12 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"
-#include "OTCore/BasicScopedBoolWrapper.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/RAII/ValueRAII.h"
 #include "OTCore/String.h"
-#include "OTGui/FillPainter2D.h"
-#include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/CheckerboardPainter2D.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Painter/CheckerboardPainter2D.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/PlainTextEdit.h"
@@ -58,6 +60,7 @@
 #include "OTWidgets/PlainTextEditView.h"
 
 // Qt header
+#include <QtCore/qprocess.h>
 #include <QtCore/qdatetime.h>
 #include <QtCore/qsettings.h>
 #include <QtGui/qevent.h>
@@ -401,7 +404,7 @@ void AppBase::slotInitialize(void) {
 
 void AppBase::slotInitializeTools(void) {
 	// Create tools
-	ot::BasicScopedBoolWrapper autoStarting(m_ignoreToolAutoStart, m_ignoreToolAutoStart);
+	ot::ValueRAII autoStarting(m_ignoreToolAutoStart, m_ignoreToolAutoStart);
 
 	for (StartOption opt : m_startArgs) {
 		if (opt == AppBase::NoAutoStart) {
@@ -412,13 +415,15 @@ void AppBase::slotInitializeTools(void) {
 
 	m_logger = new Logging;
 	
-	m_toolManager->addTool(new ColorStyleEditor);
 	m_toolManager->addTool(new BackendInfo);
+	m_toolManager->addTool(new ColorStyleEditor);
+	m_toolManager->addTool(new DiagramGenerator);
 	m_toolManager->addTool(new FAR);
 	m_toolManager->addTool(new GraphicsItemDesigner);
 	m_toolManager->addTool(new ImageEditor);
 	m_toolManager->addTool(m_logger);
 	m_toolManager->addTool(new NetworkTools);
+	m_toolManager->addTool(new ProjectHelper);
 	m_toolManager->addTool(new Randomizer);
 	m_toolManager->addTool(new SVGBrowser);
 	m_toolManager->addTool(new Terminal);

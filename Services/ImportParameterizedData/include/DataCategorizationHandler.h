@@ -20,15 +20,16 @@
 #pragma once
 
 #include "BusinessLogicHandler.h"
-#include "EntityParameterizedDataCategorization.h"
+#include "OTModelEntities/EntityParameterizedDataCategorization.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Color.h"
-#include "EntityInformation.h"
+#include "OTModelEntities/NewModelStateInfo.h"
+#include "OTModelEntities/EntityInformation.h"
 #include "MetadataAssemblyData.h"
-#include "EntityTableSelectedRanges.h"
+#include "OTModelEntities/EntityTableSelectedRanges.h"
 #include "OTCore/Variable.h"
 #include "OTGui/TableRange.h"
-#include "IVisualisationTable.h"
+#include "OTModelEntities/IVisualisationTable.h"
 #include "OTGui/TableCfg.h"
 
 #include <optional>
@@ -36,7 +37,6 @@
 #include <string>
 #include <memory>
 #include <set>
-#include "NewModelStateInfo.h"
 
 //! @brief Holds the mechanisms to create the final entities holding the four entities that describe a parameterized data collection.
 //! Research metadata, measurementseries metadata, quantities and parameters.

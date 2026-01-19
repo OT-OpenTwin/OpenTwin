@@ -20,7 +20,7 @@
 #pragma once
 
 #include "OTCore/TemplateTypeName.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 namespace ot
 {

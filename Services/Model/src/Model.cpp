@@ -23,30 +23,45 @@
 #include "stdafx.h"
 #include "Model.h"
 #include "Application.h"
-#include "EntityBase.h"
-#include "EntityUnits.h"
-#include "EntityMeshTet.h"
-#include "EntityVis2D3D.h"
-#include "EntityMaterial.h"
-#include "EntityGeometry.h"
-#include "EntityParameter.h"
-#include "EntityAnnotation.h"
-#include "EntityMeshTetItem.h"
-#include "EntityGraphicsScene.h"
-#include "EntityMeshCartesian.h"
-#include "EntityFaceAnnotation.h"
-#include "EntityMetadataCampaign.h"
-#include "EntityParameterizedDataPreviewTable.h"
-#include "EntityParameterizedDataCategorization.h"
-#include "EntityBlockConnection.h"
-#include "OTGui/SelectEntitiesDialogCfg.h"
+
+// OpenTwin header
+#include "OTCore/String.h"
+#include "OTCore/EntityName.h"
+#include "OTCore/FolderNames.h"
+#include "OTGui/KeySequence.h"
+#include "OTGui/NavigationTreeItem.h"
+#include "OTGui/VersionGraphVersionCfg.h"
+#include "OTGui/Properties/PropertyGroup.h"
+#include "OTGui/Properties/PropertyString.h"
+#include "OTGui/Dialog/SelectEntitiesDialogCfg.h"
 #include "OTGuiAPI/Frontend.h"
-#include "EntitySolverCircuitSimulator.h"
-#include "EntitySolverDataProcessing.h"
+#include "OTServiceFoundation/UILockWrapper.h"
+
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/EntityUnits.h"
+#include "OTModelEntities/EntityMeshTet.h"
+#include "OTModelEntities/EntityVis2D3D.h"
+#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/EntityParameter.h"
+#include "OTModelEntities/EntityAnnotation.h"
+#include "OTModelEntities/EntityMeshTetItem.h"
+#include "OTModelEntities/EntityGraphicsScene.h"
+#include "OTModelEntities/EntityMeshCartesian.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/EntityMetadataCampaign.h"
+#include "OTModelEntities/EntitySolverDataProcessing.h"
+#include "OTModelEntities/EntitySolverCircuitSimulator.h"
+#include "OTModelEntities/EntityParameterizedDataPreviewTable.h"
+#include "OTModelEntities/EntityParameterizedDataCategorization.h"
+
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
+#include "OTCADEntities/EntityFaceAnnotation.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
 
 #include "MicroserviceNotifier.h"
-#include "GeometryOperations.h"
-#include "TemplateDefaultManager.h"
 #include "TableReader.h"
 #include "ProgressReport.h"
 #include "ProjectTypeManager.h"
@@ -71,10 +86,9 @@
 #undef min
 #undef max
 
-#include "DataBase.h"
-#include "Document\DocumentAccess.h"
-#include "Helper\QueryBuilder.h"
-#include "Helper\BsonValuesHelper.h"
+#include "OTDataStorage/Document/DocumentAccess.h"
+#include "OTDataStorage/Helper/QueryBuilder.h"
+#include "OTDataStorage/Helper/BsonValuesHelper.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
@@ -90,21 +104,8 @@
 
 #include "tinyexpr.h"
 
-// OpenTwin header
-#include "EntityBlock.h"
-#include "OTCore/String.h"
-#include "OTCore/EntityName.h"
-#include "OTGui/KeySequence.h"
-#include "OTGui/NavigationTreeItem.h"
-#include "OTGui/PropertyGroup.h"
-#include "OTGui/PropertyString.h"
-#include "OTGui/VersionGraphVersionCfg.h"
-#include "PropertyHelper.h"
-
-#include "MetadataEntityInterface.h"
-
-#include "OTServiceFoundation/UILockWrapper.h"
-#include "OTCore/FolderNames.h"
+#include "OTBlockEntities/EntityBlock.h"
+#include "OTResultDataAccess/MetadataEntityInterface.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -210,7 +211,7 @@ void Model::resetToNew()
 	entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 	entityMap[entityRoot->getEntityID()] = entityRoot;
 
-	GeometryOperations::EntityList allNewEntities;
+	ot::GeometryOperations::EntityList allNewEntities;
 
 	// Create the various root items
 	if (typeManager.hasGeometryRoot())
@@ -990,7 +991,7 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 		entityParameterRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityParameterRoot->setName(getParameterRootName());
 
-		GeometryOperations::EntityList allNewEntities;
+		ot::GeometryOperations::EntityList allNewEntities;
 		addEntityToModel(entityParameterRoot->getName(), entityParameterRoot, entityRoot, true, allNewEntities);
 
 		addVisualizationContainerNode(entityParameterRoot->getName(), entityParameterRoot->getEntityID(), entityParameterRoot->getTreeItemEditable());
@@ -1830,7 +1831,7 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*> _entities, const s
 			}
 		}
 
-		GeometryOperations::EntityList allNewEntities;
+		ot::GeometryOperations::EntityList allNewEntities;
 		addEntityToModel(entity->getName(), entity, entityRoot, addVisualizationContainer, allNewEntities);
 
 		// Now the parent should not be empty
@@ -2615,7 +2616,7 @@ void Model::performEntityMeshUpdate(EntityMeshTet *entity)
 			std::list<EntityGeometry *> geometryEntities;
 			getAllGeometryEntities(geometryEntities);
 
-			BoundingBox boundingBox = GeometryOperations::getBoundingBox(geometryEntities);
+			BoundingBox boundingBox = ot::GeometryOperations::getBoundingBox(geometryEntities);
 
 			if (boundingBox.getDiagonal() == 0.0)
 			{
@@ -2933,7 +2934,7 @@ void Model::handleShowSelectedShapeInformation()
 
 	if (!faceCurvatureRadius.empty())
 	{
-		std::vector<std::pair<std::pair<double, double>, int>> curvatureHistogram = GeometryOperations::getCurvatureRadiusHistogram(faceCurvatureRadius, 20);
+		std::vector<std::pair<std::pair<double, double>, int>> curvatureHistogram = ot::GeometryOperations::getCurvatureRadiusHistogram(faceCurvatureRadius, 20);
 
 		message += "  Curvature radius:\n";
 
@@ -3014,7 +3015,7 @@ void Model::getFaceCurvatureRadius(const TopoDS_Shape *shape, std::list<double> 
 	for (exp.Init(*shape, TopAbs_FACE); exp.More(); exp.Next())
 	{
 		TopoDS_Face aFace = TopoDS::Face(exp.Current());
-		double maxCurvature = GeometryOperations::getMaximumFaceCurvature(aFace);
+		double maxCurvature = ot::GeometryOperations::getMaximumFaceCurvature(aFace);
 
 		if (maxCurvature > 0.0) faceCurvatureRadius.push_back(1.0 / maxCurvature);
 	}
@@ -3093,7 +3094,7 @@ void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &anno
 		annotationEntity->addFacePick(annotation);
 	}
 
-	GeometryOperations::EntityList allNewEntities;
+	ot::GeometryOperations::EntityList allNewEntities;
 	addEntityToModel(annotationEntity->getName(), annotationEntity, entityRoot, true, allNewEntities);
 
 	updateAnnotationGeometry(annotationEntity);
@@ -3144,7 +3145,7 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 				double deflection = calculateDeflectionFromListOfEntities(entity);
 
 				std::string errors;
-				GeometryOperations::facetEntity(face, nullptr, deflection, annotationEntity->getFacets()->getNodeVector(), annotationEntity->getFacets()->getTriangleList(), annotationEntity->getFacets()->getEdgeList(), annotationEntity->getFacets()->getFaceNameMap(), errors);
+				ot::GeometryOperations::facetEntity(face, nullptr, deflection, annotationEntity->getFacets()->getNodeVector(), annotationEntity->getFacets()->getTriangleList(), annotationEntity->getFacets()->getEdgeList(), annotationEntity->getFacets()->getFaceNameMap(), errors);
 			}
 		}
 	}

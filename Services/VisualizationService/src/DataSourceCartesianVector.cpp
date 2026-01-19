@@ -17,13 +17,10 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "stdafx.h"
-
 #include "DataSourceCartesianVector.h"
-#include "EntityBase.h"
-#include "EntityCartesianVector.h"
-#include "EntityMeshCartesianData.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/EntityCartesianVector.h"
+#include "OTModelEntities/EntityMeshCartesianData.h"
 
 #include <vtkNew.h>
 #include <vtkStructuredGrid.h>

@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ServiceRunData.h"
 #include "OTCommunication/ServiceInitData.h"

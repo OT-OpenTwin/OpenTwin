@@ -19,14 +19,14 @@
 
 // OpenTwin header
 #include "EntityCreator.h"
-#include "EntityPythonManifest.h"
+#include "OTModelEntities/EntityPythonManifest.h"
 #include "Application.h"
 #include "OTCore/EntityName.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "NewModelStateInfo.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 #include "OTCore/FolderNames.h"
-#include "EntityGraphicsScene.h"
-#include "EntitySolverDataProcessing.h"
+#include "OTModelEntities/EntityGraphicsScene.h"
+#include "OTModelEntities/EntitySolverDataProcessing.h"
 
 void EntityCreator::createManifests()
 {

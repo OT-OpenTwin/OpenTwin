@@ -26,10 +26,10 @@
 #include "MaterialManager.h"
 #include "FaceAnnotationsManager.h"
 
-#include "EntityGeometry.h"
-#include "EntityFaceAnnotation.h"
-#include "EntityMaterial.h"
-#include "EntityMesh.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/EntityFaceAnnotation.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/EntityMesh.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 

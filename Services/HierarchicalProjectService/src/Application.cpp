@@ -30,9 +30,9 @@
 #include "OTCore/ProjectInformation.h"
 
 // OpenTwin Gui header
-#include "OTGui/DialogCfg.h"
 #include "OTGui/FileExtension.h"
-#include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTGui/Dialog/DialogCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"
@@ -52,18 +52,18 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 
 // Entities
-#include "EntityAPI.h"
-#include "EntityFileCSV.h"
-#include "EntityFileText.h"
-#include "EntityBinaryData.h"
-#include "EntityFileRawData.h"
-#include "EntityGraphicsScene.h"
-#include "EntityBlockHierarchicalProjectItem.h"
-#include "EntityBlockHierarchicalDocumentItem.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityFileCSV.h"
+#include "OTModelEntities/EntityFileText.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/EntityFileRawData.h"
+#include "OTModelEntities/EntityGraphicsScene.h"
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalProjectItem.h"
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalDocumentItem.h"
 
 // DataBase
-#include "DocumentAPI.h"
-#include "GridFSFileInfo.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/GridFSFileInfo.h"
 
 // std header
 #include <thread>

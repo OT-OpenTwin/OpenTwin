@@ -22,7 +22,7 @@
 #include "CPythonObjectNew.h"
 #include "CPythonObjectBorrowed.h"
 #include "OTCore/Variable.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/Variable.h"
 #include "OTCore/GenericDataStruct.h"
 

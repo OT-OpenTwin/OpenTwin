@@ -24,7 +24,7 @@
 
 // OT header
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/GraphicsItemLoader.h"
@@ -304,6 +304,11 @@ int main(int _argc, char *_argv[])
 
 		if (!AppBase::instance()->initialize()) {
 			return ot::AppExitCode::GeneralError;
+		}
+
+		// Check if script was set
+		if (!argsParser.getScriptFile().isEmpty()) {
+			AppBase::instance()->runJSScriptFromFile(argsParser.getScriptFile());
 		}
 
 		// LogIn

@@ -22,10 +22,10 @@
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-#include "EntityFile.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityFile.h"
 #include <algorithm>
 
 void InfoFileManager::setData(Application* app)

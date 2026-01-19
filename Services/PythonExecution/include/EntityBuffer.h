@@ -19,10 +19,11 @@
 
 #pragma once
 #include "CPythonObjectNew.h"
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/IVisualisationTable.h"
+
 #include <string>
 #include <memory>
-#include "IVisualisationTable.h"
 
 //! @brief Singleton that buffers all entities and their properties that were used so far.
 class EntityBuffer

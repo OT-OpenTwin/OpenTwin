@@ -23,7 +23,7 @@
 #include "SupportedService.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/OTClassHelper.h"
 
 //! @brief The ServiceStartupData class contains all startup counters required for monitoring a service start.

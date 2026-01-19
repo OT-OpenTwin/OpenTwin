@@ -18,13 +18,13 @@
 // @otlicense-end
 
 #include "BlendEdges.h"
-#include "EntityGeometry.h"
-#include "EntityFaceAnnotation.h"
-#include "DataBase.h"
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/EntityFaceAnnotation.h"
 #include "EntityCache.h"
 #include "UpdateManager.h"
 
 #include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 

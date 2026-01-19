@@ -7,18 +7,17 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'OpenTwin'
-copyright = '2024, OpenTwin'
+copyright = '2026, OpenTwin'
 author = 'OpenTwin'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+#extensions = [ 'sphinx.ext.imgmath', 'sphinx_rtd_dark_mode' ]
 extensions = [ 'sphinx.ext.imgmath' ]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -28,6 +27,9 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 html_style = 'css/my_theme.css'
 html_logo = 'images/logo_small.png'
+
+# user starts in light mode
+default_dark_mode = False
 
 # -- Prolog for every file   -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-rst_prolog

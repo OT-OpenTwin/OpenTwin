@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Property.h"
-#include "OTGui/PropertyBase.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyBase.h"
 #include "OTWidgets/TreeWidgetItem.h"
 #include "OTWidgets/WidgetTypes.h"
 

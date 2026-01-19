@@ -27,7 +27,7 @@
 
 // OpenTwin header
 #include "OTCore/Rect.h"
-#include "OTGui/GraphicsGroupItemCfg.h"
+#include "OTGui/Graphics/GraphicsGroupItemCfg.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/PropertyGrid.h"

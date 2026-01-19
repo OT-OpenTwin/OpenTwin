@@ -18,12 +18,13 @@
 // @otlicense-end
 
 #pragma once
-#include "BusinessLogicHandler.h"
-#include "ResultCollectionExtender.h"
 
 #include "TouchstoneHandler.h"
-#include "MetadataSeries.h"
-#include "DatasetDescription.h"
+#include "BusinessLogicHandler.h"
+
+#include "OTResultDataAccess/MetadataSeries.h"
+#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/DatasetDescription.h"
 
 class TouchstoneToResultdata : public BusinessLogicHandler
 {

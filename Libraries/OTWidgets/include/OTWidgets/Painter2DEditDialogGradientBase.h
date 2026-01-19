@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/GuiTypes.h"
-#include "OTGui/GradientPainterStop2D.h"
+#include "OTGui/Painter/GradientPainterStop2D.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header

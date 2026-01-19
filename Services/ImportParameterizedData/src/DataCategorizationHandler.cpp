@@ -17,25 +17,30 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "DataCategorizationHandler.h"
-#include "MetadataEntityInterface.h"
-#include "OTCore/GenericDataStructMatrix.h"
-#include "MetadataEntrySingle.h"
+// Service header
 #include "Application.h"
+#include "Documentation.h"
 #include "PreviewAssemblerRMD.h"
 #include "LocaleSettingsSwitch.h"
+#include "DataCategorizationHandler.h"
 #include "CategorisationFolderNames.h"
 #include "SelectionCategorisationColours.h"
-#include "Documentation.h"
+
+// OpenTwin header
+#include "OTCore/GenericDataStructMatrix.h"
+#include "OTResultDataAccess/MetadataEntrySingle.h"
+#include "OTResultDataAccess/MetadataEntityInterface.h"
+#include "OTCore/EntityName.h"
 #include "OTCore/StringToVariableConverter.h"
 #include "OTGui/TableIndexSchemata.h"
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityResultText.h"
 
+// std header
 #include <algorithm>
 #include <bitset>
-#include "EntityResultText.h"
-#include "OTCore/EntityName.h"
+
 DataCategorizationHandler::DataCategorizationHandler(std::string _tableFolder, std::string _previewTableName)
 	:m_tableFolder(_tableFolder), m_previewTableName(_previewTableName)
 {

@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
-#include "OTGui/PropertyManager.h"
+#include "OTGui/Properties/PropertyManager.h"
 
 // std header
 #include <map>

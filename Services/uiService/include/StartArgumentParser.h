@@ -56,6 +56,9 @@ public:
 	void setProjectVersion(const std::string& _version) { m_projectVersion = _version; };
 	const std::string& getProjectVersion() const { return m_projectVersion; };
 
+	void setScriptFile(const QString& _file) { m_scriptFile = _file; };
+	const QString& getScriptFile() const { return m_scriptFile; };
+
 private:
 	bool m_debug = false;
 	bool m_checkGraphics = false;
@@ -66,4 +69,6 @@ private:
 	bool m_openProject = false;
 	ot::ProjectInformation m_projectInfo;
 	std::string m_projectVersion;
+
+	QString m_scriptFile;
 };

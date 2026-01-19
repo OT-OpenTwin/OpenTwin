@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/PropertyGridItem.h"

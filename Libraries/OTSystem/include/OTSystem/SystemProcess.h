@@ -99,6 +99,18 @@ namespace ot {
 		//! @param _waitForResponse If true, the function will wait until the process was successfully started.
 		static RunResult runApplication(const std::wstring& _applicationPath, const std::wstring& _commandLine, OT_PROCESS_HANDLE& _processHandle, const ProcessFlags& _flags = ProcessFlag::DefaultFlags);
 
+		//! @brief Will run the provided file using the system shell.
+		//! @param _filePath The path to the file that should be run.
+		//! @param _args The arguments that should be passed to the file.
+		//! @param _workingDir The working directory that should be used (if empty the current working directory will be used).
+		static RunResult runFileByShell(const std::string& _filePath, const std::string& _args, const std::string& _workingDir = std::string());
+
+		//! @brief Will run the provided file using the system shell.
+		//! @param _filePath The path to the file that should be run.
+		//! @param _args The arguments that should be passed to the file.
+		//! @param _workingDir The working directory that should be used (if empty the current working directory will be used).
+		static RunResult runFileByShell(const std::wstring& _filePath, const std::wstring& _args, const std::wstring& _workingDir = std::wstring());
+
 		//! @brief Returns true if the provided process is still alive.
 		static bool isApplicationRunning(OT_PROCESS_HANDLE& _processHandle);
 

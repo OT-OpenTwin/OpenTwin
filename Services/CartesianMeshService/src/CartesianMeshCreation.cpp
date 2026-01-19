@@ -17,31 +17,30 @@
 // limitations under the License.
 // @otlicense-end
 
-
-#include "stdafx.h"
-
 #include "CartesianMeshCreation.h"
 
 #include "Application.h"
-
-#include "EntityMeshCartesian.h"
-#include "EntityMeshCartesianData.h"
-#include "EntityGeometry.h"
-#include "EntityMaterial.h"
-#include "GeometryOperations.h"
-#include "EntityMeshCartesianFace.h"
-#include "EntityMeshCartesianFaceList.h"
-#include "EntityMeshCartesianItem.h"
-#include "EntityMeshCartesianNodes.h"
-#include "EntityCartesianVector.h"
 #include "CartesianMeshTree.h"
-#include "TemplateDefaultManager.h"
-#include "EntityVis2D3D.h"
-#include "EntityVisCartesianFaceScalar.h"
+
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityMeshCartesian.h"
+#include "OTModelEntities/EntityMeshCartesianData.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/EntityMeshCartesianFace.h"
+#include "OTModelEntities/EntityMeshCartesianFaceList.h"
+#include "OTModelEntities/EntityMeshCartesianItem.h"
+#include "OTModelEntities/EntityMeshCartesianNodes.h"
+#include "OTModelEntities/EntityCartesianVector.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/EntityVis2D3D.h"
+#include "OTModelEntities/EntityVisCartesianFaceScalar.h"
+
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
 
 #include "BRepPrimAPI_MakeBox.hxx"
 
-#include "DataBase.h"
 
 #include <chrono>
 #include <thread>	
@@ -51,7 +50,6 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #undef max

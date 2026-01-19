@@ -21,22 +21,21 @@
 
 #include "Application.h"
 
-#include "DataBase.h"
-#include "EntityProperties.h"
-#include "EntityMaterial.h"
-#include "EntityMeshTetItemDataTets.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityMaterial.h"
+#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/EntityInformation.h"
+#include "OTModelEntities/EntityMeshTetItemDataTets.h"
 
-#include "DocumentAPI.h"
-#include "Connection\ConnectionAPI.h"
-#include "Document\DocumentManager.h"
-#include "Document\DocumentAccessBase.h"
-#include "Helper\QueryBuilder.h"
-#include "Helper\BsonValuesHelper.h"
+#include "OTDataStorage/DocumentAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentManager.h"
+#include "OTDataStorage/Document/DocumentAccessBase.h"
+#include "OTDataStorage/Helper/QueryBuilder.h"
+#include "OTDataStorage/Helper/BsonValuesHelper.h"
 
-#include "EntityInformation.h"
 #include "OTServiceFoundation/ModelComponent.h"
-
-#include "EntityAPI.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
 

@@ -20,22 +20,22 @@
 #include "FDTDLauncher.h"
 #include "FDTDConfig.h"
 
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include "Application.h"
 #include "SolverBase.h"
 #include "SolverFDTD.h"
 
-#include "EntityMeshTet.h"
-#include "EntityMeshTetData.h"
-#include "EntityBinaryData.h"
-#include "EntityProperties.h"
+#include "OTModelEntities/EntityMeshTet.h"
+#include "OTModelEntities/EntityMeshTetData.h"
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/EntityProperties.h"
 
 #include "CartesianMeshToSTL.h"
 
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include <windows.h> // winapi

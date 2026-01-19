@@ -19,11 +19,11 @@
 
 #pragma once
 
+#include "VtkDriver.h"
+
 #include <string>
 #include <vector>
 #include <ctime>
-
-#include "VtkDriver.h"
 
 namespace osg
 {

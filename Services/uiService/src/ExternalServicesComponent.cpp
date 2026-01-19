@@ -28,6 +28,7 @@
 #include "ShortcutManager.h"
 #include "WebsocketClient.h"
 #include "ProjectManagement.h"
+#include "NavigationTreeView.h"
 #include "StartArgumentParser.h"
 #include "SelectProjectDialog.h"
 #include "SelectEntitiesDialog.h"
@@ -40,30 +41,30 @@
 // OpenTwin Core header
 #include "OTCore/Color.h"
 #include "OTCore/String.h"
+#include "OTCore/RAII/ValueRAII.h"
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"
 #include "OTSystem/FileSystem.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/OwnerServiceGlobal.h"
-#include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/GenericDataStructMatrix.h"
-#include "OTCore/ReturnMessage.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // OpenTwin Gui header
 #include "OTGui/GuiTypes.h"
 #include "OTGui/TableRange.h"
-#include "OTGui/GraphicsPackage.h"
-#include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/MessageDialogCfg.h"
-#include "OTGui/PropertyDialogCfg.h"
-#include "OTGui/PropertyStringList.h"
-#include "OTGui/OnePropertyDialogCfg.h"
-#include "OTGui/GraphicsLayoutItemCfg.h"
-#include "OTGui/SelectEntitiesDialogCfg.h"
 #include "OTGui/VisualisationCfg.h"
+#include "OTGui/Dialog/MessageDialogCfg.h"
+#include "OTGui/Dialog/PropertyDialogCfg.h"
+#include "OTGui/Dialog/OnePropertyDialogCfg.h"
+#include "OTGui/Dialog/SelectEntitiesDialogCfg.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsLayoutItemCfg.h"
+#include "OTGui/Properties/PropertyStringList.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/Table.h"
@@ -111,13 +112,15 @@
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
 #include "OTFMC/FMConnectorAPI.h"
 #include "ProgressUpdater.h"
-#include "DataBase.h"
-#include "DocumentAPI.h"
-#include "GridFSFileInfo.h"
+#include "OTDataStorage/DocumentAPI.h"
+
+#include "OTDataStorage/GridFSFileInfo.h"
+#include "OTModelEntities/DataBase.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
 #include <akCore/akCore.h>
+#include "akWidgets/aTreeWidget.h"
 
 // Qt header
 #include <QtCore/qdir.h>						// QDir
@@ -154,8 +157,13 @@ static bool g_runSessionServiceHealthCheck{ false };
 
 namespace ot {
 	namespace intern {
-		static void exitAsync(int _code) {
+		static void exitAsyncWorker(int _code) {
 			exit(_code);
+		}
+
+		static void exitAsync(int _code) {
+			std::thread exitThread(&ot::intern::exitAsyncWorker, _code);
+			exitThread.detach();
 		}
 	}
 }
@@ -1165,7 +1173,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 	AppBase * app{ AppBase::instance() };
 	try {
-		ot::BasicScopedBoolWrapper actionBuffer(m_bufferActions);
+		ot::ValueRAII actionBuffer(m_bufferActions, true);
 
 		m_initialSelection.clear();
 
@@ -1392,6 +1400,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		// Process buffered actions
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotProcessActionBuffer, Qt::QueuedConnection);
 
+		app->projectOpenCompleted();
+
 		return true;
 	}
 	catch (const std::exception & e) {
@@ -1423,35 +1433,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		app->storeSessionState();
 
-		// Notify the websocket that the project is closing (do not worry if the relay service shuts down)
-
-		// This also prevents new received messages from being processed and will clear the message queue
-		if (m_websocket != nullptr) {
-			m_websocket->prepareSessionClosing();
-		}
-
-		// Enable action buffering
-		ot::BasicScopedBoolWrapper actionBufferFlag(m_bufferActions, true);
-
-		// Notify the session service that the sesion should be closed now
-		ot::JsonDocument shutdownCommand;
-		shutdownCommand.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSession, shutdownCommand.GetAllocator()), shutdownCommand.GetAllocator());
-		shutdownCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->getServiceID(), shutdownCommand.GetAllocator());
-		shutdownCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, shutdownCommand.GetAllocator()), shutdownCommand.GetAllocator());
-
-		std::string responseStr;
-		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, shutdownCommand, responseStr)) {
-			OT_LOG_E("Failed to send shutdown session request to LSS");
-		}
-
-		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
-		if (response != ot::ReturnMessage::Ok) {
-			OT_LOG_E("Failed to close session at LSS: " + response.getWhat());
-		}
-
-		// Stop the session service health check
-		ot::stopSessionServiceHealthCheck();
-
+		// Stop the keep alive timer
 		if (m_keepAliveTimer != nullptr) {
 			m_keepAliveTimer->stop();
 			delete m_keepAliveTimer;
@@ -1461,35 +1443,69 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			m_lastKeepAlive = 0;
 		}
 
+		// Notify the websocket that the project is closing (do not worry if the relay service shuts down)
+		// This also prevents new received messages from being processed and will clear the message queue
+		if (m_websocket != nullptr) {
+			m_websocket->prepareSessionClosing();
+		}
+
+		// Enable action buffering
+		ot::ValueRAII actionBufferFlag(m_bufferActions, true);
+
+		m_actionBuffer.clear();
+
+		// Deactivate the visualization model (this will also remove the tree entries)
+		app->getViewerComponent()->deactivateCurrentlyActiveModel();
+
+		// Stop the session service health check
+		ot::stopSessionServiceHealthCheck();
+
+		// Notify the session service that the sesion should be closed now
+		ot::JsonDocument shutdownCommand;
+		shutdownCommand.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSession, shutdownCommand.GetAllocator()), shutdownCommand.GetAllocator());
+		shutdownCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->getServiceID(), shutdownCommand.GetAllocator());
+		shutdownCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, shutdownCommand.GetAllocator()), shutdownCommand.GetAllocator());
+
+		std::string responseStr;
+		if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, shutdownCommand.toJson(), responseStr, 0, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send shutdown session request to LSS");
+			ot::WindowAPI::showErrorPrompt("Error", "Failed to send shutdown session request to LSS.\nThe application will close now.", 
+				"{ \"LSS.Url\": \"" + m_sessionServiceURL + "\", \"Error\": \"" + ot::msg::getLastError() + "\" }");
+			
+			ot::intern::exitAsync(ot::AppExitCode::LSSNotRunning);
+			return;
+		}
+
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+		if (response != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Failed to close session at LSS: " + response.getWhat());
+			ot::WindowAPI::showErrorPrompt("Error", "Failed to close session at LSS.\nThe application will close now.", 
+				"{ \"LSS.Url\": \"" + m_sessionServiceURL + "\", \"Error\": \"" + response.getWhat() + "\" }");
+			ot::intern::exitAsync(ot::AppExitCode::LSSNotRunning);
+			return;
+		}
+			
 		// Shutdown external APIs
 		ot::FMConnectorAPI::shutdown();
 
 		// Process all pending events to ensure that all queued events are processed before we start deleting things
 		QEventLoop eventLoop;
-		//eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
-		eventLoop.processEvents(QEventLoop::AllEvents);
+		if (m_websocket) {
+			// If we have a websocket, ensure that the queue request was handled before we continue
+			eventLoop.processEvents(QEventLoop::AllEvents);
 
-		// Get the id of the curently active model
-		ModelUIDtype modelID = app->getViewerComponent()->getActiveDataModel();
-
-		//NOTE, model ids will no longer be used in the future
-		if (modelID == 0) {
-			OT_LOG_W("No project currently active");
-			return;  // No project currently active
+			while (m_websocket->isBufferHandlingRequested()) {
+				eventLoop.processEvents(QEventLoop::AllEvents);
+			}
 		}
-		modelID = 1;
-
+		else {
+			//eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
+			eventLoop.processEvents(QEventLoop::AllEvents);
+		}
+		
 		// Now get the id of the corresponding visualization model
 		ModelUIDtype visualizationModel = app->getViewerComponent()->getActiveViewerModel();
-
-		// Deactivate the visualization model (this will also remove the tree entries)
-		app->getViewerComponent()->deactivateCurrentlyActiveModel();
-
-		// Close the model (potentially with saving).
-		// This operation will also post delete queries. In this case, no attempt will be made to 
-		// remove entities in the visualization model
-
-
+		
 		// Delete the corresponding visualization model. This will also detach the currently active viewers such that 
 		// they no longer refer to the visualization model. The viewer widget itself can not be deleted, since it is still 
 		// attached to a tab. The tab with the dear viewer will therefore need to be removed separately.
@@ -1527,6 +1543,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		app->replaceInfoMessage(c_buildInfo);
 
+		// Delete the websocket connection
 		if (m_websocket != nullptr) {
 			delete m_websocket;
 			m_websocket = nullptr;
@@ -1537,6 +1554,8 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		OT_LOG_D("Close project done");
 
 		clearSessionInformation();
+
+		app->projectCloseCompleted();
 	}
 	catch (const std::exception & e) {
 		OT_LOG_E(e.what());
@@ -1721,8 +1740,7 @@ void ExternalServicesComponent::queueAction(const std::string& _json, const std:
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected() {
 	ot::stopSessionServiceHealthCheck();
 	AppBase::instance()->slotShowErrorPrompt("Error", "The Local Session Service has died unexpectedly. The application will be closed now.", "");
-	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
-	exitThread.detach();
+	ot::intern::exitAsync(ot::AppExitCode::LSSNotRunning);
 }
 
 void ExternalServicesComponent::setProgressState(bool visible, const char* message, bool continuous)
@@ -2055,8 +2073,7 @@ void ExternalServicesComponent::handleShutdown() {
 	OT_LOG_D("Showdown received");
 	AppBase::instance()->slotShowErrorPrompt("Error", "Shutdown requested by Local Session Service.", "");
 	
-	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::Success);
-	exitThread.detach();
+	ot::intern::exitAsync(ot::AppExitCode::Success);
 }
 
 void ExternalServicesComponent::handlePreShutdown() {
@@ -2066,15 +2083,13 @@ void ExternalServicesComponent::handlePreShutdown() {
 void ExternalServicesComponent::handleEmergencyShutdown() {
 	AppBase::instance()->slotShowErrorPrompt("Error", "An unexpected error has occurred and the session needs to be closed.", "");
 	
-	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::EmergencyShutdown);
-	exitThread.detach();
+	ot::intern::exitAsync(ot::AppExitCode::EmergencyShutdown);
 }
 
 void ExternalServicesComponent::handleConnectionLoss() {
 	AppBase::instance()->slotShowErrorPrompt("Error", "The session needs to be closed, since the connection to the server has been lost.\n\nPlease note that the project may remain locked for up to two minutes before it can be reopened.", "");
 
-	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
-	exitThread.detach();
+	ot::intern::exitAsync(ot::AppExitCode::LSSNotRunning);
 }
 
 void ExternalServicesComponent::handleShutdownRequestedByService() {
@@ -2117,18 +2132,19 @@ void ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocument& _d
 	}
 
 	// Here we know that all services completed the startup -> switch to main view and restore state
-	m_servicesUiSetupCompleted = true;
+	if (!m_servicesUiSetupCompleted) {
+		m_servicesUiSetupCompleted = true;
 
-	AppBase::instance()->switchToViewMenuTabIfNeeded();
-	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockType::All);
+		AppBase::instance()->switchToViewMenuTabIfNeeded();
+		m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockType::All);
 
-	AppBase::instance()->restoreSessionState();
+		AppBase::instance()->restoreSessionState();
 
-	// Apply initial selection
-	for (const InitialSelectionInfo& info : m_initialSelection) {
-		AppBase::instance()->setNavigationTreeItemsSelected(info.treeIDs, info.selected, info.clearSelection);
+		// Apply initial selection
+		applyInitialSelection();
+
+		QMetaObject::invokeMethod(AppBase::instance(), &AppBase::servicesUiSetupCompleted, Qt::QueuedConnection);
 	}
-	m_initialSelection.clear();
 }
 
 void ExternalServicesComponent::handleRegisterForModelEvents(ot::JsonDocument& _document) {
@@ -3090,15 +3106,13 @@ void ExternalServicesComponent::handleSetEntitySelected(ot::JsonDocument& _docum
 	}
 
 	if (!treeIDs.empty()) {
+		InitialSelectionInfo info;
+		info.clearSelection = clearSelection;
+		info.treeIDs = std::move(treeIDs);
+		m_initialSelection.push_back(std::move(info));
+
 		if (getAllServicesCompletedSetup()) {
-			AppBase::instance()->setNavigationTreeItemsSelected(treeIDs, selected, clearSelection);
-		}
-		else {
-			InitialSelectionInfo info;
-			info.clearSelection = clearSelection;
-			info.selected = selected;
-			info.treeIDs = std::move(treeIDs);
-			m_initialSelection.push_back(std::move(info));
+			applyInitialSelection();
 		}
 	}
 }
@@ -3188,7 +3202,7 @@ void ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _document)
 	}
 	//NOTE, add error handling
 	assert(parentUID != ak::invalidUID);
-
+	
 	// Here we need to pass the iconName as string once the functionality is added to the uiManager
 	ot::UID buttonID = AppBase::instance()->getToolBar()->addToolButton(getServiceUiUid(senderService), parentUID, iconName.c_str(), iconFolder.c_str(), text.c_str());
 
@@ -4339,6 +4353,16 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	}
 }
 
+void ExternalServicesComponent::applyInitialSelection() {
+	if (m_initialSelection.empty()) {
+		return;
+	}
+
+	InitialSelectionInfo selection = m_initialSelection.back();
+	m_initialSelection.clear();
+	AppBase::instance()->setNavigationTreeItemsSelected(selection.treeIDs, true, selection.clearSelection);
+}
+
 void ExternalServicesComponent::actionDispatchTimeout(const ot::JsonDocument& _document) {
 	std::string action;
 	if (!_document.HasMember(OT_ACTION_MEMBER) || !_document[OT_ACTION_MEMBER].IsString()) {
@@ -4754,7 +4778,9 @@ void ot::stopSessionServiceHealthCheck() {
 		return;
 	}
 	g_runSessionServiceHealthCheck = false;
-	if (g_sessionServiceHealthCheckThread->joinable()) { g_sessionServiceHealthCheckThread->join(); }
+	if (g_sessionServiceHealthCheckThread->joinable()) {
+		g_sessionServiceHealthCheckThread->join();
+	}
 	delete g_sessionServiceHealthCheckThread;
 	g_sessionServiceHealthCheckThread = nullptr;
 }

@@ -17,16 +17,14 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "stdafx.h"
-
 #include "VtkDriverCartesianVectorfield.h"
 #include "DataSourceManager.h"
 #include "DataSourceManagerItem.h"
 
-#include "EntityVis2D3D.h"
-#include "EntityMeshCartesianData.h"
-#include "PlaneProperties.h"
-#include "PropertiesVis2D3D.h"
+#include "OTModelEntities/EntityVis2D3D.h"
+#include "OTModelEntities/PlaneProperties.h"
+#include "OTModelEntities/PropertiesVis2D3D.h"
+#include "OTModelEntities/EntityMeshCartesianData.h"
 
 #include <osg/StateSet>
 #include <osg/Node>

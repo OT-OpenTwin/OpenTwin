@@ -19,16 +19,16 @@
 
 #include "Transformations.h"
 
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 #include "EntityCache.h"
 #include "UpdateManager.h"
 
 #include "OTCommunication/ActionTypes.h"
-#include "EntityInformation.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
+#include "OTModelEntities/EntityInformation.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include <string>

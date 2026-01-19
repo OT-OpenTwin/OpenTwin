@@ -18,11 +18,11 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ThisService.h"
 
-#include "OTGui/Property.h"
-#include "OTGui/PropertyGroup.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyGroup.h"
 #include "OTGuiAPI/GuiAPIManager.h"
 
 #include "OTCommunication/Msg.h"				// message sending
@@ -43,15 +43,14 @@
 #include "OTServiceFoundation/FrontendLogNotifier.h"
 #include "OTServiceFoundation/InitialSelectionHelper.h"
 
-#include "DataBase.h"
-#include "Document\DocumentAccess.h"
-#include "Connection\ConnectionAPI.h"
+#include "OTDataStorage/Document/DocumentAccess.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
 
-#include "TemplateDefaultManager.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/InvalidUID.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
 
 #include "OTServiceFoundation/ExternalServicesComponent.h"
-
-#include "InvalidUID.h"
 
 // Third party header
 #include "curl/curl.h"
@@ -255,6 +254,20 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string& _serviceNa
 	std::list<std::pair<UID, UID>> prefetchIds;
 	std::string tmp;
 	return this->sendMessage(_queue, _serviceName, _doc, prefetchIds, tmp, _requestFlags);
+}
+
+bool ot::ApplicationBase::sendMessage(bool _queue, const std::string& _serviceName, const std::list<JsonDocument>& _doc, const ot::msg::RequestFlags& _requestFlags) {
+	enableMessageQueuing(_serviceName, true);
+	bool allOk = true;
+	for (const JsonDocument& doc : _doc) {
+		std::list<std::pair<UID, UID>> prefetchIds;
+		std::string tmp;
+		if (!this->sendMessage(_queue, _serviceName, doc, prefetchIds, tmp, _requestFlags)) {
+			allOk = false;
+		}
+	}
+	enableMessageQueuing(_serviceName, false);
+	return allOk;
 }
 
 bool ot::ApplicationBase::sendMessage(bool _queue, const std::list<std::string>& _serviceNames, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags) {

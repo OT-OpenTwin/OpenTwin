@@ -24,7 +24,7 @@
 #include "MongoConstants.h"
 #include "MongoURL.h"
 
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 
 #include <boost/uuid/namespaces.hpp>

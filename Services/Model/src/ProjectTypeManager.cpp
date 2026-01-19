@@ -23,9 +23,9 @@
 #include "ProjectTypeManager.h"
 
 #include "OTCommunication/ActionTypes.h"
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/FolderNames.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 {

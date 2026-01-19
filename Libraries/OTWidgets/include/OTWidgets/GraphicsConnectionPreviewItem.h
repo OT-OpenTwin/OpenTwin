@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/GraphicsConnectionCfg.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header

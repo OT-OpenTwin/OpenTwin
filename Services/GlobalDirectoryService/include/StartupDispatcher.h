@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSON.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCommunication/GDSDebugInfo.h"
 #include "OTCommunication/ServiceInitData.h"

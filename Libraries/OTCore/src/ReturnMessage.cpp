@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 std::string ot::ReturnMessage::statusToString(ot::ReturnMessage::ReturnMessageStatus _status) {
 	switch (_status)

@@ -37,6 +37,10 @@
 #include <akGui/aTtbContainer.h>
 #include <akWidgets/aTtbPage.h>
 #include <akWidgets/aTtbGroup.h>
+#include <akWidgets/aTtbSubGroup.h>
+
+// Qt header
+#include <QtWidgets/qaction.h>
 
 const QString c_icoExit = "ExitAppBlue";
 const QString c_icoDocks = "Docks";
@@ -160,11 +164,15 @@ void ToolBar::notify(
 	}
 }
 
-tt::Page* ToolBar::getStartPage(void) {
+tt::Page* ToolBar::getStartPage() {
 	auto page = uiAPI::object::get<ak::aTtbPage>(m_file.page);
 	OTAssertNullptr(page);
 	return page->getPage();
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Slots
 
 ot::UID ToolBar::addPage(ot::UID _creator, const QString & _pageName) {
 	return uiAPI::createTabToolBarSubContainer(_creator, m_owner->m_mainWindow, _pageName);
@@ -249,9 +257,74 @@ ot::UID ToolBar::addNiceLineEdit(ot::UID _creator, ot::UID _container, const QSt
 	return obj;
 }
 
-void ToolBar::addDefaultControlsToLockManager(LockManager * _lockManger, ot::LockTypes& _flags) {
-	_lockManger->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aSettings, _flags);
-	_lockManger->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aImport, _flags);
-	_lockManger->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aGroup, _flags);
-	_lockManger->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aExportLog, _flags);
+bool ToolBar::triggerToolBarButton(ot::UID _buttonId) {
+	auto btn = uiAPI::object::get<aToolButtonWidget>(_buttonId);
+	if (btn) {
+		btn->click();
+		return true;
+	}
+	else {
+		OT_LOG_E("Button with UID " + std::to_string(_buttonId) + " not found or not a tool button");
+		return false;
+	}
+}
+
+bool ToolBar::triggerToolBarButton(const QString& _buttonPath) {
+	ot::UID parentUID = ak::invalidUID;
+
+	int lastColon = _buttonPath.lastIndexOf(':');
+	if (lastColon == -1) {
+		OT_LOG_E("Invalid button path: \"" + _buttonPath.toStdString() + "\"");
+		return false;
+	}
+	QString parentPath = _buttonPath.left(lastColon);
+	
+	ak::UID parentID = ak::uiAPI::object::getUidFromObjectUniqueName(parentPath.toStdString().c_str());
+	if (parentID == ak::invalidUID) {
+		OT_LOG_E("Parent container not found for button path: \"" + _buttonPath.toStdString() + "\"");
+		return false;
+	}
+	
+	auto container = ak::uiAPI::object::get<ak::aTtbContainer>(parentID);
+	auto group = dynamic_cast<ak::aTtbGroup*>(container);
+	auto subGroup = dynamic_cast<ak::aTtbSubGroup*>(container);
+
+	QObjectList children;
+	if (group) {
+		children = group->getGroup()->children();
+	}
+	else if (subGroup) {
+		children = subGroup->getSubGroup()->children();
+	}
+	else {
+		OT_LOG_E("Parent object is not a container for button path: \"" + _buttonPath.toStdString() + "\"");
+		return false;
+	}
+
+	ak::aToolButtonWidget* btn = findButton(_buttonPath, children);
+	if (btn) {
+		btn->click();
+		return true;
+	}
+	else {
+		OT_LOG_E("Button not found for path: \"" + _buttonPath.toStdString() + "\"");
+		return false;
+	}
+}
+
+ak::aToolButtonWidget* ToolBar::findButton(const QString& _buttonPath, const QObjectList& _objects) {
+	for (QObject* child : _objects) {
+		ak::aToolButtonWidget* btn = dynamic_cast<ak::aToolButtonWidget*>(child);
+		if (btn) {
+			if (btn->uniqueName() == _buttonPath) {
+				return btn;
+			}
+		}
+		btn = findButton(_buttonPath, child->children());
+		if (btn) {
+			return btn;
+		}
+	}
+
+	return nullptr;
 }

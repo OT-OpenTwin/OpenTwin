@@ -19,7 +19,7 @@
 
 #pragma once
 #include "OTServiceFoundation/PythonServiceInterface.h"
-#include "EntityTableSelectedRanges.h"
+#include "OTModelEntities/EntityTableSelectedRanges.h"
 #include "BusinessLogicHandler.h"
 #include "BatchUpdateInformation.h"
 #include "UniqueEntityNameCreator.h"

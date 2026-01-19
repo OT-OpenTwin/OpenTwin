@@ -19,7 +19,7 @@
 
 #pragma once
 #include "MicroServiceSolver.h"
-#include "EntityBase.h"
+#include "OTModelEntities/EntityBase.h"
 
 #include "PerformanceTracker.h"
 
@@ -40,7 +40,8 @@
 #include "Simulation/FITTD3DLoop.h"
 
 #include <string>
-#include "PlotBuilder.h"
+
+#include "OTResultDataAccess/PlotBuilder.h"
 
 //! @brief Interface between service API and solver functionality. Handles creation of entities created from solver results and settings ectrected from properties of ui entities.
 class MicroServiceInterfaceFITTDSolver : public MicroServiceSolver

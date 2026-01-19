@@ -25,19 +25,19 @@
 #include "Model.h"
 #include "curl/curl.h"
 
-#include "EntityGeometry.h"
+#include "OTCADEntities/EntityGeometry.h"
 
-#include "DataBase.h"
+#include "OTModelEntities/DataBase.h"
 #include <array>
 #include <fstream>
 #include <cstdio>
 #include <chrono>
 #include <thread>
 
-#include "OTCore/LogDispatcher.h"
-#include "OTCore/ServiceBase.h"
 #include "OTCore/CoreTypes.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"

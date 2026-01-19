@@ -2,8 +2,8 @@
 # OTServiceFoundation tests
 # Reuses OTServiceFoundation_core object files and links
 # against OTSystem / OTCore / OTGui / OTGuiAPI /
-# OTCommunication / OTModelAPI / ModelEntities / DataStorage /
-# CADModelEntities / Mongo / Zlib / cURL / OpenCascade, ...
+# OTCommunication / OTModelAPI / OTModelEntities / OTDataStorage /
+# OTCADEntities / Mongo / Zlib / cURL / OpenCascade, ...
 # ============================================================
 
 # Helper functions (same as in top-level CMake)
@@ -426,9 +426,9 @@ if(WIN32)
         OTGuiAPI
         OTCommunication
         OTModelAPI
-        ModelEntities
-        DataStorage
-        CADModelEntities
+        OTModelEntities
+        OTDataStorage
+        OTCADEntities
 
         ${MONGO_CXX_LIBS_NAME}
         ${MONGO_C_LIBS_NAME}

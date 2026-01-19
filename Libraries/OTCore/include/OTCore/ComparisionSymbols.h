@@ -18,11 +18,14 @@
 // @otlicense-end
 
 #pragma once
-#include <string>
+
+// std header
 #include <list>
+#include <string>
+
 namespace ot
 {
-	struct __declspec(dllexport) ComparisionSymbols
+	struct ComparisionSymbols
 	{
 		inline static const std::string g_anyOneOfComparator = "Any of";
 		inline static const std::string g_rangeComparator = "Range";

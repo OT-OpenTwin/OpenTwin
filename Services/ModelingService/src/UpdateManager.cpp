@@ -20,16 +20,16 @@
 #include "UpdateManager.h"
 
 #include "OTCommunication/ActionTypes.h"
-#include "DataBase.h"
-#include "EntityGeometry.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTCADEntities/EntityGeometry.h"
 #include "Transformations.h"
 #include "BooleanOperations.h"
 #include "ChamferEdges.h"
 #include "BlendEdges.h"
-#include "entityCache.h"
+#include "EntityCache.h"
 #include "PrimitiveManager.h"
 
-#include "EntityAPI.h"
+#include "OTModelEntities/EntityAPI.h"
 
 #include <map>
 

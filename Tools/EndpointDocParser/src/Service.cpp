@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // Open Twin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // project header
 #include "Service.h"

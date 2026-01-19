@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 
 ot::JsonDocument ot::GraphicsActionHandler::createItemRequestedDocument(const GraphicsItemDropEvent& _eventData) {

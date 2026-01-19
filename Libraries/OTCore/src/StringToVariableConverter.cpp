@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "OTCore/StringToVariableConverter.h"
-#include "OTCore/Json.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/StringToNumericCheck.h"
 

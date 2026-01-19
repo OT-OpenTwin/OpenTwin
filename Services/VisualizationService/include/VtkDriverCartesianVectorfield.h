@@ -19,20 +19,20 @@
 
 #pragma once
 
+#include "VtkDriver.h"
+#include "vtkRectilinearGrid.h"
+#include "OTModelEntities/EntityResultBase.h"
+#include "OTModelEntities/PropertyBundleDataHandlePlane.h"
+#include "OTModelEntities/PropertyBundleDataHandleScaling.h"
+#include "OTModelEntities/PropertyBundleDataHandleVis2D3D.h"
+#include "DataSourceResult3D.h"
+
 #include <string>
 #include <ctime>
 #include <vector>
 #include <list>
 #include <vtkAlgorithmOutput.h>
 #include <vtkDataSetMapper.h>
-
-#include "vtkRectilinearGrid.h"
-#include "VtkDriver.h"
-#include "EntityResultBase.h"
-#include "PropertyBundleDataHandlePlane.h"
-#include "PropertyBundleDataHandleScaling.h"
-#include "PropertyBundleDataHandleVis2D3D.h"
-#include "DataSourceResult3D.h"
 
 namespace osg {
 	class Node;

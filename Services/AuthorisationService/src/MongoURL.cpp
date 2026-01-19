@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "MongoURL.h"
-#include "Connection/ConnectionAPI.h"
+#include "OTDataStorage/Connection/ConnectionAPI.h"
 
 std::string getMongoURL(std::string databaseURL, std::string dbUsername, std::string dbPassword)
 {

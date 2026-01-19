@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/NavigationTreeItem.h"
 
 ot::NavigationTreeItem::NavigationTreeItem() : m_flags(NoItemFlags), m_parent(nullptr) {}

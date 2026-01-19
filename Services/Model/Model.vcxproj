@@ -132,13 +132,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(OC_ROOT)\inc;$(GMSH_ROOT_INC);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\$(Configuration)\include;$(CGAL_INC);$(GMP_INC);$(BOOST_INC)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(OC_ROOT)\inc;$(GMSH_ROOT_INC);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\$(Configuration)\include;$(CGAL_INC);$(GMP_INC);$(BOOST_INC)</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;$(OC_ROOT)\win64\vc14\lib;$(GMSH_ROOT_BIN);%CURL_LIB%;$(GMP_LIB);$(BOOST_LIB)</LibraryPath>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(OC_ROOT)\inc;$(GMSH_ROOT_INC);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include;$(CGAL_INC);$(GMP_INC);$(BOOST_INC)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(OC_ROOT)\inc;$(GMSH_ROOT_INC);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include;$(CGAL_INC);$(GMP_INC);$(BOOST_INC)</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;$(OC_ROOT)\win64\vc14\lib;$(GMSH_ROOT_BIN);%CURL_LIB%;$(GMP_LIB);$(BOOST_LIB)</LibraryPath>
     <TargetExt>.lib</TargetExt>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
@@ -151,13 +151,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(OC_ROOT)\inc;$(GMSH_ROOT)\include;$(GMSH_ROOT_INC);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\$(Configuration)\include;$(CGAL_INC);$(GMP_INC);$(BOOST_INC)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(OC_ROOT)\inc;$(GMSH_ROOT)\include;$(GMSH_ROOT_INC);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\$(Configuration)\include;$(CGAL_INC);$(GMP_INC);$(BOOST_INC)</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;$(OC_ROOT)\win64\vc14\lib;$(GMSH_ROOT_BIN);%CURL_LIB%;$(GMP_LIB);$(BOOST_LIB)</LibraryPath>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(OC_ROOT)\inc;$(GMSH_ROOT)\include;$(GMSH_ROOT_INC);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include;$(CGAL_INC);$(GMP_INC);$(BOOST_INC)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(OC_ROOT)\inc;$(GMSH_ROOT)\include;$(GMSH_ROOT_INC);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include;$(CGAL_INC);$(GMP_INC);$(BOOST_INC)</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;$(OC_ROOT)\win64\vc14\lib;$(GMSH_ROOT_BIN);%CURL_LIB%;$(GMP_LIB);$(BOOST_LIB)</LibraryPath>
     <TargetExt>.lib</TargetExt>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
@@ -207,7 +207,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBD);BlockEntities.lib;ResultDataAccess.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTCADEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBD);OTBlockEntities.lib;OTResultDataAccess.lib</AdditionalDependencies>
       <AssemblyDebug>false</AssemblyDebug>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBD);$(OC_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_CLIBD);$(OT_MODELAPI_ROOT)\$(OT_LIBD)</AdditionalLibraryDirectories>
     </Link>
@@ -228,7 +228,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTCADEntities.lib</AdditionalDependencies>
       <AssemblyDebug>false</AssemblyDebug>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBD)</AdditionalLibraryDirectories>
     </Link>
@@ -291,7 +291,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBR);$(OC_LIBPATHR);$(ZLIB_LIBPATHR);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBR);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_CLIBR);$(OT_MODELAPI_ROOT)\$(OT_LIBR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBR);BlockEntities.lib;OTModelAPI.lib;ResultDataAccess.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTCADEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBR);OTBlockEntities.lib;OTModelAPI.lib;OTResultDataAccess.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -315,7 +315,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_CLIBR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTCADEntities.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -338,7 +338,6 @@
     <ClCompile Include="src\CrossCollectionDatabaseWrapper.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FileHandler.cpp" />
-    <ClCompile Include="src\GeometryOperations.cpp" />
     <ClCompile Include="src\LibraryManagementWrapper.cpp" />
     <ClCompile Include="src\MaterialHandler.cpp" />
     <ClCompile Include="src\MicroserviceAPI.cpp" />
@@ -369,7 +368,6 @@
     <ClInclude Include="include\CheckGeometry.h" />
     <ClInclude Include="include\CrossCollectionDatabaseWrapper.h" />
     <ClInclude Include="include\FileHandler.h" />
-    <ClInclude Include="include\GeometryOperations.h" />
     <ClInclude Include="include\LibraryManagementWrapper.h" />
     <ClInclude Include="include\MaterialHandler.h" />
     <ClInclude Include="include\MicroserviceAPI.h" />

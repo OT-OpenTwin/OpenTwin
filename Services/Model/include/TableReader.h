@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "EntityCallbackBase.h"
+#include "OTModelEntities/EntityCallbackBase.h"
 
 #include <string>
 #include <list>

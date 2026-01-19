@@ -27,7 +27,7 @@
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/String.h"
 #include "OTCore/DebugHelper.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
