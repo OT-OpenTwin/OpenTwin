@@ -95,6 +95,11 @@ void ProjectHelperBatchHelperCustomItem::slotRunnerFinished() {
 	}
 }
 
+ProjectHelperBatchHelperCustomItem::ProjectHelperBatchHelperCustomItem() {
+	setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
+	setCheckState(0, Qt::Unchecked);
+}
+
 void ProjectHelperBatchHelperCustomItem::tryCreate(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, const QString& _text, const QString& _rootPath, const QString& _subPath, bool _detached) {
 	QFile file(_rootPath + _subPath);
 	if (file.exists()) {

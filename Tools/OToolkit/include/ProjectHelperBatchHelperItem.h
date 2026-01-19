@@ -18,6 +18,12 @@ class ProjectHelperBatchHelperItem : public QObject, public ot::TreeWidgetItem {
 	OT_DECL_NOCOPY(ProjectHelperBatchHelperItem)
 	OT_DECL_NOMOVE(ProjectHelperBatchHelperItem)
 public:
+	enum CreateFlag : int64_t {
+		NoCreateFlags  = 0 << 0,
+		RemoveOTPrefix = 1 << 0
+	};
+	typedef ot::Flags<CreateFlag> CreateFlags;
+
 	enum class Columns : int {
 		Name,
 		Edit,
@@ -29,7 +35,7 @@ public:
 		ColumnCount
 	};
 
-	static void createFromPath(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, const QString& _path);
+	static void createFromPath(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, const QString& _path, const CreateFlags& _flags = CreateFlag::NoCreateFlags);
 
 	ProjectHelperBatchHelperItem();
 	virtual ~ProjectHelperBatchHelperItem();
@@ -53,3 +59,5 @@ private:
 	QString m_testPath;
 	QString m_cleanPath;
 };
+
+OT_ADD_FLAG_FUNCTIONS(ProjectHelperBatchHelperItem::CreateFlag, ProjectHelperBatchHelperItem::CreateFlags)

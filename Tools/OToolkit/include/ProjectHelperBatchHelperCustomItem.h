@@ -31,7 +31,7 @@ private Q_SLOTS:
 	void slotRunnerFinished();
 
 private:
-	ProjectHelperBatchHelperCustomItem() = default;
+	ProjectHelperBatchHelperCustomItem();
 	static void tryCreate(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, const QString& _text, const QString& _rootPath, const QString& _subPath, bool _detached);
 	static ProjectHelperBatchHelperCustomItem* createItem(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, const QString& _text, const QString& _rootPath, const QString& _scriptPath, bool _detached);
 	static ot::PushButton* createScriptButton(ot::TreeWidget* _tree, ProjectHelperBatchHelperCustomItem* _item, int _column, const QString& _text, const QString& _path, bool _detached);

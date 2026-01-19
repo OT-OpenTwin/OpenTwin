@@ -39,18 +39,15 @@ bool ProjectHelper::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 }
 
 void ProjectHelper::restoreToolSettings(QSettings& _settings) {
-	QString batchPth = _settings.value("ProjectHelper.BatchHelper.RootPath", "").toString();
-	if (batchPth.isEmpty()) {
-		batchPth = qgetenv("OPENTWIN_DEV_ROOT");
-	}
-	m_batchHelper->setRootPath(batchPth);
-	m_batchHelper->slotRefreshData();
+	OTAssertNullptr(m_batchHelper);
+	m_batchHelper->restoreState(_settings);
 }
 
 bool ProjectHelper::prepareToolShutdown(QSettings& _settings) {
-	_settings.setValue("ProjectHelper.BatchHelper.RootPath", m_batchHelper->getRootPath());
-
-	return otoolkit::Tool::prepareToolShutdown(_settings);
+	OTAssertNullptr(m_batchHelper);
+	bool allOk = m_batchHelper->saveState(_settings);
+	
+	return allOk && otoolkit::Tool::prepareToolShutdown(_settings);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

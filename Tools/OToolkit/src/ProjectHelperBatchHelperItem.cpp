@@ -18,7 +18,7 @@
 
 using namespace ot;
 
-void ProjectHelperBatchHelperItem::createFromPath(TreeWidget* _tree, TreeWidgetItem* _parent, const QString& _path) {
+void ProjectHelperBatchHelperItem::createFromPath(TreeWidget* _tree, TreeWidgetItem* _parent, const QString& _path, const CreateFlags& _flags) {
 	// Check if project file exists in the given path
 	QString projPath;
 	QString buildPath;
@@ -60,7 +60,14 @@ void ProjectHelperBatchHelperItem::createFromPath(TreeWidget* _tree, TreeWidgetI
 	item->m_editPath = editPath;
 	item->m_testPath = testPath;
 
-	item->setText(static_cast<int>(Columns::Name), pathParts.last());
+	QString nameTxt = pathParts.last();
+	if (_flags.has(CreateFlag::RemoveOTPrefix)) {
+		if (nameTxt.startsWith("OT", Qt::CaseSensitive)) {
+			nameTxt = nameTxt.mid(2);
+		}
+	}
+
+	item->setText(static_cast<int>(Columns::Name), nameTxt);
 	_parent->addChild(item);
 
 	item->connect(createScriptButton(_tree, item, static_cast<int>(Columns::Edit), "Edit", editPath), &PushButton::clicked, item, &ProjectHelperBatchHelperItem::slotEdit);
@@ -71,10 +78,12 @@ void ProjectHelperBatchHelperItem::createFromPath(TreeWidget* _tree, TreeWidgetI
 }
 
 ProjectHelperBatchHelperItem::ProjectHelperBatchHelperItem() {
-
+	setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
+	setCheckState(0, Qt::Unchecked);
 }
 
 ProjectHelperBatchHelperItem::~ProjectHelperBatchHelperItem() {
+
 }
 
 QString ProjectHelperBatchHelperItem::getScriptName() const {
