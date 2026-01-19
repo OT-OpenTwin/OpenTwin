@@ -208,7 +208,7 @@ ECHO ===============================================================
 CALL "%OT_UICORE_ROOT%%testBat%" %1 %2
 
 ECHO ===============================================================
-ECHO Test Library: Viewer
+ECHO Test Library: OTViewer
 ECHO ===============================================================
 CALL "%OT_VIEWER_ROOT%%testBat%" %1 %2
 

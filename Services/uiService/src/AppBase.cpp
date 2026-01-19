@@ -114,7 +114,7 @@
 #include "OTWidgets/PropertyInputStringList.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
-#include "PlotManagerView.h"
+#include "OTViewer/PlotManagerView.h"
 
 #include "OTCommunication/msg.h"
 #include "OTCommunication/ActionTypes.h"

@@ -43,7 +43,7 @@
 #include "OTModelEntities/Geometry.h"
 
 // Viewer header
-#include "ViewerAPI.h"
+#include "OTViewer/ViewerAPI.h"
 
 // uiCore header
 #include "akCore/aNotifier.h"

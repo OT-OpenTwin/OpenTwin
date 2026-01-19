@@ -1,0 +1,380 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Viewer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ViewerAPI.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ViewerObjectSelectionHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ViewManipulator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeMaterialFactory.cpp">
+      <Filter>src\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeMaterial.cpp">
+      <Filter>src\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialRough.cpp">
+      <Filter>src\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialPlastic.cpp">
+      <Filter>src\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialPolished.cpp">
+      <Filter>src\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialMetal.cpp">
+      <Filter>src\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rubberband.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WorkingPlane.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureMapManager.cpp">
+      <Filter>src\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AxisCross.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ViewerSettings.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AxisCenterCross.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LineIntersector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HandlerBase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HandleArrow.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HandlerIntersector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TransformManipulator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ManipulatorBase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HandleWheel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ClipPlaneManipulator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ViewerView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeAnnotation.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeCartesianMesh.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeCartesianMeshItem.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeContainer.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeGeometry.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeMesh.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeMeshItem.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeVTK.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeMultiVisualisation.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Visualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ViewerToolBar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FrontendAPI.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotManagerView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GlobalModel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CurveVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeBase.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FaceSelection.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RangeVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntersectionCapCalculator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsConnectionVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VisualiserHelper.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\OTViewer\PlotManagerView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\ViewerView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\Visualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\VisualiserState.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\VisualiserInfo.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\TableVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\RangeVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\PlotVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\GraphicsVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\GraphicsItemVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\GraphicsConnectionVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\CurveVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\VisualiserHelper.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeAnnotation.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeBase.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeCartesianMesh.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeCartesianMeshItem.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeContainer.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeGeometry.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeMaterial.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeMaterialFactory.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeMesh.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeMeshItem.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeMultiVisualisation.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\SceneNodeVTK.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\MaterialBase.h">
+      <Filter>include\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\MaterialMetal.h">
+      <Filter>include\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\MaterialPlastic.h">
+      <Filter>include\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\MaterialPolished.h">
+      <Filter>include\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\MaterialRough.h">
+      <Filter>include\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\TextureMapManager.h">
+      <Filter>include\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\AxisCenterCross.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\AxisCross.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\ClipPlaneManipulator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\EdgeSelection.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\FaceSelection.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\FrontendAPI.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\GlobalFontPath.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\GlobalModel.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\HandleArrow.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\HandlerBase.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\HandlerIntersector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\HandleWheel.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\IntersectionCapCalculator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\LineIntersector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\ManipulatorBase.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\Model.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\PlotManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\Rubberband.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\TransformManipulator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\ViewChangedStates.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\ViewerAPI.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\ViewerObjectSelectionHandler.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\ViewerSettings.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\ViewerToolBar.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\ViewManipulator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\WorkingPlane.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="include\OTViewer\TextVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTViewer\Viewer.h">
+      <Filter>include</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{dc781e08-fab5-4632-abda-b91ae6477943}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{3a2333c6-55c2-41ae-ae35-786e6bac71b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Materials">
+      <UniqueIdentifier>{4c4d0fdb-467b-482c-a4f5-a64a3177da0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Materials">
+      <UniqueIdentifier>{6db3ec91-1b7b-408f-b87b-08e05ae991a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\SceneNodes">
+      <UniqueIdentifier>{40dc3399-49f9-4bc7-9aa4-74b23c389a4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\WidgetView">
+      <UniqueIdentifier>{9666d20a-8653-4100-986b-670987aeeb45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\WidgetView">
+      <UniqueIdentifier>{98463fc9-d8b8-47a9-9a36-1c785d62bce7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Visualiser">
+      <UniqueIdentifier>{da4035b1-a386-45a5-bc16-89b6d14f54c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\SceneNodes">
+      <UniqueIdentifier>{09d63a78-ff4b-4b00-9891-41d3c1bd0ff5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Visualiser">
+      <UniqueIdentifier>{0daf6459-a3e0-4628-87ec-9bc1695b8382}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

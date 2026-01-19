@@ -194,7 +194,7 @@ ECHO ===============================================================
 CALL "%OT_RUBBERBAND_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: Viewer
+ECHO Build Library: OTViewer
 ECHO ===============================================================
 CALL "%OT_VIEWER_ROOT%\build.bat" %1 %2
 

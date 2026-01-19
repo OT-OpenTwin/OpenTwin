@@ -137,7 +137,7 @@ ECHO ===============================================================
 CALL "%OT_UICORE_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
-ECHO Clean Library: Viewer
+ECHO Clean Library: OTViewer
 ECHO ===============================================================
 CALL "%OT_VIEWER_ROOT%\Clean.bat" 
 

@@ -277,8 +277,8 @@
       <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%UICORE_LIB_ROOT%\x64\Debug;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug;%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%UICORE_LIB_ROOT%\x64\Debug\uiCore.lib;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug\Viewer.lib;$(Qt_LIBS_);%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug\Model.lib;%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OTDataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%UICORE_LIB_ROOT%\x64\Debug;%SIM_PLAT_ROOT%\Libraries\OTViewer\x64\Debug;%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%UICORE_LIB_ROOT%\x64\Debug\uiCore.lib;%SIM_PLAT_ROOT%\Libraries\OTViewer\x64\Debug\OTViewer.lib;$(Qt_LIBS_);%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug\Model.lib;%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OTDataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -308,8 +308,8 @@
       <PreprocessorDefinitions>NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%UICORE_LIB_ROOT%\x64\Release;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release;%SIM_PLAT_ROOT%\Libraries\Model\x64\Release;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%UICORE_LIB_ROOT%\x64\Release\uiCore.lib;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release\Viewer.lib;%SIM_PLAT_ROOT%\Libraries\Model\x64\Release\Model.lib;%CURL_LIB%\libCurl.lib;$(Qt_LIBS_);OpenTwinCommunication.lib;OTDataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%UICORE_LIB_ROOT%\x64\Release;%SIM_PLAT_ROOT%\Libraries\OTViewer\x64\Release;%SIM_PLAT_ROOT%\Libraries\Model\x64\Release;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%UICORE_LIB_ROOT%\x64\Release\uiCore.lib;%SIM_PLAT_ROOT%\Libraries\OTViewer\x64\Release\OTViewer.lib;%SIM_PLAT_ROOT%\Libraries\Model\x64\Release\Model.lib;%CURL_LIB%\libCurl.lib;$(Qt_LIBS_);OpenTwinCommunication.lib;OTDataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
