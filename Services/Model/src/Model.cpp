@@ -281,6 +281,13 @@ void Model::resetToNew()
 		circuitSolver->setCircuitFolder(entityCircuit->getName(), entityCircuit->getEntityID());
 
 		addEntityToModel(circuitSolver->getName(), circuitSolver, entityRoot, true, allNewEntities);
+
+
+		EntityContainer* entityCircuitModelRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
+		entityCircuitModelRoot->setName(ot::FolderNames::CircuitModelsFolder);
+		entityCircuitModelRoot->setDeletable(false);
+		entityCircuitModelRoot->setTreeItemSelectChildren(false);
+		addEntityToModel(entityCircuitModelRoot->getName(), entityCircuitModelRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasMaterialRoot())
