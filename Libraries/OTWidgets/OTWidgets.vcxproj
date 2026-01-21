@@ -86,6 +86,7 @@
     <ClCompile Include="src\JsonTreeWidgetModel.cpp" />
     <ClCompile Include="src\JsonTreeWidgetNode.cpp" />
     <ClCompile Include="src\ModelLibraryDialog.cpp" />
+    <ClCompile Include="src\OnOffSlider.cpp" />
     <ClCompile Include="src\Painter2DEditDialogEntry.cpp" />
     <ClCompile Include="src\Painter2DEditDialogFillEntry.cpp" />
     <ClCompile Include="src\Painter2DEditDialogGradientBase.cpp" />
@@ -313,6 +314,7 @@
     <QtMoc Include="include\OTWidgets\Painter2DEditDialogGradientBase.h" />
     <QtMoc Include="include\OTWidgets\Painter2DEditDialogEntry.h" />
     <QtMoc Include="include\OTWidgets\ModelLibraryDialog.h" />
+    <QtMoc Include="include\OTWidgets\OnOffSlider.h" />
     <ClInclude Include="include\OTWidgets\Painter2DEditDialogFillEntry.h" />
     <ClInclude Include="include\OTWidgets\Painter2DEditDialogLinearGradientEntry.h" />
     <QtMoc Include="include\OTWidgets\Painter2DEditDialogRadialGradientEntry.h" />

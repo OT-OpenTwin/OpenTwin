@@ -625,6 +625,9 @@
     <ClCompile Include="src\GraphicsDecoration.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\OnOffSlider.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1403,6 +1406,9 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\JsonTreeWidgetModel.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\OnOffSlider.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
