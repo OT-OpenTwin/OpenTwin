@@ -38,6 +38,7 @@ namespace ot {
 		virtual QWidget* getQWidget() = 0;
 		virtual const QWidget* getQWidget() const = 0;
 
+		void setOTWidgetFlag(WidgetFlag _flag, bool _enabled = true);
 		void setOTWidgetFlags(const WidgetFlags& _flags);
 		const WidgetFlags& otWidgetFlags() const { return m_widgetFlags; };
 

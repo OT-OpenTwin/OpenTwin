@@ -54,6 +54,8 @@ ot::TreeWidgetFilter::TreeWidgetFilter(QWidget* _parent, ot::TreeWidget* _tree, 
 	m_layout->addWidget(m_lineEdit->getQWidget());
 	m_layout->addWidget(m_tree->getQWidget(), 1);
 
+	setOTWidgetFlags(otWidgetFlags() | ot::ApplyFilterOnTextChange | ot::ApplyFilterOnReturn);
+
 	connect(m_lineEdit, &ot::LineEdit::returnPressed, this, &ot::TreeWidgetFilter::slotReturnPressed);
 	connect(m_lineEdit, &ot::LineEdit::textChanged, this, &ot::TreeWidgetFilter::slotTextChanged);
 }

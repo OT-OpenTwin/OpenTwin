@@ -25,13 +25,17 @@
 #include <QtWidgets/qstyle.h>
 #include <QtWidgets/qwidget.h>
 
-void ot::WidgetBase::setOTWidgetFlags(const WidgetFlags& _flags) {
-	if (m_widgetFlags == _flags) {
-		return;
-	}
+void ot::WidgetBase::setOTWidgetFlag(WidgetFlag _flag, bool _enabled) {
+	WidgetFlags newFlags = m_widgetFlags;
+	newFlags.set(_flag, _enabled);
+	setOTWidgetFlags(newFlags);
+}
 
-	m_widgetFlags = _flags;
-	this->otWidgetFlagsChanged(m_widgetFlags);
+void ot::WidgetBase::setOTWidgetFlags(const WidgetFlags& _flags) {
+	if (m_widgetFlags != _flags) {
+		m_widgetFlags = _flags;
+		this->otWidgetFlagsChanged(m_widgetFlags);
+	}
 }
 
 void ot::WidgetBase::setSuccessForeground(bool _enabled) {
