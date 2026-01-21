@@ -22,9 +22,50 @@
 
 // Qt header
 #include <QtWidgets/qtooltip.h>
+#include <QtGui/qfontmetrics.h>
 
 void ot::ToolTipHandler::showToolTip(const QPoint& _pos, const QString& _text, int _timeout) {
 	ToolTipHandler::instance().showToolTipImpl(_pos, _text, _timeout);
+}
+
+void ot::ToolTipHandler::showToolTip(const QWidget* _widget, const QString& _text, Alignment _alignment, int _timeout) {	
+	OTAssertNullptr(_widget);
+
+	QPoint globalPos;
+	switch (_alignment) {
+	case Alignment::TopLeft:
+		globalPos = _widget->mapToGlobal(QPoint(0, 0));
+		break;
+	case Alignment::TopRight:
+		globalPos = _widget->mapToGlobal(QPoint(_widget->width(), 0));
+		break;
+	case Alignment::BottomLeft:
+		globalPos = _widget->mapToGlobal(QPoint(0, _widget->height()));
+		break;
+	case Alignment::BottomRight:
+		globalPos = _widget->mapToGlobal(QPoint(_widget->width(), _widget->height()));
+		break;
+	case Alignment::Center:
+		globalPos = _widget->mapToGlobal(QPoint(_widget->width() / 2, _widget->height() / 2));
+		break;
+	case Alignment::Top:
+		globalPos = _widget->mapToGlobal(QPoint(_widget->width() / 2, 0));
+		break;
+	case Alignment::Bottom:
+		globalPos = _widget->mapToGlobal(QPoint(_widget->width() / 2, _widget->height()));
+		break;
+	case Alignment::Left:
+		globalPos = _widget->mapToGlobal(QPoint(0, _widget->height() / 2));
+		break;
+	case Alignment::Right:
+		globalPos = _widget->mapToGlobal(QPoint(_widget->width(), _widget->height() / 2));
+		break;
+	default:
+		globalPos = _widget->mapToGlobal(QPoint(0, 0));
+		break;
+	}
+
+	ToolTipHandler::instance().showToolTipImpl(globalPos, _text, _timeout);
 }
 
 void ot::ToolTipHandler::hideToolTip(void) {

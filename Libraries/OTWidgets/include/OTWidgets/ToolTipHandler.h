@@ -35,6 +35,12 @@ namespace ot {
 		OT_DECL_NOCOPY(ToolTipHandler)
 	public:
 		static void showToolTip(const QPoint& _pos, const QString& _text, int _timeout = 0);
+		//! @brief Shows a tooltip for around specified widget at the specified alignment position.
+		//! @param _widget Widget to show the tooltip for.
+		//! @param _text Text to show in the tooltip.
+		//! @param _alignment Alignment position relative to the widget where the tooltip should be shown.
+		//! @param _timeout Timeout in milliseconds after which the tooltip will be automatically hidden. If 0 is specified, the tooltip will remain visible until manually hidden.
+		static void showToolTip(const QWidget* _widget, const QString& _text, Alignment _alignment = Alignment::BottomLeft, int _timeout = 0);
 
 		static void hideToolTip(void);
 
