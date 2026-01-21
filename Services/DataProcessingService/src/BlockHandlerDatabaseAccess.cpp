@@ -86,6 +86,9 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	SolverReport::instance().addToContent("Query limit: " + std::to_string( m_documentLimit )+ "\n");
 	SolverReport::instance().addToContent("Sorting by _id: " + std::to_string(m_sortByID) + "\n");
 
+	//For complex values {value : { $elemMatch:{"1" : 0}}}
+	//{value : { $elemMatch:{"0":{$gt : 0}}}
+
 	if (m_sortByID)
 	{
 		options.sort(m_sort);
