@@ -21,6 +21,7 @@ IF "%DEVENV_ROOT_2022%" == "" (
 
 REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Launcher\OpenTwin_set_up_services.bat"
 
 REM Ensure that the script finished successfully
 IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
