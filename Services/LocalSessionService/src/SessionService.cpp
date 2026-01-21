@@ -925,18 +925,20 @@ void SessionService::handleServiceClosing(ot::JsonDocument& _commandDoc) {
 }
 
 ot::ReturnMessage SessionService::handleShutdownSession(ot::JsonDocument& _commandDoc) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
-	
-	Session& session = this->getSession(sessionID);
-	session.prepareSessionForShutdown(serviceID, m_debugPortManager);
+
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+
+		Session& session = this->getSession(sessionID);
+		session.prepareSessionForShutdown(serviceID, m_debugPortManager);
+
+		m_shutdownQueue.push_back(std::make_pair(sessionID, false));
+		this->startWorkerThreads();
+	}
 
 	m_gds.notifySessionShuttingDown(sessionID);
-
-	m_shutdownQueue.push_back(std::make_pair(sessionID, false));
-	this->startWorkerThreads();
 
 	return ot::ReturnMessage::Ok;
 }
