@@ -73,6 +73,9 @@
     <ClCompile Include="src\QuickLogExport.cpp" />
     <ClCompile Include="src\Randomizer.cpp" />
     <ClCompile Include="src\ScriptRunner.cpp" />
+    <ClCompile Include="src\SDSLSSEntry.cpp" />
+    <ClCompile Include="src\SDSServiceEntry.cpp" />
+    <ClCompile Include="src\ServiceDebugSwitch.cpp" />
     <ClCompile Include="src\SettingsManager.cpp" />
     <ClCompile Include="src\StatusManager.cpp" />
     <ClCompile Include="src\SVGBrowser.cpp" />
@@ -129,6 +132,9 @@
     <QtMoc Include="include\ProjectHelperBatchHelperItem.h" />
     <QtMoc Include="include\ScriptRunner.h" />
     <QtMoc Include="include\ProjectHelperBatchHelperCustomItem.h" />
+    <QtMoc Include="include\ServiceDebugSwitch.h" />
+    <QtMoc Include="include\SDSLSSEntry.h" />
+    <QtMoc Include="include\SDSServiceEntry.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

@@ -72,6 +72,12 @@
     <Filter Include="Source Files\ProjectHelper">
       <UniqueIdentifier>{46996ac8-36b9-440d-9fa4-933a82492b7a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ServiceDebugSwitch">
+      <UniqueIdentifier>{31dee924-a5f4-456c-a9ed-fddcf2119bb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ServiceDebugSwitch">
+      <UniqueIdentifier>{8f98b78d-fc0d-4e78-8e20-c34a1471b696}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppBase.cpp">
@@ -272,6 +278,15 @@
     <ClCompile Include="src\ProjectHelperBatchHelperCustomItem.cpp">
       <Filter>Source Files\ProjectHelper</Filter>
     </ClCompile>
+    <ClCompile Include="src\ServiceDebugSwitch.cpp">
+      <Filter>Source Files\ServiceDebugSwitch</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SDSLSSEntry.cpp">
+      <Filter>Source Files\ServiceDebugSwitch</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SDSServiceEntry.cpp">
+      <Filter>Source Files\ServiceDebugSwitch</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -470,6 +485,15 @@
     </QtMoc>
     <QtMoc Include="include\ProjectHelperBatchHelperCustomItem.h">
       <Filter>Header Files\ProjectHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ServiceDebugSwitch.h">
+      <Filter>Header Files\ServiceDebugSwitch</Filter>
+    </QtMoc>
+    <QtMoc Include="include\SDSLSSEntry.h">
+      <Filter>Header Files\ServiceDebugSwitch</Filter>
+    </QtMoc>
+    <QtMoc Include="include\SDSServiceEntry.h">
+      <Filter>Header Files\ServiceDebugSwitch</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

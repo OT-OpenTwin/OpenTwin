@@ -38,6 +38,7 @@
 #include "SettingsManager.h"
 #include "DiagramGenerator.h"
 #include "ColorStyleEditor.h"
+#include "ServiceDebugSwitch.h"
 #include "GraphicsItemDesigner.h"
 #include "ExternalLibraryManager.h"
 
@@ -425,6 +426,7 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(new NetworkTools);
 	m_toolManager->addTool(new ProjectHelper);
 	m_toolManager->addTool(new Randomizer);
+	m_toolManager->addTool(new ServiceDebugSwitch);
 	m_toolManager->addTool(new SVGBrowser);
 	m_toolManager->addTool(new Terminal);
 	m_toolManager->addTool(new TypeHelper);
