@@ -164,13 +164,12 @@ void FDTDConfig::setExcitationProperties() {
 
 void FDTDConfig::FDTDpropertyChecking() {
 	if (m_freqStart >= m_freqStop) {
-		OT_LOG_WA("[FDTDConfig] [Frequency] Start Frequency is greater than or equal to End Frequency. Adjusting End Frequency.");
-		m_freqStart = m_freqStop * 0.1; // default 10% higher than start frequency
+		throw std::runtime_error("[FDTDConfig] [Frequency] Start Frequency is greater than or equal to End Frequency.");
 	}
 
 	if (m_timeSteps == 0) {
 		OT_LOG_WA("[FDTDConfig] [Timesteps] Number of timesteps is set to zero. Adjusting to default value of 1000.");
-		m_timeSteps = 1000; // default to 1000 timesteps
+		m_timeSteps = 1000;
 	}
 
 	if (m_excitationString == "Gauss Excitation") {
