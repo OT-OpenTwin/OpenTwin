@@ -265,9 +265,6 @@
     <ClInclude Include="include\ProjectOverviewDelegate.h">
       <Filter>Header Files\ProjectOverview</Filter>
     </ClInclude>
-    <ClInclude Include="include\ProjectOverviewTree.h">
-      <Filter>Header Files\ProjectOverview</Filter>
-    </ClInclude>
     <ClInclude Include="$(BASE64_ROOT)\base64.h">
       <Filter>Third Party files</Filter>
     </ClInclude>
@@ -356,6 +353,9 @@
     </QtMoc>
     <QtMoc Include="include\ToolBar.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectOverviewTree.h">
+      <Filter>Header Files\ProjectOverview</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

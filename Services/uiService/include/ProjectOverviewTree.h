@@ -25,6 +25,7 @@
 namespace ot {
 	
 	class ProjectOverviewTree : public TreeWidget {
+		Q_OBJECT
 		OT_DECL_NOCOPY(ProjectOverviewTree)
 		OT_DECL_NOMOVE(ProjectOverviewTree)
 		OT_DECL_NODEFAULT(ProjectOverviewTree)

@@ -1741,6 +1741,15 @@ QAbstractView:selected {
 
 /* ##################################################################################### */
 
+/* ProjectOverviewTree */
+
+ot--ProjectOverviewTree::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+/* ##################################################################################### */
+
 /* QTreeView */
 
 QTreeView:branch:hover {
