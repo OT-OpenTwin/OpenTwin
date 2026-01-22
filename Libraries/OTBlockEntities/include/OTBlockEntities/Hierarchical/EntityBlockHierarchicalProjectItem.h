@@ -41,8 +41,6 @@ public:
 
 	virtual void createProperties() override;
 
-	virtual void addVisualizationNodes() override;
-
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Data accessors
@@ -70,6 +68,7 @@ public:
 	std::string getCustomVersion() const;
 
 protected:
+	virtual void createNavigationTreeEntry() override;
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
 

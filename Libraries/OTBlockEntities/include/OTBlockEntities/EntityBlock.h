@@ -78,7 +78,7 @@ public:
 
 	//! @brief Creates a block item in the graphics scene.
 	//! @note This method requires the observer and model state to be set.
-	void createBlockItem();
+	virtual void createBlockItem();
 
 	//! @brief Creates a block request document.
 	//! @note This method requires the observer and model state to be set.
@@ -91,6 +91,7 @@ public:
 	ot::JsonDocument createGraphicsRequestDocument(const ot::Point2DD& _position);
 
 protected:
+
 	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
@@ -102,7 +103,7 @@ protected:
 	ot::Connector getConnectorByName(const std::string& _connectorName) const;
 	size_t getConnectorCount() const { return m_connectorsByName.size(); }
 
-	void createNavigationTreeEntry();
+	virtual void createNavigationTreeEntry();
 	void addConnectors(ot::GraphicsFlowItemBuilder& _flowBlockBuilder) const;
 
 	void setBlockTitle(const std::string& title) { m_blockTitle = title; setModified(); };

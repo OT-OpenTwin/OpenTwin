@@ -82,32 +82,7 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 		newEntities.addTopologyEntity(container);
 	}
 
-	const std::string newEntityName = c_projectsFolder + "/" + _projectInfo.getProjectName();
-
-	// Check if project already exists
-	std::list<std::string> existingProjects = ot::ModelServiceAPI::getListOfFolderItems(c_projectsFolder);
-	bool hasProject = false;
-	for (const std::string& childName : existingProjects) {
-		if (childName == newEntityName) {
-			hasProject = true;
-			break;
-		}
-	}
-
-	if (hasProject) {
-		if (ot::LogDispatcher::mayLog(ot::WARNING_LOG)) {
-			OT_LOG_W("Child project \"" + _projectInfo.getProjectName() + "\" was already added. Remove existing child project item before adding it again.");
-		}
-		else if (Application::instance().isUiConnected()) {
-			Application::instance().getUiComponent()->displayStyledMessage(ot::StyledTextBuilder()
-				<< "[" << ot::StyledText::Warning << "WARNING" << ot::StyledText::ClearStyle
-				<< "] Child project \"" << _projectInfo.getProjectName() << "\" was already added. Remove existing child project item before adding it again."
-			);
-		}
-
-		return;
-	}
-
+	const std::string newEntityName = CreateNewUniqueTopologyName(c_projectsFolder, _projectInfo.getProjectName());
 	const std::string serviceName = Application::instance().getServiceName();
 
 	// Create coordinates

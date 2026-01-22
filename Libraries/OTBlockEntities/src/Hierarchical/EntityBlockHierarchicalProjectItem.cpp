@@ -52,7 +52,7 @@ ot::GraphicsItemCfg* EntityBlockHierarchicalProjectItem::createBlockCfg() {
 	
 	// Mandatory settings
 	builder.setName(this->getName());
-	builder.setTitle(this->createBlockHeadline());
+	builder.setTitle(project.getProjectName());
 	builder.setProjectType(project.getProjectType());
 	builder.setLeftTitleCornerImagePath("ProjectTemplates/" + project.getProjectType());
 	builder.setTitleBackgroundGradientColor(ot::Blue);
@@ -97,20 +97,6 @@ void EntityBlockHierarchicalProjectItem::createProperties() {
 	prop = EntityPropertiesString::createProperty("Project", "Custom version", "1", "", getProperties());
 	prop->setToolTip("Specify a custom version to be used when opening the project.");
 	prop->setVisible(false);
-}
-
-void EntityBlockHierarchicalProjectItem::addVisualizationNodes() {
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-
-	ot::EntityTreeItem treeItem = this->getTreeItem();
-	treeItem.setVisibleIcon("ProjectTemplates/" + this->getProjectInformation().getProjectType());
-	treeItem.setHiddenIcon("ProjectTemplates/" + this->getProjectInformation().getProjectType());
-
-	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(treeItem, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
-
-	getObserver()->sendMessageToViewer(doc);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -177,6 +163,21 @@ void EntityBlockHierarchicalProjectItem::setCustomVersion(const std::string& _ve
 
 std::string EntityBlockHierarchicalProjectItem::getCustomVersion() const {
 	return PropertyHelper::getStringPropertyValue(this, "Custom version");
+}
+
+void EntityBlockHierarchicalProjectItem::createNavigationTreeEntry()
+{
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::EntityTreeItem treeItem = this->getTreeItem();
+	treeItem.setVisibleIcon("ProjectTemplates/" + this->getProjectInformation().getProjectType());
+	treeItem.setHiddenIcon("ProjectTemplates/" + this->getProjectInformation().getProjectType());
+
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(treeItem, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+
+	getObserver()->sendMessageToViewer(doc);
 }
 
 void EntityBlockHierarchicalProjectItem::addStorageData(bsoncxx::builder::basic::document& _storage) {
