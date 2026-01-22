@@ -58,15 +58,14 @@ ot::ProjectOverviewWidget::ViewMode ot::ProjectOverviewWidget::viewModeFromStrin
 }
 
 ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
-	: QWidget(_parent), m_resultsExceeded(false), m_isLoading(false), m_viewMode(ViewMode::Tree),
+	: QSplitter(Qt::Horizontal, _parent), m_resultsExceeded(false), m_isLoading(false), m_viewMode(ViewMode::Tree),
 	m_lastSortColumn(ProjectOverviewHeader::ColumnIndex::LastAccessed), m_sortOrder(Qt::DescendingOrder)
 {
 	// Create widgets
-	QHBoxLayout* mainLayout = new QHBoxLayout(this);
-	mainLayout->setContentsMargins(0, 0, 0, 0);
-
-	QVBoxLayout* leftLayout = new QVBoxLayout;
-	mainLayout->addLayout(leftLayout, 1);
+	QWidget* leftWidget = new QWidget(this);
+	QVBoxLayout* leftLayout = new QVBoxLayout(leftWidget);
+	addWidget(leftWidget);
+	setStretchFactor(0, 1);
 
 	QHBoxLayout* filterLayout = new QHBoxLayout;
 	leftLayout->addLayout(filterLayout);
@@ -101,7 +100,8 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	leftLayout->addWidget(m_countLabel);
 
 	m_previewBox = new ProjectOverviewPreviewBox(this);
-	mainLayout->addWidget(m_previewBox);
+	addWidget(m_previewBox);
+	setStretchFactor(1, 0);
 
 	m_basicFilterTimer.setSingleShot(true);
 	m_basicFilterTimer.setInterval(500);

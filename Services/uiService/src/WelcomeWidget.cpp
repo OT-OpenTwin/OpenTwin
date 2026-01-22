@@ -58,7 +58,7 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager, Q
 
 	m_overview = new ot::ProjectOverviewWidget(m_widget);
 	m_overview->setMultiSelectionEnabled(true);
-	centralLayout->addWidget(m_overview->getQWidget());
+	centralLayout->addWidget(m_overview->getQWidget(), 1);
 	this->connect(m_overview, &ot::ProjectOverviewWidget::selectionChanged, this, &WelcomeWidget::slotSelectionChanged);
 	this->connect(m_overview, &ot::ProjectOverviewWidget::projectOpenRequested, this, &WelcomeWidget::slotOpenProject);
 	this->connect(m_overview, &ot::ProjectOverviewWidget::filterReturnPressed, this, &WelcomeWidget::slotCreateProject);

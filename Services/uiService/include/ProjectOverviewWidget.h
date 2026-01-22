@@ -29,7 +29,7 @@
 // Qt header
 #include <QtCore/qtimer.h>
 #include <QtCore/qobject.h>
-#include <QtWidgets/qwidget.h>
+#include <QtWidgets/qsplitter.h>
 
 // std header
 #include <map>
@@ -48,7 +48,7 @@ namespace ot {
 	class ProjectOverviewHeader;
 	class ProjectOverviewPreviewBox;
 
-	class ProjectOverviewWidget : public QWidget, public WidgetBase {
+	class ProjectOverviewWidget : public QSplitter, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ProjectOverviewWidget)
 		OT_DECL_NOMOVE(ProjectOverviewWidget)

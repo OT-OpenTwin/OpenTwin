@@ -39,6 +39,7 @@ ot::ProjectOverviewPreviewBox::ProjectOverviewPreviewBox(QWidget* _parent)
 	m_imageWidget = new ot::ImagePainterWidget(this);
 	m_imageWidget->setFixedSize(previewImageSize());
 	m_imageWidget->setInteractive(false);
+	m_imageWidget->setHidden(true);
 	mainLayout->addWidget(m_imageWidget, 0, Qt::AlignCenter);
 
 	QGridLayout* infoLayout = new QGridLayout;
@@ -75,65 +76,24 @@ ot::ProjectOverviewPreviewBox::ProjectOverviewPreviewBox(QWidget* _parent)
 
 	mainLayout->addWidget(new ot::Label("Description:", this));
 	m_description = new ot::TextEdit(this);
+	m_description->setObjectName("OT_ProjectOverviewDescriptionEdit");
 	m_description->setReadOnly(true);
 	mainLayout->addWidget(m_description, 1);
 
-	// Create animation
-	QPropertyAnimation* animation = new QPropertyAnimation(this, "maximumWidth");
-	animation->setDuration(300);
-	animation->setStartValue(0);
-	animation->setEndValue(c_expandedWidth);
-	animation->setEasingCurve(QEasingCurve::InOutCubic);
-	m_animation.addAnimation(animation);
-
-	animation = new QPropertyAnimation(this, "minimumWidth");
-	animation->setDuration(300);
-	animation->setStartValue(0);
-	animation->setEndValue(c_expandedWidth);
-	animation->setEasingCurve(QEasingCurve::InOutCubic);
-	m_animation.addAnimation(animation);
-
-	m_animation.setDirection(QAbstractAnimation::Forward);
-	m_animation.setCurrentTime(0);
-	connect(&m_animation, &QParallelAnimationGroup::finished, this, &ProjectOverviewPreviewBox::slotAnimationFinished);
-
-	m_expandTimer.setSingleShot(true);
-	m_expandTimer.setInterval(150);
-	connect(&m_expandTimer, &QTimer::timeout, this, &ProjectOverviewPreviewBox::slotDelayedExpand);
-
-	m_collapseTimer.setSingleShot(true);
-	m_collapseTimer.setInterval(500);
-	connect(&m_collapseTimer, &QTimer::timeout, this, &ProjectOverviewPreviewBox::slotDelayedCollapse);
-
 	// Start collapsed
-	setMinimumWidth(0);
-	setMaximumWidth(0);
+	setMinimumWidth(300);
 }
 
 ot::ProjectOverviewPreviewBox::~ProjectOverviewPreviewBox() {
-	m_collapseTimer.stop();
-	m_expandTimer.stop();
-	m_animation.stop();
+
 }
 
-void ot::ProjectOverviewPreviewBox::unsetProject(bool _instantCollapse) {
-	setEnabled(false);
-
-	m_expandTimer.stop();
-
-	if (_instantCollapse) {
-		slotDelayedCollapse();
-	}
-	else {
-		m_collapseTimer.stop();
-		m_collapseTimer.start();
-	}
+void ot::ProjectOverviewPreviewBox::unsetProject() {
+	ExtendedProjectInformation emptyInfo;
+	setProject(emptyInfo);
 }
 
 void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation& _projectInfo) {
-	m_collapseTimer.stop();
-	m_expandTimer.stop();
-
 	// Set image if available
 	if (!_projectInfo.getImageData().empty()) {
 		ImagePainter* painter = ImagePainterManager::createFromRawData(_projectInfo.getImageData(), _projectInfo.getImageFormat());
@@ -194,40 +154,4 @@ void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation&
 		userGroupsString += group;
 	}
 	m_userGroups->setText(QString::fromStdString(userGroupsString));
-
-	// Expand
-	m_expandTimer.start();
-}
-
-void ot::ProjectOverviewPreviewBox::slotDelayedCollapse() {
-	runAnimation(QAbstractAnimation::Backward);
-}
-
-void ot::ProjectOverviewPreviewBox::slotDelayedExpand() {
-	runAnimation(QAbstractAnimation::Forward);
-}
-
-void ot::ProjectOverviewPreviewBox::slotAnimationFinished() {
-	if (m_animation.direction() == QAbstractAnimation::Forward) {
-		setEnabled(true);
-	}
-}
-
-void ot::ProjectOverviewPreviewBox::runAnimation(QAbstractAnimation::Direction _direction) {
-	if (m_animation.state() == QAbstractAnimation::Running) {
-		if (m_animation.direction() != _direction) {
-			// Animation is running but in the wrong direction
-			m_animation.setDirection(_direction);
-			m_animation.setCurrentTime(m_animation.totalDuration() - m_animation.currentTime());
-		}
-	}
-	else {
-		if ((minimumWidth() != c_expandedWidth ||_direction != QAbstractAnimation::Forward) &&
-			(minimumWidth() != 0 || _direction != QAbstractAnimation::Backward))
-		{
-			// Animation is not running and we are not already in the target state
-			m_animation.setDirection(_direction);
-			m_animation.start();
-		}
-	}
 }
