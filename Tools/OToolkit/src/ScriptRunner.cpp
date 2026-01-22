@@ -94,10 +94,9 @@ void ScriptRunner::slotStdOut() {
 	QString msg = QString::fromUtf8(m_process->readAllStandardOutput());
 	Q_EMIT stdOut(msg);
 	if (m_defaultHandling) {
-		while (msg.endsWith('\n') || msg.endsWith('\r')) {
-			msg.chop(1);
+		for (const QString& line : tidyLog(msg)) {
+			SCRIPT_LOG("[" + m_name + "] " + line);
 		}
-		SCRIPT_LOG("[" + m_name + "] " + msg);
 	}	 
 }
 
@@ -105,10 +104,9 @@ void ScriptRunner::slotStdErr() {
 	QString msg = QString::fromUtf8(m_process->readAllStandardError());
 	Q_EMIT stdErr(msg);
 	if (m_defaultHandling) {
-		while (msg.endsWith('\n') || msg.endsWith('\r')) {
-			msg.chop(1);
+		for (const QString& line : tidyLog(msg)) {
+			SCRIPT_LOGE("[" + m_name + "] " + line);
 		}
-		SCRIPT_LOGE("[" + m_name + "] " + msg);
 	}
 }
 
@@ -118,4 +116,22 @@ void ScriptRunner::slotFinished(int _exitCode, QProcess::ExitStatus _status) {
 		SCRIPT_LOG("[" + m_name + "] Script finished with exit code " + QString::number(_exitCode) + ".");
 		this->deleteLater();
 	}
+}
+
+QStringList ScriptRunner::tidyLog(const QString& _msg)
+{
+	QStringList result;
+	QString trimmedMsg = _msg.trimmed();
+	trimmedMsg.replace("\r\n", "\n");
+	for (QString line : trimmedMsg.split('\n')) {
+		while (line.startsWith('\n') || line.startsWith('\r')) {
+			line = line.mid(1);
+		}
+		while (line.endsWith('\n') || line.endsWith('\r')) {
+			line.chop(1);
+		}
+		result.append(line);
+	}
+
+	return result;
 }

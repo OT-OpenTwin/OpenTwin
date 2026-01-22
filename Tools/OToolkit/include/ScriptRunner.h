@@ -28,6 +28,8 @@ private Q_SLOTS:
     void slotFinished(int _exitCode, QProcess::ExitStatus _status);
 
 private:
+	QStringList tidyLog(const QString& _msg);
+	
 	QProcess* m_process = nullptr;
 	QString m_name;
 	bool m_defaultHandling = true;
