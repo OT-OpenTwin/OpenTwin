@@ -181,7 +181,7 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 	ot::JsonDocument documentBase;
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setAsActiveView(true);
-	visualisationCfg.setOverrideViewerContent(true);
+	visualisationCfg.setOverrideViewerContent(includeData);
 	ot::JsonObject visualisationCfgJson;
 	visualisationCfg.addToJsonObject(visualisationCfgJson, documentBase.GetAllocator());
 	documentBase.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, documentBase.GetAllocator());
