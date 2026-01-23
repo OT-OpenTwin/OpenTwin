@@ -20,6 +20,8 @@
 // OpenTwin header
 #include "OTCommunication/ActionTypes.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
+#include "OTModelEntities/EntityContainer.h"
+#include "OTCore/FolderNames.h"
 
 EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) 
 	:EntityBlock(ID, parent, obs, ms)
@@ -31,7 +33,8 @@ void EntityBlockCircuitElement::createProperties()
 {
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
-	EntityPropertiesSelection::createProperty("Model-Properties", "ModelSelection", { "LoadFromLibrary",""}, "", "default", getProperties());
+	/*EntityPropertiesSelection::createProperty("Model-Properties", "ModelSelection", { "LoadFromLibrary",""}, "", "default", getProperties());*/
+	EntityPropertiesExtendedEntityList::createProperty("Model-Properties", "ModelSelection", ot::FolderNames::CircuitModelsFolder + "/" + getFolderName(), ot::invalidUID, "", -1, {"LoadFromLibrary"},{""}, "default", getProperties());
 }
 
 bool EntityBlockCircuitElement::updateFromProperties(void) {
@@ -44,16 +47,16 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 
 	// Check if LoadFromLibrary was selected
 	auto basePropertyModel = getProperties().getProperty("ModelSelection");
-	auto modelProperty = dynamic_cast<EntityPropertiesSelection*>(basePropertyModel);
+	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
 	if (modelProperty == nullptr) {
 		OT_LOG_E("Model selection property cast failed");
 		return false;
 	}
 	
-	if (modelProperty->getValue() == "LoadFromLibrary") {
+	if (modelProperty->getValueName() == "LoadFromLibrary") {
 
 		// if it was selected use observer to send message to LMS
-		getObserver()->requestConfigForModelDialog(this->getEntityID(),this->getCollectionType(), this->getCircuitModelFolder() + this->getFolderName(), this->getFolderName());
+		getObserver()->requestConfigForModelDialog(this->getEntityID(),this->getCollectionType(), this->getCircuitModelFolder() + "/" + this->getFolderName(), this->getFolderName());
 	}
 
 	return true;
@@ -68,10 +71,38 @@ EntityNamingBehavior EntityBlockCircuitElement::getNamingBehavior() const {
 
 std::string EntityBlockCircuitElement::getCircuitModel() {
 	auto propertyBase = getProperties().getProperty("ModelSelection");
-	auto propertyCircuitModel = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	auto propertyCircuitModel = dynamic_cast<EntityPropertiesExtendedEntityList*>(propertyBase);
 	assert(propertyBase != nullptr);
-	std::string value = propertyCircuitModel->getValue();
+	std::string value = propertyCircuitModel->getValueName();
 	return value;
+}
+
+void EntityBlockCircuitElement::setCircuitModelFolder(ot::UID _folderID) {
+	auto basePropertyModel = getProperties().getProperty("ModelSelection");
+	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
+	if (modelProperty == nullptr) {
+		OT_LOG_E("Model selection property cast failed");
+		return;
+	}
+
+	modelProperty->setEntityContainerID(_folderID);
+}
+
+const ot::UID EntityBlockCircuitElement::getCircuitModelFolderID() {
+	EntityBase* entBase = getEntityFromName(this->getCircuitModelFolder());
+	
+	if (!entBase) {
+		OT_LOG_E("Could not find Circuit Model folder id: " + getCircuitModelFolder());
+		return ot::invalidUID;
+	}
+
+	EntityContainer* entContainer = dynamic_cast<EntityContainer*>(entBase);
+	if (!entContainer) {
+		OT_LOG_E("Dynamic cast to EntityContainer failed for folder: " + getCircuitModelFolder());
+		return ot::invalidUID;
+	}
+
+	return entContainer->getEntityID();
 }
 
 void EntityBlockCircuitElement::addStorageData(bsoncxx::builder::basic::document& storage)

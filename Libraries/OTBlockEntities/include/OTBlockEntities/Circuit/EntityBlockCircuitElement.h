@@ -35,10 +35,12 @@ public:
 	virtual std::string getCircuitModel();
 	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine; };
 	virtual std::string getBlockFolderName() const override { return ""; };
+	virtual void setCircuitModelFolder(ot::UID _folderID);
 
 protected:
 	virtual const std::string getCollectionType() { return "CircuitModels"; }
-	virtual const std::string getCircuitModelFolder() { return "Circuit Models/"; }
+	virtual const std::string getCircuitModelFolder() { return "Circuit Models"; }
+	virtual const ot::UID getCircuitModelFolderID();
 
 private:
 	void addStorageData(bsoncxx::builder::basic::document& storage) override;
