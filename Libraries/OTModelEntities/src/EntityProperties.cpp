@@ -228,6 +228,7 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 			if (p->getSpecialType() == "EntityList") newSetting = new EntityPropertiesEntityList;
 			else if (p->getSpecialType() == "ProjectList") newSetting = new EntityPropertiesProjectList;
 			else if (p->getSpecialType().empty()) newSetting = new EntityPropertiesSelection;
+			else if (p->getSpecialType() == "ExtendedEntityList") newSetting = new EntityPropertiesExtendedEntityList;
 			else {
 				OT_LOG_E("Unknown string list property special type \"" + p->getSpecialType() + "\"");
 				return;
@@ -309,6 +310,8 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 			else if (type == EntityPropertiesEntityList::typeString()) newSetting = new EntityPropertiesEntityList;
 			else if (type == EntityPropertiesProjectList::typeString()) newSetting = new EntityPropertiesProjectList;
 			else if (type == EntityPropertiesGuiPainter::typeString()) newSetting = new EntityPropertiesGuiPainter;
+			else if (type == EntityPropertiesExtendedEntityList::typeString()) newSetting = new EntityPropertiesExtendedEntityList;
+
 			else
 			{
 				OT_LOG_EAS("Unknown property type \"" + type + "\"");
@@ -402,7 +405,8 @@ void EntityProperties::readFromProperties(const EntityProperties &other, EntityB
 			// Check for compatible types
 			bool isCompatible =
 				modified->getType() == EntityPropertiesBase::SELECTION &&
-				(current->getType() == EntityPropertiesBase::ENTITYLIST || current->getType() == EntityPropertiesBase::PROJECTLIST)
+				(current->getType() == EntityPropertiesBase::ENTITYLIST || current->getType() == EntityPropertiesBase::PROJECTLIST
+				|| current->getType() == EntityPropertiesBase::EXTENDEDENTITYLIST)
 				|| modified->getType() == current->getType();
 			assert(isCompatible);
 
