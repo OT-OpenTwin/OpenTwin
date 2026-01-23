@@ -187,12 +187,12 @@ std::string LibraryManagementWrapper::requestCreateConfig(const ot::JsonDocument
 }
 
 void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelInfo, const std::string& _folder, const std::string& _elementType, const std::string& _modelName) {
-	Model* model = Application::instance()->getModel();
-	assert(model != nullptr);
+	Model* modelPtr = Application::instance()->getModel();
+	assert(modelPtr != nullptr);
 
-	// Check if model alreaedy imported
+	// Check if model already imported
 
-	std::list<std::string> folderEntities = model->getListOfFolderItems(_folder, true);
+	std::list<std::string> folderEntities = modelPtr->getListOfFolderItems(_folder, true);
 	for (const std::string& model : folderEntities) {
 		if (model == _folder + "/" + _modelName) {
 			return;
@@ -206,9 +206,8 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 	std::string modelType = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_ModelType);
 	
 
-
-	ot::UID entIDData = model->createEntityUID();
-	ot::UID entIDTopo = model->createEntityUID();
+	ot::UID entIDData = modelPtr->createEntityUID();
+	ot::UID entIDTopo = modelPtr->createEntityUID();
 
 	// Create EntityFile Text
 	std::unique_ptr<EntityFileText> circuitModel;
@@ -259,14 +258,13 @@ void LibraryManagementWrapper::updatePropertyOfEntity(ot::UID _entityID, bool _d
 	auto entBase = model->getEntityByID(_entityID);
 
 	auto basePropertyModel = entBase->getProperties().getProperty("ModelSelection");
-	auto modelProperty = dynamic_cast<EntityPropertiesSelection*>(basePropertyModel);
+	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
 
 	if (_dialogConfirmed) {
-		modelProperty->addOption(_propertyValue);
-		modelProperty->setValue(_propertyValue);
+		modelProperty->setValueName(_propertyValue);
 	}
 	else {
-		modelProperty->setValue("");
+		modelProperty->setValueName("");
 	}
 	entBase->storeToDataBase();
 	const std::string comment = "Property Updated";
@@ -278,4 +276,10 @@ void LibraryManagementWrapper::updatePropertyOfEntity(ot::UID _entityID, bool _d
 void LibraryManagementWrapper::addModelToEntites() {
 	Model* modelComp = Application::instance()->getModel();
 	modelComp->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added file", true, false, true);
+
+	m_entityIDsTopo.clear();
+	m_entityVersionsTopo.clear();
+	m_entityIDsData.clear();
+	m_entityVersionsData.clear();
+	m_forceVisible.clear();
 }
