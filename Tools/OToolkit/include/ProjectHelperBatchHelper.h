@@ -5,7 +5,7 @@
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
 #include "OTWidgets/WidgetBase.h"
-#include "ProjectHelperBatchHelperItem.h"
+#include "ProjectHelperBatchHelperProjectItem.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -31,33 +31,57 @@ public:
 	virtual QWidget* getQWidget() override { return m_rootWidget; };
 	virtual const QWidget* getQWidget() const override { return m_rootWidget; };
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Setter / Getter
+
 	void setRootPath(const QString& _path);
 	QString getRootPath() const;
 
 	void restoreState(QSettings& _settings);
 	bool saveState(QSettings& _settings);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Public: Slots
+
 public Q_SLOTS:
+	void clear();
 	void slotRefreshData();
 	void slotSelectionChanged();
 	void slotItemChanged(QTreeWidgetItem* _item, int _column);
 	void slotItemDoubleClicked(QTreeWidgetItem* _item, int _column);
 
 private:
-	void restoreTreeData(const QByteArray& _data);
-	QByteArray saveTreeData() const;
-	void saveCheckedItems(QJsonArray& _checkedItems, QTreeWidgetItem* _parentItem) const;
-	
-	QTreeWidgetItem* findItemByPath(const QString& _path) const;
-	QTreeWidgetItem* findItemByPath(QTreeWidgetItem* _parentItem, QStringList _pathParts) const;
-	QString itemPath(QTreeWidgetItem* _item) const;
 
-	void refreshDir(const QString& _rootPath, const QString& _childName, const ProjectHelperBatchHelperItem::CreateFlags& _flags = ProjectHelperBatchHelperItem::NoCreateFlags);
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Data helper
+
+	void refreshData();
+	void restoreTreeData(const QSettings& _settings);
+	void restoreTreeData(const QByteArray& _data);
+	void saveTreeData(QSettings& _settings) const;
+	QByteArray saveTreeData() const;
+	void saveItemsState(QTreeWidgetItem* _parentItem, QJsonArray& _expandedItems, QJsonArray& _checkedItems) const;
+	
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Refresh
+
+	void refreshFavourites();
+	void refreshFavourites(QTreeWidgetItem* _parent);
+	ot::TreeWidgetItem* createFavouritesContainer(const QString& _containerName);
+
+	void sortAll(QTreeWidgetItem* _parent);
+	void refreshProjectsDir(const QString& _rootPath, const QIcon& _icon, const QString& _childName, const ProjectHelperBatchHelperProjectItem::CreateFlags& _flags = ProjectHelperBatchHelperProjectItem::NoCreateFlags);
 
 	void refreshSelectionFromCheckState(QTreeWidgetItem* _parent);
+	void resetSelection(QTreeWidgetItem* _parent);
 
 	QWidget* m_rootWidget;
 	ot::TreeWidgetFilter* m_tree;
+	ot::TreeWidgetItem* m_favouritesItem;
 	ot::LineEdit* m_rootPathEdit;
 
 };

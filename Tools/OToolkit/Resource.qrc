@@ -25,5 +25,10 @@
         <file>images/Connected.png</file>
         <file>images/Disconnected.png</file>
         <file>images/Test.png</file>
+        <file>images/Tree/Favorite.png</file>
+        <file>images/Tree/Library.png</file>
+        <file>images/Tree/Service.png</file>
+        <file>images/Tree/Text.png</file>
+        <file>images/Tree/Tool.png</file>
     </qresource>
 </RCC>

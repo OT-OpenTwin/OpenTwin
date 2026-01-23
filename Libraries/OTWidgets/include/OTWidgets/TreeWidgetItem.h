@@ -40,11 +40,22 @@ namespace ot {
 		//! The information returned only contains the path to this item (other childs of parent items are ignored)
 		TreeWidgetItemInfo getFullInfo() const;
 
+		bool isChildOf(const QTreeWidgetItem* _parent) const;
+		bool isDirectChildOf(const QTreeWidgetItem* _parent) const { return this->parent() == _parent; };
+
+		bool hasChild(const QTreeWidgetItem* _child) const;
+		bool hasChild(const QString& _childPath, char _delimiter = '/', int _nameColumn = 0) const;
+		bool hasDirectChild(const QTreeWidgetItem* _child) const;
+		bool hasDirectChild(const QString& _childText, int _nameColumn = 0) const;
+
 		QString getTreeWidgetItemPath(char _delimiter = '/', int _nameColumn = 0) const;
 
 		void expandAllParents(bool _expandThis = false);
 
 	private:
+		bool hasChildRecursive(const QTreeWidgetItem* _item, const QTreeWidgetItem* _child) const;
+		bool hasChildRecursive(const QTreeWidgetItem* _item, const QStringList& _childPath, int _nameColumn) const;
+
 		NavigationTreeItem::ItemFlags m_flags;
 	};
 }

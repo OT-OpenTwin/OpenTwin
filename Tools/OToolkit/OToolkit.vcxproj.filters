@@ -269,7 +269,7 @@
     <ClCompile Include="src\ProjectHelperBatchHelper.cpp">
       <Filter>Source Files\ProjectHelper</Filter>
     </ClCompile>
-    <ClCompile Include="src\ProjectHelperBatchHelperItem.cpp">
+    <ClCompile Include="src\ProjectHelperBatchHelperProjectItem.cpp">
       <Filter>Source Files\ProjectHelper</Filter>
     </ClCompile>
     <ClCompile Include="src\ScriptRunner.cpp">
@@ -286,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="src\SDSServiceEntry.cpp">
       <Filter>Source Files\ServiceDebugSwitch</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProjectHelperBatchHelperItem.cpp">
+      <Filter>Source Files\ProjectHelper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -477,7 +480,7 @@
     <QtMoc Include="include\ProjectHelperBatchHelper.h">
       <Filter>Header Files\ProjectHelper</Filter>
     </QtMoc>
-    <QtMoc Include="include\ProjectHelperBatchHelperItem.h">
+    <QtMoc Include="include\ProjectHelperBatchHelperProjectItem.h">
       <Filter>Header Files\ProjectHelper</Filter>
     </QtMoc>
     <QtMoc Include="include\ScriptRunner.h">
@@ -494,6 +497,9 @@
     </QtMoc>
     <QtMoc Include="include\SDSServiceEntry.h">
       <Filter>Header Files\ServiceDebugSwitch</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectHelperBatchHelperItem.h">
+      <Filter>Header Files\ProjectHelper</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

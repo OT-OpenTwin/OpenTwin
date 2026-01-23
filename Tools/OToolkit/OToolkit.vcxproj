@@ -70,6 +70,7 @@
     <ClCompile Include="src\ProjectHelperBatchHelper.cpp" />
     <ClCompile Include="src\ProjectHelperBatchHelperCustomItem.cpp" />
     <ClCompile Include="src\ProjectHelperBatchHelperItem.cpp" />
+    <ClCompile Include="src\ProjectHelperBatchHelperProjectItem.cpp" />
     <ClCompile Include="src\QuickLogExport.cpp" />
     <ClCompile Include="src\Randomizer.cpp" />
     <ClCompile Include="src\ScriptRunner.cpp" />
@@ -129,12 +130,13 @@
     <QtMoc Include="include\TypeHelper.h" />
     <QtMoc Include="include\ProjectHelper.h" />
     <QtMoc Include="include\ProjectHelperBatchHelper.h" />
-    <QtMoc Include="include\ProjectHelperBatchHelperItem.h" />
+    <QtMoc Include="include\ProjectHelperBatchHelperProjectItem.h" />
     <QtMoc Include="include\ScriptRunner.h" />
     <QtMoc Include="include\ProjectHelperBatchHelperCustomItem.h" />
     <QtMoc Include="include\ServiceDebugSwitch.h" />
     <QtMoc Include="include\SDSLSSEntry.h" />
     <QtMoc Include="include\SDSServiceEntry.h" />
+    <QtMoc Include="include\ProjectHelperBatchHelperItem.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

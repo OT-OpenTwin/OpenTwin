@@ -71,6 +71,41 @@ ot::TreeWidgetItemInfo ot::TreeWidgetItem::getFullInfo(void) const {
 	return info;
 }
 
+bool ot::TreeWidgetItem::isChildOf(const QTreeWidgetItem* _parent) const {
+	const QTreeWidgetItem* parentItem = this->parent();
+	while (parentItem) {
+		if (parentItem == _parent) {
+			return true;
+		}
+		parentItem = parentItem->parent();
+	}
+	return false;
+}
+
+bool ot::TreeWidgetItem::hasChild(const QTreeWidgetItem* _child) const {
+	return hasChildRecursive(this, _child);
+}
+
+bool ot::TreeWidgetItem::hasChild(const QString& _childPath, char _delimiter, int _nameColumn) const {
+	return hasChildRecursive(this, _childPath.split(_delimiter, Qt::SkipEmptyParts), _nameColumn);
+}
+
+bool ot::TreeWidgetItem::hasDirectChild(const QTreeWidgetItem* _child) const {
+	for (int i = 0; i < this->childCount(); ++i) {
+		if (this->child(i) == _child) {
+			return true;
+		}
+	}
+}
+
+bool ot::TreeWidgetItem::hasDirectChild(const QString& _childText, int _nameColumn) const {
+	for (int i = 0; i < this->childCount(); ++i) {
+		if (this->child(i)->text(_nameColumn) == _childText) {
+			return true;
+		}
+	}
+}
+
 void ot::TreeWidgetItem::expandAllParents(bool _expandThis) {
 	if (_expandThis) { this->setExpanded(true); }
 	QTreeWidgetItem* itm = parent();
@@ -94,4 +129,38 @@ QString ot::TreeWidgetItem::getTreeWidgetItemPath(char _delimiter, int _nameColu
 		itm = itm->parent();
 	}
 	return path;
+}
+
+bool ot::TreeWidgetItem::hasChildRecursive(const QTreeWidgetItem* _item, const QTreeWidgetItem* _child) const {
+	for (int i = 0; i < _item->childCount(); ++i) {
+		QTreeWidgetItem* c = _item->child(i);
+		if (c == _child) {
+			return true;
+		}
+		if (hasChildRecursive(c, _child)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ot::TreeWidgetItem::hasChildRecursive(const QTreeWidgetItem* _item, const QStringList& _childPath, int _nameColumn) const {
+	if (_childPath.isEmpty()) {
+		return false;
+	}
+	
+	QStringList remainingPath = _childPath;
+	QString currentLevelText = remainingPath.takeFirst();
+	for (int i = 0; i < _item->childCount(); ++i) {
+		const QTreeWidgetItem* child = _item->child(i);
+		if (child->text(_nameColumn) == currentLevelText) {
+			if (remainingPath.isEmpty()) {
+				return true;
+			}
+			else {
+				return hasChildRecursive(child, remainingPath, _nameColumn);
+			}
+		}
+	}
+	return false;
 }
