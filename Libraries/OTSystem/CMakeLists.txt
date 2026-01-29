@@ -25,6 +25,7 @@ add_library(OTSystem_core OBJECT
     src/PortManager.cpp
     src/SystemInformation.cpp
     src/UrlEncoding.cpp
+    src/SingleSignOn_Client.cpp
 )
 
 target_include_directories(OTSystem_core
@@ -74,6 +75,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES
     src/PortManager.cpp
     src/SystemInformation.cpp
     src/UrlEncoding.cpp
+    
 
     include/OTSystem/AppExitCodes.h
     include/OTSystem/DateTime.h
@@ -112,6 +114,7 @@ if(WIN32)
         Userenv
         ws2_32
         pdh
+        Secur32
     )
 
     if(MSVC)
