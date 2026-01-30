@@ -1576,15 +1576,6 @@ void EntityPropertiesExtendedEntityList::addToConfiguration(ot::PropertyGridCfg&
 	}
 
     std::string currentValue = this->getValueName();
-	bool valueExists = false;
-
-	if (!currentValue.empty()) {
-		valueExists = (std::find(opt.begin(), opt.end(), currentValue) != opt.end());
-	}
-
-	if (!valueExists) {
-		this->setValueName("");
-	}
 
 	if (!root) {
 		opt.clear();
