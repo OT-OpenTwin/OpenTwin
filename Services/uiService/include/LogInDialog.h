@@ -103,6 +103,7 @@ private:
 	ot::Label* m_passwordConfirmLabel;
 	ot::LineEdit* m_passwordConfirm; // Register:Confirm, Change:Confirm
 	ot::CheckBox* m_savePassword;
+	ot::CheckBox* m_useSSO;
 	ot::Label* m_toggleChangePasswordModeLabel;
 	ot::Label* m_toggleRegisterModeLabel;
 	ot::PushButton* m_logInButton;
@@ -129,7 +130,8 @@ public Q_SLOTS:
 	void slotToggleChangePasswordMode();
 	void slotGSSChanged();
 	void slotPasswordChanged();
-	
+	void slotSSOChanged();
+
 	void slotLogInSuccess();
 	void slotRegisterSuccess();
 	void slotChangePasswordSuccess();
@@ -161,6 +163,8 @@ private:
 	WorkerError workerCheckVersionCompatibility();
 	WorkerError workerConnectToGSS();
 	WorkerError workerLogin(const UserManagement& _userManager);
+	WorkerError workerLoginUsernamePassword(const UserManagement& _userManager);
+	WorkerError workerLoginSSO(const UserManagement& _userManager);
 	WorkerError workerRegister(const UserManagement& _userManager);
 	WorkerError workerChangePassword(const UserManagement& _userManager);
 };
