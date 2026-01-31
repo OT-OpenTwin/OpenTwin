@@ -401,6 +401,10 @@ inline std::string ot::String::removePrefixSuffix(const std::string& _string, co
 	return String::removeSuffix(String::removePrefix(_string, _characterBlacklist, _characterWhitelist), _characterBlacklist, _characterWhitelist);
 }
 
+inline std::string ot::String::trim(const std::string& _string) {
+	return String::removePrefixSuffix(_string, " \t\n\r\f\v");
+}
+
 inline char* ot::String::getCStringCopy(const std::string& _str) {
 	size_t len = _str.length() + 1;
 	char* retval = new char[len];

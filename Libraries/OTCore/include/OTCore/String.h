@@ -186,6 +186,11 @@ namespace ot {
 		//! @return Trimmed string.
 		static std::string removePrefixSuffix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist = std::string());
 
+		//! @brief Trims leading and trailing whitespace from the provided string.
+		//! @param _string String to trim.
+		//! @return Trimmed string.
+		static std::string trim(const std::string& _string);
+
 		//! @brief Creates a C-String copy of the provided C++ String
 		static char* getCStringCopy(const std::string& _str);
 
