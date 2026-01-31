@@ -9,23 +9,62 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# ============================================================
+# Source and header lists (from .vcxproj)
+# ============================================================
+
+set(OTSYSTEM_HEADER_FILES
+    include/OTSystem/AdvancedDirectoryIterator.h
+    include/OTSystem/AppExitCodes.h
+    include/OTSystem/Application.h
+    include/OTSystem/ArchitectureInfo.h
+    include/OTSystem/DateTime.h
+    include/OTSystem/DirectoryIterator.h
+    include/OTSystem/Exception.h
+    include/OTSystem/FileInformation.h
+    include/OTSystem/FileSystem.h
+    include/OTSystem/Flags.h
+    include/OTSystem/IgnoreRules.h
+    include/OTSystem/IgnoreRules.hpp
+    include/OTSystem/Network.h
+    include/OTSystem/OperatingSystem.h
+    include/OTSystem/OTAssert.h
+    include/OTSystem/PortManager.h
+    include/OTSystem/RunResult.h
+    include/OTSystem/SystemAPIExport.h
+    include/OTSystem/SystemInformation.h
+    include/OTSystem/SystemProcess.h
+    include/OTSystem/SystemTypes.h
+    include/OTSystem/UrlEncoding.h
+)
+
+set(OTSYSTEM_SOURCE_FILES
+    src/AdvancedDirectoryIterator.cpp
+    src/AppExitCodes.cpp
+    src/DateTime.cpp
+    src/DirectoryIterator.cpp
+    src/dllmain.cpp
+    src/FileInformation.cpp
+    src/FileSystem.cpp
+    src/IgnoreRules.cpp
+    src/Network.cpp
+    src/OperatingSystem.cpp
+    src/PortManager.cpp
+    src/SystemInformation.cpp
+    src/SystemProcess.cpp
+    src/UrlEncoding.cpp
+    src/SingleSignOn_Client.cpp
+)
+
 # ------------------------------------------------------------
 # Core OBJECT library with all implementation sources.
 # Both the DLL (OTSystem) and tests (OTSystem_tests) use
 # these object files directly.
 # ------------------------------------------------------------
+
 add_library(OTSystem_core OBJECT
-    src/AppExitCodes.cpp
-    src/DateTime.cpp
-    src/FileSystem.cpp
-    src/SystemProcess.cpp
-    src/dllmain.cpp
-    src/Network.cpp
-    src/OperatingSystem.cpp
-    src/PortManager.cpp
-    src/SystemInformation.cpp
-    src/UrlEncoding.cpp
-    src/SingleSignOn_Client.cpp
+    ${OTSYSTEM_SOURCE_FILES}
+    ${OTSYSTEM_HEADER_FILES}
 )
 
 target_include_directories(OTSystem_core
@@ -60,40 +99,6 @@ if(MSVC)
         $<$<CXX_COMPILER_ID:MSVC>:/permissive- /Zc:__cplusplus>
     )
 endif()
-
-# ------------------------------------------------------------
-# Optional Visual Studio source grouping (mirrors the folder layout)
-# ------------------------------------------------------------
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES
-    src/AppExitCodes.cpp
-    src/DateTime.cpp
-    src/FileSystem.cpp
-    src/SystemProcess.cpp
-    src/dllmain.cpp
-    src/Network.cpp
-    src/OperatingSystem.cpp
-    src/PortManager.cpp
-    src/SystemInformation.cpp
-    src/UrlEncoding.cpp
-    
-
-    include/OTSystem/AppExitCodes.h
-    include/OTSystem/DateTime.h
-    include/OTSystem/Exception.h
-    include/OTSystem/FileSystem.h
-    include/OTSystem/Flags.h
-    include/OTSystem/OTAssert.h
-    include/OTSystem/SystemProcess.h
-    include/OTSystem/ArchitectureInfo.h
-    include/OTSystem/Network.h
-    include/OTSystem/OperatingSystem.h
-    include/OTSystem/PortManager.h
-    include/OTSystem/RunResult.h
-    include/OTSystem/SystemAPIExport.h
-    include/OTSystem/SystemInformation.h
-    include/OTSystem/SystemTypes.h
-    include/OTSystem/UrlEncoding.h
-)
 
 # ------------------------------------------------------------
 # Shared library (DLL) – main production artifact.
