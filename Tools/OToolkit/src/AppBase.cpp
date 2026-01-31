@@ -57,8 +57,9 @@
 #include "OTWidgets/PlainTextEdit.h"
 #include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/GlobalWidgetViewManager.h"
 #include "OTWidgets/PlainTextEditView.h"
+#include "OTWidgets/StyledTextConverter.h"
+#include "OTWidgets/GlobalWidgetViewManager.h"
 
 // Qt header
 #include <QtCore/qprocess.h>
@@ -107,6 +108,9 @@ void AppBase::log(const ot::LogMessage& _message) {
 	case ot::ERROR_LOG:
 		type = otoolkit::APIInterface::Error;
 		break;
+	case ot::TEST_LOG:
+		type = otoolkit::APIInterface::Test;
+		break;
 	default:
 		break;
 	}
@@ -114,44 +118,23 @@ void AppBase::log(const ot::LogMessage& _message) {
 }
 
 void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogType _type, const QString& _message) {
-	if (QThread::currentThreadId() == m_mainThread) {
-		// Same thread -> direct call
-		
-		switch (_type)
-		{
-		case otoolkit::APIInterface::Information:
-			this->slotLogMessage(_sender, _message);
-			break;
-		case otoolkit::APIInterface::Warning:
-			this->slotLogWarning(_sender, _message);
-			break;
-		case otoolkit::APIInterface::Error:
-			this->slotLogError(_sender, _message);
-			break;
-		default:
-			OTAssert(0, "Unknown log type");
-			this->slotLogError("OToolkit", "Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Message\": \"" + _message + "\" }");
-			break;
-		}
-	}
-	else {
-		// Different thread -> queue
-		switch (_type)
-		{
-		case otoolkit::APIInterface::Information:
-			QMetaObject::invokeMethod(this, &AppBase::slotLogMessage, Qt::QueuedConnection, _sender, _message);
-			break;
-		case otoolkit::APIInterface::Warning:
-			QMetaObject::invokeMethod(this, &AppBase::slotLogWarning, Qt::QueuedConnection, _sender, _message);
-			break;
-		case otoolkit::APIInterface::Error:
-			QMetaObject::invokeMethod(this, &AppBase::slotLogError, Qt::QueuedConnection, _sender, _message);
-			break;
-		default:
-			OTAssert(0, "Unknown log type");
-			QMetaObject::invokeMethod(this, &AppBase::slotLogError, Qt::QueuedConnection, _sender, QString("Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Message\": \"" + _message + "\" }"));
-			break;
-		}
+	switch (_type) {
+	case otoolkit::APIInterface::Information:
+		this->logMessage(_sender, _message);
+		break;
+	case otoolkit::APIInterface::Warning:
+		this->logWarning(_sender, _message);
+		break;
+	case otoolkit::APIInterface::Error:
+		this->logError(_sender, _message);
+		break;
+	case otoolkit::APIInterface::Test:
+		this->logTest(_sender, _message);
+		break;
+	default:
+		OTAssert(0, "Unknown log type");
+		this->logError("OToolkit", "Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Type\": " + QString::number(static_cast<int>(_type)) + ", \"Message\": \"" + _message + "\" }");
+		break;
 	}
 }
 
@@ -275,120 +258,34 @@ void AppBase::slotProcessMessage(const QString& _json) {
 
 // Private: Slots
 
-void AppBase::slotLogMessage(const QString& _sender, const QString& _message) {
+void AppBase::slotAppendOutputText(const QString& _text) {
 	if (!m_output) {
 		return;
 	}
 
-	m_logMutex.lock();
-	
+	std::lock_guard<std::mutex> lock(m_logMutex);
+
 	QTextCursor cursor = m_output->getPlainTextEdit()->textCursor();
 	cursor.movePosition(QTextCursor::End);
 
-	QTextCharFormat format = cursor.charFormat();
-	QTextCharFormat formatTime = format;
-	QTextCharFormat formatSender = format;
-	formatTime.setForeground(QBrush(QColor(192, 128, 255)));
-	formatSender.setForeground(QBrush(QColor(128, 192, 255)));
-
-	cursor.insertText("[");
-	cursor.setCharFormat(formatTime);
-	cursor.insertText(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-	cursor.setCharFormat(format);
-	cursor.insertText("] ");
-
-	if (!_sender.isEmpty()) {
-		cursor.insertText("[");
-		cursor.setCharFormat(formatSender);
-		cursor.insertText(_sender);
-		cursor.setCharFormat(format);
-		cursor.insertText("] ");
-	}
-
-	cursor.insertText(_message);
+	cursor.insertText(_text);
 	m_output->getPlainTextEdit()->setTextCursor(cursor);
 	m_output->getPlainTextEdit()->appendPlainText("");
-	m_logMutex.unlock();
 }
 
-void AppBase::slotLogWarning(const QString& _sender, const QString& _message) {
-	m_logMutex.lock();
-	
+void AppBase::slotAppendOutputHtml(const QString& _html) {
+	if (!m_output) {
+		return;
+	}
+
+	std::lock_guard<std::mutex> lock(m_logMutex);
+
 	QTextCursor cursor = m_output->getPlainTextEdit()->textCursor();
 	cursor.movePosition(QTextCursor::End);
 
-	QTextCharFormat format = cursor.charFormat();
-	QTextCharFormat formatTime = format;
-	QTextCharFormat formatSender = format;
-	QTextCharFormat formatWarn = format;
-	formatTime.setForeground(QBrush(QColor(192, 128, 255)));
-	formatSender.setForeground(QBrush(QColor(128, 192, 255)));
-	formatWarn.setForeground(QBrush(QColor(255, 242, 0)));
-
-	cursor.insertText("[");
-	cursor.setCharFormat(formatTime);
-	cursor.insertText(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-	cursor.setCharFormat(format);
-	cursor.insertText("] ");
-
-	if (!_sender.isEmpty()) {
-		cursor.insertText("[");
-		cursor.setCharFormat(formatSender);
-		cursor.insertText(_sender);
-		cursor.setCharFormat(format);
-		cursor.insertText("] ");
-	}
-
-	cursor.insertText("[");
-	cursor.setCharFormat(formatWarn);
-	cursor.insertText("Warning");
-	cursor.setCharFormat(format);
-	cursor.insertText("] ");
-
-	cursor.insertText(_message);
+	cursor.insertHtml(_html);
 	m_output->getPlainTextEdit()->setTextCursor(cursor);
 	m_output->getPlainTextEdit()->appendPlainText("");
-	m_logMutex.unlock();
-}
-
-void AppBase::slotLogError(const QString& _sender, const QString& _message) {
-	m_logMutex.lock();
-	
-	QTextCursor cursor = m_output->getPlainTextEdit()->textCursor();
-	cursor.movePosition(QTextCursor::End);
-
-	QTextCharFormat format = cursor.charFormat();
-	QTextCharFormat formatTime = format;
-	QTextCharFormat formatSender = format;
-	QTextCharFormat formatError = format;
-	formatTime.setForeground(QBrush(QColor(192, 128, 255)));
-	formatSender.setForeground(QBrush(QColor(128, 192, 255)));
-	formatError.setForeground(QBrush(QColor(255, 0, 0)));
-
-	cursor.insertText("[");
-	cursor.setCharFormat(formatTime);
-	cursor.insertText(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-	cursor.setCharFormat(format);
-	cursor.insertText("] ");
-
-	if (!_sender.isEmpty()) {
-		cursor.insertText("[");
-		cursor.setCharFormat(formatSender);
-		cursor.insertText(_sender);
-		cursor.setCharFormat(format);
-		cursor.insertText("] ");
-	}
-
-	cursor.insertText("[");
-	cursor.setCharFormat(formatError);
-	cursor.insertText("Error");
-	cursor.setCharFormat(format);
-	cursor.insertText("] ");
-
-	cursor.insertText(_message);
-	m_output->getPlainTextEdit()->setTextCursor(cursor);
-	m_output->getPlainTextEdit()->appendPlainText("");
-	m_logMutex.unlock();
 }
 
 void AppBase::slotSetStatus(const QString& _text) {
@@ -491,6 +388,74 @@ void AppBase::handleDisplayData(ot::JsonDocument& _doc) {
 	std::string data = ot::json::getString(_doc, OT_ACTION_PARAM_Data);
 
 	this->log("DisplayData Request", otoolkit::APIInterface::Information, QString::fromStdString(data));
+}
+
+
+void AppBase::logMessage(const QString& _sender, const QString& _message) {
+	using namespace ot;
+
+	StyledTextBuilder builder;
+	builder << "[" << StyledText::LightHighlight << StyledText::TimeHHMMSSZZZZ << StyledText::ClearStyle << "] ";
+
+	if (!_sender.isEmpty()) {
+		builder << "[" << StyledText::Highlight << _sender.toStdString() << StyledText::ClearStyle << "] ";
+	}
+
+	builder << _message.toStdString();
+	appendOutput(builder);
+}
+
+void AppBase::logWarning(const QString& _sender, const QString& _message) {
+	using namespace ot;
+
+	StyledTextBuilder builder;
+	builder << "[" << StyledText::LightHighlight << StyledText::TimeHHMMSSZZZZ << StyledText::ClearStyle << "] ";
+
+	if (!_sender.isEmpty()) {
+		builder << "[" << StyledText::Highlight << _sender.toStdString() << StyledText::ClearStyle << "] ";
+	}
+
+	builder << "[" << StyledText::Warning << "Warning" << StyledText::ClearStyle << "] " << _message.toStdString();
+	appendOutput(builder);
+}
+
+void AppBase::logError(const QString& _sender, const QString& _message) {
+	using namespace ot;
+
+	StyledTextBuilder builder;
+	builder << "[" << StyledText::LightHighlight << StyledText::TimeHHMMSSZZZZ << StyledText::ClearStyle << "] ";
+
+	if (!_sender.isEmpty()) {
+		builder << "[" << StyledText::Highlight << _sender.toStdString() << StyledText::ClearStyle << "] ";
+	}
+
+	builder << "[" << StyledText::Error << "Error" << StyledText::ClearStyle << "] " << _message.toStdString();
+	appendOutput(builder);
+}
+
+void AppBase::logTest(const QString& _sender, const QString& _message) {
+	using namespace ot;
+
+	StyledTextBuilder builder;
+	builder << "[" << StyledText::LightHighlight << StyledText::TimeHHMMSSZZZZ << StyledText::ClearStyle << "] ";
+
+	if (!_sender.isEmpty()) {
+		builder << "[" << StyledText::Highlight << _sender.toStdString() << StyledText::ClearStyle << "] ";
+	}
+
+	builder << "[" << StyledText::Comment << "Test" << StyledText::ClearStyle << "] " << _message.toStdString();
+	appendOutput(builder);
+}
+
+void AppBase::appendOutput(const ot::StyledTextBuilder& _text) {	
+	QString html = ot::StyledTextConverter::toHtml(_text, true);
+
+	if (QThread::currentThreadId() == m_mainThread) {
+		this->slotAppendOutputHtml(html);
+	}
+	else {
+		QMetaObject::invokeMethod(this, &AppBase::slotAppendOutputHtml, Qt::QueuedConnection, html);
+	}
 }
 
 AppBase::AppBase(QApplication* _app)

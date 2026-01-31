@@ -43,7 +43,8 @@ namespace otoolkit {
 		enum InterfaceLogType {
 			Information,
 			Warning,
-			Error
+			Error,
+			Test
 		};
 
 		virtual void log(const QString& _sender, InterfaceLogType _type, const QString& _message) = 0;

@@ -113,9 +113,8 @@ public Q_SLOTS:
 	// Private: Slots
 
 private Q_SLOTS:
-	void slotLogMessage(const QString& _sender, const QString& _message);
-	void slotLogWarning(const QString& _sender, const QString& _message);
-	void slotLogError(const QString& _sender, const QString& _message);
+	void slotAppendOutputText(const QString& _text);
+	void slotAppendOutputHtml(const QString& _html);
 	void slotSetStatus(const QString& _text);
 	void slotSetErrorStatus(const QString& _text);
 	void slotInitialize();
@@ -125,7 +124,12 @@ private Q_SLOTS:
 	void slotColorStyleChanged();
 
 private:
+	void logMessage(const QString& _sender, const QString& _message);
+	void logWarning(const QString& _sender, const QString& _message);
+	void logError(const QString& _sender, const QString& _message);
+	void logTest(const QString& _sender, const QString& _message);
 	void handleDisplayData(ot::JsonDocument& _doc);
+	void appendOutput(const ot::StyledTextBuilder& _text);
 
 	AppBase(QApplication* _app = (QApplication*)nullptr);
 
