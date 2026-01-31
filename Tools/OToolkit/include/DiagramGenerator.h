@@ -29,6 +29,7 @@
 #include "OTGui/PenCfg.h"
 #include "OTGui/Margins.h"
 #include "OTGui/VersionGraphVersionCfg.h"
+#include "OTGui/Diagram/SequenceDiaCfgParser.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -104,82 +105,6 @@ private:
 		ParseSyntax syntax = ParseSyntax::Cpp;
 		QStringList fileExtensions;
 		std::list<QRegularExpression> ignorePatterns;
-	};
-
-	enum class ParseFileState {
-		Idle,
-		InFunction
-	};
-
-	struct ParseFileData {
-		OT_DECL_NOCOPY(ParseFileData)
-		OT_DECL_NOMOVE(ParseFileData)
-		ParseFileData() = default;
-		~ParseFileData() = default;
-
-		QString currentFunction;
-		ParseFileState state = ParseFileState::Idle;
-	};
-
-	struct SequenceCall {
-		OT_DECL_DEFCOPY(SequenceCall)
-		OT_DECL_DEFMOVE(SequenceCall)
-		SequenceCall() = default;
-		~SequenceCall() = default;
-
-		QString text;
-		QString function;
-	};
-
-	struct SequenceReturn {
-		OT_DECL_DEFCOPY(SequenceReturn)
-		OT_DECL_DEFMOVE(SequenceReturn)
-		SequenceReturn() = default;
-		~SequenceReturn() = default;
-
-		QString text;
-	};
-
-	struct SequenceFunction {
-		OT_DECL_DEFCOPY(SequenceFunction)
-		OT_DECL_DEFMOVE(SequenceFunction)
-		SequenceFunction() = default;
-		~SequenceFunction() = default;
-
-		bool isValid() const { return !name.isEmpty() && !lifeLine.isEmpty(); }
-
-		QString lifeLine;
-		QString name;
-		QString defaultText;
-		QString filePath;
-		
-		std::list<SequenceCall> calls;
-		SequenceReturn returnValue;
-	};
-
-	struct SequenceDiagram {
-		OT_DECL_DEFCOPY(SequenceDiagram)
-		OT_DECL_DEFMOVE(SequenceDiagram)
-		SequenceDiagram() = default;
-		~SequenceDiagram() = default;
-		
-		QString name;
-		QString functionName;
-	};
-
-	struct ParserResult {
-		OT_DECL_NOCOPY(ParserResult)
-		OT_DECL_DEFMOVE(ParserResult)
-		ParserResult() = default;
-		~ParserResult() = default;
-
-		size_t filesParsed = 0;
-		size_t directoriesParsed = 0;
-		size_t invalidFunctions = 0;
-		size_t invalidDiagrams = 0;
-
-		std::map<QString, SequenceFunction> sequenceFunctions;
-		std::map<QString, SequenceDiagram> sequenceDiagrams;
 	};
 
 	struct SequenceCallItem {
@@ -263,7 +188,7 @@ private:
 		Name = Qt::UserRole + 1
 	};
 
-	ParserResult m_parseResult;
+	ot::SequenceDiaCfgParser m_parser;
 
 	QProgressBar* m_progressBar = nullptr;
 
@@ -293,18 +218,8 @@ private:
 	// Private: Worker
 
 	void parserWorker(ParserData&& _data);
-	void parseDirectory(const QString& _path, const ParserData& _data);
-	void parseFile(const QString& _filePath, const ParserData& _data);
 	
-	void finalizeFunction(const QString& _filePath, size_t _lineCounter, SequenceFunction&& _function);
-	void parseFunctionLine(const QString& _filePath, size_t _lineCounter, const QString& _line, int _prefixLen, SequenceFunction& _function);
-	void parseCallLine(const QString& _filePath, size_t _lineCounter, const QString& _line, SequenceFunction& _function);
-	void parseDiagramLine(const QString& _filePath, size_t _lineCounter, const QString& _line, int _prefixLen);
-
-	void validateFunctions();
-	bool validateFunction(const QString& _rootFunction, SequenceFunction& _function, std::set<QString>& _usedFunctions);
-	void validateDiagrams();
-
+	/*
 	void generateSequenceDiagram(const SequenceDiagram& _diagram);
 	void generateSequenceDiagram(const SequenceFunction& _function);
 	void generateSequenceDiagram(SequenceViewData& _viewData, const SequenceFunction& _function);
@@ -315,8 +230,10 @@ private:
 	void repositionCalls(SequenceViewData& _viewData);
 	void mergeProcessBoxes(SequenceViewData& _viewData);
 	void generateItems(SequenceViewData& _viewData);
+	
 	void clear(SequenceViewData& _viewData);
 	void clear(const SequenceCallItem& _callItem);
+	
 
 	SequenceLifeLineItem generateNewLifeLineItem(const QString& _name, const SequenceViewData& _viewData);
 
@@ -330,7 +247,5 @@ private:
 	double calculateLifelineDistance(const SequenceLifeLineItem& _left, const SequenceLifeLineItem& _right, const SequenceViewData& _viewData);
 
 	ot::GraphicsRectangularItemCfg* createProcessBox(SequenceLifeLineItem& _lifeLine, double _startYPos, double _endYPos, const SequenceViewData& _viewData);
-
-	bool filterKeyValue(const QString& _filePath, size_t _lineCounter, const QString& _command, QString& _cmd, QString& _key, QString& _value);
-
+	*/
 };

@@ -28,7 +28,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsItemCfgFactory : public FactoryTemplate<GraphicsItemCfg> {
 	public:
-		static GraphicsItemCfgFactory& instance(void);
+		static GraphicsItemCfgFactory& instance();
 
 		static GraphicsItemCfg* create(const ConstJsonObject& _object);
 

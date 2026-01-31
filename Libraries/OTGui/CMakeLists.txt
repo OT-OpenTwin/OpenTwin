@@ -79,8 +79,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ============================================================
 
 set(OTGUI_HEADER_FILES
-    include/OTGui/Diagram/SequenceDiaAbstractCall.h
-    include/OTGui/Diagram/SequenceDiaDirectCall.h
+    include/OTGui/Diagram/SequenceDiaAbstractCallCfg.h
+    include/OTGui/Diagram/SequenceDiaCallCfgFactory.h
+    include/OTGui/Diagram/SequenceDiaCfgParser.h
+    include/OTGui/Diagram/SequenceDiaDirectCallCfg.h
+    include/OTGui/Diagram/SequenceDiaFunctionCfg.h
+    include/OTGui/Diagram/SequenceDiaRefCfg.h
+    include/OTGui/Diagram/SequenceDiaSelfCallCfg.h
     include/OTGui/Dialog/DialogCfg.h
     include/OTGui/Dialog/PropertyDialogCfg.h
     include/OTGui/Dialog/Painter2DDialogFilter.h
@@ -221,8 +226,13 @@ set(OTGUI_HEADER_FILES
 )
 
 set(OTGUI_SOURCE_FILES
-    src/Diagram/SequenceDiaAbstractCall.cpp
-    src/Diagram/SequenceDiaDirectCall.cpp
+    src/Diagram/SequenceDiaAbstractCallCfg.cpp
+    src/Diagram/SequenceDiaCallCfgFactory.cpp
+    src/Diagram/SequenceDiaCfgParser.cpp
+    src/Diagram/SequenceDiaDirectCallCfg.cpp
+    src/Diagram/SequenceDiaFunctionCfg.cpp
+    src/Diagram/SequenceDiaRefCfg.cpp
+    src/Diagram/SequenceDiaSelfCallCfg.cpp
     src/Dialog/PropertyDialogCfg.cpp
     src/Dialog/Painter2DDialogFilter.cpp
     src/Dialog/Painter2DDialogFilterDefaults.cpp
@@ -426,17 +436,6 @@ if(MSVC)
         /Zc:__cplusplus
     )
 endif()
-
-# ============================================================
-# Visual Studio filters (simple grouping)
-# ============================================================
-assign_filter("Source Files"
-    ${OTGUI_SOURCE_FILES}
-)
-
-assign_filter("Header Files"
-    ${OTGUI_HEADER_FILES}
-)
 
 # ============================================================
 # Shared Library (DLL) OTGui
