@@ -524,9 +524,13 @@ void Model::addLCSNode(const ot::EntityTreeItem& _treeItem, const ot::Visualisat
 {
 	// Create the new LCS node
 
-	SceneNodeBase* lcsNode = new SceneNodeLCS;
+	SceneNodeLCS* lcsNode = new SceneNodeLCS;
 
 	lcsNode->setTreeItem(_treeItem);
+	lcsNode->setOrigin(coordinateSettings[0], coordinateSettings[1], coordinateSettings[2]);
+	lcsNode->setZ(coordinateSettings[3], coordinateSettings[4], coordinateSettings[5]);
+	lcsNode->setX(coordinateSettings[6], coordinateSettings[7], coordinateSettings[8]);
+	lcsNode->updateTransformationMatrix();
 
 	VisualiserHelper::addVisualizer(lcsNode, _visualisationTypes);
 
@@ -554,6 +558,21 @@ void Model::addLCSNode(const ot::EntityTreeItem& _treeItem, const ot::Visualisat
 
 	// Add the node to the maps for faster access
 	storeInMaps(lcsNode);
+}
+
+void Model::updateLCSNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings)
+{
+	SceneNodeLCS* lcsNode = dynamic_cast<SceneNodeLCS*>(m_nameToSceneNodesMap[_treeItem.getEntityName()]);
+
+	if (lcsNode != nullptr)
+	{
+		lcsNode->setOrigin(coordinateSettings[0], coordinateSettings[1], coordinateSettings[2]);
+		lcsNode->setZ(coordinateSettings[3], coordinateSettings[4], coordinateSettings[5]);
+		lcsNode->setX(coordinateSettings[6], coordinateSettings[7], coordinateSettings[8]);
+		lcsNode->updateTransformationMatrix();
+
+		refreshSelection();
+	}
 }
 
 void Model::addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
@@ -1531,20 +1550,30 @@ bool Model::getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, 
 {
 	if (root->isSelected())
 	{
+		osg::Matrix transformationMatrix;
+
 		SceneNodeGeometry *geometryNode = dynamic_cast<SceneNodeGeometry *>(root);
+		SceneNodeLCS *lcsNode = dynamic_cast<SceneNodeLCS*>(root);
 
 		if (geometryNode != nullptr)
 		{
+			transformationMatrix = geometryNode->getTransformation();
+		}
+		else if (lcsNode != nullptr)
+		{
+			transformationMatrix = lcsNode->getTransformation();
+		}
+
+		if (geometryNode != nullptr || lcsNode != nullptr)
+		{
 			if (first)
 			{
-				matrix = geometryNode->getTransformation();
+				matrix = transformationMatrix;
 				first = false;
 			}
 			else
 			{
-				osg::Matrix localMatrix = geometryNode->getTransformation();
-
-				if (!compareTransformations(matrix, localMatrix))
+				if (!compareTransformations(matrix, transformationMatrix))
 				{
 					return false;
 				}

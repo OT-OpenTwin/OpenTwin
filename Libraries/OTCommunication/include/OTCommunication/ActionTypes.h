@@ -261,6 +261,7 @@
 #define OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase "UI.View.Nodes.AddFromDataBase"
 #define OT_ACTION_CMD_UI_VIEW_AddContainerNode "UI.View.Node.AddContainer"
 #define OT_ACTION_CMD_UI_VIEW_AddLCSNode "UI.View.Node.AddLCS"
+#define OT_ACTION_CMD_UI_VIEW_UpdateLCSNode "UI.View.Node.UpdateLCS"
 #define OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode "UI.View.Node.AddVis2D3D"
 #define OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode "UI.View.Node.UpdateVis2D3D"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor "UI.VIEW.OBJ.UpdateColor"

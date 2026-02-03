@@ -55,6 +55,7 @@
 #include "OTModelEntities/EntitySolverCircuitSimulator.h"
 #include "OTModelEntities/EntityParameterizedDataPreviewTable.h"
 #include "OTModelEntities/EntityParameterizedDataCategorization.h"
+#include "OTModelEntities/EntityLocalCoordinateSystem.h"
 
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/GeometryOperations.h"
@@ -2279,7 +2280,8 @@ bool Model::updateNumericalValues(EntityBase *entity)
 	for (auto property : numericalProperties)
 	{
 		std::string expressionPropertyName = property->getName().substr(1);
-		EntityPropertiesString *expressionProperty = dynamic_cast<EntityPropertiesString *>(entity->getProperties().getProperty(expressionPropertyName));
+		std::string expressionPropertyGroup = property->getGroup();
+		EntityPropertiesString *expressionProperty = dynamic_cast<EntityPropertiesString *>(entity->getProperties().getProperty(expressionPropertyName, expressionPropertyGroup));
 
 		if (expressionProperty != nullptr)
 		{
@@ -2597,7 +2599,13 @@ void Model::performSpecialUpdates(EntityBase *entity)
 		setParameter(entity->getName(), dynamic_cast<EntityParameter*>(entity)->getNumericValue(), dynamic_cast<EntityParameter*>(entity));
 		return;
 	}
-}
+
+	if (dynamic_cast<EntityLocalCoordinateSystem*>(entity) != nullptr)
+	{
+		updateLocalCoordinateSystem(dynamic_cast<EntityLocalCoordinateSystem*>(entity));
+		return;
+	}
+} 
 
 void Model::performEntityMeshUpdate(EntityMeshTet *entity)
 {
@@ -3151,6 +3159,12 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 	}
 
 	annotationEntity->storeUpdatedFacets();
+}
+
+void Model::updateLocalCoordinateSystem(EntityLocalCoordinateSystem* lcsEntity)
+{
+	lcsEntity->getProperties().forceResetUpdateForAllProperties();
+	lcsEntity->updateVisualizationItem();
 }
 
 void Model::findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep)

@@ -22,13 +22,32 @@
 #include "SceneNodeBase.h"
 
 #include <string>
+#include <vector>
+
+#include <osg/Matrix>
 
 class SceneNodeLCS : public SceneNodeBase
 {
 public:
-	SceneNodeLCS();
-	virtual ~SceneNodeLCS();
+	SceneNodeLCS() : origin(3, 0.0), xAxis(3, 0.0), zAxis(3, 0.0) {};
+	virtual ~SceneNodeLCS() {};
 
-	virtual bool isItem3D(void) const override { return false; };
+	virtual bool isItem3D(void) const override { return true; };
 
+	void setOrigin(double x, double y, double z) { origin[0] = x; origin[1] = y; origin[2] = z; };
+	void setX(double x, double y, double z) { xAxis[0] = x; xAxis[1] = y; xAxis[2] = z; };
+	void setZ(double x, double y, double z) { zAxis[0] = x; zAxis[1] = y; zAxis[2] = z; };
+
+	void updateTransformationMatrix();
+
+	osg::Matrix getTransformation() { return transformation; }
+
+private:
+	osg::Matrix makeOrthonormalFrame(const osg::Vec3d& origin, osg::Vec3d xAxis, osg::Vec3d zAxis);
+
+	std::vector<double> origin;
+	std::vector<double> xAxis;
+	std::vector<double> zAxis;
+
+	osg::Matrix transformation;
 };

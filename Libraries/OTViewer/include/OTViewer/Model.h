@@ -81,7 +81,8 @@ public:
 	void addSceneNode(const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes);
 	
 	void addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes);
-	void addLCSNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double> &coordinateSettings);
+	void addLCSNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings);
+	void updateLCSNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings);
 
 	void addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
 		bool _isHidden, const double _edgeColorRGB[3],

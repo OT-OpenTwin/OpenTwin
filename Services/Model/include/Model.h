@@ -48,6 +48,7 @@ class EntityBrep;
 class EntityMaterial;
 class EntityParameter;
 class EntityAnnotation;
+class EntityLocalCoordinateSystem;
 class TopoDS_Shape;
 class MicroserviceNotifier;
 class ModalCommandBase;
@@ -173,7 +174,8 @@ public:
 	void deleteEntitiesFromModel(const std::list<EntityBase*>& _entityList, bool _saveModel);
 	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties);
-	
+	void updateLocalCoordinateSystem(EntityLocalCoordinateSystem* lcsEntity);
+
 	void updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment, bool _considerVisualization);
 
 	//! @brief Performs an update on a topology entity. The updated entity replaces its old version in the entity map and redirects all parent/child relationships to the updated entity.,

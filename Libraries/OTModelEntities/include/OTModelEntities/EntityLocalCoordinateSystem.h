@@ -38,6 +38,7 @@ public:
 	virtual std::string getClassName(void) const override { return EntityLocalCoordinateSystem::className(); };
 
 	void addVisualizationItem(bool isHidden);
+	void updateVisualizationItem();
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;

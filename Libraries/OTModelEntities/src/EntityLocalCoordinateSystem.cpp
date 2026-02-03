@@ -116,6 +116,32 @@ void EntityLocalCoordinateSystem::addVisualizationItem(bool isHidden)
 	getObserver()->sendMessageToViewer(doc);
 }
 
+void EntityLocalCoordinateSystem::updateVisualizationItem()
+{
+	std::vector<double> coordinateSettings;
+	coordinateSettings.reserve(9);
+
+	coordinateSettings.push_back(getValue("Origin", "X"));
+	coordinateSettings.push_back(getValue("Origin", "Y"));
+	coordinateSettings.push_back(getValue("Origin", "Z"));
+
+	coordinateSettings.push_back(getValue("z-Axis", "X"));
+	coordinateSettings.push_back(getValue("z-Axis", "Y"));
+	coordinateSettings.push_back(getValue("z-Axis", "Z"));
+
+	coordinateSettings.push_back(getValue("x-Axis", "X"));
+	coordinateSettings.push_back(getValue("x-Axis", "Y"));
+	coordinateSettings.push_back(getValue("x-Axis", "Z"));
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_UpdateLCSNode, doc.GetAllocator()), doc.GetAllocator());
+
+	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_POSITION, ot::JsonArray(coordinateSettings, doc.GetAllocator()), doc.GetAllocator());
+
+	getObserver()->sendMessageToViewer(doc);
+}
+
 void EntityLocalCoordinateSystem::removeChild(EntityBase *child)
 {
 	EntityBase::removeChild(child);
