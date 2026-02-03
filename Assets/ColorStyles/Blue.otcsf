@@ -2196,7 +2196,7 @@ LogInDialog #LogInDialogSessionServiceUrl {
     text-align: left;
 }
 
-LogInDialog #LogInDialogSavePassword {
+LogInDialog ot--CheckBox {
     background-color: transparent;
     color: white;
     spacing: 4px;
@@ -2205,77 +2205,77 @@ LogInDialog #LogInDialogSavePassword {
     padding-bottom: 4px;
 }
     
-LogInDialog #LogInDialogSavePassword:focus {
+LogInDialog ot--CheckBox:focus {
     border: none;
 }
 
-LogInDialog #LogInDialogSavePassword:disabled {
+LogInDialog ot--CheckBox:disabled {
     background-color: transparent;
     color: lightgray;
 }
 
-LogInDialog #LogInDialogSavePassword::indicator {
+LogInDialog ot--CheckBox::indicator {
     margin-left: 2px;
     height: 14px;
     width: 14px;
 }
  
-LogInDialog #LogInDialogSavePassword::indicator:unchecked {
+LogInDialog ot--CheckBox::indicator:unchecked {
     image: url('%root%/icons/log_in_checkbox_unchecked.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:unchecked:hover,
-LogInDialog #LogInDialogSavePassword::indicator:unchecked:focus {
+LogInDialog ot--CheckBox::indicator:unchecked:hover,
+LogInDialog ot--CheckBox::indicator:unchecked:focus {
     border: none;
     image: url('%root%/icons/log_in_checkbox_unchecked_focus.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:unchecked:pressed {
+LogInDialog ot--CheckBox::indicator:unchecked:pressed {
     border: none;
     image: url('%root%/icons/log_in_checkbox_unchecked_pressed.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:unchecked:disabled {
+LogInDialog ot--CheckBox::indicator:unchecked:disabled {
     image: url('%root%/icons/log_in_checkbox_unchecked_disabled.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:checked {
+LogInDialog ot--CheckBox::indicator:checked {
     image: url('%root%/icons/log_in_checkbox_checked.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:checked:hover,
-LogInDialog #LogInDialogSavePassword::indicator:checked:focus {
+LogInDialog ot--CheckBox::indicator:checked:hover,
+LogInDialog ot--CheckBox::indicator:checked:focus {
     border: none;
     image: url('%root%/icons/log_in_checkbox_checked_focus.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:checked:pressed {
+LogInDialog ot--CheckBox::indicator:checked:pressed {
     border: none;
     image: url('%root%/icons/log_in_checkbox_checked_pressed.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:checked:disabled {
+LogInDialog ot--CheckBox::indicator:checked:disabled {
     border: none;
     image: url('%root%/icons/log_in_checkbox_checked_disabled.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:indeterminate {
+LogInDialog ot--CheckBox::indicator:indeterminate {
     border: none;
     image: url('%root%/icons/log_in_checkbox_indeterminate.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:indeterminate:disabled {
+LogInDialog ot--CheckBox::indicator:indeterminate:disabled {
     border: none;
     image: url('%root%/icons/log_in_checkbox_indeterminate_disabled.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:indeterminate:focus,
-LogInDialog #LogInDialogSavePassword::indicator:indeterminate:hover {
+LogInDialog ot--CheckBox::indicator:indeterminate:focus,
+LogInDialog ot--CheckBox::indicator:indeterminate:hover {
     border: none;
     image: url('%root%/icons/log_in_checkbox_indeterminate_focus.png');
 }
 
-LogInDialog #LogInDialogSavePassword::indicator:indeterminate:pressed {
+LogInDialog ot--CheckBox::indicator:indeterminate:pressed {
     border: none;
     image: url('%root%/icons/log_in_checkbox_indeterminate_pressed.png');
 }
