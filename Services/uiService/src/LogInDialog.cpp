@@ -970,6 +970,10 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS() {
 }
 
 LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userManager) {
+	
+	bool isSSO = false;
+
+
 	// Check the username, password combination
 	std::string sessionUser, sessionPassword, validPassword, validEncryptedPassword;
 
@@ -981,7 +985,9 @@ LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userMan
 		isCurrentPasswordEncrypted = true;
 	}
 
+	// Here the name may come from the single sign on class. It will get the windows user name.
 	std::string currentUserName = m_username->text().toStdString();
+	// Password won't be available ...
 	if (!_userManager.checkPassword(currentUserName, currentPassword, isCurrentPasswordEncrypted, sessionUser, sessionPassword, validPassword, validEncryptedPassword)) {
 		return WorkerError::InvalidCreadentials;
 	}

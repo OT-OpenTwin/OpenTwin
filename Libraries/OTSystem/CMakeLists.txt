@@ -110,11 +110,11 @@ target_include_directories(OTSystem
 
 if(WIN32)
     target_link_libraries(OTSystem PRIVATE
+        Secur32
         Advapi32
         Userenv
         ws2_32
         pdh
-        Secur32
     )
 
     if(MSVC)

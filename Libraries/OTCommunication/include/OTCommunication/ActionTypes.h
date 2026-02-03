@@ -821,6 +821,7 @@
 #define OT_PARAM_AUTH_ENCRYPTED_PASSWORD "Encrypted" OT_ACTION_PASSWORD_SUBTEXT
 #define OT_PARAM_DB_USERNAME "DB.Username"
 #define OT_PARAM_DB_PASSWORD "DB." OT_ACTION_PASSWORD_SUBTEXT
+#define OT_PARAM_AUTH_Token "AuthToken"
 
 // Group Functionalities
 #define OT_ACTION_CREATE_GROUP "CreateGroup"

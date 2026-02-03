@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "OTSystem/ArchitectureInfo.h"
-
+#include "OTSystem/SystemAPIExport.h"
 #if not defined (OT_OS_WINDOWS)
 #error This is a windows only implementation
 #endif
@@ -12,7 +12,7 @@
 #include <sspi.h>
 
 namespace ot {
-    class SingleSignOn_Client
+    class OT_SYS_API_EXPORT SingleSignOn_Client
     {
     public:
         SingleSignOn_Client(const std::wstring& _servicePrincipleName = L"");

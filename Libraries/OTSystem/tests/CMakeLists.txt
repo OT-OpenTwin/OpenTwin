@@ -27,6 +27,7 @@ target_include_directories(OTSystem_tests
 
 if(WIN32)
     target_link_libraries(OTSystem_tests PRIVATE
+        Secur32
         Advapi32
         Userenv
         ws2_32
