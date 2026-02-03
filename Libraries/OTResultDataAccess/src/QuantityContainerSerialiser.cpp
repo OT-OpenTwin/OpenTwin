@@ -166,9 +166,8 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 				changingParameterValueIt++;
 			}
 		}
-		
-		addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, realQuantityID, *realValueItt);
-		addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, imagQuantityID, *imagValueItt);
+		std::list<ot::Variable> bothValues = { *realValueItt,*imagValueItt };
+		addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, realQuantityID, bothValues);
 			
 		if (i != _numberOfParameterValues - 1)
 		{
@@ -220,18 +219,16 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 				changingParameterValueIt++;
 			}
 		}
-
-
-		std::vector<ot::Variable> quantityValueEntriesFirst = _quantityDescription->getFirstValues(i);
-		for (ot::Variable& quantityValueEntry : quantityValueEntriesFirst)
+		for (size_t entryIndex = 0; entryIndex < _quantityDescription->getNumberOfFirstValues(); entryIndex++)
 		{
-			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, firstValueDescription.quantityIndex, quantityValueEntry);
-		}
-		
-		std::vector<ot::Variable> quantityValueEntriesSecond = _quantityDescription->getSecondValues(i);
-		for (ot::Variable& quantityValueEntry : quantityValueEntriesSecond)
-		{
-			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, secondValueDescription.quantityIndex, quantityValueEntry);
+			auto firstValue = _quantityDescription->getFirstValues(entryIndex);
+			auto secondValue = _quantityDescription->getSecondValues(entryIndex);
+
+			for(size_t matrixEntryIndex = 0; matrixEntryIndex < firstValue.size(); matrixEntryIndex++)
+			{
+				std::list<ot::Variable> bothValues = { firstValue[matrixEntryIndex],secondValue[matrixEntryIndex] };
+				addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, firstValueDescription.quantityIndex, bothValues);
+			}
 		}
 	}
 }
@@ -342,6 +339,35 @@ void QuantityContainerSerialiser::addQuantityContainer(ot::UID _seriesIndex, std
 		else
 		{
 			lastAddedQuantityContainer->addValue(_quantityValue);
+		}
+	}
+}
+
+void QuantityContainerSerialiser::addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _parameterValues, uint64_t _quantityIndex, const std::list<ot::Variable>& _quantityValues)
+{
+	if (m_quantityContainer.size() == 0)
+	{
+		QuantityContainer newContainer(_seriesIndex, _parameterIDs, _parameterValues, _quantityIndex);
+		newContainer.addValue(_quantityValues);
+		m_quantityContainer.push_back(std::move(newContainer));
+	}
+	else
+	{
+		QuantityContainer* lastAddedQuantityContainer = &m_quantityContainer.back();
+		const uint64_t lastAddedQuantityContainerStoredValues = lastAddedQuantityContainer->getValueArraySize();
+		if (lastAddedQuantityContainerStoredValues == m_bucketSize)
+		{
+			if (m_quantityContainer.size() == m_bufferSize)
+			{
+				flushQuantityContainer();
+			}
+			QuantityContainer newContainer(_seriesIndex, _parameterIDs, _parameterValues, _quantityIndex);
+			newContainer.addValue(_quantityValues);
+			m_quantityContainer.push_back(std::move(newContainer));
+		}
+		else
+		{
+			lastAddedQuantityContainer->addValue(_quantityValues);
 		}
 	}
 }

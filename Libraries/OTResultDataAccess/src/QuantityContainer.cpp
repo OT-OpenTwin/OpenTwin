@@ -25,8 +25,6 @@
 
 QuantityContainer::QuantityContainer(int64_t _seriesIndex, std::list<ot::UID>& _parameterAbbreviations, std::list<ot::Variable>&& _parameterValues, int64_t _quantityIndex)
 {
-	m_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaType", "QuantityContainer"));
-	m_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaVersion", 1));
 	m_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataSeries::getFieldName(), _seriesIndex));
 	m_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataQuantity::getFieldName(), _quantityIndex));
 
@@ -40,8 +38,6 @@ QuantityContainer::QuantityContainer(int64_t _seriesIndex, std::list<ot::UID>& _
 
 QuantityContainer::QuantityContainer(int64_t _seriesIndex, std::list<ot::UID>& _parameterAbbreviations, std::list<ot::Variable>& _parameterValues, int64_t _quantityIndex)
 {
-	m_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaType", "QuantityContainer"));
-	m_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaVersion", 1));
 	m_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataSeries::getFieldName(), _seriesIndex));
 	m_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataQuantity::getFieldName(), _quantityIndex));
 
@@ -75,22 +71,61 @@ QuantityContainer::~QuantityContainer()
 
 void QuantityContainer::addValue(const ot::Variable& _value)
 {
-	m_values.push_back(_value);
+	m_values.push_back({ _value });
+}
+
+void QuantityContainer::addValue(const std::list<ot::Variable>& _values)
+{
+	m_values.push_back(_values);
 }
 
 bsoncxx::builder::basic::document& QuantityContainer::getMongoDocument()
 {
+	size_t tupleSize = m_values.front().size();
+	for (const auto& value : m_values)
+	{
+		for (const auto& entry : value)
+		{
+			assert(value.size() == tupleSize);
+		}
+	}
+
 	VariableToBSONConverter converter;
 	if (m_values.size() == 1)
 	{
-		converter(m_mongoDocument, *m_values.begin(), QuantityContainer::getFieldName());
+		auto singleEntry = m_values.begin();
+		if(singleEntry->size() != 1)
+		{
+			converter(m_mongoDocument, singleEntry->front(), QuantityContainer::getFieldName());
+		}
+		else
+		{
+			auto tupleArray = bsoncxx::builder::basic::array();
+			for (auto& value : *singleEntry)
+			{
+				converter(tupleArray, value);
+			}
+			m_mongoDocument.append(bsoncxx::builder::basic::kvp(QuantityContainer::getFieldName(), tupleArray));
+		}
 	}
 	else
 	{
 		auto valueArray = bsoncxx::builder::basic::array();
 		for (auto& value : m_values)
 		{
-			converter(valueArray, value);
+			if (value.size() == 1)
+			{
+				converter(valueArray, value.front());				
+			}
+			else
+			{
+				auto tupleArray = bsoncxx::builder::basic::array();
+				for (auto& tupleEntry: value)
+				{
+					converter(tupleArray, tupleEntry);
+				}
+				valueArray.append(tupleArray);
+			}		
 		}
 		m_mongoDocument.append(bsoncxx::builder::basic::kvp(QuantityContainer::getFieldName(), valueArray));
 	}

@@ -47,11 +47,12 @@ public:
 	~QuantityContainer();
 
 	void addValue(const ot::Variable& _value);
+	void addValue(const std::list<ot::Variable>& _values);
 	int64_t getValueArraySize() const { return m_values.size(); };
 	bsoncxx::builder::basic::document& getMongoDocument();
 	static const std::string getFieldName() { return "Values"; }
 
 private:
 	bsoncxx::builder::basic::document m_mongoDocument;
-	std::list<ot::Variable> m_values;
+	std::list<std::list<ot::Variable>> m_values;
 };

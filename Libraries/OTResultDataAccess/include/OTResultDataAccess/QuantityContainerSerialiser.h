@@ -50,8 +50,11 @@ private:
 	const uint32_t m_bufferSize = 50;
 
 	std::vector<QuantityContainer> m_quantityContainer;
-
+	//! @brief Creates quantity container and fills them until their bucket size is reached.
 	void addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>&& _parameterValues, uint64_t _quantityIndex, const ot::Variable& _quantityValue);
 	void addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _parameterValues, uint64_t _quantityIndex, const ot::Variable& _quantityValue);
+	
+	//! @brief Dirty copy of the above function to add multiple values at once.
+	void addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _parameterValues, uint64_t _quantityIndex, const std::list<ot::Variable>& _quantityValues);
 
 };
