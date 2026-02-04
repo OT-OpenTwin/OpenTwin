@@ -281,7 +281,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	connectAction(OT_ACTION_CMD_UI_VIEW_RenameEntityName, this, &ExternalServicesComponent::handleRenameEntity);
 	connectAction(OT_ACTION_CMD_UI_VIEW_SetEntitySelected, this, &ExternalServicesComponent::handleSetEntitySelected);
 	connectAction(OT_ACTION_CMD_UI_VIEW_UpdateLCSNode, this, &ExternalServicesComponent::handleUpdateLCSNode);
-
+	connectAction(OT_ACTION_CMD_UI_VIEW_ActivateLCS, this, &ExternalServicesComponent::handleActivateLCSNode);
 
 	// ToolBar
 	connectAction(OT_ACTION_CMD_UI_AddMenuPage, this, &ExternalServicesComponent::handleAddMenuPage);
@@ -2816,6 +2816,14 @@ void ExternalServicesComponent::handleUpdateLCSNode(ot::JsonDocument& _document)
 	std::vector<double> coordinateSettings = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_POSITION);
 
 	ViewerAPI::updateLCSNode(visModelID, item, coordinateSettings);
+}
+
+void ExternalServicesComponent::handleActivateLCSNode(ot::JsonDocument& _document) {
+	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+
+	std::string lcsName = ot::json::getString(_document, OT_ACTION_PARAM_ObjectName);
+
+	ViewerAPI::activateLCSNode(visModelID, lcsName);
 }
 
 void ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _document) {

@@ -320,6 +320,19 @@ void ViewerAPI::updateLCSNode(ot::UID _osgModelID, const ot::EntityTreeItem& _tr
 	}
 }
 
+void ViewerAPI::activateLCSNode(ot::UID _osgModelID, const std::string &lcsName)
+{
+	try
+	{
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+
+		model->activateLCSNode(lcsName);
+	}
+	catch (std::out_of_range)
+	{
+		throw std::exception("The specified model does not exist");
+	}
+}
 
 void ViewerAPI::addVisualizationNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes)
 {

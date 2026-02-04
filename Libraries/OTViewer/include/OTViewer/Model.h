@@ -83,6 +83,7 @@ public:
 	void addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes);
 	void addLCSNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings);
 	void updateLCSNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings);
+	void activateLCSNode(const std::string &lcsName);
 
 	void addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
 		bool _isHidden, const double _edgeColorRGB[3],
@@ -267,7 +268,8 @@ private:
 	void       updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg::Vec3d &normal, const osg::Vec3d &point, double radius);
 	bool	   isLineDrawable(osg::Drawable *drawable);
 	void	   clearEdgeSelection();
-			
+	osg::Matrix getActiveCoordinateSystemTransform();
+
 	void storeInMaps(SceneNodeBase* _node);
 	void removeFromMaps(const SceneNodeBase* _node);
 
@@ -303,6 +305,7 @@ private:
 	osg::Matrix									   m_currentWorkingplaneTransform;
 	osg::Matrix									   m_currentWorkingplaneTransformTransposedInverse;
 	ManipulatorBase*                               m_currentManipulator;
+	std::string									   m_activeLocalCoordinateSystem;
 
 	bool m_hasModalMenu;
 	std::string m_currentMenu;

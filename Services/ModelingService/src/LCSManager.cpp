@@ -20,13 +20,12 @@
 #include "LCSManager.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTCommunication/ActionTypes.h"
 
 #include "OTModelEntities/EntityLocalCoordinateSystem.h"
 
 void LCSManager::createNew()
 {
-	deactivateAllLCS(false);
-
 	std::string itemName = createUniqueName("Local Coordinate Systems/LCS");
 
 	EntityLocalCoordinateSystem* lcsEntity = new EntityLocalCoordinateSystem(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
@@ -52,15 +51,22 @@ void LCSManager::createNew()
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create new local coordinate system: " + itemName);
 }
 
-void LCSManager::activateSelected()
+void LCSManager::activateLCS(const std::string &lcsName)
 {
-	deactivateAllLCS(false);
+	activeLCSName = lcsName;
 
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_ActivateLCS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, ot::ModelServiceAPI::getCurrentVisualizationModelID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(lcsName, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string tmp;
+	uiComponent->sendMessage(true, doc, tmp);
 }
 
-void LCSManager::deactivateAllLCS(bool notifyFrontend)
+void LCSManager::activateGlobal()
 {
-
+	activateLCS("");
 }
 
 std::string LCSManager::createUniqueName(const std::string& name)

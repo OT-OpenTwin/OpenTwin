@@ -32,8 +32,8 @@ public:
 	virtual ~LCSManager() {}
 
 	void createNew();
-	void activateSelected();
-	void deactivateAllLCS(bool notifyFrontend);
+	void activateLCS(const std::string& lcsName);
+	void activateGlobal();
 
 protected:
 	std::string createUniqueName(const std::string& name);
@@ -43,4 +43,6 @@ private:
 	ot::components::ModelComponent* modelComponent;
 	ot::serviceID_t serviceID;
 	std::string serviceName;
+
+	std::string activeLCSName;
 };

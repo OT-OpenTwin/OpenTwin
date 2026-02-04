@@ -130,6 +130,8 @@ void Application::modelSelectionChanged(void)
 	getUiComponent()->setControlState(m_buttonBooleanIntersect.getFullPath(), buttonsEnabled);
 	getUiComponent()->setControlState(m_buttonTransform.getFullPath(), buttonsEnabled);
 
+	getUiComponent()->setControlState(m_buttonActivateLCS.getFullPath(), this->getSelectedEntities().size() == 1);
+
 	// We need to call the handler in the base class
 	ApplicationBase::modelSelectionChanged();
 }
@@ -518,7 +520,17 @@ void Application::handleCreateLCS() {
 }
 
 void Application::handleActivateLCS() {
-	getLCSManager()->activateSelected();
+	std::list<ot::EntityInformation> selectedEntities = getSelectedEntityInfos();
+	if (selectedEntities.size() == 1)
+	{
+		if (selectedEntities.front().getEntityType() == "EntityLocalCoordinateSystem")
+		{
+			getLCSManager()->activateLCS(selectedEntities.front().getEntityName());
+			return;
+		}
+	}
+
+	getUiComponent()->displayErrorPrompt("Please select the local coordinate system to be activated.");
 }
 
 Application::Application() :

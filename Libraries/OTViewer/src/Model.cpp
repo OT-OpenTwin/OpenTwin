@@ -575,6 +575,12 @@ void Model::updateLCSNode(const ot::EntityTreeItem& _treeItem, std::vector<doubl
 	}
 }
 
+void Model::activateLCSNode(const std::string& lcsName)
+{
+	m_activeLocalCoordinateSystem = lcsName;
+	refreshSelection();
+}
+
 void Model::addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
 	bool _isHidden, const double _edgeColorRGB[3],
 	const std::vector<std::array<double, 3>>& _points,
@@ -1592,15 +1598,26 @@ bool Model::getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, 
 	return true;
 }
 
+osg::Matrix Model::getActiveCoordinateSystemTransform()
+{
+	if (m_activeLocalCoordinateSystem.empty()) return osg::Matrix::identity();  // The global coordinate system is active
+
+	SceneNodeLCS* lcsNode = dynamic_cast<SceneNodeLCS*>(m_nameToSceneNodesMap[m_activeLocalCoordinateSystem]);
+
+	if (lcsNode == nullptr) return osg::Matrix::identity(); // The active LCS does no longer exist
+
+	return lcsNode->getTransformation();
+}
+
 void Model::updateWorkingPlaneTransform() 
 {
-	osg::Matrix matrix;
+	osg::Matrix matrix = getActiveCoordinateSystemTransform();
 	bool first = true;
 
 	if (!getTransformationOfSelectedShapes(m_sceneNodesRoot, first, matrix))
 	{
 		// The transformations are not the same for all selected scene nodes -> we use as identity transform
-		matrix = osg::Matrix::identity();
+		matrix = getActiveCoordinateSystemTransform();
 	}
 
 	matrix.transpose(matrix); // We need to transpose the matrix, since the working plane transform needs to be transposed to match the shape transform

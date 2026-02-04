@@ -88,6 +88,7 @@ namespace ViewerAPI {
 	
 	__declspec(dllexport) void addLCSNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings);
 	__declspec(dllexport) void updateLCSNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings);
+	__declspec(dllexport) void activateLCSNode(ot::UID _osgModelID, const std::string &lcsName);
 	__declspec(dllexport) void addVisualizationNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes);
 	__declspec(dllexport) void addVTKNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion);
 	__declspec(dllexport) void updateVTKNode(ot::UID _osgModelID, ot::UID _entityID, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion);

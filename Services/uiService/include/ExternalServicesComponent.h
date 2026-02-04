@@ -316,6 +316,7 @@ public:
 	void handleRenameEntity(ot::JsonDocument& _document);
 	void handleSetEntitySelected(ot::JsonDocument& _document);
 	void handleUpdateLCSNode(ot::JsonDocument& _document);
+	void handleActivateLCSNode(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
