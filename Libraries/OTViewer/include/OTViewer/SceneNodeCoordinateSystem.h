@@ -1,5 +1,5 @@
 // @otlicense
-// File: SceneNodeLCS.h
+// File: SceneNodeCoordinateSystem.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -26,11 +26,11 @@
 
 #include <osg/Matrix>
 
-class SceneNodeLCS : public SceneNodeBase
+class SceneNodeCoordinateSystem : public SceneNodeBase
 {
 public:
-	SceneNodeLCS() : origin(3, 0.0), xAxis(3, 0.0), zAxis(3, 0.0) {};
-	virtual ~SceneNodeLCS() {};
+	SceneNodeCoordinateSystem() : origin(3, 0.0), xAxis(3, 0.0), zAxis(3, 0.0) {};
+	virtual ~SceneNodeCoordinateSystem() {};
 
 	virtual bool isItem3D(void) const override { return true; };
 

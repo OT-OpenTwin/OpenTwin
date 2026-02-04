@@ -151,7 +151,7 @@ set(OTMODELENTITIES_HEADER_FILES
     include/OTModelEntities/EntityFacetData.h
     include/OTModelEntities/EntityLoadingAPI.h
     include/OTModelEntities/EntityMaterial.h
-    include/OTModelEntities/EntityLocalCoordinateSystem.h
+    include/OTModelEntities/EntityCoordinateSystem.h
     include/OTModelEntities/EntityMesh.h
     include/OTModelEntities/EntityMeshCartesian.h
     include/OTModelEntities/EntityMeshCartesianData.h
@@ -254,7 +254,7 @@ set(OTMODELENTITIESSOURCE_FILES
     src/EntityGraphicsScene.cpp
     src/EntityInformation.cpp
     src/EntityMaterial.cpp
-    src/EntityLocalCoordinateSystem.cpp
+    src/EntityCoordinateSystem.cpp
     src/EntityMesh.cpp
     src/EntityMetadataSeries.cpp
     src/EntityMeshCartesian.cpp

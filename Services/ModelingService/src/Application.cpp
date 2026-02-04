@@ -39,7 +39,7 @@
 #include "BlendEdges.h"
 #include "SimplifyRemoveFaces.h"
 #include "ModalCommandHealing.h"
-#include "LCSManager.h"
+#include "CoordinateSystemManager.h"
 
 #include "STEPReader.h"
 
@@ -84,7 +84,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("Modeling", "Import");
 	_ui->addMenuGroup("Modeling", "Create");
 	_ui->addMenuGroup("Modeling", "Modify");
-	_ui->addMenuGroup("Modeling", "Local Coordinate Systems");
+	_ui->addMenuGroup("Modeling", "Coordinate Systems");
 	_ui->addMenuGroup("Modeling", "Repair");
 
 	_ui->addMenuButton(m_buttonImportStep);
@@ -329,14 +329,14 @@ STEPReader *Application::getSTEPReader(void)
 	return stepReader; 
 }
 
-LCSManager* Application::getLCSManager(void)
+CoordinateSystemManager* Application::getCoordinateSystemManager(void)
 {
-	if (lcsManager == nullptr)
+	if (coordinateSystemManager == nullptr)
 	{
-		lcsManager = new LCSManager(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName());
+		coordinateSystemManager = new CoordinateSystemManager(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName());
 	}
 
-	return lcsManager;
+	return coordinateSystemManager;
 }
 
 std::string Application::CreateTmpFileFromCompressedData(const std::string &data, ot::UID uncompressedDataLength)
@@ -515,22 +515,22 @@ void Application::handleHealing() {
 	new ModalCommandHealing(this, "Modeling", "Modeling:Repair:Heal");
 }
 
-void Application::handleCreateLCS() {
-	getLCSManager()->createNew();
+void Application::handleCreateCoordinateSystem() {
+	getCoordinateSystemManager()->createNew();
 }
 
-void Application::handleActivateLCS() {
+void Application::handleActivateCoordinateSystem() {
 	std::list<ot::EntityInformation> selectedEntities = getSelectedEntityInfos();
 	if (selectedEntities.size() == 1)
 	{
-		if (selectedEntities.front().getEntityType() == "EntityLocalCoordinateSystem")
+		if (selectedEntities.front().getEntityType() == "EntityCoordinateSystem")
 		{
-			getLCSManager()->activateLCS(selectedEntities.front().getEntityName());
+			getCoordinateSystemManager()->activateCoordinateSystem(selectedEntities.front().getEntityName());
 			return;
 		}
 	}
 
-	getUiComponent()->displayErrorPrompt("Please select the local coordinate system to be activated.");
+	getUiComponent()->displayErrorPrompt("Please select the coordinate system to be activated.");
 }
 
 Application::Application() :
@@ -542,7 +542,8 @@ Application::Application() :
 	removeFaces(nullptr),
 	stepReader(nullptr),
 	blendEdges(nullptr),
-	chamferEdges(nullptr) 
+	chamferEdges(nullptr),
+	coordinateSystemManager(nullptr)
 {
 	entityCache.setApplication(this);
 
@@ -614,13 +615,13 @@ Application::Application() :
 	m_buttonHealing.setButtonLockFlags(lockTypes);
 	connectToolBarButton(m_buttonHealing, this, &Application::handleHealing);
 
-	m_buttonCreateLCS = ot::ToolBarButtonCfg("Modeling", "Local Coordinate Systems", "Create", "Default/LocalCoordinateSystemCreate");
+	m_buttonCreateLCS = ot::ToolBarButtonCfg("Modeling", "Coordinate Systems", "Create", "Default/LocalCoordinateSystemCreate");
 	m_buttonCreateLCS.setButtonLockFlags(lockTypes);
-	connectToolBarButton(m_buttonCreateLCS, this, &Application::handleCreateLCS);
+	connectToolBarButton(m_buttonCreateLCS, this, &Application::handleCreateCoordinateSystem);
 
-	m_buttonActivateLCS = ot::ToolBarButtonCfg("Modeling", "Local Coordinate Systems", "Activate", "Default/LocalCoordinateSystemActivate");
+	m_buttonActivateLCS = ot::ToolBarButtonCfg("Modeling", "Coordinate Systems", "Activate", "Default/LocalCoordinateSystemActivate");
 	m_buttonActivateLCS.setButtonLockFlags(lockTypes);
-	connectToolBarButton(m_buttonActivateLCS, this, &Application::handleActivateLCS);
+	connectToolBarButton(m_buttonActivateLCS, this, &Application::handleActivateCoordinateSystem);
 }
 
 Application::~Application() {

@@ -81,9 +81,9 @@ public:
 	void addSceneNode(const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes);
 	
 	void addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes);
-	void addLCSNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings);
-	void updateLCSNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings);
-	void activateLCSNode(const std::string &lcsName);
+	void addCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings);
+	void updateCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings);
+	void activateCoordinateSystemNode(const std::string &csName);
 
 	void addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
 		bool _isHidden, const double _edgeColorRGB[3],
@@ -305,7 +305,7 @@ private:
 	osg::Matrix									   m_currentWorkingplaneTransform;
 	osg::Matrix									   m_currentWorkingplaneTransformTransposedInverse;
 	ManipulatorBase*                               m_currentManipulator;
-	std::string									   m_activeLocalCoordinateSystem;
+	std::string									   m_activeCoordinateSystem;
 
 	bool m_hasModalMenu;
 	std::string m_currentMenu;

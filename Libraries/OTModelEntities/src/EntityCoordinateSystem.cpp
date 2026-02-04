@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityLocalCoordinateSystem.cpp
+// File: EntityCoordinateSystem.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,7 +20,7 @@
 // Entity.cpp : Defines the Entity class which is exported for the DLL application.
 //
 
-#include "OTModelEntities/EntityLocalCoordinateSystem.h"
+#include "OTModelEntities/EntityCoordinateSystem.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -28,9 +28,9 @@
 
 #include <sstream>
 
-static EntityFactoryRegistrar<EntityLocalCoordinateSystem> registrar(EntityLocalCoordinateSystem::className());
+static EntityFactoryRegistrar<EntityCoordinateSystem> registrar(EntityCoordinateSystem::className());
 
-EntityLocalCoordinateSystem::EntityLocalCoordinateSystem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
+EntityCoordinateSystem::EntityCoordinateSystem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
 	EntityBase(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
@@ -39,21 +39,21 @@ EntityLocalCoordinateSystem::EntityLocalCoordinateSystem(ot::UID ID, EntityBase 
 	this->setDefaultTreeItem(treeItem);
 }
 
-EntityLocalCoordinateSystem::~EntityLocalCoordinateSystem()
+EntityCoordinateSystem::~EntityCoordinateSystem()
 {
 }
 
-bool EntityLocalCoordinateSystem::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
+bool EntityCoordinateSystem::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
 {
 	return false;
 }
 
-void EntityLocalCoordinateSystem::storeToDataBase(void)
+void EntityCoordinateSystem::storeToDataBase(void)
 {
 	EntityBase::storeToDataBase();
 }
 
-void EntityLocalCoordinateSystem::addStorageData(bsoncxx::builder::basic::document &storage)
+void EntityCoordinateSystem::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
 	EntityBase::addStorageData(storage);
@@ -62,7 +62,7 @@ void EntityLocalCoordinateSystem::addStorageData(bsoncxx::builder::basic::docume
 }
 
 
-void EntityLocalCoordinateSystem::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
+void EntityCoordinateSystem::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -72,14 +72,14 @@ void EntityLocalCoordinateSystem::readSpecificDataFromDataBase(const bsoncxx::do
 	resetModified();
 }
 
-void EntityLocalCoordinateSystem::addVisualizationNodes(void)
+void EntityCoordinateSystem::addVisualizationNodes(void)
 {
 	addVisualizationItem(getInitiallyHidden());
 
 	EntityBase::addVisualizationNodes();
 }
 
-double EntityLocalCoordinateSystem::getValue(const std::string& groupName, const std::string& propName)
+double EntityCoordinateSystem::getValue(const std::string& groupName, const std::string& propName)
 {
 	EntityPropertiesDouble* property = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#" + propName, groupName));
 	assert(property != nullptr);
@@ -89,7 +89,7 @@ double EntityLocalCoordinateSystem::getValue(const std::string& groupName, const
 	return property->getValue();
 }
 
-void EntityLocalCoordinateSystem::addVisualizationItem(bool isHidden)
+void EntityCoordinateSystem::addVisualizationItem(bool isHidden)
 {
 	std::vector<double> coordinateSettings;
 	coordinateSettings.reserve(9);
@@ -107,7 +107,7 @@ void EntityLocalCoordinateSystem::addVisualizationItem(bool isHidden)
 	coordinateSettings.push_back(getValue("x-Axis", "Z"));
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddLCSNode, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddCSNode, doc.GetAllocator()), doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
@@ -116,7 +116,7 @@ void EntityLocalCoordinateSystem::addVisualizationItem(bool isHidden)
 	getObserver()->sendMessageToViewer(doc);
 }
 
-void EntityLocalCoordinateSystem::updateVisualizationItem()
+void EntityCoordinateSystem::updateVisualizationItem()
 {
 	std::vector<double> coordinateSettings;
 	coordinateSettings.reserve(9);
@@ -134,7 +134,7 @@ void EntityLocalCoordinateSystem::updateVisualizationItem()
 	coordinateSettings.push_back(getValue("x-Axis", "Z"));
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_UpdateLCSNode, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_UpdateCSNode, doc.GetAllocator()), doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_POSITION, ot::JsonArray(coordinateSettings, doc.GetAllocator()), doc.GetAllocator());
@@ -142,12 +142,12 @@ void EntityLocalCoordinateSystem::updateVisualizationItem()
 	getObserver()->sendMessageToViewer(doc);
 }
 
-void EntityLocalCoordinateSystem::removeChild(EntityBase *child)
+void EntityCoordinateSystem::removeChild(EntityBase *child)
 {
 	EntityBase::removeChild(child);
 }
 
-void EntityLocalCoordinateSystem::createOrientationProperty(const std::string& groupName, const std::string& propName, double value)
+void EntityCoordinateSystem::createOrientationProperty(const std::string& groupName, const std::string& propName, double value)
 {
 	EntityPropertiesDouble* doubleProp = new EntityPropertiesDouble("#" + propName, value);
 	doubleProp->setVisible(false);
@@ -160,7 +160,7 @@ void EntityLocalCoordinateSystem::createOrientationProperty(const std::string& g
 	EntityPropertiesString::createProperty(groupName, propName, oss.str(), "", getProperties());
 }
 
-void EntityLocalCoordinateSystem::createProperties(void)
+void EntityCoordinateSystem::createProperties(void)
 {
 	createOrientationProperty("Origin", "X", 0.0);
 	createOrientationProperty("Origin", "Y", 0.0);
@@ -177,7 +177,7 @@ void EntityLocalCoordinateSystem::createProperties(void)
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-bool EntityLocalCoordinateSystem::updateFromProperties(void)
+bool EntityCoordinateSystem::updateFromProperties(void)
 {
 	// Now we need to update the entity after a property change
 	assert(getProperties().anyPropertyNeedsUpdate());

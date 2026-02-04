@@ -55,7 +55,7 @@
 #include "OTModelEntities/EntitySolverCircuitSimulator.h"
 #include "OTModelEntities/EntityParameterizedDataPreviewTable.h"
 #include "OTModelEntities/EntityParameterizedDataCategorization.h"
-#include "OTModelEntities/EntityLocalCoordinateSystem.h"
+#include "OTModelEntities/EntityCoordinateSystem.h"
 
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/GeometryOperations.h"
@@ -220,6 +220,15 @@ void Model::resetToNew()
 		EntityBase* entityGeometryRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityGeometryRoot->setName(getGeometryRootName());
 		addEntityToModel(entityGeometryRoot->getName(), entityGeometryRoot, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasCoordinateSystemRoot())
+	{
+		EntityBase* entityCoordinateSystemRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
+		entityCoordinateSystemRoot->setName(getCoordinateSystemsRootName());
+		addEntityToModel(entityCoordinateSystemRoot->getName(), entityCoordinateSystemRoot, entityRoot, true, allNewEntities);
+
+		//EntityCoordinateSystem *globalCoordinateSystem = new EntityLCS
 	}
 
 	if (typeManager.hasCircuit())
@@ -2600,9 +2609,9 @@ void Model::performSpecialUpdates(EntityBase *entity)
 		return;
 	}
 
-	if (dynamic_cast<EntityLocalCoordinateSystem*>(entity) != nullptr)
+	if (dynamic_cast<EntityCoordinateSystem*>(entity) != nullptr)
 	{
-		updateLocalCoordinateSystem(dynamic_cast<EntityLocalCoordinateSystem*>(entity));
+		updateCoordinateSystem(dynamic_cast<EntityCoordinateSystem*>(entity));
 		return;
 	}
 } 
@@ -3161,10 +3170,10 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 	annotationEntity->storeUpdatedFacets();
 }
 
-void Model::updateLocalCoordinateSystem(EntityLocalCoordinateSystem* lcsEntity)
+void Model::updateCoordinateSystem(EntityCoordinateSystem* csEntity)
 {
-	lcsEntity->getProperties().forceResetUpdateForAllProperties();
-	lcsEntity->updateVisualizationItem();
+	csEntity->getProperties().forceResetUpdateForAllProperties();
+	csEntity->updateVisualizationItem();
 }
 
 void Model::findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep)

@@ -1,5 +1,5 @@
 // @otlicense
-// File: SceneNodeLCS.cpp
+// File: SceneNodeCoordinateSystem.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,13 +17,13 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTViewer/SceneNodeLCS.h"
+#include "OTViewer/SceneNodeCoordinateSystem.h"
 
 #include <osg/Matrix>
 #include <osg/Vec3d>
 #include <cmath>
 
-void SceneNodeLCS::updateTransformationMatrix()
+void SceneNodeCoordinateSystem::updateTransformationMatrix()
 {
     transformation = makeOrthonormalFrame(osg::Vec3d(origin[0], origin[1], origin[2]), osg::Vec3d(xAxis[0], xAxis[1], xAxis[2]), osg::Vec3d(zAxis[0], zAxis[1], zAxis[2]));
 }
@@ -32,7 +32,7 @@ void SceneNodeLCS::updateTransformationMatrix()
 // X-axis and Z-axis using Gram-Schmidt orthogonalization.
 // The resulting matrix represents a pure rotation + translation
 // (no shear, no scaling).
-osg::Matrix SceneNodeLCS::makeOrthonormalFrame(const osg::Vec3d& origin, osg::Vec3d xAxis, osg::Vec3d zAxis)
+osg::Matrix SceneNodeCoordinateSystem::makeOrthonormalFrame(const osg::Vec3d& origin, osg::Vec3d xAxis, osg::Vec3d zAxis)
 {
     // ------------------------------------------------------------------
     // Step 1: Normalize the X axis

@@ -292,13 +292,13 @@ void ViewerAPI::addVisualizationContainerNode(ot::UID _osgModelID, const ot::Ent
 	}
 }
 
-void ViewerAPI::addLCSNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings)
+void ViewerAPI::addCoordinateSystemNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings)
 {
 	try
 	{
 		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addLCSNode(_treeItem, _visualisationTypes, coordinateSettings);
+		model->addCoordinateSystemNode(_treeItem, _visualisationTypes, coordinateSettings);
 	}
 	catch (std::out_of_range)
 	{
@@ -306,13 +306,13 @@ void ViewerAPI::addLCSNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeI
 	}
 }
 
-void ViewerAPI::updateLCSNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings)
+void ViewerAPI::updateCoordinateSystemNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings)
 {
 	try
 	{
 		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->updateLCSNode(_treeItem, coordinateSettings);
+		model->updateCoordinateSystemNode(_treeItem, coordinateSettings);
 	}
 	catch (std::out_of_range)
 	{
@@ -320,13 +320,13 @@ void ViewerAPI::updateLCSNode(ot::UID _osgModelID, const ot::EntityTreeItem& _tr
 	}
 }
 
-void ViewerAPI::activateLCSNode(ot::UID _osgModelID, const std::string &lcsName)
+void ViewerAPI::activateCoordinateSystemNode(ot::UID _osgModelID, const std::string &csName)
 {
 	try
 	{
 		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->activateLCSNode(lcsName);
+		model->activateCoordinateSystemNode(csName);
 	}
 	catch (std::out_of_range)
 	{

@@ -111,7 +111,7 @@
     <ClCompile Include="src\BlendEdges.cpp">
       <Filter>Source Files\Operations</Filter>
     </ClCompile>
-    <ClCompile Include="src\LCSManager.cpp">
+    <ClCompile Include="src\CoordinateSystemManager.cpp">
       <Filter>Source Files\Operations</Filter>
     </ClCompile>
   </ItemGroup>
@@ -185,7 +185,7 @@
     <ClInclude Include="include\BlendEdges.h">
       <Filter>Header Files\Operations</Filter>
     </ClInclude>
-    <ClInclude Include="include\LCSManager.h">
+    <ClInclude Include="include\CoordinateSystemManager.h">
       <Filter>Header Files\Operations</Filter>
     </ClInclude>
   </ItemGroup>
