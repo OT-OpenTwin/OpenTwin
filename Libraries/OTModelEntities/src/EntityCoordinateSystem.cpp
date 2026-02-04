@@ -59,6 +59,10 @@ void EntityCoordinateSystem::addStorageData(bsoncxx::builder::basic::document &s
 	EntityBase::addStorageData(storage);
 
 	// Now we store the particular information about the current object
+	storage.append(
+		bsoncxx::builder::basic::kvp("isGlobal", isGlobal),
+		bsoncxx::builder::basic::kvp("isActive", isActive)
+	);
 }
 
 
@@ -67,7 +71,9 @@ void EntityCoordinateSystem::readSpecificDataFromDataBase(const bsoncxx::documen
 	// We read the parent class information first 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
-	// Here we can load any special information about the material
+	// Here we can load any special information about the coordinate system
+	isGlobal = doc_view["isGlobal"].get_bool();
+	isActive = doc_view["isActive"].get_bool();
 
 	resetModified();
 }
@@ -188,3 +194,12 @@ bool EntityCoordinateSystem::updateFromProperties(void)
 	return false; // No property grid change is necessary
 }
 
+void EntityCoordinateSystem::setActive(bool flag) 
+{ 
+	isActive = flag; 
+}
+
+void EntityCoordinateSystem::setGlobal(bool flag) 
+{ 
+	isGlobal = flag; 
+}
