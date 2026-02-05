@@ -1,3 +1,4 @@
+// @otlicense
 #pragma once
 #include <string>
 namespace ot
