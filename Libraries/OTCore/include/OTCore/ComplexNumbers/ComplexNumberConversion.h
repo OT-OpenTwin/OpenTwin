@@ -19,11 +19,18 @@
 
 #pragma once
 #include <complex>
+#include <vector>
+#include "OTCore/CoreAPIExport.h"
 
 namespace ot
 {
-	using complex = std::complex<double>;
-	const std::string g_ImagSerialiseKey = "imag";
-	const std::string g_realSerialiseKey = "real";
-}
+	class OT_CORE_API_EXPORT ComplexNumberConversion
+	{
+	public:
+		static std::complex<double> polarToCartesian(double _magnitude, double _angleInRad);
 
+		//! @return Vector of size 2 where element 0 is magnitude and element 1 is angle in radians.
+		static std::vector<double> cartesianToPolar(std::complex<double> _complexNb);
+
+	};
+}

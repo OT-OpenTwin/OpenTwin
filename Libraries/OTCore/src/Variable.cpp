@@ -19,7 +19,7 @@
 
 #include "OTCore/Variable.h"
 #include <cassert>
-
+#include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 ot::Variable::Variable(float value)
 	:_value(value)
 {}
@@ -57,11 +57,11 @@ ot::Variable::Variable(std::string&& value) noexcept
 	_value = std::move(value);
 }
 
-ot::Variable::Variable(const complex& value)
+ot::Variable::Variable(const std::complex<double>& value)
 	:_value(value)
 {}
 
-ot::Variable::Variable(complex&& value) noexcept
+ot::Variable::Variable(std::complex<double>&& value) noexcept
 	:_value(std::move(value))
 {}
 
@@ -127,6 +127,19 @@ void ot::Variable::setValue(std::complex<double>&& value)
 	_value = std::move(value);
 }
 
+void ot::Variable::setValue(const std::vector<double>& value, const ot::ComplexNumberFormats& _format)
+{
+	assert(value.size() == 2);
+	if (_format == ot::ComplexNumberFormats::Cartesian)
+	{
+		_value = std::complex<double>(value[0], value[1]);
+	}
+	else
+	{
+		_value = ot::ComplexNumberConversion::polarToCartesian(value[0], value[1]);
+	}
+}
+
 
 bool ot::Variable::isFloat() const
 {
@@ -160,7 +173,7 @@ bool ot::Variable::isConstCharPtr() const
 
 bool ot::Variable::isComplex() const
 {
-	return std::holds_alternative<complex>(_value);
+	return std::holds_alternative<std::complex<double>>(_value);
 }
 
 float ot::Variable::getFloat() const
@@ -193,9 +206,22 @@ const char* ot::Variable::getConstCharPtr() const
 	return (std::get<std::string>(_value)).c_str();
 }
 
-const ot::complex ot::Variable::getComplex() const
+const std::complex<double> ot::Variable::getComplex() const
 {
-	return std::get<complex>(_value);
+	return std::get<std::complex<double>>(_value);
+}
+
+const std::vector<double> ot::Variable::getComplexInFormat(ComplexNumberFormats& _format)
+{
+	std::complex<double> complexValue = std::get<std::complex<double>>(_value);
+	if (_format == ComplexNumberFormats::Cartesian)
+	{
+		return std::vector<double>{complexValue.real(), complexValue.imag()};
+	}
+	else
+	{
+		return ComplexNumberConversion::cartesianToPolar(complexValue);
+	}
 }
 
 bool ot::Variable::operator==(const Variable& other) const

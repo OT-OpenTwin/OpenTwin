@@ -148,6 +148,7 @@ set(OTCORE_SOURCE_FILES
     src/VariableToJSONConverter.cpp
     src/VariableToStringConverter.cpp
     src/TimeFormatter.cpp
+    src/ComplexNumberConversion.cpp
 )
 
 # Third-party source (base64.c)
@@ -172,6 +173,7 @@ file(GLOB OTCORE_HEADER_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/RAII/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/RAII/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/ComplexNumbers/*.h"
 )
 
 # ============================================================

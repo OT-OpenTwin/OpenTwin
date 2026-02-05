@@ -25,7 +25,9 @@
 #include <limits>
 #include <algorithm>
 #include <math.h>
-#include "ComplexNumbers.h"
+#include <complex>
+#include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
+#include "OTCore/ComplexNumbers/ComplexNumberFormats.h"
 
 #pragma warning(disable:4251)
 namespace ot
@@ -144,8 +146,8 @@ namespace ot
 		Variable(const char* value);
 		Variable(const std::string& value);
 		Variable(std::string&& value) noexcept;
-		Variable(const complex& value);
-		Variable(complex&& value) noexcept;
+		Variable(const std::complex<double>& value);
+		Variable(std::complex<double>&& value) noexcept;
 		Variable(const Variable& other) = default;
 		Variable(Variable&& other) = default;
 		Variable& operator=(const Variable& other);
@@ -159,8 +161,12 @@ namespace ot
 		void setValue(const char* value);
 		void setValue(const std::string& value);
 		void setValue(std::string&& value);
-		void setValue(const complex& _value);
-		void setValue(complex&& _value);
+		void setValue(const std::complex<double>& _value);
+		void setValue(std::complex<double>&& _value);
+		
+		//! @brief 
+		//! @param _value Has to be of size 2. The order of the elements has to be the same as in the ComplexNumberConversion functions.
+		void setValue(const std::vector<double>& _value, const ot::ComplexNumberFormats& _format);
 
 		bool isFloat() const;
 		bool isDouble() const;
@@ -176,7 +182,11 @@ namespace ot
 		int64_t getInt64() const;
 		bool getBool() const;
 		const char* getConstCharPtr() const;
-		const complex getComplex() const;
+		const std::complex<double> getComplex() const;
+		//! @brief The underlying complex number is stored as real/imaginary parts. This function returns the complex number in the requested format.
+		//! @param _format 
+		//! @return If the requested format is Cartesian, a vector with real and imaginary part is returned. If the requested format is Polar, a vector with magnitude and angle [rad] is returned.
+		const std::vector<double> getComplexInFormat(ComplexNumberFormats& _format);
 
 		bool operator==(const Variable& other)const;
 		bool operator>(const Variable& other)const;
@@ -185,7 +195,7 @@ namespace ot
 		std::string getTypeName()const;
 
 	private:
-		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,std::string, complex>;
+		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,std::string, std::complex<double>>;
 		inline bool DoubleCompare(const double& a, const double& b) const
 		{
 			constexpr const double epsilon = 1.0e-12; //std::numeric_limits<double>::epsilon()

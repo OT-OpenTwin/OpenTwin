@@ -93,7 +93,7 @@ TEST(VariableTest, VariableIntFloatToJSON)
 TEST(VariableTest, VariableComplexToJSON)
 {
 	ot::JsonDocument(doc);
-	ot::complex value(3.5, -0.2);
+	std::complex<double> value(3.5, -0.2);
 	ot::Variable var(value);
 
 	ot::VariableToJSONConverter converter;

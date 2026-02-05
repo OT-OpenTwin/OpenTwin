@@ -18,43 +18,44 @@
 // @otlicense-end
 
 #include "OTCore/VariableToJSONConverter.h"
+#include "OTCore/ComplexNumbers/SerialisationKeys.h"
 
 ot::JsonValue ot::VariableToJSONConverter::operator()(const Variable& value, JsonAllocator& jsonAllocator)
 {
 
 	if (value.isInt32())
 	{
-		rapidjson::Value rJValue;
+		ot::JsonValue rJValue;
 		rJValue.SetInt(value.getInt32());
 		return rJValue;
 	}
 	else if (value.isInt64())
 	{
-		rapidjson::Value rJValue;
+		ot::JsonValue rJValue;
 		rJValue.SetInt64(value.getInt64());
 		return rJValue;
 	}
 	else if (value.isDouble())
 	{
-		rapidjson::Value rJValue;
+		ot::JsonValue rJValue;
 		rJValue.SetDouble(value.getDouble());
 		return rJValue;
 	}
 	else if (value.isFloat())
 	{
-		rapidjson::Value rJValue;
+		ot::JsonValue rJValue;
 		rJValue.SetFloat(value.getFloat());
 		return rJValue;
 	}
 	else if (value.isBool())
 	{
-		rapidjson::Value rJValue;
+		ot::JsonValue rJValue;
 		rJValue.SetBool(value.getBool());
 		return rJValue;
 	}
 	else if (value.isConstCharPtr())
 	{
-		rapidjson::Value rJValue;
+		ot::JsonValue rJValue;
 		const char* temp = value.getConstCharPtr();
 		rJValue.SetString(temp, jsonAllocator);
 		return rJValue;
@@ -63,8 +64,10 @@ ot::JsonValue ot::VariableToJSONConverter::operator()(const Variable& value, Jso
 	{
 		const auto complexValue = value.getComplex();
 		ot::JsonObject rJValue;
-		rJValue.AddMember(rapidjson::StringRef(ot::g_realSerialiseKey.c_str()), complexValue.real(), jsonAllocator);
-		rJValue.AddMember(rapidjson::StringRef(ot::g_ImagSerialiseKey.c_str()), complexValue.imag(), jsonAllocator);
+		ot::JsonString realKey(ot::ComplexNumbers::SerialisationKeys::g_real, jsonAllocator);
+		rJValue.AddMember(realKey, complexValue.imag(), jsonAllocator);
+		ot::JsonString imagKey(ot::ComplexNumbers::SerialisationKeys::g_imag, jsonAllocator);
+		rJValue.AddMember(imagKey, complexValue.imag(), jsonAllocator);
 		return rJValue;
 	}
 	else

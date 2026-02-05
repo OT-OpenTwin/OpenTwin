@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/ComplexNumbers/SerialisationKeys.h"
 
 ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 {
@@ -47,10 +48,12 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 	}
 	else if (value.IsObject())
 	{
-		assert(value.HasMember(ot::g_ImagSerialiseKey.c_str()));
-		assert(value.HasMember(ot::g_realSerialiseKey.c_str()));
-		ot::complex var(value[ot::g_realSerialiseKey.c_str()].GetDouble(), value[ot::g_ImagSerialiseKey.c_str()].GetDouble());
-		return ot::Variable(std::move(var));
+		assert(ot::json::exists(value, ot::ComplexNumbers::SerialisationKeys::g_real));
+		assert(ot::json::exists(value, ot::ComplexNumbers::SerialisationKeys::g_imag));
+		const double realPart = ot::json::getDouble(value, ot::ComplexNumbers::SerialisationKeys::g_real);
+		const double imagPart = ot::json::getDouble(value, ot::ComplexNumbers::SerialisationKeys::g_imag);
+
+		return ot::Variable(std::complex<double>(realPart,imagPart));
 	}
 	else
 	{
