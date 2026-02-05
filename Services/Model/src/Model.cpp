@@ -228,7 +228,19 @@ void Model::resetToNew()
 		entityCoordinateSystemRoot->setName(getCoordinateSystemsRootName());
 		addEntityToModel(entityCoordinateSystemRoot->getName(), entityCoordinateSystemRoot, entityRoot, true, allNewEntities);
 
-		//EntityCoordinateSystem *globalCoordinateSystem = new EntityLCS
+		EntityCoordinateSystem* globalCoordinateSystem = new EntityCoordinateSystem(createEntityUID(), nullptr, this, getStateManager());
+		globalCoordinateSystem->setName(getCoordinateSystemsRootName() + "/Global");
+		globalCoordinateSystem->createProperties();
+		globalCoordinateSystem->getProperties().setAllPropertiesReadOnly();
+		globalCoordinateSystem->setActive(true);
+		globalCoordinateSystem->setGlobal(true);
+		globalCoordinateSystem->registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection,
+			OT_INFO_SERVICE_TYPE_ModelingService
+		);
+		addEntityToModel(globalCoordinateSystem->getName(), globalCoordinateSystem, entityRoot, true, allNewEntities);
+		determineActiveCoordinateSystem();
 	}
 
 	if (typeManager.hasCircuit())
