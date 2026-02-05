@@ -399,6 +399,7 @@
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
 #define OT_ACTION_PARAM_VisualisationConfig "Visualization.Config"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
+#define OT_ACTION_PARAM_Active "Active"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"

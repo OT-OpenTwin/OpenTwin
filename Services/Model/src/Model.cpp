@@ -3404,6 +3404,9 @@ void Model::projectOpen(const std::string& _customVersion)
 		blockHandler.processEntity(entity.second);
 	}
 
+	// Get information about the active coordinate system
+	determineActiveCoordinateSystem();
+
 	// Reset the modified flag
 	resetModified();
 
@@ -4864,6 +4867,9 @@ void Model::updateModelStateForUndoRedo()
 		Application::instance()->getBlockHandler().processEntity(entity.second);
 	}
 
+	// Get information about the active coordinate system
+	determineActiveCoordinateSystem();
+
 	resetModified();
 	updateUndoRedoStatus();
 	setActiveVersionTreeState();
@@ -5136,5 +5142,30 @@ void Model::determineIDandVersionForEntityWithChildren(EntityBase *entity, std::
 		{
 			determineIDandVersionForEntityWithChildren(child, entityInfoIDList, entityInfoVersionList);
 		}
+	}
+}
+
+void Model::determineActiveCoordinateSystem()
+{
+	EntityContainer* container = dynamic_cast<EntityContainer*>(findEntityFromName(getCoordinateSystemsRootName()));
+	if (container != nullptr)
+	{
+		std::list<ot::UID> csList;
+		getIDsOfFolderItemsOfType(container, "EntityCoordinateSystem", true, csList);
+
+		std::string activeCoordinateSystem;
+
+		for (auto& item : csList)
+		{
+			EntityCoordinateSystem* csItem = dynamic_cast<EntityCoordinateSystem*>(getEntityByID(item));
+			if (csItem->getActive()) activeCoordinateSystem = csItem->getName();
+		}
+
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_ActivateCS, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(activeCoordinateSystem, doc.GetAllocator()), doc.GetAllocator());
+
+		std::string response;
+		Application::instance()->sendMessage(false, OT_INFO_SERVICE_TYPE_ModelingService, doc, response);
 	}
 }

@@ -37,6 +37,8 @@ EntityCoordinateSystem::EntityCoordinateSystem(ot::UID ID, EntityBase *parent, E
 	treeItem.setVisibleIcon("Default/LocalCoordinateSystemVisible");
 	treeItem.setHiddenIcon("Default/LocalCoordinateSystemHidden");
 	this->setDefaultTreeItem(treeItem);
+
+	updateIcons();
 }
 
 EntityCoordinateSystem::~EntityCoordinateSystem()
@@ -118,6 +120,7 @@ void EntityCoordinateSystem::addVisualizationItem(bool isHidden)
 	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_POSITION, ot::JsonArray(coordinateSettings, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Active, isActive, doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 }
@@ -144,6 +147,7 @@ void EntityCoordinateSystem::updateVisualizationItem()
 
 	doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_POSITION, ot::JsonArray(coordinateSettings, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Active, isActive, doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 }
@@ -197,9 +201,48 @@ bool EntityCoordinateSystem::updateFromProperties(void)
 void EntityCoordinateSystem::setActive(bool flag) 
 { 
 	isActive = flag; 
+	updateIcons();
+	setModified();
 }
 
 void EntityCoordinateSystem::setGlobal(bool flag) 
 { 
 	isGlobal = flag; 
+	updateIcons();
+	setModified();
+}
+
+void EntityCoordinateSystem::updateIcons()
+{
+	ot::NavigationTreeItemIcon icons = getTreeItemIcons();
+
+	if (isGlobal)
+	{
+		if (isActive)
+		{
+			icons.setVisibleIcon("Default/GlobalCoordinateSystemVisibleActive");
+			icons.setHiddenIcon("Default/GlobalCoordinateSystemHiddenActive");
+		}
+		else
+		{
+			icons.setVisibleIcon("Default/GlobalCoordinateSystemVisible");
+			icons.setHiddenIcon("Default/GlobalCoordinateSystemHidden");
+		}
+	}
+	else
+	{
+		if (isActive)
+		{
+			icons.setVisibleIcon("Default/LocalCoordinateSystemVisibleActive");
+			icons.setHiddenIcon("Default/LocalCoordinateSystemHiddenActive");
+		}
+		else
+		{
+			icons.setVisibleIcon("Default/LocalCoordinateSystemVisible");
+			icons.setHiddenIcon("Default/LocalCoordinateSystemHidden");
+		}
+	}
+
+	setTreeItemIcons(icons);
+	setTreeItemEditable(!isGlobal);
 }

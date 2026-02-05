@@ -59,6 +59,7 @@ private:
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	void createOrientationProperty(const std::string& groupName, const std::string& propName, double value);
 	double getValue(const std::string& groupName, const std::string& propName);
+	void updateIcons();
 
 	bool isActive = false;
 	bool isGlobal = false;

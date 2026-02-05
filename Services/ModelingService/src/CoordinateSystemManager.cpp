@@ -23,6 +23,8 @@
 #include "OTCommunication/ActionTypes.h"
 
 #include "OTModelEntities/EntityCoordinateSystem.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
 
 void CoordinateSystemManager::createNew()
 {
@@ -44,24 +46,34 @@ void CoordinateSystemManager::createNew()
 	std::list<ot::UID> topologyEntityIDList = { csEntity->getEntityID()};
 	std::list<ot::UID> topologyEntityVersionList = { csEntity->getEntityStorageVersion() };
 	std::list<bool> topologyEntityForceVisible = { false };
-	std::list<ot::UID> dataEntityIDList = { };
-	std::list<ot::UID> dataEntityVersionList = { };
-	std::list<ot::UID> dataEntityParentList = { };
 
-	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create new local coordinate system: " + itemName);
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, {}, {}, {}, "create new local coordinate system: " + itemName);
 }
 
 void CoordinateSystemManager::activateCoordinateSystem(const std::string &csName)
 {
+	if (csName == activeCoordinateSystemName) return; // No change
+
+	std::list<ot::EntityInformation> entityInfo;
+	ot::ModelServiceAPI::getEntityInformation({ activeCoordinateSystemName, csName }, entityInfo);
+
+	DataBase::instance().prefetchDocumentsFromStorage(entityInfo);
+
+	std::list<ot::UID> topologyEntityIDList;
+	std::list<ot::UID> topologyEntityVersionList;
+	std::list<bool> topologyEntityForceVisible;
+
+	setActiveFlagForCoordinateSystemEntity(entityInfo.front(), false, topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible);
+	setActiveFlagForCoordinateSystemEntity(entityInfo.back(),  true,  topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible);
+
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, {}, {}, {}, "activate coordinate system: " + (csName.empty() ? "Global" : csName));
+
 	activeCoordinateSystemName = csName;
+}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_ActivateCS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, ot::ModelServiceAPI::getCurrentVisualizationModelID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(csName, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string tmp;
-	uiComponent->sendMessage(true, doc, tmp);
+void CoordinateSystemManager::setActiveCoordinateSystem(const std::string& csName)
+{
+	activeCoordinateSystemName = csName;
 }
 
 std::string CoordinateSystemManager::createUniqueName(const std::string& name)
@@ -91,4 +103,20 @@ std::string CoordinateSystemManager::createUniqueName(const std::string& name)
 	}
 
 	return itemName;
+}
+
+void CoordinateSystemManager::setActiveFlagForCoordinateSystemEntity(const ot::EntityInformation &entityInfo, bool isActive, std::list<ot::UID>& topologyEntityIDList, std::list<ot::UID>& topologyEntityVersionList, std::list<bool>& topologyEntityForceVisible)
+{
+	EntityBase *entity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
+	if (entity == nullptr) return;
+
+	EntityCoordinateSystem* csEntity = dynamic_cast<EntityCoordinateSystem*>(entity);
+	if (csEntity == nullptr) return;
+
+	csEntity->setActive(isActive);
+	csEntity->storeToDataBase();
+
+	topologyEntityIDList.push_back(csEntity->getEntityID());
+	topologyEntityVersionList.push_back(csEntity->getEntityStorageVersion());
+	topologyEntityForceVisible.push_back(false);
 }

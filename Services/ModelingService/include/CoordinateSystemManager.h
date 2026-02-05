@@ -33,11 +33,14 @@ public:
 
 	void createNew();
 	void activateCoordinateSystem(const std::string& csName);
+	void setActiveCoordinateSystem(const std::string& csName);
 
 protected:
 	std::string createUniqueName(const std::string& name);
 
 private:
+	void setActiveFlagForCoordinateSystemEntity(const ot::EntityInformation& entityInfo, bool isActive, std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible);
+
 	ot::components::UiComponent* uiComponent;
 	ot::components::ModelComponent* modelComponent;
 	ot::serviceID_t serviceID;
