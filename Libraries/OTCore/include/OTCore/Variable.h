@@ -27,7 +27,7 @@
 #include <math.h>
 #include <complex>
 #include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
-#include "OTCore/ComplexNumbers/ComplexNumberFormats.h"
+#include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
 
 #pragma warning(disable:4251)
 namespace ot
@@ -166,7 +166,7 @@ namespace ot
 		
 		//! @brief 
 		//! @param _value Has to be of size 2. The order of the elements has to be the same as in the ComplexNumberConversion functions.
-		void setValue(const std::vector<double>& _value, const ot::ComplexNumberFormats& _format);
+		void setValue(const std::vector<double>& _value, const ot::ComplexNumberFormat& _format);
 
 		bool isFloat() const;
 		bool isDouble() const;
@@ -186,7 +186,7 @@ namespace ot
 		//! @brief The underlying complex number is stored as real/imaginary parts. This function returns the complex number in the requested format.
 		//! @param _format 
 		//! @return If the requested format is Cartesian, a vector with real and imaginary part is returned. If the requested format is Polar, a vector with magnitude and angle [rad] is returned.
-		const std::vector<double> getComplexInFormat(ComplexNumberFormats& _format);
+		const std::vector<double> getComplexInFormat(ComplexNumberFormat& _format);
 
 		bool operator==(const Variable& other)const;
 		bool operator>(const Variable& other)const;

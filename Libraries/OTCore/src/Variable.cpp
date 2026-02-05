@@ -127,10 +127,10 @@ void ot::Variable::setValue(std::complex<double>&& value)
 	_value = std::move(value);
 }
 
-void ot::Variable::setValue(const std::vector<double>& value, const ot::ComplexNumberFormats& _format)
+void ot::Variable::setValue(const std::vector<double>& value, const ot::ComplexNumberFormat& _format)
 {
 	assert(value.size() == 2);
-	if (_format == ot::ComplexNumberFormats::Cartesian)
+	if (_format == ot::ComplexNumberFormat::Cartesian)
 	{
 		_value = std::complex<double>(value[0], value[1]);
 	}
@@ -211,10 +211,10 @@ const std::complex<double> ot::Variable::getComplex() const
 	return std::get<std::complex<double>>(_value);
 }
 
-const std::vector<double> ot::Variable::getComplexInFormat(ComplexNumberFormats& _format)
+const std::vector<double> ot::Variable::getComplexInFormat(ComplexNumberFormat& _format)
 {
 	std::complex<double> complexValue = std::get<std::complex<double>>(_value);
-	if (_format == ComplexNumberFormats::Cartesian)
+	if (_format == ComplexNumberFormat::Cartesian)
 	{
 		return std::vector<double>{complexValue.real(), complexValue.imag()};
 	}

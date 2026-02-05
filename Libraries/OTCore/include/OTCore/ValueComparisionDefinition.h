@@ -23,12 +23,11 @@
 
 class __declspec(dllexport) ValueComparisionDefinition : public ot::Serializable
 {
+public:
 	ValueComparisionDefinition(const ValueComparisionDefinition& _other) = default;
 	ValueComparisionDefinition(ValueComparisionDefinition&& _other) = default;
 	ValueComparisionDefinition& operator= (const ValueComparisionDefinition& _other) = default;
 	ValueComparisionDefinition& operator= (ValueComparisionDefinition&& _other) = default;
-
-public:
 	ValueComparisionDefinition() = default;
 
 	ValueComparisionDefinition(const std::string& _name, const std::string& _comparator, const std::string& _value, const std::string& _type, const std::string& _unit)
@@ -43,9 +42,12 @@ public:
 	const std::string& getType() const { return m_type; }
 	const std::string& getUnit() const { return m_unit; }
 
+
+	void setTupleCharacteristics(const std::string& _tupleFormat, int32_t _tupleQueryInex = m_entireTupleIndex);
 	bool valueIsTuple() const { return m_tupleIndex != m_noTupleIndex; }
 	bool valueIsEntireTuple() const { return m_tupleIndex == m_entireTupleIndex; }
 	int32_t getTupleIndex() const { return m_tupleIndex; }
+	std::string getTupleFormat() const { return m_tupleFormat; }
 
 	void setName(const std::string& name) { m_name = name; }
 	void setType(const std::string& _type) { m_type = _type; }
@@ -56,6 +58,7 @@ private:
 	const static int32_t m_noTupleIndex = -2;
 	const static int32_t m_entireTupleIndex = -1;
 	int32_t m_tupleIndex = m_noTupleIndex;
+	std::string m_tupleFormat;
 
 	std::string m_name;
 	std::string m_comparator;

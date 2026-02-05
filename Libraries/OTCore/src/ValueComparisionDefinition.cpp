@@ -19,6 +19,12 @@
 
 #include "OTCore/ValueComparisionDefinition.h"
 
+void ValueComparisionDefinition::setTupleCharacteristics(const std::string& _tupleFormat, int32_t _tupleQueryInex)
+{
+	m_tupleFormat = _tupleFormat;
+	m_tupleIndex = _tupleQueryInex;
+}
+
 void ValueComparisionDefinition::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 {
 	_object.AddMember("Comperator", ot::JsonString(m_comparator, _allocator), _allocator);
@@ -27,6 +33,7 @@ void ValueComparisionDefinition::addToJsonObject(ot::JsonValue& _object, ot::Jso
 	_object.AddMember("Type", ot::JsonString(m_type, _allocator), _allocator);
 	_object.AddMember("Unit", ot::JsonString(m_unit, _allocator), _allocator);
 	_object.AddMember("TupleIndex", m_tupleIndex, _allocator);
+	_object.AddMember("TupleFormat", ot::JsonString(m_tupleFormat, _allocator), _allocator);
 }
 
 void ValueComparisionDefinition::setFromJsonObject(const ot::ConstJsonObject& _object)
@@ -37,4 +44,5 @@ void ValueComparisionDefinition::setFromJsonObject(const ot::ConstJsonObject& _o
 	m_type = ot::json::getString(_object, "Type");
 	m_unit = ot::json::getString(_object, "Unit");
 	m_tupleIndex = ot::json::getInt(_object, "TupleIndex", m_noTupleIndex);
+	m_tupleFormat = ot::json::getString(_object, "TupleFormat");
 }
