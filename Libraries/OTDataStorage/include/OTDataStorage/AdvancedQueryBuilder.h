@@ -40,4 +40,5 @@ private:
 	
 	BsonViewOrValue createComparisionEqualNoneOf(const std::list<ot::Variable>& values);
 	BsonViewOrValue createComparisionEqualToAnyOf(const std::list<ot::Variable>& values);
+	void noTupleAllowedCheck(const ValueComparisionDefinition& _definition);
 };

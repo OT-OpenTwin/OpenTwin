@@ -22,43 +22,97 @@
 #include "OTCore/VariableToBSONStringConverter.h"
 #include "OTCore/ExplicitStringValueConverter.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
+#include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
+#include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
 
 // std header
 #include <cassert>
 #include <stdarg.h>
+#include "bsoncxx/json.hpp"
 
-BsonViewOrValue AdvancedQueryBuilder::createComparison(const ValueComparisionDefinition& _valueComparision)
+BsonViewOrValue AdvancedQueryBuilder::createComparison(const ValueComparisionDefinition& _valueComparison)
 {
-	const std::string comparator = _valueComparision.getComparator();
+	const std::string comparator = _valueComparison.getComparator();
+	BsonViewOrValue comparison;
+	// The range operator is an own implementatation
 	if (comparator == ot::ComparisionSymbols::g_rangeComparator)
 	{
-		return buildRangeQuery(_valueComparision);
-	}
-
-	auto mongoComparator = m_mongoDBComparators.find(comparator);
-	if (mongoComparator == m_mongoDBComparators.end())
-	{
-		assert(0);
-		throw std::exception("Not supported comparator selected for comparison query.");
-	}
-	else if (comparator == ot::ComparisionSymbols::g_anyOneOfComparator)
-	{
-		std::list<ot::Variable> values = getVariableListFromValue(_valueComparision);
-		auto compare = createComparisionEqualToAnyOf(values);
-		return GenerateFilterQuery(_valueComparision.getName(), std::move(compare));
-	}
-	else if (comparator == ot::ComparisionSymbols::g_noneOfComparator)
-	{
-		std::list<ot::Variable> values = getVariableListFromValue(_valueComparision);
-		auto compare = createComparisionEqualNoneOf(values);
-		return GenerateFilterQuery(_valueComparision.getName(), std::move(compare));
+		noTupleAllowedCheck(_valueComparison);
+		comparison = buildRangeQuery(_valueComparison); //Muss umgebaut werden, damit der Name nicht mehr mit Teil der range query ist.
 	}
 	else
 	{
-		ot::Variable value = ot::ExplicitStringValueConverter::setValueFromString(_valueComparision.getValue(), _valueComparision.getType());
-		auto comparision = GenerateFilterQuery(mongoComparator->second, value);
-		return GenerateFilterQuery(_valueComparision.getName(), std::move(comparision));
+		//Now we translate the string comparator, displayed in the ui, into the corresponding mongo comparator
+		auto mongoComparator = m_mongoDBComparators.find(comparator);
+		if (mongoComparator == m_mongoDBComparators.end())
+		{
+			assert(0);
+			throw std::exception("Not supported comparator selected for comparison query.");
+		}
+		else if (comparator == ot::ComparisionSymbols::g_anyOneOfComparator)
+		{
+			noTupleAllowedCheck(_valueComparison);
+			std::list<ot::Variable> values = getVariableListFromValue(_valueComparison);
+			comparison = createComparisionEqualToAnyOf(values);
+			
+		}
+		else if (comparator == ot::ComparisionSymbols::g_noneOfComparator)
+		{
+			noTupleAllowedCheck(_valueComparison);
+			std::list<ot::Variable> values = getVariableListFromValue(_valueComparison);
+			auto compare = createComparisionEqualNoneOf(values);
+			comparison = GenerateFilterQuery(_valueComparison.getName(), std::move(compare));
+		}
+		else
+		{
+			//Now we have the common mathmatical comparators
+			ot::Variable value = ot::ExplicitStringValueConverter::setValueFromString(_valueComparison.getValue(), _valueComparison.getType());
+			const std::string formatName = _valueComparison.getTupleFormat();
+			//In case of tuple values, the query needs to be assembled differently
+			if (_valueComparison.valueIsTuple())
+			{
+				//Better here a converter that transforms the tuple into an array and also does the number transformations if indicated by the valueDescription.
+				std::complex<double> complexValue = value.getComplex(); //Currently only complex values are supported
+				std::vector<double> tupleValue;
+				ot::ComplexNumberFormat format = ot::ComplexNumbers::getFormatFromString(formatName);
+				if (format == ot::ComplexNumberFormat::Polar)
+				{
+					tupleValue = ot::ComplexNumberConversion::cartesianToPolar(complexValue);
+				}
+				else
+				{
+					tupleValue = { complexValue.real(),complexValue.imag() };
+				}
+					
+				if (_valueComparison.valueIsEntireTuple())
+				{
+					assert(comparator == "=");
+					comparison = GenerateFilterQuery(mongoComparator->second, { tupleValue[0] , tupleValue[1]});
+				}
+				else
+				{
+					int32_t index = _valueComparison.getTupleIndex();
+					assert(index < tupleValue.size());
+
+					BsonViewOrValue compareWithValue = GenerateFilterQuery(mongoComparator->second, tupleValue[index]);
+					BsonViewOrValue equalIndex = GenerateFilterQuery(std::to_string(index), compareWithValue.view());
+					comparison = GenerateFilterQuery("$elemMatch", equalIndex.view());
+				}
+			}
+			else
+			{
+				comparison = GenerateFilterQuery(mongoComparator->second, value);
+			}
+		}
 	}
+	
+	//Now we add the field name to the comparision, forming the final query
+	BsonViewOrValue finalQuery = GenerateFilterQuery(_valueComparison.getName(), std::move(comparison));
+
+#ifdef _DEBUG
+	std::string queryString = bsoncxx::to_json(finalQuery.view());
+#endif
+	return finalQuery;
 }
 
 BsonViewOrValue AdvancedQueryBuilder::connectWithAND(std::list<BsonViewOrValue>&& values)
@@ -161,6 +215,14 @@ BsonViewOrValue AdvancedQueryBuilder::createComparisionEqualToAnyOf(const std::l
 {
 	const std::string mongoComparator = "$in";
 	return GenerateFilterQuery(mongoComparator, values);
+}
+
+void AdvancedQueryBuilder::noTupleAllowedCheck(const ValueComparisionDefinition& _definition)
+{
+	if (_definition.valueIsTuple())
+	{
+		throw std::invalid_argument("The selected comparision does not support tuple values.");
+	}
 }
 
 

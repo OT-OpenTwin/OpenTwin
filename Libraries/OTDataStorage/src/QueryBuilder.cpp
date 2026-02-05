@@ -74,6 +74,10 @@ namespace DataStorageAPI
 			value bsonVal = DataStorageAPI::BsonValuesHelper::getBoolValue(variable.getBool());
 			builder.append(kvp(fieldName, bsonVal));
 		}
+		else
+		{
+			assert(false); // Unsupported variable type
+		}
 		return builder.extract();
 	}
 
@@ -159,12 +163,12 @@ namespace DataStorageAPI
 	BsonViewOrValue QueryBuilder::AppendElementToQuery(BsonView existingQuery, std::map<std::string, BsonValueType> newKvps)
 	{
 		auto doc = bsoncxx::builder::basic::document{};
-		for (auto oldKvp : existingQuery)
+		for (auto& oldKvp : existingQuery)
 		{
 			doc.append(kvp(oldKvp.key(), oldKvp.get_value()));
 		}
 
-		for (auto newKvp : newKvps)
+		for (auto& newKvp : newKvps)
 		{
 			doc.append(kvp(newKvp.first, newKvp.second));
 		}
