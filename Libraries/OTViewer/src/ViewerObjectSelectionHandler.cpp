@@ -343,11 +343,8 @@ void ViewerObjectSelectionHandler::processRubberbandUpdate(osgViewer::Viewer *vi
 			osg::Vec3 ip;
 			if (intersectLinePlane(helpNormal, referencePoint, rayStart, rayEnd, ip))
 			{
-				osg::Matrix transform = model->getCurrentWorkingPlaneTransformTransposedInverse();
-				ip = ip * transform;
-
 				// Now we need to determine the projection of the new point along the original plane normal
-				osg::Vec3 d = ip - lastPointInPlane;
+				osg::Vec3 d = ip - referencePoint;
 				double height = d * n;
 
 				height = creator->snapDimension(height);
