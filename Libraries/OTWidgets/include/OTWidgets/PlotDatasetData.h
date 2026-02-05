@@ -21,7 +21,7 @@
 
 // OpenTwin header
 
-#include "OTCore/ComplexNumberContainer.h"
+#include "OTCore/ComplexNumbers/ComplexNumberContainer.h"
 #include "OTGui/Plot1DCfg.h"
 #include "OTWidgets/WidgetTypes.h"
 
