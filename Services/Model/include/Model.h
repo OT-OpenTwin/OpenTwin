@@ -295,6 +295,7 @@ private:
 	void removeParentsOfProtected(std::list<EntityBase*>& unprotectedEntities, const std::list<EntityBase*>& protectedEntities);
 	std::list<EntityBase*> FindTopLevelBlockEntities(std::list<EntityBase*>& entityID);
 	std::list<EntityBase*> getTopLevelEntitiesByName(std::list<EntityBase*> entities);
+	void determineActiveCoordinateSystem();
 
 	// Button callbacks
 	ot::ButtonHandler m_buttonHandler;

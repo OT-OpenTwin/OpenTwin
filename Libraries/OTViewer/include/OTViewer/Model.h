@@ -81,9 +81,9 @@ public:
 	void addSceneNode(const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes);
 	
 	void addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes);
-	void addCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings);
-	void updateCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings);
-	void activateCoordinateSystemNode(const std::string &csName);
+	void addCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings, bool isActive);
+	void updateCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings, bool isActive);
+	bool activateCoordinateSystemNode(const std::string &csName, bool isActive);
 
 	void addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
 		bool _isHidden, const double _edgeColorRGB[3],

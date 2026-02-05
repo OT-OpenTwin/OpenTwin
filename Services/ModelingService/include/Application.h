@@ -126,7 +126,7 @@ private:
 	void handleImportSTEP(ot::JsonDocument& _document);
 	void handleCreateGeometryFromRubberband(ot::JsonDocument& _document);
 	void handleEntitiesSelected(ot::JsonDocument& _document);
-
+	void handleSetActiveCoordinateSystem(ot::JsonDocument& _document);
 
 	ot::ToolBarButtonCfg m_buttonImportStep;
 

@@ -520,7 +520,7 @@ void Model::addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, c
 	storeInMaps(containerNode);
 }
 
-void Model::addCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double> &coordinateSettings)
+void Model::addCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double> &coordinateSettings, bool isActive)
 {
 	// Create the new coordinate system node
 
@@ -558,9 +558,12 @@ void Model::addCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, const o
 
 	// Add the node to the maps for faster access
 	storeInMaps(csNode);
+
+	// Update the active state
+	activateCoordinateSystemNode(_treeItem.getEntityName(), isActive);
 }
 
-void Model::updateCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings)
+void Model::updateCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings, bool isActive)
 {
 	SceneNodeCoordinateSystem* csNode = dynamic_cast<SceneNodeCoordinateSystem*>(m_nameToSceneNodesMap[_treeItem.getEntityName()]);
 
@@ -571,14 +574,29 @@ void Model::updateCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, std:
 		csNode->setX(coordinateSettings[6], coordinateSettings[7], coordinateSettings[8]);
 		csNode->updateTransformationMatrix();
 
-		refreshSelection();
+		if (!activateCoordinateSystemNode(_treeItem.getEntityName(), isActive))
+		{
+			updateWorkingPlaneTransform();
+		}
 	}
 }
 
-void Model::activateCoordinateSystemNode(const std::string& csName)
+bool Model::activateCoordinateSystemNode(const std::string& csName, bool isActive)
 {
-	m_activeCoordinateSystem = csName;
-	refreshSelection();
+	if (m_activeCoordinateSystem == csName && isActive) return false;  // Nothing to do, since the currently activated coordinate system is still active
+	if (m_activeCoordinateSystem != csName && !isActive) return false; // Nothing to do, since the currently inactive coordinate system is still inactive
+
+	if (isActive)
+	{
+		m_activeCoordinateSystem = csName;
+	}
+	else if (m_activeCoordinateSystem == csName)
+	{
+		m_activeCoordinateSystem.clear();
+	}
+
+	updateWorkingPlaneTransform();
+	return true; 
 }
 
 void Model::addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,

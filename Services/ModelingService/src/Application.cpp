@@ -445,6 +445,13 @@ void Application::handleEntitiesSelected(ot::JsonDocument& _document) {
 	}
 }
 
+void Application::handleSetActiveCoordinateSystem(ot::JsonDocument& _document) 
+{
+	std::string csName = ot::json::getString(_document, OT_ACTION_PARAM_ObjectName);
+
+	getCoordinateSystemManager()->setActiveCoordinateSystem(csName);
+}
+
 void Application::handleRequestImportSTEP() {
 	// Get a file name for the STEP file from the UI
 	ot::JsonDocument doc;
@@ -551,6 +558,7 @@ Application::Application() :
 	connectAction("importSTEPFile", this, &Application::handleImportSTEP);
 	connectAction(OT_ACTION_CMD_MODEL_EntitiesSelected, this, &Application::handleEntitiesSelected);
 	connectAction(OT_ACTION_CMD_MODEL_CreateGeometryFromRubberbandData, this, &Application::handleCreateGeometryFromRubberband);
+	connectAction(OT_ACTION_CMD_UI_VIEW_ActivateCS, this, &Application::handleSetActiveCoordinateSystem);
 
 	// Setup and connect buttons
 	ot::LockTypes lockTypes = ot::LockType::ModelWrite | ot::LockType::ViewWrite | ot::LockType::ModelRead;

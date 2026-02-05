@@ -316,7 +316,6 @@ public:
 	void handleRenameEntity(ot::JsonDocument& _document);
 	void handleSetEntitySelected(ot::JsonDocument& _document);
 	void handleUpdateCoordinateSystemNode(ot::JsonDocument& _document);
-	void handleActivateCoordinateSystemNode(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
