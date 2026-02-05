@@ -1,5 +1,5 @@
 // @otlicense
-// File: LCSManager.h
+// File: CoordinateSystemManager.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -24,16 +24,15 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 
-class LCSManager
+class CoordinateSystemManager
 {
 public:
-	LCSManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName) 
+	CoordinateSystemManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName) 
 		: uiComponent(_uiComponent), modelComponent(_modelComponent), serviceID(_serviceID), serviceName(_serviceName) {};
-	virtual ~LCSManager() {}
+	virtual ~CoordinateSystemManager() {}
 
 	void createNew();
-	void activateSelected();
-	void deactivateAllLCS(bool notifyFrontend);
+	void activateCoordinateSystem(const std::string& csName);
 
 protected:
 	std::string createUniqueName(const std::string& name);
@@ -43,4 +42,6 @@ private:
 	ot::components::ModelComponent* modelComponent;
 	ot::serviceID_t serviceID;
 	std::string serviceName;
+
+	std::string activeCoordinateSystemName;
 };

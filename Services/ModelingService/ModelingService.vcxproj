@@ -192,7 +192,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\EdgesOperationBase.cpp" />
     <ClCompile Include="src\EntityCache.cpp" />
-    <ClCompile Include="src\LCSManager.cpp" />
+    <ClCompile Include="src\CoordinateSystemManager.cpp" />
     <ClCompile Include="src\ModalCommandHealing.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\PrimitiveManager.cpp" />
@@ -218,7 +218,7 @@
     <ClInclude Include="include\ChamferEdges.h" />
     <ClInclude Include="include\EdgesOperationBase.h" />
     <ClInclude Include="include\EntityCache.h" />
-    <ClInclude Include="include\LCSManager.h" />
+    <ClInclude Include="include\CoordinateSystemManager.h" />
     <ClInclude Include="include\ModalCommandHealing.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\PrimitiveManager.h" />

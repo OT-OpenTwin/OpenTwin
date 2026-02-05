@@ -1,5 +1,5 @@
 // @otlicense
-// File: LCSManager.cpp
+// File: CoordinateSystemManager.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,33 +17,32 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "LCSManager.h"
+#include "CoordinateSystemManager.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTCommunication/ActionTypes.h"
 
-#include "OTModelEntities/EntityLocalCoordinateSystem.h"
+#include "OTModelEntities/EntityCoordinateSystem.h"
 
-void LCSManager::createNew()
+void CoordinateSystemManager::createNew()
 {
-	deactivateAllLCS(false);
+	std::string itemName = createUniqueName("Coordinate Systems/LCS");
 
-	std::string itemName = createUniqueName("Local Coordinate Systems/LCS");
-
-	EntityLocalCoordinateSystem* lcsEntity = new EntityLocalCoordinateSystem(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
-	lcsEntity->setName(itemName);
-	lcsEntity->createProperties();
-	lcsEntity->setTreeItemEditable(true);
-	lcsEntity->registerCallbacks(
+	EntityCoordinateSystem* csEntity = new EntityCoordinateSystem(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	csEntity->setName(itemName);
+	csEntity->createProperties();
+	csEntity->setTreeItemEditable(true);
+	csEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
 		ot::EntityCallbackBase::Callback::DataNotify,
 		serviceName
 	);
 
-	lcsEntity->storeToDataBase();
+	csEntity->storeToDataBase();
 
-	std::list<ot::UID> topologyEntityIDList = { lcsEntity->getEntityID()};
-	std::list<ot::UID> topologyEntityVersionList = { lcsEntity->getEntityStorageVersion() };
+	std::list<ot::UID> topologyEntityIDList = { csEntity->getEntityID()};
+	std::list<ot::UID> topologyEntityVersionList = { csEntity->getEntityStorageVersion() };
 	std::list<bool> topologyEntityForceVisible = { false };
 	std::list<ot::UID> dataEntityIDList = { };
 	std::list<ot::UID> dataEntityVersionList = { };
@@ -52,18 +51,20 @@ void LCSManager::createNew()
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create new local coordinate system: " + itemName);
 }
 
-void LCSManager::activateSelected()
+void CoordinateSystemManager::activateCoordinateSystem(const std::string &csName)
 {
-	deactivateAllLCS(false);
+	activeCoordinateSystemName = csName;
 
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_ActivateCS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, ot::ModelServiceAPI::getCurrentVisualizationModelID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(csName, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string tmp;
+	uiComponent->sendMessage(true, doc, tmp);
 }
 
-void LCSManager::deactivateAllLCS(bool notifyFrontend)
-{
-
-}
-
-std::string LCSManager::createUniqueName(const std::string& name)
+std::string CoordinateSystemManager::createUniqueName(const std::string& name)
 {
 	// Find the parent folder name of the entity
 	std::string parentFolder;

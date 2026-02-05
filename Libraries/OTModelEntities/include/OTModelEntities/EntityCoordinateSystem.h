@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityLocalCoordinateSystem.h
+// File: EntityCoordinateSystem.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -22,22 +22,23 @@
 
 #include "EntityBase.h"
 
-class __declspec(dllexport) EntityLocalCoordinateSystem : public EntityBase
+class __declspec(dllexport) EntityCoordinateSystem : public EntityBase
 {
 public:
-	EntityLocalCoordinateSystem() : EntityLocalCoordinateSystem(0, nullptr, nullptr, nullptr) {};
-	EntityLocalCoordinateSystem(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms);
-	virtual ~EntityLocalCoordinateSystem();
+	EntityCoordinateSystem() : EntityCoordinateSystem(0, nullptr, nullptr, nullptr) {};
+	EntityCoordinateSystem(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms);
+	virtual ~EntityCoordinateSystem();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 
 	virtual void storeToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
 	
-	static std::string className() { return "EntityLocalCoordinateSystem"; };
-	virtual std::string getClassName(void) const override { return EntityLocalCoordinateSystem::className(); };
+	static std::string className() { return "EntityCoordinateSystem"; };
+	virtual std::string getClassName(void) const override { return EntityCoordinateSystem::className(); };
 
 	void addVisualizationItem(bool isHidden);
+	void updateVisualizationItem();
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
@@ -46,10 +47,19 @@ public:
 
 	virtual bool updateFromProperties(void) override;
 
+	void setActive(bool flag);
+	void setGlobal(bool flag);
+
+	bool getActive() { return isActive; }
+	bool getGlobal() { return isGlobal; }
+
 private:
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	void createOrientationProperty(const std::string& groupName, const std::string& propName, double value);
 	double getValue(const std::string& groupName, const std::string& propName);
+
+	bool isActive = false;
+	bool isGlobal = false;
 };

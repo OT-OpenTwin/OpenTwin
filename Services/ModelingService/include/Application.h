@@ -45,7 +45,7 @@ class ChamferEdges;
 class BlendEdges;
 class SimplifyRemoveFaces;
 class STEPReader;
-class LCSManager;
+class CoordinateSystemManager;
 
 // Forward declaration
 namespace ot {
@@ -109,7 +109,7 @@ private:
 	BlendEdges          *getBlendEdgesManager(void);
 	SimplifyRemoveFaces *getRemoveFacesOperation(void);
 	STEPReader			*getSTEPReader(void);
-	LCSManager			*getLCSManager(void);
+	CoordinateSystemManager *getCoordinateSystemManager(void);
 
 private:
 	EntityCache          entityCache;
@@ -121,7 +121,7 @@ private:
 	BlendEdges          *blendEdges;
 	SimplifyRemoveFaces *removeFaces;
 	STEPReader			*stepReader;
-	LCSManager			*lcsManager;
+	CoordinateSystemManager*coordinateSystemManager;
 
 	void handleImportSTEP(ot::JsonDocument& _document);
 	void handleCreateGeometryFromRubberband(ot::JsonDocument& _document);
@@ -169,8 +169,8 @@ private:
 	void handleRemoveFaces();
 	void handleHealing();
 
-	void handleCreateLCS();
-	void handleActivateLCS();
+	void handleCreateCoordinateSystem();
+	void handleActivateCoordinateSystem();
 
 	Application();
 	virtual ~Application();

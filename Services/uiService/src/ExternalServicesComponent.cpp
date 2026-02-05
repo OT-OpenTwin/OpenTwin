@@ -254,7 +254,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	connectAction(OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData, this, &ExternalServicesComponent::handleAddNodeFromFacetData);
 	connectAction(OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, this, &ExternalServicesComponent::handleAddNodeFromDataBase);
 	connectAction(OT_ACTION_CMD_UI_VIEW_AddContainerNode, this, &ExternalServicesComponent::handleAddContainerNode);
-	connectAction(OT_ACTION_CMD_UI_VIEW_AddLCSNode, this, &ExternalServicesComponent::handleAddLCSNode);
+	connectAction(OT_ACTION_CMD_UI_VIEW_AddCSNode, this, &ExternalServicesComponent::handleAddCoordinateSystemNode);
 	connectAction(OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode, this, &ExternalServicesComponent::handleAddVis2D3DNode);
 	connectAction(OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNode, this, &ExternalServicesComponent::handleAddAnnotationNode);
 	connectAction(OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNodeFromDatabase, this, &ExternalServicesComponent::handleAddAnnotationNodeFromDataBase);
@@ -280,6 +280,8 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	connectAction(OT_ACTION_CMD_UI_VIEW_SetEntityName, this, &ExternalServicesComponent::handleSetEntityName);
 	connectAction(OT_ACTION_CMD_UI_VIEW_RenameEntityName, this, &ExternalServicesComponent::handleRenameEntity);
 	connectAction(OT_ACTION_CMD_UI_VIEW_SetEntitySelected, this, &ExternalServicesComponent::handleSetEntitySelected);
+	connectAction(OT_ACTION_CMD_UI_VIEW_UpdateCSNode, this, &ExternalServicesComponent::handleUpdateCoordinateSystemNode);
+	connectAction(OT_ACTION_CMD_UI_VIEW_ActivateCS, this, &ExternalServicesComponent::handleActivateCoordinateSystemNode);
 
 	// ToolBar
 	connectAction(OT_ACTION_CMD_UI_AddMenuPage, this, &ExternalServicesComponent::handleAddMenuPage);
@@ -2797,14 +2799,31 @@ void ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& _docume
 	ViewerAPI::addVisualizationContainerNode(visModelID, item, visTypes);
 }
 
-void ExternalServicesComponent::handleAddLCSNode(ot::JsonDocument& _document) {
+void ExternalServicesComponent::handleAddCoordinateSystemNode(ot::JsonDocument& _document) {
 	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 
 	ot::EntityTreeItem item(ot::json::getObject(_document, OT_ACTION_PARAM_TreeItem));
 	ot::VisualisationTypes visTypes(ot::json::getObject(_document, OT_ACTION_PARAM_VisualizationTypes));
 	std::vector<double> coordinateSettings = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_POSITION);
 
-	ViewerAPI::addLCSNode(visModelID, item, visTypes, coordinateSettings);
+	ViewerAPI::addCoordinateSystemNode(visModelID, item, visTypes, coordinateSettings);
+}
+
+void ExternalServicesComponent::handleUpdateCoordinateSystemNode(ot::JsonDocument& _document) {
+	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+
+	ot::EntityTreeItem item(ot::json::getObject(_document, OT_ACTION_PARAM_TreeItem));
+	std::vector<double> coordinateSettings = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_POSITION);
+
+	ViewerAPI::updateCoordinateSystemNode(visModelID, item, coordinateSettings);
+}
+
+void ExternalServicesComponent::handleActivateCoordinateSystemNode(ot::JsonDocument& _document) {
+	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+
+	std::string csName = ot::json::getString(_document, OT_ACTION_PARAM_ObjectName);
+
+	ViewerAPI::activateCoordinateSystemNode(visModelID, csName);
 }
 
 void ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _document) {

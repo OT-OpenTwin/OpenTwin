@@ -286,7 +286,7 @@ public:
 	void handleAddNodeFromFacetData(ot::JsonDocument& _document);
 	void handleAddNodeFromDataBase(ot::JsonDocument& _document);
 	void handleAddContainerNode(ot::JsonDocument& _document);
-	void handleAddLCSNode(ot::JsonDocument& _document);
+	void handleAddCoordinateSystemNode(ot::JsonDocument& _document);
 	void handleAddVis2D3DNode(ot::JsonDocument& _document);
 	void handleAddAnnotationNode(ot::JsonDocument& _document);
 	void handleAddAnnotationNodeFromDataBase(ot::JsonDocument& _document);
@@ -315,6 +315,8 @@ public:
 	void handleSetEntityName(ot::JsonDocument& _document);
 	void handleRenameEntity(ot::JsonDocument& _document);
 	void handleSetEntitySelected(ot::JsonDocument& _document);
+	void handleUpdateCoordinateSystemNode(ot::JsonDocument& _document);
+	void handleActivateCoordinateSystemNode(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

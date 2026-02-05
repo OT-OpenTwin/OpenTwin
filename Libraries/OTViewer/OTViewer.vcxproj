@@ -60,7 +60,7 @@
     <ClCompile Include="src\SceneNodeCartesianMeshItem.cpp" />
     <ClCompile Include="src\SceneNodeContainer.cpp" />
     <ClCompile Include="src\SceneNodeGeometry.cpp" />
-    <ClCompile Include="src\SceneNodeLCS.cpp" />
+    <ClCompile Include="src\SceneNodeCoordinateSystem.cpp" />
     <ClCompile Include="src\SceneNodeMaterial.cpp" />
     <ClCompile Include="src\SceneNodeMaterialFactory.cpp" />
     <ClCompile Include="src\SceneNodeMesh.cpp" />
@@ -109,7 +109,7 @@
     <ClInclude Include="include\OTViewer\PlotManagerView.h" />
     <ClInclude Include="include\OTViewer\PlotVisualiser.h" />
     <ClInclude Include="include\OTViewer\RangeVisualiser.h" />
-    <ClInclude Include="include\OTViewer\SceneNodeLCS.h" />
+    <ClInclude Include="include\OTViewer\SceneNodeCoordinateSystem.h" />
     <ClInclude Include="include\OTViewer\ViewChangedStates.h" />
     <ClInclude Include="include\OTViewer\ViewerToolBar.h" />
     <ClInclude Include="include\OTViewer\Visualiser.h" />

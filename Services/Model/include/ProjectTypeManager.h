@@ -40,7 +40,8 @@ public:
 	bool hasRMDCategorizationPreview()	{ return m_hasRMDCategorizationPreview; }
 	bool hasDatasetRoot()				{ return m_hasDatasetRoot; }
 	bool hasDatasetRMD()				{ return m_hasDatasetRMD; }
-	bool hasHierarchicalRoot()          { return m_hasHierarchicalRoot; }
+	bool hasHierarchicalRoot()			{ return m_hasHierarchicalRoot; }
+	bool hasCoordinateSystemRoot()		{ return m_hasCoordinateSystemRoot; }
 
 	std::string getRMDCategorizationName()          { return m_RMDCategorizationName; }
 	std::string getDatasetRMD()                     { return m_datasetRMD; }
@@ -75,6 +76,7 @@ private:
 	bool m_hasRMDCategorization			= true;
 	bool m_hasRMDCategorizationPreview	= true;
 	bool m_hasDataProcessingRoot		= true;
+	bool m_hasCoordinateSystemRoot		= true;
 
 	//Became now mandatory since plot data and solver results in general are also stored in the result data base.
 	bool m_hasDatasetRoot				= true;

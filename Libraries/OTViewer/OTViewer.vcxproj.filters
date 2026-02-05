@@ -163,7 +163,7 @@
     <ClCompile Include="src\VisualiserHelper.cpp">
       <Filter>src\Visualiser</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneNodeLCS.cpp">
+    <ClCompile Include="src\SceneNodeCoordinateSystem.cpp">
       <Filter>src\SceneNodes</Filter>
     </ClCompile>
   </ItemGroup>
@@ -339,7 +339,8 @@
     <ClInclude Include="include\OTViewer\WorkingPlane.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\SceneNodeLCS.h">
+    <ClInclude Include="include\OTViewer\stdafx.h" />
+    <ClInclude Include="include\OTViewer\SceneNodeCoordinateSystem.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
   </ItemGroup>

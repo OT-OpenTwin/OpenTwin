@@ -42,7 +42,7 @@
 #include "OTViewer/ViewerSettings.h"
 
 #include "OTViewer/SceneNodeVTK.h"
-#include "OTViewer/SceneNodeLCS.h"
+#include "OTViewer/SceneNodeCoordinateSystem.h"
 #include "OTViewer/SceneNodeMesh.h"
 #include "OTViewer/SceneNodeBase.h"
 #include "OTViewer/VisualiserInfo.h"
@@ -520,15 +520,19 @@ void Model::addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, c
 	storeInMaps(containerNode);
 }
 
-void Model::addLCSNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double> &coordinateSettings)
+void Model::addCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double> &coordinateSettings)
 {
-	// Create the new LCS node
+	// Create the new coordinate system node
 
-	SceneNodeBase* lcsNode = new SceneNodeLCS;
+	SceneNodeCoordinateSystem* csNode = new SceneNodeCoordinateSystem;
 
-	lcsNode->setTreeItem(_treeItem);
+	csNode->setTreeItem(_treeItem);
+	csNode->setOrigin(coordinateSettings[0], coordinateSettings[1], coordinateSettings[2]);
+	csNode->setZ(coordinateSettings[3], coordinateSettings[4], coordinateSettings[5]);
+	csNode->setX(coordinateSettings[6], coordinateSettings[7], coordinateSettings[8]);
+	csNode->updateTransformationMatrix();
 
-	VisualiserHelper::addVisualizer(lcsNode, _visualisationTypes);
+	VisualiserHelper::addVisualizer(csNode, _visualisationTypes);
 
 	// Get the parent scene node
 	SceneNodeBase* parentNode = getParentNode(_treeItem.getEntityName());
@@ -537,23 +541,44 @@ void Model::addLCSNode(const ot::EntityTreeItem& _treeItem, const ot::Visualisat
 	if (parentNode == nullptr)
 	{
 		// If the model is corrupt, this might happen. We deal with this by ignoring the current item
-		delete lcsNode;
+		delete csNode;
 		return;
 	}
 
 	// Now add the current node as child to the parent
-	parentNode->addChild(lcsNode);
+	parentNode->addChild(csNode);
 
 	// Now add the current nodes osg node to the parent's osg node
-	parentNode->getShapeNode()->addChild(lcsNode->getShapeNode());
+	parentNode->getShapeNode()->addChild(csNode->getShapeNode());
 
 	// Add the tree name to the tree
-	addSceneNodesToTree(lcsNode);
+	addSceneNodesToTree(csNode);
 
-	lcsNode->setModel(this);
+	csNode->setModel(this);
 
 	// Add the node to the maps for faster access
-	storeInMaps(lcsNode);
+	storeInMaps(csNode);
+}
+
+void Model::updateCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings)
+{
+	SceneNodeCoordinateSystem* csNode = dynamic_cast<SceneNodeCoordinateSystem*>(m_nameToSceneNodesMap[_treeItem.getEntityName()]);
+
+	if (csNode != nullptr)
+	{
+		csNode->setOrigin(coordinateSettings[0], coordinateSettings[1], coordinateSettings[2]);
+		csNode->setZ(coordinateSettings[3], coordinateSettings[4], coordinateSettings[5]);
+		csNode->setX(coordinateSettings[6], coordinateSettings[7], coordinateSettings[8]);
+		csNode->updateTransformationMatrix();
+
+		refreshSelection();
+	}
+}
+
+void Model::activateCoordinateSystemNode(const std::string& csName)
+{
+	m_activeCoordinateSystem = csName;
+	refreshSelection();
 }
 
 void Model::addVisualizationAnnotationNode(const ot::EntityTreeItem& _treeItem,
@@ -1531,20 +1556,30 @@ bool Model::getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, 
 {
 	if (root->isSelected())
 	{
+		osg::Matrix transformationMatrix;
+
 		SceneNodeGeometry *geometryNode = dynamic_cast<SceneNodeGeometry *>(root);
+		SceneNodeCoordinateSystem *csNode = dynamic_cast<SceneNodeCoordinateSystem*>(root);
 
 		if (geometryNode != nullptr)
 		{
+			transformationMatrix = geometryNode->getTransformation();
+		}
+		else if (csNode != nullptr)
+		{
+			transformationMatrix = csNode->getTransformation();
+		}
+
+		if (geometryNode != nullptr || csNode != nullptr)
+		{
 			if (first)
 			{
-				matrix = geometryNode->getTransformation();
+				matrix = transformationMatrix;
 				first = false;
 			}
 			else
 			{
-				osg::Matrix localMatrix = geometryNode->getTransformation();
-
-				if (!compareTransformations(matrix, localMatrix))
+				if (!compareTransformations(matrix, transformationMatrix))
 				{
 					return false;
 				}
@@ -1563,15 +1598,26 @@ bool Model::getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, 
 	return true;
 }
 
+osg::Matrix Model::getActiveCoordinateSystemTransform()
+{
+	if (m_activeCoordinateSystem.empty()) return osg::Matrix::identity();  // The global coordinate system is active
+
+	SceneNodeCoordinateSystem* csNode = dynamic_cast<SceneNodeCoordinateSystem*>(m_nameToSceneNodesMap[m_activeCoordinateSystem]);
+
+	if (csNode == nullptr) return osg::Matrix::identity(); // The active LCS does no longer exist
+
+	return csNode->getTransformation();
+}
+
 void Model::updateWorkingPlaneTransform() 
 {
-	osg::Matrix matrix;
+	osg::Matrix matrix = getActiveCoordinateSystemTransform();
 	bool first = true;
 
 	if (!getTransformationOfSelectedShapes(m_sceneNodesRoot, first, matrix))
 	{
 		// The transformations are not the same for all selected scene nodes -> we use as identity transform
-		matrix = osg::Matrix::identity();
+		matrix = getActiveCoordinateSystemTransform();
 	}
 
 	matrix.transpose(matrix); // We need to transpose the matrix, since the working plane transform needs to be transposed to match the shape transform

@@ -48,6 +48,7 @@ class EntityBrep;
 class EntityMaterial;
 class EntityParameter;
 class EntityAnnotation;
+class EntityCoordinateSystem;
 class TopoDS_Shape;
 class MicroserviceNotifier;
 class ModalCommandBase;
@@ -112,6 +113,7 @@ public:
 	std::string getSolverRootName() { return ot::FolderNames::SolverFolder; };
 	std::string getPythonRootName() { return ot::FolderNames::PythonFolder; };
 	std::string getUnitRootName() { return "Units"; };
+	std::string getCoordinateSystemsRootName() { return "Coordinate Systems"; };
 
 	void removeShapesFromVisualization(std::list<ot::UID> &removeFromDisplay);
 	void setShapeVisibility(std::list<ot::UID> &visibleEntityIDs, std::list<ot::UID> &hiddenEntityIDs);
@@ -173,7 +175,8 @@ public:
 	void deleteEntitiesFromModel(const std::list<EntityBase*>& _entityList, bool _saveModel);
 	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties);
-	
+	void updateCoordinateSystem(EntityCoordinateSystem* csEntity);
+
 	void updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment, bool _considerVisualization);
 
 	//! @brief Performs an update on a topology entity. The updated entity replaces its old version in the entity map and redirects all parent/child relationships to the updated entity.,

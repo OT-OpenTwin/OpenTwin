@@ -80,26 +80,28 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 	}
 }
 
-void ProjectTypeManager::initializeProjectTypeHierarchical() {
-	m_hasGeometryRoot = false;
-	m_hasCircuit = false;
-	m_hasMaterialRoot = false;
-	m_hasMeshRoot = false;
-	m_hasSolverRoot = false;
-	m_hasPythonRoot = false;
-	m_hasUnitRoot = false;
-	m_hasDataCategorizationRoot = false;
-	m_hasRMDCategorization = false;
-	m_hasRMDCategorizationPreview = false;
-	m_hasDataProcessingRoot = false;
+void ProjectTypeManager::initializeProjectTypeHierarchical() 
+{
+	m_hasGeometryRoot				= false;
+	m_hasCircuit					= false;
+	m_hasMaterialRoot				= false;
+	m_hasMeshRoot					= false;
+	m_hasSolverRoot					= false;
+	m_hasPythonRoot					= false;
+	m_hasUnitRoot					= false;
+	m_hasDataCategorizationRoot		= false;
+	m_hasRMDCategorization			= false;
+	m_hasRMDCategorizationPreview	= false;
+	m_hasDataProcessingRoot			= false;
+	m_hasCoordinateSystemRoot		= false;
 
-	m_hasDatasetRoot = false;
-	m_hasDatasetRMD = false;
+	m_hasDatasetRoot				= false;
+	m_hasDatasetRMD					= false;
 
-	m_hasHierarchicalRoot = true;
+	m_hasHierarchicalRoot			= true;
 
-	m_has3DView = false;
-	m_hasBlockPicker = false;
+	m_has3DView						= false;
+	m_hasBlockPicker				= false;
 }
 
 void ProjectTypeManager::initializeProjectType3DSimulation(void)
@@ -109,12 +111,13 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 	m_hasMaterialRoot				= true;
 	m_hasMeshRoot					= true;
 	m_hasSolverRoot					= true;
-	m_hasPythonRoot				= false;
+	m_hasPythonRoot					= false;
 	m_hasUnitRoot					= true;
 	m_hasDataCategorizationRoot		= false;
 	m_hasRMDCategorization			= false;
 	m_hasRMDCategorizationPreview	= false;
 	m_hasDataProcessingRoot			= false;
+	m_hasCoordinateSystemRoot		= true;
 	
 	m_has3DView						= true;
 	m_hasBlockPicker				= false;
@@ -127,111 +130,117 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 	m_hasMaterialRoot				= false;
 	m_hasMeshRoot					= false;
 	m_hasSolverRoot					= true;
-	m_hasPythonRoot				= true;
+	m_hasPythonRoot					= true;
 	m_hasUnitRoot					= true;
 	m_hasDataCategorizationRoot		= true;
 	m_hasRMDCategorization			= true;
 	m_hasRMDCategorizationPreview	= true;
-	
+	m_hasCoordinateSystemRoot		= false;
+
 	m_has3DView						= false;
 	m_hasBlockPicker				= true;
 }
 
 void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 {
-	m_hasGeometryRoot = true;
-	m_hasCircuit	= false;
-	m_hasMaterialRoot = true;
-	m_hasMeshRoot = false;
-	m_hasSolverRoot = false;
-	m_hasPythonRoot = false;
-	m_hasUnitRoot = true;
-	m_hasDataCategorizationRoot = false;
-	m_hasRMDCategorization = false;
-	m_hasDataProcessingRoot = false;
-	m_hasRMDCategorizationPreview = false;
-	
-	m_has3DView = true;
-	m_hasBlockPicker = false;
+	m_hasGeometryRoot				= true;
+	m_hasCircuit					= false;
+	m_hasMaterialRoot				= true;
+	m_hasMeshRoot					= false;
+	m_hasSolverRoot					= false;
+	m_hasPythonRoot					= false;
+	m_hasUnitRoot					= true;
+	m_hasDataCategorizationRoot		= false;
+	m_hasRMDCategorization			= false;
+	m_hasDataProcessingRoot			= false;
+	m_hasRMDCategorizationPreview	= false;
+	m_hasCoordinateSystemRoot		= false;
+
+	m_has3DView						= true;
+	m_hasBlockPicker				= false;
 }
 
 void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 {
-	m_hasGeometryRoot = false;
-	m_hasCircuit = false;
-	m_hasMaterialRoot = false;
-	m_hasMeshRoot = false;
-	m_hasSolverRoot = false;
-	m_hasPythonRoot = false;
-	m_hasUnitRoot = false;
-	m_hasDataCategorizationRoot = false;
-	m_hasRMDCategorization = false;
-	m_hasRMDCategorizationPreview = false;
-	m_hasDataProcessingRoot = false;
+	m_hasGeometryRoot				= false;
+	m_hasCircuit					= false;
+	m_hasMaterialRoot				= false;
+	m_hasMeshRoot					= false;
+	m_hasSolverRoot					= false;
+	m_hasPythonRoot					= false;
+	m_hasUnitRoot					= false;
+	m_hasDataCategorizationRoot		= false;
+	m_hasRMDCategorization			= false;
+	m_hasRMDCategorizationPreview	= false;
+	m_hasDataProcessingRoot			= false;
+	m_hasCoordinateSystemRoot		= false;
 
-	m_has3DView = false;
-	m_hasBlockPicker = true;
+	m_has3DView						= false;
+	m_hasBlockPicker				= true;
 
 	m_datasetRMD = ot::FolderNames::DatasetFolder + "/Information";
 }
 
 void ProjectTypeManager::initializeProjectTypePyrit(void)
 {
-	m_hasGeometryRoot = true;
-	m_hasCircuit = false;
-	m_hasMaterialRoot = true;
-	m_hasMeshRoot = true;
-	m_hasSolverRoot = true;
-	m_hasPythonRoot = false;
-	m_hasUnitRoot = true;
-	m_hasDataCategorizationRoot = false;
-	m_hasRMDCategorization = false;
-	m_hasRMDCategorizationPreview = false;
-	m_hasDataProcessingRoot = false;
-	
-	m_has3DView = true;
-	m_hasBlockPicker = false;
+	m_hasGeometryRoot				= true;
+	m_hasCircuit					= false;
+	m_hasMaterialRoot				= true;
+	m_hasMeshRoot					= true;
+	m_hasSolverRoot					= true;
+	m_hasPythonRoot					= false;
+	m_hasUnitRoot					= true;
+	m_hasDataCategorizationRoot		= false;
+	m_hasRMDCategorization			= false;
+	m_hasRMDCategorizationPreview	= false;
+	m_hasDataProcessingRoot			= false;
+	m_hasCoordinateSystemRoot		= false;
+
+	m_has3DView						= true;
+	m_hasBlockPicker				= false;
 }
 
 void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
 {
-	m_hasGeometryRoot = false;
-	m_hasCircuit = true;
-	m_hasMaterialRoot = false;
-	m_hasMeshRoot = false;
-	m_hasSolverRoot = true;
-	m_hasPythonRoot = false;
-	m_hasUnitRoot = true;
-	m_hasDataCategorizationRoot = false;
-	m_hasRMDCategorization = false;
-	m_hasRMDCategorizationPreview = false;
-	m_hasDataProcessingRoot = false;
-	
+	m_hasGeometryRoot				= false;
+	m_hasCircuit					= true;
+	m_hasMaterialRoot				= false;
+	m_hasMeshRoot					= false;
+	m_hasSolverRoot					= true;
+	m_hasPythonRoot					= false;
+	m_hasUnitRoot					= true;
+	m_hasDataCategorizationRoot		= false;
+	m_hasRMDCategorization			= false;
+	m_hasRMDCategorizationPreview	= false;
+	m_hasDataProcessingRoot			= false;
+	m_hasCoordinateSystemRoot		= false;
 
-	m_has3DView = false;
-	m_hasBlockPicker = true;
+	m_has3DView						= false;
+	m_hasBlockPicker				= true;
 }
 
-void ProjectTypeManager::initializeProjectTypeFileManagement() {
-	m_hasGeometryRoot = false;
-	m_hasCircuit = false;
-	m_hasMaterialRoot = false;
-	m_hasMeshRoot = false;
-	m_hasSolverRoot = false;
-	m_hasPythonRoot = false;
-	m_hasUnitRoot = false;
-	m_hasDataCategorizationRoot = false;
-	m_hasRMDCategorization = false;
-	m_hasRMDCategorizationPreview = false;
-	m_hasDataProcessingRoot = false;
+void ProjectTypeManager::initializeProjectTypeFileManagement() 
+{
+	m_hasGeometryRoot				= false;
+	m_hasCircuit					= false;
+	m_hasMaterialRoot				= false;
+	m_hasMeshRoot					= false;
+	m_hasSolverRoot					= false;
+	m_hasPythonRoot					= false;
+	m_hasUnitRoot					= false;
+	m_hasDataCategorizationRoot		= false;
+	m_hasRMDCategorization			= false;
+	m_hasRMDCategorizationPreview	= false;
+	m_hasDataProcessingRoot			= false;
+	m_hasCoordinateSystemRoot		= false;
 
-	m_hasDatasetRoot = false;
-	m_hasDatasetRMD = false;
+	m_hasDatasetRoot				= false;
+	m_hasDatasetRMD					= false;
 
-	m_hasHierarchicalRoot = false;
+	m_hasHierarchicalRoot			= false;
 
-	m_has3DView = false;
-	m_hasBlockPicker = false;
+	m_has3DView						= false;
+	m_hasBlockPicker				= false;
 }
 
 std::string ProjectTypeManager::getViews(void)
