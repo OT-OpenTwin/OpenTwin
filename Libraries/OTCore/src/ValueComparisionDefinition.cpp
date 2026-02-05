@@ -26,6 +26,7 @@ void ValueComparisionDefinition::addToJsonObject(ot::JsonValue& _object, ot::Jso
 	_object.AddMember("Value", ot::JsonString(m_value, _allocator), _allocator);
 	_object.AddMember("Type", ot::JsonString(m_type, _allocator), _allocator);
 	_object.AddMember("Unit", ot::JsonString(m_unit, _allocator), _allocator);
+	_object.AddMember("TupleIndex", m_tupleIndex, _allocator);
 }
 
 void ValueComparisionDefinition::setFromJsonObject(const ot::ConstJsonObject& _object)
@@ -35,4 +36,5 @@ void ValueComparisionDefinition::setFromJsonObject(const ot::ConstJsonObject& _o
 	m_value = ot::json::getString(_object, "Value");
 	m_type = ot::json::getString(_object, "Type");
 	m_unit = ot::json::getString(_object, "Unit");
+	m_tupleIndex = ot::json::getInt(_object, "TupleIndex", m_noTupleIndex);
 }

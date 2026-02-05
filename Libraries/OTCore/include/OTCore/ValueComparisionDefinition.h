@@ -23,8 +23,11 @@
 
 class __declspec(dllexport) ValueComparisionDefinition : public ot::Serializable
 {
-	OT_DECL_DEFCOPY(ValueComparisionDefinition)
-	OT_DECL_DEFMOVE(ValueComparisionDefinition)
+	ValueComparisionDefinition(const ValueComparisionDefinition& _other) = default;
+	ValueComparisionDefinition(ValueComparisionDefinition&& _other) = default;
+	ValueComparisionDefinition& operator= (const ValueComparisionDefinition& _other) = default;
+	ValueComparisionDefinition& operator= (ValueComparisionDefinition&& _other) = default;
+
 public:
 	ValueComparisionDefinition() = default;
 
@@ -40,12 +43,20 @@ public:
 	const std::string& getType() const { return m_type; }
 	const std::string& getUnit() const { return m_unit; }
 
+	bool valueIsTuple() const { return m_tupleIndex != m_noTupleIndex; }
+	bool valueIsEntireTuple() const { return m_tupleIndex == m_entireTupleIndex; }
+	int32_t getTupleIndex() const { return m_tupleIndex; }
+
 	void setName(const std::string& name) { m_name = name; }
 	void setType(const std::string& _type) { m_type = _type; }
 	void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 	void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 private:
+	const static int32_t m_noTupleIndex = -2;
+	const static int32_t m_entireTupleIndex = -1;
+	int32_t m_tupleIndex = m_noTupleIndex;
+
 	std::string m_name;
 	std::string m_comparator;
 	std::string m_value;
