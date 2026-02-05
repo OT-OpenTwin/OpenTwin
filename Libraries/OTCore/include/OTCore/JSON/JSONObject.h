@@ -28,7 +28,8 @@ namespace ot {
 	class Serializable;
 
 	//! @class JsonObject
-	//! @brief JSON Object value
+	//! @brief A JSON value of type object. Only object type values can add members.
+	//! @brief The allocator used for this object must outlive the object. It is recommended to use a JsonDocument as allocator owner.
 	class OT_CORE_API_EXPORT JsonObject : public JsonValue {
 		OT_DECL_NOCOPY(JsonObject)
 		OT_DECL_DEFMOVE(JsonObject)

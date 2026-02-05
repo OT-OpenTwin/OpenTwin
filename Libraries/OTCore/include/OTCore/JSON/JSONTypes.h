@@ -34,6 +34,9 @@ namespace ot {
 	typedef rapidjson::SizeType JsonSizeType;
 
 	//! @brief Writable JSON value
+	//! @brief A variant type that can contain 1 of 6 JSON value types. Here an union is used.
+	//! @brief Default = NULL
+	//! @brief source: https://rapidjson.org/md_doc_internals.html#Value
 	typedef rapidjson::Value JsonValue;
 
 	//! @brief Allocator used for writing to JSON values
