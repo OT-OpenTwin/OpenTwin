@@ -2618,7 +2618,7 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 
 		for (auto viewer : m_viewerList)
 		{
-			viewer->setOverlayText("Move or rotate selected shapes (press RETURN to complete or ESC to cancel)");
+			viewer->setOverlayText("Move or rotate selected objects (press RETURN to complete or ESC to cancel)");
 		}
 
 		if (!m_viewerList.empty())

@@ -31,6 +31,7 @@
 #include "OTViewer/HandleWheel.h"
 #include "OTViewer/SceneNodeBase.h"
 #include "OTViewer/SceneNodeGeometry.h"
+#include "OTViewer/SceneNodeCoordinateSystem.h"
 #include "OTViewer/TransformManipulator.h"
 
 // RapidJSON header
@@ -62,6 +63,7 @@ TransformManipulator::TransformManipulator(Viewer *viewer, std::list<SceneNodeBa
 
 	// Get the current working plane transformation
 	osg::Matrix workingPlaneTransform = m_viewer3D->getWorkingPlaneTransform();
+	initialWorkingPlaneTransform = workingPlaneTransform;
 
 	m_workingPlaneRotation = osg::Matrix(workingPlaneTransform.getRotate());
 	//osg::Matrix workingPlaneRotationT;
@@ -166,6 +168,8 @@ void TransformManipulator::cancelOperation(void)
 		}
 	}
 
+	m_viewer3D->setWorkingPlaneTransform(initialWorkingPlaneTransform);
+
 	assert(m_viewer3D->getModel() != nullptr);
 
 	// Unlock the ui
@@ -215,26 +219,39 @@ void TransformManipulator::storeTransformations(void)
 	}
 }
 
-void TransformManipulator::getBoundingSphere(osg::Vec3d &center, double &radius, std::list<SceneNodeBase *> objects)
+void TransformManipulator::getBoundingSphere(osg::Vec3d& center, double& radius, std::list<SceneNodeBase*> objects)
 {
 	osg::BoundingSphere boundingSphere;
 
 	bool first = true;
 	for (auto item : objects)
 	{
-		if (first)
+		if (item->getShapeNode() != nullptr)
 		{
-			boundingSphere = item->getShapeNode()->getBound();
-			first = false;
-		}
-		else
-		{
-			boundingSphere.expandBy(item->getShapeNode()->getBound());
+			if (first)
+			{
+				boundingSphere = item->getShapeNode()->getBound();
+				first = false;
+			}
+			else
+			{
+				boundingSphere.expandBy(item->getShapeNode()->getBound());
+			}
 		}
 	}
-	
-	center = boundingSphere.center();
-	radius = boundingSphere.radius();
+
+	if (first)
+	{
+		// We could not read dimensions from the objects. This is the case when we are trying to transform a coordinate system
+		center = m_viewer3D->getModel()->getCurrentWorkingPlaneTransform() * osg::Vec3d(0.0, 0.0, 0.0);
+		osg::BoundingSphere boundingSphere = m_viewer3D->getModel()->getOSGRootNode()->getBound();
+		radius = boundingSphere.radius() / 3.0;
+	}
+	else
+	{
+		center = boundingSphere.center();
+		radius = boundingSphere.radius();
+	}
 }
 
 void TransformManipulator::updateHandlerPositions(void)
@@ -343,6 +360,8 @@ void TransformManipulator::handlerInteraction(HandlerBase *handler)
 
 void TransformManipulator::applyObjectTransformations(void)
 {
+	if (m_transformedObjects.empty()) return; // Nothing to transform
+
 	// Determine the current transformation (consider translation)
 	osg::Vec3d offset = m_sphereCenter - m_initialSphereCenter;
 
@@ -372,6 +391,19 @@ void TransformManipulator::applyObjectTransformations(void)
 			osg::Matrix newTransformation = m_initialObjectTransform[item] * transformation;
 			geometryItem->applyTransform(newTransformation);
 		}
+	}
+
+	SceneNodeCoordinateSystem* csItem = dynamic_cast<SceneNodeCoordinateSystem*>(m_transformedObjects.front());
+	if (csItem != nullptr)
+	{
+		osg::Matrix workingPlaneTransform = initialWorkingPlaneTransform;
+		workingPlaneTransform.transpose(workingPlaneTransform);
+
+		workingPlaneTransform = workingPlaneTransform * transformation;
+
+		workingPlaneTransform.transpose(workingPlaneTransform);
+
+		m_viewer3D->setWorkingPlaneTransform(workingPlaneTransform);
 	}
 }
 

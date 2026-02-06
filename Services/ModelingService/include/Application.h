@@ -90,6 +90,7 @@ public:
 	virtual bool settingChanged(const ot::Property* _item) override;
 
 	std::list<ot::EntityInformation> getSelectedGeometryEntities(void);
+	std::list<ot::EntityInformation> getSelectedCoordinateSystemEntities(void);
 	EntityCache *getEntityCache(void) { return &entityCache; }
 	virtual void modelSelectionChanged(void) override;
 	virtual void propertyChanged(ot::JsonDocument& _doc) override;

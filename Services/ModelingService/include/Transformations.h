@@ -37,6 +37,7 @@ namespace ot
 class EntityBrep;
 class TopoDS_Shape;
 class EntityGeometry;
+class EntityCoordinateSystem;
 class EntityCache;
 class UpdateManager;
 
@@ -50,8 +51,9 @@ public:
 
 	void setUpdateManager(UpdateManager *_updateManager) { updateManager = _updateManager; };
 
-	void enterTransformMode(const std::list<ot::EntityInformation> &selectedGeometryEntities);
-	void transformEntities(const std::string &selectionInfo, std::map<std::string, std::string> &options);
+	void enterTransformMode(const std::list<ot::EntityInformation> &selectedGeometryEntities, const std::list<ot::EntityInformation>& selectedCoordinateSystemEntities);
+	void transformShapes(const std::string& selectionInfo, std::map<std::string, std::string>& options);
+	void transformCoordinateSystem(const std::string& selectionInfo, std::map<std::string, std::string>& options);
 
 	static gp_Trsf setTransform(EntityGeometry *geomEntity, TopoDS_Shape &shape, gp_Trsf prevTransform);
 
@@ -59,7 +61,13 @@ public:
 
 private:
 	void updateTransformationProperties(EntityGeometry *geometryEntity, gp_XYZ transformTranslate, gp_XYZ transformAxis, double transformAngle, gp_XYZ rotationCenter);
+	void updateTransformationProperties(EntityCoordinateSystem* csEntity, gp_XYZ transformTranslate, gp_XYZ transformAxis, double transformAngle, gp_XYZ rotationCenter);
+	gp_Trsf makeTrsfFromCenterXZ(const gp_Pnt& center, const gp_Dir& xDir_in, const gp_Dir& zDir_in);
+	double getValue(EntityCoordinateSystem* csEntity, const std::string& groupName, const std::string& propName);
+	void setValue(EntityCoordinateSystem* csEntity, const std::string& groupName, const std::string& propName, double value);
 	UpdateManager *getUpdateManager(void) { assert(updateManager != nullptr); return updateManager; }
+	std::string toString(double x);
+	inline Standard_Real AbsR(const Standard_Real v) { return v < 0 ? -v : v; }
 
 	UpdateManager *updateManager;
 };

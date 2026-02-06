@@ -73,5 +73,6 @@ private:
 	double m_rotationDegZ;
 	osg::Matrix m_totalRotation;
 	osg::Matrix m_workingPlaneRotation;
+	osg::Matrix initialWorkingPlaneTransform;
 };
 

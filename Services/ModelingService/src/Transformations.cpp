@@ -29,37 +29,48 @@
 
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/EntityInformation.h"
+#include "OTModelEntities/EntityCoordinateSystem.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/DataBase.h"
 
 #include <string>
 #include <list>
 #include <map>
 
 #include <gp_Ax1.hxx>
+#include <gp_Ax3.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepBndLib.hxx>
 #include <Bnd_Box.hxx>
 
-void Transformations::enterTransformMode(const std::list<ot::EntityInformation> &selectedGeometryEntities)
+void Transformations::enterTransformMode(const std::list<ot::EntityInformation> &selectedGeometryEntities, const std::list<ot::EntityInformation>& selectedCoordinateSystemEntities)
 {
-	// First, we check which objects are currently selected
-
-	if (selectedGeometryEntities.size() == 0)
+	if (selectedGeometryEntities.size() > 0 && selectedCoordinateSystemEntities.size() == 0)
 	{
-		uiComponent->displayErrorPrompt("Please select one or more geometry objects before entering the transform mode");
+		std::map<std::string, std::string> options;
+		int count = 1;
+		for (auto entity : selectedGeometryEntities)
+		{
+			options[std::to_string(count)] = entity.getEntityName();
+			count++;
+		}
+
+		uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::TRANSFORM,
+			false, "", ot::components::UiComponent::entitySelectionAction::TRANSFORM_SHAPES, "transform", options, serviceID);
+	}
+	else if (selectedGeometryEntities.size() == 0 && selectedCoordinateSystemEntities.size() == 1)
+	{
+		std::map<std::string, std::string> options;
+		options["1"] = selectedCoordinateSystemEntities.front().getEntityName();
+
+		uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::TRANSFORM,
+			false, "", ot::components::UiComponent::entitySelectionAction::TRANSFORM_LOCALCOORDINATESYSTEM, "transform", options, serviceID);
+	}
+	else
+	{
+		uiComponent->displayErrorPrompt("Please select either one or more geometry objects or a single local coordinate system before entering the transform mode");
 		return;
 	}
-
-	std::map<std::string, std::string> options;
-	int count = 1;
-	for (auto entity : selectedGeometryEntities)
-	{
-		options[std::to_string(count)] = entity.getEntityName();
-		count++;
-	}
-
-	uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::TRANSFORM,
-		false, "", ot::components::UiComponent::entitySelectionAction::TRANSFORM_SHAPES, "transform", options, serviceID);
 }
 
 gp_Trsf Transformations::setTransform(EntityGeometry *geomEntity, TopoDS_Shape &shape, gp_Trsf prevTransform)
@@ -137,7 +148,7 @@ gp_Trsf Transformations::setTransform(EntityGeometry *geomEntity, TopoDS_Shape &
 	return transform;
 }
 
-void Transformations::transformEntities(const std::string &selectionInfo, std::map<std::string, std::string> &options)
+void Transformations::transformShapes(const std::string &selectionInfo, std::map<std::string, std::string> &options)
 {
 	// Lock the user interface
 	ot::LockTypes lockFlags(ot::LockType::ModelWrite | ot::LockType::NavigationWrite | ot::LockType::ViewWrite | ot::LockType::Properties);
@@ -324,6 +335,75 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 	uiComponent->unlockUI(lockFlags);
 }
 
+void Transformations::transformCoordinateSystem(const std::string& selectionInfo, std::map<std::string, std::string>& options)
+{
+	// Lock the user interface
+	ot::LockTypes lockFlags(ot::LockType::ModelWrite | ot::LockType::NavigationWrite | ot::LockType::ViewWrite | ot::LockType::Properties);
+
+	uiComponent->lockUI(lockFlags);
+
+	// Determine the information about all coordinate system to be transformed
+	std::list<std::string> csNames;
+
+	for (auto item : options)
+	{
+		std::string name = item.second;
+		csNames.push_back(name);
+	}
+
+	std::list<ot::EntityInformation> csEntityInfo;
+	ot::ModelServiceAPI::getEntityInformation(csNames, csEntityInfo);
+
+	// Now prefetch all geometry entities (except for the ones which are already in the cache)
+	DataBase::instance().prefetchDocumentsFromStorage(csEntityInfo);
+
+	// Read the transformation properties
+	rapidjson::Document doc;
+	doc.Parse(selectionInfo.c_str());
+
+	gp_XYZ transformTranslate;
+	transformTranslate.SetX(doc["Translate X"].GetDouble());
+	transformTranslate.SetY(doc["Translate Y"].GetDouble());
+	transformTranslate.SetZ(doc["Translate Z"].GetDouble());
+
+	gp_XYZ transformAxis;
+	transformAxis.SetX(doc["Axis X"].GetDouble());
+	transformAxis.SetY(doc["Axis Y"].GetDouble());
+	transformAxis.SetZ(doc["Axis Z"].GetDouble());
+
+	double transformAngle = doc["Angle"].GetDouble() / 180.0 * M_PI;
+
+	bool hasRotation = transformAngle != 0.0 && (transformAxis.X() != 0.0 || transformAxis.Y() != 0.0 || transformAxis.Z() != 0.0);
+	if (!hasRotation) transformAngle = 0.0;
+
+	gp_XYZ rotationCenter(0.0, 0.0, 0.0);
+
+	EntityCoordinateSystem*csEntity = dynamic_cast<EntityCoordinateSystem*>(ot::EntityAPI::readEntityFromEntityIDandVersion(csEntityInfo.front().getEntityID(), csEntityInfo.front().getEntityVersion()));
+
+	if (csEntity != nullptr)
+	{
+		// Now update the transformation
+		updateTransformationProperties(csEntity, transformTranslate, transformAxis, transformAngle, rotationCenter);
+
+		// Store the updated entity
+		csEntity->storeToDataBase();
+
+		std::list<ot::UID> topologyEntityIDList = { csEntity->getEntityID() };
+		std::list<ot::UID> topologyEntityVersionList = { csEntity->getEntityStorageVersion() };
+		std::list<bool> topologyEntityForceVisible = { false };
+
+		ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, {}, {}, {}, "transform local coordinate system: " + csEntity->getName());
+
+		delete csEntity;
+	}
+
+	uiComponent->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
+
+	// Unlock the ui
+	uiComponent->unlockUI(lockFlags);
+}
+
+
 void Transformations::updateTransformationProperties(EntityGeometry *geometryEntity, gp_XYZ transformTranslate, gp_XYZ transformAxis, double transformAngle, gp_XYZ rotationCenter)
 {
 	EntityPropertiesDouble *xposProperty = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Position X"));
@@ -428,4 +508,167 @@ void Transformations::updateTransformationProperties(EntityGeometry *geometryEnt
 	yAxisPropertyString->setValue(to_string(newAxis.Y()));
 	zAxisPropertyString->setValue(to_string(newAxis.Z()));
 	anglePropertyString->setValue(to_string(newAngle));
+}
+
+void Transformations::updateTransformationProperties(EntityCoordinateSystem* csEntity, gp_XYZ transformTranslate, gp_XYZ transformAxis, double transformAngle, gp_XYZ rotationCenter)
+{
+	// We first get the current transform
+	gp_Pnt center(getValue(csEntity, "Origin", "X"), getValue(csEntity, "Origin", "Y"), getValue(csEntity, "Origin", "Z"));
+	gp_Dir xDir  (getValue(csEntity, "x-Axis", "X"), getValue(csEntity, "x-Axis", "Y"), getValue(csEntity, "x-Axis", "Z"));
+	gp_Dir zDir  (getValue(csEntity, "z-Axis", "X"), getValue(csEntity, "z-Axis", "Y"), getValue(csEntity, "z-Axis", "Z"));
+
+	gp_Trsf transform = makeTrsfFromCenterXZ(center, xDir, zDir);
+	transform.Invert();
+	rotationCenter = gp_Pnt(rotationCenter).Transformed(transform).Coord();
+
+	// Now we determine the additional transformation
+	gp_Trsf newTransform;
+
+	// Handle the translation first
+	gp_Vec transformTranslateVec(transformTranslate);
+	transformTranslateVec.Transform(transform);
+
+	gp_Trsf newTransformT;
+	newTransformT.SetTranslation(transformTranslateVec);
+
+	// Now consider the rotation
+	if (transformAngle != 0.0)
+	{
+		gp_Trsf newTransformToCenter, newTransformFromCenter, newTransformCenterR, newTransformR;
+
+		gp_Dir rotationAxis(transformAxis);
+		rotationAxis.Transform(transform);
+
+		newTransformToCenter.SetTranslation(-gp_Vec(rotationCenter));
+		newTransformFromCenter.SetTranslation(gp_Vec(rotationCenter));
+		newTransformCenterR.SetRotation(gp_Ax1(gp_Pnt(0, 0, 0), rotationAxis), transformAngle);
+		newTransformR = newTransformFromCenter * newTransformCenterR * newTransformToCenter;
+
+		newTransform = newTransformT * newTransformR;
+	}
+	else
+	{
+		newTransform = newTransformT;
+	}
+
+	// Compute the total transformation and set the properties
+	transform = newTransform * transform;// *newTransform;
+
+	gp_XYZ origin = transform.TranslationPart();
+
+	setValue(csEntity, "Origin", "X", origin.X());
+	setValue(csEntity, "Origin", "Y", origin.Y());
+	setValue(csEntity, "Origin", "Z", origin.Z());
+
+	// The 3x3 linear (rotation) part of the transformation.
+	const gp_Mat R = transform.VectorialPart();
+
+	// For a local -> world transformation, the columns of R represent
+	// the world-space directions of the local basis vectors.
+	//
+	// Column 1 -> local X-axis
+	// Column 3 -> local Z-axis
+	gp_Vec xV(R.Value(1, 1), R.Value(2, 1), R.Value(3, 1));
+	gp_Vec zV(R.Value(1, 3), R.Value(2, 3), R.Value(3, 3));
+
+	// Normalize defensively (in case of small numerical drift).
+	if (xV.SquareMagnitude() > 0.0) xV.Normalize();
+	if (zV.SquareMagnitude() > 0.0) zV.Normalize();
+
+	setValue(csEntity, "x-Axis", "X", xV.X());
+	setValue(csEntity, "x-Axis", "Y", xV.Y());
+	setValue(csEntity, "x-Axis", "Z", xV.Z());	
+	
+	setValue(csEntity, "z-Axis", "X", zV.X());
+	setValue(csEntity, "z-Axis", "Y", zV.Y());
+	setValue(csEntity, "z-Axis", "Z", zV.Z());
+}
+
+// Center (origin) + X and Z axis directions -> gp_Trsf
+// Result: transformation from the local standard coordinate system to the world frame
+// defined by (center, xDir, zDir). Returns Identity in degenerate cases.
+gp_Trsf Transformations::makeTrsfFromCenterXZ(const gp_Pnt& center, const gp_Dir& xDir_in, const gp_Dir& zDir_in)
+{
+	gp_Trsf identity; // Default-constructed gp_Trsf is Identity.
+
+	// Convert directions to vectors for algebra.
+	gp_Vec xV(xDir_in);
+	gp_Vec zV(zDir_in);
+
+	// If X and Z are (nearly) parallel, we cannot build a valid frame.
+	// Since gp_Dir is normalized, dot is cos(angle).
+	const Standard_Real dot = xV.Dot(zV);
+	if (AbsR(AbsR(dot) - 1.0) < 1e-9) {
+		return identity;
+	}
+
+	// Orthonormalize Z with respect to X (Gram-Schmidt):
+	// z := z - (z·x) * x
+	zV = zV - dot * xV;
+
+	// If Z collapses numerically after orthogonalization, bail out.
+	const Standard_Real tol2 = 1e-24; // squared tolerance
+	if (zV.SquareMagnitude() < tol2) {
+		return identity;
+	}
+	zV.Normalize();
+
+	// Build a right-handed frame:
+	// y = z × x  (so that x × y = z)
+	gp_Vec yV = zV.Crossed(xV);
+	if (yV.SquareMagnitude() < tol2) {
+		return identity;
+	}
+	yV.Normalize();
+
+	// Re-create normalized directions.
+	gp_Dir xDir(xV);
+	gp_Dir zDir(zV);
+
+	// Define the target/world frame:
+	// gp_Ax3 takes (location, mainDirection=Z, xDirection=X).
+	gp_Ax3 worldFrame(center, zDir, xDir);
+
+	// Define the source/local frame as the OCC standard XOY coordinate system.
+	// (X along +X, Y along +Y, Z along +Z)
+	gp_Ax3 localFrame(gp::XOY());
+
+	// Build the transformation mapping local -> world.
+	gp_Trsf trsf;
+	trsf.SetTransformation(localFrame, worldFrame);
+	return trsf;
+}
+
+double Transformations::getValue(EntityCoordinateSystem* csEntity, const std::string& groupName, const std::string& propName)
+{
+	EntityPropertiesDouble* property = dynamic_cast<EntityPropertiesDouble*>(csEntity->getProperties().getProperty("#" + propName, groupName));
+	assert(property != nullptr);
+
+	if (property == nullptr) return 0.0;
+
+	return property->getValue();
+}
+
+void Transformations::setValue(EntityCoordinateSystem* csEntity, const std::string& groupName, const std::string& propName, double value)
+{
+	EntityPropertiesDouble* valueProperty  = dynamic_cast<EntityPropertiesDouble*>(csEntity->getProperties().getProperty("#" + propName, groupName));
+	EntityPropertiesString* stringProperty = dynamic_cast<EntityPropertiesString*>(csEntity->getProperties().getProperty(propName, groupName));
+	assert(valueProperty != nullptr && stringProperty != nullptr);
+
+	if (valueProperty != nullptr)
+	{
+		valueProperty->setValue(value);
+	}
+
+	if (stringProperty != nullptr)
+	{
+		stringProperty->setValue(toString(value));
+	}
+}
+
+std::string Transformations::toString(double x)
+{
+	std::ostringstream oss;
+	oss << std::defaultfloat << x;
+	return oss.str();
 }

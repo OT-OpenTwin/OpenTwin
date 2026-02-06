@@ -66,7 +66,8 @@ namespace ot {
 				BOOLEAN_INTERSECT,
 				TRANSFORM_SHAPES,
 				CHAMFER_EDGE,
-				BLEND_EDGE
+				BLEND_EDGE,
+				TRANSFORM_LOCALCOORDINATESYSTEM
 			};
 
 			UiComponent(const ot::ServiceBase& _serviceInfo, ApplicationBase* _application);

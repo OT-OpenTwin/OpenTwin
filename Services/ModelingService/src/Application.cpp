@@ -245,6 +245,28 @@ std::list<ot::EntityInformation> Application::getSelectedGeometryEntities(void)
 	return entityInfoGeometry;
 }
 
+std::list<ot::EntityInformation> Application::getSelectedCoordinateSystemEntities(void)
+{
+	std::list<ot::EntityInformation> entityInfo;
+	ot::ModelServiceAPI::getSelectedEntityInformation(entityInfo, "EntityCoordinateSystem");
+
+	// Now we filter those which are under the "Geometry" folder
+	std::list<ot::EntityInformation> entityInfoCoordinateSystem;
+
+	std::string filter = "Coordinate Systems/";
+
+	for (auto item : entityInfo)
+	{
+		if (item.getEntityName().substr(0, filter.size()) == filter)
+		{
+			// Here we have a coordinate system entity under the Coordinate Systems folder
+			entityInfoCoordinateSystem.push_back(item);
+		}
+	}
+
+	return entityInfoCoordinateSystem;
+}
+
 PrimitiveManager *Application::getPrimitiveManager(void) 
 { 
 	if (primitiveManager == nullptr)
@@ -426,7 +448,10 @@ void Application::handleEntitiesSelected(ot::JsonDocument& _document) {
 	}
 
 	if (selectionAction == "TRANSFORM") {
-		getTransformationManager()->transformEntities(selectionInfo, options);
+		getTransformationManager()->transformShapes(selectionInfo, options);
+	}
+	else if (selectionAction == "TRANSFORM_LOCALCOORDINATESYSTEM") {
+		getTransformationManager()->transformCoordinateSystem(selectionInfo, options);
 	}
 	else if (selectionAction == "BOOLEAN_ADD" || selectionAction == "BOOLEAN_SUBTRACT" || selectionAction == "BOOLEAN_INTERSECT") {
 		getBooleanOperations()->perfromOperationForSelectedEntities(selectionAction, selectionInfo, options);
@@ -503,7 +528,7 @@ void Application::handleBooleanIntersect() {
 }
 
 void Application::handleTransform() {
-	getTransformationManager()->enterTransformMode(getSelectedGeometryEntities());
+	getTransformationManager()->enterTransformMode(getSelectedGeometryEntities(), getSelectedCoordinateSystemEntities());
 }
 
 void Application::handleChamferEdges() {
