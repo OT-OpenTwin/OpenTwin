@@ -561,6 +561,9 @@ void Model::addCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, const o
 
 	// Update the active state
 	activateCoordinateSystemNode(_treeItem.getEntityName(), isActive);
+
+	// Update the working plane transformation (in case we are already active and get updated due to an undo / redo operation)
+	updateWorkingPlaneTransform();
 }
 
 void Model::updateCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings, bool isActive)
