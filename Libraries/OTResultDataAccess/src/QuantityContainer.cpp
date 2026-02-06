@@ -81,6 +81,7 @@ void QuantityContainer::addValue(const std::list<ot::Variable>& _values)
 
 bsoncxx::builder::basic::document& QuantityContainer::getMongoDocument()
 {
+	// If tuples are used, we first guarantee that all entries are tuples of the same size
 	size_t tupleSize = m_values.front().size();
 	for (const auto& value : m_values)
 	{
@@ -91,10 +92,12 @@ bsoncxx::builder::basic::document& QuantityContainer::getMongoDocument()
 	}
 
 	VariableToBSONConverter converter;
+	// First we distinguish between matrices/vectors and single points
 	if (m_values.size() == 1)
 	{
 		auto singleEntry = m_values.begin();
-		if(singleEntry->size() != 1)
+		//Now we distinguish between tuples and non-tuples
+		if(singleEntry->size() == 1)
 		{
 			converter(m_mongoDocument, singleEntry->front(), QuantityContainer::getFieldName());
 		}
@@ -113,6 +116,7 @@ bsoncxx::builder::basic::document& QuantityContainer::getMongoDocument()
 		auto valueArray = bsoncxx::builder::basic::array();
 		for (auto& value : m_values)
 		{
+			//Now we distinguish between tuples and non-tuples
 			if (value.size() == 1)
 			{
 				converter(valueArray, value.front());				
