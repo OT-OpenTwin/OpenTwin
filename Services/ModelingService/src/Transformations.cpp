@@ -60,6 +60,12 @@ void Transformations::enterTransformMode(const std::list<ot::EntityInformation> 
 	}
 	else if (selectedGeometryEntities.size() == 0 && selectedCoordinateSystemEntities.size() == 1)
 	{
+		if (isGlobalCoordinateSystem(selectedCoordinateSystemEntities.front().getEntityID(), selectedCoordinateSystemEntities.front().getEntityVersion()))
+		{
+			uiComponent->displayErrorPrompt("The selected coordinate system is the global system and cannot be transformed.");
+			return;
+		}
+
 		std::map<std::string, std::string> options;
 		options["1"] = selectedCoordinateSystemEntities.front().getEntityName();
 
@@ -671,4 +677,21 @@ std::string Transformations::toString(double x)
 	std::ostringstream oss;
 	oss << std::defaultfloat << x;
 	return oss.str();
+}
+
+bool Transformations::isGlobalCoordinateSystem(ot::UID entityID, ot::UID entityVersion)
+{
+	EntityCoordinateSystem* csEntity = dynamic_cast<EntityCoordinateSystem*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
+
+	if (csEntity != nullptr)
+	{
+		bool isGlobal = csEntity->getGlobal();
+
+		delete csEntity;
+		csEntity = nullptr;
+
+		return isGlobal;
+	}
+
+	return false;
 }

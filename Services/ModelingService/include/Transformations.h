@@ -68,6 +68,7 @@ private:
 	UpdateManager *getUpdateManager(void) { assert(updateManager != nullptr); return updateManager; }
 	std::string toString(double x);
 	inline Standard_Real AbsR(const Standard_Real v) { return v < 0 ? -v : v; }
+	bool isGlobalCoordinateSystem(ot::UID entityID, ot::UID entityVersion);
 
 	UpdateManager *updateManager;
 };
