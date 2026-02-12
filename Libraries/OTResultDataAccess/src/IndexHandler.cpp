@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/ResultCollectionDefaultIndexes.h"
-#include "OTResultDataAccess/IndexHandler.h"
+#include "OTResultDataAccess/ResultCollection/IndexHandler.h"
 
 IndexHandler::IndexHandler(const std::string& _collectionName)
 	: m_dataStorageAccess(_collectionName)

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTResultDataAccess/MetadataEntrySingle.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
 
 bool MetadataEntrySingle::operator==(const MetadataEntrySingle& other)
 {

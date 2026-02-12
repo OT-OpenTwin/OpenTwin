@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTResultDataAccess/MetadataEntryObject.h"
-#include "OTResultDataAccess/MetadataEntryComperator.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntryObject.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntryComperator.h"
 
 bool MetadataEntryObject::operator==(const MetadataEntryObject& _other)
 {

@@ -18,10 +18,10 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTResultDataAccess/MetadataEntryArray.h"
-#include "OTResultDataAccess/MetadataEntrySingle.h"
-#include "OTResultDataAccess/MetadataEntryObject.h"
-#include "OTResultDataAccess/MetadataEntryComperator.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntryArray.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntryObject.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntryComperator.h"
 
 bool MetadataEntryComperator::operator()(std::shared_ptr<MetadataEntry> one, std::shared_ptr<MetadataEntry> two)
 {

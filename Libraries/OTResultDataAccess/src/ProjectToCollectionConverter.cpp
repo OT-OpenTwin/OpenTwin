@@ -23,7 +23,7 @@
 #include "OTCore/ProjectInformation.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTResultDataAccess/ProjectToCollectionConverter.h"
+#include "OTResultDataAccess/ResultCollection/ProjectToCollectionConverter.h"
 
 
 ProjectToCollectionConverter::ProjectToCollectionConverter(const std::string& _sessionServiceURL)
