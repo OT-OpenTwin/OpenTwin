@@ -34,8 +34,6 @@
 #include "CategorisationFolderNames.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-#include "OTResultDataAccess/DatasetOverviewVisualiser.h"
-
 #include "OTDataStorage/DocumentAPI.h"
 #include "OTDataStorage/GridFSFileInfo.h"
 #include "OTModelEntities/EntityAPI.h"
