@@ -14,15 +14,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ============================================================
 
 set(OTSYSTEM_HEADER_FILES
-    include/OTSystem/AdvancedDirectoryIterator.h
+    include/OTSystem/FileSystem/AdvancedDirectoryIterator.h
+    include/OTSystem/FileSystem/DirectoryIterator.h
+    include/OTSystem/FileSystem/FileInformation.h
+    include/OTSystem/FileSystem/FileSystem.h
+    include/OTSystem/SingleSignOn/SingleSignOn_Client.h
     include/OTSystem/AppExitCodes.h
     include/OTSystem/Application.h
     include/OTSystem/ArchitectureInfo.h
     include/OTSystem/DateTime.h
-    include/OTSystem/DirectoryIterator.h
     include/OTSystem/Exception.h
-    include/OTSystem/FileInformation.h
-    include/OTSystem/FileSystem.h
     include/OTSystem/Flags.h
     include/OTSystem/IgnoreRules.h
     include/OTSystem/IgnoreRules.hpp
@@ -39,13 +40,13 @@ set(OTSYSTEM_HEADER_FILES
 )
 
 set(OTSYSTEM_SOURCE_FILES
-    src/AdvancedDirectoryIterator.cpp
+    src/FileSystem/AdvancedDirectoryIterator.cpp
+    src/FileSystem/DirectoryIterator.cpp
+    src/FileSystem/FileInformation.cpp
+    src/FileSystem/FileSystem.cpp
     src/AppExitCodes.cpp
     src/DateTime.cpp
-    src/DirectoryIterator.cpp
     src/dllmain.cpp
-    src/FileInformation.cpp
-    src/FileSystem.cpp
     src/IgnoreRules.cpp
     src/Network.cpp
     src/OperatingSystem.cpp

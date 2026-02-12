@@ -19,8 +19,8 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
-#include "OTSystem/FileSystem.h"
-#include "OTSystem/AdvancedDirectoryIterator.h"
+#include "OTSystem/FileSystem/FileSystem.h"
+#include "OTSystem/FileSystem/AdvancedDirectoryIterator.h"
 #include "OTCore/String.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTGui/Diagram/SequenceDiaCfgParser.h"

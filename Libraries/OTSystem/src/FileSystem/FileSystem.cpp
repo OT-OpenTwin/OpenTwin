@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
 #include "OTSystem/Exception.h"
-#include "OTSystem/FileSystem.h"
+#include "OTSystem/FileSystem/FileSystem.h"
 
 // std header
 #include <string>

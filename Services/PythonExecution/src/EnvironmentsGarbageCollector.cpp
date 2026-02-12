@@ -19,7 +19,7 @@
 
 #include "EnvironmentsGarbageCollector.h"
 #include <filesystem>
-#include "OTSystem/FileSystem.h"
+#include "OTSystem/FileSystem/FileSystem.h"
 #include "OTSystem/DateTime.h"
 
 #include <assert.h>

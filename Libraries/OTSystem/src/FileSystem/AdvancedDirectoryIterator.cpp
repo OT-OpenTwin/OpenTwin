@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTSystem/AdvancedDirectoryIterator.h"
+#include "OTSystem/FileSystem/AdvancedDirectoryIterator.h"
 
 ot::AdvancedDirectoryIterator::AdvancedDirectoryIterator(const std::filesystem::path& _path, const BrowseMode& _browseMode, const IgnoreRules& _ignoreRules)
 	: DirectoryIterator(_path, _browseMode), m_ignoreRules(_ignoreRules)

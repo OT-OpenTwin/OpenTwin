@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTSystem/FileInformation.h"
+#include "OTSystem/FileSystem/FileInformation.h"
 
 ot::FileInformation::FileInformation(const std::filesystem::path& _path) 
 	: m_type(FileType::Unknown)

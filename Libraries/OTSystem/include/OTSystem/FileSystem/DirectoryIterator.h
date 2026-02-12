@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/FileInformation.h"
+#include "OTSystem/FileSystem/FileInformation.h"
 
 // std header
 #include <stack>

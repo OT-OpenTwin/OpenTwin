@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTSystem/IgnoreRules.h"
-#include "OTSystem/DirectoryIterator.h"
+#include "OTSystem/FileSystem/DirectoryIterator.h"
 
 namespace ot {
 

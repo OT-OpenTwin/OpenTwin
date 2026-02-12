@@ -44,7 +44,7 @@
 #include "OTCore/RAII/ValueRAII.h"
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"
-#include "OTSystem/FileSystem.h"
+#include "OTSystem/FileSystem/FileSystem.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"

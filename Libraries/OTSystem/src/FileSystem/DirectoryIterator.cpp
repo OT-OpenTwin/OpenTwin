@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/Exception.h"
-#include "OTSystem/DirectoryIterator.h"
+#include "OTSystem/FileSystem/DirectoryIterator.h"
 
 ot::DirectoryIterator::DirectoryIterator(const std::filesystem::path& _path, const BrowseMode& _browseMode)
 	: m_mode(_browseMode), m_end()

@@ -21,7 +21,7 @@
 #include "FileManager.h"
 
 // OpenTwin header
-#include "OTSystem/FileSystem.h"
+#include "OTSystem/FileSystem/FileSystem.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/String.h"
 
