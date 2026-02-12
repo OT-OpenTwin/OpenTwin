@@ -24,8 +24,8 @@
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTModelEntities/EntityMetadataCampaign.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "OTResultDataAccess/MetadataCampaign.h"
-#include "OTResultDataAccess/MetadataEntry.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 
 // std header
 #include <stdint.h>

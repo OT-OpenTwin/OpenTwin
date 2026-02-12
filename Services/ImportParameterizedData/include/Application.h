@@ -24,7 +24,7 @@
 #include "OTGui/ToolBarButtonCfg.h"
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
-#include "OTResultDataAccess/ResultCollectionMetadataAccess.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 
 // C++ header
 #include <list>

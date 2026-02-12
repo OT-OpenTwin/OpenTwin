@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTResultDataAccess/MetadataCampaign.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
 
 // std header
 #include <cassert>

@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/GenericDataStructMatrix.h"
-#include "OTResultDataAccess/QuantityDescription.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 
 class OT_RESULTDATAACCESS_API_EXPORT QuantityDescriptionSParameter :public QuantityDescription
 {

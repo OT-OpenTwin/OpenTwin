@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/Variable.h"
 #include "OTCore/Serializable.h"
-#include "OTResultDataAccess/MetadataEntry.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 #include "OTResultDataAccess/ResultDataAccessAPIExport.h"
 
 // std header

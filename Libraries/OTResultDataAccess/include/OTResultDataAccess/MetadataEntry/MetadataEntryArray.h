@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Variable.h"
-#include "OTResultDataAccess/MetadataEntry.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 
 // std header
 #include <list>

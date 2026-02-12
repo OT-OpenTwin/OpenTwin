@@ -28,8 +28,8 @@
 
 // OpenTwin header
 #include "OTCore/GenericDataStructMatrix.h"
-#include "OTResultDataAccess/MetadataEntrySingle.h"
-#include "OTResultDataAccess/MetadataEntityInterface.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/StringToVariableConverter.h"
 #include "OTGui/TableIndexSchemata.h"

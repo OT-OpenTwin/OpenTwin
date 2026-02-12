@@ -20,7 +20,7 @@
 #pragma once
 #include <string>
 #include "OTCore/DefensiveProgramming.h"
-#include "QuantityDescription.h"
+#include "SerialisationInterfaces/QuantityDescription.h"
 
 class ValueFormatSetter
 {

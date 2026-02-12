@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "OTResultDataAccess/ResultImportLoggerEntry.h"
+#include "OTResultDataAccess/ResultImportLogger/ResultImportLoggerEntry.h"
 #include "OTResultDataAccess/ResultDataAccessAPIExport.h"
-#include "OTResultDataAccess/ResultImportLoggerVerbosity.h"
+#include "OTResultDataAccess/ResultImportLogger/ResultImportLoggerVerbosity.h"
 
 #include <list>
 

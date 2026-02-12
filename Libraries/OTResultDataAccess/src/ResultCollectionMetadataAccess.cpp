@@ -24,9 +24,9 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/EntityMetadataCampaign.h"
 #include "OTModelEntities/EntityMetadataSeries.h"
-#include "OTResultDataAccess/ResultCollectionMetadataAccess.h"
-#include "OTResultDataAccess/CrossCollectionAccess.h"
-#include "OTResultDataAccess/MetadataEntityInterface.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
+#include "OTResultDataAccess/ResultCollection/CrossCollectionAccess.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
 
 // std header
 #include <vector>

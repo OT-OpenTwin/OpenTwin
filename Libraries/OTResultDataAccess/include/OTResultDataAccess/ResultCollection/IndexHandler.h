@@ -1,5 +1,5 @@
 // @otlicense
-// File: MetadataEntryComperator.h
+// File: IndexHandler.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,13 +20,25 @@
 #pragma once
 
 // OpenTwin header
-#include "OTResultDataAccess/MetadataEntry.h"
+#include "OTDataStorage/ResultDataStorageAPI.h"
+#include "OTResultDataAccess/ResultImportLogger/ResultImportLogger.h"
 
 // std header
-#include <memory>
+#include <string>
 
-class MetadataEntryComperator
+class OT_RESULTDATAACCESS_API_EXPORT IndexHandler
 {
 public:
-	bool operator()(std::shared_ptr<MetadataEntry> one, std::shared_ptr<MetadataEntry> two);
+	IndexHandler(const std::string& _collectionName);
+	
+	void createDefaultIndexes();
+
+	//! @brief Drop all indexes in the collection except for the default _id index.
+	void dropAllIndexes();	
+
+private:
+	DataStorageAPI::ResultDataStorageAPI m_dataStorageAccess;
+	std::vector<bool> m_defaultIndexesSet = { false,false };
+
+	bool checkIfDefaultIndexesAreSet();
 };

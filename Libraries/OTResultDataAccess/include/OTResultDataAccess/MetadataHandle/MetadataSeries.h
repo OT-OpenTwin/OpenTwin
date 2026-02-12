@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
-#include "OTResultDataAccess/MetadataQuantity.h"
-#include "OTResultDataAccess/MetadataParameter.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
 
 // std header
 #include <map>

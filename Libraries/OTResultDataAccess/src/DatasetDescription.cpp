@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTResultDataAccess/DatasetDescription.h"
+#include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 
 // std header
 #include <assert.h>

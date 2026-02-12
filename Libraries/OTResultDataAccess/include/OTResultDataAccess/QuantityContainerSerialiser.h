@@ -21,13 +21,13 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
-#include "OTResultDataAccess/ResultCollectionExtender.h"
-#include "OTResultDataAccess/ResultImportLogger.h"
-#include "OTResultDataAccess/QuantityDescription.h"
-#include "OTResultDataAccess/QuantityDescriptionCurve.h"
-#include "OTResultDataAccess/QuantityDescriptionCurveComplex.h"
-#include "OTResultDataAccess/QuantityDescriptionSParameter.h"
-#include "OTResultDataAccess/QuantityDescriptionMatrix.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
+#include "OTResultDataAccess/ResultImportLogger/ResultImportLogger.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
 
 class QuantityContainerSerialiser
 {

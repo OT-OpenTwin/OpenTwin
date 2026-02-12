@@ -25,7 +25,7 @@
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTResultDataAccess/CrossCollectionAccess.h"
+#include "OTResultDataAccess/ResultCollection/CrossCollectionAccess.h"
 
 CrossCollectionAccess::CrossCollectionAccess(const std::string& collectionName, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 	:_collectionName(collectionName), _modelServiceURL(modelServiceURL)

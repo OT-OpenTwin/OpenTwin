@@ -24,10 +24,10 @@
 // OpenTwin header
 #include "OTModelEntities/EntityBase.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "OTResultDataAccess/MetadataSeries.h"
-#include "OTResultDataAccess/MetadataCampaign.h"
-#include "OTResultDataAccess/MetadataQuantity.h"
-#include "OTResultDataAccess/MetadataParameter.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
 
 class OT_RESULTDATAACCESS_API_EXPORT ResultCollectionMetadataAccess
 {

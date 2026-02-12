@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTResultDataAccess/QuantityDescriptionSParameter.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 
 QuantityDescriptionSParameter::QuantityDescriptionSParameter(uint64_t _reserveNumberOfEntries)
 {

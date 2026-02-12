@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTResultDataAccess/ResultImportLogger.h"
+#include "OTResultDataAccess/ResultImportLogger/ResultImportLogger.h"
 
 void ResultImportLogger::log(std::string& _message, ResultImportLoggerVerbosity _verbosity)
 {

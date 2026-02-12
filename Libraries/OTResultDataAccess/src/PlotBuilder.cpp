@@ -24,12 +24,12 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
 #include "OTResultDataAccess/PlotBuilder.h"
-#include "OTResultDataAccess/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
 #include "OTResultDataAccess/CurveFactory.h"
-#include "OTResultDataAccess/QuantityDescriptionCurve.h"
-#include "OTResultDataAccess/QuantityDescriptionCurveComplex.h"
-#include "OTResultDataAccess/QuantityDescriptionMatrix.h"
-#include "OTResultDataAccess/QuantityDescriptionSParameter.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 
 PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender)
 	:m_extender(_extender)

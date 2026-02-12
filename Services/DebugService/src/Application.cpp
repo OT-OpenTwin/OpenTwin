@@ -52,8 +52,8 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTResultDataAccess/PlotBuilder.h"
-#include "OTResultDataAccess/ResultCollectionExtender.h"
-#include "OTResultDataAccess/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 
 // std header
 #include <thread>

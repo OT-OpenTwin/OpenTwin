@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTResultDataAccess/QuantityDescription.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 
 class OT_RESULTDATAACCESS_API_EXPORT QuantityDescriptionCurve : public QuantityDescription
 {

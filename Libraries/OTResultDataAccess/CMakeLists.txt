@@ -77,38 +77,44 @@ get_env_libname(MONGO_C_LIB_NAME         MONGO_C_LIB)
 # ============================================================
 
 set(OTResultDataAccess_HEADERS
-    include/OTResultDataAccess/CrossCollectionAccess.h
+    include/OTResultDataAccess/ResultCollection/CrossCollectionAccess.h
+    include/OTResultDataAccess/ResultCollection/IndexHandler.h
+    include/OTResultDataAccess/ResultCollection/ProjectToCollectionConverter.h
+    include/OTResultDataAccess/ResultCollection/ResultCollectionExtender.h
+    include/OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h
+
     include/OTResultDataAccess/CurveFactory.h
-    include/OTResultDataAccess/DatasetDescription.h
-    include/OTResultDataAccess/DatasetOverviewVisualiser.h
-    include/OTResultDataAccess/IndexHandler.h
-    include/OTResultDataAccess/MetadataCampaign.h
-    include/OTResultDataAccess/MetadataEntityInterface.h
-    include/OTResultDataAccess/MetadataEntry.h
-    include/OTResultDataAccess/MetadataEntryArray.h
-    include/OTResultDataAccess/MetadataEntryComperator.h
-    include/OTResultDataAccess/MetadataEntryObject.h
-    include/OTResultDataAccess/MetadataEntrySingle.h
-    include/OTResultDataAccess/MetadataParameter.h
-    include/OTResultDataAccess/MetadataQuantity.h
-    include/OTResultDataAccess/MetadataSeries.h
-    include/OTResultDataAccess/ParameterDescription.h
+
+    include/OTResultDataAccess/MetadataEntry/MetadataEntry.h
+    include/OTResultDataAccess/MetadataEntry/MetadataEntryArray.h
+    include/OTResultDataAccess/MetadataEntry/MetadataEntryComperator.h
+    include/OTResultDataAccess/MetadataEntry/MetadataEntryObject.h
+    include/OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h
+    
+    include/OTResultDataAccess/MetadataHandle/MetadataParameter.h
+    include/OTResultDataAccess/MetadataHandle/MetadataQuantity.h
+    include/OTResultDataAccess/MetadataHandle/MetadataSeries.h
+    include/OTResultDataAccess/MetadataHandle/MetadataCampaign.h
+    include/OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h
+    
+    include/OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h
+    include/OTResultDataAccess/SerialisationInterfaces/ParameterDescription.h
+    include/OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h
+    include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h
+    include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h
+    include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h
+    include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h
+    
+    include/OTResultDataAccess/ResultImportLogger/ResultImportLogger.h
+    include/OTResultDataAccess/ResultImportLogger/ResultImportLoggerEntry.h
+    include/OTResultDataAccess/ResultImportLogger/ResultImportLoggerVerbosity.h
+    
     include/OTResultDataAccess/PlotBuilder.h
-    include/OTResultDataAccess/ProjectToCollectionConverter.h
     include/OTResultDataAccess/QuantityContainer.h
     include/OTResultDataAccess/QuantityContainerSerialiser.h
-    include/OTResultDataAccess/QuantityDescription.h
-    include/OTResultDataAccess/QuantityDescriptionCurve.h
-    include/OTResultDataAccess/QuantityDescriptionCurveComplex.h
-    include/OTResultDataAccess/QuantityDescriptionMatrix.h
-    include/OTResultDataAccess/QuantityDescriptionSParameter.h
-    include/OTResultDataAccess/ResultCollectionExtender.h
-    include/OTResultDataAccess/ResultCollectionMetadataAccess.h
     include/OTResultDataAccess/ResultDataAccessAPIExport.h
-    include/OTResultDataAccess/ResultImportLogger.h
-    include/OTResultDataAccess/ResultImportLoggerEntry.h
-    include/OTResultDataAccess/ResultImportLoggerVerbosity.h
     include/OTResultDataAccess/ValueFormatSetter.h
+    include/OTResultDataAccess/DatasetOverviewVisualiser.h
 )
 
 set(OTResultDataAccess_SOURCES

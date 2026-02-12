@@ -27,7 +27,7 @@
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
-#include "OTResultDataAccess/MetadataEntityInterface.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
 #include "OTResultDataAccess/CurveFactory.h"
 
 PlotHandler::PlotHandler() {

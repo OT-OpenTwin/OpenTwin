@@ -36,10 +36,10 @@
 #include "OTModelEntities/NewModelStateInfo.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
 
-#include "OTResultDataAccess/MetadataQuantity.h"
-#include "OTResultDataAccess/QuantityDescriptionCurve.h"
-#include "OTResultDataAccess/QuantityDescriptionMatrix.h"
-#include "OTResultDataAccess/ResultCollectionMetadataAccess.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 #include "OTResultDataAccess/CurveFactory.h"
 
 #include <map>

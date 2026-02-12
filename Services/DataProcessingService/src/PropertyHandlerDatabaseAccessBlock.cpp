@@ -27,8 +27,8 @@
 #include "Application.h"
 #include "OTModelEntities/DataBase.h"
 
-#include "OTResultDataAccess/ProjectToCollectionConverter.h"
-#include "OTResultDataAccess/ResultCollectionMetadataAccess.h"
+#include "OTResultDataAccess/ResultCollection/ProjectToCollectionConverter.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
  
 void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity)
 {

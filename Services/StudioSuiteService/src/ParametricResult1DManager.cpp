@@ -31,16 +31,16 @@
 #include "OTModelEntities/EntityResult1DPlot.h"
 
 #include "OTResultDataAccess/CurveFactory.h"
-#include "OTResultDataAccess/MetadataSeries.h"
-#include "OTResultDataAccess/MetadataParameter.h"
-#include "OTResultDataAccess/MetadataEntrySingle.h"
-#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 
 #include "OTResultDataAccess/ValueFormatSetter.h"
-#include "OTResultDataAccess/QuantityDescription.h"
-#include "OTResultDataAccess/QuantityDescriptionCurve.h"
-#include "OTResultDataAccess/QuantityDescriptionCurveComplex.h"
-#include "OTResultDataAccess/QuantityDescriptionSParameter.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 
 #include <boost/algorithm/string.hpp>
 

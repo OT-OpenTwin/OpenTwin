@@ -26,8 +26,8 @@
 
 #include "ParametricCombination.h"
 
-#include "OTResultDataAccess/DatasetDescription.h"
-#include "OTResultDataAccess/ParameterDescription.h"
+#include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
+#include "OTResultDataAccess/SerialisationInterfaces/ParameterDescription.h"
 
 class MetadataSeries;
 

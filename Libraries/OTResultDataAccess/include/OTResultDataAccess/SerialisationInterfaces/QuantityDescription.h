@@ -23,7 +23,7 @@
 #include "OTCore/Variable.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/DefensiveProgramming.h"
-#include "OTResultDataAccess/MetadataQuantity.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
 #include "OTResultDataAccess/ResultDataAccessAPIExport.h"
 
 // std header

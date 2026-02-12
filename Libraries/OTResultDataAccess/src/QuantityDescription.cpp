@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTResultDataAccess/QuantityDescription.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 
 void QuantityDescription::addValueDescription(const std::string _valueName, const std::string _valueDataType, const std::string _valueUnit)
 {

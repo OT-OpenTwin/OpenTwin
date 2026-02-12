@@ -19,8 +19,8 @@
 
 #include "FixtureResultCollectionExtender.h"
 
-#include "OTResultDataAccess/MetadataEntrySingle.h"
-#include "OTResultDataAccess/MetadataEntryArray.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntryArray.h"
 
 void FixtureResultCollectionExtender::initiateCampaignWithOneSeries()
 {

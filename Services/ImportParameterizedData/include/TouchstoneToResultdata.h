@@ -22,9 +22,9 @@
 #include "TouchstoneHandler.h"
 #include "BusinessLogicHandler.h"
 
-#include "OTResultDataAccess/MetadataSeries.h"
-#include "OTResultDataAccess/ResultCollectionExtender.h"
-#include "OTResultDataAccess/DatasetDescription.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
+#include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 
 class TouchstoneToResultdata : public BusinessLogicHandler
 {

@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
-#include "OTResultDataAccess/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
 
 class OT_RESULTDATAACCESS_API_EXPORT CurveFactory
 {

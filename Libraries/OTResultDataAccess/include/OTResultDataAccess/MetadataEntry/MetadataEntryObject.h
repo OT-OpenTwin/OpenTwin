@@ -1,5 +1,5 @@
 // @otlicense
-// File: IndexHandler.h
+// File: MetadataEntryObject.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,25 +20,20 @@
 #pragma once
 
 // OpenTwin header
-#include "OTDataStorage/ResultDataStorageAPI.h"
-#include "OTResultDataAccess/ResultImportLogger.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 
 // std header
-#include <string>
+#include <list>
+#include <memory>
 
-class OT_RESULTDATAACCESS_API_EXPORT IndexHandler
+class MetadataEntryObject : public MetadataEntry
 {
 public:
-	IndexHandler(const std::string& _collectionName);
-	
-	void createDefaultIndexes();
-
-	//! @brief Drop all indexes in the collection except for the default _id index.
-	void dropAllIndexes();	
-
+	MetadataEntryObject(const std::string& _name) : MetadataEntry(_name) {}
+	const std::list<std::shared_ptr<MetadataEntry>>& getEntries() const { return m_values; };
+	void AddMetadataEntry(std::shared_ptr<MetadataEntry> _entry) { m_values.push_back(_entry); }
+	void AddMetadataEntry(std::list<std::shared_ptr<MetadataEntry>> _entries) { m_values.splice(m_values.end(), _entries); }
+	bool operator==(const MetadataEntryObject& _other);
 private:
-	DataStorageAPI::ResultDataStorageAPI m_dataStorageAccess;
-	std::vector<bool> m_defaultIndexesSet = { false,false };
-
-	bool checkIfDefaultIndexesAreSet();
+	std::list<std::shared_ptr<MetadataEntry>> m_values;
 };

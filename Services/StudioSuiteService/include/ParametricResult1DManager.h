@@ -28,8 +28,8 @@ class ResultCollectionExtender;
 
 #include "OTCore/DefensiveProgramming.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "OTResultDataAccess/MetadataSeries.h"
-#include "OTResultDataAccess/DatasetDescription.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+#include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 
 #include <string>
 #include <list>

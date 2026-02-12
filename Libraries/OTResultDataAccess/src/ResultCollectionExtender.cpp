@@ -20,13 +20,13 @@
 // OpenTwin header
 #include "OTCore/DefensiveProgramming.h"
 #include "OTCore/VariableToStringConverter.h"
-#include "OTResultDataAccess/ResultCollectionExtender.h"
-#include "OTResultDataAccess/MetadataEntryComperator.h"
-#include "OTResultDataAccess/IndexHandler.h"
-#include "OTResultDataAccess/MetadataEntityInterface.h"
-#include "OTResultDataAccess/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntryComperator.h"
+#include "OTResultDataAccess/ResultCollection/IndexHandler.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/QuantityContainerSerialiser.h"
-#include "OTResultDataAccess/QuantityDescriptionSParameter.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 
 // std header
 #include <set>

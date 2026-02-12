@@ -24,8 +24,8 @@
 #include "OTGui/Plot1DCfg.h"
 #include "OTModelEntities/NewModelStateInfo.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
-#include "OTResultDataAccess/DatasetDescription.h"
-#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 
 // std header
 #include <string>

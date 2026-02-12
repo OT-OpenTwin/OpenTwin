@@ -60,7 +60,7 @@
 #include "OTCore/FolderNames.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTResultDataAccess/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 
 MicroServiceInterfaceFITTDSolver::~MicroServiceInterfaceFITTDSolver()
 {

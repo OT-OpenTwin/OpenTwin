@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTResultDataAccess/ResultCollectionExtender.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 
 // std header
 #include <list>

@@ -34,8 +34,8 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include "OTResultDataAccess/PlotBuilder.h"
-#include "OTResultDataAccess/ResultCollectionExtender.h"
-#include "OTResultDataAccess/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 
 #include "OTBlockEntities/EntityBlockConnection.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitVoltageSource.h"

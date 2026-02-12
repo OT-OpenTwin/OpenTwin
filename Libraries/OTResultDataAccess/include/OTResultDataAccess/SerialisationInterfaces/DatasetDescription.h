@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTResultDataAccess/QuantityDescription.h"
-#include "OTResultDataAccess/ParameterDescription.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
+#include "OTResultDataAccess/SerialisationInterfaces/ParameterDescription.h"
 
 // std header
 #include <list>

@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTCore/GenericDataStructMatrix.h"
-#include "OTResultDataAccess/MetadataSeries.h"
-#include "OTResultDataAccess/MetadataCampaign.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
 
 class TableLocationPointer
 {

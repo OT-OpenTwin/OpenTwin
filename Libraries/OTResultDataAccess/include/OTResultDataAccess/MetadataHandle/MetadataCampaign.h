@@ -22,10 +22,10 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTResultDataAccess/MetadataSeries.h"
-#include "OTResultDataAccess/MetadataQuantity.h"
-#include "OTResultDataAccess/MetadataParameter.h"
-#include "OTResultDataAccess/MetadataEntry.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 
 // std header
 #include <map>

@@ -25,7 +25,7 @@
 #include "OTCore/Serializable.h"
 #include "OTCore/VariableToJSONConverter.h"
 #include "OTCore/JSONToVariableConverter.h"
-#include "OTResultDataAccess/MetadataEntry.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 #include "OTResultDataAccess/ResultDataAccessAPIExport.h"
 
 // std header
@@ -53,6 +53,9 @@ public:
 	//In case that the unique name is already taken, the name is extended with a number. The original name is kept in parameterLabel.
 	std::string parameterLabel = "";
 	
+	std::list<std::string> m_tupleFormats;
+	std::list<std::string> m_tupleName;
+
 	/****************** Are set by the campaign handling class *********************/
 	ot::UID parameterUID = 0;
 	/******************************************************************************/

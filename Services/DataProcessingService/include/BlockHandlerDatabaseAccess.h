@@ -19,9 +19,9 @@
 
 #pragma once
 #include "BlockHandler.h"
-#include "OTResultDataAccess/MetadataCampaign.h"
-#include "OTResultDataAccess/MetadataParameter.h"
-#include "OTResultDataAccess/ResultCollectionMetadataAccess.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTDataStorage/ResultDataStorageAPI.h"
 #include "OTCore/StringToVariableConverter.h"

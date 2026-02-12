@@ -36,7 +36,7 @@
 
 #include "OTDataStorage/ResultDataStorageAPI.h"
 
-#include "OTResultDataAccess/IndexHandler.h"
+#include "OTResultDataAccess/ResultCollection/IndexHandler.h"
 #include "OTResultDataAccess/QuantityContainer.h"
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)

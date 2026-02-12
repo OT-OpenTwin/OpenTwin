@@ -23,15 +23,15 @@
 #include "OTDataStorage/ResultDataStorageAPI.h"
 #include "OTModelEntities/EntityCallbackBase.h"
 #include "OTServiceFoundation/ApplicationBase.h"
-#include "OTResultDataAccess/MetadataEntry.h"
-#include "OTResultDataAccess/MetadataSeries.h"
-#include "OTResultDataAccess/MetadataCampaign.h"
-#include "OTResultDataAccess/MetadataQuantity.h"
-#include "OTResultDataAccess/MetadataParameter.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
+#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
 #include "OTResultDataAccess/QuantityContainer.h"
-#include "OTResultDataAccess/ResultImportLogger.h"
-#include "OTResultDataAccess/DatasetDescription.h"
-#include "OTResultDataAccess/ResultCollectionMetadataAccess.h"
+#include "OTResultDataAccess/ResultImportLogger/ResultImportLogger.h"
+#include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 
 // std header
 #include <string>

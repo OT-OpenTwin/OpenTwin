@@ -1,5 +1,5 @@
 // @otlicense
-// File: MetadataEntryObject.h
+// File: MetadataEntryComperator.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,20 +20,13 @@
 #pragma once
 
 // OpenTwin header
-#include "OTResultDataAccess/MetadataEntry.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 
 // std header
-#include <list>
 #include <memory>
 
-class MetadataEntryObject : public MetadataEntry
+class MetadataEntryComperator
 {
 public:
-	MetadataEntryObject(const std::string& _name) : MetadataEntry(_name) {}
-	const std::list<std::shared_ptr<MetadataEntry>>& getEntries() const { return m_values; };
-	void AddMetadataEntry(std::shared_ptr<MetadataEntry> _entry) { m_values.push_back(_entry); }
-	void AddMetadataEntry(std::list<std::shared_ptr<MetadataEntry>> _entries) { m_values.splice(m_values.end(), _entries); }
-	bool operator==(const MetadataEntryObject& _other);
-private:
-	std::list<std::shared_ptr<MetadataEntry>> m_values;
+	bool operator()(std::shared_ptr<MetadataEntry> one, std::shared_ptr<MetadataEntry> two);
 };

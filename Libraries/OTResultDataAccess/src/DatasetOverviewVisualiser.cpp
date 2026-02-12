@@ -20,9 +20,9 @@
 // OpenTwin header
 #include "OTCore/VariableToStringConverter.h"
 #include "OTResultDataAccess/DatasetOverviewVisualiser.h"
-#include "OTResultDataAccess/MetadataEntrySingle.h"
-#include "OTResultDataAccess/MetadataEntryArray.h"
-#include "OTResultDataAccess/MetadataEntryObject.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntryArray.h"
+#include "OTResultDataAccess/MetadataEntry/MetadataEntryObject.h"
 
 ot::GenericDataStruct* DatasetOverviewVisualiser::buildTableOverview(const MetadataSeries& _metadataSeries)
 {
