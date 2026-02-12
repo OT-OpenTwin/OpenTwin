@@ -114,14 +114,12 @@ set(OTResultDataAccess_HEADERS
     include/OTResultDataAccess/QuantityContainerSerialiser.h
     include/OTResultDataAccess/ResultDataAccessAPIExport.h
     include/OTResultDataAccess/ValueFormatSetter.h
-    include/OTResultDataAccess/DatasetOverviewVisualiser.h
 )
 
 set(OTResultDataAccess_SOURCES
     src/CrossCollectionAccess.cpp
     src/CurveFactory.cpp
     src/DatasetDescription.cpp
-    src/DatasetOverviewVisualiser.cpp
     src/IndexHandler.cpp
     src/MetadataCampaign.cpp
     src/MetadataEntityInterface.cpp
