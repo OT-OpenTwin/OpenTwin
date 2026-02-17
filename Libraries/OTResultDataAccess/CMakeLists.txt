@@ -104,7 +104,9 @@ set(OTResultDataAccess_HEADERS
     include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h
     include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h
     include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h
-    
+    include/OTResultDataAccess/SerialisationInterfaces/TupleDescription.h
+    include/OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h
+
     include/OTResultDataAccess/ResultImportLogger/ResultImportLogger.h
     include/OTResultDataAccess/ResultImportLogger/ResultImportLoggerEntry.h
     include/OTResultDataAccess/ResultImportLogger/ResultImportLoggerVerbosity.h
@@ -114,6 +116,7 @@ set(OTResultDataAccess_HEADERS
     include/OTResultDataAccess/QuantityContainerSerialiser.h
     include/OTResultDataAccess/ResultDataAccessAPIExport.h
     include/OTResultDataAccess/ValueFormatSetter.h
+
 )
 
 set(OTResultDataAccess_SOURCES
