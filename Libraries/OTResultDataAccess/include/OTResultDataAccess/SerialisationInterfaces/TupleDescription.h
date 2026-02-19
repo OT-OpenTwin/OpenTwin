@@ -8,7 +8,7 @@
 #include "OTCore/Serializable.h"
 
 
-class OT_RESULTDATAACCESS_API_EXPORT TupleDescription : public ot::Serializable
+class TupleDescription : public ot::Serializable
 {
 public:
 	TupleDescription() = default;

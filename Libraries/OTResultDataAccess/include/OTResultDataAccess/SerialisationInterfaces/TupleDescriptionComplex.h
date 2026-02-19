@@ -3,7 +3,7 @@
 
 #include "OTResultDataAccess/SerialisationInterfaces/TupleDescription.h"
 #include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
-class OT_RESULTDATAACCESS_API_EXPORT TupleDescriptionComplex : public TupleDescription
+class TupleDescriptionComplex : public TupleDescription
 {
 public:
 	TupleDescriptionComplex(ot::ComplexNumberFormat _format);

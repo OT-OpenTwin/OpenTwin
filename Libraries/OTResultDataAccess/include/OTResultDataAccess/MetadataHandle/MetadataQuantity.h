@@ -85,7 +85,7 @@ public:
 	std::vector<std::string> dependingParameterLabels;
 	std::vector<ot::UID> dependingParameterIds;
 	
-	TupleDescription m_tupleDescription;
+	std::unique_ptr<TupleDescription> m_tupleDescription;
 
 	std::map < std::string, std::shared_ptr<MetadataEntry>> metaData;
 
@@ -93,12 +93,49 @@ public:
 	static const std::string getFieldName() { return "Quantity"; }
 	/********************************************************************************************************/
 	
+	MetadataQuantity& operator=(const MetadataQuantity& _other)
+	{
+		this->quantityName = _other.quantityName;
+		this->quantityLabel = _other.quantityLabel;
+		this->dataDimensions = _other.dataDimensions;
+		this->dependingParameterLabels = _other.dependingParameterLabels;
+		this->dependingParameterIds = _other.dependingParameterIds;
+		if (_other.m_tupleDescription) {
+			this->m_tupleDescription =
+				std::make_unique<TupleDescription>(*_other.m_tupleDescription);
+		}
+		else {
+			this->m_tupleDescription.reset();
+		}
+		this->metaData = _other.metaData;
+		return *this;
+	}
+
+	MetadataQuantity(const MetadataQuantity& _other)
+		: quantityName(_other.quantityName), 
+		quantityIndex(_other.quantityIndex), 
+		quantityLabel(_other.quantityLabel), 
+		dataDimensions(_other.dataDimensions), 
+		dependingParameterIds(_other.dependingParameterIds), 
+		dependingParameterLabels(_other.dependingParameterLabels), 
+		metaData(_other.metaData)
+	{
+		if (_other.m_tupleDescription) {
+			this->m_tupleDescription =
+				std::make_unique<TupleDescription>(*_other.m_tupleDescription);
+		}
+		else {
+			this->m_tupleDescription.reset();
+		}
+	}
+	MetadataQuantity() = default;
+	
 	const bool operator==(const MetadataQuantity& _other) const
 	{
 		//Two metadata quantities are equal, if they have the same data structure:
 		const bool isEqual  = this->quantityName == _other.quantityName && 
 			this->dataDimensions == _other.dataDimensions &&
-			this->m_tupleDescription == _other.m_tupleDescription;
+			*(this->m_tupleDescription) == *(_other.m_tupleDescription);
 		return isEqual;
 	}
 

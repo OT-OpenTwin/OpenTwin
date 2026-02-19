@@ -239,10 +239,7 @@ void Application::createPlotOneCurve()
 	parameter.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 	quantDesc->setName("Magnitude");
-	TupleDescription tupleDescription;
-	tupleDescription.setDataType(ot::TypeNames::getInt32TypeName());
-	tupleDescription.setUnits({ "dB" });
-	quantDesc->getMetadataQuantity().m_tupleDescription = tupleDescription;
+	quantDesc->defineQuantityAsSingle(ot::TypeNames::getInt32TypeName(), "dB");
 
 
 	for (float i = 0.; i <= 50.; i++)
@@ -278,10 +275,8 @@ void Application::createPlotTwoCurves() {
 	parameter.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 	quantDesc->setName("Magnitude");
-	TupleDescription tupleDescription;
-	tupleDescription.setDataType(ot::TypeNames::getInt32TypeName());
-	tupleDescription.setUnits({ "dB" });
-	quantDesc->getMetadataQuantity().m_tupleDescription = tupleDescription;
+	quantDesc->defineQuantityAsSingle(ot::TypeNames::getInt32TypeName(), "dB");
+	
 	
 	for (float i = 0.; i <= 50.; i++) {
 		quantDesc->addDatapoint(ot::Variable(static_cast<int32_t>(i)));
@@ -308,9 +303,7 @@ void Application::createPlotTwoCurves() {
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc2(new QuantityDescriptionCurve());
 	quantDesc2->setName("Magnitude");
 
-	tupleDescription.setDataType(ot::TypeNames::getInt32TypeName());
-	tupleDescription.setUnits({ "dB" });
-	quantDesc2->getMetadataQuantity().m_tupleDescription = tupleDescription;
+	quantDesc2->defineQuantityAsSingle(ot::TypeNames::getInt32TypeName(), "dB");
 	
 	for (float i = 0.; i <= 50.; i++) {
 		quantDesc2->addDatapoint(ot::Variable(-static_cast<int32_t>(i)));
@@ -375,10 +368,8 @@ void Application::createFamilyOfCurves()
 
 		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 		quantDesc->setName("S_11 (Magnitude)");
-		TupleDescription tupleDescription;
-		tupleDescription.setDataType(ot::TypeNames::getFloatTypeName());
-		tupleDescription.setUnits({ "dB" });
-		quantDesc->getMetadataQuantity().m_tupleDescription = tupleDescription;
+		quantDesc->defineQuantityAsSingle(ot::TypeNames::getFloatTypeName(), "dB");
+		
 	
 		for (float i = 0.; i <= 50.; i++)
 		{
@@ -449,10 +440,7 @@ void Application::createFamilyOfCurves3ParameterConst()
 
 			std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 			quantDesc->setName("S_11 (Magnitude)");
-			TupleDescription tupleDescription;
-			tupleDescription.setDataType(ot::TypeNames::getFloatTypeName());
-			tupleDescription.setUnits({ "dB" });
-			quantDesc->getMetadataQuantity().m_tupleDescription = tupleDescription;
+			quantDesc->defineQuantityAsSingle(ot::TypeNames::getFloatTypeName(), "dB");
 			
 			for (float i = 0.; i <= 50.; i++)
 			{
@@ -525,11 +513,7 @@ void Application::createFamilyOfCurves3Parameter()
 
 			std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 			quantDesc->setName("S_11 (Magnitude)");
-			TupleDescription tupleDescription;
-			tupleDescription.setDataType(ot::TypeNames::getFloatTypeName());
-			tupleDescription.setUnits({ "dB" });
-			quantDesc->getMetadataQuantity().m_tupleDescription = tupleDescription;
-			
+			quantDesc->defineQuantityAsSingle(ot::TypeNames::getFloatTypeName(), "dB");
 			for (float i = 0.; i <= 50.; i++)
 			{
 				float value = static_cast<float>((i * (runID + 1))) * powf(-1, static_cast<float>(material));
@@ -584,10 +568,7 @@ void Application::createPlotScatter() {
 	parameter.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 	quantDesc->setName("Magnitude");
-	TupleDescription tupleDescription;
-	tupleDescription.setDataType(ot::TypeNames::getInt32TypeName());
-	tupleDescription.setUnits({ "dB" });
-	quantDesc->getMetadataQuantity().m_tupleDescription = tupleDescription;
+	quantDesc->defineQuantityAsSingle(ot::TypeNames::getInt32TypeName(), "dB");
 	
 	for (float i = 0.; i <= 50.; i++) {
 		quantDesc->addDatapoint(ot::Variable(rand() % 100));
@@ -621,10 +602,7 @@ void Application::createPlotSinglePoint() {
 	parameter.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 	quantDesc->setName("Magnitude");
-	TupleDescription tupleDescription;
-	tupleDescription.setDataType(ot::TypeNames::getInt32TypeName());
-	tupleDescription.setUnits({ "dB" });
-	quantDesc->getMetadataQuantity().m_tupleDescription = tupleDescription;
+	quantDesc->defineQuantityAsSingle(ot::TypeNames::getInt32TypeName(), "dB");
 	
 	for (float i = 0.; i < 1; i++) {
 		quantDesc->addDatapoint(ot::Variable(static_cast<int32_t>(i)));
@@ -650,10 +628,8 @@ void Application::createPlotSinglePoint() {
 	parameter2.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc2(new QuantityDescriptionCurve());
 	quantDesc2->setName("Magnitude");
+	quantDesc2->defineQuantityAsSingle(ot::TypeNames::getInt32TypeName(), "dB");
 	
-	tupleDescription.setDataType(ot::TypeNames::getInt32TypeName());
-	tupleDescription.setUnits({ "dB" });
-	quantDesc2->getMetadataQuantity().m_tupleDescription = tupleDescription;
 	
 	for (float i = 0.; i < 1; i++) {
 		quantDesc2->addDatapoint(ot::Variable(-static_cast<int32_t>(i)));
@@ -813,10 +789,7 @@ void Application::createManyCurvesPlotWorker(const std::string& _plotName, int _
 		parameter.unit = "kHz";
 		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 		quantDesc->setName("Magnitude");
-		TupleDescription tupleDescription;
-		tupleDescription.setDataType(ot::TypeNames::getInt32TypeName());
-		tupleDescription.setUnits({ "dB" });
-		quantDesc->getMetadataQuantity().m_tupleDescription = tupleDescription;
+		quantDesc->defineQuantityAsSingle(ot::TypeNames::getInt32TypeName(), "dB");
 		
 		for (float i = 0.; i <= _numberOfPoints; i += 1.) {
 			quantDesc->addDatapoint(ot::Variable((curveId % 2) == 0 ? (static_cast<int32_t>(i) + curveId) : ((-static_cast<int32_t>(i)) - curveId)));

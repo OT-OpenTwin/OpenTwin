@@ -327,7 +327,7 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 			//Quantity exists already by name in campaign and is in fact identically with the existing one.
 			newQuantity.quantityLabel =  identicalQuantity->quantityLabel;
 			newQuantity.quantityIndex=  identicalQuantity->quantityIndex;
-			newQuantity.m_tupleDescription = identicalQuantity->m_tupleDescription;
+			newQuantity.m_tupleDescription = std::make_unique<TupleDescription>(*identicalQuantity->m_tupleDescription);
 			newQuantity.dataDimensions = identicalQuantity->dataDimensions;
 			
 		}

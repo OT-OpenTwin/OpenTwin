@@ -561,11 +561,8 @@ std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const
 			auto quantityDescription(std::make_unique<QuantityDescriptionCurve>());
 			quantityDescription->setName(quantityName);
 			const std::string valueTypeName = quantityEntry.second.begin()->getTypeName();
-			TupleDescription tupleDescription;
-			tupleDescription.setName("");
-			tupleDescription.setDataType(valueTypeName);
-			tupleDescription.setUnits({ unit });
-			quantityDescription->getMetadataQuantity().m_tupleDescription = tupleDescription;
+			quantityDescription->defineQuantityAsSingle(valueTypeName, unit);
+
 			quantityDescription->setDataPoints(quantityEntry.second);
 			datasetDescription.setQuantityDescription(quantityDescription.release());
 			datasetDescription.addParameterDescriptions(sharedParameter);

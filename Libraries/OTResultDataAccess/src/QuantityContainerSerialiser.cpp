@@ -84,7 +84,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	std::vector<ot::Variable>::const_iterator dataValueItt(dataValues.begin());
 
 	auto quantityMetadata = _quantityDescription->getMetadataQuantity();
-	assert(quantityMetadata.m_tupleDescription.getName() == ""); //Curves should not have a tuple description, as they only have one value per quantity. 
+	assert(quantityMetadata.m_tupleDescription->getName() == ""); //Curves should not have a tuple description, as they only have one value per quantity. 
 	
 	ot::UID quantityID = quantityMetadata.quantityIndex;
 
@@ -141,7 +141,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	std::vector<ot::Variable>::const_iterator realValueItt(realValues.begin()), imagValueItt(imagValues.begin());
 	
 	auto quantityMetadata =	_quantityDescription->getMetadataQuantity();
-	TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(&quantityMetadata.m_tupleDescription);
+	TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(quantityMetadata.m_tupleDescription.get());
 	assert(complexTupleDescription != nullptr);
 	
 	m_bucketSize = 1;
@@ -196,7 +196,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	auto& quantityMetadata = _quantityDescription->getMetadataQuantity();
 	const uint32_t numberOfPorts = quantityMetadata.dataDimensions.front();
 	m_bucketSize = numberOfPorts * numberOfPorts;
-	TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(&quantityMetadata.m_tupleDescription);
+	TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(quantityMetadata.m_tupleDescription.get());
 	
 	const size_t numberOfDocuments = _numberOfParameterValues * 2;
 	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");

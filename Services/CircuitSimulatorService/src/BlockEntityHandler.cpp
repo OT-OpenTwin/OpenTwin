@@ -335,10 +335,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			curveCfg.setEntityName(fullPlotNameVoltage + "/" + curveName);
 			yLabel = "Voltage";
 			quantity->setName(yLabel);
-			TupleDescription tupleDescription;
-			tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
-			tupleDescription.setUnits({ yUnit });
-			quantity->getMetadataQuantity().m_tupleDescription = tupleDescription;
+			quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), yUnit);
 						
 			dataset.setQuantityDescription(quantity.release());
 			plotBuilderVoltage.addCurve(std::move(dataset), curveCfg, curveName);				
@@ -349,10 +346,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			yLabel = "Current";
 			yUnit = "I";
 			quantity->setName(yLabel);
-			TupleDescription tupleDescription;
-			tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
-			tupleDescription.setUnits({ yUnit });
-			quantity->getMetadataQuantity().m_tupleDescription = tupleDescription;
+			quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), yUnit);
 			
 			dataset.setQuantityDescription(quantity.release());
 

@@ -291,10 +291,8 @@ void ResultManager::addCurveData(ltspice::RawData& resultData, std::list<std::sh
 		if (resultData.isComplex())
 		{
 			auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
-			TupleDescriptionComplex tupleDescriptionComplex(TupleDescriptionComplex::ComplexFormats::Real_Imaginary);
-			tupleDescriptionComplex.setDataType(ot::TypeNames::getDoubleTypeName());
-			tupleDescriptionComplex.setUnits({ quantityUnit, quantityUnit });
-
+			quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
+		
 			quantityDescriptionComplex->reserveSizeRealValues(numberOfXValues);
 			for (size_t index = 0; index < numberOfXValues; index++)
 			{
@@ -312,12 +310,8 @@ void ResultManager::addCurveData(ltspice::RawData& resultData, std::list<std::sh
 		else
 		{
 			auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
-			TupleDescription tupleDescription;
-			tupleDescription.setFormatName("");
-			tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
-			tupleDescription.setUnits({ quantityUnit });
-			quantityDescriptionCurve->getMetadataQuantity().m_tupleDescription = tupleDescription;
-
+			quantityDescriptionCurve->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
+			
 			quantityDescriptionCurve->reserveDatapointSize(numberOfXValues);
 			for (size_t index = 0; index < numberOfXValues; index++)
 			{

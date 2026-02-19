@@ -217,7 +217,7 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 			
 			//Update selection if necessary may keeps the value == "" if "" was selected before. However, here we want always one type selected.
 					
-			const std::string selectedType = quantity->m_tupleDescription.getDataType();
+			const std::string selectedType = ot::TypeNames::getDoubleTypeName(); //quantity->m_tupleDescription.getDataType();
 			updateIfNecessaryValueCharacteristicLabelDataType(quantityValueCharacteristic,selectedType, _properties);
 			
 

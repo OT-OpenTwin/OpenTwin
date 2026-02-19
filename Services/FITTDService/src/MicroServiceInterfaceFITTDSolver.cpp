@@ -619,10 +619,7 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkScala
 
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 	quantDesc->setName(pipeline->GetLabelYAxis());
-	TupleDescription tupleDescription;
-	tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
-	tupleDescription.setUnits({ pipeline->GetUnitYAxis() });
-	quantDesc->getMetadataQuantity().m_tupleDescription = tupleDescription;
+	quantDesc->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), pipeline->GetUnitYAxis());
 
 	index_t collectionSize = resultSink->GetResultContainerSize();
 	const double* resultVector = resultSink->GetResult();
@@ -695,10 +692,8 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 
 		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 		quantDesc->setName(pipeline->GetLabelYAxis());
-		TupleDescription tupleDescription;
-		tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
-		tupleDescription.setUnits({ pipeline->GetUnitYAxis() });
-		quantDesc->getMetadataQuantity().m_tupleDescription = tupleDescription;
+		quantDesc->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), pipeline->GetUnitYAxis());
+		
 		
 		index_t collectionSize = resultSink->GetResultContainerSize();
 		for (int i = 0; i < collectionSize; i++)

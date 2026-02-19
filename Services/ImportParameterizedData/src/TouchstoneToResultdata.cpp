@@ -171,24 +171,15 @@ DatasetDescription TouchstoneToResultdata::extractDatasetDescription(TouchstoneH
 	
 	if (selectedFormat == ts::option::Format::Decibel_angle)
 	{
-		TupleDescriptionComplex tupleDescription(TupleDescriptionComplex::ComplexFormats::Magnitude_Phase);
-		tupleDescription.setUnits({ "dB", "°" });
-		tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
-		quantityDescription->getMetadataQuantity().m_tupleDescription = tupleDescription;
+		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "dB", "°");
 	}
 	else if (selectedFormat == ts::option::Format::magnitude_angle)
 	{
-		TupleDescriptionComplex tupleDescription(TupleDescriptionComplex::ComplexFormats::Magnitude_Phase);
-		tupleDescription.setUnits({ "", "°" });
-		tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
-		quantityDescription->getMetadataQuantity().m_tupleDescription = tupleDescription;
+		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", "°");
 	}
 	else
 	{
-		TupleDescriptionComplex tupleDescription(TupleDescriptionComplex::ComplexFormats::Real_Imaginary);
-		tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
-		tupleDescription.setUnits({ "", "" });
-		quantityDescription->getMetadataQuantity().m_tupleDescription = tupleDescription;
+		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), "", "");
 	}
 	datasetDescription.setQuantityDescription(quantityDescription);
 	return datasetDescription;

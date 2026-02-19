@@ -211,7 +211,7 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 						}
 					}
 
-					quantity.m_tupleDescription = tupleDescription;
+					quantity.m_tupleDescription = std::make_unique<TupleDescription>(tupleDescription);
 				}
 			}
 			else
@@ -290,18 +290,18 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 			entitySeries.InsertToQuantityField(m_dependingParameterField, std::move(dependingParameter), quantityFieldKey);
 
 			const std::string tupleDocumentsFieldName = quantityFieldKey + "/" + m_tupleDescriptionsField;
-			const TupleDescription& tupleDescription = quantity.m_tupleDescription;
+			const auto& tupleDescription = quantity.m_tupleDescription;
 			
-			entitySeries.InsertToQuantityField(m_nameField, { tupleDescription.getName() }, tupleDocumentsFieldName);
-			entitySeries.InsertToQuantityField(m_dataTypeNameField, { tupleDescription.getDataType() }, tupleDocumentsFieldName);
+			entitySeries.InsertToQuantityField(m_nameField, { tupleDescription->getName() }, tupleDocumentsFieldName);
+			entitySeries.InsertToQuantityField(m_dataTypeNameField, { tupleDescription->getDataType() }, tupleDocumentsFieldName);
 			
 			std::list<ot::Variable> tupleUnitNames;
-			for (const std::string unitName : tupleDescription.getUnits())
+			for (const std::string unitName : tupleDescription->getUnits())
 			{
 				tupleUnitNames.push_back(ot::Variable(unitName));
 			}
 			entitySeries.InsertToQuantityField(m_unitField, std::move(tupleUnitNames), tupleDocumentsFieldName);
-			entitySeries.InsertToQuantityField(m_tupleFormat, { tupleDescription.getFormatName() }, tupleDocumentsFieldName);
+			entitySeries.InsertToQuantityField(m_tupleFormat, { tupleDescription->getFormatName() }, tupleDocumentsFieldName);
 									
 			for (auto& metadata : quantity.metaData)
 			{

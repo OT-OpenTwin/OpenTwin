@@ -156,7 +156,7 @@ bool BlockHandlerStorage::executeSpecialized()
 										datasetDescription = datasetDescriptionByQuantityLabel.find(key);
 									}
 
-									const std::string& dataType = pipelineQuantity->m_tupleDescription.getDataType();
+									const std::string& dataType = ot::TypeNames::getDoubleTypeName(); //pipelineQuantity->m_tupleDescription.getDataType();
 									if (pipelineQuantity->dataDimensions.size() > 1) // Here the data is a matrix
 									{
 										QuantityDescriptionMatrix* matrix = dynamic_cast<QuantityDescriptionMatrix*>(datasetDescription->second.getQuantityDescription());

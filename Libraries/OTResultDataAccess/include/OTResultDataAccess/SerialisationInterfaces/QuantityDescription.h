@@ -48,8 +48,15 @@ public:
 		m_metadataQuantity.quantityName = _quantityName;
 	}
 		
-	
+	//! @brief Opposite to a tuple. Has an empty tuple name.
+	void defineQuantityAsSingle(const std::string& _dataType, const std::string& _unit);
 
+	//! @brief Particular instance of a tuple with two elements.
+	//! @param _dataType 
+	//! @param _firstUnit Either magnitude or real part unit depending on the format.
+	//! @param _secondUnit Either phase or imaginary part unit depending on the format.
+	void defineQuantityAsComplex(ot::ComplexNumberFormat _format, const std::string& _dataType, const std::string& _firstUnit, const std::string& _secondUnit);
+		
 	MetadataQuantity& getMetadataQuantity() { return m_metadataQuantity; }
 	void setMetadataQuantity(const MetadataQuantity& _metadataQuantity) { m_metadataQuantity = _metadataQuantity; }
 	

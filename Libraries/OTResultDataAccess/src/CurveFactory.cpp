@@ -69,7 +69,7 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 	
 	if (!_quantityValueDescriptionNameOnYAxis.empty())
 	{
-		for (auto& tupleElementName : tupleDescription.getTupleElementNames())
+		for (auto& tupleElementName : tupleDescription->getTupleElementNames())
 		{
 			if (tupleElementName == _quantityValueDescriptionNameOnYAxis)
 			{
@@ -78,7 +78,7 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 			else
 			{
 				tupleIndex++;
-				if (tupleIndex >= tupleDescription.getTupleElementNames().size())
+				if (tupleIndex >= tupleDescription->getTupleElementNames().size())
 				{
 					throw std::invalid_argument("Creating a curve failed to extract the y-axis information. The provided value description name does not match any of the value descriptions of the quantity.");
 				}
@@ -91,8 +91,8 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 	ot::QuantityContainerEntryDescription quantityInformation;
 	quantityInformation.m_fieldName = QuantityContainer::getFieldName();
 	quantityInformation.m_label = selectedQuantity->quantityName;
-	quantityInformation.m_unit = tupleDescription.getUnits()[tupleIndex];
-	quantityInformation.m_dataType = tupleDescription.getDataType();
+	quantityInformation.m_unit = tupleDescription->getUnits()[tupleIndex];
+	quantityInformation.m_dataType = tupleDescription->getDataType();
 	quantityInformation.m_dimension = selectedQuantity->dataDimensions;
 	queryInformation.m_quantityDescription = quantityInformation;
 
