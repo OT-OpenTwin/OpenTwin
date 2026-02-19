@@ -48,6 +48,7 @@ public:
 		m_metadataQuantity.quantityName = _quantityName;
 	}
 		
+	
 
 	MetadataQuantity& getMetadataQuantity() { return m_metadataQuantity; }
 	void setMetadataQuantity(const MetadataQuantity& _metadataQuantity) { m_metadataQuantity = _metadataQuantity; }
