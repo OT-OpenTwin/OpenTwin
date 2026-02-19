@@ -22,6 +22,7 @@
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTResultDataAccess/CurveFactory.h"
 #include "OTResultDataAccess/QuantityContainer.h"
+#include "OTResultDataAccess/SerialisationInterfaces/TupleDescription.h"	
 
 void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg& _config)
 {
@@ -38,7 +39,6 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 	//assert(quantities.size() == 1);
 	
 	const MetadataQuantity* selectedQuantity = nullptr;
-	const MetadataQuantityValueDescription* selectedValueDescription = nullptr;
 	if (!_quantityNameOnYAxis.empty())
 	{
 		for (const MetadataQuantity& quantity : quantities)
@@ -64,33 +64,35 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 		throw std::exception("Curve creation failed to extract the y-axis information");
 	}
 	
+	auto& tupleDescription = selectedQuantity->m_tupleDescription;
+	int tupleIndex = 0;
+	
 	if (!_quantityValueDescriptionNameOnYAxis.empty())
 	{
-		for (auto& valueDescription : selectedQuantity->valueDescriptions)
+		for (auto& tupleElementName : tupleDescription.getTupleElementNames())
 		{
-			if (valueDescription.quantityValueLabel == _quantityValueDescriptionNameOnYAxis)
+			if (tupleElementName == _quantityValueDescriptionNameOnYAxis)
 			{
-				selectedValueDescription = &valueDescription;
 				break;
 			}
+			else
+			{
+				tupleIndex++;
+				if (tupleIndex >= tupleDescription.getTupleElementNames().size())
+				{
+					throw std::invalid_argument("Creating a curve failed to extract the y-axis information. The provided value description name does not match any of the value descriptions of the quantity.");
+				}
+			}	
 		}
 	}
-	else
-	{
-		selectedValueDescription = &(*selectedQuantity->valueDescriptions.begin());
-	}
-	
-	if (selectedValueDescription == nullptr)
-	{
-		throw std::exception("Curve creation failed to extract the y-axis information");
-	}
-	queryInformation.m_query = createQuery(_series.getSeriesIndex(), selectedValueDescription->quantityIndex);
+		
+	queryInformation.m_query = createQuery(_series.getSeriesIndex(), selectedQuantity->quantityIndex);
 
 	ot::QuantityContainerEntryDescription quantityInformation;
 	quantityInformation.m_fieldName = QuantityContainer::getFieldName();
-	quantityInformation.m_label = selectedQuantity->quantityName +" " + selectedValueDescription->quantityValueName;
-	quantityInformation.m_unit = selectedValueDescription->unit;
-	quantityInformation.m_dataType = selectedValueDescription->dataTypeName;
+	quantityInformation.m_label = selectedQuantity->quantityName;
+	quantityInformation.m_unit = tupleDescription.getUnits()[tupleIndex];
+	quantityInformation.m_dataType = tupleDescription.getDataType();
 	quantityInformation.m_dimension = selectedQuantity->dataDimensions;
 	queryInformation.m_quantityDescription = quantityInformation;
 

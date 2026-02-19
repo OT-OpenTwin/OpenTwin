@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTResultDataAccess/QuantityContainerSerialiser.h"
+#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
 
 QuantityContainerSerialiser::QuantityContainerSerialiser(const std::string& _collectionName, ResultImportLogger& _logger)
 	:m_dataStorageAccess(_collectionName), m_logger(_logger)
@@ -83,10 +84,9 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	std::vector<ot::Variable>::const_iterator dataValueItt(dataValues.begin());
 
 	auto quantityMetadata = _quantityDescription->getMetadataQuantity();
-	assert(quantityMetadata.valueDescriptions.size() == 1); //Quantities curve numbers require that a single value description is set.
-
-	auto valueDescription = quantityMetadata.valueDescriptions.begin();
-	ot::UID quantityID = valueDescription->quantityIndex;
+	assert(quantityMetadata.m_tupleDescription.getName() == ""); //Curves should not have a tuple description, as they only have one value per quantity. 
+	
+	ot::UID quantityID = quantityMetadata.quantityIndex;
 
 	m_bucketSize = 1;
 	
@@ -141,14 +141,8 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	std::vector<ot::Variable>::const_iterator realValueItt(realValues.begin()), imagValueItt(imagValues.begin());
 	
 	auto quantityMetadata =	_quantityDescription->getMetadataQuantity();
-	
-	assert(quantityMetadata.valueDescriptions.size() == 2); //Quantities that hold complex numbers require two value descriptions. Should have been set upon creation.
-	std::list<MetadataQuantityValueDescription>::iterator valueDescriptionIt =  quantityMetadata.valueDescriptions.begin();
-	MetadataQuantityValueDescription& realValueDescription = *valueDescriptionIt++;
-	ot::UID realQuantityID(realValueDescription.quantityIndex);
-
-	MetadataQuantityValueDescription& imagValueDescription = *valueDescriptionIt;
-	ot::UID imagQuantityID(imagValueDescription.quantityIndex);
+	TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(&quantityMetadata.m_tupleDescription);
+	assert(complexTupleDescription != nullptr);
 	
 	m_bucketSize = 1;
 
@@ -167,7 +161,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 			}
 		}
 		std::list<ot::Variable> bothValues = { *realValueItt,*imagValueItt };
-		addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, realQuantityID, bothValues);
+		addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, bothValues);
 			
 		if (i != _numberOfParameterValues - 1)
 		{
@@ -202,10 +196,8 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	auto& quantityMetadata = _quantityDescription->getMetadataQuantity();
 	const uint32_t numberOfPorts = quantityMetadata.dataDimensions.front();
 	m_bucketSize = numberOfPorts * numberOfPorts;
-	std::list<MetadataQuantityValueDescription>::iterator valueDescriptionIt = quantityMetadata.valueDescriptions.begin();;
-	MetadataQuantityValueDescription& firstValueDescription = *valueDescriptionIt++;
-	MetadataQuantityValueDescription& secondValueDescription = *valueDescriptionIt;
-
+	TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(&quantityMetadata.m_tupleDescription);
+	
 	const size_t numberOfDocuments = _numberOfParameterValues * 2;
 	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
 	for (size_t i = 0; i < _numberOfParameterValues; i++)
@@ -227,7 +219,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 			for(size_t matrixEntryIndex = 0; matrixEntryIndex < firstValue.size(); matrixEntryIndex++)
 			{
 				std::list<ot::Variable> bothValues = { firstValue[matrixEntryIndex],secondValue[matrixEntryIndex] };
-				addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, firstValueDescription.quantityIndex, bothValues);
+				addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, bothValues);
 			}
 		}
 	}
@@ -236,7 +228,6 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionMatrix* _quantityDescription)
 {
 	auto& quantityMetadata = _quantityDescription->getMetadataQuantity();
-	std::list<MetadataQuantityValueDescription>::iterator valueDescriptionIt = quantityMetadata.valueDescriptions.begin();;
 	
 	m_logger.log("Storing " + std::to_string(_numberOfParameterValues) + " documents");
 
@@ -264,7 +255,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 		const ot::Variable* quantityValueMatrixEntry = quantityValueMatrix.getValues();
 		for (uint32_t j = 0; j < quantityValueMatrix.getNumberOfEntries(); j++)
 		{
-			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, valueDescriptionIt->quantityIndex, quantityValueMatrixEntry[j]);
+			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, quantityValueMatrixEntry[j]);
 		}
 		
 	}

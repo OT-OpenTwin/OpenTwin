@@ -126,7 +126,7 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 	for (const GenericDocument* quantityDocument : allQuantityDocuments)
 	{
 		MetadataQuantity quantity;
-
+		quantity.quantityIndex = std::stoll(quantityDocument->getDocumentName());
 		// First the regular fields
 		auto quantityFields = extractMetadataFields(*quantityDocument);
 		for (std::shared_ptr<MetadataEntry> entry : quantityFields)
@@ -155,71 +155,69 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 			}
 		}
 
-		//Next the additional information and value descriptions. Both of which are subdocuments
+		//Next the additional information and the tuple description. Both of which are subdocuments
 		auto objectList = extractMetadataObjects(*quantityDocument);
 		for (auto& object : objectList)
 		{
 			const std::string entryName = object->getEntryName();
-			bool isValueDescriptionObject = entryName.find(m_valueDescriptionsField) != std::string::npos;
-			if (isValueDescriptionObject)
+			bool isTupleDescriptionObject = entryName.find(m_tupleDescriptionsField) != std::string::npos;
+			if (isTupleDescriptionObject)
 			{
 				MetadataEntry* entry = object.get();
 				auto objectEntry = dynamic_cast<MetadataEntryObject*>(entry);
 				assert(objectEntry != nullptr);
 
-				auto allValueDescriptionEntries = objectEntry->getEntries();
-				for (const auto valueDescriptionEntry : allValueDescriptionEntries)
+				auto allTupleDescriptionEntries = objectEntry->getEntries();
+				TupleDescription tupleDescription;
+				for (const auto tupleDescriptionEntry : allTupleDescriptionEntries)
 				{
-					auto valueDescriptionObjectEntry = dynamic_cast<MetadataEntryObject*>(valueDescriptionEntry.get());
-					assert(valueDescriptionObjectEntry != nullptr);
 
-					MetadataQuantityValueDescription valueDescription;
-					const std::string indexAsString = valueDescriptionObjectEntry->getEntryName();
-					valueDescription.quantityIndex = static_cast<ot::UID>(std::stoll(indexAsString));
-
-					auto allFields = valueDescriptionObjectEntry->getEntries();
-					for (auto field : allFields)
+					auto fieldEntry = dynamic_cast<MetadataEntrySingle*>(tupleDescriptionEntry.get());
+					if (fieldEntry != nullptr)
 					{
-						auto fieldEntry = dynamic_cast<MetadataEntrySingle*>(field.get());
-						assert(fieldEntry != nullptr);
 						if (fieldEntry->getEntryName() == m_nameField)
 						{
 							assert(fieldEntry->getValue().isConstCharPtr());
-							valueDescription.quantityValueName = fieldEntry->getValue().getConstCharPtr();
+							tupleDescription.setName(fieldEntry->getValue().getConstCharPtr());
 						}
-						else if (fieldEntry->getEntryName() == m_labelField)
+						else if (fieldEntry->getEntryName() == m_tupleFormat)
 						{
 							assert(fieldEntry->getValue().isConstCharPtr());
-							valueDescription.quantityValueLabel = fieldEntry->getValue().getConstCharPtr();
-						}
-						else if (fieldEntry->getEntryName() == m_unitField)
-						{
-							assert(fieldEntry->getValue().isConstCharPtr());
-							valueDescription.unit = fieldEntry->getValue().getConstCharPtr();
+							tupleDescription.setFormatName(fieldEntry->getValue().getConstCharPtr());
 						}
 						else if (fieldEntry->getEntryName() == m_dataTypeNameField)
 						{
 							assert(fieldEntry->getValue().isConstCharPtr());
-							valueDescription.dataTypeName = fieldEntry->getValue().getConstCharPtr();
+							tupleDescription.setDataType(fieldEntry->getValue().getConstCharPtr());
 						}
 					}
-					quantity.valueDescriptions.push_back(valueDescription);
+					else
+					{
+						auto arrayEntry = dynamic_cast<MetadataEntryArray*>(tupleDescriptionEntry.get());
+						if (arrayEntry != nullptr)
+						{
+							auto& units = 	arrayEntry->getValues();
+							std::vector<std::string> unitsAsString;
+							for(ot::Variable unit : units)
+							{
+								assert(unit.isConstCharPtr());
+								unitsAsString.push_back(unit.getConstCharPtr());
+							}
+							tupleDescription.setUnits(unitsAsString);
+						}
+						else
+						{
+							assert(false);
+						}
+					}
+
+					quantity.m_tupleDescription = tupleDescription;
 				}
 			}
 			else
 			{
 				quantity.metaData[object->getEntryName()] = object;
 			}
-		}
-
-		//By now everything should be set, except of the quantity index of the quantity. This is not an own identifier but is contained in the value descriptions (Currently)
-		if (!quantity.valueDescriptions.empty())
-		{
-			quantity.quantityIndex = quantity.valueDescriptions.begin()->quantityIndex;
-		}
-		else
-		{
-			assert(0);//Should never be empty
 		}
 
 		seriesMetadata.addQuantity(quantity);
@@ -276,7 +274,6 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 		}
 		for (const MetadataQuantity& quantity : newSeriesMetadata->getQuantities())
 		{
-			assert(quantity.valueDescriptions.size() >= 1);
 			const std::string quantityName = quantity.quantityLabel;
 
 			//Fields of the quantity itself
@@ -292,20 +289,20 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 			std::list<ot::Variable> dependingParameter =convertFromUInt64Vector(quantity.dependingParameterIds);
 			entitySeries.InsertToQuantityField(m_dependingParameterField, std::move(dependingParameter), quantityFieldKey);
 
-			const std::string valueDocumentsFieldName = quantityFieldKey + "/" + m_valueDescriptionsField;
-
-			for (auto& valueDesciption : quantity.valueDescriptions)
-			{
-				const std::string valueFieldKey = std::to_string(valueDesciption.quantityIndex);
-				const std::string valueDocumentFieldName = valueDocumentsFieldName + "/" + valueFieldKey;
-
-				entitySeries.InsertToQuantityField(m_nameField, {ot::Variable(valueDesciption.quantityValueName)}, valueDocumentFieldName);
-				entitySeries.InsertToQuantityField(m_labelField, {ot::Variable(valueDesciption.quantityValueLabel)}, valueDocumentFieldName);
-				entitySeries.InsertToQuantityField(m_dataTypeNameField, {ot::Variable(valueDesciption.dataTypeName)}, valueDocumentFieldName);
-				entitySeries.InsertToQuantityField(m_unitField, {ot::Variable(valueDesciption.unit)}, valueDocumentFieldName);
-			}
-
+			const std::string tupleDocumentsFieldName = quantityFieldKey + "/" + m_tupleDescriptionsField;
+			const TupleDescription& tupleDescription = quantity.m_tupleDescription;
 			
+			entitySeries.InsertToQuantityField(m_nameField, { tupleDescription.getName() }, tupleDocumentsFieldName);
+			entitySeries.InsertToQuantityField(m_dataTypeNameField, { tupleDescription.getDataType() }, tupleDocumentsFieldName);
+			
+			std::list<ot::Variable> tupleUnitNames;
+			for (const std::string unitName : tupleDescription.getUnits())
+			{
+				tupleUnitNames.push_back(ot::Variable(unitName));
+			}
+			entitySeries.InsertToQuantityField(m_unitField, std::move(tupleUnitNames), tupleDocumentsFieldName);
+			entitySeries.InsertToQuantityField(m_tupleFormat, { tupleDescription.getFormatName() }, tupleDocumentsFieldName);
+									
 			for (auto& metadata : quantity.metaData)
 			{
 				insertMetadata(&entitySeries, metadata.second.get());

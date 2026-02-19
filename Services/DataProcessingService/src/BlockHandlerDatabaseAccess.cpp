@@ -289,17 +289,9 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 		throw std::exception("DatabaseAccessBlock has quantity set which is not part of the selected result collection.");
 	}
 
-	auto& valueDescriptions = selectedQuantity->valueDescriptions;
-	ot::UID valueUID = 0;
-	for (auto& valueDescription : valueDescriptions)
-	{
-		if (valueDescription.quantityValueLabel == valueDescriptionLabel)
-		{
-			valueUID = valueDescription.quantityIndex;
-			m_selectedQuantityLabel= selectedQuantity->quantityName;
-			
-		}
-	}
+	
+	ot::UID valueUID = selectedQuantity->quantityIndex;
+	
 	assert(valueUID != 0);
 
 	//Now we add the query for the quantity ID

@@ -32,7 +32,7 @@
 #include "OTResultDataAccess/SerialisationInterfaces/ParameterDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
-#include "OTResultDataAccess/ValueFormatSetter.h"
+#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
 
 #include "OptionsParameterHandlerFormat.h"
 #include "OptionsParameterHandlerFrequency.h"
@@ -168,18 +168,27 @@ DatasetDescription TouchstoneToResultdata::extractDatasetDescription(TouchstoneH
 	auto quantityDescription = _touchstoneHandler.handOverQuantityDescription();
 	quantityDescription->setName("S-Parameter");
 	const ts::option::Format& selectedFormat = optionSettings.getFormat();
-	ValueFormatSetter valueFormatSetter;
+	
 	if (selectedFormat == ts::option::Format::Decibel_angle)
 	{
-		valueFormatSetter.setValueFormatDecibelPhase(*quantityDescription);
+		TupleDescriptionComplex tupleDescription(TupleDescriptionComplex::ComplexFormats::Magnitude_Phase);
+		tupleDescription.setUnits({ "dB", "°" });
+		tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
+		quantityDescription->getMetadataQuantity().m_tupleDescription = tupleDescription;
 	}
 	else if (selectedFormat == ts::option::Format::magnitude_angle)
 	{
-		valueFormatSetter.setValueFormatMagnitudePhase(*quantityDescription);
+		TupleDescriptionComplex tupleDescription(TupleDescriptionComplex::ComplexFormats::Magnitude_Phase);
+		tupleDescription.setUnits({ "", "°" });
+		tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
+		quantityDescription->getMetadataQuantity().m_tupleDescription = tupleDescription;
 	}
 	else
 	{
-		valueFormatSetter.setValueFormatRealImaginary(*quantityDescription,"");
+		TupleDescriptionComplex tupleDescription(TupleDescriptionComplex::ComplexFormats::Real_Imaginary);
+		tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
+		tupleDescription.setUnits({ "", "" });
+		quantityDescription->getMetadataQuantity().m_tupleDescription = tupleDescription;
 	}
 	datasetDescription.setQuantityDescription(quantityDescription);
 	return datasetDescription;

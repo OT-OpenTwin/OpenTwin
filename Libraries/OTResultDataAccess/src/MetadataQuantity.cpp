@@ -22,13 +22,9 @@ void MetadataQuantity::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
 	_object.AddMember("Name", ot::JsonString(quantityName, _allocator), _allocator);
 	_object.AddMember("DependingParametersIDs", ot::JsonArray(dependingParameterIds, _allocator), _allocator);
 	_object.AddMember("DependingParametersLabels", ot::JsonArray(dependingParameterLabels, _allocator), _allocator);
-	ot::JsonArray allValueDescriptions;
-	for (auto& valueDescription : valueDescriptions) {
-		ot::JsonObject entry;
-		valueDescription.addToJsonObject(entry, _allocator);
-		allValueDescriptions.PushBack(entry, _allocator);
-	}
-	_object.AddMember("ValueDescriptions", allValueDescriptions, _allocator);
+	ot::JsonObject entry;
+	m_tupleDescription.addToJsonObject(entry, _allocator);
+	_object.AddMember("TupleDescription", entry, _allocator);
 	_object.AddMember("Dimensions", ot::JsonArray(dataDimensions, _allocator), _allocator);
 }
 
@@ -42,11 +38,10 @@ void MetadataQuantity::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	dependingParameterLabels = ot::json::getStringVector(_object, "DependingParametersLabels");
 	auto allValueDesriptions = ot::json::getArray(_object, "ValueDescriptions");
-	for (rapidjson::SizeType i = 0; i < allValueDesriptions.Size(); i++) {
-		auto entry = ot::json::getObject(allValueDesriptions, i);
-		MetadataQuantityValueDescription valueDescription;
-		valueDescription.setFromJsonObject(entry);
-		valueDescriptions.push_back(valueDescription);
+	if (ot::json::exists(_object, "TupleDescription"))
+	{
+		auto tupleDescriptionObject = ot::json::getObject(_object, "TupleDescription");
+		m_tupleDescription.setFromJsonObject(tupleDescriptionObject);
 	}
 	dataDimensions = ot::json::getUIntVector(_object, "Dimensions");
 }

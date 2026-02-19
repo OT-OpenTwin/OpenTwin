@@ -214,38 +214,11 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 		{
 			//Here the selected quantity exists in the currently selected project. But maybe we need to adjust the other fields
 			//First the value  descritpions
-			EntityPropertiesSelection* selectionQuantityValDescr = _dbAccessEntity->getQuantityValueDescriptionSelection();
-			std::list<std::string> valueDescriptionLabels;
-			const auto& quantityValueDescriptions = quantity->valueDescriptions;
-			for (const auto& quantityValueDescription : quantityValueDescriptions)
-			{
-				valueDescriptionLabels.push_back(quantityValueDescription.quantityValueLabel);
-			}
-
-			updateSelectionIfNecessary(valueDescriptionLabels, selectionQuantityValDescr, _properties);
+			
 			//Update selection if necessary may keeps the value == "" if "" was selected before. However, here we want always one type selected.
-			EntityPropertiesBase* newSelectionQuantityValDescrBase = _properties.getProperty(selectionQuantityValDescr->getName(), selectionQuantityValDescr->getGroup());
-			if (newSelectionQuantityValDescrBase != nullptr)
-			{
-				EntityPropertiesSelection* newSelectionQuantityValDescr = dynamic_cast<EntityPropertiesSelection*>(newSelectionQuantityValDescrBase);
-				if (newSelectionQuantityValDescr->getValue() == m_selectedValueNone)
-				{
-					newSelectionQuantityValDescr->setValue(newSelectionQuantityValDescr->getOptions().front());
-				}
-				const std::string selectedQuantityValDescription = newSelectionQuantityValDescr->getValue();
-				
-				for (auto& valueDescription : quantity->valueDescriptions)
-				{
 					
-					if (valueDescription.quantityValueName == selectedQuantityValDescription)
-					{
-						const std::string selectedType = valueDescription.dataTypeName;
-						updateIfNecessaryValueCharacteristicLabelDataType(quantityValueCharacteristic,selectedType, _properties);
-						const std::string selectedUnit = valueDescription.unit;
-						updateIfNecessaryValueCharacteristicLabelUnit(quantityValueCharacteristic,selectedUnit,_properties);
-					}
-				}
-			}
+			const std::string selectedType = quantity->m_tupleDescription.getDataType();
+			updateIfNecessaryValueCharacteristicLabelDataType(quantityValueCharacteristic,selectedType, _properties);
 			
 
 			//Lastly we extract all parameter labels that shall be shown in relation to the selected quantity.

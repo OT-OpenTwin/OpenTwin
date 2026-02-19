@@ -24,6 +24,7 @@
 #include "OTCore/Serializable.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 #include "OTResultDataAccess/ResultDataAccessAPIExport.h"
+#include "OTResultDataAccess/SerialisationInterfaces/TupleDescription.h"
 
 // std header
 #include <stdint.h>
@@ -83,7 +84,8 @@ public:
 
 	std::vector<std::string> dependingParameterLabels;
 	std::vector<ot::UID> dependingParameterIds;
-	std::list<MetadataQuantityValueDescription> valueDescriptions;
+	
+	TupleDescription m_tupleDescription;
 
 	std::map < std::string, std::shared_ptr<MetadataEntry>> metaData;
 
@@ -96,9 +98,10 @@ public:
 		//Two metadata quantities are equal, if they have the same data structure:
 		const bool isEqual  = this->quantityName == _other.quantityName && 
 			this->dataDimensions == _other.dataDimensions &&
-			this->valueDescriptions == _other.valueDescriptions;
+			this->m_tupleDescription == _other.m_tupleDescription;
 		return isEqual;
 	}
+
 	const bool operator!=(const MetadataQuantity& _other) const
 	{
 		return !(*this == _other);

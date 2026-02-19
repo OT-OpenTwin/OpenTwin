@@ -327,7 +327,7 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 			//Quantity exists already by name in campaign and is in fact identically with the existing one.
 			newQuantity.quantityLabel =  identicalQuantity->quantityLabel;
 			newQuantity.quantityIndex=  identicalQuantity->quantityIndex;
-			newQuantity.valueDescriptions = identicalQuantity->valueDescriptions;
+			newQuantity.m_tupleDescription = identicalQuantity->m_tupleDescription;
 			newQuantity.dataDimensions = identicalQuantity->dataDimensions;
 			
 		}
@@ -401,32 +401,7 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 	m_logger.log("Quantity depends on " + std::to_string(_dependingParameterIDs.size()) + " parameter.");
 	if (newQuantity.quantityIndex == 0)
 	{
-		std::set<std::string> valueDescriptionLabels;
-		for (MetadataQuantityValueDescription& valueDescription : newQuantity.valueDescriptions)
-		{
-			std::string valueDescriptionLabel = valueDescription.quantityValueName;
-			int count(0);
-			bool labelExists = false;
-			do
-			{
-				labelExists = valueDescriptionLabels.find(valueDescriptionLabel) != valueDescriptionLabels.end();
-				if (labelExists)
-				{
-					valueDescriptionLabel = valueDescription.quantityValueName + "_" + std::to_string(count);
-					count++;
-				}
-			} while (labelExists);
-			valueDescription.quantityValueLabel = valueDescriptionLabel;
-			m_logger.log("Quantity got new value description label" + valueDescriptionLabel);
-			valueDescriptionLabels.insert(valueDescription.quantityValueLabel);
-		}
-
-		for (auto& quantityValueDescription : newQuantity.valueDescriptions)
-		{
-			quantityValueDescription.quantityIndex = findNextFreeQuantityIndex();
-		}
-
-		newQuantity.quantityIndex = newQuantity.valueDescriptions.begin()->quantityIndex;
+		newQuantity.quantityIndex = findNextFreeQuantityIndex();
 	}
 
 	//The quantity shall only be stored if the quantity was not stored for this series yet.
@@ -544,16 +519,8 @@ bool ResultCollectionExtender::quantityIsCorrectlySet(MetadataQuantity& _quantit
 		_quantity.dataDimensions.size() > 0 &&
 		_quantity.dependingParameterIds.size() > 0 &&
 		_quantity.quantityLabel != "" &&
-		_quantity.quantityName != "" &&
-		_quantity.valueDescriptions.size() > 0;
+		_quantity.quantityName != "";
 	//List of meta data may be empty
-	for (auto& valueDescription : _quantity.valueDescriptions)
-	{
-		correctlySet &=
-			valueDescription.dataTypeName != "" &&
-			valueDescription.quantityIndex != 0;
-		//label, name and unit can be empty
-	}
 	return correctlySet;
 }
 

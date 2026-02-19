@@ -150,16 +150,13 @@ bool BlockHandlerStorage::executeSpecialized()
 										//Now we reset the ids and dependencies of the quantity. They may not be the same anymore.
 										quantityDescription->getMetadataQuantity().dependingParameterIds.clear();
 										quantityDescription->getMetadataQuantity().quantityIndex = 0;
-										for (auto& valueDescription : quantityDescription->getMetadataQuantity().valueDescriptions)
-										{
-											valueDescription.quantityIndex = 0;
-										}
+		
 										newDatasetDescription.setQuantityDescription(quantityDescription.release());
 										datasetDescriptionByQuantityLabel[key] = std::move(newDatasetDescription);
 										datasetDescription = datasetDescriptionByQuantityLabel.find(key);
 									}
 
-									const std::string& dataType = pipelineQuantity->valueDescriptions.begin()->dataTypeName;
+									const std::string& dataType = pipelineQuantity->m_tupleDescription.getDataType();
 									if (pipelineQuantity->dataDimensions.size() > 1) // Here the data is a matrix
 									{
 										QuantityDescriptionMatrix* matrix = dynamic_cast<QuantityDescriptionMatrix*>(datasetDescription->second.getQuantityDescription());

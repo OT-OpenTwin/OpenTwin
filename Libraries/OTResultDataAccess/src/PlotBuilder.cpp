@@ -102,8 +102,7 @@ bool PlotBuilder::validityCheck(std::list<DatasetDescription>& _dataSetDescripti
 	for (DatasetDescription& datasetDescription : _dataSetDescriptions)
 	{	
 		valid &= (datasetDescription.getParameters().size() != 0) && 
-			(datasetDescription.getQuantityDescription() != nullptr) && 
-			(datasetDescription.getQuantityDescription()->getMetadataQuantity().valueDescriptions.size() > 0 );
+			(datasetDescription.getQuantityDescription() != nullptr);
 		QuantityDescription* quantityDescription = datasetDescription.getQuantityDescription();
 
 		if (QuantityDescriptionCurve* curve = dynamic_cast<QuantityDescriptionCurve*>(quantityDescription)) {

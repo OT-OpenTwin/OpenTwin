@@ -44,12 +44,14 @@ public:
 private:
 	const std::string m_dataDimensionsField = "DataDimensions";
 	const std::string m_dependingParameterField = "ParameterDependencies";
-	const std::string m_valueDescriptionsField = "ValueDescriptions";
+	const std::string m_tupleDescriptionsField = "TupleDescription";
 
 	const std::string m_nameField = "Name";
 	const std::string m_labelField = "Label";
 	const std::string m_unitField = "Unit";
 	const std::string m_dataTypeNameField = "DataTypeName";
+	
+	const std::string m_tupleFormat = "TupleFormat";
 		
 	const std::string m_valuesField = "Values";
 

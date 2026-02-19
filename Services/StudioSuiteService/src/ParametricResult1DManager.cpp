@@ -35,8 +35,8 @@
 #include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
+#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
 
-#include "OTResultDataAccess/ValueFormatSetter.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
@@ -347,13 +347,15 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 
 				const bool hasRealValues = !curveData->getYreValues().empty();
 				const bool hasImValue = !curveData->getYimValues().empty();
-				ValueFormatSetter valueFormatSetter;
 
 				//Values are either complex or real ? Plain imaginary values?
 				if (hasImValue && hasRealValues)
 				{
 					auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
-					valueFormatSetter.setValueFormatRealImaginary(*quantityDescriptionComplex, quantityUnit);
+					TupleDescriptionComplex tupleDescriptionComplex(TupleDescriptionComplex::ComplexFormats::Real_Imaginary);
+					tupleDescriptionComplex.setUnits({ quantityUnit, quantityUnit });
+					tupleDescriptionComplex.setDataType(ot::TypeNames::getDoubleTypeName());
+					quantityDescriptionComplex->getMetadataQuantity().m_tupleDescription = tupleDescriptionComplex;
 
 					quantityDescriptionComplex->reserveSizeRealValues(curveData->getYreValues().size());
 					for (auto realValue : curveData->getYreValues())
@@ -372,10 +374,13 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 				else
 				{
 					auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
+					TupleDescription tupleDescription;
+					tupleDescription.setName("");
+					tupleDescription.setDataType(ot::TypeNames::getDoubleTypeName());
+					tupleDescription.setUnits({ quantityUnit });
+					quantityDescription->getMetadataQuantity().m_tupleDescription = tupleDescription;
 					if (hasImValue)
 					{
-						valueFormatSetter.setValueFormatImaginaryOnly(*quantityDescriptionCurve, quantityUnit);
-
 						quantityDescriptionCurve->reserveDatapointSize(curveData->getYimValues().size());
 						for (auto imValue : curveData->getYimValues())
 						{
@@ -384,8 +389,6 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 					}
 					else
 					{
-						valueFormatSetter.setValueFormatRealOnly(*quantityDescriptionCurve, quantityUnit);
-
 						quantityDescriptionCurve->reserveDatapointSize(curveData->getYreValues().size());
 						for (auto reValue : curveData->getYreValues())
 						{
@@ -427,9 +430,11 @@ bool ParametricResult1DManager::extractDataDescriptionSParameter(const std::stri
 		quantityDescription->initiateZeroFilledValueMatrices(numberOfFrequencyPoints);
 
 		quantityDescription->setName("1D Results/S-Parameters");
-		ValueFormatSetter valueFormatSetter;
-		valueFormatSetter.setValueFormatRealImaginary(*quantityDescription, quantityUnit);
-
+		
+		TupleDescriptionComplex tupleDescriptionComplex(TupleDescriptionComplex::ComplexFormats::Real_Imaginary);
+		tupleDescriptionComplex.setUnits({ quantityUnit, quantityUnit });
+		quantityDescription->getMetadataQuantity().m_tupleDescription = tupleDescriptionComplex;
+		
 		ot::MatrixEntryPointer matrixEntry;
 
 		for (matrixEntry.m_row= 0; matrixEntry.m_row < numberOfPorts; matrixEntry.m_row++)

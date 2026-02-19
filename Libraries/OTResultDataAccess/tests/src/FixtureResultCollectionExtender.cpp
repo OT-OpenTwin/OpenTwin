@@ -83,7 +83,7 @@ MetadataQuantity FixtureResultCollectionExtender::createPower()
 	realValue.quantityValueLabel = "real";
 	realValue.unit = "W";
 	realValue.dataTypeName = ot::TypeNames::getDoubleTypeName();
-	quantity.valueDescriptions.push_back(realValue);
+
 
 	MetadataQuantityValueDescription imagValue;
 	imagValue.quantityIndex = 1;
@@ -91,7 +91,7 @@ MetadataQuantity FixtureResultCollectionExtender::createPower()
 	imagValue.quantityValueLabel = "imag";
 	imagValue.unit = "W";
 	imagValue.dataTypeName = ot::TypeNames::getDoubleTypeName();
-	quantity.valueDescriptions.push_back(imagValue);
+
 
 	return quantity;
 }

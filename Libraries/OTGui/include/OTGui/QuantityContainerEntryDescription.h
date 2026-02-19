@@ -33,7 +33,7 @@ namespace ot
 		std::string m_unit = "";
 		std::string m_dataType = "";
 		std::vector<uint32_t> m_dimension;
-
+		
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 	};
