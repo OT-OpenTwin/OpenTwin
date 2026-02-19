@@ -53,11 +53,14 @@ void EntityBlockDatabaseAccess::createProperties()
 	getProperties().createProperty(projectList, m_groupMetadataFilter);
 
 	//Basic properties:
+	//@Alex: Here ;)
 	EntityPropertiesSelection::createProperty(m_groupMetadataFilter, m_propertyNameSeriesMetadata, { ""}, "", "default", getProperties());
 	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueries, 0,0, m_maxNbOfQueries, "default", getProperties());
 	
 	//Quantity Settings
+	//@Alex: Here ;)
 	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyName, {""}, "", "default", getProperties());
+	
 	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyValueDescription, { "" }, "", "default", getProperties());
 	EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 	typeLabelProperty->setReadOnly(true);
