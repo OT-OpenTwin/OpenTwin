@@ -995,9 +995,6 @@
     <ClInclude Include="include\OTWidgets\WidgetViewDockManager.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyInputStringList.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\SignalBlockWrapper.h">
       <Filter>include\General</Filter>
     </ClInclude>
@@ -1410,6 +1407,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\OnOffSlider.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyInputStringList.h">
+      <Filter>include\Properties</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

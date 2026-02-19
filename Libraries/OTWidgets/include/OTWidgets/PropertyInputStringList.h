@@ -22,11 +22,16 @@
 // OpenTwin header
 #include "OTWidgets/PropertyInput.h"
 
+// Qt header
+#include <QtCore/qtimer.h>
+
 namespace ot {
 
+	class ComboBox;
 	class ComboButton;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputStringList : public PropertyInput {
+		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputStringList)
 		OT_DECL_NOMOVE(PropertyInputStringList)
 		OT_DECL_NODEFAULT(PropertyInputStringList)
@@ -35,18 +40,25 @@ namespace ot {
 		virtual ~PropertyInputStringList();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
-		virtual QVariant getCurrentValue(void) const override;
-		virtual QWidget* getQWidget(void) override;
-		virtual const QWidget* getQWidget(void) const override;
-		virtual Property* createPropertyConfiguration(void) const override;
+		virtual QVariant getCurrentValue() const override;
+		virtual QWidget* getQWidget() override;
+		virtual const QWidget* getQWidget() const override;
+		virtual Property* createPropertyConfiguration() const override;
 		virtual bool setupFromConfiguration(const Property* _configuration) override;
-		virtual void focusPropertyInput(void) override;
+		virtual void focusPropertyInput() override;
 
 		void setCurrentText(const QString& _text);
-		QString getCurrentText(void) const;
-		QStringList getPossibleSelection(void) const;
+		QString getCurrentText() const;
+		QStringList getPossibleSelection() const;
+
+	private Q_SLOTS:
+		void slotTextInputChanged();
 
 	private:
+		QTimer m_delayTimer;
+		QString m_currentText;
+		QWidget* m_parentWidget;
+		ComboBox* m_comboBox;
 		ComboButton* m_comboButton;
 	};
 

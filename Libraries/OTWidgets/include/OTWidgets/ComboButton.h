@@ -44,7 +44,7 @@ namespace ot {
 		void setItems(const QStringList& _items);
 
 	Q_SIGNALS:
-		void textChanged(void);
+		void textChanged();
 
 	private Q_SLOTS:
 		void slotActionTriggered(QAction* _action);

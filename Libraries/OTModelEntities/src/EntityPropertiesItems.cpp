@@ -711,9 +711,17 @@ EntityPropertiesSelection* EntityPropertiesSelection::createProperty(const std::
 	return prop;
 }
 
+EntityPropertiesSelection::EntityPropertiesSelection() : m_allowCustomValues(false)
+{}
+
+EntityPropertiesSelection::EntityPropertiesSelection(const EntityPropertiesSelection& _other) 
+	: EntityPropertiesBase(_other), m_value(_other.m_value), m_options(_other.m_options), m_allowCustomValues(_other.m_allowCustomValues)
+{}
+
 void EntityPropertiesSelection::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
 {
 	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), m_value, m_options);
+	newProp->setPropertyFlag(ot::Property::AllowCustomValues, m_allowCustomValues);
 	this->setupPropertyData(_configuration, newProp);
 }
 
@@ -742,24 +750,17 @@ void EntityPropertiesSelection::addToJsonObject(ot::JsonObject& _jsonObject, ot:
 
 	_jsonObject.AddMember("Value", ot::JsonString(m_value, _allocator), _allocator);
 	_jsonObject.AddMember("Options", ot::JsonArray(m_options, _allocator), _allocator);
+	_jsonObject.AddMember("AllowCustom", m_allowCustomValues, _allocator);
 }
 
 void EntityPropertiesSelection::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
 {
 	EntityPropertiesBase::readFromJsonObject(_object, _root);
+	setValue(ot::json::getString(_object, "Value"));
+	resetOptions(ot::json::getStringList(_object, "Options"));
 
-	const rapidjson::Value& val = _object["Value"];
-	const rapidjson::Value& opt = _object["Options"];
-
-	if (m_value != val.GetString()) setNeedsUpdate();
-	m_value = val.GetString();
-
-	// Now read the options
-	assert(opt.IsArray());
-
-	for (rapidjson::SizeType i = 0; i < opt.Size(); i++)
-	{
-		m_options.push_back(opt[i].GetString());
+	if (_object.HasMember("AllowCustom")) {
+		setAllowCustomValues(ot::json::getBool(_object, "AllowCustom", true));
 	}
 }
 
@@ -818,6 +819,13 @@ bool EntityPropertiesSelection::setValue(const std::string& s)
 
 	m_value = s;
 	return true;
+}
+
+void EntityPropertiesSelection::setAllowCustomValues(bool _allowCustomValues) {
+	if (m_allowCustomValues != _allowCustomValues) {
+		this->setNeedsUpdate();
+		m_allowCustomValues = _allowCustomValues;
+	}
 }
 
 bool EntityPropertiesSelection::checkCompatibilityOfSettings(const EntityPropertiesSelection& other) const

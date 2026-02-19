@@ -316,10 +316,10 @@ class OT_MODELENTITIES_API_EXPORT EntityPropertiesSelection : public EntityPrope
 public:
 	static std::string typeString() { return "selection"; };
 
-	EntityPropertiesSelection() {};
+	EntityPropertiesSelection();
 	virtual ~EntityPropertiesSelection() {};
 
-	EntityPropertiesSelection(const EntityPropertiesSelection &other) : EntityPropertiesBase(other) { m_options = other.m_options; m_value = other.m_value; };
+	EntityPropertiesSelection(const EntityPropertiesSelection& _other);
 
 	virtual EntityPropertiesBase *createCopy() const override { return new EntityPropertiesSelection(*this); };
 
@@ -332,6 +332,9 @@ public:
 
 	bool setValue(const std::string &s);
 	const std::string& getValue()const { return m_value; };
+
+	void setAllowCustomValues(bool _allowCustomValues);
+	bool getAllowCustomValues() const { return m_allowCustomValues; };
 
 	void clearOptions() { m_options.clear(); };
 	void addOption(const std::string &option) { assert(std::find(m_options.begin(), m_options.end(), option) == m_options.end());  m_options.push_back(option); }
@@ -356,6 +359,7 @@ private:
 
 	std::vector<std::string> m_options;
 	std::string m_value;
+	bool m_allowCustomValues;
 };
 
 // ################################################################################################################################################################
