@@ -27,13 +27,13 @@
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/ComboButton.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qheaderview.h>
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qtablewidget.h>
-
 
 LogInGSSEditDialogTableHeader::LogInGSSEditDialogTableHeader(QWidget* _parent)
 	: QHeaderView(Qt::Orientation::Horizontal, nullptr)
@@ -66,14 +66,14 @@ LogInGSSEditDialogEntry::LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, Lo
 	m_name = new ot::LineEdit(_entry.getName(), table);
 	m_name->setMinimumWidth(180);
 	m_name->setPlaceholderText("Name (e.g. Local)");
-	m_name->setToolTip("Name (e.g. Local)");
+	m_name->setToolTip("Name (e.g. Local).");
 	m_name->setFocusPolicy(Qt::NoFocus);
 	m_name->connect(m_name, &ot::LineEdit::leftMouseButtonPressed, m_name, &ot::LineEdit::setInputFocus);
 
 	m_url = new ot::LineEdit(_entry.getUrl(), table);
 	m_url->setMinimumWidth(150);
 	m_url->setPlaceholderText("Session Service URL (e.g. 127.0.0.1)");
-	m_url->setToolTip("Session Service URL (e.g. 127.0.0.1)");
+	m_url->setToolTip("Session Service URL (e.g. 127.0.0.1).");
 	m_url->setFocusPolicy(Qt::NoFocus);
 	m_url->connect(m_url, &ot::LineEdit::leftMouseButtonPressed, m_url, &ot::LineEdit::setInputFocus);
 
@@ -83,6 +83,15 @@ LogInGSSEditDialogEntry::LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, Lo
 	m_port->setToolTip("Session Service Port (e.g. 8091)");
 	m_port->setFocusPolicy(Qt::NoFocus);
 	m_port->connect(m_port, &ot::LineEdit::leftMouseButtonPressed, m_port, &ot::LineEdit::setInputFocus);
+
+	m_loginType = new ot::ComboButton(table);
+	m_loginType->setItems(QStringList() 
+		<< QString::fromStdString(ot::toString(ot::LoginType::UsernamePassword))
+		<< QString::fromStdString(ot::toString(ot::LoginType::SSO))
+	);
+	m_loginType->setText(QString::fromStdString(ot::toString(_entry.getLoginType())));
+	m_loginType->setFocusPolicy(Qt::NoFocus);
+	m_loginType->setToolTip("The login method to use for the specified Global Session Service.");
 
 	m_delete = new QTableWidgetItem;
 	auto deleteFlags = m_delete->flags();
@@ -97,12 +106,14 @@ LogInGSSEditDialogEntry::LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, Lo
 	table->setCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Name, m_name);
 	table->setCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Url, m_url);
 	table->setCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Port, m_port);
+	table->setCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::LoginType, m_loginType);
 	table->setItem(m_row, (int)LogInGSSEditDialog::TableColumn::Delete, m_delete);
 
 	// Connect signals
 	this->connect(m_name, &ot::LineEdit::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
 	this->connect(m_url, &ot::LineEdit::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
 	this->connect(m_port, &ot::LineEdit::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
+	this->connect(m_loginType, &ot::ComboButton::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
 	this->connect(table, &QTableWidget::itemPressed, this, &LogInGSSEditDialogEntry::slotDeleteItem);
 }
 
@@ -110,25 +121,33 @@ LogInGSSEditDialogEntry::~LogInGSSEditDialogEntry() {
 
 }
 
-LogInGSSEntry LogInGSSEditDialogEntry::createEntry(void) const {
-	return LogInGSSEntry(m_name->text(), m_url->text(), m_port->text());
+LogInGSSEntry LogInGSSEditDialogEntry::createEntry() const {
+	LogInGSSEntry newEntry;
+
+	newEntry.setName(m_name->text());
+	newEntry.setUrl(m_url->text());
+	newEntry.setPort(m_port->text());
+	newEntry.setLoginType(ot::stringToLoginType(m_loginType->text().toStdString()));
+
+	return newEntry;
 }
 
-bool LogInGSSEditDialogEntry::isEmpty(void) const {
+bool LogInGSSEditDialogEntry::isEmpty() const {
 	return m_name->text().isEmpty() && m_url->text().isEmpty() && m_port->text().isEmpty();
 }
 
-bool LogInGSSEditDialogEntry::isValid(void) const {
+bool LogInGSSEditDialogEntry::isValid() const {
 	if (!this->isValidIpV4() && !this->isValidIpV6()) return false;
 	if (!this->isValidPort()) return false;
 
 	return !m_name->text().isEmpty();
 }
 
-void LogInGSSEditDialogEntry::prepareDestroy(void) {
+void LogInGSSEditDialogEntry::prepareDestroy() {
 	m_dialog->getTable()->removeCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Name);
 	m_dialog->getTable()->removeCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Url);
 	m_dialog->getTable()->removeCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::Port);
+	m_dialog->getTable()->removeCellWidget(m_row, (int)LogInGSSEditDialog::TableColumn::LoginType);
 
 	delete m_name;
 	m_name = nullptr;
@@ -139,13 +158,16 @@ void LogInGSSEditDialogEntry::prepareDestroy(void) {
 	delete m_port;
 	m_port = nullptr;
 
+	delete m_loginType;
+	m_loginType = nullptr;
+
 	delete m_delete;
 	m_delete = nullptr;
 
 	m_dialog->getTable()->removeRow(m_row);
 }
 
-void LogInGSSEditDialogEntry::slotDataChanged(void) {
+void LogInGSSEditDialogEntry::slotDataChanged() {
 	this->updateErrorState();
 	m_dataChanged = true;
 }
@@ -155,7 +177,7 @@ void LogInGSSEditDialogEntry::slotDeleteItem(QTableWidgetItem* _item) {
 	m_dialog->requestDeleteEntry(m_row);
 }
 
-void LogInGSSEditDialogEntry::updateErrorState(void) {
+void LogInGSSEditDialogEntry::updateErrorState() {
 	if (this->isValidIpV4() || this->isValidIpV6()) {
 		m_url->unsetInputErrorStateProperty();
 	}
@@ -171,7 +193,7 @@ void LogInGSSEditDialogEntry::updateErrorState(void) {
 	}
 }
 
-bool LogInGSSEditDialogEntry::isValidIpV4(void) const {
+bool LogInGSSEditDialogEntry::isValidIpV4() const {
 	if (m_url->text() == "localhost") return true;
 	else if (m_url->text().length() > 6) {
 		QStringList lst = m_url->text().split(".", Qt::SkipEmptyParts);
@@ -188,11 +210,11 @@ bool LogInGSSEditDialogEntry::isValidIpV4(void) const {
 	return false;
 }
 
-bool LogInGSSEditDialogEntry::isValidIpV6(void) const {
+bool LogInGSSEditDialogEntry::isValidIpV6() const {
 	return false;
 }
 
-bool LogInGSSEditDialogEntry::isValidPort(void) const {
+bool LogInGSSEditDialogEntry::isValidPort() const {
 	if (m_port->text().isEmpty()) return false;
 	
 	bool failed = false;
@@ -252,6 +274,14 @@ LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entrie
 		m_table->setHorizontalHeaderItem((int)TableColumn::Port, headerItem);
 	}
 	{
+		QTableWidgetItem* headerItem = new QTableWidgetItem("Login Type");
+		auto flags = headerItem->flags();
+		flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
+		flags.setFlag(Qt::ItemFlag::ItemIsSelectable, false);
+		headerItem->setFlags(flags);
+		m_table->setHorizontalHeaderItem((int)TableColumn::LoginType, headerItem);
+	}
+	{
 		QTableWidgetItem* headerItem = new QTableWidgetItem;
 		auto flags = headerItem->flags();
 		flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
@@ -265,6 +295,7 @@ LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entrie
 	m_table->horizontalHeader()->setSectionResizeMode((int)LogInGSSEditDialog::TableColumn::Name, QHeaderView::Stretch);
 	m_table->horizontalHeader()->setSectionResizeMode((int)LogInGSSEditDialog::TableColumn::Url, QHeaderView::ResizeToContents);
 	m_table->horizontalHeader()->setSectionResizeMode((int)LogInGSSEditDialog::TableColumn::Port, QHeaderView::ResizeToContents);
+	m_table->horizontalHeader()->setSectionResizeMode((int)LogInGSSEditDialog::TableColumn::LoginType, QHeaderView::ResizeToContents);
 	m_table->horizontalHeader()->setSectionResizeMode((int)LogInGSSEditDialog::TableColumn::Delete, QHeaderView::ResizeToContents);
 
 	for (const LogInGSSEntry& entry : _entries) {
@@ -302,7 +333,7 @@ LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entrie
 
 }
 
-std::vector<LogInGSSEntry> LogInGSSEditDialog::getEntries(void) const {
+std::vector<LogInGSSEntry> LogInGSSEditDialog::getEntries() const {
 	std::vector<LogInGSSEntry> entries;
 
 	for (LogInGSSEditDialogEntry* entry : m_entries) {
@@ -314,7 +345,7 @@ std::vector<LogInGSSEntry> LogInGSSEditDialog::getEntries(void) const {
 	return entries;
 }
 
-bool LogInGSSEditDialog::hasChangedData(void) const {
+bool LogInGSSEditDialog::hasChangedData() const {
 	if (m_dataChanged) return true;
 	for (LogInGSSEditDialogEntry* entry : m_entries) {
 		if (entry->getDataChanged()) return true;
@@ -322,12 +353,12 @@ bool LogInGSSEditDialog::hasChangedData(void) const {
 	return false;
 }
 
-void LogInGSSEditDialog::slotAdd(void) {
+void LogInGSSEditDialog::slotAdd() {
 	m_dataChanged = true;
 	this->addEntry(LogInGSSEntry());
 }
 
-void LogInGSSEditDialog::slotSave(void) {
+void LogInGSSEditDialog::slotSave() {
 	if (!this->hasChangedData()) {
 		this->closeDialog(ot::Dialog::Cancel);
 		return;

@@ -65,13 +65,14 @@ protected:
 
 private:
 	enum class LogInStateFlag {
-		NoState = 0x00,
-		RestoredPassword   = 0x01,
-		WorkerRunning      = 0x02,
-		LogInSuccess       = 0x04,
+		NoState            = 0 << 0,
+		RestoredPassword   = 1 << 0,
+		WorkerRunning      = 1 << 1,
+		LogInSuccess       = 1 << 2,
 
-		RegisterMode       = 0x10,
-		ChangePasswordMode = 0x20
+		RegisterMode       = 1 << 3,
+		ChangePasswordMode = 1 << 4,
+		SSOMode            = 1 << 5
 	};
 	typedef ot::Flags<LogInStateFlag> LogInState;
 	OT_ADD_FRIEND_FLAG_FUNCTIONS(LogInDialog::LogInStateFlag, LogInDialog::LogInState)
@@ -103,7 +104,6 @@ private:
 	ot::Label* m_passwordConfirmLabel;
 	ot::LineEdit* m_passwordConfirm; // Register:Confirm, Change:Confirm
 	ot::CheckBox* m_savePassword;
-	ot::CheckBox* m_useSSO;
 	ot::Label* m_toggleChangePasswordModeLabel;
 	ot::Label* m_toggleRegisterModeLabel;
 	ot::PushButton* m_logInButton;
@@ -130,7 +130,6 @@ public Q_SLOTS:
 	void slotToggleChangePasswordMode();
 	void slotGSSChanged();
 	void slotPasswordChanged();
-	void slotSSOChanged();
 
 	void slotLogInSuccess();
 	void slotRegisterSuccess();
@@ -146,10 +145,16 @@ private:
 
 	void saveUserSettings() const;
 	void saveGSSOptions() const;
+	void editGSSEntries();
 
-	LogInGSSEntry findCurrentGssEntry();
+	LogInGSSEntry findCurrentGssEntry() const;
 	void initializeGssData(std::shared_ptr<QSettings> _settings);
 	void updateGssOptions();
+
+	void setControlsForUsernamePassword();
+	void setControlsForRegister();
+	void setControlsForChangePassword();
+	void setControlsForSSO();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

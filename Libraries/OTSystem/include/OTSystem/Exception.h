@@ -27,6 +27,11 @@
 
 namespace ot {
 
+    // ###########################################################################################################################################################################################################################################################################################################################
+
+    // Base
+
+	//! @brief Base class for all OpenTwin exceptions.
     class GeneralException : public std::exception {
     public:
         explicit GeneralException(const std::string& _message) : std::exception(_message.c_str()) {};
@@ -34,9 +39,28 @@ namespace ot {
     };
     namespace Exception { typedef ot::GeneralException General; }
 
+	//! @brief Basic null pointer exception.
+	class NullPointerException : public GeneralException {
+	public:
+		explicit NullPointerException() : GeneralException("Null pointer") {};
+		explicit NullPointerException(const char* _message) : GeneralException(_message) {};
+		explicit NullPointerException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit NullPointerException(const std::string& _message, const std::string& _where) : NullPointerException("nullptr at \"" + _where + "\"" + (_message.empty() ? "" : ": " + _message)) {};
+	};
+	namespace Exception { typedef ot::NullPointerException NullPointer; }
+
     // ###########################################################################################################################################################################################################################################################################################################################
 
     // Data
+
+	//! @brief Basic invalid format exception.
+	class InvalidFormatException : public GeneralException {
+	public:
+		explicit InvalidFormatException() : GeneralException("Invalid format") {};
+		explicit InvalidFormatException(const std::string& _message) : GeneralException(_message.c_str()) {};
+		explicit InvalidFormatException(const char* _message) : GeneralException(_message) {};
+	};
+	namespace Exception { typedef ot::InvalidFormatException InvalidFormat; }
 
     //! @brief Basic object not found exception.
     class ObjectNotFoundException : public GeneralException {
@@ -65,6 +89,15 @@ namespace ot {
     };
     namespace Exception { typedef ot::OutOfBoundsException OutOfBounds; }
 
+	//! @brief Basic argument missing exception.
+	class ArgumentMissingException : public GeneralException {
+	public:
+		explicit ArgumentMissingException() : GeneralException("Argument missing") {};
+		explicit ArgumentMissingException(const std::string& _message) : GeneralException(_message.c_str()) {};
+		explicit ArgumentMissingException(const char* _message) : GeneralException(_message) {};
+	};
+	namespace Exception { typedef ot::ArgumentMissingException ArgumentMissing; }
+
     //! @brief Basic invalid argument exception.
     class InvalidArgumentException : public GeneralException {
     public:
@@ -73,6 +106,86 @@ namespace ot {
         explicit InvalidArgumentException(const char* _message) : GeneralException(_message) {};
     };
     namespace Exception { typedef ot::InvalidArgumentException InvalidArgument; }
+
+	//! @brief Basic invalid type exception.
+	class InvalidTypeException : public GeneralException {
+	public:
+		explicit InvalidTypeException() : GeneralException("Invalid type") {};
+		explicit InvalidTypeException(const std::string& _message) : GeneralException(_message.c_str()) {};
+		explicit InvalidTypeException(const char* _message) : GeneralException(_message) {};
+	};
+	namespace Exception { typedef ot::InvalidTypeException InvalidType; }
+
+	//! @brief Basic invalid version exception.
+	class InvalidVersionException : public GeneralException {
+	public:
+		explicit InvalidVersionException() : GeneralException("Invalid version") {};
+		explicit InvalidVersionException(const std::string& _message) : GeneralException(_message.c_str()) {};
+		explicit InvalidVersionException(const char* _message) : GeneralException(_message) {};
+	};
+	namespace Exception { typedef ot::InvalidVersionException InvalidVersion; }
+
+    // ###########################################################################################################################################################################################################################################################################################################################
+
+    // Runtime
+
+    //! @brief Basic runtime exception.
+    class RuntimeException : public GeneralException {
+    public:
+        explicit RuntimeException() : GeneralException("Runtime exception") {};
+        explicit RuntimeException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit RuntimeException(const char* _message) : GeneralException(_message) {};
+    };
+    namespace Exception { typedef ot::RuntimeException Runtime; }
+
+	//! @brief Basic serialization exception.
+	class SerializationException : public RuntimeException {
+	public:
+		explicit SerializationException() : RuntimeException("Serialization exception") {};
+		explicit SerializationException(const std::string& _message) : RuntimeException(_message.c_str()) {};
+		explicit SerializationException(const char* _message) : RuntimeException(_message) {};
+	};
+	namespace Exception { typedef ot::SerializationException Serialization; }
+
+	//! @brief Basic deserialization exception.
+	class DeserializationException : public RuntimeException {
+	public:
+		explicit DeserializationException() : RuntimeException("Deserialization exception") {};
+		explicit DeserializationException(const std::string& _message) : RuntimeException(_message.c_str()) {};
+		explicit DeserializationException(const char* _message) : RuntimeException(_message) {};
+	};
+	namespace Exception { typedef ot::DeserializationException Deserialization; }
+
+    // ###########################################################################################################################################################################################################################################################################################################################
+
+	// State
+
+    //! @brief Basic illegal state exception.
+    class IllegalStateException : public GeneralException {
+    public:
+        explicit IllegalStateException() : GeneralException("Illegal state") {};
+        explicit IllegalStateException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit IllegalStateException(const char* _message) : GeneralException(_message) {};
+    };
+    namespace Exception { typedef ot::IllegalStateException IllegalState; }
+
+	//! @brief Basic not initialized exception.
+    class NotInitializedException : public IllegalStateException {
+    public:
+        explicit NotInitializedException() : IllegalStateException("Not initialized") {};
+        explicit NotInitializedException(const std::string& _message) : IllegalStateException(_message.c_str()) {};
+        explicit NotInitializedException(const char* _message) : IllegalStateException(_message) {};
+    };
+	namespace Exception { typedef ot::NotInitializedException NotInitialized; }
+
+	//! @brief Basic already initialized exception.
+	class AlreadyInitializedException : public IllegalStateException {
+	public:
+		explicit AlreadyInitializedException() : IllegalStateException("Already initialized") {};
+		explicit AlreadyInitializedException(const std::string& _message) : IllegalStateException(_message.c_str()) {};
+		explicit AlreadyInitializedException(const char* _message) : IllegalStateException(_message) {};
+	};
+	namespace Exception { typedef ot::AlreadyInitializedException AlreadyInitialized; }
 
     // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -116,6 +229,36 @@ namespace ot {
 
     // ###########################################################################################################################################################################################################################################################################################################################
 
+    // Configuration
+
+    //! @brief Basic configuration exception.
+    class ConfigurationException : public GeneralException {
+    public:
+        explicit ConfigurationException() : GeneralException("Configuration exception") {};
+        explicit ConfigurationException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit ConfigurationException(const char* _message) : GeneralException(_message) {};
+    };
+    namespace Exception { typedef ot::ConfigurationException Configuration; }
+
+    //! @brief Basic configuration not found exception.
+    class ConfigurationNotFoundException : public ConfigurationException {
+    public:
+        explicit ConfigurationNotFoundException() : ConfigurationException("Configuration not found") {};
+        explicit ConfigurationNotFoundException(const std::string& _message) : ConfigurationException(_message.c_str()) {};
+        explicit ConfigurationNotFoundException(const char* _message) : ConfigurationException(_message) {};
+    };
+    namespace Exception { typedef ot::ConfigurationNotFoundException ConfigurationNotFound; }
+
+    class InvalidConfigurationException : public ConfigurationException {
+    public:
+        explicit InvalidConfigurationException() : ConfigurationException("Invalid configuration") {};
+        explicit InvalidConfigurationException(const std::string& _message) : ConfigurationException(_message.c_str()) {};
+        explicit InvalidConfigurationException(const char* _message) : ConfigurationException(_message) {};
+    };
+    namespace Exception { typedef ot::InvalidConfigurationException InvalidConfiguration; }
+
+    // ###########################################################################################################################################################################################################################################################################################################################
+
     // Network
 
     //! @brief Basic network error exception.
@@ -136,4 +279,34 @@ namespace ot {
     };
     namespace Exception { typedef ot::RequestFailedException RequestFailed; }
 
+    // ###########################################################################################################################################################################################################################################################################################################################
+
+    // Other
+
+	//! @brief Basic script exception.
+	class ScriptException : public GeneralException {
+        public:
+        explicit ScriptException() : GeneralException("Script exception") {};
+        explicit ScriptException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit ScriptException(const char* _message) : GeneralException(_message) {};
+	};
+	namespace Exception { typedef ot::ScriptException Script; }
+
+	//! @brief Basic graphics exception.
+	class GraphicsException : public GeneralException {
+        public:
+        explicit GraphicsException() : GeneralException("Graphics exception") {};
+        explicit GraphicsException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit GraphicsException(const char* _message) : GeneralException(_message) {};
+	};
+	namespace Exception { typedef ot::GraphicsException Graphics; }
+
+	//! @brief Basic thread exception.
+	class ThreadException : public GeneralException {
+        public:
+        explicit ThreadException() : GeneralException("Thread exception") {};
+        explicit ThreadException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit ThreadException(const char* _message) : GeneralException(_message) {};
+	};
+	namespace Exception { typedef ot::ThreadException Thread; }
 }

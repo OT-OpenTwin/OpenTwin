@@ -108,9 +108,6 @@ LogInDialog::LogInDialog()
 	m_savePassword = new CheckBox("Save Password", this);
 	m_savePassword->setObjectName("LogInDialogSavePassword");
 
-	m_useSSO = new CheckBox("Use Single Sign-On", this);
-	m_useSSO->setObjectName("LogInDialogUseSSO");
-
 	Label* spacerLabel1 = new Label(" ", this);
 	Label* spacerLabel2 = new Label(" ", this);
 	
@@ -127,8 +124,7 @@ LogInDialog::LogInDialog()
 	m_username->setText(settings->value("LastUsername", QString()).toString());
 	m_restoredPassword = settings->value("LastPassword", QString()).toString();
 	m_savePassword->setChecked(settings->value("LastSavePassword", false).toBool());
-	m_useSSO->setChecked(settings->value("LastUseSSO", false).toBool());
-
+	
 	if (!m_restoredPassword.isEmpty()) {
 		m_password->setText(LOG_IN_RESTOREDPASSWORD_PLACEHOLDER);
 		m_state.set(LogInStateFlag::RestoredPassword);
@@ -145,7 +141,6 @@ LogInDialog::LogInDialog()
 
 	inputLayout->addWidget(gssLabel, r, 0);
 	inputLayout->addWidget(m_gss, r++, 1);
-	inputLayout->addWidget(m_useSSO, r++, 1);
 	inputLayout->addWidget(usernameLabel, r, 0);
 	inputLayout->addWidget(m_username, r++, 1);
 	inputLayout->addWidget(m_passwordLabel, r, 0);
@@ -207,8 +202,6 @@ LogInDialog::LogInDialog()
 	newTargetRect.moveTo(topLeftPos);
 	this->move(topLeftPos);
 
-	this->slotSSOChanged();
-
 	// Connect signals
 	this->connect(m_logInButton, &PushButton::clicked, this, &LogInDialog::slotLogIn);
 	this->connect(m_registerButton, &PushButton::clicked, this, &LogInDialog::slotRegister);
@@ -216,7 +209,6 @@ LogInDialog::LogInDialog()
 	this->connect(m_exitButton, &PushButton::clicked, this, &LogInDialog::closeCancel);
 	this->connect(m_gss, &ComboBox::currentTextChanged, this, &LogInDialog::slotGSSChanged);
 	this->connect(m_password, &LineEdit::textChanged, this, &LogInDialog::slotPasswordChanged);
-	this->connect(m_useSSO, &CheckBox::stateChanged, this, &LogInDialog::slotSSOChanged);
 }
 
 LogInDialog::~LogInDialog() {
@@ -224,19 +216,19 @@ LogInDialog::~LogInDialog() {
 }
 
 void LogInDialog::initialize() {
-	StartArgumentParser parser;
+	StartArgumentParser args;
 
 	// Check if we have to restore a login
-	if (!parser.parse()) {
+	if (!args.parse()) {
 		return;
 	}
 
-	if (parser.getDebug()) {
+	if (args.getDebug()) {
 		QMessageBox msg(QMessageBox::Information, "Debug", "Debug mode was requeted and is now enabled for this instance!", QMessageBox::Ok);
 		msg.exec();
 	}
 
-	if (parser.getLogInSet()) {
+	if (args.getLogInSet()) {
 		{
 			QSignalBlocker textBlock(m_password);
 			m_password->setText(LOG_IN_RESTOREDPASSWORD_PLACEHOLDER);
@@ -244,11 +236,11 @@ void LogInDialog::initialize() {
 		m_state.set(LogInStateFlag::RestoredPassword);
 
 		// Apply password and username
-		m_restoredPassword = QString::fromStdString(parser.getLogInData().getEncryptedUserPassword());
-		m_username->setText(QString::fromStdString(parser.getLogInData().getUserName()));
+		m_restoredPassword = QString::fromStdString(args.getLogInData().getEncryptedUserPassword());
+		m_username->setText(QString::fromStdString(args.getLogInData().getUserName()));
 
 		// Apply GSS
-		QString gss = parser.getLogInData().getGss().getName();
+		QString gss = args.getLogInData().getGss().getName();
 
 		int ix = 0;
 		for (const LogInGSSEntry& entry : m_gssData) {
@@ -420,30 +412,15 @@ void LogInDialog::slotToggleLogInAndRegisterMode() {
 	OTAssert(!m_state.has(LogInStateFlag::WorkerRunning), "Worker running");
 
 	if (m_state.has(LogInStateFlag::RegisterMode)) {
-		m_logInButton->setHidden(false);
-		m_registerButton->setHidden(true);
-		m_passwordConfirmLabel->setHidden(true);
-		m_passwordConfirm->setHidden(true);
-		m_toggleRegisterModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToRegister);
-		m_useSSO->setHidden(false);
-		//m_toggleChangePasswordModeLabel->setHidden(false);
-		m_state.remove(LogInStateFlag::RegisterMode);
+		if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) {
+			setControlsForSSO();
+		}
+		else {
+			setControlsForUsernamePassword();
+		}
 	}
 	else {
-		m_logInButton->setHidden(true);
-		m_registerButton->setHidden(false);
-		m_passwordConfirm->setHidden(false);
-		m_passwordConfirmLabel->setHidden(false);
-		m_toggleRegisterModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToLogIn);
-		m_useSSO->setHidden(true);
-		//m_toggleChangePasswordModeLabel->setHidden(true);
-		m_state.set(LogInStateFlag::RegisterMode);
-
-		if (m_state.has(LogInStateFlag::RestoredPassword)) {
-			m_password->blockSignals(true);
-			m_password->setText(QString());
-			m_password->blockSignals(false);
-		}
+		setControlsForRegister();
 	}
 
 	this->update();
@@ -453,58 +430,39 @@ void LogInDialog::slotToggleChangePasswordMode() {
 	OTAssert(!m_state.has(LogInStateFlag::WorkerRunning), "Worker running");
 
 	if (m_state.has(LogInStateFlag::ChangePasswordMode)) {
-		m_logInButton->setHidden(false);
-		m_changePasswordButton->setHidden(true);
-		m_passwordNew->setHidden(true);
-		m_passwordNewLabel->setHidden(true);
-		m_passwordConfirm->setHidden(true);
-		m_passwordConfirmLabel->setHidden(true);
-		m_toggleChangePasswordModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToChangePassword);
-		m_toggleRegisterModeLabel->setHidden(false);
-		m_useSSO->setHidden(false);
-		m_state.remove(LogInStateFlag::ChangePasswordMode);
+		if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) {
+			setControlsForSSO();
+		}
+		else {
+			setControlsForUsernamePassword();
+		}
 	}
 	else {
-		m_logInButton->setHidden(true);
-		m_changePasswordButton->setHidden(false);
-		m_passwordNew->setHidden(false);
-		m_passwordNewLabel->setHidden(false);
-		m_passwordConfirm->setHidden(false);
-		m_passwordConfirmLabel->setHidden(false);
-		m_toggleChangePasswordModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToLogIn);
-		m_toggleRegisterModeLabel->setHidden(true);
-		m_useSSO->setHidden(true);
-		m_state.set(LogInStateFlag::ChangePasswordMode);
-
-		if (m_state.has(LogInStateFlag::RestoredPassword)) {
-			m_password->blockSignals(true);
-			m_password->setText(QString());
-			m_password->blockSignals(false);
-		}
+		setControlsForChangePassword();
 	}
 
 	this->update();
 }
 
 void LogInDialog::slotGSSChanged() {
-	if (m_gss->currentText() != EDIT_GSS_TEXT) {
-		return;
+	if (m_gss->currentText() == EDIT_GSS_TEXT) {
+		editGSSEntries();
 	}
+	else {
+		switch (findCurrentGssEntry().getLoginType()) {
+		case ot::LoginType::UsernamePassword:
+			setControlsForUsernamePassword();
+			break;
 
-	LogInGSSEditDialog dialog(m_gssData, this);
+		case ot::LoginType::SSO:
+			setControlsForSSO();
+			break;
 
-	ot::Dialog::DialogResult result = dialog.showDialog();
-
-	m_gss->blockSignals(true);
-	
-	if (result == ot::Dialog::Ok) {
-		m_gssData = dialog.getEntries();
-		this->updateGssOptions();
-		this->saveGSSOptions();
+		default:
+			OT_LOG_E("Unknown login type for GSS entry \"" + m_gss->currentText().toStdString() + "\"");
+			break;
+		}
 	}
-
-	m_gss->setCurrentIndex(0);
-	m_gss->blockSignals(false);
 }
 
 void LogInDialog::slotPasswordChanged() {
@@ -540,27 +498,6 @@ void LogInDialog::slotPasswordChanged() {
 
 	m_state.remove(LogInStateFlag::RestoredPassword);
 	m_password->setText(newTxt);
-}
-
-void LogInDialog::slotSSOChanged() {
-	OTAssert(!m_state.hasAny(LogInStateFlag::WorkerRunning | LogInStateFlag::ChangePasswordMode | LogInStateFlag::RegisterMode), "Invalid state");
-
-	bool isCheck = m_useSSO->isChecked();
-
-	m_username->setReadOnly(isCheck);
-	m_password->setReadOnly(isCheck);
-	
-	m_savePassword->setHidden(isCheck);
-	m_toggleRegisterModeLabel->setHidden(isCheck);
-
-	if (isCheck) {
-		// Jan, tob dich hier aus :)
-
-		// set user name and password to SSO values
-
-		//m_username->setText("");
-		//m_password->setText("");
-	}
 }
 
 void LogInDialog::slotLogInSuccess() {
@@ -687,9 +624,7 @@ void LogInDialog::saveUserSettings() const {
 	OTAssert(m_loginData.isValid(), "Invalid login data");
 	std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
 
-	settings->setValue("LastUseSSO", m_useSSO->isChecked());
-
-	if (m_useSSO->isChecked()) {
+	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) {
 		settings->setValue("LastUsername", QString());
 		settings->setValue("LastPassword", QString());
 	}
@@ -716,6 +651,7 @@ void LogInDialog::saveGSSOptions() const {
 		entryObj["Name"] = entry.getName();
 		entryObj["IP"] = entry.getUrl();
 		entryObj["Port"] = entry.getPort();
+		entryObj["ConType"] = QString::fromStdString(ot::toString(entry.getLoginType()));
 		gssOptionsArr.append(entryObj);
 	}
 
@@ -723,7 +659,24 @@ void LogInDialog::saveGSSOptions() const {
 	settings->setValue("SessionServiceJSON", gssOptionsDoc.toJson(QJsonDocument::Compact));
 }
 
-LogInGSSEntry LogInDialog::findCurrentGssEntry() {
+void LogInDialog::editGSSEntries() {
+	LogInGSSEditDialog dialog(m_gssData, this);
+
+	ot::Dialog::DialogResult result = dialog.showDialog();
+
+	m_gss->blockSignals(true);
+
+	if (result == ot::Dialog::Ok) {
+		m_gssData = dialog.getEntries();
+		this->updateGssOptions();
+		this->saveGSSOptions();
+	}
+
+	m_gss->setCurrentIndex(0);
+	m_gss->blockSignals(false);
+}
+
+LogInGSSEntry LogInDialog::findCurrentGssEntry() const {
 	int index = m_gss->currentIndex();
 	if (index < 0 || index >= m_gssData.size()) {
 		return LogInGSSEntry();
@@ -776,6 +729,9 @@ void LogInDialog::initializeGssData(std::shared_ptr<QSettings> _settings) {
 				}
 
 				LogInGSSEntry newEntry(obj["Name"].toString(), obj["IP"].toString(), obj["Port"].toString());
+				if (obj.contains("ConType")) {
+					newEntry.setLoginType(ot::stringToLoginType(obj["ConType"].toString().toStdString()));
+				}
 				m_gssData.push_back(newEntry);
 
 				if (newEntry.getName() == lastSessionServiceName) {
@@ -814,6 +770,56 @@ void LogInDialog::updateGssOptions() {
 
 	m_gss->clear();
 	m_gss->addItems(options);
+}
+
+void LogInDialog::setControlsForUsernamePassword() {
+	m_logInButton->setHidden(false);
+	m_registerButton->setHidden(true);
+	m_savePassword->setHidden(false);
+
+	m_password->setHidden(false);
+	m_passwordLabel->setHidden(false);
+	m_passwordConfirmLabel->setHidden(true);
+	m_passwordConfirm->setHidden(true);
+	m_toggleRegisterModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToRegister);
+	m_state.remove(LogInStateFlag::RegisterMode);
+}
+
+void LogInDialog::setControlsForRegister() {
+	m_logInButton->setHidden(true);
+	m_registerButton->setHidden(false);
+	m_savePassword->setHidden(true);
+
+	m_password->setHidden(false);
+	m_passwordLabel->setHidden(false);
+	m_passwordConfirm->setHidden(false);
+	m_passwordConfirmLabel->setHidden(false);
+
+	m_toggleRegisterModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToLogIn);
+	m_state.set(LogInStateFlag::RegisterMode);
+
+	if (m_state.has(LogInStateFlag::RestoredPassword)) {
+		m_password->blockSignals(true);
+		m_password->setText(QString());
+		m_password->blockSignals(false);
+	}
+}
+
+void LogInDialog::setControlsForChangePassword() {
+
+}
+
+void LogInDialog::setControlsForSSO() {
+	m_logInButton->setHidden(false);
+	m_registerButton->setHidden(true);
+	m_savePassword->setHidden(true);
+
+	m_password->setHidden(true);
+	m_passwordLabel->setHidden(true);
+	m_passwordConfirm->setHidden(true);
+	m_passwordConfirmLabel->setHidden(true);
+
+	m_state.remove(LogInStateFlag::RegisterMode);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -1010,7 +1016,7 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS() {
 }
 
 LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userManager) {
-	if (m_useSSO->isChecked()) {
+	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) {
 		return this->workerLoginSSO(_userManager);
 	}
 	else {

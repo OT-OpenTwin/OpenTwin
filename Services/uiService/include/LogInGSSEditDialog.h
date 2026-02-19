@@ -23,6 +23,7 @@
 #include "LogInGSSEntry.h"
 
 // OpenTwin header
+#include "OTCore/LoginTypes.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTWidgets/Dialog.h"
 
@@ -39,6 +40,7 @@ class LogInGSSEditDialog;
 namespace ot {
 	class Label;
 	class LineEdit;
+	class ComboButton;
 }
 
 class LogInGSSEditDialogTableHeader : public QHeaderView {
@@ -66,9 +68,10 @@ public:
 	void setRow(int _row) { m_row = _row; };
 	int getRow(void) const { return m_row; };
 	bool getDataChanged(void) const { return m_dataChanged; };
-	ot::LineEdit* getNameInput(void) const { return m_name; };
-	ot::LineEdit* getUrlInput(void) const { return m_url; };
-	ot::LineEdit* getPortInput(void) const { return m_port; };
+	ot::LineEdit* getNameInput() const { return m_name; };
+	ot::LineEdit* getUrlInput() const { return m_url; };
+	ot::LineEdit* getPortInput() const { return m_port; };
+	ot::ComboButton* getLoginTypeInput() const { return m_loginType; };
 
 	bool isEmpty(void) const;
 	bool isValid(void) const;
@@ -90,6 +93,7 @@ private:
 	ot::LineEdit* m_name;
 	ot::LineEdit* m_url;
 	ot::LineEdit* m_port;
+	ot::ComboButton* m_loginType;
 	QTableWidgetItem* m_delete;
 	LogInGSSEditDialog* m_dialog;
 
@@ -105,6 +109,7 @@ public:
 		Name,
 		Url,
 		Port,
+		LoginType,
 		Delete,
 		TableColumnCount
 	};

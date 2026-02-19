@@ -92,6 +92,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # File lists for OTCore_core (from .vcxproj)
 # ============================================================
 
+file(GLOB OTCORE_HEADER_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/JSON/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/JSON/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/RAII/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/RAII/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/ComplexNumbers/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/*.hpp"
+)
+
 set(OTCORE_SOURCE_FILES
     src/JSON/JSONHelper.cpp
     src/JSON/JsonObject.cpp
@@ -124,6 +136,7 @@ set(OTCORE_SOURCE_FILES
     src/OTObject.cpp
     src/RuntimeTests.cpp
     src/StringToNumericCheck.cpp
+    src/LoginTypes.cpp
     src/Math.cpp
     src/OwnerServiceGlobal.cpp
     src/JSONToVariableConverter.cpp
@@ -162,19 +175,6 @@ elseif(BASE64_ROOT_PATH)
     set(OTCORE_THIRDPARTY_SOURCE "${BASE64_ROOT_PATH}/base64.c")
     set(OTCORE_THIRDPARTY_HEADER "${BASE64_ROOT_PATH}/base64.h")
 endif()
-
-# All headers in include/OTCore
-file(GLOB OTCORE_HEADER_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/*.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/JSON/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/JSON/*.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/RAII/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/RAII/*.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/ComplexNumbers/*.h"
-)
 
 # ============================================================
 # Core OBJECT library
