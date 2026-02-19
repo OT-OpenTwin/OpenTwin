@@ -96,6 +96,8 @@ bool ot::TreeWidgetItem::hasDirectChild(const QTreeWidgetItem* _child) const {
 			return true;
 		}
 	}
+
+	return false;
 }
 
 bool ot::TreeWidgetItem::hasDirectChild(const QString& _childText, int _nameColumn) const {
@@ -104,6 +106,8 @@ bool ot::TreeWidgetItem::hasDirectChild(const QString& _childText, int _nameColu
 			return true;
 		}
 	}
+
+	return false;
 }
 
 void ot::TreeWidgetItem::expandAllParents(bool _expandThis) {
