@@ -43,6 +43,6 @@ void QuantityDescription::defineQuantityAsComplex(ot::ComplexNumberFormat _forma
 		assert(_secondUnit == "°" || _secondUnit == "rad");
 		tupleDescription.setUnits({ _firstUnit,_secondUnit });
 	}
-	m_metadataQuantity.m_tupleDescription = std::make_unique<TupleDescription>(tupleDescription);
+	m_metadataQuantity.m_tupleDescription = std::make_unique<TupleDescriptionComplex>(tupleDescription);
 }
 

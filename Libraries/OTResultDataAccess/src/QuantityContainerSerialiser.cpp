@@ -197,7 +197,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	const uint32_t numberOfPorts = quantityMetadata.dataDimensions.front();
 	m_bucketSize = numberOfPorts * numberOfPorts;
 	TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(quantityMetadata.m_tupleDescription.get());
-	
+	assert(complexTupleDescription != nullptr);
 	const size_t numberOfDocuments = _numberOfParameterValues * 2;
 	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
 	for (size_t i = 0; i < _numberOfParameterValues; i++)
@@ -211,16 +211,14 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 				changingParameterValueIt++;
 			}
 		}
-		for (size_t entryIndex = 0; entryIndex < _quantityDescription->getNumberOfFirstValues(); entryIndex++)
-		{
-			auto firstValue = _quantityDescription->getFirstValues(entryIndex);
-			auto secondValue = _quantityDescription->getSecondValues(entryIndex);
 
-			for(size_t matrixEntryIndex = 0; matrixEntryIndex < firstValue.size(); matrixEntryIndex++)
-			{
-				std::list<ot::Variable> bothValues = { firstValue[matrixEntryIndex],secondValue[matrixEntryIndex] };
-				addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, bothValues);
-			}
+		auto firstValue = _quantityDescription->getFirstValues(i);
+		auto secondValue = _quantityDescription->getSecondValues(i);
+
+		for(size_t matrixEntryIndex = 0; matrixEntryIndex < firstValue.size(); matrixEntryIndex++)
+		{
+			std::list<ot::Variable> bothValues = { firstValue[matrixEntryIndex],secondValue[matrixEntryIndex] };
+			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, bothValues);
 		}
 	}
 }
