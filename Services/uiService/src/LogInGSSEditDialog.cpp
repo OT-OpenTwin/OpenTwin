@@ -115,6 +115,8 @@ LogInGSSEditDialogEntry::LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, Lo
 	this->connect(m_port, &ot::LineEdit::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
 	this->connect(m_loginType, &ot::ComboButton::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
 	this->connect(table, &QTableWidget::itemPressed, this, &LogInGSSEditDialogEntry::slotDeleteItem);
+
+	updateErrorState();
 }
 
 LogInGSSEditDialogEntry::~LogInGSSEditDialogEntry() {
@@ -190,6 +192,13 @@ void LogInGSSEditDialogEntry::updateErrorState() {
 	}
 	else {
 		m_port->setInputErrorStateProperty();
+	}
+
+	if (m_name->text().isEmpty()) {
+		m_name->setInputErrorStateProperty();
+	}
+	else {
+		m_name->unsetInputErrorStateProperty();
 	}
 }
 
@@ -323,8 +332,8 @@ LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entrie
 	// Setup window
 	this->setWindowTitle("Edit Global Session Services");
 	this->setWindowIcon(ot::IconManager::getApplicationIcon());
-	this->setMinimumSize(550, 300);
-	this->resize(800, 400);
+	this->setMinimumSize(800, 300);
+	this->resize(1000, 400);
 
 	// Connect signals
 	this->connect(addButton, &PushButton::clicked, this, &LogInGSSEditDialog::slotAdd);
