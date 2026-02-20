@@ -32,11 +32,11 @@ void LogInGSSEntry::clear() {
 }
 
 QString LogInGSSEntry::getDisplayText() const {
-	QString txt = m_name + " (";
+	QString txt = m_name + " (" + getConnectionUrl();
 
 	switch (m_loginType) {
 	case ot::LoginType::SSO:
-		txt.append("SSO ");
+		txt.append(" (SSO)");
 		break;
 	case ot::LoginType::UsernamePassword:
 		break;
@@ -44,7 +44,7 @@ QString LogInGSSEntry::getDisplayText() const {
 		OT_LOG_E("Unknown login type (" + std::to_string(static_cast<int>(m_loginType)) + ")");
 		break;
 	}
-	txt.append(" (" + getConnectionUrl() + ")");
+	txt.append(")");
 
 	return txt;
 }

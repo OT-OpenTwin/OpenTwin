@@ -47,6 +47,12 @@ namespace ot {
 class LogInDialog : public ot::Dialog {
 	Q_OBJECT
 public:
+	enum class ConfigFlag {
+		NoFlags    = 0 << 0, //! @brief Default configuration with no special flags.
+		NoRegister = 1 << 0  //! @brief Configuration flag to disable the registration option in the dialog.
+	};
+	typedef ot::Flags<ConfigFlag> Config;
+
 	LogInDialog();
 	virtual ~LogInDialog();
 
@@ -56,8 +62,16 @@ public:
 
 	void initialize();
 	
+	void setConfigFlag(ConfigFlag _flag, bool _enabled = true);
+	void setConfig(const Config& _cfg);
+	const Config& getConfig() const { return m_config; };
+
 Q_SIGNALS:
 	void dialogShown();
+	void configChanged(const Config& _newConfig);
+
+public Q_SLOTS:
+	void applyConfig();
 
 protected:
 	virtual bool mayCloseDialogWindow() override;
@@ -92,6 +106,7 @@ private:
 	};
 
 	LogInState m_state;
+	Config m_config;
 
 	LoginData m_loginData; //! \brief Holds the login data that is set during the login by the worker thread.
 	
@@ -141,7 +156,11 @@ public Q_SLOTS:
 	// Private helper
 
 private:
-	std::string  m_curlErrorMessage = "";
+	std::string m_curlErrorMessage = "";
+	QString m_userNameTmp;
+
+	const int m_maxDefaultHeight = 515;
+	const int m_maxSSOHeight = 460;
 
 	void saveUserSettings() const;
 	void saveGSSOptions() const;
@@ -150,6 +169,8 @@ private:
 	LogInGSSEntry findCurrentGssEntry() const;
 	void initializeGssData(std::shared_ptr<QSettings> _settings);
 	void updateGssOptions();
+
+	std::wstring determineSSOUsername() const;
 
 	void setControlsForUsernamePassword();
 	void setControlsForRegister();
@@ -173,3 +194,5 @@ private:
 	WorkerError workerRegister(const UserManagement& _userManager);
 	WorkerError workerChangePassword(const UserManagement& _userManager);
 };
+
+OT_ADD_FLAG_FUNCTIONS(LogInDialog::ConfigFlag, LogInDialog::Config)
