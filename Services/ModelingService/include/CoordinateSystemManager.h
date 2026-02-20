@@ -24,6 +24,15 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 
+#include "gp_Pnt.hxx"
+#include "gp_Dir.hxx"
+#include "gp_Vec.hxx"
+
+class TopoDS_Shape;
+
+class EntityBrep;
+class EntityCoordinateSystem;
+
 class CoordinateSystemManager
 {
 public:
@@ -35,11 +44,22 @@ public:
 	void activateCoordinateSystem(const std::string& csName);
 	void setActiveCoordinateSystem(const std::string& csName);
 
+	void alignFaceEdge();
+	void facePicked(const std::string& selectionInfo);
+	void edgePicked(const std::string& selectionInfo);
+
 protected:
 	std::string createUniqueName(const std::string& name);
 
 private:
 	void setActiveFlagForCoordinateSystemEntity(const ot::EntityInformation& entityInfo, bool isActive, std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible);
+	bool isGlobalCoordinateSystem(ot::UID entityID, ot::UID entityVersion);
+	bool findFaceFromName(EntityBrep* brepEntity, const std::string& faceName, TopoDS_Shape& face);
+	bool findEdgeFromName(EntityBrep* brepEntity, const std::string& edgeName, TopoDS_Shape& edge);
+	bool getFaceCentroidAndNormal(const TopoDS_Shape& faceShape, gp_Pnt& outCentroid, gp_Dir& outNormal);
+	bool getEdgeMidpointAndDirection(const TopoDS_Shape& edgeShape, gp_Pnt& outMidPoint, gp_Vec& outDirection);
+	void updateActiveLocalCoordinateSystem(gp_Pnt lcsOrigin, gp_Dir lcsNormal, gp_Vec edgeMidDirection);
+	void setValue(EntityCoordinateSystem* csEntity, const std::string& groupName, const std::string& propName, double value);
 
 	ot::components::UiComponent* uiComponent;
 	ot::components::ModelComponent* modelComponent;
@@ -47,4 +67,7 @@ private:
 	std::string serviceName;
 
 	std::string activeCoordinateSystemName;
+
+	gp_Pnt lcsOrigin;
+	gp_Dir lcsNormal;
 };

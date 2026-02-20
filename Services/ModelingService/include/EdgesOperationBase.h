@@ -72,10 +72,10 @@ private:
 	std::list<EdgesData> readEdgeListFromProperties(EntityProperties& properties);
 	void performOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, TopoDS_Shape& shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
 	void storeInputShapeFaceNames(EntityBrep* baseBrep, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& allFaceNames);
-	void getAllEdgesFromInputShape(EntityBrep* baseBrep, std::map< std::string, const opencascade::handle<TopoDS_TShape>>& allEdges, std::map<const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesFace1, std::map<const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesFace2);
-	void getAllEdgesForOperation(std::list<EdgesData>& edgeList, std::map< std::string, const opencascade::handle<TopoDS_TShape>>& allEdges, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation);
 	void getAllEdgesForVertex(EntityBrep* baseBrep, TopoDS_Vertex& aVertex, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation, std::list<opencascade::handle<TopoDS_TShape>>& allEdgesForVertex);
 	std::string getVertexNameFromEdges(std::list<opencascade::handle<TopoDS_TShape>>& allEdgesForVertex, std::map<const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesFace1, std::map<const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesFace2);
+	void getAllEdgesFromInputShape(EntityBrep* baseBrep, std::map< std::string, const opencascade::handle<TopoDS_TShape>>& allEdges, std::map<const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesFace1, std::map<const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesFace2);
+	void getAllEdgesForOperation(std::list<EdgesData>& edgeList, std::map< std::string, const opencascade::handle<TopoDS_TShape>>& allEdges, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation);
 
 protected:
 	void addParametricProperty(EntityGeometry* geometryEntity, const std::string& name, double value);

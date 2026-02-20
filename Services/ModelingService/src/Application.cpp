@@ -106,6 +106,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuButton(m_buttonCreateLCS);
 	_ui->addMenuButton(m_buttonActivateLCS);
+	_ui->addMenuButton(m_buttonAlignLCS);
 
 	_ui->addMenuButton(m_buttonRemoveFaces);
 	_ui->addMenuButton(m_buttonHealing);
@@ -465,6 +466,12 @@ void Application::handleEntitiesSelected(ot::JsonDocument& _document) {
 	else if (selectionAction == "BLEND_EDGE") {
 		getBlendEdgesManager()->performOperation(selectionInfo);
 	}
+	else if (selectionAction == "ALIGN_LCS_FACE") {
+		getCoordinateSystemManager()->facePicked(selectionInfo);
+	}
+	else if (selectionAction == "ALIGN_LCS_EDGE") {
+		getCoordinateSystemManager()->edgePicked(selectionInfo);
+	}
 	else {
 		OT_LOG_EAS("Unsupported selection action \"" + selectionAction + "\" received.");
 	}
@@ -550,6 +557,11 @@ void Application::handleHealing() {
 void Application::handleCreateCoordinateSystem() {
 	getCoordinateSystemManager()->createNew();
 }
+
+void Application::handleAlignCoordinateSystem() {
+	getCoordinateSystemManager()->alignFaceEdge();
+}
+
 
 void Application::handleActivateCoordinateSystem() {
 	std::list<ot::EntityInformation> selectedEntities = getSelectedEntityInfos();
@@ -655,6 +667,10 @@ Application::Application() :
 	m_buttonActivateLCS = ot::ToolBarButtonCfg("Modeling", "Coordinate Systems", "Activate", "Default/LocalCoordinateSystemActivate");
 	m_buttonActivateLCS.setButtonLockFlags(lockTypes);
 	connectToolBarButton(m_buttonActivateLCS, this, &Application::handleActivateCoordinateSystem);
+
+	m_buttonAlignLCS = ot::ToolBarButtonCfg("Modeling", "Coordinate Systems", "Align", "Default/AlignLocalCoordinateSystem");
+	m_buttonAlignLCS.setButtonLockFlags(lockTypes);
+	connectToolBarButton(m_buttonAlignLCS, this, &Application::handleAlignCoordinateSystem);
 }
 
 Application::~Application() {
