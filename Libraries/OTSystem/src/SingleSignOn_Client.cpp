@@ -20,7 +20,7 @@ std::string SingleSignOn_Client::generateToken(std::string& _receivedToken)
     size_t length = _receivedToken.size();
     BYTE* token = _receivedToken.size() == 0 ? nullptr : reinterpret_cast<BYTE*>(_receivedToken.data());
 
-    std::vector<unsigned char> newToken = generateTokenUnencoded(token, length);
+    std::vector<unsigned char> newToken = generateTokenUnencoded(token, static_cast<ULONG>(length));
 	
 	//Convert to string for easier handling
     std::string out(newToken.begin(), newToken.end());
