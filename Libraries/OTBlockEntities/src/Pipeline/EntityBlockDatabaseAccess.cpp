@@ -51,16 +51,16 @@ void EntityBlockDatabaseAccess::createProperties()
 
 	EntityPropertiesProjectList* projectList = new EntityPropertiesProjectList("Projectname");
 	getProperties().createProperty(projectList, m_groupMetadataFilter);
-
-	//Basic properties:
-	//@Alex: Here ;)
-	EntityPropertiesSelection::createProperty(m_groupMetadataFilter, m_propertyNameSeriesMetadata, { ""}, "", "default", getProperties());
+	
+	// Basic properties
+	EntityPropertiesSelection* metadataProp = EntityPropertiesSelection::createProperty(m_groupMetadataFilter, m_propertyNameSeriesMetadata, { ""}, "", "default", getProperties());
+	metadataProp->setAllowCustomValues(true);
 	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueries, 0,0, m_maxNbOfQueries, "default", getProperties());
 	
-	//Quantity Settings
-	//@Alex: Here ;)
-	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyName, {""}, "", "default", getProperties());
-	
+	// Quantity Settings
+	EntityPropertiesSelection* groupQuantityProp = EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyName, {""}, "", "default", getProperties());
+	groupQuantityProp->setAllowCustomValues(true);
+
 	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyValueDescription, { "" }, "", "default", getProperties());
 	EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 	typeLabelProperty->setReadOnly(true);
@@ -270,7 +270,6 @@ int32_t EntityBlockDatabaseAccess::getSelectedNumberOfQueries()
 	int32_t numberOfQueries = PropertyHelper::getIntegerPropertyValue(this, m_propertyNumberOfQueries);
 	return numberOfQueries;
 }
-
 
 void EntityBlockDatabaseAccess::createUpdatedProperty(const std::string& _propName, const std::string& _propGroup, const std::string& _labelValue, EntityProperties& _properties)
 {
