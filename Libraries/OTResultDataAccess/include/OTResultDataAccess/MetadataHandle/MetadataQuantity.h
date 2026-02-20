@@ -34,36 +34,6 @@
 #include <vector>
 #include <memory>
 
-class OT_RESULTDATAACCESS_API_EXPORT MetadataQuantityValueDescription : public ot::Serializable 
-{
-public:
-	/****************** Are set by the campaign handling class *********************/
-	ot::UID quantityIndex = 0;
-	
-	//Label which is unique in a series. In case that the unique name is already taken, the name is extended with a number.
-	std::string quantityValueLabel = "";
-	/******************************************************************************/
-
-	std::string quantityValueName = "";
-
-
-	std::string dataTypeName = "";
-
-	std::string unit = "";
-	//Attention: The result collection extender relies heavily on the logic of this method. Changes should be considered in the method for the creation of a new series.
-	const bool operator==(const MetadataQuantityValueDescription& other) const
-	{
-		const bool isEqual = this->quantityValueName == other.quantityValueName &&
-			this->unit == other.unit &&
-			this->dataTypeName == other.dataTypeName;
-		return isEqual;
-	}
-
-	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
-	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
-
-};
-
 class OT_RESULTDATAACCESS_API_EXPORT MetadataQuantity : public ot::Serializable
 {
 public:

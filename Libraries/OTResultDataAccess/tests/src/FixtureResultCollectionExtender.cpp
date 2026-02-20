@@ -77,20 +77,22 @@ MetadataQuantity FixtureResultCollectionExtender::createPower()
 	quantity.dependingParameterIds = { 1 };
 	quantity.metaData["Meta"] = std::make_shared<MetadataEntrySingle>("Meta", ot::Variable(13));
 
-	MetadataQuantityValueDescription realValue;
-	realValue.quantityIndex = 1;
-	realValue.quantityValueName = "real";
-	realValue.quantityValueLabel = "real";
-	realValue.unit = "W";
-	realValue.dataTypeName = ot::TypeNames::getDoubleTypeName();
 
 
-	MetadataQuantityValueDescription imagValue;
-	imagValue.quantityIndex = 1;
-	imagValue.quantityValueName = "imag";
-	imagValue.quantityValueLabel = "imag";
-	imagValue.unit = "W";
-	imagValue.dataTypeName = ot::TypeNames::getDoubleTypeName();
+	//MetadataQuantityValueDescription realValue;
+	//realValue.quantityIndex = 1;
+	//realValue.quantityValueName = "real";
+	//realValue.quantityValueLabel = "real";
+	//realValue.unit = "W";
+	//realValue.dataTypeName = ot::TypeNames::getDoubleTypeName();
+
+
+	//MetadataQuantityValueDescription imagValue;
+	//imagValue.quantityIndex = 1;
+	//imagValue.quantityValueName = "imag";
+	//imagValue.quantityValueLabel = "imag";
+	//imagValue.unit = "W";
+	//imagValue.dataTypeName = ot::TypeNames::getDoubleTypeName();
 
 
 	return quantity;
