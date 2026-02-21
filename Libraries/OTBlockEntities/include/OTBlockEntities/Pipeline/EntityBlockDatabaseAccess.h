@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/ValueComparisionDefinition.h"
+#include "OTCore/ValueComparisonDefinition.h"
 #include "OTBlockEntities/EntityBlock.h"
 
 struct __declspec(dllexport) ValueCharacteristicProperties
@@ -54,9 +54,9 @@ public:
 	
 	int32_t getSelectedNumberOfQueries();
 
-	const ValueComparisionDefinition getSelectedQuantityDefinition();
+	const ot::ValueComparisonDefinition getSelectedQuantityDefinition();
 
-	const std::list<ValueComparisionDefinition> getAdditionalQueries();
+	const std::list<ot::ValueComparisonDefinition> getAdditionalQueries();
 
 	const ot::Connector getConnectorOutput() const { return m_connectorOutput; }	
 
@@ -97,7 +97,7 @@ private:
 
 	void createUpdatedProperty(const std::string& _propName, const std::string& _propGroup, const std::string& _labelValue, EntityProperties& properties);
 
-	const ValueComparisionDefinition getSelectedValueComparisionDefinition(const std::string& _groupName);
+	const ot::ValueComparisonDefinition getSelectedValueComparisonDefinition(const std::string& _groupName);
 
 	bool setVisibleParameter(const std::string& _groupName,bool _visible);
 	void updateBlockConfig();

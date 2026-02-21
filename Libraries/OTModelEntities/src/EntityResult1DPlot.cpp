@@ -256,7 +256,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	const int32_t showMatrixRowValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix row entry");
 	const int32_t showMatrixColumnValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix column entry");
 
-	std::list<ValueComparisionDefinition> queries = m_querySettings.getValueComparisionDefinitions(this);
+	std::list<ot::ValueComparisonDefinition> queries = m_querySettings.getValueComparisonDefinitions(this);
 
 	ot::Plot1DCfg config;
 	config.setEntityName(getName());

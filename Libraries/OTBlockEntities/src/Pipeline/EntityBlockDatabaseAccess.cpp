@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/ComparisionSymbols.h"
+#include "OTCore/ComparisonSymbols.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/PropertyHelper.h"
 #include "OTBlockEntities/BlockImageNames.h"
@@ -46,7 +46,7 @@ EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* par
 
 void EntityBlockDatabaseAccess::createProperties()
 {
-	std::list<std::string> comparators = ot::ComparisionSymbols::g_comparators;
+	std::list<std::string> comparators = ot::ComparisonSymbols::g_comparators;
 	comparators.push_front("");
 
 	EntityPropertiesProjectList* projectList = new EntityPropertiesProjectList("Projectname");
@@ -281,15 +281,15 @@ void EntityBlockDatabaseAccess::createUpdatedProperty(const std::string& _propNa
 	_properties.createProperty(newLabel, newLabel->getGroup());
 }
 
-const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedQuantityDefinition()
+const ot::ValueComparisonDefinition EntityBlockDatabaseAccess::getSelectedQuantityDefinition()
 {
-	return getSelectedValueComparisionDefinition(m_groupQuantitySetttings);
+	return getSelectedValueComparisonDefinition(m_groupQuantitySetttings);
 }
 
-const std::list<ValueComparisionDefinition> EntityBlockDatabaseAccess::getAdditionalQueries()
+const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getAdditionalQueries()
 {
 	
-	std::list<ValueComparisionDefinition> valueComparisionDefinitions;
+	std::list<ot::ValueComparisonDefinition> valueComparisonDefinitions;
 	const int32_t numberOfQueries = getSelectedNumberOfQueries();
 	for (int i = 1; i <= numberOfQueries; i++)
 	{
@@ -299,13 +299,13 @@ const std::list<ValueComparisionDefinition> EntityBlockDatabaseAccess::getAdditi
 		const std::string value = PropertyHelper::getStringPropertyValue(this, m_propertyValue, groupName);
 		const std::string name = PropertyHelper::getSelectionPropertyValue(this, m_propertyName, groupName);
 		const std::string comparator = PropertyHelper::getSelectionPropertyValue(this, m_propertyComparator, groupName);
-		const ValueComparisionDefinition valueComparisionDefinition(name, comparator, value, dataType, unit);
-		valueComparisionDefinitions.push_back(valueComparisionDefinition);
+		const ot::ValueComparisonDefinition valueComparisonDefinition(name, comparator, value, dataType, unit);
+		valueComparisonDefinitions.push_back(valueComparisonDefinition);
 	}
-	return valueComparisionDefinitions;
+	return valueComparisonDefinitions;
 }
 
-const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedValueComparisionDefinition(const std::string& _groupName)
+const ot::ValueComparisonDefinition EntityBlockDatabaseAccess::getSelectedValueComparisonDefinition(const std::string& _groupName)
 {
 	auto baseProp = getProperties().getProperty(m_propertyName,_groupName);
 	auto nameProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
@@ -327,5 +327,5 @@ const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedValueComp
 	auto unitProp = dynamic_cast<EntityPropertiesString*>(baseProp);
 	const std::string unit = typeProp->getValue();
 
-	return ValueComparisionDefinition(name, comparator, value, type,unit);
+	return ot::ValueComparisonDefinition(name, comparator, value, type,unit);
 }

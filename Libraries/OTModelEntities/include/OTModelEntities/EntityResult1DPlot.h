@@ -21,7 +21,7 @@
 #include "OTModelEntities/EntityContainer.h"
 #include "OTModelEntities/IVisualisationPlot1D.h"
 #include "OTModelEntities/PropertyBundleQuerySettings.h"
-#include "OTCore/ValueComparisionDefinition.h"
+#include "OTCore/ValueComparisonDefinition.h"
 
 class __declspec(dllexport) EntityResult1DPlot: public EntityContainer, public IVisualisationPlot1D
 {

@@ -26,11 +26,10 @@
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTCore/String.h"
 #include "OTCore/TimeFormatter.h"
-#include "OTCore/ComparisionSymbols.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTCore/GenericDataStructSingle.h"
-#include "OTCore/ValueComparisionDefinition.h"
+#include "OTCore/ValueComparisonDefinition.h"
 #include "OTCore/ExplicitStringValueConverter.h"
 #include "OTCore/ResultCollectionDefaultIndexes.h"
 
@@ -222,9 +221,9 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 
 void BlockHandlerDatabaseAccess::addParameterQueries(EntityBlockDatabaseAccess* _blockEntity)
 {
-	std::list<ValueComparisionDefinition> queries =	_blockEntity->getAdditionalQueries();
+	std::list<ot::ValueComparisonDefinition> queries =	_blockEntity->getAdditionalQueries();
 	const auto& parametersByLabel =	m_resultCollectionMetadataAccess->getMetadataCampaign().getMetadataParameterByLabel();
-	for (ValueComparisionDefinition& query : queries)
+	for (ot::ValueComparisonDefinition& query : queries)
 	{
 		const std::string parameterLabel = query.getName();
 		auto parameterByLabel	= parametersByLabel.find(parameterLabel);
@@ -251,7 +250,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 		series = m_resultCollectionMetadataAccess->findMetadataSeries(seriesLabel);
 		assert(series != nullptr);
 		ot::UID valueUID = series->getSeriesIndex();
-		ValueComparisionDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
+		ot::ValueComparisonDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
 		addComparision(seriesComparision);
 	}
 	else
@@ -261,7 +260,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 		std::list< BsonViewOrValue> queries;
 		for (const MetadataSeries& series : allSeries)
 		{
-			ValueComparisionDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(series.getSeriesIndex()), ot::TypeNames::getInt64TypeName(), "");
+			ot::ValueComparisonDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(series.getSeriesIndex()), ot::TypeNames::getInt64TypeName(), "");
 			BsonViewOrValue query = builder.createComparison(seriesComparision);
 			queries.push_back(std::move(query));
 		}
@@ -274,7 +273,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 
 void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _blockEntity)
 {
-	ValueComparisionDefinition quantityDef = _blockEntity->getSelectedQuantityDefinition();
+	ot::ValueComparisonDefinition quantityDef = _blockEntity->getSelectedQuantityDefinition();
 	if (quantityDef.getName() == "")
 	{
 		throw std::exception("DatabaseAccessBlock has no quantity set.");
@@ -295,7 +294,7 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	assert(valueUID != 0);
 
 	//Now we add the query for the quantity ID
-	ValueComparisionDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
+	ot::ValueComparisonDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
 	addComparision(selectedQuantityDef);
 
 	//Now we add a comparision for the searched quantity value.
@@ -308,7 +307,7 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	m_labelFieldNamePairs.push_back(labelFieldNamePair);
 }
 
-void BlockHandlerDatabaseAccess::addComparision(const ValueComparisionDefinition& _definition)
+void BlockHandlerDatabaseAccess::addComparision(const ot::ValueComparisonDefinition& _definition)
 {
 	if (!_definition.getComparator().empty() && !_definition.getValue().empty())
 	{

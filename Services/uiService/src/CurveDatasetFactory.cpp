@@ -36,12 +36,12 @@
 // BSONCXX header
 #include "bsoncxx/json.hpp"
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ot::ValueComparisonDefinition>& _valueComparisons)
 {
 	m_curveIDDescriptions.clear();
 	const auto& queryInformation = _config.getQueryInformation();
 
-	ot::JsonDocument entireResult = queryCurveData(queryInformation, _valueComparisions);
+	ot::JsonDocument entireResult = queryCurveData(queryInformation, _valueComparisons);
 	ot::ConstJsonArray allMongoDocuments = ot::json::getArray(entireResult, "Documents");
 	if (allMongoDocuments.Size() == 0)
 	{
@@ -74,20 +74,20 @@ std::string CurveDatasetFactory::createAxisLabel(const std::string& _title, cons
 	}
 }
 
-ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions)
+ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDefinition>& _valueComparisons)
 {
-	//First we find the valid value comparisions give them additional information from the query information
-	std::list<ValueComparisionDefinition> validQueries = extractValidValueDescriptions(_queryInformation, _valueComparisions);
+	//First we find the valid value comparisons give them additional information from the query information
+	std::list<ot::ValueComparisonDefinition> validQueries = extractValidValueDescriptions(_queryInformation, _valueComparisons);
 
 	//Now we build the queries from the set properties
 	AdvancedQueryBuilder queryBuilder;
-	std::list<BsonViewOrValue> additionalComparisions;
-	for (ValueComparisionDefinition& valueComparision : validQueries)
+	std::list<BsonViewOrValue> additionalComparisons;
+	for (ot::ValueComparisonDefinition& valueComparison : validQueries)
 	{
-		const std::string type = valueComparision.getType();
-		const std::string value = valueComparision.getValue();
-		BsonViewOrValue comparision = queryBuilder.createComparison(valueComparision);
-		additionalComparisions.push_back(std::move(comparision));
+		const std::string type = valueComparison.getType();
+		const std::string value = valueComparison.getValue();
+		BsonViewOrValue comparison = queryBuilder.createComparison(valueComparison);
+		additionalComparisons.push_back(std::move(comparison));
 	}
 
 	//Now we assemble the final query
@@ -96,10 +96,10 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 
 	bsoncxx::document::value docQuery = bsoncxx::from_json(_queryInformation.m_query);
 	bsoncxx::document::view_or_value query (docQuery);
-	if (additionalComparisions.size() > 0)
+	if (additionalComparisons.size() > 0)
 	{
-		additionalComparisions.push_back(query);
-		query = queryBuilder.connectWithAND(std::move(additionalComparisions));
+		additionalComparisons.push_back(query);
+		query = queryBuilder.connectWithAND(std::move(additionalComparisons));
 	}
 
 
@@ -121,18 +121,18 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 	}
 }
 
-const std::list<ValueComparisionDefinition> CurveDatasetFactory::extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions)
+const std::list<ot::ValueComparisonDefinition> CurveDatasetFactory::extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDefinition>& _valueComparisons)
 {
-	std::list<ValueComparisionDefinition> validValueDescriptions;
-	for (const ValueComparisionDefinition& queryDefinition : _valueComparisions)
+	std::list<ot::ValueComparisonDefinition> validValueDescriptions;
+	for (const ot::ValueComparisonDefinition& queryDefinition : _valueComparisons)
 	{
 		if (_queryInformation.m_quantityDescription.m_label == queryDefinition.getName())
 		{
 			auto& quantityDescription = _queryInformation.m_quantityDescription;
-			auto validValueComparision = createValidValueComparision(quantityDescription, queryDefinition);
-			if (validValueComparision.has_value())
+			auto validValueComparison = createValidValueComparison(quantityDescription, queryDefinition);
+			if (validValueComparison.has_value())
 			{
-				validValueDescriptions.push_back(validValueComparision.value());
+				validValueDescriptions.push_back(validValueComparison.value());
 			}
 		}
 		else
@@ -141,10 +141,10 @@ const std::list<ValueComparisionDefinition> CurveDatasetFactory::extractValidVal
 			{
 				if (parameterDescription.m_label == queryDefinition.getName())
 				{
-					auto validValueComparision = createValidValueComparision(parameterDescription, queryDefinition);
-					if (validValueComparision.has_value())
+					auto validValueComparison = createValidValueComparison(parameterDescription, queryDefinition);
+					if (validValueComparison.has_value())
 					{
-						validValueDescriptions.push_back(validValueComparision.value());
+						validValueDescriptions.push_back(validValueComparison.value());
 					}
 					break;
 				}
@@ -605,17 +605,17 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 	return dataSets;
 }
 
-std::optional<ValueComparisionDefinition> CurveDatasetFactory::createValidValueComparision(const ot::QuantityContainerEntryDescription& _desciption, const ValueComparisionDefinition& _comparision)
+std::optional<ot::ValueComparisonDefinition> CurveDatasetFactory::createValidValueComparison(const ot::QuantityContainerEntryDescription& _desciption, const ot::ValueComparisonDefinition& _comparison)
 {
-	const std::string fieldName = _comparision.getName();
-	const std::string comparator = _comparision.getComparator();
-	const std::string value = _comparision.getValue();
+	const std::string fieldName = _comparison.getName();
+	const std::string comparator = _comparison.getComparator();
+	const std::string value = _comparison.getValue();
 	if (!fieldName.empty() && !comparator.empty() && !value.empty() && comparator != " ")
 	{
-		ValueComparisionDefinition validComparision = _comparision;
-		validComparision.setName(_desciption.m_fieldName);
-		validComparision.setType(_desciption.m_dataType);
-		return validComparision;
+		ot::ValueComparisonDefinition validComparison = _comparison;
+		validComparison.setName(_desciption.m_fieldName);
+		validComparison.setType(_desciption.m_dataType);
+		return validComparison;
 	}
 	else
 	{
@@ -633,8 +633,8 @@ std::optional<ValueComparisionDefinition> CurveDatasetFactory::createValidValueC
 			assert(value.empty());
 			reason = "No value entered.";
 		}
-		const std::string skippedComparision = "Name: " + fieldName + " comparator: " + comparator + "value: " + value + " reason: " + reason;
-		m_skippedValueComparisions.push_back(skippedComparision);
+		const std::string skippedComparison = "Name: " + fieldName + " comparator: " + comparator + "value: " + value + " reason: " + reason;
+		m_skippedValueComparisons.push_back(skippedComparison);
 		return {};
 	}
 }

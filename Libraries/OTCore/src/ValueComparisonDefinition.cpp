@@ -17,15 +17,15 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/ValueComparisionDefinition.h"
+#include "OTCore/ValueComparisonDefinition.h"
 
-void ValueComparisionDefinition::setTupleCharacteristics(const std::string& _tupleFormat, int32_t _tupleQueryInex)
+void ot::ValueComparisonDefinition::setTupleCharacteristics(const std::string& _tupleFormat, int32_t _tupleQueryInex)
 {
 	m_tupleFormat = _tupleFormat;
 	m_tupleIndex = _tupleQueryInex;
 }
 
-void ValueComparisionDefinition::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
+void ot::ValueComparisonDefinition::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 {
 	_object.AddMember("Comperator", ot::JsonString(m_comparator, _allocator), _allocator);
 	_object.AddMember("Name", ot::JsonString(m_name, _allocator), _allocator);
@@ -36,7 +36,7 @@ void ValueComparisionDefinition::addToJsonObject(ot::JsonValue& _object, ot::Jso
 	_object.AddMember("TupleFormat", ot::JsonString(m_tupleFormat, _allocator), _allocator);
 }
 
-void ValueComparisionDefinition::setFromJsonObject(const ot::ConstJsonObject& _object)
+void ot::ValueComparisonDefinition::setFromJsonObject(const ot::ConstJsonObject& _object)
 {
 	m_comparator = ot::json::getString(_object, "Comperator");
 	m_name = ot::json::getString(_object, "Name");

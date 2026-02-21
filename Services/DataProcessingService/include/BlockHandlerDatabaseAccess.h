@@ -64,6 +64,6 @@ private:
 	void addQuantityQuery(EntityBlockDatabaseAccess* _blockEntity);
 	void addParameterQueries(EntityBlockDatabaseAccess* _blockEntity);
 		
-	void addComparision(const ValueComparisionDefinition& _definition);
+	void addComparision(const ot::ValueComparisonDefinition& _definition);
 		
 };
