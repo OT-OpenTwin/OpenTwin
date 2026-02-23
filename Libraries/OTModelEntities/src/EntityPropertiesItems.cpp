@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityPropertiesItems.cpp
 // 
 // License:
@@ -756,12 +756,12 @@ void EntityPropertiesSelection::addToJsonObject(ot::JsonObject& _jsonObject, ot:
 void EntityPropertiesSelection::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
 {
 	EntityPropertiesBase::readFromJsonObject(_object, _root);
-	setValue(ot::json::getString(_object, "Value"));
 	resetOptions(ot::json::getStringList(_object, "Options"));
-
 	if (_object.HasMember("AllowCustom")) {
 		setAllowCustomValues(ot::json::getBool(_object, "AllowCustom", true));
 	}
+	setValue(ot::json::getString(_object, "Value"));
+
 }
 
 void EntityPropertiesSelection::copySettings(EntityPropertiesBase *other, EntityBase *root)
@@ -807,7 +807,7 @@ bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase* other) const
 
 bool EntityPropertiesSelection::setValue(const std::string& s)
 {
-	if (std::find(m_options.begin(), m_options.end(), s) == m_options.end()) 
+	if (!m_allowCustomValues && std::find(m_options.begin(), m_options.end(), s) == m_options.end()) 
 	{
 		return false; // This value is not a valid option
 	}
