@@ -29,6 +29,8 @@ void QuantityDescription::defineQuantityAsSingle(const std::string& _dataType, c
 	m_metadataQuantity.m_tupleDescription = std::make_unique<TupleDescription>(tupleDescription);
 }
 
+
+#include <iostream>
 void QuantityDescription::defineQuantityAsComplex(ot::ComplexNumberFormat _format, const std::string& _dataType, const std::string& _firstUnit, const std::string& _secondUnit)
 {
 	TupleDescriptionComplex tupleDescription(_format);
@@ -40,7 +42,7 @@ void QuantityDescription::defineQuantityAsComplex(ot::ComplexNumberFormat _forma
 	}
 	else
 	{
-		assert(_secondUnit == u8"°" || _secondUnit == "rad");
+		assert(_secondUnit == "°" || _secondUnit == "rad");
 		tupleDescription.setUnits({ _firstUnit,_secondUnit });
 	}
 	m_metadataQuantity.m_tupleDescription = std::make_unique<TupleDescriptionComplex>(tupleDescription);
