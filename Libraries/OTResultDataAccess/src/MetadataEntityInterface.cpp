@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: MetadataEntityInterface.cpp
 // 
 // License:
@@ -25,6 +25,7 @@
 #include "OTResultDataAccess/MetadataEntry/MetadataEntryObject.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
+#include "OTResultDataAccess/SerialisationInterfaces/TupleFactory.h"
 
 // std header
 #include <vector>
@@ -168,27 +169,35 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 				assert(objectEntry != nullptr);
 
 				auto allTupleDescriptionEntries = objectEntry->getEntries();
-				TupleDescription tupleDescription;
+				std::unique_ptr<TupleDescription> tupleDescription;
 				for (const auto tupleDescriptionEntry : allTupleDescriptionEntries)
 				{
-
 					auto fieldEntry = dynamic_cast<MetadataEntrySingle*>(tupleDescriptionEntry.get());
 					if (fieldEntry != nullptr)
 					{
 						if (fieldEntry->getEntryName() == m_nameField)
 						{
 							assert(fieldEntry->getValue().isConstCharPtr());
-							tupleDescription.setName(fieldEntry->getValue().getConstCharPtr());
+							const std::string name = (fieldEntry->getValue().getConstCharPtr());
+							tupleDescription.reset(TupleFactory::create(name));
+							break;
 						}
-						else if (fieldEntry->getEntryName() == m_tupleFormat)
+					}
+				}
+				for (const auto tupleDescriptionEntry : allTupleDescriptionEntries)
+				{
+					auto fieldEntry = dynamic_cast<MetadataEntrySingle*>(tupleDescriptionEntry.get());
+					if (fieldEntry != nullptr)
+					{
+						if (fieldEntry->getEntryName() == m_tupleFormat)
 						{
 							assert(fieldEntry->getValue().isConstCharPtr());
-							tupleDescription.setFormatName(fieldEntry->getValue().getConstCharPtr());
+							tupleDescription->setFormatName(fieldEntry->getValue().getConstCharPtr());
 						}
 						else if (fieldEntry->getEntryName() == m_dataTypeNameField)
 						{
 							assert(fieldEntry->getValue().isConstCharPtr());
-							tupleDescription.setDataType(fieldEntry->getValue().getConstCharPtr());
+							tupleDescription->setDataType(fieldEntry->getValue().getConstCharPtr());
 						}
 					}
 					else
@@ -196,23 +205,22 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 						auto arrayEntry = dynamic_cast<MetadataEntryArray*>(tupleDescriptionEntry.get());
 						if (arrayEntry != nullptr)
 						{
-							auto& units = 	arrayEntry->getValues();
+							auto& units = arrayEntry->getValues();
 							std::vector<std::string> unitsAsString;
-							for(ot::Variable unit : units)
+							for (ot::Variable unit : units)
 							{
 								assert(unit.isConstCharPtr());
 								unitsAsString.push_back(unit.getConstCharPtr());
 							}
-							tupleDescription.setUnits(unitsAsString);
+							tupleDescription->setUnits(unitsAsString);
 						}
 						else
 						{
 							assert(false);
 						}
 					}
-
-					quantity.m_tupleDescription = std::make_unique<TupleDescription>(tupleDescription);
 				}
+				quantity.m_tupleDescription = std::move(tupleDescription);
 			}
 			else
 			{

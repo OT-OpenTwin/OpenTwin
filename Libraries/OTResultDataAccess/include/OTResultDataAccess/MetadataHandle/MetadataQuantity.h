@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: MetadataQuantity.h
 // 
 // License:
@@ -71,8 +71,7 @@ public:
 		this->dependingParameterLabels = _other.dependingParameterLabels;
 		this->dependingParameterIds = _other.dependingParameterIds;
 		if (_other.m_tupleDescription) {
-			this->m_tupleDescription =
-				std::make_unique<TupleDescription>(*_other.m_tupleDescription);
+			m_tupleDescription.reset(_other.m_tupleDescription->clone());
 		}
 		else {
 			this->m_tupleDescription.reset();
@@ -91,8 +90,7 @@ public:
 		metaData(_other.metaData)
 	{
 		if (_other.m_tupleDescription) {
-			this->m_tupleDescription =
-				std::make_unique<TupleDescription>(*_other.m_tupleDescription);
+			m_tupleDescription.reset(_other.m_tupleDescription->clone());
 		}
 		else {
 			this->m_tupleDescription.reset();

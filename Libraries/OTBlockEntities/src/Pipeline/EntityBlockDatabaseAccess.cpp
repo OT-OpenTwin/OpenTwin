@@ -78,6 +78,11 @@ void EntityBlockDatabaseAccess::createProperties()
 	EntityPropertiesString::createProperty(m_groupQuantitySetttings, m_propertyValue, "", "default", getProperties());
 	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyComparator, comparators, comparators.front(), "default", getProperties());
 
+	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleFormat, { }, "", "default", getProperties());
+	PropertyHelper::getSelectionProperty(this, m_propertyTupleFormat, m_groupTupleSettings)->setVisible(false);
+	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleTarget, { }, "", "default", getProperties());
+	PropertyHelper::getSelectionProperty(this, m_propertyTupleTarget, m_groupTupleSettings)->setVisible(false);
+
 	EntityPropertiesBoolean::createProperty(m_groupQuerySetttings, "Order reproducable", true,"default", getProperties());
 
 	//Add all query fields
@@ -255,17 +260,16 @@ ValueCharacteristicProperties EntityBlockDatabaseAccess::getQueryValueCharacteri
 	return getValueCharacteristics(groupName);
 }
 
-std::string EntityBlockDatabaseAccess::getSelectedTupleFormat()
+EntityPropertiesSelection* EntityBlockDatabaseAccess::getTupleFormatSelection()
 {
-	const std::string tupleFormat =	PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleFormat, m_groupTupleSettings);
-	return tupleFormat;
+	return PropertyHelper::getSelectionProperty(this, m_propertyTupleFormat, m_groupTupleSettings);
 }
 
-std::string EntityBlockDatabaseAccess::getSelectedTupleTarget()
+EntityPropertiesSelection* EntityBlockDatabaseAccess::getTupleTargetSelection()
 {
-	const std::string tupleTarget = PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleTarget, m_groupTupleSettings);
-	return tupleTarget;
+	return PropertyHelper::getSelectionProperty(this, m_propertyTupleTarget, m_groupTupleSettings);
 }
+
 
 int32_t EntityBlockDatabaseAccess::getSelectedNumberOfQueries()
 {

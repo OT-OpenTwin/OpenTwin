@@ -1,9 +1,14 @@
-#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
+﻿#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
+
 
 TupleDescriptionComplex::TupleDescriptionComplex(ot::ComplexNumberFormat _format)
-	: m_tupleFormat(_format)
 {
-	m_name = "Complex";
+	setComplexNumberFormat(_format);
+}
+
+void TupleDescriptionComplex::setComplexNumberFormat(ot::ComplexNumberFormat _format)
+{
+	m_tupleFormat = (_format);
 	m_formatName = ot::ComplexNumbers::getFormatString(m_tupleFormat);
 	setTupleElements();
 }
@@ -18,9 +23,11 @@ void TupleDescriptionComplex::setTupleElements()
 	{
 		m_tupleElementNames = { "Magnitude", "Phase" };
 	}
+
+	m_tupleFormatNames = {ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian), ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar) };
 }
 
-void TupleDescriptionComplex::initialiseTupleElementNames()
+void TupleDescriptionComplex::initialiseTupleSpecifics()
 {
 	m_tupleFormat = ot::ComplexNumbers::getFormatFromString(m_formatName);
 	setTupleElements();

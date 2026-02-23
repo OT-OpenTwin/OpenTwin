@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PropertyHandlerDatabaseAccessBlock.h
 // 
 // License:
@@ -49,5 +49,6 @@ private:
 	void updateIfNecessaryValueCharacteristicLabelUnit(const ValueCharacteristicProperties& _selectedProperties, const std::string& _expectedValue, EntityProperties& _properties);
 	void updateIfNecessaryValueCharacteristicLabelDataType(const ValueCharacteristicProperties& _selectedProperties, const std::string& _expectedValue, EntityProperties& _properties);
 
+	void resetTupleVisibility(EntityBlockDatabaseAccess* _dbAccessEntity, EntityProperties& _properties);
 	void requestPropertyUpdate(ot::UIDList entityIDs, const std::string& propertiesAsJSON);
 };

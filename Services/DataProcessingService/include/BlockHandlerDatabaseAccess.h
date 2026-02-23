@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BlockHandlerDatabaseAccess.h
 // 
 // License:
@@ -55,6 +55,7 @@ private:
 
 	std::list<LabelFieldNamePair> m_labelFieldNamePairs;
 	std::string m_selectedQuantityLabel;
+	std::string m_tupleTarget;
 	PipelineData m_queriedData;
 
 	void collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity);

@@ -51,8 +51,8 @@ public:
 	ValueCharacteristicProperties getValueCharacteristics(const std::string& _groupName);
 	ValueCharacteristicProperties getQueryValueCharacteristics(int32_t _queryIndex);
 	
-	std::string getSelectedTupleFormat();
-	std::string getSelectedTupleTarget();
+	EntityPropertiesSelection* getTupleFormatSelection();
+	EntityPropertiesSelection* getTupleTargetSelection();
 
 	int32_t getSelectedNumberOfQueries();
 

@@ -106,6 +106,7 @@ set(OTResultDataAccess_HEADERS
     include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h
     include/OTResultDataAccess/SerialisationInterfaces/TupleDescription.h
     include/OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h
+    include/OTResultDataAccess/SerialisationInterfaces/TupleFactory.h
 
     include/OTResultDataAccess/ResultImportLogger/ResultImportLogger.h
     include/OTResultDataAccess/ResultImportLogger/ResultImportLoggerEntry.h
