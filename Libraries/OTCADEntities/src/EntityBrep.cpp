@@ -196,7 +196,7 @@ void EntityBrep::setFaceNameMap(std::map< const opencascade::handle<TopoDS_TShap
 	m_faceNames = faceNames;
 }
 
-std::map< const opencascade::handle<TopoDS_TShape>, std::string> EntityBrep::getFaceNameMap()
+const std::map< const opencascade::handle<TopoDS_TShape>, std::string>& EntityBrep::getFaceNameMap()
 {
 	return m_faceNames;
 }

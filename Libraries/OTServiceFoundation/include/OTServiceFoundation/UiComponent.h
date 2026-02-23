@@ -67,7 +67,9 @@ namespace ot {
 				TRANSFORM_SHAPES,
 				CHAMFER_EDGE,
 				BLEND_EDGE,
-				TRANSFORM_LOCALCOORDINATESYSTEM
+				TRANSFORM_LOCALCOORDINATESYSTEM,
+				ALIGN_LCS_FACE,
+				ALIGN_LCS_EDGE,
 			};
 
 			UiComponent(const ot::ServiceBase& _serviceInfo, ApplicationBase* _application);

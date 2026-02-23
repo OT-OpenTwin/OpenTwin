@@ -19,7 +19,7 @@
 
 #pragma once
 #include "OTModelEntities/PropertyBundle.h"
-#include "OTCore/ValueComparisionDefinition.h"
+#include "OTCore/ValueComparisonDefinition.h"
 
 class __declspec(dllexport) PropertyBundleQuerySettings : public PropertyBundle
 {
@@ -29,7 +29,7 @@ public:
 	void setQueryDefinitions(const std::list<std::string>& _queryOptions);
 	void reload(EntityBase* _thisObject);
 
-	std::list<ValueComparisionDefinition> getValueComparisionDefinitions(EntityBase* _thisObject);
+	std::list<ot::ValueComparisonDefinition> getValueComparisonDefinitions(EntityBase* _thisObject);
 	
 	//! @brief Checks if parameter that determine the query have changed.
 	bool requiresUpdate(EntityBase* _thisObject);

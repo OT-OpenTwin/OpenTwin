@@ -20,7 +20,6 @@
 #include "Application.h"
 #include "BlockEntityHandler.h"
 
-#include "OTCore/ComparisionSymbols.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/EntityAPI.h"

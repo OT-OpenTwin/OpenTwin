@@ -30,12 +30,12 @@
 #include <stdarg.h>
 #include "bsoncxx/json.hpp"
 
-BsonViewOrValue AdvancedQueryBuilder::createComparison(const ValueComparisionDefinition& _valueComparison)
+BsonViewOrValue AdvancedQueryBuilder::createComparison(const ot::ValueComparisonDefinition& _valueComparison)
 {
 	const std::string comparator = _valueComparison.getComparator();
 	BsonViewOrValue comparison;
 	// The range operator is an own implementatation
-	if (comparator == ot::ComparisionSymbols::g_rangeComparator)
+	if (comparator == ot::ComparisonSymbols::g_rangeComparator)
 	{
 		noTupleAllowedCheck(_valueComparison);
 		comparison = buildRangeQuery(_valueComparison); //Muss umgebaut werden, damit der Name nicht mehr mit Teil der range query ist.
@@ -49,14 +49,14 @@ BsonViewOrValue AdvancedQueryBuilder::createComparison(const ValueComparisionDef
 			assert(0);
 			throw std::exception("Not supported comparator selected for comparison query.");
 		}
-		else if (comparator == ot::ComparisionSymbols::g_anyOneOfComparator)
+		else if (comparator == ot::ComparisonSymbols::g_anyOneOfComparator)
 		{
 			noTupleAllowedCheck(_valueComparison);
 			std::list<ot::Variable> values = getVariableListFromValue(_valueComparison);
 			comparison = createComparisionEqualToAnyOf(values);
 			
 		}
-		else if (comparator == ot::ComparisionSymbols::g_noneOfComparator)
+		else if (comparator == ot::ComparisonSymbols::g_noneOfComparator)
 		{
 			noTupleAllowedCheck(_valueComparison);
 			std::list<ot::Variable> values = getVariableListFromValue(_valueComparison);
@@ -127,7 +127,7 @@ BsonViewOrValue AdvancedQueryBuilder::connectWithOR(std::list<BsonViewOrValue>&&
 	return BuildBsonArray(mongoOperator, std::move(values));
 }
 
-BsonViewOrValue AdvancedQueryBuilder::buildRangeQuery(const ValueComparisionDefinition& _definition)
+BsonViewOrValue AdvancedQueryBuilder::buildRangeQuery(const ot::ValueComparisonDefinition& _definition)
 {
 	const std::string& name = _definition.getName();
 	std::string valueStr = _definition.getValue();
@@ -184,7 +184,7 @@ BsonViewOrValue AdvancedQueryBuilder::buildRangeQuery(const ValueComparisionDefi
 	}
 }
 
-std::list<ot::Variable> AdvancedQueryBuilder::getVariableListFromValue(const ValueComparisionDefinition& _definition)
+std::list<ot::Variable> AdvancedQueryBuilder::getVariableListFromValue(const ot::ValueComparisonDefinition& _definition)
 {
 	std::string valueStr = _definition.getValue();
 	const std::string& type = _definition.getType();
@@ -217,7 +217,7 @@ BsonViewOrValue AdvancedQueryBuilder::createComparisionEqualToAnyOf(const std::l
 	return GenerateFilterQuery(mongoComparator, values);
 }
 
-void AdvancedQueryBuilder::noTupleAllowedCheck(const ValueComparisionDefinition& _definition)
+void AdvancedQueryBuilder::noTupleAllowedCheck(const ot::ValueComparisonDefinition& _definition)
 {
 	if (_definition.valueIsTuple())
 	{

@@ -1,5 +1,5 @@
 // @otlicense
-// File: DataObject.h
+// File: ComparisonSymbols.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -19,10 +19,17 @@
 
 #pragma once
 
-class DataObject
-{
-public:
-	DataObject() {}
-	virtual ~DataObject() {}
+// std header
+#include <list>
+#include <string>
 
-};
+namespace ot
+{
+	struct ComparisonSymbols
+	{
+		inline static const std::string g_anyOneOfComparator = "Any of";
+		inline static const std::string g_rangeComparator = "Range";
+		inline static const std::string g_noneOfComparator = "Not any of";
+		inline static const std::list<std::string> g_comparators = { "<", "<=", "=", ">", ">=", "!=", g_anyOneOfComparator, g_noneOfComparator, g_rangeComparator };
+	};
+}

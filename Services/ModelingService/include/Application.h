@@ -150,6 +150,7 @@ private:
 
 	ot::ToolBarButtonCfg m_buttonCreateLCS;
 	ot::ToolBarButtonCfg m_buttonActivateLCS;
+	ot::ToolBarButtonCfg m_buttonAlignLCS;
 
 	void handleRequestImportSTEP();
 
@@ -172,6 +173,7 @@ private:
 
 	void handleCreateCoordinateSystem();
 	void handleActivateCoordinateSystem();
+	void handleAlignCoordinateSystem();
 
 	Application();
 	virtual ~Application();

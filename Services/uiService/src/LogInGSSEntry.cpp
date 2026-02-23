@@ -19,13 +19,32 @@
 
 // Frontend header
 #include "LogInGSSEntry.h"
+#include "OTCore/Logging/Logger.h"
 
 LogInGSSEntry::LogInGSSEntry(const QString& _name, const QString& _url, const QString& _port)
 	: m_name(_name), m_url(_url), m_port(_port)
 {}
 
-void LogInGSSEntry::clear(void) {
+void LogInGSSEntry::clear() {
 	m_name.clear();
 	m_url.clear();
 	m_port.clear();
+}
+
+QString LogInGSSEntry::getDisplayText() const {
+	QString txt = m_name + " (" + getConnectionUrl();
+
+	switch (m_loginType) {
+	case ot::LoginType::SSO:
+		txt.append(" (SSO)");
+		break;
+	case ot::LoginType::UsernamePassword:
+		break;
+	default:
+		OT_LOG_E("Unknown login type (" + std::to_string(static_cast<int>(m_loginType)) + ")");
+		break;
+	}
+	txt.append(")");
+
+	return txt;
 }

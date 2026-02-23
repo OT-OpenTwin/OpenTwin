@@ -89,25 +89,143 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ============================================================
-# File lists for OTCore_core (from .vcxproj)
+# Set sources and headers
 # ============================================================
+
+set(OTCORE_HEADER_FILES
+    include/OTCore/ComplexNumbers/ComplexNumberContainer.h
+    include/OTCore/ComplexNumbers/ComplexNumberConversion.h
+    include/OTCore/ComplexNumbers/ComplexNumberFormat.h
+    include/OTCore/ComplexNumbers/SerialisationKeys.h
+
+    include/OTCore/JSON/JSON.h
+    include/OTCore/JSON/JSONArray.h
+    include/OTCore/JSON/JSONArray.hpp
+    include/OTCore/JSON/JSONDocument.h
+    include/OTCore/JSON/JSONDocument.hpp
+    include/OTCore/JSON/JSONHelper.h
+    include/OTCore/JSON/JSONNullValue.h
+    include/OTCore/JSON/JSONNumber.h
+    include/OTCore/JSON/JSONObject.h
+    include/OTCore/JSON/JSONString.h
+    include/OTCore/JSON/JSONString.hpp
+    include/OTCore/JSON/JSONTypes.h
+
+    include/OTCore/Logging/AbstractLogNotifier.h
+    include/OTCore/Logging/LogDispatcher.h
+    include/OTCore/Logging/LogMessage.h
+    include/OTCore/Logging/LogNotifierFileWriter.h
+    include/OTCore/Logging/LogNotifierStdCout.h
+    include/OTCore/Logging/LogTypes.h
+
+    include/OTCore/RAII/AtomicDecrementRAII.h
+    include/OTCore/RAII/AtomicIncrementRAII.h
+    include/OTCore/RAII/AtomicValueRAII.h
+    include/OTCore/RAII/DecrementRAII.h
+    include/OTCore/RAII/FunctionRAII.h
+    include/OTCore/RAII/IncrementRAII.h
+    include/OTCore/RAII/ValueRAII.h
+
+    include/OTCore/BasicEntityInformation.h
+    include/OTCore/BasicServiceInformation.h
+    include/OTCore/Color.h
+    include/OTCore/ComparisonSymbols.h
+    include/OTCore/ContainerHelper.h
+    include/OTCore/ContainerHelper.hpp
+    include/OTCore/CoreAPIExport.h
+    include/OTCore/CoreTypes.h
+    include/OTCore/DebugHelper.h
+    include/OTCore/DefensiveProgramming.h
+    include/OTCore/EncodingConverter_ISO88591ToUTF8.h
+    include/OTCore/EncodingConverter_UTF16ToUTF8.h
+    include/OTCore/EncodingGuesser.h
+    include/OTCore/EntityName.h
+    include/OTCore/ExplicitStringValueConverter.h
+    include/OTCore/FactoryTemplate.h
+    include/OTCore/FactoryTemplate.hpp
+    include/OTCore/FileInformation.h
+    include/OTCore/FolderNames.h
+    include/OTCore/GenericDataStruct.h
+    include/OTCore/GenericDataStructFactory.h
+    include/OTCore/GenericDataStructMatrix.h
+    include/OTCore/GenericDataStructSingle.h
+    include/OTCore/GenericDataStructVector.h
+    include/OTCore/GlobalTestingFlags.h
+    include/OTCore/JSONToVariableConverter.h
+    include/OTCore/LocalStateStack.h
+    include/OTCore/LocalStateStack.hpp
+    include/OTCore/LoginTypes.h
+    include/OTCore/Math.h
+    include/OTCore/Matrix.h
+    include/OTCore/MatrixNested.h
+    include/OTCore/MatrixVectorizedXAlign.h
+    include/OTCore/Matrix2.h
+    include/OTCore/Matrix2.hpp
+    include/OTCore/Matrix2Factory.h
+    include/OTCore/Matrix2Factory.hpp
+    include/OTCore/ObjectManagerTemplate.h
+    include/OTCore/OTClassHelper.h
+    include/OTCore/OTObject.h
+    include/OTCore/Owner.h
+    include/OTCore/OwnerService.h
+    include/OTCore/OwnerServiceGlobal.h
+    include/OTCore/PointerList.h
+    include/OTCore/PointerList.hpp
+    include/OTCore/Point2D.h
+    include/OTCore/Point3D.h
+    include/OTCore/ProjectFilterData.h
+    include/OTCore/ProjectInformation.h
+    include/OTCore/Rect.h
+    include/OTCore/ResultCollectionDefaultIndexes.h
+    include/OTCore/ReturnMessage.h
+    include/OTCore/ReturnValues.h
+    include/OTCore/RuntimeTests.h
+    include/OTCore/Serializable.h
+    include/OTCore/ServiceBase.h
+    include/OTCore/ServiceDebugInformation.h
+    include/OTCore/Size2D.h
+    include/OTCore/StateStack.h
+    include/OTCore/StateStack.hpp
+    include/OTCore/String.h
+    include/OTCore/String.hpp
+    include/OTCore/StringToNumericCheck.h
+    include/OTCore/StringToVariableConverter.h
+    include/OTCore/SystemServiceConfigInfo.h
+    include/OTCore/TemplateTypeName.h
+    include/OTCore/TemplateTypeName.hpp
+    include/OTCore/TextEncoding.h
+    include/OTCore/ThisComputerInfo.h
+    include/OTCore/ThisService.h
+    include/OTCore/TimeFormatter.h
+    include/OTCore/TypeNames.h
+    include/OTCore/UIDNamePair.h
+    include/OTCore/ValueComparisonDefinition.h
+    include/OTCore/Variable.h
+    include/OTCore/VariableListToStringListConverter.h
+    include/OTCore/VariableToBSONStringConverter.h
+    include/OTCore/VariableToJSONConverter.h
+    include/OTCore/VariableToStringConverter.h
+)
 
 set(OTCORE_SOURCE_FILES
     src/JSON/JSONHelper.cpp
     src/JSON/JsonObject.cpp
+
     src/Logging/LogMessage.cpp
     src/Logging/LogNotifierFileWriter.cpp
     src/Logging/LogNotifierStdCout.cpp
     src/Logging/LogTypes.cpp
     src/Logging/LogDispatcher.cpp
+
+    src/BasicEntityInformation.cpp
     src/BasicServiceInformation.cpp
     src/Color.cpp
+    src/ComplexNumberConversion.cpp
     src/DebugHelper.cpp
     src/dllmain.cpp
     src/EncodingConverter_ISO88591ToUTF8.cpp
     src/EncodingConverter_UTF16ToUTF8.cpp
     src/EncodingGuesser.cpp
-    src/BasicEntityInformation.cpp
     src/EntityName.cpp
     src/ExplicitStringValueConverter.cpp
     src/FileInformation.cpp
@@ -124,6 +242,7 @@ set(OTCORE_SOURCE_FILES
     src/OTObject.cpp
     src/RuntimeTests.cpp
     src/StringToNumericCheck.cpp
+    src/LoginTypes.cpp
     src/Math.cpp
     src/OwnerServiceGlobal.cpp
     src/JSONToVariableConverter.cpp
@@ -141,14 +260,13 @@ set(OTCORE_SOURCE_FILES
     src/TextEncoding.cpp
     src/ThisService.cpp
     src/UIDNamePair.cpp
-    src/ValueComparisionDefinition.cpp
+    src/ValueComparisonDefinition.cpp
     src/Variable.cpp
     src/VariableListToStringListConverter.cpp
     src/VariableToBSONStringConverter.cpp
     src/VariableToJSONConverter.cpp
     src/VariableToStringConverter.cpp
     src/TimeFormatter.cpp
-    src/ComplexNumberConversion.cpp
 )
 
 # Third-party source (base64.c)
@@ -162,19 +280,6 @@ elseif(BASE64_ROOT_PATH)
     set(OTCORE_THIRDPARTY_SOURCE "${BASE64_ROOT_PATH}/base64.c")
     set(OTCORE_THIRDPARTY_HEADER "${BASE64_ROOT_PATH}/base64.h")
 endif()
-
-# All headers in include/OTCore
-file(GLOB OTCORE_HEADER_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/*.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/JSON/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/JSON/*.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/Logging/*.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/RAII/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/RAII/*.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/OTCore/ComplexNumbers/*.h"
-)
 
 # ============================================================
 # Core OBJECT library

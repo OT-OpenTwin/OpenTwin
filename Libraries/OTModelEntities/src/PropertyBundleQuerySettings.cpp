@@ -19,20 +19,20 @@
 
 #include "OTModelEntities/PropertyBundleQuerySettings.h"
 #include "OTModelEntities/PropertyHelper.h"
-#include "OTCore/ComparisionSymbols.h"
+#include "OTCore/ComparisonSymbols.h"
 
 void PropertyBundleQuerySettings::setProperties(EntityBase* _thisObject)
 {
 	EntityPropertiesInteger::createProperty(m_groupQuerySettings, m_propertyNbOfComparisions, 0, 0, m_maxNumberOfQueryDefinitions, "default", _thisObject->getProperties());
-	std::list<std::string> comparisionSymbols = ot::ComparisionSymbols::g_comparators;
-	comparisionSymbols.push_front("");
+	std::list<std::string> comparisonSymbols = ot::ComparisonSymbols::g_comparators;
+	comparisonSymbols.push_front("");
 
 	for (uint32_t i = 1; i <= m_maxNumberOfQueryDefinitions; i++)
 	{
 		std::string groupName = m_groupQueryDefinition + "_" + std::to_string(i);
 		
 		EntityPropertiesSelection::createProperty(groupName, m_propertyName, m_selectionOptions,"", "default", _thisObject->getProperties());
-		EntityPropertiesSelection::createProperty(groupName, m_propertyComparator, comparisionSymbols, "", "default", _thisObject->getProperties());
+		EntityPropertiesSelection::createProperty(groupName, m_propertyComparator, comparisonSymbols, "", "default", _thisObject->getProperties());
 		EntityPropertiesString::createProperty(groupName, m_propertyValue, "", "default", _thisObject->getProperties());
 
 		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(false);
@@ -74,9 +74,9 @@ void PropertyBundleQuerySettings::reload(EntityBase* _thisObject)
 	m_maxNumberOfQueryDefinitions =	(uint32_t) m_selectionOptions.size();
 }
 
-std::list<ValueComparisionDefinition> PropertyBundleQuerySettings::getValueComparisionDefinitions(EntityBase* _thisObject)
+std::list<ot::ValueComparisonDefinition> PropertyBundleQuerySettings::getValueComparisonDefinitions(EntityBase* _thisObject)
 {
-	std::list<ValueComparisionDefinition> valueDefinitions;
+	std::list<ot::ValueComparisonDefinition> valueDefinitions;
 	for (uint32_t i = 1; i <= m_maxNumberOfQueryDefinitions; i++)
 	{
 		std::string groupName = m_groupQueryDefinition + "_" + std::to_string(i);
@@ -86,7 +86,7 @@ std::list<ValueComparisionDefinition> PropertyBundleQuerySettings::getValueCompa
 			std::string name = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, groupName);
 			std::string value = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyValue, groupName);
 			
-			ValueComparisionDefinition definition(name, comparator, value, "", "");
+			ot::ValueComparisonDefinition definition(name, comparator, value, "", "");
 			valueDefinitions.push_back(definition);
 		}
 	}
@@ -125,7 +125,7 @@ void PropertyBundleQuerySettings::updateQuerySettings(EntityBase* _thisObject, c
 
 	if (m_selectionOptions != _queryOptions)
 	{
-		std::list<std::string> comparisionSymbols = ot::ComparisionSymbols::g_comparators;
+		std::list<std::string> comparisonSymbols = ot::ComparisonSymbols::g_comparators;
 		m_selectionOptions = _queryOptions;
 
 		PropertyHelper::getIntegerProperty(_thisObject, m_propertyNbOfComparisions, m_groupQuerySettings)->setMax((long) _queryOptions.size());
@@ -142,7 +142,7 @@ void PropertyBundleQuerySettings::updateQuerySettings(EntityBase* _thisObject, c
 				std::string groupName = m_groupQueryDefinition + "_" + std::to_string(i);
 
 				EntityPropertiesSelection::createProperty(groupName, m_propertyName, m_selectionOptions, "", "default", _thisObject->getProperties());
-				EntityPropertiesSelection::createProperty(groupName, m_propertyComparator, comparisionSymbols, "", "default", _thisObject->getProperties());
+				EntityPropertiesSelection::createProperty(groupName, m_propertyComparator, comparisonSymbols, "", "default", _thisObject->getProperties());
 				EntityPropertiesString::createProperty(groupName, m_propertyValue, "", "default", _thisObject->getProperties());
 
 				PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(false);

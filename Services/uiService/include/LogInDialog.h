@@ -47,6 +47,12 @@ namespace ot {
 class LogInDialog : public ot::Dialog {
 	Q_OBJECT
 public:
+	enum class ConfigFlag {
+		NoFlags    = 0 << 0, //! @brief Default configuration with no special flags.
+		NoRegister = 1 << 0  //! @brief Configuration flag to disable the registration option in the dialog.
+	};
+	typedef ot::Flags<ConfigFlag> Config;
+
 	LogInDialog();
 	virtual ~LogInDialog();
 
@@ -56,8 +62,16 @@ public:
 
 	void initialize();
 	
+	void setConfigFlag(ConfigFlag _flag, bool _enabled = true);
+	void setConfig(const Config& _cfg);
+	const Config& getConfig() const { return m_config; };
+
 Q_SIGNALS:
 	void dialogShown();
+	void configChanged(const Config& _newConfig);
+
+public Q_SLOTS:
+	void applyConfig();
 
 protected:
 	virtual bool mayCloseDialogWindow() override;
@@ -65,13 +79,14 @@ protected:
 
 private:
 	enum class LogInStateFlag {
-		NoState = 0x00,
-		RestoredPassword   = 0x01,
-		WorkerRunning      = 0x02,
-		LogInSuccess       = 0x04,
+		NoState            = 0 << 0,
+		RestoredPassword   = 1 << 0,
+		WorkerRunning      = 1 << 1,
+		LogInSuccess       = 1 << 2,
 
-		RegisterMode       = 0x10,
-		ChangePasswordMode = 0x20
+		RegisterMode       = 1 << 3,
+		ChangePasswordMode = 1 << 4,
+		SSOMode            = 1 << 5
 	};
 	typedef ot::Flags<LogInStateFlag> LogInState;
 	OT_ADD_FRIEND_FLAG_FUNCTIONS(LogInDialog::LogInStateFlag, LogInDialog::LogInState)
@@ -91,6 +106,7 @@ private:
 	};
 
 	LogInState m_state;
+	Config m_config;
 
 	LoginData m_loginData; //! \brief Holds the login data that is set during the login by the worker thread.
 	
@@ -103,7 +119,6 @@ private:
 	ot::Label* m_passwordConfirmLabel;
 	ot::LineEdit* m_passwordConfirm; // Register:Confirm, Change:Confirm
 	ot::CheckBox* m_savePassword;
-	ot::CheckBox* m_useSSO;
 	ot::Label* m_toggleChangePasswordModeLabel;
 	ot::Label* m_toggleRegisterModeLabel;
 	ot::PushButton* m_logInButton;
@@ -130,7 +145,6 @@ public Q_SLOTS:
 	void slotToggleChangePasswordMode();
 	void slotGSSChanged();
 	void slotPasswordChanged();
-	void slotSSOChanged();
 
 	void slotLogInSuccess();
 	void slotRegisterSuccess();
@@ -142,14 +156,26 @@ public Q_SLOTS:
 	// Private helper
 
 private:
-	std::string  m_curlErrorMessage = "";
+	std::string m_curlErrorMessage = "";
+	QString m_userNameTmp;
+
+	const int m_maxDefaultHeight = 515;
+	const int m_maxSSOHeight = 460;
 
 	void saveUserSettings() const;
 	void saveGSSOptions() const;
+	void editGSSEntries();
 
-	LogInGSSEntry findCurrentGssEntry();
+	LogInGSSEntry findCurrentGssEntry() const;
 	void initializeGssData(std::shared_ptr<QSettings> _settings);
 	void updateGssOptions();
+
+	std::wstring determineSSOUsername() const;
+
+	void setControlsForUsernamePassword();
+	void setControlsForRegister();
+	void setControlsForChangePassword();
+	void setControlsForSSO();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -168,3 +194,5 @@ private:
 	WorkerError workerRegister(const UserManagement& _userManager);
 	WorkerError workerChangePassword(const UserManagement& _userManager);
 };
+
+OT_ADD_FLAG_FUNCTIONS(LogInDialog::ConfigFlag, LogInDialog::Config)

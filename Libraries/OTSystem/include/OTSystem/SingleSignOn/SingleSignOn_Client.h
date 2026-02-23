@@ -11,13 +11,16 @@
 #include <Lmcons.h> 
 #include <sspi.h>
 
+#pragma warning(disable:4251)
+
 namespace ot {
     class OT_SYS_API_EXPORT SingleSignOn_Client
     {
     public:
         SingleSignOn_Client(const std::wstring& _servicePrincipleName = L"");
         std::string generateToken(std::string& _receivedToken);
-        std::wstring getActiveUserName();
+
+        static std::wstring getActiveUserName();
 
     private:
         bool m_firstCall = true;
