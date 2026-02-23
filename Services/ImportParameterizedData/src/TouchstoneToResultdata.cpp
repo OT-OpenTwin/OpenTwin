@@ -1,4 +1,4 @@
-// @otlicense
+ï»¿// @otlicense
 // File: TouchstoneToResultdata.cpp
 // 
 // License:
@@ -171,11 +171,12 @@ DatasetDescription TouchstoneToResultdata::extractDatasetDescription(TouchstoneH
 	
 	if (selectedFormat == ts::option::Format::Decibel_angle)
 	{
-		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "dB", "°");
+		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "dB", "Â°");
 	}
 	else if (selectedFormat == ts::option::Format::magnitude_angle)
 	{
-		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", "°");
+		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", "Â°");
+		//quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", "rad");
 	}
 	else
 	{

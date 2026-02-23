@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: QuantityDescription.cpp
 // 
 // License:
@@ -40,7 +40,7 @@ void QuantityDescription::defineQuantityAsComplex(ot::ComplexNumberFormat _forma
 	}
 	else
 	{
-		assert(_secondUnit == "�" || _secondUnit == "rad");
+		assert(_secondUnit == u8"°" || _secondUnit == "rad");
 		tupleDescription.setUnits({ _firstUnit,_secondUnit });
 	}
 	m_metadataQuantity.m_tupleDescription = std::make_unique<TupleDescriptionComplex>(tupleDescription);

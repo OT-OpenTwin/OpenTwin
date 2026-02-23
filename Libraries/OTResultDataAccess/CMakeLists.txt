@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.20)
 
 project(OTResultDataAccess LANGUAGES CXX)
 
@@ -209,6 +209,7 @@ target_compile_features(OTResultDataAccess_core PRIVATE cxx_std_17)
 
 if(MSVC)
     target_compile_options(OTResultDataAccess_core PRIVATE /MP /wd4996)
+    add_compile_options(/utf-8)
 endif()
 
 target_compile_definitions(OTResultDataAccess_core
