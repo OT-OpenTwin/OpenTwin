@@ -65,6 +65,7 @@ public:
 	
 	MetadataQuantity& operator=(const MetadataQuantity& _other)
 	{
+		this->quantityIndex = _other.quantityIndex;
 		this->quantityName = _other.quantityName;
 		this->quantityLabel = _other.quantityLabel;
 		this->dataDimensions = _other.dataDimensions;

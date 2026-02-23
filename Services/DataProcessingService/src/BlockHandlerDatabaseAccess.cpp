@@ -297,7 +297,7 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	ot::ValueComparisonDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
 
 	TupleDescription* tupleDescription = selectedQuantity->m_tupleDescription.get();
-	if (tupleDescription->isSingle())
+	if (!tupleDescription->isSingle())
 	{
 		selectedQuantityDef.valueIsTuple();
 		const auto& allElements = tupleDescription->getTupleElementNames();
