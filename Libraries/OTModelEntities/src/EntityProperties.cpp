@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityProperties.cpp
 // 
 // License:
@@ -265,7 +265,9 @@ std::string EntityProperties::createJSON(EntityBase* root, bool visibleOnly) con
 		{
 			ot::JsonObject propObj;
 			prop->addToJsonObject(propObj, jsonDoc.GetAllocator(), root);
-			jsonDoc.AddMember(ot::JsonString(prop->getName(), jsonDoc.GetAllocator()), propObj, jsonDoc.GetAllocator());
+			
+			const std::string key = EntityProperties::createKey(prop->getName(), prop->getGroup());
+			jsonDoc.AddMember(ot::JsonString(key, jsonDoc.GetAllocator()), propObj, jsonDoc.GetAllocator());
 		}
 	}
 
@@ -288,8 +290,9 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 	// Now loop through all members of the document
 	for (ot::JsonMemberIterator i = doc.MemberBegin(); i != doc.MemberEnd(); i++)
 	{
-		std::string propertyName = i->name.GetString();
+		std::string key = i->name.GetString();
 
+		
 		if (i->value.IsObject())
 		{
 			//const rapidjson::Value &object = i->value;
@@ -320,7 +323,15 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 
 			if (newSetting) {
 				newSetting->readFromJsonObject(i->value.GetObject(), root);
-				newSetting->setName(propertyName);
+				if (EntityProperties::isKey(key))
+				{
+					const std::string name = EntityProperties::extractNameFromKey(key);
+					newSetting->setName(name);
+				}
+				else
+				{
+					newSetting->setName(key);
+				}
 
 				this->createProperty(newSetting, group);
 			}
