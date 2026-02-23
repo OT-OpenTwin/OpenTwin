@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PropertyHandlerDatabaseAccessBlock.cpp
 // 
 // License:
@@ -205,8 +205,7 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 			std::list<std::string> emptyList{};
 			
 			resetValueCharacteristicLabelsIfNecessary(quantityValueCharacteristic, _properties);
-			auto valueDescriptionSelection = _dbAccessEntity->getQuantityValueDescriptionSelection();
-			updateSelectionIfNecessary(emptyList, valueDescriptionSelection, _properties);
+			// Tuple update here
 
 			return std::list<std::string>();			
 		}
@@ -237,9 +236,7 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 	{
 		//If no quantity is selected, we need to check if the type and unit labels need to be reset.
 		resetValueCharacteristicLabelsIfNecessary(quantityValueCharacteristic, _properties);
-		EntityPropertiesSelection* selectionQuantityValDescr = _dbAccessEntity->getQuantityValueDescriptionSelection();
-		std::list<std::string> emptyList { };
-		updateSelectionIfNecessary(emptyList, selectionQuantityValDescr, _properties);
+		//Update Tuple here 
 		return std::list<std::string>();
 	}
 }

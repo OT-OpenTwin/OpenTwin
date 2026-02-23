@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityBlockDatabaseAccess.cpp
 // 
 // License:
@@ -60,8 +60,7 @@ void EntityBlockDatabaseAccess::createProperties()
 	//Quantity Settings
 	//@Alex: Here ;)
 	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyName, {""}, "", "default", getProperties());
-	
-	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyValueDescription, { "" }, "", "default", getProperties());
+
 	EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 	typeLabelProperty->setReadOnly(true);
 	typeLabelProperty->setName(m_propertyDataType);
@@ -223,15 +222,6 @@ EntityPropertiesSelection* EntityBlockDatabaseAccess::getSeriesSelection()
 	return selection;
 }
 
-EntityPropertiesSelection* EntityBlockDatabaseAccess::getQuantityValueDescriptionSelection()
-{
-	EntityPropertiesBase* base = getProperties().getProperty(m_propertyValueDescription, m_groupQuantitySetttings);
-	assert(base != nullptr);
-	EntityPropertiesSelection* selection = dynamic_cast<EntityPropertiesSelection*>(base);
-	assert(selection != nullptr);
-	return selection;
-}
-
 ValueCharacteristicProperties EntityBlockDatabaseAccess::getQuantityValueCharacteristic()
 {
 	return getValueCharacteristics(m_groupQuantitySetttings);
@@ -263,6 +253,18 @@ ValueCharacteristicProperties EntityBlockDatabaseAccess::getQueryValueCharacteri
 {
 	const std::string groupName = m_groupQuerySetttings + "_" + std::to_string(_queryIndex);
 	return getValueCharacteristics(groupName);
+}
+
+std::string EntityBlockDatabaseAccess::getSelectedTupleFormat()
+{
+	const std::string tupleFormat =	PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleFormat, m_groupTupleSettings);
+	return tupleFormat;
+}
+
+std::string EntityBlockDatabaseAccess::getSelectedTupleTarget()
+{
+	const std::string tupleTarget = PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleTarget, m_groupTupleSettings);
+	return tupleTarget;
 }
 
 int32_t EntityBlockDatabaseAccess::getSelectedNumberOfQueries()

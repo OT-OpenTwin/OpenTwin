@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityBlockDatabaseAccess.h
 // 
 // License:
@@ -46,12 +46,14 @@ public:
 	std::string getSelectedProjectName();
 
 	EntityPropertiesSelection* getSeriesSelection();
-	EntityPropertiesSelection* getQuantityValueDescriptionSelection();
-	
+		
 	ValueCharacteristicProperties getQuantityValueCharacteristic();
 	ValueCharacteristicProperties getValueCharacteristics(const std::string& _groupName);
 	ValueCharacteristicProperties getQueryValueCharacteristics(int32_t _queryIndex);
 	
+	std::string getSelectedTupleFormat();
+	std::string getSelectedTupleTarget();
+
 	int32_t getSelectedNumberOfQueries();
 
 	const ValueComparisionDefinition getSelectedQuantityDefinition();
@@ -83,11 +85,13 @@ private:
 	const std::string m_groupMetadataFilter = "Dataset";
 	const std::string m_groupQuantitySetttings = "Quantity settings";
 	const std::string m_groupQuerySetttings = "Query settings";
+	const std::string m_groupTupleSettings = "Tuple settings";
 
 	const std::string m_propertyNumberOfQueries = "Number of queries";
 
 	const std::string m_propertyName = "Name";
-	const std::string m_propertyValueDescription = "Type";
+	const std::string m_propertyTupleFormat = "Format";
+	const std::string m_propertyTupleTarget = "Target";
 	const std::string m_propertyDataType = "Data type";
 	const std::string m_propertyComparator = "Comparator";
 	const std::string m_propertyValue = "Value";

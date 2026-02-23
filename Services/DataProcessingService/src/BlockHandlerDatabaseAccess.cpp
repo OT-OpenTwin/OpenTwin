@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BlockHandlerDatabaseAccess.cpp
 // 
 // License:
@@ -280,7 +280,6 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 		throw std::exception("DatabaseAccessBlock has no quantity set.");
 	}
 
-	const std::string& valueDescriptionLabel = _blockEntity->getQuantityValueDescriptionSelection()->getValue();
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
 	const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
 
