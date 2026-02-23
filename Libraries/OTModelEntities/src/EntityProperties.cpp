@@ -304,16 +304,46 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 
 			EntityPropertiesBase* newSetting(nullptr);
 
-			if (type == EntityPropertiesDouble::typeString()) newSetting = new EntityPropertiesDouble;
-			else if (type == EntityPropertiesInteger::typeString()) newSetting = new EntityPropertiesInteger;
-			else if (type == EntityPropertiesBoolean::typeString()) newSetting = new EntityPropertiesBoolean;
-			else if (type == EntityPropertiesString::typeString()) newSetting = new EntityPropertiesString;
-			else if (type == EntityPropertiesSelection::typeString()) newSetting = new EntityPropertiesSelection;
-			else if (type == EntityPropertiesColor::typeString()) newSetting = new EntityPropertiesColor;
-			else if (type == EntityPropertiesEntityList::typeString()) newSetting = new EntityPropertiesEntityList;
-			else if (type == EntityPropertiesProjectList::typeString()) newSetting = new EntityPropertiesProjectList;
-			else if (type == EntityPropertiesGuiPainter::typeString()) newSetting = new EntityPropertiesGuiPainter;
-			else if (type == EntityPropertiesExtendedEntityList::typeString()) newSetting = new EntityPropertiesExtendedEntityList;
+			if (type == EntityPropertiesDouble::typeString())
+			{
+				newSetting = new EntityPropertiesDouble;
+			}
+			else if (type == EntityPropertiesInteger::typeString()) 
+			{
+				newSetting = new EntityPropertiesInteger;
+			}
+			else if (type == EntityPropertiesBoolean::typeString()) 
+			{
+				newSetting = new EntityPropertiesBoolean;
+			}
+			else if (type == EntityPropertiesString::typeString()) 
+			{
+				newSetting = new EntityPropertiesString;
+			}
+			else if (type == EntityPropertiesSelection::typeString()) 
+			{
+				newSetting = new EntityPropertiesSelection;
+			}
+			else if (type == EntityPropertiesColor::typeString()) 
+			{
+				newSetting = new EntityPropertiesColor;
+			}
+			else if (type == EntityPropertiesEntityList::typeString())
+			{
+				newSetting = new EntityPropertiesEntityList;
+			}
+			else if (type == EntityPropertiesProjectList::typeString()) 
+			{
+				newSetting = new EntityPropertiesProjectList;
+			}
+			else if (type == EntityPropertiesGuiPainter::typeString()) 
+			{
+				newSetting = new EntityPropertiesGuiPainter;
+			}
+			else if (type == EntityPropertiesExtendedEntityList::typeString()) 
+			{
+				newSetting = new EntityPropertiesExtendedEntityList;
+			}
 
 			else
 			{
