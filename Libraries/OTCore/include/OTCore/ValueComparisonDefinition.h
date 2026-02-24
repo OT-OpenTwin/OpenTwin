@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ValueComparisionDefinition.h
 // 
 // License:
@@ -20,6 +20,8 @@
 #pragma once
 #include <string>
 #include "OTCore/Serializable.h"
+#include "OTCore/Tuple/TupleDescription.h"
+#include <memory>
 
 namespace ot {
 
@@ -32,7 +34,9 @@ namespace ot {
 		ValueComparisonDefinition() = default;
 
 		ValueComparisonDefinition(const std::string& _name, const std::string& _comparator, const std::string& _value, const std::string& _type, const std::string& _unit)
-			: m_name(_name), m_comparator(_comparator), m_value(_value), m_type(_type), m_unit(_unit) {
+			: m_name(_name), m_comparator(_comparator), m_value(_value), m_type(_type), m_unit(_unit) 
+		{
+		
 		}
 
 		virtual ~ValueComparisonDefinition() = default;
@@ -48,21 +52,20 @@ namespace ot {
 
 		const std::string& getUnit() const { return m_unit; }
 
-		void setTupleCharacteristics(const std::string& _tupleFormat, int32_t _tupleQueryInex = m_entireTupleIndex);
-		bool valueIsTuple() const { return m_tupleIndex != m_noTupleIndex; }
-		bool valueIsEntireTuple() const { return m_tupleIndex == m_entireTupleIndex; }
-		int32_t getTupleIndex() const { return m_tupleIndex; }
-		std::string getTupleFormat() const { return m_tupleFormat; }
+		void setStorageTupleDescription(const TupleInstance& _tupleDescription);
+		void setQueryTupleDescription(const TupleInstance& _tupleDescription);
 
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+		
+		//! @brief Ownership remains with this object, caller should not delete the returned pointer.
+		const TupleInstance& getStoredTupleDescription() const { return m_storageFormatDescription; }
+		const TupleInstance& getQueryTupleDescription() const { return m_queryFormatDescription; }
 
 	private:
-		const static int32_t m_noTupleIndex = -2;
-		const static int32_t m_entireTupleIndex = -1;
-		int32_t m_tupleIndex = m_noTupleIndex;
-		std::string m_tupleFormat;
-
+		TupleInstance m_storageFormatDescription;
+		TupleInstance m_queryFormatDescription;
+		
 		std::string m_name;
 		std::string m_comparator;
 		std::string m_value;

@@ -82,6 +82,8 @@ void EntityBlockDatabaseAccess::createProperties()
 	PropertyHelper::getSelectionProperty(this, m_propertyTupleFormat, m_groupTupleSettings)->setVisible(false);
 	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleTarget, { }, "", "default", getProperties());
 	PropertyHelper::getSelectionProperty(this, m_propertyTupleTarget, m_groupTupleSettings)->setVisible(false);
+	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleUnit, {}, "", "default", getProperties());
+	PropertyHelper::getSelectionProperty(this, m_propertyTupleUnit, m_groupTupleSettings)->setVisible(false);
 
 	EntityPropertiesBoolean::createProperty(m_groupQuerySetttings, "Order reproducable", true,"default", getProperties());
 
@@ -268,6 +270,11 @@ EntityPropertiesSelection* EntityBlockDatabaseAccess::getTupleFormatSelection()
 EntityPropertiesSelection* EntityBlockDatabaseAccess::getTupleTargetSelection()
 {
 	return PropertyHelper::getSelectionProperty(this, m_propertyTupleTarget, m_groupTupleSettings);
+}
+
+EntityPropertiesSelection* EntityBlockDatabaseAccess::getTupleUnitSelection()
+{
+	return PropertyHelper::getSelectionProperty(this, m_propertyTupleUnit, m_groupTupleSettings);
 }
 
 

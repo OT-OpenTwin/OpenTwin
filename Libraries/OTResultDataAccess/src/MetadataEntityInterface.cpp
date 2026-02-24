@@ -25,7 +25,7 @@
 #include "OTResultDataAccess/MetadataEntry/MetadataEntryObject.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
-#include "OTResultDataAccess/SerialisationInterfaces/TupleFactory.h"
+#include "OTCore/Tuple/TupleFactory.h"
 
 // std header
 #include <vector>
@@ -169,7 +169,8 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 				assert(objectEntry != nullptr);
 
 				auto allTupleDescriptionEntries = objectEntry->getEntries();
-				std::unique_ptr<TupleDescription> tupleDescription;
+				
+				
 				for (const auto tupleDescriptionEntry : allTupleDescriptionEntries)
 				{
 					auto fieldEntry = dynamic_cast<MetadataEntrySingle*>(tupleDescriptionEntry.get());
@@ -179,40 +180,51 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 						{
 							assert(fieldEntry->getValue().isConstCharPtr());
 							const std::string name = (fieldEntry->getValue().getConstCharPtr());
-							tupleDescription.reset(TupleFactory::create(name));
-							break;
+							quantity.m_tupleDescription.setTupleTypeName(name);
 						}
-					}
-				}
-				for (const auto tupleDescriptionEntry : allTupleDescriptionEntries)
-				{
-					auto fieldEntry = dynamic_cast<MetadataEntrySingle*>(tupleDescriptionEntry.get());
-					if (fieldEntry != nullptr)
-					{
-						if (fieldEntry->getEntryName() == m_tupleFormat)
+						else if (fieldEntry->getEntryName() == m_tupleFormat)
 						{
 							assert(fieldEntry->getValue().isConstCharPtr());
-							tupleDescription->setFormatName(fieldEntry->getValue().getConstCharPtr());
+							quantity.m_tupleDescription.setTupleFormatName(fieldEntry->getValue().getConstCharPtr());
 						}
-						else if (fieldEntry->getEntryName() == m_dataTypeNameField)
+						else
 						{
-							assert(fieldEntry->getValue().isConstCharPtr());
-							tupleDescription->setDataType(fieldEntry->getValue().getConstCharPtr());
+							assert(false);
 						}
+						
 					}
 					else
 					{
 						auto arrayEntry = dynamic_cast<MetadataEntryArray*>(tupleDescriptionEntry.get());
 						if (arrayEntry != nullptr)
 						{
-							auto& units = arrayEntry->getValues();
-							std::vector<std::string> unitsAsString;
-							for (ot::Variable unit : units)
+							if (arrayEntry->getEntryName() == m_unitField)
 							{
-								assert(unit.isConstCharPtr());
-								unitsAsString.push_back(unit.getConstCharPtr());
+								auto& units = arrayEntry->getValues();
+								std::vector<std::string> unitsAsString;
+								for (ot::Variable unit : units)
+								{
+									assert(unit.isConstCharPtr());
+									unitsAsString.push_back(unit.getConstCharPtr());
+								}
+								quantity.m_tupleDescription.setTupleUnits(unitsAsString);
 							}
-							tupleDescription->setUnits(unitsAsString);
+							else if (fieldEntry->getEntryName() == m_dataTypeNameField)
+							{
+								assert(fieldEntry->getValue().isConstCharPtr());
+								auto& dataTypes = arrayEntry->getValues();
+								std::vector<std::string> dataTypeAsString;
+								for (ot::Variable dataType : dataTypes)
+								{
+									assert(dataType.isConstCharPtr());
+									dataTypeAsString.push_back(dataType.getConstCharPtr());
+								}
+								quantity.m_tupleDescription.setTupleElementDataTypes(dataTypeAsString);
+							}
+							else
+							{
+								assert(false);
+							}
 						}
 						else
 						{
@@ -220,7 +232,6 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 						}
 					}
 				}
-				quantity.m_tupleDescription = std::move(tupleDescription);
 			}
 			else
 			{
@@ -300,16 +311,23 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 			const std::string tupleDocumentsFieldName = quantityFieldKey + "/" + m_tupleDescriptionsField;
 			const auto& tupleDescription = quantity.m_tupleDescription;
 			
-			entitySeries.InsertToQuantityField(m_nameField, { tupleDescription->getName() }, tupleDocumentsFieldName);
-			entitySeries.InsertToQuantityField(m_dataTypeNameField, { tupleDescription->getDataType() }, tupleDocumentsFieldName);
+			entitySeries.InsertToQuantityField(m_nameField, { tupleDescription.getTupleTypeName() }, tupleDocumentsFieldName);
 			
 			std::list<ot::Variable> tupleUnitNames;
-			for (const std::string unitName : tupleDescription->getUnits())
+			for (const std::string unitName : tupleDescription.getTupleUnits())
 			{
 				tupleUnitNames.push_back(ot::Variable(unitName));
 			}
 			entitySeries.InsertToQuantityField(m_unitField, std::move(tupleUnitNames), tupleDocumentsFieldName);
-			entitySeries.InsertToQuantityField(m_tupleFormat, { tupleDescription->getFormatName() }, tupleDocumentsFieldName);
+			
+			std::list<ot::Variable> tupleElementDataTypes;
+			for(const std::string dataTypeName : tupleDescription.getTupleElementDataTypes())
+			{
+				tupleElementDataTypes.push_back(ot::Variable(dataTypeName));
+			}
+			entitySeries.InsertToQuantityField(m_dataTypeNameField, std::move(tupleElementDataTypes), tupleDocumentsFieldName);
+
+			entitySeries.InsertToQuantityField(m_tupleFormat, { tupleDescription.getTupleFormatName() }, tupleDocumentsFieldName);
 									
 			for (auto& metadata : quantity.metaData)
 			{

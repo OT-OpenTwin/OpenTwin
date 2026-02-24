@@ -26,10 +26,12 @@
 #include "OTCore/OwnerServiceGlobal.h"
 #include "Application.h"
 #include "OTModelEntities/DataBase.h"
-#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
+#include "OTCore/Tuple/TupleDescriptionComplex.h"
+#include "OTCore/Tuple/TupleFactory.h"
 #include "OTResultDataAccess/ResultCollection/ProjectToCollectionConverter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
- 
+
+
 void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity)
 {
 
@@ -218,31 +220,28 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 			const std::string selectedType = ot::TypeNames::getDoubleTypeName(); //quantity->m_tupleDescription.getDataType();
 			updateIfNecessaryValueCharacteristicLabelDataType(quantityValueCharacteristic,selectedType, _properties);
 			
-			const TupleDescription* tupleDescription = quantity->m_tupleDescription.get();
-			if (!tupleDescription->isSingle())
+			const TupleInstance& tupleInstance = quantity->m_tupleDescription;
+
+			if (!tupleInstance.isSingle())
 			{
+				TupleDescription* tupleDescription = TupleFactory::create(tupleInstance.getTupleTypeName());
+				auto allElements =	tupleDescription->getTupleElementNames(tupleInstance.getTupleFormatName());
 				//Reset the query target if necessary
-				std::vector<std::string> queryTargets;
-				queryTargets.reserve(tupleDescription->getTupleElementNames().size() +1);
-				queryTargets.push_back(tupleDescription->getName());
-				for (const std::string& _elementName : tupleDescription->getTupleElementNames())
-				{
-					queryTargets.push_back(_elementName);
-				}					
-				
+				allElements.push_back(tupleDescription->getName());
+								
 				auto tupleTargetSelection =  _dbAccessEntity->getTupleTargetSelection();
-				if (tupleTargetSelection->getOptions() != queryTargets || !tupleTargetSelection->getVisible())
+				if (tupleTargetSelection->getOptions() != allElements || !tupleTargetSelection->getVisible())
 				{
 					EntityPropertiesSelection* newTargetSelection = dynamic_cast<EntityPropertiesSelection*>(tupleTargetSelection->createCopy());
-					newTargetSelection->resetOptions(queryTargets);
-					newTargetSelection->setValue(queryTargets[0]);
+					newTargetSelection->resetOptions(allElements);
+					newTargetSelection->setValue(allElements[0]);
 					newTargetSelection->setVisible(true);
 					_properties.createProperty(newTargetSelection, newTargetSelection->getGroup());
 				}
 				
 				//Reset the query format if necessary
 				auto tupleFormatSelection =	_dbAccessEntity->getTupleFormatSelection();
-				const std::vector<std::string>& queryFormats = tupleDescription->getTupleFormatNames();
+				const std::vector<std::string>& queryFormats = tupleDescription->getAllTupleFormatNames();
 				
 				if (queryFormats != tupleFormatSelection->getOptions() || !tupleFormatSelection->getVisible())
 				{
@@ -251,6 +250,17 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 					newFormatSelection->setValue(queryFormats[0]);
 					newFormatSelection->setVisible(true);
 					_properties.createProperty(newFormatSelection, newFormatSelection->getGroup());
+				}
+
+				auto tupleUnitSelection = _dbAccessEntity->getTupleUnitSelection();
+				const std::vector<std::string>& tupleUnits =	tupleInstance.getTupleUnits();
+				if (tupleUnits != tupleUnitSelection->getOptions() || !tupleUnitSelection->getVisible())
+				{
+					EntityPropertiesSelection* newUnitSelection = dynamic_cast<EntityPropertiesSelection*>(tupleUnitSelection->createCopy());
+					newUnitSelection->resetOptions(tupleUnits);
+					newUnitSelection->setValue(tupleUnits[0]);
+					newUnitSelection->setVisible(true);
+					_properties.createProperty(newUnitSelection, newUnitSelection->getGroup());
 				}
 			}
 			
@@ -380,6 +390,13 @@ void PropertyHandlerDatabaseAccessBlock::resetTupleVisibility(EntityBlockDatabas
 		EntityPropertiesSelection* newFormatSelection = dynamic_cast<EntityPropertiesSelection*>(tupleFormatSelection->createCopy());
 		newFormatSelection->setVisible(false);
 		_properties.createProperty(newFormatSelection, newFormatSelection->getGroup());
+	}
+	auto tupleUnitSelection = _dbAccessEntity->getTupleUnitSelection();
+	if(tupleUnitSelection->getVisible())
+	{
+		EntityPropertiesSelection* newUnitSelection = dynamic_cast<EntityPropertiesSelection*>(tupleUnitSelection->createCopy());
+		newUnitSelection->setVisible(false);
+		_properties.createProperty(newUnitSelection, newUnitSelection->getGroup());
 	}
 }
 

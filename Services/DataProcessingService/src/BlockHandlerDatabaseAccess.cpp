@@ -37,6 +37,7 @@
 
 #include "OTResultDataAccess/ResultCollection/IndexHandler.h"
 #include "OTResultDataAccess/QuantityContainer.h"
+#include "OTCore/Tuple/TupleDescriptionComplex.h"
 
 #include <algorithm>
 
@@ -56,7 +57,15 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	m_resultCollectionAccess = new DataStorageAPI::ResultDataStorageAPI(collectionName);
 	IndexHandler indexHandler(collectionName);
 	indexHandler.createDefaultIndexes();
-	m_tupleTarget = blockEntity->getTupleTargetSelection()->getValue();
+
+	if (blockEntity->getTupleTargetSelection()->getVisible())
+	{
+		const std::string tupleElement = blockEntity->getTupleTargetSelection()->getValue();
+		const std::string tupleFormat = blockEntity->getTupleFormatSelection()->getValue();
+		
+	}
+	std::unique_ptr<TupleDescriptionComplex> tupleDescription;
+
 	buildQuery(blockEntity);
 }
 
@@ -295,26 +304,6 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	assert(valueUID != 0);
 	//Now we add the query for the quantity ID
 	ot::ValueComparisonDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
-
-	TupleDescription* tupleDescription = selectedQuantity->m_tupleDescription.get();
-	if (!tupleDescription->isSingle())
-	{
-		selectedQuantityDef.valueIsTuple();
-		const auto& allElements = tupleDescription->getTupleElementNames();
-		
-		ptrdiff_t pos = find(allElements.begin(), allElements.end(), m_tupleTarget) - allElements.begin();
-		if(pos >= allElements.size())
-		{
-			//Here we query the entire tuple
-			assert(m_tupleTarget == tupleDescription->getName());
-			selectedQuantityDef.setTupleCharacteristics(tupleDescription->getFormatName());
-		}
-		else
-		{
-			//Here only one of the tuple entries is queried. 
-			selectedQuantityDef.setTupleCharacteristics(tupleDescription->getFormatName(),pos);
-		}
-	}
 	addComparision(selectedQuantityDef);
 
 
@@ -323,6 +312,25 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	labelFieldNamePair.m_label = quantityDef.getName();
 	quantityDef.setName(QuantityContainer::getFieldName());
 	labelFieldNamePair.m_fieldName = QuantityContainer::getFieldName();
+
+	const TupleInstance& tupleInstance = selectedQuantity->m_tupleDescription;
+	if (!tupleInstance.isSingle())
+	{
+		
+		//quantityDef.valueIsTuple();
+		//const auto& allElements = tupleDescription->getTupleElementNames();
+
+		//ptrdiff_t pos = find(allElements.begin(), allElements.end(), m_tupleTarget) - allElements.begin();
+		//if (pos >= allElements.size())
+		//{
+		//	//Here we query the entire tuple
+		//	assert(m_tupleTarget == tupleDescription->getName());
+		//	pos = -1;
+		//	quantityDef.setType(ot::ComplexNumbers::getTypeName());
+		//}
+		//quantityDef.setTupleCharacteristics(tupleDescription->getFormatName(),pos);
+	}
+	
 	addComparision(quantityDef);
 
 	m_labelFieldNamePairs.push_back(labelFieldNamePair);

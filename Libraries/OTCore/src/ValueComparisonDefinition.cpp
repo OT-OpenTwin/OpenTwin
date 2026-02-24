@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ValueComparisionDefinition.cpp
 // 
 // License:
@@ -19,10 +19,14 @@
 
 #include "OTCore/ValueComparisonDefinition.h"
 
-void ot::ValueComparisonDefinition::setTupleCharacteristics(const std::string& _tupleFormat, int32_t _tupleQueryInex)
+void ot::ValueComparisonDefinition::setStorageTupleDescription(const TupleInstance& _tupleDescription)
 {
-	m_tupleFormat = _tupleFormat;
-	m_tupleIndex = _tupleQueryInex;
+	m_storageFormatDescription = (_tupleDescription);
+}
+
+void ot::ValueComparisonDefinition::setQueryTupleDescription(const TupleInstance& _tupleDescription)
+{
+	m_queryFormatDescription= _tupleDescription;
 }
 
 void ot::ValueComparisonDefinition::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
@@ -32,8 +36,13 @@ void ot::ValueComparisonDefinition::addToJsonObject(ot::JsonValue& _object, ot::
 	_object.AddMember("Value", ot::JsonString(m_value, _allocator), _allocator);
 	_object.AddMember("Type", ot::JsonString(m_type, _allocator), _allocator);
 	_object.AddMember("Unit", ot::JsonString(m_unit, _allocator), _allocator);
-	_object.AddMember("TupleIndex", m_tupleIndex, _allocator);
-	_object.AddMember("TupleFormat", ot::JsonString(m_tupleFormat, _allocator), _allocator);
+	ot::JsonObject tupleDescription;
+	m_storageFormatDescription.addToJsonObject(tupleDescription, _allocator);
+	_object.AddMember("TupleDescriptionStorage", tupleDescription, _allocator);
+	
+	ot::JsonObject queryTupleDescription;
+	m_queryFormatDescription.addToJsonObject(queryTupleDescription, _allocator);
+	_object.AddMember("TupleDescriptionQuery", queryTupleDescription, _allocator);
 }
 
 void ot::ValueComparisonDefinition::setFromJsonObject(const ot::ConstJsonObject& _object)
@@ -43,6 +52,8 @@ void ot::ValueComparisonDefinition::setFromJsonObject(const ot::ConstJsonObject&
 	m_value = ot::json::getString(_object, "Value");
 	m_type = ot::json::getString(_object, "Type");
 	m_unit = ot::json::getString(_object, "Unit");
-	m_tupleIndex = ot::json::getInt(_object, "TupleIndex", m_noTupleIndex);
-	m_tupleFormat = ot::json::getString(_object, "TupleFormat");
+	const ot::ConstJsonObject& tupleDescriptionStorage = _object["TupleDescriptionStorage"].GetObject();
+	m_storageFormatDescription.setFromJsonObject(tupleDescriptionStorage);
+	const ot::ConstJsonObject& tupleDescription = _object["TupleDescriptionQuery"].GetObject();
+	m_queryFormatDescription.setFromJsonObject(tupleDescription);
 }

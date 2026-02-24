@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: AdvancedQueryBuilder.cpp
 // 
 // License:
@@ -24,7 +24,7 @@
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 #include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
-
+#include "OTCore/Tuple/TupleDescriptionComplex.h"
 // std header
 #include <cassert>
 #include <stdarg.h>
@@ -65,44 +65,37 @@ BsonViewOrValue AdvancedQueryBuilder::createComparison(const ot::ValueComparison
 		}
 		else
 		{
-			//Now we have the common mathmatical comparators
-			ot::Variable value = ot::ExplicitStringValueConverter::setValueFromString(_valueComparison.getValue(), _valueComparison.getType());
-			const std::string formatName = _valueComparison.getTupleFormat();
 			//In case of tuple values, the query needs to be assembled differently
-			if (_valueComparison.valueIsTuple())
-			{
-				//Better here a converter that transforms the tuple into an array and also does the number transformations if indicated by the valueDescription.
-				std::complex<double> complexValue = value.getComplex(); //Currently only complex values are supported
-				std::vector<double> tupleValue;
-				ot::ComplexNumberFormat format = ot::ComplexNumbers::getFormatFromString(formatName);
-				if (format == ot::ComplexNumberFormat::Polar)
-				{
-					tupleValue = ot::ComplexNumberConversion::cartesianToPolar(complexValue);
-				}
-				else
-				{
-					tupleValue = { complexValue.real(),complexValue.imag() };
-				}
-					
-				if (_valueComparison.valueIsEntireTuple())
-				{
-					assert(comparator == "=");
-					comparison = GenerateFilterQuery(mongoComparator->second, { tupleValue[0] , tupleValue[1]});
-				}
-				else
-				{
-					int32_t index = _valueComparison.getTupleIndex();
-					assert(index < tupleValue.size());
+			//const TupleInstance& tupleDescription = _valueComparison.getTupl();
+			//if (!tupleDescription->isSingle())
+			//{
+			//	//Better here a converter that transforms the tuple into an array and also does the number transformations if indicated by the valueDescription.
+			//	TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(tupleDescription);
+			//	
+			//	
+			//	std::complex<double> complexNumber = ot::ComplexNumberConversion::fromString(_valueComparison.getValue(), ot::ComplexNumbers::getFormatFromString(complexTupleDescription->getFormatName()),complexTupleDescription->getUnits()[1]);
+			//	
 
-					BsonViewOrValue compareWithValue = GenerateFilterQuery(mongoComparator->second, tupleValue[index]);
-					BsonViewOrValue equalIndex = GenerateFilterQuery(std::to_string(index), compareWithValue.view());
-					comparison = GenerateFilterQuery("$elemMatch", equalIndex.view());
-				}
-			}
-			else
-			{
-				comparison = GenerateFilterQuery(mongoComparator->second, value);
-			}
+			//	if (_valueComparison.valueIsEntireTuple())
+			//	{
+			//		assert(comparator == "=");
+			//		comparison = GenerateFilterQuery(mongoComparator->second, { tupleValue[0] , tupleValue[1]});
+			//	}
+			//	else
+			//	{
+			//		int32_t index = _valueComparison.getTupleIndex();
+			//		assert(index < tupleValue.size());
+
+			//		BsonViewOrValue compareWithValue = GenerateFilterQuery(mongoComparator->second, tupleValue[index]);
+			//		BsonViewOrValue equalIndex = GenerateFilterQuery(std::to_string(index), compareWithValue.view());
+			//		comparison = GenerateFilterQuery("$elemMatch", equalIndex.view());
+			//	}
+			//}
+			//else
+			//{
+			//	ot::Variable value = ot::ExplicitStringValueConverter::setValueFromString(_valueComparison.getValue(), _valueComparison.getType());
+			//	comparison = GenerateFilterQuery(mongoComparator->second, value);
+			//}
 		}
 	}
 	
@@ -219,10 +212,10 @@ BsonViewOrValue AdvancedQueryBuilder::createComparisionEqualToAnyOf(const std::l
 
 void AdvancedQueryBuilder::noTupleAllowedCheck(const ot::ValueComparisonDefinition& _definition)
 {
-	if (_definition.valueIsTuple())
-	{
-		throw std::invalid_argument("The selected comparision does not support tuple values.");
-	}
+	//if (_definition.valueIsTuple())
+	//{
+	//	throw std::invalid_argument("The selected comparision does not support tuple values.");
+	//}
 }
 
 

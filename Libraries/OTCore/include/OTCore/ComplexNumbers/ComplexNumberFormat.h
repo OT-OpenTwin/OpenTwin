@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 #pragma once
 #include "OTCore/CoreAPIExport.h"
 #include <string>
@@ -14,6 +14,12 @@ namespace ot
 
 	namespace ComplexNumbers
 	{
+		static std::string getTypeName()
+		{
+			return "Complex";
+		}	
+
+
 		static std::string getFormatString(const ComplexNumberFormat& _format)
 		{
 			switch (_format)

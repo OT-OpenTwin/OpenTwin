@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ResultManager.cpp
 // 
 // License:
@@ -26,7 +26,7 @@
 #include "OTResultDataAccess/CurveFactory.h"
 #include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
 #include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
-#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
+
 #include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"

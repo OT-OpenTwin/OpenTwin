@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Variable.h
 // 
 // License:
@@ -166,7 +166,7 @@ namespace ot
 		
 		//! @brief 
 		//! @param _value Has to be of size 2. The order of the elements has to be the same as in the ComplexNumberConversion functions.
-		void setValue(const std::vector<double>& _value, const ot::ComplexNumberFormat& _format);
+		void setValue(const ot::ComplexNumberDefinition& _complexNumberDefinition);
 
 		bool isFloat() const;
 		bool isDouble() const;

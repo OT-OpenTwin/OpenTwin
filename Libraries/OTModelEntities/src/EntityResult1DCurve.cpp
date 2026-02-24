@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityResult1DCurve.cpp
 // 
 // License:
@@ -434,11 +434,24 @@ bsoncxx::builder::basic::document EntityResult1DCurve::serialise(ot::QuantityCon
 	{
 		quantityDimensions.append(static_cast<int32_t>(dimension));
 	}
+	const TupleInstance& tupleInstance =	_quantityContainerEntryDescription.m_tupleInstance;
+	bsoncxx::builder::basic::array tupleDataTypes;
+	for(const std::string& dataType : tupleInstance.getTupleElementDataTypes())
+	{
+		tupleDataTypes.append(dataType);
+	}
+
+	bsoncxx::builder::basic::array tupleUnits;
+	for(const std::string& unit : tupleInstance.getTupleUnits())
+	{
+		tupleUnits.append(unit);
+	}
+
 	subDocument.append(
-		bsoncxx::builder::basic::kvp("DataType", _quantityContainerEntryDescription.m_dataType),
 		bsoncxx::builder::basic::kvp("FieldName", _quantityContainerEntryDescription.m_fieldName),
 		bsoncxx::builder::basic::kvp("Label", _quantityContainerEntryDescription.m_label),
-		bsoncxx::builder::basic::kvp("Unit", _quantityContainerEntryDescription.m_unit),
+		bsoncxx::builder::basic::kvp("DataType", tupleDataTypes),
+		bsoncxx::builder::basic::kvp("Unit", tupleUnits),
 		bsoncxx::builder::basic::kvp("Dimension", quantityDimensions)
 	);
 	return subDocument;
@@ -446,10 +459,26 @@ bsoncxx::builder::basic::document EntityResult1DCurve::serialise(ot::QuantityCon
 
 ot::QuantityContainerEntryDescription EntityResult1DCurve::deserialise(bsoncxx::v_noabi::document::view _subDocument) {
 	ot::QuantityContainerEntryDescription quantityContainerEntryDescription;
-	quantityContainerEntryDescription.m_dataType = _subDocument["DataType"].get_string();
 	quantityContainerEntryDescription.m_fieldName = _subDocument["FieldName"].get_string();
 	quantityContainerEntryDescription.m_label = _subDocument["Label"].get_string();
-	quantityContainerEntryDescription.m_unit = _subDocument["Unit"].get_string();
+	
+	auto dataTypes = _subDocument["DataType"].get_array();
+	std::vector<std::string> tupleDataTypes;
+	for(auto& element : dataTypes.value)
+	{
+		tupleDataTypes.push_back(element.get_string().value.data());
+	}
+	quantityContainerEntryDescription.m_tupleInstance.setTupleElementDataTypes(tupleDataTypes);
+
+
+	auto units = _subDocument["Unit"].get_array();
+	std::vector<std::string> tupleUnits;
+	for(auto& element : units.value)
+	{
+		tupleUnits.push_back(element.get_string().value.data());
+	}
+	quantityContainerEntryDescription.m_tupleInstance.setTupleUnits(tupleUnits);
+
 	auto quantityDimension = _subDocument["Dimension"].get_array();
 	for (auto& element : quantityDimension.value)
 	{

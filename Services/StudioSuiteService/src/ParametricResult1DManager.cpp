@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ParametricResult1DManager.cpp
 // 
 // License:
@@ -35,7 +35,6 @@
 #include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
-#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
 
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"

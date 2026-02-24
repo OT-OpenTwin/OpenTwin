@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ComplexNumbers.h
 // 
 // License:
@@ -21,16 +21,24 @@
 #include <complex>
 #include <vector>
 #include "OTCore/CoreAPIExport.h"
+#include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
+#include "OTCore/ComplexNumbers/ComplexNumberDefinition.h"
 
 namespace ot
 {
 	class OT_CORE_API_EXPORT ComplexNumberConversion
 	{
 	public:
-		static std::complex<double> polarToCartesian(double _magnitude, double _angleInRad);
+
+		//! @param _magnitude 
+		//! @param _angle 
+		//! @param _angleUnit radians or degrees. Unit string should be taken out of the SIUnits::Derived namespace. If empty, radians will be assumed.
+		static std::complex<double> polarToCartesian(const ComplexNumberDefinition& _complexNumberDefinition);
 
 		//! @return Vector of size 2 where element 0 is magnitude and element 1 is angle in radians.
-		static std::vector<double> cartesianToPolar(std::complex<double> _complexNb);
+		static ComplexNumberDefinition cartesianToPolar(std::complex<double> _complexNb);
+
+		static std::complex<double> fromString(const std::string& _complexString, const ot::ComplexNumberFormat& _format, const std::string& _angleUnit = "");
 
 	};
 }

@@ -55,7 +55,7 @@ private:
 
 	std::list<LabelFieldNamePair> m_labelFieldNamePairs;
 	std::string m_selectedQuantityLabel;
-	std::string m_tupleTarget;
+	ot::ValueComparisonDefinition m_quantityQueryDefinition;
 	PipelineData m_queriedData;
 
 	void collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity);

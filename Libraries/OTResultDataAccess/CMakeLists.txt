@@ -104,9 +104,6 @@ set(OTResultDataAccess_HEADERS
     include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h
     include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h
     include/OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h
-    include/OTResultDataAccess/SerialisationInterfaces/TupleDescription.h
-    include/OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h
-    include/OTResultDataAccess/SerialisationInterfaces/TupleFactory.h
 
     include/OTResultDataAccess/ResultImportLogger/ResultImportLogger.h
     include/OTResultDataAccess/ResultImportLogger/ResultImportLoggerEntry.h
@@ -142,8 +139,6 @@ set(OTResultDataAccess_SOURCES
     src/ResultCollectionExtender.cpp
     src/ResultCollectionMetadataAccess.cpp
     src/ResultImportLogger.cpp
-    src/TupleDescription.cpp
-    src/TupleDescriptionComplex.cpp
 )
 
 # Core object library (for reuse in tests)

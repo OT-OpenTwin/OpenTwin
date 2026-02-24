@@ -19,32 +19,20 @@
 
 // OpenTwin header
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
-#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
+#include "OTCore/Tuple/TupleDescriptionComplex.h"
+#include "OTCore/Tuple/TupleDescriptionSingle.h"
 void QuantityDescription::defineQuantityAsSingle(const std::string& _dataType, const std::string& _unit)
 {
-	TupleDescription tupleDescription;
-	tupleDescription.setDataType(_dataType);
-	tupleDescription.setFormatName("");
-	tupleDescription.setUnits({ _unit });
-	m_metadataQuantity.m_tupleDescription = std::make_unique<TupleDescription>(tupleDescription);
+
+	const TupleInstance tuple =	TupleDescriptionSingle::createInstance(_unit, _dataType);
+	m_metadataQuantity.m_tupleDescription = tuple;
 }
 
-
-#include <iostream>
 void QuantityDescription::defineQuantityAsComplex(ot::ComplexNumberFormat _format, const std::string& _dataType, const std::string& _firstUnit, const std::string& _secondUnit)
 {
-	TupleDescriptionComplex tupleDescription(_format);
 
-	if (_format == ot::ComplexNumberFormat::Cartesian)
-	{
-		assert(_secondUnit == _firstUnit);
-		tupleDescription.setUnits({ _firstUnit,_secondUnit});
-	}
-	else
-	{
-		assert(_secondUnit == "°" || _secondUnit == "rad");
-		tupleDescription.setUnits({ _firstUnit,_secondUnit });
-	}
-	m_metadataQuantity.m_tupleDescription = std::make_unique<TupleDescriptionComplex>(tupleDescription);
+	TupleDescriptionComplex tupleDescription;
+	const TupleInstance instance = tupleDescription.createInstance(_format, { _firstUnit,_secondUnit }, { _dataType,_dataType });
+	m_metadataQuantity.m_tupleDescription = instance;
 }
 

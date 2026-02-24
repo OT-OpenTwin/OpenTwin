@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Variable.cpp
 // 
 // License:
@@ -20,6 +20,8 @@
 #include "OTCore/Variable.h"
 #include <cassert>
 #include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
+#include "OTCore/ComplexNumbers/ComplexNumberDefinition.h"
+
 ot::Variable::Variable(float value)
 	:_value(value)
 {}
@@ -127,16 +129,15 @@ void ot::Variable::setValue(std::complex<double>&& value)
 	_value = std::move(value);
 }
 
-void ot::Variable::setValue(const std::vector<double>& value, const ot::ComplexNumberFormat& _format)
+void ot::Variable::setValue(const ot::ComplexNumberDefinition& _complexNumberDefinition)
 {
-	assert(value.size() == 2);
-	if (_format == ot::ComplexNumberFormat::Cartesian)
+	if (_complexNumberDefinition.m_format == ot::ComplexNumberFormat::Cartesian)
 	{
-		_value = std::complex<double>(value[0], value[1]);
+		_value = std::complex<double>(_complexNumberDefinition.m_firstValue, _complexNumberDefinition.m_secondValue);
 	}
 	else
 	{
-		_value = ot::ComplexNumberConversion::polarToCartesian(value[0], value[1]);
+		_value = ot::ComplexNumberConversion::polarToCartesian(_complexNumberDefinition);
 	}
 }
 
@@ -209,19 +210,6 @@ const char* ot::Variable::getConstCharPtr() const
 const std::complex<double> ot::Variable::getComplex() const
 {
 	return std::get<std::complex<double>>(_value);
-}
-
-const std::vector<double> ot::Variable::getComplexInFormat(ComplexNumberFormat& _format)
-{
-	std::complex<double> complexValue = std::get<std::complex<double>>(_value);
-	if (_format == ComplexNumberFormat::Cartesian)
-	{
-		return std::vector<double>{complexValue.real(), complexValue.imag()};
-	}
-	else
-	{
-		return ComplexNumberConversion::cartesianToPolar(complexValue);
-	}
 }
 
 bool ot::Variable::operator==(const Variable& other) const

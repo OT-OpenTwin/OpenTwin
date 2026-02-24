@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: QuantityContainerSerialiser.cpp
 // 
 // License:
@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTResultDataAccess/QuantityContainerSerialiser.h"
-#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
+#include "OTCore/Tuple/TupleDescriptionComplex.h"
 
 QuantityContainerSerialiser::QuantityContainerSerialiser(const std::string& _collectionName, ResultImportLogger& _logger)
 	:m_dataStorageAccess(_collectionName), m_logger(_logger)
@@ -84,7 +84,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	std::vector<ot::Variable>::const_iterator dataValueItt(dataValues.begin());
 
 	auto quantityMetadata = _quantityDescription->getMetadataQuantity();
-	assert(quantityMetadata.m_tupleDescription->getName() == ""); //Curves should not have a tuple description, as they only have one value per quantity. 
+	assert(quantityMetadata.m_tupleDescription.isSingle()); //Curves should not have a tuple description, as they only have one value per quantity. 
 	
 	ot::UID quantityID = quantityMetadata.quantityIndex;
 
@@ -141,9 +141,10 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	std::vector<ot::Variable>::const_iterator realValueItt(realValues.begin()), imagValueItt(imagValues.begin());
 	
 	auto quantityMetadata =	_quantityDescription->getMetadataQuantity();
-	TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(quantityMetadata.m_tupleDescription.get());
-	assert(complexTupleDescription != nullptr);
 	
+	TupleDescriptionComplex complexTupleDescription;
+	assert(quantityMetadata.m_tupleDescription.getTupleTypeName() == complexTupleDescription.getName());
+		
 	m_bucketSize = 1;
 
 	const size_t numberOfDocuments = _numberOfParameterValues * 2;
@@ -196,8 +197,10 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	auto& quantityMetadata = _quantityDescription->getMetadataQuantity();
 	const uint32_t numberOfPorts = quantityMetadata.dataDimensions.front();
 	m_bucketSize = numberOfPorts * numberOfPorts;
-	TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(quantityMetadata.m_tupleDescription.get());
-	assert(complexTupleDescription != nullptr);
+
+	TupleDescriptionComplex complexTupleDescription;
+	assert(quantityMetadata.m_tupleDescription.getTupleTypeName() == complexTupleDescription.getName());
+
 	const size_t numberOfDocuments = _numberOfParameterValues * 2;
 	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
 	for (size_t i = 0; i < _numberOfParameterValues; i++)

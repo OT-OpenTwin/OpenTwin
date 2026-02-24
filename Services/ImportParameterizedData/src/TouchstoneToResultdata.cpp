@@ -32,7 +32,6 @@
 #include "OTResultDataAccess/SerialisationInterfaces/ParameterDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
-#include "OTResultDataAccess/SerialisationInterfaces/TupleDescriptionComplex.h"
 
 #include "OptionsParameterHandlerFormat.h"
 #include "OptionsParameterHandlerFrequency.h"

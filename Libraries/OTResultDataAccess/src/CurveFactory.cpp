@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: CurveFactory.cpp
 // 
 // License:
@@ -22,7 +22,9 @@
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTResultDataAccess/CurveFactory.h"
 #include "OTResultDataAccess/QuantityContainer.h"
-#include "OTResultDataAccess/SerialisationInterfaces/TupleDescription.h"	
+#include "OTCore/Tuple/TupleDescription.h"	
+#include "OTCore/Tuple/TupleFactory.h"
+#include "OTCore/Tuple/TupleDescriptionSingle.h"
 
 void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg& _config)
 {
@@ -66,35 +68,17 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 	
 	auto& tupleDescription = selectedQuantity->m_tupleDescription;
 	int tupleIndex = 0;
-	
-	if (!_quantityValueDescriptionNameOnYAxis.empty())
-	{
-		for (auto& tupleElementName : tupleDescription->getTupleElementNames())
-		{
-			if (tupleElementName == _quantityValueDescriptionNameOnYAxis)
-			{
-				break;
-			}
-			else
-			{
-				tupleIndex++;
-				if (tupleIndex >= tupleDescription->getTupleElementNames().size())
-				{
-					throw std::invalid_argument("Creating a curve failed to extract the y-axis information. The provided value description name does not match any of the value descriptions of the quantity.");
-				}
-			}	
-		}
-	}
-		
+			
 	queryInformation.m_query = createQuery(_series.getSeriesIndex(), selectedQuantity->quantityIndex);
-
+	
 	ot::QuantityContainerEntryDescription quantityInformation;
 	quantityInformation.m_fieldName = QuantityContainer::getFieldName();
 	quantityInformation.m_label = selectedQuantity->quantityName;
-	quantityInformation.m_unit = tupleDescription->getUnits()[tupleIndex];
-	quantityInformation.m_dataType = tupleDescription->getDataType();
 	quantityInformation.m_dimension = selectedQuantity->dataDimensions;
+	quantityInformation.m_tupleInstance = tupleDescription;
 	queryInformation.m_quantityDescription = quantityInformation;
+
+
 
 	const std::list<MetadataParameter>& parameters = _series.getParameter();
 	auto& dependingParameter = selectedQuantity->dependingParameterIds;
@@ -104,9 +88,10 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 		{
 			ot::QuantityContainerEntryDescription qcDescription;
 			qcDescription.m_label = parameter.parameterLabel;
-			qcDescription.m_dataType = parameter.typeName;
 			qcDescription.m_fieldName = std::to_string(parameter.parameterUID);
-			qcDescription.m_unit = parameter.unit;
+			auto tupleInstance = TupleDescriptionSingle::createInstance(parameter.unit, parameter.typeName);
+			qcDescription.m_tupleInstance = tupleInstance;
+			
 			if (!_defaultParameterForXAxis.empty() && _defaultParameterForXAxis == parameter.parameterName)
 			{
 				queryInformation.m_parameterDescriptions.push_front(qcDescription);

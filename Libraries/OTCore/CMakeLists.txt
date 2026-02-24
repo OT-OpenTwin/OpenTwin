@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.20)
 
 project(OTCore LANGUAGES CXX)
 
@@ -205,6 +205,12 @@ set(OTCORE_HEADER_FILES
     include/OTCore/VariableToBSONStringConverter.h
     include/OTCore/VariableToJSONConverter.h
     include/OTCore/VariableToStringConverter.h
+    include/OTCore/Units/SI.h
+    include/OTCore/Tuple/TupleDescription.h
+    include/OTCore/Tuple/TupleDescriptionComplex.h
+    include/OTCore/Tuple/TupleDescriptionSingle.h
+    include/OTCore/Tuple/TupleFactory.h
+    include/OTCore/Tuple/TupleInstance.h
 )
 
 set(OTCORE_SOURCE_FILES
@@ -267,6 +273,11 @@ set(OTCORE_SOURCE_FILES
     src/VariableToJSONConverter.cpp
     src/VariableToStringConverter.cpp
     src/TimeFormatter.cpp
+    src/TupleDescription.cpp
+    src/TupleDescriptionComplex.cpp
+    src/TupleDescriptionSingle.cpp
+    src/TupleInstance.cpp
+
 )
 
 # Third-party source (base64.c)

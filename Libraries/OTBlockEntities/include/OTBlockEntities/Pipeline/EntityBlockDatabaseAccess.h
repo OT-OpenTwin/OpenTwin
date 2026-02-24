@@ -53,6 +53,7 @@ public:
 	
 	EntityPropertiesSelection* getTupleFormatSelection();
 	EntityPropertiesSelection* getTupleTargetSelection();
+	EntityPropertiesSelection* getTupleUnitSelection();
 
 	int32_t getSelectedNumberOfQueries();
 
@@ -92,6 +93,8 @@ private:
 	const std::string m_propertyName = "Name";
 	const std::string m_propertyTupleFormat = "Format";
 	const std::string m_propertyTupleTarget = "Target";
+	const std::string m_propertyTupleUnit = "Units";
+	
 	const std::string m_propertyDataType = "Data type";
 	const std::string m_propertyComparator = "Comparator";
 	const std::string m_propertyValue = "Value";

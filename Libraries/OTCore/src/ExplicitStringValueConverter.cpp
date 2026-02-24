@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ExplicitStringValueConverter.cpp
 // 
 // License:
@@ -18,6 +18,8 @@
 // @otlicense-end
 
 #include "OTCore/ExplicitStringValueConverter.h"
+#include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
+#include "OTCore/String.h"
 
 ot::Variable ot::ExplicitStringValueConverter::setValueFromString(const std::string& _valueString, const std::string& _valueType)
 {
