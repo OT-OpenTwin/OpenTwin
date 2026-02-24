@@ -56,7 +56,9 @@ TupleInstance TupleDescriptionComplex::createInstance(ot::ComplexNumberFormat _f
 bool TupleDescriptionComplex::validateUnitsForFormat(const std::vector<std::string>& _units, const ot::ComplexNumberFormat& _format) const
 {
 	const std::string combinedUnitsString = createCombinedUnitsString(_units);
-	return m_unitCombinationsByFormatName.find(combinedUnitsString) != m_unitCombinationsByFormatName.end();
+	const auto& options = m_unitCombinationsByFormatName.find(ot::ComplexNumbers::getFormatString(_format))->second;
+	bool valid = std::find(options.begin(), options.end(), combinedUnitsString) != options.end();
+	return valid;
 }
 
 bool TupleDescriptionComplex::validateDataTypesForFormat(const std::vector<std::string>& _dataTypes, const ot::ComplexNumberFormat& _format) const

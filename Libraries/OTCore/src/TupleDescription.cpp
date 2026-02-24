@@ -19,6 +19,10 @@ std::string TupleDescription::createCombinedUnitsString(const std::vector<std::s
 		{
 			combinedUnitsString += "\"\"";
 		}
+		else
+		{
+			combinedUnitsString += unit;
+		}
 		combinedUnitsString += ",";
 	}
 	if(!combinedUnitsString.empty())

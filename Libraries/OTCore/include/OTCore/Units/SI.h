@@ -19,7 +19,7 @@ namespace ot
 		namespace Derived
 		{
 			static const std::string getRadianUnit() { return "rad"; }
-			static const std::string getDegreeUnit() { return "°"; } //Note: The degree symbol is not an official SI unit, but it is commonly used for angles.
+			static const std::string getDegreeUnit() { return u8"°"; } //Note: The degree symbol is not an official SI unit, but it is commonly used for angles.
 			static const std::string getSteradianUnit() { return "sr"; }
 			static const std::string getHertzUnit() { return "Hz"; }
 			static const std::string getNewtonUnit() { return "N"; }
