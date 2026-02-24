@@ -941,14 +941,14 @@ void Application::handleModelDialogConfirmed(ot::JsonDocument& _document) {
 	m_libraryManagementWrapper.createModelTextEntity(modelInfo, folder, elementType, selectedModel);
 
 	// Now update the property according to the dialog (confirm or cancel)
-	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, folder + "/" + selectedModel);
+	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, folder, selectedModel);
 }
 
 void Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
 	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
 
 	// Now update the property according to the dialog (confirm or cancel)
-	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, "");
+	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, "", "");
 }
 
 // ##################################################################################################################################################################################################################

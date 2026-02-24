@@ -36,7 +36,7 @@ public:
 	std::string getCircuitModel(std::string _modelName);
 	std::string requestCreateConfig(const ot::JsonDocument& _doc);
 	void createModelTextEntity(const std::string& _modelInfo, const std::string& _folder, const std::string& _elementType, const std::string& _modelName);
-	void updatePropertyOfEntity(ot::UID _entityID, bool _dialogConfirmed,const std::string& _propertyValue);
+	void updatePropertyOfEntity(ot::UID _entityID, bool _dialogConfirmed, const std::string& _folder, const std::string& _modelName);
 private:
 
 	ot::UIDList m_entityIDsTopo;

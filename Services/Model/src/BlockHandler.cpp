@@ -947,16 +947,6 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 		pythonBlock->setManifestFolder(manifestFolder->getEntityID());
 	}
 
-	//Special handling for circuit blocks
-	EntityBlockCircuitElement* circuitElement = dynamic_cast<EntityBlockCircuitElement*>(blockEnt.get());
-	if (blockEnt->getClassName() == "EntityBlockCircuitElement") {
-		EntityBase* circuitModelFolder = model->findEntityFromName(ot::FolderNames::CircuitModelsFolder + "/" + circuitElement->getFolderName());
-		if(circuitModelFolder == nullptr) {
-			OT_LOG_E("Circuit model folder not found");
-			return nullptr;
-		}
-		circuitElement->setCircuitModelFolder(circuitModelFolder->getEntityID());
-	}
 
 	// Store block entity
 	blockEnt->storeToDataBase();

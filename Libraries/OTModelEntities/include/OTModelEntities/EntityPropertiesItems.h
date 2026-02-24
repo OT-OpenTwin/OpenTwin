@@ -574,13 +574,17 @@ public:
     virtual eType getType() const override { return EXTENDEDENTITYLIST; };
     virtual std::string getTypeString() const override { return EntityPropertiesExtendedEntityList::typeString(); };
 
-	// Prefix options management
+	//! \brief Prefix options management.
+	//! Prefix options are displayed at the beginning of the dropdown list.
+	//! They do NOT correspond to actual entities in the container.
 	void clearPrefixOptions();
 	void addPrefixOption(const std::string& option);
 	void setPrefixOptions(const std::vector<std::string>& options);
 	const std::vector<std::string>& getPrefixOptions() const;
 
-	// Suffix options management
+	//! \brief Suffix options management.
+	//! Suffix options are displayed at the end of the dropdown list.
+	//! They do NOT correspond to actual entities in the container.
 	void clearSuffixOptions();
 	void addSuffixOption(const std::string& option);
 	void setSuffixOptions(const std::vector<std::string>& options);

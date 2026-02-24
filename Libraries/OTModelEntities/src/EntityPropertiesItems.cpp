@@ -1511,6 +1511,15 @@ bool EntityPropertiesExtendedEntityList::isCompatible(EntityPropertiesBase* othe
 }
 
 void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property* _property, EntityBase* root) {		
+
+	// 1. Load prefix/suffix options from JSON
+	// 2. Load entity data (Container/Value Name and ID)
+	// 3. Set the new ValueName from UI input
+	// 4. Check if the new value is a prefix/suffix option
+	//    - If YES: Set ValueID to invalidUID (no entity exists)
+	//    - If NO: Call updateValueAndContainer() to sync name/ID
+	
+
 	std::string oldValueName = getValueName();
 
 	EntityPropertiesBase::setFromConfiguration(_property, root);
@@ -1519,21 +1528,6 @@ void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property
 	if(!actualProperty) {
 		OT_LOG_E("Property cast failed");
 		return;
-	}
-
-	std::string entityData = actualProperty->getAdditionalPropertyData("EntityData");
-	if (!entityData.empty()) {
-		ot::JsonDocument dataDoc;
-		dataDoc.fromJson(entityData);
-
-		this->setEntityContainerName(ot::json::getString(dataDoc, "ContainerName"));
-		this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
-		this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
-	}
-
-	std::string currentValueFromUI = actualProperty->getCurrent();
-	if (!currentValueFromUI.empty()) {
-		this->setValueName(currentValueFromUI);
 	}
 
 	//Prefix options
@@ -1562,9 +1556,56 @@ void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property
 			}
 		}
 	}
+
+	std::string entityData = actualProperty->getAdditionalPropertyData("EntityData");
+	if (!entityData.empty()) {
+		ot::JsonDocument dataDoc;
+		dataDoc.fromJson(entityData);
+
+		this->setEntityContainerName(ot::json::getString(dataDoc, "ContainerName"));
+		this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
+		this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
+	}
+
+	
+	this->setValueName(actualProperty->getCurrent());
+	
+
+	bool isPrefixOrSuffix = false;
+	for (const auto& prefixOption : m_prefixOptions) {
+		if (getValueName() == prefixOption) {
+			isPrefixOrSuffix = true;
+			break;
+		}
+	}
+
+	for (const auto& suffixOption : m_suffixOptions) {
+		if (getValueName() == suffixOption) {
+			isPrefixOrSuffix = true;
+			break;
+		}
+	}
+
+	if (isPrefixOrSuffix) {
+		this->setValueID(ot::invalidUID);
+	}
+
+	//Update valueID and containerID
+	if (root && !isPrefixOrSuffix) {
+		std::list<std::string> opt;
+		this->updateValueAndContainer(root, opt);
+	}
+
+	
 }
 
 void EntityPropertiesExtendedEntityList::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root) {
+	// Creates a dropdown list with the following structure:
+	// 1. All prefix options
+	// 2. All direct children of the container entity
+	// 3. All suffix options 
+	// Note: Does NOT call updateValueAndContainer() to avoid overwriting the current ValueName if it's a prefix/suffix option.
+
 	std::list<std::string> opt;
 
 	for (const auto& prefixOption : m_prefixOptions) {

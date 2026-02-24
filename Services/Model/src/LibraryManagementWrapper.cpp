@@ -253,15 +253,19 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 	addModelToEntites();
 }
 
-void LibraryManagementWrapper::updatePropertyOfEntity(ot::UID _entityID, bool _dialogConfirmed, const std::string& _propertyValue) {
+void LibraryManagementWrapper::updatePropertyOfEntity(ot::UID _entityID, bool _dialogConfirmed, const std::string& _folder, const std::string& _modelName) {
 	Model* model = Application::instance()->getModel();
 	auto entBase = model->getEntityByID(_entityID);
 
 	auto basePropertyModel = entBase->getProperties().getProperty("ModelSelection");
 	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
 
-	if (_dialogConfirmed) {
-		modelProperty->setValueName(_propertyValue);
+	EntityBase* circuitModelEntity = model->findEntityFromName(_folder + "/" + _modelName);
+	EntityBase* circuitModelFolderEntity = model->findEntityFromName(_folder);
+	if (_dialogConfirmed && circuitModelEntity && circuitModelFolderEntity) {
+		modelProperty->setValueName(_folder + "/" + _modelName);
+		modelProperty->setValueID(circuitModelEntity->getEntityID());
+		modelProperty->setEntityContainerID(circuitModelFolderEntity->getEntityID());
 	}
 	else {
 		modelProperty->setValueName("");
