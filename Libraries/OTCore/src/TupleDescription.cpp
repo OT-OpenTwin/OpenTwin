@@ -15,7 +15,7 @@ std::string TupleDescription::createCombinedUnitsString(const std::vector<std::s
 	std::string combinedUnitsString;
 	for(const std::string& unit : _units)
 	{
-		if(_units.empty())
+		if(unit.empty())
 		{
 			combinedUnitsString += "\"\"";
 		}

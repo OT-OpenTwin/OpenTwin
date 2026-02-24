@@ -209,9 +209,8 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 								}
 								quantity.m_tupleDescription.setTupleUnits(unitsAsString);
 							}
-							else if (fieldEntry->getEntryName() == m_dataTypeNameField)
+							else if (arrayEntry->getEntryName() == m_dataTypeNameField)
 							{
-								assert(fieldEntry->getValue().isConstCharPtr());
 								auto& dataTypes = arrayEntry->getValues();
 								std::vector<std::string> dataTypeAsString;
 								for (ot::Variable dataType : dataTypes)

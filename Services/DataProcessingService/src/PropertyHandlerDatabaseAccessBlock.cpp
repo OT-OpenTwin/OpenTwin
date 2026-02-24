@@ -225,9 +225,11 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 			if (!tupleInstance.isSingle())
 			{
 				TupleDescription* tupleDescription = TupleFactory::create(tupleInstance.getTupleTypeName());
-				auto allElements =	tupleDescription->getTupleElementNames(tupleInstance.getTupleFormatName());
+				auto tupleFormatSelection =	_dbAccessEntity->getTupleFormatSelection();
+
+				auto allElements =	tupleDescription->getTupleElementNames(tupleFormatSelection->getValue());
+				allElements.insert(allElements.begin(), tupleDescription->getName());
 				//Reset the query target if necessary
-				allElements.push_back(tupleDescription->getName());
 								
 				auto tupleTargetSelection =  _dbAccessEntity->getTupleTargetSelection();
 				if (tupleTargetSelection->getOptions() != allElements || !tupleTargetSelection->getVisible())
@@ -240,9 +242,7 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 				}
 				
 				//Reset the query format if necessary
-				auto tupleFormatSelection =	_dbAccessEntity->getTupleFormatSelection();
 				const std::vector<std::string>& queryFormats = tupleDescription->getAllTupleFormatNames();
-				
 				if (queryFormats != tupleFormatSelection->getOptions() || !tupleFormatSelection->getVisible())
 				{
 					EntityPropertiesSelection* newFormatSelection = dynamic_cast<EntityPropertiesSelection*>(tupleFormatSelection->createCopy());
@@ -253,7 +253,8 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 				}
 
 				auto tupleUnitSelection = _dbAccessEntity->getTupleUnitSelection();
-				const std::vector<std::string>& tupleUnits =	tupleInstance.getTupleUnits();
+				const std::vector<std::string>& tupleUnits = tupleDescription->getUnitCombinations(tupleFormatSelection->getValue());
+					
 				if (tupleUnits != tupleUnitSelection->getOptions() || !tupleUnitSelection->getVisible())
 				{
 					EntityPropertiesSelection* newUnitSelection = dynamic_cast<EntityPropertiesSelection*>(tupleUnitSelection->createCopy());
