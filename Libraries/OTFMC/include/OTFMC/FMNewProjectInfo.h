@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTFMC/FMCTypes.h"
-#include "OTFMC/FMIgnoreFile.h"
+#include "OTSystem/IgnoreRules.h"
 
 namespace ot {
 
@@ -38,14 +38,14 @@ namespace ot {
 		void setReplaceIgnoreFile(bool _replaceIgnoreFile) { m_replaceIgnoreFile = _replaceIgnoreFile; };
 		bool getReplaceIgnoreFile() const { return m_replaceIgnoreFile; };
 
-		void setIgnoreFile(const FMIgnoreFile& _ignoreFile) { m_ignoreFile = _ignoreFile; };
-		void setIgnoreFile(FMIgnoreFile&& _ignoreFile) { m_ignoreFile = std::move(_ignoreFile); };
-		const FMIgnoreFile& getIgnoreFile() const { return m_ignoreFile; };
+		void setIgnoreRules(const IgnoreRules& _ignoreRules) { m_ignoreRules = _ignoreRules; };
+		void setIgnoreRules(IgnoreRules&& _ignoreRules) { m_ignoreRules = std::move(_ignoreRules); };
+		const IgnoreRules& getIgnoreRules() const { return m_ignoreRules; };
 
 	private:
 		bool m_replaceIgnoreFile = false;
 		std::string m_rootDirectory;
-		FMIgnoreFile m_ignoreFile;
+		IgnoreRules m_ignoreRules;
 		
 	};
 

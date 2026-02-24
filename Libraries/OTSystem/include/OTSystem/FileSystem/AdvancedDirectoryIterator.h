@@ -36,6 +36,8 @@ namespace ot {
 		AdvancedDirectoryIterator& operator=(const AdvancedDirectoryIterator&) = delete;
 		AdvancedDirectoryIterator& operator=(AdvancedDirectoryIterator&&) noexcept = delete;
 
+		virtual DirectoryIterator* createNew() const override;
+
 	protected:
 		virtual bool checkEntrySkipped(const std::filesystem::directory_entry& _entry) const override;
 

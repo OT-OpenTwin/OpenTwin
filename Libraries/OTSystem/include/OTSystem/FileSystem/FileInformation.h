@@ -37,7 +37,7 @@ namespace ot {
 			Symlink
 		};
 
-		FileInformation() = delete;
+		FileInformation();
 		FileInformation(const FileInformation&) = default;
 		FileInformation(FileInformation&&) noexcept = default;
 		FileInformation(const std::filesystem::path& _path);
@@ -51,6 +51,7 @@ namespace ot {
 		void operator=(std::filesystem::path&& _path);
 		void operator=(const std::filesystem::directory_entry& _entry);
 
+		bool isValid() const { return m_type != FileType::Unknown && !m_path.empty(); };
 		bool exists() const;
 		
 		FileType getType() const { return m_type; };

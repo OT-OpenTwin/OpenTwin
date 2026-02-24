@@ -28,17 +28,17 @@ ot::AdvancedDirectoryIterator::AdvancedDirectoryIterator(const std::filesystem::
 	: DirectoryIterator(_path, _browseMode), m_ignoreRules(std::move(_ignoreRules))
 {}
 
+ot::DirectoryIterator* ot::AdvancedDirectoryIterator::createNew() const {
+	return new AdvancedDirectoryIterator(getRootPath(), getBrowseMode(), m_ignoreRules);
+}
+
 bool ot::AdvancedDirectoryIterator::checkEntrySkipped(const std::filesystem::directory_entry& _entry) const {
 	const bool isDir = _entry.is_directory();
 
-    if (isDir) {
-        if (m_ignoreRules.matches(_entry.path(), true)) {
-            return true;
-        }
-    }
-    else if (m_ignoreRules.matches(_entry.path(), isDir)) {
+    if (m_ignoreRules.matches(_entry.path(), isDir)) {
         return true;
     }
-
-    return false;
+	else {
+		return false;
+	}
 }

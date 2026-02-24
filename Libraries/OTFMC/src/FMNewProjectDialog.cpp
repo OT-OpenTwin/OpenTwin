@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTSystem/FileSystem/AdvancedDirectoryIterator.h"
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTFMC/FMDirectory.h"
 #include "OTFMC/FMNewProjectDialog.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/ComboBox.h"
@@ -101,9 +101,8 @@ ot::FMNewProjectInfo ot::FMNewProjectDialog::getNewProjectInfo() const {
 	info.setRootDirectory(m_directory->getPath().toStdString());
 	info.setReplaceIgnoreFile(m_replaceIgnoreFile);
 
-	FMIgnoreFile ignoreFile;
-	ignoreFile.parseFromText(m_ignoreText->toPlainText().toStdString());
-	info.setIgnoreFile(std::move(ignoreFile));
+	IgnoreRules ignore = IgnoreRules::parseFromText(m_ignoreText->toPlainText().toStdString());
+	info.setIgnoreRules(std::move(ignore));
 
 	return info;
 }
@@ -133,23 +132,12 @@ void ot::FMNewProjectDialog::slotConfirm() {
 	}
 	
 	// Check ignore patterns
-	FMIgnoreFile ignoreFile;
-	if (!ignoreFile.parseFromText(m_ignoreText->toPlainText().toStdString())) {
-		MessageDialogCfg cfg;
-		cfg.setButtons(MessageDialogCfg::Yes | MessageDialogCfg::Cancel);
-		cfg.setIcon(MessageDialogCfg::Warning);
-		cfg.setTitle("Invalid Ignore Patterns");
-		cfg.setText("Some ignore patterns could not be parsed correctly. "
-			"Do you want to proceed anyway?");
-		if (MessageDialog::showDialog(cfg, this) != MessageDialogCfg::Yes) {
-			return;
-		}
-	}
+	IgnoreRules ignoreRules = IgnoreRules::parseFromText(m_ignoreText->toPlainText().toStdString());
 
 	// Check for existing project
-	FMDirectory root = FMDirectory::fromFileSystem(pth.toStdString(), FMIgnoreFile(), FMDirectory::ScanFlag::ScanDirectories);
-	auto cacheDir = root.getChildDirectory(pth.toStdString() + "/" + OpenTwinCacheFolderName, FMDirectory::TopLevelOnly);
-	if (cacheDir) {
+	auto existingCacheFile = DirectoryIterator::findFile(pth.toStdString(), OpenTwinCacheInfoFileName, false);
+
+	if (existingCacheFile.isValid()) {
 		MessageDialogCfg cfg;
 		cfg.setButtons(MessageDialogCfg::Ok);
 		cfg.setIcon(MessageDialogCfg::Warning);
@@ -162,9 +150,9 @@ void ot::FMNewProjectDialog::slotConfirm() {
 	}
 
 	// Check for existing ignore file
-	auto ignoreFileInfo = root.getFile(OpenTwinIgnoreFileName, FMDirectory::TopLevelOnly);
-	if (ignoreFileInfo.has_value()) {
-		if (!ignoreFile.hasPatterns()) {
+	auto existingIgnoreFile = DirectoryIterator::findFile(pth.toStdString(), OpenTwinIgnoreFileName, true);
+	if (existingIgnoreFile.isValid()) {
+		if (!ignoreRules.isEmpty()) {
 			// No ignore patterns provided, no need to replace existing ignore file
 			m_replaceIgnoreFile = false;
 		}

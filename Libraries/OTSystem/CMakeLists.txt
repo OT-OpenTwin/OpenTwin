@@ -16,6 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(OTSYSTEM_HEADER_FILES
     include/OTSystem/FileSystem/AdvancedDirectoryIterator.h
     include/OTSystem/FileSystem/DirectoryIterator.h
+    include/OTSystem/FileSystem/DirectoryIterator.hpp
     include/OTSystem/FileSystem/FileInformation.h
     include/OTSystem/FileSystem/FileSystem.h
     include/OTSystem/SingleSignOn/SingleSignOn_Client.h

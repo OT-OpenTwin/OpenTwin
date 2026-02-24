@@ -20,7 +20,10 @@
 // OpenTwin header
 #include "OTSystem/FileSystem/FileInformation.h"
 
-ot::FileInformation::FileInformation(const std::filesystem::path& _path) 
+ot::FileInformation::FileInformation() : m_type(Unknown) {
+}
+
+ot::FileInformation::FileInformation(const std::filesystem::path& _path)
 	: m_type(FileType::Unknown)
 {
 	std::filesystem::path pathCopy = _path;

@@ -22,12 +22,16 @@
 #include "OTSystem/FileSystem/DirectoryIterator.h"
 
 ot::DirectoryIterator::DirectoryIterator(const std::filesystem::path& _path, const BrowseMode& _browseMode)
-	: m_mode(_browseMode), m_end()
+	: m_rootPath(_path), m_mode(_browseMode), m_end(), m_current()
 {
-	std::filesystem::directory_iterator it = std::filesystem::directory_iterator(_path);
+	std::filesystem::directory_iterator it = std::filesystem::directory_iterator(m_rootPath);
 	if (it != m_end) {
 		m_stack.push(std::move(it));
 	}
+}
+
+ot::DirectoryIterator* ot::DirectoryIterator::createNew() const {
+	return new DirectoryIterator(m_rootPath, m_mode);
 }
 
 bool ot::DirectoryIterator::hasNext() {
@@ -42,6 +46,191 @@ ot::FileInformation ot::DirectoryIterator::next() {
 	FileInformation result(m_current);
 	m_current = std::filesystem::directory_entry{}; // invalidate cache
 	return result;
+}
+
+void ot::DirectoryIterator::reset(const std::filesystem::path& _path, const BrowseMode& _browseMode) {
+	m_rootPath = _path;
+	m_mode = _browseMode;
+
+	m_stack = std::stack<std::filesystem::directory_iterator>();
+	m_current = std::filesystem::directory_entry{};
+	
+	std::filesystem::directory_iterator it = std::filesystem::directory_iterator(m_rootPath);
+	if (it != m_end) {
+		m_stack.push(std::move(it));
+	}
+}
+
+ot::FileInformation ot::DirectoryIterator::findFile(const std::string& _fileName) {
+	intern::ValueRAIIDepr<BrowseMode> mode(m_mode, m_mode.has(Subdirectories) ? AllFiles : Files);
+
+	std::unique_ptr<DirectoryIterator> it(createNew());
+	if (!it) {
+		throw Exception::NullPointer("Failed to create DirectoryIterator instance");
+	}
+
+	try {
+		while (it->hasNext()) {
+			const auto entry = it->next();
+			if (entry.isFile() && entry.getPath().filename() == _fileName) {
+				return FileInformation(entry.getPath());
+			}
+		}
+	}
+	catch (const std::exception& _e) {
+		//! @todo Log exception
+		OTAssert(0, "Log and not throw...");
+	}
+
+	return FileInformation();
+}
+
+ot::FileInformation ot::DirectoryIterator::findFile(const std::filesystem::path& _scanDirectoryPath, const std::string& _fileName, bool _topLevelOnly) {
+	DirectoryIterator it(_scanDirectoryPath, _topLevelOnly ? DirectoryIterator::Files : DirectoryIterator::AllFiles);
+	return it.findFile(_fileName);
+}
+
+bool ot::DirectoryIterator::hasFile(const std::string& _fileName) {
+	intern::ValueRAIIDepr<BrowseMode> mode(m_mode, m_mode.has(Subdirectories) ? AllFiles : Files);
+	
+	std::unique_ptr<DirectoryIterator> it(createNew());
+	if (!it) {
+		throw Exception::NullPointer("Failed to create DirectoryIterator instance");
+	}
+
+	try {
+		while (it->hasNext()) {
+			const auto entry = it->next();
+			if (entry.isFile() && entry.getPath().filename() == _fileName) {
+				return true;
+			}
+		}
+	}
+	catch (const std::exception& _e) {
+		//! @todo Log exception
+		OTAssert(0, "Log and not throw...");
+	}
+
+	return false;
+}
+
+bool ot::DirectoryIterator::hasFile(const std::filesystem::path& _scanDirectoryPath, const std::string& _fileName, bool _topLevelOnly) {
+	DirectoryIterator it(_scanDirectoryPath, _topLevelOnly ? DirectoryIterator::Files : DirectoryIterator::AllFiles);
+	return it.hasFile(_fileName);
+}
+
+bool ot::DirectoryIterator::hasDirectory(const std::string& _directoryName) {
+	intern::ValueRAIIDepr<BrowseMode> mode(m_mode, m_mode.has(Subdirectories) ? AllDirectories : Directories);
+	
+	std::unique_ptr<DirectoryIterator> it(createNew());
+	if (!it) {
+		throw Exception::NullPointer("Failed to create DirectoryIterator instance");
+	}
+	try {
+		while (it->hasNext()) {
+			const auto entry = it->next();
+			if (entry.isDirectory() && entry.getPath().filename() == _directoryName) {
+				return true;
+			}
+		}
+	}
+	catch (const std::exception& _e) {
+		//! @todo Log exception
+		OTAssert(0, "Log and not throw...");
+	}
+	return false;
+}
+
+bool ot::DirectoryIterator::hasDirectory(const std::filesystem::path& _scanDirectoryPath, const std::string& _directoryName, bool _topLevelOnly) {
+	DirectoryIterator it(_scanDirectoryPath, _topLevelOnly ? DirectoryIterator::Directories : DirectoryIterator::AllDirectories);
+	return it.hasDirectory(_directoryName);
+}
+
+std::list<ot::FileInformation> ot::DirectoryIterator::getInfos() {
+	OTAssert(!m_rootPath.empty(), "Scan directory path must not be empty");
+
+	std::list<FileInformation> result;
+
+	std::unique_ptr<DirectoryIterator> it(createNew());
+	if (!it) {
+		throw Exception::NullPointer("Failed to create DirectoryIterator instance");
+	}
+
+	try {
+		while (it->hasNext()) {
+			result.push_back(it->next());
+		}
+	}
+	catch (const std::exception& _e) {
+		//! @todo Log exception
+		OTAssert(0, "Log and not throw...");
+	}
+
+	return result;
+}
+
+std::list<ot::FileInformation> ot::DirectoryIterator::getInfos(const std::filesystem::path& _scanDirectoryPath, const BrowseMode& _browseMode) {
+	DirectoryIterator it(_scanDirectoryPath, _browseMode);
+	return it.getInfos();
+}
+
+std::list<std::filesystem::path> ot::DirectoryIterator::getPaths() {
+	OTAssert(!m_rootPath.empty(), "Scan directory path must not be empty");
+
+	std::list<std::filesystem::path> result;
+
+	std::unique_ptr<DirectoryIterator> it(createNew());
+	if (!it) {
+		throw Exception::NullPointer("Failed to create DirectoryIterator instance");
+	}
+
+	try {
+		while (it->hasNext()) {
+			result.push_back(it->next().getPath());
+		}
+	}
+	catch (const std::exception& _e) {
+		//! @todo Log exception
+		OTAssert(0, "Log and not throw...");
+	}
+
+	return result;
+}
+
+std::list<std::filesystem::path> ot::DirectoryIterator::getPaths(const std::filesystem::path& _scanDirectoryPath, const BrowseMode& _browseMode) {
+	DirectoryIterator it(_scanDirectoryPath, _browseMode);
+	return it.getPaths();
+}
+
+std::list<std::filesystem::path> ot::DirectoryIterator::getRelativePaths() {
+	OTAssert(!m_rootPath.empty(), "Scan directory path must not be empty");
+
+	std::list<std::filesystem::path> result;
+
+	std::unique_ptr<DirectoryIterator> it(createNew());
+	if (!it) {
+		throw Exception::NullPointer("Failed to create DirectoryIterator instance");
+	}
+
+	try {
+		while (it->hasNext()) {
+			const auto entry = it->next();
+			const auto& path = entry.getPath();
+
+			result.push_back(path.lexically_relative(m_rootPath));
+		}
+	}
+	catch (const std::exception& _e) {
+		//! @todo Log exception
+		OTAssert(0, "Log and not throw...");
+	}
+
+	return result;
+}
+
+std::list<std::filesystem::path> ot::DirectoryIterator::getRelativePaths(const std::filesystem::path& _scanDirectoryPath, const BrowseMode& _browseMode) {
+	DirectoryIterator it(_scanDirectoryPath, _browseMode);
+	return it.getRelativePaths();
 }
 
 bool ot::DirectoryIterator::advance() {

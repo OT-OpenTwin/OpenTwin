@@ -10,12 +10,6 @@
     <ClCompile Include="src\FMConnectorAPI.cpp">
       <Filter>src\Management</Filter>
     </ClCompile>
-    <ClCompile Include="src\FMDirectory.cpp">
-      <Filter>src\Management</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FMIgnoreFile.cpp">
-      <Filter>src\Management</Filter>
-    </ClCompile>
     <ClCompile Include="src\FMNewProjectDialog.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
@@ -59,13 +53,7 @@
     <ClInclude Include="include\OTFMC\FMConnectorAPIExport.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTFMC\FMDirectory.h">
-      <Filter>include\Management</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTFMC\FMNewProjectInfo.h">
-      <Filter>include\Management</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTFMC\FMIgnoreFile.h">
       <Filter>include\Management</Filter>
     </ClInclude>
     <ClInclude Include="include\OTFMC\FMNewProjectDialog.h">

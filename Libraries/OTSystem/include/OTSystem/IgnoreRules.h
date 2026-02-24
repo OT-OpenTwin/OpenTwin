@@ -67,6 +67,8 @@ namespace ot {
         IgnoreRules& operator=(const IgnoreRules&) = default;
         IgnoreRules& operator=(IgnoreRules&&) noexcept = default;
 
+		bool isEmpty() const { return m_rules.empty(); };
+
         bool matches(const std::filesystem::path& _path, bool _isDir) const;
         bool matchRule(const Rule& _rule, const std::vector<std::string_view>& _pathSegments) const;
         bool matchFrom(size_t _pathIndex, const Rule& _rule, const std::vector<std::string_view>& _pathSegments) const;

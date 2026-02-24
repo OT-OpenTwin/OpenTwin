@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/FileSystem/FileInformation.h"
 #include "OTFMC/FMCTypes.h"
-#include "OTFMC/FMDirectory.h"
 #include "OTModelEntities/NewModelStateInfo.h"
 
 namespace ot {
@@ -30,14 +30,11 @@ namespace ot {
 		OT_DECL_NOCOPY(FMCache)
 		OT_DECL_DEFMOVE(FMCache)
 	public:
-		enum UpdateFlag : uint64_t {
-			None           = 0 << 0, //! @brief No update flags.
-			ShowProgress   = 1 << 0, //! @brief Show progress during the update.
-			WriteOutput    = 1 << 1, //! @brief Write output messages during the update.
-			UpdateDatabase = 1 << 2, //! @brief Write the changed files to the database.
-			WriteToDisk    = 1 << 3  //! @brief Write the cache to disk after updating.
+		struct StateInfo {
+			std::list<FileInformation> newFiles;
+			std::list<FileInformation> deletedFiles;
+			std::list<FileInformation> modifiedFiles;
 		};
-		typedef Flags<UpdateFlag> UpdateFlags;
 
 		FMCache() = default;
 		~FMCache() = default;
@@ -47,24 +44,12 @@ namespace ot {
 
 		void clear();
 
-		bool updateCache(const std::string& _rootPath, const UpdateFlags& _updateFlags);
-
-		const FMDirectory& getRootDirectory() const { return m_rootDirectory; };
-
 	private:
 		static const int c_currentCacheVersion = 1;
-
-		FMDirectory m_rootDirectory;
-
-		struct UpdateInfo {
-			std::list<FileInformation> newFiles;
-			std::list<FileInformation> deletedFiles;
-			std::list<FileInformation> modifiedFiles;
+		
+		struct FileEntry {
+			FileInformation fileInfo;
 		};
 
-		bool updateDirectory(FMDirectory& _cachedDir, const FMDirectory& _newDir, UpdateInfo& _resultInfo, const UpdateFlags& _updateFlags);
-		bool writeToDatabase(const UpdateInfo& _updateInfo);
 	};
 }
-
-OT_ADD_FLAG_FUNCTIONS(ot::FMCache::UpdateFlag, ot::FMCache::UpdateFlags)

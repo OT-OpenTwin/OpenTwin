@@ -109,37 +109,6 @@ bool ot::FileSystem::readFile(const std::string& _filePath, std::string& _output
     }
 }
 
-std::list<std::string> ot::FileSystem::getDirectories(const std::string& _path, const FileSystemOptions& _options) {
-	std::list<std::string> result;
-
-    if (_options & FileSystemOption::Recursive) {
-        for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(_path)) {
-            if (entry.is_directory()) {
-                if (_options & FileSystemOption::GenericFormat) {
-                    result.push_back(entry.path().generic_string());
-                }
-                else {
-                    result.push_back(entry.path().string());
-                }
-                
-            }
-        }
-    }
-    else {
-        for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(_path)) {
-            if (entry.is_directory()) {
-                if (_options & FileSystemOption::GenericFormat) {
-                    result.push_back(entry.path().generic_string());
-                }
-                else {
-                    result.push_back(entry.path().string());
-                }
-            }
-        }
-    }
-
-    return result;
-}
 ot::DateTime ot::FileSystem::getLastModifiedTime(const std::string& _path, bool _useLocalTime) {
     DateTime modifiedTime;
 #ifdef OT_OS_WINDOWS
@@ -299,43 +268,12 @@ ot::DateTime ot::FileSystem::getLastAccessTime(const std::string& _path, bool _u
     return accessTime;
 }
 
-std::list<std::string> ot::FileSystem::getFiles(const std::string& _path, const std::list<std::string>& _extensions, const FileSystemOptions& _options) {
-    std::list<std::string> result;
-
-    if (_options & FileSystemOption::Recursive) {
-        for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(_path)) {
-            if (entry.is_regular_file() && intern::matchesExtension(entry.path(), _extensions)) {
-                if (_options & FileSystemOption::GenericFormat) {
-                    result.push_back(entry.path().generic_string());
-                }
-                else {
-                    result.push_back(entry.path().string());
-                }
-            }
-        }
-    }
-    else {
-        for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(_path)) {
-            if (entry.is_regular_file() && intern::matchesExtension(entry.path(), _extensions)) {
-                if (_options & FileSystemOption::GenericFormat) {
-                    result.push_back(entry.path().generic_string());
-                }
-                else {
-                    result.push_back(entry.path().string());
-                }
-            }
-        }
-    }
-
-    return result;
-}
-
 std::list<std::string> ot::FileSystem::readLines(const std::string& _filePath, std::ifstream::iostate _exceptionMask) {
     std::list<std::string> lines;
     std::ifstream file(_filePath);
 
     if (!file.is_open()) {
-        throw Exception::FileOpen("Failed to open fil for reading: \"" + _filePath + "\"");
+        throw Exception::FileOpen("Failed to open file for reading: \"" + _filePath + "\"");
     }
 
     file.exceptions(_exceptionMask);
