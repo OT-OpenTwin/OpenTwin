@@ -35,8 +35,10 @@ public:
 
 private:
 	inline static const std::map<std::string, std::string> m_mongoDBComparators = { {"<","$lt"},{"<=","$lte"},{">=","$gte"},{">","$gt"},{"=","$eq"}, {"!=", "$ne"}, {ot::ComparisonSymbols::g_anyOneOfComparator,"$in"}, {ot::ComparisonSymbols::g_noneOfComparator,"$nin"} };
-	BsonViewOrValue buildRangeQuery(const ot::ValueComparisonDefinition& _definition);
+	const std::string m_listSplitToken = ",";
 	
+	BsonViewOrValue buildRangeQuery(const ot::ValueComparisonDefinition& _definition);
+	std::list<ot::Variable> getListOfValuesFromString(const std::string& _allValues, const std::vector<std::string>& _dataTypes);
 	std::list<ot::Variable> getVariableListFromValue(const ot::ValueComparisonDefinition& _definition);
 	
 	BsonViewOrValue createComparisionEqualNoneOf(const std::list<ot::Variable>& values);

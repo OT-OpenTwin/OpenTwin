@@ -74,72 +74,66 @@ BsonViewOrValue AdvancedQueryBuilder::createComparison(const ot::ValueComparison
 				TupleDescription* tupleDescription = TupleFactory::create(tupleInstanceQuery.getTupleTypeName());
 				TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(tupleDescription);
 				assert(complexTupleDescription != nullptr);
+				
+				const TupleInstance& tupleInstanceStorage = _valueComparison.getStoredTupleDescription();
+				std::list<ot::Variable> queryValues = getListOfValuesFromString(_valueComparison.getValue(), tupleInstanceQuery.getTupleElementDataTypes());
+
 				// Process: 
+				// 0) If formats match, don't transform
 				// 1) Transform query into the internal std::complex format. Base is the value string that was entered in the property.
 				// 2) Transform the complex value to match the storage format.
-
-				//1) Currently ignores the necessary dB backtransformation
-				const std::string potentialAngleUnit = tupleInstanceQuery.getTupleUnits().back();
-				std::complex<double> complexNumber = ot::ComplexNumberConversion::fromString(_valueComparison.getValue(), ot::ComplexNumbers::getFormatFromString(tupleInstanceQuery.getTupleFormatName()),potentialAngleUnit);
-				
-				//2)
-				const TupleInstance& tupleInstanceStorage = _valueComparison.getStoredTupleDescription();
-				const std::string storedFormat = tupleInstanceStorage.getTupleFormatName();
-				const std::vector<std::string>& tupleUnits = 	tupleInstanceStorage.getTupleUnits();
-
-				const std::string& targetElement = _valueComparison.getTupleTargetElement();
-				if (storedFormat == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar))
+				assert(queryValues.size() == 2);
+				std::vector<double> transformedQueryValues(2);
+				if (tupleInstanceQuery.getTupleFormatName() == tupleInstanceStorage.getTupleFormatName() && tupleInstanceQuery.getTupleUnits() == tupleInstanceStorage.getTupleUnits())
 				{
-					ot::ComplexNumberDefinition cplxPolarFormat = ot::ComplexNumberConversion::cartesianToPolar(complexNumber);
-					if (targetElement == tupleInstanceStorage.getTupleTypeName())
-					{
-						assert(comparator == "=");
-						comparison = GenerateFilterQuery(mongoComparator->second, { cplxPolarFormat.m_firstValue , cplxPolarFormat.m_secondValue});
-					}
-					else
-					{
-						auto tupleElementNames = complexTupleDescription->getTupleElementNames(tupleInstanceStorage.getTupleFormatName());
-						auto pos = std::find(tupleElementNames.begin(), tupleElementNames.end(), targetElement) - tupleElementNames.begin();
-						double value;
-						if (pos == 0)
-						{
-							value = cplxPolarFormat.m_firstValue;
-						}
-						else
-						{
-							value = cplxPolarFormat.m_secondValue;
-						}
-						BsonViewOrValue compareWithValue = GenerateFilterQuery(mongoComparator->second, value);
-						BsonViewOrValue equalIndex = GenerateFilterQuery(std::to_string(pos), compareWithValue.view());
-						comparison = GenerateFilterQuery("$elemMatch", equalIndex.view());
-					}
+					//0)
+					assert(queryValues.front().isDouble() && queryValues.back().isDouble());
+
+					transformedQueryValues[0] = queryValues.front().getDouble();
+					transformedQueryValues[1] = queryValues.back().getDouble();
 				}
 				else
 				{
+					//1) Currently ignores the necessary dB backtransformation
+					const std::string potentialAngleUnit = tupleInstanceQuery.getTupleUnits().back();
+					std::complex<double> complexNumber = ot::ComplexNumberConversion::fromString(_valueComparison.getValue(), ot::ComplexNumbers::getFormatFromString(tupleInstanceQuery.getTupleFormatName()),potentialAngleUnit);
 
-					if (targetElement == tupleInstanceStorage.getTupleTypeName())
+					//2)
+					const std::string storedFormat = tupleInstanceStorage.getTupleFormatName();
+					const std::vector<std::string>& tupleUnits = tupleInstanceStorage.getTupleUnits();
+
+					const std::string& targetElement = _valueComparison.getTupleTargetElement();
+					if (storedFormat == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar))
 					{
-						assert(comparator == "=");
-						comparison = GenerateFilterQuery(mongoComparator->second, { complexNumber.real() , complexNumber.imag()});
+						ot::ComplexNumberDefinition cplxPolarFormat = ot::ComplexNumberConversion::cartesianToPolar(complexNumber);
+						transformedQueryValues[0] = cplxPolarFormat.m_firstValue;
+						transformedQueryValues[1] = cplxPolarFormat.m_secondValue;
 					}
 					else
 					{
-						auto tupleElementNames = complexTupleDescription->getTupleElementNames(tupleInstanceStorage.getTupleFormatName());
-						auto pos = std::find(tupleElementNames.begin(), tupleElementNames.end(), targetElement) - tupleElementNames.begin();
-						double value;
-						if (pos == 0)
-						{
-							value = complexNumber.real();
-						}
-						else
-						{
-							value = complexNumber.imag();
-						}
-						BsonViewOrValue compareWithValue = GenerateFilterQuery(mongoComparator->second, value);
-						BsonViewOrValue equalIndex = GenerateFilterQuery(std::to_string(pos), compareWithValue.view());
-						comparison = GenerateFilterQuery("$elemMatch", equalIndex.view());
+						transformedQueryValues[0] = complexNumber.real();
+						transformedQueryValues[1] = complexNumber.imag();
 					}
+				}
 
+				//Now build the query depending on the target tuple element.
+				const std::string& targetElement = _valueComparison.getTupleTargetElement();
+				if (targetElement == tupleInstanceStorage.getTupleTypeName())
+				{
+					//Here we query the entire array of values. only equality comparator allowed.
+					assert(comparator == "=");
+					comparison = GenerateFilterQuery(mongoComparator->second, { transformedQueryValues[0] , transformedQueryValues[1] });
+				}
+				else
+				{
+					auto tupleElementNames = complexTupleDescription->getTupleElementNames(tupleInstanceStorage.getTupleFormatName());
+					auto pos = std::find(tupleElementNames.begin(), tupleElementNames.end(), targetElement) - tupleElementNames.begin();
+					
+					//Here we need a query of the structure: {value : { $elemMatch:{"0":{$gt : 0}}}
+					//This would query for values > 0 in the first entry of the value array. E.g. real value > 0.
+					BsonViewOrValue compareWithValue = GenerateFilterQuery(mongoComparator->second, transformedQueryValues[pos]);
+					BsonViewOrValue equalIndex = GenerateFilterQuery(std::to_string(pos), compareWithValue.view());
+					comparison = GenerateFilterQuery("$elemMatch", equalIndex.view());
 				}
 			}
 			else
@@ -226,6 +220,33 @@ BsonViewOrValue AdvancedQueryBuilder::buildRangeQuery(const ot::ValueComparisonD
 	else {
 		throw std::invalid_argument("Query for interval incorrect. The interval has to follow the english notation, e.g.: (2,3.5].");
 	}
+}
+
+std::list<ot::Variable> AdvancedQueryBuilder::getListOfValuesFromString(const std::string& _allValues, const std::vector<std::string>& _dataTypes)
+{
+	std::list<std::string> separatedValues =	ot::String::split(_allValues, m_listSplitToken);
+	std::list<ot::Variable> values;
+	auto dataType = _dataTypes.begin();
+	if (separatedValues.size() != _dataTypes.size())
+	{
+		throw std::exception("Failed to transform string to value list. Number of data type definitions missmatch the number of listed values.");
+	}
+
+	for (const std::string& separatedValue : separatedValues)
+	{
+		ot::Variable value = ot::ExplicitStringValueConverter::setValueFromString(separatedValue, *dataType);
+		if (dataType != _dataTypes.end())
+		{
+			dataType++;
+		}
+		values.push_back(value);
+
+		if (values.empty()) {
+			throw std::invalid_argument("Value in value list is empty.");
+		}
+	}
+
+	return values;
 }
 
 
