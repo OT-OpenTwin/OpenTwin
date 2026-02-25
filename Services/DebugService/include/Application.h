@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Application.h
 // 
 // License:
@@ -56,6 +56,7 @@ public:
 	void testTableMedium();
 	void testTableBig();
 	
+	void createPlotOneComplexCurve();
 	void createPlotOneCurve();
 	void createPlotTwoCurves();
 	void createPlot2_1Mil();

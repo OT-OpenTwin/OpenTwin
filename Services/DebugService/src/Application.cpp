@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Application.cpp
 // 
 // License:
@@ -54,6 +54,9 @@
 #include "OTResultDataAccess/PlotBuilder.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
+#include "OTCore/Units/SI.h"
+#include "OTSystem/OperatingSystem.h"
 
 // std header
 #include <thread>
@@ -128,6 +131,7 @@ Application::Application() :
 
 	// Plot tests
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Single Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneCurve, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Complex Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneComplexCurve, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Two Curves", "Default/Plot1DVisible"), std::bind(&Application::createPlotTwoCurves, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "2 Curves x 1M", "Default/Plot1DVisible"), std::bind(&Application::createPlot2_1Mil, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "100 Curves x 100", "Default/Plot1DVisible"), std::bind(&Application::createPlot100_100, this)));
@@ -223,6 +227,75 @@ void Application::testTableMedium(void) {
 void Application::testTableBig(void) {
 	std::thread t(&Application::sendTableWorker, this, 10000, 1000);
 	t.detach();
+}
+
+#include <fstream>
+void Application::createPlotOneComplexCurve()
+{
+	const std::string collName = getCollectionName();
+	ResultCollectionExtender extender(collName, *getModelComponent());
+	PlotBuilder builder(extender);
+	
+
+	const std::string currentPath = ot::OperatingSystem::getEnvironmentVariableString("OT_DEBUGSERVICE_ROOT");
+	const std::string jsonFile = currentPath + "\\Files\\s11_vectors.json";
+	std::fstream fileStream(jsonFile, std::ios::in);
+	
+	if (!fileStream.is_open())
+	{
+		throw std::exception(("Cannot open file: " + currentPath).c_str());
+	}
+
+	
+	const std::string fileContent = std::string(std::istreambuf_iterator<char>(fileStream), std::istreambuf_iterator<char>());
+	ot::JsonDocument sparameter;
+	sparameter.fromJson(fileContent.c_str());
+	
+	
+	
+	MetadataParameter parameter;
+	parameter.parameterName = "Frequency";
+	parameter.typeName = ot::TypeNames::getDoubleTypeName();
+	parameter.unit = "Hz";
+	std::unique_ptr<QuantityDescriptionCurveComplex> quantDesc(new QuantityDescriptionCurveComplex());
+
+	auto frequencyArray = ot::json::getArray(sparameter, "freq_Hz");
+	for (size_t i = 0; i < frequencyArray.Size(); i++)
+	{
+		double value = ot::json::getDouble(frequencyArray,i);
+		parameter.values.push_back(ot::Variable(value));
+	}
+	auto magnitudeArray = ot::json::getArray(sparameter, "s11_mag");
+	for (size_t i = 0; i < magnitudeArray.Size(); i++)
+	{
+		double value = ot::json::getDouble(magnitudeArray, i);
+		quantDesc->addValueReal(value);
+	}
+
+	auto phaseArray = ot::json::getArray(sparameter, "s11_ang_deg");
+	for (size_t i = 0; i < phaseArray.Size(); i++)
+	{
+		double value = ot::json::getDouble(phaseArray, i);
+		quantDesc->addValueImag(value);
+	}
+
+	quantDesc->setName("S11");
+	quantDesc->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", ot::SIUnits::Derived::getDegreeUnit());
+
+	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
+
+	DatasetDescription description;
+	description.setQuantityDescription(quantDesc.release());
+	description.addParameterDescription(parameterDesc);
+
+	const std::string plotName = "Test/A_Complex_Plot";
+	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "CMC_Stysch");
+	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11");
+
+	//Here the shared part
+	ot::Plot1DCfg plotCfg;
+	plotCfg.setEntityName(plotName);
+	builder.buildPlot(plotCfg);
 }
 
 void Application::createPlotOneCurve()

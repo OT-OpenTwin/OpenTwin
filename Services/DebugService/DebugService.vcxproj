@@ -195,6 +195,9 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\DebugServiceConfig.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Files\s11_vectors.json" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
