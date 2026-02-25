@@ -18,9 +18,10 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTFMC/FMCache.h"
+#include "OTSystem/FileSystem/AdvancedDirectoryIterator.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
+#include "OTFMC/FMCache.h"
 
 void ot::FMCache::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const {
 	_jsonObject.AddMember("CacheVersion", c_currentCacheVersion, _allocator);
@@ -38,6 +39,18 @@ void ot::FMCache::setFromJsonObject(const ConstJsonObject& _jsonObject) {
 	
 }
 
-void ot::FMCache::clear() {
-	
+ot::FMCache::StateInfo ot::FMCache::determineNewState(const FMProjectPath& _projectPath, const IgnoreRules& _ignoreRules) {
+	StateInfo newState;
+
+	if (_projectPath.isEmpty()) {
+		OT_LOG_E("Project path is empty");
+		return newState;
+	}
+
+	AdvancedDirectoryIterator iter(_projectPath.getPath(), DirectoryIterator::Files, _ignoreRules);
+	if (!iter.hasDirectory(_projectPath.getCacheFolderName())) {
+
+	}
+
+	return newState;
 }

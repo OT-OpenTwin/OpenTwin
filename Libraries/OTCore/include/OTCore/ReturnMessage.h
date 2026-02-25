@@ -38,7 +38,8 @@ namespace ot
 			Failed, //! @brief Error
 			True,
 			False,
-			Retry
+			Retry,
+			Cancel
 		};
 
 		static std::string statusToString(ReturnMessageStatus _status);

@@ -27,6 +27,7 @@
     <ClInclude Include="include\OTFMC\FMNewProjectDialog.h" />
     <ClInclude Include="include\OTFMC\FMNewProjectInfo.h" />
     <ClInclude Include="include\OTFMC\FMCache.h" />
+    <ClInclude Include="include\OTFMC\FMProjectPath.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}</ProjectGuid>

@@ -48,7 +48,7 @@ ot::ReturnMessage ot::FileManager::initializeNewProject() {
 	FMNewProjectDialog dia(WindowAPI::getRootWidget());
 	if (dia.showDialog() != Dialog::Ok) {
 		WindowAPI::lockUI(false);
-		return ReturnMessage::Ok;
+		return ReturnMessage::Cancel;
 	}
 
 	FMNewProjectInfo info = dia.getNewProjectInfo();
@@ -62,7 +62,7 @@ ot::ReturnMessage ot::FileManager::initializeNewProject() {
 ot::ReturnMessage ot::FileManager::commitData(JsonDocument& _doc) {
 	CommitDialog dia(WindowAPI::getRootWidget());
 	if (dia.showDialog() != Dialog::Ok) {
-		return ReturnMessage::Ok;
+		return ReturnMessage::Cancel;
 	}
 
 

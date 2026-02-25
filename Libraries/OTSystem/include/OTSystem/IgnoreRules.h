@@ -58,6 +58,7 @@ namespace ot {
 
         static IgnoreRules parseFromFile(const std::filesystem::path& _filePath);
         static IgnoreRules parseFromText(const std::string_view& _fileContent);
+		static void parseRuleFromLine(IgnoreRules& _rules, std::string_view _line);
 
         IgnoreRules() = default;
         IgnoreRules(const IgnoreRules&) = default;
@@ -74,6 +75,7 @@ namespace ot {
         bool matchFrom(size_t _pathIndex, const Rule& _rule, const std::vector<std::string_view>& _pathSegments) const;
         bool matchGlobSegment(const std::string_view& _pattern, const std::string_view& _text) const;
 
+        void addRule(const std::string& _rule);
         void addRule(Rule&& _rule) { m_rules.push_back(std::move(_rule)); };
         const std::vector<Rule>& getRules() const { return m_rules; };
 

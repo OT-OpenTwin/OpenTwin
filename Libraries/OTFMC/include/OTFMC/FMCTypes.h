@@ -20,13 +20,5 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
+#include "OTGui/GuiTypes.h"
 #include "OTFMC/FMConnectorAPIExport.h"
-
-namespace ot {
-
-	constexpr const char* OpenTwinIgnoreFileName = ".otignore";
-	constexpr const char* OpenTwinCacheFolderName = ".otcache";
-	constexpr const char* OpenTwinCacheInfoFileName = "otinfo.cache.json";
-	
-}

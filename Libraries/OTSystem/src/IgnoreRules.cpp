@@ -43,36 +43,40 @@ ot::IgnoreRules ot::IgnoreRules::parseFromText(const std::string_view& _fileCont
     IgnoreRules rules;
 
     for (std::string_view line : splitLines(_fileContent)) {
-        tidy(line);
-
-        if (line.empty() || line[0] == '#') {
-            continue;
-        }
-
-        Rule rule;
-        rule.negated = (line[0] == '!');
-        if (rule.negated) {
-            line.remove_prefix(1);
-        }
-
-        rule.anchored = (line.find('/') == 0);
-        if (rule.anchored) {
-            line.remove_prefix(1);
-        }
-
-        rule.directoryOnly = (line.rfind('/') == (line.length() - 1));
-        if (rule.directoryOnly) {
-            line.remove_suffix(1);
-        }
-
-        rule.segments = splitPath(line);
-
-        rule.kind = classify(rule.segments);
-
-        rules.addRule(std::move(rule));
+		parseRuleFromLine(rules, line);
     }
 
     return rules;
+}
+
+void ot::IgnoreRules::parseRuleFromLine(IgnoreRules& _rules, std::string_view _line) {
+    tidy(_line);
+
+    if (_line.empty() || _line[0] == '#') {
+        return;
+    }
+
+    Rule rule;
+    rule.negated = (_line[0] == '!');
+    if (rule.negated) {
+        _line.remove_prefix(1);
+    }
+
+    rule.anchored = (_line.find('/') == 0);
+    if (rule.anchored) {
+        _line.remove_prefix(1);
+    }
+
+    rule.directoryOnly = (_line.rfind('/') == (_line.length() - 1));
+    if (rule.directoryOnly) {
+        _line.remove_suffix(1);
+    }
+
+    rule.segments = splitPath(_line);
+
+    rule.kind = classify(rule.segments);
+
+	_rules.addRule(std::move(rule));
 }
 
 bool ot::IgnoreRules::matches(const std::filesystem::path& _path, bool _isDir) const {
@@ -192,4 +196,8 @@ bool ot::IgnoreRules::matchGlobSegment(const std::string_view& _pattern, const s
     }
 
     return p == _pattern.size();
+}
+
+void ot::IgnoreRules::addRule(const std::string& _rule) {
+	parseRuleFromLine(*this, _rule);
 }

@@ -20,8 +20,9 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/IgnoreRules.h"
 #include "OTSystem/FileSystem/FileInformation.h"
-#include "OTFMC/FMCTypes.h"
+#include "OTFMC/FMProjectPath.h"
 #include "OTModelEntities/NewModelStateInfo.h"
 
 namespace ot {
@@ -30,10 +31,16 @@ namespace ot {
 		OT_DECL_NOCOPY(FMCache)
 		OT_DECL_DEFMOVE(FMCache)
 	public:
+		struct CacheEntry {
+			std::filesystem::path filePath;
+			size_t fileSize = 0;
+			BasicEntityInformation entity;
+		};
+
 		struct StateInfo {
-			std::list<FileInformation> newFiles;
-			std::list<FileInformation> deletedFiles;
-			std::list<FileInformation> modifiedFiles;
+			std::vector<std::filesystem::path> newFiles;
+			std::vector<std::filesystem::path> deletedFiles;
+			std::vector<std::filesystem::path> modifiedFiles;
 		};
 
 		FMCache() = default;
@@ -42,14 +49,13 @@ namespace ot {
 		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ConstJsonObject& _jsonObject) override;
 
-		void clear();
+		FMCache::StateInfo determineNewState(const FMProjectPath& _projectPath, const IgnoreRules& _ignoreRules);
 
 	private:
 		static const int c_currentCacheVersion = 1;
 		
-		struct FileEntry {
-			FileInformation fileInfo;
-		};
+		std::map<std::filesystem::path, UIDList> m_pathToEntityUIDs;
+		std::map<UID, CacheEntry> m_entries;
 
 	};
 }
