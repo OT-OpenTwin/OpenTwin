@@ -1,4 +1,6 @@
 ﻿#include "OTCore/Tuple/TupleDescription.h"
+#include "OTCore/String.h"
+#include <algorithm>
 
 std::vector<std::string> TupleDescription::getTupleElementNames(const std::string& _formatName) const
 {
@@ -30,5 +32,13 @@ std::string TupleDescription::createCombinedUnitsString(const std::vector<std::s
 		combinedUnitsString.pop_back(); // Remove the trailing comma.
 	}
 	return combinedUnitsString;
+}
+
+std::vector<std::string> TupleDescription::separateCombinedUnitString(const std::string& _combinedUnitString) 
+{
+	std::list<std::string> units =	ot::String::split(_combinedUnitString, ",");
+	
+	std::replace(units.begin(), units.end(), std::string("\"\""), std::string(""));
+	return std::vector<std::string>{units.begin(), units.end()};
 }
 

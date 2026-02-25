@@ -54,7 +54,9 @@ namespace ot {
 
 		void setStorageTupleDescription(const TupleInstance& _tupleDescription);
 		void setQueryTupleDescription(const TupleInstance& _tupleDescription);
-
+		void setQueryTupleTargetElement(const std::string& _element);
+		const std::string& getTupleTargetElement() const { return m_queryTupleTargetElement; }
+		void setTupleTargetElement(const std::string& _target) { m_queryTupleTargetElement = _target; }
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 		
@@ -65,7 +67,8 @@ namespace ot {
 	private:
 		TupleInstance m_storageFormatDescription;
 		TupleInstance m_queryFormatDescription;
-		
+		std::string m_queryTupleTargetElement;
+
 		std::string m_name;
 		std::string m_comparator;
 		std::string m_value;

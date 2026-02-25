@@ -27,7 +27,7 @@ public:
 	const std::vector<std::string>& getAllTupleFormatNames() const { return m_tupleFormatNames; }
 		
 	std::string createCombinedUnitsString(const std::vector<std::string>& _units) const;
-
+	static std::vector<std::string> separateCombinedUnitString(const std::string& _combinedUnitString);
 private:
 
 protected:

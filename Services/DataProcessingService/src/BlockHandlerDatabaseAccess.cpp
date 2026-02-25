@@ -300,7 +300,7 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 
 	
 	ot::UID valueUID = selectedQuantity->quantityIndex;
-	
+	m_selectedQuantityLabel = selectedQuantity->quantityLabel;
 	assert(valueUID != 0);
 	//Now we add the query for the quantity ID
 	ot::ValueComparisonDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
@@ -317,6 +317,11 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	if (!tupleInstance.isSingle())
 	{
 		
+		quantityDef.setStorageTupleDescription(selectedQuantity->m_tupleDescription);
+		auto queryTupleDef = quantityDef.getQueryTupleDescription();
+		queryTupleDef.setTupleTypeName(selectedQuantity->m_tupleDescription.getTupleTypeName());
+		queryTupleDef.setTupleElementDataTypes(selectedQuantity->m_tupleDescription.getTupleElementDataTypes());
+		quantityDef.setQueryTupleDescription(queryTupleDef);
 		//quantityDef.valueIsTuple();
 		//const auto& allElements = tupleDescription->getTupleElementNames();
 

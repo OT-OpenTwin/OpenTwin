@@ -296,7 +296,19 @@ void EntityBlockDatabaseAccess::createUpdatedProperty(const std::string& _propNa
 
 const ot::ValueComparisonDefinition EntityBlockDatabaseAccess::getSelectedQuantityDefinition()
 {
-	return getSelectedValueComparisonDefinition(m_groupQuantitySetttings);
+	ot::ValueComparisonDefinition valueDefinition = getSelectedValueComparisonDefinition(m_groupQuantitySetttings);
+	const std::string tupleElementTarget =PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleTarget, m_groupTupleSettings);
+	valueDefinition.setTupleTargetElement(tupleElementTarget);
+
+	TupleInstance queryTuple;
+	const std::string formatName = PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleFormat, m_groupTupleSettings);
+	queryTuple.setTupleFormatName(formatName);
+
+	const std::string combinedUnitString = 	PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleUnit, m_groupTupleSettings);
+	auto separatedUnits = TupleDescription::separateCombinedUnitString(combinedUnitString);
+	queryTuple.setTupleUnits(separatedUnits);
+	valueDefinition.setQueryTupleDescription(queryTuple);
+	return valueDefinition;
 }
 
 const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getAdditionalQueries()

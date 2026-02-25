@@ -29,6 +29,11 @@ void ot::ValueComparisonDefinition::setQueryTupleDescription(const TupleInstance
 	m_queryFormatDescription= _tupleDescription;
 }
 
+void ot::ValueComparisonDefinition::setQueryTupleTargetElement(const std::string& _element)
+{
+	m_queryTupleTargetElement = _element;
+}
+
 void ot::ValueComparisonDefinition::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 {
 	_object.AddMember("Comperator", ot::JsonString(m_comparator, _allocator), _allocator);
