@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: JSONToVariableConverter.cpp
 // 
 // License:
@@ -54,6 +54,13 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 		const double imagPart = ot::json::getDouble(value, ot::ComplexNumbers::SerialisationKeys::g_imag);
 
 		return ot::Variable(std::complex<double>(realPart,imagPart));
+	}
+	else if (value.IsArray())
+	{
+		const double realPart = ot::json::getDouble(value.GetArray(), 0);
+		const double imagPart = ot::json::getDouble(value.GetArray(), 1);
+
+		return ot::Variable(std::complex<double>(realPart, imagPart));
 	}
 	else
 	{

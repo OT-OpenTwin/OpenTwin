@@ -32,7 +32,7 @@
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
-
+#include "OTCore/JSONToVariableConverter.h"
 // BSONCXX header
 #include "bsoncxx/json.hpp"
 
@@ -192,6 +192,8 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 	//We may need to iterate the rainbow painter
 	CurveColourSetter colourSetting(_curveCfg, numberOfQuantityEntries);
 	
+	std::list<ot::Variable> yValues;
+
 	std::vector<std::unique_ptr<ot::ComplexNumberContainerCartesian>> dataY; 
 	dataY.resize(numberOfQuantityEntries);
 	for (size_t i = 0; i < numberOfQuantityEntries; i++)
@@ -214,8 +216,14 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 		//Get quantity value
 		if (numberOfQuantityEntries == 1)
 		{
-			const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, tupleInstance.getTupleElementDataTypes().front());
-			dataY[0]->m_real.push_back(quantityValue);
+			
+			
+			
+			ot::JSONToVariableConverter converter; 
+			auto valueJson  = singleMongoDocument.FindMember(quantityInformation.m_fieldName.c_str());
+			const std::string temp = ot::json::toJson(valueJson->value);
+			ot::Variable value = converter(valueJson->value);
+			yValues.push_back(value);
 		}
 		else
 		{
@@ -259,7 +267,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 		
 		if (numberOfQuantityEntries == 1)
 		{
-
+			//@Alex: Hier müsste das PlotDataset dann eine Liste die yValues annehmen, nicht den dataY vector. Die restlichen PlotDatasets push_backs kommentiere am besten erstmal einfach aus.
 			ot::PlotDataset* singleCurve = new ot::PlotDataset(nullptr, newCurveCfg, ot::PlotDatasetData(dataX, dataY[j].release()));
 			singleCurve->setCurveNameBase(curveNameBase);
 			allCurves.push_back(singleCurve);
