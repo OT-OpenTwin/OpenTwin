@@ -187,6 +187,23 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 							assert(fieldEntry->getValue().isConstCharPtr());
 							quantity.m_tupleDescription.setTupleFormatName(fieldEntry->getValue().getConstCharPtr());
 						}
+						else if (fieldEntry->getEntryName() == m_unitField)
+						{
+							
+							auto& unit = fieldEntry->getValue();
+							std::vector<std::string> unitsAsString;
+							assert(unit.isConstCharPtr());
+							unitsAsString.push_back(unit.getConstCharPtr());
+							quantity.m_tupleDescription.setTupleUnits(unitsAsString);
+						}
+						else if (fieldEntry->getEntryName() == m_dataTypeNameField)
+						{
+							auto& dataType = fieldEntry->getValue();
+							std::vector<std::string> dataTypeAsString;
+							assert(dataType.isConstCharPtr());
+							dataTypeAsString.push_back(dataType.getConstCharPtr());
+							quantity.m_tupleDescription.setTupleElementDataTypes(dataTypeAsString);
+						}
 						else
 						{
 							assert(false);
