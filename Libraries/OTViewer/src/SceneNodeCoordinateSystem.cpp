@@ -25,6 +25,7 @@
 
 void SceneNodeCoordinateSystem::updateTransformationMatrix()
 {
+    // This transformation is a transformation from local coordinates (in the local coordinate system) to global coordinates
     transformation = makeOrthonormalFrame(osg::Vec3d(origin[0], origin[1], origin[2]), osg::Vec3d(xAxis[0], xAxis[1], xAxis[2]), osg::Vec3d(zAxis[0], zAxis[1], zAxis[2]));
 }
 

@@ -51,7 +51,7 @@ private:
 	void updateHandlerPositions(void);
 	void storeTransformations(void);
 	void applyObjectTransformations(void);
-	void setPropertyGrid(void);
+	void createPropertyGrid(void);
 	void updatePropertyGrid(void);
 	void addSetting(rapidjson::Document &jsonDoc, const std::string &group, const std::string &name, double value);
 	void updateSetting(const std::string& _groupName, const std::string& _itemName, double value);

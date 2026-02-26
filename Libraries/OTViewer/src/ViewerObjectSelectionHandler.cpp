@@ -216,14 +216,13 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 
 			// Here we assume the global coordinate system for now
 			osg::Vec3 p{ 0.0, 0.0, 0.0 };
+			osg::Vec3 p2{ 0.0, 0.0, 1.0 };
 			osg::Vec3 n{ 0.0, 0.0, 1.0 };
 
 			// Finally we need to consider the transformation into the currently active plane
 			osg::Matrix transform = model->getCurrentWorkingPlaneTransform();
-			transform.transpose(transform);
-			p = p * transform;
 
-			osg::Vec3 p2 = p + n;
+			p = p * transform;
 			p2 = p2 * transform;
 			n = p2 - p;
 			n.normalize();
@@ -308,7 +307,7 @@ void ViewerObjectSelectionHandler::processRubberbandUpdate(osgViewer::Viewer *vi
 			osg::Vec3 ip;
 			if (intersectLinePlane(n, p + n * lastHeight, rayStart, rayEnd, ip))
 			{
-				osg::Matrix transform = model->getCurrentWorkingPlaneTransformTransposedInverse();
+				osg::Matrix transform = model->getCurrentWorkingPlaneTransformInverse();
 				ip = ip * transform;
 
 				ip.set(creator->snapDimension(ip.x()), creator->snapDimension(ip.y()), creator->snapDimension(ip.z()));
@@ -328,7 +327,6 @@ void ViewerObjectSelectionHandler::processRubberbandUpdate(osgViewer::Viewer *vi
 			// start of the ray
 			// Determine the vector between the start of the ray and the reference point (last point in plane)
 			osg::Matrix transform = model->getCurrentWorkingPlaneTransform();
-			transform.transpose(transform);
 
 			osg::Vec3 referencePoint = lastPointInPlane * transform;
 

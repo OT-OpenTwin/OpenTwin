@@ -1638,21 +1638,19 @@ void Model::updateWorkingPlaneTransform()
 
 	if (!getTransformationOfSelectedShapes(m_sceneNodesRoot, first, matrix))
 	{
-		// The transformations are not the same for all selected scene nodes -> we use as identity transform
+		// The transformations are not the same for all selected scene nodes -> we use the transformation of the currently active coordinate system
 		matrix = getActiveCoordinateSystemTransform();
 	}
-
-	matrix.transpose(matrix); // We need to transpose the matrix, since the working plane transform needs to be transposed to match the shape transform
 
 	for (auto v : m_viewerList) {
 		v->setWorkingPlaneTransform(matrix);
 	}
 
-	m_currentWorkingplaneTransform = matrix;
-
-
-	matrix.transpose(matrix);
-	m_currentWorkingplaneTransformTransposedInverse = m_currentWorkingplaneTransformTransposedInverse.inverse(matrix);
+	// The working plane transform is a local to global transform. This means that coordinates in the local coordinate system can be multiplied by the transformation
+	// matrix (matrix on the right hand side of the multiplication) to get the point in global coordinates.
+	// The inverse transformation therefore transforms from global to local coordinates
+	m_currentWorkingplaneTransform        = matrix;
+	m_currentWorkingplaneTransformInverse = m_currentWorkingplaneTransformInverse.inverse(matrix);
 }
 
 void Model::toggleAxisCross() {

@@ -178,8 +178,10 @@ public:
 	void centerMouseCursor();
 	bool isWireFrameMode() { return m_wireFrameState; }
 
+	// The working plane transform transforms from local to global coordinates: globalPoint = localPoint * workingPlaneTransform
 	osg::Matrix getCurrentWorkingPlaneTransform() { return m_currentWorkingplaneTransform; }
-	osg::Matrix getCurrentWorkingPlaneTransformTransposedInverse() { return m_currentWorkingplaneTransformTransposedInverse; }
+	// The inverse working plane transform transforms from global to local coordinates: localPoint = globalPoint * workingPlaneTransformInverse
+	osg::Matrix getCurrentWorkingPlaneTransformInverse() { return m_currentWorkingplaneTransformInverse; }
 
 	void   fillPropertyGrid(const ot::PropertyGridCfg& _configuration);
 	void   clearModalPropertyGrid();
@@ -303,7 +305,7 @@ private:
 	bool										   m_treeStateRecording;
 	std::map<std::string, char>					   m_treeInfoMap;
 	osg::Matrix									   m_currentWorkingplaneTransform;
-	osg::Matrix									   m_currentWorkingplaneTransformTransposedInverse;
+	osg::Matrix									   m_currentWorkingplaneTransformInverse;
 	ManipulatorBase*                               m_currentManipulator;
 	std::string									   m_activeCoordinateSystem;
 

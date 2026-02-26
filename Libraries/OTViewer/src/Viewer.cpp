@@ -937,6 +937,11 @@ void Viewer::finishRubberbandExecution(void)
 	if (rubberband) 
 	{
 		osg::Matrix transformMatrix = model->getCurrentWorkingPlaneTransform();
+
+		// OpenSceneGraph uses row based transformation matrices whereas OpenCASCADE uses column based matrices. In our case, the working plane transform is an
+		// OSG matrix, but the shape creation itself is based on OpenCASCADE. Therefore we need to transpose the matrix.
+		transformMatrix.transpose(transformMatrix);
+
 		std::vector<double> transform;
 		transform.reserve(16);
 		for (int i=0; i < 16; i++)
@@ -1472,7 +1477,6 @@ void Viewer::toggleWorkingPlane(void) {
 
 void Viewer::setWorkingPlaneTransform(osg::Matrix matrix) {
 	workingPlaneTransform = matrix;
-	matrix.transpose(matrix);
 	workingPlane->setTransformation(matrix);
 	axisCenterCross->setTransformation(matrix);
 	axisCross->setTransformation(matrix);

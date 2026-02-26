@@ -118,7 +118,10 @@ void SceneNodeGeometry::setTransformation(const std::vector<double>& _transforma
 	if (!_transformation.empty())
 	{
 		m_transformationMatrix.set(_transformation.data());
-		m_transformationMatrix.transpose(m_transformationMatrix);
+
+		// Here we need to transpose the matrix, since in OpenCascade (where the data comes from), transformation matrices are stored column wise 
+		// but in OSG transformation matrices are stored row-wise
+		m_transformationMatrix.transpose(m_transformationMatrix);  
 	}
 }
 

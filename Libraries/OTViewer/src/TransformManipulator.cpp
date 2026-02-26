@@ -66,8 +66,6 @@ TransformManipulator::TransformManipulator(Viewer *viewer, std::list<SceneNodeBa
 	initialWorkingPlaneTransform = workingPlaneTransform;
 
 	m_workingPlaneRotation = osg::Matrix(workingPlaneTransform.getRotate());
-	//osg::Matrix workingPlaneRotationT;
-	//workingPlaneRotationT.transpose(workingPlaneRotation);
 
 	// Get the bounding sphere of the objects
 	getBoundingSphere(m_sphereCenter, m_sphereRadius, objects);
@@ -87,9 +85,9 @@ TransformManipulator::TransformManipulator(Viewer *viewer, std::list<SceneNodeBa
 	osg::Vec3d vectorY(0.0, 1.0, 0.0);
 	osg::Vec3d vectorZ(0.0, 0.0, 1.0);
 
-	vectorX = m_workingPlaneRotation * vectorX;
-	vectorY = m_workingPlaneRotation * vectorY;
-	vectorZ = m_workingPlaneRotation * vectorZ;
+	vectorX = vectorX * m_workingPlaneRotation;
+	vectorY = vectorY * m_workingPlaneRotation;
+	vectorZ = vectorZ * m_workingPlaneRotation;
 
 	m_handlerPosition[0] = m_sphereCenter - vectorX * m_sphereRadius;
 	m_handlerPosition[1] = m_sphereCenter + vectorX * m_sphereRadius;
@@ -125,8 +123,8 @@ TransformManipulator::TransformManipulator(Viewer *viewer, std::list<SceneNodeBa
 	m_rotationDegY = 0.0;
 	m_rotationDegZ = 0.0;
 
-	// Set the property grid
-	setPropertyGrid();
+	// Create the property grid
+	createPropertyGrid();
 
 	// Lock the ui
 	m_viewer3D->getModel()->lockSelectionAndModification(true);
@@ -260,9 +258,9 @@ void TransformManipulator::updateHandlerPositions(void)
 	osg::Vec3d vectorY(0.0, 1.0, 0.0);
 	osg::Vec3d vectorZ(0.0, 0.0, 1.0);
 
-	vectorX = m_workingPlaneRotation * vectorX;
-	vectorY = m_workingPlaneRotation * vectorY;
-	vectorZ = m_workingPlaneRotation * vectorZ;
+	vectorX = vectorX * m_workingPlaneRotation;
+	vectorY = vectorY * m_workingPlaneRotation;
+	vectorZ = vectorZ * m_workingPlaneRotation;
 
 	m_handlerPosition[0] = m_sphereCenter - vectorX * m_sphereRadius;
 	m_handlerPosition[1] = m_sphereCenter + vectorX * m_sphereRadius;
@@ -290,9 +288,9 @@ void TransformManipulator::handlerInteraction(HandlerBase *handler)
 	osg::Vec3d vectorY(0.0, 1.0, 0.0);
 	osg::Vec3d vectorZ(0.0, 0.0, 1.0);
 
-	vectorX = m_workingPlaneRotation * vectorX;
-	vectorY = m_workingPlaneRotation * vectorY;
-	vectorZ = m_workingPlaneRotation * vectorZ;
+	vectorX = vectorX * m_workingPlaneRotation;
+	vectorY = vectorY * m_workingPlaneRotation;
+	vectorZ = vectorZ * m_workingPlaneRotation;
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -396,24 +394,17 @@ void TransformManipulator::applyObjectTransformations(void)
 	SceneNodeCoordinateSystem* csItem = dynamic_cast<SceneNodeCoordinateSystem*>(m_transformedObjects.front());
 	if (csItem != nullptr)
 	{
-		osg::Matrix workingPlaneTransform = initialWorkingPlaneTransform;
-		workingPlaneTransform.transpose(workingPlaneTransform);
-
-		workingPlaneTransform = workingPlaneTransform * transformation;
-
-		workingPlaneTransform.transpose(workingPlaneTransform);
+		osg::Matrix workingPlaneTransform = initialWorkingPlaneTransform * transformation;
 
 		m_viewer3D->setWorkingPlaneTransform(workingPlaneTransform);
 	}
 }
 
-void TransformManipulator::setPropertyGrid(void)
+void TransformManipulator::createPropertyGrid(void)
 {
-	m_lastPropertyOffset = m_sphereCenter - m_initialSphereCenter;
-
-	osg::Quat totQuat = m_totalRotation.getRotate();
-	totQuat.getRotate(m_lastPropertyAngle, m_lastPropertyAxis);
-	m_lastPropertyAngle *= 180.0 / M_PI;
+	m_lastPropertyOffset = osg::Vec3(0.0, 0.0, 0.0);
+	m_lastPropertyAxis = osg::Vec3(0.0, 0.0, 0.0);
+	m_lastPropertyAngle = 0.0;
 
 	// Create the configuration
 	ot::PropertyGridCfg cfg;
@@ -450,6 +441,8 @@ void TransformManipulator::setPropertyGrid(void)
 
 	OTAssertNullptr(m_viewer3D->getModel());
 	m_viewer3D->getModel()->fillPropertyGrid(cfg);
+
+	updatePropertyGrid();
 }
 
 void TransformManipulator::updatePropertyGrid(void)
@@ -462,15 +455,19 @@ void TransformManipulator::updatePropertyGrid(void)
 	currentTransformT.makeTranslate(m_sphereCenter - m_initialSphereCenter);
 
 	osg::Matrix currentTransformR = m_totalRotation;
-	osg::Matrix currentTransform = currentTransformR * currentTransformT;
+	osg::Matrix currentTransform =  currentTransformR * currentTransformT;
 
-	currentTransform = currentTransform * m_workingPlaneRotation;
+	currentTransform = m_workingPlaneRotation * currentTransform;   // This transformation now is the complete global transformation of the shape
 
 	// From the rotated transformation matrix in the working plane coordinates, we can now get the properties for the translation and rotation settings
-	osg::Vec3d offset = currentTransform.getTrans();
 
-	//osg::Quat totQuat = totalRotation.getRotate();
-	osg::Matrix rotateProperty = workingPlaneRotationI * osg::Matrix(currentTransform.getRotate());
+	// The translation needs to be given in local shape coordinates, so we need to transform the translation vector from the global to the local coordinate system
+	// Therefore we need to consider the axis rotation only, but no translations.
+	osg::Vec3d offset = (m_sphereCenter - m_initialSphereCenter) * workingPlaneRotationI;
+
+	// The rotation properties also need to be specified in local coordinates. Therefore we extract the entire rotation from the global transformation matrix
+	// and extract any previous rotations from it
+	osg::Matrix rotateProperty =  osg::Matrix(currentTransform.getRotate()) * workingPlaneRotationI;
 	osg::Quat totQuat = rotateProperty.getRotate();
 	osg::Vec3d axis;
 	double angle = 0.0;
@@ -617,30 +614,14 @@ bool TransformManipulator::propertyGridValueChanged(const ot::Property* _propert
 
 	m_lastPropertyOffset = offset;
 
-	// Update the transformation
+	// Update the transformation from the properties
 	osg::Matrix propertyRotate;
-	propertyRotate.makeRotate(m_lastPropertyAngle * M_PI / 180.0, m_lastPropertyAxis);
-	propertyRotate = m_workingPlaneRotation * propertyRotate;
+	propertyRotate.makeRotate(m_lastPropertyAngle * M_PI / 180.0, m_lastPropertyAxis * m_workingPlaneRotation);
 
-	osg::Matrix propertyTranslate;
-	propertyTranslate.makeTranslate(offset);
+	m_totalRotation = osg::Matrix(propertyRotate);
 
-	osg::Matrix currentTransform = propertyRotate * propertyTranslate;
-
-	osg::Matrix workingPlaneRotationI;
-	workingPlaneRotationI = workingPlaneRotationI.inverse(m_workingPlaneRotation);
-
-	currentTransform =   currentTransform * workingPlaneRotationI;
-
-	offset = currentTransform.getTrans();
-	m_totalRotation = osg::Matrix(currentTransform.getRotate());
-
-
-
-//	totalRotation.makeRotate(lastPropertyAngle * M_PI / 180.0, lastPropertyAxis);
-//	totalRotation = totalRotation * workingPlaneRotation;
-
-	m_sphereCenter = m_initialSphereCenter + offset;
+	// Determine the new center
+	m_sphereCenter = m_initialSphereCenter + offset * m_workingPlaneRotation;
 
 	// Assign new positions to all handlers
 	updateHandlerPositions();
