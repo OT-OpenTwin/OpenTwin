@@ -20,6 +20,7 @@
 #include "OTModelEntities/EntityMetadataSeries.h"
 
 #include "OTCommunication/ActionTypes.h"
+#include "bsoncxx/json.hpp"
 
 static EntityFactoryRegistrar<EntityMetadataSeries> registrar("EntityMetadataSeries");
 
@@ -73,4 +74,40 @@ void EntityMetadataSeries::InsertToQuantityField(std::string fieldName, std::lis
 void EntityMetadataSeries::setMetadata(const ot::JsonDocument& _metadata)
 {
 	m_metadata.CopyFrom(_metadata, m_metadata.GetAllocator());
+}
+
+
+void EntityMetadataSeries::addStorageData(bsoncxx::builder::basic::document& _storage)
+{
+	EntityWithDynamicFields::addStorageData(_storage);
+	try
+	{
+		const std::string metadata = ot::json::toJson(m_metadata);
+		bsoncxx::document::value doc = bsoncxx::from_json(metadata);
+		_storage.append(bsoncxx::builder::basic::kvp("Metadata", doc));
+	}
+	catch (std::exception& _e)
+	{
+		const std::string message = "Failed to store metadata of series: " + this->getName() + ". Exception: " + std::string(_e.what());
+		OT_LOG_E(message);
+	}
+}
+
+void EntityMetadataSeries::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+{
+	EntityWithDynamicFields::readSpecificDataFromDataBase(doc_view, entityMap);
+	if (doc_view.find("Metadata") != doc_view.end())
+	{
+		try
+		{
+			auto metadataView = doc_view["Metadata"];
+			const std::string metadataString = bsoncxx::to_json(metadataView.get_document());
+			m_metadata.fromJson(metadataString);
+		}
+		catch (std::exception& _e)
+		{
+			const std::string message = "Failed to load metadata of series: " + this->getName() + ". Exception: " + std::string(_e.what());
+			OT_LOG_E(message);
+		}
+	}
 }

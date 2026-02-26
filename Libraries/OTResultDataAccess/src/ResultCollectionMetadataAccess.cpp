@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ResultCollectionMetadataAccess.cpp
 // 
 // License:
@@ -272,6 +272,10 @@ void ResultCollectionMetadataAccess::loadExistingCampaignData()
 	}
 	
 	MetadataEntityInterface campaignFactory;
+	if (metadataCampaignEntity == nullptr)
+	{
+		throw std::exception("Accessing result storage requires a campaign entity.");
+	}
 	m_metadataCampaign =	campaignFactory.createCampaign(metadataCampaignEntity, metadataSeriesEntities);
 }
 
