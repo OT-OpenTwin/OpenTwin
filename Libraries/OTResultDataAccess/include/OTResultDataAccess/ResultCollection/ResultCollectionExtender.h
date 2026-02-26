@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ResultCollectionExtender.h
 // 
 // License:
@@ -46,8 +46,7 @@ public:
 	
 	void setSaveModel(bool _saveModel) { m_saveModel = _saveModel; }
 
-	ot::UID buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata);
-	ot::UID buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>&& _seriesMetadata);
+	ot::UID buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, const ot::JsonDocument& seriesMetadata = ot::JsonDocument{});
 
 	bool campaignMetadataWithSameNameExists(std::shared_ptr<MetadataEntry> _metadata);
 	bool campaignMetadataWithSameValueExists(std::shared_ptr<MetadataEntry> _metadata);
@@ -79,7 +78,7 @@ protected:
 
 	ot::UIDList addCampaignContextDataToParameters(DatasetDescription& _dataDescription);
 	void addCampaignContextDataToQuantities(DatasetDescription& _dataDescription, ot::UIDList& _dependingParameter);
-	ot::UID createNewSeries(std::list< DatasetDescription>& _dataDescription, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata);
+	ot::UID createNewSeries(std::list< DatasetDescription>& _dataDescription, const std::string& _seriesName, const ot::JsonDocument& _seriesMetadata);
 	void addMetadataToSeries(std::list< DatasetDescription>& _dataDescription, MetadataSeries& _newSeries);
 
 	std::map<std::string, std::list<MetadataQuantity*>> m_quantitiesUpForStorageByName;

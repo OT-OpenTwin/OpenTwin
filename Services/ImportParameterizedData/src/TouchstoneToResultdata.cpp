@@ -70,18 +70,19 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 			ot::EntityCallbackBase::Callback::DataNotify,
 			Application::instance()->getServiceName()
 		);
-		
-		std::list< std::shared_ptr<MetadataEntry>> seriesMetadata;
-		
+				
 		TouchstoneHandler handler(m_fileName);
 		importTouchstoneFile(m_fileName, m_fileContent, m_uncompressedLength, _numberOfPorts, handler);
 		DatasetDescription dataset = std::move(extractDatasetDescription(handler));
 			
+		ot::JsonDocument seriesMetadata;
 		auto& optionSettings = handler.getOptionSettings();
 		std::string tsParameter = OptionsParameterHandlerParameter::ToString(optionSettings.getParameter());
-		seriesMetadata.push_back(std::make_shared<MetadataEntrySingle>("Touchstone Parameter", tsParameter));
-		seriesMetadata.push_back(std::make_shared<MetadataEntrySingle>("Reference Resistance", optionSettings.getReferenceResistance()));
-		
+		seriesMetadata.AddMember("Touchstone Parameter", ot::JsonString(tsParameter,seriesMetadata.GetAllocator()), seriesMetadata.GetAllocator());
+		ot::VariableToJSONConverter converter;
+		ot::JsonValue entry = converter(optionSettings.getReferenceResistance(), seriesMetadata.GetAllocator());
+		seriesMetadata.AddMember("Reference Resistance", entry, seriesMetadata.GetAllocator());
+				
 		std::list<DatasetDescription>datasets;
 		datasets.push_back(std::move(dataset));
 		const ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);

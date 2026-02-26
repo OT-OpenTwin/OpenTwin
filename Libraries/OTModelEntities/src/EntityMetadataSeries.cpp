@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityMetadataSeries.cpp
 // 
 // License:
@@ -70,3 +70,7 @@ void EntityMetadataSeries::InsertToQuantityField(std::string fieldName, std::lis
 	InsertInField(fieldName, std::move(values), fullDocumentPath);
 }
 
+void EntityMetadataSeries::setMetadata(const ot::JsonDocument& _metadata)
+{
+	m_metadata.CopyFrom(_metadata, m_metadata.GetAllocator());
+}

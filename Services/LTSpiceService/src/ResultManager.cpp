@@ -344,8 +344,7 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 
 	std::string seriesName = CreateNewUniqueTopologyName(ot::FolderNames::DatasetFolder, "LTSpice Imported Results");
 
-	std::list<std::shared_ptr<MetadataEntry>> seriesMetadata;
-	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(allCurveDescriptions, seriesName, seriesMetadata);
+	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(allCurveDescriptions, seriesName);
 	resultCollectionExtender.storeCampaignChanges();
 
 	const MetadataSeries* series = resultCollectionExtender.findMetadataSeries(seriesMetadataIndex);

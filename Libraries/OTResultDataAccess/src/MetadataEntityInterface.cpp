@@ -55,26 +55,8 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 	std::vector<std::string> allTopLevelDocumentNames = _seriesMetadataEntity->getDocumentsNames();
 
 	//First we extract the series meta data
-	for (const std::string& documentName : allTopLevelDocumentNames)
-	{
-		bool isParameterDocument = documentName.find(_seriesMetadataEntity->getParameterDocumentName()) != std::string::npos;
-		bool isQuantityDocument = documentName.find(_seriesMetadataEntity->getQuantityDocumentName()) != std::string::npos;
-		bool isRootDocument = documentName == "/";
-		if (!(isParameterDocument || isQuantityDocument || isRootDocument))
-		{
-			const GenericDocument* document = _seriesMetadataEntity->getDocument(documentName);
-			const auto listOfMetadata = extractMetadataFields(*document);
-			for (const auto& metadata : listOfMetadata)
-			{
-				seriesMetadata.addMetadata(metadata);
-			}
-			auto objectList = extractMetadataObjects(*document);
-			for (auto& object : objectList)
-			{
-				seriesMetadata.addMetadata(object);
-			}
-		}
-	}
+	ot::JsonDocument& doc = _seriesMetadataEntity->getMetadata();
+	seriesMetadata.setMetadata(doc);
 
 	//Now we extract the parameter meta data
 	const GenericDocument* parameterTopLevel = _seriesMetadataEntity->getDocument(_seriesMetadataEntity->getParameterDocumentName());
@@ -351,10 +333,11 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 			}
 
 		}
-		for (auto& metadata : newSeriesMetadata->getMetadata())
+		if (!newSeriesMetadata->getMetadata().ObjectEmpty())
 		{
-			insertMetadata(&entitySeries, metadata.second.get());
+			entitySeries.setMetadata(newSeriesMetadata->getMetadata());
 		}
+		
 		entitySeries.storeToDataBase();
 		m_newEntityIDs.push_back(entitySeries.getEntityID());
 		m_newEntityVersions.push_back(entitySeries.getEntityStorageVersion());

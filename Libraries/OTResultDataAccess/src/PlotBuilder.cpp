@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PlotBuilder.cpp
 // 
 // License:
@@ -124,7 +124,7 @@ bool PlotBuilder::validityCheck(std::list<DatasetDescription>& _dataSetDescripti
 
 void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
 { 
-	ot::UID seriesID = m_extender.buildSeriesMetadata(_dataSetDescriptions, _seriesName, {});
+	ot::UID seriesID = m_extender.buildSeriesMetadata(_dataSetDescriptions, _seriesName);
 	for (auto& dataset : _dataSetDescriptions)
 	{
 		m_extender.processDataPoints(&dataset, seriesID);

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityMetadataSeries.h
 // 
 // License:
@@ -19,7 +19,7 @@
 
 #pragma once
 #include "OTModelEntities/EntityWithDynamicFields.h"
-
+#include "OTCore/JSON/JSON.h"
 
 class __declspec(dllexport) EntityMetadataSeries : public EntityWithDynamicFields
 {
@@ -37,7 +37,11 @@ public:
 
 	void InsertToParameterField(std::string fieldName, std::list<ot::Variable>&& values, std::string documentName = "");
 	void InsertToQuantityField(std::string fieldName, std::list<ot::Variable>&& values, std::string documentName = "");
+
+	void setMetadata(const ot::JsonDocument& _metadata);
+	ot::JsonDocument& getMetadata() { return m_metadata; };
 private:
 	const std::string _parameterDocument = "Parameter";
 	const std::string _quantityDocument = "Quantity";
+	ot::JsonDocument m_metadata;
 };

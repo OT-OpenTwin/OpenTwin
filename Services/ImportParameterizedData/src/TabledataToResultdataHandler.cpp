@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: TabledataToResultdataHandler.cpp
 // 
 // License:
@@ -47,6 +47,8 @@
 
 #include "CategorisationFolderNames.h"
 #include "OTCore/EntityName.h"
+#include "OTCore/VariableToJSONConverter.h"
+
 
 TabledataToResultdataHandler::TabledataToResultdataHandler(const std::string& _datasetFolder, const std::string& _tableFolder)
 	: m_datasetFolder(_datasetFolder), m_tableFolder(_tableFolder)
@@ -190,7 +192,9 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 			return;
 		}
 
-		std::list<std::shared_ptr<MetadataEntry>> additionalMetadata = rangeData2MetadataEntries(std::move(seriesMetaDataRangeSelections));
+		//std::list<std::shared_ptr<MetadataEntry>> additionalMetadata = rangeData2MetadataEntries(std::move(seriesMetaDataRangeSelections));
+		ot::JsonDocument additionalMetadata;
+		rangeData2Json(additionalMetadata, std::move(seriesMetaDataRangeSelections));
 		if (datasets.empty())
 		{
 			_uiComponent->displayMessage("Skipped creation of series \"" + seriesName + "\" due to this issue:\n");
@@ -486,6 +490,29 @@ std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::rangeDat
 	}
 	return allMetadataEntries;	
 }
+
+void TabledataToResultdataHandler::rangeData2Json(ot::JsonDocument& _doc, KeyValuesExtractor&& _assembyRangeData)
+{
+	auto field = _assembyRangeData.getFields()->begin();
+	ot::VariableToJSONConverter converter;
+	for (field; field != _assembyRangeData.getFields()->end(); field++)
+	{
+		const std::string& fieldName = field->first;
+		const std::list<ot::Variable>& values = field->second;
+
+		if (values.size() == 1)
+		{
+			ot::JsonValue entry = converter(*values.begin(), _doc.GetAllocator());
+			_doc.AddMember(ot::JsonString(fieldName,_doc.GetAllocator()), entry, _doc.GetAllocator());
+		}
+		else if (values.size() > 1)
+		{
+			ot::JsonValue entry = converter(values, _doc.GetAllocator());
+			_doc.AddMember(ot::JsonString(fieldName, _doc.GetAllocator()), entry, _doc.GetAllocator());
+		}
+	}
+}
+
 
 std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<IVisualisationTable>> _loadedTables, KeyValuesExtractor& _outSeriesMetadata)
 {

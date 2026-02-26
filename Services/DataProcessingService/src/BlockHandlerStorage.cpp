@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BlockHandlerStorage.cpp
 // 
 // License:
@@ -274,8 +274,8 @@ bool BlockHandlerStorage::executeSpecialized()
 
 			
 			const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + blockNameShort;
-			std::list<std::shared_ptr<MetadataEntry>> metadata;
-			ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName,metadata);
+			
+			ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName);
 			
 			SolverReport::instance().addToContentAndDisplay("Storing data into series: " + seriesName + ".\n", _uiComponent);
 

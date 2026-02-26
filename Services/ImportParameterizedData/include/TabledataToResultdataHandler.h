@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: TabledataToResultdataHandler.h
 // 
 // License:
@@ -59,6 +59,7 @@ private:
 	void unsetConsiderForImport(MetadataAssemblyData& _metadataAssemblyData);
 
 	std::list<std::shared_ptr<MetadataEntry>> rangeData2MetadataEntries(KeyValuesExtractor&& _assembyRangeData);
+	void rangeData2Json(ot::JsonDocument& _doc, KeyValuesExtractor&& _assembyRangeData);
 
 	std::list<DatasetDescription> extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<IVisualisationTable>> loadedTables, KeyValuesExtractor& _outSeriesMetadata);
 	std::string extractUnitFromName(std::string& _name);

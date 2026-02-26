@@ -139,6 +139,7 @@ set(OTResultDataAccess_SOURCES
     src/ResultCollectionExtender.cpp
     src/ResultCollectionMetadataAccess.cpp
     src/ResultImportLogger.cpp
+    src/MetadataSeries.cpp
 )
 
 # Core object library (for reuse in tests)

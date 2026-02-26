@@ -123,8 +123,7 @@ void ParametricResult1DManager::storeDataInResultCollection()
 
 	std::string seriesName = CreateNewUniqueTopologyName(m_resultFolderName, m_seriesNameBase);
 	
-	std::list<std::shared_ptr<MetadataEntry>> seriesMetadata;
-	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(m_allDataDescriptions, seriesName, seriesMetadata);
+	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(m_allDataDescriptions, seriesName);
 	resultCollectionExtender.storeCampaignChanges();
 	const MetadataSeries *series = resultCollectionExtender.findMetadataSeries(seriesMetadataIndex);
 

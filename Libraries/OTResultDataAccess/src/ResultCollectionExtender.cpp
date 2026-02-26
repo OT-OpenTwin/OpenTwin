@@ -41,7 +41,7 @@ ResultCollectionExtender::ResultCollectionExtender(ot::ApplicationBase* _applica
 	: ResultCollectionExtender(_applicationBase->getCollectionName(), *_applicationBase->getModelComponent())
 {}
 
-ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
+ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, const ot::JsonDocument& _seriesMetadata)
 {
 	m_logger.log("Creating new series with " + std::to_string(_datasetDescriptions.size()) + " datasets.");
 	uint32_t count(1);
@@ -57,11 +57,6 @@ ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescripti
 	m_quantitiesUpForStorageByName.clear();
 	m_parameterUpForStorageByName.clear();
 	return newSeriesID;
-}
-
-ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>&& _seriesMetadata)
-{
-	return buildSeriesMetadata(_datasetDescriptions, _seriesName, _seriesMetadata);
 }
 
 bool ResultCollectionExtender::campaignMetadataWithSameNameExists(std::shared_ptr<MetadataEntry> _otherMetadata)
@@ -413,7 +408,7 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 	}
 }
 
-ot::UID ResultCollectionExtender::createNewSeries(std::list<DatasetDescription>& _dataDescription, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
+ot::UID ResultCollectionExtender::createNewSeries(std::list<DatasetDescription>& _dataDescription, const std::string& _seriesName, const ot::JsonDocument& _seriesMetadata)
 {
 	uint64_t seriesIndex;
 	const MetadataSeries* existingSeries = findMetadataSeries(_seriesName);
@@ -428,18 +423,19 @@ ot::UID ResultCollectionExtender::createNewSeries(std::list<DatasetDescription>&
 		existingSeries = findMetadataSeries(seriesLabel);
 	}
 	seriesIndex = findNextFreeSeriesIndex();
-	
+
 	MetadataSeries newSeries(_seriesName);
 	newSeries.setLabel(seriesLabel);
 	m_logger.log("Series received unique label:" + seriesLabel);
 
 	ot::UID seriesID = findNextFreeSeriesIndex();
 	newSeries.setIndex(seriesID);
+
+	addMetadataToSeries(_dataDescription, newSeries);
 	
-	addMetadataToSeries(_dataDescription,newSeries);
-	for (auto metadata : _seriesMetadata)
+	if (!_seriesMetadata.ObjectEmpty())
 	{
-		newSeries.addMetadata(metadata);
+		newSeries.setMetadata(_seriesMetadata);
 	}
 
 	m_metadataCampaign.addSeriesMetadata(std::move(newSeries));
