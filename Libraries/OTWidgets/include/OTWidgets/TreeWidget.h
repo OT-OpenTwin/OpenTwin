@@ -55,8 +55,8 @@ namespace ot {
 		// Setter / Getter
 
 		//! @brief Returns a pointer to the root widget of this object
-		virtual QWidget* getQWidget(void) override { return this; };
-		virtual const QWidget* getQWidget(void) const override { return this; };
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
 
 		QTreeWidgetItem* findItem(const QString& _itemPath, char _delimiter = '/') const;
 		
@@ -77,7 +77,10 @@ namespace ot {
 
 		//! @brief Deselects all items.
 		//! Emits itemSelectionChanged when done.
-		void deselectAll(void);
+		void deselectAll();
+
+		//! @brief Returns a list of all checked items.
+		std::list<QTreeWidgetItem*> getCheckedItems();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -107,8 +110,8 @@ namespace ot {
 		// Private: Slots
 
 	private Q_SLOTS:
-		void slotColorStyleAboutToChange(void);
-		void slotColorStyleChanged(void);
+		void slotColorStyleAboutToChange();
+		void slotColorStyleChanged();
 
 	private:
 		TreeItemDelegate* m_itemDeletegate;

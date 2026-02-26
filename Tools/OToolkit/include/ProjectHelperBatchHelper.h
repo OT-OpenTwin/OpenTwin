@@ -48,7 +48,6 @@ public:
 public Q_SLOTS:
 	void clear();
 	void slotRefreshData();
-	void slotSelectionChanged();
 	void slotItemChanged(QTreeWidgetItem* _item, int _column);
 	void slotItemDoubleClicked(QTreeWidgetItem* _item, int _column);
 
@@ -75,9 +74,6 @@ private:
 
 	void sortAll(QTreeWidgetItem* _parent);
 	void refreshProjectsDir(const QString& _rootPath, const QIcon& _icon, const QString& _childName, const ProjectHelperBatchHelperProjectItem::CreateFlags& _flags = ProjectHelperBatchHelperProjectItem::NoCreateFlags);
-
-	void refreshSelectionFromCheckState(QTreeWidgetItem* _parent);
-	void resetSelection(QTreeWidgetItem* _parent);
 
 	QWidget* m_rootWidget;
 	ot::TreeWidgetFilter* m_tree;

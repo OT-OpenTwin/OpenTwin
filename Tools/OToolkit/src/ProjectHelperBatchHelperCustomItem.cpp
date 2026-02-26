@@ -109,7 +109,7 @@ ProjectHelperBatchHelperItem* ProjectHelperBatchHelperCustomItem::createFavItemI
 }
 
 ProjectHelperBatchHelperCustomItem::ProjectHelperBatchHelperCustomItem() {
-	setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
+	setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
 	setCheckState(0, Qt::Unchecked);
 }
 

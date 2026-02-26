@@ -43,7 +43,6 @@ ProjectHelperBatchHelper::ProjectHelperBatchHelper() : m_rootWidget(nullptr), m_
 
 	m_tree = new TreeWidgetFilter(m_rootWidget);
 	TreeWidget* tree = m_tree->getTreeWidget();
-	connect(tree, &TreeWidget::itemSelectionChanged, this, &ProjectHelperBatchHelper::slotSelectionChanged);
 	connect(tree, &TreeWidget::itemChanged, this, &ProjectHelperBatchHelper::slotItemChanged);
 	connect(tree, &TreeWidget::itemDoubleClicked, this, &ProjectHelperBatchHelper::slotItemDoubleClicked);
 
@@ -109,30 +108,24 @@ void ProjectHelperBatchHelper::slotRefreshData() {
 	refreshData();
 }
 
-void ProjectHelperBatchHelper::slotSelectionChanged() {
-	TreeWidget* tree = m_tree->getTreeWidget();
-	QSignalBlocker blocker(tree);
-	refreshSelectionFromCheckState(tree->invisibleRootItem());
-	refreshFavourites();
-}
-
 void ProjectHelperBatchHelper::slotItemChanged(QTreeWidgetItem* _item, int _column) {
 	QSignalBlocker blocker(m_tree->getTreeWidget());
 	if (_item->parent() == nullptr) {
 		return;
 	}
 	if (_item->checkState(0) == Qt::Checked) {
-		if (!_item->isSelected()) {
-			_item->setSelected(true);
+		if (m_favouritesItem->hasChild(_item)) {
+			_item->setCheckState(0, Qt::Unchecked);
+			return;
 		}
 	}
 	else {
-		if (_item->isSelected()) {
-			_item->setSelected(false);
+		if (m_favouritesItem->hasChild(_item)) {
+			return;
 		}
 	}
 
-	slotSelectionChanged();
+	refreshFavourites();
 }
 
 void ProjectHelperBatchHelper::slotItemDoubleClicked(QTreeWidgetItem* _item, int _column) {
@@ -227,8 +220,7 @@ void ProjectHelperBatchHelper::restoreTreeData(const QByteArray& _data) {
 		}
 	}
 	
-	slotSelectionChanged();
-
+	refreshFavourites();
 	tree->collapseAll();
 
 	QJsonArray expandedArray = rootObj["Expanded"].toArray();
@@ -289,24 +281,24 @@ void ProjectHelperBatchHelper::refreshFavourites() {
 		return;
 	}
 	else {
-		// Reset favorite selection
+		// Reset favorite check states
 		QSignalBlocker blocker(tree);
-		auto currentSelection = tree->selectedItems();
+		auto currentChecked = tree->getCheckedItems();
 
-		for (QTreeWidgetItem* selItm : currentSelection) {
+		for (QTreeWidgetItem* selItm : currentChecked) {
 			if (m_favouritesItem->hasChild(selItm)) {
-				selItm->setSelected(false);
+				selItm->setCheckState(0, Qt::Checked);
 			}
 		}
 	}
 
 	// Check if favourites are still checked
 	refreshFavourites(m_favouritesItem);
-
+	
 	// Check for new favourites
-	auto selection = tree->selectedItems();
-	for (QTreeWidgetItem* selItm : selection) {
-		ProjectHelperBatchHelperItem* actualItem = dynamic_cast<ProjectHelperBatchHelperItem*>(selItm);
+	auto checkedItems = tree->getCheckedItems();
+	for (QTreeWidgetItem* checkItm : checkedItems) {
+		ProjectHelperBatchHelperItem* actualItem = dynamic_cast<ProjectHelperBatchHelperItem*>(checkItm);
 		if (!actualItem) {
 			continue;
 		}
@@ -415,31 +407,4 @@ void ProjectHelperBatchHelper::refreshProjectsDir(const QString& _rootPath, cons
 	}
 
 	rootItm->setExpanded(true);
-}
-
-void ProjectHelperBatchHelper::refreshSelectionFromCheckState(QTreeWidgetItem* _parent) {
-	for (int i = 0; i < _parent->childCount(); i++) {
-		QTreeWidgetItem* childItm = _parent->child(i);
-		if (childItm->checkState(0) == Qt::Checked) {
-			if (!childItm->isSelected() && childItm->parent() && !m_favouritesItem->hasChild(childItm)) {
-				childItm->setSelected(true);
-			}
-		}
-		else {
-			if (childItm->isSelected()) {
-				childItm->setSelected(false);
-			}
-		}
-		refreshSelectionFromCheckState(childItm);
-	}
-}
-
-void ProjectHelperBatchHelper::resetSelection(QTreeWidgetItem* _parent) {
-	for (int i = 0; i < _parent->childCount(); i++) {
-		QTreeWidgetItem* childItm = _parent->child(i);
-		if (childItm->isSelected()) {
-			childItm->setSelected(false);
-		}
-		resetSelection(childItm);
-	}
 }

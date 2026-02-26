@@ -95,6 +95,14 @@ void ot::TreeWidget::deselectAll(void) {
 	Q_EMIT itemSelectionChanged();
 }
 
+std::list<QTreeWidgetItem*> ot::TreeWidget::getCheckedItems() {
+	std::list<QTreeWidgetItem*> result;
+	for (QTreeWidgetItemIterator it(this, QTreeWidgetItemIterator::Checked); *it; it++) {
+		result.push_back(*it);
+	}
+	return result;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Event handler
