@@ -300,9 +300,10 @@ void EdgesOperationBase::storeInputShapeFaceNames(EntityBrep* baseBrep, std::map
 	}
 }
 
-void EdgesOperationBase::getAllEdgesFromInputShape(EntityBrep* baseBrep, std::map< std::string, const opencascade::handle<TopoDS_TShape>>& allEdges, 
-											 std::map<const opencascade::handle<TopoDS_TShape>, std::string> &allEdgesFace1,
-											 std::map<const opencascade::handle<TopoDS_TShape>, std::string> &allEdgesFace2)
+void EdgesOperationBase::getAllEdgesFromInputShape(TopoDS_Shape &brep, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& allFaceNames,
+												   std::map<const opencascade::handle<TopoDS_TShape>, std::string> &allEdges,
+											       std::map<const opencascade::handle<TopoDS_TShape>, std::string> &allEdgesFace1,
+											       std::map<const opencascade::handle<TopoDS_TShape>, std::string> &allEdgesFace2)
 {
 	allEdges.clear();
 	allEdgesFace1.clear();
@@ -312,7 +313,7 @@ void EdgesOperationBase::getAllEdgesFromInputShape(EntityBrep* baseBrep, std::ma
 	std::map< const opencascade::handle<TopoDS_TShape>, std::list<std::string>> allEdgeNames;
 
 	TopExp_Explorer exp;
-	for (exp.Init(baseBrep->getBrep(), TopAbs_FACE); exp.More(); exp.Next())
+	for (exp.Init(brep, TopAbs_FACE); exp.More(); exp.Next())
 	{
 		TopoDS_Face aFace = TopoDS::Face(exp.Current());
 
@@ -321,9 +322,9 @@ void EdgesOperationBase::getAllEdgesFromInputShape(EntityBrep* baseBrep, std::ma
 		{
 			TopoDS_Edge aEdge = TopoDS::Edge(expE.Current());
 
-			if (baseBrep->getFaceNameMap().count(aFace.TShape()) != 0)
+			if (allFaceNames.count(aFace.TShape()) != 0)
 			{
-				allEdgeNames[aEdge.TShape()].push_back(baseBrep->getFaceNameMap().at(aFace.TShape()));
+				allEdgeNames[aEdge.TShape()].push_back(allFaceNames.at(aFace.TShape()));
 			}
 		}
 	}
@@ -353,23 +354,34 @@ void EdgesOperationBase::getAllEdgesFromInputShape(EntityBrep* baseBrep, std::ma
 				allEdgesFace2[edge.first] = face1;
 			}
 
-			allEdges.emplace(edgeName, edge.first);
+			allEdges.emplace(edge.first, edgeName);
 		}
 	}
 }
 
-void EdgesOperationBase::getAllEdgesForOperation(std::list<EdgesData> &edgeList, std::map< std::string, const opencascade::handle<TopoDS_TShape>> &allEdges, std::map< const opencascade::handle<TopoDS_TShape>, std::string> &allEdgesForOperation)
+void EdgesOperationBase::getAllEdgesForOperation(TopoDS_Shape &brep, std::list<EdgesData> &edgeList, std::map<const opencascade::handle<TopoDS_TShape>, std::string> &allEdges, std::list<TopoDS_Edge> &allEdgesForOperation)
 {
 	allEdgesForOperation.clear();
+
+	std::set<std::string> selectedEdgeNames;
 	
 	for (auto selectedEdge : edgeList)
 	{
 		if (!selectedEdge.getEdgeName().empty())
 		{
-			if (allEdges.count(selectedEdge.getEdgeName()) != 0)
-			{
-				allEdgesForOperation.emplace(allEdges[selectedEdge.getEdgeName()], selectedEdge.getEdgeName());
-			}
+			selectedEdgeNames.emplace(selectedEdge.getEdgeName());
+		}
+	}
+
+	TopExp_Explorer exp;
+	for (exp.Init(brep, TopAbs_EDGE); exp.More(); exp.Next())
+	{
+		TopoDS_Edge edge = TopoDS::Edge(exp.Current());
+
+		if (selectedEdgeNames.count(allEdges[edge.TShape()]) != 0)
+		{
+			// This edge is in the list of selected edges
+			allEdgesForOperation.push_back(edge);
 		}
 	}
 }
@@ -383,28 +395,30 @@ void EdgesOperationBase::performOperation(EntityGeometry* geometryEntity, Entity
 	std::map< const opencascade::handle<TopoDS_TShape>, std::string> allFaceNames = baseBrep->getFaceNameMap();
 	geometryEntity->getBrepEntity()->setFaceNameMap(allFaceNames);
 
+	int count = 0;
+
 	if (operationActive(geometryEntity))
 	{
-		// Store information about input shape's face names
-		storeInputShapeFaceNames(baseBrep, allFaceNames);
-
 		// Get all edges and their names from the input shape
-		std::map< std::string, const opencascade::handle<TopoDS_TShape>> allEdges;
+		std::map<const opencascade::handle<TopoDS_TShape>, std::string> allEdges;
 		std::map<const opencascade::handle<TopoDS_TShape>, std::string> allEdgesFace1;
 		std::map<const opencascade::handle<TopoDS_TShape>, std::string> allEdgesFace2;
 
-		getAllEdgesFromInputShape(baseBrep, allEdges, allEdgesFace1, allEdgesFace2);
+		getAllEdgesFromInputShape(shape, allFaceNames, allEdges, allEdgesFace1, allEdgesFace2);
 
 		// Get all edges for which the operation shall be applied
-		std::map< const opencascade::handle<TopoDS_TShape>, std::string> allEdgesForOperation;
-		
-		getAllEdgesForOperation(edgeList, allEdges, allEdgesForOperation);
+		std::list<TopoDS_Edge> allEdgesForOperation;
+
+		getAllEdgesForOperation(shape, edgeList, allEdges, allEdgesForOperation);
 
 		// Perform the actual operation on the selected edges
 		TopTools_ListOfShape listOfProcessedEdges;
 		BRepTools_History* history = nullptr;
 
-		if (!performActualOperation(geometryEntity, baseBrep, allEdgesForOperation, shape, listOfProcessedEdges, history))
+		// Perform the actual operation based on the first connected loop of edges
+		TopoDS_Shape inputShape = shape;
+		TopoDS_Shape outputShape;
+		if (!performActualOperation(geometryEntity, inputShape, allEdgesForOperation, outputShape, listOfProcessedEdges, history))
 		{
 			shape = baseBrep->getBrep();
 
@@ -416,11 +430,14 @@ void EdgesOperationBase::performOperation(EntityGeometry* geometryEntity, Entity
 			return;
 		}
 
+		shape = outputShape;
+
 		// Apply the face names
 		resultFaceNames.clear();
 
 		// First, we assign the names to all unchanged faces
 		TopExp_Explorer exp;
+
 		for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next())
 		{
 			TopoDS_Face aFace = TopoDS::Face(exp.Current());
@@ -432,7 +449,7 @@ void EdgesOperationBase::performOperation(EntityGeometry* geometryEntity, Entity
 		}
 
 		// Now check for all modified faces
-		for (exp.Init(baseBrep->getBrep(), TopAbs_FACE); exp.More(); exp.Next())
+		for (exp.Init(inputShape, TopAbs_FACE); exp.More(); exp.Next())
 		{
 			TopoDS_Face aFace = TopoDS::Face(exp.Current());
 
@@ -460,7 +477,7 @@ void EdgesOperationBase::performOperation(EntityGeometry* geometryEntity, Entity
 		}
 
 		// Now we label all the faces generated from an operation on a vertex
-		for (exp.Init(baseBrep->getBrep(), TopAbs_VERTEX); exp.More(); exp.Next())
+		for (exp.Init(inputShape, TopAbs_VERTEX); exp.More(); exp.Next())
 		{
 			TopoDS_Vertex aVertex = TopoDS::Vertex(exp.Current());
 
@@ -474,7 +491,7 @@ void EdgesOperationBase::performOperation(EntityGeometry* geometryEntity, Entity
 				{
 					// Now search the edges for the vertex and therefore generate a list of all adjacent faces
 					std::list<opencascade::handle<TopoDS_TShape>> allEdgesForVertex;
-					getAllEdgesForVertex(baseBrep, aVertex, allEdgesForOperation, allEdgesForVertex);
+					getAllEdgesForVertex(inputShape, aVertex, allEdgesForOperation, allEdgesForVertex);
 
 					std::string vertexName = getVertexNameFromEdges(allEdgesForVertex, allEdgesFace1, allEdgesFace2);
 
@@ -485,7 +502,7 @@ void EdgesOperationBase::performOperation(EntityGeometry* geometryEntity, Entity
 
 		delete history;
 		history = nullptr;
-		
+
 		geometryEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
 	}
 	else
@@ -494,27 +511,21 @@ void EdgesOperationBase::performOperation(EntityGeometry* geometryEntity, Entity
 	}
 }
 
-void EdgesOperationBase::getAllEdgesForVertex(EntityBrep* baseBrep, TopoDS_Vertex& aVertex, std::map<const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation, std::list<opencascade::handle<TopoDS_TShape>>& allEdgesForVertex)
+void EdgesOperationBase::getAllEdgesForVertex(TopoDS_Shape &brep, TopoDS_Vertex& aVertex, std::list<TopoDS_Edge>& allEdgesForOperation, std::list<opencascade::handle<TopoDS_TShape>>& allEdgesForVertex)
 {
-	TopExp_Explorer exp;
-	for (exp.Init(baseBrep->getBrep(), TopAbs_EDGE); exp.More(); exp.Next())
+	for (auto aEdge : allEdgesForOperation)
 	{
-		TopoDS_Edge aEdge = TopoDS::Edge(exp.Current());
-
-		if (allEdgesForOperation.count(aEdge.TShape()) > 0)
+		// This is an edge which is used for the operation, so we check whether the edge has the vertex we are searching for
+		TopExp_Explorer expE;
+		for (expE.Init(aEdge, TopAbs_VERTEX); expE.More(); expE.Next())
 		{
-			// This is an edge which is used for the operation, so we check whether the edge has the vertex we are searching for
-			TopExp_Explorer expE;
-			for (expE.Init(aEdge, TopAbs_VERTEX); expE.More(); expE.Next())
-			{
-				TopoDS_Vertex aEdgeVertex = TopoDS::Vertex(expE.Current());
+			TopoDS_Vertex aEdgeVertex = TopoDS::Vertex(expE.Current());
 
-				if (aEdgeVertex.TShape() == aVertex.TShape())
-				{
-					// This edge has the searched for vertex
-					allEdgesForVertex.push_back(aEdge.TShape());
-					break;
-				}
+			if (aEdgeVertex.TShape() == aVertex.TShape())
+			{
+				// This edge has the searched for vertex
+				allEdgesForVertex.push_back(aEdge.TShape());
+				break;
 			}
 		}
 	}

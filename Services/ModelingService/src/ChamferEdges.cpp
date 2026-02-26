@@ -81,32 +81,27 @@ bool ChamferEdges::operationActive(EntityGeometry* geometryEntity)
 	return (chamferWidth != 0.0 && operationActive);
 }
 
-bool ChamferEdges::performActualOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation, TopoDS_Shape& shape, TopTools_ListOfShape& listOfProcessedEdges, BRepTools_History*& history)
+bool ChamferEdges::performActualOperation(EntityGeometry* geometryEntity, TopoDS_Shape &inputShape, const std::list<TopoDS_Edge>& operationEdges, TopoDS_Shape& outputShape, TopTools_ListOfShape& listOfProcessedEdges, BRepTools_History*& history)
 {
 	listOfProcessedEdges.Clear();
 	history = nullptr;
 
 	// Perform the fillet operation
-	BRepFilletAPI_MakeChamfer MC(baseBrep->getBrep());
+	BRepFilletAPI_MakeChamfer MC(inputShape);
 	TopExp_Explorer exp;
 
 	EntityPropertiesDouble* width = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Chamfer width"));
 	double chamferWidth = width->getValue();
 
-	for (exp.Init(baseBrep->getBrep(), TopAbs_EDGE); exp.More(); exp.Next())
+	for (auto edge : operationEdges)
 	{
-		TopoDS_Edge edge = TopoDS::Edge(exp.Current());
-
-		if (allEdgesForOperation.count(edge.TShape()) != 0)
-		{
-			MC.Add(chamferWidth, TopoDS::Edge(exp.Current()));
-			listOfProcessedEdges.Append(exp.Current());
-		}
+		MC.Add(chamferWidth, edge);
+		listOfProcessedEdges.Append(edge);
 	}
 
 	try
 	{
-		shape = MC.Shape();
+		outputShape = MC.Shape();
 	}
 	catch (Standard_Failure)
 	{
@@ -114,7 +109,7 @@ bool ChamferEdges::performActualOperation(EntityGeometry* geometryEntity, Entity
 	}
 
 	TopTools_ListOfShape anArguments;
-	anArguments.Append(baseBrep->getBrep());
+	anArguments.Append(inputShape);
 
 	history = new BRepTools_History(anArguments, MC);
 

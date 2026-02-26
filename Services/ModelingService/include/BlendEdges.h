@@ -49,5 +49,5 @@ protected:
 	std::string getHiddenTreeItemName();
 	std::string getShapeType();
 	bool operationActive(EntityGeometry* geometryEntity);
-	bool performActualOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation, TopoDS_Shape& shape, TopTools_ListOfShape &listOfProcessedEdges, BRepTools_History*& history);
+	bool performActualOperation(EntityGeometry* geometryEntity, TopoDS_Shape &inputShape, const std::list<TopoDS_Edge>& operationEdges, TopoDS_Shape& outputShape, TopTools_ListOfShape &listOfProcessedEdges, BRepTools_History*& history);
 };
