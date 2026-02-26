@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Application.cpp
 // 
 // License:
@@ -44,6 +44,7 @@
 #include "OTModelEntities/EntityBatchImporter.h"
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
+#include "MetadataExtender.h"
 
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/document.h>
@@ -157,6 +158,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	m_buttonUnLockCharacterisation = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Unlock Data Characterisation", "Default/Unlock");
 	_ui->addMenuButton(m_buttonUnLockCharacterisation.setButtonLockFlags(modelWrite));
+
+	m_buttonAddJsonMetadataToSeries = ot::ToolBarButtonCfg(pageName, groupNameImport, "Metadata Import", "Default/TextVisible");
+	_ui->addMenuButton(m_buttonAddJsonMetadataToSeries.setButtonLockFlags(modelWrite));
+	
+	connectToolBarButton(m_buttonAddJsonMetadataToSeries, &m_metadataExtender, &MetadataExtender::extendWithJsonFile);
 
 	std::list<std::string> enabled;
 	std::list<std::string> disabled{ m_buttonAutomaticCreationMSMD .getFullPath(), m_buttonLockCharacterisation.getFullPath(), m_buttonUnLockCharacterisation.getFullPath()};

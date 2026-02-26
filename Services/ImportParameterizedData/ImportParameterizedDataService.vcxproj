@@ -203,6 +203,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
+    <ClCompile Include="include\MetadataExtender.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\BatchedCategorisationHandler.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
@@ -240,6 +241,7 @@
     <ClInclude Include="include\BusinessLogicHandler.h" />
     <ClInclude Include="include\CategorisationFolderNames.h" />
     <ClInclude Include="include\DataCategorizationConsistencyChecker.h" />
+    <ClInclude Include="include\MetadataExtender.h" />
     <ClInclude Include="include\RangeSelectionVisualisationHandler.h" />
     <ClInclude Include="include\SelectionCategorisationColours.h" />
     <ClInclude Include="include\TabledataToResultdataHandler.h" />

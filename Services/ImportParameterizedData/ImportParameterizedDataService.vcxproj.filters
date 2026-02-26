@@ -85,6 +85,9 @@
     <ClCompile Include="src\UniqueEntityNameCreator.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="include\MetadataExtender.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -196,6 +199,9 @@
       <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
     <ClInclude Include="include\UniqueEntityNameCreator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MetadataExtender.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

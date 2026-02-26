@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Application.h
 // 
 // License:
@@ -25,6 +25,7 @@
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
+#include "MetadataExtender.h"
 
 // C++ header
 #include <list>
@@ -37,6 +38,7 @@
 #include "TouchstoneToResultdata.h"
 #include "RangeSelectionVisualisationHandler.h"
 #include "BatchedCategorisationHandler.h"
+#include "OTGuiAPI/ButtonHandler.h"
 
 // Forward declaration
 namespace ot {
@@ -50,7 +52,7 @@ namespace std {
 	class thread;
 }
 
-class Application : public ot::ApplicationBase {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -97,6 +99,7 @@ private:
 	ot::ToolBarButtonCfg m_buttonCreateQuantityEntry;
 	ot::ToolBarButtonCfg m_buttonLockCharacterisation;
 	ot::ToolBarButtonCfg m_buttonUnLockCharacterisation;
+	ot::ToolBarButtonCfg m_buttonAddJsonMetadataToSeries;
 
 	ot::ToolBarButtonCfg m_buttonAutomaticCreationMSMD;
 	ot::ToolBarButtonCfg m_buttonAddBatchCreator;
@@ -121,7 +124,9 @@ private:
 	DataCategorizationHandler* m_parametrizedDataHandler = nullptr;
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
 	TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
-	
+
+	MetadataExtender m_metadataExtender;
+
 	RangeSelectionVisualisationHandler m_rangleSelectionVisualisationHandler;
 	BatchedCategorisationHandler m_batchedCategorisationHandler;
 	void HandleSelectionChanged();

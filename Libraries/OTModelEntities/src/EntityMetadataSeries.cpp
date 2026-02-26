@@ -74,6 +74,7 @@ void EntityMetadataSeries::InsertToQuantityField(std::string fieldName, std::lis
 void EntityMetadataSeries::setMetadata(const ot::JsonDocument& _metadata)
 {
 	m_metadata.CopyFrom(_metadata, m_metadata.GetAllocator());
+	setModified();
 }
 
 
