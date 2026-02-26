@@ -241,7 +241,7 @@ void TransformManipulator::getBoundingSphere(osg::Vec3d& center, double& radius,
 	if (first)
 	{
 		// We could not read dimensions from the objects. This is the case when we are trying to transform a coordinate system
-		center = m_viewer3D->getModel()->getCurrentWorkingPlaneTransform() * osg::Vec3d(0.0, 0.0, 0.0);
+		center = osg::Vec3d(0.0, 0.0, 0.0) * m_viewer3D->getModel()->getCurrentWorkingPlaneTransform();
 		osg::BoundingSphere boundingSphere = m_viewer3D->getModel()->getOSGRootNode()->getBound();
 		radius = boundingSphere.radius() / 3.0;
 	}
