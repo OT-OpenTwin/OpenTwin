@@ -89,12 +89,10 @@ void ViewerComponent::lockSelectionAndModification(bool flag) {
 	ot::WindowAPI::lockSelectionAndModification(flag);
 }
 
-void ViewerComponent::removeViewer(ot::UID viewerID) {
-	for (auto pos = m_viewers.begin(); pos != m_viewers.end(); pos++) {
-		if (*pos == viewerID) {
-			m_viewers.erase(pos);
-			return;
-		}
+void ViewerComponent::viewerDestroyed(ot::UID viewerID) {
+	auto it = std::find(m_viewers.begin(), m_viewers.end(), viewerID);
+	if (it != m_viewers.end()) {
+		m_viewers.erase(it);
 	}
 }
 

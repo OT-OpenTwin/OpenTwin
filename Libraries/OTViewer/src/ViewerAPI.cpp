@@ -154,10 +154,6 @@ void ViewerAPI::deleteModel(ot::UID osgModelID)
 	{
 		OT_VIEWER_MEM_DBG(viewer, "Deleting viewer with ID " + std::to_string(viewer->getViewerID()));
 
-		if (frontend != nullptr) {
-			frontend->removeViewer(viewer->getViewerID());
-		}
-
 		delete viewer;
 		viewer = nullptr;
 	}
@@ -195,6 +191,10 @@ void ViewerAPI::viewerDestroyed(ot::UID _viewerID) {
 	auto viewerIt = intern::ViewerManager::uidToViewerMap().find(_viewerID);
 	if (viewerIt != intern::ViewerManager::uidToViewerMap().end()) {
 		intern::ViewerManager::uidToViewerMap().erase(viewerIt);
+	}
+	FrontendAPI* ui = FrontendAPI::instance();
+	if (ui) {
+		ui->viewerDestroyed(_viewerID);
 	}
 }
 

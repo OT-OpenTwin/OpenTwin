@@ -60,7 +60,7 @@ public:
 	virtual void addKeyShortcut(const std::string& keySequence) override;
 	virtual void lockSelectionAndModification(bool flag) override;
 
-	virtual void removeViewer(ot::UID viewerID) override;
+	virtual void viewerDestroyed(ot::UID viewerID) override;
 
 	virtual void removeUIElements(std::list<ViewerUIDtype>& itemIDList) override;
 

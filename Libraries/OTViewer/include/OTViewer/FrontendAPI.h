@@ -51,7 +51,7 @@ public:
 	virtual void addKeyShortcut(const std::string& keySequence) {};
 	virtual void lockSelectionAndModification(bool flag) {};
 
-	virtual void removeViewer(ot::UID viewerID) {};
+	virtual void viewerDestroyed(ot::UID viewerID) {};
 
 	virtual void removeUIElements(std::list<unsigned long long>& itemIDList) {};
 
