@@ -108,6 +108,7 @@
     <ClInclude Include="include\OTViewer\IntersectionCapCalculator.h" />
     <ClInclude Include="include\OTViewer\PlotManagerView.h" />
     <ClInclude Include="include\OTViewer\PlotVisualiser.h" />
+    <ClInclude Include="include\OTViewer\Private\ViewerDebug.h" />
     <ClInclude Include="include\OTViewer\RangeVisualiser.h" />
     <ClInclude Include="include\OTViewer\SceneNodeCoordinateSystem.h" />
     <ClInclude Include="include\OTViewer\ViewChangedStates.h" />

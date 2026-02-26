@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyInt.h"
 #include "OTGui/Properties/PropertyBool.h"
@@ -49,6 +50,7 @@
 #include "OTViewer/ClipPlaneManipulator.h"
 #include "OTViewer/TransformManipulator.h"
 #include "OTViewer/ViewerObjectSelectionHandler.h"
+#include "OTViewer/Private/ViewerDebug.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -112,6 +114,8 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	mouseCursorY(0.0),
 	freezeWorkingPlane(false)
 {
+	OT_VIEWER_MEM_DBG(this, "Viewer created");
+
 	model = ViewerAPI::getModelFromID(modelID);
 	assert(model != nullptr);
 
@@ -259,22 +263,10 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &Viewer::slotColorStyleChanged);
 }
 
-void Viewer::slotColorStyleChanged(void) 
-{
-	setClearColorAutomatic();
-	refresh();
-}
+Viewer::~Viewer() {
+	OT_VIEWER_MEM_DBG(this, "Viewer destroyed");
 
-void Viewer::slotUpdateViewerSettings(void) {
-	ot::PropertyGridCfg settings = createSettings();
-	FrontendAPI::instance()->updateSettings(settings);
-	FrontendAPI::instance()->saveSettings(settings);
-}
-
-Viewer::~Viewer()
-{
-	if (model != nullptr)
-	{
+	if (model != nullptr) {
 		model->detachViewer(this);
 	}
 
@@ -285,6 +277,20 @@ Viewer::~Viewer()
 	workingPlane = nullptr;
 	if (axisCross != nullptr) delete axisCross;
 	axisCross = nullptr;
+
+	ViewerAPI::viewerDestroyed(viewerUID);
+}
+
+void Viewer::slotColorStyleChanged(void) 
+{
+	setClearColorAutomatic();
+	refresh();
+}
+
+void Viewer::slotUpdateViewerSettings(void) {
+	ot::PropertyGridCfg settings = createSettings();
+	FrontendAPI::instance()->updateSettings(settings);
+	FrontendAPI::instance()->saveSettings(settings);
 }
 
 void Viewer::freeze3DView(bool flag)
@@ -535,7 +541,6 @@ void Viewer::setClearColorAutomatic(void)
 
 	refresh();
 }
-
 
 void Viewer::setClearColor(int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB) 
 {

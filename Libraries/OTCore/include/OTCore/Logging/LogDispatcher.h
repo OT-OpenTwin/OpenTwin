@@ -313,19 +313,11 @@
 
 #endif // ifdef OT_GLOBAL_LOGFLAG_LOGEnabled
 
-#ifdef OT_OS_64Bit
 //! @brief Log a memory pointer address along with a message.
 //! The memory address will be logged as 16 digit hexadecimal value with leading zeros and "0x" prefix.
 //! @param ___ptr Pointer to log.
 //! @param ___message Message to log.
-#define OT_LOG_MEM(___ptr, ___message) OT_LOG_T(___message + std::string(" 0x") + ot::String::numberToHexString(static_cast<uint64_t>(reinterpret_cast<uintptr_t>(___ptr)), '0', 16))
-#else
-//! @brief Log a memory pointer address along with a message.
-//! The memory address will be logged as 8 digit hexadecimal value with leading zeros and "0x" prefix.
-//! @param ___ptr Pointer to log.
-//! @param ___message Message to log.
-#define OT_LOG_MEM(___ptr, ___message) OT_LOG_T(___message + std::string(" 0x") + ot::String::numberToHexString(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(___ptr)), '0', 8))
-#endif
+#define OT_LOG_MEM(___ptr, ___message) OT_LOG_T(___message + std::string(" 0x") + ot::String::ptrToHexString(___ptr))
 
 #pragma warning (disable: 4251)
 

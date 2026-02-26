@@ -343,6 +343,9 @@
     <ClInclude Include="include\OTViewer\SceneNodeCoordinateSystem.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTViewer\Private\ViewerDebug.h">
+      <Filter>include\Private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTViewer\TextVisualiser.h">
@@ -382,6 +385,9 @@
     </Filter>
     <Filter Include="src\Visualiser">
       <UniqueIdentifier>{0daf6459-a3e0-4628-87ec-9bc1695b8382}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Private">
+      <UniqueIdentifier>{09bc0f83-c34a-452c-9c3e-d017cf166f1f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

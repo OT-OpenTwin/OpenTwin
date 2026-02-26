@@ -21,16 +21,21 @@
 #include "OTWidgets/WidgetViewDock.h"
 #include "OTViewer/Viewer.h"
 #include "OTViewer/ViewerView.h"
+#include "OTViewer/Private/ViewerDebug.h"
 
 ot::ViewerView::ViewerView(ot::UID _modelID, ot::UID _viewerID, double _scaleWidth, double _scaleHeight, int _backgroundR, int _backgroundG, int _backgroundB, int _overlayTextR, int _overlayTextG, int _overlayTextB, QWidget* _parent)
 	: WidgetView(WidgetViewBase::View3D, _parent)
 {
 	m_viewer = new Viewer(_modelID, _viewerID, _scaleWidth, _scaleHeight, _backgroundR, _backgroundG, _backgroundB, _overlayTextR, _overlayTextG, _overlayTextB, getViewDockWidget());
 	this->addWidgetInterfaceToDock(m_viewer);
+
+	OT_VIEWER_MEM_DBG(this, "ViewerView created with { \"Viewer.ptr\": \"0x" + String::ptrToHexString(m_viewer) + "\", \"ID\": " + std::to_string(_viewerID));
 }
 
 ot::ViewerView::~ViewerView() {
-
+	delete m_viewer;
+	m_viewer = nullptr;
+	OT_VIEWER_MEM_DBG(this, "ViewerView destroyed");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

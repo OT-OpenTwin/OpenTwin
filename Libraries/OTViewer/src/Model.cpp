@@ -61,6 +61,7 @@
 #include "OTViewer/PlotManagerView.h"
 #include "OTViewer/VisualiserHelper.h"
 #include "OTViewer/IntersectionCapCalculator.h"
+#include "OTViewer/Private/ViewerDebug.h"
 
 // OSG header
 #include <osg/BlendFunc>

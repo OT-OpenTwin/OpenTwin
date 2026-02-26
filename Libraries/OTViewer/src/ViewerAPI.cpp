@@ -32,6 +32,7 @@
 #include "OTViewer/ViewerToolBar.h"
 #include "OTViewer/GlobalFontPath.h"
 #include "OTViewer/PlotManagerView.h"
+#include "OTViewer/Private/ViewerDebug.h"
 
 namespace ViewerAPI {
 	namespace intern {
@@ -151,12 +152,11 @@ void ViewerAPI::deleteModel(ot::UID osgModelID)
 
 	for (auto viewer : viewerList)
 	{
+		OT_VIEWER_MEM_DBG(viewer, "Deleting viewer with ID " + std::to_string(viewer->getViewerID()));
+
 		if (frontend != nullptr) {
 			frontend->removeViewer(viewer->getViewerID());
 		}
-
-		intern::ViewerManager::uidToViewerMap().erase(viewer->getViewerID());
-		viewer->detachFromModel();
 
 		delete viewer;
 		viewer = nullptr;
@@ -189,6 +189,13 @@ ot::UID ViewerAPI::createViewer(ot::UID osgModelID, double scaleWidth, double sc
 	intern::ViewerManager::uidToViewerMap()[intern::ViewerManager::viewerCount()] = viewer;
 
 	return intern::ViewerManager::viewerCount();
+}
+
+void ViewerAPI::viewerDestroyed(ot::UID _viewerID) {
+	auto viewerIt = intern::ViewerManager::uidToViewerMap().find(_viewerID);
+	if (viewerIt != intern::ViewerManager::uidToViewerMap().end()) {
+		intern::ViewerManager::uidToViewerMap().erase(viewerIt);
+	}
 }
 
 ot::WidgetView* ViewerAPI::getViewerWidget(ot::UID viewerID)

@@ -33,7 +33,7 @@
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTWidgets/SelectionData.h"
-#include "ViewChangedStates.h"
+#include "OTViewer/ViewChangedStates.h"
 
 #include <list>
 #include <vector>
@@ -62,6 +62,7 @@ namespace ViewerAPI {
 	__declspec(dllexport) ot::UID getActiveViewerModel();
 
 	__declspec(dllexport) ot::UID createViewer(ot::UID _osgModelID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB, QWidget* _parent);
+	__declspec(dllexport) void viewerDestroyed(ot::UID _viewerID);
 	__declspec(dllexport) ot::WidgetView* getViewerWidget(ot::UID viewer);
 
 	__declspec(dllexport) void resetAllViews3D(ot::UID _osgModelID);
