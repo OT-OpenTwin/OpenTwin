@@ -62,14 +62,21 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 		}
 
 		allSeriesLabels  = resultCollectionAccess->listAllSeriesNames();
+		std::list<std::string> metadataOptions;
 		if (selectedSeries == m_selectedValueNone)
 		{
 			allQuantityLabels = resultCollectionAccess->listAllQuantityLabels();
+			metadataOptions = createMetadataOptions(*resultCollectionAccess.get());
 		}
 		else
 		{
 			allQuantityLabels = resultCollectionAccess->listAllQuantityLabelsFromSeries(selectedSeries);
+			metadataOptions = createMetadataOptions(*resultCollectionAccess.get(),selectedSeries);
 		}
+
+		EntityProperties metadataProperties = _dbAccessEntity->setMetadataQueryOptions(metadataOptions);
+		newProperties.merge(metadataProperties);
+
 
 		//Update Quantity labels and value description overview.
 		std::list<std::string> dependingParameterLables = updateQuantityIfNecessary(_dbAccessEntity, resultCollectionAccess.get(), newProperties);
@@ -101,6 +108,9 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 			}
 			updateParameterIfNecessary(*resultCollectionAccess.get(), queryValueCharacteristics, newProperties);
 		}
+
+
+
 	}
 	allQuantityLabels.push_front(m_selectedValueNone);
 	allSeriesLabels.push_front(m_selectedValueNone);
@@ -375,6 +385,47 @@ void PropertyHandlerDatabaseAccessBlock::updateIfNecessaryValueCharacteristicLab
 		_properties.createProperty(newDTProperty, newDTProperty->getGroup());
 	}
 }
+
+std::list<std::string> PropertyHandlerDatabaseAccessBlock::createMetadataOptions(const ResultCollectionMetadataAccess& _resultAccess, const std::string& _selectedSeries)
+{
+	std::list<std::string> seriesNames;
+	if (_selectedSeries.empty())
+	{
+		seriesNames = _resultAccess.listAllSeriesNames();
+	}
+	else
+	{
+		seriesNames.push_back(_selectedSeries);
+	}
+
+	std::list<std::string> allOptions;
+	for (const std::string& seriesName : seriesNames)
+	{
+		const ot::JsonDocument& metadata = _resultAccess.findMetadataSeries(seriesName)->getMetadata();
+		listify(metadata,allOptions,"");
+	}
+	
+	return allOptions;
+}
+
+void PropertyHandlerDatabaseAccessBlock::listify(const ot::JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase)
+{
+	if (_value.IsObject())
+	{
+		std::string separator = _nameBase.empty() ? "" : m_separator;
+		for (auto& element : _value.GetObject())
+		{
+			const std::string name = _nameBase+ separator+ element.name.GetString();
+			_allEntries.push_back(name);
+			if (element.value.IsObject())
+			{
+				listify(element.value, _allEntries, name);
+			}
+		}
+	}
+}
+
+
 
 void PropertyHandlerDatabaseAccessBlock::resetTupleVisibility(EntityBlockDatabaseAccess* _dbAccessEntity, EntityProperties& _properties)
 {

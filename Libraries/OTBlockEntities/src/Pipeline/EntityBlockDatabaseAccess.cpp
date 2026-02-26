@@ -56,6 +56,7 @@ void EntityBlockDatabaseAccess::createProperties()
 	EntityPropertiesSelection* metadataProp = EntityPropertiesSelection::createProperty(m_groupMetadataFilter, m_propertyNameSeriesMetadata, { ""}, "", "default", getProperties());
 	metadataProp->setAllowCustomValues(true);
 	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueries, 0,0, m_maxNbOfQueries, "default", getProperties());
+	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueriesMetadataSeries, 0,0, m_maxNbOfQueriesMetadata, "default", getProperties());
 	
 	// Quantity Settings
 	EntityPropertiesSelection* groupQuantityProp = EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyName, {""}, "", "default", getProperties());
@@ -87,6 +88,19 @@ void EntityBlockDatabaseAccess::createProperties()
 
 	EntityPropertiesBoolean::createProperty(m_groupQuerySetttings, "Order reproducable", true,"default", getProperties());
 
+	
+	for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
+	{
+		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
+		EntityPropertiesSelection::createProperty(groupName, m_propertyName, { "" }, "", "default", getProperties());
+		PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->setVisible(false);
+
+		EntityPropertiesString::createProperty(groupName, m_propertyValue, "", "default", getProperties());
+		PropertyHelper::getStringProperty(this, m_propertyValue, groupName)->setVisible(false);
+
+		EntityPropertiesSelection::createProperty(groupName, m_propertyComparator, comparators, comparators.front(), "default", getProperties());
+		PropertyHelper::getSelectionProperty(this, m_propertyComparator, groupName)->setVisible(false);
+	}
 	//Add all query fields
 	for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
 	{
@@ -204,6 +218,20 @@ bool EntityBlockDatabaseAccess::updateFromProperties()
 		}
 	}
 
+	auto numberOfMetadataQueries = PropertyHelper::getIntegerProperty(this, m_propertyNumberOfQueriesMetadataSeries);
+	bool metadataQueryRequiresUpdate = numberOfMetadataQueries->needsUpdate();
+	if (metadataQueryRequiresUpdate)
+	{
+		uint32_t numberVisible = static_cast<uint32_t>(numberOfMetadataQueries->getValue());
+		for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
+		{
+			const std::string groupName = m_groupSeriesMetadata+ "_" + std::to_string(i);
+			PropertyHelper::getStringProperty(this, m_propertyValue, groupName)->setVisible(i <= numberVisible);
+			PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->setVisible(i <= numberVisible);
+			PropertyHelper::getSelectionProperty(this, m_propertyComparator, groupName)->setVisible(i <= numberVisible);
+		}
+	}
+
 	getProperties().forceResetUpdateForAllProperties();
 	//updateBlockConfig();
 
@@ -227,6 +255,26 @@ EntityPropertiesSelection* EntityBlockDatabaseAccess::getSeriesSelection()
 	EntityPropertiesSelection* selection = dynamic_cast<EntityPropertiesSelection*>(base);
 	assert(selection != nullptr);
 	return selection;
+}
+
+EntityProperties EntityBlockDatabaseAccess::setMetadataQueryOptions(const std::list<std::string>& _options)
+{
+	std::vector<std::string> newOptions = { _options.begin(), _options.end() };
+	std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(1);
+	const auto& currentOptions = PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->getOptions();
+	EntityProperties newProperties;
+	if (currentOptions != newOptions)
+	{
+		for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
+		{
+			groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
+			EntityPropertiesBase* newProperty = PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->createCopy();
+			auto newSelectionProperty=	dynamic_cast<EntityPropertiesSelection*>(newProperty);
+			newSelectionProperty->resetOptions(_options);
+			newProperties.createProperty(newSelectionProperty, newSelectionProperty->getGroup());
+		}
+	}
+	return newProperties;
 }
 
 ValueCharacteristicProperties EntityBlockDatabaseAccess::getQuantityValueCharacteristic()
@@ -328,6 +376,26 @@ const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getAdd
 		valueComparisonDefinitions.push_back(valueComparisonDefinition);
 	}
 	return valueComparisonDefinitions;
+}
+
+const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getMetadataQueries()
+{
+	std::list<ot::ValueComparisonDefinition> definitions;
+	for (uint32_t index = 0; index < m_maxNbOfQueriesMetadata; index++)
+	{
+		const std::string groupName = m_groupQuerySetttings + "_" + std::to_string(index);
+		if (PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->getVisible())
+		{
+			const std::string name = PropertyHelper::getSelectionPropertyValue(this, m_propertyName, groupName);
+			const std::string comparator = PropertyHelper::getSelectionPropertyValue(this, m_propertyComparator, groupName);
+			const std::string value = PropertyHelper::getSelectionPropertyValue(this, m_propertyValue, groupName);
+			ot::ValueComparisonDefinition definition(name, comparator, value, "", "");
+			definitions.push_back(definition);
+
+		}
+	}
+	
+	return definitions;
 }
 
 const ot::ValueComparisonDefinition EntityBlockDatabaseAccess::getSelectedValueComparisonDefinition(const std::string& _groupName)

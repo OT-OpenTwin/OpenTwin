@@ -39,6 +39,7 @@ private:
 	using parameterUpdate = void (EntityBlockDatabaseAccess::*)(const std::string& _unit, const std::string& _type, EntityProperties& _properties);
 	const std::string m_selectedValueNone = "";
 
+	const std::string m_separator = "~";
 
 	void updateSelectionIfNecessary(std::list<std::string>& _valuesInProject, EntityPropertiesSelection* _selection, EntityProperties& _properties);
 	std::list<std::string> updateQuantityIfNecessary(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity, ResultCollectionMetadataAccess* _resultAccess, EntityProperties& _properties);
@@ -48,6 +49,10 @@ private:
 	void resetValueCharacteristicLabelDataType(const ValueCharacteristicProperties& _selectedProperties, EntityProperties& _properties);
 	void updateIfNecessaryValueCharacteristicLabelUnit(const ValueCharacteristicProperties& _selectedProperties, const std::string& _expectedValue, EntityProperties& _properties);
 	void updateIfNecessaryValueCharacteristicLabelDataType(const ValueCharacteristicProperties& _selectedProperties, const std::string& _expectedValue, EntityProperties& _properties);
+
+	std::list<std::string> createMetadataOptions(const ResultCollectionMetadataAccess& _resultAccess,  const std::string& _selectedSeries = "");
+	void listify(const ot::JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase);
+
 
 	void resetTupleVisibility(EntityBlockDatabaseAccess* _dbAccessEntity, EntityProperties& _properties);
 	void requestPropertyUpdate(ot::UIDList entityIDs, const std::string& propertiesAsJSON);

@@ -46,20 +46,23 @@ public:
 	std::string getSelectedProjectName();
 
 	EntityPropertiesSelection* getSeriesSelection();
-		
+	
+	EntityProperties setMetadataQueryOptions(const std::list<std::string>& _options);
+
 	ValueCharacteristicProperties getQuantityValueCharacteristic();
 	ValueCharacteristicProperties getValueCharacteristics(const std::string& _groupName);
 	ValueCharacteristicProperties getQueryValueCharacteristics(int32_t _queryIndex);
-	
+
 	EntityPropertiesSelection* getTupleFormatSelection();
 	EntityPropertiesSelection* getTupleTargetSelection();
 	EntityPropertiesSelection* getTupleUnitSelection();
 
 	int32_t getSelectedNumberOfQueries();
-
+	
 	const ot::ValueComparisonDefinition getSelectedQuantityDefinition();
 
 	const std::list<ot::ValueComparisonDefinition> getAdditionalQueries();
+	const std::list<ot::ValueComparisonDefinition> getMetadataQueries();
 
 	const ot::Connector getConnectorOutput() const { return m_connectorOutput; }	
 
@@ -79,6 +82,7 @@ protected:
 
 private:
 	const uint32_t m_maxNbOfQueries = 40;
+	const uint32_t m_maxNbOfQueriesMetadata = 4;
 
 	const std::string m_propertyNameProjectName = "Projectname";
 	const std::string m_propertyNameSeriesMetadata = "Measurement series";
@@ -88,7 +92,10 @@ private:
 	const std::string m_groupQuerySetttings = "Query settings";
 	const std::string m_groupTupleSettings = "Tuple settings";
 
-	const std::string m_propertyNumberOfQueries = "Number of queries";
+	const std::string m_groupSeriesMetadata = "Series metadata";
+
+	const std::string m_propertyNumberOfQueries = "Number of parameter queries";
+	const std::string m_propertyNumberOfQueriesMetadataSeries = "Number of metadata queries";
 
 	const std::string m_propertyName = "Name";
 	const std::string m_propertyTupleFormat = "Format";
