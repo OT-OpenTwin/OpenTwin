@@ -213,6 +213,10 @@ namespace ot {
 		//! @param _length Output string length.
 		template <class T> static std::string numberToHexString(T _number, char _fill = '0', int _length = 16);
 
+		//! @brief Returns a hex string representing the provided pointer address.
+		//! @param _ptr Pointer to convert. The pointer address will be converted to a number and then to a hex string with leading zeros.
+		static std::string ptrToHexString(const void* const _ptr);
+
 		//! @brief Evaluates any escape characters in this string.
 		static std::string evaluateEscapeCharacters(const std::string& _string);
 

@@ -61,3 +61,7 @@ template <class T> inline std::string ot::String::numberToHexString(T _number, c
 	ss << std::hex << std::setw(_length) << std::setfill(_fill) << _number;
 	return std::move(ss.str());
 }
+
+inline std::string ot::String::ptrToHexString(const void* const _ptr) {
+	return numberToHexString(static_cast<uint64_t>(reinterpret_cast<uintptr_t>(_ptr)), '0', 16);
+}
