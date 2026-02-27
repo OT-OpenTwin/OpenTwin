@@ -50,6 +50,10 @@ void MetadataSeries::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& 
 	_object.AddMember("Label", ot::JsonString(m_label, _allocator), _allocator);
 	_object.AddMember("Name", ot::JsonString(m_name, _allocator), _allocator);
 
+	ot::JsonValue metadata;
+	metadata.CopyFrom(m_metaData, _allocator);
+	_object.AddMember("Metadata", metadata,_allocator);
+
 	ot::JsonArray allQuantities;
 	for (const MetadataQuantity& quantity : m_quantity)
 	{
