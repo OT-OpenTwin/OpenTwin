@@ -2686,7 +2686,7 @@ void Model::processCurrentSelectionMode(osgUtil::Intersector *intersector, doubl
 		{
 			unsigned long long faceId = selectedItem->getFaceIdFromTriangleIndex(hitIndex);
 
-			faceSelected(selectedItem->getModelEntityID(), selectedItem, faceId);
+			faceSelected(selectedItem->getModelEntityID(), selectedItem, faceId, intersectionPoint);
 		}
 		break;
 	}
@@ -2699,7 +2699,7 @@ void Model::processCurrentSelectionMode(osgUtil::Intersector *intersector, doubl
 		SceneNodeGeometry* selectedItem = dynamic_cast<SceneNodeGeometry*> (findSelectedItemByPolytope(intersector, sceneRadius, intersectionPoint, faceId1, faceId2));
 		if (selectedItem != nullptr)
 		{
-			edgeSelected(selectedItem->getModelEntityID(), selectedItem, faceId1, faceId2);
+			edgeSelected(selectedItem->getModelEntityID(), selectedItem, faceId1, faceId2, intersectionPoint);
 		}
 		break;
 	}
@@ -2800,15 +2800,24 @@ void Model::endCurrentSelectionMode(bool cancelled)
 
 			rapidjson::Value modelID(rapidjson::kArrayType);
 			rapidjson::Value faceName(rapidjson::kArrayType);
+			rapidjson::Value intersectionPointX(rapidjson::kArrayType);
+			rapidjson::Value intersectionPointY(rapidjson::kArrayType);
+			rapidjson::Value intersectionPointZ(rapidjson::kArrayType);
 
 			for (auto selection : m_currentFaceSelection)
 			{
 				modelID.PushBack(rapidjson::Value(selection.getModelID()), newDoc.GetAllocator());
 				faceName.PushBack(ot::JsonString(selection.getFaceName().c_str(), newDoc.GetAllocator()), newDoc.GetAllocator());
+				intersectionPointX.PushBack(selection.getIntersectionPoint().x(), newDoc.GetAllocator());
+				intersectionPointY.PushBack(selection.getIntersectionPoint().y(), newDoc.GetAllocator());
+				intersectionPointZ.PushBack(selection.getIntersectionPoint().z(), newDoc.GetAllocator());
 			}
 
 			newDoc.AddMember("modelID", modelID, newDoc.GetAllocator());
 			newDoc.AddMember("faceName", faceName, newDoc.GetAllocator());
+			newDoc.AddMember("intersectionPointX", intersectionPointX, newDoc.GetAllocator());
+			newDoc.AddMember("intersectionPointY", intersectionPointY, newDoc.GetAllocator());
+			newDoc.AddMember("intersectionPointZ", intersectionPointZ, newDoc.GetAllocator());
 
 			rapidjson::StringBuffer buffer;
 			buffer.Clear();
@@ -2838,15 +2847,24 @@ void Model::endCurrentSelectionMode(bool cancelled)
 
 			rapidjson::Value modelID(rapidjson::kArrayType);
 			rapidjson::Value edgeName(rapidjson::kArrayType);
+			rapidjson::Value intersectionPointX(rapidjson::kArrayType);
+			rapidjson::Value intersectionPointY(rapidjson::kArrayType);
+			rapidjson::Value intersectionPointZ(rapidjson::kArrayType);
 
 			for (auto selection : m_currentEdgeSelection)
 			{
 				modelID.PushBack(rapidjson::Value(selection.getModelID()), newDoc.GetAllocator());
 				edgeName.PushBack(ot::JsonString(selection.getEdgeName().c_str(), newDoc.GetAllocator()), newDoc.GetAllocator());
+				intersectionPointX.PushBack(selection.getIntersectionPoint().x(), newDoc.GetAllocator());
+				intersectionPointY.PushBack(selection.getIntersectionPoint().y(), newDoc.GetAllocator());
+				intersectionPointZ.PushBack(selection.getIntersectionPoint().z(), newDoc.GetAllocator());
 			}
 
 			newDoc.AddMember("modelID", modelID, newDoc.GetAllocator());
 			newDoc.AddMember("edgeName", edgeName, newDoc.GetAllocator());
+			newDoc.AddMember("intersectionPointX", intersectionPointX, newDoc.GetAllocator());
+			newDoc.AddMember("intersectionPointY", intersectionPointY, newDoc.GetAllocator());
+			newDoc.AddMember("intersectionPointZ", intersectionPointZ, newDoc.GetAllocator());
 
 			rapidjson::StringBuffer buffer;
 			buffer.Clear();
@@ -2904,7 +2922,7 @@ void Model::endCurrentSelectionMode(bool cancelled)
 	}
 }
 
-void Model::faceSelected(unsigned long long modelID, SceneNodeGeometry *selectedItem, unsigned long long faceId)
+void Model::faceSelected(unsigned long long modelID, SceneNodeGeometry *selectedItem, unsigned long long faceId, osg::Vec3d intersectionPoint)
 {
 	std::string faceName = selectedItem->getFaceNameFromId(faceId);
 	if (faceName.empty()) return;
@@ -2933,6 +2951,7 @@ void Model::faceSelected(unsigned long long modelID, SceneNodeGeometry *selected
 		selection.setSelectedItem(selectedItem);
 		selection.setFaceId(faceId);
 		selection.setFaceName(faceName);
+		selection.setIntersectionPoint(intersectionPoint);
 
 		m_currentFaceSelection.push_back(selection);
 
@@ -2943,7 +2962,7 @@ void Model::faceSelected(unsigned long long modelID, SceneNodeGeometry *selected
 	if (!m_currentSelectionMultiple) endCurrentSelectionMode(false);
 }
 
-void Model::edgeSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2)
+void Model::edgeSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2, osg::Vec3d intersectionPoint)
 {
 	if (selectedItem == nullptr) return;
 	
@@ -2976,6 +2995,7 @@ void Model::edgeSelected(unsigned long long modelID, SceneNodeGeometry* selected
 		selection.setFaceIds(faceId1, faceId2);
 		selection.setNode(selectedItem->addSelectedEdge(faceId1, faceId2));
 		selection.setEdgeName(edgeName);
+		selection.setIntersectionPoint(intersectionPoint);
 
 		m_currentEdgeSelection.push_back(selection);
 

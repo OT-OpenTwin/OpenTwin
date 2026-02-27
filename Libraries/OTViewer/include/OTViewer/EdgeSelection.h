@@ -40,6 +40,9 @@ public:
 	void setEdgeName(const std::string& name) { edgeName = name; }
 	std::string getEdgeName(void) { return edgeName; }
 
+	void setIntersectionPoint(osg::Vec3d point) { intersectionPoint = point; }
+	osg::Vec3d getIntersectionPoint(void) { return intersectionPoint; }
+
 	bool operator==(const EdgeSelection& other) const {
 		return (selectedItem == other.getSelectedItem()
 			&& (faceId1 == other.getFaceId1() && faceId2 == other.getFaceId2()
@@ -56,4 +59,5 @@ private:
 	unsigned long long faceId2;
 	osg::Node* node;
 	std::string edgeName;
+	osg::Vec3d intersectionPoint;
 };

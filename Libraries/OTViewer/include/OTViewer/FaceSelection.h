@@ -39,6 +39,9 @@ public:
 	void setFaceName(const std::string& name) { faceName = name; }
 	std::string getFaceName(void) { return faceName; }
 
+	void setIntersectionPoint(osg::Vec3d point) { intersectionPoint = point; }
+	osg::Vec3d getIntersectionPoint(void) { return intersectionPoint; }
+
 	bool operator==(const FaceSelection& other) { return (selectedItem == other.getSelectedItem() && faceId == other.getFaceId()); }
 
 private:
@@ -46,6 +49,7 @@ private:
 	SceneNodeGeometry* selectedItem;
 	unsigned long long faceId;
 	std::string faceName;
+	osg::Vec3d intersectionPoint;
 };
 
 bool operator==(const FaceSelection& left, const FaceSelection& right);

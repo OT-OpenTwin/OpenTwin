@@ -37,7 +37,7 @@
 #include "TopTools_ShapeMapHasher.hxx"
 		 
 #include "TopoDS_Face.hxx"
-#include <TopoDS_Vertex.hxx>
+#include "TopoDS_Vertex.hxx"
 
 #include "BRepGProp.hxx"
 #include "GProp_GProps.hxx"
@@ -46,11 +46,12 @@
 #include "Geom_Surface.hxx"
 #include "GeomAPI_ProjectPointOnSurf.hxx"
 #include "GeomLProp_SLProps.hxx"
-#include <BRepExtrema_ExtPF.hxx>
-#include <BRepLProp_SLProps.hxx>
+#include "BRepExtrema_ExtPF.hxx"
+#include "BRepLProp_SLProps.hxx"
 #include "BRepAdaptor_Curve.hxx"
 #include "GCPnts_AbscissaPoint.hxx"
-#include <BRepBuilderAPI_MakeVertex.hxx>
+#include "BRepBuilderAPI_MakeVertex.hxx"
+#include "BRepExtrema_DistShapeShape.hxx"
 
 #include "TopLoc_Location.hxx"
 #include "TopAbs_Orientation.hxx"
@@ -181,12 +182,17 @@ void CoordinateSystemManager::facePicked(const std::string& selectionInfo)
 
 	ot::ConstJsonArray modelID = ot::json::getArray(doc, "modelID");
 	ot::ConstJsonArray faceName = ot::json::getArray(doc, "faceName");
+	ot::ConstJsonArray intersectionPointX = ot::json::getArray(doc, "intersectionPointX");
+	ot::ConstJsonArray intersectionPointY = ot::json::getArray(doc, "intersectionPointY");
+	ot::ConstJsonArray intersectionPointZ = ot::json::getArray(doc, "intersectionPointZ");
 
-	if (modelID.Size() != 1 || faceName.Size() != 1)
+	if (modelID.Size() != 1 || faceName.Size() != 1 || intersectionPointX.Size() != 1 || intersectionPointY.Size() != 1 || intersectionPointZ.Size() != 1)
 	{
 		assert(0); // This should not happen, since we always want to pick exactly one face from one object
 		return;
 	}
+
+	gp_Pnt intersectionPoint(intersectionPointX[0].GetDouble(), intersectionPointY[0].GetDouble(), intersectionPointZ[0].GetDouble());
 
 	ot::EntityInformation geometryInfo;
 	ot::ModelServiceAPI::getEntityInformation({modelID[0].GetUint64()}, geometryInfo);
@@ -209,7 +215,7 @@ void CoordinateSystemManager::facePicked(const std::string& selectionInfo)
 	}
 
 	TopoDS_Shape face;
-	if (!findFaceFromName(brepEntity.get(), faceName[0].GetString(), face))
+	if (!findFaceFromName(brepEntity.get(), faceName[0].GetString(), face, intersectionPoint))
 	{
 		assert(0); // This should not happen, since we just picked the face, so it should still be there
 		return;
@@ -234,12 +240,17 @@ void CoordinateSystemManager::edgePicked(const std::string& selectionInfo)
 
 	ot::ConstJsonArray modelID = ot::json::getArray(doc, "modelID");
 	ot::ConstJsonArray edgeName = ot::json::getArray(doc, "edgeName");
+	ot::ConstJsonArray intersectionPointX = ot::json::getArray(doc, "intersectionPointX");
+	ot::ConstJsonArray intersectionPointY = ot::json::getArray(doc, "intersectionPointY");
+	ot::ConstJsonArray intersectionPointZ = ot::json::getArray(doc, "intersectionPointZ");
 
-	if (modelID.Size() != 1 || edgeName.Size() != 1)
+	if (modelID.Size() != 1 || edgeName.Size() != 1 || intersectionPointX.Size() != 1 || intersectionPointY.Size() != 1 || intersectionPointZ.Size() != 1)
 	{
 		assert(0); // This should not happen, since we always want to pick exactly one edge from one object
 		return;
 	}
+
+	gp_Pnt intersectionPoint(intersectionPointX[0].GetDouble(), intersectionPointY[0].GetDouble(), intersectionPointZ[0].GetDouble());
 
 	ot::EntityInformation geometryInfo;
 	ot::ModelServiceAPI::getEntityInformation({ modelID[0].GetUint64() }, geometryInfo);
@@ -262,7 +273,7 @@ void CoordinateSystemManager::edgePicked(const std::string& selectionInfo)
 	}
 
 	TopoDS_Shape edge;
-	if (!findEdgeFromName(brepEntity.get(), edgeName[0].GetString(), edge))
+	if (!findEdgeFromName(brepEntity.get(), edgeName[0].GetString(), edge, intersectionPoint))
 	{
 		assert(0); // This should not happen, since we just picked the face, so it should still be there
 		return;
@@ -305,8 +316,14 @@ bool CoordinateSystemManager::isGlobalCoordinateSystem(ot::UID entityID, ot::UID
 	return false;
 }
 
-bool CoordinateSystemManager::findFaceFromName(EntityBrep* brepEntity, const std::string& faceName, TopoDS_Shape& face)
+bool CoordinateSystemManager::findFaceFromName(EntityBrep* brepEntity, const std::string& faceName, TopoDS_Shape& face, gp_Pnt intersectionPoint)
 {
+	// It might happen that we find mutiple faces with the same name. In this case, we choose the one closest to the intersection point
+	TopoDS_Vertex intersectionVertex = BRepBuilderAPI_MakeVertex(intersectionPoint);
+
+	double distanceToIntersection = 0.0;
+	bool faceFound = false;
+
 	TopExp_Explorer exp;
 	for (exp.Init(brepEntity->getBrep(), TopAbs_FACE); exp.More(); exp.Next())
 	{
@@ -314,16 +331,36 @@ bool CoordinateSystemManager::findFaceFromName(EntityBrep* brepEntity, const std
 
 		if (brepEntity->getFaceName(aFace) == faceName)
 		{
-			face = exp.Current();
-			return true;
+			// Calculate the distance between the face and the intersection point
+			BRepExtrema_DistShapeShape distAlgo(intersectionVertex, aFace);
+			distAlgo.Perform();
+			double thisDistance = distAlgo.Value();
+
+			if (faceFound)
+			{
+				if (thisDistance < distanceToIntersection)
+				{
+					face = exp.Current();
+					distanceToIntersection = thisDistance;
+				}
+			}
+			else
+			{
+				face = exp.Current();
+				faceFound = true;
+				distanceToIntersection = thisDistance;
+			}
 		}
 	}
 
-	return false;
+	return faceFound;
 }
 
-bool CoordinateSystemManager::findEdgeFromName(EntityBrep* brepEntity, const std::string& edgeName, TopoDS_Shape& edge)
+bool CoordinateSystemManager::findEdgeFromName(EntityBrep* brepEntity, const std::string& edgeName, TopoDS_Shape& edge, gp_Pnt intersectionPoint)
 {
+	// It might happen that we find mutiple edges with the same name. In this case, we choose the one closest to the intersection point
+	TopoDS_Vertex intersectionVertex = BRepBuilderAPI_MakeVertex(intersectionPoint);
+
 	NCollection_DataMap<TopoDS_Edge, std::list<std::string>, TopTools_ShapeMapHasher> allEdgeNames;
 
 	TopExp_Explorer exp;
@@ -358,6 +395,9 @@ bool CoordinateSystemManager::findEdgeFromName(EntityBrep* brepEntity, const std
 
 	NCollection_DataMap<TopoDS_Edge, std::list<std::string>, TopTools_ShapeMapHasher>::Iterator it(allEdgeNames);
 
+	double distanceToIntersection = 0.0;
+	bool edgeFound = false;
+
 	for (; it.More(); it.Next())
 	{
 		const TopoDS_Edge& thisEdge = it.Key();
@@ -372,13 +412,30 @@ bool CoordinateSystemManager::findEdgeFromName(EntityBrep* brepEntity, const std
 
 			if (thisEdgeName == edgeName)
 			{
-				edge = thisEdge;
-				return true;
+				// Calculate the distance between the edge and the intersection point
+				BRepExtrema_DistShapeShape distAlgo(intersectionVertex, thisEdge);
+				distAlgo.Perform();
+				double thisDistance = distAlgo.Value();
+
+				if (edgeFound)
+				{
+					if (thisDistance < distanceToIntersection)
+					{
+						edge = thisEdge;
+						distanceToIntersection = thisDistance;
+					}
+				}
+				else
+				{
+					edge = thisEdge;
+					edgeFound = true;
+					distanceToIntersection = thisDistance;
+				}
 			}
 		}
 	}
 
-	return false;
+	return edgeFound;
 }
 
 bool CoordinateSystemManager::getFacePointAndNormal(const TopoDS_Shape& faceShape, gp_Pnt& outPointOnFace, gp_Dir& outNormal)

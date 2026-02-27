@@ -245,8 +245,8 @@ private:
 	SceneNodeBase* findSelectedItemByLineSegment(osgUtil::Intersector* intersector, double sceneRadius, osg::Vec3d& intersectionPoint, unsigned long long& hitIndex);
 	SceneNodeBase* findSelectedItemByPolytope(osgUtil::Intersector* intersector, double sceneRadius, osg::Vec3d& intersectionPoint, ot::UID& faceId1, ot::UID& faceId2);
 	void	   selectSceneNode(SceneNodeBase *selectedItem, bool bCtrlKeyPressed);
-	void	   faceSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId);
-	void	   edgeSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2);
+	void	   faceSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId, osg::Vec3d intersectionPoint);
+	void	   edgeSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2, osg::Vec3d intersectionPoint);
 	SceneNodeBase *getParentNode(const std::string &treeName);
 	void	   endCurrentSelectionMode(bool cancelled);
 	SceneNodeGeometry *createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, bool _manageParentVisibility, bool _manageChildVisibility);
