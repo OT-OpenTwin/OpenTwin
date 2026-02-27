@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: JSONHelper.cpp
 // 
 // License:
@@ -1562,4 +1562,50 @@ std::string ot::json::toPrettyString(JsonValue& _value)
 	_value.Accept(writer);
 
 	return std::string(buffer.GetString());
+}
+
+void ot::json::mergeObjects(rapidjson::Value& _dstObject, const rapidjson::Value& _srcObject, rapidjson::Document::AllocatorType& _allocator, bool _secureMerge)
+{
+	for (auto srcIt = _srcObject.MemberBegin(); srcIt != _srcObject.MemberEnd(); ++srcIt)
+	{
+		auto dstIt = _dstObject.FindMember(srcIt->name);
+		if (dstIt != _dstObject.MemberEnd())
+		{
+			if (srcIt->value.GetType() != dstIt->value.GetType())
+			{
+				if (_secureMerge) {
+					throw std::exception(("Type conflict in the field: " + std::string(srcIt->name.GetString())).c_str());
+				}
+				else
+				{
+					continue;
+				}
+			}
+			if (srcIt->value.IsArray())
+			{
+				for (auto arrayIt = srcIt->value.Begin(); arrayIt != srcIt->value.End(); ++arrayIt)
+				{
+					ot::JsonValue arrayEntry;
+					arrayEntry.CopyFrom(*arrayIt, _allocator);
+					dstIt->value.PushBack(arrayEntry, _allocator);
+				}
+			}
+			else if (srcIt->value.IsObject())
+			{
+				mergeObjects(dstIt->value, srcIt->value, _allocator);
+			}
+			else
+			{
+				dstIt->value.CopyFrom(srcIt->value, _allocator);
+			}
+		}
+		else
+		{
+			ot::JsonValue value;
+			value.CopyFrom(srcIt->value, _allocator);
+			const std::string name = srcIt->name.GetString();
+			_dstObject.AddMember(ot::JsonString(name,_allocator), value, _allocator);
+		}
+	}
+
 }

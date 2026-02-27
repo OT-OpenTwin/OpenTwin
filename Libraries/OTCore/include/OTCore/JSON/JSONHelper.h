@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: JSONHelper.h
 // 
 // License:
@@ -578,6 +578,11 @@ namespace ot {
 		OT_CORE_API_EXPORT std::string toJson(const ConstJsonArray& _arr);
 		
 		OT_CORE_API_EXPORT std::string toPrettyString(JsonValue& _value);
+
+		//! @brief Merges two objects recursively. Identical fields get their values overwritten by the _srcObject, except they are arrays or documents, which get extended.
+		//! @param _allocator 
+		//! @param _secureMerge If true, an exception is thrown if 
+		OT_CORE_API_EXPORT void mergeObjects(rapidjson::Value& _dstObject, const rapidjson::Value& _srcObject, rapidjson::Document::AllocatorType& _allocator, bool _secureMerge = true);
 
 	} // namespace json
 

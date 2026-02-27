@@ -30,7 +30,7 @@ void MetadataExtender::extendWithJsonFile()
 				const std::string& content = jsonFile->getText();
 				ot::JsonDocument subDoc;
 				subDoc.fromJson(content);
-				mergeObjects(newMetadata, subDoc, newMetadata.GetAllocator());
+				ot::json::mergeObjects(newMetadata, subDoc, newMetadata.GetAllocator());
 			}
 		}
 		catch (std::exception& _e)
@@ -48,7 +48,7 @@ void MetadataExtender::extendWithJsonFile()
 				currentSeriesName = series->getName();
 				ot::JsonDocument individualMetadata;
 				individualMetadata.CopyFrom(series->getMetadata(), individualMetadata.GetAllocator());
-				mergeObjects(individualMetadata, newMetadata, individualMetadata.GetAllocator());
+				ot::json::mergeObjects(individualMetadata, newMetadata, individualMetadata.GetAllocator());
 				series->setMetadata(individualMetadata);
 			}
 		}
@@ -126,47 +126,4 @@ std::list<std::unique_ptr<EntityFileText>> MetadataExtender::getSelectedJsonFile
 		}
 	}
 	return jsonFiles;
-}
-
-void MetadataExtender::mergeObjects(rapidjson::Value& _dstObject, rapidjson::Value& _srcObject, rapidjson::Document::AllocatorType& _allocator, bool _secureMerge)
-{
-	for (auto srcIt = _srcObject.MemberBegin(); srcIt != _srcObject.MemberEnd(); ++srcIt)
-	{
-		auto dstIt = _dstObject.FindMember(srcIt->name);
-		if (dstIt != _dstObject.MemberEnd())
-		{
-			if (srcIt->value.GetType() != dstIt->value.GetType())
-			{
-				if (_secureMerge) {
-					throw std::exception(("Type conflict in the field: " + std::string(srcIt->name.GetString())).c_str());
-				}
-				else
-				{
-					continue;
-				}
-			}
-			if (srcIt->value.IsArray())
-			{
-				for (auto arrayIt = srcIt->value.Begin(); arrayIt != srcIt->value.End(); ++arrayIt)
-				{
-					dstIt->value.PushBack(*arrayIt, _allocator);
-				}
-			}
-			else if (srcIt->value.IsObject())
-			{
-				mergeObjects(dstIt->value, srcIt->value, _allocator);
-			}
-			else
-			{
-				dstIt->value.CopyFrom(srcIt->value, _allocator);
-				dstIt->value = srcIt->value;
-			}
-		}
-		else
-		{
-			ot::JsonValue value;
-			value.CopyFrom(srcIt->value, _allocator);
-			_dstObject.AddMember(srcIt->name, value,_allocator);
-		}
-	}
 }
