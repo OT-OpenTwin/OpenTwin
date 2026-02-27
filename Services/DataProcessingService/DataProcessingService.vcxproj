@@ -202,6 +202,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\EntityCreator.cpp" />
     <ClCompile Include="src\MeasurementCampaignHandler.cpp" />
+    <ClCompile Include="src\MetadataVectorizer.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\PipelineData.cpp" />
     <ClCompile Include="src\PipelineHandler.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\EntityCreator.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />
+    <ClInclude Include="include\MetadataVectorizer.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\GraphNode.h" />
     <ClInclude Include="include\PipelineData.h" />

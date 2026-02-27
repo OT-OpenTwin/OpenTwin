@@ -38,6 +38,9 @@
 #include "OTResultDataAccess/ResultCollection/IndexHandler.h"
 #include "OTResultDataAccess/QuantityContainer.h"
 #include "OTCore/Tuple/TupleDescriptionComplex.h"
+#include "MetadataVectorizer.h"
+
+#include <regex>
 
 #include <algorithm>
 
@@ -206,6 +209,8 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 {
 	collectMetadataForPipeline(_blockEntity);
 
+
+
 	//Next we add a query corresponding to the selected quantity.
 	addQuantityQuery(_blockEntity);
 
@@ -256,9 +261,81 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 {
 	const MetadataSeries* series = nullptr;
 	const std::string seriesLabel = _blockEntity->getSeriesSelection()->getValue();
+	std::list<ot::ValueComparisonDefinition> metadataQueries =	_blockEntity->getMetadataQueries();
+
+	std::list<const MetadataSeries*> matchingSeries;
 	if (seriesLabel != "")
 	{
 		series = m_resultCollectionMetadataAccess->findMetadataSeries(seriesLabel);
+		matchingSeries.push_back(series);
+	}
+	else
+	{
+		
+		const std::list<MetadataSeries>& allSeries = m_resultCollectionMetadataAccess->getMetadataCampaign().getSeriesMetadata();
+		for (const MetadataSeries& series : allSeries)
+		{
+			matchingSeries.push_back(&series);
+		}
+	}
+	auto oneSeriesIt = matchingSeries.begin();
+	while (oneSeriesIt != matchingSeries.end())
+	{
+		const ot::JsonDocument& metadata = (*oneSeriesIt)->getMetadata();
+		bool match = true;
+		for (auto& metadataQuery : metadataQueries)
+		{
+			if (metadataQuery.getComparator() != "")
+			{
+				const std::string fieldName = metadataQuery.getName();
+				const ot::JsonValue& fieldValue = MetadataVectorizer::getValue(metadata, fieldName);
+				const std::string temp = ot::json::toJson(fieldValue);
+				if (fieldValue.IsString())
+				{
+					if (metadataQuery.getComparator() != "")
+					{
+						throw std::exception(("Comparison of strings are only possible with an equality check. Field: " + metadataQuery.getName()).c_str());
+					}
+					else
+					{
+						const std::string actualSeriesMetadataValue = fieldValue.GetString();
+						match &= actualSeriesMetadataValue != metadataQuery.getValue();
+					}
+				}
+				else if(!fieldValue.IsObject() && !fieldValue.IsArray())
+				{
+					match &= compare(metadataQuery, fieldValue);
+				}
+				else
+				{
+					throw std::exception(("Metadata query targets an object, which is not yet supported. Field: " + metadataQuery.getName()).c_str());
+				}
+			}
+			else
+			{
+				OT_LOG_W("Skipping metadata query since no comparator was selected. Field: " + metadataQuery.getName());
+			}
+			if (!match)
+			{
+				break;
+			}
+		}
+	
+		if (match)
+		{
+			//The series matches the metadata query. Check the next metadata query.
+			oneSeriesIt++;
+		}
+		else
+		{
+			oneSeriesIt = matchingSeries.erase(oneSeriesIt);
+		}
+	
+	}
+
+	if (matchingSeries.size() == 1)
+	{
+		series = *matchingSeries.begin();
 		assert(series != nullptr);
 		ot::UID valueUID = series->getSeriesIndex();
 		ot::ValueComparisonDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
@@ -266,19 +343,19 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 	}
 	else
 	{
-		const std::list<MetadataSeries>& allSeries = m_resultCollectionMetadataAccess->getMetadataCampaign().getSeriesMetadata();
 		AdvancedQueryBuilder builder;
 		std::list< BsonViewOrValue> queries;
-		for (const MetadataSeries& series : allSeries)
+
+		for (const MetadataSeries* series : matchingSeries)
 		{
-			ot::ValueComparisonDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(series.getSeriesIndex()), ot::TypeNames::getInt64TypeName(), "");
-			BsonViewOrValue query = builder.createComparison(seriesComparision);
+			ot::ValueComparisonDefinition seriesComparison(MetadataSeries::getFieldName(), "=", std::to_string(series->getSeriesIndex()), ot::TypeNames::getInt64TypeName(), "");
+			BsonViewOrValue query = builder.createComparison(seriesComparison);
 			queries.push_back(std::move(query));
 		}
 		BsonViewOrValue query = builder.connectWithOR(std::move(queries));
 		m_comparisons.push_back(query);
 	}
-
+	
 	return  series;
 }
 
@@ -305,7 +382,6 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	//Now we add the query for the quantity ID
 	ot::ValueComparisonDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
 	addComparision(selectedQuantityDef);
-
 
 	//Now we add a comparision for the searched quantity value.
 	LabelFieldNamePair labelFieldNamePair;
@@ -354,6 +430,85 @@ void BlockHandlerDatabaseAccess::addComparision(const ot::ValueComparisonDefinit
 		m_comparisons.push_back(query);
 	}
 
+}
+
+void BlockHandlerDatabaseAccess::applyRegexFilter(std::list<std::string>& _options, const std::string& _filter)
+{
+	std::regex pattern(_filter);
+
+	auto option = _options.begin();
+	while (option != _options.end())
+	{
+		if (!std::regex_match(*option, pattern)) 
+		{
+			option = _options.erase(option);
+		}
+	}	
+}
+
+bool BlockHandlerDatabaseAccess::compare(const ot::ValueComparisonDefinition& _comparisonDef, const ot::JsonValue& _value)
+{
+	std::string type;
+	if (_value.IsInt())
+	{
+		type = ot::TypeNames::getInt32TypeName();
+	}
+	else if (_value.IsInt64())
+	{
+		type = ot::TypeNames::getInt64TypeName();
+	}
+	else if (_value.IsFloat())
+	{
+		type = ot::TypeNames::getFloatTypeName();
+	}
+	else if (_value.IsDouble())
+	{
+		type = ot::TypeNames::getDoubleTypeName();
+	}
+	else if(_value.IsBool())
+	{
+		type = ot::TypeNames::getBoolTypeName();
+	}
+	else
+	{
+		throw std::exception("Not supported data type for comparison");
+	}
+	
+	ot::ExplicitStringValueConverter converter;
+	ot::Variable givenValue = converter.setValueFromString(_comparisonDef.getValue(), type);
+	
+	ot::JSONToVariableConverter converterJ;
+	ot::Variable isValue = converterJ(_value);
+
+	if (_comparisonDef.getComparator() == "=")
+	{
+		return givenValue == isValue;
+	}
+	else if (_comparisonDef.getComparator() == "<")
+	{
+		return givenValue < isValue;
+	}
+	else if (_comparisonDef.getComparator() == "<=")
+	{
+		return (givenValue < isValue) || (givenValue == isValue);
+	}
+	else if (_comparisonDef.getComparator() == ">")
+	{
+		return (givenValue > isValue);
+	}
+	else if (_comparisonDef.getComparator() == ">=")
+	{
+		return (givenValue > isValue) || (givenValue == isValue);
+	}
+	else if (_comparisonDef.getComparator() == "!=")
+	{
+		return !(givenValue == isValue);
+	}
+	else
+	{
+		throw std::exception(("Not supported operator for comparison: " + _comparisonDef.getComparator()).c_str());
+	}
+	return false;
 }
 
 std::string BlockHandlerDatabaseAccess::getBlockType() const

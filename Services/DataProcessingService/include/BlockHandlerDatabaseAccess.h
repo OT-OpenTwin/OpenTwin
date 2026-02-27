@@ -66,5 +66,7 @@ private:
 	void addParameterQueries(EntityBlockDatabaseAccess* _blockEntity);
 		
 	void addComparision(const ot::ValueComparisonDefinition& _definition);
-		
+
+	void applyRegexFilter(std::list<std::string>& _options, const std::string& _filter);
+	bool compare(const ot::ValueComparisonDefinition& _comparisionDef, const ot::JsonValue& _value);
 };

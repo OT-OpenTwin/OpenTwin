@@ -30,7 +30,7 @@
 #include "OTCore/Tuple/TupleFactory.h"
 #include "OTResultDataAccess/ResultCollection/ProjectToCollectionConverter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
-
+#include "MetadataVectorizer.h"
 
 void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity)
 {
@@ -269,7 +269,14 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 				{
 					EntityPropertiesSelection* newUnitSelection = dynamic_cast<EntityPropertiesSelection*>(tupleUnitSelection->createCopy());
 					newUnitSelection->resetOptions(tupleUnits);
-					newUnitSelection->setValue(tupleUnits[0]);
+					if (tupleUnits.size() == 0)
+					{
+						newUnitSelection->setValue(tupleUnits[0]);
+					}
+					else
+					{
+						newUnitSelection->setValue(tupleUnits[0]);
+					}
 					newUnitSelection->setVisible(true);
 					_properties.createProperty(newUnitSelection, newUnitSelection->getGroup());
 				}
@@ -399,31 +406,18 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::createMetadataOptions
 	}
 
 	std::list<std::string> allOptions;
+	ot::JsonDocument overView;
 	for (const std::string& seriesName : seriesNames)
 	{
 		const ot::JsonDocument& metadata = _resultAccess.findMetadataSeries(seriesName)->getMetadata();
-		listify(metadata,allOptions,"");
+		ot::json::mergeObjects(overView, metadata, overView.GetAllocator());
 	}
+	MetadataVectorizer::vectorize(overView,allOptions,"");
 	
 	return allOptions;
 }
 
-void PropertyHandlerDatabaseAccessBlock::listify(const ot::JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase)
-{
-	if (_value.IsObject())
-	{
-		std::string separator = _nameBase.empty() ? "" : m_separator;
-		for (auto& element : _value.GetObject())
-		{
-			const std::string name = _nameBase+ separator+ element.name.GetString();
-			_allEntries.push_back(name);
-			if (element.value.IsObject())
-			{
-				listify(element.value, _allEntries, name);
-			}
-		}
-	}
-}
+
 
 
 

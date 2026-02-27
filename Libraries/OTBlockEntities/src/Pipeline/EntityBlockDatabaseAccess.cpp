@@ -381,14 +381,14 @@ const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getAdd
 const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getMetadataQueries()
 {
 	std::list<ot::ValueComparisonDefinition> definitions;
-	for (uint32_t index = 0; index < m_maxNbOfQueriesMetadata; index++)
+	for (uint32_t index = 1; index < m_maxNbOfQueriesMetadata; index++)
 	{
-		const std::string groupName = m_groupQuerySetttings + "_" + std::to_string(index);
+		const std::string groupName = m_groupSeriesMetadata+ "_" + std::to_string(index);
 		if (PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->getVisible())
 		{
 			const std::string name = PropertyHelper::getSelectionPropertyValue(this, m_propertyName, groupName);
 			const std::string comparator = PropertyHelper::getSelectionPropertyValue(this, m_propertyComparator, groupName);
-			const std::string value = PropertyHelper::getSelectionPropertyValue(this, m_propertyValue, groupName);
+			const std::string value = PropertyHelper::getStringPropertyValue(this, m_propertyValue, groupName);
 			ot::ValueComparisonDefinition definition(name, comparator, value, "", "");
 			definitions.push_back(definition);
 
