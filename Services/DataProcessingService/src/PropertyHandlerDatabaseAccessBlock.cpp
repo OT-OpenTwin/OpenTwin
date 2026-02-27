@@ -271,7 +271,7 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 					newUnitSelection->resetOptions(tupleUnits);
 					if (tupleUnits.size() == 0)
 					{
-						newUnitSelection->setValue(tupleUnits[0]);
+						newUnitSelection->setValue("");
 					}
 					else
 					{
