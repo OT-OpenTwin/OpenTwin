@@ -52,7 +52,7 @@ namespace std {
 	class thread;
 }
 
-class Application : public ot::ApplicationBase, public ot::ButtonHandler {
+class Application : public ot::ApplicationBase{
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

@@ -162,8 +162,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonAddJsonMetadataToSeries = ot::ToolBarButtonCfg(pageName, groupNameImport, "Metadata Import", "Default/TextVisible");
 	_ui->addMenuButton(m_buttonAddJsonMetadataToSeries.setButtonLockFlags(modelWrite));
 	
-	connectToolBarButton(m_buttonAddJsonMetadataToSeries, &m_metadataExtender, &MetadataExtender::extendWithJsonFile);
-
 	std::list<std::string> enabled;
 	std::list<std::string> disabled{ m_buttonAutomaticCreationMSMD .getFullPath(), m_buttonLockCharacterisation.getFullPath(), m_buttonUnLockCharacterisation.getFullPath()};
 
@@ -293,6 +291,11 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					}
 				}
 			}
+			else if (action == m_buttonAddJsonMetadataToSeries.getFullPath())
+			{
+				m_metadataExtender.extendWithJsonFile();
+			}
+			
 			else if (action == m_buttonAutomaticCreationMSMD.getFullPath())
 			{				
 				std::thread worker( &BatchedCategorisationHandler::createNewScriptDescribedMSMD, std::ref(m_batchedCategorisationHandler), _selectedEntities);
