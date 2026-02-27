@@ -152,6 +152,7 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 	);
 
 	geometryEntity->getProperties() = baseEntity->getProperties();
+	geometryEntity->resetTransformation(); // The transformation is already part of the base shape, no need to re-apply it again (same as for booleans)
 
 	deleteNonStandardProperties(geometryEntity);
 

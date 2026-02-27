@@ -538,7 +538,8 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 		getBlendEdgesManager()->updateShape(geomEntity, shape, resultFaceNames);
 	}
 
-	gp_Trsf newTransform = Transformations::setTransform(geomEntity, shape, gp_Trsf());
+	// Now we need to apply the transformation of the current entity
+	gp_Trsf newTransform = Transformations::setTransform(geomEntity, shape, geomEntity->getBrepEntity()->getTransform());
 
 	geomEntity->setBrep(shape);
 	geomEntity->getBrepEntity()->setTransform(newTransform);
