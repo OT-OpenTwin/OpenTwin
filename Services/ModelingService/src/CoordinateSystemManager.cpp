@@ -37,7 +37,8 @@
 #include "TopTools_ShapeMapHasher.hxx"
 		 
 #include "TopoDS_Face.hxx"
-		 
+#include <TopoDS_Vertex.hxx>
+
 #include "BRepGProp.hxx"
 #include "GProp_GProps.hxx"
 		 
@@ -45,10 +46,12 @@
 #include "Geom_Surface.hxx"
 #include "GeomAPI_ProjectPointOnSurf.hxx"
 #include "GeomLProp_SLProps.hxx"
-
+#include <BRepExtrema_ExtPF.hxx>
+#include <BRepLProp_SLProps.hxx>
 #include "BRepAdaptor_Curve.hxx"
 #include "GCPnts_AbscissaPoint.hxx"
-		 
+#include <BRepBuilderAPI_MakeVertex.hxx>
+
 #include "TopLoc_Location.hxx"
 #include "TopAbs_Orientation.hxx"
 		 
@@ -213,7 +216,7 @@ void CoordinateSystemManager::facePicked(const std::string& selectionInfo)
 	}
 
 	// Get the face center (-> origin) and the corresponding normal direction (-> z axis) from the face object
-	if (!getFaceCentroidAndNormal(face, lcsOrigin, lcsNormal))
+	if (!getFacePointAndNormal(face, lcsOrigin, lcsNormal))
 	{
 		uiComponent->displayErrorPrompt("The origin and face normal cannot be determined from the selected face.");
 		return;
@@ -378,59 +381,60 @@ bool CoordinateSystemManager::findEdgeFromName(EntityBrep* brepEntity, const std
 	return false;
 }
 
-bool CoordinateSystemManager::getFaceCentroidAndNormal(const TopoDS_Shape& faceShape, gp_Pnt& outCentroid, gp_Dir& outNormal)
+bool CoordinateSystemManager::getFacePointAndNormal(const TopoDS_Shape& faceShape, gp_Pnt& outPointOnFace, gp_Dir& outNormal)
 {
 	TopoDS_Face face = TopoDS::Face(faceShape);
 	if (face.IsNull())
 		return false;
 
-	// Compute area properties of the trimmed face; CentreOfMass is in model space.
+	// 1) Area centroid of the trimmed face (can be outside the trimmed region for concave/holed faces)
 	GProp_GProps gprops;
 	BRepGProp::SurfaceProperties(face, gprops);
-	gp_Pnt centroidModel = gprops.CentreOfMass();
+	const gp_Pnt centroid = gprops.CentreOfMass();
 
-	// Get the underlying surface and its location (placement) from the face.
-	TopLoc_Location loc;
-	Handle(Geom_Surface) surf = BRep_Tool::Surface(face, loc);
-	if (surf.IsNull())
+	// 2) Convert centroid to a vertex (because ExtPF works with Vertex + Face)
+	TopoDS_Vertex vtx = BRepBuilderAPI_MakeVertex(centroid);
+
+	// 3) Closest point ON THE TRIMMED FACE to the centroid (guaranteed on face)
+	BRepExtrema_ExtPF ext;
+	ext.Initialize(face);           // initialize fields using the face
+	ext.Perform(vtx, face);         // classification (trim) uses the face
+
+	if (!ext.IsDone() || ext.NbExt() < 1)
 		return false;
 
-	// Convert centroid from model space to the surface's local space (inverse location),
-	// because projection expects point coordinates in the surface's parametric space reference.
-	gp_Trsf invLoc = loc.Transformation();
-	invLoc.Invert();
-	gp_Pnt centroidLocal = centroidModel;
-	centroidLocal.Transform(invLoc);
+	// Pick closest extremum
+	Standard_Integer bestIdx = 1;
+	Standard_Real bestSqDist = ext.SquareDistance(1);
+	for (Standard_Integer i = 2; i <= ext.NbExt(); ++i)
+	{
+		const Standard_Real d = ext.SquareDistance(i);
+		if (d < bestSqDist)
+		{
+			bestSqDist = d;
+			bestIdx = i;
+		}
+	}
 
-	// Project the centroid onto the surface to obtain robust (u,v) parameters.
-	GeomAPI_ProjectPointOnSurf proj(centroidLocal, surf);
-	if (proj.NbPoints() < 1)
-		return false;
+	// Point on face + its parameters
+	const gp_Pnt pOnFace = ext.Point(bestIdx);
 
 	Standard_Real u = 0.0, v = 0.0;
-	proj.LowerDistanceParameters(u, v);
+	ext.Parameter(bestIdx, u, v);
 
-	// Evaluate point on surface at (u,v), then transform back to model space.
-	gp_Pnt pLocal = surf->Value(u, v);
-	gp_Pnt pModel = pLocal;
-	pModel.Transform(loc.Transformation());
-
-	// Compute surface normal from first derivatives at (u,v).
-	// The '1' means compute up to first derivatives; tolerance controls numerical stability.
-	GeomLProp_SLProps slProps(surf, u, v, 1, 1e-9);
+	// 4) Normal on face at (u,v) in model space
+	BRepLProp_SLProps slProps(face, u, v, 1, 1e-9);
 	if (!slProps.IsNormalDefined())
 		return false;
 
-	gp_Dir nLocal = slProps.Normal();
-	gp_Dir nModel = nLocal;
-	nModel.Transform(loc.Transformation());
+	gp_Dir n = slProps.Normal();
 
-	// Respect face orientation: REVERSED flips the geometric normal.
+	// Respect face orientation
 	if (face.Orientation() == TopAbs_REVERSED)
-		nModel.Reverse();
+		n.Reverse();
 
-	outCentroid = centroidModel; // actual area centroid of the trimmed face
-	outNormal = nModel;          // normal evaluated at the projected centroid parameters
+	outPointOnFace = pOnFace; // <-- guaranteed on the (trimmed) face
+	outNormal = n;
 	return true;
 }
 

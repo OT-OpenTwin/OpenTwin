@@ -56,7 +56,7 @@ private:
 	bool isGlobalCoordinateSystem(ot::UID entityID, ot::UID entityVersion);
 	bool findFaceFromName(EntityBrep* brepEntity, const std::string& faceName, TopoDS_Shape& face);
 	bool findEdgeFromName(EntityBrep* brepEntity, const std::string& edgeName, TopoDS_Shape& edge);
-	bool getFaceCentroidAndNormal(const TopoDS_Shape& faceShape, gp_Pnt& outCentroid, gp_Dir& outNormal);
+	bool getFacePointAndNormal(const TopoDS_Shape& faceShape, gp_Pnt& outPointOnFace, gp_Dir& outNormal);
 	bool getEdgeMidpointAndDirection(const TopoDS_Shape& edgeShape, gp_Pnt& outMidPoint, gp_Vec& outDirection);
 	void updateActiveLocalCoordinateSystem(gp_Pnt lcsOrigin, gp_Dir lcsNormal, gp_Vec edgeMidDirection);
 	void setValue(EntityCoordinateSystem* csEntity, const std::string& groupName, const std::string& propName, double value);
