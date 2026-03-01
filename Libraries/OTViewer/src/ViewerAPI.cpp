@@ -474,8 +474,10 @@ void ViewerAPI::notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::st
 		{
 			model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 		}
-		assert(model != nullptr);
-		model->notifySceneNodeAboutViewChange(_sceneNodeName, _state, _viewType);
+
+		if (model) {
+			model->notifySceneNodeAboutViewChange(_sceneNodeName, _state, _viewType);
+		}
 	}
 	catch (std::out_of_range)
 	{

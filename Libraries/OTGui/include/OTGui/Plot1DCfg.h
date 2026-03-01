@@ -42,6 +42,8 @@ namespace ot {
 		};
 
 		enum AxisQuantity {
+			Undefined,
+			XData,
 			Magnitude,
 			Phase,
 			Real,

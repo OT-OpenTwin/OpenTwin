@@ -25,11 +25,11 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/PlotDataset.h"
 #include "OTWidgets/CartesianPlot.h"
-#include "OTWidgets/PolarPlotData.h"
 #include "OTWidgets/PolarPlotCurve.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/CartesianPlotCurve.h"
-#include "OTWidgets/CoordinateFormatConverter.h"
+#include "OTWidgets/PolarPlotDatasetData.h"
+#include "OTWidgets/CartesianPlotDatasetData.h"
 
 // Qwt header
 #include <qwt_symbol.h>
@@ -249,9 +249,8 @@ ot::CartesianPlotCurve* ot::PlotDataset::getCartesianCurve() {
 		detach();
 		delete m_polarCurve;
 		m_polarCurve = nullptr;
-		m_polarCurvePointSymbol = nullptr; //Deleted by the curve ??
-		m_polarData = nullptr;
-
+		m_polarCurvePointSymbol = nullptr;
+		
 		buildCartesianCurve();
 		attach();
 		return m_cartesianCurve;
@@ -413,24 +412,16 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 	}
 }
 
-const ot::PointsContainer ot::PlotDataset::getDisplayedPoints() {
-	ot::PointsContainer points = m_coordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
-	return points;
-}
-
 void ot::PlotDataset::buildCartesianCurve() {
 	m_cartesianCurve = new CartesianPlotCurve(QString::fromStdString(m_config.getTitle()));
 	m_cartesianCurvePointSymbol = new QwtSymbol();
 	m_cartesianCurve->setSymbol(m_cartesianCurvePointSymbol);
-	ot::PointsContainer points = m_coordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
-	m_cartesianCurve->setRawSamples(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
+	m_cartesianCurve->setSamples(m_data.getCartesianAccessor());
 }
 
 void ot::PlotDataset::buildPolarCurve() {
 	m_polarCurve = new PolarPlotCurve(QString::fromStdString(m_config.getTitle()));
 	m_polarCurvePointSymbol = new QwtSymbol();
 	m_polarCurve->setSymbol(m_polarCurvePointSymbol);
-	ot::PointsContainer points = m_coordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
-	m_polarData = new PolarPlotData(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
-	m_polarCurve->setData(m_polarData);
+	m_polarCurve->setData(m_data.getPolarAccessor());
 }

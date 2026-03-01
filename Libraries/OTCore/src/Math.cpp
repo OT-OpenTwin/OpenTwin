@@ -19,10 +19,34 @@
 
 // OpenTwin header
 #include "OTCore/Math.h"
+#include "OTCore/Logging/LogDispatcher.h"
 
 // std header
 #include <cmath>
 #include <algorithm>
+
+std::string ot::Math::toString(ComplexRepresentation _representation) {
+    switch (_representation) {
+    case ot::Math::RealImaginary: return "Real / Imaginary";
+	case ot::Math::MagnitudePhase: return "Magnitude / Phase";
+    default:
+		OT_LOG_E("Invalid ComplexRepresentation value (" + std::to_string(static_cast<int>(_representation)) + ")");
+		return "Real / Imaginary";
+    }
+}
+
+ot::Math::ComplexRepresentation ot::Math::stringToComplexRepresentation(const std::string& _representation) {
+    if (toString(ComplexRepresentation::RealImaginary) == _representation) {
+        return ComplexRepresentation::RealImaginary;
+    }
+    else if (toString(ComplexRepresentation::MagnitudePhase) == _representation) {
+        return ComplexRepresentation::MagnitudePhase;
+	}
+    else {
+        OT_LOG_E("Invalid ComplexRepresentation string \"" + _representation + "\"");
+		return ComplexRepresentation::RealImaginary;
+    }
+}
 
 double ot::Math::euclideanDistance(double _x1, double _y1, double _x2, double _y2) {
     return std::sqrt((_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2));

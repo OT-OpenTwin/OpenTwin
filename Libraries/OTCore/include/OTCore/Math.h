@@ -26,6 +26,13 @@ namespace ot {
 
 	class OT_CORE_API_EXPORT Math {
 	public:
+		enum ComplexRepresentation {
+			RealImaginary, //! Complex number represented as real and imaginary parts
+			MagnitudePhase //! Complex number represented as magnitude and phase
+		};
+
+		static std::string toString(ComplexRepresentation _representation);
+		static ComplexRepresentation stringToComplexRepresentation(const std::string& _representation);
 
 		//! @brief Calculates the Euclidean distance betwenn the two given points.
 		//! @param _x1 Point 1 X.

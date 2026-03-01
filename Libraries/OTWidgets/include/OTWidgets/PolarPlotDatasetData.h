@@ -1,5 +1,5 @@
 // @otlicense
-// File: PolarPlotData.h
+// File: PolarPlotDatasetData.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qwt header
 #include <qwt_series_data.h>
@@ -28,19 +28,23 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT PolarPlotData : public QwtSeriesData<QwtPointPolar> {
+	class PlotDatasetData;
+
+	class PolarPlotDatasetData : public QwtSeriesData<QwtPointPolar> {
+		OT_DECL_NOCOPY(PolarPlotDatasetData)
+		OT_DECL_NOMOVE(PolarPlotDatasetData)
+		OT_DECL_NODEFAULT(PolarPlotDatasetData)
 	public:
-		PolarPlotData(const double* _phase, const double* _magnitude,size_t _numberOfEntries);
-	
-		virtual QwtPointPolar sample(size_t _i) const override;
+		PolarPlotDatasetData(PlotDatasetData* _data);
+		virtual ~PolarPlotDatasetData();
+
+		virtual size_t size() const override;
+		virtual QwtPointPolar sample(size_t _index) const override;
 
 	private:
-		//Expressions as they are more used in for the plot geometry. Magnitude ^= radius and in this context phase ^= azimuth
-		const double* m_azimuth = nullptr;
-		const double* m_radius = nullptr;
-		size_t m_numberOfEntries = 0;
+		friend class PlotDatasetData;
+		void forgetData() { m_data = nullptr; };
 
-		size_t size() const override;
+		PlotDatasetData* m_data;
 	};
-
 }

@@ -17,199 +17,184 @@
 // limitations under the License.
 // @otlicense-end
 
+// OpenTwin header
 #include "OTCore/Variable.h"
-#include <cassert>
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 #include "OTCore/ComplexNumbers/ComplexNumberDefinition.h"
 
 ot::Variable::Variable(float value)
-	:_value(value)
+	: m_value(value)
 {}
 
 ot::Variable::Variable(double value)
-	:_value(value)
+	: m_value(value)
 {}
 
 ot::Variable::Variable(int32_t value)
-	:_value(value)
+	: m_value(value)
 {}
 
 ot::Variable::Variable(int64_t value)
-	:_value(value)
+	: m_value(value)
 {}
 
 ot::Variable::Variable(bool value)
-	:_value(value)
+	: m_value(value)
 {}
 
 ot::Variable::Variable(const char* value)
-	:_value(value)
-{
-
-}
+	: m_value(value)
+{}
 
 ot::Variable::Variable(const std::string& value)
-	:_value(value)
-{
-}
-
+	: m_value(value)
+{}
 
 ot::Variable::Variable(std::string&& value) noexcept
 {
-	_value = std::move(value);
+	m_value = std::move(value);
 }
 
 ot::Variable::Variable(const std::complex<double>& value)
-	:_value(value)
+	: m_value(value)
 {}
 
 ot::Variable::Variable(std::complex<double>&& value) noexcept
-	:_value(std::move(value))
+	: m_value(std::move(value))
 {}
-
-ot::Variable& ot::Variable::operator=(const Variable& other)
-{
-	_value = other._value;
-	return *this;
-}
-
-ot::Variable& ot::Variable::operator=(Variable&& other) noexcept
-{
-	_value = std::move(other._value);
-	return *this;
-}
 
 void ot::Variable::setValue(float value)
 {
-	_value = value;
+	m_value = value;
 }
 
 void ot::Variable::setValue(double value)
 {
-	_value = value;
+	m_value = value;
 }
 
 void ot::Variable::setValue(int32_t value)
 {
-	_value = value;
+	m_value = value;
 }
 
 void ot::Variable::setValue(int64_t value)
 {
-	_value = value;
+	m_value = value;
 }
 
 void ot::Variable::setValue(bool value)
 {
-	_value = value;
+	m_value = value;
 }
 
 void ot::Variable::setValue(const char* value)
 {
-	_value = value;
+	m_value = value;
 }
 
 void ot::Variable::setValue(const std::string& value)
 {
-	_value = value;
+	m_value = value;
 }
 
 void ot::Variable::setValue(std::string&& value)
 {
-	_value = std::move(value);
+	m_value = std::move(value);
 }
 
 void ot::Variable::setValue(const std::complex<double>& value)
 {
-	_value = value;
+	m_value = value;
 }
 
 void ot::Variable::setValue(std::complex<double>&& value)
 {
-	_value = std::move(value);
+	m_value = std::move(value);
 }
 
 void ot::Variable::setValue(const ot::ComplexNumberDefinition& _complexNumberDefinition)
 {
 	if (_complexNumberDefinition.m_format == ot::ComplexNumberFormat::Cartesian)
 	{
-		_value = std::complex<double>(_complexNumberDefinition.m_firstValue, _complexNumberDefinition.m_secondValue);
+		m_value = std::complex<double>(_complexNumberDefinition.m_firstValue, _complexNumberDefinition.m_secondValue);
 	}
 	else
 	{
-		_value = ot::ComplexNumberConversion::polarToCartesian(_complexNumberDefinition);
+		m_value = ot::ComplexNumberConversion::polarToCartesian(_complexNumberDefinition);
 	}
 }
 
 
 bool ot::Variable::isFloat() const
 {
-	return std::holds_alternative<float>(_value);
+	return std::holds_alternative<float>(m_value);
 }
 
 bool ot::Variable::isDouble() const
 {
-	return std::holds_alternative<double>(_value);
+	return std::holds_alternative<double>(m_value);
 }
 
 bool ot::Variable::isInt32() const
 {
-	return std::holds_alternative<int32_t>(_value);
+	return std::holds_alternative<int32_t>(m_value);
 }
 
 bool ot::Variable::isInt64() const
 {
-	return std::holds_alternative<int64_t>(_value);
+	return std::holds_alternative<int64_t>(m_value);
 }
 
 bool ot::Variable::isBool() const
 {
-	return std::holds_alternative<bool>(_value);
+	return std::holds_alternative<bool>(m_value);
 }
 
 bool ot::Variable::isConstCharPtr() const
 {
-	return std::holds_alternative<std::string>(_value);
+	return std::holds_alternative<std::string>(m_value);
 }
 
 bool ot::Variable::isComplex() const
 {
-	return std::holds_alternative<std::complex<double>>(_value);
+	return std::holds_alternative<std::complex<double>>(m_value);
 }
 
 float ot::Variable::getFloat() const
 {
-	return std::get<float>(_value);
+	return std::get<float>(m_value);
 }
 
 double ot::Variable::getDouble() const
 {
-	return std::get<double>(_value);
+	return std::get<double>(m_value);
 }
 
 int32_t ot::Variable::getInt32() const
 {
-	return std::get<int32_t>(_value);
+	return std::get<int32_t>(m_value);
 }
 
 int64_t ot::Variable::getInt64() const
 {
-	return std::get<int64_t>(_value);
+	return std::get<int64_t>(m_value);
 }
 
 bool ot::Variable::getBool() const
 {
-	return std::get<bool>(_value);
+	return std::get<bool>(m_value);
 }
 
 const char* ot::Variable::getConstCharPtr() const
 {
-	return (std::get<std::string>(_value)).c_str();
+	return (std::get<std::string>(m_value)).c_str();
 }
 
 const std::complex<double> ot::Variable::getComplex() const
 {
-	return std::get<std::complex<double>>(_value);
+	return std::get<std::complex<double>>(m_value);
 }
 
 bool ot::Variable::operator==(const Variable& other) const
@@ -223,6 +208,10 @@ bool ot::Variable::operator==(const Variable& other) const
 		other.isInt64() && this->isInt64() && (other.getInt64() == this->getInt64());
 	return equal;
 	
+}
+
+bool ot::Variable::operator!=(const Variable& other) const {
+	return !(*this == other);
 }
 
 bool ot::Variable::operator>(const Variable& other) const
@@ -251,7 +240,7 @@ bool ot::Variable::operator<(const Variable& other) const
 
 std::string ot::Variable::getTypeName() const
 {
-	size_t index = _value.index();
+	const size_t index = m_value.index();
 	if (index == 0)
 	{
 		return ot::TypeNames::getInt32TypeName();
@@ -278,7 +267,7 @@ std::string ot::Variable::getTypeName() const
 	}
 	else
 	{
-		assert(0);
+		OT_LOG_EAS("[FATAL] Unknown variant index (" + std::to_string(index) + ")");
 		return "";
 	}
 }

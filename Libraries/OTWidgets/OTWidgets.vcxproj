@@ -28,6 +28,7 @@
     <ClCompile Include="src\CartesianPlot.cpp" />
     <ClCompile Include="src\CartesianPlotAxis.cpp" />
     <ClCompile Include="src\CartesianPlotCurve.cpp" />
+    <ClCompile Include="src\CartesianPlotDatasetData.cpp" />
     <ClCompile Include="src\CartesianPlotGrid.cpp" />
     <ClCompile Include="src\CartesianPlotLegend.cpp" />
     <ClCompile Include="src\CartesianPlotLegendView.cpp" />
@@ -49,7 +50,6 @@
     <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\ContextMenuAction.cpp" />
     <ClCompile Include="src\ContextMenuManager.cpp" />
-    <ClCompile Include="src\CoordinateFormatConverter.cpp" />
     <ClCompile Include="src\CreateProjectDialog.cpp" />
     <ClCompile Include="src\CustomGraphicsItem.cpp" />
     <ClCompile Include="src\CustomValidator.cpp" />
@@ -136,6 +136,7 @@
     <ClCompile Include="src\PlotPointMapper.cpp" />
     <ClCompile Include="src\PlotView.cpp" />
     <ClCompile Include="src\PolarPlotCurve.cpp" />
+    <ClCompile Include="src\PolarPlotDatasetData.cpp" />
     <ClCompile Include="src\PopupTextEdit.cpp" />
     <ClCompile Include="src\SelectionData.cpp" />
     <ClCompile Include="src\OTSVGDataParser.cpp" />
@@ -194,7 +195,6 @@
     <ClCompile Include="src\PlotDataset.cpp" />
     <ClCompile Include="src\PolarPlot.cpp" />
     <ClCompile Include="src\PolarPlotAxis.cpp" />
-    <ClCompile Include="src\PolarPlotData.cpp" />
     <ClCompile Include="src\PolarPlotGrid.cpp" />
     <ClCompile Include="src\PolarPlotLegend.cpp" />
     <ClCompile Include="src\PolarPlotMagnifier.cpp" />
@@ -279,6 +279,7 @@
     <ClInclude Include="include\OTWidgets\AbstractToolBar.h" />
     <ClInclude Include="include\OTWidgets\BasicValidator.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotCurve.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotDatasetData.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotLegendView.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotTextMarker.h" />
     <ClInclude Include="include\OTWidgets\CentralWidgetManager.h" />
@@ -287,7 +288,6 @@
     <QtMoc Include="include\OTWidgets\DelayedShowHideHandler.h" />
     <QtMoc Include="include\OTWidgets\DirectoryBrowser.h" />
     <QtMoc Include="include\OTWidgets\GlobalShortcutWrapper.h" />
-    <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h" />
     <QtMoc Include="include\OTWidgets\ExpanderWidget.h" />
     <ClInclude Include="include\OTWidgets\CustomValidator.h" />
     <ClInclude Include="include\OTWidgets\FlowLayout.h" />
@@ -322,6 +322,8 @@
     <QtMoc Include="include\OTWidgets\PDFWidget.h" />
     <QtMoc Include="include\OTWidgets\PixmapEditWidget.h" />
     <ClInclude Include="include\OTWidgets\Plot.h" />
+    <ClInclude Include="include\OTWidgets\PlotDatasetData.hpp" />
+    <ClInclude Include="include\OTWidgets\PolarPlotDatasetData.h" />
     <ClInclude Include="include\OTWidgets\PlotPointMapper.h" />
     <ClInclude Include="include\OTWidgets\PlotView.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotCurve.h" />
@@ -405,7 +407,6 @@
     <ClInclude Include="include\OTWidgets\PlotDataset.h" />
     <ClInclude Include="include\OTWidgets\PolarPlot.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotAxis.h" />
-    <ClInclude Include="include\OTWidgets\PolarPlotData.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotGrid.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotLegend.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotMagnifier.h" />

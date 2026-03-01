@@ -23,7 +23,6 @@
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTWidgets/PlotDatasetData.h"
-#include "OTWidgets/CoordinateFormatConverter.h"
 
 // Qwt header
 #include <qwt_symbol.h>
@@ -124,9 +123,9 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Data Setter / Getter
+
 		void updateCurveVisualization(void);
 		PlotDatasetData& getPlotData() { return m_data; }
-		const PointsContainer getDisplayedPoints();
 		void setPlotData(PlotDatasetData&& _dataset) { m_data = std::move(_dataset); }
 
 		void setCurveNameBase(const std::string& _curveNameBase) { m_curveNameBase = _curveNameBase; }
@@ -146,19 +145,15 @@ namespace ot {
 		bool m_isSelected = false;
 		
 		PlotDatasetData m_data;
-		CoordinateFormatConverter m_coordinateFormatConverter;
-
+		
 		// Plot elements
 		CartesianPlotCurve* m_cartesianCurve = nullptr;
+		QwtSymbol* m_cartesianCurvePointSymbol = nullptr; //Ownership is taken by the QwtPlotCurve that get the symbol set in setSymbol
 
 		PolarPlotCurve* m_polarCurve = nullptr;
-		PolarPlotData* m_polarData = nullptr; //Adapter pattern, since the QwtPolarCurve requires data of a internal type. 
-
-		QwtSymbol* m_cartesianCurvePointSymbol = nullptr; //Ownership is taken by the QwtPlotCurve that get the symbol set in setSymbol
 		QwtSymbol* m_polarCurvePointSymbol = nullptr;
 
 		// Config
-
 		Plot1DCurveCfg m_config;
 		BasicEntityInformation m_storageEntityInfo;
 	};

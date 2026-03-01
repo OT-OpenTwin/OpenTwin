@@ -1,5 +1,5 @@
 // @otlicense
-// File: PolarPlotData.cpp
+// File: CartesianPlotDatasetData.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,27 +18,35 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/PolarPlotData.h"
+#include "OTWidgets/PlotDatasetData.h"
+#include "OTWidgets/CartesianPlotDatasetData.h"
 
-ot::PolarPlotData::PolarPlotData(const double* _phase, const double* _magnitude, size_t _numberOfEntries) :
-	m_azimuth(_phase), m_radius(_magnitude), m_numberOfEntries(_numberOfEntries)
+ot::CartesianPlotDatasetData::CartesianPlotDatasetData(PlotDatasetData* _data) 
+	: m_data(_data)
 {
-	assert(m_azimuth != nullptr && m_radius != nullptr);
-	assert(m_numberOfEntries >= 0);
+	OTAssertNullptr(m_data);
 }
 
-QwtPointPolar ot::PolarPlotData::sample(size_t _i) const {
-	if (_i < m_numberOfEntries) {
-		return QwtPointPolar(m_azimuth[_i], m_radius[_i]);
+ot::CartesianPlotDatasetData::~CartesianPlotDatasetData() {
+	if (m_data) {
+		m_data->forgetCartesianAccessor();
+	}
+}
+
+size_t ot::CartesianPlotDatasetData::size() const {
+	if (m_data) {
+		return m_data->getSize();
 	}
 	else {
-		OT_LOG_EAS("Index (" + std::to_string(_i) + ") out of range");
-		return QwtPointPolar(0, 0);
+		return 0;
 	}
 }
 
-size_t ot::PolarPlotData::size() const
-{
-	return m_numberOfEntries;
+QPointF ot::CartesianPlotDatasetData::sample(size_t _index) const {
+	if (m_data) {
+		return m_data->getSample<QPointF>(_index);
+	}
+	else {
+		return QPointF();
+	}
 }

@@ -20,43 +20,95 @@
 #pragma once
 
 // OpenTwin header
-
-#include "OTCore/ComplexNumbers/ComplexNumberContainer.h"
+#include "OTCore/Math.h"
 #include "OTGui/Plot1DCfg.h"
 #include "OTWidgets/WidgetTypes.h"
 
-class QwtPlotCurve;
+// std header
+#include <vector>
+#include <complex>
 
 namespace ot {
 
-	class PolarPlotData;
+	class PolarPlotDatasetData;
+	class CartesianPlotDatasetData;
 
-	class __declspec(dllexport) PlotDatasetData
-	{
+	//! @brief The PlotDatasetData class represents the data of a dataset that is plotted in the Plot. 
+	//! It implements the QwtSeriesData interface to provide the data points for plotting.
+	//! The class supports both real and complex data, and allows for different representations of complex numbers.
+	//! The X and Y quantities can be f configured to represent different aspects of the data.
+	class OT_WIDGETS_API_EXPORT PlotDatasetData {
 		OT_DECL_NOCOPY(PlotDatasetData)
-		OT_DECL_NODEFAULT(PlotDatasetData)
+		OT_DECL_DEFMOVE(PlotDatasetData)
 	public:
-		//! @brief Takes over ownership over ComplexNumberContainer
-		PlotDatasetData(std::vector<double>&& _dataX, ComplexNumberContainer* _complexNumberContainer);
-		PlotDatasetData(std::vector<double>& _dataX, ComplexNumberContainer* _complexNumberContainer);
+		//! @brief Default constructor. Creates an empty dataset with undefined quantities.
+		PlotDatasetData();
+
+		//! @brief Constructor for real data.
+		//! The data can not be changed to a different quantity.
+		//! @param _dataX X values of the dataset.
+		//! @param _dataY Y values of the dataset.
+		PlotDatasetData(const std::vector<double>& _dataX, std::vector<double>&& _dataY);
+
+		//! @brief Constructor for real data.
+		//! The data can not be changed to a different quantity.
+		//! @param _dataX X values of the dataset.
+		//! @param _dataY Y values of the dataset.
+		PlotDatasetData(std::vector<double>&& _dataX, std::vector<double>&& _dataY);
+
+		//! @brief Constructor for complex data.
+		//! @param _dataX X values of the dataset.
+		//! @param _dataY Y values of the dataset as complex numbers. The values will be converted to real / imaginary representation if the provided representation differes.
+		//! @param _complexRepresentation Representation of the provided complex data. This is required to correctly convert the data to the real/imaginary representation.
+		//! @param _initialXQuantity Initial quantity for the X axis.
+		//! @param _initialYQuantity Initial quantity for the Y axis.
+		PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, const Math::ComplexRepresentation _complexRepresentation, Plot1DCfg::AxisQuantity _initialXQuantity = Plot1DCfg::XData, Plot1DCfg::AxisQuantity _initialYQuantity = Plot1DCfg::Real);
+
+		//! @brief Constructor for complex data.
+		//! @param _dataX X values of the dataset.
+		//! @param _dataY Y values of the dataset as complex numbers. The values will be converted to real / imaginary representation if the provided representation differes.
+		//! @param _complexRepresentation Representation of the provided complex data. This is required to correctly convert the data to the real/imaginary representation.
+		//! @param _initialXQuantity Initial quantity for the X axis.
+		//! @param _initialYQuantity Initial quantity for the Y axis.
+		PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, const Math::ComplexRepresentation _complexRepresentation, Plot1DCfg::AxisQuantity _initialXQuantity = Plot1DCfg::XData, Plot1DCfg::AxisQuantity _initialYQuantity = Plot1DCfg::Real);
+
 		~PlotDatasetData();
 
-		PlotDatasetData(PlotDatasetData&& _other) noexcept;
-		PlotDatasetData& operator = (PlotDatasetData&& _other) noexcept = default;
-		
-		//Depends on the ComplexNumberContainer what data is behind x and y
-		const std::vector<double>& getDataX(void) const { return m_dataX; };
-		const ComplexNumberContainer& getDataY(void) const { return *m_dataY; };
-		
-		//! @brief Takes over ownership over ComplexNumberContainer
-		void overrideDataY(ComplexNumberContainer* _complexNumberContainer);
-		const size_t getNumberOfDatapoints() const { return m_numberOfDatapoints; }
-		
-	private:
-		std::vector<double> m_dataX;
-		ComplexNumberContainer* m_dataY = nullptr;
-		size_t m_numberOfDatapoints = 0;
+		void setXQuantity(Plot1DCfg::AxisQuantity _quantity);
+		Plot1DCfg::AxisQuantity getXQuantity() const { return m_xQuantity; };
 
-		void initiate();
+		void setYQuantity(Plot1DCfg::AxisQuantity _quantity);
+		Plot1DCfg::AxisQuantity getYQuantity() const { return m_yQuantity; };
+
+		CartesianPlotDatasetData* getCartesianAccessor();
+		PolarPlotDatasetData* getPolarAccessor();
+
+		size_t getSize() const;
+		template <typename T> T getSample(size_t _index) const;
+
+	private:
+		friend class CartesianPlotDatasetData;
+		friend class PolarPlotDatasetData;
+
+		bool applyQuantity(Plot1DCfg::AxisQuantity _quantity, std::vector<double>& _dataTarget);
+
+		void forgetCartesianAccessor();
+		void forgetPolarAccessor();
+
+		CartesianPlotDatasetData* m_cartesianAccessor;
+		PolarPlotDatasetData* m_polarAccessor;
+
+		Plot1DCfg::AxisQuantity m_xQuantity;
+		Plot1DCfg::AxisQuantity m_yQuantity;
+
+		std::vector<double> m_dataX;
+		std::vector<std::complex<double>> m_dataY;
+		bool m_canConvert;
+
+		std::vector<double> m_calcX; //! @brief Calculated X values depending on the currently used complex representation
+		std::vector<double> m_calcY; //! @brief Calculated Y values depending on the currently used complex representation
 	};
+
 }
+
+#include "OTWidgets/PlotDatasetData.hpp"

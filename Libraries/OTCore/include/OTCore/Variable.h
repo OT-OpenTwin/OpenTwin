@@ -30,112 +30,14 @@
 #include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
 
 #pragma warning(disable:4251)
-namespace ot
-{
-
-	class OT_CORE_API_EXPORT StringWrapper
-	{
-	public:
-		StringWrapper(const char* ptr) {
-			size_t length = strlen(ptr) + 1;
-			_ptr = new char[length];
-			strcpy_s(_ptr, length, ptr);
-		}
-		StringWrapper(const std::string& val)
-		{
-			_ptr = new char[val.size() + 1] {};
-			val.copy(_ptr, val.size());
-		}
-		StringWrapper(std::string&& val)
-		{
-			_ptr = new char[val.size() + 1] {};
-			memmove_s(_ptr, val.size(), val.c_str(), val.size());
-		}
-
-		StringWrapper(const StringWrapper& other)
-		{
-			size_t length = strlen(other._ptr) + 1;
-			_ptr = new char[length] {};
-			memcpy(_ptr, other._ptr, length);
-		}
-		StringWrapper(StringWrapper&& other) noexcept
-		{
-			size_t length = strlen(other._ptr) + 1;
-			_ptr = new char[length];
-			memmove_s(_ptr, length, other._ptr, length);
-			other._ptr = nullptr;
-		}
-		StringWrapper& operator=(const char* ptr) {
-			if (_ptr != nullptr) {
-				delete[] _ptr;
-				_ptr = nullptr;
-			}
-
-			size_t length = strlen(ptr) + 1;
-			_ptr = new char[length];
-			strcpy_s(_ptr, length, ptr);
-			return *this;
-		}
-		StringWrapper& operator=(const StringWrapper& other)
-		{
-			if (_ptr != nullptr)
-			{
-				delete[] _ptr;
-				_ptr = nullptr;
-			}
-			size_t length = strlen(other._ptr) + 1;
-			_ptr = new char[length] {};
-			memcpy(_ptr, other._ptr, length);
-			return *this;
-		}
-		StringWrapper& operator=(StringWrapper&& other) noexcept
-		{
-			if (_ptr != nullptr)
-			{
-				delete[] _ptr;
-				_ptr = nullptr;
-			}
-			size_t length = strlen(other._ptr) + 1;
-			_ptr = new char[length] {};
-			memmove_s(_ptr, length, other._ptr, length);
-			other._ptr = nullptr;
-			return *this;
-		}
-
-		bool operator==(const StringWrapper& other)
-		{
-			const int t = strcmp(_ptr, other._ptr);
-			return t == 0;
-		}
-		bool operator<(const StringWrapper& other)
-		{
-			const int t = strcmp(_ptr, other._ptr);
-			return t < 0;
-		}
-		bool operator>(const StringWrapper& other)
-		{
-			const int t = strcmp(_ptr, other._ptr);
-			return t > 0;
-		}
-
-		operator const char* () const { return _ptr; }
-
-		~StringWrapper()
-		{
-			if (_ptr != nullptr)
-			{
-				delete[] _ptr;
-				_ptr = nullptr;
-			}
-		}
-	private:
-		char* _ptr = nullptr;
-	};
+namespace ot {
 
 	//! @brief Container for the usual data types.
 	//! @note Currently it is required to sort a list of variables before calling unique.
 	class OT_CORE_API_EXPORT Variable
 	{
+		OT_DECL_DEFCOPY(Variable)
+		OT_DECL_DEFMOVE(Variable)
 	public:
 		Variable() {};
 		Variable(float value);
@@ -148,10 +50,6 @@ namespace ot
 		Variable(std::string&& value) noexcept;
 		Variable(const std::complex<double>& value);
 		Variable(std::complex<double>&& value) noexcept;
-		Variable(const Variable& other) = default;
-		Variable(Variable&& other) = default;
-		Variable& operator=(const Variable& other);
-		Variable& operator=(Variable&& other) noexcept;
 
 		void setValue(float value);
 		void setValue(double value);
@@ -183,16 +81,13 @@ namespace ot
 		bool getBool() const;
 		const char* getConstCharPtr() const;
 		const std::complex<double> getComplex() const;
-		//! @brief The underlying complex number is stored as real/imaginary parts. This function returns the complex number in the requested format.
-		//! @param _format 
-		//! @return If the requested format is Cartesian, a vector with real and imaginary part is returned. If the requested format is Polar, a vector with magnitude and angle [rad] is returned.
-		const std::vector<double> getComplexInFormat(ComplexNumberFormat& _format);
 
-		bool operator==(const Variable& other)const;
-		bool operator>(const Variable& other)const;
-		bool operator<(const Variable& other)const;
+		bool operator==(const Variable& other) const;
+		bool operator!=(const Variable& other) const;
+		bool operator>(const Variable& other) const;
+		bool operator<(const Variable& other) const;
 
-		std::string getTypeName()const;
+		std::string getTypeName() const;
 
 	private:
 		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,std::string, std::complex<double>>;
@@ -217,7 +112,7 @@ namespace ot
 			}
 			return abs(a - b) <= epsilon * (std::max)(abs(a), abs(b));
 		}
-		variable_t _value;
+		variable_t m_value;
 	};
 	
 }

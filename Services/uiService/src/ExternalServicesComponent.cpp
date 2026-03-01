@@ -3654,7 +3654,7 @@ void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _documen
 				config.setTitle(curveTitle);
 				
 				//if a rainbow painter is not set yet, it may have been newly set. In that case we need to iterate the colours.
-				bool datasetHasDingleDatapoint = dataSet->getPlotData().getDataX().size() == 1;
+				bool datasetHasDingleDatapoint = dataSet->getPlotData().getSize() == 1;
 				colourSetter.setPainter(config, datasetHasDingleDatapoint);
 				
 

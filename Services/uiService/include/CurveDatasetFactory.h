@@ -18,10 +18,17 @@
 // @otlicense-end
 
 #pragma once
-#include <string>
-#include "OTDataStorage/ResultDataStorageAPI.h"
-#include "OTWidgets/PlotDataset.h"
+
+// OpenTwin header
 #include "OTCore/JSON/JSON.h"
+#include "OTCore/Variable.h"
+#include "OTWidgets/PlotDataset.h"
+#include "OTDataStorage/ResultDataStorageAPI.h"
+
+// std header
+#include <vector>
+#include <string>
+#include <complex>
 
 class CurveDatasetFactory
 {
@@ -56,4 +63,8 @@ private:
 
 	double jsonToDouble(const std::string& _memberName, ot::ConstJsonObject& _jesonEntry, const std::string& _dataType);
 	double jsonToDouble(const rapidjson::Value& _jesonEntry, const std::string& _dataType);
+
+	ot::PlotDatasetData createCurveData(const std::vector<double>& _xData, const std::vector<ot::Variable>& _yData, bool _yDataIsComplex);
+	static std::vector<double> toDoubleVector(const std::vector<ot::Variable>& _values);
+	static std::vector<std::complex<double>> toComplexVector(const std::vector<ot::Variable>& _values);
 };
