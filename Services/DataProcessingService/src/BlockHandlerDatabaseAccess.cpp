@@ -189,18 +189,29 @@ void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseA
 
 void BlockHandlerDatabaseAccess::createLabelFieldNameMap()
 {
-	
-	const std::string selectedQuantity = m_selectedQuantityLabel;
-
 	const MetadataCampaign& campaign = m_resultCollectionMetadataAccess->getMetadataCampaign();
-	const MetadataQuantity* quantity = campaign.getMetadataQuantitiesByLabel().find(selectedQuantity)->second;
-	auto& allDependingParameter = campaign.getMetadataParameterByUID();
-	const std::vector<ot::UID>& dependingParameterIDs = quantity->dependingParameterIds;
-	for (ot::UID dependingParameterID : dependingParameterIDs)
+
+	ot::UIDList relevantParameterIDs;
+	for (ot::UID quantityID : m_queriedQuantities)
 	{
+		const MetadataQuantity& quantity = campaign.getMetadataQuantitiesByUID().find(quantityID)->second;
 		LabelFieldNamePair queryDescription;
-		queryDescription.m_label = allDependingParameter.find(dependingParameterID)->second.parameterLabel;
-		queryDescription.m_fieldName = std::to_string(dependingParameterID);
+		queryDescription.m_label = quantity.quantityLabel;
+		queryDescription.m_fieldName = std::to_string(quantity.quantityIndex);
+		m_labelFieldNamePairs.push_back(queryDescription);
+
+		relevantParameterIDs.insert(relevantParameterIDs.end(), quantity.dependingParameterIds.begin(), quantity.dependingParameterIds.end());
+	}
+	relevantParameterIDs.sort();
+	relevantParameterIDs.unique();
+	const auto& allParameter = campaign.getMetadataParameterByUID();
+	for (ot::UID dependingParameterID : relevantParameterIDs)
+	{
+		const MetadataParameter& parameter = allParameter.find(dependingParameterID)->second;
+
+		LabelFieldNamePair queryDescription;
+		queryDescription.m_label = parameter.parameterLabel;
+		queryDescription.m_fieldName = std::to_string(parameter.parameterUID);
 		m_labelFieldNamePairs.push_back(queryDescription);
 	}
 }
@@ -393,10 +404,11 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	else
 	{
 		std::list<BsonViewOrValue> allQuantityQueries;
+		m_queriedQuantities.clear();
 		for (const MetadataQuantity* viableQuantity : viableQuantities)
 		{
 			ot::UID valueUID = viableQuantity->quantityIndex;
-			m_selectedQuantityLabel = viableQuantity->quantityLabel;
+			m_queriedQuantities.push_back(valueUID);
 			assert(valueUID != 0);
 			//Now we add the query for the quantity ID
 			ot::ValueComparisonDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
