@@ -53,8 +53,9 @@ private:
 	bool m_sortByID = false;
 	const int m_documentLimit = 0;
 
-	std::list<LabelFieldNamePair> m_labelFieldNamePairs;
+	std::list<LabelFieldNamePair> m_labelFieldNamePairsParameter;
 	std::list<LabelFieldNamePair> m_labelFieldNamePairsQuantities;
+	std::list<LabelFieldNamePair> m_labelFieldNamePairsSeries;
 	PipelineData m_queriedData;
 
 	void collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity);

@@ -148,7 +148,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		{
 			auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
 			ot::JsonObject translatedResponseDoc;
-			for (const LabelFieldNamePair& labelFieldNamePair : m_labelFieldNamePairs)
+			for (const LabelFieldNamePair& labelFieldNamePair : m_labelFieldNamePairsParameter)
 			{
 				if (singleMongoDocument.HasMember(labelFieldNamePair.m_fieldName.c_str()))
 				{
@@ -169,6 +169,17 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 				}
 			}
 			
+			std::string seriesID = std::to_string(singleMongoDocument[MetadataSeries::getFieldName().c_str()].GetInt64());
+			for (const auto& seriesPair : m_labelFieldNamePairsSeries)
+			{
+				if (seriesID == seriesPair.m_fieldName)
+				{
+					ot::JsonString newKey(MetadataSeries::getFieldName(), dataDoc.GetAllocator());
+					translatedResponseDoc.AddMember(std::move(newKey), ot::JsonString(seriesPair.m_label, dataDoc.GetAllocator()), dataDoc.GetAllocator());
+					break;
+				}
+			}
+
 			entries.PushBack(translatedResponseDoc, dataDoc.GetAllocator());
 		}
 	
@@ -219,7 +230,7 @@ void BlockHandlerDatabaseAccess::createLabelFieldNameMap()
 		LabelFieldNamePair queryDescription;
 		queryDescription.m_label = parameter.parameterLabel;
 		queryDescription.m_fieldName = std::to_string(parameter.parameterUID);
-		m_labelFieldNamePairs.push_back(queryDescription);
+		m_labelFieldNamePairsParameter.push_back(queryDescription);
 	}
 }
 
@@ -372,6 +383,10 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 		ot::UID valueUID = series->getSeriesIndex();
 		ot::ValueComparisonDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
 		addComparision(seriesComparision);
+		LabelFieldNamePair labelFieldNamePair;
+		labelFieldNamePair.m_fieldName = std::to_string(series->getSeriesIndex()) ;
+		labelFieldNamePair.m_label = series->getLabel();
+		m_labelFieldNamePairsSeries.push_back(labelFieldNamePair);
 	}
 	else
 	{
@@ -383,6 +398,11 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 			ot::ValueComparisonDefinition seriesComparison(MetadataSeries::getFieldName(), "=", std::to_string(series->getSeriesIndex()), ot::TypeNames::getInt64TypeName(), "");
 			BsonViewOrValue query = builder.createComparison(seriesComparison);
 			queries.push_back(std::move(query));
+
+			LabelFieldNamePair labelFieldNamePair;
+			labelFieldNamePair.m_fieldName = std::to_string(series->getSeriesIndex());
+			labelFieldNamePair.m_label = series->getName();
+			m_labelFieldNamePairsSeries.push_back(labelFieldNamePair);
 		}
 		BsonViewOrValue query = builder.connectWithOR(std::move(queries));
 		m_comparisons.push_back(query);
