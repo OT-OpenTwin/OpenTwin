@@ -111,7 +111,7 @@ void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 	}
 }
 
-void ot::PlotBase::resetView(void) {
+void ot::PlotBase::resetView() {
 	m_cartesianPlot->resetPlotView();
 	m_polarPlot->resetPlotView();
 }
@@ -164,12 +164,12 @@ void ot::PlotBase::setErrorState(bool _isError, const QString & _message) {
 	}
 }
 
-void ot::PlotBase::setIncompatibleData(void) {
+void ot::PlotBase::setIncompatibleData() {
 	clear(false);
 	setErrorState(true, "Incompatible data");
 }
 
-void ot::PlotBase::refresh(void) {
+void ot::PlotBase::refresh() {
 	this->applyConfig();
 }
 
@@ -239,7 +239,7 @@ void ot::PlotBase::requestCurveDoubleClicked(UID _entityID, bool _hasControlModi
 	Q_EMIT curveDoubleClicked(_entityID, _hasControlModifier);
 }
 
-void ot::PlotBase::applyConfig(void) {
+void ot::PlotBase::applyConfig() {
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setTitle(m_config.getTitle().c_str());
 
@@ -251,6 +251,11 @@ void ot::PlotBase::applyConfig(void) {
 	axisTitleX = m_config.getAxisLabelX();
 	axisTitleY = m_config.getAxisLabelY();
 	
+	// Update quantities
+	for (auto data : getAllDatasets()) {
+		data->setAxisQuantities(m_config.getXAxisQuantity(), m_config.getYAxisQuantity());
+	}
+
 	// Setup plot XY
 	m_cartesianPlot->setPlotGridVisible(m_config.getGridVisible(), false);
 	m_cartesianPlot->setPlotGridColor(m_config.getGridColor(), false);
@@ -296,7 +301,6 @@ void ot::PlotBase::applyConfig(void) {
 
 	m_polarPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, m_config.getYAxisMax());
 	m_polarPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, m_config.getYAxisMin());
-
 
 	m_cartesianPlot->updateGrid();
 	m_cartesianPlot->updateLegend();

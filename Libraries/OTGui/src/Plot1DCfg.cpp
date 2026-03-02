@@ -42,37 +42,15 @@ ot::Plot1DCfg::PlotType ot::Plot1DCfg::stringToPlotType(const std::string& _type
 	}
 }
 
-std::string ot::Plot1DCfg::axisQuantityToString(AxisQuantity _quantity) {
-	switch (_quantity) {
-	case ot::Plot1DCfg::Magnitude: return "Magnitude";
-	case ot::Plot1DCfg::Phase: return "Phase";
-	case ot::Plot1DCfg::Real: return "Real";
-	case ot::Plot1DCfg::Imaginary: return "Imaginary";
-	case ot::Plot1DCfg::Complex: return "Complex";
-	default:
-		OT_LOG_EAS("Unknown axis quantity (" + std::to_string((int)_quantity) + ")");
-		return "Magnitude";
-	}
-}
-
-ot::Plot1DCfg::AxisQuantity ot::Plot1DCfg::stringToAxisQuantity(const std::string& _quantity) {
-	if (_quantity == Plot1DCfg::axisQuantityToString(Plot1DCfg::Magnitude)) return Plot1DCfg::Magnitude;
-	else if (_quantity == Plot1DCfg::axisQuantityToString(Plot1DCfg::Phase)) return Plot1DCfg::Phase;
-	else if (_quantity == Plot1DCfg::axisQuantityToString(Plot1DCfg::Real)) return Plot1DCfg::Real;
-	else if (_quantity == Plot1DCfg::axisQuantityToString(Plot1DCfg::Imaginary)) return Plot1DCfg::Imaginary;
-	else if (_quantity == Plot1DCfg::axisQuantityToString(Plot1DCfg::Complex)) return Plot1DCfg::Complex;
-	else {
-		OT_LOG_EAS("Unknown axis quantity \"" + _quantity + "\"");
-		return Plot1DCfg::Magnitude;
-	}
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::Plot1DCfg::Plot1DCfg() : 
-	WidgetViewBase(WidgetViewBase::View1D, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle | WidgetViewBase::ViewCloseOnEmptySelection), m_type(Plot1DCfg::Cartesian), m_axisQuantity(Plot1DCfg::Real),
-	m_gridVisible(true), m_gridWidth(1.), m_isHidden(false), m_legendVisible(true), m_curveLimit(0), m_useLimit(false)
-{}
+	WidgetViewBase(WidgetViewBase::View1D, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle | WidgetViewBase::ViewCloseOnEmptySelection), 
+	m_type(Plot1DCfg::Cartesian), m_gridVisible(true), m_gridWidth(1.), m_isHidden(false), m_legendVisible(true), m_curveLimit(0), m_useLimit(false)
+{
+	m_xAxis.setQuantity(Plot1DAxisCfg::AxisQuantity::XData);
+	m_yAxis.setQuantity(Plot1DAxisCfg::AxisQuantity::Real);
+}
 
 ot::Plot1DCfg::~Plot1DCfg() {}
 
@@ -81,8 +59,7 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 
 	_object.AddMember("CollectionName", JsonString(m_collectionName, _allocator), _allocator);
 	_object.AddMember("Type", JsonString(this->plotTypeToString(m_type), _allocator), _allocator);
-	_object.AddMember("AxisQuantity", JsonString(this->axisQuantityToString(m_axisQuantity), _allocator), _allocator);
-
+	
 	_object.AddMember("GridVisible", m_gridVisible, _allocator);
 	JsonObject gridColorObject;
 	m_gridColor.addToJsonObject(gridColorObject, _allocator);
@@ -129,8 +106,7 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	m_collectionName = json::getString(_object, "CollectionName");
 	m_type = this->stringToPlotType(json::getString(_object, "Type"));
-	m_axisQuantity = this->stringToAxisQuantity(json::getString(_object, "AxisQuantity"));
-
+	
 	m_gridVisible = json::getBool(_object, "GridVisible");
 	m_gridColor.setFromJsonObject(json::getObject(_object, "GridColor"));
 	m_gridWidth = json::getDouble(_object, "GridWidth");
@@ -166,7 +142,6 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 	return (WidgetViewBase::operator==(_other)) &&
 		(m_collectionName == _other.m_collectionName) &&
 		(m_type == _other.m_type) &&
-		(m_axisQuantity == _other.m_axisQuantity) &&
 
 		(m_gridVisible == _other.m_gridVisible) &&
 		(m_gridColor == _other.m_gridColor) &&

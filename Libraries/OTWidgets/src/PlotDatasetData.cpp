@@ -25,7 +25,7 @@
 #include "OTWidgets/CartesianPlotDatasetData.h"
 
 ot::PlotDatasetData::PlotDatasetData() 
-	: m_xQuantity(Plot1DCfg::Undefined), m_yQuantity(Plot1DCfg::Undefined), m_canConvert(false),
+	: m_xQuantity(Plot1DAxisCfg::Undefined), m_yQuantity(Plot1DAxisCfg::Undefined), m_canConvert(false),
 	m_cartesianAccessor(nullptr), m_polarAccessor(nullptr)
 {}
 
@@ -34,46 +34,29 @@ ot::PlotDatasetData::PlotDatasetData(const std::vector<double>& _dataX, std::vec
 {}
 
 ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<double>&& _dataY)
-	: m_xQuantity(Plot1DCfg::Undefined), m_yQuantity(Plot1DCfg::Undefined), 
+	: m_xQuantity(Plot1DAxisCfg::Undefined), m_yQuantity(Plot1DAxisCfg::Undefined),
 	m_calcX(std::move(_dataX)), m_calcY(std::move(_dataY)), m_canConvert(false),
 	m_cartesianAccessor(nullptr), m_polarAccessor(nullptr)
 {
 	OTAssert(m_calcX.size() == m_calcY.size(), "Dataset size mismatch");
 }
 
-ot::PlotDatasetData::PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, const Math::ComplexRepresentation _complexRepresentation, Plot1DCfg::AxisQuantity _initialXQuantity, Plot1DCfg::AxisQuantity _initialYQuantity) 
-	: PlotDatasetData(std::move(std::vector<double>(_dataX)), std::move(_dataY), _complexRepresentation, _initialXQuantity, _initialYQuantity)
+ot::PlotDatasetData::PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity, Plot1DAxisCfg::AxisQuantity _initialYQuantity)
+	: PlotDatasetData(std::move(std::vector<double>(_dataX)), std::move(_dataY), _initialXQuantity, _initialYQuantity)
 {}
 
-ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, const Math::ComplexRepresentation _complexRepresentation, Plot1DCfg::AxisQuantity _initialXQuantity, Plot1DCfg::AxisQuantity _initialYQuantity)
-	: m_xQuantity(Plot1DCfg::Undefined), m_yQuantity(Plot1DCfg::Undefined), 
-	m_dataX(std::move(_dataX)), m_canConvert(true),
+ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity, Plot1DAxisCfg::AxisQuantity _initialYQuantity)
+	: m_xQuantity(Plot1DAxisCfg::Undefined), m_yQuantity(Plot1DAxisCfg::Undefined),
+	m_dataX(std::move(_dataX)), m_dataY(std::move(_dataY)), m_canConvert(true),
 	m_cartesianAccessor(nullptr), m_polarAccessor(nullptr)
 {
-	if (_initialXQuantity == Plot1DCfg::Undefined || _initialXQuantity == Plot1DCfg::Complex) {
-		OT_LOG_EAS("Invalid initial X quantity (" + std::to_string(static_cast<int>(_initialXQuantity)) + "). Defaulting to XData");
-		_initialXQuantity = Plot1DCfg::XData;
+	if (_initialXQuantity == Plot1DAxisCfg::Undefined) {
+		OT_LOG_EAS("Undefined initial X quantity (" + std::to_string(static_cast<int>(_initialXQuantity)) + "). Defaulting to XData");
+		_initialXQuantity = Plot1DAxisCfg::XData;
 	}
-	if (_initialYQuantity == Plot1DCfg::Undefined || _initialYQuantity == Plot1DCfg::Complex) {
-		OT_LOG_EAS("Invalid initial Y quantity (" + std::to_string(static_cast<int>(_initialYQuantity)) + "). Defaulting to Real");
-		_initialYQuantity = Plot1DCfg::Real;
-	}
-
-	switch (_complexRepresentation) {
-	case Math::ComplexRepresentation::RealImaginary:
-		m_dataY = std::move(_dataY);
-		break;
-	case Math::ComplexRepresentation::MagnitudePhase:
-		m_dataY.reserve(_dataY.size());
-		for (const auto& val : _dataY) {
-			m_dataY.push_back(std::complex<double>(std::abs(val), std::arg(val)));
-		}
-		break;
-
-	default:
-		OT_LOG_EAS("Invalid complex representation (" + std::to_string(static_cast<int>(_complexRepresentation)) + "). Defaulting to Real/Imaginary");
-		m_dataY = std::move(_dataY);
-		break;
+	if (_initialYQuantity == Plot1DAxisCfg::Undefined) {
+		OT_LOG_EAS("Undefined initial Y quantity (" + std::to_string(static_cast<int>(_initialYQuantity)) + "). Defaulting to Real");
+		_initialYQuantity = Plot1DAxisCfg::Real;
 	}
 
 	OTAssert(m_dataX.size() == m_dataY.size(), "Dataset size mismatch");
@@ -96,7 +79,7 @@ ot::PlotDatasetData::~PlotDatasetData()
 	}
 }
 
-void ot::PlotDatasetData::setXQuantity(Plot1DCfg::AxisQuantity _quantity) {
+void ot::PlotDatasetData::setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity) {
 	if (m_xQuantity == _quantity || !m_canConvert) {
 		return;
 	}
@@ -105,7 +88,7 @@ void ot::PlotDatasetData::setXQuantity(Plot1DCfg::AxisQuantity _quantity) {
 	}
 }
 
-void ot::PlotDatasetData::setYQuantity(Plot1DCfg::AxisQuantity _quantity) {
+void ot::PlotDatasetData::setYQuantity(Plot1DAxisCfg::AxisQuantity _quantity) {
 	if (m_yQuantity == _quantity || !m_canConvert) {
 		return;
 	}
@@ -128,10 +111,17 @@ ot::PolarPlotDatasetData* ot::PlotDatasetData::getPolarAccessor() {
 	return m_polarAccessor;
 }
 
-bool ot::PlotDatasetData::applyQuantity(Plot1DCfg::AxisQuantity _quantity, std::vector<double>& _dataTarget) {
+bool ot::PlotDatasetData::applyQuantity(Plot1DAxisCfg::AxisQuantity _quantity, std::vector<double>& _dataTarget) {
 	_dataTarget.clear();
+	
+	if (m_polarAccessor) {
+		m_polarAccessor->resetCachedRect();
+	}
+	if (m_cartesianAccessor) {
+		m_cartesianAccessor->resetCachedRect();
+	}
 
-	if (_quantity == Plot1DCfg::XData) {
+	if (_quantity == Plot1DAxisCfg::XData) {
 		if (m_dataX.empty()) {
 			return false;
 		}
@@ -145,44 +135,40 @@ bool ot::PlotDatasetData::applyQuantity(Plot1DCfg::AxisQuantity _quantity, std::
 	}
 
 	switch (_quantity) {
-	case ot::Plot1DCfg::XData:
+	case Plot1DAxisCfg::XData:
 		OT_LOG_EA("Invalid data state. This should not happen!");
 		break;
 
-	case ot::Plot1DCfg::Magnitude:
+	case Plot1DAxisCfg::Magnitude:
 		_dataTarget.reserve(m_dataY.size());
 		for (const auto& val : m_dataY) {
 			_dataTarget.push_back(std::abs(val));
 		}
 		break;
 
-	case ot::Plot1DCfg::Phase:
+	case Plot1DAxisCfg::Phase:
 		_dataTarget.reserve(m_dataY.size());
 		for (const auto& val : m_dataY) {
 			_dataTarget.push_back(std::arg(val));
 		}
 		break;
 
-	case ot::Plot1DCfg::Real:
+	case Plot1DAxisCfg::Real:
 		_dataTarget.reserve(m_dataY.size());
 		for (const auto& val : m_dataY) {
 			_dataTarget.push_back(val.real());
 		}
 		break;
 
-	case ot::Plot1DCfg::Imaginary:
+	case Plot1DAxisCfg::Imaginary:
 		_dataTarget.reserve(m_dataY.size());
 		for (const auto& val : m_dataY) {
 			_dataTarget.push_back(val.imag());
 		}
 		break;
 
-	case ot::Plot1DCfg::Undefined:
+	case Plot1DAxisCfg::Undefined:
 		OT_LOG_E("Undefined quantity. No values applied.");
-		return false;
-
-	case ot::Plot1DCfg::Complex:
-		OT_LOG_E("Complex quantity is not applicable for axis values. No values applied.");
 		return false;
 
 	default:
@@ -191,12 +177,4 @@ bool ot::PlotDatasetData::applyQuantity(Plot1DCfg::AxisQuantity _quantity, std::
 	}
 
 	return true;
-}
-
-void ot::PlotDatasetData::forgetCartesianAccessor() {
-	m_cartesianAccessor = nullptr;
-}
-
-void ot::PlotDatasetData::forgetPolarAccessor() {
-	m_polarAccessor = nullptr;
 }

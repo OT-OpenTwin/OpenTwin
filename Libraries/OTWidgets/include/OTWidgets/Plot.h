@@ -45,7 +45,7 @@ namespace ot {
 
 		virtual std::list<PlotDataset*> findDatasets(UID _entityID) override;
 
-		virtual std::list<PlotDataset*> getAllDatasets(void) const override;
+		virtual std::list<PlotDataset*> getAllDatasets() const override;
 
 		virtual void addDatasetToCache(PlotDataset* _dataset) override;
 

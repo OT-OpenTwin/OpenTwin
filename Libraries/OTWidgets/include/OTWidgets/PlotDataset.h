@@ -111,6 +111,8 @@ namespace ot {
 			m_config = _config;
 		}
 
+		void setAxisQuantities(Plot1DAxisCfg::AxisQuantity _xQuantity, Plot1DAxisCfg::AxisQuantity _yQuantity);
+
 		void setSelected(bool _isSelected);
 		bool isSelected() const { return m_isSelected; };
 

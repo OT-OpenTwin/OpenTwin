@@ -323,6 +323,8 @@
     <QtMoc Include="include\OTWidgets\PixmapEditWidget.h" />
     <ClInclude Include="include\OTWidgets\Plot.h" />
     <ClInclude Include="include\OTWidgets\PlotDatasetData.hpp" />
+    <ClInclude Include="include\OTWidgets\PlotSeriesData.h" />
+    <ClInclude Include="include\OTWidgets\PlotSeriesData.hpp" />
     <ClInclude Include="include\OTWidgets\PolarPlotDatasetData.h" />
     <ClInclude Include="include\OTWidgets\PlotPointMapper.h" />
     <ClInclude Include="include\OTWidgets\PlotView.h" />

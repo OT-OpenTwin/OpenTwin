@@ -18,35 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/PlotDatasetData.h"
 #include "OTWidgets/CartesianPlotDatasetData.h"
 
 ot::CartesianPlotDatasetData::CartesianPlotDatasetData(PlotDatasetData* _data) 
-	: m_data(_data)
-{
-	OTAssertNullptr(m_data);
-}
-
-ot::CartesianPlotDatasetData::~CartesianPlotDatasetData() {
-	if (m_data) {
-		m_data->forgetCartesianAccessor();
-	}
-}
-
-size_t ot::CartesianPlotDatasetData::size() const {
-	if (m_data) {
-		return m_data->getSize();
-	}
-	else {
-		return 0;
-	}
-}
-
-QPointF ot::CartesianPlotDatasetData::sample(size_t _index) const {
-	if (m_data) {
-		return m_data->getSample<QPointF>(_index);
-	}
-	else {
-		return QPointF();
-	}
-}
+	: PlotSeriesData(_data)
+{}

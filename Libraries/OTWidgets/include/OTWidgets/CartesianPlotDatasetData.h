@@ -20,30 +20,18 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/WidgetTypes.h"
-
-// Qwt header
-#include <qwt_series_data.h>
+#include "OTWidgets/PlotSeriesData.h"
 
 namespace ot {
 
 	class PlotDatasetData;
 
-	class CartesianPlotDatasetData : public QwtSeriesData<QPointF> {
+	class OT_WIDGETS_API_EXPORT CartesianPlotDatasetData : public PlotSeriesData<QPointF> {
 		OT_DECL_NOCOPY(CartesianPlotDatasetData)
 		OT_DECL_NOMOVE(CartesianPlotDatasetData)
 		OT_DECL_NODEFAULT(CartesianPlotDatasetData)
 	public:
 		CartesianPlotDatasetData(PlotDatasetData* _data);
-		virtual ~CartesianPlotDatasetData();
-
-		virtual size_t size() const override;
-		virtual QPointF sample(size_t _index) const override;
-
-	private:
-		friend class PlotDatasetData;
-		void forgetData() { m_data = nullptr; };
-
-		PlotDatasetData* m_data;
+		virtual ~CartesianPlotDatasetData() = default;
 	};
 }

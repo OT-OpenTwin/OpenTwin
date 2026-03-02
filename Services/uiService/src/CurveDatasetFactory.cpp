@@ -220,8 +220,14 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 			ot::Variable value = converter(valueJson->value);
 			if (!value.isComplex()) {
 				dataY.front().second = false;
+				dataY.front().first.push_back(std::move(value));
 			}
-			dataY.front().first.push_back(std::move(value));
+			else {
+				// recalculate (we currently get mag/phase)
+				// todo ^---
+				dataY.front().first.push_back(std::move(value));
+			}
+			
 		}
 		else {
 			ot::ConstJsonArray matrix = ot::json::getArray(singleMongoDocument, quantityInformation.m_fieldName);
@@ -267,7 +273,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 		
 		if (numberOfQuantityEntries == 1)
 		{
-			ot::PlotDatasetData curveData = createCurveData(dataX, yIterator->first, yIterator->second);
+			ot::PlotDatasetData curveData = createCurveData(dataX, yIterator->first, yIterator->second, _plotCfg);
 			ot::PlotDataset* singleCurve = new ot::PlotDataset(nullptr, newCurveCfg, std::move(curveData));
 			singleCurve->setCurveNameBase(curveNameBase);
 			allCurves.push_back(singleCurve);
@@ -276,7 +282,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 		{
 			newCurveCfg.setTitle(curveNameBase + " (" + std::to_string(j + 1) + ")");
 			
-			ot::PlotDatasetData curveData = createCurveData(dataX, yIterator->first, yIterator->second);
+			ot::PlotDatasetData curveData = createCurveData(dataX, yIterator->first, yIterator->second, _plotCfg);
 			ot::PlotDataset* familyOfCurves= new ot::PlotDataset(nullptr, newCurveCfg, std::move(curveData));
 
 			familyOfCurves->setConfig(_curveCfg);
@@ -290,7 +296,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 			uint32_t row = j - column * quantityDimensions[1];
 			if (showEntireMatrix || showMatrixColumnEntry == column && showMatrixRowEntry == row)
 			{
-				ot::PlotDatasetData curveData = createCurveData(dataX, yIterator->first, yIterator->second);
+				ot::PlotDatasetData curveData = createCurveData(dataX, yIterator->first, yIterator->second, _plotCfg);
 				ot::PlotDataset* familyOfCurves = new ot::PlotDataset(nullptr, newCurveCfg, std::move(curveData));
 
 				newCurveCfg.setTitle(curveNameBase + " (" + std::to_string(row + 1) + "," + std::to_string(column + 1) + ")");
@@ -703,11 +709,11 @@ double CurveDatasetFactory::jsonToDouble(const rapidjson::Value& _jsonEntry, con
 	return value;
 }
 
-ot::PlotDatasetData CurveDatasetFactory::createCurveData(const std::vector<double>& _xData, const std::vector<ot::Variable>& _yData, bool _yDataIsComplex) {
+ot::PlotDatasetData CurveDatasetFactory::createCurveData(const std::vector<double>& _xData, const std::vector<ot::Variable>& _yData, bool _yDataIsComplex, const ot::Plot1DCfg& _plotCfg) {
 	ot::PlotDatasetData result;
 
 	if (_yDataIsComplex) {
-		result = ot::PlotDatasetData(_xData, toComplexVector(_yData), ot::Math::RealImaginary, ot::Plot1DCfg::XData, ot::Plot1DCfg::Real);
+		result = ot::PlotDatasetData(_xData, toComplexVector(_yData), _plotCfg.getXAxisQuantity(), _plotCfg.getYAxisQuantity());
 	}
 	else {
 		result = ot::PlotDatasetData(_xData, toDoubleVector(_yData));
@@ -732,6 +738,9 @@ std::vector<double> CurveDatasetFactory::toDoubleVector(const std::vector<ot::Va
 		}
 		else if (value.isDouble()) {
 			result.push_back(value.getDouble());
+		}
+		else if (value.isComplex()) {
+			result.push_back(value.getComplex().real());
 		}
 		else {
 			OTAssert(0, "Expected numerical value");

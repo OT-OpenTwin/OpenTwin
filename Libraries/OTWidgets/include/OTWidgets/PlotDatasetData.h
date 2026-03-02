@@ -21,8 +21,11 @@
 
 // OpenTwin header
 #include "OTCore/Math.h"
-#include "OTGui/Plot1DCfg.h"
+#include "OTGui/Plot1DAxisCfg.h"
 #include "OTWidgets/WidgetTypes.h"
+
+// Qwt header
+#include <qwt_point_polar.h>
 
 // std header
 #include <vector>
@@ -30,6 +33,7 @@
 
 namespace ot {
 
+	template<typename T> class PlotSeriesData;
 	class PolarPlotDatasetData;
 	class CartesianPlotDatasetData;
 
@@ -62,7 +66,7 @@ namespace ot {
 		//! @param _complexRepresentation Representation of the provided complex data. This is required to correctly convert the data to the real/imaginary representation.
 		//! @param _initialXQuantity Initial quantity for the X axis.
 		//! @param _initialYQuantity Initial quantity for the Y axis.
-		PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, const Math::ComplexRepresentation _complexRepresentation, Plot1DCfg::AxisQuantity _initialXQuantity = Plot1DCfg::XData, Plot1DCfg::AxisQuantity _initialYQuantity = Plot1DCfg::Real);
+		PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantity _initialYQuantity = Plot1DAxisCfg::Real);
 
 		//! @brief Constructor for complex data.
 		//! @param _dataX X values of the dataset.
@@ -70,15 +74,15 @@ namespace ot {
 		//! @param _complexRepresentation Representation of the provided complex data. This is required to correctly convert the data to the real/imaginary representation.
 		//! @param _initialXQuantity Initial quantity for the X axis.
 		//! @param _initialYQuantity Initial quantity for the Y axis.
-		PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, const Math::ComplexRepresentation _complexRepresentation, Plot1DCfg::AxisQuantity _initialXQuantity = Plot1DCfg::XData, Plot1DCfg::AxisQuantity _initialYQuantity = Plot1DCfg::Real);
+		PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantity _initialYQuantity = Plot1DAxisCfg::Real);
 
 		~PlotDatasetData();
 
-		void setXQuantity(Plot1DCfg::AxisQuantity _quantity);
-		Plot1DCfg::AxisQuantity getXQuantity() const { return m_xQuantity; };
+		void setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity);
+		Plot1DAxisCfg::AxisQuantity getXQuantity() const { return m_xQuantity; };
 
-		void setYQuantity(Plot1DCfg::AxisQuantity _quantity);
-		Plot1DCfg::AxisQuantity getYQuantity() const { return m_yQuantity; };
+		void setYQuantity(Plot1DAxisCfg::AxisQuantity _quantity);
+		Plot1DAxisCfg::AxisQuantity getYQuantity() const { return m_yQuantity; };
 
 		CartesianPlotDatasetData* getCartesianAccessor();
 		PolarPlotDatasetData* getPolarAccessor();
@@ -87,19 +91,19 @@ namespace ot {
 		template <typename T> T getSample(size_t _index) const;
 
 	private:
-		friend class CartesianPlotDatasetData;
-		friend class PolarPlotDatasetData;
+		friend class PlotSeriesData<QPointF>;
+		friend class PlotSeriesData<QwtPointPolar>;
 
-		bool applyQuantity(Plot1DCfg::AxisQuantity _quantity, std::vector<double>& _dataTarget);
+		bool applyQuantity(Plot1DAxisCfg::AxisQuantity _quantity, std::vector<double>& _dataTarget);
 
-		void forgetCartesianAccessor();
-		void forgetPolarAccessor();
+		void forgetCartesianAccessor() { m_cartesianAccessor = nullptr; };
+		void forgetPolarAccessor() { m_polarAccessor = nullptr; };
 
 		CartesianPlotDatasetData* m_cartesianAccessor;
 		PolarPlotDatasetData* m_polarAccessor;
 
-		Plot1DCfg::AxisQuantity m_xQuantity;
-		Plot1DCfg::AxisQuantity m_yQuantity;
+		Plot1DAxisCfg::AxisQuantity m_xQuantity;
+		Plot1DAxisCfg::AxisQuantity m_yQuantity;
 
 		std::vector<double> m_dataX;
 		std::vector<std::complex<double>> m_dataY;

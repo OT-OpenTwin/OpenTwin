@@ -246,12 +246,9 @@ void Application::createPlotOneComplexCurve()
 		throw std::exception(("Cannot open file: " + currentPath).c_str());
 	}
 
-	
 	const std::string fileContent = std::string(std::istreambuf_iterator<char>(fileStream), std::istreambuf_iterator<char>());
 	ot::JsonDocument sparameter;
 	sparameter.fromJson(fileContent.c_str());
-	
-	
 	
 	MetadataParameter parameter;
 	parameter.parameterName = "Frequency";
@@ -262,7 +259,7 @@ void Application::createPlotOneComplexCurve()
 	auto frequencyArray = ot::json::getArray(sparameter, "freq_Hz");
 	for (size_t i = 0; i < frequencyArray.Size(); i++)
 	{
-		double value = ot::json::getDouble(frequencyArray,i);
+		double value = ot::json::getDouble(frequencyArray, i);
 		parameter.values.push_back(ot::Variable(value));
 	}
 	auto magnitudeArray = ot::json::getArray(sparameter, "s11_mag");
@@ -317,7 +314,7 @@ void Application::createPlotOneCurve()
 
 	for (float i = 0.; i <= 50.; i++)
 	{
-		quantDesc->addDatapoint(ot::Variable(static_cast<int32_t>(i)));
+		quantDesc->addDatapoint(ot::Variable(static_cast<int32_t>(i * 2)));
 		parameter.values.push_back(ot::Variable(i));
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));

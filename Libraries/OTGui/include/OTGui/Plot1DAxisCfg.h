@@ -34,6 +34,20 @@ namespace ot {
 		OT_DECL_DEFCOPY(Plot1DAxisCfg)
 		OT_DECL_DEFMOVE(Plot1DAxisCfg)
 	public:
+		enum AxisQuantity {
+			Undefined,
+			XData,
+			Magnitude,
+			Phase,
+			Real,
+			Imaginary
+		};
+
+		static std::string toString(AxisQuantity _quantity);
+		static AxisQuantity stringToAxisQuantity(const std::string& _quantity);
+
+		static std::list<std::string> getAxisQuantityStringList();
+
 		Plot1DAxisCfg();
 		virtual ~Plot1DAxisCfg();
 
@@ -51,16 +65,19 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		void setMin(double _min) { m_min = _min; };
-		double getMin(void) const { return m_min; };
+		double getMin() const { return m_min; };
 
 		void setMax(double _max) { m_max = _max; };
-		double getMax(void) const { return m_max; };
+		double getMax() const { return m_max; };
+
+		void setQuantity(AxisQuantity _quantity) { m_axisQuantity = _quantity; };
+		AxisQuantity getQuantity() const { return m_axisQuantity; };
 
 		void setIsLogScale(bool _logScaleEnabled) { m_isLogScale = _logScaleEnabled; };
-		bool getIsLogScale(void) const { return m_isLogScale; };
+		bool getIsLogScale() const { return m_isLogScale; };
 
 		void setIsAutoScale(bool _autoScaleEnabled) { m_isAutoScale = _autoScaleEnabled; };
-		bool getIsAutoScale(void) const { return m_isAutoScale; };
+		bool getIsAutoScale() const { return m_isAutoScale; };
 
 		bool getAutoDetermineAxisLabel() const { return m_autoDetermineAxisLabel; }
 		const std::string& getAxisLabel() const { return m_axisLabel; }
@@ -74,6 +91,8 @@ namespace ot {
 		bool m_isAutoScale = true;
 		bool m_autoDetermineAxisLabel = true;
 		std::string m_axisLabel = "";
+
+		AxisQuantity m_axisQuantity = AxisQuantity::Undefined;
 		
 	};
 

@@ -1,5 +1,5 @@
 // @otlicense
-// File: PolarPlotDatasetData.h
+// File: PlotSeriesData.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,19 +20,35 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/PlotSeriesData.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qwt header
-#include <qwt_point_polar.h>
+#include <qwt_series_data.h>
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT PolarPlotDatasetData : public PlotSeriesData<QwtPointPolar> {
-		OT_DECL_NOCOPY(PolarPlotDatasetData)
-		OT_DECL_NOMOVE(PolarPlotDatasetData)
-		OT_DECL_NODEFAULT(PolarPlotDatasetData)
+	class PlotDatasetData;
+
+	template<typename T>
+	class PlotSeriesData : public QwtSeriesData<T> {
+		OT_DECL_NOCOPY(PlotSeriesData)
+		OT_DECL_NOMOVE(PlotSeriesData)
+		OT_DECL_NODEFAULT(PlotSeriesData)
 	public:
-		PolarPlotDatasetData(PlotDatasetData* _data);
-		virtual ~PolarPlotDatasetData() = default;
+		PlotSeriesData(PlotDatasetData* _data);
+		virtual ~PlotSeriesData();
+
+		virtual size_t size() const override;
+		virtual T sample(size_t _index) const override;
+
+		void resetCachedRect() { QwtSeriesData<T>::cachedBoundingRect = QRectF(0.0, 0.0, -1.0, -1.0); };
+
+	private:
+		friend class PlotDatasetData;
+		void forgetData() { m_data = nullptr; };
+
+		PlotDatasetData* m_data;
 	};
 }
+
+#include "OTWidgets/PlotSeriesData.hpp"

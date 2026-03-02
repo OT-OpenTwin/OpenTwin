@@ -18,34 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/PlotDatasetData.h"
 #include "OTWidgets/PolarPlotDatasetData.h"
 
 ot::PolarPlotDatasetData::PolarPlotDatasetData(PlotDatasetData* _data)
-	: m_data(_data) {
-	OTAssertNullptr(m_data);
-}
-
-ot::PolarPlotDatasetData::~PolarPlotDatasetData() {
-	if (m_data) {
-		m_data->forgetCartesianAccessor();
-	}
-}
-
-size_t ot::PolarPlotDatasetData::size() const {
-	if (m_data) {
-		return m_data->getSize();
-	}
-	else {
-		return 0;
-	}
-}
-
-QwtPointPolar ot::PolarPlotDatasetData::sample(size_t _index) const {
-	if (m_data) {
-		return m_data->getSample<QwtPointPolar>(_index);
-	}
-	else {
-		return QwtPointPolar();
-	}
-}
+	: PlotSeriesData(_data) 
+{}

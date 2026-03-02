@@ -30,26 +30,29 @@ public:
 	EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 
 	bool getEntityBox(double& _xmin, double& _xmax, double& _ymin, double& _ymax, double& _zmin, double& _zmax) override { return false; };
-	entityType getEntityType(void) const override { return entityType::TOPOLOGY; };
-	virtual bool considerForPropertyFilter(void) const override { return true; };
-	virtual bool considerChildrenForPropertyFilter(void) const override { return false; };
-	virtual void storeToDataBase(void) override;
-	virtual void addVisualizationNodes(void) override;
-	virtual std::string getClassName(void) const override { return "EntityResult1DPlot"; };
+	entityType getEntityType() const override { return entityType::TOPOLOGY; };
+	virtual bool considerForPropertyFilter() const override { return true; };
+	virtual bool considerChildrenForPropertyFilter() const override { return false; };
+	virtual void storeToDataBase() override;
+	virtual void addVisualizationNodes() override;
+	virtual std::string getClassName() const override { return "EntityResult1DPlot"; };
 	virtual int getSchemaVersion() override { return 2; };
-	virtual bool updateFromProperties(void) override;
-	bool updatePropertyVisibilities(void);
-	
+	virtual bool updateFromProperties() override;
+	bool updatePropertyVisibilities();
+
+	void hideAxisQuantityProperties();
+
 	virtual void addChild(EntityBase* _child) override;
 	virtual void removeChild(EntityBase* _child) override;
 
-	void createProperties(void);
+	void createProperties();
 	
 	// Inherited via IVisualisationPlot1D
 	const ot::Plot1DCfg getPlot() override;
 	void setPlot(const ot::Plot1DCfg& _config) override;
 
 	bool visualisePlot() override;
+
 private:
 	PropertyBundleQuerySettings m_querySettings;
 

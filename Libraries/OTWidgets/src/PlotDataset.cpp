@@ -152,14 +152,19 @@ void ot::PlotDataset::setOwnerPlot(PlotBase* _ownerPlot)
 {
 	assert(_ownerPlot != nullptr);
 	m_ownerPlot = _ownerPlot;
-	if (m_ownerPlot->getCurrentPlotType() == Plot1DCfg::PlotType::Cartesian)
-	{
+
+	switch (m_ownerPlot->getCurrentPlotType()) {
+	case Plot1DCfg::PlotType::Cartesian:
 		buildCartesianCurve();
-	}
-	else
-	{
-		assert(_ownerPlot->getConfig().getAxisQuantity() == Plot1DCfg::AxisQuantity::Complex);
+		break;
+
+	case Plot1DCfg::PlotType::Polar:
 		buildPolarCurve();
+		break;
+
+	default:
+		OT_LOG_E("Unknown plot type (" + std::to_string(static_cast<int>(m_ownerPlot->getCurrentPlotType())) + ")");
+		break;
 	}
 }
 
@@ -228,6 +233,11 @@ void ot::PlotDataset::setPointInterval(int _interval, bool _repaint) {
 	if (_repaint) {
 		this->updateCurveVisualization();
 	}
+}
+
+void ot::PlotDataset::setAxisQuantities(Plot1DAxisCfg::AxisQuantity _xQuantity, Plot1DAxisCfg::AxisQuantity _yQuantity) {
+	m_data.setXQuantity(_xQuantity);
+	m_data.setYQuantity(_yQuantity);
 }
 
 void ot::PlotDataset::setSelected(bool _isSelected) {

@@ -41,12 +41,12 @@ EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityO
 	this->setDefaultVisualizationTypes(visTypes);
 }
 
-void EntityResult1DPlot::storeToDataBase(void)
+void EntityResult1DPlot::storeToDataBase()
 {
 	EntityContainer::storeToDataBase();
 }
 
-void EntityResult1DPlot::addVisualizationNodes(void)
+void EntityResult1DPlot::addVisualizationNodes()
 {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
@@ -62,7 +62,7 @@ void EntityResult1DPlot::addVisualizationNodes(void)
 	}
 }
 
-bool EntityResult1DPlot::updateFromProperties(void)
+bool EntityResult1DPlot::updateFromProperties()
 {
 	assert(getProperties().anyPropertyNeedsUpdate());
 
@@ -103,18 +103,10 @@ bool EntityResult1DPlot::updateFromProperties(void)
 	return updatePropertyVisibilities();
 }
 
-bool EntityResult1DPlot::updatePropertyVisibilities(void)
+bool EntityResult1DPlot::updatePropertyVisibilities()
 {
 	bool updatePropertiesGrid = false;
 	
-	EntityPropertiesSelection* plotType = PropertyHelper::getSelectionProperty(this, "Plot type");
-	EntityPropertiesSelection* plotQuantity = PropertyHelper::getSelectionProperty(this, "Plot quantity"); 
-	if (plotQuantity->getVisible() != (plotType->getValue() != "Polar - Complex")) {
-		plotQuantity->setVisible(plotType->getValue() != "Polar - Complex");
-		plotQuantity->resetNeedsUpdate();
-		updatePropertiesGrid = true;
-	}
-
 	EntityPropertiesBoolean* gridVisibility = PropertyHelper::getBoolProperty(this, "Grid"); 
 	EntityPropertiesColor* gridColor = PropertyHelper::getColourProperty(this,"Grid color");
 
@@ -156,6 +148,12 @@ bool EntityResult1DPlot::updatePropertyVisibilities(void)
 	return updatePropertiesGrid;
 }
 
+void EntityResult1DPlot::hideAxisQuantityProperties()
+{
+	PropertyHelper::getSelectionProperty(this, "Quantity", "X axis")->setVisible(false);
+	PropertyHelper::getSelectionProperty(this, "Quantity", "Y axis")->setVisible(false);
+}
+
 void EntityResult1DPlot::addChild(EntityBase* _child)
 {
 	EntityContainer::addChild(_child);
@@ -168,7 +166,7 @@ void EntityResult1DPlot::removeChild(EntityBase* _child)
 	setQuerySelections();
 }
 
-void EntityResult1DPlot::createProperties(void)
+void EntityResult1DPlot::createProperties()
 {
 	//Query options are set in the addChild and removeChild methods
 	EntityPropertiesSelection::createProperty("Curve set", "X axis parameter", {}, "", "default", getProperties());
@@ -176,13 +174,14 @@ void EntityResult1DPlot::createProperties(void)
 	m_querySettings.setQueryDefinitions(allQueryOptions);
 	m_querySettings.setProperties(this);
 
-	//EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian", "Polar", "Polar - Complex" }, "Cartesian", "", getProperties());
+	std::list<std::string> quantityOptions = ot::Plot1DAxisCfg::getAxisQuantityStringList();
+
 	EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian"}, "Cartesian", "", getProperties());
-	EntityPropertiesSelection::createProperty("General", "Plot quantity", { "Magnitude", "Phase", "Real", "Imaginary" }, "Real", "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
 	EntityPropertiesColor::createProperty("General", "Grid color", { 100, 100, 100 }, "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Legend", true, "", getProperties());
 
+	EntityPropertiesSelection::createProperty("X axis", "Quantity", quantityOptions, ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::XData), "", getProperties());
 	EntityPropertiesBoolean::createProperty("X axis", "Logscale", false, "", getProperties());
 	EntityPropertiesBoolean::createProperty("X axis", "Autoscale", true, "", getProperties());
 	EntityPropertiesDouble::createProperty("X axis", "Min", 0.0, "", getProperties());
@@ -190,6 +189,7 @@ void EntityResult1DPlot::createProperties(void)
 	EntityPropertiesBoolean::createProperty("X axis", "Automatic label", true, "", getProperties());
 	EntityPropertiesString::createProperty("X axis", "Label override", "", "", getProperties());
 
+	EntityPropertiesSelection::createProperty("Y axis", "Quantity", quantityOptions, ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::Real), "", getProperties());
 	EntityPropertiesBoolean::createProperty("Y axis", "Logscale", false, "", getProperties());
 	EntityPropertiesBoolean::createProperty("Y axis", "Autoscale", true, "", getProperties());
 	EntityPropertiesDouble::createProperty("Y axis", "Min", 0.0, "", getProperties());
@@ -209,34 +209,39 @@ void EntityResult1DPlot::createProperties(void)
 }
 
 
-const ot::Plot1DCfg EntityResult1DPlot::getPlot()
-{
-	
-	const ot::Color gridColour = PropertyHelper::getColourPropertyValue(this,"Grid color");
-	
+const ot::Plot1DCfg EntityResult1DPlot::getPlot() {
+
+	const ot::Color gridColour = PropertyHelper::getColourPropertyValue(this, "Grid color");
+
 	const std::string entityName = getName();
 	auto shortName = ot::EntityName::getSubName(entityName);
-	std::string title ("");
-	if (shortName.has_value())
-	{
+	std::string title("");
+	if (shortName.has_value()) {
 		title = shortName.value();
 	}
-	else
-	{
+	else {
 		assert(false);
 	}
 
 	const std::string plotType = PropertyHelper::getSelectionPropertyValue(this, "Plot type");
-	const std::string plotQuantity = PropertyHelper::getSelectionPropertyValue(this, "Plot quantity");
 
 	const bool gridVisible = PropertyHelper::getBoolPropertyValue(this, "Grid");
 	const bool legendVisible = PropertyHelper::getBoolPropertyValue(this, "Legend");
-	
+
+
+	std::string xAxisQuantity = ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::XData);
+	if (PropertyHelper::hasProperty(this, "Quantity", "X axis")) {
+		xAxisQuantity = PropertyHelper::getSelectionPropertyValue(this, "Quantity", "X axis");
+	}
 	const bool logScaleX = PropertyHelper::getBoolPropertyValue(this, "Logscale", "X axis");
 	const bool autoScaleX = PropertyHelper::getBoolPropertyValue(this, "Autoscale", "X axis");
 	const double minX = PropertyHelper::getDoublePropertyValue(this, "Min", "X axis");
 	const double maxX = PropertyHelper::getDoublePropertyValue(this, "Max", "X axis");
 
+	std::string yAxisQuantity = ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::Real);
+	if (PropertyHelper::hasProperty(this, "Quantity", "Y axis")) {
+		yAxisQuantity = PropertyHelper::getSelectionPropertyValue(this, "Quantity", "Y axis");
+	}
 	const bool logScaleY = PropertyHelper::getBoolPropertyValue(this, "Logscale", "Y axis");
 	const bool autoScaleY = PropertyHelper::getBoolPropertyValue(this, "Autoscale", "Y axis");
 	const double minY = PropertyHelper::getDoublePropertyValue(this, "Min", "Y axis");
@@ -270,7 +275,6 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setXAxisParameter(xAxisParameter);
 
 	config.setPlotType(ot::Plot1DCfg::stringToPlotType(plotType));
-	config.setAxisQuantity(ot::Plot1DCfg::stringToAxisQuantity(plotQuantity));
 
 	config.setGridColor(gridColour);
 	config.setGridVisible(gridVisible);
@@ -280,11 +284,13 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setXAxisIsAutoScale(autoScaleX);
 	config.setXAxisMin(minX);
 	config.setXAxisMax(maxX);
+	config.setXAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(xAxisQuantity));
 	
 	config.setYAxisIsLogScale(logScaleY);
 	config.setYAxisIsAutoScale(autoScaleY);
 	config.setYAxisMin(minY);
 	config.setYAxisMax(maxY);
+	config.setYAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(yAxisQuantity));
 
 	config.setShowEntireMatrix(showEntireMatrix);
 	config.setShowMatrixColumnEntry(showMatrixColumnValue);
@@ -355,16 +361,22 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 {
 	PropertyHelper::setColourPropertyValue(_config.getGridColor(), this, "Grid color");
 	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::plotTypeToString(_config.getPlotType()), this, "Plot type");
-	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::axisQuantityToString(_config.getAxisQuantity()), this, "Plot quantity");
+	
 	
 	PropertyHelper::setBoolPropertyValue(_config.getGridVisible(), this, "Grid");
 	PropertyHelper::setBoolPropertyValue(_config.getLegendVisible(), this, "Legend");
 
+	if (PropertyHelper::hasProperty(this, "Quantity", "X axis")) {
+		PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getXAxisQuantity()), this, "Quantity", "X axis");
+	}
 	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsLogScale(), this, "Logscale", "X axis");
 	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsAutoScale(), this, "Autoscale", "X axis");
 	PropertyHelper::setDoublePropertyValue(_config.getXAxisMin(), this, "Min", "X axis");
 	PropertyHelper::setDoublePropertyValue(_config.getXAxisMax(), this, "Max", "X axis");
 
+	if (PropertyHelper::hasProperty(this, "Quantity", "Y axis")) {
+		PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getYAxisQuantity()), this, "Quantity", "Y axis");
+	}
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsLogScale(), this, "Logscale", "Y axis");
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale", "Y axis");
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", "Y axis");

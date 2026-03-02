@@ -41,21 +41,8 @@ namespace ot {
 			Polar
 		};
 
-		enum AxisQuantity {
-			Undefined,
-			XData,
-			Magnitude,
-			Phase,
-			Real,
-			Imaginary,
-			Complex
-		};
-
 		static std::string plotTypeToString(PlotType _type);
 		static PlotType stringToPlotType(const std::string& _type);
-
-		static std::string axisQuantityToString(AxisQuantity _quantity);
-		static AxisQuantity stringToAxisQuantity(const std::string& _quantity);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -85,9 +72,6 @@ namespace ot {
 		void setPlotType(PlotType _type) { m_type = _type; };
 		PlotType getPlotType() const { return m_type; };
 
-		void setAxisQuantity(AxisQuantity _quantity) { m_axisQuantity = _quantity; };
-		AxisQuantity getAxisQuantity() const { return m_axisQuantity; };
-
 		void setGridVisible(bool _visible) { m_gridVisible = _visible; };
 		bool getGridVisible() const { return m_gridVisible; };
 
@@ -115,6 +99,9 @@ namespace ot {
 		void setXAxisMax(double _max) { m_xAxis.setMax(_max); };
 		double getXAxisMax() const { return m_xAxis.getMax(); };
 
+		void setXAxisQuantity(Plot1DAxisCfg::AxisQuantity _quantity) { m_xAxis.setQuantity(_quantity); };
+		Plot1DAxisCfg::AxisQuantity getXAxisQuantity() const { return m_xAxis.getQuantity(); };
+
 		void setXAxisIsLogScale(bool _logScaleEnabled) { m_xAxis.setIsLogScale(_logScaleEnabled); };
 		bool getXAxisIsLogScale() const { return m_xAxis.getIsLogScale(); };
 
@@ -129,6 +116,9 @@ namespace ot {
 
 		void setYAxisMax(double _max) { m_yAxis.setMax(_max); };
 		double getYAxisMax() const { return m_yAxis.getMax(); };
+
+		void setYAxisQuantity(Plot1DAxisCfg::AxisQuantity _quantity) { m_yAxis.setQuantity(_quantity); };
+		Plot1DAxisCfg::AxisQuantity getYAxisQuantity() const { return m_yAxis.getQuantity(); };
 
 		void setYAxisIsLogScale(bool _logScaleEnabled) { m_yAxis.setIsLogScale(_logScaleEnabled); };
 		bool getYAxisIsLogScale() const { return m_yAxis.getIsLogScale(); };
@@ -173,7 +163,6 @@ namespace ot {
 	private:
 		std::string m_collectionName;
 		PlotType m_type = Plot1DCfg::Cartesian;
-		AxisQuantity m_axisQuantity = Plot1DCfg::Real;
 
 		std::string m_xAxisParameter;
 

@@ -1172,6 +1172,12 @@
     <ClInclude Include="include\OTWidgets\Private\WidgetDebug.h">
       <Filter>include\Private</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlotSeriesData.h">
+      <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlotSeriesData.hpp">
+      <Filter>include\Plot\Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
