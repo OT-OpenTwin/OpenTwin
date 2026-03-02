@@ -119,10 +119,6 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 	//First we check if the series selection must be updated
 	updateSelectionIfNecessary(allSeriesLabels, selectionSeries, newProperties);
 				
-	//Update Quantity Overview
-	auto quantityValueCharacteristics = _dbAccessEntity->getQuantityValueCharacteristic();
-	updateSelectionIfNecessary(allQuantityLabels, quantityValueCharacteristics.m_label, newProperties);
-
 	//Now we update all parameter overviews and the labels of the parameter
 
 	int32_t numberOfQueries = _dbAccessEntity->getSelectedNumberOfQueries();
@@ -214,10 +210,6 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 		//Quantity of the selected name does not exist in the 
 		if (quantity == nullptr)
 		{
-			std::list<std::string> emptyList{};
-			
-			resetValueCharacteristicLabelsIfNecessary(quantityValueCharacteristic, _properties);
-			resetTupleVisibility(_dbAccessEntity.get(), _properties);
 			return std::list<std::string>();			
 		}
 		else
