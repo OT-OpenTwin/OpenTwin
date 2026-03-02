@@ -42,6 +42,8 @@
 #include "CoordinateSystemManager.h"
 
 #include "STEPReader.h"
+#include "STEPWriter.h"
+#include "STLWriter.h"
 
 // Third party libraries
 #include "base64.h"
@@ -81,13 +83,14 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	ot::LockTypes lockTypes(ot::LockType::ModelWrite | ot::LockType::ViewWrite | ot::LockType::ModelRead);
 
 	_ui->addMenuPage("Modeling");
-	_ui->addMenuGroup("Modeling", "Import");
+	_ui->addMenuGroup("Modeling", "Import/Export");
 	_ui->addMenuGroup("Modeling", "Create");
 	_ui->addMenuGroup("Modeling", "Modify");
 	_ui->addMenuGroup("Modeling", "Coordinate Systems");
 	_ui->addMenuGroup("Modeling", "Repair");
 
 	_ui->addMenuButton(m_buttonImportStep);
+	_ui->addMenuButton(m_buttonExportCad);
 
 	_ui->addMenuButton(m_buttonCreateCuboid);
 	_ui->addMenuButton(m_buttonCreateCylinder);
@@ -423,8 +426,54 @@ void Application::handleImportSTEP(ot::JsonDocument& _document) {
 		// Process the file content
 		getSTEPReader()->importSTEPFile(tmpFileName, true, originalName);
 	}
-
 }
+
+void Application::handleExportCAD(ot::JsonDocument& _document) {
+
+	std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
+
+	size_t index = fileName.rfind('.');
+	if (index == std::string::npos)
+	{
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: The export file type has not been specified. Please make sure to specify a valid file extension.\n");
+		return;
+	}
+
+	std::string extension = fileName.substr(index);
+	std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char c) { return std::tolower(c); });
+
+	std::string fileContent;
+	unsigned long long uncompressedDataLength = 0;
+
+	if (extension == ".step" || extension == ".stp")
+	{
+		STEPWriter writer(this, getServiceName());
+		writer.getExportFileContent(fileContent, uncompressedDataLength);
+	}
+	else if (extension == ".stl")
+	{
+		STLWriter writer(this, getServiceName());
+		writer.getExportFileContent(fileContent, uncompressedDataLength);
+	}
+	else
+	{
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: The export file type \"" + extension + "\" is an unsupported CAD file format. Please make sure to specify a valid file extension.\n");
+		return;
+	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SaveFileContent, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("CAD Export", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileContent, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLength, doc.GetAllocator());
+
+	std::string tmp;
+	getUiComponent()->sendMessage(true, doc, tmp);
+}
+
 
 void Application::handleCreateGeometryFromRubberband(ot::JsonDocument& _document) {
 	std::string note = ot::json::getString(_document, OT_ACTION_PARAM_VIEW_RUBBERBAND_Note);
@@ -492,6 +541,19 @@ void Application::handleRequestImportSTEP() {
 	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(ot::FileExtension::toFilterString({ ot::FileExtension::Step, ot::FileExtension::AllFiles }), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString("importSTEPFile", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, true, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+
+	std::string tmp;
+	getUiComponent()->sendMessage(true, doc, tmp);
+}
+
+void Application::handleRequestExportCAD() {
+	// Get a file name for the STEP file from the UI
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SelectFileForStoring, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Export CAD File", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(ot::FileExtension::toFilterString({ ot::FileExtension::Step, ot::FileExtension::Stl, ot::FileExtension::AllFiles }), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString("exportCADFile", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
@@ -593,6 +655,7 @@ Application::Application() :
 
 	// Connect actions
 	connectAction("importSTEPFile", this, &Application::handleImportSTEP);
+	connectAction("exportCADFile", this, &Application::handleExportCAD);
 	connectAction(OT_ACTION_CMD_MODEL_EntitiesSelected, this, &Application::handleEntitiesSelected);
 	connectAction(OT_ACTION_CMD_MODEL_CreateGeometryFromRubberbandData, this, &Application::handleCreateGeometryFromRubberband);
 	connectAction(OT_ACTION_CMD_UI_VIEW_ActivateCS, this, &Application::handleSetActiveCoordinateSystem);
@@ -600,9 +663,13 @@ Application::Application() :
 	// Setup and connect buttons
 	ot::LockTypes lockTypes = ot::LockType::ModelWrite | ot::LockType::ViewWrite | ot::LockType::ModelRead;
 
-	m_buttonImportStep = ot::ToolBarButtonCfg("Modeling", "Import", "Import STEP", "Default/Import");
+	m_buttonImportStep = ot::ToolBarButtonCfg("Modeling", "Import/Export", "Import STEP", "Default/Import");
 	m_buttonImportStep.setButtonLockFlags(lockTypes).setButtonKeySequence("Ctrl+O");
 	connectToolBarButton(m_buttonImportStep, this, &Application::handleRequestImportSTEP);
+
+	m_buttonExportCad = ot::ToolBarButtonCfg("Modeling", "Import/Export", "Export CAD", "Default/Export");
+	m_buttonExportCad.setButtonLockFlags(lockTypes);
+	connectToolBarButton(m_buttonExportCad, this, &Application::handleRequestExportCAD);
 
 	m_buttonCreateCuboid = ot::ToolBarButtonCfg("Modeling", "Create", "Cuboid", "Default/Cuboid");
 	m_buttonCreateCuboid.setButtonLockFlags(lockTypes).setButtonKeySequence("Ctrl+Alt+1");

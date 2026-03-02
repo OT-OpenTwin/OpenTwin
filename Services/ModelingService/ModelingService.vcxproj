@@ -207,6 +207,8 @@
     <ClCompile Include="src\PrimitiveTorus.cpp" />
     <ClCompile Include="src\SimplifyRemoveFaces.cpp" />
     <ClCompile Include="src\STEPReader.cpp" />
+    <ClCompile Include="src\STEPWriter.cpp" />
+    <ClCompile Include="src\STLWriter.cpp" />
     <ClCompile Include="src\Transformations.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
     <ClCompile Include="src\UpdateManager.cpp" />
@@ -233,6 +235,8 @@
     <ClInclude Include="include\PrimitiveTorus.h" />
     <ClInclude Include="include\SimplifyRemoveFaces.h" />
     <ClInclude Include="include\STEPReader.h" />
+    <ClInclude Include="include\STEPWriter.h" />
+    <ClInclude Include="include\STLWriter.h" />
     <ClInclude Include="include\Transformations.h" />
     <ClInclude Include="include\UiNotifier.h" />
     <ClInclude Include="include\UpdateManager.h" />

@@ -125,11 +125,13 @@ private:
 	CoordinateSystemManager*coordinateSystemManager;
 
 	void handleImportSTEP(ot::JsonDocument& _document);
+	void handleExportCAD(ot::JsonDocument& _document);
 	void handleCreateGeometryFromRubberband(ot::JsonDocument& _document);
 	void handleEntitiesSelected(ot::JsonDocument& _document);
 	void handleSetActiveCoordinateSystem(ot::JsonDocument& _document);
 
 	ot::ToolBarButtonCfg m_buttonImportStep;
+	ot::ToolBarButtonCfg m_buttonExportCad;
 
 	ot::ToolBarButtonCfg m_buttonCreateCuboid;
 	ot::ToolBarButtonCfg m_buttonCreateCylinder;
@@ -153,6 +155,7 @@ private:
 	ot::ToolBarButtonCfg m_buttonAlignLCS;
 
 	void handleRequestImportSTEP();
+	void handleRequestExportCAD();
 
 	void handleCreateCuboid();
 	void handleCreateCylinder();

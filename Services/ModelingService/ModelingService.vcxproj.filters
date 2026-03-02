@@ -114,6 +114,12 @@
     <ClCompile Include="src\CoordinateSystemManager.cpp">
       <Filter>Source Files\Operations</Filter>
     </ClCompile>
+    <ClCompile Include="src\STEPWriter.cpp">
+      <Filter>Source Files\Operations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\STLWriter.cpp">
+      <Filter>Source Files\Operations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -186,6 +192,12 @@
       <Filter>Header Files\Operations</Filter>
     </ClInclude>
     <ClInclude Include="include\CoordinateSystemManager.h">
+      <Filter>Header Files\Operations</Filter>
+    </ClInclude>
+    <ClInclude Include="include\STEPWriter.h">
+      <Filter>Header Files\Operations</Filter>
+    </ClInclude>
+    <ClInclude Include="include\STLWriter.h">
       <Filter>Header Files\Operations</Filter>
     </ClInclude>
   </ItemGroup>

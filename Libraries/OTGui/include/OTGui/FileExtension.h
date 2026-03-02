@@ -85,6 +85,7 @@ namespace ot {
 
 			// Technical / Engineering
 			Step,             // .step / .stp
+			Stl,              // .stl
 			Iges,             // .iges / .igs
 			Obj,              // .obj
 			Dxf,              // .dxf
