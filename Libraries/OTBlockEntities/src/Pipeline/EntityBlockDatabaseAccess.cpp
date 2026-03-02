@@ -57,13 +57,11 @@ void EntityBlockDatabaseAccess::createProperties()
 	metadataProp->setAllowCustomValues(true);
 	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueries, 0,0, m_maxNbOfQueries, "default", getProperties());
 	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueriesMetadataSeries, 0,0, m_maxNbOfQueriesMetadata, "default", getProperties());
-	EntityPropertiesBoolean::createProperty(m_groupMetadataFilter, m_propertyRegexLabel, false, "default", getProperties());
 	
 	// Quantity Settings
 	EntityPropertiesSelection* groupQuantityProp = EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyName, {""}, "", "default", getProperties());
 	groupQuantityProp->setAllowCustomValues(true);
-	EntityPropertiesBoolean::createProperty(m_groupQuantitySetttings, m_propertyRegexLabel, false, "default", getProperties());
-
+	
 	EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 	typeLabelProperty->setReadOnly(true);
 	typeLabelProperty->setName(m_propertyDataType);
@@ -199,16 +197,6 @@ bool EntityBlockDatabaseAccess::getReproducableOrder()
 {
 	const bool orderReproducable = PropertyHelper::getBoolPropertyValue(this, "Order reproducable", m_groupQuerySetttings);
 	return orderReproducable;
-}
-
-bool EntityBlockDatabaseAccess::isSeriesLabelRegex()
-{
-	return PropertyHelper::getBoolPropertyValue(this, m_propertyRegexLabel, m_groupSeriesMetadata);
-}
-
-bool EntityBlockDatabaseAccess::isQuantLabelRegex()
-{
-	return PropertyHelper::getBoolPropertyValue(this, m_propertyRegexLabel, m_groupQuantitySetttings);
 }
 
 bool EntityBlockDatabaseAccess::updateFromProperties()
