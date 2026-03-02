@@ -42,7 +42,6 @@ class QwtSymbol;
 class QwtPlotCurve;
 class QwtPolarCurve;
 
-
 namespace ot {
 
 	class PolarPlot;

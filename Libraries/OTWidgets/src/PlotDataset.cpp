@@ -87,6 +87,9 @@ ot::Plot1DCurveCfg::Symbol ot::PlotDataset::toPlot1DCurveSymbol(QwtSymbol::Style
 ot::PlotDataset::PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data) :
 	m_config(_config), m_data(std::move(_data))
 {
+	buildCartesianCurve();
+	buildPolarCurve();
+
 	if (_ownerPlot != nullptr) {
 		setOwnerPlot(_ownerPlot);
 	}
@@ -98,9 +101,6 @@ ot::PlotDataset::~PlotDataset() {
 	if (m_polarCurve != nullptr) {
 		delete m_polarCurve;
 		m_polarCurve = nullptr;
-		// point and data is deleted by the polar curve 
-		// I dont think so. The description dies nit say anything about ownership transfer:https://qwt.sourceforge.io/class_qwt_polar_curve.html
-		// The symbols do not need the be kept as members, there are getter
 	}
 	if (m_cartesianCurve != nullptr) {
 		delete m_cartesianCurve;
@@ -112,7 +112,7 @@ ot::PlotDataset::~PlotDataset() {
 
 // Attach / Detach
 
-void ot::PlotDataset::attach(void) {
+void ot::PlotDataset::attach() {
 	OTAssertNullptr(m_ownerPlot);
 
 	if (m_isAttatched) {
@@ -124,34 +124,38 @@ void ot::PlotDataset::attach(void) {
 	AbstractPlot* plot = m_ownerPlot->getPlot();
 	if (m_ownerPlot->getCurrentPlotType() == Plot1DCfg::PlotType::Cartesian)
 	{
-		m_cartesianCurve->attach(dynamic_cast<CartesianPlot*>(plot));
+		CartesianPlot* cartesianPlot = dynamic_cast<CartesianPlot*>(plot);
+		OTAssertNullptr(cartesianPlot);
+		m_cartesianCurve->attach(cartesianPlot);
 	}
 	else
 	{
-		m_polarCurve->attach(dynamic_cast<PolarPlot*>(plot));
+		PolarPlot* polarPlot = dynamic_cast<PolarPlot*>(plot);
+		OTAssertNullptr(polarPlot);
+		m_polarCurve->attach(polarPlot);
 	}
 }
 
-void ot::PlotDataset::detach(void) {
+void ot::PlotDataset::detach() {
 	if (!m_isAttatched) {
 		return;
 	}
+
 	m_isAttatched = false;
+
 	if (m_cartesianCurve != nullptr)
 	{
 		m_cartesianCurve->detach();
 	}
-	else
+
+	if (m_polarCurve != nullptr)
 	{
-		assert(m_polarCurve != nullptr);
 		m_polarCurve->detach();
 	}
 }
 
-void ot::PlotDataset::setOwnerPlot(PlotBase* _ownerPlot)
-{
-	assert(_ownerPlot != nullptr);
-	m_ownerPlot = _ownerPlot;
+void ot::PlotDataset::rebuildCurve(bool _reattach) {
+	OTAssertNullptr(m_ownerPlot);
 
 	switch (m_ownerPlot->getCurrentPlotType()) {
 	case Plot1DCfg::PlotType::Cartesian:
@@ -166,6 +170,19 @@ void ot::PlotDataset::setOwnerPlot(PlotBase* _ownerPlot)
 		OT_LOG_E("Unknown plot type (" + std::to_string(static_cast<int>(m_ownerPlot->getCurrentPlotType())) + ")");
 		break;
 	}
+
+	if (_reattach) {
+		this->detach();
+		this->attach();
+	}
+}
+
+void ot::PlotDataset::setOwnerPlot(PlotBase* _ownerPlot)
+{
+	OTAssertNullptr(_ownerPlot);
+	m_ownerPlot = _ownerPlot;
+
+	rebuildCurve();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -255,29 +272,17 @@ ot::CartesianPlotCurve* ot::PlotDataset::getCartesianCurve() {
 		return m_cartesianCurve;
 	}
 	else {
-		assert(m_polarCurve != nullptr);
-		detach();
-		delete m_polarCurve;
-		m_polarCurve = nullptr;
-		m_polarCurvePointSymbol = nullptr;
-		
 		buildCartesianCurve();
 		attach();
 		return m_cartesianCurve;
 	}
 }
 
-ot::PolarPlotCurve* ot::PlotDataset::getPolarCurve(void) {
+ot::PolarPlotCurve* ot::PlotDataset::getPolarCurve() {
 	if (m_polarCurve != nullptr) {
 		return m_polarCurve;
 	}
 	else {
-		assert(m_cartesianCurve != nullptr);
-		detach();
-		delete m_cartesianCurve;
-		m_cartesianCurve = nullptr;
-		delete m_cartesianCurvePointSymbol;
-		m_cartesianCurvePointSymbol = nullptr;
 		buildPolarCurve();
 		attach();
 		return m_polarCurve;
@@ -288,7 +293,7 @@ ot::PolarPlotCurve* ot::PlotDataset::getPolarCurve(void) {
 
 // Data Setter / Getter
 
-void ot::PlotDataset::updateCurveVisualization(void) {
+void ot::PlotDataset::updateCurveVisualization() {
 	PenFCfg linePenCfg(m_config.getLinePen());
 	const PenFCfg& pointOutlinePenCfg = m_config.getPointOutlinePen();
 

@@ -51,17 +51,13 @@ ot::PlotBase::PlotBase(QWidget* _parent) :
 	m_errorLabel->setVisible(false);
 
 	// Create plots
-	m_cartesianPlot = new CartesianPlot(this, m_centralWidget);
-	m_polarPlot = new PolarPlot(this, m_centralWidget);
+	m_cartesianPlot = new CartesianPlot(this, nullptr);
+	m_polarPlot = new PolarPlot(this, nullptr);
 
-	m_polarPlot->setParent(nullptr);
-	m_polarPlot->setVisible(false);
 	m_centralLayout->addWidget(m_cartesianPlot);
-
 }
 
 ot::PlotBase::~PlotBase() {
-
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -91,23 +87,32 @@ void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 		case Plot1DCfg::Cartesian:
 			m_centralLayout->removeWidget(m_polarPlot);
 			m_polarPlot->setParent(nullptr);
-			m_polarPlot->setVisible(false);
+			m_polarPlot->hide();
+
 			m_centralLayout->addWidget(m_cartesianPlot);
-			m_cartesianPlot->setVisible(true);
+			m_cartesianPlot->setParent(m_centralWidget);
+			m_cartesianPlot->show();
 			break;
 
 		case Plot1DCfg::Polar:
 			m_centralLayout->removeWidget(m_cartesianPlot);
 			m_cartesianPlot->setParent(nullptr);
-			m_cartesianPlot->setVisible(false);			
+			m_cartesianPlot->hide();
+
 			m_centralLayout->addWidget(m_polarPlot);
-			m_polarPlot->setVisible(true);
+			m_polarPlot->setParent(m_centralWidget);
+			m_polarPlot->show();
 			break;
 
 		default:
 			OT_LOG_EAS("Unknown plot type (" + std::to_string((int)m_currentPlotType) + ")");
 			return;
 		}
+	}
+
+	for (auto data : getAllDatasets()) {
+		data->rebuildCurve(true);
+		data->updateCurveVisualization();
 	}
 }
 

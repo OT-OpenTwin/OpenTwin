@@ -61,35 +61,37 @@ namespace ot {
 
 		// Attach / Detach
 
-		void attach(void);
+		void attach();
 
-		void detach(void);
+		void detach();
+
+		void rebuildCurve(bool _reattach = false);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// General Setter/Getter
 		
-		const Plot1DCurveCfg& getConfig(void) const { return m_config; };
+		const Plot1DCurveCfg& getConfig() const { return m_config; };
 
 		void setOwnerPlot(PlotBase* _ownerPlot);
 
 		void setEntityName(const std::string& _name) { m_config.setEntityName(_name); };
-		const std::string& getEntityName(void) const { return m_config.getEntityName(); };
+		const std::string& getEntityName() const { return m_config.getEntityName(); };
 
 		void setEntityID(UID _id) { m_config.setEntityID(_id); };
-		UID getEntityID(void) const { return m_config.getEntityID(); };
+		UID getEntityID() const { return m_config.getEntityID(); };
 
 		void setEntityVersion(UID _version) { m_config.setEntityVersion(_version); };
-		UID getEntityVersion(void) const { return m_config.getEntityVersion(); };
+		UID getEntityVersion() const { return m_config.getEntityVersion(); };
 
 		void setEntityInformation(const BasicEntityInformation& _info) { m_config = _info; };
-		const BasicEntityInformation& getBasicEntityInformation(void) const { return m_config; };
+		const BasicEntityInformation& getBasicEntityInformation() const { return m_config; };
 
 		void setStorageEntityInfo(const BasicEntityInformation& _entityInfo) { m_storageEntityInfo = _entityInfo; };
-		const BasicEntityInformation& getStorageEntityInfo(void) const { return m_storageEntityInfo; };
+		const BasicEntityInformation& getStorageEntityInfo() const { return m_storageEntityInfo; };
 
 		void setCurveIsVisibile(bool _isVisible = true, bool _repaint = true);
-		bool getCurveIsVisible(void) const { return m_config.getVisible(); };
+		bool getCurveIsVisible() const { return m_config.getVisible(); };
 
 		void setCurveWidth(double _penSize, bool _repaint = true);
 
@@ -117,7 +119,7 @@ namespace ot {
 		bool isSelected() const { return m_isSelected; };
 
 		void setNavigationId(UID _id) { m_config.setNavigationId(_id); };
-		UID getNavigationId(void) const { return m_config.getNavigationId(); };
+		UID getNavigationId() const { return m_config.getNavigationId(); };
 
 		CartesianPlotCurve* getCartesianCurve();
 		PolarPlotCurve* getPolarCurve();
@@ -126,7 +128,7 @@ namespace ot {
 
 		// Data Setter / Getter
 
-		void updateCurveVisualization(void);
+		void updateCurveVisualization();
 		PlotDatasetData& getPlotData() { return m_data; }
 		void setPlotData(PlotDatasetData&& _dataset) { m_data = std::move(_dataset); }
 

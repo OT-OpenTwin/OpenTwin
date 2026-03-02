@@ -23,3 +23,4 @@
 ot::PolarPlotDatasetData::PolarPlotDatasetData(PlotDatasetData* _data)
 	: PlotSeriesData(_data) 
 {}
+
