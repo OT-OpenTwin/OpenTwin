@@ -117,8 +117,12 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 	parameterList.push_front(m_selectedValueNone);
 
 	//First we check if the series selection must be updated
-	updateSelectionIfNecessary(allSeriesLabels, selectionSeries, newProperties);
+	updateSelectionIfNecessary(allSeriesLabels, selectionSeries, newProperties, true);
 				
+	//Update Quantity Overview
+	auto quantityValueCharacteristics = _dbAccessEntity->getQuantityValueCharacteristic();
+	updateSelectionIfNecessary(allQuantityLabels, quantityValueCharacteristics.m_label, newProperties, true);
+
 	//Now we update all parameter overviews and the labels of the parameter
 
 	int32_t numberOfQueries = _dbAccessEntity->getSelectedNumberOfQueries();
@@ -162,11 +166,12 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 	return newResultCollectionAccess;
 }
 
-void PropertyHandlerDatabaseAccessBlock::updateSelectionIfNecessary(std::list<std::string>& _valuesInProject, EntityPropertiesSelection* _selection, EntityProperties& _properties)
+void PropertyHandlerDatabaseAccessBlock::updateSelectionIfNecessary(std::list<std::string>& _valuesInProject, EntityPropertiesSelection* _selection, EntityProperties& _properties, bool _allowCustom)
 {
 	const std::vector<std::string>& optionsSeries = _selection->getOptions();
 	std::list<std::string> optionsSeriesList{ optionsSeries.begin(),optionsSeries.end() };
 	EntityPropertiesSelection* newSelection = dynamic_cast<EntityPropertiesSelection*>(_selection->createCopy());
+	
 	if (optionsSeriesList != _valuesInProject)
 	{
 		newSelection->resetOptions(_valuesInProject);
@@ -180,11 +185,18 @@ void PropertyHandlerDatabaseAccessBlock::updateSelectionIfNecessary(std::list<st
 		}
 		else
 		{
-			const std::string selectedValue = _selection->getValue();
-			auto selectedValueInSelectedProject = std::find(_valuesInProject.begin(), _valuesInProject.end(), selectedValue);
-			if (selectedValueInSelectedProject == _valuesInProject.end() || selectedValue == "")
+			if (!_allowCustom)
 			{
-				newSelection->setValue(*_valuesInProject.begin());
+				const std::string selectedValue = _selection->getValue();
+				auto selectedValueInSelectedProject = std::find(_valuesInProject.begin(), _valuesInProject.end(), selectedValue);
+				if (selectedValueInSelectedProject == _valuesInProject.end() || selectedValue == "")
+				{
+					newSelection->setValue(*_valuesInProject.begin());
+				}
+				else
+				{
+					newSelection->setValue(_selection->getValue());
+				}
 			}
 			else
 			{
