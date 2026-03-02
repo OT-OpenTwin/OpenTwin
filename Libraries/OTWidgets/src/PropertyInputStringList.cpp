@@ -34,14 +34,10 @@
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputStringList> propertyInputStringListRegistrar(ot::PropertyStringList::propertyTypeString());
 
 ot::PropertyInputStringList::PropertyInputStringList(QWidget* _parent) 
-	: m_delayTimer(this), m_parentWidget(_parent), m_comboBox(nullptr), m_comboButton(nullptr)
+	: m_parentWidget(_parent), m_comboBox(nullptr), m_comboButton(nullptr)
 {
 	m_comboButton = new ComboButton(m_parentWidget);
 	connect(m_comboButton, &ComboButton::textChanged, this, &PropertyInputStringList::slotTextInputChanged);
-
-	m_delayTimer.setSingleShot(true);
-	m_delayTimer.setInterval(500);
-	connect(&m_delayTimer, &QTimer::timeout, this, &PropertyInputStringList::slotTextInputChanged);
 }
 
 ot::PropertyInputStringList::~PropertyInputStringList() {
@@ -119,8 +115,6 @@ ot::Property* ot::PropertyInputStringList::createPropertyConfiguration(void) con
 }
 
 bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _configuration) {
-	m_delayTimer.stop();
-
 	if (!PropertyInput::setupFromConfiguration(_configuration)) return false;
 	const PropertyStringList* actualProperty = dynamic_cast<const PropertyStringList*>(_configuration);
 	if (!actualProperty) {
@@ -149,7 +143,8 @@ bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _config
 			LineEdit* lineEdit = new LineEdit(m_comboBox);
 			m_comboBox->setLineEdit(lineEdit);
 			connect(m_comboBox, &ComboBox::currentIndexChanged, this, &PropertyInputStringList::slotTextInputChanged);
-			connect(lineEdit, &LineEdit::textChanged, [=]() { m_delayTimer.stop(); m_delayTimer.start(); });
+			connect(m_comboBox, &ComboBox::returnPressed, this, &PropertyInputStringList::slotTextInputChanged);
+			connect(m_comboBox, &ComboBox::focusLost, this, &PropertyInputStringList::slotTextInputChanged);
 		}
 
 		QSignalBlocker blocker(m_comboBox);

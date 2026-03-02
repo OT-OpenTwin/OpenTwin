@@ -55,7 +55,6 @@ namespace ot {
 		void slotTextInputChanged();
 
 	private:
-		QTimer m_delayTimer;
 		QString m_currentText;
 		QWidget* m_parentWidget;
 		ComboBox* m_comboBox;

@@ -47,12 +47,14 @@ namespace ot {
 
 	Q_SIGNALS:
 		void returnPressed();
+		void focusLost();
 
 	public Q_SLOTS:
 		void togglePopup();
 
 	protected:
 		virtual void keyPressEvent(QKeyEvent* _event) override;
+		virtual void focusOutEvent(QFocusEvent* _event) override;
 
 	private:
 		bool m_popupVisible;

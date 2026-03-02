@@ -47,6 +47,11 @@ void ot::ComboBox::keyPressEvent(QKeyEvent* _event) {
 	}
 }
 
+void ot::ComboBox::focusOutEvent(QFocusEvent* _event) {
+	QComboBox::focusOutEvent(_event);
+	Q_EMIT focusLost();
+}
+
 void ot::ComboBox::togglePopup(void) {
 	if (m_popupVisible) {
 		this->hidePopup();
