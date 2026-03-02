@@ -54,7 +54,7 @@ private:
 	const int m_documentLimit = 0;
 
 	std::list<LabelFieldNamePair> m_labelFieldNamePairs;
-	ot::UIDList m_queriedQuantities;
+	std::list<LabelFieldNamePair> m_labelFieldNamePairsQuantities;
 	PipelineData m_queriedData;
 
 	void collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity);

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ResultCollectionMetadataAccess.h
 // 
 // License:
@@ -39,9 +39,10 @@ public:
 
 	virtual ~ResultCollectionMetadataAccess() {};
 
-	const std::list<std::string> listAllSeriesNames() const;
-	const std::list<std::string> listAllParameterLabels() const;
-	const std::list<std::string> listAllQuantityLabels() const;
+	std::list<std::string> listAllSeriesNames() const;
+	std::list<std::string> listAllSeriesLabels() const;
+	std::list<std::string> listAllParameterLabels() const;
+	std::list<std::string> listAllQuantityLabels() const;
 
 	const std::list<std::string> listAllParameterLabelsFromSeries(const std::string& _label) const;
 	const std::list<std::string> listAllQuantityLabelsFromSeries(const std::string& _label) const;

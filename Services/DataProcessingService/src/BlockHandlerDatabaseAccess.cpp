@@ -157,6 +157,18 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 					translatedResponseDoc.AddMember(std::move(newKey), std::move(value), dataDoc.GetAllocator());
 				}
 			}
+			ot::JsonValue quantityValue(singleMongoDocument[QuantityContainer::getFieldName().c_str()], dataDoc.GetAllocator());
+			std::string quantityID = std::to_string(singleMongoDocument[MetadataQuantity::getFieldName().c_str()].GetInt64());
+			for (const auto& quantityPairs : m_labelFieldNamePairsQuantities)
+			{
+				if (quantityID == quantityPairs.m_fieldName)
+				{
+					ot::JsonString newKey(quantityPairs.m_label, dataDoc.GetAllocator());
+					translatedResponseDoc.AddMember(std::move(newKey), std::move(quantityValue), dataDoc.GetAllocator());
+					break;
+				}
+			}
+			
 			entries.PushBack(translatedResponseDoc, dataDoc.GetAllocator());
 		}
 	
@@ -175,7 +187,7 @@ void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseA
 {
 	const MetadataCampaign* campaign = &m_resultCollectionMetadataAccess->getMetadataCampaign();
 
-	//If a series is selected, we need to add a corresponding query. Maybe n
+	//If a series is selected, we need to add a corresponding query. 
 	const MetadataSeries* series = addSeriesQuery(_blockEntity);
 
 	//Now we setup the datastream
@@ -190,17 +202,12 @@ void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseA
 void BlockHandlerDatabaseAccess::createLabelFieldNameMap()
 {
 	const MetadataCampaign& campaign = m_resultCollectionMetadataAccess->getMetadataCampaign();
-
+	const auto& allQuantitiesByLabel =	campaign.getMetadataQuantitiesByLabel();
 	ot::UIDList relevantParameterIDs;
-	for (ot::UID quantityID : m_queriedQuantities)
+	for (auto& quantityLabels : m_labelFieldNamePairsQuantities)
 	{
-		const MetadataQuantity& quantity = campaign.getMetadataQuantitiesByUID().find(quantityID)->second;
-		LabelFieldNamePair queryDescription;
-		queryDescription.m_label = quantity.quantityLabel;
-		queryDescription.m_fieldName = std::to_string(quantity.quantityIndex);
-		m_labelFieldNamePairs.push_back(queryDescription);
-
-		relevantParameterIDs.insert(relevantParameterIDs.end(), quantity.dependingParameterIds.begin(), quantity.dependingParameterIds.end());
+		const MetadataQuantity* quantity = allQuantitiesByLabel.find(quantityLabels.m_label)->second;
+		relevantParameterIDs.insert(relevantParameterIDs.end(), quantity->dependingParameterIds.begin(), quantity->dependingParameterIds.end());
 	}
 	relevantParameterIDs.sort();
 	relevantParameterIDs.unique();
@@ -278,7 +285,21 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 	if (seriesLabel != "")
 	{
 		series = m_resultCollectionMetadataAccess->findMetadataSeries(seriesLabel);
-		matchingSeries.push_back(series);
+		if (series != nullptr)
+		{
+			matchingSeries.push_back(series);
+		}
+		else
+		{
+			std::list<std::string> allSeriesLabels= m_resultCollectionMetadataAccess->listAllSeriesLabels();
+			applyRegexFilter(allSeriesLabels, seriesLabel);
+			for (const std::string& seriesName : allSeriesLabels)
+			{
+				const MetadataSeries* series = m_resultCollectionMetadataAccess->findMetadataSeries(seriesName);
+				assert(series != nullptr);
+				matchingSeries.push_back(series);
+			}
+		}
 	}
 	else
 	{
@@ -404,23 +425,23 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	else
 	{
 		std::list<BsonViewOrValue> allQuantityQueries;
-		m_queriedQuantities.clear();
 		for (const MetadataQuantity* viableQuantity : viableQuantities)
 		{
 			ot::UID valueUID = viableQuantity->quantityIndex;
-			m_queriedQuantities.push_back(valueUID);
+			
+			LabelFieldNamePair labelPair;
+			labelPair.m_fieldName= std::to_string(valueUID);
+			labelPair.m_label = viableQuantity->quantityLabel;
+			m_labelFieldNamePairsQuantities.push_back(labelPair);
+
 			assert(valueUID != 0);
 			//Now we add the query for the quantity ID
 			ot::ValueComparisonDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
 			AdvancedQueryBuilder builder;
 			BsonViewOrValue quantityMatch = builder.createComparison(selectedQuantityDef);
 			
-
 			//Now we add a comparision for the searched quantity value.
-			LabelFieldNamePair labelFieldNamePair;
-			labelFieldNamePair.m_label = quantityDef.getName();
 			quantityDef.setName(QuantityContainer::getFieldName());
-			labelFieldNamePair.m_fieldName = QuantityContainer::getFieldName();
 
 			const TupleInstance& tupleInstance = viableQuantity->m_tupleDescription;
 
@@ -447,8 +468,6 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 			{
 				allQuantityQueries.push_back(quantityMatch);
 			}
-
-			m_labelFieldNamePairs.push_back(labelFieldNamePair);
 		}
 		if (allQuantityQueries.size() == 1)
 		{
@@ -461,7 +480,6 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 			m_comparisons.push_back(quantitiesQuery);
 		}
 	}
-
 }
 
 void BlockHandlerDatabaseAccess::addComparision(const ot::ValueComparisonDefinition& _definition)

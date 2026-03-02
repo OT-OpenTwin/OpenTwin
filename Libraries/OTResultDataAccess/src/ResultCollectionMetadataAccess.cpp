@@ -63,7 +63,7 @@ ResultCollectionMetadataAccess& ResultCollectionMetadataAccess::operator=(Result
 	return *this;
 }
 
-const std::list<std::string> ResultCollectionMetadataAccess::listAllSeriesNames() const
+std::list<std::string> ResultCollectionMetadataAccess::listAllSeriesNames() const
 {
 	auto& seriesMetadataEntries= m_metadataCampaign.getSeriesMetadata();
 	std::list<std::string> seriesMetadataNames;
@@ -74,7 +74,18 @@ const std::list<std::string> ResultCollectionMetadataAccess::listAllSeriesNames(
 	return seriesMetadataNames;
 }
 
-const std::list<std::string> ResultCollectionMetadataAccess::listAllParameterLabels() const
+std::list<std::string> ResultCollectionMetadataAccess::listAllSeriesLabels() const
+{
+	auto& seriesMetadataEntries = m_metadataCampaign.getSeriesMetadata();
+	std::list<std::string> seriesMetadataLabels;
+	for (auto& seriesMetadata : seriesMetadataEntries)
+	{
+		seriesMetadataLabels.push_back(seriesMetadata.getLabel());
+	}
+	return seriesMetadataLabels;
+}
+
+std::list<std::string> ResultCollectionMetadataAccess::listAllParameterLabels() const
 {
 	auto& parametersByName = m_metadataCampaign.getMetadataParameterByLabel();
 	std::list<std::string> parameterNames;
@@ -85,7 +96,7 @@ const std::list<std::string> ResultCollectionMetadataAccess::listAllParameterLab
 	return parameterNames;
 }
 
-const std::list<std::string> ResultCollectionMetadataAccess::listAllQuantityLabels() const
+std::list<std::string> ResultCollectionMetadataAccess::listAllQuantityLabels() const
 {
 	auto& quantitiesByName = m_metadataCampaign.getMetadataQuantitiesByLabel();
 	std::list<std::string> quantityNames;
