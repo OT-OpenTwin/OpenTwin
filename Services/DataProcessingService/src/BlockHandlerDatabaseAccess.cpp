@@ -302,7 +302,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 		}
 		else
 		{
-			std::list<std::string> allSeriesLabels= m_resultCollectionMetadataAccess->listAllSeriesLabels();
+			std::list<std::string> allSeriesLabels= m_resultCollectionMetadataAccess->listAllSeriesNames();
 			applyRegexFilter(allSeriesLabels, seriesLabel);
 			for (const std::string& seriesName : allSeriesLabels)
 			{
@@ -385,7 +385,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 		addComparision(seriesComparision);
 		LabelFieldNamePair labelFieldNamePair;
 		labelFieldNamePair.m_fieldName = std::to_string(series->getSeriesIndex()) ;
-		labelFieldNamePair.m_label = series->getLabel();
+		labelFieldNamePair.m_label = series->getName();
 		m_labelFieldNamePairsSeries.push_back(labelFieldNamePair);
 	}
 	else
