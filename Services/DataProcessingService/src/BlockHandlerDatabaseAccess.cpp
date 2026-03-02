@@ -209,11 +209,8 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 {
 	collectMetadataForPipeline(_blockEntity);
 
-
-
 	//Next we add a query corresponding to the selected quantity.
 	addQuantityQuery(_blockEntity);
-
 
 	//Adding all parameter that may occur in the returned documents.
 	addParameterQueries(_blockEntity);
@@ -241,19 +238,22 @@ void BlockHandlerDatabaseAccess::addParameterQueries(EntityBlockDatabaseAccess* 
 	const auto& parametersByLabel =	m_resultCollectionMetadataAccess->getMetadataCampaign().getMetadataParameterByLabel();
 	for (ot::ValueComparisonDefinition& query : queries)
 	{
-		const std::string parameterLabel = query.getName();
-		auto parameterByLabel	= parametersByLabel.find(parameterLabel);
-		if (parameterByLabel == parametersByLabel.end())
+		if (!query.getName().empty() && !query.getComparator().empty() && !query.getValue().empty())
 		{
-			OT_LOG_E("Trying to query for: " + parameterLabel + " which was not found in the campaign.");
-			assert(0);
+			const std::string parameterLabel = query.getName();
+			auto parameterByLabel	= parametersByLabel.find(parameterLabel);
+			if (parameterByLabel == parametersByLabel.end())
+			{
+				OT_LOG_E("Trying to query for: " + parameterLabel + " which was not found in the campaign.");
+				assert(0);
+			}
+			else
+			{
+				const std::string parameterID = std::to_string(parameterByLabel->second->parameterUID);
+				query.setName(parameterID);
+			}
+			addComparision(query);
 		}
-		else
-		{
-			const std::string parameterID = std::to_string(parameterByLabel->second->parameterUID);
-			query.setName(parameterID);
-		}
-		addComparision(query);
 	}
 }
 
@@ -367,54 +367,89 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 		throw std::exception("DatabaseAccessBlock has no quantity set.");
 	}
 
-	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
+
+	std::list<const MetadataQuantity*> viableQuantities;
 	const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
-
-	if (selectedQuantity == nullptr)
+	if (selectedQuantity != nullptr)
 	{
-		throw std::exception("DatabaseAccessBlock has quantity set which is not part of the selected result collection.");
+		viableQuantities.push_back(selectedQuantity);
+	}
+	else
+	{
+
+		auto allQuantityLabel = m_resultCollectionMetadataAccess->listAllQuantityLabels();
+		applyRegexFilter(allQuantityLabel, quantityDef.getName());
+		for (const std::string & viableQuantityLabel : allQuantityLabel)
+		{
+			auto viableQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(viableQuantityLabel);
+			viableQuantities.push_back(viableQuantity);
+		}
 	}
 
-	
-	ot::UID valueUID = selectedQuantity->quantityIndex;
-	m_selectedQuantityLabel = selectedQuantity->quantityLabel;
-	assert(valueUID != 0);
-	//Now we add the query for the quantity ID
-	ot::ValueComparisonDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
-	addComparision(selectedQuantityDef);
-
-	//Now we add a comparision for the searched quantity value.
-	LabelFieldNamePair labelFieldNamePair;
-	labelFieldNamePair.m_label = quantityDef.getName();
-	quantityDef.setName(QuantityContainer::getFieldName());
-	labelFieldNamePair.m_fieldName = QuantityContainer::getFieldName();
-
-	const TupleInstance& tupleInstance = selectedQuantity->m_tupleDescription;
-	if (!tupleInstance.isSingle())
+	if (viableQuantities.size()==0)
 	{
-		
-		quantityDef.setStorageTupleDescription(selectedQuantity->m_tupleDescription);
-		auto queryTupleDef = quantityDef.getQueryTupleDescription();
-		queryTupleDef.setTupleTypeName(selectedQuantity->m_tupleDescription.getTupleTypeName());
-		queryTupleDef.setTupleElementDataTypes(selectedQuantity->m_tupleDescription.getTupleElementDataTypes());
-		quantityDef.setQueryTupleDescription(queryTupleDef);
-		//quantityDef.valueIsTuple();
-		//const auto& allElements = tupleDescription->getTupleElementNames();
-
-		//ptrdiff_t pos = find(allElements.begin(), allElements.end(), m_tupleTarget) - allElements.begin();
-		//if (pos >= allElements.size())
-		//{
-		//	//Here we query the entire tuple
-		//	assert(m_tupleTarget == tupleDescription->getName());
-		//	pos = -1;
-		//	quantityDef.setType(ot::ComplexNumbers::getTypeName());
-		//}
-		//quantityDef.setTupleCharacteristics(tupleDescription->getFormatName(),pos);
+		throw std::exception("Given quantity label expression does not match any of the possible options.");
 	}
-	
-	addComparision(quantityDef);
+	else
+	{
+		std::list<BsonViewOrValue> allQuantityQueries;
+		for (const MetadataQuantity* viableQuantity : viableQuantities)
+		{
+			ot::UID valueUID = viableQuantity->quantityIndex;
+			m_selectedQuantityLabel = viableQuantity->quantityLabel;
+			assert(valueUID != 0);
+			//Now we add the query for the quantity ID
+			ot::ValueComparisonDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
+			AdvancedQueryBuilder builder;
+			BsonViewOrValue quantityMatch = builder.createComparison(selectedQuantityDef);
+			
 
-	m_labelFieldNamePairs.push_back(labelFieldNamePair);
+			//Now we add a comparision for the searched quantity value.
+			LabelFieldNamePair labelFieldNamePair;
+			labelFieldNamePair.m_label = quantityDef.getName();
+			quantityDef.setName(QuantityContainer::getFieldName());
+			labelFieldNamePair.m_fieldName = QuantityContainer::getFieldName();
+
+			const TupleInstance& tupleInstance = viableQuantity->m_tupleDescription;
+
+			if (!tupleInstance.isSingle())
+			{
+				quantityDef.setStorageTupleDescription(viableQuantity->m_tupleDescription);
+				auto queryTupleDef = quantityDef.getQueryTupleDescription();
+				queryTupleDef.setTupleTypeName(viableQuantity->m_tupleDescription.getTupleTypeName());
+				queryTupleDef.setTupleElementDataTypes(viableQuantity->m_tupleDescription.getTupleElementDataTypes());
+				quantityDef.setQueryTupleDescription(queryTupleDef);
+			}
+			
+			if (!quantityDef.getComparator().empty() && !quantityDef.getValue().empty())
+			{
+				if (quantityDef.getType() == ot::TypeNames::getStringTypeName() && quantityDef.getComparator() != "=")
+				{
+					throw std::exception(("Query for " + quantityDef.getName() + " targets a string value with a not supported comparator. Only equality queries are currently supported.").c_str());
+				}
+				BsonViewOrValue filter= builder.createComparison(quantityDef);
+				BsonViewOrValue combinedQuery =	builder.connectWithAND({ quantityMatch,filter });
+				allQuantityQueries.push_back(combinedQuery);
+			}
+			else
+			{
+				allQuantityQueries.push_back(quantityMatch);
+			}
+
+			m_labelFieldNamePairs.push_back(labelFieldNamePair);
+		}
+		if (allQuantityQueries.size() == 1)
+		{
+			m_comparisons.push_back(allQuantityQueries.front());
+		}
+		else
+		{
+			AdvancedQueryBuilder builder;
+			BsonViewOrValue quantitiesQuery = builder.connectWithOR(std::move(allQuantityQueries));
+			m_comparisons.push_back(quantitiesQuery);
+		}
+	}
+
 }
 
 void BlockHandlerDatabaseAccess::addComparision(const ot::ValueComparisonDefinition& _definition)
