@@ -25,6 +25,7 @@
 #include "OTWidgets/PolarPlotAxis.h"
 #include "OTWidgets/PolarPlotLegend.h"
 #include "OTWidgets/PolarPlotPanner.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PolarPlotMagnifier.h"
 
 // Qt header
@@ -36,8 +37,11 @@ ot::PolarPlot::PolarPlot(PlotBase* _owner, QWidget* _parent)
 	m_grid = new PolarPlotGrid(this);
 	m_magnifier = new PolarPlotMagnifier(this);
 	m_panner = new PolarPlotPanner(this);
-
+	
 	this->setPlotAxis(new PolarPlotAxis(AbstractPlotAxis::xBottom, this), nullptr, new PolarPlotAxis(AbstractPlotAxis::yLeft, this), nullptr);
+
+	slotColorStyleChanged();
+	connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PolarPlot::slotColorStyleChanged);
 }
 
 ot::PolarPlot::~PolarPlot() {
@@ -48,7 +52,7 @@ ot::PolarPlot::~PolarPlot() {
 
 // Plot
 
-void ot::PolarPlot::updateLegend(void) {
+void ot::PolarPlot::updateLegend() {
 	if (this->getConfiguration().getLegendVisible()) {
 		if (!m_legend) {
 			m_legend = new PolarPlotLegend(this);
@@ -64,18 +68,18 @@ void ot::PolarPlot::updateLegend(void) {
 	}
 }
 
-void ot::PolarPlot::updateWholePlot(void) {
+void ot::PolarPlot::updateWholePlot() {
 	this->getPlotAxis(AbstractPlotAxis::xBottom)->updateAxis();
 	this->getPlotAxis(AbstractPlotAxis::yLeft)->updateAxis();
 
 	this->replot();
 }
 
-void ot::PolarPlot::clearPlot(void) {
+void ot::PolarPlot::clearPlot() {
 
 }
 
-void ot::PolarPlot::resetPlotView(void) {
+void ot::PolarPlot::resetPlotView() {
 
 }
 
@@ -83,7 +87,7 @@ void ot::PolarPlot::resetPlotView(void) {
 
 // Grid
 
-void ot::PolarPlot::updateGrid(void) {
+void ot::PolarPlot::updateGrid() {
 	const Plot1DCfg& config = this->getConfiguration();
 
 	QPen gridPen(QColor(), 0., Qt::NoPen);
@@ -97,4 +101,18 @@ void ot::PolarPlot::updateGrid(void) {
 	m_grid->setAxisPen(QwtPolar::Axis::AxisLeft, gridPen);
 	m_grid->setAxisPen(QwtPolar::Axis::AxisRight, gridPen);
 	m_grid->setAxisPen(QwtPolar::Axis::AxisTop, gridPen);
+}
+
+void ot::PolarPlot::keyPressEvent(QKeyEvent* _event) {
+	QwtPolarPlot::keyPressEvent(_event);
+	if (_event->key() == Qt::Key_Space) {
+		this->resetPlotView();
+	}
+}
+
+void ot::PolarPlot::slotColorStyleChanged() {
+	const auto& cs = GlobalColorStyle::instance().getCurrentStyle();
+	const auto& val = cs.getValue(ColorStyleValueEntry::WidgetBackground, ColorStyleValue());
+	this->setPlotBackground(val.toBrush());
+	update();
 }

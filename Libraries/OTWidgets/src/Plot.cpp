@@ -35,7 +35,7 @@ ot::Plot::~Plot() {
 // Virtual methods
 
 ot::PlotDataset* ot::Plot::findDataset(QwtPlotCurve* _curve) {
-	for (auto itm : m_cache) {
+	for (auto& itm : m_cache) {
 		for (PlotDataset* dataset : itm.second) {
 			if (dataset->getCartesianCurve() == _curve) {
 				return dataset;
@@ -46,7 +46,7 @@ ot::PlotDataset* ot::Plot::findDataset(QwtPlotCurve* _curve) {
 }
 
 ot::PlotDataset* ot::Plot::findDataset(QwtPolarCurve* _curve) {
-	for (auto itm : m_cache) {
+	for (auto& itm : m_cache) {
 		for (PlotDataset* dataset : itm.second) {
 			if (dataset->getPolarCurve() == _curve) {
 				return dataset;
@@ -129,7 +129,7 @@ bool ot::Plot::changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVer
 // Protected virtual methods
 
 void ot::Plot::clearCache(void) {
-	for (auto it : m_cache) {
+	for (auto& it : m_cache) {
 		for (PlotDataset* dataset : it.second) {
 			OTAssertNullptr(dataset);
 			delete dataset;
@@ -139,7 +139,7 @@ void ot::Plot::clearCache(void) {
 }
 
 void ot::Plot::detachAllCached(void) {
-	for (auto it : m_cache) {
+	for (auto& it : m_cache) {
 		for (PlotDataset* dataset : it.second) {
 			OTAssertNullptr(dataset);
 			dataset->detach();

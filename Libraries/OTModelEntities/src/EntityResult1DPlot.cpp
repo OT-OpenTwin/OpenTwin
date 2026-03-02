@@ -174,9 +174,10 @@ void EntityResult1DPlot::createProperties()
 	m_querySettings.setQueryDefinitions(allQueryOptions);
 	m_querySettings.setProperties(this);
 
-	std::list<std::string> quantityOptions = ot::Plot1DAxisCfg::getAxisQuantityStringList();
+	const std::list<std::string> plotTypeOptions = ot::Plot1DCfg::getPlotTypeStringList();
+	const std::list<std::string> quantityOptions = ot::Plot1DAxisCfg::getAxisQuantityStringList();
 
-	EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian"}, "Cartesian", "", getProperties());
+	EntityPropertiesSelection::createProperty("General", "Plot type", plotTypeOptions, ot::Plot1DCfg::toString(ot::Plot1DCfg::Cartesian), "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
 	EntityPropertiesColor::createProperty("General", "Grid color", { 100, 100, 100 }, "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Legend", true, "", getProperties());
@@ -228,20 +229,13 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot() {
 	const bool gridVisible = PropertyHelper::getBoolPropertyValue(this, "Grid");
 	const bool legendVisible = PropertyHelper::getBoolPropertyValue(this, "Legend");
 
-
-	std::string xAxisQuantity = ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::XData);
-	if (PropertyHelper::hasProperty(this, "Quantity", "X axis")) {
-		xAxisQuantity = PropertyHelper::getSelectionPropertyValue(this, "Quantity", "X axis");
-	}
+	const std::string xAxisQuantity = PropertyHelper::getSelectionPropertyValue(this, "Quantity", "X axis");
 	const bool logScaleX = PropertyHelper::getBoolPropertyValue(this, "Logscale", "X axis");
 	const bool autoScaleX = PropertyHelper::getBoolPropertyValue(this, "Autoscale", "X axis");
 	const double minX = PropertyHelper::getDoublePropertyValue(this, "Min", "X axis");
 	const double maxX = PropertyHelper::getDoublePropertyValue(this, "Max", "X axis");
 
-	std::string yAxisQuantity = ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::Real);
-	if (PropertyHelper::hasProperty(this, "Quantity", "Y axis")) {
-		yAxisQuantity = PropertyHelper::getSelectionPropertyValue(this, "Quantity", "Y axis");
-	}
+	const std::string yAxisQuantity = PropertyHelper::getSelectionPropertyValue(this, "Quantity", "Y axis");
 	const bool logScaleY = PropertyHelper::getBoolPropertyValue(this, "Logscale", "Y axis");
 	const bool autoScaleY = PropertyHelper::getBoolPropertyValue(this, "Autoscale", "Y axis");
 	const double minY = PropertyHelper::getDoublePropertyValue(this, "Min", "Y axis");
@@ -360,23 +354,18 @@ void EntityResult1DPlot::readSpecificDataFromDataBase(const bsoncxx::document::v
 void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 {
 	PropertyHelper::setColourPropertyValue(_config.getGridColor(), this, "Grid color");
-	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::plotTypeToString(_config.getPlotType()), this, "Plot type");
-	
+	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::toString(_config.getPlotType()), this, "Plot type");
 	
 	PropertyHelper::setBoolPropertyValue(_config.getGridVisible(), this, "Grid");
 	PropertyHelper::setBoolPropertyValue(_config.getLegendVisible(), this, "Legend");
 
-	if (PropertyHelper::hasProperty(this, "Quantity", "X axis")) {
-		PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getXAxisQuantity()), this, "Quantity", "X axis");
-	}
+	PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getXAxisQuantity()), this, "Quantity", "X axis");
 	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsLogScale(), this, "Logscale", "X axis");
 	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsAutoScale(), this, "Autoscale", "X axis");
 	PropertyHelper::setDoublePropertyValue(_config.getXAxisMin(), this, "Min", "X axis");
 	PropertyHelper::setDoublePropertyValue(_config.getXAxisMax(), this, "Max", "X axis");
 
-	if (PropertyHelper::hasProperty(this, "Quantity", "Y axis")) {
-		PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getYAxisQuantity()), this, "Quantity", "Y axis");
-	}
+	PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getYAxisQuantity()), this, "Quantity", "Y axis");
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsLogScale(), this, "Logscale", "Y axis");
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale", "Y axis");
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", "Y axis");

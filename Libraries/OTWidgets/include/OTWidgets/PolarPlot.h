@@ -34,6 +34,7 @@ namespace ot {
 	class PolarPlotMagnifier;
 
 	class OT_WIDGETS_API_EXPORT PolarPlot : public QwtPolarPlot, public AbstractPlot {
+		Q_OBJECT
 		OT_DECL_NOCOPY(PolarPlot)
 		OT_DECL_NOMOVE(PolarPlot)
 		OT_DECL_NODEFAULT(PolarPlot)
@@ -45,25 +46,31 @@ namespace ot {
 
 		// Plot
 
-		virtual void updateLegend(void) override;
+		virtual void updateLegend() override;
 
-		virtual void updateWholePlot(void) override;
+		virtual void updateWholePlot() override;
 
-		virtual void clearPlot(void) override;
+		virtual void clearPlot() override;
 
-		virtual void resetPlotView(void) override;
+		virtual void resetPlotView() override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Grid
 
-		virtual void updateGrid(void) override;
+		virtual void updateGrid() override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Getter
 
-		virtual Plot1DCfg::PlotType getPlotType(void) const override { return Plot1DCfg::Polar; };
+		virtual Plot1DCfg::PlotType getPlotType() const override { return Plot1DCfg::Polar; };
+
+	protected:
+		virtual void keyPressEvent(QKeyEvent* _event) override;
+
+	private Q_SLOTS:
+		void slotColorStyleChanged();
 
 	private:
 		PolarPlotGrid* m_grid;

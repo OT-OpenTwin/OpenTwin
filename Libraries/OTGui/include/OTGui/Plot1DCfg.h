@@ -41,8 +41,10 @@ namespace ot {
 			Polar
 		};
 
-		static std::string plotTypeToString(PlotType _type);
+		static std::string toString(PlotType _type);
 		static PlotType stringToPlotType(const std::string& _type);
+
+		static std::list<std::string> getPlotTypeStringList();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

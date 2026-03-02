@@ -352,7 +352,7 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
-	static EntityPropertiesSelection* createProperty(const std::string &group, const std::string &name, std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
+	static EntityPropertiesSelection* createProperty(const std::string &group, const std::string &name, const std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 	static EntityPropertiesSelection* createProperty(const std::string &group, const std::string &name, std::list<std::string>&& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:

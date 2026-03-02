@@ -40,7 +40,7 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(GlobalColorStyle)
 	public:
-		static GlobalColorStyle& instance(void);
+		static GlobalColorStyle& instance();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -52,8 +52,8 @@ namespace ot {
 		const ColorStyle& getStyle(const std::string& _name, const ColorStyle& _default = ColorStyle()) const;
 
 		bool setCurrentStyle(const std::string& _styleName, bool _force = false);
-		const std::string& getCurrentStyleName(void) const { return m_currentStyle; };
-		const ColorStyle& getCurrentStyle(void) const;
+		const std::string& getCurrentStyleName() const { return m_currentStyle; };
+		const ColorStyle& getCurrentStyle() const;
 
 		//! @brief Adds a root path where the style directories should be located at.
 		//! Returns false if the specified path does not exist.
@@ -61,7 +61,7 @@ namespace ot {
 
 		QString styleRootPath(const std::string& _styleName) const;
 
-		void scanForStyleFiles(void);
+		void scanForStyleFiles();
 
 		void evaluateColorStyleFiles(ColorStyle& _style) const;
 
@@ -69,11 +69,11 @@ namespace ot {
 
 		void setApplication(QApplication* _application);
 
-		std::list<std::string> getAvailableStyleNames(void) const;
+		std::list<std::string> getAvailableStyleNames() const;
 
 	Q_SIGNALS:
-		void currentStyleAboutToChange(void);
-		void currentStyleChanged(void);
+		void currentStyleAboutToChange();
+		void currentStyleChanged();
 
 	private:
 		GlobalColorStyle();

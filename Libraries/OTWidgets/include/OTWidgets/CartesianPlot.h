@@ -47,15 +47,17 @@ namespace ot {
 
 		// Virtual methods
 
-		virtual void updateLegend(void) override;
+		virtual void updateLegend() override;
 
-		virtual void updateWholePlot(void) override;
+		virtual void updateWholePlot() override;
 
-		virtual void clearPlot(void) override;
+		virtual void clearPlot() override;
 
 		void setZoomerPen(const QPen& _pen);
 
-		virtual void resetPlotView(void) override;
+		virtual void resetPlotView() override;
+
+		virtual void keyPressEvent(QKeyEvent* _event) override;
 
 		virtual void mouseDoubleClickEvent(QMouseEvent* _event) override;
 
@@ -63,13 +65,13 @@ namespace ot {
 
 		// Grid
 
-		virtual void updateGrid(void) override;
+		virtual void updateGrid() override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Getter
 
-		virtual Plot1DCfg::PlotType getPlotType(void) const override { return Plot1DCfg::Cartesian; };
+		virtual Plot1DCfg::PlotType getPlotType() const override { return Plot1DCfg::Cartesian; };
 
 		QwtPlotCurve* findNearestCurve(const QPoint& _pos, int& _pointIx);
 

@@ -408,7 +408,7 @@
     <QtMoc Include="include\OTWidgets\PlotBase.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\PlotDataset.h" />
-    <ClInclude Include="include\OTWidgets\PolarPlot.h" />
+    <QtMoc Include="include\OTWidgets\PolarPlot.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotAxis.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotGrid.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotLegend.h" />

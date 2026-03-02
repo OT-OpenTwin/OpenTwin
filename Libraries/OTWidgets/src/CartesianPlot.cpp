@@ -70,7 +70,7 @@ ot::CartesianPlot::~CartesianPlot() {
 
 // Virtual methods
 
-void ot::CartesianPlot::updateLegend(void) {
+void ot::CartesianPlot::updateLegend() {
 	if (this->getConfiguration().getLegendVisible()) {
 		if (!m_legend) {
 			m_legend = new CartesianPlotLegend(this);
@@ -86,7 +86,7 @@ void ot::CartesianPlot::updateLegend(void) {
 	}
 }
 
-void ot::CartesianPlot::updateWholePlot(void) {
+void ot::CartesianPlot::updateWholePlot() {
 	this->getPlotAxis(AbstractPlotAxis::xBottom)->updateAxis();
 	this->getPlotAxis(AbstractPlotAxis::yLeft)->updateAxis();
 
@@ -95,7 +95,7 @@ void ot::CartesianPlot::updateWholePlot(void) {
 	m_plotZoomer->setZoomBase(false);
 }
 
-void ot::CartesianPlot::clearPlot(void) {
+void ot::CartesianPlot::clearPlot() {
 
 }
 
@@ -104,7 +104,7 @@ void ot::CartesianPlot::setZoomerPen(const QPen & _pen) {
 	m_plotZoomer->setTrackerPen(_pen);
 }
 
-void ot::CartesianPlot::resetPlotView(void) {
+void ot::CartesianPlot::resetPlotView() {
 	double xMin = std::numeric_limits<double>::max();
 	double xMax = std::numeric_limits<double>::lowest();
 	double yMin = std::numeric_limits<double>::max();
@@ -148,6 +148,13 @@ void ot::CartesianPlot::resetPlotView(void) {
 	}
 }
 
+void ot::CartesianPlot::keyPressEvent(QKeyEvent* _event) {
+	QwtPlot::keyPressEvent(_event);
+	if (_event->key() == Qt::Key_Space) {
+		resetPlotView();
+	}
+}
+
 void ot::CartesianPlot::mouseDoubleClickEvent(QMouseEvent* _event) {
 	QwtPlot::mouseDoubleClickEvent(_event);
 	if (_event->button() == Qt::LeftButton) {
@@ -188,7 +195,7 @@ void ot::CartesianPlot::mouseDoubleClickEvent(QMouseEvent* _event) {
 
 // Grid
 
-void ot::CartesianPlot::updateGrid(void) {
+void ot::CartesianPlot::updateGrid() {
 	if (this->getConfiguration().getGridVisible()) {
 		m_grid->setPen(QtFactory::toQColor(this->getConfiguration().getGridColor()), this->getConfiguration().getGridLineWidth(), Qt::SolidLine);
 	}

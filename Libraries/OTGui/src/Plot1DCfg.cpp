@@ -23,7 +23,7 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Plot1DCfg.h"
 
-std::string ot::Plot1DCfg::plotTypeToString(PlotType _type) {
+std::string ot::Plot1DCfg::toString(PlotType _type) {
 	switch (_type) {
 	case ot::Plot1DCfg::Cartesian: return "Cartesian";
 	case ot::Plot1DCfg::Polar: return "Polar";
@@ -34,12 +34,21 @@ std::string ot::Plot1DCfg::plotTypeToString(PlotType _type) {
 }
 
 ot::Plot1DCfg::PlotType ot::Plot1DCfg::stringToPlotType(const std::string& _type) {
-	if (_type == Plot1DCfg::plotTypeToString(Plot1DCfg::Cartesian)) return Plot1DCfg::Cartesian;
-	else if (_type == Plot1DCfg::plotTypeToString(Plot1DCfg::Polar)) return Plot1DCfg::Polar;
+	if (_type == Plot1DCfg::toString(Plot1DCfg::Cartesian)) return Plot1DCfg::Cartesian;
+	else if (_type == Plot1DCfg::toString(Plot1DCfg::Polar)) return Plot1DCfg::Polar;
 	else {
 		OT_LOG_EAS("Unknown plot type \"" + _type + "\"");
 		return Plot1DCfg::Cartesian;
 	}
+}
+
+std::list<std::string> ot::Plot1DCfg::getPlotTypeStringList() {
+	return std::list<std::string>(
+		{
+			toString(Plot1DCfg::Cartesian),
+			toString(Plot1DCfg::Polar)
+		}
+	);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -58,7 +67,7 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	WidgetViewBase::addToJsonObject(_object, _allocator);
 
 	_object.AddMember("CollectionName", JsonString(m_collectionName, _allocator), _allocator);
-	_object.AddMember("Type", JsonString(this->plotTypeToString(m_type), _allocator), _allocator);
+	_object.AddMember("Type", JsonString(this->toString(m_type), _allocator), _allocator);
 	
 	_object.AddMember("GridVisible", m_gridVisible, _allocator);
 	JsonObject gridColorObject;

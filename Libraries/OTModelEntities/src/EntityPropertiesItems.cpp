@@ -669,25 +669,10 @@ bool EntityPropertiesString::hasSameValue(EntityPropertiesBase* other) const
 
 // ################################################################################################################################################################
 
-EntityPropertiesSelection* EntityPropertiesSelection::createProperty(const std::string &group, const std::string &name, std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties)
+EntityPropertiesSelection* EntityPropertiesSelection::createProperty(const std::string &group, const std::string &name, const std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
-	// Load the template defaults if any
-	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
-
-	// Now load the default value if available. Otherwise take the provided default
-	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, defaultValue);
-
-	// Finally create the new property
-	EntityPropertiesSelection *prop = new EntityPropertiesSelection;
-	prop->setName(name);
-
-	for (auto& item : options) prop->addOption(item);
-
-	prop->setValue(value);
-
-	properties.createProperty(prop, group);
-
-	return prop;
+	std::list<std::string> optionsCopy = options;
+	return EntityPropertiesSelection::createProperty(group, name, std::move(optionsCopy), defaultValue, defaultCategory, properties);
 }
 
 EntityPropertiesSelection* EntityPropertiesSelection::createProperty(const std::string& group, const std::string& name, std::list<std::string>&& options, const std::string& defaultValue, const std::string& defaultCategory, EntityProperties& properties)
@@ -702,7 +687,9 @@ EntityPropertiesSelection* EntityPropertiesSelection::createProperty(const std::
 	EntityPropertiesSelection* prop = new EntityPropertiesSelection;
 	prop->setName(name);
 
-	for (auto& item : options) prop->addOption(item);
+	for (auto& item : options) {
+		prop->addOption(item);
+	}
 
 	prop->setValue(value);
 
