@@ -104,7 +104,8 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 
 		// Open the cst project in a studio suite instance, save it and extract the data
 		StudioConnector studioObject;
-		studioObject.searchProjectAndExtractData(fileName, baseProjectName, includeResults, includeParametricResults);
+		std::string error = studioObject.searchProjectAndExtractData(fileName, baseProjectName, includeResults, includeParametricResults);
+		if (!error.empty()) throw error;
 
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName, includeResults);
@@ -890,6 +891,11 @@ void ProjectManager::sendUnitsInformation(const std::string &projectRoot)
 
 void ProjectManager::sendMaterialInformation(const std::string& projectRoot)
 {
+	if (!std::filesystem::exists(projectRoot + "/Temp/Upload/material.info"))
+	{
+		return;  // This might be a schematic only project, so the material information does not exist
+	}
+
 	std::string fileContent;
 	readFileContent(projectRoot + "/Temp/Upload/material.info", fileContent);
 
@@ -930,7 +936,7 @@ void ProjectManager::sendHistoryInformation(const std::string& projectRoot)
 	}
 	else
 	{
-		return; // No history information found
+		return; // No history information found (might also be a schematic only project)
 	}
 
 	ot::JsonDocument doc;
@@ -944,6 +950,11 @@ void ProjectManager::sendHistoryInformation(const std::string& projectRoot)
 
 void ProjectManager::sendShapeInformationAndTriangulation(const std::string& projectRoot, InfoFileManager &infoFileManager)
 {
+	if (!std::filesystem::exists(projectRoot + "/Temp/Upload/shape.info"))
+	{
+		return;  // This might be a schematic only project, so the material information does not exist
+	}
+
 	std::string fileContent;
 	readFileContent(projectRoot + "/Temp/Upload/shape.info", fileContent);
 

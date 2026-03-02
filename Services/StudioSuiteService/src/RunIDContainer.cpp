@@ -195,6 +195,10 @@ std::list<std::string> RunIDContainer::getListOfCategories()
 		{
 			categorySet.emplace(category);
 		}
+		else if (category.substr(0, 6) == "Tasks/")
+		{
+			categorySet.emplace(category);
+		}
 	}
 
 	// convert the map to a list

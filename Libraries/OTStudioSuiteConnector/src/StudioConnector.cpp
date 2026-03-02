@@ -230,9 +230,66 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 	script << "prj.save()\n";
 	script << "print('saving done')\n";
 
-	script << "vbaCode = (";
+	script << "has3D = (prj.model3d != None)\n";
+	script << "hasSchematic = (prj.schematic != None)\n";
 
-	// Here comes the VBA code. Every " in the code needs to be masked as \\\".
+	script << "vbaCodeGeneral = (";
+
+	// Here comes the general VBA code (for both 3D and schematic). Every " in the code needs to be masked as \\\".
+	// Every line is preceeded by "\" and appended by "\n"
+	// For a line break, \\n is appended to the line.
+
+	script <<
+		"\"'#Language \\\"WWB-COM\\\" \\n\"\n"
+		"\"\\n\"\n"
+		"\"Option Explicit\\n\"\n"
+		"\"\\n\"\n"
+		"\"Dim baseFolder As String\\n\"\n"
+		"\"\\n\"\n"
+		"\"Sub ExportUnits()\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Length\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Temperature\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Voltage\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Current\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Resistance\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Conductance\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Capacitance\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Inductance\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Frequency\\\")\\n\"\n"
+		"\"     Print #1, Units.GetUnit(\\\"Time\\\")\\n\"\n"
+		"\"End Sub\\n\"\n"
+		"\"\\n\"\n"
+		"\"Sub ExportParameters()\\n\"\n"
+		"\"		Print #1, CStr(GetNumberOfParameters())\\n\"\n"
+		"\"		Dim index As Long\\n\"\n"
+		"\"		For index = 0 To GetNumberOfParameters()-1\\n\"\n"
+		"\"			Print #1, GetParameterName(index)\\n\"\n"
+		"\"			Print #1, CStr(GetParameterNValue(index))\\n\"\n"
+		"\"			Print #1, GetParameterDescription(GetParameterName(index))\\n\"\n"
+		"\"		Next\\n\"\n"
+		"\"End Sub\\n\"\n"
+		"\"\\n\"\n"
+		"\"Sub Main\\n\"\n"
+		"\"\\n\"\n"
+		"\"	baseFolder = GetProjectPath(\\\"Temp\\\") + \\\"/Upload\\\"\\n\"\n"
+		"\"	On Error Resume Next\\n\"\n"
+		"\"	MkDir baseFolder\\n\"\n"
+		"\"\\n\"\n"
+		"\"	Open baseFolder + \\\"/units.info\\\" For Output As #1\\n\"\n"
+		"\"	ExportUnits()\\n\"\n"
+		"\"	Close #1\\n\"\n"
+		"\"\\n\"\n"
+		"\"	Open baseFolder + \\\"/parameters.info\\\" For Output As #1\\n\"\n"
+		"\"	ExportParameters()\\n\"\n"
+		"\"	Close #1\\n\"\n"
+		"\"\\n\"\n"
+		"\"End Sub\\n\"\n";
+
+	script << ")\n";
+
+	script << "vbaCode3D = (";
+
+	// Here comes the specific 3D VBA code. Every " in the code needs to be masked as \\\".
 	// Every line is preceeded by "\" and appended by "\n"
 	// For a line break, \\n is appended to the line.
 
@@ -319,38 +376,11 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 		"\"	Next\\n\"\n"
 		"\"End Sub\\n\"\n"
 		"\"\\n\"\n"
-		"\"\\n\"\n"
-		"\"Sub ExportUnits()\\n\"\n"
-		"\"     Print #1, Units.GetUnit(\\\"Length\\\")\\n\"\n"
-		"\"     Print #1, Units.GetUnit(\\\"Temperature\\\")\\n\"\n"
-		"\"     Print #1, Units.GetUnit(\\\"Voltage\\\")\\n\"\n"
-		"\"     Print #1, Units.GetUnit(\\\"Current\\\")\\n\"\n"
-		"\"     Print #1, Units.GetUnit(\\\"Resistance\\\")\\n\"\n"
-		"\"     Print #1, Units.GetUnit(\\\"Conductance\\\")\\n\"\n"
-		"\"     Print #1, Units.GetUnit(\\\"Capacitance\\\")\\n\"\n"
-		"\"     Print #1, Units.GetUnit(\\\"Inductance\\\")\\n\"\n"
-		"\"     Print #1, Units.GetUnit(\\\"Frequency\\\")\\n\"\n"
-		"\"     Print #1, Units.GetUnit(\\\"Time\\\")\\n\"\n"
-		"\"End Sub\\n\"\n"
-		"\"\\n\"\n"
-		"\"\\n\"\n"
-		"\"Sub ExportParameters()\\n\"\n"
-		"\"		Print #1, CStr(GetNumberOfParameters())\\n\"\n"
-		"\"		Dim index As Long\\n\"\n"
-		"\"		For index = 0 To GetNumberOfParameters()-1\\n\"\n"
-		"\"			Print #1, GetParameterName(index)\\n\"\n"
-		"\"			Print #1, CStr(GetParameterNValue(index))\\n\"\n"
-		"\"			Print #1, GetParameterDescription(GetParameterName(index))\\n\"\n"
-		"\"		Next\\n\"\n"
-		"\"End Sub\\n\"\n"
-		"\"\\n\"\n"
 		"\"Sub Main\\n\"\n"
 		"\"\\n\"\n"
 		"\"	SetLock(True)\\n\"\n"
 		"\"\\n\"\n"
 		"\"	baseFolder = GetProjectPath(\\\"Temp\\\") + \\\"/Upload\\\"\\n\"\n"
-		"\"	On Error Resume Next\\n\"\n"
-		"\"	MkDir baseFolder\\n\"\n"
 		"\"	count = 0\\n\"\n"
 		"\"\\n\"\n"
 		"\"	ScreenUpdating(False)\\n\"\n"
@@ -368,23 +398,18 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 		"\"	ExportMaterials()\\n\"\n"
 		"\"	Close #1\\n\"\n"
 		"\"\\n\"\n"
-		"\"	Open baseFolder + \\\"/units.info\\\" For Output As #1\\n\"\n"
-		"\"	ExportUnits()\\n\"\n"
-		"\"	Close #1\\n\"\n"
-		"\"\\n\"\n"
-		"\"	Open baseFolder + \\\"/parameters.info\\\" For Output As #1\\n\"\n"
-		"\"	ExportParameters()\\n\"\n"
-		"\"	Close #1\\n\"\n"
-		"\"\\n\"\n"
 		"\"	SetLock(False)\\n\"\n"
 		"\"End Sub\\n\"\n";
 		
 	script << ")\n";
 
 	script << "print('execute VBA code')\n";
-	script << "prj.schematic.execute_vba_code(vbaCode)\n";
+	script << "prj.schematic.execute_vba_code(vbaCodeGeneral)\n";
+	script << "if has3D:\n";
+	script << "    prj.schematic.execute_vba_code(vbaCode3D)\n";
 
-	script << "if includeResults:\n";
+	// Export 3D results (if selected)
+	script << "if includeResults and has3D:\n";
 	script << "    project = cst.results.ProjectFile(fileName, True)\n";
 	script << "    results = project.get_3d().get_tree_items()\n";
 
@@ -410,6 +435,46 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 	script << "                runIds = [0]\n";
 	script << "            for id in runIds : \n";
 	script << "                data = project.get_3d().get_result_item(item, id, False)\n";
+	script << "                exportFileName = exportFolder + '\\\\' + str(id) + '\\\\' + item\n";
+	script << "                os.makedirs(os.path.dirname(exportFileName), exist_ok = True)\n";
+	script << "                f = open(exportFileName, 'w')\n";
+	script << "                f.write(data.title + '\\n')\n";
+	script << "                f.write(data.xlabel + '\\n')\n";
+	script << "                f.write(data.ylabel + '\\n')\n";
+	script << "                f.write(str(len(data.get_data())) + '\\n')\n";
+	script << "                for value in data.get_data() :\n";
+	script << "                    f.write(str(value) + '\\n')\n";
+	script << "                f.close()\n";
+	script << "        except:\n";
+	script << "            pass\n";
+
+	// Export schematic results (if selected)
+	script << "if includeResults and hasSchematic:\n";
+	script << "    project = cst.results.ProjectFile(fileName, True)\n";
+	script << "    results = project.get_schematic().get_tree_items()\n";
+
+	script << "    if includeParametricResults:\n";
+	script << "        runIds = project.get_schematic().get_all_run_ids()\n";
+	script << "    else:\n";
+	script << "        runIds = [0]\n";
+
+	script << "    for id in runIds :\n";
+	script << "        dict = project.get_schematic().get_parameter_combination(id)\n";
+	script << "        exportFileName = exportFolder + '\\\\' + str(id) + '\\\\parameters.info'\n";
+	script << "        os.makedirs(os.path.dirname(exportFileName), exist_ok = True)\n";
+	script << "        f = open(exportFileName, 'w')\n";
+	script << "        for key, value in dict.items() :\n";
+	script << "            f.write(str(key) + '\\n' + str(value) + '\\n')\n";
+	script << "        f.close()\n";
+
+	script << "    for item in results :\n";
+	script << "        try:\n";
+	script << "            if includeParametricResults:\n";
+	script << "                runIds = project.get_schematic().get_run_ids(item)\n";
+	script << "            else:\n";
+	script << "                runIds = [0]\n";
+	script << "            for id in runIds : \n";
+	script << "                data = project.get_schematic().get_result_item(item, id, False)\n";
 	script << "                exportFileName = exportFolder + '\\\\' + str(id) + '\\\\' + item\n";
 	script << "                os.makedirs(os.path.dirname(exportFileName), exist_ok = True)\n";
 	script << "                f = open(exportFileName, 'w')\n";

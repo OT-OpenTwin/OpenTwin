@@ -340,8 +340,6 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 				//std::string prefix = curve.first.substr(_category.size() + 1);
 				quantityUnit = "";
 				quantityName = curve.first;
-				QuantityDescription* quantityDescription = nullptr;
-				//quantityDescription->setName(prefix);
 
 				const bool hasRealValues = !curveData->getYreValues().empty();
 				const bool hasImValue = !curveData->getYimValues().empty();
@@ -372,7 +370,6 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 				
 				if (hasRealValues)
 				{
-					
 					for (auto realValue : curveData->getYreValues())
 					{
 						quantityDescriptionComplex->addValueReal(ot::Variable(realValue));
@@ -383,9 +380,11 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 					quantityDescriptionComplex->addValueReal(ot::Variable(0.0));
 				}
 
-				quantityDescription->setName(quantityName);
-				assert(quantityDescription != nullptr);
-				newCurveDescription.setQuantityDescription(quantityDescription);
+				if (quantityName.substr(0, 6) == "Tasks/") quantityName = "1D Results/" + quantityName;   // If we have results from the circuit simulation, 
+																										  // we still need to move it under the 1D Results folder
+
+				quantityDescriptionComplex->setName(quantityName);
+				newCurveDescription.setQuantityDescription(quantityDescriptionComplex.release());
 				allCurveDescriptions.push_back(std::move(newCurveDescription));
 			}
 		}
