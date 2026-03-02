@@ -49,7 +49,7 @@ void EntityBlockDatabaseAccess::createProperties()
 	std::list<std::string> comparators = ot::ComparisonSymbols::g_comparators;
 	comparators.push_front("");
 
-	EntityPropertiesProjectList* projectList = new EntityPropertiesProjectList("Projectname");
+	EntityPropertiesProjectList* projectList = new EntityPropertiesProjectList(m_propertyNameProjectName);
 	getProperties().createProperty(projectList, m_groupMetadataFilter);
 	
 	// Basic properties
