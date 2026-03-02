@@ -76,6 +76,9 @@ public:
 
 	static const std::string getIconName() {return "Database_access.svg"; }
 
+	bool isSeriesLabelRegex();
+	bool isQuantLabelRegex();
+
 protected:
 	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
@@ -96,6 +99,9 @@ private:
 
 	const std::string m_propertyNumberOfQueries = "Number of parameter queries";
 	const std::string m_propertyNumberOfQueriesMetadataSeries = "Number of metadata queries";
+	const std::string m_propertyRegexLabel= "Label is regex";
+
+
 
 	const std::string m_propertyName = "Name";
 	const std::string m_propertyTupleFormat = "Format";

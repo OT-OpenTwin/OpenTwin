@@ -443,6 +443,10 @@ void BlockHandlerDatabaseAccess::applyRegexFilter(std::list<std::string>& _optio
 		{
 			option = _options.erase(option);
 		}
+		else
+		{
+			option++;
+		}
 	}	
 }
 
