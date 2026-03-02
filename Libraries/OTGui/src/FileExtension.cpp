@@ -97,6 +97,7 @@ std::string ot::FileExtension::toFilterString(DefaultFileExtension _extension) {
 		// Technical / Engineering
 	case FileExtension::Step: return "STEP Files (*.step *.stp)";
 	case FileExtension::Iges: return "IGES Files (*.iges *.igs)";
+	case FileExtension::Stl: return "STL Files (*.stl)";
 	case FileExtension::Obj: return "Wavefront OBJ (*.obj)";
 	case FileExtension::Dxf: return "DXF Drawings (*.dxf)";
 	case FileExtension::Dwg: return "DWG Drawings (*.dwg)";
