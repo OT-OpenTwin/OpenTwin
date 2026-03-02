@@ -25,6 +25,7 @@
 #include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/Private/WidgetDebug.h"
 
 // ADS header
 #include <ads/DockWidget.h>
@@ -44,6 +45,8 @@ ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType, QWidget* _parent)
 	m_isModified(false), m_dockWidget(nullptr), m_data(_viewType),
 	m_manager(nullptr)
 {
+	OT_WIDGETS_VIEW_DBG_PTR(this, "View created");
+
 	m_dockWidget = new WidgetViewDock(this, _parent);
 
 	this->connect(m_dockWidget, &WidgetViewDock::dockCloseRequested, this, &WidgetView::slotCloseRequested);
@@ -51,6 +54,8 @@ ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType, QWidget* _parent)
 }
 
 ot::WidgetView::~WidgetView() {
+	OT_WIDGETS_VIEW_DBG_PTR(this, "View destroying");
+
 	if (!m_isDeletedByManager && m_manager) {
 		m_manager->forgetView(this);
 		m_manager = nullptr;
@@ -68,18 +73,21 @@ ot::WidgetView::~WidgetView() {
 		}
 		m_dockWidget = nullptr;
 	}
+
+	OT_WIDGETS_VIEW_DBG_PTR(this, "View destroyed");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter/Getter
 
-QAction* ot::WidgetView::getViewToggleAction(void) const {
+QAction* ot::WidgetView::getViewToggleAction() const {
 	return (m_dockWidget ? m_dockWidget->toggleViewAction() : nullptr);
 }
 
-void ot::WidgetView::setViewWidgetFocus(void) {
+void ot::WidgetView::setViewWidgetFocus() {
 	OTAssertNullptr(this->getViewWidget());
+	OT_WIDGETS_VIEW_DBG_PTR(this, "Setting view widget focus");
 	this->getViewWidget()->setFocus();
 }
 
@@ -96,6 +104,8 @@ void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 	m_dockWidget->setPinButtonVisible(_data.getViewFlags() & WidgetViewBase::ViewIsPinnable);
 
 	this->setViewContentModified(m_isModified);
+
+	OT_WIDGETS_VIEW_DBG_PTR(this, "View data set { \"EntiyName\": \"" + m_data.getEntityName() + "\", \"ViewType\": \"" + WidgetViewBase::toString(m_data.getViewType()) + "\" }");
 }
 
 void ot::WidgetView::setViewContentModified(bool _isModified) {
@@ -109,23 +119,26 @@ void ot::WidgetView::setViewContentModified(bool _isModified) {
 	}
 }
 
-QString ot::WidgetView::getCurrentViewTitle(void) const {
+QString ot::WidgetView::getCurrentViewTitle() const {
 	return m_dockWidget->windowTitle();
 }
 
-void ot::WidgetView::openView(void) {
+void ot::WidgetView::openView() {
+	OT_WIDGETS_VIEW_DBG_PTR(this, "Opening view");
 	m_dockWidget->openView();
 }
 
-void ot::WidgetView::closeView(void) {
+void ot::WidgetView::closeView() {
+	OT_WIDGETS_VIEW_DBG_PTR(this, "Closing view");
 	m_dockWidget->closeView();
 }
 
-void ot::WidgetView::setAsCurrentViewTab(void) {
+void ot::WidgetView::setAsCurrentViewTab() {
+	OT_WIDGETS_VIEW_DBG_PTR(this, "Setting view as current tab");
 	m_dockWidget->setAsCurrentTab();
 }
 
-bool ot::WidgetView::isCurrentViewTab(void) const {
+bool ot::WidgetView::isCurrentViewTab() const {
 	return m_dockWidget->isCurrentTab();
 }
 
@@ -147,14 +160,15 @@ void ot::WidgetView::addWidgetInterfaceToDock(WidgetBase* _interface) {
 }
 
 void ot::WidgetView::addWidgetToDock(QWidget* _widget) {
+	OT_WIDGETS_VIEW_DBG_PTR(this, "Adding widget (0x" + String::ptrToHexString(_widget) + ") to dock");
 	m_dockWidget->setWidget(_widget);
 }
 
-void ot::WidgetView::slotCloseRequested(void) {
+void ot::WidgetView::slotCloseRequested() {
 	Q_EMIT closeRequested();
 }
 
-void ot::WidgetView::slotToggleVisible(void) {
+void ot::WidgetView::slotToggleVisible() {
 	m_dockWidget->toggleView(!m_dockWidget->isVisible());
 }
 

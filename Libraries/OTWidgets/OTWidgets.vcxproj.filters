@@ -744,6 +744,9 @@
     <Filter Include="include\Syntax">
       <UniqueIdentifier>{793a69dd-1675-4b3f-8487-a6176143b6b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Private">
+      <UniqueIdentifier>{bfeedc78-ac84-468c-975b-6c35be9ac040}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTWidgets\OTWidgetsAPIExport.h">
@@ -1165,6 +1168,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PlotDatasetData.hpp">
       <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Private\WidgetDebug.h">
+      <Filter>include\Private</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
