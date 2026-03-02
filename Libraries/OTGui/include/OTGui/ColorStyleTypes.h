@@ -266,6 +266,13 @@ namespace ot {
 		JsonWidgetNull,
 		JsonWidgetBracket,
 
+		PlotBackground,
+		PlotAxis,
+		PlotGrid,
+		PlotLabels,
+		PlotMarkerLine,
+		PlotMarkerFill,
+		PlotMarkerText,
 		PlotCurve,
 		PlotCurveDimmed,
 		PlotCurveHighlight,

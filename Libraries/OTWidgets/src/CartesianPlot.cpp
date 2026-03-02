@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Painter/Painter2DFactory.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/PlotBase.h"
 #include "OTWidgets/PlotDataset.h"
@@ -197,7 +198,7 @@ void ot::CartesianPlot::mouseDoubleClickEvent(QMouseEvent* _event) {
 
 void ot::CartesianPlot::updateGrid() {
 	if (this->getConfiguration().getGridVisible()) {
-		m_grid->setPen(QtFactory::toQColor(this->getConfiguration().getGridColor()), this->getConfiguration().getGridLineWidth(), Qt::SolidLine);
+		m_grid->setPen(QPen(QtFactory::toQBrush(this->getConfiguration().getGridColor()), this->getConfiguration().getGridLineWidth(), Qt::SolidLine));
 	}
 	else {
 		m_grid->setPen(QColor(), 0.0, Qt::NoPen);

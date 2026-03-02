@@ -109,8 +109,8 @@ void ot::AbstractPlot::setPlotGridVisible(bool _isVisible, bool _repaint) {
 	}
 }
 
-void ot::AbstractPlot::setPlotGridColor(const Color& _color, bool _repaint) {
-	m_config.setGridColor(_color);
+void ot::AbstractPlot::setPlotGridColor(const Painter2D* _painter, bool _repaint) {
+	m_config.setGridColor(_painter->createCopy());
 	if (_repaint) {
 		this->updateGrid();
 	}

@@ -227,6 +227,13 @@ namespace ot {
 				{ ot::ColorStyleValueEntry::JsonWidgetNull, "JSON Widget Null" },
 				{ ot::ColorStyleValueEntry::JsonWidgetBracket, "JSON Widget Bracket" },
 
+				{ ot::ColorStyleValueEntry::PlotBackground, "Plot Background" },
+				{ ot::ColorStyleValueEntry::PlotAxis, "Plot Axis" },
+				{ ot::ColorStyleValueEntry::PlotGrid, "Plot Grid" },
+				{ ot::ColorStyleValueEntry::PlotLabels, "Plot Labels" },
+				{ ot::ColorStyleValueEntry::PlotMarkerLine, "Plot Marker Line" },
+				{ ot::ColorStyleValueEntry::PlotMarkerFill, "Plot Marker Fill" },
+				{ ot::ColorStyleValueEntry::PlotMarkerText, "Plot Marker Text" },
 				{ ot::ColorStyleValueEntry::PlotCurve, "Plot Curve" },
 				{ ot::ColorStyleValueEntry::PlotCurveDimmed, "Plot Curve Dimmed" },
 				{ ot::ColorStyleValueEntry::PlotCurveHighlight, "Plot Curve Highlight" },

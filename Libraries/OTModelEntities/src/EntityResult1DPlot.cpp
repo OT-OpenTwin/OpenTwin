@@ -17,14 +17,18 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTModelEntities/EntityResult1DPlot.h"
-#include "OTModelEntities/PropertyHelper.h"
-#include "OTModelEntities/DataBase.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTGui/VisualisationTypes.h"
-#include <algorithm>
+// OpenTwin header
 #include "OTCore/EntityName.h"
+#include "OTGui/VisualisationTypes.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/EntityResult1DPlot.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
+
+// std header
+#include <algorithm>
 
 static EntityFactoryRegistrar<EntityResult1DPlot> registrar("EntityResult1DPlot");
 
@@ -108,7 +112,7 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 	bool updatePropertiesGrid = false;
 	
 	EntityPropertiesBoolean* gridVisibility = PropertyHelper::getBoolProperty(this, "Grid"); 
-	EntityPropertiesColor* gridColor = PropertyHelper::getColourProperty(this,"Grid color");
+	EntityPropertiesGuiPainter* gridColor = PropertyHelper::getPainterProperty(this,"Grid color");
 
 	if (gridVisibility->getValue() != gridColor->getVisible())
 	{
@@ -179,7 +183,7 @@ void EntityResult1DPlot::createProperties()
 
 	EntityPropertiesSelection::createProperty("General", "Plot type", plotTypeOptions, ot::Plot1DCfg::toString(ot::Plot1DCfg::Cartesian), "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
-	EntityPropertiesColor::createProperty("General", "Grid color", { 100, 100, 100 }, "", getProperties());
+	EntityPropertiesGuiPainter::createProperty("General", "Grid color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotGrid), "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Legend", true, "", getProperties());
 
 	EntityPropertiesSelection::createProperty("X axis", "Quantity", quantityOptions, ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::XData), "", getProperties());
@@ -212,7 +216,7 @@ void EntityResult1DPlot::createProperties()
 
 const ot::Plot1DCfg EntityResult1DPlot::getPlot() {
 
-	const ot::Color gridColour = PropertyHelper::getColourPropertyValue(this, "Grid color");
+	const ot::Painter2D* gridColour = PropertyHelper::getPainterPropertyValue(this, "Grid color");
 
 	const std::string entityName = getName();
 	auto shortName = ot::EntityName::getSubName(entityName);
@@ -270,7 +274,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot() {
 
 	config.setPlotType(ot::Plot1DCfg::stringToPlotType(plotType));
 
-	config.setGridColor(gridColour);
+	config.setGridColor(gridColour->createCopy());
 	config.setGridVisible(gridVisible);
 	config.setLegendVisible(legendVisible);
 
@@ -353,7 +357,7 @@ void EntityResult1DPlot::readSpecificDataFromDataBase(const bsoncxx::document::v
 
 void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 {
-	PropertyHelper::setColourPropertyValue(_config.getGridColor(), this, "Grid color");
+	PropertyHelper::setPainterPropertyValue(_config.getGridColor(), this, "Grid color");
 	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::toString(_config.getPlotType()), this, "Plot type");
 	
 	PropertyHelper::setBoolPropertyValue(_config.getGridVisible(), this, "Grid");

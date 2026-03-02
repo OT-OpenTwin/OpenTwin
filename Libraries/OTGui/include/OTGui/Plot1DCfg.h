@@ -22,10 +22,11 @@
 // OpenTwin header
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/ValueComparisonDefinition.h"
 #include "OTGui/Plot1DAxisCfg.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/NavigationTreeItemIcon.h"
-#include "OTCore/ValueComparisonDefinition.h"
+#include "OTGui/Painter/Painter2DContainer.h"
 
 // std header
 #include <list>
@@ -77,8 +78,11 @@ namespace ot {
 		void setGridVisible(bool _visible) { m_gridVisible = _visible; };
 		bool getGridVisible() const { return m_gridVisible; };
 
-		void setGridColor(const Color& _color) { m_gridColor = _color; };
-		const Color& getGridColor() const { return m_gridColor; };
+		//! @brief Set the grid color painter.
+		//! The config takes ownership of the painter.
+		//! @param _painter The painter to use for the grid color.
+		void setGridColor(Painter2D* _painter) { m_gridColor.setPainter(_painter); };
+		const Painter2D* getGridColor() const { return *m_gridColor; };
 
 		void setGridLineWidth(double _width) { m_gridWidth = _width; };
 		double getGridLineWidth() const { return m_gridWidth; };
@@ -169,7 +173,7 @@ namespace ot {
 		std::string m_xAxisParameter;
 
 		bool m_gridVisible = true;
-		ot::Color m_gridColor;
+		Painter2DContainer m_gridColor;
 		double m_gridWidth = 1.;
 
 		bool m_showEntireMatrix = true;

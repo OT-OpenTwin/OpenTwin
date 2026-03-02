@@ -22,6 +22,7 @@
 #include "OTWidgets/PlotBase.h"
 #include "OTWidgets/PlotDataset.h"
 #include "OTWidgets/CartesianPlot.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/CartesianPlotMagnifier.h"
 #include "OTWidgets/CartesianPlotTextMarker.h"
 #include "OTWidgets/CartesianPlotCrossMarker.h"
@@ -39,14 +40,19 @@ ot::CartesianPlotMagnifier::CartesianPlotMagnifier(CartesianPlot* _plot)
 	m_crossMarker = new CartesianPlotCrossMarker;
 	m_crossMarker->attach(m_plot);
 	m_crossMarker->setVisible(false);
-	m_crossMarker->setLinePen(QColor(255, 50, 50), 0.0, Qt::DashDotDotLine);
 
 	m_textMarker = new CartesianPlotTextMarker;
 	m_textMarker->attach(m_plot);
 	m_textMarker->setVisible(false);
-	m_textMarker->setLinePen(QColor(255, 50, 50), 0.0, Qt::DashDotDotLine);
 
 	this->setMouseButton(Qt::MouseButton::NoButton);
+
+	slotColorStyleChanged();
+	connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &CartesianPlotMagnifier::slotColorStyleChanged);
+}
+
+ot::CartesianPlotMagnifier::~CartesianPlotMagnifier() {
+	disconnect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &CartesianPlotMagnifier::slotColorStyleChanged);
 }
 
 void ot::CartesianPlotMagnifier::widgetMousePressEvent(QMouseEvent* _event) {
@@ -171,6 +177,15 @@ void ot::CartesianPlotMagnifier::widgetKeyPressEvent(QKeyEvent* _event) {
 	if (_event->key() == Qt::Key_Space) {
 		m_plot->getOwner()->resetView();
 	}
+}
+
+void ot::CartesianPlotMagnifier::slotColorStyleChanged() {
+	const auto& style = GlobalColorStyle::instance().getCurrentStyle();
+	const auto& lineVal = style.getValue(ColorStyleValueEntry::PlotMarkerLine, ColorStyleValue());
+	const auto& textVal = style.getValue(ColorStyleValueEntry::PlotMarkerText, ColorStyleValue());
+	
+	m_crossMarker->setLinePen(QPen(lineVal.toBrush(), 0.0, Qt::DashDotDotLine));
+	m_textMarker->setLinePen(QPen(textVal.toBrush(), 0.0, Qt::SolidLine));
 }
 
 void ot::CartesianPlotMagnifier::updateMarkers(const QPoint& _pos) {

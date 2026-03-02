@@ -941,9 +941,6 @@
     <ClInclude Include="include\OTWidgets\CartesianPlotGrid.h">
       <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\CartesianPlotMagnifier.h">
-      <Filter>include\Plot\Cartesian</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\CartesianPlotCrossMarker.h">
       <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
@@ -1425,6 +1422,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PolarPlot.h">
       <Filter>include\Plot\Polar</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\CartesianPlotMagnifier.h">
+      <Filter>include\Plot\Cartesian</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

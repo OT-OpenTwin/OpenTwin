@@ -367,7 +367,7 @@
     <ClInclude Include="include\OTWidgets\CartesianPlotAxis.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotGrid.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotLegend.h" />
-    <ClInclude Include="include\OTWidgets\CartesianPlotMagnifier.h" />
+    <QtMoc Include="include\OTWidgets\CartesianPlotMagnifier.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotCrossMarker.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotPanner.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotPicker.h" />

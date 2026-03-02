@@ -30,7 +30,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT Painter2D : public ot::Serializable {
 	public:
-		Painter2D() {};
+		explicit Painter2D() {};
 		virtual ~Painter2D() {};
 
 		//! @brief Returns the unique Painter2D type name that is used in the Painter2DFactory.

@@ -74,7 +74,7 @@ namespace ot {
 		void setPlotType(Plot1DCfg::PlotType _type);
 		Plot1DCfg::PlotType getCurrentPlotType() { return m_currentPlotType; }
 
-		void setConfig(const Plot1DCfg& _config) { m_config = _config; };
+		void setConfig(Plot1DCfg&& _config) { m_config = std::move(_config); };
 		const Plot1DCfg& getConfig() const { return m_config; };
 
 		void resetView();

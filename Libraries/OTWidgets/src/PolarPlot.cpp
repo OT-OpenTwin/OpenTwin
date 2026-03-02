@@ -45,7 +45,7 @@ ot::PolarPlot::PolarPlot(PlotBase* _owner, QWidget* _parent)
 }
 
 ot::PolarPlot::~PolarPlot() {
-
+	disconnect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PolarPlot::slotColorStyleChanged);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -93,14 +93,9 @@ void ot::PolarPlot::updateGrid() {
 	QPen gridPen(QColor(), 0., Qt::NoPen);
 
 	if (config.getGridVisible()) {
-		gridPen = QPen(QtFactory::toQColor(config.getGridColor()), config.getGridLineWidth(), Qt::SolidLine);
+		gridPen = QPen(QtFactory::toQBrush(config.getGridColor()), config.getGridLineWidth(), Qt::SolidLine);
 	}
 	m_grid->setPen(gridPen);
-	m_grid->setAxisPen(QwtPolar::Axis::AxisAzimuth, gridPen);
-	m_grid->setAxisPen(QwtPolar::Axis::AxisBottom, gridPen);
-	m_grid->setAxisPen(QwtPolar::Axis::AxisLeft, gridPen);
-	m_grid->setAxisPen(QwtPolar::Axis::AxisRight, gridPen);
-	m_grid->setAxisPen(QwtPolar::Axis::AxisTop, gridPen);
 }
 
 void ot::PolarPlot::keyPressEvent(QKeyEvent* _event) {
@@ -112,7 +107,17 @@ void ot::PolarPlot::keyPressEvent(QKeyEvent* _event) {
 
 void ot::PolarPlot::slotColorStyleChanged() {
 	const auto& cs = GlobalColorStyle::instance().getCurrentStyle();
-	const auto& val = cs.getValue(ColorStyleValueEntry::WidgetBackground, ColorStyleValue());
-	this->setPlotBackground(val.toBrush());
+	const auto& backVal = cs.getValue(ColorStyleValueEntry::PlotBackground, ColorStyleValue());
+	this->setPlotBackground(backVal.toBrush());
+
+	const auto& axisVal = cs.getValue(ColorStyleValueEntry::PlotAxis, ColorStyleValue());
+	QPen axisPen(axisVal.toBrush(), 1., Qt::SolidLine);
+
+	m_grid->setAxisPen(QwtPolar::Axis::AxisAzimuth, axisPen);
+	m_grid->setAxisPen(QwtPolar::Axis::AxisBottom, axisPen);
+	m_grid->setAxisPen(QwtPolar::Axis::AxisLeft, axisPen);
+	m_grid->setAxisPen(QwtPolar::Axis::AxisRight, axisPen);
+	m_grid->setAxisPen(QwtPolar::Axis::AxisTop, axisPen);
+
 	update();
 }

@@ -22,6 +22,8 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Plot1DCfg.h"
+#include "OTGui/Painter/Painter2DFactory.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 
 std::string ot::Plot1DCfg::toString(PlotType _type) {
 	switch (_type) {
@@ -55,7 +57,8 @@ std::list<std::string> ot::Plot1DCfg::getPlotTypeStringList() {
 
 ot::Plot1DCfg::Plot1DCfg() : 
 	WidgetViewBase(WidgetViewBase::View1D, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle | WidgetViewBase::ViewCloseOnEmptySelection), 
-	m_type(Plot1DCfg::Cartesian), m_gridVisible(true), m_gridWidth(1.), m_isHidden(false), m_legendVisible(true), m_curveLimit(0), m_useLimit(false)
+	m_type(Plot1DCfg::Cartesian), m_gridVisible(true), m_gridWidth(1.), m_isHidden(false), m_legendVisible(true), m_curveLimit(0), m_useLimit(false),
+	m_showEntireMatrix(false), m_showMatrixRowEntry(0), m_showMatrixColumnEntry(0), m_gridColor(new StyleRefPainter2D(ColorStyleValueEntry::PlotGrid))
 {
 	m_xAxis.setQuantity(Plot1DAxisCfg::AxisQuantity::XData);
 	m_yAxis.setQuantity(Plot1DAxisCfg::AxisQuantity::Real);
@@ -70,9 +73,7 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	_object.AddMember("Type", JsonString(this->toString(m_type), _allocator), _allocator);
 	
 	_object.AddMember("GridVisible", m_gridVisible, _allocator);
-	JsonObject gridColorObject;
-	m_gridColor.addToJsonObject(gridColorObject, _allocator);
-	_object.AddMember("GridColor", gridColorObject, _allocator);
+	_object.AddMember("GridColor", JsonObject(m_gridColor, _allocator), _allocator);
 	_object.AddMember("GridWidth", m_gridWidth, _allocator);
 
 	_object.AddMember("Hidden", m_isHidden, _allocator);
@@ -117,7 +118,7 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_type = this->stringToPlotType(json::getString(_object, "Type"));
 	
 	m_gridVisible = json::getBool(_object, "GridVisible");
-	m_gridColor.setFromJsonObject(json::getObject(_object, "GridColor"));
+	setGridColor(Painter2DFactory::create(json::getObject(_object, "GridColor")));
 	m_gridWidth = json::getDouble(_object, "GridWidth");
 
 	m_isHidden = json::getBool(_object, "Hidden");
@@ -153,7 +154,7 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 		(m_type == _other.m_type) &&
 
 		(m_gridVisible == _other.m_gridVisible) &&
-		(m_gridColor == _other.m_gridColor) &&
+		(m_gridColor->isEqualTo(*_other.m_gridColor)) &&
 		(m_gridWidth == _other.m_gridWidth) &&
 
 		(m_isHidden == _other.m_isHidden) &&

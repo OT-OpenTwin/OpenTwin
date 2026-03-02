@@ -3612,7 +3612,7 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 		{
 			plotConfig.setAxisLabelY(oldConfig.getAxisLabelY());
 		}
-		plot->setConfig(plotConfig);
+		plot->setConfig(std::move(plotConfig));
 
 		// Now we refresh the plot visualisation.
 		plot->refresh();
@@ -4591,7 +4591,7 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 		}
 
 		auto endTime = ot::DateTime::msSinceEpoch();
-		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, _plotConfig, _visualizationCfg, dataSets, curveIDDescriptions, (endTime - startTime));
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, std::move(_plotConfig), _visualizationCfg, dataSets, curveIDDescriptions, (endTime - startTime));
 	}
 	catch (const std::exception& e) {
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingFailed, Qt::QueuedConnection, std::string("Exception during plot data loading: " + std::string(e.what())));
@@ -4649,7 +4649,7 @@ void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _recei
 	this->sendRelayedRequest(EXECUTE, _receiverUrl, _message, response);
 }
 
-void ExternalServicesComponent::slotPlotDataLoadingCompleted(const ot::Plot1DCfg& _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, const std::list<std::string>& _curveIDDescriptions, unsigned long long _loadTimeMs)
+void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, const std::list<std::string>& _curveIDDescriptions, unsigned long long _loadTimeMs)
 {
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!_visualizationCfg.getSetAsActiveView()) {
@@ -4665,7 +4665,7 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(const ot::Plot1DCfg
 	ot::Plot* plot = plotView->getPlot();
 
 	plot->clear(true);
-	plot->setConfig(_plotConfig);
+	plot->setConfig(std::move(_plotConfig));
 
 	// Now we add the data sets to the plot and visualise them
 	int32_t curveCounter = 0;

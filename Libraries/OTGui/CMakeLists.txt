@@ -86,6 +86,7 @@ set(OTGUI_HEADER_FILES
     include/OTGui/Diagram/SequenceDiaFunctionCfg.h
     include/OTGui/Diagram/SequenceDiaRefCfg.h
     include/OTGui/Diagram/SequenceDiaSelfCallCfg.h
+
     include/OTGui/Dialog/DialogCfg.h
     include/OTGui/Dialog/PropertyDialogCfg.h
     include/OTGui/Dialog/Painter2DDialogFilter.h
@@ -94,11 +95,13 @@ set(OTGUI_HEADER_FILES
     include/OTGui/Dialog/ModelLibraryDialogCfg.h
     include/OTGui/Dialog/MessageDialogCfg.h
     include/OTGui/Dialog/OnePropertyDialogCfg.h
+
     include/OTGui/Event/GuiEvent.h
     include/OTGui/Event/GraphicsChangeEvent.h
     include/OTGui/Event/GraphicsConnectionDropEvent.h
     include/OTGui/Event/GraphicsDoubleClickEvent.h
     include/OTGui/Event/GraphicsItemDropEvent.h
+
     include/OTGui/Graphics/GraphicsArcItemCfg.h
     include/OTGui/Graphics/GraphicsConnectionCalculationData.h
     include/OTGui/Graphics/GraphicsDecorationCfg.h
@@ -130,6 +133,7 @@ set(OTGUI_HEADER_FILES
     include/OTGui/Graphics/BasicGraphicsIntersectionItem.h
     include/OTGui/Graphics/GraphicsHierarchicalProjectItemBuilder.h
     include/OTGui/Graphics/GraphicsZValues.h
+
     include/OTGui/Properties/Property.h
     include/OTGui/Properties/PropertyManagerIterator.h
     include/OTGui/Properties/PropertyManagerSilencer.h
@@ -155,8 +159,10 @@ set(OTGUI_HEADER_FILES
     include/OTGui/Properties/ManagedPropertyObjectBase.h
     include/OTGui/Properties/ManagedPropertyRegistrar.h
     include/OTGui/Properties/ManagedSpecialPropertyRegistrar.h
+
     include/OTGui/Painter/FillPainter2D.h
     include/OTGui/Painter/Painter2D.h
+    include/OTGui/Painter/Painter2DContainer.h
     include/OTGui/Painter/Painter2DFactory.h
     include/OTGui/Painter/CheckerboardPainter2D.h
     include/OTGui/Painter/GradientPainter2D.h
@@ -165,6 +171,7 @@ set(OTGUI_HEADER_FILES
     include/OTGui/Painter/RadialGradientPainter2D.h
     include/OTGui/Painter/PainterRainbowIterator.h
     include/OTGui/Painter/StyleRefPainter2D.h
+
     include/OTGui/Border.h
     include/OTGui/CheckBoxCfg.h
     include/OTGui/ColorStyleTypes.h
@@ -233,6 +240,7 @@ set(OTGUI_SOURCE_FILES
     src/Diagram/SequenceDiaFunctionCfg.cpp
     src/Diagram/SequenceDiaRefCfg.cpp
     src/Diagram/SequenceDiaSelfCallCfg.cpp
+
     src/Dialog/PropertyDialogCfg.cpp
     src/Dialog/Painter2DDialogFilter.cpp
     src/Dialog/Painter2DDialogFilterDefaults.cpp
@@ -241,12 +249,15 @@ set(OTGUI_SOURCE_FILES
     src/Dialog/DialogCfg.cpp
     src/Dialog/OnePropertyDialogCfg.cpp
     src/Dialog/SelectEntitiesDialogCfg.cpp
+
     src/Event/GuiEvent.cpp
     src/Event/GraphicsChangeEvent.cpp
     src/Event/GraphicsConnectionDropEvent.cpp
     src/Event/GraphicsDoubleClickEvent.cpp
     src/Event/GraphicsItemDropEvent.cpp
+
     src/Painter/CheckerboardPainter2D.cpp
+    src/Painter/Painter2DContainer.cpp
     src/Painter/FillPainter2D.cpp
     src/Painter/GradientPainter2D.cpp
     src/Painter/GradientPainterStop2D.cpp
@@ -256,6 +267,7 @@ set(OTGUI_SOURCE_FILES
     src/Painter/RadialGradientPainter2D.cpp
     src/Painter/PainterRainbowIterator.cpp
     src/Painter/StyleRefPainter2D.cpp
+
     src/Graphics/BasicGraphicsIntersectionItem.cpp
     src/Graphics/GraphicsArcItemCfg.cpp
     src/Graphics/GraphicsConnectionCalculationData.cpp
@@ -286,6 +298,7 @@ set(OTGUI_SOURCE_FILES
     src/Graphics/GraphicsTextItemCfg.cpp
     src/Graphics/GraphicsTriangleItem.cpp
     src/Graphics/GraphicsVBoxLayoutItemCfg.cpp
+
     src/Properties/Property.cpp
     src/Properties/PropertyManagerSilencer.cpp
     src/Properties/PropertyReadCallbackNotifier.cpp
@@ -304,6 +317,7 @@ set(OTGUI_SOURCE_FILES
     src/Properties/PropertyString.cpp
     src/Properties/PropertyStringList.cpp
     src/Properties/ManagedPropertyObject.cpp
+
     src/Border.cpp
     src/CheckBoxCfg.cpp
     src/ColorStyleTypes.cpp

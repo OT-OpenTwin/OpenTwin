@@ -82,7 +82,7 @@ namespace ot {
 
 		void setPlotGridVisible(bool _isVisible, bool _repaint = true);
 
-		void setPlotGridColor(const Color& _color, bool _repaint = true);
+		void setPlotGridColor(const Painter2D* _painter, bool _repaint = true);
 
 		void setPlotGridLineWidth(double _width, bool _repaint = true);
 

@@ -310,8 +310,10 @@ void ot::PlotBase::applyConfig() {
 	m_cartesianPlot->updateGrid();
 	m_cartesianPlot->updateLegend();
 	m_cartesianPlot->updateWholePlot();
+	m_cartesianPlot->update();
 
 	m_polarPlot->updateGrid();
 	m_polarPlot->updateLegend();
 	m_polarPlot->updateWholePlot();
+	m_polarPlot->update();
 }

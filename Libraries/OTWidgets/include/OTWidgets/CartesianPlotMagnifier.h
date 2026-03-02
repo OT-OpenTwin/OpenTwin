@@ -35,8 +35,10 @@ namespace ot {
 	class CartesianPlotCrossMarker;
 
 	class OT_WIDGETS_API_EXPORT CartesianPlotMagnifier : public QwtPlotMagnifier {
+		Q_OBJECT
 	public:
 		CartesianPlotMagnifier(CartesianPlot* _plot);
+		virtual ~CartesianPlotMagnifier();
 
 		virtual void widgetMousePressEvent(QMouseEvent* _event) override;
 
@@ -49,6 +51,9 @@ namespace ot {
 		virtual void rescale(double _factor) override;
 
 		virtual void widgetKeyPressEvent(QKeyEvent* _event) override;
+
+	private Q_SLOTS:
+		void slotColorStyleChanged();
 
 	private:
 		QPointF m_cursorPos;

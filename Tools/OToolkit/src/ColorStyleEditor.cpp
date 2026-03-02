@@ -476,6 +476,13 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetNull), new PropertyPainter2D(new FillPainter2D(Color(30, 100, 230))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetBracket), new PropertyPainter2D(new FillPainter2D(Color(160, 82, 45))));
 	
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotBackground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotAxis), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotGrid), new PropertyPainter2D(new FillPainter2D(ot::DarkGray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotLabels), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerLine), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerFill), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerText), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
@@ -716,6 +723,13 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetNull), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetBracket), new PropertyPainter2D(new FillPainter2D(Color(220, 220, 170))));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotBackground), new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotAxis), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotGrid), new PropertyPainter2D(new FillPainter2D(Color(171, 171, 171))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotLabels), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerLine), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerFill), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerText), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
@@ -957,6 +971,13 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetNull), new PropertyPainter2D(new FillPainter2D(Color(150, 220, 250))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::JsonWidgetBracket), new PropertyPainter2D(new FillPainter2D(Color(255, 255, 200))));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotAxis), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotGrid), new PropertyPainter2D(new FillPainter2D(ot::Navy)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotLabels), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerLine), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerFill), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerText), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
