@@ -34,5 +34,8 @@ namespace ot {
 	public:
 		PolarPlotDatasetData(PlotDatasetData* _data);
 		virtual ~PolarPlotDatasetData() = default;
+
+		virtual QwtPointPolar sample(size_t _index) const override;
+
 	};
 }

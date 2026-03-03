@@ -24,3 +24,9 @@ ot::PolarPlotDatasetData::PolarPlotDatasetData(PlotDatasetData* _data)
 	: PlotSeriesData(_data) 
 {}
 
+QwtPointPolar ot::PolarPlotDatasetData::sample(size_t _index) const {
+	auto pt = PlotSeriesData<QwtPointPolar>::sample(_index);
+	constexpr double radToDeg = 180.0 / M_PI;
+	pt.setAzimuth(pt.azimuth() * radToDeg);
+	return pt;
+}
