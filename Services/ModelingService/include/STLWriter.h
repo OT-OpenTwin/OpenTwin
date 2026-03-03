@@ -31,6 +31,7 @@ public:
 	virtual ~STLWriter() { };
 
 private:
+	virtual void initializeWriter() override;
 	virtual void appendData(const std::string& objectName, EntityFacetData* facetEntity, std::stringstream& dataStream) override;
 	void writeFacet(std::stringstream& output, double v1x, double v1y, double v1z, double v2x, double v2y, double v2z, double v3x, double v3y, double v3z, double nx, double ny, double nz);
 

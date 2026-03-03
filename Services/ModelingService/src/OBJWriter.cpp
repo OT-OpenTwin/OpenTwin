@@ -39,34 +39,44 @@
 #include "base64.h"
 #include "zlib.h"
 
+void OBJWriter::initializeWriter()
+{
+	offset = 1; // The vertex numbering starts at 1 in obj, but starts at 0 in the entity data structure
+}
+
 void OBJWriter::appendData(const std::string &objectName, EntityFacetData* facetEntity, std::stringstream &dataStream)
 {
-	dataStream << "solid " << objectName << "\n";
+	// Write the object key
+	dataStream << "o " << objectName << "\n";
 
-	for (auto& triangle : facetEntity->getTriangleList())
+	// Now store all vertices
+	for (auto& vertex : facetEntity->getNodeVector())
 	{
-		ot::UID n1 = triangle.getNode(0);
-		ot::UID n2 = triangle.getNode(1);
-		ot::UID n3 = triangle.getNode(2);
-
-		gp_Pnt p1(facetEntity->getNodeVector()[n1].getCoord(0), facetEntity->getNodeVector()[n1].getCoord(1), facetEntity->getNodeVector()[n1].getCoord(2));
-		gp_Pnt p2(facetEntity->getNodeVector()[n2].getCoord(0), facetEntity->getNodeVector()[n2].getCoord(1), facetEntity->getNodeVector()[n2].getCoord(2));
-		gp_Pnt p3(facetEntity->getNodeVector()[n3].getCoord(0), facetEntity->getNodeVector()[n3].getCoord(1), facetEntity->getNodeVector()[n3].getCoord(2));
-
-		gp_Vec v1(p1, p2); // p2 - p1
-		gp_Vec v2(p1, p3); // p3 - p1
-
-		gp_Vec n = v1.Crossed(v2); // (p2-p1) x (p3-p1)
-
-		gp_Dir normal;
-
-		if (n.Magnitude() > Precision::Confusion())
-		{
-			normal = gp_Dir(n);
-		}
-
-		//writeFacet(dataStream, p1.X(), p1.Y(), p1.Z(), p2.X(), p2.Y(), p2.Z(), p3.X(), p3.Y(), p3.Z(), n.X(), n.Y(), n.Z());
+		dataStream << "v " << vertex.getCoord(0) << " " << vertex.getCoord(1) << " " << vertex.getCoord(2) << std::endl;
 	}
 
-	dataStream << "endsolid " << objectName << "\n";
+	// Store the texture coordinates (per vertex)
+	for (auto& vertex : facetEntity->getNodeVector())
+	{
+		dataStream << "vt " << vertex.getUVpar(0) << " " << vertex.getUVpar(1) << std::endl;
+	}
+
+	// Store the vector normals
+	for (auto& vertex : facetEntity->getNodeVector())
+	{
+		dataStream << "vn " << vertex.getNormal(0) << " " << vertex.getNormal(1) << " " << vertex.getNormal(2) << std::endl;
+	}
+
+	// Now store all triangles
+	for (auto& triangle : facetEntity->getTriangleList())
+	{
+		// The vertex numbering starts at 1 in obj, but starts at 0 in the entity data structure. Furthermore, the vertex numbering is continuous for all objects in the file
+		ot::UID n1 = triangle.getNode(0) + offset;
+		ot::UID n2 = triangle.getNode(1) + offset;
+		ot::UID n3 = triangle.getNode(2) + offset;
+
+		dataStream << "f " << n1 << "/" << n1 << "/" << n1 << " " << n2 << "/" << n2 << "/" << n2 << " " << n3 << "/" << n3 << "/" << n3 << std::endl;
+	}
+
+	offset += facetEntity->getNodeVector().size();  // The indices are continuous.
 }

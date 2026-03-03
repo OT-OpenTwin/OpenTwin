@@ -75,6 +75,7 @@ void TriangleCADWriter::getExportFileContent(std::string& data)
 	// Now process the facets and append them to the STL data
 	std::stringstream dataStream;
 
+	initializeWriter();
 
 	for (auto facetItem : facetInfo)
 	{

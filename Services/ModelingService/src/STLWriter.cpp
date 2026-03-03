@@ -39,6 +39,10 @@
 #include "base64.h"
 #include "zlib.h"
 
+void STLWriter::initializeWriter()
+{
+}
+
 void STLWriter::appendData(const std::string &objectName, EntityFacetData* facetEntity, std::stringstream &dataStream)
 {
 	dataStream << "solid " << objectName << "\n";

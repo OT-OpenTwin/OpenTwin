@@ -38,6 +38,7 @@ public:
 
 private:
 	std::list<ot::UID> getAllGeometryEntities(void);
+	virtual void initializeWriter() = 0;
 	virtual void appendData(const std::string& objectName, EntityFacetData* facetEntity, std::stringstream& dataStream) = 0;
 
 	Application* application;

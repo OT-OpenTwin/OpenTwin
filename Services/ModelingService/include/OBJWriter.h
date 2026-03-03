@@ -31,8 +31,10 @@ public:
 	virtual ~OBJWriter() { };
 
 private:
+	virtual void initializeWriter() override;
 	virtual void appendData(const std::string& objectName, EntityFacetData* facetEntity, std::stringstream& dataStream) override;
 
+	size_t offset = 0;
 
 };
 
