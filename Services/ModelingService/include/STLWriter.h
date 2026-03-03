@@ -20,19 +20,12 @@
 #pragma once
 
 #include <string>
-#include <list>
-#include <map>
+#include <sstream>
 
 #include "OTCore/CoreTypes.h"
 
-class EntityBase;
-class EntityGeometry;
 class Application;
-
-class STEPCAFControl_Reader;
-class TopoDS_Shape;
-class TDF_Label;
-class Model;
+class EntityFacetData;
 
 class STLWriter
 {
@@ -40,10 +33,12 @@ public:
 	STLWriter(Application *_app, const std::string &_serviceName) : application(_app), serviceName(_serviceName) { };
 	virtual ~STLWriter() { };
 
-	void getExportFileContent(std::string& fileContent, unsigned long long& uncompressedDataLength);
+	void getExportFileContent(std::string& data);
 
 private:
-	void createSTLFileContent(std::string& data);
+	std::list<ot::UID> getAllGeometryEntities(void);
+	void appendSTLData(EntityFacetData* facetEntity, std::stringstream& dataStream);
+	void writeFacet(std::stringstream& output, double v1x, double v1y, double v1z, double v2x, double v2y, double v2z, double v3x, double v3y, double v3z, double nx, double ny, double nz);
 
 	Application *application;
 	std::string serviceName;

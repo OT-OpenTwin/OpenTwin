@@ -141,6 +141,8 @@ public:
 
 	std::string handleGetEntityChildInformationByID(ot::JsonDocument& _document);
 
+	std::string handleGetAllGeometryEntities(ot::JsonDocument& _document);
+
 	std::string handleGetAllGeometryEntitiesForMeshing(ot::JsonDocument& _document);
 
 	std::string handleGetCurrentVisualizationModelID();

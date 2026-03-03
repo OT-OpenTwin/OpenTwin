@@ -43,11 +43,9 @@ public:
 	STEPWriter(Application *_app, const std::string &_serviceName) : application(_app), serviceName(_serviceName) { };
 	virtual ~STEPWriter() { };
 
-	void getExportFileContent(std::string& fileContent, unsigned long long& uncompressedDataLength);
+	void getExportFileContent(std::string& data);
 
 private:
-	void createSTEPFileContent(std::string& data);
-
 	Application *application;
 	std::string serviceName;
 };

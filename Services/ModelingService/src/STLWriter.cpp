@@ -24,45 +24,131 @@
 
 #include "OTCommunication/Msg.h"
 #include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/uiComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/EntityFacetData.h"
+#include "OTModelEntities/Geometry.h"
 
 #include <iostream>
 #include <filesystem>
 
+#include "Precision.hxx"
+
 #include "base64.h"
 #include "zlib.h"
 
-void STLWriter::getExportFileContent(std::string& fileContent, unsigned long long& uncompressedDataLength)
+void STLWriter::getExportFileContent(std::string& data)
 {
-	std::string data;
-	createSTLFileContent(data);
+	// Get all geometry entities and append them
+	ot::UIDList geometryEntities = getAllGeometryEntities();
+	std::list<ot::EntityInformation> geometryInfo;
+	ot::ModelServiceAPI::getEntityInformation(geometryEntities, geometryInfo);
 
-	uncompressedDataLength = data.size();
+	DataBase::instance().prefetchDocumentsFromStorage(geometryInfo);
 
-	// Compress the file data content
-	uLong compressedSize = compressBound((uLong)uncompressedDataLength);
+	ot::UIDList facetIDs;
+	std::map<ot::UID, std::string> facetNameMap;
 
-	char* compressedData = new char[compressedSize];
-	compress((Bytef*)compressedData, &compressedSize, (Bytef*)data.data(), (uLong)uncompressedDataLength);
+	for (auto geometryItem : geometryInfo)
+	{
+		EntityGeometry* geomEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(geometryItem.getEntityID(), geometryItem.getEntityVersion()));
+		assert(geomEntity != nullptr);
 
-	// Convert the binary to an encoded string
-	int encoded_data_length = Base64encode_len(compressedSize);
-	char* base64_string = new char[encoded_data_length];
+		if (geomEntity != nullptr)
+		{
+			ot::UID facetID = geomEntity->getFacetsStorageObjectID();
+			facetNameMap[facetID] = geomEntity->getName();
+			facetIDs.push_back(facetID);
 
-	Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
+			delete geomEntity;
+			geomEntity = nullptr;
+		}
+	}
 
-	delete[] compressedData;
-	compressedData = nullptr;
+	std::list<ot::EntityInformation> facetInfo;
+	ot::ModelServiceAPI::getEntityInformation(facetIDs, facetInfo);
 
-	fileContent = std::string(base64_string);
+	DataBase::instance().prefetchDocumentsFromStorage(facetInfo);
 
-	delete[] base64_string;
-	base64_string = nullptr;
+	// Now process the facets and append them to the STL data
+	std::stringstream dataStream;
+
+
+	for (auto facetItem : facetInfo)
+	{
+		EntityFacetData* facetEntity = dynamic_cast<EntityFacetData*>(ot::EntityAPI::readEntityFromEntityIDandVersion(facetItem.getEntityID(), facetItem.getEntityVersion()));
+		assert(facetEntity != nullptr);
+
+		if (facetEntity != nullptr)
+		{
+			dataStream << "solid " << facetNameMap[facetItem.getEntityID()] << "\n";
+
+			appendSTLData(facetEntity, dataStream);
+
+			dataStream << "endsolid " << facetNameMap[facetItem.getEntityID()] << "\n";
+
+			delete facetEntity;
+			facetEntity = nullptr;
+		}
+	}
+
+	data = dataStream.str();
 }
 
-void STLWriter::createSTLFileContent(std::string& data)
+std::list<ot::UID> STLWriter::getAllGeometryEntities(void)
 {
-	data = "Hello World!";
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+
+	std::string response;
+	application->getModelComponent()->sendMessage(false, reqDoc, response);
+
+	ot::JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+	return ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
+}
+
+void STLWriter::appendSTLData(EntityFacetData* facetEntity, std::stringstream &dataStream)
+{
+	int count = 0;
+
+	for (auto& triangle : facetEntity->getTriangleList())
+	{
+		ot::UID n1 = triangle.getNode(0);
+		ot::UID n2 = triangle.getNode(1);
+		ot::UID n3 = triangle.getNode(2);
+
+		gp_Pnt p1(facetEntity->getNodeVector()[n1].getCoord(0), facetEntity->getNodeVector()[n1].getCoord(1), facetEntity->getNodeVector()[n1].getCoord(2));
+		gp_Pnt p2(facetEntity->getNodeVector()[n2].getCoord(0), facetEntity->getNodeVector()[n2].getCoord(1), facetEntity->getNodeVector()[n2].getCoord(2));
+		gp_Pnt p3(facetEntity->getNodeVector()[n3].getCoord(0), facetEntity->getNodeVector()[n3].getCoord(1), facetEntity->getNodeVector()[n3].getCoord(2));
+
+		gp_Vec v1(p1, p2); // p2 - p1
+		gp_Vec v2(p1, p3); // p3 - p1
+
+		gp_Vec n = v1.Crossed(v2); // (p2-p1) x (p3-p1)
+
+		gp_Dir normal;
+
+		if (n.Magnitude() > Precision::Confusion())
+		{
+			normal = gp_Dir(n);
+		}
+
+		writeFacet(dataStream, p1.X(), p1.Y(), p1.Z(), p2.X(), p2.Y(), p2.Z(), p3.X(), p3.Y(), p3.Z(), n.X(), n.Y(), n.Z());
+	}
+}
+
+void STLWriter::writeFacet(std::stringstream& output, double v1x, double v1y, double v1z, double v2x, double v2y, double v2z, double v3x, double v3y, double v3z, double nx, double ny, double nz)
+{
+	// Write a single triangle to the output stream in STL format
+
+	output << "  facet normal " << nx << " " << ny << " " << nz << "\n";
+	output << "    outer loop\n";
+	output << "      vertex " << v1x << " " << v1y << " " << v1z << "\n";
+	output << "      vertex " << v2x << " " << v2y << " " << v2z << "\n";
+	output << "      vertex " << v3x << " " << v3y << " " << v3z << "\n";
+	output << "    endloop\n";
+	output << "  endfacet\n";
 }

@@ -31,6 +31,7 @@
 
 // OpenTwin header
 #include "OTModelEntities/DataBase.h"
+#include "OTCADEntities/EntityGeometry.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/VisualisationCfg.h"
@@ -523,6 +524,27 @@ std::string Application::handleGetAllGeometryEntitiesForMeshing(ot::JsonDocument
 
 	ot::JsonDocument newDoc;
 	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(m_model->getAllGeometryEntitiesForMeshing(), newDoc.GetAllocator()), newDoc.GetAllocator());
+
+	return newDoc.toJson();
+}
+
+std::string Application::handleGetAllGeometryEntities(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::list<EntityGeometry*> geomEntities;
+	m_model->getAllGeometryEntities(geomEntities);
+
+	ot::UIDList geomEntityIDs;
+	for (auto& geomEntity : geomEntities)
+	{
+		geomEntityIDs.push_back(geomEntity->getEntityID());
+	}
+
+	ot::JsonDocument newDoc;
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(geomEntityIDs, newDoc.GetAllocator()), newDoc.GetAllocator());
 
 	return newDoc.toJson();
 }
@@ -1278,6 +1300,7 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_MODEL_GetSelectedEntityInformation, this, &Application::handleGetSelectedEntityInformation);
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName, this, &Application::handleGetEntityChildInformationByName);
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID, this, &Application::handleGetEntityChildInformationByID);
+	connectAction(OT_ACTION_CMD_MODEL_GetAllGeometryEntities, this, &Application::handleGetAllGeometryEntities);
 	connectAction(OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, this, &Application::handleGetAllGeometryEntitiesForMeshing);
 	connectAction(OT_ACTION_CMD_MODEL_GetCurrentVisModelID, this, &Application::handleGetCurrentVisualizationModelID);
 	

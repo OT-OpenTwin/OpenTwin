@@ -74,35 +74,7 @@
 #include "base64.h"
 #include "zlib.h"
 
-void STEPWriter::getExportFileContent(std::string& fileContent, unsigned long long& uncompressedDataLength)
-{
-	std::string data;
-	createSTEPFileContent(data);
-
-	uncompressedDataLength = data.size();
-
-	// Compress the file data content
-	uLong compressedSize = compressBound((uLong)uncompressedDataLength);
-
-	char* compressedData = new char[compressedSize];
-	compress((Bytef*)compressedData, &compressedSize, (Bytef*)data.data(), (uLong)uncompressedDataLength);
-
-	// Convert the binary to an encoded string
-	int encoded_data_length = Base64encode_len(compressedSize);
-	char* base64_string = new char[encoded_data_length];
-
-	Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
-
-	delete[] compressedData;
-	compressedData = nullptr;
-
-	fileContent = std::string(base64_string);
-
-	delete[] base64_string;
-	base64_string = nullptr;
-}
-
-void STEPWriter::createSTEPFileContent(std::string& data)
+void STEPWriter::getExportFileContent(std::string& data)
 {
 	data = "Hello World!";
 }
