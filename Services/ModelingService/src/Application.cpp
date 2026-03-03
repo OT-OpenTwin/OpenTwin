@@ -44,6 +44,7 @@
 #include "STEPReader.h"
 #include "STEPWriter.h"
 #include "STLWriter.h"
+#include "OBJWriter.h"
 
 // Third party libraries
 #include "base64.h"
@@ -455,6 +456,11 @@ void Application::handleExportCAD(ot::JsonDocument& _document) {
 		STLWriter writer(this, getServiceName());
 		writer.getExportFileContent(data);
 	}
+	else if (extension == ".obj")
+	{
+		OBJWriter writer(this, getServiceName());
+		writer.getExportFileContent(data);
+	}
 	else
 	{
 		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
@@ -578,7 +584,7 @@ void Application::handleRequestExportCAD() {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SelectFileForStoring, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Export CAD File", doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(ot::FileExtension::toFilterString({ ot::FileExtension::Step, ot::FileExtension::Stl, ot::FileExtension::AllFiles }), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(ot::FileExtension::toFilterString({ ot::FileExtension::Step, ot::FileExtension::Obj, ot::FileExtension::Stl, ot::FileExtension::AllFiles }), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString("exportCADFile", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 

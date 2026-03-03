@@ -20,20 +20,26 @@
 #pragma once
 
 #include <string>
-#include <sstream>
+#include <list>
+#include <map>
 
-#include "TriangleCADWriter.h"
+#include "OTCore/CoreTypes.h"
 
-class STLWriter : public TriangleCADWriter
+class Application;
+class EntityFacetData;
+
+class TriangleCADWriter
 {
 public:
-	STLWriter(Application *_app, const std::string &_serviceName) : TriangleCADWriter(_app, _serviceName) { };
-	virtual ~STLWriter() { };
+	TriangleCADWriter(Application* _app, const std::string& _serviceName) : application(_app), serviceName(_serviceName) {};
+	virtual ~TriangleCADWriter() {};
+
+	void getExportFileContent(std::string& data);
 
 private:
-	virtual void appendData(const std::string& objectName, EntityFacetData* facetEntity, std::stringstream& dataStream) override;
-	void writeFacet(std::stringstream& output, double v1x, double v1y, double v1z, double v2x, double v2y, double v2z, double v3x, double v3y, double v3z, double nx, double ny, double nz);
+	std::list<ot::UID> getAllGeometryEntities(void);
+	virtual void appendData(const std::string& objectName, EntityFacetData* facetEntity, std::stringstream& dataStream) = 0;
 
-
+	Application* application;
+	std::string serviceName;
 };
-

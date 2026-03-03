@@ -1,5 +1,5 @@
 // @otlicense
-// File: STLWriter.h
+// File: OBJWriter.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -24,15 +24,14 @@
 
 #include "TriangleCADWriter.h"
 
-class STLWriter : public TriangleCADWriter
+class OBJWriter : public TriangleCADWriter
 {
 public:
-	STLWriter(Application *_app, const std::string &_serviceName) : TriangleCADWriter(_app, _serviceName) { };
-	virtual ~STLWriter() { };
+	OBJWriter(Application *_app, const std::string &_serviceName) : TriangleCADWriter(_app, _serviceName) { };
+	virtual ~OBJWriter() { };
 
 private:
 	virtual void appendData(const std::string& objectName, EntityFacetData* facetEntity, std::stringstream& dataStream) override;
-	void writeFacet(std::stringstream& output, double v1x, double v1y, double v1z, double v2x, double v2y, double v2z, double v3x, double v3y, double v3z, double nx, double ny, double nz);
 
 
 };

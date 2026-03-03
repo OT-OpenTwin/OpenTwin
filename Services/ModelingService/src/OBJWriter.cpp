@@ -1,5 +1,5 @@
 // @otlicense
-// File: STLWriter.cpp
+// File: OBJWriter.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "STLWriter.h"
+#include "OBJWriter.h"
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/GeometryOperations.h"
 #include "Application.h"
@@ -39,7 +39,7 @@
 #include "base64.h"
 #include "zlib.h"
 
-void STLWriter::appendData(const std::string &objectName, EntityFacetData* facetEntity, std::stringstream &dataStream)
+void OBJWriter::appendData(const std::string &objectName, EntityFacetData* facetEntity, std::stringstream &dataStream)
 {
 	dataStream << "solid " << objectName << "\n";
 
@@ -65,21 +65,8 @@ void STLWriter::appendData(const std::string &objectName, EntityFacetData* facet
 			normal = gp_Dir(n);
 		}
 
-		writeFacet(dataStream, p1.X(), p1.Y(), p1.Z(), p2.X(), p2.Y(), p2.Z(), p3.X(), p3.Y(), p3.Z(), n.X(), n.Y(), n.Z());
+		//writeFacet(dataStream, p1.X(), p1.Y(), p1.Z(), p2.X(), p2.Y(), p2.Z(), p3.X(), p3.Y(), p3.Z(), n.X(), n.Y(), n.Z());
 	}
 
 	dataStream << "endsolid " << objectName << "\n";
-}
-
-void STLWriter::writeFacet(std::stringstream& output, double v1x, double v1y, double v1z, double v2x, double v2y, double v2z, double v3x, double v3y, double v3z, double nx, double ny, double nz)
-{
-	// Write a single triangle to the output stream in STL format
-
-	output << "  facet normal " << nx << " " << ny << " " << nz << "\n";
-	output << "    outer loop\n";
-	output << "      vertex " << v1x << " " << v1y << " " << v1z << "\n";
-	output << "      vertex " << v2x << " " << v2y << " " << v2z << "\n";
-	output << "      vertex " << v3x << " " << v3y << " " << v3z << "\n";
-	output << "    endloop\n";
-	output << "  endfacet\n";
 }
