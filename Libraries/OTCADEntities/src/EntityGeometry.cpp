@@ -661,7 +661,6 @@ void EntityGeometry::createMaterialPropertiesOnly(int colorR, int colorG, int co
 	EntityPropertiesEntityList::createProperty("Solver", "Material", materialsFolder, materialsFolderID, "", -1, "", getProperties());
 
 	EntityPropertiesColor::createProperty("Appearance", "Color", { colorR, colorG, colorB}, "", getProperties());
-	EntityPropertiesColor::createProperty("Appearance", "Color", { colorR, colorG, colorB}, "", getProperties());
 	EntityPropertiesSelection::createProperty("Appearance", "Type", { "Rough", "Plastic", "Polished", "Metal" }, "Rough", "", getProperties());
 	EntityPropertiesSelection::createProperty("Appearance", "Texture", { "None", "Rough", "Gold", "Aluminium", "Reflective" }, "None", "", getProperties());
 }
