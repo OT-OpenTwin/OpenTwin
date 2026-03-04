@@ -52,6 +52,7 @@
 #include "GCPnts_AbscissaPoint.hxx"
 #include "BRepBuilderAPI_MakeVertex.hxx"
 #include "BRepExtrema_DistShapeShape.hxx"
+#include "BRepTools.hxx"
 
 #include "TopLoc_Location.hxx"
 #include "TopAbs_Orientation.hxx"
@@ -438,60 +439,69 @@ bool CoordinateSystemManager::findEdgeFromName(EntityBrep* brepEntity, const std
 	return edgeFound;
 }
 
-bool CoordinateSystemManager::getFacePointAndNormal(const TopoDS_Shape& faceShape, gp_Pnt& outPointOnFace, gp_Dir& outNormal)
+bool CoordinateSystemManager::getFacePointAndNormal(const TopoDS_Shape& faceShape, gp_Pnt& outPointOnSurface, gp_Dir& outNormal)
 {
+	// Convert the shape to a face
 	TopoDS_Face face = TopoDS::Face(faceShape);
 	if (face.IsNull())
 		return false;
 
-	// 1) Area centroid of the trimmed face (can be outside the trimmed region for concave/holed faces)
+	// ---------------------------------------------------------------------
+	// 1) Compute the centroid of the trimmed face (area-based)
+	// ---------------------------------------------------------------------
+	// Note: For concave or holed faces the centroid may lie outside the
+	// trimmed region, but that is fine for our purpose.
 	GProp_GProps gprops;
 	BRepGProp::SurfaceProperties(face, gprops);
-	const gp_Pnt centroid = gprops.CentreOfMass();
+	gp_Pnt centroid = gprops.CentreOfMass();
 
-	// 2) Convert centroid to a vertex (because ExtPF works with Vertex + Face)
-	TopoDS_Vertex vtx = BRepBuilderAPI_MakeVertex(centroid);
-
-	// 3) Closest point ON THE TRIMMED FACE to the centroid (guaranteed on face)
-	BRepExtrema_ExtPF ext;
-	ext.Initialize(face);           // initialize fields using the face
-	ext.Perform(vtx, face);         // classification (trim) uses the face
-
-	if (!ext.IsDone() || ext.NbExt() < 1)
+	// ---------------------------------------------------------------------
+	// 2) Get the underlying geometric surface of the face
+	// ---------------------------------------------------------------------
+	Handle(Geom_Surface) surface = BRep_Tool::Surface(face);
+	if (surface.IsNull())
 		return false;
 
-	// Pick closest extremum
-	Standard_Integer bestIdx = 1;
-	Standard_Real bestSqDist = ext.SquareDistance(1);
-	for (Standard_Integer i = 2; i <= ext.NbExt(); ++i)
-	{
-		const Standard_Real d = ext.SquareDistance(i);
-		if (d < bestSqDist)
-		{
-			bestSqDist = d;
-			bestIdx = i;
-		}
-	}
+	// ---------------------------------------------------------------------
+	// 3) Project the centroid onto the geometric surface
+	// ---------------------------------------------------------------------
+	// This projection ignores trimming and works on the infinite
+	// underlying surface.
+	GeomAPI_ProjectPointOnSurf projector(centroid, surface);
 
-	// Point on face + its parameters
-	const gp_Pnt pOnFace = ext.Point(bestIdx);
-
-	Standard_Real u = 0.0, v = 0.0;
-	ext.Parameter(bestIdx, u, v);
-
-	// 4) Normal on face at (u,v) in model space
-	BRepLProp_SLProps slProps(face, u, v, 1, 1e-9);
-	if (!slProps.IsNormalDefined())
+	if (projector.NbPoints() < 1)
 		return false;
 
-	gp_Dir n = slProps.Normal();
+	// Retrieve the closest projected point
+	gp_Pnt projectedPoint = projector.NearestPoint();
 
-	// Respect face orientation
+	// Retrieve the corresponding surface parameters
+	Standard_Real u = 0.0;
+	Standard_Real v = 0.0;
+	projector.LowerDistanceParameters(u, v);
+
+	// ---------------------------------------------------------------------
+	// 4) Compute surface normal at (u,v)
+	// ---------------------------------------------------------------------
+	// BRepLProp_SLProps evaluates differential properties on the face.
+	// Using the face ensures correct orientation handling.
+	BRepLProp_SLProps props(face, u, v, 1, 1e-9);
+
+	if (!props.IsNormalDefined())
+		return false;
+
+	gp_Dir normal = props.Normal();
+
+	// Respect the topological orientation of the face
 	if (face.Orientation() == TopAbs_REVERSED)
-		n.Reverse();
+		normal.Reverse();
 
-	outPointOnFace = pOnFace; // <-- guaranteed on the (trimmed) face
-	outNormal = n;
+	// ---------------------------------------------------------------------
+	// 5) Return results
+	// ---------------------------------------------------------------------
+	outPointOnSurface = projectedPoint;
+	outNormal = normal;
+
 	return true;
 }
 
