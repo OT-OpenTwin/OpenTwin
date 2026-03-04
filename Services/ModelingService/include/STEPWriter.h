@@ -24,18 +24,11 @@
 #include <map>
 
 #include "OTCore/CoreTypes.h"
+#include "TopoDS_Solid.hxx"
 
-#include "XCAFDoc_ColorTool.hxx"
-#include "XCAFDoc_ShapeTool.hxx"
-
-class EntityBase;
-class EntityGeometry;
+class EntityBrep;
 class Application;
-
-class STEPCAFControl_Reader;
-class TopoDS_Shape;
-class TDF_Label;
-class Model;
+class STEPControl_Writer;
 
 class STEPWriter
 {
@@ -46,6 +39,10 @@ public:
 	void getExportFileContent(std::string& data);
 
 private:
+	std::list<ot::UID> getAllGeometryEntities(void);
+	TopoDS_Shape normalizeToSingleSolidOrOriginal(const TopoDS_Shape& inShape, double sewingTol = 1e-6, bool doUnifySameDomain = true, bool unifyEdges = true, bool unifyFaces = true, bool concatBSplines = false, bool requireValid = true);
+	std::string createTempFile();
+
 	Application *application;
 	std::string serviceName;
 };

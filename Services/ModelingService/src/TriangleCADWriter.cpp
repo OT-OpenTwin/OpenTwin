@@ -36,12 +36,9 @@
 
 #include "Precision.hxx"
 
-#include "base64.h"
-#include "zlib.h"
-
 void TriangleCADWriter::getExportFileContent(std::string& data)
 {
-	// Get all geometry entities and append them
+	// Get all geometry entities
 	ot::UIDList geometryEntities = getAllGeometryEntities();
 	std::list<ot::EntityInformation> geometryInfo;
 	ot::ModelServiceAPI::getEntityInformation(geometryEntities, geometryInfo);
