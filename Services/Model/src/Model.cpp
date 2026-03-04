@@ -240,7 +240,6 @@ void Model::resetToNew()
 			OT_INFO_SERVICE_TYPE_ModelingService
 		);
 		addEntityToModel(globalCoordinateSystem->getName(), globalCoordinateSystem, entityRoot, true, allNewEntities);
-		determineActiveCoordinateSystem();
 	}
 
 	if (typeManager.hasCircuit())
@@ -3317,6 +3316,10 @@ void Model::projectOpen(const std::string& _customVersion)
 	{
 		// The model state could not be loaded -> the project is new
 		resetToNew();
+
+		// Get information about the active coordinate system
+		determineActiveCoordinateSystem();
+
 		modelChangeOperationCompleted("");
 
 		// We still try to load the default settings template
