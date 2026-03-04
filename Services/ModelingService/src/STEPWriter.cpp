@@ -50,6 +50,12 @@
 #include "TopoDS.hxx"
 #include "TopoDS_Solid.hxx"
 #include "TopoDS_Shell.hxx"
+#include "BRepTools.hxx"
+#include "BRepLib.hxx"
+#include "ShapeBuild_ReShape.hxx"
+
+#include "ShapeFix_Shape.hxx"
+#include "ShapeFix_Solid.hxx"
 
 #include "BRepBuilderAPI_Sewing.hxx"
 #include "BRepCheck_Analyzer.hxx"
@@ -118,16 +124,18 @@ void STEPWriter::getExportFileContent(std::string& data)
 
 		if (brepEntity != nullptr)
         {
-            TopoDS_Shape exportShape = normalizeToSingleSolidOrOriginal(brepEntity->getBrep(), /*sewingTol*/ 1e-4);
-
-			TDF_Label label = shapeTool->AddShape(exportShape);
-
-			std::string name = brepNameMap[brepItem.getEntityID()];
-			TDataStd_Name::Set(label, TCollection_ExtendedString(name.c_str()));
+            std::string name = brepNameMap[brepItem.getEntityID()];
 
             std::vector<double> color = brepColorMap[brepItem.getEntityID()];
             assert(color.size() == 3);
-			Quantity_Color col(color[0], color[1], color[2], Quantity_TOC_RGB);
+            Quantity_Color col(color[0], color[1], color[2], Quantity_TOC_RGB);
+
+            TopoDS_Shape exportShape = cleanSolid(brepEntity->getBrep());
+
+			TDF_Label label = shapeTool->AddShape(exportShape, Standard_False);
+
+			TDataStd_Name::Set(label, TCollection_ExtendedString(name.c_str()));
+
 			colorTool->SetColor(label, col, XCAFDoc_ColorSurf);
 			colorTool->SetColor(label, col, XCAFDoc_ColorGen);
 
@@ -168,145 +176,6 @@ std::list<ot::UID> STEPWriter::getAllGeometryEntities(void)
 	return ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
 }
 
-TopoDS_Shape STEPWriter::normalizeToSingleSolidOrOriginal(const TopoDS_Shape& inShape, double sewingTol, bool doUnifySameDomain, bool unifyEdges, bool unifyFaces, bool concatBSplines, bool requireValid)
-{
-    // Normalize an OCCT shape to a *single* valid Solid if possible.
-
-    // Requested behavior:
-    //  - Runs UnifySameDomain (optional) to merge same-domain faces/edges (improves topology).
-    //  - If input contains multiple solids -> returns the ORIGINAL input shape.
-    //  - If conversion fails -> returns the ORIGINAL input shape.
-
-    // Notes:
-    //  - Return type is TopoDS_Shape so we can return either a Solid or the original shape.
-    //  - UnifySameDomain flags are passed via ctor/Initialize (OCCT API), not via setters.
-    
-    auto isGoodSolid = [&](const TopoDS_Solid& s) -> bool
-        {
-            if (s.IsNull())
-                return false;
-
-            if (requireValid)
-            {
-                // Basic topology + geometry validity check
-                BRepCheck_Analyzer ana(s, /*GeomControls*/ true);
-                if (!ana.IsValid())
-                    return false;
-            }
-            return true;
-        };
-
-    auto extractSingleSolid = [&](const TopoDS_Shape& s, TopoDS_Solid& outSolid) -> int
-        {
-            int count = 0;
-            for (TopExp_Explorer ex(s, TopAbs_SOLID); ex.More(); ex.Next())
-            {
-                ++count;
-                if (count == 1)
-                    outSolid = TopoDS::Solid(ex.Current());
-            }
-            return count;
-        };
-
-    // 0) Optional: unify same-domain faces/edges first
-    TopoDS_Shape shape = inShape;
-    if (doUnifySameDomain && !shape.IsNull())
-    {
-        // OCCT API: flags are passed in ctor (or Initialize), then Build(), then Shape().
-        ShapeUpgrade_UnifySameDomain unify(shape, unifyEdges, unifyFaces, concatBSplines);
-        // Optional tolerances (keep defaults unless you know you need them):
-        // unify.SetLinearTolerance(1e-6);
-        // unify.SetAngularTolerance(Precision::Angular());
-
-        unify.Build();
-        const TopoDS_Shape& unified = unify.Shape();
-        if (!unified.IsNull())
-            shape = unified;
-        // If it returns null (rare), silently continue with original.
-    }
-
-    // 1) If the shape is already a solid, accept it if it's valid
-    if (shape.ShapeType() == TopAbs_SOLID)
-    {
-        TopoDS_Solid s = TopoDS::Solid(shape);
-        if (isGoodSolid(s))
-            return s;
-        // If invalid, try to rebuild below; if that fails we return original.
-    }
-
-    // 2) If it contains solids: accept only if EXACTLY ONE solid is present
-    {
-        TopoDS_Solid s;
-        int n = extractSingleSolid(shape, s);
-        if (n == 1 && isGoodSolid(s))
-            return s;
-
-        if (n > 1)
-            return inShape; // requested: multiple solids -> return original
-    }
-
-    // 3) Shell -> Solid (try each shell; accept first good solid)
-    for (TopExp_Explorer ex(shape, TopAbs_SHELL); ex.More(); ex.Next())
-    {
-        TopoDS_Shell shell = TopoDS::Shell(ex.Current());
-        BRepBuilderAPI_MakeSolid mkSolid(shell);
-        if (!mkSolid.IsDone())
-            continue;
-
-        TopoDS_Solid s = mkSolid.Solid();
-        if (isGoodSolid(s))
-            return s;
-    }
-
-    // 4) Sewing -> shells -> solid
-    {
-        BRepBuilderAPI_Sewing sew(sewingTol);
-        sew.Add(shape);
-        sew.Perform();
-
-        TopoDS_Shape sewed = sew.SewedShape();
-        if (sewed.IsNull())
-            return inShape;
-
-        // Unify again after sewing (often helps)
-        if (doUnifySameDomain)
-        {
-            ShapeUpgrade_UnifySameDomain unify(sewed, unifyEdges, unifyFaces, concatBSplines);
-            unify.Build();
-            const TopoDS_Shape& unified = unify.Shape();
-            if (!unified.IsNull())
-                sewed = unified;
-        }
-
-        // If sewing produced solids, enforce "exactly one"
-        {
-            TopoDS_Solid s;
-            int n = extractSingleSolid(sewed, s);
-            if (n == 1 && isGoodSolid(s))
-                return s;
-
-            if (n > 1)
-                return inShape; // requested: multiple solids -> original
-        }
-
-        // Otherwise try shells from the sewed result
-        for (TopExp_Explorer ex(sewed, TopAbs_SHELL); ex.More(); ex.Next())
-        {
-            TopoDS_Shell shell = TopoDS::Shell(ex.Current());
-            BRepBuilderAPI_MakeSolid mkSolid(shell);
-            if (!mkSolid.IsDone())
-                continue;
-
-            TopoDS_Solid s = mkSolid.Solid();
-            if (isGoodSolid(s))
-                return s;
-        }
-    }
-
-    // 5) Failed to normalize -> return original
-    return inShape;
-}
-
 std::string STEPWriter::createTempFile()
 {
     char tempPath[MAX_PATH];
@@ -319,4 +188,42 @@ std::string STEPWriter::createTempFile()
     GetTempFileNameA(tempPath, "occ", 0, tempFile);
 
     return std::string(tempFile);
+}
+
+TopoDS_Shape STEPWriter::cleanSolid(TopoDS_Shape& shape)
+{
+    TopoDS_Shape exportShape = shape;
+
+    BRepBuilderAPI_MakeSolid ms;
+    int count = 0;
+    TopExp_Explorer exp;
+    for (exp.Init(exportShape, TopAbs_SHELL); exp.More(); exp.Next()) {
+        count++;
+        ms.Add(TopoDS::Shell(exp.Current()));
+    }
+
+    if (count)
+    {
+        BRepCheck_Analyzer ba(ms);
+
+        if (ba.IsValid())
+        {
+			exportShape = ms.Shape();
+
+            TopExp_Explorer exp;
+            for (exp.Init(exportShape, TopAbs_SOLID); exp.More(); exp.Next())
+            {
+                TopoDS_Solid solid = TopoDS::Solid(exp.Current());
+                TopoDS_Solid newsolid = solid;
+                BRepLib::OrientClosedSolid(newsolid);
+                Handle_ShapeBuild_ReShape rebuild = new ShapeBuild_ReShape;
+                rebuild->Replace(solid, newsolid);
+                TopoDS_Shape newshape = rebuild->Apply(exportShape, TopAbs_COMPSOLID);
+                exportShape = newshape;
+				break; // We expect only one solid per shape
+            }
+        }
+    }
+
+    return exportShape;
 }

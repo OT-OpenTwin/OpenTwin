@@ -40,8 +40,8 @@ public:
 
 private:
 	std::list<ot::UID> getAllGeometryEntities(void);
-	TopoDS_Shape normalizeToSingleSolidOrOriginal(const TopoDS_Shape& inShape, double sewingTol = 1e-6, bool doUnifySameDomain = true, bool unifyEdges = true, bool unifyFaces = true, bool concatBSplines = false, bool requireValid = true);
 	std::string createTempFile();
+	TopoDS_Shape cleanSolid(TopoDS_Shape& shape);
 
 	Application *application;
 	std::string serviceName;
