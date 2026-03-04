@@ -1014,3 +1014,73 @@ bool EntityGeometry::isTransformProperty(const std::string &propName)
 
 	return false;
 }
+
+std::string EntityGeometry::serialiseAsJSON()
+{
+	// Serialize general entity data
+	auto docBlock = EntityBase::serialiseAsMongoDocument();
+	const std::string jsonDocBlock = bsoncxx::to_json(docBlock);
+	ot::JsonDocument entireDoc;
+	entireDoc.fromJson(jsonDocBlock);
+
+	// Store the brep information
+	std::map<ot::UID, EntityBase*> entityMap;
+	EntityBrep* brep = dynamic_cast<EntityBrep*>(readEntityFromEntityID(this, getBrepStorageObjectID(), entityMap));
+	auto docBrep = brep->serialiseAsJSON();
+	ot::JsonDocument serialisedBrep;
+	serialisedBrep.fromJson(docBrep);
+
+	// Store the facet information
+	entityMap.clear();
+	EntityFacetData* facets = dynamic_cast<EntityFacetData*>(readEntityFromEntityID(this, getFacetsStorageObjectID(), entityMap));
+	auto docFacets = facets->serialiseAsJSON();
+	ot::JsonDocument serialisedFacets;
+	serialisedFacets.fromJson(docFacets);
+
+	entireDoc.AddMember("SerialisationOfBrep", serialisedBrep, entireDoc.GetAllocator());
+	entireDoc.AddMember("SerialisationOfFacets", serialisedFacets, entireDoc.GetAllocator());
+
+	return entireDoc.toJson();
+}
+
+bool EntityGeometry::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+{
+	try
+	{
+		const std::string serialisationString = ot::json::toJson(_serialisation);
+		std::string_view serialisedEntityJSONView(serialisationString);
+		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
+		auto serialisedEntityBSONView = serialisedEntityBSON.view();
+
+		readSpecificDataFromDataBase(serialisedEntityBSONView, _entityMap);
+		setEntityID(createEntityUID());
+
+		brepStorageID = -1;
+		facetsStorageID = -1;
+
+		ot::ConstJsonObject brepObjJson = ot::json::getObject(_serialisation, "SerialisationOfBrep");
+		ot::ConstJsonObject facesObjJson = ot::json::getObject(_serialisation, "SerialisationOfFacets");
+
+		if (!brepObjJson.ObjectEmpty())
+		{
+			resetBrep();
+			getBrepEntity()->deserialiseFromJSON(brepObjJson, _copyInformation, _entityMap);
+		}
+
+		if (!facesObjJson.ObjectEmpty())
+		{
+			resetFacets();
+			getFacets()->deserialiseFromJSON(facesObjJson, _copyInformation, _entityMap);
+		}
+
+		_entityMap[getEntityID()] = this;
+		return true;
+	}
+	catch (std::exception _e)
+	{
+		OT_LOG_E("Failed to deserialise " + getClassName() + " because: " + std::string(_e.what()));
+		return false;
+	}
+
+}
+

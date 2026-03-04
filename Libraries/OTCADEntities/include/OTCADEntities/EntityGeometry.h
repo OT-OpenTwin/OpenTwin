@@ -109,6 +109,8 @@ public:
 	void setFacetEntity(EntityFacetData *entity) { assert(facets == nullptr); facets = entity; }
 	void setBrepEntity(EntityBrep *entity) { assert(brep == nullptr); brep = entity; }
 
+	virtual std::string serialiseAsJSON() override;
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept;
 private:
 	virtual int getSchemaVersion(void) override  { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
