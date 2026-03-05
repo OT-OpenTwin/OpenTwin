@@ -31,6 +31,7 @@
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
 #include "OTGui/VisualisationTypes.h"
+#include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 
 // BSON header
 #include <bsoncxx/json.hpp>
@@ -55,7 +56,7 @@ public:
 
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(_doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc, std::list<std::pair<ot::UID, ot::UID>>& _prefetchIds) {};
-	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _elementType) {};
+	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) {};
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
 };

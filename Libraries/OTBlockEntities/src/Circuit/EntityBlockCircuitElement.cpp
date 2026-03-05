@@ -21,6 +21,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
 #include "OTModelEntities/EntityContainer.h"
+#include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 #include "OTCore/FolderNames.h"
 
 EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) 
@@ -55,8 +56,16 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 	
 	if (modelProperty->getValueName() == "LoadFromLibrary") {
 
+		ot::LibraryElementSelectionCfg config;
+		config.setRequestingEntityID(this->getEntityID());
+		config.setCollectionName(this->getCollectionType());
+		config.addAditionalInfoFilter("ElementType", getFolderName());
+		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+		config.setEntityType(ot::LmsNewEntityType::Text);
+		config.setNewEntityFolder(this->getCircuitModelFolder() + "/" + this->getFolderName());
+
 		// if it was selected use observer to send message to LMS
-		getObserver()->requestConfigForModelDialog(this->getEntityID(),this->getCollectionType(), this->getCircuitModelFolder() + "/" + this->getFolderName(), this->getFolderName());
+		getObserver()->requestConfigForModelDialog(config);
 	}
 
 	return true;
