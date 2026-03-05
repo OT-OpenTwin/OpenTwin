@@ -33,6 +33,9 @@
     <Filter Include="Header Files\Data Handling">
       <UniqueIdentifier>{05f95d4c-01c5-4d19-80b9-e8be1b396c8a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ValueProcessing">
+      <UniqueIdentifier>{91fa2a07-ea1d-4716-ada2-9981525761b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -178,8 +181,14 @@
     <ClInclude Include="include\QueryDescriptionBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ValueProcessing.h">
+      <Filter>Header Files\ValueProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ValueProcessor.h">
+      <Filter>Header Files\ValueProcessing</Filter>
+    </ClInclude>
     <ClInclude Include="include\DataLakeAccessor.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Data Handling</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

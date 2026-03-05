@@ -25,7 +25,8 @@
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTCore/StringToVariableConverter.h"
 #include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
-#include "OTDataStorage/DataLakeAPI.h"
+#include "OTCore/QueryDescription/QueryDescription.h"
+#include "DataLakeAccessor.h"
 
 class BlockHandlerDatabaseAccess : public BlockHandler
 {
@@ -43,30 +44,25 @@ private:
 		std::string m_fieldName;
 	};
 	
-	DataStorageAPI::DataLakeAPI* m_resultCollectionAccess = nullptr;
 	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
+	DataLakeAccessor m_dataLakeAccessor;
 
 	std::list< BsonViewOrValue> m_comparisons;
-	BsonViewOrValue m_query;
+
 	BsonViewOrValue m_projection;
 	BsonViewOrValue m_sort;
 	bool m_sortByID = false;
 	const int m_documentLimit = 0;
 
-	std::list<LabelFieldNamePair> m_labelFieldNamePairsParameter;
-	std::list<LabelFieldNamePair> m_labelFieldNamePairsQuantities;
-	std::list<LabelFieldNamePair> m_labelFieldNamePairsSeries;
 	PipelineData m_queriedData;
 
-	void collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity);
-	void createLabelFieldNameMap();
-	void buildQuery(EntityBlockDatabaseAccess* _blockEntity);
-	const MetadataSeries* addSeriesQuery(EntityBlockDatabaseAccess* _blockEntity);
-	void addQuantityQuery(EntityBlockDatabaseAccess* _blockEntity);
-	void addParameterQueries(EntityBlockDatabaseAccess* _blockEntity);
-		
-	void addComparision(const ot::ValueComparisonDescription& _definition);
+	void createQueryDescriptionsQuantities(EntityBlockDatabaseAccess* _blockEntity);
+	void createQueryDescriptionsParameter(EntityBlockDatabaseAccess* _blockEntity);
+	void createQueryDescriptionsSeries(EntityBlockDatabaseAccess* _blockEntity);
 
+	void collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity);
+	void buildQuery(EntityBlockDatabaseAccess* _blockEntity);
+				
 	void applyRegexFilter(std::list<std::string>& _options, const std::string& _filter);
 	bool compare(const ot::ValueComparisonDescription& _comparisionDef, const ot::JsonValue& _value);
 };

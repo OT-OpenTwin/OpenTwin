@@ -7,5 +7,5 @@ class QueryDescriptionBuilder
 public:
 	static ot::QueryDescription create(const ot::ValueComparisonDescription& _valueDescription, const MetadataParameter* _parameter);
 	static ot::QueryDescription create(const ot::ValueComparisonDescription& _valueDescription, const MetadataQuantity* _quantity);
-	static ot::QueryDescription create(const ot::ValueComparisonDescription& _valueDescription, const MetadataSeries* _series);
+	static ot::QueryDescription create(const MetadataSeries* _series);
 };

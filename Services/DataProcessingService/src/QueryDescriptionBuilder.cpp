@@ -29,31 +29,30 @@ ot::QueryDescription QueryDescriptionBuilder::create(const ot::ValueComparisonDe
 	ot::QueryTargetDescription queryTargetDescription;
 	queryTargetDescription.setTupleInstance(_quantity->m_tupleDescription);
 	queryTargetDescription.setTargetLabel(_quantity->quantityLabel);
-	queryTargetDescription.setMongoDBFieldName(MetadataQuantity::getFieldName());
+	queryTargetDescription.setMongoDBFieldName(std::to_string( _quantity->quantityIndex));
 	queryDescription.setQueryTargetDescription(queryTargetDescription);
 
 	return queryDescription;
 }
 
-ot::QueryDescription QueryDescriptionBuilder::create(const ot::ValueComparisonDescription& _valueDescription, const MetadataSeries* _series)
+ot::QueryDescription QueryDescriptionBuilder::create(const MetadataSeries* _series)
 {
-	ot::QueryDescription queryDescription;
 	// Simply a Series = id
-	queryDescription.setComparisonDescription(_valueDescription);
-
-	ot::QueryTargetDescription queryTargetDescription;
-
 	TupleInstance seriesTuple;
-	
-	seriesTuple.setTupleUnits({ ""});
+	seriesTuple.setTupleUnits({""});
 	seriesTuple.setTupleElementDataTypes({ ot::TypeNames::getInt64TypeName()});
 	seriesTuple.setTupleFormatName("");
 	seriesTuple.setTupleTypeName("");
-	queryTargetDescription.setTupleInstance(seriesTuple);
+	
+	ot::QueryDescription queryDescription;
+	ot::ValueComparisonDescription valueDescription(MetadataSeries::getFieldName(), "=", std::to_string(_series->getSeriesIndex()), seriesTuple);
+	queryDescription.setComparisonDescription(valueDescription);
 
+	ot::QueryTargetDescription queryTargetDescription;
+	queryTargetDescription.setTupleInstance(seriesTuple);
 	queryTargetDescription.setTargetLabel(_series->getLabel());
 	queryTargetDescription.setMongoDBFieldName(MetadataSeries::getFieldName());
-
 	queryDescription.setQueryTargetDescription(queryTargetDescription);
+
 	return queryDescription;
 }

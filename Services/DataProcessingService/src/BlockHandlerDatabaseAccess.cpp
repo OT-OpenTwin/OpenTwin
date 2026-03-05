@@ -33,13 +33,10 @@
 #include "OTCore/ExplicitStringValueConverter.h"
 #include "OTCore/ResultCollectionDefaultIndexes.h"
 
-#include "OTDataStorage/DataLakeAPI.h"
-
-#include "OTResultDataAccess/ResultCollection/IndexHandler.h"
 #include "OTResultDataAccess/QuantityContainer.h"
 #include "OTCore/Tuple/TupleDescriptionComplex.h"
 #include "MetadataVectorizer.h"
-
+#include "QueryDescriptionBuilder.h"
 #include <regex>
 
 #include <algorithm>
@@ -56,29 +53,13 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		const std::string errorMessage = "Database Access not possible. The selected collection has no meta data.";
 		throw std::exception(errorMessage.c_str());
 	}
-	
-	m_resultCollectionAccess = new DataStorageAPI::DataLakeAPI(collectionName);
-	IndexHandler indexHandler(collectionName);
-	indexHandler.createDefaultIndexes();
-
-	if (blockEntity->getTupleTargetSelection()->getVisible())
-	{
-		const std::string tupleElement = blockEntity->getTupleTargetSelection()->getValue();
-		const std::string tupleFormat = blockEntity->getTupleFormatSelection()->getValue();
-		
-	}
-	std::unique_ptr<TupleDescriptionComplex> tupleDescription;
+	m_dataLakeAccessor.accessPartition(collectionName);
 
 	buildQuery(blockEntity);
 }
 
 BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 {
-	if (m_resultCollectionAccess != nullptr)
-	{
-		delete m_resultCollectionAccess;
-		m_resultCollectionAccess = nullptr;
-	}
 	if (m_resultCollectionMetadataAccess != nullptr)
 	{
 		delete m_resultCollectionMetadataAccess;
@@ -87,10 +68,7 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 }
 
 bool BlockHandlerDatabaseAccess::executeSpecialized()
-{	
-	const std::string debugQuery = bsoncxx::to_json(m_query.view());
-	SolverReport::instance().addToContent("Executing query: " + debugQuery + "\n");
-	
+{		
 	const std::string debugProjection = bsoncxx::to_json(m_projection.view());
 	SolverReport::instance().addToContent("Executing projection: " + debugProjection + "\n");
 	mongocxx::options::find options;
@@ -118,154 +96,132 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	}
 
 	auto startTime = std::chrono::high_resolution_clock::now();
-
-	DataStorageAPI::DataStorageResponse dbResponse = m_resultCollectionAccess->searchInResultCollection(m_query, options);
-
+	ot::JsonDocument result = m_dataLakeAccessor.executeQuery(options);
 	auto endTime = std::chrono::high_resolution_clock::now();
-	const std::string queryDuration =	TimeFormatter::formatDuration(startTime, endTime);
-	
-	SolverReport::instance().addToContent("Query executed in " + queryDuration + "\n");
-	
-	if (dbResponse.getSuccess())
-	{
-		const std::string queryResponse = dbResponse.getResult();
-		ot::JsonDocument doc;
-		doc.fromJson(queryResponse);
-		auto allMongoDocuments = ot::json::getArray(doc, "Documents");
-		
-		//We look through the returned documents
-		const uint32_t numberOfDocuments = allMongoDocuments.Size();
-		if (numberOfDocuments == 0)
-		{
-			throw std::exception("Query returned nothing.\n");
-		}
-		
-		SolverReport::instance().addToContentAndDisplay("Query returned " + std::to_string(numberOfDocuments) + " results.\n", _uiComponent);
-			
-		ot::JsonDocument dataDoc;
-		ot::JsonArray entries;
-		for (uint32_t i = 0; i < numberOfDocuments; i++)
-		{
-			auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-			ot::JsonObject translatedResponseDoc;
-			for (const LabelFieldNamePair& labelFieldNamePair : m_labelFieldNamePairsParameter)
-			{
-				if (singleMongoDocument.HasMember(labelFieldNamePair.m_fieldName.c_str()))
-				{
-					ot::JsonValue value(singleMongoDocument[labelFieldNamePair.m_fieldName.c_str()], dataDoc.GetAllocator());
-					ot::JsonString newKey(labelFieldNamePair.m_label, dataDoc.GetAllocator());
-					translatedResponseDoc.AddMember(std::move(newKey), std::move(value), dataDoc.GetAllocator());
-				}
-			}
-			ot::JsonValue quantityValue(singleMongoDocument[QuantityContainer::getFieldName().c_str()], dataDoc.GetAllocator());
-			std::string quantityID = std::to_string(singleMongoDocument[MetadataQuantity::getFieldName().c_str()].GetInt64());
-			for (const auto& quantityPairs : m_labelFieldNamePairsQuantities)
-			{
-				if (quantityID == quantityPairs.m_fieldName)
-				{
-					ot::JsonString newKey(quantityPairs.m_label, dataDoc.GetAllocator());
-					translatedResponseDoc.AddMember(std::move(newKey), std::move(quantityValue), dataDoc.GetAllocator());
-					break;
-				}
-			}
-			
-			std::string seriesID = std::to_string(singleMongoDocument[MetadataSeries::getFieldName().c_str()].GetInt64());
-			for (const auto& seriesPair : m_labelFieldNamePairsSeries)
-			{
-				if (seriesID == seriesPair.m_fieldName)
-				{
-					ot::JsonString newKey(MetadataSeries::getFieldName(), dataDoc.GetAllocator());
-					translatedResponseDoc.AddMember(std::move(newKey), ot::JsonString(seriesPair.m_label, dataDoc.GetAllocator()), dataDoc.GetAllocator());
-					break;
-				}
-			}
 
-			entries.PushBack(translatedResponseDoc, dataDoc.GetAllocator());
-		}
-	
-		m_queriedData.setData(std::move(entries));
-	}
-	else
-	{
-		const std::string message = "Data base query failed with this response: " + dbResponse.getMessage();
-		throw std::exception(message.c_str());
-	}
+	//const std::string queryDuration =	TimeFormatter::formatDuration(startTime, endTime);
+	//
+	//SolverReport::instance().addToContent("Query executed in " + queryDuration + "\n");
+	//
+	//if (dbResponse.getSuccess())
+	//{
+	//	const std::string queryResponse = dbResponse.getResult();
+	//	ot::JsonDocument doc;
+	//	doc.fromJson(queryResponse);
+	//	auto allMongoDocuments = ot::json::getArray(doc, "Documents");
+	//	
+	//	//We look through the returned documents
+	//	const uint32_t numberOfDocuments = allMongoDocuments.Size();
+	//	if (numberOfDocuments == 0)
+	//	{
+	//		throw std::exception("Query returned nothing.\n");
+	//	}
+	//	
+	//	SolverReport::instance().addToContentAndDisplay("Query returned " + std::to_string(numberOfDocuments) + " results.\n", _uiComponent);
+	//		
+	//	ot::JsonDocument dataDoc;
+	//	ot::JsonArray entries;
+	//	for (uint32_t i = 0; i < numberOfDocuments; i++)
+	//	{
+	//		auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+	//		ot::JsonObject translatedResponseDoc;
+	//		for (const LabelFieldNamePair& labelFieldNamePair : m_labelFieldNamePairsParameter)
+	//		{
+	//			if (singleMongoDocument.HasMember(labelFieldNamePair.m_fieldName.c_str()))
+	//			{
+	//				ot::JsonValue value(singleMongoDocument[labelFieldNamePair.m_fieldName.c_str()], dataDoc.GetAllocator());
+	//				ot::JsonString newKey(labelFieldNamePair.m_label, dataDoc.GetAllocator());
+	//				translatedResponseDoc.AddMember(std::move(newKey), std::move(value), dataDoc.GetAllocator());
+	//			}
+	//		}
+	//		ot::JsonValue quantityValue(singleMongoDocument[QuantityContainer::getFieldName().c_str()], dataDoc.GetAllocator());
+	//		std::string quantityID = std::to_string(singleMongoDocument[MetadataQuantity::getFieldName().c_str()].GetInt64());
+	//		for (const auto& quantityPairs : m_labelFieldNamePairsQuantities)
+	//		{
+	//			if (quantityID == quantityPairs.m_fieldName)
+	//			{
+	//				ot::JsonString newKey(quantityPairs.m_label, dataDoc.GetAllocator());
+	//				translatedResponseDoc.AddMember(std::move(newKey), std::move(quantityValue), dataDoc.GetAllocator());
+	//				break;
+	//			}
+	//		}
+	//		
+	//		std::string seriesID = std::to_string(singleMongoDocument[MetadataSeries::getFieldName().c_str()].GetInt64());
+	//		for (const auto& seriesPair : m_labelFieldNamePairsSeries)
+	//		{
+	//			if (seriesID == seriesPair.m_fieldName)
+	//			{
+	//				ot::JsonString newKey(MetadataSeries::getFieldName(), dataDoc.GetAllocator());
+	//				translatedResponseDoc.AddMember(std::move(newKey), ot::JsonString(seriesPair.m_label, dataDoc.GetAllocator()), dataDoc.GetAllocator());
+	//				break;
+	//			}
+	//		}
+
+	//		entries.PushBack(translatedResponseDoc, dataDoc.GetAllocator());
+	//	}
+	//
+	//	m_queriedData.setData(std::move(entries));
+	//}
+	//else
+	//{
+	//	const std::string message = "Data base query failed with this response: " + dbResponse.getMessage();
+	//	throw std::exception(message.c_str());
+	//}
 	return true;
 
 }
 
-void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity)
+void BlockHandlerDatabaseAccess::createQueryDescriptionsQuantities(EntityBlockDatabaseAccess* _blockEntity)
 {
-	const MetadataCampaign* campaign = &m_resultCollectionMetadataAccess->getMetadataCampaign();
+	ot::ValueComparisonDescription quantityDef = _blockEntity->getSelectedQuantityDefinition();
+	if (quantityDef.getName() == "")
+	{
+		throw std::exception("DatabaseAccessBlock has no quantity set.");
+	}
 
-	//If a series is selected, we need to add a corresponding query. 
-	const MetadataSeries* series = addSeriesQuery(_blockEntity);
+	//First we try to find the corresponding metadata
+	std::list<const MetadataQuantity*> viableQuantities;
+	const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
+	if (selectedQuantity != nullptr)
+	{
+		viableQuantities.push_back(selectedQuantity);
+	}
+	else
+	{
+		// The selected quantity name may be a regex expression
+		auto allQuantityLabel = m_resultCollectionMetadataAccess->listAllQuantityLabels();
+		applyRegexFilter(allQuantityLabel, quantityDef.getName());
+		for (const std::string& viableQuantityLabel : allQuantityLabel)
+		{
+			auto viableQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(viableQuantityLabel);
+			viableQuantities.push_back(viableQuantity);
+		}
+	}
 
-	//Now we setup the datastream
-	ot::Connector outputConnector = _blockEntity->getConnectorOutput();
-	const std::string outputConnectorName = outputConnector.getConnectorName();
-	m_queriedData.setMetadataCampaign(campaign);
-	m_queriedData.setMetadataSeries(series);
-
-	m_dataPerPort[outputConnectorName] = &m_queriedData;
+	if (viableQuantities.size() == 0)
+	{
+		throw std::exception("Given quantity label expression does not match any of the possible options.");
+	}
+	else
+	{
+		std::list<ot::QueryDescription> allQuantityQueries;
+		for (const MetadataQuantity* viableQuantity : viableQuantities)
+		{
+			ot::ValueComparisonDescription comparisonDescription = quantityDef;
+			comparisonDescription.setName(viableQuantity->quantityName);
+			ot::QueryDescription queryDescription =  QueryDescriptionBuilder::create(comparisonDescription, viableQuantity);
+			allQuantityQueries.push_back(queryDescription);			
+		}
+		m_dataLakeAccessor.setValueDescriptionsQuantities(allQuantityQueries);
+	}
 }
 
-void BlockHandlerDatabaseAccess::createLabelFieldNameMap()
+void BlockHandlerDatabaseAccess::createQueryDescriptionsParameter(EntityBlockDatabaseAccess* _blockEntity)
 {
-	const MetadataCampaign& campaign = m_resultCollectionMetadataAccess->getMetadataCampaign();
-	const auto& allQuantitiesByLabel =	campaign.getMetadataQuantitiesByLabel();
-	ot::UIDList relevantParameterIDs;
-	for (auto& quantityLabels : m_labelFieldNamePairsQuantities)
-	{
-		const MetadataQuantity* quantity = allQuantitiesByLabel.find(quantityLabels.m_label)->second;
-		relevantParameterIDs.insert(relevantParameterIDs.end(), quantity->dependingParameterIds.begin(), quantity->dependingParameterIds.end());
-	}
-	relevantParameterIDs.sort();
-	relevantParameterIDs.unique();
-	const auto& allParameter = campaign.getMetadataParameterByUID();
-	for (ot::UID dependingParameterID : relevantParameterIDs)
-	{
-		const MetadataParameter& parameter = allParameter.find(dependingParameterID)->second;
-
-		LabelFieldNamePair queryDescription;
-		queryDescription.m_label = parameter.parameterLabel;
-		queryDescription.m_fieldName = std::to_string(parameter.parameterUID);
-		m_labelFieldNamePairsParameter.push_back(queryDescription);
-	}
-}
-
-void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEntity)
-{
-	collectMetadataForPipeline(_blockEntity);
-
-	//Next we add a query corresponding to the selected quantity.
-	addQuantityQuery(_blockEntity);
-
-	//Adding all parameter that may occur in the returned documents.
-	addParameterQueries(_blockEntity);
-
-	m_sortByID = _blockEntity->getReproducibleOrder();
-	if (m_sortByID)
-	{
-		m_sort = (bsoncxx::builder::stream::document{}
-			<< "_id" << 1  // 1 for ascending, -1 for descending
-			<< bsoncxx::builder::stream::finalize);
-	}
-	
-	createLabelFieldNameMap();
-	AdvancedQueryBuilder builder;
-	m_query = builder.connectWithAND(std::move(m_comparisons));
-
-	std::vector<std::string> projectionNamesForExclusion{ "SchemaVersion", "SchemaType"};
-
-	m_projection = builder.GenerateSelectQuery(projectionNamesForExclusion, false, false);
-}
-
-void BlockHandlerDatabaseAccess::addParameterQueries(EntityBlockDatabaseAccess* _blockEntity)
-{
-	/*std::list<ot::ValueComparisonDefinition> queries =	_blockEntity->getAdditionalQueries();
+	std::list<ot::ValueComparisonDescription> queries =	_blockEntity->getAdditionalQueries();
 	const auto& parametersByLabel =	m_resultCollectionMetadataAccess->getMetadataCampaign().getMetadataParameterByLabel();
-	for (ot::ValueComparisonDefinition& query : queries)
+	std::list<ot::QueryDescription> allParameterQueries;
+	for (ot::ValueComparisonDescription& query : queries)
 	{
 		if (!query.getName().empty() && !query.getComparator().empty() && !query.getValue().empty())
 		{
@@ -278,20 +234,20 @@ void BlockHandlerDatabaseAccess::addParameterQueries(EntityBlockDatabaseAccess* 
 			}
 			else
 			{
-				const std::string parameterID = std::to_string(parameterByLabel->second->parameterUID);
-				query.setName(parameterID);
+				ot::QueryDescription queryDescription =	QueryDescriptionBuilder::create(query, parameterByLabel->second);
+				allParameterQueries.push_back(queryDescription);
 			}
-			addComparision(query);
 		}
-	}*/
+	}
+	m_dataLakeAccessor.setValueDescriptionsParameters(allParameterQueries);
 }
 
-const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockDatabaseAccess* _blockEntity)
+void BlockHandlerDatabaseAccess::createQueryDescriptionsSeries(EntityBlockDatabaseAccess* _blockEntity)
 {
 	const MetadataSeries* series = nullptr;
 	const std::string seriesLabel = _blockEntity->getSeriesSelection()->getValue();
-	std::list<ot::ValueComparisonDescription> metadataQueries =	_blockEntity->getMetadataQueries();
 
+	//First we search the series by name, or if it failes we assume a regex expression and conduct another search.
 	std::list<const MetadataSeries*> matchingSeries;
 	if (seriesLabel != "")
 	{
@@ -302,7 +258,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 		}
 		else
 		{
-			std::list<std::string> allSeriesLabels= m_resultCollectionMetadataAccess->listAllSeriesNames();
+			std::list<std::string> allSeriesLabels = m_resultCollectionMetadataAccess->listAllSeriesNames();
 			applyRegexFilter(allSeriesLabels, seriesLabel);
 			for (const std::string& seriesName : allSeriesLabels)
 			{
@@ -314,13 +270,16 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 	}
 	else
 	{
-		
+		//If no label is selected, we take all series in consideration to allow a query that aligns with the current model state.
 		const std::list<MetadataSeries>& allSeries = m_resultCollectionMetadataAccess->getMetadataCampaign().getSeriesMetadata();
 		for (const MetadataSeries& series : allSeries)
 		{
 			matchingSeries.push_back(&series);
 		}
 	}
+
+	//Now we apply metadata filter and sort out the list of series
+	std::list<ot::ValueComparisonDescription> metadataQueries = _blockEntity->getMetadataQueries();
 	auto oneSeriesIt = matchingSeries.begin();
 	while (oneSeriesIt != matchingSeries.end())
 	{
@@ -345,7 +304,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 						match &= actualSeriesMetadataValue != metadataQuery.getValue();
 					}
 				}
-				else if(!fieldValue.IsObject() && !fieldValue.IsArray())
+				else if (!fieldValue.IsObject() && !fieldValue.IsArray())
 				{
 					match &= compare(metadataQuery, fieldValue);
 				}
@@ -363,7 +322,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 				break;
 			}
 		}
-	
+
 		if (match)
 		{
 			//The series matches the metadata query. Check the next metadata query.
@@ -373,148 +332,55 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 		{
 			oneSeriesIt = matchingSeries.erase(oneSeriesIt);
 		}
-	
+
+	}
+
+	std::list<ot::QueryDescription> seriesQueries;
+	for (const MetadataSeries* series : matchingSeries)
+	{
+		ot::QueryDescription queryDescription = QueryDescriptionBuilder::create(series);
+		seriesQueries.push_back(queryDescription);
 	}
 
 	if (matchingSeries.size() == 1)
 	{
-		series = *matchingSeries.begin();
-		assert(series != nullptr);
-		ot::UID valueUID = series->getSeriesIndex();
-		ot::ValueComparisonDescription seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
-		addComparision(seriesComparision);
-		LabelFieldNamePair labelFieldNamePair;
-		labelFieldNamePair.m_fieldName = std::to_string(series->getSeriesIndex()) ;
-		labelFieldNamePair.m_label = series->getName();
-		m_labelFieldNamePairsSeries.push_back(labelFieldNamePair);
+		m_queriedData.setMetadataSeries(series);
 	}
-	else
+
+	m_dataLakeAccessor.setValueDescriptionsSeries(seriesQueries);
+}
+
+void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity)
+{
+	const MetadataCampaign* campaign = &m_resultCollectionMetadataAccess->getMetadataCampaign();
+
+	//Now we setup the datastream
+	ot::Connector outputConnector = _blockEntity->getConnectorOutput();
+	const std::string outputConnectorName = outputConnector.getConnectorName();
+	m_queriedData.setMetadataCampaign(campaign);
+
+	m_dataPerPort[outputConnectorName] = &m_queriedData;
+}
+
+void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEntity)
+{
+	m_sortByID = _blockEntity->getReproducibleOrder();
+	if (m_sortByID)
 	{
-		AdvancedQueryBuilder builder;
-		std::list< BsonViewOrValue> queries;
-
-		for (const MetadataSeries* series : matchingSeries)
-		{
-			ot::ValueComparisonDescription seriesComparison(MetadataSeries::getFieldName(), "=", std::to_string(series->getSeriesIndex()), ot::TypeNames::getInt64TypeName(), "");
-			BsonViewOrValue query = builder.createComparison(seriesComparison);
-			queries.push_back(std::move(query));
-
-			LabelFieldNamePair labelFieldNamePair;
-			labelFieldNamePair.m_fieldName = std::to_string(series->getSeriesIndex());
-			labelFieldNamePair.m_label = series->getName();
-			m_labelFieldNamePairsSeries.push_back(labelFieldNamePair);
-		}
-		BsonViewOrValue query = builder.connectWithOR(std::move(queries));
-		m_comparisons.push_back(query);
+		m_sort = (bsoncxx::builder::stream::document{}
+			<< "_id" << 1  // 1 for ascending, -1 for descending
+			<< bsoncxx::builder::stream::finalize);
 	}
 	
-	return  series;
-}
+	createQueryDescriptionsParameter(_blockEntity);
+	createQueryDescriptionsQuantities(_blockEntity);
+	createQueryDescriptionsSeries(_blockEntity);
 
-void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _blockEntity)
-{
-	ot::ValueComparisonDescription quantityDef = _blockEntity->getSelectedQuantityDefinition();
-	if (quantityDef.getName() == "")
-	{
-		throw std::exception("DatabaseAccessBlock has no quantity set.");
-	}
+	collectMetadataForPipeline(_blockEntity);
 
-
-	std::list<const MetadataQuantity*> viableQuantities;
-	const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
-	if (selectedQuantity != nullptr)
-	{
-		viableQuantities.push_back(selectedQuantity);
-	}
-	else
-	{
-
-		auto allQuantityLabel = m_resultCollectionMetadataAccess->listAllQuantityLabels();
-		applyRegexFilter(allQuantityLabel, quantityDef.getName());
-		for (const std::string & viableQuantityLabel : allQuantityLabel)
-		{
-			auto viableQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(viableQuantityLabel);
-			viableQuantities.push_back(viableQuantity);
-		}
-	}
-
-	if (viableQuantities.size()==0)
-	{
-		throw std::exception("Given quantity label expression does not match any of the possible options.");
-	}
-	else
-	{
-		std::list<BsonViewOrValue> allQuantityQueries;
-		for (const MetadataQuantity* viableQuantity : viableQuantities)
-		{
-			ot::UID valueUID = viableQuantity->quantityIndex;
-			
-			LabelFieldNamePair labelPair;
-			labelPair.m_fieldName= std::to_string(valueUID);
-			labelPair.m_label = viableQuantity->quantityLabel;
-			m_labelFieldNamePairsQuantities.push_back(labelPair);
-
-			assert(valueUID != 0);
-			//Now we add the query for the quantity ID
-			ot::ValueComparisonDescription selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
-			AdvancedQueryBuilder builder;
-			BsonViewOrValue quantityMatch = builder.createComparison(selectedQuantityDef);
-			
-			//Now we add a comparision for the searched quantity value.
-			quantityDef.setName(QuantityContainer::getFieldName());
-
-			const TupleInstance& tupleInstance = viableQuantity->m_tupleDescription;
-
-			//if (!tupleInstance.isSingle())
-			//{
-			//	quantityDef.setStorageTupleDescription(viableQuantity->m_tupleDescription);
-			//	auto queryTupleDef = quantityDef.getQueryTupleDescription();
-			//	queryTupleDef.setTupleTypeName(viableQuantity->m_tupleDescription.getTupleTypeName());
-			//	queryTupleDef.setTupleElementDataTypes(viableQuantity->m_tupleDescription.getTupleElementDataTypes());
-			//	quantityDef.setQueryTupleDescription(queryTupleDef);
-			//}
-			//
-			//if (!quantityDef.getComparator().empty() && !quantityDef.getValue().empty())
-			//{
-			//	if (quantityDef.getType() == ot::TypeNames::getStringTypeName() && quantityDef.getComparator() != "=")
-			//	{
-			//		throw std::exception(("Query for " + quantityDef.getName() + " targets a string value with a not supported comparator. Only equality queries are currently supported.").c_str());
-			//	}
-			//	BsonViewOrValue filter= builder.createComparison(quantityDef);
-			//	BsonViewOrValue combinedQuery =	builder.connectWithAND({ quantityMatch,filter });
-			//	allQuantityQueries.push_back(combinedQuery);
-			//}
-			//else
-			//{
-			//	allQuantityQueries.push_back(quantityMatch);
-			//}
-		}
-		if (allQuantityQueries.size() == 1)
-		{
-			m_comparisons.push_back(allQuantityQueries.front());
-		}
-		else
-		{
-			AdvancedQueryBuilder builder;
-			BsonViewOrValue quantitiesQuery = builder.connectWithOR(std::move(allQuantityQueries));
-			m_comparisons.push_back(quantitiesQuery);
-		}
-	}
-}
-
-void BlockHandlerDatabaseAccess::addComparision(const ot::ValueComparisonDescription& _definition)
-{
-	if (!_definition.getComparator().empty() && !_definition.getValue().empty())
-	{
-		/*if (_definition.getType() == ot::TypeNames::getStringTypeName() && _definition.getComparator()!= "=")
-		{
-			throw std::exception(("Query for " + _definition.getName() + " targets a string value with a not supported comparator. Only equality queries are currently supported.").c_str());
-		}*/
-		AdvancedQueryBuilder builder;
-		BsonViewOrValue query =	builder.createComparison(_definition);
-		m_comparisons.push_back(query);
-	}
-
+	AdvancedQueryBuilder builder;
+	std::vector<std::string> projectionNamesForExclusion{ "SchemaVersion", "SchemaType"};
+	m_projection = builder.GenerateSelectQuery(projectionNamesForExclusion, false, false);
 }
 
 void BlockHandlerDatabaseAccess::applyRegexFilter(std::list<std::string>& _options, const std::string& _filter)

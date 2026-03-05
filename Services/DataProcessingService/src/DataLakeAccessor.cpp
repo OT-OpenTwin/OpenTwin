@@ -4,10 +4,15 @@
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTDataStorage/DataLakeAPI.h"
+#include "OTResultDataAccess/ResultCollection/IndexHandler.h"
+#include "OTResultDataAccess/QuantityContainer.h"
 
 void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 {
 	m_collectionName = _collectionName;
+	m_queryDescriptionsParameters.clear();
+	m_queryDescriptionsQuantities.clear();
+	m_queryDescriptionsSeries.clear();
 }
 
 void DataLakeAccessor::setValueDescriptionsSeries(const std::list<ot::QueryDescription>& _queryDescriptions)
@@ -31,11 +36,14 @@ ot::JsonDocument DataLakeAccessor::executeQuery(mongocxx::options::find _options
 	{
 		throw std::exception("No collection name provided");
 	}
-
+	IndexHandler indexHandler(m_collectionName);
+	indexHandler.createDefaultIndexes();
 
 	BsonViewOrValue resultCollectionQuery, transformedCollectionQuery;
 	createQueries(resultCollectionQuery,transformedCollectionQuery);
 	
+	const std::string debugQuery = bsoncxx::to_json(resultCollectionQuery.view());
+
 	if (!resultCollectionQuery.view().empty())
 	{
 		auto startTime = std::chrono::high_resolution_clock::now();
@@ -82,14 +90,14 @@ void DataLakeAccessor::createQueries(BsonViewOrValue& _resultCollectionQuery, Bs
 	{
 		std::list<BsonViewOrValue> allQueries = allQueriesBase;
 		allQueries.push_back(transformedCollectionQuantityQuery);
-		_resultCollectionQuery = builder.connectWithAND(std::move(allQueries));
+		_transformedCollectionQuery = builder.connectWithAND(std::move(allQueries));
 	}
 	
 	if (!resultCollectionQuantityQuery.view().empty())
 	{
 		std::list<BsonViewOrValue> allQueries = allQueriesBase;
-		allQueries.push_back(transformedCollectionQuantityQuery);
-		_transformedCollectionQuery = builder.connectWithAND(std::move(allQueries));
+		allQueries.push_back(resultCollectionQuantityQuery);
+		_resultCollectionQuery = builder.connectWithAND(std::move(allQueries));
 	}
 }
 
@@ -144,7 +152,7 @@ BsonViewOrValue DataLakeAccessor::generateSeriesQuery()
 
 		seriesQuery = std::move(comparisons.front());
 	}
-
+	const std::string debugQuery = bsoncxx::to_json(seriesQuery);
 	return seriesQuery;
 }
 
@@ -155,9 +163,12 @@ std::list<BsonViewOrValue> DataLakeAccessor::generateParameterQueries()
 	std::list<BsonViewOrValue> comparisons;
 	for (ot::QueryDescription& queryDescription : m_queryDescriptionsParameters)
 	{
-		const ot::ValueComparisonDescription& selectedQuery = queryDescription.getValueComparisonDescription();
+		ot::ValueComparisonDescription selectedQuery = queryDescription.getValueComparisonDescription();
+		const std::string fieldName = queryDescription.getQueryTargetDescription().getMongoDBFieldName();
+		selectedQuery.setName(fieldName);
 		BsonViewOrValue comparison = builder.createComparison(selectedQuery);
 		comparisons.push_back(comparison);
+		const std::string debugQuery = bsoncxx::to_json(comparison);
 	}
 
 	return comparisons;
@@ -170,8 +181,20 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 
 	for (ot::QueryDescription& queryDescription : m_queryDescriptionsQuantities)
 	{
-		const ot::ValueComparisonDescription& selectedQuery = queryDescription.getValueComparisonDescription();
-		BsonViewOrValue comparison = builder.createComparison(selectedQuery);
+		std::list<BsonViewOrValue > queryElements;
+		//First we need to define a query for the quantity ID
+		const std::string fieldValue = queryDescription.getQueryTargetDescription().getMongoDBFieldName();
+		TupleInstance instance;
+		instance.setTupleElementDataTypes({ ot::TypeNames::getInt64TypeName() });
+		ot::ValueComparisonDescription quantitySelection(MetadataQuantity::getFieldName(), "=", fieldValue, instance);
+		queryElements.push_back(builder.createComparison(quantitySelection));
+
+		ot::ValueComparisonDescription valueQuery = queryDescription.getValueComparisonDescription();
+		valueQuery.setName(QuantityContainer::getFieldName());
+		queryElements.push_back(builder.createComparison(valueQuery));
+
+		BsonViewOrValue combinedQuery = builder.connectWithAND(std::move(queryElements));
+		const std::string debugQuery = bsoncxx::to_json(combinedQuery.view());
 
 		const ot::QueryTargetDescription& targetDescription = queryDescription.getQueryTargetDescription();
 		auto storedTupleDescription = targetDescription.getTupleInstance();
@@ -183,11 +206,11 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 			{
 				storeTransformation(queryTupleDescription, storedTupleDescription);
 			}
-			transformedCollectionQueries.push_back(comparison);
+			transformedCollectionQueries.push_back(combinedQuery);
 		}
 		else
 		{
-			resultCollectionQueries.push_back(comparison);
+			resultCollectionQueries.push_back(combinedQuery);
 		}
 	}
 

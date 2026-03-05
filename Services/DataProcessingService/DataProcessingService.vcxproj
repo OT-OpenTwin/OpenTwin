@@ -239,6 +239,8 @@
     <ClInclude Include="include\StringConverter.h" />
     <ClInclude Include="include\UiNotifier.h" />
     <ClInclude Include="include\GraphHandler.h" />
+    <ClInclude Include="include\ValueProcessing.h" />
+    <ClInclude Include="include\ValueProcessor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
