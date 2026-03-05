@@ -56,6 +56,8 @@ private:
 	void AddNodePoints(osg::Node* parent);
 	void SetColouring(vtkPolyDataMapper* mapper);
 	vtkAlgorithmOutput* GetPointSource(void);
+	void getMinMaxScaling(double& minVal, double& maxVal);
+
 
 	void CheckForModelUpdates();
 	void DeletePropertyData(void);

@@ -231,11 +231,14 @@ void VtkDriverUnstructuredScalarSurface::AddNodeContour(osg::Node* parent)
 		dynamic_cast<osg::Switch*>(parent)->addChild(planeNode);
 	}
 
+	double minVal = 0.0, maxVal = 0.0;
+	getMinMaxScaling(minVal, maxVal);
+
 	vtkNew<vtkBandedPolyDataContourFilter> bf;
 	bf->SetInputConnection(filter->GetOutputPort());
 	bf->SetGenerateContourEdges(true);
 	bf->SetScalarModeToValue();
-	bf->GenerateValues(scalingData->GetColourResolution(), scalarRange);
+	bf->GenerateValues(scalingData->GetColourResolution(), minVal, maxVal);
 	bf->Update();
 
 	vtkNew<vtkPolyDataNormals> shadedContour;
@@ -283,6 +286,9 @@ void VtkDriverUnstructuredScalarSurface::AddNodePoints(osg::Node* parent)
 
 	scalarRange = downSampling->GetOutput()->GetScalarRange();
 
+	double minVal = 0.0, maxVal = 0.0;
+	getMinMaxScaling(minVal, maxVal);
+
 	vtkNew<vtkPolyDataMapper> scalarFieldMapper;
 	vtkNew<vtkGlyph3D> glyph;
 
@@ -291,7 +297,7 @@ void VtkDriverUnstructuredScalarSurface::AddNodePoints(osg::Node* parent)
 	glyph->ScalingOn();
 	glyph->SetColorModeToColorByScalar();
 	glyph->SetScaleModeToScaleByScalar();
-	double normalization = std::abs(scalarRange[1]);
+	double normalization = std::abs(maxVal);
 
 	double dx = dataSource->GetVtkGrid()->GetBounds()[1] - dataSource->GetVtkGrid()->GetBounds()[0];
 	double dy = dataSource->GetVtkGrid()->GetBounds()[3] - dataSource->GetVtkGrid()->GetBounds()[2];
@@ -324,21 +330,12 @@ void VtkDriverUnstructuredScalarSurface::AddNodePoints(osg::Node* parent)
 	dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
 }
 
-
-void VtkDriverUnstructuredScalarSurface::SetColouring(vtkPolyDataMapper* mapper)
+void VtkDriverUnstructuredScalarSurface::getMinMaxScaling(double& minVal, double& maxVal)
 {
-	vtkNew<vtkLookupTable> lut;
-	lut->SetNumberOfTableValues(scalingData->GetColourResolution());
-	lut->SetHueRange(.667, 0.0);
-	lut->SetAlphaRange(1., 1.);
-	lut->IndexedLookupOff();
-	lut->SetVectorModeToMagnitude();
-
 	assert(scalingData != nullptr);
 	assert(scalarRange != nullptr);
 
 	auto scalingMethod = scalingData->GetScalingMethod();
-	double minVal, maxVal;
 	if (scalingMethod == ScalingProperties::ScalingMethod::rangeScale)
 	{
 
@@ -367,6 +364,21 @@ void VtkDriverUnstructuredScalarSurface::SetColouring(vtkPolyDataMapper* mapper)
 	{
 		throw std::invalid_argument("Not supported scaling method");
 	}
+}
+
+void VtkDriverUnstructuredScalarSurface::SetColouring(vtkPolyDataMapper* mapper)
+{
+	vtkNew<vtkLookupTable> lut;
+	lut->SetNumberOfTableValues(scalingData->GetColourResolution());
+	lut->SetHueRange(.667, 0.0);
+	lut->SetAlphaRange(1., 1.);
+	lut->IndexedLookupOff();
+	lut->SetVectorModeToMagnitude();
+
+	double minVal=0.0, maxVal= 0.0;
+	getMinMaxScaling(minVal, maxVal);
+
+	assert(scalingData != nullptr);
 
 	auto scalingFunction = scalingData->GetScalingFunction();
 	if (scalingFunction == ScalingProperties::ScalingFunction::linScale)
