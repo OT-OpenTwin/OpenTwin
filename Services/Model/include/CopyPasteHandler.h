@@ -19,6 +19,10 @@
 
 #pragma once
 
+#include <map>
+#include <set>
+#include <string>
+
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
@@ -34,4 +38,7 @@ public:
 private:
 	//! @brief Stores the pasted entities. For that new, unique names are created by adding a postfix "_" + str(counter). Pasted DataEntities must have their parent set!
 	void storeEntities(std::map<ot::UID, EntityBase*>& _newEntitiesByName);
+	std::map<ot::UID, EntityBase*> getParentEntities(std::map<ot::UID, EntityBase*>& _newEntitiesByName);
+	void markAllChildren(EntityBase* entity, std::set<ot::UID> &childEntities);
+	void recursivelyRenameChildren(const std::string& oldName, const std::string& newName, EntityBase* parentEntity);
 };

@@ -1024,21 +1024,37 @@ std::string EntityGeometry::serialiseAsJSON()
 	entireDoc.fromJson(jsonDocBlock);
 
 	// Store the brep information
+	ot::JsonDocument serialisedBrep;
 	std::map<ot::UID, EntityBase*> entityMap;
 	EntityBrep* brep = dynamic_cast<EntityBrep*>(readEntityFromEntityID(this, getBrepStorageObjectID(), entityMap));
-	auto docBrep = brep->serialiseAsJSON();
-	ot::JsonDocument serialisedBrep;
-	serialisedBrep.fromJson(docBrep);
+	if (brep != nullptr)
+	{
+		auto docBrep = brep->serialiseAsJSON();
+		serialisedBrep.fromJson(docBrep);
+	}
 
 	// Store the facet information
 	entityMap.clear();
-	EntityFacetData* facets = dynamic_cast<EntityFacetData*>(readEntityFromEntityID(this, getFacetsStorageObjectID(), entityMap));
-	auto docFacets = facets->serialiseAsJSON();
 	ot::JsonDocument serialisedFacets;
-	serialisedFacets.fromJson(docFacets);
+	EntityFacetData* facets = dynamic_cast<EntityFacetData*>(readEntityFromEntityID(this, getFacetsStorageObjectID(), entityMap));
+	if (facets != nullptr)
+	{
+		auto docFacets = facets->serialiseAsJSON();
+		serialisedFacets.fromJson(docFacets);
+	}
 
 	entireDoc.AddMember("SerialisationOfBrep", serialisedBrep, entireDoc.GetAllocator());
 	entireDoc.AddMember("SerialisationOfFacets", serialisedFacets, entireDoc.GetAllocator());
+
+	// Now we need to serialize the children of this geometry entity (= construction history)
+	ot::JsonArray childEntities;
+	for (auto& child : getChildrenList())
+	{
+		std::string childData = child->serialiseAsJSON();
+		childEntities.PushBack(ot::JsonString(childData, entireDoc.GetAllocator()), entireDoc.GetAllocator());
+	}
+
+	entireDoc.AddMember("Children", childEntities, entireDoc.GetAllocator());
 
 	return entireDoc.toJson();
 }
@@ -1047,6 +1063,7 @@ bool EntityGeometry::deserialiseFromJSON(const ot::ConstJsonObject& _serialisati
 {
 	try
 	{
+		// De-Serialize this entity together with the corresponding brep and facets
 		const std::string serialisationString = ot::json::toJson(_serialisation);
 		std::string_view serialisedEntityJSONView(serialisationString);
 		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
@@ -1074,6 +1091,31 @@ bool EntityGeometry::deserialiseFromJSON(const ot::ConstJsonObject& _serialisati
 		}
 
 		_entityMap[getEntityID()] = this;
+
+		// De-Serialize Children
+		ot::ConstJsonArray children = ot::json::getArray(_serialisation, "Children");
+		for (uint32_t j = 0; j < children.Size(); j++)
+		{
+			EntityFactory& factory = EntityFactory::instance();
+
+			std::string childData = children[j].GetString();
+
+			ot::JsonDocument document;
+			document.fromJson(childData);
+			std::string entityType = ot::json::getString(document, "SchemaType");
+			std::unique_ptr<EntityBase> entity(factory.create(entityType));
+
+			if (entity != nullptr)
+			{
+				bool serialisedSuccessfully = entity->deserialiseFromJSON(document.getConstObject(), _copyInformation, _entityMap);
+				if (serialisedSuccessfully)
+				{
+					entity->setParent(this);
+					addChild(entity.release());
+				}
+			}
+		}
+
 		return true;
 	}
 	catch (std::exception _e)

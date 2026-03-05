@@ -163,7 +163,11 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 
 	addSpecificProperties(geometryEntity);
 
-	EntityPropertiesString* baseShapeProperty = new EntityPropertiesString("baseShape", std::to_string(baseEntity->getEntityID()));
+	std::string baseShapeName = baseEntity->getName();
+	size_t index = baseShapeName.rfind('/');
+	std::string baseNameWithoutPath = baseShapeName.substr(index + 1);
+
+	EntityPropertiesString* baseShapeProperty = new EntityPropertiesString("baseShape", baseNameWithoutPath);
 	baseShapeProperty->setVisible(false);
 	geometryEntity->getProperties().createProperty(baseShapeProperty, "Internal");
 
@@ -266,7 +270,10 @@ void EdgesOperationBase::updateShape(EntityGeometry* geometryEntity, TopoDS_Shap
 	EntityPropertiesString* baseShapeProperty = dynamic_cast<EntityPropertiesString*>(geometryEntity->getProperties().getProperty("baseShape"));
 	assert(baseShapeProperty != nullptr);
 
-	ot::UID baseShapeID = std::stoull(baseShapeProperty->getValue());
+	std::string baseShapeName = geometryEntity->getName() + "/" + baseShapeProperty->getValue();
+	ot::EntityInformation info;
+	ot::ModelServiceAPI::getEntityInformation(baseShapeName, info);
+	ot::UID baseShapeID = info.getEntityID();
 
 	std::list<ot::EntityInformation> entityInfo;
 	ot::ModelServiceAPI::getEntityInformation(ot::UIDList{ baseShapeID }, entityInfo);
