@@ -50,14 +50,13 @@ public:
 
 private:
 
-	std::string getModelInformation(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
+	std::string getModelInformation(const ot::LibraryElementSelectionCfg& _selectionCfg,
 		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
 	std::string getModelMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
 		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
-	std::optional<ot::ModelLibraryDialogCfg> createModelLibraryDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
-		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	std::optional<ot::ModelLibraryDialogCfg> createModelLibraryDialogCfg(const ot::LibraryElementSelectionCfg _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
 	std::string sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl);
 	std::string sendMessageToModel(const ot::JsonDocument& _doc, const std::string& _modelUrl);
