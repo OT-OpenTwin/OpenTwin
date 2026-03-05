@@ -432,8 +432,16 @@ void VtkDriverUnstructuredScalarVolume::AddIsosurfaces(osg::Node* parent)
 	}
 	else if (scalingMethod == ScalingProperties::ScalingMethod::autoScale)
 	{
-		minVal = scalarRange[0];
-		maxVal = scalarRange[1];
+		if (scalingData->GetGlobalRangeSet())
+		{
+			minVal = scalingData->GetGlobalMin();
+			maxVal = scalingData->GetGlobalMax();
+		}
+		else
+		{
+			minVal = scalarRange[0];
+			maxVal = scalarRange[1];
+		}
 	}
 	else
 	{
@@ -502,8 +510,16 @@ void VtkDriverUnstructuredScalarVolume::SetColouring(vtkPolyDataMapper* mapper)
 	}
 	else if (scalingMethod == ScalingProperties::ScalingMethod::autoScale)
 	{
-		minVal = scalarRange[0];
-		maxVal = scalarRange[1];
+		if (scalingData->GetGlobalRangeSet())
+		{
+			minVal = scalingData->GetGlobalMin();
+			maxVal = scalingData->GetGlobalMax();
+		}
+		else
+		{
+			minVal = scalarRange[0];
+			maxVal = scalarRange[1];
+		}
 	}
 	else
 	{

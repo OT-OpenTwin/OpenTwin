@@ -36,6 +36,14 @@ void PropertyBundleScaling::setProperties(EntityBase * _thisObject)
 	EntityPropertiesDouble::createProperty(m_groupName, m_properties.GetPropertyNameRangeMax(), 0.0, m_defaultCategory, _thisObject->getProperties());
 
 	EntityPropertiesInteger::createProperty(m_groupName, m_properties.GetPropertyNameColourResolution(), 30, m_defaultCategory, _thisObject->getProperties());
+
+	EntityPropertiesBoolean::createProperty(m_groupName, m_properties.GetPropertyValueGlobalRangeSet(), false, m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesDouble::createProperty(m_groupName, m_properties.GetPropertyValueGlobalMin(), 0.0, m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesDouble::createProperty(m_groupName, m_properties.GetPropertyValueGlobalMax(), 0.0, m_defaultCategory, _thisObject->getProperties());
+
+	_thisObject->getProperties().getProperty(m_properties.GetPropertyValueGlobalRangeSet())->setVisible(false);
+	_thisObject->getProperties().getProperty(m_properties.GetPropertyValueGlobalMin())->setVisible(false);
+	_thisObject->getProperties().getProperty(m_properties.GetPropertyValueGlobalMax())->setVisible(false);
 }
 
 bool PropertyBundleScaling::updatePropertyVisibility(EntityBase * _thisObject)
@@ -75,3 +83,19 @@ bool PropertyBundleScaling::updatePropertyVisibility(EntityBase * _thisObject)
 	return updatePropertiesGrid;
 }
 
+void PropertyBundleScaling::setGlobalRange(EntityBase* _thisObject, double minValue, double maxValue)
+{
+	auto globalRangeProp = dynamic_cast<EntityPropertiesBoolean*>(_thisObject->getProperties().getProperty(m_properties.GetPropertyValueGlobalRangeSet()));
+	auto minValueProp = dynamic_cast<EntityPropertiesDouble*>(_thisObject->getProperties().getProperty(m_properties.GetPropertyValueGlobalMin()));
+	auto maxValueProp = dynamic_cast<EntityPropertiesDouble*>(_thisObject->getProperties().getProperty(m_properties.GetPropertyValueGlobalMax()));
+
+	if (globalRangeProp == nullptr || minValueProp == nullptr || maxValueProp == nullptr)
+	{
+		assert(0); // This should not happen for newly created visualization entities
+		return;
+	}
+
+	globalRangeProp->setValue(true);
+	minValueProp->setValue(minValue);
+	maxValueProp->setValue(maxValue);
+}

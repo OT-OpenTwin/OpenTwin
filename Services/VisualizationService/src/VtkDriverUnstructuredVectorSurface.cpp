@@ -343,8 +343,16 @@ void VtkDriverUnstructuredVectorSurface::SetColouring(vtkPolyDataMapper * mapper
 	}
 	else if (scalingMethod == ScalingProperties::ScalingMethod::autoScale)
 	{
-		minVal = scalarRange[0];
-		maxVal = scalarRange[1];
+		if (scalingData->GetGlobalRangeSet())
+		{
+			minVal = scalingData->GetGlobalMin();
+			maxVal = scalingData->GetGlobalMax();
+		}
+		else
+		{
+			minVal = scalarRange[0];
+			maxVal = scalarRange[1];
+		}
 	}
 	else
 	{

@@ -35,6 +35,10 @@ public:
 	bool UpdateMinMaxProperties(double minValue, double maxValue);
 	void GetEntityProperties(long long& _UID, long long& Version);
 
+	const bool GetGlobalRangeSet(void) const {return globalRangeSet;}
+	const double GetGlobalMin(void) const { return globalMin; }
+	const double GetGlobalMax(void) const { return globalMax; }
+
 private:
 	EntityBase* thisObject = nullptr;
 
@@ -43,6 +47,9 @@ private:
 	ScalingProperties::ScalingMethod scalingMethod;
 	double rangeMin=-1.;
 	double rangeMax=-1.;
+	bool globalRangeSet = false;
+	double globalMin = -1.;
+	double globalMax = -1.;
 	int colourResolution;
 
 	virtual void LoadCurrentData(EntityBase * thisObject) override;
