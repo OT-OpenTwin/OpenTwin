@@ -149,49 +149,6 @@ void ot::CartesianPlot::resetPlotView() {
 	}
 }
 
-void ot::CartesianPlot::keyPressEvent(QKeyEvent* _event) {
-	QwtPlot::keyPressEvent(_event);
-	if (_event->key() == Qt::Key_Space) {
-		resetPlotView();
-	}
-}
-
-void ot::CartesianPlot::mouseDoubleClickEvent(QMouseEvent* _event) {
-	QwtPlot::mouseDoubleClickEvent(_event);
-	if (_event->button() == Qt::LeftButton) {
-		int ix = 0;
-		QwtPlotCurve* curve = this->findNearestCurve(_event->pos(), ix);
-
-		if (curve) {
-			QPointF point = curve->sample(ix);
-
-			// Point in pixel coordinates
-			QPointF pxPoint(transform(xBottom, point.x()), transform(yLeft, point.y()));
-
-			// Distance to the mouse position in pixel coordinates
-			double dist = QPointF(_event->position() - pxPoint).manhattanLength();
-
-			const double pixelThreshold = 150.0;
-
-			if (dist <= pixelThreshold) {
-				PlotDataset* dataset = this->getOwner()->findDataset(curve);
-				if (!dataset) {
-					OT_LOG_E("Failed to find dataset from curve");
-					return;
-				}
-
-				this->getOwner()->requestCurveDoubleClicked(dataset->getEntityID(), _event->modifiers() & Qt::KeyboardModifier::ControlModifier);
-			}
-			else {
-				this->getOwner()->requestResetItemSelection();
-			}
-		}
-		else {
-			this->getOwner()->requestResetItemSelection();
-		}
-	}
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Grid
@@ -232,4 +189,81 @@ QwtPlotCurve * ot::CartesianPlot::findNearestCurve(const QPoint & _pos, int& _po
 	}
 
 	return curve;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Event handling
+
+void ot::CartesianPlot::keyPressEvent(QKeyEvent* _event)
+{
+	QwtPlot::keyPressEvent(_event);
+	if (_event->key() == Qt::Key_Space)
+	{
+		resetPlotView();
+	}
+}
+
+void ot::CartesianPlot::mouseDoubleClickEvent(QMouseEvent* _event)
+{
+	QwtPlot::mouseDoubleClickEvent(_event);
+	if (_event->button() == Qt::LeftButton)
+	{
+		int ix = 0;
+		QwtPlotCurve* curve = this->findNearestCurve(_event->pos(), ix);
+
+		if (curve)
+		{
+			QPointF point = curve->sample(ix);
+
+			// Point in pixel coordinates
+			QPointF pxPoint(transform(xBottom, point.x()), transform(yLeft, point.y()));
+
+			// Distance to the mouse position in pixel coordinates
+			double dist = QPointF(_event->position() - pxPoint).manhattanLength();
+
+			const double pixelThreshold = 150.0;
+
+			if (dist <= pixelThreshold)
+			{
+				PlotDataset* dataset = this->getOwner()->findDataset(curve);
+				if (!dataset)
+				{
+					OT_LOG_E("Failed to find dataset from curve");
+					return;
+				}
+
+				this->getOwner()->requestCurveDoubleClicked(dataset->getEntityID(), _event->modifiers() & Qt::KeyboardModifier::ControlModifier);
+			}
+			else
+			{
+				this->getOwner()->requestResetItemSelection();
+			}
+		}
+		else
+		{
+			this->getOwner()->requestResetItemSelection();
+		}
+	}
+}
+
+void ot::CartesianPlot::mouseMoveEvent(QMouseEvent* _event)
+{
+	OTAssertNullptr(getOwner());
+
+	QwtPlot::mouseMoveEvent(_event);
+	
+	const double xValue = invTransform(xBottom, _event->position().x());
+	const double yValue = invTransform(yLeft, _event->position().y());
+
+	getOwner()->setInfoTextFromPosition(QPointF(xValue, yValue));
+
+}
+
+void ot::CartesianPlot::leaveEvent(QEvent* _event)
+{
+	OTAssertNullptr(getOwner());
+	QwtPlot::leaveEvent(_event);
+
+	getOwner()->clearPositionInfoText();
 }

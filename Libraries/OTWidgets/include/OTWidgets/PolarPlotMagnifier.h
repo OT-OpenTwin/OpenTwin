@@ -23,6 +23,7 @@
 #include "OTWidgets/WidgetTypes.h"
 
 // Qwt header
+#include <qwt_text.h>
 #include <qwt_polar_magnifier.h>
 
 namespace ot {
@@ -31,12 +32,16 @@ namespace ot {
 	class PolarPlotMarker;
 
 	class OT_WIDGETS_API_EXPORT PolarPlotMagnifier : public QwtPolarMagnifier {
+		Q_OBJECT
 		OT_DECL_NOCOPY(PolarPlotMagnifier)
 		OT_DECL_NODEFAULT(PolarPlotMagnifier)
 	public:
 		PolarPlotMagnifier(PolarPlot* _plot);
 		virtual ~PolarPlotMagnifier();
 
+		virtual void rescale(double _factor) override;
+
+	protected:
 		virtual void widgetMousePressEvent(QMouseEvent* _event) override;
 
 		virtual void widgetMouseMoveEvent(QMouseEvent* _event) override;
@@ -45,14 +50,25 @@ namespace ot {
 
 		virtual void widgetWheelEvent(QWheelEvent* _wheelEvent) override;
 
-		virtual void rescale(double _factor) override;
-
-
+	private Q_SLOTS:
+		void slotColorStyleChanged();
+		
 	private:
-		PolarPlot* m_plot;
-		bool				m_rightMouseIsPressed;
-		bool				m_mouseMoved;
+		void updateMarker(const QPoint& _pos);
+		void hideMarker();
+
+		enum class State {
+			None               = 0 << 0,
+			RightMousePressed  = 1 << 0,
+			MarkerShown        = 1 << 1
+		};
+		typedef Flags<State> StateFlags;
+		OT_ADD_FRIEND_FLAG_FUNCTIONS(State, StateFlags)
+
+		PolarPlot*       m_plot;
 		PolarPlotMarker* m_marker;
+		QwtText          m_markerText;
+		StateFlags       m_state;
 	};
 
 }

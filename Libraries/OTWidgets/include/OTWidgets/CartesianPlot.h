@@ -47,6 +47,9 @@ namespace ot {
 
 		// Virtual methods
 
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
+
 		virtual void updateLegend() override;
 
 		virtual void updateWholePlot() override;
@@ -56,10 +59,6 @@ namespace ot {
 		void setZoomerPen(const QPen& _pen);
 
 		virtual void resetPlotView() override;
-
-		virtual void keyPressEvent(QKeyEvent* _event) override;
-
-		virtual void mouseDoubleClickEvent(QMouseEvent* _event) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -73,7 +72,17 @@ namespace ot {
 
 		virtual Plot1DCfg::PlotType getPlotType() const override { return Plot1DCfg::Cartesian; };
 
-		QwtPlotCurve* findNearestCurve(const QPoint& _pos, int& _pointIx);
+		OT_DECL_NODISCARD QwtPlotCurve* findNearestCurve(const QPoint& _pos, int& _pointIx);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Event handling
+
+	protected:
+		virtual void keyPressEvent(QKeyEvent* _event) override;
+		virtual void mouseDoubleClickEvent(QMouseEvent* _event) override;
+		virtual void mouseMoveEvent(QMouseEvent* _event) override;
+		virtual void leaveEvent(QEvent* _event) override;
 
 	private:
 		CartesianPlotZoomer* m_plotZoomer  = nullptr;

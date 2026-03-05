@@ -26,6 +26,9 @@
 #include "OTWidgets/AbstractPlot.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
+// Qwt header
+#include <qwt_point_polar.h>
+
 // Qt header
 #include <QtCore/qstring.h>
 #include <QtCore/qobject.h>
@@ -34,16 +37,16 @@
 // std header
 #include <map>
 
-class QWidget;
-class QLabel;
 class QVBoxLayout;
 
 class QwtSymbol;
 class QwtPlotCurve;
 class QwtPolarCurve;
+class QwtPointPolar;
 
 namespace ot {
 
+	class Label;
 	class PolarPlot;
 	class PlotDataset;
 	class CartesianPlot;
@@ -121,6 +124,12 @@ namespace ot {
 		void requestResetItemSelection();
 		void requestCurveDoubleClicked(UID _treeItemUid, bool _hasControlModifier);
 
+		void setInfoText(const QString& _text);
+		void clearPositionInfoText();
+		void setInfoTextFromPosition(const QPoint& _pos);
+		void setInfoTextFromPosition(const QPointF& _pos);
+		void setInfoTextFromPosition(const QwtPointPolar& _pos);
+
 	Q_SIGNALS:
 		void resetItemSelectionRequest();
 		void curveDoubleClicked(UID _entityID, bool _hasControlModifier);
@@ -136,8 +145,11 @@ namespace ot {
 		Plot1DCfg m_config;
 
 		QWidget* m_centralWidget;
-		QLabel* m_errorLabel;
-		QVBoxLayout* m_centralLayout;
+		Label* m_errorLabel;
+		QVBoxLayout* m_plotLayout;
+
+		QString m_infoText;
+		Label* m_infoLabel;
 
 		CartesianPlot* m_cartesianPlot;
 		PolarPlot* m_polarPlot;

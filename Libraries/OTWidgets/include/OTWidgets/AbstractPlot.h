@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/Plot1DCfg.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/AbstractPlotAxis.h"
 
 // Qt header
@@ -30,7 +31,7 @@ namespace ot {
 
 	class PlotBase;
 
-	class OT_WIDGETS_API_EXPORT AbstractPlot {
+	class OT_WIDGETS_API_EXPORT AbstractPlot : public WidgetBase {
 		OT_DECL_NOCOPY(AbstractPlot)
 		OT_DECL_NODEFAULT(AbstractPlot)
 	public:
@@ -44,17 +45,17 @@ namespace ot {
 
 		void setPlotLegendVisible(bool _isVisible = true, bool _repaint = true);
 
-		virtual void updateLegend(void) = 0;
+		virtual void updateLegend() = 0;
 
-		virtual void updateGrid(void) = 0;
+		virtual void updateGrid() = 0;
 
-		virtual void updateWholePlot(void) = 0;
+		virtual void updateWholePlot() = 0;
 
-		virtual void clearPlot(void) = 0;
+		virtual void clearPlot() = 0;
 
-		virtual void resetPlotView(void) = 0;
+		virtual void resetPlotView() = 0;
 
-		virtual Plot1DCfg::PlotType getPlotType(void) const = 0;
+		virtual Plot1DCfg::PlotType getPlotType() const = 0;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -90,9 +91,9 @@ namespace ot {
 
 		// Getter
 
-		PlotBase* getOwner(void) const { return m_owner; }
+		PlotBase* getOwner() const { return m_owner; }
 
-		const Plot1DCfg& getConfiguration(void) const { return m_config; };
+		const Plot1DCfg& getConfiguration() const { return m_config; };
 
 	private:
 		PlotBase* m_owner;

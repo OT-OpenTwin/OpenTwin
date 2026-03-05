@@ -18,6 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/Math.h"
+#include "OTWidgets/Label.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/PlotBase.h"
 #include "OTWidgets/PolarPlot.h"
@@ -28,8 +30,13 @@
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PolarPlotMagnifier.h"
 
+// Qwt header
+#include <qwt_polar_canvas.h>
+
 // Qt header
+#include <QtCore/qstringbuilder.h>
 #include <QtGui/qevent.h>
+#include <QtWidgets/qlayout.h>
 
 ot::PolarPlot::PolarPlot(PlotBase* _owner, QWidget* _parent)
 	: QwtPolarPlot(_parent), AbstractPlot(_owner), m_legend(nullptr)
@@ -37,14 +44,15 @@ ot::PolarPlot::PolarPlot(PlotBase* _owner, QWidget* _parent)
 	m_grid = new PolarPlotGrid(this);
 	m_magnifier = new PolarPlotMagnifier(this);
 	m_panner = new PolarPlotPanner(this);
-	
+		
 	this->setPlotAxis(new PolarPlotAxis(AbstractPlotAxis::xBottom, this), nullptr, new PolarPlotAxis(AbstractPlotAxis::yLeft, this), nullptr);
 
 	slotColorStyleChanged();
 	connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PolarPlot::slotColorStyleChanged);
 }
 
-ot::PolarPlot::~PolarPlot() {
+ot::PolarPlot::~PolarPlot()
+{
 	disconnect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PolarPlot::slotColorStyleChanged);
 }
 
@@ -98,11 +106,62 @@ void ot::PolarPlot::updateGrid() {
 	m_grid->setPen(gridPen);
 }
 
+QwtPolarCurve* ot::PolarPlot::findNearestCurve(const QwtPointPolar& _pos, size_t& _pointIx) {
+	QPoint mPos = canvas()->transform(_pos);
+
+	double minDist = std::numeric_limits<double>::max();
+	QwtPolarCurve* nearest = nullptr;
+
+	for (QwtPolarItemIterator it = itemList().begin(); it != itemList().end(); ++it) {
+		if ((*it)->rtti() != QwtPolarItem::Rtti_PolarCurve) {
+			continue;
+		}
+
+		QwtPolarCurve* curve = static_cast<QwtPolarCurve*>(*it);
+		const QwtSeriesData<QwtPointPolar>* series = curve->data();
+
+		const size_t size = series->size();
+
+		for (size_t i = 0; i < size; i++) {
+			const QwtPointPolar p = series->sample(i);
+			QPoint pt = canvas()->transform(p);
+
+			double dist = ot::Math::euclideanDistance(mPos.x(), mPos.y(), pt.x(), pt.y());
+			if (dist < 0.) {
+				dist *= (-1.);
+			}
+
+			if (dist < minDist) {
+				minDist = dist;
+				nearest = curve;
+				_pointIx = i;
+			}
+		}
+	}
+
+	return nearest;
+}
+
 void ot::PolarPlot::keyPressEvent(QKeyEvent* _event) {
 	QwtPolarPlot::keyPressEvent(_event);
 	if (_event->key() == Qt::Key_Space) {
 		this->resetPlotView();
 	}
+}
+
+void ot::PolarPlot::mouseMoveEvent(QMouseEvent* _event) {
+	OTAssertNullptr(getOwner());
+	QwtPolarPlot::mouseMoveEvent(_event);
+	
+	const QwtPointPolar polarPt = canvas()->invTransform(_event->pos());
+	getOwner()->setInfoTextFromPosition(polarPt);
+}
+
+void ot::PolarPlot::leaveEvent(QEvent* _event) {
+	OTAssertNullptr(getOwner());
+	QwtPolarPlot::leaveEvent(_event);
+
+	getOwner()->clearPositionInfoText();
 }
 
 void ot::PolarPlot::slotColorStyleChanged() {

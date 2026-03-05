@@ -20,46 +20,52 @@
 // OpenTwin header
 #include "OTWidgets/PolarPlot.h"
 #include "OTWidgets/PolarPlotMarker.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PolarPlotMagnifier.h"
+
+// Qwt header
+#include <qwt_polar_canvas.h>
 
 // Qt header
 #include <QtGui/qevent.h>
 
 ot::PolarPlotMagnifier::PolarPlotMagnifier(PolarPlot* _plot)
-	: QwtPolarMagnifier(_plot->canvas()), m_rightMouseIsPressed(false), m_mouseMoved(false), m_plot(_plot) 
+	: QwtPolarMagnifier(_plot->canvas()), m_state(State::None), m_plot(_plot) 
 {
 	this->setMouseButton(Qt::MouseButton::NoButton);
 	this->setEnabled(true);
 	m_marker = new PolarPlotMarker(m_plot);
-	m_plot->setVisible(false);
+	m_marker->setVisible(false);
+
+	slotColorStyleChanged();
+	connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PolarPlotMagnifier::slotColorStyleChanged);
 }
 
 ot::PolarPlotMagnifier::~PolarPlotMagnifier() {
-
+	disconnect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PolarPlotMagnifier::slotColorStyleChanged);
 }
 
 void ot::PolarPlotMagnifier::widgetMousePressEvent(QMouseEvent* _event) {
 	if (_event->button() == Qt::MouseButton::RightButton) {
-		m_rightMouseIsPressed = true;
-		m_mouseMoved = false;
+		m_state.set(State::RightMousePressed);
+		updateMarker(_event->pos());
 	}
 	QwtPolarMagnifier::widgetMousePressEvent(_event);
 }
 
 void ot::PolarPlotMagnifier::widgetMouseMoveEvent(QMouseEvent* _event) {
-
-	m_mouseMoved = true;
-
+	if (m_state.has(State::MarkerShown)) {
+		updateMarker(_event->pos());
+	}
 	QwtPolarMagnifier::widgetMouseMoveEvent(_event);
 }
 
 void ot::PolarPlotMagnifier::widgetMouseReleaseEvent(QMouseEvent* _event) {
-	if (_event->button() == Qt::MouseButton::RightButton) {
-		if (m_mouseMoved) {
-			m_marker->setVisible(false);
-			m_plot->replot();
+	if (m_state.has(State::MarkerShown)) {
+		if (_event->button() == Qt::MouseButton::RightButton) {
+			m_state.remove(State::RightMousePressed);
+			hideMarker();
 		}
-		m_rightMouseIsPressed = false;
 	}
 	QwtPolarMagnifier::widgetMouseReleaseEvent(_event);
 }
@@ -80,4 +86,48 @@ void ot::PolarPlotMagnifier::widgetWheelEvent(QWheelEvent* _wheelEvent) {
 
 void ot::PolarPlotMagnifier::rescale(double _factor) {
 	QwtPolarMagnifier::rescale(_factor);
+}
+
+void ot::PolarPlotMagnifier::slotColorStyleChanged() {
+	const auto& style = GlobalColorStyle::instance().getCurrentStyle();
+	const auto& textVal = style.getValue(ColorStyleValueEntry::PlotMarkerText, ColorStyleValue());
+
+	m_markerText.setColor(textVal.toColor());
+}
+
+void ot::PolarPlotMagnifier::updateMarker(const QPoint& _pos) {
+	const QwtPolarCanvas* canvas = m_plot->canvas();
+	QwtPointPolar polar = canvas->invTransform(_pos);
+
+	size_t ix = 0;
+	QwtPolarCurve* curve = m_plot->findNearestCurve(polar, ix);
+
+	if (!curve) {
+		return;
+	}
+
+	polar = curve->data()->sample(ix);
+
+	double radius = polar.radius();
+	double azimuthRad = polar.azimuth();
+	double azimuthDeg = qRadiansToDegrees(azimuthRad);
+
+	m_markerText.setText("r = " + QString::number(radius) + "\n"
+		"\xCF\x86 = " + QString::number(azimuthRad) + " rad\n"
+		"\xCF\x86 =" + QString::number(azimuthDeg) + " deg"
+	);
+
+	m_state.set(State::MarkerShown);
+
+	m_marker->setPosition(polar);
+	m_marker->setLabel(m_markerText);
+	m_marker->setVisible(true);
+
+	m_plot->replot();
+}
+
+void ot::PolarPlotMagnifier::hideMarker() {
+	m_state.remove(State::MarkerShown);
+	m_marker->setVisible(false);
+	m_plot->replot();
 }

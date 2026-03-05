@@ -40,6 +40,10 @@ namespace ot {
 		CartesianPlotMagnifier(CartesianPlot* _plot);
 		virtual ~CartesianPlotMagnifier();
 
+		virtual void rescale(double _factor) override;
+
+	protected:
+
 		virtual void widgetMousePressEvent(QMouseEvent* _event) override;
 
 		virtual void widgetMouseMoveEvent(QMouseEvent* _event) override;
@@ -47,8 +51,6 @@ namespace ot {
 		virtual void widgetMouseReleaseEvent(QMouseEvent* _event) override;
 
 		virtual void widgetWheelEvent(QWheelEvent* _wheelEvent) override;
-
-		virtual void rescale(double _factor) override;
 
 		virtual void widgetKeyPressEvent(QKeyEvent* _event) override;
 

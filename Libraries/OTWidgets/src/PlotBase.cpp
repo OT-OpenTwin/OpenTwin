@@ -45,7 +45,19 @@ ot::PlotBase::PlotBase(QWidget* _parent) :
 	m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
 {
 	m_centralWidget = new QWidget(_parent);
-	m_centralLayout = new QVBoxLayout(m_centralWidget);
+	QVBoxLayout* centralLayout = new QVBoxLayout(m_centralWidget);
+	centralLayout->setContentsMargins(0, 0, 0, 0);
+
+	m_plotLayout = new QVBoxLayout();
+	centralLayout->addLayout(m_plotLayout, 1);
+
+	QHBoxLayout* infoLayout = new QHBoxLayout();
+	infoLayout->setContentsMargins(2, 2, 2, 2);
+	centralLayout->addLayout(infoLayout, 0);
+
+	m_infoLabel = new Label(m_centralWidget);
+	infoLayout->addWidget(m_infoLabel);
+	infoLayout->addStretch(1);
 
 	m_errorLabel = new Label("Error", m_centralWidget);
 	m_errorLabel->setVisible(false);
@@ -54,7 +66,7 @@ ot::PlotBase::PlotBase(QWidget* _parent) :
 	m_cartesianPlot = new CartesianPlot(this, nullptr);
 	m_polarPlot = new PolarPlot(this, nullptr);
 
-	m_centralLayout->addWidget(m_cartesianPlot);
+	m_plotLayout->addWidget(m_cartesianPlot->getQWidget());
 }
 
 ot::PlotBase::~PlotBase() {
@@ -85,21 +97,21 @@ void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 		switch (m_currentPlotType)
 		{
 		case Plot1DCfg::Cartesian:
-			m_centralLayout->removeWidget(m_polarPlot);
+			m_plotLayout->removeWidget(m_polarPlot->getQWidget());
 			m_polarPlot->setParent(nullptr);
 			m_polarPlot->hide();
 
-			m_centralLayout->addWidget(m_cartesianPlot);
+			m_plotLayout->addWidget(m_cartesianPlot->getQWidget());
 			m_cartesianPlot->setParent(m_centralWidget);
 			m_cartesianPlot->show();
 			break;
 
 		case Plot1DCfg::Polar:
-			m_centralLayout->removeWidget(m_cartesianPlot);
+			m_plotLayout->removeWidget(m_cartesianPlot->getQWidget());
 			m_cartesianPlot->setParent(nullptr);
 			m_cartesianPlot->hide();
 
-			m_centralLayout->addWidget(m_polarPlot);
+			m_plotLayout->addWidget(m_polarPlot->getQWidget());
 			m_polarPlot->setParent(m_centralWidget);
 			m_polarPlot->show();
 			break;
@@ -141,11 +153,11 @@ void ot::PlotBase::setErrorState(bool _isError, const QString & _message) {
 	switch (m_currentPlotType)
 	{
 	case Plot1DCfg::Cartesian:
-		currentPlot = m_cartesianPlot;
+		currentPlot = m_cartesianPlot->getQWidget();
 		break;
 
 	case Plot1DCfg::Polar:
-		currentPlot = m_polarPlot;
+		currentPlot = m_polarPlot->getQWidget();
 		break;
 
 	default:
@@ -155,16 +167,16 @@ void ot::PlotBase::setErrorState(bool _isError, const QString & _message) {
 
 	if (_isError && !m_isError) {
 		
-		m_centralLayout->removeWidget(currentPlot);
+		m_plotLayout->removeWidget(currentPlot);
 		currentPlot->setParent(nullptr);
 		m_errorLabel->setText(_message);
-		m_centralLayout->addWidget(m_errorLabel);
+		m_plotLayout->addWidget(m_errorLabel);
 		m_isError = true;
 	}
 	else if (!_isError && m_isError) {
-		m_centralLayout->removeWidget(m_errorLabel);
+		m_plotLayout->removeWidget(m_errorLabel);
 		m_errorLabel->setParent(nullptr);
-		m_centralLayout->addWidget(currentPlot);
+		m_plotLayout->addWidget(currentPlot);
 		m_isError = false;
 	}
 }
@@ -242,6 +254,35 @@ void ot::PlotBase::requestResetItemSelection() {
 
 void ot::PlotBase::requestCurveDoubleClicked(UID _entityID, bool _hasControlModifier) {
 	Q_EMIT curveDoubleClicked(_entityID, _hasControlModifier);
+}
+
+void ot::PlotBase::setInfoText(const QString& _text) 
+{
+	m_infoText = _text;
+	m_infoLabel->setText(m_infoText);
+}
+
+void ot::PlotBase::clearPositionInfoText()
+{
+	m_infoLabel->setText(m_infoText);
+}
+
+void ot::PlotBase::setInfoTextFromPosition(const QPoint& _pos)
+{
+	const QString posText = "x = " + QString::number(_pos.x()) + "; y = " + QString::number(_pos.y());
+	m_infoLabel->setText(posText);
+}
+
+void ot::PlotBase::setInfoTextFromPosition(const QPointF& _pos)
+{
+	const QString posText = "x = " + QString::number(_pos.x()) + "; y = " + QString::number(_pos.y());
+	m_infoLabel->setText(posText);
+}
+
+void ot::PlotBase::setInfoTextFromPosition(const QwtPointPolar& _pos)
+{
+	const QString posText = "r = " + QString::number(_pos.radius()) + "     \xCF\x86 = " + QString::number(qRadiansToDegrees(_pos.azimuth())) + "     deg\xCF\x86 = " + QString::number(_pos.azimuth()) + " rad";
+	m_infoLabel->setText(posText);
 }
 
 void ot::PlotBase::applyConfig() {

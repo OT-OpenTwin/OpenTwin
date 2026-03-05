@@ -412,7 +412,7 @@
     <ClInclude Include="include\OTWidgets\PolarPlotAxis.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotGrid.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotLegend.h" />
-    <ClInclude Include="include\OTWidgets\PolarPlotMagnifier.h" />
+    <QtMoc Include="include\OTWidgets\PolarPlotMagnifier.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotMarker.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotPanner.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />

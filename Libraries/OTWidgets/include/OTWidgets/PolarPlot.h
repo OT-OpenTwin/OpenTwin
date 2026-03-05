@@ -25,6 +25,7 @@
 
 // Qwt header
 #include <qwt_polar_plot.h>
+#include <qwt_polar_curve.h>
 
 namespace ot {
 
@@ -46,6 +47,9 @@ namespace ot {
 
 		// Plot
 
+		virtual QWidget* getQWidget() override { return this; }
+		virtual const QWidget* getQWidget() const override { return this; };
+
 		virtual void updateLegend() override;
 
 		virtual void updateWholePlot() override;
@@ -66,8 +70,18 @@ namespace ot {
 
 		virtual Plot1DCfg::PlotType getPlotType() const override { return Plot1DCfg::Polar; };
 
+		//! @brief Find the curve nearest to the provided position.
+		//! @param _pos Position to find the nearest curve for.
+		//! @param _pointIx Index of the point in the curve that is nearest to the provided position will be set here. Will not be initialized
+		//! @return Pointer to the nearest curve, or nullptr if no curve is near enough.
+		OT_DECL_NODISCARD QwtPolarCurve* findNearestCurve(const QwtPointPolar& _pos, size_t& _pointIx);
+
 	protected:
 		virtual void keyPressEvent(QKeyEvent* _event) override;
+
+		virtual void mouseMoveEvent(QMouseEvent* _event) override;
+
+		virtual void leaveEvent(QEvent* _event) override;
 
 	private Q_SLOTS:
 		void slotColorStyleChanged();
