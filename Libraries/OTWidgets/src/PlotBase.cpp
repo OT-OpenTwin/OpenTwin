@@ -281,7 +281,7 @@ void ot::PlotBase::setInfoTextFromPosition(const QPointF& _pos)
 
 void ot::PlotBase::setInfoTextFromPosition(const QwtPointPolar& _pos)
 {
-	const QString posText = "r = " + QString::number(_pos.radius()) + "     \xCF\x86 = " + QString::number(qRadiansToDegrees(_pos.azimuth())) + "     deg\xCF\x86 = " + QString::number(_pos.azimuth()) + " rad";
+	const QString posText = "r = " + QString::number(_pos.radius()) + "    \xCF\x86 = " + QString::number(qRadiansToDegrees(_pos.azimuth())) + " deg    \xCF\x86 = " + QString::number(_pos.azimuth()) + " rad";
 	m_infoLabel->setText(posText);
 }
 

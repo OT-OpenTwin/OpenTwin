@@ -19,10 +19,12 @@
 
 // OpenTwin header
 #include "OTCore/Math.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/PlotBase.h"
 #include "OTWidgets/PolarPlot.h"
+#include "OTWidgets/PlotDataset.h"
 #include "OTWidgets/PolarPlotGrid.h"
 #include "OTWidgets/PolarPlotAxis.h"
 #include "OTWidgets/PolarPlotLegend.h"
@@ -106,14 +108,23 @@ void ot::PolarPlot::updateGrid() {
 	m_grid->setPen(gridPen);
 }
 
-QwtPolarCurve* ot::PolarPlot::findNearestCurve(const QwtPointPolar& _pos, size_t& _pointIx) {
+QwtPolarCurve* ot::PolarPlot::findNearestCurve(const QwtPointPolar& _pos, size_t& _pointIx) 
+{
+	double tmp = 0.;
+	return findNearestCurve(_pos, _pointIx, tmp);
+}
+
+QwtPolarCurve* ot::PolarPlot::findNearestCurve(const QwtPointPolar& _pos, size_t& _pointIx, double& _distance)
+{
 	QPoint mPos = canvas()->transform(_pos);
 
-	double minDist = std::numeric_limits<double>::max();
+	_distance = std::numeric_limits<double>::max();
 	QwtPolarCurve* nearest = nullptr;
 
-	for (QwtPolarItemIterator it = itemList().begin(); it != itemList().end(); ++it) {
-		if ((*it)->rtti() != QwtPolarItem::Rtti_PolarCurve) {
+	for (QwtPolarItemIterator it = itemList().begin(); it != itemList().end(); ++it)
+	{
+		if ((*it)->rtti() != QwtPolarItem::Rtti_PolarCurve)
+		{
 			continue;
 		}
 
@@ -122,17 +133,20 @@ QwtPolarCurve* ot::PolarPlot::findNearestCurve(const QwtPointPolar& _pos, size_t
 
 		const size_t size = series->size();
 
-		for (size_t i = 0; i < size; i++) {
+		for (size_t i = 0; i < size; i++)
+		{
 			const QwtPointPolar p = series->sample(i);
 			QPoint pt = canvas()->transform(p);
 
 			double dist = ot::Math::euclideanDistance(mPos.x(), mPos.y(), pt.x(), pt.y());
-			if (dist < 0.) {
+			if (dist < 0.)
+			{
 				dist *= (-1.);
 			}
 
-			if (dist < minDist) {
-				minDist = dist;
+			if (dist < _distance)
+			{
+				_distance = dist;
 				nearest = curve;
 				_pointIx = i;
 			}
@@ -153,8 +167,48 @@ void ot::PolarPlot::mouseMoveEvent(QMouseEvent* _event) {
 	OTAssertNullptr(getOwner());
 	QwtPolarPlot::mouseMoveEvent(_event);
 	
-	const QwtPointPolar polarPt = canvas()->invTransform(_event->pos());
-	getOwner()->setInfoTextFromPosition(polarPt);
+	QRectF pRect = plotRect();
+	const int radius = pRect.width() / 2;
+
+	const QPoint canvasPos = canvas()->mapFrom(this, _event->pos());
+	QwtPointPolar polarPt = canvas()->invTransform(canvasPos);
+
+	if (polarPt.radius() <= radius)
+	{
+		getOwner()->setInfoTextFromPosition(polarPt);
+	}
+	else
+	{
+		getOwner()->clearPositionInfoText();
+	}
+}
+
+void ot::PolarPlot::mouseDoubleClickEvent(QMouseEvent* _event)
+{
+	QwtPolarPlot::mouseDoubleClickEvent(_event);
+	if (_event->button() == Qt::LeftButton) {
+		size_t pointIx = 0;
+
+		PlotBase* owner = getOwner();
+		OTAssertNullptr(owner);
+		
+		const double pixelThreshold = 150.0;
+
+		double dist = 20000.;
+		QwtPolarCurve* curve = findNearestCurve(canvas()->invTransform(_event->pos()), pointIx, dist);
+		if (curve && dist < pixelThreshold) {
+			PlotDataset* dataset = owner->findDataset(curve);
+			if (!dataset) {
+				OT_LOG_E("Failed to find dataset from curve");
+				owner->requestResetItemSelection();
+				return;
+			}
+			owner->requestCurveDoubleClicked(dataset->getEntityID(), _event->modifiers().testFlag(Qt::ControlModifier));
+		}
+		else {
+			owner->requestResetItemSelection();
+		}
+	}
 }
 
 void ot::PolarPlot::leaveEvent(QEvent* _event) {

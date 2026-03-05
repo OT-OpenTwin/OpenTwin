@@ -122,7 +122,7 @@ namespace ot {
 		void setSelectedCurves(const UIDList& _selectedCurves);
 
 		void requestResetItemSelection();
-		void requestCurveDoubleClicked(UID _treeItemUid, bool _hasControlModifier);
+		void requestCurveDoubleClicked(UID _entityID, bool _hasControlModifier);
 
 		void setInfoText(const QString& _text);
 		void clearPositionInfoText();
