@@ -86,7 +86,7 @@ void EntityBlockDatabaseAccess::createProperties()
 	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleUnit, {}, "", "default", getProperties());
 	PropertyHelper::getSelectionProperty(this, m_propertyTupleUnit, m_groupTupleSettings)->setVisible(false);
 
-	EntityPropertiesBoolean::createProperty(m_groupQuerySetttings, "Order reproducable", true,"default", getProperties());
+	EntityPropertiesBoolean::createProperty(m_groupQuerySetttings, m_propertyOrder, true,"default", getProperties());
 
 	
 	for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
@@ -193,10 +193,10 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::createBlockCfg()
 	return graphicsItemConfig;
 }
 
-bool EntityBlockDatabaseAccess::getReproducableOrder()
+bool EntityBlockDatabaseAccess::getReproducibleOrder()
 {
-	const bool orderReproducable = PropertyHelper::getBoolPropertyValue(this, "Order reproducable", m_groupQuerySetttings);
-	return orderReproducable;
+	const bool orderReproducible = PropertyHelper::getBoolPropertyValue(this, m_propertyOrder, m_groupQuerySetttings);
+	return orderReproducible;
 }
 
 bool EntityBlockDatabaseAccess::updateFromProperties()
@@ -342,27 +342,29 @@ void EntityBlockDatabaseAccess::createUpdatedProperty(const std::string& _propNa
 	_properties.createProperty(newLabel, newLabel->getGroup());
 }
 
-const ot::ValueComparisonDefinition EntityBlockDatabaseAccess::getSelectedQuantityDefinition()
+ot::ValueComparisonDescription EntityBlockDatabaseAccess::getSelectedQuantityDefinition()
 {
-	ot::ValueComparisonDefinition valueDefinition = getSelectedValueComparisonDefinition(m_groupQuantitySetttings);
-	const std::string tupleElementTarget =PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleTarget, m_groupTupleSettings);
-	valueDefinition.setTupleTargetElement(tupleElementTarget);
 
-	TupleInstance queryTuple;
+	ot::ValueComparisonDescription valueDefinition = getSelectedValueComparisonDefinition(m_groupQuantitySetttings);
+	TupleInstance tupleInstance = valueDefinition.getTupleInstance();
+
 	const std::string formatName = PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleFormat, m_groupTupleSettings);
-	queryTuple.setTupleFormatName(formatName);
-
+	tupleInstance.setTupleFormatName(formatName);
 	const std::string combinedUnitString = 	PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleUnit, m_groupTupleSettings);
 	auto separatedUnits = TupleDescription::separateCombinedUnitString(combinedUnitString);
-	queryTuple.setTupleUnits(separatedUnits);
-	valueDefinition.setQueryTupleDescription(queryTuple);
+	tupleInstance.setTupleUnits(separatedUnits);
+	valueDefinition.setTupleInstance(tupleInstance);
+
+	const std::string tupleElementTarget = PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleTarget, m_groupTupleSettings);
+	valueDefinition.setTupleTarget(tupleElementTarget);
+	
 	return valueDefinition;
 }
 
-const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getAdditionalQueries()
+std::list<ot::ValueComparisonDescription> EntityBlockDatabaseAccess::getAdditionalQueries()
 {
 	
-	std::list<ot::ValueComparisonDefinition> valueComparisonDefinitions;
+	std::list<ot::ValueComparisonDescription> valueComparisonDefinitions;
 	const int32_t numberOfQueries = getSelectedNumberOfQueries();
 	for (int i = 1; i <= numberOfQueries; i++)
 	{
@@ -372,15 +374,15 @@ const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getAdd
 		const std::string value = PropertyHelper::getStringPropertyValue(this, m_propertyValue, groupName);
 		const std::string name = PropertyHelper::getSelectionPropertyValue(this, m_propertyName, groupName);
 		const std::string comparator = PropertyHelper::getSelectionPropertyValue(this, m_propertyComparator, groupName);
-		const ot::ValueComparisonDefinition valueComparisonDefinition(name, comparator, value, dataType, unit);
+		const ot::ValueComparisonDescription valueComparisonDefinition(name, comparator, value, dataType, unit);
 		valueComparisonDefinitions.push_back(valueComparisonDefinition);
 	}
 	return valueComparisonDefinitions;
 }
 
-const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getMetadataQueries()
+std::list<ot::ValueComparisonDescription> EntityBlockDatabaseAccess::getMetadataQueries()
 {
-	std::list<ot::ValueComparisonDefinition> definitions;
+	std::list<ot::ValueComparisonDescription> definitions;
 	for (uint32_t index = 1; index < m_maxNbOfQueriesMetadata; index++)
 	{
 		const std::string groupName = m_groupSeriesMetadata+ "_" + std::to_string(index);
@@ -389,7 +391,7 @@ const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getMet
 			const std::string name = PropertyHelper::getSelectionPropertyValue(this, m_propertyName, groupName);
 			const std::string comparator = PropertyHelper::getSelectionPropertyValue(this, m_propertyComparator, groupName);
 			const std::string value = PropertyHelper::getStringPropertyValue(this, m_propertyValue, groupName);
-			ot::ValueComparisonDefinition definition(name, comparator, value, "", "");
+			ot::ValueComparisonDescription definition(name, comparator, value, "", "");
 			definitions.push_back(definition);
 
 		}
@@ -398,7 +400,7 @@ const std::list<ot::ValueComparisonDefinition> EntityBlockDatabaseAccess::getMet
 	return definitions;
 }
 
-const ot::ValueComparisonDefinition EntityBlockDatabaseAccess::getSelectedValueComparisonDefinition(const std::string& _groupName)
+const ot::ValueComparisonDescription EntityBlockDatabaseAccess::getSelectedValueComparisonDefinition(const std::string& _groupName)
 {
 	auto baseProp = getProperties().getProperty(m_propertyName,_groupName);
 	auto nameProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
@@ -420,5 +422,5 @@ const ot::ValueComparisonDefinition EntityBlockDatabaseAccess::getSelectedValueC
 	auto unitProp = dynamic_cast<EntityPropertiesString*>(baseProp);
 	const std::string unit = typeProp->getValue();
 
-	return ot::ValueComparisonDefinition(name, comparator, value, type,unit);
+	return ot::ValueComparisonDescription(name, comparator, value, type,unit);
 }

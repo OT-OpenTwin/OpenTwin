@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PropertyBundleQuerySettings.h
 // 
 // License:
@@ -19,7 +19,7 @@
 
 #pragma once
 #include "OTModelEntities/PropertyBundle.h"
-#include "OTCore/ValueComparisonDefinition.h"
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
 
 class __declspec(dllexport) PropertyBundleQuerySettings : public PropertyBundle
 {
@@ -29,7 +29,7 @@ public:
 	void setQueryDefinitions(const std::list<std::string>& _queryOptions);
 	void reload(EntityBase* _thisObject);
 
-	std::list<ot::ValueComparisonDefinition> getValueComparisonDefinitions(EntityBase* _thisObject);
+	std::list<ot::ValueComparisonDescription> getValueComparisonDefinitions(EntityBase* _thisObject);
 	
 	//! @brief Checks if parameter that determine the query have changed.
 	bool requiresUpdate(EntityBase* _thisObject);

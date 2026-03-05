@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ExternalServicesComponent.cpp
 // 
 // License:
@@ -4550,7 +4550,7 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 		std::list<std::string> curveIDDescriptions;
 
 		const std::string xAxisParameter = _plotConfig.getXAxisParameter();
-		const std::list<ot::ValueComparisonDefinition>& queries = _plotConfig.getQueries();
+		const std::list<ot::ValueComparisonDescription>& queries = _plotConfig.getQueries();
 		bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
 		int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
 

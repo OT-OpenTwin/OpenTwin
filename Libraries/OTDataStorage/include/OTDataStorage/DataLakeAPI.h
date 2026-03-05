@@ -1,5 +1,5 @@
-// @otlicense
-// File: ResultDataStorageAPI.h
+﻿// @otlicense
+// File: DataLakeAPI.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -43,15 +43,15 @@ using BsonViewOrValue = bsoncxx::document::view_or_value;
 
 namespace DataStorageAPI
 {
-	class __declspec(dllexport)  ResultDataStorageAPI
+	class __declspec(dllexport)  DataLakeAPI
 	{
 	public:
-		ResultDataStorageAPI(const std::string& _collectionName);
-		ResultDataStorageAPI(const ResultDataStorageAPI& _other) = default;
-		ResultDataStorageAPI(ResultDataStorageAPI&& _other) = default;
-		ResultDataStorageAPI& operator=(const ResultDataStorageAPI& _other) = default;
-		ResultDataStorageAPI& operator=(ResultDataStorageAPI&& _other) = default;
-		~ResultDataStorageAPI() = default;
+		DataLakeAPI(const std::string& _collectionName, const std::string partition = ".results");
+		DataLakeAPI(const DataLakeAPI& _other) = default;
+		DataLakeAPI(DataLakeAPI&& _other) = default;
+		DataLakeAPI& operator=(const DataLakeAPI& _other) = default;
+		DataLakeAPI& operator=(DataLakeAPI&& _other) = default;
+		~DataLakeAPI() = default;
 
 		DataStorageResponse insertDocumentToResultStorage(Document& _jsonData, bool _checkForExistence, bool _allowQueueing);
 		DataStorageResponse searchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery,int _limit);

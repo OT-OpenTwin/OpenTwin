@@ -195,6 +195,7 @@
     <ClCompile Include="src\BlockHandlerFileWriter.cpp" />
     <ClCompile Include="src\BlockHandlerPython.cpp" />
     <ClCompile Include="src\BlockHandlerStorage.cpp" />
+    <ClCompile Include="src\DataLakeAccessor.cpp" />
     <ClCompile Include="src\Graph.cpp" />
     <ClCompile Include="src\GraphNode.cpp" />
     <ClCompile Include="src\BlockEntityHandler.cpp" />
@@ -207,6 +208,7 @@
     <ClCompile Include="src\PipelineData.cpp" />
     <ClCompile Include="src\PipelineHandler.cpp" />
     <ClCompile Include="src\PropertyHandlerDatabaseAccessBlock.cpp" />
+    <ClCompile Include="src\QueryDescriptionBuilder.cpp" />
     <ClCompile Include="src\SolverReport.cpp" />
     <ClCompile Include="src\StringConverter.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
@@ -222,6 +224,7 @@
     <ClInclude Include="include\BlockHandlerPython.h" />
     <ClInclude Include="include\BlockHandlerStorage.h" />
     <ClInclude Include="include\DataDocument.h" />
+    <ClInclude Include="include\DataLakeAccessor.h" />
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\EntityCreator.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />
@@ -231,6 +234,7 @@
     <ClInclude Include="include\PipelineData.h" />
     <ClInclude Include="include\PipelineHandler.h" />
     <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h" />
+    <ClInclude Include="include\QueryDescriptionBuilder.h" />
     <ClInclude Include="include\SolverReport.h" />
     <ClInclude Include="include\StringConverter.h" />
     <ClInclude Include="include\UiNotifier.h" />

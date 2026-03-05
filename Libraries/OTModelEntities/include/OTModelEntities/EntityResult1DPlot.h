@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityResult1DPlot.h
 // 
 // License:
@@ -21,7 +21,7 @@
 #include "OTModelEntities/EntityContainer.h"
 #include "OTModelEntities/IVisualisationPlot1D.h"
 #include "OTModelEntities/PropertyBundleQuerySettings.h"
-#include "OTCore/ValueComparisonDefinition.h"
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
 
 class __declspec(dllexport) EntityResult1DPlot: public EntityContainer, public IVisualisationPlot1D
 {

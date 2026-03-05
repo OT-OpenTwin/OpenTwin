@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: IndexHandler.h
 // 
 // License:
@@ -20,11 +20,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTDataStorage/ResultDataStorageAPI.h"
 #include "OTResultDataAccess/ResultImportLogger/ResultImportLogger.h"
 
 // std header
 #include <string>
+#include "OTDataStorage/DataLakeAPI.h"
 
 class OT_RESULTDATAACCESS_API_EXPORT IndexHandler
 {
@@ -37,7 +37,7 @@ public:
 	void dropAllIndexes();	
 
 private:
-	DataStorageAPI::ResultDataStorageAPI m_dataStorageAccess;
+	DataStorageAPI::DataLakeAPI m_dataStorageAccess;
 	std::vector<bool> m_defaultIndexesSet = { false,false };
 
 	bool checkIfDefaultIndexesAreSet();

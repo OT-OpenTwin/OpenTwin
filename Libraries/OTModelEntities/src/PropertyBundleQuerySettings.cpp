@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PropertyBundleQuerySettings.cpp
 // 
 // License:
@@ -74,9 +74,9 @@ void PropertyBundleQuerySettings::reload(EntityBase* _thisObject)
 	m_maxNumberOfQueryDefinitions =	(uint32_t) m_selectionOptions.size();
 }
 
-std::list<ot::ValueComparisonDefinition> PropertyBundleQuerySettings::getValueComparisonDefinitions(EntityBase* _thisObject)
+std::list<ot::ValueComparisonDescription> PropertyBundleQuerySettings::getValueComparisonDefinitions(EntityBase* _thisObject)
 {
-	std::list<ot::ValueComparisonDefinition> valueDefinitions;
+	std::list<ot::ValueComparisonDescription> valueDefinitions;
 	for (uint32_t i = 1; i <= m_maxNumberOfQueryDefinitions; i++)
 	{
 		std::string groupName = m_groupQueryDefinition + "_" + std::to_string(i);
@@ -86,7 +86,7 @@ std::list<ot::ValueComparisonDefinition> PropertyBundleQuerySettings::getValueCo
 			std::string name = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, groupName);
 			std::string value = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyValue, groupName);
 			
-			ot::ValueComparisonDefinition definition(name, comparator, value, "", "");
+			ot::ValueComparisonDescription definition(name, comparator, value, "", "");
 			valueDefinitions.push_back(definition);
 		}
 	}

@@ -36,7 +36,7 @@
 // BSONCXX header
 #include "bsoncxx/json.hpp"
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ot::ValueComparisonDefinition>& _valueComparisons)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ot::ValueComparisonDescription>& _valueComparisons)
 {
 	m_curveIDDescriptions.clear();
 	const auto& queryInformation = _config.getQueryInformation();
@@ -74,17 +74,17 @@ std::string CurveDatasetFactory::createAxisLabel(const std::string& _title, cons
 	}
 }
 
-ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDefinition>& _valueComparisons)
+ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDescription>& _valueComparisons)
 {
 	//First we find the valid value comparisons give them additional information from the query information
-	std::list<ot::ValueComparisonDefinition> validQueries = extractValidValueDescriptions(_queryInformation, _valueComparisons);
+	std::list<ot::ValueComparisonDescription> validQueries = extractValidValueDescriptions(_queryInformation, _valueComparisons);
 
 	//Now we build the queries from the set properties
 	AdvancedQueryBuilder queryBuilder;
 	std::list<BsonViewOrValue> additionalComparisons;
-	for (ot::ValueComparisonDefinition& valueComparison : validQueries)
+	for (ot::ValueComparisonDescription& valueComparison : validQueries)
 	{
-		const std::string type = valueComparison.getType();
+		const std::string type = valueComparison.getTupleInstance().getTupleElementDataTypes().front();
 		const std::string value = valueComparison.getValue();
 		BsonViewOrValue comparison = queryBuilder.createComparison(valueComparison);
 		additionalComparisons.push_back(std::move(comparison));
@@ -121,10 +121,10 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 	}
 }
 
-const std::list<ot::ValueComparisonDefinition> CurveDatasetFactory::extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDefinition>& _valueComparisons)
+const std::list<ot::ValueComparisonDescription> CurveDatasetFactory::extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDescription>& _valueComparisons)
 {
-	std::list<ot::ValueComparisonDefinition> validValueDescriptions;
-	for (const ot::ValueComparisonDefinition& queryDefinition : _valueComparisons)
+	std::list<ot::ValueComparisonDescription> validValueDescriptions;
+	for (const ot::ValueComparisonDescription& queryDefinition : _valueComparisons)
 	{
 		if (_queryInformation.m_quantityDescription.m_label == queryDefinition.getName())
 		{
@@ -623,16 +623,18 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 	return dataSets;
 }
 
-std::optional<ot::ValueComparisonDefinition> CurveDatasetFactory::createValidValueComparison(const ot::QuantityContainerEntryDescription& _desciption, const ot::ValueComparisonDefinition& _comparison)
+std::optional<ot::ValueComparisonDescription> CurveDatasetFactory::createValidValueComparison(const ot::QuantityContainerEntryDescription& _desciption, const ot::ValueComparisonDescription& _comparison)
 {
 	const std::string fieldName = _comparison.getName();
 	const std::string comparator = _comparison.getComparator();
 	const std::string value = _comparison.getValue();
 	if (!fieldName.empty() && !comparator.empty() && !value.empty() && comparator != " ")
 	{
-		ot::ValueComparisonDefinition validComparison = _comparison;
+		ot::ValueComparisonDescription validComparison = _comparison;
 		validComparison.setName(_desciption.m_fieldName);
-		validComparison.setType(_desciption.m_tupleInstance.getTupleElementDataTypes().front());
+		TupleInstance instance;
+		instance.setTupleElementDataTypes({ _desciption.m_tupleInstance.getTupleElementDataTypes().front() });
+		validComparison.setTupleInstance(instance);
 		return validComparison;
 	}
 	else

@@ -30,6 +30,9 @@
     <Filter Include="Header Files\Helper">
       <UniqueIdentifier>{b35061e5-9426-4e30-b521-e6b66a278c3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Data Handling">
+      <UniqueIdentifier>{05f95d4c-01c5-4d19-80b9-e8be1b396c8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -98,6 +101,12 @@
     <ClCompile Include="src\MetadataVectorizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\QueryDescriptionBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataLakeAccessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -164,6 +173,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\MetadataVectorizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QueryDescriptionBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataLakeAccessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: IndexHandler.cpp
 // 
 // License:
@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+
 #include "OTCore/ResultCollectionDefaultIndexes.h"
 #include "OTResultDataAccess/ResultCollection/IndexHandler.h"
 

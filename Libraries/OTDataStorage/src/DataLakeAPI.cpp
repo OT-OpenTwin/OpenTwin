@@ -1,5 +1,5 @@
-// @otlicense
-// File: ResultDataStorageAPI.cpp
+﻿// @otlicense
+// File: DataLakeAPI.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTDataStorage/ResultDataStorageAPI.h"
+#include "OTDataStorage/DataLakeAPI.h"
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 
 // MongoDB header
@@ -26,13 +26,13 @@
 
 namespace DataStorageAPI
 {
-	ResultDataStorageAPI::ResultDataStorageAPI(const std::string& _collectionName)
-		:m_documentAccess("Projects", _collectionName + ".results"), m_docBase("Projects", _collectionName + ".results")
+	DataLakeAPI::DataLakeAPI(const std::string& _collectionName, const std::string partition)
+		:m_documentAccess("Projects", _collectionName + partition), m_docBase("Projects", _collectionName + ".results")
 	{	
 
 	}
 
-	DataStorageResponse ResultDataStorageAPI::insertDocumentToResultStorage(Document& _jsonData, bool _checkForExistence, bool _allowQueueing)
+	DataStorageResponse DataLakeAPI::insertDocumentToResultStorage(Document& _jsonData, bool _checkForExistence, bool _allowQueueing)
 	{
 		auto jsonDataLength = _jsonData.view().length();
 		if (jsonDataLength > m_maxDocumentLength)
@@ -46,7 +46,7 @@ namespace DataStorageAPI
 		return m_documentAccess.InsertDocumentToDatabase(_jsonData.extract(), _allowQueueing);
 	}
 
-	DataStorageResponse ResultDataStorageAPI::searchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, int _limit)
+	DataStorageResponse DataLakeAPI::searchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, int _limit)
 	{
 
 		
@@ -54,17 +54,17 @@ namespace DataStorageAPI
 
 	}
 
-	DataStorageResponse ResultDataStorageAPI::searchInResultCollection(BsonViewOrValue _queryFilter, mongocxx::options::find& _options)
+	DataStorageResponse DataLakeAPI::searchInResultCollection(BsonViewOrValue _queryFilter, mongocxx::options::find& _options)
 	{
 		return m_documentAccess.GetAllDocuments(_queryFilter, _options);
 	}
 	
-	DataStorageResponse ResultDataStorageAPI::searchInResultCollection(const std::string& _queryFilter, const std::string& _projectionQuery, int _limit)
+	DataStorageResponse DataLakeAPI::searchInResultCollection(const std::string& _queryFilter, const std::string& _projectionQuery, int _limit)
 	{
 		return searchInResultCollection(bsoncxx::from_json(_queryFilter), bsoncxx::from_json(_projectionQuery), _limit);
 	}
 
-	void ResultDataStorageAPI::flushQueuedData()
+	void DataLakeAPI::flushQueuedData()
 	{
 		m_docBase.FlushQueuedDocuments();
 	}

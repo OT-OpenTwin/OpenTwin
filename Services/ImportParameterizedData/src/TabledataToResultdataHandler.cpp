@@ -25,7 +25,7 @@
 #include "Documentation.h"
 #include "DataCategorizationConsistencyChecker.h"
 
-#include "OTDataStorage/ResultDataStorageAPI.h"
+#include "OTDataStorage/DataLakeAPI.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityAPI.h"

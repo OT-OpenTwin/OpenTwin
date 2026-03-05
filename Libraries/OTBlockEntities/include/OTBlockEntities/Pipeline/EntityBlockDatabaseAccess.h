@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/ValueComparisonDefinition.h"
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTBlockEntities/EntityBlock.h"
 
 struct __declspec(dllexport) ValueCharacteristicProperties
@@ -59,12 +59,12 @@ public:
 
 	int32_t getSelectedNumberOfQueries();
 	
-	const ot::ValueComparisonDefinition getSelectedQuantityDefinition();
+	ot::ValueComparisonDescription getSelectedQuantityDefinition();
 
-	const std::list<ot::ValueComparisonDefinition> getAdditionalQueries();
-	const std::list<ot::ValueComparisonDefinition> getMetadataQueries();
+	std::list<ot::ValueComparisonDescription> getAdditionalQueries();
+	std::list<ot::ValueComparisonDescription> getMetadataQueries();
 
-	const ot::Connector getConnectorOutput() const { return m_connectorOutput; }	
+	ot::Connector getConnectorOutput() const { return m_connectorOutput; }	
 
 	virtual bool updateFromProperties() override;
 
@@ -72,7 +72,7 @@ public:
 
 	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
 
-	bool getReproducableOrder() ;
+	bool getReproducibleOrder() ;
 
 	static const std::string getIconName() {return "Database_access.svg"; }
 
@@ -101,7 +101,10 @@ private:
 	const std::string m_propertyTupleFormat = "Format";
 	const std::string m_propertyTupleTarget = "Target";
 	const std::string m_propertyTupleUnit = "Units";
+	const std::string m_propertyOrder = "Order reproducible";
 	
+
+
 	const std::string m_propertyDataType = "Data type";
 	const std::string m_propertyComparator = "Comparator";
 	const std::string m_propertyValue = "Value";
@@ -111,7 +114,7 @@ private:
 
 	void createUpdatedProperty(const std::string& _propName, const std::string& _propGroup, const std::string& _labelValue, EntityProperties& properties);
 
-	const ot::ValueComparisonDefinition getSelectedValueComparisonDefinition(const std::string& _groupName);
+	const ot::ValueComparisonDescription getSelectedValueComparisonDefinition(const std::string& _groupName);
 
 	bool setVisibleParameter(const std::string& _groupName,bool _visible);
 	void updateBlockConfig();

@@ -29,11 +29,11 @@
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTCore/GenericDataStructSingle.h"
-#include "OTCore/ValueComparisonDefinition.h"
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTCore/ExplicitStringValueConverter.h"
 #include "OTCore/ResultCollectionDefaultIndexes.h"
 
-#include "OTDataStorage/ResultDataStorageAPI.h"
+#include "OTDataStorage/DataLakeAPI.h"
 
 #include "OTResultDataAccess/ResultCollection/IndexHandler.h"
 #include "OTResultDataAccess/QuantityContainer.h"
@@ -57,7 +57,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		throw std::exception(errorMessage.c_str());
 	}
 	
-	m_resultCollectionAccess = new DataStorageAPI::ResultDataStorageAPI(collectionName);
+	m_resultCollectionAccess = new DataStorageAPI::DataLakeAPI(collectionName);
 	IndexHandler indexHandler(collectionName);
 	indexHandler.createDefaultIndexes();
 
@@ -244,7 +244,7 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 	//Adding all parameter that may occur in the returned documents.
 	addParameterQueries(_blockEntity);
 
-	m_sortByID = _blockEntity->getReproducableOrder();
+	m_sortByID = _blockEntity->getReproducibleOrder();
 	if (m_sortByID)
 	{
 		m_sort = (bsoncxx::builder::stream::document{}
@@ -263,7 +263,7 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 
 void BlockHandlerDatabaseAccess::addParameterQueries(EntityBlockDatabaseAccess* _blockEntity)
 {
-	std::list<ot::ValueComparisonDefinition> queries =	_blockEntity->getAdditionalQueries();
+	/*std::list<ot::ValueComparisonDefinition> queries =	_blockEntity->getAdditionalQueries();
 	const auto& parametersByLabel =	m_resultCollectionMetadataAccess->getMetadataCampaign().getMetadataParameterByLabel();
 	for (ot::ValueComparisonDefinition& query : queries)
 	{
@@ -283,14 +283,14 @@ void BlockHandlerDatabaseAccess::addParameterQueries(EntityBlockDatabaseAccess* 
 			}
 			addComparision(query);
 		}
-	}
+	}*/
 }
 
 const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockDatabaseAccess* _blockEntity)
 {
 	const MetadataSeries* series = nullptr;
 	const std::string seriesLabel = _blockEntity->getSeriesSelection()->getValue();
-	std::list<ot::ValueComparisonDefinition> metadataQueries =	_blockEntity->getMetadataQueries();
+	std::list<ot::ValueComparisonDescription> metadataQueries =	_blockEntity->getMetadataQueries();
 
 	std::list<const MetadataSeries*> matchingSeries;
 	if (seriesLabel != "")
@@ -381,7 +381,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 		series = *matchingSeries.begin();
 		assert(series != nullptr);
 		ot::UID valueUID = series->getSeriesIndex();
-		ot::ValueComparisonDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
+		ot::ValueComparisonDescription seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
 		addComparision(seriesComparision);
 		LabelFieldNamePair labelFieldNamePair;
 		labelFieldNamePair.m_fieldName = std::to_string(series->getSeriesIndex()) ;
@@ -395,7 +395,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 
 		for (const MetadataSeries* series : matchingSeries)
 		{
-			ot::ValueComparisonDefinition seriesComparison(MetadataSeries::getFieldName(), "=", std::to_string(series->getSeriesIndex()), ot::TypeNames::getInt64TypeName(), "");
+			ot::ValueComparisonDescription seriesComparison(MetadataSeries::getFieldName(), "=", std::to_string(series->getSeriesIndex()), ot::TypeNames::getInt64TypeName(), "");
 			BsonViewOrValue query = builder.createComparison(seriesComparison);
 			queries.push_back(std::move(query));
 
@@ -413,7 +413,7 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 
 void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _blockEntity)
 {
-	ot::ValueComparisonDefinition quantityDef = _blockEntity->getSelectedQuantityDefinition();
+	ot::ValueComparisonDescription quantityDef = _blockEntity->getSelectedQuantityDefinition();
 	if (quantityDef.getName() == "")
 	{
 		throw std::exception("DatabaseAccessBlock has no quantity set.");
@@ -456,7 +456,7 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 
 			assert(valueUID != 0);
 			//Now we add the query for the quantity ID
-			ot::ValueComparisonDefinition selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
+			ot::ValueComparisonDescription selectedQuantityDef(MetadataQuantity::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
 			AdvancedQueryBuilder builder;
 			BsonViewOrValue quantityMatch = builder.createComparison(selectedQuantityDef);
 			
@@ -465,29 +465,29 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 
 			const TupleInstance& tupleInstance = viableQuantity->m_tupleDescription;
 
-			if (!tupleInstance.isSingle())
-			{
-				quantityDef.setStorageTupleDescription(viableQuantity->m_tupleDescription);
-				auto queryTupleDef = quantityDef.getQueryTupleDescription();
-				queryTupleDef.setTupleTypeName(viableQuantity->m_tupleDescription.getTupleTypeName());
-				queryTupleDef.setTupleElementDataTypes(viableQuantity->m_tupleDescription.getTupleElementDataTypes());
-				quantityDef.setQueryTupleDescription(queryTupleDef);
-			}
-			
-			if (!quantityDef.getComparator().empty() && !quantityDef.getValue().empty())
-			{
-				if (quantityDef.getType() == ot::TypeNames::getStringTypeName() && quantityDef.getComparator() != "=")
-				{
-					throw std::exception(("Query for " + quantityDef.getName() + " targets a string value with a not supported comparator. Only equality queries are currently supported.").c_str());
-				}
-				BsonViewOrValue filter= builder.createComparison(quantityDef);
-				BsonViewOrValue combinedQuery =	builder.connectWithAND({ quantityMatch,filter });
-				allQuantityQueries.push_back(combinedQuery);
-			}
-			else
-			{
-				allQuantityQueries.push_back(quantityMatch);
-			}
+			//if (!tupleInstance.isSingle())
+			//{
+			//	quantityDef.setStorageTupleDescription(viableQuantity->m_tupleDescription);
+			//	auto queryTupleDef = quantityDef.getQueryTupleDescription();
+			//	queryTupleDef.setTupleTypeName(viableQuantity->m_tupleDescription.getTupleTypeName());
+			//	queryTupleDef.setTupleElementDataTypes(viableQuantity->m_tupleDescription.getTupleElementDataTypes());
+			//	quantityDef.setQueryTupleDescription(queryTupleDef);
+			//}
+			//
+			//if (!quantityDef.getComparator().empty() && !quantityDef.getValue().empty())
+			//{
+			//	if (quantityDef.getType() == ot::TypeNames::getStringTypeName() && quantityDef.getComparator() != "=")
+			//	{
+			//		throw std::exception(("Query for " + quantityDef.getName() + " targets a string value with a not supported comparator. Only equality queries are currently supported.").c_str());
+			//	}
+			//	BsonViewOrValue filter= builder.createComparison(quantityDef);
+			//	BsonViewOrValue combinedQuery =	builder.connectWithAND({ quantityMatch,filter });
+			//	allQuantityQueries.push_back(combinedQuery);
+			//}
+			//else
+			//{
+			//	allQuantityQueries.push_back(quantityMatch);
+			//}
 		}
 		if (allQuantityQueries.size() == 1)
 		{
@@ -502,14 +502,14 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	}
 }
 
-void BlockHandlerDatabaseAccess::addComparision(const ot::ValueComparisonDefinition& _definition)
+void BlockHandlerDatabaseAccess::addComparision(const ot::ValueComparisonDescription& _definition)
 {
 	if (!_definition.getComparator().empty() && !_definition.getValue().empty())
 	{
-		if (_definition.getType() == ot::TypeNames::getStringTypeName() && _definition.getComparator()!= "=")
+		/*if (_definition.getType() == ot::TypeNames::getStringTypeName() && _definition.getComparator()!= "=")
 		{
 			throw std::exception(("Query for " + _definition.getName() + " targets a string value with a not supported comparator. Only equality queries are currently supported.").c_str());
-		}
+		}*/
 		AdvancedQueryBuilder builder;
 		BsonViewOrValue query =	builder.createComparison(_definition);
 		m_comparisons.push_back(query);
@@ -535,7 +535,7 @@ void BlockHandlerDatabaseAccess::applyRegexFilter(std::list<std::string>& _optio
 	}	
 }
 
-bool BlockHandlerDatabaseAccess::compare(const ot::ValueComparisonDefinition& _comparisonDef, const ot::JsonValue& _value)
+bool BlockHandlerDatabaseAccess::compare(const ot::ValueComparisonDescription& _comparisonDef, const ot::JsonValue& _value)
 {
 	std::string type;
 	if (_value.IsInt())

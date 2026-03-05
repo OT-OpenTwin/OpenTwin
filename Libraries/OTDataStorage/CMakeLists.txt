@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.20)
 
 project(OTDataStorage LANGUAGES CXX)
 
@@ -120,7 +120,7 @@ set(OTDATASTORAGE_SOURCE_FILES
     src/GridFSFileInfo.cpp
     src/MongoDBAssertions.cpp
     src/QueryBuilder.cpp
-    src/ResultDataStorageAPI.cpp
+    src/DataLakeAPI.cpp
     src/SystemDataAccess.cpp
     src/ThreadLocalClientInitialiser.cpp
     src/UniqueFileName.cpp
@@ -147,7 +147,7 @@ set(OTDATASTORAGE_HEADER_FILES
     include/OTDataStorage/Document/DocumentAccessBase.h
     include/OTDataStorage/Document/DocumentManager.h
     include/OTDataStorage/GridFSFileInfo.h
-    include/OTDataStorage/ResultDataStorageAPI.h
+    include/OTDataStorage/DataLakeAPI.h
     include/OTDataStorage/System/SystemDataAccess.h
     include/OTDataStorage/targetver.h
     include/OTDataStorage/Helper/UniqueFileName.h

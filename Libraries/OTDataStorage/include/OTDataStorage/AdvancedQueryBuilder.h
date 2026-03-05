@@ -23,12 +23,12 @@
 #include "OTCore/Variable.h"
 #include "OTDataStorage/Helper/QueryBuilder.h"
 #include "OTCore/ComparisonSymbols.h"
-#include "OTCore/ValueComparisonDefinition.h"
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
 
 class __declspec(dllexport) AdvancedQueryBuilder : public DataStorageAPI::QueryBuilder
 {
 public:
-	BsonViewOrValue createComparison(const ot::ValueComparisonDefinition& _valueComparison);
+	BsonViewOrValue createComparison(const ot::ValueComparisonDescription& _valueComparison);
 
 	BsonViewOrValue connectWithAND(std::list<BsonViewOrValue>&& values);
 	BsonViewOrValue connectWithOR(std::list<BsonViewOrValue>&& values);
@@ -37,11 +37,11 @@ private:
 	inline static const std::map<std::string, std::string> m_mongoDBComparators = { {"<","$lt"},{"<=","$lte"},{">=","$gte"},{">","$gt"},{"=","$eq"}, {"!=", "$ne"}, {ot::ComparisonSymbols::g_anyOneOfComparator,"$in"}, {ot::ComparisonSymbols::g_noneOfComparator,"$nin"} };
 	const std::string m_listSplitToken = ",";
 	
-	BsonViewOrValue buildRangeQuery(const ot::ValueComparisonDefinition& _definition);
+	BsonViewOrValue buildRangeQuery(const ot::ValueComparisonDescription& _definition);
 	std::list<ot::Variable> getListOfValuesFromString(const std::string& _allValues, const std::vector<std::string>& _dataTypes);
-	std::list<ot::Variable> getVariableListFromValue(const ot::ValueComparisonDefinition& _definition);
+	std::list<ot::Variable> getVariableListFromValue(const ot::ValueComparisonDescription& _definition);
 	
 	BsonViewOrValue createComparisionEqualNoneOf(const std::list<ot::Variable>& values);
 	BsonViewOrValue createComparisionEqualToAnyOf(const std::list<ot::Variable>& values);
-	void noTupleAllowedCheck(const ot::ValueComparisonDefinition& _definition);
+	void noTupleAllowedCheck(const ot::ValueComparisonDescription& _definition);
 };

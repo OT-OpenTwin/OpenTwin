@@ -20,7 +20,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTDataStorage/ResultDataStorageAPI.h"
 #include "OTModelEntities/EntityCallbackBase.h"
 #include "OTServiceFoundation/ApplicationBase.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"

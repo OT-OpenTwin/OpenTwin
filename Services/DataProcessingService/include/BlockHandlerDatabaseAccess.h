@@ -23,9 +23,9 @@
 #include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
-#include "OTDataStorage/ResultDataStorageAPI.h"
 #include "OTCore/StringToVariableConverter.h"
 #include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
+#include "OTDataStorage/DataLakeAPI.h"
 
 class BlockHandlerDatabaseAccess : public BlockHandler
 {
@@ -43,7 +43,7 @@ private:
 		std::string m_fieldName;
 	};
 	
-	DataStorageAPI::ResultDataStorageAPI* m_resultCollectionAccess = nullptr;
+	DataStorageAPI::DataLakeAPI* m_resultCollectionAccess = nullptr;
 	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
 
 	std::list< BsonViewOrValue> m_comparisons;
@@ -65,8 +65,8 @@ private:
 	void addQuantityQuery(EntityBlockDatabaseAccess* _blockEntity);
 	void addParameterQueries(EntityBlockDatabaseAccess* _blockEntity);
 		
-	void addComparision(const ot::ValueComparisonDefinition& _definition);
+	void addComparision(const ot::ValueComparisonDescription& _definition);
 
 	void applyRegexFilter(std::list<std::string>& _options, const std::string& _filter);
-	bool compare(const ot::ValueComparisonDefinition& _comparisionDef, const ot::JsonValue& _value);
+	bool compare(const ot::ValueComparisonDescription& _comparisionDef, const ot::JsonValue& _value);
 };

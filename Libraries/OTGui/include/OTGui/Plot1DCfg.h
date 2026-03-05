@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Plot1DCfg.h
 // 
 // License:
@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
-#include "OTCore/ValueComparisonDefinition.h"
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTGui/Plot1DAxisCfg.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/NavigationTreeItemIcon.h"
@@ -147,9 +147,9 @@ namespace ot {
 		const std::string& getAxisLabelX() const { return m_xAxis.getAxisLabel(); };
 		void setAxisLabelX(const std::string& _label) { m_xAxis.setAxisLabel(_label); };
 
-		const std::list<ValueComparisonDefinition>& getQueries() { return m_queries; };
-		void setQueries(const std::list<ValueComparisonDefinition>& _queries) { m_queries = _queries; };
-		void setQueries(std::list<ValueComparisonDefinition>&& _queries) { m_queries = std::move(_queries); };
+		const std::list<ValueComparisonDescription>& getQueries() { return m_queries; };
+		void setQueries(const std::list<ValueComparisonDescription>& _queries) { m_queries = _queries; };
+		void setQueries(std::list<ValueComparisonDescription>&& _queries) { m_queries = std::move(_queries); };
 
 		void setUseLimitNbOfCurves(bool _useLimit) { m_useLimit = _useLimit; };
 		bool getUseLimitNbOfCurves() const { return m_useLimit; };
@@ -186,7 +186,7 @@ namespace ot {
 		int32_t m_curveLimit = 25;
 
 		NavigationTreeItemIcon m_treeIcons;
-		std::list<ValueComparisonDefinition> m_queries;
+		std::list<ValueComparisonDescription> m_queries;
 
 		Plot1DAxisCfg m_xAxis;
 		Plot1DAxisCfg m_yAxis;

@@ -110,10 +110,10 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 const std::string CurveFactory::createQuery(ot::UID _seriesID, ot::UID _quantityID)
 {
 	AdvancedQueryBuilder builder;
-	ot::ValueComparisonDefinition seriesComparison(MetadataSeries::getFieldName(), "=", std::to_string(_seriesID), ot::TypeNames::getInt64TypeName(), "");
+	ot::ValueComparisonDescription seriesComparison(MetadataSeries::getFieldName(), "=", std::to_string(_seriesID), ot::TypeNames::getInt64TypeName(), "");
 	auto firstComparision = builder.createComparison(seriesComparison);
 
-	ot::ValueComparisonDefinition quantityComparison(MetadataQuantity::getFieldName(), "=", std::to_string(_quantityID), ot::TypeNames::getInt64TypeName(), "");
+	ot::ValueComparisonDescription quantityComparison(MetadataQuantity::getFieldName(), "=", std::to_string(_quantityID), ot::TypeNames::getInt64TypeName(), "");
 	auto secondComparision = builder.createComparison(quantityComparison);
 	auto finalQuery = builder.connectWithAND({ firstComparision,secondComparision });
 

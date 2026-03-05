@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ExternalServicesComponent.h
 // 
 // License:
@@ -37,7 +37,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionDispatchProfiler.h"
-#include "OTDataStorage/ResultDataStorageAPI.h"
+#include "OTDataStorage/DataLakeAPI.h"
 
 // Model header
 #include "OTModelEntities/Geometry.h"

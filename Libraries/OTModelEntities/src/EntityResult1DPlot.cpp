@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityResult1DPlot.cpp
 // 
 // License:
@@ -259,7 +259,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot() {
 	const int32_t showMatrixRowValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix row entry");
 	const int32_t showMatrixColumnValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix column entry");
 
-	std::list<ot::ValueComparisonDefinition> queries = m_querySettings.getValueComparisonDefinitions(this);
+	std::list<ot::ValueComparisonDescription> queries = m_querySettings.getValueComparisonDefinitions(this);
 
 	ot::Plot1DCfg config;
 	config.setEntityName(getName());

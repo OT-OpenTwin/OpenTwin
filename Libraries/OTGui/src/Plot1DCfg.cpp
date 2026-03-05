@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Plot1DCfg.cpp
 // 
 // License:
@@ -101,7 +101,7 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	_object.AddMember("ShowMatrixColumn", m_showMatrixColumnEntry, _allocator);
 
 	JsonArray allQueries;
-	for(const ValueComparisonDefinition& query : m_queries)
+	for(const ValueComparisonDescription& query : m_queries)
 	{
 		JsonObject querySerialised;
 		query.addToJsonObject(querySerialised, _allocator);
@@ -139,7 +139,7 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	for (uint32_t i = 0; i < allQueries.Size(); i++)
 	{
 		const auto& query = ot::json::getObject(allQueries, i);
-		ValueComparisonDefinition valueDescription;
+		ValueComparisonDescription valueDescription;
 		valueDescription.setFromJsonObject(query);
 		m_queries.push_back(valueDescription);
 	}

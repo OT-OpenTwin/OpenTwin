@@ -199,13 +199,17 @@ set(OTCORE_HEADER_FILES
     include/OTCore/TimeFormatter.h
     include/OTCore/TypeNames.h
     include/OTCore/UIDNamePair.h
-    include/OTCore/ValueComparisonDefinition.h
     include/OTCore/Variable.h
     include/OTCore/VariableListToStringListConverter.h
     include/OTCore/VariableToBSONStringConverter.h
     include/OTCore/VariableToJSONConverter.h
     include/OTCore/VariableToStringConverter.h
     include/OTCore/Units/SI.h
+    
+    include/OTCore/QueryDescription/ValueComparisonDescription.h
+    include/OTCore/QueryDescription/QueryDescription.h
+    include/OTCore/QueryDescription/QueryTargetDescription.h
+    
     include/OTCore/Tuple/TupleDescription.h
     include/OTCore/Tuple/TupleDescriptionComplex.h
     include/OTCore/Tuple/TupleDescriptionSingle.h
@@ -266,7 +270,7 @@ set(OTCORE_SOURCE_FILES
     src/TextEncoding.cpp
     src/ThisService.cpp
     src/UIDNamePair.cpp
-    src/ValueComparisonDefinition.cpp
+   
     src/Variable.cpp
     src/VariableListToStringListConverter.cpp
     src/VariableToBSONStringConverter.cpp
@@ -277,6 +281,10 @@ set(OTCORE_SOURCE_FILES
     src/TupleDescriptionComplex.cpp
     src/TupleDescriptionSingle.cpp
     src/TupleInstance.cpp
+
+    src/ValueComparisonDescription.cpp
+    src/QueryDescription.cpp
+    src/QueryTargetDescription.cpp
 
 )
 

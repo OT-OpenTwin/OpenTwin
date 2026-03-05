@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: QuantityContainerSerialiser.h
 // 
 // License:
@@ -28,6 +28,7 @@
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
+#include "OTDataStorage/DataLakeAPI.h"
 
 class QuantityContainerSerialiser
 {
@@ -39,7 +40,7 @@ public:
 	void flushQuantityContainer();
 
 private:
-	DataStorageAPI::ResultDataStorageAPI m_dataStorageAccess;
+	DataStorageAPI::DataLakeAPI m_dataStorageAccess;
 	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionCurve* _quantityDescription);
 	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionCurveComplex* _quantityDescription);
 	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionSParameter* _quantityDescription);
