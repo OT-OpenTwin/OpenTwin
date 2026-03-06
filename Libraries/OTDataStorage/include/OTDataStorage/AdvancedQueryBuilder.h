@@ -38,7 +38,7 @@ private:
 	const std::string m_listSplitToken = ",";
 	
 	BsonViewOrValue buildRangeQuery(const ot::ValueComparisonDescription& _definition);
-	std::list<ot::Variable> getListOfValuesFromString(const std::string& _allValues, const std::vector<std::string>& _dataTypes);
+	std::vector<ot::Variable> getListOfValuesFromString(const std::string& _allValues, const std::vector<std::string>& _dataTypes);
 	std::list<ot::Variable> getVariableListFromValue(const ot::ValueComparisonDescription& _definition);
 	
 	BsonViewOrValue createComparisionEqualNoneOf(const std::list<ot::Variable>& values);

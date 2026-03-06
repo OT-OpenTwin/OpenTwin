@@ -50,7 +50,7 @@ namespace ot {
 		const TupleInstance& getTupleInstance() const { return m_tupleDescription; }
 
 		void setTupleTarget(const std::string& _tupleTarget) { m_tupleTarget = _tupleTarget; }
-		const std::string& getTupleTarget() { return m_tupleTarget; }
+		const std::string& getTupleTarget() const { return m_tupleTarget; }
 	private:
 		std::string m_name;
 		std::string m_comparator;
