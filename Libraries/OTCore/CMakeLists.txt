@@ -190,6 +190,7 @@ set(OTCORE_HEADER_FILES
     include/OTCore/String.hpp
     include/OTCore/StringToNumericCheck.h
     include/OTCore/StringToVariableConverter.h
+    include/OTCore/Symbol.h
     include/OTCore/SystemServiceConfigInfo.h
     include/OTCore/TemplateTypeName.h
     include/OTCore/TemplateTypeName.hpp
