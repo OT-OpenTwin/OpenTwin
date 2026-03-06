@@ -195,7 +195,26 @@ void TransformManipulator::performOperation(void)
 	doc.AddMember("Axis Z", m_lastPropertyAxis.z(), doc.GetAllocator());
 
 	doc.AddMember("Angle", m_lastPropertyAngle, doc.GetAllocator());
-	
+
+	doc.AddMember("RotationCenter X", m_initialSphereCenter.x(), doc.GetAllocator());
+	doc.AddMember("RotationCenter Y", m_initialSphereCenter.y(), doc.GetAllocator());
+	doc.AddMember("RotationCenter Z", m_initialSphereCenter.z(), doc.GetAllocator());
+
+	osg::Matrix transformMatrix = m_viewer3D->getModel()->getCurrentWorkingPlaneTransform();
+
+	// OpenSceneGraph uses row based transformation matrices whereas OpenCASCADE uses column based matrices. In our case, the working plane transform is an
+	// OSG matrix, but the shape creation itself is based on OpenCASCADE. Therefore we need to transpose the matrix.
+	transformMatrix.transpose(transformMatrix);
+
+	std::vector<double> transform;
+	transform.reserve(16);
+	for (int i = 0; i < 16; i++)
+	{
+		transform.push_back(transformMatrix.ptr()[i]);
+	}
+
+	doc.AddMember("Active Coordinate Transform", ot::JsonArray(transform, doc.GetAllocator()), doc.GetAllocator());
+
 	std::string selectionInfo = doc.toJson();
 
 	// Send the selection message to the model
