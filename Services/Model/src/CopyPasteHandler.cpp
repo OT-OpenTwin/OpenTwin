@@ -130,8 +130,6 @@ void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitie
 				newEntity->setName(newName);
 				recursivelyRenameChildren(oldName, newName, newEntity);
 			}
-		
-			newEntity->storeToDataBase();  // This will also store all children and potentially associated data entities
 		}
 	}
 
@@ -142,6 +140,22 @@ void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitie
 	for (auto& newEntityByName : _newEntitiesByName)
 	{
 		EntityBase* newEntity = newEntityByName.second;
+
+		EntityContainer* container = dynamic_cast<EntityContainer*>(newEntity);
+		if (container != nullptr)
+		{
+			// Here we need to remove the parent / child relationships, since this will be added during the actual insertion of the entities into the model
+			// (based on the names)
+			std::list<EntityBase*> childrenList = container->getChildrenList();
+			while (!childrenList.empty())
+			{
+				childrenList.front()->setParent(nullptr);
+				container->removeChild(childrenList.front());
+				childrenList = container->getChildrenList();
+			}
+		}
+
+		newEntity->storeToDataBase();
 
 		if (newEntity->getEntityType() == EntityBase::entityType::TOPOLOGY)
 		{
