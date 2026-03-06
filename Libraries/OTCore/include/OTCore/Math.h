@@ -22,17 +22,73 @@
 // OpenTwin header
 #include "OTCore/Point2D.h"
 
+// std header
+#include <cmath>
+#include <algorithm>
+
 namespace ot {
 
+	//! @brief The Math class provides mathematical constants and general utility functions.
 	class OT_CORE_API_EXPORT Math {
 	public:
+
 		enum ComplexRepresentation {
 			RealImaginary, //! Complex number represented as real and imaginary parts
 			MagnitudePhase //! Complex number represented as magnitude and phase
 		};
-
 		static std::string toString(ComplexRepresentation _representation);
 		static ComplexRepresentation stringToComplexRepresentation(const std::string& _representation);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// pi
+
+		static constexpr double pi() noexcept { return 3.141592653589793238462643383279502884; };
+		static constexpr double twoPi() noexcept { return 6.283185307179586476925286766559005768; };
+		static constexpr double halfPi() noexcept { return 1.570796326794896619231321691639751442; };
+		static constexpr double quarterPi() noexcept { return 0.785398163397448309615660845819875721; };
+		static constexpr double invPi() noexcept { return 0.318309886183790671537767526745028724; };
+		static constexpr double invTwoPi() noexcept { return 0.159154943091895335768883763372514362; };
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Roots
+
+		static constexpr double sqrt2() noexcept { return 1.414213562373095048801688724209698079; }
+		static constexpr double invSqrt2() noexcept { return 0.707106781186547524400844362104849039; }
+		static constexpr double sqrtPi() noexcept { return 1.772453850905516027298167483341145182; }
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Exponential and logarithmic constants
+
+		static constexpr double e() noexcept { return 2.718281828459045235360287471352662498; }
+
+		static constexpr double ln2() noexcept { return 0.693147180559945309417232121458176568; }
+		static constexpr double ln10() noexcept { return 2.302585092994045684017991454684364208; }
+
+		static constexpr double log2e() noexcept { return 1.442695040888963407359924681001892137; }
+		static constexpr double log10e() noexcept { return 0.434294481903251827651128918916605082; }
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+		
+		// Conversion
+
+		static constexpr double degToRad(double _value) noexcept { return _value * (pi() / 180.0); };
+		static constexpr double radToDeg(double _value) noexcept { return _value * (180.0 / pi()); };
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Scaling with decibels
+
+		static constexpr double scaleWithDB10(double _value) noexcept { return 10 * std::log10(_value); };
+		static constexpr double invScaleWithDB10(double _value) noexcept { return std::pow(10, _value / 10); };
+		static constexpr double scaleWithDB20(double _value) noexcept { return 20 * std::log10(_value); };
+		static constexpr double invScaleWithDB20(double _value) noexcept { return std::pow(10, _value / 20); };
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Distance calculations
 
 		//! @brief Calculates the Euclidean distance betwenn the two given points.
 		//! @param _x1 Point 1 X.
@@ -86,6 +142,7 @@ namespace ot {
 
 		//! @see Point2DD calculateShortestDistanceFromPointToBezierCurve(double _px, double _py, double _startX, double _startY, double _control1X, double _control1Y, double _control2X, double _control2Y, double _endX, double _endY)
 		static double calculateShortestDistanceFromPointToBezierCurve(const Point2DD& _pt, const Point2DD& _start, const Point2DD& _control1, const Point2DD& _control2, const Point2DD& _end) { return Math::calculateShortestDistanceFromPointToBezierCurve(_pt.x(), _pt.y(), _start.x(), _start.y(), _control1.x(), _control1.y(), _control2.x(), _control2.y(), _end.x(), _end.y()); };
+
 	};
 
 }

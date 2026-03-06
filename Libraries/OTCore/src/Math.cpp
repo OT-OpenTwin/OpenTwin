@@ -22,8 +22,6 @@
 #include "OTCore/Logging/LogDispatcher.h"
 
 // std header
-#include <cmath>
-#include <algorithm>
 
 std::string ot::Math::toString(ComplexRepresentation _representation) {
     switch (_representation) {
@@ -47,6 +45,10 @@ ot::Math::ComplexRepresentation ot::Math::stringToComplexRepresentation(const st
 		return ComplexRepresentation::RealImaginary;
     }
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Distance calculations
 
 double ot::Math::euclideanDistance(double _x1, double _y1, double _x2, double _y2) {
     return std::sqrt((_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2));
