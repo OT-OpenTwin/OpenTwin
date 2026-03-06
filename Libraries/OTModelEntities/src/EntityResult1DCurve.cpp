@@ -157,7 +157,7 @@ void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
 	colorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
 
 	// Line width
-	EntityPropertiesInteger* widthProp = EntityPropertiesInteger::createProperty("General", "Line Width", 1, 1, 99, "", getProperties());
+	EntityPropertiesInteger* widthProp = EntityPropertiesInteger::createProperty("General", "Line Width", 2, 1, 99, "", getProperties());
 	widthProp->setToolTip("The width of the curve line in the plot.");
 	widthProp->setAllowCustomValues(false);
 
