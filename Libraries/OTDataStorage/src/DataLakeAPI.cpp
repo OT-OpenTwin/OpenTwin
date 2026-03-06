@@ -32,7 +32,7 @@ namespace DataStorageAPI
 
 	}
 
-	DataStorageResponse DataLakeAPI::insertDocumentToResultStorage(Document& _jsonData, bool _checkForExistence, bool _allowQueueing)
+	DataStorageResponse DataLakeAPI::insertDocumentToDataLakePartition(Document& _jsonData, bool _checkForExistence, bool _allowQueueing)
 	{
 		auto jsonDataLength = _jsonData.view().length();
 		if (jsonDataLength > m_maxDocumentLength)
@@ -46,7 +46,7 @@ namespace DataStorageAPI
 		return m_documentAccess.InsertDocumentToDatabase(_jsonData.extract(), _allowQueueing);
 	}
 
-	DataStorageResponse DataLakeAPI::searchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, int _limit)
+	DataStorageResponse DataLakeAPI::searchInDataLakePartition(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, int _limit)
 	{
 
 		
@@ -54,14 +54,21 @@ namespace DataStorageAPI
 
 	}
 
-	DataStorageResponse DataLakeAPI::searchInResultCollection(BsonViewOrValue _queryFilter, mongocxx::options::find& _options)
+	DataStorageResponse DataLakeAPI::searchInDataLakePartition(BsonViewOrValue _queryFilter, mongocxx::options::find& _options)
 	{
 		return m_documentAccess.GetAllDocuments(_queryFilter, _options);
 	}
 	
-	DataStorageResponse DataLakeAPI::searchInResultCollection(const std::string& _queryFilter, const std::string& _projectionQuery, int _limit)
+	DataStorageResponse DataLakeAPI::searchInDataLakePartition(const std::string& _queryFilter, const std::string& _projectionQuery, int _limit)
 	{
-		return searchInResultCollection(bsoncxx::from_json(_queryFilter), bsoncxx::from_json(_projectionQuery), _limit);
+		return searchInDataLakePartition(bsoncxx::from_json(_queryFilter), bsoncxx::from_json(_projectionQuery), _limit);
+	}
+
+	int64_t DataLakeAPI::countInDataLakePartition(BsonViewOrValue _queryFilter)
+	{
+		auto& collection = getCollection();
+		int64_t count =	collection.count_documents(_queryFilter);
+		return count;
 	}
 
 	void DataLakeAPI::flushQueuedData()

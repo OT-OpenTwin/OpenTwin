@@ -49,7 +49,7 @@ ot::JsonDocument DataLakeAccessor::executeQuery(mongocxx::options::find _options
 		auto startTime = std::chrono::high_resolution_clock::now();
 		DataStorageAPI::DataLakeAPI resultCollectionAccess(m_collectionName);
 		auto collectionHandleCreated = std::chrono::high_resolution_clock::now();
-		DataStorageAPI::DataStorageResponse dbResponse = resultCollectionAccess.searchInResultCollection(resultCollectionQuery, _options);
+		DataStorageAPI::DataStorageResponse dbResponse = resultCollectionAccess.searchInDataLakePartition(resultCollectionQuery, _options);
 		auto queryExecuted = std::chrono::high_resolution_clock::now();
 		if (dbResponse.getSuccess())
 		{
@@ -122,12 +122,14 @@ bool DataLakeAccessor::transformationNecessary(const TupleInstance& _storedForma
 
 bool DataLakeAccessor::alreadyStoredTransformation(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat)
 {
+	DataStorageAPI::DataLakeAPI resultCollectionAccess(m_collectionName,".transformed");
+	//resultCollectionAccess.
 	return false;
 }
 
 void DataLakeAccessor::storeTransformation(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat)
 {
-
+	
 }
 
 BsonViewOrValue DataLakeAccessor::generateSeriesQuery()

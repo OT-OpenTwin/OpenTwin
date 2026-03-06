@@ -53,10 +53,11 @@ namespace DataStorageAPI
 		DataLakeAPI& operator=(DataLakeAPI&& _other) = default;
 		~DataLakeAPI() = default;
 
-		DataStorageResponse insertDocumentToResultStorage(Document& _jsonData, bool _checkForExistence, bool _allowQueueing);
-		DataStorageResponse searchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery,int _limit);
-		DataStorageResponse searchInResultCollection(BsonViewOrValue _queryFilter, mongocxx::options::find& _options);
-		DataStorageResponse searchInResultCollection(const std::string& _queryFilter, const std::string& _projectionQuery, int _limit);
+		DataStorageResponse insertDocumentToDataLakePartition(Document& _jsonData, bool _checkForExistence, bool _allowQueueing);
+		DataStorageResponse searchInDataLakePartition(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery,int _limit);
+		DataStorageResponse searchInDataLakePartition(BsonViewOrValue _queryFilter, mongocxx::options::find& _options);
+		DataStorageResponse searchInDataLakePartition(const std::string& _queryFilter, const std::string& _projectionQuery, int _limit);
+		int64_t countInDataLakePartition(BsonViewOrValue _queryFilter);
 		void flushQueuedData();
 
 		mongocxx::collection& getCollection() { return m_docBase.getCollection(); }

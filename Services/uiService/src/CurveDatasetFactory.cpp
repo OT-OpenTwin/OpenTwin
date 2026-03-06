@@ -106,7 +106,7 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 
 	const std::string queryTmp = bsoncxx::to_json(query);
 	const std::string projectionTmp = bsoncxx::to_json(projection);
-	DataStorageAPI::DataStorageResponse dbResponse = m_dataAccess.searchInResultCollection(query, projection, 0);
+	DataStorageAPI::DataStorageResponse dbResponse = m_dataAccess.searchInDataLakePartition(query, projection, 0);
 
 	if (dbResponse.getSuccess()) 
 	{

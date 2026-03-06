@@ -267,7 +267,7 @@ void QuantityContainerSerialiser::flushQuantityContainer()
 {
 	for (auto& qc : m_quantityContainer)
 	{
-		DataStorageAPI::DataStorageResponse response = m_dataStorageAccess.insertDocumentToResultStorage(qc.getMongoDocument(), false, true);
+		DataStorageAPI::DataStorageResponse response = m_dataStorageAccess.insertDocumentToDataLakePartition(qc.getMongoDocument(), false, true);
 		if (!response.getSuccess())
 		{
 			throw std::exception("Insertion of quantity container failed.");
