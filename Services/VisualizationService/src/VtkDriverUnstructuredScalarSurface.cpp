@@ -244,6 +244,9 @@ void VtkDriverUnstructuredScalarSurface::AddNodeContour(osg::Node* parent)
 	vtkNew<vtkPolyDataNormals> shadedContour;
 	shadedContour->SetInputConnection(bf->GetOutputPort());
 	shadedContour->SetFeatureAngle(45.0);
+	shadedContour->ConsistencyOn();
+	shadedContour->ComputeCellNormalsOn();
+	shadedContour->ComputePointNormalsOff();
 	//shadedContour->AutoOrientNormalsOn();  // This feature cannot be used if the surfaces are not closed surfaces (e.g. 2D data).
 
 	if (visData->GetShow2dIsolines())
@@ -268,6 +271,8 @@ void VtkDriverUnstructuredScalarSurface::AddNodeContour(osg::Node* parent)
 
 	vtkNew<vtkActor> scalarFieldActor;
 	scalarFieldActor->SetMapper(scalarFieldMapper);
+	scalarFieldActor->GetProperty()->LightingOn();
+	scalarFieldActor->GetProperty()->SetInterpolationToFlat();
 
 	osg::Node* cutNode = VTKActorToOSG(scalarFieldActor);
 	dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
