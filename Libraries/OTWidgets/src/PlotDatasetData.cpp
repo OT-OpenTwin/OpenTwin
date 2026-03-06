@@ -63,6 +63,8 @@ ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<s
 
 	setXQuantity(_initialXQuantity);
 	setYQuantity(_initialYQuantity);
+
+	updateData();
 }
 
 ot::PlotDatasetData::~PlotDatasetData()
@@ -79,21 +81,56 @@ ot::PlotDatasetData::~PlotDatasetData()
 	}
 }
 
-void ot::PlotDatasetData::setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity) {
+void ot::PlotDatasetData::updateData()
+{
+	applyQuantityWithScaling(m_xQuantity, m_xQuantityScaling, m_calcX);
+	applyQuantityWithScaling(m_yQuantity, m_yQuantityScaling, m_calcY);
+}
+
+void ot::PlotDatasetData::setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bool _updateData) {
 	if (m_xQuantity == _quantity || !m_canConvert) {
 		return;
 	}
-	else if (applyQuantity(_quantity, m_calcX)) {
-		m_xQuantity = _quantity;
+	m_xQuantity = _quantity;
+	
+	if (_updateData)
+	{
+		applyQuantityWithScaling(m_xQuantity, m_xQuantityScaling, m_calcX);
 	}
 }
 
-void ot::PlotDatasetData::setYQuantity(Plot1DAxisCfg::AxisQuantity _quantity) {
+void ot::PlotDatasetData::setXQuantityScaling(const Plot1DAxisCfg::QuantityScaling& _scaling, bool _updateData)
+{
+	if (m_xQuantityScaling == _scaling || !m_canConvert) {
+		return;
+	}
+	m_xQuantityScaling = _scaling;
+	if (_updateData)
+	{
+		applyQuantityWithScaling(m_xQuantity, m_xQuantityScaling, m_calcX);
+	}
+}
+
+void ot::PlotDatasetData::setYQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bool _updateData) {
 	if (m_yQuantity == _quantity || !m_canConvert) {
 		return;
 	}
-	else if (applyQuantity(_quantity, m_calcY)) {
-		m_yQuantity = _quantity;
+	m_yQuantity = _quantity;
+	if (_updateData)
+	{
+		applyQuantityWithScaling(m_yQuantity, m_yQuantityScaling, m_calcY);
+	}
+}
+
+void ot::PlotDatasetData::setYQuantityScaling(const Plot1DAxisCfg::QuantityScaling& _scaling, bool _updateData)
+{
+	if (m_yQuantityScaling == _scaling || !m_canConvert) {
+		return;
+	}
+	m_yQuantityScaling = _scaling;
+	if (_updateData)
+	{
+		applyQuantityWithScaling(m_yQuantity, m_yQuantityScaling, m_calcY);
 	}
 }
 
@@ -111,7 +148,32 @@ ot::PolarPlotDatasetData* ot::PlotDatasetData::getPolarAccessor() {
 	return m_polarAccessor;
 }
 
-bool ot::PlotDatasetData::applyQuantity(Plot1DAxisCfg::AxisQuantity _quantity, std::vector<double>& _dataTarget) {
+double ot::PlotDatasetData::scaledValue(double _value, const Plot1DAxisCfg::QuantityScaling& _scaling) const
+{
+	double result = _value;
+	if (_scaling.has(Plot1DAxisCfg::DB10)) {
+		if (result > 0.0) {
+			result = Math::scaleWithDB10(_value);
+		}
+		else {
+			result = (-200.);
+		}
+	}
+	if (_scaling.has(Plot1DAxisCfg::DB20))
+	{
+		if (result > 0.0)
+		{
+			result = Math::scaleWithDB20(_value);
+		}
+		else
+		{
+			result = (-200.);
+		}
+	}
+	return result;
+}
+
+bool ot::PlotDatasetData::applyQuantityWithScaling(Plot1DAxisCfg::AxisQuantity _quantity, const Plot1DAxisCfg::QuantityScaling& _scaling, std::vector<double>& _dataTarget) {
 	_dataTarget.clear();
 	
 	if (m_polarAccessor) {
@@ -126,7 +188,10 @@ bool ot::PlotDatasetData::applyQuantity(Plot1DAxisCfg::AxisQuantity _quantity, s
 			return false;
 		}
 
-		_dataTarget = m_dataX;
+		_dataTarget.reserve(m_dataX.size());
+		for (const auto& val : m_dataX) {
+			_dataTarget.push_back(scaledValue(val, _scaling));
+		}
 		return true;
 	}
 
@@ -142,28 +207,28 @@ bool ot::PlotDatasetData::applyQuantity(Plot1DAxisCfg::AxisQuantity _quantity, s
 	case Plot1DAxisCfg::Magnitude:
 		_dataTarget.reserve(m_dataY.size());
 		for (const auto& val : m_dataY) {
-			_dataTarget.push_back(std::abs(val));
+			_dataTarget.push_back(scaledValue(std::abs(val), _scaling));
 		}
 		break;
 
 	case Plot1DAxisCfg::Phase:
 		_dataTarget.reserve(m_dataY.size());
 		for (const auto& val : m_dataY) {
-			_dataTarget.push_back(std::arg(val));
+			_dataTarget.push_back(scaledValue(std::arg(val), _scaling));
 		}
 		break;
 
 	case Plot1DAxisCfg::Real:
 		_dataTarget.reserve(m_dataY.size());
 		for (const auto& val : m_dataY) {
-			_dataTarget.push_back(val.real());
+			_dataTarget.push_back(scaledValue(val.real(), _scaling));
 		}
 		break;
 
 	case Plot1DAxisCfg::Imaginary:
 		_dataTarget.reserve(m_dataY.size());
 		for (const auto& val : m_dataY) {
-			_dataTarget.push_back(val.imag());
+			_dataTarget.push_back(scaledValue(val.imag(), _scaling));
 		}
 		break;
 

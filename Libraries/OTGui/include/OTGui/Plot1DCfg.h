@@ -97,6 +97,7 @@ namespace ot {
 		const NavigationTreeItemIcon& getOldTreeIcons() const { return m_treeIcons; };
 
 		void setXAxis(const Plot1DAxisCfg& _xAxis) { m_xAxis = _xAxis; };
+		void setXAxis(Plot1DAxisCfg&& _xAxis) { m_xAxis = std::move(_xAxis); };
 		const Plot1DAxisCfg& getXAxis() const { return m_xAxis; };
 
 		void setXAxisMin(double _min) { m_xAxis.setMin(_min); };
@@ -115,6 +116,7 @@ namespace ot {
 		bool getXAxisIsAutoScale() const { return m_xAxis.getIsAutoScale(); };
 
 		void setYAxis(const Plot1DAxisCfg& _yAxis) { m_yAxis = _yAxis; };
+		void setYAxis(Plot1DAxisCfg&& _yAxis) { m_yAxis = std::move(_yAxis); };
 		const Plot1DAxisCfg& getYAxis() const { return m_yAxis; };
 
 		void setYAxisMin(double _min) { m_yAxis.setMin(_min); };
@@ -132,24 +134,32 @@ namespace ot {
 		void setYAxisIsAutoScale(bool _autoScaleEnabled) { m_yAxis.setIsAutoScale(_autoScaleEnabled); };
 		bool getYAxisIsAutoScale() const { return m_yAxis.getIsAutoScale(); };
 
-		std::string getXAxisParameter() const { return m_xAxisParameter; };
 		void setXAxisParameter(const std::string _parameterName) { m_xAxisParameter = _parameterName; };
+		std::string getXAxisParameter() const { return m_xAxisParameter; };
 
-		bool getXLabelAxisAutoDetermine() const { return m_xAxis.getAutoDetermineAxisLabel(); };
 		void setXLabelAxisAutoDetermine(bool _autoDetermine) { m_xAxis.setAutoDetermineAxisLabel(_autoDetermine); };
+		bool getXLabelAxisAutoDetermine() const { return m_xAxis.getAutoDetermineAxisLabel(); };
 
-		bool getYLabelAxisAutoDetermine() const { return m_yAxis.getAutoDetermineAxisLabel(); };
 		void setYLabelAxisAutoDetermine(bool _autoDetermine) { m_yAxis.setAutoDetermineAxisLabel(_autoDetermine); };
+		bool getYLabelAxisAutoDetermine() const { return m_yAxis.getAutoDetermineAxisLabel(); };
 
-		const std::string& getAxisLabelY() const { return m_yAxis.getAxisLabel(); };
 		void setAxisLabelY(const std::string& _label) { m_yAxis.setAxisLabel(_label); };
+		const std::string& getAxisLabelY() const { return m_yAxis.getAxisLabel(); };
 
-		const std::string& getAxisLabelX() const { return m_xAxis.getAxisLabel(); };
+		//! @brief Returns the axis label to be displayed.
+		//! Will include the axis label, quantity name and quantity scaling information.
+		std::string getDisplayAxisLabelY() const { return m_yAxis.getDisplayAxisLabel(*this); };
+
 		void setAxisLabelX(const std::string& _label) { m_xAxis.setAxisLabel(_label); };
+		const std::string& getAxisLabelX() const { return m_xAxis.getAxisLabel(); };
 
-		const std::list<ValueComparisonDefinition>& getQueries() { return m_queries; };
+		//! @brief Returns the axis label to be displayed.
+		//! Will include the axis label, quantity name and quantity scaling information.
+		std::string getDisplayAxisLabelX() const { return m_xAxis.getDisplayAxisLabel(*this); };
+
 		void setQueries(const std::list<ValueComparisonDefinition>& _queries) { m_queries = _queries; };
 		void setQueries(std::list<ValueComparisonDefinition>&& _queries) { m_queries = std::move(_queries); };
+		const std::list<ValueComparisonDefinition>& getQueries() { return m_queries; };
 
 		void setUseLimitNbOfCurves(bool _useLimit) { m_useLimit = _useLimit; };
 		bool getUseLimitNbOfCurves() const { return m_useLimit; };
@@ -165,6 +175,18 @@ namespace ot {
 		
 		void setShowMatrixRowEntry(int32_t _rowEntry) { m_showMatrixRowEntry = _rowEntry; };
 		int32_t getShowMatrixRowEntry() { return m_showMatrixRowEntry; };
+
+		void setDataLabelX(const std::string& _dataLabelX) { m_dataLabelX = _dataLabelX; };
+		const std::string& getDataLabelX() const { return m_dataLabelX; };
+
+		void setDataLabelY(const std::string& _dataLabelY) { m_dataLabelY = _dataLabelY; };
+		const std::string& getDataLabelY() const { return m_dataLabelY; };
+
+		void setUnitLabelX(const std::string& _unitLabelX) { m_unitLabelX = _unitLabelX; };
+		const std::string& getUnitLabelX() const { return m_unitLabelX; };
+
+		void setUnitLabelY(const std::string& _unitLabelY) { m_unitLabelY = _unitLabelY; };
+		const std::string& getUnitLabelY() const { return m_unitLabelY; };
 
 	private:
 		std::string m_collectionName;
@@ -187,6 +209,12 @@ namespace ot {
 
 		NavigationTreeItemIcon m_treeIcons;
 		std::list<ValueComparisonDefinition> m_queries;
+
+		std::string m_dataLabelX;
+		std::string m_dataLabelY;
+
+		std::string m_unitLabelX;
+		std::string m_unitLabelY;
 
 		Plot1DAxisCfg m_xAxis;
 		Plot1DAxisCfg m_yAxis;

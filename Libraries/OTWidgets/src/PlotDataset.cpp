@@ -252,9 +252,13 @@ void ot::PlotDataset::setPointInterval(int _interval, bool _repaint) {
 	}
 }
 
-void ot::PlotDataset::setAxisQuantities(Plot1DAxisCfg::AxisQuantity _xQuantity, Plot1DAxisCfg::AxisQuantity _yQuantity) {
+void ot::PlotDataset::setAxisQuantitiesAndScaling(Plot1DAxisCfg::AxisQuantity _xQuantity, const Plot1DAxisCfg::QuantityScaling& _xQuantityScaling, Plot1DAxisCfg::AxisQuantity _yQuantity, const Plot1DAxisCfg::QuantityScaling& _yQuantityScaling)
+{
 	m_data.setXQuantity(_xQuantity);
+	m_data.setXQuantityScaling(_xQuantityScaling);
 	m_data.setYQuantity(_yQuantity);
+	m_data.setYQuantityScaling(_yQuantityScaling);
+	m_data.updateData();
 }
 
 void ot::PlotDataset::setSelected(bool _isSelected) {
@@ -428,15 +432,25 @@ void ot::PlotDataset::updateCurveVisualization() {
 }
 
 void ot::PlotDataset::buildCartesianCurve() {
-	m_cartesianCurve = new CartesianPlotCurve(QString::fromStdString(m_config.getTitle()));
-	m_cartesianCurvePointSymbol = new QwtSymbol();
-	m_cartesianCurve->setSymbol(m_cartesianCurvePointSymbol);
-	m_cartesianCurve->setSamples(m_data.getCartesianAccessor());
+	if (m_cartesianCurve == nullptr)
+	{
+		OTAssert(m_cartesianCurvePointSymbol == nullptr, "Cartesian curve point symbol should be null when cartesian curve is null");
+
+		m_cartesianCurve = new CartesianPlotCurve(QString::fromStdString(m_config.getTitle()));
+		m_cartesianCurvePointSymbol = new QwtSymbol();
+		m_cartesianCurve->setSymbol(m_cartesianCurvePointSymbol);
+		m_cartesianCurve->setSamples(m_data.getCartesianAccessor());
+	}
 }
 
 void ot::PlotDataset::buildPolarCurve() {
-	m_polarCurve = new PolarPlotCurve(QString::fromStdString(m_config.getTitle()));
-	m_polarCurvePointSymbol = new QwtSymbol();
-	m_polarCurve->setSymbol(m_polarCurvePointSymbol);
-	m_polarCurve->setData(m_data.getPolarAccessor());
+	if (m_polarCurve == nullptr)
+	{
+		OTAssert(m_polarCurvePointSymbol == nullptr, "Polar curve point symbol should be null when polar curve is null");
+
+		m_polarCurve = new PolarPlotCurve(QString::fromStdString(m_config.getTitle()));
+		m_polarCurvePointSymbol = new QwtSymbol();
+		m_polarCurve->setSymbol(m_polarCurvePointSymbol);
+		m_polarCurve->setData(m_data.getPolarAccessor());
+	}
 }

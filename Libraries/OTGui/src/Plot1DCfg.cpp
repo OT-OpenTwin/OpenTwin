@@ -91,6 +91,12 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	m_yAxis.addToJsonObject(yAxisObject, _allocator);
 	_object.AddMember("YAxis", yAxisObject, _allocator);
 
+	_object.AddMember("DataLabelX", ot::JsonString(m_dataLabelX, _allocator), _allocator);
+	_object.AddMember("DataLabelY", ot::JsonString(m_dataLabelY, _allocator), _allocator);
+
+	_object.AddMember("UnitLabelX", ot::JsonString(m_unitLabelX, _allocator), _allocator);
+	_object.AddMember("UnitLabelY", ot::JsonString(m_unitLabelY, _allocator), _allocator);
+
 	_object.AddMember("XAxisParameter", ot::JsonString(m_xAxisParameter, _allocator), _allocator);
 
 	_object.AddMember("UseLimitOfCurves", m_useLimit, _allocator);
@@ -129,6 +135,12 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_xAxis.setFromJsonObject(json::getObject(_object, "XAxis"));
 	m_yAxis.setFromJsonObject(json::getObject(_object, "YAxis"));
 
+	m_dataLabelX = ot::json::getString(_object, "DataLabelX");
+	m_dataLabelY = ot::json::getString(_object, "DataLabelY");
+
+	m_unitLabelX = ot::json::getString(_object, "UnitLabelX");
+	m_unitLabelY = ot::json::getString(_object, "UnitLabelY");
+
 	m_xAxisParameter = ot::json::getString(_object, "XAxisParameter");
 
 	m_showEntireMatrix = ot::json::getBool(_object, "ShowEntireMatrix");
@@ -162,8 +174,16 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 
 		(m_treeIcons == _other.m_treeIcons) &&
 
+		(m_dataLabelX == _other.m_dataLabelX) &&
+		(m_dataLabelY == _other.m_dataLabelY) &&
+
+		(m_unitLabelX == _other.m_unitLabelX) &&
+		(m_unitLabelY == _other.m_unitLabelY) &&
+
 		(m_xAxis == _other.m_xAxis) &&
-		(m_yAxis == _other.m_yAxis);
+		(m_yAxis == _other.m_yAxis)
+		
+		;
 }
 
 bool ot::Plot1DCfg::operator!=(const Plot1DCfg& _other) const {

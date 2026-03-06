@@ -256,9 +256,10 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 		const ot::Painter2D* symbolFillPainter = PropertyHelper::getPainterPropertyValue(this, "Symbol Fill Color");
 		curveCfg.setPointFillPainter(symbolFillPainter->createCopy());
 	}
-	catch (...) {
+	catch (const std::exception& _e) {
+		OT_LOG_T("Legacy curve: " + std::string(_e.what()));
 		// Legacy
-		penCfg.setWidth(1);
+		penCfg.setWidth(2);
 		penCfg.setStyle(ot::LineStyle::SolidLine);
 
 		curveCfg.setPointSymbol(ot::Plot1DCurveCfg::NoSymbol);

@@ -18,7 +18,6 @@
 // @otlicense-end
 
 #pragma once
-#pragma warning(disable : 4251)
 
 #include <map>
 #include <string>
@@ -33,6 +32,7 @@
 #include <bsoncxx/types.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 
+#pragma warning(disable : 4251)
 
 class EntityBase;
 

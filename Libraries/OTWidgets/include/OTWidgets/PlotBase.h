@@ -140,6 +140,7 @@ namespace ot {
 	
 		void replaceConfig(Plot1DCfg&& _config) { m_config = std::move(_config); };
 		void applyConfig();
+		void updateAxisTitles(bool _replot = false);
 		
 	private:
 		Plot1DCfg m_config;

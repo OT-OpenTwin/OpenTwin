@@ -56,7 +56,7 @@ void EntityProperties::merge(EntityProperties& other)
 	other.m_propertiesList.clear();
 }
 
-void EntityProperties::deleteAllProperties(void)
+void EntityProperties::deleteAllProperties()
 {
 	// Delete all properties
 	for (std::map<std::string, EntityPropertiesBase *>::iterator it = m_properties.begin(); it != m_properties.end(); it++)
@@ -139,7 +139,7 @@ bool EntityProperties::propertyExists(const std::string &_name, const std::strin
 	return (base != nullptr);
 }
 
-void EntityProperties::checkWhetherUpdateNecessary(void)
+void EntityProperties::checkWhetherUpdateNecessary()
 {
 	m_needsUpdate = false;
 
@@ -149,7 +149,7 @@ void EntityProperties::checkWhetherUpdateNecessary(void)
 	}
 }
 
-void EntityProperties::forceResetUpdateForAllProperties(void)
+void EntityProperties::forceResetUpdateForAllProperties()
 {
 	for (std::map<std::string, EntityPropertiesBase *>::iterator it = m_properties.begin(); it != m_properties.end(); it++)
 	{
@@ -470,7 +470,7 @@ void EntityProperties::readFromProperties(const EntityProperties &other, EntityB
 	}
 }
 
-void EntityProperties::setAllPropertiesReadOnly(void)
+void EntityProperties::setAllPropertiesReadOnly()
 {
 	for (auto prop : m_properties)
 	{
@@ -478,7 +478,7 @@ void EntityProperties::setAllPropertiesReadOnly(void)
 	}
 }
 
-void EntityProperties::setAllPropertiesNonProtected(void)
+void EntityProperties::setAllPropertiesNonProtected()
 {
 	for (auto prop : m_properties)
 	{
@@ -486,7 +486,7 @@ void EntityProperties::setAllPropertiesNonProtected(void)
 	}
 }
 
-std::list<EntityPropertiesBase*> EntityProperties::getListOfAllProperties(void)
+std::list<EntityPropertiesBase*> EntityProperties::getListOfAllProperties()
 {
 	std::list<EntityPropertiesBase*> allProperties;
 
@@ -498,7 +498,7 @@ std::list<EntityPropertiesBase*> EntityProperties::getListOfAllProperties(void)
 	return allProperties;
 }
 
-std::list<EntityPropertiesBase *> EntityProperties::getListOfPropertiesWhichNeedUpdate(void)
+std::list<EntityPropertiesBase *> EntityProperties::getListOfPropertiesWhichNeedUpdate()
 {
 	std::list<EntityPropertiesBase *> needsUpdate;
 
@@ -513,7 +513,7 @@ std::list<EntityPropertiesBase *> EntityProperties::getListOfPropertiesWhichNeed
 	return needsUpdate;
 }
 
-std::list<EntityPropertiesDouble *> EntityProperties::getListOfNumericalProperties(void)
+std::list<EntityPropertiesDouble *> EntityProperties::getListOfNumericalProperties()
 {
 	std::list<EntityPropertiesDouble *> numericalProperty;
 

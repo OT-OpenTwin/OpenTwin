@@ -78,11 +78,19 @@ namespace ot {
 
 		~PlotDatasetData();
 
-		void setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity);
+		void updateData();
+
+		void setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bool _updateData = false);
 		Plot1DAxisCfg::AxisQuantity getXQuantity() const { return m_xQuantity; };
 
-		void setYQuantity(Plot1DAxisCfg::AxisQuantity _quantity);
+		void setXQuantityScaling(const Plot1DAxisCfg::QuantityScaling& _scaling, bool _updateData = false);
+		const Plot1DAxisCfg::QuantityScaling& getXQuantityScaling() const { return m_xQuantityScaling; };
+
+		void setYQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bool _updateData = false);
 		Plot1DAxisCfg::AxisQuantity getYQuantity() const { return m_yQuantity; };
+
+		void setYQuantityScaling(const Plot1DAxisCfg::QuantityScaling& _scaling, bool _updateData = false);
+		const Plot1DAxisCfg::QuantityScaling& getYQuantityScaling() const { return m_yQuantityScaling; };
 
 		CartesianPlotDatasetData* getCartesianAccessor();
 		PolarPlotDatasetData* getPolarAccessor();
@@ -94,7 +102,8 @@ namespace ot {
 		friend class PlotSeriesData<QPointF>;
 		friend class PlotSeriesData<QwtPointPolar>;
 
-		bool applyQuantity(Plot1DAxisCfg::AxisQuantity _quantity, std::vector<double>& _dataTarget);
+		double scaledValue(double _value, const Plot1DAxisCfg::QuantityScaling& _scaling) const;
+		bool applyQuantityWithScaling(Plot1DAxisCfg::AxisQuantity _quantity, const Plot1DAxisCfg::QuantityScaling& _scaling, std::vector<double>& _dataTarget);
 
 		void forgetCartesianAccessor() { m_cartesianAccessor = nullptr; };
 		void forgetPolarAccessor() { m_polarAccessor = nullptr; };
@@ -103,7 +112,9 @@ namespace ot {
 		PolarPlotDatasetData* m_polarAccessor;
 
 		Plot1DAxisCfg::AxisQuantity m_xQuantity;
+		Plot1DAxisCfg::QuantityScaling m_xQuantityScaling;
 		Plot1DAxisCfg::AxisQuantity m_yQuantity;
+		Plot1DAxisCfg::QuantityScaling m_yQuantityScaling;
 
 		std::vector<double> m_dataX;
 		std::vector<std::complex<double>> m_dataY;

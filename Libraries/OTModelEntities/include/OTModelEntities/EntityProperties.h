@@ -18,14 +18,16 @@
 // @otlicense-end
 
 #pragma once
-#pragma warning(disable : 4251)
 
-#include <string>
-#include <map>
-
+// OpenTwin header
+#include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTModelEntities/EntityPropertiesItems.h"
 
-#include "OTGui/Properties/PropertyGridCfg.h"
+// std header
+#include <map>
+#include <string>
+
+#pragma warning(disable : 4251)
 
 class EntityBase;
 
@@ -46,12 +48,25 @@ public:
 	bool deleteProperty(const std::string &_name, const std::string& _groupName = "");
 	bool propertyExists(const std::string &_name, const std::string& _groupName = "");
 
-	EntityPropertiesBase* getProperty(const std::string& _name, const std::string& _groupName = "") { return getPropertyImpl(_name, _groupName); };
-	const EntityPropertiesBase* getProperty(const std::string& _name, const std::string& _groupName = "") const { return getPropertyImpl(_name, _groupName); };
+	//! @brief Returns a writable pointer to the property with the provided name and group.
+	//! If no group is provided, the first property with the provided name will be returned.
+	//! The caller needs to check whether the returned pointer is valid.
+	//! The ownership of the property pointer remains with the EntityProperties object.
+	//! @param _name Property name.
+	//! @param _groupName Group name (optional).
+	OT_DECL_NODISCARD EntityPropertiesBase* getProperty(const std::string& _name, const std::string& _groupName = "") { return getPropertyImpl(_name, _groupName); };
 
-	void setNeedsUpdate(void) { m_needsUpdate = true; };
-	bool anyPropertyNeedsUpdate(void) const { return m_needsUpdate; };
-	void checkWhetherUpdateNecessary(void);
+	//! @brief Returns a read only pointer to the property with the provided name and group.
+	//! If no group is provided, the first property with the provided name will be returned.
+	//! The caller needs to check whether the returned pointer is valid.
+	//! The ownership of the property pointer remains with the EntityProperties object.
+	//! @param _name Property name.
+	//! @param _groupName Group name (optional).
+	OT_DECL_NODISCARD const EntityPropertiesBase* getProperty(const std::string& _name, const std::string& _groupName = "") const { return getPropertyImpl(_name, _groupName); };
+
+	void setNeedsUpdate() { m_needsUpdate = true; };
+	bool anyPropertyNeedsUpdate() const { return m_needsUpdate; };
+	void checkWhetherUpdateNecessary();
 	void forceResetUpdateForAllProperties();
 
 	void addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _config) const;
@@ -66,13 +81,13 @@ public:
 
 	EntityProperties& operator=(const EntityProperties &other);
 
-	void setAllPropertiesReadOnly(void);
-	void setAllPropertiesNonProtected(void);
+	void setAllPropertiesReadOnly();
+	void setAllPropertiesNonProtected();
 
-	std::list<EntityPropertiesBase*> getListOfAllProperties(void);
-	std::list<EntityPropertiesBase *> getListOfPropertiesWhichNeedUpdate(void);
-	std::list<EntityPropertiesDouble *> getListOfNumericalProperties(void);
-	size_t getNumberOfProperties(void) const { return m_properties.size(); }
+	std::list<EntityPropertiesBase*> getListOfAllProperties();
+	std::list<EntityPropertiesBase *> getListOfPropertiesWhichNeedUpdate();
+	std::list<EntityPropertiesDouble *> getListOfNumericalProperties();
+	size_t getNumberOfProperties() const { return m_properties.size(); }
 
 	std::list<std::string> getListOfPropertiesForGroup(const std::string &group) const;
 
@@ -81,7 +96,7 @@ public:
 	std::string extractNameFromKey(const std::string& _key) const;
 
 private:
-	void deleteAllProperties(void);
+	void deleteAllProperties();
 	EntityPropertiesBase* getPropertyImpl(const std::string& _name, const std::string& _groupName = "") const;
 
 	bool m_needsUpdate;

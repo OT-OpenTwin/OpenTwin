@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/Symbol.h"
 #include "OTWidgets/PolarPlot.h"
 #include "OTWidgets/PolarPlotMarker.h"
 #include "OTWidgets/GlobalColorStyle.h"
@@ -112,9 +113,9 @@ void ot::PolarPlotMagnifier::updateMarker(const QPoint& _pos) {
 	double azimuthRad = polar.azimuth();
 	double azimuthDeg = qRadiansToDegrees(azimuthRad);
 
-	m_markerText.setText("r = " + QString::number(radius) + "\n"
-		"\xCF\x86 = " + QString::number(azimuthRad) + " rad\n"
-		"\xCF\x86 =" + QString::number(azimuthDeg) + " deg"
+	m_markerText.setText("r = " + QString::number(radius) + "\n" +
+		QString::fromUtf8(Symbol::phi()) + " = " + QString::number(azimuthRad) + " rad\n" +
+		QString::fromUtf8(Symbol::phi()) + " =" + QString::number(azimuthDeg) + " deg"
 	);
 
 	m_state.set(State::MarkerShown);

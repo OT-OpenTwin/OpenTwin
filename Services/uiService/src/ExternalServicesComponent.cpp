@@ -3603,16 +3603,15 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 		const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, insertFlags, visualisationCfg.getVisualisingEntities());
 		ot::Plot* plot = plotView->getPlot();
 
-		const ot::Plot1DCfg& oldConfig = plot->getConfig();
-		if (plotConfig.getXLabelAxisAutoDetermine())
+		// Copy data labels from old config since they are set while loading plot data
 		{
-			plotConfig.setAxisLabelX(oldConfig.getAxisLabelX());
+			const ot::Plot1DCfg& oldConfig = plot->getConfig();
+			plotConfig.setDataLabelX(oldConfig.getDataLabelX());
+			plotConfig.setDataLabelY(oldConfig.getDataLabelY());
+			plotConfig.setUnitLabelX(oldConfig.getUnitLabelX());
+			plotConfig.setUnitLabelY(oldConfig.getUnitLabelY());
+			plot->setConfig(std::move(plotConfig));
 		}
-		if (plotConfig.getYLabelAxisAutoDetermine())
-		{
-			plotConfig.setAxisLabelY(oldConfig.getAxisLabelY());
-		}
-		plot->setConfig(std::move(plotConfig));
 
 		// Now we refresh the plot visualisation.
 		plot->refresh();

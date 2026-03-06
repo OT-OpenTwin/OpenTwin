@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/Symbol.h"
 #include "OTCore/EntityName.h"
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
@@ -121,32 +122,32 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 		updatePropertiesGrid = true;
 	}
 
-	EntityPropertiesBoolean* autoscaleX = PropertyHelper::getBoolProperty(this, "Autoscale", "X axis");
-	EntityPropertiesDouble* minX = PropertyHelper::getDoubleProperty(this, "Min", "X axis");
-	EntityPropertiesDouble* maxX = PropertyHelper::getDoubleProperty(this, "Max", "X axis");
+	updatePropertiesGrid |= updateAxisPropertiesVisibility(getXAxisPropertyGroupName());
+	updatePropertiesGrid |= updateAxisPropertiesVisibility(getYAxisPropertyGroupName());
+	updatePropertiesGrid |= updateAxisPropertiesVisibility(getRadiusAxisPropertyGroupName());
+	updatePropertiesGrid |= updateAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName());
 
-	if (autoscaleX->getValue() == minX->getVisible())
+	switch (getPlotType())
 	{
-		minX->setVisible(!autoscaleX->getValue());
-		maxX->setVisible(!autoscaleX->getValue());
-		minX->resetNeedsUpdate();
-		maxX->resetNeedsUpdate();
-		updatePropertiesGrid = true;
+	case ot::Plot1DCfg::Cartesian:
+		updatePropertiesGrid |= setAxisPropertiesVisibility(getXAxisPropertyGroupName(), true);
+		updatePropertiesGrid |= setAxisPropertiesVisibility(getYAxisPropertyGroupName(), true);
+		updatePropertiesGrid |= setAxisPropertiesVisibility(getRadiusAxisPropertyGroupName(), false);
+		updatePropertiesGrid |= setAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName(), false);
+		break;
+
+	case ot::Plot1DCfg::Polar:
+		updatePropertiesGrid |= setAxisPropertiesVisibility(getXAxisPropertyGroupName(), false);
+		updatePropertiesGrid |= setAxisPropertiesVisibility(getYAxisPropertyGroupName(), false);
+		updatePropertiesGrid |= setAxisPropertiesVisibility(getRadiusAxisPropertyGroupName(), true);
+		updatePropertiesGrid |= setAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName(), true);
+		break;
+
+	default:
+		OT_LOG_E("Unknown plot type (" + std::to_string(static_cast<int>(getPlotType())) + ")");
+		break;
 	}
-
-	EntityPropertiesBoolean* autoscaleY = PropertyHelper::getBoolProperty(this,"Autoscale", "Y axis");
-	EntityPropertiesDouble* minY = PropertyHelper::getDoubleProperty(this, "Min","Y axis");
-	EntityPropertiesDouble* maxY = PropertyHelper::getDoubleProperty(this, "Max","Y axis");
-
-	if (autoscaleY->getValue() == minY->getVisible())
-	{
-		minY->setVisible(!autoscaleY->getValue());
-		maxY->setVisible(!autoscaleY->getValue());
-		minY->resetNeedsUpdate();
-		maxY->resetNeedsUpdate();
-		updatePropertiesGrid = true;
-	}
-
+	
 	updatePropertiesGrid |= m_querySettings.updatePropertyVisibility(this);
 
 	return updatePropertiesGrid;
@@ -172,59 +173,54 @@ void EntityResult1DPlot::removeChild(EntityBase* _child)
 
 void EntityResult1DPlot::createProperties()
 {
-	//Query options are set in the addChild and removeChild methods
+	// Query options are set in the addChild and removeChild methods
 	EntityPropertiesSelection::createProperty("Curve set", "X axis parameter", {}, "", "default", getProperties());
 	std::list<std::string> allQueryOptions{ "" };
 	m_querySettings.setQueryDefinitions(allQueryOptions);
 	m_querySettings.setProperties(this);
 
-	const std::list<std::string> plotTypeOptions = ot::Plot1DCfg::getPlotTypeStringList();
-	const std::list<std::string> quantityOptions = ot::Plot1DAxisCfg::getAxisQuantityStringList();
+	EntityPropertiesBoolean::createProperty(m_querySettings.getGroupQuerySettingsName(), "Show full matrix", true, "", getProperties());
+	EntityPropertiesInteger::createProperty(m_querySettings.getGroupQuerySettingsName(), "Show matrix row entry", 1, 1, 60, "", getProperties());
+	EntityPropertiesInteger::createProperty(m_querySettings.getGroupQuerySettingsName(), "Show matrix column entry", 1, 1, 60, "", getProperties());
 
+	// General settings
+
+	const std::list<std::string> plotTypeOptions = ot::Plot1DCfg::getPlotTypeStringList();
 	EntityPropertiesSelection::createProperty("General", "Plot type", plotTypeOptions, ot::Plot1DCfg::toString(ot::Plot1DCfg::Cartesian), "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
 	EntityPropertiesGuiPainter::createProperty("General", "Grid color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotGrid), "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Legend", true, "", getProperties());
 
-	EntityPropertiesSelection::createProperty("X axis", "Quantity", quantityOptions, ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::XData), "", getProperties());
-	EntityPropertiesBoolean::createProperty("X axis", "Logscale", false, "", getProperties());
-	EntityPropertiesBoolean::createProperty("X axis", "Autoscale", true, "", getProperties());
-	EntityPropertiesDouble::createProperty("X axis", "Min", 0.0, "", getProperties());
-	EntityPropertiesDouble::createProperty("X axis", "Max", 0.0, "", getProperties());
-	EntityPropertiesBoolean::createProperty("X axis", "Automatic label", true, "", getProperties());
-	EntityPropertiesString::createProperty("X axis", "Label override", "", "", getProperties());
+	// Axis settings
 
-	EntityPropertiesSelection::createProperty("Y axis", "Quantity", quantityOptions, ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::Real), "", getProperties());
-	EntityPropertiesBoolean::createProperty("Y axis", "Logscale", false, "", getProperties());
-	EntityPropertiesBoolean::createProperty("Y axis", "Autoscale", true, "", getProperties());
-	EntityPropertiesDouble::createProperty("Y axis", "Min", 0.0, "", getProperties());
-	EntityPropertiesDouble::createProperty("Y axis", "Max", 0.0, "", getProperties());
-	EntityPropertiesBoolean::createProperty("Y axis", "Automatic label", true, "", getProperties());
-	EntityPropertiesString::createProperty("Y axis", "Label override", "", "", getProperties());
-	EntityPropertiesBoolean::createProperty("Y axis", "Show full matrix", true, "", getProperties());
-	EntityPropertiesInteger::createProperty("Y axis", "Show matrix row entry", 1,1,60, "", getProperties());
-	EntityPropertiesInteger::createProperty("Y axis", "Show matrix column entry", 1,1,60, "", getProperties());
+	createAxisProperties(getXAxisPropertyGroupName());
+	createAxisProperties(getYAxisPropertyGroupName());
+	createAxisProperties(getRadiusAxisPropertyGroupName());
+	createAxisProperties(getAzimuthAxisPropertyGroupName());
+
+	// Curve limit settings
 
 	EntityPropertiesBoolean::createProperty("Curve limit", "Number of curves", true, "default", getProperties());
 	EntityPropertiesInteger::createProperty("Curve limit", "Max", 25, "default", getProperties());
 
 	updatePropertyVisibilities();
-
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-
-const ot::Plot1DCfg EntityResult1DPlot::getPlot() {
+const ot::Plot1DCfg EntityResult1DPlot::getPlot()
+{
 
 	const ot::Painter2D* gridColour = PropertyHelper::getPainterPropertyValue(this, "Grid color");
 
 	const std::string entityName = getName();
 	auto shortName = ot::EntityName::getSubName(entityName);
 	std::string title("");
-	if (shortName.has_value()) {
+	if (shortName.has_value())
+	{
 		title = shortName.value();
 	}
-	else {
+	else
+	{
 		assert(false);
 	}
 
@@ -233,27 +229,10 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot() {
 	const bool gridVisible = PropertyHelper::getBoolPropertyValue(this, "Grid");
 	const bool legendVisible = PropertyHelper::getBoolPropertyValue(this, "Legend");
 
-	const std::string xAxisQuantity = PropertyHelper::getSelectionPropertyValue(this, "Quantity", "X axis");
-	const bool logScaleX = PropertyHelper::getBoolPropertyValue(this, "Logscale", "X axis");
-	const bool autoScaleX = PropertyHelper::getBoolPropertyValue(this, "Autoscale", "X axis");
-	const double minX = PropertyHelper::getDoublePropertyValue(this, "Min", "X axis");
-	const double maxX = PropertyHelper::getDoublePropertyValue(this, "Max", "X axis");
-
-	const std::string yAxisQuantity = PropertyHelper::getSelectionPropertyValue(this, "Quantity", "Y axis");
-	const bool logScaleY = PropertyHelper::getBoolPropertyValue(this, "Logscale", "Y axis");
-	const bool autoScaleY = PropertyHelper::getBoolPropertyValue(this, "Autoscale", "Y axis");
-	const double minY = PropertyHelper::getDoublePropertyValue(this, "Min", "Y axis");
-	const double maxY = PropertyHelper::getDoublePropertyValue(this, "Max", "Y axis");
-
 	const int32_t maxNbOfCurves = PropertyHelper::getIntegerPropertyValue(this, "Max", "Curve limit");
 	const bool useCurveLimit = PropertyHelper::getBoolPropertyValue(this, "Number of curves", "Curve limit");
 
-	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "X axis parameter","Curve set");
-
-	const bool automaticLabelX = PropertyHelper::getBoolPropertyValue(this, "Automatic label", "X axis");
-	const bool automaticLabelY = PropertyHelper::getBoolPropertyValue(this, "Automatic label", "Y axis");
-	const std::string labelY = PropertyHelper::getStringPropertyValue(this, "Label override", "Y axis");
-	const std::string labelX = PropertyHelper::getStringPropertyValue(this, "Label override", "X axis");
+	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "X axis parameter", "Curve set");
 
 	const bool showEntireMatrix = PropertyHelper::getBoolPropertyValue(this, "Show full matrix");
 	const int32_t showMatrixRowValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix row entry");
@@ -278,32 +257,39 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot() {
 	config.setGridVisible(gridVisible);
 	config.setLegendVisible(legendVisible);
 
-	config.setXAxisIsLogScale(logScaleX);
-	config.setXAxisIsAutoScale(autoScaleX);
-	config.setXAxisMin(minX);
-	config.setXAxisMax(maxX);
-	config.setXAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(xAxisQuantity));
-	
-	config.setYAxisIsLogScale(logScaleY);
-	config.setYAxisIsAutoScale(autoScaleY);
-	config.setYAxisMin(minY);
-	config.setYAxisMax(maxY);
-	config.setYAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(yAxisQuantity));
-
 	config.setShowEntireMatrix(showEntireMatrix);
 	config.setShowMatrixColumnEntry(showMatrixColumnValue);
 	config.setShowMatrixRowEntry(showMatrixRowValue);
-
-	config.setYLabelAxisAutoDetermine(automaticLabelY);
-	config.setXLabelAxisAutoDetermine(automaticLabelX);
-	config.setAxisLabelY(labelY);
-	config.setAxisLabelX(labelX);
-
 
 	config.setQueries(queries);
 
 	config.setLimitOfCurves(maxNbOfCurves);
 	config.setUseLimitNbOfCurves(useCurveLimit);
+
+	// Setup axis
+
+	ot::Plot1DAxisCfg xAxisCfg = config.getXAxis();
+	ot::Plot1DAxisCfg yAxisCfg = config.getYAxis();
+
+	switch (config.getPlotType())
+	{
+	case ot::Plot1DCfg::Cartesian:
+		setAxisFromProperties(getXAxisPropertyGroupName(), xAxisCfg);
+		setAxisFromProperties(getYAxisPropertyGroupName(), yAxisCfg);
+		break;
+
+	case ot::Plot1DCfg::Polar:
+		setAxisFromProperties(getRadiusAxisPropertyGroupName(), xAxisCfg);
+		setAxisFromProperties(getAzimuthAxisPropertyGroupName(), yAxisCfg);
+		break;
+
+	default:
+		OT_LOG_E("Unknown plot type (" + std::to_string(static_cast<int>(config.getPlotType())) + ")");
+		break;
+	}
+
+	config.setXAxis(std::move(xAxisCfg));
+	config.setYAxis(std::move(yAxisCfg));
 
 	return config;
 }
@@ -311,6 +297,112 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot() {
 bool EntityResult1DPlot::visualisePlot()
 {
 	return true;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Property Setter / Getter
+
+ot::Plot1DCfg::PlotType EntityResult1DPlot::getPlotType() const
+{
+	const std::string plotType = PropertyHelper::getSelectionPropertyValue(this, "Plot type", "General");
+	return ot::Plot1DCfg::stringToPlotType(plotType);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private helper
+
+void EntityResult1DPlot::createAxisProperties(const std::string& _axisName)
+{
+	const std::list<std::string> quantityOptions = ot::Plot1DAxisCfg::getAxisQuantityStringList();
+	const std::list<std::string> quantityScalingOptions = ot::Plot1DAxisCfg::getQuantityScalingStringList();
+	EntityPropertiesSelection::createProperty(_axisName, "Quantity", quantityOptions, ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::Real), "", getProperties());
+	EntityPropertiesSelection::createProperty(_axisName, "Quantity scaling", quantityScalingOptions, ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::NoQuantityScaling), "", getProperties());
+
+	EntityPropertiesBoolean::createProperty(_axisName, "Logscale", false, "", getProperties());
+	EntityPropertiesBoolean::createProperty(_axisName, "Autoscale", true, "", getProperties());
+
+	EntityPropertiesDouble::createProperty(_axisName, "Min", 0.0, "", getProperties());
+	EntityPropertiesDouble::createProperty(_axisName, "Max", 0.0, "", getProperties());
+
+	EntityPropertiesBoolean::createProperty(_axisName, "Automatic label", true, "", getProperties());
+	EntityPropertiesString::createProperty(_axisName, "Label override", "", "", getProperties());
+}
+
+void EntityResult1DPlot::setAxisFromProperties(const std::string& _axisName, ot::Plot1DAxisCfg& _axis)
+{
+	const std::string quantity = PropertyHelper::getSelectionPropertyValue(this, "Quantity", _axisName);
+	const std::string quantityScaling = PropertyHelper::getSelectionPropertyValue(this, "Quantity scaling", _axisName);
+
+	const bool logScale = PropertyHelper::getBoolPropertyValue(this, "Logscale", _axisName);
+	const bool autoScale = PropertyHelper::getBoolPropertyValue(this, "Autoscale", _axisName);
+
+	const double min = PropertyHelper::getDoublePropertyValue(this, "Min", _axisName);
+	const double max = PropertyHelper::getDoublePropertyValue(this, "Max", _axisName);
+
+	const bool automaticLabel = PropertyHelper::getBoolPropertyValue(this, "Automatic label", _axisName);
+	const std::string labelOverride = PropertyHelper::getStringPropertyValue(this, "Label override", _axisName);
+
+	_axis.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(quantity));
+	_axis.setQuantityScaling(ot::Plot1DAxisCfg::stringToQuantityScalingFlag(quantityScaling));
+	_axis.setIsLogScale(logScale);
+	_axis.setIsAutoScale(autoScale);
+	_axis.setMin(min);
+	_axis.setMax(max);
+	_axis.setAutoDetermineAxisLabel(automaticLabel);
+	_axis.setAxisLabel(labelOverride);
+}
+
+bool EntityResult1DPlot::setAxisPropertiesVisibility(const std::string& _axisName, bool _visible)
+{
+	auto selProp = PropertyHelper::getSelectionProperty(this, "Quantity", _axisName);
+	OTAssertNullptr(selProp);
+	if (selProp->getVisible() == _visible)
+	{
+		return false;
+	}
+	selProp->setVisible(_visible);
+	getProperties().getProperty("Quantity scaling", _axisName)->setVisible(_visible);
+	getProperties().getProperty("Logscale", _axisName)->setVisible(_visible);
+	getProperties().getProperty("Autoscale", _axisName)->setVisible(_visible);
+
+	getProperties().getProperty("Min", _axisName)->setVisible(_visible);
+	getProperties().getProperty("Max", _axisName)->setVisible(_visible);
+
+	getProperties().getProperty("Automatic label", _axisName)->setVisible(_visible);
+	getProperties().getProperty("Label override", _axisName)->setVisible(_visible);
+
+	return true;
+}
+
+bool EntityResult1DPlot::updateAxisPropertiesVisibility(const std::string& _axisName)
+{
+	bool changed = false;
+
+	EntityPropertiesBoolean* autoscaleX = PropertyHelper::getBoolProperty(this, "Autoscale", _axisName);
+	EntityPropertiesDouble* minX = PropertyHelper::getDoubleProperty(this, "Min", _axisName);
+	EntityPropertiesDouble* maxX = PropertyHelper::getDoubleProperty(this, "Max", _axisName);
+
+	if (autoscaleX->getValue() == minX->getVisible())
+	{
+		minX->setVisible(!autoscaleX->getValue());
+		maxX->setVisible(!autoscaleX->getValue());
+		minX->resetNeedsUpdate();
+		maxX->resetNeedsUpdate();
+		changed = true;
+	}
+
+	EntityPropertiesBoolean* autoLabelProp = PropertyHelper::getBoolProperty(this, "Automatic label", _axisName);
+	EntityPropertiesString* labelOverrideProp = PropertyHelper::getStringProperty(this, "Label override", _axisName);
+	if (autoLabelProp->getValue() == labelOverrideProp->getVisible())
+	{
+		labelOverrideProp->setVisible(!autoLabelProp->getValue());
+		labelOverrideProp->resetNeedsUpdate();
+		changed = true;
+	}
+
+	return changed;
 }
 
 void EntityResult1DPlot::setQuerySelections()

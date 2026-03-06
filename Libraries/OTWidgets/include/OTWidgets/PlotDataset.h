@@ -113,7 +113,7 @@ namespace ot {
 			m_config = _config;
 		}
 
-		void setAxisQuantities(Plot1DAxisCfg::AxisQuantity _xQuantity, Plot1DAxisCfg::AxisQuantity _yQuantity);
+		void setAxisQuantitiesAndScaling(Plot1DAxisCfg::AxisQuantity _xQuantity, const Plot1DAxisCfg::QuantityScaling& _xQuantityScaling, Plot1DAxisCfg::AxisQuantity _yQuantity, const Plot1DAxisCfg::QuantityScaling& _yQuantityScaling);
 
 		void setSelected(bool _isSelected);
 		bool isSelected() const { return m_isSelected; };

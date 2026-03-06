@@ -51,7 +51,7 @@ private:
 	std::list<std::string> m_skippedValueComparisons;
 	DataStorageAPI::ResultDataStorageAPI m_dataAccess;
 
-	std::string createAxisLabel(const std::string& _title, const std::string& _unit);
+	std::string createUnitLabel(const std::string& _unit);
 
 	ot::JsonDocument queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDefinition>& _valueComparisons);
 	const std::list<ot::ValueComparisonDefinition> extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDefinition>& _valueComparisions);

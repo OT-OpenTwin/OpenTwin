@@ -74,17 +74,17 @@ namespace ot {
 		
 		// Conversion
 
-		static constexpr double degToRad(double _value) noexcept { return _value * (pi() / 180.0); };
-		static constexpr double radToDeg(double _value) noexcept { return _value * (180.0 / pi()); };
+		static constexpr double degToRad(double _value) noexcept { return _value * pi() / 180.0; };
+		static constexpr double radToDeg(double _value) noexcept { return _value * 180.0 / pi(); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Scaling with decibels
 
-		static constexpr double scaleWithDB10(double _value) noexcept { return 10 * std::log10(_value); };
-		static constexpr double invScaleWithDB10(double _value) noexcept { return std::pow(10, _value / 10); };
-		static constexpr double scaleWithDB20(double _value) noexcept { return 20 * std::log10(_value); };
-		static constexpr double invScaleWithDB20(double _value) noexcept { return std::pow(10, _value / 20); };
+		static inline double scaleWithDB10(double _value) noexcept { return 10 * std::log10(_value); };
+		static inline double invScaleWithDB10(double _value) noexcept { return std::pow(10, _value / 10); };
+		static inline double scaleWithDB20(double _value) noexcept { return 20 * std::log10(_value); };
+		static inline double invScaleWithDB20(double _value) noexcept { return std::pow(10, _value / 20); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

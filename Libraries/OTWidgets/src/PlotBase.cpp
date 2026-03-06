@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
+#include "OTCore/Symbol.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/PlotBase.h"
@@ -126,6 +127,8 @@ void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 		data->rebuildCurve(true);
 		data->updateCurveVisualization();
 	}
+
+	updateAxisTitles(true);
 }
 
 void ot::PlotBase::resetView() {
@@ -145,8 +148,8 @@ void ot::PlotBase::renameDataset(const std::string& _oldEntityPath, const std::s
 
 // Data handling
 
-void ot::PlotBase::setErrorState(bool _isError, const QString & _message) {
-	
+void ot::PlotBase::setErrorState(bool _isError, const QString & _message) 
+{
 	// Get the current or new plot widget
 	// The widget depends on the current polot type
 	QWidget * currentPlot;
@@ -165,15 +168,16 @@ void ot::PlotBase::setErrorState(bool _isError, const QString & _message) {
 		return;
 	}
 
-	if (_isError && !m_isError) {
-		
+	if (_isError && !m_isError) 
+	{
 		m_plotLayout->removeWidget(currentPlot);
 		currentPlot->setParent(nullptr);
 		m_errorLabel->setText(_message);
 		m_plotLayout->addWidget(m_errorLabel);
 		m_isError = true;
 	}
-	else if (!_isError && m_isError) {
+	else if (!_isError && m_isError) 
+	{
 		m_plotLayout->removeWidget(m_errorLabel);
 		m_errorLabel->setParent(nullptr);
 		m_plotLayout->addWidget(currentPlot);
@@ -181,20 +185,25 @@ void ot::PlotBase::setErrorState(bool _isError, const QString & _message) {
 	}
 }
 
-void ot::PlotBase::setIncompatibleData() {
+void ot::PlotBase::setIncompatibleData() 
+{
 	clear(false);
 	setErrorState(true, "Incompatible data");
 }
 
-void ot::PlotBase::refresh() {
+void ot::PlotBase::refresh() 
+{
 	this->applyConfig();
 }
 
-void ot::PlotBase::clear(bool _clearCache) {
-	if (_clearCache) {
+void ot::PlotBase::clear(bool _clearCache) 
+{
+	if (_clearCache) 
+	{
 		this->clearCache();
 	}
-	else {
+	else 
+	{
 		this->detachAllCached();
 	}
 
@@ -237,22 +246,28 @@ void ot::PlotBase::clear(bool _clearCache) {
 	return;
 }
 
-void ot::PlotBase::setSelectedCurves(const UIDList& _selectedCurves) {
-	for (PlotDataset* dataset : this->getAllDatasets()) {
-		if (std::find(_selectedCurves.begin(), _selectedCurves.end(), dataset->getEntityID()) != _selectedCurves.end()) {
+void ot::PlotBase::setSelectedCurves(const UIDList& _selectedCurves) 
+{
+	for (PlotDataset* dataset : this->getAllDatasets()) 
+	{
+		if (std::find(_selectedCurves.begin(), _selectedCurves.end(), dataset->getEntityID()) != _selectedCurves.end()) 
+		{
 			dataset->setSelected(true);
 		}
-		else {
+		else 
+		{
 			dataset->setSelected(false);
 		}
 	}
 }
 
-void ot::PlotBase::requestResetItemSelection() {
+void ot::PlotBase::requestResetItemSelection() 
+{
 	Q_EMIT resetItemSelectionRequest();
 }
 
-void ot::PlotBase::requestCurveDoubleClicked(UID _entityID, bool _hasControlModifier) {
+void ot::PlotBase::requestCurveDoubleClicked(UID _entityID, bool _hasControlModifier) 
+{
 	Q_EMIT curveDoubleClicked(_entityID, _hasControlModifier);
 }
 
@@ -281,25 +296,26 @@ void ot::PlotBase::setInfoTextFromPosition(const QPointF& _pos)
 
 void ot::PlotBase::setInfoTextFromPosition(const QwtPointPolar& _pos)
 {
-	const QString posText = "r = " + QString::number(_pos.radius()) + "    \xCF\x86 = " + QString::number(qRadiansToDegrees(_pos.azimuth())) + " deg    \xCF\x86 = " + QString::number(_pos.azimuth()) + " rad";
+	const QString posText = "r = " + QString::number(_pos.radius()) + "    " + QString::fromUtf8(Symbol::phi()) + " = " + QString::number(qDegreesToRadians(_pos.azimuth())) + " rad    " + QString::fromUtf8(Symbol::phi()) + " = " + QString::number(_pos.azimuth()) + " deg";
 	m_infoLabel->setText(posText);
 }
 
-void ot::PlotBase::applyConfig() {
+void ot::PlotBase::applyConfig() 
+{
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setTitle(m_config.getTitle().c_str());
 
 	this->setPlotType(m_config.getPlotType());
-
-	std::string axisTitleX;
-	std::string axisTitleY;
 		
-	axisTitleX = m_config.getAxisLabelX();
-	axisTitleY = m_config.getAxisLabelY();
-	
-	// Update quantities
-	for (auto data : getAllDatasets()) {
-		data->setAxisQuantities(m_config.getXAxisQuantity(), m_config.getYAxisQuantity());
+	// Update quantities and scaling for all datasets
+	const Plot1DAxisCfg::AxisQuantity xAxisQuantity = m_config.getXAxisQuantity();
+	const Plot1DAxisCfg::AxisQuantity yAxisQuantity = m_config.getYAxisQuantity();
+	const Plot1DAxisCfg::QuantityScaling xQuantityScaling = m_config.getXAxis().getQuantityScaling();
+	const Plot1DAxisCfg::QuantityScaling yQuantityScaling = m_config.getYAxis().getQuantityScaling();
+
+	for (PlotDataset* data : getAllDatasets()) 
+	{
+		data->setAxisQuantitiesAndScaling(xAxisQuantity, xQuantityScaling, yAxisQuantity, yQuantityScaling);
 	}
 
 	// Setup plot XY
@@ -308,9 +324,6 @@ void ot::PlotBase::applyConfig() {
 	m_cartesianPlot->setPlotGridLineWidth(0.5, true);
 
 	m_cartesianPlot->setPlotLegendVisible(m_config.getLegendVisible());
-
-	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX.c_str());
-	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY.c_str());
 
 	// Setup axis
 	m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
@@ -332,9 +345,6 @@ void ot::PlotBase::applyConfig() {
 
 	m_polarPlot->setPlotLegendVisible(m_config.getLegendVisible());
 
-	m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX.c_str());
-	m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY.c_str());
-
 	// Setup axis
 	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
 	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsAutoScale());
@@ -348,6 +358,8 @@ void ot::PlotBase::applyConfig() {
 	m_polarPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, m_config.getYAxisMax());
 	m_polarPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, m_config.getYAxisMin());
 
+	updateAxisTitles(false);
+
 	m_cartesianPlot->updateGrid();
 	m_cartesianPlot->updateLegend();
 	m_cartesianPlot->updateWholePlot();
@@ -357,4 +369,25 @@ void ot::PlotBase::applyConfig() {
 	m_polarPlot->updateLegend();
 	m_polarPlot->updateWholePlot();
 	m_polarPlot->update();
+}
+
+void ot::PlotBase::updateAxisTitles(bool _replot)
+{
+	const QString axisTitleX = QString::fromStdString(m_config.getDisplayAxisLabelX());
+	const QString axisTitleY = QString::fromStdString(m_config.getDisplayAxisLabelY());
+
+	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX);
+	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY);
+
+	m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX);
+	m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY);
+
+	if (_replot) 
+	{
+		m_cartesianPlot->updateWholePlot();
+		m_cartesianPlot->update();
+
+		m_polarPlot->updateWholePlot();
+		m_polarPlot->update();
+	}
 }

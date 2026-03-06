@@ -18,7 +18,6 @@
 // @otlicense-end
 
 #pragma once
-#pragma warning(disable : 4251)
 
 // OpenTwin header
 #include "OTGui/Dialog/Painter2DDialogFilter.h"
@@ -28,6 +27,8 @@
 // std header
 #include <string>
 #include <vector>
+
+#pragma warning(disable : 4251)
 
 class EntityBase;
 class EntityContainer;

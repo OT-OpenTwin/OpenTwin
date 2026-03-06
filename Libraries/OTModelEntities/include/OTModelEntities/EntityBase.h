@@ -18,19 +18,18 @@
 // @otlicense-end
 
 #pragma once
-#pragma warning(disable : 4251)
 
 // OpenTwin header
-#include "OTModelEntities/ModelState.h"
-#include "OTModelEntities/EntityProperties.h"
-#include "OTModelEntities/EntityCallbackBase.h"
-#include "OTModelEntities/EntityFactoryRegistrar.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/BasicEntityInformation.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
 #include "OTGui/VisualisationTypes.h"
+#include "OTModelEntities/ModelState.h"
+#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/EntityCallbackBase.h"
+#include "OTModelEntities/EntityFactoryRegistrar.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 
 // BSON header
@@ -42,6 +41,8 @@
 #include <map>
 #include <list>
 #include <string>
+
+#pragma warning(disable : 4251)
 
 class EntityBase;
 
