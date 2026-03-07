@@ -29,11 +29,11 @@
 #include "OTCore/EntityName.h"
 #include "OTCore/FolderNames.h"
 #include "OTGui/KeySequence.h"
-#include "OTGui/NavigationTreeItem.h"
 #include "OTGui/VersionGraphVersionCfg.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGui/Properties/PropertyString.h"
 #include "OTGui/Dialog/SelectEntitiesDialogCfg.h"
+#include "OTGui/Widgets/NavigationTreeItemCfg.h"
 #include "OTGuiAPI/Frontend.h"
 #include "OTServiceFoundation/UILockWrapper.h"
 

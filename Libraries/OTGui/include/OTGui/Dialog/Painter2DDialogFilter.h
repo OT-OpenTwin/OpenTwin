@@ -23,7 +23,7 @@
 #include "OTSystem/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 
 // std header
 #include <list>

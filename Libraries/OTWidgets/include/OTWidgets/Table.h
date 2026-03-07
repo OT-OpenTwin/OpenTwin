@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
-#include "OTGui/TableCfg.h"
 #include "OTGui/TableRange.h"
+#include "OTGui/Widgets/TableCfg.h"
 #include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 

@@ -18,9 +18,13 @@
 // @otlicense-end
 
 #pragma once
-#include <string>
-#include "OTGui/TextEditorCfg.h"
+
+// OpenTwin header
 #include "OTGui/VisualisationCfg.h"
+#include "OTGui/Widgets/TextEditorCfg.h"
+
+// std header
+#include <string>
 
 class __declspec(dllexport) IVisualisationText
 {

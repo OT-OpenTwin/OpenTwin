@@ -134,6 +134,31 @@ set(OTGUI_HEADER_FILES
     include/OTGui/Graphics/GraphicsHierarchicalProjectItemBuilder.h
     include/OTGui/Graphics/GraphicsZValues.h
 
+    include/OTGui/Menu/MenuButtonCfg.h
+    include/OTGui/Menu/MenuCfg.h
+    include/OTGui/Menu/MenuClickableEntryCfg.h
+    include/OTGui/Menu/MenuEntryCfg.h
+    include/OTGui/Menu/MenuEntryCfgFactory.h
+    include/OTGui/Menu/MenuSeparatorCfg.h
+
+    include/OTGui/Painter/FillPainter2D.h
+    include/OTGui/Painter/Painter2D.h
+    include/OTGui/Painter/Painter2DContainer.h
+    include/OTGui/Painter/Painter2DFactory.h
+    include/OTGui/Painter/CheckerboardPainter2D.h
+    include/OTGui/Painter/GradientPainter2D.h
+    include/OTGui/Painter/GradientPainterStop2D.h
+    include/OTGui/Painter/LinearGradientPainter2D.h
+    include/OTGui/Painter/RadialGradientPainter2D.h
+    include/OTGui/Painter/PainterRainbowIterator.h
+    include/OTGui/Painter/StyleRefPainter2D.h
+
+    include/OTGui/Plot/Plot1DAxisCfg.h
+    include/OTGui/Plot/Plot1DCfg.h
+    include/OTGui/Plot/Plot1DCurveCfg.h
+    include/OTGui/Plot/Plot1DDataBaseCfg.h
+
+    include/OTGui/Properties/DefaultPropertyValues.h
     include/OTGui/Properties/Property.h
     include/OTGui/Properties/PropertyManagerIterator.h
     include/OTGui/Properties/PropertyManagerSilencer.h
@@ -160,76 +185,55 @@ set(OTGUI_HEADER_FILES
     include/OTGui/Properties/ManagedPropertyRegistrar.h
     include/OTGui/Properties/ManagedSpecialPropertyRegistrar.h
 
-    include/OTGui/Painter/FillPainter2D.h
-    include/OTGui/Painter/Painter2D.h
-    include/OTGui/Painter/Painter2DContainer.h
-    include/OTGui/Painter/Painter2DFactory.h
-    include/OTGui/Painter/CheckerboardPainter2D.h
-    include/OTGui/Painter/GradientPainter2D.h
-    include/OTGui/Painter/GradientPainterStop2D.h
-    include/OTGui/Painter/LinearGradientPainter2D.h
-    include/OTGui/Painter/RadialGradientPainter2D.h
-    include/OTGui/Painter/PainterRainbowIterator.h
-    include/OTGui/Painter/StyleRefPainter2D.h
+    include/OTGui/Style/Border.h
+    include/OTGui/Style/ColorStyleTypes.h
+    include/OTGui/Style/DefaultSyntaxHighlighterRules.h
+    include/OTGui/Style/Font.h
+    include/OTGui/Style/Grid.h
+    include/OTGui/Style/Margins.h
+    include/OTGui/Style/PenCfg.h
+    include/OTGui/Style/StyledText.h
+    include/OTGui/Style/StyledTextBuilder.h
+    include/OTGui/Style/StyledTextEntry.h
+    include/OTGui/Style/StyledTextStyle.h
+    include/OTGui/Style/StyleValue.h
+    include/OTGui/Style/SyntaxHighlighterRule.h
 
-    include/OTGui/Border.h
-    include/OTGui/CheckBoxCfg.h
-    include/OTGui/ColorStyleTypes.h
+    include/OTGui/Widgets/CheckBoxCfg.h
+    include/OTGui/Widgets/LineEditCfg.h
+    include/OTGui/Widgets/NavigationTreeCfg.h
+    include/OTGui/Widgets/NavigationTreeItemCfg.h
+    include/OTGui/Widgets/NavigationTreeItemIcon.h
+    include/OTGui/Widgets/PDFWidgetCfg.h
+    include/OTGui/Widgets/TableCfg.h
+    include/OTGui/Widgets/TableHeaderItemCfg.h
+    include/OTGui/Widgets/TextEditorCfg.h
+    include/OTGui/Widgets/ToolBarButtonCfg.h
+    include/OTGui/Widgets/ToolButtonCfg.h
+    include/OTGui/Widgets/WidgetBaseCfg.h
+    include/OTGui/Widgets/WidgetBaseCfgFactory.h
+    include/OTGui/Widgets/WidgetViewBase.h
+
     include/OTGui/CopyEntityInformation.h
     include/OTGui/CopyInformation.h
-    include/OTGui/DefaultPropertyValues.h
     include/OTGui/EntityTreeItem.h
     include/OTGui/ExtendedProjectInformation.h
     include/OTGui/FileExtension.h
-    include/OTGui/LibraryModel.h
-    include/OTGui/LineEditCfg.h
-    include/OTGui/MenuCfg.h
-    include/OTGui/MenuClickableEntryCfg.h
-    include/OTGui/MenuEntryCfg.h
-    include/OTGui/MenuEntryCfgFactory.h
-    include/OTGui/MenuButtonCfg.h
-    include/OTGui/DefaultSyntaxHighlighterRules.h
-    include/OTGui/Grid.h
-    include/OTGui/KeySequence.h
-    include/OTGui/MenuSeparatorCfg.h
-    include/OTGui/NavigationTreeItemIcon.h
-    include/OTGui/PDFWidgetCfg.h
-    include/OTGui/PenCfg.h
-    include/OTGui/Font.h
     include/OTGui/GuiTypes.h
-    include/OTGui/Margins.h
-    include/OTGui/NavigationTreeItem.h
-    include/OTGui/NavigationTreePackage.h
+    include/OTGui/KeySequence.h
+    include/OTGui/LibraryModel.h
     include/OTGui/OTGuiAPIExport.h
     include/OTGui/Path2D.h
-    include/OTGui/Plot1DAxisCfg.h
-    include/OTGui/Plot1DCfg.h
-    include/OTGui/Plot1DCurveCfg.h
-    include/OTGui/Plot1DDataBaseCfg.h
     include/OTGui/ProjectTemplateInformation.h
     include/OTGui/QuantityContainerEntryDescription.h
     include/OTGui/QueryInformation.h
-    include/OTGui/StyledText.h
-    include/OTGui/StyledTextBuilder.h
-    include/OTGui/StyledTextEntry.h
-    include/OTGui/StyledTextStyle.h
-    include/OTGui/StyleValue.h
-    include/OTGui/SyntaxHighlighterRule.h
-    include/OTGui/TableCfg.h
-    include/OTGui/TableHeaderItemCfg.h
     include/OTGui/TableIndexSchemata.h
     include/OTGui/TableRange.h
-    include/OTGui/TextEditorCfg.h
-    include/OTGui/ToolBarButtonCfg.h
-    include/OTGui/ToolButtonCfg.h
     include/OTGui/Transform.h
     include/OTGui/VersionGraphCfg.h
     include/OTGui/VersionGraphVersionCfg.h
     include/OTGui/VisualisationCfg.h
     include/OTGui/VisualisationTypes.h
-    include/OTGui/WidgetBaseCfg.h
-    include/OTGui/WidgetBaseCfgFactory.h
-    include/OTGui/WidgetViewBase.h
 )
 
 set(OTGUI_SOURCE_FILES
@@ -255,18 +259,6 @@ set(OTGUI_SOURCE_FILES
     src/Event/GraphicsConnectionDropEvent.cpp
     src/Event/GraphicsDoubleClickEvent.cpp
     src/Event/GraphicsItemDropEvent.cpp
-
-    src/Painter/CheckerboardPainter2D.cpp
-    src/Painter/Painter2DContainer.cpp
-    src/Painter/FillPainter2D.cpp
-    src/Painter/GradientPainter2D.cpp
-    src/Painter/GradientPainterStop2D.cpp
-    src/Painter/LinearGradientPainter2D.cpp
-    src/Painter/Painter2D.cpp
-    src/Painter/Painter2DFactory.cpp
-    src/Painter/RadialGradientPainter2D.cpp
-    src/Painter/PainterRainbowIterator.cpp
-    src/Painter/StyleRefPainter2D.cpp
 
     src/Graphics/BasicGraphicsIntersectionItem.cpp
     src/Graphics/GraphicsArcItemCfg.cpp
@@ -299,83 +291,99 @@ set(OTGUI_SOURCE_FILES
     src/Graphics/GraphicsTriangleItem.cpp
     src/Graphics/GraphicsVBoxLayoutItemCfg.cpp
 
+    src/Menu/MenuButtonCfg.cpp
+    src/Menu/MenuCfg.cpp
+    src/Menu/MenuClickableEntryCfg.cpp
+    src/Menu/MenuEntryCfg.cpp
+    src/Menu/MenuEntryCfgFactory.cpp
+    src/Menu/MenuSeparatorCfg.cpp
+
+    src/Painter/CheckerboardPainter2D.cpp
+    src/Painter/Painter2DContainer.cpp
+    src/Painter/FillPainter2D.cpp
+    src/Painter/GradientPainter2D.cpp
+    src/Painter/GradientPainterStop2D.cpp
+    src/Painter/LinearGradientPainter2D.cpp
+    src/Painter/Painter2D.cpp
+    src/Painter/Painter2DFactory.cpp
+    src/Painter/RadialGradientPainter2D.cpp
+    src/Painter/PainterRainbowIterator.cpp
+    src/Painter/StyleRefPainter2D.cpp
+
+    src/Plot/Plot1DAxisCfg.cpp
+    src/Plot/Plot1DCfg.cpp
+    src/Plot/Plot1DCurveCfg.cpp
+    src/Plot/Plot1DDataBaseCfg.cpp
+
+    src/Properties/DefaultPropertyValues.cpp
+    src/Properties/ManagedPropertyObject.cpp
     src/Properties/Property.cpp
-    src/Properties/PropertyManagerSilencer.cpp
-    src/Properties/PropertyReadCallbackNotifier.cpp
     src/Properties/PropertyBase.cpp
     src/Properties/PropertyBool.cpp
     src/Properties/PropertyColor.cpp
     src/Properties/PropertyDouble.cpp
     src/Properties/PropertyFactory.cpp
-    src/Properties/PropertyPath.cpp
     src/Properties/PropertyGridCfg.cpp
     src/Properties/PropertyGroup.cpp
     src/Properties/PropertyInt.cpp
     src/Properties/PropertyManager.cpp
     src/Properties/PropertyManagerNotifier.cpp
+    src/Properties/PropertyManagerSilencer.cpp
     src/Properties/PropertyPainter2D.cpp
+    src/Properties/PropertyPath.cpp
+    src/Properties/PropertyReadCallbackNotifier.cpp
     src/Properties/PropertyString.cpp
     src/Properties/PropertyStringList.cpp
-    src/Properties/ManagedPropertyObject.cpp
+    
+    src/Style/Border.cpp
+    src/Style/ColorStyleTypes.cpp
+    src/Style/DefaultSyntaxHighlighterRules.cpp
+    src/Style/Font.cpp
+    src/Style/Grid.cpp
+    src/Style/Margins.cpp
+    src/Style/PenCfg.cpp
+    src/Style/StyledText.cpp
+    src/Style/StyledTextBuilder.cpp
+    src/Style/StyledTextEntry.cpp
+    src/Style/StyledTextStyle.cpp
+    src/Style/StyleValue.cpp
+    src/Style/SyntaxHighlighterRule.cpp
 
-    src/Border.cpp
-    src/CheckBoxCfg.cpp
-    src/ColorStyleTypes.cpp
+    src/Widgets/CheckBoxCfg.cpp
+    src/Widgets/LineEditCfg.cpp
+    src/Widgets/NavigationTreeCfg.cpp
+    src/Widgets/NavigationTreeItemCfg.cpp
+    src/Widgets/NavigationTreeItemIcon.cpp
+    src/Widgets/PDFWidgetCfg.cpp
+    src/Widgets/TableCfg.cpp
+    src/Widgets/TableHeaderItemCfg.cpp
+    src/Widgets/TextEditorCfg.cpp
+    src/Widgets/ToolBarButtonCfg.cpp
+    src/Widgets/ToolButtonCfg.cpp
+    src/Widgets/WidgetBaseCfg.cpp
+    src/Widgets/WidgetBaseCfgFactory.cpp
+    src/Widgets/WidgetViewBase.cpp
+
     src/CopyEntityInformation.cpp
     src/CopyInformation.cpp
-    src/DefaultPropertyValues.cpp
-    src/DefaultSyntaxHighlighterRules.cpp
     src/EntityTreeItem.cpp
     src/ExtendedProjectInformation.cpp
     src/FileExtension.cpp
-    src/Grid.cpp
     src/KeySequence.cpp
     src/LibraryModel.cpp
-    src/LineEditCfg.cpp
-    src/MenuCfg.cpp
-    src/MenuClickableEntryCfg.cpp
-    src/MenuEntryCfg.cpp
-    src/MenuEntryCfgFactory.cpp
-    src/MenuButtonCfg.cpp
-    src/MenuSeparatorCfg.cpp
-    src/NavigationTreeItemIcon.cpp
-    src/PDFWidgetCfg.cpp
-    src/PenCfg.cpp
     src/dllmain.cpp
-    src/Font.cpp
     src/GuiTypes.cpp
-    src/Margins.cpp
-    src/NavigationTreeItem.cpp
-    src/NavigationTreePackage.cpp
     src/Path2D.cpp
-    src/Plot1DAxisCfg.cpp
-    src/Plot1DCfg.cpp
-    src/Plot1DCurveCfg.cpp
-    src/Plot1DDataBaseCfg.cpp
     src/ProjectTemplateInformation.cpp
     src/QuantityContainerEntryDescription.cpp
     src/QueryInformation.cpp
-    src/StyledText.cpp
-    src/StyledTextBuilder.cpp
-    src/StyledTextEntry.cpp
-    src/StyledTextStyle.cpp
-    src/StyleValue.cpp
-    src/SyntaxHighlighterRule.cpp
-    src/TableCfg.cpp
-    src/TableHeaderItemCfg.cpp
     src/TableIndexSchemata.cpp
     src/TableRange.cpp
-    src/TextEditorCfg.cpp
-    src/ToolBarButtonCfg.cpp
-    src/ToolButtonCfg.cpp
     src/Transform.cpp
     src/VersionGraphCfg.cpp
     src/VersionGraphVersionCfg.cpp
     src/VisualisationCfg.cpp
     src/VisualisationTypes.cpp
-    src/WidgetBaseCfg.cpp
-    src/WidgetBaseCfgFactory.cpp
-    src/WidgetViewBase.cpp
 )
 
 # ============================================================

@@ -23,10 +23,10 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/RuntimeTests.h"
 
-#include "OTGui/NavigationTreeItem.h"
 #include "OTGui/Dialog/PropertyDialogCfg.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGui/Properties/PropertyStringList.h"
+#include "OTGui/Widgets/NavigationTreeItemCfg.h"
 
 #include "OTWidgets/Splitter.h"
 #include "OTWidgets/TableView.h"

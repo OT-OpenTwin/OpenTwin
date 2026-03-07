@@ -20,10 +20,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Margins.h"
 #include "OTGui/Event/GraphicsChangeEvent.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
+#include "OTGui/Style/Margins.h"
 #include "OTWidgets/GraphicsElement.h"
 #include "OTWidgets/GraphicsSnapInfo.h"
 

@@ -22,9 +22,9 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/ToolBarButtonCfg.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
+#include "OTCommunication/ActionHandler.h"
 
 // std header
 #include <functional>

@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/QtFactory.h"

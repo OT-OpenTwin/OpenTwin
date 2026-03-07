@@ -31,7 +31,7 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityAPI.h"
-#include "OTGui/StyledTextBuilder.h"
+#include "OTGui/Style/StyledTextBuilder.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntitySolverPyrit.h"

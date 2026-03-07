@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Plot1DCfg.h"
-#include "OTGui/Plot1DDataBaseCfg.h"
+#include "OTGui/Plot/Plot1DCfg.h"
+#include "OTGui/Plot/Plot1DDataBaseCfg.h"
 #include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/AbstractPlot.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
@@ -129,6 +129,10 @@ namespace ot {
 		void setInfoTextFromPosition(const QPoint& _pos);
 		void setInfoTextFromPosition(const QPointF& _pos);
 		void setInfoTextFromPosition(const QwtPointPolar& _pos);
+
+		QString toPositionInfoText(const QPoint& _pos) const;
+		QString toPositionInfoText(const QPointF& _pos) const;
+		QString toPositionInfoText(const QwtPointPolar& _pos) const;
 
 	Q_SIGNALS:
 		void resetItemSelectionRequest();

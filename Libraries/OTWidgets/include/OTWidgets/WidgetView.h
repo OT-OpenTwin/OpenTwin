@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
-#include "OTGui/WidgetViewBase.h"
+#include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTWidgets/SelectionInformation.h"
 
 // Qt header

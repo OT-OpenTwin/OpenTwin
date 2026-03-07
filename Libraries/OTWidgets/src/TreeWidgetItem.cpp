@@ -22,7 +22,7 @@
 
 
 ot::TreeWidgetItem::TreeWidgetItem(int _type)
-	: QTreeWidgetItem(_type), m_flags(NavigationTreeItem::NoItemFlags)
+	: QTreeWidgetItem(_type), m_flags(NavigationTreeItemCfg::NoItemFlags)
 {
 	
 }
@@ -61,7 +61,7 @@ ot::TreeWidgetItemInfo ot::TreeWidgetItem::getFullInfo(void) const {
 			info.setFlags(castItem->getNavigationItemFlags());
 		}
 		else {
-			info.setFlags(NavigationTreeItem::NoItemFlags);
+			info.setFlags(NavigationTreeItemCfg::NoItemFlags);
 		}
 
 		info.addChildItem(child);

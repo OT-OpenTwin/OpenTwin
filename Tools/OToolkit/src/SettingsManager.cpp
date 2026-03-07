@@ -23,7 +23,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyPath.h"
 #include "OTGui/Properties/PropertyGroup.h"

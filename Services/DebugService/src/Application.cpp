@@ -27,7 +27,6 @@
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/ThisComputerInfo.h"
 
-#include "OTGui/TableCfg.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTGui/Properties/PropertyInt.h"
@@ -38,6 +37,7 @@
 #include "OTGui/Properties/PropertyDouble.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/Properties/PropertyPainter2D.h"
+#include "OTGui/Widgets/TableCfg.h"
 
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"

@@ -19,13 +19,15 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTGui/Widgets/TableCfg.h"
 #include "OTModelEntities/EntityResultTable.h"
 
-#include <string>
-#include <stdint.h>
-#include <vector>
+// std header
 #include <map>
-#include "OTGui/TableCfg.h"
+#include <string>
+#include <vector>
+#include <stdint.h>
 
 class __declspec(dllexport) EntityParameterizedDataTable : public EntityResultTable<std::string>
 {

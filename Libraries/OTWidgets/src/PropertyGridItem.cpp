@@ -23,7 +23,7 @@
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyInput.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PropertyGridGroup.h"

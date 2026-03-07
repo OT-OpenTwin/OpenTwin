@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"
-#include "OTGui/StyledTextBuilder.h"
+#include "OTGui/Style/StyledTextBuilder.h"
 
 // std header
 #include <string>

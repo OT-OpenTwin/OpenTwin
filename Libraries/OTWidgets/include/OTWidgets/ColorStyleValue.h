@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt header

@@ -28,10 +28,10 @@
 #include "OTGui/GuiTypes.h"
 #include "OTGui/TableRange.h"
 #include "OTGui/EntityTreeItem.h"
-#include "OTGui/WidgetViewBase.h"
-#include "OTGui/Plot1DDataBaseCfg.h"
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTGui/Plot/Plot1DDataBaseCfg.h"
+#include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTWidgets/SelectionData.h"
 #include "OTViewer/ViewChangedStates.h"
 

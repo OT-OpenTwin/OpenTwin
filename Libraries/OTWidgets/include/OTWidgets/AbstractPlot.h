@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Plot1DCfg.h"
+#include "OTGui/Plot/Plot1DCfg.h"
 #include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/AbstractPlotAxis.h"
 

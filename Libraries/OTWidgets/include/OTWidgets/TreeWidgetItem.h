@@ -32,9 +32,9 @@ namespace ot {
 		TreeWidgetItem(const TreeWidgetItemInfo& _itemInfo, int _type = 0);
 		virtual ~TreeWidgetItem();
 
-		void setNavigationItemFlag(NavigationTreeItem::ItemFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
-		void setNavigationItemFlags(const NavigationTreeItem::ItemFlags& _flags) { m_flags = _flags; };
-		const NavigationTreeItem::ItemFlags getNavigationItemFlags() const { return m_flags; };
+		void setNavigationItemFlag(NavigationTreeItemCfg::ItemFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
+		void setNavigationItemFlags(const NavigationTreeItemCfg::ItemFlags& _flags) { m_flags = _flags; };
+		const NavigationTreeItemCfg::ItemFlags getNavigationItemFlags() const { return m_flags; };
 
 		//! @brief Returns the item info
 		//! The information returned only contains the path to this item (other childs of parent items are ignored)
@@ -56,6 +56,6 @@ namespace ot {
 		bool hasChildRecursive(const QTreeWidgetItem* _item, const QTreeWidgetItem* _child) const;
 		bool hasChildRecursive(const QTreeWidgetItem* _item, const QStringList& _childPath, int _nameColumn) const;
 
-		NavigationTreeItem::ItemFlags m_flags;
+		NavigationTreeItemCfg::ItemFlags m_flags;
 	};
 }

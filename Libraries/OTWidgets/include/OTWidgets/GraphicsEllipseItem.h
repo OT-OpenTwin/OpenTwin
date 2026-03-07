@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/PenCfg.h"
+#include "OTGui/Style/PenCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header

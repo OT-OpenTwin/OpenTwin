@@ -284,20 +284,37 @@ void ot::PlotBase::clearPositionInfoText()
 
 void ot::PlotBase::setInfoTextFromPosition(const QPoint& _pos)
 {
-	const QString posText = "x = " + QString::number(_pos.x()) + "; y = " + QString::number(_pos.y());
-	m_infoLabel->setText(posText);
+	m_infoLabel->setText(toPositionInfoText(_pos));
 }
 
 void ot::PlotBase::setInfoTextFromPosition(const QPointF& _pos)
 {
-	const QString posText = "x = " + QString::number(_pos.x()) + "; y = " + QString::number(_pos.y());
-	m_infoLabel->setText(posText);
+	m_infoLabel->setText(toPositionInfoText(_pos));
 }
 
 void ot::PlotBase::setInfoTextFromPosition(const QwtPointPolar& _pos)
 {
-	const QString posText = "r = " + QString::number(_pos.radius()) + "    " + QString::fromUtf8(Symbol::phi()) + " = " + QString::number(qDegreesToRadians(_pos.azimuth())) + " rad    " + QString::fromUtf8(Symbol::phi()) + " = " + QString::number(_pos.azimuth()) + " deg";
-	m_infoLabel->setText(posText);
+	m_infoLabel->setText(toPositionInfoText(_pos));
+}
+
+QString ot::PlotBase::toPositionInfoText(const QPoint& _pos) const
+{
+	return toPositionInfoText(_pos.toPointF());
+}
+
+QString ot::PlotBase::toPositionInfoText(const QPointF& _pos) const
+{
+	std::string txt = m_config.getXAxis().getValueDisplayString(_pos.x(), m_config);
+	txt.append("     " + m_config.getYAxis().getValueDisplayString(_pos.y(), m_config));
+	return QString::fromStdString(txt);
+}
+
+QString ot::PlotBase::toPositionInfoText(const QwtPointPolar& _pos) const
+{
+	std::string txt = m_config.getXAxis().getValueDisplayString(_pos.radius(), m_config);
+	txt.append("\n     " + m_config.getYAxis().getValueDisplayString(_pos.azimuth(), m_config, "deg "));
+	txt.append("\n     " + m_config.getYAxis().getValueDisplayString(Math::degToRad(_pos.azimuth()), m_config, "rad "));
+	return QString::fromStdString(txt);
 }
 
 void ot::PlotBase::applyConfig() 

@@ -23,7 +23,7 @@
 #include "OTSystem/Flags.h"
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/BasicServiceInformation.h"
-#include "OTGui/WidgetViewBase.h"
+#include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/SelectionInformation.h"
 #include "OTWidgets/WidgetViewDockManager.h"

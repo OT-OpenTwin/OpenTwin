@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Math.h"
-#include "OTGui/Plot1DAxisCfg.h"
+#include "OTGui/Plot/Plot1DAxisCfg.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qwt header

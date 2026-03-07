@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
-#include "OTGui/TextEditorCfg.h"
+#include "OTGui/Widgets/TextEditorCfg.h"
 #include "OTWidgets/PlainTextEdit.h"
 
 // Qt header

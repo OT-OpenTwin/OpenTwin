@@ -26,8 +26,8 @@
 #include "OTCore/TimeFormatter.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/ExplicitStringValueConverter.h"
-#include "OTGui/Plot1DCfg.h"
-#include "OTGui/Plot1DCurveCfg.h"
+#include "OTGui/Plot/Plot1DCfg.h"
+#include "OTGui/Plot/Plot1DCurveCfg.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTCommunication/ActionTypes.h"
 

@@ -23,8 +23,8 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/GraphicsScene.h"
-#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/GraphicsEllipseItem.h"
 

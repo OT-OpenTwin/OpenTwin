@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/SyntaxHighlighterRule.h"
+#include "OTGui/Style/SyntaxHighlighterRule.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt header

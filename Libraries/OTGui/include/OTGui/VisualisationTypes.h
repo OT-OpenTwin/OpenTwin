@@ -23,7 +23,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/GuiTypes.h"
-#include "OTGui/WidgetViewBase.h"
+#include "OTGui/Widgets/WidgetViewBase.h"
 
 // std header
 #include <map>

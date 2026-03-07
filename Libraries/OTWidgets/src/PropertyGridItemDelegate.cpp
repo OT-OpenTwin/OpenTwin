@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/TreeWidget.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PropertyGridGroup.h"

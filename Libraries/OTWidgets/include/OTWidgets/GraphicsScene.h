@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTGui/Grid.h"
-#include "OTGui/Margins.h"
+#include "OTGui/Style/Grid.h"
+#include "OTGui/Style/Margins.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 

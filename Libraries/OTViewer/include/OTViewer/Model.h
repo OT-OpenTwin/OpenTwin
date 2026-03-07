@@ -21,9 +21,9 @@
 
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
-#include "OTGui/WidgetViewBase.h"
-#include "OTGui/Plot1DDataBaseCfg.h"
+#include "OTGui/Plot/Plot1DDataBaseCfg.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTWidgets/SelectionData.h"
 #include "OTModelEntities/Geometry.h"
 #include "SceneNodeBase.h"

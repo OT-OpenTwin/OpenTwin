@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/ColorPreviewBox.h"
 #include "OTWidgets/GlobalColorStyle.h"

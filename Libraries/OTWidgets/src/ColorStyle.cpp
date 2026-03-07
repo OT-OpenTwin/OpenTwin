@@ -21,7 +21,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/ColorStyle.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 
 ot::ColorStyle::ColorStyle() {
 

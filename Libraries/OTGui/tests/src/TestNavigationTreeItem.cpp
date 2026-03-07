@@ -19,15 +19,15 @@
 
 #include "gtest/gtest.h"
 
-#include "OTGui/NavigationTreeItem.h"
+#include "OTGui/Widgets/NavigationTreeItemCfg.h"
 
 TEST(NavigationTreeItem, Merge) {
-	ot::NavigationTreeItem r1("Root");
-	ot::NavigationTreeItem B("B");
+	ot::NavigationTreeItemCfg r1("Root");
+	ot::NavigationTreeItemCfg B("B");
 	r1.addChildItem(B);
 
-	ot::NavigationTreeItem r2("Root");
-	ot::NavigationTreeItem C("C");
+	ot::NavigationTreeItemCfg r2("Root");
+	ot::NavigationTreeItemCfg C("C");
 	r2.addChildItem(C);
 
 	r1.merge(r2);

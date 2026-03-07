@@ -44,7 +44,7 @@ namespace ot {
 		struct ItemInformation {
 			QString text;
 			QIcon icon;
-			NavigationTreeItem::ItemFlags flags;
+			NavigationTreeItemCfg::ItemFlags flags;
 		};
 
 		explicit TreeWidget(QWidget * _parentWidget);

@@ -17,15 +17,16 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTModelEntities/EntityResult1DCurve.h"
-#include "OTModelEntities/PropertyHelper.h"
-#include "OTCommunication/ActionTypes.h"
+// OpenTwin header
 #include "OTCore/EntityName.h"
-#include "OTGui/ColorStyleTypes.h"
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/Dialog/Painter2DDialogFilterDefaults.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Style/ColorStyleTypes.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/EntityResult1DCurve.h"
+#include "OTModelEntities/PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntityResult1DCurve> registrar("EntityResult1DCurve");
 

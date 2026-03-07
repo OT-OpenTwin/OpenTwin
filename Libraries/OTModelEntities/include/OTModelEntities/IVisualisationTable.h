@@ -18,9 +18,13 @@
 // @otlicense-end
 
 #pragma once
-#include <string>
-#include "OTGui/TableCfg.h"
+
+// OpenTwin header
 #include "OTCore/GenericDataStructMatrix.h"
+#include "OTGui/Widgets/TableCfg.h"
+
+// std header
+#include <string>
 
 class __declspec(dllexport) IVisualisationTable
 {

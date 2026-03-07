@@ -36,10 +36,7 @@
 #include "OTCore/Logging/AbstractLogNotifier.h"
 
 // OpenTwin Gui header
-#include "OTGui/TableCfg.h"
 #include "OTGui/GuiTypes.h"
-#include "OTGui/Plot1DCfg.h"
-#include "OTGui/TextEditorCfg.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
@@ -47,8 +44,11 @@
 #include "OTGui/Dialog/MessageDialogCfg.h"
 #include "OTGui/Event/GraphicsChangeEvent.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTGui/Widgets/TableCfg.h"
+#include "OTGui/Widgets/TextEditorCfg.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/WidgetView.h"

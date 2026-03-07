@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Plot1DCurveCfg.h"
+#include "OTGui/Plot/Plot1DCurveCfg.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
 
 class CurveColourSetter

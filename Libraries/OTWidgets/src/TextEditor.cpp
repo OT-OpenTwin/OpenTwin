@@ -20,8 +20,8 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTGui/ColorStyleTypes.h"
-#include "OTGui/DefaultSyntaxHighlighterRules.h"
+#include "OTGui/Style/ColorStyleTypes.h"
+#include "OTGui/Style/DefaultSyntaxHighlighterRules.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/TextEditor.h"

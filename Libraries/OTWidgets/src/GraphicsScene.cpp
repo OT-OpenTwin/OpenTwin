@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/Math.h"
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsItem.h"

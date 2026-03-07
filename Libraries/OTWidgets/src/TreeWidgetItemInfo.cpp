@@ -21,20 +21,20 @@
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/TreeWidgetItemInfo.h"
 
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo() : m_flags(NavigationTreeItem::NoItemFlags) {}
+ot::TreeWidgetItemInfo::TreeWidgetItemInfo() : m_flags(NavigationTreeItemCfg::NoItemFlags) {}
 
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const QString& _text, const QIcon& _icon, const NavigationTreeItem::ItemFlags& _flags) :
+ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const QString& _text, const QIcon& _icon, const NavigationTreeItemCfg::ItemFlags& _flags) :
 	m_text(_text), m_icon(_icon), m_flags(_flags)
 {}
 
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const NavigationTreeItem& _config) :
+ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const NavigationTreeItemCfg& _config) :
 	m_text(QString::fromStdString(_config.getText())), m_flags(_config.getFlags())
 {
 	if (!_config.getVisibleIconPath().empty()) {
 		m_icon = IconManager::getIcon(QString::fromStdString(_config.getVisibleIconPath()));
 	}
 
-	for (const NavigationTreeItem& child : _config.getChildItems()) {
+	for (const NavigationTreeItemCfg& child : _config.getChildItems()) {
 		m_childs.push_back(TreeWidgetItemInfo(child));
 	}
 }
@@ -55,7 +55,7 @@ ot::TreeWidgetItemInfo& ot::TreeWidgetItemInfo::operator = (const TreeWidgetItem
 	return *this;
 }
 
-ot::TreeWidgetItemInfo& ot::TreeWidgetItemInfo::addChildItem(const QString& _text, const QIcon& _icon, const NavigationTreeItem::ItemFlags& _flags) {
+ot::TreeWidgetItemInfo& ot::TreeWidgetItemInfo::addChildItem(const QString& _text, const QIcon& _icon, const NavigationTreeItemCfg::ItemFlags& _flags) {
 	m_childs.push_back(TreeWidgetItemInfo(_text, _icon, _flags));
 	return m_childs.back();
 }

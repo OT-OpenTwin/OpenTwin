@@ -28,9 +28,9 @@
 
 // OpenTwin Gui header
 #include "OTGui/GuiTypes.h"
-#include "OTGui/ToolBarButtonCfg.h"
-#include "OTGui/StyledTextBuilder.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTGui/Style/StyledTextBuilder.h"
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"

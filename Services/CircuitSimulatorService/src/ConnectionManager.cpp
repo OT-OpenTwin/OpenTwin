@@ -21,20 +21,21 @@
 #include "ConnectionManager.h"
 #include "SimulationResults.h"
 
-// Qt Header
-#include "QtNetwork/qlocalserver.h"
-#include "QtNetwork/qlocalsocket.h"
-#include "QtCore/qjsonarray.h"
-#include "QtCore/qjsondocument.h"
-#include "QtCore/qjsonobject.h"
-#include "QtCore/qcoreapplication.h"
-#include <QtCore/qelapsedtimer>
 // OpenTwin Header
-#include "OTCore/Logging/LogDispatcher.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTSystem/OperatingSystem.h"
-#include "OTGui/StyledTextBuilder.h"
 #include "Application.h"
+#include "OTSystem/OperatingSystem.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Style/StyledTextBuilder.h"
+#include "OTCommunication/ActionTypes.h"
+
+// Qt Header
+#include <QtCore/qjsonarray.h>
+#include <QtCore/qjsondocument.h>
+#include <QtCore/qjsonobject.h>
+#include <QtCore/qcoreapplication.h>
+#include <QtCore/qelapsedtimer>
+#include <QtNetwork/qlocalserver.h>
+#include <QtNetwork/qlocalsocket.h>
 
 QString ConnectionManager::toString(RequestType _type) {
     

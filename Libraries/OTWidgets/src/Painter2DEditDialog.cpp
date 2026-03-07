@@ -19,12 +19,12 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTGui/ColorStyleTypes.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Painter/LinearGradientPainter2D.h"
 #include "OTGui/Painter/RadialGradientPainter2D.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/PushButton.h"

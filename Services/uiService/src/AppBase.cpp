@@ -63,12 +63,12 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 
-#include "OTGui/ColorStyleTypes.h"
 #include "OTGui/Dialog/MessageDialogCfg.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Properties/PropertyStringList.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 
 #include "OTGuiAPI/TableActionHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"

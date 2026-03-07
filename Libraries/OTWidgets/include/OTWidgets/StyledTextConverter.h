@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/StyledTextBuilder.h"
+#include "OTGui/Style/StyledTextBuilder.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header

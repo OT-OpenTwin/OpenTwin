@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/MenuCfg.h"
+#include "OTGui/Menu/MenuCfg.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt header

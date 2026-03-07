@@ -18,7 +18,9 @@
 // @otlicense-end
 
 #pragma once
-#include "OTGui/Plot1DCfg.h"
+
+// OpenTwin header
+#include "OTGui/Plot/Plot1DCfg.h"
 
 class IVisualisationPlot1D
 {
