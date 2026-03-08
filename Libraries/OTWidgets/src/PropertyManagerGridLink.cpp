@@ -46,39 +46,43 @@ void ot::PropertyManagerGridLink::visualizeAtGrid(PropertyGrid* _grid) {
 
 	m_grid->setupGridFromConfig(manager->createGridConfiguration());
 
-	this->connect(m_grid, &PropertyGrid::propertyChanged, this, &PropertyManagerGridLink::slotPropertyChanged);
+	this->connect(m_grid, &PropertyGrid::propertiesChanged, this, &PropertyManagerGridLink::slotPropertiesChanged);
 	this->connect(m_grid, &PropertyGrid::propertyDeleteRequested, this, &PropertyManagerGridLink::slotPropertyDeleteRequested);
 }
 
 void ot::PropertyManagerGridLink::forgetPropertyGrid(void) {
 	if (m_grid) {
-		this->disconnect(m_grid, &PropertyGrid::propertyChanged, this, &PropertyManagerGridLink::slotPropertyChanged);
+		this->disconnect(m_grid, &PropertyGrid::propertiesChanged, this, &PropertyManagerGridLink::slotPropertiesChanged);
 		this->disconnect(m_grid, &PropertyGrid::propertyDeleteRequested, this, &PropertyManagerGridLink::slotPropertyDeleteRequested);
 
 		m_grid = nullptr;
 	}
 }
 
-void ot::PropertyManagerGridLink::slotPropertyChanged(const Property* _property) {
+void ot::PropertyManagerGridLink::slotPropertiesChanged(const std::list<const Property*> _properties) {
 	// Ensure property should be modified
-	if (_property->getPropertyFlags() & (PropertyBase::IsReadOnly | PropertyBase::IsProtected | PropertyBase::IsHidden)) {
-		OT_LOG_W("Property should not have changed");
-		if (m_grid) {
-			this->visualizeAtGrid(m_grid);
+	for (const Property* prop : _properties) {
+		if (prop->getPropertyFlags() & (PropertyBase::IsReadOnly | PropertyBase::IsProtected | PropertyBase::IsHidden)) {
+			OT_LOG_W("Property should not have changed");
+			if (m_grid) {
+				this->visualizeAtGrid(m_grid);
+			}
+			return;
 		}
-		return;
 	}
 
 	// Get manager
 	WidgetPropertyManager* manager = this->getWidgetPropertyManager();
 	OTAssertNullptr(manager);
 
-	// Get group
-	const PropertyGroup* grp = _property->getParentGroup();
-	OTAssertNullptr(grp);
-	
-	// Update property
-	manager->updateProperty(grp->getName(), _property, false);
+	for (const Property* prop : _properties) {
+		// Get group
+		const PropertyGroup* grp = prop->getParentGroup();
+		OTAssertNullptr(grp);
+
+		// Update property
+		manager->updateProperty(grp->getName(), prop, false);
+	}
 }
 
 void ot::PropertyManagerGridLink::slotPropertyDeleteRequested(const Property* _property) {

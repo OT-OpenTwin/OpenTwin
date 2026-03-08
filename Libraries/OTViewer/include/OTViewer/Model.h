@@ -187,7 +187,7 @@ public:
 	void   clearModalPropertyGrid();
 	void   setDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName, double value);
 	double getDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName);
-	bool   propertyGridValueChanged(const ot::Property* _property);
+	bool   propertyGridValuesChanged(const std::list<const ot::Property*>& _properties);
 
 	void lockSelectionAndModification(bool flag);
 

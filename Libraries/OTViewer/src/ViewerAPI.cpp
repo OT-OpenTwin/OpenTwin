@@ -838,12 +838,13 @@ void ViewerAPI::settingsItemChanged(ot::UID _viewerID, const ot::Property* _item
 	viewer->second->getViewer()->settingsItemChanged(_item);
 }
 
-bool ViewerAPI::propertyGridValueChanged(ot::UID _viewerID, const ot::Property* _property)
+bool ViewerAPI::propertyGridValuesChanged(ot::UID _viewerID, const std::list<const ot::Property*> _properties)
 {
 	auto viewer = intern::ViewerManager::uidToViewerMap().find(_viewerID);
 	if (viewer == intern::ViewerManager::uidToViewerMap().end()) {
 		assert(0);
 		return false;
 	}
-	return viewer->second->getViewer()->propertyGridValueChanged(_property);
+
+	return viewer->second->getViewer()->propertyGridValuesChanged(_properties);
 }

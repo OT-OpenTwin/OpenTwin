@@ -1765,9 +1765,9 @@ void Viewer::processHoverViewHandlers(osgUtil::LineSegmentIntersector *intersect
 	osgCameraManipulator->setHandleMouseMovement(currentHandler == nullptr);
 }
 
-bool Viewer::propertyGridValueChanged(const ot::Property* _property)
+bool Viewer::propertyGridValuesChanged(const std::list<const ot::Property*>& _properties)
 {
-	return model->propertyGridValueChanged(_property);
+	return model->propertyGridValuesChanged(_properties);
 }
 
 void Viewer::enableClipPlane(osg::Vec3d normal, osg::Vec3d point)

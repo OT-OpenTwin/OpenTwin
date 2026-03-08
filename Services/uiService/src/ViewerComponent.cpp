@@ -1123,14 +1123,18 @@ void ViewerComponent::settingsItemChanged(const ot::Property* _property) {
 	}
 }
 
-bool ViewerComponent::propertyGridValueChanged(const ot::Property* _property) {
+bool ViewerComponent::propertyGridValuesChanged(const std::list<const ot::Property*> _properties) {
 	for (auto vId : m_viewers) {
-		if (ViewerAPI::propertyGridValueChanged(vId, _property)) {
+		if (ViewerAPI::propertyGridValuesChanged(vId, _properties)) {
 			return true;  // The viewer has handled the property grid change
 		}
 	}
 
 	return false;  // No viewer has handled the change
+}
+
+void ViewerComponent::propertyGridValueTemporarlyChanged(const ot::Property* _property)
+{
 }
 
 void ViewerComponent::viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType, bool _isModified) {

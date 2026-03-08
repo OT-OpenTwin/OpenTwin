@@ -82,10 +82,10 @@ namespace ot {
 			}
 
 			void setTreeItem(TreeWidgetItem* _item) { m_treeItem = _item; };
-			TreeWidgetItem* getTreeItem(void) const { return m_treeItem; };
+			TreeWidgetItem* getTreeItem() const { return m_treeItem; };
 
 			void setGridConfig(const PropertyGridCfg& _config) { m_gridConfig = _config; };
-			const PropertyGridCfg& getGridConfig(void) const { return m_gridConfig; };
+			const PropertyGridCfg& getGridConfig() const { return m_gridConfig; };
 
 		private:
 			TreeWidgetItem* m_treeItem;
@@ -136,7 +136,7 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	this->connect(m_navigation->getTreeWidget(), &TreeWidget::itemSelectionChanged, this, &PropertyDialog::slotTreeSelectionChanged);
 	this->connect(m_confirmButton, &QPushButton::clicked, this, &PropertyDialog::slotConfirm);
 	this->connect(btnCancel, &QPushButton::clicked, this, &PropertyDialog::closeCancel);
-	this->connect(m_grid, &PropertyGrid::propertyChanged, this, &PropertyDialog::slotPropertyChanged);
+	this->connect(m_grid, &PropertyGrid::propertiesChanged, this, &PropertyDialog::slotPropertiesChanged);
 	this->connect(m_grid, &PropertyGrid::propertyDeleteRequested, this, &PropertyDialog::slotPropertyDeleteRequested);
 
 	this->slotTreeSelectionChanged();
@@ -203,7 +203,7 @@ void ot::PropertyDialog::setConfirmButtonEnabled(bool _enabled) {
 
 // Private slots
 
-void ot::PropertyDialog::slotConfirm(void) {
+void ot::PropertyDialog::slotConfirm() {
 	if ((this->dialogFlags() & DialogCfg::CancelOnNoChange) && !m_changed) {
 		this->closeDialog(Dialog::Cancel);
 	}
@@ -212,7 +212,7 @@ void ot::PropertyDialog::slotConfirm(void) {
 	}
 }
 
-void ot::PropertyDialog::slotTreeSelectionChanged(void) {
+void ot::PropertyDialog::slotTreeSelectionChanged() {
 	m_grid->clear();
 	if (m_navigation->getTreeWidget()->selectedItems().count() != 1) return;
 
@@ -227,11 +227,13 @@ void ot::PropertyDialog::slotTreeSelectionChanged(void) {
 	Q_EMIT propertyGridRefreshed();
 }
 
-void ot::PropertyDialog::slotPropertyChanged(const Property* _property) {
-	// Store a copy if the signal is not used and the properties need to be accessed all at once after the dialog was confirmed.
-	m_changedProperties.push_back(_property->createCopyWithParents());
+void ot::PropertyDialog::slotPropertiesChanged(const std::list<const Property*>& _properties) {
+	for (const Property* prop : _properties) {
+		// Store a copy if the signal is not used and the properties need to be accessed all at once after the dialog was confirmed.
+		m_changedProperties.push_back(prop->createCopyWithParents());
 
-	Q_EMIT propertyChanged(_property);
+		Q_EMIT propertyChanged(prop);
+	}
 }
 
 void ot::PropertyDialog::slotPropertyDeleteRequested(const Property* _property) {

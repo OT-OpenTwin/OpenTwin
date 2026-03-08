@@ -1099,7 +1099,9 @@ void AppBase::createUi() {
 			// #######################################################################
 
 			// Register notifier
-			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyChanged, this, &AppBase::slotPropertyGridValueChanged);
+			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertiesChanged, this, &AppBase::slotPropertyGridValuesChanged);
+			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyTemporarlyChanged, this, &AppBase::slotPropertyGridValueTemporarlyChanged);
+			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::temporaryChangesCleared, this, &AppBase::slotPropertyGridTemporaryChangesCleared);
 			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyDeleteRequested, this, &AppBase::slotPropertyGridValueDeleteRequested);
 			
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::selectionChangeCompleted, this, &AppBase::slotTreeItemSelectionChanged);
@@ -3599,13 +3601,25 @@ void AppBase::downloadInstaller(QString gssUrl) {
 
 // Property grid slots
 
-void AppBase::slotPropertyGridValueChanged(const ot::Property* _property) {
+void AppBase::slotPropertyGridValuesChanged(const std::list<const ot::Property*> _properties) {
 	// We first ask the viewer whether it needs to handle the property grid change.
-	if (!m_viewerComponent->propertyGridValueChanged(_property))
+	if (!m_viewerComponent->propertyGridValuesChanged(_properties))
 	{
 		// If not, we pass this change on to the external services component
-		m_ExternalServicesComponent->propertyGridValueChanged(_property);
+		m_ExternalServicesComponent->propertyGridValuesChanged(_properties);
 	}
+}
+
+void AppBase::slotPropertyGridTemporaryChangesCleared()
+{
+	OTAssertNullptr(m_ExternalServicesComponent);
+	m_ExternalServicesComponent->temporaryPropertyChangeCleared();
+}
+
+void AppBase::slotPropertyGridValueTemporarlyChanged(const ot::Property* _property)
+{
+	OTAssertNullptr(m_ExternalServicesComponent);
+	m_ExternalServicesComponent->propertyGridValueChangedTemporarly(_property);
 }
 
 void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property) {

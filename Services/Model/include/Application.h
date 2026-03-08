@@ -170,6 +170,8 @@ public:
 	// Action handler: Properties
 
 	void handleSetPropertiesFromJSON(ot::JsonDocument& _document);
+	void handleSetTemporaryPropertiesFromJson(ot::JsonDocument& _document);
+	void handleClearTemporaryPropertyChanges(ot::JsonDocument& _document);
 
 	std::string handleGetEntityProperties(ot::JsonDocument& _document);
 

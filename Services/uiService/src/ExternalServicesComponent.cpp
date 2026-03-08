@@ -693,13 +693,16 @@ ot::Property* ExternalServicesComponent::createCleanedProperty(const ot::Propert
 		propertyList.front()->addAdditionalPropertyData("EntityData", newDataDoc.toJson());
 	}
 
+	OTAssertNullptr(propertyList.front()->getRootGroup());
 	return propertyList.front();
 }
 
-void ExternalServicesComponent::propertyGridValueChanged(const ot::Property* _property) {
+void ExternalServicesComponent::propertyGridValuesChanged(const std::list<const ot::Property*>& _properties) {
+	using namespace ot;
+
 	try {
 		// Get the currently selected model entities. We first get all visible entities only.
-		std::list<ot::UID> selectedModelEntityIDs;
+		UIDList selectedModelEntityIDs;
 		getSelectedVisibleModelEntityIDs(selectedModelEntityIDs);
 		bool itemsVisible = true;
 
@@ -710,32 +713,43 @@ void ExternalServicesComponent::propertyGridValueChanged(const ot::Property* _pr
 			itemsVisible = false;
 		}
 
-		// Finally send the string
-		ot::UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
+		// Determine active data model
+		const UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
 
-		ot::Property* cleanedProperty = this->createCleanedProperty(_property);
-		if (!cleanedProperty) {
-			OT_LOG_EA("Failed to create cleaned property");
-			return;
+		// Prepare the configuration
+		PropertyGridCfg newConfig;
+
+		for (const Property* prop : _properties) {
+			Property* cleanedProperty = this->createCleanedProperty(prop);
+			if (!cleanedProperty) {
+				OT_LOG_EA("Failed to create cleaned property");
+				return;
+			}
+
+			std::unique_ptr<PropertyGroup> newRoot(cleanedProperty->getRootGroup());
+
+			ot::PropertyGroup* existingGroup = newConfig.findGroup(newRoot->getName(), false);
+			if (existingGroup) {
+				existingGroup->mergeWith(*newRoot, Property::FullMerge);
+			}
+			else {
+				newConfig.addRootGroup(newRoot.release());
+			}
 		}
 
-		ot::PropertyGridCfg newConfig;
-		newConfig.addRootGroup(cleanedProperty->getRootGroup());
-
-		ot::JsonDocument doc;
-		ot::JsonObject cfgObj;
-		newConfig.addToJsonObject(cfgObj, doc.GetAllocator());
-
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
+		// Prepare JSON document
+		JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Config, JsonObject(newConfig, doc.GetAllocator()), doc.GetAllocator());
 
+		// Notify all listeners
 		std::string response;
-
-		for (auto reciever : m_modelViewNotifier) {
+		
+		for (const ServiceDataUi* reciever : m_modelViewNotifier) {
 			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -744,6 +758,113 @@ void ExternalServicesComponent::propertyGridValueChanged(const ot::Property* _pr
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
 				OT_LOG_W(response);
 			}
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+}
+
+void ExternalServicesComponent::propertyGridValueChangedTemporarly(const ot::Property* _property)
+{
+	using namespace ot;
+
+	try {
+		// Get the currently selected model entities. We first get all visible entities only.
+		UIDList selectedModelEntityIDs;
+		getSelectedVisibleModelEntityIDs(selectedModelEntityIDs);
+		bool itemsVisible = true;
+
+		// If we do not have visible entities, then we also look for the hidden ones.
+		if (selectedModelEntityIDs.empty())
+		{
+			getSelectedModelEntityIDs(selectedModelEntityIDs);
+			itemsVisible = false;
+		}
+
+		// Determine active data model
+		const UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
+
+		// Prepare the configuration
+		PropertyGridCfg newConfig;
+
+		Property* cleanedProperty = this->createCleanedProperty(_property);
+		if (!cleanedProperty) {
+			OT_LOG_EA("Failed to create cleaned property");
+			return;
+		}
+
+		OTAssertNullptr(cleanedProperty->getRootGroup());
+		newConfig.addRootGroup(cleanedProperty->getRootGroup());
+
+		// Prepare JSON document
+		JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_SetTemporaryProperties, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Config, JsonObject(newConfig, doc.GetAllocator()), doc.GetAllocator());
+
+		// Notify all listeners
+		std::string response;
+
+		for (const ServiceDataUi* reciever : m_modelViewNotifier) {
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
+			// Check if response is an error or warning
+			OT_ACTION_IF_RESPONSE_ERROR(response) {
+				OT_LOG_E(response);
+			}
+			else OT_ACTION_IF_RESPONSE_WARNING(response) {
+				OT_LOG_W(response);
+			}
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+}
+
+void ExternalServicesComponent::temporaryPropertyChangeCleared()
+{
+	using namespace ot;
+
+	try {
+		// Get the currently selected model entities. We first get all visible entities only.
+		UIDList selectedModelEntityIDs;
+		getSelectedVisibleModelEntityIDs(selectedModelEntityIDs);
+		bool itemsVisible = true;
+
+		// If we do not have visible entities, then we also look for the hidden ones.
+		if (selectedModelEntityIDs.empty())
+		{
+			getSelectedModelEntityIDs(selectedModelEntityIDs);
+			itemsVisible = false;
+		}
+
+		// Determine active data model
+		const UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
+
+		// Prepare JSON document
+		JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ClearTemporaryPropertyChanges, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
+		
+		// Notify all listeners
+		std::string response;
+
+		for (const ServiceDataUi* reciever : m_modelViewNotifier) {
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
+			// Check if response is an error or warning
+			OT_ACTION_IF_RESPONSE_ERROR(response) {
+				OT_LOG_E(response);
+			}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			OT_LOG_W(response);
+		}
 		}
 	}
 	catch (const std::exception& _e) {

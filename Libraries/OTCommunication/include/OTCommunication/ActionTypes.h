@@ -109,6 +109,8 @@
 #define OT_ACTION_CMD_MODEL_ItemRenamed "Model.Event.ItemRenamed"
 #define OT_ACTION_CMD_MODEL_GetIsModified "Model.State.Modified.Get"
 #define OT_ACTION_CMD_MODEL_SetPropertiesFromJSON "Model.Properties.SetFromJSON"
+#define OT_ACTION_CMD_MODEL_SetTemporaryProperties "Model.Properties.SetTemporary"
+#define OT_ACTION_CMD_MODEL_ClearTemporaryPropertyChanges "Model.Properties.ClearTemporary"
 #define OT_ACTION_CMD_MODEL_DeleteProperty "Model.Properties.Delete"
 #define OT_ACTION_CMD_MODEL_GenerateEntityIDs "Model.EntityIDs.Generate"
 #define OT_ACTION_CMD_MODEL_GetListOfFolderItems "Model.FolderItems.GetList"

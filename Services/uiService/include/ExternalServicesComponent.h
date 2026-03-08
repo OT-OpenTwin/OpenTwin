@@ -148,7 +148,9 @@ public:
 
 	ot::Property* createCleanedProperty(const ot::Property* const _item);
 
-	void propertyGridValueChanged(const ot::Property* _property);
+	void propertyGridValuesChanged(const std::list<const ot::Property*>& _properties);
+	void propertyGridValueChangedTemporarly(const ot::Property* _property);
+	void temporaryPropertyChangeCleared();
 	void propertyGridValueDeleteRequested(const ot::Property* _property);
 
 	//void notifyButtonPressed(ModelUIDtype buttonID);
