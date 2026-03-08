@@ -193,7 +193,7 @@ void ot::Dialog::keyPressEvent(QKeyEvent* _event) {
 void ot::Dialog::mousePressEvent(QMouseEvent* _event) {
 	QDialog::mousePressEvent(_event);
 	if (_event->button() == Qt::LeftButton && m_flags & DialogCfg::MoveGrabAnywhere) {
-		m_lastMousePos = _event->globalPos();
+		m_lastMousePos = _event->globalPosition().toPoint();
 		m_state.set(DialogState::MousePressed, true);
 	}
 }
@@ -201,10 +201,10 @@ void ot::Dialog::mousePressEvent(QMouseEvent* _event) {
 void ot::Dialog::mouseMoveEvent(QMouseEvent* _event) {
 	QDialog::mouseMoveEvent(_event);
 	if (m_flags & DialogCfg::MoveGrabAnywhere && m_state & DialogState::MousePressed) {
-		QPoint delta = _event->globalPos() - m_lastMousePos;
+		QPoint delta = _event->globalPosition().toPoint() - m_lastMousePos;
 		if (delta.isNull()) return;
 		this->move(this->pos() + delta);
-		m_lastMousePos = _event->globalPos();
+		m_lastMousePos = _event->globalPosition().toPoint();
 	}
 }
 

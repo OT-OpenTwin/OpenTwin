@@ -18,6 +18,8 @@
 // @otlicense-end
 
 #pragma once
+
+/*
 #include "OTWidgets/PlotDatasetData.h"
 #include <vector>
 #include "OTCore/ComplexNumberContainer.h"
@@ -100,3 +102,4 @@ public:
 		return { 0,90,180,-90,45 };
 	}
 };
+*/

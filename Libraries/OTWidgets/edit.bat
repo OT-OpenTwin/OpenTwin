@@ -31,7 +31,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_WIDGETS_ROOT%\OTWidgets.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_WIDGETS_ROOT%"
 
 GOTO END
 

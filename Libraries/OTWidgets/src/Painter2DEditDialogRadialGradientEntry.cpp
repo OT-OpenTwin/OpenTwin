@@ -111,7 +111,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	this->connect(m_centerX, &DoubleSpinBox::valueChanged, this, &Painter2DEditDialogEntry::slotValueChanged);
 	this->connect(m_centerY, &DoubleSpinBox::valueChanged, this, &Painter2DEditDialogEntry::slotValueChanged);
 	this->connect(m_centerRadius, &DoubleSpinBox::valueChanged, this, &Painter2DEditDialogEntry::slotValueChanged);
-	this->connect(m_useFocal, &CheckBox::stateChanged, this, &Painter2DEditDialogRadialGradientEntry::slotFocalEnabledChanged);
+	this->connect(m_useFocal, &CheckBox::checkStateChanged, this, &Painter2DEditDialogRadialGradientEntry::slotFocalEnabledChanged);
 	this->connect(m_focalX, &DoubleSpinBox::valueChanged, this, &Painter2DEditDialogEntry::slotValueChanged);
 	this->connect(m_focalY, &DoubleSpinBox::valueChanged, this, &Painter2DEditDialogEntry::slotValueChanged);
 	this->connect(m_focalRadius, &DoubleSpinBox::valueChanged, this, &Painter2DEditDialogEntry::slotValueChanged);

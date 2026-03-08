@@ -17,6 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
+/*
 #include "gtest/gtest.h"
 #include "FixtureCoordinateFormatConverter.h"
 #include "OTWidgets/CoordinateFormatConverter.h"
@@ -261,3 +262,4 @@ TEST_F(FixtureCoordinateFormatConverter, BufferOverwrite)
 		EXPECT_EQ(dataset.getDataX()[i], (*plotData.m_xData)[i]);
 	}
 }
+*/

@@ -28,8 +28,9 @@ ot::JsonTreeWidgetFilterModel::JsonTreeWidgetFilterModel(QObject* _parent)
 }
 
 void ot::JsonTreeWidgetFilterModel::setFilterText(const QString& _text) {
+    beginFilterChange();
     m_filterText = _text.trimmed();
-    invalidateFilter();
+    endFilterChange();
 }
 
 bool ot::JsonTreeWidgetFilterModel::filterAcceptsRow(int _sourceRow, const QModelIndex& _sourceParent) const {

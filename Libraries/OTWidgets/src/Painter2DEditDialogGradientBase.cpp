@@ -61,7 +61,7 @@ ot::Painter2DEditDialogGradientBase::Painter2DEditDialogGradientBase(QVBoxLayout
 	if (_painter) m_spreadBox->setCurrentText(QString::fromStdString(toString(_painter->getSpread())));
 	else m_spreadBox->setCurrentText(QString::fromStdString(toString(GradientSpread::Pad)));
 	m_stopsBox = new SpinBox(_parent);
-	m_stopsBox->setValue(tmp.size());
+	m_stopsBox->setValue(static_cast<int>(tmp.size()));
 	m_stopsBox->setRange(1, 99);
 	stopsLay->addWidget(stopsLabel, 0);
 	stopsLay->addWidget(m_stopsBox, 1);

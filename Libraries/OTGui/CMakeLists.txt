@@ -36,16 +36,6 @@ function(join_paths OUT_VAR BASE SUBDIR)
     endif()
 endfunction()
 
-# Small helper for Visual Studio source_group mapping
-function(assign_filter FILTER_NAME)
-    foreach(FILE IN LISTS ARGN)
-        set(_full_path "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}")
-        if(EXISTS "${_full_path}")
-            source_group("${FILTER_NAME}" FILES "${FILE}")
-        endif()
-    endforeach()
-endfunction()
-
 # ============================================================
 # Environment configuration (mirrors .vcxproj usage)
 # ============================================================
@@ -68,14 +58,13 @@ get_env_path(R_JSON_INCR_PATH      R_JSON_INCR)
 
 # ============================================================
 # C++ standard
-# OTGui uses C++20 in the original vcxproj
 # ============================================================
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ============================================================
-# Source and header lists (from .vcxproj)
+# Source and header lists
 # ============================================================
 
 set(OTGUI_HEADER_FILES

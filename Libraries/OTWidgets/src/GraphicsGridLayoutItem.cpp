@@ -77,10 +77,10 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 	// Setup stretches
 	for (size_t r = 0; r < cfg->getRowStretch().size(); r++) {
-		if (cfg->getRowStretch()[r] > 0) this->setRowStretchFactor(r, cfg->getRowStretch()[r]);
+		if (cfg->getRowStretch()[r] > 0) this->setRowStretchFactor(static_cast<int>(r), cfg->getRowStretch()[r]);
 	}
 	for (size_t c = 0; c < cfg->getColumnStretch().size(); c++) {
-		if (cfg->getColumnStretch()[c] > 0) this->setColumnStretchFactor(c, cfg->getColumnStretch()[c]);
+		if (cfg->getColumnStretch()[c] > 0) this->setColumnStretchFactor(static_cast<int>(c), cfg->getColumnStretch()[c]);
 	}
 
 	this->setMinimumSize(QtFactory::toQSize(_cfg->getMinimumSize()));

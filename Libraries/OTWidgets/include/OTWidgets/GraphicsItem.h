@@ -24,6 +24,7 @@
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTGui/Style/Margins.h"
+#include "OTGui/Painter/Painter2D.h"
 #include "OTWidgets/GraphicsElement.h"
 #include "OTWidgets/GraphicsSnapInfo.h"
 

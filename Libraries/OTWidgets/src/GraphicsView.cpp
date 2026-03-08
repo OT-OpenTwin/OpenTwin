@@ -528,8 +528,8 @@ void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event) {
 void ot::GraphicsView::mouseMoveEvent(QMouseEvent* _event)
 {
 	if (m_viewStateFlags & MiddleMousePressedState) {
-		this->horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (_event->x() - m_lastPanPos.x()));
-		this->verticalScrollBar()->setValue(verticalScrollBar()->value() - (_event->y() - m_lastPanPos.y()));
+		this->horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (_event->position().x() - m_lastPanPos.x()));
+		this->verticalScrollBar()->setValue(verticalScrollBar()->value() - (_event->position().y() - m_lastPanPos.y()));
 		m_lastPanPos = _event->pos();
 		_event->accept();
 	}
@@ -684,7 +684,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	}
 
 	// Snap position to grid
-	QPointF gridPos = m_scene->snapToGrid(this->mapToScene(_event->pos()));
+	QPointF gridPos = m_scene->snapToGrid(this->mapToScene(_event->position().toPoint()));
 	
 	// Emit event
 	Q_EMIT itemRequested(itemName, gridPos);

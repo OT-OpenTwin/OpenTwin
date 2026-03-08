@@ -30,7 +30,7 @@ ot::PropertyInputBool::PropertyInputBool(QWidget* _parent)
 {
 	m_checkBox = new CheckBox(_parent);
 	m_checkBox->setFocusPolicy(Qt::NoFocus);
-	this->connect(m_checkBox, &QCheckBox::stateChanged, this, qOverload<int>(&PropertyInput::slotValueChanged));
+	this->connect(m_checkBox, &QCheckBox::checkStateChanged, this, qOverload<int>(&PropertyInput::slotValueChanged));
 }
 
 ot::PropertyInputBool::~PropertyInputBool() {

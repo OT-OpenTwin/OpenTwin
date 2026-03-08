@@ -116,7 +116,7 @@ ot::CartesianPlotCurve::CartesianPlotCurve(const QString& _title) :
 // Virtual methods
 
 void ot::CartesianPlotCurve::drawSeries(QPainter* _painter, const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QRectF& _canvasRect, int _from, int _to) const {
-    const size_t numSamples = this->dataSize();
+    const int numSamples = static_cast<int>(this->dataSize());
     
 	// Check if painter is valid and number of samples is positive
     if (!_painter || numSamples <= 0) {
