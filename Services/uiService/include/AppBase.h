@@ -614,7 +614,9 @@ public Q_SLOTS:
 
 	// Property grid slots
 
-	void slotPropertyGridValueChanged(const ot::Property* _property);
+	void slotPropertyGridValuesChanged(const std::list<const ot::Property*> _properties);
+	void slotPropertyGridTemporaryChangesCleared();
+	void slotPropertyGridValueTemporarlyChanged(const ot::Property* _property);
 	void slotPropertyGridValueDeleteRequested(const ot::Property* _property);
 
 	// ###########################################################################################################################################################################################################################################################################################################################

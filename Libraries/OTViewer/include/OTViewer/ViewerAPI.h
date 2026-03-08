@@ -163,7 +163,9 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void settingsItemChanged(ot::UID _viewerID, const ot::Property* _property);
 
-	__declspec(dllexport) bool propertyGridValueChanged(ot::UID _viewerID, const ot::Property* _property);
+	__declspec(dllexport) bool propertyGridValuesChanged(ot::UID _viewerID, const std::list<const ot::Property*> _properties);
+	__declspec(dllexport) void propertyGridValueTemporarlyChanged(ot::UID _viewerID, const ot::Property* _property);
+	__declspec(dllexport) void temporaryPropertyGridChangesCleared();
 
 	__declspec(dllexport) void freeze3DView(ot::UID osgModelID, bool flag);
 

@@ -287,11 +287,11 @@ double Model::getDoublePropertyGridValue(const std::string& _groupName, const st
 	return FrontendAPI::instance()->getDoublePropertyValue(_groupName, _itemName);
 }
 
-bool Model::propertyGridValueChanged(const ot::Property* _property)
+bool Model::propertyGridValuesChanged(const std::list<const ot::Property*>& _properties)
 {
 	if (m_currentManipulator != nullptr)
 	{
-		return m_currentManipulator->propertyGridValueChanged(_property);
+		return m_currentManipulator->propertyGridValuesChanged(_properties);
 	}
 
 	return false;

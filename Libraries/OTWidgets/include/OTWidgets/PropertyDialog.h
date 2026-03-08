@@ -56,9 +56,9 @@ namespace ot {
 		//! Existing data will be removed.
 		void setupFromConfiguration(const PropertyDialogCfg& _config);
 
-		const PropertyGrid* getPropertyGrid(void) const { return m_grid; };
+		const PropertyGrid* getPropertyGrid() const { return m_grid; };
 
-		const std::list<const Property*>& getChangedProperties(void) const { return m_changedProperties; };
+		const std::list<const Property*>& getChangedProperties() const { return m_changedProperties; };
 
 		void setConfirmButtonEnabled(bool _enabled);
 
@@ -68,16 +68,16 @@ namespace ot {
 
 		//! @brief Is emitted whenever the property grid was setup from the active configuration.
 		//! The active configuration depends on the selected tree item.
-		void propertyGridRefreshed(void);
+		void propertyGridRefreshed();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private slots
 
 	private Q_SLOTS:
-		void slotConfirm(void);
-		void slotTreeSelectionChanged(void);
-		void slotPropertyChanged(const Property* _property);
+		void slotConfirm();
+		void slotTreeSelectionChanged();
+		void slotPropertiesChanged(const std::list<const Property*>& _property);
 		void slotPropertyDeleteRequested(const Property* _property);
 
 		// ###########################################################################################################################################################################################################################################################################################################################

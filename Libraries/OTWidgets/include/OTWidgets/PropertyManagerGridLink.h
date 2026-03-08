@@ -47,10 +47,10 @@ namespace ot {
 
 		void visualizeAtGrid(PropertyGrid* _grid);
 
-		void forgetPropertyGrid(void);
+		void forgetPropertyGrid();
 
 	private Q_SLOTS:
-		void slotPropertyChanged(const Property* _property);
+		void slotPropertiesChanged(const std::list<const Property*> _propertiess);
 		void slotPropertyDeleteRequested(const Property* _property);
 
 	private:

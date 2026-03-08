@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
+#include "OTWidgets/PushButton.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/PropertyGridItem.h"
@@ -28,24 +29,37 @@
 // Qt header
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
+#include <QtWidgets/qlayout.h>
 
 ot::PropertyGrid::PropertyGrid(QWidget* _parent) :
-	QObject(_parent), m_isModal(false)
+	QObject(_parent), m_isModal(false), m_state(GridState::DefaultState)
 {
-	m_tree = new PropertyGridTree(_parent);
-	
+	m_rootWidget = new QWidget(_parent);
+	QVBoxLayout* rootLayout = new QVBoxLayout(m_rootWidget);
+
+	m_tree = new PropertyGridTree(m_rootWidget);
 	this->connect(m_tree, &QTreeWidget::itemCollapsed, this, &PropertyGrid::slotItemCollapsed);
 	this->connect(m_tree, &QTreeWidget::itemExpanded, this, &PropertyGrid::slotItemExpanded);
+	rootLayout->addWidget(m_tree, 1);
+
+	m_buttonContainer = new QWidget(m_rootWidget);
+	QHBoxLayout* buttonLayout = new QHBoxLayout(m_buttonContainer);
+	buttonLayout->addStretch(1);
+
+	PushButton* applyButton = new PushButton("Apply", m_buttonContainer);
+	connect(applyButton, &PushButton::clicked, this, &PropertyGrid::applyChanges);
+	buttonLayout->addWidget(applyButton);
+
+	PushButton* cancelButton = new PushButton("Cancel", m_buttonContainer);
+	connect(cancelButton, &PushButton::clicked, this, &PropertyGrid::clear);
+	buttonLayout->addWidget(cancelButton);
+
+	setGroupingState(false);
 }
 
-ot::PropertyGrid::~PropertyGrid() {}
-
-QWidget* ot::PropertyGrid::getQWidget() {
-	return m_tree;
-}
-
-const QWidget* ot::PropertyGrid::getQWidget() const {
-	return m_tree;
+ot::PropertyGrid::~PropertyGrid() {
+	blockSignals(true);
+	clear();
 }
 
 ot::TreeWidget* ot::PropertyGrid::getTreeWidget() const {
@@ -123,14 +137,6 @@ std::list<ot::PropertyGridItem*> ot::PropertyGrid::getAllItems() const {
 	return result;
 }
 
-void ot::PropertyGrid::clear() {
-	QSignalBlocker thisBlock(this);
-	QSignalBlocker treeBlock(m_tree);
-
-	m_tree->clear();
-	m_isModal = false;
-}
-
 void ot::PropertyGrid::focusProperty(const std::string& _groupName, const std::string& _itemName) {
 	std::list<std::string> newPath;
 	newPath.push_back(_groupName);
@@ -157,8 +163,35 @@ void ot::PropertyGrid::focusProperty(const std::list<std::string>& _groupPath, c
 	prop->getInput()->focusPropertyInput();
 }
 
+void ot::PropertyGrid::clear() {
+	QSignalBlocker thisBlock(this);
+	QSignalBlocker treeBlock(m_tree);
+
+	m_tree->clear();
+	m_isModal = false;
+	clearPropertyChangeBuffer();
+}
+
+void ot::PropertyGrid::applyChanges()
+{
+	std::list<const Property*> props = getGroupedChangedProperties();
+	if (props.empty()) {
+		return;
+	}
+
+	Q_EMIT propertiesChanged(props);
+	clearPropertyChangeBuffer();
+}
+
 void ot::PropertyGrid::slotPropertyChanged(const Property* _property) {
-	Q_EMIT propertyChanged(_property);
+	if (m_state.has(GridState::GroupChanges) || _property->getPropertyFlags().has(Property::GroupChanges)) {
+		groupPropertyChange(_property);
+	}
+	else {
+		std::list<const Property*> props;
+		props.push_back(_property);
+		Q_EMIT propertiesChanged(props);
+	}
 }
 
 void ot::PropertyGrid::slotPropertyDeleteRequested(const Property* _property) {
@@ -177,6 +210,58 @@ void ot::PropertyGrid::slotItemExpanded(QTreeWidgetItem* _item) {
 	if (g) {
 		g->updateStateIcon();
 	}
+}
+
+void ot::PropertyGrid::setGroupingState(bool _groupingIsEnabled)
+{
+	m_state.set(GridState::GroupChanges, _groupingIsEnabled);
+	m_buttonContainer->setVisible(_groupingIsEnabled);
+}
+
+void ot::PropertyGrid::groupPropertyChange(const Property* _property)
+{
+	if (!m_state.has(GridState::GroupChanges)) {
+		setGroupingState(true);
+	}
+	
+	const std::string propertyPath = _property->getPropertyPath();
+	std::unique_ptr<Property> propertyCopy(_property->createCopy());
+	OTAssertNullptr(propertyCopy.get());
+
+	auto it = m_groupedPropertyChanges.find(propertyPath);
+	if (it == m_groupedPropertyChanges.end()) {
+		m_groupedPropertyChanges.insert_or_assign(propertyPath, propertyCopy.release());
+	}
+	else {
+		delete it->second;
+		it->second = propertyCopy.release();
+	}
+
+	Q_EMIT propertyTemporarlyChanged(_property);
+}
+
+void ot::PropertyGrid::clearPropertyChangeBuffer()
+{
+	const bool hadChanges = !m_groupedPropertyChanges.empty();
+	for (auto& it : m_groupedPropertyChanges) {
+		delete it.second;
+	}
+	m_groupedPropertyChanges.clear();
+	
+	if (hadChanges) {
+		Q_EMIT temporaryChangesCleared();
+	}
+
+	setGroupingState(false);
+}
+
+std::list<const ot::Property*> ot::PropertyGrid::getGroupedChangedProperties() const
+{
+	std::list<const Property*> result;
+	for (const auto& it : m_groupedPropertyChanges) {
+		result.push_back(it.second);
+	}
+	return result;
 }
 
 ot::PropertyGridGroup* ot::PropertyGrid::findGroup(QTreeWidgetItem* _parentTreeItem, const std::list<std::string>& _groupPath) const {

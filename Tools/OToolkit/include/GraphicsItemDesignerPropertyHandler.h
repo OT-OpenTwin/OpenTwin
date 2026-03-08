@@ -77,7 +77,7 @@ protected:
 	virtual void propertyDeleteRequested(const ot::Property* _property) = 0;
 
 private Q_SLOTS:
-	void slotPropertyChanged(const ot::Property* _property);
+	void slotPropertiesChanged(const std::list<const ot::Property*>& _properties);
 	void slotPropertyDeleteRequested(const ot::Property* _property);
 
 private:

@@ -35,7 +35,7 @@ public:
 	virtual void cancelOperation(void) = 0;
 	virtual void performOperation(void) = 0;
 
-	virtual bool propertyGridValueChanged(const ot::Property* _property) { return false; }
+	virtual bool propertyGridValuesChanged(const std::list<const ot::Property*>& _properties) { return false; }
 
 	void setReplyTo(ot::serviceID_t replyTo) { messageReplyTo = replyTo; }
 	void setAction(const std::string &selectionAction) { messageSelectionAction = selectionAction; }

@@ -739,6 +739,16 @@ void Application::handleSetPropertiesFromJSON(ot::JsonDocument& _document) {
 	m_model->setPropertiesFromJson(entityIDList, cfg, update, itemsVisible);
 }
 
+void Application::handleSetTemporaryPropertiesFromJson(ot::JsonDocument& _document)
+{
+	
+}
+
+void Application::handleClearTemporaryPropertyChanges(ot::JsonDocument& _document)
+{
+
+}
+
 std::string Application::handleGetEntityProperties(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
@@ -1280,6 +1290,8 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_GetVisualizationModel, this, &Application::handleGetVisualizationModel);
 	connectAction(OT_ACTION_CMD_MODEL_GetIsModified, this, &Application::handleGetIsModified);
 	connectAction(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, this, &Application::handleSetPropertiesFromJSON);
+	connectAction(OT_ACTION_CMD_MODEL_SetTemporaryProperties, this, &Application::handleSetTemporaryPropertiesFromJson);
+	connectAction(OT_ACTION_CMD_MODEL_ClearTemporaryPropertyChanges, this, &Application::handleClearTemporaryPropertyChanges);
 	connectAction(OT_ACTION_CMD_MODEL_GenerateEntityIDs, this, &Application::handleGenerateEntityIDs);
 	connectAction(OT_ACTION_CMD_MODEL_RequestImportTableFile, this, &Application::handleRequestImportTableFile);
 	connectAction(OT_ACTION_CMD_MODEL_QueueMessages, this, &Application::handleQueueMessages);

@@ -68,7 +68,6 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		//! @brief Adds the contents of the other configuration to this configuration.
-		//! If an improved merge is required just subclass and implement 
 		//! @param _other Other group to merge into this.
 		virtual void mergeWith(const PropertyGroup& _other, const PropertyBase::MergeMode& _mergeMode);
 

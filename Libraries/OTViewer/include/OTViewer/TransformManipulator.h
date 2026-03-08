@@ -44,9 +44,10 @@ public:
 	virtual void cancelOperation(void) override;
 	virtual void performOperation(void) override;
 
-	virtual bool propertyGridValueChanged(const ot::Property* _property) override;
+	virtual bool propertyGridValuesChanged(const std::list<const ot::Property*>& _property) override;
 
 private:
+	bool handlePropertyGridValueChanged(const ot::Property* _property);
 	void getBoundingSphere(osg::Vec3d &center, double &radius, std::list<SceneNodeBase *> objects);
 	void updateHandlerPositions(void);
 	void storeTransformations(void);

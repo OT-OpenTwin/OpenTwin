@@ -231,8 +231,10 @@ public:
 
 	void settingsItemChanged(const ot::Property* _property);
 
-	bool propertyGridValueChanged(const ot::Property* _property);
-	
+	bool propertyGridValuesChanged(const std::list<const ot::Property*> _properties);
+	void propertyGridValueTemporarlyChanged(const ot::Property* _property);
+	void temporarlyPropertyGridChangesCleared();
+
 	void viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType, bool _isModified);
 
 private Q_SLOTS:

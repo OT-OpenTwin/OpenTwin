@@ -28,6 +28,7 @@
 #include <QtWidgets/qwidget.h>
 
 // std header
+#include <map>
 #include <list>
 
 class QTreeWidgetItem;
@@ -53,8 +54,8 @@ namespace ot {
 
 		// Base class functions
 
-		virtual QWidget* getQWidget() override;
-		virtual const QWidget* getQWidget() const override;
+		virtual QWidget* getQWidget() override { return m_rootWidget; };
+		virtual const QWidget* getQWidget() const override { return m_rootWidget; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -77,14 +78,18 @@ namespace ot {
 		PropertyGridItem* findItem(const std::list<std::string>& _groupPath, const std::string& _itemName) const;
 		std::list<PropertyGridItem*> getAllItems() const;
 
-		void clear();
-
 		void focusProperty(const std::string& _groupName, const std::string& _itemName);
 		void focusProperty(const std::list<std::string>& _groupPath, const std::string& _itemName);
 
 	Q_SIGNALS:
-		void propertyChanged(const Property* _property);
+		void temporaryChangesCleared();
+		void propertiesChanged(const std::list<const Property*>& _property);
+		void propertyTemporarlyChanged(const Property* _property);
 		void propertyDeleteRequested(const Property* _property);
+
+	public Q_SLOTS:
+		void clear();
+		void applyChanges();
 
 	private Q_SLOTS:
 		void slotPropertyChanged(const Property* _property);
@@ -93,11 +98,31 @@ namespace ot {
 		void slotItemExpanded(QTreeWidgetItem* _item);
 
 	private:
+		enum GridState {
+			DefaultState = 0 << 0,
+			GroupChanges = 1 << 0
+		};
+		typedef Flags<GridState> GridStateFlags;
+
+		OT_ADD_FRIEND_FLAG_FUNCTIONS(GridState, GridStateFlags)
+
+		void setGroupingState(bool _groupingIsEnabled);
+		void groupPropertyChange(const Property* _property);
+		void clearPropertyChangeBuffer();
+		std::list<const Property*> getGroupedChangedProperties() const;
+
 		PropertyGridGroup* findGroup(QTreeWidgetItem* _parentTreeItem, const std::list<std::string>& _groupPath) const;
 		void findAllChildItems(QTreeWidgetItem* _parentTreeItem, std::list<PropertyGridItem*>& _items) const;
 
+		QWidget* m_rootWidget;
+		QWidget* m_buttonContainer;
+
 		bool m_isModal;
 		PropertyGridTree* m_tree;
+
+		GridStateFlags m_state;
+
+		std::map<std::string, Property*> m_groupedPropertyChanges;
 	};
 
 }
