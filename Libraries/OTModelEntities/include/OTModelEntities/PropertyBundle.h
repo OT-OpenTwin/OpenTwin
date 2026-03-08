@@ -19,7 +19,7 @@
 
 #pragma once
 #include "OTModelEntities/EntityBase.h"
-class __declspec(dllexport)  PropertyBundle
+class __declspec(dllexport) PropertyBundle
 {
 	virtual void setProperties(EntityBase * _thisObject) = 0;
 	virtual bool updatePropertyVisibility(EntityBase * _thisObject) = 0;

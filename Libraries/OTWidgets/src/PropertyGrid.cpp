@@ -43,6 +43,7 @@ ot::PropertyGrid::PropertyGrid(QWidget* _parent) :
 	rootLayout->addWidget(m_tree, 1);
 
 	m_buttonContainer = new QWidget(m_rootWidget);
+	rootLayout->addWidget(m_buttonContainer, 0);
 	QHBoxLayout* buttonLayout = new QHBoxLayout(m_buttonContainer);
 	buttonLayout->addStretch(1);
 
@@ -226,7 +227,7 @@ void ot::PropertyGrid::groupPropertyChange(const Property* _property)
 	}
 	
 	const std::string propertyPath = _property->getPropertyPath();
-	std::unique_ptr<Property> propertyCopy(_property->createCopy());
+	std::unique_ptr<Property> propertyCopy(_property->createCopyWithParents());
 	OTAssertNullptr(propertyCopy.get());
 
 	auto it = m_groupedPropertyChanges.find(propertyPath);

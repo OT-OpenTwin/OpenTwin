@@ -122,22 +122,21 @@ void Model::entityModified(EntityBase *entity)
 // Model class
 
 Model::Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName) :
-	entityRoot(nullptr),
-	modelStorageVersion(0),
-	anyDataChangeSinceLastWrite(true),
-	visualizationModelID(0),
-	isModified(true),
-	projectName(_projectName),
-	projectType(_projectType),
-	collectionName(_collectionName),
-	shutdown(false),
-	uiCreated(false),
-	versionGraphCreated(false),
-	stateManager(nullptr),
+	m_entityRoot(nullptr),
+	m_modelStorageVersion(0),
+	m_anyDataChangeSinceLastWrite(true),
+	m_visualizationModelID(0),
+	m_isModified(true),
+	m_projectName(_projectName),
+	m_projectType(_projectType),
+	m_collectionName(_collectionName),
+	m_shutdown(false),
+	m_uiCreated(false),
+	m_versionGraphCreated(false),
+	m_stateManager(nullptr),
 	m_isProjectOpen(false)
 {
-	//NOTE, debug only
-	std::cout << "Created model for project \"" << _projectName << "\"" << std::endl;
+	OT_LOG_D("Created model { \"Project.Name\": \"" + _projectName + "\", \"Project.Type\": \"" +  + " }");
 	
 	m_infoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Geometry", "Info", "Default/Information");
 	m_infoButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Control, ot::BasicKey::I));
@@ -166,11 +165,11 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 
 void Model::clearAll()
 {
-	if (visualizationModelID != 0)
+	if (m_visualizationModelID != 0)
 	{
 		std::list<ot::UID> modelEntityIDs;
 
-		for (const auto& entity : entityMap)
+		for (const auto& entity : m_entityMap)
 		{
 			if (entity.second != nullptr) {
 				modelEntityIDs.push_back(entity.first);
@@ -180,37 +179,37 @@ void Model::clearAll()
 		removeShapesFromVisualization(modelEntityIDs);
 	}
 
-	modelStorageVersion = 0;
+	m_modelStorageVersion = 0;
 
 	// Reset the model state
 	getStateManager()->reset();
 
 	// Reset all the temporary attributes
-	entityMap.clear();
-	pendingEntityUpdates.clear();
+	m_entityMap.clear();
+	m_pendingEntityUpdates.clear();
 	Application::instance()->getSelectionHandler().clearAllBuffer();
-	parameterMap.clear();
+	m_parameterMap.clear();
 	Application::instance()->getBlockHandler().clearMap();
 
 	// Now we delete all entities (recursively)
-	if (entityRoot != nullptr) delete entityRoot;
-	entityRoot = nullptr;
+	if (m_entityRoot != nullptr) delete m_entityRoot;
+	m_entityRoot = nullptr;
 
 	// We have changed the model data
-	anyDataChangeSinceLastWrite = true;
+	m_anyDataChangeSinceLastWrite = true;
 
 	// Set the modification flat
-	isModified = true;
+	m_isModified = true;
 }
 
 void Model::resetToNew()
 {
 	clearAll();
 
-	ProjectTypeManager typeManager(projectType);
+	ProjectTypeManager typeManager(m_projectType);
 
-	entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
-	entityMap[entityRoot->getEntityID()] = entityRoot;
+	m_entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
+	m_entityMap[m_entityRoot->getEntityID()] = m_entityRoot;
 
 	ot::GeometryOperations::EntityList allNewEntities;
 
@@ -219,14 +218,14 @@ void Model::resetToNew()
 	{
 		EntityBase* entityGeometryRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityGeometryRoot->setName(getGeometryRootName());
-		addEntityToModel(entityGeometryRoot->getName(), entityGeometryRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityGeometryRoot->getName(), entityGeometryRoot, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasCoordinateSystemRoot())
 	{
 		EntityBase* entityCoordinateSystemRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityCoordinateSystemRoot->setName(getCoordinateSystemsRootName());
-		addEntityToModel(entityCoordinateSystemRoot->getName(), entityCoordinateSystemRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityCoordinateSystemRoot->getName(), entityCoordinateSystemRoot, m_entityRoot, true, allNewEntities);
 
 		EntityCoordinateSystem* globalCoordinateSystem = new EntityCoordinateSystem(createEntityUID(), nullptr, this, getStateManager());
 		globalCoordinateSystem->setName(getCoordinateSystemsRootName() + "/Global");
@@ -239,7 +238,7 @@ void Model::resetToNew()
 			ot::EntityCallbackBase::Callback::Selection,
 			OT_INFO_SERVICE_TYPE_ModelingService
 		);
-		addEntityToModel(globalCoordinateSystem->getName(), globalCoordinateSystem, entityRoot, true, allNewEntities);
+		addEntityToModel(globalCoordinateSystem->getName(), globalCoordinateSystem, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasCircuit())
@@ -247,7 +246,7 @@ void Model::resetToNew()
 		EntityBase* entityCircuitsRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityCircuitsRoot->setName(getCircuitsRootName());
 		entityCircuitsRoot->setTreeItemSelectChildren(false);
-		addEntityToModel(entityCircuitsRoot->getName(), entityCircuitsRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityCircuitsRoot->getName(), entityCircuitsRoot, m_entityRoot, true, allNewEntities);
 
 		EntityGraphicsScene* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, this, getStateManager());
 		entityCircuit->setName(typeManager.getCircuitName());
@@ -261,11 +260,11 @@ void Model::resetToNew()
 			ot::EntityCallbackBase::Callback::DataNotify,
 			OT_INFO_SERVICE_TYPE_CircuitSimulatorService
 		);
-		addEntityToModel(entityCircuit->getName(), entityCircuit, entityRoot, true, allNewEntities);
+		addEntityToModel(entityCircuit->getName(), entityCircuit, m_entityRoot, true, allNewEntities);
 
 		EntityBase* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entitySolverRoot->setName(typeManager.getSolverRootName());
-		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, m_entityRoot, true, allNewEntities);
 
 		EntitySolverCircuitSimulator* circuitSolver = new EntitySolverCircuitSimulator(createEntityUID(), nullptr, this, getStateManager());
 		circuitSolver->setName(typeManager.getCircuitSolverName());
@@ -279,35 +278,35 @@ void Model::resetToNew()
 		circuitSolver->createProperties(ot::FolderNames::CircuitsFolder, entityCircuitsRoot->getEntityID(), entityCircuitsRoot->getName());
 		circuitSolver->setCircuitFolder(entityCircuit->getName(), entityCircuit->getEntityID());
 
-		addEntityToModel(circuitSolver->getName(), circuitSolver, entityRoot, true, allNewEntities);
+		addEntityToModel(circuitSolver->getName(), circuitSolver, m_entityRoot, true, allNewEntities);
 
 
 		EntityContainer* entityCircuitModelRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityCircuitModelRoot->setName(ot::FolderNames::CircuitModelsFolder);
 		entityCircuitModelRoot->setDeletable(false);
 		entityCircuitModelRoot->setTreeItemSelectChildren(false);
-		addEntityToModel(entityCircuitModelRoot->getName(), entityCircuitModelRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityCircuitModelRoot->getName(), entityCircuitModelRoot, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasMaterialRoot())
 	{
 		EntityBase* entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityMaterialRoot->setName(getMaterialRootName());
-		addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasMeshRoot())
 	{
 		EntityBase* entityMeshRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityMeshRoot->setName(getMeshRootName());
-		addEntityToModel(entityMeshRoot->getName(), entityMeshRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityMeshRoot->getName(), entityMeshRoot, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasSolverRoot())
 	{
 		EntityContainer* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entitySolverRoot->setName(getSolverRootName());
-		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasPythonRoot())
@@ -316,19 +315,19 @@ void Model::resetToNew()
 		entityPythonRoot->setName(getPythonRootName());
 		entityPythonRoot->setDeletable(false);
 		entityPythonRoot->setTreeItemSelectChildren(false);
-		addEntityToModel(entityPythonRoot->getName(), entityPythonRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityPythonRoot->getName(), entityPythonRoot, m_entityRoot, true, allNewEntities);
 
 		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityScriptRoot->setName(ot::FolderNames::PythonScriptFolder);
 		entityScriptRoot->setDeletable(false);
 		entityScriptRoot->setTreeItemSelectChildren(false);
-		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, m_entityRoot, true, allNewEntities);
 
 		EntityContainer* entityManifestRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityManifestRoot->setName(ot::FolderNames::PythonManifestFolder);
 		entityManifestRoot->setDeletable(false);
 		entityManifestRoot->setTreeItemSelectChildren(false);
-		addEntityToModel(entityManifestRoot->getName(), entityManifestRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityManifestRoot->getName(), entityManifestRoot, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasDataProcessingRoot())
@@ -336,7 +335,7 @@ void Model::resetToNew()
 		EntityContainer* dataProcessingRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		dataProcessingRoot->setName(ot::FolderNames::DataProcessingFolder);
 		dataProcessingRoot->setTreeItemSelectChildren(false);
-		addEntityToModel(dataProcessingRoot->getName(), dataProcessingRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(dataProcessingRoot->getName(), dataProcessingRoot, m_entityRoot, true, allNewEntities);
 
 		EntityGraphicsScene* entityPipeline = new EntityGraphicsScene(createEntityUID(), nullptr, this, getStateManager());
 		entityPipeline->setName(typeManager.getPipelineName());
@@ -349,11 +348,11 @@ void Model::resetToNew()
 			ot::EntityCallbackBase::Callback::Selection,
 			OT_INFO_SERVICE_TYPE_DataProcessingService
 		);
-		addEntityToModel(entityPipeline->getName(), entityPipeline, entityRoot, true, allNewEntities);
+		addEntityToModel(entityPipeline->getName(), entityPipeline, m_entityRoot, true, allNewEntities);
 
 		EntityBase* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entitySolverRoot->setName(typeManager.getSolverRootName());
-		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, m_entityRoot, true, allNewEntities);
 
 		EntitySolverDataProcessing* pipelineSolver = new EntitySolverDataProcessing(createEntityUID(), nullptr, this, getStateManager());
 		pipelineSolver->setName(typeManager.getPiplineSolverName());
@@ -367,7 +366,7 @@ void Model::resetToNew()
 		pipelineSolver->createProperties(dataProcessingRoot->getName(), dataProcessingRoot->getEntityID());
 		pipelineSolver->setPipelineFolder(entityPipeline->getName(), dataProcessingRoot->getEntityID());
 
-		addEntityToModel(pipelineSolver->getName(), pipelineSolver, entityRoot, true, allNewEntities);
+		addEntityToModel(pipelineSolver->getName(), pipelineSolver, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasUnitRoot())
@@ -376,14 +375,14 @@ void Model::resetToNew()
 		entityUnits->setName(getUnitRootName());
 		entityUnits->createProperties();
 		//entityUnits->storeToDataBase();
-		addEntityToModel(entityUnits->getName(), entityUnits, entityRoot, true, allNewEntities);
+		addEntityToModel(entityUnits->getName(), entityUnits, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasDataCategorizationRoot())
 	{
 		EntityBase* entityRMDCategorizationRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityRMDCategorizationRoot->setName(typeManager.getDataCategorizationRootName());
-		addEntityToModel(entityRMDCategorizationRoot->getName(), entityRMDCategorizationRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityRMDCategorizationRoot->getName(), entityRMDCategorizationRoot, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasRMDCategorization())
@@ -392,21 +391,21 @@ void Model::resetToNew()
 		newDataCatEntity->CreateProperties(EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
 		newDataCatEntity->setName(typeManager.getRMDCategorizationName());
 		newDataCatEntity->setTreeItemEditable(false);
-		addEntityToModel(newDataCatEntity->getName(), newDataCatEntity, entityRoot, true, allNewEntities);
+		addEntityToModel(newDataCatEntity->getName(), newDataCatEntity, m_entityRoot, true, allNewEntities);
 	}
 
 	//if (typeManager.hasRMDCategorizationPreview())
 	//{
 	//	auto rmdCategorizationPreview = new EntityParameterizedDataPreviewTable(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	//	rmdCategorizationPreview->setName(typeManager.getRMDCategorizationName() + "/Preview");
-	//	addEntityToModel(rmdCategorizationPreview->getName(), rmdCategorizationPreview, entityRoot, true, allNewEntities);
+	//	addEntityToModel(rmdCategorizationPreview->getName(), rmdCategorizationPreview, m_entityRoot, true, allNewEntities);
 	//}
 
 	if (typeManager.hasDatasetRoot())
 	{
 		EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
 		entityDatasetRoot->setName(typeManager.getDatasetRootName());
-		addEntityToModel(entityDatasetRoot->getName(), entityDatasetRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityDatasetRoot->getName(), entityDatasetRoot, m_entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasDatasetRMD())
@@ -419,7 +418,7 @@ void Model::resetToNew()
 			ot::EntityCallbackBase::Callback::DataNotify,
 			OT_INFO_SERVICE_TYPE_ImportParameterizedDataService
 		);
-		addEntityToModel(rmd->getName(), rmd, entityRoot, true, allNewEntities);
+		addEntityToModel(rmd->getName(), rmd, m_entityRoot, true, allNewEntities);
 	}
 	
 	if (typeManager.hasHierarchicalRoot()) {
@@ -444,7 +443,7 @@ void Model::resetToNew()
 		ot::VisualisationTypes visTypes = hierarchicalRoot->getVisualizationTypes();
 		hierarchicalRoot->setCustomVisualizationViewFlags(ot::VisualisationTypes::GraphicsView, ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewNameAsTitle);
 
-		addEntityToModel(hierarchicalRoot->getName(), hierarchicalRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(hierarchicalRoot->getName(), hierarchicalRoot, m_entityRoot, true, allNewEntities);
 	}
 
 	// Now we load the default materials from the template definition
@@ -455,7 +454,7 @@ void Model::resetToNew()
 	}
 
 	// We have changed the model data
-	anyDataChangeSinceLastWrite = true;
+	m_anyDataChangeSinceLastWrite = true;
 
 	// Now create the visualization items if needed
 	if (Application::instance()->isUiConnected())
@@ -468,20 +467,20 @@ void Model::resetToNew()
 
 Model::~Model()
 {
-	shutdown = true;
+	m_shutdown = true;
 
 	// Restore the original version if needed
 	// This must be called before cleaerAll since clearAll will reset the state manager
-	if (stateManager) {
-		stateManager->restoreOriginalVersionIfNeeded();
+	if (m_stateManager) {
+		m_stateManager->restoreOriginalVersionIfNeeded();
 	}
 
 	// delete all entities
 	clearAll();
 
-	if (stateManager != nullptr) {
-		delete stateManager;
-		stateManager = nullptr;
+	if (m_stateManager != nullptr) {
+		delete m_stateManager;
+		m_stateManager = nullptr;
 	}
 }
 
@@ -498,17 +497,17 @@ void Model::initialize() {
 	}
 
 	// Here we set a dummy project name (needs to be changed later on)
-	DataBase::instance().setCollectionName(collectionName);
+	DataBase::instance().setCollectionName(m_collectionName);
 }
 
 void Model::detachAllViewer()
 {
-	visualizationModelID = 0;
+	m_visualizationModelID = 0;
 }
 
 void Model::setupUIControls(ot::components::UiComponent* _ui)
 {	
-	assert(!uiCreated);
+	assert(!m_uiCreated);
 
 	ot::LockTypes modelRead(ot::LockType::ModelRead);
 	ot::LockTypes modelWrite(ot::LockType::ModelWrite);
@@ -541,7 +540,7 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 
 	Application::instance()->addButtons();
 
-	uiCreated = true;
+	m_uiCreated = true;
 
 	// Send an initial notification to properly set the state of the new controls
 	Application::instance()->getSelectionHandler().clearAllBufferAndNotify();
@@ -551,7 +550,7 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 
 void Model::updateUndoRedoStatus()
 {
-	if (!uiCreated) return;
+	if (!m_uiCreated) return;
 
 	enableQueuingHttpRequests(true);
 
@@ -625,7 +624,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 			while (entityNames[entity->getName()]);
 
 			// Now we have a unique name for the entity
-			addEntityToModel(entity->getName(), entity, entityRoot, addVisualizationContainers, newEntities);
+			addEntityToModel(entity->getName(), entity, m_entityRoot, addVisualizationContainers, newEntities);
 			return;
 		}
 		else
@@ -652,7 +651,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 		std::string folderName = entityPath.substr(0, pos);
 		std::string entityName = entityPath.substr(pos + 1);
 
-		if (root != entityRoot) folderName = root->getName() + "/" + folderName;
+		if (root != m_entityRoot) folderName = root->getName() + "/" + folderName;
 
 		// Check whetehr the container already exists and if not, create it
 		EntityContainer *containerRoot = dynamic_cast<EntityContainer *>(root);
@@ -679,7 +678,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 					while (entityNames[entity->getName()]);
 
 					// Now we have a unique name for the entity
-					addEntityToModel(entity->getName(), entity, entityRoot, addVisualizationContainers, newEntities);
+					addEntityToModel(entity->getName(), entity, m_entityRoot, addVisualizationContainers, newEntities);
 					return;
 				}
 				break;
@@ -692,7 +691,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 			container = new EntityContainer(createEntityUID(), root, this, getStateManager());
 
 			container->setName(folderName);
-			container->setTreeItemEditable(entity->getTreeItemEditable() && entityRoot != containerRoot); // If the entity is editable, a newly created container 
+			container->setTreeItemEditable(entity->getTreeItemEditable() && m_entityRoot != containerRoot); // If the entity is editable, a newly created container 
 																						  // should be editable, too - if it is not a top level container
 			container->setCreateVisualizationItem(addVisualizationContainers);
 
@@ -716,7 +715,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 
 void  Model::addEntityToMap(EntityBase *entity)
 {
-	entityMap[entity->getEntityID()] = entity;
+	m_entityMap[entity->getEntityID()] = entity;
 	Application::instance()->getBlockHandler().processEntity(entity);
 	setModified();
 
@@ -754,7 +753,7 @@ void Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool kee
 	}
 
 	// Depending on the operation, the entity might already have been removed from the list
-	entityMap.erase(entity->getEntityID());
+	m_entityMap.erase(entity->getEntityID());
 	
 	// Now we also remove the entity from the model state manager (this will also remove all children from the state Manager)
 	// Removing the children here from the state manager is important, since not the entire information about an entity may be loaded 
@@ -775,7 +774,7 @@ void Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool kee
 
 bool Model::entityExists(ot::UID uID)
 {
-	return (entityMap.count(uID) > 0);
+	return (m_entityMap.count(uID) > 0);
 }
 
 ot::UID Model::createEntityUID()
@@ -821,7 +820,7 @@ std::map<std::string, bool> Model::getListOfEntityNames()
 {
 	std::map<std::string, bool> existingEntityNames;
 
-	std::list<EntityBase *> entityList = entityRoot->getChildrenList();
+	std::list<EntityBase *> entityList = m_entityRoot->getChildrenList();
 
 	for (auto entity : entityList)
 	{
@@ -852,7 +851,7 @@ std::map<std::string, ot::UID> Model::getEntityNameToIDMap()
 {
 	std::map<std::string, ot::UID> entityNameToIDMap;
 
-	std::list<EntityBase *> entityList = entityRoot->getChildrenList();
+	std::list<EntityBase *> entityList = m_entityRoot->getChildrenList();
 
 	for (auto entity : entityList)
 	{
@@ -866,27 +865,27 @@ void Model::getModelBox(double &xmin, double &xmax, double &ymin, double &ymax, 
 {
 	xmin = xmax = ymin = ymax = zmin = zmax = 0.0;
 
-	entityRoot->getEntityBox(xmin, xmax, ymin, ymax, zmin, zmax);
+	m_entityRoot->getEntityBox(xmin, xmax, ymin, ymax, zmin, zmax);
 }
 
 void Model::setVisualizationModel(ot::UID visModelID)
 {
-	visualizationModelID = visModelID;	
+	m_visualizationModelID = visModelID;	
 		
 	if (Application::instance()->isUiConnected())
 	{
 		enableQueuingHttpRequests(true);
 
-		if (entityRoot != nullptr)
+		if (m_entityRoot != nullptr)
 		{
 			// Ensure that the root nodes have a visualization item
 			//createVisualizationItems();
 
-			entityRoot->addVisualizationNodes();
+			m_entityRoot->addVisualizationNodes();
 		}
 
 		// Request a view reset
-		Application::instance()->getNotifier()->resetAllViews(visualizationModelID);
+		Application::instance()->getNotifier()->resetAllViews(m_visualizationModelID);
 
 		Application::instance()->getSelectionHandler().clearAllBufferAndNotify();
 
@@ -901,10 +900,10 @@ void Model::setVisualizationModel(ot::UID visModelID)
 
 void Model::createVisualizationItems()
 {
-	if (visualizationModelID == 0) return;
+	if (m_visualizationModelID == 0) return;
 
 	// Ensure that the root nodes have a visualization item
-	std::list<EntityBase *> entityList = entityRoot->getChildrenList();
+	std::list<EntityBase *> entityList = m_entityRoot->getChildrenList();
 
 	for (auto entity : entityList)
 	{
@@ -927,33 +926,33 @@ void Model::addVisualizationContainerNode(const std::string &name, ot::UID entit
 	treeItem.setEntityName(name);
 	
 	ot::VisualisationTypes visTypes;
-	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, treeItem, visTypes);
+	Application::instance()->getNotifier()->addVisualizationContainerNode(m_visualizationModelID, treeItem, visTypes);
 }
 
 ot::UID Model::getVisualizationModel()
 {
-	return visualizationModelID;
+	return m_visualizationModelID;
 }
 
 void Model::addModalCommand(ModalCommandBase *command)
 {
-	assert(std::find(modalCommands.begin(), modalCommands.end(), command) == modalCommands.end()); // Ensure that the command is not yet in the list
+	assert(std::find(m_modalCommands.begin(), m_modalCommands.end(), command) == m_modalCommands.end()); // Ensure that the command is not yet in the list
 	
-	modalCommands.push_back(command);
+	m_modalCommands.push_back(command);
 }
 
 void Model::removeModalCommand(ModalCommandBase *command)
 {
-	assert(std::find(modalCommands.begin(), modalCommands.end(), command) != modalCommands.end());  // Ensure that the command is in the list
+	assert(std::find(m_modalCommands.begin(), m_modalCommands.end(), command) != m_modalCommands.end());  // Ensure that the command is in the list
 
-	modalCommands.erase(std::find(modalCommands.begin(), modalCommands.end(), command));
+	m_modalCommands.erase(std::find(m_modalCommands.begin(), m_modalCommands.end(), command));
 }
 
 void Model::requestImportTableFile(const std::string& _itemName)
 {
 	// Get a file name for the Table file from the UI
 
-	newTableItemName = _itemName;
+	m_newTableItemName = _itemName;
 	Application::instance()->getNotifier()->requestFileForReading("Import Table File", "Table files (*.csv)", OT_ACTION_CMD_ImportTableFile, DataBase::instance().getSiteID());
 }
 
@@ -962,7 +961,7 @@ void Model::importTableFile(const std::string &fileName, bool removeFile)
 	TableReader reader;
 	reader.setModel(this);
 	ot::EntityCallbackBase cb;
-	std::string error = reader.readFromFile(fileName, newTableItemName, this, getStateManager(), cb);
+	std::string error = reader.readFromFile(fileName, m_newTableItemName, this, getStateManager(), cb);
 
 	if (removeFile)
 	{
@@ -1000,7 +999,7 @@ void Model::handleCreateNewParameter()
 	treeItem.setEntityName(parameterName);
 
 	ot::VisualisationTypes visTypes;
-	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, treeItem, visTypes);
+	Application::instance()->getNotifier()->addVisualizationContainerNode(m_visualizationModelID, treeItem, visTypes);
 
 	setModified();
 
@@ -1020,7 +1019,7 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 		entityParameterRoot->setName(getParameterRootName());
 
 		ot::GeometryOperations::EntityList allNewEntities;
-		addEntityToModel(entityParameterRoot->getName(), entityParameterRoot, entityRoot, true, allNewEntities);
+		addEntityToModel(entityParameterRoot->getName(), entityParameterRoot, m_entityRoot, true, allNewEntities);
 
 		addVisualizationContainerNode(entityParameterRoot->getName(), entityParameterRoot->getEntityID(), entityParameterRoot->getTreeItemEditable());
 	}
@@ -1041,22 +1040,25 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 void Model::setParameter(const std::string &name, double value, EntityParameter *parameter)
 {
 	std::string baseName = name.substr(getParameterRootName().size() + 1);
-	parameterMap[baseName] = std::pair<double, EntityParameter*>(value, parameter);
+	m_parameterMap[baseName] = std::pair<double, EntityParameter*>(value, parameter);
 }
 
 void Model::removeParameter(const std::string &name)
 {	
 	std::string baseName = name.substr(getParameterRootName().size() + 1);
-	parameterMap.erase(baseName);
+	m_parameterMap.erase(baseName);
 }
 
 void Model::setParameterDependency(std::list<std::string> &parameters, ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup)
 {
 	std::set<std::string> parameterSet;
-	for (auto param : parameters) parameterSet.insert(param);
+	for (const auto& param : parameters)
+	{
+		parameterSet.insert(param);
+	}
 
 	// First, we remove this dependency from all parameters
-	for (auto &parameter : parameterMap)
+	for (auto &parameter : m_parameterMap)
 	{
 		// Make sure that we don't want to add the dependency for this parameter again
 		if (parameterSet.count(parameter.first) == 0)
@@ -1068,7 +1070,7 @@ void Model::setParameterDependency(std::list<std::string> &parameters, ot::UID e
 	// Now we add the dependency to the affected paramters
 	for (auto &parameter : parameters)
 	{
-		parameterMap[parameter].second->addDependency(entityID, propertyName,propertyGroup);
+		m_parameterMap[parameter].second->addDependency(entityID, propertyName,propertyGroup);
 	}
 }
 
@@ -1077,7 +1079,7 @@ void Model::removeParameterDependency(ot::UID entityID)
 	// Here we need to check whether we are currently removing a parameter. 
 	EntityParameter *parameterEntity = dynamic_cast<EntityParameter *>(getEntityByID(entityID));		
 
-	for (auto &parameter : parameterMap)
+	for (auto &parameter : m_parameterMap)
 	{
 		if (parameter.second.second->hasDependency(entityID))
 		{
@@ -1328,9 +1330,9 @@ void Model::handleDeleteSelectedShapes()
 
 void Model::removeShapesFromVisualization(std::list<ot::UID> &removeFromDisplay)
 {
-	if (visualizationModelID != 0)
+	if (m_visualizationModelID != 0)
 	{
-		Application::instance()->getNotifier()->removeShapesFromVisualization(visualizationModelID, removeFromDisplay);
+		Application::instance()->getNotifier()->removeShapesFromVisualization(m_visualizationModelID, removeFromDisplay);
 	}
 }
 
@@ -1352,7 +1354,7 @@ void Model::deleteEntity(EntityBase *entity)
 bool Model::isProtectedEntity(EntityBase *entity)
 {
 	if (entity->getParent() == nullptr) return true;
-	if (entity->getParent() == entityRoot) return true;
+	if (entity->getParent() == m_entityRoot) return true;
 	
 	return !entity->getDeletable();
 }
@@ -1361,7 +1363,7 @@ bool Model::anyMeshItemSelected(std::list<ot::UID> &selectedEntityID)
 {
 	for (auto entityID : selectedEntityID)
 	{
-		EntityMesh *entity = dynamic_cast<EntityMesh *> (entityMap[entityID]);
+		EntityMesh *entity = dynamic_cast<EntityMesh *> (m_entityMap[entityID]);
 		if (entity != nullptr) return true;
 	}
 
@@ -1372,7 +1374,7 @@ bool Model::anyMaterialItemSelected(std::list<ot::UID> &selectedEntityID)
 {
 	for (auto entityID : selectedEntityID)
 	{
-		EntityMaterial *entity = dynamic_cast<EntityMaterial *> (entityMap[entityID]);
+		EntityMaterial *entity = dynamic_cast<EntityMaterial *> (m_entityMap[entityID]);
 
 		if (entity != nullptr) return true;
 	}
@@ -1452,7 +1454,7 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	// Rename the corresponding path in each entity name
 	std::string filter = fromPath + "/";
 
-	for (auto ent : entityMap)
+	for (auto ent : m_entityMap)
 	{
 		EntityBase *item = ent.second;
 
@@ -1519,20 +1521,20 @@ void Model::updatePropertyGrid()
 
 void Model::setEntityOutdated(EntityBase *entity)
 {
-	pendingEntityUpdates[entity] = true;
+	m_pendingEntityUpdates[entity] = true;
 }
 
 void Model::setEntityUpdated(EntityBase *entity)
 {
-	if (pendingEntityUpdates.count(entity) != 0)
+	if (m_pendingEntityUpdates.count(entity) != 0)
 	{
-		pendingEntityUpdates.erase(entity);
+		m_pendingEntityUpdates.erase(entity);
 	}
 }
 
 void Model::clearEntityUpdates(EntityBase *entity)
 {
-	pendingEntityUpdates.clear();
+	m_pendingEntityUpdates.clear();
 }
 
 void Model::addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, bool visibleOnly, ot::PropertyGridCfg& _config)
@@ -1561,7 +1563,7 @@ void Model::clearSelection()
 
 void Model::resetAllViews()
 {
-	Application::instance()->getNotifier()->resetAllViews(visualizationModelID);
+	Application::instance()->getNotifier()->resetAllViews(m_visualizationModelID);
 }
 
 void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration, bool update, bool itemsVisible)
@@ -1814,9 +1816,9 @@ void Model::getEntityProperties(EntityBase* entity, bool recursive, const std::s
 
 void Model::setShapeVisibility(std::list<ot::UID>& visibleEntityIDs, std::list<ot::UID>& hiddenEntityIDs)
 {
-	if (visualizationModelID != 0)
+	if (m_visualizationModelID != 0)
 	{
-		Application::instance()->getNotifier()->setShapeVisibility(visualizationModelID, visibleEntityIDs, hiddenEntityIDs);
+		Application::instance()->getNotifier()->setShapeVisibility(m_visualizationModelID, visibleEntityIDs, hiddenEntityIDs);
 	}
 }
 
@@ -1860,7 +1862,7 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*> _entities, const s
 		}
 
 		ot::GeometryOperations::EntityList allNewEntities;
-		addEntityToModel(entity->getName(), entity, entityRoot, addVisualizationContainer, allNewEntities);
+		addEntityToModel(entity->getName(), entity, m_entityRoot, addVisualizationContainer, allNewEntities);
 
 		// Now the parent should not be empty
 		ot::UID parentID = 0;
@@ -2118,7 +2120,7 @@ void Model::setProperties(const std::list<EntityBase *> &entities, EntityPropert
 
 bool Model::entitiesNeedUpdate()
 {
-	return (!pendingEntityUpdates.empty());
+	return (!m_pendingEntityUpdates.empty());
 }
 
 void Model::updateEntityProperties(bool itemsVisible)
@@ -2132,9 +2134,9 @@ void Model::updateEntityProperties(bool itemsVisible)
 
 	bool needsWritingQueueFlush = false;
 
-	bool anyEntityNeedsUpdate = !pendingEntityUpdates.empty();
+	bool anyEntityNeedsUpdate = !m_pendingEntityUpdates.empty();
 	
-	while (!pendingEntityUpdates.empty())
+	while (!m_pendingEntityUpdates.empty())
 	{
 		// Now we try to pick a paramter from the list of pending entity updates, such that the parameters are 
 		// always updated first. If there is no parameter to update, just pich the first entity from the map.
@@ -2142,7 +2144,7 @@ void Model::updateEntityProperties(bool itemsVisible)
 		EntityBase * entity = nullptr;
 		
 		// Try for find a paramter
-		for (auto &ent : pendingEntityUpdates)
+		for (auto &ent : m_pendingEntityUpdates)
 		{
 			if (dynamic_cast<EntityParameter *>(ent.first) != nullptr)
 			{
@@ -2155,7 +2157,7 @@ void Model::updateEntityProperties(bool itemsVisible)
 		if (entity == nullptr)
 		{
 			// No parameter found, pick the first entity
-			entity = pendingEntityUpdates.begin()->first;
+			entity = m_pendingEntityUpdates.begin()->first;
 		}
 
 		updateEntity(entity);
@@ -2250,8 +2252,8 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 			entityIDs.push_back(entity.first);
 			entityVersions.push_back(entity.second);
 			brepVersions.push_back(brepVersion);
-			auto changedEntityByID = entityMap.find(entity.first);
-			assert(changedEntityByID != entityMap.end());
+			auto changedEntityByID = m_entityMap.find(entity.first);
+			assert(changedEntityByID != m_entityMap.end());
 			ot::EntityInformation entityInfo(changedEntityByID->second);
 			ot::JsonObject entityInfoSerialised;
 			entityInfo.addToJsonObject(entityInfoSerialised, notify.GetAllocator());
@@ -2462,14 +2464,14 @@ std::string Model::replaceParameterInExpression(std::string expression, const st
 
 bool Model::evaluateExpressionDouble(const std::string &expression, double &value, ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup)
 {
-	int nParameter = (int)parameterMap.size();
+	int nParameter = static_cast<int>(m_parameterMap.size());
 	te_variable *parameter = nullptr;
 
 	if (nParameter > 0)
 	{
 		parameter = new te_variable[nParameter];
 		int index = 0;
-		for (auto &par : parameterMap)
+		for (auto &par : m_parameterMap)
 		{
 			parameter[index].name = par.first.c_str();
 			parameter[index].address = &(par.second.first);
@@ -2761,7 +2763,7 @@ void Model::getAllGeometryEntities(std::list<EntityGeometry *> &geometryEntities
 void Model::getAllEntities(std::list<EntityBase *> &allEntities)
 {
 	allEntities.clear();
-	addAllEntitiesToList(entityRoot, allEntities);
+	addAllEntitiesToList(m_entityRoot, allEntities);
 }
 
 void Model::displayMessage(const std::string &message)
@@ -2789,7 +2791,7 @@ void Model::handleShowSelectedShapeInformation()
 	std::list<EntityBase *> selectedEntities;
 	for (ot::UID entityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
 	{
-		selectedEntities.push_back(entityMap[entityID]);
+		selectedEntities.push_back(m_entityMap[entityID]);
 	}
 
 	// We need to ensure that we have all necessary geometry information loaded (prefetching)
@@ -3003,7 +3005,7 @@ size_t Model::getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geom
 	for (auto entity : geometryEntities)
 	{
 		unsigned long long entityID = entity->getFacetsStorageObjectID();
-		unsigned long long entityVersion = stateManager->getCurrentEntityVersion(entityID);
+		unsigned long long entityVersion = m_stateManager->getCurrentEntityVersion(entityID);
 
 		assert(entityVersion != 1); // This is for testing whether still some old version convention is being used somewhere
 
@@ -3130,7 +3132,7 @@ void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &anno
 	}
 
 	ot::GeometryOperations::EntityList allNewEntities;
-	addEntityToModel(annotationEntity->getName(), annotationEntity, entityRoot, true, allNewEntities);
+	addEntityToModel(annotationEntity->getName(), annotationEntity, m_entityRoot, true, allNewEntities);
 
 	updateAnnotationGeometry(annotationEntity);
 }
@@ -3352,7 +3354,7 @@ void Model::projectOpen(const std::string& _customVersion)
 	if (!GetDocumentFromEntityID(0, doc))
 	{
 		OT_LOG_E("Failed to read most recent mode from storage. Resetting project to new...");
-		displayMessage("ERROR: Unable to read most recent model from storage: " + projectName + "\n");
+		displayMessage("ERROR: Unable to read most recent model from storage: " + m_projectName + "\n");
 		resetToNew();
 		modelChangeOperationCompleted("");
 
@@ -3389,7 +3391,7 @@ void Model::projectOpen(const std::string& _customVersion)
 
 	// Now setup the UI
 	auto ui = Application::instance()->getUiComponent();
-	if (ui && !uiCreated)
+	if (ui && !m_uiCreated)
 	{
 		enableQueuingHttpRequests(true);
 		
@@ -3409,13 +3411,13 @@ void Model::projectOpen(const std::string& _customVersion)
 	// Now read the root entity (this will implicitly also recursively load all other subentities as well
 	if (entityRootId != -1)
 	{
-		entityRoot = dynamic_cast<EntityContainer*>(readEntityFromEntityID(nullptr, entityRootId, entityMap));
+		m_entityRoot = dynamic_cast<EntityContainer*>(readEntityFromEntityID(nullptr, entityRootId, m_entityMap));
 	}
 	
 	// Process all entities and store the parameter values
 	BlockHandler& blockHandler = Application::instance()->getBlockHandler();
 
-	for (auto &entity : entityMap)
+	for (auto &entity : m_entityMap)
 	{
 		EntityParameter *parameter = dynamic_cast<EntityParameter *>(entity.second);
 		if (parameter != nullptr)
@@ -3433,7 +3435,7 @@ void Model::projectOpen(const std::string& _customVersion)
 	resetModified();
 
 	// reset the model data changed flag
-	anyDataChangeSinceLastWrite = false;
+	m_anyDataChangeSinceLastWrite = false;
 
 	// update the undo information
 	updateUndoRedoStatus();
@@ -3443,7 +3445,7 @@ void Model::projectOpen(const std::string& _customVersion)
 
 void Model::updateVersionGraph()
 {
-	if (Application::instance()->isUiConnected() && !versionGraphCreated && visualizationModelID != 0)
+	if (Application::instance()->isUiConnected() && !m_versionGraphCreated && m_visualizationModelID != 0)
 	{
 		enableQueuingHttpRequests(true);
 
@@ -3456,9 +3458,9 @@ void Model::updateVersionGraph()
 
 void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 {
-	if (entityRoot != nullptr)
+	if (m_entityRoot != nullptr)
 	{
-		if (entityRoot->getModified()) setModified();
+		if (m_entityRoot->getModified()) setModified();
 	}
 
 	if (!getModified())
@@ -3476,14 +3478,14 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	updateEntityProperties(true);
 
 	// First recursively store the entities
-	if (entityRoot != nullptr)
+	if (m_entityRoot != nullptr)
 	{
-		entityRoot->storeToDataBase();
+		m_entityRoot->storeToDataBase();
 	}
 
 	// Now we store the specific information about the model itself
 
-	if (anyDataChangeSinceLastWrite)
+	if (m_anyDataChangeSinceLastWrite)
 	{
 		bool newModel = (getModelStorageVersion() == 0);
 		assert(newModel); // We should have a single model entry only
@@ -3510,13 +3512,13 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 			bsoncxx::builder::basic::kvp("ModelType", "Parametric3D"),
 			bsoncxx::builder::basic::kvp("ActiveBranch", ""),
 			bsoncxx::builder::basic::kvp("ActiveVersion", ""),
-			bsoncxx::builder::basic::kvp("entityRoot", (long long)((entityRoot == nullptr) ? -1 : entityRoot->getEntityID()))
+			bsoncxx::builder::basic::kvp("entityRoot", (long long)((m_entityRoot == nullptr) ? -1 : m_entityRoot->getEntityID()))
 		);
 
 		DataBase::instance().storeDataItem(doc);
 		DataBase::instance().flushWritingQueue();
 
-		anyDataChangeSinceLastWrite = false;
+		m_anyDataChangeSinceLastWrite = false;
 	}
 
 	// Get the previous Model version
@@ -3575,8 +3577,8 @@ void Model::promptResponse(const std::string& _type, ot::MessageDialogCfg::Basic
 
 EntityBase* Model::getEntityByID(ot::UID _entityID) const
 {
-	auto entityBaseIt = entityMap.find(_entityID);
-	if (entityBaseIt == entityMap.end())
+	auto entityBaseIt = m_entityMap.find(_entityID);
+	if (entityBaseIt == m_entityMap.end())
 	{
 		//assert(0); //Entity was not found -> No assertion since this might happen in some cases and will be handled by the callers
 		return nullptr;
@@ -3589,18 +3591,18 @@ EntityBase* Model::getEntityByID(ot::UID _entityID) const
 
 void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) {
 	using namespace ot;
-	if (entityRoot) {
-		_object.AddMember("EntityRoot", JsonObject(entityRoot->getTreeItem(), _allocator), _allocator);
+	if (m_entityRoot) {
+		_object.AddMember("EntityRoot", JsonObject(m_entityRoot->getTreeItem(), _allocator), _allocator);
 	}
 	else {
 		_object.AddMember("EntityRoot", JsonNullValue(), _allocator);
 	}
 
-	_object.AddMember("ModelStorageVersion", modelStorageVersion, _allocator);
-	_object.AddMember("AnyDataChangeSinceLastWrite", anyDataChangeSinceLastWrite, _allocator);
+	_object.AddMember("ModelStorageVersion", m_modelStorageVersion, _allocator);
+	_object.AddMember("AnyDataChangeSinceLastWrite", m_anyDataChangeSinceLastWrite, _allocator);
 
 	JsonArray entityMapArr;
-	for (const auto& it : entityMap) {
+	for (const auto& it : m_entityMap) {
 		JsonObject entityObj;
 		entityObj.AddMember("ID", it.first, _allocator);
 		if (it.second) {
@@ -3614,7 +3616,7 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 	_object.AddMember("EntityMap", entityMapArr, _allocator);
 
 	JsonArray pendingEntityUpdatesArr;
-	for (const auto& it : pendingEntityUpdates) {
+	for (const auto& it : m_pendingEntityUpdates) {
 		if (it.first) {
 			pendingEntityUpdatesArr.PushBack(JsonObject(it.first->getTreeItem(), _allocator), _allocator);
 		}
@@ -3625,18 +3627,18 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 	_object.AddMember("PendingEntityUpdates", pendingEntityUpdatesArr, _allocator);
 
 	_object.AddMember("IsProjectOpen", m_isProjectOpen, _allocator);
-	_object.AddMember("VisualizationModelID", visualizationModelID, _allocator);
-	_object.AddMember("IsModified", isModified, _allocator);
-	_object.AddMember("ProjectName", JsonString(projectName, _allocator), _allocator);
-	_object.AddMember("ProjectType", JsonString(projectType, _allocator), _allocator);
-	_object.AddMember("CollectionName", JsonString(collectionName, _allocator), _allocator);
+	_object.AddMember("VisualizationModelID", m_visualizationModelID, _allocator);
+	_object.AddMember("IsModified", m_isModified, _allocator);
+	_object.AddMember("ProjectName", JsonString(m_projectName, _allocator), _allocator);
+	_object.AddMember("ProjectType", JsonString(m_projectType, _allocator), _allocator);
+	_object.AddMember("CollectionName", JsonString(m_collectionName, _allocator), _allocator);
 
-	_object.AddMember("UiCreated", uiCreated, _allocator);
-	_object.AddMember("VersionGraphCreated", versionGraphCreated, _allocator);
-	_object.AddMember("NewTableItemName", JsonString(newTableItemName, _allocator), _allocator);
+	_object.AddMember("UiCreated", m_uiCreated, _allocator);
+	_object.AddMember("VersionGraphCreated", m_versionGraphCreated, _allocator);
+	_object.AddMember("NewTableItemName", JsonString(m_newTableItemName, _allocator), _allocator);
 
 	JsonArray meshingActiveArr;
-	for (const auto& it : meshingActive) {
+	for (const auto& it : m_meshingActive) {
 		meshingActiveArr.PushBack(it.first, _allocator);
 	}
 	_object.AddMember("MeshingActive", meshingActiveArr, _allocator);
@@ -3644,7 +3646,7 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 	_object.AddMember("SelectedVersion", JsonString(m_selectedVersion, _allocator), _allocator);
 
 	JsonArray parameterMapArr;
-	for (const auto& it : parameterMap) {
+	for (const auto& it : m_parameterMap) {
 		JsonObject paramObj;
 		paramObj.AddMember("Name", JsonString(it.first, _allocator), _allocator);
 		JsonObject entryObj;
@@ -3658,16 +3660,16 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 		parameterMapArr.PushBack(paramObj, _allocator);
 	}
 
-	if (stateManager) {
+	if (m_stateManager) {
 		JsonObject stateManagerObj;
-		stateManager->getDebugInformation(stateManagerObj, _allocator);
+		m_stateManager->getDebugInformation(stateManagerObj, _allocator);
 		_object.AddMember("StateManager", stateManagerObj, _allocator);
 	}
 	else {
 		_object.AddMember("StateManager", JsonNullValue(), _allocator);
 	}
 
-	_object.AddMember("IsShutdown", shutdown, _allocator);
+	_object.AddMember("IsShutdown", m_shutdown, _allocator);
 }
 
 void Model::enableQueuingHttpRequests(bool flag)
@@ -3691,25 +3693,25 @@ void Model::prefetchDocumentsFromStorage(std::list<ot::UID> &prefetchIds)
 
 void Model::setModified() 
 { 
-	bool sendNotification = !isModified;
+	bool sendNotification = !m_isModified;
 
-	isModified = true; 
+	m_isModified = true;
 
-	if (sendNotification && !shutdown)
+	if (sendNotification && !m_shutdown)
 	{
-		Application::instance()->getNotifier()->isModified(visualizationModelID, true);
+		Application::instance()->getNotifier()->isModified(m_visualizationModelID, true);
 	}
 }
 
 void Model::resetModified()
 { 
-	bool sendNotification = isModified;
+	bool sendNotification = m_isModified;
 
-	isModified = false; 
+	m_isModified = false;
 
-	if (sendNotification && !shutdown)
+	if (sendNotification && !m_shutdown)
 	{
-		Application::instance()->getNotifier()->isModified(visualizationModelID, false);
+		Application::instance()->getNotifier()->isModified(m_visualizationModelID, false);
 	}
 }
 
@@ -3734,15 +3736,15 @@ void Model::uiIsAvailable(ot::components::UiComponent* _ui)
 
 	// The visualization items themselves will be created when the message setVisualizationModel is received, In case that the message
 	// was already sent, we will create the visualization items now.
-	if (visualizationModelID != 0)
+	if (m_visualizationModelID != 0)
 	{
-		if (entityRoot != nullptr)
+		if (m_entityRoot != nullptr)
 		{
-			entityRoot->addVisualizationNodes();
+			m_entityRoot->addVisualizationNodes();
 		}
 
 		// Request a view reset
-		Application::instance()->getNotifier()->resetAllViews(visualizationModelID);
+		Application::instance()->getNotifier()->resetAllViews(m_visualizationModelID);
 	}
 
 	updateVersionGraph();
@@ -3751,8 +3753,8 @@ void Model::uiIsAvailable(ot::components::UiComponent* _ui)
 }
 
 void Model::sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const std::string& _currentVersion, std::string _activeBranch) {
-	if (visualizationModelID != 0) {
-		versionGraphCreated = true;
+	if (m_visualizationModelID != 0) {
+		m_versionGraphCreated = true;
 
 		// Add the first version to the active branch version so the graph can find the version
 
@@ -3790,7 +3792,7 @@ void Model::setActiveVersionTreeState()
 void Model::removeVersionGraphVersions(const std::list<std::string> &versions) {
 	ot::JsonDocument notify;
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions, notify.GetAllocator()), notify.GetAllocator());
-	notify.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_ID, m_visualizationModelID, notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_List, ot::JsonArray(versions, notify.GetAllocator()), notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
@@ -3812,7 +3814,7 @@ void Model::addNewVersionTreeStateAndActivate(const std::string& _branch, const 
 
 void Model::sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {
 	// Here we need to add the information about the visualization model to the document 
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, m_visualizationModelID, doc.GetAllocator());
 
 	// And sent the message to the viewer
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(doc, prefetchIds);
@@ -3849,9 +3851,9 @@ void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visua
 
 EntityBase *Model::findEntityFromName(const std::string &name)
 {
-	if (entityRoot == nullptr) return nullptr;
+	if (m_entityRoot == nullptr) return nullptr;
 
-	return entityRoot->getEntityFromName(name);
+	return m_entityRoot->getEntityFromName(name);
 }
 
 std::string Model::getCurrentModelVersion()
@@ -4035,7 +4037,7 @@ void Model::addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, 
 
 	for (ot::UID id : _topologyEntityIDList)
 	{
-		EntityBase *entity = readEntityFromEntityIDandVersion(nullptr, id, *version, entityMap);
+		EntityBase *entity = readEntityFromEntityIDandVersion(nullptr, id, *version, m_entityMap);
 		assert(entity != nullptr);
 		assert(entity->getEntityType() == EntityBase::TOPOLOGY);
 
@@ -4257,7 +4259,7 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 
 		// Next, add the entity to the model again (at a new position)
 		std::list<EntityBase*> newEntities;
-		addEntityToModel(entity->getName(), entity, entityRoot, true, newEntities);
+		addEntityToModel(entity->getName(), entity, m_entityRoot, true, newEntities);
 
 		// Register the data entities in the model state
 		EntityGeometry *geometry = dynamic_cast<EntityGeometry *>(entity);
@@ -4275,7 +4277,7 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 	}
 
 	// refresh the view and save the model
-	Application::instance()->getNotifier()->selectObject(visualizationModelID, geomEntityID);
+	Application::instance()->getNotifier()->selectObject(m_visualizationModelID, geomEntityID);
 	refreshAllViews();
 	enableQueuingHttpRequests(false);
 
@@ -4285,8 +4287,8 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 void Model::deleteEntitiesFromModel(const ot::UIDList& _entityIDList, bool _saveModel) {
 	std::list<EntityBase*> entityList;
 	for (ot::UID id : _entityIDList) {
-		auto it = entityMap.find(id);
-		if (it != entityMap.end()) {
+		auto it = m_entityMap.find(id);
+		if (it != m_entityMap.end()) {
 			entityList.push_back(it->second);
 		}
 	}
@@ -4343,14 +4345,20 @@ void Model::deleteEntitiesFromModel(const std::list<EntityBase*>& _entityList, b
 
 void Model::setMeshingActive(ot::UID meshEntityID, bool flag)
 {
-	meshingActive[meshEntityID] = flag;
+	m_meshingActive[meshEntityID] = flag;
 }
 
 bool Model::getMeshingActive(ot::UID meshEntityID)
 {
-	if (meshingActive.count(meshEntityID) == 0) return false;
-
-	return meshingActive[meshEntityID];
+	const auto it = m_meshingActive.find(meshEntityID);
+	if (it == m_meshingActive.end())
+	{
+		return false;
+	}
+	else
+	{
+		return it->second;
+	}
 }
 
 void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion)
@@ -4504,7 +4512,7 @@ void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::U
 
 			//First we remove possible data entities from the entity map that have the old entity as their parent.
 			//ot::UIDList dataChildren;
-			for (auto entityByID : entityMap)
+			for (const auto& entityByID : m_entityMap)
 			{
 				EntityBase* entity = entityByID.second;
 				if (entity->getEntityType() == EntityBase::DATA)
@@ -4587,8 +4595,8 @@ void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::
 	ot::JsonArray changedEntitiesInfos;
 	for (ot::UID& entityID : entityIDs)
 	{
-		auto changedEntityByID = entityMap.find(entityID);
-		assert(changedEntityByID != entityMap.end());
+		auto changedEntityByID = m_entityMap.find(entityID);
+		assert(changedEntityByID != m_entityMap.end());
 		ot::EntityInformation entityInfo(changedEntityByID->second);
 		ot::JsonObject entityInfoSerialised;
 		entityInfo.addToJsonObject(entityInfoSerialised, notify.GetAllocator());
@@ -4739,61 +4747,62 @@ void Model::updateModelStateForUndoRedo()
 	// Loop through all entities of the current model and check whether they are part of the model state and up-to-date
 	std::list<ot::UID> removeFromDisplay;
 
-	std::map<ot::UID, EntityBase *> entityMapTmp = entityMap;
+	std::map<ot::UID, EntityBase *> entityMapTmp = m_entityMap;
 
-	for (auto entity : entityMapTmp)
+	for (const auto& entity : entityMapTmp)
 	{
 		// The item might have already been deleted as a child of a previously deleted item. Therefore, we need to check
 		// here if the item is still in the map before deleting it.
-
-		if (entityMap.count(entity.first) > 0)
+		if (m_entityMap.find(entity.first) == m_entityMap.end())
 		{
-			long long version = getStateManager()->getCurrentEntityVersion(entity.first);
-			if (version == -1 || version != entity.second->getEntityStorageVersion())
+			continue;
+		}
+
+		long long version = getStateManager()->getCurrentEntityVersion(entity.first);
+		if (version == -1 || version != entity.second->getEntityStorageVersion())
+		{
+			// The entity is not part of the current model state or not at the right version -> delete the entity
+
+			// Check whether we are deleting a paramter. If so, remove it from the list
+			if (dynamic_cast<EntityParameter*>(entity.second) != nullptr)
 			{
-				// The entity is not part of the current model state or not at the right version -> delete the entity
+				removeParameter(entity.second->getName());
+			}
 
-				// Check whether we are deleting a paramter. If so, remove it from the list
-				if (dynamic_cast<EntityParameter *>(entity.second) != nullptr)
+			if (entity.second == m_entityRoot)
+			{
+				// We are deleting the top level entity
+				for (auto child : m_entityRoot->getChildrenList())
 				{
-					removeParameter(entity.second->getName());
+					removeFromDisplay.push_back(child->getEntityID());
 				}
 
-				if (entity.second == entityRoot)
-				{
-					// We are deleting the top level entity
-					for (auto child : entityRoot->getChildrenList())
-					{
-						removeFromDisplay.push_back(child->getEntityID());
-					}
+				delete entity.second;
+				m_entityRoot = nullptr;
+			}
+			else
+			{
+				removeFromDisplay.push_back(entity.second->getEntityID());
 
-					delete entity.second;
-					entityRoot = nullptr;
-				}
-				else
-				{
-					removeFromDisplay.push_back(entity.second->getEntityID());
+				removeEntityFromMap(entity.second, true, true);
 
-					removeEntityFromMap(entity.second, true, true);
-
-					delete entity.second;
-				}
+				delete entity.second;
 			}
 		}
-	}		
+	}
 	
-	Application::instance()->getNotifier()->setTreeStateRecording(visualizationModelID, true);
+	Application::instance()->getNotifier()->setTreeStateRecording(m_visualizationModelID, true);
 
 	removeShapesFromVisualization(removeFromDisplay);
 
-	if (entityMap.empty())
+	if (m_entityMap.empty())
 	{
 		// We need to reload the entire project
 		projectOpen();
 
 		//createVisualizationItems();
 
-		entityRoot->addVisualizationNodes();
+		m_entityRoot->addVisualizationNodes();
 	}
 	else
 	{
@@ -4805,7 +4814,7 @@ void Model::updateModelStateForUndoRedo()
 		std::list<ot::UID> prefetchIds;
 		for (auto entity : topologyEntitiesLeft)
 		{
-			if (entityMap.count(entity) == 0)
+			if (m_entityMap.count(entity) == 0)
 			{
 				// This entity is currenty not loaded
 				prefetchIds.push_back(entity);
@@ -4815,7 +4824,7 @@ void Model::updateModelStateForUndoRedo()
 		// Prefetch all entities which are needed below
 		prefetchDocumentsFromStorage(prefetchIds);
 
-		if (entityMap.empty()) {
+		if (m_entityMap.empty()) {
 			OT_LOG_EA("Entity map is empty after initialization");
 		}
 
@@ -4826,14 +4835,14 @@ void Model::updateModelStateForUndoRedo()
 
 			for (auto entity : topologyEntities)
 			{
-				if (entity != 0 && entityMap.count(entity) == 0)
+				if (entity != 0 && m_entityMap.count(entity) == 0)
 				{
 					// This entity needs to be loaded
 
 					ot::UID parentID = getStateManager()->getCurrentEntityParent(entity);
 					if (parentID != 0 && getStateManager()->getCurrentEntityVersion(parentID) != -1)
 					{
-						if (entityMap.count(parentID) == 0)
+						if (m_entityMap.count(parentID) == 0)
 						{
 							// The parent of the current entity has not been loaded yet -> we need to repeat once the parent is loaded
 							topologyEntitiesLeft.push_back(entity);
@@ -4842,11 +4851,11 @@ void Model::updateModelStateForUndoRedo()
 						{
 							EntityBase *parentEntity = getEntityByID(parentID);
 
-							if (entityMap.empty()) {
+							if (m_entityMap.empty()) {
 								OT_LOG_EA("Entity map is empty before reading entity");
 							}
 
-							EntityBase *newEntity = readEntityFromEntityID(parentEntity, entity, entityMap);
+							EntityBase *newEntity = readEntityFromEntityID(parentEntity, entity, m_entityMap);
 							if(newEntity != nullptr) 
 							{
 								newEntity->addVisualizationNodes();
@@ -4863,7 +4872,7 @@ void Model::updateModelStateForUndoRedo()
 									setParameter(parameter->getName(), parameter->getNumericValue(), parameter);
 								}
 
-								if (entityMap.empty()) {
+								if (m_entityMap.empty()) {
 									OT_LOG_EA("Entity map is empty after reading entity");
 								}
 							}
@@ -4888,7 +4897,7 @@ void Model::updateModelStateForUndoRedo()
 	// Clear the whole m_viewBlockConnectionsMap to ensure that no remove is missed and that the map is filled up correctly
 	Application::instance()->getBlockHandler().clearMap();
 	// Now reset the modified flag for all entities and the model itself
-	for (auto entity : entityMap)
+	for (auto entity : m_entityMap)
 	{
 		entity.second->resetModified();
 
@@ -4903,14 +4912,14 @@ void Model::updateModelStateForUndoRedo()
 	updateUndoRedoStatus();
 	setActiveVersionTreeState();
 
-	Application::instance()->getNotifier()->setTreeStateRecording(visualizationModelID, false);
+	Application::instance()->getNotifier()->setTreeStateRecording(m_visualizationModelID, false);
 }
 
 void Model::hideEntities(std::list<ot::UID> &hiddenEntityIDs)
 {
-	if (visualizationModelID != 0)
+	if (m_visualizationModelID != 0)
 	{
-		Application::instance()->getNotifier()->hideEntities(visualizationModelID, hiddenEntityIDs);
+		Application::instance()->getNotifier()->hideEntities(m_visualizationModelID, hiddenEntityIDs);
 	}
 }
 
@@ -5080,7 +5089,7 @@ std::string Model::checkParentUpdates(std::list<ot::UID> &modifiedEntities)
 	if (affectedParentList.empty())
 	{
 		// No further update is required. Refresh selection
-		Application::instance()->getNotifier()->refreshSelection(visualizationModelID);
+		Application::instance()->getNotifier()->refreshSelection(m_visualizationModelID);
 		return "";
 	}
 
@@ -5106,24 +5115,24 @@ int Model::getSessionCount()
 
 ModelState * Model::getStateManager()
 {
-	if (stateManager == nullptr) {
-		stateManager = new ModelState(getSessionCount(), static_cast<unsigned int>(getServiceID()));
+	if (m_stateManager == nullptr) {
+		m_stateManager = new ModelState(getSessionCount(), static_cast<unsigned int>(getServiceID()));
 	}
-	return stateManager;
+	return m_stateManager;
 }
 
 void Model::setStateMangager(ModelState* state)
 {
-	entityMap.clear();
+	m_entityMap.clear();
 
-	stateManager = state;
-	stateManager->openProject();
+	m_stateManager = state;
+	m_stateManager->openProject();
 
 	auto doc = bsoncxx::builder::basic::document{};
 
 	if (!GetDocumentFromEntityID(0, doc))
 	{
-		displayMessage("ERROR: Unable to read most recent model from storage: " + projectName + "\n");
+		displayMessage("ERROR: Unable to read most recent model from storage: " + m_projectName + "\n");
 		return;
 	}
 
@@ -5143,7 +5152,7 @@ void Model::setStateMangager(ModelState* state)
 	// Now read the root entity (this will implicitly also recursively load all other subentities as well
 	if (entityRootId != -1)
 	{
-		entityRoot = dynamic_cast<EntityContainer*>(readEntityFromEntityID(nullptr, entityRootId, entityMap));
+		m_entityRoot = dynamic_cast<EntityContainer*>(readEntityFromEntityID(nullptr, entityRootId, m_entityMap));
 	}
 }
 

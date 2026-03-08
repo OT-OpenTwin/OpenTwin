@@ -90,6 +90,9 @@ public:
 	void setErrorState(bool _flag) { m_errorState = _flag; };
 	bool getErrorState() const { return m_errorState; };
 
+	void setGroupChanges(bool _flag) { m_groupChanges = _flag; };
+	bool getGroupChanges() const { return m_groupChanges; };
+
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
 	EntityPropertiesBase& operator=(const EntityPropertiesBase &other);
@@ -110,6 +113,7 @@ private:
 	bool m_protectedProperty;
 	bool m_visible;
 	bool m_errorState;
+	bool m_groupChanges;
 };
 
 // ################################################################################################################################################################
