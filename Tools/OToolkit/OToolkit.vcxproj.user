@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLD);$(OT_GUI_ROOT)\$(OT_DLLD);$(OT_WIDGETS_ROOT)\$(OT_DLLD);$(OT_OTOOLKITAPI_ROOT)\$(OT_DLLD);$(QT_ADS_ROOT)\lib;$(QtDllPath);%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLD);$(OT_GUI_ROOT)\$(OT_CDLLD);$(OT_WIDGETS_ROOT)\$(OT_CDLLD);$(OT_OTOOLKITAPI_ROOT)\$(OT_DLLD);$(QT_ADS_ROOT)\lib;$(QtDllPath);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>$(TargetPath) "unused" "127.0.0.1:8080" "unused" "unused"</LocalDebuggerCommandArguments>
