@@ -126,7 +126,7 @@ void VtkDriverCartesianFaceScalar::setProperties(EntityVis2D3D *visEntity)
 	}
 }
 
-std::string VtkDriverCartesianFaceScalar::buildSceneNode(DataSourceManagerItem *dataItem)
+std::string VtkDriverCartesianFaceScalar::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData)
 {
 	std::time_t timer = time(nullptr);
 	reportTime("VTK image creation started", timer);
@@ -230,6 +230,8 @@ std::string VtkDriverCartesianFaceScalar::buildSceneNode(DataSourceManagerItem *
 			assert(0); // Unknown direction
 		}
 	}
+
+	colorRampData.clear(); // We still need to support the color ramp here
 
 	// Now we serialize the node information and return it as a string
 	std::stringstream dataOut;

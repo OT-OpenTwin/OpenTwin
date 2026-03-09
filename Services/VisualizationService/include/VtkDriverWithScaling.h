@@ -23,6 +23,7 @@
 #include "OTModelEntities/PropertyBundleDataHandleScaling.h"
 
 #include <vtkPolyDataMapper.h>
+#include <vtkLookupTable.h>
 
 class VtkDriverWithScaling : public VtkDriver {
 public:
@@ -31,11 +32,15 @@ public:
 
 	virtual void setProperties(EntityVis2D3D* visEntity) override;
 
+	void getColorRampData(std::string& colorRampData);
+
 protected:
 	void SetColouring(vtkPolyDataMapper* mapper);
 	void getMinMaxScaling(double& minVal, double& maxVal);
 	virtual void DeletePropertyData(void);
+	void extractColorRampFromLookupTable(vtkLookupTable* lut);
 
 	PropertyBundleDataHandleScaling* scalingData = nullptr;
 	double* scalarRange = nullptr;
+	std::string colorRampData;
 };

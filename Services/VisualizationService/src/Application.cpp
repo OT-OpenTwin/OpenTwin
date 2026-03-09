@@ -117,7 +117,7 @@ void Application::updateEntities(std::list<ot::UID> &entityIDs, std::list<ot::UI
 
 }
 
-std::pair<ot::UID, ot::UID> Application::createDataItems(EntityVis2D3D *visEntity)
+std::pair<ot::UID, ot::UID> Application::createDataItems(EntityVis2D3D *visEntity, std::string &colorRampData)
 {
 	// Update the visualization -> Create a new visualization data object
 	VtkDriver *vtkDriver = VtkDriverFactory::createDriver(visEntity);
@@ -132,7 +132,7 @@ std::pair<ot::UID, ot::UID> Application::createDataItems(EntityVis2D3D *visEntit
 	DataSourceManagerItem *dataItem = DataSourceManager::getDataItem(visEntity->getSourceID(), visEntity->getSourceVersion(), visEntity->getMeshID(), visEntity->getMeshVersion(), this->getModelComponent());
 
 	// Now buld the osg node and convert it to a string
-	std::string nodeString = vtkDriver->buildSceneNode(dataItem);
+	std::string nodeString = vtkDriver->buildSceneNode(dataItem, colorRampData);
 
 	//if (vtkDriver->GetUpdateTopoEntityID().size() != 0)
 	//{
@@ -163,12 +163,13 @@ void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bo
 
 	// Read all data from the entity
 	std::pair<ot::UID, ot::UID> binaryDataItems;
-	
+	std::string colorRampData;
+
 	if (itemsVisible)
 	{
 		try
 		{
-			binaryDataItems = createDataItems(visEntity);
+			binaryDataItems = createDataItems(visEntity, colorRampData);
 		}
 		catch (std::exception)
 		{
@@ -176,8 +177,6 @@ void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bo
 			return;
 		}
 	}
-
-	std::string colorRampData;
 
 	// Send the information about the new visualization data to the model. The model then updates the EntityVis2D item and sends the update message to the viewer.
 	sendNewVisualizationDataToModeler(visEntity, binaryDataItems.first, binaryDataItems.second, colorRampData);

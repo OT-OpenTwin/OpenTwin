@@ -164,7 +164,7 @@ void VtkDriverGeneric::setProperties(EntityVis2D3D *visEntity)
 	}
 }
 
-std::string VtkDriverGeneric::buildSceneNode(DataSourceManagerItem *dataItem)
+std::string VtkDriverGeneric::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData)
 {
 	std::time_t timer = time(nullptr);
 	reportTime("VTK image creation started", timer);
