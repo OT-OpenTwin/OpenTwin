@@ -177,8 +177,10 @@ void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bo
 		}
 	}
 
+	std::string colorRampData;
+
 	// Send the information about the new visualization data to the model. The model then updates the EntityVis2D item and sends the update message to the viewer.
-	sendNewVisualizationDataToModeler(visEntity, binaryDataItems.first, binaryDataItems.second);
+	sendNewVisualizationDataToModeler(visEntity, binaryDataItems.first, binaryDataItems.second, colorRampData);
 }
 
 std::pair<ot::UID, ot::UID> Application::storeBinaryData(const char *data, size_t dataLength)
@@ -191,7 +193,7 @@ std::pair<ot::UID, ot::UID> Application::storeBinaryData(const char *data, size_
 	return std::pair<ot::UID, ot::UID>(dataItem->getEntityID(), dataItem->getEntityStorageVersion());
 }
 
-void Application::sendNewVisualizationDataToModeler(EntityVis2D3D *visEntity, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion)
+void Application::sendNewVisualizationDataToModeler(EntityVis2D3D *visEntity, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion, const std::string &colorRampData)
 {
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_UpdateVisualizationEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -199,6 +201,7 @@ void Application::sendNewVisualizationDataToModeler(EntityVis2D3D *visEntity, ot
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, visEntity->getEntityStorageVersion(), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataID, binaryDataItemID, requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataVersion, binaryDataItemVersion, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ColorRamp, ot::JsonString(colorRampData, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string tmp;
 	sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, requestDoc, tmp);

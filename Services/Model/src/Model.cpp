@@ -4361,7 +4361,7 @@ bool Model::getMeshingActive(ot::UID meshEntityID)
 	}
 }
 
-void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion)
+void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion, const std::string &colorRampData)
 {
 	// We add the binaryData items as childs to the visualization entity id and update this entity. This function is called as part of the 
 	// update process, so the modelChangeOperationCompleted function will be called later.
@@ -4404,6 +4404,7 @@ void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVers
 	notify.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::instance().getCollectionName(), notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_DataID, binaryDataItemID, notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_DataVersion, binaryDataItemVersion, notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_ColorRamp, ot::JsonString(colorRampData, notify.GetAllocator()), notify.GetAllocator());
 
 	sendMessageToViewer(notify, prefetchIds);
 }

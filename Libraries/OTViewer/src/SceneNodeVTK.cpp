@@ -223,11 +223,12 @@ void SceneNodeVTK::setHighlighted(bool h)
 	SceneNodeBase::setHighlighted(h);
 }
 
-void SceneNodeVTK::updateVTKNode(const std::string &projName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
+void SceneNodeVTK::updateVTKNode(const std::string &projName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion, const std::string& colorRampData)
 {
 	dataID      = visualizationDataID;
 	dataVersion = visualizationDataVersion;
 	projectName = projName;
+	
 
 	// Add a switch (group) node for the shape
 	if (m_shapeNode == nullptr)

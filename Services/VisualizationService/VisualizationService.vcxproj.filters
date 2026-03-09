@@ -75,6 +75,9 @@
     <ClCompile Include="src\VtkDriverUnstructuredVectorSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\VtkDriverWithScaling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -135,6 +138,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\VisualizationServiceTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VtkDriverWithScaling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -226,8 +226,9 @@ void Application::handleUpdateVisualizationEntity(ot::JsonDocument& _document) {
 	ot::UID visEntityVersion = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityVersion);
 	ot::UID binaryDataItemID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_DataID);
 	ot::UID binaryDataItemVersion = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_DataVersion);
+	std::string colorRampData = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ColorRamp);
 
-	m_model->updateVisualizationEntity(visEntityID, visEntityVersion, binaryDataItemID, binaryDataItemVersion);
+	m_model->updateVisualizationEntity(visEntityID, visEntityVersion, binaryDataItemID, binaryDataItemVersion, colorRampData);
 }
 
 void Application::handleUpdateGeometryEntity(ot::JsonDocument& _document) {

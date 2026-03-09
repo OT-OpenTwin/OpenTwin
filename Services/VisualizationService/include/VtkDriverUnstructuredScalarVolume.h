@@ -20,7 +20,7 @@
 #pragma once
 
 #include "VisualizationServiceTypes.h"
-#include "VtkDriver.h"
+#include "VtkDriverWithScaling.h"
 #include "vtkRectilinearGrid.h"
 #include "OTModelEntities/EntityResultBase.h"
 #include "OTModelEntities/PropertyBundleDataHandlePlane.h"
@@ -39,7 +39,7 @@ namespace osg {
 	class Node;
 }
 
-class VtkDriverUnstructuredScalarVolume : public VtkDriver {
+class VtkDriverUnstructuredScalarVolume : public VtkDriverWithScaling {
 public:
 	VtkDriverUnstructuredScalarVolume();
 	virtual ~VtkDriverUnstructuredScalarVolume();
@@ -49,9 +49,7 @@ public:
 
 private:
 	PropertyBundleDataHandlePlane* planeData = nullptr;
-	PropertyBundleDataHandleScaling* scalingData = nullptr;
 	PropertyBundleDataHandleVisUnstructuredScalar* visData = nullptr;
-	double* scalarRange = nullptr;
 
 	vtkAlgorithmOutput* ApplyCutplane(osg::Node* parent);
 	void Assemble2DNode(osg::Node* parent);
@@ -60,11 +58,10 @@ private:
 
 	void AddNodePoints(osg::Node* parent);
 	void AddIsosurfaces(osg::Node* parent);
-	void SetColouring(vtkPolyDataMapper* mapper);
 	vtkAlgorithmOutput* GetPointSource(void);
 
 	void CheckForModelUpdates();
-	void DeletePropertyData(void);
+	virtual void DeletePropertyData(void) override;
 
 	DataSourceUnstructuredMesh* dataSource;
 	vtkAlgorithmOutput* dataConnection;

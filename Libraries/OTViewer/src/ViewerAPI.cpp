@@ -341,13 +341,13 @@ void ViewerAPI::addVisualizationNode(ot::UID _osgModelID, const ot::EntityTreeIt
 	}
 }
 
-void ViewerAPI::addVTKNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
+void ViewerAPI::addVTKNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string& colorRampData)
 {
 	try
 	{
 		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addVTKNode(_treeItem, _isHidden, _projectName, _dataEntityID, _dataEntityVersion);
+		model->addVTKNode(_treeItem, _isHidden, _projectName, _dataEntityID, _dataEntityVersion, colorRampData);
 	}
 	catch (std::out_of_range)
 	{
@@ -355,13 +355,13 @@ void ViewerAPI::addVTKNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeI
 	}
 }
 
-void ViewerAPI::updateVTKNode(ot::UID _osgModelID, ot::UID _entityID, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
+void ViewerAPI::updateVTKNode(ot::UID _osgModelID, ot::UID _entityID, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string& colorRampData)
 {
 	try
 	{
 		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->updateVTKNode(_entityID, _projectName, _dataEntityID, _dataEntityVersion);
+		model->updateVTKNode(_entityID, _projectName, _dataEntityID, _dataEntityVersion, colorRampData);
 	}
 	catch (std::out_of_range)
 	{

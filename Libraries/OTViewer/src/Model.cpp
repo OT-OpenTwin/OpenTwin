@@ -3455,7 +3455,7 @@ void Model::loadRemainingData(const std::string& _entityName, ot::WidgetViewBase
 	}
 }
 
-void Model::addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
+void Model::addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string& colorRampData)
 {
 	// Check whether the item already exists
 	SceneNodeBase *item = m_modelItemToSceneNodesMap[_treeItem.getEntityID()];
@@ -3510,20 +3510,20 @@ void Model::addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, cons
 		vtkNode->setModel(this);
 
 		// Now update the vtk node
-		vtkNode->updateVTKNode(_projectName, _dataEntityID, _dataEntityVersion);
+		vtkNode->updateVTKNode(_projectName, _dataEntityID, _dataEntityVersion, colorRampData);
 
 		// Add the node to the maps for faster access
 		storeInMaps(vtkNode);
 	}
 }
 
-void Model::updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
+void Model::updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion, const std::string& colorRampData)
 {
 	SceneNodeVTK *vtkNode = dynamic_cast<SceneNodeVTK *>(m_modelItemToSceneNodesMap[_entityID]);
 	assert(vtkNode != nullptr);
 	if (vtkNode == nullptr) return;
 
-	vtkNode->updateVTKNode(projectName, visualizationDataID, visualizationDataVersion);
+	vtkNode->updateVTKNode(projectName, visualizationDataID, visualizationDataVersion, colorRampData);
 }
 
 SceneNodeBase* Model::getSceneNodeByEntityID(ot::UID _modelEntityID) const {

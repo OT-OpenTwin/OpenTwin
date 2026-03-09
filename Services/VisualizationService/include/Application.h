@@ -61,6 +61,6 @@ private:
 	void updateEntities(std::list<ot::UID> &entityIDs, std::list<ot::UID> &entityVersions, bool itemsVisible);
 	void updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bool itemsVisible);
 	std::pair<ot::UID, ot::UID> storeBinaryData(const char *data, size_t dataLength);
-	void sendNewVisualizationDataToModeler(EntityVis2D3D *visEntity, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
+	void sendNewVisualizationDataToModeler(EntityVis2D3D *visEntity, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion, const std::string& colorRampData);
 	std::pair<ot::UID, ot::UID> createDataItems(EntityVis2D3D *visEntity);
 };

@@ -81,6 +81,7 @@ protected:
 	ot::UID meshID;
 	ot::UID meshVersion;
 	EntityResultBase::tResultType resultType;
+	std::string colorRampData;
 
 	// Temporary
 	//EntityResultBase *source;

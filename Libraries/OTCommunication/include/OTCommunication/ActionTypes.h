@@ -579,6 +579,7 @@
 #define OT_ACTION_PARAM_MODEL_EntityNameList "Model.Entities.NameList"
 #define OT_ACTION_PARAM_MODEL_DataID "Model.Entities.DataID"
 #define OT_ACTION_PARAM_MODEL_DataVersion "Model.Entities.DataVersion"
+#define OT_ACTION_PARAM_MODEL_ColorRamp "Model.Entities.ColorRamp"
 #define OT_ACTION_PARAM_MODEL_SourceID "Model.Entities.SourceID"
 #define OT_ACTION_PARAM_MODEL_SourceVersion "Model.Entities.SourceVersion"
 #define OT_ACTION_PARAM_MODEL_MeshID "Model.Entities.MeshID"
