@@ -44,6 +44,7 @@ packages
 # Build Logs
 buildLog_Debug.txt
 buildLog_Release.txt
+build/
 
 # Output directory
 x64
