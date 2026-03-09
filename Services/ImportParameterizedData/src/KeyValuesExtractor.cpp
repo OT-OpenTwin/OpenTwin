@@ -304,6 +304,20 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						allFieldsConverted = false;
 					}
 				}
+				else if (_rangeTypesByRangeNames[fieldName] == ot::TypeNames::getDateTimeTypeName())
+				{
+					bool dataTypeFits = ot::StringToNumericCheck::fitsInDateTime(fieldValueStringFixed);
+					if (dataTypeFits)
+					{
+						const int64_t valueOfCastedType = std::stoll(fieldValueStringFixed);
+						values.push_back(ot::Variable(valueOfCastedType));
+					}
+					else
+					{
+						Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+						allFieldsConverted = false;
+					}
+				}
 			}
 		}
 		m_fields.insert({ fieldName,values });

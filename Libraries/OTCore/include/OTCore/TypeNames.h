@@ -35,5 +35,6 @@ namespace ot
 		static std::string getFloatTypeName() { return "float"; };
 		static std::string getCharTypeName() { return "char"; };
 		static std::string getBoolTypeName() { return "bool"; };
+		static std::string getDateTimeTypeName() { return "datetime"; };
 	};
 }

@@ -84,7 +84,7 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	getProperties().createProperty(tableOrientation,sourceFileGroup);
 	
 	std::string categoryGroup = "Data properties";
-	EntityPropertiesSelection::createProperty(categoryGroup, "Datatype", { ot::TypeNames::getDoubleTypeName(),ot::TypeNames::getFloatTypeName(), ot::TypeNames::getInt64TypeName(), ot::TypeNames::getInt32TypeName(), ot::TypeNames::getStringTypeName() }, _defaultType, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
+	EntityPropertiesSelection::createProperty(categoryGroup, "Datatype", { ot::TypeNames::getDoubleTypeName(),ot::TypeNames::getFloatTypeName(), ot::TypeNames::getInt64TypeName(), ot::TypeNames::getInt32TypeName(), ot::TypeNames::getStringTypeName(), ot::TypeNames::getDateTimeTypeName() }, _defaultType, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 
 	const std::string rangeGroup = "Range";
 	auto topRow = new EntityPropertiesInteger("Top row", 1);

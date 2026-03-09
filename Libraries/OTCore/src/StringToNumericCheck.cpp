@@ -18,8 +18,10 @@
 // @otlicense-end
 
 #include "OTCore/StringToNumericCheck.h"
+#include "OTSystem/DateTime.h"
 #include <stdint.h>
 #include <charconv>
+#include <exception>
 
 bool ot::StringToNumericCheck::fitsInInt32(const std::string& str)
 {
@@ -59,4 +61,17 @@ bool ot::StringToNumericCheck::fitsInDouble(const std::string& str)
 		fits = ec == std::errc() && ptr == str.data() + str.size();
 	}
 	return fits;
+}
+
+bool ot::StringToNumericCheck::fitsInDateTime(const std::string& str)
+{
+	try
+	{
+		ot::DateTime::timestampToMsec(str, ot::DateTime::DateFormat::Simple);
+		return true;
+	}
+	catch (const std::exception&)
+	{
+		return false;
+	}
 }
