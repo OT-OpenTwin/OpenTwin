@@ -24,7 +24,7 @@
 #include "OTGui/Widgets/NavigationTreeCfg.h"
 #include "OTGui/Widgets/NavigationTreeItemCfg.h"
 #include "OTGui/Dialog/SelectEntitiesDialogCfg.h"
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Dialog/Dialog.h"
 
 // Qt header
 #include <QtCore/qstringlist.h>

@@ -22,11 +22,11 @@
 
 // OT header
 #include "OTCore/ServiceBase.h"
-#include "OTWidgets/WidgetView.h"
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/TextEditor.h"
-#include "OTWidgets/PropertyGrid.h"
-#include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/Graphics/GraphicsView.h"
+#include "OTWidgets/Properties/PropertyGrid.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
+#include "OTWidgets/Widgets/TextEditor.h"
+#include "OTWidgets/WidgetView/WidgetView.h"
 
 // AK header
 #include <akAPI/uiAPI.h>

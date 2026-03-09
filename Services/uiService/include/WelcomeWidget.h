@@ -26,7 +26,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/ProjectInformation.h"
 #include "OTGui/GuiTypes.h"
-#include "OTWidgets/WidgetBase.h"
+#include "OTWidgets/Widgets/WidgetBase.h"
 
 // Qt header
 #include <QtCore/qobject.h>

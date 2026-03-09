@@ -20,11 +20,11 @@
 // OpenTwin header
 #include "ProjectOverviewPreviewBox.h"
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/Label.h"
-#include "OTWidgets/TextEdit.h"
-#include "OTWidgets/ImagePainterWidget.h"
-#include "OTWidgets/PixmapImagePainter.h"
-#include "OTWidgets/ImagePainterManager.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/TextEdit.h"
+#include "OTWidgets/Widgets/ImagePainterWidget.h"
+#include "OTWidgets/ImagePainter/PixmapImagePainter.h"
+#include "OTWidgets/ImagePainter/ImagePainterManager.h"
 
 // Qt header
 #include <QtCore/qpropertyanimation.h>

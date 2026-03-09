@@ -51,10 +51,10 @@
 #include "OTGui/Widgets/TextEditorCfg.h"
 
 // OpenTwin Widgets header
-#include "OTWidgets/WidgetView.h"
 #include "OTWidgets/WidgetTypes.h"
-#include "OTWidgets/MessageBoxHandler.h"
-#include "OTWidgets/GraphicsPickerManager.h"
+#include "OTWidgets/Dialog/MessageBoxHandler.h"
+#include "OTWidgets/Graphics/GraphicsPickerManager.h"
+#include "OTWidgets/WidgetView/WidgetView.h"
 
 // OpenTwin Frontend API header
 #include "OTFrontendConnectorAPI/WindowAPI.h"

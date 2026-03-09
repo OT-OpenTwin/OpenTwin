@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/CopyInformation.h"
-#include "OTWidgets/WidgetView.h"
+#include "OTWidgets/WidgetView/WidgetView.h"
 
 namespace ak { class aTreeWidget; };
 

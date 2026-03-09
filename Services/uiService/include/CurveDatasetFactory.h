@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/Variable.h"
-#include "OTWidgets/PlotDataset.h"
+#include "OTWidgets/Plot/PlotDataset.h"
 #include "OTDataStorage/ResultDataStorageAPI.h"
 
 // std header

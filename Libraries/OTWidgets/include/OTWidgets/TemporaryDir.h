@@ -20,8 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qt header
 #include <QtCore/qdatetime.h>

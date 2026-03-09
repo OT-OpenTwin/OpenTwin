@@ -22,8 +22,7 @@
 // OpenTwin header
 #include "OTCore/OTObject.h"
 #include "OTCore/BasicServiceInformation.h"
-#include "OTGui/GuiTypes.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // std header
 #include <map>

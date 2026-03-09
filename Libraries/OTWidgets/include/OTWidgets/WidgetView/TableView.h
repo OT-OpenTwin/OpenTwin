@@ -1,0 +1,55 @@
+// @otlicense
+// File: TableView.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin header
+#include "OTWidgets/Widgets/Table.h"
+#include "OTWidgets/WidgetView/WidgetView.h"
+
+namespace ot {
+
+	class OT_WIDGETS_API_EXPORT TableView : public WidgetView {
+		Q_OBJECT
+		OT_DECL_NOCOPY(TableView)
+		OT_DECL_NOMOVE(TableView)
+		OT_DECL_NODEFAULT(TableView)
+	public:
+		explicit TableView(QWidget* _parent);
+		explicit TableView(Table* _table, QWidget* _parent);
+		virtual ~TableView();
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Base class functions
+
+		virtual QWidget* getViewWidget(void) override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		Table* getTable(void) const { return m_table; };
+
+	private Q_SLOTS:
+		void slotModifiedChanged(bool _isModified);
+
+	private:
+		Table* m_table;
+	};
+
+}

@@ -24,10 +24,10 @@
 // OpenTwin header
 #include "OTSystem/DateTime.h"
 #include "OTCore/String.h"
-#include "OTWidgets/Label.h"
-#include "OTWidgets/PushButton.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/PlainTextEdit.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/PlainTextEdit.h"
 
 // Qt header
 #include <QtCore/qthread.h>

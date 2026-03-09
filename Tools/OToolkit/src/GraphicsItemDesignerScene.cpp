@@ -24,9 +24,9 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Style/ColorStyleTypes.h"
-#include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/GraphicsEllipseItem.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
+#include "OTWidgets/Graphics/GraphicsScene.h"
+#include "OTWidgets/Graphics/GraphicsEllipseItem.h"
 
 // Qt header
 #include <QtWidgets/qgraphicssceneevent.h>

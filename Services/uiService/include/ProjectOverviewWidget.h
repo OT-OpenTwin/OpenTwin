@@ -24,7 +24,7 @@
 #include "OTCore/ProjectFilterData.h"
 #include "OTCore/ProjectInformation.h"
 #include "OTGui/ExtendedProjectInformation.h"
-#include "OTWidgets/WidgetBase.h"
+#include "OTWidgets/Widgets/WidgetBase.h"
 
 // Qt header
 #include <QtCore/qtimer.h>

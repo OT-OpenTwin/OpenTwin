@@ -24,7 +24,7 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
-#include "OTWidgets/Splitter.h"
+#include "OTWidgets/Widgets/Splitter.h"
 #include "OTCommunication/Msg.h"
 
 // Qt header

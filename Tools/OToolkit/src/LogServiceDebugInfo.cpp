@@ -23,9 +23,9 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTWidgets/Table.h"
-#include "OTWidgets/TableItem.h"
-#include "OTWidgets/PushButton.h"
+#include "OTWidgets/Widgets/Table.h"
+#include "OTWidgets/Widgets/TableItem.h"
+#include "OTWidgets/Widgets/PushButton.h"
 
 // Qt header
 #include <QtGui/qclipboard.h>

@@ -26,8 +26,6 @@
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Graphics/GraphicsLineItemCfg.h"
-#include "OTWidgets/QtFactory.h"
-#include "OTWidgets/GraphicsScene.h"
 
 static WrappedItemFactoryRegistrar<WrappedLineItem> circleRegistrar(ot::GraphicsLineItemCfg::className());
 

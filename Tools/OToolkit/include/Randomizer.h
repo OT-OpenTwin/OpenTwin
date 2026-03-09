@@ -24,7 +24,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OT header
-#include <OTWidgets/Dialog.h>
+#include "OTWidgets/Dialog/Dialog.h"
 
 // Qt header
 #include <QtCore/qobject.h>

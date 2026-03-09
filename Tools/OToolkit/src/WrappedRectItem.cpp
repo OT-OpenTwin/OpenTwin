@@ -25,8 +25,6 @@
 // OpenTwin header
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Graphics/GraphicsRectangularItemCfg.h"
-#include "OTWidgets/QtFactory.h"
-#include "OTWidgets/GraphicsScene.h"
 
 static WrappedItemFactoryRegistrar<WrappedRectItem> circleRegistrar(ot::GraphicsRectangularItemCfg::className());
 

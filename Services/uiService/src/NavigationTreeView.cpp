@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "NavigationTreeView.h"
-#include "OTWidgets/WidgetViewDock.h"
+#include "OTWidgets/WidgetView/WidgetViewDock.h"
 
 // uiCore header
 #include "akWidgets/aTreeWidget.h"

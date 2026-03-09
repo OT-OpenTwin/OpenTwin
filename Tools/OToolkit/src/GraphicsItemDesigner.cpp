@@ -40,13 +40,13 @@
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsGroupItemCfg.h"
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/PropertyGrid.h"
-#include "OTWidgets/TreeWidgetFilter.h"
-#include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/Graphics/GraphicsItem.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Properties/PropertyGrid.h"
+#include "OTWidgets/Properties/PropertyGridItem.h"
+#include "OTWidgets/Properties/PropertyGridGroup.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
+#include "OTWidgets/Widgets/TreeWidgetFilter.h"
 
 // Qt header
 #include <QtCore/qfile.h>

@@ -26,8 +26,6 @@
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Graphics/GraphicsTextItemCfg.h"
-#include "OTWidgets/QtFactory.h"
-#include "OTWidgets/GraphicsScene.h"
 
 // Qt header
 #include <QtGui/qfontdatabase.h>

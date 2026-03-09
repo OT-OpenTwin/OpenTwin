@@ -25,7 +25,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTWidgets/GlobalWidgetViewManager.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 
 // Qt header
 #include <QtWidgets/qmenu.h>

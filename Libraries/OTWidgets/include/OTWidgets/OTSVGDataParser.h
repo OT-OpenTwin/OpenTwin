@@ -20,8 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/ColorStyle.h"
-#include "OTWidgets/WidgetTypes.h"
+#include "OTWidgets/Style/ColorStyle.h"
 
 // Qt header
 #include <QtCore/qbytearray.h>

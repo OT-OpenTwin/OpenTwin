@@ -22,7 +22,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/Properties/PropertyGridItem.h"
 
 GraphicsItemDesignerPropertyHandler::GraphicsItemDesignerPropertyHandler()
 	: m_propertyGrid(nullptr), m_navigation(nullptr), m_navigationItem(nullptr)

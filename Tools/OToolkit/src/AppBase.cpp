@@ -53,13 +53,13 @@
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Painter/CheckerboardPainter2D.h"
 #include "OTCommunication/ActionDispatcher.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/PlainTextEdit.h"
-#include "OTWidgets/WidgetViewDock.h"
-#include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/PlainTextEditView.h"
-#include "OTWidgets/StyledTextConverter.h"
-#include "OTWidgets/GlobalWidgetViewManager.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Style/StyledTextConverter.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
+#include "OTWidgets/Widgets/PlainTextEdit.h"
+#include "OTWidgets/WidgetView/WidgetViewDock.h"
+#include "OTWidgets/WidgetView/PlainTextEditView.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 
 // Qt header
 #include <QtCore/qprocess.h>

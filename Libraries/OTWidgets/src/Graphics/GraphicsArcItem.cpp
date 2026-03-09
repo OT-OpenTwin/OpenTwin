@@ -1,0 +1,139 @@
+// @otlicense
+// File: GraphicsArcItem.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+// OpenTwin header
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Painter/Painter2D.h"
+#include "OTGui/Graphics/GraphicsArcItemCfg.h"
+#include "OTWidgets/QtFactory.h"
+#include "OTWidgets/Graphics/GraphicsScene.h"
+#include "OTWidgets/Graphics/GraphicsArcItem.h"
+#include "OTWidgets/Graphics/GraphicsItemFactory.h"
+
+// Qt header
+#include <QtGui/qpainter.h>
+#include <QtGui/qevent.h>
+
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsArcItem> arcItemRegistrar(ot::GraphicsArcItemCfg::className());
+
+ot::GraphicsArcItem::GraphicsArcItem()
+	: ot::CustomGraphicsItem(new GraphicsArcItemCfg)
+{
+
+}
+
+ot::GraphicsArcItem::~GraphicsArcItem() {
+
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: ot::GraphicsItems
+
+bool ot::GraphicsArcItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
+	OTAssertNullptr(_cfg);
+
+	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
+
+	this->setBlockConfigurationNotifications(true);
+	this->updateItemGeometry();
+	this->setBlockConfigurationNotifications(false);
+
+	return true;
+}
+
+QMarginsF ot::GraphicsArcItem::getOutlineMargins(void) const {
+	const GraphicsArcItemCfg* cfg = this->getItemConfiguration<GraphicsArcItemCfg>();
+	OTAssertNullptr(cfg);
+	double margs = cfg->getLineStyle().getWidth() / 2.;
+	return QMarginsF(margs, margs, margs, margs);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: ot::CustomGraphicsItem
+
+QSizeF ot::GraphicsArcItem::getPreferredGraphicsItemSize(void) const {
+	return QtFactory::toQSize(this->getItemConfiguration<GraphicsArcItemCfg>()->getRect().getSize());
+}
+
+void ot::GraphicsArcItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
+	const GraphicsArcItemCfg* cfg = this->getItemConfiguration<GraphicsArcItemCfg>();
+	
+	QPen borderPen = QtFactory::toQPen(cfg->getLineStyle());
+
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
+			std::unique_ptr<Painter2D> newPainter(GraphicsItem::createSelectionBorderPainter());
+			borderPen.setBrush(QtFactory::toQBrush(newPainter.get()));
+		}
+		else if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
+			std::unique_ptr<Painter2D> newPainter(GraphicsItem::createHoverBorderPainter());
+			borderPen.setBrush(QtFactory::toQBrush(newPainter.get()));
+		}
+	}
+
+	_painter->setPen(borderPen);
+	_painter->drawArc(QtFactory::toQRect(this->getArcRect()), this->getStartAngle(), this->getSpanAngle());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter/Getter
+
+void ot::GraphicsArcItem::setArcRect(const RectD& _rect) {
+	this->getItemConfiguration<GraphicsArcItemCfg>()->setRect(_rect);
+	this->update();
+}
+
+void ot::GraphicsArcItem::setArcRect(const QRectF& _rect) {
+	this->setArcRect(QtFactory::toRect(_rect));
+}
+
+const ot::RectD& ot::GraphicsArcItem::getArcRect(void) const {
+	return this->getItemConfiguration<GraphicsArcItemCfg>()->getRect();
+}
+
+void ot::GraphicsArcItem::setStartAngle(double _angle) {
+	this->getItemConfiguration<GraphicsArcItemCfg>()->setStartAngle(_angle);
+	this->update();
+}
+
+double ot::GraphicsArcItem::getStartAngle(void) const {
+	return this->getItemConfiguration<GraphicsArcItemCfg>()->getStartAngle();
+}
+
+void ot::GraphicsArcItem::setSpanAngle(double _angle) {
+	this->getItemConfiguration<GraphicsArcItemCfg>()->setSpanAngle(_angle);
+	this->update();
+}
+
+double ot::GraphicsArcItem::getSpanAngle(void) const {
+	return this->getItemConfiguration<GraphicsArcItemCfg>()->getSpanAngle();
+}
+
+void ot::GraphicsArcItem::setLineStyle(const PenFCfg& _style) {
+	this->getItemConfiguration<GraphicsArcItemCfg>()->setLineStyle(_style);
+	this->update();
+}
+
+const ot::PenFCfg& ot::GraphicsArcItem::getLineStyle(void) const {
+	const GraphicsArcItemCfg* cfg = this->getItemConfiguration<GraphicsArcItemCfg>();
+	return cfg->getLineStyle();
+}

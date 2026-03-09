@@ -23,7 +23,7 @@
 #include "GraphicsItemDesignerItemBase.h"
 
 // OpenTwin header
-#include "OTWidgets/GraphicsTextItem.h"
+#include "OTWidgets/Graphics/GraphicsTextItem.h"
 
 namespace ot { class Painter2D; }
 

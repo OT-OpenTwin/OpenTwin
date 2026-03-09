@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Dialog/Dialog.h"
 
 namespace ot { class CheckBox; }
 namespace ot { class ComboBox; }

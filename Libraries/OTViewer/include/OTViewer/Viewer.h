@@ -22,7 +22,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
-#include "OTWidgets/WidgetBase.h"
+#include "OTWidgets/Widgets/WidgetBase.h"
 
 #include <QMainWindow>
 #include <QtOpenGLWidgets/qopenglwidget.h>

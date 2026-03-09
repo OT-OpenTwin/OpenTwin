@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/PlotBase.h"
+#include "OTWidgets/Plot/PlotBase.h"
 
 namespace ot {
 

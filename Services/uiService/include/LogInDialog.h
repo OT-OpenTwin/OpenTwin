@@ -26,7 +26,7 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Dialog/Dialog.h"
 
 // Qt header
 #include <QtCore/qstring.h>

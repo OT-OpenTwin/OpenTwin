@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/ProjectInformation.h"
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Dialog/Dialog.h"
 
 // Qt header
 #include <QtGui/qicon.h>

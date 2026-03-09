@@ -1,0 +1,50 @@
+// @otlicense
+// File: GraphicsConnectionConnectorItem.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin Widgets header
+#include "OTWidgets/Graphics/GraphicsEllipseItem.h"
+
+namespace ot {
+
+	class GraphicsConnectionItem;
+
+	class OT_WIDGETS_API_EXPORT GraphicsConnectionConnectorItem : public GraphicsEllipseItem {
+		OT_DECL_NOCOPY(GraphicsConnectionConnectorItem)
+		OT_DECL_NOMOVE(GraphicsConnectionConnectorItem)
+		OT_DECL_NODEFAULT(GraphicsConnectionConnectorItem)
+	public:
+		GraphicsConnectionConnectorItem(GraphicsConnectionItem* _connection);
+		virtual ~GraphicsConnectionConnectorItem();
+
+		//! @brief Returns true if this item is a connection connector item.
+		virtual bool isInternalItem() const { return true; };
+
+		GraphicsConnectionItem* getConnection() { return m_connection; };
+		const GraphicsConnectionItem* getConnection() const { return m_connection; };
+
+	protected:
+		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) override;
+
+	private:
+		GraphicsConnectionItem* m_connection;
+	};
+
+}

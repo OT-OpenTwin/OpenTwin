@@ -25,11 +25,11 @@
 // OT header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/GraphicsItemLoader.h"
-#include "OTWidgets/GlobalWidgetViewManager.h"
-#include "OTWidgets/ApplicationPropertiesManager.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
+#include "OTWidgets/Graphics/GraphicsItemLoader.h"
+#include "OTWidgets/Properties/ApplicationPropertiesManager.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 

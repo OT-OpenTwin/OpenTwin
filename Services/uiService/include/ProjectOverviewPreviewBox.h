@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/ExtendedProjectInformation.h"
-#include "OTWidgets/WidgetBase.h"
+#include "OTWidgets/Widgets/WidgetBase.h"
 
 // Qt header
 #include <QtCore/qtimer.h>

@@ -18,30 +18,30 @@
 // @otlicense-end
 
  // Wrapper header
-#include <ViewerComponent.h>				// Corresponding header
-#include <ExternalServicesComponent.h>		// Model Component
+#include "ViewerComponent.h"				// Corresponding header
+#include "ExternalServicesComponent.h"		// Model Component
 #include "AppBase.h"
 #include "ToolBar.h"
 #include "UITestLogs.h"
 #include "ControlsManager.h"
 #include "ShortcutManager.h"
 #include "UserSettings.h"
-#include "OTCore/ReturnMessage.h"
 
 #include "OTSystem/OTAssert.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTWidgets/Table.h"
-#include "OTWidgets/TableView.h"
-#include "OTWidgets/TextEditor.h"
-#include "OTWidgets/PlotView.h"
-#include "OTWidgets/PlotDataset.h"
-#include "OTWidgets/GraphicsView.h"
-#include "OTWidgets/DoubleSpinBox.h"
-#include "OTWidgets/TextEditorView.h"
-#include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/GraphicsViewView.h"
-#include "OTWidgets/PropertyInputDouble.h"
-#include "OTWidgets/GlobalWidgetViewManager.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTWidgets/Plot/PlotDataset.h"
+#include "OTWidgets/Graphics/GraphicsView.h"
+#include "OTWidgets/Properties/PropertyGridItem.h"
+#include "OTWidgets/Properties/PropertyInputDouble.h"
+#include "OTWidgets/Widgets/Table.h"
+#include "OTWidgets/Widgets/TextEditor.h"
+#include "OTWidgets/Widgets/DoubleSpinBox.h"
+#include "OTWidgets/WidgetView/PlotView.h"
+#include "OTWidgets/WidgetView/TableView.h"
+#include "OTWidgets/WidgetView/TextEditorView.h"
+#include "OTWidgets/WidgetView/GraphicsViewView.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 
 // C++ header
 #include <exception>

@@ -29,9 +29,9 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTGui/Style/ColorStyleTypes.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/ApplicationPropertiesManager.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
+#include "OTWidgets/Properties/ApplicationPropertiesManager.h"
 #include "OTCommunication/actionTypes.h"
 
 // Qt header

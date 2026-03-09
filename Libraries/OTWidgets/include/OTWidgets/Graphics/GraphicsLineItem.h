@@ -1,0 +1,77 @@
+// @otlicense
+// File: GraphicsLineItem.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin header
+#include "OTGui/Style/PenCfg.h"
+#include "OTWidgets/Graphics/CustomGraphicsItem.h"
+
+// Qt header
+#include <QtCore/qline.h>
+
+namespace ot {
+
+	class OT_WIDGETS_API_EXPORT GraphicsLineItem : public CustomGraphicsItem {
+		OT_DECL_NOCOPY(GraphicsLineItem)
+		OT_DECL_NOMOVE(GraphicsLineItem)
+	public:
+		GraphicsLineItem();
+		virtual ~GraphicsLineItem();
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Base class functions: ot::GraphicsItem
+
+		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
+
+		virtual QMarginsF getOutlineMargins() const override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Base class functions: ot::CustomGraphicsItem
+
+		virtual QSizeF getPreferredGraphicsItemSize() const override;
+
+	protected:
+
+		//! @brief Paint the item inside the provided rect
+		virtual void paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
+
+	public:
+
+		void setLine(qreal _x1, qreal _y1, qreal _x2, qreal _y2) { this->setLine(Point2DD(_x1, _y1), Point2DD(_x2, _y2)); };
+		void setLine(const Point2DD& _from, const Point2DD& _to);
+		void setLine(const QPointF& _from, const QPointF& _to);
+		void setLine(const QLineF& _line);
+		const Point2DD& getFrom() const;
+		const Point2DD& getTo() const;
+		QLineF getLine() const;
+
+		void setLineStyle(const PenFCfg& _style);
+		const PenFCfg& getLineStyle() const;
+
+	};
+
+
+}

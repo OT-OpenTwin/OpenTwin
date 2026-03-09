@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/Table.h"
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Widgets/Table.h"
+#include "OTWidgets/Dialog/Dialog.h"
 
 namespace ot { class LineEdit; }
 namespace ot { class CheckBox; }

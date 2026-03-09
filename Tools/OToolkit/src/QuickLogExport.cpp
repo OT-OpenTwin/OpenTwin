@@ -23,10 +23,10 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTWidgets/Label.h"
-#include "OTWidgets/CheckBox.h"
-#include "OTWidgets/ComboBox.h"
-#include "OTWidgets/PushButton.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/CheckBox.h"
+#include "OTWidgets/Widgets/ComboBox.h"
+#include "OTWidgets/Widgets/PushButton.h"
 
 // Qt header
 #include <QtCore/qfile.h>

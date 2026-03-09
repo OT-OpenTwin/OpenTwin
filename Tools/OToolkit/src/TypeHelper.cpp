@@ -20,10 +20,10 @@
 #include "TypeHelper.h"
 
 // OpenTwin header
-#include "OTWidgets/Label.h"
-#include "OTWidgets/CheckBox.h"
-#include "OTWidgets/ComboBox.h"
-#include "OTWidgets/LineEdit.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/CheckBox.h"
+#include "OTWidgets/Widgets/ComboBox.h"
+#include "OTWidgets/Widgets/LineEdit.h"
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"

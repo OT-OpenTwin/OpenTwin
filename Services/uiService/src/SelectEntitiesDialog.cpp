@@ -20,11 +20,11 @@
 // OpenTwin header
 #include "SelectEntitiesDialog.h"
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/TreeWidgetItem.h"
-#include "OTWidgets/TreeWidgetFilter.h"
-#include "OTWidgets/PushButton.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
+#include "OTWidgets/Widgets/TreeWidgetItem.h"
+#include "OTWidgets/Widgets/TreeWidgetFilter.h"
+#include "OTWidgets/Widgets/PushButton.h"
 
 // Qt header
 #include <QtWidgets/qlabel.h>

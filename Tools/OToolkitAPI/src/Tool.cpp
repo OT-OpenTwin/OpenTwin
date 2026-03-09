@@ -22,9 +22,9 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/WidgetViewDock.h"
-#include "OTWidgets/BasicWidgetView.h"
-#include "OTWidgets/GlobalWidgetViewManager.h"
+#include "OTWidgets/WidgetView/WidgetViewDock.h"
+#include "OTWidgets/WidgetView/BasicWidgetView.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 
 otoolkit::Tool::Tool() 
 	: m_isRunning(false), m_isExternal(false)

@@ -23,7 +23,7 @@
 #include "GraphicsItemDesignerItemBase.h"
 
 // OpenTwin header
-#include "OTWidgets/GraphicsPolygonItem.h"
+#include "OTWidgets/Graphics/GraphicsPolygonItem.h"
 
 class WrappedPolygonItem : public ot::GraphicsPolygonItem, public GraphicsItemDesignerItemBase {
 	OT_DECL_NOCOPY(WrappedPolygonItem)

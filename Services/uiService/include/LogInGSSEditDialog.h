@@ -25,7 +25,7 @@
 // OpenTwin header
 #include "OTCore/LoginTypes.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Dialog/Dialog.h"
 
 // Qt header
 #include <QtWidgets/qheaderview.h>

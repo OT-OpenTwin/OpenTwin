@@ -24,7 +24,6 @@
 
 // OpenTwin header
 #include "OTGui/Painter/StyleRefPainter2D.h"
-#include "OTWidgets/GraphicsScene.h"
 
 WrappedCircleItem::WrappedCircleItem() {
 	this->setOutline(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));

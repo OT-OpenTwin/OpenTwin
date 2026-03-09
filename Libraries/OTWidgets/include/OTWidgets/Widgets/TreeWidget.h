@@ -1,0 +1,129 @@
+// @otlicense
+// File: TreeWidget.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin header
+#include "OTWidgets/Widgets/WidgetBase.h"
+#include "OTWidgets/Widgets/TreeWidgetItemInfo.h"
+
+// Qt header
+#include <QtCore/qlist.h>
+#include <QtWidgets/qtreewidget.h>
+
+// std header
+#include <list>
+
+namespace ot {
+
+	class TreeItemDelegate;
+
+	class OT_WIDGETS_API_EXPORT TreeWidget : public QTreeWidget, public ot::WidgetBase {
+		Q_OBJECT
+		OT_DECL_NOCOPY(TreeWidget)
+		OT_DECL_NOMOVE(TreeWidget)
+		OT_DECL_NODEFAULT(TreeWidget)
+	public:
+		struct ItemInformation {
+			QString text;
+			QIcon icon;
+			NavigationTreeItemCfg::ItemFlags flags;
+		};
+
+		explicit TreeWidget(QWidget * _parentWidget);
+		virtual ~TreeWidget();
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
+
+		//! @brief Returns a pointer to the root widget of this object
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
+
+		QTreeWidgetItem* findItem(const QString& _itemPath, char _delimiter = '/') const;
+		
+		//! @brief Checks if the item at the given path exists.
+		//! @param _itemPath Path to the item (e.g. "Root/Child/Item" for a delimiter '/').
+		//! @param _delimiter Delimiter to separate the item path.
+		bool itemExists(const QString& _itemPath, char _delimiter = '/') const { return this->findItem(_itemPath, _delimiter); };
+
+		//! @brief Checks if an item with the given text exists.
+		//! The item text is the text of the single item.
+		//! The item to check may be nested.
+		//! @param _itemText Text to check.
+		bool itemTextExists(const QString& _itemText) const;
+
+		QString getItemPath(QTreeWidgetItem* _item, char _delimiter = '/') const;
+
+		QTreeWidgetItem* addItem(const TreeWidgetItemInfo& _item);
+
+		//! @brief Deselects all items.
+		//! Emits itemSelectionChanged when done.
+		void deselectAll();
+
+		//! @brief Returns a list of all checked items.
+		std::list<QTreeWidgetItem*> getCheckedItems();
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Event handler
+
+		virtual void mousePressEvent(QMouseEvent* _event) override;
+
+		virtual void drawRow(QPainter* _painter, const QStyleOptionViewItem& _options, const QModelIndex& _index) const override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Helper
+
+		//! @brief Checks if an item with the given text exists.
+		//! The item text is the text of the single item.
+		//! The item to check may be nested.
+		//! @param _parent The parent item to check the childs.
+		//! @param _itemText Text to check.
+		bool itemTextExists(QTreeWidgetItem* _parent, const QString& _itemText) const;
+
+		QTreeWidgetItem* findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const;
+
+		QTreeWidgetItem* findItemByText(QTreeWidgetItem* _parent, const QString& _itemText) const;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private: Slots
+
+	private Q_SLOTS:
+		void slotColorStyleAboutToChange();
+		void slotColorStyleChanged();
+
+	private:
+		TreeItemDelegate* m_itemDeletegate;
+
+		std::list<int> m_columnWidths;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private: Helper
+
+		QTreeWidgetItem* addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item);
+		void destroyRecursive(QTreeWidgetItem* _item);
+		
+	};
+
+}

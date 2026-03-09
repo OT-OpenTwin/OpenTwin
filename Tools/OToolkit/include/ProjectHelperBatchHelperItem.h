@@ -3,7 +3,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/TreeWidgetItem.h"
+#include "OTWidgets/Widgets/TreeWidgetItem.h"
 
 // Qt header
 #include <QtCore/qobject.h>

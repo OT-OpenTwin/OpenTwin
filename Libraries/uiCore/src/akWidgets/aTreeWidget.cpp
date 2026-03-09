@@ -19,8 +19,8 @@
 
 // OpenTwin header
 #include "OTCore/RAII/ValueRAII.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/TreeItemDelegate.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Delegate/TreeItemDelegate.h"
 
 // AK header
 #include <akCore/aException.h>

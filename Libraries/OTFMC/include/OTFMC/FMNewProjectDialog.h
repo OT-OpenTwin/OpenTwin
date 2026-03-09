@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Dialog/Dialog.h"
 #include "OTFMC/FMCTypes.h"
 #include "OTFMC/FMNewProjectInfo.h"
 

@@ -22,10 +22,10 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/LogDispatcher.h"
 
-#include "OTWidgets/Table.h"
-#include "OTWidgets/TableView.h"
-#include "OTWidgets/TextEditor.h"
-#include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/Widgets/Table.h"
+#include "OTWidgets/Widgets/TextEditor.h"
+#include "OTWidgets/WidgetView/TableView.h"
+#include "OTWidgets/WidgetView/TextEditorView.h"
 
 #include "OTCommunication/ActionTypes.h"
 

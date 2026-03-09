@@ -23,7 +23,7 @@
 #include "GraphicsItemDesignerImageExportConfig.h"
 
 // OpenTwin header
-#include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/Graphics/GraphicsScene.h"
 
 // Qt header
 #include <QtGui/qimage.h>

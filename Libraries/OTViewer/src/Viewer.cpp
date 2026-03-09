@@ -28,7 +28,7 @@
 #include "OTGui/Properties/PropertyDouble.h"
 #include "OTGui/Properties/PropertyString.h"
 #include "OTGui/Properties/PropertyStringList.h"
-#include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
 
 // OpenTwin Viewer header
 #include "OTViewer/Model.h"

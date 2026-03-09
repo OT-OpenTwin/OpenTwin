@@ -20,9 +20,9 @@
 // OpenTwin header
 #include "ProjectOverviewHeader.h"
 #include "ProjectOverviewDelegate.h"
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/ColorStyle.h"
-#include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/Style/ColorStyle.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
 
 // Qt header
 #include <QtGui/qpainter.h>

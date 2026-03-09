@@ -1,0 +1,124 @@
+// @otlicense
+// File: TabToolBarPage.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+// OpenTwin header
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTWidgets/ToolBar/TabToolBar.h"
+#include "OTWidgets/ToolBar/TabToolBarPage.h"
+#include "OTWidgets/ToolBar/TabToolBarGroup.h"
+
+// TabToolBar header
+#include <TabToolbar/Page.h>
+
+ot::TabToolBarPage::TabToolBarPage(TabToolBar* _parentTabToolBar, tt::Page* _page, const std::string& _name) :
+	m_name(_name), m_page(_page), m_parentTabToolBar(_parentTabToolBar)
+{
+	OTAssertNullptr(m_parentTabToolBar);
+}
+
+ot::TabToolBarPage::~TabToolBarPage() {
+	if (m_parentTabToolBar) {
+		m_parentTabToolBar->forgetPage(this);
+	}
+	for (TabToolBarGroup* group : m_groups) {
+		group->setParentTabToolBarPage(nullptr);
+	}
+
+	delete m_page;
+	m_page = nullptr;
+}
+
+void ot::TabToolBarPage::setAsCurrentPage(void) {
+	OTAssertNullptr(m_parentTabToolBar);
+	m_parentTabToolBar->setCurrentPage(this);
+}
+
+ot::TabToolBarGroup* ot::TabToolBarPage::addGroup(const std::string& _groupName, bool _returnExisting) {
+	TabToolBarGroup* newGroup = this->findGroup(_groupName);
+	if (newGroup) {
+		if (_returnExisting) {
+			return newGroup;
+		}
+		else {
+			OT_LOG_E("Group \"" + _groupName + "\" already exists in page \"" + m_name + "\"");
+			return nullptr;
+		}
+	}
+
+	tt::Group* group = m_page->AddGroup(QString::fromStdString(_groupName));
+
+	newGroup = new TabToolBarGroup(this, group, _groupName);
+	m_groups.push_back(newGroup);
+
+	return newGroup;
+}
+
+ot::TabToolBarSubGroup* ot::TabToolBarPage::addSubGroup(const std::string& _groupName, const std::string& _subGroupName, bool _returnExisting) {
+	TabToolBarGroup* group = this->findGroup(_groupName);
+	if (!group) {
+		OT_LOG_E("Group \"" + _groupName + "\" not found in page \"" + m_name + "\"");
+		return nullptr;
+	}
+	else {
+		return group->addSubGroup(_subGroupName, _returnExisting);
+	}
+}
+
+void ot::TabToolBarPage::forgetGroup(TabToolBarGroup* _group) {
+	auto it = std::find(m_groups.begin(), m_groups.end(), _group);
+	if (it != m_groups.end()) {
+		m_groups.erase(it);
+	}
+}
+
+ot::TabToolBarGroup* ot::TabToolBarPage::findGroup(const std::string& _groupName) {
+	for (TabToolBarGroup* group : m_groups) {
+		if (group->getName() == _groupName) {
+			return group;
+		}
+	}
+	return nullptr;
+}
+
+const ot::TabToolBarGroup* ot::TabToolBarPage::findGroup(const std::string& _groupName) const {
+	for (const TabToolBarGroup* group : m_groups) {
+		if (group->getName() == _groupName) {
+			return group;
+		}
+	}
+	return nullptr;
+}
+
+ot::TabToolBarSubGroup* ot::TabToolBarPage::findSubGroup(const std::string& _groupName, const std::string& _subGroupName) {
+	for (TabToolBarGroup* group : m_groups) {
+		if (group->getName() == _groupName) {
+			return group->findSubGroup(_subGroupName);
+		}
+	}
+	return nullptr;
+}
+
+const ot::TabToolBarSubGroup* ot::TabToolBarPage::findSubGroup(const std::string& _groupName, const std::string& _subGroupName) const {
+	for (const TabToolBarGroup* group : m_groups) {
+		if (group->getName() == _groupName) {
+			return group->findSubGroup(_subGroupName);
+		}
+	}
+	return nullptr;
+}

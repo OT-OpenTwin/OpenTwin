@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/WidgetView.h"
+#include "OTWidgets/WidgetView/WidgetView.h"
 
 namespace ot {
 

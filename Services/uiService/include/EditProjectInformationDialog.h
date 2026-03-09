@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "LoginData.h"
 #include "OTGui/ExtendedProjectInformation.h"
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Dialog/Dialog.h"
 
 namespace ot {
 	class ComboBox;

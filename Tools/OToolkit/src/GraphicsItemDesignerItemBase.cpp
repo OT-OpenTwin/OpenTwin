@@ -22,7 +22,7 @@
 #include "GraphicsItemDesignerNavigation.h"
 
 // OpenTwin header
-#include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/Graphics/GraphicsItem.h"
 
 GraphicsItemDesignerItemBase::GraphicsItemDesignerItemBase() 
 	: m_designerItemFlags(DesignerItemFlag::NoDesignerItemFlags)

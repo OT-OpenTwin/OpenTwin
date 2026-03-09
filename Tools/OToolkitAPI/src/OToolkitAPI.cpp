@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
 
 // Qt header
 #include <QtCore/qdir.h>
