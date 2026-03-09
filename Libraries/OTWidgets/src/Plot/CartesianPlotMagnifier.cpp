@@ -220,7 +220,7 @@ void ot::CartesianPlotMagnifier::updateMarkers(const QPoint& _pos) {
 		}
 		
 		// Set new label
-		QwtText newText(QString::number(pt.x()) + "; " + QString::number(pt.y()), QwtText::PlainText);
+		QwtText newText(m_plot->getOwner()->toPositionInfoText(pt, true), QwtText::PlainText);
 		newText.setColor(QColor(255, 50, 50));
 
 		// Get canvas rect and transform maps

@@ -291,7 +291,7 @@ public:
 	void setRelayURLs(const std::string &);
 
 	//! @brief Will return the current Relay URLs
-	std::string getRelayURLs() const;
+	std::string getRelayURLs() const { return m_relayURLs; }
 
 	//! @brief Will return the current Service URL
 	const std::string & getServiceURL() const { return m_uiServiceURL; }
@@ -579,7 +579,8 @@ public Q_SLOTS:
 	void slotViewCloseRequested(ot::WidgetView* _view);
 	void slotViewTabClicked(ot::WidgetView* _view);
 	void slotViewDataModifiedChanged(ot::WidgetView* _view);
-	
+	bool focusLastAddedCentralView();
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Project management slots

@@ -284,36 +284,38 @@ void ot::PlotBase::clearPositionInfoText()
 
 void ot::PlotBase::setInfoTextFromPosition(const QPoint& _pos)
 {
-	m_infoLabel->setText(toPositionInfoText(_pos));
+	m_infoLabel->setText(toPositionInfoText(_pos, false));
 }
 
 void ot::PlotBase::setInfoTextFromPosition(const QPointF& _pos)
 {
-	m_infoLabel->setText(toPositionInfoText(_pos));
+	m_infoLabel->setText(toPositionInfoText(_pos, false));
 }
 
 void ot::PlotBase::setInfoTextFromPosition(const QwtPointPolar& _pos)
 {
-	m_infoLabel->setText(toPositionInfoText(_pos));
+	m_infoLabel->setText(toPositionInfoText(_pos, false));
 }
 
-QString ot::PlotBase::toPositionInfoText(const QPoint& _pos) const
+QString ot::PlotBase::toPositionInfoText(const QPoint& _pos, bool _multiline) const
 {
-	return toPositionInfoText(_pos.toPointF());
+	return toPositionInfoText(_pos.toPointF(), false);
 }
 
-QString ot::PlotBase::toPositionInfoText(const QPointF& _pos) const
+QString ot::PlotBase::toPositionInfoText(const QPointF& _pos, bool _multiline) const
 {
+	const std::string sep = _multiline ? "\n     " : "     ";
 	std::string txt = m_config.getXAxis().getValueDisplayString(_pos.x(), m_config);
-	txt.append("     " + m_config.getYAxis().getValueDisplayString(_pos.y(), m_config));
+	txt.append(sep + m_config.getYAxis().getValueDisplayString(_pos.y(), m_config));
 	return QString::fromStdString(txt);
 }
 
-QString ot::PlotBase::toPositionInfoText(const QwtPointPolar& _pos) const
+QString ot::PlotBase::toPositionInfoText(const QwtPointPolar& _pos, bool _multiline) const
 {
+	const std::string sep = _multiline ? "\n     " : "     ";
 	std::string txt = m_config.getXAxis().getValueDisplayString(_pos.radius(), m_config);
-	txt.append("\n     " + m_config.getYAxis().getValueDisplayString(_pos.azimuth(), m_config, "deg "));
-	txt.append("\n     " + m_config.getYAxis().getValueDisplayString(Math::degToRad(_pos.azimuth()), m_config, "rad "));
+	txt.append(sep + m_config.getYAxis().getValueDisplayString(_pos.azimuth(), m_config, "deg "));
+	txt.append(sep + m_config.getYAxis().getValueDisplayString(Math::degToRad(_pos.azimuth()), m_config, "rad "));
 	return QString::fromStdString(txt);
 }
 

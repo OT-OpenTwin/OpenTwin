@@ -157,6 +157,10 @@ namespace ot {
 		//! @brief Renames the view with the given name.
 		void renameView(const std::string& _oldEntityName, const std::string _newEntityName);
 
+		//! @brief Focus the last added central view that is not in the provided blacklist.
+		//! @param _viewBlacklist List of views that should be ignored when trying to focus the last added central view. This is used to prevent focusing a view that is currently closed for example.
+		bool focusLastAddedCentralView(const std::list<WidgetView*>& _viewBlacklist = std::list<WidgetView*>());
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// View manipulation

@@ -128,9 +128,9 @@ namespace ot {
 		void setInfoTextFromPosition(const QPointF& _pos);
 		void setInfoTextFromPosition(const QwtPointPolar& _pos);
 
-		QString toPositionInfoText(const QPoint& _pos) const;
-		QString toPositionInfoText(const QPointF& _pos) const;
-		QString toPositionInfoText(const QwtPointPolar& _pos) const;
+		QString toPositionInfoText(const QPoint& _pos, bool _multiline) const;
+		QString toPositionInfoText(const QPointF& _pos, bool _multiline) const;
+		QString toPositionInfoText(const QwtPointPolar& _pos, bool _multiline) const;
 
 	Q_SIGNALS:
 		void resetItemSelectionRequest();

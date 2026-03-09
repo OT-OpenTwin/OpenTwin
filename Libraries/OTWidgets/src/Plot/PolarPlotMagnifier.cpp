@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Symbol.h"
+#include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/PolarPlot.h"
 #include "OTWidgets/Plot/PolarPlotMarker.h"
 #include "OTWidgets/Plot/PolarPlotMagnifier.h"
@@ -100,6 +101,9 @@ void ot::PolarPlotMagnifier::updateMarker(const QPoint& _pos) {
 	const QwtPolarCanvas* canvas = m_plot->canvas();
 	QwtPointPolar polar = canvas->invTransform(_pos);
 
+	PlotBase* ownerPlot = m_plot->getOwner();
+	OTAssertNullptr(ownerPlot);
+
 	size_t ix = 0;
 	QwtPolarCurve* curve = m_plot->findNearestCurve(polar, ix);
 
@@ -113,10 +117,7 @@ void ot::PolarPlotMagnifier::updateMarker(const QPoint& _pos) {
 	double azimuthRad = polar.azimuth();
 	double azimuthDeg = qRadiansToDegrees(azimuthRad);
 
-	m_markerText.setText("r = " + QString::number(radius) + "\n" +
-		QString::fromUtf8(Symbol::phi()) + " = " + QString::number(azimuthRad) + " rad\n" +
-		QString::fromUtf8(Symbol::phi()) + " =" + QString::number(azimuthDeg) + " deg"
-	);
+	m_markerText.setText(ownerPlot->toPositionInfoText(polar, true));
 
 	m_state.set(State::MarkerShown);
 

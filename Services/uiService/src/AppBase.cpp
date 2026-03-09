@@ -1067,8 +1067,9 @@ void AppBase::createUi() {
 
 			// Display docks
 			OT_LOG_D("Settings up dock window visibility");
-	
+			
 			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_defaultView);
+			m_defaultView->setAsCurrentViewTab();
 			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
 			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
 			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
@@ -1452,25 +1453,28 @@ void AppBase::setSessionServiceURL(const std::string & _url) {
 	m_ExternalServicesComponent->setSessionServiceURL(m_sessionServiceURL);
 }
 
-void AppBase::setRelayURLs(const std::string & _url) {
+void AppBase::setRelayURLs(const std::string & _url) 
+{
 	m_relayURLs = _url;
 	m_ExternalServicesComponent->setMessagingRelay(m_relayURLs);
-	std::cout << "Relay service URL: " << _url;
+	OT_LOG_D("Relay service URL set to \"" + _url + "\"");
 }
 
-std::string AppBase::getRelayURLs() const { return m_relayURLs; }
-
-void AppBase::switchToViewMenuTabIfNeeded() const {
-	if (uiAPI::window::getCurrentTabToolBarTab(m_mainWindow) == 0) {
+void AppBase::switchToViewMenuTabIfNeeded() const
+{
+	if (uiAPI::window::getCurrentTabToolBarTab(m_mainWindow) == 0)
+	{
 		uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, 1);
 	}
 }
 
-void AppBase::switchToMenuTab(const std::string& _menu) {
+void AppBase::switchToMenuTab(const std::string& _menu) 
+{
 	uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, QString::fromStdString(_menu));
 }
 
-std::string AppBase::getCurrentMenuTab() {
+std::string AppBase::getCurrentMenuTab()
+{
 	return uiAPI::window::getCurrentToolBarTabText(m_mainWindow);
 }
 
@@ -2954,15 +2958,32 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 	OT_SLECTION_TEST_LOG("View focus changed. { \"Previous\": \"" + (_previousView ? _previousView->getViewData().getEntityName() : "<None>") +
 		"\", \"Focused\": " + (_focusedView ? _focusedView->getViewData().getEntityName() : "<None>") + "\" }");
 
-	if (_previousView) {
+	if (_focusedView == _previousView) {
+		OT_LOG_D("Focused view is the same as previous view... Ignoring focus change.");
+		return;
+	}
+
+	if (_previousView) 
+	{
 		m_navigationManager.slotViewDeselected();
+
+		if (m_lastFocusedView == _previousView)
+		{
+			m_lastFocusedView = nullptr;
+		}
+		if (m_lastFocusedCentralView == _previousView)
+		{
+			m_lastFocusedCentralView = nullptr;
+		}
 	}
 
 	// Newly focused (focus in)
-	if (_focusedView) {
+	if (_focusedView) 
+	{
 
 		// Avoid focus change to same view
-		if (_focusedView == m_lastFocusedView) {
+		if (_focusedView == m_lastFocusedView) 
+		{
 			return;
 		}
 		m_lastFocusedView = _focusedView;
@@ -2971,18 +2992,24 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		m_navigationManager.slotViewSelected();
 
 		// Forward focus events of central views to the viewer component
-		if (focusedData.getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+		if (focusedData.getViewFlags() & ot::WidgetViewBase::ViewIsCentral) 
+		{
 			// Update graphics picker content
 			ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_focusedView);
-			if (graphicsView) {
+
+			if (graphicsView) 
+			{
 				m_graphicsPickerManager.setCurrentKey(graphicsView->getGraphicsView()->getPickerKey());
 			}
-			else {
+			else 
+			{
 				m_graphicsPickerManager.clearPicker();
 			}
 
 			ak::aTreeWidget* tree = m_projectNavigation->getTree();
-			if (!(m_viewHandling & (ot::ViewHandlingFlag::SkipEntitySelection | ot::ViewHandlingFlag::SkipViewHandling))) {
+
+			if (!(m_viewHandling & (ot::ViewHandlingFlag::SkipEntitySelection | ot::ViewHandlingFlag::SkipViewHandling)))
+			{
 				// Skip entity selection if configured
 				QSignalBlocker sigBlock(tree);
 				// Reset current selection
@@ -3020,7 +3047,8 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		}
 	}
 	else {
-		m_lastFocusedView = nullptr;
+		
+
 	}
 
 	OT_SLECTION_TEST_LOG(">> View focus changed completed");
@@ -3100,6 +3128,13 @@ void AppBase::slotViewDataModifiedChanged(ot::WidgetView* _view) {
 
 		m_viewerComponent->viewDataModifiedChanged(_view->getViewData().getEntityName(), _view->getViewData().getViewType(), _view->getViewContentModified());
 	}
+}
+
+bool AppBase::focusLastAddedCentralView()
+{
+	const std::list<ot::WidgetView*> lst({  });
+	//const std::list<ot::WidgetView*> lst({ m_defaultView });
+	return ot::GlobalWidgetViewManager::instance().focusLastAddedCentralView(lst);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

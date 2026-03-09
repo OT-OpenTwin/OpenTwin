@@ -290,20 +290,23 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 
 	// Find name list from owner and erase the view entry
 	ViewNameTypeList* lst = this->findViewNameTypeList(owner);
-	if (lst) {
+	if (lst) 
+	{
 		ViewNameTypeListEntry entry;
 		entry.first = _entityName;
 		entry.second = _type;
 
 		auto lstIt = std::find(lst->begin(), lst->end(), entry);
-		if (lstIt != lst->end()) {
+		if (lstIt != lst->end()) 
+		{
 			lst->erase(lstIt);
 		}
 
 		OTAssert(std::find(lst->begin(), lst->end(), entry) == lst->end(), "Duplicate entry");
 
 		// If the owner has no more views, erase the owner.
-		if (lst->empty()) {
+		if (lst->empty()) 
+		{
 			m_viewOwnerMap.erase(owner);
 		}
 	}
@@ -354,6 +357,31 @@ void ot::WidgetViewManager::renameView(const std::string& _oldEntityName, const 
 	}
 
 	this->updateCentralViewTitles();
+}
+
+bool ot::WidgetViewManager::focusLastAddedCentralView(const std::list<WidgetView*>& _viewBlacklist)
+{
+	WidgetView* lastCentralView = nullptr;
+
+	for (auto it = m_views.begin(); it != m_views.end(); it++) 
+	{
+		if (it->second->getViewData().getViewFlags().has(WidgetViewBase::ViewIsCentral))
+		{
+			if (std::find(_viewBlacklist.begin(), _viewBlacklist.end(), it->second) == _viewBlacklist.end())
+			{
+				lastCentralView = it->second;
+			}
+		}
+	}
+	if (lastCentralView) 
+	{
+		lastCentralView->setAsCurrentViewTab();
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
