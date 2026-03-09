@@ -40,6 +40,7 @@
 #include "OTGui/VisualisationTypes.h"
 #include "EdgeSelection.h"
 #include "FaceSelection.h"
+#include "ColorRamp.h"
 
 class Viewer;
 class SceneNodeGeometry;
@@ -202,6 +203,11 @@ public:
 	void updateEdgeColorMode();
 	void updateMeshEdgeColor();
 
+	void setColorRamp(const std::string& itemName, const std::string& colorRampData);
+	void removeColorRamp(const std::string& itemName);
+	void setColorRampActive(const std::string& itemName, bool active);
+	void updateColorRamps();
+
 private:
 	// Methods
 	void	   fillTree();
@@ -308,6 +314,7 @@ private:
 	osg::Matrix									   m_currentWorkingplaneTransformInverse;
 	ManipulatorBase*                               m_currentManipulator;
 	std::string									   m_activeCoordinateSystem;
+	std::map<std::string, ColorRamp>			   m_colorRampMap;
 
 	bool m_hasModalMenu;
 	std::string m_currentMenu;

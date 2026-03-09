@@ -37,6 +37,7 @@ class AxisCenterCross;
 class HandlerBase;
 class ClipPlaneManipulator;
 class ViewerObjectSelectionHandler;
+class ColorRamp;
 
 #include <osg/Group>
 #include <osg/ClipNode>
@@ -139,6 +140,8 @@ public:
 
 	double snapDimension(double value);
 	double snapAngle(double value);
+
+	void setActiveColorRamp(ColorRamp *activeColorRamp);
 
 private Q_SLOTS:
 	void slotColorStyleChanged(void);

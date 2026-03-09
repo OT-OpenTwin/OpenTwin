@@ -51,6 +51,7 @@
 #include "OTViewer/TransformManipulator.h"
 #include "OTViewer/ViewerObjectSelectionHandler.h"
 #include "OTViewer/Private/ViewerDebug.h"
+#include "OTViewer/ColorRamp.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -2042,5 +2043,11 @@ double Viewer::snapAngle(double value)
 	}
 
 	return value;
+}
+
+void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
+{
+	int i = 0;
+
 }
 

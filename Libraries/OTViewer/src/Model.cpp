@@ -3792,3 +3792,86 @@ void Model::updateMeshEdgeColor()
 
 	setupdateMeshEdgeColorModeRecursive(m_sceneNodesRoot, setupdateMeshEdgeColorModeRecursive);
 }
+
+void Model::setColorRamp(const std::string& itemName, const std::string& colorRampData)
+{
+	if (colorRampData.empty()) return;
+
+	ColorRamp colorRamp;
+	colorRamp.loadFromString(colorRampData);
+
+	m_colorRampMap[itemName] = colorRamp;
+
+	updateColorRamps();
+}
+
+void Model::removeColorRamp(const std::string& itemName)
+{
+	auto item = m_colorRampMap.find(itemName);
+
+	if (item != m_colorRampMap.end())
+	{
+		bool updateNeeded = item->second.isActive();
+		m_colorRampMap.erase(item);
+		
+		if (updateNeeded)
+		{
+			updateColorRamps();
+		}
+	}
+}
+
+void Model::setColorRampActive(const std::string& itemName, bool active)
+{
+	bool updateNeeded = false;
+
+	auto item = m_colorRampMap.find(itemName);
+
+	if (item != m_colorRampMap.end())
+	{
+		if (item->second.isActive() != active)
+		{
+			item->second.setActive(active);
+			updateNeeded = true;
+		}
+	}
+
+	if (updateNeeded)
+	{
+		updateColorRamps();
+	}
+}
+
+void Model::updateColorRamps()
+{
+	// Find the currently active colorramp.
+	// If multiple incompatible color ramps are active, the result will be nullptr.
+
+	ColorRamp* activeColorRamp = nullptr;
+
+	for (auto& item : m_colorRampMap)
+	{
+		if (item.second.isActive())
+		{
+			if (activeColorRamp == nullptr)
+			{
+				activeColorRamp = &item.second;
+			}
+			else
+			{
+				if (!(*activeColorRamp == item.second))
+				{
+					activeColorRamp = nullptr;
+					break;
+				}
+			}
+		}
+	}
+
+	// Now process the currently active color ramp
+
+	for (auto viewer : m_viewerList)
+	{
+		viewer->setActiveColorRamp(activeColorRamp);
+	}
+}

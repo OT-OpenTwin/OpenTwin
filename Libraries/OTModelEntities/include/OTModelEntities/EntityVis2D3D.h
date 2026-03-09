@@ -68,6 +68,8 @@ public:
 	ot::UID getMeshID(void) { return meshID; }
 	ot::UID getMeshVersion(void) { return meshVersion; }
 
+	void setColorRampData(const std::string& _colorRampData) { colorRampData = _colorRampData; setModified(); }
+
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;

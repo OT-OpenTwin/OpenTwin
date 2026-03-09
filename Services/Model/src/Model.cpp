@@ -4386,6 +4386,7 @@ void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVers
 
 	visEntity->setDataID(binaryDataItemID);
 	visEntity->setDataVersion(binaryDataItemVersion);
+	visEntity->setColorRampData(colorRampData);
 
 	if (binaryDataItemID > 0)
 	{

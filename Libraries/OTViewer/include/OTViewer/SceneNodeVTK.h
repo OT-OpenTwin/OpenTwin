@@ -64,5 +64,6 @@ private:
 	std::string projectName;
 	unsigned long long dataID;
 	unsigned long long dataVersion;
+	std::string colorRampData;
 };
 
