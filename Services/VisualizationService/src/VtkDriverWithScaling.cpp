@@ -96,19 +96,14 @@ void VtkDriverWithScaling::SetColouring(vtkPolyDataMapper* mapper)
 	else if (scalingFunction == ScalingProperties::ScalingFunction::logScale)
 	{
 		//Log scaling requires the range to be > 0
-		if (minVal < 0)
+		if (minVal <= 0)
 		{
-			minVal = 0;
-			//ToDo: Message to the UI!
+			minVal = maxVal / 1000.0;
 		}
-		if (scalingData->GetRangeMax() < 0)
+
+		if (maxVal <= 0)
 		{
-			maxVal = 0;
-			if (maxVal < minVal)
-			{
-				maxVal = minVal;
-			}
-			//ToDo: Message to the UI!
+			minVal = maxVal = pow(10, -200);
 		}
 
 		lut->SetScaleToLog10();
@@ -152,8 +147,8 @@ void VtkDriverWithScaling::extractColorRampFromLookupTable(vtkLookupTable* lut)
 
 		if (scale == VTK_SCALE_LOG10)
 		{
-			double logMin = log10(range[0]);
-			double logMax = log10(range[1]);
+			double logMin = range[0] <= 0 ? -200 : log10(range[0]);
+			double logMax = range[1] <= 0 ? -200 : log10(range[1]);
 
 			double logStart = logMin + (double(i) / n) * (logMax - logMin);
 			double logEnd = logMin + (double(i + 1) / n) * (logMax - logMin);
