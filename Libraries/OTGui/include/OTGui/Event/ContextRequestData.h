@@ -15,6 +15,7 @@
 
 namespace ot {
 
+	//! @brief The ContextRequestData class is used to request the creation of a new context menus in the frontend.
 	class OT_GUI_API_EXPORT ContextRequestData : public BasicEntityInformation
 	{
 		OT_DECL_DEFCOPY(ContextRequestData)
@@ -36,7 +37,9 @@ namespace ot {
 		static ContextRequestData* fromJson(const std::string& _jsonString);
 		static ContextRequestData* fromJson(const ConstJsonObject& _jsonObject);
 
-		ContextRequestData() = default;
+		ContextRequestData(WidgetViewBase::ViewType _viewType = WidgetViewBase::CustomView);
+		ContextRequestData(const BasicEntityInformation& _basicEntityInformation, WidgetViewBase::ViewType _viewType = WidgetViewBase::CustomView);
+		ContextRequestData(BasicEntityInformation&& _basicEntityInformation, WidgetViewBase::ViewType _viewType = WidgetViewBase::CustomView) noexcept;
 		~ContextRequestData() = default;
 
 		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
@@ -65,7 +68,7 @@ namespace ot {
 		static std::map<std::string, ContextConstructorFunction>& getRegisteredClasses();
 
 		Point2DD m_pos;
-		WidgetViewBase::ViewType m_viewType{ WidgetViewBase::CustomView };
+		WidgetViewBase::ViewType m_viewType;
 	};
 
 } // namespace ot

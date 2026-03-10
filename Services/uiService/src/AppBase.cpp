@@ -1003,7 +1003,7 @@ void AppBase::createUi() {
 			m_projectNavigation = new ot::NavigationTreeView(dockManagerWidget);
 			m_projectNavigation->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROJECTNAVIGATION, TITLE_DOCK_PROJECTNAVIGATION, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewNavigation, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_projectNavigation->setViewIsPermanent(true);
-			
+
 			this->connect(m_projectNavigation, &ot::NavigationTreeView::copyRequested, this, &AppBase::slotCopyRequested);
 			this->connect(m_projectNavigation, &ot::NavigationTreeView::pasteRequested, this, &AppBase::slotPasteRequested);
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::customContextMenuRequested, this, &AppBase::slotNavigationTreeContextMenuRequested);
@@ -3832,6 +3832,12 @@ void AppBase::slotNavigationTreeContextMenuRequested(const QPoint& _pos)
 		return;
 	}
 	const ot::UID entityId = ViewerAPI::getModelEntityIDFromTreeID(item->id());
+	if (entityId == ot::invalidUID)
+	{
+		return;
+	}
+
+	entityUnderMouse = ViewerAPI::getEntityTreeItem(entityId);
 
 	// Determine menu externally
 	if (!m_contextMenuManager.navigationItemContextRequest(entityUnderMouse, menuCfg))

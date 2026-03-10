@@ -19,14 +19,22 @@ ContextMenuManager::~ContextMenuManager()
 
 bool ContextMenuManager::navigationItemContextRequest(const ot::BasicEntityInformation& _hoveredEntity, ot::MenuCfg& _resultMenu)
 {
-	std::unique_ptr<ot::NavigationContextRequestData> requestData = std::make_unique<ot::NavigationContextRequestData>();
-	
+	// Prepare request data
+	if (_hoveredEntity.getEntityName().empty())
+	{
+		return false;
+	}
+
+	std::unique_ptr<ot::NavigationContextRequestData> requestData(new ot::NavigationContextRequestData(_hoveredEntity));
+
 	ot::JsonDocument requestDoc = ot::ContextMenuHandler::createContextMenuRequestedDocument(requestData.release());
 
+	// Send request and handle response
 	auto ext = m_app->getExternalServicesComponent();
 
 	std::list<std::string> responsesJson;
 	ext->broadcastToViewNotifiers(requestDoc.toJson(), responsesJson);
+
 	for (const std::string& responseJson : responsesJson)
 	{
 		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseJson);
@@ -41,6 +49,7 @@ bool ContextMenuManager::navigationItemContextRequest(const ot::BasicEntityInfor
 			return false;
 		}
 
+		//! @todo here we need to merge the menu cfgs
 		_resultMenu.setFromJsonObject(doc.getConstObject());
 	}
 

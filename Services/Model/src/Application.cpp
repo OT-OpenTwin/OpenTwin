@@ -1276,7 +1276,7 @@ bool Application::getContinueAsyncActionWorker() {
 
 Application::Application() 
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL, new UiNotifier, new ModelNotifier),
-	m_model(nullptr), m_continueAsyncActionWorker(true)
+	m_model(nullptr), m_continueAsyncActionWorker(true), m_contextActionHandler(this)
 {
 	m_notifier = new MicroserviceNotifier;
 

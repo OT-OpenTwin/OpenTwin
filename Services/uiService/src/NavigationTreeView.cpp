@@ -31,6 +31,7 @@ ot::NavigationTreeView::NavigationTreeView(QWidget* _parent)
 	: WidgetView(WidgetViewBase::ViewNavigation, _parent)
 {
 	m_tree = new ak::aTreeWidget(getViewDockWidget());
+	m_tree->treeWidget()->setContextMenuPolicy(Qt::CustomContextMenu);
 	this->addWidgetInterfaceToDock(m_tree);
 
 	QShortcut* projectNavCopy = new QShortcut(QKeySequence("Ctrl+C"), m_tree->getQWidget());

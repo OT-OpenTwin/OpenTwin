@@ -27,6 +27,7 @@
 #include "MaterialHandler.h"
 #include "SelectionHandler.h"
 #include "CopyPasteHandler.h"
+#include "ContextActionHandler.h"
 #include "ViewVisualisationHandler.h"
 #include "LibraryManagementWrapper.h"
 #include "ProjectInformationHandler.h"
@@ -297,6 +298,7 @@ private:
 	CopyPasteHandler m_copyPasteHandler;
 	BlockHandler m_blockHandler;
 	LibraryManagementWrapper m_libraryManagementWrapper;
+	ContextActionHandler m_contextActionHandler;
 
 	Application();
 	~Application();

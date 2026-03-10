@@ -35,6 +35,18 @@ ot::ContextRequestData* ot::ContextRequestData::fromJson(const ConstJsonObject& 
 	}
 }
 
+ot::ContextRequestData::ContextRequestData(WidgetViewBase::ViewType _viewType)
+	: m_viewType(_viewType)
+{}
+
+ot::ContextRequestData::ContextRequestData(const BasicEntityInformation & _basicEntityInformation, WidgetViewBase::ViewType _viewType)
+	: BasicEntityInformation(_basicEntityInformation), m_viewType(_viewType)
+{}
+
+ot::ContextRequestData::ContextRequestData(BasicEntityInformation&& _basicEntityInformation, WidgetViewBase::ViewType _viewType) noexcept
+	: BasicEntityInformation(std::move(_basicEntityInformation)), m_viewType(_viewType)
+{}
+
 void ot::ContextRequestData::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const
 {
 	BasicEntityInformation::addToJsonObject(_object, _allocator);

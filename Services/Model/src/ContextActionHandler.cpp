@@ -2,7 +2,12 @@
 
 // OpenTwin header
 #include <stdafx.h>
+#include "Application.h"
 #include "ContextActionHandler.h"
+
+ContextActionHandler::ContextActionHandler(Application* _application) 
+	: m_app(_application)
+{}
 
 ot::MenuCfg ContextActionHandler::contextMenuRequested(const ot::ContextMenuRequestEvent& _event)
 {
@@ -26,10 +31,9 @@ ot::MenuCfg ContextActionHandler::createNavigationContextMenu(const ot::Navigati
 {
 	ot::MenuCfg menu;
 
-	menu.addButton("NavigateTo", "Navigate to \"" + _requestData.getNavigationItemPath() + "\"");
+	menu.addButton("NavigateTo", "Navigate to \"" + _requestData.getEntityName() + "\"");
 	menu.addSeparator();
 	menu.addButton("EntityID", "{ \"EntityID\": " + std::to_string(_requestData.getEntityID()) + " }");
-	menu.addButton("EntityName", "{ \"EntityName\": \"" + _requestData.getEntityName() + "\" }");
 
 	return menu;
 }
