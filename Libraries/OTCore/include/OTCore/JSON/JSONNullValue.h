@@ -31,8 +31,8 @@ namespace ot {
 		OT_DECL_NOCOPY(JsonNullValue)
 		OT_DECL_DEFMOVE(JsonNullValue)
 	public:
-		JsonNullValue() : JsonValue(rapidjson::kNullType) {};
-		~JsonNullValue() {};
+		inline explicit JsonNullValue() noexcept : JsonValue(rapidjson::kNullType) {};
+		~JsonNullValue() = default;
 	};
 
 }

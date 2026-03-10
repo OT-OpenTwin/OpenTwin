@@ -40,6 +40,19 @@ namespace ot {
 		~JsonString() {};
 	};
 
+	//! @class JsonString
+	//! @brief JSON String value
+	class JsonStringRef : public JsonValue
+	{
+		OT_DECL_NOCOPY(JsonStringRef)
+		OT_DECL_DEFMOVE(JsonStringRef)
+		OT_DECL_NODEFAULT(JsonStringRef)
+	public:
+		explicit JsonStringRef(const char* _cstr);
+		explicit JsonStringRef(const char* _cstr, uint32_t _strLen);
+		~JsonStringRef() {};
+	};
+
 }
 
 #include "OTCore/JSON/JSONString.hpp"

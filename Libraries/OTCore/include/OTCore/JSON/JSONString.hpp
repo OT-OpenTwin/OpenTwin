@@ -23,9 +23,17 @@
 #include "OTCore/JSON/JSONString.h"
 
 inline ot::JsonString::JsonString(const char* _cstr, JsonAllocator& _allocator) :
-	JsonValue(_cstr, _allocator) {
-}
+	JsonValue(_cstr, _allocator) 
+{}
 
 inline ot::JsonString::JsonString(const std::string& _str, JsonAllocator& _allocator) :
-	JsonValue(_str.c_str(), _allocator) {
-}
+	JsonValue(_str.c_str(), _allocator) 
+{}
+
+inline ot::JsonStringRef::JsonStringRef(const char* _cstr) : 
+	JsonStringRef(_cstr, static_cast<rapidjson::SizeType>(std::strlen(_cstr))) 
+{}
+
+inline ot::JsonStringRef::JsonStringRef(const char* _cstr, uint32_t _strLen) : 
+	JsonValue(_cstr, _strLen) 
+{}
