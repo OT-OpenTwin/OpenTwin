@@ -2157,47 +2157,31 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 	textHeight = segmentHeight / 2.0f * tickInterval;
 	if (textHeight > maxTextHeight) textHeight = maxTextHeight;
 
-	// Determine whether the text in the middle needs to be merged	
+	int numberOfTicksBothSides = ((activeColorRamp->getValues().size()-1) / tickInterval + 1) / 2;
 
-	float yLowerMax = 0.0f;
-	float yUpperMin = 0.0f;
+	bool showCenterLabel = (2 * numberOfTicksBothSides * tickInterval < activeColorRamp->getValues().size());
 
-	for (std::size_t i = 0; i <= activeColorRamp->getValues().size() / 2; i += tickInterval)
-	{
-		yLowerMax = origin.y() + static_cast<float>(i) * segmentHeight;
-	}
-
-	for (std::size_t i = activeColorRamp->getValues().size()-1; i >= activeColorRamp->getValues().size() / 2; i -= tickInterval)
-	{
-		yUpperMin = origin.y() + static_cast<float>(i) * segmentHeight;
-	}
-
-	int mergeCenterLabel = 0;
-	if (yUpperMin - yLowerMax < 1.5 * textHeight)
-	{
-		mergeCenterLabel = 1;
-	}
-	 
 	// Lower half of the label set
-	for (std::size_t i = 0; i <= activeColorRamp->getValues().size() / 2 - mergeCenterLabel * tickInterval; i += tickInterval)
+	for (std::size_t i = 0; i < numberOfTicksBothSides; i++)
 	{
-		float y = origin.y() + static_cast<float>(i) * segmentHeight;
+		float y = origin.y() + static_cast<float>(i* tickInterval) * segmentHeight;
 		osg::Vec2 textPos(origin.x() - labelOffset, y);
 			
-		overlayColorRampNode->addDrawable(createText(textPos, formatValue(activeColorRamp->getValues()[i], precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
+		overlayColorRampNode->addDrawable(createText(textPos, formatValue(activeColorRamp->getValues()[i * tickInterval], precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
 	}
 
 	// Upper half of the label set
-	for (std::size_t i = activeColorRamp->getValues().size()-1; i >= activeColorRamp->getValues().size() / 2 + mergeCenterLabel * tickInterval; i -= tickInterval)
+	for (std::size_t i = 0; i < numberOfTicksBothSides; i++)
 	{
-		float y = origin.y() + static_cast<float>(i) * segmentHeight;
+		int index = activeColorRamp->getValues().size() - 1 - i* tickInterval;
+		float y = origin.y() + static_cast<float>(index) * segmentHeight;
 		osg::Vec2 textPos(origin.x() - labelOffset, y);
-			
-		overlayColorRampNode->addDrawable(createText(textPos, formatValue(activeColorRamp->getValues()[i], precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
+
+		overlayColorRampNode->addDrawable(createText(textPos, formatValue(activeColorRamp->getValues()[index], precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
 	}
 
 	// Center label if necessary
-	if (mergeCenterLabel)
+	if (showCenterLabel)
 	{
 		float y = origin.y() + heightBox / 2.0f;
 		osg::Vec2 textPos(origin.x() - labelOffset, y);
