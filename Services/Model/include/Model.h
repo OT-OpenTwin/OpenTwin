@@ -177,7 +177,7 @@ public:
 	void deleteEntitiesFromModel(const ot::UIDList& _entityIDList, bool _saveModel);
 	void deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel);
 	void deleteEntitiesFromModel(const std::list<EntityBase*>& _entityList, bool _saveModel);
-	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion, const std::string& colorRampData);
+	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion, const std::string& colorRampData, const std::string& unit);
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties);
 	void updateCoordinateSystem(EntityCoordinateSystem* csEntity);
 

@@ -43,4 +43,5 @@ protected:
 	PropertyBundleDataHandleScaling* scalingData = nullptr;
 	double* scalarRange = nullptr;
 	std::string colorRampData;
+	std::string unit;
 };

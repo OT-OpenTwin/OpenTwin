@@ -55,6 +55,9 @@ public:
 	void setResultType(EntityResultBase::tResultType type) { resultType = type; }
 	EntityResultBase::tResultType getResultType(void) { return resultType; }
 
+	void setUnit(const std::string& _unit) { unit = _unit; }
+	std::string getUnit() { return unit; }
+
 	void setSource(ot::UID id, ot::UID version) { sourceID = id; sourceVersion = version; }
 	void setMesh(ot::UID id, ot::UID version) { meshID = id; meshVersion = version; }
 
@@ -84,6 +87,7 @@ protected:
 	ot::UID meshVersion;
 	EntityResultBase::tResultType resultType;
 	std::string colorRampData;
+	std::string unit;
 
 	// Temporary
 	//EntityResultBase *source;

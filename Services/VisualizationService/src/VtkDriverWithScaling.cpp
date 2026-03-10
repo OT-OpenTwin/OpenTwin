@@ -180,10 +180,8 @@ void VtkDriverWithScaling::extractColorRampFromLookupTable(vtkLookupTable* lut)
 	}
 
 	// Now we build information about the colorramp
-	std::string labelText = "Header";
-
 	ot::JsonDocument colorRampDoc;
-	colorRampDoc.AddMember("Label", ot::JsonString(labelText, colorRampDoc.GetAllocator()), colorRampDoc.GetAllocator());
+	colorRampDoc.AddMember("Label", ot::JsonString(unit, colorRampDoc.GetAllocator()), colorRampDoc.GetAllocator());
 	colorRampDoc.AddMember("NumberValues", n, colorRampDoc.GetAllocator());
 	colorRampDoc.AddMember("Values", ot::JsonArray(values, colorRampDoc.GetAllocator()), colorRampDoc.GetAllocator());
 	colorRampDoc.AddMember("ColorR", ot::JsonArray(colorR, colorRampDoc.GetAllocator()), colorRampDoc.GetAllocator());
@@ -196,6 +194,7 @@ void VtkDriverWithScaling::extractColorRampFromLookupTable(vtkLookupTable* lut)
 void VtkDriverWithScaling::setProperties(EntityVis2D3D* visEntity)
 {
 	scalingData = new PropertyBundleDataHandleScaling(visEntity);
+	unit = visEntity->getUnit();
 }
 
 void VtkDriverWithScaling::DeletePropertyData(void)

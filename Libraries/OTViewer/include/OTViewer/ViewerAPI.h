@@ -90,8 +90,8 @@ namespace ViewerAPI {
 	__declspec(dllexport) void addCoordinateSystemNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings, bool isActive);
 	__declspec(dllexport) void updateCoordinateSystemNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings, bool isActive);
 	__declspec(dllexport) void addVisualizationNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes);
-	__declspec(dllexport) void addVTKNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string& colorRampData);
-	__declspec(dllexport) void updateVTKNode(ot::UID _osgModelID, ot::UID _entityID, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string& colorRampData);
+	__declspec(dllexport) void addVTKNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string& colorRampData, const std::string& unit);
+	__declspec(dllexport) void updateVTKNode(ot::UID _osgModelID, ot::UID _entityID, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string& colorRampData, const std::string& unit);
 
 	__declspec(dllexport) void addVisualizationAnnotationNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem,
 															  bool _isHidden, const double _edgeColorRGB[3],

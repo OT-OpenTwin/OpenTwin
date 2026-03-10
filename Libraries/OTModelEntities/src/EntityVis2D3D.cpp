@@ -64,7 +64,8 @@ void EntityVis2D3D::addStorageData(bsoncxx::builder::basic::document &storage)
 		bsoncxx::builder::basic::kvp("sourceVersion", (long long) sourceVersion),
 		bsoncxx::builder::basic::kvp("meshID", (long long) meshID),
 		bsoncxx::builder::basic::kvp("meshVersion", (long long)meshVersion),
-		bsoncxx::builder::basic::kvp("colorRampData", colorRampData)
+		bsoncxx::builder::basic::kvp("colorRampData", colorRampData),
+		bsoncxx::builder::basic::kvp("unit", unit)
 	);
 }
 
@@ -113,6 +114,14 @@ void EntityVis2D3D::readSpecificDataFromDataBase(const bsoncxx::document::view &
 		colorRampData.clear();
 	}
 
+	try {
+		unit = doc_view["unit"].get_string();
+	}
+	catch (std::exception)
+	{
+		unit.clear();
+	}
+
 	resetModified();
 }
 
@@ -128,6 +137,7 @@ void EntityVis2D3D::addVisualizationNodes(void)
 		doc.AddMember(OT_ACTION_PARAM_MODEL_SourceID, sourceID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_SourceVersion, sourceVersion, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ColorRamp, ot::JsonString(colorRampData, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_Unit, ot::JsonString(unit, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_MeshID, meshID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_MeshVersion, meshVersion, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, this->getInitiallyHidden(), doc.GetAllocator());

@@ -104,8 +104,8 @@ public:
 	void addVisualizationCartesianMeshItemNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::vector<int>& _facesList, double _color[3]);
 	void visualizationTetMeshNodeTetEdges(unsigned long long modelEntityID, bool displayTetEdges);
 
-	void addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string &colorRampData);
-	void updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion, const std::string& colorRampData);
+	void addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string &colorRampData, const std::string& unit);
+	void updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion, const std::string& colorRampData, const std::string& unit);
 
 	SceneNodeBase* getSceneNodeByEntityID(ot::UID _modelEntityID) const;
 
