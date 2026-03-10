@@ -28,10 +28,10 @@
 #include "OTGui/GuiTypes.h"
 #include "OTGui/TableRange.h"
 #include "OTGui/EntityTreeItem.h"
-#include "OTGui/WidgetViewBase.h"
-#include "OTGui/Plot1DDataBaseCfg.h"
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTGui/Plot/Plot1DDataBaseCfg.h"
+#include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTWidgets/SelectionData.h"
 #include "OTViewer/ViewChangedStates.h"
 
@@ -90,8 +90,8 @@ namespace ViewerAPI {
 	__declspec(dllexport) void addCoordinateSystemNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings, bool isActive);
 	__declspec(dllexport) void updateCoordinateSystemNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings, bool isActive);
 	__declspec(dllexport) void addVisualizationNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes);
-	__declspec(dllexport) void addVTKNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion);
-	__declspec(dllexport) void updateVTKNode(ot::UID _osgModelID, ot::UID _entityID, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion);
+	__declspec(dllexport) void addVTKNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string& colorRampData);
+	__declspec(dllexport) void updateVTKNode(ot::UID _osgModelID, ot::UID _entityID, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string& colorRampData);
 
 	__declspec(dllexport) void addVisualizationAnnotationNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem,
 															  bool _isHidden, const double _edgeColorRGB[3],
@@ -163,7 +163,9 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void settingsItemChanged(ot::UID _viewerID, const ot::Property* _property);
 
-	__declspec(dllexport) bool propertyGridValueChanged(ot::UID _viewerID, const ot::Property* _property);
+	__declspec(dllexport) bool propertyGridValuesChanged(ot::UID _viewerID, const std::list<const ot::Property*> _properties);
+	__declspec(dllexport) void propertyGridValueTemporarlyChanged(ot::UID _viewerID, const ot::Property* _property);
+	__declspec(dllexport) void temporaryPropertyGridChangesCleared();
 
 	__declspec(dllexport) void freeze3DView(ot::UID osgModelID, bool flag);
 

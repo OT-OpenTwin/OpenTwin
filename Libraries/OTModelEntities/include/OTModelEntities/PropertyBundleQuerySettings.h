@@ -38,6 +38,8 @@ public:
 
 	void updateQuerySettings(EntityBase* _thisObject,const std::list<std::string>& _queryOptions);
 
+	const std::string& getGroupQuerySettingsName() const { return m_groupQuerySettings; };
+
 private:
 	const std::string m_groupQuerySettings = "Query settings";
 	const std::string m_propertyNbOfComparisions = "Number of queries";

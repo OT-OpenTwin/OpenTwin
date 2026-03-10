@@ -81,6 +81,8 @@ void SceneNodeVTK::deleteShapeNode(void)
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
 		m_shapeNode = nullptr;
 	}
+
+	getModel()->removeColorRamp(getName());
 }
 
 void SceneNodeVTK::setTransparent(bool t)
@@ -108,6 +110,8 @@ void SceneNodeVTK::setTransparent(bool t)
 		stateset->setRenderingHint(osg::StateSet::OPAQUE_BIN);  // We can not render the vtka images transparent, since they have their own transparency settings inside. 
 															    // Thereforen, we will just dim them when they are unselected.
 
+		getModel()->setColorRampActive(getName(), false);
+
 		//getShapeNode()->setNodeMask(getShapeNode()->getNodeMask() & ~1);  // Reset last bit of node mask
 	}
 	else
@@ -115,6 +119,8 @@ void SceneNodeVTK::setTransparent(bool t)
 		// Set node to opaque state
 		osg::StateSet *stateset = getShapeNode()->getOrCreateStateSet();
 		stateset->clear();
+
+		getModel()->setColorRampActive(getName(), true);
 
 		//getShapeNode()->setNodeMask(getShapeNode()->getNodeMask() | 1);  // Set last bit of node mask
 	}
@@ -206,10 +212,12 @@ void SceneNodeVTK::setVisible(bool v)
 		if (isVisible())
 		{
 			getShapeNode()->setAllChildrenOn();
+			getModel()->setColorRampActive(getName(), true);
 		}
 		else
 		{
 			getShapeNode()->setAllChildrenOff();
+			getModel()->setColorRampActive(getName(), false);
 		}
 	}
 }
@@ -223,11 +231,13 @@ void SceneNodeVTK::setHighlighted(bool h)
 	SceneNodeBase::setHighlighted(h);
 }
 
-void SceneNodeVTK::updateVTKNode(const std::string &projName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
+void SceneNodeVTK::updateVTKNode(const std::string &projName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion, const std::string& _colorRampData)
 {
-	dataID      = visualizationDataID;
-	dataVersion = visualizationDataVersion;
-	projectName = projName;
+	dataID        = visualizationDataID;
+	dataVersion   = visualizationDataVersion;
+	projectName   = projName;
+	colorRampData = _colorRampData;
+	
 
 	// Add a switch (group) node for the shape
 	if (m_shapeNode == nullptr)
@@ -244,6 +254,7 @@ void SceneNodeVTK::updateVTKNode(const std::string &projName, unsigned long long
 	{
 		// Delete the children of the shape node
 		while (m_shapeNode->removeChild((unsigned int)0));
+		getModel()->removeColorRamp(getName());
 	}
 
 	initialized = false;
@@ -341,6 +352,8 @@ osg::Node *SceneNodeVTK::createOSGNodeFromVTK(void)
 		osgDB::ReaderWriter::ReadResult rr = rw2->readNode(dataIn);
 		node = rr.takeNode();
 	}
+
+	getModel()->setColorRamp(getName(), colorRampData);
 
 	// return the new osg node
 	return node;

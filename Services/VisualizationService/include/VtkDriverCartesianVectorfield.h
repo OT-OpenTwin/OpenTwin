@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "VtkDriver.h"
+#include "VtkDriverWithScaling.h"
 #include "vtkRectilinearGrid.h"
 #include "OTModelEntities/EntityResultBase.h"
 #include "OTModelEntities/PropertyBundleDataHandlePlane.h"
@@ -38,17 +38,16 @@ namespace osg {
 	class Node;
 }
 
-class VtkDriverCartesianVectorfield : public VtkDriver {
+class VtkDriverCartesianVectorfield : public VtkDriverWithScaling {
 public:
 	VtkDriverCartesianVectorfield();
 	virtual ~VtkDriverCartesianVectorfield();
 
 	virtual void setProperties(EntityVis2D3D *visEntity) override;
-	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem) override;
+	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData) override;
 	
 private:
 	PropertyBundleDataHandlePlane * planeData = nullptr;
-	PropertyBundleDataHandleScaling * scalingData = nullptr;
 	PropertyBundleDataHandleVis2D3D * vis2D3DData = nullptr;
 	double * scalarRange = nullptr;
 
@@ -56,8 +55,7 @@ private:
 	void AssembleNode (vtkAlgorithmOutput * input, osg::Node *parent);
 	vtkAlgorithmOutput* AddNodeVectors(vtkAlgorithmOutput* input);
 	vtkAlgorithmOutput* SetScalarValues(vtkAlgorithmOutput* input);
-	void SetColouring(vtkPolyDataMapper* mapper);
 
 	void CheckForModelUpdates();
-	void DeletePropertyData(void);
+	virtual void DeletePropertyData(void) override;
 };

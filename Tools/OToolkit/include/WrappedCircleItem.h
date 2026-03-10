@@ -23,7 +23,7 @@
 #include "GraphicsItemDesignerItemBase.h"
 
 // OpenTwin header
-#include "OTWidgets/GraphicsEllipseItem.h"
+#include "OTWidgets/Graphics/GraphicsEllipseItem.h"
 
 class WrappedCircleItem : public ot::GraphicsEllipseItem, public GraphicsItemDesignerItemBase {
 	OT_DECL_NOCOPY(WrappedCircleItem)

@@ -1,0 +1,56 @@
+// @otlicense
+// File: ToolButtonCfg.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+// OpenTwin header
+#include "OTGui/Widgets/ToolButtonCfg.h"
+#include "OTGui/Widgets/WidgetBaseCfgFactory.h"
+
+static ot::WidgetBaseCfgFactoryRegistrar<ot::ToolButtonCfg> g_toolButtonCfgRegistrar(ot::ToolButtonCfg::getToolButtonCfgTypeString());
+
+ot::ToolButtonCfg::ToolButtonCfg() {
+
+}
+
+ot::ToolButtonCfg::ToolButtonCfg(const std::string& _name, const std::string& _text, const std::string& _relativeIconPath, const MenuCfg& _menu) :
+	WidgetBaseCfg(_name), m_text(_text), m_iconPath(_relativeIconPath), m_menu(_menu)
+{
+
+}
+
+ot::ToolButtonCfg::~ToolButtonCfg() {
+
+}
+
+void ot::ToolButtonCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	WidgetBaseCfg::addToJsonObject(_object, _allocator);
+
+	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
+	_object.AddMember("Icon", JsonString(m_iconPath, _allocator), _allocator);
+	_object.AddMember("KeySequence", JsonString(m_keySequence, _allocator), _allocator);
+	_object.AddMember("Menu", JsonObject(m_menu, _allocator), _allocator);
+}
+
+void ot::ToolButtonCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	WidgetBaseCfg::setFromJsonObject(_object);
+
+	m_text = json::getString(_object, "Text");
+	m_iconPath = json::getString(_object, "Icon");
+	m_keySequence = json::getString(_object, "KeySequence");
+	m_menu.setFromJsonObject(json::getObject(_object, "Menu"));
+}

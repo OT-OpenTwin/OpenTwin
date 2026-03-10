@@ -27,10 +27,10 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/GSSDebugInfo.h"
 #include "OTCommunication/LSSDebugInfo.h"
-#include "OTWidgets/Label.h"
-#include "OTWidgets/LineEdit.h"
-#include "OTWidgets/PushButton.h"
-#include "OTWidgets/ExpanderWidget.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/LineEdit.h"
+#include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/ExpanderWidget.h"
 #include "OTWidgets/ToolTipHandler.h"
 
 // Qt header

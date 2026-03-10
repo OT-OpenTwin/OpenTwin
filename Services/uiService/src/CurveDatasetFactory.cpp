@@ -64,14 +64,14 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	return dataSets;
 }
 
-std::string CurveDatasetFactory::createAxisLabel(const std::string& _title, const std::string& _unit) {
-	std::string unit = ot::String::removePrefixSuffix(_unit, " \t\n\r");
-	if (unit.empty()) {
-		return _title;
+std::string CurveDatasetFactory::createUnitLabel(const std::string& _unit) {
+	std::string result = ot::String::removePrefixSuffix(_unit, " \t\n\r");
+	if (!result.empty())
+	{
+		result.insert(result.begin(), '(');
+		result.push_back(')');
 	}
-	else {
-		return _title + " (" + _unit + ")";
-	}
+	return result;
 }
 
 ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDescription>& _valueComparisons)
@@ -246,15 +246,12 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 		dataX.push_back(parameterValue);
 	}
 	
-	if (_plotCfg.getXLabelAxisAutoDetermine())
-	{
-		_plotCfg.setAxisLabelX(createAxisLabel(entryDescription->m_label, entryDescription->m_tupleInstance.getTupleUnits().front()));
-	}
-	if (_plotCfg.getYLabelAxisAutoDetermine())
-	{
-		_plotCfg.setAxisLabelY(createAxisLabel(quantityInformation.m_label, entryDescription->m_tupleInstance.getTupleUnits().front()));
-	}
-	
+	_plotCfg.setUnitLabelX(createUnitLabel(entryDescription->m_tupleInstance.getTupleUnits().front()));
+	_plotCfg.setDataLabelX(entryDescription->m_label);
+
+	_plotCfg.setUnitLabelY(createUnitLabel(quantityInformation.m_tupleInstance.getTupleUnits().front()));
+	_plotCfg.setDataLabelY(quantityInformation.m_label);
+
 	const std::string curveNameBase = ot::EntityName::getSubName(_curveCfg.getEntityName()).value();
 	std::list<ot::PlotDataset*> allCurves;
 	
@@ -610,15 +607,11 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		}	
 	}
 	
+	_plotCfg.setUnitLabelX(createUnitLabel(xAxisParameter->m_tupleInstance.getTupleUnits().front()));
+	_plotCfg.setDataLabelX(xAxisParameter->m_label);
 
-	if (_plotCfg.getYLabelAxisAutoDetermine())
-	{
-		_plotCfg.setAxisLabelY(createAxisLabel(quantityInformation.m_label, quantityInformation.m_tupleInstance.getTupleUnits().front()));
-	}
-	if (_plotCfg.getXLabelAxisAutoDetermine())
-	{
-		_plotCfg.setAxisLabelX(createAxisLabel(xAxisParameter->m_label, quantityInformation.m_tupleInstance.getTupleUnits().front()));
-	}
+	_plotCfg.setUnitLabelY(createUnitLabel(quantityInformation.m_tupleInstance.getTupleUnits().front()));
+	_plotCfg.setDataLabelY(quantityInformation.m_label);
 
 	return dataSets;
 }

@@ -23,7 +23,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/GlobalWidgetViewManager.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 
 ToolViewManager::ToolViewManager() {
 	this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &ToolViewManager::slotViewFocusChanged);

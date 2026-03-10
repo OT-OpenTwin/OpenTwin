@@ -21,7 +21,7 @@
 
 #include "OTServiceFoundation/UiComponent.h"
 #include "SelectionChangedObserver.h"
-#include "OTGui/Plot1DCurveCfg.h"
+#include "OTGui/Plot/Plot1DCurveCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTModelEntities/EntityResult1DPlot.h"

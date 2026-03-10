@@ -18,15 +18,20 @@
 // @otlicense-end
 
 #pragma once
-#pragma warning(disable:4251)
 
+// OpenTwin header
 #include "OTCore/Serializable.h"
-#include <string>
 #include "OTCore/Tuple/TupleInstance.h"
+#include "OTGui/OTGuiAPIExport.h"
+
+// std header
+#include <string>
+
+#pragma warning(disable:4251)
 
 namespace ot
 {
-	struct __declspec(dllexport) QuantityContainerEntryDescription : public ot::Serializable
+	struct OT_GUI_API_EXPORT QuantityContainerEntryDescription : public ot::Serializable
 	{
 		//This one is also bson serialised in the EntityResult1DCurve entity. Any changes here in the config also need to be done in the 
 		std::string m_fieldName = "";

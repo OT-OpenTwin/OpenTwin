@@ -18,9 +18,12 @@
 // @otlicense-end
 
 #pragma once
-#include "Application.h"
 
-#include "OTGui/ToolBarButtonCfg.h"
+// OpenTwin header
+#include "Application.h"
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
+
+// std header
 #include <atomic>
 
 class UIControlsHandler

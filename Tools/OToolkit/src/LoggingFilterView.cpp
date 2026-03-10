@@ -21,8 +21,8 @@
 #include "LoggingFilterView.h"
 
 // OpenTwin header
-#include "OTWidgets/SpinBox.h"
-#include "OTWidgets/CheckBox.h"
+#include "OTWidgets/Widgets/SpinBox.h"
+#include "OTWidgets/Widgets/CheckBox.h"
 
 // Qt header
 #include <QtCore/qjsonarray.h>

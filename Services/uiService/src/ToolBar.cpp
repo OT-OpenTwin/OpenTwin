@@ -25,8 +25,8 @@
 // OpenTwin header
 #include "OTSystem/Flags.h"
 #include "OTGui/GuiTypes.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/GlobalWidgetViewManager.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 
 #include <ads/DockManager.h>
 #include <TabToolbar/Group.h>

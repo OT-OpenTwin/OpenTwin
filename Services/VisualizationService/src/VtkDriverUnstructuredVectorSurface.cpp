@@ -101,11 +101,7 @@ void VtkDriverUnstructuredVectorSurface::CheckForModelUpdates()
 
 void VtkDriverUnstructuredVectorSurface::DeletePropertyData(void)
 {
-	if (scalingData != nullptr)
-	{
-		delete scalingData;
-		scalingData = nullptr;
-	}
+	VtkDriverWithScaling::DeletePropertyData();
 
 	if (visData != nullptr)
 	{
@@ -114,7 +110,7 @@ void VtkDriverUnstructuredVectorSurface::DeletePropertyData(void)
 	}
 }
 
-std::string VtkDriverUnstructuredVectorSurface::buildSceneNode(DataSourceManagerItem *dataItem) 
+std::string VtkDriverUnstructuredVectorSurface::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData)
 {
 	objectsToDelete.clear();
 
@@ -144,6 +140,8 @@ std::string VtkDriverUnstructuredVectorSurface::buildSceneNode(DataSourceManager
 		}
 
 		AssembleNode(node);
+
+		getColorRampData(colorRampData);
 
 		CheckForModelUpdates();
 	}
@@ -316,78 +314,9 @@ void VtkDriverUnstructuredVectorSurface::AddNodeVectors(vtkAlgorithmOutput *inpu
 	dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
 }
 
-void VtkDriverUnstructuredVectorSurface::SetColouring(vtkPolyDataMapper * mapper)
-{
-	vtkNew<vtkLookupTable> lut;
-	lut->SetNumberOfTableValues(scalingData->GetColourResolution());
-	lut->SetHueRange(.667, 0.0);
-	lut->SetAlphaRange(1., 1.);
-	lut->IndexedLookupOff();
-	lut->SetVectorModeToMagnitude();
-	
-	assert(scalingData != nullptr);
-	assert(scalarRange != nullptr);
-
-	auto scalingMethod = scalingData->GetScalingMethod();
-	double minVal, maxVal;
-	if (scalingMethod == ScalingProperties::ScalingMethod::rangeScale)
-	{
-
-		minVal = scalingData->GetRangeMin();
-		maxVal = scalingData->GetRangeMax();
-		if (minVal > maxVal)
-		{
-			//ToDo: UI display message
-			minVal = maxVal;
-		}
-	}
-	else if (scalingMethod == ScalingProperties::ScalingMethod::autoScale)
-	{
-		minVal = scalarRange[0];
-		maxVal = scalarRange[1];
-	}
-	else
-	{
-		throw std::invalid_argument("Not supported scaling method");
-	}
-
-	auto scalingFunction = scalingData->GetScalingFunction();
-	if (scalingFunction == ScalingProperties::ScalingFunction::linScale)
-	{
-		lut->SetScaleToLinear();
-	}
-	else if (scalingFunction == ScalingProperties::ScalingFunction::logScale)
-	{
-		//Log scaling requires the range to be > 0
-		if (minVal < 0)
-		{
-			minVal = 0;
-			//ToDo: Message to the UI!
-		}
-		if (scalingData->GetRangeMax() < 0)
-		{
-			maxVal = 0;
-			if (maxVal < minVal)
-			{
-				maxVal = minVal;
-			}
-			//ToDo: Message to the UI!
-		}
-
-		lut->SetScaleToLog10();
-	}
-	else
-	{
-		throw std::invalid_argument("Not supported scaling function");
-	}
-	lut->SetTableRange(minVal, maxVal);
-	lut->Build();
-	mapper->SetLookupTable(lut);
-}
-
 void VtkDriverUnstructuredVectorSurface::setProperties(EntityVis2D3D *visEntity) 
 {
 	DeletePropertyData();
-	scalingData = new PropertyBundleDataHandleScaling(visEntity);
+	VtkDriverWithScaling::setProperties(visEntity);
 	visData = new PropertyBundleDataHandleVisUnstructuredVectorSurface(visEntity);
 }

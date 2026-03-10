@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/WidgetViewDock.h"
+#include "OTWidgets/WidgetView/WidgetViewDock.h"
 #include "OTViewer/PlotManager.h"
 #include "OTViewer/PlotManagerView.h"
 

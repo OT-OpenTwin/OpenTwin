@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "ProjectOverviewFilterData.h"
 #include "OTCore/ProjectInformation.h"
-#include "OTWidgets/TreeWidgetItem.h"
+#include "OTWidgets/Widgets/TreeWidgetItem.h"
 
 // Qt header
 #include <QtCore/qobject.h>

@@ -23,7 +23,7 @@
 #include "GraphicsItemDesignerExportConfig.h"
 
 // OpenTwin header
-#include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
 
 // Qt header
 #include <QtCore/qstring.h>

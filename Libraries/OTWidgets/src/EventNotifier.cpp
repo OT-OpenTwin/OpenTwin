@@ -18,7 +18,6 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTSystem/OTAssert.h"
 #include "OTWidgets/EventNotifier.h"
 
 // Qt header

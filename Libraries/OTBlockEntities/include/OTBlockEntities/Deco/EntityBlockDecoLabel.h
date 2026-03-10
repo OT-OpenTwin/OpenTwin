@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Font.h"
+#include "OTGui/Style/Font.h"
 #include "OTBlockEntities/Deco/EntityBlockDecoration.h"
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockDecoLabel : public EntityBlockDecoration {

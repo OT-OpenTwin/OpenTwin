@@ -35,54 +35,144 @@ CopyPasteHandler::CopyPasteHandler() {
 	connectAction(OT_ACTION_CMD_PasteEntities, this, &CopyPasteHandler::pasteEntitiesAction);
 }
 
+void CopyPasteHandler::markAllChildren(EntityBase* entity, std::set<ot::UID> &childEntities)
+{
+	EntityContainer *container = dynamic_cast<EntityContainer*>(entity);
+	if (container != nullptr)
+	{
+		for (auto& child : container->getChildrenList())
+		{
+			childEntities.emplace(child->getEntityID());
+			markAllChildren(child, childEntities);
+		}
+	}
+}
+
+std::map<ot::UID, EntityBase*> CopyPasteHandler::getParentEntities(std::map<ot::UID, EntityBase*>& _newEntitiesByName)
+{
+	// Flag all chilren
+	std::set<ot::UID> childEntities;
+	for (auto& entity : _newEntitiesByName)
+	{
+		markAllChildren(entity.second, childEntities);
+	}
+
+	std::map<ot::UID, EntityBase*> parentEntities;
+
+	for (auto& entity : _newEntitiesByName)
+	{
+		if (entity.second->getEntityType() == EntityBase::entityType::TOPOLOGY)
+		{
+			if (childEntities.count(entity.first) == 0)
+			{
+				// This entity is a parent entity
+				parentEntities[entity.first] = entity.second;
+			}
+		}
+	}
+
+	return parentEntities;
+}
+
+void CopyPasteHandler::recursivelyRenameChildren(const std::string &oldName, const std::string &newName, EntityBase *parentEntity)
+{
+	EntityContainer* container = dynamic_cast<EntityContainer*>(parentEntity);
+	if (container != nullptr)
+	{
+		for (auto& child : container->getChildrenList())
+		{
+			// Rename the child (only the first part of the name needs to be changed
+			assert(child->getName().size() > oldName.size());
+			assert(child->getName().substr(0, oldName.size() + 1) == oldName + "/");
+
+			std::string newChildName = newName + child->getName().substr(oldName.size());
+			child->setName(newChildName);
+
+			// Process the children of the child
+			recursivelyRenameChildren(oldName, newName, child);
+		}
+	}
+}
+
 void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitiesByName)
 {
-	ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
-	std::list<bool> forceVis;
+	std::map<ot::UID, EntityBase*> parentEntities = getParentEntities(_newEntitiesByName);
 
 	Model* model = Application::instance()->getModel();
 	auto entityNames = model->getListOfEntityNames();
 	const uint32_t safetyLimit = 100000;
 
-	for (auto& newEntityByName : _newEntitiesByName)
+	for (auto& newEntityByName : parentEntities)
 	{
 		EntityBase* newEntity = newEntityByName.second;
 		const std::string oldName = newEntity->getName();
 		uint32_t counter(0);
-		std::string newName = oldName +"_" +std::to_string(counter);
-		while (entityNames.find(newName) != entityNames.end() && counter < safetyLimit)
+		std::string newName = oldName;
+		if (entityNames.find(newName) != entityNames.end())
 		{
-			counter++;
 			newName = oldName + "_" + std::to_string(counter);
+			while (entityNames.find(newName) != entityNames.end() && counter < safetyLimit)
+			{
+				counter++;
+				newName = oldName + "_" + std::to_string(counter);
+			}
 		}
 		if (counter == safetyLimit)
 		{
-			OT_LOG_E("Infinit loop protection. Failed to execute a paste of " + oldName+ " because of entities number of entities with the same postfix exceed number of : " + std::to_string(safetyLimit));
+			OT_LOG_E("Infinite loop protection. Failed to execute a paste of " + oldName+ " because of entities number of entities with the same postfix exceed number of : " + std::to_string(safetyLimit));
 		}
 		else
 		{
 			entityNames[newName] = true;
-			newEntity->setName(newName);
-		
-			newEntity->storeToDataBase();
 
-			if (newEntity->getEntityType() == EntityBase::entityType::TOPOLOGY)
+			if (newEntity->getName() != newName)
 			{
-				topoEntID.push_back(newEntity->getEntityID());
-				topoEntVers.push_back(newEntity->getEntityStorageVersion());
-				forceVis.push_back(false);
-			}
-			else
-			{
-				dataEntID.push_back(newEntity->getEntityID());
-				dataEntVers.push_back(newEntity->getEntityStorageVersion());
-				EntityBase* parent = newEntity->getParent();
-				assert(parent != nullptr);
-				dataEntParent.push_back(parent->getEntityID());
+				newEntity->setName(newName);
+				recursivelyRenameChildren(oldName, newName, newEntity);
 			}
 		}
 	}
-	
+
+	// Now we add all new entities (including children and data entities) to the storage
+	ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
+	std::list<bool> forceVis;
+
+	for (auto& newEntityByName : _newEntitiesByName)
+	{
+		EntityBase* newEntity = newEntityByName.second;
+
+		EntityContainer* container = dynamic_cast<EntityContainer*>(newEntity);
+		if (container != nullptr)
+		{
+			// Here we need to remove the parent / child relationships, since this will be added during the actual insertion of the entities into the model
+			// (based on the names)
+			std::list<EntityBase*> childrenList = container->getChildrenList();
+			while (!childrenList.empty())
+			{
+				childrenList.front()->setParent(nullptr);
+				container->removeChild(childrenList.front());
+				childrenList = container->getChildrenList();
+			}
+		}
+
+		newEntity->storeToDataBase();
+
+		if (newEntity->getEntityType() == EntityBase::entityType::TOPOLOGY)
+		{
+			topoEntID.push_back(newEntity->getEntityID());
+			topoEntVers.push_back(newEntity->getEntityStorageVersion());
+			forceVis.push_back(false);
+		}
+		else
+		{
+			dataEntID.push_back(newEntity->getEntityID());
+			dataEntVers.push_back(newEntity->getEntityStorageVersion());
+			EntityBase* parent = newEntity->getParent();
+			assert(parent != nullptr);
+			dataEntParent.push_back(parent->getEntityID());
+		}
+	}
+
 	model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Copy+Paste Entities", true,false,true);
 }
 

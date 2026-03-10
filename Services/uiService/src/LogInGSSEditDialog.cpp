@@ -23,11 +23,11 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/String.h"
-#include "OTWidgets/Label.h"
-#include "OTWidgets/LineEdit.h"
-#include "OTWidgets/PushButton.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/ComboButton.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/LineEdit.h"
+#include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/ComboButton.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>

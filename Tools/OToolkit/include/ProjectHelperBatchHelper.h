@@ -4,7 +4,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/WidgetBase.h"
+#include "OTWidgets/Widgets/WidgetBase.h"
 #include "ProjectHelperBatchHelperProjectItem.h"
 
 // Qt header

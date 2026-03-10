@@ -28,10 +28,10 @@
 // OpenTwin header
 #include "OTCore/Rect.h"
 #include "OTGui/Graphics/GraphicsGroupItemCfg.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/PropertyGrid.h"
-#include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Graphics/GraphicsItem.h"
+#include "OTWidgets/Graphics/GraphicsScene.h"
+#include "OTWidgets/Properties/PropertyGrid.h"
 
 GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation(GraphicsItemDesigner* _designer, QWidget* _parent)
 	: ot::TreeWidget(_parent), m_designer(_designer), m_currentPropertyHandler(nullptr), m_selectionChangeInProgress(false)

@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "NavigationTreeView.h"
-#include "OTWidgets/WidgetViewDock.h"
+#include "OTWidgets/WidgetView/WidgetViewDock.h"
 
 // uiCore header
 #include "akWidgets/aTreeWidget.h"
@@ -36,7 +36,7 @@ ot::NavigationTreeView::NavigationTreeView(QWidget* _parent)
 	QShortcut* projectNavCopy = new QShortcut(QKeySequence("Ctrl+C"), m_tree->getQWidget());
 	projectNavCopy->setContext(Qt::WidgetWithChildrenShortcut);
 	this->connect(projectNavCopy, &QShortcut::activated, this, &NavigationTreeView::slotCopyRequested);
-	QShortcut* projectNavPaste = new QShortcut(QKeySequence("Ctrl+P"), m_tree->getQWidget());
+	QShortcut* projectNavPaste = new QShortcut(QKeySequence("Ctrl+V"), m_tree->getQWidget());
 	projectNavPaste->setContext(Qt::WidgetWithChildrenShortcut);
 	this->connect(projectNavPaste, &QShortcut::activated, this, &NavigationTreeView::slotPasteRequested);
 }

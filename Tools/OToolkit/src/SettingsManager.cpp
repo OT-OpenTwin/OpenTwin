@@ -23,16 +23,16 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyPath.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGui/Properties/PropertyStringList.h"
-#include "OTWidgets/PropertyGrid.h"
-#include "OTWidgets/PropertyDialog.h"
-#include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/ApplicationPropertiesManager.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
+#include "OTWidgets/Properties/ApplicationPropertiesManager.h"
+#include "OTWidgets/Properties/PropertyGrid.h"
+#include "OTWidgets/Properties/PropertyDialog.h"
+#include "OTWidgets/Properties/PropertyGridItem.h"
 
 SettingsManager::SettingsManager(AppBase* _app)
 	: m_currentColorStyle(ot::ColorStyleName::BrightStyle), m_app(_app)

@@ -20,7 +20,7 @@
 #pragma once
 
 #include "VisualizationServiceTypes.h"
-#include "VtkDriver.h"
+#include "VtkDriverWithScaling.h"
 #include "vtkRectilinearGrid.h"
 #include "OTModelEntities/EntityResultBase.h"
 #include "OTModelEntities/PropertyBundleDataHandlePlane.h"
@@ -39,28 +39,25 @@ namespace osg {
 	class Node;
 }
 
-class VtkDriverUnstructuredVectorSurface : public VtkDriver {
+class VtkDriverUnstructuredVectorSurface : public VtkDriverWithScaling {
 public:
 	VtkDriverUnstructuredVectorSurface();
 	virtual ~VtkDriverUnstructuredVectorSurface();
 
 	virtual void setProperties(EntityVis2D3D *visEntity) override;
-	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem) override;
+	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData) override;
 	
 private:
-	PropertyBundleDataHandleScaling * scalingData = nullptr;
 	PropertyBundleDataHandleVisUnstructuredVectorSurface * visData = nullptr;
-	double * scalarRange = nullptr;
 
 	void AssembleNode(osg::Node* parent);
 
 	void AddNodeVectors(vtkAlgorithmOutput* input, osg::Node* parent);
 	vtkAlgorithmOutput* SetScalarValues(void);
-	void SetColouring(vtkPolyDataMapper* mapper);
 	vtkAlgorithmOutput* GetArrowSource(void);
 
 	void CheckForModelUpdates();
-	void DeletePropertyData(void);
+	virtual void DeletePropertyData(void) override;
 
 	DataSourceUnstructuredMesh* dataSource;
 	vtkAlgorithmOutput* dataConnection;

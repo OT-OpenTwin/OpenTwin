@@ -21,10 +21,10 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/NavigationTreeItem.h"
-#include "OTGui/NavigationTreePackage.h"
+#include "OTGui/Widgets/NavigationTreeCfg.h"
+#include "OTGui/Widgets/NavigationTreeItemCfg.h"
 #include "OTGui/Dialog/SelectEntitiesDialogCfg.h"
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Dialog/Dialog.h"
 
 // Qt header
 #include <QtCore/qstringlist.h>
@@ -64,9 +64,9 @@ private Q_SLOTS:
 
 private:
 	void addSelectedPaths(QTreeWidgetItem* _item, std::list<std::string>& _list, char _pathDelimiter, bool _bottomLevelOnly) const;
-	ot::TreeWidgetItem* addItem(ot::TreeWidget* _tree, QTreeWidgetItem* _parentItem, const ot::NavigationTreeItem& _item);
+	ot::TreeWidgetItem* addItem(ot::TreeWidget* _tree, QTreeWidgetItem* _parentItem, const ot::NavigationTreeItemCfg& _item);
 
-	ot::NavigationTreePackage::NavigationTreePackageFlags m_flags;
+	ot::NavigationTreeCfg::TreeFlags m_flags;
 	std::list<std::string> m_initiallySelected;
 	ot::TreeWidgetFilter* m_available;
 	ot::TreeWidgetFilter* m_selected;

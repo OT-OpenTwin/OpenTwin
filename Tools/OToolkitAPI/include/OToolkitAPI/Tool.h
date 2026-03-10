@@ -25,7 +25,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/WidgetView.h"
+#include "OTWidgets/WidgetView/WidgetView.h"
 
 // Qt header
 #include <QtCore/qlist.h>

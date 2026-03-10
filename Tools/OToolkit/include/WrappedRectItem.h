@@ -23,7 +23,7 @@
 #include "GraphicsItemDesignerItemBase.h"
 
 // OpenTwin header
-#include "OTWidgets/GraphicsRectangularItem.h"
+#include "OTWidgets/Graphics/GraphicsRectangularItem.h"
 
 class WrappedRectItem : public ot::GraphicsRectangularItem, public GraphicsItemDesignerItemBase {
 	OT_DECL_NOCOPY(WrappedRectItem)

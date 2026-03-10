@@ -19,8 +19,9 @@
 
 #pragma once
 
-#include "OTGui/TableCfg.h"
+// OpenTwin header
 #include "OTGui/TableRange.h"
+#include "OTGui/Widgets/TableCfg.h"
 
 namespace ot {
 

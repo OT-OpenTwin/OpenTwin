@@ -1,0 +1,1173 @@
+// @otlicense
+// File: WidgetViewManager.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+// OpenTwin header
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/String.h"
+#include "OTCore/EntityName.h"
+#include "OTCore/ContainerHelper.h"
+#include "OTWidgets/Private/WidgetDebug.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/WidgetView/WidgetView.h"
+#include "OTWidgets/WidgetView/WidgetViewTab.h"
+#include "OTWidgets/WidgetView/WidgetViewDock.h"
+#include "OTWidgets/WidgetView/WidgetViewManager.h"
+#include "OTWidgets/WidgetView/WidgetViewDockComponentsFactory.h"
+
+// ADS header
+#include <ads/DockManager.h>
+#include <ads/IconProvider.h>
+#include <ads/DockWidgetTab.h>
+#include <ads/DockAreaWidget.h>
+
+// Qt header
+#include <QtCore/qtimer.h>
+#include <QtWidgets/qmenu.h>
+
+ot::WidgetViewManager::WidgetViewManager() :
+	m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState),
+	m_dockComponentsFactory(nullptr), m_initialStateVersion(0), m_autoCloseTimer(this), m_hasQueuedDelayedFocusUpdate(false)
+{
+	m_focusInfo.last = nullptr;
+	m_focusInfo.lastSide = nullptr;
+	m_focusInfo.lastTool = nullptr;
+	m_focusInfo.lastCentral = nullptr;
+
+	m_autoCloseTimer.setInterval(0);
+	m_autoCloseTimer.setSingleShot(true);
+	this->connect(&m_autoCloseTimer, &QTimer::timeout, this, &WidgetViewManager::slotCloseUnpinnedViews);
+}
+
+ot::WidgetViewManager::~WidgetViewManager() {
+	this->disconnect(&m_autoCloseTimer, &QTimer::timeout, this, &WidgetViewManager::slotCloseUnpinnedViews);
+
+	this->deleteLater();
+}
+
+void ot::WidgetViewManager::initialize(WidgetViewDockManager* _dockManager) {
+	if (m_dockManager) {
+		OT_LOG_WA("WidgetViewManager already initialized");
+		return;
+	}
+
+	m_dockManager = _dockManager;
+
+	if (!m_dockManager) {
+		using namespace ads;
+		
+		CDockManager::setConfigFlags(
+			CDockManager::AllTabsHaveCloseButton | 
+			CDockManager::MiddleMouseButtonClosesTab | 
+			CDockManager::MiddleMouseButtonClosesTab |
+			CDockManager::FloatingContainerHasWidgetTitle |
+			CDockManager::DisableTabTextEliding |
+			CDockManager::FocusHighlighting |
+			CDockManager::XmlCompressionEnabled
+		);
+
+		m_dockManager = new WidgetViewDockManager;
+		m_dockManager->setStyleSheet("");
+	}
+
+	ads::CDockComponentsFactory::setFactory(new WidgetViewDockComponentsFactory(m_dockManager));
+	
+	// Initialize custom icons
+	ads::CIconProvider& iconProvider = m_dockManager->iconProvider();
+
+	QPixmap pixmap(8, 8);
+	pixmap.fill(QColor(0, 0, 0, 0));
+	QIcon transparentIcon(pixmap);
+
+	iconProvider.registerCustomIcon(ads::TabCloseIcon, transparentIcon);
+
+	// Initialze dock toggle action
+	m_dockToggleRoot = new QAction("Windows");
+	QMenu* newMenu = new QMenu;
+	m_dockToggleRoot->setMenu(newMenu);
+
+	// Connect signals
+	this->connect(m_dockManager, &ads::CDockManager::focusedDockWidgetChanged, this, &WidgetViewManager::slotViewFocused);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// View Management
+
+bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags, WidgetView* _parentView) {
+	return this->addViewImpl(_owner, _view, _insertFlags, _parentView);
+}
+
+ot::WidgetView* ot::WidgetViewManager::findView(const std::string& _entityName, WidgetViewBase::ViewType _type) const {
+	ViewNameTypeListEntry entry;
+	entry.first = _entityName;
+	entry.second = _type;
+	return this->findView(entry);
+	
+}
+
+ot::WidgetView* ot::WidgetViewManager::findViewFromTitle(const std::string& _viewTitle) const {
+	for (const ViewEntry& entry : m_views) {
+		if (entry.second->getViewData().getTitle() == _viewTitle || entry.second->getCurrentViewTitle().toStdString() == _viewTitle) {
+			return entry.second;
+		}
+	}
+	return nullptr;
+}
+
+bool ot::WidgetViewManager::findViewAndOwner(const std::string& _entityName, WidgetViewBase::ViewType _type, WidgetView*& _view, BasicServiceInformation& _owner) const {
+	for (const ViewEntry& view : m_views) {
+		if (view.second->getViewData().getEntityName() == _entityName && view.second->getViewData().getViewType() == _type) {
+			_owner = view.first;
+			_view = view.second;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+ot::WidgetView* ot::WidgetViewManager::getViewFromDockWidget(ads::CDockWidget* _dock) const {
+	for (const ViewEntry& view : m_views) {
+		if (view.second->getViewDockWidget() == _dock) {
+			return view.second;
+		}
+	}
+
+	return nullptr;
+}
+
+void ot::WidgetViewManager::closeView(WidgetView* _view) {
+	OTAssertNullptr(_view);
+	if (_view->getViewIsPermanent()) {
+		return;
+	}
+
+	auto bck = m_state;
+	m_state |= CloseViewState;
+
+	// Set the view as deleted by manager so it wont remove itself and remove it from the maps
+	_view->m_isDeletedByManager = true;
+	this->forgetView(_view);
+
+	// Remove the toggle dock action
+	_view->getViewDockWidget()->toggleViewAction()->setVisible(false);
+	m_dockToggleRoot->menu()->removeAction(_view->getViewDockWidget()->toggleViewAction());
+	_view->getViewDockWidget()->blockSignals(true);
+	if (_view->getViewDockWidget()->getWidgetViewTab()) {
+		_view->getViewDockWidget()->getWidgetViewTab()->blockSignals(true);
+		_view->getViewDockWidget()->getWidgetViewTab()->setEnabled(false);
+		_view->getViewDockWidget()->getWidgetViewTab()->disableButtons();
+	}
+	_view->blockSignals(true);
+
+	// Disconnect signals
+	this->disconnect(_view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->disconnect(_view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
+	this->disconnect(_view, &WidgetView::pinnedChanged, this, &WidgetViewManager::slotViewPinnedChanged);
+	if (_view->getViewDockWidget()->tabWidget()) {
+		this->disconnect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
+	}
+
+	// Since the view may be the origin of a signal that leads to the removal of the view, we delete it later
+	_view->deleteLater();
+
+	m_state = bck;
+	
+	updateCentralViewTitles();
+}
+
+void ot::WidgetViewManager::closeView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
+	OTAssertNullptr(m_dockManager);
+
+	WidgetView* view = this->findView(_entityName, _type);
+	if (view) {
+		this->closeView(view);
+	}
+}
+
+void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
+	OTAssertNullptr(m_dockManager);
+
+	ViewNameTypeList* lst = this->findViewNameTypeList(_owner);
+	if (lst) {
+		ViewNameTypeList tmp = *lst;
+		auto bck = m_state;
+		m_state |= MulticloseViewState;
+		for (const ViewNameTypeListEntry& i : tmp) {
+			this->closeView(i.first, i.second);
+		}
+		m_state = bck;
+	}
+}
+
+void ot::WidgetViewManager::closeViews() {
+	OTAssertNullptr(m_dockManager);
+
+	ViewNameTypeList tmp;
+	for (const ViewEntry& view : m_views) {
+		ViewNameTypeListEntry entry;
+		entry.first = view.second->getViewData().getEntityName();
+		entry.second = view.second->getViewData().getViewType();
+		tmp.push_back(entry);
+	}
+
+	auto bck = m_state;
+	m_state |= MulticloseViewState;
+	for (const ViewNameTypeListEntry& i : tmp) {
+		this->closeView(i.first, i.second);
+	}
+	m_state = bck;
+}
+
+void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, const SelectionInformation& _activeSelection, bool _ignoreCurrent) {
+	m_autoCloseTimer.stop();
+
+	m_autoCloseInfo.flags = _flags;
+	m_autoCloseInfo.activeSelection = _activeSelection;
+	m_autoCloseInfo.ignoreCurrent = _ignoreCurrent;
+
+	m_autoCloseTimer.start();
+}
+
+void ot::WidgetViewManager::forgetView(WidgetView* _view) {
+	OTAssertNullptr(m_dockManager);
+	OTAssertNullptr(_view);
+	this->forgetView(_view->getViewData().getEntityName(), _view->getViewData().getViewType());
+}
+
+ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
+	OTAssertNullptr(m_dockManager);
+
+	// Remove from auto close list
+	for (auto it = m_autoCloseInfo.viewsToClose.begin(); it != m_autoCloseInfo.viewsToClose.end();) {
+		if ((*it)->getViewData().getEntityName() == _entityName && (*it)->getViewData().getViewType() == _type) {
+			it = m_autoCloseInfo.viewsToClose.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+
+	// Find view and owner
+	WidgetView* view = nullptr;
+	BasicServiceInformation owner;
+	if (!this->findViewAndOwner(_entityName, _type, view, owner)) {
+		return nullptr;
+	}
+	
+	// Disconnect signals
+	this->disconnect(view->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->disconnect(view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->disconnect(view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
+	this->disconnect(view, &WidgetView::pinnedChanged, this, &WidgetViewManager::slotViewPinnedChanged);
+	if (view->getViewDockWidget()->tabWidget()) {
+		this->disconnect(view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
+	}
+
+	// If the view is the current central, set current central to 0
+	if (view == m_focusInfo.last) m_focusInfo.last = nullptr;
+	if (view == m_focusInfo.lastSide) m_focusInfo.lastSide = nullptr;
+	if (view == m_focusInfo.lastTool) m_focusInfo.lastTool = nullptr;
+	if (view == m_focusInfo.lastCentral) m_focusInfo.lastCentral = nullptr;
+	if (view->getViewDockWidget() == m_focusChangeData.newFocus) m_focusChangeData.newFocus = nullptr;
+	if (view->getViewDockWidget() == m_focusChangeData.oldFocus) m_focusChangeData.oldFocus = nullptr;
+
+	// Find name list from owner and erase the view entry
+	ViewNameTypeList* lst = this->findViewNameTypeList(owner);
+	if (lst) 
+	{
+		ViewNameTypeListEntry entry;
+		entry.first = _entityName;
+		entry.second = _type;
+
+		auto lstIt = std::find(lst->begin(), lst->end(), entry);
+		if (lstIt != lst->end()) 
+		{
+			lst->erase(lstIt);
+		}
+
+		OTAssert(std::find(lst->begin(), lst->end(), entry) == lst->end(), "Duplicate entry");
+
+		// If the owner has no more views, erase the owner.
+		if (lst->empty()) 
+		{
+			m_viewOwnerMap.erase(owner);
+		}
+	}
+	else {
+		OT_LOG_EAS("ViewNameTypeList not found");
+	}
+	
+	ViewEntry viewsEntry;
+	viewsEntry.first = owner;
+	viewsEntry.second = view;
+
+	auto viewIterator = std::find(m_views.begin(), m_views.end(), viewsEntry);
+	if (viewIterator == m_views.end()) {
+		OT_LOG_EA("View entry not found");
+	}
+	else {
+		m_views.erase(viewIterator);
+	}
+
+	return view;
+}
+
+void ot::WidgetViewManager::renameView(const std::string& _oldEntityName, const std::string _newEntityName) {
+	// Ensure change occured
+	if (_oldEntityName == _newEntityName) {
+		return;
+	}
+
+	// Rename in owner map
+	for (auto& it : m_viewOwnerMap) {
+		for (ViewNameTypeListEntry& entry : *it.second) {
+			if (entry.first == _oldEntityName) {
+				entry.first = _newEntityName;
+			}
+		}
+	}
+
+	// Rename in views list
+	for (ViewEntry& entry : m_views) {
+		if (entry.second->getViewData().getEntityName() == _oldEntityName) {
+			// Update entity name
+			WidgetViewBase data = entry.second->getViewData();
+			data.setEntityName(_newEntityName);
+
+			entry.second->setViewData(data);
+			entry.second->viewRenamed();
+		}
+	}
+
+	this->updateCentralViewTitles();
+}
+
+bool ot::WidgetViewManager::focusLastAddedCentralView(const std::list<WidgetView*>& _viewBlacklist)
+{
+	WidgetView* lastCentralView = nullptr;
+
+	for (auto it = m_views.begin(); it != m_views.end(); it++) 
+	{
+		if (it->second->getViewData().getViewFlags().has(WidgetViewBase::ViewIsCentral))
+		{
+			if (std::find(_viewBlacklist.begin(), _viewBlacklist.end(), it->second) == _viewBlacklist.end())
+			{
+				lastCentralView = it->second;
+			}
+		}
+	}
+	if (lastCentralView) 
+	{
+		lastCentralView->setAsCurrentViewTab();
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// View manipulation
+
+void ot::WidgetViewManager::setCurrentView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
+	WidgetView* view = this->findView(_entityName, _type);
+	if (view) {
+		view->setAsCurrentViewTab();
+	}
+}
+
+void ot::WidgetViewManager::setCurrentViewFromTitle(const std::string& _viewTitle) {
+	WidgetView* view = this->findViewFromTitle(_viewTitle);
+	if (view) {
+		view->setAsCurrentViewTab();
+	}
+}
+
+std::string ot::WidgetViewManager::saveState(int _version) {
+	OTAssertNullptr(m_dockManager);
+
+	OT_WIDGETS_VIEW_DBG("Saving state");
+
+	QByteArray tmp = m_dockManager->saveState(_version);
+	if (tmp.isEmpty()) {
+		return std::string();
+	}
+
+	std::string ret;
+	ret.reserve((tmp.size() * 3) - 1);
+
+	for (char c : tmp) {
+		if (!ret.empty()) ret.push_back(';');
+		ret.append(std::to_string((int)c));
+	}
+
+	if (m_initialState.empty()) {
+		m_initialState = ret;
+		m_initialStateVersion = _version;
+	}
+
+	return ret;
+}
+
+bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
+	OTAssertNullptr(m_dockManager);
+
+	if (_state.empty()) {
+		OT_LOG_D("Empty state. Skipping restore");
+		return false;
+	}
+
+	OT_WIDGETS_VIEW_DBG("Restoring state");
+
+	// Save the current state as the initial state if no initial state found yet.
+	if (m_initialState.empty()) {
+		this->saveState(_version);
+	}
+
+	QByteArray tmp;
+
+	size_t ix = _state.find(';');
+	bool convertFail = false;
+	while (ix != std::string::npos) {
+		tmp.append((char)ot::String::toNumber<int>(_state.substr(0, ix), convertFail));
+		if (convertFail) {
+			OT_LOG_E("State contains invalid characters");
+			return false;
+		}
+		_state.erase(0, ix + 1);
+		ix = _state.find(';');
+	}
+
+	if (!_state.empty()) {
+		tmp.append((char)ot::String::toNumber<int>(_state, convertFail));
+	}
+
+	bool result = m_dockManager->restoreState(tmp, _version);
+
+	this->slotUpdateViewVisibility();
+	
+	return result;
+}
+
+void ot::WidgetViewManager::applyInitialState() {
+	OT_WIDGETS_VIEW_DBG("Applying initial state");
+
+	if (m_initialState.empty()) {
+		OT_LOG_D("Initial state is empty.");
+	}
+	else {
+		this->restoreState(m_initialState, m_initialStateVersion);
+	}	
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Information gathering
+
+ot::BasicServiceInformation ot::WidgetViewManager::getOwnerFromView(WidgetView* _view) const {
+	for (const auto& it : m_views) {
+		if (it.second == _view) {
+			return it.first;
+		}
+	}
+
+	OT_LOG_EA("View not found");
+	return BasicServiceInformation();
+}
+
+ot::WidgetView* ot::WidgetViewManager::findViewFromWidget(QWidget* _widget) const {
+	for (const ViewEntry& view : m_views) {
+		if (view.second->getViewWidget() == _widget) {
+			return view.second;
+		}
+	}
+	return nullptr;
+}
+
+bool ot::WidgetViewManager::getViewExists(const std::string& _entityName, WidgetViewBase::ViewType _type) const {
+	return this->findView(_entityName, _type) != nullptr;
+}
+
+bool ot::WidgetViewManager::getViewTitleExists(const std::string& _title) const {
+	return this->findViewFromTitle(_title) != nullptr;
+}
+
+ot::WidgetViewManager::ViewNameTypeList ot::WidgetViewManager::getViewNamesFromOwner(const BasicServiceInformation& _owner) const {
+	auto it = m_viewOwnerMap.find(_owner);
+	if (it == m_viewOwnerMap.end()) {
+		return ViewNameTypeList();
+	}
+	else {
+		return ViewNameTypeList(*it->second);
+	}
+}
+
+std::list<std::string> ot::WidgetViewManager::getViewNamesFromOwner(const BasicServiceInformation& _owner, WidgetViewBase::ViewType _type) const {
+	std::list<std::string> result;
+	for (const ViewNameTypeListEntry& entry : this->getViewNamesFromOwner(_owner)) {
+		if (entry.second == _type) {
+			result.push_back(entry.first);
+		}
+	}
+	return result;
+}
+
+bool ot::WidgetViewManager::getAnyViewContentModified() {
+	for (const ViewEntry& entry : m_views) {
+		if (entry.second->getViewContentModified()) {
+			return true;
+		}
+	}
+	return false;
+}
+
+ot::WidgetView* ot::WidgetViewManager::getCurrentlyFocusedView() const {
+	return this->getViewFromDockWidget(m_dockManager->focusedDockWidget());
+}
+
+void ot::WidgetViewManager::getDebugInformation(JsonObject& _object, JsonAllocator& _allocator) const {
+	JsonArray stateArr;
+	if (m_state & ManagerState::InsertViewState) {
+		stateArr.PushBack(JsonString("InsertViewState", _allocator), _allocator);
+	}
+	if (m_state & ManagerState::CloseViewState) {
+		stateArr.PushBack(JsonString("CloseViewState", _allocator), _allocator);
+	}
+	if (m_state & ManagerState::MulticloseViewState) {
+		stateArr.PushBack(JsonString("MulticloseViewState", _allocator), _allocator);
+	}
+	_object.AddMember("State", stateArr, _allocator);
+
+	JsonArray configArr;
+	if (m_config & ManagerConfigFlag::InputFocusCentralViewOnFocusChange) {
+		configArr.PushBack(JsonString("InputFocusCentralViewOnFocusChange", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::InputFocusSideViewOnFocusChange) {
+		configArr.PushBack(JsonString("InputFocusSideViewOnFocusChange", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::InputFocusToolViewOnFocusChange) {
+		configArr.PushBack(JsonString("InputFocusToolViewOnFocusChange", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::IgnoreInputFocusOnViewInsert) {
+		configArr.PushBack(JsonString("IgnoreInputFocusOnViewInsert", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::UseBestAreaFinderOnViewInsert) {
+		configArr.PushBack(JsonString("UseBestAreaFinderOnViewInsert", _allocator), _allocator);
+	}
+	_object.AddMember("Config", configArr, _allocator);
+
+	JsonObject focusInfoObj;
+	if (m_focusInfo.last) {
+		focusInfoObj.AddMember("LastFocusedView", JsonString(m_focusInfo.last->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedView", JsonNullValue(), _allocator);
+	}
+	if (m_focusInfo.lastCentral) {
+		focusInfoObj.AddMember("LastFocusedCentralView", JsonString(m_focusInfo.lastCentral->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedCentralView", JsonNullValue(), _allocator);
+	}
+	if (m_focusInfo.lastSide) {
+		focusInfoObj.AddMember("LastFocusedSideView", JsonString(m_focusInfo.lastSide->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedSideView", JsonNullValue(), _allocator);
+	}
+	if (m_focusInfo.lastTool) {
+		focusInfoObj.AddMember("LastFocusedToolView", JsonString(m_focusInfo.lastTool->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedToolView", JsonNullValue(), _allocator);
+	}
+	_object.AddMember("FocusInfo", focusInfoObj, _allocator);
+
+	JsonObject autoCloseInfoObj;
+	autoCloseInfoObj.AddMember("Flags", JsonArray(WidgetViewBase::toStringList(m_autoCloseInfo.flags), _allocator), _allocator);
+	autoCloseInfoObj.AddMember("ActiveSelection", JsonArray(m_autoCloseInfo.activeSelection.getSelectedNavigationItems(), _allocator), _allocator);
+	autoCloseInfoObj.AddMember("IgnoreCurrent", m_autoCloseInfo.ignoreCurrent, _allocator);
+	JsonArray viewsToCloseArr;
+	for (WidgetView* view : m_autoCloseInfo.viewsToClose) {
+		JsonObject viewObj;
+		viewObj.AddMember("EntityName", JsonString(view->getViewData().getEntityName(), _allocator), _allocator);
+		viewObj.AddMember("Type", JsonString(WidgetViewBase::toString(view->getViewData().getViewType()), _allocator), _allocator);
+		viewsToCloseArr.PushBack(viewObj, _allocator);
+	}
+	autoCloseInfoObj.AddMember("ViewsToClose", viewsToCloseArr, _allocator);
+	_object.AddMember("AutoCloseInfo", autoCloseInfoObj, _allocator);
+
+	JsonArray viewOwnerMapArr;
+	for (const auto& it : m_viewOwnerMap) {
+		JsonObject entryObj;
+		JsonObject ownerObj;
+		it.first.addToJsonObject(ownerObj, _allocator);
+
+		JsonArray viewNamesArr;
+		for (const ViewNameTypeListEntry& entry : *it.second) {
+			JsonObject nameTypeObj;
+			nameTypeObj.AddMember("Name", JsonString(entry.first, _allocator), _allocator);
+			nameTypeObj.AddMember("Type", JsonString(WidgetViewBase::toString(entry.second), _allocator), _allocator);
+			viewNamesArr.PushBack(nameTypeObj, _allocator);
+		}
+		entryObj.AddMember("Owner", ownerObj, _allocator);
+		entryObj.AddMember("ViewInfo", viewNamesArr, _allocator);
+		viewOwnerMapArr.PushBack(entryObj, _allocator);
+	}
+	_object.AddMember("ViewOwnerMap", viewOwnerMapArr, _allocator);
+
+	JsonArray viewsArr;
+	for (const ViewEntry& entry : m_views) {
+		JsonObject entryObj;
+		JsonObject ownerObj;
+		entry.first.addToJsonObject(ownerObj, _allocator);
+		JsonObject viewObj;
+		entry.second->getDebugInformation(viewObj, _allocator);
+		entryObj.AddMember("Owner", ownerObj, _allocator);
+		entryObj.AddMember("View", viewObj, _allocator);
+		viewsArr.PushBack(entryObj, _allocator);
+	}
+	_object.AddMember("Views", viewsArr, _allocator);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus) {
+	m_focusChangeData.newFocus = _newFocus;
+	m_focusChangeData.oldFocus = _oldFocus;
+	if (!m_focusChangeData.queued) {
+		m_focusChangeData.queued = true;
+		QMetaObject::invokeMethod(this, &WidgetViewManager::slotViewFocusedImpl, Qt::QueuedConnection);
+	}
+}
+
+void ot::WidgetViewManager::slotViewFocusedImpl() {
+	m_focusChangeData.queued = false;
+
+	if (m_state.hasAny(MulticloseViewState | InsertViewState)) {
+		return;
+	}
+
+	WidgetView* o = this->getViewFromDockWidget(m_focusChangeData.oldFocus);
+	WidgetView* n = this->getViewFromDockWidget(m_focusChangeData.newFocus);
+
+	if (n) {
+		OT_WIDGETS_VIEW_DBG_PTR(n, "View focused");
+
+		m_focusInfo.last = n;
+		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral) {
+			m_focusInfo.lastCentral = n;
+			if (!(m_config & IgnoreInputFocusOnViewInsert && m_state & InsertViewState) && m_config & InputFocusCentralViewOnFocusChange) {
+				n->setViewWidgetFocus();
+			}
+		}
+		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide) {
+			m_focusInfo.lastSide = n;
+			if (!(m_config & IgnoreInputFocusOnViewInsert && m_state & InsertViewState) && m_config & InputFocusSideViewOnFocusChange) {
+				n->setViewWidgetFocus();
+			}
+		}
+		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool) {
+			m_focusInfo.lastTool = n;
+			if (!(m_config & IgnoreInputFocusOnViewInsert && m_state & InsertViewState) && m_config & InputFocusToolViewOnFocusChange) {
+				n->setViewWidgetFocus();
+			}
+		}
+
+		Q_EMIT viewFocusChanged(n, o);
+	}
+}
+
+void ot::WidgetViewManager::slotViewCloseRequested() {
+	if (m_state & MulticloseViewState) {
+		OT_LOG_E("Enexpected event");
+		return;
+	}
+
+	WidgetView* view = dynamic_cast<WidgetView*>(sender());
+	if (view) {
+		this->handleViewCloseRequest(view);
+	}
+	else {
+		OT_LOG_E("View not found");
+	}
+}
+
+void ot::WidgetViewManager::slotUpdateViewVisibility() {
+	if (m_state & MulticloseViewState) {
+		return;
+	}
+
+	for (const ViewEntry& entry : m_views) {
+		if (!(entry.second->getViewData().getViewFlags() & WidgetViewBase::ViewFlag::ViewIsCloseable) && 
+			!entry.second->getViewDockWidget()->dockAreaWidget()) 
+		{
+			OT_LOG_D("View visibility restored: \"" + entry.second->getViewData().getEntityName() + "\"");
+
+			// Determine area
+			m_dockManager->addView(entry.second, this->getBestDockArea(entry.second), ot::WidgetView::NoInsertFlags);
+		}
+	}
+}
+
+void ot::WidgetViewManager::slotViewTabClicked() {
+	if (m_state & MulticloseViewState) {
+		OT_LOG_E("Enexpected event");
+		return;
+	}
+
+	ads::CDockWidgetTab* tab = dynamic_cast<ads::CDockWidgetTab*>(sender());
+	if (!tab) {
+		return;
+	}
+
+	WidgetView* view = this->getViewFromDockWidget(tab->dockWidget());
+	if (!view) {
+		return;
+	}
+
+	Q_EMIT viewTabClicked(view);
+}
+
+void ot::WidgetViewManager::slotViewDataModifiedChanged() {
+	if (m_state & MulticloseViewState) {
+		return;
+	}
+
+	ot::WidgetView* view = dynamic_cast<ot::WidgetView*>(sender());
+	if (!view) {
+		return;
+	}
+
+	Q_EMIT viewDataModifiedChanged(view);
+}
+
+void ot::WidgetViewManager::slotCloseUnpinnedViews() {
+	// Iterate trough all views
+	for (const ViewEntry& view : m_views) {
+		const WidgetViewDock* dock = view.second->getViewDockWidget();
+		OTAssertNullptr(dock);
+
+		// Check if the view matches the auto close flags and is not pinned
+		if ((view.second->getViewData().getViewFlags() & m_autoCloseInfo.flags) == m_autoCloseInfo.flags && !dock->getIsPinned()) {
+			bool concider = true;
+
+			// If ignore current is set, do not close the last focused view
+			if (m_autoCloseInfo.ignoreCurrent) {
+				concider = !(view.second == m_focusInfo.last ||
+					view.second == m_focusInfo.lastCentral ||
+					view.second == m_focusInfo.lastSide ||
+					view.second == m_focusInfo.lastTool);
+			}
+
+			// If the active selection is set, do not close views that are selected in the active selection
+			const UIDList& activeSel = m_autoCloseInfo.activeSelection.getSelectedNavigationItems();
+
+			if (concider) {
+				if (activeSel.empty()) {
+					// No active selection, ensure view is allowed to close on empty selection
+					if (!(view.second->getViewData().getViewFlags() & WidgetViewBase::ViewCloseOnEmptySelection)) {
+						concider = false;
+					}
+				}
+				else {
+					// Check if the view is selected in the active selection
+					if (ContainerHelper::hasIntersection(activeSel, view.second->getVisualizingItems().getSelectedNavigationItems())) {
+						concider = false;
+					}
+				}
+			}
+
+			// If the view matches all criteria, add it to the list of views to close
+			if (concider) {
+				m_autoCloseInfo.viewsToClose.push_back(view.second);
+			}
+		}
+	}
+
+	// Request to close all matching views
+	while (!m_autoCloseInfo.viewsToClose.empty()) {
+		WidgetView* view = m_autoCloseInfo.viewsToClose.front();
+		m_autoCloseInfo.viewsToClose.pop_front();
+		this->handleViewCloseRequest(view);
+	}
+}
+
+void ot::WidgetViewManager::slotViewPinnedChanged(bool _pinned) {
+	WidgetView* view = dynamic_cast<WidgetView*>(sender());
+	if (!view) {
+		OT_LOG_E("View cast failed");
+		return;
+	}
+
+	view->setAsCurrentViewTab();
+	view->getViewDockWidget()->setFocus();
+}
+
+void ot::WidgetViewManager::slotUpdateViewFocus() {
+	m_hasQueuedDelayedFocusUpdate = false;
+
+	ads::CDockWidget* currentFocus = m_dockManager->focusedDockWidget();
+	ads::CDockWidget* lastFocus = (m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr);
+	if (currentFocus != lastFocus) {
+		slotViewFocused(lastFocus, currentFocus);
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private
+
+bool ot::WidgetViewManager::getViewExists(const ViewNameTypeListEntry& _entry) const {
+	return this->findView(_entry) != nullptr;
+}
+
+ot::WidgetView* ot::WidgetViewManager::findView(const ViewNameTypeListEntry& _entry) const {
+	for (const ViewEntry& view : m_views) {
+		if (view.second->getViewData().getEntityName() == _entry.first && view.second->getViewData().getViewType() == _entry.second) {
+			return view.second;
+		}
+	}
+
+	return nullptr;
+}
+
+bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags, WidgetView* _parentView) {
+	OTAssertNullptr(m_dockManager);
+	OTAssertNullptr(_view);
+	// Ensure view does not exist
+	ViewNameTypeListEntry nameTypeEntry;
+	nameTypeEntry.first = _view->getViewData().getEntityName();
+	nameTypeEntry.second = _view->getViewData().getViewType();
+
+	OT_WIDGETS_VIEW_DBG_PTR(_view, "Adding view { \"EntityName\": \"" + nameTypeEntry.first + "\", \"ViewType\": \"" + WidgetViewBase::toString(nameTypeEntry.second) + "\" }");
+
+	if (this->getViewExists(nameTypeEntry)) {
+		OT_LOG_W("WidgetView already exists { \"EntityName\": \"" + nameTypeEntry.first + "\", \"ViewType\": \"" + WidgetViewBase::toString(nameTypeEntry.second) + "\" }");
+		return false;
+	}
+
+	// Get view name list for given owner
+	ViewNameTypeList* lst = this->findOrCreateViewNameTypeList(_owner);
+	auto lstIt = std::find(lst->begin(), lst->end(), nameTypeEntry);
+	if (lstIt != lst->end()) {
+		OT_LOG_E("Invalid entry");
+		return false;
+	}
+
+	// Check if the title already exists and try to create a unique one
+	_view->getViewDockWidget()->setWindowIcon(ot::IconManager::getApplicationIcon());
+
+	// Determine parent area
+	ads::CDockAreaWidget* area = nullptr;
+	if (_parentView) {
+		area = _parentView->getViewDockWidget()->dockAreaWidget();
+	}
+	else if (m_config & UseBestAreaFinderOnViewInsert) {
+		area = this->getBestDockArea(_view);
+	}
+
+	// If the current focus settings should not change store the current active views
+	std::list<WidgetView*> focusedViews;
+
+	if (_insertFlags & WidgetView::KeepCurrentFocus) {
+		for (const ViewEntry& entry : m_views) {
+			if (entry.second->isCurrentViewTab()) {
+				focusedViews.push_back(entry.second);
+			}
+		}
+	}
+
+	// Add the new view
+	m_state.set(InsertViewState);
+
+	m_dockManager->addView(_view, area, _insertFlags);
+	_view->setManager(this);
+
+	m_state.remove(InsertViewState);
+
+	// Add view toggle (only visible if dock is closeable)
+	m_dockToggleRoot->menu()->addAction(_view->getViewDockWidget()->toggleViewAction());
+	
+	// Store information
+	lst->push_back(nameTypeEntry);
+	ViewEntry newViewEntry;
+	newViewEntry.first = _owner;
+	newViewEntry.second = _view;
+	m_views.push_back(newViewEntry);
+
+	// Connect signals
+	this->connect(_view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->connect(_view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
+	this->connect(_view, &WidgetView::pinnedChanged, this, &WidgetViewManager::slotViewPinnedChanged);
+	if (_view->getViewDockWidget()->tabWidget()) {
+		this->connect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
+	}
+
+	updateCentralViewTitles();
+
+	Q_EMIT viewAdded(_view);
+
+	// Update focus information or reset the current focus depending on the insert mode
+	if (_insertFlags & WidgetView::KeepCurrentFocus) {
+		m_state.set(InsertViewState);
+		for (WidgetView* view : focusedViews) {
+			view->setAsCurrentViewTab();
+		}
+		m_state.remove(InsertViewState);
+	}
+	else {
+		m_state.set(InsertViewState);
+		_view->setAsCurrentViewTab();
+		if (_insertFlags & WidgetView::UpdateFocusDelayed) {
+			if (!m_hasQueuedDelayedFocusUpdate) {
+				m_hasQueuedDelayedFocusUpdate = true;
+				QMetaObject::invokeMethod(this, &WidgetViewManager::slotUpdateViewFocus, Qt::QueuedConnection);
+			}
+			m_state.remove(InsertViewState);
+		}
+		else {
+			m_state.remove(InsertViewState);
+			this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
+		}
+	}
+
+	return true;
+}
+
+ads::CDockAreaWidget* ot::WidgetViewManager::getBestDockArea(const WidgetView* _view) const {
+	if (_view->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool) {
+		if (m_focusInfo.lastTool) {
+			OT_WIDGETS_VIEW_DBG_PTR(_view, "Found best view area for tool via last focus { \"Focus.Name\": \"" + m_focusInfo.lastTool->getViewData().getEntityName() + "\", \"Focus.Ptr\": \"0x" + String::ptrToHexString(m_focusInfo.lastTool) + "\" }");
+
+			return m_focusInfo.lastTool->getViewDockWidget()->dockAreaWidget();
+		}
+		else {
+			ads::CDockAreaWidget* area = this->getFirstMatchingView(WidgetViewBase::ViewIsTool);
+			if (area) {
+				OT_WIDGETS_VIEW_DBG_PTR(_view, "Found best view area for tool via first matching view { \"Focus.Ptr\": \"0x" + String::ptrToHexString(area) + "\" }");
+				return area;
+			}
+		}
+	}
+
+	if (_view->getViewData().getViewFlags() & (WidgetViewBase::ViewIsTool | WidgetViewBase::ViewIsSide)) {
+		if (m_focusInfo.lastSide) {
+			OT_WIDGETS_VIEW_DBG_PTR(_view, "Found best view area for side view via last focus { \"Focus.Name\": \"" + m_focusInfo.lastSide->getViewData().getEntityName() + "\", \"Focus.Ptr\": \"0x" + String::ptrToHexString(m_focusInfo.lastSide) + "\" }");
+			return m_focusInfo.lastSide->getViewDockWidget()->dockAreaWidget();
+		}
+		else {
+			ads::CDockAreaWidget* area = this->getFirstMatchingView(WidgetViewBase::ViewIsSide);
+			if (area) {
+				OT_WIDGETS_VIEW_DBG_PTR(_view, "Found best view area for side view via first matching view { \"Focus.Ptr\": \"0x" + String::ptrToHexString(area) + "\" }");
+				return area;
+			}
+		}
+	}
+
+	if (m_focusInfo.lastCentral) {
+		OT_WIDGETS_VIEW_DBG_PTR(_view, "Found best view area for central view via last focus { \"Focus.Name\": \"" + m_focusInfo.lastCentral->getViewData().getEntityName() + "\", \"Focus.Ptr\": \"0x" + String::ptrToHexString(m_focusInfo.lastCentral) + "\" }");
+		return m_focusInfo.lastCentral->getViewDockWidget()->dockAreaWidget();
+	}
+	else {
+		auto area = this->getFirstMatchingView(WidgetViewBase::ViewIsCentral);
+		if (area) {
+			OT_WIDGETS_VIEW_DBG_PTR(_view, "Found best view area for central view via first matching view { \"Focus.Ptr\": \"0x" + String::ptrToHexString(area) + "\" }");
+			return area;
+		}
+	}
+
+	return nullptr;
+}
+
+ads::CDockAreaWidget* ot::WidgetViewManager::getFirstMatchingView(WidgetViewBase::ViewFlag _viewTypeFlag) const {
+	for (const ViewEntry& entry : m_views) {
+		if (entry.second->getViewData().getViewFlags().has(_viewTypeFlag)) {
+			return entry.second->getViewDockWidget()->dockAreaWidget();
+		}
+	}
+	return nullptr;
+}
+
+ot::WidgetViewManager::ViewNameTypeList* ot::WidgetViewManager::findViewNameTypeList(const BasicServiceInformation& _owner) {
+	auto it = m_viewOwnerMap.find(_owner);
+	if (it == m_viewOwnerMap.end()) {
+		return nullptr;
+	}
+	else {
+		return it->second;
+	}
+}
+
+ot::WidgetViewManager::ViewNameTypeList* ot::WidgetViewManager::findOrCreateViewNameTypeList(const BasicServiceInformation& _owner) {
+	ViewNameTypeList* ret = this->findViewNameTypeList(_owner);
+	if (!ret) {
+		ret = new ViewNameTypeList;
+		m_viewOwnerMap.insert_or_assign(_owner, ret);
+	}
+	return ret;
+}
+
+void ot::WidgetViewManager::handleViewCloseRequest(WidgetView* _view) {
+	OT_WIDGETS_VIEW_DBG_PTR(_view, "Handling view close request");
+
+	if (_view->getViewData().getViewFlags() & WidgetViewBase::ViewDefaultCloseHandling) {
+		_view->getViewDockWidget()->toggleView(_view->getViewDockWidget()->isClosed());
+	}
+	else {
+		Q_EMIT viewCloseRequested(_view);
+	}
+}
+
+void ot::WidgetViewManager::updateCentralViewTitles() {
+	struct CheckInfo {
+		WidgetView* view;
+		std::list<std::string> options;
+	};
+
+	std::map<std::string, CheckInfo> initialViewTitleMap;
+
+	// Determine options for all central views
+	std::list<CheckInfo> viewsToCheck;
+	for (const auto& entry : m_views) {
+		WidgetViewBase& data = entry.second->getViewData();
+		if (data.getViewFlags() & WidgetViewBase::ViewIsCentral) {
+			CheckInfo info;
+			info.view = entry.second;
+
+			if (data.getViewFlags() & WidgetViewBase::ViewNameAsTitle) {
+				std::string subName = EntityName::getSubName(data.getEntityName()).value();
+				std::string typeExtension = " - " + WidgetViewBase::toString(data.getViewType());
+				if (subName != data.getEntityName()) {
+					info.options.push_back(std::move(subName));
+					info.options.push_back(info.options.back() + typeExtension);
+				}
+				info.options.push_back(data.getEntityName());
+				info.options.push_back(info.options.back() + typeExtension);
+			}
+			else {
+				info.options.push_back(data.getTitle());
+			}
+
+			viewsToCheck.push_back(std::move(info));
+		}
+		else {
+			// Non-central views remain unchanged
+			CheckInfo info;
+			info.view = entry.second;
+			info.options.push_back(data.getTitle());
+			initialViewTitleMap.insert_or_assign(data.getTitle(), std::move(info));
+		}
+	}
+
+	for (auto info = viewsToCheck.begin(); info != viewsToCheck.end(); ) {
+		bool changed = false;
+		for (CheckInfo& otherInfo : viewsToCheck) {
+			if (info->view != otherInfo.view && info->options.front() == otherInfo.options.front()) {
+				changed = true;
+				if (info->options.size() == 1 && otherInfo.options.size() == 1) {
+					OT_LOG_W("Failed to rename view title: No unique title found { \"ViewEntityName\": \"" + info->view->getViewData().getEntityName() + "\" }");
+					info = viewsToCheck.erase(info);
+					break;
+				}
+				else if (otherInfo.options.size() > 1) {
+					otherInfo.options.pop_front();
+				}
+			}
+		}
+
+		if (changed) {
+			if (info->options.size() > 1) {
+				info->options.pop_front();
+			}
+			info = viewsToCheck.begin();
+		}
+		else {
+			info++;
+		}
+	}
+		/*
+
+		// Reset map and fill with non-central views
+		std::map<std::string, CheckInfo> viewTitleMap = initialViewTitleMap;
+
+		// Check all views
+		for (auto infoIt = viewsToCheck.begin(); infoIt != viewsToCheck.end(); ) {
+			auto it = viewTitleMap.find(infoIt->options.front());
+			if (it == viewTitleMap.end()) {
+				// Title is currently not used, insert it
+				viewTitleMap.insert_or_assign(infoIt->options.front(), *infoIt);
+				infoIt++;
+			}
+			else {
+				// Conflict found
+				if (infoIt->options.size() == 1) {
+
+					// View can not be renamed anymore, check other view
+					if (it->second.options.size() == 1) {
+						// Both views can not be renamed anymore, remove current view
+						OT_LOG_W("Failed to rename view title: No unique title found { \"ViewEntityName\": \"" + infoIt->view->getViewData().getEntityName() + "\" }");
+						infoIt = viewsToCheck.erase(infoIt);
+						continue;
+					}
+					else {
+						// Other view can be renamed further
+						for (CheckInfo& updateIt : viewsToCheck) {
+							if (updateIt.view == it->second.view) {
+								updateIt.options.pop_front();
+								break;
+							}
+						}
+					}
+				}
+				else {
+
+					// Resolve conflict
+					infoIt->options.pop_front();
+
+					// If existing view can be renamed, do it
+					if (it->second.options.size() > 1) {
+						for (CheckInfo& updateIt : viewsToCheck) {
+							if (updateIt.view == it->second.view) {
+								updateIt.options.pop_front();
+								break;
+							}
+						}
+					}
+				}
+
+				changed = true;
+				break; // Restart checking
+			}
+		}
+		*/
+
+	// Rename all views
+	for (const auto& entry : viewsToCheck) {
+		WidgetViewBase data = entry.view->getViewData();
+		if (data.getTitle() != entry.options.front()) {
+			data.setTitle(entry.options.front());
+			entry.view->setViewData(data);
+			entry.view->viewRenamed();
+		}
+	}
+}

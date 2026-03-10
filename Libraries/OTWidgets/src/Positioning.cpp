@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/Positioning.h"
-#include "OTWidgets/WidgetBase.h"
+#include "OTWidgets/Widgets/WidgetBase.h"
 
 // Qt header
 #include <QtGui/qscreen.h>

@@ -23,7 +23,7 @@
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "OTModelEntities/EntityInformation.h"
 #include "OTModelEntities/EntityMeshCartesianData.h"
-#include "OTGui/ToolBarButtonCfg.h"
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
 
 // C++ header

@@ -18,6 +18,9 @@
 // @otlicense-end
 
 #pragma once
+
+// OpenTwin header
+#include "OTCore/Symbol.h"
 #include "OTModelEntities/EntityContainer.h"
 #include "OTModelEntities/IVisualisationPlot1D.h"
 #include "OTModelEntities/PropertyBundleQuerySettings.h"
@@ -53,8 +56,28 @@ public:
 
 	bool visualisePlot() override;
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Property Setter / Getter
+
+	ot::Plot1DCfg::PlotType getPlotType() const;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private helper
+
 private:
 	PropertyBundleQuerySettings m_querySettings;
+
+	static std::string getXAxisPropertyGroupName() { return "X axis"; };
+	static std::string getYAxisPropertyGroupName() { return "Y axis"; };
+	static std::string getRadiusAxisPropertyGroupName() { return "r axis"; };
+	static std::string getAzimuthAxisPropertyGroupName() { return std::string(ot::Symbol::phi()) + " axis"; };
+
+	void createAxisProperties(const std::string& _axisName);
+	void setAxisFromProperties(const std::string& _axisName, ot::Plot1DAxisCfg& _axis);
+	bool setAxisPropertiesVisibility(const std::string& _axisName, bool _visible);
+	bool updateAxisPropertiesVisibility(const std::string& _axisName);
 
 	void setQuerySelections();
 

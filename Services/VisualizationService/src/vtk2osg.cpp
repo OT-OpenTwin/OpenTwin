@@ -21,6 +21,7 @@
 #include <osg/LineWidth>
 #include <osg/Vec3>
 #include <osg/PolygonMode>
+#include <osg/LightModel>
 
 osg::Node *VTKActorToOSG(vtkActor *actor) {
   actor->GetMapper()->Update();
@@ -211,6 +212,9 @@ osg::Geometry *processPrimitive(vtkActor *actor, vtkCellArray *prim_array, osg::
 
   if (normals != NULL && actor->GetProperty()->GetRepresentation() != VTK_WIREFRAME) {
     state->setMode(GL_LIGHTING, osg::StateAttribute::ON);
+    osg::ref_ptr<osg::LightModel> lm = new osg::LightModel;
+    lm->setTwoSided(true);
+    state->setAttributeAndModes(lm, osg::StateAttribute::ON);
   } else {
     state->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
   }

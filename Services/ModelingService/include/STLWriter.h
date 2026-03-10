@@ -20,32 +20,21 @@
 #pragma once
 
 #include <string>
-#include <list>
-#include <map>
+#include <sstream>
 
-#include "OTCore/CoreTypes.h"
+#include "TriangleCADWriter.h"
 
-class EntityBase;
-class EntityGeometry;
-class Application;
-
-class STEPCAFControl_Reader;
-class TopoDS_Shape;
-class TDF_Label;
-class Model;
-
-class STLWriter
+class STLWriter : public TriangleCADWriter
 {
 public:
-	STLWriter(Application *_app, const std::string &_serviceName) : application(_app), serviceName(_serviceName) { };
+	STLWriter(Application *_app, const std::string &_serviceName) : TriangleCADWriter(_app, _serviceName) { };
 	virtual ~STLWriter() { };
 
-	void getExportFileContent(std::string& fileContent, unsigned long long& uncompressedDataLength);
-
 private:
-	void createSTLFileContent(std::string& data);
+	virtual void initializeWriter() override;
+	virtual void appendData(const std::string& objectName, EntityFacetData* facetEntity, std::stringstream& dataStream) override;
+	void writeFacet(std::stringstream& output, double v1x, double v1y, double v1z, double v2x, double v2y, double v2z, double v3x, double v3y, double v3z, double nx, double ny, double nz);
 
-	Application *application;
-	std::string serviceName;
+
 };
 

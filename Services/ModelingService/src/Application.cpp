@@ -44,6 +44,7 @@
 #include "STEPReader.h"
 #include "STEPWriter.h"
 #include "STLWriter.h"
+#include "OBJWriter.h"
 
 // Third party libraries
 #include "base64.h"
@@ -443,18 +444,22 @@ void Application::handleExportCAD(ot::JsonDocument& _document) {
 	std::string extension = fileName.substr(index);
 	std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char c) { return std::tolower(c); });
 
-	std::string fileContent;
-	unsigned long long uncompressedDataLength = 0;
+	std::string data;
 
 	if (extension == ".step" || extension == ".stp")
 	{
 		STEPWriter writer(this, getServiceName());
-		writer.getExportFileContent(fileContent, uncompressedDataLength);
+		writer.getExportFileContent(data);
 	}
 	else if (extension == ".stl")
 	{
 		STLWriter writer(this, getServiceName());
-		writer.getExportFileContent(fileContent, uncompressedDataLength);
+		writer.getExportFileContent(data);
+	}
+	else if (extension == ".obj")
+	{
+		OBJWriter writer(this, getServiceName());
+		writer.getExportFileContent(data);
 	}
 	else
 	{
@@ -463,6 +468,33 @@ void Application::handleExportCAD(ot::JsonDocument& _document) {
 		return;
 	}
 
+	// Compress and encode the data
+	std::string fileContent;
+	unsigned long long uncompressedDataLength = data.size();
+
+	// Compress the file data content
+	uLong compressedSize = compressBound((uLong)uncompressedDataLength);
+
+	char* compressedData = new char[compressedSize];
+	compress((Bytef*)compressedData, &compressedSize, (Bytef*)data.data(), (uLong)uncompressedDataLength);
+
+	data.clear();
+
+	// Convert the binary to an encoded string
+	int encoded_data_length = Base64encode_len(compressedSize);
+	char* base64_string = new char[encoded_data_length];
+
+	Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
+
+	delete[] compressedData;
+	compressedData = nullptr;
+
+	fileContent = std::string(base64_string);
+
+	delete[] base64_string;
+	base64_string = nullptr;
+
+	// Send the data to the frontend
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SaveFileContent, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("CAD Export", doc.GetAllocator()), doc.GetAllocator());
@@ -552,7 +584,7 @@ void Application::handleRequestExportCAD() {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SelectFileForStoring, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Export CAD File", doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(ot::FileExtension::toFilterString({ ot::FileExtension::Step, ot::FileExtension::Stl, ot::FileExtension::AllFiles }), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(ot::FileExtension::toFilterString({ ot::FileExtension::Step, ot::FileExtension::Obj, ot::FileExtension::Stl, ot::FileExtension::AllFiles }), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString("exportCADFile", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 

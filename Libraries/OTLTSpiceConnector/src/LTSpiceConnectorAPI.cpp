@@ -22,7 +22,7 @@
 #include "OTLTSpiceConnector/CommitMessageDialog.h"
 #include "OTLTSpiceConnector/ProjectInformationDialog.h"
 
-#include "OTWidgets/MessageBoxManager.h"
+#include "OTWidgets/Dialog/MessageBoxManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 #include "OTFrontendConnectorAPI/CommunicationAPI.h"

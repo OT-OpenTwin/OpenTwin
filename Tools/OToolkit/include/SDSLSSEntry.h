@@ -4,9 +4,9 @@
 
 // OpenTwin header
 #include "OTCore/ServiceBase.h"
-#include "OTWidgets/WidgetBase.h"
-#include "OTWidgets/ExpanderWidget.h"
-#include "OTWidgets/TreeWidgetFilter.h"
+#include "OTWidgets/Widgets/WidgetBase.h"
+#include "OTWidgets/Widgets/ExpanderWidget.h"
+#include "OTWidgets/Widgets/TreeWidgetFilter.h"
 
 // Qt header
 #include <QtCore/qobject.h>

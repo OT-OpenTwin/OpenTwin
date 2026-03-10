@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/Variable.h"
-#include "OTWidgets/PlotDataset.h"
+#include "OTWidgets/Plot/PlotDataset.h"
 #include "OTDataStorage/DataLakeAPI.h"
 
 // std header
@@ -51,7 +51,7 @@ private:
 	std::list<std::string> m_skippedValueComparisons;
 	DataStorageAPI::DataLakeAPI m_dataAccess;
 
-	std::string createAxisLabel(const std::string& _title, const std::string& _unit);
+	std::string createUnitLabel(const std::string& _unit);
 
 	ot::JsonDocument queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDescription>& _valueComparisons);
 	const std::list<ot::ValueComparisonDescription> extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDescription>& _valueComparisions);

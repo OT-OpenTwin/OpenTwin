@@ -27,7 +27,6 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/String.h"
-#include "OTGui/ColorStyleTypes.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/LinearGradientPainter2D.h"
 #include "OTGui/Properties/PropertyInt.h"
@@ -39,22 +38,23 @@
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/Properties/PropertyStringList.h"
 #include "OTGui/Properties/PropertyPainter2D.h"
-#include "OTWidgets/SpinBox.h"
-#include "OTWidgets/Splitter.h"
-#include "OTWidgets/TabWidget.h"
-#include "OTWidgets/ColorStyle.h"
-#include "OTWidgets/TextEditor.h"
-#include "OTWidgets/PushButton.h"
-#include "OTWidgets/PropertyGrid.h"
-#include "OTWidgets/DoubleSpinBox.h"
-#include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/PropertyInputInt.h"
-#include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/PropertyInputString.h"
-#include "OTWidgets/PropertyInputDouble.h"
-#include "OTWidgets/Painter2DEditButton.h"
-#include "OTWidgets/PropertyInputPainter2D.h"
+#include "OTGui/Style/ColorStyleTypes.h"
+#include "OTWidgets/Properties/PropertyGrid.h"
+#include "OTWidgets/Properties/PropertyGridItem.h"
+#include "OTWidgets/Properties/PropertyInputInt.h"
+#include "OTWidgets/Properties/PropertyGridGroup.h"
+#include "OTWidgets/Properties/PropertyInputString.h"
+#include "OTWidgets/Properties/PropertyInputDouble.h"
+#include "OTWidgets/Properties/PropertyInputPainter2D.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
+#include "OTWidgets/Style/ColorStyle.h"
+#include "OTWidgets/Widgets/SpinBox.h"
+#include "OTWidgets/Widgets/Splitter.h"
+#include "OTWidgets/Widgets/TabWidget.h"
+#include "OTWidgets/Widgets/TextEditor.h"
+#include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/DoubleSpinBox.h"
+#include "OTWidgets/Widgets/Painter2DEditButton.h"
 
 // Qt header
 #include <QtCore/qfile.h>
@@ -730,10 +730,10 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerLine), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerFill), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotMarkerText), new PropertyPainter2D(new FillPainter2D(ot::Red)));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(0, 240, 0)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(80, 120, 80, 100)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveSymbol), new PropertyPainter2D(new FillPainter2D(0, 255, 0)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveSymbol), new PropertyPainter2D(new FillPainter2D(150, 58, 240)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SuccessForeground), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WarningForeground), new PropertyPainter2D(new FillPainter2D(ot::Yellow)));

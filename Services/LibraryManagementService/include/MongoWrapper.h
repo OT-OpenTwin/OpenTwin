@@ -46,7 +46,9 @@
 #include <mongocxx/instance.hpp>
 
 
-
+using bsoncxx::builder::basic::kvp;
+using bsoncxx::builder::basic::make_document;
+using BsonViewOrValue = bsoncxx::document::view_or_value;
 
 
 // std header
@@ -61,15 +63,13 @@ public:
 	~MongoWrapper() = default;
 
 	std::string getDocument(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
-	std::string getDocumentList(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	std::string getDocumentList(const ot::LibraryElementSelectionCfg& _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 	std::string getMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 private:
 	std::string getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword);
+	bsoncxx::document::value buildCombinedFilterQuery( const std::list<std::pair<std::string, std::string>>& _additionalFilters, const std::list<std::pair<std::string, std::string>>& _metadataFilters);
 
 	std::string m_databaseURL;
 	std::string m_siteID;
 	std::string dbName = "Libraries";
-
-
-
 };

@@ -30,17 +30,17 @@
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/Properties/PropertyPainter2D.h"
 #include "OTGui/Properties/PropertyStringList.h"
-#include "OTWidgets/PropertyGrid.h"
-#include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/PropertyInputInt.h"
-#include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/PropertyInputInt.h"
-#include "OTWidgets/PropertyInputBool.h"
-#include "OTWidgets/PropertyInputColor.h"
-#include "OTWidgets/PropertyInputDouble.h"
-#include "OTWidgets/PropertyInputString.h"
-#include "OTWidgets/PropertyInputPainter2D.h"
-#include "OTWidgets/PropertyInputStringList.h"
+#include "OTWidgets/Properties/PropertyGrid.h"
+#include "OTWidgets/Properties/PropertyGridItem.h"
+#include "OTWidgets/Properties/PropertyInputInt.h"
+#include "OTWidgets/Properties/PropertyGridGroup.h"
+#include "OTWidgets/Properties/PropertyInputInt.h"
+#include "OTWidgets/Properties/PropertyInputBool.h"
+#include "OTWidgets/Properties/PropertyInputColor.h"
+#include "OTWidgets/Properties/PropertyInputDouble.h"
+#include "OTWidgets/Properties/PropertyInputString.h"
+#include "OTWidgets/Properties/PropertyInputPainter2D.h"
+#include "OTWidgets/Properties/PropertyInputStringList.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -77,7 +77,7 @@ protected:
 	virtual void propertyDeleteRequested(const ot::Property* _property) = 0;
 
 private Q_SLOTS:
-	void slotPropertyChanged(const ot::Property* _property);
+	void slotPropertiesChanged(const std::list<const ot::Property*>& _properties);
 	void slotPropertyDeleteRequested(const ot::Property* _property);
 
 private:

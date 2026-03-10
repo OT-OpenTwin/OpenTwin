@@ -19,7 +19,7 @@
 
 #include "OTStudioSuiteConnector/CommitMessageDialog.h"
 
-#include "OTWidgets/IconManager.h"
+#include "OTWidgets/Style/IconManager.h"
 
 #include <qwidget.h>
 #include <qlayout.h>

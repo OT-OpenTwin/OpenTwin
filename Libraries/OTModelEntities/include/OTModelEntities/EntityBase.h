@@ -18,19 +18,19 @@
 // @otlicense-end
 
 #pragma once
-#pragma warning(disable : 4251)
 
 // OpenTwin header
-#include "OTModelEntities/ModelState.h"
-#include "OTModelEntities/EntityProperties.h"
-#include "OTModelEntities/EntityCallbackBase.h"
-#include "OTModelEntities/EntityFactoryRegistrar.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/BasicEntityInformation.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
 #include "OTGui/VisualisationTypes.h"
+#include "OTModelEntities/ModelState.h"
+#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/EntityCallbackBase.h"
+#include "OTModelEntities/EntityFactoryRegistrar.h"
+#include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 
 // BSON header
 #include <bsoncxx/json.hpp>
@@ -41,6 +41,8 @@
 #include <map>
 #include <list>
 #include <string>
+
+#pragma warning(disable : 4251)
 
 class EntityBase;
 
@@ -55,7 +57,7 @@ public:
 
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(_doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc, std::list<std::pair<ot::UID, ot::UID>>& _prefetchIds) {};
-	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _elementType) {};
+	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) {};
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
 };

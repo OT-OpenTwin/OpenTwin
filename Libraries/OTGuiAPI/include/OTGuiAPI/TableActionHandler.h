@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTGui/TableCfg.h"
+#include "OTGui/Widgets/TableCfg.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
 namespace ot {

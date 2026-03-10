@@ -26,14 +26,14 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/Label.h"
-#include "OTWidgets/Table.h"
-#include "OTWidgets/CheckBox.h"
-#include "OTWidgets/LineEdit.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/TableItem.h"
-#include "OTWidgets/ToolButton.h"
-#include "OTWidgets/IconManager.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/Table.h"
+#include "OTWidgets/Widgets/CheckBox.h"
+#include "OTWidgets/Widgets/LineEdit.h"
+#include "OTWidgets/Widgets/TableItem.h"
+#include "OTWidgets/Widgets/ToolButton.h"
 
 // TabToolbar
 #include <TabToolbar/Page.h>

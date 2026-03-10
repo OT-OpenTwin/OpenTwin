@@ -34,11 +34,11 @@
 #include "OTCore/DebugHelper.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
-#include "OTWidgets/Label.h"
-#include "OTWidgets/Splitter.h"
-#include "OTWidgets/ComboBox.h"
 #include "OTWidgets/Positioning.h"
-#include "OTWidgets/WidgetViewDock.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/Splitter.h"
+#include "OTWidgets/Widgets/ComboBox.h"
+#include "OTWidgets/WidgetView/WidgetViewDock.h"
 
 // Qt header
 #include <QtCore/qtimer.h>

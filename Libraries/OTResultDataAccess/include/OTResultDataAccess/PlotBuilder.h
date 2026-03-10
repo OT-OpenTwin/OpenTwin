@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Plot1DCurveCfg.h"
-#include "OTGui/Plot1DCfg.h"
+#include "OTGui/Plot/Plot1DCfg.h"
+#include "OTGui/Plot/Plot1DCurveCfg.h"
 #include "OTModelEntities/NewModelStateInfo.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
 #include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"

@@ -32,7 +32,7 @@ ECHO Building Project
 
 RMDIR /S /Q "%OT_WIDGETS_ROOT%\.vs"
 RMDIR /S /Q "%OT_WIDGETS_ROOT%\x64"
-RMDIR /S /Q "%OT_WIDGETS_ROOT%\packages"
+RMDIR /S /Q "%OT_WIDGETS_ROOT%\build"
 
 GOTO END
 

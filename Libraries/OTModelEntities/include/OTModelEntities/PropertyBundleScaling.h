@@ -27,6 +27,8 @@ public:
 	void setProperties(EntityBase * _thisObject) override;
 	bool updatePropertyVisibility(EntityBase * _thisObject) override;
 	
+	void setGlobalRange(EntityBase* _thisObject, double minValue, double maxValue);
+
 private:
 	const std::string m_groupName = "Scaling";
 	const std::string m_defaultCategory = "Scaling";

@@ -22,11 +22,10 @@
 #include "AppBase.h"
 
 // OpenTwin header
-#include "OTWidgets/IconManager.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
-#include "OTWidgets/IconManager.h"
 #include "OTWidgets/Positioning.h"
+#include "OTWidgets/Style/IconManager.h"
 
 // Qt header
 #include <QtCore/qsettings.h>

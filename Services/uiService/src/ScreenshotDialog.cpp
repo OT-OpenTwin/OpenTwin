@@ -18,9 +18,9 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Label.h"
-#include "OTWidgets/PushButton.h"
-#include "OTWidgets/PixmapEditWidget.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/PixmapEditWidget.h"
 #include "ScreenshotDialog.h"
 
 // Qt header

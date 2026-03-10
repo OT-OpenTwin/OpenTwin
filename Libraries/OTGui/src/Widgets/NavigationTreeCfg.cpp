@@ -1,0 +1,99 @@
+// @otlicense
+// File: NavigationTreePackage.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+// OpenTwin header
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Widgets/NavigationTreeCfg.h"
+
+std::string ot::NavigationTreeCfg::toString(TreeFlag _flag) {
+	switch (_flag)
+	{
+	case NoFlags: return "None";
+	case ItemsDefaultExpanded: return "ItemsDefaultExpanded";
+	default:
+		OT_LOG_WAS("Unknown flag: " + std::to_string((int)_flag));
+		return "None";
+	}
+}
+
+ot::NavigationTreeCfg::TreeFlag ot::NavigationTreeCfg::stringToFlag(const std::string& _flag) {
+	if (_flag == toString(NoFlags)) return NoFlags;
+	else if (_flag == toString(ItemsDefaultExpanded)) return ItemsDefaultExpanded;
+	else {
+		OT_LOG_WAS("Unknown flag: \"" + _flag + "\"");
+		return NoFlags;
+	}
+}
+
+ot::NavigationTreeCfg::NavigationTreeCfg() : m_flags(NoFlags) {}
+
+ot::NavigationTreeCfg::~NavigationTreeCfg() {}
+
+void ot::NavigationTreeCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	JsonArray flagArr;
+	if (m_flags & ItemsDefaultExpanded) flagArr.PushBack(JsonString(toString(ItemsDefaultExpanded), _allocator), _allocator);
+	_object.AddMember("Flags", flagArr, _allocator);
+
+	JsonArray rootArr;
+	for (const NavigationTreeItemCfg& itm : m_rootItems) {
+		JsonObject itmObj;
+		itm.addToJsonObject(itmObj, _allocator);
+		rootArr.PushBack(itmObj, _allocator);
+	}
+	_object.AddMember("RootItems", rootArr, _allocator);
+}
+
+void ot::NavigationTreeCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	m_flags = NoFlags;
+	ConstJsonArray flagArr = json::getArray(_object, "Flags");
+	for (JsonSizeType i = 0; i < flagArr.Size(); i++) {
+		m_flags |= stringToFlag(json::getString(flagArr, i, toString(NoFlags)));
+	}
+
+	m_rootItems.clear();
+	ConstJsonArray rootArr = json::getArray(_object, "RootItems");
+	for (JsonSizeType i = 0; i < rootArr.Size(); i++) {
+		ConstJsonObject itmObj = json::getObject(rootArr, i);
+		NavigationTreeItemCfg itm;
+		itm.setFromJsonObject(itmObj);
+		m_rootItems.push_back(itm);
+	}
+}
+
+void ot::NavigationTreeCfg::addRootItem(const NavigationTreeItemCfg& _item) {
+	m_rootItems.push_back(_item);
+}
+
+void ot::NavigationTreeCfg::mergeItems(bool _mergeAllChilds) {
+	std::list<NavigationTreeItemCfg> bck = m_rootItems;
+	m_rootItems.clear();
+	bool exists = false;
+	for (const NavigationTreeItemCfg& item : bck) {
+		exists = false;
+		for (NavigationTreeItemCfg& eItem : m_rootItems) {
+			if (eItem.getText() == item.getText()) {
+				eItem.merge(item);
+				exists = true;
+				break;
+			}
+		}
+		if (!exists) m_rootItems.push_back(item);
+	}
+}

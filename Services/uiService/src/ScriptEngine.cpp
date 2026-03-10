@@ -21,7 +21,7 @@
 #include "AppBase.h"
 #include "ToolBar.h"
 #include "ScriptEngine.h"
-#include "OTWidgets/GlobalWidgetViewManager.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 
 ScriptEngine::ScriptEngine(QObject* _parent) 
 	: QJSEngine(_parent)

@@ -36,10 +36,7 @@
 #include "OTCore/Logging/AbstractLogNotifier.h"
 
 // OpenTwin Gui header
-#include "OTGui/TableCfg.h"
 #include "OTGui/GuiTypes.h"
-#include "OTGui/Plot1DCfg.h"
-#include "OTGui/TextEditorCfg.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
@@ -47,14 +44,17 @@
 #include "OTGui/Dialog/MessageDialogCfg.h"
 #include "OTGui/Event/GraphicsChangeEvent.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTGui/Widgets/TableCfg.h"
+#include "OTGui/Widgets/TextEditorCfg.h"
 
 // OpenTwin Widgets header
-#include "OTWidgets/WidgetView.h"
 #include "OTWidgets/WidgetTypes.h"
-#include "OTWidgets/MessageBoxHandler.h"
-#include "OTWidgets/GraphicsPickerManager.h"
+#include "OTWidgets/Dialog/MessageBoxHandler.h"
+#include "OTWidgets/Graphics/GraphicsPickerManager.h"
+#include "OTWidgets/WidgetView/WidgetView.h"
 
 // OpenTwin Frontend API header
 #include "OTFrontendConnectorAPI/WindowAPI.h"
@@ -291,7 +291,7 @@ public:
 	void setRelayURLs(const std::string &);
 
 	//! @brief Will return the current Relay URLs
-	std::string getRelayURLs() const;
+	std::string getRelayURLs() const { return m_relayURLs; }
 
 	//! @brief Will return the current Service URL
 	const std::string & getServiceURL() const { return m_uiServiceURL; }
@@ -579,7 +579,8 @@ public Q_SLOTS:
 	void slotViewCloseRequested(ot::WidgetView* _view);
 	void slotViewTabClicked(ot::WidgetView* _view);
 	void slotViewDataModifiedChanged(ot::WidgetView* _view);
-	
+	bool focusLastAddedCentralView();
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Project management slots
@@ -614,7 +615,9 @@ public Q_SLOTS:
 
 	// Property grid slots
 
-	void slotPropertyGridValueChanged(const ot::Property* _property);
+	void slotPropertyGridValuesChanged(const std::list<const ot::Property*> _properties);
+	void slotPropertyGridTemporaryChangesCleared();
+	void slotPropertyGridValueTemporarlyChanged(const ot::Property* _property);
 	void slotPropertyGridValueDeleteRequested(const ot::Property* _property);
 
 	// ###########################################################################################################################################################################################################################################################################################################################

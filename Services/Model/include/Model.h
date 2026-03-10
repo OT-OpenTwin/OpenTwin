@@ -33,6 +33,7 @@
 #include "OTModelEntities/EntityContainer.h"
 #include "OTModelEntities/NewModelStateInfo.h"
 #include "OTCADEntities/EntityFaceAnnotation.h"
+#include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 
 // std header
 #include <string>
@@ -59,12 +60,15 @@ class ModalCommandBase;
 //! 0 is not a valid UID and is returned in case of an error.
 class Model : public EntityObserver
 {
+	OT_DECL_NODEFAULT(Model)
+	OT_DECL_NOCOPY(Model)
+	OT_DECL_NOMOVE(Model)
 public:
 	// Overrides from EntityObserver
 	virtual void entityRemoved(EntityBase *entity) override;
 	virtual void entityModified(EntityBase *entity) override;
 	virtual void sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) override;
-	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _elementType) override;
+	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) override;
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName);
@@ -103,7 +107,7 @@ public:
 	void getAllGeometryEntities(std::list<EntityGeometry *> &geometryEntities);
 	void getAllEntities(std::list<EntityBase *> &entities);
 	void addEntityToModel(std::string entityPath, EntityBase *entity, EntityBase *root, bool addVisualizationContainers, std::list<EntityBase *> &newEntities);
-	EntityBase *getRootNode() { return entityRoot; };
+	EntityBase *getRootNode() { return m_entityRoot; };
 
 	std::string getGeometryRootName() { return "Geometry"; };
 	std::string getCircuitsRootName() { return ot::FolderNames::CircuitsFolder; };
@@ -123,16 +127,16 @@ public:
 	void reportWarning(const std::string &message);
 	void reportInformation(const std::string &message);
 
-	std::string getProjectType() { return projectType; }
+	std::string getProjectType() { return m_projectType; };
 
 	void entitiesSelected(const std::string &selectionAction, const std::string &selectionInfo, std::map<std::string, std::string> &options);
 
-	void         setModelStorageVersion(ot::UID version) { modelStorageVersion = version; };
-	ot::UID getModelStorageVersion() { return modelStorageVersion; };
+	void         setModelStorageVersion(ot::UID version) { m_modelStorageVersion = version; };
+	ot::UID getModelStorageVersion() { return m_modelStorageVersion; };
 
 	void setModified();
 	void resetModified();
-	bool getModified() { return isModified; };
+	bool getModified() { return m_isModified; };
 	
 	void resetToNew();
 
@@ -173,7 +177,7 @@ public:
 	void deleteEntitiesFromModel(const ot::UIDList& _entityIDList, bool _saveModel);
 	void deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel);
 	void deleteEntitiesFromModel(const std::list<EntityBase*>& _entityList, bool _saveModel);
-	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
+	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion, const std::string& colorRampData);
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties);
 	void updateCoordinateSystem(EntityCoordinateSystem* csEntity);
 
@@ -223,7 +227,7 @@ public:
 
 	EntityBase* getEntityByID(ot::UID _entityID) const;
 
-	std::map<ot::UID, EntityBase*>& getAllEntitiesByUID() { return entityMap; }
+	std::map<ot::UID, EntityBase*>& getAllEntitiesByUID() { return m_entityMap; };
 
 	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator);
 
@@ -313,42 +317,39 @@ private:
 	void handleCreateNewParameter();
 
 	// Persistent attributes (need to be stored in data base)
-	EntityContainer               *entityRoot;
+	EntityContainer*               m_entityRoot;
 
-	ot::UID modelStorageVersion;
-	bool anyDataChangeSinceLastWrite;
+	ot::UID                        m_modelStorageVersion;
+	bool                           m_anyDataChangeSinceLastWrite;
 
 	// Temporary attributes (need to be rebuilt when the model is loaded)
-	std::map<ot::UID, EntityBase *>    entityMap;
-	std::map<EntityBase*, bool>	   pendingEntityUpdates;
+	std::map<ot::UID, EntityBase*> m_entityMap;
+	std::map<EntityBase*, bool>	   m_pendingEntityUpdates;
 	
 	// Temporary attributes
 	bool                           m_isProjectOpen;
-	ot::UID							visualizationModelID;
-	bool						   isModified;
-	std::string					   projectName;
-	std::string					   projectType;
-	std::string					   collectionName;
+	ot::UID						   m_visualizationModelID;
+	bool						   m_isModified;
+	std::string					   m_projectName;
+	std::string					   m_projectType;
+	std::string					   m_collectionName;
 	
-	bool						   uiCreated;
-	bool						   versionGraphCreated;
-	std::string					   newTableItemName;
-	std::map<ot::UID, bool>		   meshingActive;
+	bool						   m_uiCreated;
+	bool						   m_versionGraphCreated;
+	std::string					   m_newTableItemName;
+	std::map<ot::UID, bool>		   m_meshingActive;
 	std::string                    m_selectedVersion;
 
-	std::map<std::string, std::pair<double, EntityParameter*>>  parameterMap;
-
-	Model() = delete;
-	Model(const Model&) = delete;
-
 	// Model state manager
-	ModelState *stateManager;
+	ModelState *                   m_stateManager;
 
 	// Flag indicating whether the model is currently shutting down (no more modified messages are sent)
-	bool shutdown;
+	bool                           m_shutdown;
 
 	// List of Modal operations
-	std::list<ModalCommandBase *> modalCommands;
+	std::list<ModalCommandBase *>  m_modalCommands;
+
+	std::map<std::string, std::pair<double, EntityParameter*>>  m_parameterMap;
 };
 
 

@@ -46,7 +46,7 @@
 #include <akWidgets/aWindow.h>
 #include <akWidgets/aWindowManager.h>
 
-#include "OTWidgets/IconManager.h"
+#include "OTWidgets/Style/IconManager.h"
 
 // Qt header
 #include <qsurfaceformat.h>					// QSurfaceFormat

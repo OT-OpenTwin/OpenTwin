@@ -31,6 +31,7 @@
 
 // OpenTwin header
 #include "OTModelEntities/DataBase.h"
+#include "OTCADEntities/EntityGeometry.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/VisualisationCfg.h"
@@ -225,8 +226,9 @@ void Application::handleUpdateVisualizationEntity(ot::JsonDocument& _document) {
 	ot::UID visEntityVersion = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityVersion);
 	ot::UID binaryDataItemID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_DataID);
 	ot::UID binaryDataItemVersion = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_DataVersion);
+	std::string colorRampData = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ColorRamp);
 
-	m_model->updateVisualizationEntity(visEntityID, visEntityVersion, binaryDataItemID, binaryDataItemVersion);
+	m_model->updateVisualizationEntity(visEntityID, visEntityVersion, binaryDataItemID, binaryDataItemVersion, colorRampData);
 }
 
 void Application::handleUpdateGeometryEntity(ot::JsonDocument& _document) {
@@ -527,6 +529,27 @@ std::string Application::handleGetAllGeometryEntitiesForMeshing(ot::JsonDocument
 	return newDoc.toJson();
 }
 
+std::string Application::handleGetAllGeometryEntities(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::list<EntityGeometry*> geomEntities;
+	m_model->getAllGeometryEntities(geomEntities);
+
+	ot::UIDList geomEntityIDs;
+	for (auto& geomEntity : geomEntities)
+	{
+		geomEntityIDs.push_back(geomEntity->getEntityID());
+	}
+
+	ot::JsonDocument newDoc;
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(geomEntityIDs, newDoc.GetAllocator()), newDoc.GetAllocator());
+
+	return newDoc.toJson();
+}
+
 std::string Application::handleGetCurrentVisualizationModelID() {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
@@ -715,6 +738,16 @@ void Application::handleSetPropertiesFromJSON(ot::JsonDocument& _document) {
 	bool itemsVisible = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_ItemsVisible);
 
 	m_model->setPropertiesFromJson(entityIDList, cfg, update, itemsVisible);
+}
+
+void Application::handleSetTemporaryPropertiesFromJson(ot::JsonDocument& _document)
+{
+	
+}
+
+void Application::handleClearTemporaryPropertyChanges(ot::JsonDocument& _document)
+{
+
 }
 
 std::string Application::handleGetEntityProperties(ot::JsonDocument& _document) {
@@ -931,24 +964,24 @@ ot::ReturnMessage Application::handleShowTable(ot::JsonDocument& _document) {
 }
 
 void Application::handleModelDialogConfirmed(ot::JsonDocument& _document) {
-	std::string modelInfo = ot::json::getString(_document, OT_ACTION_PARAM_ModelInfo);
-	std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
-	std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
-	std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
-	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+	//std::string modelInfo = ot::json::getString(_document, OT_ACTION_PARAM_ModelInfo);
+	//std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
+	//std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
+	//std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+	//ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
 
 	// First add the model entity to the Project
-	m_libraryManagementWrapper.createModelTextEntity(modelInfo, folder, elementType, selectedModel);
+	//m_libraryManagementWrapper.createModelTextEntity(modelInfo, folder, elementType, selectedModel);
 
 	// Now update the property according to the dialog (confirm or cancel)
-	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, folder, selectedModel);
+	//m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, folder, selectedModel);
 }
 
 void Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
-	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+	//ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
 
-	// Now update the property according to the dialog (confirm or cancel)
-	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, "", "");
+	//// Now update the property according to the dialog (confirm or cancel)
+	//m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, "", "");
 }
 
 // ##################################################################################################################################################################################################################
@@ -1258,6 +1291,8 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_GetVisualizationModel, this, &Application::handleGetVisualizationModel);
 	connectAction(OT_ACTION_CMD_MODEL_GetIsModified, this, &Application::handleGetIsModified);
 	connectAction(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, this, &Application::handleSetPropertiesFromJSON);
+	connectAction(OT_ACTION_CMD_MODEL_SetTemporaryProperties, this, &Application::handleSetTemporaryPropertiesFromJson);
+	connectAction(OT_ACTION_CMD_MODEL_ClearTemporaryPropertyChanges, this, &Application::handleClearTemporaryPropertyChanges);
 	connectAction(OT_ACTION_CMD_MODEL_GenerateEntityIDs, this, &Application::handleGenerateEntityIDs);
 	connectAction(OT_ACTION_CMD_MODEL_RequestImportTableFile, this, &Application::handleRequestImportTableFile);
 	connectAction(OT_ACTION_CMD_MODEL_QueueMessages, this, &Application::handleQueueMessages);
@@ -1278,6 +1313,7 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_MODEL_GetSelectedEntityInformation, this, &Application::handleGetSelectedEntityInformation);
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName, this, &Application::handleGetEntityChildInformationByName);
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID, this, &Application::handleGetEntityChildInformationByID);
+	connectAction(OT_ACTION_CMD_MODEL_GetAllGeometryEntities, this, &Application::handleGetAllGeometryEntities);
 	connectAction(OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, this, &Application::handleGetAllGeometryEntitiesForMeshing);
 	connectAction(OT_ACTION_CMD_MODEL_GetCurrentVisModelID, this, &Application::handleGetCurrentVisualizationModelID);
 	

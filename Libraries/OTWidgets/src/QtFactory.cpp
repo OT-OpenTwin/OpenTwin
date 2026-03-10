@@ -26,7 +26,7 @@
 #include "OTGui/Painter/LinearGradientPainter2D.h"
 #include "OTGui/Painter/RadialGradientPainter2D.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
 
 // Qt header
 #include <QtGui/qpixmap.h>

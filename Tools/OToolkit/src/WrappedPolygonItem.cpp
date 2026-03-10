@@ -25,8 +25,6 @@
 // OpenTwin header
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Graphics/GraphicsPolygonItemCfg.h"
-#include "OTWidgets/QtFactory.h"
-#include "OTWidgets/GraphicsScene.h"
 
 static WrappedItemFactoryRegistrar<WrappedPolygonItem> circleRegistrar(ot::GraphicsPolygonItemCfg::className());
 

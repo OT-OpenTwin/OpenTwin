@@ -22,9 +22,9 @@
 
 // OpenTwin header
 #include "OTGui/Graphics/GraphicsItemCfg.h"
-#include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/GraphicsItemFactory.h"
+#include "OTWidgets/Graphics/GraphicsItem.h"
+#include "OTWidgets/Graphics/GraphicsScene.h"
+#include "OTWidgets/Graphics/GraphicsItemFactory.h"
 
 GraphicsItemDesignerPreview::GraphicsItemDesignerPreview(QWidget* _parent) 
 	: ot::GraphicsView(_parent), m_item(nullptr)

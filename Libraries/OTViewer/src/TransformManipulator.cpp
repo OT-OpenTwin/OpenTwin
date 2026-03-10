@@ -195,7 +195,26 @@ void TransformManipulator::performOperation(void)
 	doc.AddMember("Axis Z", m_lastPropertyAxis.z(), doc.GetAllocator());
 
 	doc.AddMember("Angle", m_lastPropertyAngle, doc.GetAllocator());
-	
+
+	doc.AddMember("RotationCenter X", m_initialSphereCenter.x(), doc.GetAllocator());
+	doc.AddMember("RotationCenter Y", m_initialSphereCenter.y(), doc.GetAllocator());
+	doc.AddMember("RotationCenter Z", m_initialSphereCenter.z(), doc.GetAllocator());
+
+	osg::Matrix transformMatrix = m_viewer3D->getModel()->getCurrentWorkingPlaneTransform();
+
+	// OpenSceneGraph uses row based transformation matrices whereas OpenCASCADE uses column based matrices. In our case, the working plane transform is an
+	// OSG matrix, but the shape creation itself is based on OpenCASCADE. Therefore we need to transpose the matrix.
+	transformMatrix.transpose(transformMatrix);
+
+	std::vector<double> transform;
+	transform.reserve(16);
+	for (int i = 0; i < 16; i++)
+	{
+		transform.push_back(transformMatrix.ptr()[i]);
+	}
+
+	doc.AddMember("Active Coordinate Transform", ot::JsonArray(transform, doc.GetAllocator()), doc.GetAllocator());
+
 	std::string selectionInfo = doc.toJson();
 
 	// Send the selection message to the model
@@ -215,6 +234,107 @@ void TransformManipulator::storeTransformations(void)
 
 		m_initialObjectTransform[item] = transformation;
 	}
+}
+
+bool TransformManipulator::handlePropertyGridValueChanged(const ot::Property* _property)
+{
+	osg::Vec3d offset = m_lastPropertyOffset;
+
+	ot::PropertyGroup* propertyGroup = _property->getParentGroup();
+	OTAssertNullptr(propertyGroup);
+
+	if (propertyGroup->getName() == PROP_Group_Rotation) {
+		if (_property->getPropertyName() == PROP_Item_AxisX) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			m_lastPropertyAxis = osg::Vec3d(actualProperty->getValue(), m_lastPropertyAxis.y(), m_lastPropertyAxis.z());
+		}
+		else if (_property->getPropertyName() == PROP_Item_AxisY) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			m_lastPropertyAxis = osg::Vec3d(m_lastPropertyAxis.x(), actualProperty->getValue(), m_lastPropertyAxis.z());
+		}
+		else if (_property->getPropertyName() == PROP_Item_AxisZ) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			m_lastPropertyAxis = osg::Vec3d(m_lastPropertyAxis.x(), m_lastPropertyAxis.y(), actualProperty->getValue());
+		}
+		else if (_property->getPropertyName() == PROP_Item_Angle) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			m_lastPropertyAngle = actualProperty->getValue();
+		}
+		else {
+			OT_LOG_E("Unknown property \"" + _property->getPropertyName() + "\"");
+		}
+	}
+	else if (propertyGroup->getName() == PROP_Group_Translation) {
+		if (_property->getPropertyName() == PROP_Item_TranslateX) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			offset.set(actualProperty->getValue(), offset.y(), offset.z());
+		}
+		else if (_property->getPropertyName() == PROP_Item_TranslateY) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			offset.set(offset.x(), actualProperty->getValue(), offset.z());
+		}
+		else if (_property->getPropertyName() == PROP_Item_TranslateZ) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			offset.set(offset.x(), offset.y(), actualProperty->getValue());
+		}
+		else {
+			OT_LOG_E("Unknown property \"" + _property->getPropertyName() + "\"");
+		}
+	}
+	else {
+		OT_LOG_E("Unknown property group \"" + propertyGroup->getName() + "\"");
+		return false;
+	}
+
+	m_lastPropertyOffset = offset;
+
+	// Update the transformation from the properties
+	osg::Matrix propertyRotate;
+	propertyRotate.makeRotate(m_lastPropertyAngle * M_PI / 180.0, m_lastPropertyAxis * m_workingPlaneRotation);
+
+	m_totalRotation = osg::Matrix(propertyRotate);
+
+	// Determine the new center
+	m_sphereCenter = m_initialSphereCenter + offset * m_workingPlaneRotation;
+
+	// Assign new positions to all handlers
+	updateHandlerPositions();
+
+	// Transform entities
+	applyObjectTransformations();
+
+	// Refresh the scene
+	m_viewer3D->refresh();
+
+	return true;  // We handle the property grid change
 }
 
 void TransformManipulator::getBoundingSphere(osg::Vec3d& center, double& radius, std::list<SceneNodeBase*> objects)
@@ -534,105 +654,15 @@ void TransformManipulator::updateSetting(const std::string& _groupName, const st
 	m_viewer3D->getModel()->setDoublePropertyGridValue(_groupName, _itemName, value);
 }
 
-bool TransformManipulator::propertyGridValueChanged(const ot::Property* _property)
+bool TransformManipulator::propertyGridValuesChanged(const std::list<const ot::Property*>& _properties)
 {
-	osg::Vec3d offset = m_lastPropertyOffset;
+	bool handled = false;
 
-	ot::PropertyGroup* propertyGroup = _property->getParentGroup();
-	OTAssertNullptr(propertyGroup);
-
-	if (propertyGroup->getName() == PROP_Group_Rotation) {
-		if (_property->getPropertyName() == PROP_Item_AxisX) {
-			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
-			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
-				return false;
-			}
-			m_lastPropertyAxis = osg::Vec3d(actualProperty->getValue(), m_lastPropertyAxis.y(), m_lastPropertyAxis.z());
-		}
-		else if (_property->getPropertyName() == PROP_Item_AxisY) {
-			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
-			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
-				return false;
-			}
-			m_lastPropertyAxis = osg::Vec3d(m_lastPropertyAxis.x(), actualProperty->getValue(), m_lastPropertyAxis.z());
-		}
-		else if (_property->getPropertyName() == PROP_Item_AxisZ) {
-			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
-			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
-				return false;
-			}
-			m_lastPropertyAxis = osg::Vec3d(m_lastPropertyAxis.x(), m_lastPropertyAxis.y(), actualProperty->getValue());
-		}
-		else if (_property->getPropertyName() == PROP_Item_Angle) {
-			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
-			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
-				return false;
-			}
-			m_lastPropertyAngle = actualProperty->getValue();
-		}
-		else {
-			OT_LOG_E("Unknown property \"" + _property->getPropertyName() + "\"");
-		}
-	}
-	else if (propertyGroup->getName() == PROP_Group_Translation) {
-		if (_property->getPropertyName() == PROP_Item_TranslateX) {
-			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
-			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
-				return false;
-			}
-			offset.set(actualProperty->getValue(), offset.y(), offset.z());
-		}
-		else if (_property->getPropertyName() == PROP_Item_TranslateY) {
-			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
-			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
-				return false;
-			}
-			offset.set(offset.x(), actualProperty->getValue(), offset.z());
-		}
-		else if (_property->getPropertyName() == PROP_Item_TranslateZ) {
-			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
-			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
-				return false;
-			}
-			offset.set(offset.x(), offset.y(), actualProperty->getValue());
-		}
-		else {
-			OT_LOG_E("Unknown property \"" + _property->getPropertyName() + "\"");
-		}
-	}
-	else {
-		OT_LOG_E("Unknown property group \"" + propertyGroup->getName() + "\"");
-		return false;
+	for (const ot::Property* prop : _properties) {
+		handled |= handlePropertyGridValueChanged(prop);
 	}
 
-	m_lastPropertyOffset = offset;
-
-	// Update the transformation from the properties
-	osg::Matrix propertyRotate;
-	propertyRotate.makeRotate(m_lastPropertyAngle * M_PI / 180.0, m_lastPropertyAxis * m_workingPlaneRotation);
-
-	m_totalRotation = osg::Matrix(propertyRotate);
-
-	// Determine the new center
-	m_sphereCenter = m_initialSphereCenter + offset * m_workingPlaneRotation;
-
-	// Assign new positions to all handlers
-	updateHandlerPositions();
-
-	// Transform entities
-	applyObjectTransformations();
-
-	// Refresh the scene
-	m_viewer3D->refresh();
-
-	return true;  // We handle the property grid change
+	return handled;
 }
 
 

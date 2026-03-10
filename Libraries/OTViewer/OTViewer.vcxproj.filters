@@ -166,6 +166,9 @@
     <ClCompile Include="src\SceneNodeCoordinateSystem.cpp">
       <Filter>src\SceneNodes</Filter>
     </ClCompile>
+    <ClCompile Include="src\ColorRamp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTViewer\PlotManagerView.h">
@@ -345,6 +348,9 @@
     </ClInclude>
     <ClInclude Include="include\OTViewer\Private\ViewerDebug.h">
       <Filter>include\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTViewer\ColorRamp.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

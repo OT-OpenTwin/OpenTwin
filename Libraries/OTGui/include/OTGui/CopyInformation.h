@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTCore/BasicServiceInformation.h"
-#include "OTGui/WidgetViewBase.h"
 #include "OTGui/CopyEntityInformation.h"
+#include "OTGui/Widgets/WidgetViewBase.h"
 
 // std header
 #include <string>

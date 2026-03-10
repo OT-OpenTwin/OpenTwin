@@ -63,56 +63,56 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 
-#include "OTGui/ColorStyleTypes.h"
 #include "OTGui/Dialog/MessageDialogCfg.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Properties/PropertyStringList.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 
 #include "OTGuiAPI/TableActionHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTGuiAPI/TextEditorActionHandler.h"
 
-#include "OTWidgets/Label.h"
-#include "OTWidgets/Table.h"
-#include "OTWidgets/PlotView.h"
-#include "OTWidgets/TableView.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/WidgetView.h"
-#include "OTWidgets/TextEditor.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/PlotDataset.h"
-#include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/GraphicsView.h"
-#include "OTWidgets/PropertyGrid.h"
-#include "OTWidgets/MessageDialog.h"
-#include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/PropertyInput.h"
-#include "OTWidgets/GraphicsPicker.h"
-#include "OTWidgets/TextEditorView.h"
-#include "OTWidgets/WidgetViewDock.h"
-#include "OTWidgets/BasicWidgetView.h"
-#include "OTWidgets/StyledSvgWidget.h"
-#include "OTWidgets/GraphicsViewView.h"
-#include "OTWidgets/PropertyGridView.h"
-#include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/WidgetProperties.h"
-#include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/PlainTextEditView.h"
-#include "OTWidgets/MessageBoxManager.h"
-#include "OTWidgets/GraphicsItemLoader.h"
-#include "OTWidgets/GraphicsPickerView.h"
-#include "OTWidgets/VersionGraphManager.h"
-#include "OTWidgets/PropertyInputDouble.h"
-#include "OTWidgets/CreateProjectDialog.h"
-#include "OTWidgets/StyledTextConverter.h"
-#include "OTWidgets/GraphicsConnectionItem.h"
-#include "OTWidgets/GlobalWidgetViewManager.h"
-#include "OTWidgets/PropertyInputStringList.h"
-#include "OTWidgets/VersionGraphManagerView.h"
+#include "OTWidgets/Dialog/CreateProjectDialog.h"
+#include "OTWidgets/Dialog/MessageDialog.h"
+#include "OTWidgets/Dialog/MessageBoxManager.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
+#include "OTWidgets/Style/StyledTextConverter.h"
+#include "OTWidgets/Plot/PlotDataset.h"
+#include "OTWidgets/Widgets/WidgetProperties.h"
+#include "OTWidgets/Version/VersionGraphManager.h"
+#include "OTWidgets/Properties/PropertyGrid.h"
+#include "OTWidgets/Properties/PropertyInput.h"
+#include "OTWidgets/Properties/PropertyGridItem.h"
+#include "OTWidgets/Properties/PropertyGridGroup.h"
+#include "OTWidgets/Properties/PropertyInputDouble.h"
+#include "OTWidgets/Properties/PropertyInputStringList.h"
+#include "OTWidgets/Graphics/GraphicsItem.h"
+#include "OTWidgets/Graphics/GraphicsView.h"
+#include "OTWidgets/Graphics/GraphicsScene.h"
+#include "OTWidgets/Graphics/GraphicsPicker.h"
+#include "OTWidgets/Graphics/GraphicsItemLoader.h"
+#include "OTWidgets/Graphics/GraphicsConnectionItem.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/Table.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
+#include "OTWidgets/Widgets/TextEditor.h"
+#include "OTWidgets/Widgets/StyledSvgWidget.h"
+#include "OTWidgets/WidgetView/PlotView.h"
+#include "OTWidgets/WidgetView/TableView.h"
+#include "OTWidgets/WidgetView/WidgetView.h"
+#include "OTWidgets/WidgetView/TextEditorView.h"
+#include "OTWidgets/WidgetView/WidgetViewDock.h"
+#include "OTWidgets/WidgetView/BasicWidgetView.h"
+#include "OTWidgets/WidgetView/GraphicsViewView.h"
+#include "OTWidgets/WidgetView/PropertyGridView.h"
+#include "OTWidgets/WidgetView/PlainTextEditView.h"
+#include "OTWidgets/WidgetView/GraphicsPickerView.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
+#include "OTWidgets/WidgetView/VersionGraphManagerView.h"
 
 #include "OTViewer/PlotManagerView.h"
 
@@ -1067,8 +1067,9 @@ void AppBase::createUi() {
 
 			// Display docks
 			OT_LOG_D("Settings up dock window visibility");
-	
+			
 			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_defaultView);
+			m_defaultView->setAsCurrentViewTab();
 			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
 			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
 			ot::GlobalWidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
@@ -1099,7 +1100,9 @@ void AppBase::createUi() {
 			// #######################################################################
 
 			// Register notifier
-			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyChanged, this, &AppBase::slotPropertyGridValueChanged);
+			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertiesChanged, this, &AppBase::slotPropertyGridValuesChanged);
+			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyTemporarlyChanged, this, &AppBase::slotPropertyGridValueTemporarlyChanged);
+			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::temporaryChangesCleared, this, &AppBase::slotPropertyGridTemporaryChangesCleared);
 			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyDeleteRequested, this, &AppBase::slotPropertyGridValueDeleteRequested);
 			
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::selectionChangeCompleted, this, &AppBase::slotTreeItemSelectionChanged);
@@ -1450,25 +1453,28 @@ void AppBase::setSessionServiceURL(const std::string & _url) {
 	m_ExternalServicesComponent->setSessionServiceURL(m_sessionServiceURL);
 }
 
-void AppBase::setRelayURLs(const std::string & _url) {
+void AppBase::setRelayURLs(const std::string & _url) 
+{
 	m_relayURLs = _url;
 	m_ExternalServicesComponent->setMessagingRelay(m_relayURLs);
-	std::cout << "Relay service URL: " << _url;
+	OT_LOG_D("Relay service URL set to \"" + _url + "\"");
 }
 
-std::string AppBase::getRelayURLs() const { return m_relayURLs; }
-
-void AppBase::switchToViewMenuTabIfNeeded() const {
-	if (uiAPI::window::getCurrentTabToolBarTab(m_mainWindow) == 0) {
+void AppBase::switchToViewMenuTabIfNeeded() const
+{
+	if (uiAPI::window::getCurrentTabToolBarTab(m_mainWindow) == 0)
+	{
 		uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, 1);
 	}
 }
 
-void AppBase::switchToMenuTab(const std::string& _menu) {
+void AppBase::switchToMenuTab(const std::string& _menu) 
+{
 	uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, QString::fromStdString(_menu));
 }
 
-std::string AppBase::getCurrentMenuTab() {
+std::string AppBase::getCurrentMenuTab()
+{
 	return uiAPI::window::getCurrentToolBarTabText(m_mainWindow);
 }
 
@@ -2952,15 +2958,32 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 	OT_SLECTION_TEST_LOG("View focus changed. { \"Previous\": \"" + (_previousView ? _previousView->getViewData().getEntityName() : "<None>") +
 		"\", \"Focused\": " + (_focusedView ? _focusedView->getViewData().getEntityName() : "<None>") + "\" }");
 
-	if (_previousView) {
+	if (_focusedView == _previousView) {
+		OT_LOG_D("Focused view is the same as previous view... Ignoring focus change.");
+		return;
+	}
+
+	if (_previousView) 
+	{
 		m_navigationManager.slotViewDeselected();
+
+		if (m_lastFocusedView == _previousView)
+		{
+			m_lastFocusedView = nullptr;
+		}
+		if (m_lastFocusedCentralView == _previousView)
+		{
+			m_lastFocusedCentralView = nullptr;
+		}
 	}
 
 	// Newly focused (focus in)
-	if (_focusedView) {
+	if (_focusedView) 
+	{
 
 		// Avoid focus change to same view
-		if (_focusedView == m_lastFocusedView) {
+		if (_focusedView == m_lastFocusedView) 
+		{
 			return;
 		}
 		m_lastFocusedView = _focusedView;
@@ -2969,18 +2992,24 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		m_navigationManager.slotViewSelected();
 
 		// Forward focus events of central views to the viewer component
-		if (focusedData.getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+		if (focusedData.getViewFlags() & ot::WidgetViewBase::ViewIsCentral) 
+		{
 			// Update graphics picker content
 			ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_focusedView);
-			if (graphicsView) {
+
+			if (graphicsView) 
+			{
 				m_graphicsPickerManager.setCurrentKey(graphicsView->getGraphicsView()->getPickerKey());
 			}
-			else {
+			else 
+			{
 				m_graphicsPickerManager.clearPicker();
 			}
 
 			ak::aTreeWidget* tree = m_projectNavigation->getTree();
-			if (!(m_viewHandling & (ot::ViewHandlingFlag::SkipEntitySelection | ot::ViewHandlingFlag::SkipViewHandling))) {
+
+			if (!(m_viewHandling & (ot::ViewHandlingFlag::SkipEntitySelection | ot::ViewHandlingFlag::SkipViewHandling)))
+			{
 				// Skip entity selection if configured
 				QSignalBlocker sigBlock(tree);
 				// Reset current selection
@@ -3018,7 +3047,8 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		}
 	}
 	else {
-		m_lastFocusedView = nullptr;
+		
+
 	}
 
 	OT_SLECTION_TEST_LOG(">> View focus changed completed");
@@ -3098,6 +3128,13 @@ void AppBase::slotViewDataModifiedChanged(ot::WidgetView* _view) {
 
 		m_viewerComponent->viewDataModifiedChanged(_view->getViewData().getEntityName(), _view->getViewData().getViewType(), _view->getViewContentModified());
 	}
+}
+
+bool AppBase::focusLastAddedCentralView()
+{
+	const std::list<ot::WidgetView*> lst({  });
+	//const std::list<ot::WidgetView*> lst({ m_defaultView });
+	return ot::GlobalWidgetViewManager::instance().focusLastAddedCentralView(lst);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -3599,13 +3636,25 @@ void AppBase::downloadInstaller(QString gssUrl) {
 
 // Property grid slots
 
-void AppBase::slotPropertyGridValueChanged(const ot::Property* _property) {
+void AppBase::slotPropertyGridValuesChanged(const std::list<const ot::Property*> _properties) {
 	// We first ask the viewer whether it needs to handle the property grid change.
-	if (!m_viewerComponent->propertyGridValueChanged(_property))
+	if (!m_viewerComponent->propertyGridValuesChanged(_properties))
 	{
 		// If not, we pass this change on to the external services component
-		m_ExternalServicesComponent->propertyGridValueChanged(_property);
+		m_ExternalServicesComponent->propertyGridValuesChanged(_properties);
 	}
+}
+
+void AppBase::slotPropertyGridTemporaryChangesCleared()
+{
+	OTAssertNullptr(m_ExternalServicesComponent);
+	m_ExternalServicesComponent->temporaryPropertyChangeCleared();
+}
+
+void AppBase::slotPropertyGridValueTemporarlyChanged(const ot::Property* _property)
+{
+	OTAssertNullptr(m_ExternalServicesComponent);
+	m_ExternalServicesComponent->propertyGridValueChangedTemporarly(_property);
 }
 
 void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property) {

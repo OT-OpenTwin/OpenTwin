@@ -18,7 +18,9 @@
 // @otlicense-end
 
 #pragma once
-#include "OTGui/Plot1DCurveCfg.h"
+
+// OpenTwin header
+#include "OTGui/Plot/Plot1DCurveCfg.h"
 
 class IVisualisationCurve
 {

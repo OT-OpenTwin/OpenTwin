@@ -21,7 +21,7 @@
 #include "GraphicsItemDesignerToolBar.h"
 
 // OpenTwin header
-#include "OTWidgets/IconManager.h"
+#include "OTWidgets/Style/IconManager.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>

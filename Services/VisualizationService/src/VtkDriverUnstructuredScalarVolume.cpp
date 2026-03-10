@@ -98,16 +98,12 @@ void VtkDriverUnstructuredScalarVolume::CheckForModelUpdates()
 
 void VtkDriverUnstructuredScalarVolume::DeletePropertyData(void)
 {
+	VtkDriverWithScaling::DeletePropertyData();
+
 	if (planeData != nullptr)
 	{
 		delete planeData;
 		planeData = nullptr;
-	}
-
-	if (scalingData != nullptr)
-	{
-		delete scalingData;
-		scalingData = nullptr;
 	}
 
 	if (visData != nullptr)
@@ -117,7 +113,7 @@ void VtkDriverUnstructuredScalarVolume::DeletePropertyData(void)
 	}
 }
 
-std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerItem* dataItem)
+std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerItem* dataItem, std::string &colorRampData)
 {
 	objectsToDelete.clear();
 
@@ -161,6 +157,8 @@ std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerI
 		{
 			Assemble2DNode(node);
 		}
+
+		getColorRampData(colorRampData);
 
 		CheckForModelUpdates();
 	}
@@ -418,27 +416,8 @@ void VtkDriverUnstructuredScalarVolume::AddIsosurfaces(osg::Node* parent)
 	if (dataConnection != nullptr) contourFilter->SetInputConnection(dataConnection);
 	else contourFilter->SetInputData(dataSource->GetVtkGrid());
 
-	auto scalingMethod = scalingData->GetScalingMethod();
 	double minVal, maxVal;
-	if (scalingMethod == ScalingProperties::ScalingMethod::rangeScale)
-	{
-		minVal = scalingData->GetRangeMin();
-		maxVal = scalingData->GetRangeMax();
-		if (minVal > maxVal)
-		{
-			//ToDo: UI display message
-			minVal = maxVal;
-		}
-	}
-	else if (scalingMethod == ScalingProperties::ScalingMethod::autoScale)
-	{
-		minVal = scalarRange[0];
-		maxVal = scalarRange[1];
-	}
-	else
-	{
-		throw std::invalid_argument("Not supported scaling method");
-	}
+	getMinMaxScaling(minVal, maxVal);
 
 	if (visData->GetNumberIsosurfaces() == 1)
 	{
@@ -475,79 +454,10 @@ void VtkDriverUnstructuredScalarVolume::AddIsosurfaces(osg::Node* parent)
 	dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
 }
 
-void VtkDriverUnstructuredScalarVolume::SetColouring(vtkPolyDataMapper* mapper)
-{
-	vtkNew<vtkLookupTable> lut;
-	lut->SetNumberOfTableValues(scalingData->GetColourResolution());
-	lut->SetHueRange(.667, 0.0);
-	lut->SetAlphaRange(1., 1.);
-	lut->IndexedLookupOff();
-	lut->SetVectorModeToMagnitude();
-
-	assert(scalingData != nullptr);
-	assert(scalarRange != nullptr);
-
-	auto scalingMethod = scalingData->GetScalingMethod();
-	double minVal, maxVal;
-	if (scalingMethod == ScalingProperties::ScalingMethod::rangeScale)
-	{
-
-		minVal = scalingData->GetRangeMin();
-		maxVal = scalingData->GetRangeMax();
-		if (minVal > maxVal)
-		{
-			//ToDo: UI display message
-			minVal = maxVal;
-		}
-	}
-	else if (scalingMethod == ScalingProperties::ScalingMethod::autoScale)
-	{
-		minVal = scalarRange[0];
-		maxVal = scalarRange[1];
-	}
-	else
-	{
-		throw std::invalid_argument("Not supported scaling method");
-	}
-
-	auto scalingFunction = scalingData->GetScalingFunction();
-	if (scalingFunction == ScalingProperties::ScalingFunction::linScale)
-	{
-		lut->SetScaleToLinear();
-	}
-	else if (scalingFunction == ScalingProperties::ScalingFunction::logScale)
-	{
-		//Log scaling requires the range to be > 0
-		if (minVal < 0)
-		{
-			minVal = 0;
-			//ToDo: Message to the UI!
-		}
-		if (scalingData->GetRangeMax() < 0)
-		{
-			maxVal = 0;
-			if (maxVal < minVal)
-			{
-				maxVal = minVal;
-			}
-			//ToDo: Message to the UI!
-		}
-
-		lut->SetScaleToLog10();
-	}
-	else
-	{
-		throw std::invalid_argument("Not supported scaling function");
-	}
-	lut->SetTableRange(minVal, maxVal);
-	lut->Build();
-	mapper->SetLookupTable(lut);
-}
-
 void VtkDriverUnstructuredScalarVolume::setProperties(EntityVis2D3D* visEntity)
 {
 	DeletePropertyData();
+	VtkDriverWithScaling::setProperties(visEntity);
 	planeData = new PropertyBundleDataHandlePlane(visEntity);
-	scalingData = new PropertyBundleDataHandleScaling(visEntity);
 	visData = new PropertyBundleDataHandleVisUnstructuredScalar(visEntity);
 }

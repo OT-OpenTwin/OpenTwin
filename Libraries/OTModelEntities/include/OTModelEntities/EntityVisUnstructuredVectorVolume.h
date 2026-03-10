@@ -42,6 +42,8 @@ public:
 	virtual void createProperties(void) override;
 	virtual bool updatePropertyVisibilities(void) override;
 
+	virtual void setGlobalRange(double minValue, double maxValue) override { propertyBundleScaling.setGlobalRange(this, minValue, maxValue); }
+
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;

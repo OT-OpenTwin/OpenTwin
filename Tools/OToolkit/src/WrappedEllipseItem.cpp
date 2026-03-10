@@ -25,8 +25,6 @@
 // OpenTwin header
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Graphics/GraphicsEllipseItemCfg.h"
-#include "OTWidgets/QtFactory.h"
-#include "OTWidgets/GraphicsScene.h"
 
 static WrappedItemFactoryRegistrar<WrappedEllipseItem> circleRegistrar(ot::GraphicsEllipseItemCfg::className());
 

@@ -21,11 +21,11 @@
 #include "LogVisualizerColumnWidthSaveDialog.h"
 
 // OpenTwin header
-#include "OTWidgets/Label.h"
-#include "OTWidgets/LineEdit.h"
-#include "OTWidgets/PushButton.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/BasicValidator.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Syntax/BasicValidator.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/LineEdit.h"
+#include "OTWidgets/Widgets/PushButton.h"
 
 // Qt header
 #include <QtWidgets/qmenu.h>

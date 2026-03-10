@@ -50,3 +50,4 @@ packages
 
 # VS internal build directory
 /**/.vs
+/**/build

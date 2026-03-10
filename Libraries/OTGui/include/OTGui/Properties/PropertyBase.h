@@ -50,7 +50,8 @@ namespace ot {
 			IsDeletable         = 1 << 5, //! @brief Property is deletable
 			AllowCustomValues   = 1 << 6, //! @brief User may set user values (e.g. in the StringListProperty)
 			AllowMultiselection = 1 << 7, //! @brief User may select multiple values (e.g. in the StringListProperty)
-			NoSerialize         = 1 << 8  //! @brief Property will not be concidered when serializing parent object.
+			GroupChanges        = 1 << 8, //! @brief If enabled the changes of this and other properties after will be grouped.
+			NoSerialize         = 1 << 9  //! @brief Property will not be concidered when serializing parent object.
 		};
 
 		//! @typedef PropertyFlags

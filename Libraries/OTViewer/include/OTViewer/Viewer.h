@@ -22,7 +22,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
-#include "OTWidgets/WidgetBase.h"
+#include "OTWidgets/Widgets/WidgetBase.h"
 
 #include <QMainWindow>
 #include <QtOpenGLWidgets/qopenglwidget.h>
@@ -37,6 +37,7 @@ class AxisCenterCross;
 class HandlerBase;
 class ClipPlaneManipulator;
 class ViewerObjectSelectionHandler;
+class ColorRamp;
 
 #include <osg/Group>
 #include <osg/ClipNode>
@@ -123,7 +124,7 @@ public:
 
 	Model *getModel(void) { return model; }
 
-	bool propertyGridValueChanged(const ot::Property* _property);
+	bool propertyGridValuesChanged(const std::list<const ot::Property*>& _properties);
 
 	void enableClipPlane(osg::Vec3d normal, osg::Vec3d point);
 	void updateClipPlane(osg::Vec3d normal, osg::Vec3d point);
@@ -139,6 +140,8 @@ public:
 
 	double snapDimension(double value);
 	double snapAngle(double value);
+
+	void setActiveColorRamp(ColorRamp *activeColorRamp);
 
 private Q_SLOTS:
 	void slotColorStyleChanged(void);

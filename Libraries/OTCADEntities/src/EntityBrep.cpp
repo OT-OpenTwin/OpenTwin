@@ -200,3 +200,38 @@ const std::map< const opencascade::handle<TopoDS_TShape>, std::string>& EntityBr
 {
 	return m_faceNames;
 }
+
+std::string EntityBrep::serialiseAsJSON()
+{
+	// Serialize general entity data
+	auto docBlock = EntityBase::serialiseAsMongoDocument();
+	const std::string jsonDocBlock = bsoncxx::to_json(docBlock);
+	ot::JsonDocument entireDoc;
+	entireDoc.fromJson(jsonDocBlock);
+
+	return entireDoc.toJson();
+}
+
+bool EntityBrep::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+{
+	try
+	{
+		const std::string serialisationString = ot::json::toJson(_serialisation);
+		std::string_view serialisedEntityJSONView(serialisationString);
+		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
+		auto serialisedEntityBSONView = serialisedEntityBSON.view();
+
+		readSpecificDataFromDataBase(serialisedEntityBSONView, _entityMap);
+		setEntityID(createEntityUID());
+
+		_entityMap[getEntityID()] = this;
+		return true;
+	}
+	catch (std::exception _e)
+	{
+		OT_LOG_E("Failed to deserialise " + getClassName() + " because: " + std::string(_e.what()));
+		return false;
+	}
+
+}
+

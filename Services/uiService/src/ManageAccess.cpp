@@ -28,10 +28,10 @@
 #include "OTCore/ProjectInformation.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTWidgets/Label.h"
-#include "OTWidgets/LineEdit.h"
-#include "OTWidgets/CheckBox.h"
-#include "OTWidgets/PushButton.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/LineEdit.h"
+#include "OTWidgets/Widgets/CheckBox.h"
+#include "OTWidgets/Widgets/PushButton.h"
 
 // Qt header
 #include <QtGui/qevent.h>

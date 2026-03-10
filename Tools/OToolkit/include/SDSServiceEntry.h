@@ -3,9 +3,9 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/OnOffSlider.h"
-#include "OTWidgets/TreeWidgetItem.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
+#include "OTWidgets/Widgets/OnOffSlider.h"
+#include "OTWidgets/Widgets/TreeWidgetItem.h"
 
 // Qt header
 #include <QtCore/qobject.h>

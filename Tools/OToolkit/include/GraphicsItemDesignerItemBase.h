@@ -24,17 +24,15 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/IconManager.h"
+#include "OTWidgets/QtFactory.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Graphics/GraphicsItem.h"
+#include "OTWidgets/Graphics/GraphicsScene.h"
 
 // Qt header
 #include <QtCore/qlist.h>
 #include <QtCore/qpoint.h>
-
-namespace ot {
-	class GraphicsItem;
-	class GraphicsItemCfg;
-}
 
 class GraphicsItemDesignerItemBase : public GraphicsItemDesignerPropertyHandler {
 	OT_DECL_NOCOPY(GraphicsItemDesignerItemBase)

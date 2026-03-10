@@ -28,7 +28,7 @@
 #include "OTGui/Properties/PropertyDouble.h"
 #include "OTGui/Properties/PropertyString.h"
 #include "OTGui/Properties/PropertyStringList.h"
-#include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
 
 // OpenTwin Viewer header
 #include "OTViewer/Model.h"
@@ -51,6 +51,7 @@
 #include "OTViewer/TransformManipulator.h"
 #include "OTViewer/ViewerObjectSelectionHandler.h"
 #include "OTViewer/Private/ViewerDebug.h"
+#include "OTViewer/ColorRamp.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -1765,9 +1766,9 @@ void Viewer::processHoverViewHandlers(osgUtil::LineSegmentIntersector *intersect
 	osgCameraManipulator->setHandleMouseMovement(currentHandler == nullptr);
 }
 
-bool Viewer::propertyGridValueChanged(const ot::Property* _property)
+bool Viewer::propertyGridValuesChanged(const std::list<const ot::Property*>& _properties)
 {
-	return model->propertyGridValueChanged(_property);
+	return model->propertyGridValuesChanged(_properties);
 }
 
 void Viewer::enableClipPlane(osg::Vec3d normal, osg::Vec3d point)
@@ -2042,5 +2043,11 @@ double Viewer::snapAngle(double value)
 	}
 
 	return value;
+}
+
+void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
+{
+	int i = 0;
+
 }
 

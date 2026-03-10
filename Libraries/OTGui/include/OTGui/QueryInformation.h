@@ -18,15 +18,19 @@
 // @otlicense-end
 
 #pragma once
-#include <string>
+
+// OpenTwin header
 #include "OTCore/Serializable.h"
-#include "QuantityContainerEntryDescription.h"
+#include "OTGui/QuantityContainerEntryDescription.h"
+
+// std header
+#include <string>
 
 #pragma warning(disable:4251)
 
 namespace ot
 {
-	struct __declspec(dllexport) QueryInformation : public ot::Serializable
+	struct OT_GUI_API_EXPORT QueryInformation : public ot::Serializable
 	{
 		std::string m_query;
 		std::string m_projection;

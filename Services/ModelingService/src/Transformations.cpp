@@ -218,31 +218,27 @@ void Transformations::transformShapes(const std::string &selectionInfo, std::map
 
 	double transformAngle = doc["Angle"].GetDouble() / 180.0 * M_PI;
 
+	gp_XYZ rotationCenter;
+	rotationCenter.SetX(doc["RotationCenter X"].GetDouble());
+	rotationCenter.SetY(doc["RotationCenter Y"].GetDouble());
+	rotationCenter.SetZ(doc["RotationCenter Z"].GetDouble());
+
+	gp_Trsf coordinateSystemTransform;
+
+	std::vector<double> csTransformation = ot::json::getDoubleVector(doc, "Active Coordinate Transform");
+
+	assert(csTransformation.size() == 16);
+	coordinateSystemTransform.SetValues(csTransformation[0], csTransformation[1], csTransformation[2], csTransformation[3],
+		csTransformation[4], csTransformation[5], csTransformation[6], csTransformation[7],
+		csTransformation[8], csTransformation[9], csTransformation[10], csTransformation[11]);
+	assert(csTransformation[12] == 0.0);
+	assert(csTransformation[13] == 0.0);
+	assert(csTransformation[14] == 0.0);
+	assert(csTransformation[15] == 1.0);
+
 	bool hasRotation = transformAngle != 0.0 && (transformAxis.X() != 0.0 || transformAxis.Y() != 0.0 || transformAxis.Z() != 0.0);
 
-	gp_XYZ rotationCenter;
-
-	if (hasRotation)
-	{
-		// Determine the exact bounding box
-		Bnd_Box boundingBox;
-
-		for (auto brep : brepEntityInfo)
-		{
-			// Now we load the corresponding brep 
-			EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(brep.getEntityID(), brep.getEntityVersion()));
-			if (brepEntity == nullptr) continue;
-
-			BRepBndLib tightBox;
-			tightBox.AddOptimal(brepEntity->getBrep(), boundingBox);
-		}
-
-		gp_Pnt cmin = boundingBox.CornerMin();
-		gp_Pnt cmax = boundingBox.CornerMax();
-
-		rotationCenter = gp_XYZ(0.5*(cmin.X() + cmax.X()), 0.5*(cmin.Y() + cmax.Y()), 0.5*(cmin.Z() + cmax.Z()));
-	}
-	else
+	if (!hasRotation)
 	{
 		transformAngle = 0.0;
 	}
@@ -254,7 +250,7 @@ void Transformations::transformShapes(const std::string &selectionInfo, std::map
 	for (auto geometryEntity : geometryEntities)
 	{
 		// update the transformation properties
-		updateTransformationProperties(geometryEntity, transformTranslate, transformAxis, transformAngle, rotationCenter);
+		updateTransformationProperties(geometryEntity, transformTranslate, transformAxis, transformAngle, rotationCenter, coordinateSystemTransform);
 
 		// Now we load the corresponding brep (since this was already loaded for the bounding box calc, it will come from the cache)
 		EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(brep->getEntityID(), brep->getEntityVersion()));
@@ -410,7 +406,7 @@ void Transformations::transformCoordinateSystem(const std::string& selectionInfo
 }
 
 
-void Transformations::updateTransformationProperties(EntityGeometry *geometryEntity, gp_XYZ transformTranslate, gp_XYZ transformAxis, double transformAngle, gp_XYZ rotationCenter)
+void Transformations::updateTransformationProperties(EntityGeometry *geometryEntity, gp_XYZ transformTranslate, gp_XYZ transformAxis, double transformAngle, gp_XYZ rotationCenter, gp_Trsf coordinateSystemTransform)
 {
 	EntityPropertiesDouble *xposProperty = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Position X"));
 	EntityPropertiesDouble *yposProperty = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Position Y"));
@@ -462,7 +458,7 @@ void Transformations::updateTransformationProperties(EntityGeometry *geometryEnt
 
 	// Handle the translation first
 	gp_Vec transformTranslateVec(transformTranslate);
-	transformTranslateVec.Transform(transform);
+	transformTranslateVec.Transform(coordinateSystemTransform);
 
 	gp_Trsf newTransformT;
 	newTransformT.SetTranslation(transformTranslateVec);
@@ -473,7 +469,7 @@ void Transformations::updateTransformationProperties(EntityGeometry *geometryEnt
 		gp_Trsf newTransformToCenter, newTransformFromCenter, newTransformCenterR, newTransformR;
 
 		gp_Dir rotationAxis(transformAxis);
-		rotationAxis.Transform(transform);
+		rotationAxis.Transform(coordinateSystemTransform);
 
 		newTransformToCenter.SetTranslation(-gp_Vec(rotationCenter));
 		newTransformFromCenter.SetTranslation(gp_Vec(rotationCenter));

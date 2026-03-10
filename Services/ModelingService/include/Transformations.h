@@ -60,7 +60,7 @@ public:
 	Transformations() = delete;
 
 private:
-	void updateTransformationProperties(EntityGeometry *geometryEntity, gp_XYZ transformTranslate, gp_XYZ transformAxis, double transformAngle, gp_XYZ rotationCenter);
+	void updateTransformationProperties(EntityGeometry *geometryEntity, gp_XYZ transformTranslate, gp_XYZ transformAxis, double transformAngle, gp_XYZ rotationCenter, gp_Trsf coordinateSystemTransform);
 	void updateTransformationProperties(EntityCoordinateSystem* csEntity, gp_XYZ transformTranslate, gp_XYZ transformAxis, double transformAngle, gp_XYZ rotationCenter);
 	gp_Trsf makeTrsfFromCenterXZ(const gp_Pnt& center, const gp_Dir& xDir_in, const gp_Dir& zDir_in);
 	double getValue(EntityCoordinateSystem* csEntity, const std::string& groupName, const std::string& propName);

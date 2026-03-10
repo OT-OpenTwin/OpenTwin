@@ -44,6 +44,11 @@ public:
 	const std::string GetPropertyValueLogscaling(void) { return valueLogScale; }
 	const std::string GetPropertyValueLinScaling(void) { return valueLinScale; }
 
+	const std::string GetPropertyValueGlobalRangeSet(void) { return valueGlobalSet; }
+	const std::string GetPropertyValueGlobalMin(void) { return valueGlobalMin; }
+	const std::string GetPropertyValueGlobalMax(void) { return valueGlobalMax; }
+
+
 	const ScalingMethod GetScalingMethod(std::string scaling)
 	{
 		ScalingMethod returnVal;
@@ -70,6 +75,10 @@ private:
 	const std::string valueLinScale = "Linear scale";
 
 	const std::string nameColourResolution = "Colour Resolution";
+
+	const std::string valueGlobalSet = "Global Range Set";
+	const std::string valueGlobalMin = "Global Min";
+	const std::string valueGlobalMax = "Global Max";
 
 	std::map < std::string, ScalingMethod> scalingMethodMapping{ {valueAutoScaling, ScalingMethod::autoScale}, {valueRangeScaling, ScalingMethod::rangeScale} };
 	std::map < std::string, ScalingFunction> scalingFunctionMapping{ {valueLinScale,ScalingFunction::linScale}, {valueLogScale, ScalingFunction::logScale} };

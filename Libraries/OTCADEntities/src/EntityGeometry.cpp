@@ -661,7 +661,6 @@ void EntityGeometry::createMaterialPropertiesOnly(int colorR, int colorG, int co
 	EntityPropertiesEntityList::createProperty("Solver", "Material", materialsFolder, materialsFolderID, "", -1, "", getProperties());
 
 	EntityPropertiesColor::createProperty("Appearance", "Color", { colorR, colorG, colorB}, "", getProperties());
-	EntityPropertiesColor::createProperty("Appearance", "Color", { colorR, colorG, colorB}, "", getProperties());
 	EntityPropertiesSelection::createProperty("Appearance", "Type", { "Rough", "Plastic", "Polished", "Metal" }, "Rough", "", getProperties());
 	EntityPropertiesSelection::createProperty("Appearance", "Texture", { "None", "Rough", "Gold", "Aluminium", "Reflective" }, "None", "", getProperties());
 }
@@ -1015,3 +1014,115 @@ bool EntityGeometry::isTransformProperty(const std::string &propName)
 
 	return false;
 }
+
+std::string EntityGeometry::serialiseAsJSON()
+{
+	// Serialize general entity data
+	auto docBlock = EntityBase::serialiseAsMongoDocument();
+	const std::string jsonDocBlock = bsoncxx::to_json(docBlock);
+	ot::JsonDocument entireDoc;
+	entireDoc.fromJson(jsonDocBlock);
+
+	// Store the brep information
+	ot::JsonDocument serialisedBrep;
+	std::map<ot::UID, EntityBase*> entityMap;
+	EntityBrep* brep = dynamic_cast<EntityBrep*>(readEntityFromEntityID(this, getBrepStorageObjectID(), entityMap));
+	if (brep != nullptr)
+	{
+		auto docBrep = brep->serialiseAsJSON();
+		serialisedBrep.fromJson(docBrep);
+	}
+
+	// Store the facet information
+	entityMap.clear();
+	ot::JsonDocument serialisedFacets;
+	EntityFacetData* facets = dynamic_cast<EntityFacetData*>(readEntityFromEntityID(this, getFacetsStorageObjectID(), entityMap));
+	if (facets != nullptr)
+	{
+		auto docFacets = facets->serialiseAsJSON();
+		serialisedFacets.fromJson(docFacets);
+	}
+
+	entireDoc.AddMember("SerialisationOfBrep", serialisedBrep, entireDoc.GetAllocator());
+	entireDoc.AddMember("SerialisationOfFacets", serialisedFacets, entireDoc.GetAllocator());
+
+	// Now we need to serialize the children of this geometry entity (= construction history)
+	ot::JsonArray childEntities;
+	for (auto& child : getChildrenList())
+	{
+		std::string childData = child->serialiseAsJSON();
+		childEntities.PushBack(ot::JsonString(childData, entireDoc.GetAllocator()), entireDoc.GetAllocator());
+	}
+
+	entireDoc.AddMember("Children", childEntities, entireDoc.GetAllocator());
+
+	return entireDoc.toJson();
+}
+
+bool EntityGeometry::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+{
+	try
+	{
+		// De-Serialize this entity together with the corresponding brep and facets
+		const std::string serialisationString = ot::json::toJson(_serialisation);
+		std::string_view serialisedEntityJSONView(serialisationString);
+		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
+		auto serialisedEntityBSONView = serialisedEntityBSON.view();
+
+		readSpecificDataFromDataBase(serialisedEntityBSONView, _entityMap);
+		setEntityID(createEntityUID());
+
+		brepStorageID = -1;
+		facetsStorageID = -1;
+
+		ot::ConstJsonObject brepObjJson = ot::json::getObject(_serialisation, "SerialisationOfBrep");
+		ot::ConstJsonObject facesObjJson = ot::json::getObject(_serialisation, "SerialisationOfFacets");
+
+		if (!brepObjJson.ObjectEmpty())
+		{
+			resetBrep();
+			getBrepEntity()->deserialiseFromJSON(brepObjJson, _copyInformation, _entityMap);
+		}
+
+		if (!facesObjJson.ObjectEmpty())
+		{
+			resetFacets();
+			getFacets()->deserialiseFromJSON(facesObjJson, _copyInformation, _entityMap);
+		}
+
+		_entityMap[getEntityID()] = this;
+
+		// De-Serialize Children
+		ot::ConstJsonArray children = ot::json::getArray(_serialisation, "Children");
+		for (uint32_t j = 0; j < children.Size(); j++)
+		{
+			EntityFactory& factory = EntityFactory::instance();
+
+			std::string childData = children[j].GetString();
+
+			ot::JsonDocument document;
+			document.fromJson(childData);
+			std::string entityType = ot::json::getString(document, "SchemaType");
+			std::unique_ptr<EntityBase> entity(factory.create(entityType));
+
+			if (entity != nullptr)
+			{
+				bool serialisedSuccessfully = entity->deserialiseFromJSON(document.getConstObject(), _copyInformation, _entityMap);
+				if (serialisedSuccessfully)
+				{
+					entity->setParent(this);
+					addChild(entity.release());
+				}
+			}
+		}
+
+		return true;
+	}
+	catch (std::exception _e)
+	{
+		OT_LOG_E("Failed to deserialise " + getClassName() + " because: " + std::string(_e.what()));
+		return false;
+	}
+
+}
+

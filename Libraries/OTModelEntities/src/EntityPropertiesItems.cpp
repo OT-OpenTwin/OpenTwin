@@ -39,7 +39,7 @@
 
 EntityPropertiesBase::EntityPropertiesBase()
 	: m_container(nullptr), m_needsUpdateFlag(false), m_multipleValues(false), m_readOnly(false), m_protectedProperty(true),
-	m_visible(true), m_errorState(false) 
+	m_visible(true), m_errorState(false), m_groupChanges(false)
 {}
 
 EntityPropertiesBase::EntityPropertiesBase(const EntityPropertiesBase &other)
@@ -55,6 +55,7 @@ EntityPropertiesBase::EntityPropertiesBase(const EntityPropertiesBase &other)
 	m_visible = other.m_visible;
 	m_errorState = other.m_errorState;
 	m_toolTip = other.m_toolTip;
+	m_groupChanges = other.m_groupChanges;
 }
 
 void EntityPropertiesBase::setNeedsUpdate() {
@@ -65,12 +66,13 @@ void EntityPropertiesBase::setNeedsUpdate() {
 
 void EntityPropertiesBase::setFromConfiguration(const ot::Property* _property, EntityBase* root) {
 	this->setName(_property->getPropertyName());
-	this->setHasMultipleValues(_property->getPropertyFlags() & ot::Property::HasMultipleValues);
-	this->setReadOnly(_property->getPropertyFlags() & ot::Property::IsReadOnly);
-	this->setProtected(!(_property->getPropertyFlags() & ot::Property::IsDeletable));
-	this->setVisible(!(_property->getPropertyFlags() & ot::Property::IsHidden));
-	this->setErrorState(_property->getPropertyFlags() & ot::Property::HasInputError);
+	this->setHasMultipleValues(_property->getPropertyFlags().has(ot::Property::HasMultipleValues));
+	this->setReadOnly(_property->getPropertyFlags().has(ot::Property::IsReadOnly));
+	this->setProtected(!_property->getPropertyFlags().has(ot::Property::IsDeletable));
+	this->setVisible(!_property->getPropertyFlags().has(ot::Property::IsHidden));
+	this->setErrorState(_property->getPropertyFlags().has(ot::Property::HasInputError));
 	this->setToolTip(_property->getPropertyTip());
+	this->setGroupChanges(_property->getPropertyFlags().has(ot::Property::GroupChanges));
 }
 
 void EntityPropertiesBase::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* root) {
@@ -82,6 +84,7 @@ void EntityPropertiesBase::addToJsonObject(ot::JsonObject& _jsonObject, ot::Json
 	_jsonObject.AddMember("ErrorState", this->getErrorState(), _allocator);
 	_jsonObject.AddMember("Group", ot::JsonString(this->getGroup(), _allocator), _allocator);
 	_jsonObject.AddMember("ToolTip", ot::JsonString(this->getToolTip(), _allocator), _allocator);
+	_jsonObject.AddMember("GroupChanges", this->getGroupChanges(), _allocator);
 }
 
 void EntityPropertiesBase::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root) {
@@ -103,6 +106,9 @@ void EntityPropertiesBase::readFromJsonObject(const ot::ConstJsonObject& _object
 	if (_object.HasMember("ToolTip")) {
 		this->setToolTip(ot::json::getString(_object, "ToolTip"));
 	}
+	if (_object.HasMember("GroupChanges")) {
+		this->setGroupChanges(ot::json::getBool(_object, "GroupChanges"));
+	}
 }
 
 void EntityPropertiesBase::copySettings(EntityPropertiesBase *other, EntityBase *root)
@@ -118,6 +124,7 @@ void EntityPropertiesBase::copySettings(EntityPropertiesBase *other, EntityBase 
 	m_visible = other->m_visible;
 	m_errorState = other->m_errorState;
 	m_toolTip = other->m_toolTip;
+	m_groupChanges = other->m_groupChanges;
 }
 
 EntityPropertiesBase& EntityPropertiesBase::operator=(const EntityPropertiesBase &other)
@@ -134,6 +141,7 @@ EntityPropertiesBase& EntityPropertiesBase::operator=(const EntityPropertiesBase
 		m_visible = other.m_visible;
 		m_errorState = other.m_errorState;
 		m_toolTip = other.m_toolTip;
+		m_groupChanges = other.m_groupChanges;
 	}
 	
 	return *this; 
@@ -146,6 +154,8 @@ void EntityPropertiesBase::setupPropertyData(ot::PropertyGridCfg& _configuration
 	if (!this->getProtected()) _property->setPropertyFlag(ot::Property::IsDeletable);
 	if (!this->getVisible()) _property->setPropertyFlag(ot::Property::IsHidden);
 	if (this->getErrorState()) _property->setPropertyFlag(ot::Property::HasInputError);
+	if (this->getGroupChanges()) _property->setPropertyFlag(ot::Property::GroupChanges);
+
 	_property->setPropertyTip(m_toolTip);
 
 	ot::PropertyGroup* group = _configuration.findOrCreateGroup(this->getGroup());

@@ -21,9 +21,9 @@
 #include "AppBase.h"
 
 #include "OTSystem/OTAssert.h"
-#include "OTGui/ColorStyleTypes.h"
-#include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/ApplicationPropertiesManager.h"
+#include "OTGui/Style/ColorStyleTypes.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
+#include "OTWidgets/Properties/ApplicationPropertiesManager.h"
 
 UserSettings& UserSettings::instance(void) {
 	static UserSettings g_instance;

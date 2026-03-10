@@ -19,10 +19,10 @@
 
 // OpenTwin header
 #include "OTFMC/CommitDialog.h"
-#include "OTWidgets/Label.h"
-#include "OTWidgets/LineEdit.h"
-#include "OTWidgets/PushButton.h"
 #include "OTWidgets/ToolTipHandler.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/LineEdit.h"
+#include "OTWidgets/Widgets/PushButton.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>

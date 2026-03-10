@@ -27,7 +27,6 @@
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/ThisComputerInfo.h"
 
-#include "OTGui/TableCfg.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTGui/Properties/PropertyInt.h"
@@ -38,6 +37,7 @@
 #include "OTGui/Properties/PropertyDouble.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/Properties/PropertyPainter2D.h"
+#include "OTGui/Widgets/TableCfg.h"
 
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -60,6 +60,7 @@
 
 // std header
 #include <thread>
+#include <fstream>
 
 #define OT_DEBUG_SERVICE_PAGE_NAME "Debug"
 
@@ -131,7 +132,8 @@ Application::Application() :
 
 	// Plot tests
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Single Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneCurve, this)));
-	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Complex Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneComplexCurve, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Complex Curve (real / imag)", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneComplexCurveRealImag, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Complex Curve (mag / phase)", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneComplexCurveMagPhase, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Two Curves", "Default/Plot1DVisible"), std::bind(&Application::createPlotTwoCurves, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "2 Curves x 1M", "Default/Plot1DVisible"), std::bind(&Application::createPlot2_1Mil, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "100 Curves x 100", "Default/Plot1DVisible"), std::bind(&Application::createPlot100_100, this)));
@@ -229,21 +231,24 @@ void Application::testTableBig(void) {
 	t.detach();
 }
 
-#include <fstream>
-void Application::createPlotOneComplexCurve()
+void Application::createPlotOneComplexCurveMagPhase()
 {
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
 	PlotBuilder builder(extender);
 	
 
-	const std::string currentPath = ot::OperatingSystem::getEnvironmentVariableString("OT_DEBUGSERVICE_ROOT");
-	const std::string jsonFile = currentPath + "\\Files\\s11_vectors.json";
+	const std::string devPath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
+	if (devPath.empty())
+	{
+		throw std::exception("OPENTWIN_DEV_ROOT environment variable is not set.");
+	}
+	const std::string jsonFile = devPath + "\\Services\\DebugService\\Files\\s11_vectors.json";
 	std::fstream fileStream(jsonFile, std::ios::in);
 	
 	if (!fileStream.is_open())
 	{
-		throw std::exception(("Cannot open file: " + currentPath).c_str());
+		throw std::exception(("Cannot open file: " + jsonFile).c_str());
 	}
 
 	const std::string fileContent = std::string(std::istreambuf_iterator<char>(fileStream), std::istreambuf_iterator<char>());
@@ -257,20 +262,20 @@ void Application::createPlotOneComplexCurve()
 	std::unique_ptr<QuantityDescriptionCurveComplex> quantDesc(new QuantityDescriptionCurveComplex());
 
 	auto frequencyArray = ot::json::getArray(sparameter, "freq_Hz");
-	for (size_t i = 0; i < frequencyArray.Size(); i++)
+	for (ot::JsonSizeType i = 0; i < frequencyArray.Size(); i++)
 	{
 		double value = ot::json::getDouble(frequencyArray, i);
 		parameter.values.push_back(ot::Variable(value));
 	}
 	auto magnitudeArray = ot::json::getArray(sparameter, "s11_mag");
-	for (size_t i = 0; i < magnitudeArray.Size(); i++)
+	for (ot::JsonSizeType i = 0; i < magnitudeArray.Size(); i++)
 	{
 		double value = ot::json::getDouble(magnitudeArray, i);
 		quantDesc->addValueReal(value);
 	}
 
 	auto phaseArray = ot::json::getArray(sparameter, "s11_ang_deg");
-	for (size_t i = 0; i < phaseArray.Size(); i++)
+	for (ot::JsonSizeType i = 0; i < phaseArray.Size(); i++)
 	{
 		double value = ot::json::getDouble(phaseArray, i);
 		quantDesc->addValueImag(value);
@@ -285,7 +290,75 @@ void Application::createPlotOneComplexCurve()
 	description.setQuantityDescription(quantDesc.release());
 	description.addParameterDescription(parameterDesc);
 
-	const std::string plotName = "Test/A_Complex_Plot";
+	const std::string plotName = "Test/A_Complex_Plot_MagPhase";
+	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "CMC_Stysch");
+	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11");
+
+	//Here the shared part
+	ot::Plot1DCfg plotCfg;
+	plotCfg.setEntityName(plotName);
+	builder.buildPlot(plotCfg);
+}
+
+void Application::createPlotOneComplexCurveRealImag()
+{
+	const std::string collName = getCollectionName();
+	ResultCollectionExtender extender(collName, *getModelComponent());
+	PlotBuilder builder(extender);
+
+	const std::string devPath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
+	if (devPath.empty())
+	{
+		throw std::exception("OPENTWIN_DEV_ROOT environment variable is not set.");
+	}
+	const std::string jsonFile = devPath + "\\Services\\DebugService\\Files\\s11_vectors.json";
+	std::fstream fileStream(jsonFile, std::ios::in);
+
+	if (!fileStream.is_open())
+	{
+		throw std::exception(("Cannot open file: " + jsonFile).c_str());
+	}
+
+	const std::string fileContent = std::string(std::istreambuf_iterator<char>(fileStream), std::istreambuf_iterator<char>());
+	ot::JsonDocument sparameter;
+	sparameter.fromJson(fileContent.c_str());
+
+	MetadataParameter parameter;
+	parameter.parameterName = "Frequency";
+	parameter.typeName = ot::TypeNames::getDoubleTypeName();
+	parameter.unit = "Hz";
+	std::unique_ptr<QuantityDescriptionCurveComplex> quantDesc(new QuantityDescriptionCurveComplex());
+
+	auto frequencyArray = ot::json::getArray(sparameter, "freq_Hz");
+	for (ot::JsonSizeType i = 0; i < frequencyArray.Size(); i++)
+	{
+		double value = ot::json::getDouble(frequencyArray, i);
+		parameter.values.push_back(ot::Variable(value));
+	}
+	auto magnitudeArray = ot::json::getArray(sparameter, "s11_real");
+	for (ot::JsonSizeType i = 0; i < magnitudeArray.Size(); i++)
+	{
+		double value = ot::json::getDouble(magnitudeArray, i);
+		quantDesc->addValueReal(value);
+	}
+
+	auto phaseArray = ot::json::getArray(sparameter, "s11_imag");
+	for (ot::JsonSizeType i = 0; i < phaseArray.Size(); i++)
+	{
+		double value = ot::json::getDouble(phaseArray, i);
+		quantDesc->addValueImag(value);
+	}
+
+	quantDesc->setName("S11");
+	quantDesc->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), "", "");
+
+	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
+
+	DatasetDescription description;
+	description.setQuantityDescription(quantDesc.release());
+	description.addParameterDescription(parameterDesc);
+
+	const std::string plotName = "Test/A_Complex_Plot_RIm";
 	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "CMC_Stysch");
 	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11");
 

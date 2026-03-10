@@ -24,11 +24,11 @@
 #include "ProjectOverviewWidget.h"
 
 // OpenTwin header
-#include "OTWidgets/Label.h"
-#include "OTWidgets/LineEdit.h"
-#include "OTWidgets/ToolButton.h"
-#include "OTWidgets/PushButton.h"
-#include "OTWidgets/IconManager.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/LineEdit.h"
+#include "OTWidgets/Widgets/ToolButton.h"
+#include "OTWidgets/Widgets/PushButton.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>

@@ -22,10 +22,10 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/LogDispatcher.h"
 
-#include "OTWidgets/Table.h"
-#include "OTWidgets/TableView.h"
-#include "OTWidgets/TextEditor.h"
-#include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/Widgets/Table.h"
+#include "OTWidgets/Widgets/TextEditor.h"
+#include "OTWidgets/WidgetView/TableView.h"
+#include "OTWidgets/WidgetView/TextEditorView.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -287,11 +287,11 @@ double Model::getDoublePropertyGridValue(const std::string& _groupName, const st
 	return FrontendAPI::instance()->getDoublePropertyValue(_groupName, _itemName);
 }
 
-bool Model::propertyGridValueChanged(const ot::Property* _property)
+bool Model::propertyGridValuesChanged(const std::list<const ot::Property*>& _properties)
 {
 	if (m_currentManipulator != nullptr)
 	{
-		return m_currentManipulator->propertyGridValueChanged(_property);
+		return m_currentManipulator->propertyGridValuesChanged(_properties);
 	}
 
 	return false;
@@ -3455,7 +3455,7 @@ void Model::loadRemainingData(const std::string& _entityName, ot::WidgetViewBase
 	}
 }
 
-void Model::addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion)
+void Model::addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string& colorRampData)
 {
 	// Check whether the item already exists
 	SceneNodeBase *item = m_modelItemToSceneNodesMap[_treeItem.getEntityID()];
@@ -3510,20 +3510,20 @@ void Model::addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, cons
 		vtkNode->setModel(this);
 
 		// Now update the vtk node
-		vtkNode->updateVTKNode(_projectName, _dataEntityID, _dataEntityVersion);
+		vtkNode->updateVTKNode(_projectName, _dataEntityID, _dataEntityVersion, colorRampData);
 
 		// Add the node to the maps for faster access
 		storeInMaps(vtkNode);
 	}
 }
 
-void Model::updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
+void Model::updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion, const std::string& colorRampData)
 {
 	SceneNodeVTK *vtkNode = dynamic_cast<SceneNodeVTK *>(m_modelItemToSceneNodesMap[_entityID]);
 	assert(vtkNode != nullptr);
 	if (vtkNode == nullptr) return;
 
-	vtkNode->updateVTKNode(projectName, visualizationDataID, visualizationDataVersion);
+	vtkNode->updateVTKNode(projectName, visualizationDataID, visualizationDataVersion, colorRampData);
 }
 
 SceneNodeBase* Model::getSceneNodeByEntityID(ot::UID _modelEntityID) const {
@@ -3791,4 +3791,87 @@ void Model::updateMeshEdgeColor()
 		};
 
 	setupdateMeshEdgeColorModeRecursive(m_sceneNodesRoot, setupdateMeshEdgeColorModeRecursive);
+}
+
+void Model::setColorRamp(const std::string& itemName, const std::string& colorRampData)
+{
+	if (colorRampData.empty()) return;
+
+	ColorRamp colorRamp;
+	colorRamp.loadFromString(colorRampData);
+
+	m_colorRampMap[itemName] = colorRamp;
+
+	updateColorRamps();
+}
+
+void Model::removeColorRamp(const std::string& itemName)
+{
+	auto item = m_colorRampMap.find(itemName);
+
+	if (item != m_colorRampMap.end())
+	{
+		bool updateNeeded = item->second.isActive();
+		m_colorRampMap.erase(item);
+		
+		if (updateNeeded)
+		{
+			updateColorRamps();
+		}
+	}
+}
+
+void Model::setColorRampActive(const std::string& itemName, bool active)
+{
+	bool updateNeeded = false;
+
+	auto item = m_colorRampMap.find(itemName);
+
+	if (item != m_colorRampMap.end())
+	{
+		if (item->second.isActive() != active)
+		{
+			item->second.setActive(active);
+			updateNeeded = true;
+		}
+	}
+
+	if (updateNeeded)
+	{
+		updateColorRamps();
+	}
+}
+
+void Model::updateColorRamps()
+{
+	// Find the currently active colorramp.
+	// If multiple incompatible color ramps are active, the result will be nullptr.
+
+	ColorRamp* activeColorRamp = nullptr;
+
+	for (auto& item : m_colorRampMap)
+	{
+		if (item.second.isActive())
+		{
+			if (activeColorRamp == nullptr)
+			{
+				activeColorRamp = &item.second;
+			}
+			else
+			{
+				if (!(*activeColorRamp == item.second))
+				{
+					activeColorRamp = nullptr;
+					break;
+				}
+			}
+		}
+	}
+
+	// Now process the currently active color ramp
+
+	for (auto viewer : m_viewerList)
+	{
+		viewer->setActiveColorRamp(activeColorRamp);
+	}
 }

@@ -196,6 +196,7 @@
     <ClCompile Include="src\CoordinateSystemManager.cpp" />
     <ClCompile Include="src\ModalCommandHealing.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
+    <ClCompile Include="src\OBJWriter.cpp" />
     <ClCompile Include="src\PrimitiveManager.cpp" />
     <ClCompile Include="src\ShapeHealing.cpp" />
     <ClCompile Include="src\ShapesBase.cpp" />
@@ -210,6 +211,7 @@
     <ClCompile Include="src\STEPWriter.cpp" />
     <ClCompile Include="src\STLWriter.cpp" />
     <ClCompile Include="src\Transformations.cpp" />
+    <ClCompile Include="src\TriangleCADWriter.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
     <ClCompile Include="src\UpdateManager.cpp" />
   </ItemGroup>
@@ -224,6 +226,7 @@
     <ClInclude Include="include\CoordinateSystemManager.h" />
     <ClInclude Include="include\ModalCommandHealing.h" />
     <ClInclude Include="include\ModelNotifier.h" />
+    <ClInclude Include="include\OBJWriter.h" />
     <ClInclude Include="include\PrimitiveManager.h" />
     <ClInclude Include="include\ShapeHealing.h" />
     <ClInclude Include="include\ShapesBase.h" />
@@ -238,6 +241,7 @@
     <ClInclude Include="include\STEPWriter.h" />
     <ClInclude Include="include\STLWriter.h" />
     <ClInclude Include="include\Transformations.h" />
+    <ClInclude Include="include\TriangleCADWriter.h" />
     <ClInclude Include="include\UiNotifier.h" />
     <ClInclude Include="include\UpdateManager.h" />
   </ItemGroup>

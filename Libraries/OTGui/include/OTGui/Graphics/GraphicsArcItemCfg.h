@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTCore/Rect.h"
-#include "OTGui/PenCfg.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Style/PenCfg.h"
 
 namespace ot {
 

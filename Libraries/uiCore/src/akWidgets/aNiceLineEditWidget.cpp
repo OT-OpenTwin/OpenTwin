@@ -22,7 +22,7 @@
 #include <akWidgets/aNiceLineEditWidget.h>
 
 // OpenTwin header
-#include "OTWidgets/Label.h"
+#include "OTWidgets/Widgets/Label.h"
 
 #include <qevent.h>
 #include <qlayout.h>

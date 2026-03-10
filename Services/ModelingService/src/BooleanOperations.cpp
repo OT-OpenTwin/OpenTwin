@@ -253,13 +253,17 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 		EntityPropertiesString *baseShapeProperty = dynamic_cast<EntityPropertiesString*>(geometryEntity->getProperties().getProperty("baseShape"));
 
+		std::string baseShapeName = baseEntity->getName();
+		size_t index = baseShapeName.rfind('/');
+		std::string baseNameWithoutPath = baseShapeName.substr(index + 1);
+
 		if (baseShapeProperty != nullptr)
 		{
-			baseShapeProperty->setValue(std::to_string(baseEntity->getEntityID()));
+			baseShapeProperty->setValue(baseNameWithoutPath);
 		}
 		else
 		{
-			baseShapeProperty = new EntityPropertiesString("baseShape", std::to_string(baseEntity->getEntityID()));
+			baseShapeProperty = new EntityPropertiesString("baseShape", baseNameWithoutPath);
 			baseShapeProperty->setVisible(false);
 			geometryEntity->getProperties().createProperty(baseShapeProperty, "Internal");
 		}
@@ -268,7 +272,11 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 		for (auto entity : toolEntities)
 		{
-			toolPropertyValue.append(std::to_string(entity->getEntityID()) + ",");
+			std::string toolShapeName = entity->getName();
+			size_t index = toolShapeName.rfind('/');
+			std::string toolNameWithoutPath = toolShapeName.substr(index + 1);
+
+			toolPropertyValue.append(toolNameWithoutPath + "\n");
 		}
 
 		EntityPropertiesString *toolShapeProperty = dynamic_cast<EntityPropertiesString*>(geometryEntity->getProperties().getProperty("toolShapes"));

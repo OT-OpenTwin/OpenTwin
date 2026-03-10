@@ -35,7 +35,7 @@ public:
 	virtual ~VtkDriver();
 
 	virtual void setProperties(EntityVis2D3D *visEntity) = 0;
-	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem) = 0;
+	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData) = 0;
 
 	std::list<ot::UID> GetUpdateTopoEntityID() { return updateTopoEntityID; }
 	std::list<ot::UID> GetUpdateTopoEntityVersion() { return updateTopoEntityVersion; }

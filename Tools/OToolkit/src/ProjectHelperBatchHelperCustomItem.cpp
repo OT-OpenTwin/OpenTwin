@@ -5,8 +5,8 @@
 #include "ScriptRunner.h"
 #include "OToolkitAPI/OToolkitAPI.h"
 #include "ProjectHelperBatchHelperCustomItem.h"
-#include "OTWidgets/PushButton.h"
-#include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
 
 // Qt header
 #include <QtCore/qdiriterator.h>

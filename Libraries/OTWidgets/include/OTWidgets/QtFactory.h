@@ -24,12 +24,12 @@
 #include "OTCore/Color.h"
 #include "OTCore/Size2D.h"
 #include "OTCore/Point2D.h"
-#include "OTGui/Font.h"
-#include "OTGui/PenCfg.h"
 #include "OTGui/Path2D.h"
-#include "OTGui/Margins.h"
 #include "OTGui/Transform.h"
 #include "OTGui/TableRange.h"
+#include "OTGui/Style/Font.h"
+#include "OTGui/Style/Margins.h"
+#include "OTGui/Style/PenCfg.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt header

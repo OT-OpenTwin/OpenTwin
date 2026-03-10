@@ -26,6 +26,7 @@
     <ClCompile Include="src\AxisCenterCross.cpp" />
     <ClCompile Include="src\AxisCross.cpp" />
     <ClCompile Include="src\ClipPlaneManipulator.cpp" />
+    <ClCompile Include="src\ColorRamp.cpp" />
     <ClCompile Include="src\CurveVisualiser.cpp" />
     <ClCompile Include="src\FaceSelection.cpp" />
     <ClCompile Include="src\FrontendAPI.cpp" />
@@ -92,6 +93,7 @@
     <ClInclude Include="include\OTViewer\AxisCenterCross.h" />
     <ClInclude Include="include\OTViewer\AxisCross.h" />
     <ClInclude Include="include\OTViewer\ClipPlaneManipulator.h" />
+    <ClInclude Include="include\OTViewer\ColorRamp.h" />
     <ClInclude Include="include\OTViewer\CurveVisualiser.h" />
     <ClInclude Include="include\OTViewer\EdgeSelection.h" />
     <ClInclude Include="include\OTViewer\FaceSelection.h" />
@@ -280,7 +282,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(Qt_LIBS_);OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTDataStorage.lib;OTRubberband.lib;OTRubberbandOSG.lib;OTCommunication.lib;OTServiceFoundation.lib;OTModelEntities.lib;$(MONGO_CXX_LIB);$(OSG_LIBD);$(QWT_LIB_LIBD);qtadvanceddockingd.lib;libgmp-10.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_CLIBD);$(OT_GUI_ROOT)\$(OT_CLIBD);$(OT_WIDGETS_ROOT)\$(OT_LIBD);$(MONGO_CXX_LIBPATHD);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBD);$(OT_FOUNDATION_ROOT)\$(OT_CLIBD);$(OT_COMMUNICATION_ROOT)\$(OT_CLIBD);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBD);$(QWT_LIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)\$(OT_CLIBD);$(OT_RUBBERBAND_OSG_ROOT)\$(OT_LIBD);$(OSG_LIBPATHD);$(QT_ADS_ROOT)\lib;$(GMP_LIBPATHD);$(BOOST_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBD);$(OT_CORE_ROOT)\$(OT_CLIBD);$(OT_GUI_ROOT)\$(OT_CLIBD);$(OT_WIDGETS_ROOT)\$(OT_CLIBD);$(MONGO_CXX_LIBPATHD);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBD);$(OT_FOUNDATION_ROOT)\$(OT_CLIBD);$(OT_COMMUNICATION_ROOT)\$(OT_CLIBD);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBD);$(QWT_LIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)\$(OT_CLIBD);$(OT_RUBBERBAND_OSG_ROOT)\$(OT_LIBD);$(OSG_LIBPATHD);$(QT_ADS_ROOT)\lib;$(GMP_LIBPATHD);$(BOOST_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -324,7 +326,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>$(Qt_LIBS_);OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTDataStorage.lib;OTRubberband.lib;OTRubberbandOSG.lib;OTCommunication.lib;OTServiceFoundation.lib;OTModelEntities.lib;$(MONGO_CXX_LIB);$(OSG_LIBR);$(QWT_LIB_LIBR);qtadvanceddocking.lib;libgmp-10.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_CLIBR);$(OT_GUI_ROOT)\$(OT_CLIBR);$(OT_WIDGETS_ROOT)\$(OT_LIBR);$(MONGO_CXX_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBR);$(OT_FOUNDATION_ROOT)\$(OT_CLIBR);$(OT_COMMUNICATION_ROOT)\$(OT_CLIBR);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBR);$(QWT_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_CLIBR);$(OT_RUBBERBAND_OSG_ROOT)\$(OT_LIBR);$(OSG_LIBPATHR);$(QT_ADS_ROOT)\lib;$(GMP_LIBPATHR);$(BOOST_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_CLIBR);$(OT_CORE_ROOT)\$(OT_CLIBR);$(OT_GUI_ROOT)\$(OT_CLIBR);$(OT_WIDGETS_ROOT)\$(OT_CLIBR);$(MONGO_CXX_LIBPATHR);$(OT_MODELENTITIES_ROOT)\$(OT_CLIBR);$(OT_FOUNDATION_ROOT)\$(OT_CLIBR);$(OT_COMMUNICATION_ROOT)\$(OT_CLIBR);$(OT_DATASTORAGE_ROOT)\$(OT_CLIBR);$(QWT_LIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)\$(OT_CLIBR);$(OT_RUBBERBAND_OSG_ROOT)\$(OT_LIBR);$(OSG_LIBPATHR);$(QT_ADS_ROOT)\lib;$(GMP_LIBPATHR);$(BOOST_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleasePerfTest|x64'">

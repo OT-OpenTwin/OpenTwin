@@ -26,7 +26,6 @@ PropertyBundleDataHandleScaling::PropertyBundleDataHandleScaling(EntityBase * th
 
 void PropertyBundleDataHandleScaling::LoadCurrentData(EntityBase * thisObject)
 {
-
 	auto scaleMethodProperty = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetPropertyNameScalingMethod()));
 	assert(scaleMethodProperty != nullptr);
 	scalingMethod = properties.GetScalingMethod(scaleMethodProperty->getValue());
@@ -47,6 +46,25 @@ void PropertyBundleDataHandleScaling::LoadCurrentData(EntityBase * thisObject)
 	auto colourResolutionEnt = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetPropertyNameColourResolution()));
 	colourResolution = colourResolutionEnt->getValue();
 
+
+	auto globalRangeSetProperty = dynamic_cast<EntityPropertiesBoolean*>(thisObject->getProperties().getProperty(properties.GetPropertyValueGlobalRangeSet()));
+	if (globalRangeSetProperty)
+	{
+		auto globalMinProperty = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyValueGlobalMin()));
+		assert(globalMinProperty != nullptr);
+		auto globalMaxProperty = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyValueGlobalMax()));
+		assert(globalMaxProperty != nullptr);
+
+		globalRangeSet = globalRangeSetProperty->getValue();
+		globalMin = globalMinProperty->getValue();
+		globalMax = globalMaxProperty->getValue();
+	}
+	else
+	{
+		globalRangeSet = false;
+		globalMin = -1.;
+		globalMax = -1.;
+	}
 }
 
 bool PropertyBundleDataHandleScaling::UpdateMinMaxProperties(double minValue, double maxValue)

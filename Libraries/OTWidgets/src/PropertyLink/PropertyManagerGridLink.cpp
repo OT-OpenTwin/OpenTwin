@@ -1,0 +1,90 @@
+// @otlicense
+// File: PropertyManagerGridLink.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+// OpenTwin header
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyGroup.h"
+#include "OTWidgets/Properties/PropertyGrid.h"
+#include "OTWidgets/Properties/PropertyGridItem.h"
+#include "OTWidgets/PropertyLink/WidgetPropertyManager.h"
+#include "OTWidgets/PropertyLink/PropertyManagerGridLink.h"
+
+ot::PropertyManagerGridLink::PropertyManagerGridLink(WidgetPropertyManager* _manager) :
+	ManagedPropertyLink(_manager), m_grid(nullptr)
+{
+
+}
+
+ot::PropertyManagerGridLink::~PropertyManagerGridLink() {
+	this->forgetPropertyGrid();
+}
+
+void ot::PropertyManagerGridLink::visualizeAtGrid(PropertyGrid* _grid) {
+	OTAssertNullptr(_grid);
+	this->forgetPropertyGrid();
+	m_grid = _grid;
+
+	WidgetPropertyManager* manager = this->getWidgetPropertyManager();
+	OTAssertNullptr(manager);
+
+	m_grid->setupGridFromConfig(manager->createGridConfiguration());
+
+	this->connect(m_grid, &PropertyGrid::propertiesChanged, this, &PropertyManagerGridLink::slotPropertiesChanged);
+	this->connect(m_grid, &PropertyGrid::propertyDeleteRequested, this, &PropertyManagerGridLink::slotPropertyDeleteRequested);
+}
+
+void ot::PropertyManagerGridLink::forgetPropertyGrid(void) {
+	if (m_grid) {
+		this->disconnect(m_grid, &PropertyGrid::propertiesChanged, this, &PropertyManagerGridLink::slotPropertiesChanged);
+		this->disconnect(m_grid, &PropertyGrid::propertyDeleteRequested, this, &PropertyManagerGridLink::slotPropertyDeleteRequested);
+
+		m_grid = nullptr;
+	}
+}
+
+void ot::PropertyManagerGridLink::slotPropertiesChanged(const std::list<const Property*> _properties) {
+	// Ensure property should be modified
+	for (const Property* prop : _properties) {
+		if (prop->getPropertyFlags() & (PropertyBase::IsReadOnly | PropertyBase::IsProtected | PropertyBase::IsHidden)) {
+			OT_LOG_W("Property should not have changed");
+			if (m_grid) {
+				this->visualizeAtGrid(m_grid);
+			}
+			return;
+		}
+	}
+
+	// Get manager
+	WidgetPropertyManager* manager = this->getWidgetPropertyManager();
+	OTAssertNullptr(manager);
+
+	for (const Property* prop : _properties) {
+		// Get group
+		const PropertyGroup* grp = prop->getParentGroup();
+		OTAssertNullptr(grp);
+
+		// Update property
+		manager->updateProperty(grp->getName(), prop, false);
+	}
+}
+
+void ot::PropertyManagerGridLink::slotPropertyDeleteRequested(const Property* _property) {
+	OT_LOG_EA("Removeable entities are not supported yet");
+}

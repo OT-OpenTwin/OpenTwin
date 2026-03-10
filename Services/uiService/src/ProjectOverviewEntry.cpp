@@ -21,8 +21,8 @@
 #include "ProjectOverviewEntry.h"
 #include "ProjectOverviewHeader.h"
 #include "OTSystem/DateTime.h"
-#include "OTWidgets/CheckBox.h"
-#include "OTWidgets/IconManager.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Widgets/CheckBox.h"
 
 ot::ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInfo)
 	: ot::TreeWidgetItem(), m_projectInfo(_projectInfo)

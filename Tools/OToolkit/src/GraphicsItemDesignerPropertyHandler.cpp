@@ -22,7 +22,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/Properties/PropertyGridItem.h"
 
 GraphicsItemDesignerPropertyHandler::GraphicsItemDesignerPropertyHandler()
 	: m_propertyGrid(nullptr), m_navigation(nullptr), m_navigationItem(nullptr)
@@ -37,21 +37,23 @@ void GraphicsItemDesignerPropertyHandler::setPropertyGrid(ot::PropertyGrid* _gri
 
 	m_propertyGrid = _grid;
 
-	this->connect(m_propertyGrid, &ot::PropertyGrid::propertyChanged, this, &GraphicsItemDesignerPropertyHandler::slotPropertyChanged);
+	this->connect(m_propertyGrid, &ot::PropertyGrid::propertiesChanged, this, &GraphicsItemDesignerPropertyHandler::slotPropertiesChanged);
 	this->connect(m_propertyGrid, &ot::PropertyGrid::propertyDeleteRequested, this, &GraphicsItemDesignerPropertyHandler::slotPropertyDeleteRequested);
 
 	this->fillPropertyGrid();
 }
 
 void GraphicsItemDesignerPropertyHandler::unsetPropertyGrid(void) {
-	this->disconnect(m_propertyGrid, &ot::PropertyGrid::propertyChanged, this, &GraphicsItemDesignerPropertyHandler::slotPropertyChanged);
+	this->disconnect(m_propertyGrid, &ot::PropertyGrid::propertiesChanged, this, &GraphicsItemDesignerPropertyHandler::slotPropertiesChanged);
 	this->disconnect(m_propertyGrid, &ot::PropertyGrid::propertyDeleteRequested, this, &GraphicsItemDesignerPropertyHandler::slotPropertyDeleteRequested);
 
 	m_propertyGrid = nullptr;
 }
 
-void GraphicsItemDesignerPropertyHandler::slotPropertyChanged(const ot::Property* _property) {
-	this->propertyChanged(_property);
+void GraphicsItemDesignerPropertyHandler::slotPropertiesChanged(const std::list<const ot::Property*>& _properties) {
+	for (const ot::Property* prop : _properties) {
+		this->propertyChanged(prop);
+	}
 }
 
 void GraphicsItemDesignerPropertyHandler::slotPropertyDeleteRequested(const ot::Property* _property) {

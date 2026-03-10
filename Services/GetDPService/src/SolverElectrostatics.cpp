@@ -33,6 +33,9 @@
 
 #include <cassert>
 
+#undef min
+#undef max
+
 void SolverElectrostatics::writeInputFile(std::ofstream& _controlFile, Application *app)
 {
     // Get map of all materials and their corresponding objects
@@ -501,13 +504,14 @@ void SolverElectrostatics::writePostOperation(std::ofstream& controlFile)
 void SolverElectrostatics::convertPotential(const std::string& tempDirPath, Application* app, EntityBase* solverEntity, long long& globalVisualizationMeshID, long long& globalVisualizationMeshVersion)
 {
     std::map<std::string, std::string> nodeToPotentialMap;
+    double globalMinValue = 0.0, globalMaxValue = 0.0;
 
-    convertGlobalPotential(tempDirPath, nodeToPotentialMap, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
-    convertSurfacePotentials(tempDirPath, nodeToPotentialMap, app, solverEntity);
+    convertGlobalPotential(tempDirPath, nodeToPotentialMap, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion, globalMinValue, globalMaxValue);
+    convertSurfacePotentials(tempDirPath, nodeToPotentialMap, app, solverEntity, globalMinValue, globalMaxValue);
 }
 
 void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string>& nodeToPotentialMap, Application* app, EntityBase*solverEntity,
-                                                  long long &globalVisualizationMeshID, long long &globalVisualizationMeshVersion)
+                                                  long long &globalVisualizationMeshID, long long &globalVisualizationMeshVersion, double &globalMinValue, double &globalMaxValue)
 {
     // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
     std::string potentialFileName = tempDirPath + "\\potential.pos";
@@ -592,6 +596,9 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
     visualizationEntity->setSource(scalarDataID, scalarDataVersion);
     visualizationEntity->setMesh(globalVisualizationMeshID, globalVisualizationMeshVersion);
 
+    findGlobalPotentialRange(potentialList, globalMinValue, globalMaxValue);
+    visualizationEntity->setGlobalRange(globalMinValue, globalMaxValue);  // Here we need to set the global range to ensure same scaling for global potential and surface potentials
+
     visualizationEntity->storeToDataBase();
 
     app->getModelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
@@ -638,7 +645,27 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
     vtkFile.close();
 }
 
-void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, EntityBase* solverEntity)
+void SolverElectrostatics::findGlobalPotentialRange(std::list<std::string> &potentialList, double &globalMinValue, double &globalMaxValue)
+{
+    if (potentialList.empty())
+    {
+        globalMinValue = globalMaxValue = 0.0;
+        return;
+    }
+
+    globalMaxValue = std::numeric_limits<double>::lowest();
+    globalMinValue = std::numeric_limits<double>::max();
+
+    for (auto &potential : potentialList)
+    {
+        double value = atof(potential.c_str());
+
+        globalMaxValue = std::max(globalMaxValue, value);
+        globalMinValue = std::min(globalMinValue, value);
+    }
+}
+
+void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, EntityBase* solverEntity, double globalMinValue, double globalMaxValue)
 {
     for (auto item : groupNameToIdMap)
     {
@@ -730,6 +757,7 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
 
             visualizationEntity->setSource(scalarDataID, scalarDataVersion);
             visualizationEntity->setMesh(visualizationMeshID, visualizationMeshVersion);
+            visualizationEntity->setGlobalRange(globalMinValue, globalMaxValue);   // Here we need to set the global range to ensure same scaling for global potential and surface potentials
 
             visualizationEntity->storeToDataBase();
 

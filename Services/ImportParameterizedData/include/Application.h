@@ -21,7 +21,7 @@
 
 // Open twin header
 #include "OTCore/FolderNames.h"
-#include "OTGui/ToolBarButtonCfg.h"
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"

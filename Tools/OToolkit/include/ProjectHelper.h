@@ -28,9 +28,9 @@
 // OpenTwin header
 #include "OTCore/Rect.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Font.h"
-#include "OTGui/PenCfg.h"
-#include "OTGui/Margins.h"
+#include "OTGui/Style/Font.h"
+#include "OTGui/Style/PenCfg.h"
+#include "OTGui/Style/Margins.h"
 #include "OTGui/VersionGraphVersionCfg.h"
 
 // Qt header

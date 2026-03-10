@@ -24,26 +24,26 @@
 // OToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
 
-// C++ header
-#include <Windows.h>			// windows types
-#include <thread>				// thread
+// Open Twin header
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTGui/Style/ColorStyleTypes.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
+#include "OTWidgets/Properties/ApplicationPropertiesManager.h"
+#include "OTCommunication/actionTypes.h"
 
-#include <exception>
-
+// Qt header
 #include <QtCore/qdir.h>
 #include <QtCore/qfile.h>
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qapplication.h>
 
-// Open Twin header
-#include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
-#include "OTCore/ReturnMessage.h"
-#include "OTGui/ColorStyleTypes.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/ApplicationPropertiesManager.h"
-#include "OTCommunication/actionTypes.h"
+// std header
+#include <thread>				// thread
+#include <exception>
+#include <Windows.h>			// windows types
 
 #define DLLMAIN_LOG(___msg) OTOOLKIT_LOG("main", ___msg)
 #define DLLMAIN_LOGW(___msg) OTOOLKIT_LOGW("main", ___msg)

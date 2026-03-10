@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTGui/EntityTreeItem.h"
-#include "OTGui/WidgetViewBase.h"
+#include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
 
 // Qt header

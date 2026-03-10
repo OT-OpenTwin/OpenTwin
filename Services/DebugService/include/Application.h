@@ -56,7 +56,8 @@ public:
 	void testTableMedium();
 	void testTableBig();
 	
-	void createPlotOneComplexCurve();
+	void createPlotOneComplexCurveMagPhase();
+	void createPlotOneComplexCurveRealImag();
 	void createPlotOneCurve();
 	void createPlotTwoCurves();
 	void createPlot2_1Mil();

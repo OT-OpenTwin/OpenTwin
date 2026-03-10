@@ -26,8 +26,8 @@
 #include "GraphicsItemDesignerViewStatusOverlay.h"
 
 // OpenTwin header
-#include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/GraphicsEllipseItem.h"
+#include "OTWidgets/Graphics/GraphicsScene.h"
+#include "OTWidgets/Graphics/GraphicsEllipseItem.h"
 
 GraphicsItemDesignerView::GraphicsItemDesignerView(GraphicsItemDesigner* _designer, QWidget* _parent)
 	: GraphicsView(_parent), m_designer(_designer), m_cursorItem(nullptr), m_drawHandler(nullptr), m_selectionChangeInProgress(false)

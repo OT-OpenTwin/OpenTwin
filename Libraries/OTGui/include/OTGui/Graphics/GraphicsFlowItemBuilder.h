@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
-#include "OTGui/Margins.h"
+#include "OTGui/Style/Margins.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsTriangleItemCfg.h"
 

@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/OverlayWidgetBase.h"
+#include "OTWidgets/Widgets/OverlayWidgetBase.h"
 
 // Qt header
 #include <QtCore/qstring.h>

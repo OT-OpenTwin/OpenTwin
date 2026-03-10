@@ -21,7 +21,7 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTWidgets/OTSVGDataParser.h"
-#include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
 
 // std header
 #include <map>

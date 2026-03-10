@@ -28,6 +28,7 @@
 #include "BlendEdges.h"
 #include "EntityCache.h"
 #include "PrimitiveManager.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include "OTModelEntities/EntityAPI.h"
 
@@ -243,7 +244,10 @@ bool UpdateManager::updateBooleanParent(const std::string &type, EntityGeometry 
 	EntityPropertiesString *baseShapeProperty = dynamic_cast<EntityPropertiesString*>(geomEntity->getProperties().getProperty("baseShape"));
 	assert(baseShapeProperty != nullptr);
 
-	ot::UID baseShapeID = std::stoull(baseShapeProperty->getValue());
+	std::string baseShapeName = geomEntity->getName() + "/" + baseShapeProperty->getValue();
+	ot::EntityInformation info;
+	ot::ModelServiceAPI::getEntityInformation(baseShapeName, info);
+	ot::UID baseShapeID = info.getEntityID();
 
 	if (entityVersionMap.count(baseShapeID) == 0)
 	{
@@ -256,7 +260,9 @@ bool UpdateManager::updateBooleanParent(const std::string &type, EntityGeometry 
 	EntityPropertiesString *toolShapeProperty = dynamic_cast<EntityPropertiesString*>(geomEntity->getProperties().getProperty("toolShapes"));
 	assert(toolShapeProperty != nullptr);
 
-	std::list<ot::UID> toolShapeID = splitString(toolShapeProperty->getValue());
+	std::list<std::string> toolShapeNames = splitString(geomEntity->getName(), toolShapeProperty->getValue());
+	std::list<ot::EntityInformation> toolList;
+	ot::ModelServiceAPI::getEntityInformation(toolShapeNames, toolList);
 
 	// Prefetch all necessary breps
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchData;
@@ -264,13 +270,13 @@ bool UpdateManager::updateBooleanParent(const std::string &type, EntityGeometry 
 
 	int toolShapeCount = 0;
 
-	for (auto entity : toolShapeID)
+	for (auto entity : toolList)
 	{
-		if (entityVersionMap.count(entity) != 0)
+		if (entityVersionMap.count(entity.getEntityID()) != 0)
 		{
 			toolShapeCount++;
 
-			prefetchData.push_back(std::pair<unsigned long long, unsigned long long>(entity, entityVersionMap[entity]));
+			prefetchData.push_back(std::pair<unsigned long long, unsigned long long>(entity.getEntityID(), entityVersionMap[entity.getEntityID()]));
 		}
 	}
 
@@ -298,8 +304,10 @@ bool UpdateManager::updateBooleanParent(const std::string &type, EntityGeometry 
 	prefetchBrepData.push_back(std::pair<unsigned long long, unsigned long long>(baseBrepID, baseBrepVersion));
 
 	std::list<std::pair<unsigned long long, unsigned long long>> toolBrepsIds;
-	for (auto entityID : toolShapeID)
+	for (auto tool : toolList)
 	{
+		ot::UID entityID = tool.getEntityID();
+
 		assert(entityVersionMap.count(entityID) != 0);
 
 		EntityGeometry *toolShape = dynamic_cast<EntityGeometry*>(entityCache->getEntity(entityID, entityVersionMap[entityID]));
@@ -350,22 +358,22 @@ bool UpdateManager::updateBooleanParent(const std::string &type, EntityGeometry 
 	return success;
 }
 
-std::list<ot::UID> UpdateManager::splitString(std::string value)
+std::list<std::string> UpdateManager::splitString(const std::string& parentName, std::string value)
 {
-	std::list<ot::UID> ids;
+	std::list<std::string> nameList;
 
 	while (!value.empty())
 	{
-		size_t index = value.find(',');
+		size_t index = value.find('\n');
 		assert(index != value.npos);
 
 		std::string id = value.substr(0, index);
 		value = value.substr(index + 1);
 
-		ids.push_back(std::stoull(id));
+		nameList.push_back(parentName + "/" + id);
 	}
 
-	return ids;
+	return nameList;
 }
 
 std::list<ot::UID> UpdateManager::updateEntities(std::list<ot::UID> &entityIDs, std::list<ot::UID> &entityVersions, std::list<ot::UID> &brepVersions, bool itemsVisible)

@@ -5,12 +5,12 @@
 #include "ProjectHelperBatchHelper.h"
 #include "ProjectHelperBatchHelperCustomItem.h"
 #include "ProjectHelperBatchHelperProjectItem.h"
-#include "OTWidgets/Label.h"
-#include "OTWidgets/LineEdit.h"
-#include "OTWidgets/PushButton.h"
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/TreeWidgetItem.h"
-#include "OTWidgets/TreeWidgetFilter.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/LineEdit.h"
+#include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
+#include "OTWidgets/Widgets/TreeWidgetItem.h"
+#include "OTWidgets/Widgets/TreeWidgetFilter.h"
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // Qt header

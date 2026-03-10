@@ -21,10 +21,7 @@
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
-#include "OTGui/ToolBarButtonCfg.h"
-// C++ header
-#include <string>
-
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
 #include "BlockEntityHandler.h"
 #include "PipelineHandler.h"
 #include "PropertyHandlerDatabaseAccessBlock.h"
@@ -33,6 +30,9 @@
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "EntityCreator.h"
+
+// std header
+#include <string>
 
 // Forward declaration
 namespace ot {

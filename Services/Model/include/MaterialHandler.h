@@ -19,7 +19,7 @@
 
 #pragma once
 #include "SelectionChangedObserver.h"
-#include "OTGui/ToolBarButtonCfg.h"
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTModelEntities/EntityMaterial.h"

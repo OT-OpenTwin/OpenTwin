@@ -17,15 +17,16 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTModelEntities/EntityResult1DCurve.h"
-#include "OTModelEntities/PropertyHelper.h"
-#include "OTCommunication/ActionTypes.h"
+// OpenTwin header
 #include "OTCore/EntityName.h"
-#include "OTGui/ColorStyleTypes.h"
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/Dialog/Painter2DDialogFilterDefaults.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Style/ColorStyleTypes.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/EntityResult1DCurve.h"
+#include "OTModelEntities/PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntityResult1DCurve> registrar("EntityResult1DCurve");
 
@@ -157,7 +158,7 @@ void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
 	colorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
 
 	// Line width
-	EntityPropertiesInteger* widthProp = EntityPropertiesInteger::createProperty("General", "Line Width", 1, 1, 99, "", getProperties());
+	EntityPropertiesInteger* widthProp = EntityPropertiesInteger::createProperty("General", "Line Width", 2, 1, 99, "", getProperties());
 	widthProp->setToolTip("The width of the curve line in the plot.");
 	widthProp->setAllowCustomValues(false);
 
@@ -256,9 +257,10 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 		const ot::Painter2D* symbolFillPainter = PropertyHelper::getPainterPropertyValue(this, "Symbol Fill Color");
 		curveCfg.setPointFillPainter(symbolFillPainter->createCopy());
 	}
-	catch (...) {
+	catch (const std::exception& _e) {
+		OT_LOG_T("Legacy curve: " + std::string(_e.what()));
 		// Legacy
-		penCfg.setWidth(1);
+		penCfg.setWidth(2);
 		penCfg.setStyle(ot::LineStyle::SolidLine);
 
 		curveCfg.setPointSymbol(ot::Plot1DCurveCfg::NoSymbol);

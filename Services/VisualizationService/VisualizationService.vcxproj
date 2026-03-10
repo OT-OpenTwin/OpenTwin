@@ -205,6 +205,7 @@
     <ClCompile Include="src\VtkDriverUnstructuredScalarVolume.cpp" />
     <ClCompile Include="src\VtkDriverUnstructuredVectorSurface.cpp" />
     <ClCompile Include="src\VtkDriverUnstructuredVectorVolume.cpp" />
+    <ClCompile Include="src\VtkDriverWithScaling.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
@@ -227,6 +228,7 @@
     <ClInclude Include="include\VtkDriverUnstructuredScalarVolume.h" />
     <ClInclude Include="include\VtkDriverUnstructuredVectorSurface.h" />
     <ClInclude Include="include\VtkDriverUnstructuredVectorVolume.h" />
+    <ClInclude Include="include\VtkDriverWithScaling.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

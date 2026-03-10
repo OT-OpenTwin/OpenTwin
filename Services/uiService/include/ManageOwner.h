@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/Table.h"
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Widgets/Table.h"
+#include "OTWidgets/Dialog/Dialog.h"
 
 namespace ot {
 	class LineEdit;

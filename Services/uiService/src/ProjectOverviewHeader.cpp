@@ -21,8 +21,8 @@
 #include "ProjectOverviewHeader.h"
 #include "ProjectOverviewWidget.h"
 #include "ProjectOverviewFilter.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Style/GlobalColorStyle.h"
 
 // Qt header
 #include <QtGui/qevent.h>

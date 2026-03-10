@@ -23,7 +23,7 @@
 #include "GraphicsItemDesignerImageExportConfig.h"
 
 // OpenTwin header
-#include "OTWidgets/Dialog.h"
+#include "OTWidgets/Dialog/Dialog.h"
 
 // Qt header
 #include <QtGui/qimage.h>

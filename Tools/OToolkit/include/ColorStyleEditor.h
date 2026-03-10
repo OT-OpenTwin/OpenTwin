@@ -22,8 +22,8 @@
 // Toolkit API header
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/Color.h"
-#include "OTGui/ColorStyleTypes.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 #include "OToolkitAPI/Tool.h"
 
 // Qt header

@@ -67,33 +67,34 @@
 #include "OTGui/Properties/PropertyStringList.h"
 
 // OpenTwin Widgets header
-#include "OTWidgets/Table.h"
-#include "OTWidgets/PlotView.h"
+#include "OTWidgets/Widgets/Table.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/TableView.h"
-#include "OTWidgets/TextEditor.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/TemporaryDir.h"
-#include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/PropertyInput.h"
-#include "OTWidgets/MessageDialog.h"
-#include "OTWidgets/GraphicsPicker.h"
-#include "OTWidgets/TextEditorView.h"
-#include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/OTSVGDataParser.h"
-#include "OTWidgets/GraphicsViewView.h"
-#include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/OnePropertyDialog.h"
-#include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/ModelLibraryDialog.h"
-#include "OTWidgets/GraphicsLayoutItem.h"
-#include "OTWidgets/GraphicsItemFactory.h"
-#include "OTWidgets/StyledTextConverter.h"
-#include "OTWidgets/VersionGraphManager.h"
-#include "OTWidgets/GlobalWidgetViewManager.h"
-#include "OTWidgets/VersionGraphManagerView.h"
+
+#include "OTWidgets/Dialog/MessageDialog.h"
+#include "OTWidgets/Dialog/ModelLibraryDialog.h"
+#include "OTWidgets/Graphics/GraphicsItem.h"
+#include "OTWidgets/Graphics/GraphicsScene.h"
+#include "OTWidgets/Graphics/GraphicsPicker.h"
+#include "OTWidgets/Graphics/GraphicsLayoutItem.h"
+#include "OTWidgets/Graphics/GraphicsItemFactory.h"
+#include "OTWidgets/Properties/PropertyGrid.h"
+#include "OTWidgets/Properties/PropertyInput.h"
+#include "OTWidgets/Properties/PropertyDialog.h"
+#include "OTWidgets/Properties/PropertyGridItem.h"
+#include "OTWidgets/Properties/OnePropertyDialog.h"
+#include "OTWidgets/Properties/PropertyGridGroup.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Style/StyledTextConverter.h"
+#include "OTWidgets/Version/VersionGraphManager.h"
+#include "OTWidgets/Widgets/TextEditor.h"
+#include "OTWidgets/WidgetView/PlotView.h"
+#include "OTWidgets/WidgetView/TableView.h"
+#include "OTWidgets/WidgetView/TextEditorView.h"
+#include "OTWidgets/WidgetView/GraphicsViewView.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
+#include "OTWidgets/WidgetView/VersionGraphManagerView.h"
 
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 
@@ -693,13 +694,16 @@ ot::Property* ExternalServicesComponent::createCleanedProperty(const ot::Propert
 		propertyList.front()->addAdditionalPropertyData("EntityData", newDataDoc.toJson());
 	}
 
+	OTAssertNullptr(propertyList.front()->getRootGroup());
 	return propertyList.front();
 }
 
-void ExternalServicesComponent::propertyGridValueChanged(const ot::Property* _property) {
+void ExternalServicesComponent::propertyGridValuesChanged(const std::list<const ot::Property*>& _properties) {
+	using namespace ot;
+
 	try {
 		// Get the currently selected model entities. We first get all visible entities only.
-		std::list<ot::UID> selectedModelEntityIDs;
+		UIDList selectedModelEntityIDs;
 		getSelectedVisibleModelEntityIDs(selectedModelEntityIDs);
 		bool itemsVisible = true;
 
@@ -710,32 +714,43 @@ void ExternalServicesComponent::propertyGridValueChanged(const ot::Property* _pr
 			itemsVisible = false;
 		}
 
-		// Finally send the string
-		ot::UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
+		// Determine active data model
+		const UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
 
-		ot::Property* cleanedProperty = this->createCleanedProperty(_property);
-		if (!cleanedProperty) {
-			OT_LOG_EA("Failed to create cleaned property");
-			return;
+		// Prepare the configuration
+		PropertyGridCfg newConfig;
+
+		for (const Property* prop : _properties) {
+			Property* cleanedProperty = this->createCleanedProperty(prop);
+			if (!cleanedProperty) {
+				OT_LOG_EA("Failed to create cleaned property");
+				return;
+			}
+
+			std::unique_ptr<PropertyGroup> newRoot(cleanedProperty->getRootGroup());
+
+			ot::PropertyGroup* existingGroup = newConfig.findGroup(newRoot->getName(), false);
+			if (existingGroup) {
+				existingGroup->mergeWith(*newRoot, Property::FullMerge);
+			}
+			else {
+				newConfig.addRootGroup(newRoot.release());
+			}
 		}
 
-		ot::PropertyGridCfg newConfig;
-		newConfig.addRootGroup(cleanedProperty->getRootGroup());
-
-		ot::JsonDocument doc;
-		ot::JsonObject cfgObj;
-		newConfig.addToJsonObject(cfgObj, doc.GetAllocator());
-
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
+		// Prepare JSON document
+		JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Config, JsonObject(newConfig, doc.GetAllocator()), doc.GetAllocator());
 
+		// Notify all listeners
 		std::string response;
-
-		for (auto reciever : m_modelViewNotifier) {
+		
+		for (const ServiceDataUi* reciever : m_modelViewNotifier) {
 			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -744,6 +759,113 @@ void ExternalServicesComponent::propertyGridValueChanged(const ot::Property* _pr
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
 				OT_LOG_W(response);
 			}
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+}
+
+void ExternalServicesComponent::propertyGridValueChangedTemporarly(const ot::Property* _property)
+{
+	using namespace ot;
+
+	try {
+		// Get the currently selected model entities. We first get all visible entities only.
+		UIDList selectedModelEntityIDs;
+		getSelectedVisibleModelEntityIDs(selectedModelEntityIDs);
+		bool itemsVisible = true;
+
+		// If we do not have visible entities, then we also look for the hidden ones.
+		if (selectedModelEntityIDs.empty())
+		{
+			getSelectedModelEntityIDs(selectedModelEntityIDs);
+			itemsVisible = false;
+		}
+
+		// Determine active data model
+		const UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
+
+		// Prepare the configuration
+		PropertyGridCfg newConfig;
+
+		Property* cleanedProperty = this->createCleanedProperty(_property);
+		if (!cleanedProperty) {
+			OT_LOG_EA("Failed to create cleaned property");
+			return;
+		}
+
+		OTAssertNullptr(cleanedProperty->getRootGroup());
+		newConfig.addRootGroup(cleanedProperty->getRootGroup());
+
+		// Prepare JSON document
+		JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_SetTemporaryProperties, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Config, JsonObject(newConfig, doc.GetAllocator()), doc.GetAllocator());
+
+		// Notify all listeners
+		std::string response;
+
+		for (const ServiceDataUi* reciever : m_modelViewNotifier) {
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
+			// Check if response is an error or warning
+			OT_ACTION_IF_RESPONSE_ERROR(response) {
+				OT_LOG_E(response);
+			}
+			else OT_ACTION_IF_RESPONSE_WARNING(response) {
+				OT_LOG_W(response);
+			}
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+}
+
+void ExternalServicesComponent::temporaryPropertyChangeCleared()
+{
+	using namespace ot;
+
+	try {
+		// Get the currently selected model entities. We first get all visible entities only.
+		UIDList selectedModelEntityIDs;
+		getSelectedVisibleModelEntityIDs(selectedModelEntityIDs);
+		bool itemsVisible = true;
+
+		// If we do not have visible entities, then we also look for the hidden ones.
+		if (selectedModelEntityIDs.empty())
+		{
+			getSelectedModelEntityIDs(selectedModelEntityIDs);
+			itemsVisible = false;
+		}
+
+		// Determine active data model
+		const UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
+
+		// Prepare JSON document
+		JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ClearTemporaryPropertyChanges, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
+		
+		// Notify all listeners
+		std::string response;
+
+		for (const ServiceDataUi* reciever : m_modelViewNotifier) {
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
+			// Check if response is an error or warning
+			OT_ACTION_IF_RESPONSE_ERROR(response) {
+				OT_LOG_E(response);
+			}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			OT_LOG_W(response);
+		}
 		}
 	}
 	catch (const std::exception& _e) {
@@ -2830,7 +2952,9 @@ void ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _document
 	ot::UID visualizationDataID = _document[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
 	ot::UID visualizationDataVersion = _document[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
 
-	ViewerAPI::addVTKNode(visModelID, item, isHidden, collectionName, visualizationDataID, visualizationDataVersion);
+	std::string colorRampData = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ColorRamp);
+
+	ViewerAPI::addVTKNode(visModelID, item, isHidden, collectionName, visualizationDataID, visualizationDataVersion, colorRampData);
 }
 
 void ExternalServicesComponent::handleAddAnnotationNode(ot::JsonDocument& _document) {
@@ -2948,8 +3072,9 @@ void ExternalServicesComponent::handleUpdateVis2D3DNode(ot::JsonDocument& _docum
 
 	ot::UID visualizationDataID = _document[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
 	ot::UID visualizationDataVersion = _document[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
+	std::string colorRampData = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ColorRamp);
 
-	ViewerAPI::updateVTKNode(visModelID, modelEntityID, projectName, visualizationDataID, visualizationDataVersion);
+	ViewerAPI::updateVTKNode(visModelID, modelEntityID, projectName, visualizationDataID, visualizationDataVersion, colorRampData);
 }
 
 void ExternalServicesComponent::handleUpdateObjectColor(ot::JsonDocument& _document) {
@@ -3603,16 +3728,15 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 		const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, insertFlags, visualisationCfg.getVisualisingEntities());
 		ot::Plot* plot = plotView->getPlot();
 
-		const ot::Plot1DCfg& oldConfig = plot->getConfig();
-		if (plotConfig.getXLabelAxisAutoDetermine())
+		// Copy data labels from old config since they are set while loading plot data
 		{
-			plotConfig.setAxisLabelX(oldConfig.getAxisLabelX());
+			const ot::Plot1DCfg& oldConfig = plot->getConfig();
+			plotConfig.setDataLabelX(oldConfig.getDataLabelX());
+			plotConfig.setDataLabelY(oldConfig.getDataLabelY());
+			plotConfig.setUnitLabelX(oldConfig.getUnitLabelX());
+			plotConfig.setUnitLabelY(oldConfig.getUnitLabelY());
+			plot->setConfig(std::move(plotConfig));
 		}
-		if (plotConfig.getYLabelAxisAutoDetermine())
-		{
-			plotConfig.setAxisLabelY(oldConfig.getAxisLabelY());
-		}
-		plot->setConfig(std::move(plotConfig));
 
 		// Now we refresh the plot visualisation.
 		plot->refresh();

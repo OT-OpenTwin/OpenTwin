@@ -29,9 +29,9 @@
 #include "ProjectOverviewPreviewBox.h"
 #include "OTSystem/DateTime.h"
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/Label.h"
-#include "OTWidgets/LineEdit.h"
-#include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/LineEdit.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
 #include "OTModelEntities/ModelState.h"
 
 // Qt header

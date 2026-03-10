@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/Painter/Painter2D.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/Style/ColorStyleTypes.h"
 
 // std header
 #include <string>

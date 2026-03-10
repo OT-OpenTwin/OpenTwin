@@ -17,6 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
+#include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/PropertyHelper.h"
 #include "OTCore/Logging/LogDispatcher.h"
 
@@ -42,6 +43,40 @@ bool PropertyHelper::hasProperty(EntityBase* _base, const std::string& _name, co
 		}
 	}
 	return false;
+}
+
+EntityPropertiesBase* PropertyHelper::getPropertyBase(EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
+	if (propertyBase == nullptr)
+	{
+		std::string msg = "Failed to access property { \"Name\": \"" + _name + "\", \"Group\": \"" + _groupName + "\"}";
+		throw ot::Exception::ObjectNotFound(msg);
+	}
+
+	return propertyBase;
+}
+
+const EntityPropertiesBase* PropertyHelper::getPropertyBase(const EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
+	if (propertyBase == nullptr)
+	{
+		std::string msg = "Failed to access property { \"Name\": \"" + _name + "\", \"Group\": \"" + _groupName + "\"}";
+		throw ot::Exception::ObjectNotFound(msg);
+	}
+
+	return propertyBase;
+}
+
+void PropertyHelper::setPropertyVisible(bool _visible, EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	getPropertyBase(_base, _name, _groupName)->setVisible(_visible);
+}
+
+bool PropertyHelper::getPropertyVisible(const EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	return getPropertyBase(_base, _name, _groupName)->getVisible();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -119,22 +154,8 @@ ot::UID PropertyHelper::getEntityListPropertyValueID(const EntityBase* _base, co
 
 const EntityPropertiesProjectList* PropertyHelper::getEntityProjectListProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr)
-	{
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	const EntityPropertiesProjectList* entitySelection = dynamic_cast<const EntityPropertiesProjectList*>(propertyBase);
-	if (entitySelection == nullptr)
-	{
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: entity project selection").c_str());
-	}
-
-	return entitySelection;
+	return getProperty<EntityPropertiesProjectList>(_base, _name, _groupName);
 }
-
-
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -171,7 +192,7 @@ void PropertyHelper::setBoolPropertyValue(bool _value, EntityBase* _base, const 
 	booleanProeprty->setValue(_value);
 }
 
-void PropertyHelper::setColourPropertyValue(ot::Color _value, EntityBase* _base, const std::string& _name, const std::string& _groupName) {
+void PropertyHelper::setColourPropertyValue(const ot::Color& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName) {
 	EntityPropertiesColor* colourProperty = getColourProperty(_base, _name, _groupName);
 
 	const double gridColorR = (static_cast<double>(_value.r()) - 0.5) / 255.0;
@@ -198,130 +219,42 @@ void PropertyHelper::setIntegerPropertyValue(int32_t _value, EntityBase* _base, 
 
 EntityPropertiesDouble* PropertyHelper::getDoubleProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr)
-	{
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	EntityPropertiesDouble* doubleProperty = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
-	if (doubleProperty == nullptr)
-	{
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: double").c_str());
-	}
-	return doubleProperty;
+	return getProperty<EntityPropertiesDouble>(_base, _name, _groupName);
 }
 
 EntityPropertiesString* PropertyHelper::getStringProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr)
-	{
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	EntityPropertiesString* stringProperty = dynamic_cast<EntityPropertiesString*>(propertyBase);
-	if (stringProperty == nullptr)
-	{
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: string").c_str());
-	}
-	return stringProperty;
+	return getProperty<EntityPropertiesString>(_base, _name, _groupName);
 }
 
 EntityPropertiesSelection* PropertyHelper::getSelectionProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr)
-	{
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-	EntityPropertiesSelection* selectionProperty = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
-	if (selectionProperty == nullptr)
-	{
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: string").c_str());
-	}
-	return selectionProperty;
+	return getProperty<EntityPropertiesSelection>(_base, _name, _groupName);
 }
 
 EntityPropertiesBoolean* PropertyHelper::getBoolProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr)
-	{
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	EntityPropertiesBoolean* boolProperty = dynamic_cast<EntityPropertiesBoolean*>(propertyBase);
-	if (boolProperty == nullptr)
-	{
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: bool").c_str());
-	}
-	return boolProperty;
+	return getProperty<EntityPropertiesBoolean>(_base, _name, _groupName);
 }
 
 EntityPropertiesColor* PropertyHelper::getColourProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr)
-	{
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	EntityPropertiesColor* colourProperty = dynamic_cast<EntityPropertiesColor*>(propertyBase);
-	if (colourProperty == nullptr)
-	{
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: bool").c_str());
-	}
-	return colourProperty;
+	return getProperty<EntityPropertiesColor>(_base, _name, _groupName);
 }
 
 EntityPropertiesInteger* PropertyHelper::getIntegerProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr)
-	{
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	EntityPropertiesInteger* intProperty = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
-	if (intProperty == nullptr)
-	{
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: integer").c_str());
-	}
-	return intProperty;
+	return getProperty<EntityPropertiesInteger>(_base, _name, _groupName);
 }
 
 EntityPropertiesGuiPainter* PropertyHelper::getPainterProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr)
-	{
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	EntityPropertiesGuiPainter* painter = dynamic_cast<EntityPropertiesGuiPainter*>(propertyBase);
-	if (painter== nullptr)
-	{
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: integer").c_str());
-	}
-	return painter;
+	return getProperty<EntityPropertiesGuiPainter>(_base, _name, _groupName);
 }
 
 EntityPropertiesEntityList* PropertyHelper::getEntityListProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr)
-	{
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	EntityPropertiesEntityList* entitySelection = dynamic_cast<EntityPropertiesEntityList*>(propertyBase);
-	if (entitySelection == nullptr)
-	{
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: entity selection").c_str());
-	}
-
-	return entitySelection;
+	return getProperty<EntityPropertiesEntityList>(_base, _name, _groupName);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -329,105 +262,33 @@ EntityPropertiesEntityList* PropertyHelper::getEntityListProperty(EntityBase* _b
 // Read-only property access
 
 const EntityPropertiesDouble* PropertyHelper::getDoubleProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName) {
-	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr) {
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	const EntityPropertiesDouble* doubleProperty = dynamic_cast<const EntityPropertiesDouble*>(propertyBase);
-	if (doubleProperty == nullptr) {
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: double").c_str());
-	}
-	return doubleProperty;
+	return getProperty<EntityPropertiesDouble>(_base, _name, _groupName);
 }
 
 const EntityPropertiesString* PropertyHelper::getStringProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName) {
-	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr) {
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	const EntityPropertiesString* stringProperty = dynamic_cast<const EntityPropertiesString*>(propertyBase);
-	if (stringProperty == nullptr) {
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: string").c_str());
-	}
-	return stringProperty;
+	return getProperty<EntityPropertiesString>(_base, _name, _groupName);
 }
 
 const EntityPropertiesSelection* PropertyHelper::getSelectionProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName) {
-	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr) {
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-	const EntityPropertiesSelection* selectionProperty = dynamic_cast<const EntityPropertiesSelection*>(propertyBase);
-	if (selectionProperty == nullptr) {
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: string").c_str());
-	}
-	return selectionProperty;
+	return getProperty<EntityPropertiesSelection>(_base, _name, _groupName);
 }
 
 const EntityPropertiesBoolean* PropertyHelper::getBoolProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName) {
-	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr) {
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	const EntityPropertiesBoolean* boolProperty = dynamic_cast<const EntityPropertiesBoolean*>(propertyBase);
-	if (boolProperty == nullptr) {
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: bool").c_str());
-	}
-	return boolProperty;
+	return getProperty<EntityPropertiesBoolean>(_base, _name, _groupName);
 }
 
 const EntityPropertiesColor* PropertyHelper::getColourProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName) {
-	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr) {
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	const EntityPropertiesColor* colourProperty = dynamic_cast<const EntityPropertiesColor*>(propertyBase);
-	if (colourProperty == nullptr) {
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: bool").c_str());
-	}
-	return colourProperty;
+	return getProperty<EntityPropertiesColor>(_base, _name, _groupName);
 }
 
 const EntityPropertiesInteger* PropertyHelper::getIntegerProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName) {
-	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr) {
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	const EntityPropertiesInteger* intProperty = dynamic_cast<const EntityPropertiesInteger*>(propertyBase);
-	if (intProperty == nullptr) {
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: integer").c_str());
-	}
-	return intProperty;
+	return getProperty<EntityPropertiesInteger>(_base, _name, _groupName);
 }
 
 const EntityPropertiesGuiPainter* PropertyHelper::getPainterProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName) {
-	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr) {
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	const EntityPropertiesGuiPainter* painter = dynamic_cast<const EntityPropertiesGuiPainter*>(propertyBase);
-	if (painter == nullptr) {
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: integer").c_str());
-	}
-	return painter;
+	return getProperty<EntityPropertiesGuiPainter>(_base, _name, _groupName);
 }
 
 const EntityPropertiesEntityList* PropertyHelper::getEntityListProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName) {
-	const EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
-	if (propertyBase == nullptr) {
-		throw std::exception(("Failed to access property " + _name).c_str());
-	}
-
-	const EntityPropertiesEntityList* entitySelection = dynamic_cast<const EntityPropertiesEntityList*>(propertyBase);
-	if (entitySelection == nullptr) {
-		throw std::exception(("Tried to cast property " + _name + " to wrong type: entity selection").c_str());
-	}
-
-	return entitySelection;
+	return getProperty<EntityPropertiesEntityList>(_base, _name, _groupName);
 }

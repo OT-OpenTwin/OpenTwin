@@ -3,9 +3,9 @@
 // OpenTwin header
 #include "SDSLSSEntry.h"
 #include "SDSServiceEntry.h"
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/PushButton.h"
-#include "OTWidgets/TreeWidgetFilter.h"
+#include "OTWidgets/Widgets/TreeWidget.h"
+#include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/TreeWidgetFilter.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/LSSDebugInfo.h"

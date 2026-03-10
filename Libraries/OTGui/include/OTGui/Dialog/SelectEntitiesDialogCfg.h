@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/NavigationTreeItem.h"
-#include "OTGui/NavigationTreePackage.h"
+#include "OTGui/Widgets/NavigationTreeItemCfg.h"
+#include "OTGui/Widgets/NavigationTreeCfg.h"
 
 // std header
 #include <list>
@@ -29,7 +29,8 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT SelectEntitiesDialogCfg : public NavigationTreePackage {
+	class OT_GUI_API_EXPORT SelectEntitiesDialogCfg : public NavigationTreeCfg
+	{
 	public:
 		SelectEntitiesDialogCfg();
 		virtual ~SelectEntitiesDialogCfg();

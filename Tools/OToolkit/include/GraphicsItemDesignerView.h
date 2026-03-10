@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/Graphics/GraphicsView.h"
 
 class GraphicsItemDesigner;
 class GraphicsItemDesignerScene;

@@ -22,8 +22,8 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTWidgets/Splitter.h"
-#include "OTWidgets/BasicWidgetView.h"
+#include "OTWidgets/Widgets/Splitter.h"
+#include "OTWidgets/WidgetView/BasicWidgetView.h"
 
 // Qt header
 #include <QtCore/qdir.h>

@@ -20,11 +20,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSON/JSON.h"
-#include "OTCore/CoreTypes.h"
-#include "OTGui/WidgetViewBase.h"
 #include "VisualiserInfo.h"
 #include "VisualiserState.h"
+#include "OTCore/JSON/JSON.h"
+#include "OTCore/CoreTypes.h"
+#include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTGui/VisualisationCfg.h"
 
 // std header

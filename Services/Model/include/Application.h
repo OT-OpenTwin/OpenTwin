@@ -141,6 +141,8 @@ public:
 
 	std::string handleGetEntityChildInformationByID(ot::JsonDocument& _document);
 
+	std::string handleGetAllGeometryEntities(ot::JsonDocument& _document);
+
 	std::string handleGetAllGeometryEntitiesForMeshing(ot::JsonDocument& _document);
 
 	std::string handleGetCurrentVisualizationModelID();
@@ -168,6 +170,8 @@ public:
 	// Action handler: Properties
 
 	void handleSetPropertiesFromJSON(ot::JsonDocument& _document);
+	void handleSetTemporaryPropertiesFromJson(ot::JsonDocument& _document);
+	void handleClearTemporaryPropertyChanges(ot::JsonDocument& _document);
 
 	std::string handleGetEntityProperties(ot::JsonDocument& _document);
 

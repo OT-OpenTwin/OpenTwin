@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/EntityTreeItem.h"
-#include "OTWidgets/WidgetBase.h"
+#include "OTWidgets/Widgets/WidgetBase.h"
 
  // AK header
 #include <akCore/globalDataTypes.h>

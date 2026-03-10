@@ -29,12 +29,12 @@ class __declspec(dllexport) EntityVis2D3D : public EntityContainer
 {
 public:
 	EntityVis2D3D() : EntityVis2D3D(0, nullptr, nullptr, nullptr) {};
-	EntityVis2D3D(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
+	EntityVis2D3D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
 	virtual ~EntityVis2D3D();
 
 	virtual void addVisualizationNodes(void) override;
 
-	virtual std::string getClassName(void) const override { return "EntityVis2D3D"; } ;
+	virtual std::string getClassName(void) const override { return "EntityVis2D3D"; };
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
@@ -58,6 +58,8 @@ public:
 	void setSource(ot::UID id, ot::UID version) { sourceID = id; sourceVersion = version; }
 	void setMesh(ot::UID id, ot::UID version) { meshID = id; meshVersion = version; }
 
+	virtual void setGlobalRange(double minValue, double maxValue) { assert(0); };
+
 	//void ensureSourceDataLoaded(void);
 
 	ot::UID getSourceID(void) { return sourceID; }
@@ -65,6 +67,8 @@ public:
 
 	ot::UID getMeshID(void) { return meshID; }
 	ot::UID getMeshVersion(void) { return meshVersion; }
+
+	void setColorRampData(const std::string& _colorRampData) { colorRampData = _colorRampData; setModified(); }
 
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;
@@ -79,6 +83,7 @@ protected:
 	ot::UID meshID;
 	ot::UID meshVersion;
 	EntityResultBase::tResultType resultType;
+	std::string colorRampData;
 
 	// Temporary
 	//EntityResultBase *source;

@@ -26,11 +26,11 @@
 #include "OTCore/Serializable.h"
 
 // OpenTwin Gui header
-#include "OTGui/Font.h"
-#include "OTGui/Margins.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Transform.h"
 #include "OTGui/Graphics/GraphicsZValues.h"
+#include "OTGui/Style/Font.h"
+#include "OTGui/Style/Margins.h"
 
 // std header
 #include <map>

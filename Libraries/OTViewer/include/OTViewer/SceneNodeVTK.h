@@ -52,7 +52,7 @@ public:
 	
 	virtual bool isItem3D(void) const override { return true; };
 
-	void updateVTKNode(const std::string &projName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
+	void updateVTKNode(const std::string &projName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion, const std::string& colorRampData);
 
 private:
 	void deleteShapeNode(void);
@@ -64,5 +64,6 @@ private:
 	std::string projectName;
 	unsigned long long dataID;
 	unsigned long long dataVersion;
+	std::string colorRampData;
 };
 

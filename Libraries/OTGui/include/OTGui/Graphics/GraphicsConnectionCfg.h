@@ -24,8 +24,8 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTGui/PenCfg.h"
 #include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/Style/PenCfg.h"
 
 // std header
 #include <string>

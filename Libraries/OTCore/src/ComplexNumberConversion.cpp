@@ -1,16 +1,15 @@
 ﻿
-#include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
-#include "OTCore/Units/SI.h"
+#include "OTCore/Math.h"
 #include "OTCore/String.h"
-
+#include "OTCore/Units/SI.h"
+#include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 
 std::complex<double> ot::ComplexNumberConversion::polarToCartesian(const ComplexNumberDefinition& _complexNumberDefinition)
 {
-	constexpr double pi = 3.14159265358979323846;
 	double angle = 0;
 	if(_complexNumberDefinition.m_angleUnit == ot::SIUnits::Derived::getDegreeUnit())
 	{
-		angle = _complexNumberDefinition.m_secondValue * pi / 180.0; // Convert degrees to radians
+		angle = Math::degToRad(_complexNumberDefinition.m_secondValue);
 	}
 	else if(_complexNumberDefinition.m_angleUnit != SIUnits::Derived::getRadianUnit() && !_complexNumberDefinition.m_angleUnit.empty())
 	{

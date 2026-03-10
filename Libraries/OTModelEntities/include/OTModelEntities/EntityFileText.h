@@ -19,7 +19,7 @@
 
 #pragma once
 #include "OTCore/TextEncoding.h"
-#include "OTGui/TextEditorCfg.h"
+#include "OTGui/Widgets/TextEditorCfg.h"
 #include "OTModelEntities/EntityFile.h"
 #include "OTModelEntities/IVisualisationText.h"
 

@@ -23,7 +23,7 @@
 #include "OTStudioSuiteConnector/ProjectInformationDialog.h"
 
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/MessageBoxManager.h"
+#include "OTWidgets/Dialog/MessageBoxManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 #include "OTFrontendConnectorAPI/CommunicationAPI.h"

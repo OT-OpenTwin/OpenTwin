@@ -18,8 +18,9 @@
 // @otlicense-end
 
 #pragma once
-#include "OTModelEntities/PropertyBundle.h"
 
+// OpenTwin header
+#include "OTModelEntities/PropertyBundle.h"
 #include "OTModelEntities/PropertiesVisUnstructuredVector.h"
 
 class __declspec(dllexport) PropertyBundleVisUnstructuredVectorSurface : public PropertyBundle

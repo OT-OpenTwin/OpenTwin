@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/BasicEntityInformation.h"
-#include "OTGui/NavigationTreeItemIcon.h"
+#include "OTGui/Widgets/NavigationTreeItemIcon.h"
 
 namespace ot {
 

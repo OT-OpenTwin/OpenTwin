@@ -27,7 +27,6 @@
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Graphics/GraphicsArcItemCfg.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/GraphicsScene.h"
 
 static WrappedItemFactoryRegistrar<WrappedArcItem> arcRegistrar(ot::GraphicsArcItemCfg::className());
 

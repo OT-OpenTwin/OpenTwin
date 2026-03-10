@@ -21,9 +21,9 @@
 
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
-#include "OTGui/WidgetViewBase.h"
-#include "OTGui/Plot1DDataBaseCfg.h"
+#include "OTGui/Plot/Plot1DDataBaseCfg.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTWidgets/SelectionData.h"
 #include "OTModelEntities/Geometry.h"
 #include "SceneNodeBase.h"
@@ -40,6 +40,7 @@
 #include "OTGui/VisualisationTypes.h"
 #include "EdgeSelection.h"
 #include "FaceSelection.h"
+#include "ColorRamp.h"
 
 class Viewer;
 class SceneNodeGeometry;
@@ -103,8 +104,8 @@ public:
 	void addVisualizationCartesianMeshItemNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::vector<int>& _facesList, double _color[3]);
 	void visualizationTetMeshNodeTetEdges(unsigned long long modelEntityID, bool displayTetEdges);
 
-	void addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion);
-	void updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
+	void addVTKNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion, const std::string &colorRampData);
+	void updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion, const std::string& colorRampData);
 
 	SceneNodeBase* getSceneNodeByEntityID(ot::UID _modelEntityID) const;
 
@@ -187,7 +188,7 @@ public:
 	void   clearModalPropertyGrid();
 	void   setDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName, double value);
 	double getDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName);
-	bool   propertyGridValueChanged(const ot::Property* _property);
+	bool   propertyGridValuesChanged(const std::list<const ot::Property*>& _properties);
 
 	void lockSelectionAndModification(bool flag);
 
@@ -201,6 +202,11 @@ public:
 	void setHighlightLineWidth(double lineWidthValue);
 	void updateEdgeColorMode();
 	void updateMeshEdgeColor();
+
+	void setColorRamp(const std::string& itemName, const std::string& colorRampData);
+	void removeColorRamp(const std::string& itemName);
+	void setColorRampActive(const std::string& itemName, bool active);
+	void updateColorRamps();
 
 private:
 	// Methods
@@ -308,6 +314,7 @@ private:
 	osg::Matrix									   m_currentWorkingplaneTransformInverse;
 	ManipulatorBase*                               m_currentManipulator;
 	std::string									   m_activeCoordinateSystem;
+	std::map<std::string, ColorRamp>			   m_colorRampMap;
 
 	bool m_hasModalMenu;
 	std::string m_currentMenu;
