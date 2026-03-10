@@ -3844,7 +3844,7 @@ void AppBase::slotNavigationTreeContextMenuRequested(const QPoint& _pos)
 	{
 		return;
 	}
-
+	return;
 	ot::ContextMenu menu(menuCfg, this->mainWindow());
 
 	const QPoint globalPos = m_projectNavigation->getTree()->treeWidget()->mapToGlobal(_pos);
