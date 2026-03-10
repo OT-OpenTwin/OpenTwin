@@ -25,16 +25,24 @@ void ProjectHelperBatchHelperCustomItem::createFromPath(TreeWidget* _tree, TreeW
 		path.chop(1);
 	}
 
-	tryCreate(_tree, _parent, _slotItem, "Build All", path, "/Scripts/BuildAndTest/BuildAll.bat", false);
-	tryCreate(_tree, _parent, _slotItem, "Build Documentation", path, "/Scripts/BuildAndTest/BuildDocumentation.bat", false);
-	tryCreate(_tree, _parent, _slotItem, "Build Sphinx Documentation", path, "/Documentation/Developer/build.bat", false);
-	tryCreate(_tree, _parent, _slotItem, "Clean All", path, "/Scripts/BuildAndTest/CleanAll.bat", false);
-	tryCreate(_tree, _parent, _slotItem, "Create Deployment", path, "/Scripts/BuildAndTest/CreateDeployment.bat", true);
-	tryCreate(_tree, _parent, _slotItem, "Create Frontend Installer", path, "/Scripts/BuildAndTest/CreateFrontendInstaller.bat", false);
-	tryCreate(_tree, _parent, _slotItem, "Rebuild All", path, "/Scripts/BuildAndTest/RebuildAll.bat", false);
-	tryCreate(_tree, _parent, _slotItem, "Shutdown All", path, "/Scripts/BuildAndTest/ShutdownAll.bat", true);
-	tryCreate(_tree, _parent, _slotItem, "Test All", path, "/Scripts/BuildAndTest/TestAll.bat", false);
-	tryCreate(_tree, _parent, _slotItem, "Update Deployment", path, "/Scripts/BuildAndTest/UpdateDeploymentLibrariesOnly.bat", true);
+	tryCreate(_tree, _parent, _slotItem, "Build All", path, "/Scripts/BuildAndTest/BuildAll.bat", {}, false);
+	tryCreate(_tree, _parent, _slotItem, "Build Documentation", path, "/Scripts/BuildAndTest/BuildDocumentation.bat", {}, false);
+	tryCreate(_tree, _parent, _slotItem, "Build Sphinx Documentation", path, "/Documentation/Developer/build.bat", {}, false);
+	tryCreate(_tree, _parent, _slotItem, "Edit Sphinx Documentation (VSCode)", path, "/Documentation/Developer/EditInVsCode.bat", {}, true);
+	tryCreate(_tree, _parent, _slotItem, "Open Sphinx Documentation", path, "/Documentation/Developer/_build/html/index.html", {}, true);
+	tryCreate(_tree, _parent, _slotItem, "OpenTwin VSCode", path, "/Scripts/VSCode/OpenTwinVSCode.bat", {}, true);
+	tryCreate(_tree, _parent, _slotItem, "Clean All", path, "/Scripts/BuildAndTest/CleanAll.bat", {}, false);
+	tryCreate(_tree, _parent, _slotItem, "Create Deployment", path, "/Scripts/BuildAndTest/CreateDeployment.bat", {}, true);
+	tryCreate(_tree, _parent, _slotItem, "Create Frontend Installer", path, "/Scripts/BuildAndTest/CreateFrontendInstaller.bat", {}, false);
+	tryCreate(_tree, _parent, _slotItem, "Rebuild All", path, "/Scripts/BuildAndTest/RebuildAll.bat", {}, false);
+	tryCreate(_tree, _parent, _slotItem, "Shutdown All", path, "/Scripts/BuildAndTest/ShutdownAll.bat", {}, true);
+	tryCreate(_tree, _parent, _slotItem, "Test All", path, "/Scripts/BuildAndTest/TestAll.bat", {}, false);
+	tryCreate(_tree, _parent, _slotItem, "Update Deployment", path, "/Scripts/BuildAndTest/UpdateDeploymentLibrariesOnly.bat", {}, true);
+}
+
+void ProjectHelperBatchHelperCustomItem::createFromScript(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, const QString& _text, const QString& _rootPath, const QString& _scriptPath, const QStringList& _args, bool _detached, ProjectHelperBatchHelperCustomItem* _slotItem)
+{
+	tryCreate(_tree, _parent, _slotItem, _text, _rootPath, _scriptPath, _args, _detached);
 }
 
 void ProjectHelperBatchHelperCustomItem::referenceDestroyed(ProjectHelperBatchHelperItem* _reference) {
@@ -81,7 +89,7 @@ void ProjectHelperBatchHelperCustomItem::slotRunDetached() {
 		return;
 	}
 
-	if (ScriptRunner::runDetached(m_name, m_path, {}, m_rootPath)) {
+	if (ScriptRunner::runDetached(m_name, m_path, m_args, m_rootPath)) {
 		PHBH_LOG("Detached script executed successfully: \"" + m_path + "\"");
 	}
 	else {
@@ -99,7 +107,7 @@ void ProjectHelperBatchHelperCustomItem::slotRunnerFinished() {
 }
 
 ProjectHelperBatchHelperItem* ProjectHelperBatchHelperCustomItem::createFavItemImpl(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent) {
-	ProjectHelperBatchHelperCustomItem* itm = createItem(_tree, _parent, this, m_name, m_rootPath, m_path, m_detached);
+	ProjectHelperBatchHelperCustomItem* itm = createItem(_tree, _parent, this, m_name, m_rootPath, m_path, {}, m_detached);
 	if (itm) {
 		m_runButtonRef = itm->m_runButton;
 		m_stopButtonRef = itm->m_stopButton;
@@ -113,21 +121,22 @@ ProjectHelperBatchHelperCustomItem::ProjectHelperBatchHelperCustomItem() {
 	setCheckState(0, Qt::Unchecked);
 }
 
-void ProjectHelperBatchHelperCustomItem::tryCreate(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, ProjectHelperBatchHelperCustomItem* _slotItem, const QString& _text, const QString& _rootPath, const QString& _subPath, bool _detached) {
+void ProjectHelperBatchHelperCustomItem::tryCreate(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, ProjectHelperBatchHelperCustomItem* _slotItem, const QString& _text, const QString& _rootPath, const QString& _subPath, const QStringList& _args, bool _detached) {
 	QFile file(_rootPath + _subPath);
 	if (file.exists()) {
-		createItem(_tree, _parent, _slotItem, _text, _rootPath, _rootPath + _subPath, _detached);
+		createItem(_tree, _parent, _slotItem, _text, _rootPath, _rootPath + _subPath, _args, _detached);
 	}
 	else {
 		PHBH_LOGW("Batch file not found: \"" + _rootPath + _subPath + "\"");
 	}
 }
 
-ProjectHelperBatchHelperCustomItem* ProjectHelperBatchHelperCustomItem::createItem(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, ProjectHelperBatchHelperCustomItem* _slotItem, const QString& _text, const QString& _rootPath, const QString& _scriptPath, bool _detached) {
+ProjectHelperBatchHelperCustomItem* ProjectHelperBatchHelperCustomItem::createItem(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, ProjectHelperBatchHelperCustomItem* _slotItem, const QString& _text, const QString& _rootPath, const QString& _scriptPath, const QStringList& _args, bool _detached) {
 	ProjectHelperBatchHelperCustomItem* item = new ProjectHelperBatchHelperCustomItem;
 	item->m_name = _text;
 	item->m_path = _scriptPath;
 	item->m_rootPath = _rootPath;
+	item->m_args = _args;
 	item->m_detached = _detached;
 	item->setText(0, _text);
 
