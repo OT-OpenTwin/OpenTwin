@@ -37,13 +37,16 @@ namespace ot {
 		OT_DECL_NOCOPY(ContextMenuManager)
 		OT_DECL_NODEFAULT(ContextMenuManager)
 	public:
-		ContextMenuManager(QWidget* _widget);
+		ContextMenuManager(QWidget* _widget, Qt::ContextMenuPolicy _defaultMenuPolicy = Qt::NoContextMenu);
 		virtual ~ContextMenuManager();
 
 		void setMenu(const MenuCfg& _config);
 
+		void setDefaultMenuPolicy(Qt::ContextMenuPolicy _policy) { m_defaultMenuPolicy = _policy; };
+		Qt::ContextMenuPolicy getDefaultMenuPolicy() const { return m_defaultMenuPolicy; };
+
 	Q_SIGNALS:
-		void clearRequested(void);
+		void clearRequested();
 		void actionTriggered(const std::string& _actionName);
 
 	public Q_SLOTS:
@@ -56,6 +59,7 @@ namespace ot {
 		QWidget* m_widget;
 		MenuCfg m_config;
 		ContextMenu* m_menu;
+		Qt::ContextMenuPolicy m_defaultMenuPolicy;
 	};
 
 }

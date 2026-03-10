@@ -22,7 +22,7 @@
 #include "OTGui/Menu/MenuButtonCfg.h"
 #include "OTGui/Menu/MenuEntryCfgFactory.h"
 
-static ot::MenuEntryCfgFactoryRegistrar<ot::MenuButtonCfg> buttonRegistarar(ot::MenuEntryCfg::toString(ot::MenuEntryCfg::Button));
+static ot::MenuEntryCfgFactoryRegistrar<ot::MenuButtonCfg> buttonRegistarar(ot::MenuButtonCfg::className());
 
 std::string ot::MenuButtonCfg::toString(ButtonAction _action) {
 	switch (_action) {

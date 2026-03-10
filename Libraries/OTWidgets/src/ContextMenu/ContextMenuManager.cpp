@@ -22,10 +22,15 @@
 #include "OTWidgets/ContextMenu/ContextMenu.h"
 #include "OTWidgets/ContextMenu/ContextMenuManager.h"
 
-ot::ContextMenuManager::ContextMenuManager(QWidget* _widget) :
-	m_widget(_widget), m_menu(nullptr) 
+ot::ContextMenuManager::ContextMenuManager(QWidget* _widget, Qt::ContextMenuPolicy _defaultMenuPolicy) :
+	m_widget(_widget), m_menu(nullptr), m_defaultMenuPolicy(_defaultMenuPolicy)
 {
 	OTAssertNullptr(m_widget);
+	if (m_defaultMenuPolicy == Qt::CustomContextMenu) {
+		OT_LOG_EA("Default context menu policy should not be \"custom\"");
+		m_defaultMenuPolicy = Qt::NoContextMenu;
+	}
+	m_widget->setContextMenuPolicy(m_defaultMenuPolicy);
 }
 
 ot::ContextMenuManager::~ContextMenuManager() {
@@ -38,7 +43,7 @@ ot::ContextMenuManager::~ContextMenuManager() {
 void ot::ContextMenuManager::setMenu(const MenuCfg& _config) {
 	m_config = _config;
 
-	m_widget->setContextMenuPolicy((m_config.isEmpty() ? Qt::DefaultContextMenu : Qt::CustomContextMenu));
+	m_widget->setContextMenuPolicy((m_config.isEmpty() ? m_defaultMenuPolicy : Qt::CustomContextMenu));
 }
 
 void ot::ContextMenuManager::slotShowContextMenu(const QPoint& _pos) {

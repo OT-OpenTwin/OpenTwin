@@ -26,7 +26,7 @@ ot::MenuEntryCfgFactory& ot::MenuEntryCfgFactory::instance(void) {
 }
 
 ot::MenuEntryCfg* ot::MenuEntryCfgFactory::create(const ConstJsonObject& _jsonObject) {
-	return MenuEntryCfgFactory::instance().createFromJSON(_jsonObject, MenuEntryCfg::entryTypeJsonKey());
+	return MenuEntryCfgFactory::instance().createFromJSON(_jsonObject, MenuEntryCfg::classNameJsonKey());
 }
 
 ot::MenuEntryCfgFactory::MenuEntryCfgFactory() {

@@ -22,7 +22,7 @@
 #include "OTGui/Menu/MenuSeparatorCfg.h"
 #include "OTGui/Menu/MenuEntryCfgFactory.h"
 
-static ot::MenuEntryCfgFactoryRegistrar<ot::MenuCfg> menuRegistarar(ot::MenuEntryCfg::toString(ot::MenuEntryCfg::Menu));
+static ot::MenuEntryCfgFactoryRegistrar<ot::MenuCfg> menuRegistarar(ot::MenuCfg::className());
 
 ot::MenuCfg::MenuCfg() {
 

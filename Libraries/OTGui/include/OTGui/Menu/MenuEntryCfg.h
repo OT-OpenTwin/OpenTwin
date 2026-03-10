@@ -32,15 +32,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT MenuEntryCfg : public Serializable {
 	public:
-		enum EntryType {
-			Menu,
-			Button,
-			Separator
-		};
-
-		static std::string toString(EntryType _type);
-		static EntryType stringToEntryType(const std::string& _type);
-		static const std::string& entryTypeJsonKey(void);
+		static const std::string& classNameJsonKey();
 
 		MenuEntryCfg();
 		MenuEntryCfg(const MenuEntryCfg& _other);
@@ -48,8 +40,8 @@ namespace ot {
 		
 		MenuEntryCfg& operator = (const MenuEntryCfg& _other);
 
-		virtual MenuEntryCfg* createCopy(void) const = 0;
-		virtual EntryType getMenuEntryType(void) const = 0;
+		virtual MenuEntryCfg* createCopy() const = 0;
+		virtual std::string getClassName() const = 0;
 
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _object Json object reference to write the data to.

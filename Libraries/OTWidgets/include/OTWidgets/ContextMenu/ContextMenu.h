@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/Menu/MenuCfg.h"
+#include "OTGui/Menu/MenuSeparatorCfg.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt header

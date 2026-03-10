@@ -21,29 +21,8 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Menu/MenuEntryCfg.h"
 
-std::string ot::MenuEntryCfg::toString(EntryType _type) {
-	switch (_type) {
-	case ot::MenuEntryCfg::Menu: return "Menu";
-	case ot::MenuEntryCfg::Button: return "Button";
-	case ot::MenuEntryCfg::Separator: return "Separator";
-	default:
-		OT_LOG_EAS("Unknown entry type (" + std::to_string((int)_type) + ")");
-		return "Separator";
-	}
-}
-
-ot::MenuEntryCfg::EntryType ot::MenuEntryCfg::stringToEntryType(const std::string& _type) {
-	if (_type == MenuEntryCfg::toString(EntryType::Menu)) return EntryType::Menu;
-	else if (_type == MenuEntryCfg::toString(EntryType::Button)) return EntryType::Button;
-	else if (_type == MenuEntryCfg::toString(EntryType::Separator)) return EntryType::Separator;
-	else {
-		OT_LOG_EAS("Unknown entry type \"" + _type + "\"");
-		return EntryType::Separator;
-	}
-}
-
-const std::string& ot::MenuEntryCfg::entryTypeJsonKey(void) {
-	static std::string key("EntryType");
+const std::string& ot::MenuEntryCfg::classNameJsonKey() {
+	static std::string key("ClassName");
 	return key;
 }
 
@@ -64,9 +43,9 @@ ot::MenuEntryCfg& ot::MenuEntryCfg::operator=(const MenuEntryCfg& _other) {
 }
 
 void ot::MenuEntryCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember("EntryType", JsonString(this->toString(this->getMenuEntryType()), _allocator), _allocator);
+	_object.AddMember(JsonString(MenuEntryCfg::classNameJsonKey(), _allocator), JsonString(this->getClassName(), _allocator), _allocator);
 }
 
 void ot::MenuEntryCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
-
+	OTAssert(json::getString(_object, MenuEntryCfg::classNameJsonKey()) == this->getClassName(), "Invalid class name in JSON object for deserialization");
 }

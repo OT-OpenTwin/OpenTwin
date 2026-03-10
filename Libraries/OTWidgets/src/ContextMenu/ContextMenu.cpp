@@ -53,10 +53,9 @@ void ot::ContextMenu::setFromConfiguration(const MenuCfg& _config) {
     // Go trough child entries
     for (const MenuEntryCfg* entry : _config.getEntries()) {
         OTAssertNullptr(entry);
-        switch (entry->getMenuEntryType()) {
-
-        case ot::MenuEntryCfg::Button: // Add action
+        if (entry->getClassName() == ot::MenuButtonCfg::className()) 
         {
+            // Add action
             const MenuButtonCfg* itemCfg = dynamic_cast<const MenuButtonCfg*>(entry);
             if (!itemCfg) {
                 OT_LOG_EAS("Item configuration cast failed");
@@ -66,10 +65,9 @@ void ot::ContextMenu::setFromConfiguration(const MenuCfg& _config) {
             this->addAction(newAction);
             this->connect(newAction, &QAction::triggered, this, qOverload<>(&ContextMenu::slotActionTriggered));
         }
-        break;
-
-        case ot::MenuEntryCfg::Menu: // Add child menu
+        else if (entry->getClassName() == ot::MenuCfg::className())
         {
+			// Add submenu
             const MenuCfg* menuCfg = dynamic_cast<const MenuCfg*>(entry);
             if (!menuCfg) {
                 OT_LOG_EAS("Menu configuration cast failed");
@@ -79,18 +77,15 @@ void ot::ContextMenu::setFromConfiguration(const MenuCfg& _config) {
             this->addMenu(newMenu);
             this->connect(newMenu, &ContextMenu::contextActionTriggered, this, qOverload<const std::string&>(&ContextMenu::slotActionTriggered));
         }
-        break;
-
-        case ot::MenuEntryCfg::Separator: // Add separator
+        else if (entry->getClassName() == ot::MenuSeparatorCfg::className())
+        {
             this->addSeparator();
-            break;
-
-        default:
-            OT_LOG_EAS("Unknown menu entry type (" + std::to_string((int)entry->getMenuEntryType()) + ")");
-            break;
+        }
+        else
+        {
+			OT_LOG_EAS("Unknown menu entry type \"" + entry->getClassName() + "\"");
         }
     }
-
 }
 
 void ot::ContextMenu::slotActionTriggered(void) {

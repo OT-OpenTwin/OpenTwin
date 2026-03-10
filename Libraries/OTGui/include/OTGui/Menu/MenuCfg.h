@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/Menu/MenuButtonCfg.h"
+#include "OTGui/Menu/MenuSeparatorCfg.h"
 #include "OTGui/Menu/MenuClickableEntryCfg.h"
 
 // std header
@@ -38,8 +39,9 @@ namespace ot {
 
 		MenuCfg& operator = (const MenuCfg& _other);
 
-		virtual MenuEntryCfg* createCopy(void) const override;
-		virtual EntryType getMenuEntryType(void) const override { return MenuEntryCfg::Menu; };
+		virtual MenuEntryCfg* createCopy() const override;
+		static std::string className() { return "MenuCfg"; };
+		virtual std::string getClassName() const override { return MenuCfg::className(); };
 
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _object Json object reference to write the data to.
@@ -70,19 +72,19 @@ namespace ot {
 		MenuButtonCfg* addButton(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string(), MenuButtonCfg::ButtonAction _action = MenuButtonCfg::ButtonAction::NotifyOwner);
 
 		//! @brief Creates and adds a separator.
-		void addSeparator(void);
+		void addSeparator();
 
 		//! @brief Searches for the menu button with the given name in this menu and all of its child menus.
 		//! The menu keeps ownership of the button.
 		MenuButtonCfg* findMenuButton(const std::string& _name) const;
 
-		const std::list<MenuEntryCfg*>& getEntries(void) const { return m_childs; };
+		const std::list<MenuEntryCfg*>& getEntries() const { return m_childs; };
 
 		//! @brief Returns true if this menu has no buttons (child menus do not count).
-		bool isEmpty(void) const;
+		bool isEmpty() const;
 
 	private:
-		void clear(void);
+		void clear();
 
 		std::list<MenuEntryCfg*> m_childs;
 

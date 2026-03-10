@@ -42,8 +42,9 @@ namespace ot {
 
 		MenuButtonCfg& operator = (const MenuButtonCfg&) = delete;
 
-		virtual MenuEntryCfg* createCopy(void) const override;
-		virtual EntryType getMenuEntryType(void) const override { return MenuEntryCfg::Button; };
+		virtual MenuEntryCfg* createCopy() const override;
+		static std::string className() { return "MenuButtonCfg"; };
+		virtual std::string getClassName() const override { return MenuButtonCfg::className(); };
 
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _object Json object reference to write the data to.
@@ -56,7 +57,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		void setButtonAction(ButtonAction _action) { m_action = _action; };
-		ButtonAction getButtonAction(void) const { return m_action; };
+		ButtonAction getButtonAction() const { return m_action; };
 
 	private:
 		ButtonAction m_action;

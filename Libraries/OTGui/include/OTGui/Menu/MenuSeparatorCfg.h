@@ -33,7 +33,8 @@ namespace ot {
 		MenuSeparatorCfg& operator = (const MenuSeparatorCfg&) = delete;
 
 		virtual MenuEntryCfg* createCopy(void) const override;
-		virtual EntryType getMenuEntryType(void) const override { return MenuEntryCfg::Separator; };
+		static std::string className() { return "MenuSeparatorCfg"; };
+		virtual std::string getClassName() const override { return MenuSeparatorCfg::className(); };
 	};
 
 }
