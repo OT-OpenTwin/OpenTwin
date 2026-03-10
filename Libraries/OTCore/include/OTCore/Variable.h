@@ -99,32 +99,6 @@ namespace ot {
 		Variable operator-(const Variable& o) const;
 		Variable operator/(const Variable& o) const;
 
-		ot::Variable ln() const;
-
-		ot::Variable ot::Variable::log10() const
-		{
-			return applyUnaryOp(*this, [](auto v) -> ot::Variable
-				{
-					return std::log10(v);
-				});
-		}
-
-		ot::Variable ot::Variable::log2() const
-		{
-			return applyUnaryOp(*this, [](auto v) -> ot::Variable
-				{
-					return std::log2(v);
-				});
-		}
-
-		ot::Variable ot::Variable::sqrt() const
-		{
-			return applyUnaryOp(*this, [](auto v) -> ot::Variable
-				{
-					return std::sqrt(v);
-				});
-		}
-
 		std::string getTypeName() const;
 
 	private:

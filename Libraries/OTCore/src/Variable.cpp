@@ -388,55 +388,6 @@ ot::Variable ot::Variable::operator/(const Variable& o) const
 	return VariableHelper::applyNumericOp(*this, o, [](auto a, auto b) { return a / b; });
 }
 
-ot::Variable ot::Variable::ln() const
-{
-	return VariableHelper::applyUnaryOp(*this, [](auto v) -> ot::Variable
-		{
-			return std::log(v);
-		});
-}
-ot::Variable ot::Variable::log10() const
-{
-	if (!isComplex())
-	{
-
-		return VariableHelper::applyUnaryOp(*this, [](auto v) -> ot::Variable
-			{
-				return std::log10(v);
-			});
-	}
-	else
-	{
-		throw std::exception("Complex numbers only support the natural logarithm");
-	}
-}
-
-ot::Variable ot::Variable::log2() const
-{
-	if (!isComplex())
-	{
-
-		return VariableHelper::applyUnaryOp(*this, [](auto v) -> ot::Variable
-			{
-				return std::log2(v);
-			});
-	}
-	else
-	{
-		throw std::exception("Complex numbers only support the natural logarithm");
-	}
-}
-
-ot::Variable ot::Variable::logNatural() const
-{
-	return VariableHelper::applyUnaryOp(*this, [](auto v) -> ot::Variable
-		{
-			return std::log1p(v);
-		});
-}
-
-
-
 std::string ot::Variable::getTypeName() const
 {
 	const size_t index = m_value.index();

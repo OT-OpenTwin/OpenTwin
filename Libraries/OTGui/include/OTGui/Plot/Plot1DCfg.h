@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
-#include "OTCore/ValueComparisonDefinition.h"
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTGui/Plot/Plot1DAxisCfg.h"
 #include "OTGui/Widgets/NavigationTreeItemIcon.h"
 #include "OTGui/Widgets/WidgetViewBase.h"
