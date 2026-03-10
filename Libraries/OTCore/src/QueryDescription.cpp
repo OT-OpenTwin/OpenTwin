@@ -14,12 +14,12 @@ void ot::QueryDescription::setComparisonDescription(const ot::ValueComparisonDes
 	m_comparisonDescription = _valueComparison;
 }
 
-const ot::QueryTargetDescription& ot::QueryDescription::getQueryTargetDescription()
+const ot::QueryTargetDescription& ot::QueryDescription::getQueryTargetDescription() const
 {
 	return m_queryTargetDescription;
 }
 
-const ot::ValueComparisonDescription& ot::QueryDescription::getValueComparisonDescription()
+const ot::ValueComparisonDescription& ot::QueryDescription::getValueComparisonDescription() const
 {
 	return m_comparisonDescription;
 }

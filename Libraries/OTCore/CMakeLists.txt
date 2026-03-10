@@ -215,6 +215,8 @@ set(OTCORE_HEADER_FILES
     include/OTCore/Tuple/TupleDescriptionSingle.h
     include/OTCore/Tuple/TupleFactory.h
     include/OTCore/Tuple/TupleInstance.h
+
+    include/OTCore/Variable/VariableHelper.h
 )
 
 set(OTCORE_SOURCE_FILES

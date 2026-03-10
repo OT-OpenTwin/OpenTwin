@@ -120,11 +120,37 @@ bool DataLakeAccessor::transformationNecessary(const TupleInstance& _storedForma
 	}
 }
 
-bool DataLakeAccessor::alreadyStoredTransformation(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat)
+bool DataLakeAccessor::alreadyStoredTransformation(const ot::QueryDescription& _queryDescription)
 {
-	DataStorageAPI::DataLakeAPI resultCollectionAccess(m_collectionName,".transformed");
-	//resultCollectionAccess.
-	return false;
+	DataStorageAPI::DataLakeAPI transformedCollectionAccess(m_collectionName,".transformed");
+
+	const std::string fieldValue = _queryDescription.getQueryTargetDescription().getMongoDBFieldName();
+	TupleInstance instance;
+	instance.setTupleElementDataTypes({ ot::TypeNames::getInt64TypeName() });
+	ot::ValueComparisonDescription quantitySelection(MetadataQuantity::getFieldName(), "=", fieldValue, instance);
+	AdvancedQueryBuilder builder;
+	BsonViewOrValue queryForQuantity = builder.createComparison(quantitySelection);
+	
+	int64_t countInTransformedCollection = transformedCollectionAccess.countInDataLakePartition(queryForQuantity);
+	if (countInTransformedCollection != 0)
+	{
+		DataStorageAPI::DataLakeAPI resultCollectionAccess(m_collectionName);
+		int64_t countInResultCollection = resultCollectionAccess.countInDataLakePartition(queryForQuantity);
+		if (countInResultCollection != countInTransformedCollection)
+		{
+			//Here we may have additional documents of the searched quantity in the collection. Better to do a clean reset and start anew.
+			transformedCollectionAccess.getCollection().delete_many(queryForQuantity);
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void DataLakeAccessor::storeTransformation(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat)
@@ -204,7 +230,7 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		auto queryTupleDescription = comparisonDescription.getTupleInstance();
 		if (transformationNecessary(queryTupleDescription, storedTupleDescription))
 		{
-			if (!alreadyStoredTransformation(queryTupleDescription, storedTupleDescription))
+			if (!alreadyStoredTransformation(queryDescription))
 			{
 				storeTransformation(queryTupleDescription, storedTupleDescription);
 			}

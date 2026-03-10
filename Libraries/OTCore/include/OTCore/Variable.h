@@ -73,6 +73,7 @@ namespace ot {
 		bool isBool() const;
 		bool isConstCharPtr() const;
 		bool isComplex() const;
+		bool isNumeric() const;
 
 		float getFloat() const;
 		double getDouble() const;
@@ -82,15 +83,54 @@ namespace ot {
 		const char* getConstCharPtr() const;
 		const std::complex<double> getComplex() const;
 
+		double toDouble() const;
+		float toFloat() const;
+		int64_t toInt64() const;
+		int32_t toInt32() const;
+		std::complex<double> toComplex() const;
+
 		bool operator==(const Variable& other) const;
 		bool operator!=(const Variable& other) const;
 		bool operator>(const Variable& other) const;
 		bool operator<(const Variable& other) const;
+		
+		Variable operator*(const Variable& o) const;
+		Variable operator+(const Variable& o) const;
+		Variable operator-(const Variable& o) const;
+		Variable operator/(const Variable& o) const;
+
+		ot::Variable ln() const;
+
+		ot::Variable ot::Variable::log10() const
+		{
+			return applyUnaryOp(*this, [](auto v) -> ot::Variable
+				{
+					return std::log10(v);
+				});
+		}
+
+		ot::Variable ot::Variable::log2() const
+		{
+			return applyUnaryOp(*this, [](auto v) -> ot::Variable
+				{
+					return std::log2(v);
+				});
+		}
+
+		ot::Variable ot::Variable::sqrt() const
+		{
+			return applyUnaryOp(*this, [](auto v) -> ot::Variable
+				{
+					return std::sqrt(v);
+				});
+		}
 
 		std::string getTypeName() const;
 
 	private:
 		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,std::string, std::complex<double>>;
+		variable_t m_value;		
+		
 		inline bool DoubleCompare(const double& a, const double& b) const
 		{
 			constexpr const double epsilon = 1.0e-12; //std::numeric_limits<double>::epsilon()
@@ -112,7 +152,6 @@ namespace ot {
 			}
 			return abs(a - b) <= epsilon * (std::max)(abs(a), abs(b));
 		}
-		variable_t m_value;
 	};
 	
 }

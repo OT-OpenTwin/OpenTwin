@@ -21,7 +21,7 @@ private:
 	
 	void createQueries(BsonViewOrValue& _resultCollectionQueries, BsonViewOrValue& _transformedCollectionQueries);
 	bool transformationNecessary(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat);
-	bool alreadyStoredTransformation(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat);
+	bool alreadyStoredTransformation(const ot::QueryDescription& _queryDescription);
 	void storeTransformation(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat);
 
 	//! @brief All provided series are valid options and each document has only one series it belongs to. Thus, the series query is assembled as an or connected list of series ID options

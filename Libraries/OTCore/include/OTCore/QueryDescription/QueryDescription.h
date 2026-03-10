@@ -19,8 +19,8 @@ namespace ot
 		void setQueryTargetDescription(const QueryTargetDescription& _queryTargetDescription);
 		void setComparisonDescription(const ot::ValueComparisonDescription& _valueComparison);
 
-		const QueryTargetDescription& getQueryTargetDescription();
-		const ot::ValueComparisonDescription& getValueComparisonDescription();
+		const QueryTargetDescription& getQueryTargetDescription() const;
+		const ot::ValueComparisonDescription& getValueComparisonDescription() const;
 
 		void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ConstJsonObject& _jsonObject) override;

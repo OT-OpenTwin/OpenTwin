@@ -213,6 +213,8 @@
     <ClCompile Include="src\StringConverter.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
     <ClCompile Include="src\GraphHandler.cpp" />
+    <ClCompile Include="src\ValueProcessing.cpp" />
+    <ClCompile Include="src\ValueProcessorAdd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
@@ -241,6 +243,9 @@
     <ClInclude Include="include\GraphHandler.h" />
     <ClInclude Include="include\ValueProcessing.h" />
     <ClInclude Include="include\ValueProcessor.h" />
+    <ClInclude Include="include\ValueProcessorAdd.h" />
+    <ClInclude Include="include\ValueProcessorLog.h" />
+    <ClInclude Include="include\ValueProcessorMultiply.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

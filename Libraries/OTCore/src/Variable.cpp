@@ -22,6 +22,7 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 #include "OTCore/ComplexNumbers/ComplexNumberDefinition.h"
+#include "OTCore/Variable/VariableHelper.h"
 
 ot::Variable::Variable(float value)
 	: m_value(value)
@@ -162,6 +163,11 @@ bool ot::Variable::isComplex() const
 	return std::holds_alternative<std::complex<double>>(m_value);
 }
 
+bool ot::Variable::isNumeric() const
+{
+	return isFloat() || isDouble() || isInt32() || isInt64() || isComplex();
+}
+
 float ot::Variable::getFloat() const
 {
 	return std::get<float>(m_value);
@@ -195,6 +201,130 @@ const char* ot::Variable::getConstCharPtr() const
 const std::complex<double> ot::Variable::getComplex() const
 {
 	return std::get<std::complex<double>>(m_value);
+}
+
+double ot::Variable::toDouble() const
+{
+	if (isDouble())
+	{
+		return getDouble();
+	}
+	else if (isFloat())
+	{
+		return static_cast<double>(getFloat());
+	}
+	else if (isInt64())
+	{
+		return static_cast<double>(getInt64());
+	}
+	else if (isInt32())
+	{
+		return static_cast<double>(getInt32());
+	}
+	else
+	{
+		throw std::runtime_error("Variable: cannot convert to double: " + getTypeName());
+	}
+}
+
+float ot::Variable::toFloat() const
+{
+	if (isFloat())
+	{
+		return getFloat();
+	}
+	else if (isDouble())
+	{
+		return static_cast<float>(getDouble());
+	}
+	else if (isInt64())
+	{
+		return static_cast<float>(getInt64());
+	}
+	else if (isInt32())
+	{
+		return static_cast<float>(getInt32());
+	}
+	else
+	{
+		throw std::runtime_error("Variable: cannot convert to float: " + getTypeName());
+	}
+}
+
+int64_t ot::Variable::toInt64() const
+{
+	if (isInt64())
+	{
+		return getInt64();
+	}
+	else if (isInt32())
+	{
+		return static_cast<int64_t>(getInt32());
+	}
+	else if (isDouble())
+	{
+		return static_cast<int64_t>(getDouble());
+	}
+	else if (isFloat())
+	{
+		return static_cast<int64_t>(getFloat());
+	}
+	else
+	{
+		throw std::runtime_error("Variable: cannot convert to int64: " + getTypeName());
+	}
+}
+
+int32_t ot::Variable::toInt32() const
+{
+	if (isInt32())
+	{
+		return getInt32();
+	}
+	else if (isInt64())
+	{
+		return static_cast<int32_t>(getInt64());
+	}
+	else if (isDouble())
+	{
+		return static_cast<int32_t>(getDouble());
+	}
+	else if (isFloat())
+	{
+		return static_cast<int32_t>(getFloat());
+	}
+	else
+	{
+		throw std::runtime_error("Variable: cannot convert to int32: " + getTypeName());
+	}
+}
+
+std::complex<double> ot::Variable::toComplex() const
+{
+	if (isComplex())
+	{
+		return getComplex();
+	}
+	else if (isDouble())
+	{
+		return std::complex<double>(getDouble());
+	}
+	else if (isFloat())
+	{
+		return std::complex<double>(static_cast<double>(getFloat()));
+	}
+	else if (isInt64())
+	{
+		return std::complex<double>(static_cast<double>(getInt64()));
+	}
+	else if (isInt32())
+	{
+		return std::complex<double>(static_cast<double>(getInt32()));
+	}
+	else
+	{
+		throw ("Trying to cast a non numeric variable to complex");
+	}
 }
 
 bool ot::Variable::operator==(const Variable& other) const
@@ -237,6 +367,75 @@ bool ot::Variable::operator<(const Variable& other) const
 		other.isInt64() && this->isInt64() && (this->getInt64() < other.getInt64());
 	return smaller;
 }
+
+ot::Variable ot::Variable::operator*(const Variable& o) const
+{
+	return VariableHelper::applyNumericOp(*this, o, [](auto a, auto b) { return a * b; });
+}
+
+ot::Variable ot::Variable::operator+(const Variable& o) const
+{
+	return VariableHelper::applyNumericOp(*this, o, [](auto a, auto b) { return a + b; });
+}
+
+ot::Variable ot::Variable::operator-(const Variable& o) const
+{
+	return VariableHelper::applyNumericOp(*this, o, [](auto a, auto b) { return a - b; });
+}
+
+ot::Variable ot::Variable::operator/(const Variable& o) const
+{
+	return VariableHelper::applyNumericOp(*this, o, [](auto a, auto b) { return a / b; });
+}
+
+ot::Variable ot::Variable::ln() const
+{
+	return VariableHelper::applyUnaryOp(*this, [](auto v) -> ot::Variable
+		{
+			return std::log(v);
+		});
+}
+ot::Variable ot::Variable::log10() const
+{
+	if (!isComplex())
+	{
+
+		return VariableHelper::applyUnaryOp(*this, [](auto v) -> ot::Variable
+			{
+				return std::log10(v);
+			});
+	}
+	else
+	{
+		throw std::exception("Complex numbers only support the natural logarithm");
+	}
+}
+
+ot::Variable ot::Variable::log2() const
+{
+	if (!isComplex())
+	{
+
+		return VariableHelper::applyUnaryOp(*this, [](auto v) -> ot::Variable
+			{
+				return std::log2(v);
+			});
+	}
+	else
+	{
+		throw std::exception("Complex numbers only support the natural logarithm");
+	}
+}
+
+ot::Variable ot::Variable::logNatural() const
+{
+	return VariableHelper::applyUnaryOp(*this, [](auto v) -> ot::Variable
+		{
+			return std::log1p(v);
+		});
+}
+
+
 
 std::string ot::Variable::getTypeName() const
 {

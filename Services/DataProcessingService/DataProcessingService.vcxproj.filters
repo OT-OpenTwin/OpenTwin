@@ -110,6 +110,12 @@
     <ClCompile Include="src\DataLakeAccessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ValueProcessing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ValueProcessorAdd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -189,6 +195,15 @@
     </ClInclude>
     <ClInclude Include="include\DataLakeAccessor.h">
       <Filter>Header Files\Data Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ValueProcessorMultiply.h">
+      <Filter>Header Files\ValueProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ValueProcessorAdd.h">
+      <Filter>Header Files\ValueProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ValueProcessorLog.h">
+      <Filter>Header Files\ValueProcessing</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
