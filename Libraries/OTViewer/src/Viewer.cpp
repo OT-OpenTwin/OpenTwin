@@ -111,6 +111,7 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	clipPlaneTransform(nullptr),
 	clipPlaneManipulator(nullptr),
 	overlayTextNode(nullptr),
+	overlayColorRampNode(nullptr),
 	mouseCursorX(0.0),
 	mouseCursorY(0.0),
 	freezeWorkingPlane(false)
@@ -434,7 +435,7 @@ osg::Camera* Viewer::createOverlayCamera(double xmin, double xmax, double ymin, 
 	return camera;
 }
 
-osgText::Text *Viewer::createText(const osg::Vec2 &pos, const std::string &message, float textSize)
+osgText::Text *Viewer::createText(const osg::Vec2 &pos, const std::string &message, float textSize, osgText::TextBase::AlignmentType alignment)
 {
 	osg::Vec3 pos3(pos.x(), pos.y(), 0.0);
 
@@ -444,7 +445,7 @@ osgText::Text *Viewer::createText(const osg::Vec2 &pos, const std::string &messa
 	text->setCharacterSize(textSize);
 	text->setFontResolution(120, 120);
 	text->setAxisAlignment(osgText::TextBase::XY_PLANE);
-	text->setAlignment(osgText::TextBase::AlignmentType::CENTER_CENTER);
+	text->setAlignment(alignment);
 	text->setPosition(pos3);
 	text->setColor(osg::Vec4(0.0, 0.0, 0.0, 1.0));
 	text->setText(message);
@@ -2045,9 +2046,138 @@ double Viewer::snapAngle(double value)
 	return value;
 }
 
+osg::Geometry* Viewer::createFilledRect(const osg::Vec3& bottomLeft, float width, float height, const osg::Vec4& color)
+{
+	auto* geom = new osg::Geometry();
+
+	auto* verts = new osg::Vec3Array();
+	verts->push_back(bottomLeft);                                      // 0 unten links
+	verts->push_back(bottomLeft + osg::Vec3(width, 0.0f, 0.0f));      // 1 unten rechts
+	verts->push_back(bottomLeft + osg::Vec3(width, height, 0.0f));    // 2 oben rechts
+	verts->push_back(bottomLeft + osg::Vec3(0.0f, height, 0.0f));     // 3 oben links
+	geom->setVertexArray(verts);
+
+	auto* cols = new osg::Vec4Array();
+	cols->push_back(color);
+	geom->setColorArray(cols, osg::Array::BIND_OVERALL);
+
+	geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
+
+	return geom;
+}
+
+std::string Viewer::formatValue(double v, int precision)
+{
+	std::ostringstream os;
+	os << std::fixed << std::setprecision(precision) << v;
+	return os.str();
+}
+
+osg::Geometry* Viewer::createRectOutline(const osg::Vec3& bottomLeft, float width, float height, const osg::Vec4& color)
+{
+	auto* geom = new osg::Geometry();
+
+	auto* verts = new osg::Vec3Array();
+	verts->push_back(bottomLeft);
+	verts->push_back(bottomLeft + osg::Vec3(width, 0.0f, 0.0f));
+	verts->push_back(bottomLeft + osg::Vec3(width, height, 0.0f));
+	verts->push_back(bottomLeft + osg::Vec3(0.0f, height, 0.0f));
+	geom->setVertexArray(verts);
+
+	auto* cols = new osg::Vec4Array();
+	cols->push_back(color);
+	geom->setColorArray(cols, osg::Array::BIND_OVERALL);
+
+	geom->addPrimitiveSet(new osg::DrawArrays(GL_LINE_LOOP, 0, 4));
+
+	return geom;
+}
+
 void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 {
-	int i = 0;
+	if (osgOverlayCamera == nullptr) return;
 
+	// Remove any current color ramp
+	while (osgOverlayCamera->removeChild(overlayColorRampNode));
+
+	if (activeColorRamp == nullptr) return;
+
+	// Determine color ramp properties
+	int numberSegments = activeColorRamp->getValues().size() - 1;
+	if (numberSegments < 1) return;
+
+	float widthBox = 150.0f;
+	float heightBox = 300.0f;
+	float barWidth = 45.0f;
+	float labelOffset = 5.0f;
+	int precision = 3;
+	float maxTextHeight = 15.0f;
+	float minTextHeight = 12.0f;
+
+	osg::Vec3 origin(1.0 * this->width() - widthBox, 1.0 * this->height() - heightBox - 60.0, 0.0);
+
+	// Create the new color ramp node
+	overlayColorRampNode = new osg::Geode;
+
+	osg::StateSet* ss = overlayColorRampNode->getOrCreateStateSet();
+	ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+	// Add the color bar to the node
+	float segmentHeight = heightBox / numberSegments;
+
+	for (std::size_t i = 0; i < numberSegments; ++i)
+	{
+		osg::Vec3 bl = origin + osg::Vec3(0.0f, static_cast<float>(i) * segmentHeight, 0.0f);
+
+		osg::Vec4 color(activeColorRamp->getColorR()[i], activeColorRamp->getColorG()[i], activeColorRamp->getColorB()[i], 1.0);
+
+		overlayColorRampNode->addDrawable(createFilledRect(bl, barWidth, segmentHeight, color));
+	}
+
+	// Add the text to the node
+	float textHeight = segmentHeight / 2.0f;
+
+	int tickInterval = 1;
+	if (textHeight < minTextHeight)
+	{
+		// Determine how many labels need to be skipped
+		int maxNumberTextLines = (int)(heightBox / minTextHeight / 2.0f);
+		tickInterval = ceil(1.0f * activeColorRamp->getValues().size() / maxNumberTextLines);
+	}
+
+	textHeight = segmentHeight / 2.0f * tickInterval;
+	if (textHeight > maxTextHeight) textHeight = maxTextHeight;
+
+	for (std::size_t i = 0; i < activeColorRamp->getValues().size(); ++i)
+	{
+		float y = origin.y() + static_cast<float>(i) * segmentHeight;
+		osg::Vec2 textPos(origin.x() - labelOffset, y);
+
+		bool plotLabel = false;
+		if (i % tickInterval == 0) plotLabel = true;
+
+		if (i + tickInterval >= activeColorRamp->getValues().size())
+		{
+			// The next (end) label would not be plotted 
+			plotLabel = false;
+		}
+
+		if (i == activeColorRamp->getValues().size()-1)
+		{
+			// Always plot the last label
+			plotLabel = true;
+		}
+
+		if (plotLabel)
+		{
+			overlayColorRampNode->addDrawable(createText(textPos, formatValue(activeColorRamp->getValues()[i], precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
+		}
+	}
+
+	// Add the label to the node
+	overlayColorRampNode->addDrawable(createText(osg::Vec2(origin.x() + barWidth / 2.0f, origin.y() + heightBox + 2.0f * labelOffset), activeColorRamp->getLabel(), maxTextHeight, osgText::TextBase::AlignmentType::CENTER_BOTTOM));
+
+	// Add the node to the scene
+	osgOverlayCamera->addChild(overlayColorRampNode);
 }
 

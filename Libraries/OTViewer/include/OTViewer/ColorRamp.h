@@ -34,6 +34,13 @@ public:
 
 	bool operator==(const ColorRamp& other);
 
+	std::string getLabel() { return label; }
+
+	const std::vector<double>& getValues() { return values; }
+	const std::vector<double>& getColorR() { return colorR; }
+	const std::vector<double>& getColorG() { return colorG; }
+	const std::vector<double>& getColorB() { return colorB; }
+
 private:
 	bool active;
 	std::string label;

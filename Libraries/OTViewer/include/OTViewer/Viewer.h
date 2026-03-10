@@ -42,6 +42,7 @@ class ColorRamp;
 #include <osg/Group>
 #include <osg/ClipNode>
 #include <osgText/Font>
+#include <osgText/TextBase>
 #include <osgUtil/LineSegmentIntersector>
 
 namespace osgGA     { class EventQueue; };
@@ -171,7 +172,7 @@ private:
 	// Methods
 	osgGA::EventQueue* getEventQueue() const;
 	osg::Camera* createOverlayCamera(double xmin, double xmax, double ymin, double ymax);
-	osgText::Text *createText(const osg::Vec2 &pos, const std::string &text, float textSize);
+	osgText::Text *createText(const osg::Vec2 &pos, const std::string &text, float textSize, osgText::TextBase::AlignmentType alignment = osgText::TextBase::AlignmentType::CENTER_CENTER);
 	void updateOverlaySize(int width, int height);
 	ot::PropertyGridCfg createSettings(void);
 	void updateProjection(void);
@@ -182,6 +183,9 @@ private:
 	void settingsSynchronized(const ot::PropertyGridCfg& _dataset);
 	void updateDisplaySettings(osg::Node *node);
 	void refreshCutplane(void);
+	osg::Geometry* createFilledRect(const osg::Vec3& bottomLeft, float width, float height, const osg::Vec4& color);
+	osg::Geometry* createRectOutline(const osg::Vec3& bottomLeft, float width, float height, const osg::Vec4& color);
+	std::string formatValue(double v, int precision);
 
 	// Attributes
 	ot::UID							   viewerUID;
@@ -211,6 +215,7 @@ private:
 	osgText::Text					  *overlayText;
 	osgText::Text					  *mouseCursorText;
 	osg::Geode						  *overlayTextNode;
+	osg::Geode                        *overlayColorRampNode;
 	osg::Geode						  *cursorTextNode;
 	osg::ShapeDrawable				  *overlayBox;
 	osg::ShapeDrawable				  *mouseCursorBox;
