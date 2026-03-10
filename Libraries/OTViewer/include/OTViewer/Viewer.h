@@ -24,6 +24,8 @@
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTWidgets/Widgets/WidgetBase.h"
 
+#include "ColorRamp.h"
+
 #include <QMainWindow>
 #include <QtOpenGLWidgets/qopenglwidget.h>
 
@@ -37,7 +39,6 @@ class AxisCenterCross;
 class HandlerBase;
 class ClipPlaneManipulator;
 class ViewerObjectSelectionHandler;
-class ColorRamp;
 
 #include <osg/Group>
 #include <osg/ClipNode>
@@ -260,4 +261,6 @@ private:
 	int viewColorAutoBackgroundB;
 
 	bool freezeWorkingPlane;
+
+	ColorRamp currentColorRamp;
 };
