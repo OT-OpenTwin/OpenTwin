@@ -17,11 +17,11 @@
 // limitations under the License.
 // @otlicense-end
 
+#include "Documentation.h"
 #include "KeyValuesExtractor.h"
 #include "DataCategorizationHandler.h"
 #include "OTCore/StringToNumericCheck.h"
-#include "OTCore/StringToVariableConverter.h"
-#include "Documentation.h"
+#include "OTCore/Variable/StringToVariableConverter.h"
 #include "OTGui/TableIndexSchemata.h"
 
 void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData , std::map<std::string, std::shared_ptr<IVisualisationTable>>& _allTablesByName)

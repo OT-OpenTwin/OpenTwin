@@ -19,8 +19,8 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
-#include "OTCore/VariableToBSONStringConverter.h"
-#include "OTCore/ExplicitStringValueConverter.h"
+#include "OTCore/Variable/VariableToBSONStringConverter.h"
+#include "OTCore/Variable/ExplicitStringValueConverter.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 #include "OTCore/ComplexNumbers/ComplexNumberFormat.h"

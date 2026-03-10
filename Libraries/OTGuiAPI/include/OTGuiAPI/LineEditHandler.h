@@ -39,7 +39,7 @@ namespace ot {
 		OT_DECL_NOCOPY(LineEditHandler)
 		OT_DECL_NOMOVE(LineEditHandler)
 	public:
-		LineEditHandler();
+		explicit LineEditHandler();
 		virtual ~LineEditHandler() = default;
 
 	protected:

@@ -21,7 +21,7 @@
 #include "OTCore/String.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ContainerHelper.h"
-#include "OTCore/VariableToStringConverter.h"
+#include "OTCore/Variable/VariableToStringConverter.h"
 
 ot::GenericDataStructMatrix CSVToTableTransformer::operator()(const std::string& _csvText, const CSVProperties& _properties) {
 	assert(_properties.m_columnDelimiter != "" && _properties.m_rowDelimiter != "");

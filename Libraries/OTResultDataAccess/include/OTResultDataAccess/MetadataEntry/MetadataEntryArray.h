@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 
 // std header

@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #pragma once
+
 #include "OptionsParameterHandler.h"
-#include "OTCore/StringToVariableConverter.h"
 
 class OptionsParameterHandlerReference : public OptionsParameterHandler
 {

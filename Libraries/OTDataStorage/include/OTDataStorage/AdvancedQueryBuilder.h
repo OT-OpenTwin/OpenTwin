@@ -20,7 +20,7 @@
 #pragma once
 #include <string>
 #include <list>
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTDataStorage/Helper/QueryBuilder.h"
 #include "OTCore/ComparisonSymbols.h"
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"

@@ -41,7 +41,7 @@ namespace ot {
 		OT_DECL_NOCOPY(ButtonHandler)
 		OT_DECL_NOMOVE(ButtonHandler)
 	public:	
-		ButtonHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
+		explicit ButtonHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
 		virtual ~ButtonHandler() = default;
 		
 	protected:

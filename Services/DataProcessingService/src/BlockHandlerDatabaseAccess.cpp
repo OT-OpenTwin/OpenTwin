@@ -26,11 +26,11 @@
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTCore/String.h"
 #include "OTCore/TimeFormatter.h"
-#include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTCore/GenericDataStructSingle.h"
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
-#include "OTCore/ExplicitStringValueConverter.h"
+#include "OTCore/Variable/ExplicitStringValueConverter.h"
 #include "OTCore/ResultCollectionDefaultIndexes.h"
 
 #include "OTResultDataAccess/QuantityContainer.h"

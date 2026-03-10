@@ -20,7 +20,7 @@
 #pragma once
 #include <map>
 #include <string>
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTCore/GenericDataStruct.h"
 
 struct PipelineDataDocument

@@ -23,7 +23,7 @@
 #include <optional>
 #include <map>
 
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTCore/ReturnValues.h"
 #include "PortData.h"
 #include "CPythonObject.h"

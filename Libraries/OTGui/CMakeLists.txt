@@ -85,11 +85,14 @@ set(OTGUI_HEADER_FILES
     include/OTGui/Dialog/MessageDialogCfg.h
     include/OTGui/Dialog/OnePropertyDialogCfg.h
 
+    include/OTGui/Event/ContextMenuRequestEvent.h
+    include/OTGui/Event/ContextRequestData.h
     include/OTGui/Event/GuiEvent.h
     include/OTGui/Event/GraphicsChangeEvent.h
     include/OTGui/Event/GraphicsConnectionDropEvent.h
     include/OTGui/Event/GraphicsDoubleClickEvent.h
     include/OTGui/Event/GraphicsItemDropEvent.h
+    include/OTGui/Event/NavigationContextRequestData.h
 
     include/OTGui/Graphics/GraphicsArcItemCfg.h
     include/OTGui/Graphics/GraphicsConnectionCalculationData.h
@@ -243,11 +246,14 @@ set(OTGUI_SOURCE_FILES
     src/Dialog/OnePropertyDialogCfg.cpp
     src/Dialog/SelectEntitiesDialogCfg.cpp
 
+    src/Event/ContextMenuRequestEvent.cpp
+    src/Event/ContextRequestData.cpp
     src/Event/GuiEvent.cpp
     src/Event/GraphicsChangeEvent.cpp
     src/Event/GraphicsConnectionDropEvent.cpp
     src/Event/GraphicsDoubleClickEvent.cpp
     src/Event/GraphicsItemDropEvent.cpp
+    src/Event/NavigationContextRequestData.cpp
 
     src/Graphics/BasicGraphicsIntersectionItem.cpp
     src/Graphics/GraphicsArcItemCfg.cpp

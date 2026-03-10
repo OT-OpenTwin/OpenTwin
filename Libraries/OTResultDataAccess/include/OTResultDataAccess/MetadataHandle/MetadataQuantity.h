@@ -20,12 +20,13 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Variable.h"
 #include "OTCore/Serializable.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 #include "OTResultDataAccess/ResultDataAccessAPIExport.h"
 #include "OTCore/Tuple/TupleDescription.h"
 #include "OTCore/Tuple/TupleInstance.h"
+#include "OTCore/Variable/Variable.h"
+
 // std header
 #include <stdint.h>
 #include <string>

@@ -24,7 +24,7 @@
 #include "PythonObjectBuilder.h"
 #include "PythonAPI.h"
 #include "PythonModuleAPI.h"
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTCore/ReturnMessage.h"
 
 class FixturePythonAPI : public testing::Test

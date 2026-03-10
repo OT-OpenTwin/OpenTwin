@@ -23,7 +23,7 @@
 #include <vector>
 #include <functional>
 
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "GenericDataStruct.h"
 
 namespace ot

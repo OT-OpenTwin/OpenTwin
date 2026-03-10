@@ -34,7 +34,7 @@ namespace ot {
 		OT_DECL_NOCOPY(FrontendActionHandler)
 		OT_DECL_ACTION_HANDLER(FrontendActionHandler)
 	public:
-		FrontendActionHandler() {};
+		explicit FrontendActionHandler() {};
 		virtual ~FrontendActionHandler() {};
 
 		// ###########################################################################################################################################################################################################################################################################################################################

@@ -1,0 +1,79 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.1 Chrome/142.0.7444.265 Electron/39.8.0 Safari/537.36" version="29.6.1">
+  <diagram name="Page-1" id="Ybr_vinueMcZda-WxRUk">
+    <mxGraphModel dx="1224" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-3" edge="1" parent="1" source="pZGq5jJ7rGh7xE8hOVvz-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" target="pZGq5jJ7rGh7xE8hOVvz-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-1" parent="1" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;fillColor=#ffe6cc;strokeColor=#000000;" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;MenuEntryCfg&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;-&amp;nbsp;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;+ &lt;i&gt;createCopy() = 0&lt;/i&gt;: MenuEntryCfg*&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;+ &lt;i&gt;getClassName() = 0&lt;/i&gt;: String&lt;/p&gt;" vertex="1">
+          <mxGeometry height="120" width="200" x="320" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-2" parent="1" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;fillColor=#ffe6cc;strokeColor=#000000;" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;Serializable&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="40" width="160" x="340" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-5" edge="1" parent="1" source="pZGq5jJ7rGh7xE8hOVvz-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" target="pZGq5jJ7rGh7xE8hOVvz-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-4" parent="1" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;fillColor=#ffe6cc;strokeColor=#000000;" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;MenuClickableEntryCfg&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;- m_name: String&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;- m_text: String&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;- m_iconPath: String&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;- m_toolTip: String&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="120" width="200" x="620" y="119.99" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-9" edge="1" parent="1" source="pZGq5jJ7rGh7xE8hOVvz-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;startArrow=diamondThin;startFill=0;" target="pZGq5jJ7rGh7xE8hOVvz-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-6" parent="1" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;fillColor=#ffe6cc;strokeColor=#000000;" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;MenuEntryCfgFactory&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;+ create(JSON): MenuEntryCfg&lt;/p&gt;" vertex="1">
+          <mxGeometry height="80.33" width="200" x="40" y="139.82999999999998" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-10" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;connectable=0;allowArrows=0;" value="*" vertex="1">
+          <mxGeometry height="29.84" width="30" x="290" y="190.32" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-11" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;connectable=0;allowArrows=0;" value="creates" vertex="1">
+          <mxGeometry height="40" width="40" x="260" y="140.16" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-12" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;connectable=0;allowArrows=0;" value="is" vertex="1">
+          <mxGeometry height="40" width="40" x="380" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-13" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;connectable=0;allowArrows=0;" value="is" vertex="1">
+          <mxGeometry height="40" width="40" x="550" y="139.82999999999998" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-15" edge="1" parent="1" source="pZGq5jJ7rGh7xE8hOVvz-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" target="pZGq5jJ7rGh7xE8hOVvz-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-14" parent="1" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;fillColor=#ffe6cc;strokeColor=#000000;" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;MenuCfg&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;- m_childs: MenuEntryCfg[*]&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;+ addMenu(...): MenuCfg&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;+ addButton(...): MenuButtonCfg&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;+ addSeparator(): void&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;+ findMenuButton(...): MenuButtonCfg&lt;/p&gt;" vertex="1">
+          <mxGeometry height="120" width="240" x="600" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-20" edge="1" parent="1" source="pZGq5jJ7rGh7xE8hOVvz-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" target="pZGq5jJ7rGh7xE8hOVvz-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-21" edge="1" parent="1" source="pZGq5jJ7rGh7xE8hOVvz-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamondThin;startFill=1;endArrow=open;endFill=0;" target="pZGq5jJ7rGh7xE8hOVvz-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-16" parent="1" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;fillColor=#ffe6cc;strokeColor=#000000;" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;MenuButtonCfg&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;- m_action: ButtonAction&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="80.33" width="160" x="920" y="140.15999999999988" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-18" parent="1" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;fillColor=#ffe6cc;strokeColor=#000000;rounded=0;fontColor=default;" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;&amp;lt;&amp;lt;enumeration&amp;gt;&amp;gt;&lt;/font&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;ButtonAction&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;NotifyOwner&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;Clear&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;Delete&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;Select&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;SelectAll&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="140" width="160" x="920" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-19" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;connectable=0;allowArrows=0;" value="is" vertex="1">
+          <mxGeometry height="40" width="40" x="680" y="260.49" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-22" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;connectable=0;allowArrows=0;" value="1" vertex="1">
+          <mxGeometry height="30" width="30" x="1000" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-23" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;connectable=0;allowArrows=0;" value="has" vertex="1">
+          <mxGeometry height="40" width="40" x="960" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-25" edge="1" parent="1" source="pZGq5jJ7rGh7xE8hOVvz-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" target="pZGq5jJ7rGh7xE8hOVvz-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-24" parent="1" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;fillColor=#ffe6cc;strokeColor=#000000;" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;MenuSeparatorCfg&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="40" width="160" x="340" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="pZGq5jJ7rGh7xE8hOVvz-26" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;connectable=0;allowArrows=0;" value="is" vertex="1">
+          <mxGeometry height="40" width="40" x="380" y="260.49" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

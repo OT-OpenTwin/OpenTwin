@@ -1239,6 +1239,24 @@ void ExternalServicesComponent::activateVersion(const std::string& _version)
 	}
 }
 
+void ExternalServicesComponent::broadcastToViewNotifiers(const std::string& _message, std::list<std::string>& _responses)
+{
+	for (const ServiceDataUi* reciever : m_modelViewNotifier) {
+		std::string response;
+		sendRelayedRequest(EXECUTE, reciever->getServiceURL(), _message, response);
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			OT_LOG_EAS("Error response: " + response);
+		}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			OT_LOG_EAS("Warning response: " + response);
+		}
+		else {
+			_responses.push_back(std::move(response));
+		}
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Project handling

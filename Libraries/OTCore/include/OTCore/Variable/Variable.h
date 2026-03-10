@@ -18,16 +18,20 @@
 // @otlicense-end
 
 #pragma once
-#include <variant>
-#include <stdint.h>
+
+// OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/TypeNames.h"
+#include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
+#include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
+
+// std header
 #include <limits>
-#include <algorithm>
 #include <math.h>
 #include <complex>
-#include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
-#include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
+#include <variant>
+#include <stdint.h>
+#include <algorithm>
 
 #pragma warning(disable:4251)
 namespace ot {
@@ -39,6 +43,7 @@ namespace ot {
 		OT_DECL_DEFCOPY(Variable)
 		OT_DECL_DEFMOVE(Variable)
 	public:
+
 		Variable() {};
 		Variable(float value);
 		Variable(double value);
@@ -102,6 +107,8 @@ namespace ot {
 		std::string getTypeName() const;
 
 	private:
+		friend class VariableHelper;
+
 		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,std::string, std::complex<double>>;
 		variable_t m_value;		
 		

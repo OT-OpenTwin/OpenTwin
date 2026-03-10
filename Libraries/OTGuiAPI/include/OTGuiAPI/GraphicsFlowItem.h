@@ -27,6 +27,7 @@ namespace ot {
 
 	class OT_GUIAPI_API_EXPORT GraphicsFlowItem {
 		OT_DECL_NOCOPY(GraphicsFlowItem)
+		OT_DECL_NOMOVE(GraphicsFlowItem)
 	public:
 		enum FlowConnectorType {
 			Input, // Triangle
@@ -37,9 +38,9 @@ namespace ot {
 			OutputOptional // Circle
 		};
 
-		GraphicsFlowItem();
-		GraphicsFlowItem(const std::string& _name);
-		GraphicsFlowItem(const std::string& _name, const std::string& _title);
+		explicit GraphicsFlowItem();
+		explicit GraphicsFlowItem(const std::string& _name);
+		explicit GraphicsFlowItem(const std::string& _name, const std::string& _title);
 		virtual ~GraphicsFlowItem();
 
 		void setName(const std::string& _name) { m_builder.setName(_name); };

@@ -27,7 +27,7 @@
 #include "OTModelEntities/EntityInformation.h"
 #include "MetadataAssemblyData.h"
 #include "OTModelEntities/EntityTableSelectedRanges.h"
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTGui/TableRange.h"
 #include "OTModelEntities/IVisualisationTable.h"
 #include "OTGui/Widgets/TableCfg.h"

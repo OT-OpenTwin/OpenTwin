@@ -19,10 +19,10 @@
 
 #include <iostream>
 #include "gtest/gtest.h"
-#include "OTCore/Variable.h"
-#include "OTCore/VariableToJSONConverter.h"
-#include "OTCore/JSONToVariableConverter.h"
-#include "OTCore/StringToVariableConverter.h"
+#include "OTCore/Variable/Variable.h"
+#include "OTCore/Variable/VariableToJSONConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
+#include "OTCore/Variable/StringToVariableConverter.h"
 
 #include "FixtureVariable.h"
 

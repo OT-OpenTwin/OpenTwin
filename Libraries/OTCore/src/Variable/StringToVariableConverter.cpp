@@ -17,9 +17,9 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/StringToVariableConverter.h"
+#include "OTCore/Variable/StringToVariableConverter.h"
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/StringToNumericCheck.h"
 
 ot::Variable ot::StringToVariableConverter::operator()(const std::string& _value, const char _decimalSeparator)

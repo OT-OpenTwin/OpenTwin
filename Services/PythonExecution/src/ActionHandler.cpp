@@ -19,10 +19,10 @@
 
 #include "ActionHandler.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTCore/VariableToJSONConverter.h"
-#include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/Variable/VariableToJSONConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/ReturnValues.h"
 #include "OTCore/GenericDataStruct.h"
 #include "OTCore/GenericDataStructFactory.h"

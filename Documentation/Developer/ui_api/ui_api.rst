@@ -9,5 +9,6 @@ User Interface API
    text_editor_api
    table_api
    graphics_editor_api
+   context_menus
    color_style
    view_handling

@@ -19,7 +19,7 @@
 
 #pragma once
 #include <bsoncxx/builder/basic/document.hpp>
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include <bsoncxx/builder/basic/array.hpp>
 
 struct __declspec(dllexport) VariableToBSONConverter

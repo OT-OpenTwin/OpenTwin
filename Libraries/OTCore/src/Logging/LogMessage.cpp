@@ -156,9 +156,7 @@ std::string ot::exportLogMessagesToString(const std::list<LogMessage>& _messages
 
 bool ot::importLogMessagesFromString(const std::string& _string, std::list<LogMessage>& _messages) {
 	ot::JsonDocument doc;
-	doc.fromJson(_string);
-
-	if (!doc.IsArray()) {
+	if (!doc.fromJson(_string) || !doc.IsArray()) {
 		OT_LOG_E("Document is not an array");
 		return false;
 	}

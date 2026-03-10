@@ -19,7 +19,6 @@
 
 // OpenTwin header
 #include "OTWidgets/ContextMenu/ContextMenu.h"
-#include "OTWidgets/ContextMenu/ContextMenuAction.h"
 #include "OTWidgets/Style/IconManager.h"
 
 ot::ContextMenu::ContextMenu(QWidget* _parent)

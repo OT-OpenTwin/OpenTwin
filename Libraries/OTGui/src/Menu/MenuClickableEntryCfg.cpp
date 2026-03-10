@@ -20,37 +20,14 @@
 // OpenTwin header
 #include "OTGui/Menu/MenuClickableEntryCfg.h"
 
-ot::MenuClickableEntryCfg::MenuClickableEntryCfg() {
-
-}
-
 ot::MenuClickableEntryCfg::MenuClickableEntryCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath)
 	: m_name(_name), m_text(_text), m_iconPath(_iconPath) 
 {
 
 }
 
-ot::MenuClickableEntryCfg::MenuClickableEntryCfg(const MenuClickableEntryCfg& _other)
-	: MenuEntryCfg(_other), m_name(_other.m_name), m_text(_other.m_text), m_iconPath(_other.m_iconPath), m_toolTip(_other.m_toolTip)
-{
-
-}
-
 ot::MenuClickableEntryCfg::~MenuClickableEntryCfg() {
 
-}
-
-ot::MenuClickableEntryCfg& ot::MenuClickableEntryCfg::operator=(const MenuClickableEntryCfg& _other) {
-	if (this != &_other) {
-		MenuEntryCfg::operator=(_other);
-
-		m_name = _other.m_name;
-		m_text = _other.m_text;
-		m_iconPath = _other.m_iconPath;
-		m_toolTip = _other.m_toolTip;
-	}
-
-	return *this;
 }
 
 void ot::MenuClickableEntryCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {

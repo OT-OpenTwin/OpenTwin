@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/VariableListToStringListConverter.h"
+#include "OTCore/Variable/VariableListToStringListConverter.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntryArray.h"

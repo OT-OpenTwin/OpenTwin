@@ -31,15 +31,14 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT MenuEntryCfg : public Serializable {
+		OT_DECL_DEFCOPY(MenuEntryCfg)
+		OT_DECL_DEFMOVE(MenuEntryCfg)
 	public:
 		static const std::string& classNameJsonKey();
 
-		MenuEntryCfg();
-		MenuEntryCfg(const MenuEntryCfg& _other);
-		virtual ~MenuEntryCfg();
+		MenuEntryCfg() = default;
+		virtual ~MenuEntryCfg() = default;
 		
-		MenuEntryCfg& operator = (const MenuEntryCfg& _other);
-
 		virtual MenuEntryCfg* createCopy() const = 0;
 		virtual std::string getClassName() const = 0;
 

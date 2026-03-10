@@ -31,7 +31,7 @@ namespace ot {
 		OT_DECL_NOCOPY(TableActionHandler)
 		OT_DECL_NOMOVE(TableActionHandler)
 	public:
-		TableActionHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
+		explicit TableActionHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
 		virtual ~TableActionHandler() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################

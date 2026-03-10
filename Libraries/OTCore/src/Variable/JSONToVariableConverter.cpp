@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/ComplexNumbers/SerialisationKeys.h"
 
 ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)

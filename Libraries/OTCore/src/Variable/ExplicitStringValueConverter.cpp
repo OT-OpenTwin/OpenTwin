@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/ExplicitStringValueConverter.h"
+#include "OTCore/Variable/ExplicitStringValueConverter.h"
 #include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
 #include "OTCore/String.h"
 

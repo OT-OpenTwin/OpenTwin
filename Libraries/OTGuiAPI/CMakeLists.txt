@@ -91,6 +91,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(OTGUIAPI_HEADER_FILES
     include/OTGuiAPI/ButtonHandler.h
     include/OTGuiAPI/CheckBoxHandler.h
+    include/OTGuiAPI/ContextMenuHandler.h
     include/OTGuiAPI/FrontendActionHandler.h
     include/OTGuiAPI/Frontend.h
     include/OTGuiAPI/GraphicsFlowItem.h
@@ -105,6 +106,7 @@ set(OTGUIAPI_HEADER_FILES
 set(OTGUIAPI_SOURCE_FILES
     src/ButtonHandler.cpp
     src/CheckBoxHandler.cpp
+    src/ContextMenuHandler.cpp
     src/dllmain.cpp
     src/FrontendActionHandler.cpp
     src/Frontend.cpp

@@ -126,6 +126,29 @@ set(OTCORE_HEADER_FILES
     include/OTCore/RAII/IncrementRAII.h
     include/OTCore/RAII/ValueRAII.h
 
+    include/OTCore/Units/SI.h
+    
+    include/OTCore/QueryDescription/ValueComparisonDescription.h
+    include/OTCore/QueryDescription/QueryDescription.h
+    include/OTCore/QueryDescription/QueryTargetDescription.h
+    
+    include/OTCore/Tuple/TupleDescription.h
+    include/OTCore/Tuple/TupleDescriptionComplex.h
+    include/OTCore/Tuple/TupleDescriptionSingle.h
+    include/OTCore/Tuple/TupleFactory.h
+    include/OTCore/Tuple/TupleInstance.h
+
+    include/OTCore/Variable/ExplicitStringValueConverter.h
+    include/OTCore/Variable/JSONToVariableConverter.h
+    include/OTCore/Variable/StringToVariableConverter.h
+    include/OTCore/Variable/Variable.h
+    include/OTCore/Variable/VariableData.h
+    include/OTCore/Variable/VariableHelper.h
+    include/OTCore/Variable/VariableListToStringListConverter.h
+    include/OTCore/Variable/VariableToBSONStringConverter.h
+    include/OTCore/Variable/VariableToJSONConverter.h
+    include/OTCore/Variable/VariableToStringConverter.h
+
     include/OTCore/BasicEntityInformation.h
     include/OTCore/BasicServiceInformation.h
     include/OTCore/Color.h
@@ -140,7 +163,6 @@ set(OTCORE_HEADER_FILES
     include/OTCore/EncodingConverter_UTF16ToUTF8.h
     include/OTCore/EncodingGuesser.h
     include/OTCore/EntityName.h
-    include/OTCore/ExplicitStringValueConverter.h
     include/OTCore/FactoryTemplate.h
     include/OTCore/FactoryTemplate.hpp
     include/OTCore/FileInformation.h
@@ -151,7 +173,6 @@ set(OTCORE_HEADER_FILES
     include/OTCore/GenericDataStructSingle.h
     include/OTCore/GenericDataStructVector.h
     include/OTCore/GlobalTestingFlags.h
-    include/OTCore/JSONToVariableConverter.h
     include/OTCore/LocalStateStack.h
     include/OTCore/LocalStateStack.hpp
     include/OTCore/LoginTypes.h
@@ -189,7 +210,6 @@ set(OTCORE_HEADER_FILES
     include/OTCore/String.h
     include/OTCore/String.hpp
     include/OTCore/StringToNumericCheck.h
-    include/OTCore/StringToVariableConverter.h
     include/OTCore/Symbol.h
     include/OTCore/SystemServiceConfigInfo.h
     include/OTCore/TemplateTypeName.h
@@ -200,24 +220,6 @@ set(OTCORE_HEADER_FILES
     include/OTCore/TimeFormatter.h
     include/OTCore/TypeNames.h
     include/OTCore/UIDNamePair.h
-    include/OTCore/Variable.h
-    include/OTCore/VariableListToStringListConverter.h
-    include/OTCore/VariableToBSONStringConverter.h
-    include/OTCore/VariableToJSONConverter.h
-    include/OTCore/VariableToStringConverter.h
-    include/OTCore/Units/SI.h
-    
-    include/OTCore/QueryDescription/ValueComparisonDescription.h
-    include/OTCore/QueryDescription/QueryDescription.h
-    include/OTCore/QueryDescription/QueryTargetDescription.h
-    
-    include/OTCore/Tuple/TupleDescription.h
-    include/OTCore/Tuple/TupleDescriptionComplex.h
-    include/OTCore/Tuple/TupleDescriptionSingle.h
-    include/OTCore/Tuple/TupleFactory.h
-    include/OTCore/Tuple/TupleInstance.h
-
-    include/OTCore/Variable/VariableHelper.h
 )
 
 set(OTCORE_SOURCE_FILES
@@ -230,6 +232,17 @@ set(OTCORE_SOURCE_FILES
     src/Logging/LogTypes.cpp
     src/Logging/LogDispatcher.cpp
 
+    src/Variable/ExplicitStringValueConverter.cpp
+    src/Variable/JSONToVariableConverter.cpp
+    src/Variable/StringToVariableConverter.cpp
+    src/Variable/Variable.cpp
+    src/Variable/VariableData.cpp
+    src/Variable/VariableHelper.cpp
+    src/Variable/VariableListToStringListConverter.cpp
+    src/Variable/VariableToBSONStringConverter.cpp
+    src/Variable/VariableToJSONConverter.cpp
+    src/Variable/VariableToStringConverter.cpp
+
     src/BasicEntityInformation.cpp
     src/BasicServiceInformation.cpp
     src/Color.cpp
@@ -240,7 +253,6 @@ set(OTCORE_SOURCE_FILES
     src/EncodingConverter_UTF16ToUTF8.cpp
     src/EncodingGuesser.cpp
     src/EntityName.cpp
-    src/ExplicitStringValueConverter.cpp
     src/FileInformation.cpp
     src/GenericDataStruct.cpp
     src/GenericDataStructFactory.cpp
@@ -258,7 +270,6 @@ set(OTCORE_SOURCE_FILES
     src/LoginTypes.cpp
     src/Math.cpp
     src/OwnerServiceGlobal.cpp
-    src/JSONToVariableConverter.cpp
     src/Owner.cpp
     src/Point2D.cpp
     src/Rect.cpp
@@ -268,17 +279,10 @@ set(OTCORE_SOURCE_FILES
     src/OwnerService.cpp
     src/Size2D.cpp
     src/String.cpp
-    src/StringToVariableConverter.cpp
     src/SystemServiceConfigInfo.cpp
     src/TextEncoding.cpp
     src/ThisService.cpp
     src/UIDNamePair.cpp
-   
-    src/Variable.cpp
-    src/VariableListToStringListConverter.cpp
-    src/VariableToBSONStringConverter.cpp
-    src/VariableToJSONConverter.cpp
-    src/VariableToStringConverter.cpp
     src/TimeFormatter.cpp
     src/TupleDescription.cpp
     src/TupleDescriptionComplex.cpp

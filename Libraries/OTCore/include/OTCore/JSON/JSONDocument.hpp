@@ -27,6 +27,7 @@ inline ot::JsonDocument::JsonDocument() : rapidjson::Document(rapidjson::kObject
 inline ot::JsonDocument::JsonDocument(rapidjson::Type _type) : rapidjson::Document(_type) {};
 
 inline bool ot::JsonDocument::fromJson(const char* _fromJson) {
+	this->SetNull();
 	this->Parse(_fromJson);
 	return (this->GetType() == rapidjson::kObjectType) || (this->GetType() == rapidjson::kArrayType);
 }

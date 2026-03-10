@@ -19,7 +19,7 @@
 
 #pragma once
 #include <stdint.h>
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 
 namespace ts
 {

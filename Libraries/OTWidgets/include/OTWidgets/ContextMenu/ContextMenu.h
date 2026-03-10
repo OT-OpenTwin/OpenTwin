@@ -23,6 +23,7 @@
 #include "OTGui/Menu/MenuCfg.h"
 #include "OTGui/Menu/MenuSeparatorCfg.h"
 #include "OTWidgets/WidgetTypes.h"
+#include "OTWidgets/ContextMenu/ContextMenuAction.h"
 
 // Qt header
 #include <QtWidgets/qmenu.h>

@@ -19,7 +19,7 @@
 
 #pragma once
 #include <list>
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "GraphNode.h"
 #include "PipelineData.h"

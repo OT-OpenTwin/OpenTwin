@@ -24,7 +24,7 @@
 #include "SubprocessManager.h"
 
 // Open twin header
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTCore/TypeNames.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTServiceFoundation/UiComponent.h"

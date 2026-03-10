@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #pragma once
+
 #include "Options.h"
 
 namespace ts
@@ -29,29 +30,32 @@ namespace ts
 		OptionSettings();
 
 		bool operator==(const OptionSettings& other)const;
+		bool operator!=(const OptionSettings& other)const { return !(*this == other); };
 		
-		const option::Frequency getFrequency() const { return _frequency; }
-		void setFrequency(const option::Frequency& frequency) { _frequency = frequency; }
+		const option::Frequency getFrequency() const { return m_frequency; };
+		void setFrequency(const option::Frequency& frequency) { m_frequency = frequency; };
 		
-		const option::Format getFormat() const { return _format; }
-		void setFormat(const option::Format& format) { _format = format; }
+		const option::Format getFormat() const { return m_format; };
+		void setFormat(const option::Format& format) { m_format = format; };
 
-		const option::Parameter getParameter() const { return _parameter; }
-		void setParameter(const option::Parameter& parameter) { _parameter = parameter; }
+		const option::Parameter getParameter() const { return m_parameter; };
+		void setParameter(const option::Parameter& parameter) { m_parameter = parameter; };
 
 		/// <summary>
 		/// Unit: Ohm
 		/// </summary>
 		/// <returns></returns>
-		const ot::Variable getReferenceResistance() const { return _referenceResistance; }
+		const ot::Variable getReferenceResistance() const { return m_referenceResistance; };
+
 		/// <summary>
 		/// Unit: Ohm
 		/// </summary>
-		void setReferenceResistance(const ot::Variable& value) { _referenceResistance = value; }
+		void setReferenceResistance(const ot::Variable& value) { m_referenceResistance = value; };
+
 	private:
-		option::Frequency _frequency;
-		option::Format _format;
-		option::Parameter _parameter;
-		ot::Variable _referenceResistance;
+		option::Frequency m_frequency;
+		option::Format m_format;
+		option::Parameter m_parameter;
+		ot::Variable m_referenceResistance;
 	};
 }

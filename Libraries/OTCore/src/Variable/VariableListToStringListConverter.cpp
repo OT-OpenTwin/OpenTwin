@@ -1,5 +1,5 @@
 // @otlicense
-// File: ExplicitStringValueConverter.h
+// File: VariableListToStringListConverter.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,20 +17,18 @@
 // limitations under the License.
 // @otlicense-end
 
-#pragma once
-#include "OTCore/Variable.h"
-#include "OTCore/JSON/JSON.h"
+#include "OTCore/Variable/VariableListToStringListConverter.h"
 
-#include <memory>
-
-namespace ot
+std::list<std::string> ot::VariableListToStringListConverter::operator()(const std::list<Variable>& values)
 {
-	class __declspec(dllexport) ExplicitStringValueConverter
+	std::list<std::string> strValueList;
+	for (const ot::Variable& value : values)
 	{
-	public:
+		if (value.isConstCharPtr())
+		{
+			strValueList.push_back(value.getConstCharPtr());
+		}
+	}
 
-		static ot::Variable setValueFromString(const std::string& _valueString, const std::string& _valueType);
-		static void setValueFromString(std::unique_ptr<ot::Variable>& _value, const std::string& _valueString, const std::string& _valueType);
-		static ot::Variable setValueFromString(const ot::JsonValue& _jsValue, const std::string& _valueType);
-	};
+	return strValueList;
 }

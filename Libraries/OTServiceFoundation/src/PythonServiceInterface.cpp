@@ -21,8 +21,8 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/CommunicationTypes.h"
-#include "OTCore/JSONToVariableConverter.h"
-#include "OTCore/VariableToJSONConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
+#include "OTCore/Variable/VariableToJSONConverter.h"
 
 #include "OTDataStorage/DocumentAPI.h"
 #include "OTModelEntities/DataBase.h"

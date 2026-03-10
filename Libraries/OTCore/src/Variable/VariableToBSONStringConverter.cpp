@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/VariableToBSONStringConverter.h"
+#include "OTCore/Variable/VariableToBSONStringConverter.h"
 #include <cassert>
 
 std::string ot::VariableToBSONStringConverter::operator()(const ot::Variable& variable)

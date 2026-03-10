@@ -20,9 +20,9 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Variable.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/DefensiveProgramming.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
 #include "OTResultDataAccess/ResultDataAccessAPIExport.h"
 

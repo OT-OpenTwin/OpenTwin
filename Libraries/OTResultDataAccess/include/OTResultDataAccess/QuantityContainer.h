@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Variable.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTResultDataAccess/ResultDataAccessAPIExport.h"
 
 // MongoDB header

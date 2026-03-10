@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #pragma once
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 

@@ -25,7 +25,7 @@
 #include <list>
 #include <memory>
 #include <stdint.h>
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "MetadataAssemblyData.h"
 
 class KeyValuesExtractor

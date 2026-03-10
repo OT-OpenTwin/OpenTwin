@@ -28,11 +28,12 @@
 #include "OTCore/TypeNames.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTCore/ExplicitStringValueConverter.h"
+#include "OTCore/Variable/ExplicitStringValueConverter.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
-#include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
+
 // BSONCXX header
 #include "bsoncxx/json.hpp"
 

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 class ValueProcessor 
 {
 public:

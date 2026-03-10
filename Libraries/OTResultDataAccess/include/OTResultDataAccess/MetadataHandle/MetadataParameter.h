@@ -20,11 +20,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Variable.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/VariableToJSONConverter.h"
-#include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/Variable/Variable.h"
+#include "OTCore/Variable/VariableToJSONConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
 #include "OTResultDataAccess/ResultDataAccessAPIExport.h"
 

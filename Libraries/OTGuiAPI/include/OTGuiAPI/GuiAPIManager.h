@@ -52,7 +52,7 @@ namespace ot {
 		ServiceBase m_frontend; //! @brief Current frontend information
 		
 		//! @brief Private constructor
-		GuiAPIManager();
+		explicit GuiAPIManager();
 
 		//! @brief Private destructor
 		~GuiAPIManager();

@@ -48,7 +48,7 @@ namespace ot {
 
 		static JsonDocument createChangeEventDocument(const ot::GraphicsChangeEvent& _changeEvent);
 
-		GraphicsActionHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
+		explicit GraphicsActionHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
 		virtual ~GraphicsActionHandler() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################

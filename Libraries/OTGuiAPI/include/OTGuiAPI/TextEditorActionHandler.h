@@ -30,7 +30,7 @@ namespace ot {
 		OT_DECL_NOCOPY(TextEditorActionHandler)
 		OT_DECL_NOMOVE(TextEditorActionHandler)
 	public:
-		TextEditorActionHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
+		explicit TextEditorActionHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
 		virtual ~TextEditorActionHandler() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################

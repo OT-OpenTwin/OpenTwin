@@ -26,7 +26,7 @@
 #include <map>
 #include <stdint.h>
 #include <exception>
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 
 //! @brief Abstract class that allows assembling fields and subdocuments of the entity during runtime.
 class __declspec(dllexport) EntityWithDynamicFields : public EntityContainer

@@ -47,7 +47,7 @@
 
 #include "CategorisationFolderNames.h"
 #include "OTCore/EntityName.h"
-#include "OTCore/VariableToJSONConverter.h"
+#include "OTCore/Variable/VariableToJSONConverter.h"
 
 
 TabledataToResultdataHandler::TabledataToResultdataHandler(const std::string& _datasetFolder, const std::string& _tableFolder)

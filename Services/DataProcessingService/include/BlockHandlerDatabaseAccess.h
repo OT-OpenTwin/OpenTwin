@@ -23,7 +23,7 @@
 #include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
-#include "OTCore/StringToVariableConverter.h"
+#include "OTCore/Variable/StringToVariableConverter.h"
 #include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
 #include "OTCore/QueryDescription/QueryDescription.h"
 #include "DataLakeAccessor.h"

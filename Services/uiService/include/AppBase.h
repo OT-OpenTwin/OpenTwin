@@ -25,6 +25,7 @@
 // Frontend header
 #include "uiServiceTypes.h"				// Model and View types
 #include "LoginData.h"
+#include "ContextMenuManager.h"
 #include "ProjectOverviewWidget.h"
 #include "NavigationSelectionManager.h"
 
@@ -43,6 +44,7 @@
 #include "OTGui/ExtendedProjectInformation.h"
 #include "OTGui/Dialog/MessageDialogCfg.h"
 #include "OTGui/Event/GraphicsChangeEvent.h"
+#include "OTGui/Event/ContextMenuRequestEvent.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Properties/Property.h"
@@ -667,6 +669,8 @@ public Q_SLOTS:
 
 	void slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result, ot::SelectionOrigin _eventOrigin);
 
+	void slotNavigationTreeContextMenuRequested(const QPoint& _pos);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Plot slots
@@ -800,6 +804,8 @@ private:
 
 	ShortcutManager *			m_shortcutManager;
 	
+	ContextMenuManager           m_contextMenuManager;
+
 	ot::NavigationTreeView* m_projectNavigation;
 	ot::NavigationSelectionManager m_navigationManager;
 

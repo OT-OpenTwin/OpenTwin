@@ -36,8 +36,8 @@ namespace ot {
 		};
 		typedef ot::Flags<EventFlag> EventFlags;
 
-		GuiEvent();
-		GuiEvent(const EventFlags& _flags);
+		explicit GuiEvent();
+		explicit GuiEvent(const EventFlags& _flags);
 		GuiEvent(const ConstJsonObject& _jsonObject);
 		virtual ~GuiEvent() = default;
 

@@ -31,7 +31,7 @@
 #include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
 #include "OTCore/EntityName.h"
-#include "OTCore/StringToVariableConverter.h"
+#include "OTCore/Variable/StringToVariableConverter.h"
 #include "OTGui/TableIndexSchemata.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityAPI.h"

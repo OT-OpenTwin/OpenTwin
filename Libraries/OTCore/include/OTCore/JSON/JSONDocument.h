@@ -59,7 +59,7 @@ namespace ot {
 		bool fromJson(const std::string& _json) { return this->fromJson(_json.c_str()); };
 		bool fromJson(const char* _fromJson);
 
-		std::string toJson() const;
+		OT_DECL_NODISCARD std::string toJson() const;
 	};
 
 }

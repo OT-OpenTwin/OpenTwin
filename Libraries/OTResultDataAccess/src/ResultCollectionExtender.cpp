@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/DefensiveProgramming.h"
-#include "OTCore/VariableToStringConverter.h"
+#include "OTCore/Variable/VariableToStringConverter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntryComperator.h"
 #include "OTResultDataAccess/ResultCollection/IndexHandler.h"

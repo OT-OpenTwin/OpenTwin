@@ -25,8 +25,8 @@
 #include <memory>
 
 #include "OTCore/GenericDataStruct.h"
-#include "OTCore/Variable.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 
 namespace ot

@@ -19,12 +19,12 @@
 
 #include "OTCore/ReturnValues.h"
 
-#include "OTCore/VariableToJSONConverter.h"
-#include "OTCore/JSONToVariableConverter.h"
-#include "OTCore/GenericDataStructFactory.h"
 #include "OTCore/GenericDataStructSingle.h"
 #include "OTCore/GenericDataStructVector.h"
 #include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/GenericDataStructFactory.h"
+#include "OTCore/Variable/VariableToJSONConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
 
 ot::ReturnValues::~ReturnValues()
 {

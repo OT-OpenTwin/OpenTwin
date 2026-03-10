@@ -68,7 +68,7 @@ namespace ot {
 
 	private:
 		
-		Frontend() {};
+		explicit Frontend() {};
 		~Frontend() {};
 	};
 

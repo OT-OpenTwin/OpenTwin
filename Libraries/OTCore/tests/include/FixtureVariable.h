@@ -19,7 +19,7 @@
 
 #pragma once
 #include "gtest/gtest.h"
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 
 class FixtureVariable : public testing::TestWithParam<ot::Variable>
 {

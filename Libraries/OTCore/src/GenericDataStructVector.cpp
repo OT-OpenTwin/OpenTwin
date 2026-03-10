@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #include "OTCore/GenericDataStructVector.h"
-#include "OTCore/VariableToJSONConverter.h"
-#include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/Variable/VariableToJSONConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
 
 ot::GenericDataStructVector::GenericDataStructVector(const std::vector<ot::Variable>& _values)
 	:GenericDataStruct(getClassName(),static_cast<int32_t>(_values.size()))

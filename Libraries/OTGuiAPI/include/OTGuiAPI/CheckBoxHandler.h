@@ -39,7 +39,7 @@ namespace ot {
 		OT_DECL_NOCOPY(CheckBoxHandler)
 			OT_DECL_NOMOVE(CheckBoxHandler)
 	public:
-		CheckBoxHandler();
+		explicit CheckBoxHandler();
 		virtual ~CheckBoxHandler() = default;
 
 	protected:

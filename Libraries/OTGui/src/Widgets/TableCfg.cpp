@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTCore/VariableToStringConverter.h"
+#include "OTCore/Variable/VariableToStringConverter.h"
 #include "OTGui/Widgets/TableCfg.h"
 
 #if OT_TESTING_GLOBAL_AllTestsEnabled==true

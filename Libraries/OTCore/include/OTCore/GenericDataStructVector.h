@@ -20,8 +20,8 @@
 #pragma once
 #include <stdint.h>
 
-#include "GenericDataStruct.h"
-#include "Variable.h"
+#include "OTCore/GenericDataStruct.h"
+#include "OTCore/Variable/Variable.h"
 
 namespace ot
 {

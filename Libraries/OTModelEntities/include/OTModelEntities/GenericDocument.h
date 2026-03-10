@@ -24,7 +24,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 
 class __declspec(dllexport) GenericDocument
 {

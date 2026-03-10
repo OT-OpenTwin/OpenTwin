@@ -23,7 +23,7 @@
 #include "OTCore/GenericDataStructVector.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "PipelineData.h"
-#include "OTCore/VariableToStringConverter.h"
+#include "OTCore/Variable/VariableToStringConverter.h"
 
 namespace ot
 {

@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/VariableToStringConverter.h"
+#include "OTCore/Variable/VariableToStringConverter.h"
 #include <cassert>
 
 std::string ot::VariableToStringConverter::operator()(const ot::Variable& value)

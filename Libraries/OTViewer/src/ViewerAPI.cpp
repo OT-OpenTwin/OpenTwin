@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTCore/VariableToStringConverter.h"
+#include "OTCore/Variable/VariableToStringConverter.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityBase.h"
 #include "OTViewer/Viewer.h"

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "OptionsParameterHandlerReference.h"
-
+#include "OTCore/Variable/StringToVariableConverter.h"
 
 bool OptionsParameterHandlerReference::IndividualInterpretation(const std::string& entry, ts::OptionSettings& options)
 {

@@ -33,7 +33,7 @@ namespace ot
 	public:
 		using Serializable::toJson;
 
-		enum ReturnMessageStatus {
+		enum ReturnMessageStatus : int32_t {
 			Ok,     //! @brief Ok
 			Failed, //! @brief Error
 			True,
@@ -42,26 +42,31 @@ namespace ot
 			Cancel
 		};
 
-		static std::string statusToString(ReturnMessageStatus _status);
-		static ReturnMessageStatus stringToStatus(const std::string& _status);
+		OT_DECL_NODISCARD static std::string statusToString(ReturnMessageStatus _status);
+		OT_DECL_NODISCARD static ReturnMessageStatus stringToStatus(const std::string& _status);
 
 		//! @brief Create a ReturnMessage from the provided json string.
 		//! This function will create a new instance and and call set from json.
 		//! If the provided json string is invalid the resulting return message will have the result Failed and the what() will return the error string.
 		//! If the provided json string is empty the resulting return message will have the result Ok.
 		//! @param _json The json string.
-		static ReturnMessage fromJson(const std::string& _json);
+		OT_DECL_NODISCARD static ReturnMessage fromJson(const std::string& _json);
 
 		//! @brief Create a json string that can be used to create a ReturnMessage instance
 		//! @param _status The status
 		//! @param _what The message contents
-		static std::string toJson(ReturnMessageStatus _status, const std::string& _what = std::string());
+		OT_DECL_NODISCARD static std::string toJson(ReturnMessageStatus _status, const std::string& _what = std::string());
 
 		//! @brief Create a json string that can be used to create a ReturnMessage instance
 		//! @param _status Message status
 		//! @param _document JSON document that will be set as message
-		static std::string toJson(ReturnMessageStatus _status, const ot::JsonDocument& _document);
+		OT_DECL_NODISCARD static std::string toJson(ReturnMessageStatus _status, const ot::JsonDocument& _document);
 
+		OT_DECL_NODISCARD static ReturnMessage ok(const std::string& _what) { return ReturnMessage(ReturnMessageStatus::Ok, _what); };
+		OT_DECL_NODISCARD static ReturnMessage failed(const std::string& _what) { return ReturnMessage(ReturnMessageStatus::Failed, _what); };
+		OT_DECL_NODISCARD static ReturnMessage retry(const std::string& _what) { return ReturnMessage(ReturnMessageStatus::Retry, _what); };
+		OT_DECL_NODISCARD static ReturnMessage cancel(const std::string& _what) { return ReturnMessage(ReturnMessageStatus::Cancel, _what); };
+		
 		//! @brief Constructor
 		//! @param _status The status
 		//! @param _what The message contents
@@ -113,6 +118,11 @@ namespace ot
 		ReturnMessageStatus getStatus() const { return m_status; };
 
 		bool isOk() const { return m_status == ReturnMessageStatus::Ok; };
+		bool isFailed() const { return m_status == ReturnMessageStatus::Failed; };
+		bool isRetry() const { return m_status == ReturnMessageStatus::Retry; };
+		bool isCancel() const { return m_status == ReturnMessageStatus::Cancel; };
+		bool isTrue() const { return m_status == ReturnMessageStatus::True; };
+		bool isFalse() const { return m_status == ReturnMessageStatus::False; };
 
 		void setValues(const ReturnValues& _values) { m_values = _values; };
 		

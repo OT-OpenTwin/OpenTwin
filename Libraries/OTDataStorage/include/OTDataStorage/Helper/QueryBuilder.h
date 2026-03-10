@@ -27,7 +27,7 @@
 #include <map>
 #include <vector>
 #include <list>
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 
 #include <bsoncxx/types/value.hpp>
 #include <bsoncxx/document/view_or_value.hpp>

@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTWidgets/Plot/PlotDataset.h"
 #include "OTDataStorage/DataLakeAPI.h"
 

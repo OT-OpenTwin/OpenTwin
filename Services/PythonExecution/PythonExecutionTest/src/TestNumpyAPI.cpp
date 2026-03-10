@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "FixtureNumpyAPI.h"
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 
 #define PY_ARRAY_UNIQUE_SYMBOL FixtureNumpyAPI_ARRAY_API
 #define NO_IMPORT_ARRAY

@@ -25,13 +25,12 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT MenuClickableEntryCfg : public MenuEntryCfg {
+		OT_DECL_DEFCOPY(MenuClickableEntryCfg)
+		OT_DECL_DEFMOVE(MenuClickableEntryCfg)
 	public:
-		MenuClickableEntryCfg();
+		MenuClickableEntryCfg() = default;
 		MenuClickableEntryCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string());
-		MenuClickableEntryCfg(const MenuClickableEntryCfg& _other);
 		virtual ~MenuClickableEntryCfg();
-
-		MenuClickableEntryCfg& operator = (const MenuClickableEntryCfg& _other);
 
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _object Json object reference to write the data to.

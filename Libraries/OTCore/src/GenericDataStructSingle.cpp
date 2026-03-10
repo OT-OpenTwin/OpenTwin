@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #include "OTCore/GenericDataStructSingle.h"
-#include "OTCore/JSONToVariableConverter.h"
-#include "OTCore/VariableToJSONConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
+#include "OTCore/Variable/VariableToJSONConverter.h"
 
 ot::GenericDataStructSingle::GenericDataStructSingle()
 	:ot::GenericDataStruct(getClassName(), 1)

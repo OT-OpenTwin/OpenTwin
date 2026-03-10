@@ -84,6 +84,7 @@
 #include "OTWidgets/Plot/PlotDataset.h"
 #include "OTWidgets/Widgets/WidgetProperties.h"
 #include "OTWidgets/Version/VersionGraphManager.h"
+#include "OTWidgets/ContextMenu/ContextMenu.h"
 #include "OTWidgets/Properties/PropertyGrid.h"
 #include "OTWidgets/Properties/PropertyInput.h"
 #include "OTWidgets/Properties/PropertyGridItem.h"
@@ -219,7 +220,8 @@ AppBase::AppBase() :
 	m_lastFocusedCentralView(nullptr),
 	m_defaultView(nullptr),
 	m_loginDialog(nullptr),
-	m_outputWasHtml(false)
+	m_outputWasHtml(false),
+	m_contextMenuManager(this)
 {
 	m_currentStateWindow.viewShown = false;
 
@@ -1004,6 +1006,7 @@ void AppBase::createUi() {
 			
 			this->connect(m_projectNavigation, &ot::NavigationTreeView::copyRequested, this, &AppBase::slotCopyRequested);
 			this->connect(m_projectNavigation, &ot::NavigationTreeView::pasteRequested, this, &AppBase::slotPasteRequested);
+			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::customContextMenuRequested, this, &AppBase::slotNavigationTreeContextMenuRequested);
 
 			//m_projectNavigation->getTree()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
@@ -3815,6 +3818,35 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 	this->autoCloseUnpinnedViews(!selectionInfo.getSelectedNavigationItems().empty());
 
 	OT_SLECTION_TEST_LOG(">> Handle selection has changed completed");
+}
+
+void AppBase::slotNavigationTreeContextMenuRequested(const QPoint& _pos)
+{
+	ot::MenuCfg menuCfg;
+	ot::BasicEntityInformation entityUnderMouse;
+
+	// Determine item under mouse
+	ak::aTreeWidgetItem* item = dynamic_cast<ak::aTreeWidgetItem*>(m_projectNavigation->getTree()->itemAt(_pos));
+	if (!item)
+	{
+		return;
+	}
+	const ot::UID entityId = ViewerAPI::getModelEntityIDFromTreeID(item->id());
+
+	// Determine menu externally
+	if (!m_contextMenuManager.navigationItemContextRequest(entityUnderMouse, menuCfg))
+	{
+		return;
+	}
+
+	ot::ContextMenu menu(menuCfg, this->mainWindow());
+
+	const QPoint globalPos = m_projectNavigation->getTree()->treeWidget()->mapToGlobal(_pos);
+	ot::ContextMenuAction* action = dynamic_cast<ot::ContextMenuAction*>(menu.exec(globalPos));
+	if (!action)
+	{
+		return;
+	}	
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

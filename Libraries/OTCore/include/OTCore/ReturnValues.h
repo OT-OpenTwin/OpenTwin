@@ -20,7 +20,7 @@
 #pragma once
 #include <map>
 
-#include "OTCore/Variable.h"
+#include "OTCore/Variable/Variable.h"
 #include "OTCore/GenericDataStruct.h"
 #include "OTCore/Serializable.h"
 
