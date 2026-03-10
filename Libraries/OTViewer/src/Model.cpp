@@ -2333,7 +2333,10 @@ unsigned long long Model::getModelEntityIDFromTreeID(ot::UID treeItem)
 	SceneNodeBase *item = m_treeItemToSceneNodesMap[treeItem];
 	assert(item != nullptr);
 
-	if (item == nullptr) return 0;
+	if (item == nullptr)
+	{
+		return ot::invalidUID;
+	}
 
 	return item->getModelEntityID();
 }

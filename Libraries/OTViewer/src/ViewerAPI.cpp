@@ -677,6 +677,27 @@ ot::UID ViewerAPI::getTreeIDFromModelEntityID(ot::UID modelID)
 	return GlobalModel::instance()->getTreeIDFromModelID(modelID);
 }
 
+ot::EntityTreeItem ViewerAPI::getEntityTreeItem(ot::UID _modelEntityID)
+{
+	if (GlobalModel::instance() == nullptr)
+	{
+		OT_LOG_E("Modl not created yet");
+		return ot::EntityTreeItem();
+	}
+	else
+	{
+		auto node = GlobalModel::instance()->getSceneNodeByEntityID(_modelEntityID);
+		if (!node) {
+			OT_LOG_W("Scene node not found { \"EntityID\": " + std::to_string(_modelEntityID) + " }");
+			return ot::EntityTreeItem();
+		}
+		else
+		{
+			return node->getTreeItem();
+		}
+	}
+}
+
 void ViewerAPI::removeShapes(ot::UID osgModelID, std::list<unsigned long long> modelEntityID)
 {
 	try

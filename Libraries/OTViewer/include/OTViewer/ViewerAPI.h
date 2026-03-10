@@ -129,6 +129,7 @@ namespace ViewerAPI {
 	__declspec(dllexport) void getSelectedVisibleModelEntityIDs(std::list<ot::UID> &selected);
 	__declspec(dllexport) ot::UID getModelEntityIDFromTreeID(ot::UID treeID);
 	__declspec(dllexport) ot::UID getTreeIDFromModelEntityID(ot::UID treeID);
+	__declspec(dllexport) ot::EntityTreeItem getEntityTreeItem(ot::UID _modelEntityID);
 
 	__declspec(dllexport) void removeShapes(ot::UID _osgModelID, std::list<ot::UID> modelEntityID);
 	__declspec(dllexport) void setShapeVisibility(ot::UID _osgModelID, std::list<ot::UID> visibleID, std::list<ot::UID> hiddenID);
