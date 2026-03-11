@@ -2111,6 +2111,8 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 		currentColorRamp = *activeColorRamp;
 	}
 
+	if (!activeColorRamp->isActive()) return;
+
 	// Determine color ramp properties
 	int numberSegments = activeColorRamp->getValues().size() - 1;
 	if (numberSegments < 1) return;

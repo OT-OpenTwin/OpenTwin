@@ -120,7 +120,7 @@ void SceneNodeVTK::setTransparent(bool t)
 		osg::StateSet *stateset = getShapeNode()->getOrCreateStateSet();
 		stateset->clear();
 
-		getModel()->setColorRampActive(getName(), true);
+		getModel()->setColorRampActive(getName(), isVisible());
 
 		//getShapeNode()->setNodeMask(getShapeNode()->getNodeMask() | 1);  // Set last bit of node mask
 	}
