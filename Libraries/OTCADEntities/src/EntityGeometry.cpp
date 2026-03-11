@@ -677,15 +677,15 @@ void EntityGeometry::createNonMaterialProperties(void)
 
 	createTransformProperty("#Angle (deg.)", 0.0);
 
-	EntityPropertiesString::createProperty("Transformation", "Position X", "0",	"", getProperties());
-	EntityPropertiesString::createProperty("Transformation", "Position Y", "0",	"", getProperties());
-	EntityPropertiesString::createProperty("Transformation", "Position Z", "0",	"", getProperties());
+	EntityPropertiesString::createProperty("Transformation", "Position X", "0",	"", getProperties())->setGroupChanges(true);
+	EntityPropertiesString::createProperty("Transformation", "Position Y", "0",	"", getProperties())->setGroupChanges(true);
+	EntityPropertiesString::createProperty("Transformation", "Position Z", "0",	"", getProperties())->setGroupChanges(true);
 
-	EntityPropertiesString::createProperty("Transformation", "Axis X", "0",	"", getProperties());
-	EntityPropertiesString::createProperty("Transformation", "Axis Y", "0",	"", getProperties());
-	EntityPropertiesString::createProperty("Transformation", "Axis Z", "0",	"", getProperties());
+	EntityPropertiesString::createProperty("Transformation", "Axis X", "0",	"", getProperties())->setGroupChanges(true);
+	EntityPropertiesString::createProperty("Transformation", "Axis Y", "0",	"", getProperties())->setGroupChanges(true);
+	EntityPropertiesString::createProperty("Transformation", "Axis Z", "0",	"", getProperties())->setGroupChanges(true);
 
-	EntityPropertiesString::createProperty("Transformation", "Angle (deg.)", "0",	"", getProperties());
+	EntityPropertiesString::createProperty("Transformation", "Angle (deg.)", "0",	"", getProperties())->setGroupChanges(true);
 
 	EntityPropertiesBoolean::createProperty("Mesh", "Consider for meshing",											  true, "",     getProperties());
 	EntityPropertiesDouble::createProperty("Mesh", "Mesh priority",													   0.0,	"",     getProperties());

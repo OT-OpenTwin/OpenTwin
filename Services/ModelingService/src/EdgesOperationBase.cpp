@@ -227,6 +227,7 @@ void EdgesOperationBase::storeEdgeListInProperties(std::list<EdgesData> &edgeLis
 		index = "(" + std::to_string(edgeCounter) + ")";
 
 		EntityPropertiesString* stringProp = new EntityPropertiesString("Edge name " + index, edge->getEdgeName());
+		stringProp->setGroupChanges(true);
 		properties.createProperty(stringProp, "Edges", true);
 
 		edgeCounter--;
