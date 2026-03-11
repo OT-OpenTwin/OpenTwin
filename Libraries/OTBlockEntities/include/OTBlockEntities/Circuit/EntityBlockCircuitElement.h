@@ -38,7 +38,7 @@ public:
 	virtual void setCircuitModelFolder(ot::UID _folderID);
 
 protected:
-	virtual const std::string getCollectionType() { return "CircuitMetaData"; }
+	virtual const std::string getCollectionType() { return "CircuitData"; }
 	virtual const std::string getCircuitModelFolder() { return "Circuit Models"; }
 	virtual const ot::UID getCircuitModelFolderID();
 
