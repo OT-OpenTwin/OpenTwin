@@ -173,6 +173,7 @@ set(OTCORE_HEADER_FILES
     include/OTCore/GenericDataStructSingle.h
     include/OTCore/GenericDataStructVector.h
     include/OTCore/GlobalTestingFlags.h
+    include/OTCore/InClassFactory.h
     include/OTCore/LocalStateStack.h
     include/OTCore/LocalStateStack.hpp
     include/OTCore/LoginTypes.h
