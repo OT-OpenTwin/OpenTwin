@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/Menu/MenuCfg.h"
+#include "OTGui/Event/ContextMenuRequestEvent.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt header
@@ -30,36 +31,31 @@ class QWidget;
 
 namespace ot {
 
-	class ContextMenu;
+	class ContextMenuManagerHandler;
 
 	class OT_WIDGETS_API_EXPORT ContextMenuManager : public QObject {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ContextMenuManager)
+		OT_DECL_NOMOVE(ContextMenuManager)
 		OT_DECL_NODEFAULT(ContextMenuManager)
 	public:
-		ContextMenuManager(QWidget* _widget, Qt::ContextMenuPolicy _defaultMenuPolicy = Qt::NoContextMenu);
+		//! @brief Constructs a ContextMenuManager with the given handler.
+		//! The caller keeps ownership of the handler and must ensure that it remains valid for the lifetime of the ContextMenuManager.
+		//! @param _handler A pointer to the ContextMenuManagerHandler that will provide context menu configurations. Must not be null.
+		ContextMenuManager(const ContextMenuManagerHandler* _handler);
 		virtual ~ContextMenuManager();
+		
+		//! @brief Requests the display of a context menu for the given widget and event data.
+		//! @param _widget The widget for which the context menu should be displayed.
+		//! @param _requestEvent The event data containing the context menu request information.
+		//! Should contain the positition in local coordinates of the widget where the context menu should be displayed.
+		//! @return True if the context menu was successfully shown and a action was selected, false otherwise.
+		bool showContextMenu(QWidget* _widget, const ContextMenuRequestEvent& _requestEvent);
 
-		void setMenu(const MenuCfg& _config);
-
-		void setDefaultMenuPolicy(Qt::ContextMenuPolicy _policy) { m_defaultMenuPolicy = _policy; };
-		Qt::ContextMenuPolicy getDefaultMenuPolicy() const { return m_defaultMenuPolicy; };
-
-	Q_SIGNALS:
-		void clearRequested();
-		void actionTriggered(const std::string& _actionName);
-
-	public Q_SLOTS:
-		void slotShowContextMenu(const QPoint& _pos);
-
-	private Q_SLOTS:
-		void slotContextActionTriggered(const std::string& _actionName);
+		void forgetHandler() { m_handler = nullptr; };
 
 	private:
-		QWidget* m_widget;
-		MenuCfg m_config;
-		ContextMenu* m_menu;
-		Qt::ContextMenuPolicy m_defaultMenuPolicy;
+		const ContextMenuManagerHandler* m_handler;
 	};
 
 }

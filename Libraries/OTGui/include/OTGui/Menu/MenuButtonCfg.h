@@ -25,10 +25,18 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT MenuButtonCfg : public MenuClickableEntryCfg {
+		OT_DECL_DEFCOPY(MenuButtonCfg)
+		OT_DECL_DEFMOVE(MenuButtonCfg)
 	public:
 		enum ButtonAction {
-			NotifyOwner,
-			Clear
+			NoAction,         //! @brief No action will be performed when the button is clicked.
+
+			Clear,            //! @brief Clear the content of the widget (per widget implementation).
+			Select,           //! @brief Select the content of the widget (per widget implementation).
+			SelectAll,        //! @brief Select all content of the widget (per widget implementation).
+
+			TriggerTTBButton, //! @brief Trigger the button with the same name in the toolbar (if available).
+			NotifyOwner       //! @brief Notify the menu owner (e.g. the widget) about the button click, so that it can handle the action (e.g. by triggering an event or calling a callback).
 		};
 
 		static std::string toString(ButtonAction _action);
@@ -36,11 +44,8 @@ namespace ot {
 
 		MenuButtonCfg();
 		MenuButtonCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string(), ButtonAction _action = ButtonAction::NotifyOwner);
-		MenuButtonCfg(const MenuButtonCfg& _other);
 		MenuButtonCfg(const ot::ConstJsonObject& _object);
-		virtual ~MenuButtonCfg();
-
-		MenuButtonCfg& operator = (const MenuButtonCfg&) = delete;
+		virtual ~MenuButtonCfg() = default;
 
 		virtual MenuEntryCfg* createCopy() const override;
 		static std::string className() { return "MenuButtonCfg"; };

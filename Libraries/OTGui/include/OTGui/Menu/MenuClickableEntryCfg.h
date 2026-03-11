@@ -43,16 +43,16 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& getName(void) const { return m_name; };
+		const std::string& getName() const { return m_name; };
 
 		void setText(const std::string& _text) { m_text = _text; };
-		const std::string& getText(void) const { return m_text; };
+		const std::string& getText() const { return m_text; };
 
 		void setIconPath(const std::string& _iconPath) { m_iconPath = _iconPath; };
-		const std::string& getIconPath(void) const { return m_iconPath; };
+		const std::string& getIconPath() const { return m_iconPath; };
 
 		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
-		const std::string& getToolTip(void) const { return m_toolTip; };
+		const std::string& getToolTip() const { return m_toolTip; };
 
 	private:
 		std::string m_name;

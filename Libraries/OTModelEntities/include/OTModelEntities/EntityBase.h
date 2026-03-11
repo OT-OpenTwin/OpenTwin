@@ -26,6 +26,8 @@
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
 #include "OTGui/VisualisationTypes.h"
+#include "OTGui/Event/NavigationContextRequestData.h"
+#include "OTGui/Menu/MenuCfg.h"
 #include "OTModelEntities/ModelState.h"
 #include "OTModelEntities/EntityProperties.h"
 #include "OTModelEntities/EntityCallbackBase.h"
@@ -62,6 +64,12 @@ public:
 
 };
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 //! @brief The Entity class is the base class for model entities and provides basic access properties to model entities. 
 class  OT_MODELENTITIES_API_EXPORT EntityBase : public ot::EntityCallbackBase
 {
@@ -71,6 +79,10 @@ public:
 	EntityBase(EntityBase&& _other) = default;
 
 	virtual ~EntityBase();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Setter / Getter
 
 	static void setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator);
 	static DataStorageAPI::UniqueUIDGenerator *getUidGenerator();
@@ -205,6 +217,8 @@ public:
 
 	void setIsCopyable(bool _isCopyable);
 	bool getIsCopyable() const { return m_isCopyable; };
+
+	void fillContextMenu(const ot::NavigationContextRequestData* _requestData, ot::MenuCfg& _menuCfg);
 
 protected:
 	//! @brief Will set the default tree item.

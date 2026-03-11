@@ -36,12 +36,15 @@ namespace ot {
 		virtual ~ContextMenuAction();
 
 		void setFromConfiguration(const MenuButtonCfg& _config);
+		const MenuButtonCfg& getConfiguration() const { return m_config; };
 
-		void setContextMenuActionName(const std::string& _name) { m_name = _name; };
-		const std::string& getContextMenuActionName(void) const { return m_name; };
+		void setContextMenuActionName(const std::string& _name) { m_config.setName(_name); };
+		const std::string& getContextMenuActionName(void) const { return m_config.getName(); };
 
 	private:
-		std::string m_name;
+		void applyConfig();
+
+		MenuButtonCfg m_config;
 	};
 
 }

@@ -28,7 +28,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT MenuEntryCfgFactory : public FactoryTemplate<MenuEntryCfg> {
 		OT_DECL_NOCOPY(MenuEntryCfgFactory)
 	public:
-		static MenuEntryCfgFactory& instance(void);
+		static MenuEntryCfgFactory& instance();
 
 		static MenuEntryCfg* create(const ConstJsonObject& _jsonObject);
 

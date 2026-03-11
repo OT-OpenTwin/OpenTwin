@@ -38,15 +38,22 @@ ot::ContextMenuAction::~ContextMenuAction() {
 }
 
 void ot::ContextMenuAction::setFromConfiguration(const MenuButtonCfg& _config) {
-    m_name = _config.getName();
-    this->setText(QString::fromStdString(_config.getText()));
-    this->setToolTip(QString::fromStdString(_config.getToolTip()));
+    m_config = _config;
+    applyConfig();
+}
+
+void ot::ContextMenuAction::applyConfig() {
+    this->setText(QString::fromStdString(m_config.getText()));
+    this->setToolTip(QString::fromStdString(m_config.getToolTip()));
 
     // Set icon if needed
-    if (_config.getIconPath().empty()) {
+    if (m_config.getIconPath().empty())
+    {
         this->setIcon(QIcon());
     }
-    else {
-        this->setIcon(IconManager::getIcon(QString::fromStdString(_config.getIconPath())));
+    else
+    {
+        this->setIcon(IconManager::getIcon(QString::fromStdString(m_config.getIconPath())));
     }
 }
+

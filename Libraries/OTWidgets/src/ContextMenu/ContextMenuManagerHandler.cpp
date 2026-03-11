@@ -1,5 +1,5 @@
 // @otlicense
-// File: MenuSeparatorCfg.cpp
+// File: ContextMenuManagerHandler.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,11 +18,9 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/Menu/MenuSeparatorCfg.h"
-#include "OTGui/Menu/MenuEntryCfgFactory.h"
+#include "OTWidgets/ContextMenu/ContextMenuManagerHandler.h"
 
-static ot::MenuEntryCfgFactoryRegistrar<ot::MenuSeparatorCfg> separatorRegistarar(ot::MenuSeparatorCfg::className());
+ot::ContextMenuManagerHandler::ContextMenuManagerHandler()
+{
 
-ot::MenuEntryCfg* ot::MenuSeparatorCfg::createCopy() const {
-	return new MenuSeparatorCfg(*this);
 }

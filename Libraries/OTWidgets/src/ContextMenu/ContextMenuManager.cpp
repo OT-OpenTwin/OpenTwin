@@ -19,70 +19,47 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/ContextMenu/ContextMenu.h"
 #include "OTWidgets/ContextMenu/ContextMenuManager.h"
+#include "OTWidgets/ContextMenu/ContextMenuManagerHandler.h"
 
-ot::ContextMenuManager::ContextMenuManager(QWidget* _widget, Qt::ContextMenuPolicy _defaultMenuPolicy) :
-	m_widget(_widget), m_menu(nullptr), m_defaultMenuPolicy(_defaultMenuPolicy)
+ot::ContextMenuManager::ContextMenuManager(const ContextMenuManagerHandler* _handler)
+	: m_handler(_handler)
 {
-	OTAssertNullptr(m_widget);
-	if (m_defaultMenuPolicy == Qt::CustomContextMenu) {
-		OT_LOG_EA("Default context menu policy should not be \"custom\"");
-		m_defaultMenuPolicy = Qt::NoContextMenu;
-	}
-	m_widget->setContextMenuPolicy(m_defaultMenuPolicy);
+	
 }
 
 ot::ContextMenuManager::~ContextMenuManager() {
-	if (m_menu) {
-		delete m_menu;
-		m_menu = nullptr;
-	}
+
 }
 
-void ot::ContextMenuManager::setMenu(const MenuCfg& _config) {
-	m_config = _config;
-
-	m_widget->setContextMenuPolicy((m_config.isEmpty() ? m_defaultMenuPolicy : Qt::CustomContextMenu));
-}
-
-void ot::ContextMenuManager::slotShowContextMenu(const QPoint& _pos) {
-	if (m_config.isEmpty()) {
-		return;
+bool ot::ContextMenuManager::showContextMenu(QWidget* _widget, const ContextMenuRequestEvent& _requestEvent)
+{
+	if (!m_handler) {
+		OT_LOG_E("Cannot show context menu: No handler set.");
+		return false;
 	}
 
-	if (m_menu) {
-		OT_LOG_EA("Menu already set");
-		return;
+	// Get the context menu configuration from the handler
+	MenuCfg cfg = m_handler->getContextMenuConfiguration(_widget, _requestEvent);
+
+	ContextMenu menu(cfg, _widget);
+	QPoint globalPos = QtFactory::toQPoint(_requestEvent.getRequestData()->getPosition()).toPoint();
+	QAction* selectedAction = menu.exec(globalPos);
+	if (!selectedAction)
+	{
+		return false;
 	}
 
-	m_menu = new ContextMenu(m_config);
-	this->connect(m_menu, &ContextMenu::contextActionTriggered, this, &ContextMenuManager::slotContextActionTriggered);
-	m_menu->exec(m_widget->mapToGlobal(_pos));
-
-	this->disconnect(m_menu, &ContextMenu::contextActionTriggered, this, &ContextMenuManager::slotContextActionTriggered);
-	delete m_menu;
-	m_menu = nullptr;
-}
-
-void ot::ContextMenuManager::slotContextActionTriggered(const std::string& _actionName) {
-	MenuButtonCfg* button = m_config.findMenuButton(_actionName);
-	if (!button) {
-		OT_LOG_EAS("Menu button not found \"" + _actionName + "\"");
-		return;
+	ContextMenuAction* contextMenuAction = dynamic_cast<ContextMenuAction*>(selectedAction);
+	if (!contextMenuAction)
+	{
+		OT_LOG_E("Invalid context menu selection");
+		return false;
 	}
 
-	switch (button->getButtonAction()) {
-	case ot::MenuButtonCfg::NotifyOwner:
-		Q_EMIT actionTriggered(_actionName);
-		break;
+	
 
-	case ot::MenuButtonCfg::Clear:
-		Q_EMIT clearRequested();
-		break;
-
-	default:
-		OT_LOG_EAS("Unknown button action (" + std::to_string((int)button->getButtonAction()) + ")");
-		break;
-	}
+	return false;
 }

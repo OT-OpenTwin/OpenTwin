@@ -55,21 +55,11 @@ ot::MenuButtonCfg::MenuButtonCfg(const std::string& _name, const std::string& _t
 
 }
 
-ot::MenuButtonCfg::MenuButtonCfg(const MenuButtonCfg& _other)
-	: MenuClickableEntryCfg(_other), m_action(_other.m_action)
-{
-
-}
-
 ot::MenuButtonCfg::MenuButtonCfg(const ot::ConstJsonObject& _object) {
 	this->setFromJsonObject(_object);
 }
 
-ot::MenuButtonCfg::~MenuButtonCfg() {
-
-}
-
-ot::MenuEntryCfg* ot::MenuButtonCfg::createCopy(void) const {
+ot::MenuEntryCfg* ot::MenuButtonCfg::createCopy() const {
 	return new MenuButtonCfg(*this);
 }
 

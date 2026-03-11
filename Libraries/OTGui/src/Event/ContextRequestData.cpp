@@ -4,6 +4,23 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Event/ContextRequestData.h"
 
+namespace ot {
+	void ContextRequestData::registerClass(const std::string& _className, FactoryConstructorFunction _constructor)
+	{
+		if (getRegisteredClasses().find(_className) != getRegisteredClasses().end())
+		{
+			ot::LogDispatcher::instance().dispatch("Class with name \"" + _className + "\" is already registered.", __FUNCTION__, ot::ERROR_LOG); return;
+		}
+		else
+		{
+			getRegisteredClasses().emplace(_className, std::move(_constructor));
+		}
+	} std::map<std::string, ContextRequestData::FactoryConstructorFunction>& ContextRequestData::getRegisteredClasses()
+	{
+		static std::map<std::string, ContextRequestData::FactoryConstructorFunction> registeredClasses; return registeredClasses;
+	}
+}
+
 static ot::ContextRequestData::Registrar<ot::ContextRequestData> registrar(ot::ContextRequestData::className());
 
 ot::ContextRequestData* ot::ContextRequestData::fromJson(const std::string& _jsonString)
@@ -23,7 +40,7 @@ ot::ContextRequestData* ot::ContextRequestData::fromJson(const ConstJsonObject& 
 	auto it = getRegisteredClasses().find(className);
 	if (it != getRegisteredClasses().end())
 	{
-		ContextConstructorFunction constructor = it->second;
+		auto constructor = it->second;
 		ContextRequestData* instance = constructor();
 		instance->setFromJsonObject(_jsonObject);
 		return instance;
@@ -64,21 +81,3 @@ void ot::ContextRequestData::setFromJsonObject(const ConstJsonObject& _object)
 	m_viewType = static_cast<WidgetViewBase::ViewType>(json::getUInt64(_object, "ViewType"));
 }
 
-void ot::ContextRequestData::registerClass(const std::string& _className, ContextConstructorFunction _constructor)
-{
-	if (getRegisteredClasses().find(_className) != getRegisteredClasses().end())
-	{
-		OT_LOG_E("ContextRequestData class with name \"" + _className + "\" is already registered.");
-		return;
-	}
-	else
-	{
-		getRegisteredClasses().emplace(_className, std::move(_constructor));
-	}
-}
-
-std::map<std::string, ot::ContextRequestData::ContextConstructorFunction>& ot::ContextRequestData::getRegisteredClasses()
-{
-	static std::map<std::string, ot::ContextRequestData::ContextConstructorFunction> registeredClasses;
-	return registeredClasses;
-}

@@ -25,14 +25,13 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT MenuSeparatorCfg : public MenuEntryCfg {
+		OT_DECL_DEFCOPY(MenuSeparatorCfg)
+		OT_DECL_DEFMOVE(MenuSeparatorCfg)
 	public:
-		MenuSeparatorCfg();
-		MenuSeparatorCfg(const MenuSeparatorCfg& _other);
-		virtual ~MenuSeparatorCfg();
+		MenuSeparatorCfg() = default;
+		virtual ~MenuSeparatorCfg() = default;
 
-		MenuSeparatorCfg& operator = (const MenuSeparatorCfg&) = delete;
-
-		virtual MenuEntryCfg* createCopy(void) const override;
+		virtual MenuEntryCfg* createCopy() const override;
 		static std::string className() { return "MenuSeparatorCfg"; };
 		virtual std::string getClassName() const override { return MenuSeparatorCfg::className(); };
 	};

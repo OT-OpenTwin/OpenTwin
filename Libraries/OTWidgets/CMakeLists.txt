@@ -49,7 +49,7 @@ get_env_path(OT_GUI_ROOT_PATH     OT_GUI_ROOT)
 join_paths(OT_GUI_DEBUG_LIB_DIR      "${OT_GUI_ROOT_PATH}" "${OT_CLIBD_PATH}")
 join_paths(OT_GUI_RELEASE_LIB_DIR    "${OT_GUI_ROOT_PATH}" "${OT_CLIBR_PATH}")
 
-get_env_path(OT_WIDGETS_ROOT_PATH OT_WIDGETS_ROOT)
+get_env_path(OT_WIDGETS_ROOT_PATH OT_WIDGETS_ROOT)  
 
 # RapidJSON include
 get_env_path(R_JSON_INCD_PATH      R_JSON_INCD)
@@ -117,6 +117,7 @@ file(GLOB_RECURSE OTWIDGETS_SOURCE_FILES
 file(GLOB_RECURSE OTWIDGETS_HEADER_FILES
     CONFIGURE_DEPENDS
     "${OT_WIDGETS_ROOT_PATH}/include/*.h"
+    "${OT_WIDGETS_ROOT_PATH}/include/*.hpp"
 )
 
 # ============================================================
