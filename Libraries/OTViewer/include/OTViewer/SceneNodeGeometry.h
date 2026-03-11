@@ -56,7 +56,8 @@ public:
 	void setTriangles(osg::Node *t) { m_triangles = t; };
 	void setEdges(osg::Node* e) { m_edges = e; };
 	void setEdgesHighlighted(osg::Node *e) { m_edgesHighlighted = e; };
-	void setFaceEdgesHighlighted(osg::Switch *e) { m_faceEdgesHighlightNode = e; };
+	void setFaceEdgesHighlighted(osg::Switch* e) { m_faceEdgesHighlightNode = e; };
+	void setFacesHighlighted(osg::Switch* e) { m_facesHighlightNode = e; };
 	void setMaterialType(const std::string &material) { m_materialType = material; }
 	void setTextureType(const std::string &texture, bool reflect) { m_textureType = texture; m_reflective = reflect; }
 	void setMaterialProperties(osg::ref_ptr<osg::Material>& mat,double r , double g, double b);
@@ -73,7 +74,8 @@ public:
 	osg::Node *getTriangles(void) { return m_triangles; };
 	osg::Node* getEdges(void) { return m_edges; };
 	osg::Node *getEdgesHighlighted(void) { return m_edgesHighlighted; };
-	osg::Switch *getFaceEdgesHighlight(void) { return m_faceEdgesHighlightNode; };
+	osg::Switch* getFaceEdgesHighlight(void) { return m_faceEdgesHighlightNode; };
+	osg::Switch* getFacesHighlight(void) { return m_facesHighlightNode; };
 
 	void setEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2);
 
@@ -129,6 +131,8 @@ public:
 	void setHighlightLineWidth(double lineWidth);
 	void updateEdgeColorMode();
 
+	void selectFace(int faceId, bool flag);
+
 private:
 	void deleteShapeNode(void);
 	osg::Node *createOSGNodeFromTriangles(double colorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, bool backFaceCulling, double offsetFactor, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles);
@@ -142,11 +146,14 @@ private:
 	osg::Node* getEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2, double lineWidth);
 	double getActualEdgeColor(const double color[], int index);
 	void setEdgesColor(const double color[]);
+	void determineFaceTriangles(int faceId, std::list<int>& triangleIndexList);
+	osg::Node* createFaceNodeFromTriangles(int faceId, std::list<int>& triangleIndexList);
 
 	osg::Node* m_triangles;
 	osg::Node* m_edges;
 	osg::Node* m_edgesHighlighted;
 	osg::Switch* m_faceEdgesHighlightNode;
+	osg::Switch* m_facesHighlightNode;
 	osg::Node* m_highlightNode;
 
 	std::map<unsigned long long, osg::Node *> m_faceEdgesHighlight;

@@ -3015,10 +3015,12 @@ void Model::setSelectedFacesHighlight(SceneNodeGeometry *selectedItem, unsigned 
 	{
 		m_selectedFacesList[selectedItem].remove(faceId);
 		m_selectedFacesList[selectedItem].push_back(faceId);
+		selectedItem->selectFace(faceId, true);
 	}
 	else
 	{
 		m_selectedFacesList[selectedItem].remove(faceId);
+		selectedItem->selectFace(faceId, false);
 	}
 
 }
@@ -3029,7 +3031,7 @@ void Model::clearSelectedFacesHighlight()
 	{
 		for (auto face : entity.second)
 		{
-			entity.first->setEdgeHighlight(face, false, 1.0);
+			entity.first->selectFace(face, false);
 		}
 	}
 
@@ -3042,7 +3044,7 @@ void Model::updateSelectedFacesHighlight()
 	{
 		for (auto face : entity.second)
 		{
-			entity.first->setEdgeHighlight(face, true, 3.0);
+			entity.first->selectFace(face, true);
 		}
 	}
 }

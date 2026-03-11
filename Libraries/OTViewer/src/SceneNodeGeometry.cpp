@@ -56,6 +56,7 @@ SceneNodeGeometry::SceneNodeGeometry() :
 	m_edges(nullptr),
 	m_edgesHighlighted(nullptr),
 	m_faceEdgesHighlightNode(nullptr),
+	m_facesHighlightNode(nullptr),
 	m_highlightNode(nullptr),
 	m_surfaceColorRGB{ 0.0, 0.0, 0.0 },
 	m_edgeColorRGB{ 0.0, 0.0, 0.0 },
@@ -104,9 +105,11 @@ void SceneNodeGeometry::deleteShapeNode(void)
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
 		//m_shapeNode		    = nullptr;  The shape node is a reference pointer belonging to this object and will be deleted when this object is deleted
 		m_triangles				= nullptr;
-		m_edges                   = nullptr;
+		m_edges                 = nullptr;
 		m_edgesHighlighted		= nullptr;
-		m_faceEdgesHighlightNode	= nullptr;
+		m_faceEdgesHighlightNode= nullptr;
+		m_facesHighlightNode    = nullptr,
+
 
 		m_faceEdgesHighlight.clear();
 		m_triangleToFaceId.clear();
@@ -464,12 +467,14 @@ void SceneNodeGeometry::applyTransform(osg::Matrix matrix)
 	osg::MatrixTransform *triangles = dynamic_cast<osg::MatrixTransform *>(getTriangles());
 	osg::MatrixTransform* edges = dynamic_cast<osg::MatrixTransform*>(getEdges());
 	osg::MatrixTransform *edgesHighlighted = dynamic_cast<osg::MatrixTransform *>(getEdgesHighlighted());
-	osg::MatrixTransform *faceEdgesHighlightNode = dynamic_cast<osg::MatrixTransform *>(getFaceEdgesHighlight());
+	osg::MatrixTransform* faceEdgesHighlightNode = dynamic_cast<osg::MatrixTransform*>(getFaceEdgesHighlight());
+	osg::MatrixTransform* facesHighlightNode = dynamic_cast<osg::MatrixTransform*>(getFacesHighlight());
 
 	if (triangles != nullptr             ) triangles->setMatrix(matrix);
 	if (edges != nullptr				 ) edges->setMatrix(matrix);
 	if (edgesHighlighted != nullptr      ) edgesHighlighted->setMatrix(matrix);
 	if (faceEdgesHighlightNode != nullptr) faceEdgesHighlightNode->setMatrix(matrix);
+	if (facesHighlightNode != nullptr    ) facesHighlightNode->setMatrix(matrix);
 }
 
 void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string> &faceNameMap)
@@ -492,6 +497,7 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 		if (getEdges() != nullptr) m_shapeNode->removeChild(getEdges());
 		if (getEdgesHighlighted() != nullptr) m_shapeNode->removeChild(getEdgesHighlighted());
 		if (getFaceEdgesHighlight() != nullptr) m_shapeNode->removeChild(getFaceEdgesHighlight());
+		if (getFacesHighlight() != nullptr) m_shapeNode->removeChild(getFacesHighlight());
 
 		m_triangleToFaceId.clear();
 		m_faceEdgesHighlight.clear();
@@ -522,12 +528,16 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 	setEdges(edgeNode);
 	setEdgesHighlighted(edgeHighlightedNode);
 	setFaceEdgesHighlighted(faceEdgesHighlightNode);
+	setFacesHighlighted(new osg::Switch());
+
+	getFacesHighlight()->setNodeMask(getFacesHighlight()->getNodeMask() & ~3); // Reset the first and second bit of the node mask to exclude the highlight geometries from picking
 
 	// Add the triangle and edge nodes to the group node and add the group node to the root
 	m_shapeNode->addChild(triangleNode);
 	m_shapeNode->addChild(edgeNode);
 	m_shapeNode->addChild(edgeHighlightedNode);
 	m_shapeNode->addChild(faceEdgesHighlightNode);
+	m_shapeNode->addChild(getFacesHighlight());
 
 	// Apply the parent transformation (if any)
 	applyParentTransform();
@@ -544,6 +554,7 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 		// Set node to hidden state
 		getShapeNode()->setChildValue(getEdges(), false);
 		getShapeNode()->setChildValue(getTriangles(), false);
+		getShapeNode()->setChildValue(getFacesHighlight(), false);
 	}
 
 	updateWireframeState(isVisible(), isWireframe(), isTransparent());
@@ -1429,6 +1440,41 @@ void SceneNodeGeometry::setHighlightColor(const ot::Color& colorValue)
 			edgesGeometry->dirtyGLObjects();
 		}
 	}
+
+	// Now we change the color for the faces
+	unsigned int numHighlightFaces = m_facesHighlightNode->getNumChildren();
+
+	for (unsigned int i = 0; i < numHighlightFaces; ++i)
+	{
+		osg::Node* child = m_facesHighlightNode->getChild(i);
+
+		osg::Transform* faceTransform = dynamic_cast<osg::Transform*>(child);
+		assert(faceTransform != nullptr);
+
+		assert(faceTransform->getNumChildren() == 1);
+		osg::Geode* facesHighlightedGeode = dynamic_cast<osg::Geode*>(faceTransform->getChild(0));
+		assert(facesHighlightedGeode != nullptr);
+
+		if (facesHighlightedGeode != nullptr)
+		{
+			osg::Geometry* facesGeometry = dynamic_cast<osg::Geometry*>(facesHighlightedGeode->getDrawable(0));
+			assert(facesGeometry != nullptr);
+
+			osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(facesGeometry->getColorArray());
+			if (colorArray != nullptr)
+			{
+				for (auto& color : *colorArray)
+				{
+					color[0] = colorValue.toColorF().r();
+					color[1] = colorValue.toColorF().g();
+					color[2] = colorValue.toColorF().b();
+				}
+			}
+
+			colorArray->dirty();
+			facesGeometry->dirtyGLObjects();
+		}
+	}
 }
 
 void SceneNodeGeometry::setHighlightLineWidth(double lineWidth)
@@ -1487,3 +1533,139 @@ void SceneNodeGeometry::setEdgesColor(const double color[])
 		}
 	}
 }
+
+void SceneNodeGeometry::selectFace(int faceId, bool flag)
+{
+	if (getFacesHighlight() == nullptr) return;
+
+	// Check if face is already selected
+	if (getFacesHighlight()->getNumChildren() > 0)
+	{
+		for (int child = 0; child < getFacesHighlight()->getNumChildren(); child++)
+		{
+			osg::Node* childNode = getFacesHighlight()->getChild(child);
+			assert(childNode != nullptr);
+
+			int childFaceId = -1;
+			if (childNode->getUserValue("id", childFaceId))
+			{
+				if (faceId == childFaceId)
+				{
+					// We found the face in the list
+					if (flag)
+					{
+						return; // Nothing to do, the face is already selected
+					}
+					else
+					{
+						// We need to remove this face
+						getFacesHighlight()->removeChild(childNode);
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	// Here we want to select a face which is not already selected. Therefore, we need to create a new node with the face triangles
+	std::list<int> triangleIndexList;
+	determineFaceTriangles(faceId, triangleIndexList);
+
+	osg::Node* faceNode = createFaceNodeFromTriangles(faceId, triangleIndexList);
+
+	if (faceNode != nullptr)
+	{
+		faceNode->setUserValue("id", faceId);
+		getFacesHighlight()->addChild(faceNode);
+		getFacesHighlight()->setAllChildrenOn();
+	}
+}
+
+void SceneNodeGeometry::determineFaceTriangles(int faceId, std::list<int> &triangleIndexList)
+{
+	int triangleIndex = 0;
+	for (auto triangleFace : m_triangleToFaceId)
+	{
+		if (triangleFace == faceId)
+		{
+			triangleIndexList.push_back(triangleIndex);
+		}
+
+		triangleIndex++;
+	}
+}
+
+osg::Node* SceneNodeGeometry::createFaceNodeFromTriangles(int faceId, std::list<int>& triangleIndexList)
+{
+	if (triangleIndexList.empty()) return nullptr;
+
+	// First we need to extract the vertices and triangle information from the vertex array
+	std::vector<Geometry::Node> nodes;
+	std::list<Geometry::Triangle> triangles;
+
+	nodes.reserve(triangleIndexList.size() * 3);
+
+	osg::Transform* triangleTransform = dynamic_cast<osg::Transform*>(getTriangles());
+	if (triangleTransform == nullptr) return nullptr;
+	assert(triangleTransform->getNumChildren() == 1);
+
+	osg::Geode* triangleNode = dynamic_cast<osg::Geode*>(triangleTransform->getChild(0));
+	if (triangleNode == nullptr) return nullptr;
+
+	if (triangleNode->getNumDrawables() != 1) return nullptr;
+
+	osg::Geometry* geometry = dynamic_cast<osg::Geometry*>(triangleNode->getDrawable(0));
+	if (geometry == nullptr) return nullptr;
+
+	osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geometry->getVertexArray());
+	if (vertices == nullptr) return nullptr;
+
+	osg::Vec3Array* normals = dynamic_cast<osg::Vec3Array*>(geometry->getNormalArray());
+	if (normals == nullptr) return nullptr;
+
+	int nodeIndex = 0;
+
+	for (auto triangleIndex : triangleIndexList)
+	{
+		osg::Vec3 v1 = (*vertices)[3 * triangleIndex];
+		osg::Vec3 v2 = (*vertices)[3 * triangleIndex + 1];
+		osg::Vec3 v3 = (*vertices)[3 * triangleIndex + 2];
+
+		osg::Vec3 n1 = (*normals)[3 * triangleIndex];
+		osg::Vec3 n2 = (*normals)[3 * triangleIndex + 1];
+		osg::Vec3 n3 = (*normals)[3 * triangleIndex + 2];
+
+		Geometry::Node p1;
+		p1.setCoords(v1.x(), v1.y(), v1.z());
+		p1.setNormals(n1.x(), n1.y(), n1.z());
+
+		Geometry::Node p2;
+		p2.setCoords(v2.x(), v2.y(), v2.z());
+		p2.setNormals(n2.x(), n2.y(), n2.z());
+
+		Geometry::Node p3;
+		p3.setCoords(v3.x(), v3.y(), v3.z());
+		p3.setNormals(n3.x(), n3.y(), n3.z());
+
+		nodes.push_back(p1);
+		nodes.push_back(p2);
+		nodes.push_back(p3);
+
+		Geometry::Triangle t;
+		t.setNodes(nodeIndex, nodeIndex + 1, nodeIndex + 2);
+		t.setFaceId(faceId);
+
+		triangles.push_back(t);
+
+		nodeIndex += 3;
+	}
+
+	double colorRGB[] = { ViewerSettings::instance()->geometryHighlightColor.r() / 255.0,  ViewerSettings::instance()->geometryHighlightColor.g() / 255.0,  ViewerSettings::instance()->geometryHighlightColor.b() / 255.0 };
+	double offset = -2.0;
+
+	osg::Node *faceNode = createOSGNodeFromTriangles(colorRGB, "Rough", "None", false, false, offset, nodes, triangles);
+
+	return faceNode;
+}
+
+
