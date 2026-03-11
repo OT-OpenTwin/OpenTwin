@@ -53,7 +53,6 @@ endfunction()
 # OT roots and include subdir
 get_env_path(OT_SYSTEM_ROOT_PATH   OT_SYSTEM_ROOT)
 get_env_path(OT_CORE_ROOT_PATH     OT_CORE_ROOT)
-get_env_path(OT_CORE_ROOT_PATH     OT_CORE_ROOT)
 get_env_path(OT_INC_PATH           OT_INC)
 
 # OT library subdirs

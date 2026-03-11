@@ -28,7 +28,7 @@
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/DebugInfo/GSSDebugInfo.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 
 #include "OTServiceFoundation/IDManager.h"
 #include "OTSystem/SystemInformation.h"

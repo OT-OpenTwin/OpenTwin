@@ -35,7 +35,7 @@
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 #include "OTCommunication/Dispatch/ActionDispatchProfiler.h"
 #include "OTDataStorage/DataLakeAPI.h"
 

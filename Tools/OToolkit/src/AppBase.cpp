@@ -52,7 +52,7 @@
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Painter/CheckerboardPainter2D.h"
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Style/StyledTextConverter.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"

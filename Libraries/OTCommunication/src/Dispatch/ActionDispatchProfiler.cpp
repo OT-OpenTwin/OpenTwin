@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
-#include "OTCommunication/ActionDispatchProfiler.h"
+#include "OTCommunication/Dispatch/ActionDispatchProfiler.h"
 
 ot::ActionDispatchProfiler::ActionDispatchProfiler(int64_t _timeout) 
 	: m_timeout(_timeout), m_lastInterval(0) 

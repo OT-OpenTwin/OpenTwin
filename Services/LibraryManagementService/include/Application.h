@@ -25,7 +25,7 @@
 #include "OTCore/ServiceBase.h"
 #include "OTGui/Dialog/ModelLibraryDialogCfg.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 
 
 // std header
