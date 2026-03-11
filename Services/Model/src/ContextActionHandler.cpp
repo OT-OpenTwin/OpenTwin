@@ -5,54 +5,79 @@
 #include "Model.h"
 #include "Application.h"
 #include "ContextActionHandler.h"
+#include "OTGui/Menu/MenuCfg.h"
+#include "OTGui/Event/ContextMenuRequestEvent.h"
+#include "OTGui/Event/NavigationContextRequestData.h"
 
-ContextActionHandler::ContextActionHandler(Application* _application) 
-	: m_app(_application)
-{}
+using namespace ot;
 
-ot::MenuCfg ContextActionHandler::contextMenuRequested(const ot::ContextMenuRequestEvent& _event)
+class ContextActionHandler::PrivateData
+{
+public:
+	PrivateData();
+};
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ContextActionHandler::ContextActionHandler() 
+{
+	m_data = std::make_unique<PrivateData>();
+}
+
+MenuCfg ContextActionHandler::contextMenuRequested(const ContextMenuRequestEvent& _event)
 {
 	auto data = _event.getRequestData();
 	if (!data) {
-		return ot::MenuCfg();
+		return MenuCfg();
 	}
 	
-	if (data->getClassName() == ot::NavigationContextRequestData::className()) {
-		return createNavigationContextMenu(*static_cast<const ot::NavigationContextRequestData*>(data));
+	if (data->getClassName() == NavigationContextRequestData::className()) {
+		return createNavigationContextMenu(static_cast<const NavigationContextRequestData*>(data));
 	}
 	else
 	{
 		OT_LOG_W("Unsupported context menu request type: \"" + data->getClassName() + "\"");
-		return ot::MenuCfg();
+		return MenuCfg();
 	}
 
 }
 
-ot::MenuCfg ContextActionHandler::createNavigationContextMenu(const ot::NavigationContextRequestData& _requestData) const
+MenuCfg ContextActionHandler::createNavigationContextMenu(const NavigationContextRequestData* _requestData) const
 {
-	ot::MenuCfg menu;
+	MenuCfg menu;
 
-	auto model = m_app->getModel();
-	if (!model) {
-		OT_LOG_E("Model is not available.");
-		return menu;
-	}
-
-	EntityBase* entity = model->getEntityByID(_requestData.getEntityID());
-	if (!entity) {
-		OT_LOG_E("Entity with ID " + std::to_string(_requestData.getEntityID()) + " is not available in the model.");
-		return menu;
-	}
-
-	menu.addButton("NavigateTo", "Navigate to \"" + _requestData.getEntityName() + "\"");
-	menu.addSeparator();
-	menu.addButton("EntityID", "{ \"EntityID\": " + std::to_string(_requestData.getEntityID()) + " }");
-
-	if (entity->getDeletable())
+	// Get model
+	Model* model = Application::instance()->getModel();
+	if (!model)
 	{
-		menu.addSeparator();
-		menu.addButton("DeleteEntity", "Delete", "ContextMenu/Remove.png");
+		OT_LOG_EA("Model is not available.");
+		return menu;
 	}
+
+	// Get entity
+	EntityBase* entity = model->getEntityByID(_requestData->getEntityID());
+	if (!entity)
+	{
+		OT_LOG_E("Entity not found { \"ID\": " + std::to_string(_requestData->getEntityID()) + " }");
+		return menu;
+	}
+
+	// Fill menu
+	entity->fillContextMenu(_requestData, menu);
 
 	return menu;
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ContextActionHandler::PrivateData::PrivateData()
+{}
+

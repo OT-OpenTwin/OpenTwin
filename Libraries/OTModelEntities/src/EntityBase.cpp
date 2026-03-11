@@ -21,6 +21,8 @@
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityFactory.h"
 #include "OTCore/String.h"
+#include "OTGui/Menu/MenuCfg.h"
+#include "OTGui/Event/NavigationContextRequestData.h"
 
 #include "OTCore/Logging/LogDispatcher.h"
 
@@ -455,6 +457,22 @@ void EntityBase::setIsCopyable(bool _isCopyable) {
 		setModified();
 	}
 }
+
+void EntityBase::fillContextMenu(const ot::ContextRequestData* _requestData, ot::MenuCfg& _menuCfg)
+{
+	if (m_isDeletable)
+	{
+		_menuCfg.addButton("Delete", "Delete", "ContextMenu/Remove.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("Model//Delete");
+	}
+	if (m_treeItem.getIsEditable())
+	{
+		_menuCfg.addButton("Rename", "Rename", "ContextMenu/Rename.png", ot::MenuButtonCfg::ButtonAction::Rename);
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected methods
 
 void EntityBase::setDefaultTreeItem(const ot::EntityTreeItem& _treeItem) {
 	ot::UID uid = m_treeItem.getEntityID();

@@ -31,6 +31,7 @@ std::string ot::MenuButtonCfg::toString(ButtonAction _action) {
 	case ButtonAction::Clear: return "Clear";
 	case ButtonAction::Select: return "Select";
 	case ButtonAction::SelectAll: return "Select All";
+	case ButtonAction::Rename: return "Rename";
 
 	case ButtonAction::TriggerButton: return "Trigger Button";
 	case ButtonAction::NotifyOwner: return "Notify Owner";
@@ -46,6 +47,7 @@ ot::MenuButtonCfg::ButtonAction ot::MenuButtonCfg::stringToButtonAction(const st
 	else if (_action == MenuButtonCfg::toString(ButtonAction::Clear)) return ButtonAction::Clear;
 	else if (_action == MenuButtonCfg::toString(ButtonAction::Select)) return ButtonAction::Select;
 	else if (_action == MenuButtonCfg::toString(ButtonAction::SelectAll)) return ButtonAction::SelectAll;
+	else if (_action == MenuButtonCfg::toString(ButtonAction::Rename)) return ButtonAction::Rename;
 
 	else if (_action == MenuButtonCfg::toString(ButtonAction::TriggerButton)) return ButtonAction::TriggerButton;
 	else if (_action == MenuButtonCfg::toString(ButtonAction::NotifyOwner)) return ButtonAction::NotifyOwner;

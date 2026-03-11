@@ -35,7 +35,8 @@ namespace ot {
 			Clear,         //! @brief Clear the content of the widget (per widget implementation).
 			Select,        //! @brief Select the content of the widget (per widget implementation).
 			SelectAll,     //! @brief Select all content of the widget (per widget implementation).
-			
+			Rename,		   //! @brief rename the widget/context (per widget implementation).
+
 			TriggerButton, //! @brief Trigger the button with the same name in the toolbar (if available).
 			NotifyOwner    //! @brief Notify the menu owner (e.g. the widget) about the button click, so that it can handle the action (e.g. by triggering an event or calling a callback).
 		};
@@ -62,13 +63,13 @@ namespace ot {
 		//! @throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		void setButtonAction(ButtonAction _action) { m_action = _action; };
+		MenuButtonCfg& setButtonAction(ButtonAction _action) { m_action = _action; return *this; };
 		ButtonAction getButtonAction() const { return m_action; };
 
 		//! @brief Set the tab toolbar button to trigger when this menu button is clicked.
 		//! Sets the action to TriggerButton automatically.
 		//! @param _ttbButtonName Name of the button in the tab toolbar to trigger when this menu button is clicked.
-		void setTriggerButton(const std::string& _ttbButtonName) { m_ttbButtonName = _ttbButtonName; m_action = ButtonAction::TriggerButton; };
+		MenuButtonCfg& setTriggerButton(const std::string& _ttbButtonName) { m_ttbButtonName = _ttbButtonName; m_action = ButtonAction::TriggerButton; return *this; };
 		const std::string& getTriggerButton() const { return m_ttbButtonName; };
 
 	private:

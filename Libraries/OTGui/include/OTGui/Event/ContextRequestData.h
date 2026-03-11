@@ -72,7 +72,6 @@ namespace ot {
 		WidgetViewBase::ViewType getViewType() const { return m_viewType; };
 
 	private:
-
 		Point2DD m_pos;
 		WidgetViewBase::ViewType m_viewType;
 	};

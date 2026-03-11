@@ -24,10 +24,10 @@
 #include "OTModelEntities/EntityProperties.h"
 #include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalDocumentItem.h"
 
-static EntityFactoryRegistrar<EntityBlockHierarchicalDocumentItem> registrar(EntityBlockHierarchicalDocumentItem::className());
+static EntityFactoryRegistrar<ot::EntityBlockHierarchicalDocumentItem> registrar(ot::EntityBlockHierarchicalDocumentItem::className());
 
-EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
-	: EntityBlock(_ID, _parent, _obs, _ms), m_documentUID(ot::invalidUID), m_documentVersion(ot::invalidUID), m_documentData(nullptr)
+ot::EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+	: EntityBlockHierarchicalBase(_ID, _parent, _obs, _ms), m_documentUID(ot::invalidUID), m_documentVersion(ot::invalidUID), m_documentData(nullptr)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Hierarchical/Document");
@@ -43,7 +43,7 @@ EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot::UID
 	resetModified();
 }
 
-ot::GraphicsItemCfg* EntityBlockHierarchicalDocumentItem::createBlockCfg() {
+ot::GraphicsItemCfg* ot::EntityBlockHierarchicalDocumentItem::createBlockCfg() {
 	ot::GraphicsHierarchicalProjectItemBuilder builder;
 
 	// Mandatory settings
@@ -57,19 +57,19 @@ ot::GraphicsItemCfg* EntityBlockHierarchicalDocumentItem::createBlockCfg() {
 	return builder.createGraphicsItem();
 }
 
-bool EntityBlockHierarchicalDocumentItem::updateFromProperties() {
-	return EntityBlock::updateFromProperties();
+bool ot::EntityBlockHierarchicalDocumentItem::updateFromProperties() {
+	return EntityBlockHierarchicalBase::updateFromProperties();
 }
 
-void EntityBlockHierarchicalDocumentItem::createProperties() {
-	
+void ot::EntityBlockHierarchicalDocumentItem::createProperties() {
+	EntityBlockHierarchicalBase::createProperties();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Data accessors
 
-void EntityBlockHierarchicalDocumentItem::setDocument(ot::UID _entityID, ot::UID _entityVersion, const std::string& _documentType, const std::string& _documentExtension) {
+void ot::EntityBlockHierarchicalDocumentItem::setDocument(ot::UID _entityID, ot::UID _entityVersion, const std::string& _documentType, const std::string& _documentExtension) {
 	m_documentUID = _entityID;
 	m_documentVersion = _entityVersion;
 	m_documentType = _documentType;
@@ -80,7 +80,7 @@ void EntityBlockHierarchicalDocumentItem::setDocument(ot::UID _entityID, ot::UID
 	setModified();
 }
 
-std::string EntityBlockHierarchicalDocumentItem::getText() {
+std::string ot::EntityBlockHierarchicalDocumentItem::getText() {
 	ensureDocumentDataLoaded();
 
 	if (m_documentData) {
@@ -91,7 +91,7 @@ std::string EntityBlockHierarchicalDocumentItem::getText() {
 	}
 }
 
-void EntityBlockHierarchicalDocumentItem::setText(const std::string& _text) {
+void ot::EntityBlockHierarchicalDocumentItem::setText(const std::string& _text) {
 	ensureDocumentDataLoaded();
 	if (!m_documentData) {
 		return;
@@ -104,7 +104,7 @@ void EntityBlockHierarchicalDocumentItem::setText(const std::string& _text) {
 	setModified();
 }
 
-ot::TextEditorCfg EntityBlockHierarchicalDocumentItem::createConfig(const ot::VisualisationCfg& _visualizationConfig) {
+ot::TextEditorCfg ot::EntityBlockHierarchicalDocumentItem::createConfig(const ot::VisualisationCfg& _visualizationConfig) {
 	ot::TextEditorCfg result;
 	result.setDocumentSyntax(ot::DocumentSyntax::PlainText);
 	result.setEntityInformation(getBasicEntityInformation());
@@ -131,8 +131,8 @@ ot::TextEditorCfg EntityBlockHierarchicalDocumentItem::createConfig(const ot::Vi
 
 // Property accessors
 
-void EntityBlockHierarchicalDocumentItem::addStorageData(bsoncxx::builder::basic::document& _storage) {
-	EntityBlock::addStorageData(_storage);
+void ot::EntityBlockHierarchicalDocumentItem::addStorageData(bsoncxx::builder::basic::document& _storage) {
+	EntityBlockHierarchicalBase::addStorageData(_storage);
 
 	_storage.append(
 		bsoncxx::builder::basic::kvp("DocumentID", static_cast<int64_t>(m_documentUID)),
@@ -142,8 +142,8 @@ void EntityBlockHierarchicalDocumentItem::addStorageData(bsoncxx::builder::basic
 	);
 }
 
-void EntityBlockHierarchicalDocumentItem::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
-	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
+void ot::EntityBlockHierarchicalDocumentItem::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+	EntityBlockHierarchicalBase::readSpecificDataFromDataBase(_docView, _entityMap);
 
 	m_documentUID = static_cast<ot::UID>(_docView["DocumentID"].get_int64());
 	m_documentVersion = static_cast<ot::UID>(_docView["DocumentVersion"].get_int64());
@@ -151,7 +151,7 @@ void EntityBlockHierarchicalDocumentItem::readSpecificDataFromDataBase(const bso
 	m_documentExtension = _docView["DocumentExtension"].get_string().value.data();
 }
 
-void EntityBlockHierarchicalDocumentItem::ensureDocumentDataLoaded() {
+void ot::EntityBlockHierarchicalDocumentItem::ensureDocumentDataLoaded() {
 	if (m_documentData) {
 		return;
 	}

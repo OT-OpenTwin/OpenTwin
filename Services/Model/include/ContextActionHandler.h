@@ -4,9 +4,10 @@
 
 // OpenTwin header
 #include "OTGuiAPI/ContextMenuHandler.h"
-#include "OTGui/Event/NavigationContextRequestData.h"
 
-class Application;
+namespace ot {
+	class NavigationContextRequestData;
+}
 
 class ContextActionHandler : public ot::ContextMenuHandler
 {
@@ -14,7 +15,7 @@ class ContextActionHandler : public ot::ContextMenuHandler
 	OT_DECL_NOMOVE(ContextActionHandler)
 	OT_DECL_NODEFAULT(ContextActionHandler)
 public:
-	ContextActionHandler(Application* _application);
+	ContextActionHandler();
 	~ContextActionHandler() = default;
 
 protected:
@@ -22,8 +23,8 @@ protected:
 	OT_DECL_NODISCARD virtual ot::MenuCfg contextMenuRequested(const ot::ContextMenuRequestEvent& _event) override;
 
 private:
-	ot::MenuCfg createNavigationContextMenu(const ot::NavigationContextRequestData& _requestData) const;
+	ot::MenuCfg createNavigationContextMenu(const ot::NavigationContextRequestData* _requestData) const;
 
-	Application* m_app;
-
+	class PrivateData;
+	std::unique_ptr<PrivateData> m_data;
 };

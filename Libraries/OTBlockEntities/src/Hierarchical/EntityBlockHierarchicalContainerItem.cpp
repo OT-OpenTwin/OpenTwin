@@ -24,10 +24,10 @@
 #include "OTModelEntities/EntityProperties.h"
 #include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalContainerItem.h"
 
-static EntityFactoryRegistrar<EntityBlockHierarchicalContainerItem> registrar(EntityBlockHierarchicalContainerItem::className());
+static EntityFactoryRegistrar<ot::EntityBlockHierarchicalContainerItem> registrar(ot::EntityBlockHierarchicalContainerItem::className());
 
-EntityBlockHierarchicalContainerItem::EntityBlockHierarchicalContainerItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
-	: EntityBlock(_ID, _parent, _obs, _ms) 
+ot::EntityBlockHierarchicalContainerItem::EntityBlockHierarchicalContainerItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+	: ot::EntityBlockHierarchicalBase(_ID, _parent, _obs, _ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Hierarchical/Container");
@@ -39,7 +39,7 @@ EntityBlockHierarchicalContainerItem::EntityBlockHierarchicalContainerItem(ot::U
 	resetModified();
 }
 
-ot::GraphicsItemCfg* EntityBlockHierarchicalContainerItem::createBlockCfg() {
+ot::GraphicsItemCfg* ot::EntityBlockHierarchicalContainerItem::createBlockCfg() {
 	ot::GraphicsHierarchicalProjectItemBuilder builder;
 
 	// Mandatory settings

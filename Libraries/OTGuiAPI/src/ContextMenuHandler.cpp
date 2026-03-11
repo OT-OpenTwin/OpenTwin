@@ -20,6 +20,9 @@
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
 #include "OTCore/Logging/LogDispatcher.h"
+#include "OTGui/Menu/MenuCfg.h"
+#include "OTGui/Event/ContextRequestData.h"
+#include "OTGui/Event/ContextMenuRequestEvent.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTCommunication/Handler/ActionHandleConnector.h"

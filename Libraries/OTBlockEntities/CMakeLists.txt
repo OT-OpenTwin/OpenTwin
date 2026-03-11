@@ -125,6 +125,7 @@ set(OTBLOCKENTITIES_HEADER_FILES
     include/OTBlockEntities/Deco/EntityBlockDecoLabel.h
     include/OTBlockEntities/Deco/EntityBlockDecoration.h
     include/OTBlockEntities/Deco/EntityBlockImage.h
+    include/OTBlockEntities/Hierarchical/EntityBlockHierarchicalBase.h
     include/OTBlockEntities/Hierarchical/EntityBlockHierarchicalContainerItem.h
     include/OTBlockEntities/Hierarchical/EntityBlockHierarchicalDocumentItem.h
     include/OTBlockEntities/Hierarchical/EntityBlockHierarchicalProjectItem.h
@@ -156,6 +157,7 @@ set(OTBLOCKENTITIES_SOURCE_FILES
     src/Deco/EntityBlockDecoLabel.cpp
     src/Deco/EntityBlockDecoration.cpp
     src/Deco/EntityBlockImage.cpp
+    src/Hierarchical/EntityBlockHierarchicalBase.cpp
     src/Hierarchical/EntityBlockHierarchicalContainerItem.cpp
     src/Hierarchical/EntityBlockHierarchicalDocumentItem.cpp
     src/Hierarchical/EntityBlockHierarchicalProjectItem.cpp

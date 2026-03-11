@@ -22,8 +22,6 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Event/ContextMenuRequestEvent.h"
-#include "OTGui/Menu/MenuCfg.h"
 #include "OTCommunication/Handler/ActionHandler.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
@@ -33,6 +31,8 @@
 
 namespace ot {
 
+	class MenuCfg;
+	class ContextRequestData;
 	class ContextMenuRequestEvent;
 
 	class ActionHandleConnector;

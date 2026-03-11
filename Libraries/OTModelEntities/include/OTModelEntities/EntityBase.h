@@ -26,8 +26,7 @@
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
 #include "OTGui/VisualisationTypes.h"
-#include "OTGui/Event/NavigationContextRequestData.h"
-#include "OTGui/Menu/MenuCfg.h"
+#include "OTGui/Event/ContextRequestData.h"
 #include "OTModelEntities/ModelState.h"
 #include "OTModelEntities/EntityProperties.h"
 #include "OTModelEntities/EntityCallbackBase.h"
@@ -47,6 +46,10 @@
 #pragma warning(disable : 4251)
 
 class EntityBase;
+
+namespace ot { 
+	class MenuCfg;
+}
 
 class OT_MODELENTITIES_API_EXPORT EntityObserver
 {
@@ -218,7 +221,13 @@ public:
 	void setIsCopyable(bool _isCopyable);
 	bool getIsCopyable() const { return m_isCopyable; };
 
-	void fillContextMenu(const ot::NavigationContextRequestData* _requestData, ot::MenuCfg& _menuCfg);
+	//! @brief Fills the context menu config for this entity.
+	//! Adds:
+	//!    -> Delete
+	//!    -> Rename
+	//! @param _requestData Data related to the context menu request. Caller keeps ownership of the pointer.
+	//! @param _menuCfg Context menu config to fill.
+	virtual void fillContextMenu(const ot::ContextRequestData* _requestData, ot::MenuCfg& _menuCfg);
 
 protected:
 	//! @brief Will set the default tree item.

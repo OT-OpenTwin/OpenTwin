@@ -21,67 +21,71 @@
 
 // OpenTwin header
 #include "OTCore/ProjectInformation.h"
-#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalBase.h"
 
 class EntityBinaryData;
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalProjectItem : public EntityBlock {
-public:
-	EntityBlockHierarchicalProjectItem() : EntityBlockHierarchicalProjectItem(0, nullptr, nullptr, nullptr) {};
-	EntityBlockHierarchicalProjectItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
+namespace ot {
 
-	static std::string className() { return "EntityBlockHierarchicalProjectItem"; }
-	virtual std::string getClassName(void) const override { return EntityBlockHierarchicalProjectItem::className(); };
-	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
+	class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalProjectItem : public EntityBlockHierarchicalBase
+	{
+	public:
+		EntityBlockHierarchicalProjectItem() : EntityBlockHierarchicalProjectItem(0, nullptr, nullptr, nullptr) {};
+		EntityBlockHierarchicalProjectItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 
-	virtual std::string getBlockFolderName() const override { return "Projects"; };
+		static std::string className() { return "EntityBlockHierarchicalProjectItem"; }
+		virtual std::string getClassName(void) const override { return EntityBlockHierarchicalProjectItem::className(); };
+		virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
-	virtual ot::GraphicsItemCfg* createBlockCfg() override;
-	virtual bool updateFromProperties() override;
+		virtual std::string getBlockFolderName() const override { return "Projects"; };
 
-	virtual void createProperties() override;
+		virtual ot::GraphicsItemCfg* createBlockCfg() override;
+		virtual bool updateFromProperties() override;
 
-	// ###########################################################################################################################################################################################################################################################################################################################
+		virtual void createProperties() override;
 
-	// Data accessors
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-	void setPreviewFile(const EntityBase& _entity, ot::ImageFileFormat _format) { setPreviewFile(_entity.getEntityID(), _entity.getEntityStorageVersion(), _format); };
-	void setPreviewFile(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format);
-	void removePreviewFile();
-	bool hasPreviewFile() const { return m_previewUID != ot::invalidUID; };
-	ot::UID getPreviewFileID() const { return m_previewUID; };
-	ot::UID getPreviewFileVersion() const { return m_previewVersion; };
-	ot::ImageFileFormat getPreviewFileFormat() const { return m_previewFormat; };
-	std::shared_ptr<EntityBinaryData> getPreviewFileData();
+		// Data accessors
 
-	// ###########################################################################################################################################################################################################################################################################################################################
+		void setPreviewFile(const EntityBase& _entity, ot::ImageFileFormat _format) { setPreviewFile(_entity.getEntityID(), _entity.getEntityStorageVersion(), _format); };
+		void setPreviewFile(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format);
+		void removePreviewFile();
+		bool hasPreviewFile() const { return m_previewUID != ot::invalidUID; };
+		ot::UID getPreviewFileID() const { return m_previewUID; };
+		ot::UID getPreviewFileVersion() const { return m_previewVersion; };
+		ot::ImageFileFormat getPreviewFileFormat() const { return m_previewFormat; };
+		std::shared_ptr<EntityBinaryData> getPreviewFileData();
 
-	// Property accessors
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-	void setProjectInformation(const ot::ProjectInformation& _info);
-	ot::ProjectInformation getProjectInformation() const;
+		// Property accessors
 
-	void setUseLatestVersion(bool _flag);
-	bool getUseLatestVersion() const;
+		void setProjectInformation(const ot::ProjectInformation& _info);
+		ot::ProjectInformation getProjectInformation() const;
 
-	void setCustomVersion(const std::string& _version);
-	std::string getCustomVersion() const;
+		void setUseLatestVersion(bool _flag);
+		bool getUseLatestVersion() const;
 
-protected:
-	virtual void createNavigationTreeEntry() override;
-	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
-	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+		void setCustomVersion(const std::string& _version);
+		std::string getCustomVersion() const;
 
-private:
-	void ensurePreviewLoaded();
+	protected:
+		virtual void createNavigationTreeEntry() override;
+		virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
+		virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
-	std::string m_projectName;
-	std::string m_projectType;
-	std::string m_collectionName;
+	private:
+		void ensurePreviewLoaded();
 
-	ot::UID m_previewUID;
-	ot::UID m_previewVersion;
-	ot::ImageFileFormat m_previewFormat;
-	std::shared_ptr<EntityBinaryData> m_previewData;
-};
+		std::string m_projectName;
+		std::string m_projectType;
+		std::string m_collectionName;
 
+		ot::UID m_previewUID;
+		ot::UID m_previewVersion;
+		ot::ImageFileFormat m_previewFormat;
+		std::shared_ptr<EntityBinaryData> m_previewData;
+	};
+
+}
