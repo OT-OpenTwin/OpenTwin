@@ -65,13 +65,22 @@ bool ot::StringToNumericCheck::fitsInDouble(const std::string& str)
 
 bool ot::StringToNumericCheck::fitsInDateTime(const std::string& str)
 {
-	try
-	{
-		ot::DateTime::timestampToMsec(str, ot::DateTime::DateFormat::Simple);
-		return true;
-	}
-	catch (const std::exception&)
-	{
-		return false;
-	}
+	auto fits = [&](ot::DateTime::DateFormat format) -> bool
+		{
+			try
+			{
+				ot::DateTime::timestampToMsec(str, format);
+				return true;
+			}
+			catch (const std::exception&)
+			{
+				return false;
+			}
+		};
+
+	return fits(ot::DateTime::DateFormat::Simple) ||
+		fits(ot::DateTime::DateFormat::SimpleUTC) ||
+		fits(ot::DateTime::DateFormat::ISO8601UTC) ||
+		fits(ot::DateTime::DateFormat::RFC3339) ||
+		fits(ot::DateTime::DateFormat::Msec);
 }
