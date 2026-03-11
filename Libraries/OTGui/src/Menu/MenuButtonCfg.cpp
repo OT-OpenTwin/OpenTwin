@@ -26,17 +26,29 @@ static ot::MenuEntryCfgFactoryRegistrar<ot::MenuButtonCfg> buttonRegistarar(ot::
 
 std::string ot::MenuButtonCfg::toString(ButtonAction _action) {
 	switch (_action) {
-	case ot::MenuButtonCfg::NotifyOwner: return "NotifyOwner";
-	case ot::MenuButtonCfg::Clear: return "Clear";
+	case ButtonAction::NoAction: return "No Action";
+
+	case ButtonAction::Clear: return "Clear";
+	case ButtonAction::Select: return "Select";
+	case ButtonAction::SelectAll: return "Select All";
+
+	case ButtonAction::TriggerButton: return "Trigger Button";
+	case ButtonAction::NotifyOwner: return "Notify Owner";
 	default:
-		OT_LOG_EAS("Unknown button action (" + std::to_string((int)_action));
-		return "NotifyOwner";
+		OT_LOG_EAS("Unknown button action (" + std::to_string((int)_action) + ")");
+		return "No Action";
 	}
 }
 
 ot::MenuButtonCfg::ButtonAction ot::MenuButtonCfg::stringToButtonAction(const std::string& _action) {
-	if (_action == MenuButtonCfg::toString(ButtonAction::NotifyOwner)) return ButtonAction::NotifyOwner;
+	if (_action == MenuButtonCfg::toString(ButtonAction::NoAction)) return ButtonAction::NoAction;
+
 	else if (_action == MenuButtonCfg::toString(ButtonAction::Clear)) return ButtonAction::Clear;
+	else if (_action == MenuButtonCfg::toString(ButtonAction::Select)) return ButtonAction::Select;
+	else if (_action == MenuButtonCfg::toString(ButtonAction::SelectAll)) return ButtonAction::SelectAll;
+
+	else if (_action == MenuButtonCfg::toString(ButtonAction::TriggerButton)) return ButtonAction::TriggerButton;
+	else if (_action == MenuButtonCfg::toString(ButtonAction::NotifyOwner)) return ButtonAction::NotifyOwner;
 	else {
 		OT_LOG_EAS("Unknown button action \"" + _action + "\"");
 		return ButtonAction::NotifyOwner;
@@ -67,10 +79,12 @@ void ot::MenuButtonCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 	MenuClickableEntryCfg::addToJsonObject(_object, _allocator);
 
 	_object.AddMember("Action", JsonString(this->toString(m_action), _allocator), _allocator);
+	_object.AddMember("TriggerButton", JsonString(m_ttbButtonName, _allocator), _allocator);
 }
 
 void ot::MenuButtonCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	MenuClickableEntryCfg::setFromJsonObject(_object);
 
 	m_action = this->stringToButtonAction(json::getString(_object, "Action"));
+	m_ttbButtonName = json::getString(_object, "TriggerButton");
 }

@@ -20,6 +20,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/BasicServiceInformation.h"
 #include "OTGui/Menu/MenuClickableEntryCfg.h"
 
 namespace ot {
@@ -29,14 +30,14 @@ namespace ot {
 		OT_DECL_DEFMOVE(MenuButtonCfg)
 	public:
 		enum ButtonAction {
-			NoAction,         //! @brief No action will be performed when the button is clicked.
+			NoAction,      //! @brief No action will be performed when the button is clicked.
 
-			Clear,            //! @brief Clear the content of the widget (per widget implementation).
-			Select,           //! @brief Select the content of the widget (per widget implementation).
-			SelectAll,        //! @brief Select all content of the widget (per widget implementation).
-
-			TriggerTTBButton, //! @brief Trigger the button with the same name in the toolbar (if available).
-			NotifyOwner       //! @brief Notify the menu owner (e.g. the widget) about the button click, so that it can handle the action (e.g. by triggering an event or calling a callback).
+			Clear,         //! @brief Clear the content of the widget (per widget implementation).
+			Select,        //! @brief Select the content of the widget (per widget implementation).
+			SelectAll,     //! @brief Select all content of the widget (per widget implementation).
+			
+			TriggerButton, //! @brief Trigger the button with the same name in the toolbar (if available).
+			NotifyOwner    //! @brief Notify the menu owner (e.g. the widget) about the button click, so that it can handle the action (e.g. by triggering an event or calling a callback).
 		};
 
 		static std::string toString(ButtonAction _action);
@@ -64,8 +65,15 @@ namespace ot {
 		void setButtonAction(ButtonAction _action) { m_action = _action; };
 		ButtonAction getButtonAction() const { return m_action; };
 
+		//! @brief Set the tab toolbar button to trigger when this menu button is clicked.
+		//! Sets the action to TriggerButton automatically.
+		//! @param _ttbButtonName Name of the button in the tab toolbar to trigger when this menu button is clicked.
+		void setTriggerButton(const std::string& _ttbButtonName) { m_ttbButtonName = _ttbButtonName; m_action = ButtonAction::TriggerButton; };
+		const std::string& getTriggerButton() const { return m_ttbButtonName; };
+
 	private:
 		ButtonAction m_action;
+		std::string m_ttbButtonName;
 	};
 
 }
