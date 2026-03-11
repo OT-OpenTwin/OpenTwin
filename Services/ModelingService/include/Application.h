@@ -24,7 +24,7 @@
 #include "OTModelEntities/EntityInformation.h"
 
 #include "OTGuiAPI/ButtonHandler.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handle/ActionHandler.h"
 
 #include "EntityCache.h"
 

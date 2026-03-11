@@ -21,8 +21,8 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionDispatcherBase.h"
-#include "OTCommunication/ActionHandleConnector.h"
+#include "OTCommunication/Dispatch/ActionDispatcherBase.h"
+#include "OTCommunication/Handler/ActionHandleConnector.h"
 
 ot::ActionDispatcherBase::ActionDispatcherBase() : m_defaultMessageType(ot::SECURE_MESSAGE_TYPES) {}
 

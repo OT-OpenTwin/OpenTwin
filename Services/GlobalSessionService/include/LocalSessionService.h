@@ -23,7 +23,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCommunication/GSSDebugInfo.h"
+#include "OTCommunication/DebugInfo/GSSDebugInfo.h"
 
 // std header
 #include <list>

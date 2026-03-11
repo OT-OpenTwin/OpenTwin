@@ -27,8 +27,8 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
-#include "OTCommunication/GDSDebugInfo.h"
-#include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/DebugInfo/GDSDebugInfo.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 

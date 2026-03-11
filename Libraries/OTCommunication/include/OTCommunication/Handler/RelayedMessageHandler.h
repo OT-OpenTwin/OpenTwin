@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCommunication/CommunicationAPIExport.h"
+#include "OTCommunication/CommunicationTypes.h"
 
 // std header
 #include <map>

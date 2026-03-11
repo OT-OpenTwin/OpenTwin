@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCommunication/ServiceRunData.h"
+#include "OTCommunication/Data/ServiceRunData.h"
 
 ot::ServiceRunData::ServiceRunData() {
 

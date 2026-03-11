@@ -22,6 +22,7 @@
 // OpenTwin header
 #include "OTSystem/Flags.h"		// Add flag fuctions
 #include "OTCore/Logging/LogDispatcher.h"	// LogFlag type
+#include "OTCommunication/CommunicationAPIExport.h"
 
 namespace ot {
 

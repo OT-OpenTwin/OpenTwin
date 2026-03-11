@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 
 // std header
 #include <string>

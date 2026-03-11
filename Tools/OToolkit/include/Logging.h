@@ -24,7 +24,7 @@
 
 // OT header
 #include "OTCore/Logging/LogDispatcher.h"		// LogMessage
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 
 // Qt header
 #include <QtCore/qobject.h>

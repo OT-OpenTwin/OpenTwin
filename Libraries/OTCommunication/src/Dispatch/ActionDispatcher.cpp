@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 
 ot::ActionDispatcher& ot::ActionDispatcher::instance(void) {
 	static ActionDispatcher g_instance;

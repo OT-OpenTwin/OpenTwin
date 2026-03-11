@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 
 ot::ServiceInitData::ServiceInitData() : m_serviceID(ot::invalidServiceID) {
 

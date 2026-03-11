@@ -36,7 +36,7 @@
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTCommunication/ActionDispatchProfiler.h"
+#include "OTCommunication/Dispatch/ActionDispatchProfiler.h"
 #include "OTDataStorage/DataLakeAPI.h"
 
 // Model header

@@ -26,7 +26,7 @@
 // OpenTwin header
 #include "OTCore/Logging/AbstractLogNotifier.h"
 #include "OTGui/Style/StyledTextBuilder.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 
 // Qt header
 #include <QtCore/qthread.h>

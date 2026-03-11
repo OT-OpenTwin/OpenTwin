@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
 // std header

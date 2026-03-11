@@ -24,7 +24,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Event/ContextMenuRequestEvent.h"
 #include "OTGui/Menu/MenuCfg.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
 // std header

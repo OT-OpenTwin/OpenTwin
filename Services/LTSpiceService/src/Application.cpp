@@ -24,7 +24,7 @@
 
 // OpenTwin header
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"

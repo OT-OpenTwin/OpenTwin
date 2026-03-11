@@ -22,8 +22,8 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTCommunication/ServiceInitData.h"
 #include "OTCommunication/CommunicationAPIExport.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 
 // std header
 #include <list>

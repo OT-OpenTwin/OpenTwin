@@ -25,8 +25,8 @@
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCommunication/GDSDebugInfo.h"
-#include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/DebugInfo/GDSDebugInfo.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 
 // std header
 #include <string>

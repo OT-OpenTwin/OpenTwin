@@ -106,7 +106,6 @@ find_package(Qt6 REQUIRED COMPONENTS
 
 # ============================================================
 # Source collection
-# (much safer than listing 150 files manually)
 # ============================================================
 
 file(GLOB_RECURSE OTWIDGETS_SOURCE_FILES

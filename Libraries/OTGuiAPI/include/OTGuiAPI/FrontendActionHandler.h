@@ -21,8 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 
 
 namespace ot {

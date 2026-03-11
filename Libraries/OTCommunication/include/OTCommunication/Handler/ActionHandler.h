@@ -22,11 +22,9 @@
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTCommunication/ActionDispatcherBase.h"
-
-#include "OTCommunication/ActionDispatcher.h"
-#include "OTCommunication/ActionHandleInlineConnector.h"
-#include "OTCommunication/ActionHandleConnectorManager.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
+#include "OTCommunication/Handler/ActionHandleInlineConnector.h"
+#include "OTCommunication/Handler/ActionHandleConnectorManager.h"
 
 // std header
 #include <functional>
@@ -238,4 +236,4 @@ private: \
 //! \param ___class The class
 #define OT_DECL_ACTION_HANDLER(___class) OT_DECL_ACTION_HANDLER_CUSTOM(___class, &ot::ActionDispatcher::instance())
 
-#include "OTCommunication/ActionHandler.hpp"
+#include "OTCommunication/Handler/ActionHandler.hpp"

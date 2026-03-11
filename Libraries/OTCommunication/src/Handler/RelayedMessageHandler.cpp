@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/String.h"
-#include "OTCommunication/RelayedMessageHandler.h"
+#include "OTCommunication/Handler/RelayedMessageHandler.h"
 
 // std header
 #include <charconv>

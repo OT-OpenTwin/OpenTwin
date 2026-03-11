@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "OTCommunication/CommunicationAPIExport.h"
 #include "OTCommunication/CommunicationTypes.h"
 
  // C++ header

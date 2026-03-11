@@ -20,9 +20,9 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCommunication/ActionHandler.h"
-#include "OTCommunication/ActionDispatcher.h"
-#include "OTCommunication/ActionHandleConnector.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
+#include "OTCommunication/Handler/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandleConnector.h"
 
 namespace ot {
 

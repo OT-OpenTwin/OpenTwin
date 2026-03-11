@@ -30,8 +30,8 @@
 #include "OTSystem/RunResult.h"
 #include "OTSystem/PortManager.h"
 #include "OTCore/JSON/JSON.h"
-#include "OTCommunication/LDSDebugInfo.h"
-#include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/DebugInfo/LDSDebugInfo.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 
 // std header
 #include <map>

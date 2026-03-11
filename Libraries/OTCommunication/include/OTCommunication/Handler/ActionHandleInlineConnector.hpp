@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCommunication/ActionHandleInlineConnector.h"
+#include "OTCommunication/Handler/ActionHandleInlineConnector.h"
 
 template <class T>
 ot::ActionHandleInlineConnector<T>::ActionHandleInlineConnector(T* _object, typename ActionHandleConnectorManager<T>::HandlerMethodType _method, const std::string& _actionName, ActionHandleConnectorManager<T>& _manager, const MessageTypeFlags& _messageFlags) {

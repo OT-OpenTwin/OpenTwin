@@ -27,7 +27,7 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/Logging/AbstractLogNotifier.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 
 // std header
 #include <list>

@@ -32,7 +32,7 @@
 #include "OTGui/Style/PenCfg.h"
 #include "OTGui/Style/Margins.h"
 #include "OTGui/VersionGraphVersionCfg.h"
-#include "OTCommunication/GSSDebugInfo.h"
+#include "OTCommunication/DebugInfo/GSSDebugInfo.h"
 
 // Qt header
 #include <QtCore/qobject.h>

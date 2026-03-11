@@ -24,7 +24,7 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTServiceFoundation/Foundation.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
 // std header

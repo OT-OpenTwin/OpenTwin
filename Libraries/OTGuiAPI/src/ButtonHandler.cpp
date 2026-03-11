@@ -21,8 +21,8 @@
 #include "OTSystem/OTAssert.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionDispatcher.h"
-#include "OTCommunication/ActionHandleConnector.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
+#include "OTCommunication/Handler/ActionHandleConnector.h"
 #include "OTGuiAPI/ButtonHandler.h"
 
 ot::ButtonHandler::ButtonHandler(ActionDispatcherBase* _dispatcher)

@@ -34,7 +34,7 @@
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"                     // Message related methods and types
-#include "OTCommunication/ActionHandler.h"           // Action handle connection
+#include "OTCommunication/Handler/ActionHandler.h"           // Action handle connection
 
 // OpenTwin ServiceFoundation header
 #include "OTServiceFoundation/FoundationAPIExport.h" // OT_SERVICEFOUNDATION_API_EXPORT

@@ -28,7 +28,7 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 
 // std header
 #include <string>

@@ -29,7 +29,7 @@
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTGuiAPI/TableActionHandler.h"
 #include "OTGuiAPI/TextEditorActionHandler.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handle/ActionHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 

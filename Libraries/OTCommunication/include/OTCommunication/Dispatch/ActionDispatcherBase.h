@@ -24,7 +24,6 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCommunication/CommunicationTypes.h"
-#include "OTCommunication/CommunicationAPIExport.h"
 
 // std header
 #include <map>

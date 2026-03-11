@@ -53,6 +53,7 @@ endfunction()
 # OT roots and include subdir
 get_env_path(OT_SYSTEM_ROOT_PATH   OT_SYSTEM_ROOT)
 get_env_path(OT_CORE_ROOT_PATH     OT_CORE_ROOT)
+get_env_path(OT_CORE_ROOT_PATH     OT_CORE_ROOT)
 get_env_path(OT_INC_PATH           OT_INC)
 
 # OT library subdirs
@@ -113,59 +114,22 @@ elseif(BASE64_ROOT_PATH)
         set(OTCOMM_THIRDPARTY_HEADER "${BASE64_ROOT_PATH}/base64/base64.h")
     endif()
 else()
-    # Fallback: original relative path from vcxproj (may or may not work, depending on tree layout)
-    set(OTCOMM_THIRDPARTY_SOURCE "../../ThirdParty/base64/base64.c")
-    set(OTCOMM_THIRDPARTY_HEADER "../../ThirdParty/base64/base64.h")
+    # Display error and exit if neither environment variable is set or valid
+    message(FATAL_ERROR "Base64 source/header not found. Please set OPENTWIN_THIRDPARTY_ROOT or BASE64_ROOT environment variable to point to the base64 implementation.")
 endif()
 
 # ============================================================
 # Source and header lists (from .vcxproj)
 # ============================================================
-set(OTCOMM_SOURCE_FILES
-    src/ActionDispatcher.cpp
-    src/ActionDispatcherBase.cpp
-    src/ActionDispatchProfiler.cpp
-    src/ActionHandleConnector.cpp
-    src/ActionHandleConnectorContainer.cpp
-    src/CommunicationTypes.cpp
-    src/dllmain.cpp
-    src/GDSDebugInfo.cpp
-    src/GSSDebugInfo.cpp
-    src/IpConverter.cpp
-    src/LDSDebugInfo.cpp
-    src/LSSDebugInfo.cpp
-    src/Msg.cpp
-    src/RelayedMessageHandler.cpp
-    src/ServiceInitData.cpp
-    src/ServiceLogNotifier.cpp
-    src/ServiceRunData.cpp
+file(GLOB_RECURSE OTCOMM_SOURCE_FILES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-set(OTCOMM_HEADER_FILES
-    include/OTCommunication/ActionDispatcher.h
-    include/OTCommunication/ActionDispatcherBase.h
-    include/OTCommunication/ActionDispatchProfiler.h
-    include/OTCommunication/ActionHandleConnectorContainer.h
-    include/OTCommunication/ActionHandleConnectorManager.hpp
-    include/OTCommunication/ActionHandleConnector.h
-    include/OTCommunication/ActionHandleConnectorManager.h
-    include/OTCommunication/ActionHandleInlineConnector.h
-    include/OTCommunication/ActionHandleInlineConnector.hpp
-    include/OTCommunication/ActionHandler.h
-    include/OTCommunication/ActionHandler.hpp
-    include/OTCommunication/ActionTypes.h
-    include/OTCommunication/CommunicationAPIExport.h
-    include/OTCommunication/CommunicationTypes.h
-    include/OTCommunication/GDSDebugInfo.h
-    include/OTCommunication/GSSDebugInfo.h
-    include/OTCommunication/IpConverter.h
-    include/OTCommunication/LDSDebugInfo.h
-    include/OTCommunication/LSSDebugInfo.h
-    include/OTCommunication/Msg.h
-    include/OTCommunication/RelayedMessageHandler.h
-    include/OTCommunication/ServiceInitData.h
-    include/OTCommunication/ServiceLogNotifier.h
-    include/OTCommunication/ServiceRunData.h
+file(GLOB_RECURSE OTCOMM_HEADER_FILES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
 )
 
 # ============================================================

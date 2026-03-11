@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 #include "OTCommunication/CommunicationTypes.h"
 
 // std header

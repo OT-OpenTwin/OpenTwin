@@ -25,7 +25,7 @@
 // OpenTwin header
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCommunication/LDSDebugInfo.h"
+#include "OTCommunication/DebugInfo/LDSDebugInfo.h"
 
 // std header
 #include <list>

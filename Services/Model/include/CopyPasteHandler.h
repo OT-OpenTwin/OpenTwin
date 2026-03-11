@@ -24,7 +24,7 @@
 #include <string>
 
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handle/ActionHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 
 class CopyPasteHandler : public ot::ActionHandler

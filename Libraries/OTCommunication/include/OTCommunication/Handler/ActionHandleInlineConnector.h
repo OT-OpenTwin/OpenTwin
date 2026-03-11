@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCommunication/ActionHandleConnectorManager.h"
+#include "OTCommunication/Handler/ActionHandleConnectorManager.h"
 
 #define OT_DEFAULT_ACTION_HANDLER_NAME ot_intern_actionhandleconnectormanager
 
@@ -38,4 +38,4 @@ namespace ot {
 	};
 }
 
-#include "OTCommunication/ActionHandleInlineConnector.hpp"
+#include "OTCommunication/Handler/ActionHandleInlineConnector.hpp"

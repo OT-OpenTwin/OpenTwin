@@ -20,7 +20,6 @@
 #pragma once
 
 #include "OTSystem/Flags.h"
-#include "OTCommunication/CommunicationAPIExport.h"
 #include "OTCommunication/CommunicationTypes.h"
 
  // C++ header

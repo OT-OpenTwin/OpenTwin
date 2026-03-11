@@ -21,8 +21,8 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTCommunication/ActionHandleConnector.h"
-#include "OTCommunication/ActionHandleConnectorManager.h"
+#include "OTCommunication/Handler/ActionHandleConnector.h"
+#include "OTCommunication/Handler/ActionHandleConnectorManager.h"
 
 template <class T>
 ot::ActionHandleConnectorManager<T>::ActionHandleConnectorManager(T* _obj, ActionDispatcherBase* _dispatcher)

@@ -27,7 +27,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/GSSDebugInfo.h"
+#include "OTCommunication/DebugInfo/GSSDebugInfo.h"
 #include "OTCommunication/ActionHandler.h"
 
 #include "OTServiceFoundation/IDManager.h"

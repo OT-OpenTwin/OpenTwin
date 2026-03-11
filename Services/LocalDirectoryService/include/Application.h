@@ -27,7 +27,7 @@
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 
 // std header
 #include <list>

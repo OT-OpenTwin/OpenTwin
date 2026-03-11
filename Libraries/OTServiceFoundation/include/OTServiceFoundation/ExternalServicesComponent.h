@@ -23,9 +23,9 @@
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
-#include "OTCommunication/ActionHandler.h"
-#include "OTCommunication/ServiceRunData.h"
-#include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/Handler/ActionHandler.h"
+#include "OTCommunication/Data/ServiceRunData.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 
 // std header
 #include <string> // string

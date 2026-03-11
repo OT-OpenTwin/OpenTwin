@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handle/ActionHandler.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
 

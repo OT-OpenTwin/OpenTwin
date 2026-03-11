@@ -31,8 +31,8 @@
 #include "OTCommunication/Msg.h"								// message sending
 #include "OTCommunication/ActionTypes.h"						// action member and types definition
 #include "OTCommunication/IpConverter.h"						// extract IP information from sender information
-#include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"				// logging
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ApplicationBase.h"

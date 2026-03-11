@@ -25,7 +25,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCommunication/LSSDebugInfo.h"
+#include "OTCommunication/DebugInfo/LSSDebugInfo.h"
 
 // std header
 #include <list>

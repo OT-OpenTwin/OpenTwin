@@ -23,11 +23,11 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OTCommunication/GSSDebugInfo.h"
-#include "OTCommunication/LSSDebugInfo.h"
-#include "OTCommunication/GDSDebugInfo.h"
-#include "OTCommunication/LDSDebugInfo.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/DebugInfo/GSSDebugInfo.h"
+#include "OTCommunication/DebugInfo/LSSDebugInfo.h"
+#include "OTCommunication/DebugInfo/GDSDebugInfo.h"
+#include "OTCommunication/DebugInfo/LDSDebugInfo.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 
 // Qt header
 #include <QtCore/qobject.h>

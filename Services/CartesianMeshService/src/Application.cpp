@@ -28,7 +28,7 @@
 
 // Open twin header
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelEntities/EntityAPI.h"

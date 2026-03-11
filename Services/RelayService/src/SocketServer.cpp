@@ -27,7 +27,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"				// message sending
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
-#include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 
 // Qt header
 #include <QtCore/qfile.h>

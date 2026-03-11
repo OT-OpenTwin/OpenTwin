@@ -29,7 +29,7 @@
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/ActionTypes.h"        // Action types
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelAPI/ModelAPIManager.h"

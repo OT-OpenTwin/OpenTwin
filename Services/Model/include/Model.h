@@ -25,7 +25,7 @@
 #include "OTGui/Dialog/MessageDialogCfg.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handle/ActionHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTModelEntities/Geometry.h"
 #include "OTModelEntities/ModelState.h"

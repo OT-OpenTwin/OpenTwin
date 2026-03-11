@@ -23,7 +23,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCommunication/CommunicationTypes.h"
-#include "OTCommunication/ActionDispatcherBase.h"
+#include "OTCommunication/Dispatch/ActionDispatcherBase.h"
 
 // std header
 #include <list>
@@ -57,4 +57,4 @@ namespace ot {
 
 }
 
-#include "OTCommunication/ActionHandleConnectorManager.hpp"
+#include "OTCommunication/Handler/ActionHandleConnectorManager.hpp"

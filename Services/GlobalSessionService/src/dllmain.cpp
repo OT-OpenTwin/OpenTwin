@@ -33,7 +33,7 @@
 #include "OTCore/DebugHelper.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,

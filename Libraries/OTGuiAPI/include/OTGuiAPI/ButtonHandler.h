@@ -24,7 +24,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Widgets/ToolBarButtonCfg.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 
 // std header
 #include <functional>

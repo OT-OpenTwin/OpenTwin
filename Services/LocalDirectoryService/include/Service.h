@@ -25,7 +25,7 @@
 // OpenTwin header
 #include "OTSystem/Network.h"
 #include "OTSystem/SystemProcess.h"
-#include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 
 // std header
 #include <map>

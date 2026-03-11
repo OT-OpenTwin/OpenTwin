@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCommunication/ActionHandleConnector.h"
+#include "OTCommunication/Handler/ActionHandleConnector.h"
 
 // std header
 #include <list>

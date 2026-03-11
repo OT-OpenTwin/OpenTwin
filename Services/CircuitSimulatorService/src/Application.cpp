@@ -30,7 +30,7 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTCommunication/Msg.h"
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTGui/Graphics/GraphicsLayoutItemCfg.h"
 #include "OTGui/Graphics/GraphicsFlowItemBuilder.h"

@@ -23,7 +23,7 @@
 // OpenTwin header
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceDebugInformation.h"
-#include "OTCommunication/RelayedMessageHandler.h"
+#include "OTCommunication/Handler/RelayedMessageHandler.h"
 
 // Qt header
 #include <QtCore/qobject.h>

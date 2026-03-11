@@ -8,7 +8,7 @@
 #include "OTWidgets/Widgets/TreeWidgetFilter.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/LSSDebugInfo.h"
+#include "OTCommunication/DebugInfo/LSSDebugInfo.h"
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // Qt header

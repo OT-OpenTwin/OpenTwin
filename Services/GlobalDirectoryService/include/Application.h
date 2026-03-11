@@ -26,8 +26,8 @@
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionHandler.h"
-#include "OTCommunication/ServiceInitData.h"
+#include "OTCommunication/Handler/ActionHandler.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 #include "OTServiceFoundation/IDManager.h"
 
 // std header

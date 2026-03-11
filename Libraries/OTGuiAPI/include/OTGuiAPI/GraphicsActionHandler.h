@@ -27,7 +27,7 @@
 #include "OTGui/Event/GraphicsDoubleClickEvent.h"
 #include "OTGui/Event/GraphicsConnectionDropEvent.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
 namespace ot {

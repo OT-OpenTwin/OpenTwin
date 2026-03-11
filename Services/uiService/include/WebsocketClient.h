@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTCommunication/RelayedMessageHandler.h"
+#include "OTCommunication/Handle/RelayedMessageHandler.h"
 
 // Qt header
 #include <QtCore/qobject.h>

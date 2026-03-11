@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 #include "OTGui/Widgets/TableCfg.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 

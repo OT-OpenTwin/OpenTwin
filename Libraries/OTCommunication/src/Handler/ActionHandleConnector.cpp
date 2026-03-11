@@ -18,9 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCommunication/ActionDispatcher.h"
-#include "OTCommunication/ActionDispatcherBase.h"
-#include "OTCommunication/ActionHandleConnector.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
+#include "OTCommunication/Handler/ActionHandleConnector.h"
 
 ot::ActionHandleConnector::ActionHandleConnector(const std::string& _actionName, const DispatchMethodType& _method, const MessageTypeFlags& _messageFlags)
 	: m_messageFlags(_messageFlags), m_actionNames({ _actionName }), m_actionDispatcher(nullptr), m_method(_method)

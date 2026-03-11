@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCommunication/ActionHandleConnectorContainer.h"
+#include "OTCommunication/Handler/ActionHandleConnectorContainer.h"
 
 ot::ActionHandleConnectorContainer::ActionHandleConnectorContainer(ActionHandleConnectorContainer&& _other) noexcept {
 	this->operator=(std::move(_other));

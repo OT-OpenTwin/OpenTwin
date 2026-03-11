@@ -102,9 +102,9 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
-#include "OTCommunication/ServiceRunData.h"
-#include "OTCommunication/ServiceInitData.h"
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/Data/ServiceRunData.h"
+#include "OTCommunication/Data/ServiceInitData.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
 // OpenTwin header
