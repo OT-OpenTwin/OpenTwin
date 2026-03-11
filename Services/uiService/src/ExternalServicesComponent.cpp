@@ -4288,9 +4288,7 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
 	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
-	std::string targetFolder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
-	std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
-	std::string modelUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+	std::string additionalInfo = ot::json::getString(_document, OT_ACTION_PARAM_Info);
 	std::string lmsUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
@@ -4303,9 +4301,7 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityID, responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(targetFolder, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_ElementType, ot::JsonString(elementType, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(modelUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(additionalInfo, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(dbUserName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(dbUserPassword, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(dbServerUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());

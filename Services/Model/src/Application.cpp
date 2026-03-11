@@ -40,6 +40,7 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/Encryption.h"
 #include "CrossCollectionDatabaseWrapper.h"
+#include "OTModelEntities/Lms/LibraryElement.h"
 
 // std header
 #include <thread>
@@ -993,24 +994,23 @@ ot::ReturnMessage Application::handleShowTable(ot::JsonDocument& _document) {
 }
 
 void Application::handleModelDialogConfirmed(ot::JsonDocument& _document) {
-	//std::string modelInfo = ot::json::getString(_document, OT_ACTION_PARAM_ModelInfo);
-	//std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
-	//std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
-	//std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
-	//ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
 
-	// First add the model entity to the Project
-	//m_libraryManagementWrapper.createModelTextEntity(modelInfo, folder, elementType, selectedModel);
+	ot::LibraryElement importCfg;
+	importCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	// Now update the property according to the dialog (confirm or cancel)
-	//m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, folder, selectedModel);
+	/* First add the model entity to the Project*/
+	m_libraryManagementWrapper.createLibraryEntity(importCfg);
+
+	/* Now update the property according to the dialog (confirm or cancel)*/
+	m_libraryManagementWrapper.updatePropertyOfEntity(importCfg,true);
 }
 
 void Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
-	//ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+	ot::LibraryElement importCfg;
+	importCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	//// Now update the property according to the dialog (confirm or cancel)
-	//m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, "", "");
+	// Now update the property according to the dialog (confirm or cancel)
+	m_libraryManagementWrapper.updatePropertyOfEntity(importCfg,false);
 }
 
 // ##################################################################################################################################################################################################################

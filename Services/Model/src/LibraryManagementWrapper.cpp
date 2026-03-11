@@ -186,84 +186,89 @@ std::string LibraryManagementWrapper::requestCreateConfig(const ot::JsonDocument
 	return lmsResonse;
 }
 
-void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelInfo, const std::string& _folder, const std::string& _elementType, const std::string& _modelName) {
+void LibraryManagementWrapper::createLibraryEntity(const ot::LibraryElement& _importCfg) {
 	Model* modelPtr = Application::instance()->getModel();
 	assert(modelPtr != nullptr);
 
 	// Check if model already imported
+	std::string newEntityFolder = _importCfg.getNewEntityFolder();
+	std::string newEntityName = _importCfg.getName();
 
-	std::list<std::string> folderEntities = modelPtr->getListOfFolderItems(_folder, true);
+
+	std::list<std::string> folderEntities = modelPtr->getListOfFolderItems(newEntityFolder, true);
 	for (const std::string& model : folderEntities) {
-		if (model == _folder + "/" + _modelName) {
+		if (model == newEntityFolder + "/" + newEntityName) {
 			return;
 		}
 	}
 
-	ot::JsonDocument circuitModelDoc;
-	circuitModelDoc.fromJson(_modelInfo);
+	//Check what type of library entity is requested and create the entity accordingly. For now, only file text entities are supported, but in the future, other types can be added as well.
+	ot::LmsNewEntityType entityType = _importCfg.getEntityType();
+	if(entityType == ot::LmsNewEntityType::Text) {
+		
+		ot::UID entIDData = modelPtr->createEntityUID();
+		ot::UID entIDTopo = modelPtr->createEntityUID();
 
-	std::string modelText = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_Content);
-	std::string modelType = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_ModelType);
-	
+		// Create Text Entity
+		std::unique_ptr<EntityFileText> libraryEntity;
+		libraryEntity.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr));
 
-	ot::UID entIDData = modelPtr->createEntityUID();
-	ot::UID entIDTopo = modelPtr->createEntityUID();
+		// Create the data entity
+		EntityBinaryData fileContent(entIDData, libraryEntity.get(), nullptr, nullptr);
+		fileContent.setData(_importCfg.getData().data(), _importCfg.getData().size());
+		fileContent.storeToDataBase();
 
-	// Create EntityFile Text
-	std::unique_ptr<EntityFileText> circuitModel;
-	circuitModel.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr));
+		// Set the data entity to the topology entity
+		libraryEntity->setDataEntity(fileContent);
+		libraryEntity->setFileProperties("","","");
 
-	//Create the data entity
-	EntityBinaryData fileContent(entIDData, circuitModel.get(), nullptr, nullptr);
-	fileContent.setData(modelText.data(), modelText.size());
-	fileContent.storeToDataBase();
+		libraryEntity->setTextEncoding(ot::TextEncoding::UTF8);
 
-	//ot::EncodingGuesser guesser;
+		// Add the additional infos as properties to the topology entity
+		for (const auto& additionalInfos : _importCfg.getAdditionalInfos()) {
+			EntityPropertiesString* additionalInfoProp = EntityPropertiesString::createProperty("Metadata", additionalInfos.first, additionalInfos.second, "Default", libraryEntity->getProperties());
+			additionalInfoProp->setReadOnly(true);
+		}
 
-	// set the data entity 
-	circuitModel->setDataEntity(fileContent);
-	circuitModel->setFileProperties("", "", "");
+		libraryEntity->getProperties().getProperty("Path", "Selected File")->setVisible(false);
+		libraryEntity->getProperties().getProperty("Filename", "Selected File")->setVisible(false);
+		libraryEntity->getProperties().getProperty("FileType", "Selected File")->setVisible(false);
+		libraryEntity->getProperties().getProperty("Text Encoding", "Text Properties")->setVisible(false);
+		libraryEntity->getProperties().getProperty("Syntax Highlight", "Text Properties")->setVisible(false);
 
-	circuitModel->setTextEncoding(ot::TextEncoding::UTF8);
-
-	EntityPropertiesString* nameProp = EntityPropertiesString::createProperty("Model", "ElementType", _elementType, "Default", circuitModel->getProperties());
-	nameProp->setReadOnly(true);
-
-	EntityPropertiesString* modelTypeProp = EntityPropertiesString::createProperty("Model", "ModelType", modelType, "Default", circuitModel->getProperties());
-	modelTypeProp->setReadOnly(true);
-
-	circuitModel->getProperties().getProperty("Path", "Selected File")->setVisible(false);
-	circuitModel->getProperties().getProperty("Filename", "Selected File")->setVisible(false);
-	circuitModel->getProperties().getProperty("FileType", "Selected File")->setVisible(false);
-	circuitModel->getProperties().getProperty("Text Encoding", "Text Properties")->setVisible(false);
-	circuitModel->getProperties().getProperty("Syntax Highlight", "Text Properties")->setVisible(false);
+		const std::string entityName = CreateNewUniqueTopologyName(folderEntities, newEntityFolder, newEntityName);
+		libraryEntity->setName(entityName);
+		libraryEntity->storeToDataBase();
 
 
-	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, _folder, _modelName);
+		m_entityIDsTopo.push_back(entIDTopo);
+		m_entityVersionsTopo.push_back(libraryEntity->getEntityStorageVersion());
+		m_entityIDsData.push_back(entIDData);
+		m_entityVersionsData.push_back(fileContent.getEntityStorageVersion());
+		m_forceVisible.push_back(false);
+	}
+	else {
+		OT_LOG_E("Unsupported entity type requested: " + std::to_string((int)entityType));
+		return;
+	}
 
-	circuitModel->setName(entityName);
 
-	circuitModel->storeToDataBase();
-	m_entityIDsTopo.push_back(entIDTopo);
-	m_entityVersionsTopo.push_back(circuitModel->getEntityStorageVersion());
-	m_entityIDsData.push_back(entIDData);
-	m_entityVersionsData.push_back(fileContent.getEntityStorageVersion());
-	m_forceVisible.push_back(false);
+
 
 	addModelToEntites();
 }
 
-void LibraryManagementWrapper::updatePropertyOfEntity(ot::UID _entityID, bool _dialogConfirmed, const std::string& _folder, const std::string& _modelName) {
+void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& _importCfg, bool _dialogConfirmed) {
 	Model* model = Application::instance()->getModel();
-	auto entBase = model->getEntityByID(_entityID);
+	auto entBase = model->getEntityByID(_importCfg.getRequestingEntityID());
 
 	auto basePropertyModel = entBase->getProperties().getProperty("ModelSelection");
 	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
 
-	EntityBase* circuitModelEntity = model->findEntityFromName(_folder + "/" + _modelName);
-	EntityBase* circuitModelFolderEntity = model->findEntityFromName(_folder);
+	EntityBase* circuitModelEntity = model->findEntityFromName(_importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
+	EntityBase* circuitModelFolderEntity = model->findEntityFromName(_importCfg.getNewEntityFolder());
 	if (_dialogConfirmed && circuitModelEntity && circuitModelFolderEntity) {
-		modelProperty->setValueName(_folder + "/" + _modelName);
+		modelProperty->setValueName(_importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
 		modelProperty->setValueID(circuitModelEntity->getEntityID());
 		modelProperty->setEntityContainerID(circuitModelFolderEntity->getEntityID());
 	}

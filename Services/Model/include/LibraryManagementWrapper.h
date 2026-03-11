@@ -26,6 +26,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
+#include "OTModelEntities/Lms/LibraryElement.h"
 
 class LibraryManagementWrapper : public BusinessLogicHandler {
 public:
@@ -35,8 +36,8 @@ public:
 	std::list<std::string> getCircuitModels();
 	std::string getCircuitModel(std::string _modelName);
 	std::string requestCreateConfig(const ot::JsonDocument& _doc);
-	void createModelTextEntity(const std::string& _modelInfo, const std::string& _folder, const std::string& _elementType, const std::string& _modelName);
-	void updatePropertyOfEntity(ot::UID _entityID, bool _dialogConfirmed, const std::string& _folder, const std::string& _modelName);
+	void createLibraryEntity(const ot::LibraryElement& _importCfg);
+	void updatePropertyOfEntity(const ot::LibraryElement& _importCfg, bool _dialogConfirmed);
 private:
 
 	ot::UIDList m_entityIDsTopo;

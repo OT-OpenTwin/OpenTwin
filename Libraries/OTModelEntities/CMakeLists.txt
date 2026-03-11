@@ -93,7 +93,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ============================================================
 
 set(OTMODELENTITIES_HEADER_FILES
-    include/OTModelEntities/Lms/LibraryElementSelectionCfg.h
     include/OTModelEntities/BoundingBox.h
     include/OTModelEntities/BsonArrayTypeGetterWrapper.h
     include/OTModelEntities/BsonArrayTypeGetterWrapper.hpp
@@ -199,6 +198,8 @@ set(OTMODELENTITIES_HEADER_FILES
     include/OTModelEntities/EntityVisCartesianFaceScalar.h
     include/OTModelEntities/GenericDocument.h
     include/OTModelEntities/Geometry.h
+    include/OTModelEntities/Lms/LibraryElementSelectionCfg.h
+    include/OTModelEntities/Lms/LibraryElement.h
     include/OTModelEntities/ModelEntitiesAPIExport.h
     include/OTModelEntities/ModelState.h
     include/OTModelEntities/NewModelStateInfo.h
@@ -321,6 +322,7 @@ set(OTMODELENTITIESSOURCE_FILES
     src/GenericDocument.cpp
     src/Geometry.cpp
     src/Lms/LibraryElementSelectionCfg.cpp
+    src/Lms/LibraryElement.cpp
     src/ModelState.cpp
     src/NewModelStateInfo.cpp
     src/PropertyBundleDataHandlePlane.cpp

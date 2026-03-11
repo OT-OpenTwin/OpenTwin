@@ -105,6 +105,10 @@ namespace ot {
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		//! @brief Serialize callback service, entity type and new entity folder into m_additionalInfo as JSON string
+		//! This allows passing these values through the LibraryManagementService
+		void serializeCallbackInfoToAdditionalInfo();
+		
 	private:
 		std::string m_collectionName;
 		std::list<std::pair<std::string, std::string>> m_additionalInfoFilters;
@@ -119,5 +123,9 @@ namespace ot {
 
 	};
 }
+
+
+
+
 
 

@@ -17,9 +17,26 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTModelEntities/Lms/LibraryElementImportCfg.h"
+#include "OTModelEntities/Lms/LibraryElement.h"
 
-void ot::LibraryElementImportCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+std::string ot::LibraryElement::getMetaDataValue(const std::string& _key) const {
+    auto it = m_metaData.find(_key);
+    if (it != m_metaData.end()) {
+        return it->second;
+    }
+    return "";
+}
+
+std::string ot::LibraryElement::getAdditionalInfoValue(const std::string& _key) const {
+    auto it = m_additionalInfos.find(_key);
+    if (it != m_additionalInfos.end()) {
+        return it->second;
+    }
+    return "";
+}
+
+
+void ot::LibraryElement::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
     // Basic information
     _object.AddMember("Name", ot::JsonString(m_name, _allocator), _allocator);
     _object.AddMember("Version", m_version, _allocator);
@@ -61,7 +78,7 @@ void ot::LibraryElementImportCfg::addToJsonObject(ot::JsonValue& _object, ot::Js
     _object.AddMember("AdditionalInfos", additionalInfosObj, _allocator);
 }
 
-void ot::LibraryElementImportCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
+void ot::LibraryElement::setFromJsonObject(const ot::ConstJsonObject& _object) {
     // Basic information
     m_name = ot::json::getString(_object, "Name");
     m_version = ot::json::getInt64(_object, "Version");
@@ -104,7 +121,7 @@ void ot::LibraryElementImportCfg::setFromJsonObject(const ot::ConstJsonObject& _
     }
 }
 
-bool ot::LibraryElementImportCfg::deserializeCallbackInfoFromAdditionalInfo(const std::string& _additionalInfo) {
+bool ot::LibraryElement::deserializeCallbackInfoFromAdditionalInfo(const std::string& _additionalInfo) {
  
 
     if (_additionalInfo.empty()) {

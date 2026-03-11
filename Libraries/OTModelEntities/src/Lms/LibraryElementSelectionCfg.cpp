@@ -23,14 +23,15 @@ ot::LibraryElementSelectionCfg::LibraryElementSelectionCfg() : m_newEntityType(L
 }
 
 ot::LibraryElementSelectionCfg::LibraryElementSelectionCfg(const LibraryElementSelectionCfg& _other) : m_collectionName(_other.m_collectionName),
-m_additionalInfoFilters(_other.m_additionalInfoFilters),
-m_metaDataInfoFilters(_other.m_metaDataInfoFilters),
-m_callBackService(_other.m_callBackService),
-m_callBackAction(_other.m_callBackAction),
-m_newEntityType(_other.m_newEntityType),
-m_requestingEntityID(_other.m_requestingEntityID),
-m_uiServiceUrl(_other.m_uiServiceUrl),
-m_additionalInfo(_other.m_additionalInfo) {
+    m_additionalInfoFilters(_other.m_additionalInfoFilters),
+    m_metaDataInfoFilters(_other.m_metaDataInfoFilters),
+    m_callBackService(_other.m_callBackService),
+    m_callBackAction(_other.m_callBackAction),
+    m_newEntityType(_other.m_newEntityType),
+    m_requestingEntityID(_other.m_requestingEntityID),
+    m_uiServiceUrl(_other.m_uiServiceUrl),
+    m_additionalInfo(_other.m_additionalInfo),
+    m_newEntityFolder(_other.m_newEntityFolder) {
 }
 
 ot::LibraryElementSelectionCfg::LibraryElementSelectionCfg(LibraryElementSelectionCfg&& _other) noexcept
@@ -42,7 +43,8 @@ ot::LibraryElementSelectionCfg::LibraryElementSelectionCfg(LibraryElementSelecti
     m_newEntityType(_other.m_newEntityType),
     m_requestingEntityID(_other.m_requestingEntityID),
     m_uiServiceUrl(std::move(_other.m_uiServiceUrl)),
-    m_additionalInfo(_other.m_additionalInfo) {
+    m_additionalInfo(_other.m_additionalInfo),
+    m_newEntityFolder(_other.m_newEntityFolder) {
 }
 
 ot::LibraryElementSelectionCfg& ot::LibraryElementSelectionCfg::operator=(const LibraryElementSelectionCfg& _other) {
@@ -56,6 +58,7 @@ ot::LibraryElementSelectionCfg& ot::LibraryElementSelectionCfg::operator=(const 
         m_requestingEntityID = _other.m_requestingEntityID;
         m_uiServiceUrl = _other.m_uiServiceUrl;
         m_additionalInfo = _other.m_additionalInfo;
+		m_newEntityFolder = _other.m_newEntityFolder;
     }
     return *this;
 }
@@ -71,6 +74,7 @@ ot::LibraryElementSelectionCfg& ot::LibraryElementSelectionCfg::operator=(Librar
         m_requestingEntityID = _other.m_requestingEntityID;
         m_uiServiceUrl = std::move(_other.m_uiServiceUrl);
         m_additionalInfo = std::move(_other.m_additionalInfo);
+		m_newEntityFolder = std::move(_other.m_newEntityFolder);
     }
     return *this;
 }
@@ -104,6 +108,7 @@ void ot::LibraryElementSelectionCfg::addToJsonObject(ot::JsonValue& _object, ot:
     _object.AddMember("RequestingEntityID", static_cast<int64_t>(m_requestingEntityID), _allocator);
     _object.AddMember("UiServiceURL", ot::JsonString(m_uiServiceUrl, _allocator), _allocator);
 	_object.AddMember("AdditionalInfo", ot::JsonString(m_additionalInfo, _allocator), _allocator);
+	_object.AddMember("NewEntityFolder", ot::JsonString(m_newEntityFolder, _allocator), _allocator);
 }
 
 void ot::LibraryElementSelectionCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -142,6 +147,7 @@ void ot::LibraryElementSelectionCfg::setFromJsonObject(const ot::ConstJsonObject
     m_requestingEntityID = ot::json::getUInt64(_object, "RequestingEntityID");
     m_uiServiceUrl = ot::json::getString(_object, "UiServiceURL");
 	m_additionalInfo = ot::json::getString(_object, "AdditionalInfo");
+	m_newEntityFolder = ot::json::getString(_object, "NewEntityFolder");
 }
 
 std::string ot::LibraryElementSelectionCfg::entityTypeToString(LmsNewEntityType _type) {
@@ -171,3 +177,14 @@ ot::LmsNewEntityType ot::LibraryElementSelectionCfg::stringToEntityType(const st
         return LmsNewEntityType::Text;
     }
 }
+
+void ot::LibraryElementSelectionCfg::serializeCallbackInfoToAdditionalInfo() {
+    
+    ot::JsonDocument doc;
+    doc.AddMember("CallbackService", ot::JsonString(m_callBackService, doc.GetAllocator()), doc.GetAllocator());
+    doc.AddMember("EntityType", ot::JsonString(entityTypeToString(m_newEntityType), doc.GetAllocator()), doc.GetAllocator());
+    doc.AddMember("NewEntityFolder", ot::JsonString(m_newEntityFolder, doc.GetAllocator()), doc.GetAllocator());
+
+    m_additionalInfo = doc.toJson();
+}
+

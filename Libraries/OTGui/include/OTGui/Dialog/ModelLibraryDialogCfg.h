@@ -67,6 +67,7 @@ namespace ot {
 	private:
 		std::list<LibraryModel> m_models;
 		std::list<std::string> m_filter;
+		std::string m_additionalInfo;
 		
 	};
 }

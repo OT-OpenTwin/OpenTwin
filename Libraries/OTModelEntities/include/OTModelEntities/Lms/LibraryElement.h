@@ -31,10 +31,10 @@ namespace ot{
     //! @brief Configuration class representing a complete library model to be imported
     //! This class holds all information about a model loaded from the database including
     //! metadata, additional infos, origin information and the actual model data
-    class OT_MODELENTITIES_API_EXPORT LibraryElementImportCfg : public ot::Serializable {
+    class OT_MODELENTITIES_API_EXPORT LibraryElement : public ot::Serializable {
     public:
-        LibraryElementImportCfg() = default;
-        virtual ~LibraryElementImportCfg() = default;
+        LibraryElement() = default;
+        virtual ~LibraryElement() = default;
 
         // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -83,64 +83,18 @@ namespace ot{
         // Metadata management
 
         //! @brief Add a metadata key-value pair (e.g., "IS": "27.5")
-        void addMetaData(const std::string& _key, const std::string& _value) {
-            m_metaData[_key] = _value;
-        }
-
-        //! @brief Check if metadata key exists
-        bool hasMetaData(const std::string& _key) const {
-            return m_metaData.find(_key) != m_metaData.end();
-        }
-
-        //! @brief Get metadata value by key
-        std::string getMetaDataValue(const std::string& _key) const {
-            auto it = m_metaData.find(_key);
-            if (it != m_metaData.end()) {
-                return it->second;
-            }
-            return "";
-        }
-
-        //! @brief Get all metadata
-        const std::map<std::string, std::string>& getMetaData() const {
-            return m_metaData;
-        }
-
-        //! @brief Clear all metadata
-        void clearMetaData() {
-            m_metaData.clear();
-        }
+        void addMetaData(const std::string& _key, const std::string& _value) { m_metaData[_key] = _value; }
+        bool hasMetaData(const std::string& _key) const { return m_metaData.find(_key) != m_metaData.end(); }
+        std::string getMetaDataValue(const std::string& _key) const;
+        const std::map<std::string, std::string>& getMetaData() const { return m_metaData; }
+        void clearMetaData() { m_metaData.clear(); }
 
         // Additional info management
-
-        //! @brief Add an additional info key-value pair
-        void addAdditionalInfo(const std::string& _key, const std::string& _value) {
-            m_additionalInfos[_key] = _value;
-        }
-
-        //! @brief Check if additional info key exists
-        bool hasAdditionalInfo(const std::string& _key) const {
-            return m_additionalInfos.find(_key) != m_additionalInfos.end();
-        }
-
-        //! @brief Get additional info value by key
-        std::string getAdditionalInfoValue(const std::string& _key) const {
-            auto it = m_additionalInfos.find(_key);
-            if (it != m_additionalInfos.end()) {
-                return it->second;
-            }
-            return "";
-        }
-
-        //! @brief Get all additional infos
-        const std::map<std::string, std::string>& getAdditionalInfos() const {
-            return m_additionalInfos;
-        }
-
-        //! @brief Clear all additional infos
-        void clearAdditionalInfos() {
-            m_additionalInfos.clear();
-        }
+        void addAdditionalInfo(const std::string& _key, const std::string& _value) { m_additionalInfos[_key] = _value; }
+        bool hasAdditionalInfo(const std::string& _key) const { return m_additionalInfos.find(_key) != m_additionalInfos.end(); }
+        std::string getAdditionalInfoValue(const std::string& _key) const;
+        const std::map<std::string, std::string>& getAdditionalInfos() const { return m_additionalInfos; }
+        void clearAdditionalInfos() { m_additionalInfos.clear(); }
 
         // ###########################################################################################################################################################################################################################################################################################################################
 

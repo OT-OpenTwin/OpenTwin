@@ -28,7 +28,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTCore/ReturnMessage.h"
-
+#include "OTModelEntities/Lms/LibraryElement.h"
 
 
 
@@ -140,11 +140,6 @@ std::string Application::getModelInformation(const ot::LibraryElementSelectionCf
 	return result;
 }
 
-std::string Application::getModelMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
-	auto result = db->getMetaData(_collectionName, _fieldType, _value, _dbUserName, _dbUserPassword, _dbServerUrl);
-	return result;
-}
-
  std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCfg(const ot::LibraryElementSelectionCfg _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
 	
 	// First get model info from database
@@ -180,22 +175,6 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 			std::string name = doc["Name"].GetString();
 
 			ot::LibraryModel model(name, "", "");
-
-			if (doc.HasMember("additionalInfos") && doc["additionalInfos"].IsObject()) 	{
-				ot::ConstJsonObject additionalInfos = doc["additionalInfos"].GetObject();
-
-				for (auto it = additionalInfos.MemberBegin(); it != additionalInfos.MemberEnd(); ++it) {
-					std::string key = it->name.GetString();
-					std::string value;
-
-					if (it->value.IsString()) {
-						value = it->value.GetString();
-					}
-
-					model.addMetaData(key, value);
-					dialogCfg.addFilter(key);
-				}
-			}
 
 			if (doc.HasMember("metaData") && doc["metaData"].IsObject()) {
 				ot::ConstJsonObject metaDataObj = doc["metaData"].GetObject();
@@ -284,77 +263,32 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 	 return modelResponse;
  }
 
-void Application::packMetaData(const bsoncxx::document::view& _doc, ot::LibraryModel& _model, ot::ModelLibraryDialogCfg& _dialogCfg) {
-	if (_doc["Parameters"] && _doc["Parameters"].type() == bsoncxx::type::k_document) {
-		auto paramsDoc = _doc["Parameters"].get_document().value;
-
-		for (auto&& element : paramsDoc) {
-			if (element.type() == bsoncxx::type::k_double) {
-				std::string key = std::string(element.key());
-				std::string value = std::to_string(element.get_double().value);
-
-				// Here we add the meta data to the model object
-				_model.addMetaData(key, value);
-
-				// Here we add the filter options to the cfg
-				_dialogCfg.addFilter(key);
-			}
-		}
-
-		// Now we add the full model object to the dialogCfg
-		_dialogCfg.addModel(_model);
-	}
-}
-
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Action handler
 
-std::string Application::handleGetDocument(ot::JsonDocument& _document) {
+std::string Application::handleGetCompleteSelectedDocument(ot::JsonDocument& _document) {
 
-	std::string collectionName= ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
-	std::string fieldType = ot::json::getString(_document, OT_ACTION_PARAM_Type);
-	std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	std::string selectedDocument = ot::json::getString(_document, OT_ACTION_PARAM_Value);
 	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 
-	auto result = db->getDocument(collectionName, fieldType, value,dbUserName,dbUserPassword,dbServerUrl);
+	auto result = db->getCompleteDocument(collectionName,dbUserName,dbUserPassword,dbServerUrl,selectedDocument);
 	if (!result.empty()) {	
 		return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
 	}
 	else {
 		return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
 	}
-
-
-}
-
-
-std::string Application::handleGetListOfDocuments(ot::JsonDocument& _document) {
-
-	//std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
-	//std::string fieldType = ot::json::getString(_document, OT_ACTION_PARAM_Type);
-	//std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
-	//std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
-	//std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
-	//std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
-
-	//auto result = db->getDocumentList(collectionName, fieldType, value, dbUserName, dbUserPassword, dbServerUrl);
-	//if (!result.empty()) {
-	//	return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
-	//}
-	//else {
-	//	return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
-	//}
-	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
 }
 
 std::string Application::handleCreateDialogConfig(ot::JsonDocument& _document) {
 	ot::ConstJsonObject configObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	ot::LibraryElementSelectionCfg selectionCfg;
 	selectionCfg.setFromJsonObject(configObj);
+	selectionCfg.serializeCallbackInfoToAdditionalInfo();
 
 	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
@@ -376,77 +310,73 @@ std::string Application::handleCreateDialogConfig(ot::JsonDocument& _document) {
 	modelCfgDoc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(this->getServiceURL(), modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
 	modelCfgDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, selectionCfg.getRequestingEntityID(), modelCfgDoc.GetAllocator());
 	modelCfgDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(selectionCfg.getCollectionName(), modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
-	modelCfgDoc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(selectionCfg.getNewEntityFolder(), modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
-	modelCfgDoc.AddMember(OT_ACTION_PARAM_ElementType, ot::JsonString("Diode", modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
-	modelCfgDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(selectionCfg.getCallBackService(), modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
 	modelCfgDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(dbUserName, modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
 	modelCfgDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(dbUserPassword, modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
 	modelCfgDoc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(dbServerUrl, modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
-
+	modelCfgDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(selectionCfg.getAdditionalInfo(), modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
 	modelCfgDoc.AddMember(OT_ACTION_PARAM_Config, modelCfg,modelCfgDoc.GetAllocator());
 	
 	//Send config to UI
 	std::string uiResponse = sendConfigToUI(modelCfgDoc, selectionCfg.getUIServiceUrl());
 	
 	return uiResponse;
-
-	return "";
 }
 
 std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document) {
-	//// Adding fieldtype value for GetDocument
-	//_document.AddMember(OT_ACTION_PARAM_Type, ot::JsonString("Name", _document.GetAllocator()), _document.GetAllocator());
+	
+	// Get model description from database
+	std::string modelInfo = handleGetCompleteSelectedDocument(_document);
+	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(modelInfo);
+	if (rMsg != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Get Models failed: " + rMsg.getWhat());
+		return "Failed";
+	}
 
-	//// Get model description
-	//std::string modelInfo = handleGetDocument(_document);
-	//ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(modelInfo);
-	//if (rMsg != ot::ReturnMessage::Ok) {
-	//	OT_LOG_E("Get Models failed: " + rMsg.getWhat());
-	//	return "Failed";
-	//}
+	// Convert model info from database to json doc
+	ot::JsonDocument modelInfoDoc;
+	modelInfoDoc.fromJson(rMsg.getWhat());
+	
+	// Get the additional info string which contains serialized callback data
+	std::string additionalInfo = ot::json::getString(_document, OT_ACTION_PARAM_Info);
+	
+	// Deserialize the callback information
+	ot::JsonDocument callbackInfoDoc;
+	callbackInfoDoc.fromJson(additionalInfo);
+	
+	modelInfoDoc.AddMember("CollectionName", ot::JsonString(ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
+	modelInfoDoc.AddMember("RequestingEntityID", ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID), modelInfoDoc.GetAllocator());
+	modelInfoDoc.AddMember("CallbackService", ot::JsonString(ot::json::getString(callbackInfoDoc, "CallbackService"), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
+	modelInfoDoc.AddMember("EntityType", ot::JsonString(ot::json::getString(callbackInfoDoc, "EntityType"), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
+	modelInfoDoc.AddMember("NewEntityFolder", ot::JsonString(ot::json::getString(callbackInfoDoc, "NewEntityFolder"), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
 
-	//// Getting relevant infos
+	// Create LibraryElementImportCfg and populate it with the complete modelInfoDoc
+	ot::LibraryElement importCfg;
+	importCfg.setFromJsonObject(modelInfoDoc.getConstObject());
 
-	//std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
-	//ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-	//std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
-	//std::string targetFolder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
-	//std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
-	//std::string modelUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
-
-
-
-	//
-
-
-	//
-	//// Creating dialog confirmed doc and add the model description 
-	//ot::JsonDocument dialogConfirmed;
-	//dialogConfirmed.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ModelDialogConfirmed, dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
-	//dialogConfirmed.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityID, dialogConfirmed.GetAllocator());
-	//dialogConfirmed.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
-	//dialogConfirmed.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(targetFolder, dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
-	//dialogConfirmed.AddMember(OT_ACTION_PARAM_ElementType, ot::JsonString(elementType, dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
-	//dialogConfirmed.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(selectedModel, dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
-	//
-	//// Add the model info got from database
-	//dialogConfirmed.AddMember(OT_ACTION_PARAM_ModelInfo, ot::JsonString(rMsg.getWhat(), dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
-	//std::string response = sendMessageToModel(dialogConfirmed, modelUrl);
+	// Creating dialog confirmed doc with the import config
+	ot::JsonDocument dialogConfirmed;
+	dialogConfirmed.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ModelDialogConfirmed, dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
+	
+	// Add the complete import configuration as a JSON object
+	ot::JsonObject importCfgObj;
+	importCfg.addToJsonObject(importCfgObj, dialogConfirmed.GetAllocator());
+	dialogConfirmed.AddMember(OT_ACTION_PARAM_Config, importCfgObj, dialogConfirmed.GetAllocator());
+	
+	std::string response = sendMessageToModel(dialogConfirmed, importCfg.getCallBackService());
 
 	return "";
-
 }
 
 std::string Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
 	
-	/*ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
 	std::string modelUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
 
 	ot::JsonDocument dialogCanceled;
 	dialogCanceled.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ModelDialogCanceled, dialogCanceled.GetAllocator()), dialogCanceled.GetAllocator());
 	dialogCanceled.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityID, dialogCanceled.GetAllocator());
 
-	std::string response = sendMessageToModel(dialogCanceled, modelUrl);*/
+	std::string response = sendMessageToModel(dialogCanceled, modelUrl);
 	return "";
 }
 

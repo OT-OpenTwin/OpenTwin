@@ -62,12 +62,22 @@ public:
 	MongoWrapper(std::string _siteID);
 	~MongoWrapper() = default;
 
-	std::string getDocument(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 	std::string getDocumentList(const ot::LibraryElementSelectionCfg& _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
-	std::string getMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	std::string getCompleteDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument);
+
 private:
+	// Database connection and validation
 	std::string getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword);
-	bsoncxx::document::value buildCombinedFilterQuery( const std::list<std::pair<std::string, std::string>>& _additionalFilters, const std::list<std::pair<std::string, std::string>>& _metadataFilters);
+	bool initializeConnection(const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	bool checkCollectionExists(const std::string& _collectionName);
+
+	// Document query helpers
+	bsoncxx::document::value buildCombinedFilterQuery(const std::list<std::pair<std::string, std::string>>& _additionalFilters, const std::list<std::pair<std::string, std::string>>& _metadataFilters);
+	bsoncxx::stdx::optional<bsoncxx::document::value> fetchDocumentByName(DataStorageAPI::DocumentAccessBase& _docBase, const std::string& _documentName);
+
+	// Data loading helpers
+	std::string loadDocumentData(const bsoncxx::document::view& _documentView, const std::string& _collectionName);
+	std::string loadGridFSData(const bsoncxx::oid& _oid, const std::string& _collectionName);
 
 	std::string m_databaseURL;
 	std::string m_siteID;
