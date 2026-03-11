@@ -131,11 +131,11 @@ namespace DataStorageAPI
 		}
 	}
 
-	void DocumentAPI::GetDocumentUsingGridFs(value id, uint8_t *&buffer, size_t &length, const std::string &fileName)
+	void DocumentAPI::GetDocumentUsingGridFs(value id, uint8_t *&buffer, size_t &length, const std::string &fileName, const std::string& dataBase)
 	{
 		try
 		{
-			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase("Projects");
+			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase(dataBase);
 			mongocxx::options::gridfs::bucket bucketOptions = mongocxx::options::gridfs::bucket();
 			bucketOptions.bucket_name(fileName);
 			auto bucket = db.gridfs_bucket(bucketOptions);
@@ -219,11 +219,11 @@ namespace DataStorageAPI
 			throw e;
 		}
 	}
-	value DocumentAPI::InsertBinaryDataUsingGridFs(const uint8_t* dataBuffer, size_t dataSize, const std::string &fileName)
+	value DocumentAPI::InsertBinaryDataUsingGridFs(const uint8_t* dataBuffer, size_t dataSize, const std::string &fileName, const std::string& dataBase)
 	{
 		try
 		{
-			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase("Projects");
+			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase(dataBase);
 			mongocxx::options::gridfs::bucket bucketOptions = mongocxx::options::gridfs::bucket();
 			bucketOptions.bucket_name(fileName);
 			auto bucket = db.gridfs_bucket(bucketOptions);

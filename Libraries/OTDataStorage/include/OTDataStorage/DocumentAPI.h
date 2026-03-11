@@ -46,8 +46,8 @@ namespace DataStorageAPI
 		__declspec(dllexport) value InsertDocumentUsingGridFs(bsoncxx::document::view docView, const std::string &fileName);
 		__declspec(dllexport) void GetDocumentUsingGridFs(value id, uint8_t *&buffer, size_t &length);
 		__declspec(dllexport) value InsertDocumentUsingGridFs(bsoncxx::document::view docView, const std::string &fileName, Document &metaDoc);
-		__declspec(dllexport) void GetDocumentUsingGridFs(value id, uint8_t *&buffer, size_t &length, const std::string &fileName);
-		__declspec(dllexport) value InsertBinaryDataUsingGridFs(const uint8_t* dataBuffer, size_t dataSize, const std::string &fileName);
+		__declspec(dllexport) void GetDocumentUsingGridFs(value id, uint8_t *&buffer, size_t &length, const std::string &fileName, const std::string& dataBase = "Projects");
+		__declspec(dllexport) value InsertBinaryDataUsingGridFs(const uint8_t* dataBuffer, size_t dataSize, const std::string &fileName, const std::string& dataBase = "Projects");
 		__declspec(dllexport) void DeleteGridFSData(value id, const std::string& fileName);
 
 
