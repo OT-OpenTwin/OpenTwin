@@ -64,6 +64,8 @@ namespace ot {
 		//! @param _msecInterval Time interval in milliseconds.
 		static std::string intervalToString(int64_t _msecInterval);
 
+		static bool isValidTimestamp(const std::string& _timestamp, DateFormat _format);
+
 		//! @brief Get current date and time.
 		//! @param _useLocalTime If true local time is used, otherwise UTC time is used.
 		static DateTime current(bool _useLocalTime = false);

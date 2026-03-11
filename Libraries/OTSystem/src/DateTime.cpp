@@ -24,6 +24,7 @@
 // std header
 #include <regex>
 #include <chrono>
+#include <charconv>
 #include <sstream>
 #include <iomanip>
 #include <stdexcept>
@@ -274,6 +275,125 @@ std::string ot::DateTime::intervalToString(int64_t _msecInterval) {
     }
 
     return oss.str();
+}
+
+bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _format)
+{
+    if (_format == Msec)
+    {
+        int64_t value = 0;
+        auto [ptr, ec] = std::from_chars(_timestamp.data(), _timestamp.data() + _timestamp.size(), value);
+        return ec == std::errc() && ptr == _timestamp.data() + _timestamp.size();
+    }
+
+    auto parseSimpleDateTime = [&](char dateTimeSeparator, bool requireZuluOrOffset, bool allowOffset) -> bool
+        {
+            if (_timestamp.size() < 23)
+            {
+                return false;
+            }
+
+            if (_timestamp[4] != '-' || _timestamp[7] != '-' || _timestamp[10] != dateTimeSeparator ||
+                _timestamp[13] != ':' || _timestamp[16] != ':' || _timestamp[19] != '.')
+            {
+                return false;
+            }
+
+            int year = 0;
+            int month = 0;
+            int day = 0;
+            int hour = 0;
+            int minute = 0;
+            int second = 0;
+            int millisecond = 0;
+
+            auto [ptrYear, ecYear] = std::from_chars(_timestamp.data() + 0, _timestamp.data() + 4, year);
+            auto [ptrMonth, ecMonth] = std::from_chars(_timestamp.data() + 5, _timestamp.data() + 7, month);
+            auto [ptrDay, ecDay] = std::from_chars(_timestamp.data() + 8, _timestamp.data() + 10, day);
+            auto [ptrHour, ecHour] = std::from_chars(_timestamp.data() + 11, _timestamp.data() + 13, hour);
+            auto [ptrMinute, ecMinute] = std::from_chars(_timestamp.data() + 14, _timestamp.data() + 16, minute);
+            auto [ptrSecond, ecSecond] = std::from_chars(_timestamp.data() + 17, _timestamp.data() + 19, second);
+            auto [ptrMillisecond, ecMillisecond] = std::from_chars(_timestamp.data() + 20, _timestamp.data() + 23, millisecond);
+
+            if (ecYear != std::errc() || ptrYear != _timestamp.data() + 4 ||
+                ecMonth != std::errc() || ptrMonth != _timestamp.data() + 7 ||
+                ecDay != std::errc() || ptrDay != _timestamp.data() + 10 ||
+                ecHour != std::errc() || ptrHour != _timestamp.data() + 13 ||
+                ecMinute != std::errc() || ptrMinute != _timestamp.data() + 16 ||
+                ecSecond != std::errc() || ptrSecond != _timestamp.data() + 19 ||
+                ecMillisecond != std::errc() || ptrMillisecond != _timestamp.data() + 23)
+            {
+                return false;
+            }
+
+            if (!ot::DateTime(year, month, day, hour, minute, second, millisecond).isValid())
+            {
+                return false;
+            }
+
+            if (!requireZuluOrOffset && !allowOffset)
+            {
+                return _timestamp.size() == 23;
+            }
+
+            if (requireZuluOrOffset && !allowOffset)
+            {
+                return _timestamp.size() == 24 && _timestamp[23] == 'Z';
+            }
+
+            if (allowOffset)
+            {
+                if (_timestamp.size() == 24 && _timestamp[23] == 'Z')
+                {
+                    return true;
+                }
+
+                if (_timestamp.size() != 29)
+                {
+                    return false;
+                }
+
+                if ((_timestamp[23] != '+' && _timestamp[23] != '-') || _timestamp[26] != ':')
+                {
+                    return false;
+                }
+
+                int tzHour = 0;
+                int tzMinute = 0;
+
+                auto [ptrTzHour, ecTzHour] = std::from_chars(_timestamp.data() + 24, _timestamp.data() + 26, tzHour);
+                auto [ptrTzMinute, ecTzMinute] = std::from_chars(_timestamp.data() + 27, _timestamp.data() + 29, tzMinute);
+
+                if (ecTzHour != std::errc() || ptrTzHour != _timestamp.data() + 26 ||
+                    ecTzMinute != std::errc() || ptrTzMinute != _timestamp.data() + 29)
+                {
+                    return false;
+                }
+
+                return tzHour >= 0 && tzHour <= 23 && tzMinute >= 0 && tzMinute <= 59;
+            }
+
+            return false;
+        };
+
+    switch (_format)
+    {
+    case Simple:
+    case SimpleUTC:
+        return parseSimpleDateTime(' ', false, false);
+
+    case ISO8601UTC:
+        return parseSimpleDateTime('T', true, false);
+
+    case RFC3339:
+        return parseSimpleDateTime('T', true, true);
+
+    case Msec:
+        return false;
+
+    default:
+        return false;
+    }
 }
 
 ot::DateTime ot::DateTime::current(bool _useLocalTime) {
