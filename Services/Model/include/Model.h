@@ -309,12 +309,14 @@ private:
 	ot::ToolBarButtonCfg m_infoButton;
 	ot::ToolBarButtonCfg m_saveButton;
 	ot::ToolBarButtonCfg m_createParameterButton;
+	ot::ToolBarButtonCfg m_createGroupButton;
 
 	void handleUndoLastOperation();
 	void handleRedoNextOperation();
 	void handleDeleteSelectedShapes();
 	void handleShowSelectedShapeInformation();
 	void handleCreateNewParameter();
+	void handleCreateNewGroup();
 
 	// Persistent attributes (need to be stored in data base)
 	EntityContainer*               m_entityRoot;

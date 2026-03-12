@@ -161,6 +161,10 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	m_deleteButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Delete));
 	m_deleteButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonHandler.connectToolBarButton(m_deleteButton, this, &Model::handleDeleteSelectedShapes);
+
+	m_createGroupButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Groups", "Create Group", "Default/CreateGroup");
+	m_createGroupButton.setButtonLockFlags(ot::LockType::ModelRead);
+	m_buttonHandler.connectToolBarButton(m_createGroupButton, this, &Model::handleCreateNewGroup);
 }
 
 void Model::clearAll()
@@ -532,10 +536,12 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 		_ui->addMenuGroup("Model", "Geometry");
 		_ui->addMenuGroup("Model", "Material");
 		_ui->addMenuGroup("Model", "Parameters");
+		_ui->addMenuGroup("Model", "Groups");
 		_ui->addMenuGroup("Model", "Plots");
 
 		_ui->addMenuButton(m_infoButton);
 		_ui->addMenuButton(m_createParameterButton);
+		_ui->addMenuButton(m_createGroupButton);
 	}
 
 	Application::instance()->addButtons();
@@ -924,6 +930,7 @@ void Model::addVisualizationContainerNode(const std::string &name, ot::UID entit
 	ot::EntityTreeItem treeItem = EntityContainer::createDefaultTreeItem();
 	treeItem.setEntityID(entityID);
 	treeItem.setEntityName(name);
+	treeItem.setIsEditable(isEditable);
 	
 	ot::VisualisationTypes visTypes;
 	Application::instance()->getNotifier()->addVisualizationContainerNode(m_visualizationModelID, treeItem, visTypes);
@@ -1005,9 +1012,68 @@ void Model::handleCreateNewParameter()
 
 	updatePropertyGrid(); // We need to update the property grid to make sure that the new material will become visible in the material selection
 
-	modelChangeOperationCompleted("create new parameter");
+	modelChangeOperationCompleted("create new parameter: " + parameterName);
 
 	enableQueuingHttpRequests(false);
+}
+
+void Model::handleCreateNewGroup()
+{
+	ot::UIDList selectedEntities = Application::instance()->getSelectionHandler().getSelectedEntityIDs();
+
+	// Determine list of parent folders
+	std::list<EntityBase*> containerFolders;
+
+	for (auto entityID : selectedEntities)
+	{
+		EntityBase *entity = getEntityByID(entityID);
+		if (entity != nullptr)
+		{
+			if (entity->getClassName() == "EntityContainer")
+			{
+				// We have a container entity selected
+				containerFolders.push_back(entity);
+			}
+		}
+	}
+
+	std::list<EntityBase*> parentFolders = removeChildrenFromList(containerFolders);
+
+	if (parentFolders.size() != 1)
+	{
+		std::string error = "Unable to determine location for new group. Please select one parent folder.";
+		Application::instance()->getNotifier()->reportError(error);
+		return;
+	}
+
+	std::string parentName = parentFolders.front()->getName();
+	std::string groupName;
+
+	std::list<std::string> folderItemsList = getListOfFolderItems(parentName, false);
+	std::set<std::string> folderItemsSet(folderItemsList.begin(), folderItemsList.end());
+
+	int count = 1;
+	do
+	{
+		groupName = parentName + "/Group" + std::to_string(count);
+		count++;
+
+	} while (folderItemsSet.find(groupName) != folderItemsSet.end());
+
+	EntityContainer *groupEntity= new EntityContainer(createEntityUID(), nullptr, this, getStateManager());
+	groupEntity->setName(groupName);
+	groupEntity->setTreeItemEditable(true);
+
+	ot::GeometryOperations::EntityList allNewEntities;
+	addEntityToModel(groupEntity->getName(), groupEntity, getRootNode(), false, allNewEntities);
+	addVisualizationContainerNode(groupEntity->getName(), groupEntity->getEntityID(), groupEntity->getTreeItemEditable());
+
+	setModified();
+	updatePropertyGrid(); // We need to update the property grid to make sure that the new group will become visible in the group selection
+
+	modelChangeOperationCompleted("create new group: " + groupName);
+
+	Application::instance()->getNotifier()->selectObject(getVisualizationModel(), groupEntity->getEntityID());
 }
 
 EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
