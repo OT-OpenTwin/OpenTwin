@@ -79,57 +79,8 @@ Note:
 It might be a useful feature to explicitly create a new branch in order to avoid
 misclicking in the *"delete all other data in branch irreversibly :D"* dialog.
 
-Existing Context Menu Configuration
-***********************************
-
-.. image:: images/context_menu_gui_classdia.drawio.svg
-   :alt: Context menu GUI class diagram
-
-How do we set up the context menus?
-***********************************
-
-The context menu can either be **static** (fixed code on widget side) or **dynamic**.
-
-- All the UI is dynamic, so keeping this approach would be consistent.
-
-Advantages:
-
-- Allows full customization of context menus
-- Requires server-side context menu creation
-- Synchronous request handling preferred
-
-.. image:: images/context_menu_request_sequence.drawio.svg
-   :alt: Context menu request sequence diagram
-
-What are the context menus doing?
-*********************************
-
-Internal Handling
-=================
-
-Different possible actions:
-
-- ``Clear``
-- ``Delete``
-- ``PressButton``
-- ...
-
--> Widgets can bind default logic to these actions.
-
-Examples:
----------
-
-- Text editor: ``Clear``
-- Graphics view: delete context handling via item delete request signal
-- Trigger a tool button via its **button path**
-
-External Handling
-=================
-
-- Trigger any action with context data
-
-Base Class for Widgets
+Context Menu Roundtrip
 **********************
 
-.. image:: images/context_menu_widget_classdia.drawio.svg
-   :alt: Context menu widget class diagram
+.. image:: images/context_menu_full_cycle_seq.drawio.svg
+   :alt: Context menu roundtrip
