@@ -61,7 +61,9 @@ ot::BasicEntityInformation UIContextMenuManager::getEntityInformationFromName(co
 		return ot::BasicEntityInformation();
 	}
 
-	return ViewerAPI::getEntityTreeItem(entityId);
+	ot::EntityTreeItem entityInfo = ViewerAPI::getEntityTreeItem(entityId);
+	OTAssert(entityId == entityInfo.getEntityID(), "Received entity information with mismatching ID");
+	return entityInfo;
 }
 
 ot::MenuCfg UIContextMenuManager::getContextMenuConfiguration(const ot::ContextMenuCallbackBase* _callbackObject, const ot::ContextMenuRequestEvent& _requestEvent) const

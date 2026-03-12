@@ -387,7 +387,9 @@ namespace ak {
 
 		aTreeWidgetItem * itemAt(const QPoint& _pos);
 
-		QWidget* getContextWidget() const override;
+		virtual QWidget* getContextWidget() const override;
+
+		virtual QPoint mapPositionToGlobal(const ot::ContextRequestWidgetEvent* _event) const override;
 
 	protected:
 		/*

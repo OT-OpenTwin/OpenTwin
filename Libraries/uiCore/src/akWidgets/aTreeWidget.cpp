@@ -690,6 +690,11 @@ QWidget* ak::aTreeWidget::getContextWidget() const
 	return m_tree;
 }
 
+QPoint ak::aTreeWidget::mapPositionToGlobal(const ot::ContextRequestWidgetEvent* _event) const
+{
+	return m_tree->mapToGlobal(_event->getPosition());
+}
+
 /*
 bool ak::aTreeWidget::contextActionCopy(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
 {

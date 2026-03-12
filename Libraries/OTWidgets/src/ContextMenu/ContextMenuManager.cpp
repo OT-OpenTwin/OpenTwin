@@ -46,13 +46,18 @@ bool ot::ContextMenuManager::showContextMenu(const ContextRequestWidgetEvent* _e
 	ContextMenuCallbackBase* callbackBase = _event->getContextMenuCallback();
 
 	ot::ContextRequestData* requestData = _event->createRequestData(m_handler);
+	if (!requestData)
+	{
+		return false;
+	}
+
 	ot::ContextMenuRequestEvent guiEvent(requestData);
 
 	// Get the context menu configuration from the handler
 	MenuCfg cfg = m_handler->getContextMenuConfiguration(callbackBase, guiEvent);
 
 	ContextMenu menu(cfg, _event->getWidget());
-	const QPoint globalPos = _event->getPosition();
+	const QPoint globalPos = callbackBase->mapPositionToGlobal(_event);
 	QAction* selectedAction = menu.exec(globalPos);
 	if (!selectedAction)
 	{

@@ -29,9 +29,16 @@ ot::ContextRequestData* ot::NavigationContextRequestEvent::createRequestData(con
 	}
 
 	OTAssertNullptr(_handler);
-	BasicEntityInformation entityInfo = _handler->getEntityInformationFromName(itemPath.toStdString());
-
-	return new NavigationContextRequestData(entityInfo);
+	bool failed = false;
+	BasicEntityInformation entityInfo = _handler->getEntityInformationFromName(itemPath.toStdString(), &failed);
+	if (failed)
+	{
+		return nullptr;
+	}
+	else
+	{
+		return new NavigationContextRequestData(entityInfo);
+	}
 }
 
 const QTreeWidgetItem* ot::NavigationContextRequestEvent::getItemAt(const QPoint& _pos) const

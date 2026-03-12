@@ -5,6 +5,9 @@
 // OpenTwin header
 #include "OTWidgets/WidgetTypes.h"
 
+// Qt header
+#include <QtCore/qpoint.h>
+
 class QWidget;
 
 namespace ot {
@@ -23,6 +26,8 @@ namespace ot {
 		bool handleContextActionTriggered(const ContextMenuAction* _action, const ContextRequestWidgetEvent* _event, const ContextMenuManagerHandler* _handler);
 
 		virtual QWidget* getContextWidget() const = 0;
+
+		virtual QPoint mapPositionToGlobal(const ContextRequestWidgetEvent* _event) const = 0;
 
 	protected:
 		virtual bool contextActionClear(const ContextMenuAction* _action, const ContextRequestWidgetEvent* _event, const ContextMenuManagerHandler* _handler);
