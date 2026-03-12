@@ -137,7 +137,7 @@ bool WorkingPlane::calculateSize(bool _calculateGridStepWidth, bool& _gridResolu
 		h = ViewerSettings::instance()->workingPlaneDefaultSize;
 	}
 	else {
-		w = m_rootGeometryNode->getBound().radius() * 5.f;
+		w = (m_rootGeometryNode->getBound().radius() + m_rootGeometryNode->getBound().center().length()) * 5.f;
 		h = w;
 		if (w == 0.f || h == 0.f) {
 			w = ViewerSettings::instance()->workingPlaneDefaultSize;
