@@ -1457,21 +1457,17 @@ void SceneNodeGeometry::setHighlightColor(const ot::Color& colorValue)
 
 		if (facesHighlightedGeode != nullptr)
 		{
+			assert(facesHighlightedGeode->getNumDrawables() == 1);
+
 			osg::Geometry* facesGeometry = dynamic_cast<osg::Geometry*>(facesHighlightedGeode->getDrawable(0));
 			assert(facesGeometry != nullptr);
 
-			osg::Vec4Array* colorArray = dynamic_cast<osg::Vec4Array*>(facesGeometry->getColorArray());
-			if (colorArray != nullptr)
-			{
-				for (auto& color : *colorArray)
-				{
-					color[0] = colorValue.toColorF().r();
-					color[1] = colorValue.toColorF().g();
-					color[2] = colorValue.toColorF().b();
-				}
-			}
+			osg::ref_ptr<osg::Material> material = new osg::Material;
 
-			colorArray->dirty();
+			SceneNodeMaterial sceneNodeMaterial;
+			sceneNodeMaterial.setMaterial(material, "Rough", colorValue.toColorF().r(), colorValue.toColorF().g(), colorValue.toColorF().b(), 1.0 - m_transparency);
+
+			facesGeometry->getOrCreateStateSet()->setAttribute(material);
 			facesGeometry->dirtyGLObjects();
 		}
 	}
