@@ -31,14 +31,7 @@ REM ===========================================================================
 REM Shutdown the session and authorisation services if they are still running 
 REM ===========================================================================
 
-REM Shutdown microservices
-taskkill /IM "open_twin.exe" /F 2> nul
-
-REM Shutdown ui
-taskkill /IM "uiFrontend.exe" /F 2> nul
-
-REM Shutdown Apache server
-taskkill /IM "httpd.exe" /F 2> nul
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\ShutdownAll.bat"
 
 REM Clean up the Deployment directory
 RMDIR /S /Q "%OT_DEPLOYMENT_DIR%"
