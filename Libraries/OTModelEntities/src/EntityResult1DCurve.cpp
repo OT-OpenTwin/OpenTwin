@@ -39,7 +39,7 @@ ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _
 	case DefaultCurveStyle::Default:
 		cfg.setLinePenStyle(ot::LineStyle::SolidLine);
 		cfg.setLinePenColor(ot::ColorStyleValueEntry::PlotCurve);
-		cfg.setLinePenWidth(1.);
+		cfg.setLinePenWidth(2.);
 		cfg.setPointSymbol(ot::Plot1DCurveCfg::NoSymbol);
 		cfg.setPointSize(5);
 		cfg.setPointInterval(1);
@@ -51,7 +51,7 @@ ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _
 	case DefaultCurveStyle::ScatterPlot:
 		cfg.setLinePenStyle(ot::LineStyle::NoLine);
 		cfg.setLinePenColor(ot::ColorStyleValueEntry::PlotCurve);
-		cfg.setLinePenWidth(1.);
+		cfg.setLinePenWidth(2.);
 		cfg.setPointSymbol(ot::Plot1DCurveCfg::Circle);
 		cfg.setPointSize(10);
 		cfg.setPointInterval(1);
