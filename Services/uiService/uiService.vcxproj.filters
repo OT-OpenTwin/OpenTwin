@@ -200,7 +200,7 @@
     <ClCompile Include="src\ScriptEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ContextMenuManager.cpp">
+    <ClCompile Include="src\UIContextMenuManager.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -270,9 +270,6 @@
     </ClInclude>
     <ClInclude Include="$(BASE64_ROOT)\base64.h">
       <Filter>Third Party files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ContextMenuManager.h">
-      <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -362,6 +359,9 @@
     </QtMoc>
     <QtMoc Include="include\ProjectOverviewTree.h">
       <Filter>Header Files\ProjectOverview</Filter>
+    </QtMoc>
+    <QtMoc Include="include\UIContextMenuManager.h">
+      <Filter>Header Files\Components</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

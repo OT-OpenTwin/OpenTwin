@@ -24,17 +24,14 @@
 #include "OTGui/Event/ContextMenuRequestEvent.h"
 #include "OTWidgets/WidgetTypes.h"
 
-// Qt header
-#include <QtCore/qobject.h>
-
 class QWidget;
 
 namespace ot {
 
+	class ContextMenuCallbackBase;
 	class ContextMenuManagerHandler;
 
-	class OT_WIDGETS_API_EXPORT ContextMenuManager : public QObject {
-		Q_OBJECT
+	class OT_WIDGETS_API_EXPORT ContextMenuManager {
 		OT_DECL_NOCOPY(ContextMenuManager)
 		OT_DECL_NOMOVE(ContextMenuManager)
 		OT_DECL_NODEFAULT(ContextMenuManager)
@@ -50,9 +47,10 @@ namespace ot {
 		//! @param _requestEvent The event data containing the context menu request information.
 		//! Should contain the positition in local coordinates of the widget where the context menu should be displayed.
 		//! @return True if the context menu was successfully shown and a action was selected, false otherwise.
-		bool showContextMenu(QWidget* _widget, const ContextMenuRequestEvent& _requestEvent);
+		bool showContextMenu(ContextMenuCallbackBase* _widget, const ContextMenuRequestEvent& _requestEvent);
 
 		void forgetHandler() { m_handler = nullptr; };
+		const ContextMenuManagerHandler* getHandler() const { return m_handler; };
 
 	private:
 		const ContextMenuManagerHandler* m_handler;

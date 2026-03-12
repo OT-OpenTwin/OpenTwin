@@ -91,7 +91,7 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 	blockCoordinates.storeToDataBase();
 
 	// Create block
-	EntityBlockHierarchicalProjectItem blockEntity;
+	ot::EntityBlockHierarchicalProjectItem blockEntity;
 	blockEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	blockEntity.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
@@ -252,7 +252,7 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 	_newEntities.addDataEntity(blockUid, coord);
 
 	// Create block entity
-	EntityBlockHierarchicalDocumentItem blockEntity;
+	ot::EntityBlockHierarchicalDocumentItem blockEntity;
 	blockEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	blockEntity.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
@@ -438,7 +438,7 @@ void EntityHandler::addLabel() {
 void EntityHandler::updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities) {
 	// Load project entity
 	std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(_projectInfo.getEntityID(), _projectInfo.getEntityVersion()));
-	EntityBlockHierarchicalProjectItem* projectEntity = dynamic_cast<EntityBlockHierarchicalProjectItem*>(entity.get());
+	ot::EntityBlockHierarchicalProjectItem* projectEntity = dynamic_cast<ot::EntityBlockHierarchicalProjectItem*>(entity.get());
 	if (!projectEntity) {
 		OT_LOG_W("Project entity is not of expected type { \"EntityName: \"" + _projectInfo.getEntityName() + "\", \"EntityType\": \"" + entity->getClassName() + "\" }");
 		return;
@@ -519,7 +519,7 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 		OT_LOG_E("Could not read entity from database for project entity: \"" + _projectEntityName + "\"");
 		return false;
 	}
-	std::unique_ptr<EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<EntityBlockHierarchicalProjectItem*>(entity));
+	std::unique_ptr<ot::EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<ot::EntityBlockHierarchicalProjectItem*>(entity));
 	if (!projectEntity) {
 		OT_LOG_E("Entity is not of expected type for project entity { \"Entity\": \"" + _projectEntityName + "\", \"EntityType\": \"" + entity->getClassName() + "\" }");
 		delete entity;
@@ -589,7 +589,7 @@ bool EntityHandler::removeImageFromProjects(const std::list<ot::EntityInformatio
 			continue;
 		}
 
-		std::unique_ptr<EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<EntityBlockHierarchicalProjectItem*>(entity));
+		std::unique_ptr<ot::EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<ot::EntityBlockHierarchicalProjectItem*>(entity));
 		if (!projectEntity) {
 			OT_LOG_W("Project entity is not of expected type { \"EntityName: \"" + proj.getEntityName() + "\", \"EntityType\": \"" + entity->getClassName() + "\" }");
 			continue;
@@ -634,7 +634,7 @@ void EntityHandler::addContainer() {
 	coord.setEntityID(_modelComponent->createEntityUID());
 	coord.storeToDataBase();
 
-	EntityBlockHierarchicalContainerItem newContainer;
+	ot::EntityBlockHierarchicalContainerItem newContainer;
 
 	newContainer.setTreeItemEditable(true);
 	newContainer.setEntityID(_modelComponent->createEntityUID());

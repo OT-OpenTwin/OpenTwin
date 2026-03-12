@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(BASE64_ROOT)\base64.c" />
-    <ClCompile Include="src\ContextMenuManager.cpp" />
+    <ClCompile Include="src\UIContextMenuManager.cpp" />
     <ClCompile Include="src\CopyProjectDialog.cpp" />
     <ClCompile Include="src\CurveColourSetter.cpp" />
     <ClCompile Include="src\CurveDatasetFactory.cpp" />
@@ -88,7 +88,7 @@
     <ClInclude Include="$(BASE64_ROOT)\base64.h" />
     <QtMoc Include="include\NavigationSelectionManager.h" />
     <ClInclude Include="include\ContainerFlexibleOwnership.h" />
-    <ClInclude Include="include\ContextMenuManager.h" />
+    <QtMoc Include="include\UIContextMenuManager.h" />
     <ClInclude Include="include\CurveColourSetter.h" />
     <ClInclude Include="include\CurveDatasetFactory.h" />
     <ClInclude Include="include\Datapoints.h" />

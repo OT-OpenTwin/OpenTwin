@@ -24,11 +24,10 @@
 #include "OTGui/Event/ContextMenuRequestEvent.h"
 #include "OTWidgets/ContextMenu/ContextMenu.h"
 
-class QWidget;
-
 namespace ot {
 
 	class ContextMenuManager;
+	class ContextMenuCallbackBase;
 
 	class OT_WIDGETS_API_EXPORT ContextMenuManagerHandler
 	{
@@ -38,7 +37,11 @@ namespace ot {
 
 	protected:
 		friend class ContextMenuManager;
-		virtual MenuCfg getContextMenuConfiguration(const QWidget* _widget, const ContextMenuRequestEvent& _requestEvent) const = 0;
+		friend class ContextMenuCallbackBase;
+
+		virtual MenuCfg getContextMenuConfiguration(const ContextMenuCallbackBase* _callbackObject, const ContextMenuRequestEvent& _requestEvent) const = 0;
+		virtual bool notifyContextOwner(const ContextMenuAction* _action) const = 0;
+		virtual bool triggerToolbarButton(const std::string& _buttonName) const = 0;
 	};
 
 }

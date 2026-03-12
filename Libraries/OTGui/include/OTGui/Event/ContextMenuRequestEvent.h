@@ -35,6 +35,7 @@ namespace ot {
 	public:
 		explicit ContextMenuRequestEvent() = default;
 		explicit ContextMenuRequestEvent(ContextRequestData* _data);
+		explicit ContextMenuRequestEvent(std::unique_ptr<ContextRequestData>&& _data);
 		ContextMenuRequestEvent(const ConstJsonObject& _jsonObject);
 		~ContextMenuRequestEvent() = default;
 

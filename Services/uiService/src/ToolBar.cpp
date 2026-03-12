@@ -279,7 +279,14 @@ bool ToolBar::triggerToolBarButton(const QString& _buttonPath) {
 	}
 	QString parentPath = _buttonPath.left(lastColon);
 	
-	ak::UID parentID = ak::uiAPI::object::getUidFromObjectUniqueName(parentPath.toStdString().c_str());
+	ak::UID parentID = ak::invalidUID;
+	try
+	{
+		ak::uiAPI::object::getUidFromObjectUniqueName(parentPath.toStdString().c_str());
+	}
+	catch (...)
+	{}
+
 	if (parentID == ak::invalidUID) {
 		OT_LOG_E("Parent container not found for button path: \"" + _buttonPath.toStdString() + "\"");
 		return false;

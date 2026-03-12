@@ -28,6 +28,10 @@ std::string ot::MenuButtonCfg::toString(ButtonAction _action) {
 	switch (_action) {
 	case ButtonAction::NoAction: return "No Action";
 
+	case ButtonAction::Copy: return "Copy";
+	case ButtonAction::Cut: return "Cut";
+	case ButtonAction::Paste: return "Paste";
+
 	case ButtonAction::Clear: return "Clear";
 	case ButtonAction::Select: return "Select";
 	case ButtonAction::SelectAll: return "Select All";
@@ -43,6 +47,10 @@ std::string ot::MenuButtonCfg::toString(ButtonAction _action) {
 
 ot::MenuButtonCfg::ButtonAction ot::MenuButtonCfg::stringToButtonAction(const std::string& _action) {
 	if (_action == MenuButtonCfg::toString(ButtonAction::NoAction)) return ButtonAction::NoAction;
+
+	else if (_action == MenuButtonCfg::toString(ButtonAction::Copy)) return ButtonAction::Copy;
+	else if (_action == MenuButtonCfg::toString(ButtonAction::Cut)) return ButtonAction::Cut;
+	else if (_action == MenuButtonCfg::toString(ButtonAction::Paste)) return ButtonAction::Paste;
 
 	else if (_action == MenuButtonCfg::toString(ButtonAction::Clear)) return ButtonAction::Clear;
 	else if (_action == MenuButtonCfg::toString(ButtonAction::Select)) return ButtonAction::Select;

@@ -211,11 +211,11 @@ ot::ReturnMessage Application::graphicsItemDoubleClicked(const ot::GraphicsDoubl
 	}
 
 	// Check entity type
-	if (info.getEntityType() == EntityBlockHierarchicalProjectItem::className()) {
+	if (info.getEntityType() == ot::EntityBlockHierarchicalProjectItem::className()) {
 		// Request to open the project
 		return this->requestToOpenProject(info);
 	}
-	else if (info.getEntityType() == EntityBlockHierarchicalDocumentItem::className()) {
+	else if (info.getEntityType() == ot::EntityBlockHierarchicalDocumentItem::className()) {
 		// Request to open the document
 		return this->requestToOpenDocument(info);
 	}
@@ -521,7 +521,7 @@ std::list<ot::EntityInformation> Application::getSelectedDocuments() {
 	std::list<ot::EntityInformation> ret;
 	const std::list<ot::EntityInformation>& selectedInfos = this->getSelectedEntityInfos();
 	for (const ot::EntityInformation& info : selectedInfos) {
-		if (info.getEntityType() == EntityBlockHierarchicalDocumentItem::className()) {
+		if (info.getEntityType() == ot::EntityBlockHierarchicalDocumentItem::className()) {
 			ret.push_back(info);
 		}
 	}
@@ -532,7 +532,7 @@ std::list<ot::EntityInformation> Application::getSelectedProjects() {
 	std::list<ot::EntityInformation> ret;
 	const std::list<ot::EntityInformation>& selectedInfos = this->getSelectedEntityInfos();
 	for (const ot::EntityInformation& info : selectedInfos) {
-		if (info.getEntityType() == EntityBlockHierarchicalProjectItem::className()) {
+		if (info.getEntityType() == ot::EntityBlockHierarchicalProjectItem::className()) {
 			ret.push_back(info);
 		}
 	}
@@ -550,12 +550,12 @@ ot::ReturnMessage Application::requestToOpenProject(const ot::EntityInformation&
 		return ret;
 	}
 
-	std::unique_ptr<EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<EntityBlockHierarchicalProjectItem*>(entity));
+	std::unique_ptr<ot::EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<ot::EntityBlockHierarchicalProjectItem*>(entity));
 	if (!projectEntity.get()) {
 		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Invalid entity type "
 			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
 			", \"Version\": " + std::to_string(_entity.getEntityVersion()) +
-			", \"Type\": \"" + _entity.getEntityType() + "\", \"ExpectedType\": \"" + EntityBlockHierarchicalProjectItem::className() + "\" }"
+			", \"Type\": \"" + _entity.getEntityType() + "\", \"ExpectedType\": \"" + ot::EntityBlockHierarchicalProjectItem::className() + "\" }"
 		);
 		OT_LOG_E(ret.getWhat());
 		delete entity;
@@ -589,12 +589,12 @@ ot::ReturnMessage Application::requestToOpenDocument(const ot::EntityInformation
 	}
 
 	// Check if entity is of expected type
-	EntityBlockHierarchicalDocumentItem* documentEntity = dynamic_cast<EntityBlockHierarchicalDocumentItem*>(entity.get());
+	ot::EntityBlockHierarchicalDocumentItem* documentEntity = dynamic_cast<ot::EntityBlockHierarchicalDocumentItem*>(entity.get());
 	if (!documentEntity) {
 		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Invalid entity type "
 			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
 			", \"Version\": " + std::to_string(_entity.getEntityVersion()) +
-			", \"Type\": \"" + _entity.getEntityType() + "\", \"ExpectedType\": \"" + EntityBlockHierarchicalDocumentItem::className() + "\" }"
+			", \"Type\": \"" + _entity.getEntityType() + "\", \"ExpectedType\": \"" + ot::EntityBlockHierarchicalDocumentItem::className() + "\" }"
 		);
 		OT_LOG_E(ret.getWhat());
 		return ret;
@@ -653,7 +653,7 @@ ot::ReturnMessage Application::requestToOpenDocument(const ot::EntityInformation
 	}
 }
 
-ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBinaryData* _data, const EntityBlockHierarchicalDocumentItem* _block) {
+ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBinaryData* _data, const ot::EntityBlockHierarchicalDocumentItem* _block) {
 	OTAssertNullptr(_data);
 	
 	uint64_t uncompressedDataLength = _data->getData().size();
@@ -675,7 +675,7 @@ ot::ReturnMessage Application::requestToOpenRawDataDocument(EntityBinaryData* _d
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage Application::requestToOpenTextDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block) {
+ot::ReturnMessage Application::requestToOpenTextDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, ot::EntityBlockHierarchicalDocumentItem* _block) {
 	OTAssertNullptr(_data);
 	
 	ot::JsonDocument doc;
@@ -700,7 +700,7 @@ ot::ReturnMessage Application::requestToOpenTextDocument(ot::UID _visualizingEnt
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage Application::requestToOpenCSVDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block) {
+ot::ReturnMessage Application::requestToOpenCSVDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, ot::EntityBlockHierarchicalDocumentItem* _block) {
 	
 
 	return ot::ReturnMessage::Ok;

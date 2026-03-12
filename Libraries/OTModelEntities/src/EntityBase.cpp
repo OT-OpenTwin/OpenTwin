@@ -462,7 +462,7 @@ void EntityBase::fillContextMenu(const ot::ContextRequestData* _requestData, ot:
 {
 	if (m_isDeletable)
 	{
-		_menuCfg.addButton("Delete", "Delete", "ContextMenu/Remove.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("Model//Delete");
+		_menuCfg.addButton("Delete", "Delete", "ContextMenu/Remove.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("Model/Edit/Delete");
 	}
 	if (m_treeItem.getIsEditable())
 	{

@@ -25,7 +25,13 @@ public:
 
 ContextActionHandler::ContextActionHandler() 
 {
-	m_data = std::make_unique<PrivateData>();
+	m_data = new PrivateData;
+}
+
+ContextActionHandler::~ContextActionHandler()
+{
+	OTAssertNullptr(m_data);
+	delete m_data;
 }
 
 MenuCfg ContextActionHandler::contextMenuRequested(const ContextMenuRequestEvent& _event)
@@ -43,7 +49,6 @@ MenuCfg ContextActionHandler::contextMenuRequested(const ContextMenuRequestEvent
 		OT_LOG_W("Unsupported context menu request type: \"" + data->getClassName() + "\"");
 		return MenuCfg();
 	}
-
 }
 
 MenuCfg ContextActionHandler::createNavigationContextMenu(const NavigationContextRequestData* _requestData) const

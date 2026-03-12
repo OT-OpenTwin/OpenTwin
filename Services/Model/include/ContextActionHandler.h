@@ -13,10 +13,9 @@ class ContextActionHandler : public ot::ContextMenuHandler
 {
 	OT_DECL_NOCOPY(ContextActionHandler)
 	OT_DECL_NOMOVE(ContextActionHandler)
-	OT_DECL_NODEFAULT(ContextActionHandler)
 public:
 	ContextActionHandler();
-	~ContextActionHandler() = default;
+	~ContextActionHandler();
 
 protected:
 
@@ -26,5 +25,5 @@ private:
 	ot::MenuCfg createNavigationContextMenu(const ot::NavigationContextRequestData* _requestData) const;
 
 	class PrivateData;
-	std::unique_ptr<PrivateData> m_data;
+	PrivateData* m_data;
 };

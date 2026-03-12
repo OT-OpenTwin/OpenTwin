@@ -682,6 +682,31 @@ ak::aTreeWidgetItem * ak::aTreeWidget::itemAt(const QPoint& _pos) {
 	}
 }
 
+QWidget* ak::aTreeWidget::getContextParentWidget() const
+{
+	return m_tree;
+}
+
+bool ak::aTreeWidget::contextActionCopy(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
+{
+	return false;
+}
+
+bool ak::aTreeWidget::contextActionCut(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
+{
+	return false;
+}
+
+bool ak::aTreeWidget::contextActionPaste(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
+{
+	return false;
+}
+
+bool ak::aTreeWidget::contextActionRename(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
+{
+	return false;
+}
+
 // ###########################################################################################################################
 
 void ak::aTreeWidget::slotHandleSelectionChanged() {

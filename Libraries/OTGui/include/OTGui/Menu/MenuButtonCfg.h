@@ -32,6 +32,10 @@ namespace ot {
 		enum ButtonAction {
 			NoAction,      //! @brief No action will be performed when the button is clicked.
 
+			Copy,
+			Cut,
+			Paste,
+
 			Clear,         //! @brief Clear the content of the widget (per widget implementation).
 			Select,        //! @brief Select the content of the widget (per widget implementation).
 			SelectAll,     //! @brief Select all content of the widget (per widget implementation).

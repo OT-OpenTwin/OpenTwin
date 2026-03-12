@@ -21,6 +21,18 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Event/ContextMenuRequestEvent.h"
 
+ot::ContextMenuRequestEvent::ContextMenuRequestEvent(ContextRequestData* _data)
+	: m_data(_data)
+{
+
+}
+
+ot::ContextMenuRequestEvent::ContextMenuRequestEvent(std::unique_ptr<ContextRequestData>&& _data)
+	: m_data(std::move(_data))
+{
+
+}
+
 ot::ContextMenuRequestEvent::ContextMenuRequestEvent(const ConstJsonObject& _jsonObject) : ContextMenuRequestEvent()
 {
 	setFromJsonObject(_jsonObject);

@@ -38,7 +38,9 @@
 #include <functional>
 
 class EntityBinaryData;
-class EntityBlockHierarchicalDocumentItem;
+namespace ot {
+	class EntityBlockHierarchicalDocumentItem;
+}
 
 class Application : public ot::ApplicationBase, public ot::ActionHandler, 
 	public ot::ButtonHandler, public ot::GraphicsActionHandler, public ot::TextEditorActionHandler, public ot::TableActionHandler
@@ -122,11 +124,11 @@ private:
 
 	ot::ReturnMessage requestToOpenDocument(const ot::EntityInformation& _entity);
 
-	ot::ReturnMessage requestToOpenRawDataDocument(EntityBinaryData* _data, const EntityBlockHierarchicalDocumentItem* _block);
+	ot::ReturnMessage requestToOpenRawDataDocument(EntityBinaryData* _data, const ot::EntityBlockHierarchicalDocumentItem* _block);
 
-	ot::ReturnMessage requestToOpenTextDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block);
+	ot::ReturnMessage requestToOpenTextDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, ot::EntityBlockHierarchicalDocumentItem* _block);
 
-	ot::ReturnMessage requestToOpenCSVDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, EntityBlockHierarchicalDocumentItem* _block);
+	ot::ReturnMessage requestToOpenCSVDocument(ot::UID _visualizingEntity, EntityBinaryData* _data, ot::EntityBlockHierarchicalDocumentItem* _block);
 
 	EntityHandler m_entityHandler;
 

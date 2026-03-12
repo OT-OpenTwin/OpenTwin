@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/EntityTreeItem.h"
+#include "OTWidgets/ContextMenu/ContextMenuCallbackBase.h"
 #include "OTWidgets/Widgets/WidgetBase.h"
 
  // AK header
@@ -62,7 +63,8 @@ namespace ak {
 	class aTreeWidgetItem;
 	class aLineEditWidget;
 
-	class UICORE_API_EXPORT aTreeWidget : public QObject, public aWidget, public ot::WidgetBase {
+	class UICORE_API_EXPORT aTreeWidget : public QObject, public aWidget, public ot::WidgetBase, public ot::ContextMenuCallbackBase
+	{
 		Q_OBJECT
 		OT_DECL_NOCOPY(aTreeWidget)
 		OT_DECL_NOMOVE(aTreeWidget)
@@ -383,6 +385,17 @@ namespace ak {
 		);
 
 		aTreeWidgetItem * itemAt(const QPoint& _pos);
+
+		QWidget* getContextParentWidget() const override;
+
+	protected:
+		virtual bool contextActionCopy(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
+		virtual bool contextActionCut(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
+		virtual bool contextActionPaste(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
+
+		virtual bool contextActionRename(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
+
+	public:
 
 	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
