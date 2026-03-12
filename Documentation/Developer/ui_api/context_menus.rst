@@ -1,5 +1,5 @@
-Context Menu Proposal
-#####################
+Context Menu API
+################
 
 Where are context menus needed?
 *******************************
@@ -82,5 +82,16 @@ misclicking in the *"delete all other data in branch irreversibly :D"* dialog.
 Context Menu Roundtrip
 **********************
 
+The figure below shows all relevant classes involved in displaying a context menu for a widget and reacting to its button press.
+
 .. image:: images/context_menu_full_cycle_seq.drawio.svg
    :alt: Context menu roundtrip
+
+There are five main steps:
+
+#. Widget raises event and the wrapper class creates the corresponding **1:** ``ContextRequestWidgetEvent (CRWE)`` instance.
+#. ``CRWE`` creates ``ContextRequestData`` and sets it to the **2:** ``ContextMenuRequestEvent (CMRE)``.
+#. Event is dispatched to the callback service (e.g. Model) which then returns a **3:** ``MenuCfg`` configuration.
+#. Configuration (3) is used to create and display the **4:** ``ContextMenu``.
+#. User selected action is used to perform default action or send owner notification via the ``ContextMenuCallbackBase (CMCB)``.
+
