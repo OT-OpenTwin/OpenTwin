@@ -282,7 +282,7 @@ bool ToolBar::triggerToolBarButton(const QString& _buttonPath) {
 	ak::UID parentID = ak::invalidUID;
 	try
 	{
-		ak::uiAPI::object::getUidFromObjectUniqueName(parentPath.toStdString().c_str());
+		parentID = ak::uiAPI::object::getUidFromObjectUniqueName(parentPath.toStdString().c_str());
 	}
 	catch (...)
 	{}
