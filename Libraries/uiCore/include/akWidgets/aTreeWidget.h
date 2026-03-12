@@ -396,9 +396,9 @@ namespace ak {
 		virtual bool contextActionCopy(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
 		virtual bool contextActionCut(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
 		virtual bool contextActionPaste(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
-
-		virtual bool contextActionRename(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
 		*/
+		virtual bool contextActionRename(const ot::ContextMenuAction* _action, const ot::ContextRequestWidgetEvent* _event, const ot::ContextMenuManagerHandler* _handler) override;
+		
 	public:
 
 	Q_SIGNALS:

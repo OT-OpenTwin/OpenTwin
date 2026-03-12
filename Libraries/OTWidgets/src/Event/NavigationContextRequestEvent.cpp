@@ -41,7 +41,7 @@ ot::ContextRequestData* ot::NavigationContextRequestEvent::createRequestData(con
 	}
 }
 
-const QTreeWidgetItem* ot::NavigationContextRequestEvent::getItemAt(const QPoint& _pos) const
+QTreeWidgetItem* ot::NavigationContextRequestEvent::getItemAt(const QPoint& _pos) const
 {
 	QTreeWidget* treeWidget = this->getTreeWidget();
 	OTAssertNullptr(treeWidget);

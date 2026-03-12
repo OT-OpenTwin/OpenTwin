@@ -23,11 +23,10 @@ namespace ot {
 		//! Caller takes ownership of the created instance.
 		virtual ContextRequestData* createRequestData(const ContextMenuManagerHandler* _handler) const override;
 
-		const QTreeWidgetItem* getItemAt(const QPoint& _pos) const;
-		const QTreeWidgetItem* getItem() const { return getItemAt(this->getPosition()); };
-
-	protected:
 		QTreeWidget* getTreeWidget() const { return this->getWidgetAs<QTreeWidget>(); };
+
+		QTreeWidgetItem* getItemAt(const QPoint& _pos) const;
+		QTreeWidgetItem* getItem() const { return getItemAt(this->getPosition()); };
 
 	};
 } // namespace ot

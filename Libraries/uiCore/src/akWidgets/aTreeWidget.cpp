@@ -711,14 +711,35 @@ bool ak::aTreeWidget::contextActionPaste(const ot::ContextMenuAction* _action, c
 	return false;
 }
 
-bool ak::aTreeWidget::contextActionRename(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
+*/
+bool ak::aTreeWidget::contextActionRename(const ot::ContextMenuAction* _action, const ot::ContextRequestWidgetEvent* _event, const ot::ContextMenuManagerHandler* _handler)
 {
 	using namespace ot;
+	const ot::NavigationContextRequestEvent* navEvent = dynamic_cast<const ot::NavigationContextRequestEvent*>(_event);
+	if (!navEvent)
+	{
+		OT_LOG_E("Event cast failed");
+		return false;
+	}
 	
+	QTreeWidget* tree = navEvent->getTreeWidget();
+	if (!tree) 
+	{
+		OT_LOG_E("Tree widget not set");
+		return false;
+	}
 
-	return false;
+	QTreeWidgetItem* treeItem = navEvent->getItem();
+	if (!treeItem)
+	{
+		OT_LOG_E("No item found at event position");
+		return false;
+	}
+
+	tree->editItem(treeItem, 0);
+
+	return true;
 }
-*/
 
 // ###########################################################################################################################
 
