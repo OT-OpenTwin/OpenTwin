@@ -35,6 +35,8 @@ namespace ot {
 		ContextMenuManagerHandler();
 		virtual ~ContextMenuManagerHandler() = default;
 
+		virtual BasicEntityInformation getEntityInformationFromName(const std::string& _entityName, bool* _failFlag = (bool*)nullptr) const = 0;
+
 	protected:
 		friend class ContextMenuManager;
 		friend class ContextMenuCallbackBase;

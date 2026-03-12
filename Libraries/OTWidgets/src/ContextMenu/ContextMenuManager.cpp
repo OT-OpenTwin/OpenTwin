@@ -24,6 +24,7 @@
 #include "OTWidgets/ContextMenu/ContextMenuManager.h"
 #include "OTWidgets/ContextMenu/ContextMenuCallbackBase.h"
 #include "OTWidgets/ContextMenu/ContextMenuManagerHandler.h"
+#include "OTWidgets/Event/ContextRequestWidgetEvent.h"
 
 ot::ContextMenuManager::ContextMenuManager(const ContextMenuManagerHandler* _handler)
 	: m_handler(_handler)
@@ -35,18 +36,23 @@ ot::ContextMenuManager::~ContextMenuManager() {
 
 }
 
-bool ot::ContextMenuManager::showContextMenu(ContextMenuCallbackBase* _widget, const ContextMenuRequestEvent& _requestEvent)
+bool ot::ContextMenuManager::showContextMenu(const ContextRequestWidgetEvent* _event)
 {
 	if (!m_handler) {
 		OT_LOG_E("Cannot show context menu: No handler set.");
 		return false;
 	}
 
-	// Get the context menu configuration from the handler
-	MenuCfg cfg = m_handler->getContextMenuConfiguration(_widget, _requestEvent);
+	ContextMenuCallbackBase* callbackBase = _event->getContextMenuCallback();
 
-	ContextMenu menu(cfg, _widget->getContextParentWidget());
-	QPoint globalPos = QtFactory::toQPoint(_requestEvent.getRequestData()->getPosition()).toPoint();
+	ot::ContextRequestData* requestData = _event->createRequestData(m_handler);
+	ot::ContextMenuRequestEvent guiEvent(requestData);
+
+	// Get the context menu configuration from the handler
+	MenuCfg cfg = m_handler->getContextMenuConfiguration(callbackBase, guiEvent);
+
+	ContextMenu menu(cfg, _event->getWidget());
+	const QPoint globalPos = _event->getPosition();
 	QAction* selectedAction = menu.exec(globalPos);
 	if (!selectedAction)
 	{
@@ -60,5 +66,5 @@ bool ot::ContextMenuManager::showContextMenu(ContextMenuCallbackBase* _widget, c
 		return false;
 	}
 
-	return _widget->handleContextActionTriggered(contextMenuAction, m_handler);
+	return callbackBase->handleContextActionTriggered(contextMenuAction, _event, m_handler);
 }

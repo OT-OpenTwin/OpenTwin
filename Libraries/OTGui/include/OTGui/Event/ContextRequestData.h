@@ -48,22 +48,6 @@ namespace ot {
 
 		// Setter / Getter
 
-		//! @brief Set position in global screen coordinates where the context menu should be displayed.
-		//! @param _x X coordinate in global screen coordinates.
-		//! @param _y Y coordinate in global screen coordinates.
-		void setPosition(double _x, double _y) { m_pos.set(_x, _y); };
-
-		//! @brief Set position in global screen coordinates where the context menu should be displayed.
-		//! @param _pos Position in global screen coordinates.
-		void setPosition(const Point2DD& _pos) { m_pos = _pos; };
-
-		//! @brief Set position in global screen coordinates where the context menu should be displayed.
-		//! @param _pos Position in global screen coordinates.
-		void setPosition(Point2DD&& _pos) { m_pos = std::move(_pos); };
-
-		//! @brief Get position in global screen coordinates where the context menu should be displayed.
-		const Point2DD& getPosition() const { return m_pos; };
-
 		//! @brief Set the view type for which the context menu is requested.
 		//! @param _viewType The view type for which the context menu is requested.
 		void setViewType(WidgetViewBase::ViewType _viewType) { m_viewType = _viewType; };
@@ -72,7 +56,6 @@ namespace ot {
 		WidgetViewBase::ViewType getViewType() const { return m_viewType; };
 
 	private:
-		Point2DD m_pos;
 		WidgetViewBase::ViewType m_viewType;
 	};
 

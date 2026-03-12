@@ -20,7 +20,10 @@
 // OpenTwin header
 #include "OTCore/RAII/ValueRAII.h"
 #include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/ContextMenu/ContextMenuAction.h"
+#include "OTWidgets/ContextMenu/ContextMenuManagerHandler.h"
 #include "OTWidgets/Delegate/TreeItemDelegate.h"
+#include "OTWidgets/Event/NavigationContextRequestEvent.h"
 
 // AK header
 #include <akCore/aException.h>
@@ -682,11 +685,12 @@ ak::aTreeWidgetItem * ak::aTreeWidget::itemAt(const QPoint& _pos) {
 	}
 }
 
-QWidget* ak::aTreeWidget::getContextParentWidget() const
+QWidget* ak::aTreeWidget::getContextWidget() const
 {
 	return m_tree;
 }
 
+/*
 bool ak::aTreeWidget::contextActionCopy(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
 {
 	return false;
@@ -704,8 +708,12 @@ bool ak::aTreeWidget::contextActionPaste(const ot::ContextMenuAction* _action, c
 
 bool ak::aTreeWidget::contextActionRename(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
 {
+	using namespace ot;
+	
+
 	return false;
 }
+*/
 
 // ###########################################################################################################################
 
@@ -849,7 +857,8 @@ void ak::aTreeWidget::slotFilterKeyPressed(QKeyEvent * _event) {
 }
 
 void ak::aTreeWidget::slotCustomContextMenuRequested(const QPoint& _pos) {
-	Q_EMIT customContextMenuRequested(_pos);
+	ot::NavigationContextRequestEvent event(this, _pos);
+	Q_EMIT contextMenuRequest(&event);
 }
 
 // ###########################################################################################################################

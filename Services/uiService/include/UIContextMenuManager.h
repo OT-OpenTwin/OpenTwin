@@ -17,8 +17,13 @@ class AppBase;
 namespace ak {
 	class aTreeWidget;
 }
+namespace ot {
+	class ContextMenuRequestEvent;
+	class ContextMenuCallbackBase;
+	class ContextRequestWidgetEvent;
+}
 
-class UIContextMenuManager : public QObject, public ot::ContextMenuManager, public ot::ContextMenuManagerHandler
+class UIContextMenuManager : public ot::ContextMenuManager, public ot::ContextMenuManagerHandler
 {
 	Q_OBJECT
 private:
@@ -30,8 +35,7 @@ public:
 
 	void initialize(AppBase* _app);
 
-public Q_SLOTS:
-	void onNavigationContextRequest(const QPoint& _pos);
+	virtual ot::BasicEntityInformation getEntityInformationFromName(const std::string& _entityName, bool* _failFlag = (bool*)nullptr) const override;
 
 protected:
 	virtual ot::MenuCfg getContextMenuConfiguration(const ot::ContextMenuCallbackBase* _callbackObject, const ot::ContextMenuRequestEvent& _requestEvent) const override;

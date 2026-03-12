@@ -58,6 +58,6 @@ namespace ot {
 		
 	private:
 		std::unique_ptr<ContextRequestData> m_data;
-	};
+	};	
 
 }

@@ -50,6 +50,7 @@ class QMouseEvent;
 
 namespace ot {
 	class TreeItemDelegate;
+	class ContextRequestWidgetEvent;
 }
 
 namespace ak {
@@ -386,15 +387,16 @@ namespace ak {
 
 		aTreeWidgetItem * itemAt(const QPoint& _pos);
 
-		QWidget* getContextParentWidget() const override;
+		QWidget* getContextWidget() const override;
 
 	protected:
+		/*
 		virtual bool contextActionCopy(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
 		virtual bool contextActionCut(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
 		virtual bool contextActionPaste(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
 
 		virtual bool contextActionRename(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
-
+		*/
 	public:
 
 	Q_SIGNALS:
@@ -414,7 +416,7 @@ namespace ak {
 		void itemTextChanged(QTreeWidgetItem *, int);
 		void itemLocationChanged(QTreeWidgetItem *, int);
 		void itemsMoved(const QList<UID>& _itemIds, const QList<UID>& _oldParentIds, const QList<UID>& _newParentIds);
-		void customContextMenuRequested(const QPoint& _pos);
+		void contextMenuRequest(const ot::ContextRequestWidgetEvent* _event);
 
 	public Q_SLOTS:
 		void slotHandleSelectionChanged();

@@ -70,14 +70,12 @@ void ot::ContextRequestData::addToJsonObject(JsonValue& _object, JsonAllocator& 
 	static int32_t jsonKeyLength = static_cast<int32_t>(std::strlen(classNameJsonKey()));
 	_object.AddMember(JsonStringRef(classNameJsonKey(), jsonKeyLength), JsonString(getClassName(), _allocator), _allocator);
 
-	_object.AddMember("Position", JsonObject(m_pos, _allocator), _allocator);
 	_object.AddMember("ViewType", static_cast<uint64_t>(m_viewType), _allocator);
 }
 
 void ot::ContextRequestData::setFromJsonObject(const ConstJsonObject& _object)
 {
 	BasicEntityInformation::setFromJsonObject(_object);
-	m_pos.setFromJsonObject(json::getObject(_object, "Position"));
 	m_viewType = static_cast<WidgetViewBase::ViewType>(json::getUInt64(_object, "ViewType"));
 }
 

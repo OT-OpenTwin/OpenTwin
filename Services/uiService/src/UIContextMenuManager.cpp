@@ -10,6 +10,7 @@
 #include "OTGuiAPI/ContextMenuHandler.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/ContextMenu/ContextMenu.h"
+#include "OTWidgets/Event/ContextRequestWidgetEvent.h"
 #include "akWidgets/aTreeWidget.h"
 
 UIContextMenuManager::UIContextMenuManager()
@@ -42,43 +43,25 @@ void UIContextMenuManager::initialize(AppBase* _app)
 	OTAssertNullptr(tree);
 
 	// Connect signals
-	connect(tree, &ak::aTreeWidget::customContextMenuRequested, this, &UIContextMenuManager::onNavigationContextRequest);
+	connect(tree, &ak::aTreeWidget::contextMenuRequest, this, &UIContextMenuManager::showContextMenu);
 }
 
-void UIContextMenuManager::onNavigationContextRequest(const QPoint& _pos)
+ot::BasicEntityInformation UIContextMenuManager::getEntityInformationFromName(const std::string& _entityName, bool* _failFlag) const
 {
 	OTAssertNullptr(m_app);
+	ot::UID entityId = ot::invalidUID;
 
-	ak::aTreeWidget* tree = dynamic_cast<ak::aTreeWidget*>(sender());
-	OTAssertNullptr(tree);
-
-	ot::MenuCfg menuCfg;
-	ot::BasicEntityInformation entityUnderMouse;
-
-	// Determine item under mouse
-	ak::aTreeWidgetItem* item = dynamic_cast<ak::aTreeWidgetItem*>(tree->itemAt(_pos));
-	if (!item)
-	{
-		return;
-	}
-	const ot::UID entityId = ViewerAPI::getModelEntityIDFromTreeID(item->id());
+	entityId = ViewerAPI::getEntityID(_entityName);
 	if (entityId == ot::invalidUID)
 	{
-		return;
+		if (_failFlag)
+		{
+			*_failFlag = true;
+		}
+		return ot::BasicEntityInformation();
 	}
 
-	entityUnderMouse = ViewerAPI::getEntityTreeItem(entityId);
-
-	if (entityUnderMouse.getEntityName().empty())
-	{
-		return;
-	}
-
-	std::unique_ptr<ot::NavigationContextRequestData> requestData(new ot::NavigationContextRequestData(entityUnderMouse));
-	requestData->setPosition(ot::QtFactory::toPoint2D(tree->treeWidget()->mapToGlobal(_pos).toPointF()));
-	ot::ContextMenuRequestEvent event(std::move(requestData));
-
-	showContextMenu(tree, event);
+	return ViewerAPI::getEntityTreeItem(entityId);
 }
 
 ot::MenuCfg UIContextMenuManager::getContextMenuConfiguration(const ot::ContextMenuCallbackBase* _callbackObject, const ot::ContextMenuRequestEvent& _requestEvent) const
