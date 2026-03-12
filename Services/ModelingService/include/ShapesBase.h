@@ -58,4 +58,6 @@ protected:
 private:
 	static std::string materialsFolder;
 	static ot::UID materialsFolderID;
+	static std::string geometryFolder;
+	static ot::UID geometryFolderID;
 };

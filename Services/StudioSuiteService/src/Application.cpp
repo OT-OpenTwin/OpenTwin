@@ -917,24 +917,39 @@ void Application::result1D(bool appendData, std::string& data, size_t uncompress
 
 void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles, std::list<std::string>& shapeHash)
 {
+	// Determine materials folder
 	std::string materialsFolder = "Materials";
 
-	std::list<std::string> entityList{ materialsFolder };
-	std::list<ot::EntityInformation> entityInfo;
+	std::list<std::string> entityListMaterials{ materialsFolder };
+	std::list<ot::EntityInformation> entityInfoMaterials;
 
-	ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(entityListMaterials, entityInfoMaterials);
 
-	assert(entityInfo.size() == 1);
-	assert(entityInfo.front().getEntityName() == materialsFolder);
+	assert(entityInfoMaterials.size() == 1);
+	assert(entityInfoMaterials.front().getEntityName() == materialsFolder);
 
-	ot::UID materialsFolderID = entityInfo.front().getEntityID();
+	ot::UID materialsFolderID = entityInfoMaterials.front().getEntityID();
 
+	// Determine geometry folder
+	std::string geometryFolder = "Geometry";
+
+	std::list<std::string> entityListGeometry{ geometryFolder };
+	std::list<ot::EntityInformation> entityInfoGeometry;
+
+	ot::ModelServiceAPI::getEntityInformation(entityListGeometry, entityInfoGeometry);
+
+	assert(entityInfoGeometry.size() == 1);
+	assert(entityInfoGeometry.front().getEntityName() == geometryFolder);
+
+	ot::UID geometryFolderID = entityInfoGeometry.front().getEntityID();
+
+	// Store the shape (with triangles)
 	auto triangles = shapeTriangles.begin();
 	auto hash = shapeHash.begin();
 
 	for (const auto& name : shapeNames)
 	{
-		storeShape(name, *triangles, materialsFolder, materialsFolderID);
+		storeShape(name, *triangles, geometryFolder, geometryFolderID, materialsFolder, materialsFolderID);
 		infoFileManager.setShapeHash(name, *hash);
 
 		triangles++;
@@ -943,6 +958,7 @@ void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<s
 }
 
 void Application::storeShape(const std::string& name, const std::string& triangles, 
+							 const std::string &geometryFolder, ot::UID geometryFolderID,
 							 const std::string &materialsFolder, ot::UID materialsFolderID)
 {
 	std::string otName = "Geometry\\" + name;
@@ -968,7 +984,7 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 		getServiceName()
 	);
 
-	entityGeom->createProperties(colorR, colorG, colorB, materialsFolder, materialsFolderID);
+	entityGeom->createProperties(colorR, colorG, colorB, geometryFolder, geometryFolderID, materialsFolder, materialsFolderID);
 
 	EntityPropertiesEntityList* materialProp = dynamic_cast<EntityPropertiesEntityList*> (entityGeom->getProperties().getProperty("Material"));
 	assert(materialProp != nullptr);

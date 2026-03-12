@@ -90,7 +90,7 @@ public:
 	static void setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator);
 	static DataStorageAPI::UniqueUIDGenerator *getUidGenerator();
 
-	void setName(const std::string& _name);
+	virtual void setName(const std::string& _name);
 	std::string getName() const { return m_treeItem.getEntityName(); };
 
 	//! @brief Returns the name of the entity without the parent entity names.

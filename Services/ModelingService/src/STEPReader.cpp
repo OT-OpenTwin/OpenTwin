@@ -73,6 +73,8 @@
 
 std::string STEPReader::materialsFolder;
 ot::UID STEPReader::materialsFolderID = 0;
+std::string STEPReader::geometryFolder;
+ot::UID STEPReader::geometryFolderID = 0;
 
 void STEPReader::importSTEPFile(const std::string &fileName, bool removeFile, const std::string &originalName)
 {
@@ -473,6 +475,22 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 					materialsFolderID = entityInfo.front().getEntityID();
 				}
 
+				if (geometryFolder.empty())
+				{
+					// The materials folder information has not yet been retrieved. We get the information about the entity from the model
+					geometryFolder = "Geometry";
+
+					std::list<std::string> entityList{ geometryFolder };
+					std::list<ot::EntityInformation> entityInfo;
+
+					ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
+
+					assert(entityInfo.size() == 1);
+					assert(entityInfo.front().getEntityName() == geometryFolder);
+
+					geometryFolderID = entityInfo.front().getEntityID();
+				}
+
 				for (auto itemShape : shapes)
 				{
 					// Make name unique
@@ -525,7 +543,7 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 
 					entityGeom->getBrepEntity()->setFaceNameMap(allFaceNames);
 
-					entityGeom->createProperties(colorR, colorG, colorB, materialsFolder, materialsFolderID);
+					entityGeom->createProperties(colorR, colorG, colorB, geometryFolder, geometryFolderID, materialsFolder, materialsFolderID);
 
 					analyzeGeometry(entityGeom, messages);
 

@@ -38,6 +38,8 @@ public:
 	EntityGeometry(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	virtual ~EntityGeometry();
 
+	virtual void setName(const std::string& _name) override;
+
 	void		 setBrep(TopoDS_Shape shape);
 	TopoDS_Shape &getBrep(void);
 
@@ -75,8 +77,9 @@ public:
 	long long getBrepPrefetchID(void);
 	long long getFacetsPrefetchID(void);
 
-	void createProperties(int colorR, int colorG, int colorB, const std::string materialsFolder, ot::UID materialsFolderID);
-	void createMaterialPropertiesOnly(int colorR, int colorG, int colorB, const std::string materialsFolder, ot::UID materialsFolderID);
+	void createProperties(int colorR, int colorG, int colorB, const std::string &geometryFolder, ot::UID geometryFolderID, const std::string &materialsFolder, ot::UID materialsFolderID);
+	void createGroupPropertiesOnly(const std::string& geometryFolder, ot::UID geometryFolderID);
+	void createMaterialPropertiesOnly(int colorR, int colorG, int colorB, const std::string &materialsFolder, ot::UID materialsFolderID);
 	void createNonMaterialProperties(void);
 
 	void facetEntity(bool isHidden);
@@ -121,6 +124,7 @@ private:
 	void updateDimensionProperties(void);
 	bool isTransformProperty(const std::string &propName);
 	void createTransformProperty(const std::string &propName, double value);
+	std::string getParentName();
 
 	// Persistent data
 	EntityBrep *brep;

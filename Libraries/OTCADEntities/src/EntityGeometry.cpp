@@ -650,13 +650,22 @@ void EntityGeometry::createTransformProperty(const std::string &propName, double
 	getProperties().createProperty(doubleProp, "Transformation");
 }
 
-void EntityGeometry::createProperties(int colorR, int colorG, int colorB, const std::string materialsFolder, ot::UID materialsFolderID)
+void EntityGeometry::createProperties(int colorR, int colorG, int colorB, const std::string &geometryFolder, ot::UID geometryFolderID, const std::string &materialsFolder, ot::UID materialsFolderID)
 {
+	createGroupPropertiesOnly(geometryFolder, geometryFolderID);
 	createMaterialPropertiesOnly(colorR, colorG, colorB, materialsFolder, materialsFolderID);
 	createNonMaterialProperties();
 }
 
-void EntityGeometry::createMaterialPropertiesOnly(int colorR, int colorG, int colorB, const std::string materialsFolder, ot::UID materialsFolderID)
+void EntityGeometry::createGroupPropertiesOnly(const std::string& geometryFolder, ot::UID geometryFolderID)
+{
+	EntityPropertiesEntityList* groupProperty = EntityPropertiesEntityList::createProperty("Group", "Parent Group", geometryFolder, geometryFolderID, getParentName(), -1, "", getProperties());
+	
+	groupProperty->setFilter("EntityContainer");
+	groupProperty->setIncludeRoot(true);
+}
+
+void EntityGeometry::createMaterialPropertiesOnly(int colorR, int colorG, int colorB, const std::string &materialsFolder, ot::UID materialsFolderID)
 {
 	EntityPropertiesEntityList::createProperty("Solver", "Material", materialsFolder, materialsFolderID, "", -1, "", getProperties());
 
@@ -1126,3 +1135,21 @@ bool EntityGeometry::deserialiseFromJSON(const ot::ConstJsonObject& _serialisati
 
 }
 
+void EntityGeometry::setName(const std::string& _name)
+{
+	EntityContainer::setName(_name);
+
+	// Now we update the groups property accordingly
+	EntityPropertiesEntityList* groupProp = dynamic_cast<EntityPropertiesEntityList*>(getProperties().getProperty("Parent Group"));
+
+	if (groupProp != nullptr)
+	{
+		groupProp->setValueName(getParentName());
+	}
+}
+
+std::string EntityGeometry::getParentName()
+{
+	size_t index = getName().rfind('/');
+	return getName().substr(0, index);
+}

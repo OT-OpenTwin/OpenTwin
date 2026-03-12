@@ -42,6 +42,8 @@
 
 std::string ShapesBase::materialsFolder;
 ot::UID ShapesBase::materialsFolderID = 0;
+std::string ShapesBase::geometryFolder;
+ot::UID ShapesBase::geometryFolderID = 0;
 
 ShapesBase::ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache) :
 	uiComponent(_uiComponent),
@@ -99,6 +101,22 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 		assert(entityInfo.front().getEntityName() == materialsFolder);
 
 		materialsFolderID = entityInfo.front().getEntityID();
+	}
+
+	if (geometryFolder.empty())
+	{
+		// The materials folder information has not yet been retrieved. We get the information about the entity from the model
+		geometryFolder = "Geometry";
+
+		std::list<std::string> entityList{ geometryFolder };
+		std::list<ot::EntityInformation> entityInfo;
+
+		ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
+
+		assert(entityInfo.size() == 1);
+		assert(entityInfo.front().getEntityName() == geometryFolder);
+
+		geometryFolderID = entityInfo.front().getEntityID();
 	}
 
 	// Find the parent folder name of the entity
@@ -166,6 +184,7 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 	typeProp->setVisible(false);
 	geometryEntity->getProperties().createProperty(typeProp, "Internal");
 
+	geometryEntity->createGroupPropertiesOnly(geometryFolder, geometryFolderID);
 	geometryEntity->createMaterialPropertiesOnly(colorR, colorG, colorB, materialsFolder, materialsFolderID);
 
 	for (auto prop : shapeParameters)

@@ -955,7 +955,12 @@ bool EntityPropertiesEntityList::hasSameValue(EntityPropertiesBase *other) const
 
 	if (entity == nullptr) return false;
 
-	return (getEntityContainerName() == entity->getEntityContainerName() && getEntityContainerID() == entity->getEntityContainerID() && getValueName() == entity->getValueName() && getValueID() == entity->getValueID());
+	return (   getEntityContainerName() == entity->getEntityContainerName() 
+			&& getEntityContainerID() == entity->getEntityContainerID() 
+			&& getValueName() == entity->getValueName() 
+			&& getValueID() == entity->getValueID() 
+			&& getFilter() == entity->getFilter()
+			&& getIncludeRoot() == entity->getIncludeRoot());
 }
 
 void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
@@ -976,6 +981,8 @@ void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _config
 	dataDoc.AddMember("ContainerName", ot::JsonString(this->getEntityContainerName(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
 	dataDoc.AddMember("ContainerID", this->getEntityContainerID(), dataDoc.GetAllocator());
 	dataDoc.AddMember("ValueID", this->getValueID(), dataDoc.GetAllocator());
+	dataDoc.AddMember("Filter", ot::JsonString(this->getFilter(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
+	dataDoc.AddMember("IncludeRoot", this->getIncludeRoot(), dataDoc.GetAllocator());
 
 	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), this->getValueName(), opt);
 	newProp->setSpecialType("EntityList");
@@ -1007,6 +1014,24 @@ void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _prope
 	this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
 	this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
 
+	if (dataDoc.HasMember("Filter"))
+	{
+		this->setFilter(ot::json::getString(dataDoc, "Filter"));
+	}
+	else
+	{
+		this->setFilter("");
+	}
+
+	if (dataDoc.HasMember("IncludeRoot"))
+	{
+		this->setIncludeRoot(ot::json::getBool(dataDoc, "IncludeRoot"));
+	}
+	else
+	{
+		this->setIncludeRoot(false);
+	}
+
 	if (_root) {
 		std::list<std::string> opt;
 		this->updateValueAndContainer(_root, opt);
@@ -1028,6 +1053,8 @@ void EntityPropertiesEntityList::addToJsonObject(ot::JsonObject& _jsonObject, ot
 	_jsonObject.AddMember("ContainerID", static_cast<int64_t>(this->getEntityContainerID()), _allocator);
 	_jsonObject.AddMember("ValueName", ot::JsonString(this->getValueName(), _allocator), _allocator);
 	_jsonObject.AddMember("ValueID", static_cast<int64_t>(this->getValueID()), _allocator);
+	_jsonObject.AddMember("Filter", ot::JsonString(this->getFilter(), _allocator), _allocator);
+	_jsonObject.AddMember("IncludeRoot", this->getIncludeRoot(), _allocator);
 
 	if (_root) {
 		_jsonObject.AddMember("Options", ot::JsonArray(opt, _allocator), _allocator);
@@ -1048,6 +1075,26 @@ void EntityPropertiesEntityList::readFromJsonObject(const ot::ConstJsonObject& _
 	this->setValueName(valName.GetString());
 	this->setValueID(valID.GetInt64());
 
+	if (_object.HasMember("Filter"))
+	{
+		const rapidjson::Value& filter = _object["Filter"];
+		this->setFilter(filter.GetString());
+	}
+	else
+	{
+		this->setFilter("");
+	}
+
+	if (_object.HasMember("IncludeRoot"))
+	{
+		const rapidjson::Value& includeRoot = _object["IncludeRoot"];
+		this->setIncludeRoot(includeRoot.GetBool());
+	}
+	else
+	{
+		this->setIncludeRoot(false);
+	}
+
 	if (_root) {
 		std::list<std::string> opt;
 		this->updateValueAndContainer(_root, opt);
@@ -1064,6 +1111,8 @@ EntityPropertiesEntityList& EntityPropertiesEntityList::operator=(const EntityPr
 		setEntityContainerID(other.getEntityContainerID()); 
 		setValueName(other.getValueName()); 
 		setValueID(other.getValueID());
+		setFilter(other.getFilter());
+		setIncludeRoot(other.getIncludeRoot());
 	}
 
 	return *this;
@@ -1084,6 +1133,8 @@ void EntityPropertiesEntityList::copySettings(EntityPropertiesBase *other, Entit
 		setEntityContainerID(entity->getEntityContainerID());
 		setValueName(entity->getValueName());
 		setValueID(entity->getValueID());
+		setFilter(entity->getFilter());
+		setIncludeRoot(entity->getIncludeRoot());
 
 		return;
 	}
@@ -1154,9 +1205,27 @@ void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std:
 		}
 	}
 
+	bool hasFilter = !getFilter().empty();
+
+
 	if (container) {
+		if (getIncludeRoot())
+		{
+			_containerOptions.push_back(container->getName());
+		}
+
 		for (auto child : container->getChildrenList()) {
-			_containerOptions.push_back(child->getName());
+			if (hasFilter)
+			{
+				if (child->getClassName() == getFilter())
+				{
+					_containerOptions.push_back(child->getName());
+				}
+			}
+			else
+			{
+				_containerOptions.push_back(child->getName());
+			}
 		}
 	}
 	else {
