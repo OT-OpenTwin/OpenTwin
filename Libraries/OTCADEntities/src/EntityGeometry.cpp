@@ -663,6 +663,7 @@ void EntityGeometry::createGroupPropertiesOnly(const std::string& geometryFolder
 	
 	groupProperty->setFilter("EntityContainer");
 	groupProperty->setIncludeRoot(true);
+	groupProperty->setRecursive(true);
 }
 
 void EntityGeometry::createMaterialPropertiesOnly(int colorR, int colorG, int colorB, const std::string &materialsFolder, ot::UID materialsFolderID)

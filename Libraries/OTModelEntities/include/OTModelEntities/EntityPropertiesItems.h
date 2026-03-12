@@ -422,10 +422,10 @@ class OT_MODELENTITIES_API_EXPORT EntityPropertiesEntityList : public EntityProp
 public:
 	static std::string typeString() { return "entitylist"; };
 
-	EntityPropertiesEntityList() : m_entityContainerID(0), m_valueID(0), m_includeRoot(false) {};
+	EntityPropertiesEntityList() : m_entityContainerID(0), m_valueID(0), m_includeRoot(false), m_recursive(false) {};
 
-	EntityPropertiesEntityList(const EntityPropertiesEntityList& other) : EntityPropertiesBase(other) { m_entityContainerName = other.getEntityContainerName(); m_entityContainerID = other.getEntityContainerID(); m_valueName = other.getValueName(); m_valueID = other.getValueID(); m_filter = other.getFilter(); m_includeRoot = other.getIncludeRoot(); };
-	EntityPropertiesEntityList(const std::string& n, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID) : m_entityContainerName(contName), m_entityContainerID(contID), m_valueName(valName), m_valueID(valID), m_includeRoot(false) { setName(n); };
+	EntityPropertiesEntityList(const EntityPropertiesEntityList& other) : EntityPropertiesBase(other) { m_entityContainerName = other.getEntityContainerName(); m_entityContainerID = other.getEntityContainerID(); m_valueName = other.getValueName(); m_valueID = other.getValueID(); m_filter = other.getFilter(); m_includeRoot = other.getIncludeRoot(); m_recursive = other.getRecursive(); };
+	EntityPropertiesEntityList(const std::string& n, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID) : m_entityContainerName(contName), m_entityContainerID(contID), m_valueName(valName), m_valueID(valID), m_includeRoot(false), m_recursive(false) { setName(n); };
 
 	virtual ~EntityPropertiesEntityList() {};
 
@@ -464,6 +464,9 @@ public:
 	void setIncludeRoot(bool flag) { m_includeRoot = flag; }
 	bool getIncludeRoot() const { return m_includeRoot; }
 
+	void setRecursive(bool flag) { m_recursive = flag; }
+	bool getRecursive() const { return m_recursive; }
+
 	static EntityPropertiesEntityList* createProperty(const std::string &group, const std::string &name, const std::string &contName, ot::UID contID, const std::string &valName, ot::UID valID, const std::string &defaultCategory, EntityProperties &properties);
 
 protected:
@@ -478,6 +481,8 @@ protected:
 	EntityBase *findEntityFromName(EntityBase *root, const std::string &entityName);
 	EntityBase *findEntityFromID(EntityBase *root, ot::UID entityID);
 
+	void appendItemToList(EntityBase* item, const std::string& filter, bool recursive, std::list<std::string>& _containerOptions);
+
 private:
 	std::string m_entityContainerName;
 	ot::UID m_entityContainerID;
@@ -486,6 +491,7 @@ private:
 	ot::UID m_valueID;
 	std::string m_filter;
 	bool m_includeRoot;
+	bool m_recursive;
 };
 
 // ################################################################################################################################################################

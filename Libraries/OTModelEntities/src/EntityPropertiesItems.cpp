@@ -960,7 +960,8 @@ bool EntityPropertiesEntityList::hasSameValue(EntityPropertiesBase *other) const
 			&& getValueName() == entity->getValueName() 
 			&& getValueID() == entity->getValueID() 
 			&& getFilter() == entity->getFilter()
-			&& getIncludeRoot() == entity->getIncludeRoot());
+			&& getIncludeRoot() == entity->getIncludeRoot()
+			&& getRecursive() == entity->getRecursive());
 }
 
 void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
@@ -983,6 +984,7 @@ void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _config
 	dataDoc.AddMember("ValueID", this->getValueID(), dataDoc.GetAllocator());
 	dataDoc.AddMember("Filter", ot::JsonString(this->getFilter(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
 	dataDoc.AddMember("IncludeRoot", this->getIncludeRoot(), dataDoc.GetAllocator());
+	dataDoc.AddMember("Recursive", this->getRecursive(), dataDoc.GetAllocator());
 
 	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), this->getValueName(), opt);
 	newProp->setSpecialType("EntityList");
@@ -1014,23 +1016,9 @@ void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _prope
 	this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
 	this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
 
-	if (dataDoc.HasMember("Filter"))
-	{
-		this->setFilter(ot::json::getString(dataDoc, "Filter"));
-	}
-	else
-	{
-		this->setFilter("");
-	}
-
-	if (dataDoc.HasMember("IncludeRoot"))
-	{
-		this->setIncludeRoot(ot::json::getBool(dataDoc, "IncludeRoot"));
-	}
-	else
-	{
-		this->setIncludeRoot(false);
-	}
+	if (dataDoc.HasMember("Filter")) this->setFilter(ot::json::getString(dataDoc, "Filter"));
+	if (dataDoc.HasMember("IncludeRoot"))this->setIncludeRoot(ot::json::getBool(dataDoc, "IncludeRoot"));
+	if (dataDoc.HasMember("Recursive")) this->setRecursive(ot::json::getBool(dataDoc, "Recursive"));
 
 	if (_root) {
 		std::list<std::string> opt;
@@ -1055,6 +1043,7 @@ void EntityPropertiesEntityList::addToJsonObject(ot::JsonObject& _jsonObject, ot
 	_jsonObject.AddMember("ValueID", static_cast<int64_t>(this->getValueID()), _allocator);
 	_jsonObject.AddMember("Filter", ot::JsonString(this->getFilter(), _allocator), _allocator);
 	_jsonObject.AddMember("IncludeRoot", this->getIncludeRoot(), _allocator);
+	_jsonObject.AddMember("Recursive", this->getRecursive(), _allocator);
 
 	if (_root) {
 		_jsonObject.AddMember("Options", ot::JsonArray(opt, _allocator), _allocator);
@@ -1074,26 +1063,13 @@ void EntityPropertiesEntityList::readFromJsonObject(const ot::ConstJsonObject& _
 	this->setEntityContainerID(containerID.GetInt64());
 	this->setValueName(valName.GetString());
 	this->setValueID(valID.GetInt64());
+	this->setFilter("");
+	this->setIncludeRoot(false);
+	this->setRecursive(false);
 
-	if (_object.HasMember("Filter"))
-	{
-		const rapidjson::Value& filter = _object["Filter"];
-		this->setFilter(filter.GetString());
-	}
-	else
-	{
-		this->setFilter("");
-	}
-
-	if (_object.HasMember("IncludeRoot"))
-	{
-		const rapidjson::Value& includeRoot = _object["IncludeRoot"];
-		this->setIncludeRoot(includeRoot.GetBool());
-	}
-	else
-	{
-		this->setIncludeRoot(false);
-	}
+	if (_object.HasMember("Filter")) this->setFilter(_object["Filter"].GetString());
+	if (_object.HasMember("IncludeRoot")) this->setIncludeRoot(_object["IncludeRoot"].GetBool());
+	if (_object.HasMember("Recursive")) this->setRecursive(_object["Recursive"].GetBool());
 
 	if (_root) {
 		std::list<std::string> opt;
@@ -1113,6 +1089,7 @@ EntityPropertiesEntityList& EntityPropertiesEntityList::operator=(const EntityPr
 		setValueID(other.getValueID());
 		setFilter(other.getFilter());
 		setIncludeRoot(other.getIncludeRoot());
+		setRecursive(other.getRecursive());
 	}
 
 	return *this;
@@ -1135,6 +1112,7 @@ void EntityPropertiesEntityList::copySettings(EntityPropertiesBase *other, Entit
 		setValueID(entity->getValueID());
 		setFilter(entity->getFilter());
 		setIncludeRoot(entity->getIncludeRoot());
+		setRecursive(entity->getRecursive());
 
 		return;
 	}
@@ -1205,9 +1183,6 @@ void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std:
 		}
 	}
 
-	bool hasFilter = !getFilter().empty();
-
-
 	if (container) {
 		if (getIncludeRoot())
 		{
@@ -1215,17 +1190,7 @@ void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std:
 		}
 
 		for (auto child : container->getChildrenList()) {
-			if (hasFilter)
-			{
-				if (child->getClassName() == getFilter())
-				{
-					_containerOptions.push_back(child->getName());
-				}
-			}
-			else
-			{
-				_containerOptions.push_back(child->getName());
-			}
+			appendItemToList(child, getFilter(), getRecursive(), _containerOptions);
 		}
 	}
 	else {
@@ -1246,6 +1211,33 @@ void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std:
 		else {
 			//OT_LOG_EA("Value not found");  For copied items, e.g. mesh data items, this information is now available, so the current information in the entity should be used.
 			//							     No error message should be shown in this case.
+		}
+	}
+}
+
+void EntityPropertiesEntityList::appendItemToList(EntityBase *item, const std::string &filter, bool recursive, std::list<std::string>& _containerOptions)
+{
+	if (filter.empty())
+	{
+		_containerOptions.push_back(item->getName());
+	}
+	else
+	{
+		if (item->getClassName() == getFilter())
+		{
+			_containerOptions.push_back(item->getName());
+		}
+	}
+
+	// Process the children, if recursive search
+	if (recursive)
+	{
+		EntityContainer* container = dynamic_cast<EntityContainer*>(item);
+		if (container != nullptr)
+		{
+			for (auto child : container->getChildrenList()) {
+				appendItemToList(child, filter, recursive, _containerOptions);
+			}
 		}
 	}
 }
