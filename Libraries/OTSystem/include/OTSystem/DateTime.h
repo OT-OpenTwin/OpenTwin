@@ -24,6 +24,7 @@
 
 // std header
 #include <string>
+#include <optional>
 
 namespace ot {
 
@@ -64,7 +65,16 @@ namespace ot {
 		//! @param _msecInterval Time interval in milliseconds.
 		static std::string intervalToString(int64_t _msecInterval);
 
+		//! @brief Checks if the given timestamp string is valid for the given format.
+		//! @param _timestamp Timestamp string to check.
+		//! @param _format Format of the timestamp string.
+		//! @return True if the timestamp is valid, false otherwise.
 		static bool isValidTimestamp(const std::string& _timestamp, DateFormat _format);
+
+		//! @brief Detects the date format of the given timestamp string.
+		//! @param _timestamp Timestamp string to analyze.
+		//! @return Detected date format, or std::nullopt if the format could not be detected.
+		static std::optional<DateFormat> detectDateTimeFormat(const std::string& _timestamp);
 
 		//! @brief Get current date and time.
 		//! @param _useLocalTime If true local time is used, otherwise UTC time is used.

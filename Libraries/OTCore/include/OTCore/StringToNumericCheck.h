@@ -29,6 +29,5 @@ namespace ot
 		bool __declspec(dllexport) fitsInInt64(const std::string& str);
 		bool __declspec(dllexport) fitsInFloat(const std::string& str);
 		bool __declspec(dllexport) fitsInDouble(const std::string& str);
-		bool __declspec(dllexport) fitsInDateTime(const std::string& str);
 	}
 }

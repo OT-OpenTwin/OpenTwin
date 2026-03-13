@@ -20,6 +20,7 @@
 #include "Documentation.h"
 #include "KeyValuesExtractor.h"
 #include "DataCategorizationHandler.h"
+#include "OTSystem/DateTime.h"
 #include "OTCore/StringToNumericCheck.h"
 #include "OTCore/Variable/StringToVariableConverter.h"
 #include "OTGui/TableIndexSchemata.h"
@@ -306,10 +307,10 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 				}
 				else if (_rangeTypesByRangeNames[fieldName] == ot::TypeNames::getDateTimeTypeName())
 				{
-					bool dataTypeFits = ot::StringToNumericCheck::fitsInDateTime(fieldValueStringFixed);
-					if (dataTypeFits)
+					auto fmt = ot::DateTime::detectDateTimeFormat(fieldValueStringFixed);
+					if (fmt.has_value())
 					{
-						const int64_t valueOfCastedType = std::stoll(fieldValueStringFixed);
+						const int64_t valueOfCastedType = ot::DateTime::timestampToMsec(fieldValueStringFixed, *fmt);
 						values.push_back(ot::Variable(valueOfCastedType));
 					}
 					else

@@ -396,6 +396,16 @@ bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _f
     }
 }
 
+std::optional<ot::DateTime::DateFormat> ot::DateTime::detectDateTimeFormat(const std::string& _timestamp)
+{
+	if (isValidTimestamp(_timestamp, Simple)) return Simple;
+	if (isValidTimestamp(_timestamp, SimpleUTC)) return SimpleUTC;
+	if (isValidTimestamp(_timestamp, ISO8601UTC)) return ISO8601UTC;
+	if (isValidTimestamp(_timestamp, RFC3339)) return RFC3339;
+	if (isValidTimestamp(_timestamp, Msec)) return Msec;
+	return std::nullopt;
+}
+
 ot::DateTime ot::DateTime::current(bool _useLocalTime) {
     const auto now = std::chrono::system_clock::now();
     const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;

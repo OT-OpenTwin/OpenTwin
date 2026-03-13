@@ -21,7 +21,6 @@
 #include "OTSystem/DateTime.h"
 #include <stdint.h>
 #include <charconv>
-#include <exception>
 
 bool ot::StringToNumericCheck::fitsInInt32(const std::string& str)
 {
@@ -61,13 +60,4 @@ bool ot::StringToNumericCheck::fitsInDouble(const std::string& str)
 		fits = ec == std::errc() && ptr == str.data() + str.size();
 	}
 	return fits;
-}
-
-bool ot::StringToNumericCheck::fitsInDateTime(const std::string& str)
-{
-	return ot::DateTime::isValidTimestamp(str, ot::DateTime::DateFormat::Simple) ||
-		ot::DateTime::isValidTimestamp(str, ot::DateTime::DateFormat::SimpleUTC) ||
-		ot::DateTime::isValidTimestamp(str, ot::DateTime::DateFormat::ISO8601UTC) ||
-		ot::DateTime::isValidTimestamp(str, ot::DateTime::DateFormat::RFC3339) ||
-		ot::DateTime::isValidTimestamp(str, ot::DateTime::DateFormat::Msec);
 }
