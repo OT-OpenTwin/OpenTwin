@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/Menu/MenuCfg.h"
-#include "OTGui/Event/ContextMenuRequestEvent.h"
+#include "OTGui/Event/MenuRequestEvent.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt header
@@ -31,22 +31,22 @@ class QWidget;
 
 namespace ot {
 
-	class ContextMenuManagerHandler;
-	class ContextRequestWidgetEvent;
+	class MenuManagerHandler;
+	class MenuRequestWidgetEvent;
 
-	class OT_WIDGETS_API_EXPORT ContextMenuManager : public QObject {
-		OT_DECL_NOCOPY(ContextMenuManager)
-		OT_DECL_NOMOVE(ContextMenuManager)
-		OT_DECL_NODEFAULT(ContextMenuManager)
+	class OT_WIDGETS_API_EXPORT MenuManager : public QObject {
+		OT_DECL_NOCOPY(MenuManager)
+		OT_DECL_NOMOVE(MenuManager)
+		OT_DECL_NODEFAULT(MenuManager)
 	public:
 		//! @brief Constructs a ContextMenuManager with the given handler.
 		//! The caller keeps ownership of the handler and must ensure that it remains valid for the lifetime of the ContextMenuManager.
 		//! @param _handler A pointer to the ContextMenuManagerHandler that will provide context menu configurations. Must not be null.
-		ContextMenuManager(const ContextMenuManagerHandler* _handler);
-		virtual ~ContextMenuManager();
+		MenuManager(const MenuManagerHandler* _handler);
+		virtual ~MenuManager();
 		
 		void forgetHandler() { m_handler = nullptr; };
-		const ContextMenuManagerHandler* getHandler() const { return m_handler; };
+		const MenuManagerHandler* getHandler() const { return m_handler; };
 
 	public Q_SLOTS:
 
@@ -55,10 +55,10 @@ namespace ot {
 		//! @param _requestEvent The event data containing the context menu request information.
 		//! Should contain the positition in local coordinates of the widget where the context menu should be displayed.
 		//! @return True if the context menu was successfully shown and a action was selected, false otherwise.
-		bool showContextMenu(const ContextRequestWidgetEvent* _event);
+		bool showMenu(const MenuRequestWidgetEvent* _event);
 
 	private:
-		const ContextMenuManagerHandler* m_handler;
+		const MenuManagerHandler* m_handler;
 	};
 
 }

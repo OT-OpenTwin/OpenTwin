@@ -19,21 +19,21 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTGui/Event/ContextMenuRequestEvent.h"
+#include "OTGui/Event/MenuRequestEvent.h"
 
-ot::ContextMenuRequestEvent::ContextMenuRequestEvent(ContextRequestData* _data)
+ot::MenuRequestEvent::MenuRequestEvent(MenuRequestData* _data)
 	: m_data(_data)
 {
 
 }
 
-ot::ContextMenuRequestEvent::ContextMenuRequestEvent(std::unique_ptr<ContextRequestData>&& _data)
+ot::MenuRequestEvent::MenuRequestEvent(std::unique_ptr<MenuRequestData>&& _data)
 	: m_data(std::move(_data))
 {
 
 }
 
-ot::ContextMenuRequestEvent::ContextMenuRequestEvent(const ConstJsonObject& _jsonObject) : ContextMenuRequestEvent()
+ot::MenuRequestEvent::MenuRequestEvent(const ConstJsonObject& _jsonObject) : MenuRequestEvent()
 {
 	setFromJsonObject(_jsonObject);
 }
@@ -42,7 +42,7 @@ ot::ContextMenuRequestEvent::ContextMenuRequestEvent(const ConstJsonObject& _jso
 
 // Virtual methods
 
-void ot::ContextMenuRequestEvent::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const
+void ot::MenuRequestEvent::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const
 {
 	GuiEvent::addToJsonObject(_object, _allocator);
 	
@@ -56,7 +56,7 @@ void ot::ContextMenuRequestEvent::addToJsonObject(JsonValue& _object, JsonAlloca
 	}
 }
 
-void ot::ContextMenuRequestEvent::setFromJsonObject(const ConstJsonObject& _object)
+void ot::MenuRequestEvent::setFromJsonObject(const ConstJsonObject& _object)
 {
 	GuiEvent::setFromJsonObject(_object);
 
@@ -67,7 +67,7 @@ void ot::ContextMenuRequestEvent::setFromJsonObject(const ConstJsonObject& _obje
 	}
 	else
 	{
-		ContextRequestData* data = ContextRequestData::fromJson(dat->value.GetObject());
+		MenuRequestData* data = MenuRequestData::fromJson(dat->value.GetObject());
 		OTAssertNullptr(data);
 		setRequestData(data);
 	}

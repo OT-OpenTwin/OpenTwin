@@ -5,9 +5,9 @@
 // OpenTwin header
 #include "OTCore/BasicEntityInformation.h"
 #include "OTGui/Menu/MenuCfg.h"
-#include "OTGui/Event/ContextRequestData.h"
-#include "OTWidgets/ContextMenu/ContextMenuManager.h"
-#include "OTWidgets/ContextMenu/ContextMenuManagerHandler.h"
+#include "OTGui/Event/MenuRequestData.h"
+#include "OTWidgets/Menu/MenuManagerHandler.h"
+#include "OTWidgets/Menu/MenuManager.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -18,12 +18,12 @@ namespace ak {
 	class aTreeWidget;
 }
 namespace ot {
-	class ContextMenuRequestEvent;
-	class ContextMenuCallbackBase;
-	class ContextRequestWidgetEvent;
+	class MenuRequestEvent;
+	class MenuCallbackBase;
+	class RequestWidgetEvent;
 }
 
-class UIContextMenuManager : public ot::ContextMenuManager, public ot::ContextMenuManagerHandler
+class UIContextMenuManager : public ot::MenuManager, public ot::MenuManagerHandler
 {
 	Q_OBJECT
 private:
@@ -38,7 +38,7 @@ public:
 	virtual ot::BasicEntityInformation getEntityInformationFromName(const std::string& _entityName, bool* _failFlag = (bool*)nullptr) const override;
 
 protected:
-	virtual ot::MenuCfg getContextMenuConfiguration(const ot::ContextMenuCallbackBase* _callbackObject, const ot::ContextMenuRequestEvent& _requestEvent) const override;
-	virtual bool notifyContextOwner(const ot::ContextMenuAction* _action) const override;
+	virtual ot::MenuCfg getMenuConfiguration(const ot::MenuCallbackBase* _callbackObject, const ot::MenuRequestEvent& _requestEvent) const override;
+	virtual bool notifyMenuOwner(const ot::MenuAction* _action) const override;
 	virtual bool triggerToolbarButton(const std::string& _buttonName) const override;
 };

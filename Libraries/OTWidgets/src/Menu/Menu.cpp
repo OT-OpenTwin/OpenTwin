@@ -18,26 +18,26 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/ContextMenu/ContextMenu.h"
+#include "OTWidgets/Menu/Menu.h"
 #include "OTWidgets/Style/IconManager.h"
 
-ot::ContextMenu::ContextMenu(QWidget* _parent)
+ot::Menu::Menu(QWidget* _parent)
     : QMenu(_parent)
 {
 
 }
 
-ot::ContextMenu::ContextMenu(const MenuCfg& _config, QWidget* _parent)
+ot::Menu::Menu(const MenuCfg& _config, QWidget* _parent)
     : QMenu(_parent)
 {
 	this->setFromConfiguration(_config);
 }
 
-ot::ContextMenu::~ContextMenu() {
+ot::Menu::~Menu() {
    
 }
 
-void ot::ContextMenu::setFromConfiguration(const MenuCfg& _config) {
+void ot::Menu::setFromConfiguration(const MenuCfg& _config) {
 	this->clear();
     
     m_name = _config.getName();
@@ -60,9 +60,9 @@ void ot::ContextMenu::setFromConfiguration(const MenuCfg& _config) {
                 OT_LOG_EAS("Item configuration cast failed");
                 continue;
             }
-            ContextMenuAction* newAction = new ContextMenuAction(*itemCfg, this);
+            MenuAction* newAction = new MenuAction(*itemCfg, this);
             this->addAction(newAction);
-            this->connect(newAction, &QAction::triggered, this, qOverload<>(&ContextMenu::slotActionTriggered));
+            this->connect(newAction, &QAction::triggered, this, qOverload<>(&Menu::slotActionTriggered));
         }
         else if (entry->getClassName() == ot::MenuCfg::className())
         {
@@ -72,9 +72,9 @@ void ot::ContextMenu::setFromConfiguration(const MenuCfg& _config) {
                 OT_LOG_EAS("Menu configuration cast failed");
                 continue;
             }
-            ContextMenu* newMenu = new ContextMenu(*menuCfg, this);
+            Menu* newMenu = new Menu(*menuCfg, this);
             this->addMenu(newMenu);
-            this->connect(newMenu, &ContextMenu::contextActionTriggered, this, qOverload<const std::string&>(&ContextMenu::slotActionTriggered));
+            this->connect(newMenu, &Menu::actionTriggered, this, qOverload<const std::string&>(&Menu::slotActionTriggered));
         }
         else if (entry->getClassName() == ot::MenuSeparatorCfg::className())
         {
@@ -87,16 +87,16 @@ void ot::ContextMenu::setFromConfiguration(const MenuCfg& _config) {
     }
 }
 
-void ot::ContextMenu::slotActionTriggered(void) {
-    ContextMenuAction* actualAction = dynamic_cast<ContextMenuAction*>(this->sender());
+void ot::Menu::slotActionTriggered() {
+    MenuAction* actualAction = dynamic_cast<MenuAction*>(this->sender());
     if (actualAction) {
-        this->slotActionTriggered(actualAction->getContextMenuActionName());
+        this->slotActionTriggered(actualAction->getMenuActionName());
     }
     else {
         OT_LOG_EA("ContextMenuAction cast failed");
     }
 }
 
-void ot::ContextMenu::slotActionTriggered(const std::string& _actionName) {
-    Q_EMIT contextActionTriggered(_actionName);
+void ot::Menu::slotActionTriggered(const std::string& _actionName) {
+    Q_EMIT actionTriggered(_actionName);
 }

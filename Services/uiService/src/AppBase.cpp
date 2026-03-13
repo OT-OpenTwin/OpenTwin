@@ -84,7 +84,7 @@
 #include "OTWidgets/Plot/PlotDataset.h"
 #include "OTWidgets/Widgets/WidgetProperties.h"
 #include "OTWidgets/Version/VersionGraphManager.h"
-#include "OTWidgets/ContextMenu/ContextMenu.h"
+#include "OTWidgets/Menu/Menu.h"
 #include "OTWidgets/Properties/PropertyGrid.h"
 #include "OTWidgets/Properties/PropertyInput.h"
 #include "OTWidgets/Properties/PropertyGridItem.h"

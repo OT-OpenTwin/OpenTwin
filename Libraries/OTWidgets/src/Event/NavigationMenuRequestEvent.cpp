@@ -1,17 +1,17 @@
 // @otlicense
 
 // OpenTwin header
-#include "OTGui/Event/NavigationContextRequestData.h"
-#include "OTWidgets/Event/NavigationContextRequestEvent.h"
-#include "OTWidgets/ContextMenu/ContextMenuManagerHandler.h"
+#include "OTGui/Event/NavigationMenuRequestData.h"
+#include "OTWidgets/Event/NavigationMenuRequestEvent.h"
+#include "OTWidgets/Menu/MenuManagerHandler.h"
 
-ot::NavigationContextRequestEvent::NavigationContextRequestEvent(ContextMenuCallbackBase* _callbackBase, const QPoint& _pos)
-	: ContextRequestWidgetEvent(_callbackBase, _pos)
+ot::NavigationMenuRequestEvent::NavigationMenuRequestEvent(MenuCallbackBase* _callbackBase, const QPoint& _pos)
+	: MenuRequestWidgetEvent(_callbackBase, _pos)
 {
 	OTAssertNullptr(getTreeWidget());
 }
 
-ot::ContextRequestData* ot::NavigationContextRequestEvent::createRequestData(const ContextMenuManagerHandler* _handler) const
+ot::MenuRequestData* ot::NavigationMenuRequestEvent::createRequestData(const MenuManagerHandler* _handler) const
 {	
 	QTreeWidget* treeWidget = this->getTreeWidget();
 	OTAssertNullptr(treeWidget);
@@ -37,11 +37,11 @@ ot::ContextRequestData* ot::NavigationContextRequestEvent::createRequestData(con
 	}
 	else
 	{
-		return new NavigationContextRequestData(entityInfo);
+		return new NavigationMenuRequestData(entityInfo);
 	}
 }
 
-QTreeWidgetItem* ot::NavigationContextRequestEvent::getItemAt(const QPoint& _pos) const
+QTreeWidgetItem* ot::NavigationMenuRequestEvent::getItemAt(const QPoint& _pos) const
 {
 	QTreeWidget* treeWidget = this->getTreeWidget();
 	OTAssertNullptr(treeWidget);

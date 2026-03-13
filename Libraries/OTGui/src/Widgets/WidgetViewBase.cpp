@@ -116,10 +116,16 @@ std::string ot::WidgetViewBase::toString(ViewType _type) {
 	case ot::WidgetViewBase::ViewProperties: return "Properties";
 	case ot::WidgetViewBase::ViewNavigation: return "Navigation";
 	case ot::WidgetViewBase::ViewPDF: return "PDF";
-	case ot::WidgetViewBase::CustomView: return "Custom";
 	default:
-		OT_LOG_EAS("Unknown view type (" + std::to_string((int)_type) + ")");
-		return "Custom";
+		if (_type >= ot::WidgetViewBase::CustomView)
+		{
+			return "Custom";
+		}
+		else
+		{
+			OT_LOG_EAS("Unknown view type (" + std::to_string(static_cast<int32_t>(_type)) + ")");
+			return "Custom";
+		}
 	}
 }
 

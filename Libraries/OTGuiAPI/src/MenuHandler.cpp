@@ -21,31 +21,23 @@
 #include "OTSystem/OTAssert.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Menu/MenuCfg.h"
-#include "OTGui/Event/ContextRequestData.h"
-#include "OTGui/Event/ContextMenuRequestEvent.h"
+#include "OTGui/Event/MenuRequestData.h"
+#include "OTGui/Event/MenuRequestEvent.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTCommunication/Handler/ActionHandleConnector.h"
-#include "OTGuiAPI/ContextMenuHandler.h"
+#include "OTGuiAPI/MenuHandler.h"
 
-ot::ContextMenuHandler::ContextMenuHandler(ActionDispatcherBase* _dispatcher)
+ot::MenuHandler::MenuHandler(ActionDispatcherBase* _dispatcher)
 	: m_actionHandler(_dispatcher)
 {
-	if (!m_actionHandler.connectAction(OT_ACTION_CMD_UI_CreateContextMenu, this, &ContextMenuHandler::handleContextMenuRequested, ot::SECURE_MESSAGE_TYPES))
+	if (!m_actionHandler.connectAction(OT_ACTION_CMD_UI_CreateContextMenu, this, &MenuHandler::handleMenuRequested, ot::SECURE_MESSAGE_TYPES))
 	{
 		OT_LOG_EA("Failed to register context menu request handler");
 	}
 }
 
-ot::JsonDocument ot::ContextMenuHandler::createContextMenuRequestedDocument(ContextRequestData* _eventData)
-{
-	ContextMenuRequestEvent eventData;
-	eventData.setRequestData(_eventData);
-
-	return ContextMenuHandler::createContextMenuRequestedDocument(eventData);
-}
-
-ot::JsonDocument ot::ContextMenuHandler::createContextMenuRequestedDocument(const ContextMenuRequestEvent& _eventData)
+ot::JsonDocument ot::MenuHandler::createMenuRequestedDocument(const MenuRequestEvent& _eventData)
 {
 	JsonDocument result;
 	result.AddMember(OT_ACTION_MEMBER, JsonStringRef(OT_ACTION_CMD_UI_CreateContextMenu), result.GetAllocator());
@@ -54,15 +46,15 @@ ot::JsonDocument ot::ContextMenuHandler::createContextMenuRequestedDocument(cons
 	return result;
 }
 
-ot::MenuCfg ot::ContextMenuHandler::contextMenuRequested(const ContextMenuRequestEvent& _event)
+ot::MenuCfg ot::MenuHandler::menuRequested(const MenuRequestEvent& _event)
 {
-	OT_LOG_W("Context menu requested, handler in use, request not implemented, returning empty menu");
+	OT_LOG_W("Menu requested, handler in use, request not implemented, returning empty menu");
 	return MenuCfg();
 }
 
-ot::ReturnMessage ot::ContextMenuHandler::handleContextMenuRequested(JsonDocument& _document)
+ot::ReturnMessage ot::MenuHandler::handleMenuRequested(JsonDocument& _document)
 {
-	ContextMenuRequestEvent event = json::getObject(_document, OT_ACTION_PARAM_Event);
-	MenuCfg menu = contextMenuRequested(event);
+	MenuRequestEvent event = json::getObject(_document, OT_ACTION_PARAM_Event);
+	MenuCfg menu = menuRequested(event);
 	return ReturnMessage::ok(menu.toJson());
 }

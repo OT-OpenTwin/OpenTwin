@@ -21,28 +21,23 @@
 
 // OpenTwin header
 #include "OTGui/Menu/MenuCfg.h"
-#include "OTGui/Event/ContextMenuRequestEvent.h"
-#include "OTWidgets/ContextMenu/ContextMenu.h"
+#include "OTGui/Event/MenuRequestEvent.h"
+#include "OTWidgets/Menu/Menu.h"
 
 namespace ot {
 
-	class ContextMenuManager;
-	class ContextMenuCallbackBase;
+	class MenuManager;
+	class MenuCallbackBase;
 
-	class OT_WIDGETS_API_EXPORT ContextMenuManagerHandler
+	class OT_WIDGETS_API_EXPORT MenuManagerHandler
 	{
 	public:
-		ContextMenuManagerHandler();
-		virtual ~ContextMenuManagerHandler() = default;
+		MenuManagerHandler();
+		virtual ~MenuManagerHandler() = default;
 
 		virtual BasicEntityInformation getEntityInformationFromName(const std::string& _entityName, bool* _failFlag = (bool*)nullptr) const = 0;
-
-	protected:
-		friend class ContextMenuManager;
-		friend class ContextMenuCallbackBase;
-
-		virtual MenuCfg getContextMenuConfiguration(const ContextMenuCallbackBase* _callbackObject, const ContextMenuRequestEvent& _requestEvent) const = 0;
-		virtual bool notifyContextOwner(const ContextMenuAction* _action) const = 0;
+		virtual MenuCfg getMenuConfiguration(const MenuCallbackBase* _callbackObject, const MenuRequestEvent& _requestEvent) const = 0;
+		virtual bool notifyMenuOwner(const MenuAction* _action) const = 0;
 		virtual bool triggerToolbarButton(const std::string& _buttonName) const = 0;
 	};
 

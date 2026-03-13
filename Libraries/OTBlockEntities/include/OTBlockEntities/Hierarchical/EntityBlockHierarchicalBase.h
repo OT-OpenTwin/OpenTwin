@@ -44,7 +44,7 @@ namespace ot {
 		//!    -> EntityBlock::fillContextMenu()
 		//! @param _requestData Data related to the context menu request. Caller keeps ownership of the pointer.
 		//! @param _menuCfg Context menu config to fill.
-		virtual void fillContextMenu(const ContextRequestData* _requestData, MenuCfg& _menu) override;
+		virtual void fillContextMenu(const MenuRequestData* _requestData, MenuCfg& _menu) override;
 
 	protected:
 		virtual void createNavigationTreeEntry() override;

@@ -18,9 +18,9 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/ContextMenu/ContextMenuManagerHandler.h"
+#include "OTWidgets/Menu/MenuManagerHandler.h"
 
-ot::ContextMenuManagerHandler::ContextMenuManagerHandler()
+ot::MenuManagerHandler::MenuManagerHandler()
 {
 
 }

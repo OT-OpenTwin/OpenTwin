@@ -28,18 +28,18 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT ContextMenuAction : public QAction {
-		OT_DECL_NOCOPY(ContextMenuAction)
+	class OT_WIDGETS_API_EXPORT MenuAction : public QAction {
+		OT_DECL_NOCOPY(MenuAction)
 	public:
-		ContextMenuAction(QObject* _parent = (QObject*) nullptr);
-		ContextMenuAction(const MenuButtonCfg& _config, QObject* _parent = (QObject*) nullptr);
-		virtual ~ContextMenuAction();
+		MenuAction(QObject* _parent = (QObject*) nullptr);
+		MenuAction(const MenuButtonCfg& _config, QObject* _parent = (QObject*) nullptr);
+		virtual ~MenuAction();
 
 		void setFromConfiguration(const MenuButtonCfg& _config);
 		const MenuButtonCfg& getConfiguration() const { return m_config; };
 
-		void setContextMenuActionName(const std::string& _name) { m_config.setName(_name); };
-		const std::string& getContextMenuActionName(void) const { return m_config.getName(); };
+		void setMenuActionName(const std::string& _name) { m_config.setName(_name); };
+		const std::string& getMenuActionName() const { return m_config.getName(); };
 
 	private:
 		void applyConfig();

@@ -28,6 +28,7 @@
 namespace ot {
 
 	class CustomValidator;
+	class TextEditorMenuRequestData;
 
 	class OT_WIDGETS_API_EXPORT PlainTextEdit : public QPlainTextEdit, public ot::WidgetBase {
 		Q_OBJECT

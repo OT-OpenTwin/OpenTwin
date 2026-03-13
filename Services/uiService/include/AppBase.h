@@ -44,7 +44,7 @@
 #include "OTGui/ExtendedProjectInformation.h"
 #include "OTGui/Dialog/MessageDialogCfg.h"
 #include "OTGui/Event/GraphicsChangeEvent.h"
-#include "OTGui/Event/ContextMenuRequestEvent.h"
+#include "OTGui/Event/MenuRequestEvent.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Properties/Property.h"

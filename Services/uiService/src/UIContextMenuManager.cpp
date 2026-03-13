@@ -6,15 +6,15 @@
 #include "NavigationTreeView.h"
 #include "UIContextMenuManager.h"
 #include "ExternalServicesComponent.h"
-#include "OTGui/Event/NavigationContextRequestData.h"
-#include "OTGuiAPI/ContextMenuHandler.h"
+#include "OTGui/Event/NavigationMenuRequestData.h"
+#include "OTGuiAPI/MenuHandler.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/ContextMenu/ContextMenu.h"
-#include "OTWidgets/Event/ContextRequestWidgetEvent.h"
+#include "OTWidgets/Menu/Menu.h"
+#include "OTWidgets/Event/MenuRequestWidgetEvent.h"
 #include "akWidgets/aTreeWidget.h"
 
 UIContextMenuManager::UIContextMenuManager()
-	: ot::ContextMenuManager(this), m_app(nullptr)
+	: ot::MenuManager(this), m_app(nullptr)
 {
 	
 }
@@ -43,7 +43,7 @@ void UIContextMenuManager::initialize(AppBase* _app)
 	OTAssertNullptr(tree);
 
 	// Connect signals
-	connect(tree, &ak::aTreeWidget::contextMenuRequest, this, &UIContextMenuManager::showContextMenu);
+	connect(tree, &ak::aTreeWidget::contextMenuRequest, this, &UIContextMenuManager::showMenu);
 }
 
 ot::BasicEntityInformation UIContextMenuManager::getEntityInformationFromName(const std::string& _entityName, bool* _failFlag) const
@@ -66,13 +66,13 @@ ot::BasicEntityInformation UIContextMenuManager::getEntityInformationFromName(co
 	return entityInfo;
 }
 
-ot::MenuCfg UIContextMenuManager::getContextMenuConfiguration(const ot::ContextMenuCallbackBase* _callbackObject, const ot::ContextMenuRequestEvent& _requestEvent) const
+ot::MenuCfg UIContextMenuManager::getMenuConfiguration(const ot::MenuCallbackBase* _callbackObject, const ot::MenuRequestEvent& _requestEvent) const
 {
 	ot::MenuCfg resultMenu;
 
 	OTAssertNullptr(m_app);
 
-	ot::JsonDocument requestDoc = ot::ContextMenuHandler::createContextMenuRequestedDocument(_requestEvent);
+	ot::JsonDocument requestDoc = ot::MenuHandler::createMenuRequestedDocument(_requestEvent);
 
 	// Send request and handle response
 	auto ext = m_app->getExternalServicesComponent();
@@ -102,7 +102,7 @@ ot::MenuCfg UIContextMenuManager::getContextMenuConfiguration(const ot::ContextM
 	return resultMenu;
 }
 
-bool UIContextMenuManager::notifyContextOwner(const ot::ContextMenuAction* _action) const
+bool UIContextMenuManager::notifyMenuOwner(const ot::MenuAction* _action) const
 {
 	return false;
 }

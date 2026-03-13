@@ -18,7 +18,6 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/Menu/MenuCfg.h"
 #include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalBase.h"
 
 ot::EntityBlockHierarchicalBase::EntityBlockHierarchicalBase(UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
@@ -35,7 +34,7 @@ void ot::EntityBlockHierarchicalBase::createProperties()
 	EntityBlock::createProperties();
 }
 
-void ot::EntityBlockHierarchicalBase::fillContextMenu(const ContextRequestData* _requestData, MenuCfg& _menu)
+void ot::EntityBlockHierarchicalBase::fillContextMenu(const MenuRequestData* _requestData, MenuCfg& _menu)
 {
 	_menu.addButton("Open", "Open", "ContextMenu/Open.png", MenuButtonCfg::ButtonAction::TriggerButton)
 		->setTriggerButton("Project/Selection/Open");

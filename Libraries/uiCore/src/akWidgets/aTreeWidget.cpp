@@ -20,10 +20,10 @@
 // OpenTwin header
 #include "OTCore/RAII/ValueRAII.h"
 #include "OTWidgets/Style/IconManager.h"
-#include "OTWidgets/ContextMenu/ContextMenuAction.h"
-#include "OTWidgets/ContextMenu/ContextMenuManagerHandler.h"
 #include "OTWidgets/Delegate/TreeItemDelegate.h"
-#include "OTWidgets/Event/NavigationContextRequestEvent.h"
+#include "OTWidgets/Event/NavigationMenuRequestEvent.h"
+#include "OTWidgets/Menu/MenuAction.h"
+#include "OTWidgets/Menu/MenuManagerHandler.h"
 
 // AK header
 #include <akCore/aException.h>
@@ -685,37 +685,20 @@ ak::aTreeWidgetItem * ak::aTreeWidget::itemAt(const QPoint& _pos) {
 	}
 }
 
-QWidget* ak::aTreeWidget::getContextWidget() const
+QWidget* ak::aTreeWidget::getMenuWidget() const
 {
 	return m_tree;
 }
 
-QPoint ak::aTreeWidget::mapPositionToGlobal(const ot::ContextRequestWidgetEvent* _event) const
+QPoint ak::aTreeWidget::mapPositionToGlobal(const ot::MenuRequestWidgetEvent* _event) const
 {
 	return m_tree->mapToGlobal(_event->getPosition());
 }
 
-/*
-bool ak::aTreeWidget::contextActionCopy(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
-{
-	return false;
-}
-
-bool ak::aTreeWidget::contextActionCut(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
-{
-	return false;
-}
-
-bool ak::aTreeWidget::contextActionPaste(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler)
-{
-	return false;
-}
-
-*/
-bool ak::aTreeWidget::contextActionRename(const ot::ContextMenuAction* _action, const ot::ContextRequestWidgetEvent* _event, const ot::ContextMenuManagerHandler* _handler)
+bool ak::aTreeWidget::menuActionRename(const ot::MenuAction* _action, const ot::MenuRequestWidgetEvent* _event, const ot::MenuManagerHandler* _handler)
 {
 	using namespace ot;
-	const ot::NavigationContextRequestEvent* navEvent = dynamic_cast<const ot::NavigationContextRequestEvent*>(_event);
+	const ot::NavigationMenuRequestEvent* navEvent = dynamic_cast<const ot::NavigationMenuRequestEvent*>(_event);
 	if (!navEvent)
 	{
 		OT_LOG_E("Event cast failed");
@@ -883,7 +866,7 @@ void ak::aTreeWidget::slotFilterKeyPressed(QKeyEvent * _event) {
 }
 
 void ak::aTreeWidget::slotCustomContextMenuRequested(const QPoint& _pos) {
-	ot::NavigationContextRequestEvent event(this, _pos);
+	ot::NavigationMenuRequestEvent event(this, _pos);
 	Q_EMIT contextMenuRequest(&event);
 }
 

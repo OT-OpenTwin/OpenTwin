@@ -3,13 +3,13 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGuiAPI/ContextMenuHandler.h"
+#include "OTGuiAPI/MenuHandler.h"
 
 namespace ot {
-	class NavigationContextRequestData;
+	class NavigationMenuRequestData;
 }
 
-class ContextActionHandler : public ot::ContextMenuHandler
+class ContextActionHandler : public ot::MenuHandler
 {
 	OT_DECL_NOCOPY(ContextActionHandler)
 	OT_DECL_NOMOVE(ContextActionHandler)
@@ -19,10 +19,10 @@ public:
 
 protected:
 
-	OT_DECL_NODISCARD virtual ot::MenuCfg contextMenuRequested(const ot::ContextMenuRequestEvent& _event) override;
+	OT_DECL_NODISCARD virtual ot::MenuCfg menuRequested(const ot::MenuRequestEvent& _event) override;
 
 private:
-	ot::MenuCfg createNavigationContextMenu(const ot::NavigationContextRequestData* _requestData) const;
+	ot::MenuCfg createNavigationContextMenu(const ot::NavigationMenuRequestData* _requestData) const;
 
 	class PrivateData;
 	PrivateData* m_data;

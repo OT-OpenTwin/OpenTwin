@@ -22,7 +22,6 @@
 #include "OTModelEntities/EntityFactory.h"
 #include "OTCore/String.h"
 #include "OTGui/Menu/MenuCfg.h"
-#include "OTGui/Event/NavigationContextRequestData.h"
 
 #include "OTCore/Logging/LogDispatcher.h"
 
@@ -458,7 +457,7 @@ void EntityBase::setIsCopyable(bool _isCopyable) {
 	}
 }
 
-void EntityBase::fillContextMenu(const ot::ContextRequestData* _requestData, ot::MenuCfg& _menuCfg)
+void EntityBase::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
 {
 	if (m_isDeletable)
 	{

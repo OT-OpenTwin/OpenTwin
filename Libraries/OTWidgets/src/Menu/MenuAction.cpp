@@ -18,31 +18,31 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/ContextMenu/ContextMenuAction.h"
+#include "OTWidgets/Menu/MenuAction.h"
 #include "OTWidgets/Style/IconManager.h"
 
-ot::ContextMenuAction::ContextMenuAction(QObject* _parent)
+ot::MenuAction::MenuAction(QObject* _parent)
     : QAction(_parent)
 {
 
 }
 
-ot::ContextMenuAction::ContextMenuAction(const MenuButtonCfg& _config, QObject* _parent)
+ot::MenuAction::MenuAction(const MenuButtonCfg& _config, QObject* _parent)
     : QAction(_parent)
 {
 	this->setFromConfiguration(_config);
 }
 
-ot::ContextMenuAction::~ContextMenuAction() {
+ot::MenuAction::~MenuAction() {
     
 }
 
-void ot::ContextMenuAction::setFromConfiguration(const MenuButtonCfg& _config) {
+void ot::MenuAction::setFromConfiguration(const MenuButtonCfg& _config) {
     m_config = _config;
     applyConfig();
 }
 
-void ot::ContextMenuAction::applyConfig() {
+void ot::MenuAction::applyConfig() {
     this->setText(QString::fromStdString(m_config.getText()));
     this->setToolTip(QString::fromStdString(m_config.getToolTip()));
 

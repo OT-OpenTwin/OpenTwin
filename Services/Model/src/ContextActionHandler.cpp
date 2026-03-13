@@ -6,8 +6,8 @@
 #include "Application.h"
 #include "ContextActionHandler.h"
 #include "OTGui/Menu/MenuCfg.h"
-#include "OTGui/Event/ContextMenuRequestEvent.h"
-#include "OTGui/Event/NavigationContextRequestData.h"
+#include "OTGui/Event/MenuRequestEvent.h"
+#include "OTGui/Event/NavigationMenuRequestData.h"
 
 using namespace ot;
 
@@ -34,15 +34,15 @@ ContextActionHandler::~ContextActionHandler()
 	delete m_data;
 }
 
-MenuCfg ContextActionHandler::contextMenuRequested(const ContextMenuRequestEvent& _event)
+MenuCfg ContextActionHandler::menuRequested(const MenuRequestEvent& _event)
 {
 	auto data = _event.getRequestData();
 	if (!data) {
 		return MenuCfg();
 	}
 	
-	if (data->getClassName() == NavigationContextRequestData::className()) {
-		return createNavigationContextMenu(static_cast<const NavigationContextRequestData*>(data));
+	if (data->getClassName() == NavigationMenuRequestData::className()) {
+		return createNavigationContextMenu(static_cast<const NavigationMenuRequestData*>(data));
 	}
 	else
 	{
@@ -51,7 +51,7 @@ MenuCfg ContextActionHandler::contextMenuRequested(const ContextMenuRequestEvent
 	}
 }
 
-MenuCfg ContextActionHandler::createNavigationContextMenu(const NavigationContextRequestData* _requestData) const
+MenuCfg ContextActionHandler::createNavigationContextMenu(const NavigationMenuRequestData* _requestData) const
 {
 	MenuCfg menu;
 

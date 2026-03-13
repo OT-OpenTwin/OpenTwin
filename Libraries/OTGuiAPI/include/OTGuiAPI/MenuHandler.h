@@ -32,29 +32,29 @@
 namespace ot {
 
 	class MenuCfg;
-	class ContextRequestData;
-	class ContextMenuRequestEvent;
+	class MenuRequestData;
+	class MenuRequestEvent;
 
 	class ActionHandleConnector;
 
 	//! @brief The CheckBoxHandler class is used to handle check box changed events.
 	//! If no handler is registered for a event the corresponding virtual function will be called.
-	class OT_GUIAPI_API_EXPORT ContextMenuHandler
+	class OT_GUIAPI_API_EXPORT MenuHandler
 	{
-		OT_DECL_NOCOPY(ContextMenuHandler)
-		OT_DECL_NOMOVE(ContextMenuHandler)
+		OT_DECL_NOCOPY(MenuHandler)
+		OT_DECL_NOMOVE(MenuHandler)
 	public:
-		explicit ContextMenuHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
-		virtual ~ContextMenuHandler() = default;
+		explicit MenuHandler(ActionDispatcherBase* _dispatcher = &ot::ActionDispatcher::instance());
+		virtual ~MenuHandler() = default;
 
-		//! @brief Create a JSON document for a context menu request event.
-		//! @param _eventData Data for the context menu request event. The method takes ownership of the provided pointer and will delete it after use.
-		static JsonDocument createContextMenuRequestedDocument(ContextRequestData* _eventData);
-		static JsonDocument createContextMenuRequestedDocument(const ContextMenuRequestEvent& _eventData);
+		//! @brief Create a JSON document for a menu request event.
+		//! @param _eventData Data for the menu request event. The method takes ownership of the provided pointer and will delete it after use.
+		static JsonDocument createMenuRequestedDocument(MenuRequestData* _eventData);
+		static JsonDocument createMenuRequestedDocument(const MenuRequestEvent& _eventData);
 
 	protected:
 
-		OT_DECL_NODISCARD virtual MenuCfg contextMenuRequested(const ContextMenuRequestEvent& _event);
+		OT_DECL_NODISCARD virtual MenuCfg menuRequested(const MenuRequestEvent& _event);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -63,7 +63,7 @@ namespace ot {
 	private:
 		ActionHandler m_actionHandler;
 
-		ReturnMessage handleContextMenuRequested(JsonDocument& _document);
+		ReturnMessage handleMenuRequested(JsonDocument& _document);
 
 	};
 }

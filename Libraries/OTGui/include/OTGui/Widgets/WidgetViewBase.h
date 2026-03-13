@@ -61,7 +61,7 @@ namespace ot {
 			Bottom   //! @brief Bottom dock location.
 		};
 
-		enum ViewType {
+		enum ViewType : int32_t {
 			View3D,             //! @brief 3D view.
 			View1D,             //! @brief 1D plot view.
 			ViewText,           //! @brief Text editor view.
@@ -72,7 +72,7 @@ namespace ot {
 			ViewProperties,     //! @brief Properties view.
 			ViewNavigation,     //! @brief Navigation view.
 			ViewPDF,            //! @brief PDF view.
-			CustomView          //! @brief Custom view.
+			CustomView = 1000   //! @brief Custom view values start here.
 		};
 
 		//! @brief Returns a string representation of the provided view flag.

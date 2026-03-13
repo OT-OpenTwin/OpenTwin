@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Event/ContextRequestData.h"
+#include "OTGui/Event/MenuRequestData.h"
 #include "OTGui/Event/GuiEvent.h"
 
 // std header
@@ -28,16 +28,16 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT ContextMenuRequestEvent : public GuiEvent
+	class OT_GUI_API_EXPORT MenuRequestEvent : public GuiEvent
 	{
-		OT_DECL_DEFCOPY(ContextMenuRequestEvent)
-		OT_DECL_DEFMOVE(ContextMenuRequestEvent)
+		OT_DECL_DEFCOPY(MenuRequestEvent)
+		OT_DECL_DEFMOVE(MenuRequestEvent)
 	public:
-		explicit ContextMenuRequestEvent() = default;
-		explicit ContextMenuRequestEvent(ContextRequestData* _data);
-		explicit ContextMenuRequestEvent(std::unique_ptr<ContextRequestData>&& _data);
-		ContextMenuRequestEvent(const ConstJsonObject& _jsonObject);
-		~ContextMenuRequestEvent() = default;
+		explicit MenuRequestEvent() = default;
+		explicit MenuRequestEvent(MenuRequestData* _data);
+		explicit MenuRequestEvent(std::unique_ptr<MenuRequestData>&& _data);
+		MenuRequestEvent(const ConstJsonObject& _jsonObject);
+		~MenuRequestEvent() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -50,14 +50,14 @@ namespace ot {
 
 		// Setter / Getter
 
-		void setRequestData(ContextRequestData* _data) { m_data.reset(_data); };
-		void setRequestData(std::unique_ptr<ContextRequestData>&& _data) { m_data = std::move(_data); };
-		ContextRequestData* getRequestData() { return m_data.get(); };
-		const ContextRequestData* getRequestData() const { return m_data.get(); };
+		void setRequestData(MenuRequestData* _data) { m_data.reset(_data); };
+		void setRequestData(std::unique_ptr<MenuRequestData>&& _data) { m_data = std::move(_data); };
+		MenuRequestData* getRequestData() { return m_data.get(); };
+		const MenuRequestData* getRequestData() const { return m_data.get(); };
 		template <typename T> T* getRequestDataAs() { return dynamic_cast<T*>(m_data.get()); };
 		
 	private:
-		std::unique_ptr<ContextRequestData> m_data;
+		std::unique_ptr<MenuRequestData> m_data;
 	};	
 
 }

@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTGui/EntityTreeItem.h"
-#include "OTWidgets/ContextMenu/ContextMenuCallbackBase.h"
+#include "OTWidgets/Menu/MenuCallbackBase.h"
 #include "OTWidgets/Widgets/WidgetBase.h"
 
  // AK header
@@ -50,7 +50,7 @@ class QMouseEvent;
 
 namespace ot {
 	class TreeItemDelegate;
-	class ContextRequestWidgetEvent;
+	class MenuRequestWidgetEvent;
 }
 
 namespace ak {
@@ -64,7 +64,7 @@ namespace ak {
 	class aTreeWidgetItem;
 	class aLineEditWidget;
 
-	class UICORE_API_EXPORT aTreeWidget : public QObject, public aWidget, public ot::WidgetBase, public ot::ContextMenuCallbackBase
+	class UICORE_API_EXPORT aTreeWidget : public QObject, public aWidget, public ot::WidgetBase, public ot::MenuCallbackBase
 	{
 		Q_OBJECT
 		OT_DECL_NOCOPY(aTreeWidget)
@@ -81,10 +81,10 @@ namespace ak {
 		virtual ~aTreeWidget();
 
 		//! @brief Will return the widgets widget to display it
-		virtual QWidget * widget(void) override;
+		virtual QWidget * widget() override;
 
-		virtual QWidget* getQWidget(void) override;
-		virtual const QWidget* getQWidget(void) const override;
+		virtual QWidget* getQWidget() override;
+		virtual const QWidget* getQWidget() const override;
 
 		// ###########################################################################################################################################
 
@@ -213,7 +213,7 @@ namespace ak {
 
 		//! @brief Will refresh the tree by means of the current filter
 		//! If the filter is empty (length = 0) all items will be shown
-		void applyCurrentFilter(void);
+		void applyCurrentFilter();
 
 		//! @brief Will set the case sensitive mode for the filter
 		//! @param _caseSensitive If true, the filter is case sensitive
@@ -242,7 +242,7 @@ namespace ak {
 		);
 
 		//! @brief Will expand all items in this tree
-		void expandAllItems(void);
+		void expandAllItems();
 
 		void expandItem(
 			ak::UID			_itemUID,
@@ -254,7 +254,7 @@ namespace ak {
 		);
 
 		//! @brief Will collapse all items in this tree
-		void collapseAllItems(void);
+		void collapseAllItems();
 
 		//! @brief Will delete the provided item from this tree
 		//! @param _item The item to delete
@@ -310,7 +310,7 @@ namespace ak {
 		// Information gathering
 
 		//! @brief Returns a list of all selected items
-		std::list<UID> selectedItems(void);
+		std::list<UID> selectedItems();
 
 		//! @brief Will return all items from root to specified item as a vector where the first item is the root item
 		//! @param _itemId The UID of the requested item
@@ -350,18 +350,18 @@ namespace ak {
 		bool enabled() const;
 
 		//! @brief Will return the count of items in this tree
-		int itemCount(void) const;
+		int itemCount() const;
 
 		//! @brief Will return the sorting enabled state
-		bool isSortingEnabled(void) const;
+		bool isSortingEnabled() const;
 
-		bool isReadOnly(void) const { return m_isReadOnly; }
+		bool isReadOnly() const { return m_isReadOnly; }
 
-		bool getAutoSelectAndDeselectChildrenEnabled(void) { return m_selectAndDeselectChildren; }
-		bool getMultiSelectionEnabled(void);
+		bool getAutoSelectAndDeselectChildrenEnabled() { return m_selectAndDeselectChildren; }
+		bool getMultiSelectionEnabled();
 
-		aTreeWidgetBase * treeWidget(void) { return m_tree; }
-		aLineEditWidget * filterWidget(void) { return m_filter; }
+		aTreeWidgetBase * treeWidget() { return m_tree; }
+		aLineEditWidget * filterWidget() { return m_filter; }
 
 		// ###########################################################################################################################################
 
@@ -387,17 +387,12 @@ namespace ak {
 
 		aTreeWidgetItem * itemAt(const QPoint& _pos);
 
-		virtual QWidget* getContextWidget() const override;
+		virtual QWidget* getMenuWidget() const override;
 
-		virtual QPoint mapPositionToGlobal(const ot::ContextRequestWidgetEvent* _event) const override;
+		virtual QPoint mapPositionToGlobal(const ot::MenuRequestWidgetEvent* _event) const override;
 
 	protected:
-		/*
-		virtual bool contextActionCopy(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
-		virtual bool contextActionCut(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
-		virtual bool contextActionPaste(const ot::ContextMenuAction* _action, const ot::ContextMenuManagerHandler* _handler) override;
-		*/
-		virtual bool contextActionRename(const ot::ContextMenuAction* _action, const ot::ContextRequestWidgetEvent* _event, const ot::ContextMenuManagerHandler* _handler) override;
+		virtual bool menuActionRename(const ot::MenuAction* _action, const ot::MenuRequestWidgetEvent* _event, const ot::MenuManagerHandler* _handler) override;
 		
 	public:
 
@@ -418,7 +413,7 @@ namespace ak {
 		void itemTextChanged(QTreeWidgetItem *, int);
 		void itemLocationChanged(QTreeWidgetItem *, int);
 		void itemsMoved(const QList<UID>& _itemIds, const QList<UID>& _oldParentIds, const QList<UID>& _newParentIds);
-		void contextMenuRequest(const ot::ContextRequestWidgetEvent* _event);
+		void contextMenuRequest(const ot::MenuRequestWidgetEvent* _event);
 
 	public Q_SLOTS:
 		void slotHandleSelectionChanged();
@@ -464,7 +459,7 @@ namespace ak {
 			const QList<UID>& _oldParentIds, const QList<UID>& _newParentIds);
 
 		//! @brief Will clear the memory
-		void memFree(void);
+		void memFree();
 
 		//! @brief Will delete the childs of this item and remove them from the map
 		//! @param _itm The item to clear the childs from
@@ -515,7 +510,7 @@ namespace ak {
 		// #######################################################################################################
 
 		//! @brief Will return the widgets widget to display it
-		virtual QWidget * widget(void) override;
+		virtual QWidget * widget() override;
 
 		// ####################################################################################################################################
 
@@ -540,10 +535,10 @@ namespace ak {
 		);
 
 		//! @brief Will return the names of all top level items
-		std::vector<QString> topLevelItemsText(void);
+		std::vector<QString> topLevelItemsText();
 
 		//! @brief Will clear the tree
-		void Clear(void);
+		void Clear();
 
 		//! @brief Will remove the topLevelItem with the provided UID
 		//! Will not destroy the item
@@ -558,7 +553,7 @@ namespace ak {
 			QTreeWidgetItem *				_item
 		);
 
-		QList<aTreeWidgetItem *> selectedItemsRef(void) const;
+		QList<aTreeWidgetItem *> selectedItemsRef() const;
 		void extendedItemSelectionInformation(const QList<aTreeWidgetItem *>& _selectedItems, QList<UID>& _selectedItemIds, QList<UID>& _itemParentIds) const;
 
 	Q_SIGNALS:
@@ -684,7 +679,7 @@ namespace ak {
 		);
 
 		//! @brief Will collapse this item and all of its childs
-		void collapse(void);
+		void collapse();
 
 		void setEditable(bool _editable = true);
 
@@ -729,35 +724,35 @@ namespace ak {
 		);
 
 		//! @brief Will return true if this item has childs
-		bool hasChilds(void);
+		bool hasChilds();
 
 		//! @brief Will take and remove the first child item of this item
-		aTreeWidgetItem * popFirstChild(void);
+		aTreeWidgetItem * popFirstChild();
 
 		//! @brief Will return all next level childs of this item
-		const std::list<aTreeWidgetItem *> & childs(void);
+		const std::list<aTreeWidgetItem *> & childs();
 
 		//! @brief Will return all childs of this item
-		const std::list<aTreeWidgetItem *> & allChilds(void);
+		const std::list<aTreeWidgetItem *> & allChilds();
 
 		//! @brief Will return the UIDs of all childs at this item
-		const std::list<UID> & allChildsUIDs(void);
+		const std::list<UID> & allChildsUIDs();
 
 		//! @brief Will return the ammound of childs this item has
-		int childCount(void) const;
+		int childCount() const;
 
 		//! @brief Will return the id of the child
-		UID id(void) const;
+		UID id() const;
 
 		//! @brief Will return the id of the parent item
 		//! Returns -1 if there is no parent item
-		UID parentId(void) const;
+		UID parentId() const;
 
 		//! @brief Will set the stored text, this value is only used to evaluate the changed event
 		void setStoredText(const QString & _text) { m_text = _text; }
 
 		//! @brief Will return the stored text
-		QString storedText(void) const { return m_text; }
+		QString storedText() const { return m_text; }
 
 		//! @brief Will return all items from root to this item as a vector where the first item is the root item
 		std::list<QString> getItemPath();
@@ -769,16 +764,16 @@ namespace ak {
 			char							_delimiter = '|'
 		);
 
-		bool isVisible(void) const { return m_isVisible; }
+		bool isVisible() const { return m_isVisible; }
 
-		aTreeWidgetItem * parentItem(void) const { return m_parent; }
+		aTreeWidgetItem * parentItem() const { return m_parent; }
 
 		void setSelectChilds(bool flag) { m_selectChilds = flag; }
-		bool getSelectChilds(void) { return m_selectChilds; }
+		bool getSelectChilds() { return m_selectChilds; }
 
 	private:
 
-		void refreshEditableState(void);
+		void refreshEditableState();
 
 		aTreeWidgetItem *				m_parent;
 		std::list<aTreeWidgetItem *>	m_childs;			//! Contains all childs of this item
