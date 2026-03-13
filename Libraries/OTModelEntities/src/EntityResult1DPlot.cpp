@@ -155,8 +155,10 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 
 void EntityResult1DPlot::hideAxisQuantityProperties()
 {
-	PropertyHelper::getSelectionProperty(this, "Quantity", "X axis")->setVisible(false);
-	PropertyHelper::getSelectionProperty(this, "Quantity", "Y axis")->setVisible(false);
+	PropertyHelper::getSelectionProperty(this, "Quantity", getXAxisPropertyGroupName())->setVisible(false);
+	PropertyHelper::getSelectionProperty(this, "Quantity", getYAxisPropertyGroupName())->setVisible(false);
+	PropertyHelper::getSelectionProperty(this, "Quantity", getRadiusAxisPropertyGroupName())->setVisible(false);
+	PropertyHelper::getSelectionProperty(this, "Quantity", getAzimuthAxisPropertyGroupName())->setVisible(false);
 }
 
 void EntityResult1DPlot::addChild(EntityBase* _child)
@@ -451,29 +453,47 @@ void EntityResult1DPlot::readSpecificDataFromDataBase(const bsoncxx::document::v
 
 void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 {
+	std::string xAxisPropGroup;
+	std::string yAxisPropGroup;
+
+	switch (getPlotType())
+	{
+	case ot::Plot1DCfg::Cartesian:
+		xAxisPropGroup = getXAxisPropertyGroupName();
+		yAxisPropGroup = getYAxisPropertyGroupName();
+		break;
+
+	case ot::Plot1DCfg::Polar:
+		xAxisPropGroup = getRadiusAxisPropertyGroupName();
+		yAxisPropGroup = getAzimuthAxisPropertyGroupName();
+		break;
+
+	default:
+		OT_LOG_E("Unknown plot type (" + std::to_string(static_cast<int>(getPlotType())) + ")");
+		break;
+	}
+
 	PropertyHelper::setPainterPropertyValue(_config.getGridColor(), this, "Grid color");
 	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::toString(_config.getPlotType()), this, "Plot type");
 	
 	PropertyHelper::setBoolPropertyValue(_config.getGridVisible(), this, "Grid");
 	PropertyHelper::setBoolPropertyValue(_config.getLegendVisible(), this, "Legend");
 
-	PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getXAxisQuantity()), this, "Quantity", "X axis");
-	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsLogScale(), this, "Logscale", "X axis");
-	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsAutoScale(), this, "Autoscale", "X axis");
-	PropertyHelper::setDoublePropertyValue(_config.getXAxisMin(), this, "Min", "X axis");
-	PropertyHelper::setDoublePropertyValue(_config.getXAxisMax(), this, "Max", "X axis");
+	PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getXAxisQuantity()), this, "Quantity", xAxisPropGroup);
+	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsLogScale(), this, "Logscale", xAxisPropGroup);
+	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsAutoScale(), this, "Autoscale", xAxisPropGroup);
+	PropertyHelper::setDoublePropertyValue(_config.getXAxisMin(), this, "Min", xAxisPropGroup);
+	PropertyHelper::setDoublePropertyValue(_config.getXAxisMax(), this, "Max", xAxisPropGroup);
+	PropertyHelper::setStringPropertyValue(_config.getYAxisLabel(), this, "Label override", xAxisPropGroup);
+	PropertyHelper::setBoolPropertyValue(_config.getXAxisLabelAutoDetermine(), this, "Automatic label", xAxisPropGroup);
 
-	PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getYAxisQuantity()), this, "Quantity", "Y axis");
-	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsLogScale(), this, "Logscale", "Y axis");
-	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale", "Y axis");
-	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", "Y axis");
-	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Max", "Y axis");
-
-	PropertyHelper::setStringPropertyValue(_config.getAxisLabelX(), this, "Label override", "X axis");
-	PropertyHelper::setBoolPropertyValue(_config.getXLabelAxisAutoDetermine(), this, "Automatic label", "X axis");
-	
-	PropertyHelper::setStringPropertyValue(_config.getAxisLabelY(), this, "Label override", "Y axis");
-	PropertyHelper::setBoolPropertyValue(_config.getYLabelAxisAutoDetermine(), this, "Automatic label", "Y axis");
+	PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getYAxisQuantity()), this, "Quantity", yAxisPropGroup);
+	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsLogScale(), this, "Logscale", yAxisPropGroup);
+	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale", yAxisPropGroup);
+	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", yAxisPropGroup);
+	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Max", yAxisPropGroup);
+	PropertyHelper::setStringPropertyValue(_config.getXAxisLabel(), this, "Label override", yAxisPropGroup);
+	PropertyHelper::setBoolPropertyValue(_config.getYAxisLabelAutoDetermine(), this, "Automatic label", yAxisPropGroup);
 }
 
 
