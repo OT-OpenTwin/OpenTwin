@@ -11,6 +11,18 @@ ot::TextEditorMenuRequestData::TextEditorMenuRequestData()
 
 }
 
+ot::TextEditorMenuRequestData::TextEditorMenuRequestData(const BasicEntityInformation& _entityInfo)
+	: MenuRequestData(_entityInfo, WidgetViewBase::ViewText)
+{
+
+}
+
+ot::TextEditorMenuRequestData::TextEditorMenuRequestData(BasicEntityInformation&& _entityInfo) noexcept
+	: MenuRequestData(std::move(_entityInfo), WidgetViewBase::ViewText)
+{
+
+}
+
 ot::TextEditorMenuRequestData::~TextEditorMenuRequestData()
 {
 }

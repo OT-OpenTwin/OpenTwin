@@ -9,10 +9,12 @@ namespace ot {
 	
 	class OT_GUI_API_EXPORT TextEditorMenuRequestData : public ot::MenuRequestData
 	{
-		OT_DECL_DEFCOPY(TextEditorMenuRequestData)
-		OT_DECL_DEFMOVE(TextEditorMenuRequestData)
+		OT_DECL_NOCOPY(TextEditorMenuRequestData)
+		OT_DECL_NOMOVE(TextEditorMenuRequestData)
 	public:
 		TextEditorMenuRequestData();
+		TextEditorMenuRequestData(const BasicEntityInformation& _basicEntityInformation);
+		TextEditorMenuRequestData(BasicEntityInformation&& _basicEntityInformation) noexcept;
 		virtual ~TextEditorMenuRequestData();
 
 		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;

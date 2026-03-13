@@ -25,9 +25,9 @@ namespace ot {
 		
 		//! @brief Create a new instance of the menu request data for this event. 
 		//! Caller takes ownership of the created instance.
-		virtual MenuRequestData* createRequestData(const MenuManagerHandler* _handler) const = 0;
+		OT_DECL_NODISCARD virtual MenuRequestData* createRequestData(const MenuManagerHandler* _handler) const = 0;
 
-		MenuCallbackBase* getMenuCallback() const { return m_callbackBase; };
+		OT_DECL_NODISCARD MenuCallbackBase* getMenuCallback() const { return m_callbackBase; };
 
 		void setPosition(const QPoint& _pos) { m_pos = _pos; };
 		inline const QPoint& getPosition() const { return m_pos; };

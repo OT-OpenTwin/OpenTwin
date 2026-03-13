@@ -7,7 +7,12 @@
 #include "ContextActionHandler.h"
 #include "OTGui/Menu/MenuCfg.h"
 #include "OTGui/Event/MenuRequestEvent.h"
+#include "OTGui/Event/GraphicsMenuRequestData.h"
 #include "OTGui/Event/NavigationMenuRequestData.h"
+#include "OTGui/Event/PlotMenuRequestData.h"
+#include "OTGui/Event/TableMenuRequestData.h"
+#include "OTGui/Event/TextEditorMenuRequestData.h"
+#include "OTGui/Event/View3DMenuRequestData.h"
 
 using namespace ot;
 
@@ -42,7 +47,22 @@ MenuCfg ContextActionHandler::menuRequested(const MenuRequestEvent& _event)
 	}
 	
 	if (data->getClassName() == NavigationMenuRequestData::className()) {
-		return createNavigationContextMenu(static_cast<const NavigationMenuRequestData*>(data));
+		return createContextMenu(static_cast<const NavigationMenuRequestData*>(data));
+	}
+	else if (data->getClassName() == GraphicsMenuRequestData::className()) {
+		return createContextMenu(static_cast<const GraphicsMenuRequestData*>(data));
+	}
+	else if (data->getClassName() == PlotMenuRequestData::className()) {
+		return createContextMenu(static_cast<const PlotMenuRequestData*>(data));
+	}
+	else if (data->getClassName() == TableMenuRequestData::className()) {
+		return createContextMenu(static_cast<const TableMenuRequestData*>(data));
+	}
+	else if (data->getClassName() == TextEditorMenuRequestData::className()) {
+		return createContextMenu(static_cast<const TextEditorMenuRequestData*>(data));
+	}
+	else if (data->getClassName() == View3DMenuRequestData::className()) {
+		return createContextMenu(static_cast<const View3DMenuRequestData*>(data));
 	}
 	else
 	{
@@ -51,7 +71,7 @@ MenuCfg ContextActionHandler::menuRequested(const MenuRequestEvent& _event)
 	}
 }
 
-MenuCfg ContextActionHandler::createNavigationContextMenu(const NavigationMenuRequestData* _requestData) const
+MenuCfg ContextActionHandler::createContextMenu(const NavigationMenuRequestData* _requestData) const
 {
 	MenuCfg menu;
 
@@ -75,6 +95,31 @@ MenuCfg ContextActionHandler::createNavigationContextMenu(const NavigationMenuRe
 	entity->fillContextMenu(_requestData, menu);
 
 	return menu;
+}
+
+MenuCfg ContextActionHandler::createContextMenu(const GraphicsMenuRequestData* _requestData) const
+{
+	return MenuCfg();
+}
+
+MenuCfg ContextActionHandler::createContextMenu(const PlotMenuRequestData* _requestData) const
+{
+	return MenuCfg();
+}
+
+MenuCfg ContextActionHandler::createContextMenu(const TableMenuRequestData* _requestData) const
+{
+	return MenuCfg();
+}
+
+MenuCfg ContextActionHandler::createContextMenu(const TextEditorMenuRequestData* _requestData) const
+{
+	return MenuCfg();
+}
+
+MenuCfg ContextActionHandler::createContextMenu(const View3DMenuRequestData* _requestData) const
+{
+	return MenuCfg();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

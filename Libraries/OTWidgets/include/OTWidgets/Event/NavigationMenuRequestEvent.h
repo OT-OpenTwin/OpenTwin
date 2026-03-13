@@ -21,12 +21,12 @@ namespace ot {
 		
 		//! @brief Create a new instance of the menu request data for this event. 
 		//! Caller takes ownership of the created instance.
-		virtual MenuRequestData* createRequestData(const MenuManagerHandler* _handler) const override;
+		OT_DECL_NODISCARD virtual MenuRequestData* createRequestData(const MenuManagerHandler* _handler) const override;
 
-		QTreeWidget* getTreeWidget() const { return this->getWidgetAs<QTreeWidget>(); };
+		OT_DECL_NODISCARD QTreeWidget* getTreeWidget() const { return this->getWidgetAs<QTreeWidget>(); };
 
-		QTreeWidgetItem* getItemAt(const QPoint& _pos) const;
-		QTreeWidgetItem* getItem() const { return getItemAt(this->getPosition()); };
+		OT_DECL_NODISCARD QTreeWidgetItem* getItemAt(const QPoint& _pos) const;
+		OT_DECL_NODISCARD QTreeWidgetItem* getItem() const { return getItemAt(this->getPosition()); };
 
 	};
 } // namespace ot
