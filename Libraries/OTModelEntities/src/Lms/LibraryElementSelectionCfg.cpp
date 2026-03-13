@@ -19,7 +19,7 @@
 
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 
-ot::LibraryElementSelectionCfg::LibraryElementSelectionCfg() : m_newEntityType(LmsNewEntityType::Text), m_requestingEntityID(0) {
+ot::LibraryElementSelectionCfg::LibraryElementSelectionCfg() : m_requestingEntityID(0) {
 }
 
 ot::LibraryElementSelectionCfg::LibraryElementSelectionCfg(const LibraryElementSelectionCfg& _other) : m_collectionName(_other.m_collectionName),
@@ -27,7 +27,7 @@ ot::LibraryElementSelectionCfg::LibraryElementSelectionCfg(const LibraryElementS
     m_metaDataInfoFilters(_other.m_metaDataInfoFilters),
     m_callBackService(_other.m_callBackService),
     m_callBackAction(_other.m_callBackAction),
-    m_newEntityType(_other.m_newEntityType),
+    m_className(_other.m_className),
     m_requestingEntityID(_other.m_requestingEntityID),
     m_uiServiceUrl(_other.m_uiServiceUrl),
     m_additionalInfo(_other.m_additionalInfo),
@@ -40,7 +40,7 @@ ot::LibraryElementSelectionCfg::LibraryElementSelectionCfg(LibraryElementSelecti
     m_metaDataInfoFilters(std::move(_other.m_metaDataInfoFilters)),
     m_callBackService(std::move(_other.m_callBackService)),
     m_callBackAction(std::move(_other.m_callBackAction)),
-    m_newEntityType(_other.m_newEntityType),
+    m_className(_other.m_className),
     m_requestingEntityID(_other.m_requestingEntityID),
     m_uiServiceUrl(std::move(_other.m_uiServiceUrl)),
     m_additionalInfo(_other.m_additionalInfo),
@@ -54,7 +54,7 @@ ot::LibraryElementSelectionCfg& ot::LibraryElementSelectionCfg::operator=(const 
         m_metaDataInfoFilters = _other.m_metaDataInfoFilters;
         m_callBackService = _other.m_callBackService;
         m_callBackAction = _other.m_callBackAction;
-        m_newEntityType = _other.m_newEntityType;
+        m_className = _other.m_className;
         m_requestingEntityID = _other.m_requestingEntityID;
         m_uiServiceUrl = _other.m_uiServiceUrl;
         m_additionalInfo = _other.m_additionalInfo;
@@ -70,7 +70,7 @@ ot::LibraryElementSelectionCfg& ot::LibraryElementSelectionCfg::operator=(Librar
         m_metaDataInfoFilters = std::move(_other.m_metaDataInfoFilters);
         m_callBackService = std::move(_other.m_callBackService);
         m_callBackAction = std::move(_other.m_callBackAction);
-        m_newEntityType = _other.m_newEntityType;
+        m_className = _other.m_className;
         m_requestingEntityID = _other.m_requestingEntityID;
         m_uiServiceUrl = std::move(_other.m_uiServiceUrl);
         m_additionalInfo = std::move(_other.m_additionalInfo);
@@ -104,7 +104,7 @@ void ot::LibraryElementSelectionCfg::addToJsonObject(ot::JsonValue& _object, ot:
     _object.AddMember("MetadataInfo", metadataArray, _allocator);
     _object.AddMember("CallbackService", ot::JsonString(m_callBackService, _allocator), _allocator);
     _object.AddMember("CallbackAction", ot::JsonString(m_callBackAction, _allocator), _allocator);
-    _object.AddMember("EntityType", ot::JsonString(entityTypeToString(m_newEntityType), _allocator), _allocator);
+    _object.AddMember("EntityType", ot::JsonString(m_className, _allocator), _allocator);
     _object.AddMember("RequestingEntityID", static_cast<int64_t>(m_requestingEntityID), _allocator);
     _object.AddMember("UiServiceURL", ot::JsonString(m_uiServiceUrl, _allocator), _allocator);
 	_object.AddMember("AdditionalInfo", ot::JsonString(m_additionalInfo, _allocator), _allocator);
@@ -142,47 +142,18 @@ void ot::LibraryElementSelectionCfg::setFromJsonObject(const ot::ConstJsonObject
 
     m_callBackService = ot::json::getString(_object, "CallbackService");
     m_callBackAction = ot::json::getString(_object, "CallbackAction");
-    std::string entityTypeStr = ot::json::getString(_object, "EntityType");
-    m_newEntityType = stringToEntityType(entityTypeStr);
+    m_className = ot::json::getString(_object, "EntityType");
     m_requestingEntityID = ot::json::getUInt64(_object, "RequestingEntityID");
     m_uiServiceUrl = ot::json::getString(_object, "UiServiceURL");
 	m_additionalInfo = ot::json::getString(_object, "AdditionalInfo");
 	m_newEntityFolder = ot::json::getString(_object, "NewEntityFolder");
 }
 
-std::string ot::LibraryElementSelectionCfg::entityTypeToString(LmsNewEntityType _type) {
-    switch (_type) {
-    case LmsNewEntityType::Text:
-        return "Text";
-    case LmsNewEntityType::Geometry:
-        return "IsGeometry";
-    case LmsNewEntityType::PythonScript:
-        return "PythonScript";
-    default:
-        return "Text";
-    }
-}
-
-ot::LmsNewEntityType ot::LibraryElementSelectionCfg::stringToEntityType(const std::string& _typeStr) {
-    if (_typeStr == "Text") {
-        return LmsNewEntityType::Text;
-    }
-    else if (_typeStr == "IsGeometry") {
-        return LmsNewEntityType::Geometry;
-    }
-    else if (_typeStr == "PythonScript") {
-        return LmsNewEntityType::PythonScript;
-    }
-    else {
-        return LmsNewEntityType::Text;
-    }
-}
-
 void ot::LibraryElementSelectionCfg::serializeCallbackInfoToAdditionalInfo() {
     
     ot::JsonDocument doc;
     doc.AddMember("CallbackService", ot::JsonString(m_callBackService, doc.GetAllocator()), doc.GetAllocator());
-    doc.AddMember("EntityType", ot::JsonString(entityTypeToString(m_newEntityType), doc.GetAllocator()), doc.GetAllocator());
+    doc.AddMember("EntityType", ot::JsonString(m_className, doc.GetAllocator()), doc.GetAllocator());
     doc.AddMember("NewEntityFolder", ot::JsonString(m_newEntityFolder, doc.GetAllocator()), doc.GetAllocator());
 
     m_additionalInfo = doc.toJson();

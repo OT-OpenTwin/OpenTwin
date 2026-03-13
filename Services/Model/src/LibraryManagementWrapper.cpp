@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "LibraryManagementWrapper.h"
 #include "Application.h"
-#include "Model.h"
 
 // OpenTwin header
 #include "OTModelEntities/DataBase.h"
@@ -38,6 +37,8 @@
 #include "OTModelEntities/EntityResultTextData.h"
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTBlockEntities/EntityBlock.h"
+#include "OTModelEntities/EntityFactory.h"
+#include "OTModelEntities/Lms/LibraryEntityInterface.h"
 
 
 
@@ -188,74 +189,24 @@ std::string LibraryManagementWrapper::requestCreateConfig(const ot::JsonDocument
 
 void LibraryManagementWrapper::createLibraryEntity(const ot::LibraryElement& _importCfg) {
 	Model* modelPtr = Application::instance()->getModel();
-	assert(modelPtr != nullptr);
-
-	// Check if model already imported
-	std::string newEntityFolder = _importCfg.getNewEntityFolder();
-	std::string newEntityName = _importCfg.getName();
-
-
-	std::list<std::string> folderEntities = modelPtr->getListOfFolderItems(newEntityFolder, true);
-	for (const std::string& model : folderEntities) {
-		if (model == newEntityFolder + "/" + newEntityName) {
-			return;
-		}
-	}
-
-	//Check what type of library entity is requested and create the entity accordingly. For now, only file text entities are supported, but in the future, other types can be added as well.
-	ot::LmsNewEntityType entityType = _importCfg.getEntityType();
-	if(entityType == ot::LmsNewEntityType::Text) {
-		
-		ot::UID entIDData = modelPtr->createEntityUID();
-		ot::UID entIDTopo = modelPtr->createEntityUID();
-
-		// Create Text Entity
-		std::unique_ptr<EntityFileText> libraryEntity;
-		libraryEntity.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr));
-
-		// Create the data entity
-		EntityBinaryData fileContent(entIDData, libraryEntity.get(), nullptr, nullptr);
-		fileContent.setData(_importCfg.getData().data(), _importCfg.getData().size());
-		fileContent.storeToDataBase();
-
-		// Set the data entity to the topology entity
-		libraryEntity->setDataEntity(fileContent);
-		libraryEntity->setFileProperties("","","");
-
-		libraryEntity->setTextEncoding(ot::TextEncoding::UTF8);
-
-		// Add the additional infos as properties to the topology entity
-		for (const auto& additionalInfos : _importCfg.getAdditionalInfos()) {
-			EntityPropertiesString* additionalInfoProp = EntityPropertiesString::createProperty("Metadata", additionalInfos.first, additionalInfos.second, "Default", libraryEntity->getProperties());
-			additionalInfoProp->setReadOnly(true);
-		}
-
-		libraryEntity->getProperties().getProperty("Path", "Selected File")->setVisible(false);
-		libraryEntity->getProperties().getProperty("Filename", "Selected File")->setVisible(false);
-		libraryEntity->getProperties().getProperty("FileType", "Selected File")->setVisible(false);
-		libraryEntity->getProperties().getProperty("Text Encoding", "Text Properties")->setVisible(false);
-		libraryEntity->getProperties().getProperty("Syntax Highlight", "Text Properties")->setVisible(false);
-
-		const std::string entityName = CreateNewUniqueTopologyName(folderEntities, newEntityFolder, newEntityName);
-		libraryEntity->setName(entityName);
-		libraryEntity->storeToDataBase();
-
-
-		m_entityIDsTopo.push_back(entIDTopo);
-		m_entityVersionsTopo.push_back(libraryEntity->getEntityStorageVersion());
-		m_entityIDsData.push_back(entIDData);
-		m_entityVersionsData.push_back(fileContent.getEntityStorageVersion());
-		m_forceVisible.push_back(false);
-	}
-	else {
-		OT_LOG_E("Unsupported entity type requested: " + std::to_string((int)entityType));
+	if (!modelPtr) {
+		OT_LOG_E("Model is null");
 		return;
 	}
 
+	// Check if entity already exists
+	std::string fullPath = _importCfg.getNewEntityFolder() + "/" + _importCfg.getName();
+	if (checkEntityExists(fullPath, modelPtr)) {
+		OT_LOG_W("Entity already exists: " + fullPath);
+		return;
+	}
 
+	// Create and initialize entity
+	EntityBase* entity = createAndInitializeEntity(_importCfg, modelPtr);
+	if (!entity) return;
 
-
-	addModelToEntites();
+	// Add entity to model
+	addEntityToModel(entity, modelPtr);
 }
 
 void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& _importCfg, bool _dialogConfirmed) {
@@ -282,13 +233,61 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 	model->updateTopologyEntities(topoList, versionList, comment, true);
 }
 
-void LibraryManagementWrapper::addModelToEntites() {
-	Model* modelComp = Application::instance()->getModel();
-	modelComp->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added file", true, false, true);
+EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::LibraryElement& _importCfg, Model* _model) {
 
-	m_entityIDsTopo.clear();
-	m_entityVersionsTopo.clear();
-	m_entityIDsData.clear();
-	m_entityVersionsData.clear();
-	m_forceVisible.clear();
+	// Create entity from factory
+	EntityFactory& factory = EntityFactory::instance();
+	EntityBase* entity = factory.create(_importCfg.getEntityType());
+	if (!entity) {
+		OT_LOG_E("Failed to create entity of type: " + _importCfg.getEntityType());
+		return nullptr;
+	}
+
+	// Initialize entity with model information
+	entity->setEntityID(_model->createEntityUID());
+	entity->setModelState(_model->getStateManager());
+	entity->setObserver(_model);
+
+	// Populate entity with library data
+	auto* libInterface = dynamic_cast<ot::LibraryEntityInterface*>(entity);
+	if (!libInterface) {
+		OT_LOG_E("Entity does not implement LibraryEntityInterface: " + _importCfg.getEntityType());
+		delete entity;
+		return nullptr;
+	}
+
+	libInterface->setLibraryElement(_importCfg);
+
+	std::string fullPath = _importCfg.getNewEntityFolder() + "/" + _importCfg.getName();
+	entity->setName(fullPath);
+	entity->storeToDataBase();
+
+	return entity;
 }
+
+bool LibraryManagementWrapper::checkEntityExists(const std::string& _entityPath, Model* _model) {
+	return _model->findEntityFromName(_entityPath) != nullptr;
+}
+void LibraryManagementWrapper::addEntityToModel(EntityBase* _entity, Model* _model) {
+	auto* libInterface = dynamic_cast<ot::LibraryEntityInterface*>(_entity);
+	if (!libInterface) return;
+
+	// Collect topology entity
+	ot::UIDList topoIDs{ _entity->getEntityID() };
+	ot::UIDList topoVersions{ _entity->getEntityStorageVersion() };
+	std::list<bool> forceVisible{ false };
+
+	// Collect data entities
+	ot::UIDList dataIDs, dataVersions;
+	for (const auto& [dataID, dataVersion] : libInterface->getDataEntities()) {
+		dataIDs.push_back(dataID);
+		dataVersions.push_back(dataVersion);
+	}
+
+	// Add to model
+	_model->addEntitiesToModel(topoIDs, topoVersions, forceVisible, dataIDs, dataVersions,
+		topoIDs, "Added library entity", true, false, true);
+}
+
+
+

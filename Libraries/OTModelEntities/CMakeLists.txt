@@ -200,6 +200,7 @@ set(OTMODELENTITIES_HEADER_FILES
     include/OTModelEntities/Geometry.h
     include/OTModelEntities/Lms/LibraryElementSelectionCfg.h
     include/OTModelEntities/Lms/LibraryElement.h
+    include/OTModelEntities/Lms/LibraryEntityInterface.h
     include/OTModelEntities/ModelEntitiesAPIExport.h
     include/OTModelEntities/ModelState.h
     include/OTModelEntities/NewModelStateInfo.h

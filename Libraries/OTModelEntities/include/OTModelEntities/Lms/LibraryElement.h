@@ -77,8 +77,8 @@ namespace ot{
         const std::string& getNewEntityFolder() const { return m_newEntityFolder; };
 
         //! @brief Set the type of the new entity to create based on the selection
-        void setEntityType(LmsNewEntityType _type) { m_newEntityType = _type; };
-        LmsNewEntityType getEntityType() const { return m_newEntityType; };
+        void setEntityType(std::string _type) { m_className = _type; };
+        std::string getEntityType() const { return m_className; };
 
         // Metadata management
 
@@ -137,7 +137,7 @@ namespace ot{
         // Additional info fields for callback handling (serialized into m_additionalInfo as JSON string)
         std::string m_callBackService;
         std::string m_newEntityFolder;
-        LmsNewEntityType m_newEntityType;
+        std::string m_className;
 
     };
 }

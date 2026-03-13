@@ -23,6 +23,7 @@
 #include "OTModelEntities/EntityContainer.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 #include "OTCore/FolderNames.h"
+#include "OTModelEntities/EntityFileText.h"
 
 EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) 
 	:EntityBlock(ID, parent, obs, ms)
@@ -61,7 +62,7 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 		config.setCollectionName(this->getCollectionType());
 		config.addAditionalInfoFilter("ElementType", getFolderName());
 		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
-		config.setEntityType(ot::LmsNewEntityType::Text);
+		config.setEntityType(EntityFileText::className());
 		config.setNewEntityFolder(this->getCircuitModelFolder() + "/" + this->getFolderName());
 
 		// if it was selected use observer to send message to LMS

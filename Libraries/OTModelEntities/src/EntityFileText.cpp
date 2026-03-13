@@ -22,6 +22,7 @@
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityBinaryData.h"
 #include "OTCore/String.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/RuntimeTests.h"
@@ -204,6 +205,70 @@ bool EntityFileText::updateFromProperties()
 	getProperties().forceResetUpdateForAllProperties();
 
 	return false;
+}
+
+void EntityFileText::setLibraryElement(const ot::LibraryElement& _libraryElement) {
+	std::string newEntityFolder = _libraryElement.getNewEntityFolder();
+	std::string newEntityName = _libraryElement.getName();
+
+	// Create a new EntityBinaryData on the heap (will be stored in DB)
+	EntityBinaryData* dataEntity = new EntityBinaryData(
+		this->getModelState()->createEntityUID(),
+		this,  // parent is this EntityFileText
+		nullptr,  // observer will be set later
+		this->getModelState()
+	);
+
+	// Set the binary data from the library element
+	dataEntity->setData(_libraryElement.getData().data(), _libraryElement.getData().size());
+
+	// Store the data entity to the database FIRST
+	dataEntity->storeToDataBase();
+
+	// Now update this entity to reference the stored data entity
+	this->setDataEntity(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+
+	// Set file properties
+	this->setFileProperties("", "", "");
+
+	// Set text encoding to UTF-8
+	this->setTextEncoding(ot::TextEncoding::UTF8);
+
+	// Add additional infos as properties
+	for (const auto& additionalInfos : _libraryElement.getAdditionalInfos()) {
+		EntityPropertiesString* additionalInfoProp = EntityPropertiesString::createProperty(
+			"Metadata",
+			additionalInfos.first,
+			additionalInfos.second,
+			"Default",
+			this->getProperties()
+		);
+		additionalInfoProp->setReadOnly(true);
+	}
+
+	// Hide default properties
+	EntityPropertiesBase* pathProp = this->getProperties().getProperty("Path", "Selected File");
+	EntityPropertiesBase* filenameProp = this->getProperties().getProperty("Filename", "Selected File");
+	EntityPropertiesBase* fileTypeProp = this->getProperties().getProperty("FileType", "Selected File");
+	EntityPropertiesBase* encodingProp = this->getProperties().getProperty("Text Encoding", "Text Properties");
+	EntityPropertiesBase* highlightProp = this->getProperties().getProperty("Syntax Highlight", "Text Properties");
+
+	if (pathProp) pathProp->setVisible(false);
+	if (filenameProp) filenameProp->setVisible(false);
+	if (fileTypeProp) fileTypeProp->setVisible(false);
+	if (encodingProp) encodingProp->setVisible(false);
+	if (highlightProp) highlightProp->setVisible(false);
+}
+
+std::list<std::pair<ot::UID, ot::UID>> EntityFileText::getDataEntities() const {
+	std::list<std::pair<ot::UID, ot::UID>> result;
+
+	// EntityFile stores data entity ID and version
+	if (m_dataUID != ot::invalidUID && m_dataVersion != ot::invalidUID) {
+		result.push_back({ m_dataUID, m_dataVersion });
+	}
+
+	return result;
 }
 
 void EntityFileText::setSpecializedProperties()

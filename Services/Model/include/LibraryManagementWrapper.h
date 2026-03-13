@@ -27,6 +27,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
+#include "Model.h"
 
 class LibraryManagementWrapper : public BusinessLogicHandler {
 public:
@@ -40,11 +41,8 @@ public:
 	void updatePropertyOfEntity(const ot::LibraryElement& _importCfg, bool _dialogConfirmed);
 private:
 
-	ot::UIDList m_entityIDsTopo;
-	ot::UIDList m_entityVersionsTopo;
-	ot::UIDList m_entityIDsData {};
-	ot::UIDList m_entityVersionsData {};
-	std::list<bool> m_forceVisible;
-
-	void addModelToEntites();
+	// Helper methods
+	EntityBase* createAndInitializeEntity(const ot::LibraryElement& _importCfg, Model* _model);
+	bool checkEntityExists(const std::string& _entityPath, Model* _model);
+	void addEntityToModel(EntityBase* _entity, Model* _model);
 };

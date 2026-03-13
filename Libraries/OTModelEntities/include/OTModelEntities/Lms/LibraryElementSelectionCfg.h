@@ -78,8 +78,8 @@ namespace ot {
 		const std::string& getCallBackAction() const { return m_callBackAction; };
 
 		//! @brief Set the type of the new entity to create based on the selection
-		void setEntityType(LmsNewEntityType _type) { m_newEntityType = _type; };
-		LmsNewEntityType getEntityType() const { return m_newEntityType; };
+		void setEntityType(std::string _type) { m_className = _type; };
+		std::string getEntityType() const { return m_className; };
 
 		//! @brief Set the entity ID that initiated the request (used for callback context)
 		void setRequestingEntityID(ot::UID _entityID) { m_requestingEntityID = _entityID; };
@@ -97,10 +97,6 @@ namespace ot {
 		void setAdditionalInfo(const std::string& _info) { m_additionalInfo = _info; };
 		const std::string& getAdditionalInfo() const { return m_additionalInfo; };
 
-		// Helper methods
-		static std::string entityTypeToString(LmsNewEntityType _type);
-		static LmsNewEntityType stringToEntityType(const std::string& _typeStr);
-
 		// Serialization
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
@@ -115,7 +111,7 @@ namespace ot {
 		std::list<std::pair<std::string, std::string>> m_metaDataInfoFilters;
 		std::string m_callBackService;
 		std::string m_callBackAction;
-		LmsNewEntityType m_newEntityType;
+		std::string m_className;
 		ot::UID m_requestingEntityID;
 		std::string m_uiServiceUrl;
 		std::string m_newEntityFolder;

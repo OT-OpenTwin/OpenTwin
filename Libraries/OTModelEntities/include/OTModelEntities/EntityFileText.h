@@ -22,8 +22,9 @@
 #include "OTGui/Widgets/TextEditorCfg.h"
 #include "OTModelEntities/EntityFile.h"
 #include "OTModelEntities/IVisualisationText.h"
+#include "OTModelEntities/Lms/LibraryEntityInterface.h"
 
-class __declspec(dllexport) EntityFileText : public EntityFile, public IVisualisationText
+class __declspec(dllexport) EntityFileText : public EntityFile, public IVisualisationText, public ot::LibraryEntityInterface
 {
 public:
 	EntityFileText() : EntityFileText(0, nullptr, nullptr, nullptr) {};
@@ -48,6 +49,10 @@ public:
 
 	bool updateFromProperties() override;
 
+	// Set Library element
+	void setLibraryElement(const ot::LibraryElement& _libraryElement) override;
+	//! @brief Get the binary data entity associated with this file
+	std::list<std::pair<ot::UID, ot::UID>> getDataEntities() const override;
 protected:
 	void setSpecializedProperties() override;
 	
