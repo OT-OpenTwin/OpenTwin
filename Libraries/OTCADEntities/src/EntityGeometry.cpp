@@ -1154,3 +1154,13 @@ std::string EntityGeometry::getParentName()
 	size_t index = getName().rfind('/');
 	return getName().substr(0, index);
 }
+
+void EntityGeometry::removeGroupProperties()
+{
+	EntityPropertiesBase* groupProperty = getProperties().getProperty("Parent Group", "Group");
+
+	if (groupProperty != nullptr)
+	{
+		getProperties().deleteProperty(groupProperty->getName(), groupProperty->getGroup());
+	}
+}

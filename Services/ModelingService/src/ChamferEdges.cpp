@@ -67,7 +67,7 @@ std::string ChamferEdges::getShapeType()
 
 void ChamferEdges::addSpecificProperties(EntityGeometry* geometryEntity)
 {
-	addParametricProperty(geometryEntity, "Chamfer width", 0.0);
+	addParametricProperty(geometryEntity, "Chamfer width", 0.0, "Transformation");
 }
 
 bool ChamferEdges::operationActive(EntityGeometry* geometryEntity)

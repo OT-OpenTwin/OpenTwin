@@ -4298,9 +4298,15 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 				icons.setVisibleIcon(icons.getVisibleIcon() + "Base");
 				icons.setHiddenIcon(icons.getHiddenIcon() + "Base");
 				geomEntity->setTreeItemIcons(icons);
+				geomEntity->removeGroupProperties();
 			}
 
 			isBaseShape = false;
+		}
+		else
+		{
+			EntityGeometry* geomEntity = dynamic_cast<EntityGeometry*>(childrenNameMap[childName]);
+			geomEntity->removeGroupProperties();
 		}
 
 		// add the new children path

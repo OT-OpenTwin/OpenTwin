@@ -66,7 +66,7 @@ std::string BlendEdges::getShapeType()
 
 void BlendEdges::addSpecificProperties(EntityGeometry* geometryEntity)
 {
-	addParametricProperty(geometryEntity, "Blend radius", 0.0);
+	addParametricProperty(geometryEntity, "Blend radius", 0.0, "Transformation");
 }
 
 bool BlendEdges::operationActive(EntityGeometry* geometryEntity)

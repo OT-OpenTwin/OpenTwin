@@ -79,7 +79,7 @@ private:
 	void getAllEdgesForOperation(TopoDS_Shape& brep, std::list<EdgesData>& edgeList, std::map<const opencascade::handle<TopoDS_TShape>, std::string>& allEdges, std::list<TopoDS_Edge>& allEdgesForOperation);
 
 protected:
-	void addParametricProperty(EntityGeometry* geometryEntity, const std::string& name, double value);
+	void addParametricProperty(EntityGeometry* geometryEntity, const std::string& name, double value, const std::string& insertBeforeGroup);
 
 	virtual void addSpecificProperties(EntityGeometry* geometryEntity) = 0;
 	virtual ot::components::UiComponent::entitySelectionAction getSelectionAction() = 0;

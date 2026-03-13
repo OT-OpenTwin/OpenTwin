@@ -48,14 +48,14 @@ void EdgesOperationBase::enterSelectEdgesMode(void)
 	uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::EDGE, true, "", getSelectionAction(), getOperationDescription(), options, serviceID);
 }
 
-void EdgesOperationBase::addParametricProperty(EntityGeometry* geometryEntity, const std::string &name, double value)
+void EdgesOperationBase::addParametricProperty(EntityGeometry* geometryEntity, const std::string &name, double value, const std::string &insertBeforeGroup)
 {
 	EntityPropertiesDouble* doubleProp = new EntityPropertiesDouble("#" + name, value);
 	doubleProp->setVisible(false);
-	geometryEntity->getProperties().createProperty(doubleProp, "Shape properties", true);
+	geometryEntity->getProperties().createProperty(doubleProp, "Shape properties", false, insertBeforeGroup);
 
 	EntityPropertiesString* stringProp = new EntityPropertiesString(name, std::to_string(value));
-	geometryEntity->getProperties().createProperty(stringProp, "Shape properties", true);
+	geometryEntity->getProperties().createProperty(stringProp, "Shape properties", false, insertBeforeGroup);
 }
 
 void EdgesOperationBase::performOperation(const std::string &selectionInfo)
@@ -156,12 +156,12 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 
 	deleteNonStandardProperties(geometryEntity);
 
-	storeEdgeListInProperties(edgeList, geometryEntity->getProperties());
+	addSpecificProperties(geometryEntity);
 
 	EntityPropertiesBoolean* enabledProp = new EntityPropertiesBoolean("Active", true);
-	geometryEntity->getProperties().createProperty(enabledProp, "Shape properties", true);
+	geometryEntity->getProperties().createProperty(enabledProp, "Shape properties", false, "Transformation");
 
-	addSpecificProperties(geometryEntity);
+	storeEdgeListInProperties(edgeList, geometryEntity->getProperties());
 
 	std::string baseShapeName = baseEntity->getName();
 	size_t index = baseShapeName.rfind('/');
@@ -219,8 +219,11 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 
 void EdgesOperationBase::storeEdgeListInProperties(std::list<EdgesData> &edgeList, EntityProperties &properties)
 {
-	// We are putting all items to the front of the property list, so we need to add them in reverse order
-	size_t edgeCounter = edgeList.size();
+	EntityPropertiesInteger* numberEdgesProp = new EntityPropertiesInteger("Number of edges", (int)edgeList.size());
+	numberEdgesProp->setReadOnly(true);
+	properties.createProperty(numberEdgesProp, "Edges", false, "Transformation");
+
+	size_t edgeCounter = 1;
 	for (auto edge = edgeList.rbegin(); edge != edgeList.rend(); ++edge)
 	{
 		std::string index;
@@ -228,14 +231,10 @@ void EdgesOperationBase::storeEdgeListInProperties(std::list<EdgesData> &edgeLis
 
 		EntityPropertiesString* stringProp = new EntityPropertiesString("Edge name " + index, edge->getEdgeName());
 		stringProp->setGroupChanges(true);
-		properties.createProperty(stringProp, "Edges", true);
+		properties.createProperty(stringProp, "Edges", false, "Transformation");
 
-		edgeCounter--;
+		edgeCounter++;
 	}
-
-	EntityPropertiesInteger* numberEdgesProp = new EntityPropertiesInteger("Number of edges", (int)edgeList.size());
-	numberEdgesProp->setReadOnly(true);
-	properties.createProperty(numberEdgesProp, "Edges", true);
 }
 
 std::list<EdgesData> EdgesOperationBase::readEdgeListFromProperties(EntityProperties& properties)

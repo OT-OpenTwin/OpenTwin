@@ -69,7 +69,7 @@ void EntityProperties::deleteAllProperties()
 	m_propertiesList.clear();
 }
 
-bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::string &group, bool addToFront)
+bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::string &group, bool addToFront, std::string insertBeforeGroup)
 {
 	EntityPropertiesBase *property = getProperty(prop->getName(),group);
 
@@ -86,7 +86,23 @@ bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::str
 	}
 	else
 	{
-		m_propertiesList.push_back(prop);
+		if (insertBeforeGroup.empty())
+		{
+			m_propertiesList.push_back(prop);
+		}
+		else
+		{
+			for (auto it = m_propertiesList.begin(); it != m_propertiesList.end(); ++it)
+			{
+				if ((*it)->getGroup() == insertBeforeGroup)
+				{
+					m_propertiesList.insert(it, prop);
+					return true;
+				}
+			}
+
+			m_propertiesList.push_back(prop);
+		}
 	}
 
 	return true;

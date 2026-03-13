@@ -82,6 +82,8 @@ public:
 	void createMaterialPropertiesOnly(int colorR, int colorG, int colorB, const std::string &materialsFolder, ot::UID materialsFolderID);
 	void createNonMaterialProperties(void);
 
+	void removeGroupProperties();
+
 	void facetEntity(bool isHidden);
 
 	void setData(void *data) { tmpData = data; }
