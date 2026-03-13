@@ -150,17 +150,17 @@ void ot::Plot1DAxisCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	m_quantityScaling = static_cast<QuantityScaling>(json::getUInt(_object, "QuantityScale"));
 }
 
-std::string ot::Plot1DAxisCfg::getDisplayAxisLabel(const Plot1DCfg& _plotCfg) const
+std::string ot::Plot1DAxisCfg::getDisplayLabel(const Plot1DCfg& _plotCfg) const
 {
 	std::string result;
 
-	if (!m_autoDetermineAxisLabel)
+	if (m_autoDetermineAxisLabel)
 	{
-		result = m_axisLabel;
+		result = getQuantityLabel(_plotCfg) + " " + getUnitWithScalingLabel(_plotCfg);
 	}
 	else
 	{
-		return getQuantityLabel(_plotCfg) + " " + getUnitWithScalingLabel(_plotCfg);
+		result = m_axisLabel;
 	}
 	return result;
 }

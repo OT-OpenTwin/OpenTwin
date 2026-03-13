@@ -156,7 +156,7 @@ namespace ot {
 
 		//! @brief Returns the axis label to be displayed.
 		//! Will include the axis label, quantity name and quantity scaling information.
-		std::string getDisplayAxisLabel(const Plot1DCfg& _plotCfg) const;
+		std::string getDisplayLabel(const Plot1DCfg& _plotCfg) const;
 
 		std::string getValueDisplayString(double _value, const Plot1DCfg& _plotCfg) const;
 		std::string getValueDisplayString(double _value, const Plot1DCfg& _plotCfg, const std::string& _unitPrefix) const;

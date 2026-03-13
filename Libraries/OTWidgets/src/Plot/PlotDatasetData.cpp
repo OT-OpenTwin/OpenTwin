@@ -34,11 +34,18 @@ ot::PlotDatasetData::PlotDatasetData(const std::vector<double>& _dataX, std::vec
 {}
 
 ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<double>&& _dataY)
-	: m_xQuantity(Plot1DAxisCfg::Undefined), m_yQuantity(Plot1DAxisCfg::Undefined),
-	m_calcX(std::move(_dataX)), m_calcY(std::move(_dataY)), m_canConvert(false),
+	: m_xQuantity(Plot1DAxisCfg::XData), m_yQuantity(Plot1DAxisCfg::Real),
+	m_dataX(std::move(_dataX)), m_canConvert(false),
 	m_cartesianAccessor(nullptr), m_polarAccessor(nullptr)
 {
-	OTAssert(m_calcX.size() == m_calcY.size(), "Dataset size mismatch");
+	m_dataY.reserve(_dataY.size());
+	for (double val : _dataY) {
+		m_dataY.emplace_back(val, 0.0);
+	}
+
+	OTAssert(m_dataX.size() == m_dataY.size(), "Dataset size mismatch");
+
+	updateData();
 }
 
 ot::PlotDatasetData::PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity, Plot1DAxisCfg::AxisQuantity _initialYQuantity)
@@ -65,6 +72,38 @@ ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<s
 	setYQuantity(_initialYQuantity);
 
 	updateData();
+}
+
+ot::PlotDatasetData::PlotDatasetData(PlotDatasetData&& _other) noexcept
+	: PlotDatasetData()
+{
+	*this = std::move(_other);
+}
+
+ot::PlotDatasetData& ot::PlotDatasetData::operator=(PlotDatasetData&& _other) noexcept
+{
+	if (this != &_other)
+	{
+		m_cartesianAccessor = _other.m_cartesianAccessor;
+		m_polarAccessor = _other.m_polarAccessor;
+
+		m_xQuantity = _other.m_xQuantity;
+		m_xQuantityScaling = _other.m_xQuantityScaling;
+		m_yQuantity = _other.m_yQuantity;
+		m_yQuantityScaling = _other.m_yQuantityScaling;
+
+		m_dataX = std::move(_other.m_dataX);
+		m_dataY = std::move(_other.m_dataY);
+		m_canConvert = _other.m_canConvert;
+
+		m_calcX = std::move(_other.m_calcX);
+		m_calcY = std::move(_other.m_calcY);
+
+		_other.m_cartesianAccessor = nullptr;
+		_other.m_polarAccessor = nullptr;
+	}
+
+	return *this;
 }
 
 ot::PlotDatasetData::~PlotDatasetData()
@@ -101,7 +140,7 @@ void ot::PlotDatasetData::setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bo
 
 void ot::PlotDatasetData::setXQuantityScaling(const Plot1DAxisCfg::QuantityScaling& _scaling, bool _updateData)
 {
-	if (m_xQuantityScaling == _scaling || !m_canConvert) {
+	if (m_xQuantityScaling == _scaling) {
 		return;
 	}
 	m_xQuantityScaling = _scaling;
@@ -124,7 +163,7 @@ void ot::PlotDatasetData::setYQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bo
 
 void ot::PlotDatasetData::setYQuantityScaling(const Plot1DAxisCfg::QuantityScaling& _scaling, bool _updateData)
 {
-	if (m_yQuantityScaling == _scaling || !m_canConvert) {
+	if (m_yQuantityScaling == _scaling) {
 		return;
 	}
 	m_yQuantityScaling = _scaling;

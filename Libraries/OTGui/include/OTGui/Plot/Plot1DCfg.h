@@ -119,6 +119,19 @@ namespace ot {
 		void setYAxis(Plot1DAxisCfg&& _yAxis) { m_yAxis = std::move(_yAxis); };
 		const Plot1DAxisCfg& getYAxis() const { return m_yAxis; };
 
+		void setXAxisParameter(const std::string _parameterName) { m_xAxisParameter = _parameterName; };
+		std::string getXAxisParameter() const { return m_xAxisParameter; };
+
+		void setXAxisLabelAutoDetermine(bool _autoDetermine) { m_xAxis.setAutoDetermineAxisLabel(_autoDetermine); };
+		bool getXAxisLabelAutoDetermine() const { return m_xAxis.getAutoDetermineAxisLabel(); };
+
+		void setXAxisLabel(const std::string& _label) { m_xAxis.setAxisLabel(_label); };
+		const std::string& getXAxisLabel() const { return m_xAxis.getAxisLabel(); };
+
+		//! @brief Returns the axis label to be displayed.
+		//! Will include the axis label, quantity name and quantity scaling information.
+		std::string getXAxisDisplayLabel() const { return m_xAxis.getDisplayLabel(*this); };
+
 		void setYAxisMin(double _min) { m_yAxis.setMin(_min); };
 		double getYAxisMin() const { return m_yAxis.getMin(); };
 
@@ -134,29 +147,15 @@ namespace ot {
 		void setYAxisIsAutoScale(bool _autoScaleEnabled) { m_yAxis.setIsAutoScale(_autoScaleEnabled); };
 		bool getYAxisIsAutoScale() const { return m_yAxis.getIsAutoScale(); };
 
-		void setXAxisParameter(const std::string _parameterName) { m_xAxisParameter = _parameterName; };
-		std::string getXAxisParameter() const { return m_xAxisParameter; };
+		void setYAxisLabelAutoDetermine(bool _autoDetermine) { m_yAxis.setAutoDetermineAxisLabel(_autoDetermine); };
+		bool getYAxisLabelAutoDetermine() const { return m_yAxis.getAutoDetermineAxisLabel(); };
 
-		void setXLabelAxisAutoDetermine(bool _autoDetermine) { m_xAxis.setAutoDetermineAxisLabel(_autoDetermine); };
-		bool getXLabelAxisAutoDetermine() const { return m_xAxis.getAutoDetermineAxisLabel(); };
-
-		void setYLabelAxisAutoDetermine(bool _autoDetermine) { m_yAxis.setAutoDetermineAxisLabel(_autoDetermine); };
-		bool getYLabelAxisAutoDetermine() const { return m_yAxis.getAutoDetermineAxisLabel(); };
-
-		void setAxisLabelY(const std::string& _label) { m_yAxis.setAxisLabel(_label); };
-		const std::string& getAxisLabelY() const { return m_yAxis.getAxisLabel(); };
+		void setYAxisLabel(const std::string& _label) { m_yAxis.setAxisLabel(_label); };
+		const std::string& getYAxisLabel() const { return m_yAxis.getAxisLabel(); };
 
 		//! @brief Returns the axis label to be displayed.
 		//! Will include the axis label, quantity name and quantity scaling information.
-		std::string getDisplayAxisLabelY() const { return m_yAxis.getDisplayAxisLabel(*this); };
-
-		void setAxisLabelX(const std::string& _label) { m_xAxis.setAxisLabel(_label); };
-		const std::string& getAxisLabelX() const { return m_xAxis.getAxisLabel(); };
-
-		//! @brief Returns the axis label to be displayed.
-		//! Will include the axis label, quantity name and quantity scaling information.
-		std::string getDisplayAxisLabelX() const { return m_xAxis.getDisplayAxisLabel(*this); };
-
+		std::string getYAxisDisplayLabel() const { return m_yAxis.getDisplayLabel(*this); };
 
 		const std::list<ValueComparisonDescription>& getQueries() { return m_queries; };
 		void setQueries(const std::list<ValueComparisonDescription>& _queries) { m_queries = _queries; };

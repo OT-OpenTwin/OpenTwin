@@ -135,6 +135,8 @@ namespace ot {
 		void setCurveNameBase(const std::string& _curveNameBase) { m_curveNameBase = _curveNameBase; }
 		const std::string& getCurveNameBase() { return m_curveNameBase; }
 
+		inline bool canConvert() const { return m_data.canConvert(); };
+
 	private:
 		friend class PlotBase;
 

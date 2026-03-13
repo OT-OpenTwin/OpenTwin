@@ -43,7 +43,6 @@ namespace ot {
 	//! The X and Y quantities can be f configured to represent different aspects of the data.
 	class OT_WIDGETS_API_EXPORT PlotDatasetData {
 		OT_DECL_NOCOPY(PlotDatasetData)
-		OT_DECL_DEFMOVE(PlotDatasetData)
 	public:
 		//! @brief Default constructor. Creates an empty dataset with undefined quantities.
 		PlotDatasetData();
@@ -76,6 +75,9 @@ namespace ot {
 		//! @param _initialYQuantity Initial quantity for the Y axis.
 		PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantity _initialYQuantity = Plot1DAxisCfg::Real);
 
+		PlotDatasetData(PlotDatasetData&& _other) noexcept;
+		PlotDatasetData& operator=(PlotDatasetData&& _other) noexcept;
+
 		~PlotDatasetData();
 
 		void updateData();
@@ -97,6 +99,8 @@ namespace ot {
 
 		size_t getSize() const;
 		template <typename T> T getSample(size_t _index) const;
+
+		constexpr bool canConvert() const { return m_canConvert; };
 
 	private:
 		friend class PlotSeriesData<QPointF>;

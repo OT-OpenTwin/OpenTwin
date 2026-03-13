@@ -392,8 +392,22 @@ void ot::PlotBase::applyConfig()
 
 void ot::PlotBase::updateAxisTitles(bool _replot)
 {
-	const QString axisTitleX = QString::fromStdString(m_config.getDisplayAxisLabelX());
-	const QString axisTitleY = QString::fromStdString(m_config.getDisplayAxisLabelY());
+	bool canConvertAll = true;
+
+	for (auto data : getAllDatasets())
+	{
+		if (!data->canConvert())
+		{
+			canConvertAll = false;
+			break;
+		}
+	}
+
+	m_config.setXAxisLabelAutoDetermine(canConvertAll);
+	m_config.setYAxisLabelAutoDetermine(canConvertAll);
+
+	const QString axisTitleX = QString::fromStdString(m_config.getXAxisDisplayLabel());
+	const QString axisTitleY = QString::fromStdString(m_config.getYAxisDisplayLabel());
 
 	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX);
 	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY);
