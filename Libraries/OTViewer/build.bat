@@ -11,7 +11,7 @@ REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 REM Call the build shell
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CmakeBuildSingleProject.bat" %OT_VIEWER_ROOT% %0 %2 
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildSingleProject.bat" "%OT_VIEWER_ROOT%\OTViewer.sln" %1 %2 
 
 GOTO END
 

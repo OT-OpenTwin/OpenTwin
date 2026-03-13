@@ -3,7 +3,7 @@
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
 REM 2. OPENTWIN_THIRDPARTY_ROOT
-REM 2. DEVENV_ROOT_2022
+REM 3. DEVENV_ROOT_2022
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
 	goto PAUSE_END
@@ -27,6 +27,8 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
+ECHO Testing Project : OTViewer
+
 REM Open project
 
 SET RELEASE=1
@@ -42,12 +44,30 @@ IF "%1"=="DEBUG" (
   SET DEBUG=1
 )
 
+SET TYPE=/Rebuild
+SET TYPE_NAME=REBUILD
+
+IF "%2"=="BUILD" (
+	SET TYPE=/Build
+	SET TYPE_NAME=BUILD
+)
+
 IF %DEBUG%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_VIEWER_ROOT%" DEBUG
+	ECHO %TYPE% DEBUGTEST
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_VIEWER_ROOT%\OTViewer.vcxproj" %TYPE% "DebugTest|x64"  
+	ECHO %TYPE% DEBUG
+	"%OT_VIEWER_ROOT%\x64\Debug\OTViewerTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTViewerDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTViewerDebugReport.xml" "OTViewer" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTViewerDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_VIEWER_ROOT%" RELEASE
+	ECHO %TYPE% RELEASETEST
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_VIEWER_ROOT%\OTViewer.vcxproj" %TYPE% "ReleaseTest|x64"
+	ECHO %TYPE% RELEASE
+	"%OT_VIEWER_ROOT%\x64\Release\OTViewerTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTViewerReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTViewerReleaseReport.xml" "OTViewer" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTViewerReleaseReport.xml"
 ) 
   
 GOTO END
