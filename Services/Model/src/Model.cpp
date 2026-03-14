@@ -1644,11 +1644,123 @@ void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const 
 		EntityProperties properties;
 		properties.buildFromConfiguration(_configuration, getRootNode());
 
+		std::string newParentGroup = handleParentGroupPropertyChange(properties);
+
 		setProperties(entities, properties);
 
 		if (update) {
+
+			if (!newParentGroup.empty())
+			{
+				applyParentGroupChange(entities, newParentGroup);
+			}
+
 			updateEntityProperties(itemsVisible);
 		}
+	}
+}
+
+std::string Model::handleParentGroupPropertyChange(EntityProperties &properties)
+{
+	std::string newGroupName;
+	
+	EntityPropertiesEntityList* groupProp = dynamic_cast<EntityPropertiesEntityList*>(properties.getProperty("Parent Group", "Group"));
+
+	if (groupProp != nullptr)
+	{
+		newGroupName = groupProp->getValueName();
+		properties.deleteProperty(groupProp->getName(), groupProp->getGroup());
+	}
+
+	return newGroupName;
+}
+
+void Model::applyParentGroupChange(std::list<EntityBase*> entities, const std::string & newParentGroup)
+{
+	std::list<EntityBase*> parentEntities = removeChildrenFromList(entities);
+
+	// Now we rename all the parent Entities to the new parent
+	for (auto entity : parentEntities)
+	{
+		std::string newName = newParentGroup + "/" + entity->getNameOnly();
+
+		renameEntityWithChildren(entity, newName);
+		setEntityOutdated(entity);
+	}
+
+	// Finally, reset the parent group change property for all entities, since we have already handled this change
+	for (auto entity : entities)
+	{
+		EntityPropertiesEntityList* groupProp = dynamic_cast<EntityPropertiesEntityList*>(entity->getProperties().getProperty("Parent Group", "Group"));
+		if (groupProp != nullptr)
+		{
+			groupProp->resetNeedsUpdate();
+		}
+	}
+}
+
+void Model::renameEntityWithChildren(EntityBase* entity, const std::string& newName)
+{
+	std::string oldName = entity->getName();
+
+	// First, get a list of the entity and all its children
+	std::list<std::pair<ot::UID, ot::UID>> entityAndChildrenID{ std::pair<ot::UID, ot::UID>(entity->getEntityID(), entity->getEntityStorageVersion()) };
+	getListOfAllChildEntities(entity, entityAndChildrenID);
+
+	std::list<EntityBase*> entityAndChildren;
+	for (auto entityID : entityAndChildrenID)
+	{
+		entityAndChildren.push_back(getEntityByID(entityID.first));
+	}
+
+	// Now we remove all entties from the model, display and shapemanager
+	std::list<ot::UID> removeFromDisplay;
+
+	for (auto entityID : entityAndChildren)
+	{
+		removeFromDisplay.push_back(entity->getEntityID());
+
+		// Remove the entity from the entity map and also from the model state
+		std::list<EntityBase*> removedEntityList;
+		removeEntityFromMap(entity, false, true, false);   // In this operation, we are removing the entity from the model. However, it will be added back again
+														   // We keep the children, since this will also include the data entities
+														   // in a later step, so the dependecy of the entityID on the parameter remains. Therefore, we keep it here.
+
+		//removeEntityWithChildrenFromMap(entity, false, true, removedEntityList);  
+
+		if (entity->getParent() != nullptr)
+		{
+			entity->getParent()->removeChild(entity);
+			entity->setParent(nullptr);
+		}
+	}
+
+	removeShapesFromVisualization(removeFromDisplay);
+
+	// Now we rename all entities
+	for (auto entity : entityAndChildren)
+	{
+		std::string nameWithoutParent = entity->getName().substr(oldName.size());
+		std::string newEntityName = newName + nameWithoutParent;
+
+		entity->setName(newEntityName);
+	}
+
+	// Add the entities back to the model at the new position
+	for (auto entity : entityAndChildren)
+	{
+		// Since allChildrenList contains all children, we need to insert the entities one by one. This implies that
+		// all hierarchical functionality on the entity needs to be turned off. Therefore, we need to detach the 
+		// entity from its parent and also remove all pointers to the children. This information will automatically be
+		// rebuilt by the addEntityToModel operation.
+		entity->detachFromHierarchy();
+
+		// Next, add the entity to the model again (at a new position)
+		std::list<EntityBase*> newEntities;
+		addEntityToModel(entity->getName(), entity, m_entityRoot, true, newEntities);
+
+		// Finally add the entity to the visualization
+		entity->addVisualizationNodes();
 	}
 }
 

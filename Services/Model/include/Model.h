@@ -300,8 +300,11 @@ private:
 	std::list<EntityBase*> FindTopLevelBlockEntities(std::list<EntityBase*>& entityID);
 	std::list<EntityBase*> getTopLevelEntitiesByName(std::list<EntityBase*> entities);
 	void determineActiveCoordinateSystem();
+	std::string handleParentGroupPropertyChange(EntityProperties& properties);
+	void applyParentGroupChange(std::list<EntityBase*> entities, const std::string& newParentGroup);
+	void renameEntityWithChildren(EntityBase* entity, const std::string& newName);
 
-	// Button callbacks
+		// Button callbacks
 	ot::ButtonHandler m_buttonHandler;
 	ot::ToolBarButtonCfg m_undoButton;
 	ot::ToolBarButtonCfg m_redoButton;
