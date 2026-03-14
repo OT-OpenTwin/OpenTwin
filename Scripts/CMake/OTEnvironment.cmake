@@ -500,6 +500,8 @@ ot_get_env_path(QWT_LIB_LIBPATHR_PATH             QWT_LIB_LIBPATHR)
 ot_get_env_path(QWTPOLAR_LIB_LIBPATHD_PATH        QWTPOLAR_LIB_LIBPATHD)
 ot_get_env_path(QWTPOLAR_LIB_LIBPATHR_PATH        QWTPOLAR_LIB_LIBPATHR)
 ot_get_env_path(QT_ADS_ROOT_PATH                  QT_ADS_ROOT)
+ot_get_env_string(QWTPOLAR_LIB_LIBD_NAME          QWTPOLAR_LIB_LIBD)
+ot_get_env_string(QWTPOLAR_LIB_LIBR_NAME          QWTPOLAR_LIB_LIBR)
 
 ot_get_env_path(CGAL_INCD_PATH                    CGAL_INCD)
 ot_get_env_path(CGAL_INCR_PATH                    CGAL_INCR)
