@@ -14,7 +14,7 @@ namespace ot {
 	class MenuCallbackBase;
 	class MenuManagerHandler;
 
-	class MenuRequestWidgetEvent : public WidgetEvent
+	class OT_WIDGETS_API_EXPORT MenuRequestWidgetEvent : public WidgetEvent
 	{
 		OT_DECL_NOCOPY(MenuRequestWidgetEvent)
 		OT_DECL_NOMOVE(MenuRequestWidgetEvent)

@@ -157,8 +157,8 @@ void EntityResult1DPlot::hideAxisQuantityProperties()
 {
 	PropertyHelper::getSelectionProperty(this, "Quantity", getXAxisPropertyGroupName())->setVisible(false);
 	PropertyHelper::getSelectionProperty(this, "Quantity", getYAxisPropertyGroupName())->setVisible(false);
-	PropertyHelper::getSelectionProperty(this, "Quantity", getRadiusAxisPropertyGroupName())->setVisible(false);
 	PropertyHelper::getSelectionProperty(this, "Quantity", getAzimuthAxisPropertyGroupName())->setVisible(false);
+	PropertyHelper::getSelectionProperty(this, "Quantity", getRadiusAxisPropertyGroupName())->setVisible(false);
 }
 
 void EntityResult1DPlot::addChild(EntityBase* _child)
@@ -199,8 +199,8 @@ void EntityResult1DPlot::createProperties()
 
 	createAxisProperties(getXAxisPropertyGroupName());
 	createAxisProperties(getYAxisPropertyGroupName());
-	createAxisProperties(getRadiusAxisPropertyGroupName());
 	createAxisProperties(getAzimuthAxisPropertyGroupName());
+	createAxisProperties(getRadiusAxisPropertyGroupName());
 
 	// Curve limit settings
 
@@ -494,6 +494,9 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Max", yAxisPropGroup);
 	PropertyHelper::setStringPropertyValue(_config.getXAxisLabel(), this, "Label override", yAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisLabelAutoDetermine(), this, "Automatic label", yAxisPropGroup);
+
+	updateAxisPropertiesVisibility(xAxisPropGroup);
+	updateAxisPropertiesVisibility(yAxisPropGroup);
 }
 
 

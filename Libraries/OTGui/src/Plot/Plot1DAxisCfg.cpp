@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/Symbol.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Plot/Plot1DAxisCfg.h"
@@ -186,21 +187,38 @@ std::string ot::Plot1DAxisCfg::getQuantityLabel(const Plot1DCfg& _plotCfg) const
 	}
 	else
 	{
-		result = (m_axisQuantity == Plot1DAxisCfg::XData ? _plotCfg.getDataLabelX() : _plotCfg.getDataLabelY());
+		// Determine quantity label based on axis quantity and plot type
+		result = String::trim((m_axisQuantity == Plot1DAxisCfg::XData ? _plotCfg.getDataLabelX() : _plotCfg.getDataLabelY()));
+
+		if (!result.empty())
+		{
+			result.append(" ");
+		}
+		else
+		{
+			switch (_plotCfg.getPlotType())
+			{
+			case Plot1DCfg::PlotType::Cartesian:
+				result.append(m_axisQuantity == Plot1DAxisCfg::XData ? "X" : "Y");
+				break;
+			case Plot1DCfg::PlotType::Polar:
+				result.append(m_axisQuantity == Plot1DAxisCfg::XData ? Symbol::phi() : "r");
+				break;
+			}
+		}
 
 		switch (m_axisQuantity)
 		{
 		case ot::Plot1DAxisCfg::Undefined: break;
 		case ot::Plot1DAxisCfg::XData: break;
-		case ot::Plot1DAxisCfg::Magnitude: result.append(" Magnitude"); break;
-		case ot::Plot1DAxisCfg::Phase: result.append(" Phase"); break;
-		case ot::Plot1DAxisCfg::Real: result.append(" Real"); break;
-		case ot::Plot1DAxisCfg::Imaginary: result.append(" Imaginary"); break;
+		case ot::Plot1DAxisCfg::Magnitude: result.append("Magnitude"); break;
+		case ot::Plot1DAxisCfg::Phase: result.append("Phase"); break;
+		case ot::Plot1DAxisCfg::Real: result.append("Real"); break;
+		case ot::Plot1DAxisCfg::Imaginary: result.append("Imaginary"); break;
 		default:
 			OT_LOG_E("Unknown axis quantity (" + std::to_string((int)m_axisQuantity) + ")");
 			break;
 		}
-
 	}
 	return result;
 }

@@ -392,20 +392,6 @@ void ot::PlotBase::applyConfig()
 
 void ot::PlotBase::updateAxisTitles(bool _replot)
 {
-	bool canConvertAll = true;
-
-	for (auto data : getAllDatasets())
-	{
-		if (!data->canConvert())
-		{
-			canConvertAll = false;
-			break;
-		}
-	}
-
-	m_config.setXAxisLabelAutoDetermine(canConvertAll);
-	m_config.setYAxisLabelAutoDetermine(canConvertAll);
-
 	const QString axisTitleX = QString::fromStdString(m_config.getXAxisDisplayLabel());
 	const QString axisTitleY = QString::fromStdString(m_config.getYAxisDisplayLabel());
 
