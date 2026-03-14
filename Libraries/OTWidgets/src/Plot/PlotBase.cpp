@@ -304,18 +304,18 @@ QString ot::PlotBase::toPositionInfoText(const QPoint& _pos, bool _multiline) co
 
 QString ot::PlotBase::toPositionInfoText(const QPointF& _pos, bool _multiline) const
 {
-	const std::string sep = _multiline ? "\n     " : "     ";
-	std::string txt = m_config.getXAxis().getValueDisplayString(_pos.x(), m_config);
-	txt.append(sep + m_config.getYAxis().getValueDisplayString(_pos.y(), m_config));
+	const std::string sep = _multiline ? "\n" : "     ";
+	std::string txt = "X = " + m_config.getXAxis().getValueDisplayString(_pos.x(), m_config);
+	txt.append(sep + "Y = " + m_config.getYAxis().getValueDisplayString(_pos.y(), m_config));
 	return QString::fromStdString(txt);
 }
 
 QString ot::PlotBase::toPositionInfoText(const QwtPointPolar& _pos, bool _multiline) const
 {
-	const std::string sep = _multiline ? "\n     " : "     ";
-	std::string txt = m_config.getXAxis().getValueDisplayString(_pos.radius(), m_config);
-	txt.append(sep + m_config.getYAxis().getValueDisplayString(_pos.azimuth(), m_config, "deg "));
-	txt.append(sep + m_config.getYAxis().getValueDisplayString(Math::degToRad(_pos.azimuth()), m_config, "rad "));
+	const std::string sep = _multiline ? "\n" : "     ";
+	std::string txt = "r = " + m_config.getXAxis().getValueDisplayString(_pos.radius(), m_config);
+	txt.append(sep + std::string(Symbol::phi()) + " = " + m_config.getYAxis().getValueDisplayString(_pos.azimuth(), m_config, "deg "));
+	txt.append(sep + std::string(Symbol::phi()) + " = " + m_config.getYAxis().getValueDisplayString(Math::degToRad(_pos.azimuth()), m_config, "rad "));
 	return QString::fromStdString(txt);
 }
 

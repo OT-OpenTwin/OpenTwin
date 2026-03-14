@@ -187,26 +187,15 @@ std::string ot::Plot1DAxisCfg::getQuantityLabel(const Plot1DCfg& _plotCfg) const
 	}
 	else
 	{
-		// Determine quantity label based on axis quantity and plot type
+		// Determine axis type label based on plot type and axis quantity
 		result = String::trim((m_axisQuantity == Plot1DAxisCfg::XData ? _plotCfg.getDataLabelX() : _plotCfg.getDataLabelY()));
 
 		if (!result.empty())
 		{
 			result.append(" ");
 		}
-		else
-		{
-			switch (_plotCfg.getPlotType())
-			{
-			case Plot1DCfg::PlotType::Cartesian:
-				result.append(m_axisQuantity == Plot1DAxisCfg::XData ? "X" : "Y");
-				break;
-			case Plot1DCfg::PlotType::Polar:
-				result.append(m_axisQuantity == Plot1DAxisCfg::XData ? Symbol::phi() : "r");
-				break;
-			}
-		}
 
+		// Append the quantity name based on the axis quantity.
 		switch (m_axisQuantity)
 		{
 		case ot::Plot1DAxisCfg::Undefined: break;
