@@ -1644,20 +1644,15 @@ void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const 
 		EntityProperties properties;
 		properties.buildFromConfiguration(_configuration, getRootNode());
 
-		std::string newParentGroup = handleParentGroupPropertyChange(properties);
+		handleParentGroupPropertyChange(entities, properties);
 
 		setProperties(entities, properties);
-
-		if (!newParentGroup.empty())
-		{
-			applyParentGroupChange(entities, newParentGroup);
-		}
 
 		updateEntityProperties(itemsVisible);
 	}
 }
 
-std::string Model::handleParentGroupPropertyChange(EntityProperties &properties)
+void Model::handleParentGroupPropertyChange(std::list<EntityBase*> &entities, EntityProperties &properties)
 {
 	std::string newGroupName;
 	
@@ -1669,17 +1664,20 @@ std::string Model::handleParentGroupPropertyChange(EntityProperties &properties)
 		properties.deleteProperty(groupProp->getName(), groupProp->getGroup());
 	}
 
-	return newGroupName;
+	if (!newGroupName.empty())
+	{
+		applyParentGroupChange(entities, newGroupName);
+	}
 }
 
-void Model::applyParentGroupChange(std::list<EntityBase*> entities, const std::string & newParentGroup)
+void Model::applyParentGroupChange(std::list<EntityBase*> &entities, const std::string & newParentGroup)
 {
 	std::list<EntityBase*> parentEntities = removeChildrenFromList(entities);
 
 	// Now we rename all the parent Entities to the new parent
 	for (auto entity : parentEntities)
 	{
-		std::string newName = newParentGroup + "/" + entity->getNameOnly();
+		std::string newName = ensureUniqueName(newParentGroup + "/" + entity->getNameOnly());
 
 		renameEntityWithChildren(entity, newName);
 		setEntityOutdated(entity);
@@ -1694,6 +1692,26 @@ void Model::applyParentGroupChange(std::list<EntityBase*> entities, const std::s
 			groupProp->resetNeedsUpdate();
 		}
 	}
+}
+
+std::string Model::ensureUniqueName(const std::string& name)
+{
+	if (findEntityFromName(name) == nullptr)
+	{
+		return name;  // The name is already unique
+	}
+
+	int count = 0;
+	std::string newName;
+
+	do
+	{
+		count++;
+		newName = name + "_" + std::to_string(count);
+
+	} while (findEntityFromName(newName) != nullptr);
+
+	return newName;
 }
 
 void Model::renameEntityWithChildren(EntityBase* entity, const std::string& newName)

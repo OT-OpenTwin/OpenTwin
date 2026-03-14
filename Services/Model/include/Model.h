@@ -300,9 +300,10 @@ private:
 	std::list<EntityBase*> FindTopLevelBlockEntities(std::list<EntityBase*>& entityID);
 	std::list<EntityBase*> getTopLevelEntitiesByName(std::list<EntityBase*> entities);
 	void determineActiveCoordinateSystem();
-	std::string handleParentGroupPropertyChange(EntityProperties& properties);
-	void applyParentGroupChange(std::list<EntityBase*> entities, const std::string& newParentGroup);
+	void handleParentGroupPropertyChange(std::list<EntityBase*> &entities, EntityProperties& properties);
+	void applyParentGroupChange(std::list<EntityBase*> &entities, const std::string& newParentGroup);
 	void renameEntityWithChildren(EntityBase* entity, const std::string& newName);
+	std::string ensureUniqueName(const std::string& name);
 
 		// Button callbacks
 	ot::ButtonHandler m_buttonHandler;
