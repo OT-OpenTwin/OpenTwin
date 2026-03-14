@@ -735,10 +735,9 @@ void Application::handleSetPropertiesFromJSON(ot::JsonDocument& _document) {
 	ot::PropertyGridCfg cfg;
 	cfg.setFromJsonObject(cfgObj);
 
-	bool update = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_Update);
 	bool itemsVisible = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_ItemsVisible);
 
-	m_model->setPropertiesFromJson(entityIDList, cfg, update, itemsVisible);
+	m_model->setPropertiesFromJson(entityIDList, cfg, itemsVisible);
 }
 
 void Application::handleSetTemporaryPropertiesFromJson(ot::JsonDocument& _document)

@@ -91,7 +91,7 @@ public:
 	std::map<std::string, ot::UID> getEntityNameToIDMap();
 
 	void addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, bool visibleOnly, ot::PropertyGridCfg& _config);
-	void        setPropertiesFromJson(const std::list<ot::UID>& entityIDList, const ot::PropertyGridCfg& _configuration, bool updateEntities, bool itemsVisible);
+	void        setPropertiesFromJson(const std::list<ot::UID>& entityIDList, const ot::PropertyGridCfg& _configuration, bool itemsVisible);
 	void setVersionPropertiesFromJson(const ot::PropertyGridCfg& _configuration);
 	void        deleteProperty(const std::list<ot::UID>& entityIDList, const std::string &propertyName, const std::string& propertyGroup);
 

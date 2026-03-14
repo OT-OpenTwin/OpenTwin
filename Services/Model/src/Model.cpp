@@ -1632,7 +1632,7 @@ void Model::resetAllViews()
 	Application::instance()->getNotifier()->resetAllViews(m_visualizationModelID);
 }
 
-void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration, bool update, bool itemsVisible)
+void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration, bool itemsVisible)
 {
 	if (!m_selectedVersion.empty()) {
 		this->setVersionPropertiesFromJson(_configuration);
@@ -1648,15 +1648,12 @@ void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const 
 
 		setProperties(entities, properties);
 
-		if (update) {
-
-			if (!newParentGroup.empty())
-			{
-				applyParentGroupChange(entities, newParentGroup);
-			}
-
-			updateEntityProperties(itemsVisible);
+		if (!newParentGroup.empty())
+		{
+			applyParentGroupChange(entities, newParentGroup);
 		}
+
+		updateEntityProperties(itemsVisible);
 	}
 }
 

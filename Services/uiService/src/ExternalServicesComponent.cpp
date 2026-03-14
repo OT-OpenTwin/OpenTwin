@@ -747,7 +747,6 @@ void ExternalServicesComponent::propertyGridValuesChanged(const std::list<const 
 		doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_Config, JsonObject(newConfig, doc.GetAllocator()), doc.GetAllocator());
 
@@ -807,7 +806,6 @@ void ExternalServicesComponent::propertyGridValueChangedTemporarly(const ot::Pro
 		doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_SetTemporaryProperties, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_Config, JsonObject(newConfig, doc.GetAllocator()), doc.GetAllocator());
 
@@ -855,7 +853,6 @@ void ExternalServicesComponent::temporaryPropertyChangeCleared()
 		doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ClearTemporaryPropertyChanges, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
 		
 		// Notify all listeners
