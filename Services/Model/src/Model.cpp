@@ -1672,6 +1672,9 @@ void Model::handleParentGroupPropertyChange(std::list<EntityBase*> &entities, En
 
 void Model::applyParentGroupChange(std::list<EntityBase*> &entities, const std::string & newParentGroup)
 {
+	enableQueuingHttpRequests(true);
+	std::list<ot::UID> itemsToSelect;
+
 	std::list<EntityBase*> parentEntities = removeChildrenFromList(entities);
 
 	// Now we rename all the parent Entities to the new parent
@@ -1681,6 +1684,8 @@ void Model::applyParentGroupChange(std::list<EntityBase*> &entities, const std::
 
 		renameEntityWithChildren(entity, newName);
 		setEntityOutdated(entity);
+
+		itemsToSelect.push_back(entity->getEntityID());
 	}
 
 	// Finally, reset the parent group change property for all entities, since we have already handled this change
@@ -1692,6 +1697,14 @@ void Model::applyParentGroupChange(std::list<EntityBase*> &entities, const std::
 			groupProp->resetNeedsUpdate();
 		}
 	}
+
+	if (!itemsToSelect.empty())
+	{
+		Application::instance()->getNotifier()->selectObjects(m_visualizationModelID, itemsToSelect);
+		refreshAllViews();
+	}
+
+	enableQueuingHttpRequests(false);
 }
 
 std::string Model::ensureUniqueName(const std::string& name)

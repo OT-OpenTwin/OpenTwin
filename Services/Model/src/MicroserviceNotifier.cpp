@@ -338,6 +338,16 @@ void MicroserviceNotifier::selectObject(ot::UID visualizationModelID, ot::UID en
 	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
+void MicroserviceNotifier::selectObjects(ot::UID visualizationModelID, const std::list<ot::UID> &entityIDList)
+{
+	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_SelectObjects);
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, inDoc.GetAllocator()), inDoc.GetAllocator());
+
+	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
+}
+
 void MicroserviceNotifier::refreshAllViews(ot::UID visualizationModelID)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_Refresh);

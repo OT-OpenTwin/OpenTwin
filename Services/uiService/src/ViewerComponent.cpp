@@ -845,6 +845,18 @@ void ViewerComponent::selectObject(ModelUIDtype visualizationModelID, ot::UID en
 	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to select object.", _e.what()); }
 }
 
+void ViewerComponent::selectObjects(ModelUIDtype visualizationModelID, const std::list<ot::UID> &entityIDList) {
+	try {
+		try {
+			ViewerAPI::selectObjects(visualizationModelID, entityIDList);
+		}
+		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::selectObjects()"); }
+		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::selectObjects()"); }
+		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::selectObjects()"); }
+	}
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to select objects.", _e.what()); }
+}
+
 void ViewerComponent::updateObjectColor(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string& materialType, const std::string& textureType, bool reflective) {
 	try {
 		try { ViewerAPI::updateObjectColor(visModelID, modelEntityID, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective); }

@@ -429,6 +429,28 @@ void Model::selectObject(unsigned long long modelEntityID)
 	selectSceneNode(entity, false);
 }
 
+void Model::selectObjects(const std::list<ot::UID> &modelEntityIDList)
+{
+	if (modelEntityIDList.empty()) return;
+
+	bool first = true;
+	for (auto entityID : modelEntityIDList)
+	{
+		SceneNodeBase* entity = nullptr;
+
+		if (m_modelItemToSceneNodesMap.count(entityID) != 0)
+		{
+			entity = m_modelItemToSceneNodesMap[entityID];
+		}
+
+		if (entity != nullptr)
+		{
+			selectSceneNode(entity, !first);
+			first = false;
+		}
+	}
+}
+
 void Model::setTreeStateRecording(bool flag)
 {
 	if (flag)

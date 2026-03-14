@@ -228,6 +228,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	connectAction(OT_ACTION_CMD_UI_VIEW_ClearSelection, this, &ExternalServicesComponent::handleClearSelection);
 	connectAction(OT_ACTION_CMD_UI_VIEW_RefreshSelection, this, &ExternalServicesComponent::handleRefreshSelection);
 	connectAction(OT_ACTION_CMD_UI_VIEW_SelectObject, this, &ExternalServicesComponent::handleSelectObject);
+	connectAction(OT_ACTION_CMD_UI_VIEW_SelectObjects, this, &ExternalServicesComponent::handleSelectObjects);
 	connectAction(OT_ACTION_CMD_UI_VIEW_SetModifiedState, this, &ExternalServicesComponent::handleSetModifiedState);
 	connectAction(OT_ACTION_CMD_UI_SetProgressVisibility, this, &ExternalServicesComponent::handleSetProgressVisibility);
 	connectAction(OT_ACTION_CMD_UI_SetProgressbarValue, this, &ExternalServicesComponent::handleSetProgressValue);
@@ -2618,6 +2619,13 @@ void ExternalServicesComponent::handleSelectObject(ot::JsonDocument& _document) 
 	ot::UID entityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 
 	AppBase::instance()->getViewerComponent()->selectObject(visualizationModelID, entityID);
+}
+
+void ExternalServicesComponent::handleSelectObjects(ot::JsonDocument& _document) {
+	ot::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+
+	AppBase::instance()->getViewerComponent()->selectObjects(visualizationModelID, entityIDList);
 }
 
 void ExternalServicesComponent::handleSetModifiedState(ot::JsonDocument& _document) {

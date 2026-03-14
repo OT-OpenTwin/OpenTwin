@@ -184,6 +184,7 @@ public:
 	void clearSelection(ViewerUIDtype visualizationModelID);
 	void refreshSelection(ViewerUIDtype visualizationModelID);
 	void selectObject(ModelUIDtype visualizationModelID, ot::UID entityID);
+	void selectObjects(ModelUIDtype visualizationModelID, const std::list<ot::UID> &entityIDList);
 
 	void updateObjectColor(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string& materialType, const std::string& textureType, bool reflective);
 	void updateMeshColor(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, double colorRGB[3]);

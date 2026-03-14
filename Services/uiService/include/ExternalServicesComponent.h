@@ -257,6 +257,7 @@ public:
 	void handleClearSelection(ot::JsonDocument& _document);
 	void handleRefreshSelection(ot::JsonDocument& _document);
 	void handleSelectObject(ot::JsonDocument& _document);
+	void handleSelectObjects(ot::JsonDocument& _document);
 	void handleSetModifiedState(ot::JsonDocument& _document);
 	void handleSetProgressVisibility(ot::JsonDocument& _document);
 	void handleSetProgressValue(ot::JsonDocument& _document);

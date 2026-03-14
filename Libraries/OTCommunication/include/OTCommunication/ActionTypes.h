@@ -261,6 +261,7 @@
 #define OT_ACTION_CMD_UI_VIEW_ClearSelection "UI.View.ClearSelection"
 #define OT_ACTION_CMD_UI_VIEW_RefreshSelection "UI.View.RefreshSelection"
 #define OT_ACTION_CMD_UI_VIEW_SelectObject "UI.View.SelectObject"
+#define OT_ACTION_CMD_UI_VIEW_SelectObjects "UI.View.SelectObjects"
 #define OT_ACTION_CMD_UI_VIEW_Refresh "UI.View.Refresh"
 #define OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData "UI.View.Nodes.AddFromFacetData"
 #define OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase "UI.View.Nodes.AddFromDataBase"

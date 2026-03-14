@@ -239,6 +239,11 @@ void ViewerAPI::selectObject(ot::UID osgModelID, ot::UID enttiyID)
 	getModelFromID(osgModelID)->selectObject(enttiyID);
 }
 
+void ViewerAPI::selectObjects(ot::UID osgModelID, const std::list<ot::UID> &enttiyIDList)
+{
+	getModelFromID(osgModelID)->selectObjects(enttiyIDList);
+}
+
 void ViewerAPI::setTreeStateRecording(ot::UID osgModelID, bool flag)
 {
 	getModelFromID(osgModelID)->setTreeStateRecording(flag);

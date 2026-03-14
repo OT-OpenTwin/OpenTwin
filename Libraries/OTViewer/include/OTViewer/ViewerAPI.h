@@ -70,6 +70,7 @@ namespace ViewerAPI {
 	__declspec(dllexport) void clearSelection(ot::UID _osgModelID);
 	__declspec(dllexport) void refreshSelection(ot::UID _osgModelID);
 	__declspec(dllexport) void selectObject(ot::UID _osgModelID, ot::UID entityID);
+	__declspec(dllexport) void selectObjects(ot::UID _osgModelID, const std::list<ot::UID> &entityIDList);
 
 	__declspec(dllexport) void setTreeStateRecording(ot::UID _osgModelID, bool flag);
 
