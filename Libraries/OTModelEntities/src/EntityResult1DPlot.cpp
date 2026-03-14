@@ -188,9 +188,7 @@ void EntityResult1DPlot::createProperties()
 	// General settings
 
 	const std::list<std::string> plotTypeOptions = ot::Plot1DCfg::getPlotTypeStringList();
-	EntityPropertiesSelection* plotTypeProp = EntityPropertiesSelection::createProperty("General", "Plot type", plotTypeOptions, ot::Plot1DCfg::toString(ot::Plot1DCfg::Cartesian), "", getProperties());
-	plotTypeProp->setGroupChanges(true);
-
+	EntityPropertiesSelection::createProperty("General", "Plot type", plotTypeOptions, ot::Plot1DCfg::toString(ot::Plot1DCfg::Cartesian), "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
 	EntityPropertiesGuiPainter::createProperty("General", "Grid color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotGrid), "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Legend", true, "", getProperties());
