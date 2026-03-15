@@ -37,6 +37,34 @@
 #undef max
 #endif
 
+std::string ot::String::toString(DisplayNumberFormat _format)
+{
+	switch (_format)
+	{
+	case ot::String::Decimal: return "Decimal";
+	case ot::String::DecimalFixed: return "Decimal Fixed";
+	case ot::String::Interger: return "Integer";
+	case ot::String::Scientific: return "Scientific";
+	case ot::String::Engineering: return "Engineering";
+	default:
+		OTAssert(0, "Unknown display number format");
+		return "Decimal";
+	}
+}
+
+ot::String::DisplayNumberFormat ot::String::stringToDisplayNumberFormat(const std::string& _format)
+{
+	if (_format == toString(DisplayNumberFormat::Decimal)) return DisplayNumberFormat::Decimal;
+	else if (_format == toString(DisplayNumberFormat::DecimalFixed)) return DisplayNumberFormat::DecimalFixed;
+	else if (_format == toString(DisplayNumberFormat::Interger)) return DisplayNumberFormat::Interger;
+	else if (_format == toString(DisplayNumberFormat::Scientific)) return DisplayNumberFormat::Scientific;
+	else if (_format == toString(DisplayNumberFormat::Engineering)) return DisplayNumberFormat::Engineering;
+	else {
+		OTAssert(0, "Unknown display number format");
+		return DisplayNumberFormat::Decimal;
+	}
+}
+
 inline std::string ot::String::toString(const std::wstring& _string) {
 	if (_string.empty()) return {};
 

@@ -56,6 +56,49 @@ template<class T> inline bool ot::String::isNumber(const std::string& _string) {
 	return !failed;
 }
 
+template<typename T>
+inline std::string ot::String::numberToString(T _number, DisplayNumberFormat _format, int _decimalPlaces)
+{
+	thread_local std::ostringstream stream;
+
+	switch (_format)
+	{
+	case DisplayNumberFormat::Decimal:
+		stream << std::setprecision(_decimalPlaces) << _number;
+		break;
+
+	case DisplayNumberFormat::DecimalFixed:
+		stream << std::fixed << std::setprecision(_decimalPlaces) << _number;
+		break;
+
+	case DisplayNumberFormat::Interger:
+		stream << static_cast<int64_t>(std::llround(_number));
+		break;
+
+	case DisplayNumberFormat::Scientific:
+		stream << std::scientific << std::setprecision(_decimalPlaces) << _number;
+		break;
+
+	case DisplayNumberFormat::Engineering:
+		if (_number == 0.0) {
+			stream << "0";
+		}
+		else {
+			const int exp = static_cast<int32_t>(std::floor(std::log10(std::fabs(_number))));
+			const int engExp = exp - (exp % 3);
+			const double mantissa = _number / std::pow(10.0, engExp);
+			stream << std::fixed << std::setprecision(_decimalPlaces) << mantissa << "e" << engExp;
+		}
+		break;
+
+	default:
+		OTAssert(0, "Unknown display number format");
+		break;
+	}
+
+	return stream.str();
+}
+
 template <class T> inline std::string ot::String::numberToHexString(T _number, char _fill, int _length) {
 	std::stringstream ss;
 	ss << std::hex << std::setw(_length) << std::setfill(_fill) << _number;

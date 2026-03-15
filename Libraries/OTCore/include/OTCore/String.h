@@ -33,7 +33,17 @@ namespace ot {
 		OT_DECL_NOCOPY(String)
 		OT_DECL_NODEFAULT(String)
 	public:
-		
+		enum DisplayNumberFormat {
+			Decimal,
+			DecimalFixed,
+			Interger,
+			Scientific,
+			Engineering
+		};
+
+		static std::string toString(DisplayNumberFormat _format);
+		static DisplayNumberFormat stringToDisplayNumberFormat(const std::string& _format);
+
 		//! @brief Use the default convert method to convert the wstring to a string.
 		//! @param _string String to convert.
 		static std::string toString(const std::wstring& _string);
@@ -206,6 +216,8 @@ namespace ot {
 		//! @tparam T Number type.
 		//! @param _string Number string.
 		template <class T> static bool isNumber(const std::string& _string);
+
+		template <typename T> static std::string numberToString(T _number, DisplayNumberFormat _format = DisplayNumberFormat::Decimal, int _decimalPlaces = 3);
 
 		//! @brief Returns a hex string representing the provided number.
 		//! @param _number Number to convert.
