@@ -127,10 +127,10 @@ void ot::Painter2DEditButton::updateText() {
 		m_btn->setText("Linear");
 		
 		m_btnText = "Linear";
-		m_btnTip = "LinearGradient { X1: " + QString::number(actualPainter->getStart().x()) +
-			"; Y1: " + QString::number(actualPainter->getStart().y()) +
-			"; X2: " + QString::number(actualPainter->getFinalStop().x()) +
-			"; Y2: " + QString::number(actualPainter->getFinalStop().y()) +
+		m_btnTip = "LinearGradient { X1: " + QString::number(actualPainter->getStart().getX()) +
+			"; Y1: " + QString::number(actualPainter->getStart().getY()) +
+			"; X2: " + QString::number(actualPainter->getFinalStop().getX()) +
+			"; Y2: " + QString::number(actualPainter->getFinalStop().getY()) +
 			"; Spread: " + QString::fromStdString(toString(actualPainter->getSpread())) +
 			"; ";
 
@@ -150,18 +150,18 @@ void ot::Painter2DEditButton::updateText() {
 		m_btnText = "Radial";
 		
 		if (actualPainter->isFocalPointSet()) {
-			m_btnTip = "RadialGradient { CX: " + QString::number(actualPainter->getCenterPoint().x()) +
-				"; CY: " + QString::number(actualPainter->getCenterPoint().y()) +
+			m_btnTip = "RadialGradient { CX: " + QString::number(actualPainter->getCenterPoint().getX()) +
+				"; CY: " + QString::number(actualPainter->getCenterPoint().getY()) +
 				"; Radius: " + QString::number(actualPainter->getCenterRadius()) +
-				"; FX: " + QString::number(actualPainter->getFocalPoint().x()) +
-				"; FY: " + QString::number(actualPainter->getFocalPoint().y()) +
+				"; FX: " + QString::number(actualPainter->getFocalPoint().getX()) +
+				"; FY: " + QString::number(actualPainter->getFocalPoint().getY()) +
 				"; FR: " + QString::number(actualPainter->getFocalRadius()) +
 				"; Spread: " + QString::fromStdString(toString(actualPainter->getSpread())) +
 				" }";
 		}
 		else {
-			m_btnTip = "RadialGradient { CX: " + QString::number(actualPainter->getCenterPoint().x()) +
-				"; CY: " + QString::number(actualPainter->getCenterPoint().y()) +
+			m_btnTip = "RadialGradient { CX: " + QString::number(actualPainter->getCenterPoint().getX()) +
+				"; CY: " + QString::number(actualPainter->getCenterPoint().getY()) +
 				"; Radius: " + QString::number(actualPainter->getCenterRadius()) +
 				"; Spread: " + QString::fromStdString(toString(actualPainter->getSpread())) +
 				"; ";

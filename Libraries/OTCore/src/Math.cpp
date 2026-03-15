@@ -97,7 +97,7 @@ double ot::Math::calculateShortestDistanceFromPointToBezierCurve(double _px, dou
     for (int i = 0; i <= segments; ++i) {
         double t = static_cast<double>(i) / static_cast<double>(segments);
         Point2DD segmentPoint = Math::calculatePointOnBezierCurve(t, _startX, _startY, _control1X, _control1Y, _control2X, _control2Y, _endX, _endY);
-        double dist = Math::euclideanDistance(_px, _py, segmentPoint.x(), segmentPoint.y());
+        double dist = Math::euclideanDistance(_px, _py, segmentPoint.getX(), segmentPoint.getY());
         if (dist < minDistance) {
             minDistance = dist;
         }

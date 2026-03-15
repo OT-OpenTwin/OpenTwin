@@ -21,7 +21,7 @@
 #include <map>
 
 #include "OTCore/Variable/Variable.h"
-#include "OTCore/GenericDataStruct.h"
+#include "OTCore/DataStruct/GenericDataStruct.h"
 #include "OTCore/Serializable.h"
 
 namespace ot

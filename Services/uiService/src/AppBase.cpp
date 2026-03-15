@@ -57,7 +57,7 @@
 
 #include "OTSystem/Flags.h"
 #include "OTCore/String.h"
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"

@@ -18,16 +18,19 @@
 // @otlicense-end
 
 #pragma once
-#include <string>
-#include <tuple>
-#include <optional>
-#include <map>
-#include <memory>
 
-#include "OTCore/GenericDataStruct.h"
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStruct.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Variable/Variable.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
+
+// std header
+#include <map>
+#include <tuple>
+#include <string>
+#include <memory>
+#include <optional>
 
 namespace ot
 {

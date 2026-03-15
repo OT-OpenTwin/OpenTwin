@@ -23,7 +23,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OTCore/Rect.h"
+#include "OTCore/Geometry/Rect.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Diagram/SequenceDiaCfgParser.h"
 #include "OTGui/VersionGraphVersionCfg.h"

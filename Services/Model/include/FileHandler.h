@@ -23,7 +23,7 @@
 #include "OTModelEntities/IVisualisationText.h"
 #include "OTModelEntities/IVisualisationTable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTGui/Widgets/TableCfg.h"
 #include "OTGui/Widgets/ToolBarButtonCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"

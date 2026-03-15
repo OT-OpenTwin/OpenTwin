@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTGui/Painter/GradientPainterStop2D.h"

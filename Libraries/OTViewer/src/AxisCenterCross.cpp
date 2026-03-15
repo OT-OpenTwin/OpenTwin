@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "OTSystem/OTAssert.h"
+#include "OTCore/Geometry/Point3D.h"
 #include "OTViewer/ViewerSettings.h"
 #include "OTViewer/AxisCenterCross.h"
 
@@ -136,7 +137,7 @@ void AxisCenterCross::createArrow(osg::Geode * _geode, const ot::Color& _color, 
 	}
 	std::list<osg::Vec3> pointList;
 	pointList.push_back(osg::Vec3(0.f, 0.f, 0.f));
-	pointList.push_back(osg::Vec3(pos.x(), pos.y(), pos.z()));
+	pointList.push_back(osg::Vec3(pos.getX(), pos.getY(), pos.getZ()));
 
 	// Create vertices
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array(pointList.size());
@@ -195,8 +196,8 @@ void AxisCenterCross::createDashedLine(osg::Geode * _geode, const ot::Color& _co
 			OTAssert(0, "Unknown orientation");
 			break;
 		}
-		pointList.push_back(osg::Vec3(posF.x(), posF.y(), posF.z()));
-		pointList.push_back(osg::Vec3(posT.x(), posT.y(), posT.z()));
+		pointList.push_back(osg::Vec3(posF.getX(), posF.getY(), posF.getZ()));
+		pointList.push_back(osg::Vec3(posT.getX(), posT.getY(), posT.getZ()));
 	}
 
 	// Create vertices

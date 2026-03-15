@@ -19,12 +19,11 @@
 
 #pragma once
 
-#include "OTModelEntities/Geometry.h"
-
-#include "OTCore/JSON/JSON.h"
+// OpenTwin header
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
-#include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
+#include "OTCore/JSON/JSON.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/TableRange.h"
 #include "OTGui/EntityTreeItem.h"
@@ -34,12 +33,15 @@
 #include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTWidgets/SelectionData.h"
 #include "OTViewer/ViewChangedStates.h"
+#include "OTModelEntities/Geometry.h"
 
+// Qt header
+#include <QtGui/qcolor.h>
+
+// std header
 #include <list>
 #include <vector>
 #include <string>
-
-#include <qcolor.h>
 
 class Model;
 class QPen;

@@ -99,8 +99,8 @@ bool ot::GraphicsDecoration::isDecorationFilled() const {
 }
 
 QPainterPath ot::GraphicsDecoration::createTrianglePath() const {
-	const double w = m_config.getSize().width();
-	const double h = m_config.getSize().height();
+	const double w = m_config.getSize().getWidth();
+	const double h = m_config.getSize().getHeight();
 
 	QPainterPath path;
 	path.moveTo(-(w / 2.), 0.);          // tip (left)
@@ -111,8 +111,8 @@ QPainterPath ot::GraphicsDecoration::createTrianglePath() const {
 }
 
 QPainterPath ot::GraphicsDecoration::createArrowPath() const {
-	const double w = m_config.getSize().width();
-	const double h = m_config.getSize().height();
+	const double w = m_config.getSize().getWidth();
+	const double h = m_config.getSize().getHeight();
 
 	QPainterPath path;
 	path.moveTo(-(w / 2.), 0.);         // tip
@@ -124,8 +124,8 @@ QPainterPath ot::GraphicsDecoration::createArrowPath() const {
 }
 
 QPainterPath ot::GraphicsDecoration::createVArrowPath() const {
-	const double w = m_config.getSize().width();
-	const double h = m_config.getSize().height();
+	const double w = m_config.getSize().getWidth();
+	const double h = m_config.getSize().getHeight();
 
 	QPainterPath path;
 	path.moveTo(w / 2., -(h / 2.));      // top back
@@ -135,8 +135,8 @@ QPainterPath ot::GraphicsDecoration::createVArrowPath() const {
 }
 
 QPainterPath ot::GraphicsDecoration::createCirclePath() const {
-	const double w = m_config.getSize().width();
-	const double h = m_config.getSize().height();
+	const double w = m_config.getSize().getWidth();
+	const double h = m_config.getSize().getHeight();
 
 	QPainterPath path;
 	path.addEllipse(QPointF(0., 0.), w / 2., h / 2.);
@@ -144,8 +144,8 @@ QPainterPath ot::GraphicsDecoration::createCirclePath() const {
 }
 
 QPainterPath ot::GraphicsDecoration::createSquarePath() const {
-	const double w = m_config.getSize().width();
-	const double h = m_config.getSize().height();
+	const double w = m_config.getSize().getWidth();
+	const double h = m_config.getSize().getHeight();
 
 	QPainterPath path;
 	path.moveTo(-(w / 2.), (h / 2.));
@@ -157,8 +157,8 @@ QPainterPath ot::GraphicsDecoration::createSquarePath() const {
 }
 
 QPainterPath ot::GraphicsDecoration::createDiamondPath() const {
-	const double w = m_config.getSize().width();
-	const double h = m_config.getSize().height();
+	const double w = m_config.getSize().getWidth();
+	const double h = m_config.getSize().getHeight();
 
 	QPainterPath path;
 	path.moveTo(-(w / 2.), 0.);         // left tip
@@ -170,8 +170,8 @@ QPainterPath ot::GraphicsDecoration::createDiamondPath() const {
 }
 
 QPainterPath ot::GraphicsDecoration::createCrossPath() const {
-	const double w = m_config.getSize().width();
-	const double h = m_config.getSize().height();
+	const double w = m_config.getSize().getWidth();
+	const double h = m_config.getSize().getHeight();
 
 	QPainterPath path;
 	path.moveTo(-(w / 2.), -(h / 2.));

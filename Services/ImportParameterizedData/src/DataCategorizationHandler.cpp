@@ -27,7 +27,7 @@
 #include "SelectionCategorisationColours.h"
 
 // OpenTwin header
-#include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
 #include "OTCore/EntityName.h"

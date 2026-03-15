@@ -18,10 +18,15 @@
 // @otlicense-end
 
 #pragma once
-#include <string>
+
+// OpenTwin header
 #include "OTModelEntities/CSVProperties.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
+
+// std header
+#include <string>
 #include <vector>
-#include "OTCore/GenericDataStructMatrix.h"
+
 class CSVToTableTransformer
 {
 public:

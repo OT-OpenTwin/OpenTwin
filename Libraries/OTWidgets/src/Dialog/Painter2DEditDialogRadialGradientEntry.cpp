@@ -42,7 +42,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	m_centerX->setDecimals(2);
 	m_centerX->setSuffix("%");
 	m_centerX->setToolTip("The center X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
-	if (actualPainter) m_centerX->setValue(actualPainter->getCenterPoint().x() * 100.);
+	if (actualPainter) m_centerX->setValue(actualPainter->getCenterPoint().getX() * 100.);
 	positionLay->addWidget(centerXLabel, 0, 0);
 	positionLay->addWidget(m_centerX, 0, 1);
 
@@ -52,7 +52,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	m_centerY->setDecimals(2);
 	m_centerY->setSuffix("%");
 	m_centerY->setToolTip("The center Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
-	if (actualPainter) m_centerY->setValue(actualPainter->getCenterPoint().y() * 100.);
+	if (actualPainter) m_centerY->setValue(actualPainter->getCenterPoint().getY() * 100.);
 	positionLay->addWidget(centerYLabel, 1, 0);
 	positionLay->addWidget(m_centerY, 1, 1);
 
@@ -79,7 +79,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	m_focalX->setDecimals(2);
 	m_focalX->setSuffix("%");
 	m_focalX->setToolTip("The fianl stop X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
-	if (actualPainter) m_focalX->setValue(actualPainter->getFocalPoint().x() * 100.);
+	if (actualPainter) m_focalX->setValue(actualPainter->getFocalPoint().getX() * 100.);
 	positionLay->addWidget(focalXLabel, 4, 0);
 	positionLay->addWidget(m_focalX, 4, 1);
 
@@ -89,7 +89,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	m_focalY->setDecimals(2);
 	m_focalY->setSuffix("%");
 	m_focalY->setToolTip("The fianl stop Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
-	if (actualPainter) m_focalY->setValue(actualPainter->getFocalPoint().x() * 100.);
+	if (actualPainter) m_focalY->setValue(actualPainter->getFocalPoint().getX() * 100.);
 	positionLay->addWidget(focalYLabel, 5, 0);
 	positionLay->addWidget(m_focalY, 5, 1);
 

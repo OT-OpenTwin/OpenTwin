@@ -19,11 +19,17 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTCore/OTClassHelper.h"
+
 namespace ot {
 
 	//! @class Point3D
 	//! @brief Three dimensional point
-	template <class T> class Point3D {
+	template <class T> class Point3D 
+	{
+		OT_DECL_DEFCOPY(Point3D)
+		OT_DECL_DEFMOVE(Point3D)
 	public:
 		//! @brief Constructor
 		//! @param _x The initial X value
@@ -31,11 +37,6 @@ namespace ot {
 		//! @param _z The initial Z value
 		Point3D(T _x, T _y, T _z);
 
-		//! @brief Copy constructor
-		//! @param _other The other 3D point
-		Point3D(const Point3D<T> & _other);
-
-		Point3D<T> & operator = (const Point3D<T> & _other);
 		Point3D<T> operator + (const Point3D<T> & _other) const;
 		Point3D<T> operator - (const Point3D<T> & _other) const;
 		Point3D<T> operator * (const Point3D<T> & _other) const;
@@ -48,13 +49,13 @@ namespace ot {
 		bool operator != (const Point3D<T> & _other);
 
 		//! @brief Returns the current X value
-		inline T x(void) const { return m_x; }
+		inline T getX() const { return m_x; }
 
 		//! @brief Returns the current Y value
-		inline T y(void) const { return m_y; }
+		inline T getY() const { return m_y; }
 
 		//! @brief Returns the current Z value
-		inline T z(void) const { return m_z; }
+		inline T getZ() const { return m_z; }
 
 		//! @brief Will set the X value
 		//! @param _x The X value to set
@@ -103,13 +104,6 @@ namespace ot {
 	}; // class Point3D
 
 	template <class T> Point3D<T>::Point3D(T _x, T _y, T _z) { m_x = _x; m_y = _y; m_z = _z; }
-
-	template <class T> Point3D<T>::Point3D(const Point3D<T> & _other) { m_x = _other.x(); m_y = _other.y(); m_z = _other.z(); }
-
-	template <class T> Point3D<T> & Point3D<T>::operator = (const Point3D<T> & _other) {
-		m_x = _other.x(); m_y = _other.y(); m_z = _other.z();
-		return *this;
-	}
 
 	template <class T> Point3D<T> Point3D<T>::operator + (const Point3D<T> & _other) const {
 		Point3D<T> ret(m_x + _other.m_x, m_y + _other.m_y, m_z + _other.m_z);
@@ -166,9 +160,9 @@ namespace ot {
 	}
 
 	template <class T> bool Point3D<T>::operator == (const Point3D<T> & _other) {
-		if (m_x != _other.x()) { return false; }
-		if (m_y != _other.y()) { return false; }
-		if (m_z != _other.z()) { return false; }
+		if (m_x != _other.getX()) { return false; }
+		if (m_y != _other.getY()) { return false; }
+		if (m_z != _other.getZ()) { return false; }
 		return true;
 	}
 

@@ -100,8 +100,8 @@ void WrappedRectItem::fillPropertyGrid(void) {
 	this->fillBasePropertyGrid(cfg);
 	
 	PropertyGroup* rectangleGroup = new PropertyGroup("Rectangle");
-	rectangleGroup->addProperty(new PropertyDouble("Width", this->getRectangleSize().width(), 0., std::numeric_limits<double>::max()));
-	rectangleGroup->addProperty(new PropertyDouble("Height", this->getRectangleSize().height(), 0., std::numeric_limits<double>::max()));
+	rectangleGroup->addProperty(new PropertyDouble("Width", this->getRectangleSize().getWidth(), 0., std::numeric_limits<double>::max()));
+	rectangleGroup->addProperty(new PropertyDouble("Height", this->getRectangleSize().getHeight(), 0., std::numeric_limits<double>::max()));
 	rectangleGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().getPainter()));
 	rectangleGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().getWidth(), 0., std::numeric_limits<double>::max()));
 	rectangleGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
@@ -129,7 +129,7 @@ void WrappedRectItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		this->setRectangleSize(QSizeF(actualProperty->getValue(), this->getRectangleSize().height()));
+		this->setRectangleSize(QSizeF (actualProperty->getValue(), this->getRectangleSize().getHeight()));
 	}
 	else if (group->getName() == "Rectangle" && _property->getPropertyName() == "Height") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
@@ -138,7 +138,7 @@ void WrappedRectItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		this->setRectangleSize(QSizeF(this->getRectangleSize().width(), actualProperty->getValue()));
+		this->setRectangleSize(QSizeF(this->getRectangleSize().getWidth(), actualProperty->getValue()));
 	}
 	else if (group->getName() == "Rectangle" && _property->getPropertyName() == "Border Painter") {
 		const PropertyPainter2D* actualProperty = dynamic_cast<const PropertyPainter2D*>(_property);

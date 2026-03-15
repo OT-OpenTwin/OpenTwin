@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Matrix2.h"
+#include "OTCore/Matrix/Matrix2.h"
 
 // std header
 #include <vector>
@@ -34,4 +34,4 @@ public:
 	static Matrix2<T>* createColumnWiseOptimizedEmpty(int64_t _rows, int64_t _columns);
 };
 
-#include "OTCore/Matrix2Factory.hpp"
+#include "OTCore/Matrix/Matrix2Factory.hpp"

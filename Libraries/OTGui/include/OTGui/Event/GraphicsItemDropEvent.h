@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTGui/Event/GuiEvent.h"
 
 namespace ot {

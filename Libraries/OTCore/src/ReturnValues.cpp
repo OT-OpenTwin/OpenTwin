@@ -17,12 +17,12 @@
 // limitations under the License.
 // @otlicense-end
 
+// OpenTwin header
 #include "OTCore/ReturnValues.h"
-
-#include "OTCore/GenericDataStructSingle.h"
-#include "OTCore/GenericDataStructVector.h"
-#include "OTCore/GenericDataStructMatrix.h"
-#include "OTCore/GenericDataStructFactory.h"
+#include "OTCore/DataStruct/GenericDataStructSingle.h"
+#include "OTCore/DataStruct/GenericDataStructVector.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructFactory.h"
 #include "OTCore/Variable/VariableToJSONConverter.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
 

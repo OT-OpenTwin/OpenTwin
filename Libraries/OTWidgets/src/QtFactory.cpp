@@ -163,25 +163,25 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
     else if (_painter->getFactoryKey() == OT_FactoryKey_CheckerboardPainter2D) {
         const CheckerboardPainter2D* painter = dynamic_cast<const CheckerboardPainter2D*>(_painter);
         OTAssertNullptr(painter);
-        OTAssert(painter->getCellSize().width() > 0, "Invalid cell width");
-        OTAssert(painter->getCellSize().height() > 0, "Invalid cell height");
+        OTAssert(painter->getCellSize().getWidth() > 0, "Invalid cell width");
+        OTAssert(painter->getCellSize().getHeight() > 0, "Invalid cell height");
 
         QBrush primaryBrush = QtFactory::toQBrush(painter->getPrimaryPainter());
         QBrush secondaryBrush = QtFactory::toQBrush(painter->getSecondaryPainter());
 
-        QPixmap checkerboard(painter->getCellSize().width() * 2, painter->getCellSize().height() * 2);
+        QPixmap checkerboard(painter->getCellSize().getWidth() * 2, painter->getCellSize().getHeight() * 2);
         checkerboard.fill(Qt::transparent);
 
         QPainter pixmapPainter(&checkerboard);
         
         pixmapPainter.setBrush(primaryBrush);
         pixmapPainter.setPen(Qt::NoPen);
-        pixmapPainter.drawRect(0, 0, painter->getCellSize().width(), painter->getCellSize().height()); // TopLeft
-        pixmapPainter.drawRect(painter->getCellSize().width(), painter->getCellSize().height(), painter->getCellSize().width(), painter->getCellSize().height()); // BottomRight
+        pixmapPainter.drawRect(0, 0, painter->getCellSize().getWidth(), painter->getCellSize().getHeight()); // TopLeft
+        pixmapPainter.drawRect(painter->getCellSize().getWidth(), painter->getCellSize().getHeight(), painter->getCellSize().getWidth(), painter->getCellSize().getHeight()); // BottomRight
 
         pixmapPainter.setBrush(secondaryBrush);
-        pixmapPainter.drawRect(painter->getCellSize().width(), 0, painter->getCellSize().width(), painter->getCellSize().height()); // TopRight
-        pixmapPainter.drawRect(0, painter->getCellSize().height(), painter->getCellSize().width(), painter->getCellSize().height()); // BottomLeft
+        pixmapPainter.drawRect(painter->getCellSize().getWidth(), 0, painter->getCellSize().getWidth(), painter->getCellSize().getHeight()); // TopRight
+        pixmapPainter.drawRect(0, painter->getCellSize().getHeight(), painter->getCellSize().getWidth(), painter->getCellSize().getHeight()); // BottomLeft
         pixmapPainter.end();
 
         return QBrush(checkerboard);

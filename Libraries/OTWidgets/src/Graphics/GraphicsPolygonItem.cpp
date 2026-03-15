@@ -73,10 +73,10 @@ QSizeF ot::GraphicsPolygonItem::getPreferredGraphicsItemSize(void) const {
 	QPointF bottomRightPoint(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest());
 
 	for (const Point2DD& pt : cfg->getPoints()) {
-		if (pt.x() < topLeftPoint.x()) topLeftPoint.setX(pt.x());
-		if (pt.y() < topLeftPoint.y()) topLeftPoint.setY(pt.y());
-		if (pt.x() > bottomRightPoint.x()) bottomRightPoint.setX(pt.x());
-		if (pt.y() > bottomRightPoint.y()) bottomRightPoint.setY(pt.y());
+		if (pt.getX() < topLeftPoint.x()) topLeftPoint.setX(pt.getX());
+		if (pt.getY() < topLeftPoint.y()) topLeftPoint.setY(pt.getY());
+		if (pt.getX() > bottomRightPoint.x()) bottomRightPoint.setX(pt.getX());
+		if (pt.getY() > bottomRightPoint.y()) bottomRightPoint.setY(pt.getY());
 	}
 
 	if (topLeftPoint.x() < 0.) {

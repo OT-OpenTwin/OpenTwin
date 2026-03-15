@@ -100,8 +100,8 @@ void WrappedTriangleItem::fillPropertyGrid(void) {
 	this->fillBasePropertyGrid(cfg);
 
 	PropertyGroup* triangleGroup = new PropertyGroup("Triangle");
-	triangleGroup->addProperty(new PropertyDouble("Width", this->getTriangleSize().width(), 0., std::numeric_limits<double>::max()));
-	triangleGroup->addProperty(new PropertyDouble("Height", this->getTriangleSize().height(), 0., std::numeric_limits<double>::max()));
+	triangleGroup->addProperty(new PropertyDouble("Width", this->getTriangleSize().getWidth(), 0., std::numeric_limits<double>::max()));
+	triangleGroup->addProperty(new PropertyDouble("Height", this->getTriangleSize().getHeight(), 0., std::numeric_limits<double>::max()));
 	{
 		std::list<std::string> possibleSelection;
 		possibleSelection.push_back(GraphicsTriangleItemCfg::triangleShapeToString(GraphicsTriangleItemCfg::Triangle));
@@ -146,7 +146,7 @@ void WrappedTriangleItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		this->setTriangleSize(QSizeF(actualProperty->getValue(), this->getTriangleSize().height()));
+		this->setTriangleSize(QSizeF(actualProperty->getValue(), this->getTriangleSize().getHeight()));
 	}
 	else if (group->getName() == "Triangle" && _property->getPropertyName() == "Height") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
@@ -155,7 +155,7 @@ void WrappedTriangleItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		this->setTriangleSize(QSizeF(this->getTriangleSize().width(), actualProperty->getValue()));
+		this->setTriangleSize(QSizeF(this->getTriangleSize().getWidth(), actualProperty->getValue()));
 	}
 	else if (group->getName() == "Triangle" && _property->getPropertyName() == "Shape") {
 		const PropertyStringList* actualProperty = dynamic_cast<const PropertyStringList*>(_property);

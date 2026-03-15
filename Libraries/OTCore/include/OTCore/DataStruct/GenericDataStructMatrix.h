@@ -19,22 +19,24 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStruct.h"
+#include "OTCore/Variable/Variable.h"
 #include <stdint.h>
+
+// std header
 #include <vector>
 #include <functional>
 
-#include "OTCore/Variable/Variable.h"
-#include "GenericDataStruct.h"
+namespace ot {
 
-namespace ot
-{
-	struct __declspec(dllexport) MatrixEntryPointer
+	struct MatrixEntryPointer
 	{
 		uint32_t m_column = 0;
 		uint32_t m_row = 0;
 	};
 
-	class __declspec(dllexport) GenericDataStructMatrix : public GenericDataStruct
+	class OT_CORE_API_EXPORT GenericDataStructMatrix : public GenericDataStruct
 	{
 	public:
 		//! @brief Only for deserialisation. Generally use the constructor with explicit topology data.
@@ -50,17 +52,17 @@ namespace ot
 		GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer);
 		GenericDataStructMatrix(uint32_t _rows, uint32_t _columns, ot::Variable _defaultValue);
 		GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable _defaultValue);
-		
+
 		void setValue(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable&& _value);
 		void setValue(const MatrixEntryPointer& _matrixEntryPointer, const ot::Variable& _value);
 		void setValues(const ot::Variable* _values, uint32_t _size);
-		
+
 		//! @brief Assumes the list to be a linearised matrix of the topology this class was initialised with.
 		void setValues(std::list<ot::Variable> _values);
 		/// <summary>
 		/// column-major access
 		/// </summary>
-		const ot::Variable& getValue(const MatrixEntryPointer& _matrixEntryPointer)const;
+		const ot::Variable& getValue(const MatrixEntryPointer& _matrixEntryPointer) const;
 		const ot::Variable* getValues()const;
 		const uint32_t getNumberOfColumns() const { return m_numberOfColumns; }
 		const uint32_t getNumberOfRows() const { return m_numberOfRows; }
@@ -73,12 +75,12 @@ namespace ot
 	private:
 		uint32_t m_numberOfColumns = 0;
 		uint32_t m_numberOfRows = 0;
-		
+
 		std::vector<ot::Variable> m_values;
 		void allocateValueMemory();
-		void allocateValueMemory( const ot::Variable& _defaultValue);
-		void allocateValueMemory( ot::Variable&& _defaultValue);
-		
+		void allocateValueMemory(const ot::Variable& _defaultValue);
+		void allocateValueMemory(ot::Variable&& _defaultValue);
+
 		inline uint32_t getIndex(const uint32_t& _columnIndex, const uint32_t& _rowIndex) const { return m_numberOfColumns * _rowIndex + _columnIndex; }
 	};
 

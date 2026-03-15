@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Painter/GradientPainter2D.h"
 #include "OTGui/Painter/GradientPainterStop2D.h"

@@ -17,9 +17,12 @@
 // limitations under the License.
 // @otlicense-end
 
+// Google test header
 #include <gtest/gtest.h>
-#include "OTCore/GenericDataStructMatrix.h"
-#include "OTCore/GenericDataStructVector.h"
+
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructVector.h"
 
 TEST(GenericDataStructMatrix, FillingWithOneValue)
 {

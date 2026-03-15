@@ -192,21 +192,21 @@ ot::Point2DD ot::Grid::snapToGrid(const Point2DD& _pt) const {
 
 ot::Point2D ot::Grid::snapToGrid(const Point2D& _pt, const Point2D& _gridStep) {
 	Point2D pt = _pt;
-	if (_gridStep.x() > 0) {
-		if (pt.x() < 0.) {
-			pt.setX(pt.x() + (((int)pt.x() * (-1)) % _gridStep.x()));
+	if (_gridStep.getX() > 0) {
+		if (pt.getX() < 0.) {
+			pt.setX(pt.getX() + (((int)pt.getX() * (-1)) % _gridStep.getX()));
 		}
 		else {
-			pt.setX(pt.x() - (((int)pt.x()) % _gridStep.x()));
+			pt.setX(pt.getX() - (((int)pt.getX()) % _gridStep.getX()));
 		}
 	}
 
-	if (_gridStep.y() > 0) {
-		if (pt.y() < 0.) {
-			pt.setY(pt.y() + (((int)pt.y() * (-1)) % _gridStep.y()));
+	if (_gridStep.getY() > 0) {
+		if (pt.getY() < 0.) {
+			pt.setY(pt.getY() + (((int)pt.getY() * (-1)) % _gridStep.getY()));
 		}
 		else {
-			pt.setY(pt.y() - (((int)pt.y()) % _gridStep.y()));
+			pt.setY(pt.getY() - (((int)pt.getY()) % _gridStep.getY()));
 		}
 	}
 
@@ -215,25 +215,25 @@ ot::Point2D ot::Grid::snapToGrid(const Point2D& _pt, const Point2D& _gridStep) {
 
 ot::Point2DF ot::Grid::snapToGrid(const Point2DF& _pt, const Point2D& _gridStep) {
 	Point2DF pt = _pt;
-	if (_gridStep.x() > 0) {
-		pt.setX(std::round(pt.x()));
+	if (_gridStep.getX() > 0) {
+		pt.setX(std::round(pt.getX()));
 
-		if (pt.x() < 0.) {
-			pt.setX(pt.x() + (float)(((int)pt.x() * (-1)) % _gridStep.x()));
+		if (pt.getX() < 0.) {
+			pt.setX(pt.getX() + (float)(((int)pt.getX() * (-1)) % _gridStep.getX()));
 		}
 		else {
-			pt.setX(pt.x() - (float)(((int)pt.x()) % _gridStep.x()));
+			pt.setX(pt.getX() - (float)(((int)pt.getX()) % _gridStep.getX()));
 		}
 	}
 
-	if (_gridStep.y() > 0) {
-		pt.setY(std::round(pt.y()));
+	if (_gridStep.getY() > 0) {
+		pt.setY(std::round(pt.getY()));
 
-		if (pt.y() < 0.) {
-			pt.setY(pt.y() + (float)(((int)pt.y() * (-1)) % _gridStep.y()));
+		if (pt.getY() < 0.) {
+			pt.setY(pt.getY() + (float)(((int)pt.getY() * (-1)) % _gridStep.getY()));
 		}
 		else {
-			pt.setY(pt.y() - (float)(((int)pt.y()) % _gridStep.y()));
+			pt.setY(pt.getY() - (float)(((int)pt.getY()) % _gridStep.getY()));
 		}
 	}
 
@@ -242,25 +242,25 @@ ot::Point2DF ot::Grid::snapToGrid(const Point2DF& _pt, const Point2D& _gridStep)
 
 ot::Point2DD ot::Grid::snapToGrid(const Point2DD& _pt, const Point2D& _gridStep) {
 	Point2DD pt = _pt;
-	if (_gridStep.x() > 0) {
-		pt.setX(std::round(pt.x()));
+	if (_gridStep.getX() > 0) {
+		pt.setX(std::round(pt.getX()));
 
-		if (pt.x() < 0.) {
-			pt.setX(pt.x() + (double)(((int)pt.x() * (-1)) % _gridStep.x()));
+		if (pt.getX() < 0.) {
+			pt.setX(pt.getX() + (double)(((int)pt.getX() * (-1)) % _gridStep.getX()));
 		}
 		else {
-			pt.setX(pt.x() - (double)(((int)pt.x()) % _gridStep.x()));
+			pt.setX(pt.getX() - (double)(((int)pt.getX()) % _gridStep.getX()));
 		}
 	}
 
-	if (_gridStep.y() > 0) {
-		pt.setY(std::round(pt.y()));
+	if (_gridStep.getY() > 0) {
+		pt.setY(std::round(pt.getY()));
 
-		if (pt.y() < 0.) {
-			pt.setY(pt.y() + (double)(((int)pt.y() * (-1)) % _gridStep.y()));
+		if (pt.getY() < 0.) {
+			pt.setY(pt.getY() + (double)(((int)pt.getY() * (-1)) % _gridStep.getY()));
 		}
 		else {
-			pt.setY(pt.y() - (double)(((int)pt.y()) % _gridStep.y()));
+			pt.setY(pt.getY() - (double)(((int)pt.getY()) % _gridStep.getY()));
 		}
 	}
 

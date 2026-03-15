@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Matrix2Factory.h"
+#include "OTCore/Matrix/Matrix2Factory.h"
 
 template<class T>
 inline Matrix2<T>* Matrix2Factory<T>::createRowWiseOptimized(int64_t rows, int64_t columns, std::vector<std::vector<T>> columnWiseData) {

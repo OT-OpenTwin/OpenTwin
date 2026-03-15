@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
-#include "OTCore/Matrix.h"
+#include "OTCore/Matrix/Matrix.h"
 
 // std header
 #include <vector>

@@ -92,7 +92,7 @@ void WrappedSquareItem::fillPropertyGrid(void) {
 	this->fillBasePropertyGrid(cfg);
 	
 	PropertyGroup* squareGroup = new PropertyGroup("Square");
-	squareGroup->addProperty(new PropertyDouble("Size", this->getRectangleSize().width(), 0., std::numeric_limits<double>::max()));
+	squareGroup->addProperty(new PropertyDouble("Size", this->getRectangleSize().getWidth(), 0., std::numeric_limits<double>::max()));
 	squareGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().getPainter()));
 	squareGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().getWidth(), 0., std::numeric_limits<double>::max()));
 	squareGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));

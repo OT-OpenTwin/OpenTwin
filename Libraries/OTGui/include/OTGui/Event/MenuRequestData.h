@@ -3,7 +3,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTCore/InClassFactory.h"
 #include "OTCore/BasicEntityInformation.h"
 #include "OTGui/GuiTypes.h"

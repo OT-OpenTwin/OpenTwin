@@ -26,7 +26,7 @@
 #include "ProjectHelperBatchHelper.h"
 
 // OpenTwin header
-#include "OTCore/Rect.h"
+#include "OTCore/Geometry/Rect.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Style/Font.h"
 #include "OTGui/Style/PenCfg.h"

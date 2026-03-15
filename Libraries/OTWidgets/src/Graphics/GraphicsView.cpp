@@ -557,7 +557,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 		}
 		else {
 			this->beginItemMove();
-			m_scene->moveAllSelectedItems(Point2DD(-m_scene->getGrid().getGridStep().x(), 0.));
+			m_scene->moveAllSelectedItems(Point2DD(-m_scene->getGrid().getGridStep().getX(), 0.));
 		}
 	}
 	else if (_event->key() == Qt::Key_Right) {
@@ -566,7 +566,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 		}
 		else {
 			this->beginItemMove();
-			m_scene->moveAllSelectedItems(Point2DD(m_scene->getGrid().getGridStep().x(), 0.));
+			m_scene->moveAllSelectedItems(Point2DD(m_scene->getGrid().getGridStep().getX(), 0.));
 		}
 	}
 	else if (_event->key() == Qt::Key_Up) {
@@ -575,7 +575,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 		}
 		else {
 			this->beginItemMove();
-			m_scene->moveAllSelectedItems(Point2DD(0., -m_scene->getGrid().getGridStep().y()));
+			m_scene->moveAllSelectedItems(Point2DD(0., -m_scene->getGrid().getGridStep().getY()));
 		}
 	}
 	else if (_event->key() == Qt::Key_Down) {
@@ -584,7 +584,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 		}
 		else {
 			this->beginItemMove();
-			m_scene->moveAllSelectedItems(Point2DD(0., m_scene->getGrid().getGridStep().y()));
+			m_scene->moveAllSelectedItems(Point2DD(0., m_scene->getGrid().getGridStep().getY()));
 		}
 	}
 	else if (_event->key() == Qt::Key_R) {

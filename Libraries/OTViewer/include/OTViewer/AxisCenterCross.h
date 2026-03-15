@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "OTCore/Point3D.h"
 #include "OTCore/Color.h"
 #include <osg/Geode>
 

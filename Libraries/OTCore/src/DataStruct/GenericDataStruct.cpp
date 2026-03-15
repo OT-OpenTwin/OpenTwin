@@ -17,7 +17,8 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/GenericDataStruct.h"
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStruct.h"
 
 void ot::GenericDataStruct::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 {

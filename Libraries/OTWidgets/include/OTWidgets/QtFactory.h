@@ -20,10 +20,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Rect.h"
+#include "OTCore/Geometry/Rect.h"
 #include "OTCore/Color.h"
-#include "OTCore/Size2D.h"
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Size2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTGui/Path2D.h"
 #include "OTGui/Transform.h"
 #include "OTGui/TableRange.h"
@@ -65,16 +65,16 @@ namespace ot {
 		static inline ot::Color toColor(const QColor& _color) { return ot::Color(_color.red(), _color.green(), _color.blue(), _color.alpha()); };
 		static inline ot::ColorF toColorF(const QColor& _color) { return ot::Color(_color.red(), _color.green(), _color.blue(), _color.alpha()).toColorF(); };
 
-		static inline QPoint toQPoint(const Point2D& _pt) noexcept { return QPoint(_pt.x(), _pt.y()); };
-		static inline QPointF toQPoint(const Point2DF& _pt) noexcept { return QPointF((qreal)_pt.x(), (qreal)_pt.y()); };
-		static inline QPointF toQPoint(const Point2DD& _pt) noexcept { return QPointF((qreal)_pt.x(), (qreal)_pt.y()); };
+		static inline QPoint toQPoint(const Point2D& _pt) noexcept { return QPoint(_pt.getX(), _pt.getY()); };
+		static inline QPointF toQPoint(const Point2DF& _pt) noexcept { return QPointF((qreal)_pt.getX(), (qreal)_pt.getY()); };
+		static inline QPointF toQPoint(const Point2DD& _pt) noexcept { return QPointF((qreal)_pt.getX(), (qreal)_pt.getY()); };
 
 		static inline ot::Point2D toPoint2D(const QPoint& _pt) { return ot::Point2D(_pt.x(), _pt.y()); };
 		static inline ot::Point2DD toPoint2D(const QPointF& _pt) { return ot::Point2DD(_pt.x(), _pt.y()); };
 
-		static inline QSize toQSize(const Size2D& _s) noexcept { return QSize(_s.width(), _s.height()); };
-		static inline QSizeF toQSize(const Size2DF& _s) noexcept { return QSizeF((qreal)_s.width(), (qreal)_s.height()); };
-		static inline QSizeF toQSize(const Size2DD& _s) noexcept { return QSizeF((qreal)_s.width(), (qreal)_s.height()); };
+		static inline QSize toQSize(const Size2D& _s) noexcept { return QSize(_s.getWidth(), _s.getHeight()); };
+		static inline QSizeF toQSize(const Size2DF& _s) noexcept { return QSizeF((qreal)_s.getWidth(), (qreal)_s.getHeight()); };
+		static inline QSizeF toQSize(const Size2DD& _s) noexcept { return QSizeF((qreal)_s.getWidth(), (qreal)_s.getHeight()); };
 
 		static inline Size2D toSize2D(const QSize& _s) { return Size2D(_s.width(), _s.height()); };
 		static inline Size2DD toSize2D(const QSizeF& _s) { return Size2DD(_s.width(), _s.height()); };

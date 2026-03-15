@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Rect.h"
+#include "OTCore/Geometry/Rect.h"
 
 ot::Rect::Rect() 
     : m_topLeft(0, 0), m_bottomRight(0, 0)
@@ -29,12 +29,14 @@ ot::Rect::Rect(const Point2D& _topLeft, const Point2D& _bottomRight)
 {}
 
 ot::Rect::Rect(const Point2D& _topLeft, const Size2D& _size)
-    : m_topLeft(_topLeft), m_bottomRight(_topLeft.x() + _size.width(), _topLeft.y() + _size.height())
+    : m_topLeft(_topLeft), m_bottomRight(_topLeft.getX() + _size.getWidth(), _topLeft.getY() + _size.getHeight())
 {}
 
-ot::Rect::Rect(const Rect& _other)
-    : m_topLeft(_other.m_topLeft), m_bottomRight(_other.m_bottomRight)
-{}
+ot::Rect::Rect(const ConstJsonObject& _jsonObject)
+    : Rect()
+{
+	this->setFromJsonObject(_jsonObject);
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -58,28 +60,28 @@ void ot::Rect::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 ot::Rect ot::Rect::unionWith(const Rect& _other) const {
     Point2D newTopLeft(
-        std::min(m_topLeft.x(), _other.getTopLeft().x()),
-        std::min(m_topLeft.y(), _other.getTopLeft().y())
+        std::min(m_topLeft.getX(), _other.getTopLeft().getX()),
+        std::min(m_topLeft.getY(), _other.getTopLeft().getY())
     );
     Point2D newBottomRight(
-        std::max(m_bottomRight.x(), _other.getBottomRight().x()),
-        std::max(m_bottomRight.y(), _other.getBottomRight().y())
+        std::max(m_bottomRight.getX(), _other.getBottomRight().getX()),
+        std::max(m_bottomRight.getY(), _other.getBottomRight().getY())
     );
     return Rect(newTopLeft, newBottomRight);
 }
 
 ot::Rect ot::Rect::intersectsWith(const Rect& _other) const {
     Point2D newTopLeft(
-        std::max(m_topLeft.x(), _other.getTopLeft().x()),
-        std::max(m_topLeft.y(), _other.getTopLeft().y())
+        std::max(m_topLeft.getX(), _other.getTopLeft().getX()),
+        std::max(m_topLeft.getY(), _other.getTopLeft().getY())
     );
     Point2D newBottomRight(
-        std::min(m_bottomRight.x(), _other.getBottomRight().x()),
-        std::min(m_bottomRight.y(), _other.getBottomRight().y())
+        std::min(m_bottomRight.getX(), _other.getBottomRight().getX()),
+        std::min(m_bottomRight.getY(), _other.getBottomRight().getY())
     );
 
     // Check if there is no intersection
-    if (newTopLeft.x() > newBottomRight.x() || newTopLeft.y() > newBottomRight.y()) {
+    if (newTopLeft.getX() > newBottomRight.getX() || newTopLeft.getY() > newBottomRight.getY()) {
         return Rect(Point2D(0, 0), Point2D(0, 0));
     }
     return Rect(newTopLeft, newBottomRight);
@@ -108,7 +110,7 @@ ot::RectD ot::Rect::toRectD(void) const {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::RectF::RectF() 
+ot::RectF::RectF()
     : m_topLeft(0.f, 0.f), m_bottomRight(0.f, 0.f)
 {}
 
@@ -117,12 +119,14 @@ ot::RectF::RectF(const Point2DF& _topLeft, const Point2DF& _bottomRight)
 {}
 
 ot::RectF::RectF(const Point2DF& _topLeft, const Size2DF& _size)
-    : m_topLeft(_topLeft), m_bottomRight(_topLeft.x() + _size.width(), _topLeft.y() + _size.height())
+    : m_topLeft(_topLeft), m_bottomRight(_topLeft.getX() + _size.getWidth(), _topLeft.getY() + _size.getHeight())
 {}
 
-ot::RectF::RectF(const RectF& _other)
-    : m_topLeft(_other.m_topLeft), m_bottomRight(_other.m_bottomRight)
-{}
+ot::RectF::RectF(const ConstJsonObject& _jsonObject)
+    : RectF()
+{
+    this->setFromJsonObject(_jsonObject);
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -146,28 +150,28 @@ void ot::RectF::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 ot::RectF ot::RectF::unionWith(const RectF& _other) const {
     Point2DF newTopLeft(
-        std::min(m_topLeft.x(), _other.getTopLeft().x()),
-        std::min(m_topLeft.y(), _other.getTopLeft().y())
+        std::min(m_topLeft.getX(), _other.getTopLeft().getX()),
+        std::min(m_topLeft.getY(), _other.getTopLeft().getY())
     );
     Point2DF newBottomRight(
-        std::max(m_bottomRight.x(), _other.getBottomRight().x()),
-        std::max(m_bottomRight.y(), _other.getBottomRight().y())
+        std::max(m_bottomRight.getX(), _other.getBottomRight().getX()),
+        std::max(m_bottomRight.getY(), _other.getBottomRight().getY())
     );
     return RectF(newTopLeft, newBottomRight);
 }
 
 ot::RectF ot::RectF::intersectsWith(const RectF& _other) const {
     Point2DF newTopLeft(
-        std::max(m_topLeft.x(), _other.getTopLeft().x()),
-        std::max(m_topLeft.y(), _other.getTopLeft().y())
+        std::max(m_topLeft.getX(), _other.getTopLeft().getX()),
+        std::max(m_topLeft.getY(), _other.getTopLeft().getY())
     );
     Point2DF newBottomRight(
-        std::min(m_bottomRight.x(), _other.getBottomRight().x()),
-        std::min(m_bottomRight.y(), _other.getBottomRight().y())
+        std::min(m_bottomRight.getX(), _other.getBottomRight().getX()),
+        std::min(m_bottomRight.getY(), _other.getBottomRight().getY())
     );
 
     // Check if there is no intersection
-    if (newTopLeft.x() > newBottomRight.x() || newTopLeft.y() > newBottomRight.y()) {
+    if (newTopLeft.getX() > newBottomRight.getX() || newTopLeft.getY() > newBottomRight.getY()) {
         return RectF(Point2DF(0.f, 0.f), Point2DF(0.f, 0.f));
     }
     return RectF(newTopLeft, newBottomRight);
@@ -205,12 +209,14 @@ ot::RectD::RectD(const Point2DD& _topLeft, const Point2DD& _bottomRight)
 {}
 
 ot::RectD::RectD(const Point2DD& _topLeft, const Size2DD& _size)
-    : m_topLeft(_topLeft), m_bottomRight(_topLeft.x() + _size.width(), _topLeft.y() + _size.height())
+    : m_topLeft(_topLeft), m_bottomRight(_topLeft.getX() + _size.getWidth(), _topLeft.getY() + _size.getHeight())
 {}
 
-ot::RectD::RectD(const RectD& _other)
-    : m_topLeft(_other.m_topLeft), m_bottomRight(_other.m_bottomRight)
-{}
+ot::RectD::RectD(const ConstJsonObject& _jsonObject)
+    : RectD()
+{
+    this->setFromJsonObject(_jsonObject);
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -234,28 +240,28 @@ void ot::RectD::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 ot::RectD ot::RectD::unionWith(const RectD& _other) const {
     Point2DD newTopLeft(
-        std::min(m_topLeft.x(), _other.getTopLeft().x()),
-        std::min(m_topLeft.y(), _other.getTopLeft().y())
+        std::min(m_topLeft.getX(), _other.getTopLeft().getX()),
+        std::min(m_topLeft.getY(), _other.getTopLeft().getY())
     );
     Point2DD newBottomRight(
-        std::max(m_bottomRight.x(), _other.getBottomRight().x()),
-        std::max(m_bottomRight.y(), _other.getBottomRight().y())
+        std::max(m_bottomRight.getX(), _other.getBottomRight().getX()),
+        std::max(m_bottomRight.getY(), _other.getBottomRight().getY())
     );
     return RectD(newTopLeft, newBottomRight);
 }
 
 ot::RectD ot::RectD::intersectsWith(const RectD& _other) const {
     Point2DD newTopLeft(
-        std::max(m_topLeft.x(), _other.getTopLeft().x()),
-        std::max(m_topLeft.y(), _other.getTopLeft().y())
+        std::max(m_topLeft.getX(), _other.getTopLeft().getX()),
+        std::max(m_topLeft.getY(), _other.getTopLeft().getY())
     );
     Point2DD newBottomRight(
-        std::min(m_bottomRight.x(), _other.getBottomRight().x()),
-        std::min(m_bottomRight.y(), _other.getBottomRight().y())
+        std::min(m_bottomRight.getX(), _other.getBottomRight().getX()),
+        std::min(m_bottomRight.getY(), _other.getBottomRight().getY())
     );
 
     // Check if there is no intersection
-    if (newTopLeft.x() > newBottomRight.x() || newTopLeft.y() > newBottomRight.y()) {
+    if (newTopLeft.getX() > newBottomRight.getX() || newTopLeft.getY() > newBottomRight.getY()) {
         return RectD(Point2DD(0., 0.), Point2DD(0., 0.));
     }
     return RectD(newTopLeft, newBottomRight);

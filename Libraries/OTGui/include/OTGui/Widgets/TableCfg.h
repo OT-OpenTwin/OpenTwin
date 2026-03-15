@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTGui/Widgets/TableHeaderItemCfg.h"
 

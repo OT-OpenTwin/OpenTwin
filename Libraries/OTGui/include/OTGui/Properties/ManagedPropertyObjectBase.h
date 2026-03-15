@@ -21,9 +21,9 @@
 
 // OT header
 #include "OTSystem/OTAssert.h"
-#include "OTCore/Rect.h"
-#include "OTCore/Size2D.h"
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Rect.h"
+#include "OTCore/Geometry/Size2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/Properties/PropertyInt.h"
 #include "OTGui/Properties/PropertyBool.h"

@@ -24,7 +24,7 @@
 #include "OTCore/Variable/Variable.h"
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/Variable/Variable.h"
-#include "OTCore/GenericDataStruct.h"
+#include "OTCore/DataStruct/GenericDataStruct.h"
 
 #include <stdint.h>
 #include <string>

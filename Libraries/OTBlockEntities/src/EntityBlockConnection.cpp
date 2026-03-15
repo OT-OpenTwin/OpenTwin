@@ -200,20 +200,19 @@ void EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document& st
 
 	
 	storage.append(
-		
-	   bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName),
+
+		bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName),
 		bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_pickerKey),
 
 		bsoncxx::builder::basic::kvp("FromConnectable", m_connectorNameOrigin),
 		bsoncxx::builder::basic::kvp("ToConnectable", m_connectorNameDestination),
 		bsoncxx::builder::basic::kvp("FromUID", static_cast<int64_t>(m_blockIDOrigin)),
 		bsoncxx::builder::basic::kvp("ToUID", static_cast<int64_t>(m_blockIDDestination)),
-		bsoncxx::builder::basic::kvp("OriginPosX", m_originPos.x()),
-		bsoncxx::builder::basic::kvp("OriginPosY", m_originPos.y()),
-		bsoncxx::builder::basic::kvp("DestinationPosX", m_destPos.x()),
-		bsoncxx::builder::basic::kvp("DestinationPosY", m_destPos.y())
-);
-	
+		bsoncxx::builder::basic::kvp("OriginPosX", m_originPos.getX()),
+		bsoncxx::builder::basic::kvp("OriginPosY", m_originPos.getY()),
+		bsoncxx::builder::basic::kvp("DestinationPosX", m_destPos.getX()),
+		bsoncxx::builder::basic::kvp("DestinationPosY", m_destPos.getY())
+	);
 }
 
 void EntityBlockConnection::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)

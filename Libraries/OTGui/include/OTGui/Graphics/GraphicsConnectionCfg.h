@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"

@@ -18,10 +18,16 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Size2D.h"
+#include "OTCore/Geometry/Size2D.h"
 
 #define OT_JSON_MEMBER_Width "w"
 #define OT_JSON_MEMBER_Height "h"
+
+ot::Size2D::Size2D(const ConstJsonObject& _jsonObject)
+	: Size2D()
+{
+	setFromJsonObject(_jsonObject);
+}
 
 void ot::Size2D::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember(OT_JSON_MEMBER_Width, m_w, _allocator);
@@ -33,6 +39,12 @@ void ot::Size2D::setFromJsonObject(const ConstJsonObject& _object) {
 	m_h = json::getInt(_object, OT_JSON_MEMBER_Height);
 }
 
+ot::Size2DF::Size2DF(const ConstJsonObject& _jsonObject)
+	: Size2DF()
+{
+	setFromJsonObject(_jsonObject);
+}
+
 void ot::Size2DF::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember(OT_JSON_MEMBER_Width, m_w, _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Height, m_h, _allocator);
@@ -41,6 +53,12 @@ void ot::Size2DF::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator)
 void ot::Size2DF::setFromJsonObject(const ConstJsonObject& _object) {
 	m_w = json::getFloat(_object, OT_JSON_MEMBER_Width);
 	m_h = json::getFloat(_object, OT_JSON_MEMBER_Height);
+}
+
+ot::Size2DD::Size2DD(const ConstJsonObject& _jsonObject)
+	: Size2DD()
+{
+	setFromJsonObject(_jsonObject);
 }
 
 void ot::Size2DD::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

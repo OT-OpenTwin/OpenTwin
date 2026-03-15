@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
-#include "OTCore/Size2D.h"
+#include "OTCore/Geometry/Size2D.h"
 #include "OTGui/Painter/Painter2D.h"
 
 #define OT_FactoryKey_CheckerboardPainter2D "OT_P2DCheck"

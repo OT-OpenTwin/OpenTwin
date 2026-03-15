@@ -17,12 +17,15 @@
 // limitations under the License.
 // @otlicense-end
 
+// Google test header
 #include <gtest/gtest.h>
+
+// OpenTwin header
 #include "OTCore/ReturnValues.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTCore/GenericDataStructVector.h"
-#include "OTCore/GenericDataStructSingle.h"
-#include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructVector.h"
+#include "OTCore/DataStruct/GenericDataStructSingle.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 /*
 TEST(ReturnValues, Serialize)
 {

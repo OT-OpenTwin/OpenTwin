@@ -19,9 +19,9 @@
 
 #include "PythonObjectBuilder.h"
 #include "PythonException.h"
-#include "OTCore/GenericDataStructSingle.h"
-#include "OTCore/GenericDataStructVector.h"
-#include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructSingle.h"
+#include "OTCore/DataStruct/GenericDataStructVector.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include <iterator>
 
 #define NO_IMPORT_ARRAY

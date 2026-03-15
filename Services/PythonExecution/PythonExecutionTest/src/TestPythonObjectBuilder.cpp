@@ -24,8 +24,8 @@
 
 #include "PythonObjectBuilder.h"
 #include "FixturePythonObjectBuilder.h"
-#include "OTCore/GenericDataStructVector.h"
-#include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructVector.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 
 #define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
 #define NO_IMPORT_ARRAY

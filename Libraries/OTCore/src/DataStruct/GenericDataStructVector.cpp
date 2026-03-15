@@ -17,33 +17,33 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/GenericDataStructVector.h"
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStructVector.h"
 #include "OTCore/Variable/VariableToJSONConverter.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
 
 ot::GenericDataStructVector::GenericDataStructVector(const std::vector<ot::Variable>& _values)
-	:GenericDataStruct(getClassName(),static_cast<int32_t>(_values.size()))
+	: GenericDataStruct(getClassName(),static_cast<int32_t>(_values.size()))
 {
 	m_values = _values;
 }
 
 ot::GenericDataStructVector::GenericDataStructVector(std::vector<ot::Variable>&& _values) noexcept
-	:GenericDataStruct(getClassName(), static_cast<int32_t>(_values.size()))
+	: GenericDataStruct(getClassName(), static_cast<int32_t>(_values.size()))
 {
 	m_values = std::move(_values);
 }
 
 ot::GenericDataStructVector::GenericDataStructVector(uint32_t _numberOfEntries)
-	:GenericDataStruct(getClassName(), _numberOfEntries)
+	: GenericDataStruct(getClassName(), _numberOfEntries)
 {
 	allocateValueMemory();
 }
 
 
 ot::GenericDataStructVector::GenericDataStructVector()
-	:GenericDataStruct(getClassName())
-{
-}
+	: GenericDataStruct(getClassName())
+{}
 
 ot::GenericDataStructVector::GenericDataStructVector(const GenericDataStructVector& _other)
 	:GenericDataStruct(getClassName(),_other.m_numberOfEntries), m_values(_other.m_values)
@@ -51,7 +51,7 @@ ot::GenericDataStructVector::GenericDataStructVector(const GenericDataStructVect
 }
 
 ot::GenericDataStructVector::GenericDataStructVector(GenericDataStructVector&& _other) noexcept
-	:GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_values(std::move(_other.m_values))
+	: GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_values(std::move(_other.m_values))
 {
 	_other.m_numberOfEntries = 0;
 }

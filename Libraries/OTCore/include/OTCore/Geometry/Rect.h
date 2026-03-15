@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Size2D.h"
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Size2D.h"
+#include "OTCore/Geometry/Point2D.h"
 
 namespace ot {
 
@@ -31,11 +31,14 @@ namespace ot {
 	//! @class Rect
 	//! @brief Rectangle that holds the top left and bottom right corner in int values.
 	class OT_CORE_API_EXPORT Rect : public Serializable {
+		OT_DECL_DEFCOPY(Rect)
+		OT_DECL_DEFMOVE(Rect)
 	public:
 		Rect();
 		Rect(const Point2D& _topLeft, const Point2D& _bottomRight);
 		Rect(const Point2D& _topLeft, const Size2D& _size);
-		Rect(const Rect& _other);
+		Rect(const ConstJsonObject& _jsonObject);
+		~Rect() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -55,40 +58,39 @@ namespace ot {
 
 		// Operators
 
-		bool operator = (const Rect& _other) { m_topLeft = _other.getTopLeft(); m_bottomRight = _other.getBottomRight(); return this; };
-		bool operator == (const Rect& _other) const { return m_topLeft == _other.getTopLeft() && m_bottomRight == _other.getBottomRight(); };
-		bool operator != (const Rect& _other) const { return m_topLeft != _other.getTopLeft() || m_bottomRight != _other.getBottomRight(); };
+		constexpr bool operator == (const Rect& _other) const { return m_topLeft == _other.getTopLeft() && m_bottomRight == _other.getBottomRight(); };
+		constexpr bool operator != (const Rect& _other) const { return m_topLeft != _other.getTopLeft() || m_bottomRight != _other.getBottomRight(); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
 
-		void setTop(int _top) { m_topLeft.setY(_top); };
-		int getTop(void) const { return m_topLeft.y(); };
+		inline void setTop(int _top) { m_topLeft.setY(_top); };
+		constexpr int getTop(void) const { return m_topLeft.getY(); };
 
-		void setLeft(int _left) { m_topLeft.setX(_left); };
-		int getLeft(void) const { return m_topLeft.x(); };
+		inline void setLeft(int _left) { m_topLeft.setX(_left); };
+		constexpr int getLeft(void) const { return m_topLeft.getX(); };
 
-		void setTopLeft(const Point2D& _topLeft) { m_topLeft = _topLeft; };
-		const Point2D& getTopLeft(void) const { return m_topLeft; };
+		inline void setTopLeft(const Point2D& _topLeft) { m_topLeft = _topLeft; };
+		constexpr const Point2D& getTopLeft(void) const { return m_topLeft; };
 
-		void setBottom(int _bottom) { m_bottomRight.setY(_bottom); };
-		int getBottom(void) const { return m_bottomRight.y(); };
+		inline void setBottom(int _bottom) { m_bottomRight.setY(_bottom); };
+		constexpr int getBottom(void) const { return m_bottomRight.getY(); };
 
-		void setRight(int _right) { m_bottomRight.setX(_right); };
-		int getRight(void) const { return m_bottomRight.x(); };
+		inline void setRight(int _right) { m_bottomRight.setX(_right); };
+		constexpr int getRight(void) const { return m_bottomRight.getX(); };
 
-		void setBottomRight(const Point2D& _bottomRight) { m_bottomRight = m_bottomRight; };
-		const Point2D& getBottomRight(void) const { return m_bottomRight; };
+		inline void setBottomRight(const Point2D& _bottomRight) { m_bottomRight = m_bottomRight; };
+		constexpr const Point2D& getBottomRight(void) const { return m_bottomRight; };
 
-		void setWidth(int _width) { m_bottomRight = Point2D(m_topLeft.x() + _width, m_topLeft.y()); };
-		int getWidth(void) const { return m_bottomRight.x() - m_topLeft.x(); };
+		inline void setWidth(int _width) { m_bottomRight = Point2D(m_topLeft.getX() + _width, m_topLeft.getY()); };
+		constexpr int getWidth(void) const { return m_bottomRight.getX() - m_topLeft.getX(); };
 
-		void setHeight(int _height) { m_bottomRight = Point2D(m_topLeft.x(), m_topLeft.y() + _height); };
-		int getHeight(void) const { return m_bottomRight.y() - m_topLeft.y(); };
+		inline void setHeight(int _height) { m_bottomRight = Point2D(m_topLeft.getX(), m_topLeft.getY() + _height); };
+		constexpr int getHeight(void) const { return m_bottomRight.getY() - m_topLeft.getY(); };
 
-		void setSize(const Size2D& _size) { m_bottomRight = Point2D(m_topLeft.x() + _size.width(), m_topLeft.y() + _size.height()); };
-		Size2D getSize(void) const { return Size2D(m_bottomRight.x() - m_topLeft.x(), m_bottomRight.y() - m_topLeft.y()); };
+		inline void setSize(const Size2D& _size) { m_bottomRight = Point2D(m_topLeft.getX() + _size.getWidth(), m_topLeft.getY() + _size.getHeight()); };
+		Size2D getSize() const { return Size2D(m_bottomRight.getX() - m_topLeft.getX(), m_bottomRight.getY() - m_topLeft.getY()); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -101,11 +103,11 @@ namespace ot {
 		Rect intersectsWith(const Rect& _other) const;
 
 		//! @brief Returns true if top left is (0, 0) and bottom right is (0, 0).
-		bool isAllZero(void) const { return m_topLeft.x() == 0 && m_topLeft.y() == 0 && m_bottomRight.x() == 0 && m_bottomRight.y() == 0; };
+		bool isAllZero(void) const { return m_topLeft.getX() == 0 && m_topLeft.getY() == 0 && m_bottomRight.getX() == 0 && m_bottomRight.getY() == 0; };
 
 		//! @brief Returns true if the top left and bottom right points are set correctly.
 		//! If the left value is bigger than the right value or the bottom value bigger than the top value false is returned.
-		bool isValid(void) const { return (m_topLeft.x() <= m_bottomRight.x()) && (m_topLeft.y() <= m_bottomRight.y()); };
+		bool isValid(void) const { return (m_topLeft.getX() <= m_bottomRight.getX()) && (m_topLeft.getY() <= m_bottomRight.getY()); };
 
 		//! @see void moveTo(const Point2D& _topLeft)
 		void moveTo(int _ax, int _ay) { this->moveTo(Point2D(_ax, _ay)); };
@@ -138,11 +140,14 @@ namespace ot {
 	//! @class Rect
 	//! @brief Rectangle that holds the top left and bottom right corner in float values.
 	class OT_CORE_API_EXPORT RectF : public Serializable {
+		OT_DECL_DEFCOPY(RectF)
+		OT_DECL_DEFMOVE(RectF)
 	public:
 		RectF();
 		RectF(const Point2DF& _topLeft, const Point2DF& _bottomRight);
 		RectF(const Point2DF& _topLeft, const Size2DF& _size);
-		RectF(const RectF& _other);
+		RectF(const ConstJsonObject& _jsonObject);
+		~RectF() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -162,7 +167,6 @@ namespace ot {
 
 		// Operators
 
-		bool operator = (const RectF& _other) { m_topLeft = _other.getTopLeft(); m_bottomRight = _other.getBottomRight(); return this; };
 		bool operator == (const RectF& _other) const { return m_topLeft == _other.getTopLeft() && m_bottomRight == _other.getBottomRight(); };
 		bool operator != (const RectF& _other) const { return m_topLeft != _other.getTopLeft() || m_bottomRight != _other.getBottomRight(); };
 
@@ -171,31 +175,31 @@ namespace ot {
 		// Setter / Getter
 
 		void setTop(float _top) { m_topLeft.setY(_top); };
-		float getTop(void) const { return m_topLeft.y(); };
+		float getTop(void) const { return m_topLeft.getY(); };
 
 		void setLeft(float _left) { m_topLeft.setX(_left); };
-		float getLeft(void) const { return m_topLeft.x(); };
+		float getLeft(void) const { return m_topLeft.getX(); };
 
 		void setTopLeft(const Point2DF& _topLeft) { m_topLeft = _topLeft; };
 		const Point2DF& getTopLeft(void) const { return m_topLeft; };
 
 		void setBottom(float _bottom) { m_bottomRight.setY(_bottom); };
-		float getBottom(void) const { return m_bottomRight.y(); };
+		float getBottom(void) const { return m_bottomRight.getY(); };
 
 		void setRight(float _right) { m_bottomRight.setX(_right); };
-		float getRight(void) const { return m_bottomRight.x(); };
+		float getRight(void) const { return m_bottomRight.getX(); };
 
 		void setBottomRight(const Point2DF& _bottomRight) { m_bottomRight = m_bottomRight; };
 		const Point2DF& getBottomRight(void) const { return m_bottomRight; };
 
-		void setWidth(float _width) { m_bottomRight = Point2DF(m_topLeft.x() + _width, m_topLeft.y()); };
-		float getWidth(void) const { return m_bottomRight.x() - m_topLeft.x(); };
+		void setWidth(float _width) { m_bottomRight = Point2DF(m_topLeft.getX() + _width, m_topLeft.getY()); };
+		float getWidth(void) const { return m_bottomRight.getX() - m_topLeft.getX(); };
 
-		void setHeight(float _height) { m_bottomRight = Point2DF(m_topLeft.x(), m_topLeft.y() + _height); };
-		float getHeight(void) const { return m_bottomRight.y() - m_topLeft.y(); };
+		void setHeight(float _height) { m_bottomRight = Point2DF(m_topLeft.getX(), m_topLeft.getY() + _height); };
+		float getHeight(void) const { return m_bottomRight.getY() - m_topLeft.getY(); };
 
-		void setSize(const Size2DF& _size) { m_bottomRight = Point2DF(m_topLeft.x() + _size.width(), m_topLeft.y() + _size.height()); };
-		Size2DF getSize(void) const { return Size2DF(m_bottomRight.x() - m_topLeft.x(), m_bottomRight.y() - m_topLeft.y()); };
+		void setSize(const Size2DF& _size) { m_bottomRight = Point2DF(m_topLeft.getX() + _size.getWidth(), m_topLeft.getY() + _size.getHeight()); };
+		Size2DF getSize(void) const { return Size2DF(m_bottomRight.getX() - m_topLeft.getX(), m_bottomRight.getY() - m_topLeft.getY()); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -208,11 +212,11 @@ namespace ot {
 		RectF intersectsWith(const RectF& _other) const;
 
 		//! @brief Returns true if top left is (0, 0) and bottom right is (0, 0).
-		bool isAllZero(void) const { return m_topLeft.x() == 0 && m_topLeft.y() == 0 && m_bottomRight.x() == 0 && m_bottomRight.y() == 0; };
+		bool isAllZero(void) const { return m_topLeft.getX() == 0 && m_topLeft.getY() == 0 && m_bottomRight.getX() == 0 && m_bottomRight.getY() == 0; };
 
 		//! @brief Returns true if the top left and bottom right points are set correctly.
 		//! If the left value is bigger than the right value or the bottom value bigger than the top value false is returned.
-		bool isValid(void) const { return (m_topLeft.x() <= m_bottomRight.x()) && (m_topLeft.y() <= m_bottomRight.y()); };
+		bool isValid(void) const { return (m_topLeft.getX() <= m_bottomRight.getX()) && (m_topLeft.getY() <= m_bottomRight.getY()); };
 
 		//! @see void moveTo(const Point2DF& _topLeft)
 		void moveTo(float _ax, float _ay) { this->moveTo(Point2DF(_ax, _ay)); };
@@ -245,11 +249,14 @@ namespace ot {
 	//! @class RectD
 	//! @brief Rectangle that holds the top left and bottom right corner in double values.
 	class OT_CORE_API_EXPORT RectD : public Serializable {
+		OT_DECL_DEFCOPY(RectD)
+		OT_DECL_DEFMOVE(RectD)
 	public:
 		RectD();
 		RectD(const Point2DD& _topLeft, const Point2DD& _bottomRight);
 		RectD(const Point2DD& _topLeft, const Size2DD& _size);
-		RectD(const RectD& _other);
+		RectD(const ConstJsonObject& _jsonObject);
+		~RectD() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -269,7 +276,6 @@ namespace ot {
 
 		// Operators
 
-		bool operator = (const RectD& _other) { m_topLeft = _other.getTopLeft(); m_bottomRight = _other.getBottomRight(); return this; };
 		bool operator == (const RectD& _other) const { return m_topLeft == _other.getTopLeft() && m_bottomRight == _other.getBottomRight(); };
 		bool operator != (const RectD& _other) const { return m_topLeft != _other.getTopLeft() || m_bottomRight != _other.getBottomRight(); };
 
@@ -278,31 +284,31 @@ namespace ot {
 		// Setter / Getter
 
 		void setTop(double _top) { m_topLeft.setY(_top); };
-		double getTop(void) const { return m_topLeft.y(); };
+		double getTop(void) const { return m_topLeft.getY(); };
 
 		void setLeft(double _left) { m_topLeft.setX(_left); };
-		double getLeft(void) const { return m_topLeft.x(); };
+		double getLeft(void) const { return m_topLeft.getX(); };
 
 		void setTopLeft(const Point2DD& _topLeft) { m_topLeft = _topLeft; };
 		const Point2DD& getTopLeft(void) const { return m_topLeft; };
 
 		void setBottom(double _bottom) { m_bottomRight.setY(_bottom); };
-		double getBottom(void) const { return m_bottomRight.y(); };
+		double getBottom(void) const { return m_bottomRight.getY(); };
 
 		void setRight(double _right) { m_bottomRight.setX(_right); };
-		double getRight(void) const { return m_bottomRight.x(); };
+		double getRight(void) const { return m_bottomRight.getX(); };
 
 		void setBottomRight(const Point2DD& _bottomRight) { m_bottomRight = m_bottomRight; };
 		const Point2DD& getBottomRight(void) const { return m_bottomRight; };
 
-		void setWidth(double _width) { m_bottomRight = Point2DD(m_topLeft.x() + _width, m_topLeft.y()); };
-		double getWidth(void) const { return m_bottomRight.x() - m_topLeft.x(); };
+		void setWidth(double _width) { m_bottomRight = Point2DD(m_topLeft.getX() + _width, m_topLeft.getY()); };
+		double getWidth(void) const { return m_bottomRight.getX() - m_topLeft.getX(); };
 
-		void setHeight(double _height) { m_bottomRight = Point2DD(m_topLeft.x(), m_topLeft.y() + _height); };
-		double getHeight(void) const { return m_bottomRight.y() - m_topLeft.y(); };
+		void setHeight(double _height) { m_bottomRight = Point2DD(m_topLeft.getX(), m_topLeft.getY() + _height); };
+		double getHeight(void) const { return m_bottomRight.getY() - m_topLeft.getY(); };
 
-		void setSize(const Size2DD& _size) { m_bottomRight = Point2DD(m_topLeft.x() + _size.width(), m_topLeft.y() + _size.height()); };
-		Size2DD getSize(void) const { return Size2DD(m_bottomRight.x() - m_topLeft.x(), m_bottomRight.y() - m_topLeft.y()); };
+		void setSize(const Size2DD& _size) { m_bottomRight = Point2DD(m_topLeft.getX() + _size.getWidth(), m_topLeft.getY() + _size.getHeight()); };
+		Size2DD getSize(void) const { return Size2DD(m_bottomRight.getX() - m_topLeft.getX(), m_bottomRight.getY() - m_topLeft.getY()); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -315,11 +321,11 @@ namespace ot {
 		RectD intersectsWith(const RectD& _other) const;
 
 		//! @brief Returns true if top left is (0, 0) and bottom right is (0, 0).
-		bool isAllZero(void) const { return m_topLeft.x() == 0 && m_topLeft.y() == 0 && m_bottomRight.x() == 0 && m_bottomRight.y() == 0; };
+		bool isAllZero(void) const { return m_topLeft.getX() == 0 && m_topLeft.getY() == 0 && m_bottomRight.getX() == 0 && m_bottomRight.getY() == 0; };
 
 		//! @brief Returns true if the top left and bottom right points are set correctly.
 		//! If the left value is bigger than the right value or the bottom value bigger than the top value false is returned.
-		bool isValid(void) const { return (m_topLeft.x() <= m_bottomRight.x()) && (m_topLeft.y() <= m_bottomRight.y()); };
+		bool isValid(void) const { return (m_topLeft.getX() <= m_bottomRight.getX()) && (m_topLeft.getY() <= m_bottomRight.getY()); };
 
 		//! @see void moveTo(const Point2DD& _topLeft)
 		void moveTo(double _ax, double _ay) { this->moveTo(Point2DD(_ax, _ay)); };

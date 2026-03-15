@@ -59,10 +59,10 @@ void ot::LinearGradientPainter2D::setFromJsonObject(const ConstJsonObject& _obje
 }
 
 std::string ot::LinearGradientPainter2D::generateQss() const {
-	std::string ret = "qlineargradient(x1: " + std::to_string(m_start.x()) +
-		", y1: " + std::to_string(m_start.y()) +
-		", x2: " + std::to_string(m_finalStop.x()) +
-		", y2: " + std::to_string(m_finalStop.y());
+	std::string ret = "qlineargradient(x1: " + std::to_string(m_start.getX()) +
+		", y1: " + std::to_string(m_start.getY()) +
+		", x2: " + std::to_string(m_finalStop.getX()) +
+		", y2: " + std::to_string(m_finalStop.getY());
 
 	this->addStopsAndSpreadToQss(ret);
 	ret.append(")");
@@ -73,10 +73,10 @@ std::string ot::LinearGradientPainter2D::generateQss() const {
 std::string ot::LinearGradientPainter2D::generateSvgColorString(const std::string& _id) const {
 	std::ostringstream ss;
 	ss << "<linearGradient id=\"" << _id
-		<< "\" x1=\"" << m_start.x()
-		<< "\" y1=\"" << m_start.y()
-		<< "\" x2=\"" << m_finalStop.x()
-		<< "\" y2=\"" << m_finalStop.y()
+		<< "\" x1=\"" << m_start.getX()
+		<< "\" y1=\"" << m_start.getY()
+		<< "\" x2=\"" << m_finalStop.getX()
+		<< "\" y2=\"" << m_finalStop.getY()
 		<< "\" gradientUnits=\"objectBoundingBox\"";
 
 	// Handle spread method if applicable

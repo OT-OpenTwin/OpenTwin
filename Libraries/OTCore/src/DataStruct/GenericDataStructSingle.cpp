@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/GenericDataStructSingle.h"
+#include "OTCore/DataStruct/GenericDataStructSingle.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/Variable/VariableToJSONConverter.h"
 

@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTSystem/Flags.h"
 #include "OTCore/Color.h"
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/Style/PenCfg.h"
@@ -187,7 +187,7 @@ namespace ot {
 		bool isGridLinesValid(void) const { return (m_flags | Grid::NoGridLineMask) != NoGridLineMask; };
 
 		//! @brief Returns true if the grid snap is enabled and the grid step is greater than 0 for at least one axis.
-		bool isGridSnapValid(void) const { return (m_snapMode != NoGridSnap) && (m_gridStep.x() > 0 || m_gridStep.y() > 0); };
+		bool isGridSnapValid(void) const { return (m_snapMode != NoGridSnap) && (m_gridStep.getX() > 0 || m_gridStep.getY() > 0); };
 
 	private:
 		GridFlags m_flags;

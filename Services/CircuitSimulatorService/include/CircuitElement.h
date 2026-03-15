@@ -22,7 +22,7 @@
 
 #pragma once
 //OT Header
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Point2D.h"
 
 //C++ Header
 #include <string>

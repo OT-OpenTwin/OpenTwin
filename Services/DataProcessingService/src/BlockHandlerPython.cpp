@@ -17,15 +17,20 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "BlockHandlerPython.h"
-#include "OTModelEntities/EntityProperties.h"
 #include "Application.h"
-#include "OTModelEntities/EntityFile.h"
+#include "BlockHandlerPython.h"
+
+// OpenTwin header
 #include "OTCore/ReturnValues.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTServiceFoundation/PythonServiceInterface.h"
-#include "OTCore/GenericDataStructSingle.h"
+#include "OTCore/DataStruct/GenericDataStructSingle.h"
 #include "OTCore/TimeFormatter.h"
+
+#include "OTCommunication/ActionTypes.h"
+
+#include "OTServiceFoundation/PythonServiceInterface.h"
+
+#include "OTModelEntities/EntityFile.h"
+#include "OTModelEntities/EntityProperties.h"
 
 BlockHandlerPython::BlockHandlerPython(EntityBlockPython* _blockEntity, const HandlerMap& _handlerMap)
     : BlockHandler(_blockEntity, _handlerMap)

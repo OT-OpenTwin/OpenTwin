@@ -18,14 +18,17 @@
 // @otlicense-end
 
 #pragma once
-#include <stdint.h>
 
-#include "OTCore/GenericDataStruct.h"
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStruct.h"
 #include "OTCore/Variable/Variable.h"
+
+// std header
+#include <stdint.h>
 
 namespace ot
 {
-	class __declspec(dllexport) GenericDataStructVector : public GenericDataStruct
+	class OT_CORE_API_EXPORT GenericDataStructVector : public GenericDataStruct
 	{
 
 	public:

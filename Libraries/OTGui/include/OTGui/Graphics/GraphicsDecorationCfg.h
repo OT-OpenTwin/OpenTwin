@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Size2D.h"
+#include "OTCore/Geometry/Size2D.h"
 #include "OTGui/Style/PenCfg.h"
 
 namespace ot {

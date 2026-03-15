@@ -93,8 +93,8 @@ void ot::GraphicsDecoratedLineItem::paintCustomItem(QPainter* _painter, const QS
 	QPointF dir = line.unitVector().p2() - line.unitVector().p1();
 
 	// Shift inward
-	double fromOffset = fromSize.width() * 0.5;
-	double toOffset = toSize.width() * 0.5;
+	double fromOffset = fromSize.getWidth() * 0.5;
+	double toOffset = toSize.getWidth() * 0.5;
 
 	QPointF innerFrom = line.p1() + dir * fromOffset;
 	QPointF innerTo = line.p2() - dir * toOffset;

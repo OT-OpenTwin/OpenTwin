@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Rect.h"
+#include "OTCore/Geometry/Rect.h"
 #include "OTGui/Style/PenCfg.h"
 #include "OTWidgets/Graphics/CustomGraphicsItem.h"
 

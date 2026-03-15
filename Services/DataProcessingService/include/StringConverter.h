@@ -18,11 +18,13 @@
 // @otlicense-end
 
 #pragma once
-#include "OTCore/GenericDataStruct.h"
-#include "OTCore/GenericDataStructSingle.h"
-#include "OTCore/GenericDataStructVector.h"
-#include "OTCore/GenericDataStructMatrix.h"
+
+// OpenTwin header
 #include "PipelineData.h"
+#include "OTCore/DataStruct/GenericDataStruct.h"
+#include "OTCore/DataStruct/GenericDataStructSingle.h"
+#include "OTCore/DataStruct/GenericDataStructVector.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTCore/Variable/VariableToStringConverter.h"
 
 namespace ot

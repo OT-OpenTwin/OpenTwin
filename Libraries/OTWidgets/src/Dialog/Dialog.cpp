@@ -45,13 +45,13 @@ ot::Dialog::Dialog(const DialogCfg& _config, QWidget* _parent)
 	this->setWindowIcon(IconManager::getApplicationIcon());
 
 	// Initialize size constrains and initial size
-	if (_config.getMinSize().width() >= 0) { this->setMinimumWidth(_config.getMinSize().width()); }
-	if (_config.getMinSize().height() >= 0) { this->setMinimumHeight(_config.getMinSize().height()); }
-	if (_config.getMaxSize().width() >= 0) { this->setMaximumWidth(_config.getMaxSize().width()); }
-	if (_config.getMaxSize().height() >= 0) { this->setMaximumHeight(_config.getMaxSize().height()); }
+	if (_config.getMinSize().getWidth() >= 0) { this->setMinimumWidth(_config.getMinSize().getWidth()); }
+	if (_config.getMinSize().getHeight() >= 0) { this->setMinimumHeight(_config.getMinSize().getHeight()); }
+	if (_config.getMaxSize().getWidth() >= 0) { this->setMaximumWidth(_config.getMaxSize().getWidth()); }
+	if (_config.getMaxSize().getHeight() >= 0) { this->setMaximumHeight(_config.getMaxSize().getHeight()); }
 	QSize iniSize = this->size();
-	if (_config.getInitialSize().width() >= 0) { iniSize.setWidth(_config.getInitialSize().width()); }
-	if (_config.getInitialSize().height() >= 0) { iniSize.setHeight(_config.getInitialSize().height()); }
+	if (_config.getInitialSize().getWidth() >= 0) { iniSize.setWidth(_config.getInitialSize().getWidth()); }
+	if (_config.getInitialSize().getHeight() >= 0) { iniSize.setHeight(_config.getInitialSize().getHeight()); }
 	this->resize(iniSize);
 }
 

@@ -41,7 +41,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	m_startX->setDecimals(2);
 	m_startX->setSuffix("%");
 	m_startX->setToolTip("The start X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the width and -1.0 the width in negative direction.");
-	if (actualPainter) m_startX->setValue(actualPainter->getStart().x() * 100.);
+	if (actualPainter) m_startX->setValue(actualPainter->getStart().getX() * 100.);
 	positionLay->addWidget(startXLabel, 0, 0);
 	positionLay->addWidget(m_startX, 0, 1);
 
@@ -51,7 +51,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	m_startY->setDecimals(2);
 	m_startY->setSuffix("%");
 	m_startY->setToolTip("The start Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the height and -1.0 the height in negative direction.");
-	if (actualPainter) m_startY->setValue(actualPainter->getStart().y() * 100.);
+	if (actualPainter) m_startY->setValue(actualPainter->getStart().getY() * 100.);
 	positionLay->addWidget(startYLabel, 1, 0);
 	positionLay->addWidget(m_startY, 1, 1);
 
@@ -62,7 +62,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	m_finalX->setValue(100.);
 	m_finalX->setSuffix("%");
 	m_finalX->setToolTip("The fianl stop X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the width and -1.0 the width in negative direction.");
-	if (actualPainter) m_finalX->setValue(actualPainter->getFinalStop().x() * 100.);
+	if (actualPainter) m_finalX->setValue(actualPainter->getFinalStop().getX() * 100.);
 	positionLay->addWidget(endXLabel, 2, 0);
 	positionLay->addWidget(m_finalX, 2, 1);
 
@@ -73,7 +73,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	m_finalY->setValue(100.);
 	m_finalX->setSuffix("%");
 	m_finalY->setToolTip("The fianl stop Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the height and -1.0 the height in negative direction.");
-	if (actualPainter) m_finalY->setValue(actualPainter->getFinalStop().y() * 100.);
+	if (actualPainter) m_finalY->setValue(actualPainter->getFinalStop().getY() * 100.);
 	positionLay->addWidget(endYLabel, 3, 0);
 	positionLay->addWidget(m_finalY, 3, 1);
 

@@ -50,7 +50,7 @@
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTCore/BasicServiceInformation.h"
-#include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTCore/Logging/LogDispatcher.h"
 
 // OpenTwin Gui header

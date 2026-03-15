@@ -85,12 +85,12 @@ void WrappedPolygonItem::controlPointsChanged(void) {
 	std::list<ot::Point2DD> newPoints;
 
 	for (const QPointF& pt : this->getControlPoints()) {
-		if (pt.x() < topLeftPoint.x()) topLeftPoint.setX(pt.x());
-		if (pt.y() < topLeftPoint.y()) topLeftPoint.setY(pt.y());
+		if (pt.x() < topLeftPoint.getX()) topLeftPoint.setX(pt.x());
+		if (pt.y() < topLeftPoint.getY()) topLeftPoint.setY(pt.y());
 		newPoints.push_back(ot::QtFactory::toPoint2D(pt));
 	}
 
-	if (topLeftPoint.x() == std::numeric_limits<double>::max() || topLeftPoint.y() == std::numeric_limits<double>::max()) {
+	if (topLeftPoint.getX() == std::numeric_limits<double>::max() || topLeftPoint.getY() == std::numeric_limits<double>::max()) {
 		OT_LOG_E("Invalid points");
 		return;
 	}

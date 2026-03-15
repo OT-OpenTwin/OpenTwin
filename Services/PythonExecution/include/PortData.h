@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #pragma once
-#include "OTCore/GenericDataStruct.h"
+#include "OTCore/DataStruct/GenericDataStruct.h"
 #include <list>
 #include <memory>
 

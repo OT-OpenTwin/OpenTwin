@@ -68,12 +68,12 @@ void ot::RadialGradientPainter2D::setFocalPoint(const ot::Point2DD& _focal) {
 }
 
 std::string ot::RadialGradientPainter2D::generateQss() const {
-	std::string ret = "qradialgradient(cx: " + std::to_string(m_center.x()) +
-						", cy: " + std::to_string(m_center.y()) +
+	std::string ret = "qradialgradient(cx: " + std::to_string(m_center.getX()) +
+						", cy: " + std::to_string(m_center.getY()) +
 						", radius: " + std::to_string(m_centerRadius);
 	if (m_focalSet) {
-		ret.append(", fx: " + std::to_string(m_focal.x()) +
-			", fy: " + std::to_string(m_focal.y()) +
+		ret.append(", fx: " + std::to_string(m_focal.getX()) +
+			", fy: " + std::to_string(m_focal.getY()) +
 			", fradius: " + std::to_string(m_focalRadius)
 		);
 	}
@@ -87,14 +87,14 @@ std::string ot::RadialGradientPainter2D::generateQss() const {
 std::string ot::RadialGradientPainter2D::generateSvgColorString(const std::string& _id) const {
 	std::ostringstream ss;
 	ss << "<radialGradient id=\"" << _id
-		<< "\" cx=\"" << m_center.x()
-		<< "\" cy=\"" << m_center.y()
+		<< "\" cx=\"" << m_center.getX()
+		<< "\" cy=\"" << m_center.getY()
 		<< "\" r=\"" << m_centerRadius
 		<< "\" gradientUnits=\"objectBoundingBox\"";
 
 	// Add focal point if defined
 	if (m_focalSet) {
-		ss << " fx=\"" << m_focal.x() << "\" fy=\"" << m_focal.y() << "\"";
+		ss << " fx=\"" << m_focal.getX() << "\" fy=\"" << m_focal.getY() << "\"";
 	}
 
 	// Handle spread method

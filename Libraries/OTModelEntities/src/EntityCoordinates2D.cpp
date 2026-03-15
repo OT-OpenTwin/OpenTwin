@@ -66,8 +66,8 @@ void EntityCoordinates2D::addStorageData(bsoncxx::builder::basic::document& stor
 {
 	EntityBase::addStorageData(storage);
 	storage.append(
-		bsoncxx::builder::basic::kvp("LocationX", m_location.x()),
-		bsoncxx::builder::basic::kvp("LocationY", m_location.y())
+		bsoncxx::builder::basic::kvp("LocationX", m_location.getX()),
+		bsoncxx::builder::basic::kvp("LocationY", m_location.getY())
 	);
 }
 

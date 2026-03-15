@@ -17,28 +17,30 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "BlockHandlerDatabaseAccess.h"
-
+// Service header
 #include "Application.h"
 #include "SolverReport.h"
-#include "PropertyHandlerDatabaseAccessBlock.h"
-
-#include "OTDataStorage/AdvancedQueryBuilder.h"
-#include "OTCore/String.h"
-#include "OTCore/TimeFormatter.h"
-#include "OTCore/Variable/JSONToVariableConverter.h"
-#include "OTCore/GenericDataStructMatrix.h"
-#include "OTCore/GenericDataStructSingle.h"
-#include "OTCore/QueryDescription/ValueComparisonDescription.h"
-#include "OTCore/Variable/ExplicitStringValueConverter.h"
-#include "OTCore/ResultCollectionDefaultIndexes.h"
-
-#include "OTResultDataAccess/QuantityContainer.h"
-#include "OTCore/Tuple/TupleDescriptionComplex.h"
 #include "MetadataVectorizer.h"
 #include "QueryDescriptionBuilder.h"
-#include <regex>
+#include "BlockHandlerDatabaseAccess.h"
+#include "PropertyHandlerDatabaseAccessBlock.h"
 
+// OpenTwin header
+#include "OTCore/String.h"
+#include "OTCore/TimeFormatter.h"
+#include "OTCore/ResultCollectionDefaultIndexes.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructSingle.h"
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
+#include "OTCore/Tuple/TupleDescriptionComplex.h"
+#include "OTCore/Variable/ExplicitStringValueConverter.h"
+#include "OTCore/Variable/JSONToVariableConverter.h"
+
+#include "OTDataStorage/AdvancedQueryBuilder.h"
+#include "OTResultDataAccess/QuantityContainer.h"
+
+// std header
+#include <regex>
 #include <algorithm>
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)

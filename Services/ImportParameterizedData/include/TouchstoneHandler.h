@@ -18,13 +18,19 @@
 // @otlicense-end
 
 #pragma once
-#include <string>
-#include <list>
+
+// Service header
 #include "OptionSettings.h"
-#include "OTCore/GenericDataStructMatrix.h"
+
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 #include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 #include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+
+// std header
+#include <list>
+#include <string>
 
 class TouchstoneHandler
 {

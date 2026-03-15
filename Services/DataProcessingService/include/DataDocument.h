@@ -18,10 +18,14 @@
 // @otlicense-end
 
 #pragma once
+
+// OpenTwin header
+#include "OTCore/Variable/Variable.h"
+#include "OTCore/DataStruct/GenericDataStruct.h"
+
+// std header
 #include <map>
 #include <string>
-#include "OTCore/Variable/Variable.h"
-#include "OTCore/GenericDataStruct.h"
 
 struct PipelineDataDocument
 {

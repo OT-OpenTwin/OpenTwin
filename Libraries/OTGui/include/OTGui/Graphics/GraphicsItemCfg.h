@@ -21,8 +21,8 @@
 
 // OpenTwin Core header
 #include "OTSystem/Flags.h"
-#include "OTCore/Size2D.h"
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Size2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTCore/Serializable.h"
 
 // OpenTwin Gui header

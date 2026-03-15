@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #pragma once
+#include "OTCore/Geometry/Point2D.h"
 #include "OTModelEntities/EntityBase.h"
-#include "OTCore/Point2D.h"
 
 class __declspec(dllexport) EntityCoordinates2D : public EntityBase
 {

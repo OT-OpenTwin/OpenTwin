@@ -441,7 +441,7 @@ DiagramGenerator::SequenceViewData DiagramGenerator::initializeSequenceViewData(
 
 	QFontMetrics cfm(QtFactory::toQFont(viewData.callFont));
 	viewData.callTextHeight = static_cast<double>(cfm.height());
-	viewData.callVSeparation = viewData.callTextHeight + viewData.callSpacing + (viewData.callArrowHeadSize.height()) + viewData.callTextLineSpacing;
+	viewData.callVSeparation = viewData.callTextHeight + viewData.callSpacing + (viewData.callArrowHeadSize.getHeight()) + viewData.callTextLineSpacing;
 
 	// Finally calculate call starting position
 	RectD titleRect;// = calculateLifeLineTextBoxRect("Title", viewData, Point2DD());

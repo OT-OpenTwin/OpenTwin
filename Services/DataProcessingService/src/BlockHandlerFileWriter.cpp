@@ -17,27 +17,28 @@
 // limitations under the License.
 // @otlicense-end
 
+// Service header
 #include "Application.h"
+#include "SolverReport.h"
+#include "StringConverter.h"
 #include "BlockHandlerFileWriter.h"
 
+// OpenTwin header
 #include "OTSystem/OTAssert.h"
 
-#include "OTCore/FolderNames.h"
-#include "OTCore/GenericDataStruct.h"
-#include "OTCore/GenericDataStructSingle.h"
-#include "OTCore/GenericDataStructVector.h"
-#include "OTCore/GenericDataStructMatrix.h"
-
-#include "OTModelEntities/EntityFileText.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTModelEntities/EntityBinaryData.h"
-#include "StringConverter.h"
-#include "OTModelAPI/ModelServiceAPI.h"
-
-#include "OTCore/EntityName.h"
-#include "SolverReport.h"
-
 #include "OTCore/EncodingGuesser.h"
+#include "OTCore/EntityName.h"
+#include "OTCore/FolderNames.h"
+#include "OTCore/DataStruct/GenericDataStruct.h"
+#include "OTCore/DataStruct/GenericDataStructSingle.h"
+#include "OTCore/DataStruct/GenericDataStructVector.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
+
+#include "OTCommunication/ActionTypes.h"
+
+#include "OTModelEntities/EntityBinaryData.h"
+#include "OTModelEntities/EntityFileText.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity, handlerMap)

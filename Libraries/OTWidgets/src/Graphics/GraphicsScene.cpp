@@ -181,7 +181,7 @@ void ot::GraphicsScene::deselectAll() {
 }
 
 void ot::GraphicsScene::moveAllSelectedItems(const Point2DD& _delta) {
-	if (_delta.x() == 0. && _delta.y() == 0.) {
+	if (_delta.getX() == 0. && _delta.getY() == 0.) {
 		return;
 	}
 
@@ -195,7 +195,7 @@ void ot::GraphicsScene::moveAllSelectedItems(const Point2DD& _delta) {
 				}
 				else if (otItem->getGraphicsItemFlags() & GraphicsItemCfg::ItemSnapsToGridCenter) {
 					QRectF rect = otItem->getQGraphicsItem()->boundingRect();
-					rect.translate(_delta.x(), _delta.y());
+					rect.translate(_delta.getX(), _delta.getY());
 					QPointF newPos = QtFactory::toQPoint(m_grid.snapToGrid(QtFactory::toPoint2D(rect.center()))) - QPointF(rect.width() / 2., rect.height() / 2.);
 					otItem->setGraphicsItemPos(newPos);
 				}
@@ -527,10 +527,10 @@ void ot::GraphicsScene::calculateGridLines(const QRectF& _painterRect, QList<QLi
 	int lineCounterY = 0;
 
 	// If wide lines will be displayed the line counter need to be calculated
-	if ((m_grid.getGridFlags() & Grid::ShowWideLines) && (m_grid.getWideGridLineCounter().x() > 1 || m_grid.getWideGridLineCounter().y() > 1)) {
+	if ((m_grid.getGridFlags() & Grid::ShowWideLines) && (m_grid.getWideGridLineCounter().getX() > 1 || m_grid.getWideGridLineCounter().getY() > 1)) {
 
 		// Calculate initial line counter for X axis
-		lineCounterX = (int)(startPos.x() / scaledStepSize.x());
+		lineCounterX = (int)(startPos.x() / scaledStepSize.getX());
 		if (lineCounterX < 0) {
 			lineCounterX *= (-1);
 		}
@@ -541,11 +541,11 @@ void ot::GraphicsScene::calculateGridLines(const QRectF& _painterRect, QList<QLi
 			else {
 				lineCounterX++;
 			}
-			startPos.setX(startPos.x() + scaledStepSize.x());
+			startPos.setX(startPos.x() + scaledStepSize.getX());
 		}
 
 		// Calculate initial line counter for Y axis
-		lineCounterY = (int)(startPos.y() / scaledStepSize.y());
+		lineCounterY = (int)(startPos.y() / scaledStepSize.getY());
 		if (lineCounterY < 0) {
 			lineCounterY *= (-1);
 		}
@@ -556,23 +556,23 @@ void ot::GraphicsScene::calculateGridLines(const QRectF& _painterRect, QList<QLi
 			else {
 				lineCounterY++;
 			}
-			startPos.setY(startPos.y() + scaledStepSize.y());
+			startPos.setY(startPos.y() + scaledStepSize.getY());
 		}
 
 		// And now use modulo to get the current counter value in the counter range
-		lineCounterX = (lineCounterX % m_grid.getWideGridLineCounter().x());
-		lineCounterY = (lineCounterY % m_grid.getWideGridLineCounter().y());
+		lineCounterX = (lineCounterX % m_grid.getWideGridLineCounter().getX());
+		lineCounterY = (lineCounterY % m_grid.getWideGridLineCounter().getY());
 	}
 
 	// Calculate X axis lines
-	for (qreal x = startPos.x(); x < _painterRect.right(); x += scaledStepSize.x())
+	for (qreal x = startPos.x(); x < _painterRect.right(); x += scaledStepSize.getX())
 	{
 		if (m_grid.getGridFlags() & Grid::ShowNormalLines) {
 			_normalLines.push_back(QLineF(x, _painterRect.top(), x, _painterRect.bottom()));
 		}
-		if ((m_grid.getGridFlags() & Grid::ShowWideLines) && (m_grid.getWideGridLineCounter().x() > 1)) {
+		if ((m_grid.getGridFlags() & Grid::ShowWideLines) && (m_grid.getWideGridLineCounter().getX() > 1)) {
 			// Wide line
-			if (lineCounterX >= m_grid.getWideGridLineCounter().x()) {
+			if (lineCounterX >= m_grid.getWideGridLineCounter().getX()) {
 				_wideLines.push_back(QLineF(x, _painterRect.top(), x, _painterRect.bottom()));
 				lineCounterX = 0;
 			}
@@ -581,15 +581,15 @@ void ot::GraphicsScene::calculateGridLines(const QRectF& _painterRect, QList<QLi
 	}
 
 	// Calculate Y axis lines	
-	for (qreal y = startPos.y(); y < _painterRect.bottom(); y += scaledStepSize.y())
+	for (qreal y = startPos.y(); y < _painterRect.bottom(); y += scaledStepSize.getY())
 	{
 		if (m_grid.getGridFlags() & Grid::ShowNormalLines) {
 			// Small line only
 			_normalLines.push_back(QLineF(_painterRect.left(), y, _painterRect.right(), y));
 		}
-		if ((m_grid.getGridFlags() & Grid::ShowWideLines) && (m_grid.getWideGridLineCounter().y() > 1)) {
+		if ((m_grid.getGridFlags() & Grid::ShowWideLines) && (m_grid.getWideGridLineCounter().getY() > 1)) {
 			// Wide line
-			if (lineCounterY >= m_grid.getWideGridLineCounter().y()) {
+			if (lineCounterY >= m_grid.getWideGridLineCounter().getY()) {
 				_wideLines.push_back(QLineF(_painterRect.left(), y, _painterRect.right(), y));
 				lineCounterY = 0;
 			}
@@ -601,9 +601,9 @@ void ot::GraphicsScene::calculateGridLines(const QRectF& _painterRect, QList<QLi
 ot::Point2D ot::GraphicsScene::calculateScaledGridStepSize(const QRectF& _rect) const {
 	Point2D scaledStepSize = m_grid.getGridStep();
 	if (m_grid.getGridFlags() & Grid::AutoScaleGrid) {
-		while ((_rect.width() / scaledStepSize.x()) > 200 || (_rect.height() / scaledStepSize.y()) > 200) {
-			scaledStepSize.setX(scaledStepSize.x() * 10);
-			scaledStepSize.setY(scaledStepSize.y() * 10);
+		while ((_rect.width() / scaledStepSize.getX()) > 200 || (_rect.height() / scaledStepSize.getY()) > 200) {
+			scaledStepSize.setX(scaledStepSize.getX() * 10);
+			scaledStepSize.setY(scaledStepSize.getY() * 10);
 		}
 	}
 	return scaledStepSize;

@@ -20,11 +20,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Rect.h"
 #include "OTCore/Color.h"
-#include "OTCore/Size2D.h"
-#include "OTCore/Point2D.h"
-#include "OTCore/Point3D.h"
+#include "OTCore/Geometry/Rect.h"
+#include "OTCore/Geometry/Size2D.h"
+#include "OTCore/Geometry/Point2D.h"
+#include "OTCore/Geometry/Point3D.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyPath.h"

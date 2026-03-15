@@ -101,7 +101,7 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	if (m_config) {
 		this->getQGraphicsItem()->setZValue(m_config->getZValue());
 
-		m_moveStartPt = QPointF(m_config->getPosition().x(), m_config->getPosition().y());
+		m_moveStartPt = QPointF(m_config->getPosition().getX(), m_config->getPosition().getY());
 		this->setGraphicsItemName(this->getGraphicsItemName());
 		if (!m_blockFlagNotifications) {
 			this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());

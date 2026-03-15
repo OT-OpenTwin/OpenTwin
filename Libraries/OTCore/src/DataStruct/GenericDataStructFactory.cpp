@@ -17,11 +17,13 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/GenericDataStructFactory.h"
-#include "OTCore/GenericDataStructMatrix.h"
-#include "OTCore/GenericDataStructVector.h"
-#include "OTCore/GenericDataStructSingle.h"
-ot::GenericDataStruct* ot::GenericDataStructFactory::Create(const ot::ConstJsonObject& object)
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructSingle.h"
+#include "OTCore/DataStruct/GenericDataStructVector.h"
+#include "OTCore/DataStruct/GenericDataStructFactory.h"
+
+ot::GenericDataStruct* ot::GenericDataStructFactory::create(const ot::ConstJsonObject& object)
 {
 	ot::GenericDataStruct temp;
 	temp.setFromJsonObject(object);

@@ -149,8 +149,8 @@ bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
 
 	// Grid
 	_settings.setValue("GID.ShowGrid", m_view->getDesignerScene()->getGrid().isGridLinesValid());
-	_settings.setValue("GID.GridStep", m_view->getDesignerScene()->getGridStep().x());
-	_settings.setValue("GID.GridWide", m_view->getDesignerScene()->getWideGridLineCounter().x());
+	_settings.setValue("GID.GridStep", m_view->getDesignerScene()->getGridStep().getX());
+	_settings.setValue("GID.GridWide", m_view->getDesignerScene()->getWideGridLineCounter().getX());
 	_settings.setValue("GID.GridSnap", QString::fromStdString(ot::Grid::toString(m_view->getDesignerScene()->getGridSnapMode())));
 
 	// Export

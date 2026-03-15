@@ -26,7 +26,7 @@
 #include "GraphicsItemDesignerNavigationRoot.h"
 
 // OpenTwin header
-#include "OTCore/Rect.h"
+#include "OTCore/Geometry/Rect.h"
 #include "OTGui/Graphics/GraphicsGroupItemCfg.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Graphics/GraphicsItem.h"
@@ -166,10 +166,10 @@ ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(const Graphi
 		if (_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign) {
 			RectD newRect(Point2DD(std::numeric_limits<double>::max(), std::numeric_limits<double>::max()),Point2DD (std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest()));
 			for (GraphicsItemCfg* cfg : rootGroup->getItems()) {
-				if (cfg->getPosition().x() < newRect.getLeft()) newRect.setLeft(cfg->getPosition().x());
-				if (cfg->getPosition().y() < newRect.getTop()) newRect.setTop(cfg->getPosition().y());
-				if (cfg->getPosition().x() > newRect.getRight()) newRect.setRight(cfg->getPosition().x());
-				if (cfg->getPosition().y() > newRect.getBottom()) newRect.setBottom(cfg->getPosition().y());
+				if (cfg->getPosition().getX() < newRect.getLeft()) newRect.setLeft(cfg->getPosition().getX());
+				if (cfg->getPosition().getY() < newRect.getTop()) newRect.setTop(cfg->getPosition().getY());
+				if (cfg->getPosition().getX() > newRect.getRight()) newRect.setRight(cfg->getPosition().getX());
+				if (cfg->getPosition().getY() > newRect.getBottom()) newRect.setBottom(cfg->getPosition().getY());
 			}
 
 			if (!newRect.isValid()) {

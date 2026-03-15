@@ -1,5 +1,5 @@
 // @otlicense
-// File: GenericDataStruct.h
+// File: GenericDataStructSingle.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,30 +18,36 @@
 // @otlicense-end
 
 #pragma once
-#include "OTCore/Serializable.h"
-#pragma warning(disable:4251)
+
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStruct.h"
+#include "OTCore/Variable/Variable.h"
 
 namespace ot
 {
-	
-	class __declspec(dllexport) GenericDataStruct : public Serializable
+	class OT_CORE_API_EXPORT GenericDataStructSingle : public GenericDataStruct
 	{
+	
 	public:
-		GenericDataStruct(const std::string& _typeName = "", uint32_t _numberOfEntries = 0) :m_numberOfEntries(_numberOfEntries), m_typeName(_typeName) {}
-		virtual ~GenericDataStruct() {
+		GenericDataStructSingle();
+		GenericDataStructSingle(const GenericDataStructSingle& _other);
+		GenericDataStructSingle(GenericDataStructSingle&& _other) noexcept;
+		GenericDataStructSingle& operator=(const GenericDataStructSingle& _other) = default;
+		GenericDataStructSingle& operator=(GenericDataStructSingle&& _other) noexcept = default;
+		~GenericDataStructSingle();
 
-		};
+		void setValue(const ot::Variable& _value);
+		void setValue(ot::Variable&& _value);
+
+		const ot::Variable& getValue() const;
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
-		const uint32_t getNumberOfEntries() const { return m_numberOfEntries; }
-		
-		std::string	getTypeIdentifyer() { return m_typeName; }
 
-	protected:
-		uint32_t m_numberOfEntries;
-		std::string m_typeName;
+		static std::string getClassName() { return "GenericDataStructSingle"; }
+	
+	private:
+		ot::Variable m_value;
 	};
 
-	using GenericDataStructList = std::list<ot::GenericDataStruct*>;
 }

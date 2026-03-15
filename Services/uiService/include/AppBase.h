@@ -30,7 +30,7 @@
 #include "NavigationSelectionManager.h"
 
 // OpenTwin Core header
-#include "OTCore/Point2D.h"
+#include "OTCore/Geometry/Point2D.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/ProjectInformation.h"

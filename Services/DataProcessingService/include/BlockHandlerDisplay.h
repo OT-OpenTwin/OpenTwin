@@ -18,9 +18,10 @@
 // @otlicense-end
 
 #pragma once
+
 #include "BlockHandler.h"
+#include "OTCore/DataStruct/GenericDataStruct.h"
 #include "OTBlockEntities/Pipeline/EntityBlockDisplay.h"
-#include "OTCore/GenericDataStruct.h"
 
 class BlockHandlerDisplay : public BlockHandler
 {

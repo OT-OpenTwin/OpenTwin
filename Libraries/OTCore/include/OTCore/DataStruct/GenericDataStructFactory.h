@@ -18,15 +18,19 @@
 // @otlicense-end
 
 #pragma once
-#include <memory>
-#include "OTCore/GenericDataStruct.h"
+
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStruct.h"
 #include "OTCore/JSON/JSON.h"
+
+// std header
+#include <memory>
 
 namespace ot
 {
-	class __declspec(dllexport) GenericDataStructFactory
+	class OT_CORE_API_EXPORT GenericDataStructFactory
 	{
 	public:
-		static ot::GenericDataStruct* Create(const ot::ConstJsonObject& object);
+		static ot::GenericDataStruct* create(const ot::ConstJsonObject& object);
 	};
 }

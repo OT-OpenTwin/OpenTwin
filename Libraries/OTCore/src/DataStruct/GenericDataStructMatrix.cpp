@@ -17,11 +17,10 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/GenericDataStructMatrix.h"
+// OpenTwin header
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/Variable/VariableToJSONConverter.h"
-
-using namespace ot;
 
 ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _rows, uint32_t _columns) 
 	: GenericDataStruct(getClassName(), _rows * _columns), m_numberOfColumns(_columns), m_numberOfRows(_rows)
@@ -29,7 +28,7 @@ ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _rows, uint32_t _c
 	allocateValueMemory();
 }
 
-GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer)
+ot::GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer)
 	: GenericDataStruct(getClassName(), _matrixEntryPointer.m_row * _matrixEntryPointer.m_column), m_numberOfColumns(_matrixEntryPointer.m_column), m_numberOfRows(_matrixEntryPointer.m_row)
 {
 	allocateValueMemory();
@@ -47,11 +46,11 @@ ot::GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _
 	allocateValueMemory(_defaultValue);
 }
 
-GenericDataStructMatrix::GenericDataStructMatrix()
+ot::GenericDataStructMatrix::GenericDataStructMatrix()
 	: GenericDataStruct(getClassName())
 {}
 
-GenericDataStructMatrix::~GenericDataStructMatrix()
+ot::GenericDataStructMatrix::~GenericDataStructMatrix()
 {}
 
 ot::GenericDataStructMatrix::GenericDataStructMatrix(const GenericDataStructMatrix& _other)
@@ -65,13 +64,13 @@ ot::GenericDataStructMatrix::GenericDataStructMatrix(GenericDataStructMatrix&& _
 	_other.m_numberOfEntries = 0;
 }
 
-void GenericDataStructMatrix::setValue(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable&& _value)
+void ot::GenericDataStructMatrix::setValue(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable&& _value)
 {
 	const uint32_t index = getIndex(_matrixEntryPointer.m_column, _matrixEntryPointer.m_row);
 	m_values[index] = std::move(_value);
 }
 
-void GenericDataStructMatrix::setValue(const MatrixEntryPointer& _matrixEntryPointer, const ot::Variable& _value)
+void ot::GenericDataStructMatrix::setValue(const MatrixEntryPointer& _matrixEntryPointer, const ot::Variable& _value)
 {
 	const uint32_t index = getIndex(_matrixEntryPointer.m_column,_matrixEntryPointer.m_row);
 	m_values[index] = _value;
@@ -91,7 +90,7 @@ void ot::GenericDataStructMatrix::setValues(std::list<ot::Variable> _values)
 	m_values = { _values.begin(), _values.end() };
 }
 
-const ot::Variable& GenericDataStructMatrix::getValue(const MatrixEntryPointer& _matrixEntryPointer) const
+const ot::Variable& ot::GenericDataStructMatrix::getValue(const MatrixEntryPointer& _matrixEntryPointer) const
 {
 	assert(_matrixEntryPointer.m_column < m_numberOfColumns);
 	assert(_matrixEntryPointer.m_row < m_numberOfRows);
