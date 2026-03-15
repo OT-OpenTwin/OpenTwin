@@ -316,6 +316,12 @@ void EntityContainer::detachFromHierarchy(void)
 
 std::string EntityContainer::serialiseAsJSON()
 {
+	// We do not serialize top-level entities
+	if (getName().find('/') == std::string::npos)
+	{
+		return std::string();
+	}
+
 	// Serialize general entity data
 	auto docBlock = EntityBase::serialiseAsMongoDocument();
 	const std::string jsonDocBlock = bsoncxx::to_json(docBlock);
