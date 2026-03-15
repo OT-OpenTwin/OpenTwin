@@ -96,18 +96,55 @@ void CopyPasteHandler::recursivelyRenameChildren(const std::string &oldName, con
 
 void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitiesByName)
 {
-	std::map<ot::UID, EntityBase*> parentEntities = getParentEntities(_newEntitiesByName);
-
 	Model* model = Application::instance()->getModel();
 	auto entityNames = model->getListOfEntityNames();
+
+	// First, we build a re-naming map from all containers in the pasted entity list
+	std::map<std::string, std::string> renamingMap;
+
+	for (auto& newEntityByName : _newEntitiesByName)
+	{
+		if (newEntityByName.second->getClassName() == "EntityContainer")
+		{
+			EntityBase* newEntity = newEntityByName.second;
+			const std::string oldName = newEntity->getName();
+			std::string newName = oldName;
+
+			if (entityNames.find(newName) != entityNames.end())
+			{
+				int counter = 1;
+				do
+				{
+					newName = oldName + "_" + std::to_string(counter);
+					counter++;
+
+				} while (entityNames.find(newName) != entityNames.end());
+
+				renamingMap[oldName + "/"] = newName + "/";
+			}
+		}
+	}
+
+	std::map<ot::UID, EntityBase*> parentEntities = getParentEntities(_newEntitiesByName);
+
 	const uint32_t safetyLimit = 100000;
 
 	for (auto& newEntityByName : parentEntities)
 	{
 		EntityBase* newEntity = newEntityByName.second;
 		const std::string oldName = newEntity->getName();
-		uint32_t counter(0);
+		uint32_t counter(1);
 		std::string newName = oldName;
+		// Check, whether this entity is in the renaming map
+		for (auto renameInfo : renamingMap)
+		{
+			if (renameInfo.first == newName.substr(0, renameInfo.first.size()))
+			{
+				// This item must be renamed
+				newName = renameInfo.second + newName.substr(renameInfo.first.size());
+			}
+		}
+
 		if (entityNames.find(newName) != entityNames.end())
 		{
 			newName = oldName + "_" + std::to_string(counter);

@@ -313,3 +313,41 @@ void EntityContainer::detachFromHierarchy(void)
 
 	children.clear();   // Clear child references
 }
+
+std::string EntityContainer::serialiseAsJSON()
+{
+	// Serialize general entity data
+	auto docBlock = EntityBase::serialiseAsMongoDocument();
+	const std::string jsonDocBlock = bsoncxx::to_json(docBlock);
+	ot::JsonDocument entireDoc;
+	entireDoc.fromJson(jsonDocBlock);
+
+	// We do not serialize the children information, since the children will also be copied separately
+
+	return entireDoc.toJson();
+}
+
+bool EntityContainer::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+{
+	try
+	{
+		// De-Serialize this entity together with the corresponding brep and facets
+		const std::string serialisationString = ot::json::toJson(_serialisation);
+		std::string_view serialisedEntityJSONView(serialisationString);
+		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
+		auto serialisedEntityBSONView = serialisedEntityBSON.view();
+
+		readSpecificDataFromDataBase(serialisedEntityBSONView, _entityMap);
+		setEntityID(createEntityUID());
+
+		_entityMap[getEntityID()] = this;
+
+		return true;
+	}
+	catch (std::exception _e)
+	{
+		OT_LOG_E("Failed to deserialise " + getClassName() + " because: " + std::string(_e.what()));
+		return false;
+	}
+
+}
