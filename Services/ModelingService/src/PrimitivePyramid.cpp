@@ -206,7 +206,7 @@ void PrimitivePyramid::createFromRubberbandJson(const std::string& _json, std::v
 			shapeParameters.push_back(std::pair<std::string, std::string>("ZMin", to_string(zmin)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("ZMax", to_string(zmax)));
 
-			storeShapeInModel(pyramid, _transform, "Geometry/Pyramid", "Pyramid", shapeParameters, faceNames);
+			storeShapeInModel(pyramid, _transform, getParentFolder() + "/Pyramid", "Pyramid", shapeParameters, faceNames);
 		}
 		else {
 			if (uiComponent)

@@ -21,11 +21,13 @@
 
 #include "ShapesBase.h"
 
+class PrimitiveManager;
+
 class PrimitivePyramid : public ShapesBase
 {
 public:
-	PrimitivePyramid(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache) 
-		: ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache) {};
+	PrimitivePyramid(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache, PrimitiveManager* _primitiveManager)
+		: ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, _primitiveManager) {};
 	~PrimitivePyramid() {};
 
 	void sendRubberbandData(void);

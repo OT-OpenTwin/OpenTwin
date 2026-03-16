@@ -50,7 +50,7 @@ class SimplifyRemoveFaces : public ShapesBase
 {
 public:
 	SimplifyRemoveFaces(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache) 
-		: ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache), updateManager(nullptr) {};
+		: ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, nullptr), updateManager(nullptr) {};
 	virtual ~SimplifyRemoveFaces() {}
 
 	void setUpdateManager(UpdateManager *_updateManager) { updateManager = _updateManager; };

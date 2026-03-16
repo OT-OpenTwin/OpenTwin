@@ -173,7 +173,7 @@ void PrimitiveCuboid::createFromRubberbandJson(const std::string& _json, std::ve
 				faceNames = { "f1", "f2", "f3", "f4", "f5", "f6" };
 			}
 
-			storeShapeInModel(box, _transform, "Geometry/Cuboid", "Cuboid", shapeParameters, faceNames);
+			storeShapeInModel(box, _transform, getParentFolder() + "/Cuboid", "Cuboid", shapeParameters, faceNames);
 		}
 		else 
 		{

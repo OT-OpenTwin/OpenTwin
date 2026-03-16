@@ -43,7 +43,7 @@
 #include <BRepBuilderAPI_MakeSolid.hxx>
 
 BooleanOperations::BooleanOperations(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, EntityCache *_entityCache, ot::serviceID_t _serviceID) :
-	ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache)
+	ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, nullptr)
 {
 
 }

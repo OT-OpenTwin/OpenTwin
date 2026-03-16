@@ -272,6 +272,7 @@
 #define OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode "UI.View.Node.AddVis2D3D"
 #define OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode "UI.View.Node.UpdateVis2D3D"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor "UI.VIEW.OBJ.UpdateColor"
+#define OT_ACTION_CMD_UI_VIEW_LatestParentGroup "UI.VIEW.OBJ.LatestParentGroup"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_UpdateFacetsFromDataBase "UI.VIEW.OBJ.UpdateFacetsFromDataBase"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_RemoveShapes "UI.VIEW.OBJ.Shapes.Remove"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_TreeStateRecording "UI.VIEW.OBJ.Tree.StateRecording"

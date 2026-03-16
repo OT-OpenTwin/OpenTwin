@@ -190,7 +190,7 @@ void PrimitiveCylinder::createFromRubberbandJson(const std::string& _json, std::
 			shapeParameters.push_back(std::pair<std::string, std::string>("ZMax",	 to_string(zmax)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("Radius",  to_string(radius)));
 
-			storeShapeInModel(body, _transform, "Geometry/Cylinder", "Cylinder", shapeParameters, faceNames);
+			storeShapeInModel(body, _transform, getParentFolder() + "/Cylinder", "Cylinder", shapeParameters, faceNames);
 		}
 		else {
 			if (uiComponent) { uiComponent->displayWarningPrompt("Invalid number of points received for create cylinder from rubberband"); }

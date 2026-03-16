@@ -129,6 +129,7 @@ private:
 	void handleCreateGeometryFromRubberband(ot::JsonDocument& _document);
 	void handleEntitiesSelected(ot::JsonDocument& _document);
 	void handleSetActiveCoordinateSystem(ot::JsonDocument& _document);
+	void handleSetLatestParentGroup(ot::JsonDocument& _document);
 
 	ot::ToolBarButtonCfg m_buttonImportStep;
 	ot::ToolBarButtonCfg m_buttonExportCad;

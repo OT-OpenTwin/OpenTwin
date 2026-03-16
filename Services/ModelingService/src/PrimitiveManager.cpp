@@ -26,6 +26,8 @@
 #include "PrimitiveTorus.h"
 #include "PrimitivePyramid.h"
 
+std::string PrimitiveManager::currentParentGroupName;
+
 PrimitiveManager::PrimitiveManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent,
 								   const std::string &_serviceName, ot::serviceID_t _serviceID, EntityCache *_entityCache) : 
 	uiComponent(_uiComponent),
@@ -33,12 +35,12 @@ PrimitiveManager::PrimitiveManager(ot::components::UiComponent *_uiComponent, ot
 	serviceName(_serviceName),
 	entityCache(_entityCache)
 {
-	cone     = new PrimitiveCone(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache);
-	cuboid   = new PrimitiveCuboid(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache);
-	cylinder = new PrimitiveCylinder(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache);
-	pyramid  = new PrimitivePyramid(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache);
-	sphere   = new PrimitiveSphere(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache);
-	torus    = new PrimitiveTorus(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache);
+	cone     = new PrimitiveCone(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, this);
+	cuboid   = new PrimitiveCuboid(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, this);
+	cylinder = new PrimitiveCylinder(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, this);
+	pyramid  = new PrimitivePyramid(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, this);
+	sphere   = new PrimitiveSphere(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, this);
+	torus    = new PrimitiveTorus(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, this);
 }
 
 PrimitiveManager::~PrimitiveManager()

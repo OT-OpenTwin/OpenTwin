@@ -1071,6 +1071,14 @@ void Model::handleCreateNewGroup()
 	setModified();
 	updatePropertyGrid(); // We need to update the property grid to make sure that the new group will become visible in the group selection
 
+	// Inform modeling service about the new group and set this as the new default for shape creation
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_LatestParentGroup, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string response;
+	Application::instance()->sendMessage(false, OT_INFO_SERVICE_TYPE_ModelingService, doc, response);
+
 	modelChangeOperationCompleted("create new group: " + groupName);
 
 	Application::instance()->getNotifier()->selectObject(getVisualizationModel(), groupEntity->getEntityID());
@@ -1667,6 +1675,13 @@ void Model::handleParentGroupPropertyChange(std::list<EntityBase*> &entities, En
 	if (!newGroupName.empty())
 	{
 		applyParentGroupChange(entities, newGroupName);
+
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_LatestParentGroup, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(newGroupName, doc.GetAllocator()), doc.GetAllocator());
+
+		std::string response;
+		Application::instance()->sendMessage(false, OT_INFO_SERVICE_TYPE_ModelingService, doc, response);
 	}
 }
 

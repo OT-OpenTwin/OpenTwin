@@ -56,6 +56,9 @@ public:
 
 	PrimitiveManager() = delete;
 
+	void setCurrentParentGroup(const std::string& _parentGroup) { currentParentGroupName = _parentGroup;	}
+	std::string getCurrentParentGroup() { return currentParentGroupName; }
+
 private:
 	ot::components::UiComponent *uiComponent;
 	ot::components::ModelComponent *modelComponent;
@@ -68,5 +71,7 @@ private:
 	PrimitivePyramid  *pyramid;
 	PrimitiveSphere   *sphere;
 	PrimitiveTorus    *torus;
+
+	static std::string currentParentGroupName;
 };
 

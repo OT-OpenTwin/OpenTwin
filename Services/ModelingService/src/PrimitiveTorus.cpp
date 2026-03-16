@@ -273,7 +273,7 @@ void PrimitiveTorus::createFromRubberbandJson(const std::string& _json, std::vec
 			shapeParameters.push_back(std::pair<std::string, std::string>("Distance center to pipe center",  to_string(distanceToPipeCenter)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("Pipe radius",				     to_string(pipeRadius)));
 
-			storeShapeInModel(body, _transform, "Geometry/Torus", "Torus", shapeParameters, faceNames);
+			storeShapeInModel(body, _transform, getParentFolder() + "/Torus", "Torus", shapeParameters, faceNames);
 		}
 		else {
 			if (uiComponent)

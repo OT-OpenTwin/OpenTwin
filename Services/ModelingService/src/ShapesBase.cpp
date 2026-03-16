@@ -21,6 +21,7 @@
 
 #include "ApplicationSettings.h"
 #include "EntityCache.h"
+#include "PrimitiveManager.h"
 
 #include "OTCore/CoreTypes.h"
 #include "OTCADEntities/EntityGeometry.h"
@@ -45,12 +46,13 @@ ot::UID ShapesBase::materialsFolderID = 0;
 std::string ShapesBase::geometryFolder;
 ot::UID ShapesBase::geometryFolderID = 0;
 
-ShapesBase::ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache) :
+ShapesBase::ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache, PrimitiveManager *_primitiveManager) :
 	uiComponent(_uiComponent),
 	modelComponent(_modelComponent),
 	serviceID(_serviceID),
 	serviceName(_serviceName),
-	entityCache(_entityCache)
+	entityCache(_entityCache),
+	primitiveManager(_primitiveManager)
 {
 
 }
@@ -330,5 +332,26 @@ void ShapesBase::writeShapeToStepFile(const TopoDS_Shape & _shape, const std::st
 		}
 		break;
 	}
+}
+
+std::string ShapesBase::getParentFolder()
+{
+	std::string parentFolder = "Geometry";
+
+	if (primitiveManager == nullptr) return parentFolder;
+
+	std::string parentGroupName = primitiveManager->getCurrentParentGroup();
+	if (parentGroupName.empty()) return parentFolder;
+
+	// The materials folder information has not yet been retrieved. We get the information about the entity from the model
+	ot::EntityInformation parentGroupInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(parentGroupName, parentGroupInfo))
+	{
+		// The item does not exist anymore
+		return parentFolder;
+	}
+	
+	// The parent group still exists, so we can use it
+	return parentGroupName;
 }
 

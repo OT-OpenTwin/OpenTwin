@@ -565,6 +565,14 @@ void Application::handleSetActiveCoordinateSystem(ot::JsonDocument& _document)
 	getCoordinateSystemManager()->setActiveCoordinateSystem(csName);
 }
 
+void Application::handleSetLatestParentGroup(ot::JsonDocument& _document)
+{
+	std::string parentGroupName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	getPrimitiveManager()->setCurrentParentGroup(parentGroupName);
+}
+
+
 void Application::handleRequestImportSTEP() {
 	// Get a file name for the STEP file from the UI
 	ot::JsonDocument doc;
@@ -691,6 +699,7 @@ Application::Application() :
 	connectAction(OT_ACTION_CMD_MODEL_EntitiesSelected, this, &Application::handleEntitiesSelected);
 	connectAction(OT_ACTION_CMD_MODEL_CreateGeometryFromRubberbandData, this, &Application::handleCreateGeometryFromRubberband);
 	connectAction(OT_ACTION_CMD_UI_VIEW_ActivateCS, this, &Application::handleSetActiveCoordinateSystem);
+	connectAction(OT_ACTION_CMD_UI_VIEW_LatestParentGroup, this, &Application::handleSetLatestParentGroup);
 
 	// Setup and connect buttons
 	ot::LockTypes lockTypes = ot::LockType::ModelWrite | ot::LockType::ViewWrite | ot::LockType::ModelRead;

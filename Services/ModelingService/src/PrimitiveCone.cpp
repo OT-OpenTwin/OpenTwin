@@ -264,7 +264,7 @@ void PrimitiveCone::createFromRubberbandJson(const std::string& _json, std::vect
 			shapeParameters.push_back(std::pair<std::string, std::string>("BottomRadius", to_string(bottomRadius)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("TopRadius",	  to_string(topRadius)));
 
-			storeShapeInModel(body, _transform, "Geometry/Cone", "Cone", shapeParameters, faceNames);
+			storeShapeInModel(body, _transform, getParentFolder() + "/Cone", "Cone", shapeParameters, faceNames);
 		}
 		else {
 			if (uiComponent)

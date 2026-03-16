@@ -31,10 +31,12 @@ class EntityCache;
 
 class TopoDS_Shape;
 
+class PrimitiveManager;
+
 class ShapesBase
 {
 public:
-	ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache);
+	ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache, PrimitiveManager *_primitiveManager);
 	~ShapesBase() {};
 
 	ShapesBase() = delete;
@@ -49,11 +51,14 @@ protected:
 	void deleteNonStandardProperties(EntityGeometry* geometryEntity);
 
 protected:
+	std::string getParentFolder();
+
 	ot::components::UiComponent *uiComponent;
 	ot::components::ModelComponent *modelComponent;
 	ot::serviceID_t serviceID;
 	std::string serviceName;
 	EntityCache *entityCache;
+	PrimitiveManager* primitiveManager;
 
 private:
 	static std::string materialsFolder;
