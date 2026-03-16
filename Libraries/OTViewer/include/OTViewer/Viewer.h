@@ -173,7 +173,7 @@ private:
 	// Methods
 	osgGA::EventQueue* getEventQueue() const;
 	osg::Camera* createOverlayCamera(double xmin, double xmax, double ymin, double ymax);
-	osgText::Text *createText(const osg::Vec2 &pos, const std::string &text, float textSize, osgText::TextBase::AlignmentType alignment = osgText::TextBase::AlignmentType::CENTER_CENTER);
+	osgText::Text *createText(const osg::Vec2 &pos, const osg::Vec4 &color, const std::string &text, float textSize, osgText::TextBase::AlignmentType alignment = osgText::TextBase::AlignmentType::CENTER_CENTER);
 	void updateOverlaySize(int width, int height);
 	ot::PropertyGridCfg createSettings(void);
 	void updateProjection(void);

@@ -435,7 +435,7 @@ osg::Camera* Viewer::createOverlayCamera(double xmin, double xmax, double ymin, 
 	return camera;
 }
 
-osgText::Text *Viewer::createText(const osg::Vec2 &pos, const std::string &message, float textSize, osgText::TextBase::AlignmentType alignment)
+osgText::Text *Viewer::createText(const osg::Vec2 &pos, const osg::Vec4 &color, const std::string &message, float textSize, osgText::TextBase::AlignmentType alignment)
 {
 	osg::Vec3 pos3(pos.x(), pos.y(), 0.0);
 
@@ -447,7 +447,7 @@ osgText::Text *Viewer::createText(const osg::Vec2 &pos, const std::string &messa
 	text->setAxisAlignment(osgText::TextBase::XY_PLANE);
 	text->setAlignment(alignment);
 	text->setPosition(pos3);
-	text->setColor(osg::Vec4(0.0, 0.0, 0.0, 1.0));
+	text->setColor(color);
 	text->setText(message);
 	text->setCharacterSizeMode(osgText::TextBase::SCREEN_COORDS);
 
@@ -483,7 +483,7 @@ void Viewer::setOverlayText(const std::string &text)
 	overlayBox->setShape(new osg::Box(osg::Vec3(this->width()/2, this->height()- textHeight, -1.0), this->width(), 2* textHeight, 0.0));
 	overlayBox->setColor(osg::Vec4(1.0, 0.95, 0.62, 0.8));
 
-	overlayText = createText(osg::Vec2(this->width() / 2, this->height() - textHeight), text, 1.0f * textHeight);
+	overlayText = createText(osg::Vec2(this->width() / 2, this->height() - textHeight), osg::Vec4(0.0, 0.0, 0.0, 1.0), text, 1.0f * textHeight);
 
 	overlayTextNode->addDrawable(overlayBox);
 	overlayTextNode->addDrawable(overlayText);
@@ -1989,7 +1989,7 @@ void Viewer::setCursorText(const std::string& text)
 		float centerX = mouseCursorX / scaleWidth;
 		float centerY = this->height() - mouseCursorY / scaleHeight - 1.3 * textHeight;
 
-		mouseCursorText = createText(osg::Vec2(centerX, centerY), text, 1.0f * textHeight);
+		mouseCursorText = createText(osg::Vec2(centerX, centerY), osg::Vec4(0.0, 0.0, 0.0, 1.0), text, 1.0f * textHeight);
 
 		osg::BoundingBox textBox = mouseCursorText->computeBoundingBox();
 
@@ -2163,13 +2163,15 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 
 	bool showCenterLabel = (2 * numberOfTicksBothSides * tickInterval < activeColorRamp->getValues().size());
 
+	osg::Vec4 textColor(overlayTextColor[0], overlayTextColor[1], overlayTextColor[2], 1.0);
+
 	// Lower half of the label set
 	for (std::size_t i = 0; i < numberOfTicksBothSides; i++)
 	{
 		float y = origin.y() + static_cast<float>(i* tickInterval) * segmentHeight;
 		osg::Vec2 textPos(origin.x() - labelOffset, y);
 			
-		overlayColorRampNode->addDrawable(createText(textPos, formatValue(activeColorRamp->getValues()[i * tickInterval], precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
+		overlayColorRampNode->addDrawable(createText(textPos, textColor, formatValue(activeColorRamp->getValues()[i * tickInterval], precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
 	}
 
 	// Upper half of the label set
@@ -2179,7 +2181,7 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 		float y = origin.y() + static_cast<float>(index) * segmentHeight;
 		osg::Vec2 textPos(origin.x() - labelOffset, y);
 
-		overlayColorRampNode->addDrawable(createText(textPos, formatValue(activeColorRamp->getValues()[index], precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
+		overlayColorRampNode->addDrawable(createText(textPos, textColor, formatValue(activeColorRamp->getValues()[index], precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
 	}
 
 	// Center label if necessary
@@ -2200,11 +2202,11 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 			centerValue = activeColorRamp->getValues()[activeColorRamp->getValues().size() / 2];
 		}
 
-		overlayColorRampNode->addDrawable(createText(textPos, formatValue(centerValue, precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
+		overlayColorRampNode->addDrawable(createText(textPos, textColor, formatValue(centerValue, precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
 	}
 
 	// Add the label to the node
-	overlayColorRampNode->addDrawable(createText(osg::Vec2(origin.x() + barWidth / 2.0f, origin.y() + heightBox + 2.0f * labelOffset), activeColorRamp->getLabel(), maxTextHeight, osgText::TextBase::AlignmentType::CENTER_BOTTOM));
+	overlayColorRampNode->addDrawable(createText(osg::Vec2(origin.x() + barWidth / 2.0f, origin.y() + heightBox + 2.0f * labelOffset), textColor, activeColorRamp->getLabel(), maxTextHeight, osgText::TextBase::AlignmentType::CENTER_BOTTOM));
 
 	// Add the node to the scene
 	osgOverlayCamera->addChild(overlayColorRampNode);
