@@ -422,6 +422,35 @@ std::string Application::handleGetEntityInformationByName(ot::JsonDocument& _doc
 	return this->getEntityInformation(entityIDList);
 }
 
+std::string Application::handleIsSubshapeOfGeometryOperation(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	bool isSubshape = false;
+
+	std::list<std::string> entityNameList = ot::json::getStringList(_document, OT_ACTION_PARAM_MODEL_EntityNameList);
+
+	std::list<ot::UID> entityIDList;
+	for (auto name : entityNameList)
+	{
+		EntityBase* entity = m_model->findEntityFromName(name);
+
+		if (dynamic_cast<EntityGeometry*>(entity->getParent()) != nullptr)
+		{
+			// The parent entity is a geometry entity, so we are a subshape of a geometry operation
+			isSubshape = true;
+			break;
+		}
+	}
+
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, isSubshape, responseDoc.GetAllocator());
+
+	return responseDoc.toJson();
+}
+
 std::string Application::handleGetSelectedEntityInformation(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
@@ -1311,6 +1340,7 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityInformationFromID, this, &Application::handleGetEntityInformationByID);
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityInformationFromName, this, &Application::handleGetEntityInformationByName);
 	connectAction(OT_ACTION_CMD_MODEL_GetSelectedEntityInformation, this, &Application::handleGetSelectedEntityInformation);
+	connectAction(OT_ACTION_CMD_MODEL_IsSubshapeOfGeometryOperation, this, &Application::handleIsSubshapeOfGeometryOperation);
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName, this, &Application::handleGetEntityChildInformationByName);
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID, this, &Application::handleGetEntityChildInformationByID);
 	connectAction(OT_ACTION_CMD_MODEL_GetAllGeometryEntities, this, &Application::handleGetAllGeometryEntities);

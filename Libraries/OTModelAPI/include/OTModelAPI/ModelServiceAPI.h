@@ -74,7 +74,11 @@ namespace ot {
 		//! @brief Will fill the provided EntityInformation object with information about the requested entity. Only works for topology entities.
 		//! Requesting information about data entities will result in a default EntityInformation object being returned.
 		static void getEntityInformation(const std::list<UID>& _entities, std::list<EntityInformation>& _entityInfo);
-		
+
+		//! @brief Will determine if any of the given shapes is a sub-shape of a geometry operation. If so, the function returns true and otherwise false.
+		static bool anySubshapeOfGeometryOperation(const std::list<std::string>& _entities);
+		static bool anySubshapeOfGeometryOperation(const std::list<ot::EntityInformation>& _entities);
+
 		//! @brief Will fill the provided EntityInformation object with information about the requested entity. Only works for topology entities.
 		//! Requesting information about data entities will result in a default EntityInformation object being returned.
 		static void getEntityInformation(const std::list<std::string>& _entities, std::list<EntityInformation>& _entityInfo);

@@ -355,3 +355,9 @@ std::string ShapesBase::getParentFolder()
 	return parentGroupName;
 }
 
+bool ShapesBase::isSubshapeOfGeometryOperation(const std::string& shapeName)
+{
+	std::list<std::string> entityList{ shapeName };
+
+	return ot::ModelServiceAPI::anySubshapeOfGeometryOperation(entityList);
+}

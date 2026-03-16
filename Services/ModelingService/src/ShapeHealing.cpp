@@ -68,6 +68,13 @@
 void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool fixSmallFaces, bool sewFaces, bool makeSolids)
 {
 	std::list<ot::EntityInformation> selectedGeometryEntities = application->getSelectedGeometryEntities();
+
+	if (ot::ModelServiceAPI::anySubshapeOfGeometryOperation(selectedGeometryEntities))
+	{
+		application->getUiComponent()->displayErrorPrompt("Construction sub-shapes of geometric operations must not be modified by healing operations.");
+		return;
+	}
+
 	application->getEntityCache()->prefetchEntities(selectedGeometryEntities);
 
 	// Filter the list of selected shapes for editable ones

@@ -371,6 +371,40 @@ void ot::ModelServiceAPI::getEntityInformation(const std::list<std::string>& _en
 	}
 }
 
+bool ot::ModelServiceAPI::anySubshapeOfGeometryOperation(const std::list<std::string>& _entities)
+{
+	// Prepare the request
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_IsSubshapeOfGeometryOperation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityNameList, JsonArray(_entities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
+	// Send the command
+	std::string response;
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+		return false;
+	}
+
+	// Process the result from the model service
+	JsonDocument responseDoc;
+	responseDoc.fromJson(response);
+
+	bool result = ot::json::getBool(responseDoc, OT_ACTION_PARAM_BASETYPE_Bool);
+
+	return result;
+}
+
+bool ot::ModelServiceAPI::anySubshapeOfGeometryOperation(const std::list<ot::EntityInformation> &_entities)
+{
+	std::list<std::string> entityNames;
+
+	for (auto entity : _entities)
+	{
+		entityNames.push_back(entity.getEntityName());
+	}
+
+	return anySubshapeOfGeometryOperation(entityNames);
+}
+
 void ot::ModelServiceAPI::getSelectedEntityInformation(std::list<EntityInformation>& _entityInfo, const std::string& typeFilter) {
 	// Prepare the request
 	JsonDocument requestDoc;

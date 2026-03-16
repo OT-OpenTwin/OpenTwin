@@ -60,6 +60,12 @@ void BooleanOperations::enterAddMode(const std::list<ot::EntityInformation> &sel
 
 	std::string baseShapeName = selectedGeometryEntities.front().getEntityName();
 
+	if (isSubshapeOfGeometryOperation(baseShapeName))
+	{
+		uiComponent->displayErrorPrompt("Construction sub-shapes of geometric operations must not be selected for boolean operations.");
+		return;
+	}
+
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
 
@@ -79,6 +85,11 @@ void BooleanOperations::enterSubtractMode(const std::list<ot::EntityInformation>
 
 	std::string baseShapeName = selectedGeometryEntities.front().getEntityName();
 
+	if (isSubshapeOfGeometryOperation(baseShapeName))
+	{
+		uiComponent->displayErrorPrompt("Construction sub-shapes of geometric operations must not be selected for boolean operations.");
+		return;
+	}
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
 
@@ -97,6 +108,12 @@ void BooleanOperations::enterIntersectMode(const std::list<ot::EntityInformation
 	}
 
 	std::string baseShapeName = selectedGeometryEntities.front().getEntityName();
+
+	if (isSubshapeOfGeometryOperation(baseShapeName))
+	{
+		uiComponent->displayErrorPrompt("Construction sub-shapes of geometric operations must not be selected for boolean operations.");
+		return;
+	}
 
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
@@ -123,11 +140,14 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 	// Build a list of all geometry shapes and check whether the original shape is also selected as tool shape
 	std::list<ot::EntityInformation> geometryEntities;
+	std::list<std::string> geometryEntitiesNames;
+
 	for (auto entity : entityInfo)
 	{
 		if (entity.getEntityType() == "EntityGeometry")
 		{
 			geometryEntities.push_back(entity);
+			geometryEntitiesNames.push_back(entity.getEntityName());
 		}
 
 		if (entity.getEntityName() == baseEntityName)
@@ -135,6 +155,12 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 			uiComponent->displayErrorPrompt("The base shape must not be selected as tool shape for the operation as well");
 			return;
 		}
+	}
+
+	if (ot::ModelServiceAPI::anySubshapeOfGeometryOperation(geometryEntitiesNames))
+	{
+		uiComponent->displayErrorPrompt("Construction sub-shapes of geometric operations must not be selected for boolean operations.");
+		return;
 	}
 
 	// Prefetch all geometry entities

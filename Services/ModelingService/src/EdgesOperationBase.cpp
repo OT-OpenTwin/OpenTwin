@@ -104,6 +104,12 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 	std::list<ot::EntityInformation> entityInfo;
 	ot::ModelServiceAPI::getEntityInformation(affectedEntities, entityInfo);
 
+	if (ot::ModelServiceAPI::anySubshapeOfGeometryOperation(entityInfo))
+	{
+		uiComponent->displayErrorPrompt("Construction sub-shapes of geometric operations must not be modified by operations on edges.");
+		return;
+	}
+
 	// Prefetch the geometry entity
 	entityCache->prefetchEntities(entityInfo);
 

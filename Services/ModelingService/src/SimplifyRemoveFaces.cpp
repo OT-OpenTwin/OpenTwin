@@ -81,6 +81,12 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 	std::list<ot::EntityInformation> entityInfo;
 	ot::ModelServiceAPI::getEntityInformation(affectedEntities, entityInfo);
 
+	if (ot::ModelServiceAPI::anySubshapeOfGeometryOperation(entityInfo))
+	{
+		uiComponent->displayErrorPrompt("Construction sub-shapes of geometric operations must not be modified by remove face operations.");
+		return;
+	}
+
 	// Prefetch the geometry entities
 	entityCache->prefetchEntities(entityInfo);
 

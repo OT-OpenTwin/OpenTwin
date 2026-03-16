@@ -138,6 +138,8 @@ public:
 
 	std::string handleGetSelectedEntityInformation(ot::JsonDocument& _document);
 
+	std::string handleIsSubshapeOfGeometryOperation(ot::JsonDocument& _document);
+
 	std::string handleGetEntityChildInformationByName(ot::JsonDocument& _document);
 
 	std::string handleGetEntityChildInformationByID(ot::JsonDocument& _document);

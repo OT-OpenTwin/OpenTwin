@@ -123,6 +123,7 @@
 #define OT_ACTION_CMD_MODEL_GetEntityInformationFromName "Model.Entities.GetInformationFromName"
 #define OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID "Model.Entities.Childs.GetInformationFromID"
 #define OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName "Model.Entities.Childs.GetInformationFromName"
+#define OT_ACTION_CMD_MODEL_IsSubshapeOfGeometryOperation "Model.Entities.Childs.IsSubshapeOfGeometryOperation"
 #define OT_ACTION_CMD_MODEL_GetSelectedEntityInformation "Model.SelectedEntities.GetEntities"
 #define OT_ACTION_CMD_MODEL_GetAllGeometryEntities "Model.GeometryEntities"
 #define OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing "Model.Entities.ForMeshing"

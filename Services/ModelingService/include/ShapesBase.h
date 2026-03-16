@@ -52,6 +52,7 @@ protected:
 
 protected:
 	std::string getParentFolder();
+	bool isSubshapeOfGeometryOperation(const std::string& shapeName);
 
 	ot::components::UiComponent *uiComponent;
 	ot::components::ModelComponent *modelComponent;
