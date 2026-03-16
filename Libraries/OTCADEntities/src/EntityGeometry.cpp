@@ -1146,6 +1146,7 @@ void EntityGeometry::setName(const std::string& _name)
 	if (groupProp != nullptr)
 	{
 		groupProp->setValueName(getParentName());
+		groupProp->setValueID(-1);
 	}
 }
 
