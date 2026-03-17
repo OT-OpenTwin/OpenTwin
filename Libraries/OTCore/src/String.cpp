@@ -43,7 +43,7 @@ std::string ot::String::toString(DisplayNumberFormat _format)
 	{
 	case ot::String::Decimal: return "Decimal";
 	case ot::String::DecimalFixed: return "Decimal Fixed";
-	case ot::String::Interger: return "Integer";
+	case ot::String::Integer: return "Integer";
 	case ot::String::Scientific: return "Scientific";
 	case ot::String::Engineering: return "Engineering";
 	default:
@@ -56,7 +56,7 @@ ot::String::DisplayNumberFormat ot::String::stringToDisplayNumberFormat(const st
 {
 	if (_format == toString(DisplayNumberFormat::Decimal)) return DisplayNumberFormat::Decimal;
 	else if (_format == toString(DisplayNumberFormat::DecimalFixed)) return DisplayNumberFormat::DecimalFixed;
-	else if (_format == toString(DisplayNumberFormat::Interger)) return DisplayNumberFormat::Interger;
+	else if (_format == toString(DisplayNumberFormat::Integer)) return DisplayNumberFormat::Integer;
 	else if (_format == toString(DisplayNumberFormat::Scientific)) return DisplayNumberFormat::Scientific;
 	else if (_format == toString(DisplayNumberFormat::Engineering)) return DisplayNumberFormat::Engineering;
 	else {

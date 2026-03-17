@@ -33,10 +33,11 @@ namespace ot {
 		OT_DECL_NOCOPY(String)
 		OT_DECL_NODEFAULT(String)
 	public:
-		enum DisplayNumberFormat {
+		enum DisplayNumberFormat : uint32_t
+		{
 			Decimal,
 			DecimalFixed,
-			Interger,
+			Integer,
 			Scientific,
 			Engineering
 		};

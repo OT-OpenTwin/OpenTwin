@@ -71,7 +71,7 @@ inline std::string ot::String::numberToString(T _number, DisplayNumberFormat _fo
 		stream << std::fixed << std::setprecision(_decimalPlaces) << _number;
 		break;
 
-	case DisplayNumberFormat::Interger:
+	case DisplayNumberFormat::Integer:
 		stream << static_cast<int64_t>(std::llround(_number));
 		break;
 
