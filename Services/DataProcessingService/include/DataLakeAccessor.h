@@ -3,6 +3,7 @@
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTCore/QueryDescription/QueryDescription.h"
 #include "mongocxx/options/find.hpp"
+#include <map>
 
 class DataLakeAccessor
 {
@@ -10,7 +11,7 @@ public:
 	void accessPartition(const std::string& _collectionName);
 	void setValueDescriptionsSeries(const std::list<ot::QueryDescription>& _queryDescriptions);
 	void setValueDescriptionsQuantities(const std::list<ot::QueryDescription>& _queryDescriptions);
-	void setValueDescriptionsParameters(const std::list<ot::QueryDescription>& _queryDescriptions);
+	void addValueDescriptionsParameters(const std::list<ot::QueryDescription>& _queryDescriptions);
 
 	ot::JsonDocument executeQuery(mongocxx::options::find _options);
 private:
@@ -18,11 +19,17 @@ private:
 	std::list<ot::QueryDescription> m_queryDescriptionsQuantities;
 	std::list<ot::QueryDescription> m_queryDescriptionsParameters;
 	std::string m_collectionName;
+	const std::string m_transformedCollectionEnding = ".transformed";
+	const std::string m_resultDataField = "Data";
+
 	
 	void createQueries(BsonViewOrValue& _resultCollectionQueries, BsonViewOrValue& _transformedCollectionQueries);
 	bool transformationNecessary(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat);
 	bool alreadyStoredTransformation(const ot::QueryDescription& _queryDescription);
 	void storeTransformation(const ot::QueryDescription& _queryDescription);
+
+	ot::JsonDocument createClearTextResult(const ot::JsonDocument& _databaseResults);
+	std::map<std::string,std::string> createFieldKeyLabelLookup(const std::list<ot::QueryDescription>& _queryDescription);
 
 	//! @brief All provided series are valid options and each document has only one series it belongs to. Thus, the series query is assembled as an or connected list of series ID options
 	//! @return Empty if not series was provided. Should be prevented at a higher level, since queries without series specification will target every datapoint regardless of the modelstate.

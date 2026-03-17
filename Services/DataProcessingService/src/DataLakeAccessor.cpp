@@ -27,9 +27,24 @@ void DataLakeAccessor::setValueDescriptionsQuantities(const std::list<ot::QueryD
 	m_queryDescriptionsQuantities = _queryDescriptions;
 }
 
-void DataLakeAccessor::setValueDescriptionsParameters(const std::list<ot::QueryDescription>& _queryDescriptions)
+void DataLakeAccessor::addValueDescriptionsParameters(const std::list<ot::QueryDescription>& _queryDescriptions)
 {
-	m_queryDescriptionsParameters = _queryDescriptions;
+	for (const ot::QueryDescription& queryDescription : _queryDescriptions)
+	{
+		bool exists = false;
+		for (const ot::QueryDescription& alreadyStoredDescription : m_queryDescriptionsParameters)
+		{
+			if (queryDescription.getQueryTargetDescription().getMongoDBFieldName() == alreadyStoredDescription.getQueryTargetDescription().getMongoDBFieldName())
+			{
+				exists = true;
+				break;
+			}
+		}
+		if (!exists)
+		{
+			m_queryDescriptionsParameters.push_back(queryDescription);
+		}
+	}
 }
 
 ot::JsonDocument DataLakeAccessor::executeQuery(mongocxx::options::find _options)
@@ -46,27 +61,53 @@ ot::JsonDocument DataLakeAccessor::executeQuery(mongocxx::options::find _options
 	
 	const std::string debugQuery = bsoncxx::to_json(resultCollectionQuery.view());
 
+	ot::JsonDocument result;
+	ot::JsonArray data;
+
+	auto startTime = std::chrono::high_resolution_clock::now();
 	if (!resultCollectionQuery.view().empty())
 	{
-		auto startTime = std::chrono::high_resolution_clock::now();
-		DataStorageAPI::DataLakeAPI resultCollectionAccess(m_collectionName);
-		auto collectionHandleCreated = std::chrono::high_resolution_clock::now();
+		DataStorageAPI::DataLakeAPI resultCollectionAccess(m_collectionName);	
 		DataStorageAPI::DataStorageResponse dbResponse = resultCollectionAccess.searchInDataLakePartition(resultCollectionQuery, _options);
-		auto queryExecuted = std::chrono::high_resolution_clock::now();
+
 		if (dbResponse.getSuccess())
 		{
 			const std::string queryResponse = dbResponse.getResult();
 			ot::JsonDocument doc;
 			doc.fromJson(queryResponse);
-			auto allMongoDocuments = ot::json::getArray(doc, "Documents");
+			if (doc.HasMember("Documents"))
+			{
+				auto& allMongoDocuments = doc["Documents"];
+				ot::json::mergeArrays(data, allMongoDocuments, result.GetAllocator());
+			}
 		}
 	}
 
+	if (!transformedCollectionQuery.view().empty())
+	{
+		DataStorageAPI::DataLakeAPI resultCollectionAccess(m_collectionName, m_transformedCollectionEnding);
+		DataStorageAPI::DataStorageResponse dbResponse = resultCollectionAccess.searchInDataLakePartition(transformedCollectionQuery, _options);
 
+		if (dbResponse.getSuccess())
+		{
+			const std::string queryResponse = dbResponse.getResult();
+			ot::JsonDocument doc;
+			doc.fromJson(queryResponse);
+			if (doc.HasMember("Documents"))
+			{
+				auto& allMongoDocuments = doc["Documents"];
+				size_t numberOfReturnedDocs = allMongoDocuments.Size();
+				ot::json::mergeArrays(data, allMongoDocuments, result.GetAllocator());
+				size_t temp = data.Size();
 
-	//const std::string queryDuration = TimeFormatter::formatDuration(startTime, endTime);
+			}
+		}
+	}
 
-	return ot::JsonDocument();
+	result.AddMember(ot::JsonString(m_resultDataField,result.GetAllocator()), data, result.GetAllocator());
+	ot::JsonDocument clearTextResult = createClearTextResult(result);
+
+	return clearTextResult;
 }
 
 
@@ -93,6 +134,7 @@ void DataLakeAccessor::createQueries(BsonViewOrValue& _resultCollectionQuery, Bs
 		std::list<BsonViewOrValue> allQueries = allQueriesBase;
 		allQueries.push_back(transformedCollectionQuantityQuery);
 		_transformedCollectionQuery = builder.connectWithAND(std::move(allQueries));
+		const std::string temp = bsoncxx::to_json(_transformedCollectionQuery);
 	}
 	
 	if (!resultCollectionQuantityQuery.view().empty())
@@ -100,6 +142,8 @@ void DataLakeAccessor::createQueries(BsonViewOrValue& _resultCollectionQuery, Bs
 		std::list<BsonViewOrValue> allQueries = allQueriesBase;
 		allQueries.push_back(resultCollectionQuantityQuery);
 		_resultCollectionQuery = builder.connectWithAND(std::move(allQueries));
+		const std::string temp = bsoncxx::to_json(_transformedCollectionQuery);
+
 	}
 }
 
@@ -124,7 +168,7 @@ bool DataLakeAccessor::transformationNecessary(const TupleInstance& _storedForma
 
 bool DataLakeAccessor::alreadyStoredTransformation(const ot::QueryDescription& _queryDescription)
 {
-	DataStorageAPI::DataLakeAPI transformedCollectionAccess(m_collectionName,".transformed");
+	DataStorageAPI::DataLakeAPI transformedCollectionAccess(m_collectionName, m_transformedCollectionEnding);
 
 	const std::string fieldValue = _queryDescription.getQueryTargetDescription().getMongoDBFieldName();
 	TupleInstance instance;
@@ -216,7 +260,7 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 
 		ot::JsonDocument dataDoc;
 		
-		DataStorageAPI::DataLakeAPI transformationCollectionAccess(m_collectionName,".transformed");
+		DataStorageAPI::DataLakeAPI transformationCollectionAccess(m_collectionName, m_transformedCollectionEnding);
 		for (uint32_t i = 0; i < numberOfDocuments; i++)
 		{
 			ot::ConstJsonObject singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
@@ -247,6 +291,65 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 		}
 		transformationCollectionAccess.flushQueuedData();
 	}
+}
+
+ot::JsonDocument DataLakeAccessor::createClearTextResult(const ot::JsonDocument& _databaseResults)
+{
+	ot::ConstJsonArray encodedEntries =	ot::json::getArray(_databaseResults, m_resultDataField);
+	ot::JsonDocument clearTextDoc;
+	ot::JsonArray clearTextEntries;
+
+	auto mongoKeyToLabelQuantity = createFieldKeyLabelLookup(m_queryDescriptionsQuantities);
+	auto mongoKeyToLabelSeries = createFieldKeyLabelLookup(m_queryDescriptionsSeries);
+	
+	//Missing: unit transformations
+	for (uint32_t i = 0; i < encodedEntries.Size(); i++)
+	{
+		auto singleMongoDocument = ot::json::getObject(encodedEntries, i);
+		ot::JsonObject clearTextEntry;
+		for (const ot::QueryDescription& parameter : m_queryDescriptionsParameters)
+		{
+			const std::string& mongoDBFieldName =  parameter.getQueryTargetDescription().getMongoDBFieldName();
+			const std::string& label = parameter.getQueryTargetDescription().getLabel();
+			if (singleMongoDocument.HasMember(mongoDBFieldName.c_str()))
+			{
+				ot::JsonValue value(singleMongoDocument[mongoDBFieldName.c_str()], clearTextDoc.GetAllocator());
+				ot::JsonString newKey(label, clearTextDoc.GetAllocator());
+				clearTextEntry.AddMember(std::move(newKey), std::move(value), clearTextDoc.GetAllocator());
+			}
+		}
+
+		std::string quantityID = std::to_string(singleMongoDocument[MetadataQuantity::getFieldName().c_str()].GetInt64());
+		ot::JsonString quantityName(MetadataQuantity::getFieldName().c_str(), clearTextDoc.GetAllocator());
+		auto quantityLabelByMongoField =	mongoKeyToLabelQuantity.find(quantityID);
+		const std::string label = quantityLabelByMongoField->second;
+		clearTextEntry.AddMember(std::move(quantityName), ot::JsonString(label, clearTextDoc.GetAllocator()), clearTextDoc.GetAllocator());
+		
+		ot::JsonValue quantityValue(singleMongoDocument[QuantityContainer::getFieldName().c_str()], clearTextDoc.GetAllocator());
+		clearTextEntry.AddMember(ot::JsonString(QuantityContainer::getFieldName().c_str(), clearTextDoc.GetAllocator()), quantityValue, clearTextDoc.GetAllocator());
+					
+		std::string seriesID = std::to_string(singleMongoDocument[MetadataSeries::getFieldName().c_str()].GetInt64());
+		auto seriesLabelByMongoField = mongoKeyToLabelSeries.find(seriesID);
+		ot::JsonString newKey(MetadataSeries::getFieldName(), clearTextDoc.GetAllocator());
+		clearTextEntry.AddMember(std::move(newKey), ot::JsonString(label, clearTextDoc.GetAllocator()), clearTextDoc.GetAllocator());
+		
+		clearTextEntries.PushBack(clearTextEntry, clearTextDoc.GetAllocator());
+	}
+	clearTextDoc.AddMember(ot::JsonString(m_resultDataField, clearTextDoc.GetAllocator()), clearTextEntries, clearTextDoc.GetAllocator());
+	return clearTextDoc;
+}
+
+std::map<std::string, std::string> DataLakeAccessor::createFieldKeyLabelLookup(const std::list<ot::QueryDescription>& _queryDescriptions)
+{
+	std::map<std::string, std::string> lookUp;
+	for (const ot::QueryDescription& _queryDescription : _queryDescriptions)
+	{
+		const std::string mongoDBKey = _queryDescription.getQueryTargetDescription().getMongoDBFieldName();
+		const std::string fieldLabel = _queryDescription.getQueryTargetDescription().getLabel();
+		lookUp[mongoDBKey] = fieldLabel;
+	}
+
+	return lookUp;
 }
 
 BsonViewOrValue DataLakeAccessor::generateSeriesQuery()
@@ -283,11 +386,14 @@ std::list<BsonViewOrValue> DataLakeAccessor::generateParameterQueries()
 	for (ot::QueryDescription& queryDescription : m_queryDescriptionsParameters)
 	{
 		ot::ValueComparisonDescription selectedQuery = queryDescription.getValueComparisonDescription();
-		const std::string fieldName = queryDescription.getQueryTargetDescription().getMongoDBFieldName();
-		selectedQuery.setName(fieldName);
-		BsonViewOrValue comparison = builder.createComparison(selectedQuery);
-		comparisons.push_back(comparison);
-		const std::string debugQuery = bsoncxx::to_json(comparison);
+		if (!selectedQuery.getComparator().empty() && !selectedQuery.getValue().empty() && !selectedQuery.getName().empty())
+		{
+			const std::string fieldName = queryDescription.getQueryTargetDescription().getMongoDBFieldName();
+			selectedQuery.setName(fieldName);
+			BsonViewOrValue comparison = builder.createComparison(selectedQuery);
+			comparisons.push_back(comparison);
+			const std::string debugQuery = bsoncxx::to_json(comparison);
+		}
 	}
 
 	return comparisons;

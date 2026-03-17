@@ -583,6 +583,7 @@ namespace ot {
 		//! @param _allocator 
 		//! @param _secureMerge If true, an exception is thrown if 
 		OT_CORE_API_EXPORT void mergeObjects(rapidjson::Value& _dstObject, const rapidjson::Value& _srcObject, rapidjson::Document::AllocatorType& _allocator, bool _secureMerge = true);
+		OT_CORE_API_EXPORT void mergeArrays(rapidjson::Value& _dstArray, const rapidjson::Value& _srcArray, rapidjson::Document::AllocatorType& _allocator, bool _secureMerge = true);
 
 	} // namespace json
 

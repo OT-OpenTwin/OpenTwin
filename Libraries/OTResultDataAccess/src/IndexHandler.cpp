@@ -23,7 +23,7 @@
 #include "OTResultDataAccess/ResultCollection/IndexHandler.h"
 
 IndexHandler::IndexHandler(const std::string& _collectionName)
-	: m_dataStorageAccess(_collectionName)
+	: m_dataStorageAccess(_collectionName), m_transformedDataStorageAccess(_collectionName,".transformed")
 {}
 
 void IndexHandler::createDefaultIndexes()
@@ -39,6 +39,9 @@ void IndexHandler::createDefaultIndexes()
 		index.append(bsoncxx::builder::basic::kvp(indexName, 1));
 	}
 	collection.create_index(index.view());
+
+	auto transformedCollection = m_transformedDataStorageAccess.getCollection();
+	transformedCollection.create_index(index.view());
 }
 
 void IndexHandler::dropAllIndexes()

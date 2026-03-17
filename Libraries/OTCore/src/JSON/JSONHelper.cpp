@@ -1583,12 +1583,7 @@ void ot::json::mergeObjects(rapidjson::Value& _dstObject, const rapidjson::Value
 			}
 			if (srcIt->value.IsArray())
 			{
-				for (auto arrayIt = srcIt->value.Begin(); arrayIt != srcIt->value.End(); ++arrayIt)
-				{
-					ot::JsonValue arrayEntry;
-					arrayEntry.CopyFrom(*arrayIt, _allocator);
-					dstIt->value.PushBack(arrayEntry, _allocator);
-				}
+				mergeArrays(dstIt->value, srcIt->value,_allocator, _secureMerge);
 			}
 			else if (srcIt->value.IsObject())
 			{
@@ -1608,4 +1603,25 @@ void ot::json::mergeObjects(rapidjson::Value& _dstObject, const rapidjson::Value
 		}
 	}
 
+}
+
+void ot::json::mergeArrays(rapidjson::Value& _dstArray, const rapidjson::Value& _srcArray, rapidjson::Document::AllocatorType& _allocator, bool _secureMerge)
+{
+	if (_dstArray.GetType() != _srcArray.GetType()||!_dstArray.IsArray())
+	{
+		if (_secureMerge) {
+			throw std::exception("Failed array merge");
+		}
+		else
+		{
+			return;
+		}
+	}
+	auto destArray = _dstArray.GetArray();
+	for (auto arrayIt = _srcArray.GetArray().Begin(); arrayIt != _srcArray.GetArray().End(); ++arrayIt)
+	{
+		ot::JsonValue arrayEntry;
+		arrayEntry.CopyFrom(*arrayIt, _allocator);
+		destArray.PushBack(arrayEntry, _allocator);
+	}
 }

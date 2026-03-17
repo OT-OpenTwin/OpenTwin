@@ -100,7 +100,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	auto startTime = std::chrono::high_resolution_clock::now();
 	ot::JsonDocument result = m_dataLakeAccessor.executeQuery(options);
 	auto endTime = std::chrono::high_resolution_clock::now();
-
+	m_queriedData.setData(std::move(result));
 	//const std::string queryDuration =	TimeFormatter::formatDuration(startTime, endTime);
 	//
 	//SolverReport::instance().addToContent("Query executed in " + queryDuration + "\n");
@@ -162,7 +162,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	//		entries.PushBack(translatedResponseDoc, dataDoc.GetAllocator());
 	//	}
 	//
-	//	m_queriedData.setData(std::move(entries));
+	
 	//}
 	//else
 	//{
@@ -207,8 +207,10 @@ void BlockHandlerDatabaseAccess::createQueryDescriptionsQuantities(EntityBlockDa
 	else
 	{
 		std::list<ot::QueryDescription> allQuantityQueries;
+		ot::UIDList relatedParameterUIDs;
 		for (const MetadataQuantity* viableQuantity : viableQuantities)
 		{
+			relatedParameterUIDs.insert(relatedParameterUIDs.begin(), viableQuantity->dependingParameterIds.begin(), viableQuantity->dependingParameterIds.end());
 			ot::ValueComparisonDescription comparisonDescription = quantityDef;
 			comparisonDescription.setName(viableQuantity->quantityName);
 			TupleInstance tupleInstance = 	quantityDef.getTupleInstance();
@@ -219,6 +221,18 @@ void BlockHandlerDatabaseAccess::createQueryDescriptionsQuantities(EntityBlockDa
 			allQuantityQueries.push_back(queryDescription);			
 		}
 		m_dataLakeAccessor.setValueDescriptionsQuantities(allQuantityQueries);
+
+		std::list<ot::QueryDescription> allRelatedParameterQueries;
+		relatedParameterUIDs.sort();
+		relatedParameterUIDs.unique();
+		for (ot::UID parameterUID : relatedParameterUIDs)
+		{
+			const MetadataParameter* relatedParameter = m_resultCollectionMetadataAccess->findMetadataParameter(parameterUID);
+			ot::ValueComparisonDescription comparisonDescription;
+			ot::QueryDescription queryDescription = QueryDescriptionBuilder::create(comparisonDescription, relatedParameter);
+			allRelatedParameterQueries.push_back(queryDescription);
+		}
+		m_dataLakeAccessor.addValueDescriptionsParameters(allRelatedParameterQueries);
 	}
 }
 
@@ -245,7 +259,7 @@ void BlockHandlerDatabaseAccess::createQueryDescriptionsParameter(EntityBlockDat
 			}
 		}
 	}
-	m_dataLakeAccessor.setValueDescriptionsParameters(allParameterQueries);
+	m_dataLakeAccessor.addValueDescriptionsParameters(allParameterQueries);
 }
 
 void BlockHandlerDatabaseAccess::createQueryDescriptionsSeries(EntityBlockDatabaseAccess* _blockEntity)

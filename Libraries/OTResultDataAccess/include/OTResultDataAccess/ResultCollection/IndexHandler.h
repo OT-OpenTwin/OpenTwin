@@ -38,6 +38,7 @@ public:
 
 private:
 	DataStorageAPI::DataLakeAPI m_dataStorageAccess;
+	DataStorageAPI::DataLakeAPI m_transformedDataStorageAccess;
 	std::vector<bool> m_defaultIndexesSet = { false,false };
 
 	bool checkIfDefaultIndexesAreSet();
