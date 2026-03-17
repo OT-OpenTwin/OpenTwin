@@ -1,5 +1,5 @@
 // @otlicense
-// File: LibraryModelImportCfg.h
+// File: LibraryEntityInterface.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -25,13 +25,12 @@
 #include "OTModelEntities/Lms/LibraryElement.h"
 
 namespace ot {
-	class __declspec(dllexport) LibraryEntityInterface {
+	class OT_MODELENTITIES_API_EXPORT LibraryEntityInterface {
 	public:
-		LibraryEntityInterface() = default;
+		LibraryEntityInterface();
 		virtual ~LibraryEntityInterface() = default;
 
 		virtual void setLibraryElement(const ot::LibraryElement& _libraryElement) = 0;
-
 		//! @brief Get list of binary data entities (ID, Version) associated with this library entity
 		//! @return List of pairs containing entity ID and version
 		virtual std::list<std::pair<ot::UID, ot::UID>> getDataEntities() const { return {}; }

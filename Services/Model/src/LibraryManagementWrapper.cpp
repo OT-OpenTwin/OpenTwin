@@ -213,7 +213,7 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 	Model* model = Application::instance()->getModel();
 	auto entBase = model->getEntityByID(_importCfg.getRequestingEntityID());
 
-	auto basePropertyModel = entBase->getProperties().getProperty("ModelSelection");
+	auto basePropertyModel = entBase->getProperties().getProperty(_importCfg.getPropertyName());
 	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
 
 	EntityBase* circuitModelEntity = model->findEntityFromName(_importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
@@ -226,6 +226,8 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 	else {
 		modelProperty->setValueName("");
 	}
+	
+	entBase->updateFromProperties();
 	entBase->storeToDataBase();
 	const std::string comment = "Property Updated";
 	ot::UIDList topoList{entBase->getEntityID()};
@@ -286,8 +288,92 @@ void LibraryManagementWrapper::addEntityToModel(EntityBase* _entity, Model* _mod
 
 	// Add to model
 	_model->addEntitiesToModel(topoIDs, topoVersions, forceVisible, dataIDs, dataVersions,
-		topoIDs, "Added library entity", true, false, true);
+		topoIDs, "Added library entity", false, false, true);
 }
+
+void LibraryManagementWrapper::createLibraryEntityAndUpdateProperty(
+    const ot::LibraryElement& _importCfg, 
+    bool _dialogConfirmed) 
+{
+    Model* modelPtr = Application::instance()->getModel();
+    if (!modelPtr) {
+        OT_LOG_E("Model is null");
+        return;
+    }
+
+    // Check if entity already exists
+    std::string fullPath = _importCfg.getNewEntityFolder() + "/" + _importCfg.getName();
+    if (checkEntityExists(fullPath, modelPtr)) {
+        OT_LOG_W("Entity already exists: " + fullPath);
+        return;
+    }
+
+    // Create and initialize entity
+    EntityBase* entity = createAndInitializeEntity(_importCfg, modelPtr);
+    if (!entity) return;
+
+    // Get requesting entity for property update
+    auto entBase = modelPtr->getEntityByID(_importCfg.getRequestingEntityID());
+    if (!entBase) {
+        OT_LOG_E("Requesting entity not found");
+        delete entity;
+        return;
+    }
+
+    // Get model state for batch operation
+    ModelState* modelState = modelPtr->getStateManager();
+    if (!modelState) {
+        OT_LOG_E("ModelState is null");
+        delete entity;
+        return;
+    }
+
+    // Add new entity to model state
+    modelState->addNewEntity(
+        entity->getEntityID(),
+        entity->getParent()->getEntityID(),
+        entity->getEntityStorageVersion(),
+        ModelStateEntity::tEntityType::TOPOLOGY
+    );
+
+    // Update property if conditions are met
+    if (_dialogConfirmed) {
+        EntityBase* circuitModelEntity = modelPtr->findEntityFromName(fullPath);
+        EntityBase* circuitModelFolderEntity = modelPtr->findEntityFromName(_importCfg.getNewEntityFolder());
+        
+        if (circuitModelEntity && circuitModelFolderEntity) {
+            auto basePropertyModel = entBase->getProperties().getProperty(_importCfg.getPropertyName());
+            auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
+            
+            if (modelProperty) {
+                modelProperty->setValueName(fullPath);
+                modelProperty->setValueID(circuitModelEntity->getEntityID());
+                modelProperty->setEntityContainerID(circuitModelFolderEntity->getEntityID());
+            }
+        }
+    }
+
+    // Update requesting entity
+    entBase->updateFromProperties();
+    entBase->storeToDataBase();
+    
+    // Mark requesting entity as modified in model state
+    modelState->modifyEntity(
+        entBase->getEntityID(),
+        entBase->getParent()->getEntityID(),
+        entBase->getEntityStorageVersion(),
+        ModelStateEntity::tEntityType::TOPOLOGY
+    );
+
+    // Send all changes to model in one operation
+    ot::UIDList topoList{ entity->getEntityID(), entBase->getEntityID() };
+    ot::UIDList versionList{ entity->getEntityStorageVersion(), entBase->getEntityStorageVersion() };
+    std::string comment = _dialogConfirmed ? "Created library entity and updated property" : "Created library entity";
+    
+    modelPtr->updateTopologyEntities(topoList, versionList, comment, true);
+}
+
+
 
 
 

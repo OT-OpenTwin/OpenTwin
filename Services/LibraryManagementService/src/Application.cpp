@@ -263,6 +263,13 @@ std::string Application::getModelInformation(const ot::LibraryElementSelectionCf
 	 return modelResponse;
  }
 
+ std::string Application::sendAsyncMessageToModel(const ot::JsonDocument& _doc, const std::string& _modelUrl) {
+	 ot::msg::sendAsync(this->getServiceURL(), _modelUrl, ot::EXECUTE, _doc.toJson(), ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+
+	 // sendAsync is fire-and-forget, so we return an empty string or a status
+	 return "";
+ }
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Action handler
@@ -315,7 +322,7 @@ std::string Application::handleCreateDialogConfig(ot::JsonDocument& _document) {
 	modelCfgDoc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(dbServerUrl, modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
 	modelCfgDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(selectionCfg.getAdditionalInfo(), modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
 	modelCfgDoc.AddMember(OT_ACTION_PARAM_Config, modelCfg,modelCfgDoc.GetAllocator());
-	
+	modelCfgDoc.AddMember(OT_ACTION_PARAM_PROPERTY_Name, ot::JsonString(selectionCfg.getPropertyName(), modelCfgDoc.GetAllocator()), modelCfgDoc.GetAllocator());
 	//Send config to UI
 	std::string uiResponse = sendConfigToUI(modelCfgDoc, selectionCfg.getUIServiceUrl());
 	
@@ -348,6 +355,7 @@ std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document)
 	modelInfoDoc.AddMember("CallbackService", ot::JsonString(ot::json::getString(callbackInfoDoc, "CallbackService"), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
 	modelInfoDoc.AddMember("EntityType", ot::JsonString(ot::json::getString(callbackInfoDoc, "EntityType"), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
 	modelInfoDoc.AddMember("NewEntityFolder", ot::JsonString(ot::json::getString(callbackInfoDoc, "NewEntityFolder"), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
+	modelInfoDoc.AddMember("PropertyName", ot::JsonString(ot::json::getString(_document, OT_ACTION_PARAM_PROPERTY_Name), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
 
 	// Create LibraryElementImportCfg and populate it with the complete modelInfoDoc
 	ot::LibraryElement importCfg;
@@ -362,7 +370,7 @@ std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document)
 	importCfg.addToJsonObject(importCfgObj, dialogConfirmed.GetAllocator());
 	dialogConfirmed.AddMember(OT_ACTION_PARAM_Config, importCfgObj, dialogConfirmed.GetAllocator());
 	
-	std::string response = sendMessageToModel(dialogConfirmed, importCfg.getCallBackService());
+	std::string response = sendAsyncMessageToModel(dialogConfirmed, importCfg.getCallBackService());
 
 	return "";
 }
@@ -376,7 +384,7 @@ std::string Application::handleModelDialogCanceled(ot::JsonDocument& _document) 
 	dialogCanceled.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ModelDialogCanceled, dialogCanceled.GetAllocator()), dialogCanceled.GetAllocator());
 	dialogCanceled.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityID, dialogCanceled.GetAllocator());
 
-	std::string response = sendMessageToModel(dialogCanceled, modelUrl);
+	std::string response = sendAsyncMessageToModel(dialogCanceled, modelUrl);
 	return "";
 }
 

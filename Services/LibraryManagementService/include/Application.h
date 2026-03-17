@@ -51,6 +51,7 @@ private:
 
 	std::string sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl);
 	std::string sendMessageToModel(const ot::JsonDocument& _doc, const std::string& _modelUrl);
+	std::string sendAsyncMessageToModel(const ot::JsonDocument& _doc, const std::string& _modelUrl);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

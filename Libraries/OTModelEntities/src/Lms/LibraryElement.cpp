@@ -1,5 +1,5 @@
 // @otlicense
-// File: LibraryModelImportCfg.cpp
+// File: LibraryElement.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -54,6 +54,7 @@ void ot::LibraryElement::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
     _object.AddMember("EntityType", ot::JsonString(m_className, _allocator), _allocator);
     _object.AddMember("NewEntityFolder", ot::JsonString(m_newEntityFolder, _allocator), _allocator);
     _object.AddMember("CallbackService", ot::JsonString(m_callBackService, _allocator), _allocator);
+    _object.AddMember("PropertyName", ot::JsonString(m_propertyName, _allocator), _allocator);
 
     // Serialize metadata
     ot::JsonObject metaDataObj;
@@ -97,6 +98,7 @@ void ot::LibraryElement::setFromJsonObject(const ot::ConstJsonObject& _object) {
     m_callBackService = ot::json::getString(_object, "CallbackService");
 	m_className =ot::json::getString(_object, "EntityType");
 	m_newEntityFolder = ot::json::getString(_object, "NewEntityFolder");
+    m_propertyName = ot::json::getString(_object, "PropertyName");
 
     // Deserialize metadata
     m_metaData.clear();

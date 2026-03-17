@@ -1003,6 +1003,7 @@ void Application::handleModelDialogConfirmed(ot::JsonDocument& _document) {
 
 	/* Now update the property according to the dialog (confirm or cancel)*/
 	m_libraryManagementWrapper.updatePropertyOfEntity(importCfg,true);
+	
 }
 
 void Application::handleModelDialogCanceled(ot::JsonDocument& _document) {

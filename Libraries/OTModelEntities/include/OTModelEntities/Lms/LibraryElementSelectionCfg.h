@@ -97,6 +97,10 @@ namespace ot {
 		void setAdditionalInfo(const std::string& _info) { m_additionalInfo = _info; };
 		const std::string& getAdditionalInfo() const { return m_additionalInfo; };
 
+		//! @brief Set the property name to store the selection result in the requesting entity
+		void setPropertyName(const std::string& _propertyName) { m_propertyName = _propertyName; };
+		const std::string& getPropertyName() const { return m_propertyName; };
+
 		// Serialization
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
@@ -116,7 +120,7 @@ namespace ot {
 		std::string m_uiServiceUrl;
 		std::string m_newEntityFolder;
 		std::string m_additionalInfo;
-
+		std::string m_propertyName;
 	};
 }
 

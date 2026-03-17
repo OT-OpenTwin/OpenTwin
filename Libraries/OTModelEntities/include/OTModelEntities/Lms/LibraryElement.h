@@ -80,6 +80,10 @@ namespace ot{
         void setEntityType(std::string _type) { m_className = _type; };
         std::string getEntityType() const { return m_className; };
 
+		//! @brief Set the property name to store the selection result in the requesting entity
+		void setPropertyName(std::string _propertyName) { m_propertyName = _propertyName; };
+		std::string getPropertyName() const { return m_propertyName; };
+
         // Metadata management
 
         //! @brief Add a metadata key-value pair (e.g., "IS": "27.5")
@@ -138,6 +142,6 @@ namespace ot{
         std::string m_callBackService;
         std::string m_newEntityFolder;
         std::string m_className;
-
+        std::string m_propertyName;
     };
 }

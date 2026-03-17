@@ -201,6 +201,7 @@ set(OTMODELENTITIES_HEADER_FILES
     include/OTModelEntities/Lms/LibraryElementSelectionCfg.h
     include/OTModelEntities/Lms/LibraryElement.h
     include/OTModelEntities/Lms/LibraryEntityInterface.h
+    include/OTModelEntities/Lms/EntityPythonScript.h
     include/OTModelEntities/ModelEntitiesAPIExport.h
     include/OTModelEntities/ModelState.h
     include/OTModelEntities/NewModelStateInfo.h
@@ -324,6 +325,8 @@ set(OTMODELENTITIESSOURCE_FILES
     src/Geometry.cpp
     src/Lms/LibraryElementSelectionCfg.cpp
     src/Lms/LibraryElement.cpp
+    src/Lms/EntityPythonScript.cpp
+    src/Lms/LibraryEntityInterface.cpp
     src/ModelState.cpp
     src/NewModelStateInfo.cpp
     src/PropertyBundleDataHandlePlane.cpp

@@ -64,7 +64,7 @@ public:
 
 	std::string getDocumentList(const ot::LibraryElementSelectionCfg& _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 	std::string getCompleteDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument);
-
+	void migrateLibraryEntryDataToGridFS(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument);
 private:
 	// Database connection and validation
 	std::string getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword);

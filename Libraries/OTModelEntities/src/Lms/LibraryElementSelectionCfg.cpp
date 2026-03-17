@@ -109,6 +109,7 @@ void ot::LibraryElementSelectionCfg::addToJsonObject(ot::JsonValue& _object, ot:
     _object.AddMember("UiServiceURL", ot::JsonString(m_uiServiceUrl, _allocator), _allocator);
 	_object.AddMember("AdditionalInfo", ot::JsonString(m_additionalInfo, _allocator), _allocator);
 	_object.AddMember("NewEntityFolder", ot::JsonString(m_newEntityFolder, _allocator), _allocator);
+	_object.AddMember("PropertyName", ot::JsonString(m_propertyName, _allocator), _allocator);
 }
 
 void ot::LibraryElementSelectionCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -147,6 +148,7 @@ void ot::LibraryElementSelectionCfg::setFromJsonObject(const ot::ConstJsonObject
     m_uiServiceUrl = ot::json::getString(_object, "UiServiceURL");
 	m_additionalInfo = ot::json::getString(_object, "AdditionalInfo");
 	m_newEntityFolder = ot::json::getString(_object, "NewEntityFolder");
+	m_propertyName = ot::json::getString(_object, "PropertyName");
 }
 
 void ot::LibraryElementSelectionCfg::serializeCallbackInfoToAdditionalInfo() {

@@ -4293,6 +4293,7 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
+	std::string propertyName = ot::json::getString(_document, OT_ACTION_PARAM_PROPERTY_Name);
 
 	ot::ModelLibraryDialogCfg cfg;
 	cfg.setFromJsonObject(cfgObj);
@@ -4305,6 +4306,7 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 	responseDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(dbUserName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(dbUserPassword, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(dbServerUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_PROPERTY_Name, ot::JsonString(propertyName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 	// Show dialog
 	ot::ModelLibraryDialog dia(std::move(cfg), AppBase::instance()->mainWindow());

@@ -39,6 +39,7 @@ public:
 	std::string requestCreateConfig(const ot::JsonDocument& _doc);
 	void createLibraryEntity(const ot::LibraryElement& _importCfg);
 	void updatePropertyOfEntity(const ot::LibraryElement& _importCfg, bool _dialogConfirmed);
+	void createLibraryEntityAndUpdateProperty(const ot::LibraryElement& _importCfg, bool _dialogConfirmed);
 private:
 
 	// Helper methods

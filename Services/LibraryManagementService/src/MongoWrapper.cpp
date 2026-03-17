@@ -119,6 +119,80 @@ std::string MongoWrapper::getCompleteDocument(const std::string& _collectionName
     }
 }
 
+void MongoWrapper::migrateLibraryEntryDataToGridFS(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument) {
+    // Initialization of MongoDB connection
+    if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
+        OT_LOG_E("Failed to initialize database connection for migration");
+        return;
+    }
+
+    // Check if collection exists
+    if (!checkCollectionExists(_collectionName)) {
+        return;
+    }
+
+    try {
+        DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+
+        // Get the document
+        auto queryResult = fetchDocumentByName(docBase, _selectedDocument);
+        if (!queryResult) {
+            OT_LOG_E("Document '" + _selectedDocument + "' not found in collection '" + _collectionName + "'");
+            return;
+        }
+
+        bsoncxx::document::view documentView = queryResult->view();
+
+        // Check if DataID already exists (migration already done)
+        auto dataIdElement = documentView["DataID"];
+        if (dataIdElement && dataIdElement.type() == bsoncxx::type::k_oid) {
+            OT_LOG_W("Document '" + _selectedDocument + "' has already been migrated to GridFS");
+            return;
+        }
+
+        // Extract the script content from the document
+        std::string scriptContent;
+        auto contentElement = documentView["Content"];
+        if (contentElement && contentElement.type() == bsoncxx::type::k_utf8) {
+            scriptContent = std::string(contentElement.get_utf8().value);
+        }
+        else {
+            OT_LOG_E("No script content found in document '" + _selectedDocument + "'");
+            return;
+        }
+
+        // Upload script content to GridFS
+        DataStorageAPI::DocumentAPI api;
+
+        // Convert string content to binary buffer
+        const uint8_t* dataBuffer = reinterpret_cast<const uint8_t*>(scriptContent.c_str());
+        size_t dataSize = scriptContent.size();
+
+        // Insert binary data into GridFS
+        bsoncxx::types::value gridfsId = api.InsertBinaryDataUsingGridFs(dataBuffer, dataSize, _collectionName, dbName);
+
+        // Build the update document
+        auto updateBuilder = bsoncxx::builder::basic::document{};
+        updateBuilder.append(bsoncxx::builder::basic::kvp("DataID", gridfsId.get_oid().value));
+
+        // Create the update query
+        auto filterBuilder = bsoncxx::builder::basic::document{};
+        filterBuilder.append(bsoncxx::builder::basic::kvp("Name", _selectedDocument));
+
+        auto updateDoc = bsoncxx::builder::basic::document{};
+        updateDoc.append(bsoncxx::builder::basic::kvp("$set", updateBuilder.view()));
+
+        // Update the document in the collection
+        auto collection = docBase.getCollection();
+        collection.update_one(filterBuilder.view(), updateDoc.view());
+
+        OT_LOG_I("Successfully migrated document '" + _selectedDocument + "' to GridFS with ID: " + gridfsId.get_oid().value.to_string());
+    }
+    catch (const std::exception& e) {
+        OT_LOG_E("Error migrating document to GridFS: " + std::string(e.what()));
+        return;
+    }
+}
 // Private helper methods
 
 bool MongoWrapper::initializeConnection(const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {

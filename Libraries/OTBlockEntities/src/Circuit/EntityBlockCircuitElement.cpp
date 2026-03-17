@@ -64,7 +64,7 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
 		config.setEntityType(EntityFileText::className());
 		config.setNewEntityFolder(this->getCircuitModelFolder() + "/" + this->getFolderName());
-
+		config.setPropertyName("ModelSelection");
 		// if it was selected use observer to send message to LMS
 		getObserver()->requestConfigForModelDialog(config);
 	}
