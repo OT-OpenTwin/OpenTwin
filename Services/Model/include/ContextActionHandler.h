@@ -19,8 +19,8 @@ class ContextActionHandler : public ot::MenuHandler
 	OT_DECL_NOCOPY(ContextActionHandler)
 	OT_DECL_NOMOVE(ContextActionHandler)
 public:
-	ContextActionHandler();
-	~ContextActionHandler();
+	ContextActionHandler() = default;
+	virtual ~ContextActionHandler() = default;
 
 protected:
 
@@ -34,6 +34,4 @@ private:
 	ot::MenuCfg createContextMenu(const ot::TextEditorMenuRequestData* _requestData) const;
 	ot::MenuCfg createContextMenu(const ot::View3DMenuRequestData* _requestData) const;
 
-	class PrivateData;
-	PrivateData* m_data;
 };
