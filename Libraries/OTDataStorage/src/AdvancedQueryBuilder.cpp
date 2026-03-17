@@ -35,6 +35,7 @@ BsonViewOrValue AdvancedQueryBuilder::createComparison(const ot::ValueComparison
 {
 	const std::string comparator = _valueComparison.getComparator();
 	BsonViewOrValue comparison;
+	std::string fieldName = _valueComparison.getName();
 	// The range operator is an own implementatation
 	if (comparator == ot::ComparisonSymbols::g_rangeComparator)
 	{
@@ -113,12 +114,10 @@ BsonViewOrValue AdvancedQueryBuilder::createComparison(const ot::ValueComparison
 					{
 						auto tupleElementNames = complexTupleDescription->getTupleElementNames(tupleInstanceQuery.getTupleFormatName());
 						auto pos = std::find(tupleElementNames.begin(), tupleElementNames.end(), targetElement) - tupleElementNames.begin();
-
+						fieldName = fieldName + "." + std::to_string(pos);
 						//Here we need a query of the structure: {value : { $elemMatch:{"0":{$gt : 0}}}
 						//This would query for values > 0 in the first entry of the value array. E.g. real value > 0.
-						BsonViewOrValue compareWithValue = GenerateFilterQuery(mongoComparator->second, queryValue);
-						BsonViewOrValue equalIndex = GenerateFilterQuery(std::to_string(pos), compareWithValue.view());
-						comparison = GenerateFilterQuery("$elemMatch", equalIndex.view());
+						comparison = GenerateFilterQuery(mongoComparator->second, queryValue);
 					}
 				}
 				else
@@ -136,7 +135,7 @@ BsonViewOrValue AdvancedQueryBuilder::createComparison(const ot::ValueComparison
 	}
 	
 	//Now we add the field name to the comparision, forming the final query
-	BsonViewOrValue finalQuery = GenerateFilterQuery(_valueComparison.getName(), std::move(comparison));
+	BsonViewOrValue finalQuery = GenerateFilterQuery(fieldName, std::move(comparison));
 
 #ifdef _DEBUG
 	std::string queryString = bsoncxx::to_json(finalQuery.view());

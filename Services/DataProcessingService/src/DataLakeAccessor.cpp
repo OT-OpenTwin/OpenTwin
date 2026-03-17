@@ -142,7 +142,7 @@ void DataLakeAccessor::createQueries(BsonViewOrValue& _resultCollectionQuery, Bs
 		std::list<BsonViewOrValue> allQueries = allQueriesBase;
 		allQueries.push_back(resultCollectionQuantityQuery);
 		_resultCollectionQuery = builder.connectWithAND(std::move(allQueries));
-		const std::string temp = bsoncxx::to_json(_transformedCollectionQuery);
+		const std::string temp = bsoncxx::to_json(_resultCollectionQuery);
 
 	}
 }
