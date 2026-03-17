@@ -132,6 +132,12 @@ namespace ot {
 		//! Will include the axis label, quantity name and quantity scaling information.
 		std::string getXAxisDisplayLabel() const { return m_xAxis.getDisplayLabel(*this); };
 
+		void setXAxisDisplayNumberFormat(String::DisplayNumberFormat _format) { m_xAxis.setDisplayNumberFormat(_format); };
+		String::DisplayNumberFormat getXAxisDisplayNumberFormat() const { return m_xAxis.getDisplayNumberFormat(); };
+
+		void setXAxisDisplayNumberPrecision(int32_t _precision) { m_xAxis.setDisplayNumberPrecision(_precision); };
+		int32_t getXAxisDisplayNumberPrecision() const { return m_xAxis.getDisplayNumberPrecision(); };
+
 		void setYAxisMin(double _min) { m_yAxis.setMin(_min); };
 		double getYAxisMin() const { return m_yAxis.getMin(); };
 
@@ -156,6 +162,12 @@ namespace ot {
 		//! @brief Returns the axis label to be displayed.
 		//! Will include the axis label, quantity name and quantity scaling information.
 		std::string getYAxisDisplayLabel() const { return m_yAxis.getDisplayLabel(*this); };
+
+		void setYAxisDisplayNumberFormat(String::DisplayNumberFormat _format) { m_yAxis.setDisplayNumberFormat(_format); };
+		String::DisplayNumberFormat getYAxisDisplayNumberFormat() const { return m_yAxis.getDisplayNumberFormat(); };
+
+		void setYAxisDisplayNumberPrecision(int32_t _precision) { m_yAxis.setDisplayNumberPrecision(_precision); };
+		int32_t getYAxisDisplayNumberPrecision() const { return m_yAxis.getDisplayNumberPrecision(); };
 
 		const std::list<ValueComparisonDescription>& getQueries() { return m_queries; };
 		void setQueries(const std::list<ValueComparisonDescription>& _queries) { m_queries = _queries; };

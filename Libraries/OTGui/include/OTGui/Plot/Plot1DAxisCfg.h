@@ -20,6 +20,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"
 
@@ -103,6 +104,12 @@ namespace ot {
 		inline void setScaling(const AxisScaling& _scaling) { m_axisScaling = _scaling; };
 		constexpr const AxisScaling& getScaling() const { return m_axisScaling; };
 
+		inline void setDisplayNumberFormat(String::DisplayNumberFormat _format) { m_displayNumberFormat = _format; };
+		constexpr String::DisplayNumberFormat getDisplayNumberFormat() const { return m_displayNumberFormat; };
+
+		inline void setDisplayNumberPrecision(int32_t _decimals) { m_displayNumberPrecision = _decimals; };
+		constexpr int32_t getDisplayNumberPrecision() const { return m_displayNumberPrecision; };
+
 		//! @brief Set whether automatic scaling is enabled for the axis.
 		//! When enabled, the axis range will be automatically determined based on the data being plotted.
 		//! When disabled, the axis range will be determined by the manually set minimum and maximum values.
@@ -174,6 +181,9 @@ namespace ot {
 
 		bool m_autoDetermineAxisLabel = true;
 		std::string m_axisLabel = "";
+
+		String::DisplayNumberFormat m_displayNumberFormat = String::DisplayNumberFormat::Decimal;
+		int32_t m_displayNumberPrecision = 3;
 
 		AxisQuantity m_axisQuantity = AxisQuantity::Undefined;
 		AxisScaling m_axisScaling = AxisScalingFlag::Autoscale;

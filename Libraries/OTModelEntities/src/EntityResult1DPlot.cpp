@@ -330,6 +330,16 @@ void EntityResult1DPlot::createAxisProperties(const std::string& _axisName)
 
 	EntityPropertiesBoolean::createProperty(_axisName, "Automatic label", true, "", getProperties());
 	EntityPropertiesString::createProperty(_axisName, "Label override", "", "", getProperties());
+
+	std::list<std::string> displayNumberFormatOptions = {
+		ot::String::toString(ot::String::Auto),
+		ot::String::toString(ot::String::Integer),
+		ot::String::toString(ot::String::Decimal),
+		ot::String::toString(ot::String::Scientific),
+		ot::String::toString(ot::String::Engineering)
+	};
+	EntityPropertiesSelection::createProperty(_axisName, "Display number format", std::move(displayNumberFormatOptions), ot::String::toString(ot::String::Auto), "", getProperties());
+	EntityPropertiesInteger::createProperty(_axisName, "Display number precision", 3, 1, 99, "", getProperties())->setAllowCustomValues(false);
 }
 
 void EntityResult1DPlot::setAxisFromProperties(const std::string& _axisName, ot::Plot1DAxisCfg& _axis)
@@ -346,14 +356,23 @@ void EntityResult1DPlot::setAxisFromProperties(const std::string& _axisName, ot:
 	const bool automaticLabel = PropertyHelper::getBoolPropertyValue(this, "Automatic label", _axisName);
 	const std::string labelOverride = PropertyHelper::getStringPropertyValue(this, "Label override", _axisName);
 
-	_axis.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(quantity));
-	_axis.setQuantityScaling(ot::Plot1DAxisCfg::stringToQuantityScalingFlag(quantityScaling));
-	_axis.setIsLogScale(logScale);
-	_axis.setIsAutoScale(autoScale);
+	const ot::String::DisplayNumberFormat displayNumberFormat = ot::String::stringToDisplayNumberFormat(PropertyHelper::getSelectionPropertyValue(this, "Display number format", _axisName));
+	const int displayNumberPrecision = PropertyHelper::getIntegerPropertyValue(this, "Display number precision", _axisName);
+
 	_axis.setMin(min);
 	_axis.setMax(max);
+
+	_axis.setIsLogScale(logScale);
+	_axis.setIsAutoScale(autoScale);
+
+	_axis.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(quantity));
+	_axis.setQuantityScaling(ot::Plot1DAxisCfg::stringToQuantityScalingFlag(quantityScaling));
+
 	_axis.setAutoDetermineAxisLabel(automaticLabel);
 	_axis.setAxisLabel(labelOverride);
+
+	_axis.setDisplayNumberFormat(displayNumberFormat);
+	_axis.setDisplayNumberPrecision(displayNumberPrecision);
 }
 
 bool EntityResult1DPlot::setAxisPropertiesVisibility(const std::string& _axisName, bool _visible)
@@ -375,6 +394,9 @@ bool EntityResult1DPlot::setAxisPropertiesVisibility(const std::string& _axisNam
 	getProperties().getProperty("Automatic label", _axisName)->setVisible(_visible);
 	getProperties().getProperty("Label override", _axisName)->setVisible(_visible);
 
+	getProperties().getProperty("Display number format", _axisName)->setVisible(_visible);
+	getProperties().getProperty("Display number precision", _axisName)->setVisible(_visible);
+
 	return true;
 }
 
@@ -382,6 +404,7 @@ bool EntityResult1DPlot::updateAxisPropertiesVisibility(const std::string& _axis
 {
 	bool changed = false;
 
+	// Min / Max
 	EntityPropertiesBoolean* autoscaleX = PropertyHelper::getBoolProperty(this, "Autoscale", _axisName);
 	EntityPropertiesDouble* minX = PropertyHelper::getDoubleProperty(this, "Min", _axisName);
 	EntityPropertiesDouble* maxX = PropertyHelper::getDoubleProperty(this, "Max", _axisName);
@@ -395,12 +418,25 @@ bool EntityResult1DPlot::updateAxisPropertiesVisibility(const std::string& _axis
 		changed = true;
 	}
 
+	// Label
 	EntityPropertiesBoolean* autoLabelProp = PropertyHelper::getBoolProperty(this, "Automatic label", _axisName);
 	EntityPropertiesString* labelOverrideProp = PropertyHelper::getStringProperty(this, "Label override", _axisName);
 	if (autoLabelProp->getValue() == labelOverrideProp->getVisible())
 	{
 		labelOverrideProp->setVisible(!autoLabelProp->getValue());
 		labelOverrideProp->resetNeedsUpdate();
+		changed = true;
+	}
+
+	// Display number format
+	const ot::String::DisplayNumberFormat displayNumberFormat = ot::String::stringToDisplayNumberFormat(PropertyHelper::getSelectionPropertyValue(this, "Display number format", _axisName));
+	bool precisionVisible = displayNumberFormat != ot::String::DisplayNumberFormat::Integer;
+	auto displayNumberPrecisionProp = PropertyHelper::getIntegerProperty(this, "Display number precision", _axisName);
+	OTAssertNullptr(displayNumberPrecisionProp);
+	if (precisionVisible != displayNumberPrecisionProp->getVisible())
+	{
+		displayNumberPrecisionProp->setVisible(precisionVisible);
+		displayNumberPrecisionProp->resetNeedsUpdate();
 		changed = true;
 	}
 

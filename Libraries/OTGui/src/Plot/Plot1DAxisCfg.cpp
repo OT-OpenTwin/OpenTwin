@@ -114,7 +114,12 @@ bool ot::Plot1DAxisCfg::operator==(const Plot1DAxisCfg& _other) const
 		
 		m_axisScaling == _other.m_axisScaling &&
 		m_axisQuantity == _other.m_axisQuantity &&
-		m_quantityScaling == _other.m_quantityScaling
+		m_quantityScaling == _other.m_quantityScaling &&
+
+		m_displayNumberFormat == _other.m_displayNumberFormat &&
+		m_displayNumberPrecision == _other.m_displayNumberPrecision &&
+
+		m_autoDetermineAxisLabel == _other.m_autoDetermineAxisLabel
 		;
 }
 
@@ -132,11 +137,15 @@ void ot::Plot1DAxisCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 	_object.AddMember("Min", m_min, _allocator);
 	_object.AddMember("Max", m_max, _allocator);
 
+	_object.AddMember("AutoDetermineAxisLabel", m_autoDetermineAxisLabel, _allocator);
 	_object.AddMember("AxisLabel", ot::JsonString(m_axisLabel, _allocator), _allocator);
 	
 	_object.AddMember("AxisQuantity", JsonString(toString(m_axisQuantity), _allocator), _allocator);
 	_object.AddMember("AxisScale", static_cast<uint32_t>(m_axisScaling), _allocator);
 	_object.AddMember("QuantityScale", static_cast<uint32_t>(m_quantityScaling), _allocator);
+
+	_object.AddMember("DisplayNumberFormat", static_cast<uint32_t>(m_displayNumberFormat), _allocator);
+	_object.AddMember("DisplayNumberPrecision", m_displayNumberPrecision, _allocator);
 }
 
 void ot::Plot1DAxisCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
@@ -144,11 +153,15 @@ void ot::Plot1DAxisCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	m_min = json::getDouble(_object, "Min");
 	m_max = json::getDouble(_object, "Max");
 
+	m_autoDetermineAxisLabel = json::getBool(_object, "AutoDetermineAxisLabel");
 	m_axisLabel = json::getString(_object, "AxisLabel");
 	
 	m_axisQuantity = stringToAxisQuantity(json::getString(_object, "AxisQuantity"));
 	m_axisScaling = static_cast<AxisScaling>(json::getUInt(_object, "AxisScale"));
 	m_quantityScaling = static_cast<QuantityScaling>(json::getUInt(_object, "QuantityScale"));
+
+	m_displayNumberPrecision = json::getInt(_object, "DisplayNumberPrecision");
+	m_displayNumberFormat = static_cast<String::DisplayNumberFormat>(json::getUInt(_object, "DisplayNumberFormat"));
 }
 
 std::string ot::Plot1DAxisCfg::getDisplayLabel(const Plot1DCfg& _plotCfg) const
@@ -168,12 +181,18 @@ std::string ot::Plot1DAxisCfg::getDisplayLabel(const Plot1DCfg& _plotCfg) const
 
 std::string ot::Plot1DAxisCfg::getValueDisplayString(double _value, const Plot1DCfg& _plotCfg) const
 {
-	return getQuantityLabel(_plotCfg) + " = " + std::to_string(_value) + " " + getUnitWithScalingLabel(_plotCfg);
+	return
+		getQuantityLabel(_plotCfg) + 
+		" = " +  String::numberToString(_value, m_displayNumberFormat, m_displayNumberPrecision) +
+		" " + getUnitWithScalingLabel(_plotCfg);
 }
 
 std::string ot::Plot1DAxisCfg::getValueDisplayString(double _value, const Plot1DCfg& _plotCfg, const std::string& _unitPrefix) const
 {
-	return getQuantityLabel(_plotCfg) + " = " + std::to_string(_value) + " " + _unitPrefix + getUnitWithScalingLabel(_plotCfg);
+	return 
+		getQuantityLabel(_plotCfg) + 
+		" = " + String::numberToString(_value, m_displayNumberFormat, m_displayNumberPrecision) +
+		" " + _unitPrefix + getUnitWithScalingLabel(_plotCfg);
 }
 
 
