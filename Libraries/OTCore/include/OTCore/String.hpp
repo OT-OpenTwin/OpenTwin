@@ -59,15 +59,15 @@ template<class T> inline bool ot::String::isNumber(const std::string& _string) {
 template<typename T>
 inline std::string ot::String::numberToString(T _number, DisplayNumberFormat _format, int _decimalPlaces)
 {
-	thread_local std::ostringstream stream;
+	std::ostringstream stream;
 
 	switch (_format)
 	{
-	case DisplayNumberFormat::Decimal:
+	case DisplayNumberFormat::Auto:
 		stream << std::setprecision(_decimalPlaces) << _number;
 		break;
 
-	case DisplayNumberFormat::DecimalFixed:
+	case DisplayNumberFormat::Decimal:
 		stream << std::fixed << std::setprecision(_decimalPlaces) << _number;
 		break;
 

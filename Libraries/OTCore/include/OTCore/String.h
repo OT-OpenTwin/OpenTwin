@@ -35,8 +35,8 @@ namespace ot {
 	public:
 		enum DisplayNumberFormat : uint32_t
 		{
+			Auto,
 			Decimal,
-			DecimalFixed,
 			Integer,
 			Scientific,
 			Engineering
