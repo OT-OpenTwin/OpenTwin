@@ -27,7 +27,7 @@
 namespace DataStorageAPI
 {
 	DataLakeAPI::DataLakeAPI(const std::string& _collectionName, const std::string partition)
-		:m_documentAccess("Projects", _collectionName + partition), m_docBase("Projects", _collectionName + ".results")
+		:m_documentAccess("Projects", _collectionName + partition), m_docBase("Projects", _collectionName + partition)
 	{	
 
 	}
@@ -44,6 +44,20 @@ namespace DataStorageAPI
 
 		}
 		return m_documentAccess.InsertDocumentToDatabase(_jsonData.extract(), _allowQueueing);
+	}
+
+	DataStorageResponse DataLakeAPI::insertDocumentToDataLakePartition(BsonViewOrValue& _jsonData, bool _checkForExistence, bool _allowQueueing)
+	{
+		auto jsonDataLength = _jsonData.view().length();
+		if (jsonDataLength > m_maxDocumentLength)
+		{
+			throw std::exception(("The result collection does not support documents with a size larger then " + std::to_string(m_maxDocumentLength)).c_str());
+		}
+		if (_checkForExistence)
+		{
+
+		}
+		return m_documentAccess.InsertDocumentToDatabase(_jsonData, _allowQueueing);
 	}
 
 	DataStorageResponse DataLakeAPI::searchInDataLakePartition(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, int _limit)

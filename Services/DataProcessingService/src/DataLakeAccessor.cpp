@@ -6,6 +6,8 @@
 #include "OTDataStorage/DataLakeAPI.h"
 #include "OTResultDataAccess/ResultCollection/IndexHandler.h"
 #include "OTResultDataAccess/QuantityContainer.h"
+#include "OTCore/Tuple/TupleFactory.h"
+#include <tuple>
 
 void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 {
@@ -153,9 +155,98 @@ bool DataLakeAccessor::alreadyStoredTransformation(const ot::QueryDescription& _
 	}
 }
 
-void DataLakeAccessor::storeTransformation(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat)
+void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDescription)
 {
+	const std::string fieldValue = _queryDescription.getQueryTargetDescription().getMongoDBFieldName();
+	TupleInstance instance;
+	instance.setTupleElementDataTypes({ ot::TypeNames::getInt64TypeName() });
+	ot::ValueComparisonDescription quantitySelection(MetadataQuantity::getFieldName(), "=", fieldValue, instance);
+	AdvancedQueryBuilder builder;
+	BsonViewOrValue queryForQuantity = builder.createComparison(quantitySelection);
 	
+	DataStorageAPI::DataLakeAPI resultCollectionAccess(m_collectionName);
+	mongocxx::options::find options;
+	auto response =	resultCollectionAccess.searchInDataLakePartition(queryForQuantity,options);
+	if (response.getSuccess())
+	{
+		const std::string queryResponse = response.getResult();
+		ot::JsonDocument doc;
+		doc.fromJson(queryResponse);
+		auto allMongoDocuments = ot::json::getArray(doc, "Documents");
+
+		const uint32_t numberOfDocuments = allMongoDocuments.Size();
+		if (numberOfDocuments == 0)
+		{
+			throw std::exception("Query returned nothing.\n");
+		}
+
+		const ot::QueryTargetDescription& storedDataDescr = _queryDescription.getQueryTargetDescription();
+		const ot::ValueComparisonDescription& queryDescription =	_queryDescription.getValueComparisonDescription();
+
+		const std::string storedFormatName = storedDataDescr.getTupleInstance().getTupleFormatName();
+		const std::string storedTupleType = storedDataDescr.getTupleInstance().getTupleTypeName();
+		const std::string queryFormatName = queryDescription.getTupleInstance().getTupleFormatName();
+		TupleDescription* tupleDescription = TupleFactory::create(storedTupleType);
+		TupleDescriptionComplex* complexDescr = dynamic_cast<TupleDescriptionComplex*>(tupleDescription);
+		std::function<std::pair<double, double>(double, double)> transform;
+
+		if (queryFormatName == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian))
+		{
+			assert(storedTupleType == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar));
+			transform =
+				[](double _first, double _second) -> std::pair<double, double>
+				{
+					std::complex<double> transformed = ot::ComplexNumberConversion::polarToCartesian(_first, _second);
+					return { transformed.real(), transformed.imag() };
+				};
+		}
+		else
+		{
+			assert(storedTupleType == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
+			transform =
+				[](double _first, double _second) -> std::pair<double, double>
+				{
+					std::complex<double> reIm(_first, _second);
+
+					auto transformed = ot::ComplexNumberConversion::cartesianToPolar(reIm);
+					return { transformed.m_firstValue, transformed.m_secondValue };
+				};
+		}
+
+
+		ot::JsonDocument dataDoc;
+		
+		DataStorageAPI::DataLakeAPI transformationCollectionAccess(m_collectionName,".transformed");
+		for (uint32_t i = 0; i < numberOfDocuments; i++)
+		{
+			ot::ConstJsonObject singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+
+			ot::ConstJsonArray complexValue = ot::json::getArray(singleMongoDocument, QuantityContainer::getFieldName());
+			double first = ot::json::getDouble(complexValue, 0);
+			double second = ot::json::getDouble(complexValue, 1);
+			std::pair<double,double> transFormedValues = transform(first, second);
+			bsoncxx::builder::basic::array values;
+			values.append(transFormedValues.first);
+			values.append(transFormedValues.second);
+
+			bsoncxx::document::value parsed = bsoncxx::from_json(ot::json::toJson(singleMongoDocument));
+			bsoncxx::builder::basic::document transformedDocument{};
+
+			for (auto&& elem : parsed.view()) {
+				if (elem.key() == QuantityContainer::getFieldName()) 
+				{
+					// Replace "x" with the double array y
+					transformedDocument.append(bsoncxx::builder::basic::kvp(QuantityContainer::getFieldName(), values));
+				}
+				else {
+					// Copy all other fields unchanged
+					transformedDocument.append(bsoncxx::builder::basic::kvp(elem.key(), elem.get_value()));
+				}
+			}
+			transformationCollectionAccess.insertDocumentToDataLakePartition(transformedDocument, false, true);
+		}
+		transformationCollectionAccess.flushQueuedData();
+	}
 }
 
 BsonViewOrValue DataLakeAccessor::generateSeriesQuery()
@@ -232,7 +323,7 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		{
 			if (!alreadyStoredTransformation(queryDescription))
 			{
-				storeTransformation(queryTupleDescription, storedTupleDescription);
+				storeTransformation(queryDescription);
 			}
 			transformedCollectionQueries.push_back(combinedQuery);
 		}

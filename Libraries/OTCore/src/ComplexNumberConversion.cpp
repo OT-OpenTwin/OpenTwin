@@ -16,9 +16,15 @@ std::complex<double> ot::ComplexNumberConversion::polarToCartesian(const Complex
 		throw std::invalid_argument("Invalid angle unit. Expected 'rad' or '°'.");
 	}
 
-	double realPart = _complexNumberDefinition.m_firstValue * cos(_complexNumberDefinition.m_secondValue);
-	double imagPart = _complexNumberDefinition.m_firstValue * sin(_complexNumberDefinition.m_secondValue);
-	return std::complex<double>(realPart, imagPart);
+	std::complex<double> transformed =	polarToCartesian(_complexNumberDefinition.m_firstValue, _complexNumberDefinition.m_secondValue);
+	return transformed;
+}
+
+std::complex<double> ot::ComplexNumberConversion::polarToCartesian(double _magnitude, double _angle)
+{
+	double realPart = _magnitude * cos(_angle);
+	double imagPart = _magnitude * sin(_angle);
+	return {realPart, imagPart};
 }
 
 ot::ComplexNumberDefinition ot::ComplexNumberConversion::cartesianToPolar(std::complex<double> _complexNb)

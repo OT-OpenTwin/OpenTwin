@@ -34,10 +34,11 @@ namespace ot
 		//! @param _angle 
 		//! @param _angleUnit radians or degrees. Unit string should be taken out of the SIUnits::Derived namespace. If empty, radians will be assumed.
 		static std::complex<double> polarToCartesian(const ComplexNumberDefinition& _complexNumberDefinition);
+		static std::complex<double>  polarToCartesian(double _magnitude, double _angle);
 
 		//! @return Vector of size 2 where element 0 is magnitude and element 1 is angle in radians.
 		static ComplexNumberDefinition cartesianToPolar(std::complex<double> _complexNb);
-
+		
 		static std::complex<double> fromString(const std::string& _complexString, const ot::ComplexNumberFormat& _format, const std::string& _angleUnit = "");
 
 	};
