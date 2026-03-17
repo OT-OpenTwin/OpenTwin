@@ -19,8 +19,8 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
-#include "OTWidgets/Plot/CartesianPlot.h"
-#include "OTWidgets/Plot/CartesianPlotAxis.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlot.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotAxis.h"
 
 // Qwt header
 #include <qwt_scale_engine.h>

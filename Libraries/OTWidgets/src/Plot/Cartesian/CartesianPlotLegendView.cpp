@@ -1,5 +1,5 @@
 // @otlicense
-// File: PolarPlotGrid.cpp
+// File: CartesianPlotLegendView.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,13 +18,16 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/PolarPlot.h"
-#include "OTWidgets/Plot/PolarPlotGrid.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotLegendView.h"
 
-ot::PolarPlotGrid::PolarPlotGrid(PolarPlot* _plot) : m_plot(_plot) {
-	this->attach(m_plot);
-}
+// Qt header
+#include <QtWidgets/qlayout.h>
 
-ot::PolarPlotGrid::~PolarPlotGrid() {
+ot::CartesianPlotLegendView::CartesianPlotLegendView(QWidget* _parent) :
+	QScrollArea(_parent)
+{
+	m_contentsWidget = new QWidget(this);
+	this->setWidget(m_contentsWidget);
 
+	m_contentsLayout = new QVBoxLayout(m_contentsWidget);
 }

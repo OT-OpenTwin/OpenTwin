@@ -1,5 +1,5 @@
 // @otlicense
-// File: CartesianPlotPicker.cpp
+// File: CartesianPlotDatasetData.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,15 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/CartesianPlot.h"
-#include "OTWidgets/Plot/CartesianPlotPicker.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotDatasetData.h"
 
-ot::CartesianPlotPicker::CartesianPlotPicker(CartesianPlot* _plot)
-	: QwtPlotPicker(_plot->canvas()), m_plot(_plot) 
-{
-
-}
-
-ot::CartesianPlotPicker::~CartesianPlotPicker() {
-
-}
+ot::CartesianPlotDatasetData::CartesianPlotDatasetData(PlotDatasetData* _data) 
+	: PlotSeriesData(_data)
+{}

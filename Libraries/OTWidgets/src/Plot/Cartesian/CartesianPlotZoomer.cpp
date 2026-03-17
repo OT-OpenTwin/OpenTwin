@@ -20,8 +20,8 @@
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/Plot/PlotBase.h"
-#include "OTWidgets/Plot/CartesianPlot.h"
-#include "OTWidgets/Plot/CartesianPlotZoomer.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlot.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotZoomer.h"
 
 // Qt header
 #include <QtGui/qevent.h>

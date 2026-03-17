@@ -1,5 +1,5 @@
 // @otlicense
-// File: CartesianPlotLegendView.cpp
+// File: CartesianPlotPicker.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,16 +18,15 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/CartesianPlotLegendView.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlot.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotPicker.h"
 
-// Qt header
-#include <QtWidgets/qlayout.h>
-
-ot::CartesianPlotLegendView::CartesianPlotLegendView(QWidget* _parent) :
-	QScrollArea(_parent)
+ot::CartesianPlotPicker::CartesianPlotPicker(CartesianPlot* _plot)
+	: QwtPlotPicker(_plot->canvas()), m_plot(_plot) 
 {
-	m_contentsWidget = new QWidget(this);
-	this->setWidget(m_contentsWidget);
 
-	m_contentsLayout = new QVBoxLayout(m_contentsWidget);
+}
+
+ot::CartesianPlotPicker::~CartesianPlotPicker() {
+
 }

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/CartesianPlotWidgetCanvas.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotWidgetCanvas.h"
 
 ot::CartesianPlotWidgetCanvas::CartesianPlotWidgetCanvas(CartesianPlot* _plot) :
 	m_plot(_plot) 

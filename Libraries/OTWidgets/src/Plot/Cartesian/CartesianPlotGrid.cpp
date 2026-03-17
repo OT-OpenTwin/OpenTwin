@@ -1,5 +1,5 @@
 // @otlicense
-// File: PolarPlotPanner.cpp
+// File: CartesianPlotGrid.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,16 +18,18 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/PolarPlot.h"
-#include "OTWidgets/Plot/PolarPlotPanner.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotGrid.h"
 
-ot::PolarPlotPanner::PolarPlotPanner(PolarPlot* _plot)
-	: QwtPolarPanner(_plot->canvas()), m_plot(_plot) 
-{
-	this->setMouseButton(Qt::MouseButton::MiddleButton);
-	this->setEnabled(true);
+ot::CartesianPlotGrid::CartesianPlotGrid() {
+	this->setPen(QColor(100, 100, 100), 0.5);
 }
 
-ot::PolarPlotPanner::~PolarPlotPanner() {
+ot::CartesianPlotGrid::~CartesianPlotGrid() {}
 
+void ot::CartesianPlotGrid::setGrid(const QColor& _color, double _width) {
+	this->setPen(_color, _width);
+}
+
+void ot::CartesianPlotGrid::setGrid(const QPen& _pen) {
+	this->setPen(_pen);
 }

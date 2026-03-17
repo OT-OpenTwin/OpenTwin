@@ -20,8 +20,8 @@
 // OpenTwin header
 #include "OTModelEntities/DataBase.h"
 #include "OTWidgets/Plot/PlotDataset.h"
-#include "OTWidgets/Plot/PolarPlotCurve.h"
-#include "OTWidgets/Plot/CartesianPlotCurve.h"
+#include "OTWidgets/Plot/Polar/PolarPlotCurve.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotCurve.h"
 #include "OTViewer/PlotManager.h"
 
 ot::PlotManager::PlotManager(QWidget* _parent) : PlotBase(_parent) {

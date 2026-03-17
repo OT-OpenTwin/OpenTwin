@@ -1,5 +1,5 @@
 // @otlicense
-// File: PolarPlotMarker.cpp
+// File: CartesianPlotTextMarker.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,14 +18,17 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/PolarPlot.h"
-#include "OTWidgets/Plot/PolarPlotMarker.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotTextMarker.h"
 
-ot::PolarPlotMarker::PolarPlotMarker(PolarPlot* _plot) : m_plot(_plot) {
-	OTAssertNullptr(m_plot);
-	this->attach(m_plot);
+// Qwt header
+#include <qwt_symbol.h>
+
+ot::CartesianPlotTextMarker::CartesianPlotTextMarker() {
+	this->setLineStyle(QwtPlotMarker::LineStyle::NoLine);
+	this->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
+	this->setLinePen(QPen(QColor(200, 150, 0), 0, Qt::DashDotLine));
 }
 
-ot::PolarPlotMarker::~PolarPlotMarker() {
+ot::CartesianPlotTextMarker::~CartesianPlotTextMarker() {
 
 }

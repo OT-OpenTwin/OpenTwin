@@ -1,5 +1,5 @@
 // @otlicense
-// File: PolarPlotCurve.cpp
+// File: PolarPlotLegend.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,10 +18,15 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/PolarPlotCurve.h"
+#include "OTWidgets/Plot/Polar/PolarPlot.h"
+#include "OTWidgets/Plot/Polar/PolarPlotLegend.h"
 
-ot::PolarPlotCurve::PolarPlotCurve(const QString& _title) :
-	QwtPolarCurve(_title), m_outlinePen(Qt::NoPen), m_pointInterval(1)
+ot::PolarPlotLegend::PolarPlotLegend(PolarPlot* _plot) : 
+	m_plot(_plot) 
 {
+	
+}
+
+ot::PolarPlotLegend::~PolarPlotLegend() {
 
 }

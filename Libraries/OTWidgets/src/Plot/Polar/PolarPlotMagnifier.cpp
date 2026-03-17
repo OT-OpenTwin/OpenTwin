@@ -20,9 +20,9 @@
 // OpenTwin header
 #include "OTCore/Symbol.h"
 #include "OTWidgets/Plot/PlotBase.h"
-#include "OTWidgets/Plot/PolarPlot.h"
-#include "OTWidgets/Plot/PolarPlotMarker.h"
-#include "OTWidgets/Plot/PolarPlotMagnifier.h"
+#include "OTWidgets/Plot/Polar/PolarPlot.h"
+#include "OTWidgets/Plot/Polar/PolarPlotMarker.h"
+#include "OTWidgets/Plot/Polar/PolarPlotMagnifier.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 
 // Qwt header

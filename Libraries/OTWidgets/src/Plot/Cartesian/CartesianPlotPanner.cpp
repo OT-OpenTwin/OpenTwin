@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/CartesianPlot.h"
-#include "OTWidgets/Plot/CartesianPlotPanner.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlot.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotPanner.h"
 
 // Qt header
 #include <QtGui/qevent.h>

@@ -65,11 +65,9 @@ exceptions:
 
 */
 
-#pragma once
-
 // OpenTwin header
 #include "OTWidgets/Plot/PlotPointMapper.h"
-#include "OTWidgets/Plot/CartesianPlotCurve.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotCurve.h"
 
 // Qwt header
 #include <qwt_symbol.h>

@@ -21,8 +21,8 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 #include "OTWidgets/Plot/PlotDatasetData.h"
-#include "OTWidgets/Plot/PolarPlotDatasetData.h"
-#include "OTWidgets/Plot/CartesianPlotDatasetData.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotDatasetData.h"
+#include "OTWidgets/Plot/Polar/PolarPlotDatasetData.h"
 
 ot::PlotDatasetData::PlotDatasetData() 
 	: m_xQuantity(Plot1DAxisCfg::Undefined), m_yQuantity(Plot1DAxisCfg::Undefined), m_canConvert(false),

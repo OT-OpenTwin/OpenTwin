@@ -1,5 +1,5 @@
 // @otlicense
-// File: PolarPlotLegend.cpp
+// File: PolarPlotDatasetData.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,15 +18,14 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/PolarPlot.h"
-#include "OTWidgets/Plot/PolarPlotLegend.h"
+#include "OTWidgets/Plot/Polar/PolarPlotDatasetData.h"
 
-ot::PolarPlotLegend::PolarPlotLegend(PolarPlot* _plot) : 
-	m_plot(_plot) 
-{
-	
-}
+ot::PolarPlotDatasetData::PolarPlotDatasetData(PlotDatasetData* _data)
+	: PlotSeriesData(_data) 
+{}
 
-ot::PolarPlotLegend::~PolarPlotLegend() {
-
+QwtPointPolar ot::PolarPlotDatasetData::sample(size_t _index) const {
+	auto pt = PlotSeriesData<QwtPointPolar>::sample(_index);
+	pt.setAzimuth(Math::radToDeg(pt.azimuth()));
+	return pt;
 }

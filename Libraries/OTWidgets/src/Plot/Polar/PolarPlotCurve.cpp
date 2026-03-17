@@ -1,5 +1,5 @@
 // @otlicense
-// File: CartesianPlotGrid.cpp
+// File: PolarPlotCurve.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,18 +18,10 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/CartesianPlotGrid.h"
+#include "OTWidgets/Plot/Polar/PolarPlotCurve.h"
 
-ot::CartesianPlotGrid::CartesianPlotGrid() {
-	this->setPen(QColor(100, 100, 100), 0.5);
-}
+ot::PolarPlotCurve::PolarPlotCurve(const QString& _title) :
+	QwtPolarCurve(_title), m_outlinePen(Qt::NoPen), m_pointInterval(1)
+{
 
-ot::CartesianPlotGrid::~CartesianPlotGrid() {}
-
-void ot::CartesianPlotGrid::setGrid(const QColor& _color, double _width) {
-	this->setPen(_color, _width);
-}
-
-void ot::CartesianPlotGrid::setGrid(const QPen& _pen) {
-	this->setPen(_pen);
 }

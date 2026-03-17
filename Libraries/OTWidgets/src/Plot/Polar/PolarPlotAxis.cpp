@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/PolarPlot.h"
-#include "OTWidgets/Plot/PolarPlotAxis.h"
+#include "OTWidgets/Plot/Polar/PolarPlot.h"
+#include "OTWidgets/Plot/Polar/PolarPlotAxis.h"
 
 // Qwt header
 #include <qwt_scale_engine.h>

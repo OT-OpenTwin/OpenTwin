@@ -23,9 +23,9 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Plot/PlotBase.h"
-#include "OTWidgets/Plot/PolarPlot.h"
 #include "OTWidgets/Plot/PlotDataset.h"
-#include "OTWidgets/Plot/CartesianPlot.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlot.h"
+#include "OTWidgets/Plot/Polar/PolarPlot.h"
 #include "OTWidgets/Widgets/Label.h"
 
 // Qwt header

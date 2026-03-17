@@ -21,8 +21,8 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/Plot/Plot.h"
 #include "OTWidgets/Plot/PlotDataset.h"
-#include "OTWidgets/Plot/PolarPlotCurve.h"
-#include "OTWidgets/Plot/CartesianPlotCurve.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotCurve.h"
+#include "OTWidgets/Plot/Polar/PolarPlotCurve.h"
 
 ot::Plot::Plot(QWidget* _parent) : PlotBase(_parent) {}
 

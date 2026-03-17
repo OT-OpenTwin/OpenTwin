@@ -1,5 +1,5 @@
 // @otlicense
-// File: CartesianPlotTextMarker.cpp
+// File: CartesianPlotCrossMarker.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,17 +18,25 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/CartesianPlotTextMarker.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotCrossMarker.h"
 
 // Qwt header
 #include <qwt_symbol.h>
 
-ot::CartesianPlotTextMarker::CartesianPlotTextMarker() {
-	this->setLineStyle(QwtPlotMarker::LineStyle::NoLine);
+ot::CartesianPlotCrossMarker::CartesianPlotCrossMarker() : m_symbol(nullptr) {
+	this->setLineStyle(QwtPlotMarker::LineStyle::Cross);
 	this->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
 	this->setLinePen(QPen(QColor(200, 150, 0), 0, Qt::DashDotLine));
+	m_symbol = new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::yellow), QColor(Qt::green), QSize(7, 7));
+	this->setSymbol(m_symbol);
 }
 
-ot::CartesianPlotTextMarker::~CartesianPlotTextMarker() {
+ot::CartesianPlotCrossMarker::~CartesianPlotCrossMarker() {
+	delete m_symbol;
+}
 
+void ot::CartesianPlotCrossMarker::setStyle(const QColor& _innerColor, const QColor& _outerColor, int _size, double _outerColorSize) {
+	m_symbol->setBrush(_innerColor);
+	m_symbol->setPen(_outerColor, _outerColorSize);
+	m_symbol->setSize(_size);
 }

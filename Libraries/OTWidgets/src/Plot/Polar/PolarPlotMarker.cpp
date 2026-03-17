@@ -1,5 +1,5 @@
 // @otlicense
-// File: CartesianPlotDatasetData.cpp
+// File: PolarPlotMarker.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,8 +18,14 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTWidgets/Plot/CartesianPlotDatasetData.h"
+#include "OTWidgets/Plot/Polar/PolarPlot.h"
+#include "OTWidgets/Plot/Polar/PolarPlotMarker.h"
 
-ot::CartesianPlotDatasetData::CartesianPlotDatasetData(PlotDatasetData* _data) 
-	: PlotSeriesData(_data)
-{}
+ot::PolarPlotMarker::PolarPlotMarker(PolarPlot* _plot) : m_plot(_plot) {
+	OTAssertNullptr(m_plot);
+	this->attach(m_plot);
+}
+
+ot::PolarPlotMarker::~PolarPlotMarker() {
+
+}

@@ -23,13 +23,13 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Plot/PlotBase.h"
-#include "OTWidgets/Plot/PolarPlot.h"
 #include "OTWidgets/Plot/PlotDataset.h"
-#include "OTWidgets/Plot/CartesianPlot.h"
-#include "OTWidgets/Plot/PolarPlotCurve.h"
-#include "OTWidgets/Plot/CartesianPlotCurve.h"
-#include "OTWidgets/Plot/PolarPlotDatasetData.h"
-#include "OTWidgets/Plot/CartesianPlotDatasetData.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlot.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotCurve.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotDatasetData.h"
+#include "OTWidgets/Plot/Polar/PolarPlot.h"
+#include "OTWidgets/Plot/Polar/PolarPlotCurve.h"
+#include "OTWidgets/Plot/Polar/PolarPlotDatasetData.h"
 
 // Qwt header
 #include <qwt_symbol.h>

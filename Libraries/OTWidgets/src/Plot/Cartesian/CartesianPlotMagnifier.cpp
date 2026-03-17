@@ -22,10 +22,10 @@
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/PlotDataset.h"
-#include "OTWidgets/Plot/CartesianPlot.h"
-#include "OTWidgets/Plot/CartesianPlotMagnifier.h"
-#include "OTWidgets/Plot/CartesianPlotTextMarker.h"
-#include "OTWidgets/Plot/CartesianPlotCrossMarker.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlot.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotMagnifier.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotTextMarker.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotCrossMarker.h"
 
 // Qwt header
 #include <qwt_text.h>
