@@ -85,15 +85,39 @@ void EntityPythonScript::setLibraryElement(const ot::LibraryElement& _libraryEle
 
 	std::string environmentInfo = _libraryElement.getAdditionalInfoValue("Environment");
 	if (!environmentInfo.empty()) {
-		// If there is environment information, we can store it as additional info in the entity
+		// Create the LibraryElementSelectionCfg as before
 		ot::LibraryElementSelectionCfg config;
 		config.setRequestingEntityID(_libraryElement.getRequestingEntityID());
 		config.setCollectionName("PythonEnvironments");
-		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+		config.setCallBackAction(OT_ACTION_CMD_UI_ModelDialogConfirmed);
 		config.setEntityType(EntityFileText::className());
 		config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
 		config.setPropertyName("Environment");
+		config.setCallBackService(_libraryElement.getCallBackService());
 
-		getObserver()->requestConfigForModelDialog(config);
+		// Build the document for handleModelDialogConfirmed
+		ot::JsonDocument dialogDoc;
+
+		// Required: OT_ACTION_PARAM_COLLECTION_NAME
+		dialogDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString("PythonEnvironments", dialogDoc.GetAllocator()), dialogDoc.GetAllocator());
+
+		// Required: OT_ACTION_PARAM_MODEL_EntityID (the requesting entity ID)
+		dialogDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _libraryElement.getRequestingEntityID(), dialogDoc.GetAllocator());
+
+		// Required: OT_ACTION_PARAM_Value (the selected document name)
+		dialogDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(environmentInfo, dialogDoc.GetAllocator()), dialogDoc.GetAllocator());
+
+		// Required: OT_ACTION_PARAM_Info (serialized callback information)
+		ot::JsonDocument callbackInfo;
+		callbackInfo.AddMember("CallbackService", ot::JsonString(config.getCallBackService(), callbackInfo.GetAllocator()), callbackInfo.GetAllocator());
+		callbackInfo.AddMember("EntityType", ot::JsonString(config.getEntityType(), callbackInfo.GetAllocator()), callbackInfo.GetAllocator());
+		callbackInfo.AddMember("NewEntityFolder", ot::JsonString(config.getNewEntityFolder(), callbackInfo.GetAllocator()), callbackInfo.GetAllocator());
+		dialogDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(callbackInfo.toJson(), dialogDoc.GetAllocator()), dialogDoc.GetAllocator());
+
+		// Required: OT_ACTION_PARAM_PROPERTY_Name
+		dialogDoc.AddMember(OT_ACTION_PARAM_PROPERTY_Name, ot::JsonString("Environment", dialogDoc.GetAllocator()), dialogDoc.GetAllocator());
+
+		// Send the document to the observer (Model Service)
+		getObserver()->requestLibraryElement(dialogDoc);
 	}
 }

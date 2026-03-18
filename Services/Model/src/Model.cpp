@@ -4065,6 +4065,18 @@ void Model::requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config)
 	Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);
 }
 
+void Model::requestLibraryElement(ot::JsonDocument& _doc) {
+	
+	_doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ModelDialogConfirmed, _doc.GetAllocator()), _doc.GetAllocator());
+
+	// Add the database information to the document
+	_doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::instance().getUserName(), _doc.GetAllocator()), _doc.GetAllocator());
+	_doc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::instance().getUserPassword(), _doc.GetAllocator()), _doc.GetAllocator());
+	_doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::instance().getDataBaseServerURL(), _doc.GetAllocator()), _doc.GetAllocator());
+
+	Application::instance()->getLibraryManagementWrapper().requestCreateConfig(_doc);
+}
+
 void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg)
 {
 	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationCfg);

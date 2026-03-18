@@ -69,6 +69,7 @@ public:
 	virtual void entityModified(EntityBase *entity) override;
 	virtual void sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) override;
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) override;
+	virtual void requestLibraryElement(ot::JsonDocument& _doc) override;
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName);
