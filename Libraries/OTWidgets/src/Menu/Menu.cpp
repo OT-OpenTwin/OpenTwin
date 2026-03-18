@@ -43,6 +43,7 @@ void ot::Menu::setFromConfiguration(const MenuCfg& _config) {
     m_name = _config.getName();
     this->setTitle(QString::fromStdString(_config.getText()));
     this->setToolTip(QString::fromStdString(_config.getToolTip()));
+	this->setEnabled(_config.getEnabled());
 
     // Set menu icon if needed
     if (!_config.getIconPath().empty()) {

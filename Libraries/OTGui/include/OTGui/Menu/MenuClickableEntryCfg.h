@@ -54,11 +54,15 @@ namespace ot {
 		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
 		const std::string& getToolTip() const { return m_toolTip; };
 
+		void setEnabled(bool _isEnabled) { m_isEnabled = _isEnabled; };
+		bool getEnabled() const { return m_isEnabled; };
+
 	private:
 		std::string m_name;
 		std::string m_text;
 		std::string m_iconPath;
 		std::string m_toolTip;
+		bool m_isEnabled = true;
 	};
 
 }

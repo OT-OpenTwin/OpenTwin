@@ -45,6 +45,7 @@ void ot::MenuAction::setFromConfiguration(const MenuButtonCfg& _config) {
 void ot::MenuAction::applyConfig() {
     this->setText(QString::fromStdString(m_config.getText()));
     this->setToolTip(QString::fromStdString(m_config.getToolTip()));
+    this->setEnabled(m_config.getEnabled());
 
     // Set icon if needed
     if (m_config.getIconPath().empty())

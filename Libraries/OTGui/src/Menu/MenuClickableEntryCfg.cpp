@@ -37,6 +37,7 @@ void ot::MenuClickableEntryCfg::addToJsonObject(ot::JsonValue& _object, ot::Json
 	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
 	_object.AddMember("Icon", JsonString(m_iconPath, _allocator), _allocator);
 	_object.AddMember("ToolTip", JsonString(m_toolTip, _allocator), _allocator);
+	_object.AddMember("Enabled", m_isEnabled, _allocator);
 }
 
 void ot::MenuClickableEntryCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -46,4 +47,5 @@ void ot::MenuClickableEntryCfg::setFromJsonObject(const ot::ConstJsonObject& _ob
 	m_text = json::getString(_object, "Text");
 	m_iconPath = json::getString(_object, "Icon");
 	m_toolTip = json::getString(_object, "ToolTip");
+	m_isEnabled = json::getBool(_object, "Enabled");
 }

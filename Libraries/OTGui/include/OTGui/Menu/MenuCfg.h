@@ -29,6 +29,8 @@
 
 namespace ot {
 
+	class MenuButtonCfg;
+
 	class OT_GUI_API_EXPORT MenuCfg : public MenuClickableEntryCfg {
 	public:
 		MenuCfg();
@@ -78,7 +80,11 @@ namespace ot {
 		//! The menu keeps ownership of the button.
 		MenuButtonCfg* findMenuButton(const std::string& _name) const;
 
+		//! @brief Returns a list of all menu entries that are direct children of this menu.
 		const std::list<MenuEntryCfg*>& getEntries() const { return m_childs; };
+
+		//! @brief Returns a list of all menu entries in this menu and all of its child menus (recursively).
+		std::list<MenuEntryCfg*> getAllEntries() const;
 
 		//! @brief Returns true if this menu has no buttons (child menus do not count).
 		bool isEmpty() const;
