@@ -314,7 +314,7 @@ void ViewerObjectSelectionHandler::processRubberbandUpdate(osgViewer::Viewer *vi
 
 				// We have an intersection of the ray with the plane
 				//assert(fabs(ip.z()) < 1e-5);
-				creator->getRubberband()->updateCurrentPosition(ip.x(), ip.y(), 0.0);
+				creator->getRubberband()->updateCurrentPosition(ip.x(), ip.y(), 0.0, lastHeight, lastPointInPlane.x(), lastPointInPlane.y(), lastPointInPlane.z(), this);
 				lastPointInPlane = ip;
 			}
 
@@ -348,7 +348,7 @@ void ViewerObjectSelectionHandler::processRubberbandUpdate(osgViewer::Viewer *vi
 				height = creator->snapDimension(height);
 				lastHeight = height;
 
-				creator->getRubberband()->updateCurrentPosition(referencePoint.x(), referencePoint.y(), height);
+				creator->getRubberband()->updateCurrentPosition(referencePoint.x(), referencePoint.y(), height, lastHeight, lastPointInPlane.x(), lastPointInPlane.y(), lastPointInPlane.z(), this);
 			}
 
 			break;

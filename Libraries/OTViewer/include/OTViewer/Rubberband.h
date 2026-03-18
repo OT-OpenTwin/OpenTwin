@@ -23,6 +23,7 @@
 
 // C++ header
 #include <string>
+#include <tuple>
 
 #include "OTRubberband/Core/dataTypes.h"
 #include <osg/Array>
@@ -33,6 +34,8 @@ namespace rbeWrapper {
 namespace osg {
 	class Switch;
 }
+
+class ViewerObjectSelectionHandler;
 
 class Rubberband {
 public:
@@ -46,6 +49,7 @@ public:
 	// Setter
 
 	bool switchToNextStep(void);
+	bool switchToPreviousStep(void);
 
 	void applyCurrentStep(void);
 
@@ -59,7 +63,7 @@ public:
 
 	rbeWrapper::RubberbandOsgWrapper * engine(void) { return m_engine; }
 
-	void updateCurrentPosition(coordinate_t _u, coordinate_t _v, coordinate_t _w);
+	void updateCurrentPosition(coordinate_t _u, coordinate_t _v, coordinate_t _w, double lastHeight, double lastPoint_u, double lastPoint_v, double lastPoint_w, ViewerObjectSelectionHandler *handler);
 
 	std::string createPointDataJson(void);
 
@@ -71,4 +75,12 @@ private:
 	Rubberband() = delete;
 	Rubberband(Rubberband&) = delete;
 	Rubberband& operator = (Rubberband&) = delete;
+
+	std::tuple< coordinate_t, coordinate_t, coordinate_t> m_currentCoordinate;
+	std::tuple< coordinate_t, coordinate_t, coordinate_t> m_currentLastPointInPlane;
+	double m_currentlastHeight;
+	std::list<std::tuple< coordinate_t, coordinate_t, coordinate_t>> m_selectedCoordinates;
+	std::list<std::tuple< coordinate_t, coordinate_t, coordinate_t>> m_lastPointInPlaneCoordinates;
+	std::list<double> m_selectedLastHeight;
+	ViewerObjectSelectionHandler* m_selectionHandler;
 };

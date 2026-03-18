@@ -40,6 +40,8 @@ public:
 	bool getActive() const { return active; };
 	Viewer* getCreator() const { return creator; };
 	double getLastHeight() const { return lastHeight; };
+	void setLastHeight(double _lastHeight) { lastHeight = _lastHeight; }
+	void setLastPointInPlane(const osg::Vec3 &_lastPointInPlane) { lastPointInPlane = _lastPointInPlane; }
 
 private:
 	enum projectionType {IN_PLANE, HEIGHT};

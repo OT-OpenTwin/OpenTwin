@@ -823,6 +823,11 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 			model->escapeKeyPressed();
 		}
 
+		if (event->key() == Qt::Key_Backspace)
+		{
+			dropPointInRubberband();
+		}
+
 		if (event->key() == Qt::Key_Return)
 		{
 			model->returnKeyPressed();
@@ -971,6 +976,16 @@ void Viewer::cancelRubberband(void) {
 
 		delete rubberband;
 		rubberband = nullptr;
+	}
+}
+
+void Viewer::dropPointInRubberband(void) {
+	if (rubberband)
+	{
+		if (!rubberband->switchToPreviousStep())
+		{
+			cancelRubberband();
+		}
 	}
 }
 

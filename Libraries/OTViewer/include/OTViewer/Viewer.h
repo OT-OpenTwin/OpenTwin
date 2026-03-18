@@ -92,6 +92,7 @@ public:
 	void finishRubberbandExecution(void);
 
 	void cancelRubberband(void);
+	void dropPointInRubberband(void);
 
 	void settingsItemChanged(const ot::Property* _property);
 
