@@ -72,6 +72,50 @@ osgUtil::Intersector *ViewerObjectSelectionHandler::createIntersector(osgUtil::I
 	return intersector;
 }
 
+void ViewerObjectSelectionHandler::handleRubberbandPosition(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
+{
+	model->clearHoverView();
+
+	osgViewer::Viewer* viewer = dynamic_cast<osgViewer::Viewer*>(&aa);
+
+	// Here we assume the global coordinate system for now
+	osg::Vec3 p{ 0.0, 0.0, 0.0 };
+	osg::Vec3 p2{ 0.0, 0.0, 1.0 };
+	osg::Vec3 n{ 0.0, 0.0, 1.0 };
+
+	// Finally we need to consider the transformation into the currently active plane
+	osg::Matrix transform = model->getCurrentWorkingPlaneTransform();
+
+	p = p * transform;
+	p2 = p2 * transform;
+	n = p2 - p;
+	n.normalize();
+
+	Rubberband* rubberband = creator->getRubberband();
+	if (rubberband) {
+		rbeWrapper::RubberbandOsgWrapper* osgEngine = rubberband->engine();
+		if (osgEngine) {
+			if (osgEngine->currentStep() == 0) {
+				lastHeight = 0.0;
+				processRubberbandUpdate(viewer, ea.getX(), ea.getY(), IN_PLANE, n, p);
+			}
+			else {
+				rbeCore::Step* step = osgEngine->step(osgEngine->currentStep());
+				if (step) {
+					switch (step->projection())
+					{
+					case rbeCore::Step::pUV: processRubberbandUpdate(viewer, ea.getX(), ea.getY(), IN_PLANE, n, p); break;
+					case rbeCore::Step::pW: processRubberbandUpdate(viewer, ea.getX(), ea.getY(), HEIGHT, n, p); break;
+					default:
+						OTAssert(0, "Unknown step projection");
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
 bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
 {
 	if (!active) return false;
@@ -95,6 +139,7 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 			else
 			{
 				stepCount++;
+				handleRubberbandPosition(ea, aa);
 			}
 		}
 		else {
@@ -210,46 +255,7 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 		// Mouse is moving and no button is pressed
 		if (creator->getRubberband()) 
 		{
-			model->clearHoverView();
-
-			osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer*>(&aa);
-
-			// Here we assume the global coordinate system for now
-			osg::Vec3 p{ 0.0, 0.0, 0.0 };
-			osg::Vec3 p2{ 0.0, 0.0, 1.0 };
-			osg::Vec3 n{ 0.0, 0.0, 1.0 };
-
-			// Finally we need to consider the transformation into the currently active plane
-			osg::Matrix transform = model->getCurrentWorkingPlaneTransform();
-
-			p = p * transform;
-			p2 = p2 * transform;
-			n = p2 - p;
-			n.normalize();
-
-			Rubberband * rubberband = creator->getRubberband();
-			if (rubberband) {
-				rbeWrapper::RubberbandOsgWrapper * osgEngine = rubberband->engine();
-				if (osgEngine) {
-					if (osgEngine->currentStep() == 0) {
-						lastHeight = 0.0;
-						processRubberbandUpdate(viewer, ea.getX(), ea.getY(), IN_PLANE, n, p);
-					}
-					else {
-						rbeCore::Step * step = osgEngine->step(osgEngine->currentStep());
-						if (step) {
-							switch (step->projection())
-							{
-							case rbeCore::Step::pUV: processRubberbandUpdate(viewer, ea.getX(), ea.getY(), IN_PLANE, n, p); break;
-							case rbeCore::Step::pW: processRubberbandUpdate(viewer, ea.getX(), ea.getY(), HEIGHT, n, p); break;
-							default:
-								OTAssert(0, "Unknown step projection");
-								break;
-							}
-						}
-					}
-				}
-			}
+			handleRubberbandPosition(ea, aa);
 		}
 		else if (creator->hasHandlers())
 		{
