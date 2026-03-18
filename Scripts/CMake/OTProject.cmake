@@ -199,11 +199,12 @@ function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
     add_library(${_core} OBJECT ${_src} ${_hdr})
 
     set_target_properties(${_core} PROPERTIES
-        CXX_STANDARD 17
-        CXX_STANDARD_REQUIRED YES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS NO
     )
 
+    # export function
     target_compile_definitions(${_core} PRIVATE
         UNICODE
         _UNICODE
@@ -235,6 +236,13 @@ function(ot_initialize_app TARGET_NAME ROOT_PATH_VAR)
     ot_initialize_lib(${TARGET_NAME} ${ROOT_PATH_VAR})
     _ot_target_core_name(_core ${TARGET_NAME})
     set_property(TARGET ${_core} PROPERTY OT_IS_APP TRUE)
+endfunction()
+
+function(ot_add_export TARGET_NAME)
+    string(REGEX REPLACE "^OT" "" _lib "${TARGET_NAME}")
+    string(TOUPPER "${_lib}" _lib_upper)
+    set(_export_macro "OPENTWIN${_lib_upper}_EXPORTS")
+    target_compile_definitions(${TARGET_NAME}_core PRIVATE ${_export_macro})
 endfunction()
 
 # ------------------------------------------------------------
