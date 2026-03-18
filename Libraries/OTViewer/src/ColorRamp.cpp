@@ -35,7 +35,7 @@ void ColorRamp::loadFromString(const std::string& colorRampData)
 	colorB = ot::json::getDoubleVector(colorRamp, "ColorB");
 }
 
-bool ColorRamp::operator==(const ColorRamp& other)
+bool ColorRamp::operator==(const ColorRamp& other) const
 {
 	if (label != other.label) return false;
 

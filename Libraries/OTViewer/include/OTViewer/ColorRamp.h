@@ -30,9 +30,9 @@ public:
 
 	void loadFromString(const std::string& colorRampData);
 	void setActive(bool flag) { active = flag; };
-	bool isActive() { return active; }
+	bool isActive() const { return active; }
 
-	bool operator==(const ColorRamp& other);
+	bool operator==(const ColorRamp& other) const;
 
 	std::string getLabel() { return label; }
 
