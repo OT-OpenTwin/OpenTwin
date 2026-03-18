@@ -43,3 +43,12 @@ void EntitySolverDataProcessing::setPipelineFolder(const std::string& _pipelineF
 	pipeline->setValueID(_pipelineFolderID);
 	this->setModified();
 }
+
+void EntitySolverDataProcessing::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
+{
+	_menuCfg.addButton("Update", "Update", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("Data Processing/Pipeline Handling/Run");
+
+	_menuCfg.addSeparator();
+
+	EntitySolver::fillContextMenu(_requestData, _menuCfg);
+}

@@ -87,3 +87,13 @@ bool EntitySolverPyrit::updateFromProperties(void)
 
 	return updatePropertiesGrid;
 }
+
+void EntitySolverPyrit::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
+{
+	_menuCfg.addButton("Update", "Update", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("Pyrit/Solver/Run Solver");
+
+	_menuCfg.addSeparator();
+
+	EntitySolver::fillContextMenu(_requestData, _menuCfg);
+}
+

@@ -98,3 +98,12 @@ const std::string EntitySolverFITTD::GetPropertyValueVolumeFull()
 	static const std::string propertyValueVolumenFull = "Full";
 	return propertyValueVolumenFull;
 }
+
+void EntitySolverFITTD::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
+{
+	_menuCfg.addButton("Update", "Update", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("FIT-TD/Solver/Run Solver");
+
+	_menuCfg.addSeparator();
+
+	EntitySolver::fillContextMenu(_requestData, _menuCfg);
+}

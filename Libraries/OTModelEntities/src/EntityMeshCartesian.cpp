@@ -377,3 +377,12 @@ void EntityMeshCartesian::removeChild(EntityBase *child)
 
 	EntityContainer::removeChild(child);
 }
+
+void EntityMeshCartesian::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
+{
+	_menuCfg.addButton("Update", "Update", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("Mesh/Cartesian Mesh/Update Cartesian Mesh");
+
+	_menuCfg.addSeparator();
+
+	EntityMesh::fillContextMenu(_requestData, _menuCfg);
+}

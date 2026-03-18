@@ -35,4 +35,6 @@ public:
 
 	void setPipelineFolder(const std::string& _pipelineFolderName, const ot::UID _pipelineFolderID);
 
+	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg) override;
+
 };

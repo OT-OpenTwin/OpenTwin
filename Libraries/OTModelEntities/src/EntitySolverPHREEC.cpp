@@ -32,4 +32,12 @@ EntitySolverPHREEC::~EntitySolverPHREEC()
 {
 }
 
+void EntitySolverPHREEC::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
+{
+	_menuCfg.addButton("Update", "Update", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("PHREEC/Solver/Run Solver");
+
+	_menuCfg.addSeparator();
+
+	EntitySolver::fillContextMenu(_requestData, _menuCfg);
+}
 

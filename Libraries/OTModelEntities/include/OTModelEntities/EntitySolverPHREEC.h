@@ -33,6 +33,8 @@ public:
 
 	virtual std::string getClassName(void) const override { return "EntitySolverPHREEC"; } ;
 
+	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg) override;
+
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;
 

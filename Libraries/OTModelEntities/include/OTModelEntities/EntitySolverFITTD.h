@@ -45,6 +45,7 @@ public:
 	static const std::string GetPropertyValueDimension3D();
 	static const std::string GetPropertyValueVolumeFull();
 	
+	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg) override;
 
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;

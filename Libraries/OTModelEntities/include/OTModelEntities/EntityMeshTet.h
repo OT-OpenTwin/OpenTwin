@@ -76,6 +76,8 @@ public:
 
 	bool updatePropertyVisibilities(void);
 
+	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg) override;
+
 private:
 	void EnsureMeshDataLoaded(void);
 	virtual int getSchemaVersion(void) override { return 1; };

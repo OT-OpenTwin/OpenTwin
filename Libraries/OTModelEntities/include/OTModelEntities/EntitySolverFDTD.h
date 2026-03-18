@@ -38,6 +38,8 @@ public:
 
 	virtual bool updateFromProperties(void) override;
 
+	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg) override;
+
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };
 

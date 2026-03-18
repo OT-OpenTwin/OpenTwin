@@ -38,6 +38,8 @@ public:
 
 	void setCircuitFolder(const std::string circuitFolderName, ot::UID circuitFolderID);
 	
+	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg) override;
+
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };
 
