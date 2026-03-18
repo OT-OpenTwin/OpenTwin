@@ -40,11 +40,13 @@ namespace ot {
 
 	class PlotBase;
 	class PolarPlotData;
+	class PlotLegendItem;
 	class PolarPlotCurve;
 	class CartesianPlotCurve;
 
 	class OT_WIDGETS_API_EXPORT PlotDataset {
 		OT_DECL_NOCOPY(PlotDataset)
+		OT_DECL_NOMOVE(PlotDataset)
 		OT_DECL_NODEFAULT(PlotDataset)
 	public:
 		static QwtSymbol::Style toQwtSymbolStyle(Plot1DCurveCfg::Symbol _symbol);
@@ -138,10 +140,9 @@ namespace ot {
 		inline bool canConvert() const { return m_data.canConvert(); };
 
 	private:
-		friend class PlotBase;
-
 		std::string m_curveNameBase = "";
 
+		void createLegendItem();
 		void buildCartesianCurve();
 		void buildPolarCurve();
 
@@ -162,6 +163,8 @@ namespace ot {
 		// Config
 		Plot1DCurveCfg m_config;
 		BasicEntityInformation m_storageEntityInfo;
+
+		PlotLegendItem* m_legendItem;
 	};
 
 }

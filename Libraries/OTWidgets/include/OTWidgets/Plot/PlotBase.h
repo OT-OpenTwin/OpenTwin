@@ -46,6 +46,7 @@ namespace ot {
 
 	class Label;
 	class PolarPlot;
+	class PlotLegend;
 	class PlotDataset;
 	class CartesianPlot;
 	class PolarPlotData;
@@ -68,6 +69,8 @@ namespace ot {
 
 		AbstractPlot* getPlot();
 		
+		PlotLegend* getLegend() const { return m_legend; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter
@@ -153,6 +156,9 @@ namespace ot {
 
 		QString m_infoText;
 		Label* m_infoLabel;
+
+		QWidget* m_legendContainer;
+		PlotLegend* m_legend;
 
 		CartesianPlot* m_cartesianPlot;
 		PolarPlot* m_polarPlot;

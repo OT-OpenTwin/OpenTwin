@@ -24,6 +24,8 @@
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/PlotDataset.h"
+#include "OTWidgets/Plot/PlotLegend.h"
+#include "OTWidgets/Plot/PlotLegendItem.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlot.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotCurve.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotDatasetData.h"
@@ -85,7 +87,9 @@ ot::Plot1DCurveCfg::Symbol ot::PlotDataset::toPlot1DCurveSymbol(QwtSymbol::Style
 // Constructor / Destructor
 
 ot::PlotDataset::PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data) :
-	m_config(_config), m_data(std::move(_data))
+	m_config(_config), m_data(std::move(_data)), m_legendItem(nullptr),
+	m_cartesianCurve(nullptr), m_cartesianCurvePointSymbol(nullptr), 
+	m_polarCurve(nullptr), m_polarCurvePointSymbol(nullptr)
 {
 	buildCartesianCurve();
 	buildPolarCurve();
@@ -105,7 +109,12 @@ ot::PlotDataset::~PlotDataset() {
 	if (m_cartesianCurve != nullptr) {
 		delete m_cartesianCurve;
 		m_cartesianCurve = nullptr;
-	}	
+	}
+
+	if (m_legendItem != nullptr) {
+		delete m_legendItem;
+		m_legendItem = nullptr;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -116,7 +125,6 @@ void ot::PlotDataset::attach() {
 	OTAssertNullptr(m_ownerPlot);
 
 	if (m_isAttatched) {
-		//OT_LOG_WA("Dataset already attached");
 		return;
 	}
 	m_isAttatched = true;
@@ -134,6 +142,10 @@ void ot::PlotDataset::attach() {
 		OTAssertNullptr(polarPlot);
 		m_polarCurve->attach(polarPlot);
 	}
+
+	createLegendItem();
+	OTAssertNullptr(m_legendItem);
+	m_legendItem->attach();
 }
 
 void ot::PlotDataset::detach() {
@@ -151,6 +163,11 @@ void ot::PlotDataset::detach() {
 	if (m_polarCurve != nullptr)
 	{
 		m_polarCurve->detach();
+	}
+
+	if (m_legendItem)
+	{
+		m_legendItem->detach();
 	}
 }
 
@@ -182,6 +199,15 @@ void ot::PlotDataset::setOwnerPlot(PlotBase* _ownerPlot)
 	OTAssertNullptr(_ownerPlot);
 	m_ownerPlot = _ownerPlot;
 
+	if (m_ownerPlot)
+	{
+		createLegendItem();
+		m_legendItem->setLegend(m_ownerPlot->getLegend());
+	}
+	else if (m_legendItem) {
+		m_legendItem->forgetLegend();
+	}
+	
 	rebuildCurve();
 }
 
@@ -298,19 +324,17 @@ ot::PolarPlotCurve* ot::PlotDataset::getPolarCurve() {
 // Data Setter / Getter
 
 void ot::PlotDataset::updateCurveVisualization() {
+	createLegendItem();
+
 	PenFCfg linePenCfg(m_config.getLinePen());
 	const PenFCfg& pointOutlinePenCfg = m_config.getPointOutlinePen();
-
-	// The line has no pen style set use the color from the points
-	if (linePenCfg.getStyle() == LineStyle::NoLine) {
-		linePenCfg.setPainter(m_config.getPointFillPainter()->createCopy());
-	}
 
 	QPen linePen = QtFactory::toQPen(linePenCfg);
 	
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
-	
-	QBrush dimmedBrush = cs.getValue(ColorStyleValueEntry::PlotCurveDimmed).toBrush();
+	const ColorStyleValue& dimmedColorValue = cs.getValue(ColorStyleValueEntry::PlotCurveDimmed);
+
+	QBrush dimmedBrush = dimmedColorValue.toBrush();
 
 	QPen dimmedPen = linePen;
 	dimmedPen.setBrush(dimmedBrush);
@@ -321,6 +345,8 @@ void ot::PlotDataset::updateCurveVisualization() {
 	QPen outlinePen = linePen;
 	outlinePen.setBrush(cs.getValue(ColorStyleValueEntry::PlotCurveHighlight).toBrush());
 	outlinePen.setWidthF(linePen.width() * 3.);
+
+	const Painter2D* legendPainter = nullptr;
 
 	// Setup outline
 	if (m_isSelected) {
@@ -350,6 +376,8 @@ void ot::PlotDataset::updateCurveVisualization() {
 			if (m_polarCurve) {
 				m_polarCurve->setPen(dimmedPen);
 			}
+
+			legendPainter = dimmedColorValue.painter();
 		}
 		else {
 			// Regular curve pen
@@ -359,6 +387,12 @@ void ot::PlotDataset::updateCurveVisualization() {
 			if (m_polarCurve) {
 				m_polarCurve->setPen(linePen);
 			}
+
+			if (linePenCfg.getStyle() != LineStyle::NoLine)
+			{
+				legendPainter = m_config.getLinePen().getPainter();
+			}
+			
 		}
 	}
 	else {
@@ -398,6 +432,10 @@ void ot::PlotDataset::updateCurveVisualization() {
 				m_polarCurvePointSymbol->setPen(pointOutlinePen);
 				m_polarCurvePointSymbol->setBrush(pointOutlineFillBrush);
 			}
+
+			if (legendPainter == nullptr) {
+				legendPainter = m_config.getPointFillPainter();
+			}
 		}
 
 		// Symbol
@@ -428,6 +466,24 @@ void ot::PlotDataset::updateCurveVisualization() {
 		m_polarCurve->setTitle(QString::fromStdString(m_config.getTitle()));
 		m_polarCurve->setVisible(m_config.getVisible());
 		m_polarCurve->setPointInterval(m_config.getPointInterval());
+	}
+
+	// Update legend item
+	OTAssertNullptr(m_legendItem);
+	m_legendItem->setLabel(QString::fromStdString(m_config.getTitle()));
+	if (legendPainter)
+	{
+		m_legendItem->setPainter(legendPainter);
+	}
+}
+
+void ot::PlotDataset::createLegendItem()
+{
+	if (!m_legendItem)
+	{
+		m_legendItem = new PlotLegendItem;
+		m_legendItem->setLabel(QString::fromStdString(m_config.getEntityName()));
+		m_legendItem->setPainter(m_config.getLinePen().getPainter());
 	}
 }
 

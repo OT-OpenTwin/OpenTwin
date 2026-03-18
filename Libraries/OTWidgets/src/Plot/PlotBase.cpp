@@ -23,6 +23,7 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Plot/PlotBase.h"
+#include "OTWidgets/Plot/PlotLegend.h"
 #include "OTWidgets/Plot/PlotDataset.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlot.h"
 #include "OTWidgets/Plot/Polar/PolarPlot.h"
@@ -46,15 +47,18 @@ ot::PlotBase::PlotBase(QWidget* _parent) :
 	m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
 {
 	m_centralWidget = new QWidget(_parent);
-	QVBoxLayout* centralLayout = new QVBoxLayout(m_centralWidget);
-	centralLayout->setContentsMargins(0, 0, 0, 0);
+	QHBoxLayout* centralLayout = new QHBoxLayout(m_centralWidget);
+
+	QVBoxLayout* plotContainerLayout = new QVBoxLayout;
+	centralLayout->addLayout(plotContainerLayout, 1);
+	plotContainerLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_plotLayout = new QVBoxLayout();
-	centralLayout->addLayout(m_plotLayout, 1);
+	plotContainerLayout->addLayout(m_plotLayout, 1);
 
 	QHBoxLayout* infoLayout = new QHBoxLayout();
 	infoLayout->setContentsMargins(2, 2, 2, 2);
-	centralLayout->addLayout(infoLayout, 0);
+	plotContainerLayout->addLayout(infoLayout, 0);
 
 	m_infoLabel = new Label(m_centralWidget);
 	infoLayout->addWidget(m_infoLabel);
@@ -68,6 +72,19 @@ ot::PlotBase::PlotBase(QWidget* _parent) :
 	m_polarPlot = new PolarPlot(this, nullptr);
 
 	m_plotLayout->addWidget(m_cartesianPlot->getQWidget());
+
+	// Layout
+	m_legendContainer = new QWidget(m_centralWidget);
+	centralLayout->addWidget(m_legendContainer, 0);
+
+	QVBoxLayout* legendContainerLayout = new QVBoxLayout(m_legendContainer);
+	legendContainerLayout->setContentsMargins(0, 0, 0, 0);
+
+	legendContainerLayout->addWidget(new Label(" ", m_legendContainer), 0);
+
+	m_legend = new PlotLegend(this, m_legendContainer);
+	m_legendContainer->setHidden(true);
+	legendContainerLayout->addWidget(m_legend->getQWidget(), 1);
 }
 
 ot::PlotBase::~PlotBase() {
@@ -337,12 +354,13 @@ void ot::PlotBase::applyConfig()
 		data->setAxisQuantitiesAndScaling(xAxisQuantity, xQuantityScaling, yAxisQuantity, yQuantityScaling);
 	}
 
+	// Legend
+	m_legendContainer->setHidden(!m_config.getLegendVisible());
+
 	// Setup plot XY
 	m_cartesianPlot->setPlotGridVisible(m_config.getGridVisible(), false);
 	m_cartesianPlot->setPlotGridColor(m_config.getGridColor(), false);
 	m_cartesianPlot->setPlotGridLineWidth(0.5, true);
-
-	m_cartesianPlot->setPlotLegendVisible(m_config.getLegendVisible());
 
 	// Setup axis
 	m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
@@ -361,8 +379,6 @@ void ot::PlotBase::applyConfig()
 	m_polarPlot->setPlotGridVisible(m_config.getGridVisible(), false);
 	m_polarPlot->setPlotGridColor(m_config.getGridColor(), false);
 	m_polarPlot->setPlotGridLineWidth(0.5, true);
-
-	m_polarPlot->setPlotLegendVisible(m_config.getLegendVisible());
 
 	// Setup axis
 	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());

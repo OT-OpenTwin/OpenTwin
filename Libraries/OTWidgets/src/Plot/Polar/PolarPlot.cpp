@@ -26,7 +26,6 @@
 #include "OTWidgets/Plot/Polar/PolarPlot.h"
 #include "OTWidgets/Plot/Polar/PolarPlotGrid.h"
 #include "OTWidgets/Plot/Polar/PolarPlotAxis.h"
-#include "OTWidgets/Plot/Polar/PolarPlotLegend.h"
 #include "OTWidgets/Plot/Polar/PolarPlotPanner.h"
 #include "OTWidgets/Plot/Polar/PolarPlotMagnifier.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
@@ -41,7 +40,7 @@
 #include <QtWidgets/qlayout.h>
 
 ot::PolarPlot::PolarPlot(PlotBase* _owner, QWidget* _parent)
-	: QwtPolarPlot(_parent), AbstractPlot(_owner), m_legend(nullptr)
+	: QwtPolarPlot(_parent), AbstractPlot(_owner)
 {
 	m_grid = new PolarPlotGrid(this);
 	m_magnifier = new PolarPlotMagnifier(this);
@@ -61,22 +60,6 @@ ot::PolarPlot::~PolarPlot()
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Plot
-
-void ot::PolarPlot::updateLegend() {
-	if (this->getConfiguration().getLegendVisible()) {
-		if (!m_legend) {
-			m_legend = new PolarPlotLegend(this);
-			this->insertLegend(m_legend);
-		}
-	}
-	else {
-		if (m_legend) {
-			// This destroys the legend
-			this->insertLegend(nullptr);
-			m_legend = nullptr;
-		}
-	}
-}
 
 void ot::PolarPlot::updateWholePlot() {
 	this->getPlotAxis(AbstractPlotAxis::xBottom)->updateAxis();

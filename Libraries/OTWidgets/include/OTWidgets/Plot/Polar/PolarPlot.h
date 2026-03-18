@@ -29,7 +29,6 @@
 namespace ot {
 
 	class PolarPlotGrid;
-	class PolarPlotLegend;
 	class PolarPlotPanner;
 	class PolarPlotMagnifier;
 
@@ -48,8 +47,6 @@ namespace ot {
 
 		virtual QWidget* getQWidget() override { return this; }
 		virtual const QWidget* getQWidget() const override { return this; };
-
-		virtual void updateLegend() override;
 
 		virtual void updateWholePlot() override;
 
@@ -93,7 +90,6 @@ namespace ot {
 
 	private:
 		PolarPlotGrid* m_grid;
-		PolarPlotLegend* m_legend;
 		PolarPlotMagnifier* m_magnifier;
 		PolarPlotPanner* m_panner;
 	};

@@ -43,10 +43,6 @@ namespace ot {
 
 		// Plot
 
-		void setPlotLegendVisible(bool _isVisible = true, bool _repaint = true);
-
-		virtual void updateLegend() = 0;
-
 		virtual void updateGrid() = 0;
 
 		virtual void updateWholePlot() = 0;

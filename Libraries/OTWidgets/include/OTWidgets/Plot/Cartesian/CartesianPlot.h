@@ -28,7 +28,6 @@ namespace ot {
 
 	class CartesianPlotGrid;
 	class CartesianPlotPanner;
-	class CartesianPlotLegend;
 	class CartesianPlotPicker;
 	class CartesianPlotZoomer;
 	class CartesianPlotMagnifier;
@@ -48,8 +47,6 @@ namespace ot {
 
 		virtual QWidget* getQWidget() override { return this; };
 		virtual const QWidget* getQWidget() const override { return this; };
-
-		virtual void updateLegend() override;
 
 		virtual void updateWholePlot() override;
 
@@ -88,7 +85,6 @@ namespace ot {
 		CartesianPlotMagnifier* m_plotMagnifier = nullptr;
 		CartesianPlotPanner* m_plotPanner = nullptr;
 		CartesianPlotWidgetCanvas* m_canvas = nullptr;
-		CartesianPlotLegend* m_legend = nullptr;
 		CartesianPlotGrid* m_grid = nullptr;
 		CartesianPlotPicker* m_picker = nullptr;
 	};

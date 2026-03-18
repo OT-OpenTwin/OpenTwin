@@ -27,7 +27,6 @@
 #include "OTWidgets/Plot/Cartesian/CartesianPlotAxis.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotGrid.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotPicker.h"
-#include "OTWidgets/Plot/Cartesian/CartesianPlotLegend.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotPanner.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotZoomer.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotMagnifier.h"
@@ -43,7 +42,7 @@
 #include <QtGui/qevent.h>
 
 ot::CartesianPlot::CartesianPlot(PlotBase* _owner, QWidget* _parent)
-	: QwtPlot(_parent), AbstractPlot(_owner), m_legend(nullptr)
+	: QwtPlot(_parent), AbstractPlot(_owner)
 {
 	setPlotAxis(new CartesianPlotAxis(AbstractPlotAxis::xBottom, this), nullptr, new CartesianPlotAxis(AbstractPlotAxis::yLeft, this), nullptr);
 
@@ -70,22 +69,6 @@ ot::CartesianPlot::~CartesianPlot() {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Virtual methods
-
-void ot::CartesianPlot::updateLegend() {
-	if (this->getConfiguration().getLegendVisible()) {
-		if (!m_legend) {
-			m_legend = new CartesianPlotLegend(this);
-			this->insertLegend(m_legend);
-		}
-	}
-	else {
-		if (m_legend) {
-			// This destroys the legend
-			this->insertLegend(nullptr);
-			m_legend = nullptr;
-		}
-	}
-}
 
 void ot::CartesianPlot::updateWholePlot() {
 	this->getPlotAxis(AbstractPlotAxis::xBottom)->updateAxis();
