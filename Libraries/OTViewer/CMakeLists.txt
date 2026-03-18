@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(OTViewer LANGUAGES CXX)
 
-set(CMAKE_AUTOMOC ON)
-
 include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
