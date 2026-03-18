@@ -301,9 +301,9 @@ ot::JsonDocument DataLakeAccessor::createClearTextResult(const ot::JsonDocument&
 
 	auto mongoKeyToLabelQuantity = createFieldKeyLabelLookup(m_queryDescriptionsQuantities);
 	auto mongoKeyToLabelSeries = createFieldKeyLabelLookup(m_queryDescriptionsSeries);
-	
+	uint32_t numberOfDocuments = encodedEntries.Size();
 	//Missing: unit transformations
-	for (uint32_t i = 0; i < encodedEntries.Size(); i++)
+	for (uint32_t i = 0; i < numberOfDocuments; i++)
 	{
 		auto singleMongoDocument = ot::json::getObject(encodedEntries, i);
 		ot::JsonObject clearTextEntry;
