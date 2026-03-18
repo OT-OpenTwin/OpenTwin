@@ -246,3 +246,12 @@ void EntityCoordinateSystem::updateIcons()
 	setTreeItemIcons(icons);
 	setTreeItemEditable(!isGlobal);
 }
+
+void EntityCoordinateSystem::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
+{
+	_menuCfg.addButton("Activate", "Activate", "ContextMenu/Activate.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("Modeling/Coordinate Systems/Activate");
+
+	_menuCfg.addSeparator();
+
+	EntityBase::fillContextMenu(_requestData, _menuCfg);
+}

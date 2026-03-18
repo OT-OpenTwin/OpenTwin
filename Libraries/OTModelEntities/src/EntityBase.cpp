@@ -459,6 +459,14 @@ void EntityBase::setIsCopyable(bool _isCopyable) {
 
 void EntityBase::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
 {
+	_menuCfg.addButton("Show", "Show", "ContextMenu/Show.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("View/Visibility/Show Selected");
+	_menuCfg.addButton("Hide", "Hide", "ContextMenu/Hide.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("View/Visibility/Hide Selected");
+
+	if (m_isDeletable || m_treeItem.getIsEditable())
+	{
+		_menuCfg.addSeparator();
+	}
+
 	if (m_isDeletable)
 	{
 		_menuCfg.addButton("Delete", "Delete", "ContextMenu/Remove.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("Model/Edit/Delete");

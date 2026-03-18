@@ -53,6 +53,8 @@ public:
 	bool getActive() { return isActive; }
 	bool getGlobal() { return isGlobal; }
 
+	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg) override;
+
 private:
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
