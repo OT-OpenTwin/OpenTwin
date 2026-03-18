@@ -113,3 +113,12 @@ void Rubberband::updateCurrentPosition(coordinate_t _u, coordinate_t _v, coordin
 std::string Rubberband::createPointDataJson(void) {
 	return m_engine->pointsJsonArray();
 }
+
+osg::Vec3 Rubberband::getPreviousPoint()
+{
+	if (m_selectedCoordinates.empty()) return osg::Vec3(0.0, 0.0, 0.0);
+
+	std::tuple< coordinate_t, coordinate_t, coordinate_t> lastCoordinate = m_selectedCoordinates.back();
+
+	return osg::Vec3(std::get<0>(lastCoordinate), std::get<1>(lastCoordinate), std::get<2>(lastCoordinate));
+}

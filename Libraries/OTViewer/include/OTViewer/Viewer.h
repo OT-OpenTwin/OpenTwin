@@ -76,8 +76,10 @@ public:
 	void refresh(bool _ignoreUpdateSettingsRequest = true);
 	void setClearColorAutomatic(int backgroundR, int backgroundG, int backgroundB, int foregroundR, int foregroundG, int foregroundB);
 
-	void removeOverlay(void);
-	void setOverlayText(const std::string &text);
+	void removeOverlayTop(void);
+	void removeOverlayBottom(void);
+	void setOverlayTextTop(const std::string &text);
+	void setOverlayTextBottom(const std::string &text);
 
 	ot::UID getViewerID(void) { return viewerUID; };
 
@@ -214,12 +216,15 @@ private:
 	osg::ref_ptr<osg::MatrixTransform> clipPlaneTransform;
 	osg::ref_ptr<osgText::Font>		   overlayFont;
 	double							   overlayTextColor[3];
-	osgText::Text					  *overlayText;
+	osgText::Text					  *overlayTextTop;
+	osgText::Text					  *overlayTextBottom;
 	osgText::Text					  *mouseCursorText;
-	osg::Geode						  *overlayTextNode;
+	osg::Geode						  *overlayTextNodeTop;
+	osg::Geode						  *overlayTextNodeBottom;
 	osg::Geode                        *overlayColorRampNode;
 	osg::Geode						  *cursorTextNode;
-	osg::ShapeDrawable				  *overlayBox;
+	osg::ShapeDrawable				  *overlayBoxTop;
+	osg::ShapeDrawable				  *overlayBoxBottom;
 	osg::ShapeDrawable				  *mouseCursorBox;
 	double							   lightSourceDistance;
 	bool							   lightSourceDistanceInfinite;

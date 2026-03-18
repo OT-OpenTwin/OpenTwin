@@ -92,8 +92,10 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	middleButtonDown(false),
 	rightButtonDown(false),
 	selectionHandler(nullptr),
-	overlayBox(nullptr),
-	overlayText(nullptr),
+	overlayBoxTop(nullptr),
+	overlayBoxBottom(nullptr),
+	overlayTextTop(nullptr),
+	overlayTextBottom(nullptr),
 	mouseCursorText(nullptr),
 	rubberband(nullptr),
 	rubberbandGroup(nullptr),
@@ -110,7 +112,8 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	clipPlaneActive(false),
 	clipPlaneTransform(nullptr),
 	clipPlaneManipulator(nullptr),
-	overlayTextNode(nullptr),
+	overlayTextNodeTop(nullptr),
+	overlayTextNodeBottom(nullptr),
 	overlayColorRampNode(nullptr),
 	mouseCursorX(0.0),
 	mouseCursorY(0.0),
@@ -449,48 +452,95 @@ osgText::Text *Viewer::createText(const osg::Vec2 &pos, const osg::Vec4 &color, 
 	text->setPosition(pos3);
 	text->setColor(color);
 	text->setText(message);
+	text->setLineSpacing(0.25);
 	text->setCharacterSizeMode(osgText::TextBase::SCREEN_COORDS);
 
 	return text.release();
 }
 
-void Viewer::removeOverlay(void)
+void Viewer::removeOverlayTop(void)
 {
 	if (osgOverlayCamera == nullptr) return;
 
-	while (osgOverlayCamera->removeChild(overlayTextNode));
+	while (osgOverlayCamera->removeChild(overlayTextNodeTop));
 
-	overlayBox = nullptr;
-	overlayText = nullptr;
+	overlayBoxTop = nullptr;
+	overlayTextTop = nullptr;
 
 	refresh();
 }
 
-void Viewer::setOverlayText(const std::string &text)
+void Viewer::removeOverlayBottom(void)
 {
 	if (osgOverlayCamera == nullptr) return;
 
-	removeOverlay();
+	while (osgOverlayCamera->removeChild(overlayTextNodeBottom));
 
-	overlayTextNode = new osg::Geode;
+	overlayBoxBottom = nullptr;
+	overlayTextBottom = nullptr;
+
+	refresh();
+}
+
+void Viewer::setOverlayTextTop(const std::string &text)
+{
+	if (osgOverlayCamera == nullptr) return;
+
+	removeOverlayTop();
+
+	overlayTextNodeTop = new osg::Geode;
 
 	osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc;
 	blendFunc->setFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	const int textHeight = 15;
 
-	overlayBox = new osg::ShapeDrawable;
-	overlayBox->setShape(new osg::Box(osg::Vec3(this->width()/2, this->height()- textHeight, -1.0), this->width(), 2* textHeight, 0.0));
-	overlayBox->setColor(osg::Vec4(1.0, 0.95, 0.62, 0.8));
+	overlayBoxTop = new osg::ShapeDrawable;
+	overlayBoxTop->setShape(new osg::Box(osg::Vec3(this->width()/2, this->height()- textHeight, -1.0), this->width(), 2* textHeight, 0.0));
+	overlayBoxTop->setColor(osg::Vec4(1.0, 0.95, 0.62, 0.8));
 
-	overlayText = createText(osg::Vec2(this->width() / 2, this->height() - textHeight), osg::Vec4(0.0, 0.0, 0.0, 1.0), text, 1.0f * textHeight);
+	overlayTextTop = createText(osg::Vec2(this->width() / 2, this->height() - textHeight), osg::Vec4(0.0, 0.0, 0.0, 1.0), text, 1.0f * textHeight);
 
-	overlayTextNode->addDrawable(overlayBox);
-	overlayTextNode->addDrawable(overlayText);
-	overlayTextNode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-	overlayTextNode->getOrCreateStateSet()->setAttributeAndModes(blendFunc);
+	overlayTextNodeTop->addDrawable(overlayBoxTop);
+	overlayTextNodeTop->addDrawable(overlayTextTop);
+	overlayTextNodeTop->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	overlayTextNodeTop->getOrCreateStateSet()->setAttributeAndModes(blendFunc);
 
-	osgOverlayCamera->addChild(overlayTextNode);
+	osgOverlayCamera->addChild(overlayTextNodeTop);
+
+	refresh();
+}
+
+void Viewer::setOverlayTextBottom(const std::string& text)
+{
+	if (osgOverlayCamera == nullptr) return;
+
+	removeOverlayBottom();
+
+	overlayTextNodeBottom = new osg::Geode;
+
+	osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc;
+	blendFunc->setFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	const int characterHeight = 15.0;
+	double borderSize = 0.5 * characterHeight;
+
+	overlayTextBottom = createText(osg::Vec2(this->width()- borderSize, borderSize), osg::Vec4(0.0, 0.0, 0.0, 1.0), text, characterHeight, osgText::TextBase::AlignmentType::RIGHT_BOTTOM);
+	osg::BoundingBox textBox = overlayTextBottom->getBoundingBox();
+
+	double textWidth = textBox.xMax() - textBox.xMin() + 2 * borderSize;
+	double textHeight = textBox.yMax() - textBox.yMin() + 2 * borderSize;
+
+	overlayBoxBottom = new osg::ShapeDrawable;
+	overlayBoxBottom->setShape(new osg::Box(osg::Vec3(this->width() - 0.5 * textWidth, 0.5* textHeight, -1.0), textWidth, textHeight, 0.0));
+	overlayBoxBottom->setColor(osg::Vec4(1.0, 0.95, 0.62, 0.8));
+
+	overlayTextNodeBottom->addDrawable(overlayBoxBottom);
+	overlayTextNodeBottom->addDrawable(overlayTextBottom);
+	overlayTextNodeBottom->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	overlayTextNodeBottom->getOrCreateStateSet()->setAttributeAndModes(blendFunc);
+
+	osgOverlayCamera->addChild(overlayTextNodeBottom);
 
 	refresh();
 }
@@ -502,12 +552,25 @@ void Viewer::updateOverlaySize(int width, int height)
 		osgOverlayCamera->setProjectionMatrix(osg::Matrix::ortho2D(0, width, 0, height));
 	}
 
-	const int textHeight = 15;
+	double characterHeight = 15.0;
 
-	if (overlayBox && overlayText)
+	if (overlayBoxTop && overlayTextTop)
 	{
-		overlayText->setPosition(osg::Vec3(width / 2, height - textHeight, 0.0));
-		overlayBox->setShape(new osg::Box(osg::Vec3(width / 2, height - textHeight, -1.0), width, 2 * textHeight, 0.0));
+		overlayTextTop->setPosition(osg::Vec3(width / 2, height - characterHeight, 0.0));
+		overlayBoxTop->setShape(new osg::Box(osg::Vec3(width / 2, height - characterHeight, -1.0), width, 2 * characterHeight, 0.0));
+	}
+
+	if (overlayBoxBottom && overlayTextBottom)
+	{
+		double borderSize = 0.5 * characterHeight;
+
+		overlayTextBottom->setPosition(osg::Vec3(width - borderSize, borderSize, 0.0));
+		osg::BoundingBox textBox = overlayTextBottom->getBoundingBox();
+
+		double textWidth = textBox.xMax() - textBox.xMin() + 2 * borderSize;
+		double textHeight = textBox.yMax() - textBox.yMin() + 2 * borderSize;
+
+		overlayBoxBottom->setShape(new osg::Box(osg::Vec3(width - 0.5 * textWidth, 0.5 * textHeight, -1.0), textWidth, textHeight, 0.0));
 	}
 
 	setActiveColorRamp(&currentColorRamp);
@@ -936,7 +999,7 @@ void Viewer::createRubberband(ot::serviceID_t _senderId, std::string & _note, co
 	}
 
 	rubberband = new Rubberband(rubberbandGroup, _senderId, _note, _configurationJson);
-	setOverlayText("Double-click left mouse button to select next point or press ESC to cancel");
+	setOverlayTextTop("Double-click left mouse button to select next point or press ESC to cancel");
 
 	setFocus();
 }
@@ -959,7 +1022,7 @@ void Viewer::finishRubberbandExecution(void)
 		}
 
 		FrontendAPI::instance()->rubberbandFinished(rubberband->creator(), rubberband->note(), rubberband->createPointDataJson(), transform);
-		removeOverlay();
+		removeOverlayTop();
 
 		//delete rubberband;		We do not delete the rubberband here to avoid flickerung. The rubberband will be removed, when the shape is added.
 		//rubberband = nullptr;
@@ -972,7 +1035,8 @@ void Viewer::finishRubberbandExecution(void)
 void Viewer::cancelRubberband(void) {
 	if (rubberband) 
 	{
-		removeOverlay();
+		removeOverlayTop();
+		removeOverlayBottom();
 
 		delete rubberband;
 		rubberband = nullptr;

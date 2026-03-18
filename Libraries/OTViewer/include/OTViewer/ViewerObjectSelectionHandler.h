@@ -51,6 +51,7 @@ private:
 	bool intersectLinePlane(const osg::Vec3 &n, const osg::Vec3 &p, const osg::Vec3 &l1, const osg::Vec3 &l2, osg::Vec3 &ip);
 	osgUtil::Intersector *createIntersector(osgUtil::Intersector::CoordinateFrame cf, double x, double y);
 	void handleRubberbandPosition(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa);
+	void updateRubberbandText(double x, double y, double z, enum projectionType pType, bool hasPreviousPoint, const osg::Vec3& previousPoint);
 
 	Model *model;
 	bool   active;

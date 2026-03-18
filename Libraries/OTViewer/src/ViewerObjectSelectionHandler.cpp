@@ -296,6 +296,45 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 	return false;
 }
 
+void ViewerObjectSelectionHandler::updateRubberbandText(double x, double y, double z, enum projectionType pType, bool hasPreviousPoint, const osg::Vec3 &previousPoint)
+{
+	std::string coordinateText;
+
+	switch (pType)
+	{
+		case IN_PLANE:
+		{
+			if (hasPreviousPoint)
+			{
+				double px = previousPoint.x();
+				double py = previousPoint.y();
+				double pz = previousPoint.z();
+				double distance = sqrt((x - px) * (x - px) + (y - py) * (y - py) + (z - pz) * (z - pz));
+
+				coordinateText = " x=" + std::to_string(x) + ",  y=" + std::to_string(y) + ",  z=" + std::to_string(z)
+								+ "\ndx=" + std::to_string(x - px) + ", dy=" + std::to_string(y - py) + ", dz=" + std::to_string(z - pz)
+								+"\ndistance=" + std::to_string(distance);
+			}
+			else
+			{
+				coordinateText = "x=" + std::to_string(x) + ", y=" + std::to_string(y) + ", z=" + std::to_string(z);
+			}
+
+			break;
+		}
+		case HEIGHT:
+		{
+			coordinateText = "height=" + std::to_string(z);
+			break;
+		}
+		default:
+			assert(0); //Unknown projection type
+	}
+
+	creator->setOverlayTextBottom(coordinateText);
+}
+
+
 void ViewerObjectSelectionHandler::processRubberbandUpdate(osgViewer::Viewer *viewer, float mouseX, float mouseY, enum projectionType pType, 
 														   const osg::Vec3 &n, const osg::Vec3 &p)
 {
@@ -321,6 +360,7 @@ void ViewerObjectSelectionHandler::processRubberbandUpdate(osgViewer::Viewer *vi
 				// We have an intersection of the ray with the plane
 				//assert(fabs(ip.z()) < 1e-5);
 				creator->getRubberband()->updateCurrentPosition(ip.x(), ip.y(), 0.0, lastHeight, lastPointInPlane.x(), lastPointInPlane.y(), lastPointInPlane.z(), this);
+				updateRubberbandText(ip.x(), ip.y(), 0.0, IN_PLANE, creator->getRubberband()->hasPreviousPoint(), creator->getRubberband()->getPreviousPoint());
 				lastPointInPlane = ip;
 			}
 
@@ -355,6 +395,7 @@ void ViewerObjectSelectionHandler::processRubberbandUpdate(osgViewer::Viewer *vi
 				lastHeight = height;
 
 				creator->getRubberband()->updateCurrentPosition(referencePoint.x(), referencePoint.y(), height, lastHeight, lastPointInPlane.x(), lastPointInPlane.y(), lastPointInPlane.z(), this);
+				updateRubberbandText(referencePoint.x(), referencePoint.y(), height, HEIGHT, false, osg::Vec3(0.0, 0.0, 0.0));
 			}
 
 			break;

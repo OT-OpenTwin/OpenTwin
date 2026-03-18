@@ -2573,7 +2573,7 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 			std::string firstText = allowMultipleSelection ? "Double-click to select faces to " : "Double-click to select a face to ";
 			std::string secondText = allowMultipleSelection ? " (press RETURN to complete or ESC to cancel)" : " (press ESC to cancel)";
 
-			viewer->setOverlayText(firstText + selectionMessage + secondText);
+			viewer->setOverlayTextTop(firstText + selectionMessage + secondText);
 			viewer->setFreezeWorkingPlane(true);
 		}
 
@@ -2598,7 +2598,7 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 			std::string firstText = allowMultipleSelection ? "Double-click to select edges to " : "Double-click to select an edge to ";
 			std::string secondText = allowMultipleSelection ? " (press RETURN to complete or ESC to cancel)" : " (press ESC to cancel)";
 
-			viewer->setOverlayText(firstText + selectionMessage + secondText);
+			viewer->setOverlayTextTop(firstText + selectionMessage + secondText);
 			viewer->setFreezeWorkingPlane(true);
 		}
 
@@ -2623,7 +2623,7 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 			std::string firstText = allowMultipleSelection ? "Double-click to select shapes to " : "Double-click to select a shape to ";
 			std::string secondText = allowMultipleSelection ? " (press RETURN to complete or ESC to cancel)" : " (press ESC to cancel)";
 
-			viewer->setOverlayText(firstText + selectionMessage + secondText);
+			viewer->setOverlayTextTop(firstText + selectionMessage + secondText);
 			viewer->setFreezeWorkingPlane(true);
 		}
 
@@ -2645,7 +2645,7 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 
 		for (auto viewer : m_viewerList)
 		{
-			viewer->setOverlayText("Move or rotate selected objects (press RETURN to complete or ESC to cancel)");
+			viewer->setOverlayTextTop("Move or rotate selected objects (press RETURN to complete or ESC to cancel)");
 		}
 
 		if (!m_viewerList.empty())
@@ -2762,7 +2762,7 @@ void Model::escapeKeyPressed()
 	{
 		for (auto viewer : m_viewerList)
 		{
-			viewer->removeOverlay();
+			viewer->removeOverlayTop();
 		}
 
 		m_currentManipulator->cancelOperation();
@@ -2778,7 +2778,7 @@ void Model::returnKeyPressed()
 	{
 		for (auto viewer : m_viewerList)
 		{
-			viewer->removeOverlay();
+			viewer->removeOverlayTop();
 		}
 
 		m_currentManipulator->performOperation();
@@ -2798,7 +2798,7 @@ void Model::endCurrentSelectionMode(bool cancelled)
 	{
 		for (auto viewer : m_viewerList)
 		{
-			viewer->removeOverlay();
+			viewer->removeOverlayTop();
 			viewer->setFreezeWorkingPlane(false);
 		}
 	}

@@ -67,6 +67,9 @@ public:
 
 	std::string createPointDataJson(void);
 
+	bool hasPreviousPoint() { return !m_selectedCoordinates.empty(); }
+	osg::Vec3 getPreviousPoint();
+
 private:
 	ot::serviceID_t						m_creatorId;
 	std::string							m_note;
