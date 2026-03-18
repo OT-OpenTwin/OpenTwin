@@ -587,6 +587,8 @@ ViewerUIDtype ViewerComponent::addMenuPage(const std::string& pageName) {
 	try {
 		try {
 			ot::UID page = AppBase::instance()->getToolBar()->addPage(AppBase::instance()->getViewerUID(), pageName.c_str());
+			ak::uiAPI::object::setObjectUniqueName(page, pageName.c_str());
+
 			AppBase::instance()->controlsManager()->uiElementCreated(this->getBasicServiceInformation(), page, false);
 			return page;
 		}
@@ -602,6 +604,11 @@ ViewerUIDtype ViewerComponent::addMenuGroup(ViewerUIDtype menuPageID, const std:
 	try {
 		try {
 			ot::UID group = AppBase::instance()->getToolBar()->addGroup(AppBase::instance()->getViewerUID(), menuPageID, groupName.c_str());
+			
+			QString uniqueName = ak::uiAPI::object::getObjectUniqueName(menuPageID);
+			uniqueName.append(":").append(QString::fromStdString(groupName));
+			ak::uiAPI::object::setObjectUniqueName(group, uniqueName);
+
 			AppBase::instance()->controlsManager()->uiElementCreated(this->getBasicServiceInformation(), group, false);
 			return group;
 		}
@@ -615,6 +622,11 @@ ViewerUIDtype ViewerComponent::addMenuGroup(ViewerUIDtype menuPageID, const std:
 
 ViewerUIDtype ViewerComponent::addMenuSubGroup(ViewerUIDtype _menuGroupID, const std::string& _subGroupName) {
 	ot::UID subGroup = AppBase::instance()->getToolBar()->addSubGroup(AppBase::instance()->getViewerUID(), _menuGroupID, QString::fromStdString(_subGroupName));
+
+	QString uniqueName = ak::uiAPI::object::getObjectUniqueName(_menuGroupID);
+	uniqueName.append(":").append(QString::fromStdString(_subGroupName));
+	ak::uiAPI::object::setObjectUniqueName(subGroup, uniqueName);
+
 	AppBase::instance()->controlsManager()->uiElementCreated(this->getBasicServiceInformation(), subGroup, false);
 	return subGroup;
 }
@@ -624,6 +636,11 @@ ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, cons
 		try {
 			//NOTE, add actual icon path
 			ViewerUIDtype btnUid = AppBase::instance()->getToolBar()->addToolButton(AppBase::instance()->getViewerUID(), menuGroupID, iconName.c_str(), "Default", buttonName.c_str(), this);
+
+			QString uniqueName = ak::uiAPI::object::getObjectUniqueName(menuGroupID);
+			uniqueName.append(":").append(QString::fromStdString(buttonName));
+			ak::uiAPI::object::setObjectUniqueName(btnUid, uniqueName);
+
 			AppBase::instance()->controlsManager()->uiElementCreated(this->getBasicServiceInformation(), btnUid, true);
 			ot::LockTypes flags;
 			flags.set(ot::LockType::All);
