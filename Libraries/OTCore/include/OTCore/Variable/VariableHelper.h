@@ -66,5 +66,38 @@ namespace ot {
 				throw std::runtime_error("Variable: unsupported type for unary op: " + operand.getTypeName());
 			}
 		}
+	
+		static ot::Variable ln(const ot::Variable& _variable)
+		{
+			return applyUnaryOp(_variable, [](auto v) -> ot::Variable
+				{
+					return std::log(v);
+				});
+		}
+
+		static ot::Variable log10(const ot::Variable& _variable) 
+		{
+			return applyUnaryOp(_variable, [](auto v) -> ot::Variable
+				{
+					return std::log10(v);
+				});
+		}
+
+		ot::Variable sqrt(const ot::Variable& _variable) 
+		{
+			return applyUnaryOp(_variable, [](auto v) -> ot::Variable
+				{
+					return std::sqrt(v);
+				});
+		}
+
+		ot::Variable pow(const ot::Variable& _base, double _exponent) const
+		{
+			return applyNumericOp(_base, _exponent, [](auto base, auto exp) -> ot::Variable
+				{
+					return std::pow(base, exp);
+				});
+		}
+
 	};
 }
