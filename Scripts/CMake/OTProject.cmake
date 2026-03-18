@@ -22,8 +22,6 @@
 #   cmake_minimum_required(VERSION 3.20)
 #   project(<LIB_NAME> LANGUAGES CXX)
 #
-#   set(CMAKE_AUTOMOC ON)
-#
 #   include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
 #   include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 #
@@ -40,8 +38,6 @@
 #   cmake_minimum_required(VERSION 3.20)
 #   project(<APP_NAME> LANGUAGES CXX)
 #
-#   set(CMAKE_AUTOMOC ON)
-#
 #   include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
 #   include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 #
@@ -56,6 +52,9 @@ include_guard(GLOBAL)
 
 # Requires OTEnvironment.cmake first (for THIRDPARTY_ROOT_PATH, OT_* paths, etc.)
 include("$ENV{OT_CMAKE_DIR}/OTQT.cmake")
+
+set(CMAKE_AUTOMOC ON)
+
 
 if(MSVC)
     add_compile_options(/Zc:__cplusplus /permissive- /Zc:preprocessor /MP)
@@ -249,12 +248,18 @@ function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
     )
 
     # export function
+    if(WIN32)
+        target_compile_definitions(${_core} PRIVATE
+            UNICODE
+            _UNICODE
+            _WINDOWS
+            _USRDLL
+        )
+    endif()
     target_compile_definitions(${_core} PRIVATE
-        UNICODE
-        _UNICODE
         $<$<CONFIG:Debug>:_DEBUG>
         $<$<NOT:$<CONFIG:Debug>>:NDEBUG>
-    )
+)
 
     target_include_directories(${_core} PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
