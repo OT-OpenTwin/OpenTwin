@@ -1,5 +1,5 @@
 ﻿#include "OTCore/Tuple/TupleDescriptionComplex.h"
-#include "OTCore/Units/SI.h"
+#include "OTCore/Units/SIUnits.h"
 
 
 TupleDescriptionComplex::TupleDescriptionComplex()
@@ -13,7 +13,7 @@ TupleDescriptionComplex::TupleDescriptionComplex()
 
 	// Define possible unit combinations for each format.
 	m_unitCombinationsByFormatName[ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian)] = { createCombinedUnitsString({"",""}) };
-	std::vector<std::string> angleUnits{ ot::SIUnits::Derived::getDegreeUnit(), ot::SIUnits::Derived::getRadianUnit() };
+	std::vector<std::string> angleUnits{ "Deg", "rad"};
 	std::vector<std::string> magnitudeUnits{ "", "dB"};
 	for (const std::string& magnitudeUnit : magnitudeUnits)
 	{

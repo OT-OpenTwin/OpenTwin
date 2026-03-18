@@ -1,20 +1,20 @@
 ﻿
 #include "OTCore/Math.h"
 #include "OTCore/String.h"
-#include "OTCore/Units/SI.h"
+#include "OTCore/Units/SIUnits.h"
 #include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 
 std::complex<double> ot::ComplexNumberConversion::polarToCartesian(const ComplexNumberDefinition& _complexNumberDefinition)
 {
 	double angle = 0;
-	if(_complexNumberDefinition.m_angleUnit == ot::SIUnits::Derived::getDegreeUnit())
+	/*if(_complexNumberDefinition.m_angleUnit == ot::SIUnits::Derived::getDegreeUnit())
 	{
 		angle = Math::degToRad(_complexNumberDefinition.m_secondValue);
 	}
 	else if(_complexNumberDefinition.m_angleUnit != SIUnits::Derived::getRadianUnit() && !_complexNumberDefinition.m_angleUnit.empty())
 	{
 		throw std::invalid_argument("Invalid angle unit. Expected 'rad' or '°'.");
-	}
+	}*/
 
 	std::complex<double> transformed =	polarToCartesian(_complexNumberDefinition.m_firstValue, _complexNumberDefinition.m_secondValue);
 	return transformed;
