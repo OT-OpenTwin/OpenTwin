@@ -375,6 +375,15 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         _ot_apply_tp_to_core("${CORE_TARGET}" "${_tp}")
         return()
     endif()
+
+    _ot_env_get_path(_inc  "${DEP}_INC")
+    _ot_env_get_path(_incd "${DEP}_INCD")
+    _ot_env_get_path(_incr "${DEP}_INCR")
+    if(NOT ("${_inc}" STREQUAL "" AND "${_incd}" STREQUAL "" AND "${_incr}" STREQUAL ""))
+        _ot_apply_tp_to_core("${CORE_TARGET}" "${DEP}")
+        return()
+    endif()
+
 endfunction()
 
 # Adds BOTH new (CMake build output) and old (x64/<Config>) link dir layouts.
@@ -556,7 +565,15 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         return()
     endif()
 
+    _ot_env_get_path(_libpathd "${DEP}_LIBPATHD")
+    _ot_env_get_path(_libpathr "${DEP}_LIBPATHR")
+    if(NOT ("${_libpathd}" STREQUAL "" AND "${_libpathr}" STREQUAL ""))
+        _ot_apply_tp_to_final("${FINAL_TARGET}" "${DEP}")
+        return()
+    endif()
+
     message(WARNING "ot_finalize_lib(${FINAL_TARGET}): Unknown dependency token '${DEP}'")
+
 endfunction()
 
 # ------------------------------------------------------------
