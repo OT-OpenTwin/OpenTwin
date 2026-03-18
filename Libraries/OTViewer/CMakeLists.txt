@@ -31,8 +31,8 @@ ot_add_dependency(OTViewer
     QWT
 
     RJSON
-    TP:MONGO_C
-    TP:MONGO_CXX
+    MONGO_C
+    MONGO_CXX
     EARCUT
 
     WINLIB:userenv
