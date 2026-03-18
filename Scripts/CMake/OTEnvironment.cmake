@@ -1,29 +1,24 @@
+# License:
+# Copyright 2026 by OpenTwin
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # Centralized environment parsing for OpenTwin subprojects
 # Purpose:
+#   - Used by OTProject.cmake to help parse include and link setup
 #   - Read environment variables set by SetupEnvironment.bat
-#   - Normalize paths into CMake-friendly form
 #   - Expose parsed values as regular CMake variables
-#   - Provide small helper functions for common include/link setup
 #
-# Expected usage:
-#   1. Ensure SetupEnvironment.bat has been run.
-#   2. Ensure OT_CMAKE_DIR points to the directory containing this file.
-#   3. Include this module from a project CMakeLists.txt:
-#
-#        include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
-#
-#   4. Use parsed variables such as:
-#        OT_CLIBD_PATH
-#        OT_CLIBR_PATH
-#        R_JSON_INCD_PATH
-#        OT_SYSTEM_ROOT_PATH
-#
-#   5. Use helper functions for repeated target setup:
-#        ot_add_env_include_dirs(...)
-#        ot_add_env_include_dirs_with_suffix(...)
-#        ot_add_env_link_dirs(...)
-#        ot_add_env_link_dirs_with_suffix(...)
-#        ot_add_env_link_dirs_with_config_suffixes(...)
 #
 # Notes:
 #   - Helpers that use ENV{...} expect environment variable names, not CMake variable names.
@@ -177,133 +172,6 @@ function(ot_add_debug_release_link_dirs TARGET_NAME DEBUG_DIR RELEASE_DIR)
             $<$<CONFIG:MinSizeRel>:${RELEASE_DIR}>
         )
     endif()
-endfunction()
-
-# ot_add_env_include_dirs(<target> <env-name>...)
-#
-# For each provided environment variable name, reads ENV{<env-name>} and adds
-# the value as a private include directory on <target>, if the env var exists
-# and is non-empty.
-#
-# Expected inputs:
-#   - environment variable names only
-#   - each environment variable must already point directly to an include dir
-#
-# Do not pass parsed CMake variables like R_JSON_INCD_PATH here.
-#
-# Example:
-#   ot_add_env_include_dirs(OTViewer_core
-#     QT_INC
-#     OSG_INCD
-#     OSG_INCR
-#     MONGO_CXX_INC
-#   )
-function(ot_add_env_include_dirs target)
-    foreach(_v ${ARGN})
-        if(DEFINED ENV{${_v}} AND NOT "$ENV{${_v}}" STREQUAL "")
-            target_include_directories(${target} PRIVATE "$ENV{${_v}}")
-        endif()
-    endforeach()
-endfunction()
-
-# ot_add_env_include_dirs_with_suffix(<target> <suffix> <env-name>...)
-#
-# For each provided environment variable name, reads ENV{<env-name>}, appends
-# "/<suffix>", and adds the resulting path as a private include directory on
-# <target>, if the env var exists and is non-empty.
-#
-# Use when the environment variable points to a root directory and the actual
-# include directory is a fixed child path such as "include".
-#
-# Example:
-#   ot_add_env_include_dirs_with_suffix(OTViewer_core "include" QT_ADS_ROOT)
-#
-# Another example:
-#   ot_add_env_include_dirs_with_suffix(OTViewer_core "${_ot_inc}"
-#     OT_SYSTEM_ROOT
-#     OT_CORE_ROOT
-#     OT_GUI_ROOT
-#   )
-function(ot_add_env_include_dirs_with_suffix target suffix)
-    foreach(_v ${ARGN})
-        if(DEFINED ENV{${_v}} AND NOT "$ENV{${_v}}" STREQUAL "")
-            target_include_directories(${target} PRIVATE "$ENV{${_v}}/${suffix}")
-        endif()
-    endforeach()
-endfunction()
-
-# ot_add_env_link_dirs(<target> <env-name>...)
-#
-# For each provided environment variable name, reads ENV{<env-name>} and adds
-# the value as a private link directory on <target>, if the env var exists
-# and is non-empty.
-#
-# Expected inputs:
-#   - environment variable names only
-#   - each environment variable must already point directly to a link directory
-#
-# Example:
-#   ot_add_env_link_dirs(OTViewer
-#     OSG_LIBPATHD
-#     OSG_LIBPATHR
-#     GMP_LIBPATHD
-#     GMP_LIBPATHR
-#   )
-function(ot_add_env_link_dirs target)
-    foreach(_v ${ARGN})
-        if(DEFINED ENV{${_v}} AND NOT "$ENV{${_v}}" STREQUAL "")
-            target_link_directories(${target} PRIVATE "$ENV{${_v}}")
-        endif()
-    endforeach()
-endfunction()
-
-# ot_add_env_link_dirs_with_suffix(<target> <suffix> <env-name>...)
-#
-# For each provided environment variable name, reads ENV{<env-name>}, appends
-# "/<suffix>", and adds the resulting path as a private link directory on
-# <target>, if the env var exists and is non-empty.
-#
-# Use when the environment variable points to a package root and the actual link
-# directory is a fixed child directory such as "lib".
-#
-# Example:
-#   ot_add_env_link_dirs_with_suffix(OTViewer "lib" QT_ADS_ROOT)
-function(ot_add_env_link_dirs_with_suffix target suffix)
-    foreach(_v ${ARGN})
-        if(DEFINED ENV{${_v}} AND NOT "$ENV{${_v}}" STREQUAL "")
-            target_link_directories(${target} PRIVATE "$ENV{${_v}}/${suffix}")
-        endif()
-    endforeach()
-endfunction()
-
-# ot_add_env_link_dirs_with_config_suffixes(<target> <debug-suffix> <release-suffix> <env-name>...)
-#
-# For each provided environment variable name, reads ENV{<env-name>} as a root
-# directory and adds configuration-specific link directories to <target>:
-#   - Debug uses "<env-value>/<debug-suffix>"
-#   - Release, RelWithDebInfo, and MinSizeRel use "<env-value>/<release-suffix>"
-#
-# This helper is useful for OpenTwin libraries where the environment variable
-# points to a library root and the debug/release library directories are stored
-# under standard subpaths such as OT_CLIBD_PATH and OT_CLIBR_PATH.
-#
-# Example:
-#   ot_add_env_link_dirs_with_config_suffixes(OTViewer "${OT_CLIBD_PATH}" "${OT_CLIBR_PATH}"
-#     OT_SYSTEM_ROOT
-#     OT_CORE_ROOT
-#     OT_GUI_ROOT
-#   )
-function(ot_add_env_link_dirs_with_config_suffixes target debug_suffix release_suffix)
-    foreach(_v ${ARGN})
-        if(DEFINED ENV{${_v}} AND NOT "$ENV{${_v}}" STREQUAL "")
-            target_link_directories(${target} PRIVATE
-                $<$<CONFIG:Debug>:$ENV{${_v}}/${debug_suffix}>
-                $<$<CONFIG:Release>:$ENV{${_v}}/${release_suffix}>
-                $<$<CONFIG:RelWithDebInfo>:$ENV{${_v}}/${release_suffix}>
-                $<$<CONFIG:MinSizeRel>:$ENV{${_v}}/${release_suffix}>
-            )
-        endif()
-    endforeach()
 endfunction()
 
 # ============================================================

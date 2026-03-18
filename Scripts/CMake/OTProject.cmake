@@ -1,3 +1,57 @@
+# License:
+# Copyright 2026 by OpenTwin
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# OpenTwin CMake project helper functions
+# This file provides helper functions to define CMake targets for OpenTwin libraries and applications,
+# following the conventions of the OpenTwin project structure and environment variables.
+#
+# =====================================================================
+# Usage for library:
+#   cmake_minimum_required(VERSION 3.20)
+#   project(<LIB_NAME> LANGUAGES CXX)
+#
+#   set(CMAKE_AUTOMOC ON)
+#
+#   include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
+#   include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
+#
+#   ot_initialize_lib(<LIB_NAME> <LIB>_ROOT_PATH)
+#   ot_add_export(<LIB_NAME>)
+#
+#   ot_add_dependency(<LIB_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
+#
+#   ot_finalize_lib(<LIB_NAME>)
+#   ot_add_test(<LIB_NAME>)
+#
+# =====================================================================
+# Usage for binary:
+#   cmake_minimum_required(VERSION 3.20)
+#   project(<APP_NAME> LANGUAGES CXX)
+#
+#   set(CMAKE_AUTOMOC ON)
+#
+#   include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
+#   include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
+#
+#   ot_initialize_bin(<APP_NAME> <APP>_ROOT_PATH)
+#
+#   ot_add_dependency(<APP_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
+#
+#   ot_finalize_bin(<APP_NAME>)
+#   ot_add_test(<APP_NAME>)
+
 include_guard(GLOBAL)
 
 # Requires OTEnvironment.cmake first (for THIRDPARTY_ROOT_PATH, OT_* paths, etc.)
@@ -10,6 +64,7 @@ endif()
 # ------------------------------------------------------------
 # internal helpers
 # ------------------------------------------------------------
+# Converts a target name like "OTFoo" to "OTFoo_core" for the internal object library
 function(_ot_target_core_name OUT_VAR TARGET_NAME)
     set(${OUT_VAR} "${TARGET_NAME}_core" PARENT_SCOPE)
 endfunction()
@@ -65,18 +120,7 @@ function(_ot_get_ot_inc_suffix OUT_VAR)
     endif()
 endfunction()
 
-# ------------------------------------------------------------
-# Generic ThirdParty token support: TP:<NAME>
-#
-# Convention supported:
-#   <NAME>_INC                      (single include dir)
-#   <NAME>_INCD / <NAME>_INCR       (debug/release include dirs)
-#   <NAME>_LIBPATHD / <NAME>_LIBPATHR
-#   <NAME>_LIBD / <NAME>_LIBR       (semicolon-separated list allowed)
-#   <NAME>_LIB / <NAME>_LIBS        (compat: single list used for all configs)
-#
-# "Sane" rule: do NOT add Debug+Release include dirs together.
-# ------------------------------------------------------------
+
 function(_ot_env_get_path OUT_VAR ENV_NAME)
     if(DEFINED ENV{${ENV_NAME}} AND NOT "$ENV{${ENV_NAME}}" STREQUAL "")
         set(_v "$ENV{${ENV_NAME}}")
@@ -174,7 +218,7 @@ function(_ot_apply_tp_to_final FINAL_TARGET TP_NAME)
 endfunction()
 
 # ------------------------------------------------------------
-# 7) initialize_lib / initialize_app
+# initialize_lib / initialize_app
 # ------------------------------------------------------------
 function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
     if(NOT DEFINED ${ROOT_PATH_VAR} OR "${${ROOT_PATH_VAR}}" STREQUAL "")
@@ -232,7 +276,7 @@ function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
     )
 endfunction()
 
-function(ot_initialize_app TARGET_NAME ROOT_PATH_VAR)
+function(ot_initialize_bin TARGET_NAME ROOT_PATH_VAR)
     ot_initialize_lib(${TARGET_NAME} ${ROOT_PATH_VAR})
     _ot_target_core_name(_core ${TARGET_NAME})
     set_property(TARGET ${_core} PROPERTY OT_IS_APP TRUE)
@@ -246,7 +290,7 @@ function(ot_add_export TARGET_NAME)
 endfunction()
 
 # ------------------------------------------------------------
-# 8) add_dependency (collect tokens)
+# add_dependency (collect tokens)
 # ------------------------------------------------------------
 function(ot_add_dependency TARGET_NAME)
     _ot_target_core_name(_core ${TARGET_NAME})
@@ -267,7 +311,7 @@ function(ot_add_dependency TARGET_NAME)
 endfunction()
 
 # ------------------------------------------------------------
-# dependency resolution helpers (apply to CORE or FINAL)
+# dependency resolution helpers
 # ------------------------------------------------------------
 function(_ot_apply_dep_to_core CORE_TARGET DEP)
     # OT* deps: add include dirs to compile *_core
@@ -371,16 +415,8 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         return()
     endif()
 
-    # Friendly alias: EARCUT -> TP:EARCUT
     if(DEP STREQUAL "EARCUT")
         _ot_apply_tp_to_core("${CORE_TARGET}" "EARCUT")
-        return()
-    endif()
-
-    # Generic ThirdParty token: TP:<NAME>
-    if(DEP MATCHES "^TP:.+")
-        string(REPLACE "TP:" "" _tp "${DEP}")
-        _ot_apply_tp_to_core("${CORE_TARGET}" "${_tp}")
         return()
     endif()
 
@@ -400,7 +436,6 @@ function(_ot_add_ot_dep_link_dirs FINAL_TARGET ROOT_DIR)
         return()
     endif()
 
-    # New CMake-style: build/windows-*/<Config>
     if(OT_CLIBD_PATH AND OT_CLIBR_PATH)
         ot_add_debug_release_link_dirs("${FINAL_TARGET}"
             "${ROOT_DIR}/${OT_CLIBD_PATH}"
@@ -408,7 +443,6 @@ function(_ot_add_ot_dep_link_dirs FINAL_TARGET ROOT_DIR)
         )
     endif()
 
-    # Old VS-style: x64/<Config>
     if(OT_LIBD_PATH AND OT_LIBR_PATH)
         ot_add_debug_release_link_dirs("${FINAL_TARGET}"
             "${ROOT_DIR}/${OT_LIBD_PATH}"
@@ -416,7 +450,6 @@ function(_ot_add_ot_dep_link_dirs FINAL_TARGET ROOT_DIR)
         )
     endif()
 
-    # Some projects put import libs next to "CDLL" outputs (also build/windows-*/<Config>)
     if(OT_CDLLD_PATH AND OT_CDLLR_PATH)
         ot_add_debug_release_link_dirs("${FINAL_TARGET}"
             "${ROOT_DIR}/${OT_CDLLD_PATH}"
@@ -426,7 +459,7 @@ function(_ot_add_ot_dep_link_dirs FINAL_TARGET ROOT_DIR)
 endfunction()
 
 function(_ot_apply_dep_to_final FINAL_TARGET DEP)
-    # OT libs: link + compatibility link directories (new + old layouts)
+    # OT libs: link + compatibility link dirs
     if(DEP MATCHES "^OT")
         target_link_libraries("${FINAL_TARGET}" PRIVATE ${DEP})
 
@@ -560,16 +593,9 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         return()
     endif()
 
-    # Friendly alias: EARCUT -> TP:EARCUT (header-only)
+    # Friendly alias: EARCUT (header-only)
     if(DEP STREQUAL "EARCUT")
         _ot_apply_tp_to_final("${FINAL_TARGET}" "EARCUT")
-        return()
-    endif()
-
-    # Generic ThirdParty token: TP:<NAME>
-    if(DEP MATCHES "^TP:.+")
-        string(REPLACE "TP:" "" _tp "${DEP}")
-        _ot_apply_tp_to_final("${FINAL_TARGET}" "${_tp}")
         return()
     endif()
 
@@ -585,7 +611,7 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
 endfunction()
 
 # ------------------------------------------------------------
-# 9) finalize_lib / finalize_app
+# finalize_lib / finalize_app
 # ------------------------------------------------------------
 function(ot_finalize_lib TARGET_NAME)
     _ot_target_core_name(_core ${TARGET_NAME})
@@ -607,10 +633,10 @@ function(ot_finalize_lib TARGET_NAME)
     endforeach()
 endfunction()
 
-function(ot_finalize_app TARGET_NAME)
+function(ot_finalize_bin TARGET_NAME)
     _ot_target_core_name(_core ${TARGET_NAME})
     if(NOT TARGET ${_core})
-        message(FATAL_ERROR "ot_finalize_app: core target '${_core}' does not exist. Call ot_initialize_app first.")
+        message(FATAL_ERROR "ot_finalize_bin: core target '${_core}' does not exist. Call ot_initialize_app first.")
     endif()
 
     add_executable(${TARGET_NAME} $<TARGET_OBJECTS:${_core}>)
@@ -627,7 +653,7 @@ function(ot_finalize_app TARGET_NAME)
 endfunction()
 
 # ------------------------------------------------------------
-# 10) tests
+#  tests
 # ------------------------------------------------------------
 function(ot_add_test TARGET_NAME)
     include(CTest)
@@ -639,4 +665,37 @@ function(ot_add_test TARGET_NAME)
             message(STATUS "ot_add_test(${TARGET_NAME}): no tests/ directory found")
         endif()
     endif()
+endfunction()
+
+function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
+    file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+
+    add_executable(${TEST_TARGET_NAME} ${TEST_SOURCES})
+
+    target_include_directories(${TEST_TARGET_NAME} PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    )
+
+    target_compile_definitions(${TEST_TARGET_NAME} PRIVATE
+        $<$<CONFIG:Debug>:_DEBUG>
+        $<$<NOT:$<CONFIG:Debug>>:NDEBUG>
+    )
+
+    target_link_libraries(${TEST_TARGET_NAME} PRIVATE ${MAIN_TARGET_NAME})
+
+    if(DEFINED ENV{GOOGLE_TEST_INC} AND NOT "$ENV{GOOGLE_TEST_INC}" STREQUAL "")
+        target_include_directories(${TEST_TARGET_NAME} PRIVATE "$ENV{GOOGLE_TEST_INC}")
+    endif()
+    if(DEFINED ENV{GOOGLE_TEST_LIB} AND NOT "$ENV{GOOGLE_TEST_LIB}" STREQUAL "")
+        target_link_libraries(${TEST_TARGET_NAME} PRIVATE $ENV{GOOGLE_TEST_LIB})
+    endif()
+    if(DEFINED ENV{GOOGLE_TEST_LIBPATHD} AND NOT "$ENV{GOOGLE_TEST_LIBPATHD}" STREQUAL "")
+        target_link_directories(${TEST_TARGET_NAME} PRIVATE $<$<CONFIG:Debug>:$ENV{GOOGLE_TEST_LIBPATHD}>)
+    endif()
+    if(DEFINED ENV{GOOGLE_TEST_LIBPATHR} AND NOT "$ENV{GOOGLE_TEST_LIBPATHR}" STREQUAL "")
+        target_link_directories(${TEST_TARGET_NAME} PRIVATE $<$<NOT:$<CONFIG:Debug>>:$ENV{GOOGLE_TEST_LIBPATHR}>)
+    endif()
+
+    add_test(NAME ${TEST_TARGET_NAME} COMMAND ${TEST_TARGET_NAME})
 endfunction()
