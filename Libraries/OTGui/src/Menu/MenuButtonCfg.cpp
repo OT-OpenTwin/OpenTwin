@@ -90,6 +90,7 @@ void ot::MenuButtonCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 
 	_object.AddMember("Action", JsonString(this->toString(m_action), _allocator), _allocator);
 	_object.AddMember("TriggerButton", JsonString(m_ttbButtonName, _allocator), _allocator);
+	_object.AddMember("Hidden", m_hidden, _allocator);
 }
 
 void ot::MenuButtonCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -97,4 +98,5 @@ void ot::MenuButtonCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	m_action = this->stringToButtonAction(json::getString(_object, "Action"));
 	m_ttbButtonName = json::getString(_object, "TriggerButton");
+	m_hidden = json::getBool(_object, "Hidden");
 }

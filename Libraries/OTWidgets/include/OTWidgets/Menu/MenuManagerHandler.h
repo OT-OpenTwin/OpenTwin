@@ -39,6 +39,8 @@ namespace ot {
 		virtual MenuCfg getMenuConfiguration(const MenuCallbackBase* _callbackObject, const MenuRequestEvent& _requestEvent) const = 0;
 		virtual bool notifyMenuOwner(const MenuAction* _action) const = 0;
 		virtual bool triggerToolbarButton(const std::string& _buttonName) const = 0;
+		virtual bool checkToolBarButtonExists(const std::string& _buttonName) const = 0;
+		virtual bool isToolBarButtonEnabled(const std::string& _buttonName) const = 0;
 	};
 
 }

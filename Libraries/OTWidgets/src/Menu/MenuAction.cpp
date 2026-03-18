@@ -46,6 +46,7 @@ void ot::MenuAction::applyConfig() {
     this->setText(QString::fromStdString(m_config.getText()));
     this->setToolTip(QString::fromStdString(m_config.getToolTip()));
     this->setEnabled(m_config.getEnabled());
+	this->setVisible(!m_config.getHidden());
 
     // Set icon if needed
     if (m_config.getIconPath().empty())

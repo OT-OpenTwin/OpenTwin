@@ -112,8 +112,22 @@ bool UIContextMenuManager::triggerToolbarButton(const std::string& _buttonName) 
 	OTAssertNullptr(m_app);
 	ToolBar* toolBar = m_app->getToolBar();
 	OTAssertNullptr(toolBar);
-	QString btnName = QString::fromStdString(_buttonName);
-	btnName.replace('/', ':'); // Replace slashes with colons to match the expected format
-	return toolBar->triggerToolBarButton(btnName);
+	return toolBar->triggerToolBarButton(QString::fromStdString(_buttonName));
+}
+
+bool UIContextMenuManager::checkToolBarButtonExists(const std::string& _buttonName) const
+{
+	OTAssertNullptr(m_app);
+	ToolBar* toolBar = m_app->getToolBar();
+	OTAssertNullptr(toolBar);
+	return toolBar->checkToolBarButtonExists(QString::fromStdString(_buttonName));
+}
+
+bool UIContextMenuManager::isToolBarButtonEnabled(const std::string& _buttonName) const
+{
+	OTAssertNullptr(m_app);
+	ToolBar* toolBar = m_app->getToolBar();
+	OTAssertNullptr(toolBar);
+	return toolBar->isToolBarButtonEnabled(QString::fromStdString(_buttonName));
 }
 

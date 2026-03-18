@@ -52,6 +52,9 @@ public:
 	
 	tt::Page* getStartPage();
 
+	bool checkToolBarButtonExists(const QString& _buttonPath) const;
+	bool isToolBarButtonEnabled(const QString& _buttonPath) const;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Slots
@@ -82,10 +85,12 @@ public Q_SLOTS:
 	bool triggerToolBarButton(const QString& _buttonPath);
 
 private:
+	ak::aToolButtonWidget* findButton(const QString& _buttonPath) const;
+
 	//! @brief Will find the button specified by its path in the provided object list.
-	//! @param _buttonPath The path of the button to find (e.g. "View:Settings:Show Grid").
+	//! @param _uniqueName The path of the button to find (e.g. "View:Settings:Show Grid").
 	//! @param _objects The object list to search in.
-	ak::aToolButtonWidget* findButton(const QString& _buttonPath, const QObjectList& _objects);
+	ak::aToolButtonWidget* findButton(const QString& _uniqueName, const QObjectList& _objects) const;
 
 	struct structView {
 		ot::UID				page;

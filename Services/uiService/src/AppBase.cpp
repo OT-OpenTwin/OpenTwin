@@ -2163,7 +2163,9 @@ void AppBase::destroyObjects(const std::vector<ot::UID>& _objects) {
 		for (auto obj : _objects) {
 			if (uiAPI::object::exists(obj)) {
 				uiAPI::object::destroy(obj, true);
-				if (!uiAPI::object::exists(obj)) { erased = true; }
+				if (!uiAPI::object::exists(obj)) {
+					erased = true;
+				}
 			}
 		}
 	}

@@ -55,7 +55,34 @@ bool ot::MenuManager::showMenu(const MenuRequestWidgetEvent* _event)
 
 	// Get the menu configuration from the handler
 	MenuCfg cfg = m_handler->getMenuConfiguration(callbackBase, guiEvent);
+	if (cfg.isEmpty())
+	{
+		return false;
+	}
 
+	// Update enabled state of buttons
+	for (MenuEntryCfg* entry : cfg.getAllEntries())
+	{
+		MenuButtonCfg* btnCfg = dynamic_cast<MenuButtonCfg*>(entry);
+		if (btnCfg)
+		{
+			if (btnCfg->getButtonAction() == MenuButtonCfg::ButtonAction::TriggerButton)
+			{
+				if (!m_handler->checkToolBarButtonExists(btnCfg->getTriggerButton()))
+				{
+					// Trigger button does not exist -> Hide context button
+					btnCfg->setHidden(true);
+				}
+				else if (!m_handler->isToolBarButtonEnabled(btnCfg->getTriggerButton()))
+				{
+					// Trigger button is disabled -> Disable context button
+					btnCfg->setEnabled(false);
+				}
+			}
+		}
+	}
+
+	// Create and display the menu
 	Menu menu(cfg, _event->getWidget());
 	const QPoint globalPos = callbackBase->mapPositionToGlobal(_event);
 	QAction* selectedAction = menu.exec(globalPos);
@@ -64,6 +91,7 @@ bool ot::MenuManager::showMenu(const MenuRequestWidgetEvent* _event)
 		return false;
 	}
 
+	// Handle the selected action
 	MenuAction* menuAction = dynamic_cast<MenuAction*>(selectedAction);
 	if (!menuAction)
 	{

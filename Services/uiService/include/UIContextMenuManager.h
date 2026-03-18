@@ -41,4 +41,6 @@ protected:
 	virtual ot::MenuCfg getMenuConfiguration(const ot::MenuCallbackBase* _callbackObject, const ot::MenuRequestEvent& _requestEvent) const override;
 	virtual bool notifyMenuOwner(const ot::MenuAction* _action) const override;
 	virtual bool triggerToolbarButton(const std::string& _buttonName) const override;
+	virtual bool checkToolBarButtonExists(const std::string& _buttonName) const override;
+	virtual bool isToolBarButtonEnabled(const std::string& _buttonName) const override;
 };

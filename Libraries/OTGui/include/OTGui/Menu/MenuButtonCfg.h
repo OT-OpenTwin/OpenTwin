@@ -76,9 +76,13 @@ namespace ot {
 		MenuButtonCfg& setTriggerButton(const std::string& _ttbButtonName) { m_ttbButtonName = _ttbButtonName; m_action = ButtonAction::TriggerButton; return *this; };
 		const std::string& getTriggerButton() const { return m_ttbButtonName; };
 
+		void setHidden(bool _hidden) { m_hidden = _hidden; };
+		bool getHidden() const { return m_hidden; };
+
 	private:
 		ButtonAction m_action;
 		std::string m_ttbButtonName;
+		bool m_hidden = false;
 	};
 
 }

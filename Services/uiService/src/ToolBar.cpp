@@ -170,6 +170,23 @@ tt::Page* ToolBar::getStartPage() {
 	return page->getPage();
 }
 
+bool ToolBar::checkToolBarButtonExists(const QString& _buttonPath) const
+{
+	return findButton(_buttonPath) != nullptr;
+}
+
+bool ToolBar::isToolBarButtonEnabled(const QString& _buttonPath) const
+{
+	auto btn = findButton(_buttonPath);
+	if (btn) {
+		return btn->isEnabled();
+	}
+	else {
+		OT_LOG_E("Button not found for path: \"" + _buttonPath.toStdString() + "\"");
+		return false;
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Slots
@@ -269,46 +286,9 @@ bool ToolBar::triggerToolBarButton(ot::UID _buttonId) {
 	}
 }
 
-bool ToolBar::triggerToolBarButton(const QString& _buttonPath) {
-	ot::UID parentUID = ak::invalidUID;
-
-	int lastColon = _buttonPath.lastIndexOf(':');
-	if (lastColon == -1) {
-		OT_LOG_E("Invalid button path: \"" + _buttonPath.toStdString() + "\"");
-		return false;
-	}
-	QString parentPath = _buttonPath.left(lastColon);
-	
-	ak::UID parentID = ak::invalidUID;
-	try
-	{
-		parentID = ak::uiAPI::object::getUidFromObjectUniqueName(parentPath.toStdString().c_str());
-	}
-	catch (...)
-	{}
-
-	if (parentID == ak::invalidUID) {
-		OT_LOG_E("Parent container not found for button path: \"" + _buttonPath.toStdString() + "\"");
-		return false;
-	}
-	
-	auto container = ak::uiAPI::object::get<ak::aTtbContainer>(parentID);
-	auto group = dynamic_cast<ak::aTtbGroup*>(container);
-	auto subGroup = dynamic_cast<ak::aTtbSubGroup*>(container);
-
-	QObjectList children;
-	if (group) {
-		children = group->getGroup()->children();
-	}
-	else if (subGroup) {
-		children = subGroup->getSubGroup()->children();
-	}
-	else {
-		OT_LOG_E("Parent object is not a container for button path: \"" + _buttonPath.toStdString() + "\"");
-		return false;
-	}
-
-	ak::aToolButtonWidget* btn = findButton(_buttonPath, children);
+bool ToolBar::triggerToolBarButton(const QString& _buttonPath) 
+{
+	ak::aToolButtonWidget* btn = findButton(_buttonPath);
 	if (btn) {
 		if (btn->isEnabled())
 		{
@@ -322,15 +302,68 @@ bool ToolBar::triggerToolBarButton(const QString& _buttonPath) {
 	}
 }
 
-ak::aToolButtonWidget* ToolBar::findButton(const QString& _buttonPath, const QObjectList& _objects) {
+ak::aToolButtonWidget* ToolBar::findButton(const QString& _buttonPath) const
+{
+	ot::UID parentUID = ak::invalidUID;
+
+	QString path = _buttonPath;
+	path.replace('/', ':');
+
+	int lastColon = path.lastIndexOf(':');
+	if (lastColon == -1)
+	{
+		OT_LOG_E("Invalid button path: \"" + _buttonPath.toStdString() + "\"");
+		return nullptr;
+	}
+	QString parentPath = path.left(lastColon);
+
+	ak::UID parentID = ak::invalidUID;
+	try
+	{
+		parentID = ak::uiAPI::object::getUidFromObjectUniqueName(parentPath.toStdString().c_str());
+	}
+	catch (...)
+	{
+	}
+
+	if (parentID == ak::invalidUID)
+	{
+		return nullptr;
+	}
+
+	auto container = ak::uiAPI::object::get<ak::aTtbContainer>(parentID);
+	auto group = dynamic_cast<ak::aTtbGroup*>(container);
+	auto subGroup = dynamic_cast<ak::aTtbSubGroup*>(container);
+
+	QObjectList children;
+	if (group)
+	{
+		children = group->getGroup()->children();
+	}
+	else if (subGroup)
+	{
+		children = subGroup->getSubGroup()->children();
+	}
+	else
+	{
+		OT_LOG_E("Parent object is not a container for button path: \"" + _buttonPath.toStdString() + "\"");
+		return nullptr;
+	}
+
+	return findButton(path, children);
+}
+
+ak::aToolButtonWidget* ToolBar::findButton(const QString& _uniqueName, const QObjectList& _objects) const
+{
 	for (QObject* child : _objects) {
+		OTAssertNullptr(child);
 		ak::aToolButtonWidget* btn = dynamic_cast<ak::aToolButtonWidget*>(child);
 		if (btn) {
-			if (btn->uniqueName() == _buttonPath) {
+			if (btn->uniqueName() == _uniqueName) {
 				return btn;
 			}
 		}
-		btn = findButton(_buttonPath, child->children());
+		btn = findButton(_uniqueName, child->children());
 		if (btn) {
 			return btn;
 		}

@@ -100,7 +100,10 @@ void ViewerComponent::removeUIElements(std::list<ViewerUIDtype>& itemIDList) {
 	try {
 		try {
 			std::vector<ViewerUIDtype> i;
-			for (auto itm : itemIDList) { i.push_back(itm); }
+			for (auto itm : itemIDList) {
+				i.push_back(itm);
+			}
+
 			AppBase* app = AppBase::instance();
 			app->destroyObjects(i);
 			for (auto itm : i) {
