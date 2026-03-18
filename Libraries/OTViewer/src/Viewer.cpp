@@ -117,7 +117,8 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	overlayColorRampNode(nullptr),
 	mouseCursorX(0.0),
 	mouseCursorY(0.0),
-	freezeWorkingPlane(false)
+	freezeWorkingPlane(false),
+	osgOverlayCamera(nullptr)
 {
 	OT_VIEWER_MEM_DBG(this, "Viewer created");
 
@@ -620,6 +621,7 @@ void Viewer::setClearColor(int backgroundR, int backgroundG, int backgroundB, in
 	overlayTextColor[2] = (overlayTextB / 255.0);
 
 	if (axisCross != nullptr) axisCross->setTextColor(overlayTextColor);
+	setActiveColorRamp(&currentColorRamp);
 }
 
 void Viewer::setLightSourceDistance(const std::string &value)
@@ -2180,9 +2182,12 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 
 	// Remove any current color ramp
 	while (osgOverlayCamera->removeChild(overlayColorRampNode));
-	currentColorRamp.setActive(false);
 
-	if (activeColorRamp == nullptr) return;
+	if (activeColorRamp == nullptr)
+	{
+		currentColorRamp.setActive(false);
+		return;
+	}
 
 	if (&currentColorRamp != activeColorRamp)
 	{
