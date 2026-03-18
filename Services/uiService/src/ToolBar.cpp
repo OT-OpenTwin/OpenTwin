@@ -310,7 +310,10 @@ bool ToolBar::triggerToolBarButton(const QString& _buttonPath) {
 
 	ak::aToolButtonWidget* btn = findButton(_buttonPath, children);
 	if (btn) {
-		btn->click();
+		if (btn->isEnabled())
+		{
+			btn->click();
+		}
 		return true;
 	}
 	else {
