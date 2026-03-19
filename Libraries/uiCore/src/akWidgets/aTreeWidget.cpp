@@ -135,7 +135,9 @@ ak::UID ak::aTreeWidget::add(UID _parentId, const QString& _text, textAlignment 
 		if (itm == nullptr) {
 			itm = createItem(_text, _textAlignment, _icon);
 			parent->second->AddChild(itm);
-			if (parent->second->isSelected() && m_selectAndDeselectChildren) { itm->setSelected(true); }
+			if (parent->second->isSelected() && m_selectAndDeselectChildren) {
+				itm->setSelected(true); 
+			}
 			m_items.insert_or_assign(itm->id(), itm);
 		}
 		return itm->id();
@@ -180,7 +182,9 @@ ak::UID ak::aTreeWidget::add(const QString& _cmd, char _delimiter, textAlignment
 			assert(nItm != nullptr); // Failed to create
 			// Add item
 			currentItem->AddChild(nItm);
-			if (currentItem->isSelected() && m_selectAndDeselectChildren) { nItm->setSelected(true); }
+			if (currentItem->isSelected() && m_selectAndDeselectChildren) {
+				nItm->setSelected(true);
+			}
 
 			// Store data
 			m_items.insert_or_assign(nItm->id(), nItm);
@@ -666,7 +670,10 @@ void ak::aTreeWidget::selectionChangedEvent(
 				i->setChildsSelected(true);
 			}
 
-			i->ensureTopLevelSelectionVisible();
+			if (m_expandParentsOnSelectionChange)
+			{
+				i->ensureTopLevelSelectionVisible();
+			}
 		}
 	}
 

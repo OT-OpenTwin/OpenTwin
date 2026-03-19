@@ -3024,7 +3024,13 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 				QSignalBlocker sigBlock(tree);
 
 				OT_SLECTION_TEST_LOG("+ View focus changed: Restoring selection");
+
+				bool autoExpand = tree->getExpandParentsOnSelectionChange();
+				tree->setExpandParentsOnSelectionChange(false);
+
 				tree->setItemsSelected(_focusedView->getVisualizingItems().getSelectedNavigationItems(), true);
+
+				tree->setExpandParentsOnSelectionChange(autoExpand);
 
 				//m_navigationManager.setSelectedItems(tree->selectedItems());
 			}

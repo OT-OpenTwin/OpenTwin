@@ -363,6 +363,9 @@ namespace ak {
 		aTreeWidgetBase * treeWidget() { return m_tree; }
 		aLineEditWidget * filterWidget() { return m_filter; }
 
+		void setExpandParentsOnSelectionChange(bool flag) { m_expandParentsOnSelectionChange = flag; }
+		bool getExpandParentsOnSelectionChange() { return m_expandParentsOnSelectionChange; }
+
 		// ###########################################################################################################################################
 
 		// Events
@@ -490,6 +493,8 @@ namespace ak {
 
 		bool										m_selectAndDeselectChildren;
 		bool										m_itemsAreEditable;		//! If true then the items in this tree are editable
+
+		bool                            m_expandParentsOnSelectionChange = true;
 	};
 
 	// #########################################################################################################################################
