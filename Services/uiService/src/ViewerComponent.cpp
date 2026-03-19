@@ -1186,5 +1186,5 @@ void ViewerComponent::slotSetCurveDimmed(const std::string& _plotName, ot::UID _
 		curve->setDimmed(_setDimmed, true);
 	}
 
-	plot->refresh();
+	plot->replot();
 }

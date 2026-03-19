@@ -301,6 +301,19 @@ void ot::PlotDataset::setSelected(bool _isSelected) {
 	this->updateCurveVisualization();
 }
 
+void ot::PlotDataset::setHighlighted(bool _hasHighlight)
+{
+	if (m_cartesianCurve) {
+		m_cartesianCurve->setHighlight(_hasHighlight);
+	}
+	if (m_polarCurve) {
+		m_polarCurve->setHighlight(_hasHighlight);
+	}
+
+	OTAssertNullptr(m_ownerPlot);
+	m_ownerPlot->replot();
+}
+
 ot::CartesianPlotCurve* ot::PlotDataset::getCartesianCurve() {
 	if (m_cartesianCurve != nullptr) {
 		return m_cartesianCurve;
@@ -344,26 +357,17 @@ void ot::PlotDataset::updateCurveVisualization() {
 
 	QPen invisPen(QBrush(), 0., Qt::NoPen);
 
-	QPen outlinePen = linePen;
-	outlinePen.setBrush(cs.getValue(ColorStyleValueEntry::PlotCurveHighlight).toBrush());
-	outlinePen.setWidthF(linePen.width() * 3.);
+	QPen highlightPen = linePen;
+	highlightPen.setBrush(cs.getValue(ColorStyleValueEntry::PlotCurveHighlight).toBrush());
+	highlightPen.setWidthF(linePen.width() * 3.);
 
-	// Setup outline
-	if (m_isSelected) {
-		if (m_cartesianCurve) {
-			m_cartesianCurve->setOutlinePen(outlinePen);
-		}
-		if (m_polarCurve) {
-			m_polarCurve->setOutlinePen(outlinePen);
-		}
+	if (m_cartesianCurve)
+	{
+		m_cartesianCurve->setHighlightPen(highlightPen);
 	}
-	else {
-		if (m_cartesianCurve) {
-			m_cartesianCurve->setOutlinePen(QPen(Qt::NoPen));
-		}
-		if (m_polarCurve) {
-			m_polarCurve->setOutlinePen(QPen(Qt::NoPen));
-		}
+	if (m_polarCurve)
+	{
+		m_polarCurve->setHighlightPen(highlightPen);
 	}
 
 	// Setup curve pen

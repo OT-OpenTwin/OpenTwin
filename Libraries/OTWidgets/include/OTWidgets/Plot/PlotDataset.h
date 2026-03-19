@@ -120,6 +120,8 @@ namespace ot {
 		void setSelected(bool _isSelected);
 		bool isSelected() const { return m_isSelected; };
 
+		void setHighlighted(bool _hasHighlight);
+
 		void setNavigationId(UID _id) { m_config.setNavigationId(_id); };
 		UID getNavigationId() const { return m_config.getNavigationId(); };
 

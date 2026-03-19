@@ -104,9 +104,18 @@ QRectF ot::CartesianPlotCurve::intersectedClipRect(const QRectF& _rect, QPainter
 // Constructor
 
 ot::CartesianPlotCurve::CartesianPlotCurve(const QString& _title) :
-	QwtPlotCurve(_title), m_outlinePen(Qt::NoPen), m_pointInterval(1)
+	QwtPlotCurve(_title), m_highlightPen(Qt::NoPen), m_pointInterval(1), m_hasHighlight(false)
 {
 
+}
+
+void ot::CartesianPlotCurve::setHighlight(bool _highlight)
+{
+    if (_highlight == m_hasHighlight) {
+        return;
+	}
+
+    m_hasHighlight = _highlight;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -129,13 +138,14 @@ void ot::CartesianPlotCurve::drawSeries(QPainter* _painter, const QwtScaleMap& _
     if (CartesianPlotCurve::verifyRange(numSamples, _from, _to) > 0) {
         
         // Draw outline if needed
-		/*if (m_outlinePen.style() != Qt::NoPen) {
+        if (m_hasHighlight && m_highlightPen.style() != Qt::NoPen)
+        {
             _painter->save();
-            _painter->setPen(m_outlinePen);
+            _painter->setPen(m_highlightPen);
             this->drawCurve(_painter, this->style(), _xMap, _yMap, _canvasRect, _from, _to);
             _painter->restore();
-		}*/
-
+        }
+		
 		// Draw the curve
         if (this->pen().style() != Qt::NoPen) {
             _painter->save();

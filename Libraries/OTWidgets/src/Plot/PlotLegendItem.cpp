@@ -110,12 +110,14 @@ void ot::PlotLegendItem::detach()
 
 void ot::PlotLegendItem::slotHovered()
 {
-
+	OTAssertNullptr(m_dataset);
+	m_dataset->setHighlighted(true);
 }
 
 void ot::PlotLegendItem::slotUnhovered()
 {
-
+	OTAssertNullptr(m_dataset);
+	m_dataset->setHighlighted(false);
 }
 
 void ot::PlotLegendItem::slotClicked(Qt::KeyboardModifiers _modifiers)

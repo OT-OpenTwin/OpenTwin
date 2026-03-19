@@ -21,7 +21,15 @@
 #include "OTWidgets/Plot/Polar/PolarPlotCurve.h"
 
 ot::PolarPlotCurve::PolarPlotCurve(const QString& _title) :
-	QwtPolarCurve(_title), m_outlinePen(Qt::NoPen), m_pointInterval(1)
+	QwtPolarCurve(_title), m_highlightPen(Qt::NoPen), m_pointInterval(1), m_hasHighlight(false)
 {
 
+}
+
+void ot::PolarPlotCurve::setHighlight(bool _highlight) {
+	if (_highlight == m_hasHighlight) {
+		return;
+	}
+
+	m_hasHighlight = _highlight;
 }

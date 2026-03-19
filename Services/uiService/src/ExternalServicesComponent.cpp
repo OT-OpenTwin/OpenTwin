@@ -3767,8 +3767,8 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 			plot->setConfig(std::move(plotConfig));
 		}
 
-		// Now we refresh the plot visualisation.
-		plot->refresh();
+		// Now we apply the config
+		plot->applyConfig();
 		plot->resetView();
 
 		if (visualisationCfg.getSupressViewHandling()) {
@@ -3818,7 +3818,7 @@ void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _documen
 			}
 		}
 		
-		plot->refresh();
+		plot->replot();
 	}
 	else
 	{
@@ -4849,7 +4849,7 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 	}
 
 	// Now we refresh the plot visualisation.
-	plot->refresh();
+	plot->applyConfig();
 	plot->resetView();
 	
 	if (_visualizationCfg.getSupressViewHandling()) {

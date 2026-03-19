@@ -93,7 +93,8 @@ namespace ot {
 
 		void setIncompatibleData();
 
-		void refresh();
+		void applyConfig();
+		void replot();
 
 		void clear(bool _clearCache);
 
@@ -144,7 +145,6 @@ namespace ot {
 		virtual void detachAllCached() = 0;
 	
 		void replaceConfig(Plot1DCfg&& _config) { m_config = std::move(_config); };
-		void applyConfig();
 		void updateAxisTitles(bool _replot = false);
 		
 	private:

@@ -171,7 +171,6 @@ void ot::PolarPlot::mouseDoubleClickEvent(QMouseEvent* _event)
 	QwtPolarPlot::mouseDoubleClickEvent(_event);
 	if (_event->button() == Qt::LeftButton) {
 		size_t pointIx = 0;
-
 		PlotBase* owner = getOwner();
 		OTAssertNullptr(owner);
 		

@@ -94,9 +94,10 @@ namespace ot {
 
 		// Setter / Getter
 
-		void setOutlinePen(const QPen& _pen) { m_outlinePen = _pen; };
-		const QPen& getOutlinePen() const { return m_outlinePen; };
+		void setHighlightPen(const QPen& _pen) { m_highlightPen = _pen; };
 
+		void setHighlight(bool _highlight);
+		
 		void setPointInterval(int _interval) { m_pointInterval = _interval; };
 		int getPointInterval() const { return m_pointInterval; };
 
@@ -111,7 +112,8 @@ namespace ot {
 		virtual void drawSymbols(QPainter* _painter, const QwtSymbol& _symbol, const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QRectF& _canvasRect, int _from, int _to) const;
 
 	private:
-		QPen m_outlinePen;
+		QPen m_highlightPen;
+        bool m_hasHighlight;
 		int m_pointInterval;
 	};
 
