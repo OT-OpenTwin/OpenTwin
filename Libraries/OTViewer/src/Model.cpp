@@ -225,7 +225,7 @@ void Model::attachViewer(Viewer *viewer)
 	if (m_viewerList.size() == 1)
 	{
 		// The first viewer was registered. We assume that the 3D tab is active
-		ViewerToolBar::instance().setupUIControls3D();
+		ViewerToolBar::instance().setupUIControls3D(this);
 	}
 }
 
@@ -264,7 +264,7 @@ void Model::activateModel()
 		std::list<ot::UID> selectedTreeItemID;
 		getSelectedTreeItemIDs(selectedTreeItemID);
 
-		ViewerToolBar::instance().updateViewEnabledState(selectedTreeItemID);
+		ViewerToolBar::instance().updateViewEnabledState(selectedTreeItemID, this);
 	}
 }
 
@@ -1270,7 +1270,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 		// Update the working plane transformation 
 		updateWorkingPlaneTransform();
 		
-		ViewerToolBar::instance().updateViewEnabledState(_selectionData.getSelectedTreeItems());
+		ViewerToolBar::instance().updateViewEnabledState(_selectionData.getSelectedTreeItems(), this);
 		refreshAllViews();
 
 		// Clear visualizing entities for last central view
@@ -1341,7 +1341,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 	}
 
 	// Update the UI state and the view
-	ViewerToolBar::instance().updateViewEnabledState(_selectionData.getSelectedTreeItems());
+	ViewerToolBar::instance().updateViewEnabledState(_selectionData.getSelectedTreeItems(), this);
 	refreshAllViews();
 
 	// Update the working plane transformation 
@@ -1978,7 +1978,7 @@ void Model::viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo) {
 
 	switch (_viewInfo.getViewType()) {
 	case ot::WidgetViewBase::View3D:
-		ViewerToolBar::instance().setupUIControls3D();
+		ViewerToolBar::instance().setupUIControls3D(this);
 		break;
 
 	case ot::WidgetViewBase::ViewText:
@@ -2011,6 +2011,7 @@ void Model::executeAction(ot::UID _buttonID) {
 	switch (button) {
 	case ViewerToolBar::Reset3DViewButton: resetAllViews3D(); break;
 	case ViewerToolBar::ShowGeometryButton: showGeometrySceneNodesAction(); break;
+	case ViewerToolBar::ShowMeshButton: showMeshSceneNodesAction(); break;
 	case ViewerToolBar::ShowSelectedButton: showSelectedSceneNodesAction(); break;
 	case ViewerToolBar::HideSelectedButton: hideSelectedSceneNodesAction(); break;
 	case ViewerToolBar::HideUnselectedButton: hideUnselectedSceneNodesAction(); break;
@@ -2085,6 +2086,39 @@ void Model::showGeometrySceneNodesAction()
 		}
 	}
 	
+	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
+}
+
+void Model::showMeshSceneNodesAction()
+{
+	// First, hide all scene nodes
+	hideAllSceneNodes(m_sceneNodesRoot);
+
+	// Now we show the ones which belong to the selected mesh
+	SceneNodeBase* meshContainer = getSceneNodeByEntityName("Meshes");
+	if (meshContainer != nullptr)
+	{
+		for (auto meshItem : meshContainer->getChildren())
+		{
+			if (meshItem->isSelected())
+			{
+				// We need to show this mesh
+				SceneNodeBase* meshData = getSceneNodeByEntityName(meshItem->getName() + "/Mesh");
+				if (meshData != nullptr)
+				{
+					showAllSceneNodes(meshData);
+
+					// Now hide the background
+					SceneNodeBase* meshBackground = getSceneNodeByEntityName(meshItem->getName() + "/Mesh/Background");
+					if (meshBackground != nullptr)
+					{
+						setItemVisibleState(meshBackground, false);
+					}
+				}
+			}
+		}
+	}
+
 	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
 }
 
@@ -3591,6 +3625,17 @@ SceneNodeBase* Model::getSceneNodeByEntityID(ot::UID _modelEntityID) const
 {
 	const auto it = m_modelItemToSceneNodesMap.find(_modelEntityID);
 	if (it != m_modelItemToSceneNodesMap.end()) {
+		return it->second;
+	}
+	else {
+		return nullptr;
+	}
+}
+
+SceneNodeBase* Model::getSceneNodeByTreeItemID(ot::UID _treeItemID) const
+{
+	const auto it = m_treeItemToSceneNodesMap.find(_treeItemID);
+	if (it != m_treeItemToSceneNodesMap.end()) {
 		return it->second;
 	}
 	else {

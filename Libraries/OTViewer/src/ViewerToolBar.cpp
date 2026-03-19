@@ -20,6 +20,9 @@
 // Viewer header
 #include "OTViewer/FrontendAPI.h"
 #include "OTViewer/ViewerToolBar.h"
+#include "OTViewer/Model.h"
+#include "OTViewer/SceneNodeMesh.h"
+#include "OTViewer/SceneNodeCartesianMesh.h"
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
@@ -32,6 +35,7 @@ ViewerToolBar& ViewerToolBar::instance(void) {
 ViewerToolBar::ButtonType ViewerToolBar::getButtonTypeFromUID(ot::UID _uid) const {
 	if (_uid == m_resetView3DButtonID) return ButtonType::Reset3DViewButton;
 	else if (_uid == m_showGeometryButtonID) return ButtonType::ShowGeometryButton;
+	else if (_uid == m_showMeshButtonID) return ButtonType::ShowMeshButton;
 	else if (_uid == m_showSelectedButtonID) return ButtonType::ShowSelectedButton;
 	else if (_uid == m_hideSelectedButtonID) return ButtonType::HideSelectedButton;
 	else if (_uid == m_hideUnselectedButtonID) return ButtonType::HideUnselectedButton;
@@ -84,7 +88,7 @@ void ViewerToolBar::setupDefaultControls(void) {
 	m_removeItemIDList.push_front(m_hideSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
 }
 
-void ViewerToolBar::setupUIControls3D(void) {
+void ViewerToolBar::setupUIControls3D(Model *model) {
 	assert(FrontendAPI::instance() != nullptr);
 	if (FrontendAPI::instance() == nullptr) return;
 	if (!m_removeItemIDList.empty()) return;
@@ -101,6 +105,7 @@ void ViewerToolBar::setupUIControls3D(void) {
 	m_removeItemIDList.push_front(m_hideSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
 	m_removeItemIDList.push_front(m_hideUnselectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Unselected", "HideUnselected"));
 	m_removeItemIDList.push_front(m_showGeometryButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Show Geometry Only", "ShowGeometry"));
+	m_removeItemIDList.push_front(m_showMeshButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Show Mesh Only", "ShowMesh"));
 
 	m_removeItemIDList.push_front(m_wireframeButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Wireframe", "Wireframe"));
 	m_removeItemIDList.push_front(m_workingPlaneButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Working Plane", "WorkingPlane"));
@@ -109,7 +114,7 @@ void ViewerToolBar::setupUIControls3D(void) {
 	m_removeItemIDList.push_front(m_cutplaneButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Cutplane", "Cutplane"));
 
 	// Send an initial notification to properly set the state of the new controls
-	this->updateViewEnabledState(ot::UIDList());
+	this->updateViewEnabledState(ot::UIDList(), model);
 }
 
 void ViewerToolBar::setupUIControlsText(void) {
@@ -182,7 +187,7 @@ void ViewerToolBar::removeUIControls(void) {
 	this->resetControlsData();
 }
 
-void ViewerToolBar::updateViewEnabledState(const ot::UIDList& _selectedTreeItems) {
+void ViewerToolBar::updateViewEnabledState(const ot::UIDList& _selectedTreeItems, Model *model) {
 	if (!m_removeItemIDList.empty()) {
 		std::list<unsigned long long> enabled;
 		std::list<unsigned long long> disabled;
@@ -196,6 +201,33 @@ void ViewerToolBar::updateViewEnabledState(const ot::UIDList& _selectedTreeItems
 			enabled.push_back(m_showSelectedButtonID);
 			enabled.push_back(m_hideSelectedButtonID);
 			enabled.push_back(m_hideUnselectedButtonID);
+		}
+
+		// Determine whether a mesh is selected
+		bool meshItemSelected = false;
+		for (auto treeItem : _selectedTreeItems)
+		{
+			SceneNodeBase* item = model->getSceneNodeByTreeItemID(treeItem);
+			if (item != nullptr)
+			{
+				if (item->getParent() != nullptr)
+				{
+					if (item->getParent()->getName() == "Meshes")
+					{
+						meshItemSelected = true;
+						break;
+					}
+				}
+			}
+		}
+
+		if (meshItemSelected)
+		{
+			enabled.push_back(m_showMeshButtonID);
+		}
+		else
+		{
+			disabled.push_back(m_showMeshButtonID);
 		}
 
 		FrontendAPI::instance()->enableDisableControls(enabled, true, disabled);
@@ -251,6 +283,7 @@ void ViewerToolBar::resetControlsData(void) {
 	m_styleGroupID = 0;
 	m_resetView3DButtonID = 0;
 	m_showGeometryButtonID = 0;
+	m_showMeshButtonID = 0;
 	m_showSelectedButtonID = 0;
 	m_hideSelectedButtonID = 0;
 	m_hideUnselectedButtonID = 0;

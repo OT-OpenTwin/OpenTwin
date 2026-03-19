@@ -110,6 +110,7 @@ public:
 
 	SceneNodeBase* getSceneNodeByEntityID(ot::UID _modelEntityID) const;
 	SceneNodeBase* getSceneNodeByEntityName(const std::string &_entityName) const;
+	SceneNodeBase* getSceneNodeByTreeItemID(ot::UID _treeItemID) const;
 
 	void setEntityName(ot::UID _modelEntityID, const std::string& _newName);
 	std::string getEntityName(ot::UID _modelEntityID) const;
@@ -260,6 +261,7 @@ private:
 	SceneNodeGeometry *createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, bool _manageParentVisibility, bool _manageChildVisibility);
 	void       setItemVisibleState(SceneNodeBase* _item, bool _visible);
 	void	   showGeometrySceneNodesAction();
+	void	   showMeshSceneNodesAction();
 	void	   showSelectedSceneNodesAction();
 	void	   hideSelectedSceneNodesAction();
 	void	   hideUnselectedSceneNodesAction();

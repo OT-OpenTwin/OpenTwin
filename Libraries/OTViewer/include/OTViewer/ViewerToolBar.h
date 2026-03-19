@@ -25,11 +25,14 @@
 // std header
 #include <list>
 
+class Model;
+
 class ViewerToolBar {
 public:
 	enum ButtonType : ot::UID {
 		Reset3DViewButton,
 		ShowGeometryButton,
+		ShowMeshButton,
 		ShowSelectedButton,
 		HideSelectedButton,
 		HideUnselectedButton,
@@ -59,13 +62,13 @@ public:
 	void viewDataModifiedHasChanged(ot::WidgetViewBase::ViewType _type, bool _isModified);
 
 	void setupDefaultControls(void);
-	void setupUIControls3D(void);
+	void setupUIControls3D(Model* model);
 	void setupUIControlsText(void);
 	void setupUIControlsTable(void);
 	
 	void removeUIControls(void);
 
-	void updateViewEnabledState(const ot::UIDList& _selectedTreeItems);
+	void updateViewEnabledState(const ot::UIDList& _selectedTreeItems, Model* model);
 	void updateTextEditorEnabledState(void);
 	void updateTextEditorSaveEnabledState(void);
 
@@ -86,6 +89,7 @@ private:
 	ot::UID m_styleGroupID;
 	ot::UID m_resetView3DButtonID;
 	ot::UID m_showGeometryButtonID;
+	ot::UID m_showMeshButtonID;
 	ot::UID m_showSelectedButtonID;
 	ot::UID m_hideSelectedButtonID;
 	ot::UID m_hideUnselectedButtonID;
