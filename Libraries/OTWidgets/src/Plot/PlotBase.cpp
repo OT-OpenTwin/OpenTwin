@@ -229,12 +229,7 @@ void ot::PlotBase::applyConfig()
 	// Legend
 	m_legendContainer->setHidden(!m_config.getLegendVisible());
 
-	// Setup plot XY
-	m_cartesianPlot->setPlotGridVisible(m_config.getGridVisible(), false);
-	m_cartesianPlot->setPlotGridColor(m_config.getGridColor(), false);
-	m_cartesianPlot->setPlotGridLineWidth(0.5, true);
-
-	// Setup axis
+	// Setup cartesian axes
 	m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
 	m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsAutoScale());
 
@@ -247,12 +242,7 @@ void ot::PlotBase::applyConfig()
 	m_cartesianPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, m_config.getYAxisMax());
 	m_cartesianPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, m_config.getYAxisMin());
 
-	// Setup plot XY
-	m_polarPlot->setPlotGridVisible(m_config.getGridVisible(), false);
-	m_polarPlot->setPlotGridColor(m_config.getGridColor(), false);
-	m_polarPlot->setPlotGridLineWidth(0.5, true);
-
-	// Setup axis
+	// Setup polar axes
 	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
 	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsAutoScale());
 
@@ -265,6 +255,7 @@ void ot::PlotBase::applyConfig()
 	m_polarPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, m_config.getYAxisMax());
 	m_polarPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, m_config.getYAxisMin());
 
+	// Update
 	updateAxisTitles(false);
 
 	m_cartesianPlot->updateGrid();

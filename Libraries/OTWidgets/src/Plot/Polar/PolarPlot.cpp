@@ -62,8 +62,7 @@ ot::PolarPlot::~PolarPlot()
 // Plot
 
 void ot::PolarPlot::updateWholePlot() {
-	this->getPlotAxis(AbstractPlotAxis::xBottom)->updateAxis();
-	this->getPlotAxis(AbstractPlotAxis::yLeft)->updateAxis();
+	updateAllAxes();
 
 	this->replot();
 }
@@ -76,17 +75,23 @@ void ot::PolarPlot::resetPlotView() {
 
 }
 
+void ot::PolarPlot::updateAllAxes()
+{
+	this->getPlotAxis(AbstractPlotAxis::xBottom)->updateAxis();
+	this->getPlotAxis(AbstractPlotAxis::yLeft)->updateAxis();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Grid
 
 void ot::PolarPlot::updateGrid() {
-	const Plot1DCfg& config = this->getConfiguration();
+	const Plot1DCfg& cfg = this->getConfig();
 
 	QPen gridPen(QColor(), 0., Qt::NoPen);
 
-	if (config.getGridVisible()) {
-		gridPen = QPen(QtFactory::toQBrush(config.getGridColor()), config.getGridLineWidth(), Qt::SolidLine);
+	if (cfg.getGridVisible()) {
+		gridPen = QPen(QtFactory::toQBrush(cfg.getGridColor()), cfg.getGridLineWidth(), Qt::SolidLine);
 	}
 	m_grid->setPen(gridPen);
 }

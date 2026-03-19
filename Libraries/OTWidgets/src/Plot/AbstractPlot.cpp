@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
+#include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/AbstractPlot.h"
 
 ot::AbstractPlot::AbstractPlot(PlotBase* _ownerPlot) :
@@ -26,6 +27,12 @@ ot::AbstractPlot::AbstractPlot(PlotBase* _ownerPlot) :
 {}
 
 ot::AbstractPlot::~AbstractPlot() {}
+
+const ot::Plot1DCfg& ot::AbstractPlot::getConfig() const {
+	const PlotBase* base = this->getOwner();
+	OTAssertNullptr(base);
+	return base->getConfig();
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -87,27 +94,3 @@ void ot::AbstractPlot::repaintPlotAxis(AbstractPlotAxis::AxisID _axis) {
 	this->getPlotAxis(_axis)->updateAxis();
 }
 
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Grid
-
-void ot::AbstractPlot::setPlotGridVisible(bool _isVisible, bool _repaint) {
-	m_config.setGridVisible(_isVisible);
-	if (_repaint) {
-		this->updateGrid();
-	}
-}
-
-void ot::AbstractPlot::setPlotGridColor(const Painter2D* _painter, bool _repaint) {
-	m_config.setGridColor(_painter->createCopy());
-	if (_repaint) {
-		this->updateGrid();
-	}
-}
-
-void ot::AbstractPlot::setPlotGridLineWidth(double _width, bool _repaint) {
-	m_config.setGridLineWidth(_width);
-	if (_repaint) {
-		this->updateGrid();
-	}
-}

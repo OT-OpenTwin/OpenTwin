@@ -58,7 +58,7 @@ ot::CartesianPlot::CartesianPlot(PlotBase* _owner, QWidget* _parent)
 
 	m_grid = new CartesianPlotGrid();
 	m_grid->attach(this);
-
+	
 	m_picker = new CartesianPlotPicker(this);
 }
 
@@ -71,8 +71,7 @@ ot::CartesianPlot::~CartesianPlot() {
 // Virtual methods
 
 void ot::CartesianPlot::updateWholePlot() {
-	this->getPlotAxis(AbstractPlotAxis::xBottom)->updateAxis();
-	this->getPlotAxis(AbstractPlotAxis::yLeft)->updateAxis();
+	updateAllAxes();
 
 	this->replot();
 
@@ -112,7 +111,9 @@ void ot::CartesianPlot::resetPlotView() {
 		}
 	}
 
-	const Plot1DCfg& cfg = this->getConfiguration();
+	PlotBase* base = this->getOwner();
+	OTAssertNullptr(base);
+	const Plot1DCfg& cfg = base->getConfig();
 
 	// If auto scale is disabled use the specified min max values for the axis
 	if (!cfg.getXAxisIsAutoScale()) {
@@ -132,13 +133,20 @@ void ot::CartesianPlot::resetPlotView() {
 	}
 }
 
+void ot::CartesianPlot::updateAllAxes()
+{
+	this->getPlotAxis(AbstractPlotAxis::xBottom)->updateAxis();
+	this->getPlotAxis(AbstractPlotAxis::yLeft)->updateAxis();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Grid
 
 void ot::CartesianPlot::updateGrid() {
-	if (this->getConfiguration().getGridVisible()) {
-		m_grid->setPen(QPen(QtFactory::toQBrush(this->getConfiguration().getGridColor()), this->getConfiguration().getGridLineWidth(), Qt::SolidLine));
+	const Plot1DCfg& cfg = this->getConfig();
+	if (cfg.getGridVisible()) {
+		m_grid->setPen(QPen(QtFactory::toQBrush(cfg.getGridColor()), cfg.getGridLineWidth(), Qt::SolidLine));
 	}
 	else {
 		m_grid->setPen(QColor(), 0.0, Qt::NoPen);

@@ -25,6 +25,7 @@
 namespace ot {
 
 	class PolarPlot;
+	class PlotScaleDraw;
 
 	class OT_WIDGETS_API_EXPORT PolarPlotAxis : public AbstractPlotAxis {
 		OT_DECL_NOCOPY(PolarPlotAxis)
@@ -37,6 +38,7 @@ namespace ot {
 
 	private:
 		PolarPlot* m_plot;
+		PlotScaleDraw* m_scaleDraw;
 	};
 
 }

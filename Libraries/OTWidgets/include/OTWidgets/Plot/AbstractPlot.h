@@ -53,11 +53,11 @@ namespace ot {
 
 		virtual Plot1DCfg::PlotType getPlotType() const = 0;
 
+		virtual void updateAllAxes() = 0;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Axis
-
-		void setPlotAxis(AbstractPlotAxis* _axisXBottom, AbstractPlotAxis* _axisXTop, AbstractPlotAxis* _axisYLeft, AbstractPlotAxis* _axisYRight);
 
 		AbstractPlotAxis* getPlotAxis(AbstractPlotAxis::AxisID _id);
 
@@ -75,25 +75,17 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		// Grid
-
-		void setPlotGridVisible(bool _isVisible, bool _repaint = true);
-
-		void setPlotGridColor(const Painter2D* _painter, bool _repaint = true);
-
-		void setPlotGridLineWidth(double _width, bool _repaint = true);
-
-		// ###########################################################################################################################################################################################################################################################################################################################
-
 		// Getter
 
 		PlotBase* getOwner() const { return m_owner; }
 
-		const Plot1DCfg& getConfiguration() const { return m_config; };
+		const Plot1DCfg& getConfig() const;
+
+	protected:
+		void setPlotAxis(AbstractPlotAxis* _axisXBottom, AbstractPlotAxis* _axisXTop, AbstractPlotAxis* _axisYLeft, AbstractPlotAxis* _axisYRight);
 
 	private:
 		PlotBase* m_owner;
-		Plot1DCfg m_config;
 
 		AbstractPlotAxis* m_axisXBottom;
 		AbstractPlotAxis* m_axisXTop;

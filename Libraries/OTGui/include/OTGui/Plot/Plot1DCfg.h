@@ -208,7 +208,7 @@ namespace ot {
 
 		bool m_gridVisible = true;
 		Painter2DContainer m_gridColor;
-		double m_gridWidth = 1.;
+		double m_gridWidth = .5;
 
 		bool m_showEntireMatrix = true;
 		int32_t m_showMatrixColumnEntry = 1;

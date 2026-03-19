@@ -24,6 +24,7 @@
 
 namespace ot {
 
+	class PlotScaleDraw;
 	class CartesianPlot;
 
 	class OT_WIDGETS_API_EXPORT CartesianPlotAxis : public AbstractPlotAxis {
@@ -33,10 +34,11 @@ namespace ot {
 		CartesianPlotAxis(AxisID _axisID, CartesianPlot* _plot);
 		virtual ~CartesianPlotAxis();
 
-		virtual void updateAxis(void) override;
+		virtual void updateAxis() override;
 
 	private:
 		CartesianPlot* m_plot;
+		PlotScaleDraw* m_scaleDraw;
 	};
 
 }

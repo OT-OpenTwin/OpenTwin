@@ -19,6 +19,8 @@
 
 // OpenTwin header
 #include "OTCore/Logging/LogDispatcher.h"
+#include "OTWidgets/Plot/PlotBase.h"
+#include "OTWidgets/Plot/PlotScaleDraw.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlot.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotAxis.h"
 
@@ -26,17 +28,20 @@
 #include <qwt_scale_engine.h>
 
 ot::CartesianPlotAxis::CartesianPlotAxis(AxisID _axisID, CartesianPlot* _plot) :
-	AbstractPlotAxis(_axisID), m_plot(_plot)
+	AbstractPlotAxis(_axisID), m_plot(_plot), m_scaleDraw(nullptr)
 {
 	OTAssertNullptr(m_plot);
 	m_plot->setAxisScaleEngine(this->getCartesianAxisID(), new QwtLinearScaleEngine());
+
+	m_scaleDraw = new PlotScaleDraw;
+	m_plot->setAxisScaleDraw(this->getCartesianAxisID(), m_scaleDraw);
 }
 
 ot::CartesianPlotAxis::~CartesianPlotAxis() {
 	
 }
 
-void ot::CartesianPlotAxis::updateAxis(void) {
+void ot::CartesianPlotAxis::updateAxis() {
 	m_plot->setAxisTitle(this->getCartesianAxisID(), this->getTitle());
 
 	if (this->getIsLogScale() && !this->getIsLogScaleSet()) {
@@ -56,4 +61,25 @@ void ot::CartesianPlotAxis::updateAxis(void) {
 		m_plot->setAxisScale(this->getCartesianAxisID(), this->getMin(), this->getMax());
 	}	
 
+	PlotBase* base = m_plot->getOwner();
+	OTAssertNullptr(base);
+	const Plot1DCfg& cfg = base->getConfig();
+	String::DisplayNumberFormat numberFormat = String::Auto;
+	int decimals = 3;
+
+	AbstractPlotAxis::AxisID axisId = getAxisID();
+	if (axisId == xBottom || axisId == xTop)
+	{
+		numberFormat = cfg.getXAxisDisplayNumberFormat();
+		decimals = cfg.getXAxisDisplayNumberPrecision();
+	}
+	else
+	{
+		numberFormat = cfg.getYAxisDisplayNumberFormat();
+		decimals = cfg.getYAxisDisplayNumberPrecision();
+	}
+
+	m_scaleDraw->setNumberFormat(numberFormat);
+	m_scaleDraw->setNumberPrecision(decimals);
+	m_scaleDraw->invalidateCache();
 }
