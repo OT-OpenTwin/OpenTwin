@@ -42,6 +42,7 @@ namespace ot {
 	class LineEdit;
 	class ComboBox;
 	class PushButton;
+	class InteractiveLabel;
 }
 
 class LogInDialog : public ot::Dialog {
@@ -119,8 +120,8 @@ private:
 	ot::Label* m_passwordConfirmLabel;
 	ot::LineEdit* m_passwordConfirm; // Register:Confirm, Change:Confirm
 	ot::CheckBox* m_savePassword;
-	ot::Label* m_toggleChangePasswordModeLabel;
-	ot::Label* m_toggleRegisterModeLabel;
+	ot::InteractiveLabel* m_toggleChangePasswordModeLabel;
+	ot::InteractiveLabel* m_toggleRegisterModeLabel;
 	ot::PushButton* m_logInButton;
 	ot::PushButton* m_changePasswordButton;
 	ot::PushButton* m_registerButton;

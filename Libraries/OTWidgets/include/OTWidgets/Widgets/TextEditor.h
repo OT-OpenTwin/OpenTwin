@@ -36,6 +36,7 @@ namespace ot {
 
 	class Label;
 	class TextEditor;
+	class InteractiveLabel;
 	class SyntaxHighlighter;
 	class TextEditorSearchPopup;
 	
@@ -181,8 +182,8 @@ namespace ot {
 		bool m_loadMoreLabelVisible;
 		QFrame* m_loadWidgets;
 		Label* m_spacerLabel;
-		Label* m_showMoreLabel;
-		Label* m_showAllLabel;
+		InteractiveLabel* m_showMoreLabel;
+		InteractiveLabel* m_showAllLabel;
 
 		size_t m_nextChunkStartIx;
 	};

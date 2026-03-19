@@ -28,6 +28,7 @@
 #include "OTWidgets/Widgets/LineEdit.h"
 #include "OTWidgets/Widgets/TextEditor.h"
 #include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/InteractiveLabel.h"
 #include "OTWidgets/Widgets/TextEditorSearchPopup.h"
 
 // Qt header
@@ -102,18 +103,18 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	QHBoxLayout* loadLayout = new QHBoxLayout(m_loadWidgets);
 	connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::slotUpdateLabelsPosition);
 
-	m_showMoreLabel = new Label("Load more...", this);
+	m_showMoreLabel = new InteractiveLabel("Load more...", this);
 	m_showMoreLabel->setObjectName("OT_TextEditor_ShowMoreLabel");
 	loadLayout->addWidget(m_showMoreLabel);
-	connect(m_showMoreLabel, &Label::mouseClicked, this, &TextEditor::slotShowMore);
+	connect(m_showMoreLabel, &InteractiveLabel::mouseClicked, this, &TextEditor::slotShowMore);
 
 	m_spacerLabel = new Label("   ", this);
 	loadLayout->addWidget(m_spacerLabel);
 
-	m_showAllLabel = new Label("Load all...", this);
+	m_showAllLabel = new InteractiveLabel("Load all...", this);
 	m_showAllLabel->setObjectName("OT_TextEditor_ShowAllLabel");
 	loadLayout->addWidget(m_showAllLabel);
-	connect(m_showAllLabel, &Label::mouseClicked, this, &TextEditor::slotShowAll);
+	connect(m_showAllLabel, &InteractiveLabel::mouseClicked, this, &TextEditor::slotShowAll);
 
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 

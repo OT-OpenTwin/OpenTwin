@@ -885,6 +885,23 @@ QLabel:disabled {
     color: %color:Widget Disabled Foreground%;
 }
 
+
+/* ##################################################################################### */
+
+/* Interactive label */
+
+ot--InteractiveLabel {
+    color:%color:Widget Foreground%;
+}
+
+ot--InteractiveLabel:hover {
+    color:%color:Widget Hover Background%;
+}
+
+ot--InteractiveLabel:pressed {
+    color:%color:Widget Selection Background%;
+}
+
 /* ##################################################################################### */
 
 /* QTextBrowser */
@@ -2349,21 +2366,6 @@ ot--TextEditorSearchPopup {
     background-color: %color:Title Background%;
     padding: 4px;
     border: 1px solid %color:Border Color%;
-}
-
-#OT_TextEditor_ShowMoreLabel,
-#OT_TextEditor_ShowAllLabel {
-    color:%color:Widget Foreground%;
-}
-
-#OT_TextEditor_ShowMoreLabel:hover,
-#OT_TextEditor_ShowAllLabel:hover {
-    color:%color:Widget Hover Background%;
-}
-
-#OT_TextEditor_ShowMoreLabel:pressed,
-#OT_TextEditor_ShowAllLabel:pressed {
-    color:%color:Widget Selection Background%;
 }
 
 #OT_TextEditor_LabelsFrame {

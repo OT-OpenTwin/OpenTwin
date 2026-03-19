@@ -891,6 +891,23 @@ QLabel:disabled {
     color: rgba(168,168,168,255);
 }
 
+
+/* ##################################################################################### */
+
+/* Interactive label */
+
+ot--InteractiveLabel {
+    color:rgba(0,0,0,255);
+}
+
+ot--InteractiveLabel:hover {
+    color:rgba(0,215,255,255);
+}
+
+ot--InteractiveLabel:pressed {
+    color:rgba(0,255,0,255);
+}
+
 /* ##################################################################################### */
 
 /* QTextBrowser */
@@ -2355,21 +2372,6 @@ ot--TextEditorSearchPopup {
     background-color: rgba(211,211,211,255);
     padding: 4px;
     border: 1px solid rgba(0,0,0,255);
-}
-
-#OT_TextEditor_ShowMoreLabel,
-#OT_TextEditor_ShowAllLabel {
-    color:rgba(0,0,0,255);
-}
-
-#OT_TextEditor_ShowMoreLabel:hover,
-#OT_TextEditor_ShowAllLabel:hover {
-    color:rgba(0,215,255,255);
-}
-
-#OT_TextEditor_ShowMoreLabel:pressed,
-#OT_TextEditor_ShowAllLabel:pressed {
-    color:rgba(0,255,0,255);
 }
 
 #OT_TextEditor_LabelsFrame {

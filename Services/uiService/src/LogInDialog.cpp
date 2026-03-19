@@ -37,6 +37,7 @@
 #include "OTWidgets/Widgets/ComboBox.h"
 #include "OTWidgets/Widgets/PushButton.h"
 #include "OTWidgets/Widgets/ImagePreview.h"
+#include "OTWidgets/Widgets/InteractiveLabel.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
@@ -168,22 +169,22 @@ LogInDialog::LogInDialog()
 	centralLayout->addLayout(registerLayout);
 
 	// ... Setup optional inputs (this section may be disabled when a registration is not allowed)
-	m_toggleRegisterModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToRegister, this);
+	m_toggleRegisterModeLabel = new InteractiveLabel(TOGGLE_MODE_LABEL_SwitchToRegister, this);
 	m_toggleRegisterModeLabel->setObjectName("LogInDialogRegisterLabel");
 	m_toggleRegisterModeLabel->setMargin(4);
 	registerLayout->addStretch(1);
 	registerLayout->addWidget(m_toggleRegisterModeLabel);
 	registerLayout->addStretch(1);
-	connect(m_toggleRegisterModeLabel, &Label::mouseClicked, this, &LogInDialog::slotToggleLogInAndRegisterMode);
+	connect(m_toggleRegisterModeLabel, &InteractiveLabel::mouseClicked, this, &LogInDialog::slotToggleLogInAndRegisterMode);
 
-	m_toggleChangePasswordModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToChangePassword, this);
+	m_toggleChangePasswordModeLabel = new InteractiveLabel(TOGGLE_MODE_LABEL_SwitchToChangePassword, this);
 	m_toggleChangePasswordModeLabel->setObjectName("LogInDialogChangePasswordLabel");
 	m_toggleChangePasswordModeLabel->setMargin(4);
 	m_toggleChangePasswordModeLabel->setVisible(false);
 	changePasswordLayout->addStretch(1);
 	changePasswordLayout->addWidget(m_toggleChangePasswordModeLabel);
 	changePasswordLayout->addStretch(1);
-	connect(m_toggleChangePasswordModeLabel, &Label::mouseClicked, this, &LogInDialog::slotToggleChangePasswordMode);
+	connect(m_toggleChangePasswordModeLabel, &InteractiveLabel::mouseClicked, this, &LogInDialog::slotToggleChangePasswordMode);
 	
 	// Setup window
 	QSize fixSize(350, m_maxDefaultHeight);

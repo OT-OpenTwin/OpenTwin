@@ -26,8 +26,8 @@
 #include "OTWidgets/Properties/PropertyGridItem.h"
 #include "OTWidgets/Properties/PropertyGridGroup.h"
 #include "OTWidgets/Properties/PropertyInputFactory.h"
-#include "OTWidgets/Widgets/Label.h"
 #include "OTWidgets/Widgets/TreeWidget.h"
+#include "OTWidgets/Widgets/InteractiveLabel.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>
@@ -44,7 +44,7 @@ ot::PropertyGridItem::PropertyGridItem(QWidget* _parent)
 	m_titleLabel->setObjectName("PropertyGridItemTitleLabel");
 	titleLayout->addWidget(m_titleLabel, 1);
 
-	m_deleteLabel = new Label(m_titleLayoutW);
+	m_deleteLabel = new InteractiveLabel(m_titleLayoutW);
 	m_deleteLabel->setObjectName("PropertyGridItemDeleteLabel");
 	m_deleteLabel->setHidden(true);
 	titleLayout->addWidget(m_deleteLabel);
@@ -52,7 +52,7 @@ ot::PropertyGridItem::PropertyGridItem(QWidget* _parent)
 	this->slotGlobalStyleChanged();
 
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridItem::slotGlobalStyleChanged);
-	this->connect(m_deleteLabel, &Label::mouseClicked, this, &PropertyGridItem::slotDeleteRequested);
+	this->connect(m_deleteLabel, &InteractiveLabel::mouseClicked, this, &PropertyGridItem::slotDeleteRequested);
 }
 
 ot::PropertyGridItem::~PropertyGridItem() {

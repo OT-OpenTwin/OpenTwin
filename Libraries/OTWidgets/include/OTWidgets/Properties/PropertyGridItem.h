@@ -37,6 +37,7 @@ namespace ot {
 	class Label;
 	class Property;
 	class PropertyInput;
+	class InteractiveLabel;
 	class PropertyGridGroup;
 
 	class OT_WIDGETS_API_EXPORT PropertyGridItem : public QObject, public TreeWidgetItem {
@@ -88,7 +89,7 @@ namespace ot {
 		PropertyGridGroup* m_parentGroup;
 
 		QWidget* m_titleLayoutW;
-		Label* m_deleteLabel;
+		InteractiveLabel* m_deleteLabel;
 		Label* m_titleLabel;
 
 		PropertyInput* m_input;
