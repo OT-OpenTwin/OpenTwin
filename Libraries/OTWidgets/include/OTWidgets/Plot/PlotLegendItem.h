@@ -44,6 +44,11 @@ namespace ot {
 		
 		PlotDataset* getDataset() const { return m_dataset; };
 
+	private Q_SLOTS:
+		void slotHovered();
+		void slotUnhovered();
+		void slotClicked(Qt::KeyboardModifiers _modifiers);
+
 	private:
 		PlotLegend* m_legend;
 		PlotDataset* m_dataset;

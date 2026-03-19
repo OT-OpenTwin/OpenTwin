@@ -12,12 +12,13 @@ class QWidget;
 
 namespace ot {
 	
-	class Label;
 	class Painter2D;
 	class Painter2DPreview;
+	class InteractiveLabel;
 
 	class OT_WIDGETS_API_EXPORT PlotLegendItemWidget : public QObject, public WidgetBase
 	{
+		Q_OBJECT
 		OT_DECL_NOCOPY(PlotLegendItemWidget)
 		OT_DECL_NOMOVE(PlotLegendItemWidget)
 	public:
@@ -30,11 +31,21 @@ namespace ot {
 		void setLabel(const QString& _text);
 		void setPainter(const ot::Painter2D* _painter);
 
+	Q_SIGNALS:
+		void hovered();
+		void unhovered();
+		void clicked(Qt::KeyboardModifiers _modifiers);
+
+	private Q_SLOTS:
+		void slotMouseEntered();
+		void slotMouseLeft();
+		void slotMouseClicked(Qt::KeyboardModifiers _modifiers);
+
 	private:
 		QWidget* m_rootWidget;
 
 		Painter2DPreview* m_colorPreview;
-		Label* m_label;
+		InteractiveLabel* m_label;
 
 	};
 }

@@ -31,6 +31,8 @@ namespace ot {
 		void addItem(PlotLegendItem* _item);
 		void removeItem(PlotLegendItem* _item);
 
+		PlotBase* getPlot() const { return m_plot; };
+
 	private:
 		friend class PlotLegendItem;
 

@@ -2,8 +2,8 @@
 
 // OpenTwin header
 #include "OTWidgets/Plot/PlotLegendItemWidget.h"
-#include "OTWidgets/Widgets/Label.h"
 #include "OTWidgets/Widgets/Painter2DPreview.h"
+#include "OTWidgets/Widgets/InteractiveLabel.h"
 
 // Qt header
 #include <QtWidgets/qwidget.h>
@@ -18,8 +18,12 @@ ot::PlotLegendItemWidget::PlotLegendItemWidget()
 	m_colorPreview->setFixedSize(10, 10);
 	layout->addWidget(m_colorPreview, 0);
 
-	m_label = new Label(m_rootWidget);
+	m_label = new InteractiveLabel(m_rootWidget);
 	layout->addWidget(m_label, 1);
+
+	connect(m_label, &InteractiveLabel::mouseEntered, this, &PlotLegendItemWidget::slotMouseEntered);
+	connect(m_label, &InteractiveLabel::mouseLeft, this, &PlotLegendItemWidget::slotMouseLeft);
+	connect(m_label, &InteractiveLabel::mouseDoubleClicked, this, &PlotLegendItemWidget::slotMouseClicked);
 }
 
 ot::PlotLegendItemWidget::~PlotLegendItemWidget()
@@ -36,4 +40,19 @@ void ot::PlotLegendItemWidget::setLabel(const QString& _text)
 void ot::PlotLegendItemWidget::setPainter(const ot::Painter2D* _painter)
 {
 	m_colorPreview->setFromPainter(_painter);
+}
+
+void ot::PlotLegendItemWidget::slotMouseEntered()
+{
+	Q_EMIT hovered();
+}
+
+void ot::PlotLegendItemWidget::slotMouseLeft()
+{
+	Q_EMIT unhovered();
+}
+
+void ot::PlotLegendItemWidget::slotMouseClicked(Qt::KeyboardModifiers _modifiers)
+{
+	Q_EMIT clicked(_modifiers);
 }

@@ -19,8 +19,8 @@ namespace ot {
 		virtual ~InteractiveLabel() {};
 
 	Q_SIGNALS:
-		void mouseClicked();
-		void mouseDoubleClicked();
+		void mouseClicked(Qt::KeyboardModifiers _keyboardModifiers);
+		void mouseDoubleClicked(Qt::KeyboardModifiers _keyboardModifiers);
 		void mouseEntered();
 		void mouseLeft();
 

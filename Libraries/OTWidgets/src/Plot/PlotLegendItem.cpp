@@ -2,6 +2,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
+#include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/PlotLegend.h"
 #include "OTWidgets/Plot/PlotDataset.h"
 #include "OTWidgets/Plot/PlotLegendItem.h"
@@ -17,6 +18,14 @@ ot::PlotLegendItem::PlotLegendItem(PlotDataset* _dataset)
 	m_selectedWidget = new PlotLegendItemWidget;
 	m_dimmedWidget = new PlotLegendItemWidget;
 	m_dimmedWidget->getQWidget()->setVisible(false);
+
+	connect(m_selectedWidget, &PlotLegendItemWidget::hovered, this, &PlotLegendItem::slotHovered);
+	connect(m_selectedWidget, &PlotLegendItemWidget::unhovered, this, &PlotLegendItem::slotUnhovered);
+	connect(m_selectedWidget, &PlotLegendItemWidget::clicked, this, &PlotLegendItem::slotClicked);
+
+	connect(m_dimmedWidget, &PlotLegendItemWidget::hovered, this, &PlotLegendItem::slotHovered);
+	connect(m_dimmedWidget, &PlotLegendItemWidget::unhovered, this, &PlotLegendItem::slotUnhovered);
+	connect(m_dimmedWidget, &PlotLegendItemWidget::clicked, this, &PlotLegendItem::slotClicked);
 }
 
 ot::PlotLegendItem::~PlotLegendItem()
@@ -97,4 +106,25 @@ void ot::PlotLegendItem::detach()
 	{
 		m_legend->removeItem(this);
 	}
+}
+
+void ot::PlotLegendItem::slotHovered()
+{
+
+}
+
+void ot::PlotLegendItem::slotUnhovered()
+{
+
+}
+
+void ot::PlotLegendItem::slotClicked(Qt::KeyboardModifiers _modifiers)
+{
+	OTAssertNullptr(m_legend);
+	OTAssertNullptr(m_dataset);
+
+	PlotBase* plot = m_legend->getPlot();
+	OTAssertNullptr(plot);
+
+	plot->requestCurveDoubleClicked(m_dataset->getEntityID(), _modifiers.testFlag(Qt::ControlModifier));
 }
