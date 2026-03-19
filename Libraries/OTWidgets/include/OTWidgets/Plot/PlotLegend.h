@@ -36,7 +36,8 @@ namespace ot {
 
 		PlotBase* m_plot;
 		QWidget* m_rootWidget;
-		QVBoxLayout* m_itemLayout;
+		QVBoxLayout* m_selectedLayout;
+		QVBoxLayout* m_dimmedLayout;
 
 		std::list<PlotLegendItem*> m_items;
 	};

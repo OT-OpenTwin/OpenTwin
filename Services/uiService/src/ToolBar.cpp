@@ -284,6 +284,7 @@ bool ToolBar::triggerToolBarButton(ot::UID _buttonId) {
 		OT_LOG_E("Button with UID " + std::to_string(_buttonId) + " not found or not a tool button");
 		return false;
 	}
+
 }
 
 bool ToolBar::triggerToolBarButton(const QString& _buttonPath) 

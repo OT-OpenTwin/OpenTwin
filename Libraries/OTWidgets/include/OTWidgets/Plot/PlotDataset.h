@@ -142,14 +142,15 @@ namespace ot {
 	private:
 		std::string m_curveNameBase = "";
 
-		void createLegendItem();
 		void buildCartesianCurve();
 		void buildPolarCurve();
+		void createLegendItem();
+		void updateLegendVisualization();
 
 		PlotBase* m_ownerPlot = nullptr;
 
 		bool m_isAttatched = false;
-		bool m_isSelected = false;
+		bool m_isSelected = true;
 		
 		PlotDatasetData m_data;
 		

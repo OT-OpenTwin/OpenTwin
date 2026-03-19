@@ -187,6 +187,15 @@ ot::PolarPlotDatasetData* ot::PlotDatasetData::getPolarAccessor() {
 	return m_polarAccessor;
 }
 
+void ot::PlotDatasetData::resetCachedRect() {
+	if (m_cartesianAccessor) {
+		m_cartesianAccessor->resetCachedRect();
+	}
+	if (m_polarAccessor) {
+		m_polarAccessor->resetCachedRect();
+	}
+}
+
 double ot::PlotDatasetData::scaledValue(double _value, const Plot1DAxisCfg::QuantityScaling& _scaling) const
 {
 	double result = _value;

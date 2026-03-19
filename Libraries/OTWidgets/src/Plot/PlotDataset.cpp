@@ -36,6 +36,9 @@
 // Qwt header
 #include <qwt_symbol.h>
 
+// Qt header
+#include <QtCore/qthread.h>
+
 QwtSymbol::Style ot::PlotDataset::toQwtSymbolStyle(Plot1DCurveCfg::Symbol _symbol) {
 	switch (_symbol) {
 	case ot::Plot1DCurveCfg::NoSymbol: return QwtSymbol::Style::NoSymbol;
@@ -146,6 +149,7 @@ void ot::PlotDataset::attach() {
 	createLegendItem();
 	OTAssertNullptr(m_legendItem);
 	m_legendItem->attach();
+	updateLegendVisualization();
 }
 
 void ot::PlotDataset::detach() {
@@ -324,8 +328,6 @@ ot::PolarPlotCurve* ot::PlotDataset::getPolarCurve() {
 // Data Setter / Getter
 
 void ot::PlotDataset::updateCurveVisualization() {
-	createLegendItem();
-
 	PenFCfg linePenCfg(m_config.getLinePen());
 	const PenFCfg& pointOutlinePenCfg = m_config.getPointOutlinePen();
 
@@ -345,8 +347,6 @@ void ot::PlotDataset::updateCurveVisualization() {
 	QPen outlinePen = linePen;
 	outlinePen.setBrush(cs.getValue(ColorStyleValueEntry::PlotCurveHighlight).toBrush());
 	outlinePen.setWidthF(linePen.width() * 3.);
-
-	const Painter2D* legendPainter = nullptr;
 
 	// Setup outline
 	if (m_isSelected) {
@@ -376,8 +376,6 @@ void ot::PlotDataset::updateCurveVisualization() {
 			if (m_polarCurve) {
 				m_polarCurve->setPen(dimmedPen);
 			}
-
-			legendPainter = dimmedColorValue.painter();
 		}
 		else {
 			// Regular curve pen
@@ -386,13 +384,7 @@ void ot::PlotDataset::updateCurveVisualization() {
 			}
 			if (m_polarCurve) {
 				m_polarCurve->setPen(linePen);
-			}
-
-			if (linePenCfg.getStyle() != LineStyle::NoLine)
-			{
-				legendPainter = m_config.getLinePen().getPainter();
-			}
-			
+			}			
 		}
 	}
 	else {
@@ -432,10 +424,6 @@ void ot::PlotDataset::updateCurveVisualization() {
 				m_polarCurvePointSymbol->setPen(pointOutlinePen);
 				m_polarCurvePointSymbol->setBrush(pointOutlineFillBrush);
 			}
-
-			if (legendPainter == nullptr) {
-				legendPainter = m_config.getPointFillPainter();
-			}
 		}
 
 		// Symbol
@@ -468,23 +456,10 @@ void ot::PlotDataset::updateCurveVisualization() {
 		m_polarCurve->setPointInterval(m_config.getPointInterval());
 	}
 
-	// Update legend item
-	OTAssertNullptr(m_legendItem);
-	m_legendItem->setLabel(QString::fromStdString(m_config.getTitle()));
-	if (legendPainter)
-	{
-		m_legendItem->setPainter(legendPainter);
-	}
-}
+	m_data.resetCachedRect();
 
-void ot::PlotDataset::createLegendItem()
-{
-	if (!m_legendItem)
-	{
-		m_legendItem = new PlotLegendItem;
-		m_legendItem->setLabel(QString::fromStdString(m_config.getEntityName()));
-		m_legendItem->setPainter(m_config.getLinePen().getPainter());
-	}
+	// Update/Create legend item
+	updateLegendVisualization();
 }
 
 void ot::PlotDataset::buildCartesianCurve() {
@@ -509,4 +484,39 @@ void ot::PlotDataset::buildPolarCurve() {
 		m_polarCurve->setSymbol(m_polarCurvePointSymbol);
 		m_polarCurve->setData(m_data.getPolarAccessor());
 	}
+}
+
+void ot::PlotDataset::createLegendItem()
+{
+	if (!m_legendItem)
+	{
+		if (!m_ownerPlot)
+		{
+			OT_LOG_E("Can not create legend item without owner set");
+			return;
+		}
+		else if (QThread::currentThread() != m_ownerPlot->thread()) {
+			OT_LOG_E("Can not create legend item from non main gui thread");
+			return;
+		}
+
+		m_legendItem = new PlotLegendItem(this);
+		m_legendItem->setLegend(m_ownerPlot->getLegend());
+		m_legendItem->setLabel(QString::fromStdString(m_config.getEntityName()));
+	}
+}
+
+void ot::PlotDataset::updateLegendVisualization()
+{
+	if (!m_legendItem) {
+		return;
+	}
+
+	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
+	const ColorStyleValue& dimmedColorValue = cs.getValue(ColorStyleValueEntry::PlotCurveDimmed);
+
+	m_legendItem->setLabel(QString::fromStdString(m_config.getEntityName()));
+	m_legendItem->setSelectedPainter(m_config.getLinePen().getPainter());
+	m_legendItem->setDimmedPainter(dimmedColorValue.painter());
+	m_legendItem->updateVisibility();
 }

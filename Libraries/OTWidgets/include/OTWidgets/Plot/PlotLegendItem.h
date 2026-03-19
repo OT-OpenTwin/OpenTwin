@@ -12,37 +12,45 @@ class QWidget;
 
 namespace ot {
 
-	class Label;
 	class Painter2D;
 	class PlotLegend;
-	class Painter2DPreview;
+	class PlotDataset;
+	class PlotLegendItemWidget;
 
 	class OT_WIDGETS_API_EXPORT PlotLegendItem : public QObject {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PlotLegendItem)
 		OT_DECL_NOMOVE(PlotLegendItem)
+		OT_DECL_NODEFAULT(PlotLegendItem)
 	public:
-		explicit PlotLegendItem();
+		explicit PlotLegendItem(PlotDataset* _dataset);
 		virtual ~PlotLegendItem();
 
-		QWidget* getItemWidget() const { return m_itemWidget; };
+		QWidget* getSelectedWidget() const;
+		QWidget* getDimmedWidget() const;
+
+		void updateVisibility();
 
 		void setLegend(PlotLegend* _legend) { m_legend = _legend; };
 		PlotLegend* getLegend() const { return m_legend; };
 		void forgetLegend() { m_legend = nullptr; };
 
 		void setLabel(const QString& _text);
-		void setPainter(const ot::Painter2D* _painter);
+		void setSelectedPainter(const ot::Painter2D* _painter);
+		void setDimmedPainter(const ot::Painter2D* _painter);
 
 		void attach();
 		void detach();
+		
+		PlotDataset* getDataset() const { return m_dataset; };
 
 	private:
 		PlotLegend* m_legend;
+		PlotDataset* m_dataset;
 
-		QWidget* m_itemWidget;
-		Label* m_label;
-		Painter2DPreview* m_colorPreview;
+		PlotLegendItemWidget* m_selectedWidget;
+		PlotLegendItemWidget* m_dimmedWidget;
+
 	};
 
 }

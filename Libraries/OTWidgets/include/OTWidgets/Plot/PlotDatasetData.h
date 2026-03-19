@@ -102,6 +102,8 @@ namespace ot {
 
 		constexpr bool canConvert() const { return m_canConvert; };
 
+		void resetCachedRect();
+
 	private:
 		friend class PlotSeriesData<QPointF>;
 		friend class PlotSeriesData<QwtPointPolar>;

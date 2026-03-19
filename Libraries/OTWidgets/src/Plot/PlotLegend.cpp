@@ -4,6 +4,7 @@
 #include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/PlotLegend.h"
+#include "OTWidgets/Plot/PlotDataset.h"
 #include "OTWidgets/Plot/PlotLegendItem.h"
 
 // Qt header
@@ -12,7 +13,7 @@
 #include <QtWidgets/qscrollarea.h>
 
 ot::PlotLegend::PlotLegend(PlotBase* _plot, QWidget* _parentWidget)
-	: m_plot(_plot), m_rootWidget(nullptr), m_itemLayout(nullptr)
+	: m_plot(_plot)
 {
 	m_rootWidget = new QWidget(_parentWidget);
 	QVBoxLayout* rootLayout = new QVBoxLayout(m_rootWidget);
@@ -26,8 +27,12 @@ ot::PlotLegend::PlotLegend(PlotBase* _plot, QWidget* _parentWidget)
 	QVBoxLayout* entriesContainerLayout = new QVBoxLayout(entriesWidget);
 	entriesContainerLayout->setContentsMargins(0, 0, 0, 0);
 
-	m_itemLayout = new QVBoxLayout;
-	entriesContainerLayout->addLayout(m_itemLayout, 0);
+	m_selectedLayout = new QVBoxLayout;
+	entriesContainerLayout->addLayout(m_selectedLayout, 0);
+
+	m_dimmedLayout = new QVBoxLayout;
+	entriesContainerLayout->addLayout(m_dimmedLayout, 0);
+
 	entriesContainerLayout->addStretch(1);
 		
 	scrollArea->setWidget(entriesWidget);
@@ -57,13 +62,20 @@ void ot::PlotLegend::addItem(PlotLegendItem* _item)
 
 	_item->setLegend(this);
 	m_items.push_back(_item);
-	m_itemLayout->addWidget(_item->getItemWidget(), 0);
+
+	PlotDataset* dataset = _item->getDataset();
+	if (!dataset)
+	{
+		OT_LOG_EAS("Legend item has no dataset");
+		return;
+	}
+
+	m_selectedLayout->addWidget(_item->getSelectedWidget(), 0);
+	m_dimmedLayout->addWidget(_item->getDimmedWidget(), 0);
 }
 
 void ot::PlotLegend::removeItem(PlotLegendItem* _item)
 {
-	_item->forgetLegend();
-
 	auto it = std::find(m_items.begin(), m_items.end(), _item);
 	if (it == m_items.end())
 	{
@@ -71,6 +83,10 @@ void ot::PlotLegend::removeItem(PlotLegendItem* _item)
 	}
 
 	m_items.erase(it);
-	m_itemLayout->removeWidget(_item->getItemWidget());
-	_item->getItemWidget()->setParent(nullptr);
+	
+	m_selectedLayout->removeWidget(_item->getSelectedWidget());
+	_item->getSelectedWidget()->setParent(nullptr);
+
+	m_dimmedLayout->removeWidget(_item->getDimmedWidget());
+	_item->getDimmedWidget()->setParent(nullptr);
 }
