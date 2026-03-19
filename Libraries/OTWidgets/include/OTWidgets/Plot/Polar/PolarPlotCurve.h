@@ -50,6 +50,13 @@ namespace ot {
 		void setPointInterval(int _interval) { m_pointInterval = _interval; };
 		int getPointInterval() const { return m_pointInterval; };
 
+	protected:
+		virtual void drawCurve(QPainter* _painter, int _style, const QwtScaleMap& _azimuthMap, const QwtScaleMap& _radialMap, const QPointF& _pole, int _from, int _to) const override;
+
+		virtual void drawSymbols(QPainter* _painter, const QwtSymbol& _symbol, const QwtScaleMap& _azimuthMap, const QwtScaleMap& _radialMap, const QPointF& _pole, int _from, int _to) const override;
+
+		virtual void drawLines(QPainter* _painter, const QwtScaleMap& _azimuthMap, const QwtScaleMap& _radialMap, const QPointF& _pole, int _from, int _to) const override;
+
 	private:
 		QPen m_highlightPen;
 		bool m_hasHighlight;
