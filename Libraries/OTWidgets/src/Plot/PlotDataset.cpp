@@ -359,7 +359,7 @@ void ot::PlotDataset::updateCurveVisualization() {
 
 	QPen highlightPen = linePen;
 	highlightPen.setBrush(cs.getValue(ColorStyleValueEntry::PlotCurveHighlight).toBrush());
-	highlightPen.setWidthF(linePen.width() * 3.);
+	highlightPen.setWidthF(linePen.width() + 6.);
 
 	if (m_cartesianCurve)
 	{

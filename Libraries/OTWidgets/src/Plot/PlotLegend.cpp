@@ -28,9 +28,11 @@ ot::PlotLegend::PlotLegend(PlotBase* _plot, QWidget* _parentWidget)
 	entriesContainerLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_selectedLayout = new QVBoxLayout;
+	m_selectedLayout->setContentsMargins(0, 0, 0, 0);
 	entriesContainerLayout->addLayout(m_selectedLayout, 0);
 
 	m_dimmedLayout = new QVBoxLayout;
+	m_dimmedLayout->setContentsMargins(0, 0, 0, 0);
 	entriesContainerLayout->addLayout(m_dimmedLayout, 0);
 
 	entriesContainerLayout->addStretch(1);

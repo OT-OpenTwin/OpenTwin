@@ -12,7 +12,9 @@
 ot::PlotLegendItemWidget::PlotLegendItemWidget()
 {
 	m_rootWidget = new QWidget;
+	m_rootWidget->setContentsMargins(0, 0, 0, 0);
 	QHBoxLayout* layout = new QHBoxLayout(m_rootWidget);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	m_colorPreview = new Painter2DPreview(m_rootWidget);
 	m_colorPreview->setFixedSize(10, 10);
