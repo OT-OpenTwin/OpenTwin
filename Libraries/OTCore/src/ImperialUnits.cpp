@@ -2,6 +2,12 @@
 
 using namespace ot;
 
+ImperialUnits& ImperialUnits::instance()
+{
+    static ImperialUnits INSTANCE;
+    return INSTANCE;
+}
+
 ot::ImperialUnits::ImperialUnits()
 {
     auto helper = [](std::string _sym, std::string _name, std::string _set, Dimension _dim, double _scale = 1., double _offset = 0.) {

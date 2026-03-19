@@ -8,7 +8,7 @@
 #include "OTResultDataAccess/QuantityContainer.h"
 #include "OTCore/Tuple/TupleFactory.h"
 #include <tuple>
-
+#include "ValueProcessingChainBuilder.h"
 void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 {
 	m_collectionName = _collectionName;
@@ -381,6 +381,7 @@ BsonViewOrValue DataLakeAccessor::generateSeriesQuery()
 std::list<BsonViewOrValue> DataLakeAccessor::generateParameterQueries()
 {
 	AdvancedQueryBuilder builder;
+	ValueProcessingChainBuilder chainBuilder;
 
 	std::list<BsonViewOrValue> comparisons;
 	for (ot::QueryDescription& queryDescription : m_queryDescriptionsParameters)
@@ -388,6 +389,14 @@ std::list<BsonViewOrValue> DataLakeAccessor::generateParameterQueries()
 		ot::ValueComparisonDescription selectedQuery = queryDescription.getValueComparisonDescription();
 		if (!selectedQuery.getComparator().empty() && !selectedQuery.getValue().empty() && !selectedQuery.getName().empty())
 		{
+			auto unitsTarget = selectedQuery.getTupleInstance().getTupleUnits();
+			auto unitsCurrent = queryDescription.getQueryTargetDescription().getTupleInstance().getTupleUnits();
+			assert(unitsCurrent.size() == unitsTarget.size() == 1); //Parameter are suppose to be single
+			ValueProcessing processingChain = chainBuilder.build(unitsCurrent[0], unitsTarget[0]);
+			if (processingChain.executionNecessary())
+			{
+				selectedQuery.getValue();
+			}
 			const std::string fieldName = queryDescription.getQueryTargetDescription().getMongoDBFieldName();
 			selectedQuery.setName(fieldName);
 			BsonViewOrValue comparison = builder.createComparison(selectedQuery);

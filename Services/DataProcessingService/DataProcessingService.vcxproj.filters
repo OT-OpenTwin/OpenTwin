@@ -116,6 +116,21 @@
     <ClCompile Include="src\ValueProcessorAdd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\UnitTokenizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ValueProcessingChainBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ValueProcessorPow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ValueProcessorLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ValueProcessorMultiply.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -203,6 +218,21 @@
       <Filter>Header Files\ValueProcessing</Filter>
     </ClInclude>
     <ClInclude Include="include\ValueProcessorLog.h">
+      <Filter>Header Files\ValueProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UnitTokenizer.h">
+      <Filter>Header Files\ValueProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UnitToken.h">
+      <Filter>Header Files\ValueProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ValueProcessingChainBuilder.h">
+      <Filter>Header Files\ValueProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResolvedToken.h">
+      <Filter>Header Files\ValueProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ValueProcessorPow.h">
       <Filter>Header Files\ValueProcessing</Filter>
     </ClInclude>
   </ItemGroup>

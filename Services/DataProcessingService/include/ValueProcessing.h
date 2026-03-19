@@ -17,10 +17,15 @@ class ValueProcessing
 public:
 	ot::Variable executeSequence(const ot::Variable& _input);
 	void setSequence(const std::string& _jsonSerialisedSequence);
+	void setSequence(std::list<std::unique_ptr<ValueProcessor>>&& _sequence);
+	bool executionNecessary() { return m_processors.size() > 0; }
 private:
 	ValueProcessor* m_startProcessor;
 	std::list<std::unique_ptr<ValueProcessor>> m_processors;
 };
+
+
+
 
 
 //target = "m/s", unit = "km/h" -> bool processible = parse(unit, target) -> ValueProcessor::Linear(1000), ValueProcessor::Linear(1/3600)

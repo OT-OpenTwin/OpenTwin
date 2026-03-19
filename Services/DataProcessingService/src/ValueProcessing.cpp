@@ -19,3 +19,8 @@ void ValueProcessing::setSequence(const std::string& _jsonSerialisedSequence)
 {
 
 }
+
+void ValueProcessing::setSequence(std::list<std::unique_ptr<ValueProcessor>>&& _sequence)
+{
+	m_processors = std::move(_sequence);
+}

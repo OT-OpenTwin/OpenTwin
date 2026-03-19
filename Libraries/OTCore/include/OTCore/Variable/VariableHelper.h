@@ -3,10 +3,11 @@
 // OpenTwin header
 #include "OTCore/Variable/Variable.h"
 #include "OTCore/Serializable.h"
+#include "OTCore/CoreAPIExport.h"
 
 namespace ot {
 
-	class VariableHelper
+	class OT_CORE_API_EXPORT VariableHelper
 	{
 	public:
 		template <typename Op>
@@ -83,7 +84,7 @@ namespace ot {
 				});
 		}
 
-		ot::Variable sqrt(const ot::Variable& _variable) 
+		static ot::Variable sqrt(const ot::Variable& _variable) 
 		{
 			return applyUnaryOp(_variable, [](auto v) -> ot::Variable
 				{
@@ -91,7 +92,7 @@ namespace ot {
 				});
 		}
 
-		ot::Variable pow(const ot::Variable& _base, double _exponent) const
+		static ot::Variable pow(const ot::Variable& _base, double _exponent) 
 		{
 			return applyNumericOp(_base, _exponent, [](auto base, auto exp) -> ot::Variable
 				{

@@ -1,14 +1,12 @@
 ﻿#pragma once
 #include "ValueProcessor.h"
-
-class ValueProcessorLog : public ValueProcessor
+class ValueProcessorPow : public ValueProcessor
 {
 public:
-	ValueProcessorLog(double _multiplier, double _base);
+	ValueProcessorPow(double _multiplier, double _exp);
 	ot::Variable execute(const ot::Variable& _input) override;
 	
 private:
 	const double m_multiplier;
-	const double m_base;
-
+	const double m_exponent;
 };

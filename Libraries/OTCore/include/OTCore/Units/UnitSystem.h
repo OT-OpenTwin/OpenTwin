@@ -4,6 +4,8 @@
 #include <string>
 #include "OTCore/Units/ResolvedComponent.h"
 #include "OTCore/CoreAPIExport.h"
+#pragma warning(disable:4251)
+
 
 namespace ot
 {
@@ -11,27 +13,7 @@ namespace ot
 	{
 	public:
 		virtual std::string getSystemName() { return ""; }
-		virtual std::optional<ResolvedComponent> resolve(const std::string& _symbol) const
-		{
-            // 1. Try full symbol as a registered unit first (e.g. "km" if registered)
-            if (auto unit = m_registry.findUnit(_symbol))
-            {
-                return ResolvedComponent{ {"", "identity", 1.0}, *unit };
-            }
-            // 2. Greedy longest-prefix match
-            for (const auto& pfx : m_registry.getPrefixes()) {
-                if (_symbol.size() > pfx.m_symbol.size() &&
-                    _symbol.substr(0, pfx.m_symbol.size()) == pfx.m_symbol)
-                {
-                    auto rest = _symbol.substr(pfx.m_symbol.size());
-                    if (auto unit = m_registry.findUnit(rest))
-                    {
-                        return ResolvedComponent{ pfx, *unit };
-                    }
-                }
-            }
-            return std::nullopt;
-		}
+        virtual std::optional<ResolvedComponent> resolve(const std::string& _symbol) const;
 
         // Dimension shorthands for the base quantities
         static constexpr Dimension DIMLESS{};

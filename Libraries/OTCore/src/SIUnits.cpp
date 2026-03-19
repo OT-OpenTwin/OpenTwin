@@ -26,7 +26,6 @@ SIUnits::SIUnits()
         {"d",  "deci",  1e-1},
         {"c",  "centi", 1e-2},
         {"m",  "milli", 1e-3},
-        {"µ",  "micro", 1e-6},
         {"u",  "micro", 1e-6},
         {"n",  "nano",  1e-9},
         {"p",  "pico",  1e-12},
@@ -39,12 +38,12 @@ SIUnits::SIUnits()
         m_registry.addPrefix({ sym, name, fac });
     }
 
-    auto helper = [](std::string _sym, std::string _name, std::string _set, Dimension _dim, double _scale = 1., double _offset = 0.) {
-            return UnitDescriptor{ _sym, _name, _set, _dim, _scale, _offset };
+    auto helper = [](std::string _sym, std::string _name, std::string _set, Dimension _dim, double _scale = 1., double _offset = 0., UnitKind _unitKind = UnitKind::Linear) {
+            return UnitDescriptor{ _sym, _name, _set, _dim, _scale, _offset,_unitKind };
         };
 
     // --- SI Base Units ---
-    m_registry.addUnit(helper("m", "metre", "SI", LEN));
+    m_registry.addUnit(helper("m", "meter", "SI", LEN));
     m_registry.addUnit(helper("g", "gram", "SI", MASS, 1e-3));  // base is kg
     m_registry.addUnit(helper("s", "second", "SI", TIME));
     m_registry.addUnit(helper("A", "ampere", "SI", CURR));
@@ -68,5 +67,12 @@ SIUnits::SIUnits()
 
     // --- Affine Temperature (SI-adjacent) ---
     m_registry.addUnit(helper("degC", "celsius", "SI", TEMP, 1.0, 273.15));
+
+    // dB for amplitude ratios (S-parameters, voltage, field quantities)
+    m_registry.addUnit(helper( "dB",  "decibel", "SI", Dimension{}, 1.0, 0.0, UnitKind::LogAmplitude ));
+
+    // dBm: dB relative to 1 mW — power, so 10*log10
+    m_registry.addUnit(helper( "dBm", "decibel-milliwatt", "SI", Dimension{}, 1.0, 0.0, UnitKind::LogPower ));
+
 }
 

@@ -3,8 +3,11 @@
 namespace ot
 {
     struct ResolvedComponent {
-            PrefixDescriptor prefix;   // factor=1, symbol="" if no prefix
-            UnitDescriptor   base;
- 
+            PrefixDescriptor m_prefix;   // factor=1, symbol="" if no prefix
+            UnitDescriptor   m_base;
+            double   totalScale() const 
+            {
+                return m_prefix.m_factor * m_base.toSIScale;
+            }
         };
 }
