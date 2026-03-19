@@ -2010,7 +2010,7 @@ void Model::executeAction(ot::UID _buttonID) {
 	ViewerToolBar::ButtonType button = ViewerToolBar::instance().getButtonTypeFromUID(_buttonID);
 	switch (button) {
 	case ViewerToolBar::Reset3DViewButton: resetAllViews3D(); break;
-	case ViewerToolBar::ShowAllButton: showAllSceneNodesAction(); break;
+	case ViewerToolBar::ShowGeometryButton: showGeometrySceneNodesAction(); break;
 	case ViewerToolBar::ShowSelectedButton: showSelectedSceneNodesAction(); break;
 	case ViewerToolBar::HideSelectedButton: hideSelectedSceneNodesAction(); break;
 	case ViewerToolBar::HideUnselectedButton: hideUnselectedSceneNodesAction(); break;
@@ -2038,19 +2038,53 @@ void Model::executeAction(ot::UID _buttonID) {
 	refreshAllViews();
 }
 
-void Model::showAllSceneNodesAction()
+void Model::showGeometrySceneNodesAction()
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
 	std::string projectName;
 
-	getPrefetchForAllSceneNodes(m_sceneNodesRoot, projectName, prefetchIDs);
+	// Define the folders which contain geometry and therefore should be shown
+	std::list<std::string> geometryFolders = { "Geometry", "Terminals" };
+
+	// Get a map of all top level folders
+	std::map<SceneNodeBase*, bool> topLevelFoldersToHide;
+	for (auto topLevel : m_sceneNodesRoot->getChildren())
+	{
+		topLevelFoldersToHide[topLevel] = true;
+	}
+
+	std::list<SceneNodeBase*> rootSceneNodes;
+	for (auto item : geometryFolders)
+	{
+		SceneNodeBase* itemNode = getSceneNodeByEntityName(item);
+		if (itemNode != nullptr)
+		{
+			topLevelFoldersToHide[itemNode] = false;
+
+			rootSceneNodes.push_back(itemNode);
+			getPrefetchForAllSceneNodes(itemNode, projectName, prefetchIDs);
+		}
+	}
 
 	if (!prefetchIDs.empty())
 	{
 		DataBase::instance().prefetchDocumentsFromStorage(prefetchIDs);
 	}
 
-	showAllSceneNodes(m_sceneNodesRoot);
+	for (auto item : rootSceneNodes)
+	{
+		showAllSceneNodes(item);
+	}
+
+	// Now we hide all other folders
+	for (auto item : topLevelFoldersToHide)
+	{
+		if (item.second)
+		{
+			hideAllSceneNodes(item.first);
+		}
+	}
+	
 	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
 }
 
@@ -3553,9 +3587,21 @@ void Model::updateVTKNode(ot::UID _entityID, const std::string &projectName, uns
 	vtkNode->updateVTKNode(projectName, visualizationDataID, visualizationDataVersion, colorRampData, unit);
 }
 
-SceneNodeBase* Model::getSceneNodeByEntityID(ot::UID _modelEntityID) const {
+SceneNodeBase* Model::getSceneNodeByEntityID(ot::UID _modelEntityID) const 
+{
 	const auto it = m_modelItemToSceneNodesMap.find(_modelEntityID);
 	if (it != m_modelItemToSceneNodesMap.end()) {
+		return it->second;
+	}
+	else {
+		return nullptr;
+	}
+}
+
+SceneNodeBase* Model::getSceneNodeByEntityName(const std::string& _entityName) const 
+{
+	const auto it = m_nameToSceneNodesMap.find(_entityName);
+	if (it != m_nameToSceneNodesMap.end()) {
 		return it->second;
 	}
 	else {

@@ -109,6 +109,7 @@ public:
 	void updateVTKNode(ot::UID _entityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion, const std::string& colorRampData, const std::string& unit);
 
 	SceneNodeBase* getSceneNodeByEntityID(ot::UID _modelEntityID) const;
+	SceneNodeBase* getSceneNodeByEntityName(const std::string &_entityName) const;
 
 	void setEntityName(ot::UID _modelEntityID, const std::string& _newName);
 	std::string getEntityName(ot::UID _modelEntityID) const;
@@ -258,7 +259,7 @@ private:
 	void	   endCurrentSelectionMode(bool cancelled);
 	SceneNodeGeometry *createNewGeometryNode(const ot::EntityTreeItem& _treeItem, bool _isHidden, bool _manageParentVisibility, bool _manageChildVisibility);
 	void       setItemVisibleState(SceneNodeBase* _item, bool _visible);
-	void	   showAllSceneNodesAction();
+	void	   showGeometrySceneNodesAction();
 	void	   showSelectedSceneNodesAction();
 	void	   hideSelectedSceneNodesAction();
 	void	   hideUnselectedSceneNodesAction();

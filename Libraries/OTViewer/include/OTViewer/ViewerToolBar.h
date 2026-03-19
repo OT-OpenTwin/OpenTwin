@@ -29,7 +29,7 @@ class ViewerToolBar {
 public:
 	enum ButtonType : ot::UID {
 		Reset3DViewButton,
-		ShowAllButton,
+		ShowGeometryButton,
 		ShowSelectedButton,
 		HideSelectedButton,
 		HideUnselectedButton,
@@ -85,7 +85,7 @@ private:
 	ot::UID m_visiblityGroupID;
 	ot::UID m_styleGroupID;
 	ot::UID m_resetView3DButtonID;
-	ot::UID m_showAllButtonID;
+	ot::UID m_showGeometryButtonID;
 	ot::UID m_showSelectedButtonID;
 	ot::UID m_hideSelectedButtonID;
 	ot::UID m_hideUnselectedButtonID;
