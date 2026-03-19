@@ -45,3 +45,13 @@ std::optional<PrefixDescriptor> ot::UnitRegistry::findPrefix(const std::string& 
     }
     return std::nullopt;
 }
+
+void ot::UnitRegistry::addAlias(const std::string& _alias, const std::string& _canonicalSym)
+{
+    auto it = m_unitsBySymbol.find(_canonicalSym);
+    assert(it != m_unitsBySymbol.end());
+    
+    UnitDescriptor aliased = it->second;
+    aliased.m_symbol = _alias;  // keep everything else identical
+    m_unitsBySymbol[_alias] = aliased;
+}

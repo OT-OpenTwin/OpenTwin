@@ -23,4 +23,6 @@ ot::ImperialUnits::ImperialUnits()
     m_registry.addUnit(helper("BTU", "BTU", "imperial", ENERGY, 1055.06));
     m_registry.addUnit(helper("psi", "psi", "imperial", PRESS, 6894.76));
     m_registry.addUnit(helper("hp", "horsepower", "imperial", POWER, 745.7));
+
+    m_registry.addAlias(u8"°F", "degF");
 }

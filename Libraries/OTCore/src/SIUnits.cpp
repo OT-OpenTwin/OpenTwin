@@ -2,6 +2,8 @@
 
 using namespace ot;
 
+constexpr double pi = 3.14159265358979323846;
+
 SIUnits& SIUnits::instance()
 {
 	static SIUnits INSTANCE;
@@ -51,6 +53,8 @@ SIUnits::SIUnits()
     m_registry.addUnit(helper("mol", "mole", "SI", AMOUNT));
     m_registry.addUnit(helper("cd", "candela", "SI", LUM));
 
+    m_registry.addAlias("degK", "K");
+
     // --- SI Derived Units ---
     m_registry.addUnit(helper("N", "newton", "SI", FORCE));
     m_registry.addUnit(helper("J", "joule", "SI", ENERGY));
@@ -67,12 +71,28 @@ SIUnits::SIUnits()
 
     // --- Affine Temperature (SI-adjacent) ---
     m_registry.addUnit(helper("degC", "celsius", "SI", TEMP, 1.0, 273.15));
+    m_registry.addAlias("Cel", "degC");
 
     // dB for amplitude ratios (S-parameters, voltage, field quantities)
     m_registry.addUnit(helper( "dB",  "decibel", "SI", Dimension{}, 1.0, 0.0, UnitKind::LogAmplitude ));
 
     // dBm: dB relative to 1 mW — power, so 10*log10
     m_registry.addUnit(helper( "dBm", "decibel-milliwatt", "SI", Dimension{}, 1.0, 0.0, UnitKind::LogPower ));
+
+    // --- Angle units ---
+    // SI base: radian (rad = 1 m/m, but tracked via pseudo-dimension)
+    m_registry.addUnit(helper( "rad",  "radian",      "SI",       ANGLE, 1.0 ));
+    m_registry.addUnit(helper( "deg",  "degree",      "SI",       ANGLE, pi / 180.0 ));
+    m_registry.addUnit(helper( "grad", "gradian",     "SI",       ANGLE, pi / 200.0 ));
+    m_registry.addUnit(helper( "rev",  "revolution",  "SI",       ANGLE, 2.0 * pi));
+    m_registry.addUnit(helper( "arcmin","arcminute",  "SI",       ANGLE, pi / 10800.0 ));
+    m_registry.addUnit(helper( "arcsec","arcsecond",  "SI",       ANGLE, pi / 648000.0 ));
+
+    m_registry.addAlias("degree", "deg");
+    m_registry.addAlias("degrees", "deg");
+    m_registry.addAlias("radian", "rad");
+    m_registry.addAlias("radians", "rad");
+    m_registry.addAlias("gon", "grad");    
 
 }
 
