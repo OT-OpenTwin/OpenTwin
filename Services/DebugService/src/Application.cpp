@@ -55,7 +55,7 @@
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
-#include "OTCore/Units/SI.h"
+#include "OTCore/Units/SIUnits.h"
 #include "OTSystem/OperatingSystem.h"
 
 // std header
@@ -282,7 +282,7 @@ void Application::createPlotOneComplexCurveMagPhase()
 	}
 
 	quantDesc->setName("S11");
-	quantDesc->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", ot::SIUnits::Derived::getDegreeUnit());
+	//quantDesc->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", ot::SIUnits::Derived::getDegreeUnit());
 
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 
