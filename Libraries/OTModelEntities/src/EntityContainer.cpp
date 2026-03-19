@@ -355,5 +355,14 @@ bool EntityContainer::deserialiseFromJSON(const ot::ConstJsonObject& _serialisat
 		OT_LOG_E("Failed to deserialise " + getClassName() + " because: " + std::string(_e.what()));
 		return false;
 	}
+}
 
+void EntityContainer::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
+{
+	if (getName() == "Geometry")
+	{
+		_menuCfg.addButton("Show Geometry Only", "Show Geometry Only", "ContextMenu/ShowGeometryOnly.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("View/Visibility/Show Geometry Only");
+	}
+
+	EntityBase::fillContextMenu(_requestData, _menuCfg);
 }

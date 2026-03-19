@@ -2086,7 +2086,7 @@ void Model::showGeometrySceneNodesAction()
 		}
 	}
 	
-	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
+	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->clearTreeSelection();
 }
 
 void Model::showMeshSceneNodesAction()

@@ -73,6 +73,8 @@ public:
 
 	virtual std::string serialiseAsJSON() override;
 	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept;
+	
+	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg) override;
 
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;

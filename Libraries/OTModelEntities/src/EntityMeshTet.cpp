@@ -363,8 +363,8 @@ void EntityMeshTet::removeChild(EntityBase *child)
 void EntityMeshTet::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
 {
 	_menuCfg.addButton("Update", "Update", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("Mesh/Tet Mesh/Update Tet Mesh");
-
 	_menuCfg.addSeparator();
+	_menuCfg.addButton("Show Mesh Only", "Show Mesh Only", "ContextMenu/ShowMeshOnly.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("View/Visibility/Show Mesh Only");
 
 	EntityMesh::fillContextMenu(_requestData, _menuCfg);
 }
