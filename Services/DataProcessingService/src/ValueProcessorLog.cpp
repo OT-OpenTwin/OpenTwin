@@ -1,11 +1,37 @@
 ﻿#include "ValueProcessorLog.h"
-
-ValueProcessorLog::ValueProcessorLog(double _multiplier, double _base)
+#include "OTCore/Variable/VariableHelper.h"
+#include "ValueProcessorPow.h"
+ValueProcessorLog::ValueProcessorLog(double _multiplier, SupportedBases _base)
 	: m_multiplier(_multiplier), m_base(_base)
 {
 }
 
 ot::Variable ValueProcessorLog::execute(const ot::Variable& _input)
 {
-	return ot::Variable();
+	ot::Variable value;
+	if (m_base == SupportedBases::m_10)
+	{
+		 value = ot::VariableHelper::log10(_input);
+	}
+	else if (m_base == SupportedBases::m_e)
+	{
+		value = ot::VariableHelper::ln(_input);
+	}
+	
+	value = value * m_multiplier;
+	return value;
+}
+
+std::unique_ptr<ValueProcessor> ValueProcessorLog::inverse() const
+{
+	constexpr double e = 2.71828182845904523536;
+	if (m_base == SupportedBases::m_10)
+	{
+		return std::make_unique<ValueProcessorPow>(m_multiplier, 10);
+	}
+	else if (m_base == SupportedBases::m_e)
+	{
+		return std::make_unique<ValueProcessorPow>(m_multiplier, e);
+	}
+	
 }

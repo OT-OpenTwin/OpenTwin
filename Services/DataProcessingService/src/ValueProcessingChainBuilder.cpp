@@ -31,6 +31,69 @@ ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitStrin
     }
 }
 
+ValueProcessing ValueProcessingChainBuilder::buildToSIChain(const std::string& _unitExpr)
+{
+    UnitTokenizer tokenizer;
+    std::vector<UnitToken> unitTokens= tokenizer.tokenize(_unitExpr);
+    std::vector<ResolvedToken> resolvedTokens = resolveTokens(unitTokens);
+
+    std::list<std::unique_ptr<ValueProcessor>> processors; 
+
+
+    // ---- Separate log token from linear tokens ----------------------
+    const ResolvedToken* logToken = nullptr;
+    std::vector<ResolvedToken> linearTokens;
+
+    for (const auto& token : resolvedTokens) 
+    {
+        if (token.m_resolvedComponent.m_base.isLog() && token.m_exponent == 1)
+        {
+            logToken = &token;
+        }
+        else
+        {
+            linearTokens.push_back(token);
+        }
+    }
+
+    if (logToken) 
+    {
+        // ---- dB/Np/... → linear SI ----------------------------------
+        // Step 1: inverse-log restores the linear ratio
+        auto log = std::make_unique<ValueProcessorLog>(logToken->m_resolvedComponent.m_base.getLogMultiplier(), ValueProcessorLog::SupportedBases::m_10);
+        processors.push_back(std::move(log));
+
+        // Step 2: scale the remaining linear tokens to SI base
+        // (e.g. the /degF part in dB/degF)
+        double factor = netSIScale(linearTokens);
+        if (multiplicationIsRelevant(factor))
+        {
+            auto multipl = std::make_unique<ValueProcessorMultiply>(factor);
+            processors.push_back(std::move(multipl));
+        }
+    }
+    else 
+    {
+        // ---- Pure linear / affine -----------------------------------
+        SIBaseConversion si = computeSIBase(linearTokens);
+
+        if (multiplicationIsRelevant(si.scaleFactor))
+        {
+            auto add = std::make_unique<ValueProcessorMultiply>(si.scaleFactor);
+            processors.push_back(std::move(add));
+        }
+
+        if (si.isAffine && summationIsRelevant(si.offsetToSI))
+        {
+            auto multipl = std::make_unique<ValueProcessorMultiply>(si.offsetToSI);
+            processors.push_back(std::move(multipl));
+        }
+    }
+    ValueProcessing processing;
+    processing.setSequence(std::move(processors));
+    return processing;
+}
+
 std::vector<ResolvedToken> ValueProcessingChainBuilder::resolveTokens(const std::vector<UnitToken>& _tokens)
 {
     std::vector<ResolvedToken> result;
@@ -161,7 +224,7 @@ ValueProcessing ValueProcessingChainBuilder::buildChain(const std::vector<Resolv
                 processors.push_back(std::move(add));
             }
         }
-        auto log = std::make_unique <ValueProcessorLog>(tgtLog->m_resolvedComponent.m_base.getLogMultiplier(), 10);
+        auto log = std::make_unique <ValueProcessorLog>(tgtLog->m_resolvedComponent.m_base.getLogMultiplier(), ValueProcessorLog::SupportedBases::m_10);
         processors.push_back(std::move(log));
     }
     else if (srcLog && !tgtLog) {
@@ -295,3 +358,16 @@ bool ValueProcessingChainBuilder::multiplicationIsRelevant(double _factor)
     return (std::abs(_factor - 1.0) > 1e-15);
 }
 
+ValueProcessingChainBuilder::SIBaseConversion ValueProcessingChainBuilder::computeSIBase(const std::vector<ResolvedToken>& tokens)
+{
+    // Affine: single token, exponent +1
+    if (useAffineConversion(tokens)) {
+        const auto& token = tokens[0];
+        double scale = token.m_resolvedComponent.m_prefix.m_factor * token.m_resolvedComponent.m_base.toSIScale;
+        double offset = token.m_resolvedComponent.m_base.toSIOffset;
+        return { scale, offset, true };
+    }
+
+    // All other cases: pure multiplicative
+    return { netSIScale(tokens), 0.0, false };
+}

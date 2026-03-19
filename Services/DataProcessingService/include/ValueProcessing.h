@@ -19,6 +19,8 @@ public:
 	void setSequence(const std::string& _jsonSerialisedSequence);
 	void setSequence(std::list<std::unique_ptr<ValueProcessor>>&& _sequence);
 	bool executionNecessary() { return m_processors.size() > 0; }
+	ValueProcessing createInverse();
+
 private:
 	ValueProcessor* m_startProcessor;
 	std::list<std::unique_ptr<ValueProcessor>> m_processors;

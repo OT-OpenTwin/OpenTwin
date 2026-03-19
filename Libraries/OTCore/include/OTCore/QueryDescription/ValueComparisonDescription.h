@@ -41,6 +41,7 @@ namespace ot {
 		const std::string& getName() const { return m_name; }
 
 		const std::string& getComparator() const { return m_comparator; }
+		void setValue(const std::string& _value) { m_value = _value; }
 		const std::string& getValue() const { return m_value; }
 
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;

@@ -10,3 +10,8 @@ ot::Variable ValueProcessorPow::execute(const ot::Variable & _input)
 	temp = temp * m_multiplier;
 	return temp;
 }
+
+std::unique_ptr<ValueProcessor> ValueProcessorPow::inverse() const
+{
+	return std::make_unique<ValueProcessorPow>(1/m_multiplier, 1.0 / m_exponent);
+}

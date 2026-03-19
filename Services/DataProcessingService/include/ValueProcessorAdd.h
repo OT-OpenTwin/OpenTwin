@@ -4,10 +4,14 @@
 class ValueProcessorAdd : public ValueProcessor
 {
 public:
-	ValueProcessorAdd(ot::Variable _summand);
+	ValueProcessorAdd(double _summand);
 	ot::Variable execute(const ot::Variable& _input) override;
+	// Inherited via ValueProcessor
+	std::unique_ptr<ValueProcessor> inverse() const override;
 	
 private:
-	const ot::Variable m_summand;
+	const double m_summand;
+
+
 
 };

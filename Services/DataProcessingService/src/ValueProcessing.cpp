@@ -24,3 +24,15 @@ void ValueProcessing::setSequence(std::list<std::unique_ptr<ValueProcessor>>&& _
 {
 	m_processors = std::move(_sequence);
 }
+
+ValueProcessing ValueProcessing::createInverse()
+{
+	ValueProcessing inverse;
+	std::list<std::unique_ptr<ValueProcessor>> processors;
+	for (auto it = m_processors.rbegin(); it != m_processors.rend(); ++it)
+	{
+		processors.push_back((*it)->inverse());
+	}
+	inverse.setSequence(std::move(processors));
+	return inverse;
+}

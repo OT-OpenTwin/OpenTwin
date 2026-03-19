@@ -4,11 +4,18 @@
 class ValueProcessorLog : public ValueProcessor
 {
 public:
-	ValueProcessorLog(double _multiplier, double _base);
+	enum class SupportedBases
+	{
+		m_10,
+		m_e
+	};
+	ValueProcessorLog(double _multiplier, SupportedBases _base);
 	ot::Variable execute(const ot::Variable& _input) override;
+	// Inherited via ValueProcessor
+	std::unique_ptr<ValueProcessor> inverse() const override;
 	
 private:
 	const double m_multiplier;
-	const double m_base;
+	SupportedBases m_base;
 
 };

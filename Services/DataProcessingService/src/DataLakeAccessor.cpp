@@ -357,11 +357,16 @@ BsonViewOrValue DataLakeAccessor::generateSeriesQuery()
 	AdvancedQueryBuilder builder;
 
 	std::list<BsonViewOrValue> comparisons;
+
 	for (ot::QueryDescription& queryDescription : m_queryDescriptionsSeries)
 	{
-		const ot::ValueComparisonDescription& selectedQuery = queryDescription.getValueComparisonDescription();
-		BsonViewOrValue comparison = builder.createComparison(selectedQuery);
-		comparisons.push_back(comparison);
+		ot::ValueComparisonDescription selectedQuery = queryDescription.getValueComparisonDescription();
+		if (!selectedQuery.getComparator().empty() && !selectedQuery.getValue().empty() && !selectedQuery.getName().empty())
+		{
+			BsonViewOrValue comparison = builder.createComparison(selectedQuery);
+			comparisons.push_back(comparison);
+			const std::string debugQuery = bsoncxx::to_json(comparison);
+		}
 	}
 	
 	BsonViewOrValue seriesQuery;
@@ -380,28 +385,14 @@ BsonViewOrValue DataLakeAccessor::generateSeriesQuery()
 
 std::list<BsonViewOrValue> DataLakeAccessor::generateParameterQueries()
 {
-	AdvancedQueryBuilder builder;
-	ValueProcessingChainBuilder chainBuilder;
-
 	std::list<BsonViewOrValue> comparisons;
 	for (ot::QueryDescription& queryDescription : m_queryDescriptionsParameters)
 	{
-		ot::ValueComparisonDescription selectedQuery = queryDescription.getValueComparisonDescription();
-		if (!selectedQuery.getComparator().empty() && !selectedQuery.getValue().empty() && !selectedQuery.getName().empty())
+		std::optional<BsonViewOrValue> comparison = generateComparisonConsideringUnits(queryDescription);
+		if (comparison.has_value())
 		{
-			auto unitsTarget = selectedQuery.getTupleInstance().getTupleUnits();
-			auto unitsCurrent = queryDescription.getQueryTargetDescription().getTupleInstance().getTupleUnits();
-			assert(unitsCurrent.size() == unitsTarget.size() == 1); //Parameter are suppose to be single
-			ValueProcessing processingChain = chainBuilder.build(unitsCurrent[0], unitsTarget[0]);
-			if (processingChain.executionNecessary())
-			{
-				selectedQuery.getValue();
-			}
-			const std::string fieldName = queryDescription.getQueryTargetDescription().getMongoDBFieldName();
-			selectedQuery.setName(fieldName);
-			BsonViewOrValue comparison = builder.createComparison(selectedQuery);
-			comparisons.push_back(comparison);
-			const std::string debugQuery = bsoncxx::to_json(comparison);
+			comparisons.push_back(comparison.value());
+			const std::string debugQuery = bsoncxx::to_json(comparison.value());
 		}
 	}
 
@@ -423,28 +414,38 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		ot::ValueComparisonDescription quantitySelection(MetadataQuantity::getFieldName(), "=", fieldValue, instance);
 		queryElements.push_back(builder.createComparison(quantitySelection));
 
-		ot::ValueComparisonDescription valueQuery = queryDescription.getValueComparisonDescription();
-		valueQuery.setName(QuantityContainer::getFieldName());
-		queryElements.push_back(builder.createComparison(valueQuery));
-
-		BsonViewOrValue combinedQuery = builder.connectWithAND(std::move(queryElements));
-		const std::string debugQuery = bsoncxx::to_json(combinedQuery.view());
-
-		const ot::QueryTargetDescription& targetDescription = queryDescription.getQueryTargetDescription();
-		auto storedTupleDescription = targetDescription.getTupleInstance();
-		const ot::ValueComparisonDescription& comparisonDescription = queryDescription.getValueComparisonDescription();
-		auto queryTupleDescription = comparisonDescription.getTupleInstance();
-		if (transformationNecessary(queryTupleDescription, storedTupleDescription))
+		//Now we create the value comparison
+		ot::QueryDescription valueQueryDescription = queryDescription;
+		ot::ValueComparisonDescription valueQueryComparison = valueQueryDescription.getValueComparisonDescription();
+		valueQueryComparison.setName(QuantityContainer::getFieldName());
+		valueQueryDescription.setComparisonDescription(valueQueryComparison);
+		std::optional<BsonViewOrValue> valueQuery =	generateComparisonConsideringUnits(valueQueryDescription);
+		
+		if (valueQuery.has_value())
 		{
-			if (!alreadyStoredTransformation(queryDescription))
+			// Value comparison was viable for creating a query.
+			queryElements.push_back(valueQuery.value());
+			BsonViewOrValue combinedQuery = builder.connectWithAND(std::move(queryElements));
+			const std::string debugQuery = bsoncxx::to_json(combinedQuery.view());
+
+			// Lastly we check if the 
+			const ot::QueryTargetDescription& targetDescription = queryDescription.getQueryTargetDescription();
+			auto storedTupleDescription = targetDescription.getTupleInstance();
+			const ot::ValueComparisonDescription& comparisonDescription = queryDescription.getValueComparisonDescription();
+			auto queryTupleDescription = comparisonDescription.getTupleInstance();
+		
+			if (transformationNecessary(queryTupleDescription, storedTupleDescription))
 			{
-				storeTransformation(queryDescription);
+				if (!alreadyStoredTransformation(queryDescription))
+				{
+					storeTransformation(queryDescription);
+				}
+				transformedCollectionQueries.push_back(combinedQuery);
 			}
-			transformedCollectionQueries.push_back(combinedQuery);
-		}
-		else
-		{
-			resultCollectionQueries.push_back(combinedQuery);
+			else
+			{
+				resultCollectionQueries.push_back(combinedQuery);
+			}
 		}
 	}
 
@@ -465,5 +466,43 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 	else if (transformedCollectionQueries.size() > 1)
 	{
 		_transformedCollectionQuery = builder.connectWithOR(std::move(transformedCollectionQueries));
+	}
+}
+
+std::optional<BsonViewOrValue> DataLakeAccessor::generateComparisonConsideringUnits(ot::QueryDescription& _queryDescription)
+{
+	ot::ValueComparisonDescription selectedQuery = _queryDescription.getValueComparisonDescription();
+	if (!selectedQuery.getComparator().empty() && !selectedQuery.getValue().empty() && !selectedQuery.getName().empty())
+	{
+		//First we get the components for the query
+		AdvancedQueryBuilder queryBuilder;
+		auto valueComparisonCleaned = _queryDescription.getValueComparisonDescription();
+		std::list<std::string> mongoDBComparators = queryBuilder.extractMongoComparators(valueComparisonCleaned);
+		std::vector<ot::Variable> values = queryBuilder.getListOfValuesFromString(valueComparisonCleaned);
+		const std::string fieldName = queryBuilder.createFieldName(valueComparisonCleaned);
+
+		//We may need to adjust the values if the unit that was selected in the query differs from the unit the data are stored with
+		auto unitsTarget = selectedQuery.getTupleInstance().getTupleUnits();
+		auto unitsCurrent = _queryDescription.getQueryTargetDescription().getTupleInstance().getTupleUnits();
+		assert(values.size() == unitsTarget.size() == unitsCurrent.size());
+		ValueProcessingChainBuilder chainBuilder;
+		for (size_t i = 0; i < values.size(); i++)
+		{
+			ValueProcessing processingChain = chainBuilder.build(unitsCurrent[i], unitsTarget[i]);
+			if (processingChain.executionNecessary())
+			{
+				values[i] = processingChain.executeSequence(values[i]);
+				ValueProcessing inverseProcessingChain = processingChain.createInverse();
+				m_inverseTransformationsByFieldKey.insert({ fieldName, std::move(inverseProcessingChain) });
+			}
+		}
+
+		//Finally we create the query
+		BsonViewOrValue query = queryBuilder.createComparison(fieldName, mongoDBComparators, { values.begin(),values.end()});
+		return query;
+	}
+	else
+	{
+		return std::nullopt;
 	}
 }

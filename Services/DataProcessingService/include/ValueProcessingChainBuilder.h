@@ -7,6 +7,8 @@ class ValueProcessingChainBuilder
 {
 public:
 	ValueProcessing build(const std::string& _unitStringCurrent , const std::string& _unitStringTarget);
+    ValueProcessing buildToSIChain(const std::string& unitExpr);
+
 private:
 	std::vector<ResolvedToken> resolveTokens(const std::vector<UnitToken>& _tokens);
    
@@ -23,4 +25,16 @@ private:
 
     bool summationIsRelevant(double _summand);
     bool multiplicationIsRelevant(double _factor);
+
+    // Computes the net SI scale and SI offset for a single resolved token list.
+    // Returns the factor by which the source value must be multiplied to reach
+    // the SI base value. For affine units the offset is returned separately.
+    struct SIBaseConversion {
+        double scaleFactor = 1.0;
+        double offsetToSI = 0.0; // added AFTER scaling (affine only)
+        bool   isAffine = false;
+    };
+
+    SIBaseConversion computeSIBase(const std::vector<ResolvedToken>& tokens);
+
 };

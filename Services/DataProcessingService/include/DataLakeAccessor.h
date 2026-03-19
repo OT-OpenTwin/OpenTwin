@@ -4,6 +4,7 @@
 #include "OTCore/QueryDescription/QueryDescription.h"
 #include "mongocxx/options/find.hpp"
 #include <map>
+#include "ValueProcessing.h"
 
 class DataLakeAccessor
 {
@@ -18,6 +19,8 @@ private:
 	std::list<ot::QueryDescription> m_queryDescriptionsSeries;
 	std::list<ot::QueryDescription> m_queryDescriptionsQuantities;
 	std::list<ot::QueryDescription> m_queryDescriptionsParameters;
+	std::map<std::string, ValueProcessing> m_inverseTransformationsByFieldKey;
+
 	std::string m_collectionName;
 	const std::string m_transformedCollectionEnding = ".transformed";
 	const std::string m_resultDataField = "Data";
@@ -42,4 +45,6 @@ private:
 	//! Depending on the targeted and stored tuple format, data points may be transformed and stored in another collection.
 	void generateQuantityQueries(BsonViewOrValue& _resultCollectionQueries, BsonViewOrValue& _transformedCollectionQueries);
 	
+	std::optional<BsonViewOrValue> generateComparisonConsideringUnits(ot::QueryDescription& _queryDescription);
+
 };
