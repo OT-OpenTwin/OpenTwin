@@ -434,6 +434,10 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 	storeDependencyArray(doc, "InputDependency", m_inputDependency);
 	storeDependencyArray(doc, "OutputDependency", m_outputDependency);
 
+	m_updateSelfDepedency = false; // The self dependencies should only be updated during the next save. Subsequent saves should not be affected.
+								   // The item will be kept in memory in the model service. If we would not reset the flag, all subsequent changes
+								   // would not be tracked in the dependencies.
+
 	addStorageData(doc);
 
 	return doc;

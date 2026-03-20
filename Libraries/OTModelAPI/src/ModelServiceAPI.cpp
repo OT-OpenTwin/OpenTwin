@@ -677,6 +677,16 @@ void ot::ModelServiceAPI::modelChangeOperationCompleted(const std::string& descr
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
+void ot::ModelServiceAPI::storeAllEntitiesToDataBase() {
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_StoreAllEntitiesToDataBase, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
+	// Send the command
+	std::string response;
+	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
+}
+
+
 void ot::ModelServiceAPI::updatePropertyGrid() {
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_UpdatePropertyGrid, requestDoc.GetAllocator()), requestDoc.GetAllocator());

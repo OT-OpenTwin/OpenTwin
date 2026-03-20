@@ -163,6 +163,7 @@ public:
 	void enableQueuingHttpRequests(bool flag);
 
 	void modelChangeOperationCompleted(const std::string &description, bool askForCreationOfBranch = true);
+	void storeAllEntitiesToDataBase(); // Only store all entities to database, but do not write any model state information
 
 	void uiIsAvailable(ot::components::UiComponent* _ui);
 

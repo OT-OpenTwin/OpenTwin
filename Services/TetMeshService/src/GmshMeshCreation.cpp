@@ -477,7 +477,8 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 
 	// Finally store newly created entities in the model. Due to building the hierarchy in the model service, this 
 	// might update the entity versions. Therefore, we do not save the model here.
-	application->getModelComponent()->storeNewEntities("intermediate store");
+	application->getModelComponent()->storeNewEntities("intermediate store", false, false);
+	ot::ModelServiceAPI::storeAllEntitiesToDataBase();  // Make sure that the modeler writes all entities to update their save versions before we get them here
 
 	// Now update the versions of the input and output depencencies according to the current state
 	application->getModelComponent()->updateEntityVersions(inputDependencyList);

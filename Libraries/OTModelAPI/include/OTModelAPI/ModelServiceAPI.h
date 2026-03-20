@@ -49,6 +49,7 @@ namespace ot {
 		static std::list<UID> getIDsOfFolderItemsOfType(const std::string& _folder, const std::string& _entityClassName, bool recursive);
 		static void enableMessageQueueing(bool flag);
 		static void modelChangeOperationCompleted(const std::string& description);
+		static void storeAllEntitiesToDataBase(void);
 
 		// Entity management
 

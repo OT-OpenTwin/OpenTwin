@@ -3677,6 +3677,16 @@ void Model::updateVersionGraph()
 	}
 }
 
+void Model::storeAllEntitiesToDataBase()
+{
+	// Recursively store the entities
+	if (m_entityRoot != nullptr)
+	{
+		m_entityRoot->storeToDataBase();
+	}
+}
+
+
 void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 {
 	if (m_entityRoot != nullptr)

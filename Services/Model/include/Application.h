@@ -118,6 +118,8 @@ public:
 
 	void handleModelChangeOperationCompleted(ot::JsonDocument& _document);
 
+	void handleStoreAllEntitiesToDataBase(ot::JsonDocument& _document);
+
 	void handleRequestUpdateVisualizationEntity(ot::JsonDocument& _document);
 
 	std::string handleCheckParentUpdates(ot::JsonDocument& _document);

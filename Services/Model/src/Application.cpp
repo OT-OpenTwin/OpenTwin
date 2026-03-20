@@ -269,6 +269,15 @@ void Application::handleModelChangeOperationCompleted(ot::JsonDocument& _documen
 	m_model->modelChangeOperationCompleted(description);
 }
 
+void Application::handleStoreAllEntitiesToDataBase(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	m_model->storeAllEntitiesToDataBase();
+}
+
 void Application::handleRequestUpdateVisualizationEntity(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
@@ -1336,6 +1345,7 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_MODEL_UpdateVisualizationEntity, this, &Application::handleUpdateVisualizationEntity);
 	connectAction(OT_ACTION_CMD_MODEL_UpdateGeometryEntity, this, &Application::handleUpdateGeometryEntity);
 	connectAction(OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted, this, &Application::handleModelChangeOperationCompleted);
+	connectAction(OT_ACTION_CMD_MODEL_StoreAllEntitiesToDataBase, this, &Application::handleStoreAllEntitiesToDataBase);
 	connectAction(OT_ACTION_CMD_MODEL_RequestUpdateVisualizationEntity, this, &Application::handleRequestUpdateVisualizationEntity);
 	connectAction(OT_ACTION_CMD_MODEL_CheckParentUpdates, this, &Application::handleCheckParentUpdates);
 	connectAction(OT_ACTION_CMD_MODEL_AddEntities, this, &Application::handleAddEntities);

@@ -138,6 +138,7 @@
 #define OT_ACTION_CMD_MODEL_UpdateVisualizationEntity "Model.Entities.UpdateVisEntity"
 #define OT_ACTION_CMD_MODEL_UpdateGeometryEntity "Model.Entities.UpdateGeomEntity"
 #define OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted "Model.OperationCompleted"
+#define OT_ACTION_CMD_MODEL_StoreAllEntitiesToDataBase "Model.StoreAllEntitiesToDataBase"
 #define OT_ACTION_CMD_MODEL_RequestUpdateVisualizationEntity "Model.Entities.RequestUpdateVisEntity"
 #define OT_ACTION_CMD_MODEL_MeshingCompleted "Model.State.MeshingCompleted"
 #define OT_ACTION_CMD_MODEL_QueueMessages "Model.QueueMessages"
