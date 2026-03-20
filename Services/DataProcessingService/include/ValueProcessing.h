@@ -15,6 +15,7 @@
 class ValueProcessing
 {
 public:
+	~ValueProcessing();
 	ot::Variable executeSequence(const ot::Variable& _input);
 	void setSequence(const std::string& _jsonSerialisedSequence);
 	void setSequence(std::list<std::unique_ptr<ValueProcessor>>&& _sequence);
@@ -22,8 +23,7 @@ public:
 	ValueProcessing createInverse();
 
 private:
-	ValueProcessor* m_startProcessor;
-	std::list<std::unique_ptr<ValueProcessor>> m_processors;
+	std::list<ValueProcessor*> m_processors;
 };
 
 

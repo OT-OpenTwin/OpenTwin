@@ -111,7 +111,6 @@ ot::JsonDocument DataLakeAccessor::executeQuery(mongocxx::options::find _options
 }
 
 
-
 void DataLakeAccessor::createQueries(BsonViewOrValue& _resultCollectionQuery, BsonViewOrValue& _transformedCollectionQuery)
 {
 	BsonViewOrValue seriesQuery = generateSeriesQuery();
@@ -232,46 +231,54 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 		// Transformation into SI base unit
 		ValueProcessingChainBuilder valueProcessingChainBuilder;
 		const auto& units = storedDataDescr.getTupleInstance().getTupleUnits();
-		std::list<ValueProcessing> toSIConversions;
+		std::vector<ValueProcessing> toSIConversions;
+		toSIConversions.reserve(units.size());
 		for (const std::string& unit : units)
 		{
 			ValueProcessing processing = valueProcessingChainBuilder.buildToSIChain(unit);
-			toSIConversions.insert(toSIConversions.end(),std::move(processing));
+			toSIConversions.push_back(std::move(processing));
 		}
 		std::function<std::pair<double, double>(double, double)> transformToSI;
-		if (!toSIConversions.front().executionNecessary() && !toSIConversions.back().executionNecessary())
+		if (!toSIConversions[0].executionNecessary() && !toSIConversions[1].executionNecessary())
 		{
 			transformToSI = [](double _first, double _second)->std::pair<double, double>
 				{
 					return { _first, _second };
 				};
 		}
-		else if (toSIConversions.front().executionNecessary() && toSIConversions.back().executionNecessary())
+		else if (toSIConversions[0].executionNecessary() && toSIConversions[1].executionNecessary())
 		{
 			transformToSI = [&toSIConversions](double _first, double _second)->std::pair<double, double>
 				{
-					_first = toSIConversions.front().executeSequence(_first).getDouble();
-					_second= toSIConversions.back().executeSequence(_second).getDouble();
+					_first = toSIConversions[0].executeSequence(_first).getDouble();
+					_second= toSIConversions[1].executeSequence(_second).getDouble();
 					return { _first, _second };
 				};
 		}
-		else if(toSIConversions.front().executionNecessary())
+		else if(toSIConversions[0].executionNecessary())
 		{
 			transformToSI = [&toSIConversions](double _first, double _second)->std::pair<double, double>
 				{
-					_first = toSIConversions.front().executeSequence(_first).getDouble();
+					_first = toSIConversions[0].executeSequence(_first).getDouble();
 					return { _first, _second };
 				};
 		}
 		else
 		{
-			assert(toSIConversions.back().executionNecessary());
+			assert(toSIConversions[1].executionNecessary());
 			transformToSI = [&toSIConversions](double _first, double _second)->std::pair<double, double>
 				{
-					_second = toSIConversions.back().executeSequence(_second).getDouble();
+					_second = toSIConversions[1] .executeSequence(_second).getDouble();
 					return { _first, _second };
 				};
 		}
+
+		std::list<ValueProcessing> toSIConversionInverse;
+		for (ValueProcessing& processing : toSIConversions)
+		{
+			toSIConversionInverse.push_back(processing.createInverse());
+		}
+		m_inverseQuantityTransformationsByFieldKey[fieldValue] = toSIConversionInverse;
 
 		// Now comes the tuple format transformation.
 		const std::string storedFormatName = storedDataDescr.getTupleInstance().getTupleFormatName();
@@ -542,7 +549,7 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateComparisonConsideringUn
 			{
 				values[i] = processingChain.executeSequence(values[i]);
 				ValueProcessing inverseProcessingChain = processingChain.createInverse();
-				m_inverseTransformationsByFieldKey.insert({ fieldName, std::move(inverseProcessingChain) });
+				m_inverseParameterTransformationsByFieldKey.insert({ fieldName, std::move(inverseProcessingChain)});
 			}
 		}
 
