@@ -283,7 +283,7 @@ void Application::createPlotOneComplexCurveMagPhase()
 	}
 
 	quantDesc->setName("S11");
-	//quantDesc->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", ot::SIUnits::Derived::getDegreeUnit());
+	quantDesc->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", "Deg");
 
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 
@@ -293,7 +293,7 @@ void Application::createPlotOneComplexCurveMagPhase()
 
 	const std::string plotName = "Test/A_Complex_Plot_MagPhase";
 	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "CMC_Stysch");
-	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11");
+	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11_Polar");
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
@@ -361,7 +361,7 @@ void Application::createPlotOneComplexCurveRealImag()
 
 	const std::string plotName = "Test/A_Complex_Plot_RIm";
 	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "CMC_Stysch");
-	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11");
+	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11_Cartesian");
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;

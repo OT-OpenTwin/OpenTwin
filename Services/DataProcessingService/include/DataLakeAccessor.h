@@ -54,7 +54,11 @@ private:
 	//! @brief All provided quantities are valid options and each document holds only one quantity. Thus, the quantity query is assembled as an or connected list of quantity ID options.
 	//! Depending on the targeted and stored tuple format, data points may be transformed and stored in another collection.
 	void generateQuantityQueries(BsonViewOrValue& _resultCollectionQueries, BsonViewOrValue& _transformedCollectionQueries);
-	
+
+	ot::QueryDescription createQuantityValueQueryDescription(ot::QueryDescription _queryDescription);
+
 	std::optional<BsonViewOrValue> generateComparisonConsideringUnits(ot::QueryDescription& _queryDescription);
+
+	std::optional <BsonViewOrValue> generateQueryFromSIBaseToTarget(ot::QueryDescription& _queryDescription);
 
 };

@@ -273,13 +273,6 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 				};
 		}
 
-		std::list<ValueProcessing> toSIConversionInverse;
-		for (ValueProcessing& processing : toSIConversions)
-		{
-			toSIConversionInverse.push_back(processing.createInverse());
-		}
-		m_inverseQuantityTransformationsByFieldKey[fieldValue] = toSIConversionInverse;
-
 		// Now comes the tuple format transformation.
 		const std::string storedFormatName = storedDataDescr.getTupleInstance().getTupleFormatName();
 		const std::string queryFormatName = queryDescription.getTupleInstance().getTupleFormatName();
@@ -471,39 +464,48 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		queryElements.push_back(builder.createComparison(quantitySelection));
 
 		//Now we create the value comparison
-		ot::QueryDescription valueQueryDescription = queryDescription;
-		ot::ValueComparisonDescription valueQueryComparison = valueQueryDescription.getValueComparisonDescription();
-		valueQueryComparison.setName(QuantityContainer::getFieldName());
-		valueQueryDescription.setComparisonDescription(valueQueryComparison);
-		std::optional<BsonViewOrValue> valueQuery =	generateComparisonConsideringUnits(valueQueryDescription);
-		
-		if (valueQuery.has_value())
-		{
-			// Value comparison was viable for creating a query.
-			queryElements.push_back(valueQuery.value());
-			BsonViewOrValue combinedQuery = builder.connectWithAND(std::move(queryElements));
-			const std::string debugQuery = bsoncxx::to_json(combinedQuery.view());
+		const ot::QueryTargetDescription& targetDescription = queryDescription.getQueryTargetDescription();
+		auto storedTupleDescription = targetDescription.getTupleInstance();
+		const ot::ValueComparisonDescription& comparisonDescription = queryDescription.getValueComparisonDescription();
+		auto queryTupleDescription = comparisonDescription.getTupleInstance();
 
-			// Lastly we check if the 
-			const ot::QueryTargetDescription& targetDescription = queryDescription.getQueryTargetDescription();
-			auto storedTupleDescription = targetDescription.getTupleInstance();
-			const ot::ValueComparisonDescription& comparisonDescription = queryDescription.getValueComparisonDescription();
-			auto queryTupleDescription = comparisonDescription.getTupleInstance();
-		
-			if (transformationNecessary(queryTupleDescription, storedTupleDescription))
+		auto valueQueryDescription = createQuantityValueQueryDescription(queryDescription);
+		if (transformationNecessary(queryTupleDescription, storedTupleDescription))
+		{
+			// If transform necessary :
+			// 1) Storage tuple format to SIBase -> Store all data points as SIBase in new format in transformed db
+			// 2) target tuple format to SIBase -> Adjust query value accordingly
+			// 3) Determine unit transformation from target tuple format to SIBase -> Take inverse and use it for the resulting data 
+			if (!alreadyStoredTransformation(queryDescription))
 			{
-				if (!alreadyStoredTransformation(queryDescription))
-				{
-					storeTransformation(queryDescription);
-				}
-				transformedCollectionQueries.push_back(combinedQuery);
+				storeTransformation(queryDescription);
 			}
-			else
+			std::optional<BsonViewOrValue> valueQuery = generateQueryFromSIBaseToTarget(valueQueryDescription);
+			if (valueQuery.has_value())
 			{
-				resultCollectionQueries.push_back(combinedQuery);
+				// Value comparison was viable for creating a query.
+				queryElements.push_back(valueQuery.value());
 			}
 		}
+		else
+		{
+			std::optional<BsonViewOrValue> valueQuery = generateComparisonConsideringUnits(valueQueryDescription);
+
+			if (valueQuery.has_value())
+			{
+				// Value comparison was viable for creating a query.
+				queryElements.push_back(valueQuery.value());
+			}
+		}
+	
+		BsonViewOrValue combinedQuery = builder.connectWithAND(std::move(queryElements));
+		const std::string debugQuery = bsoncxx::to_json(combinedQuery.view());
+
+		// Without transformation: Simple transformation from target format to storage format
+		resultCollectionQueries.push_back(combinedQuery);
 	}
+
+
 
 	if (resultCollectionQueries.size() == 1)
 	{
@@ -525,6 +527,14 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 	}
 }
 
+ot::QueryDescription DataLakeAccessor::createQuantityValueQueryDescription(ot::QueryDescription _queryDescription)
+{
+	ot::ValueComparisonDescription valueQueryComparison = _queryDescription.getValueComparisonDescription();
+	valueQueryComparison.setName(QuantityContainer::getFieldName());
+	_queryDescription.setComparisonDescription(valueQueryComparison);
+	return _queryDescription;
+}
+
 std::optional<BsonViewOrValue> DataLakeAccessor::generateComparisonConsideringUnits(ot::QueryDescription& _queryDescription)
 {
 	ot::ValueComparisonDescription selectedQuery = _queryDescription.getValueComparisonDescription();
@@ -540,21 +550,168 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateComparisonConsideringUn
 		//We may need to adjust the values if the unit that was selected in the query differs from the unit the data are stored with
 		auto unitsTarget = selectedQuery.getTupleInstance().getTupleUnits();
 		auto unitsCurrent = _queryDescription.getQueryTargetDescription().getTupleInstance().getTupleUnits();
-		assert(values.size() == unitsTarget.size() == unitsCurrent.size());
+		
+		assert(unitsTarget.size() == unitsCurrent.size());
 		ValueProcessingChainBuilder chainBuilder;
-		for (size_t i = 0; i < values.size(); i++)
+		bool queryForEntireTuple = _queryDescription.getValueComparisonDescription().getTupleTarget() == _queryDescription.getValueComparisonDescription().getTupleInstance().getTupleTypeName();
+		bool queryTuple = 	_queryDescription.getValueComparisonDescription().getTupleInstance().isSingle();
+		if (!queryTuple || (queryTuple  && queryForEntireTuple))
 		{
-			ValueProcessing processingChain = chainBuilder.build(unitsCurrent[i], unitsTarget[i]);
-			if (processingChain.executionNecessary())
+			if (values.size() != unitsCurrent.size())
 			{
-				values[i] = processingChain.executeSequence(values[i]);
-				ValueProcessing inverseProcessingChain = processingChain.createInverse();
-				m_inverseParameterTransformationsByFieldKey.insert({ fieldName, std::move(inverseProcessingChain)});
+				//If not tuple, then units size = 1, thus unit size cannot be larger then values
+				assert(values.size() < unitsCurrent.size());
+				throw std::exception("Not values provided for a tuple query.");
 			}
+
+			for (size_t i = 0; i < values.size(); i++)
+			{
+				ValueProcessing processingChain = chainBuilder.build(unitsCurrent[i], unitsTarget[i]);
+				ValueProcessing inverseProcessingChain;
+				if (processingChain.executionNecessary())
+				{
+					values[i] = processingChain.executeSequence(values[i]);
+					inverseProcessingChain = processingChain.createInverse();
+				}
+				else
+				{
+					inverseProcessingChain = processingChain;
+				}
+
+				if (values.size() > 1)
+				{
+					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(inverseProcessingChain));
+				}
+				else
+				{
+					m_inverseParameterTransformationsByFieldKey.insert({ fieldName, std::move(inverseProcessingChain) });
+				}
+			}
+		}
+		else
+		{
+			// Special handling for query of a single tuple entry.
+			assert(values.size() == 1);
+
+			TupleDescription* tupleDescription = TupleFactory::create(_queryDescription.getQueryTargetDescription().getTupleInstance().getTupleTypeName());
+			TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(tupleDescription);
+			assert(complexTupleDescription != nullptr);
+			const std::string targetElement = _queryDescription.getValueComparisonDescription().getTupleTarget();
+
+			auto tupleElementNames = complexTupleDescription->getTupleElementNames(_queryDescription.getQueryTargetDescription().getTupleInstance().getTupleFormatName());
+			auto pos = std::find(tupleElementNames.begin(), tupleElementNames.end(), targetElement) - tupleElementNames.begin();
+			
+			for (size_t i = 0; i < unitsCurrent.size(); i++)
+			{
+				ValueProcessing processingChain = chainBuilder.build(unitsCurrent[i], unitsTarget[i]);
+				if (processingChain.executionNecessary())
+				{
+					if (i == pos)
+					{
+						values[0] = processingChain.executeSequence(values[0]);
+					}
+					ValueProcessing inverseProcessingChain = processingChain.createInverse();
+					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(inverseProcessingChain));
+				}
+				else
+				{
+					// Keep the processing chain as inverse, so that later chains can be associated by index to the returned value.
+					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(processingChain));
+				}
+
+			}
+
 		}
 
 		//Finally we create the query
 		BsonViewOrValue query = queryBuilder.createComparison(fieldName, mongoDBComparators, { values.begin(),values.end()});
+		return query;
+	}
+	else
+	{
+		return std::nullopt;
+	}
+}
+
+std::optional<BsonViewOrValue> DataLakeAccessor::generateQueryFromSIBaseToTarget(ot::QueryDescription& _queryDescription)
+{
+
+	ot::ValueComparisonDescription selectedQuery = _queryDescription.getValueComparisonDescription();
+	if (!selectedQuery.getComparator().empty() && !selectedQuery.getValue().empty() && !selectedQuery.getName().empty())
+	{
+		//First we get the components for the query
+		AdvancedQueryBuilder queryBuilder;
+		auto valueComparisonCleaned = _queryDescription.getValueComparisonDescription();
+		std::list<std::string> mongoDBComparators = queryBuilder.extractMongoComparators(valueComparisonCleaned);
+		std::vector<ot::Variable> values = queryBuilder.getListOfValuesFromString(valueComparisonCleaned);
+		const std::string fieldName = queryBuilder.createFieldName(valueComparisonCleaned);
+
+		//We may need to adjust the values if the unit that was selected in the query differs from the unit the data are stored with
+		auto unitsTarget = selectedQuery.getTupleInstance().getTupleUnits();
+		
+		ValueProcessingChainBuilder chainBuilder;
+		bool queryForEntireTuple = _queryDescription.getValueComparisonDescription().getTupleTarget() == _queryDescription.getValueComparisonDescription().getTupleInstance().getTupleTypeName();
+		bool queryTuple = _queryDescription.getValueComparisonDescription().getTupleInstance().isSingle();
+		if (!queryTuple || (queryTuple && queryForEntireTuple))
+		{
+			if (values.size() != unitsTarget.size())
+			{
+				//If not tuple, then units size = 1, thus unit size cannot be larger then values
+				assert(values.size() < unitsTarget.size());
+				throw std::exception("Not values provided for a tuple query.");
+			}
+
+			for (size_t i = 0; i < values.size(); i++)
+			{
+				ValueProcessing processingChain = chainBuilder.buildToSIChain(unitsTarget[i]);
+				if (processingChain.executionNecessary())
+				{
+					values[i] = processingChain.executeSequence(values[i]);
+					ValueProcessing inverseProcessingChain = processingChain.createInverse();
+					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(inverseProcessingChain));
+				}
+				else
+				{
+					// Keep the processing chain as inverse, so that later chains can be associated by index to the returned value.
+					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(processingChain));
+				}
+			}
+		}
+		else
+		{
+			// Special handling for query of a single tuple entry.
+			assert(values.size() == 1);
+
+			TupleDescription* tupleDescription = TupleFactory::create(_queryDescription.getQueryTargetDescription().getTupleInstance().getTupleTypeName());
+			TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(tupleDescription);
+			assert(complexTupleDescription != nullptr);
+			const std::string targetElement = _queryDescription.getValueComparisonDescription().getTupleTarget();
+
+			auto tupleElementNames = complexTupleDescription->getTupleElementNames(_queryDescription.getQueryTargetDescription().getTupleInstance().getTupleFormatName());
+			auto pos = std::find(tupleElementNames.begin(), tupleElementNames.end(), targetElement) - tupleElementNames.begin();
+
+			for (size_t i = 0; i < unitsTarget.size(); i++)
+			{
+				ValueProcessing processingChain = chainBuilder.buildToSIChain(unitsTarget[i]);
+				if (processingChain.executionNecessary())
+				{
+					if (i == pos)
+					{
+						values[0] = processingChain.executeSequence(values[0]);
+					}
+					ValueProcessing inverseProcessingChain = processingChain.createInverse();
+					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(inverseProcessingChain));
+				}
+				else
+				{
+					// Keep the processing chain as inverse, so that later chains can be associated by index to the returned value.
+					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(processingChain)); 
+				}
+			}
+		}
+
+		//Finally we create the query
+		BsonViewOrValue query = queryBuilder.createComparison(fieldName, mongoDBComparators, { values.begin(),values.end() });
 		return query;
 	}
 	else
