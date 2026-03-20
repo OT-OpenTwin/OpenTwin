@@ -182,13 +182,13 @@ public:
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties);
 	void updateCoordinateSystem(EntityCoordinateSystem* csEntity);
 
-	void updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment, bool _considerVisualization);
+	void updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment, bool _considerVisualization, bool _updateSelfDependencies);
 
 	//! @brief Performs an update on a topology entity. The updated entity replaces its old version in the entity map and redirects all parent/child relationships to the updated entity.,
 	//! @param topoEntityID 
 	//! @param topoEntityVersion 
 	//! @param comment 
-	void updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::UIDList& _topoEntityVersion, const std::string& _comment, bool _considerVisualization);
+	void updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::UIDList& _topoEntityVersion, const std::string& _comment, bool _considerVisualization, bool _updateSelfDependencies);
 	void requestUpdateVisualizationEntity(ot::UID visEntityID);
 	std::list<ot::UID> getNewEntityIDs(unsigned long long count);
 	std::list<std::string> getListOfFolderItems(const std::string &folder, bool recursive);

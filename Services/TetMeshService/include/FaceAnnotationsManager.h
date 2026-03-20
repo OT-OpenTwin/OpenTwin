@@ -46,7 +46,7 @@ public:
 	FaceAnnotationsManager(Application *app) : application(app) {};
 	~FaceAnnotationsManager() {};
 
-	void loadAllFaceAnnotations(void);
+	void loadAllFaceAnnotations(std::list<std::pair<ot::UID, ot::UID>> &inputDependencyList);
 	void buildEntityNameToAnnotationsMap(void);
 	void buildFaceToAnnotationMap(const std::string &entityName, EntityBrep* brep);
 	void buildIndexedFaceToAnnotationVector(const TopoDS_Shape *shape);

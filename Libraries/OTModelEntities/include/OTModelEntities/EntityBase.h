@@ -227,6 +227,23 @@ public:
 	//! @param _menuCfg Context menu config to fill.
 	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg);
 
+	//!@brief Set the input dependency information for this entity. 
+	//! Input dependency means that the operation of this entity depends on the input entities.
+	//! @note If the entity itself is part of the list, it will be updated to the latest version while saving.
+	void setInputDependency(const std::list<std::pair<ot::UID, ot::UID>>& _inputDependency);
+
+	//!@brief Set the output dependency information for this entity (all entitites which are created by this entity)
+	void setOutputDependency(const std::list<std::pair<ot::UID, ot::UID>>& _outputDependency);
+
+	//!@brief Get the list of input dependencies for this entity. 
+	void getInputDependency(std::list<std::pair<ot::UID, ot::UID>>& _inputDependency) {	_inputDependency = m_inputDependency; }
+
+	//!@brief Get the list of output dependencies for this entity. 
+	void getOutputDependency(std::list<std::pair<ot::UID, ot::UID>>& _outputDependency) { _outputDependency = m_outputDependency; }
+
+	//!@brief Set whether the entity should update its own version in the dependency lists during the next save operation
+	void setUpdateSelfDependency(bool _updateSelfDepedency) { m_updateSelfDepedency = _updateSelfDepedency; }
+
 protected:
 	//! @brief Will set the default tree item.
 	//! Will reset the modified flags for all entries of the tree item.
@@ -249,6 +266,8 @@ protected:
 	virtual int getSchemaVersion() { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) {};
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
+	void storeDependencyArray(bsoncxx::builder::basic::document& _doc, const std::string& _dependencyName, const std::list<std::pair<ot::UID, ot::UID>>& _dependencies);
+	void readDependencyArray(const bsoncxx::document::view& _doc_view, const std::string& _dependencyName, std::list<std::pair<ot::UID, ot::UID>>& _dependencies);
 
 	ot::UID createEntityUID();
 	EntityBase *readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap);
@@ -270,6 +289,11 @@ private:
 	ot::VisualisationTypes  m_visualizationTypes; // Only stored when modified
 	bool                    m_isCopyable;
 	bool                    m_isCopyableChanged;
+
+	// Dependencies
+	std::list<std::pair<ot::UID, ot::UID>> m_inputDependency;
+	std::list<std::pair<ot::UID, ot::UID>> m_outputDependency;
+	bool m_updateSelfDepedency;
 
 	// Temporary attributes
 	EntityBase*             m_parentEntity;

@@ -165,6 +165,53 @@ void ot::components::ModelComponent::storeNewEntities(const std::string &descrip
 	clearNewEntityList();
 }
 
+void ot::components::ModelComponent::getListOfNewEntities(std::list<std::pair<ot::UID, ot::UID>> &newEntityList)
+{
+	newEntityList.clear();
+	assert(topologyEntityIDList.size() == topologyEntityVersionList.size());
+	assert(dataEntityIDList.size() == dataEntityVersionList.size());
+
+	auto it1t = topologyEntityIDList.begin();
+	auto it2t = topologyEntityVersionList.begin();
+
+	for (; it1t != topologyEntityIDList.end(); ++it1t, ++it2t) {
+		newEntityList.emplace_back(*it1t, *it2t);
+	}
+
+	auto it1d = dataEntityIDList.begin();
+	auto it2d = dataEntityVersionList.begin();
+
+	for (; it1d != dataEntityIDList.end(); ++it1d, ++it2d) {
+		newEntityList.emplace_back(*it1d, *it2d);
+	}
+}
+
+void ot::components::ModelComponent::updateEntityVersions(std::list<std::pair<ot::UID, ot::UID>>& entityList)
+{
+	// Store the entity ids in a list and get their entity information
+	std::list<ot::UID> entityIDList;
+	for (auto& entity : entityList)
+	{
+		entityIDList.push_back(entity.first);
+	}
+
+	std::list<ot::EntityInformation> entityInfoList;
+	ModelServiceAPI::getEntityInformation(entityIDList, entityInfoList);
+
+	// Store the new entity id -> version information in a map for fast access
+	std::map<ot::UID, ot::UID> newVersionMap;
+	for (auto& entityInfo : entityInfoList)
+	{
+		newVersionMap[entityInfo.getEntityID()] = entityInfo.getEntityVersion();
+	}
+
+	// Update the entity versions in the list
+	for (auto& entity : entityList)
+	{
+		entity.second = newVersionMap[entity.first];
+	}
+}
+
 void ot::components::ModelComponent::loadMaterialInformation()
 {
 	materialIDToNameMap.clear();

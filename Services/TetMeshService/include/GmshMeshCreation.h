@@ -67,7 +67,8 @@ private:
 	void closeProgressInformation(void);
 	enum lockType {ANY_OPERATION, MODEL_CHANGE};
 	void setUILock(bool flag, lockType type);
-	std::list<EntityGeometry *> loadGeometryEntitiesAndBreps(std::list<ot::UID> &geometryEntitiesID);
+	std::list<EntityGeometry *> loadGeometryEntitiesAndBreps(std::list<ot::UID> &geometryEntitiesID, std::list<std::pair<ot::UID, ot::UID>>& inputDependencyList);
+	bool meshNeedsUpdating(EntityMeshTet* mesh, const std::list<std::pair<ot::UID, ot::UID>>& currentInputDependencyList);
 
 	// Attributes
 	Application *application;

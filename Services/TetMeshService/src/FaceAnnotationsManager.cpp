@@ -33,15 +33,13 @@
 
 #include <gmsh.h_cwrap>
 
-void FaceAnnotationsManager::loadAllFaceAnnotations(void)
+void FaceAnnotationsManager::loadAllFaceAnnotations(std::list<std::pair<ot::UID, ot::UID>> &inputDependencyList)
 {
 	std::list<ot::UID> annotationEntityIDs = ot::ModelServiceAPI::getIDsOfFolderItemsOfType("", "EntityFaceAnnotation", true);
 
 	if (annotationEntityIDs.empty()) return;
 
 	application->prefetchDocumentsFromStorage(annotationEntityIDs);
-
-
 
 	for (auto annotation : annotationEntityIDs)
 	{
@@ -50,6 +48,8 @@ void FaceAnnotationsManager::loadAllFaceAnnotations(void)
 
 		EntityFaceAnnotation *annotationEntity = dynamic_cast<EntityFaceAnnotation *>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
 		assert(annotationEntity != nullptr);
+
+		inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(entityID, entityVersion));
 
 		if (annotationEntity != nullptr)
 		{

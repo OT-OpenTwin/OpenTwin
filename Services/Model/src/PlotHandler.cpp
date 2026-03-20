@@ -117,7 +117,7 @@ void PlotHandler::handleAddCurveToPlot()
 	
 	if (storeSecond)
 	{
-		model->updateTopologyEntities(plotsForUpdate, comment, true);
+		model->updateTopologyEntities(plotsForUpdate, comment, true, false);
 	}
 	
 	for (EntityResult1DPlot* selectedPlot : selectedPlots)

@@ -640,17 +640,18 @@ void ot::ModelServiceAPI::getEntityProperties(const std::string& entityName, boo
 	}
 }
 
-void ot::ModelServiceAPI::updateTopologyEntities(const NewModelStateInfo& _updatedEntities, const std::string& _comment, bool _considerVisualization) {
+void ot::ModelServiceAPI::updateTopologyEntities(const NewModelStateInfo& _updatedEntities, const std::string& _comment, bool _considerVisualization, bool _updateSelfDependencies) {
 	updateTopologyEntities(_updatedEntities.getTopologyEntityIDs(), _updatedEntities.getTopologyEntityVersions(), _comment, _considerVisualization);
 }
 
-void ot::ModelServiceAPI::updateTopologyEntities(const ot::UIDList& topologyEntityIDs, const ot::UIDList& topologyEntityVersions, const std::string& comment, bool _considerVisualization) {
+void ot::ModelServiceAPI::updateTopologyEntities(const ot::UIDList& topologyEntityIDs, const ot::UIDList& topologyEntityVersions, const std::string& comment, bool _considerVisualization, bool _updateSelfDependencies) {
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_UpdateTopologyEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityIDList, JsonArray(topologyEntityIDs, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityVersionList, JsonArray(topologyEntityVersions, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Description, JsonString(comment, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_ConsiderVisualization, _considerVisualization, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_UpdateSelfDependencies, _updateSelfDependencies, requestDoc.GetAllocator());
 	// Send the command
 	std::string response;
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);

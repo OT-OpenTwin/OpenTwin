@@ -4702,11 +4702,11 @@ void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot:
 	geomEntity->addVisualizationNodes();
 }
 
-void Model::updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment, bool _considerVisualization) {
-	updateTopologyEntities(_modelStateInfo.getTopologyEntityIDs(), _modelStateInfo.getTopologyEntityVersions(), _comment, _considerVisualization);
+void Model::updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment, bool _considerVisualization, bool _updateSelfDependencies) {
+	updateTopologyEntities(_modelStateInfo.getTopologyEntityIDs(), _modelStateInfo.getTopologyEntityVersions(), _comment, _considerVisualization, _updateSelfDependencies);
 }
 
-void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::UIDList& _topoEntityVersion, const std::string& _comment, bool _considerVisualization)
+void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::UIDList& _topoEntityVersion, const std::string& _comment, bool _considerVisualization, bool _updateSelfDependencies)
 {
 	enableQueuingHttpRequests(true);
 
@@ -4728,6 +4728,11 @@ void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::U
 	{
 		std::map<ot::UID, EntityBase*> map;
 		EntityBase* newEntity = readEntityFromEntityIDandVersion(nullptr, topoEntityID, *topoEntityVersion, map);
+		if (_updateSelfDependencies)
+		{
+			newEntity->setUpdateSelfDependency(true);
+		}
+
 		topoEntityVersion++;
 		EntityBase* oldEntity = findEntityFromName(newEntity->getName());
 

@@ -45,7 +45,8 @@ EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	m_modelState(_ms),
 	m_isDeletable(true),
 	m_isCopyable(true),
-	m_isCopyableChanged(false)
+	m_isCopyableChanged(false),
+	m_updateSelfDepedency(false)
 {
 	m_treeItem.setEntityID(_ID);
 }
@@ -259,6 +260,11 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 			setIsCopyable(docIt->get_bool());
 		}
 
+		readDependencyArray(doc_view, "InputDependency", m_inputDependency);
+		readDependencyArray(doc_view, "OutputDependency", m_outputDependency);
+
+		m_updateSelfDepedency = false; // Since we are loading the dependencies, we should never modify them again
+
 		std::string propertiesJSON = bsoncxx::to_json(bsonObj);
 		m_properties.buildFromJSON(propertiesJSON, nullptr);
 		m_properties.forceResetUpdateForAllProperties();
@@ -424,9 +430,99 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 		doc.append(bsoncxx::builder::basic::kvp("IsCopyable", m_isCopyable));
 	}
 
+	// Add the dependency arrays
+	storeDependencyArray(doc, "InputDependency", m_inputDependency);
+	storeDependencyArray(doc, "OutputDependency", m_outputDependency);
+
 	addStorageData(doc);
 
 	return doc;
+}
+
+void EntityBase::storeDependencyArray(bsoncxx::builder::basic::document& _doc, const std::string& _dependencyName, const std::list<std::pair<ot::UID, ot::UID>>& _dependencies)
+{
+	if (!_dependencies.empty())
+	{
+		bsoncxx::builder::basic::array dependencyArrayID;
+		bsoncxx::builder::basic::array dependencyArrayVersion;
+
+		for (const auto& pair : _dependencies)
+		{
+			if (pair.first == getEntityID() && m_updateSelfDepedency)
+			{
+				// If we are part of the dependencies (usually input), then we update our version to the latest save version
+				dependencyArrayID.append((long long)getEntityID());
+				dependencyArrayVersion.append((long long)getEntityStorageVersion());
+			}
+			else
+			{
+				dependencyArrayID.append((long long)pair.first);
+				dependencyArrayVersion.append((long long)pair.second);
+			}
+		}
+
+		_doc.append(bsoncxx::builder::basic::kvp(_dependencyName + "ID", dependencyArrayID));
+		_doc.append(bsoncxx::builder::basic::kvp(_dependencyName + "Version", dependencyArrayVersion));
+	}
+}
+
+void EntityBase::readDependencyArray(const bsoncxx::document::view& _doc_view, const std::string& _dependencyName, std::list<std::pair<ot::UID, ot::UID>>& _dependencies)
+{
+	_dependencies.clear();
+
+	std::string idName = _dependencyName + "ID";
+	std::string versionName = _dependencyName + "Version";
+
+	if (_doc_view.find(idName) == _doc_view.end()) return;
+	if (_doc_view.find(versionName) == _doc_view.end()) return;
+
+	auto idArray = _doc_view[idName].get_array().value;
+	auto versionArray = _doc_view[versionName].get_array().value;
+
+	size_t numberDependenciesId = std::distance(idArray.begin(), idArray.end());
+	size_t numberDependenciesVersion = std::distance(versionArray.begin(), versionArray.end());
+
+	if (numberDependenciesId != numberDependenciesVersion)
+	{
+		assert(0);
+		return;
+	}
+
+	auto pId = idArray.begin();
+	auto pVersion = versionArray.begin();
+
+	for (unsigned long index = 0; index < numberDependenciesId; index++)
+	{
+		ot::UID id = DataBase::getIntFromArrayViewIterator(pId);
+		ot::UID version = DataBase::getIntFromArrayViewIterator(pVersion);
+
+		_dependencies.push_back(std::pair<ot::UID, ot::UID>(id, version));
+
+		pId++;
+		pVersion++;
+	}
+}
+
+void EntityBase::setInputDependency(const std::list<std::pair<ot::UID, ot::UID>>& _inputDependency)
+{
+	m_inputDependency = _inputDependency;
+
+	// When storing the entity itself, its version will be updated. In order to keep the correct entity in the dependency list, we need to 
+	// update its version
+	m_updateSelfDepedency = true;
+
+	setModified();
+}
+
+void EntityBase::setOutputDependency(const std::list<std::pair<ot::UID, ot::UID>>& _outputDependency)
+{
+	m_outputDependency = _outputDependency;
+
+	// When storing the entity itself, its version will be updated. In order to keep the correct entity in the dependency list, we need to 
+	// update its version
+	m_updateSelfDepedency = true;
+
+	setModified();
 }
 
 void EntityBase::detachFromHierarchy(void) {

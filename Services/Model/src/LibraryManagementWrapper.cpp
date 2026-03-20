@@ -232,7 +232,7 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 	const std::string comment = "Property Updated";
 	ot::UIDList topoList{entBase->getEntityID()};
 	ot::UIDList versionList{entBase->getEntityStorageVersion()};
-	model->updateTopologyEntities(topoList, versionList, comment, true);
+	model->updateTopologyEntities(topoList, versionList, comment, true, false);
 }
 
 EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::LibraryElement& _importCfg, Model* _model) {
@@ -370,7 +370,7 @@ void LibraryManagementWrapper::createLibraryEntityAndUpdateProperty(
     ot::UIDList versionList{ entity->getEntityStorageVersion(), entBase->getEntityStorageVersion() };
     std::string comment = _dialogConfirmed ? "Created library entity and updated property" : "Created library entity";
     
-    modelPtr->updateTopologyEntities(topoList, versionList, comment, true);
+    modelPtr->updateTopologyEntities(topoList, versionList, comment, true, false);
 }
 
 

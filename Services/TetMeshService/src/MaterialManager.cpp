@@ -30,7 +30,7 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometryEntities, Properties &properties)
+void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometryEntities, Properties &properties, std::list<std::pair<ot::UID, ot::UID>> &inputDependencyList)
 {
 	application->getModelComponent()->loadMaterialInformation();
 
@@ -76,6 +76,8 @@ void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometr
 	for (auto mat : materialInformation)
 	{
 		EntityMaterial *material = dynamic_cast<EntityMaterial *> (ot::EntityAPI::readEntityFromEntityIDandVersion(mat.getEntityID(), mat.getEntityVersion()));
+
+		inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(mat.getEntityID(), mat.getEntityVersion()));
 
 		if (material == nullptr)
 		{

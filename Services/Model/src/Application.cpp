@@ -340,7 +340,12 @@ void Application::handleUpdateTopologyEntity(ot::JsonDocument& _document) {
 		considerVisualization = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_ConsiderVisualization);
 	}
 
-	m_model->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, comment, considerVisualization);
+	bool updateSelfDependencies = false;
+	if (ot::json::exists(_document, OT_ACTION_PARAM_MODEL_UpdateSelfDependencies)) {
+		updateSelfDependencies = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_UpdateSelfDependencies);
+	}
+
+	m_model->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, comment, considerVisualization, updateSelfDependencies);
 }
 
 void Application::handleAddGeometryOperation(ot::JsonDocument& _document) {

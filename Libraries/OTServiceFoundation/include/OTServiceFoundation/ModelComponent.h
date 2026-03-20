@@ -65,6 +65,8 @@ namespace ot {
 			void addNewTopologyEntity(UID entityID, UID entityVersion, bool forceVisible);
 			void addNewDataEntity(UID entityID, UID entityVersion, UID entityParentID);
 			void storeNewEntities(const std::string &description, bool askForBranchCreation = true, bool storeModel = true);
+			void getListOfNewEntities(std::list<std::pair<ot::UID, ot::UID>>& newEntityList);
+			void updateEntityVersions(std::list<std::pair<ot::UID, ot::UID>>& entityList);
 
 			void loadMaterialInformation();
 			std::string getCurrentMaterialName(EntityPropertiesEntityList* material);

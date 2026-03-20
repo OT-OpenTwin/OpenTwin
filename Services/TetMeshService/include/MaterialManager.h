@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "OTCore/CoreTypes.h"
+
 #include "Properties.h"
 
 #include <list>
@@ -35,7 +37,7 @@ public:
 	MaterialManager(Application *app) : application(app) {};
 	~MaterialManager() {};
 
-	void loadNecessaryMaterials(std::list<EntityGeometry *> geometryEntities, Properties &properties);
+	void loadNecessaryMaterials(std::list<EntityGeometry *> geometryEntities, Properties &properties, std::list<std::pair<ot::UID, ot::UID>>& inputDependencyList);
 	EntityMaterial *getMaterial(const std::string &name);
 
 private:
