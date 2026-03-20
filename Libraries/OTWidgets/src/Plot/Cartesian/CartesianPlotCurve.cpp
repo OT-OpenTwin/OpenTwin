@@ -108,6 +108,7 @@ ot::CartesianPlotCurve::CartesianPlotCurve(const QString& _title) :
 	QwtPlotCurve(_title), m_highlightPen(Qt::NoPen), m_pointInterval(1), m_hasHighlight(false)
 {
     setZ(PlotBase::ItemZOrder::visibleCurves());
+    setRenderHint(QwtPlotItem::RenderHint::RenderAntialiased, true);
 }
 
 void ot::CartesianPlotCurve::setHighlight(bool _highlight)
@@ -143,6 +144,7 @@ void ot::CartesianPlotCurve::drawSeries(QPainter* _painter, const QwtScaleMap& _
         {
             _painter->save();
             _painter->setPen(m_highlightPen);
+			_painter->setRenderHint(QPainter::Antialiasing, true);
             this->drawCurve(_painter, this->style(), _xMap, _yMap, _canvasRect, _from, _to);
             _painter->restore();
         }
@@ -151,6 +153,7 @@ void ot::CartesianPlotCurve::drawSeries(QPainter* _painter, const QwtScaleMap& _
         if (this->pen().style() != Qt::NoPen) {
             _painter->save();
             _painter->setPen(this->pen());
+            _painter->setRenderHint(QPainter::Antialiasing, true);
             this->drawCurve(_painter, this->style(), _xMap, _yMap, _canvasRect, _from, _to);
             _painter->restore();
         }
@@ -158,6 +161,7 @@ void ot::CartesianPlotCurve::drawSeries(QPainter* _painter, const QwtScaleMap& _
 		// Draw symbols if they are set
         if (this->symbol() && (this->symbol()->style() != QwtSymbol::NoSymbol)) {
             _painter->save();
+            _painter->setRenderHint(QPainter::Antialiasing, true);
             this->drawSymbols(_painter, *this->symbol(), _xMap, _yMap, _canvasRect, _from, _to);
             _painter->restore();
         }
@@ -179,7 +183,7 @@ void ot::CartesianPlotCurve::drawSymbols(QPainter* _painter, const QwtSymbol& _s
         const int n = qMin(chunkSize, _to - i + 1);
 
         const QPolygonF points = mapper.toPointsF(_xMap, _yMap, data(), i, i + n - 1, interval);
-
+        
         if (points.size() > 0) {
             _symbol.drawSymbols(_painter, points);
         }

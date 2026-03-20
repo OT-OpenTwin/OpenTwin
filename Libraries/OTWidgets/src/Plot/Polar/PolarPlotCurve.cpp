@@ -109,6 +109,7 @@ ot::PolarPlotCurve::PolarPlotCurve(const QString& _title) :
 	QwtPolarCurve(_title), m_highlightPen(Qt::NoPen), m_pointInterval(1), m_hasHighlight(false)
 {
     setZ(PlotBase::ItemZOrder::visibleCurves());
+    setRenderHint(QwtPolarItem::RenderHint::RenderAntialiased, true);
 }
 
 void ot::PolarPlotCurve::setHighlight(bool _highlight) {
