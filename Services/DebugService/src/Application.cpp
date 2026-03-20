@@ -450,8 +450,7 @@ void Application::createPlotTwoCurves() {
 	quantDesc2->defineQuantityAsSingle(ot::TypeNames::getInt32TypeName(), "dB");
 	
 	for (float i = 0.; i <= 50.; i++) {
-		//quantDesc2->addDatapoint(ot::Variable(-static_cast<int32_t>(i)));
-		quantDesc2->addDatapoint(ot::Variable(static_cast<int32_t>(i)));
+		quantDesc2->addDatapoint(ot::Variable(-static_cast<int32_t>(i)));
 		parameter2.values.push_back(ot::Variable(i));
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc2(new ParameterDescription(parameter2, false));

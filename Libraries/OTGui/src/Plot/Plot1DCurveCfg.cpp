@@ -74,12 +74,13 @@ ot::Plot1DCurveCfg::Symbol ot::Plot1DCurveCfg::stringToSymbol(const std::string&
 // Constructor / Destructor
 
 ot::Plot1DCurveCfg::Plot1DCurveCfg() : 
-	Plot1DCurveCfg(0, 0, std::string()) 
+	Plot1DCurveCfg(0, 0, std::string())
 {}
 
 ot::Plot1DCurveCfg::Plot1DCurveCfg(UID _id, UID _version, const std::string& _name) :
 	BasicEntityInformation(_name, _id, _version), m_navigationId(0), m_visible(true), m_dimmed(false),
-	m_linePen(1., new StyleRefPainter2D(ColorStyleValueEntry::PlotCurve)), m_pointSize(5), m_pointInterval(1), m_pointSymbol(NoSymbol),
+	m_linePen(1., new StyleRefPainter2D(ColorStyleValueEntry::PlotCurve)),
+	m_pointSize(5), m_pointInterval(1), m_pointSymbol(NoSymbol), m_pointColorFromCurve(false),
 	m_pointFillPainter(new StyleRefPainter2D(ColorStyleValueEntry::PlotCurveSymbol)), 
 	m_pointOulinePen(1., new StyleRefPainter2D(ColorStyleValueEntry::PlotCurveSymbol))
 {}
@@ -120,6 +121,7 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(Plot1DCurveCfg&& _other) noexc
 
 		m_pointSize = _other.m_pointSize;
 		m_pointInterval = _other.m_pointInterval;
+		m_pointColorFromCurve = _other.m_pointColorFromCurve;
 		m_pointSymbol = _other.m_pointSymbol;
 		m_pointOulinePen = std::move(_other.m_pointOulinePen);
 
@@ -151,6 +153,7 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const Plot1DCurveCfg& _other) 
 		m_pointSize = _other.m_pointSize;
 		m_pointInterval = _other.m_pointInterval;
 		m_pointSymbol = _other.m_pointSymbol;
+		m_pointColorFromCurve = _other.m_pointColorFromCurve;
 		m_pointOulinePen = _other.m_pointOulinePen;
 
 		m_queryInformation = _other.m_queryInformation;
@@ -187,6 +190,7 @@ void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
 	_object.AddMember("PointSymbol", JsonString(Plot1DCurveCfg::toString(m_pointSymbol), _allocator), _allocator);
 	_object.AddMember("PointSize", m_pointSize, _allocator);
 	_object.AddMember("PointInterval", m_pointInterval, _allocator);
+	_object.AddMember("PointColorFromCurve", m_pointColorFromCurve, _allocator);
 	_object.AddMember("PointOutlinePen", JsonObject(m_pointOulinePen, _allocator), _allocator);
 	_object.AddMember("PointFillPainter", JsonObject(m_pointFillPainter, _allocator), _allocator);
 
@@ -207,6 +211,7 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_pointSymbol = Plot1DCurveCfg::stringToSymbol(json::getString(_object, "PointSymbol"));
 	m_pointSize = json::getInt(_object, "PointSize");
 	m_pointInterval = json::getInt(_object, "PointInterval");
+	m_pointColorFromCurve = json::getBool(_object, "PointColorFromCurve");
 	m_pointOulinePen.setFromJsonObject(json::getObject(_object, "PointOutlinePen"));
 
 	m_queryInformation.setFromJsonObject(json::getObject(_object, "QueryInformation"));

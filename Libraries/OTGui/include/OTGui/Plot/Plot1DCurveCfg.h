@@ -134,6 +134,9 @@ namespace ot {
 		void setPointInterval(int _interval) { m_pointInterval = _interval; };
 		int getPointInterval() const { return m_pointInterval; };
 
+		void setPointColorFromCurve(bool _colorFromCurve) { m_pointColorFromCurve = _colorFromCurve; };
+		bool getPointColorFromCurve() const { return m_pointColorFromCurve; };
+
 		void setPointOutlinePen(const PenFCfg& _pen) { m_pointOulinePen = _pen; };
 		void setPointOutlinePenWidth(double _width) { m_pointOulinePen.setWidth(_width); };
 		void setPointOutlinePenColor(DefaultColor _color) { m_pointOulinePen.setColor(_color); };
@@ -178,6 +181,7 @@ namespace ot {
 
 		int m_pointSize;
 		int m_pointInterval;
+		bool m_pointColorFromCurve;
 		Symbol m_pointSymbol;
 		PenFCfg m_pointOulinePen;
 		Painter2D* m_pointFillPainter;

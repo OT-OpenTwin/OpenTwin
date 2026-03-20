@@ -39,8 +39,10 @@
 // Qt header
 #include <QtCore/qthread.h>
 
-QwtSymbol::Style ot::PlotDataset::toQwtSymbolStyle(Plot1DCurveCfg::Symbol _symbol) {
-	switch (_symbol) {
+QwtSymbol::Style ot::PlotDataset::toQwtSymbolStyle(Plot1DCurveCfg::Symbol _symbol)
+{
+	switch (_symbol)
+	{
 	case ot::Plot1DCurveCfg::NoSymbol: return QwtSymbol::Style::NoSymbol;
 	case ot::Plot1DCurveCfg::Circle: return QwtSymbol::Style::Ellipse;
 	case ot::Plot1DCurveCfg::Square: return QwtSymbol::Style::Rect;
@@ -62,8 +64,10 @@ QwtSymbol::Style ot::PlotDataset::toQwtSymbolStyle(Plot1DCurveCfg::Symbol _symbo
 	}
 }
 
-ot::Plot1DCurveCfg::Symbol ot::PlotDataset::toPlot1DCurveSymbol(QwtSymbol::Style _symbol) {
-	switch (_symbol) {
+ot::Plot1DCurveCfg::Symbol ot::PlotDataset::toPlot1DCurveSymbol(QwtSymbol::Style _symbol)
+{
+	switch (_symbol)
+	{
 	case QwtSymbol::NoSymbol: return Plot1DCurveCfg::NoSymbol;
 	case QwtSymbol::Ellipse: return Plot1DCurveCfg::Circle;
 	case QwtSymbol::Rect: return Plot1DCurveCfg::Square;
@@ -91,30 +95,35 @@ ot::Plot1DCurveCfg::Symbol ot::PlotDataset::toPlot1DCurveSymbol(QwtSymbol::Style
 
 ot::PlotDataset::PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data) :
 	m_config(_config), m_data(std::move(_data)), m_legendItem(nullptr),
-	m_cartesianCurve(nullptr), m_cartesianCurvePointSymbol(nullptr), 
+	m_cartesianCurve(nullptr), m_cartesianCurvePointSymbol(nullptr),
 	m_polarCurve(nullptr), m_polarCurvePointSymbol(nullptr)
 {
 	buildCartesianCurve();
 	buildPolarCurve();
 
-	if (_ownerPlot != nullptr) {
+	if (_ownerPlot != nullptr)
+	{
 		setOwnerPlot(_ownerPlot);
 	}
 }
 
-ot::PlotDataset::~PlotDataset() {
+ot::PlotDataset::~PlotDataset()
+{
 	this->detach();
-	
-	if (m_polarCurve != nullptr) {
+
+	if (m_polarCurve != nullptr)
+	{
 		delete m_polarCurve;
 		m_polarCurve = nullptr;
 	}
-	if (m_cartesianCurve != nullptr) {
+	if (m_cartesianCurve != nullptr)
+	{
 		delete m_cartesianCurve;
 		m_cartesianCurve = nullptr;
 	}
 
-	if (m_legendItem != nullptr) {
+	if (m_legendItem != nullptr)
+	{
 		delete m_legendItem;
 		m_legendItem = nullptr;
 	}
@@ -124,10 +133,12 @@ ot::PlotDataset::~PlotDataset() {
 
 // Attach / Detach
 
-void ot::PlotDataset::attach() {
+void ot::PlotDataset::attach()
+{
 	OTAssertNullptr(m_ownerPlot);
 
-	if (m_isAttatched) {
+	if (m_isAttatched)
+	{
 		return;
 	}
 	m_isAttatched = true;
@@ -152,8 +163,10 @@ void ot::PlotDataset::attach() {
 	updateLegendVisualization();
 }
 
-void ot::PlotDataset::detach() {
-	if (!m_isAttatched) {
+void ot::PlotDataset::detach()
+{
+	if (!m_isAttatched)
+	{
 		return;
 	}
 
@@ -175,10 +188,12 @@ void ot::PlotDataset::detach() {
 	}
 }
 
-void ot::PlotDataset::rebuildCurve(bool _reattach) {
+void ot::PlotDataset::rebuildCurve(bool _reattach)
+{
 	OTAssertNullptr(m_ownerPlot);
 
-	switch (m_ownerPlot->getCurrentPlotType()) {
+	switch (m_ownerPlot->getCurrentPlotType())
+	{
 	case Plot1DCfg::PlotType::Cartesian:
 		buildCartesianCurve();
 		break;
@@ -192,7 +207,8 @@ void ot::PlotDataset::rebuildCurve(bool _reattach) {
 		break;
 	}
 
-	if (_reattach) {
+	if (_reattach)
+	{
 		this->detach();
 		this->attach();
 	}
@@ -208,10 +224,11 @@ void ot::PlotDataset::setOwnerPlot(PlotBase* _ownerPlot)
 		createLegendItem();
 		m_legendItem->setLegend(m_ownerPlot->getLegend());
 	}
-	else if (m_legendItem) {
+	else if (m_legendItem)
+	{
 		m_legendItem->forgetLegend();
 	}
-	
+
 	rebuildCurve();
 }
 
@@ -247,65 +264,83 @@ ot::PolarPlotCurve* ot::PlotDataset::getPolarCurve()
 	}
 }
 
-void ot::PlotDataset::setCurveIsVisibile(bool _isVisible, bool _repaint) {
+void ot::PlotDataset::setCurveIsVisibile(bool _isVisible, bool _repaint)
+{
 	m_config.setVisible(_isVisible);
-	if (_repaint) {
+	if (_repaint)
+	{
 		this->updateCurveVisualization();
 	}
 }
 
-void ot::PlotDataset::setCurveWidth(double _penSize, bool _repaint) {
+void ot::PlotDataset::setCurveWidth(double _penSize, bool _repaint)
+{
 	m_config.setLinePenWidth(_penSize);
-	if (_repaint) {
+	if (_repaint)
+	{
 		this->updateCurveVisualization();
 	}
 }
 
-void ot::PlotDataset::setCurveColor(const Color& _color, bool _repaint) {
+void ot::PlotDataset::setCurveColor(const Color& _color, bool _repaint)
+{
 	m_config.setLinePenColor(_color);
-	if (_repaint) {
+	if (_repaint)
+	{
 		this->updateCurveVisualization();
 	}
 }
 
-void ot::PlotDataset::setCurvePointInnerColor(const Color& _color, bool _repaint) {
+void ot::PlotDataset::setCurvePointInnerColor(const Color& _color, bool _repaint)
+{
 	m_config.setPointFillColor(_color);
-	if (_repaint) {
+	if (_repaint)
+	{
 		this->updateCurveVisualization();
 	}
 }
 
-void ot::PlotDataset::setCurvePointOuterColor(const Color& _color, bool _repaint) {
+void ot::PlotDataset::setCurvePointOuterColor(const Color& _color, bool _repaint)
+{
 	m_config.setPointOutlinePenColor(_color);
-	if (_repaint) {
+	if (_repaint)
+	{
 		this->updateCurveVisualization();
 	}
 }
 
-void ot::PlotDataset::setCurvePointSize(int _size, bool _repaint) {
+void ot::PlotDataset::setCurvePointSize(int _size, bool _repaint)
+{
 	m_config.setPointSize(_size);
-	if (_repaint) {
+	if (_repaint)
+	{
 		this->updateCurveVisualization();
 	}
 }
 
-void ot::PlotDataset::setCurvePointOuterColorWidth(double _size, bool _repaint) {
+void ot::PlotDataset::setCurvePointOuterColorWidth(double _size, bool _repaint)
+{
 	m_config.setPointOutlinePenWidth(_size);
-	if (_repaint) {
+	if (_repaint)
+	{
 		this->updateCurveVisualization();
 	}
 }
 
-void ot::PlotDataset::setDimmed(bool _isDimmed, bool _repaint) {
+void ot::PlotDataset::setDimmed(bool _isDimmed, bool _repaint)
+{
 	m_config.setDimmed(_isDimmed);
-	if (_repaint) {
+	if (_repaint)
+	{
 		this->updateCurveVisualization();
 	}
 }
 
-void ot::PlotDataset::setPointInterval(int _interval, bool _repaint) {
+void ot::PlotDataset::setPointInterval(int _interval, bool _repaint)
+{
 	m_config.setPointInterval(_interval);
-	if (_repaint) {
+	if (_repaint)
+	{
 		this->updateCurveVisualization();
 	}
 }
@@ -319,8 +354,10 @@ void ot::PlotDataset::setAxisQuantitiesAndScaling(Plot1DAxisCfg::AxisQuantity _x
 	m_data.updateData();
 }
 
-void ot::PlotDataset::setSelected(bool _isSelected) {
-	if (_isSelected == m_isSelected) {
+void ot::PlotDataset::setSelected(bool _isSelected)
+{
+	if (_isSelected == m_isSelected)
+	{
 		return;
 	}
 
@@ -343,11 +380,13 @@ void ot::PlotDataset::setHighlighted(bool _hasHighlight)
 		zVal = PlotBase::ItemZOrder::highlightedCurves();
 	}
 
-	if (m_cartesianCurve) {
+	if (m_cartesianCurve)
+	{
 		m_cartesianCurve->setHighlight(_hasHighlight);
 		m_cartesianCurve->setZ(zVal);
 	}
-	if (m_polarCurve) {
+	if (m_polarCurve)
+	{
 		m_polarCurve->setHighlight(_hasHighlight);
 		m_polarCurve->setZ(zVal);
 	}
@@ -360,12 +399,13 @@ void ot::PlotDataset::setHighlighted(bool _hasHighlight)
 
 // Data Setter / Getter
 
-void ot::PlotDataset::updateCurveVisualization() {
+void ot::PlotDataset::updateCurveVisualization()
+{
 	PenFCfg linePenCfg(m_config.getLinePen());
 	const PenFCfg& pointOutlinePenCfg = m_config.getPointOutlinePen();
 
 	QPen linePen = QtFactory::toQPen(linePenCfg);
-	
+
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 	const ColorStyleValue& dimmedColorValue = cs.getValue(ColorStyleValueEntry::PlotCurveDimmed);
 
@@ -400,90 +440,138 @@ void ot::PlotDataset::updateCurveVisualization() {
 	}
 
 	// Setup curve pen
-	if (m_config.getVisible()) {
-		if (m_config.getDimmed()) {
+	if (m_config.getVisible())
+	{
+		if (m_config.getDimmed())
+		{
 			// Dimmend curve pen
-			if (m_cartesianCurve) {
+			if (m_cartesianCurve)
+			{
 				m_cartesianCurve->setPen(dimmedPen);
 			}
-			if (m_polarCurve) {
+			if (m_polarCurve)
+			{
 				m_polarCurve->setPen(dimmedPen);
 			}
 		}
-		else {
+		else
+		{
 			// Regular curve pen
-			if (m_cartesianCurve) {
+			if (m_cartesianCurve)
+			{
 				m_cartesianCurve->setPen(linePen);
 			}
-			if (m_polarCurve) {
+			if (m_polarCurve)
+			{
 				m_polarCurve->setPen(linePen);
-			}			
+			}
 		}
 	}
-	else {
+	else
+	{
 		// Invisible curve pen
-		if (m_cartesianCurve) {
+		if (m_cartesianCurve)
+		{
 			m_cartesianCurve->setPen(invisPen);
 		}
-		if (m_polarCurve) {
+		if (m_polarCurve)
+		{
 			m_polarCurve->setPen(invisPen);
 		}
 	}
 
 	// Setup points
-	if (m_config.getPointSymbol() != Plot1DCurveCfg::NoSymbol) {
-		if (m_config.getDimmed()) {
-			// Dimmed Point Pen & Brush
-			if (m_cartesianCurvePointSymbol) {
-				m_cartesianCurvePointSymbol->setPen(dimmedPen);
-				m_cartesianCurvePointSymbol->setBrush(dimmedBrush);
+	if (m_config.getPointSymbol() != Plot1DCurveCfg::NoSymbol)
+	{
+		if (m_config.getDimmed())
+		{
+			if (m_config.getLinePen().getStyle() == LineStyle::NoLine)
+			{
+				// Dimmed Point Pen & Brush if no line is shown
+				if (m_cartesianCurvePointSymbol)
+				{
+					m_cartesianCurvePointSymbol->setPen(dimmedPen);
+					m_cartesianCurvePointSymbol->setBrush(dimmedBrush);
+				}
+				if (m_polarCurvePointSymbol)
+				{
+					m_polarCurvePointSymbol->setPen(dimmedPen);
+					m_polarCurvePointSymbol->setBrush(dimmedBrush);
+				}
 			}
-			if (m_polarCurvePointSymbol) {
-				m_polarCurvePointSymbol->setPen(dimmedPen);
-				m_polarCurvePointSymbol->setBrush(dimmedBrush);
+			else
+			{
+				// Hide points if line is shown.
+				if (m_cartesianCurvePointSymbol)
+				{
+					m_cartesianCurvePointSymbol->setPen(QPen(QBrush(Qt::NoBrush), 0., Qt::PenStyle::NoPen));
+					m_cartesianCurvePointSymbol->setBrush(QBrush(Qt::NoBrush));
+				}
+				if (m_polarCurvePointSymbol)
+				{
+					m_polarCurvePointSymbol->setPen(QPen(QBrush(Qt::NoBrush), 0., Qt::PenStyle::NoPen));
+					m_polarCurvePointSymbol->setBrush(QBrush(Qt::NoBrush));
+				}
 			}
 		}
-		else {
+		else
+		{
 			// Regular Point Pen & Brush
 
 			QPen pointOutlinePen = QtFactory::toQPen(pointOutlinePenCfg);
 			QBrush pointOutlineFillBrush = QtFactory::toQBrush(m_config.getPointFillPainter());
 
-			if (m_cartesianCurvePointSymbol) {
+			if (m_config.getPointColorFromCurve())
+			{
+				pointOutlineFillBrush = linePen.brush();
+				pointOutlinePen.setBrush(pointOutlineFillBrush);
+			}
+
+			if (m_cartesianCurvePointSymbol)
+			{
 				m_cartesianCurvePointSymbol->setPen(pointOutlinePen);
 				m_cartesianCurvePointSymbol->setBrush(pointOutlineFillBrush);
 			}
-			if (m_polarCurvePointSymbol) {
+			if (m_polarCurvePointSymbol)
+			{
 				m_polarCurvePointSymbol->setPen(pointOutlinePen);
 				m_polarCurvePointSymbol->setBrush(pointOutlineFillBrush);
 			}
 		}
 
-		// Symbol
-		if (m_cartesianCurvePointSymbol) {
+		// Symbol and size
+		if (m_cartesianCurvePointSymbol)
+		{
 			m_cartesianCurvePointSymbol->setStyle(toQwtSymbolStyle(m_config.getPointSymbol()));
 			m_cartesianCurvePointSymbol->setSize(m_config.getPointSize());
 		}
-		if (m_polarCurvePointSymbol) {
+		if (m_polarCurvePointSymbol)
+		{
 			m_polarCurvePointSymbol->setStyle(toQwtSymbolStyle(m_config.getPointSymbol()));
 			m_polarCurvePointSymbol->setSize(m_config.getPointSize());
 		}
 	}
-	else { // No symbol
-		if (m_cartesianCurvePointSymbol) {
+	else
+	{ 
+		// No symbol
+		if (m_cartesianCurvePointSymbol)
+		{
 			m_cartesianCurvePointSymbol->setStyle(QwtSymbol::NoSymbol);
 		}
-		if (m_polarCurvePointSymbol) {
+		if (m_polarCurvePointSymbol)
+		{
 			m_polarCurvePointSymbol->setStyle(QwtSymbol::NoSymbol);
 		}
 	}
 
-	if (m_cartesianCurve) {
+	if (m_cartesianCurve)
+	{
 		m_cartesianCurve->setTitle(QString::fromStdString(m_config.getTitle()));
 		m_cartesianCurve->setVisible(m_config.getVisible());
 		m_cartesianCurve->setPointInterval(m_config.getPointInterval());
 	}
-	if (m_polarCurve) {
+	if (m_polarCurve)
+	{
 		m_polarCurve->setTitle(QString::fromStdString(m_config.getTitle()));
 		m_polarCurve->setVisible(m_config.getVisible());
 		m_polarCurve->setPointInterval(m_config.getPointInterval());
@@ -495,7 +583,8 @@ void ot::PlotDataset::updateCurveVisualization() {
 	updateLegendVisualization();
 }
 
-void ot::PlotDataset::buildCartesianCurve() {
+void ot::PlotDataset::buildCartesianCurve()
+{
 	if (m_cartesianCurve == nullptr)
 	{
 		OTAssert(m_cartesianCurvePointSymbol == nullptr, "Cartesian curve point symbol should be null when cartesian curve is null");
@@ -507,7 +596,8 @@ void ot::PlotDataset::buildCartesianCurve() {
 	}
 }
 
-void ot::PlotDataset::buildPolarCurve() {
+void ot::PlotDataset::buildPolarCurve()
+{
 	if (m_polarCurve == nullptr)
 	{
 		OTAssert(m_polarCurvePointSymbol == nullptr, "Polar curve point symbol should be null when polar curve is null");
@@ -528,7 +618,8 @@ void ot::PlotDataset::createLegendItem()
 			OT_LOG_E("Can not create legend item without owner set");
 			return;
 		}
-		else if (QThread::currentThread() != m_ownerPlot->thread()) {
+		else if (QThread::currentThread() != m_ownerPlot->thread())
+		{
 			OT_LOG_E("Can not create legend item from non main gui thread");
 			return;
 		}
@@ -541,7 +632,8 @@ void ot::PlotDataset::createLegendItem()
 
 void ot::PlotDataset::updateLegendVisualization()
 {
-	if (!m_legendItem) {
+	if (!m_legendItem)
+	{
 		return;
 	}
 
