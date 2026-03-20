@@ -26,13 +26,12 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT TableHeaderItemCfg : public Serializable {
+		OT_DECL_DEFCOPY(TableHeaderItemCfg)
+		OT_DECL_DEFMOVE(TableHeaderItemCfg)
 	public:
-		TableHeaderItemCfg();
+		TableHeaderItemCfg() = default;
 		TableHeaderItemCfg(const std::string& _text);
-		TableHeaderItemCfg(const TableHeaderItemCfg& _other);
-		virtual ~TableHeaderItemCfg();
-
-		TableHeaderItemCfg& operator = (const TableHeaderItemCfg& _other);
+		virtual ~TableHeaderItemCfg() = default;
 
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _object Json object reference to write the data to.
@@ -47,8 +46,12 @@ namespace ot {
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string& getText() const { return m_text; };
 
+		void setFilterEnabled(bool _enabled) { m_filterEnabled = _enabled; };
+		bool getFilterEnabled() const { return m_filterEnabled; };
+
 	private:
 		std::string m_text;
+		bool m_filterEnabled = false;
 	};
 
 }

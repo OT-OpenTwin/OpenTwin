@@ -79,8 +79,9 @@ namespace ot {
 		void setRowHeader(int _row, TableHeaderItemCfg* _item);
 		const TableHeaderItemCfg* getRowHeader(int _row) const;
 
-		void setColumnHeader(int _column, const std::string& _headerText);
 		void setColumnHeader(int _column, TableHeaderItemCfg* _item);
+		void setColumnHeaderText(int _column, const std::string& _headerText);
+		void setColumnHeaderFilterEnabled(int _column, bool _enabled);
 		const TableHeaderItemCfg* getColumnHeader(int _column) const;
 
 		void setSortingEnabled(bool _enable = true) { m_sortingEnabled = _enable; };

@@ -203,7 +203,7 @@ ot::TableCfg ot::Table::createConfig(void) const {
 			hasColumnHeader = true;
 
 			const std::string text = m_headerBuffer[column]; //We take the value from the buffer, not the displayed value. The displayed value is beautified.
-			cfg.setColumnHeader(column, text);
+			cfg.setColumnHeaderText(column, text);
 		}
 	}
 

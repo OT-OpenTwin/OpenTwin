@@ -88,7 +88,7 @@ ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::Tab
 		for (matrixPointer.m_column = 0; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);
-			this->setColumnHeader(matrixPointer.m_column, entry);
+			this->setColumnHeaderText(matrixPointer.m_column, entry);
 		}
 	}
 	
@@ -413,15 +413,37 @@ const ot::TableHeaderItemCfg* ot::TableCfg::getRowHeader(int _row) const {
 	return m_rowHeader[_row];
 }
 
-void ot::TableCfg::setColumnHeader(int _column, const std::string& _headerText) {
-	this->setColumnHeader(_column, new TableHeaderItemCfg(_headerText));
-}
-
 void ot::TableCfg::setColumnHeader(int _column, TableHeaderItemCfg* _item) {
 	OTAssert(_column < m_columns, "Index out of range");
 	if (m_columnHeader[_column] == _item) return;
 	if (m_columnHeader[_column]) delete m_columnHeader[_column];
 	m_columnHeader[_column] = _item;
+}
+
+void ot::TableCfg::setColumnHeaderText(int _column, const std::string& _headerText)
+{
+	OTAssert(_column < m_columns, "Index out of range");
+	TableHeaderItemCfg* itm = m_columnHeader[_column];
+	if (!itm)
+	{
+		itm = new TableHeaderItemCfg;
+		this->setColumnHeader(_column, itm);
+	}
+	
+	itm->setText(_headerText);
+}
+
+void ot::TableCfg::setColumnHeaderFilterEnabled(int _column, bool _enabled)
+{
+	OTAssert(_column < m_columns, "Index out of range");
+	TableHeaderItemCfg* itm = m_columnHeader[_column];
+	if (!itm)
+	{
+		itm = new TableHeaderItemCfg;
+		this->setColumnHeader(_column, itm);
+	}
+
+	itm->setFilterEnabled(_enabled);
 }
 
 const ot::TableHeaderItemCfg* ot::TableCfg::getColumnHeader(int _column) const {
