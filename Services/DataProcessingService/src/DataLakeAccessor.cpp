@@ -554,7 +554,7 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateComparisonConsideringUn
 		assert(unitsTarget.size() == unitsCurrent.size());
 		ValueProcessingChainBuilder chainBuilder;
 		bool queryForEntireTuple = _queryDescription.getValueComparisonDescription().getTupleTarget() == _queryDescription.getValueComparisonDescription().getTupleInstance().getTupleTypeName();
-		bool queryTuple = 	_queryDescription.getValueComparisonDescription().getTupleInstance().isSingle();
+		bool queryTuple = 	!_queryDescription.getValueComparisonDescription().getTupleInstance().isSingle();
 		if (!queryTuple || (queryTuple  && queryForEntireTuple))
 		{
 			if (values.size() != unitsCurrent.size())
@@ -603,14 +603,14 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateComparisonConsideringUn
 			
 			for (size_t i = 0; i < unitsCurrent.size(); i++)
 			{
-				ValueProcessing processingChain = chainBuilder.build(unitsCurrent[i], unitsTarget[i]);
+				const ValueProcessing processingChain = chainBuilder.build(unitsCurrent[i], unitsTarget[i]);
 				if (processingChain.executionNecessary())
 				{
 					if (i == pos)
 					{
 						values[0] = processingChain.executeSequence(values[0]);
 					}
-					ValueProcessing inverseProcessingChain = processingChain.createInverse();
+					const ValueProcessing inverseProcessingChain = processingChain.createInverse();
 					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(inverseProcessingChain));
 				}
 				else

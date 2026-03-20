@@ -15,3 +15,9 @@ std::unique_ptr<ValueProcessor> ValueProcessorPow::inverse() const
 {
 	return std::make_unique<ValueProcessorPow>(1/m_multiplier, 1.0 / m_exponent);
 }
+
+ValueProcessor* ValueProcessorPow::createCopy()
+{
+	auto newProcessor = std::make_unique< ValueProcessorPow>(m_multiplier, m_exponent);
+	return newProcessor.release();
+}

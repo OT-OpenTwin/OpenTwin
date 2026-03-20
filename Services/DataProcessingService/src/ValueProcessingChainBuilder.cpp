@@ -12,17 +12,60 @@ ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitStrin
 {
     try
     {
-        UnitTokenizer tokenizer;
-        std::vector<UnitToken> unitTokensCurrent = tokenizer.tokenize(_unitStringCurrent);
-        std::vector<UnitToken> unitTokensTarget = tokenizer.tokenize(_unitStringTarget);
+        if (_unitStringCurrent.empty() || _unitStringTarget.empty())
+        {
+            // Both units have to be dimensionless.
+            if (_unitStringCurrent.empty() && _unitStringTarget.empty())
+            {
+                return ValueProcessing();
+            }
 
-        std::vector<ResolvedToken> resolvedTokenCurrent = resolveTokens(unitTokensCurrent);
-        std::vector<ResolvedToken> resolvedTokenTarget = resolveTokens(unitTokensTarget);
+            UnitTokenizer tokenizer;
+            ResolvedToken dummyToken;
+            dummyToken.m_exponent = 1;
+            dummyToken.m_resolvedComponent.m_base = { "", "", "SI", ot::Dimension{}, 1.0, 0.0 };
 
-        dimensionCompatibilityGuard(resolvedTokenCurrent, resolvedTokenTarget, _unitStringCurrent, _unitStringTarget);
+            if (!_unitStringCurrent.empty())
+            {
+                std::vector<UnitToken> unitTokensCurrent = tokenizer.tokenize(_unitStringCurrent);
+                std::vector<ResolvedToken> resolvedTokenCurrent = resolveTokens(unitTokensCurrent);
+                assert(resolvedTokenCurrent.size() == 1);
+                if (!(resolvedTokenCurrent[0].m_resolvedComponent.m_base.m_dimension == ot::Dimension{}))
+                {
+                    throw std::exception("Cannot transform a dimensionless unit into a unit with dimension.");
+                }
+                
+                const ValueProcessing processing = buildChain(resolvedTokenCurrent, { dummyToken });
+                return processing;
+            }
+            else
+            {
+                std::vector<UnitToken> unitTokensTarget = tokenizer.tokenize(_unitStringTarget);
+                std::vector<ResolvedToken> resolvedTokenTarget= resolveTokens(unitTokensTarget);
+                assert(resolvedTokenTarget.size() == 1);
+                if (!(resolvedTokenTarget[0].m_resolvedComponent.m_base.m_dimension == ot::Dimension{}))
+                {
+                    throw std::exception("Cannot transform a dimensionless unit into a unit with dimension.");
+                }
 
-        ValueProcessing processing = buildChain(resolvedTokenCurrent, resolvedTokenTarget);
-	    return processing;
+                const ValueProcessing processing = buildChain({ dummyToken }, resolvedTokenTarget);
+                return processing;
+            }
+        }
+        else
+        {
+            UnitTokenizer tokenizer;
+            std::vector<UnitToken> unitTokensCurrent = tokenizer.tokenize(_unitStringCurrent);
+            std::vector<ResolvedToken> resolvedTokenCurrent = resolveTokens(unitTokensCurrent);
+            std::vector<UnitToken> unitTokensTarget = tokenizer.tokenize(_unitStringTarget);
+
+            std::vector<ResolvedToken> resolvedTokenTarget = resolveTokens(unitTokensTarget);
+
+            dimensionCompatibilityGuard(resolvedTokenCurrent, resolvedTokenTarget, _unitStringCurrent, _unitStringTarget);
+
+            const ValueProcessing processing = buildChain(resolvedTokenCurrent, resolvedTokenTarget);
+	        return processing;
+        }
     }
     catch (std::exception& _e)
     {

@@ -12,17 +12,49 @@ ValueProcessing::~ValueProcessing()
 	}
 }
 
-ot::Variable ValueProcessing::executeSequence(const ot::Variable& _input)
+ValueProcessing::ValueProcessing(const ValueProcessing& _other)
 {
-	ValueProcessor* currentProcessor = *m_processors.begin();
+	for (auto& processor : _other.m_processors)
+	{
+		m_processors.push_back(processor->createCopy());
+	}
+}
+
+ValueProcessing::ValueProcessing(ValueProcessing&& _other) noexcept
+{
+	for (auto& processor : _other.m_processors)
+	{
+		m_processors.push_back(std::move(processor));
+	}
+	_other.m_processors.clear();
+}
+
+ValueProcessing& ValueProcessing::operator=(const ValueProcessing& _other)
+{
+	for (auto& processor : _other.m_processors)
+	{
+		m_processors.push_back(processor->createCopy());
+	}
+	return *this;
+}
+
+ValueProcessing& ValueProcessing::operator=(ValueProcessing&& _other) noexcept 
+{
+	for (auto& processor : _other.m_processors)
+	{
+		m_processors.push_back(std::move(processor));
+	}
+	_other.m_processors.clear();
+	return *this;
+}
+
+ot::Variable ValueProcessing::executeSequence(const ot::Variable& _input) const
+{
 	ot::Variable currentValue = _input;
-	while (currentProcessor != nullptr)
+	for (ValueProcessor* currentProcessor : m_processors)
 	{
 		currentValue = currentProcessor->execute(currentValue);
-		currentProcessor = currentProcessor->getNext();
-
 	}
-
 	return currentValue;
 }
 
@@ -39,7 +71,7 @@ void ValueProcessing::setSequence(std::list<std::unique_ptr<ValueProcessor>>&& _
 	}
 }
 
-ValueProcessing ValueProcessing::createInverse()
+ValueProcessing ValueProcessing::createInverse() const 
 {
 	ValueProcessing inverse;
 	std::list<std::unique_ptr<ValueProcessor>> processors;

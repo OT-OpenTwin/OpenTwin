@@ -16,11 +16,17 @@ class ValueProcessing
 {
 public:
 	~ValueProcessing();
-	ot::Variable executeSequence(const ot::Variable& _input);
+	ValueProcessing() = default;
+	ValueProcessing(const ValueProcessing& _other);
+	ValueProcessing(ValueProcessing&& _other) noexcept;
+	ValueProcessing& operator=(const ValueProcessing& _other);
+	ValueProcessing& operator=(ValueProcessing&& _other) noexcept;
+
+	ot::Variable executeSequence(const ot::Variable& _input) const;
 	void setSequence(const std::string& _jsonSerialisedSequence);
 	void setSequence(std::list<std::unique_ptr<ValueProcessor>>&& _sequence);
-	bool executionNecessary() { return m_processors.size() > 0; }
-	ValueProcessing createInverse();
+	bool executionNecessary() const { return m_processors.size() > 0; }
+	ValueProcessing createInverse() const;
 
 private:
 	std::list<ValueProcessor*> m_processors;

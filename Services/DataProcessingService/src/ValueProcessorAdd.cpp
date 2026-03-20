@@ -14,3 +14,9 @@ std::unique_ptr<ValueProcessor> ValueProcessorAdd::inverse() const
 	auto add = std::make_unique<ValueProcessorAdd>(-m_summand);
 	return add;
 }
+
+ValueProcessor* ValueProcessorAdd::createCopy()
+{
+	auto newProcessor = std::make_unique<ValueProcessorAdd>(m_summand);
+	return newProcessor.release();
+}

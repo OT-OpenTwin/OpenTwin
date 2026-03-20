@@ -40,3 +40,9 @@ std::unique_ptr<ValueProcessor> ValueProcessorLog::inverse() const
 	}
 	
 }
+
+ValueProcessor* ValueProcessorLog::createCopy()
+{
+	auto newProcessor = std::make_unique<ValueProcessorLog>(m_multiplier, m_base);
+	return newProcessor.release();
+}

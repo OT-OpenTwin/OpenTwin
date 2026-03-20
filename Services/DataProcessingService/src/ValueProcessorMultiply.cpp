@@ -13,3 +13,11 @@ std::unique_ptr<ValueProcessor> ValueProcessorMultiply::inverse() const
 {
     return std::make_unique<ValueProcessorMultiply>(1/m_factor);
 }
+
+ValueProcessor* ValueProcessorMultiply::createCopy()
+{
+    auto newProcessor = std::make_unique<ValueProcessorMultiply>(m_factor);
+    return newProcessor.release();
+}
+
+

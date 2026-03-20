@@ -13,7 +13,8 @@ public:
 	ot::Variable execute(const ot::Variable& _input) override;
 	// Inherited via ValueProcessor
 	std::unique_ptr<ValueProcessor> inverse() const override;
-	
+	ValueProcessor* createCopy() override;
+
 private:
 	const double m_multiplier;
 	SupportedBases m_base;

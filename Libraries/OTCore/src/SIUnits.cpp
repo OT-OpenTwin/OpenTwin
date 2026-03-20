@@ -89,6 +89,7 @@ SIUnits::SIUnits()
     m_registry.addUnit(helper( "arcsec","arcsecond",  "SI",       ANGLE, pi / 648000.0 ));
 
     m_registry.addAlias("degree", "deg");
+    m_registry.addAlias("Deg", "deg");
     m_registry.addAlias("degrees", "deg");
     m_registry.addAlias("radian", "rad");
     m_registry.addAlias("radians", "rad");
