@@ -35,7 +35,7 @@ namespace ot {
 		OT_DECL_NOMOVE(PlotSeriesData)
 		OT_DECL_NODEFAULT(PlotSeriesData)
 	public:
-		PlotSeriesData(PlotDatasetData* _data);
+		explicit PlotSeriesData(PlotDatasetData* _data);
 		virtual ~PlotSeriesData();
 
 		virtual size_t size() const override;

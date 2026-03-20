@@ -33,9 +33,12 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT Plot1DCurveCfg : public BasicEntityInformation {
+	//! @brief The Plot1DCurveCfg class represents the configuration for a single curve in a 1D plot.
+	class OT_GUI_API_EXPORT Plot1DCurveCfg : public BasicEntityInformation
+	{
 	public:
-		enum Symbol {
+		enum Symbol
+		{
 			NoSymbol,
 			Circle,
 			Square,
@@ -157,7 +160,10 @@ namespace ot {
 		//! The curve keeps ownership of the painter.
 		const Painter2D* getPointFillPainter() const { return m_pointFillPainter; };
 
-		void setQueryInformation(QueryInformation _queryInformation) { m_queryInformation = _queryInformation; };
+		//! @brief Set the query information for the curve.
+		//! @param _queryInformation 
+		void setQueryInformation(const QueryInformation& _queryInformation) { m_queryInformation = _queryInformation; };
+		void setQueryInformation(QueryInformation&& _queryInformation) { m_queryInformation = std::move(_queryInformation); };
 		const QueryInformation& getQueryInformation() const { return m_queryInformation; };
 
 	private:
@@ -169,7 +175,7 @@ namespace ot {
 		bool m_dimmed;
 
 		PenFCfg m_linePen;
-		
+
 		int m_pointSize;
 		int m_pointInterval;
 		Symbol m_pointSymbol;

@@ -66,6 +66,7 @@ exceptions:
 */
 
 // OpenTwin header
+#include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/PlotPointMapper.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotCurve.h"
 
@@ -106,7 +107,7 @@ QRectF ot::CartesianPlotCurve::intersectedClipRect(const QRectF& _rect, QPainter
 ot::CartesianPlotCurve::CartesianPlotCurve(const QString& _title) :
 	QwtPlotCurve(_title), m_highlightPen(Qt::NoPen), m_pointInterval(1), m_hasHighlight(false)
 {
-
+    setZ(PlotBase::ItemZOrder::visibleCurves());
 }
 
 void ot::CartesianPlotCurve::setHighlight(bool _highlight)
@@ -114,7 +115,7 @@ void ot::CartesianPlotCurve::setHighlight(bool _highlight)
     if (_highlight == m_hasHighlight) {
         return;
 	}
-
+    
     m_hasHighlight = _highlight;
 }
 

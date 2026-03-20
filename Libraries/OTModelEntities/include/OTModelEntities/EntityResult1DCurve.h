@@ -105,6 +105,6 @@ protected:
 private:
 	ot::QueryInformation m_queryInformation;
 
-	bsoncxx::builder::basic::document serialise(ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription);
+	bsoncxx::builder::basic::document serialise(const ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription);
 	ot::QuantityContainerEntryDescription deserialise(bsoncxx::v_noabi::document::view _subDocument);
 };

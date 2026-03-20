@@ -190,7 +190,7 @@ void ot::PolarPlot::mouseDoubleClickEvent(QMouseEvent* _event)
 				owner->requestResetItemSelection();
 				return;
 			}
-			owner->requestCurveDoubleClicked(dataset->getEntityID(), _event->modifiers().testFlag(Qt::ControlModifier));
+			owner->requestCurveDoubleClicked(dataset, _event->modifiers().testFlag(Qt::ControlModifier));
 		}
 		else {
 			owner->requestResetItemSelection();

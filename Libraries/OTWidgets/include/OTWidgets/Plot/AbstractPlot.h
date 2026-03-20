@@ -31,11 +31,12 @@ namespace ot {
 
 	class PlotBase;
 
+	//! @brief Abstract base class for 1D and Polar plots.
 	class OT_WIDGETS_API_EXPORT AbstractPlot : public WidgetBase {
 		OT_DECL_NOCOPY(AbstractPlot)
 		OT_DECL_NODEFAULT(AbstractPlot)
 	public:
-		AbstractPlot(PlotBase* _ownerPlot);
+		explicit AbstractPlot(PlotBase* _ownerPlot);
 
 		virtual ~AbstractPlot();
 
@@ -43,9 +44,8 @@ namespace ot {
 
 		// Plot
 
+		//! @brief Updates the grid properties (visibility, color, line width, ...) on the plot.
 		virtual void updateGrid() = 0;
-
-		virtual void updateWholePlot() = 0;
 
 		virtual void clearPlot() = 0;
 
@@ -55,10 +55,21 @@ namespace ot {
 
 		virtual void updateAllAxes() = 0;
 
+		//! @brief Update the entire plot by updating the axes and calling replot() on the plot widget.
+		//! After replotting the zoomer and panner will be reset if needed.
+		virtual void updateWholePlot() = 0;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Axis
 
+		bool hasPlotAxis(AbstractPlotAxis::AxisID _id) const;
+
+		//! @brief Returns the plot axis for the given identifier.
+		//! The plot keeps ownership of the axis.
+		//! @throws ot::InvalidArgumentException if the provided axis identifier is not valid for this plot type (e.g. xBottom or xTop for Polar plots).
+		//! @throws ot::ObjectNotFoundException if the axis for the provided identifier does not exist (e.g. yRight axis for a plot that only has a left Y-axis).
+		//! @param _id Identifier of the axis to return.
 		AbstractPlotAxis* getPlotAxis(AbstractPlotAxis::AxisID _id);
 
 		void setPlotAxisTitle(AbstractPlotAxis::AxisID _axis, const QString& _title);

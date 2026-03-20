@@ -3854,8 +3854,10 @@ void AppBase::slotPlotResetItemSelectionRequest() {
 	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
-void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModifier) {
+void AppBase::slotPlotCurveDoubleClicked(ot::PlotDataset* _dataset, bool _hasControlModifier) {
 	OT_SLECTION_TEST_LOG("Plot curve double clicked");
+
+	OTAssertNullptr(_dataset);
 
 	ot::Plot* plot = dynamic_cast<ot::Plot*>(sender());
 	if (!plot) {
@@ -3866,7 +3868,7 @@ void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModi
 	try {
 		QSignalBlocker sigBlock(m_projectNavigation->getTree());
 
-		ot::UID treeId = ViewerAPI::getTreeIDFromModelEntityID(_entityID);
+		ot::UID treeId = ViewerAPI::getTreeIDFromModelEntityID(_dataset->getEntityID());
 
 		if (_hasControlModifier) {
 			this->toggleNavigationTreeItemSelection(treeId, false);
@@ -3874,7 +3876,7 @@ void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModi
 			// Check if any curve will be visible after the operation
 			bool hasSelection = false;
 			for (const ot::PlotDataset* data : plot->getAllDatasets()) {
-				if (data->getEntityID() == _entityID && !this->isTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(data->getEntityID()))) {
+				if (data->getEntityID() == _dataset->getEntityID() && !this->isTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(data->getEntityID()))) {
 					hasSelection = true;
 					break;
 				}
@@ -3896,7 +3898,7 @@ void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModi
 
 			// Reset selection for other curves in plot
 			for (const ot::PlotDataset* data : plot->getAllDatasets()) {
-				if (data->getEntityID() != _entityID) {
+				if (data->getEntityID() != _dataset->getEntityID()) {
 					this->setNavigationTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(data->getEntityID()), false);
 				}
 			}

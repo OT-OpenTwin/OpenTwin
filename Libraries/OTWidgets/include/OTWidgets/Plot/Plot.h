@@ -26,7 +26,8 @@ namespace ot {
 
 	//! @class Plot
 	//! @brief Basic plot.
-	//! The plot allows multiple Datasets to be added for the same UID.
+	//! The plot caches the datasets for each entity ID.
+	//! Allows multiple Datasets to be added for the same entity ID.
 	class OT_WIDGETS_API_EXPORT Plot : public PlotBase {
 		OT_DECL_NOCOPY(Plot)
 		OT_DECL_NOMOVE(Plot)
@@ -70,8 +71,8 @@ namespace ot {
 		// Protected virtual methods
 
 	protected:
-		virtual void clearCache(void) override;
-		virtual void detachAllCached(void) override;
+		virtual void clearCache() override;
+		virtual void detachAllCached() override;
 		
 	private:
 		std::map<UID, std::list<PlotDataset*>> m_cache;

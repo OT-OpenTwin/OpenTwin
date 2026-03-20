@@ -30,9 +30,12 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotGrid : public QwtPlotGrid {
+	class OT_WIDGETS_API_EXPORT CartesianPlotGrid : public QwtPlotGrid
+	{
+		OT_DECL_NOCOPY(CartesianPlotGrid)
+		OT_DECL_NOMOVE(CartesianPlotGrid)
 	public:
-		CartesianPlotGrid();
+		explicit CartesianPlotGrid();
 		virtual ~CartesianPlotGrid();
 
 		void setGrid(const QColor& _color, double _width);

@@ -17,6 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
+// OpenTwin header
 #include "OTGui/QuantityContainerEntryDescription.h"
 
 void ot::QuantityContainerEntryDescription::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
@@ -24,9 +25,7 @@ void ot::QuantityContainerEntryDescription::addToJsonObject(ot::JsonValue& _obje
 	_object.AddMember("FieldName", JsonString(m_fieldName, _allocator), _allocator);
 	_object.AddMember("Label", JsonString(m_label, _allocator), _allocator);
 	_object.AddMember("DataDimension", JsonArray(m_dimension, _allocator), _allocator);
-	ot::JsonObject tupleInstance;
-	m_tupleInstance.addToJsonObject(tupleInstance, _allocator);
-	_object.AddMember("TupleInstance", tupleInstance, _allocator);
+	_object.AddMember("TupleInstance", JsonObject(m_tupleInstance, _allocator), _allocator);
 }
 
 void ot::QuantityContainerEntryDescription::setFromJsonObject(const ot::ConstJsonObject& _object)
@@ -34,8 +33,7 @@ void ot::QuantityContainerEntryDescription::setFromJsonObject(const ot::ConstJso
 	m_fieldName = ot::json::getString(_object, "FieldName");
 	m_label = ot::json::getString(_object, "Label");
 	m_dimension = ot::json::getUIntVector(_object, "DataDimension");
-	auto tupleInstance = ot::json::getObject(_object, "TupleInstance");
-	m_tupleInstance.setFromJsonObject(tupleInstance);
+	m_tupleInstance.setFromJsonObject(ot::json::getObject(_object, "TupleInstance"));
 }
 
 

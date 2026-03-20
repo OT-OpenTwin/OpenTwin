@@ -31,9 +31,10 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PolarPlotPanner : public QwtPolarPanner {
 		OT_DECL_NOCOPY(PolarPlotPanner)
+		OT_DECL_NOMOVE(PolarPlotPanner)
 		OT_DECL_NODEFAULT(PolarPlotPanner)
 	public:
-		PolarPlotPanner(PolarPlot* _plot);
+		explicit PolarPlotPanner(PolarPlot* _plot);
 		virtual ~PolarPlotPanner();
 
 	private:

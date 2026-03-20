@@ -45,19 +45,19 @@ namespace ot {
 		OT_DECL_NOCOPY(PlotDatasetData)
 	public:
 		//! @brief Default constructor. Creates an empty dataset with undefined quantities.
-		PlotDatasetData();
+		explicit PlotDatasetData();
 
 		//! @brief Constructor for real data.
 		//! The data can not be changed to a different quantity.
 		//! @param _dataX X values of the dataset.
 		//! @param _dataY Y values of the dataset.
-		PlotDatasetData(const std::vector<double>& _dataX, std::vector<double>&& _dataY);
+		explicit PlotDatasetData(const std::vector<double>& _dataX, std::vector<double>&& _dataY);
 
 		//! @brief Constructor for real data.
 		//! The data can not be changed to a different quantity.
 		//! @param _dataX X values of the dataset.
 		//! @param _dataY Y values of the dataset.
-		PlotDatasetData(std::vector<double>&& _dataX, std::vector<double>&& _dataY);
+		explicit PlotDatasetData(std::vector<double>&& _dataX, std::vector<double>&& _dataY);
 
 		//! @brief Constructor for complex data.
 		//! @param _dataX X values of the dataset.
@@ -65,7 +65,7 @@ namespace ot {
 		//! @param _complexRepresentation Representation of the provided complex data. This is required to correctly convert the data to the real/imaginary representation.
 		//! @param _initialXQuantity Initial quantity for the X axis.
 		//! @param _initialYQuantity Initial quantity for the Y axis.
-		PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantity _initialYQuantity = Plot1DAxisCfg::Real);
+		explicit PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantity _initialYQuantity = Plot1DAxisCfg::Real);
 
 		//! @brief Constructor for complex data.
 		//! @param _dataX X values of the dataset.
@@ -73,7 +73,7 @@ namespace ot {
 		//! @param _complexRepresentation Representation of the provided complex data. This is required to correctly convert the data to the real/imaginary representation.
 		//! @param _initialXQuantity Initial quantity for the X axis.
 		//! @param _initialYQuantity Initial quantity for the Y axis.
-		PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantity _initialYQuantity = Plot1DAxisCfg::Real);
+		explicit PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantity _initialYQuantity = Plot1DAxisCfg::Real);
 
 		PlotDatasetData(PlotDatasetData&& _other) noexcept;
 		PlotDatasetData& operator=(PlotDatasetData&& _other) noexcept;
@@ -100,7 +100,7 @@ namespace ot {
 		size_t getSize() const;
 		template <typename T> T getSample(size_t _index) const;
 
-		constexpr bool canConvert() const { return m_canConvert; };
+		inline bool dataIsComplex() const { return m_dataIsComplex; };
 
 		void resetCachedRect();
 
@@ -124,7 +124,7 @@ namespace ot {
 
 		std::vector<double> m_dataX;
 		std::vector<std::complex<double>> m_dataY;
-		bool m_canConvert;
+		bool m_dataIsComplex;
 
 		std::vector<double> m_calcX; //! @brief Calculated X values depending on the currently used complex representation
 		std::vector<double> m_calcY; //! @brief Calculated Y values depending on the currently used complex representation

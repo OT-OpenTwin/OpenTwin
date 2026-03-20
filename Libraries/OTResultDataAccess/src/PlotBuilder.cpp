@@ -62,11 +62,11 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	curveEntity.setName(_config.getEntityName());
 	curveEntity.createProperties();
 
-	m_quantityLabel.push_back(_config.getQueryInformation().m_quantityDescription.m_label);
+	m_quantityLabel.push_back(_config.getQueryInformation().getQuantityDescription().getLabel());
 
-	for (auto& parameterDescription : _config.getQueryInformation().m_parameterDescriptions)
+	for (auto& parameterDescription : _config.getQueryInformation().getParameterDescriptions())
 	{
-		m_parameterLabels.push_back(parameterDescription.m_label);
+		m_parameterLabels.push_back(parameterDescription.getLabel());
 	}
 	curveEntity.setCurve(_config);
 	curveEntity.setTreeItemEditable(true);

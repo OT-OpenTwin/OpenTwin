@@ -33,11 +33,14 @@ namespace ot {
 
 	class Plot1DCfg;
 
-	class OT_GUI_API_EXPORT Plot1DAxisCfg : public Serializable {
+	//! @brief The Plot1DAxisCfg class represents the configuration for a single axis of a 1D plot.
+	class OT_GUI_API_EXPORT Plot1DAxisCfg : public Serializable
+	{
 		OT_DECL_DEFCOPY(Plot1DAxisCfg)
 		OT_DECL_DEFMOVE(Plot1DAxisCfg)
 	public:
-		enum AxisQuantity : uint8_t {
+		enum AxisQuantity : uint8_t
+		{
 			Undefined,
 			XData,
 			Magnitude,
@@ -48,8 +51,8 @@ namespace ot {
 
 		enum AxisScalingFlag : uint32_t
 		{
-			NoScaling   = 0 << 0, //! @brief No scaling applied to the axis (Linear scale).
-			Autoscale   = 1 << 0, //! @brief Automatic scaling applied to the axis based on the data range.
+			NoScaling = 0 << 0, //! @brief No scaling applied to the axis (Linear scale).
+			Autoscale = 1 << 0, //! @brief Automatic scaling applied to the axis based on the data range.
 			Logarithmic = 1 << 1, //! @brief Logarithmic scaling applied to the axis.
 		};
 		typedef Flags<AxisScalingFlag, uint32_t> AxisScaling;
@@ -57,8 +60,8 @@ namespace ot {
 		enum QuantityScalingFlag : uint32_t
 		{
 			NoQuantityScaling = 0 << 0, //! @brief No scaling applied to the quantities. f(x)=x.
-			DB10              = 1 << 1, //! @brief Decibel (dB) scaling applied to the quantities. f(x)=(10 * log10(x)).
-			DB20              = 1 << 2  //! @brief Decibel (dB) scaling applied to the quantities. f(x)=(20 * log10(x)).
+			DB10 = 1 << 1, //! @brief Decibel (dB) scaling applied to the quantities. f(x)=(10 * log10(x)).
+			DB20 = 1 << 2  //! @brief Decibel (dB) scaling applied to the quantities. f(x)=(20 * log10(x)).
 		};
 		typedef Flags<QuantityScalingFlag, uint32_t> QuantityScaling;
 
@@ -133,7 +136,7 @@ namespace ot {
 		//! @brief Set the quantity scaling flags for the axis.
 		//! @param _scaling The quantity scaling flags to set for the axis.
 		inline void setQuantityScaling(const QuantityScaling& _scaling) { m_quantityScaling = _scaling; };
-		
+
 		//! @brief Get the quantity scaling flags for the axis.
 		constexpr const QuantityScaling& getQuantityScaling() const { return m_quantityScaling; };
 

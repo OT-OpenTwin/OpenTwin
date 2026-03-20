@@ -383,19 +383,19 @@ void EntityResult1DCurve::addStorageData(bsoncxx::builder::basic::document& stor
 {
 	EntityBase::addStorageData(storage);
 
-	ot::QuantityContainerEntryDescription quantityDescription = m_queryInformation.m_quantityDescription;
+	const ot::QuantityContainerEntryDescription& quantityDescription = m_queryInformation.getQuantityDescription();
 	bsoncxx::builder::basic::document quantityDescriptionSerialised = serialise(quantityDescription);
 	
 	bsoncxx::builder::basic::array arrayOfSubDocs;
-	for (ot::QuantityContainerEntryDescription& parameterDescr : m_queryInformation.m_parameterDescriptions)
+	for (const ot::QuantityContainerEntryDescription& parameterDescr : m_queryInformation.getParameterDescriptions())
 	{
 		bsoncxx::builder::basic::document parameterDescrDoc = serialise(parameterDescr);
 		arrayOfSubDocs.append(parameterDescrDoc.extract());
 	}
 
 	storage.append(
-		bsoncxx::builder::basic::kvp("Query", m_queryInformation.m_query),
-		bsoncxx::builder::basic::kvp("Projection", m_queryInformation.m_projection),
+		bsoncxx::builder::basic::kvp("Query", m_queryInformation.getQuery()),
+		bsoncxx::builder::basic::kvp("Projection", m_queryInformation.getProjection()),
 		bsoncxx::builder::basic::kvp("QuantityDescription", quantityDescriptionSerialised.extract()),
 		bsoncxx::builder::basic::kvp("ParameterDescription", arrayOfSubDocs.extract())
 	);
@@ -407,12 +407,12 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
-	m_queryInformation.m_query = doc_view["Query"].get_string();
-	m_queryInformation.m_projection = doc_view["Projection"].get_string();
+	m_queryInformation.setQuery(std::string(doc_view["Query"].get_string()));
+	m_queryInformation.setProjection(std::string(doc_view["Projection"].get_string()));
 
 	const auto& quantityDescriptionDoc = doc_view["QuantityDescription"].get_document();
 
-	m_queryInformation.m_quantityDescription = deserialise(quantityDescriptionDoc);
+	m_queryInformation.setQuantityDescription(deserialise(quantityDescriptionDoc));
 
 	bsoncxx::array::view parameterDescriptions	= doc_view["ParameterDescription"].get_array().value;
 	
@@ -420,7 +420,7 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 	{
 		const auto& parameterDoc = parameterDescription->get_document();
 		ot::QuantityContainerEntryDescription parameterDesc = deserialise(parameterDoc);
-		m_queryInformation.m_parameterDescriptions.push_back(parameterDesc);
+		m_queryInformation.addParameterDescription(std::move(parameterDesc));
 	}
 }
 
@@ -428,15 +428,15 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 
 // Private: Helper
 
-bsoncxx::builder::basic::document EntityResult1DCurve::serialise(ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription) {
+bsoncxx::builder::basic::document EntityResult1DCurve::serialise(const ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription) {
 	bsoncxx::builder::basic::document subDocument;
 
 	bsoncxx::builder::basic::array quantityDimensions;
-	for (uint32_t dimension : _quantityContainerEntryDescription.m_dimension)
+	for (uint32_t dimension : _quantityContainerEntryDescription.getDimension())
 	{
 		quantityDimensions.append(static_cast<int32_t>(dimension));
 	}
-	const TupleInstance& tupleInstance =	_quantityContainerEntryDescription.m_tupleInstance;
+	const TupleInstance& tupleInstance = _quantityContainerEntryDescription.getTupleInstance();
 	bsoncxx::builder::basic::array tupleDataTypes;
 	for(const std::string& dataType : tupleInstance.getTupleElementDataTypes())
 	{
@@ -450,8 +450,8 @@ bsoncxx::builder::basic::document EntityResult1DCurve::serialise(ot::QuantityCon
 	}
 
 	subDocument.append(
-		bsoncxx::builder::basic::kvp("FieldName", _quantityContainerEntryDescription.m_fieldName),
-		bsoncxx::builder::basic::kvp("Label", _quantityContainerEntryDescription.m_label),
+		bsoncxx::builder::basic::kvp("FieldName", _quantityContainerEntryDescription.getFieldName()),
+		bsoncxx::builder::basic::kvp("Label", _quantityContainerEntryDescription.getLabel()),
 		bsoncxx::builder::basic::kvp("DataType", tupleDataTypes),
 		bsoncxx::builder::basic::kvp("Unit", tupleUnits),
 		bsoncxx::builder::basic::kvp("Dimension", quantityDimensions)
@@ -461,8 +461,10 @@ bsoncxx::builder::basic::document EntityResult1DCurve::serialise(ot::QuantityCon
 
 ot::QuantityContainerEntryDescription EntityResult1DCurve::deserialise(bsoncxx::v_noabi::document::view _subDocument) {
 	ot::QuantityContainerEntryDescription quantityContainerEntryDescription;
-	quantityContainerEntryDescription.m_fieldName = _subDocument["FieldName"].get_string();
-	quantityContainerEntryDescription.m_label = _subDocument["Label"].get_string();
+	TupleInstance tupleInstance;
+
+	quantityContainerEntryDescription.setFieldName(std::string(_subDocument["FieldName"].get_string()));
+	quantityContainerEntryDescription.setLabel(std::string(_subDocument["Label"].get_string()));
 	
 	auto dataTypes = _subDocument["DataType"].get_array();
 	std::vector<std::string> tupleDataTypes;
@@ -470,7 +472,7 @@ ot::QuantityContainerEntryDescription EntityResult1DCurve::deserialise(bsoncxx::
 	{
 		tupleDataTypes.push_back(element.get_string().value.data());
 	}
-	quantityContainerEntryDescription.m_tupleInstance.setTupleElementDataTypes(tupleDataTypes);
+	tupleInstance.setTupleElementDataTypes(tupleDataTypes);
 
 
 	auto units = _subDocument["Unit"].get_array();
@@ -479,12 +481,14 @@ ot::QuantityContainerEntryDescription EntityResult1DCurve::deserialise(bsoncxx::
 	{
 		tupleUnits.push_back(element.get_string().value.data());
 	}
-	quantityContainerEntryDescription.m_tupleInstance.setTupleUnits(tupleUnits);
+	tupleInstance.setTupleUnits(tupleUnits);
 
 	auto quantityDimension = _subDocument["Dimension"].get_array();
 	for (auto& element : quantityDimension.value)
 	{
-		quantityContainerEntryDescription.m_dimension.push_back(static_cast<uint32_t>(element.get_int32()));
+		quantityContainerEntryDescription.addDimension(static_cast<uint32_t>(element.get_int32()));
 	}
+
+	quantityContainerEntryDescription.setTupleInstance(std::move(tupleInstance));
 	return quantityContainerEntryDescription;
 }

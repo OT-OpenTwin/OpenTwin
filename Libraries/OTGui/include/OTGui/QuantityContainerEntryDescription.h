@@ -31,15 +31,39 @@
 
 namespace ot
 {
-	struct OT_GUI_API_EXPORT QuantityContainerEntryDescription : public ot::Serializable
+	class OT_GUI_API_EXPORT QuantityContainerEntryDescription : public ot::Serializable
 	{
-		//This one is also bson serialised in the EntityResult1DCurve entity. Any changes here in the config also need to be done in the 
+		OT_DECL_DEFCOPY(QuantityContainerEntryDescription)
+		OT_DECL_DEFMOVE(QuantityContainerEntryDescription)
+	public:
+		QuantityContainerEntryDescription() = default;
+		~QuantityContainerEntryDescription() = default;
+
+		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
+		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+
+		inline void setFieldName(const std::string& _fieldName) { m_fieldName = _fieldName; };
+		inline void setFiledName(std::string&& _fieldName) { m_fieldName = std::move(_fieldName); };
+		inline const std::string& getFieldName() const { return m_fieldName; };
+
+		inline void setLabel(const std::string& _label) { m_label = _label; };
+		inline void setLabel(std::string&& _label) { m_label = std::move(_label); };
+		inline const std::string& getLabel() const { return m_label; };
+
+		inline void addDimension(uint32_t _dimension) { m_dimension.push_back(_dimension); };
+		inline void setDimension(const std::vector<uint32_t>& _dimension) { m_dimension = _dimension; };
+		inline void setDimension(std::vector<uint32_t>&& _dimension) { m_dimension = std::move(_dimension); };
+		inline const std::vector<uint32_t>& getDimension() const { return m_dimension; };
+
+		inline void setTupleInstance(const TupleInstance& _tupleInstance) { m_tupleInstance = _tupleInstance; };
+		inline void setTupleInstance(TupleInstance&& _tupleInstance) { m_tupleInstance = std::move(_tupleInstance); };
+		inline const TupleInstance& getTupleInstance() const { return m_tupleInstance; };
+
+	private:
+		//! @brief This one is also bson serialised in the EntityResult1DCurve entity.
 		std::string m_fieldName = "";
 		std::string m_label = "";
 		std::vector<uint32_t> m_dimension;
 		TupleInstance m_tupleInstance;
-
-		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
-		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 	};
 }

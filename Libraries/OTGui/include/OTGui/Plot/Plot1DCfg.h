@@ -33,11 +33,14 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT Plot1DCfg : public WidgetViewBase {
+	//! @brief The Plot1DCfg class represents the configuration for a 1D plot view.
+	class OT_GUI_API_EXPORT Plot1DCfg : public WidgetViewBase
+	{
 		OT_DECL_DEFCOPY(Plot1DCfg)
 		OT_DECL_DEFMOVE(Plot1DCfg)
 	public:
-		enum PlotType {
+		enum PlotType
+		{
 			Cartesian,
 			Polar
 		};
@@ -51,7 +54,7 @@ namespace ot {
 
 		Plot1DCfg();
 		virtual ~Plot1DCfg();
-		
+
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _object Json object reference to write the data to.
 		//! @param _allocator Allocator.
@@ -184,7 +187,7 @@ namespace ot {
 
 		void setShowMatrixColumnEntry(int32_t _columnEntry) { m_showMatrixColumnEntry = _columnEntry; };
 		int32_t getShowMatrixColumnEntry() { return m_showMatrixColumnEntry; };
-		
+
 		void setShowMatrixRowEntry(int32_t _rowEntry) { m_showMatrixRowEntry = _rowEntry; };
 		int32_t getShowMatrixRowEntry() { return m_showMatrixRowEntry; };
 

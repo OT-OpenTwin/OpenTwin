@@ -27,11 +27,13 @@ namespace ot {
 	class PlotScaleDraw;
 	class CartesianPlot;
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotAxis : public AbstractPlotAxis {
+	class OT_WIDGETS_API_EXPORT CartesianPlotAxis : public AbstractPlotAxis
+	{
 		OT_DECL_NOCOPY(CartesianPlotAxis)
+		OT_DECL_NOMOVE(CartesianPlotAxis)
 		OT_DECL_NODEFAULT(CartesianPlotAxis)
 	public:
-		CartesianPlotAxis(AxisID _axisID, CartesianPlot* _plot);
+		explicit CartesianPlotAxis(AxisID _axisID, CartesianPlot* _plot);
 		virtual ~CartesianPlotAxis();
 
 		virtual void updateAxis() override;

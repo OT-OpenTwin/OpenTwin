@@ -92,10 +92,10 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 	}
 
 	//Now we assemble the final query
-	bsoncxx::document::value docProjection = bsoncxx::from_json(_queryInformation.m_projection);
+	bsoncxx::document::value docProjection = bsoncxx::from_json(_queryInformation.getProjection());
 	bsoncxx::document::view_or_value projection(docProjection);
 
-	bsoncxx::document::value docQuery = bsoncxx::from_json(_queryInformation.m_query);
+	bsoncxx::document::value docQuery = bsoncxx::from_json(_queryInformation.getQuery());
 	bsoncxx::document::view_or_value query (docQuery);
 	if (additionalComparisons.size() > 0)
 	{
@@ -127,9 +127,9 @@ const std::list<ot::ValueComparisonDescription> CurveDatasetFactory::extractVali
 	std::list<ot::ValueComparisonDescription> validValueDescriptions;
 	for (const ot::ValueComparisonDescription& queryDefinition : _valueComparisons)
 	{
-		if (_queryInformation.m_quantityDescription.m_label == queryDefinition.getName())
+		if (_queryInformation.getQuantityDescription().getLabel() == queryDefinition.getName())
 		{
-			auto& quantityDescription = _queryInformation.m_quantityDescription;
+			const auto& quantityDescription = _queryInformation.getQuantityDescription();
 			auto validValueComparison = createValidValueComparison(quantityDescription, queryDefinition);
 			if (validValueComparison.has_value())
 			{
@@ -138,9 +138,9 @@ const std::list<ot::ValueComparisonDescription> CurveDatasetFactory::extractVali
 		}
 		else
 		{
-			for (auto& parameterDescription : _queryInformation.m_parameterDescriptions)
+			for (const auto& parameterDescription : _queryInformation.getParameterDescriptions())
 			{
-				if (parameterDescription.m_label == queryDefinition.getName())
+				if (parameterDescription.getLabel() == queryDefinition.getName())
 				{
 					auto validValueComparison = createValidValueComparison(parameterDescription, queryDefinition);
 					if (validValueComparison.has_value())
@@ -159,7 +159,7 @@ const std::list<ot::ValueComparisonDescription> CurveDatasetFactory::extractVali
 
 CurveDatasetFactory::CurveType CurveDatasetFactory::determineCurveType(const ot::QueryInformation& _queryInformation)
 {
-	size_t numberOfParameter = _queryInformation.m_parameterDescriptions.size();
+	size_t numberOfParameter = _queryInformation.getParameterDescriptions().size();
 	if (numberOfParameter == 0)
 	{
 		throw std::exception("Trying to visualise a curve with no parameter");
@@ -180,10 +180,10 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 	const uint32_t numberOfDocuments = _allMongoDBDocuments.Size();
 
 	const ot::QueryInformation& queryInformation =_curveCfg.getQueryInformation();
-	const ot::QuantityContainerEntryDescription& quantityInformation = queryInformation.m_quantityDescription;
+	const ot::QuantityContainerEntryDescription& quantityInformation = queryInformation.getQuantityDescription();
 	assert(queryInformation.m_parameterDescriptions.size() == 1); // For a single curve there should be only one parameter
 
-	std::vector<uint32_t> quantityDimensions = quantityInformation.m_dimension;
+	std::vector<uint32_t> quantityDimensions = quantityInformation.getDimension();
 	uint32_t numberOfQuantityEntries(1);
 	for (uint32_t quantityDimension : quantityDimensions)
 	{
@@ -206,9 +206,9 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 		dataY.back().first.reserve(numberOfDocuments);
 	}
 
-	auto entryDescription = queryInformation.m_parameterDescriptions.begin();
+	auto entryDescription = queryInformation.getParameterDescriptions().begin();
 
-	const TupleInstance& tupleInstance = quantityInformation.m_tupleInstance;
+	const TupleInstance& tupleInstance = quantityInformation.getTupleInstance();
 
 	for (uint32_t i = 0; i < numberOfDocuments; i++) {
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);		
@@ -216,7 +216,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 		// Get quantity value
 		if (numberOfQuantityEntries == 1) {
 			ot::JSONToVariableConverter converter; 
-			auto valueJson  = singleMongoDocument.FindMember(quantityInformation.m_fieldName.c_str());
+			auto valueJson  = singleMongoDocument.FindMember(quantityInformation.getFieldName().c_str());
 			const std::string temp = ot::json::toJson(valueJson->value);
 			ot::Variable value = converter(valueJson->value);
 			if (!value.isComplex()) {
@@ -231,7 +231,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 			
 		}
 		else {
-			ot::ConstJsonArray matrix = ot::json::getArray(singleMongoDocument, quantityInformation.m_fieldName);
+			ot::ConstJsonArray matrix = ot::json::getArray(singleMongoDocument, quantityInformation.getFieldName());
 			assert(matrix.Size() == numberOfQuantityEntries);
 			for (uint32_t j = 0; j < numberOfQuantityEntries; j++)
 			{
@@ -243,15 +243,15 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 		}
 
 		// Get parameter value
-		double parameterValue = jsonToDouble(entryDescription->m_fieldName, singleMongoDocument, entryDescription->m_tupleInstance.getTupleElementDataTypes().front());
+		double parameterValue = jsonToDouble(entryDescription->getFieldName(), singleMongoDocument, entryDescription->getTupleInstance().getTupleElementDataTypes().front());
 		dataX.push_back(parameterValue);
 	}
 	
-	_plotCfg.setUnitLabelX(createUnitLabel(entryDescription->m_tupleInstance.getTupleUnits().front()));
-	_plotCfg.setDataLabelX(entryDescription->m_label);
+	_plotCfg.setUnitLabelX(createUnitLabel(entryDescription->getTupleInstance().getTupleUnits().front()));
+	_plotCfg.setDataLabelX(entryDescription->getLabel());
 
-	_plotCfg.setUnitLabelY(createUnitLabel(quantityInformation.m_tupleInstance.getTupleUnits().front()));
-	_plotCfg.setDataLabelY(quantityInformation.m_label);
+	_plotCfg.setUnitLabelY(createUnitLabel(quantityInformation.getTupleInstance().getTupleUnits().front()));
+	_plotCfg.setDataLabelY(quantityInformation.getLabel());
 
 	const std::string curveNameBase = ot::EntityName::getSubName(_curveCfg.getEntityName()).value();
 	std::list<ot::PlotDataset*> allCurves;
@@ -322,20 +322,20 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		
 	//Lables of curves will be <parameter_Label_1>_<parameter_Value_1>_<parameter_Unit_1>_ ... _<parameter_Label_n>_<parameter_Value_n>_<parameter_Unit_n>
 	const ot::QueryInformation queryInformation = _curveCfg.getQueryInformation();
-	const ot::QuantityContainerEntryDescription& quantityInformation = queryInformation.m_quantityDescription;
+	const ot::QuantityContainerEntryDescription& quantityInformation = queryInformation.getQuantityDescription();
 
 	size_t numberOfDocuments = _allMongoDBDocuments.Size();
 	std::string xAxisParameterLabel = _xAxisParameter;
 	//Auto selection
 	if (xAxisParameterLabel == "")
 	{
-		xAxisParameterLabel = queryInformation.m_parameterDescriptions.begin()->m_label;
+		xAxisParameterLabel = queryInformation.getParameterDescriptions().begin()->getLabel();
 	}
 
 	const ot::QuantityContainerEntryDescription* xAxisParameter = nullptr;
-	for (auto& parameterDescription : queryInformation.m_parameterDescriptions)
+	for (const auto& parameterDescription : queryInformation.getParameterDescriptions())
 	{
-		if (parameterDescription.m_label == xAxisParameterLabel)
+		if (parameterDescription.getLabel() == xAxisParameterLabel)
 		{
 			xAxisParameter = &parameterDescription;
 		}
@@ -355,19 +355,19 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		std::list<ShortParameterDescription> additionalParameterInfos;
 		
 		//Get values for the additional parameter and store their information
-		for (auto& additionalParameter :queryInformation.m_parameterDescriptions) 
+		for (const auto& additionalParameter :queryInformation.getParameterDescriptions())
 		{
 			if (&additionalParameter != xAxisParameter)
 			{
-				const TupleInstance& parameterTuple =  additionalParameter.m_tupleInstance;
+				const TupleInstance& parameterTuple =  additionalParameter.getTupleInstance();
 
-				auto& additionalParameterEntry = singleMongoDocument[additionalParameter.m_fieldName.c_str()];
+				auto& additionalParameterEntry = singleMongoDocument[additionalParameter.getFieldName().c_str()];
 				const std::string value =	ot::json::toJson(additionalParameterEntry);
-				curveName += " (" + additionalParameter.m_label + "=" + value + " " + parameterTuple.getTupleUnits().front() + "); ";
-				parameterValuesByParameterName[additionalParameter.m_label].push_back(value);
+				curveName += " (" + additionalParameter.getLabel() + "=" + value + " " + parameterTuple.getTupleUnits().front() + "); ";
+				parameterValuesByParameterName[additionalParameter.getLabel()].push_back(value);
 				
 				ShortParameterDescription additionalParameterInfo;
-				additionalParameterInfo.m_label = additionalParameter.m_label;
+				additionalParameterInfo.m_label = additionalParameter.getLabel();
 				additionalParameterInfo.m_value = value;
 				additionalParameterInfo.m_unit = parameterTuple.getTupleUnits().front();
 				additionalParameterInfos.push_back(additionalParameterInfo);
@@ -392,13 +392,13 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		{
 			dataPoints.push_back(Datapoints());
 		}
-		const TupleInstance& tupleInstance =	quantityInformation.m_tupleInstance;
-		if (ot::json::isArray(singleMongoDocument, quantityInformation.m_fieldName))
+		const TupleInstance& tupleInstance =	quantityInformation.getTupleInstance();
+		if (ot::json::isArray(singleMongoDocument, quantityInformation.getFieldName()))
 		{
 			//Get x-axis value
-			const double xAxisParameterValue = jsonToDouble(xAxisParameter->m_fieldName, singleMongoDocument, xAxisParameter->m_tupleInstance.getTupleElementDataTypes().front());
+			const double xAxisParameterValue = jsonToDouble(xAxisParameter->getFieldName(), singleMongoDocument, xAxisParameter->getTupleInstance().getTupleElementDataTypes().front());
 			
-			auto dataVector = ot::json::getArray(singleMongoDocument, quantityInformation.m_fieldName);
+			auto dataVector = ot::json::getArray(singleMongoDocument, quantityInformation.getFieldName());
 			auto nextDatapointsContainer = dataPoints.begin();
 			for (auto& data : dataVector)
 			{
@@ -418,11 +418,11 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		else
 		{
 			
-			const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, tupleInstance.getTupleElementDataTypes().front());
+			const double quantityValue = jsonToDouble(quantityInformation.getFieldName(), singleMongoDocument, tupleInstance.getTupleElementDataTypes().front());
 			dataPoints.front().m_yData.push_back(quantityValue);
 
 			// Get x-axis value
-			const double xAxisParameterValue = jsonToDouble(xAxisParameter->m_fieldName, singleMongoDocument, tupleInstance.getTupleElementDataTypes().front());
+			const double xAxisParameterValue = jsonToDouble(xAxisParameter->getFieldName(), singleMongoDocument, tupleInstance.getTupleElementDataTypes().front());
 			dataPoints.front().m_xData.push_back(xAxisParameterValue);
 		}
 		
@@ -448,7 +448,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 
 	
 	// In this case we need to make the names better readable. Since we have more then one parameter in the name 	
-	size_t numberOfParameter =	queryInformation.m_parameterDescriptions.size();
+	size_t numberOfParameter =	queryInformation.getParameterDescriptions().size();
 	const std::string simpleNameBase = _curveCfg.getTitle();
 
 	if (numberOfParameter > 2)
@@ -576,7 +576,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 			// Matrices
 
 			std::list<Datapoints>& curveDataList = singleCurve.second;
-			const std::vector<uint32_t>& quantityDimensions = queryInformation.m_quantityDescription.m_dimension;
+			const std::vector<uint32_t>& quantityDimensions = queryInformation.getQuantityDescription().getDimension();
 			uint32_t j(0);
 			bool showEntireMatrix = _plotCfg.getShowEntireMatrix();
 			int32_t showMatrixRowEntry = _plotCfg.getShowMatrixRowEntry() - 1;
@@ -608,11 +608,11 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		}	
 	}
 	
-	_plotCfg.setUnitLabelX(createUnitLabel(xAxisParameter->m_tupleInstance.getTupleUnits().front()));
-	_plotCfg.setDataLabelX(xAxisParameter->m_label);
+	_plotCfg.setUnitLabelX(createUnitLabel(xAxisParameter->getTupleInstance().getTupleUnits().front()));
+	_plotCfg.setDataLabelX(xAxisParameter->getLabel());
 
-	_plotCfg.setUnitLabelY(createUnitLabel(quantityInformation.m_tupleInstance.getTupleUnits().front()));
-	_plotCfg.setDataLabelY(quantityInformation.m_label);
+	_plotCfg.setUnitLabelY(createUnitLabel(quantityInformation.getTupleInstance().getTupleUnits().front()));
+	_plotCfg.setDataLabelY(quantityInformation.getLabel());
 
 	return dataSets;
 }
@@ -625,9 +625,9 @@ std::optional<ot::ValueComparisonDescription> CurveDatasetFactory::createValidVa
 	if (!fieldName.empty() && !comparator.empty() && !value.empty() && comparator != " ")
 	{
 		ot::ValueComparisonDescription validComparison = _comparison;
-		validComparison.setName(_desciption.m_fieldName);
+		validComparison.setName(_desciption.getFieldName());
 		TupleInstance instance;
-		instance.setTupleElementDataTypes({ _desciption.m_tupleInstance.getTupleElementDataTypes().front() });
+		instance.setTupleElementDataTypes({ _desciption.getTupleInstance().getTupleElementDataTypes().front() });
 		validComparison.setTupleInstance(instance);
 		return validComparison;
 	}

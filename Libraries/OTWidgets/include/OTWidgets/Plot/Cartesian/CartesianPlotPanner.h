@@ -29,9 +29,13 @@ namespace ot {
 
 	class CartesianPlot;
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotPanner : public QwtPlotPanner {
+	class OT_WIDGETS_API_EXPORT CartesianPlotPanner : public QwtPlotPanner
+	{
+		OT_DECL_NOCOPY(CartesianPlotPanner)
+		OT_DECL_NOMOVE(CartesianPlotPanner)
+		OT_DECL_NODEFAULT(CartesianPlotPanner)
 	public:
-		CartesianPlotPanner(CartesianPlot* _plot);
+		explicit CartesianPlotPanner(CartesianPlot* _plot);
 		virtual ~CartesianPlotPanner();
 
 		virtual bool eventFilter(QObject* _object, QEvent* _event) override;

@@ -29,7 +29,11 @@ namespace ot {
 
 	class CartesianPlot;
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotPicker : public QwtPlotPicker {
+	class OT_WIDGETS_API_EXPORT CartesianPlotPicker : public QwtPlotPicker
+	{
+		OT_DECL_NOCOPY(CartesianPlotPicker)
+		OT_DECL_NOMOVE(CartesianPlotPicker)
+		OT_DECL_NODEFAULT(CartesianPlotPicker)
 	public:
 		explicit CartesianPlotPicker(CartesianPlot* _plot);
 		virtual ~CartesianPlotPicker();

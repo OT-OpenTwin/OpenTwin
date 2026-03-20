@@ -94,15 +94,6 @@ ot::PlotBase::~PlotBase() {
 
 // Setter
 
-ot::AbstractPlot* ot::PlotBase::getPlot() {
-	if (m_currentPlotType == Plot1DCfg::PlotType::Cartesian) {
-		return m_cartesianPlot;
-	}
-	else {
-		return m_polarPlot;
-	}
-}
-
 void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 	if (_type == m_currentPlotType) {
 		return;
@@ -146,6 +137,18 @@ void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 	}
 
 	updateAxisTitles(true);
+}
+
+ot::AbstractPlot* ot::PlotBase::getCurrentPlot()
+{
+	if (m_currentPlotType == Plot1DCfg::PlotType::Cartesian)
+	{
+		return m_cartesianPlot;
+	}
+	else
+	{
+		return m_polarPlot;
+	}
 }
 
 void ot::PlotBase::resetView() {
@@ -345,9 +348,10 @@ void ot::PlotBase::requestResetItemSelection()
 	Q_EMIT resetItemSelectionRequest();
 }
 
-void ot::PlotBase::requestCurveDoubleClicked(UID _entityID, bool _hasControlModifier) 
+void ot::PlotBase::requestCurveDoubleClicked(PlotDataset* _dataset, bool _hasControlModifier)
 {
-	Q_EMIT curveDoubleClicked(_entityID, _hasControlModifier);
+	OTAssertNullptr(_dataset);
+	Q_EMIT curveDoubleClicked(_dataset, _hasControlModifier);
 }
 
 void ot::PlotBase::setInfoText(const QString& _text) 

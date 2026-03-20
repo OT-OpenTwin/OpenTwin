@@ -26,12 +26,13 @@ namespace ot {
 
 	class PlotDatasetData;
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotDatasetData : public PlotSeriesData<QPointF> {
+	class OT_WIDGETS_API_EXPORT CartesianPlotDatasetData : public PlotSeriesData<QPointF>
+	{
 		OT_DECL_NOCOPY(CartesianPlotDatasetData)
 		OT_DECL_NOMOVE(CartesianPlotDatasetData)
 		OT_DECL_NODEFAULT(CartesianPlotDatasetData)
 	public:
-		CartesianPlotDatasetData(PlotDatasetData* _data);
+		explicit CartesianPlotDatasetData(PlotDatasetData* _data);
 		virtual ~CartesianPlotDatasetData() = default;
 	};
 }

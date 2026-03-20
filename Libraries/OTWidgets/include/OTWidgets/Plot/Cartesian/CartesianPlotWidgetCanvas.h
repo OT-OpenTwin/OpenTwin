@@ -29,10 +29,13 @@ namespace ot {
 
 	class CartesianPlot;
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotWidgetCanvas : public QwtPlotCanvas {
-		//Q_OBJECT
+	class OT_WIDGETS_API_EXPORT CartesianPlotWidgetCanvas : public QwtPlotCanvas
+	{
+		OT_DECL_NOCOPY(CartesianPlotWidgetCanvas)
+		OT_DECL_NOMOVE(CartesianPlotWidgetCanvas)
+		OT_DECL_NODEFAULT(CartesianPlotWidgetCanvas)
 	public:
-		CartesianPlotWidgetCanvas(CartesianPlot* _plot);
+		explicit CartesianPlotWidgetCanvas(CartesianPlot* _plot);
 		virtual ~CartesianPlotWidgetCanvas();
 
 	private:

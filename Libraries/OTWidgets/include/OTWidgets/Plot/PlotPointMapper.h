@@ -65,7 +65,7 @@ namespace ot {
             int count;
         };
 
-        PlotPointMapper();
+        explicit PlotPointMapper();
         ~PlotPointMapper();
 
         void setFlags(QwtPointMapper::TransformationFlags _flags) { m_transformationFlags = _flags; };

@@ -103,6 +103,7 @@ namespace ot { class Property; }
 namespace ot { class PlotView; }
 namespace ot { class TableView; }
 namespace ot { class WidgetView; }
+namespace ot { class PlotDataset; }
 namespace ot { class GraphicsItem; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class TextEditorView; }
@@ -674,7 +675,7 @@ public Q_SLOTS:
 	// Plot slots
 
 	void slotPlotResetItemSelectionRequest();
-	void slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModifier);
+	void slotPlotCurveDoubleClicked(ot::PlotDataset* _dataset, bool _hasControlModifier);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

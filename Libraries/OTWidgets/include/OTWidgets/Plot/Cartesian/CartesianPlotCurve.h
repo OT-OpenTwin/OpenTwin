@@ -78,7 +78,10 @@ exceptions:
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotCurve : public QwtPlotCurve {
+	class OT_WIDGETS_API_EXPORT CartesianPlotCurve : public QwtPlotCurve
+    {
+        OT_DECL_NOCOPY(CartesianPlotCurve)
+		OT_DECL_NOMOVE(CartesianPlotCurve)
 	public:
 		static int verifyRange(int _size, int& _i1, int& _i2);
 
@@ -88,7 +91,7 @@ namespace ot {
 
 		// Constructor
 
-		CartesianPlotCurve(const QString& _title = QString());
+		explicit CartesianPlotCurve(const QString& _title = QString());
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

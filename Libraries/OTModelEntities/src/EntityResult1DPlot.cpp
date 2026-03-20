@@ -452,16 +452,16 @@ void EntityResult1DPlot::setQuerySelections()
 		if (curve != nullptr)
 		{
 			const ot::QueryInformation& queryInformation = curve->getQueryInformation();
-			filterOptions.push_back(queryInformation.m_quantityDescription.m_label);
-			for (auto& parameterDescr : queryInformation.m_parameterDescriptions)
+			filterOptions.push_back(queryInformation.getQuantityDescription().getLabel());
+			for (const auto& parameterDescr : queryInformation.getParameterDescriptions())
 			{
-				if (find(filterOptions.begin(), filterOptions.end(), parameterDescr.m_label) == filterOptions.end())
+				if (find(filterOptions.begin(), filterOptions.end(), parameterDescr.getLabel()) == filterOptions.end())
 				{
-					filterOptions.push_back(parameterDescr.m_label);
+					filterOptions.push_back(parameterDescr.getLabel());
 				}
-				if (find(parameterOptions.begin(), parameterOptions.end(), parameterDescr.m_label) == parameterOptions.end())
+				if (find(parameterOptions.begin(), parameterOptions.end(), parameterDescr.getLabel()) == parameterOptions.end())
 				{
-					parameterOptions.push_back(parameterDescr.m_label);
+					parameterOptions.push_back(parameterDescr.getLabel());
 				}
 			}
 		}

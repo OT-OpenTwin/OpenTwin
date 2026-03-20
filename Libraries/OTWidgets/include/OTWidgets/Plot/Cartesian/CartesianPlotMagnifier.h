@@ -34,10 +34,14 @@ namespace ot {
 	class CartesianPlotTextMarker;
 	class CartesianPlotCrossMarker;
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotMagnifier : public QwtPlotMagnifier {
+	class OT_WIDGETS_API_EXPORT CartesianPlotMagnifier : public QwtPlotMagnifier
+	{
 		Q_OBJECT
+		OT_DECL_NOCOPY(CartesianPlotMagnifier)
+		OT_DECL_NOMOVE(CartesianPlotMagnifier)
+		OT_DECL_NODEFAULT(CartesianPlotMagnifier)
 	public:
-		CartesianPlotMagnifier(CartesianPlot* _plot);
+		explicit CartesianPlotMagnifier(CartesianPlot* _plot);
 		virtual ~CartesianPlotMagnifier();
 
 		virtual void rescale(double _factor) override;

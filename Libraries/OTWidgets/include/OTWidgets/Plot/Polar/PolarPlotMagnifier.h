@@ -31,12 +31,14 @@ namespace ot {
 	class PolarPlot;
 	class PolarPlotMarker;
 
-	class OT_WIDGETS_API_EXPORT PolarPlotMagnifier : public QwtPolarMagnifier {
+	class OT_WIDGETS_API_EXPORT PolarPlotMagnifier : public QwtPolarMagnifier
+	{
 		Q_OBJECT
 		OT_DECL_NOCOPY(PolarPlotMagnifier)
+		OT_DECL_NOMOVE(PolarPlotMagnifier)
 		OT_DECL_NODEFAULT(PolarPlotMagnifier)
 	public:
-		PolarPlotMagnifier(PolarPlot* _plot);
+		explicit PolarPlotMagnifier(PolarPlot* _plot);
 		virtual ~PolarPlotMagnifier();
 
 		virtual void rescale(double _factor) override;

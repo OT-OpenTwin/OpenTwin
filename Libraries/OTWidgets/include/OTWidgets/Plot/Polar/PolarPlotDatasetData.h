@@ -27,12 +27,13 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT PolarPlotDatasetData : public PlotSeriesData<QwtPointPolar> {
+	class OT_WIDGETS_API_EXPORT PolarPlotDatasetData : public PlotSeriesData<QwtPointPolar>
+	{
 		OT_DECL_NOCOPY(PolarPlotDatasetData)
 		OT_DECL_NOMOVE(PolarPlotDatasetData)
 		OT_DECL_NODEFAULT(PolarPlotDatasetData)
 	public:
-		PolarPlotDatasetData(PlotDatasetData* _data);
+		explicit PolarPlotDatasetData(PlotDatasetData* _data);
 		virtual ~PolarPlotDatasetData() = default;
 
 		virtual QwtPointPolar sample(size_t _index) const override;

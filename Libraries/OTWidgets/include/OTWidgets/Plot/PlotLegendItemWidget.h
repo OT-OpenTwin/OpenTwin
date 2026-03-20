@@ -22,7 +22,7 @@ namespace ot {
 		OT_DECL_NOCOPY(PlotLegendItemWidget)
 		OT_DECL_NOMOVE(PlotLegendItemWidget)
 	public:
-		PlotLegendItemWidget();
+		explicit PlotLegendItemWidget();
 		virtual ~PlotLegendItemWidget();
 
 		virtual QWidget* getQWidget() override { return m_rootWidget; };

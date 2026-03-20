@@ -34,7 +34,7 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg& _config, const std::string& _quantityNameOnYAxis, const std::string& _quantityValueDescriptionNameOnYAxis, const std::string& _defaultParameterForXAxis)
 {
 	ot::QueryInformation queryInformation;
-	queryInformation.m_projection = createProjection();
+	queryInformation.setProjection(createProjection());
 
 	const std::list<MetadataQuantity>& quantities = _series.getQuantities();
 
@@ -66,19 +66,18 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 		throw std::exception("Curve creation failed to extract the y-axis information");
 	}
 	
-	auto& tupleDescription = selectedQuantity->m_tupleDescription;
+	TupleInstance tupleDescription = selectedQuantity->m_tupleDescription;
 	int tupleIndex = 0;
 			
-	queryInformation.m_query = createQuery(_series.getSeriesIndex(), selectedQuantity->quantityIndex);
+	queryInformation.setQuery(createQuery(_series.getSeriesIndex(), selectedQuantity->quantityIndex));
 	
 	ot::QuantityContainerEntryDescription quantityInformation;
-	quantityInformation.m_fieldName = QuantityContainer::getFieldName();
-	quantityInformation.m_label = selectedQuantity->quantityName;
-	quantityInformation.m_dimension = selectedQuantity->dataDimensions;
-	quantityInformation.m_tupleInstance = tupleDescription;
-	queryInformation.m_quantityDescription = quantityInformation;
+	quantityInformation.setFieldName(QuantityContainer::getFieldName());
+	quantityInformation.setLabel(selectedQuantity->quantityName);
+	quantityInformation.setDimension(selectedQuantity->dataDimensions);
+	quantityInformation.setTupleInstance(std::move(tupleDescription));
 
-
+	queryInformation.setQuantityDescription(std::move(quantityInformation));
 
 	const std::list<MetadataParameter>& parameters = _series.getParameter();
 	auto& dependingParameter = selectedQuantity->dependingParameterIds;
@@ -87,18 +86,18 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 		if (std::find(dependingParameter.begin(), dependingParameter.end(), parameter.parameterUID) != dependingParameter.end())
 		{
 			ot::QuantityContainerEntryDescription qcDescription;
-			qcDescription.m_label = parameter.parameterLabel;
-			qcDescription.m_fieldName = std::to_string(parameter.parameterUID);
-			auto tupleInstance = TupleDescriptionSingle::createInstance(parameter.unit, parameter.typeName);
-			qcDescription.m_tupleInstance = tupleInstance;
+			qcDescription.setLabel(parameter.parameterLabel);
+			qcDescription.setFieldName(std::to_string(parameter.parameterUID));
+			TupleInstance tupleInstance = TupleDescriptionSingle::createInstance(parameter.unit, parameter.typeName);
+			qcDescription.setTupleInstance(std::move(tupleInstance));
 			
 			if (!_defaultParameterForXAxis.empty() && _defaultParameterForXAxis == parameter.parameterName)
 			{
-				queryInformation.m_parameterDescriptions.push_front(qcDescription);
+				queryInformation.addParameterDescriptionFront(qcDescription);
 			}
 			else
 			{
-				queryInformation.m_parameterDescriptions.push_back(qcDescription);
+				queryInformation.addParameterDescription(qcDescription);
 			}
 		}
 	}

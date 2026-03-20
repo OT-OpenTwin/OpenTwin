@@ -27,11 +27,13 @@ namespace ot {
 	class PolarPlot;
 	class PlotScaleDraw;
 
-	class OT_WIDGETS_API_EXPORT PolarPlotAxis : public AbstractPlotAxis {
+	class OT_WIDGETS_API_EXPORT PolarPlotAxis : public AbstractPlotAxis
+	{
 		OT_DECL_NOCOPY(PolarPlotAxis)
+		OT_DECL_NOMOVE(PolarPlotAxis)
 		OT_DECL_NODEFAULT(PolarPlotAxis)
 	public:
-		PolarPlotAxis(AxisID _axisID, PolarPlot* _plot);
+		explicit PolarPlotAxis(AxisID _axisID, PolarPlot* _plot);
 		virtual ~PolarPlotAxis();
 
 		virtual void updateAxis(void) override;

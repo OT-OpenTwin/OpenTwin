@@ -27,8 +27,10 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotCrossMarker : public QwtPlotMarker {
+	class OT_WIDGETS_API_EXPORT CartesianPlotCrossMarker : public QwtPlotMarker
+	{
 		OT_DECL_NOCOPY(CartesianPlotCrossMarker)
+		OT_DECL_NOMOVE(CartesianPlotCrossMarker)
 	public:
 		CartesianPlotCrossMarker();
 		virtual ~CartesianPlotCrossMarker();

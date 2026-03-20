@@ -128,5 +128,5 @@ void ot::PlotLegendItem::slotClicked(Qt::KeyboardModifiers _modifiers)
 	PlotBase* plot = m_legend->getPlot();
 	OTAssertNullptr(plot);
 
-	plot->requestCurveDoubleClicked(m_dataset->getEntityID(), _modifiers.testFlag(Qt::ControlModifier));
+	plot->requestCurveDoubleClicked(m_dataset, _modifiers.testFlag(Qt::ControlModifier));
 }

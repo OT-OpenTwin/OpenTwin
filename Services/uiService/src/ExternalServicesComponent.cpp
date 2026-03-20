@@ -4715,8 +4715,8 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 			const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
 			bool curveHasDataToVisualise = false;
 			if (xAxisParameter != "") {
-				for (const auto& parameter : queryInformation.m_parameterDescriptions) {
-					if (parameter.m_label == xAxisParameter) {
+				for (const auto& parameter : queryInformation.getParameterDescriptions()) {
+					if (parameter.getLabel() == xAxisParameter) {
 						curveHasDataToVisualise = true;
 					}
 				}

@@ -132,7 +132,7 @@ void ot::PlotDataset::attach() {
 	}
 	m_isAttatched = true;
 
-	AbstractPlot* plot = m_ownerPlot->getPlot();
+	AbstractPlot* plot = m_ownerPlot->getCurrentPlot();
 	if (m_ownerPlot->getCurrentPlotType() == Plot1DCfg::PlotType::Cartesian)
 	{
 		CartesianPlot* cartesianPlot = dynamic_cast<CartesianPlot*>(plot);
@@ -218,6 +218,34 @@ void ot::PlotDataset::setOwnerPlot(PlotBase* _ownerPlot)
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // General Setter/Getter
+
+ot::CartesianPlotCurve* ot::PlotDataset::getCartesianCurve()
+{
+	if (m_cartesianCurve != nullptr)
+	{
+		return m_cartesianCurve;
+	}
+	else
+	{
+		buildCartesianCurve();
+		attach();
+		return m_cartesianCurve;
+	}
+}
+
+ot::PolarPlotCurve* ot::PlotDataset::getPolarCurve()
+{
+	if (m_polarCurve != nullptr)
+	{
+		return m_polarCurve;
+	}
+	else
+	{
+		buildPolarCurve();
+		attach();
+		return m_polarCurve;
+	}
+}
 
 void ot::PlotDataset::setCurveIsVisibile(bool _isVisible, bool _repaint) {
 	m_config.setVisible(_isVisible);
@@ -312,28 +340,6 @@ void ot::PlotDataset::setHighlighted(bool _hasHighlight)
 
 	OTAssertNullptr(m_ownerPlot);
 	m_ownerPlot->replot();
-}
-
-ot::CartesianPlotCurve* ot::PlotDataset::getCartesianCurve() {
-	if (m_cartesianCurve != nullptr) {
-		return m_cartesianCurve;
-	}
-	else {
-		buildCartesianCurve();
-		attach();
-		return m_cartesianCurve;
-	}
-}
-
-ot::PolarPlotCurve* ot::PlotDataset::getPolarCurve() {
-	if (m_polarCurve != nullptr) {
-		return m_polarCurve;
-	}
-	else {
-		buildPolarCurve();
-		attach();
-		return m_polarCurve;
-	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

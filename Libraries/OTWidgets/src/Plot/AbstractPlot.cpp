@@ -24,12 +24,14 @@
 
 ot::AbstractPlot::AbstractPlot(PlotBase* _ownerPlot) :
 	m_axisXBottom(nullptr), m_axisXTop(nullptr), m_axisYLeft(nullptr), m_axisYRight(nullptr), m_owner(_ownerPlot)
-{}
+{
+}
 
 ot::AbstractPlot::~AbstractPlot() {}
 
-const ot::Plot1DCfg& ot::AbstractPlot::getConfig() const {
-	const PlotBase* base = this->getOwner();
+const ot::Plot1DCfg& ot::AbstractPlot::getConfig() const
+{
+	const PlotBase* base = getOwner();
 	OTAssertNullptr(base);
 	return base->getConfig();
 }
@@ -38,59 +40,92 @@ const ot::Plot1DCfg& ot::AbstractPlot::getConfig() const {
 
 // Axis
 
-void ot::AbstractPlot::setPlotAxis(AbstractPlotAxis * _axisXBottom, AbstractPlotAxis * _axisXTop, AbstractPlotAxis * _axisYLeft, AbstractPlotAxis * _axisYRight) {
+void ot::AbstractPlot::setPlotAxis(AbstractPlotAxis* _axisXBottom, AbstractPlotAxis* _axisXTop, AbstractPlotAxis* _axisYLeft, AbstractPlotAxis* _axisYRight)
+{
 	m_axisXBottom = _axisXBottom;
 	m_axisXTop = _axisXTop;
 	m_axisYLeft = _axisYLeft;
 	m_axisYRight = _axisYRight;
 }
 
-ot::AbstractPlotAxis * ot::AbstractPlot::getPlotAxis(AbstractPlotAxis::AxisID _id) {
+bool ot::AbstractPlot::hasPlotAxis(AbstractPlotAxis::AxisID _id) const
+{
 	switch (_id)
 	{
-	case AbstractPlotAxis::yLeft:
-		OTAssertNullptr(m_axisYLeft);
-		return m_axisYLeft;
-
-	case AbstractPlotAxis::yRight:
-		OTAssertNullptr(m_axisYRight);
-		return m_axisYRight;
-
-	case AbstractPlotAxis::xBottom:
-		OTAssertNullptr(m_axisXBottom);
-		return m_axisXBottom;
-
-	case AbstractPlotAxis::xTop:
-		OTAssertNullptr(m_axisXTop);
-		return m_axisXTop;
-
+	case ot::AbstractPlotAxis::yLeft:   return m_axisYLeft != nullptr;
+	case ot::AbstractPlotAxis::yRight:  return m_axisYRight != nullptr;
+	case ot::AbstractPlotAxis::xBottom: return m_axisXBottom != nullptr;
+	case ot::AbstractPlotAxis::xTop:    return m_axisXTop != nullptr;
 	default:
 		OT_LOG_EAS("Invalid plot axis (" + std::to_string(_id) + ")");
-		return nullptr;
+		return false;
 	}
 }
 
-void ot::AbstractPlot::setPlotAxisTitle(AbstractPlotAxis::AxisID _axis, const QString & _title) {
-	this->getPlotAxis(_axis)->setTitle(_title);
+ot::AbstractPlotAxis* ot::AbstractPlot::getPlotAxis(AbstractPlotAxis::AxisID _id)
+{
+	ot::AbstractPlotAxis* result = nullptr;
+
+	switch (_id)
+	{
+	case AbstractPlotAxis::yLeft:
+		result = m_axisYLeft;
+		break;
+
+	case AbstractPlotAxis::yRight:
+		result = m_axisYRight;
+		break;
+
+	case AbstractPlotAxis::xBottom:
+		result = m_axisXBottom;
+		break;
+
+	case AbstractPlotAxis::xTop:
+		result = m_axisXTop;
+		break;
+
+	default:
+		const std::string msg = "Invalid plot axis (" + std::to_string(_id) + ")";
+		OT_LOG_EAS(msg);
+		throw Exception::InvalidArgument(msg);
+	}
+
+	if (result == nullptr)
+	{
+		OT_LOG_EAS("Plot axis not set for axis id " + std::to_string(_id));
+		throw Exception::ObjectNotFound("Plot axis not set for axis id " + std::to_string(_id));
+	}
+
+	return result;
 }
 
-void ot::AbstractPlot::setPlotAxisAutoScale(AbstractPlotAxis::AxisID _axis, bool _isAutoScale) {
-	this->getPlotAxis(_axis)->setIsAutoScale(_isAutoScale);
+void ot::AbstractPlot::setPlotAxisTitle(AbstractPlotAxis::AxisID _axis, const QString& _title)
+{
+	getPlotAxis(_axis)->setTitle(_title);
 }
 
-void ot::AbstractPlot::setPlotAxisLogScale(AbstractPlotAxis::AxisID _axis, bool _isLogScale) {
-	this->getPlotAxis(_axis)->setIsLogScale(_isLogScale);
+void ot::AbstractPlot::setPlotAxisAutoScale(AbstractPlotAxis::AxisID _axis, bool _isAutoScale)
+{
+	getPlotAxis(_axis)->setIsAutoScale(_isAutoScale);
 }
 
-void ot::AbstractPlot::setPlotAxisMin(AbstractPlotAxis::AxisID _axis, double _minValue) {
-	this->getPlotAxis(_axis)->setMin(_minValue);
+void ot::AbstractPlot::setPlotAxisLogScale(AbstractPlotAxis::AxisID _axis, bool _isLogScale)
+{
+	getPlotAxis(_axis)->setIsLogScale(_isLogScale);
 }
 
-void ot::AbstractPlot::setPlotAxisMax(AbstractPlotAxis::AxisID _axis, double _maxValue) {
-	this->getPlotAxis(_axis)->setMax(_maxValue);
+void ot::AbstractPlot::setPlotAxisMin(AbstractPlotAxis::AxisID _axis, double _minValue)
+{
+	getPlotAxis(_axis)->setMin(_minValue);
 }
 
-void ot::AbstractPlot::repaintPlotAxis(AbstractPlotAxis::AxisID _axis) {
-	this->getPlotAxis(_axis)->updateAxis();
+void ot::AbstractPlot::setPlotAxisMax(AbstractPlotAxis::AxisID _axis, double _maxValue)
+{
+	getPlotAxis(_axis)->setMax(_maxValue);
+}
+
+void ot::AbstractPlot::repaintPlotAxis(AbstractPlotAxis::AxisID _axis)
+{
+	getPlotAxis(_axis)->updateAxis();
 }
 

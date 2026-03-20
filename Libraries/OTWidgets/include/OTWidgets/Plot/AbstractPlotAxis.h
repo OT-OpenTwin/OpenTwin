@@ -32,48 +32,78 @@
 
 namespace ot {
 
+	//! @brief Abstract base class for plot axes.
+	//! It provides the common interface for Cartesian and Polar plot axes.
 	class OT_WIDGETS_API_EXPORT AbstractPlotAxis {
 		OT_DECL_NOCOPY(AbstractPlotAxis)
 		OT_DECL_NODEFAULT(AbstractPlotAxis)
 	public:
-		enum AxisID {
-			yLeft = 0,
-			yRight = 1,
-			xBottom = 2,
-			xTop = 3
+
+		//! @brief Enumeration for axis identification.
+		enum AxisID : int32_t
+		{
+			yLeft = 0,		//! @brief Left Y-axis (Cartesian) or Radial axis (Polar).
+			yRight = 1,		//! @brief Right Y-axis (Cartesian) or Angular axis (Polar).
+			xBottom = 2,	//! @brief Bottom X-axis (Cartesian) or not used in Polar plots.
+			xTop = 3		//! @brief Top X-axis (Cartesian) or not used in Polar plots.
 		};
 
-		AbstractPlotAxis(AxisID _id);
+		explicit AbstractPlotAxis(AxisID _id);
 
 		virtual ~AbstractPlotAxis();
 
-		virtual void updateAxis(void) = 0;
+		//! @brief Updates the axis properties (title, scale type, auto-scaling, display format, ...) on the plot.
+		virtual void updateAxis() = 0;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
 
+		//! @brief Returns the identifier of the axis.
+		AxisID getAxisID() const { return m_id; };
+
+		//! @brief Returns the corresponding Qwt axis identifier for Cartesian plots. 
+		QwtPlot::Axis getCartesianAxisID() const;
+
+		//! @brief Returns the corresponding Qwt axis identifier for Polar plots.
+		QwtPolar::Axis getPolarAxisID() const;
+
+		//! @brief Sets the title of the axis.
+		//! Call updateAxis() to apply the change to the plot.
+		//! @param _title The new title for the axis.
 		void setTitle(const QString& _title) { m_title = _title; };
-		const QString& getTitle(void) const { return m_title; }
+		const QString& getTitle() const { return m_title; }
 
+		//! @brief Enables or disables auto-scaling for the axis.
+		//! Call updateAxis() to apply the change to the plot.
+		//! @param _isAutoScale True to enable auto-scaling, false to disable.
 		void setIsAutoScale(bool _isAutoScale);
-		bool getIsAutoScale(void) const;
+		bool getIsAutoScale() const;
 
+		//! @brief Enables or disables logarithmic scaling for the axis.
+		//! Call updateAxis() to apply the change to the plot.
+		//! @param _isLogScale True to enable logarithmic scaling, false to disable.
 		void setIsLogScale(bool _isLogScale);
-		bool getIsLogScale(void) const;
+		bool getIsLogScale() const;
 
+		//! @brief Sets the minimum value of the axis scale.
+		//! Call updateAxis() to apply the change to the plot.
+		//! @param _minValue The new minimum value for the axis scale.
 		void setMin(double _minValue);
-		double getMin(void) const;
+		double getMin() const;
 
+		//! @brief Sets the maximum value of the axis scale.
+		//! Call updateAxis() to apply the change to the plot.
+		//! @param _maxValue The new maximum value for the axis scale.
 		void setMax(double _maxValue);
-		double getMax(void) const;
+		double getMax() const;
 
-		AxisID getAxisID(void) const { return m_id; };
-		QwtPlot::Axis getCartesianAxisID(void) const;
-		QwtPolar::Axis getPolarAxisID(void) const;
-
-		void setIsLogScaleSet(bool _isSet) { m_isLogScaleSet = _isSet; };
-		bool getIsLogScaleSet(void) const { return m_isLogScaleSet; };
+	protected:
+		//! @brief Sets whether logarithmic scaling is currently applied to the axis.
+		//! This is used internally to track the current state of the axis scaling and apply the necessary changes when updateAxis() is called.
+		//! @param _isSet 
+		inline void setIsLogScaleSet(bool _isSet) { m_isLogScaleSet = _isSet; };
+		inline bool getIsLogScaleSet() const { return m_isLogScaleSet; };
 
 	private:
 		Plot1DAxisCfg m_config;

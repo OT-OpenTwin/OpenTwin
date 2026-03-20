@@ -31,35 +31,41 @@ ot::CartesianPlotAxis::CartesianPlotAxis(AxisID _axisID, CartesianPlot* _plot) :
 	AbstractPlotAxis(_axisID), m_plot(_plot), m_scaleDraw(nullptr)
 {
 	OTAssertNullptr(m_plot);
-	m_plot->setAxisScaleEngine(this->getCartesianAxisID(), new QwtLinearScaleEngine());
+	m_plot->setAxisScaleEngine(getCartesianAxisID(), new QwtLinearScaleEngine());
 
 	m_scaleDraw = new PlotScaleDraw;
-	m_plot->setAxisScaleDraw(this->getCartesianAxisID(), m_scaleDraw);
+	m_plot->setAxisScaleDraw(getCartesianAxisID(), m_scaleDraw);
 }
 
-ot::CartesianPlotAxis::~CartesianPlotAxis() {
-	
+ot::CartesianPlotAxis::~CartesianPlotAxis()
+{
+
 }
 
-void ot::CartesianPlotAxis::updateAxis() {
-	m_plot->setAxisTitle(this->getCartesianAxisID(), this->getTitle());
+void ot::CartesianPlotAxis::updateAxis()
+{
+	m_plot->setAxisTitle(getCartesianAxisID(), getTitle());
 
-	if (this->getIsLogScale() && !this->getIsLogScaleSet()) {
-		this->setIsLogScaleSet(true);
-		m_plot->setAxisScaleEngine(this->getCartesianAxisID(), new QwtLogScaleEngine());
+	if (getIsLogScale() && !getIsLogScaleSet())
+	{
+		setIsLogScaleSet(true);
+		m_plot->setAxisScaleEngine(getCartesianAxisID(), new QwtLogScaleEngine());
 
 	}
-	else if (!this->getIsLogScale() && this->getIsLogScaleSet()) {
-		this->setIsLogScaleSet(false);
-		m_plot->setAxisScaleEngine(this->getCartesianAxisID(), new QwtLinearScaleEngine());
+	else if (!getIsLogScale() && getIsLogScaleSet())
+	{
+		setIsLogScaleSet(false);
+		m_plot->setAxisScaleEngine(getCartesianAxisID(), new QwtLinearScaleEngine());
 	}
-	
-	if (this->getIsAutoScale()) {
-		m_plot->setAxisAutoScale(this->getCartesianAxisID(), this->getIsAutoScale());
+
+	if (getIsAutoScale())
+	{
+		m_plot->setAxisAutoScale(getCartesianAxisID(), getIsAutoScale());
 	}
-	else {
-		m_plot->setAxisScale(this->getCartesianAxisID(), this->getMin(), this->getMax());
-	}	
+	else
+	{
+		m_plot->setAxisScale(getCartesianAxisID(), getMin(), getMax());
+	}
 
 	PlotBase* base = m_plot->getOwner();
 	OTAssertNullptr(base);

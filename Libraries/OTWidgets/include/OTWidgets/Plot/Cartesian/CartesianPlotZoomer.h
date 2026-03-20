@@ -29,9 +29,13 @@ namespace ot {
 
 	class CartesianPlot;
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotZoomer : public QwtPlotZoomer {
+	class OT_WIDGETS_API_EXPORT CartesianPlotZoomer : public QwtPlotZoomer
+	{
+		OT_DECL_NOCOPY(CartesianPlotZoomer)
+		OT_DECL_NOMOVE(CartesianPlotZoomer)
+		OT_DECL_NODEFAULT(CartesianPlotZoomer)
 	public:
-		CartesianPlotZoomer(CartesianPlot* _plot);
+		explicit CartesianPlotZoomer(CartesianPlot* _plot);
 
 		virtual void widgetMousePressEvent(QMouseEvent* _event) override;
 

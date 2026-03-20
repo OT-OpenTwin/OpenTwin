@@ -224,7 +224,7 @@ void ot::CartesianPlot::mouseDoubleClickEvent(QMouseEvent* _event)
 					return;
 				}
 
-				this->getOwner()->requestCurveDoubleClicked(dataset->getEntityID(), _event->modifiers() & Qt::KeyboardModifier::ControlModifier);
+				this->getOwner()->requestCurveDoubleClicked(dataset, _event->modifiers() & Qt::KeyboardModifier::ControlModifier);
 			}
 			else
 			{

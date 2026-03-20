@@ -32,20 +32,21 @@ namespace ot {
 	class PolarPlotPanner;
 	class PolarPlotMagnifier;
 
-	class OT_WIDGETS_API_EXPORT PolarPlot : public QwtPolarPlot, public AbstractPlot {
+	class OT_WIDGETS_API_EXPORT PolarPlot : public QwtPolarPlot, public AbstractPlot
+	{
 		Q_OBJECT
 		OT_DECL_NOCOPY(PolarPlot)
 		OT_DECL_NOMOVE(PolarPlot)
 		OT_DECL_NODEFAULT(PolarPlot)
 	public:
-		PolarPlot(PlotBase* _owner, QWidget* _parent);
+		explicit PolarPlot(PlotBase* _owner, QWidget* _parent);
 		virtual ~PolarPlot();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Plot
 
-		virtual QWidget* getQWidget() override { return this; }
+		virtual QWidget* getQWidget() override { return this; };
 		virtual const QWidget* getQWidget() const override { return this; };
 
 		virtual void updateWholePlot() override;

@@ -31,9 +31,10 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PolarPlotGrid : public QwtPolarGrid {
 		OT_DECL_NOCOPY(PolarPlotGrid)
+		OT_DECL_NOMOVE(PolarPlotGrid)
 		OT_DECL_NODEFAULT(PolarPlotGrid)
 	public:
-		PolarPlotGrid(PolarPlot* _plot);
+		explicit PolarPlotGrid(PolarPlot* _plot);
 		virtual ~PolarPlotGrid();
 
 	private:

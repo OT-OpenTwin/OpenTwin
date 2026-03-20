@@ -25,7 +25,7 @@
 #include "OTWidgets/Plot/Polar/PolarPlotDatasetData.h"
 
 ot::PlotDatasetData::PlotDatasetData() 
-	: m_xQuantity(Plot1DAxisCfg::Undefined), m_yQuantity(Plot1DAxisCfg::Undefined), m_canConvert(false),
+	: m_xQuantity(Plot1DAxisCfg::Undefined), m_yQuantity(Plot1DAxisCfg::Undefined), m_dataIsComplex(false),
 	m_cartesianAccessor(nullptr), m_polarAccessor(nullptr)
 {}
 
@@ -35,7 +35,7 @@ ot::PlotDatasetData::PlotDatasetData(const std::vector<double>& _dataX, std::vec
 
 ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<double>&& _dataY)
 	: m_xQuantity(Plot1DAxisCfg::XData), m_yQuantity(Plot1DAxisCfg::Real),
-	m_dataX(std::move(_dataX)), m_canConvert(false),
+	m_dataX(std::move(_dataX)), m_dataIsComplex(false),
 	m_cartesianAccessor(nullptr), m_polarAccessor(nullptr)
 {
 	m_dataY.reserve(_dataY.size());
@@ -54,7 +54,7 @@ ot::PlotDatasetData::PlotDatasetData(const std::vector<double>& _dataX, std::vec
 
 ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity, Plot1DAxisCfg::AxisQuantity _initialYQuantity)
 	: m_xQuantity(Plot1DAxisCfg::Undefined), m_yQuantity(Plot1DAxisCfg::Undefined),
-	m_dataX(std::move(_dataX)), m_dataY(std::move(_dataY)), m_canConvert(true),
+	m_dataX(std::move(_dataX)), m_dataY(std::move(_dataY)), m_dataIsComplex(true),
 	m_cartesianAccessor(nullptr), m_polarAccessor(nullptr)
 {
 	if (_initialXQuantity == Plot1DAxisCfg::Undefined) {
@@ -94,7 +94,7 @@ ot::PlotDatasetData& ot::PlotDatasetData::operator=(PlotDatasetData&& _other) no
 
 		m_dataX = std::move(_other.m_dataX);
 		m_dataY = std::move(_other.m_dataY);
-		m_canConvert = _other.m_canConvert;
+		m_dataIsComplex = _other.m_dataIsComplex;
 
 		m_calcX = std::move(_other.m_calcX);
 		m_calcY = std::move(_other.m_calcY);
@@ -127,7 +127,7 @@ void ot::PlotDatasetData::updateData()
 }
 
 void ot::PlotDatasetData::setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bool _updateData) {
-	if (m_xQuantity == _quantity || !m_canConvert) {
+	if (m_xQuantity == _quantity || !m_dataIsComplex) {
 		return;
 	}
 	m_xQuantity = _quantity;
@@ -151,7 +151,7 @@ void ot::PlotDatasetData::setXQuantityScaling(const Plot1DAxisCfg::QuantityScali
 }
 
 void ot::PlotDatasetData::setYQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bool _updateData) {
-	if (m_yQuantity == _quantity || !m_canConvert) {
+	if (m_yQuantity == _quantity || !m_dataIsComplex) {
 		return;
 	}
 	m_yQuantity = _quantity;
