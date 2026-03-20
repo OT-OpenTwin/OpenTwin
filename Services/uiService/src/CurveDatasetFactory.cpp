@@ -181,7 +181,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 
 	const ot::QueryInformation& queryInformation =_curveCfg.getQueryInformation();
 	const ot::QuantityContainerEntryDescription& quantityInformation = queryInformation.getQuantityDescription();
-	assert(queryInformation.m_parameterDescriptions.size() == 1); // For a single curve there should be only one parameter
+	assert(queryInformation.getParameterDescriptions().size() == 1); // For a single curve there should be only one parameter
 
 	std::vector<uint32_t> quantityDimensions = quantityInformation.getDimension();
 	uint32_t numberOfQuantityEntries(1);
