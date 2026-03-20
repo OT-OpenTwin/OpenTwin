@@ -149,12 +149,14 @@ void ot::PlotDataset::attach()
 		CartesianPlot* cartesianPlot = dynamic_cast<CartesianPlot*>(plot);
 		OTAssertNullptr(cartesianPlot);
 		m_cartesianCurve->attach(cartesianPlot);
+		m_cartesianCurve->setRenderHint(QwtPlotItem::RenderAntialiased, true);
 	}
 	else
 	{
 		PolarPlot* polarPlot = dynamic_cast<PolarPlot*>(plot);
 		OTAssertNullptr(polarPlot);
 		m_polarCurve->attach(polarPlot);
+		m_polarCurve->setRenderHint(QwtPolarItem::RenderAntialiased, true);
 	}
 
 	createLegendItem();

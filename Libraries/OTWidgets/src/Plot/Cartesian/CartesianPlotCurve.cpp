@@ -109,6 +109,7 @@ ot::CartesianPlotCurve::CartesianPlotCurve(const QString& _title) :
 {
     setZ(PlotBase::ItemZOrder::visibleCurves());
     setRenderHint(QwtPlotItem::RenderHint::RenderAntialiased, true);
+	setPaintAttribute(QwtPlotCurve::PaintAttribute::FilterPointsAggressive, true);
 }
 
 void ot::CartesianPlotCurve::setHighlight(bool _highlight)

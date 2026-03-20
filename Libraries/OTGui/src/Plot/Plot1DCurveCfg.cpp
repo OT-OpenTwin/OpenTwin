@@ -89,6 +89,11 @@ ot::Plot1DCurveCfg::Plot1DCurveCfg(UID _id, UID _version, const std::string& _na
 	m_pointFillPainter(new StyleRefPainter2D(ColorStyleValueEntry::PlotCurveSymbol)),
 	m_pointOulinePen(1., new StyleRefPainter2D(ColorStyleValueEntry::PlotCurveSymbol))
 {
+	m_linePen.setCap(LineCapStyle::RoundCap);
+	m_linePen.setJoinStyle(LineJoinStyle::RoundJoin);
+
+	m_pointOulinePen.setCap(LineCapStyle::RoundCap);
+	m_pointOulinePen.setJoinStyle(LineJoinStyle::RoundJoin);
 }
 
 ot::Plot1DCurveCfg::Plot1DCurveCfg(const Plot1DCurveCfg& _other) : m_pointFillPainter(nullptr)
