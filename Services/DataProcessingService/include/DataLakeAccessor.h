@@ -27,8 +27,16 @@ private:
 
 	
 	void createQueries(BsonViewOrValue& _resultCollectionQueries, BsonViewOrValue& _transformedCollectionQueries);
+	
+	//! @brief  If there is a mismatch between the query tuple format and the stored tuple format, it becomes necessary to transform the tuple.
 	bool transformationNecessary(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat);
+	
+	//! @brief Transformed tuple are stored in a "<collectionID>.transformed" collection. 
+	//! A simple check is performed that counts the number of documents in the result collection which hold the target quantity. 
+	//! Since currently no documents are deleted, the data is completely transformed if the number of documents matches the number of documents of the quantity in the transformed collection.
 	bool alreadyStoredTransformation(const ot::QueryDescription& _queryDescription);
+
+	//! @brief Store transformed tuple in SI base unit in "<collectionID>.transformed" collection
 	void storeTransformation(const ot::QueryDescription& _queryDescription);
 
 	ot::JsonDocument createClearTextResult(const ot::JsonDocument& _databaseResults);

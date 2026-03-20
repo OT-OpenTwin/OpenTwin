@@ -201,6 +201,7 @@ bool DataLakeAccessor::alreadyStoredTransformation(const ot::QueryDescription& _
 
 void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDescription)
 {
+	// First we gather the data from the result collection
 	const std::string fieldValue = _queryDescription.getQueryTargetDescription().getMongoDBFieldName();
 	TupleInstance instance;
 	instance.setTupleElementDataTypes({ ot::TypeNames::getInt64TypeName() });
@@ -224,20 +225,67 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 			throw std::exception("Query returned nothing.\n");
 		}
 
+		// Now we assemble a transformation function to change the format and turn the data into an SI base unit.
 		const ot::QueryTargetDescription& storedDataDescr = _queryDescription.getQueryTargetDescription();
 		const ot::ValueComparisonDescription& queryDescription =	_queryDescription.getValueComparisonDescription();
 
+		// Transformation into SI base unit
+		ValueProcessingChainBuilder valueProcessingChainBuilder;
+		const auto& units = storedDataDescr.getTupleInstance().getTupleUnits();
+		std::list<ValueProcessing> toSIConversions;
+		for (const std::string& unit : units)
+		{
+			ValueProcessing processing = valueProcessingChainBuilder.buildToSIChain(unit);
+			toSIConversions.insert(toSIConversions.end(),std::move(processing));
+		}
+		std::function<std::pair<double, double>(double, double)> transformToSI;
+		if (!toSIConversions.front().executionNecessary() && !toSIConversions.back().executionNecessary())
+		{
+			transformToSI = [](double _first, double _second)->std::pair<double, double>
+				{
+					return { _first, _second };
+				};
+		}
+		else if (toSIConversions.front().executionNecessary() && toSIConversions.back().executionNecessary())
+		{
+			transformToSI = [&toSIConversions](double _first, double _second)->std::pair<double, double>
+				{
+					_first = toSIConversions.front().executeSequence(_first).getDouble();
+					_second= toSIConversions.back().executeSequence(_second).getDouble();
+					return { _first, _second };
+				};
+		}
+		else if(toSIConversions.front().executionNecessary())
+		{
+			transformToSI = [&toSIConversions](double _first, double _second)->std::pair<double, double>
+				{
+					_first = toSIConversions.front().executeSequence(_first).getDouble();
+					return { _first, _second };
+				};
+		}
+		else
+		{
+			assert(toSIConversions.back().executionNecessary());
+			transformToSI = [&toSIConversions](double _first, double _second)->std::pair<double, double>
+				{
+					_second = toSIConversions.back().executeSequence(_second).getDouble();
+					return { _first, _second };
+				};
+		}
+
+		// Now comes the tuple format transformation.
 		const std::string storedFormatName = storedDataDescr.getTupleInstance().getTupleFormatName();
-		const std::string storedTupleType = storedDataDescr.getTupleInstance().getTupleTypeName();
 		const std::string queryFormatName = queryDescription.getTupleInstance().getTupleFormatName();
+		
+		const std::string storedTupleType = storedDataDescr.getTupleInstance().getTupleTypeName();
 		TupleDescription* tupleDescription = TupleFactory::create(storedTupleType);
 		TupleDescriptionComplex* complexDescr = dynamic_cast<TupleDescriptionComplex*>(tupleDescription);
-		std::function<std::pair<double, double>(double, double)> transform;
+		std::function<std::pair<double, double>(double, double)> transformFormat;
 
 		if (queryFormatName == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian))
 		{
 			assert(storedTupleType == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar));
-			transform =
+			transformFormat =
 				[](double _first, double _second) -> std::pair<double, double>
 				{
 					std::complex<double> transformed = ot::ComplexNumberConversion::polarToCartesian(_first, _second);
@@ -247,7 +295,7 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 		else
 		{
 			assert(storedTupleType == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
-			transform =
+			transformFormat =
 				[](double _first, double _second) -> std::pair<double, double>
 				{
 					std::complex<double> reIm(_first, _second);
@@ -268,7 +316,8 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 			ot::ConstJsonArray complexValue = ot::json::getArray(singleMongoDocument, QuantityContainer::getFieldName());
 			double first = ot::json::getDouble(complexValue, 0);
 			double second = ot::json::getDouble(complexValue, 1);
-			std::pair<double,double> transFormedValues = transform(first, second);
+			std::pair<double, double> inSIBaseUnit = transformToSI(first, second);
+			std::pair<double,double> transFormedValues = transformFormat(inSIBaseUnit.first, inSIBaseUnit.second);
 			bsoncxx::builder::basic::array values;
 			values.append(transFormedValues.first);
 			values.append(transFormedValues.second);

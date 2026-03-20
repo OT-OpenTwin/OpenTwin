@@ -33,5 +33,10 @@ std::unique_ptr<ValueProcessor> ValueProcessorLog::inverse() const
 	{
 		return std::make_unique<ValueProcessorPow>(m_multiplier, e);
 	}
+	else
+	{
+		assert(false);
+		throw std::exception("Not supported base in log operation.");
+	}
 	
 }
