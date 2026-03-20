@@ -29,6 +29,8 @@ namespace ot {
 		virtual const QWidget* getQWidget() const override { return m_rootWidget; };
 
 		void setLabel(const QString& _text);
+		void setToolTip(const QString& _toolTip);
+
 		void setPainter(const ot::Painter2D* _painter);
 
 	Q_SIGNALS:

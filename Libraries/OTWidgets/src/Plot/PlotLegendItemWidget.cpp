@@ -39,6 +39,11 @@ void ot::PlotLegendItemWidget::setLabel(const QString& _text)
 	m_label->setText(_text);
 }
 
+void ot::PlotLegendItemWidget::setToolTip(const QString& _toolTip)
+{
+	m_label->setToolTip(_toolTip);
+}
+
 void ot::PlotLegendItemWidget::setPainter(const ot::Painter2D* _painter)
 {
 	m_colorPreview->setFromPainter(_painter);

@@ -39,6 +39,8 @@ namespace ot {
 		void setSelectedPainter(const ot::Painter2D* _painter);
 		void setDimmedPainter(const ot::Painter2D* _painter);
 
+		void setToolTip(const QString& _toolTip);
+
 		void attach();
 		void detach();
 		

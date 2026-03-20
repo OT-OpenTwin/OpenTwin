@@ -169,6 +169,10 @@ namespace ot {
 		void setQueryInformation(QueryInformation&& _queryInformation) { m_queryInformation = std::move(_queryInformation); };
 		const QueryInformation& getQueryInformation() const { return m_queryInformation; };
 
+		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
+		void setToolTip(std::string&& _toolTip) { m_toolTip = std::move(_toolTip); };
+		const std::string& getToolTip() const { return m_toolTip; };
+
 	private:
 		UID m_navigationId;
 
@@ -187,6 +191,8 @@ namespace ot {
 		Painter2D* m_pointFillPainter;
 
 		QueryInformation m_queryInformation;
+
+		std::string m_toolTip;
 	};
 
 }

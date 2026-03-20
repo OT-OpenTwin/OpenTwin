@@ -92,6 +92,15 @@ void ot::PlotLegendItem::setDimmedPainter(const ot::Painter2D* _painter)
 	m_dimmedWidget->setPainter(_painter);
 }
 
+void ot::PlotLegendItem::setToolTip(const QString& _toolTip)
+{
+	OTAssertNullptr(m_selectedWidget);
+	m_selectedWidget->setToolTip(_toolTip);
+
+	OTAssertNullptr(m_dimmedWidget);
+	m_dimmedWidget->setToolTip(_toolTip);
+}
+
 void ot::PlotLegendItem::attach()
 {
 	if (m_legend)

@@ -641,6 +641,14 @@ void ot::PlotDataset::updateLegendVisualization()
 	const ColorStyleValue& dimmedColorValue = cs.getValue(ColorStyleValueEntry::PlotCurveDimmed);
 
 	m_legendItem->setLabel(QString::fromStdString(m_config.getEntityName()));
+	if (m_config.getToolTip().empty())
+	{
+		m_legendItem->setToolTip(QString::fromStdString(m_config.getTitle()));
+	}
+	else
+	{
+		m_legendItem->setToolTip(QString::fromStdString(m_config.getToolTip()));
+	}
 	m_legendItem->setSelectedPainter(m_config.getLinePen().getPainter());
 	m_legendItem->setDimmedPainter(dimmedColorValue.painter());
 	m_legendItem->updateVisibility();
