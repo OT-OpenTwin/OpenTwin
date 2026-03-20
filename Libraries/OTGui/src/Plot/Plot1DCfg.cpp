@@ -56,9 +56,7 @@ std::list<std::string> ot::Plot1DCfg::getPlotTypeStringList() {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::Plot1DCfg::Plot1DCfg() : 
-	WidgetViewBase(WidgetViewBase::View1D, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle | WidgetViewBase::ViewCloseOnEmptySelection), 
-	m_type(Plot1DCfg::Cartesian), m_gridVisible(true), m_gridWidth(1.), m_isHidden(false), m_legendVisible(true), m_curveLimit(0), m_useLimit(false),
-	m_showEntireMatrix(false), m_showMatrixRowEntry(0), m_showMatrixColumnEntry(0), m_gridColor(new StyleRefPainter2D(ColorStyleValueEntry::PlotGrid))
+	WidgetViewBase(WidgetViewBase::View1D, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle | WidgetViewBase::ViewCloseOnEmptySelection)
 {
 	m_xAxis.setQuantity(Plot1DAxisCfg::AxisQuantity::XData);
 	m_yAxis.setQuantity(Plot1DAxisCfg::AxisQuantity::Real);
@@ -67,6 +65,8 @@ ot::Plot1DCfg::Plot1DCfg() :
 ot::Plot1DCfg::~Plot1DCfg() {}
 
 void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	OTAssert(invariant(), "Plot1DCfg object is in an invalid state before serialization.");
+
 	WidgetViewBase::addToJsonObject(_object, _allocator);
 
 	_object.AddMember("CollectionName", JsonString(m_collectionName, _allocator), _allocator);
@@ -115,6 +115,7 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	}
 	_object.AddMember("Queries", allQueries, _allocator);
 
+	_object.AddMember("PolarDegreeOrigin", m_polarDegreeOrigin, _allocator);
 }
 
 void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -158,6 +159,10 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	m_useLimit = ot::json::getBool(_object,"UseLimitOfCurves");
 	m_curveLimit = ot::json::getInt(_object, "NbCurveLimit");
+
+	m_polarDegreeOrigin = ot::json::getDouble(_object, "PolarDegreeOrigin");
+
+	OTAssert(invariant(), "Plot1DCfg object is in an invalid state after deserialization.");
 }
 
 bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
@@ -181,11 +186,18 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 		(m_unitLabelY == _other.m_unitLabelY) &&
 
 		(m_xAxis == _other.m_xAxis) &&
-		(m_yAxis == _other.m_yAxis)
+		(m_yAxis == _other.m_yAxis) &&
+
+		(m_polarDegreeOrigin == _other.m_polarDegreeOrigin)
 		
 		;
 }
 
 bool ot::Plot1DCfg::operator!=(const Plot1DCfg& _other) const {
 	return !Plot1DCfg::operator==(_other);
+}
+
+bool ot::Plot1DCfg::invariant() const
+{
+	return m_polarDegreeOrigin > (-360.) && m_polarDegreeOrigin < 360.;
 }

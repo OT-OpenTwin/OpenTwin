@@ -203,7 +203,12 @@ namespace ot {
 		void setUnitLabelY(const std::string& _unitLabelY) { m_unitLabelY = _unitLabelY; };
 		const std::string& getUnitLabelY() const { return m_unitLabelY; };
 
+		void setPolarDegreeOrigin(double _origin) { m_polarDegreeOrigin = _origin; };
+		double getPolarDegreeOrigin() const { return m_polarDegreeOrigin; };
+
 	private:
+		bool invariant() const;
+
 		std::string m_collectionName;
 		PlotType m_type = Plot1DCfg::Cartesian;
 
@@ -211,7 +216,7 @@ namespace ot {
 
 		bool m_gridVisible = true;
 		Painter2DContainer m_gridColor;
-		double m_gridWidth = .5;
+		double m_gridWidth = .4;
 
 		bool m_showEntireMatrix = true;
 		int32_t m_showMatrixColumnEntry = 1;
@@ -233,5 +238,7 @@ namespace ot {
 
 		Plot1DAxisCfg m_xAxis;
 		Plot1DAxisCfg m_yAxis;
+
+		double m_polarDegreeOrigin = 0.0;
 	};
 }

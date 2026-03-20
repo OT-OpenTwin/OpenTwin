@@ -215,6 +215,7 @@ void ot::PlotBase::applyConfig()
 {
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setTitle(m_config.getTitle().c_str());
+	m_polarPlot->setAzimuthOrigin(Math::degToRad(m_config.getPolarDegreeOrigin()));
 
 	this->setPlotType(m_config.getPlotType());
 

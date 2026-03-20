@@ -34,7 +34,7 @@
 static EntityFactoryRegistrar<EntityResult1DPlot> registrar("EntityResult1DPlot");
 
 EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
-	:EntityContainer(_ID,_parent,_obs,_ms)
+	:EntityContainer(_ID, _parent, _obs, _ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Default/Plot1DVisible");
@@ -77,12 +77,12 @@ bool EntityResult1DPlot::updateFromProperties()
 	//Properties that require the curve data to be fetched again
 	bool requiresDataToBeFetched = false;
 	auto numberOfCurves = PropertyHelper::getBoolProperty(this, "Number of curves", "Curve limit");
-	requiresDataToBeFetched |=	numberOfCurves->needsUpdate();
+	requiresDataToBeFetched |= numberOfCurves->needsUpdate();
 	auto numberOfCurvesMax = PropertyHelper::getIntegerProperty(this, "Max", "Curve limit");
 	requiresDataToBeFetched |= numberOfCurvesMax->needsUpdate();
 	requiresDataToBeFetched |= m_querySettings.requiresUpdate(this);
-	
-	auto showFullMatrixProp =	PropertyHelper::getBoolProperty(this,"Show full matrix");
+
+	auto showFullMatrixProp = PropertyHelper::getBoolProperty(this, "Show full matrix");
 	requiresDataToBeFetched |= showFullMatrixProp->needsUpdate();
 
 	if (!showFullMatrixProp->getValue())
@@ -111,9 +111,9 @@ bool EntityResult1DPlot::updateFromProperties()
 bool EntityResult1DPlot::updatePropertyVisibilities()
 {
 	bool updatePropertiesGrid = false;
-	
-	EntityPropertiesBoolean* gridVisibility = PropertyHelper::getBoolProperty(this, "Grid"); 
-	EntityPropertiesGuiPainter* gridColor = PropertyHelper::getPainterProperty(this,"Grid color");
+
+	EntityPropertiesBoolean* gridVisibility = PropertyHelper::getBoolProperty(this, "Grid");
+	EntityPropertiesGuiPainter* gridColor = PropertyHelper::getPainterProperty(this, "Grid color");
 
 	if (gridVisibility->getValue() != gridColor->getVisible())
 	{
@@ -127,7 +127,8 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 	updatePropertiesGrid |= updateAxisPropertiesVisibility(getRadiusAxisPropertyGroupName());
 	updatePropertiesGrid |= updateAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName());
 
-	switch (getPlotType())
+	ot::Plot1DCfg::PlotType plotType = getPlotType();
+	switch (plotType)
 	{
 	case ot::Plot1DCfg::Cartesian:
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getXAxisPropertyGroupName(), true);
@@ -147,8 +148,17 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 		OT_LOG_E("Unknown plot type (" + std::to_string(static_cast<int>(getPlotType())) + ")");
 		break;
 	}
-	
+
 	updatePropertiesGrid |= m_querySettings.updatePropertyVisibility(this);
+
+	EntityPropertiesDouble* originProp = PropertyHelper::getDoubleProperty(this, "Origin", "General");
+	OTAssertNullptr(originProp);
+	const bool originPropVis = (plotType == ot::Plot1DCfg::Polar);
+	if (originProp->getVisible() != originPropVis)
+	{
+		originProp->setVisible(originPropVis);
+		updatePropertiesGrid = true;
+	}
 
 	return updatePropertiesGrid;
 }
@@ -192,6 +202,11 @@ void EntityResult1DPlot::createProperties()
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
 	EntityPropertiesGuiPainter::createProperty("General", "Grid color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotGrid), "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Legend", true, "", getProperties());
+	auto originProp = EntityPropertiesDouble::createProperty("General", "Origin", 0.0, -359.999, 359.999, "", getProperties());
+	originProp->setAllowCustomValues(false);
+	originProp->setSuffix("deg");
+	originProp->setToolTip("Plot origin offset in degrees.");
+	originProp->setDecimalPlaces(3);
 
 	// Axis settings
 
@@ -267,6 +282,8 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 
 	config.setLimitOfCurves(maxNbOfCurves);
 	config.setUseLimitNbOfCurves(useCurveLimit);
+
+	config.setPolarDegreeOrigin(PropertyHelper::getDoublePropertyValue(this, "Origin", "General"));
 
 	// Setup axis
 
@@ -405,16 +422,20 @@ bool EntityResult1DPlot::updateAxisPropertiesVisibility(const std::string& _axis
 	bool changed = false;
 
 	// Min / Max
-	EntityPropertiesBoolean* autoscaleX = PropertyHelper::getBoolProperty(this, "Autoscale", _axisName);
-	EntityPropertiesDouble* minX = PropertyHelper::getDoubleProperty(this, "Min", _axisName);
-	EntityPropertiesDouble* maxX = PropertyHelper::getDoubleProperty(this, "Max", _axisName);
+	EntityPropertiesBoolean* autoscaleProp = PropertyHelper::getBoolProperty(this, "Autoscale", _axisName);
+	EntityPropertiesDouble* minProp = PropertyHelper::getDoubleProperty(this, "Min", _axisName);
+	EntityPropertiesDouble* maxProp = PropertyHelper::getDoubleProperty(this, "Max", _axisName);
 
-	if (autoscaleX->getValue() == minX->getVisible())
+	const bool minMaxVisible = !autoscaleProp->getValue();
+
+	if (minProp->getVisible() != minMaxVisible)
 	{
-		minX->setVisible(!autoscaleX->getValue());
-		maxX->setVisible(!autoscaleX->getValue());
-		minX->resetNeedsUpdate();
-		maxX->resetNeedsUpdate();
+		minProp->setVisible(minMaxVisible);
+		minProp->resetNeedsUpdate();
+
+		maxProp->setVisible(minMaxVisible);
+		maxProp->resetNeedsUpdate();
+
 		changed = true;
 	}
 
@@ -509,9 +530,10 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 
 	PropertyHelper::setPainterPropertyValue(_config.getGridColor(), this, "Grid color");
 	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::toString(_config.getPlotType()), this, "Plot type");
-	
+
 	PropertyHelper::setBoolPropertyValue(_config.getGridVisible(), this, "Grid");
 	PropertyHelper::setBoolPropertyValue(_config.getLegendVisible(), this, "Legend");
+	PropertyHelper::setDoublePropertyValue(_config.getPolarDegreeOrigin(), this, "Origin", "General");
 
 	PropertyHelper::setSelectionPropertyValue(ot::Plot1DAxisCfg::toString(_config.getXAxisQuantity()), this, "Quantity", xAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsLogScale(), this, "Logscale", xAxisPropGroup);
@@ -529,6 +551,7 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 	PropertyHelper::setStringPropertyValue(_config.getXAxisLabel(), this, "Label override", yAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisLabelAutoDetermine(), this, "Automatic label", yAxisPropGroup);
 
+	updatePropertyVisibilities();
 	updateAxisPropertiesVisibility(xAxisPropGroup);
 	updateAxisPropertiesVisibility(yAxisPropGroup);
 }

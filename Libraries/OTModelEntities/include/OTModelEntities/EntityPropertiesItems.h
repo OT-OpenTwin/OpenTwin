@@ -149,8 +149,14 @@ public:
 	void setAllowCustomValues(bool _allowCustomValues);
 	bool getAllowCustomValues() const { return m_allowCustomValues; };
 
-	void setSuffix(const std::string& _suffix) { m_suffix = _suffix; };
+	void setSuffix(const std::string& _suffix);
 	const std::string& getSuffix() const { return m_suffix; };
+
+	//! @brief Set the decimal places when using a spin control for this property.
+	//! This is only relevant for the property grid and does not affect the actual value of the property.
+	//! @param _precision Number of decimal places to show in the spin control.
+	void setDecimalPlaces(int _precision);
+	int getDecimalPlaces() const { return m_precision; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
@@ -170,6 +176,7 @@ private:
 	bool m_allowCustomValues;
 	double m_min;
 	double m_max;
+	int m_precision;
 	std::string m_suffix;
 };
 
@@ -206,7 +213,7 @@ public:
 	void setAllowCustomValues(bool _allowCustomValues);
 	bool getAllowCustomValues() const { return m_allowCustomValues; };
 
-	void setSuffix(const std::string& _suffix) { m_suffix = _suffix; };
+	void setSuffix(const std::string& _suffix);
 	const std::string& getSuffix() const { return m_suffix; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
