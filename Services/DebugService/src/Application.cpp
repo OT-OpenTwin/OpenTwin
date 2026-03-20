@@ -51,6 +51,7 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/EntityResult1DCurve.h"
 #include "OTResultDataAccess/PlotBuilder.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
@@ -430,11 +431,9 @@ void Application::createPlotTwoCurves() {
 	description.setQuantityDescription(quantDesc.release());
 	description.addParameterDescription(parameterDesc);
 
-	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setLinePenWidth(2.);
-	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	const std::string plotName = "Test/A_plot_Double";
-	curveCfg.setEntityName(plotName + "/A_Curve1");
+	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "A_Curve1");
+	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 
 	builder.addCurve(std::move(description), curveCfg, "TwoCurves1");
 
@@ -458,11 +457,8 @@ void Application::createPlotTwoCurves() {
 	description2.setQuantityDescription(quantDesc2.release());
 	description2.addParameterDescription(parameterDesc2);
 
-	ot::Plot1DCurveCfg curveCfg2;
-	curveCfg2.setLinePenWidth(2.);
+	ot::Plot1DCurveCfg curveCfg2 = EntityResult1DCurve::createDefaultConfig(plotName, "A_Curve2");
 	curveCfg2.setLinePenColor(ot::Color(ot::DefaultColor::Red));
-	curveCfg2.setEntityName(plotName + "/A_Curve2");
-
 	builder.addCurve(std::move(description2), curveCfg2, "TwoCurves2");
 
 	// Here the shared part
@@ -542,8 +538,7 @@ void Application::createFamilyOfCurves()
 
 	ot::PainterRainbowIterator rainbowPainterIt;
 	
-	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setEntityName(plotName + "/A_Curve");
+	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "A_Curve");
 	auto stylePainter = rainbowPainterIt.getNextPainter();
 
 	curveCfg.setLinePenPainter(stylePainter.release());
@@ -568,11 +563,10 @@ void Application::createFamilyOfCurves3ParameterConst()
 	parameter.unit = "kHz";
 
 
-
-	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	const std::string plotName = "Test/A_plot_3Param_const";
-	curveCfg.setEntityName(plotName + "/A_FamilyOfCurves");
+
+	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "A_FamilyOfCurves");
+	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 
 	std::vector<float> offsets{ 3.5f,7.2f,13.f };
 	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
@@ -641,11 +635,9 @@ void Application::createFamilyOfCurves3Parameter()
 	parameter.unit = "kHz";
 
 
-
-	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	const std::string plotName = "Test/A_plot_3Param";
-	curveCfg.setEntityName(plotName + "/A_FamilyOfCurves");
+	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "A_FamilyOfCurves");
+	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 
 	std::vector<float> offsets{ 3.5f,7.2f,13.f };
 	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
@@ -758,11 +750,10 @@ void Application::createPlotSinglePoint() {
 	description.setQuantityDescription(quantDesc.release());
 	description.addParameterDescription(parameterDesc);
 
-	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	const std::string plotName = "Test/A_plot_SingleValue";
-	curveCfg.setEntityName(plotName + "/SingleValueCurve1");
-
+	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "SingleValueCurve1");
+	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
+	
 	builder.addCurve(std::move(description), curveCfg, "SingleValueCurve1");
 
 	// Second curve
@@ -785,9 +776,8 @@ void Application::createPlotSinglePoint() {
 	description2.setQuantityDescription(quantDesc2.release());
 	description2.addParameterDescription(parameterDesc2);
 
-	ot::Plot1DCurveCfg curveCfg2;
+	ot::Plot1DCurveCfg curveCfg2 = EntityResult1DCurve::createDefaultConfig(plotName, "SingleValueCurve2");
 	curveCfg2.setLinePenColor(ot::Color(ot::DefaultColor::Red));
-	curveCfg2.setEntityName(plotName + "/SingleValueCurve2");
 
 	builder.addCurve(std::move(description2), curveCfg2, "SingleValueCurve2");
 
@@ -946,9 +936,8 @@ void Application::createManyCurvesPlotWorker(const std::string& _plotName, int _
 		description.setQuantityDescription(quantDesc.release());
 		description.addParameterDescription(parameterDesc);
 
-		ot::Plot1DCurveCfg curveCfg;
+		ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(_plotName, "/A_Curve" + std::to_string(curveId));
 		curveCfg.setLinePenPainter(rainbowPainterIt.getNextPainter().release());
-		curveCfg.setEntityName(_plotName + "/A_Curve" + std::to_string(curveId));
 
 		builder.addCurve(std::move(description), curveCfg, "Curve" + std::to_string(curveId));
 	}
