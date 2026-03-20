@@ -21,6 +21,7 @@
 #include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ThisService.h"
 
+#include "OTGui/Event/MenuRequestEvent.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGuiAPI/GuiAPIManager.h"
@@ -70,6 +71,7 @@ ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_SettingsItemChanged, this, &ApplicationBase::handleSettingsItemChanged, ot::SECURE_MESSAGE_TYPES);
 	m_actionHandler.connectAction(OT_ACTION_CMD_RegisterNewLibraryManagementService, this, &ApplicationBase::handleRegisterNewLMS, ot::SECURE_MESSAGE_TYPES);
 	m_actionHandler.connectAction(OT_ACTION_CMD_GetDebugInformation, this, &ApplicationBase::handleGetDebugInformation, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_CreateStaticContextMenu, this, &ApplicationBase::handleCreateStaticContextMenu, ot::SECURE_MESSAGE_TYPES);
 }
 
 ot::ApplicationBase::~ApplicationBase()
@@ -613,6 +615,12 @@ ot::PropertyGridCfg ot::ApplicationBase::getSettingsFromDataBase(const std::stri
 	}
 }
 
+bool ot::ApplicationBase::fillContextMenu(const MenuRequestData* _request, std::list<MenuEntryCfg*>& _prepend, std::list<MenuEntryCfg*>& _append)
+{
+	OT_UNUSED(_request);
+	return false;
+}
+
 // ##########################################################################################################################################
 
 // Private: Action handler
@@ -769,6 +777,30 @@ ot::ReturnMessage ot::ApplicationBase::handleGetDebugInformation(JsonDocument& _
 	}
 	
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, debugInfo);
+}
+
+ot::ReturnMessage ot::ApplicationBase::handleCreateStaticContextMenu(JsonDocument& _document) {
+	ReturnMessage result(ReturnMessage::False);
+
+	MenuRequestEvent event(json::getObject(_document, OT_ACTION_PARAM_Event));
+	std::list<MenuEntryCfg*> prependEntries;
+	std::list<MenuEntryCfg*> appendEntries;
+
+	if (this->fillContextMenu(event.getRequestData(), prependEntries, appendEntries)) {
+		JsonDocument responseDoc;
+		MenuCfg pre;
+		pre.setEntries(std::move(prependEntries));
+		responseDoc.AddMember(OT_ACTION_PARAM_Prefix, JsonObject(pre, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+		MenuCfg suf;
+		suf.setEntries(std::move(appendEntries));
+		responseDoc.AddMember(OT_ACTION_PARAM_Suffix, JsonObject(suf, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+		result.setWhat(responseDoc.toJson());
+		result.setStatus(ReturnMessage::True);
+	}
+
+	return result;
 }
 
 // ##########################################################################################################################################

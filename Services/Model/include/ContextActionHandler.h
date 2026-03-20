@@ -23,15 +23,6 @@ public:
 	virtual ~ContextActionHandler() = default;
 
 protected:
-
 	OT_DECL_NODISCARD virtual ot::MenuCfg menuRequested(const ot::MenuRequestEvent& _event) override;
-
-private:
-	ot::MenuCfg createContextMenu(const ot::NavigationMenuRequestData* _requestData) const;
-	ot::MenuCfg createContextMenu(const ot::GraphicsMenuRequestData* _requestData) const;
-	ot::MenuCfg createContextMenu(const ot::PlotMenuRequestData* _requestData) const;
-	ot::MenuCfg createContextMenu(const ot::TableMenuRequestData* _requestData) const;
-	ot::MenuCfg createContextMenu(const ot::TextEditorMenuRequestData* _requestData) const;
-	ot::MenuCfg createContextMenu(const ot::View3DMenuRequestData* _requestData) const;
 
 };

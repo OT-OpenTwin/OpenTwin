@@ -60,6 +60,8 @@ namespace ot {
 		class ExternalServicesComponent;
 	}
 
+	class MenuEntryCfg;
+	class MenuRequestData;
 	class ModalCommandBase;
 	class AbstractUiNotifier;
 	class AbstractSettingsItem;
@@ -368,6 +370,18 @@ namespace ot {
 
 		PropertyGridCfg getSettingsFromDataBase(const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection);
 
+		//! @brief Will be called when a context menu should be filled for the provided request data.
+		//! The resulting menu will look like this: <br>
+		//! <"prepend" entries> <br>
+		//! <entity specific entries> <br>
+		//! <"append" entries>
+		//! 
+		//! @param _request The request data for which the context menu should be filled.
+		//! @param _prepend Entries that will be prepended to the context menu. The caller takes ownership of the provided entries.
+		//! @param _append Entries that will be appended to the context menu. The caller takes ownership of the provided entries.
+		//! @return True if the context menu was filled, false otherwise.
+		virtual bool fillContextMenu(const MenuRequestData* _request, std::list<MenuEntryCfg*>& _prepend, std::list<MenuEntryCfg*>& _append);
+
 		// ##########################################################################################################################################
 
 		// Private: Action handler
@@ -379,6 +393,7 @@ namespace ot {
 		ot::ReturnMessage handleSettingsItemChanged(JsonDocument& _document);
 		ot::ReturnMessage handleRegisterNewLMS(JsonDocument& _document);
 		ot::ReturnMessage handleGetDebugInformation(JsonDocument& _document);
+		ot::ReturnMessage handleCreateStaticContextMenu(JsonDocument& _document);
 		
 		// ##########################################################################################################################################
 

@@ -210,6 +210,7 @@
 #define OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion "UI.AddActivateGraph.Version"
 #define OT_ACTION_CMD_UI_OpenRawFile "UI.OpenRawFile"
 #define OT_ACTION_CMD_UI_CreateContextMenu "UI.CreateContextMenu"
+#define OT_ACTION_CMD_UI_CreateStaticContextMenu "UI.CreateStaticContextMenu"
 #define OT_ACTION_CMD_UI_ContextMenuTriggered "UI.ContextMenuTriggered"
 
 #define OT_ACTION_CMD_UI_SS_IMPORT "StudioSuite.Import"
