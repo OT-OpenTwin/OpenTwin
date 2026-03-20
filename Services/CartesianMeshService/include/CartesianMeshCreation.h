@@ -365,7 +365,7 @@ private:
 	EntityCartesianVector* getDepsMatrix(void) { return matrixDeps; };
 	EntityCartesianVector* getDmuMatrix(void) { return matrixDmu; };
 	EntityCartesianVector* getDsigmaMatrix(void) { return matrixDsigma; };
-	std::string readMaterialInformation(const std::list<EntityGeometry *> &geometryEntities);
+	std::string readMaterialInformation(const std::list<EntityGeometry *> &geometryEntities, std::list<std::pair<ot::UID, ot::UID>>& inputDependencyList);
 	void clearMaterialInformation(const std::list<EntityGeometry *> &geometryEntities);
 	void calcDsW(double *matrix, long long nu, long long nv, long long nw, long long mu, long long mv, long long mw, EntityGeometry **meshFill);
 	void calcDaW(double *matrix, long long nu, long long nv, long long nw, long long mu, long long mv, long long mw, EntityGeometry **meshFill);
@@ -374,6 +374,8 @@ private:
 	void calcDsigmaW(double *matrix, long long nu, long long nv, long long nw, long long mu, long long mv, long long mw, double *meshLinesU, double *meshLinesV, EntityGeometry **meshFill);
 	void addMatrixPlot(EntityResultBase::tResultType resultType, const std::string &plotName, EntityCartesianVector *matrix, EntityMeshCartesianData *mesh, std::list<EntityBase *> &entityList, std::map<ot::UID,bool> &topologyEntityForceVisible);
 	void copyGeometryEntities(std::list<EntityGeometry*>& geometryEntities, std::list<EntityBase*>& entityList, const std::string &meshName);
+	bool meshNeedsUpdating(EntityBase* mesh, const std::list<std::pair<ot::UID, ot::UID>>& currentInputDependencyList);
+	void addToOutputDependencies(const std::list<ot::UID>& entityIDList, const std::list<ot::UID>& entityVersionList, std::list<std::pair<ot::UID, ot::UID>>& outputDependencyList);
 
 	enum lockType {ANY_OPERATION, MODEL_CHANGE};
 	void setUILock(bool flag, lockType type);

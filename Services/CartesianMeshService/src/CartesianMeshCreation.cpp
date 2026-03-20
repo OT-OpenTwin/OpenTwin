@@ -35,6 +35,7 @@
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTModelEntities/EntityVis2D3D.h"
 #include "OTModelEntities/EntityVisCartesianFaceScalar.h"
+#include "OTModelEntities/InvalidUID.h"
 
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/GeometryOperations.h"
@@ -45,6 +46,7 @@
 #include <chrono>
 #include <thread>	
 #include <limits>
+#include <set>
 
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -113,15 +115,22 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 	std::time_t timer = time(nullptr);
 	//reportTime("Cartesian meshing started", timer);
 
+	std::list<std::pair<ot::UID, ot::UID>> inputDependencyList;
+	std::list<std::pair<ot::UID, ot::UID>> outputDependencyList;
+
 	try
 	{
+		inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(meshEntity->getEntityID(), meshEntity->getEntityStorageVersion()));  // Add ourselves to the dependency list (because of the properties)
+
 		newTopologyEntities.clear();
 		newDataEntities.clear();
 
 		setEntityMesh(dynamic_cast<EntityMeshCartesian *>(meshEntity));
 
-		// Delete the previous mesh data (if any)
-		deleteMesh();
+		// -----------------------------------------------------------------------------------------
+		// In a first step, we load all necessary data for the meshing process 
+		// (this will also create the input dependency list)
+		// -----------------------------------------------------------------------------------------
 
 		// Read the setting from the mesh entity
 		EntityPropertiesDouble *maximumEdgeLengthProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Maximum edge length"));
@@ -140,17 +149,8 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		bool visualizeMatrices = false;
 		if (visualizeMatricesProperty != nullptr) visualizeMatrices = visualizeMatricesProperty->getValue();
 
-		// Start the actual meshing process
-		displayMessage("____________________________________________________________\n\n"
-			"Cartesian mesh generation started.\n\n");
-
 		// Get all geometry entities which need to be considered for meshing
 		std::list<ot::UID> geometryEntitiesID = getAllGeometryEntitiesForMeshing();
-
-		if (geometryEntitiesID.empty())
-		{
-			throw std::string("ERROR: Mesh cannot be created, because no shapes are selected for meshing.\n\n");
-		}
 
 		// Now load all geometry entities in the model
 		getApplication()->prefetchDocumentsFromStorage(geometryEntitiesID);
@@ -159,6 +159,8 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		{
 			ot::UID entityVersion = getApplication()->getPrefetchedEntityVersion(entityID);
 			EntityGeometry* geom = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
+
+			inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(geom->getEntityID(), geom->getEntityStorageVersion()));
 
 			if (geom == nullptr)
 			{
@@ -175,7 +177,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		if (backgroundCube != nullptr) geometryEntities.push_back(backgroundCube);
 
 		// Now load the material information for each geometry object
-		std::string error = readMaterialInformation(geometryEntities);
+		std::string error = readMaterialInformation(geometryEntities, inputDependencyList);
 		if (!error.empty()) throw error;
 
 		// In the following we need the Brep description for each object.
@@ -205,12 +207,44 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 				EntityFacetData *facet = dynamic_cast<EntityFacetData *>(ot::EntityAPI::readEntityFromEntityIDandVersion(facetID, facetVersion));
 				EntityBrep *brep = dynamic_cast<EntityBrep *>(ot::EntityAPI::readEntityFromEntityIDandVersion(brepID, brepVersion));
 
+				inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(facet->getEntityID(), facet->getEntityStorageVersion()));
+				inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(brep->getEntityID(), brep->getEntityStorageVersion()));
+
 				geomEntity->setFacetEntity(facet);
 				geomEntity->setBrepEntity(brep);
 			}
 		}
 
-		// Now set the facet and brep entities for the geometry entities
+		// -----------------------------------------------------------------------------------------
+		// Check whether the mesh is up-to-date and does not need updating
+		// -----------------------------------------------------------------------------------------
+
+		inputDependencyList.sort();
+		inputDependencyList.unique();
+
+		if (!meshNeedsUpdating(meshEntity, inputDependencyList))
+		{
+			// Nothing to do here. Stop the meshing process
+			displayMessage("____________________________________________________________\n\nThe mesh is already up-to-date.\n");
+
+			DataBase::instance().setWritingQueueEnabled(false);
+			ot::ModelServiceAPI::enableMessageQueueing(false);
+
+			setUILock(false, MODEL_CHANGE);
+			return;
+		}
+
+		// Start the actual meshing process
+		displayMessage("____________________________________________________________\n\n"
+					   "Cartesian mesh generation started.\n\n");
+
+		// The mesh needs to be updated, so we delete the old mesh first.
+		deleteMesh();
+
+		if (geometryEntitiesID.empty())
+		{
+			throw std::string("ERROR: Mesh cannot be created, because no shapes are selected for meshing.\n\n");
+		}
 
 		// In a first step, we need to determine the mesh line distribution. 
 		setProgressInformation("Determine mesh line distribution", true);
@@ -369,13 +403,47 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 			}
 		}
 
+		// Add to the output dependency list
+		addToOutputDependencies(topologyEntityIDList, topologyEntityVersionList, outputDependencyList);
+		addToOutputDependencies(dataEntityIDList, dataEntityVersionList, outputDependencyList);
+
 		// Add the new mesh entity version to the topology
 		topologyEntityIDList.push_front(getEntityMesh()->getEntityID());
 		topologyEntityVersionList.push_front(getEntityMesh()->getEntityStorageVersion());
 		topologyEntityForceVisible.push_front(false);
 
-		// Add the newly created entities to the model service
-		ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "update cartesian mesh");
+		// Add the newly created entities to the model service, but do not save the model yet
+		ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "", false, false);
+		ot::ModelServiceAPI::storeAllEntitiesToDataBase();  // Make sure that the modeler writes all entities to update their save versions before we get them here
+
+		// Now update the versions of the input and output depencencies according to the current state
+		application->getModelComponent()->updateEntityVersions(inputDependencyList);
+		application->getModelComponent()->updateEntityVersions(outputDependencyList);
+
+		// Now the mesh entity was stored and potentially modified by the model service when saving. Therefore we need to load the
+		// mesh entity again here and just add the dependency information
+		ot::EntityInformation updatedMeshEntityInfo;
+		ot::ModelServiceAPI::getEntityInformation(getEntityMesh()->getName(), updatedMeshEntityInfo);
+
+		EntityMesh* updatedMeshEntity = dynamic_cast<EntityMesh*>(ot::EntityAPI::readEntityFromEntityIDandVersion(updatedMeshEntityInfo.getEntityID(), updatedMeshEntityInfo.getEntityVersion()));
+		assert(updatedMeshEntity != nullptr);
+
+		if (updatedMeshEntity != nullptr)
+		{
+			updatedMeshEntity->setInputDependency(inputDependencyList);		// The mesh entity is part of the input dependency, but will be updated to the latest version while saving automatically.
+			updatedMeshEntity->setOutputDependency(outputDependencyList);
+			updatedMeshEntity->storeToDataBase();
+
+			// Finally store the new model state (and save the updated mesh entity)
+			ot::UIDList topologyEntityIDs = { updatedMeshEntity->getEntityID() };
+			ot::UIDList topologyEntityVersions = { updatedMeshEntity->getEntityStorageVersion() };
+			ot::ModelServiceAPI::updateTopologyEntities(topologyEntityIDs, topologyEntityVersions, "update cartesian mesh: " + getEntityMesh()->getName(), false, true);
+		}
+		else
+		{
+			// Just save the new state
+			ot::ModelServiceAPI::modelChangeOperationCompleted("update cartesian mesh: " + getEntityMesh()->getName());
+		}
 	}
 	catch (std::string &error)
 	{
@@ -492,7 +560,7 @@ void CartesianMeshCreation::clearMaterialInformation(const std::list<EntityGeome
 	materialList.clear();
 }
 
-std::string CartesianMeshCreation::readMaterialInformation(const std::list<EntityGeometry *> &geometryEntities)
+std::string CartesianMeshCreation::readMaterialInformation(const std::list<EntityGeometry *> &geometryEntities, std::list<std::pair<ot::UID, ot::UID>> &inputDependencyList)
 {
 	std::string error;
 
@@ -562,6 +630,8 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 	for (auto info : materialInfo)
 	{
 		EntityMaterial *material = dynamic_cast<EntityMaterial *>(ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion()));
+
+		inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(material->getEntityID(), material->getEntityStorageVersion()));
 
 		if (material == nullptr)
 		{
@@ -2644,5 +2714,74 @@ void CartesianMeshCreation::determine2DFill(std::list<EntityGeometry *> &geometr
 
 	}
 
+}
+
+bool CartesianMeshCreation::meshNeedsUpdating(EntityBase* mesh, const std::list<std::pair<ot::UID, ot::UID>>& currentInputDependencyList)
+{
+	// First, we need to check whether the new check has delivered the same dependencies as the ones which are already stored.
+	std::list<std::pair<ot::UID, ot::UID>> previousInputDependencyList;
+	mesh->getInputDependency(previousInputDependencyList);
+
+	if (currentInputDependencyList.size() != previousInputDependencyList.size()) return true; // The number of dependencies is different -> mesh needs to be updated
+
+	// Now we have the same count of dependencies in both lists. We just need to check if all entires from one list are also contained in the other list.
+	std::set<std::pair<ot::UID, ot::UID>> currentInputDependencySet;
+	for (auto entity : currentInputDependencyList)
+	{
+		currentInputDependencySet.emplace(entity);
+	}
+
+	for (auto entity : previousInputDependencyList)
+	{
+		if (currentInputDependencySet.find(entity) == currentInputDependencySet.end())
+		{
+			// This item is not present in the list. Therefore the lists are not identical and need to be updated
+			return true;
+		}
+	}
+
+	// So far, all input dependencies still seem to be the same. Check whether the previous output dependencies are still present.
+	std::list<std::pair<ot::UID, ot::UID>> previousOutputDependencyList;
+	mesh->getOutputDependency(previousOutputDependencyList);
+
+	std::list<ot::UID> outputIDList;
+	std::map<ot::UID, ot::UID> outputEntityMap;
+
+	for (auto entity : previousOutputDependencyList)
+	{
+		outputIDList.push_back(entity.first);
+		outputEntityMap[entity.first] = entity.second;
+	}
+
+	std::list<ot::EntityInformation> entityInfo;
+	ot::ModelServiceAPI::getEntityInformation(outputIDList, entityInfo);
+
+	for (auto entity : entityInfo)
+	{
+		if (entity.getEntityID() == ot::getInvalidUID())
+		{
+			// The entity is not longer available
+			return false;
+		}
+
+		if (outputEntityMap[entity.getEntityID()] != entity.getEntityVersion())
+		{
+			// The version of the output entity has changed or the output entity is no longer present
+			return true;
+		}
+	}
+
+	// The input are unchanged and all output dependencies are still there, no update necessary
+	return false;
+}
+
+void CartesianMeshCreation::addToOutputDependencies(const std::list<ot::UID>& entityIDList, const std::list<ot::UID>& entityVersionList, std::list<std::pair<ot::UID, ot::UID>>& outputDependencyList)
+{
+	auto it1 = entityIDList.begin();
+	auto it2 = entityVersionList.begin();
+
+	for (; it1 != entityIDList.end(); ++it1, ++it2) {
+		outputDependencyList.emplace_back(*it1, *it2);
+	}
 }
 
