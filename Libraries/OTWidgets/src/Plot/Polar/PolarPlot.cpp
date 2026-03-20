@@ -47,7 +47,7 @@ ot::PolarPlot::PolarPlot(PlotBase* _owner, QWidget* _parent)
 	m_panner = new PolarPlotPanner(this);
 		
 	this->setPlotAxis(new PolarPlotAxis(AbstractPlotAxis::xBottom, this), nullptr, new PolarPlotAxis(AbstractPlotAxis::yLeft, this), nullptr);
-
+	
 	slotColorStyleChanged();
 	connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PolarPlot::slotColorStyleChanged);
 }

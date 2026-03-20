@@ -431,6 +431,7 @@ void Application::createPlotTwoCurves() {
 	description.addParameterDescription(parameterDesc);
 
 	ot::Plot1DCurveCfg curveCfg;
+	curveCfg.setLinePenWidth(2.);
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	const std::string plotName = "Test/A_plot_Double";
 	curveCfg.setEntityName(plotName + "/A_Curve1");
@@ -449,7 +450,8 @@ void Application::createPlotTwoCurves() {
 	quantDesc2->defineQuantityAsSingle(ot::TypeNames::getInt32TypeName(), "dB");
 	
 	for (float i = 0.; i <= 50.; i++) {
-		quantDesc2->addDatapoint(ot::Variable(-static_cast<int32_t>(i)));
+		//quantDesc2->addDatapoint(ot::Variable(-static_cast<int32_t>(i)));
+		quantDesc2->addDatapoint(ot::Variable(static_cast<int32_t>(i)));
 		parameter2.values.push_back(ot::Variable(i));
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc2(new ParameterDescription(parameter2, false));
@@ -458,6 +460,7 @@ void Application::createPlotTwoCurves() {
 	description2.addParameterDescription(parameterDesc2);
 
 	ot::Plot1DCurveCfg curveCfg2;
+	curveCfg2.setLinePenWidth(2.);
 	curveCfg2.setLinePenColor(ot::Color(ot::DefaultColor::Red));
 	curveCfg2.setEntityName(plotName + "/A_Curve2");
 

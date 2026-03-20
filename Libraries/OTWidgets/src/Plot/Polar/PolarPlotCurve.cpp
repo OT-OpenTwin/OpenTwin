@@ -68,6 +68,7 @@ exceptions:
 */
 
 // OpenTwin header
+#include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/Polar/PolarPlotCurve.h"
 
 // Qwt header
@@ -107,7 +108,7 @@ namespace ot {
 ot::PolarPlotCurve::PolarPlotCurve(const QString& _title) :
 	QwtPolarCurve(_title), m_highlightPen(Qt::NoPen), m_pointInterval(1), m_hasHighlight(false)
 {
-
+    setZ(PlotBase::ItemZOrder::visibleCurves());
 }
 
 void ot::PolarPlotCurve::setHighlight(bool _highlight) {

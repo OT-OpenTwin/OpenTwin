@@ -331,11 +331,25 @@ void ot::PlotDataset::setSelected(bool _isSelected) {
 
 void ot::PlotDataset::setHighlighted(bool _hasHighlight)
 {
+	double zVal = PlotBase::ItemZOrder::visibleCurves();
+
+	if (!m_isSelected)
+	{
+		zVal = PlotBase::ItemZOrder::dimmedCurves();
+	}
+
+	if (_hasHighlight)
+	{
+		zVal = PlotBase::ItemZOrder::highlightedCurves();
+	}
+
 	if (m_cartesianCurve) {
 		m_cartesianCurve->setHighlight(_hasHighlight);
+		m_cartesianCurve->setZ(zVal);
 	}
 	if (m_polarCurve) {
 		m_polarCurve->setHighlight(_hasHighlight);
+		m_polarCurve->setZ(zVal);
 	}
 
 	OTAssertNullptr(m_ownerPlot);
@@ -365,15 +379,24 @@ void ot::PlotDataset::updateCurveVisualization() {
 
 	QPen highlightPen = linePen;
 	highlightPen.setBrush(cs.getValue(ColorStyleValueEntry::PlotCurveHighlight).toBrush());
-	highlightPen.setWidthF(linePen.width() + 6.);
+	highlightPen.setWidthF(linePen.width() + 2.);
+
+	double zVal = PlotBase::ItemZOrder::visibleCurves();
+
+	if (!m_isSelected)
+	{
+		zVal = PlotBase::ItemZOrder::dimmedCurves();
+	}
 
 	if (m_cartesianCurve)
 	{
 		m_cartesianCurve->setHighlightPen(highlightPen);
+		m_cartesianCurve->setZ(zVal);
 	}
 	if (m_polarCurve)
 	{
 		m_polarCurve->setHighlightPen(highlightPen);
+		m_polarCurve->setZ(zVal);
 	}
 
 	// Setup curve pen
