@@ -85,6 +85,21 @@ ot::MenuEntryCfg* ot::MenuButtonCfg::createCopy() const {
 	return new MenuButtonCfg(*this);
 }
 
+bool ot::MenuButtonCfg::isEqual(const MenuEntryCfg* _other) const
+{
+	const MenuButtonCfg* other = dynamic_cast<const MenuButtonCfg*>(_other);
+	if (other == nullptr) {
+		return false;
+	}
+	else
+	{
+		return MenuClickableEntryCfg::isEqual(_other)
+			&& m_action == other->m_action
+			&& m_ttbButtonName == other->m_ttbButtonName
+			&& m_hidden == other->m_hidden;
+	}
+}
+
 void ot::MenuButtonCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	MenuClickableEntryCfg::addToJsonObject(_object, _allocator);
 

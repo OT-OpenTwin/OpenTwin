@@ -36,11 +36,12 @@ namespace ot {
 	public:
 		static const std::string& classNameJsonKey();
 
-		MenuEntryCfg() = default;
+		explicit MenuEntryCfg() = default;
 		virtual ~MenuEntryCfg() = default;
 		
 		virtual MenuEntryCfg* createCopy() const = 0;
 		virtual std::string getClassName() const = 0;
+		virtual bool isEqual(const MenuEntryCfg* _other) const = 0;
 
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _object Json object reference to write the data to.

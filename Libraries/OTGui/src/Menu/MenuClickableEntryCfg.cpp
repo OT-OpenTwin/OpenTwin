@@ -49,3 +49,19 @@ void ot::MenuClickableEntryCfg::setFromJsonObject(const ot::ConstJsonObject& _ob
 	m_toolTip = json::getString(_object, "ToolTip");
 	m_isEnabled = json::getBool(_object, "Enabled");
 }
+
+bool ot::MenuClickableEntryCfg::isEqual(const MenuEntryCfg* _other) const
+{
+	const MenuClickableEntryCfg* other = dynamic_cast<const MenuClickableEntryCfg*>(_other);
+	if (other == nullptr) {
+		return false;
+	}
+	else
+	{
+		return m_name == other->m_name
+			&& m_text == other->m_text
+			&& m_iconPath == other->m_iconPath
+			&& m_toolTip == other->m_toolTip
+			&& m_isEnabled == other->m_isEnabled;
+	}
+}

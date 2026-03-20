@@ -77,5 +77,4 @@
 
 //! @def OT_UNUSED
 //! @brief Avoid "warning C4101: unreferenced local variable".
-//! Use only when working with preprocessor definitions, unused locals should not occur in the first place :).
 #define OT_UNUSED(___unusedVariable) (void)(___unusedVariable);

@@ -43,6 +43,12 @@ ot::MenuCfg::MenuCfg(const MenuCfg& _other)
 	}
 }
 
+ot::MenuCfg::MenuCfg(MenuCfg&& _other) noexcept
+	: MenuClickableEntryCfg(std::move(_other)), m_childs(std::move(_other.m_childs))
+{
+	_other.m_childs.clear();
+}
+
 ot::MenuCfg::MenuCfg(const ot::ConstJsonObject& _object) {
 	this->setFromJsonObject(_object);
 }
@@ -66,8 +72,46 @@ ot::MenuCfg& ot::MenuCfg::operator=(const MenuCfg& _other) {
 	return *this;
 }
 
+ot::MenuCfg& ot::MenuCfg::operator=(MenuCfg&& _other) noexcept
+{
+	if (this != &_other) {
+		this->clear();
+		MenuClickableEntryCfg::operator=(std::move(_other));
+		m_childs = std::move(_other.m_childs);
+		_other.m_childs.clear();
+	}
+
+	return *this;
+}
+
 ot::MenuEntryCfg* ot::MenuCfg::createCopy(void) const {
 	return new MenuCfg(*this);
+}
+
+bool ot::MenuCfg::isEqual(const MenuEntryCfg* _other) const
+{
+	const MenuCfg* otherMenu = dynamic_cast<const MenuCfg*>(_other);
+	if (!otherMenu || !MenuClickableEntryCfg::isEqual(_other)) {
+		return false;
+	}
+
+	const std::list<MenuEntryCfg*>& otherEntries = otherMenu->getEntries();
+	for (const MenuEntryCfg* entry : m_childs) {
+		OTAssertNullptr(entry);
+		bool found = false;
+		for (const MenuEntryCfg* otherEntry : otherEntries) {
+			OTAssertNullptr(otherEntry);
+			if (entry->isEqual(otherEntry)) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void ot::MenuCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
@@ -141,6 +185,12 @@ ot::MenuButtonCfg* ot::MenuCfg::findMenuButton(const std::string& _name) const {
 	return nullptr;
 }
 
+void ot::MenuCfg::setEntries(std::list<MenuEntryCfg*>&& _entries)
+{
+	clear();
+	m_childs = std::move(_entries);
+}
+
 std::list<ot::MenuEntryCfg*> ot::MenuCfg::getAllEntries() const
 {
 	std::list<MenuEntryCfg*> result;
@@ -177,7 +227,27 @@ bool ot::MenuCfg::isEmpty(void) const {
 	return true;
 }
 
-void ot::MenuCfg::clear(void) {
+ot::MenuCfg ot::MenuCfg::intersect(const MenuCfg& _other) const
+{
+	MenuCfg result;
+	result.MenuClickableEntryCfg::operator=(*this);
+	
+	for (const MenuEntryCfg* entry : m_childs)
+	{
+		for (const MenuEntryCfg* otherEntry : _other.getEntries())
+		{
+			if (entry->isEqual(otherEntry))
+			{
+				result.add(entry->createCopy());
+				break;
+			}
+		}
+	}
+
+	return result;
+}
+
+void ot::MenuCfg::clear() {
 	for (MenuEntryCfg* child : m_childs) {
 		delete child;
 	}

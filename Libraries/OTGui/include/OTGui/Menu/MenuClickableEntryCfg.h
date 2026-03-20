@@ -28,8 +28,8 @@ namespace ot {
 		OT_DECL_DEFCOPY(MenuClickableEntryCfg)
 		OT_DECL_DEFMOVE(MenuClickableEntryCfg)
 	public:
-		MenuClickableEntryCfg() = default;
-		MenuClickableEntryCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string());
+		explicit MenuClickableEntryCfg() = default;
+		explicit MenuClickableEntryCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string());
 		virtual ~MenuClickableEntryCfg();
 
 		//! @brief Add the object contents to the provided JSON object.
@@ -41,6 +41,8 @@ namespace ot {
 		//! @param _object The JSON object containing the information.
 		//! @throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+
+		virtual bool isEqual(const MenuEntryCfg* _other) const override;
 
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& getName() const { return m_name; };

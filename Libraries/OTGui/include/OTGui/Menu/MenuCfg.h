@@ -33,17 +33,20 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT MenuCfg : public MenuClickableEntryCfg {
 	public:
-		MenuCfg();
-		MenuCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string());
+		explicit MenuCfg();
+		explicit MenuCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string());
 		MenuCfg(const MenuCfg& _other);
-		MenuCfg(const ot::ConstJsonObject& _object);
+		MenuCfg(MenuCfg&& _other) noexcept;
+		explicit MenuCfg(const ot::ConstJsonObject& _object);
 		virtual ~MenuCfg();
 
 		MenuCfg& operator = (const MenuCfg& _other);
+		MenuCfg& operator = (MenuCfg&& _other) noexcept;
 
 		virtual MenuEntryCfg* createCopy() const override;
 		static std::string className() { return "MenuCfg"; };
 		virtual std::string getClassName() const override { return MenuCfg::className(); };
+		virtual bool isEqual(const MenuEntryCfg* _other) const override;
 
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _object Json object reference to write the data to.
@@ -80,14 +83,23 @@ namespace ot {
 		//! The menu keeps ownership of the button.
 		MenuButtonCfg* findMenuButton(const std::string& _name) const;
 
+		//! @brief Sets the list of menu entries that are direct children of this menu.
+		//! @param _entries List of menu entries to set as direct children of this menu. The menu takes ownership of the provided entries.
+		void setEntries(std::list<MenuEntryCfg*>&& _entries);
+
 		//! @brief Returns a list of all menu entries that are direct children of this menu.
 		const std::list<MenuEntryCfg*>& getEntries() const { return m_childs; };
 
 		//! @brief Returns a list of all menu entries in this menu and all of its child menus (recursively).
 		std::list<MenuEntryCfg*> getAllEntries() const;
 
-		//! @brief Returns true if this menu has no buttons (child menus do not count).
+		//! @brief Returns true if this and all child menus have no buttons.
 		bool isEmpty() const;
+ 
+		//! @brief Returns a new MenuCfg that is the intersection of this and the provided menu configuration.
+		//! The intersection contains only the menu entries that are present in both menus (by name) and are equal (isEqual) in both menus. 
+		//! The general information of the resulting menu is set from this menu (MenuClickableEntryCfg::operator=).
+		MenuCfg intersect(const MenuCfg& _other) const;
 
 	private:
 		void clear();

@@ -26,3 +26,9 @@ static ot::MenuEntryCfgFactoryRegistrar<ot::MenuSeparatorCfg> separatorRegistara
 ot::MenuEntryCfg* ot::MenuSeparatorCfg::createCopy() const {
 	return new MenuSeparatorCfg(*this);
 }
+
+bool ot::MenuSeparatorCfg::isEqual(const MenuEntryCfg* _other) const
+{
+	const MenuSeparatorCfg* other = dynamic_cast<const MenuSeparatorCfg*>(_other);
+	return other != nullptr;
+}

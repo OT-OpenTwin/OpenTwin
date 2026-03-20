@@ -378,6 +378,8 @@
 #define OT_ACTION_PARAM_Color "Color"
 #define OT_ACTION_PARAM_Event "Event"
 #define OT_ACTION_PARAM_Hidden "Hidden"
+#define OT_ACTION_PARAM_Prefix "Prefix"
+#define OT_ACTION_PARAM_Suffix "Suffix"
 #define OT_ACTION_PARAM_Ranges "Ranges"
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Parent "Parent"

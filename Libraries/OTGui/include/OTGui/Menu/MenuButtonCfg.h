@@ -48,14 +48,15 @@ namespace ot {
 		static std::string toString(ButtonAction _action);
 		static ButtonAction stringToButtonAction(const std::string& _action);
 
-		MenuButtonCfg();
-		MenuButtonCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string(), ButtonAction _action = ButtonAction::NotifyOwner);
-		MenuButtonCfg(const ot::ConstJsonObject& _object);
+		explicit MenuButtonCfg();
+		explicit MenuButtonCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string(), ButtonAction _action = ButtonAction::NotifyOwner);
+		explicit MenuButtonCfg(const ot::ConstJsonObject& _object);
 		virtual ~MenuButtonCfg() = default;
 
 		virtual MenuEntryCfg* createCopy() const override;
 		static std::string className() { return "MenuButtonCfg"; };
 		virtual std::string getClassName() const override { return MenuButtonCfg::className(); };
+		virtual bool isEqual(const MenuEntryCfg* _other) const override;
 
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _object Json object reference to write the data to.
