@@ -51,9 +51,7 @@ include_guard(GLOBAL)
 #   ot_add_test(<APP_NAME>)
 
 # Requires OTEnvironment.cmake first (for THIRDPARTY_ROOT_PATH, OT_* paths, etc.)
-include("$ENV{OT_CMAKE_DIR}/OTQT.cmake")
-
-set(CMAKE_AUTOMOC ON)
+include("$ENV{OT_CMAKE_DIR}/OTQt.cmake")
 
 if(MSVC)
     add_compile_options(/Zc:__cplusplus /permissive- /Zc:preprocessor /MP)
@@ -609,7 +607,30 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
 endfunction()
 
 # ------------------------------------------------------------
-# finalize_lib / finalize_app
+# finalize helpers
+# ------------------------------------------------------------
+function(_ot_set_automoc_if_qt TARGET_NAME DEPS_LIST)
+    foreach(dep IN LISTS DEPS_LIST)
+        if(dep MATCHES "^Qt" OR dep STREQUAL "QtFull")
+            set_target_properties(${TARGET_NAME} PROPERTIES
+                AUTOMOC ON
+                # AUTOUIC ON
+                # AUTORCC ON
+            )
+            return()
+        endif()
+    endforeach()
+endfunction()
+
+function(_ot_apply_all_deps TARGET_NAME CORE_NAME DEPS)
+    foreach(dep IN LISTS DEPS)
+        _ot_apply_dep_to_core(${CORE_NAME} "${dep}")
+        _ot_apply_dep_to_final(${TARGET_NAME} "${dep}")
+    endforeach()
+endfunction()
+
+# ------------------------------------------------------------
+# finalize_lib / finalize_bin
 # ------------------------------------------------------------
 function(ot_finalize_lib TARGET_NAME)
     _ot_target_core_name(_core ${TARGET_NAME})
@@ -617,18 +638,17 @@ function(ot_finalize_lib TARGET_NAME)
         message(FATAL_ERROR "ot_finalize_lib: core target '${_core}' does not exist. Call ot_initialize_lib first.")
     endif()
 
-    add_library(${TARGET_NAME} SHARED $<TARGET_OBJECTS:${_core}>)
-    target_include_directories(${TARGET_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-
     get_property(_deps TARGET ${_core} PROPERTY OT_DEPS)
     if(NOT _deps)
         set(_deps "")
     endif()
 
-    foreach(dep IN LISTS _deps)
-        _ot_apply_dep_to_core(${_core} "${dep}")
-        _ot_apply_dep_to_final(${TARGET_NAME} "${dep}")
-    endforeach()
+    add_library(${TARGET_NAME} SHARED $<TARGET_OBJECTS:${_core}>)
+    target_include_directories(${TARGET_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+    _ot_apply_all_deps(${TARGET_NAME} ${_core} "${_deps}")
+
+    _ot_set_automoc_if_qt(${_core} "${_deps}")
 endfunction()
 
 function(ot_finalize_bin TARGET_NAME)
@@ -637,17 +657,16 @@ function(ot_finalize_bin TARGET_NAME)
         message(FATAL_ERROR "ot_finalize_bin: core target '${_core}' does not exist. Call ot_initialize_app first.")
     endif()
 
-    add_executable(${TARGET_NAME} $<TARGET_OBJECTS:${_core}>)
-
     get_property(_deps TARGET ${_core} PROPERTY OT_DEPS)
     if(NOT _deps)
         set(_deps "")
     endif()
 
-    foreach(dep IN LISTS _deps)
-        _ot_apply_dep_to_core(${_core} "${dep}")
-        _ot_apply_dep_to_final(${TARGET_NAME} "${dep}")
-    endforeach()
+    add_executable(${TARGET_NAME} $<TARGET_OBJECTS:${_core}>)
+
+    _ot_apply_all_deps(${TARGET_NAME} ${_core} "${_deps}")
+
+    _ot_set_automoc_if_qt(${_core} "${_deps}")
 endfunction()
 
 # ------------------------------------------------------------
@@ -669,6 +688,12 @@ function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
     file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
     add_executable(${TEST_TARGET_NAME} ${TEST_SOURCES})
+
+    set_target_properties(${TEST_TARGET_NAME} PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED ON
+        CXX_EXTENSIONS NO
+    )
 
     target_include_directories(${TEST_TARGET_NAME} PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/../include"
