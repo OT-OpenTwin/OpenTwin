@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_guard(GLOBAL)
+
 # OpenTwin CMake project helper functions
 # This file provides helper functions to define CMake targets for OpenTwin libraries and applications,
 # following the conventions of the OpenTwin project structure and environment variables.
@@ -48,13 +50,10 @@
 #   ot_finalize_bin(<APP_NAME>)
 #   ot_add_test(<APP_NAME>)
 
-include_guard(GLOBAL)
-
 # Requires OTEnvironment.cmake first (for THIRDPARTY_ROOT_PATH, OT_* paths, etc.)
 include("$ENV{OT_CMAKE_DIR}/OTQT.cmake")
 
 set(CMAKE_AUTOMOC ON)
-
 
 if(MSVC)
     add_compile_options(/Zc:__cplusplus /permissive- /Zc:preprocessor /MP)
@@ -410,12 +409,6 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         endif()
         if(QWT_LIB_INCR_PATH AND NOT QWT_LIB_INCR_PATH STREQUAL QWT_LIB_INCD_PATH)
             target_include_directories("${CORE_TARGET}" PRIVATE "${QWT_LIB_INCR_PATH}")
-        endif()
-        if(QWTPOLAR_LIB_INCD_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${QWTPOLAR_LIB_INCD_PATH}")
-        endif()
-        if(QWTPOLAR_LIB_INCR_PATH AND NOT QWTPOLAR_LIB_INCR_PATH STREQUAL QWTPOLAR_LIB_INCD_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${QWTPOLAR_LIB_INCR_PATH}")
         endif()
         return()
     endif()
