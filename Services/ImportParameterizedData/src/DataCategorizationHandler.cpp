@@ -28,6 +28,7 @@
 
 // OpenTwin header
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
+#include "OTSystem/DateTime.h"
 #include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
 #include "OTCore/EntityName.h"
@@ -565,9 +566,13 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisualisationTable* _table, const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType, ot::TableCfg::TableHeaderMode _headerMode)
 {
 	ot::StringToVariableConverter converter;
-	std::bitset<5> dataTypeOverall;
+	std::bitset<6> dataTypeOverall;
 
-	char decimalDelimiter =_table->getDecimalDelimiter();
+	// Track if all valid entries conform to a datetime
+	bool allNonEmptyAreDateTime = true;
+	bool hasNonEmpty = false;
+
+	char decimalDelimiter = _table->getDecimalDelimiter();
 	char thousandsDelimiter;
 	if (decimalDelimiter == '.')
 	{
@@ -578,52 +583,64 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 		thousandsDelimiter = '.';
 	}
 
-	//If one filed value is detected that is definately a string, we end the search.
+	// If one filed value is detected that is definately a string, we end the search. 
 	auto rangeIt = _selectedRanges.begin();
 	ot::MatrixEntryPointer matrixPointer;
-
 	ot::GenericDataStructMatrix tableContent = _table->getTable();
 
 	while (rangeIt != _selectedRanges.end())
 	{
 		matrixPointer.m_row = static_cast<uint32_t>(rangeIt->getTopRow());
-		while(matrixPointer.m_row <= static_cast<uint32_t>(rangeIt->getBottomRow()))
+		while (matrixPointer.m_row <= static_cast<uint32_t>(rangeIt->getBottomRow()))
 		{
 			matrixPointer.m_column = static_cast<uint32_t>(rangeIt->getLeftColumn());
-			while( matrixPointer.m_column <= static_cast<uint32_t>(rangeIt->getRightColumn()))
+			while (matrixPointer.m_column <= static_cast<uint32_t>(rangeIt->getRightColumn()))
 			{
 				const ot::Variable& cellValue = tableContent.getValue(matrixPointer);
 				assert(cellValue.isConstCharPtr());
-				std::string value = cellValue.getConstCharPtr();
-				
-				if (value != "")
+
+				// Keep the original string untouched for DateTime validation
+				std::string originalValue = cellValue.getConstCharPtr();
+
+				if (originalValue != "")
 				{
-					
+					hasNonEmpty = true;
+					auto datetimeVariable = ot::DateTime::detectDateTimeFormat(originalValue);
+
+					if (!datetimeVariable.has_value())
+					{
+						allNonEmptyAreDateTime = false;
+					}
+
+					// Now safely use a copy for numeric normalization
+					std::string value = originalValue;
 					if (value.find(thousandsDelimiter) != std::string::npos && _logMessagesByErrorType.find("Thousands delimiter was found") == _logMessagesByErrorType.end())
 					{
 						_logMessagesByErrorType["Thousands delimiter was found"] = "Make sure that the decimal character is not: \"" + std::string(1, thousandsDelimiter) + "\". String to numeric value cast may lead to unwanted results.\n";
 					}
 					converter.normaliseNumericString(value, decimalDelimiter);
 					ot::Variable variable = converter(value, decimalDelimiter);
-				
-					std::bitset<5> dataTypeField;
-					dataTypeField[0]= variable.isInt32();
+
+					std::bitset<6> dataTypeField;
+					dataTypeField[0] = variable.isInt32();
 					dataTypeField[1] = variable.isInt64();
 					dataTypeField[2] = variable.isFloat();
 					dataTypeField[3] = variable.isDouble();
-					dataTypeField[4] = variable.isConstCharPtr();
+					dataTypeField[4] = variable.isConstCharPtr() && !datetimeVariable.has_value();
+					dataTypeField[5] = datetimeVariable.has_value();
 
 					dataTypeOverall[0] = dataTypeOverall[0] || dataTypeField[0];
 					dataTypeOverall[1] = dataTypeOverall[1] || dataTypeField[1];
 					dataTypeOverall[2] = dataTypeOverall[2] || dataTypeField[2];
 					dataTypeOverall[3] = dataTypeOverall[3] || dataTypeField[3];
 					dataTypeOverall[4] = dataTypeOverall[4] || dataTypeField[4];
-				
+					dataTypeOverall[5] = dataTypeOverall[5] || dataTypeField[5];
+
 					if (dataTypeField[4] == 1)
 					{
 						ot::TableRange cellAsRange(matrixPointer.m_row, matrixPointer.m_column, matrixPointer.m_row, matrixPointer.m_column);
 						const ot::TableRange userCellCoordinates = ot::TableIndexSchemata::matrixToUserRange(cellAsRange, _headerMode);
-						_logMessagesByErrorType["String detected. A cast to numeric values must be selected manually, but a cast may fail."]  += "row " + std::to_string(userCellCoordinates.getBottomRow()) + " column " + std::to_string(userCellCoordinates.getLeftColumn()) + "\n";
+						_logMessagesByErrorType["String detected. A cast to numeric values must be selected manually, but a cast may fail."] += "row " + std::to_string(userCellCoordinates.getBottomRow()) + " column " + std::to_string(userCellCoordinates.getLeftColumn()) + "\n";
 					}
 				}
 				else
@@ -638,12 +655,18 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 		}
 		rangeIt++;
 	}
-	//Now we get the common denominator of all detected datypes
-	//Dominance is as following (Strong to weak) : String, Double, Float, Int64, Int32
+
+	// Now we get the common denominator of all detected datypes
+	// Dominance is as following (Strong to weak) : DateTime, String, Double, Float, Int64, Int32 
 	std::string typeName("");
-	if (dataTypeOverall[4])
+
+	if (hasNonEmpty && allNonEmptyAreDateTime)
 	{
-		typeName = ot::TypeNames::getStringTypeName();;
+		typeName = ot::TypeNames::getDateTimeTypeName();
+	}
+	else if (dataTypeOverall[4])
+	{
+		typeName = ot::TypeNames::getStringTypeName();
 	}
 	else if (dataTypeOverall[3])
 	{
@@ -663,8 +686,9 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 	}
 	else
 	{
-		typeName = ot::TypeNames::getStringTypeName(); //Default, happens when all entries were empty, i.e. ""
+		typeName = ot::TypeNames::getStringTypeName(); // Default, happens when all entries were empty, i.e. "" 
 	}
+
 	return typeName;
 }
 

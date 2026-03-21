@@ -281,12 +281,14 @@ bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _f
 {
     if (_format == Msec)
     {
+        if (_timestamp.size() < 11 || _timestamp.size() > 15) return false;
+
         int64_t value = 0;
         auto [ptr, ec] = std::from_chars(_timestamp.data(), _timestamp.data() + _timestamp.size(), value);
         return ec == std::errc() && ptr == _timestamp.data() + _timestamp.size();
     }
 
-    auto parseSimpleDateTime = [&](char dateTimeSeparator, bool requireZuluOrOffset, bool allowOffset) -> bool
+    auto parseSimpleDateTime = [&](char dateTimeSeparator, bool requireOffsetOrUTC, bool allowOffset) -> bool
         {
             if (_timestamp.size() < 23)
             {
@@ -331,12 +333,12 @@ bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _f
                 return false;
             }
 
-            if (!requireZuluOrOffset && !allowOffset)
+            if (!requireOffsetOrUTC && !allowOffset)
             {
                 return _timestamp.size() == 23;
             }
 
-            if (requireZuluOrOffset && !allowOffset)
+            if (requireOffsetOrUTC && !allowOffset)
             {
                 return _timestamp.size() == 24 && _timestamp[23] == 'Z';
             }
@@ -389,7 +391,7 @@ bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _f
         return parseSimpleDateTime('T', true, true);
 
     case Msec:
-        return false;
+        return true;
 
     default:
         return false;
