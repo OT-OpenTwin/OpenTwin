@@ -1,5 +1,5 @@
 // @otlicense
-// File: ProjectOverviewFilter.cpp
+// File: HeaderFilter.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,10 +18,9 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "ProjectOverviewWidget.h"
-#include "ProjectOverviewFilter.h"
 #include "OTWidgets/Positioning.h"
 #include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Header/HeaderFilter.h"
 #include "OTWidgets/Widgets/Label.h"
 #include "OTWidgets/Widgets/LineEdit.h"
 #include "OTWidgets/Widgets/ToolButton.h"
@@ -33,8 +32,8 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qlistwidget.h>
 
-ot::ProjectOverviewFilter::ProjectOverviewFilter(ProjectOverviewWidget* _overview, int _logicalIndex, bool _sortOnly)
-	: QMenu(_overview->getQWidget()), m_logicalIndex(_logicalIndex), m_isConfirmed(false),
+ot::HeaderFilter::HeaderFilter(int _logicalIndex, bool _sortOnly, QWidget* _parent)
+	: QMenu(_parent), m_logicalIndex(_logicalIndex), m_isConfirmed(false),
 	m_optionsList(nullptr), m_filterEdit(nullptr)
 {
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
@@ -48,7 +47,7 @@ ot::ProjectOverviewFilter::ProjectOverviewFilter(ProjectOverviewWidget* _overvie
 	ToolButton* sortAscButton = new ToolButton(IconManager::getIcon("Button/SortAscending.png"), "", this);
 	sortAscLayout->addWidget(sortAscButton);
 	sortAscLayout->addWidget(new Label("Sort Ascending", this), 1);
-	connect(sortAscButton, &ToolButton::clicked, this, &ProjectOverviewFilter::slotSortAscending);
+	connect(sortAscButton, &ToolButton::clicked, this, &HeaderFilter::slotSortAscending);
 
 	QHBoxLayout* sortDescLayout = new QHBoxLayout;
 	sortDescLayout->setContentsMargins(0, 0, 0, 0);
@@ -56,12 +55,13 @@ ot::ProjectOverviewFilter::ProjectOverviewFilter(ProjectOverviewWidget* _overvie
 	ToolButton* sortDescButton = new ToolButton(IconManager::getIcon("Button/SortDescending.png"), "", this);
 	sortDescLayout->addWidget(sortDescButton);
 	sortDescLayout->addWidget(new Label("Sort Descending", this), 1);
-	connect(sortDescButton, &ToolButton::clicked, this, &ProjectOverviewFilter::slotSortDescending);
+	connect(sortDescButton, &ToolButton::clicked, this, &HeaderFilter::slotSortDescending);
 
-	if (!_sortOnly) {
+	if (!_sortOnly)
+	{
 		m_filterEdit = new LineEdit(this);
 		m_filterEdit->setPlaceholderText("Type to filter...");
-		connect(m_filterEdit, &LineEdit::textChanged, this, &ProjectOverviewFilter::slotTextChanged);
+		connect(m_filterEdit, &LineEdit::textChanged, this, &HeaderFilter::slotTextChanged);
 		centralLayout->addWidget(m_filterEdit);
 
 		m_optionsList = new QListWidget(this);
@@ -69,7 +69,7 @@ ot::ProjectOverviewFilter::ProjectOverviewFilter(ProjectOverviewWidget* _overvie
 		m_optionsList->setSelectionMode(QAbstractItemView::NoSelection);
 		m_optionsList->setSortingEnabled(false);
 		setOptions(QStringList());
-		connect(m_optionsList, &QListWidget::itemChanged, this, &ProjectOverviewFilter::slotCheckedChanged);
+		connect(m_optionsList, &QListWidget::itemChanged, this, &HeaderFilter::slotCheckedChanged);
 		centralLayout->addWidget(m_optionsList);
 
 		QHBoxLayout* buttonLayout = new QHBoxLayout;
@@ -78,27 +78,31 @@ ot::ProjectOverviewFilter::ProjectOverviewFilter(ProjectOverviewWidget* _overvie
 		centralLayout->addLayout(buttonLayout);
 
 		PushButton* confirmButton = new PushButton("Apply", this);
-		connect(confirmButton, &PushButton::clicked, this, &ProjectOverviewFilter::slotConfirm);
+		connect(confirmButton, &PushButton::clicked, this, &HeaderFilter::slotConfirm);
 		buttonLayout->addWidget(confirmButton);
 
 		PushButton* cancelButton = new PushButton("Cancel", this);
-		connect(cancelButton, &PushButton::clicked, this, &ProjectOverviewFilter::slotCancel);
+		connect(cancelButton, &PushButton::clicked, this, &HeaderFilter::slotCancel);
 		buttonLayout->addWidget(cancelButton);
 	}
 }
 
-void ot::ProjectOverviewFilter::setTitle(const QString& _title) {
+void ot::HeaderFilter::setTitle(const QString& _title)
+{
 	m_title->setText(_title);
 }
 
-void ot::ProjectOverviewFilter::setOptions(const QStringList& _options) {
-	if (m_optionsList) {
+void ot::HeaderFilter::setOptions(const QStringList& _options)
+{
+	if (m_optionsList)
+	{
 		QSignalBlocker blocker(m_optionsList);
 		m_optionsList->clear();
 		m_optionsList->addItem("< Select All >");
 		m_optionsList->addItems(_options);
 
-		for (int i = 0; i < m_optionsList->count(); ++i) {
+		for (int i = 0; i < m_optionsList->count(); ++i)
+		{
 			QListWidgetItem* item = m_optionsList->item(i);
 			item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
 			item->setCheckState(Qt::Unchecked);
@@ -106,60 +110,41 @@ void ot::ProjectOverviewFilter::setOptions(const QStringList& _options) {
 	}
 }
 
-ot::ProjectOverviewFilterData ot::ProjectOverviewFilter::getFilterData() const {
-	ProjectOverviewFilterData data(m_logicalIndex);
-
-	if (m_optionsList) {
-		bool hasUnchecked = false;
-		for (int i = 1; i < m_optionsList->count(); ++i) {
-			QListWidgetItem* item = m_optionsList->item(i);
-			if (item->checkState() == Qt::Checked) {
-				data.addSelectedFilter(item->text());
-			}
-			else {
-				hasUnchecked = true;
-			}
-		}
-
-		// If all items are checked, clear the selection to indicate no filtering
-		if (!hasUnchecked) {
-			data.clearSelectedFilters();
-		}
-	}
-
-	return data;
-}
-
-void ot::ProjectOverviewFilter::updateCheckedState(const ProjectOverviewFilterData& _data) {
-	if (!_data.isValid() || _data.getLogicalIndex() != m_logicalIndex) {
-		return;
-	}
-
-	if (m_optionsList) {
+void ot::HeaderFilter::updateCheckedState(const QStringList& _checkedItems)
+{
+	if (m_optionsList)
+	{
 		QSignalBlocker blocker(m_optionsList);
 
-		if (_data.getSelectedFilters().isEmpty()) {
+		if (_checkedItems.empty())
+		{
 			// No filters provided, check all
-			for (int i = 0; i < m_optionsList->count(); ++i) {
+			for (int i = 0; i < m_optionsList->count(); ++i)
+			{
 				QListWidgetItem* item = m_optionsList->item(i);
 				item->setCheckState(Qt::Checked);
 			}
 		}
-		else {
+		else
+		{
 			// Uncheck all
-			for (int i = 0; i < m_optionsList->count(); ++i) {
+			for (int i = 0; i < m_optionsList->count(); ++i)
+			{
 				QListWidgetItem* item = m_optionsList->item(i);
 				item->setCheckState(Qt::Unchecked);
 			}
 
 			// Check matching items
 			bool allChecked = true;
-			for (int i = 1; i < m_optionsList->count(); ++i) {
+			for (int i = 1; i < m_optionsList->count(); ++i)
+			{
 				QListWidgetItem* item = m_optionsList->item(i);
-				if (_data.getSelectedFilters().contains(item->text())) {
+				if (_checkedItems.contains(item->text()))
+				{
 					item->setCheckState(Qt::Checked);
 				}
-				else {
+				else
+				{
 					allChecked = false;
 				}
 			}
@@ -170,10 +155,41 @@ void ot::ProjectOverviewFilter::updateCheckedState(const ProjectOverviewFilterDa
 	}
 }
 
-void ot::ProjectOverviewFilter::showAt(const QPoint& _pos) {
+QStringList ot::HeaderFilter::saveCheckedState() const
+{
+	QStringList data;
+
+	if (m_optionsList)
+	{
+		bool hasUnchecked = false;
+		for (int i = 1; i < m_optionsList->count(); ++i)
+		{
+			QListWidgetItem* item = m_optionsList->item(i);
+			if (item->checkState() == Qt::Checked)
+			{
+				data.append(item->text());
+			}
+			else
+			{
+				hasUnchecked = true;
+			}
+		}
+
+		// If all items are checked, clear the selection to indicate no filtering
+		if (!hasUnchecked)
+		{
+			data.clear();
+		}
+	}
+
+	return data;
+}
+
+void ot::HeaderFilter::showAt(const QPoint& _pos)
+{
 	layout()->activate();
 	QRect menuRect(_pos, layout()->totalSizeHint());
-	
+
 	menuRect = Positioning::fitOnScreen(menuRect, Positioning::FitByTopLeft);
 	exec(menuRect.topLeft());
 }
@@ -182,21 +198,25 @@ void ot::ProjectOverviewFilter::showAt(const QPoint& _pos) {
 
 // Private: Slots
 
-void ot::ProjectOverviewFilter::slotConfirm() {
+void ot::HeaderFilter::slotConfirm()
+{
 	m_isConfirmed = true;
 	close();
 }
 
-void ot::ProjectOverviewFilter::slotCancel() {
+void ot::HeaderFilter::slotCancel()
+{
 	close();
 }
 
-void ot::ProjectOverviewFilter::slotTextChanged() {
+void ot::HeaderFilter::slotTextChanged()
+{
 	OTAssertNullptr(m_optionsList);
 
 	const QString filterText = m_filterEdit->text().toLower();
 
-	for (int i = 1; i < m_optionsList->count(); i++) {
+	for (int i = 1; i < m_optionsList->count(); i++)
+	{
 		QListWidgetItem* item = m_optionsList->item(i);
 		const QString itemText = item->text().toLower();
 		const bool shouldShow = itemText.contains(filterText) || filterText.isEmpty();
@@ -204,32 +224,40 @@ void ot::ProjectOverviewFilter::slotTextChanged() {
 	}
 }
 
-void ot::ProjectOverviewFilter::slotSortAscending() {
+void ot::HeaderFilter::slotSortAscending()
+{
 	Q_EMIT sortOrderChanged(m_logicalIndex, Qt::AscendingOrder);
 }
 
-void ot::ProjectOverviewFilter::slotSortDescending() {
+void ot::HeaderFilter::slotSortDescending()
+{
 	Q_EMIT sortOrderChanged(m_logicalIndex, Qt::DescendingOrder);
 }
 
-void ot::ProjectOverviewFilter::slotCheckedChanged(QListWidgetItem* _item) {
+void ot::HeaderFilter::slotCheckedChanged(QListWidgetItem* _item)
+{
 	OTAssertNullptr(m_optionsList);
 	OTAssert(m_optionsList->count() > 0, "Options list is empty");
 
 	QSignalBlocker blocker(m_optionsList);
 	bool shouldAllSelect = false;
-	if (_item == m_optionsList->item(0)) {
+	if (_item == m_optionsList->item(0))
+	{
 		shouldAllSelect = (_item->checkState() == Qt::Checked);
-		for (int i = 1; i < m_optionsList->count(); ++i) {
+		for (int i = 1; i < m_optionsList->count(); ++i)
+		{
 			QListWidgetItem* item = m_optionsList->item(i);
 			item->setCheckState(shouldAllSelect ? Qt::Checked : Qt::Unchecked);
 		}
 	}
-	else {
+	else
+	{
 		bool allChecked = true;
-		for (int i = 1; i < m_optionsList->count(); ++i) {
+		for (int i = 1; i < m_optionsList->count(); ++i)
+		{
 			QListWidgetItem* item = m_optionsList->item(i);
-			if (item->checkState() != Qt::Checked) {
+			if (item->checkState() != Qt::Checked)
+			{
 				allChecked = false;
 				break;
 			}

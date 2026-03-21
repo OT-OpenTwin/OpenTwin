@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "ProjectOverviewHeader.h"
 #include "ProjectOverviewWidget.h"
-#include "ProjectOverviewFilter.h"
+#include "OTWidgets/Header/HeaderFilter.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 
@@ -29,13 +29,9 @@
 #include <QtGui/qpainter.h>
 
 ot::ProjectOverviewHeader::ProjectOverviewHeader(ProjectOverviewWidget* _overview, QWidget* _parent)
-	: QHeaderView(Qt::Orientation::Horizontal, _parent), m_overview(_overview),
-    c_buttonSize(14, 14), c_buttonPadding(4, 4),
-    m_hoveredFilter(-1), m_pressedFilter(-1), m_activeFilter(-1)
+	: HeaderBase(Orientation::Horizontal, _parent), m_overview(_overview)
 {
-	setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-	setMouseTracking(true);
-	setSectionsClickable(true);
+	
 }
 
 ot::ProjectOverviewHeader::~ProjectOverviewHeader() {
@@ -46,14 +42,9 @@ ot::ProjectOverviewHeader::~ProjectOverviewHeader() {
 
 // Overrides
 
-int ot::ProjectOverviewHeader::sizeHintForColumn(int _column) const {
-	int hint = QHeaderView::sizeHintForColumn(_column);
-    
-    if (canFilter(_column)) {
-        hint += c_buttonSize.width() + c_buttonPadding.width();
-	}
-
-    return hint;
+bool ot::ProjectOverviewHeader::canFilter(int _logicalIndex) const
+{
+	return (_logicalIndex != ColumnIndex::Checked);
 }
 
 void ot::ProjectOverviewHeader::setFilterData(const ProjectFilterData& _filterData) {
@@ -117,231 +108,87 @@ void ot::ProjectOverviewHeader::setFilterData(const ProjectFilterData& _filterDa
 	m_filterOptions.emplace(ColumnIndex::Access, std::move(accessOptions));
 }
 
-void ot::ProjectOverviewHeader::paintSection(QPainter* _painter, const QRect& _rect, int _logicalIndex) const {
-    // Draw default section background & text
-    QStyleOptionHeader opt;
-    initStyleOption(&opt);
-	opt.iconAlignment = Qt::AlignLeft | Qt::AlignVCenter;
-	opt.textAlignment = Qt::AlignLeft | Qt::AlignVCenter;
-    opt.rect = _rect;
-    opt.section = _logicalIndex;
-    opt.text = model() ? model()->headerData(_logicalIndex, Qt::Horizontal).toString() : QString();
-    opt.state |= QStyle::State_Raised;
-
-    // Call style to draw base header
-    style()->drawControl(QStyle::CE_Header, &opt, _painter, this);
-
-    if (!canFilter(_logicalIndex)) {
-        return;
-    }
-
-    const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
-
-    // Draw filter icon
-    QRect iconRect = QRect(
-        (_rect.right() - c_buttonSize.width()),
-        _rect.center().y() - c_buttonSize.height() / 2,
-        c_buttonSize.width(),
-        c_buttonSize.height()
-    );
-
-    // Choose icon based on hover/press state
-    QIcon icon;
-    if (m_pressedFilter == _logicalIndex) {
-        icon = QIcon(cs.getFile(ColorStyleFileEntry::HeaderFilterPressedIcon));
-    }
-    else if (m_hoveredFilter == _logicalIndex) {
-        icon = QIcon(cs.getFile(ColorStyleFileEntry::HeaderFilterHoverIcon));
-    }
-    else if (m_activeFilter == _logicalIndex) {
-        icon = QIcon(cs.getFile(ColorStyleFileEntry::HeaderFilterActiveIcon));
-    }
-    else {
-        icon = QIcon(cs.getFile(ColorStyleFileEntry::HeaderFilterIcon));
-    }
-
-    if (!icon.isNull()) {
-        QPixmap pix = icon.pixmap(c_buttonSize);
-        _painter->drawPixmap(iconRect.topLeft(), pix);
-    }
-}
-
-QSize ot::ProjectOverviewHeader::sectionSizeFromContents(int _logicalIndex) const {
-	QSize size = QHeaderView::sectionSizeFromContents(_logicalIndex);
-	
-    if (canFilter(_logicalIndex)) {
-        size = size.expandedTo(c_buttonSize + c_buttonPadding);
-        size.setWidth(size.width() + c_buttonSize.width());
-    }
-
-	return size;
-}
-
-void ot::ProjectOverviewHeader::mousePressEvent(QMouseEvent* _event) {
-    int ix = logicalIndexAt(_event->pos());
-    if (ix >= 0 && canFilter(ix)) {
-        QRect iconRect = filterIconRect(ix);
-        if (iconRect.contains(_event->pos())) {
-            update();
-            QHeaderView::mousePressEvent(_event);
-
-            showFilterMenu(ix);
-            return;
-        }
-        else {
-            ix = -1;
-        }
-    }
-    else {
-        ix = -1;
-    }
-
-    if (ix == m_pressedFilter) {
-        return;
-    }
-
-	m_pressedFilter = ix;
-    update();
-    QHeaderView::mousePressEvent(_event);
-}
-
-void ot::ProjectOverviewHeader::mouseReleaseEvent(QMouseEvent* _event) {
-    if (m_pressedFilter == -1) {
-        return;
+void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex)
+{
+	if (!canFilter(_logicalIndex))
+	{
+		return;
 	}
+	QRect rect = filterIconRect(_logicalIndex);
 
-    m_pressedFilter = -1;
-    update();
-    QHeaderView::mouseReleaseEvent(_event);
-}
+	HeaderFilter filter(_logicalIndex, _logicalIndex == ColumnIndex::LastAccessed, m_overview->getQWidget());
 
-void ot::ProjectOverviewHeader::mouseMoveEvent(QMouseEvent* _event) {
-    int ix = logicalIndexAt(_event->pos());
-    if (ix >= 0 && canFilter(ix)) {
-        QRect iconRect = filterIconRect(ix);
-        if (!iconRect.contains(_event->pos())) {
-            ix = -1;
-        }
-    }
-    else {
-        ix = -1;
-    }
-
-    if (ix != m_hoveredFilter) {
-        m_hoveredFilter = ix;
-        update();
-        QHeaderView::mouseMoveEvent(_event);
-	}
-}
-
-void ot::ProjectOverviewHeader::leaveEvent(QEvent* _event) {
-    if (m_hoveredFilter == -1 && m_pressedFilter == -1) {
-        return;
-	}
-
-    m_hoveredFilter = -1;
-    m_pressedFilter = -1;
-    update();
-    QHeaderView::leaveEvent(_event);
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Private: Slots
-
-void ot::ProjectOverviewHeader::slotSortChanged(int _logicalIndex, Qt::SortOrder _sortOrder) {
-    m_overview->sort(_logicalIndex, _sortOrder);
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Private: Helper
-
-bool ot::ProjectOverviewHeader::canFilter(int _logicalIndex) const {
-	return (_logicalIndex != ColumnIndex::Checked);
-}
-
-QRect ot::ProjectOverviewHeader::filterIconRect(int _logicalIndex) const {
-    const int pos = sectionViewportPosition(_logicalIndex);
-    const int size = sectionSize(_logicalIndex);
-    QRect sectionRect(pos, 0, size, height());
-
-    return QRect(
-        sectionRect.right() - c_buttonSize.width(),
-        sectionRect.center().y() - c_buttonSize.height() / 2,
-        c_buttonSize.width(),
-        c_buttonSize.height()
-    );
-}
-
-void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex) {
-    if (!canFilter(_logicalIndex)) {
-        return;
-    }
-    QRect rect = filterIconRect(_logicalIndex);
-
-    ProjectOverviewFilter filter(m_overview, _logicalIndex, _logicalIndex == ColumnIndex::LastAccessed);
-	
 	// Fill options based on column
-    switch (_logicalIndex) {
+	switch (_logicalIndex)
+	{
 	case ColumnIndex::Group:
-        filter.setTitle("Project Group");
-        break;
-
-    case ColumnIndex::Type:
-        filter.setTitle("Project Type");
+		filter.setTitle("Project Group");
 		break;
 
-    case ColumnIndex::Name:
+	case ColumnIndex::Type:
+		filter.setTitle("Project Type");
+		break;
+
+	case ColumnIndex::Name:
 		filter.setTitle("Project Name");
 		break;
 
 	case ColumnIndex::Tags:
-        filter.setTitle("Project Tags");
-        break;
+		filter.setTitle("Project Tags");
+		break;
 
-    case ColumnIndex::Owner:
+	case ColumnIndex::Owner:
 		filter.setTitle("Project Owner");
 		break;
-    
-    case ColumnIndex::Access:
-        filter.setTitle("Shared Groups");
+
+	case ColumnIndex::Access:
+		filter.setTitle("Shared Groups");
 		break;
 
 	case ColumnIndex::LastAccessed:
-        filter.setTitle("Last Accessed");
+		filter.setTitle("Last Accessed");
 		break;
 
-    default:
-        OT_LOG_E("Invalid column for filter (" + std::to_string(_logicalIndex) + ")");
-        return;
-    }
+	default:
+		OT_LOG_E("Invalid column for filter (" + std::to_string(_logicalIndex) + ")");
+		return;
+	}
 
 	auto optionsIt = m_filterOptions.find(_logicalIndex);
-    if (optionsIt != m_filterOptions.end()) {
-        filter.setOptions(optionsIt->second);
-    }
-
-	filter.updateCheckedState(m_lastFilter);
-
-	connect(&filter, &ProjectOverviewFilter::sortOrderChanged, this, &ProjectOverviewHeader::slotSortChanged);
-	
-	filter.showAt(mapToGlobal(rect.bottomLeft()));
-    
-    disconnect(&filter, &ProjectOverviewFilter::sortOrderChanged, this, &ProjectOverviewHeader::slotSortChanged);
-    
-    if (filter.isConfirmed()) {
-		m_lastFilter = filter.getFilterData();
-
-        if (m_lastFilter.getSelectedFilters().empty()) {
-            m_activeFilter = -1;
-        }
-        else {
-            m_activeFilter = m_lastFilter.getLogicalIndex();
-        }
-
-        m_overview->filterProjects(m_lastFilter);
-
-        update();
+	if (optionsIt != m_filterOptions.end())
+	{
+		filter.setOptions(optionsIt->second);
 	}
+
+	filter.updateCheckedState(m_lastFilter.getSelectedFilters());
+
+	connect(&filter, &HeaderFilter::sortOrderChanged, this, &ProjectOverviewHeader::sortOrderChangeRequest);
+
+	filter.showAt(mapToGlobal(rect.bottomLeft()));
+
+	disconnect(&filter, &HeaderFilter::sortOrderChanged, this, &ProjectOverviewHeader::sortOrderChangeRequest);
+
+	if (filter.wasConfirmed())
+	{
+		m_lastFilter.setSelectedFilters(filter.saveCheckedState());
+		m_lastFilter.setLogicalIndex(_logicalIndex);
+
+		if (m_lastFilter.getSelectedFilters().empty())
+		{
+			setActiveFilterIndex(-1);
+		}
+		else
+		{
+			setActiveFilterIndex(m_lastFilter.getLogicalIndex());
+		}
+
+		m_overview->filterProjects(m_lastFilter);
+		
+		update();
+	}
+}
+
+void ot::ProjectOverviewHeader::sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _sortOrder)
+{
+	m_overview->sort(_logicalIndex, _sortOrder);
 }

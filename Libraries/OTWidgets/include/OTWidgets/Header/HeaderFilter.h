@@ -1,4 +1,14 @@
 // @otlicense
+
+#pragma once
+
+// OpenTwin header
+#include "OTWidgets/WidgetTypes.h"
+
+// Qt header
+#include <QtWidgets/qmenu.h>
+
+// @otlicense
 // File: ProjectOverviewFilter.h
 // 
 // License:
@@ -20,7 +30,6 @@
 #pragma once
 
 // OpenTwin header
-#include "ProjectOverviewFilterData.h"
 #include "OTWidgets/WidgetTypes.h"
 
 // Qt header
@@ -35,27 +44,30 @@ namespace ot {
 
 	class Label;
 	class LineEdit;
-	class ProjectOverviewWidget;
-
-	class ProjectOverviewFilter : public QMenu {
+	
+	class OT_WIDGETS_API_EXPORT HeaderFilter : public QMenu
+	{
 		Q_OBJECT
-		OT_DECL_NOCOPY(ProjectOverviewFilter)
-		OT_DECL_NOMOVE(ProjectOverviewFilter)
-		OT_DECL_NODEFAULT(ProjectOverviewFilter)
+		OT_DECL_NOCOPY(HeaderFilter)
+		OT_DECL_NOMOVE(HeaderFilter)
+		OT_DECL_NODEFAULT(HeaderFilter)
 	public:
-		ProjectOverviewFilter(ProjectOverviewWidget* _overview, int _logicalIndex, bool _sortOnly);
-		virtual ~ProjectOverviewFilter() = default;
+		explicit HeaderFilter(int _logicalIndex, bool _sortOnly, QWidget* _parent);
+		virtual ~HeaderFilter() = default;
 
 		void setTitle(const QString& _title);
 
 		void setOptions(const QStringList& _options);
-		ProjectOverviewFilterData getFilterData() const;
 
 		//! @brief Will uncheck all items and check only those that are present in the provided data.
 		//! @param _data The filter data to set the state from.
-		void updateCheckedState(const ProjectOverviewFilterData& _data);
+		void updateCheckedState(const QStringList& _checkedItems);
 
-		bool isConfirmed() const { return m_isConfirmed; };
+		//! @brief Returns a list of all checked items.
+		QStringList saveCheckedState() const;
+
+		int getLogicalIndex() const { return m_logicalIndex; }
+		bool wasConfirmed() const { return m_isConfirmed; };
 
 		//! @brief Show the filter menu at the specified position.
 		//! Will ensure the menu is properly positioned on screen.
@@ -64,7 +76,7 @@ namespace ot {
 
 	Q_SIGNALS:
 		void sortOrderChanged(int _logicalIndex, Qt::SortOrder _sortOrder);
-		
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Slots

@@ -52,7 +52,6 @@
     <ClCompile Include="src\ProgressUpdater.cpp" />
     <ClCompile Include="src\ProjectOverviewDelegate.cpp" />
     <ClCompile Include="src\ProjectOverviewEntry.cpp" />
-    <ClCompile Include="src\ProjectOverviewFilter.cpp" />
     <ClCompile Include="src\ProjectOverviewFilterData.cpp" />
     <ClCompile Include="src\ProjectOverviewHeader.cpp" />
     <ClCompile Include="src\ProjectOverviewPreviewBox.cpp" />
@@ -100,7 +99,6 @@
     <QtMoc Include="include\ProjectOverviewEntry.h" />
     <QtMoc Include="include\ProjectOverviewWidget.h" />
     <QtMoc Include="include\ProjectOverviewHeader.h" />
-    <QtMoc Include="include\ProjectOverviewFilter.h" />
     <ClInclude Include="include\ProjectOverviewDelegate.h" />
     <ClInclude Include="include\ProjectOverviewFilterData.h" />
     <QtMoc Include="include\ProjectOverviewPreviewBox.h" />

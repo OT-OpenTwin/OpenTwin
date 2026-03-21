@@ -176,9 +176,6 @@
     <ClCompile Include="src\ProjectOverviewFilterData.cpp">
       <Filter>Source Files\ProjectOverview</Filter>
     </ClCompile>
-    <ClCompile Include="src\ProjectOverviewFilter.cpp">
-      <Filter>Source Files\ProjectOverview</Filter>
-    </ClCompile>
     <ClCompile Include="src\ProjectOverviewPreviewBox.cpp">
       <Filter>Source Files\ProjectOverview</Filter>
     </ClCompile>
@@ -334,9 +331,6 @@
       <Filter>Header Files\ProjectOverview</Filter>
     </QtMoc>
     <QtMoc Include="include\ProjectOverviewEntry.h">
-      <Filter>Header Files\ProjectOverview</Filter>
-    </QtMoc>
-    <QtMoc Include="include\ProjectOverviewFilter.h">
       <Filter>Header Files\ProjectOverview</Filter>
     </QtMoc>
     <QtMoc Include="include\ProjectOverviewPreviewBox.h">
