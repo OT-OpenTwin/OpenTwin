@@ -13,19 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_guard(GLOBAL)
+
 # Centralized environment parsing for OpenTwin subprojects
 # Purpose:
 #   - Used by OTProject.cmake to help parse include and link setup
 #   - Read environment variables set by SetupEnvironment.bat
 #   - Expose parsed values as regular CMake variables
 #
-#
 # Notes:
 #   - Helpers that use ENV{...} expect environment variable names, not CMake variable names.
 #   - Variables ending in _PATH are normal CMake variables already parsed from the environment.
 #   - Project-specific target wiring should remain in the consuming CMakeLists.txt.
-
-include_guard(GLOBAL)
 
 # ============================================================
 # helpers
