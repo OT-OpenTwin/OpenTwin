@@ -225,10 +225,26 @@ bsoncxx::stdx::optional<bsoncxx::document::value> MongoWrapper::fetchDocumentByN
     DataStorageAPI::DocumentAccessBase& _docBase, 
     const std::string& _documentName) {
     
+    // Check if _documentName is a valid ObjectId (24 hex characters)
+    if (_documentName.length() == 24 && 
+        _documentName.find_first_not_of("0123456789abcdefABCDEF") == std::string::npos) {
+        try {
+            // Try to query by ObjectId
+            bsoncxx::oid oid(_documentName);
+            auto filterQuery = bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp("_id", oid)
+            );
+            return _docBase.GetDocument(std::move(filterQuery), bsoncxx::document::view{});
+        }
+        catch (const std::exception&) {
+            // If ObjectId parsing fails, fall through to name-based search
+        }
+    }
+    
+    // Query by Name field
     auto filterQuery = bsoncxx::builder::basic::make_document(
         bsoncxx::builder::basic::kvp("Name", _documentName)
     );
-
     return _docBase.GetDocument(std::move(filterQuery), bsoncxx::document::view{});
 }
 
@@ -240,50 +256,72 @@ std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _docum
 
     // Extract Name
     if (_documentView["Name"]) {
-        resultDoc.AddMember("Name", rapidjson::Value(_documentView["Name"].get_utf8().value.data(), allocator), allocator);
+        rapidjson::Value nameKey("Name", allocator);
+        rapidjson::Value nameVal(_documentView["Name"].get_utf8().value.data(), allocator);
+        resultDoc.AddMember(nameKey, nameVal, allocator);
     }
 
     // Extract Version
     if (_documentView["Version"]) {
-        resultDoc.AddMember("Version", _documentView["Version"].get_int64().value, allocator);
+        rapidjson::Value versionKey("Version", allocator);
+        resultDoc.AddMember(versionKey, _documentView["Version"].get_int64().value, allocator);
     }
 
     // Extract additionalInfos as complete object
     if (_documentView["additionalInfos"]) {
         bsoncxx::document::view additionalInfosView = _documentView["additionalInfos"].get_document().value;
-
         rapidjson::Value additionalInfosObj(rapidjson::kObjectType);
 
-        // Extract ModelType and ElementType for top-level access
         std::string modelType, elementType;
 
         for (auto&& element : additionalInfosView) {
             std::string key = std::string(element.key());
+            rapidjson::Value keyVal(key.c_str(), static_cast<rapidjson::SizeType>(key.length()), allocator);
+            
             if (element.type() == bsoncxx::type::k_utf8) {
                 std::string value = std::string(element.get_utf8().value);
-                additionalInfosObj.AddMember(
-                    rapidjson::Value(key.c_str(), allocator),
-                    rapidjson::Value(value.c_str(), allocator),
-                    allocator
-                );
+                rapidjson::Value valueVal(value.c_str(), static_cast<rapidjson::SizeType>(value.length()), allocator);
+                additionalInfosObj.AddMember(keyVal, valueVal, allocator);
 
                 if (key == "ModelType") modelType = value;
                 if (key == "ElementType") elementType = value;
             }
+            else if (element.type() == bsoncxx::type::k_oid) {
+                std::string oidValue = element.get_oid().value.to_string();
+                rapidjson::Value valueVal(oidValue.c_str(), static_cast<rapidjson::SizeType>(oidValue.length()), allocator);
+                additionalInfosObj.AddMember(keyVal, valueVal, allocator);
+            }
+            else if (element.type() == bsoncxx::type::k_double) {
+                additionalInfosObj.AddMember(keyVal, element.get_double().value, allocator);
+            }
+            else if (element.type() == bsoncxx::type::k_int32) {
+                additionalInfosObj.AddMember(keyVal, element.get_int32().value, allocator);
+            }
+            else if (element.type() == bsoncxx::type::k_int64) {
+                additionalInfosObj.AddMember(keyVal, element.get_int64().value, allocator);
+            }
+            else if (element.type() == bsoncxx::type::k_bool) {
+                additionalInfosObj.AddMember(keyVal, element.get_bool().value, allocator);
+            }
         }
 
-        resultDoc.AddMember("AdditionalInfos", additionalInfosObj, allocator);
+        rapidjson::Value additionalInfosKey("AdditionalInfos", allocator);
+        resultDoc.AddMember(additionalInfosKey, additionalInfosObj, allocator);
 
-        // Add ModelType and ElementType to top level for easy access
+        // Add ModelType and ElementType to top level
         if (!modelType.empty()) {
-            resultDoc.AddMember("ModelType", rapidjson::Value(modelType.c_str(), allocator), allocator);
+            rapidjson::Value modelTypeKey("ModelType", allocator);
+            rapidjson::Value modelTypeVal(modelType.c_str(), static_cast<rapidjson::SizeType>(modelType.length()), allocator);
+            resultDoc.AddMember(modelTypeKey, modelTypeVal, allocator);
         }
         if (!elementType.empty()) {
-            resultDoc.AddMember("ElementType", rapidjson::Value(elementType.c_str(), allocator), allocator);
+            rapidjson::Value elementTypeKey("ElementType", allocator);
+            rapidjson::Value elementTypeVal(elementType.c_str(), static_cast<rapidjson::SizeType>(elementType.length()), allocator);
+            resultDoc.AddMember(elementTypeKey, elementTypeVal, allocator);
         }
     }
 
-    // Extract metaData as complete object (convert all to strings)
+    // Extract metaData as complete object
     if (_documentView["metaData"]) {
         rapidjson::Value metaDataObj(rapidjson::kObjectType);
         bsoncxx::document::view metaDataView = _documentView["metaData"].get_document().value;
@@ -292,7 +330,6 @@ std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _docum
             std::string key = std::string(element.key());
             std::string value;
 
-            // Convert different BSON types to string
             if (element.type() == bsoncxx::type::k_utf8) {
                 value = std::string(element.get_utf8().value);
             }
@@ -307,14 +344,13 @@ std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _docum
             }
 
             if (!value.empty()) {
-                metaDataObj.AddMember(
-                    rapidjson::Value(key.c_str(), allocator),
-                    rapidjson::Value(value.c_str(), allocator),
-                    allocator
-                );
+                rapidjson::Value keyVal(key.c_str(), static_cast<rapidjson::SizeType>(key.length()), allocator);
+                rapidjson::Value valueVal(value.c_str(), static_cast<rapidjson::SizeType>(value.length()), allocator);
+                metaDataObj.AddMember(keyVal, valueVal, allocator);
             }
         }
-        resultDoc.AddMember("MetaData", metaDataObj, allocator);
+        rapidjson::Value metaDataKey("MetaData", allocator);
+        resultDoc.AddMember(metaDataKey, metaDataObj, allocator);
     }
 
     // Extract originInformation
@@ -323,23 +359,30 @@ std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _docum
 
         if (originInfoView["fileName"]) {
             std::string fileName = std::string(originInfoView["fileName"].get_utf8().value);
-            resultDoc.AddMember("FileName", rapidjson::Value(fileName.c_str(), allocator), allocator);
+            rapidjson::Value fileNameKey("FileName", allocator);
+            rapidjson::Value fileNameVal(fileName.c_str(), static_cast<rapidjson::SizeType>(fileName.length()), allocator);
+            resultDoc.AddMember(fileNameKey, fileNameVal, allocator);
         }
 
         if (originInfoView["hash"]) {
             std::string hash = std::string(originInfoView["hash"].get_utf8().value);
-            resultDoc.AddMember("Hash", rapidjson::Value(hash.c_str(), allocator), allocator);
+            rapidjson::Value hashKey("Hash", allocator);
+            rapidjson::Value hashVal(hash.c_str(), static_cast<rapidjson::SizeType>(hash.length()), allocator);
+            resultDoc.AddMember(hashKey, hashVal, allocator);
         }
     }
 
     // Load GridFS data if DataID exists
     auto dataIdElement = _documentView["DataID"];
+    rapidjson::Value dataKey("Data", allocator);
     if (dataIdElement && dataIdElement.type() == bsoncxx::type::k_oid) {
         std::string gridFSData = loadGridFSData(dataIdElement.get_oid().value, _collectionName);
-        resultDoc.AddMember("Data", rapidjson::Value(gridFSData.c_str(), allocator), allocator);
+        rapidjson::Value dataVal(gridFSData.c_str(), static_cast<rapidjson::SizeType>(gridFSData.length()), allocator);
+        resultDoc.AddMember(dataKey, dataVal, allocator);
     }
     else {
-        resultDoc.AddMember("Data", rapidjson::Value("", allocator), allocator);
+        rapidjson::Value dataVal("", allocator);
+        resultDoc.AddMember(dataKey, dataVal, allocator);
     }
 
     // Convert to JSON string

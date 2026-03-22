@@ -4183,13 +4183,13 @@ void Model::requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config)
 }
 
 void Model::requestLibraryElement(ot::JsonDocument& _doc) {
-	
-	_doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ModelDialogConfirmed, _doc.GetAllocator()), _doc.GetAllocator());
 
 	// Add the database information to the document
 	_doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::instance().getUserName(), _doc.GetAllocator()), _doc.GetAllocator());
 	_doc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::instance().getUserPassword(), _doc.GetAllocator()), _doc.GetAllocator());
 	_doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::instance().getDataBaseServerURL(), _doc.GetAllocator()), _doc.GetAllocator());
+	_doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), _doc.GetAllocator()), _doc.GetAllocator());
+	_doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->getUiComponent()->getServiceURL(), _doc.GetAllocator()), _doc.GetAllocator());
 
 	Application::instance()->getLibraryManagementWrapper().requestCreateConfig(_doc);
 }

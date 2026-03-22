@@ -35,7 +35,7 @@
 #include "OTCADEntities/EntityFaceAnnotation.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 #include "MetadataHandler.h"
-
+#include "OTModelEntities/Lms/LibraryElementRequest.h"
 
 // std header
 #include <string>

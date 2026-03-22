@@ -36,7 +36,7 @@ void EntityBlockCircuitElement::createProperties()
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
 	/*EntityPropertiesSelection::createProperty("Model-Properties", "ModelSelection", { "LoadFromLibrary",""}, "", "default", getProperties());*/
-	EntityPropertiesExtendedEntityList::createProperty("Model-Properties", "ModelSelection", ot::FolderNames::CircuitModelsFolder + "/" + getFolderName(), ot::invalidUID, "", -1, {"< Load from library >"},{""}, "default", getProperties());
+	EntityPropertiesExtendedEntityList::createProperty("Model-Properties", "ModelSelection", ot::FolderNames::CircuitModelsFolder + "/" + getFolderName(), ot::invalidUID, "", -1, {"< Load from Library >"},{""}, "default", getProperties());
 }
 
 bool EntityBlockCircuitElement::updateFromProperties(void) {
@@ -55,7 +55,7 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 		return false;
 	}
 	
-	if (modelProperty->getValueName() == "LoadFromLibrary") {
+	if (modelProperty->getValueName() == "< Load from Library >") {
 
 		ot::LibraryElementSelectionCfg config;
 		config.setRequestingEntityID(this->getEntityID());
@@ -65,8 +65,17 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 		config.setEntityType(EntityFileText::className());
 		config.setNewEntityFolder(this->getCircuitModelFolder() + "/" + this->getFolderName());
 		config.setPropertyName("ModelSelection");
+
+		// Build the document
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_CreateConfig, doc.GetAllocator()), doc.GetAllocator());
+		// Add the config information to the document
+		ot::JsonObject configObj;
+		config.addToJsonObject(configObj, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
+
 		// if it was selected use observer to send message to LMS
-		getObserver()->requestConfigForModelDialog(config);
+		getObserver()->requestLibraryElement(doc);
 	}
 
 	return true;

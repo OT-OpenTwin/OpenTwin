@@ -35,6 +35,7 @@
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
 #include "OTCore/QueryDescription/DataLakeQueryCfg.h"
+#include "OTModelEntities/Lms/LibraryElementRequest.h"
 
 // BSON header
 #include <bsoncxx/json.hpp>

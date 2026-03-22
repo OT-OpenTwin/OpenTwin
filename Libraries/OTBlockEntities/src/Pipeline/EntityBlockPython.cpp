@@ -102,7 +102,7 @@ bool EntityBlockPython::updateFromProperties()
 		return false;
 	}
 
-	if (modelProperty->getValueName() == "LoadFromLibrary") {
+	if (modelProperty->getValueName() == "< Load from Library >") {
 
 		ot::LibraryElementSelectionCfg config;
 		config.setRequestingEntityID(this->getEntityID());
@@ -112,8 +112,16 @@ bool EntityBlockPython::updateFromProperties()
 		config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
 		config.setPropertyName(m_propertyNameScripts);
 
+		// Build the document
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_CreateConfig, doc.GetAllocator()), doc.GetAllocator());
+		// Add the config information to the document
+		ot::JsonObject configObj;
+		config.addToJsonObject(configObj, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
+
 		// if it was selected use observer to send message to LMS
-		getObserver()->requestConfigForModelDialog(config);
+		getObserver()->requestLibraryElement(doc);
 	}
 
 	auto scriptSelectionProperty =	getProperties().getProperty(m_propertyNameScripts);
@@ -153,7 +161,7 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 
 	auto propertyBase =	getProperties().getProperty(m_propertyNameScripts);
 	auto propertyEntityList = dynamic_cast<EntityPropertiesExtendedEntityList*>(propertyBase);
-	if(propertyEntityList->getValueName() == "LoadFromLibrary" || propertyEntityList->getValueName() == "")
+	if(propertyEntityList->getValueName() == "< Load from Library >" || propertyEntityList->getValueName() == "")
 	{
 		return; // No script selected, so we do not need to update the block.
 	}

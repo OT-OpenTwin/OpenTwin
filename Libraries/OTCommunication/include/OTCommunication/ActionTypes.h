@@ -318,6 +318,7 @@
 #define OT_ACTION_CMD_LMS_GetDocumentList "LMS.DocumentList.Get"
 #define OT_ACTION_CMD_LMS_AddDocument "LMS.Document.Add"
 #define OT_ACTION_CMD_LMS_CreateConfig "LMS.Config.Create"
+#define OT_ACTION_CMD_LMS_LibraryElementRequest "LMS.Element.Request"
 
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker "UI.GraphicsPicker.Fill"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor "UI.GraphicsEditor.Create"

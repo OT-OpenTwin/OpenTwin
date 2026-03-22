@@ -105,6 +105,29 @@ void EntityPythonManifest::replaceManifest(const std::string& _newManifestText)
 	m_manifestText = _newManifestText;
 	setModified();
 }
+
+void EntityPythonManifest::setLibraryElement(const ot::LibraryElement& _libraryElement) {
+	this->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection,
+		OT_INFO_SERVICE_TYPE_DataProcessingService
+	);
+
+	this->setText(_libraryElement.getData());
+	
+	// Add additional infos as properties
+	for (const auto& additionalInfos : _libraryElement.getAdditionalInfos()) {
+		EntityPropertiesString* additionalInfoProp = EntityPropertiesString::createProperty(
+			"Metadata",
+			additionalInfos.first,
+			additionalInfos.second,
+			"Default",
+			this->getProperties()
+		);
+		additionalInfoProp->setReadOnly(true);
+	}
+}
+
 bool EntityPythonManifest::environmentHasChanged(const std::string& _newContent)
 {
 	auto currentPackageList = getPackageList(m_manifestText);

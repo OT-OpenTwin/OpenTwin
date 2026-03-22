@@ -280,15 +280,16 @@ void LibraryManagementWrapper::addEntityToModel(EntityBase* _entity, Model* _mod
 	std::list<bool> forceVisible{ false };
 
 	// Collect data entities
-	ot::UIDList dataIDs, dataVersions;
+	ot::UIDList dataIDs, dataVersions, dataParent;
 	for (const auto& [dataID, dataVersion] : libInterface->getDataEntities()) {
 		dataIDs.push_back(dataID);
 		dataVersions.push_back(dataVersion);
+		dataParent.push_back(_entity->getEntityID());
 	}
 
 	// Add to model
 	_model->addEntitiesToModel(topoIDs, topoVersions, forceVisible, dataIDs, dataVersions,
-		topoIDs, "Added library entity", false, false, true);
+		dataParent, "Added library entity", false, false, true);
 }
 
 void LibraryManagementWrapper::createLibraryEntityAndUpdateProperty(
@@ -372,6 +373,10 @@ void LibraryManagementWrapper::createLibraryEntityAndUpdateProperty(
     
     modelPtr->updateTopologyEntities(topoList, versionList, comment, true, false);
 }
+
+
+
+
 
 
 

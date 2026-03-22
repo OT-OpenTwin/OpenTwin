@@ -18,6 +18,8 @@
 // @otlicense-end
 
 #include "OTModelEntities/Lms/EntityPythonScript.h"
+#include "OTModelEntities/Lms/LibraryElementRequest.h"
+#include "OTModelEntities/EntityPythonManifest.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/FolderNames.h"
 #include "OTCore/EncodingGuesser.h"
@@ -69,55 +71,28 @@ void EntityPythonScript::setLibraryElement(const ot::LibraryElement& _libraryEle
 		additionalInfoProp->setReadOnly(true);
 	}
 
-	//// Hide default properties
-	//EntityPropertiesBase* pathProp = this->getProperties().getProperty("Path", "Selected File");
-	//EntityPropertiesBase* filenameProp = this->getProperties().getProperty("Filename", "Selected File");
-	//EntityPropertiesBase* fileTypeProp = this->getProperties().getProperty("FileType", "Selected File");
-	//EntityPropertiesBase* encodingProp = this->getProperties().getProperty("Text Encoding", "Text Properties");
-	//EntityPropertiesBase* highlightProp = this->getProperties().getProperty("Syntax Highlight", "Text Properties");
-
-	//if (pathProp) pathProp->setVisible(false);
-	//if (filenameProp) filenameProp->setVisible(false);
-	//if (fileTypeProp) fileTypeProp->setVisible(false);
-	//if (encodingProp) encodingProp->setVisible(false);
-	//if (highlightProp) highlightProp->setVisible(false);
-	// Additional handling specific to EntityPythonScript can be added here if needed
-
 	std::string environmentInfo = _libraryElement.getAdditionalInfoValue("Environment");
 	if (!environmentInfo.empty()) {
-		// Create the LibraryElementSelectionCfg as before
-		ot::LibraryElementSelectionCfg config;
-		config.setRequestingEntityID(_libraryElement.getRequestingEntityID());
-		config.setCollectionName("PythonEnvironments");
-		config.setCallBackAction(OT_ACTION_CMD_UI_ModelDialogConfirmed);
-		config.setEntityType(EntityFileText::className());
-		config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
-		config.setPropertyName("Environment");
-		config.setCallBackService(_libraryElement.getCallBackService());
+		// Create the LibraryElementRequest configuration
+		ot::LibraryElementRequest request;
+		request.setRequestingEntityID(_libraryElement.getRequestingEntityID());
+		request.setCollectionName("PythonEnvironments");
+		request.setCallBackAction(OT_ACTION_CMD_LMS_LibraryElementRequest);
+		request.setEntityType(EntityPythonManifest::className());
+		request.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
+		request.setPropertyName("Environment");
+		request.setCallBackService(_libraryElement.getCallBackService());
+		request.setValue(environmentInfo);  // Now passing string directly
 
-		// Build the document for handleModelDialogConfirmed
-		ot::JsonDocument dialogDoc;
-
-		// Required: OT_ACTION_PARAM_COLLECTION_NAME
-		dialogDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString("PythonEnvironments", dialogDoc.GetAllocator()), dialogDoc.GetAllocator());
-
-		// Required: OT_ACTION_PARAM_MODEL_EntityID (the requesting entity ID)
-		dialogDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _libraryElement.getRequestingEntityID(), dialogDoc.GetAllocator());
-
-		// Required: OT_ACTION_PARAM_Value (the selected document name)
-		dialogDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(environmentInfo, dialogDoc.GetAllocator()), dialogDoc.GetAllocator());
-
-		// Required: OT_ACTION_PARAM_Info (serialized callback information)
-		ot::JsonDocument callbackInfo;
-		callbackInfo.AddMember("CallbackService", ot::JsonString(config.getCallBackService(), callbackInfo.GetAllocator()), callbackInfo.GetAllocator());
-		callbackInfo.AddMember("EntityType", ot::JsonString(config.getEntityType(), callbackInfo.GetAllocator()), callbackInfo.GetAllocator());
-		callbackInfo.AddMember("NewEntityFolder", ot::JsonString(config.getNewEntityFolder(), callbackInfo.GetAllocator()), callbackInfo.GetAllocator());
-		dialogDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(callbackInfo.toJson(), dialogDoc.GetAllocator()), dialogDoc.GetAllocator());
-
-		// Required: OT_ACTION_PARAM_PROPERTY_Name
-		dialogDoc.AddMember(OT_ACTION_PARAM_PROPERTY_Name, ot::JsonString("Environment", dialogDoc.GetAllocator()), dialogDoc.GetAllocator());
+		// Build the document
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_LibraryElementRequest, doc.GetAllocator()), doc.GetAllocator());
+		// Add the config information to the document
+		ot::JsonObject configObj;
+		request.addToJsonObject(configObj, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 		// Send the document to the observer (Model Service)
-		getObserver()->requestLibraryElement(dialogDoc);
+		getObserver()->requestLibraryElement(doc);
 	}
 }

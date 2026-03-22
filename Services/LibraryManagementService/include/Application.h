@@ -60,6 +60,7 @@ private:
 	OT_HANDLER(handleCreateDialogConfig, Application, OT_ACTION_CMD_LMS_CreateConfig, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleModelDialogConfirmed, Application, OT_ACTION_CMD_UI_ModelDialogConfirmed, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleModelDialogCanceled, Application, OT_ACTION_CMD_UI_ModelDialogCanceled, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleLibraryElementRequest, Application, OT_ACTION_CMD_LMS_LibraryElementRequest, ot::SECURE_MESSAGE_TYPES)
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	

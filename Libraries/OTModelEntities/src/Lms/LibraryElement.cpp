@@ -35,7 +35,6 @@ std::string ot::LibraryElement::getAdditionalInfoValue(const std::string& _key) 
     return "";
 }
 
-
 void ot::LibraryElement::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
     // Basic information
     _object.AddMember("Name", ot::JsonString(m_name, _allocator), _allocator);

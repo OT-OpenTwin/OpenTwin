@@ -29,7 +29,7 @@
 #include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
-
+#include "OTModelEntities/Lms/LibraryElementRequest.h"
 
 
 
@@ -295,11 +295,16 @@ std::string Application::handleCreateDialogConfig(ot::JsonDocument& _document) {
 	ot::ConstJsonObject configObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	ot::LibraryElementSelectionCfg selectionCfg;
 	selectionCfg.setFromJsonObject(configObj);
-	selectionCfg.serializeCallbackInfoToAdditionalInfo();
 
 	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
+	std::string callbackService = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	std::string uiServiceUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+	selectionCfg.setUIServiceUrl(uiServiceUrl);
+	selectionCfg.setCallBackService(callbackService);
+	selectionCfg.serializeCallbackInfoToAdditionalInfo();
+
 
 	ot::ModelLibraryDialogCfg modelDialogCfg;
 
@@ -386,6 +391,59 @@ std::string Application::handleModelDialogCanceled(ot::JsonDocument& _document) 
 
 	std::string response = sendAsyncMessageToModel(dialogCanceled, modelUrl);
 	return "";
+}
+
+std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document) {
+
+	// Get the request configuration
+	ot::ConstJsonObject configObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	ot::LibraryElementRequest requestConfig;
+	requestConfig.setFromJsonObject(configObj);
+
+	// Extract database credentials
+	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
+	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
+	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
+	std::string collectionName = requestConfig.getCollectionName();
+	std::string environmentInfo = requestConfig.getValue();
+
+	// Get the complete document from database
+	auto documentResult = db->getCompleteDocument(collectionName, dbUserName, dbUserPassword, dbServerUrl, environmentInfo);
+
+	if (documentResult.empty()) {
+		OT_LOG_E("Failed to load document: " + environmentInfo + " from collection: " + collectionName);
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Document not found").toJson();
+	}
+
+	// Convert result to JSON document
+	ot::JsonDocument loadedDoc;
+	loadedDoc.fromJson(documentResult);
+
+	// Add the request information to the loaded document
+	loadedDoc.AddMember("RequestingEntityID", requestConfig.getRequestingEntityID(), loadedDoc.GetAllocator());
+	loadedDoc.AddMember("CollectionName", ot::JsonString(collectionName, loadedDoc.GetAllocator()), loadedDoc.GetAllocator());
+	loadedDoc.AddMember("CallbackService", ot::JsonString(requestConfig.getCallBackService(), loadedDoc.GetAllocator()), loadedDoc.GetAllocator());
+	loadedDoc.AddMember("EntityType", ot::JsonString(requestConfig.getEntityType(), loadedDoc.GetAllocator()), loadedDoc.GetAllocator());
+	loadedDoc.AddMember("NewEntityFolder", ot::JsonString(requestConfig.getNewEntityFolder(), loadedDoc.GetAllocator()), loadedDoc.GetAllocator());
+	loadedDoc.AddMember("PropertyName", ot::JsonString(requestConfig.getPropertyName(), loadedDoc.GetAllocator()), loadedDoc.GetAllocator());
+
+	// Create LibraryElement and populate it with the complete loadedDoc
+	ot::LibraryElement libraryElement;
+	libraryElement.setFromJsonObject(loadedDoc.getConstObject());
+
+	// Create the response document
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ModelDialogConfirmed, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+	// Add the complete library element as a JSON object
+	ot::JsonObject libraryElementObj;
+	libraryElement.addToJsonObject(libraryElementObj, responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_Config, libraryElementObj, responseDoc.GetAllocator());
+
+	// Send the response asynchronously to the callback service
+	sendAsyncMessageToModel(responseDoc, libraryElement.getCallBackService());
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

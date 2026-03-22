@@ -1,5 +1,5 @@
 // @otlicense
-// File: LibraryModelImportCfg.h
+// File: LibraryElement.h
 // 
 // License:
 // Copyright 2025 by OpenTwin

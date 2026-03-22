@@ -22,8 +22,10 @@
 // OpenTwin header
 #include "OTModelEntities/Visualization/IVisualisationText.h"
 #include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/Lms/LibraryElement.h"
+#include "OTModelEntities/Lms/LibraryEntityInterface.h"
 
-class __declspec(dllexport) EntityPythonManifest : public ot::IVisualisationText, public EntityBase
+class __declspec(dllexport) EntityPythonManifest : public ot::IVisualisationText, public EntityBase, public ot::LibraryEntityInterface
 {
 	friend class FixturePythonManifest;
 public:
@@ -56,6 +58,9 @@ public:
 	std::optional <std::list<std::string>> getManifestPackages() { return getPackageList(m_manifestText); }
 	//! @brief Replaces manifest text without generating a new manifest ID
 	void replaceManifest(const std::string& _newManifestText);
+
+	// Set Library element
+	void setLibraryElement(const ot::LibraryElement& _libraryElement) override;
 
 private:
 	ot::UID m_manifestID = ot::invalidUID;
