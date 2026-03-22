@@ -230,6 +230,8 @@ void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
 	EntityPropertiesGuiPainter* symbolFillColorProp = EntityPropertiesGuiPainter::createProperty("General", "Symbol Fill Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurveSymbol), "", getProperties());
 	symbolFillColorProp->setToolTip("The fill color of the curve data point symbols in the plot.");
 	symbolFillColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve(true));
+	
+	m_queryProperties.setProperties(this);
 
 	this->updatePropertyVisibilities();
 
@@ -420,8 +422,10 @@ bool EntityResult1DCurve::updatePropertyVisibilities()
 		}
 
 	}
-
-	getProperties().forceResetUpdateForAllProperties();
+			getProperties().forceResetUpdateForAllProperties();
+		}
+	}
+	visibilityChanged |= m_queryProperties.updatePropertyVisibility(this);
 	return visibilityChanged;
 }
 

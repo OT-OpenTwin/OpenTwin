@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.20)
 
 project(OTModelEntities LANGUAGES CXX)
 
@@ -336,6 +336,7 @@ set(OTMODELENTITIESSOURCE_FILES
     src/PropertyBundleDataHandleVisUnstructuredScalarSurface.cpp
     src/PropertyBundleDataHandleVisUnstructuredVector.cpp
     src/PropertyBundleDataHandleVisUnstructuredVectorSurface.cpp
+    src/PropertyBundleDataLakeQuery.cpp
     src/PropertyBundlePlane.cpp
     src/PropertyBundleQuerySettings.cpp
     src/PropertyBundleScaling.cpp

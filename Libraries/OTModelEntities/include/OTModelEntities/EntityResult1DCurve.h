@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityResult1DCurve.h
 // 
 // License:
@@ -21,6 +21,7 @@
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/IVisualisationCurve.h"
 #include "OTGui/QueryInformation.h"
+#include "OTModelEntities/PropertyBundleDataLakeQuery.h"
 
 class __declspec(dllexport) EntityResult1DCurve : public EntityBase, public IVisualisationCurve
 {
@@ -104,6 +105,7 @@ protected:
 
 private:
 	ot::QueryInformation m_queryInformation;
+	PropertyBundleDataLakeQuery m_queryProperties;
 
 	bsoncxx::builder::basic::document serialise(const ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription);
 	ot::QuantityContainerEntryDescription deserialise(bsoncxx::v_noabi::document::view _subDocument);
