@@ -365,6 +365,12 @@ private:
 
 	// The maximum number of array entities per state
 	const size_t m_maxNumberArrayEntitiesPerState;
+
+	// The current number of relative model states after the previous absolute state
+	size_t m_relativeModelStateCount;
+
+	// The maximum allowed number of relative model states before an absolute state is written (for undo/redo and model open performance)
+	const size_t m_maximualRelativeModelStateCount;
 		
 	// The active branch which is currently stored in the model entity
 	std::string m_activeBranchInModelEntity;

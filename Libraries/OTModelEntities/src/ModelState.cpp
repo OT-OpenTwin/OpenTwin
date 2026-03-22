@@ -41,7 +41,9 @@ ModelState::ModelState(unsigned int sessionID, unsigned int serviceID) :
 	m_previewImageFormat(ot::ImageFileFormat::PNG),
 	m_descriptionUID(ot::invalidUID),
 	m_descriptionVersion(ot::invalidUID),
-	m_descriptionSyntax(ot::DocumentSyntax::PlainText)
+	m_descriptionSyntax(ot::DocumentSyntax::PlainText),
+	m_relativeModelStateCount(0),
+	m_maximualRelativeModelStateCount(30)
 {
 	DataStorageAPI::UniqueUIDGenerator *uidGenerator = EntityBase::getUidGenerator();
 	if (uidGenerator == nullptr)
@@ -73,6 +75,7 @@ void ModelState::reset()
 
 	m_customInitialVersion = VersionInformation();
 
+	m_relativeModelStateCount = 0;
 	m_stateModified = false;
 }
 
@@ -404,6 +407,12 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 		saveAbsolute = true;
 	}
 
+	if (m_relativeModelStateCount >= m_maximualRelativeModelStateCount)
+	{
+		// We have reached the maximum number of relative model states. For performance reasons (open, undo, redo) we now write an absolute state
+		saveAbsolute = true;
+	}
+
 	if (m_currentModelBaseStateVersion.empty()) {
 		// We can not save a relative state without having the base state
 		saveAbsolute = true;
@@ -417,11 +426,13 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 
 	// Finally we store an absolute or relative state 
 	if (saveAbsolute) {
+		m_relativeModelStateCount = 0;
 		if (!saveAbsoluteState(saveComment)) {
 			return false;
 		}
 	}
 	else {
+		m_relativeModelStateCount++;
 		if (!saveIncrementalState(saveComment)) {
 			return false;
 		}
@@ -487,6 +498,7 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 
 		// The corresponding base state is our own state
 		m_currentModelBaseStateVersion = docView["Version"].get_utf8().value.data();
+		m_relativeModelStateCount = 0;
 
 		return loadAbsoluteState(docView);
 	}
@@ -498,11 +510,11 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 
 		// Find and load the last absolute state
 		if (!loadModelState(m_currentModelBaseStateVersion)) return false;
-		
+		m_relativeModelStateCount = 0;
+
 		// Now load the following (incremental) versions until we reach the desired version
 		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
-		
 		std::list<const ot::VersionGraphVersionCfg*> versionsToImport = m_graphCfg.findNextVersions(m_currentModelBaseStateVersion, incrementalStateVersion.getBranchName(), incrementalStateVersion.getName());
 
 		for (const ot::VersionGraphVersionCfg* versionData : versionsToImport) {
@@ -519,6 +531,7 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 			}
 
 			this->loadIncrementalState(result->view());
+			m_relativeModelStateCount++;
 		}
 
 		return true;
@@ -538,6 +551,8 @@ void ModelState::clearModelState()
 
 	m_addedOrModifiedEntities.clear();
 	m_removedEntities.clear();
+
+	m_relativeModelStateCount = 0;
 
 	m_stateModified = false;
 }
