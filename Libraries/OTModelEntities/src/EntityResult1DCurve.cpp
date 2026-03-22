@@ -422,9 +422,9 @@ bool EntityResult1DCurve::updatePropertyVisibilities()
 		}
 
 	}
-			getProperties().forceResetUpdateForAllProperties();
-		}
-	}
+	
+	getProperties().forceResetUpdateForAllProperties();
+
 	visibilityChanged |= m_queryProperties.updatePropertyVisibility(this);
 	return visibilityChanged;
 }
