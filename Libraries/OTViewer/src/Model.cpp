@@ -1603,7 +1603,8 @@ bool Model::getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, 
 		osg::Matrix transformationMatrix;
 
 		SceneNodeGeometry *geometryNode = dynamic_cast<SceneNodeGeometry *>(root);
-		SceneNodeCoordinateSystem *csNode = dynamic_cast<SceneNodeCoordinateSystem*>(root);
+		SceneNodeCoordinateSystem* csNode = dynamic_cast<SceneNodeCoordinateSystem*>(root);
+		SceneNodeVTK* vtkNode = dynamic_cast<SceneNodeVTK*>(root);
 
 		if (geometryNode != nullptr)
 		{
@@ -1613,8 +1614,12 @@ bool Model::getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, 
 		{
 			transformationMatrix = csNode->getTransformation();
 		}
+		else if (vtkNode != nullptr)
+		{
+			transformationMatrix = osg::Matrix().identity();
+		}
 
-		if (geometryNode != nullptr || csNode != nullptr)
+		if (geometryNode != nullptr || csNode != nullptr || vtkNode != nullptr)
 		{
 			if (first)
 			{
