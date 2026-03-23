@@ -214,12 +214,7 @@
     <ClCompile Include="src\UiNotifier.cpp" />
     <ClCompile Include="src\GraphHandler.cpp" />
     <ClCompile Include="src\UnitTokenizer.cpp" />
-    <ClCompile Include="src\ValueProcessing.cpp" />
     <ClCompile Include="src\ValueProcessingChainBuilder.cpp" />
-    <ClCompile Include="src\ValueProcessorAdd.cpp" />
-    <ClCompile Include="src\ValueProcessorLog.cpp" />
-    <ClCompile Include="src\ValueProcessorMultiply.cpp" />
-    <ClCompile Include="src\ValueProcessorPow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
@@ -250,12 +245,6 @@
     <ClInclude Include="include\ValueProcessingChainBuilder.h" />
     <ClInclude Include="include\UnitTokenizer.h" />
     <ClInclude Include="include\UnitToken.h" />
-    <ClInclude Include="include\ValueProcessing.h" />
-    <ClInclude Include="include\ValueProcessor.h" />
-    <ClInclude Include="include\ValueProcessorAdd.h" />
-    <ClInclude Include="include\ValueProcessorLog.h" />
-    <ClInclude Include="include\ValueProcessorMultiply.h" />
-    <ClInclude Include="include\ValueProcessorPow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

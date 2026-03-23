@@ -231,44 +231,44 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 		// Transformation into SI base unit
 		ValueProcessingChainBuilder valueProcessingChainBuilder;
 		const auto& units = storedDataDescr.getTupleInstance().getTupleUnits();
-		std::vector<ValueProcessing> toSIConversions;
+		std::vector<ot::ValueProcessing> toSIConversions;
 		toSIConversions.reserve(units.size());
 		for (const std::string& unit : units)
 		{
-			ValueProcessing processing = valueProcessingChainBuilder.buildToSIChain(unit);
+			ot::ValueProcessing processing = valueProcessingChainBuilder.buildToSIChain(unit);
 			toSIConversions.push_back(std::move(processing));
 		}
 		std::function<std::pair<double, double>(double, double)> transformToSI;
-		if (!toSIConversions[0].executionNecessary() && !toSIConversions[1].executionNecessary())
+		if (toSIConversions[0].isEmpty() && toSIConversions[1].isEmpty())
 		{
 			transformToSI = [](double _first, double _second)->std::pair<double, double>
 				{
 					return { _first, _second };
 				};
 		}
-		else if (toSIConversions[0].executionNecessary() && toSIConversions[1].executionNecessary())
+		else if (!toSIConversions[0].isEmpty() && !toSIConversions[1].isEmpty())
 		{
 			transformToSI = [&toSIConversions](double _first, double _second)->std::pair<double, double>
 				{
-					_first = toSIConversions[0].executeSequence(_first).getDouble();
-					_second= toSIConversions[1].executeSequence(_second).getDouble();
+					_first = toSIConversions[0].execute(_first).getDouble();
+					_second= toSIConversions[1].execute(_second).getDouble();
 					return { _first, _second };
 				};
 		}
-		else if(toSIConversions[0].executionNecessary())
+		else if(!toSIConversions[0].isEmpty())
 		{
 			transformToSI = [&toSIConversions](double _first, double _second)->std::pair<double, double>
 				{
-					_first = toSIConversions[0].executeSequence(_first).getDouble();
+					_first = toSIConversions[0].execute(_first).getDouble();
 					return { _first, _second };
 				};
 		}
 		else
 		{
-			assert(toSIConversions[1].executionNecessary());
+			assert(!toSIConversions[1].isEmpty());
 			transformToSI = [&toSIConversions](double _first, double _second)->std::pair<double, double>
 				{
-					_second = toSIConversions[1] .executeSequence(_second).getDouble();
+					_second = toSIConversions[1].execute(_second).getDouble();
 					return { _first, _second };
 				};
 		}
@@ -566,12 +566,12 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateComparisonConsideringUn
 
 			for (size_t i = 0; i < values.size(); i++)
 			{
-				ValueProcessing processingChain = chainBuilder.build(unitsCurrent[i], unitsTarget[i]);
-				ValueProcessing inverseProcessingChain;
-				if (processingChain.executionNecessary())
+				ot::ValueProcessing processingChain = chainBuilder.build(unitsCurrent[i], unitsTarget[i]);
+				ot::ValueProcessing inverseProcessingChain;
+				if (!processingChain.isEmpty())
 				{
-					values[i] = processingChain.executeSequence(values[i]);
-					inverseProcessingChain = processingChain.createInverse();
+					values[i] = processingChain.execute(values[i]);
+					inverseProcessingChain = processingChain.inverse();
 				}
 				else
 				{
@@ -603,14 +603,14 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateComparisonConsideringUn
 			
 			for (size_t i = 0; i < unitsCurrent.size(); i++)
 			{
-				const ValueProcessing processingChain = chainBuilder.build(unitsCurrent[i], unitsTarget[i]);
-				if (processingChain.executionNecessary())
+				const ot::ValueProcessing processingChain = chainBuilder.build(unitsCurrent[i], unitsTarget[i]);
+				if (!processingChain.isEmpty())
 				{
 					if (i == pos)
 					{
-						values[0] = processingChain.executeSequence(values[0]);
+						values[0] = processingChain.execute(values[0]);
 					}
-					const ValueProcessing inverseProcessingChain = processingChain.createInverse();
+					const ot::ValueProcessing inverseProcessingChain = processingChain.inverse();
 					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(inverseProcessingChain));
 				}
 				else
@@ -663,11 +663,11 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateQueryFromSIBaseToTarget
 
 			for (size_t i = 0; i < values.size(); i++)
 			{
-				ValueProcessing processingChain = chainBuilder.buildToSIChain(unitsTarget[i]);
-				if (processingChain.executionNecessary())
+				ot::ValueProcessing processingChain = chainBuilder.buildToSIChain(unitsTarget[i]);
+				if (!processingChain.isEmpty())
 				{
-					values[i] = processingChain.executeSequence(values[i]);
-					ValueProcessing inverseProcessingChain = processingChain.createInverse();
+					values[i] = processingChain.execute(values[i]);
+					ot::ValueProcessing inverseProcessingChain = processingChain.inverse();
 					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(inverseProcessingChain));
 				}
 				else
@@ -692,14 +692,14 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateQueryFromSIBaseToTarget
 
 			for (size_t i = 0; i < unitsTarget.size(); i++)
 			{
-				ValueProcessing processingChain = chainBuilder.buildToSIChain(unitsTarget[i]);
-				if (processingChain.executionNecessary())
+				ot::ValueProcessing processingChain = chainBuilder.buildToSIChain(unitsTarget[i]);
+				if (!processingChain.isEmpty())
 				{
 					if (i == pos)
 					{
-						values[0] = processingChain.executeSequence(values[0]);
+						values[0] = processingChain.execute(values[0]);
 					}
-					ValueProcessing inverseProcessingChain = processingChain.createInverse();
+					ot::ValueProcessing inverseProcessingChain = processingChain.inverse();
 					m_inverseQuantityTransformationsByFieldKey[fieldName].push_back(std::move(inverseProcessingChain));
 				}
 				else

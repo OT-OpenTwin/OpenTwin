@@ -110,25 +110,10 @@
     <ClCompile Include="src\DataLakeAccessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ValueProcessing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ValueProcessorAdd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\UnitTokenizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ValueProcessingChainBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ValueProcessorPow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ValueProcessorLog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ValueProcessorMultiply.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -202,23 +187,8 @@
     <ClInclude Include="include\QueryDescriptionBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ValueProcessing.h">
-      <Filter>Header Files\ValueProcessing</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ValueProcessor.h">
-      <Filter>Header Files\ValueProcessing</Filter>
-    </ClInclude>
     <ClInclude Include="include\DataLakeAccessor.h">
       <Filter>Header Files\Data Handling</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ValueProcessorMultiply.h">
-      <Filter>Header Files\ValueProcessing</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ValueProcessorAdd.h">
-      <Filter>Header Files\ValueProcessing</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ValueProcessorLog.h">
-      <Filter>Header Files\ValueProcessing</Filter>
     </ClInclude>
     <ClInclude Include="include\UnitTokenizer.h">
       <Filter>Header Files\ValueProcessing</Filter>
@@ -230,9 +200,6 @@
       <Filter>Header Files\ValueProcessing</Filter>
     </ClInclude>
     <ClInclude Include="include\ResolvedToken.h">
-      <Filter>Header Files\ValueProcessing</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ValueProcessorPow.h">
       <Filter>Header Files\ValueProcessing</Filter>
     </ClInclude>
   </ItemGroup>

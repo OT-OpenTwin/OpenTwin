@@ -4,7 +4,7 @@
 #include "OTCore/QueryDescription/QueryDescription.h"
 #include "mongocxx/options/find.hpp"
 #include <map>
-#include "ValueProcessing.h"
+#include "OTCore/ValueProcessing/ValueProcessing.h"
 
 class DataLakeAccessor
 {
@@ -20,8 +20,8 @@ private:
 	std::list<ot::QueryDescription> m_queryDescriptionsSeries;
 	std::list<ot::QueryDescription> m_queryDescriptionsQuantities;
 	std::list<ot::QueryDescription> m_queryDescriptionsParameters;
-	std::map<std::string, ValueProcessing> m_inverseParameterTransformationsByFieldKey;
-	std::map<std::string, std::list<ValueProcessing>> m_inverseQuantityTransformationsByFieldKey;
+	std::map<std::string, ot::ValueProcessing> m_inverseParameterTransformationsByFieldKey;
+	std::map<std::string, std::list<ot::ValueProcessing>> m_inverseQuantityTransformationsByFieldKey;
 
 	std::string m_collectionName;
 	const std::string m_transformedCollectionEnding = ".transformed";
@@ -59,6 +59,6 @@ private:
 
 	std::optional<BsonViewOrValue> generateComparisonConsideringUnits(ot::QueryDescription& _queryDescription);
 
-	std::optional <BsonViewOrValue> generateQueryFromSIBaseToTarget(ot::QueryDescription& _queryDescription);
+	std::optional<BsonViewOrValue> generateQueryFromSIBaseToTarget(ot::QueryDescription& _queryDescription);
 
 };

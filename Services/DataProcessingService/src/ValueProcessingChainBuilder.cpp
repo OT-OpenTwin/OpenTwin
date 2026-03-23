@@ -2,13 +2,12 @@
 #include "UnitTokenizer.h"
 #include "OTCore/Units/SIUnits.h"
 #include "OTCore/Units/ImperialUnits.h"
-#include "ValueProcessorMultiply.h"
-#include "ValueProcessorAdd.h"
-#include "ValueProcessorLog.h"
-#include "ValueProcessorPow.h"
+#include "OTCore/ValueProcessing/ValueProcessorAdd.h"
+#include "OTCore/ValueProcessing/ValueProcessorLog.h"
+#include "OTCore/ValueProcessing/ValueProcessorPow.h"
+#include "OTCore/ValueProcessing/ValueProcessorMultiply.h"
 
-
-ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitStringCurrent, const std::string& _unitStringTarget)
+ot::ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitStringCurrent, const std::string& _unitStringTarget)
 {
     try
     {
@@ -17,7 +16,7 @@ ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitStrin
             // Both units have to be dimensionless.
             if (_unitStringCurrent.empty() && _unitStringTarget.empty())
             {
-                return ValueProcessing();
+                return ot::ValueProcessing();
             }
 
             UnitTokenizer tokenizer;
@@ -35,7 +34,7 @@ ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitStrin
                     throw std::exception("Cannot transform a dimensionless unit into a unit with dimension.");
                 }
                 
-                const ValueProcessing processing = buildChain(resolvedTokenCurrent, { dummyToken });
+                const ot::ValueProcessing processing = buildChain(resolvedTokenCurrent, { dummyToken });
                 return processing;
             }
             else
@@ -48,7 +47,7 @@ ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitStrin
                     throw std::exception("Cannot transform a dimensionless unit into a unit with dimension.");
                 }
 
-                const ValueProcessing processing = buildChain({ dummyToken }, resolvedTokenTarget);
+                const ot::ValueProcessing processing = buildChain({ dummyToken }, resolvedTokenTarget);
                 return processing;
             }
         }
@@ -63,7 +62,7 @@ ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitStrin
 
             dimensionCompatibilityGuard(resolvedTokenCurrent, resolvedTokenTarget, _unitStringCurrent, _unitStringTarget);
 
-            const ValueProcessing processing = buildChain(resolvedTokenCurrent, resolvedTokenTarget);
+            const ot::ValueProcessing processing = buildChain(resolvedTokenCurrent, resolvedTokenTarget);
 	        return processing;
         }
     }
@@ -74,14 +73,13 @@ ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitStrin
     }
 }
 
-ValueProcessing ValueProcessingChainBuilder::buildToSIChain(const std::string& _unitExpr)
+ot::ValueProcessing ValueProcessingChainBuilder::buildToSIChain(const std::string& _unitExpr)
 {
+    ot::ValueProcessing processing;
+
     UnitTokenizer tokenizer;
     std::vector<UnitToken> unitTokens= tokenizer.tokenize(_unitExpr);
     std::vector<ResolvedToken> resolvedTokens = resolveTokens(unitTokens);
-
-    std::list<std::unique_ptr<ValueProcessor>> processors; 
-
 
     // ---- Separate log token from linear tokens ----------------------
     const ResolvedToken* logToken = nullptr;
@@ -103,16 +101,14 @@ ValueProcessing ValueProcessingChainBuilder::buildToSIChain(const std::string& _
     {
         // ---- dB/Np/... → linear SI ----------------------------------
         // Step 1: inverse-log restores the linear ratio
-        auto log = std::make_unique<ValueProcessorLog>(logToken->m_resolvedComponent.m_base.getLogMultiplier(), ValueProcessorLog::SupportedBases::m_10);
-        processors.push_back(std::move(log));
+        processing.addBack(new ot::ValueProcessorLog(logToken->m_resolvedComponent.m_base.getLogMultiplier(), ot::ValueProcessorLog::LogBase::Base10));
 
         // Step 2: scale the remaining linear tokens to SI base
         // (e.g. the /degF part in dB/degF)
         double factor = netSIScale(linearTokens);
         if (multiplicationIsRelevant(factor))
         {
-            auto multipl = std::make_unique<ValueProcessorMultiply>(factor);
-            processors.push_back(std::move(multipl));
+			processing.addBack(new ot::ValueProcessorMultiply(factor));
         }
     }
     else 
@@ -122,18 +118,16 @@ ValueProcessing ValueProcessingChainBuilder::buildToSIChain(const std::string& _
 
         if (multiplicationIsRelevant(si.scaleFactor))
         {
-            auto add = std::make_unique<ValueProcessorMultiply>(si.scaleFactor);
-            processors.push_back(std::move(add));
+			processing.addBack(new ot::ValueProcessorMultiply(si.scaleFactor));
         }
 
         if (si.isAffine && summationIsRelevant(si.offsetToSI))
         {
-            auto multipl = std::make_unique<ValueProcessorMultiply>(si.offsetToSI);
-            processors.push_back(std::move(multipl));
+			processing.addBack(new ot::ValueProcessorMultiply(si.offsetToSI));
+			//processing.addBack(new ot::ValueProcessorAdd(si.offsetToSI));
         }
     }
-    ValueProcessing processing;
-    processing.setSequence(std::move(processors));
+    
     return processing;
 }
 
@@ -194,12 +188,10 @@ double ValueProcessingChainBuilder::netSIScale(const std::vector<ResolvedToken>&
     return scale;
 }
 
-ValueProcessing ValueProcessingChainBuilder::buildChain(const std::vector<ResolvedToken>& _current, const std::vector<ResolvedToken>& _tgt)
+ot::ValueProcessing ValueProcessingChainBuilder::buildChain(const std::vector<ResolvedToken>& _current, const std::vector<ResolvedToken>& _tgt)
 {
-    
-    ValueProcessing processing;
-    std::list<std::unique_ptr<ValueProcessor>> processors;
-            
+    ot::ValueProcessing processing;
+
     // Collect non-log tokens for scale computation
     std::vector<ResolvedToken> srcScale, tgtScale;
     for (const auto& token : _current)
@@ -245,8 +237,7 @@ ValueProcessing ValueProcessingChainBuilder::buildChain(const std::vector<Resolv
         double dbOffset = tgtLog->m_resolvedComponent.m_base.getLogMultiplier() * std::log10(factor);
         if (summationIsRelevant(dbOffset))
         {
-            auto add = std::make_unique<ValueProcessorAdd>(dbOffset);
-            processors.push_back(std::move(add));
+			processing.addBack(new ot::ValueProcessorAdd(dbOffset));
         }
     }
     else if (!srcLog && tgtLog) 
@@ -256,39 +247,36 @@ ValueProcessing ValueProcessingChainBuilder::buildChain(const std::vector<Resolv
         if (srcAffine)
         {
             assert(srcScale.size() == 1 && tgtScale.size() == 1); 
-            buildAffineChain(srcScale[0], tgtScale[0], processors);
+            buildAffineChain(srcScale[0], tgtScale[0], processing);
         }
         else
         {
             double factor = netSIScale(srcScale) / netSIScale(tgtScale);
             if (multiplicationIsRelevant(factor))
             {
-                auto add = std::make_unique<ValueProcessorMultiply>(factor);
-                processors.push_back(std::move(add));
+				processing.addBack(new ot::ValueProcessorMultiply(factor));
             }
         }
-        auto log = std::make_unique <ValueProcessorLog>(tgtLog->m_resolvedComponent.m_base.getLogMultiplier(), ValueProcessorLog::SupportedBases::m_10);
-        processors.push_back(std::move(log));
+
+		processing.addBack(new ot::ValueProcessorLog(tgtLog->m_resolvedComponent.m_base.getLogMultiplier(), ot::ValueProcessorLog::LogBase::Base10));
     }
     else if (srcLog && !tgtLog) {
         // CASE 3: dB -> linear
         // Step A: dB -> linear
-        auto pow = std::make_unique <ValueProcessorPow>(srcLog->m_resolvedComponent.m_base.getLogMultiplier(), 10);
-        processors.push_back(std::move(pow));
+		processing.addBack(new ot::ValueProcessorPow(srcLog->m_resolvedComponent.m_base.getLogMultiplier(), 10));
 
         // Step B: scale to target        
         if (srcAffine && tgtAffine)
         {
             assert(srcScale.size() == 1 && tgtScale.size() == 1);
-            buildAffineChain(srcScale[0], tgtScale[0], processors);
+            buildAffineChain(srcScale[0], tgtScale[0], processing);
         }
         else
         {
             double factor = netSIScale(srcScale) / netSIScale(tgtScale);
             if (multiplicationIsRelevant(factor))
             {
-                auto mult = std::make_unique <ValueProcessorMultiply>(factor);
-                processors.push_back(std::move(mult));
+				processing.addBack(new ot::ValueProcessorMultiply(factor));
             }
         }
     }
@@ -298,25 +286,23 @@ ValueProcessing ValueProcessingChainBuilder::buildChain(const std::vector<Resolv
         if (srcAffine && tgtAffine)
         {
             assert(srcScale.size() == 1 && tgtScale.size() == 1);
-            buildAffineChain(srcScale[0], tgtScale[0],processors);
+            buildAffineChain(srcScale[0], tgtScale[0], processing);
         }
         else
         {
             double factor = netSIScale(srcScale) / netSIScale(tgtScale);
             if (multiplicationIsRelevant(factor))
             {
-                auto mult = std::make_unique <ValueProcessorMultiply>(factor);
-                processors.push_back(std::move(mult));
+				processing.addBack(new ot::ValueProcessorMultiply(factor));
             }
         }
         
     }
-    processing.setSequence(std::move(processors));
 
     return processing;
 }
 
-void ValueProcessingChainBuilder::buildAffineChain(const ResolvedToken& _current, const ResolvedToken& _tgt, std::list<std::unique_ptr<ValueProcessor>>& _processorChain)
+void ValueProcessingChainBuilder::buildAffineChain(const ResolvedToken& _current, const ResolvedToken& _tgt, ot::ValueProcessing& _processorChain)
 {
     const auto& sourceBase = _current.m_resolvedComponent.m_base;
     const auto& tgtBase = _tgt.m_resolvedComponent.m_base;
@@ -333,14 +319,12 @@ void ValueProcessingChainBuilder::buildAffineChain(const ResolvedToken& _current
     
     if (multiplicationIsRelevant(totalScale))
     {
-        auto multiply = std::make_unique<ValueProcessorMultiply>(totalScale);
-        _processorChain.push_back( std::move(multiply));
+		_processorChain.addBack(new ot::ValueProcessorMultiply(totalScale));
     }
 
     if (summationIsRelevant(offset))
     {
-        auto add = std::make_unique<ValueProcessorAdd>(offset);
-        _processorChain.push_back(std::move(add));
+		_processorChain.addBack(new ot::ValueProcessorAdd(offset));
     }
 }
 

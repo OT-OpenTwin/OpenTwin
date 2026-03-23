@@ -1,5 +1,7 @@
 ﻿#pragma once
+
 #include "OTCore/Units/ResolvedComponent.h"
+
 struct ResolvedToken
 {
 	ot::ResolvedComponent m_resolvedComponent;
