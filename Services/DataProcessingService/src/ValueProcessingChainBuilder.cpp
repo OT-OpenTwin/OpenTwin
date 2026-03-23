@@ -123,8 +123,7 @@ ot::ValueProcessing ValueProcessingChainBuilder::buildToSIChain(const std::strin
 
         if (si.isAffine && summationIsRelevant(si.offsetToSI))
         {
-			processing.addBack(new ot::ValueProcessorMultiply(si.offsetToSI));
-			//processing.addBack(new ot::ValueProcessorAdd(si.offsetToSI));
+			processing.addBack(new ot::ValueProcessorAdd(si.offsetToSI));
         }
     }
     
