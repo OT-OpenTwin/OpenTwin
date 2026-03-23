@@ -26,7 +26,7 @@
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 #include "OTResultDataAccess/ResultCollection/CrossCollectionAccess.h"
-#include "OTResultDataAccess/MetadataEntityInterface.h"
+#include "OTModelEntities/MetadataEntityInterface.h"
 
 // std header
 #include <vector>

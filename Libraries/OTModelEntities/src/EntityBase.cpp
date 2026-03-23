@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityBase.cpp
 // 
 // License:

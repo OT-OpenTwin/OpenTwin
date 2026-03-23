@@ -19,14 +19,15 @@
 
 // OpenTwin header
 #include "OTCore/Variable/VariableListToStringListConverter.h"
-#include "OTModelAPI/ModelServiceAPI.h"
+
 #include "OTCore/MetadataEntry/MetadataEntry.h"
 #include "OTCore/MetadataEntry/MetadataEntryArray.h"
 #include "OTCore/MetadataEntry/MetadataEntryObject.h"
 #include "OTCore/MetadataEntry/MetadataEntrySingle.h"
-#include "OTResultDataAccess/MetadataEntityInterface.h"
+#include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTCore/Tuple/TupleFactory.h"
-
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityBase.h"
 // std header
 #include <vector>
 
@@ -243,9 +244,17 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 	return seriesMetadata;
 }
 
-void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _modelComponent, MetadataCampaign& _metaDataCampaign)
+ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(MetadataCampaign& _metaDataCampaign)
 {
-	EntityMetadataCampaign entityCampaign(_modelComponent.createEntityUID(), nullptr, nullptr, nullptr);
+	if (EntityBase::getUidGenerator() == nullptr)
+	{
+		assert(false);
+		return ot::NewModelStateInfo();
+	}
+
+	ot::UID entityID = EntityBase::getUidGenerator()->getUID();
+
+	EntityMetadataCampaign entityCampaign(entityID, nullptr, nullptr, nullptr);
 	entityCampaign.setCallbackData(this->getCallbackData());
 
 	for (auto& metadata : _metaDataCampaign.getMetaData())
@@ -253,18 +262,22 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 		insertMetadata(&entityCampaign, metadata.second.get());
 	}
 	entityCampaign.storeToDataBase();
-	m_newEntityIDs.push_back(entityCampaign.getEntityID());
-	m_newEntityVersions.push_back(entityCampaign.getEntityStorageVersion());
+	ot::NewModelStateInfo newEntity;
+	newEntity.addTopologyEntity(entityCampaign);
+	return newEntity;
 }
 
-void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _modelComponent, MetadataCampaign& _metaDataCampaign, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel)
+ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(MetadataCampaign& _metaDataCampaign, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel)
 {
-	storeCampaign(_modelComponent, _metaDataCampaign);
-	storeCampaign(_modelComponent, _seriesMetadata, _saveModel);
+	ot::NewModelStateInfo entInfosCamp = storeCampaign(_metaDataCampaign);
+	ot::NewModelStateInfo entInfosSer = storeCampaign(_seriesMetadata, _saveModel);
+	entInfosCamp.splice(entInfosSer);
+	return entInfosCamp;
 }
 
-void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _modelComponent, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel)
+ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel)
 {
+	ot::NewModelStateInfo newEntitiesInfos;
 	std::list< EntityMetadataSeries> entitiesMetadataSeries;
 	for (auto& newSeriesMetadata : _seriesMetadata)
 	{
@@ -339,13 +352,9 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 		}
 		
 		entitySeries.storeToDataBase();
-		m_newEntityIDs.push_back(entitySeries.getEntityID());
-		m_newEntityVersions.push_back(entitySeries.getEntityStorageVersion());
+		newEntitiesInfos.addTopologyEntity(entitySeries);
 	}
-
-	std::list<bool> visibillity(m_newEntityIDs.size(), false);
-	assert(m_newEntityIDs.size() == m_newEntityVersions.size() && m_newEntityVersions.size() == visibillity.size());
-	ot::ModelServiceAPI::addEntitiesToModel(std::move(m_newEntityIDs), std::move(m_newEntityVersions), std::move(visibillity), {}, {}, {}, "Updated result data collection", true, _saveModel);
+	return newEntitiesInfos;
 }
 
 void MetadataEntityInterface::extractCampaignMetadata(MetadataCampaign& _measurementCampaign, std::shared_ptr<EntityMetadataCampaign> _rmd)

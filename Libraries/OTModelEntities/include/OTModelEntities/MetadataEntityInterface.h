@@ -23,23 +23,23 @@
 #include "OTModelEntities/EntityCallbackBase.h"
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTModelEntities/EntityMetadataCampaign.h"
-#include "OTServiceFoundation/ModelComponent.h"
 #include "OTCore/MetadataHandle/MetadataCampaign.h"
 #include "OTCore/MetadataEntry/MetadataEntry.h"
-#include "OTResultDataAccess/ResultDataAccessAPIExport.h"
+#include "OTModelEntities/ModelEntitiesAPIExport.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 // std header
 #include <stdint.h>
 
-class OT_RESULTDATAACCESS_API_EXPORT MetadataEntityInterface : public ot::EntityCallbackBase
+class  OT_MODELENTITIES_API_EXPORT MetadataEntityInterface : public ot::EntityCallbackBase
 {
 public:
 	MetadataEntityInterface() = default;
 	MetadataCampaign createCampaign(std::shared_ptr<EntityMetadataCampaign> _rmd, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds);
 	MetadataSeries createSeries(std::shared_ptr<EntityMetadataSeries> _seriesMetadataEntity);
 	MetadataSeries createSeries(EntityMetadataSeries* _seriesMetadataEntity);
-	void storeCampaign(ot::components::ModelComponent& _modelComponent, MetadataCampaign& _metaDataCampaign);
-	void storeCampaign(ot::components::ModelComponent& _modelComponent, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);
-	void storeCampaign(ot::components::ModelComponent& _modelComponent,  MetadataCampaign& _metaDataCampaign, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);
+	ot::NewModelStateInfo storeCampaign(MetadataCampaign& _metaDataCampaign);
+	ot::NewModelStateInfo storeCampaign(std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);
+	ot::NewModelStateInfo storeCampaign(MetadataCampaign& _metaDataCampaign, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);
 
 private:
 	const std::string m_dataDimensionsField = "DataDimensions";
@@ -54,9 +54,6 @@ private:
 	const std::string m_tupleFormat = "TupleFormat";
 		
 	const std::string m_valuesField = "Values";
-
-	std::list<ot::UID> m_newEntityIDs;
-	std::list<ot::UID> m_newEntityVersions;
 
 	void extractCampaignMetadata(MetadataCampaign& _measurementCampaign, std::shared_ptr<EntityMetadataCampaign> _rmd);
 	void extractSeriesMetadata(MetadataCampaign& _measurementCampaign, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds);

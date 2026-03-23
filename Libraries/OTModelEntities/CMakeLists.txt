@@ -231,6 +231,7 @@ set(OTMODELENTITIES_HEADER_FILES
     include/OTModelEntities/SerializeWithBSON.h
     include/OTModelEntities/TemplateDefaultManager.h
     include/OTModelEntities/VariableToBSONConverter.h
+    include/OTModelEntities/MetadataEntityInterface.h
 )
 
 set(OTMODELENTITIESSOURCE_FILES
@@ -348,6 +349,7 @@ set(OTMODELENTITIESSOURCE_FILES
     src/PropertyHelper.cpp
     src/TemplateDefaultManager.cpp
     src/VariableToBSONConverter.cpp
+    src/MetadataEntityInterface.cpp
 )
 
 # ============================================================

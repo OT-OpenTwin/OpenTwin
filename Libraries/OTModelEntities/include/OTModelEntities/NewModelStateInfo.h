@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: NewModelStateInfo.h
 // 
 // License:
@@ -98,6 +98,7 @@ namespace ot {
 		//! @brief Returns the lists of data entity parent topology entity IDs.
 		const std::list<ot::UID>& getDataEntityParentIDs() const { return m_dataEntityParentIDs; };
 
+		void splice(NewModelStateInfo& _other);
 	private:
 		std::list<ot::UID> m_topologyEntityIDs;
 		std::list<ot::UID> m_topologyEntityVersions;

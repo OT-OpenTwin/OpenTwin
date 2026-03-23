@@ -23,11 +23,11 @@
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTCore/MetadataEntry/MetadataEntryComperator.h"
 #include "OTResultDataAccess/ResultCollection/IndexHandler.h"
-#include "OTResultDataAccess/MetadataEntityInterface.h"
+#include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/QuantityContainerSerialiser.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
-
+#include "OTModelAPI/ModelServiceAPI.h"
 // std header
 #include <set>
 #include <cassert>
@@ -160,18 +160,23 @@ void ResultCollectionExtender::storeCampaignChanges()
 {
 	MetadataEntityInterface entityCreator;
 	entityCreator.setCallbackData(this->getCallbackData());
-
+	ot::NewModelStateInfo newEntities;
 	if (m_requiresUpdateMetadataCampaign && m_seriesMetadataForStorage.size() != 0)
 	{
-		entityCreator.storeCampaign(*m_modelComponent, m_metadataCampaign, m_seriesMetadataForStorage, m_saveModel);
+		newEntities = entityCreator.storeCampaign(m_metadataCampaign, m_seriesMetadataForStorage, m_saveModel);
 	}
 	else if (m_requiresUpdateMetadataCampaign)
 	{
-		entityCreator.storeCampaign(*m_modelComponent, m_metadataCampaign);
+		newEntities = entityCreator.storeCampaign(m_metadataCampaign);
 	}
 	else if (m_seriesMetadataForStorage.size() != 0)
 	{
-		entityCreator.storeCampaign(*m_modelComponent, m_seriesMetadataForStorage, m_saveModel);
+		newEntities = entityCreator.storeCampaign(m_seriesMetadataForStorage, m_saveModel);
+	}
+	
+	if (newEntities.getTopologyEntityIDs().size() > 0)
+	{
+		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Updated result data collection", true, m_saveModel);
 	}
 }
 

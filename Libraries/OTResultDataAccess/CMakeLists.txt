@@ -85,8 +85,6 @@ set(OTResultDataAccess_HEADERS
 
     include/OTResultDataAccess/CurveFactory.h
     
-    include/OTResultDataAccess/MetadataEntityInterface.h
-    
     include/OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h
     include/OTResultDataAccess/SerialisationInterfaces/ParameterDescription.h
     include/OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h
@@ -112,7 +110,6 @@ set(OTResultDataAccess_SOURCES
     src/CurveFactory.cpp
     src/DatasetDescription.cpp
     src/IndexHandler.cpp
-    src/MetadataEntityInterface.cpp
     src/PlotBuilder.cpp
     src/ProjectToCollectionConverter.cpp
     src/QuantityContainer.cpp
