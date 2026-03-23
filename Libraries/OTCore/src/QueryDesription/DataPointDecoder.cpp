@@ -20,6 +20,12 @@
 // OpenTwin header
 #include "OTCore/QueryDescription/DataPointDecoder.h"
 
+ot::DataPointDecoder::DataPointDecoder(const ConstJsonObject& _jsonObject)
+	: DataPointDecoder()
+{
+	setFromJsonObject(_jsonObject);
+}
+
 void ot::DataPointDecoder::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const
 {
 	_object.AddMember("FieldName", JsonString(m_fieldName, _allocator), _allocator);

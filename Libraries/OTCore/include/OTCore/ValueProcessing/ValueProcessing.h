@@ -26,7 +26,8 @@ namespace ot {
 	public:
 		static ValueProcessing fromJson(const std::string& _jsonString);
 
-		ValueProcessing() = default;
+		explicit ValueProcessing() = default;
+		explicit ValueProcessing(const ConstJsonObject& _jsonObject);
 		ValueProcessing(const ValueProcessing& _other);
 		ValueProcessing(ValueProcessing&& _other) noexcept;
 		virtual ~ValueProcessing();

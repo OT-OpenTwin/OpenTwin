@@ -3,6 +3,12 @@
 // OpenTwin header
 #include "OTCore/ValueProcessing/ValueProcessing.h"
 
+ot::ValueProcessing::ValueProcessing(const ConstJsonObject& _jsonObject)
+	: ValueProcessing()
+{
+	setFromJsonObject(_jsonObject);
+}
+
 ot::ValueProcessing::ValueProcessing(const ValueProcessing& _other)
 {
 	for (const ValueProcessor* processor : _other.m_processors)

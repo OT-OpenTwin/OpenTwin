@@ -28,13 +28,15 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT Painter2DFactory : public FactoryTemplate<Painter2D> {
 	public:
-		static Painter2DFactory& instance(void);
+		static Painter2DFactory& instance();
 		
-		static Painter2D* create(const ConstJsonObject& _jsonObject);
+		//! @brief Creates a Painter2D instance according to the key in the provided JSON object.
+		//! The caller takes ownership of the created object.
+		OT_DECL_NODISCARD static Painter2D* create(const ConstJsonObject& _jsonObject);
 
 	private:
-		Painter2DFactory() {};
-		virtual ~Painter2DFactory() {};
+		Painter2DFactory() = default;
+		~Painter2DFactory() = default;
 	};
 
 	template <class T>

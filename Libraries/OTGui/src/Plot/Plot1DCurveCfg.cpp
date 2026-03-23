@@ -219,6 +219,7 @@ void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
 	_object.AddMember("PointFillPainter", JsonObject(m_pointFillPainter, _allocator), _allocator);
 
 	_object.AddMember("QueryInformation", JsonObject(m_queryInformation, _allocator), _allocator);
+	_object.AddMember("DataAccess", JsonObject(m_dataAccessConfig, _allocator), _allocator);
 
 	_object.AddMember("ToolTip", JsonString(m_toolTip, _allocator), _allocator);
 }
@@ -242,6 +243,7 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	m_pointOulinePen.setFromJsonObject(json::getObject(_object, "PointOutlinePen"));
 
 	m_queryInformation.setFromJsonObject(json::getObject(_object, "QueryInformation"));
+	m_dataAccessConfig.setFromJsonObject(json::getObject(_object, "DataAccess"));
 
 	m_toolTip = json::getString(_object, "ToolTip");
 

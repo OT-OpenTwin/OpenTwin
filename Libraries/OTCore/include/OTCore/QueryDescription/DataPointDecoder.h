@@ -30,8 +30,9 @@ namespace ot
 		OT_DECL_DEFCOPY(DataPointDecoder)
 		OT_DECL_DEFMOVE(DataPointDecoder)
 	public:
-		DataPointDecoder() = default;
-		~DataPointDecoder() = default;
+		explicit DataPointDecoder() = default;
+		explicit DataPointDecoder(const ConstJsonObject& _jsonObject);
+		virtual ~DataPointDecoder() = default;
 
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;

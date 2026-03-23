@@ -23,6 +23,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/BasicEntityInformation.h"
+#include "OTCore/QueryDescription/DataLakeAccessCfg.h"
 #include "OTGui/QueryInformation.h"
 #include "OTGui/Style/PenCfg.h"
 
@@ -169,6 +170,9 @@ namespace ot {
 		void setQueryInformation(QueryInformation&& _queryInformation) { m_queryInformation = std::move(_queryInformation); };
 		const QueryInformation& getQueryInformation() const { return m_queryInformation; };
 
+		void setDataAccessConfig(DataLakeAccessCfg&& _dataAccessConfig) { m_dataAccessConfig = std::move(_dataAccessConfig); };
+		const DataLakeAccessCfg& getDataAccessConfig() const { return m_dataAccessConfig; };
+
 		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
 		void setToolTip(std::string&& _toolTip) { m_toolTip = std::move(_toolTip); };
 		const std::string& getToolTip() const { return m_toolTip; };
@@ -191,6 +195,7 @@ namespace ot {
 		Painter2D* m_pointFillPainter;
 
 		QueryInformation m_queryInformation;
+		DataLakeAccessCfg m_dataAccessConfig;
 
 		std::string m_toolTip;
 	};
