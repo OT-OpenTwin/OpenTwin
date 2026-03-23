@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: DataCategorizationHandler.cpp
 // 
 // License:
@@ -29,8 +29,8 @@
 // OpenTwin header
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTSystem/DateTime.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
+#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
+#include "OTResultDataAccess/MetadataEntityInterface.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/Variable/StringToVariableConverter.h"
 #include "OTGui/TableIndexSchemata.h"

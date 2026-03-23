@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "OTResultDataAccess/ResultCollection/ProjectToCollectionConverter.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
+#include "OTCore/MetadataHandle/MetadataCampaign.h"
 #include <memory>
 
 class MetadataHandler

@@ -1,7 +1,7 @@
-// @otlicense
+﻿// @otlicense
 
 // OpenTwin header
-#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+#include "OTCore/MetadataHandle/MetadataParameter.h"
 
 void MetadataParameter::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Label", ot::JsonString(parameterLabel, _allocator), _allocator);

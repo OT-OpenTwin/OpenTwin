@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ParameterDescription.h
 // 
 // License:
@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Variable/Variable.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+#include "OTCore/MetadataHandle/MetadataParameter.h"
 
 // std header
 #include <list>

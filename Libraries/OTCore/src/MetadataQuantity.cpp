@@ -1,7 +1,7 @@
 ﻿// @otlicense
 
 // OpenTwin header
-#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
+#include "OTCore/MetadataHandle/MetadataQuantity.h"
 
 void MetadataQuantity::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Label", ot::JsonString(quantityLabel, _allocator), _allocator);

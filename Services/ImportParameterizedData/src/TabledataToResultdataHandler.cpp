@@ -35,11 +35,11 @@
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTModelEntities/EntityMetadataCampaign.h"
 
-#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+#include "OTCore/MetadataHandle/MetadataParameter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntryArray.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntryObject.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
+#include "OTCore/MetadataEntry/MetadataEntryArray.h"
+#include "OTCore/MetadataEntry/MetadataEntryObject.h"
+#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
 
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"

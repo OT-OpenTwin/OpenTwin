@@ -84,18 +84,8 @@ set(OTResultDataAccess_HEADERS
     include/OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h
 
     include/OTResultDataAccess/CurveFactory.h
-
-    include/OTResultDataAccess/MetadataEntry/MetadataEntry.h
-    include/OTResultDataAccess/MetadataEntry/MetadataEntryArray.h
-    include/OTResultDataAccess/MetadataEntry/MetadataEntryComperator.h
-    include/OTResultDataAccess/MetadataEntry/MetadataEntryObject.h
-    include/OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h
     
-    include/OTResultDataAccess/MetadataHandle/MetadataParameter.h
-    include/OTResultDataAccess/MetadataHandle/MetadataQuantity.h
-    include/OTResultDataAccess/MetadataHandle/MetadataSeries.h
-    include/OTResultDataAccess/MetadataHandle/MetadataCampaign.h
-    include/OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h
+    include/OTResultDataAccess/MetadataEntityInterface.h
     
     include/OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h
     include/OTResultDataAccess/SerialisationInterfaces/ParameterDescription.h
@@ -122,14 +112,7 @@ set(OTResultDataAccess_SOURCES
     src/CurveFactory.cpp
     src/DatasetDescription.cpp
     src/IndexHandler.cpp
-    src/MetadataCampaign.cpp
     src/MetadataEntityInterface.cpp
-    src/MetadataEntryArray.cpp
-    src/MetadataEntryComperator.cpp
-    src/MetadataEntryObject.cpp
-    src/MetadataEntrySingle.cpp
-    src/MetadataParameter.cpp
-    src/MetadataQuantity.cpp
     src/PlotBuilder.cpp
     src/ProjectToCollectionConverter.cpp
     src/QuantityContainer.cpp
@@ -139,7 +122,6 @@ set(OTResultDataAccess_SOURCES
     src/ResultCollectionExtender.cpp
     src/ResultCollectionMetadataAccess.cpp
     src/ResultImportLogger.cpp
-    src/MetadataSeries.cpp
 )
 
 # Core object library (for reuse in tests)

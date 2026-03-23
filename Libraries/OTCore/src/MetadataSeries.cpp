@@ -1,4 +1,4 @@
-﻿#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+﻿#include "OTCore/MetadataHandle/MetadataSeries.h"
 
 MetadataSeries::MetadataSeries(const MetadataSeries& _other)
 	: m_name(_other.m_name), m_label(_other.m_label), m_index(_other.m_index),

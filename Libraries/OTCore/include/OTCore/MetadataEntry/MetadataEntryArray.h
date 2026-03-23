@@ -1,5 +1,5 @@
-// @otlicense
-// File: MetadataEntry.h
+﻿// @otlicense
+// File: MetadataEntryArray.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,14 +18,22 @@
 // @otlicense-end
 
 #pragma once
-#include <string>
 
-class MetadataEntry
+// OpenTwin header
+#include "OTCore/Variable/Variable.h"
+#include "OTCore/MetadataEntry/MetadataEntry.h"
+
+// std header
+#include <list>
+
+class OT_CORE_API_EXPORT MetadataEntryArray : public MetadataEntry
 {
 public:
-	MetadataEntry(const std::string& entryName) : m_entryName(entryName) {}
-	virtual ~MetadataEntry() {};
-	virtual const std::string& getEntryName() const { return m_entryName; }
+	MetadataEntryArray(const std::string name, std::list<ot::Variable>&& values) : MetadataEntry(name), _values(values){}
+	MetadataEntryArray(const std::string name, const std::list<ot::Variable>& values) : MetadataEntry(name), _values(values){}
+	const std::list<ot::Variable>& getValues() const { return _values; }
+
+	bool operator==(const MetadataEntryArray& other);
 private:
-	std::string m_entryName;
+	std::list<ot::Variable> _values;
 };

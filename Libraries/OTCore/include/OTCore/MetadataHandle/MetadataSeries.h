@@ -21,15 +21,16 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+#include "OTCore/MetadataHandle/MetadataQuantity.h"
+#include "OTCore/MetadataHandle/MetadataParameter.h"
+#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <map>
 #include <list>
 #include <string>
 
-class OT_RESULTDATAACCESS_API_EXPORT MetadataSeries : public ot::Serializable
+class OT_CORE_API_EXPORT MetadataSeries : public ot::Serializable
 {
 public:
 	MetadataSeries(const std::string& name):m_name(name){};

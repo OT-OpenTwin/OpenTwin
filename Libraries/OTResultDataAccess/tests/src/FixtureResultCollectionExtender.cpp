@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: FixtureResultCollectionExtender.cpp
 // 
 // License:
@@ -19,8 +19,8 @@
 
 #include "FixtureResultCollectionExtender.h"
 
-#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntryArray.h"
+#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
+#include "OTCore/MetadataEntry/MetadataEntryArray.h"
 
 void FixtureResultCollectionExtender::initiateCampaignWithOneSeries()
 {

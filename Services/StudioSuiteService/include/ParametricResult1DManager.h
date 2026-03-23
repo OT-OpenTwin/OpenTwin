@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ParametricResult1DManager.h
 // 
 // License:
@@ -28,7 +28,7 @@ class ResultCollectionExtender;
 
 #include "OTCore/DefensiveProgramming.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+#include "OTCore/MetadataHandle/MetadataSeries.h"
 #include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 
 #include <string>

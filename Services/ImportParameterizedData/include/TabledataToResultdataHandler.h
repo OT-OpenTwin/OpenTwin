@@ -26,7 +26,7 @@
 #include "KeyValuesExtractor.h"
 #include "BusinessLogicHandler.h"
 #include "MetadataAssemblyData.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
+#include "OTCore/MetadataEntry/MetadataEntry.h"
 #include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 #include "OTModelEntities/EntityMetadataCampaign.h"
 #include "OTModelEntities/IVisualisationTable.h"

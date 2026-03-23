@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: MetadataEntryObject.h
 // 
 // License:
@@ -20,13 +20,13 @@
 #pragma once
 
 // OpenTwin header
-#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
+#include "OTCore/MetadataEntry/MetadataEntry.h"
 
 // std header
 #include <list>
 #include <memory>
 
-class MetadataEntryObject : public MetadataEntry
+class OT_CORE_API_EXPORT MetadataEntryObject : public MetadataEntry
 {
 public:
 	MetadataEntryObject(const std::string& _name) : MetadataEntry(_name) {}

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: TouchstoneToResultdata.h
 // 
 // License:
@@ -22,7 +22,7 @@
 #include "TouchstoneHandler.h"
 #include "BusinessLogicHandler.h"
 
-#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+#include "OTCore/MetadataHandle/MetadataSeries.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 

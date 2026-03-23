@@ -20,11 +20,11 @@
 // OpenTwin header
 #include "OTCore/Variable/VariableListToStringListConverter.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntryArray.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntryObject.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
+#include "OTCore/MetadataEntry/MetadataEntry.h"
+#include "OTCore/MetadataEntry/MetadataEntryArray.h"
+#include "OTCore/MetadataEntry/MetadataEntryObject.h"
+#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
+#include "OTResultDataAccess/MetadataEntityInterface.h"
 #include "OTCore/Tuple/TupleFactory.h"
 
 // std header

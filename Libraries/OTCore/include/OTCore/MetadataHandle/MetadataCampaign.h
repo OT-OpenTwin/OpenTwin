@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: MetadataCampaign.h
 // 
 // License:
@@ -22,17 +22,18 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
+#include "OTCore/MetadataHandle/MetadataSeries.h"
+#include "OTCore/MetadataHandle/MetadataQuantity.h"
+#include "OTCore/MetadataHandle/MetadataParameter.h"
+#include "OTCore/MetadataEntry/MetadataEntry.h"
+#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <map>
 #include <string>
 #include <memory>
 
-class OT_RESULTDATAACCESS_API_EXPORT MetadataCampaign : public ot::Serializable
+class OT_CORE_API_EXPORT MetadataCampaign : public ot::Serializable
 {
 public:
 	MetadataCampaign() = default;

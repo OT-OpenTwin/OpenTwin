@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: MetadataCampaign.cpp
 // 
 // License:
@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
+#include "OTCore/MetadataHandle/MetadataCampaign.h"
 
 // std header
 #include <cassert>

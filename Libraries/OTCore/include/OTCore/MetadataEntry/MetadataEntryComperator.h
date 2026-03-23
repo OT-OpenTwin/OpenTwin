@@ -1,5 +1,5 @@
-// @otlicense
-// File: MetadataEntrySingle.h
+﻿// @otlicense
+// File: MetadataEntryComperator.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,17 +20,13 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Variable/Variable.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
+#include "OTCore/MetadataEntry/MetadataEntry.h"
 
-class MetadataEntrySingle : public MetadataEntry
+// std header
+#include <memory>
+
+class OT_CORE_API_EXPORT MetadataEntryComperator
 {
 public:
-	MetadataEntrySingle(const std::string& name, ot::Variable&& value) : MetadataEntry(name), _value(value){}
-	MetadataEntrySingle(const std::string& name, const ot::Variable& value) : MetadataEntry(name), _value(value){}
-	const ot::Variable& getValue() const { return _value; }
-	bool operator==(const MetadataEntrySingle& other);
-
-private:
-	const ot::Variable _value;
+	bool operator()(std::shared_ptr<MetadataEntry> one, std::shared_ptr<MetadataEntry> two);
 };

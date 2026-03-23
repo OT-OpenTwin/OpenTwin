@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: QuantityContainer.cpp
 // 
 // License:
@@ -19,8 +19,8 @@
 
 // OpenTwin header
 #include "OTModelEntities/VariableToBSONConverter.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
+#include "OTCore/MetadataHandle/MetadataSeries.h"
+#include "OTCore/MetadataHandle/MetadataQuantity.h"
 #include "OTResultDataAccess/QuantityContainer.h"
 
 QuantityContainer::QuantityContainer(int64_t _seriesIndex, std::list<ot::UID>& _parameterAbbreviations, std::list<ot::Variable>&& _parameterValues, int64_t _quantityIndex)

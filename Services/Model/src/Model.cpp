@@ -106,7 +106,7 @@
 #include "tinyexpr.h"
 
 #include "OTBlockEntities/EntityBlock.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
+#include "OTResultDataAccess/MetadataEntityInterface.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 

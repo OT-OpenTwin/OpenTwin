@@ -27,8 +27,8 @@
 #include "OTModelEntities/DataBase.h"
 
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
+#include "OTCore/MetadataHandle/MetadataCampaign.h"
+#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/SerialisationInterfaces/ParameterDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"

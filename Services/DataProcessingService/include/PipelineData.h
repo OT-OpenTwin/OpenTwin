@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PipelineData.h
 // 
 // License:
@@ -21,10 +21,10 @@
 
 #include "DataDocument.h"
 
-#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
+#include "OTCore/MetadataHandle/MetadataCampaign.h"
+#include "OTCore/MetadataHandle/MetadataSeries.h"
+#include "OTCore/MetadataHandle/MetadataParameter.h"
+#include "OTCore/MetadataHandle/MetadataQuantity.h"
 
 
 #include <memory>

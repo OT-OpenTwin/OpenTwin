@@ -36,7 +36,7 @@
 #include "OTModelEntities/NewModelStateInfo.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
 
-#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
+#include "OTCore/MetadataHandle/MetadataQuantity.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"

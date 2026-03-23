@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: TouchstoneHandler.h
 // 
 // License:
@@ -26,7 +26,7 @@
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 #include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+#include "OTCore/MetadataHandle/MetadataParameter.h"
 
 // std header
 #include <list>

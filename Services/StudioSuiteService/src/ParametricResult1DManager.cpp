@@ -31,9 +31,9 @@
 #include "OTModelEntities/EntityResult1DPlot.h"
 
 #include "OTResultDataAccess/CurveFactory.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
+#include "OTCore/MetadataHandle/MetadataSeries.h"
+#include "OTCore/MetadataHandle/MetadataParameter.h"
+#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"

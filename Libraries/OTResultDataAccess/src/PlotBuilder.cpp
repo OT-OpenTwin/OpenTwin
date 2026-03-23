@@ -24,7 +24,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
 #include "OTResultDataAccess/PlotBuilder.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
+#include "OTCore/MetadataHandle/MetadataSeries.h"
 #include "OTResultDataAccess/CurveFactory.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"

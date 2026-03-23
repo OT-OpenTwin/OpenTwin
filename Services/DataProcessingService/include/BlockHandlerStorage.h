@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BlockHandlerStorage.h
 // 
 // License:
@@ -20,7 +20,7 @@
 #pragma once
 #include "BlockHandler.h"
 #include "OTBlockEntities/Pipeline/EntityBlockStorage.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+#include "OTCore/MetadataHandle/MetadataParameter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 
 class BlockHandlerStorage : public BlockHandler

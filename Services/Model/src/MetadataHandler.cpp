@@ -4,7 +4,7 @@
 #include "OTModelEntities/DataBase.h"
 #include "CrossCollectionDatabaseWrapper.h"
 #include "OTModelEntities/EntityAPI.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataEntityInterface.h"
+#include "OTResultDataAccess/MetadataEntityInterface.h"
 
 MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projectName)
 {

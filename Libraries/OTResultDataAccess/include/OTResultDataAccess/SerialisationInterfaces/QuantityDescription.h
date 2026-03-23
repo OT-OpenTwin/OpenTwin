@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: QuantityDescription.h
 // 
 // License:
@@ -23,7 +23,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/DefensiveProgramming.h"
 #include "OTCore/Variable/Variable.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataQuantity.h"
+#include "OTCore/MetadataHandle/MetadataQuantity.h"
 #include "OTResultDataAccess/ResultDataAccessAPIExport.h"
 
 // std header

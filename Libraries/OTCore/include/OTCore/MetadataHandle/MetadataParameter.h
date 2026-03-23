@@ -25,8 +25,8 @@
 #include "OTCore/Variable/Variable.h"
 #include "OTCore/Variable/VariableToJSONConverter.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
-#include "OTResultDataAccess/ResultDataAccessAPIExport.h"
+#include "OTCore/MetadataEntry/MetadataEntry.h"
+#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <map>
@@ -34,7 +34,7 @@
 #include <memory>
 #include <string>
 
-class OT_RESULTDATAACCESS_API_EXPORT MetadataParameter : public ot::Serializable
+class OT_CORE_API_EXPORT MetadataParameter : public ot::Serializable
 {
 public:
 	MetadataParameter() = default;

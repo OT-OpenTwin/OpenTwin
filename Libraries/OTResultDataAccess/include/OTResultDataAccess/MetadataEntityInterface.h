@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: MetadataEntityInterface.h
 // 
 // License:
@@ -24,9 +24,9 @@
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTModelEntities/EntityMetadataCampaign.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataCampaign.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
-
+#include "OTCore/MetadataHandle/MetadataCampaign.h"
+#include "OTCore/MetadataEntry/MetadataEntry.h"
+#include "OTResultDataAccess/ResultDataAccessAPIExport.h"
 // std header
 #include <stdint.h>
 

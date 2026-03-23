@@ -21,11 +21,12 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
-#include "OTResultDataAccess/MetadataEntry/MetadataEntry.h"
-#include "OTResultDataAccess/ResultDataAccessAPIExport.h"
+#include "OTCore/MetadataEntry/MetadataEntry.h"
+
 #include "OTCore/Tuple/TupleDescription.h"
 #include "OTCore/Tuple/TupleInstance.h"
 #include "OTCore/Variable/Variable.h"
+#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <stdint.h>
@@ -35,7 +36,7 @@
 #include <vector>
 #include <memory>
 
-class OT_RESULTDATAACCESS_API_EXPORT MetadataQuantity : public ot::Serializable
+class OT_CORE_API_EXPORT MetadataQuantity : public ot::Serializable
 {
 public:
 	std::string quantityName = "";

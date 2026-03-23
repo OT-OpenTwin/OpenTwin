@@ -24,10 +24,10 @@
 #include "LTSpiceRawReader.h"
 
 #include "OTResultDataAccess/CurveFactory.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataSeries.h"
-#include "OTResultDataAccess/MetadataHandle/MetadataParameter.h"
+#include "OTCore/MetadataHandle/MetadataSeries.h"
+#include "OTCore/MetadataHandle/MetadataParameter.h"
 
-#include "OTResultDataAccess/MetadataEntry/MetadataEntrySingle.h"
+#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
