@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityBase.h
 // 
 // License:
@@ -33,7 +33,6 @@
 #include "OTModelEntities/EntityCallbackBase.h"
 #include "OTModelEntities/EntityFactoryRegistrar.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
-
 // BSON header
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -63,6 +62,7 @@ public:
 	virtual void requestLibraryElement(ot::JsonDocument& _doc) {};
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
+	//virtual MetadataCampaign getMetadataCampaign(const std::string _projectName) {};
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################

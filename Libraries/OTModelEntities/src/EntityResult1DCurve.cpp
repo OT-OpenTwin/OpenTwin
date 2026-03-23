@@ -126,6 +126,12 @@ bool EntityResult1DCurve::updateFromProperties()
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+void  EntityResult1DCurve::updateMetadataProperties()
+{
+	
+}
+
+
 // Configuration
 
 void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
@@ -544,3 +550,5 @@ ot::DataPointDecoder EntityResult1DCurve::deserialise(bsoncxx::v_noabi::document
 	quantityContainerEntryDescription.setTupleInstance(std::move(tupleInstance));
 	return quantityContainerEntryDescription;
 }
+
+

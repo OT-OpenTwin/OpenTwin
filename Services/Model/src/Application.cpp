@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Application.cpp
 // 
 // License:
@@ -679,6 +679,7 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 	ModelState secondary(m_model->getSessionCount(), static_cast<unsigned int>(m_model->getServiceID()));
 	secondary.openProject();
 
+	// Load entire modelstate
 	std::list<ot::UID> prefetchIds;
 	secondary.getListOfTopologyEntites(prefetchIds);
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;

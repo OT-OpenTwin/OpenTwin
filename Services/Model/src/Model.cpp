@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Model.cpp
 // 
 // License:
@@ -4092,6 +4092,11 @@ void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visua
 	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationCfg);
 }
 
+//MetadataCampaign Model::getMetadataCampaign(const std::string _projectName)
+//{
+//	return m_metadataHandler.getMetadataCampaign(_projectName);
+//}
+
 EntityBase *Model::findEntityFromName(const std::string &name)
 {
 	if (m_entityRoot == nullptr) return nullptr;
@@ -4216,6 +4221,30 @@ std::list<ot::UID> Model::getIDsOfFolderItemsOfType(const std::string &folder, c
 		if (container != nullptr)
 		{
 			getIDsOfFolderItemsOfType(container, className, recursive, folderItems);
+		}
+	}
+
+	return folderItems;
+}
+
+ot::UIDList Model::getIDsOfFolderItems(const std::string& folder, bool recursive)
+{
+	ot::UIDList folderItems;
+	EntityBase* item = findEntityFromName(folder);
+	if (item != nullptr)
+	{
+		EntityContainer* container = dynamic_cast<EntityContainer*>(item);
+		if (container != nullptr)
+		{
+			for (auto child : container->getChildrenList())
+			{
+				folderItems.push_back(child->getEntityID());
+				if (recursive)
+				{
+					ot::UIDList childrenList = getIDsOfFolderItems(child->getName(), recursive);
+					folderItems.splice(folderItems.end(), childrenList);
+				}
+			}
 		}
 	}
 

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Model.h
 // 
 // License:
@@ -34,7 +34,7 @@
 #include "OTModelEntities/NewModelStateInfo.h"
 #include "OTCADEntities/EntityFaceAnnotation.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
-
+#include "MetadataHandler.h"
 // std header
 #include <string>
 #include <map>
@@ -71,6 +71,7 @@ public:
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) override;
 	virtual void requestLibraryElement(ot::JsonDocument& _doc) override;
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
+	//virtual MetadataCampaign getMetadataCampaign(const std::string _projectName) override;
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName);
 	virtual ~Model();
@@ -194,6 +195,7 @@ public:
 	std::list<ot::UID> getNewEntityIDs(unsigned long long count);
 	std::list<std::string> getListOfFolderItems(const std::string &folder, bool recursive);
 	std::list<ot::UID> getIDsOfFolderItemsOfType(const std::string &folder, const std::string &className, bool recursive);
+	ot::UIDList getIDsOfFolderItems(const std::string &folder, bool recursive);
 	std::list<EntityBase*> getListOfSelectedEntities(const std::string &typeFilter = "");
 	void addPropertiesToEntities(std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration);
 	void updatePropertiesOfEntities(std::list<ot::UID> &entityIDList, const std::string& _entitiesJson);
@@ -323,6 +325,8 @@ private:
 	void handleShowSelectedShapeInformation();
 	void handleCreateNewParameter();
 	void handleCreateNewGroup();
+
+	MetadataHandler m_metadataHandler;
 
 	// Persistent attributes (need to be stored in data base)
 	EntityContainer*               m_entityRoot;

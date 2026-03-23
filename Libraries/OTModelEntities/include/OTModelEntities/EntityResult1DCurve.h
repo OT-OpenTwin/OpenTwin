@@ -101,7 +101,7 @@ protected:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private: Helper
+	
 
 private:
 	ot::QueryInformation m_queryInformation;
@@ -109,4 +109,6 @@ private:
 
 	bsoncxx::builder::basic::document serialise(const ot::DataPointDecoder& _quantityContainerEntryDescription);
 	ot::DataPointDecoder deserialise(bsoncxx::v_noabi::document::view _subDocument);
+
+	void updateMetadataProperties();
 };
