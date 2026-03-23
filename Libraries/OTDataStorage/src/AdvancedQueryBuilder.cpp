@@ -151,8 +151,8 @@ std::string AdvancedQueryBuilder::createFieldName(const ot::ValueComparisonDescr
 	if (isTuple && !queryTargetsEntireTuple(_definition))
 	{
 		//Better here a converter that transforms the tuple into an array and also does the number transformations if indicated by the valueDescription.
-		TupleDescription* tupleDescription = TupleFactory::create(_definition.getTupleInstance().getTupleTypeName());
-		TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(tupleDescription);
+		ot::TupleDescription* tupleDescription = TupleFactory::create(_definition.getTupleInstance().getTupleTypeName());
+		ot::TupleDescriptionComplex* complexTupleDescription = dynamic_cast<ot::TupleDescriptionComplex*>(tupleDescription);
 		assert(complexTupleDescription != nullptr);
 		const std::string targetElement = _definition.getTupleTarget();
 
@@ -178,7 +178,7 @@ BsonViewOrValue AdvancedQueryBuilder::createComparison(const std::string _fieldN
 	}
 	else if (_comparators.size() == 1 && _values.size() > 1)
 	{
-		//Here we have an array compare (Tuple, in or not in). Guard against invalid operators on this field is part of extractMongoComparators
+		// Here we have an array compare (Tuple, in or not in). Guard against invalid operators on this field is part of extractMongoComparators
 		comparison = GenerateFilterQuery(_comparators.front(), _values);
 	}
 	else

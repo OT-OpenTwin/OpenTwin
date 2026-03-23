@@ -24,15 +24,15 @@
 void QuantityDescription::defineQuantityAsSingle(const std::string& _dataType, const std::string& _unit)
 {
 
-	const TupleInstance tuple =	TupleDescriptionSingle::createInstance(_unit, _dataType);
+	const ot::TupleInstance tuple = ot::TupleDescriptionSingle::createInstance(_unit, _dataType);
 	m_metadataQuantity.m_tupleDescription = tuple;
 }
 
 void QuantityDescription::defineQuantityAsComplex(ot::ComplexNumberFormat _format, const std::string& _dataType, const std::string& _firstUnit, const std::string& _secondUnit)
 {
 
-	TupleDescriptionComplex tupleDescription;
-	const TupleInstance instance = tupleDescription.createInstance(_format, { _firstUnit,_secondUnit }, { _dataType,_dataType });
+	ot::TupleDescriptionComplex tupleDescription;
+	const ot::TupleInstance instance = tupleDescription.createInstance(_format, { _firstUnit,_secondUnit }, { _dataType,_dataType });
 	m_metadataQuantity.m_tupleDescription = instance;
 }
 

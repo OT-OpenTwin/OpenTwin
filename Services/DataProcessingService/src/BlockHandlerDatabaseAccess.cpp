@@ -213,7 +213,7 @@ void BlockHandlerDatabaseAccess::createQueryDescriptionsQuantities(EntityBlockDa
 			relatedParameterUIDs.insert(relatedParameterUIDs.begin(), viableQuantity->dependingParameterIds.begin(), viableQuantity->dependingParameterIds.end());
 			ot::ValueComparisonDescription comparisonDescription = quantityDef;
 			comparisonDescription.setName(viableQuantity->quantityName);
-			TupleInstance tupleInstance = 	quantityDef.getTupleInstance();
+			ot::TupleInstance tupleInstance = quantityDef.getTupleInstance();
 			tupleInstance.setTupleTypeName(viableQuantity->m_tupleDescription.getTupleTypeName());
 			comparisonDescription.setTupleInstance(tupleInstance);
 

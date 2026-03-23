@@ -59,7 +59,7 @@ private:
 	std::list <ot::PlotDataset*> createSingleCurve(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
 	std::list<ot::PlotDataset*> createCurveFamily(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, ot::ConstJsonArray& _allMongoDBDocuments);
 	
-	std::optional<ot::ValueComparisonDescription> createValidValueComparison(const ot::QuantityContainerEntryDescription& _desciption, const ot::ValueComparisonDescription& _comparision);
+	std::optional<ot::ValueComparisonDescription> createValidValueComparison(const ot::DataPointDecoder& _desciption, const ot::ValueComparisonDescription& _comparision);
 
 	double jsonToDouble(const std::string& _memberName, ot::ConstJsonObject& _jesonEntry, const std::string& _dataType);
 	double jsonToDouble(const rapidjson::Value& _jesonEntry, const std::string& _dataType);

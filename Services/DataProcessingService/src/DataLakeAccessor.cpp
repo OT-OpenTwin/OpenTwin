@@ -146,7 +146,7 @@ void DataLakeAccessor::createQueries(BsonViewOrValue& _resultCollectionQuery, Bs
 	}
 }
 
-bool DataLakeAccessor::transformationNecessary(const TupleInstance& _storedFormat, const TupleInstance& _queryFormat)
+bool DataLakeAccessor::transformationNecessary(const ot::TupleInstance& _storedFormat, const ot::TupleInstance& _queryFormat)
 {
 	if (!(_storedFormat == _queryFormat))
 	{
@@ -170,7 +170,7 @@ bool DataLakeAccessor::alreadyStoredTransformation(const ot::QueryDescription& _
 	DataStorageAPI::DataLakeAPI transformedCollectionAccess(m_collectionName, m_transformedCollectionEnding);
 
 	const std::string fieldValue = _queryDescription.getQueryTargetDescription().getMongoDBFieldName();
-	TupleInstance instance;
+	ot::TupleInstance instance;
 	instance.setTupleElementDataTypes({ ot::TypeNames::getInt64TypeName() });
 	ot::ValueComparisonDescription quantitySelection(MetadataQuantity::getFieldName(), "=", fieldValue, instance);
 	AdvancedQueryBuilder builder;
@@ -202,7 +202,7 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 {
 	// First we gather the data from the result collection
 	const std::string fieldValue = _queryDescription.getQueryTargetDescription().getMongoDBFieldName();
-	TupleInstance instance;
+	ot::TupleInstance instance;
 	instance.setTupleElementDataTypes({ ot::TypeNames::getInt64TypeName() });
 	ot::ValueComparisonDescription quantitySelection(MetadataQuantity::getFieldName(), "=", fieldValue, instance);
 	AdvancedQueryBuilder builder;
@@ -278,8 +278,8 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 		const std::string queryFormatName = queryDescription.getTupleInstance().getTupleFormatName();
 		
 		const std::string storedTupleType = storedDataDescr.getTupleInstance().getTupleTypeName();
-		TupleDescription* tupleDescription = TupleFactory::create(storedTupleType);
-		TupleDescriptionComplex* complexDescr = dynamic_cast<TupleDescriptionComplex*>(tupleDescription);
+		ot::TupleDescription* tupleDescription = TupleFactory::create(storedTupleType);
+		ot::TupleDescriptionComplex* complexDescr = dynamic_cast<ot::TupleDescriptionComplex*>(tupleDescription);
 		std::function<std::pair<double, double>(double, double)> transformFormat;
 
 		if (queryFormatName == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian))
@@ -458,7 +458,7 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		std::list<BsonViewOrValue > queryElements;
 		//First we need to define a query for the quantity ID
 		const std::string fieldValue = queryDescription.getQueryTargetDescription().getMongoDBFieldName();
-		TupleInstance instance;
+		ot::TupleInstance instance;
 		instance.setTupleElementDataTypes({ ot::TypeNames::getInt64TypeName() });
 		ot::ValueComparisonDescription quantitySelection(MetadataQuantity::getFieldName(), "=", fieldValue, instance);
 		queryElements.push_back(builder.createComparison(quantitySelection));
@@ -593,8 +593,8 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateComparisonConsideringUn
 			// Special handling for query of a single tuple entry.
 			assert(values.size() == 1);
 
-			TupleDescription* tupleDescription = TupleFactory::create(_queryDescription.getQueryTargetDescription().getTupleInstance().getTupleTypeName());
-			TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(tupleDescription);
+			ot::TupleDescription* tupleDescription = TupleFactory::create(_queryDescription.getQueryTargetDescription().getTupleInstance().getTupleTypeName());
+			ot::TupleDescriptionComplex* complexTupleDescription = dynamic_cast<ot::TupleDescriptionComplex*>(tupleDescription);
 			assert(complexTupleDescription != nullptr);
 			const std::string targetElement = _queryDescription.getValueComparisonDescription().getTupleTarget();
 
@@ -682,8 +682,8 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateQueryFromSIBaseToTarget
 			// Special handling for query of a single tuple entry.
 			assert(values.size() == 1);
 
-			TupleDescription* tupleDescription = TupleFactory::create(_queryDescription.getQueryTargetDescription().getTupleInstance().getTupleTypeName());
-			TupleDescriptionComplex* complexTupleDescription = dynamic_cast<TupleDescriptionComplex*>(tupleDescription);
+			ot::TupleDescription* tupleDescription = TupleFactory::create(_queryDescription.getQueryTargetDescription().getTupleInstance().getTupleTypeName());
+			ot::TupleDescriptionComplex* complexTupleDescription = dynamic_cast<ot::TupleDescriptionComplex*>(tupleDescription);
 			assert(complexTupleDescription != nullptr);
 			const std::string targetElement = _queryDescription.getValueComparisonDescription().getTupleTarget();
 

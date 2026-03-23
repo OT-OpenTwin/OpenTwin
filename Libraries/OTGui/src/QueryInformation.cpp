@@ -48,7 +48,7 @@ void ot::QueryInformation::setFromJsonObject(const ot::ConstJsonObject& _object)
 	for (uint32_t i = 0; i < quantityContainerEntryDescription.Size(); i++)
 	{
 		 ot::ConstJsonObject entry = ot::json::getObject(quantityContainerEntryDescription, i);
-		 QuantityContainerEntryDescription parameterDescsr;
+		 DataPointDecoder parameterDescsr;
 		 parameterDescsr.setFromJsonObject(entry);
 		 m_parameterDescriptions.push_back(parameterDescsr);
 	}

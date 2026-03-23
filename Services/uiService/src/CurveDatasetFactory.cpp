@@ -180,7 +180,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 	const uint32_t numberOfDocuments = _allMongoDBDocuments.Size();
 
 	const ot::QueryInformation& queryInformation =_curveCfg.getQueryInformation();
-	const ot::QuantityContainerEntryDescription& quantityInformation = queryInformation.getQuantityDescription();
+	const ot::DataPointDecoder& quantityInformation = queryInformation.getQuantityDescription();
 	assert(queryInformation.getParameterDescriptions().size() == 1); // For a single curve there should be only one parameter
 
 	std::vector<uint32_t> quantityDimensions = quantityInformation.getDimension();
@@ -208,7 +208,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 
 	auto entryDescription = queryInformation.getParameterDescriptions().begin();
 
-	const TupleInstance& tupleInstance = quantityInformation.getTupleInstance();
+	const ot::TupleInstance& tupleInstance = quantityInformation.getTupleInstance();
 
 	for (uint32_t i = 0; i < numberOfDocuments; i++) {
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);		
@@ -322,7 +322,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		
 	//Lables of curves will be <parameter_Label_1>_<parameter_Value_1>_<parameter_Unit_1>_ ... _<parameter_Label_n>_<parameter_Value_n>_<parameter_Unit_n>
 	const ot::QueryInformation queryInformation = _curveCfg.getQueryInformation();
-	const ot::QuantityContainerEntryDescription& quantityInformation = queryInformation.getQuantityDescription();
+	const ot::DataPointDecoder& quantityInformation = queryInformation.getQuantityDescription();
 
 	size_t numberOfDocuments = _allMongoDBDocuments.Size();
 	std::string xAxisParameterLabel = _xAxisParameter;
@@ -332,7 +332,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		xAxisParameterLabel = queryInformation.getParameterDescriptions().begin()->getLabel();
 	}
 
-	const ot::QuantityContainerEntryDescription* xAxisParameter = nullptr;
+	const ot::DataPointDecoder* xAxisParameter = nullptr;
 	for (const auto& parameterDescription : queryInformation.getParameterDescriptions())
 	{
 		if (parameterDescription.getLabel() == xAxisParameterLabel)
@@ -359,7 +359,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		{
 			if (&additionalParameter != xAxisParameter)
 			{
-				const TupleInstance& parameterTuple =  additionalParameter.getTupleInstance();
+				const ot::TupleInstance& parameterTuple =  additionalParameter.getTupleInstance();
 
 				auto& additionalParameterEntry = singleMongoDocument[additionalParameter.getFieldName().c_str()];
 				const std::string value =	ot::json::toJson(additionalParameterEntry);
@@ -392,7 +392,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		{
 			dataPoints.push_back(Datapoints());
 		}
-		const TupleInstance& tupleInstance =	quantityInformation.getTupleInstance();
+		const ot::TupleInstance& tupleInstance =	quantityInformation.getTupleInstance();
 		if (ot::json::isArray(singleMongoDocument, quantityInformation.getFieldName()))
 		{
 			//Get x-axis value
@@ -617,7 +617,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 	return dataSets;
 }
 
-std::optional<ot::ValueComparisonDescription> CurveDatasetFactory::createValidValueComparison(const ot::QuantityContainerEntryDescription& _desciption, const ot::ValueComparisonDescription& _comparison)
+std::optional<ot::ValueComparisonDescription> CurveDatasetFactory::createValidValueComparison(const ot::DataPointDecoder& _desciption, const ot::ValueComparisonDescription& _comparison)
 {
 	const std::string fieldName = _comparison.getName();
 	const std::string comparator = _comparison.getComparator();
@@ -626,7 +626,7 @@ std::optional<ot::ValueComparisonDescription> CurveDatasetFactory::createValidVa
 	{
 		ot::ValueComparisonDescription validComparison = _comparison;
 		validComparison.setName(_desciption.getFieldName());
-		TupleInstance instance;
+		ot::TupleInstance instance;
 		instance.setTupleElementDataTypes({ _desciption.getTupleInstance().getTupleElementDataTypes().front() });
 		validComparison.setTupleInstance(instance);
 		return validComparison;

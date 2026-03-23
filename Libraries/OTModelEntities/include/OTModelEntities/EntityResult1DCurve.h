@@ -107,6 +107,6 @@ private:
 	ot::QueryInformation m_queryInformation;
 	PropertyBundleDataLakeQuery m_queryProperties;
 
-	bsoncxx::builder::basic::document serialise(const ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription);
-	ot::QuantityContainerEntryDescription deserialise(bsoncxx::v_noabi::document::view _subDocument);
+	bsoncxx::builder::basic::document serialise(const ot::DataPointDecoder& _quantityContainerEntryDescription);
+	ot::DataPointDecoder deserialise(bsoncxx::v_noabi::document::view _subDocument);
 };

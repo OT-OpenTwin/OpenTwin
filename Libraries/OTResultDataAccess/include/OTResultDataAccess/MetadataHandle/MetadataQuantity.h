@@ -56,7 +56,7 @@ public:
 	std::vector<std::string> dependingParameterLabels;
 	std::vector<ot::UID> dependingParameterIds;
 	
-	TupleInstance m_tupleDescription;
+	ot::TupleInstance m_tupleDescription;
 
 	std::map < std::string, std::shared_ptr<MetadataEntry>> metaData;
 

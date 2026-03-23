@@ -25,7 +25,7 @@
 
 namespace ot {
 
-	class __declspec(dllexport) ValueComparisonDescription : public ot::Serializable {
+	class OT_CORE_API_EXPORT ValueComparisonDescription : public ot::Serializable {
 	public:
 		ValueComparisonDescription(const ValueComparisonDescription& _other) = default;
 		ValueComparisonDescription(ValueComparisonDescription&& _other) = default;

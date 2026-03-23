@@ -433,11 +433,11 @@ void EntityResult1DCurve::addStorageData(bsoncxx::builder::basic::document& stor
 {
 	EntityBase::addStorageData(storage);
 
-	const ot::QuantityContainerEntryDescription& quantityDescription = m_queryInformation.getQuantityDescription();
+	const ot::DataPointDecoder& quantityDescription = m_queryInformation.getQuantityDescription();
 	bsoncxx::builder::basic::document quantityDescriptionSerialised = serialise(quantityDescription);
 
 	bsoncxx::builder::basic::array arrayOfSubDocs;
-	for (const ot::QuantityContainerEntryDescription& parameterDescr : m_queryInformation.getParameterDescriptions())
+	for (const ot::DataPointDecoder& parameterDescr : m_queryInformation.getParameterDescriptions())
 	{
 		bsoncxx::builder::basic::document parameterDescrDoc = serialise(parameterDescr);
 		arrayOfSubDocs.append(parameterDescrDoc.extract());
@@ -469,7 +469,7 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 	for (auto parameterDescription = parameterDescriptions.begin(); parameterDescription != parameterDescriptions.end(); parameterDescription++)
 	{
 		const auto& parameterDoc = parameterDescription->get_document();
-		ot::QuantityContainerEntryDescription parameterDesc = deserialise(parameterDoc);
+		ot::DataPointDecoder parameterDesc = deserialise(parameterDoc);
 		m_queryInformation.addParameterDescription(std::move(parameterDesc));
 	}
 }
@@ -478,7 +478,7 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 
 // Private: Helper
 
-bsoncxx::builder::basic::document EntityResult1DCurve::serialise(const ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription)
+bsoncxx::builder::basic::document EntityResult1DCurve::serialise(const ot::DataPointDecoder& _quantityContainerEntryDescription)
 {
 	bsoncxx::builder::basic::document subDocument;
 
@@ -487,7 +487,7 @@ bsoncxx::builder::basic::document EntityResult1DCurve::serialise(const ot::Quant
 	{
 		quantityDimensions.append(static_cast<int32_t>(dimension));
 	}
-	const TupleInstance& tupleInstance = _quantityContainerEntryDescription.getTupleInstance();
+	const ot::TupleInstance& tupleInstance = _quantityContainerEntryDescription.getTupleInstance();
 	bsoncxx::builder::basic::array tupleDataTypes;
 	for (const std::string& dataType : tupleInstance.getTupleElementDataTypes())
 	{
@@ -510,10 +510,10 @@ bsoncxx::builder::basic::document EntityResult1DCurve::serialise(const ot::Quant
 	return subDocument;
 }
 
-ot::QuantityContainerEntryDescription EntityResult1DCurve::deserialise(bsoncxx::v_noabi::document::view _subDocument)
+ot::DataPointDecoder EntityResult1DCurve::deserialise(bsoncxx::v_noabi::document::view _subDocument)
 {
-	ot::QuantityContainerEntryDescription quantityContainerEntryDescription;
-	TupleInstance tupleInstance;
+	ot::DataPointDecoder quantityContainerEntryDescription;
+	ot::TupleInstance tupleInstance;
 
 	quantityContainerEntryDescription.setFieldName(std::string(_subDocument["FieldName"].get_string()));
 	quantityContainerEntryDescription.setLabel(std::string(_subDocument["Label"].get_string()));

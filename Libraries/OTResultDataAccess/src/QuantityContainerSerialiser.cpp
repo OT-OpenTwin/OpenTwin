@@ -142,7 +142,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	
 	auto quantityMetadata =	_quantityDescription->getMetadataQuantity();
 	
-	TupleDescriptionComplex complexTupleDescription;
+	ot::TupleDescriptionComplex complexTupleDescription;
 	assert(quantityMetadata.m_tupleDescription.getTupleTypeName() == complexTupleDescription.getName());
 		
 	m_bucketSize = 1;
@@ -198,7 +198,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	const uint32_t numberOfPorts = quantityMetadata.dataDimensions.front();
 	m_bucketSize = numberOfPorts * numberOfPorts;
 
-	TupleDescriptionComplex complexTupleDescription;
+	ot::TupleDescriptionComplex complexTupleDescription;
 	assert(quantityMetadata.m_tupleDescription.getTupleTypeName() == complexTupleDescription.getName());
 
 	const size_t numberOfDocuments = _numberOfParameterValues * 2;

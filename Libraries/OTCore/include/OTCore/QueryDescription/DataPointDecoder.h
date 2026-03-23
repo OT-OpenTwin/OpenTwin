@@ -1,5 +1,5 @@
 ﻿// @otlicense
-// File: QuantityContainerEntryDescription.h
+// File: DataPointDecoder.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -22,22 +22,16 @@
 // OpenTwin header
 #include "OTCore/Serializable.h"
 #include "OTCore/Tuple/TupleInstance.h"
-#include "OTGui/OTGuiAPIExport.h"
-
-// std header
-#include <string>
-
-#pragma warning(disable:4251)
 
 namespace ot
 {
-	class OT_GUI_API_EXPORT QuantityContainerEntryDescription : public ot::Serializable
+	class OT_CORE_API_EXPORT DataPointDecoder : public ot::Serializable
 	{
-		OT_DECL_DEFCOPY(QuantityContainerEntryDescription)
-		OT_DECL_DEFMOVE(QuantityContainerEntryDescription)
+		OT_DECL_DEFCOPY(DataPointDecoder)
+		OT_DECL_DEFMOVE(DataPointDecoder)
 	public:
-		QuantityContainerEntryDescription() = default;
-		~QuantityContainerEntryDescription() = default;
+		DataPointDecoder() = default;
+		~DataPointDecoder() = default;
 
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;

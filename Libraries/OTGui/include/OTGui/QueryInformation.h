@@ -21,7 +21,8 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
-#include "OTGui/QuantityContainerEntryDescription.h"
+#include "OTCore/QueryDescription/DataPointDecoder.h"
+#include "OTGui/GuiTypes.h"
 
 // std header
 #include <string>
@@ -51,25 +52,25 @@ namespace ot
 
 		//! @brief Set the quantity description for the main quantity of interest (e.g. Y-Axis in a 1D plot).
 		//! This is also used for the curve family parameter in a 1D plot if no parameter descriptions are provided.
-		inline void setQuantityDescription(const QuantityContainerEntryDescription& _quantityDescription) { m_quantityDescription = _quantityDescription; };
-		inline void setQuantityDescription(QuantityContainerEntryDescription&& _quantityDescription) { m_quantityDescription = std::move(_quantityDescription); };
-		const QuantityContainerEntryDescription& getQuantityDescription() const { return m_quantityDescription; };
+		inline void setQuantityDescription(const DataPointDecoder& _quantityDescription) { m_quantityDescription = _quantityDescription; };
+		inline void setQuantityDescription(DataPointDecoder&& _quantityDescription) { m_quantityDescription = std::move(_quantityDescription); };
+		const DataPointDecoder& getQuantityDescription() const { return m_quantityDescription; };
 
-		inline void addParameterDescription(const QuantityContainerEntryDescription& _parameterDescription) { m_parameterDescriptions.push_back(_parameterDescription); };
-		inline void addParameterDescription(QuantityContainerEntryDescription&& _parameterDescription) { m_parameterDescriptions.push_back(std::move(_parameterDescription)); };
-		inline void addParameterDescriptionFront(const QuantityContainerEntryDescription& _parameterDescription) { m_parameterDescriptions.push_front(_parameterDescription); };
-		inline void addParameterDescriptionFront(QuantityContainerEntryDescription&& _parameterDescription) { m_parameterDescriptions.push_front(std::move(_parameterDescription)); };
-		inline void setParameterDescriptions(const std::list<QuantityContainerEntryDescription>& _parameterDescriptions) { m_parameterDescriptions = _parameterDescriptions; };
-		inline void setParameterDescriptions(std::list<QuantityContainerEntryDescription>&& _parameterDescriptions) { m_parameterDescriptions = std::move(_parameterDescriptions); };
-		const std::list<QuantityContainerEntryDescription>& getParameterDescriptions() const { return m_parameterDescriptions; };
+		inline void addParameterDescription(const DataPointDecoder& _parameterDescription) { m_parameterDescriptions.push_back(_parameterDescription); };
+		inline void addParameterDescription(DataPointDecoder&& _parameterDescription) { m_parameterDescriptions.push_back(std::move(_parameterDescription)); };
+		inline void addParameterDescriptionFront(const DataPointDecoder& _parameterDescription) { m_parameterDescriptions.push_front(_parameterDescription); };
+		inline void addParameterDescriptionFront(DataPointDecoder&& _parameterDescription) { m_parameterDescriptions.push_front(std::move(_parameterDescription)); };
+		inline void setParameterDescriptions(const std::list<DataPointDecoder>& _parameterDescriptions) { m_parameterDescriptions = _parameterDescriptions; };
+		inline void setParameterDescriptions(std::list<DataPointDecoder>&& _parameterDescriptions) { m_parameterDescriptions = std::move(_parameterDescriptions); };
+		const std::list<DataPointDecoder>& getParameterDescriptions() const { return m_parameterDescriptions; };
 
 	private:
 		std::string m_query;
 		std::string m_projection;
 
-		QuantityContainerEntryDescription m_quantityDescription;
+		DataPointDecoder m_quantityDescription;
 
 		// Curves are using the parameter prioritised by their order in this list. E.g. the first entry is used in a 1D plot as X-Axis, the remaining are used for plotting the curve family.
-		std::list<QuantityContainerEntryDescription> m_parameterDescriptions;
+		std::list<DataPointDecoder> m_parameterDescriptions;
 	};	
 }

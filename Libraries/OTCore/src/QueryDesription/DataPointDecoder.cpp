@@ -1,5 +1,5 @@
 ﻿// @otlicense
-// File: QuantityContainerEntryDescription.cpp
+// File: DataPointDecoder.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,9 +18,9 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/QuantityContainerEntryDescription.h"
+#include "OTCore/QueryDescription/DataPointDecoder.h"
 
-void ot::QuantityContainerEntryDescription::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
+void ot::DataPointDecoder::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const
 {
 	_object.AddMember("FieldName", JsonString(m_fieldName, _allocator), _allocator);
 	_object.AddMember("Label", JsonString(m_label, _allocator), _allocator);
@@ -28,7 +28,7 @@ void ot::QuantityContainerEntryDescription::addToJsonObject(ot::JsonValue& _obje
 	_object.AddMember("TupleInstance", JsonObject(m_tupleInstance, _allocator), _allocator);
 }
 
-void ot::QuantityContainerEntryDescription::setFromJsonObject(const ot::ConstJsonObject& _object)
+void ot::DataPointDecoder::setFromJsonObject(const ConstJsonObject& _object)
 {
 	m_fieldName = ot::json::getString(_object, "FieldName");
 	m_label = ot::json::getString(_object, "Label");

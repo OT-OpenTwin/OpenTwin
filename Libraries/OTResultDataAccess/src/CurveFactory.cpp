@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/QuantityContainerEntryDescription.h"
+#include "OTCore/QueryDescription/DataPointDecoder.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTResultDataAccess/CurveFactory.h"
 #include "OTResultDataAccess/QuantityContainer.h"
@@ -66,12 +66,12 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 		throw std::exception("Curve creation failed to extract the y-axis information");
 	}
 	
-	TupleInstance tupleDescription = selectedQuantity->m_tupleDescription;
+	ot::TupleInstance tupleDescription = selectedQuantity->m_tupleDescription;
 	int tupleIndex = 0;
 			
 	queryInformation.setQuery(createQuery(_series.getSeriesIndex(), selectedQuantity->quantityIndex));
 	
-	ot::QuantityContainerEntryDescription quantityInformation;
+	ot::DataPointDecoder quantityInformation;
 	quantityInformation.setFieldName(QuantityContainer::getFieldName());
 	quantityInformation.setLabel(selectedQuantity->quantityName);
 	quantityInformation.setDimension(selectedQuantity->dataDimensions);
@@ -85,10 +85,10 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 	{
 		if (std::find(dependingParameter.begin(), dependingParameter.end(), parameter.parameterUID) != dependingParameter.end())
 		{
-			ot::QuantityContainerEntryDescription qcDescription;
+			ot::DataPointDecoder qcDescription;
 			qcDescription.setLabel(parameter.parameterLabel);
 			qcDescription.setFieldName(std::to_string(parameter.parameterUID));
-			TupleInstance tupleInstance = TupleDescriptionSingle::createInstance(parameter.unit, parameter.typeName);
+			ot::TupleInstance tupleInstance = ot::TupleDescriptionSingle::createInstance(parameter.unit, parameter.typeName);
 			qcDescription.setTupleInstance(std::move(tupleInstance));
 			
 			if (!_defaultParameterForXAxis.empty() && _defaultParameterForXAxis == parameter.parameterName)

@@ -30,7 +30,7 @@ const std::string& ot::QueryTargetDescription::getMongoDBFieldName() const
 	return m_mongoDBFieldName;
 }
 
-const TupleInstance& ot::QueryTargetDescription::getTupleInstance() const
+const ot::TupleInstance& ot::QueryTargetDescription::getTupleInstance() const
 {
 	return m_tupleDescription;
 }

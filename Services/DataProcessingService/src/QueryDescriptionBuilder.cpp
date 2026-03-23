@@ -7,7 +7,7 @@ ot::QueryDescription QueryDescriptionBuilder::create(const ot::ValueComparisonDe
 
 	ot::QueryTargetDescription queryTargetDescription;
 	
-	TupleInstance parameterTuple;
+	ot::TupleInstance parameterTuple;
 	parameterTuple.setTupleUnits({ _parameter->unit });
 	parameterTuple.setTupleElementDataTypes({ _parameter->typeName });
 	parameterTuple.setTupleFormatName("");
@@ -38,7 +38,7 @@ ot::QueryDescription QueryDescriptionBuilder::create(const ot::ValueComparisonDe
 ot::QueryDescription QueryDescriptionBuilder::create(const MetadataSeries* _series)
 {
 	// Simply a Series = id
-	TupleInstance seriesTuple;
+	ot::TupleInstance seriesTuple;
 	seriesTuple.setTupleUnits({""});
 	seriesTuple.setTupleElementDataTypes({ ot::TypeNames::getInt64TypeName()});
 	seriesTuple.setTupleFormatName("");

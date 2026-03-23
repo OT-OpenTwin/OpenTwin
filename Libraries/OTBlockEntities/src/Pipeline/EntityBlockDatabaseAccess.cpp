@@ -346,12 +346,12 @@ ot::ValueComparisonDescription EntityBlockDatabaseAccess::getSelectedQuantityDef
 {
 
 	ot::ValueComparisonDescription valueDefinition = getSelectedValueComparisonDefinition(m_groupQuantitySetttings);
-	TupleInstance tupleInstance = valueDefinition.getTupleInstance();
+	ot::TupleInstance tupleInstance = valueDefinition.getTupleInstance();
 
 	const std::string formatName = PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleFormat, m_groupTupleSettings);
 	tupleInstance.setTupleFormatName(formatName);
 	const std::string combinedUnitString = 	PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleUnit, m_groupTupleSettings);
-	auto separatedUnits = TupleDescription::separateCombinedUnitString(combinedUnitString);
+	auto separatedUnits = ot::TupleDescription::separateCombinedUnitString(combinedUnitString);
 	tupleInstance.setTupleUnits(separatedUnits);
 	valueDefinition.setTupleInstance(tupleInstance);
 

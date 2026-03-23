@@ -234,11 +234,11 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 			const std::string selectedType = ot::TypeNames::getDoubleTypeName(); //quantity->m_tupleDescription.getDataType();
 			updateIfNecessaryValueCharacteristicLabelDataType(quantityValueCharacteristic,selectedType, _properties);
 			
-			const TupleInstance& tupleInstance = quantity->m_tupleDescription;
+			const ot::TupleInstance& tupleInstance = quantity->m_tupleDescription;
 
 			if (!tupleInstance.isSingle())
 			{
-				TupleDescription* tupleDescription = TupleFactory::create(tupleInstance.getTupleTypeName());
+				ot::TupleDescription* tupleDescription = TupleFactory::create(tupleInstance.getTupleTypeName());
 				auto tupleFormatSelection =	_dbAccessEntity->getTupleFormatSelection();
 
 				auto allElements =	tupleDescription->getTupleElementNames(tupleFormatSelection->getValue());
