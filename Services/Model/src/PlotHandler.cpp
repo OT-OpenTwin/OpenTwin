@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PlotHandler.cpp
 // 
 // License:
@@ -57,12 +57,6 @@ void PlotHandler::handleCreatePlot()
 {
 	QueuingHttpRequestsRAII uiQueue;
 
-	auto selectedSeriesMetadata = getSelectedSeriesMetadata();
-	if (selectedSeriesMetadata.size() == 0)
-	{
-		return;
-	}
-
 	//Find a free name for a plot
 	const std::string plotName = getFreePlotName();
 	if (plotName.empty())
@@ -71,9 +65,7 @@ void PlotHandler::handleCreatePlot()
 	}
 
 	ot::NewModelStateInfo newModelStateInformation;
-	createCurves(selectedSeriesMetadata, newModelStateInformation, plotName);
-
-
+	
 	//Finally we create the plot entity
 	Model* model = Application::instance()->getModel();
 	EntityResult1DPlot newPlot(model->createEntityUID(), nullptr, nullptr, nullptr);
@@ -94,20 +86,16 @@ void PlotHandler::handleCreatePlot()
 void PlotHandler::handleAddCurveToPlot()
 {
 	QueuingHttpRequestsRAII uiQueue;
-	
-	auto selectedSeriesMetadata = getSelectedSeriesMetadata();
+
 	auto selectedPlots = getSelectedPlots();
-	if (selectedSeriesMetadata.size() == 0 || selectedPlots.size() == 0)
-	{
-		return;
-	}
+
 	
 	ot::NewModelStateInfo newModelStateInformation, plotsForUpdate;
 	bool storeSecond = false;
 	for (EntityResult1DPlot* selectedPlot : selectedPlots)
 	{
 		const std::string plotName = selectedPlot->getName();
-		createCurves(selectedSeriesMetadata, newModelStateInformation, plotName);		
+		createCurves(newModelStateInformation, plotName);		
 	}
 
 	Model* model = Application::instance()->getModel();
@@ -211,36 +199,31 @@ std::string PlotHandler::getFreePlotName()
 	}
 }
 
-void PlotHandler::createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInfo& _modelStateInformation, const std::string& _nameBase)
+void PlotHandler::createCurves(ot::NewModelStateInfo& _modelStateInformation, const std::string& _nameBase)
 {
 	ot::PainterRainbowIterator colourIt;
 	MetadataEntityInterface metadataEntityInteraface;
 	Model* model = Application::instance()->getModel();
+	
+	ot::Plot1DCurveCfg curveConfig;
+	
+	const std::string shortName = "curve";
+	auto painter = colourIt.getNextPainter();
+	curveConfig.setLinePenPainter(painter.release());
 
-	for (EntityMetadataSeries* seriesMetadata : _seriesMetadata)
-	{
-		MetadataSeries series = metadataEntityInteraface.createSeries(seriesMetadata);
-		ot::Plot1DCurveCfg curveConfig;
-		const std::string fullName = seriesMetadata->getName();
-		const std::string shortName = fullName.substr(fullName.find_last_of("/") + 1);
-		auto painter = colourIt.getNextPainter();
-		curveConfig.setLinePenPainter(painter.release());
+	EntityResult1DCurve newCurve(model->createEntityUID(), nullptr, nullptr, nullptr);
+	newCurve.setName(_nameBase + "/" + shortName);
+	newCurve.createProperties();
+	newCurve.setCurve(curveConfig);
+	newCurve.storeToDataBase();
 
-		CurveFactory::addToConfig(series, curveConfig);
-
-		EntityResult1DCurve newCurve(model->createEntityUID(), nullptr, nullptr, nullptr);
-		newCurve.setName(_nameBase + "/" + shortName);
-		newCurve.createProperties();
-		newCurve.setCurve(curveConfig);
-		newCurve.storeToDataBase();
-
-		_modelStateInformation.addTopologyEntity(newCurve);
-	}
+	_modelStateInformation.addTopologyEntity(newCurve);
+	
 }
 
 void PlotHandler::updatedSelection(std::list<EntityBase*>& _selectedEntities, std::list<std::string>& _enabledButtons, std::list<std::string>& _disabledButtons)
 {
-	bool seriesSelected = false;
+	/*bool seriesSelected = false;
 	bool plotSelected = false;
 	for (EntityBase* selectedEntity : _selectedEntities)
 	{
@@ -275,7 +258,7 @@ void PlotHandler::updatedSelection(std::list<EntityBase*>& _selectedEntities, st
 	else
 	{
 		_disabledButtons.push_back(m_btnAddCurveToPlot.getFullPath());
-	}
+	}*/
 }
 
 

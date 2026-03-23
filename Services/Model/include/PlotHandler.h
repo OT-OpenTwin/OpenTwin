@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PlotHandler.h
 // 
 // License:
@@ -49,5 +49,5 @@ private:
 	std::list<EntityResult1DPlot*> getSelectedPlots();
 	std::string getFreePlotName();
 
-	void createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInfo& _modelStateInformation, const std::string& _nameBase);
+	void createCurves(ot::NewModelStateInfo& _modelStateInformation, const std::string& _nameBase);
 };

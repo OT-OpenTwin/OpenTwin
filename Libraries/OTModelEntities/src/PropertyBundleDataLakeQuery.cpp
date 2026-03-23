@@ -123,5 +123,5 @@ bool PropertyBundleDataLakeQuery::updatePropertyVisibility(EntityBase* _thisObje
 			PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(i <= numberVisible);
 		}
 	}
-	return requiresUpdate;
+	return requiresUpdate || metadataQueryRequiresUpdate;
 }
