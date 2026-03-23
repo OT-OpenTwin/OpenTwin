@@ -310,7 +310,17 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 					auto fmt = ot::DateTime::detectDateTimeFormat(fieldValueStringFixed);
 					if (fmt.has_value())
 					{
-						const int64_t valueOfCastedType = ot::DateTime::timestampToMsec(fieldValueStringFixed, *fmt);
+						int64_t valueOfCastedType = 0;
+
+						if (*fmt == ot::DateTime::Duration)
+						{
+							valueOfCastedType = ot::DateTime::durationToMsec(fieldValueStringFixed);
+						}
+						else
+						{
+							valueOfCastedType = ot::DateTime::timestampToMsec(fieldValueStringFixed, *fmt);
+						}
+
 						values.push_back(ot::Variable(valueOfCastedType));
 					}
 					else

@@ -214,6 +214,48 @@ int64_t ot::DateTime::timestampToMsec(const std::string& _timestamp, DateFormat 
     }
 }
 
+int64_t ot::DateTime::durationToMsec(const std::string& _duration) {
+    static const std::regex re(R"(^(?:(?:(?:(\d+):)?(\d+):)?(\d+):)?(\d+)(?:\.(\d+))?$)");
+    std::smatch match;
+
+    if (!std::regex_match(_duration, match, re)) {
+        throw std::runtime_error("Invalid duration format: " + _duration);
+    }
+
+    int64_t days = 0;
+    int64_t hours = 0;
+    int64_t minutes = 0;
+    int64_t seconds = 0;
+    int64_t msec = 0;
+
+    seconds = std::stoll(match[4].str());
+
+    if (match[3].matched) {
+        minutes = std::stoll(match[3].str());
+    }
+
+    if (match[2].matched) {
+        hours = std::stoll(match[2].str());
+    }
+
+    if (match[1].matched) {
+        days = std::stoll(match[1].str());
+    }
+
+    if (match[5].matched) {
+        std::string fraction = match[5].str();
+        if (fraction.length() > 3) {
+            fraction = fraction.substr(0, 3);
+        }
+        else {
+            fraction.append(3 - fraction.length(), '0');
+        }
+        msec = std::stoll(fraction);
+    }
+
+    return (((days * 24LL + hours) * 60LL + minutes) * 60LL + seconds) * 1000LL + msec;
+}
+
 std::string ot::DateTime::intervalToString(int64_t _msecInterval) {
     if (_msecInterval < 0) {
         return "-" + DateTime::intervalToString(-_msecInterval);
@@ -392,7 +434,11 @@ bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _f
 
     case Msec:
         return true;
-
+    case Duration:
+    {
+        static const std::regex durationRe(R"(^(?:(?:(?:\d+:)?\d+:)?\d+:)?\d+(?:\.\d+)?$)");
+        return std::regex_match(_timestamp, durationRe);
+    }
     default:
         return false;
     }
@@ -400,6 +446,7 @@ bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _f
 
 std::optional<ot::DateTime::DateFormat> ot::DateTime::detectDateTimeFormat(const std::string& _timestamp)
 {
+	if (isValidTimestamp(_timestamp, Duration)) return Duration;
 	if (isValidTimestamp(_timestamp, Simple)) return Simple;
 	if (isValidTimestamp(_timestamp, SimpleUTC)) return SimpleUTC;
 	if (isValidTimestamp(_timestamp, ISO8601UTC)) return ISO8601UTC;

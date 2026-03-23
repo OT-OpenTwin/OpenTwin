@@ -37,7 +37,8 @@ namespace ot {
             SimpleUTC,  //! @brief Simple format, UTC time ("yyyy-mm-dd hh:MM:ss.zzz", e.g. "2000-01-01 00:00:00.000").
             ISO8601UTC, //! @brief ISO 8601, UTC time ("yyyy-mm-ddThh:MM:ss.zzzZ", e.g. "2000-01-01T00:00:00.000Z").
             RFC3339,    //! @brief ISO 8601, explicit timezone ("yyyy-mm-ddThh:MM:ss.zzzZ", e.g. "2000-01-01T00:00:00.000+00:00").
-			Msec        //! @brief Milliseconds since epoch, UTC time.
+			Msec,       //! @brief Milliseconds since epoch, UTC time.
+			Duration,   //! @brief Time delta format (e.g. "DD:HH:MM:SS.sss" or "HH:MM:SS.sss" or "MM:SS.sss" or "SS.sss").
         };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -60,6 +61,11 @@ namespace ot {
 		//! @param _timestamp Timestamp string to convert.
 		//! @param _format Format of the timestamp string.
 		static int64_t timestampToMsec(const std::string& _timestamp, DateFormat _format);
+
+		//! @brief Converts a duration string to milliseconds.
+		//! @param _duration Duration string to convert.
+		//! @return Milliseconds represented by the duration string.
+		static int64_t durationToMsec(const std::string& _duration);
 
 		//! @brief Converts a time interval in milliseconds to a human-readable string.
 		//! @param _msecInterval Time interval in milliseconds.
