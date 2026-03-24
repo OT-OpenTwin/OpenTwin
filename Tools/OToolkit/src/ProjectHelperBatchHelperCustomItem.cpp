@@ -60,17 +60,17 @@ void ProjectHelperBatchHelperCustomItem::referenceDestroyed(ProjectHelperBatchHe
 
 void ProjectHelperBatchHelperCustomItem::slotRun() {
 	if (m_runner) {
-		PHBH_LOGW("Script is already running: \"" + m_name + "\"");
+		PHBH_LOGW("Script is already running: \"" + getItemName() + "\"");
 		return;
 	}
-	m_runner = ScriptRunner::runScript(m_name, m_path, {}, m_rootPath);
+	m_runner = ScriptRunner::runScript(getItemName(), getFullPath(), {}, getRootPath());
 	if (m_runner) {
 		setButtonState(true);
 		connect(m_runner, &ScriptRunner::finished, this, &ProjectHelperBatchHelperCustomItem::slotRunnerFinished);
-		PHBH_LOG("Script executed successfully: \"" + m_path + "\"");
+		PHBH_LOG("Script executed successfully: \"" + getFullPath() + "\"");
 	}
 	else {
-		PHBH_LOGE("Script execution failed: \"" + m_path + "\"");
+		PHBH_LOGE("Script execution failed: \"" + getFullPath() + "\"");
 	}
 }
 
@@ -85,15 +85,15 @@ void ProjectHelperBatchHelperCustomItem::slotStop() {
 
 void ProjectHelperBatchHelperCustomItem::slotRunDetached() {
 	if (m_runner) {
-		PHBH_LOGW("Script is already running: \"" + m_name + "\"");
+		PHBH_LOGW("Script is already running: \"" + getItemName() + "\"");
 		return;
 	}
 
-	if (ScriptRunner::runDetached(m_name, m_path, m_args, m_rootPath)) {
-		PHBH_LOG("Detached script executed successfully: \"" + m_path + "\"");
+	if (ScriptRunner::runDetached(getItemName(), getFullPath(), m_args, getRootPath())) {
+		PHBH_LOG("Detached script executed successfully: \"" + getFullPath() + "\"");
 	}
 	else {
-		PHBH_LOGE("Detached script execution failed: \"" + m_path + "\"");
+		PHBH_LOGE("Detached script execution failed: \"" + getFullPath() + "\"");
 	}
 }
 
@@ -107,7 +107,7 @@ void ProjectHelperBatchHelperCustomItem::slotRunnerFinished() {
 }
 
 ProjectHelperBatchHelperItem* ProjectHelperBatchHelperCustomItem::createFavItemImpl(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent) {
-	ProjectHelperBatchHelperCustomItem* itm = createItem(_tree, _parent, this, m_name, m_rootPath, m_path, {}, m_detached);
+	ProjectHelperBatchHelperCustomItem* itm = createItem(_tree, _parent, this, getItemName(), getFullPath(), {}, m_detached);
 	if (itm) {
 		m_runButtonRef = itm->m_runButton;
 		m_stopButtonRef = itm->m_stopButton;
@@ -116,46 +116,40 @@ ProjectHelperBatchHelperItem* ProjectHelperBatchHelperCustomItem::createFavItemI
 	return itm;
 }
 
-ProjectHelperBatchHelperCustomItem::ProjectHelperBatchHelperCustomItem() {
-	setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
-	setCheckState(0, Qt::Unchecked);
-}
+ProjectHelperBatchHelperCustomItem::ProjectHelperBatchHelperCustomItem(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, const QString& _name, const QString& _rootPath)
+	: ProjectHelperBatchHelperItem(_tree, _parent, _name, _rootPath),
+	m_runner(nullptr), m_runButton(nullptr), m_stopButton(nullptr), m_runButtonRef(nullptr), m_stopButtonRef(nullptr)
+{}
 
 void ProjectHelperBatchHelperCustomItem::tryCreate(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, ProjectHelperBatchHelperCustomItem* _slotItem, const QString& _text, const QString& _rootPath, const QString& _subPath, const QStringList& _args, bool _detached) {
 	QFile file(_rootPath + _subPath);
 	if (file.exists()) {
-		createItem(_tree, _parent, _slotItem, _text, _rootPath, _rootPath + _subPath, _args, _detached);
+		createItem(_tree, _parent, _slotItem, _text, _rootPath + _subPath, _args, _detached);
 	}
 	else {
 		PHBH_LOGW("Batch file not found: \"" + _rootPath + _subPath + "\"");
 	}
 }
 
-ProjectHelperBatchHelperCustomItem* ProjectHelperBatchHelperCustomItem::createItem(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, ProjectHelperBatchHelperCustomItem* _slotItem, const QString& _text, const QString& _rootPath, const QString& _scriptPath, const QStringList& _args, bool _detached) {
-	ProjectHelperBatchHelperCustomItem* item = new ProjectHelperBatchHelperCustomItem;
-	item->m_name = _text;
-	item->m_path = _scriptPath;
-	item->m_rootPath = _rootPath;
+ProjectHelperBatchHelperCustomItem* ProjectHelperBatchHelperCustomItem::createItem(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, ProjectHelperBatchHelperCustomItem* _slotItem, const QString& _text, const QString& _scriptPath, const QStringList& _args, bool _detached) {
+	ProjectHelperBatchHelperCustomItem* item = new ProjectHelperBatchHelperCustomItem(_tree, _parent, _text, _scriptPath);
 	item->m_args = _args;
 	item->m_detached = _detached;
-	item->setText(0, _text);
 
 	ProjectHelperBatchHelperCustomItem* actualSlotItm = _slotItem;
 	if (!actualSlotItm) {
 		actualSlotItm = item;
 	}
 
-	_parent->addChild(item);
-
 	if (_detached) {
-		item->m_runButton = createScriptButton(_tree, item, 1, "Run Detached", _scriptPath, _detached);
+		item->m_runButton = createScriptButton(_tree, item, static_cast<int>(Columns::Run), "Run Detached", _scriptPath, _detached);
 		item->connect(item->m_runButton, &PushButton::clicked, actualSlotItm, &ProjectHelperBatchHelperCustomItem::slotRunDetached);
 	}
 	else {
-		item->m_runButton = createScriptButton(_tree, item, 1, "Run", _scriptPath, _detached);
+		item->m_runButton = createScriptButton(_tree, item, static_cast<int>(Columns::Run), "Run", _scriptPath, _detached);
 		item->connect(item->m_runButton, &PushButton::clicked, actualSlotItm, &ProjectHelperBatchHelperCustomItem::slotRun);
 
-		item->m_stopButton = createScriptButton(_tree, item, 2, "Stop", "Stop script execution", _detached);
+		item->m_stopButton = createScriptButton(_tree, item, static_cast<int>(Columns::Stop), "Stop", "Stop script execution", _detached);
 		item->connect(item->m_stopButton, &PushButton::clicked, actualSlotItm, &ProjectHelperBatchHelperCustomItem::slotStop);
 	}
 

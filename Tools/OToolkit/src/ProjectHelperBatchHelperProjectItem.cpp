@@ -53,14 +53,6 @@ ProjectHelperBatchHelperProjectItem* ProjectHelperBatchHelperProjectItem::create
 
 	QStringList pathParts = _path.split('/', Qt::SkipEmptyParts);
 	OTAssert(pathParts.size() > 0, "Invalid path provided");
-	ProjectHelperBatchHelperProjectItem* item = new ProjectHelperBatchHelperProjectItem;
-	item->m_rootPath = _path;
-	item->m_createFlags = _flags;
-	item->m_buildPath = buildPath;
-	item->m_cleanPath = cleanPath;
-	item->m_editPath = editPath;
-	item->m_testPath = testPath;
-
 	QString nameTxt = pathParts.last();
 	if (_flags.has(CreateFlag::RemoveOTPrefix)) {
 		if (nameTxt.startsWith("OT", Qt::CaseSensitive)) {
@@ -68,12 +60,16 @@ ProjectHelperBatchHelperProjectItem* ProjectHelperBatchHelperProjectItem::create
 		}
 	}
 
+	ProjectHelperBatchHelperProjectItem* item = new ProjectHelperBatchHelperProjectItem(_tree, _parent, nameTxt, _path);
+	item->m_createFlags = _flags;
+	item->m_buildPath = buildPath;
+	item->m_cleanPath = cleanPath;
+	item->m_editPath = editPath;
+	item->m_testPath = testPath;
+
 	if (!_slotItem) {
 		_slotItem = item;
 	}
-
-	item->setText(static_cast<int>(Columns::Name), nameTxt);
-	_parent->addChild(item);
 
 	item->connect(createScriptButton(_tree, item, static_cast<int>(Columns::Edit), "Edit", editPath), &PushButton::clicked, _slotItem, &ProjectHelperBatchHelperProjectItem::slotEdit);
 	item->connect(createScriptButton(_tree, item, static_cast<int>(Columns::Build), "Build", buildPath), &PushButton::clicked, _slotItem, &ProjectHelperBatchHelperProjectItem::slotBuild);
@@ -88,26 +84,12 @@ ProjectHelperBatchHelperProjectItem::~ProjectHelperBatchHelperProjectItem() {
 
 }
 
-QString ProjectHelperBatchHelperProjectItem::getScriptName() const {
-	QString pth = m_rootPath;
-	pth.replace('\\', '/');
-	QStringList pathParts = pth.split('/', Qt::SkipEmptyParts);
-	if (pathParts.isEmpty()) {
-		return QString();
-	}
-	QStringList nameParts = pathParts.last().split('.', Qt::SkipEmptyParts);
-	if (nameParts.isEmpty()) {
-		return QString();
-	}
-	return nameParts.first();
-}
-
 void ProjectHelperBatchHelperProjectItem::referenceDestroyed(ProjectHelperBatchHelperItem* _reference) {
 
 }
 
 void ProjectHelperBatchHelperProjectItem::slotBuild() {
-	ScriptRunner* runner = ScriptRunner::runScript(getScriptName() + " - Build", m_buildPath, { "BOTH", "BUILD" }, m_rootPath);
+	ScriptRunner* runner = ScriptRunner::runScript(getItemName() + " - Build", m_buildPath, { "BOTH", "BUILD" }, getRootPath());
 	if (runner) {
 		connect(runner, &ScriptRunner::finished, this, &ProjectHelperBatchHelperProjectItem::slotBuildFinished);
 		PHBH_LOG("Build batch executed successfully: \"" + m_buildPath + "\"");
@@ -118,7 +100,7 @@ void ProjectHelperBatchHelperProjectItem::slotBuild() {
 }
 
 void ProjectHelperBatchHelperProjectItem::slotRebuild() {
-	ScriptRunner* runner = ScriptRunner::runScript(getScriptName() + " - Rebuild", m_buildPath, { "BOTH", "REBUILD" }, m_rootPath);
+	ScriptRunner* runner = ScriptRunner::runScript(getItemName() + " - Rebuild", m_buildPath, { "BOTH", "REBUILD" }, getRootPath());
 	if (runner) {
 		connect(runner, &ScriptRunner::finished, this, &ProjectHelperBatchHelperProjectItem::slotBuildFinished);
 		PHBH_LOG("Rebuild batch executed successfully: \"" + m_buildPath + "\"");
@@ -129,7 +111,7 @@ void ProjectHelperBatchHelperProjectItem::slotRebuild() {
 }
 
 void ProjectHelperBatchHelperProjectItem::slotClean() {
-	if (ScriptRunner::runScript(getScriptName() + " - Clean", m_cleanPath, {}, m_rootPath)) {
+	if (ScriptRunner::runScript(getItemName() + " - Clean", m_cleanPath, {}, getRootPath())) {
 		PHBH_LOG("Clear batch executed successfully: \"" + m_cleanPath + "\"");
 	}
 	else {
@@ -138,7 +120,7 @@ void ProjectHelperBatchHelperProjectItem::slotClean() {
 }
 
 void ProjectHelperBatchHelperProjectItem::slotEdit() {
-	if (ScriptRunner::runDetached(getScriptName() + " - Edit", m_editPath, {}, m_rootPath)) {
+	if (ScriptRunner::runDetached(getItemName() + " - Edit", m_editPath, {}, getRootPath())) {
 		PHBH_LOG("Edit batch executed successfully: \"" + m_editPath + "\"");
 	}
 	else {
@@ -147,7 +129,7 @@ void ProjectHelperBatchHelperProjectItem::slotEdit() {
 }
 
 void ProjectHelperBatchHelperProjectItem::slotTest() {
-	if (ScriptRunner::runScript(getScriptName() + " - Test", m_testPath, { "--output-on-failure" }, m_rootPath)) {
+	if (ScriptRunner::runScript(getItemName() + " - Test", m_testPath, { "--output-on-failure" }, getRootPath())) {
 		PHBH_LOG("Test batch executed successfully: \"" + m_testPath + "\"");
 	}
 	else {
@@ -156,7 +138,7 @@ void ProjectHelperBatchHelperProjectItem::slotTest() {
 }
 
 void ProjectHelperBatchHelperProjectItem::slotBuildFinished() {
-	QFile dbgFile(m_rootPath + "buildlog_Debug.txt");
+	QFile dbgFile(getRootPath() + "buildlog_Debug.txt");
 	if (dbgFile.open(QFile::ReadOnly | QFile::Text)) {
 		QTextStream in(&dbgFile);
 		QString lastLine;
@@ -176,10 +158,10 @@ void ProjectHelperBatchHelperProjectItem::slotBuildFinished() {
 		}
 	}
 	else {
-		PHBH_LOGW("Debug build log not found: \"" + m_rootPath + "buildlog_Debug.txt\"");
+		PHBH_LOGW("Debug build log not found: \"" + getRootPath() + "buildlog_Debug.txt\"");
 	}
 
-	QFile relFile(m_rootPath + "buildlog_Release.txt");
+	QFile relFile(getRootPath() + "buildlog_Release.txt");
 	if (relFile.open(QFile::ReadOnly | QFile::Text)) {
 		QTextStream in(&relFile);
 		QString lastLine;
@@ -200,17 +182,17 @@ void ProjectHelperBatchHelperProjectItem::slotBuildFinished() {
 		}
 	}
 	else {
-		PHBH_LOGW("Release build log not found: \"" + m_rootPath + "buildlog_Release.txt\"");
+		PHBH_LOGW("Release build log not found: \"" + getRootPath() + "buildlog_Release.txt\"");
 	}
 }
 
 ProjectHelperBatchHelperItem* ProjectHelperBatchHelperProjectItem::createFavItemImpl(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent) {
-	return createFromPath(_tree, _parent, m_rootPath, m_createFlags, this);
+	return createFromPath(_tree, _parent, getRootPath(), m_createFlags, this);
 }
 
-ProjectHelperBatchHelperProjectItem::ProjectHelperBatchHelperProjectItem() {
-	setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
-	setCheckState(0, Qt::Unchecked);
+ProjectHelperBatchHelperProjectItem::ProjectHelperBatchHelperProjectItem(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, const QString& _name, const QString& _rootPath)
+	: ProjectHelperBatchHelperItem(_tree, _parent, _name, _rootPath)
+{
 }
 
 ot::PushButton* ProjectHelperBatchHelperProjectItem::createScriptButton(ot::TreeWidget* _tree, ProjectHelperBatchHelperProjectItem* _item, int _column, const QString& _text, const QString& _path) {
