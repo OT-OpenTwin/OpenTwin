@@ -155,7 +155,7 @@ void ot::ProjectOverviewHeader::sortOrderChangeRequest(int _logicalIndex, Qt::So
 	m_overview->sort(_logicalIndex, _sortOrder);
 }
 
-void ot::ProjectOverviewHeader::menuActionTriggered(int _logicalIndex, const QStringList& _selectedOptions)
+void ot::ProjectOverviewHeader::filterOptionsChanged(int _logicalIndex, const QStringList& _selectedOptions)
 {
 	m_lastFilter.setSelectedFilters(_selectedOptions);
 	m_lastFilter.setLogicalIndex(_logicalIndex);

@@ -138,7 +138,7 @@ void ProjectHelperBatchHelperProjectItem::slotTest() {
 }
 
 void ProjectHelperBatchHelperProjectItem::slotBuildFinished() {
-	QFile dbgFile(getRootPath() + "buildlog_Debug.txt");
+	QFile dbgFile(getRootPath() + "/buildlog_Debug.txt");
 	if (dbgFile.open(QFile::ReadOnly | QFile::Text)) {
 		QTextStream in(&dbgFile);
 		QString lastLine;
@@ -158,10 +158,10 @@ void ProjectHelperBatchHelperProjectItem::slotBuildFinished() {
 		}
 	}
 	else {
-		PHBH_LOGW("Debug build log not found: \"" + getRootPath() + "buildlog_Debug.txt\"");
+		PHBH_LOGW("Debug build log not found: \"" + getRootPath() + "/buildlog_Debug.txt\"");
 	}
 
-	QFile relFile(getRootPath() + "buildlog_Release.txt");
+	QFile relFile(getRootPath() + "/buildlog_Release.txt");
 	if (relFile.open(QFile::ReadOnly | QFile::Text)) {
 		QTextStream in(&relFile);
 		QString lastLine;
@@ -182,7 +182,7 @@ void ProjectHelperBatchHelperProjectItem::slotBuildFinished() {
 		}
 	}
 	else {
-		PHBH_LOGW("Release build log not found: \"" + getRootPath() + "buildlog_Release.txt\"");
+		PHBH_LOGW("Release build log not found: \"" + getRootPath() + "/buildlog_Release.txt\"");
 	}
 }
 

@@ -64,7 +64,7 @@ namespace ot {
 		virtual QStringList getFilterOptions(int _logicalIndex) const override;
 
 		virtual void sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _sortOrder) override;
-		virtual void menuActionTriggered(int _logicalIndex, const QStringList& _selectedOptions) override;
+		virtual void filterOptionsChanged(int _logicalIndex, const QStringList& _selectedOptions) override;
 
 	private:
 		ProjectOverviewWidget* m_overview;

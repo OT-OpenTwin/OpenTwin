@@ -84,13 +84,11 @@ namespace ot {
 		void setColumnHeaderFilterBehavior(int _column, TableHeaderItemCfg::FilterBehavior _behavior);
 		const TableHeaderItemCfg* getColumnHeader(int _column) const;
 
-		void setSortingEnabled(bool _enable = true) { m_sortingEnabled = _enable; };
-		bool getSortingEnabled() const { return m_sortingEnabled; };
+		void setColumnSortingEnabled(bool _enable = true) { m_columnsSortable = _enable; };
+		bool getColumnSortingEnabled() const { return m_columnsSortable; };
 
-		//! @brief If set the sorting can be cleared when pressing the sort button repeatadly.
-		//! This has no effect if sorting is not enabled.
-		void setSortingClearable(bool _enable = true) { m_sortingClearable = _enable; };
-		bool getSortingClearable() const { return m_sortingClearable; };
+		void setRowSortingEnabled(bool _enable = true) { m_rowsSortable = _enable; };
+		bool getRowSortingEnabled() const { return m_rowsSortable; };
 
 	private:
 		void initialize();
@@ -99,11 +97,13 @@ namespace ot {
 
 		int m_rows = 0;
 		int m_columns = 0;
-		bool m_sortingEnabled = false;
-		bool m_sortingClearable = false;
 
+		bool m_rowsSortable = false;
 		std::vector<TableHeaderItemCfg*> m_rowHeader;
+
+		bool m_columnsSortable = false;
 		std::vector<TableHeaderItemCfg*> m_columnHeader;
+
 		std::vector<std::vector<std::string>> m_data;
 	};
 

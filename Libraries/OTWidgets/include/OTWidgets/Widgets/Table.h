@@ -34,6 +34,7 @@
 namespace ot {
 
 	class TableItem;
+	class TableHeader;
 	class TableItemDelegate;
 
 	class OT_WIDGETS_API_EXPORT Table : public QTableWidget, public WidgetBase {
@@ -81,6 +82,12 @@ namespace ot {
 		//! @return Default item. The table keeps ownership of the item.
 		TableItem* addItem(int _row, int _column, const QIcon& _icon, const QString& _text, const QString& _sortHint = QString());
 
+		const TableHeaderItemCfg* getHorizontalHeaderItemCfg(int _column) const;
+		const TableHeaderItemCfg* getVerticalHeaderItemCfg(int _row) const;
+
+		bool getFilterRowSortingEnabled() const { return m_filterRowSortingEnabled; };
+		bool getFilterColumnSortingEnabled() const { return m_filterColumnSortingEnabled; };
+
 	Q_SIGNALS:
 		void saveRequested();
 		void modifiedChanged(bool _isModified);
@@ -108,6 +115,7 @@ namespace ot {
 		void resizeColumnsToContentIfNeeded();
 		void resizeRowsToContentIfNeeded();
 		void setResizeRequired();
+		void clearHeaderConfigs();
 
 		TableItemDelegate* m_itemDelegate;
 
@@ -117,6 +125,15 @@ namespace ot {
 		bool m_contentChanged;
 		std::vector<int> m_columnWidthBuffer;
 		std::vector<int> m_rowHeightBuffer;
+
+		bool m_filterRowSortingEnabled = false;
+		bool m_filterColumnSortingEnabled = false;
+
+		TableHeader* m_horizontalHeader;
+		std::vector<TableHeaderItemCfg*> m_horizontalHeaderItemCfgs;
+
+		TableHeader* m_verticalHeader;
+		std::vector<TableHeaderItemCfg*> m_verticalHeaderItemCfgs;
 
 		std::vector<std::string> m_headerBuffer; //The displayed strings are not correct, they don't correspond with the text file. This is because the displayed headers are freed of "-characters
 	};

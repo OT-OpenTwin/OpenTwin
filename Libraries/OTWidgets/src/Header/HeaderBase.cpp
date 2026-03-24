@@ -23,7 +23,7 @@ ot::HeaderBase::HeaderBase(Qt::Orientation _orientation, QWidget* _parent)
 	: QHeaderView(_orientation, _parent),
 	m_buttonSize(14, 14), m_buttonPadding(4, 4)
 {
-
+	
 }
 
 int ot::HeaderBase::sizeHintForColumn(int _column) const
@@ -279,7 +279,7 @@ void ot::HeaderBase::showFilterMenu(int _logicalIndex)
 
 		try
 		{
-			menuActionTriggered(_logicalIndex, opt);
+			filterOptionsChanged(_logicalIndex, opt);
 		}
 		catch (const std::exception& ex)
 		{
@@ -290,7 +290,7 @@ void ot::HeaderBase::showFilterMenu(int _logicalIndex)
 	}
 }
 
-void ot::HeaderBase::menuActionTriggered(int _logicalIndex, const QStringList& _selectedOptions)
+void ot::HeaderBase::filterOptionsChanged(int _logicalIndex, const QStringList& _selectedOptions)
 {
 
 }

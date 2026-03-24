@@ -68,7 +68,7 @@ namespace ot {
 		//! @brief Is called when the user confirms the filter menu.
 		//! @param _logicalIndex The logical index the filter menu was shown for.
 		//! @param _selectedOptions The list of selected options in the filter menu.
-		virtual void menuActionTriggered(int _logicalIndex, const QStringList& _selectedOptions);
+		virtual void filterOptionsChanged(int _logicalIndex, const QStringList& _selectedOptions);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

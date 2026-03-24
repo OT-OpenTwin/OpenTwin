@@ -22,6 +22,7 @@
 #include "OTCore/RuntimeTests.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Delegate/TableItemDelegate.h"
+#include "OTWidgets/Header/TableHeader.h"
 #include "OTWidgets/Widgets/Table.h"
 #include "OTWidgets/Widgets/TableItem.h"
 #include "OTCore/String.h"
@@ -74,15 +75,14 @@ QRect ot::Table::getSelectionBoundingRect(const QList<QTableWidgetSelectionRange
 
 ot::Table::Table(QWidget* _parentWidget)
 	: QTableWidget(_parentWidget), m_contentChanged(false), m_resizeRequired(false),
-	m_stopResizing(true), m_itemDelegate(nullptr)
+	m_stopResizing(true), m_itemDelegate(nullptr), m_horizontalHeader(nullptr), m_verticalHeader(nullptr)
 {
-
 	this->ini();
 }
 
 ot::Table::Table(int _rows, int _columns, QWidget* _parentWidget) 
 	: QTableWidget(_rows, _columns, _parentWidget), m_contentChanged(false), m_resizeRequired(false),
-	m_stopResizing(true), m_itemDelegate(nullptr)
+	m_stopResizing(true), m_itemDelegate(nullptr), m_horizontalHeader(nullptr), m_verticalHeader(nullptr)
 {
 	this->ini();
 }
@@ -90,6 +90,8 @@ ot::Table::Table(int _rows, int _columns, QWidget* _parentWidget)
 ot::Table::~Table() {
 	delete m_itemDelegate;
 	m_itemDelegate = nullptr;
+
+	clearHeaderConfigs();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -108,6 +110,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		this->clear();
 		m_columnWidthBuffer.clear();
 		m_rowHeightBuffer.clear();
+		clearHeaderConfigs();
 	}
 
 	// Initialize dimensions
@@ -120,10 +123,13 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 	// Initialize Header
 	{
 		OT_TEST_TABLE_Interval("Setup from config: Set vertical header");
+		m_verticalHeaderItemCfgs.reserve(_config.getRowCount());
 		QHeaderView* header = this->verticalHeader();
 		for (int r = 0; r < _config.getRowCount(); r++) {
 			const TableHeaderItemCfg* headerItem = _config.getRowHeader(r);
 			if (headerItem) {
+				m_verticalHeaderItemCfgs.push_back(headerItem->createCopy());
+
 				if (m_headerBuffer.capacity() == 0)
 				{
 					m_headerBuffer.reserve(_config.getRowCount());
@@ -140,22 +146,29 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 				}
 				this->setVerticalHeaderItem(r, new QTableWidgetItem(QString::fromStdString(headerContent)));
 			}
+			else
+			{
+				m_verticalHeaderItemCfgs.push_back(nullptr);
+			}
 		}
 	}
 	{
 		OT_TEST_TABLE_Interval("Setup from config: Set horizontal header");
+		m_horizontalHeaderItemCfgs.reserve(_config.getColumnCount());
 		QHeaderView* header = this->horizontalHeader();
 		for (int c = 0; c < _config.getColumnCount(); c++) {
 			const TableHeaderItemCfg* headerItem = _config.getColumnHeader(c);
 			if (headerItem) 
 			{
+				m_horizontalHeaderItemCfgs.push_back(headerItem->createCopy());
+
 				if (m_headerBuffer.capacity() == 0)
 				{
 					m_headerBuffer.reserve(_config.getColumnCount());
 				}
 
 				std::string headerContent = headerItem->getText();
-				m_headerBuffer.push_back(headerContent); //Here we store the original value
+				m_headerBuffer.push_back(headerContent); // Here we store the original value
 
 				//Here we create the beautified version to display
 				headerContent.erase(headerContent.begin(), std::find_if(headerContent.begin(), headerContent.end(), [](unsigned char ch) { return !std::isspace(ch); }));
@@ -166,6 +179,10 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 				}
 
 				this->setHorizontalHeaderItem(c, new QTableWidgetItem(QString::fromStdString(headerContent)));
+			}
+			else
+			{
+				m_horizontalHeaderItemCfgs.push_back(nullptr);
 			}
 		}
 	}
@@ -186,8 +203,8 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		}
 	}
 
-	this->horizontalHeader()->setSortIndicatorClearable(_config.getSortingClearable());
-	this->setSortingEnabled(_config.getSortingEnabled());
+	m_filterColumnSortingEnabled = _config.getColumnSortingEnabled();
+	m_filterRowSortingEnabled = _config.getRowSortingEnabled();
 
 	this->setResizeRequired();
 }
@@ -241,14 +258,17 @@ ot::TableCfg ot::Table::createConfig() const {
 		}
 	}
 	
-	cfg.setSortingClearable(this->horizontalHeader()->isSortIndicatorClearable());
-	cfg.setSortingEnabled(this->isSortingEnabled());
+	cfg.setRowSortingEnabled(m_filterRowSortingEnabled);
+	cfg.setColumnSortingEnabled(m_filterColumnSortingEnabled);
 
 	return cfg;
 }
 
 void ot::Table::setContentChanged(bool _changed) {
-	if (m_contentChanged == _changed) return;
+	if (m_contentChanged == _changed)
+	{
+		return;
+	}
 	m_contentChanged = _changed;
 	Q_EMIT modifiedChanged(m_contentChanged);
 }
@@ -282,6 +302,27 @@ ot::TableItem* ot::Table::addItem(int _row, int _column, const QIcon& _icon, con
 	newItem->setIcon(_icon);
 	this->setItem(_row, _column, newItem);
 	return newItem;
+}
+
+const ot::TableHeaderItemCfg* ot::Table::getHorizontalHeaderItemCfg(int _column) const
+{
+	if (_column >= 0 && _column < m_horizontalHeaderItemCfgs.size()) {
+		return m_horizontalHeaderItemCfgs.at(_column);
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+const ot::TableHeaderItemCfg* ot::Table::getVerticalHeaderItemCfg(int _row) const
+{
+	if (_row >= 0 && _row < m_verticalHeaderItemCfgs.size()) {
+		return m_verticalHeaderItemCfgs.at(_row);
+	}
+	{
+		return nullptr;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -434,6 +475,11 @@ void ot::Table::slotResizeRowToContent(int _row) {
 void ot::Table::ini() {
 	m_itemDelegate = new TableItemDelegate(this);
 
+	m_horizontalHeader = new TableHeader(this, Qt::Horizontal);
+	this->setHorizontalHeader(m_horizontalHeader);
+	m_verticalHeader = new TableHeader(this, Qt::Vertical);
+	this->setVerticalHeader(m_verticalHeader);
+
 	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
 	saveShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 	
@@ -486,4 +532,16 @@ void ot::Table::setResizeRequired() {
 	else {
 		m_resizeRequired = true;
 	}
+}
+
+void ot::Table::clearHeaderConfigs()
+{
+	for (auto* cfg : m_horizontalHeaderItemCfgs)
+	{
+		if (cfg)
+		{
+			delete cfg;
+		}
+	}
+	m_horizontalHeaderItemCfgs.clear();
 }

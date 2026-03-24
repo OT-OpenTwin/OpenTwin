@@ -65,7 +65,7 @@ ot::TableCfg::TableHeaderMode ot::TableCfg::stringToHeaderMode(const std::string
 }
 
 ot::TableCfg::TableCfg(int _rows, int _columns, WidgetViewBase _baseInfo)
-	: WidgetViewBase(_baseInfo), m_rows(_rows), m_columns(_columns), m_sortingEnabled(false), m_sortingClearable(false)
+	: WidgetViewBase(_baseInfo), m_rows(_rows), m_columns(_columns)
 {
 	this->initialize();
 }
@@ -113,7 +113,7 @@ ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::Tab
 }
 
 ot::TableCfg::TableCfg(const TableCfg& _other) 
-	: WidgetViewBase(_other), m_rows(0), m_columns(0), m_sortingEnabled(false), m_sortingClearable(false)
+	: WidgetViewBase(_other)
 {
 	*this = _other;
 }
@@ -128,8 +128,8 @@ ot::TableCfg::TableCfg(TableCfg&& _other) noexcept
 	m_columnHeader = std::move(_other.m_columnHeader);
 	m_data = std::move(_other.m_data);
 
-	m_sortingEnabled = std::move(_other.m_sortingEnabled);
-	m_sortingClearable = std::move(_other.m_sortingClearable);
+	m_columnsSortable = _other.m_columnsSortable;
+	m_rowsSortable = _other.m_rowsSortable;
 }
 
 ot::TableCfg::~TableCfg() {
@@ -149,8 +149,9 @@ ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 	// Initialize data
 	m_rows = _other.m_rows;
 	m_columns = _other.m_columns;
-	m_sortingEnabled = _other.m_sortingEnabled;
-	m_sortingClearable = _other.m_sortingClearable;
+
+	m_columnsSortable = _other.m_columnsSortable;
+	m_rowsSortable = _other.m_rowsSortable;
 
 	this->initialize();
 
@@ -197,8 +198,8 @@ void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 
 	_object.AddMember("Rows", m_rows, _allocator);
 	_object.AddMember("Columns", m_columns, _allocator);
-	_object.AddMember("SortingClearable", m_sortingClearable, _allocator);
-	_object.AddMember("SortingEnabled", m_sortingEnabled, _allocator);
+	_object.AddMember("ColumnSorting", m_columnsSortable, _allocator);
+	_object.AddMember("RowSorting", m_rowsSortable, _allocator);
 
 	// Row header
 	JsonArray rowHeaderArr;
@@ -245,8 +246,9 @@ void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	m_rows = json::getInt(_object, "Rows");
 	m_columns = json::getInt(_object, "Columns");
-	m_sortingClearable = json::getBool(_object, "SortingClearable");
-	m_sortingEnabled = json::getBool(_object, "SortingEnabled");
+	
+	m_rowsSortable = json::getBool(_object, "RowSorting");
+	m_columnsSortable = json::getBool(_object, "ColumnSorting");
 
 	this->initialize();
 
