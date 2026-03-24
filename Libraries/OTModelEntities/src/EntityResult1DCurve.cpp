@@ -101,6 +101,16 @@ void EntityResult1DCurve::addVisualizationNodes()
 
 bool EntityResult1DCurve::updateFromProperties()
 {
+	if (getObserver() != nullptr)
+	{
+		auto projectSelection = m_queryProperties.getProjectSelection(this);
+		if (projectSelection->needsUpdate())
+		{
+			const std::string projectName = projectSelection->getValue();
+			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName);
+		}
+	}
+
 	// Update the curve displayed in the frontend after the property change
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());

@@ -6,6 +6,8 @@ public:
 	void setProperties(EntityBase* _thisObject) override;
 	bool updatePropertyVisibility(EntityBase* _thisObject) override;
 
+	EntityPropertiesSelection* getProjectSelection(EntityBase* _thisObject);
+
 private:
 	const uint32_t m_maxNbOfQueries = 40;
 	const uint32_t m_maxNbOfQueriesMetadata = 4;

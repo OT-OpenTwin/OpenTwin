@@ -42,10 +42,11 @@
 #include <map>
 #include <list>
 #include <string>
-
+#include <optional>
 #pragma warning(disable : 4251)
 
 class EntityBase;
+#include "OTCore/MetadataHandle/MetadataCampaign.h"
 
 class OT_MODELENTITIES_API_EXPORT EntityObserver
 {
@@ -62,7 +63,7 @@ public:
 	virtual void requestLibraryElement(ot::JsonDocument& _doc) {};
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
-	//virtual MetadataCampaign getMetadataCampaign(const std::string _projectName) {};
+	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string _projectName) {return std::nullopt;	};
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################

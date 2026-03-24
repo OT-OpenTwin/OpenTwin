@@ -125,3 +125,9 @@ bool PropertyBundleDataLakeQuery::updatePropertyVisibility(EntityBase* _thisObje
 	}
 	return requiresUpdate || metadataQueryRequiresUpdate;
 }
+
+
+EntityPropertiesSelection* PropertyBundleDataLakeQuery::getProjectSelection(EntityBase* _thisObject)
+{
+	return PropertyHelper::getSelectionProperty(_thisObject, m_propertyNameProjectName);
+}

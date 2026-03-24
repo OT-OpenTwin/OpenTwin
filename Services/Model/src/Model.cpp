@@ -4092,10 +4092,10 @@ void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visua
 	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationCfg);
 }
 
-//MetadataCampaign Model::getMetadataCampaign(const std::string _projectName)
-//{
-//	return m_metadataHandler.getMetadataCampaign(_projectName);
-//}
+std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string _projectName)
+{
+	return m_metadataHandler.getMetadataCampaign(_projectName);
+}
 
 EntityBase *Model::findEntityFromName(const std::string &name)
 {
