@@ -60,7 +60,7 @@ public:
 	virtual std::string getTypeString() const = 0;
 
 	void resetNeedsUpdate() { m_needsUpdateFlag = false; };
-	bool needsUpdate();
+	bool needsUpdate() const;
 	void setNeedsUpdate();
 
 	void setHasMultipleValues(bool b) { m_multipleValues = b; };
@@ -300,7 +300,7 @@ public:
 	virtual eType getType() const override { return STRING; };
 	virtual std::string getTypeString() const override { return EntityPropertiesString::typeString(); };
 
-	void setValue(const std::string& s) { if (m_value != s) { setNeedsUpdate(); m_value = s; } };
+	void setValue(const std::string& _value);
 	const std::string& getValue() const { return m_value; };
 
 	void setIsMultiline(bool _flag) { if (m_isMultiline != _flag) { m_isMultiline = _flag; setNeedsUpdate(); } };
@@ -524,7 +524,7 @@ public:
 	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
-	void setValue(const std::string& value) { m_value = value; }
+	void setValue(const std::string& _value) { if (m_value != _value) setNeedsUpdate(); m_value = _value; }
 	std::string getValue() const {return m_value;}
 private:
 	std::string m_value;

@@ -1,4 +1,6 @@
 ﻿#include "OTModelEntities/PropertyBundle.h"
+#include "OTCore/MetadataHandle/MetadataCampaign.h"
+#include "OTCore/Tuple/TupleInstance.h"
 
 class __declspec(dllexport) PropertyBundleDataLakeQuery : public PropertyBundle
 {
@@ -6,7 +8,8 @@ public:
 	void setProperties(EntityBase* _thisObject) override;
 	bool updatePropertyVisibility(EntityBase* _thisObject) override;
 
-	EntityPropertiesSelection* getProjectSelection(EntityBase* _thisObject);
+	const EntityPropertiesProjectList* getProjectSelection(EntityBase* _thisObject);
+	bool updateOptions(EntityBase* _thisObject, MetadataCampaign& _campaign);
 
 private:
 	const uint32_t m_maxNbOfQueries = 40;
@@ -35,4 +38,11 @@ private:
 	const std::string m_propertyComparator = "Comparator";
 	const std::string m_propertyValue = "Value";
 	const std::string m_propertyUnit = "Unit";
+
+
+	void setNameOptions(EntityBase* _thisObject, const std::list<std::string>& _options, const std::string& _group, const std::string& _name);
+	void setValueProperties(EntityBase* _thisObject, const std::string& _groupName, const ot::TupleInstance& _tupleInstance);
+	void setValuePropertiesEmpty(EntityBase* _thisObject, const std::string& _groupName);
+
+	void vectorize(const ot::JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase);
 };

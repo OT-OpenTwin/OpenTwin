@@ -101,14 +101,15 @@ void EntityResult1DCurve::addVisualizationNodes()
 
 bool EntityResult1DCurve::updateFromProperties()
 {
+	bool refresh = this->updatePropertyVisibilities();
+
 	if (getObserver() != nullptr)
 	{
 		auto projectSelection = m_queryProperties.getProjectSelection(this);
-		if (projectSelection->needsUpdate())
-		{
-			const std::string projectName = projectSelection->getValue();
-			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName);
-		}
+		const std::string projectName = projectSelection->getValue();
+		auto associatedCampaign = getObserver()->getMetadataCampaign(projectName);
+		assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
+		refresh |= m_queryProperties.updateOptions(this,associatedCampaign.value());
 	}
 
 	// Update the curve displayed in the frontend after the property change
@@ -130,8 +131,8 @@ bool EntityResult1DCurve::updateFromProperties()
 
 	doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
 	getObserver()->sendMessageToViewer(doc);
-
-	return this->updatePropertyVisibilities();
+	getProperties().forceResetUpdateForAllProperties();
+	return refresh;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -388,6 +389,7 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
 	}
 
 	this->updatePropertyVisibilities();
+	getProperties().forceResetUpdateForAllProperties();
 
 	m_queryInformation = _curve.getQueryInformation();
 }
@@ -440,8 +442,7 @@ bool EntityResult1DCurve::updatePropertyVisibilities()
 	}
 	
 	visibilityChanged |= m_queryProperties.updatePropertyVisibility(this);
-	getProperties().forceResetUpdateForAllProperties();
-
+	
 	return visibilityChanged;
 }
 

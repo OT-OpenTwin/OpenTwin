@@ -175,7 +175,7 @@ void EntityPropertiesBase::setupPropertyData(ot::PropertyGridCfg& _configuration
 	group->addProperty(_property);
 }
 
-bool EntityPropertiesBase::needsUpdate()
+bool EntityPropertiesBase::needsUpdate() const
 {
 	return m_needsUpdateFlag;
 }
@@ -697,6 +697,15 @@ EntityPropertiesString* EntityPropertiesString::createProperty(const std::string
 	newProperty->setIsMultiline(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultBool(defaultCategory, name + "_Multiline", false));
 	properties.createProperty(newProperty, group);
 	return newProperty;
+}
+
+void EntityPropertiesString::setValue(const std::string& _value)
+{
+	if (m_value != _value)
+	{
+		setNeedsUpdate(); 
+		m_value = _value; 
+	} 
 }
 
 EntityPropertiesString::EntityPropertiesString()
@@ -1468,7 +1477,10 @@ void EntityPropertiesProjectList::setFromConfiguration(const ot::Property* _prop
 		OT_LOG_E("Property cast failed");
 		return;
 	}
-
+	if (m_value != actualProperty->getCurrent())
+	{
+		setNeedsUpdate();
+	}
 	m_value = actualProperty->getCurrent();
 }
 

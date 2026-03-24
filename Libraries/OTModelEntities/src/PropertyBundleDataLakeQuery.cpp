@@ -127,7 +127,147 @@ bool PropertyBundleDataLakeQuery::updatePropertyVisibility(EntityBase* _thisObje
 }
 
 
-EntityPropertiesSelection* PropertyBundleDataLakeQuery::getProjectSelection(EntityBase* _thisObject)
+const EntityPropertiesProjectList* PropertyBundleDataLakeQuery::getProjectSelection(EntityBase* _thisObject)
 {
-	return PropertyHelper::getSelectionProperty(_thisObject, m_propertyNameProjectName);
+	return PropertyHelper::getEntityProjectListProperty(_thisObject, m_propertyNameProjectName);
+}
+
+
+bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, MetadataCampaign& _campaign)
+{
+	bool refreshNecessary = false;
+	bool projectChanged = PropertyHelper::getEntityProjectListProperty(_thisObject, m_propertyNameProjectName)->needsUpdate();
+
+	const auto& allParameterByLabel = _campaign.getMetadataParameterByLabel();
+	auto allQuantityByLabel = _campaign.getMetadataQuantitiesByLabel();
+
+	if (projectChanged)
+	{
+		refreshNecessary = true;
+		const std::list<MetadataSeries>& allSeries = _campaign.getSeriesMetadata();
+		std::list<std::string> seriesNames;
+		ot::JsonDocument overView;
+		for (const MetadataSeries& series : allSeries)
+		{
+			seriesNames.push_back(series.getName());
+			const ot::JsonDocument& metadata = series.getMetadata();
+			ot::json::mergeObjects(overView, metadata, overView.GetAllocator());
+		}
+		std::list<std::string> allOptions;
+		vectorize(overView, allOptions, "");
+		for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
+		{
+			const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
+			PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->resetOptions(allOptions);
+		}
+
+
+
+		seriesNames.push_front("");
+		setNameOptions(_thisObject, seriesNames, m_groupMetadataFilter, m_propertyNameSeriesMetadata);
+
+		//Could be used to filter the quantity and parameter options
+		bool seriesChanged = PropertyHelper::getSelectionProperty(_thisObject, m_propertyNameSeriesMetadata)->needsUpdate();
+
+		// First the label options for quantity and parameter. 
+		// Available quantity could be filtered by the series selection, parameter selection by series and quantity selection.
+		std::list<std::string> allParameterLabel;;
+		for (const auto& parameterByLabel : allParameterByLabel)
+		{
+			allParameterLabel.push_back(parameterByLabel.first);
+		}
+		allParameterLabel.push_front("");
+		for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
+		{
+			const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
+			setNameOptions(_thisObject,allParameterLabel, groupName, m_propertyName);
+		}
+
+		std::list<std::string> allQuantityLabel;;
+		for (const auto& quantityByLabel : allQuantityByLabel)
+		{
+			allQuantityLabel.push_back(quantityByLabel.first);
+		}
+		allQuantityLabel.push_front("");
+		setNameOptions(_thisObject, allQuantityLabel, m_groupQuantitySettings, m_propertyName);
+	}
+
+	bool refreshQuantityDescription = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->needsUpdate();
+	refreshNecessary |= refreshQuantityDescription;
+	if (refreshQuantityDescription)
+	{
+		const std::string label = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, m_groupQuantitySettings);
+		auto quantityByLabel =	allQuantityByLabel.find(label);
+		if (quantityByLabel == allQuantityByLabel.end())
+		{
+			setValuePropertiesEmpty(_thisObject, m_groupQuantitySettings);
+		}
+		else
+		{
+			setValueProperties(_thisObject, m_groupQuantitySettings, quantityByLabel->second->m_tupleDescription);
+		}
+	}
+
+	for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
+	{
+		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
+		bool refreshParameterDescription = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->needsUpdate();
+		refreshNecessary |= refreshParameterDescription;
+		if (refreshParameterDescription)
+		{
+			const std::string label = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, groupName);
+			auto parameterByLabel = allParameterByLabel.find(label);
+			if (parameterByLabel == allParameterByLabel.end())
+			{
+				setValuePropertiesEmpty(_thisObject, groupName);
+			}
+			else
+			{
+				MetadataParameter* parameter = parameterByLabel->second;
+				ot::TupleInstance single;
+				single.setTupleElementDataTypes({ parameter->typeName });
+				single.setTupleUnits({ parameter->unit });
+				setValueProperties(_thisObject,groupName, single);
+			}
+
+		}
+	}
+
+
+	return refreshNecessary;
+}
+
+
+void PropertyBundleDataLakeQuery::setNameOptions(EntityBase* _thisObject, const std::list<std::string>& _options, const std::string& _group, const std::string& _name)
+{
+	PropertyHelper::getSelectionProperty(_thisObject, _name, _group)->resetOptions(_options);
+}
+void PropertyBundleDataLakeQuery::setValueProperties(EntityBase* _thisObject, const std::string& _groupName, const ot::TupleInstance& _tupleInstance)
+{
+	PropertyHelper::getStringProperty(_thisObject, m_propertyDataType, _groupName)->setValue(_tupleInstance.getTupleElementDataTypes().front());
+	PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, _groupName)->setValue(_tupleInstance.getTupleUnits().front());
+}
+void PropertyBundleDataLakeQuery::setValuePropertiesEmpty(EntityBase* _thisObject, const std::string& _groupName)
+{
+	PropertyHelper::getStringProperty(_thisObject, m_propertyDataType, _groupName)->setValue("");
+	PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, _groupName)->setValue("");
+}
+
+
+void PropertyBundleDataLakeQuery::vectorize(const ot::JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase)
+{
+	if (_value.IsObject())
+	{
+		std::string separator = _nameBase.empty() ? "" : "~";
+		for (auto& element : _value.GetObject())
+		{
+			std::string name = _nameBase + separator + element.name.GetString();
+			ot::String::removeControlCharacters(name);
+			_allEntries.push_back(name);
+			if (element.value.IsObject())
+			{
+				vectorize(element.value, _allEntries, name);
+			}
+		}
+	}
 }
