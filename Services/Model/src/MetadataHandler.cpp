@@ -66,10 +66,6 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 						EntityMetadataSeries* series = dynamic_cast<EntityMetadataSeries*>(baseEnt.release());
 						measurementMetadataEntity.push_back(std::shared_ptr<EntityMetadataSeries>(series));
 					}
-					else
-					{
-						assert(false);
-					}
 				}
 			}
 		}
