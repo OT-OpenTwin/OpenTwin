@@ -165,13 +165,13 @@ ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 	for (int i = 0; i < m_rows; i++) {
 		OTAssert(i < m_rowHeader.size(), "Index out of range");
 		if (_other.m_rowHeader[i]) {
-			m_rowHeader[i] = new TableHeaderItemCfg(*_other.m_rowHeader[i]);
+			m_rowHeader[i] = _other.m_rowHeader[i]->createCopy();
 		}
 	}
 	for (int i = 0; i < m_columns; i++) {
 		OTAssert(i < m_columnHeader.size(), "Index out of range");
 		if (_other.m_columnHeader[i]) {
-			m_columnHeader[i] = new TableHeaderItemCfg(*_other.m_columnHeader[i]);
+			m_columnHeader[i] = _other.m_columnHeader[i]->createCopy();
 		}
 	}
 
@@ -288,7 +288,7 @@ void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 }
 
-ot::GenericDataStructMatrix ot::TableCfg::createMatrix(void) const {
+ot::GenericDataStructMatrix ot::TableCfg::createMatrix() const {
 	MatrixEntryPointer dimensions;
 	dimensions.m_row = m_rows;
 	dimensions.m_column = m_columns;
@@ -415,35 +415,31 @@ const ot::TableHeaderItemCfg* ot::TableCfg::getRowHeader(int _row) const {
 
 void ot::TableCfg::setColumnHeader(int _column, TableHeaderItemCfg* _item) {
 	OTAssert(_column < m_columns, "Index out of range");
-	if (m_columnHeader[_column] == _item) return;
-	if (m_columnHeader[_column]) delete m_columnHeader[_column];
+	
+	// Skip self assignment
+	if (m_columnHeader[_column] == _item)
+	{
+		return;
+	}
+
+	// Delete existing
+	if (m_columnHeader[_column])
+	{
+		delete m_columnHeader[_column];
+	}
+	
+	// Assign new
 	m_columnHeader[_column] = _item;
 }
 
 void ot::TableCfg::setColumnHeaderText(int _column, const std::string& _headerText)
 {
-	OTAssert(_column < m_columns, "Index out of range");
-	TableHeaderItemCfg* itm = m_columnHeader[_column];
-	if (!itm)
-	{
-		itm = new TableHeaderItemCfg;
-		this->setColumnHeader(_column, itm);
-	}
-	
-	itm->setText(_headerText);
+	getOrCreateColumnHeaderItem(_column)->setText(_headerText);
 }
 
-void ot::TableCfg::setColumnHeaderFilterEnabled(int _column, bool _enabled)
+void ot::TableCfg::setColumnHeaderFilterBehavior(int _column, TableHeaderItemCfg::FilterBehavior _behavior)
 {
-	OTAssert(_column < m_columns, "Index out of range");
-	TableHeaderItemCfg* itm = m_columnHeader[_column];
-	if (!itm)
-	{
-		itm = new TableHeaderItemCfg;
-		this->setColumnHeader(_column, itm);
-	}
-
-	itm->setFilterEnabled(_enabled);
+	getOrCreateColumnHeaderItem(_column)->setFilterBehavior(_behavior);
 }
 
 const ot::TableHeaderItemCfg* ot::TableCfg::getColumnHeader(int _column) const {
@@ -469,4 +465,16 @@ void ot::TableCfg::initialize(int _rows, int _columns)
 	m_rows = _rows;
 	m_columns = _columns;
 	this->initialize();
+}
+
+inline ot::TableHeaderItemCfg* ot::TableCfg::getOrCreateColumnHeaderItem(int _column)
+{
+	OTAssert(_column < m_columns && _column >= 0, "Index out of range");
+	TableHeaderItemCfg* itm = m_columnHeader[_column];
+	if (!itm)
+	{
+		itm = new TableHeaderItemCfg;
+		this->setColumnHeader(_column, itm);
+	}
+	return itm;
 }

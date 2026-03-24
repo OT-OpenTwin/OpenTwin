@@ -1,8 +1,10 @@
 // @otlicense
 
 // OpenTwin header
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Header/HeaderBase.h"
+#include "OTWidgets/Header/HeaderFilter.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 
 // Qt header
@@ -28,7 +30,7 @@ int ot::HeaderBase::sizeHintForColumn(int _column) const
 {
 	int hint = QHeaderView::sizeHintForColumn(_column);
 
-	if (canFilter(_column))
+	if (getFilterFeatures(_column))
 	{
 		hint += m_buttonSize.width() + m_buttonPadding.width();
 	}
@@ -40,7 +42,7 @@ int ot::HeaderBase::sizeHintForRow(int _row) const
 {
 	int hint = QHeaderView::sizeHintForRow(_row);
 
-	if (canFilter(_row))
+	if (getFilterFeatures(_row))
 	{
 		hint += m_buttonSize.height() + m_buttonPadding.height();
 	}
@@ -63,7 +65,7 @@ void ot::HeaderBase::paintSection(QPainter* _painter, const QRect& _rect, int _l
 	// Call style to draw base header
 	style()->drawControl(QStyle::CE_Header, &opt, _painter, this);
 
-	if (!canFilter(_logicalIndex))
+	if (!getFilterFeatures(_logicalIndex))
 	{
 		return;
 	}
@@ -108,7 +110,7 @@ QSize ot::HeaderBase::sectionSizeFromContents(int _logicalIndex) const
 {
 	QSize size = QHeaderView::sectionSizeFromContents(_logicalIndex);
 
-	if (canFilter(_logicalIndex))
+	if (getFilterFeatures(_logicalIndex))
 	{
 		size = size.expandedTo(m_buttonSize + m_buttonPadding);
 		size.setWidth(size.width() + m_buttonSize.width());
@@ -120,7 +122,7 @@ QSize ot::HeaderBase::sectionSizeFromContents(int _logicalIndex) const
 void ot::HeaderBase::mousePressEvent(QMouseEvent* _event)
 {
 	int ix = logicalIndexAt(_event->pos());
-	if (ix >= 0 && canFilter(ix))
+	if (ix >= 0 && getFilterFeatures(ix))
 	{
 		QRect iconRect = filterIconRect(ix);
 		if (iconRect.contains(_event->pos()))
@@ -166,7 +168,7 @@ void ot::HeaderBase::mouseReleaseEvent(QMouseEvent* _event)
 void ot::HeaderBase::mouseMoveEvent(QMouseEvent* _event)
 {
 	int ix = logicalIndexAt(_event->pos());
-	if (ix >= 0 && canFilter(ix))
+	if (ix >= 0 && getFilterFeatures(ix))
 	{
 		QRect iconRect = filterIconRect(ix);
 		if (!iconRect.contains(_event->pos()))
@@ -202,20 +204,21 @@ void ot::HeaderBase::leaveEvent(QEvent* _event)
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Private: Slots
+// Protected: Filtering
 
-void ot::HeaderBase::sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _sortOrder)
+ot::HeaderFilter::Features ot::HeaderBase::getFilterFeatures(int _logicalIndex) const
 {
-
+	return HeaderFilter::Feature::NoFeatuers;
 }
 
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Private: Helper
-
-bool ot::HeaderBase::canFilter(int _logicalIndex) const
+QString ot::HeaderBase::getFilterTitle(int _logicalIndex) const
 {
-	return false;
+	return QString();
+}
+
+QStringList ot::HeaderBase::getFilterOptions(int _logicalIndex) const
+{
+	return QStringList();
 }
 
 QRect ot::HeaderBase::filterIconRect(int _logicalIndex) const
@@ -234,5 +237,67 @@ QRect ot::HeaderBase::filterIconRect(int _logicalIndex) const
 
 void ot::HeaderBase::showFilterMenu(int _logicalIndex)
 {
-	
+	HeaderFilter::Features features = getFilterFeatures(_logicalIndex);
+	if (!features)
+	{
+		return;
+	}
+
+	QRect rect = filterIconRect(_logicalIndex);
+	HeaderFilter filter(_logicalIndex, features, parentWidget());
+
+	filter.setTitle(getFilterTitle(_logicalIndex));
+	filter.setOptions(getFilterOptions(_logicalIndex));
+
+	auto it = m_filterState.filterData.find(_logicalIndex);
+	if (it != m_filterState.filterData.end())
+	{
+		filter.updateCheckedState(it->second);
+	}
+
+	connect(&filter, &HeaderFilter::sortOrderChanged, this, &HeaderBase::sortOrderChangeRequest);
+
+	filter.showAt(mapToGlobal(rect.bottomLeft()));
+
+	disconnect(&filter, &HeaderFilter::sortOrderChanged, this, &HeaderBase::sortOrderChangeRequest);
+
+	if (filter.wasConfirmed())
+	{
+		QStringList selectedOptions = filter.saveCheckedState();
+
+		if (selectedOptions.isEmpty())
+		{
+
+			m_filterState.activeFilter = (-1);
+		}
+		else
+		{
+			m_filterState.activeFilter = _logicalIndex;
+		}
+
+		const QStringList& opt = m_filterState.filterData.insert_or_assign(_logicalIndex, std::move(selectedOptions)).first->second;
+
+		try
+		{
+			menuActionTriggered(_logicalIndex, opt);
+		}
+		catch (const std::exception& ex)
+		{
+			OT_LOG_E("Exception while applying filter: " + std::string(ex.what()));
+		}
+
+		update();
+	}
 }
+
+void ot::HeaderBase::menuActionTriggered(int _logicalIndex, const QStringList& _selectedOptions)
+{
+
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Slots
+
+void ot::HeaderBase::sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _sortOrder)
+{}

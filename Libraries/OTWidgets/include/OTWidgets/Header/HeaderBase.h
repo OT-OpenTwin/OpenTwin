@@ -4,6 +4,7 @@
 
 // OpenTwin header
 #include "OTWidgets/WidgetTypes.h"
+#include "OTWidgets/Header/HeaderFilter.h"
 
 // Qt header
 #include <QtCore/qsize.h>
@@ -11,6 +12,8 @@
 
 namespace ot {
 	
+	class HeaderFilter;
+
 	class OT_WIDGETS_API_EXPORT HeaderBase : public QHeaderView
 	{
 		OT_DECL_NOCOPY(HeaderBase)
@@ -46,10 +49,26 @@ namespace ot {
 
 		// Protected: Filtering
 
-		virtual bool canFilter(int _logicalIndex) const;
-		virtual QRect filterIconRect(int _logicalIndex) const;
-		virtual void showFilterMenu(int _logicalIndex);
+		virtual HeaderFilter::Features getFilterFeatures(int _logicalIndex) const;
+		virtual QString getFilterTitle(int _logicalIndex) const;
+		virtual QStringList getFilterOptions(int _logicalIndex) const;
+		
 		inline void setActiveFilterIndex(int _logicalIndex) { m_filterState.activeFilter = _logicalIndex; };
+		inline bool getActiveFilterIndex() const { return m_filterState.activeFilter; };
+
+		virtual QRect filterIconRect(int _logicalIndex) const;
+
+		//! @brief Displays the filter menu for the specified logical index if filtering is enabled for that index.
+		//! Uses the virtual methods to setup a HeaderFilter instance.
+		//! Sorting will be handled synchronously by calling the sortOrderChangeRequest slot.
+		//! Filters will be handled on confirm by calling the menuActionTriggered method with the selected options.
+		//! @param _logicalIndex The logical index to show the filter menu for.
+		virtual void showFilterMenu(int _logicalIndex);
+
+		//! @brief Is called when the user confirms the filter menu.
+		//! @param _logicalIndex The logical index the filter menu was shown for.
+		//! @param _selectedOptions The list of selected options in the filter menu.
+		virtual void menuActionTriggered(int _logicalIndex, const QStringList& _selectedOptions);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -70,6 +89,8 @@ namespace ot {
 			int hoveredFilter = -1;
 			int pressedFilter = -1;
 			int activeFilter = -1;
+
+			std::map<int, QStringList> filterData; //! @brief Map <logical index, last selection>
 		};
 		FilterState m_filterState;
 

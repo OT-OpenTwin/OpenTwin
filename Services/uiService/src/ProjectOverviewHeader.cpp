@@ -42,9 +42,51 @@ ot::ProjectOverviewHeader::~ProjectOverviewHeader() {
 
 // Overrides
 
-bool ot::ProjectOverviewHeader::canFilter(int _logicalIndex) const
+ot::HeaderFilter::Features ot::ProjectOverviewHeader::getFilterFeatures(int _logicalIndex) const
 {
-	return (_logicalIndex != ColumnIndex::Checked);
+	HeaderFilter::Features features;
+
+	if (_logicalIndex != ProjectOverviewHeader::Checked)
+	{
+		features.set(ot::HeaderFilter::Feature::SortingEnabled);
+
+		if (_logicalIndex != ProjectOverviewHeader::LastAccessed)
+		{
+			features.set(ot::HeaderFilter::Feature::FilteringEnabled);
+		}
+	}
+
+	return features;
+}
+
+QString ot::ProjectOverviewHeader::getFilterTitle(int _logicalIndex) const
+{
+	switch (_logicalIndex)
+	{
+	case ColumnIndex::Group: return "Project Group";
+	case ColumnIndex::Type: return "Project Type";
+	case ColumnIndex::Name: return "Project Name";
+	case ColumnIndex::Tags: return "Project Tags";
+	case ColumnIndex::Owner: return "Project Owner";
+	case ColumnIndex::Access: return "Shared Groups";
+	case ColumnIndex::LastAccessed: return "Last Accessed";
+	default:
+		OT_LOG_E("Invalid column for filter (" + std::to_string(_logicalIndex) + ")");
+		return "";
+	}
+}
+
+QStringList ot::ProjectOverviewHeader::getFilterOptions(int _logicalIndex) const
+{
+	const auto optionsIt = m_filterOptions.find(_logicalIndex);
+	if (optionsIt != m_filterOptions.end())
+	{
+		return optionsIt->second;
+	}
+	else
+	{
+		return QStringList();
+	}
 }
 
 void ot::ProjectOverviewHeader::setFilterData(const ProjectFilterData& _filterData) {
@@ -108,87 +150,14 @@ void ot::ProjectOverviewHeader::setFilterData(const ProjectFilterData& _filterDa
 	m_filterOptions.emplace(ColumnIndex::Access, std::move(accessOptions));
 }
 
-void ot::ProjectOverviewHeader::showFilterMenu(int _logicalIndex)
-{
-	if (!canFilter(_logicalIndex))
-	{
-		return;
-	}
-	QRect rect = filterIconRect(_logicalIndex);
-
-	HeaderFilter filter(_logicalIndex, _logicalIndex == ColumnIndex::LastAccessed, m_overview->getQWidget());
-
-	// Fill options based on column
-	switch (_logicalIndex)
-	{
-	case ColumnIndex::Group:
-		filter.setTitle("Project Group");
-		break;
-
-	case ColumnIndex::Type:
-		filter.setTitle("Project Type");
-		break;
-
-	case ColumnIndex::Name:
-		filter.setTitle("Project Name");
-		break;
-
-	case ColumnIndex::Tags:
-		filter.setTitle("Project Tags");
-		break;
-
-	case ColumnIndex::Owner:
-		filter.setTitle("Project Owner");
-		break;
-
-	case ColumnIndex::Access:
-		filter.setTitle("Shared Groups");
-		break;
-
-	case ColumnIndex::LastAccessed:
-		filter.setTitle("Last Accessed");
-		break;
-
-	default:
-		OT_LOG_E("Invalid column for filter (" + std::to_string(_logicalIndex) + ")");
-		return;
-	}
-
-	auto optionsIt = m_filterOptions.find(_logicalIndex);
-	if (optionsIt != m_filterOptions.end())
-	{
-		filter.setOptions(optionsIt->second);
-	}
-
-	filter.updateCheckedState(m_lastFilter.getSelectedFilters());
-
-	connect(&filter, &HeaderFilter::sortOrderChanged, this, &ProjectOverviewHeader::sortOrderChangeRequest);
-
-	filter.showAt(mapToGlobal(rect.bottomLeft()));
-
-	disconnect(&filter, &HeaderFilter::sortOrderChanged, this, &ProjectOverviewHeader::sortOrderChangeRequest);
-
-	if (filter.wasConfirmed())
-	{
-		m_lastFilter.setSelectedFilters(filter.saveCheckedState());
-		m_lastFilter.setLogicalIndex(_logicalIndex);
-
-		if (m_lastFilter.getSelectedFilters().empty())
-		{
-			setActiveFilterIndex(-1);
-		}
-		else
-		{
-			setActiveFilterIndex(m_lastFilter.getLogicalIndex());
-		}
-
-		m_overview->filterProjects(m_lastFilter);
-		
-		update();
-	}
-}
-
 void ot::ProjectOverviewHeader::sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _sortOrder)
 {
 	m_overview->sort(_logicalIndex, _sortOrder);
+}
+
+void ot::ProjectOverviewHeader::menuActionTriggered(int _logicalIndex, const QStringList& _selectedOptions)
+{
+	m_lastFilter.setSelectedFilters(_selectedOptions);
+	m_lastFilter.setLogicalIndex(_logicalIndex);
+	m_overview->filterProjects(m_lastFilter);
 }

@@ -32,32 +32,35 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qlistwidget.h>
 
-ot::HeaderFilter::HeaderFilter(int _logicalIndex, bool _sortOnly, QWidget* _parent)
+ot::HeaderFilter::HeaderFilter(int _logicalIndex, const Features& _features, QWidget* _parent)
 	: QMenu(_parent), m_logicalIndex(_logicalIndex), m_isConfirmed(false),
-	m_optionsList(nullptr), m_filterEdit(nullptr)
+	m_optionsList(nullptr), m_filterEdit(nullptr), m_features(_features)
 {
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
 
 	m_title = new Label(this);
 	centralLayout->addWidget(m_title);
 
-	QHBoxLayout* sortAscLayout = new QHBoxLayout;
-	sortAscLayout->setContentsMargins(0, 0, 0, 0);
-	centralLayout->addLayout(sortAscLayout);
-	ToolButton* sortAscButton = new ToolButton(IconManager::getIcon("Button/SortAscending.png"), "", this);
-	sortAscLayout->addWidget(sortAscButton);
-	sortAscLayout->addWidget(new Label("Sort Ascending", this), 1);
-	connect(sortAscButton, &ToolButton::clicked, this, &HeaderFilter::slotSortAscending);
+	if (m_features.has(Feature::SortingEnabled))
+	{
+		QHBoxLayout* sortAscLayout = new QHBoxLayout;
+		sortAscLayout->setContentsMargins(0, 0, 0, 0);
+		centralLayout->addLayout(sortAscLayout);
+		ToolButton* sortAscButton = new ToolButton(IconManager::getIcon("Button/SortAscending.png"), "", this);
+		sortAscLayout->addWidget(sortAscButton);
+		sortAscLayout->addWidget(new Label("Sort Ascending", this), 1);
+		connect(sortAscButton, &ToolButton::clicked, this, &HeaderFilter::slotSortAscending);
 
-	QHBoxLayout* sortDescLayout = new QHBoxLayout;
-	sortDescLayout->setContentsMargins(0, 0, 0, 0);
-	centralLayout->addLayout(sortDescLayout);
-	ToolButton* sortDescButton = new ToolButton(IconManager::getIcon("Button/SortDescending.png"), "", this);
-	sortDescLayout->addWidget(sortDescButton);
-	sortDescLayout->addWidget(new Label("Sort Descending", this), 1);
-	connect(sortDescButton, &ToolButton::clicked, this, &HeaderFilter::slotSortDescending);
+		QHBoxLayout* sortDescLayout = new QHBoxLayout;
+		sortDescLayout->setContentsMargins(0, 0, 0, 0);
+		centralLayout->addLayout(sortDescLayout);
+		ToolButton* sortDescButton = new ToolButton(IconManager::getIcon("Button/SortDescending.png"), "", this);
+		sortDescLayout->addWidget(sortDescButton);
+		sortDescLayout->addWidget(new Label("Sort Descending", this), 1);
+		connect(sortDescButton, &ToolButton::clicked, this, &HeaderFilter::slotSortDescending);
+	}
 
-	if (!_sortOnly)
+	if (m_features.has(Feature::FilteringEnabled))
 	{
 		m_filterEdit = new LineEdit(this);
 		m_filterEdit->setPlaceholderText("Type to filter...");

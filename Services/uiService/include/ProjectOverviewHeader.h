@@ -59,9 +59,12 @@ namespace ot {
 		void setFilterData(const ProjectFilterData& _filterData);
 
 	protected:
-		virtual bool canFilter(int _logicalIndex) const override;
-		virtual void showFilterMenu(int _logicalIndex) override;
+		virtual ot::HeaderFilter::Features getFilterFeatures(int _logicalIndex) const override;
+		virtual QString getFilterTitle(int _logicalIndex) const override;
+		virtual QStringList getFilterOptions(int _logicalIndex) const override;
+
 		virtual void sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _sortOrder) override;
+		virtual void menuActionTriggered(int _logicalIndex, const QStringList& _selectedOptions) override;
 
 	private:
 		ProjectOverviewWidget* m_overview;

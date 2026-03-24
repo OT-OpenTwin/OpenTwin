@@ -81,7 +81,7 @@ namespace ot {
 
 		void setColumnHeader(int _column, TableHeaderItemCfg* _item);
 		void setColumnHeaderText(int _column, const std::string& _headerText);
-		void setColumnHeaderFilterEnabled(int _column, bool _enabled);
+		void setColumnHeaderFilterBehavior(int _column, TableHeaderItemCfg::FilterBehavior _behavior);
 		const TableHeaderItemCfg* getColumnHeader(int _column) const;
 
 		void setSortingEnabled(bool _enable = true) { m_sortingEnabled = _enable; };
@@ -95,6 +95,7 @@ namespace ot {
 	private:
 		void initialize();
 		void initialize(int _rows, int _columns);
+		inline TableHeaderItemCfg* getOrCreateColumnHeaderItem(int _column);
 
 		int m_rows = 0;
 		int m_columns = 0;

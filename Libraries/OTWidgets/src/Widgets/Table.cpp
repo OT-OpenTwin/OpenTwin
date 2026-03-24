@@ -76,6 +76,7 @@ ot::Table::Table(QWidget* _parentWidget)
 	: QTableWidget(_parentWidget), m_contentChanged(false), m_resizeRequired(false),
 	m_stopResizing(true), m_itemDelegate(nullptr)
 {
+
 	this->ini();
 }
 
@@ -191,7 +192,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 	this->setResizeRequired();
 }
 
-ot::TableCfg ot::Table::createConfig(void) const {
+ot::TableCfg ot::Table::createConfig() const {
 	OT_TEST_TABLE_Interval("Create config");
 
 	TableCfg cfg(this->rowCount(), this->columnCount());
@@ -266,7 +267,7 @@ void ot::Table::setSelectedCellsBackground(const QColor& _color) {
 	}
 }
 
-void ot::Table::prepareForDataChange(void) {
+void ot::Table::prepareForDataChange() {
 	m_stopResizing = true;
 }
 
@@ -287,7 +288,7 @@ ot::TableItem* ot::Table::addItem(int _row, int _column, const QIcon& _icon, con
 
 // Public slots
 
-void ot::Table::slotSaveRequested(void) {
+void ot::Table::slotSaveRequested() {
 	Q_EMIT saveRequested();
 }
 
@@ -430,7 +431,7 @@ void ot::Table::slotResizeRowToContent(int _row) {
 
 // Private helper
 
-void ot::Table::ini(void) {
+void ot::Table::ini() {
 	m_itemDelegate = new TableItemDelegate(this);
 
 	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
@@ -440,7 +441,7 @@ void ot::Table::ini(void) {
 	this->connect(saveShortcut, &QShortcut::activated, this, &Table::slotSaveRequested);
 }
 
-void ot::Table::resizeColumnsToContentIfNeeded(void) {
+void ot::Table::resizeColumnsToContentIfNeeded() {
 	// Ensure we have any content
 	if (this->horizontalHeader()->count() == 0) {
 		this->resizeRowsToContentIfNeeded();
@@ -460,7 +461,7 @@ void ot::Table::resizeColumnsToContentIfNeeded(void) {
 	this->slotResizeColumnToContent(0);
 }
 
-void ot::Table::resizeRowsToContentIfNeeded(void) {
+void ot::Table::resizeRowsToContentIfNeeded() {
 	// Ensure we have any content
 	if (this->verticalHeader()->count() == 0) {
 		return;
@@ -478,7 +479,7 @@ void ot::Table::resizeRowsToContentIfNeeded(void) {
 	this->slotResizeRowToContent(0);
 }
 
-void ot::Table::setResizeRequired(void) {
+void ot::Table::setResizeRequired() {
 	if (this->isVisible()) {
 		this->resizeColumnsToContentIfNeeded();
 	}

@@ -29,6 +29,14 @@ namespace ot {
 		OT_DECL_DEFCOPY(TableHeaderItemCfg)
 		OT_DECL_DEFMOVE(TableHeaderItemCfg)
 	public:
+		enum FilterBehavior {
+			NoFilter,
+			UseText,
+			RequestData
+		};
+		static std::string toString(FilterBehavior _behavior);
+		static FilterBehavior stringToFilterBehavior(const std::string& _behavior);
+
 		TableHeaderItemCfg() = default;
 		TableHeaderItemCfg(const std::string& _text);
 		virtual ~TableHeaderItemCfg() = default;
@@ -43,15 +51,17 @@ namespace ot {
 		//! @throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		virtual TableHeaderItemCfg* createCopy() const { return new TableHeaderItemCfg(*this); };
+
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string& getText() const { return m_text; };
 
-		void setFilterEnabled(bool _enabled) { m_filterEnabled = _enabled; };
-		bool getFilterEnabled() const { return m_filterEnabled; };
+		void setFilterBehavior(FilterBehavior _behavior) { m_filterBehavior = _behavior; };
+		FilterBehavior getFilterBehavior() const { return m_filterBehavior; };
 
 	private:
 		std::string m_text;
-		bool m_filterEnabled = false;
+		FilterBehavior m_filterBehavior = FilterBehavior::NoFilter;
 	};
 
 }

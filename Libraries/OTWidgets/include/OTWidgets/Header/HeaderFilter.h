@@ -52,7 +52,15 @@ namespace ot {
 		OT_DECL_NOMOVE(HeaderFilter)
 		OT_DECL_NODEFAULT(HeaderFilter)
 	public:
-		explicit HeaderFilter(int _logicalIndex, bool _sortOnly, QWidget* _parent);
+		enum class Feature : uint32_t
+		{
+			NoFeatuers       = 0 << 0,
+			SortingEnabled   = 1 << 0,
+			FilteringEnabled = 1 << 1
+		};
+		typedef Flags<Feature, uint32_t> Features;
+
+		explicit HeaderFilter(int _logicalIndex, const Features& _features, QWidget* _parent);
 		virtual ~HeaderFilter() = default;
 
 		void setTitle(const QString& _title);
@@ -74,6 +82,8 @@ namespace ot {
 		//! @param _pos Global position where the menu should be shown.
 		void showAt(const QPoint& _pos);
 
+		const Features& getFilterFeatures() const { return m_features; };
+
 	Q_SIGNALS:
 		void sortOrderChanged(int _logicalIndex, Qt::SortOrder _sortOrder);
 
@@ -92,6 +102,8 @@ namespace ot {
 	private:
 		int m_logicalIndex;
 		bool m_isConfirmed;
+
+		Features m_features;
 
 		Label* m_title;
 		LineEdit* m_filterEdit;
