@@ -795,6 +795,7 @@
 #define OT_INFO_SERVICE_TYPE_LibraryManagementService "LibraryManagementService"
 #define OT_INFO_SERVICE_TYPE_HierarchicalProjectService "HierarchicalProjectService"
 #define OT_INFO_SERVICE_TYPE_FileManagementProjectService "FileManagementProjectService"
+#define OT_INFO_SERVICE_TYPE_OPENEMS "OpenEMSService"
 
 #define OT_INFO_MESSAGE_LogIn "UI.LogIn"
 

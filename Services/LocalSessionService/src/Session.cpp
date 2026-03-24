@@ -110,6 +110,7 @@ std::list<std::string> Session::getToolBarTabOrder() {
 	tabOrder.push_back("PHREEC");
 	tabOrder.push_back("GetDP");
 	tabOrder.push_back("ElmerFEM");
+	tabOrder.push_back("OpenEMS");
 	tabOrder.push_back("Post Processing");
 	
 	return tabOrder;

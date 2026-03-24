@@ -112,19 +112,20 @@ SessionService::SessionService()
 	//DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_KRIGING, OT_INFO_SERVICE_TYPE_KRIGING));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ModelingService, OT_INFO_SERVICE_TYPE_ModelingService));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_VisualizationService, OT_INFO_SERVICE_TYPE_VisualizationService));
-	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FITTD, OT_INFO_SERVICE_TYPE_FITTD));
+	//DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FITTD, OT_INFO_SERVICE_TYPE_FITTD));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CartesianMeshService, OT_INFO_SERVICE_TYPE_CartesianMeshService));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_GETDP, OT_INFO_SERVICE_TYPE_GETDP));
-	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FDTD, OT_INFO_SERVICE_TYPE_FDTD));
-	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ELMERFEM, OT_INFO_SERVICE_TYPE_ELMERFEM));
+	//DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FDTD, OT_INFO_SERVICE_TYPE_FDTD));
+	//DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ELMERFEM, OT_INFO_SERVICE_TYPE_ELMERFEM));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DataProcessingService, OT_INFO_SERVICE_TYPE_DataProcessingService));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_STUDIOSUITE, OT_INFO_SERVICE_TYPE_STUDIOSUITE));
 	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_LTSPICE, OT_INFO_SERVICE_TYPE_LTSPICE));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_OPENEMS, OT_INFO_SERVICE_TYPE_OPENEMS));
 
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, std::move(DevelopmentSessionServices));
 
@@ -155,12 +156,13 @@ SessionService::SessionService()
 	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PHREEC, OT_INFO_SERVICE_TYPE_PHREEC));
 	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ModelingService, OT_INFO_SERVICE_TYPE_ModelingService));
 	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_VisualizationService, OT_INFO_SERVICE_TYPE_VisualizationService));
-	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FITTD, OT_INFO_SERVICE_TYPE_FITTD));
+	//Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FITTD, OT_INFO_SERVICE_TYPE_FITTD));
 	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CartesianMeshService, OT_INFO_SERVICE_TYPE_CartesianMeshService));
 	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
 	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_GETDP, OT_INFO_SERVICE_TYPE_GETDP));
-	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FDTD, OT_INFO_SERVICE_TYPE_FDTD));
-	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ELMERFEM, OT_INFO_SERVICE_TYPE_ELMERFEM));
+	//Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FDTD, OT_INFO_SERVICE_TYPE_FDTD));
+	//Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ELMERFEM, OT_INFO_SERVICE_TYPE_ELMERFEM));
+	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_OPENEMS, OT_INFO_SERVICE_TYPE_OPENEMS));
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_3DSIM, std::move(Simulation3DSessionServices));
 
 	//

@@ -65,7 +65,8 @@ set OT_LOCALDIRECTORYSERVICE_CONFIGURATION={^
 		"LTSpiceService",^
 		"PyritService",^
 		"HierarchicalProjectService",^
-		"FileManagementProjectService"^
+		"FileManagementProjectService",^
+		"OpenEMSService"^
 		]^
 	}
 set OT_LOCALDIRECTORYSERVICE_CONFIGURATION_DEFINED=1
