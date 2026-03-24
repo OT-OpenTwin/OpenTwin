@@ -34,7 +34,7 @@
 #include "OTGui/Style/StyledTextBuilder.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTModelEntities/DataBase.h"
-#include "OTModelEntities/EntitySolverPyrit.h"
+#include "OTModelEntities/EntitySolverOpenEMS.h"
 #include "OTModelEntities/EntityResultText.h"
 #include "OTModelEntities/EntityFileText.h"
 #include "OTModelEntities/EntityResultUnstructuredMeshVtk.h"
@@ -119,7 +119,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	_ui->addMenuPage("OpenEMS");
 
 	_ui->addMenuGroup("OpenEMS", "Solver");
-	//	_ui->addMenuGroup("Pyrit", "Sources");
+	//	_ui->addMenuGroup("OpenEMS", "Sources");
 
 	_ui->addMenuButton(m_addSolverButton);
 	_ui->addMenuButton(m_runSolverButton);
@@ -222,10 +222,10 @@ void Application::handleAddSolver()
 	ot::ModelServiceAPI::getAvailableScripts(scriptFolderName, scriptFolderID, scriptName, scriptID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverPyrit* solverEntity = new EntitySolverPyrit(entityID, nullptr, nullptr, nullptr);
+	EntitySolverOpenEMS* solverEntity = new EntitySolverOpenEMS(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
 	solverEntity->setTreeItemEditable(true);
-	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID, scriptFolderName, scriptFolderID, scriptName, scriptID);
+	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);
 	solverEntity->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
@@ -266,7 +266,7 @@ void Application::handleRunSolver()
 	std::map<std::string, bool> solverRunMap;
 	for (auto& entity : this->getSelectedEntityInfos())
 	{
-		if (entity.getEntityType() == "EntitySolverPyrit")
+		if (entity.getEntityType() == "EntitySolverOpenEMS")
 		{
 			if (entity.getEntityName().substr(0, 8) == "Solvers/")
 			{
@@ -351,7 +351,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	}
 
 	if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-	this->getUiComponent()->displayMessage("\nPyrit solver started: " + solverName + "\n\n");
+	this->getUiComponent()->displayMessage("\nOpenEMS solver started: " + solverName + "\n\n");
 
 	if (solverEntity == nullptr)
 	{
@@ -448,24 +448,24 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 
 	std::string returnMessage;
 	if (!m_subprocessManager->sendRequest(doc, returnMessage)) {
-		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to execute pyrit script").toJson();
+		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to execute OpenEMS script").toJson();
 	}
 
 	ot::ReturnMessage returnValue = ot::ReturnMessage::fromJson(returnMessage);
 	
 	if (returnValue.getStatus() == ot::ReturnMessage::Ok)
 	{
-		std::string message = "\nPyrit solver successfully completed.\n";
+		std::string message = "\nOpenEMS solver successfully completed.\n";
 		this->getUiComponent()->displayMessage(message);
 		m_subprocessManager->addLogText(message);
 	}
 	else if (returnValue.getStatus() == ot::ReturnMessage::Failed)
 	{
 		ot::StyledTextBuilder message;
-		message << "\n[" << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle << "] " << "Pyrit solver failed : (" << returnValue.getWhat() << ")\n";
+		message << "\n[" << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle << "] " << "OpenEMS solver failed : (" << returnValue.getWhat() << ")\n";
 
 		this->getUiComponent()->displayStyledMessage(message);
-		m_subprocessManager->addLogText("ERROR: Pyrit solver failed : (" + returnValue.getWhat() + ")\n");
+		m_subprocessManager->addLogText("ERROR: OpenEMS solver failed : (" + returnValue.getWhat() + ")\n");
 	}
 	else
 	{

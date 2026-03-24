@@ -188,6 +188,7 @@ set(OTMODELENTITIES_HEADER_FILES
     include/OTModelEntities/EntitySignalType.h
     include/OTModelEntities/EntitySolver.h
     include/OTModelEntities/EntitySolverFITTD.h
+    include/OTModelEntities/EntitySolverOpenEMS.h
     include/OTModelEntities/EntitySolverKriging.h
     include/OTModelEntities/EntitySolverMonitor.h
     include/OTModelEntities/EntitySolverPHREEC.h
@@ -316,6 +317,7 @@ set(OTMODELENTITIESSOURCE_FILES
     src/EntitySolverKriging.cpp
     src/EntitySolverMonitor.cpp
     src/EntitySolverPHREEC.cpp
+    src/EntitySolverOpenEMS.cpp
     src/EntitySolverPort.cpp
     src/EntityTableSelectedRanges.cpp
     src/EntityUnits.cpp
