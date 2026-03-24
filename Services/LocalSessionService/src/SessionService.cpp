@@ -322,10 +322,7 @@ bool SessionService::runMandatoryServices(Session& _session) {
 
 		ot::ServiceInitData generalData = _session.createServiceInitData(1);
 
-		if (!m_gds.requestToStartServices(generalData, releaseServices)) {
-			OT_LOG_E("Failed to request service start");
-			return false;
-		}
+		m_gds.requestToStartServices(generalData, releaseServices);
 	}
 
 	return true;

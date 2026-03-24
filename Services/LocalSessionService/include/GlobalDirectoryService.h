@@ -73,8 +73,8 @@ public:
 	//! @param _serviceInformation List of services to start.
 	//! @param _sessionID The ID of the session that requested the service start.
 	//! @param _lssUrl The URL of the LSS that requested the services to start.
-	//! @return Returns true if the services were successfully requested to start, false otherwise.
-	bool requestToStartServices(const ot::ServiceInitData& _generalData, const std::list<ot::ServiceBase>& _serviceInformation);
+	//! @throw ot::GeneralException Throws an exception if the service start request failed.
+	void requestToStartServices(const ot::ServiceInitData& _generalData, const std::list<ot::ServiceBase>& _serviceInformation);
 
 	//! @brief Requests the GDS to start a relay service.
 	//! The relay service start will be performed synchronously.
