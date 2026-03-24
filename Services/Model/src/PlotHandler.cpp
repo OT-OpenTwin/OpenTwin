@@ -29,6 +29,7 @@
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTResultDataAccess/CurveFactory.h"
+#include "OTCore/EntityName.h"
 
 PlotHandler::PlotHandler() {
 	const std::string pageName = Application::getToolBarPageName();
@@ -208,10 +209,13 @@ void PlotHandler::createCurves(ot::NewModelStateInfo& _modelStateInformation, co
 	ot::Plot1DCurveCfg curveConfig;
 	
 	const std::string shortName = "curve";
+	
 	auto painter = colourIt.getNextPainter();
 	curveConfig.setLinePenPainter(painter.release());
 
 	EntityResult1DCurve newCurve(model->createEntityUID(), nullptr, nullptr, nullptr);
+	std::list<std::string> takenNames = model->getListOfFolderItems(_nameBase,false);
+	const std::string fullName = ot::EntityName::createUniqueEntityName(_nameBase, shortName, takenNames);
 	newCurve.setName(_nameBase + "/" + shortName);
 	newCurve.createProperties();
 	newCurve.setCurve(curveConfig);
