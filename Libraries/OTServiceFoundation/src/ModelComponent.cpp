@@ -250,3 +250,24 @@ std::string ot::components::ModelComponent::getCurrentMaterialName(EntityPropert
 	// The material could not be found
 	return "";
 }
+
+bool ot::components::ModelComponent::updateTetMesh(const std::string& meshName)
+{
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MESH_UpdateSingleMesh, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_NAME, JsonString(meshName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
+	std::string response;
+	return m_application->sendMessage(false, OT_INFO_SERVICE_TYPE_TetMeshService, requestDoc, response);
+}
+
+bool ot::components::ModelComponent::updateCartesianMesh(const std::string& meshName)
+{
+	JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MESH_UpdateSingleMesh, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_NAME, JsonString(meshName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
+	std::string response;
+	return m_application->sendMessage(false, OT_INFO_SERVICE_TYPE_CartesianMeshService, requestDoc, response);
+}
+

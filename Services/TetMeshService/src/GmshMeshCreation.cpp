@@ -174,7 +174,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 		if (!meshNeedsUpdating(mesh, inputDependencyList))
 		{
 			// Nothing to do here. Stop the meshing process
-			displayMessage("____________________________________________________________\n\nThe mesh is already up-to-date.\n");
+			displayMessage("____________________________________________________________\n\nThe mesh is already up-to-date.\n\n");
 
 			gmsh::finalize();
 

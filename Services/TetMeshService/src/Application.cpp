@@ -68,6 +68,7 @@ Application::Application()
 {
 	connectAction("exportMeshFile", this, &Application::handleExportMesh);
 	connectAction("importMeshFile", this, &Application::handleImportMesh);
+	connectAction(OT_ACTION_CMD_MESH_UpdateSingleMesh, this, &Application::handleUpdateSingleMesh);
 }
 
 Application::~Application()
@@ -354,6 +355,36 @@ void Application::handleExportMesh(ot::JsonDocument& _doc) {
 
 	exportMeshFile(fileName);
 }
+
+void Application::handleUpdateSingleMesh(ot::JsonDocument& _doc) 
+{
+	// Here we will update the mesh with the given name and return only once the mesh update is completed.
+	// Therefore, this function can be called from within solvers to update the mesh before the solver run starts.
+
+	std::string meshName = ot::json::getString(_doc, OT_ACTION_PARAM_NAME);
+
+	ot::EntityInformation mesherInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(meshName, mesherInfo))
+	{
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: Unable to update mesh: " + meshName + "\n");
+		return;
+	}
+
+	EntityMeshTet* meshEntity = dynamic_cast<EntityMeshTet*> (ot::EntityAPI::readEntityFromEntityIDandVersion(mesherInfo.getEntityID(), mesherInfo.getEntityVersion()));
+	assert(meshEntity != nullptr);
+
+	if (meshEntity == nullptr)
+	{
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: Unable to update mesh: " + meshName + "\n");
+		return;
+	}
+
+	// Now we run the mesher in the main thread, so we will return only once the mesh generation if finished.
+	runSingleMesher(mesherInfo, meshEntity);
+}
+
 
 void Application::exportMeshFile(const std::string &fileName) {
 	// Determine the file extension (defines the type of the mesh export)

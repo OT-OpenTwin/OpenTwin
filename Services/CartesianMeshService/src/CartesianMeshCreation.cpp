@@ -225,7 +225,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		if (!meshNeedsUpdating(meshEntity, inputDependencyList))
 		{
 			// Nothing to do here. Stop the meshing process
-			displayMessage("____________________________________________________________\n\nThe mesh is already up-to-date.\n");
+			displayMessage("____________________________________________________________\n\nThe mesh is already up-to-date.\n\n");
 
 			DataBase::instance().setWritingQueueEnabled(false);
 			ot::ModelServiceAPI::enableMessageQueueing(false);

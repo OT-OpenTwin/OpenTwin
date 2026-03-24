@@ -335,6 +335,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 	}
 
 	deleteSingleSolverResults(solverEntity);
+	getModelComponent()->updateTetMesh(mesh->getValueName());
 
 	GetDPLauncher getDPSolver(this);
 	getModelComponent()->clearNewEntityList();

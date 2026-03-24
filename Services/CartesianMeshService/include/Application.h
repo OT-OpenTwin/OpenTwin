@@ -38,7 +38,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase, public ot::ButtonHandler {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler, public ot::ActionHandler {
 	OT_DECL_NOCOPY(Application)
 public:
 	static Application * instance(void);
@@ -57,6 +57,8 @@ public:
 	virtual void uiConnected(ot::components::UiComponent * _ui) override;
 
 	virtual void modelSelectionChanged() override;
+
+	void handleUpdateSingleMesh(ot::JsonDocument& _doc);
 
 	// ##################################################################################################################################
 

@@ -71,6 +71,9 @@ namespace ot {
 			void loadMaterialInformation();
 			std::string getCurrentMaterialName(EntityPropertiesEntityList* material);
 
+			bool updateTetMesh(const std::string& meshName);
+			bool updateCartesianMesh(const std::string& meshName);
+
 		private:
 			
 			ApplicationBase * m_application = nullptr;

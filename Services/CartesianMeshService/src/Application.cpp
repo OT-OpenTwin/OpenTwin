@@ -62,7 +62,7 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
-	
+	connectAction(OT_ACTION_CMD_MESH_UpdateSingleMesh, this, &Application::handleUpdateSingleMesh);
 }
 
 Application::~Application()
@@ -265,3 +265,31 @@ void Application::runSingleMesher(ot::EntityInformation &mesher, EntityBase *mes
 	cartesianMesher.updateMesh(this, meshEntity);
 }
 
+void Application::handleUpdateSingleMesh(ot::JsonDocument& _doc)
+{
+	// Here we will update the mesh with the given name and return only once the mesh update is completed.
+	// Therefore, this function can be called from within solvers to update the mesh before the solver run starts.
+
+	std::string meshName = ot::json::getString(_doc, OT_ACTION_PARAM_NAME);
+
+	ot::EntityInformation mesherInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(meshName, mesherInfo))
+	{
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: Unable to update mesh: " + meshName + "\n");
+		return;
+	}
+
+	EntityMeshCartesian* meshEntity = dynamic_cast<EntityMeshCartesian*> (ot::EntityAPI::readEntityFromEntityIDandVersion(mesherInfo.getEntityID(), mesherInfo.getEntityVersion()));
+	assert(meshEntity != nullptr);
+
+	if (meshEntity == nullptr)
+	{
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: Unable to update mesh: " + meshName + "\n");
+		return;
+	}
+
+	// Now we run the mesher in the main thread, so we will return only once the mesh generation if finished.
+	runSingleMesher(mesherInfo, meshEntity);
+}

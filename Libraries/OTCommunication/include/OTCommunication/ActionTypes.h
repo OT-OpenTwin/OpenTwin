@@ -156,6 +156,8 @@
 
 #define OT_ACTION_CMD_MODEL_RequestVisualisationData "Model.Visualisation.Data"
 
+#define OT_ACTION_CMD_MESH_UpdateSingleMesh "Mesh.Update.SingleMesh"
+
 #define OT_ACTION_CMD_UI_ServiceSetupCompleted "UI.Service.SetupCompleted"
 #define OT_ACTION_CMD_UI_RegisterForModelEvents "UI.ModelView.Events.Register"
 #define OT_ACTION_CMD_UI_DeregisterForModelEvents "UI.ModelView.Events.Deregister"

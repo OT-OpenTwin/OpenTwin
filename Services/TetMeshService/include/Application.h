@@ -67,6 +67,7 @@ public:
 
 	void handleImportMesh(ot::JsonDocument& _doc);
 	void handleExportMesh(ot::JsonDocument& _doc);
+	void handleUpdateSingleMesh(ot::JsonDocument& _doc);
 
 	void mesherThread(std::list<ot::EntityInformation> mesherInfo, std::map<std::string, EntityMeshTet *> mesherMap);
 	void runSingleMesher(ot::EntityInformation &mesher, EntityMeshTet *meshEntity);

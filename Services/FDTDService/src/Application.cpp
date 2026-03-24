@@ -331,6 +331,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 	}
 
 	deleteSingleSolverResults(solverEntity);
+	getModelComponent()->updateCartesianMesh(mesh->getValueName());
 
 	FDTDLauncher FDTDSolver(this);
 	getModelComponent()->clearNewEntityList();
