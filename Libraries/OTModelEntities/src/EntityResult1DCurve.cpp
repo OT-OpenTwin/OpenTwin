@@ -27,6 +27,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
 #include "OTModelEntities/PropertyHelper.h"
+#include "OTCore/QueryDescription/DataLakeQueryCfg.h"
 
 static EntityFactoryRegistrar<EntityResult1DCurve> registrar("EntityResult1DCurve");
 
@@ -106,10 +107,20 @@ bool EntityResult1DCurve::updateFromProperties()
 	if (getObserver() != nullptr)
 	{
 		
-		const std::string projectName = m_queryProperties.getProjectSelection(this);
-		auto associatedCampaign = getObserver()->getMetadataCampaign(projectName);
+		const std::string projectName = m_queryProperties.getSelectedProject(this);
+		std::string collectionName;
+		auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
 		assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
 		refresh |= m_queryProperties.updateOptions(this,associatedCampaign.value());
+		
+		DataLakeQueryCfg cfg;
+		cfg.setCollectionName(collectionName);
+		cfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
+		cfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
+		cfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
+		cfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
+
+		ot::DataLakeAccessCfg accessCfg =  getObserver()->requestDataLakeAccessConfig(cfg);
 	}
 
 	// Update the curve displayed in the frontend after the property change

@@ -6,7 +6,7 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
 
-MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projectName)
+MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projectName, std::string& _collectionName)
 {
 	if (m_projectToCollectionConverter == nullptr)
 	{
@@ -31,9 +31,9 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 			const std::string pswd = Application::instance()->getLogInUserPassword();
 			
 			// Getting information of session service. Potential to reduce communication with buffer.
-			const std::string collectionName =	m_projectToCollectionConverter->nameCorrespondingCollection(_projectName,userName,pswd);
+			_collectionName =	m_projectToCollectionConverter->nameCorrespondingCollection(_projectName,userName,pswd);
 			std::string actualOpenedProject = DataBase::instance().getCollectionName();
-			CrossCollectionDatabaseWrapper wrapper(collectionName);
+			CrossCollectionDatabaseWrapper wrapper(_collectionName);
 			ModelState secondary(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
 			secondary.openProject();
 
@@ -71,6 +71,7 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 		}
 		else
 		{
+			_collectionName = Application::instance()->getCollectionName();
 			ot::UIDList entityIDs = model->getIDsOfFolderItems(ot::FolderNames::DatasetFolder,true);
 			model->prefetchDocumentsFromStorage(entityIDs);
 			for (ot::UID entityID : entityIDs)

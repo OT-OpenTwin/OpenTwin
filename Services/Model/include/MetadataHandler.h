@@ -7,7 +7,7 @@ class MetadataHandler
 {
 public:
 	
-	MetadataCampaign getMetadataCampaign(const std::string& _projectName);
+	MetadataCampaign getMetadataCampaign(const std::string& _projectName, std::string& _collectionName);
 
 private: 
 	std::unique_ptr<ProjectToCollectionConverter> m_projectToCollectionConverter;

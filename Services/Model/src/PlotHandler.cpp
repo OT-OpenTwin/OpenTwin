@@ -221,8 +221,7 @@ void PlotHandler::createCurves(ot::NewModelStateInfo& _modelStateInformation, co
 	newCurve.setCurve(curveConfig);
 	newCurve.storeToDataBase();
 
-	_modelStateInformation.addTopologyEntity(newCurve);
-	
+	_modelStateInformation.addTopologyEntity(newCurve);	
 }
 
 void PlotHandler::updatedSelection(std::list<EntityBase*>& _selectedEntities, std::list<std::string>& _enabledButtons, std::list<std::string>& _disabledButtons)

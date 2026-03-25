@@ -127,11 +127,14 @@ bool PropertyBundleDataLakeQuery::updatePropertyVisibility(EntityBase* _thisObje
 }
 
 
-std::string PropertyBundleDataLakeQuery::getProjectSelection(EntityBase* _thisObject)
+std::string PropertyBundleDataLakeQuery::getSelectedProject(EntityBase* _thisObject)
 {
 	return PropertyHelper::getProjectPropertyValue(_thisObject, m_propertyNameProjectName);
 }
-
+std::string PropertyBundleDataLakeQuery::getSelectedSeries(EntityBase* _thisObject)
+{
+	return PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyNameSeriesMetadata, m_groupMetadataFilter);
+}
 
 bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, MetadataCampaign& _campaign)
 {
@@ -253,7 +256,6 @@ void PropertyBundleDataLakeQuery::setValuePropertiesEmpty(EntityBase* _thisObjec
 	PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, _groupName)->setValue("");
 }
 
-
 void PropertyBundleDataLakeQuery::vectorize(const ot::JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase)
 {
 	if (_value.IsObject())
@@ -272,7 +274,6 @@ void PropertyBundleDataLakeQuery::vectorize(const ot::JsonValue& _value, std::li
 	}
 }
 
-
 ot::ValueComparisonDescription PropertyBundleDataLakeQuery::getQuantityQuery(EntityBase* _thisObject) const
 {
 	const std::string dataType = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyDataType, m_groupQuantitySettings);
@@ -287,7 +288,7 @@ ot::ValueComparisonDescription PropertyBundleDataLakeQuery::getQuantityQuery(Ent
 std::list<ot::ValueComparisonDescription> PropertyBundleDataLakeQuery::getParameterQueries(EntityBase* _thisObject) const
 {
 	std::list<ot::ValueComparisonDescription> valueComparisonDefinitions;
-	for (int i = 1; i <= m_maxNbOfQueries; i++)
+	for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
 	{
 		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
 		const std::string dataType = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyDataType, groupName);

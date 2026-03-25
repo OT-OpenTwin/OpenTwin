@@ -4,7 +4,7 @@
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTDataStorage/DataLakeAPI.h"
-#include "OTResultDataAccess/ResultCollection/IndexHandler.h"
+
 #include "OTResultDataAccess/QuantityContainer.h"
 #include "OTCore/Tuple/TupleFactory.h"
 #include <tuple>
@@ -12,7 +12,7 @@
 #include "OTCore/DataFilter/RegexHelper.h"
 #include "OTCore/JSON/JSONVectoriser.h"
 #include "OTCore/Variable/ExplicitStringValueConverter.h"
-
+#include "OTDataStorage/DataLakeHelper.h"
 void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 {
 	m_collectionName = _collectionName;
@@ -235,8 +235,6 @@ ot::JsonDocument DataLakeAccessor::executeQuery(mongocxx::options::find _options
 	{
 		throw std::exception("No collection name provided");
 	}
-	IndexHandler indexHandler(m_collectionName);
-	indexHandler.createDefaultIndexes();
 
 	BsonViewOrValue resultCollectionQuery, transformedCollectionQuery;
 	createQueries(resultCollectionQuery,transformedCollectionQuery);
@@ -298,8 +296,7 @@ ot::DataLakeAccessCfg DataLakeAccessor::createConfig()
 	{
 		throw std::exception("No collection name provided");
 	}
-	IndexHandler indexHandler(m_collectionName);
-	indexHandler.createDefaultIndexes();
+	DataLakeHelper::createDefaultIndexes(m_collectionName);
 
 	BsonViewOrValue resultCollectionQuery, transformedCollectionQuery;
 	createQueries(resultCollectionQuery, transformedCollectionQuery);
@@ -383,8 +380,6 @@ ot::JsonDocument DataLakeAccessor::executeQuery(ot::DataLakeAccessCfg& _config, 
 		{
 			throw std::exception("No collection name provided");
 		}
-		IndexHandler indexHandler(collectionName + collectionEnding);
-		indexHandler.createDefaultIndexes();
 		
 
 		DataStorageAPI::DataLakeAPI resultCollectionAccess(collectionName, collectionEnding);

@@ -33,6 +33,9 @@
 #include "OTModelEntities/EntityCallbackBase.h"
 #include "OTModelEntities/EntityFactoryRegistrar.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
+#include "OTCore/QueryDescription/DataLakeAccessCfg.h"
+#include "OTCore/QueryDescription/DataLakeQueryCfg.h"
+
 // BSON header
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -63,7 +66,8 @@ public:
 	virtual void requestLibraryElement(ot::JsonDocument& _doc) {};
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
-	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string _projectName) {return std::nullopt;	};
+	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt;	};
+	virtual ot::DataLakeAccessCfg requestDataLakeAccessConfig(const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); }
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -9,7 +9,8 @@ public:
 	void setProperties(EntityBase* _thisObject) override;
 	bool updatePropertyVisibility(EntityBase* _thisObject) override;
 
-	std::string getProjectSelection(EntityBase* _thisObject);
+	std::string getSelectedProject(EntityBase* _thisObject);
+	std::string getSelectedSeries(EntityBase* _thisObject);
 	bool updateOptions(EntityBase* _thisObject, MetadataCampaign& _campaign);
 	ot::ValueComparisonDescription getQuantityQuery (EntityBase* _thisObject) const;
 	std::list<ot::ValueComparisonDescription> getParameterQueries(EntityBase* _thisObject) const;

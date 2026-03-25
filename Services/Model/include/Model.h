@@ -35,6 +35,8 @@
 #include "OTCADEntities/EntityFaceAnnotation.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 #include "MetadataHandler.h"
+
+
 // std header
 #include <string>
 #include <map>
@@ -71,9 +73,10 @@ public:
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) override;
 	virtual void requestLibraryElement(ot::JsonDocument& _doc) override;
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
-	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string _projectName) override;
+	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) override;
+	virtual ot::DataLakeAccessCfg requestDataLakeAccessConfig(const DataLakeQueryCfg & _queryCfg) override;
 
-	Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName);
+	Model(const std::string &_projectName, const std::string& _projectType, const std::string& _collectionName);
 	virtual ~Model();
 	void initialize();
 

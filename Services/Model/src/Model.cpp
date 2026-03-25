@@ -4092,9 +4092,35 @@ void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visua
 	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationCfg);
 }
 
-std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string _projectName)
+std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string& _projectName, std::string& _collectionName)
 {
-	return m_metadataHandler.getMetadataCampaign(_projectName);
+	return m_metadataHandler.getMetadataCampaign(_projectName,_collectionName);
+}
+
+ot::DataLakeAccessCfg Model::requestDataLakeAccessConfig(const DataLakeQueryCfg& _config)
+{
+	ot::JsonDocument doc;
+	ot::JsonObject queryCfg;
+	_config.addToJsonObject(queryCfg, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, queryCfg,doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_DataProcessing_CreateAccessConfig, doc.GetAllocator());
+
+	std::string response;
+	bool success = Application::instance()->sendMessage(false, OT_INFO_SERVICE_TYPE_DataProcessingService, doc, response);
+	if (success)
+	{
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+		ot::ConstJsonObject configObj = ot::json::getObject(responseDoc, OT_ACTION_PARAM_Config);
+		ot::DataLakeAccessCfg config;
+		config.setFromJsonObject(configObj);
+		return config;
+	}
+	else
+	{
+		assert(false);
+		return ot::DataLakeAccessCfg();
+	}
 }
 
 EntityBase *Model::findEntityFromName(const std::string &name)
