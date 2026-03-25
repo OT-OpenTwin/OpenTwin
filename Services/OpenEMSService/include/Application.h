@@ -85,6 +85,8 @@ public:
 
 
 private:
+	std::string buildScript();
+
 	SubprocessManager*		m_subprocessManager;
 	ot::ToolBarButtonCfg m_addSolverButton;
 	ot::ToolBarButtonCfg m_runSolverButton;
