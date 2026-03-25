@@ -214,11 +214,11 @@ int64_t ot::DateTime::timestampToMsec(const std::string& _timestamp, DateFormat 
     }
 }
 
-int64_t ot::DateTime::durationToMsec(const std::string& _duration) {
-    static const std::regex re(R"(^(?:(?:(?:(\d+):)?(\d+):)?(\d+):)?(\d+)(?:\.(\d+))?$)");
+int64_t ot::DateTime::durationToMsec(const std::string& _duration)
+{
     std::smatch match;
 
-    if (!std::regex_match(_duration, match, re)) {
+    if (!std::regex_match(_duration, match, m_durationRe)) {
         throw std::runtime_error("Invalid duration format: " + _duration);
     }
 
@@ -435,10 +435,7 @@ bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _f
     case Msec:
         return true;
     case Duration:
-    {
-        static const std::regex durationRe(R"(^(?:(?:(?:\d+:)?\d+:)?\d+:)?\d+(?:\.\d+)?$)");
-        return std::regex_match(_timestamp, durationRe);
-    }
+        return std::regex_match(_timestamp, m_durationRe);
     default:
         return false;
     }

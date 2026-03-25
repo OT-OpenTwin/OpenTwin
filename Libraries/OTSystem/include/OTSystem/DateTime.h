@@ -24,6 +24,7 @@
 
 // std header
 #include <string>
+#include <regex>
 #include <optional>
 
 namespace ot {
@@ -38,7 +39,7 @@ namespace ot {
             ISO8601UTC, //! @brief ISO 8601, UTC time ("yyyy-mm-ddThh:MM:ss.zzzZ", e.g. "2000-01-01T00:00:00.000Z").
             RFC3339,    //! @brief ISO 8601, explicit timezone ("yyyy-mm-ddThh:MM:ss.zzzZ", e.g. "2000-01-01T00:00:00.000+00:00").
 			Msec,       //! @brief Milliseconds since epoch, UTC time.
-			Duration,   //! @brief Time delta format (e.g. "DD:HH:MM:SS.sss" or "HH:MM:SS.sss" or "MM:SS.sss" or "SS.sss").
+			Duration,   //! @brief Time delta format (e.g. "DD:HH:MM:SS.sss" or "HH:MM:SS.sss" or "MM:SS.sss").
         };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -234,6 +235,8 @@ namespace ot {
 		int m_minute = 0;
 		int m_second = 0;
 		int m_millisec = 0;
+
+		static inline const std::regex m_durationRe{R"(^(?=.*[:])(?:(?:(?:\d+:)?\d+:)?\d+:)?\d+(?:\.\d+)?$)"};
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
