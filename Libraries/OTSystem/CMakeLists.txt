@@ -8,8 +8,9 @@ ot_initialize_lib(OTSystem OT_SYSTEM_ROOT_PATH)
 ot_add_export(OTSystem)
 
 target_compile_options(OTSystem_core PRIVATE
-        /wd4996
-        /sdl
+    /W3
+    /wd4996
+    /sdl
 )
 
 ot_add_dependency(OTSystem
