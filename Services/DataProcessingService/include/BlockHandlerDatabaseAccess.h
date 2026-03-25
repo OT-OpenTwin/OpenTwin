@@ -56,13 +56,8 @@ private:
 
 	PipelineData m_queriedData;
 
-	void createQueryDescriptionsQuantities(EntityBlockDatabaseAccess* _blockEntity);
-	void createQueryDescriptionsParameter(EntityBlockDatabaseAccess* _blockEntity);
-	void createQueryDescriptionsSeries(EntityBlockDatabaseAccess* _blockEntity);
-
 	void collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity);
 	void buildQuery(EntityBlockDatabaseAccess* _blockEntity);
 				
 	void applyRegexFilter(std::list<std::string>& _options, const std::string& _filter);
-	bool compare(const ot::ValueComparisonDescription& _comparisionDef, const ot::JsonValue& _value);
 };

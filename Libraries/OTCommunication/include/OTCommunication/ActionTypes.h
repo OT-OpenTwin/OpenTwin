@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ActionTypes.h
 // 
 // License:
@@ -355,6 +355,13 @@
 #define OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground "UI.Table.SetCurrentSelectionBackground"
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
+
+#define OT_ACTION_CMD_DataProcessing_CreateAccessConfig "DataProcessing.Create.AccessConfig"
+#define OT_ACTION_PARAM_DataProcessing_QuantityVD "DataProcessing.ValueDescription.Quantity"
+#define OT_ACTION_PARAM_DataProcessing_ParameterVD "DataProcessing.ValueDescription.Parameter"
+#define OT_ACTION_PARAM_DataProcessing_SeriesVD "DataProcessing.ValueDescription.Series"
+#define OT_ACTION_PARAM_DataProcessing_SeriesLabel "DataProcessing.Label.Series"
+#define OT_ACTION_PARAM_DataProcessing_Collection "DataProcessing.Label.Collection"
 
 #define OT_ACTION_PARAM_BASETYPE_UID "BaseTypes.UID"
 #define OT_ACTION_PARAM_BASETYPE_Bool "BaseTypes.Boolean"

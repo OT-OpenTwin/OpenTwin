@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 
 // OpenTwin header
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
@@ -25,26 +25,25 @@ void ot::DataLakeAccessCfg::addToJsonObject(JsonValue& _jsonObject, JsonAllocato
 	}
 	_jsonObject.AddMember("SeriesMetadataMap", std::move(seriesMetadataArr), _allocator);
 	
-	_jsonObject.AddMember("Projection", JsonString(m_projection, _allocator), _allocator);
 
 	JsonArray fieldDecoderArr;
-	for (const auto& it : m_fieldDecoders)
+	/*for (const auto& it : m_fieldDecoders)
 	{
 		JsonObject kvp;
 		kvp.AddMember("Field", JsonString(it.first, _allocator), _allocator);
 		kvp.AddMember("Decoder", JsonObject(it.second, _allocator), _allocator);
 		fieldDecoderArr.PushBack(std::move(kvp), _allocator);
-	}
+	}*/
 	_jsonObject.AddMember("FieldDecoders", std::move(fieldDecoderArr), _allocator);
 
 	JsonArray valueTransformerArr;
-	for (const auto& it : m_valueTransformerByFieldKey)
+	/*for (const auto& it : m_valueTransformerByFieldKey)
 	{
 		JsonObject kvp;
 		kvp.AddMember("Field", JsonString(it.first, _allocator), _allocator);
 		kvp.AddMember("Transformer", JsonObject(it.second, _allocator), _allocator);
 		valueTransformerArr.PushBack(std::move(kvp), _allocator);
-	}
+	}*/
 	_jsonObject.AddMember("ValueTransformers", std::move(valueTransformerArr), _allocator);
 }
 
@@ -67,9 +66,8 @@ void ot::DataLakeAccessCfg::setFromJsonObject(const ot::ConstJsonObject& _jsonOb
 		m_seriesMetadataMap.emplace(std::move(series), std::move(metadata));
 	}
 
-	m_projection = json::getString(_jsonObject, "Projection");
 
-	m_fieldDecoders.clear();
+	/*m_fieldDecoders.clear();
 	for (const ConstJsonObject& kvp : json::getObjectList(_jsonObject, "FieldDecoders"))
 	{
 		std::string fieldKey = json::getString(kvp, "Field");
@@ -83,5 +81,5 @@ void ot::DataLakeAccessCfg::setFromJsonObject(const ot::ConstJsonObject& _jsonOb
 		std::string fieldKey = json::getString(kvp, "Field");
 		ValueProcessing transformer(json::getObject(kvp, "Transformer"));
 		m_valueTransformerByFieldKey.emplace(std::move(fieldKey), std::move(transformer));
-	}
+	}*/
 }

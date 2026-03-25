@@ -128,6 +128,7 @@ set(OTDATASTORAGE_SOURCE_FILES
     src/UnittestDocumentAccess.cpp
     src/UnittestDocumentAccessBase.cpp
     src/UserAPI.cpp
+    src/DataLakeHelper.cpp
 )
 
 set(OTDATASTORAGE_HEADER_FILES
@@ -157,6 +158,7 @@ set(OTDATASTORAGE_HEADER_FILES
     include/OTDataStorage/Unittest/UnittestDocumentAccessBase.h
     include/OTDataStorage/UserAPI.h
     include/OTDataStorage/Enums/InsertTypeEnum.h
+    include/OTDataStorage/DataLakeHelper.h
 )
 
 # ============================================================

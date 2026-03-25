@@ -105,8 +105,8 @@ bool EntityResult1DCurve::updateFromProperties()
 
 	if (getObserver() != nullptr)
 	{
-		auto projectSelection = m_queryProperties.getProjectSelection(this);
-		const std::string projectName = projectSelection->getValue();
+		
+		const std::string projectName = m_queryProperties.getProjectSelection(this);
 		auto associatedCampaign = getObserver()->getMetadataCampaign(projectName);
 		assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
 		refresh |= m_queryProperties.updateOptions(this,associatedCampaign.value());

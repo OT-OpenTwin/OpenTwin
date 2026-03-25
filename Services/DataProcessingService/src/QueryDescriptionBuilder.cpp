@@ -16,6 +16,7 @@ ot::QueryDescription QueryDescriptionBuilder::create(const ot::ValueComparisonDe
 		
 	queryTargetDescription.setTargetLabel(_parameter->parameterLabel);
 	queryTargetDescription.setMongoDBFieldName(std::to_string(_parameter->parameterUID));
+	queryTargetDescription.setDimension({ 1 });
 	
 	queryDescription.setQueryTargetDescription(queryTargetDescription);
 	return queryDescription;
@@ -30,6 +31,8 @@ ot::QueryDescription QueryDescriptionBuilder::create(const ot::ValueComparisonDe
 	queryTargetDescription.setTupleInstance(_quantity->m_tupleDescription);
 	queryTargetDescription.setTargetLabel(_quantity->quantityLabel);
 	queryTargetDescription.setMongoDBFieldName(std::to_string( _quantity->quantityIndex));
+	queryTargetDescription.setDimension(_quantity->dataDimensions);
+	
 	queryDescription.setQueryTargetDescription(queryTargetDescription);
 
 	return queryDescription;
@@ -52,7 +55,7 @@ ot::QueryDescription QueryDescriptionBuilder::create(const MetadataSeries* _seri
 	queryTargetDescription.setTupleInstance(seriesTuple);
 	queryTargetDescription.setTargetLabel(_series->getLabel());
 	queryTargetDescription.setMongoDBFieldName(MetadataSeries::getFieldName());
+	queryTargetDescription.setDimension({ 1 });
 	queryDescription.setQueryTargetDescription(queryTargetDescription);
-
 	return queryDescription;
 }

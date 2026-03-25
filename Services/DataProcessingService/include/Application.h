@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Application.h
 // 
 // License:
@@ -30,9 +30,11 @@
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "EntityCreator.h"
+#include "OTCommunication/Handler/ActionHandler.h"
 
 // std header
 #include <string>
+#include "OTCore/JSON/JSON.h"
 
 // Forward declaration
 namespace ot {
@@ -43,6 +45,7 @@ namespace ot {
 }
 
 class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler, public ot::GraphicsActionHandler {
+	OT_DECL_ACTION_HANDLER(Application)
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -59,6 +62,7 @@ public:
 	// The third parameter is a String containing the action name
 	// The last parameter are flags describing the allowed message types for this handler
 	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle", ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(createDataLakeAccessCfg, Application, OT_ACTION_CMD_DataProcessing_CreateAccessConfig, ot::SECURE_MESSAGE_TYPES)
 
 	// ##################################################################################################################################################################################################################
 
@@ -88,5 +92,4 @@ private:
 	EntityCreator m_entityCreator;
 
 	void runPipeline();
-	
 };

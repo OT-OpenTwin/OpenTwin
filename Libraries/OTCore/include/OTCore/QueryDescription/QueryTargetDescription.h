@@ -24,9 +24,13 @@ namespace ot
 
 		void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ConstJsonObject& _jsonObject) override;
+
+		void setDimension(std::vector<uint32_t> _dimensions) { m_dimensions = _dimensions; }
+		const std::vector<uint32_t>& getDimensions() const  { return m_dimensions; }
 	private:
 		TupleInstance m_tupleDescription;
 		std::string m_mongoDBFieldName;
 		std::string m_targetLabel;
+		std::vector<uint32_t> m_dimensions;
 	};
 }

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Application.cpp
 // 
 // License:
@@ -39,6 +39,7 @@
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTBlockEntities/BlockHelper.h"
+#include "DataLakeAccessor.h"
 
 #include "OTModelEntities/EntitySolverDataProcessing.h"
 
@@ -121,6 +122,43 @@ void Application::runPipeline()
 			OT_LOG_E("Pipeline run failed: " + std::string(e.what()));
 		}
 	}
+}
+
+std::string Application::createDataLakeAccessCfg(ot::JsonDocument& _document)
+{
+	DataLakeAccessor dataLakeAccessor;
+
+	ot::ValueComparisonDescription quantityValueDescription;
+	quantityValueDescription.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_DataProcessing_QuantityVD));
+	dataLakeAccessor.createQueryDescriptionQuantity(quantityValueDescription);
+
+	std::list<ot::ValueComparisonDescription> parameterValueDescriptions;
+	ot::ConstJsonArray parameterValueDescriptionsSer= ot::json::getArray(_document, OT_ACTION_PARAM_DataProcessing_ParameterVD);
+	for (int32_t i = 0; i < parameterValueDescriptionsSer.Size(); i++)
+	{
+		ot::ValueComparisonDescription valueDescription;
+		valueDescription.setFromJsonObject(ot::json::getObject(parameterValueDescriptionsSer, i));
+		parameterValueDescriptions.push_back(valueDescription);
+	}
+	dataLakeAccessor.createQueryDescriptionsParameter(parameterValueDescriptions);
+
+	
+	std::list<ot::ValueComparisonDescription> seriesValueDescriptions;
+	ot::ConstJsonArray seriesValueDescriptionsSer = ot::json::getArray(_document, OT_ACTION_PARAM_DataProcessing_SeriesVD);
+	for (int32_t i = 0; i < seriesValueDescriptionsSer.Size(); i++)
+	{
+		ot::ValueComparisonDescription valueDescription;
+		valueDescription.setFromJsonObject(ot::json::getObject(seriesValueDescriptionsSer, i));
+		seriesValueDescriptions.push_back(valueDescription);
+	}
+	
+	const std::string seriesLabel = ot::json::getString(_document, OT_ACTION_PARAM_DataProcessing_SeriesLabel);
+	dataLakeAccessor.createQueryDescriptionsSeries(seriesValueDescriptions,seriesLabel);
+	const std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_DataProcessing_Collection);
+	dataLakeAccessor.accessPartition(collectionName);
+
+
+	return "";
 }
 
 // ##################################################################################################################################################################################################################

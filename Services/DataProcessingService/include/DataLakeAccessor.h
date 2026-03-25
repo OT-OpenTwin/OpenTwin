@@ -5,17 +5,21 @@
 #include "mongocxx/options/find.hpp"
 #include <map>
 #include "OTCore/ValueProcessing/ValueProcessing.h"
+#include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
+#include "OTCore/QueryDescription/DataLakeAccessCfg.h"
 
 class DataLakeAccessor
 {
 public:
 	void accessPartition(const std::string& _collectionName);
-	void setValueDescriptionsSeries(const std::list<ot::QueryDescription>& _queryDescriptions);
-	void setValueDescriptionsQuantities(const std::list<ot::QueryDescription>& _queryDescriptions);
-	void addValueDescriptionsParameters(const std::list<ot::QueryDescription>& _queryDescriptions);
-
+	void createQueryDescriptionsSeries(const std::list<ot::ValueComparisonDescription>& _valueComparisons, const std::string& _seriesLabel);
+	void createQueryDescriptionsParameter(const std::list<ot::ValueComparisonDescription>& _valueComparisons);
+	void createQueryDescriptionQuantity(ot::ValueComparisonDescription& _valueComparisons);
+	
 	ot::JsonDocument executeQuery(mongocxx::options::find _options);
+	ot::DataLakeAccessCfg createConfig();
 
+	ot::JsonDocument executeQuery(ot::DataLakeAccessCfg& _config, mongocxx::options::find _options);
 private:
 	std::list<ot::QueryDescription> m_queryDescriptionsSeries;
 	std::list<ot::QueryDescription> m_queryDescriptionsQuantities;
@@ -25,8 +29,14 @@ private:
 
 	std::string m_collectionName;
 	const std::string m_transformedCollectionEnding = ".transformed";
+	const std::string m_resultCollectionEnding = ".results";
 	const std::string m_resultDataField = "Data";
+	
+	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
 
+	bool compare(const ot::ValueComparisonDescription& _comparisionDef, const ot::JsonValue& _value);
+
+	void addValueDescriptionsParameters(const std::list<ot::QueryDescription>& _queryDescriptions);
 	
 	void createQueries(BsonViewOrValue& _resultCollectionQueries, BsonViewOrValue& _transformedCollectionQueries);
 	
@@ -42,6 +52,7 @@ private:
 	void storeTransformation(const ot::QueryDescription& _queryDescription);
 
 	ot::JsonDocument createClearTextResult(const ot::JsonDocument& _databaseResults);
+	ot::JsonDocument createClearTextResult(ot::DataLakeAccessCfg& _config, const ot::JsonDocument& _databaseResults);
 	std::map<std::string,std::string> createFieldKeyLabelLookup(const std::list<ot::QueryDescription>& _queryDescription);
 
 	//! @brief All provided series are valid options and each document has only one series it belongs to. Thus, the series query is assembled as an or connected list of series ID options

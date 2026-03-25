@@ -127,9 +127,9 @@ bool PropertyBundleDataLakeQuery::updatePropertyVisibility(EntityBase* _thisObje
 }
 
 
-const EntityPropertiesProjectList* PropertyBundleDataLakeQuery::getProjectSelection(EntityBase* _thisObject)
+std::string PropertyBundleDataLakeQuery::getProjectSelection(EntityBase* _thisObject)
 {
-	return PropertyHelper::getEntityProjectListProperty(_thisObject, m_propertyNameProjectName);
+	return PropertyHelper::getProjectPropertyValue(_thisObject, m_propertyNameProjectName);
 }
 
 
@@ -270,4 +270,49 @@ void PropertyBundleDataLakeQuery::vectorize(const ot::JsonValue& _value, std::li
 			}
 		}
 	}
+}
+
+
+ot::ValueComparisonDescription PropertyBundleDataLakeQuery::getQuantityQuery(EntityBase* _thisObject) const
+{
+	const std::string dataType = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyDataType, m_groupQuantitySettings);
+	const std::string unit = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyUnit, m_groupQuantitySettings);
+	const std::string value = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyValue, m_groupQuantitySettings);
+	const std::string name = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, m_groupQuantitySettings);
+	const std::string comparator = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyComparator, m_groupQuantitySettings);
+	const ot::ValueComparisonDescription valueComparisonDefinition(name, comparator, value, dataType, unit);
+	return valueComparisonDefinition;
+}
+
+std::list<ot::ValueComparisonDescription> PropertyBundleDataLakeQuery::getParameterQueries(EntityBase* _thisObject) const
+{
+	std::list<ot::ValueComparisonDescription> valueComparisonDefinitions;
+	for (int i = 1; i <= m_maxNbOfQueries; i++)
+	{
+		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
+		const std::string dataType = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyDataType, groupName);
+		const std::string unit = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyUnit, groupName);
+		const std::string value = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyValue, groupName);
+		const std::string name = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, groupName);
+		const std::string comparator = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyComparator, groupName);
+		const ot::ValueComparisonDescription valueComparisonDefinition(name, comparator, value, dataType, unit);
+		valueComparisonDefinitions.push_back(valueComparisonDefinition);
+	}
+	return valueComparisonDefinitions;
+}
+
+std::list<ot::ValueComparisonDescription> PropertyBundleDataLakeQuery::getMetadataQueries(EntityBase* _thisObject) const
+{
+	std::list<ot::ValueComparisonDescription> definitions;
+	for (uint32_t index = 1; index < m_maxNbOfQueriesMetadata; index++)
+	{
+		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(index);
+		
+		const std::string name = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, groupName);
+		const std::string comparator = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyComparator, groupName);
+		const std::string value = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyValue, groupName);
+		ot::ValueComparisonDescription definition(name, comparator, value, "", "");
+		definitions.push_back(definition);
+	}
+	return definitions;
 }

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 
 #pragma once
 
@@ -6,6 +6,7 @@
 #include "OTCore/Serializable.h"
 #include "OTCore/QueryDescription/DataPointDecoder.h"
 #include "OTCore/ValueProcessing/ValueProcessing.h"
+#include <optional>
 
 namespace ot {
 
@@ -32,34 +33,96 @@ namespace ot {
 		void addCollection(const std::string& _collection, std::string&& _query) { m_collectionToQueryMap.insert_or_assign(_collection, std::move(_query)); };
 		bool hasCollection(const std::string& _collection) const { return m_collectionToQueryMap.find(_collection) != m_collectionToQueryMap.end(); };
 		const std::string& getQueryForCollection(const std::string& _collection) const { return m_collectionToQueryMap.at(_collection); };
+		const std::map<std::string, std::string>& getQueriesByCollection() { return m_collectionToQueryMap; }
+
 
 		void addSeriesMetadata(const std::string& _series, JsonDocument&& _metadata) { m_seriesMetadataMap.insert_or_assign(_series, std::move(_metadata)); };
 		bool hasSeriesMetadata(const std::string& _series) const { return m_seriesMetadataMap.find(_series) != m_seriesMetadataMap.end(); };
 		JsonDocument& getSeriesMetadata(const std::string& _series) { return m_seriesMetadataMap.at(_series); };
 		const JsonDocument& getSeriesMetadata(const std::string& _series) const { return m_seriesMetadataMap.at(_series); };
 
-		void setProjection(const std::string& _projection) { m_projection = _projection; };
-		void setProjection(std::string&& _projection) { m_projection = std::move(_projection); };
-		const std::string& getProjection() const { return m_projection; };
+		void addFieldDecoderQuantity(const DataPointDecoder& _decoder) 
+		{ 
+			m_fieldDecodersQuantity.insert_or_assign(_decoder.getFieldName(), _decoder);
+		};		
 
-		DataPointDecoder& addFieldDecoder(const std::string& _fieldKey, const DataPointDecoder& _decoder) { return m_fieldDecoders.insert_or_assign(_fieldKey, _decoder).first->second; };
-		DataPointDecoder& addFieldDecoder(const std::string& _fieldKey, DataPointDecoder&& _decoder) { return m_fieldDecoders.insert_or_assign(_fieldKey, std::move(_decoder)).first->second; };
-		bool hasFieldDecoder(const std::string& _fieldKey) const { return m_fieldDecoders.find(_fieldKey) != m_fieldDecoders.end(); };
-		DataPointDecoder& getFieldDecoder(const std::string& _fieldKey) { return m_fieldDecoders.at(_fieldKey); };
-		const DataPointDecoder& getFieldDecoder(const std::string& _fieldKey) const { return m_fieldDecoders.at(_fieldKey); };
+		std::optional<DataPointDecoder> getFieldDecoderQuantity(const std::string& _fieldKey) 
+		{ 
+			auto decoder = m_fieldDecodersQuantity.find(_fieldKey);
+			if (decoder != m_fieldDecodersQuantity.end())
+			{
+				return decoder->second;
+			}
+			else
+			{
+				return std::nullopt; 
+			}
 
-		ValueProcessing& addValueTransformer(const std::string& _fieldKey, const ValueProcessing& _valueTransformer) { return m_valueTransformerByFieldKey.insert_or_assign(_fieldKey, _valueTransformer).first->second; };
-		ValueProcessing& addValueTransformer(const std::string& _fieldKey, ValueProcessing&& _valueTransformer) { return m_valueTransformerByFieldKey.insert_or_assign(_fieldKey, std::move(_valueTransformer)).first->second; };
-		bool hasValueTransformer(const std::string& _fieldKey) const { return m_valueTransformerByFieldKey.find(_fieldKey) != m_valueTransformerByFieldKey.end(); };
-		ValueProcessing& getValueTransformer(const std::string& _fieldKey) { return m_valueTransformerByFieldKey.at(_fieldKey); };
-		const ValueProcessing& getValueTransformer(const std::string& _fieldKey) const { return m_valueTransformerByFieldKey.at(_fieldKey); };
+		};
+		
+		void addFieldDecoderParameter(const DataPointDecoder& _decoder) 
+		{ 
+			m_fieldDecodersParameter.insert_or_assign(_decoder.getFieldName(), _decoder);
+		}
+		std::optional<DataPointDecoder> getFieldDecoderParameter(const std::string& _fieldKey) 
+		{
+			auto decoder = m_fieldDecodersParameter.find(_fieldKey);
+			if (decoder != m_fieldDecodersParameter.end())
+			{
+				return decoder->second;
+			}
+			else
+			{
+				return std::nullopt;
+			}
+		}
 
+		void addFieldDecoderSeries(const DataPointDecoder& _decoder) 
+		{ 
+			m_fieldDecodersSeries.insert_or_assign(_decoder.getFieldName(), _decoder);
+		}
+		std::optional<DataPointDecoder> getFieldDecoderSeries(const std::string& _fieldKey) 
+		{
+			auto decoder = m_fieldDecodersSeries.find(_fieldKey);
+			if (decoder != m_fieldDecodersSeries.end())
+			{
+				return decoder->second;
+			}
+			else
+			{
+				return std::nullopt;
+			}
+		}
+
+		const std::map<std::string, DataPointDecoder>& getAllFieldDecoderParameter()
+		{
+			return m_fieldDecodersParameter;
+		}
+
+		ValueProcessing& addParameterValueTransformer(const std::string& _fieldKey, const ValueProcessing& _valueTransformer) { return m_valueTransformerByFieldKeyParameter.insert_or_assign(_fieldKey, _valueTransformer).first->second; };
+		ValueProcessing& addParameterValueTransformer(const std::string& _fieldKey, ValueProcessing&& _valueTransformer) { return m_valueTransformerByFieldKeyParameter.insert_or_assign(_fieldKey, std::move(_valueTransformer)).first->second; };
+		bool hasParameterValueTransformer(const std::string& _fieldKey) const { return m_valueTransformerByFieldKeyParameter.find(_fieldKey) != m_valueTransformerByFieldKeyParameter.end(); };
+		ValueProcessing& getParameterValueTransformer(const std::string& _fieldKey) { return m_valueTransformerByFieldKeyParameter.at(_fieldKey); };
+		const ValueProcessing& getParameterValueTransformer(const std::string& _fieldKey) const { return m_valueTransformerByFieldKeyParameter.at(_fieldKey); };
+
+		void addQuantityValueTransformer(const std::string& _fieldKey, const std::list<ValueProcessing>& _valueTransformers) { m_valueTransformerByFieldKeyQuantity.insert_or_assign(_fieldKey, _valueTransformers); }
+		std::list<ValueProcessing> getQuantityValueTransformer(const std::string& _key) const { return m_valueTransformerByFieldKeyQuantity.at(_key); }
+	
+		std::string& getCollectionName() { return m_collectionNameBase; }
+		void setCollectionName(const std::string& _collectionName) { m_collectionNameBase = _collectionName; }
 	private:
 		std::map<std::string, std::string> m_collectionToQueryMap;
+
 		std::map<std::string, JsonDocument> m_seriesMetadataMap;
-		std::string m_projection;
-		std::map<std::string, DataPointDecoder> m_fieldDecoders;
-		std::map<std::string, ValueProcessing> m_valueTransformerByFieldKey;
+		
+		std::string m_collectionNameBase;
+
+		std::map<std::string, DataPointDecoder> m_fieldDecodersParameter;
+		std::map<std::string, DataPointDecoder> m_fieldDecodersQuantity;
+		std::map<std::string, DataPointDecoder> m_fieldDecodersSeries;
+		
+		std::map<std::string, ValueProcessing> m_valueTransformerByFieldKeyParameter;
+		std::map<std::string, std::list<ValueProcessing>> m_valueTransformerByFieldKeyQuantity;
 	};
 
 }
