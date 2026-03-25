@@ -20,6 +20,7 @@
 
 // OToolkit header
 #include "DiagramGenerator.h"
+#include "ExportableGraphicsView.h"
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
@@ -35,6 +36,7 @@
 #include "OTWidgets/Graphics/GraphicsView.h"
 #include "OTWidgets/Graphics/GraphicsItemFactory.h"
 #include "OTWidgets/Properties/PropertyGrid.h"
+#include "OTWidgets/Diagram/SequenceDiaSceneBuilder.h"
 #include "OTWidgets/Widgets/Label.h"
 #include "OTWidgets/Widgets/ComboBox.h"
 #include "OTWidgets/Widgets/LineEdit.h"
@@ -45,6 +47,7 @@
 #include "OTWidgets/Widgets/PathBrowseEdit.h"
 #include "OTWidgets/Widgets/ExpanderWidget.h"
 #include "OTWidgets/Widgets/TreeWidgetFilter.h"
+#include "OTWidgets/WidgetView/GraphicsViewView.h"
 #include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 #include "OTWidgets/WidgetView/WidgetViewDock.h"
 
@@ -266,47 +269,82 @@ void DiagramGenerator::slotGenerateResult() {
 }
 
 void DiagramGenerator::slotResultItemDoubleClicked(QTreeWidgetItem* _item, int _column) {
-	return;
-	/*
-	if (!(_item->data(0, Qt::UserRole).canConvert<int>())) {
+	if (!(_item->data(0, Qt::UserRole).canConvert<int>()))
+	{
 		DIAGEN_LOGE("Invalid item data");
 		return;
 	}
 
 	ResultType type = static_cast<ResultType>(_item->data(0, Qt::UserRole).toInt());
-	switch (type) {
+	switch (type)
+	{
 	case ResultType::Container:
 		// Do nothing
 		break;
 	case ResultType::SequenceDiagram:
 	{
 		QString diaName = _item->data(0, static_cast<int>(DiagramRoleIx::Name)).toString();
-		auto diaIt = m_parseResult.sequenceDiagrams.find(diaName);
-		if (diaIt == m_parseResult.sequenceDiagrams.end()) {
+
+		const auto diaIt = m_parser.getSequenceDiagrams().find(diaName.toStdString());
+		if (diaIt == m_parser.getSequenceDiagrams().end())
+		{
 			DIAGEN_LOGE("Could not find sequence diagram: " + diaName);
 			return;
 		}
-		generateSequenceDiagram(diaIt->second);
+
+		ExportableGraphicsView* newView = new ExportableGraphicsView();
+		if (!ot::GlobalWidgetViewManager::instance().addView(ot::BasicServiceInformation(), newView))
+		{
+			delete newView;
+			DIAGEN_LOGE("Failed to add sequence diagram view to global view manager");
+			return;
+		}
+
+		const auto funcIt = m_parser.getSequenceFunctions().find(diaIt->second.getFunctionName());
+		if (funcIt == m_parser.getSequenceFunctions().end())
+		{
+			ot::GlobalWidgetViewManager::instance().closeView(newView);
+			DIAGEN_LOGE("Could not find sequence function for diagram: " + QString::fromStdString(diaIt->second.getFunctionName()));
+			return;
+		}
+
+		ot::SequenceDiaSceneBuilder builder(newView->getGraphicsView());
+		builder.addFunction(funcIt->second);
+		builder.build();
+
+		m_sequenceDiagramViews.push_back(newView);
 	}
-		break;
+	break;
 
 	case ResultType::SequenceFunction:
 	{
 		QString funcName = _item->data(0, static_cast<int>(FunctionRoleIx::Name)).toString();
-		auto funcIt = m_parseResult.sequenceFunctions.find(funcName);
-		if (funcIt == m_parseResult.sequenceFunctions.end()) {
+		const auto funcIt = m_parser.getSequenceFunctions().find(funcName.toStdString());
+		if (funcIt == m_parser.getSequenceFunctions().end())
+		{
 			DIAGEN_LOGE("Could not find sequence function: " + funcName);
 			return;
 		}
-		generateSequenceDiagram(funcIt->second);
+
+		ExportableGraphicsView* newView = new ExportableGraphicsView();
+		if (!ot::GlobalWidgetViewManager::instance().addView(ot::BasicServiceInformation(), newView))
+		{
+			delete newView;
+			DIAGEN_LOGE("Failed to add sequence diagram view to global view manager");
+			return;
+		}
+		m_sequenceDiagramViews.push_back(newView);
+
+		ot::SequenceDiaSceneBuilder builder(newView->getGraphicsView());
+		builder.addFunction(funcIt->second);
+		builder.build();
 	}
 		break;
 
 	default:
-		DIAGEN_LOGE("Unknown item type");
+		DIAGEN_LOGE("Unknown item type (" + QString::number(static_cast<int>(type)) + ")");
 		break;
 	}
-	*/
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -37,33 +37,33 @@ namespace ot {
 
 		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 
-		virtual void removeAllConnections(void) override;
+		virtual void removeAllConnections() override;
 
-		virtual void prepareGraphicsItemGeometryChange(void) override;
+		virtual void prepareGraphicsItemGeometryChange() override;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
-		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
-		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
-		virtual const QGraphicsItem* getQGraphicsItem(void) const override { return this; };
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem() override { return this; };
+		virtual QGraphicsItem* getQGraphicsItem() override { return this; };
+		virtual const QGraphicsItem* getQGraphicsItem() const override { return this; };
 
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName) override;
 
-		virtual void finalizeGraphicsItem(void) override;
+		virtual void finalizeGraphicsItem() override;
 
 		virtual std::list<GraphicsConnectionItem*> getAllConnections() const override;
 
-		virtual std::list<GraphicsElement*> getAllGraphicsElements(void) override;
+		virtual std::list<GraphicsElement*> getAllGraphicsElements() override;
 
-		virtual std::list<GraphicsElement*> getAllDirectChildElements(void) override;
+		virtual std::list<GraphicsElement*> getAllDirectChildElements() override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Base class functions: QGraphicsItem
 
-		virtual QRectF boundingRect(void) const override;
+		virtual QRectF boundingRect() const override;
 
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 
@@ -90,9 +90,9 @@ namespace ot {
 		void addItem(GraphicsItem* _item);
 
 		//! @brief Returns the maximum trigger distance in any direction of this item and its childs.
-		virtual double getMaxAdditionalTriggerDistance(void) const override;
+		virtual double getMaxAdditionalTriggerDistance() const override;
 
-		void clear(void);
+		void clear();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

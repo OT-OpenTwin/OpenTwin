@@ -218,34 +218,4 @@ private:
 	// Private: Worker
 
 	void parserWorker(ParserData&& _data);
-	
-	/*
-	void generateSequenceDiagram(const SequenceDiagram& _diagram);
-	void generateSequenceDiagram(const SequenceFunction& _function);
-	void generateSequenceDiagram(SequenceViewData& _viewData, const SequenceFunction& _function);
-
-	void generateSequenceDiagramLifeLines(const SequenceFunction& _function, SequenceViewData& _viewData);
-	void generateSequenceDiagramCalls(const SequenceFunction& _function, SequenceViewData& _viewData);
-	void repositionLifelines(SequenceViewData& _viewData);
-	void repositionCalls(SequenceViewData& _viewData);
-	void mergeProcessBoxes(SequenceViewData& _viewData);
-	void generateItems(SequenceViewData& _viewData);
-	
-	void clear(SequenceViewData& _viewData);
-	void clear(const SequenceCallItem& _callItem);
-	
-
-	SequenceLifeLineItem generateNewLifeLineItem(const QString& _name, const SequenceViewData& _viewData);
-
-	//! @brief Generate a new call item between two lifelines.
-	//! @return The vertical position of the call line item.
-	double generateNewCallItem(SequenceLifeLineItem& _from, SequenceLifeLineItem& _to, SequenceViewData& _viewData, const QString& _callText, const CallFlags& _flags);
-
-	ot::Point2DD calculateNextLifeLinePosition(const SequenceViewData& _viewData);
-	ot::RectD calculateLifeLineTextBoxRect(const QString& _text, const SequenceViewData& _viewData, const ot::Point2DD& _position);
-
-	double calculateLifelineDistance(const SequenceLifeLineItem& _left, const SequenceLifeLineItem& _right, const SequenceViewData& _viewData);
-
-	ot::GraphicsRectangularItemCfg* createProcessBox(SequenceLifeLineItem& _lifeLine, double _startYPos, double _endYPos, const SequenceViewData& _viewData);
-	*/
 };
