@@ -78,7 +78,6 @@ get_env_libname(MONGO_C_LIB_NAME         MONGO_C_LIB)
 
 set(OTResultDataAccess_HEADERS
     include/OTResultDataAccess/ResultCollection/CrossCollectionAccess.h
-    include/OTResultDataAccess/ResultCollection/IndexHandler.h
     include/OTResultDataAccess/ResultCollection/ProjectToCollectionConverter.h
     include/OTResultDataAccess/ResultCollection/ResultCollectionExtender.h
     include/OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h
@@ -109,7 +108,6 @@ set(OTResultDataAccess_SOURCES
     src/CrossCollectionAccess.cpp
     src/CurveFactory.cpp
     src/DatasetDescription.cpp
-    src/IndexHandler.cpp
     src/PlotBuilder.cpp
     src/ProjectToCollectionConverter.cpp
     src/QuantityContainer.cpp

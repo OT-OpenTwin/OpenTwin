@@ -47,7 +47,7 @@ ot::JsonDocument DataLakeHelper::executeQuery(ot::DataLakeAccessCfg& _config, mo
 	return clearTextResult;
 }
 
-void DataLakeHelper::createDefaultIndexes(const std::string& _collectionName, DataStorageAPI::DataLakeAPI& _dataLakeAPI)
+void DataLakeHelper::createDefaultIndexes(DataStorageAPI::DataLakeAPI& _dataLakeAPI)
 {
 	std::vector<std::string> defaultIndexes = { "Quantity" ,"Series" };
 	bsoncxx::builder::basic::document index{};
@@ -56,6 +56,14 @@ void DataLakeHelper::createDefaultIndexes(const std::string& _collectionName, Da
 		index.append(bsoncxx::builder::basic::kvp(indexName, 1));
 	}
 	_dataLakeAPI.getCollection().create_index(index.view());
+}
+
+void DataLakeHelper::createDefaultIndexes(const std::string& _collectionName)
+{
+	DataStorageAPI::DataLakeAPI results(_collectionName + getResultCollectionEnding());
+	createDefaultIndexes(results);
+	DataStorageAPI::DataLakeAPI transformed(_collectionName + getTransformedCollectionEnding());
+	createDefaultIndexes(transformed);
 }
 
 ot::JsonDocument DataLakeHelper::createClearTextResult(ot::DataLakeAccessCfg& _config, const ot::JsonDocument& _databaseResults)

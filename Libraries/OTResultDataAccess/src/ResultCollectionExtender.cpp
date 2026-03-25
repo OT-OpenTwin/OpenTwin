@@ -22,12 +22,12 @@
 #include "OTCore/Variable/VariableToStringConverter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTCore/MetadataEntry/MetadataEntryComperator.h"
-#include "OTResultDataAccess/ResultCollection/IndexHandler.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/QuantityContainerSerialiser.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTDataStorage/DataLakeHelper.h"
 // std header
 #include <set>
 #include <cassert>
@@ -146,8 +146,7 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescri
 	parameterIndices.insert(parameterIndices.end(), parameterIndicesNonConstant.begin(), parameterIndicesNonConstant.end());
 	quantityContainerSerialiser.storeDataPoints(_seriesMetadataIndex, parameterIndices, sharedParameterValues, allParameterValueIt, numberOfParameter, currentQuantityDescription);
 
-	IndexHandler indexHandler(m_collectionName);
-	indexHandler.createDefaultIndexes();
+	DataLakeHelper::createDefaultIndexes(m_collectionName);
 }
 
 void ResultCollectionExtender::addCampaignMetadata(std::shared_ptr<MetadataEntry> _metadata)

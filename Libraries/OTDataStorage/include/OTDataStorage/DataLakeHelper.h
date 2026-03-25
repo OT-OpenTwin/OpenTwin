@@ -12,7 +12,9 @@ public:
 	static ot::JsonDocument executeQuery(ot::DataLakeAccessCfg& _config, mongocxx::options::find _options);
 	static std::string getTransformedCollectionEnding() { return ".transformed"; }
 	static std::string getResultCollectionEnding() { return ".results"; }
-	static void createDefaultIndexes(const std::string& _collectionName, DataStorageAPI::DataLakeAPI& _dataLakeAPI);
+	static void createDefaultIndexes(DataStorageAPI::DataLakeAPI& _dataLakeAPI);
+	static void createDefaultIndexes(const std::string& _collectionName);
+
 private:
 	static const std::string m_resultDataField;
 	
