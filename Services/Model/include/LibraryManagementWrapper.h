@@ -46,4 +46,6 @@ private:
 	EntityBase* createAndInitializeEntity(const ot::LibraryElement& _importCfg, Model* _model);
 	bool checkEntityExists(const std::string& _entityPath, Model* _model);
 	void addEntityToModel(EntityBase* _entity, Model* _model);
+
+	//bool checkIfLibraryEntityContentMatches(const ot::LibraryElement& _importCfg, Model* _model, const std::list<std::string>& libraryElements);
 };

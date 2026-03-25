@@ -80,24 +80,70 @@ void ot::LibraryElement::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
 
 void ot::LibraryElement::setFromJsonObject(const ot::ConstJsonObject& _object) {
     // Basic information
-    m_name = ot::json::getString(_object, "Name");
-    m_version = ot::json::getInt64(_object, "Version");
+    if (_object.HasMember("Name")) {
+        m_name = ot::json::getString(_object, "Name");
+    } else {
+        m_name = "";
+    }
+
+    if (_object.HasMember("Version")) {
+        m_version = ot::json::getInt64(_object, "Version");
+    }
 
     // Origin information
-    m_fileName = ot::json::getString(_object, "FileName");
-    m_hash = ot::json::getString(_object, "Hash");
+    if (_object.HasMember("FileName")) {
+        m_fileName = ot::json::getString(_object, "FileName");
+    } else {
+        m_fileName = "";
+    }
+
+    if (_object.HasMember("Hash")) {
+        m_hash = ot::json::getString(_object, "Hash");
+    } else {
+        m_hash = "";
+    }
 
     // Model data
-    m_data = ot::json::getString(_object, "Data");
+    if (_object.HasMember("Data")) {
+        m_data = ot::json::getString(_object, "Data");
+    } else {
+        m_data = "";
+    }
 
     // Import context
-    m_requestingEntityID = ot::json::getUInt64(_object, "RequestingEntityID");
-    m_collectionName = ot::json::getString(_object, "CollectionName");
+    if (_object.HasMember("RequestingEntityID")) {
+        m_requestingEntityID = ot::json::getUInt64(_object, "RequestingEntityID");
+    }
 
-    m_callBackService = ot::json::getString(_object, "CallbackService");
-	m_className =ot::json::getString(_object, "EntityType");
-	m_newEntityFolder = ot::json::getString(_object, "NewEntityFolder");
-    m_propertyName = ot::json::getString(_object, "PropertyName");
+    if (_object.HasMember("CollectionName")) {
+        m_collectionName = ot::json::getString(_object, "CollectionName");
+    } else {
+        m_collectionName = "";
+    }
+
+    if (_object.HasMember("CallbackService")) {
+        m_callBackService = ot::json::getString(_object, "CallbackService");
+    } else {
+        m_callBackService = "";
+    }
+
+    if (_object.HasMember("EntityType")) {
+        m_className = ot::json::getString(_object, "EntityType");
+    } else {
+        m_className = "";
+    }
+
+    if (_object.HasMember("NewEntityFolder")) {
+        m_newEntityFolder = ot::json::getString(_object, "NewEntityFolder");
+    } else {
+        m_newEntityFolder = "";
+    }
+
+    if (_object.HasMember("PropertyName")) {
+        m_propertyName = ot::json::getString(_object, "PropertyName");
+    } else {
+        m_propertyName = "";
+    }
 
     // Deserialize metadata
     m_metaData.clear();

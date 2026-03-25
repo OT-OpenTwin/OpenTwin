@@ -41,7 +41,6 @@
 #include "OTModelEntities/Lms/LibraryEntityInterface.h"
 
 
-
 std::list<std::string> LibraryManagementWrapper::getCircuitModels() {
 
 	
@@ -222,12 +221,13 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 		modelProperty->setValueName(_importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
 		modelProperty->setValueID(circuitModelEntity->getEntityID());
 		modelProperty->setEntityContainerID(circuitModelFolderEntity->getEntityID());
+		entBase->updateFromProperties();
 	}
 	else {
 		modelProperty->setValueName("");
 	}
 	
-	entBase->updateFromProperties();
+	
 	entBase->storeToDataBase();
 	const std::string comment = "Property Updated";
 	ot::UIDList topoList{entBase->getEntityID()};
@@ -245,6 +245,19 @@ EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::Librar
 		return nullptr;
 	}
 
+
+	// Check if entity with the same name already exists and if the content of the entities matches
+	// Determine unique name
+
+	std::string	libraryElementFolderName = _importCfg.getNewEntityFolder();
+	std::list<std::string> libraryElements = _model->getListOfFolderItems(libraryElementFolderName, true);
+
+	
+
+	std::string entName = CreateNewUniqueTopologyName(libraryElements, libraryElementFolderName, _importCfg.getName());
+	entity->setName(entName);
+
+
 	// Initialize entity with model information
 	entity->setEntityID(_model->createEntityUID());
 	entity->setModelState(_model->getStateManager());
@@ -260,8 +273,7 @@ EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::Librar
 
 	libInterface->setLibraryElement(_importCfg);
 
-	std::string fullPath = _importCfg.getNewEntityFolder() + "/" + _importCfg.getName();
-	entity->setName(fullPath);
+	
 	entity->storeToDataBase();
 
 	return entity;
@@ -291,6 +303,23 @@ void LibraryManagementWrapper::addEntityToModel(EntityBase* _entity, Model* _mod
 	_model->addEntitiesToModel(topoIDs, topoVersions, forceVisible, dataIDs, dataVersions,
 		dataParent, "Added library entity", false, false, true);
 }
+
+//bool LibraryManagementWrapper::checkIfLibraryEntityContentMatches(const ot::LibraryElement& _importCfg, Model* _model, const std::list<std::string>& libraryElements) {
+//	for (const auto& elementPath : libraryElements) {
+//		EntityBase* entity = _model->findEntityFromName(elementPath);
+//		if (!entity) continue;
+//
+//		auto* libInterface = dynamic_cast<ot::LibraryEntityInterface*>(entity);
+//		if (!libInterface) continue;
+//
+//		// Use the virtual function - polymorphism handles the rest
+//		if (libInterface->hasMatchingContent(_importCfg)) {
+//			return true;
+//		}
+//	}
+//
+//	return false;
+//}
 
 void LibraryManagementWrapper::createLibraryEntityAndUpdateProperty(
     const ot::LibraryElement& _importCfg, 

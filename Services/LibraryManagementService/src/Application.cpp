@@ -381,15 +381,35 @@ std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document)
 }
 
 std::string Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
-	
-	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-	std::string modelUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+
+	ot::JsonDocument modelInfoDoc;
+	// Get the additional info string which contains serialized callback data
+	std::string additionalInfo = ot::json::getString(_document, OT_ACTION_PARAM_Info);
+
+	// Deserialize the callback information
+	ot::JsonDocument callbackInfoDoc;
+	callbackInfoDoc.fromJson(additionalInfo);
+	modelInfoDoc.AddMember("CollectionName", ot::JsonString(ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
+	modelInfoDoc.AddMember("RequestingEntityID", ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID), modelInfoDoc.GetAllocator());
+	modelInfoDoc.AddMember("CallbackService", ot::JsonString(ot::json::getString(callbackInfoDoc, "CallbackService"), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
+	modelInfoDoc.AddMember("EntityType", ot::JsonString(ot::json::getString(callbackInfoDoc, "EntityType"), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
+	modelInfoDoc.AddMember("NewEntityFolder", ot::JsonString(ot::json::getString(callbackInfoDoc, "NewEntityFolder"), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
+	modelInfoDoc.AddMember("PropertyName", ot::JsonString(ot::json::getString(_document, OT_ACTION_PARAM_PROPERTY_Name), modelInfoDoc.GetAllocator()), modelInfoDoc.GetAllocator());
+
+	// Create LibraryElementImportCfg and populate it with the complete modelInfoDoc
+	ot::LibraryElement importCfg;
+	importCfg.setFromJsonObject(modelInfoDoc.getConstObject());
 
 	ot::JsonDocument dialogCanceled;
 	dialogCanceled.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ModelDialogCanceled, dialogCanceled.GetAllocator()), dialogCanceled.GetAllocator());
-	dialogCanceled.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityID, dialogCanceled.GetAllocator());
 
-	std::string response = sendAsyncMessageToModel(dialogCanceled, modelUrl);
+	// Add the complete import configuration as a JSON object
+	ot::JsonObject importCfgObj;
+	importCfg.addToJsonObject(importCfgObj, dialogCanceled.GetAllocator());
+	dialogCanceled.AddMember(OT_ACTION_PARAM_Config, importCfgObj, dialogCanceled.GetAllocator());
+
+
+	std::string response = sendAsyncMessageToModel(dialogCanceled, importCfg.getCallBackService());
 	return "";
 }
 
