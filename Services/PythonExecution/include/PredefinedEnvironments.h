@@ -24,6 +24,7 @@
 namespace PredefinedEnvironments
 {
 	static std::string getPyritEnvironmentName() { return "PyritEnvironment"; }
+	static std::string getOpenEMSEnvironmentName() { return "OpenEMSEnvironment"; }
 	static std::string getBuildToolsEnvironmentName() { return "PythonBuildTools"; }
 	static std::string getCoreEnvironmentName() { return "CoreEnvironment"; }
 	static std::list<std::string> getMandatoryEnvironments()
@@ -40,7 +41,8 @@ namespace PredefinedEnvironments
 		{
 			getCoreEnvironmentName(),
 			getBuildToolsEnvironmentName(),
-			getPyritEnvironmentName()
+			getPyritEnvironmentName(),
+			getOpenEMSEnvironmentName()
 		};
 	}
 }

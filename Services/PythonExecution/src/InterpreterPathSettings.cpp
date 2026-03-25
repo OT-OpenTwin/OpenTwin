@@ -41,6 +41,12 @@ InterpreterPathSettings::InterpreterPathSettings(const std::string& _predefinedE
 		OT_LOG_D("Initialize Pyrit environment");
 		m_customEnvironmentName = PredefinedEnvironments::getPyritEnvironmentName();
 	}
+	else if (_predefinedEnvironmentName == "OpenEMS")
+	{
+		// Environment is a special, which already exists in the python interpreter installation
+		OT_LOG_D("Initialize OpenEMS environment");
+		m_customEnvironmentName = PredefinedEnvironments::getOpenEMSEnvironmentName();
+	}
 	else if (_predefinedEnvironmentName == "Core")
 	{
 		m_customEnvironmentName = "";

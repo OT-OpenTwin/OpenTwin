@@ -185,7 +185,7 @@ void PackageHandler::importMissingPackages()
         if (m_environmentState == EnvironmentState::initialised)
         {
             //Here we have an initialised environment, so we need to restart the interpreter with a new environment
-            //In case that we have a named environment like Pyrit (not connected) we can not extend the environment
+            //In case that we have a named environment like Pyrit or OpenEMS (not connected) we can not extend the environment
             if (m_currentManifest == nullptr)
             {
                 throw std::exception("Packages can only be added if the execution is happening in a custom environment. Select an environment and run again.");

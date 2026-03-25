@@ -62,9 +62,6 @@ bool CommunicationHandler::sendToClient(const ot::JsonDocument& _document, std::
 bool CommunicationHandler::sendConfigToClient(void) {
 	OT_LOG_D("Sending configuration to client");
 
-	if (!this->sendServiceInfoToClient()) {
-		return false;
-	}
 	if (!this->sendModelConfigToClient()) {
 		return false;
 	}
@@ -74,7 +71,10 @@ bool CommunicationHandler::sendConfigToClient(void) {
 	if (!this->sendDataBaseConfigToClient()) {
 		return false;
 	}
-	
+	if (!this->sendServiceInfoToClient()) {
+		return false;
+	}
+
 	OT_LOG_D("Client configuration completed");
 
 	m_isInitializingClient = false;
@@ -124,7 +124,7 @@ bool CommunicationHandler::sendServiceInfoToClient(void) {
 	if (!m_serviceAndSessionInfoSet) {
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYRIT, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_OPENEMS, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
 

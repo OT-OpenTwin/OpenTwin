@@ -35,7 +35,7 @@
 #include <thread>
 
 #ifdef _DEBUG
-	#define _SUBSERVICEDEBUG
+	//#define _SUBSERVICEDEBUG
 #endif
 
 SubprocessManager::SubprocessManager(Application* _app) 
@@ -198,7 +198,7 @@ void SubprocessManager::worker(std::string _projectName) {
 			// Encode project name to base64 to avoid issues with special characters
 			const std::string encodedString = ot::String::toBase64Url(_projectName);
 
-			m_communicationHandler = new CommunicationHandler(this, OT_INFO_SERVICE_TYPE_PYRIT "_" + encodedString);
+			m_communicationHandler = new CommunicationHandler(this, OT_INFO_SERVICE_TYPE_OPENEMS "_" + encodedString);
 #endif		
 		}
 

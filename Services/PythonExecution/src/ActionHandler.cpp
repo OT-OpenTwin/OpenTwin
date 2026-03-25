@@ -136,6 +136,14 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc)
 			OT_LOG_D("Initialise Pyrit environment");
 			m_pythonAPI.initializeEnvironment("Pyrit");
 		}
+		else if (serviceName == OT_INFO_SERVICE_TYPE_OPENEMS) {
+			OT_LOG_D("Initialise UID Generator");
+			const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
+			const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
+			Application::instance().initialiseUIDGenerator(sessionCount, serviceID);
+			OT_LOG_D("Initialise OpenEMS environment");
+			m_pythonAPI.initializeEnvironment("OpenEMS");
+		}
 		else if (serviceName == OT_INFO_SERVICE_TYPE_STUDIOSUITE)
 		{
 			OT_LOG_D("Initialise UID Generator");

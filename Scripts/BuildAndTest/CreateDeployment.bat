@@ -196,8 +196,8 @@ REM GETDP
 COPY "%GETDP_BIN%\*.*" "%OT_DEPLOYMENT_DIR%"
 
 REM FDTD
-MKDIR "%OT_DEPLOYMENT_DIR%\openEMS"
-XCOPY /S "%OPENTWIN_THIRDPARTY_ROOT%\openEMS\openEMS_v0.0.36\*.*" "%OT_DEPLOYMENT_DIR%\openEMS"
+MKDIR "%OT_DEPLOYMENT_DIR%\openEMSSolver"
+XCOPY /S "%OPENTWIN_THIRDPARTY_ROOT%\openEMS\openEMS_v0.0.36\*.*" "%OT_DEPLOYMENT_DIR%\openEMSSolver"
 
 REM FDTD
 REM COPY "%FDTD_BIN%\*.*" "%OT_DEPLOYMENT_DIR%"
@@ -211,6 +211,7 @@ COPY "%OT_PYTHON_BIN%\Release\python.exe" "%OT_DEPLOYMENT_DIR%"
 COPY "%OT_PYTHON_BIN%\Release\python311_release._pth" "%OT_DEPLOYMENT_DIR%\python311._pth"
 COPY "%OT_PYTHON_BIN%\Release\python311.dll" "%OT_DEPLOYMENT_DIR%"
 XCOPY /S "%OT_PYTHON_ROOT%\Environments\PyritEnvironment\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\PyritEnvironment\" 
+XCOPY /S "%OT_PYTHON_ROOT%\Environments\OpenEMSEnvironment\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\OpenEMSEnvironment\" 
 XCOPY /S "%OT_PYTHON_ROOT%\Environments\PythonBuildTools\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\PythonBuildTools\" 
 XCOPY /S "%OT_PYTHON_ROOT%\Environments\CoreEnvironment\Lib\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\CoreEnvironment\Lib\" 
 XCOPY /S "%OT_PYTHON_ROOT%\Environments\CoreEnvironment\DLLs\Release\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\CoreEnvironment\DLLs\" 

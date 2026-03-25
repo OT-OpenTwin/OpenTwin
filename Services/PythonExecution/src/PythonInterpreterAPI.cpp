@@ -67,7 +67,7 @@ void PythonInterpreterAPI::initializeEnvironment(const std::string& _environment
 {
 	OT_LOG_D("Initialize environment from predefined environment " + _environmentName);
 
-	//Pyrit next to a custom environment or instead ?
+	//Pyrit or OpenEMS next to a custom environment or instead ?
 	m_interpreterPathSettings = InterpreterPathSettings(_environmentName);
 	
 	m_wrapper.initializePythonInterpreter(m_interpreterPathSettings);

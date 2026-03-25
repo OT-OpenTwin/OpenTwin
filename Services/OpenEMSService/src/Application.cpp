@@ -359,36 +359,43 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		return;
 	}
 
-	EntityPropertiesSelection* problemType = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Problem type"));
-	assert(problemType != nullptr);
+	//EntityPropertiesSelection* problemType = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Problem type"));
+	//assert(problemType != nullptr);
 
-	if (problemType == nullptr)
-	{
-		this->getUiComponent()->displayMessage("ERROR: Unable to read problem type for solver.\n");
-		return;
-	}
+	//if (problemType == nullptr)
+	//{
+	//	this->getUiComponent()->displayMessage("ERROR: Unable to read problem type for solver.\n");
+	//	return;
+	//}
 
-	std::string command;
+	//std::string command;
 
-	if (problemType->getValue() == "Custom")
-	{
-		command = problemTypeScript(solverEntity);
-	}
-	else if (problemType->getValue() == "Electrostatics")
-	{
+	//if (problemType->getValue() == "Custom")
+	//{
+	//	command = problemTypeScript(solverEntity);
+	//}
+	//else if (problemType->getValue() == "Electrostatics")
+	//{
 
 
-	}
-	else
-	{
-		this->getUiComponent()->displayMessage("ERROR: Unknown problem type.\n");
-		return;
-	}
+	//}
+	//else
+	//{
+	//	this->getUiComponent()->displayMessage("ERROR: Unknown problem type.\n");
+	//	return;
+	//}
 
-	if (command.empty())
-	{
-		return;
-	}
+	//if (command.empty())
+	//{
+	//	return;
+	//}
+
+	std::string command = "import CSXCAD\n"
+						  "import openEMS\n"
+						  "print(CSXCAD)\n"
+						  "print(openEMS)\n"
+						  "print(\"Hello\")\n";
+
 
 
 	//EntityPropertiesEntityList* mesh = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Mesh"));
@@ -439,6 +446,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	//						"for i in range(5):\n"
 	//						"    print(f'Python schreibt: {i}')\n"
 	//						"    time.sleep(1)";
+
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Command, doc.GetAllocator()), doc.GetAllocator());
