@@ -66,9 +66,6 @@ bool EntitySolverOpenEMS::updateFromProperties(void)
 {
 	bool updatePropertiesGrid = false;
 
-	// Now we need to update the entity after a property change
-	assert(getProperties().anyPropertyNeedsUpdate());
-
 	// Since there is a change now, we need to set the modified flag
 	setModified();
 

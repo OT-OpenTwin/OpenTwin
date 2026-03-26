@@ -81,9 +81,6 @@ if not defined OPEN_TWIN_LOGGING_MODE (
 	REM set OPEN_TWIN_LOGGING_MODE=ALL_LOG_FLAGS
 )
 
-REM Set the environment variable which is required for running OpenEMS
-set "OPENEMS_INSTALL_PATH=%~dp0openEMSSolver"
-
 pushd "%~dp0" 
 call OpenTwin_set_up_LDS.bat %1
 popd

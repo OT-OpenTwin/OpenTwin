@@ -216,11 +216,6 @@ void Application::handleAddSolver()
 
 	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
-	std::string scriptFolderName, scriptName;
-	ot::UID scriptFolderID{ 0 }, scriptID{ 0 };
-
-	ot::ModelServiceAPI::getAvailableScripts(scriptFolderName, scriptFolderID, scriptName, scriptID);
-
 	// Create the new solver item and store it in the data base
 	EntitySolverOpenEMS* solverEntity = new EntitySolverOpenEMS(entityID, nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
@@ -656,6 +651,7 @@ std::string Application::buildScript()
 	std::string text =
 		"import os, tempfile\n"
 		"import numpy as np\n"
+		"os.environ[\"OPENEMS_INSTALL_PATH\"] = \"C:\\OT\\OpenTwin\\Deployment\\openEMSSolver\"\n"
 		"\n"
 		"from CSXCAD  import ContinuousStructure\n"
 		"from openEMS import openEMS\n"
