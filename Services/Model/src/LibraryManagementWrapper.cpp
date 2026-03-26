@@ -222,6 +222,7 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 		modelProperty->setValueID(circuitModelEntity->getEntityID());
 		modelProperty->setEntityContainerID(circuitModelFolderEntity->getEntityID());
 		entBase->updateFromProperties();
+		entBase->setModified();
 	}
 	else {
 		modelProperty->setValueName("");
